@@ -32,13 +32,15 @@ pipeline {
         label 'centos-stable'
       }
       steps {
-        cambpmCopyArtifacts("cambpm-ce/cambpm-main/${env.BRANCH_NAME}")
-        cambpmStash("platform-stash-runtime",
-                    ".m2/org/camunda/**/*-SNAPSHOT/**",
-                    "**/qa/**,**/*qa*/**,**/*.zip,**/*.tar.gz")
-        cambpmStash("platform-stash-qa",
-                    ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**",
-                    "**/*.zip,**/*.tar.gz")
+        cambpmConditionalRetry {
+          cambpmCopyArtifacts("cambpm-ce/cambpm-main/${env.BRANCH_NAME}")
+          cambpmStash("platform-stash-runtime",
+                      ".m2/org/camunda/**/*-SNAPSHOT/**",
+                      "**/qa/**,**/*qa*/**,**/*.zip,**/*.tar.gz")
+          cambpmStash("platform-stash-qa",
+                      ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**",
+                      "**/*.zip,**/*.tar.gz")
+        }
       }
     }
     stage('check-sql-scripts') {
@@ -46,7 +48,9 @@ pipeline {
         label 'centos-stable'
       }
       steps {
-        sh '.ci/scripts/check-sql-scripts.sh'
+        cambpmConditionalRetry {
+          sh '.ci/scripts/check-sql-scripts.sh'
+        }
       }
     }
     stage('Standalone QA tests') {
@@ -62,7 +66,9 @@ pipeline {
             label 'h2'
           }
           steps {
-            cambpmRunMavenByStageType('sql-scripts', 'h2')
+            cambpmConditionalRetry {
+              cambpmRunMavenByStageType('sql-scripts', 'h2')
+            }
           }
           post {
             failure {
@@ -79,7 +85,9 @@ pipeline {
             label 'h2'
           }
           steps {
-            cambpmRunMaven('distro/wildfly/subsystem', 'test', runtimeStash: true)
+            cambpmConditionalRetry {
+              cambpmRunMaven('distro/wildfly/subsystem', 'test', runtimeStash: true)
+            }
           }
           post {
             always {
@@ -98,7 +106,9 @@ pipeline {
             label 'h2'
           }
           steps {
-            cambpmRunMavenByStageType('upgrade-database', 'h2')
+            cambpmConditionalRetry {
+              cambpmRunMavenByStageType('upgrade-database', 'h2')
+            }
           }
           post {
             always {
@@ -120,7 +130,9 @@ pipeline {
             label 'h2'
           }
           steps {
-            cambpmRunMavenByStageType('instance-migration', 'h2')
+            cambpmConditionalRetry {
+              cambpmRunMavenByStageType('instance-migration', 'h2')
+            }
           }
           post {
             always {
@@ -142,7 +154,9 @@ pipeline {
             label 'h2'
           }
           steps {
-            cambpmRunMavenByStageType('old-engine', 'h2')
+            cambpmConditionalRetry {
+              cambpmRunMavenByStageType('old-engine', 'h2')
+            }
           }
           post {
             always {
@@ -164,7 +178,9 @@ pipeline {
             label 'h2'
           }
           steps {
-            cambpmRunMavenByStageType('rolling-update', 'h2')
+            cambpmConditionalRetry {
+              cambpmRunMavenByStageType('rolling-update', 'h2')
+            }
           }
           post {
             always {
@@ -184,7 +200,9 @@ pipeline {
             label 'h2'
           }
           steps {
-            cambpmRunMavenByStageType('large-data-tests', 'h2')
+            cambpmConditionalRetry {
+              cambpmRunMavenByStageType('large-data-tests', 'h2')
+            }
           }
           post {
             always {
@@ -231,10 +249,12 @@ pipeline {
         stages {
           stage('JDK') {
             steps {
-              cambpmRunMaven('.',
-                  'install source:jar source:test-jar -pl \'!webapps\',\'!distro/jbossas7/subsystem\' -Pdistro,distro-ce,distro-wildfly',
-                  jdkVersion: env.JDK,
-                  runtimeStash: true)
+              cambpmConditionalRetry {
+                cambpmRunMaven('.',
+                    'install source:jar source:test-jar -pl \'!webapps\',\'!distro/jbossas7/subsystem\' -Pdistro,distro-ce,distro-wildfly',
+                    jdkVersion: env.JDK,
+                    runtimeStash: true)
+              }
             }
             post {
               always {
