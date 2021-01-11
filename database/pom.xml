@@ -25,7 +25,7 @@
     <version.oracle>${version.oracle-11}</version.oracle>
     <version.mariadb>1.1.8</version.mariadb>
     <version.mariadb.galera>1.6.3</version.mariadb.galera>
-    <version.mysql>5.1.21</version.mysql>
+    <version.mysql>8.0.22</version.mysql>
     <version.sqlserver>8.2.2.jre8</version.sqlserver>
     <version.db2-11.1>11.1.1.1</version.db2-11.1>
     <version.db2-10.5>10.5.0.5</version.db2-10.5>
@@ -284,8 +284,8 @@
       <id>mysql</id>
       <properties>
         <database.type>mysql</database.type>
-        <database.driver>com.mysql.jdbc.Driver</database.driver>
-        <database.datasource.class>com.mysql.jdbc.jdbc2.optional.MysqlDataSource</database.datasource.class>
+        <database.driver>com.mysql.cj.jdbc.Driver</database.driver>
+        <database.datasource.class>com.mysql.cj.jdbc.MysqlDataSource</database.datasource.class>
       </properties>
 
       <dependencies>
