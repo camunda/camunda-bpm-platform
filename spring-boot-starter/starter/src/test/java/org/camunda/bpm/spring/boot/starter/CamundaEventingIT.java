@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.spring.boot.starter.event.TaskEvent;
+import org.camunda.bpm.spring.boot.starter.test.nonpa.BoundaryEventServiceTask;
 import org.camunda.bpm.spring.boot.starter.test.nonpa.TestApplication;
 import org.camunda.bpm.spring.boot.starter.test.nonpa.TestEventCaptor;
 import org.junit.After;
@@ -38,6 +39,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.Collections;
 import java.util.Date;
 
 import static junit.framework.TestCase.fail;
@@ -183,14 +185,37 @@ public class CamundaEventingIT extends AbstractCamundaAutoConfigurationIT {
     // given
     eventCaptor.clear();
     instance = runtime.startProcessInstanceByKey("eventingWithBoundaryEvent");
-
-    // then 10
+    runtime.signalEventReceived("countSignal");
+    // then 13
     // 1 for process (start)
     // 3 for start event (start, take, end)
+    // 3 for signal event (start, take, end)
     // 3 for service task (start, take, end)
     // 2 for end event (start, end)
     // 1 for process (end)
-    int expectedCount = 1 + 3 + 3 + 2 + 1;
+    int expectedCount = 1 + 3 + 3 + 3 + 2 + 1;
+    assertThat(eventCaptor.executionEvents).hasSize(expectedCount);
+    assertThat(eventCaptor.immutableExecutionEvents).hasSize(expectedCount);
+    assertThat(eventCaptor.transactionExecutionEvents).hasSize(expectedCount);
+    assertThat(eventCaptor.transactionImmutableExecutionEvents).hasSize(expectedCount);
+  }
+
+  @Test
+  public final void shouldEventExecutionWhenBoundaryEventWithErrorExists() {
+    // given
+    eventCaptor.clear();
+    instance = runtime.startProcessInstanceByKey("eventingWithBoundaryEvent",
+            Collections.singletonMap(BoundaryEventServiceTask.ERROR_NAME, "testError"));
+    runtime.signalEventReceived("countSignal");
+    // then 15
+    // 1 for process (start)
+    // 3 for start event (start, take, end)
+    // 3 for signal event (start, take, end)
+    // 2 for service task (start, end)
+    // 3 for boundary error event (start, take, end)
+    // 2 for end event (start, end)
+    // 1 for process (end)
+    int expectedCount = 1 + 3 + 3 + 2 + 3 + 2 + 1;
     assertThat(eventCaptor.executionEvents).hasSize(expectedCount);
     assertThat(eventCaptor.immutableExecutionEvents).hasSize(expectedCount);
     assertThat(eventCaptor.transactionExecutionEvents).hasSize(expectedCount);
