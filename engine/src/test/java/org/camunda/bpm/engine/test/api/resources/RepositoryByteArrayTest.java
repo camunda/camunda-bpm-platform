@@ -23,6 +23,7 @@ import static org.junit.Assert.assertNotNull;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.time.DateUtils;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RepositoryService;
@@ -31,8 +32,10 @@ import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.identity.Picture;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.Resource;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -73,11 +76,13 @@ public class RepositoryByteArrayTest {
   @After
   public void cleanUp() {
     identityService.deleteUser(USER_ID);
+    ClockUtil.reset();
   }
 
+  @RequiredDatabase(excludes = DbSqlSessionFactory.MYSQL)
   @Test
   public void testResourceBinary() {
-    Date fixedDate = new Date();
+    Date fixedDate = ClockUtil.getCurrentTime();
     ClockUtil.setCurrentTime(fixedDate);
 
     String bpmnDeploymentId = testRule.deploy("org/camunda/bpm/engine/test/repository/one.bpmn20.xml").getId();
@@ -89,9 +94,17 @@ public class RepositoryByteArrayTest {
     checkResource(fixedDate, cmmnDeplymentId);
   }
 
+  @RequiredDatabase(includes = DbSqlSessionFactory.MYSQL)
+  @Test
+  public void testResourceBinary_MySQL() {
+    ClockUtil.setCurrentTime(DateUtils.setMilliseconds(ClockUtil.getCurrentTime(), 0));
+    testResourceBinary();
+  }
+
+  @RequiredDatabase(excludes = DbSqlSessionFactory.MYSQL)
   @Test
   public void testFormsBinaries() {
-    Date fixedDate = new Date();
+    Date fixedDate = ClockUtil.getCurrentTime();
     ClockUtil.setCurrentTime(fixedDate);
 
     String deploymentId = testRule.deploy("org/camunda/bpm/engine/test/api/form/DeployedFormsProcess.bpmn20.xml",
@@ -108,10 +121,18 @@ public class RepositoryByteArrayTest {
     }
   }
 
+  @RequiredDatabase(includes = DbSqlSessionFactory.MYSQL)
+  @Test
+  public void testFormsBinaries_MySQL() {
+    ClockUtil.setCurrentTime(DateUtils.setMilliseconds(ClockUtil.getCurrentTime(), 0));
+    testFormsBinaries();
+  }
+
+  @RequiredDatabase(excludes = DbSqlSessionFactory.MYSQL)
   @Test
   public void testUserPictureBinary() {
     // when
-    Date fixedDate = new Date();
+    Date fixedDate = ClockUtil.getCurrentTime();
     ClockUtil.setCurrentTime(fixedDate);
     User user = identityService.newUser(USER_ID);
     identityService.saveUser(user);
@@ -128,6 +149,13 @@ public class RepositoryByteArrayTest {
     assertNotNull(byteArrayEntity);
     assertEquals(fixedDate.toString(), byteArrayEntity.getCreateTime().toString());
     assertEquals(REPOSITORY.getValue(), byteArrayEntity.getType());
+  }
+
+  @RequiredDatabase(includes = DbSqlSessionFactory.MYSQL)
+  @Test
+  public void testUserPictureBinary_MySQL() {
+    ClockUtil.setCurrentTime(DateUtils.setMilliseconds(ClockUtil.getCurrentTime(), 0));
+    testUserPictureBinary();
   }
 
 

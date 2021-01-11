@@ -42,6 +42,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.commons.lang3.time.DateUtils;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
@@ -53,8 +54,10 @@ import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.Direction;
 import org.camunda.bpm.engine.impl.QueryOrderingProperty;
 import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.history.event.HistoricCaseActivityInstanceEventEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseActivityInstanceEntity;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.runtime.CaseExecution;
@@ -253,6 +256,7 @@ public class HistoricCaseActivityInstanceTest extends CmmnTest {
     assertStateQuery(COMPLETED, TERMINATED, TERMINATED, TERMINATED);
   }
 
+  @RequiredDatabase(excludes = DbSqlSessionFactory.MYSQL)
   @Deployment
   @Test
   public void testHistoricCaseActivityInstanceDates() {
@@ -348,6 +352,15 @@ public class HistoricCaseActivityInstanceTest extends CmmnTest {
     assertCount(6, historicQuery().endedBefore(afterEnd));
 
     assertCount(0, historicQuery().endedBefore(created).endedAfter(afterEnd));
+  }
+
+  @RequiredDatabase(includes = DbSqlSessionFactory.MYSQL)
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricCaseActivityInstanceTest" +
+      ".testHistoricCaseActivityInstanceDates.cmmn"})
+  @Test
+  public void testHistoricCaseActivityInstanceDates_MySQL() {
+    ClockUtil.setCurrentTime(DateUtils.setMilliseconds(ClockUtil.getCurrentTime(), 0));
+    testHistoricCaseActivityInstanceDates();
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithManualActivation.cmmn"})

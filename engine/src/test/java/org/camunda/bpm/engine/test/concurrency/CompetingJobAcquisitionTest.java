@@ -20,22 +20,29 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import org.apache.commons.lang3.time.DateUtils;
 import org.camunda.bpm.engine.CrdbTransactionRetryException;
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.AcquireJobsCmd;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.jobexecutor.AcquiredJobs;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 import org.slf4j.Logger;
+
+import java.util.Date;
 
 
 /**
@@ -78,6 +85,12 @@ public class CompetingJobAcquisitionTest {
     runtimeService = engineRule.getRuntimeService();
   }
 
+  @After
+  public void reset() {
+    ClockUtil.reset();
+  }
+
+  @RequiredDatabase(excludes = DbSqlSessionFactory.MYSQL)
   @Deployment
   @Test
   public void testCompetingJobAcquisitions() {
@@ -111,6 +124,15 @@ public class CompetingJobAcquisitionTest {
       // a `CrdbTransactionRetryException` to the caller.
       assertThat(threadTwo.exception).isInstanceOf(CrdbTransactionRetryException.class);
     }
+  }
+
+  @RequiredDatabase(includes = DbSqlSessionFactory.MYSQL)
+  @Deployment(resources = {"org/camunda/bpm/engine/test/concurrency/CompetingJobAcquisitionTest" +
+      ".testCompetingJobAcquisitions.bpmn20.xml"})
+  @Test
+  public void testCompetingJobAcquisitions_MySQL() {
+    ClockUtil.setCurrentTime(DateUtils.setMilliseconds(ClockUtil.getCurrentTime(), 0));
+    testCompetingJobAcquisitions();
   }
 
   public class JobAcquisitionThread extends ControllableThread {

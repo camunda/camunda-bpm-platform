@@ -55,8 +55,10 @@ import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
@@ -72,6 +74,7 @@ import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -106,6 +109,11 @@ public class HistoricProcessInstanceTest {
     historyService = engineRule.getHistoryService();
     taskService = engineRule.getTaskService();
     caseService = engineRule.getCaseService();
+  }
+
+  @After
+  public void reset() {
+    ClockUtil.reset();
   }
 
   @Test
@@ -1177,11 +1185,12 @@ public class HistoricProcessInstanceTest {
     assertEquals(1, historicProcessInstance.getProcessDefinitionVersion().intValue());
   }
 
+  @RequiredDatabase(excludes = DbSqlSessionFactory.MYSQL)
   @Test
   public void testHistoricProcInstExecutedActivityInInterval() {
     // given proc instance with wait state
-    Calendar now = Calendar.getInstance();
-    ClockUtil.setCurrentTime(now.getTime());
+    Date now = ClockUtil.getCurrentTime();
+    ClockUtil.setCurrentTime(now);
     BpmnModelInstance model = Bpmn.createExecutableProcess("proc")
                                   .startEvent()
                                     .userTask()
@@ -1189,8 +1198,7 @@ public class HistoricProcessInstanceTest {
                                   .done();
     deployment(model);
 
-    Calendar hourFromNow = (Calendar) now.clone();
-    hourFromNow.add(Calendar.HOUR_OF_DAY, 1);
+    Date hourFromNow = DateUtils.addHours(now, 1);
 
     runtimeService.startProcessInstanceByKey("proc");
 
@@ -1198,8 +1206,8 @@ public class HistoricProcessInstanceTest {
     // and before a hour after start time
     HistoricProcessInstance historicProcessInstance =
       historyService.createHistoricProcessInstanceQuery()
-        .executedActivityAfter(now.getTime())
-        .executedActivityBefore(hourFromNow.getTime())
+        .executedActivityAfter(now)
+        .executedActivityBefore(hourFromNow)
         .singleResult();
 
 
@@ -1208,129 +1216,163 @@ public class HistoricProcessInstanceTest {
 
 
     // when proc inst is not in interval
-    Calendar sixHoursFromNow = (Calendar) now.clone();
-    sixHoursFromNow.add(Calendar.HOUR_OF_DAY, 6);
+    Date sixHoursFromNow = DateUtils.addHours(now, 6);
 
 
     historicProcessInstance =
       historyService.createHistoricProcessInstanceQuery()
-        .executedActivityAfter(hourFromNow.getTime())
-        .executedActivityBefore(sixHoursFromNow.getTime())
+        .executedActivityAfter(hourFromNow)
+        .executedActivityBefore(sixHoursFromNow)
         .singleResult();
 
     //then query should return NO result
     assertNull(historicProcessInstance);
   }
 
+  @RequiredDatabase(includes = DbSqlSessionFactory.MYSQL)
+  @Test
+  public void testHistoricProcInstExecutedActivityInInterval_MySQL() {
+    ClockUtil.setCurrentTime(DateUtils.setMilliseconds(ClockUtil.getCurrentTime(), 0));
+    testHistoricProcInstExecutedActivityInInterval();
+  }
+
+  @RequiredDatabase(excludes = DbSqlSessionFactory.MYSQL)
   @Test
   public void testHistoricProcInstExecutedActivityAfter() {
     // given
-    Calendar now = Calendar.getInstance();
-    ClockUtil.setCurrentTime(now.getTime());
+    Date now = ClockUtil.getCurrentTime();
+    ClockUtil.setCurrentTime(now);
     BpmnModelInstance model = Bpmn.createExecutableProcess("proc").startEvent().endEvent().done();
     deployment(model);
 
-    Calendar hourFromNow = (Calendar) now.clone();
-    hourFromNow.add(Calendar.HOUR_OF_DAY, 1);
+    Date hourFromNow = DateUtils.addHours(now, 1);
 
     runtimeService.startProcessInstanceByKey("proc");
 
     //when query historic process instance which has executed an activity after the start time
-    HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().executedActivityAfter(now.getTime()).singleResult();
+    HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().executedActivityAfter(now).singleResult();
 
     //then query returns result
     assertNotNull(historicProcessInstance);
 
     //when query historic proc inst with execute activity after a hour of the starting time
-    historicProcessInstance = historyService.createHistoricProcessInstanceQuery().executedActivityAfter(hourFromNow.getTime()).singleResult();
+    historicProcessInstance = historyService.createHistoricProcessInstanceQuery().executedActivityAfter(hourFromNow).singleResult();
 
     //then query returns no result
     assertNull(historicProcessInstance);
   }
 
+  @RequiredDatabase(includes = DbSqlSessionFactory.MYSQL)
+  @Test
+  public void testHistoricProcInstExecutedActivityAfter_MySQL() {
+    ClockUtil.setCurrentTime(DateUtils.setMilliseconds(ClockUtil.getCurrentTime(), 0));
+    testHistoricProcInstExecutedActivityAfter();
+  }
+
+  @RequiredDatabase(excludes = DbSqlSessionFactory.MYSQL)
   @Test
   public void testHistoricProcInstExecutedActivityBefore() {
     // given
-    Calendar now = Calendar.getInstance();
-    ClockUtil.setCurrentTime(now.getTime());
+    Date now = ClockUtil.getCurrentTime();
+    ClockUtil.setCurrentTime(now);
     BpmnModelInstance model = Bpmn.createExecutableProcess("proc").startEvent().endEvent().done();
     deployment(model);
 
-    Calendar hourBeforeNow = (Calendar) now.clone();
-    hourBeforeNow.add(Calendar.HOUR, -1);
+    Date hourBeforeNow = DateUtils.addHours(now, -1);
 
     runtimeService.startProcessInstanceByKey("proc");
 
     //when query historic process instance which has executed an activity before the start time
-    HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().executedActivityBefore(now.getTime()).singleResult();
+    HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().executedActivityBefore(now).singleResult();
 
     //then query returns result, since the query is less-then-equal
     assertNotNull(historicProcessInstance);
 
     //when query historic proc inst which executes an activity an hour before the starting time
-    historicProcessInstance = historyService.createHistoricProcessInstanceQuery().executedActivityBefore(hourBeforeNow.getTime()).singleResult();
+    historicProcessInstance = historyService.createHistoricProcessInstanceQuery().executedActivityBefore(hourBeforeNow).singleResult();
 
     //then query returns no result
     assertNull(historicProcessInstance);
   }
 
+  @RequiredDatabase(includes = DbSqlSessionFactory.MYSQL)
+  @Test
+  public void testHistoricProcInstExecutedActivityBefore_MySQL() {
+    ClockUtil.setCurrentTime(DateUtils.setMilliseconds(ClockUtil.getCurrentTime(), 0));
+    testHistoricProcInstExecutedActivityBefore();
+  }
+
+  @RequiredDatabase(excludes = DbSqlSessionFactory.MYSQL)
   @Test
   public void testHistoricProcInstExecutedActivityWithTwoProcInsts() {
     // given
     BpmnModelInstance model = Bpmn.createExecutableProcess("proc").startEvent().endEvent().done();
     deployment(model);
 
-    Calendar now = Calendar.getInstance();
-    Calendar hourBeforeNow = (Calendar) now.clone();
-    hourBeforeNow.add(Calendar.HOUR, -1);
+    Date now = ClockUtil.getCurrentTime();
+    ClockUtil.setCurrentTime(now);
+    Date hourBeforeNow = DateUtils.addHours(now, -1);
 
-    ClockUtil.setCurrentTime(hourBeforeNow.getTime());
+    ClockUtil.setCurrentTime(hourBeforeNow);
     runtimeService.startProcessInstanceByKey("proc");
 
-    ClockUtil.setCurrentTime(now.getTime());
+    ClockUtil.setCurrentTime(now);
     runtimeService.startProcessInstanceByKey("proc");
 
     //when query execute activity between now and an hour ago
     List<HistoricProcessInstance> list = historyService.createHistoricProcessInstanceQuery()
-                                                       .executedActivityAfter(hourBeforeNow.getTime())
-                                                       .executedActivityBefore(now.getTime()).list();
+                                                       .executedActivityAfter(hourBeforeNow)
+                                                       .executedActivityBefore(now).list();
 
     //then two historic process instance have to be returned
     assertEquals(2, list.size());
 
     //when query execute activity after an half hour before now
-    Calendar halfHour = (Calendar) now.clone();
-    halfHour.add(Calendar.MINUTE, -30);
+    Date halfHour = DateUtils.addMinutes(now, -30);
     HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
-      .executedActivityAfter(halfHour.getTime()).singleResult();
+      .executedActivityAfter(halfHour).singleResult();
 
     //then only the latest historic process instance is returned
     assertNotNull(historicProcessInstance);
   }
 
+  @RequiredDatabase(includes = DbSqlSessionFactory.MYSQL)
+  @Test
+  public void testHistoricProcInstExecutedActivityWithTwoProcInsts_MySQL() {
+    ClockUtil.setCurrentTime(DateUtils.setMilliseconds(ClockUtil.getCurrentTime(), 0));
+    testHistoricProcInstExecutedActivityWithTwoProcInsts();
+  }
 
+  @RequiredDatabase(excludes = DbSqlSessionFactory.MYSQL)
   @Test
   public void testHistoricProcInstExecutedActivityWithEmptyInterval() {
     // given
-    Calendar now = Calendar.getInstance();
-    ClockUtil.setCurrentTime(now.getTime());
+    Date now = ClockUtil.getCurrentTime();
+    ClockUtil.setCurrentTime(now);
     BpmnModelInstance model = Bpmn.createExecutableProcess("proc").startEvent().endEvent().done();
     deployment(model);
 
-    Calendar hourBeforeNow = (Calendar) now.clone();
-    hourBeforeNow.add(Calendar.HOUR, -1);
+    Date hourBeforeNow = DateUtils.addHours(now, -1);
 
     runtimeService.startProcessInstanceByKey("proc");
 
     //when query historic proc inst which executes an activity an hour before and after the starting time
     HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
-      .executedActivityBefore(hourBeforeNow.getTime())
-      .executedActivityAfter(hourBeforeNow.getTime()).singleResult();
+      .executedActivityBefore(hourBeforeNow)
+      .executedActivityAfter(hourBeforeNow).singleResult();
 
     //then query returns no result
     assertNull(historicProcessInstance);
   }
 
+  @RequiredDatabase(includes = DbSqlSessionFactory.MYSQL)
+  @Test
+  public void testHistoricProcInstExecutedActivityWithEmptyInterval_MySQL() {
+    ClockUtil.setCurrentTime(DateUtils.setMilliseconds(ClockUtil.getCurrentTime(), 0));
+    testHistoricProcInstExecutedActivityWithEmptyInterval();
+  }
+
+  @RequiredDatabase(excludes = DbSqlSessionFactory.MYSQL)
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testHistoricProcInstExecutedJobAfter() {
@@ -1340,10 +1382,9 @@ public class HistoricProcessInstanceTest {
     BpmnModelInstance model = Bpmn.createExecutableProcess("proc").startEvent().endEvent().done();
     deployment(model);
 
-    Calendar now = Calendar.getInstance();
-    ClockUtil.setCurrentTime(now.getTime());
-    Calendar hourFromNow = (Calendar) now.clone();
-    hourFromNow.add(Calendar.HOUR_OF_DAY, 1);
+    Date now = ClockUtil.getCurrentTime();
+    ClockUtil.setCurrentTime(now);
+    Date hourFromNow = DateUtils.addHours(now, 1);
 
     runtimeService.startProcessInstanceByKey("async");
     Job job = managementService.createJobQuery().singleResult();
@@ -1352,19 +1393,27 @@ public class HistoricProcessInstanceTest {
 
     //when query historic process instance which has executed an job after the start time
     HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
-      .executedJobAfter(now.getTime()).singleResult();
+      .executedJobAfter(now).singleResult();
 
     //then query returns only a single process instance
     assertNotNull(historicProcessInstance);
 
     //when query historic proc inst with execute job after a hour of the starting time
-    historicProcessInstance = historyService.createHistoricProcessInstanceQuery().executedJobAfter(hourFromNow.getTime()).singleResult();
+    historicProcessInstance = historyService.createHistoricProcessInstanceQuery().executedJobAfter(hourFromNow).singleResult();
 
     //then query returns no result
     assertNull(historicProcessInstance);
   }
 
+  @RequiredDatabase(includes = DbSqlSessionFactory.MYSQL)
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void testHistoricProcInstExecutedJobAfter_MySQL() {
+    ClockUtil.setCurrentTime(DateUtils.setMilliseconds(ClockUtil.getCurrentTime(), 0));
+    testHistoricProcInstExecutedJobAfter();
+  }
 
+  @RequiredDatabase(excludes = DbSqlSessionFactory.MYSQL)
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testHistoricProcInstExecutedJobBefore() {
@@ -1374,10 +1423,9 @@ public class HistoricProcessInstanceTest {
     BpmnModelInstance model = Bpmn.createExecutableProcess("proc").startEvent().endEvent().done();
     deployment(model);
 
-    Calendar now = Calendar.getInstance();
-    ClockUtil.setCurrentTime(now.getTime());
-    Calendar hourBeforeNow = (Calendar) now.clone();
-    hourBeforeNow.add(Calendar.HOUR_OF_DAY, -1);
+    Date now = ClockUtil.getCurrentTime();
+    ClockUtil.setCurrentTime(now);
+    Date hourBeforeNow = DateUtils.addHours(now, -1);
 
     runtimeService.startProcessInstanceByKey("async");
     Job job = managementService.createJobQuery().singleResult();
@@ -1386,18 +1434,27 @@ public class HistoricProcessInstanceTest {
 
     //when query historic process instance which has executed an job before the start time
     HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
-      .executedJobBefore(now.getTime()).singleResult();
+      .executedJobBefore(now).singleResult();
 
     //then query returns only a single process instance since before is less-then-equal
     assertNotNull(historicProcessInstance);
 
     //when query historic proc inst with executed job before an hour of the starting time
-    historicProcessInstance = historyService.createHistoricProcessInstanceQuery().executedJobBefore(hourBeforeNow.getTime()).singleResult();
+    historicProcessInstance = historyService.createHistoricProcessInstanceQuery().executedJobBefore(hourBeforeNow).singleResult();
 
     //then query returns no result
     assertNull(historicProcessInstance);
   }
 
+  @RequiredDatabase(includes = DbSqlSessionFactory.MYSQL)
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void testHistoricProcInstExecutedJobBefore_MySQL() {
+    ClockUtil.setCurrentTime(DateUtils.setMilliseconds(ClockUtil.getCurrentTime(), 0));
+    testHistoricProcInstExecutedJobBefore();
+  }
+
+  @RequiredDatabase(excludes = DbSqlSessionFactory.MYSQL)
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testHistoricProcInstExecutedJobWithTwoProcInsts() {
@@ -1408,38 +1465,45 @@ public class HistoricProcessInstanceTest {
     BpmnModelInstance model = Bpmn.createExecutableProcess("proc").startEvent().endEvent().done();
     deployment(model);
 
-    Calendar now = Calendar.getInstance();
-    ClockUtil.setCurrentTime(now.getTime());
-    Calendar hourBeforeNow = (Calendar) now.clone();
-    hourBeforeNow.add(Calendar.HOUR_OF_DAY, -1);
+    Date now = ClockUtil.getCurrentTime();
+    ClockUtil.setCurrentTime(now);
+    Date hourBeforeNow = DateUtils.addHours(now, -1);
 
-    ClockUtil.setCurrentTime(hourBeforeNow.getTime());
+    ClockUtil.setCurrentTime(hourBeforeNow);
     runtimeService.startProcessInstanceByKey("async");
     Job job = managementService.createJobQuery().singleResult();
     managementService.executeJob(job.getId());
 
-    ClockUtil.setCurrentTime(now.getTime());
+    ClockUtil.setCurrentTime(now);
     runtimeService.startProcessInstanceByKey("async");
     runtimeService.startProcessInstanceByKey("proc");
 
     //when query executed job between now and an hour ago
     List<HistoricProcessInstance> list = historyService.createHistoricProcessInstanceQuery()
-      .executedJobAfter(hourBeforeNow.getTime())
-      .executedJobBefore(now.getTime()).list();
+      .executedJobAfter(hourBeforeNow)
+      .executedJobBefore(now).list();
 
     //then the two async historic process instance have to be returned
     assertEquals(2, list.size());
 
     //when query execute activity after an half hour before now
-    Calendar halfHour = (Calendar) now.clone();
-    halfHour.add(Calendar.MINUTE, -30);
+    Date halfHour = DateUtils.addMinutes(now, -30);
     HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
-      .executedJobAfter(halfHour.getTime()).singleResult();
+      .executedJobAfter(halfHour).singleResult();
 
     //then only the latest async historic process instance is returned
     assertNotNull(historicProcessInstance);
   }
 
+  @RequiredDatabase(includes = DbSqlSessionFactory.MYSQL)
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void testHistoricProcInstExecutedJobWithTwoProcInsts_MySQL() {
+    ClockUtil.setCurrentTime(DateUtils.setMilliseconds(ClockUtil.getCurrentTime(), 0));
+    testHistoricProcInstExecutedJobWithTwoProcInsts();
+  }
+
+  @RequiredDatabase(excludes = DbSqlSessionFactory.MYSQL)
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testHistoricProcInstExecutedJobWithEmptyInterval() {
@@ -1449,10 +1513,9 @@ public class HistoricProcessInstanceTest {
     BpmnModelInstance model = Bpmn.createExecutableProcess("proc").startEvent().endEvent().done();
     deployment(model);
 
-    Calendar now = Calendar.getInstance();
-    ClockUtil.setCurrentTime(now.getTime());
-    Calendar hourBeforeNow = (Calendar) now.clone();
-    hourBeforeNow.add(Calendar.HOUR_OF_DAY, -1);
+    Date now = ClockUtil.getCurrentTime();
+    ClockUtil.setCurrentTime(now);
+    Date hourBeforeNow = DateUtils.addHours(now, -1);
 
     runtimeService.startProcessInstanceByKey("async");
     Job job = managementService.createJobQuery().singleResult();
@@ -1461,11 +1524,19 @@ public class HistoricProcessInstanceTest {
 
     //when query historic proc inst with executed job before and after an hour before the starting time
     HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
-      .executedJobBefore(hourBeforeNow.getTime())
-      .executedJobAfter(hourBeforeNow.getTime()).singleResult();
+      .executedJobBefore(hourBeforeNow)
+      .executedJobAfter(hourBeforeNow).singleResult();
 
     //then query returns no result
     assertNull(historicProcessInstance);
+  }
+
+  @RequiredDatabase(includes = DbSqlSessionFactory.MYSQL)
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void testHistoricProcInstExecutedJobWithEmptyInterval_MySQL() {
+    ClockUtil.setCurrentTime(DateUtils.setMilliseconds(ClockUtil.getCurrentTime(), 0));
+    testHistoricProcInstExecutedJobWithEmptyInterval();
   }
 
   @Test

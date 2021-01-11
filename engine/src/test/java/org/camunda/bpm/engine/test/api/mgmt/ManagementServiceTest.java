@@ -31,6 +31,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.time.DateUtils;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NullValueException;
@@ -38,6 +39,7 @@ import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.AcquireJobsCmd;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -48,6 +50,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.TableMetaData;
@@ -79,6 +82,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTest {
     if (tearDownTelemetry) {
       managementService.toggleTelemetry(false);
     }
+    ClockUtil.reset();
   }
 
   @Test
@@ -587,6 +591,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTest {
     managementService.executeJob(timerJob.getId());
   }
 
+  @RequiredDatabase(excludes = DbSqlSessionFactory.MYSQL)
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
   @Test
   public void testSetJobDuedate() {
@@ -602,7 +607,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTest {
     assertNotNull(timerJob.getDuedate());
 
     Calendar cal = Calendar.getInstance();
-    cal.setTime(new Date());
+    cal.setTime(ClockUtil.getCurrentTime());
     cal.add(Calendar.DATE, 3); // add 3 days on the actual date
     managementService.setJobDuedate(timerJob.getId(), cal.getTime());
 
@@ -610,10 +615,16 @@ public class ManagementServiceTest extends PluggableProcessEngineTest {
         .processInstanceId(processInstance.getId())
         .singleResult();
 
-    // normalize date for mysql dropping fractional seconds in time values
-    int SECOND = 1000;
-    assertEquals((cal.getTime().getTime() / SECOND) * SECOND,
-        (newTimerJob.getDuedate().getTime() / SECOND) * SECOND);
+    assertThat(cal.getTime())
+        .isEqualTo(newTimerJob.getDuedate());
+  }
+
+  @RequiredDatabase(includes = DbSqlSessionFactory.MYSQL)
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
+  @Test
+  public void testSetJobDuedate_MySQL() {
+    ClockUtil.setCurrentTime(DateUtils.setMilliseconds(ClockUtil.getCurrentTime(), 0));
+    testSetJobDuedate();
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})

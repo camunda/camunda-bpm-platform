@@ -59,7 +59,9 @@ import org.camunda.bpm.engine.history.HistoricExternalTaskLog;
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Incident;
@@ -2811,6 +2813,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     }
   }
 
+  @RequiredDatabase(excludes = DbSqlSessionFactory.MYSQL)
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
   @Test
   public void testExtendLockTime() {
@@ -2822,7 +2825,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
       List<LockedExternalTask> lockedTasks = externalTaskService.fetchAndLock(1, WORKER_ID).topic(TOPIC_NAME, LOCK_TIME).execute();
 
       // when
-      Date extendLockTime = new Date();
+      Date extendLockTime = ClockUtil.getCurrentTime();
       ClockUtil.setCurrentTime(extendLockTime);
 
       externalTaskService.extendLock(lockedTasks.get(0).getId(), WORKER_ID, LOCK_TIME);
@@ -2830,12 +2833,20 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
       // then
       ExternalTask taskWithExtendedLock = externalTaskService.createExternalTaskQuery().locked().singleResult();
       assertNotNull(taskWithExtendedLock);
-      AssertUtil.assertEqualsSecondPrecision(new Date(extendLockTime.getTime() + LOCK_TIME), taskWithExtendedLock.getLockExpirationTime());
+      assertThat(new Date(extendLockTime.getTime() + LOCK_TIME)).isEqualTo(taskWithExtendedLock.getLockExpirationTime());
 
     } finally {
       ClockUtil.setCurrentTime(oldCurrentTime);
     }
 
+  }
+
+  @RequiredDatabase(includes = DbSqlSessionFactory.MYSQL)
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  @Test
+  public void testExtendLockTime_MySQL() {
+    ClockUtil.setCurrentTime(DateUtils.setMilliseconds(ClockUtil.getCurrentTime(), 0));
+    testExtendLockTime();
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")

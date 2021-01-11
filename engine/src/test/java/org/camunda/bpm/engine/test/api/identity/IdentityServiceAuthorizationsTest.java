@@ -55,11 +55,14 @@ import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.TenantQuery;
 import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TenantEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.junit.After;
 import org.junit.Assert;
@@ -77,6 +80,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
   public void tearDown() throws Exception {
     processEngineConfiguration.setAuthorizationEnabled(false);
     cleanupAfterTest();
+    ClockUtil.reset();
 
   }
 
@@ -229,9 +233,9 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
 
   }
 
+  @RequiredDatabase(excludes = DbSqlSessionFactory.MYSQL)
   @Test
   public void testUserUnlock() throws ParseException {
-
     // crate user while still in god-mode:
     String userId = "jonny";
     User jonny = identityService.newUser(userId);
@@ -269,9 +273,17 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     assertEquals(0, lockedUser.getAttempts());
   }
 
+  @RequiredDatabase(includes = DbSqlSessionFactory.MYSQL)
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  @Test
+  public void testUserUnlock_MySQL() throws ParseException {
+    ClockUtil.setCurrentTime(DateUtils.setMilliseconds(ClockUtil.getCurrentTime(), 0));
+    testUserUnlock();
+  }
+
+  @RequiredDatabase(excludes = DbSqlSessionFactory.MYSQL)
   @Test
   public void testUserUnlockWithoutAuthorization() throws ParseException {
-
     // crate user while still in god-mode:
     String userId = "jonny";
     User jonny = identityService.newUser(userId);
@@ -307,6 +319,13 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     assertNotNull(lockedUser);
     assertNotNull(lockedUser.getLockExpirationTime());
     assertEquals(maxNumOfLoginAttempts, lockedUser.getAttempts());
+  }
+
+  @RequiredDatabase(includes = DbSqlSessionFactory.MYSQL)
+  @Test
+  public void testUserUnlockWithoutAuthorization_MySQL() throws ParseException {
+    ClockUtil.setCurrentTime(DateUtils.setMilliseconds(ClockUtil.getCurrentTime(), 0));
+    testUserUnlockWithoutAuthorization();
   }
 
   @Test

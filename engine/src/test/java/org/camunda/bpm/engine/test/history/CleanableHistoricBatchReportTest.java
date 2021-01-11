@@ -37,6 +37,8 @@ import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.history.CleanableHistoricBatchReportResult;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -281,6 +283,7 @@ public class CleanableHistoricBatchReportTest {
     checkResultNumbers(historyService.createCleanableHistoricBatchReport().singleResult(), 0, 18, null);
   }
 
+  @RequiredDatabase(excludes = DbSqlSessionFactory.MYSQL)
   @Test
   public void testReportZeroTTL() {
     Map<String, String> map = new HashMap<>();
@@ -301,6 +304,13 @@ public class CleanableHistoricBatchReportTest {
     CleanableHistoricBatchReportResult result = historyService.createCleanableHistoricBatchReport().singleResult();
     assertNotNull(result);
     checkResultNumbers(result, 1, 1, modOperationsTTL);
+  }
+
+  @RequiredDatabase(includes = DbSqlSessionFactory.MYSQL)
+  @Test
+  public void testReportZeroTTL_MySQL() {
+    ClockUtil.setCurrentTime(DateUtils.setMilliseconds(ClockUtil.getCurrentTime(), 0));
+    testReportZeroTTL();
   }
 
   @Test

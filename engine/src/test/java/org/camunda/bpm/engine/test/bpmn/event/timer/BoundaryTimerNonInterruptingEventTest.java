@@ -28,14 +28,18 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.commons.lang.time.DateUtils;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.delegate.TaskListener;
+import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
@@ -625,12 +629,13 @@ public class BoundaryTimerNonInterruptingEventTest {
     assertEquals(2, managementService.createJobQuery().withRetriesLeft().count());
   }
 
+  @RequiredDatabase(excludes = DbSqlSessionFactory.MYSQL)
   @Deployment
   @Test
   public void testUpdateTimerRepeat() {
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-    Calendar currentTime = Calendar.getInstance();
-    ClockUtil.setCurrentTime(currentTime.getTime());
+
+    ClockUtil.setCurrentTime(ClockUtil.getCurrentTime());
 
     // GIVEN
     // Start process instance with a non-interrupting boundary timer event
@@ -667,8 +672,7 @@ public class BoundaryTimerNonInterruptingEventTest {
     TimerEntity updatedTimerJob = (TimerEntity) managementService.createJobQuery().singleResult();
     assertEquals("R3/PT3H", updatedTimerJob.getRepeat());
 
-    currentTime.add(Calendar.HOUR, 1);
-    ClockUtil.setCurrentTime(currentTime.getTime());
+    ClockUtil.setCurrentTime(DateUtils.addHours(ClockUtil.getCurrentTime(), 1));
     managementService.executeJob(timerJob.getId());
 
     // and when the timer executes, there should be 2 user tasks waiting
@@ -680,9 +684,18 @@ public class BoundaryTimerNonInterruptingEventTest {
     // finally, the second timer job should have a DueDate in 3 hours instead of 1 hour
     // and its repeat property should be the one we updated
     TimerEntity secondTimerJob = (TimerEntity) managementService.createJobQuery().singleResult();
-    currentTime.add(Calendar.HOUR, 3);
+    ClockUtil.setCurrentTime(DateUtils.addHours(ClockUtil.getCurrentTime(), 3));
     assertEquals("R3/PT3H", secondTimerJob.getRepeat());
-    assertEquals(sdf.format(currentTime.getTime()), sdf.format(secondTimerJob.getDuedate()));
+    assertThat(ClockUtil.getCurrentTime()).isEqualTo(secondTimerJob.getDuedate());
+  }
+
+  @RequiredDatabase(includes = DbSqlSessionFactory.MYSQL)
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/timer" +
+      "/BoundaryTimerNonInterruptingEventTest.testUpdateTimerRepeat.bpmn20.xml"})
+  @Test
+  public void testUpdateTimerRepeat_MySQL() {
+    ClockUtil.setCurrentTime(DateUtils.setMilliseconds(ClockUtil.getCurrentTime(), 0));
+    testUpdateTimerRepeat();
   }
 
   @Test

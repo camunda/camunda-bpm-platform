@@ -38,6 +38,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.time.DateUtils;
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -49,7 +50,9 @@ import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.OptimizeService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Attachment;
@@ -491,10 +494,11 @@ public class GetHistoricOperationLogsForOptimizeTest {
     assertThat(userOperationsLog.get(3).getEntityType(), is(EntityTypes.PROCESS_INSTANCE));
   }
 
+  @RequiredDatabase(excludes = DbSqlSessionFactory.MYSQL)
   @Test
   public void occurredAfterParameterWorks() {
     // given
-    Date now = new Date();
+    Date now = ClockUtil.getCurrentTime();
     ClockUtil.setCurrentTime(now);
     final ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("process");
     runtimeService.suspendProcessInstanceById(processInstance.getProcessInstanceId());
@@ -518,10 +522,18 @@ public class GetHistoricOperationLogsForOptimizeTest {
     assertTrue(allowedOperationsTypes.contains(userOperationsLog.get(1).getOperationType()));
   }
 
+  @RequiredDatabase(includes = DbSqlSessionFactory.MYSQL)
+  @Test
+  public void occurredAfterParameterWorks_MySQL() {
+    ClockUtil.setCurrentTime(DateUtils.setMilliseconds(ClockUtil.getCurrentTime(), 0));
+    occurredAfterParameterWorks();
+  }
+
+  @RequiredDatabase(excludes = DbSqlSessionFactory.MYSQL)
   @Test
   public void occurredAtParameterWorks() {
     // given
-    Date now = new Date();
+    Date now = ClockUtil.getCurrentTime();
     ClockUtil.setCurrentTime(now);
     final ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("process");
     runtimeService.suspendProcessInstanceById(processInstance.getProcessInstanceId());
@@ -537,6 +549,13 @@ public class GetHistoricOperationLogsForOptimizeTest {
     // then
     assertThat(userOperationsLog.size(), is(1));
     assertThat(userOperationsLog.get(0).getOperationType(), is(OPERATION_TYPE_SUSPEND));
+  }
+
+  @RequiredDatabase(includes = DbSqlSessionFactory.MYSQL)
+  @Test
+  public void occurredAtParameterWorks_MySQL() {
+    ClockUtil.setCurrentTime(DateUtils.setMilliseconds(ClockUtil.getCurrentTime(), 0));
+    occurredAtParameterWorks();
   }
 
   @Test

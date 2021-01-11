@@ -24,6 +24,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang3.time.DateUtils;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -34,7 +35,9 @@ import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.OptimizeService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.persistence.entity.optimize.OptimizeHistoricIdentityLinkLogEntity;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.IdentityLinkType;
@@ -209,6 +212,7 @@ public class GetHistoricIdentityLinkLogsForOptimizeTest {
     assertThat(identityLinkLogs.get(0).getType(), is(IdentityLinkType.ASSIGNEE));
   }
 
+  @RequiredDatabase(excludes = DbSqlSessionFactory.MYSQL)
   @Test
   public void occurredAfterParameterWorks() {
     // given
@@ -221,7 +225,7 @@ public class GetHistoricIdentityLinkLogsForOptimizeTest {
     testHelper.deploy(simpleDefinition);
     runtimeService.startProcessInstanceByKey("process");
     String taskId = taskService.createTaskQuery().singleResult().getId();
-    Date now = new Date();
+    Date now = ClockUtil.getCurrentTime();
     ClockUtil.setCurrentTime(now);
     taskService.addCandidateUser(taskId, userId);
 
@@ -239,6 +243,13 @@ public class GetHistoricIdentityLinkLogsForOptimizeTest {
 
     // then
     assertThat(identityLinkLogs.size(), is(2));
+  }
+
+  @RequiredDatabase(includes = DbSqlSessionFactory.MYSQL)
+  @Test
+  public void occurredAfterParameterWorks_MySQL() {
+    ClockUtil.setCurrentTime(DateUtils.setMilliseconds(ClockUtil.getCurrentTime(), 0));
+    occurredAfterParameterWorks();
   }
 
   @Test

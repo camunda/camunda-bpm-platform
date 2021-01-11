@@ -23,6 +23,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang3.time.DateUtils;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -34,6 +35,8 @@ import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.OptimizeService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
@@ -118,6 +121,7 @@ public class GetCompletedHistoricProcessInstancesForOptimizeTest {
     assertThatInstanceHasAllImportantInformation(completedHistoricProcessInstances.get(0));
   }
 
+  @RequiredDatabase(excludes = DbSqlSessionFactory.MYSQL)
   @Test
   public void fishedAfterParameterWorks() {
      // given
@@ -126,7 +130,7 @@ public class GetCompletedHistoricProcessInstancesForOptimizeTest {
       .endEvent()
       .done();
     testHelper.deploy(simpleDefinition);
-    Date now = new Date();
+    Date now = ClockUtil.getCurrentTime();
     ClockUtil.setCurrentTime(now);
     runtimeService.startProcessInstanceByKey("process");
     Date nowPlus2Seconds = new Date(now.getTime() + 2000L);
@@ -141,6 +145,14 @@ public class GetCompletedHistoricProcessInstancesForOptimizeTest {
     assertThat(completedHistoricProcessInstances.size(), is(1));
   }
 
+  @RequiredDatabase(includes = DbSqlSessionFactory.MYSQL)
+  @Test
+  public void fishedAfterParameterWorks_MySQL() {
+    ClockUtil.setCurrentTime(DateUtils.setMilliseconds(ClockUtil.getCurrentTime(), 0));
+    fishedAfterParameterWorks();
+  }
+
+  @RequiredDatabase(excludes = DbSqlSessionFactory.MYSQL)
   @Test
   public void fishedAtParameterWorks() {
      // given
@@ -149,7 +161,7 @@ public class GetCompletedHistoricProcessInstancesForOptimizeTest {
       .endEvent()
       .done();
     testHelper.deploy(simpleDefinition);
-    Date now = new Date();
+    Date now = ClockUtil.getCurrentTime();
     ClockUtil.setCurrentTime(now);
     ProcessInstance processInstance =
       runtimeService.startProcessInstanceByKey("process");
@@ -164,6 +176,13 @@ public class GetCompletedHistoricProcessInstancesForOptimizeTest {
     // then
     assertThat(completedHistoricProcessInstances.size(), is(1));
     assertThat(completedHistoricProcessInstances.get(0).getId(), is(processInstance.getId()));
+  }
+
+  @RequiredDatabase(includes = DbSqlSessionFactory.MYSQL)
+  @Test
+  public void fishedAtParameterWorks_MySQL() {
+    ClockUtil.setCurrentTime(DateUtils.setMilliseconds(ClockUtil.getCurrentTime(), 0));
+    fishedAtParameterWorks();
   }
 
   @Test

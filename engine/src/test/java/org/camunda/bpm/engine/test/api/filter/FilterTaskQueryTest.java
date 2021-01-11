@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.gson.JsonObject;
+import org.apache.commons.lang3.time.DateUtils;
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.filter.Filter;
@@ -45,9 +46,12 @@ import org.camunda.bpm.engine.impl.TaskQueryImpl;
 import org.camunda.bpm.engine.impl.TaskQueryProperty;
 import org.camunda.bpm.engine.impl.TaskQueryVariableValue;
 import org.camunda.bpm.engine.impl.VariableOrderProperty;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.json.JsonTaskQueryConverter;
 import org.camunda.bpm.engine.impl.persistence.entity.FilterEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -141,6 +145,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
         taskService.deleteTask(task.getId(), true);
       }
     }
+    ClockUtil.reset();
   }
 
   @Test
@@ -2008,11 +2013,12 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     assertThat(filterService.count(filter.getId())).isEqualTo(1L);
   }
 
+  @RequiredDatabase(excludes = DbSqlSessionFactory.MYSQL)
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   @Test
   public void testDueDate() {
     // given
-    Date date = new Date();
+    Date date = ClockUtil.getCurrentTime();
     String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
 
     Task task = taskService.createTaskQuery()
@@ -2034,6 +2040,14 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
 
     // then
     assertThat(filterService.count(filter.getId())).isEqualTo(1L);
+  }
+
+  @RequiredDatabase(includes = DbSqlSessionFactory.MYSQL)
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @Test
+  public void testDueDate_MySQL() {
+    ClockUtil.setCurrentTime(DateUtils.setMilliseconds(ClockUtil.getCurrentTime(), 0));
+    testDueDate();
   }
 
   @Test

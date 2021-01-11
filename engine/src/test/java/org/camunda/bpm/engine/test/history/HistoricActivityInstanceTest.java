@@ -29,13 +29,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.time.DateUtils;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -47,6 +50,7 @@ import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.After;
 import org.junit.Test;
 
 /**
@@ -56,6 +60,11 @@ import org.junit.Test;
  */
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
 public class HistoricActivityInstanceTest extends PluggableProcessEngineTest {
+
+  @After
+  public void reset() {
+    ClockUtil.reset();
+  }
 
   @Deployment
   @Test
@@ -74,6 +83,7 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTest {
     assertTrue(historicActivityInstance.getDurationInMillis() >= 0);
   }
 
+  @RequiredDatabase(excludes = DbSqlSessionFactory.MYSQL)
   @Deployment
   @Test
   public void testHistoricActivityInstanceReceive() {
@@ -107,6 +117,15 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTest {
     assertNotNull(historicActivityInstance.getStartTime());
     assertTrue(historicActivityInstance.getDurationInMillis() >= 1000);
     assertTrue(((HistoricActivityInstanceEventEntity)historicActivityInstance).getDurationRaw() >= 1000);
+  }
+
+  @RequiredDatabase(includes = DbSqlSessionFactory.MYSQL)
+  @Deployment(resources = { "org/camunda/bpm/engine/test/history/HistoricActivityInstanceTest" +
+      ".testHistoricActivityInstanceReceive.bpmn20.xml" })
+  @Test
+  public void testHistoricActivityInstanceReceive_MySQL() {
+    ClockUtil.setCurrentTime(DateUtils.setMilliseconds(ClockUtil.getCurrentTime(), 0));
+    testHistoricActivityInstanceReceive();
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/history/HistoricActivityInstanceTest.testHistoricActivityInstanceReceive.bpmn20.xml" })
