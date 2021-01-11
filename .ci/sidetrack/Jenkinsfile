@@ -58,13 +58,15 @@ pipeline {
         label 'centos-stable'
       }
       steps {
-        cambpmCopyArtifacts("cambpm-ce/cambpm-main/${env.BRANCH_NAME}")
-        cambpmStash("platform-stash-runtime",
-                    ".m2/org/camunda/**/*-SNAPSHOT/**",
-                    "**/qa/**,**/*qa*/**,**/*.zip,**/*.tar.gz")
-        cambpmStash("platform-stash-qa",
-                    ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**",
-                    "**/*.zip,**/*.tar.gz")
+        cambpmConditionalRetry {
+          cambpmCopyArtifacts("cambpm-ce/cambpm-main/${env.BRANCH_NAME}")
+          cambpmStash("platform-stash-runtime",
+                      ".m2/org/camunda/**/*-SNAPSHOT/**",
+                      "**/qa/**,**/*qa*/**,**/*.zip,**/*.tar.gz")
+          cambpmStash("platform-stash-qa",
+                      ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**",
+                      "**/*.zip,**/*.tar.gz")
+        }
       }
     }
     stage('UNIT DB tests') {
@@ -91,8 +93,10 @@ pipeline {
         stages {
           stage('UNIT test') {
             steps {
-              echo("UNIT DB Test Stage: ${env.STAGE_TYPE}-${env.DB}")
-              cambpmRunMavenByStageType(env.STAGE_TYPE, env.DB)
+              cambpmConditionalRetry {
+                echo("UNIT DB Test Stage: ${env.STAGE_TYPE}-${env.DB}")
+                cambpmRunMavenByStageType(env.STAGE_TYPE, env.DB)
+              }
             }
             post {
               always {
