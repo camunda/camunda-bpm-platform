@@ -1731,6 +1731,56 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
       .hasMessageContaining("Propagation of bpmn error errorCode failed.");
   }
 
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.externalTaskWithNestedErrorEventDefinitionExpressionIncludesErrorMessage.bpmn20.xml"})
+  public void shouldResolveExpressionWithErrorMessageInNestedErrorEventDefinitionOnFailure() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskWithNestedErrorEventDefinition");
+    List<LockedExternalTask> externalTasks = externalTaskService
+        .fetchAndLock(1, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    assertThat(externalTasks).hasSize(1);
+    LockedExternalTask task = externalTasks.get(0);
+
+    // when
+    externalTaskService.handleFailure(task.getId(), WORKER_ID, "myErrorMessage", "myErrorDetails", 0, 3000L);
+
+    // then
+    // expression was evaluated to true
+    // error was caught
+    // flow continued to user task
+    List<Task> tasks = taskService.createTaskQuery().list();
+    assertThat(tasks).hasSize(1);
+    assertThat(tasks.get(0).getName()).isEqualTo("userTask");
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.externalTaskWithNestedErrorEventDefinitionExpressionIncludesNullErrorMessage.bpmn20.xml"})
+  public void shouldResolveExpressionWithErrorMessageInNestedErrorEventDefinitionOnComplete() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskWithNestedErrorEventDefinition");
+    List<LockedExternalTask> externalTasks = externalTaskService
+        .fetchAndLock(1, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    assertThat(externalTasks).hasSize(1);
+    LockedExternalTask task = externalTasks.get(0);
+
+    // when
+    externalTaskService.complete(task.getId(), WORKER_ID);
+
+    // then
+    // expression was evaluated to true
+    // error was caught
+    // flow continued to user task
+    List<Task> tasks = taskService.createTaskQuery().list();
+    assertThat(tasks).hasSize(1);
+    assertThat(tasks.get(0).getName()).isEqualTo("userTask");
+  }
+
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
   @Test
   public void testLocking() {
@@ -3968,6 +4018,8 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     assertThat(lockedExternalTasks).hasSize(1);
     assertThat(lockedExternalTasks.get(0).getExtensionProperties()).isEmpty();
   }
+
+
 
   protected Date nowPlus(long millis) {
     return new Date(ClockUtil.getCurrentTime().getTime() + millis);
