@@ -27,31 +27,31 @@ pipeline {
       steps {
         cambpmConditionalRetry {
 
-//          cambpmRunMaven('.',
-//              'clean install source:jar -Pdistro,distro-ce,distro-wildfly,distro-webjar com.mycila:license-maven-plugin:check',
-//              withCatch: false,
-//              withNpm: true)
+          cambpmRunMaven('.',
+              'clean install source:jar -Pdistro,distro-ce,distro-wildfly,distro-webjar com.mycila:license-maven-plugin:check',
+              withCatch: false,
+              withNpm: true)
 
           // archive all .jar, .pom, .xml, .txt runtime artifacts + required .war/.zip/.tar.gz for EE pipeline
           // add a new line for each group of artifacts
-//          cambpmArchiveArtifacts('.m2/org/camunda/**/*-SNAPSHOT/**/*.jar,.m2/org/camunda/**/*-SNAPSHOT/**/*.pom,.m2/org/camunda/**/*-SNAPSHOT/**/*.xml,.m2/org/camunda/**/*-SNAPSHOT/**/*.txt',
-//                                 '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*frontend-sources.zip',
-//                                 '.m2/org/camunda/**/*-SNAPSHOT/**/license-book*.zip',
-//                                 '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-jboss-modules*.zip',
-//                                 '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-*-assembly*.tar.gz',
-//                                 '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*.war',
-//                                 '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-engine-rest*.war',
-//                                 '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-example-invoice*.war',
-//                                 '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-h2-webapp*.war')
-//
-//          cambpmStash("platform-stash-runtime",
-//                      ".m2/org/camunda/**/*-SNAPSHOT/**",
-//                      "**/qa/**,**/*qa*/**,**/*.zip,**/*.tar.gz")
-//          cambpmStash("platform-stash-archives",
-//                      ".m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.zip,.m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.tar.gz")
-//          cambpmStash("platform-stash-qa",
-//                      ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**",
-//                      "**/*.zip,**/*.tar.gz")
+          cambpmArchiveArtifacts('.m2/org/camunda/**/*-SNAPSHOT/**/*.jar,.m2/org/camunda/**/*-SNAPSHOT/**/*.pom,.m2/org/camunda/**/*-SNAPSHOT/**/*.xml,.m2/org/camunda/**/*-SNAPSHOT/**/*.txt',
+                                 '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*frontend-sources.zip',
+                                 '.m2/org/camunda/**/*-SNAPSHOT/**/license-book*.zip',
+                                 '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-jboss-modules*.zip',
+                                 '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-*-assembly*.tar.gz',
+                                 '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*.war',
+                                 '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-engine-rest*.war',
+                                 '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-example-invoice*.war',
+                                 '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-h2-webapp*.war')
+
+          cambpmStash("platform-stash-runtime",
+                      ".m2/org/camunda/**/*-SNAPSHOT/**",
+                      "**/qa/**,**/*qa*/**,**/*.zip,**/*.tar.gz")
+          cambpmStash("platform-stash-archives",
+                      ".m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.zip,.m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.tar.gz")
+          cambpmStash("platform-stash-qa",
+                      ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**",
+                      "**/*.zip,**/*.tar.gz")
 
           script {
             if (env.BRANCH_NAME == cambpmDefaultBranch()) {
