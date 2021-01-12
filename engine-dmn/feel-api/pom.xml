@@ -10,7 +10,9 @@
 
   <artifactId>camunda-engine-feel-api</artifactId>
   <name>camunda DMN - engine FEEL - API</name>
-
+  <properties>
+    <camunda.artifact>org.camunda.bpm.dmn.feel.impl</camunda.artifact>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.camunda.commons</groupId>

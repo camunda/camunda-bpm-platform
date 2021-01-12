@@ -13,7 +13,13 @@
 
   <name>camunda BPM - CMMN Model API</name>
   <inceptionYear>2014</inceptionYear>
-
+  <properties>
+    <camunda.artifact>org.camunda.bpm.model.cmmn</camunda.artifact>
+    <camunda.osgi.export>
+      !org.camunda.bpm.model.cmmn.schema.*,
+      ${camunda.osgi.export.pkg};${camunda.osgi.version};-noimport:=true
+    </camunda.osgi.export>
+  </properties>
   <dependencies>
 
     <dependency>
@@ -40,11 +46,6 @@
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
-        <configuration>
-          <instructions>
-            <Export-Package>org.camunda.bpm.model*</Export-Package>
-          </instructions>
-        </configuration>
         <executions>
           <execution>
             <phase>generate-sources</phase>

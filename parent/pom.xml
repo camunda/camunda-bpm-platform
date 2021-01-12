@@ -71,7 +71,6 @@
       ${camunda.osgi.import.before.defaults},
       ${camunda.osgi.import.defaults},
       ${camunda.osgi.import.additional},
-      org.camunda.*;${camunda.osgi.import.camunda.version},
       *
     </camunda.osgi.import.pkg>
     <camunda.osgi.activator />

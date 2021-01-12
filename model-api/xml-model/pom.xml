@@ -13,7 +13,13 @@
 
   <name>camunda BPM - Xml Model API</name>
   <inceptionYear>2014</inceptionYear>
-
+  <properties>
+    <camunda.artifact>org.camunda.bpm.model.xml</camunda.artifact>
+    <camunda.osgi.import.additional>
+      org.assertj.*;resolution:=optional,
+      org.junit.*;resolution:=optional
+    </camunda.osgi.import.additional>
+  </properties>
   <dependencies>
 
     <dependency>
@@ -35,20 +41,6 @@
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
-        <configuration>
-            <instructions>
-              <Export-Package>org.camunda.bpm.model*</Export-Package>
-              <Import-Package>
-                javax.xml.parsers,
-                javax.xml.transform,
-                javax.xml.transform.dom,javax.xml.transform.stream,
-                javax.xml.validation,
-                org.assertj.core.api;resolution:=optional,
-                org.w3c.dom,
-                org.xml.sax
-              </Import-Package>
-            </instructions>
-          </configuration>
         <executions>
           <execution>
             <phase>generate-sources</phase>
