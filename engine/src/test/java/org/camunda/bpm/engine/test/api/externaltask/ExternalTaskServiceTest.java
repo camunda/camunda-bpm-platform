@@ -1781,6 +1781,36 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     assertThat(tasks.get(0).getName()).isEqualTo("userTask");
   }
 
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.externalTaskWithNestedErrorEventDefinitionExpressionIncludesNullErrorMessage.bpmn20.xml"})
+  public void shouldResolveExpressionWithErrorMessageInNestedErrorEventDefinitionOnCompleteWithMultipleActivities() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskWithNestedErrorEventDefinition");
+    List<LockedExternalTask> lockedExternalTasks = externalTaskService
+        .fetchAndLock(1, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    assertThat(lockedExternalTasks).hasSize(1);
+    LockedExternalTask task = lockedExternalTasks.get(0);
+    runtimeService.startProcessInstanceByKey("oneExternalTaskWithNestedErrorEventDefinition");
+    List<ExternalTask> externalTasks = externalTaskService.createExternalTaskQuery().activityId(task.getActivityId()).list();
+    assertThat(externalTasks).hasSize(2);
+
+    // when
+    externalTaskService.complete(task.getId(), WORKER_ID);
+
+    // then
+    // correct external task was completed
+    // expression was evaluated to true
+    // error was caught
+    // flow continued to user task
+    List<Task> tasks = taskService.createTaskQuery().list();
+    assertThat(tasks).hasSize(1);
+    assertThat(tasks.get(0).getName()).isEqualTo("userTask");
+    assertThat(tasks.get(0).getProcessInstanceId()).isEqualTo(task.getProcessInstanceId());
+  }
+
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
   @Test
   public void testLocking() {

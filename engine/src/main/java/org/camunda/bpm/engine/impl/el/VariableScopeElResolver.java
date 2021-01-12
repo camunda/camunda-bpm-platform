@@ -16,19 +16,19 @@
  */
 package org.camunda.bpm.engine.impl.el;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.VariableScope;
-import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ExternalTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.javax.el.ELContext;
 import org.camunda.bpm.engine.impl.javax.el.ELResolver;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
-
 import java.beans.FeatureDescriptor;
 import java.util.Iterator;
+import java.util.List;
 
 
 /**
@@ -66,10 +66,12 @@ public class VariableScopeElResolver extends ELResolver {
             && variableScope instanceof ExecutionEntity
             && ((ExecutionEntity) variableScope).getActivity() != null
             && ((ExecutionEntity) variableScope).getActivity().getActivityBehavior() instanceof ExternalTaskActivityBehavior) {
-          ActivityImpl externalTaskActivity = ((ExecutionEntity) variableScope).getActivity();
-          ExternalTask externalTask = Context.getProcessEngineConfiguration().getExternalTaskService().createExternalTaskQuery().activityId(externalTaskActivity.getId()).singleResult();
+          List<ExternalTaskEntity> externalTasks = ((ExecutionEntity) variableScope).getExternalTasks();
+          if(externalTasks.size() != 1) {
+            throw new ProcessEngineException("Could not resolve expression to single external task entity.");
+          }
           context.setPropertyResolved(true);
-          return externalTask;
+          return externalTasks.get(0);
 
         } else if (EXECUTION_KEY.equals(property) && variableScope instanceof TaskEntity) {
           context.setPropertyResolved(true);
