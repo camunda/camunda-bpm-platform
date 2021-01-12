@@ -214,3 +214,6 @@ engine-rest-IT-embedded-wildfly:
   labels:
   - 'rest-api'
   nodeLabel: 'h2'
+new-stage-type:
+  dir: 'qa'
+  command: 'clean install'
