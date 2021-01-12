@@ -125,12 +125,26 @@
                    ng-model="variable.valueInfo.objectTypeName"
                    name="objectTypeName" />
 
-            <label class="control-label">{{ "VARIABLE_OBJECT_TYPE_NAME" | translate }}</label>
+            <span ng-if="repeatForm.objectTypeName.$invalid && repeatForm.objectTypeName.$dirty" class="has-error">
+              <span ng-if="repeatForm.objectTypeName.$error.required"
+                    class="help-block">
+                {{ 'REQUIRED_FIELD' | translate }}
+              </span>
+            </span>
+
+            <label class="control-label">{{ "CAM_WIDGET_VARIABLE_DIALOG_LABEL_SERIALIZATION" | translate }}</label>
             <input class="form-control"
                    required
                    ng-model="variable.valueInfo.serializationDataFormat"
                    name="serializationDataFormat" />
-            
+
+            <span ng-if="repeatForm.serializationDataFormat.$invalid && repeatForm.serializationDataFormat.$dirty" class="has-error">
+              <span ng-if="repeatForm.serializationDataFormat.$error.required"
+                    class="help-block">
+                {{ 'REQUIRED_FIELD' | translate }}
+              </span>
+            </span>
+
             <label class="control-label">{{ "CAM_WIDGET_VARIABLE_DIALOG_LABEL_SERIALIZED_VALUE" | translate }}</label>
             <textarea class="form-control"
                    required
@@ -152,7 +166,7 @@
                  type="file"                 
                  cam-variable-name="{{ variable.name }}"
                  cam-variable-type="File"
-                 ng-model="variable.value" />
+                 ng-model="variable.file" />
 
           <input ng-switch-default
                  class="form-control"
