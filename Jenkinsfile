@@ -28,7 +28,7 @@ pipeline {
         cambpmConditionalRetry {
 
           cambpmRunMaven('.',
-              'clean install source:jar -Pdistro,distro-ce,distro-wildfly,distro-webjar com.mycila:license-maven-plugin:check',
+              'clean install source:jar -Pdistro,distro-ce,distro-wildfly,distro-webjar com.mycila:license-maven-plugin:check -DskipTest',
               withCatch: false,
               withNpm: true)
 
