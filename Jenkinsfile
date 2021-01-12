@@ -7,7 +7,7 @@ def failedStageTypes = []
 pipeline {
   agent none
   options {
-    buildDiscarder(logRotator(numToKeepStr: '5')) //, artifactNumToKeepStr: '30'
+    buildDiscarder(logRotator(numToKeepStr: '5'))
     copyArtifactPermission('*');
   }
   parameters {
