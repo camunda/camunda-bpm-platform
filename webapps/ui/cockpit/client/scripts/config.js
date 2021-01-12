@@ -16,6 +16,11 @@
  */
 
 export default {
+  // // change the app name and vendor
+  // app: {
+  //   name: 'Operations',
+  //   vendor: 'Company'
+  // },
   // customScripts: [
   //   // If you have a folder called 'my-custom-script' (in the 'cockpit' folder)
   //   // with a file called 'customScript.js' in it

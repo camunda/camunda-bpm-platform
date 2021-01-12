@@ -17,6 +17,7 @@
 
 'use strict';
 var fs = require('fs');
+var $ = require('jquery');
 
 var angular = require('../../../../camunda-bpm-sdk-js/vendor/angular'),
   template = fs.readFileSync(__dirname + '/cam-widget-header.html', 'utf8'),
@@ -50,8 +51,7 @@ module.exports = function() {
       signOut: '@?',
       toggleNavigation: '@?',
       myProfile: '@?',
-      smallScreenWarning: '@?',
-      brandName: '@'
+      smallScreenWarning: '@?'
     },
 
     compile: function(el, attrs) {
@@ -64,9 +64,6 @@ module.exports = function() {
       if (!attrs.signOut) {
         attrs.signOut = 'CAM_WIDGET_HEADER_SIGN_OUT';
       }
-      if (!attrs.brandName) {
-        attrs.brandName = 'Camunda';
-      }
       if (!attrs.smallScreenWarning) {
         attrs.smallScreenWarning = 'CAM_WIDGET_HEADER_SMALL_SCREEN_WARNING';
       }
@@ -76,8 +73,12 @@ module.exports = function() {
       '$scope',
       'AuthenticationService',
       '$sce',
-      function($scope, AuthenticationService, $sce) {
+      'configuration',
+      function($scope, AuthenticationService, $sce, configuration) {
         $scope.logo = $sce.trustAsHtml(logo);
+        $scope.brandName =
+          configuration.getAppVendor() + ' ' + configuration.getAppName();
+        $('head title').text($scope.brandName);
 
         $scope.logout = AuthenticationService.logout;
         $scope.getTargetRoute = function() {
