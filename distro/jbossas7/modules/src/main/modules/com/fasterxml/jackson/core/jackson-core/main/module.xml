@@ -1,6 +1,6 @@
 <module xmlns="urn:jboss:module:1.0" name="com.fasterxml.jackson.core.jackson-core">
   <resources>
-    <resource-root path="jackson-core-2.10.0.jar" />
+    <resource-root path="jackson-core-2.12.1.jar" />
   </resources>
 
   <dependencies>
