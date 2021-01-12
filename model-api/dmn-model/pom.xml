@@ -15,6 +15,10 @@
   <inceptionYear>2015</inceptionYear>
   <properties>
     <camunda.artifact>org.camunda.bpm.model.dmn</camunda.artifact>
+    <camunda.osgi.export>
+      !org.camunda.bpm.model.dmn.schema,
+      ${camunda.osgi.export.pkg};${camunda.osgi.version};-noimport:=true
+    </camunda.osgi.export>
   </properties>
   <dependencies>
 
