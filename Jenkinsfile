@@ -62,15 +62,15 @@ pipeline {
               eeBranch = params.EE_DOWNSTREAM
             }
 
-            if (cambpmWithLabels('webapp-integration','all-as','h2','websphere','weblogic','jbosseap','run','spring-boot','authorizations')) {
+            if (cambpmWithLabels('webapp-integration', 'all-as', 'h2', 'websphere', 'weblogic', 'jbosseap', 'run', 'spring-boot', 'authorizations', 'e2e')) {
               cambpmTriggerDownstream("cambpm-ee/" + eeBranch, true, true, true)
             }
 
-            if (cambpmWithLabels('all-db','cockroachdb','authorizations')) {
+            if (cambpmWithLabels('all-db', 'cockroachdb', 'authorizations')) {
               cambpmTriggerDownstream("cambpm-ce/cambpm-sidetrack/${env.BRANCH_NAME}")
             }
 
-            if (cambpmWithLabels('daily','default-build','rolling-update','migration','all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql','cockroachdb')) {
+            if (cambpmWithLabels('daily', 'default-build', 'rolling-update', 'migration', 'all-db', 'h2', 'db2', 'mysql', 'oracle', 'mariadb', 'sqlserver', 'postgresql', 'cockroachdb')) {
               cambpmTriggerDownstream("cambpm-ce/cambpm-daily/${env.BRANCH_NAME}")
             }
 
