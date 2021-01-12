@@ -16,7 +16,7 @@
  */
 
 window.camAdminConf = {
-  // change the app name and vendor
+  // // change the app name and vendor
   // app: {
   //   name: 'Admin',
   //   vendor: 'Company'

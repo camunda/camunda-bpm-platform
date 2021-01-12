@@ -16,6 +16,7 @@
  */
 
 export default {
+  // // change the app name and vendor
   // app: {
   //   name: 'Operations',
   //   vendor: 'Company'
