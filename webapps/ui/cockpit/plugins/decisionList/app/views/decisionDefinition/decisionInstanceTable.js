@@ -30,7 +30,6 @@ var decisionSearchConfig = JSON.parse(
 
 var debouncePromiseFactory = require('camunda-bpm-sdk-js').utils
   .debouncePromiseFactory;
-var debounceCount = debouncePromiseFactory();
 var debounceQuery = debouncePromiseFactory();
 
 module.exports = [
@@ -168,27 +167,30 @@ module.exports = [
               searchQuery
             );
 
-            return debounceCount(
-              historyService.decisionInstanceCount(countQuery)
+            return debounceQuery(
+              historyService
+                .decisionInstanceCount(countQuery)
+                .then(function(count) {
+                  var total = count.count;
+
+                  return historyService
+                    .decisionInstance(decisionInstanceQuery)
+
+                    .then(function(data) {
+                      return {total, data};
+                    });
+                })
             )
-              .then(function(data) {
-                var total = data.count;
+              .then(({total, data}) => {
+                $scope.decisionInstances = data;
+                $scope.loadingState = data.length ? 'LOADED' : 'EMPTY';
 
-                return debounceQuery(
-                  historyService.decisionInstance(decisionInstanceQuery)
-                )
-                  .then(function(data) {
-                    $scope.decisionInstances = data;
-                    $scope.loadingState = data.length ? 'LOADED' : 'EMPTY';
+                var phase = $scope.$root.$$phase;
+                if (phase !== '$apply' && phase !== '$digest') {
+                  $scope.$apply();
+                }
 
-                    var phase = $scope.$root.$$phase;
-                    if (phase !== '$apply' && phase !== '$digest') {
-                      $scope.$apply();
-                    }
-
-                    return total;
-                  })
-                  .catch(angular.noop);
+                return total;
               })
               .catch(angular.noop);
           }
