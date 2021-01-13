@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.impl.history.event.HistoricTaskInstanceEventEntity
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.spring.boot.starter.event.ExecutionEvent;
 import org.camunda.bpm.spring.boot.starter.event.TaskEvent;
 import org.camunda.bpm.spring.boot.starter.test.nonpa.BoundaryEventServiceTask;
 import org.camunda.bpm.spring.boot.starter.test.nonpa.TestApplication;
@@ -174,6 +175,22 @@ public class CamundaEventingIT extends AbstractCamundaAutoConfigurationIT {
     // 2 for end event (start, end)
     // 1 for process (end)
     int expectedCount = 2 + 3 + 2 + 1;
+    assertThat(eventCaptor.executionEvents).hasSize(expectedCount);
+    assertThat(eventCaptor.immutableExecutionEvents).hasSize(expectedCount);
+    assertThat(eventCaptor.transactionExecutionEvents).hasSize(expectedCount);
+    assertThat(eventCaptor.transactionImmutableExecutionEvents).hasSize(expectedCount);
+  }
+
+  @Test
+  public final void shouldEventExecutionWhenIntermediateCatchExists() {
+    // given
+    eventCaptor.clear();
+    instance = runtime.startProcessInstanceByKey("eventingWithIntermediateCatch");
+    // then 13
+    // 1 for process (start)
+    // 3 for start event (start, take, end)
+    // 1 for timer event (start)
+    int expectedCount = 1 + 3 +  1;
     assertThat(eventCaptor.executionEvents).hasSize(expectedCount);
     assertThat(eventCaptor.immutableExecutionEvents).hasSize(expectedCount);
     assertThat(eventCaptor.transactionExecutionEvents).hasSize(expectedCount);
