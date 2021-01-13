@@ -200,7 +200,7 @@ public abstract class ReflectUtil {
   public static Object invoke(Object target, String methodName, Object[] args) {
     try {
       Class<? extends Object> clazz = target.getClass();
-      Method method = findMethod(clazz, methodName, (Class<?>[]) Arrays.stream(args).map(Object::getClass).toArray());
+      Method method = findMethod(clazz, methodName, Arrays.stream(args).map(Object::getClass).toArray(Class<?>[]::new));
       method.setAccessible(true);
       return method.invoke(target, args);
     }
@@ -345,7 +345,7 @@ public abstract class ReflectUtil {
   @SuppressWarnings({ "unchecked", "rawtypes" })
   private static <T> Constructor<T> findMatchingConstructor(Class<T> clazz, Object[] args) {
     for (Constructor constructor: clazz.getDeclaredConstructors()) { // cannot use <?> or <T> due to JDK 5/6 incompatibility
-      if (matches(constructor.getParameterTypes(), (Class<?>[]) Arrays.stream(args).map(Object::getClass).toArray())){
+      if (matches(constructor.getParameterTypes(), Arrays.stream(args).map(Object::getClass).toArray(Class<?>[]::new))){
         return constructor;
       }
     }

@@ -1811,6 +1811,136 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     assertThat(tasks.get(0).getProcessInstanceId()).isEqualTo(task.getProcessInstanceId());
   }
 
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.externalTaskWithTwoNestedErrorEventDefinitionExpressions.bpmn20.xml"})
+  public void shouldResolveFirstOfTwoExpressionsInNestedErrorEventDefinitionOnComplete() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskWithNestedErrorEventDefinition");
+    List<LockedExternalTask> lockedExternalTasks = externalTaskService
+        .fetchAndLock(1, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    assertThat(lockedExternalTasks).hasSize(1);
+    LockedExternalTask task = lockedExternalTasks.get(0);
+    runtimeService.startProcessInstanceByKey("oneExternalTaskWithNestedErrorEventDefinition");
+
+    // when
+    // expression for error A is true
+    Map<String, Object> vars = new HashMap<>();
+    vars.put("a", true);
+    vars.put("b", false);
+    externalTaskService.complete(task.getId(), WORKER_ID, vars);
+
+    // then
+    // error A is thrown
+    List<Task> tasks = taskService.createTaskQuery().list();
+    assertThat(tasks).hasSize(1);
+    assertThat(tasks.get(0).getName()).isEqualTo("userTask A");
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.externalTaskWithTwoNestedErrorEventDefinitionExpressions.bpmn20.xml"})
+  public void shouldResolveSecondOfTwoExpressionsInNestedErrorEventDefinitionOnComplete() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskWithNestedErrorEventDefinition");
+    List<LockedExternalTask> lockedExternalTasks = externalTaskService
+        .fetchAndLock(1, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    assertThat(lockedExternalTasks).hasSize(1);
+    LockedExternalTask task = lockedExternalTasks.get(0);
+    runtimeService.startProcessInstanceByKey("oneExternalTaskWithNestedErrorEventDefinition");
+
+    // when
+    // expression for error B is true
+    Map<String, Object> vars = new HashMap<>();
+    vars.put("a", false);
+    vars.put("b", true);
+    externalTaskService.complete(task.getId(), WORKER_ID, vars);
+
+    // then
+    // error B is thrown
+    List<Task> tasks = taskService.createTaskQuery().list();
+    assertThat(tasks).hasSize(1);
+    assertThat(tasks.get(0).getName()).isEqualTo("userTask B");
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.externalTaskWithTwoNestedErrorEventDefinitionExpressions.bpmn20.xml"})
+  public void shouldResolveBothOfTwoExpressionsInNestedErrorEventDefinitionOnComplete() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskWithNestedErrorEventDefinition");
+    List<LockedExternalTask> lockedExternalTasks = externalTaskService
+        .fetchAndLock(1, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    assertThat(lockedExternalTasks).hasSize(1);
+    LockedExternalTask task = lockedExternalTasks.get(0);
+    runtimeService.startProcessInstanceByKey("oneExternalTaskWithNestedErrorEventDefinition");
+
+    // when
+    // expressions for both errors are true
+    Map<String, Object> vars = new HashMap<>();
+    vars.put("a", true);
+    vars.put("b", true);
+    externalTaskService.complete(task.getId(), WORKER_ID, vars);
+
+    // then
+    // error A is thrown as it is defined first
+    List<Task> tasks = taskService.createTaskQuery().list();
+    assertThat(tasks).hasSize(1);
+    assertThat(tasks.get(0).getName()).isEqualTo("userTask A");
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.externalTaskWithNestedErrorEventDefinitionEmptyExpression.bpmn20.xml"})
+  public void shouldIgnoreEmptyExpressionInNestedErrorEventDefinitionOnComplete() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskWithNestedErrorEventDefinition");
+    List<LockedExternalTask> lockedExternalTasks = externalTaskService
+        .fetchAndLock(1, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    assertThat(lockedExternalTasks).hasSize(1);
+    LockedExternalTask task = lockedExternalTasks.get(0);
+    runtimeService.startProcessInstanceByKey("oneExternalTaskWithNestedErrorEventDefinition");
+
+    // when
+    externalTaskService.complete(task.getId(), WORKER_ID);
+
+    // then
+    // no error is thrown
+    List<Task> tasks = taskService.createTaskQuery().list();
+    assertThat(tasks).hasSize(0);
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.externalTaskWithNestedErrorEventDefinitionEmptyExpression.bpmn20.xml"})
+  public void shouldIgnoreNullExpressionInNestedErrorEventDefinitionOnComplete() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskWithNestedErrorEventDefinition");
+    List<LockedExternalTask> lockedExternalTasks = externalTaskService
+        .fetchAndLock(1, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    assertThat(lockedExternalTasks).hasSize(1);
+    LockedExternalTask task = lockedExternalTasks.get(0);
+    runtimeService.startProcessInstanceByKey("oneExternalTaskWithNestedErrorEventDefinition");
+
+    // when
+    externalTaskService.complete(task.getId(), WORKER_ID);
+
+    // then
+    // no error is thrown
+    List<Task> tasks = taskService.createTaskQuery().list();
+    assertThat(tasks).hasSize(0);
+  }
+
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
   @Test
   public void testLocking() {
