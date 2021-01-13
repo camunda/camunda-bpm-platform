@@ -1,6 +1,6 @@
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
-@Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library@fix-pullrequest-labels']) _
 
 def failedStageTypes = []
 
@@ -12,6 +12,7 @@ pipeline {
         description: 'A build to take the artifacts from'
     )
     booleanParam defaultValue: true, description: '', name: 'STANDALONE'
+    booleanParam defaultValue: false, description: 'Is the current build triggered in the scope of an upstream pull request', name: 'IS_PULL_REQUEST'
     string defaultValue: '', description: 'The labels assigned to the CE pull request', name: 'PR_LABELS'
   }
   options {
