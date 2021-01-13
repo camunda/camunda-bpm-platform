@@ -332,16 +332,15 @@ public abstract class ReflectUtil {
   }
 
   public static Object instantiate(String className, Object[] args) {
-  Class<?> clazz = loadClass(className);
-  Constructor<?> constructor = findMatchingConstructor(clazz, args);
-  ensureNotNull("couldn't find constructor for " + className + " with args " + Arrays.asList(args), "constructor", constructor);
-  try {
-    return constructor.newInstance(args);
+    Class<?> clazz = loadClass(className);
+    Constructor<?> constructor = findMatchingConstructor(clazz, args);
+    ensureNotNull("couldn't find constructor for " + className + " with args " + Arrays.asList(args), "constructor", constructor);
+    try {
+      return constructor.newInstance(args);
+    } catch (Exception e) {
+      throw LOG.exceptionWhileInstantiatingClass(className, e);
+    }
   }
-  catch (Exception e) {
-    throw LOG.exceptionWhileInstantiatingClass(className, e);
-  }
-}
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
   private static <T> Constructor<T> findMatchingConstructor(Class<T> clazz, Object[] args) {
