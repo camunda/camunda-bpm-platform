@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.impl.util;
 
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -34,6 +35,8 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
+
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Tom Baeyens
@@ -327,6 +330,28 @@ public abstract class ReflectUtil {
     }
     return null;
   }
+
+  public static Object instantiate(String className, Object[] args) {
+  Class<?> clazz = loadClass(className);
+  Constructor<?> constructor = findMatchingConstructor(clazz, args);
+  ensureNotNull("couldn't find constructor for " + className + " with args " + Arrays.asList(args), "constructor", constructor);
+  try {
+    return constructor.newInstance(args);
+  }
+  catch (Exception e) {
+    throw LOG.exceptionWhileInstantiatingClass(className, e);
+  }
+}
+
+@SuppressWarnings({ "unchecked", "rawtypes" })
+private static <T> Constructor<T> findMatchingConstructor(Class<T> clazz, Object[] args) {
+  for (Constructor constructor: clazz.getDeclaredConstructors()) { // cannot use <?> or <T> due to JDK 5/6 incompatibility
+    if (matches(constructor.getParameterTypes(), (Class<?>[]) Arrays.stream(args).map(Object::getClass).toArray())){
+      return constructor;
+    }
+  }
+  return null;
+}
 
   private static boolean matches(Class< ? >[] parameterTypes, Class< ? >[] args) {
     if ( parameterTypes==null
