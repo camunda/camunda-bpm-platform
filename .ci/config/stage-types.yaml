@@ -45,6 +45,8 @@ webapp-unit:
   command: 'clean test -Dskip.frontend.build=true -P'
   stash:
     runtimeStash: true
+  labels:
+  - 'default-build'
 webapp-unit-authorizations:
   directory: 'webapps'
   command: 'clean test -Dskip.frontend.build=true -PcfgAuthorizationCheckRevokesAlways,'
