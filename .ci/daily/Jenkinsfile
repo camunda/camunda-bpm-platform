@@ -12,7 +12,7 @@ pipeline {
         description: 'A build to take the artifacts from'
     )
     booleanParam defaultValue: true, description: '', name: 'STANDALONE'
-    booleanParam defaultValue: false, description: 'Is the current build triggered in the scope of an upstream pull request', name: 'IS_PULL_REQUEST'
+    booleanParam defaultValue: false, description: 'Is the current build triggered in the scope of an upstream pull request', name: 'UPSTREAM_PR'
     string defaultValue: '', description: 'The labels assigned to the CE pull request', name: 'PR_LABELS'
   }
   options {
