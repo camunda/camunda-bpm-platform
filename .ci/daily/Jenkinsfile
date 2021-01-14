@@ -223,7 +223,7 @@ pipeline {
       steps {
         script {
           parallel(cambpmGetMatrixStages('daily-stages', failedStageTypes, { stageType, dbLabel ->
-            return cambpmWithLabels(cambpmGetLabels(stageType, 'cockroachdb'))
+            return cambpmWithLabels(cambpmGetLabels(stageType, 'cockroachdb')) && cambpmWithLabels(cambpmGetDbType(dbLabel))
           }))
         }
       }
