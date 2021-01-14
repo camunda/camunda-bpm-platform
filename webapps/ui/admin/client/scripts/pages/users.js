@@ -24,6 +24,11 @@ var searchConfig = JSON.parse(
   fs.readFileSync(__dirname + '/users-search-plugin-config.json', 'utf8')
 );
 
+var debouncePromiseFactory = require('camunda-bpm-sdk-js').utils
+  .debouncePromiseFactory;
+var debounceQuery = debouncePromiseFactory();
+var debounceCount = debouncePromiseFactory();
+
 var angular = require('../../../../../camunda-commons-ui/vendor/angular');
 
 var Controller = [
@@ -83,14 +88,17 @@ var Controller = [
       $scope.userList = null;
       $scope.loadingState = 'LOADING';
 
-      return UserResource.count(angular.extend({}, $scope.query))
-        .$promise.then(function(data) {
+      return debounceCount(
+        UserResource.count(angular.extend({}, $scope.query)).$promise
+      )
+        .then(function(data) {
           var total = data.count;
 
-          return UserResource.query(
-            angular.extend({}, $scope.query, queryParams)
+          return debounceQuery(
+            UserResource.query(angular.extend({}, $scope.query, queryParams))
+              .$promise
           )
-            .$promise.then(function(data) {
+            .then(function(data) {
               $scope.userList = data;
               $scope.loadingState = data.length ? 'LOADED' : 'EMPTY';
 
@@ -101,10 +109,12 @@ var Controller = [
               // Try again with default sorting
               delete queryParams.sortBy;
               delete queryParams.sortOrder;
-              return UserResource.query(
-                angular.extend({}, $scope.query, queryParams)
+              return debounceQuery(
+                UserResource.query(
+                  angular.extend({}, $scope.query, queryParams)
+                ).$promise
               )
-                .$promise.then(function(data) {
+                .then(function(data) {
                   $scope.canSortEntries = false;
                   $scope.userList = data;
                   $scope.loadingState = data.length ? 'LOADED' : 'EMPTY';
@@ -122,7 +132,13 @@ var Controller = [
                 });
             });
         })
-        .catch(angular.noop);
+        .catch(angular.noop)
+        .finally(function() {
+          var phase = $scope.$root.$$phase;
+          if (phase !== '$apply' && phase !== '$digest') {
+            $scope.$apply();
+          }
+        });
     }
 
     $scope.availableOperations = {};

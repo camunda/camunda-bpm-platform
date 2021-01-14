@@ -29,6 +29,10 @@ var searchConfigJSON = fs.readFileSync(
   'utf8'
 );
 
+var debouncePromiseFactory = require('camunda-bpm-sdk-js').utils
+  .debouncePromiseFactory;
+var debounceQuery = debouncePromiseFactory();
+
 module.exports = [
   function() {
     return {
@@ -73,8 +77,10 @@ module.exports = [
               maxResults: pages.size
             };
 
-            return Deployment.list(
-              lodash.assign(query, pagination, $scope.deploymentsSorting)
+            return debounceQuery(
+              Deployment.list(
+                lodash.assign(query, pagination, $scope.deploymentsSorting)
+              )
             )
               .then(function(res) {
                 $scope.deployments = res.items;

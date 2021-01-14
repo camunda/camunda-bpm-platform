@@ -24,6 +24,11 @@ var searchConfig = JSON.parse(
   fs.readFileSync(__dirname + '/tenants-search-plugin-config.json', 'utf8')
 );
 
+var debouncePromiseFactory = require('camunda-bpm-sdk-js').utils
+  .debouncePromiseFactory;
+var debounceQuery = debouncePromiseFactory();
+var debounceCount = debouncePromiseFactory();
+
 var angular = require('../../../../../camunda-commons-ui/vendor/angular');
 
 var Controller = [
@@ -81,14 +86,17 @@ var Controller = [
       $scope.tenantList = null;
       $scope.loadingState = 'LOADING';
 
-      return TenantResource.count(angular.extend({}, $scope.query))
+      return debounceCount(
+        TenantResource.count(angular.extend({}, $scope.query)).$promise
+      )
         .$promise.then(function(data) {
           var total = data.count;
 
-          return TenantResource.query(
-            angular.extend({}, $scope.query, queryParams)
+          return debounceQuery(
+            TenantResource.query(angular.extend({}, $scope.query, queryParams))
+              .$promise
           )
-            .$promise.then(function(data) {
+            .then(function(data) {
               $scope.tenantList = data;
               $scope.loadingState = data.length ? 'LOADED' : 'EMPTY';
 
@@ -96,7 +104,13 @@ var Controller = [
             })
             .catch(angular.noop);
         })
-        .catch(angular.noop);
+        .catch(angular.noop)
+        .finally(function() {
+          var phase = $scope.$root.$$phase;
+          if (phase !== '$apply' && phase !== '$digest') {
+            $scope.$apply();
+          }
+        });
     }
 
     $scope.availableOperations = {};

@@ -122,25 +122,28 @@ function _eachSeries(arr, iterator, callback) {
  * });
  */
 utils.series = function(tasks, callback) {
-  callback = callback || function() {};
+  return new Promise(function(resolve, reject) {
+    callback = callback || function() {};
 
-  var results = {};
-  _eachSeries(
-    Object.keys(tasks),
-    function(k, callback) {
-      tasks[k](function(err) {
-        var args = Array.prototype.slice.call(arguments, 1);
-        if (args.length <= 1) {
-          args = args[0];
-        }
-        results[k] = args;
-        callback(err);
-      });
-    },
-    function(err) {
-      callback(err, results);
-    }
-  );
+    var results = {};
+    _eachSeries(
+      Object.keys(tasks),
+      function(k, callback) {
+        tasks[k](function(err) {
+          var args = Array.prototype.slice.call(arguments, 1);
+          if (args.length <= 1) {
+            args = args[0];
+          }
+          results[k] = args;
+          callback(err);
+        });
+      },
+      function(err) {
+        err ? reject(err) : resolve(results);
+        callback(err, results);
+      }
+    );
+  });
 };
 
 /**
@@ -155,4 +158,33 @@ utils.escapeUrl = function(string) {
     .replace(/%2F/g, '%252F')
     .replace(/\*/g, '%2A')
     .replace(/%5C/g, '%255C');
+};
+
+/**
+ * Creates a debounce function, which only resolves the latest promise
+ *
+ * @returns {function}
+ */
+utils.debouncePromiseFactory = function() {
+  let latestPromise = null;
+
+  /**
+   * Might get called again before the first promise resolves. In that case, the first promise will never resolve
+   *
+   * @param {promise} promise
+   * @returns {promise}
+   */
+  return async promise => {
+    latestPromise = promise;
+
+    const result = await promise;
+
+    // Make sure it was not called again while we waited for it to resolve
+    if (latestPromise === promise) {
+      return result;
+    } else {
+      // Otherwise, never resolve
+      await new Promise(() => {});
+    }
+  };
 };
