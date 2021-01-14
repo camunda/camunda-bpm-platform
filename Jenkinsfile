@@ -1,6 +1,6 @@
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
-@Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library@CAM-12986-pr-label-to-ee']) _
 
 def failedStageTypes = []
 
@@ -74,7 +74,8 @@ pipeline {
               cambpmTriggerDownstream("cambpm-ce/cambpm-daily/${env.BRANCH_NAME}")
             }
 
-            if (cambpmWithLabels('master')) {
+            if (cambpmWithLabels()) {
+              // only execute on `master`
               cambpmRunMaven('.',
                   'org.sonatype.plugins:nexus-staging-maven-plugin:deploy-staged -DaltStagingDirectory=${WORKSPACE}/staging -DskipStaging=true',
                   withCatch: false,
