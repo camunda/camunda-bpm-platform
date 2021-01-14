@@ -1823,7 +1823,6 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
 
     assertThat(lockedExternalTasks).hasSize(1);
     LockedExternalTask task = lockedExternalTasks.get(0);
-    runtimeService.startProcessInstanceByKey("oneExternalTaskWithNestedErrorEventDefinition");
 
     // when
     // expression for error A is true
@@ -1851,7 +1850,6 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
 
     assertThat(lockedExternalTasks).hasSize(1);
     LockedExternalTask task = lockedExternalTasks.get(0);
-    runtimeService.startProcessInstanceByKey("oneExternalTaskWithNestedErrorEventDefinition");
 
     // when
     // expression for error B is true
@@ -1879,7 +1877,6 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
 
     assertThat(lockedExternalTasks).hasSize(1);
     LockedExternalTask task = lockedExternalTasks.get(0);
-    runtimeService.startProcessInstanceByKey("oneExternalTaskWithNestedErrorEventDefinition");
 
     // when
     // expressions for both errors are true
@@ -1907,7 +1904,6 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
 
     assertThat(lockedExternalTasks).hasSize(1);
     LockedExternalTask task = lockedExternalTasks.get(0);
-    runtimeService.startProcessInstanceByKey("oneExternalTaskWithNestedErrorEventDefinition");
 
     // when
     externalTaskService.complete(task.getId(), WORKER_ID);
@@ -1930,7 +1926,6 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
 
     assertThat(lockedExternalTasks).hasSize(1);
     LockedExternalTask task = lockedExternalTasks.get(0);
-    runtimeService.startProcessInstanceByKey("oneExternalTaskWithNestedErrorEventDefinition");
 
     // when
     externalTaskService.complete(task.getId(), WORKER_ID);
