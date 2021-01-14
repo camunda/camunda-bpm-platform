@@ -22,6 +22,7 @@ module.exports = function(grunt) {
   'use strict';
 
   require('load-grunt-tasks')(grunt);
+  require('./grunt/tasks/terser')(grunt);
 
   var pkg = require('./package.json');
   var protractorConfig =
@@ -185,8 +186,6 @@ module.exports = function(grunt) {
 
     localescompile: localesConf,
 
-    uglify: uglifyConf,
-
     clean: require('./grunt/config/clean')(config),
 
     watch: watchConf,
@@ -194,6 +193,8 @@ module.exports = function(grunt) {
     eslint: eslintConf,
 
     stylelint: stylelintConf,
+
+    terser: uglifyConf,
 
     ensureLibs: {
       thirdParty: {}
@@ -228,7 +229,7 @@ module.exports = function(grunt) {
     'clean:sdk-js',
     'copy:sdk-js',
     'browserify:sdk-js',
-    'uglify:sdk-js'
+    'terser:sdk-js'
   ]);
 
   grunt.registerTask('build', function(mode, app) {
@@ -284,7 +285,7 @@ module.exports = function(grunt) {
     }
 
     if (grunt.config.data.buildMode === 'prod') {
-      tasksToRun.push('uglify');
+      tasksToRun.push('terser');
     }
 
     tasksToRun.push('license-header');
