@@ -270,6 +270,7 @@ public final class BpmnModelConstants {
   public static final String CAMUNDA_ELEMENT_CONNECTOR_ID = "connectorId";
   public static final String CAMUNDA_ELEMENT_CONSTRAINT = "constraint";
   public static final String CAMUNDA_ELEMENT_ENTRY = "entry";
+  public static final String CAMUNDA_ELEMENT_ERROR_EVENT_DEFINITION = "errorEventDefinition";
   public static final String CAMUNDA_ELEMENT_EXECUTION_LISTENER = "executionListener";
   public static final String CAMUNDA_ELEMENT_EXPRESSION = "expression";
   public static final String CAMUNDA_ELEMENT_FAILED_JOB_RETRY_TIME_CYCLE = "failedJobRetryTimeCycle";

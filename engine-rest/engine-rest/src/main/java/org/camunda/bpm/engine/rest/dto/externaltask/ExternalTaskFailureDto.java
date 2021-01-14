@@ -16,6 +16,10 @@
  */
 package org.camunda.bpm.engine.rest.dto.externaltask;
 
+import java.util.Map;
+
+import org.camunda.bpm.engine.rest.dto.VariableValueDto;
+
 /**
  * @author Thorben Lindhauer
  * @author Askar Akhmerov
@@ -28,6 +32,8 @@ public class ExternalTaskFailureDto extends HandleExternalTaskDto {
   protected String errorDetails;
   protected long retryTimeout;
   protected int retries;
+  protected Map<String, VariableValueDto> variables;
+  protected Map<String, VariableValueDto> localVariables;
 
   public String getErrorMessage() {
     return errorMessage;
@@ -59,6 +65,22 @@ public class ExternalTaskFailureDto extends HandleExternalTaskDto {
 
   public void setErrorDetails(String errorDetails) {
     this.errorDetails = errorDetails;
+  }
+
+  public Map<String, VariableValueDto> getVariables() {
+    return variables;
+  }
+
+  public void setVariables(Map<String, VariableValueDto> variables) {
+    this.variables = variables;
+  }
+
+  public Map<String, VariableValueDto> getLocalVariables() {
+    return localVariables;
+  }
+
+  public void setLocalVariables(Map<String, VariableValueDto> localVariables) {
+    this.localVariables = localVariables;
   }
 
 }

@@ -27,7 +27,6 @@ import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
-import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.externaltask.UpdateExternalTaskRetriesBuilder;
 import org.camunda.bpm.engine.externaltask.UpdateExternalTaskRetriesSelectBuilder;
 
@@ -242,6 +241,41 @@ public interface ExternalTaskService {
    *   </ul>
    */
   public void handleFailure(String externalTaskId, String workerId, String errorMessage, String errorDetails, int retries, long retryTimeout);
+
+  /**
+   * <p>Signals that an external task could not be successfully executed.
+   * The task must be assigned to the given worker. The number of retries left can be specified. In addition, a timeout can be
+   * provided, such that the task cannot be fetched before <code>now + retryTimeout</code> again.</p>
+   *
+   * <p>If <code>retries</code> is 0, an incident with the given error message is created. The incident gets resolved,
+   * once the number of retries is increased again.</p>
+   * 
+   * Variables passed with the <code>variables</code> or <code>localVariables</code> parameter will be set before any
+   * output mapping is performed.
+   *
+   * @param externalTaskId the id of the external task to report a failure for
+   * @param workerId the id of the worker that reports the failure
+   * @param errorMessage short error message related to this failure. This message can be retrieved via
+   *   {@link ExternalTask#getErrorMessage()} and is used as the incident message in case <code>retries</code> is <code>null</code>.
+   *   May be <code>null</code>.
+   * @param errorDetails full error message related to this failure. This message can be retrieved via
+   *   {@link ExternalTaskService#getExternalTaskErrorDetails(String)} ()}
+   * @param retries the number of retries left. External tasks with 0 retries cannot be fetched anymore unless
+   *   the number of retries is increased via API. Must be >= 0.
+   * @param retryTimeout the timeout before the task can be fetched again. Must be >= 0.
+   * @param variables a map of variables to set on the execution
+   *   the external task is assigned to
+   * @param localVariables a map of variables to set on the execution locally
+   *
+   * @throws NotFoundException if no external task with the given id exists
+   * @throws BadUserRequestException if the task is assigned to a different worker
+   * @throws AuthorizationException thrown if the current user does not possess any of the following permissions:
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_INSTANCE}</li>
+   *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
+   */
+  public void handleFailure(String externalTaskId, String workerId, String errorMessage, String errorDetails, int retries, long retryDuration, Map<String, Object> variables, Map<String, Object> localVariables);
 
   /**
    * <p>Signals that an business error appears, which should be handled by the process engine.

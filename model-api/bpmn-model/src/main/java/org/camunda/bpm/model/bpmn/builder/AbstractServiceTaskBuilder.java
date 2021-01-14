@@ -17,7 +17,9 @@
 package org.camunda.bpm.model.bpmn.builder;
 
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.instance.ErrorEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.ServiceTask;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaErrorEventDefinition;
 
 /**
  * @author Sebastian Menski
@@ -131,17 +133,29 @@ public abstract class AbstractServiceTaskBuilder<B extends AbstractServiceTaskBu
     this.camundaTopic(camundaTopic);
     return myself;
   }
-  
+
   /**
    * Sets the camunda task priority attribute. This is only meaningful when
    * the {@link #camundaType(String)} attribute has the value <code>external</code>.
-   * 
-   * 
+   *
+   *
    * @param taskPriority the priority for the external task
    * @return the builder object
    */
   public B camundaTaskPriority(String taskPriority) {
     element.setCamundaTaskPriority(taskPriority);
     return myself;
+  }
+
+  /**
+   * Creates an error event definition for this service task and returns a builder for the error event definition.
+   * This is only meaningful when the {@link #camundaType(String)} attribute has the value <code>external</code>.
+   *
+   * @return the error event definition builder object
+   */
+  public CamundaErrorEventDefinitionBuilder camundaErrorEventDefinition() {
+    ErrorEventDefinition camundaErrorEventDefinition = createInstance(CamundaErrorEventDefinition.class);
+    addExtensionElement(camundaErrorEventDefinition);
+    return new CamundaErrorEventDefinitionBuilder(modelInstance, camundaErrorEventDefinition);
   }
 }
