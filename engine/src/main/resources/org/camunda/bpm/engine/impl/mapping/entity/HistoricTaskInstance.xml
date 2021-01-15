@@ -315,19 +315,19 @@
               ${queryType} RES.ID_ in (select TASK_ID_ from ${prefix}ACT_HI_IDENTITYLINK HIL
               <where>
                 <if test= "query.taskInvolvedUser != null">
-                  HIL.USER_ID_ = #{query.taskInvolvedUser}
+                  ${queryType} HIL.USER_ID_ = #{query.taskInvolvedUser}
                 </if>
                 <if test ="query.taskInvolvedGroup != null">
-                  and HIL.GROUP_ID_ = #{query.taskInvolvedGroup}
+                  ${queryType} HIL.GROUP_ID_ = #{query.taskInvolvedGroup}
                 </if>
                 <if test="query.taskHadCandidateUser != null">
-                  and HIL.TYPE_ = 'candidate' and HIL.USER_ID_ = #{query.taskHadCandidateUser}
+                  ${queryType} HIL.TYPE_ = 'candidate' and HIL.USER_ID_ = #{query.taskHadCandidateUser}
                 </if>
                 <if test="query.taskHadCandidateGroup != null">
-                  and HIL.TYPE_ = 'candidate' and HIL.GROUP_ID_ = #{query.taskHadCandidateGroup}
+                  ${queryType} HIL.TYPE_ = 'candidate' and HIL.GROUP_ID_ = #{query.taskHadCandidateGroup}
                 </if>
                 <if test="query.withCandidateGroups">
-                  and HIL.TYPE_ = 'candidate' and HIL.GROUP_ID_ is not null
+                  ${queryType} HIL.TYPE_ = 'candidate' and HIL.GROUP_ID_ is not null
                 </if>
               </where>
               )

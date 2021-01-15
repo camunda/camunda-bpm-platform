@@ -852,6 +852,52 @@ public class HistoricTaskInstanceQueryOrTest {
     assertThat(tasks.size()).isEqualTo(2);
   }
 
+  @Test
+  public void shouldReturnHistoricTasksWithHadCandidateUserOrHadCandidateGroup() {
+    // given
+    Task task1 = taskService.newTask();
+    taskService.saveTask(task1);
+    taskService.addCandidateUser(task1.getId(), "USER_TEST");
+
+    Task task2 = taskService.newTask();
+    taskService.saveTask(task2);
+    taskService.addCandidateGroup(task2.getId(), "GROUP_TEST");
+
+    // when
+    List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery()
+      .or()
+        .taskHadCandidateUser("USER_TEST")
+        .taskHadCandidateGroup("GROUP_TEST")
+      .endOr()
+      .list();
+
+    // then
+    assertThat(tasks).hasSize(2);
+  }
+
+  @Test
+  public void shouldReturnHistoricTasksWithCandidateCandidateUserInvolvedOrCandidateGroupInvolved() {
+    // given
+    Task task1 = taskService.newTask();
+    taskService.saveTask(task1);
+    taskService.addCandidateUser(task1.getId(), "USER_TEST");
+
+    Task task2 = taskService.newTask();
+    taskService.saveTask(task2);
+    taskService.addCandidateGroup(task2.getId(), "GROUP_TEST");
+
+    // when
+    List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery()
+      .or()
+        .taskInvolvedUser("USER_TEST")
+        .taskInvolvedGroup("GROUP_TEST")
+      .endOr()
+      .list();
+
+    // then
+    assertThat(tasks).hasSize(2);
+  }
+
   public HashMap<String, Date> createFollowUpAndDueDateTasks() throws ParseException {
     final Date date = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse("27/07/2017 01:12:13"),
       oneHourAgo = new Date(date.getTime() - 60 * 60 * 1000),
