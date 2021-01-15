@@ -63,7 +63,7 @@
         <database.name>process-engine</database.name>
         <database.username>camunda</database.username>
         <database.password>camunda</database.password>
-        <database.url>jdbc:mysql://${database.host}:${database.port}/${database.name}</database.url>
+        <database.url>jdbc:mysql://${database.host}:${database.port}/${database.name}?sendFractionalSeconds=false</database.url>
       </properties>
     </profile>
     <profile>
