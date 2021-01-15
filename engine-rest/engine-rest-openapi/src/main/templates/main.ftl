@@ -37,6 +37,7 @@
     {"name": "Deployment"},
     {"name": "Engine"},
     {"name": "Event Subscription"},
+    {"name": "Execution"},
     {"name": "External Task"},
     {"name": "Group"},
     {"name": "Historic Activity Instance"},
