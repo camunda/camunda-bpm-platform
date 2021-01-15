@@ -42,7 +42,7 @@
                    "example-2":{
                      "summary": "PUT `/execution/anExecutionId/localVariables/aVarName`",
                      "value": {
-                       "value": "",
+                       "value": "<myobj><prop1>a</prop1><prop2>b</prop2></myobj>",
                        "type": "Object",
                        "valueInfo": {
                          "objectTypeName": "com.example.MyObject",
