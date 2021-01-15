@@ -20,12 +20,12 @@ import org.assertj.core.util.DateUtil;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.delegate.TaskListener;
+import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.history.event.HistoricIdentityLinkLogEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricTaskInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
-import org.camunda.bpm.spring.boot.starter.event.ExecutionEvent;
 import org.camunda.bpm.spring.boot.starter.event.TaskEvent;
 import org.camunda.bpm.spring.boot.starter.test.nonpa.BoundaryEventServiceTask;
 import org.camunda.bpm.spring.boot.starter.test.nonpa.TestApplication;
@@ -78,6 +78,9 @@ public class CamundaEventingIT extends AbstractCamundaAutoConfigurationIT {
       if (instance != null) {
         runtime.deleteProcessInstance(instance.getProcessInstanceId(), "eventing shutdown");
       }
+    }
+    for (HistoricVariableInstance historicVariableInstance : historyService.createHistoricVariableInstanceQuery().list()) {
+      historyService.deleteHistoricVariableInstance(historicVariableInstance.getId());
     }
   }
 
