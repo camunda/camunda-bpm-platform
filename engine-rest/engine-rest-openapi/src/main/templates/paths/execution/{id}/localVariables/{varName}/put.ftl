@@ -39,7 +39,17 @@
                        "type": "String"
                      }
                    },
-                   ']
+                   "example-2":{
+                     "summary": "PUT `/execution/anExecutionId/localVariables/aVarName`",
+                     "value": {
+                       "value": "",
+                       "type": "Object",
+                       "valueInfo": {
+                         "objectTypeName": "com.example.MyObject",
+                         "serializationDataFormat": "application/xml"
+                       }
+                     }
+                   }']
   />
 
   "responses": {
