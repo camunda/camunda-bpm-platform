@@ -41,8 +41,8 @@
 
     <!-- application servers -->
     <version.jboss.as>7.2.0.Final</version.jboss.as>
-    <version.wildfly>20.0.1.Final</version.wildfly>
-    <version.wildfly.core>12.0.3.Final</version.wildfly.core>
+    <version.wildfly>21.0.2.Final</version.wildfly>
+    <version.wildfly.core>13.0.3.Final</version.wildfly.core>
 
     <!-- This version is mirrored in the external task client.
     If you change it here, also change it there -->
