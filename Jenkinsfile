@@ -1,6 +1,6 @@
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
-@Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library@INFRA-2082-fix-copy-artifacts']) _
 
 def failedStageTypes = []
 
@@ -50,8 +50,8 @@ pipeline {
           cambpmStash("platform-stash-archives",
                       ".m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.zip,.m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.tar.gz")
           cambpmStash("platform-stash-qa",
-                      ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**",
-                      "**/*.zip,**/*.tar.gz")
+                     ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**",
+                     "**/*.zip,**/*.tar.gz")
 
           script {
             if (env.BRANCH_NAME == cambpmDefaultBranch()) {
@@ -71,7 +71,11 @@ pipeline {
             }
 
             if (cambpmWithLabels('daily', 'default-build', 'rolling-update', 'migration', 'all-db', 'h2', 'db2', 'mysql', 'oracle', 'mariadb', 'sqlserver', 'postgresql', 'cockroachdb')) {
-              cambpmTriggerDownstream("cambpm-ce/cambpm-daily/${env.BRANCH_NAME}")
+              cambpmTriggerDownstream(
+                "cambpm-ce/cambpm-daily/${env.BRANCH_NAME}",
+                [string(name: 'UPSTREAM_PROJECT_NAME', value: env.JOB_NAME),
+                 string(name: 'UPSTREAM_BUILD_NUMBER', value: env.BUILD_NUMBER)]
+              )
             }
 
             if (cambpmWithLabels('master')) {
