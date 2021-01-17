@@ -92,6 +92,9 @@ pipeline {
     stage('h2 tests') {
       parallel {
         stage('engine-UNIT-h2') {
+          options {
+            retry(3)
+          }
           when {
             expression {
               cambpmWithLabels('h2', 'rolling-update', 'migration')
@@ -116,6 +119,9 @@ pipeline {
           }
         }
         stage('engine-UNIT-authorizations-h2') {
+          options {
+            retry(3)
+          }
           when {
             expression {
               cambpmWithLabels('h2', 'authorizations')
@@ -140,6 +146,9 @@ pipeline {
           }
         }
         stage('webapp-UNIT-h2') {
+          options {
+            retry(3)
+          }
           when {
             expression {
               cambpmWithLabels('default-build')
@@ -164,6 +173,9 @@ pipeline {
           }
         }
         stage('webapp-UNIT-authorizations-h2') {
+          options {
+            retry(3)
+          }
           when {
             expression {
               cambpmWithLabels('default-build')
@@ -187,6 +199,9 @@ pipeline {
           }
         }
         stage('engine-UNIT-historylevel-none') {
+          options {
+            retry(3)
+          }
           when {
             expression {
               cambpmWithLabels('default-build')
@@ -210,6 +225,9 @@ pipeline {
           }
         }
         stage('engine-UNIT-historylevel-audit') {
+          options {
+            retry(3)
+          }
           when {
             expression {
               cambpmWithLabels('default-build')
@@ -233,6 +251,9 @@ pipeline {
           }
         }
         stage('engine-UNIT-historylevel-activity') {
+          options {
+            retry(3)
+          }
           when {
             expression {
               cambpmWithLabels('default-build')
@@ -256,6 +277,9 @@ pipeline {
           }
         }
         stage('engine-IT-tomcat-9-postgresql-96') {
+          options {
+            retry(3)
+          }
           when {
             expression {
               cambpmWithLabels('all-as', 'tomcat')
@@ -277,6 +301,9 @@ pipeline {
           }
         }
         stage('engine-IT-wildfly-postgresql-96') {
+          options {
+            retry(3)
+          }
           when {
             expression {
               cambpmWithLabels('all-as', 'wildfly')
@@ -302,6 +329,9 @@ pipeline {
           }
         }
         stage('engine-IT-XA-wildfly-postgresql-96') {
+          options {
+            retry(3)
+          }
           when {
             branch cambpmDefaultBranch();
             beforeAgent true
@@ -324,6 +354,9 @@ pipeline {
           }
         }
         stage('webapp-IT-tomcat-9-h2') {
+          options {
+            retry(3)
+          }
           when {
             expression {
               cambpmWithLabels('webapp-integration', 'h2')
@@ -345,6 +378,9 @@ pipeline {
           }
         }
         stage('webapp-IT-wildfly-h2') {
+          options {
+            retry(3)
+          }
           when {
             expression {
               cambpmWithLabels('webapp-integration', 'h2')
@@ -366,6 +402,9 @@ pipeline {
           }
         }
         stage('webapp-IT-standalone-tomcat-9') {
+          options {
+            retry(3)
+          }
           when {
             branch cambpmDefaultBranch();
             beforeAgent true
@@ -385,6 +424,9 @@ pipeline {
           }
         }
         stage('webapp-IT-standalone-wildfly') {
+          options {
+            retry(3)
+          }
           when {
             branch cambpmDefaultBranch();
             beforeAgent true
@@ -404,6 +446,9 @@ pipeline {
           }
         }
         stage('camunda-run-IT') {
+          options {
+            retry(3)
+          }
           when {
             expression {
               cambpmWithLabels('run')
@@ -425,6 +470,9 @@ pipeline {
           }
         }
         stage('spring-boot-starter-IT') {
+          options {
+            retry(3)
+          }
           when {
             expression {
               cambpmWithLabels('spring-boot')
@@ -474,6 +522,9 @@ pipeline {
     stage('MISC tests') {
       parallel {
         stage('engine-api-compatibility') {
+          options {
+            retry(3)
+          }
           when {
             allOf {
               expression {
@@ -498,6 +549,9 @@ pipeline {
           }
         }
         stage('engine-UNIT-plugins') {
+          options {
+            retry(3)
+          }
           when {
             allOf {
               expression {
@@ -522,6 +576,9 @@ pipeline {
           }
         }
         stage('engine-UNIT-database-table-prefix') {
+          options {
+            retry(3)
+          }
           when {
             expression {
               cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit') && cambpmWithLabels('all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql','cockroachdb') // TODO store as param
@@ -543,6 +600,9 @@ pipeline {
           }
         }
         stage('webapp-UNIT-database-table-prefix') {
+          options {
+            retry(3)
+          }
           when {
             allOf {
               expression {
@@ -567,6 +627,9 @@ pipeline {
           }
         }
         stage('engine-UNIT-wls-compatibility') {
+          options {
+            retry(3)
+          }
           when {
             allOf {
               expression {
@@ -591,6 +654,9 @@ pipeline {
           }
         }
         stage('engine-IT-wildfly-domain') {
+          options {
+            retry(3)
+          }
           when {
             expression {
               cambpmIsNotFailedStageType(failedStageTypes, 'engine-IT-wildfly') && cambpmWithLabels('wildfly')
@@ -612,6 +678,9 @@ pipeline {
           }
         }
         stage('engine-IT-wildfly-servlet') {
+          options {
+            retry(3)
+          }
           when {
             expression {
               cambpmIsNotFailedStageType(failedStageTypes, 'engine-IT-wildfly') && cambpmWithLabels('wildfly')

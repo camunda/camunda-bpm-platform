@@ -21,6 +21,9 @@ pipeline {
   }
   stages {
     stage('Prepare') {
+      options {
+        retry(3)
+      }
       when {
         expression {
           !cambpmWithLabels('standalone')
@@ -43,6 +46,9 @@ pipeline {
       }
     }
     stage('check-sql-scripts') {
+      options {
+        retry(3)
+      }
       agent {
         label 'centos-stable'
       }
@@ -55,6 +61,9 @@ pipeline {
     stage('Standalone QA tests') {
       parallel {
         stage('sql-scripts-h2') {
+          options {
+            retry(3)
+          }
           when {
             expression {
               cambpmWithLabels('h2', 'all-db')
@@ -76,6 +85,9 @@ pipeline {
           }
         }
         stage('wildfly-subsystem-UNIT-wildfly') {
+          options {
+            retry(3)
+          }
           when {
             branch cambpmDefaultBranch();
             beforeAgent true
@@ -95,6 +107,9 @@ pipeline {
           }
         }
         stage('UPGRADE-databases-from-714-h2') {
+          options {
+            retry(3)
+          }
           when {
             expression {
               cambpmWithLabels('h2', 'all-db')
@@ -119,6 +134,9 @@ pipeline {
           }
         }
         stage('UPGRADE-instance-migration-h2') {
+          options {
+            retry(3)
+          }
           when {
             expression {
               cambpmWithLabels('default-build', 'migration')
@@ -143,6 +161,9 @@ pipeline {
           }
         }
         stage('UPGRADE-old-engine-from-714-h2') {
+          options {
+            retry(3)
+          }
           when {
             expression {
               cambpmWithLabels('h2', 'all-db')
@@ -167,6 +188,9 @@ pipeline {
           }
         }
         stage('UPGRADE-rolling-update-h2') {
+          options {
+            retry(3)
+          }
           when {
             expression {
               cambpmWithLabels('rolling-update', 'default-build')
@@ -191,6 +215,9 @@ pipeline {
           }
         }
         stage('PERFORMANCE-large-data-h2') {
+          options {
+            retry(3)
+          }
           when {
             branch cambpmDefaultBranch();
             beforeAgent true
@@ -215,6 +242,9 @@ pipeline {
       }
     }
     stage('QA DB tests') {
+      options {
+        retry(3)
+      }
       agent {
         label 'centos'
       }
@@ -247,6 +277,9 @@ pipeline {
         }
         stages {
           stage('JDK') {
+            options {
+              retry(3)
+            }
             steps {
               cambpmConditionalRetry {
                 cambpmRunMaven('.',
