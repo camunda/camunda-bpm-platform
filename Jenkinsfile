@@ -25,7 +25,10 @@ pipeline {
         beforeAgent true
       }
       agent {
-        label 'h2_perf32'
+        node {
+          label 'h2_perf32'
+          customWorkspace '/home/camunda/agent'
+        }
       }
       steps {
         cambpmConditionalRetry {
@@ -719,12 +722,12 @@ pipeline {
         }
       }
     }
-    always {
-      script {
-        if (agentDisconnected()) {// Retrigger the build if the slave disconnected
-          build job: currentBuild.projectName, propagate: false, quietPeriod: 60, wait: false
-        }
-      }
-    }
+    // always {
+    //   script {
+    //     if (agentDisconnected()) {// Retrigger the build if the slave disconnected
+    //       build job: currentBuild.projectName, propagate: false, quietPeriod: 60, wait: false
+    //     }
+    //   }
+    // }
   }
 }
