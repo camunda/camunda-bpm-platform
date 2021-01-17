@@ -15,6 +15,9 @@ pipeline {
   }
   stages {
     stage('ASSEMBLY') {
+      options {
+        retry(3)
+      }
       when {
         expression {
           env.BRANCH_NAME == cambpmDefaultBranch() || !pullRequest.labels.contains('no-build')
