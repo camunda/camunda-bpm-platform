@@ -27,7 +27,7 @@ pipeline {
       agent {
         node {
           label 'h2_perf32'
-          customWorkspace '/home/camunda/agent'
+          customWorkspace '/home/work/agent'
         }
       }
       steps {
@@ -112,7 +112,10 @@ pipeline {
             beforeAgent true
           }
           agent {
-            label 'h2'
+            node {
+              label 'h2'
+              customWorkspace '/home/work/agent'
+            }
           }
           steps {
             cambpmConditionalRetry {
@@ -139,7 +142,10 @@ pipeline {
             beforeAgent true
           }
           agent {
-            label 'h2'
+            node {
+              label 'h2'
+              customWorkspace '/home/work/agent'
+            }
           }
           steps {
             cambpmConditionalRetry() {
@@ -166,7 +172,10 @@ pipeline {
             beforeAgent true
           }
           agent {
-            label 'h2'
+            node {
+              label 'h2'
+              customWorkspace '/home/work/agent'
+            }
           }
           steps {
             cambpmConditionalRetry() {
@@ -192,7 +201,10 @@ pipeline {
             }
           }
           agent {
-            label 'h2'
+            node {
+              label 'h2'
+              customWorkspace '/home/work/agent'
+            }
           }
           steps {
             cambpmConditionalRetry() {
@@ -221,6 +233,7 @@ pipeline {
           agent {
             node {
               label 'h2'
+              customWorkspace '/home/work/agent'
             }
           }
           steps {
@@ -247,6 +260,7 @@ pipeline {
           agent {
             node {
               label 'h2'
+              customWorkspace '/home/work/agent'
             }
           }
           steps {
@@ -273,6 +287,7 @@ pipeline {
           agent {
             node {
               label 'h2'
+              customWorkspace '/home/work/agent'
             }
           }
           steps {
@@ -297,7 +312,10 @@ pipeline {
             beforeAgent true
           }
           agent {
-            label 'postgresql_96'
+            node {
+              label 'postgresql_96'
+              customWorkspace '/home/work/agent'
+            }
           }
           steps {
             cambpmConditionalRetry() {
@@ -321,7 +339,10 @@ pipeline {
             beforeAgent true
           }
           agent {
-            label 'postgresql_96'
+            node {
+              label 'postgresql_96'
+              customWorkspace '/home/work/agent'
+            }
           }
           steps {
             cambpmConditionalRetry() {
@@ -347,7 +368,10 @@ pipeline {
             beforeAgent true
           }
           agent {
-            label 'postgresql_96'
+            node {
+              label 'postgresql_96'
+              customWorkspace '/home/work/agent'
+            }
           }
           steps {
             cambpmConditionalRetry() {
@@ -374,7 +398,10 @@ pipeline {
             beforeAgent true
           }
           agent {
-            label 'chrome_78'
+            node {
+              label 'chrome_78'
+              customWorkspace '/home/work/agent'
+            }
           }
           steps {
             cambpmConditionalRetry() {
@@ -398,7 +425,10 @@ pipeline {
             beforeAgent true
           }
           agent {
-            label 'chrome_78'
+            node {
+              label 'chrome_78'
+              customWorkspace '/home/work/agent'
+            }
           }
           steps {
             cambpmConditionalRetry() {
@@ -420,7 +450,10 @@ pipeline {
             beforeAgent true
           }
           agent {
-            label 'chrome_78'
+            node {
+              label 'chrome_78'
+              customWorkspace '/home/work/agent'
+            }
           }
           steps {
             cambpmConditionalRetry() {
@@ -442,7 +475,10 @@ pipeline {
             beforeAgent true
           }
           agent {
-            label 'chrome_78'
+            node {
+              label 'chrome_78'
+              customWorkspace '/home/work/agent'
+            }
           }
           steps {
             cambpmConditionalRetry() {
@@ -466,7 +502,10 @@ pipeline {
             beforeAgent true
           }
           agent {
-            label 'chrome_78'
+            node {
+              label 'chrome_78'
+              customWorkspace '/home/work/agent'
+            }
           }
           steps {
             cambpmConditionalRetry() {
@@ -490,7 +529,10 @@ pipeline {
             beforeAgent true
           }
           agent {
-            label 'chrome_78'
+            node {
+              label 'chrome_78'
+              customWorkspace '/home/work/agent'
+            }
           }
           steps {
             cambpmConditionalRetry() {
@@ -507,8 +549,11 @@ pipeline {
     }
     stage('Engine Rest UNIT tests') {
       agent {
-        label 'centos'
-      }
+            node {
+              label 'centos'
+              customWorkspace '/home/work/agent'
+            }
+          }
       steps {
         script {
           parallel(cambpmGetMatrixStages('engine-rest', failedStageTypes, { stageType, dbLabel ->
@@ -519,8 +564,11 @@ pipeline {
     }
     stage('UNIT DB tests') {
       agent {
-        label 'centos'
-      }
+            node {
+              label 'centos'
+              customWorkspace '/home/work/agent'
+            }
+          }
       steps {
         script {
           parallel(cambpmGetMatrixStages('engine-webapp-unit', failedStageTypes, { stageType, dbLabel ->
@@ -545,7 +593,10 @@ pipeline {
             beforeAgent true
           }
           agent {
-            label 'h2'
+            node {
+              label 'h2'
+              customWorkspace '/home/work/agent'
+            }
           }
           steps {
             cambpmConditionalRetry() {
@@ -572,7 +623,10 @@ pipeline {
             beforeAgent true
           }
           agent {
-            label 'h2'
+            node {
+              label 'h2'
+              customWorkspace '/home/work/agent'
+            }
           }
           steps {
             cambpmConditionalRetry() {
@@ -596,7 +650,10 @@ pipeline {
             beforeAgent true
           }
           agent {
-            label 'h2'
+            node {
+              label 'h2'
+              customWorkspace '/home/work/agent'
+            }
           }
           steps {
             cambpmConditionalRetry() {
@@ -623,7 +680,10 @@ pipeline {
             beforeAgent true
           }
           agent {
-            label 'h2'
+            node {
+              label 'h2'
+              customWorkspace '/home/work/agent'
+            }
           }
           steps {
             cambpmConditionalRetry() {
@@ -650,7 +710,10 @@ pipeline {
             beforeAgent true
           }
           agent {
-            label 'h2'
+            node {
+              label 'h2'
+              customWorkspace '/home/work/agent'
+            }
           }
           steps {
             cambpmConditionalRetry() {
@@ -674,7 +737,10 @@ pipeline {
             beforeAgent true
           }
           agent {
-            label 'h2'
+            node {
+              label 'h2'
+              customWorkspace '/home/work/agent'
+            }
           }
           steps {
             cambpmConditionalRetry() {
@@ -698,7 +764,10 @@ pipeline {
             beforeAgent true
           }
           agent {
-            label 'h2'
+            node {
+              label 'h2'
+              customWorkspace '/home/work/agent'
+            }
           }
           steps {
             cambpmConditionalRetry() {
