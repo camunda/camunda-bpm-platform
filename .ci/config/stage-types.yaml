@@ -113,36 +113,6 @@ large-data-tests:
     runtimeStash: true
   timeout:
     cockroachdb: 14400
-webapp-plugins-unit:
-  directory: 'webapps/camunda-webapp/plugins'
-  command: 'clean test -Dskip.frontend.build=true -P'
-  stash:
-    runtimeStash: true
-    archiveStash: true
-  labels:
-  - 'all-db'
-  - 'db2'
-  - 'mysql'
-  - 'oracle'
-  - 'mariadb'
-  - 'sqlserver'
-  - 'postgresql'
-  - 'cockroachdb'
-webapp-plugins-unit-authorizations:
-  directory: 'webapps/camunda-webapp/plugins'
-  command: 'clean test -Dskip.frontend.build=true -PcfgAuthorizationCheckRevokesAlways,'
-  stash:
-    runtimeStash: true
-    archiveStash: true
-  labels:
-  - 'all-db'
-  - 'db2'
-  - 'mysql'
-  - 'oracle'
-  - 'mariadb'
-  - 'sqlserver'
-  - 'postgresql'
-  - 'cockroachdb'
 engine-rest-unit-jersey-2:
   directory: 'engine-rest/engine-rest'
   command: 'clean install -Pjersey2'
