@@ -70,7 +70,7 @@ pipeline {
               cambpmTriggerDownstream("cambpm-ce/cambpm-sidetrack/${env.BRANCH_NAME}")
             }
 
-            if (cambpmWithLabels('daily', 'default-build', 'rolling-update', 'migration', 'all-db', 'h2', 'db2', 'mysql', 'oracle', 'mariadb', 'sqlserver', 'postgresql', 'cockroachdb')) {
+            if (cambpmWithLabels('daily', 'default-build', 'rolling-update', 'migration', 'all-db', 'h2', 'db2', 'mysql', 'oracle', 'mariadb', 'sqlserver', 'postgresql')) {
               cambpmTriggerDownstream("cambpm-ce/cambpm-daily/${env.BRANCH_NAME}")
             }
 
