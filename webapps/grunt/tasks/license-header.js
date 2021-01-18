@@ -24,7 +24,7 @@ const COMERCIAL = `/*
 * You may not use this file except in compliance with the commercial license.
 */
 
-`
+`;
 
 const APACHE = `/*
  * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
@@ -45,16 +45,14 @@ const APACHE = `/*
 
 `;
 
-
 module.exports = function(grunt, isEE) {
-
   const LICENSE_BANNER = isEE ? COMERCIAL : APACHE;
 
   grunt.registerTask('license-header', function() {
     const targets = glob.sync('target/webapp/{**/camunda-*.js,plugin/**/*.js}');
 
     console.log('Adding license header to files:');
-    for(const target of targets) {
+    for (const target of targets) {
       console.log(target);
       var data = fs.readFileSync(target);
 
