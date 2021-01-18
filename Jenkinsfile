@@ -6,7 +6,11 @@
 def failedStageTypes = []
 
 pipeline {
-  agent none
+  agent {
+    node {
+      label 'centos-stable'
+    }
+  }
   options {
     buildDiscarder(logRotator(numToKeepStr: '5'))
     copyArtifactPermission('*');
@@ -16,24 +20,15 @@ pipeline {
   }
   stages {
     stage('ASSEMBLY') {
-      options {
-        retry(3)
-      }
       when {
         expression {
           env.BRANCH_NAME == cambpmDefaultBranch() || !pullRequest.labels.contains('no-build')
         }
         beforeAgent true
       }
-      agent {
-        node {
-          label 'h2_perf32'
-          customWorkspace '/home/work/agent'
-        }
-      }
+      agent none
       steps {
-        cambpmConditionalRetry {
-
+        cambpmConditionalRetry(agentLabel: 'h2_perf32') {
           cambpmRunMaven('.',
               'clean install source:jar -Pdistro,distro-ce,distro-wildfly,distro-webjar com.mycila:license-maven-plugin:check',
               withCatch: false,
@@ -103,23 +98,15 @@ pipeline {
     stage('h2 tests') {
       parallel {
         stage('engine-UNIT-h2') {
-          options {
-            retry(3)
-          }
           when {
             expression {
               cambpmWithLabels('h2', 'rolling-update', 'migration')
             }
             beforeAgent true
           }
-          agent {
-            node {
-              label 'h2'
-              customWorkspace '/home/work/agent'
-            }
-          }
+          agent none
           steps {
-            cambpmConditionalRetry {
+            cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMavenByStageType('engine-unit', 'h2')
             }
           }
@@ -133,23 +120,15 @@ pipeline {
           }
         }
         stage('engine-UNIT-authorizations-h2') {
-          options {
-            retry(3)
-          }
           when {
             expression {
               cambpmWithLabels('h2', 'authorizations')
             }
             beforeAgent true
           }
-          agent {
-            node {
-              label 'h2'
-              customWorkspace '/home/work/agent'
-            }
-          }
+          agent none
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMavenByStageType('engine-unit-authorizations', 'h2')
             }
           }
@@ -163,23 +142,15 @@ pipeline {
           }
         }
         stage('webapp-UNIT-h2') {
-          options {
-            retry(3)
-          }
           when {
             expression {
               cambpmWithLabels('default-build')
             }
             beforeAgent true
           }
-          agent {
-            node {
-              label 'h2'
-              customWorkspace '/home/work/agent'
-            }
-          }
+          agent none
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMavenByStageType('webapp-unit', 'h2')
             }
           }
@@ -193,22 +164,14 @@ pipeline {
           }
         }
         stage('webapp-UNIT-authorizations-h2') {
-          options {
-            retry(3)
-          }
           when {
             expression {
               cambpmWithLabels('default-build')
             }
           }
-          agent {
-            node {
-              label 'h2'
-              customWorkspace '/home/work/agent'
-            }
-          }
+          agent none
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMavenByStageType('webapp-unit-authorizations', 'h2')
             }
           }
@@ -222,23 +185,15 @@ pipeline {
           }
         }
         stage('engine-UNIT-historylevel-none') {
-          options {
-            retry(3)
-          }
           when {
             expression {
               cambpmWithLabels('default-build')
             }
             beforeAgent true
           }
-          agent {
-            node {
-              label 'h2'
-              customWorkspace '/home/work/agent'
-            }
-          }
+          agent none
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMaven('engine/', 'verify -Pcfghistorynone', runtimeStash: true)
             }
           }
@@ -249,23 +204,15 @@ pipeline {
           }
         }
         stage('engine-UNIT-historylevel-audit') {
-          options {
-            retry(3)
-          }
           when {
             expression {
               cambpmWithLabels('default-build')
             }
             beforeAgent true
           }
-          agent {
-            node {
-              label 'h2'
-              customWorkspace '/home/work/agent'
-            }
-          }
+          agent none
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMaven('engine/', 'verify -Pcfghistoryaudit', runtimeStash: true)
             }
           }
@@ -276,23 +223,15 @@ pipeline {
           }
         }
         stage('engine-UNIT-historylevel-activity') {
-          options {
-            retry(3)
-          }
           when {
             expression {
               cambpmWithLabels('default-build')
             }
             beforeAgent true
           }
-          agent {
-            node {
-              label 'h2'
-              customWorkspace '/home/work/agent'
-            }
-          }
+          agent none
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMaven('engine/', 'verify -Pcfghistoryactivity', runtimeStash: true)
             }
           }
@@ -303,23 +242,15 @@ pipeline {
           }
         }
         stage('engine-IT-tomcat-9-postgresql-96') {
-          options {
-            retry(3)
-          }
           when {
             expression {
               cambpmWithLabels('all-as', 'tomcat')
             }
             beforeAgent true
           }
-          agent {
-            node {
-              label 'postgresql_96'
-              customWorkspace '/home/work/agent'
-            }
-          }
+          agent none
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'postgresql_96') {
               cambpmRunMaven('qa/', 'clean install -Ptomcat,postgresql,engine-integration', runtimeStash: true, archiveStash: true)
             }
           }
@@ -330,23 +261,15 @@ pipeline {
           }
         }
         stage('engine-IT-wildfly-postgresql-96') {
-          options {
-            retry(3)
-          }
           when {
             expression {
               cambpmWithLabels('all-as', 'wildfly')
             }
             beforeAgent true
           }
-          agent {
-            node {
-              label 'postgresql_96'
-              customWorkspace '/home/work/agent'
-            }
-          }
+          agent none
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'postgresql_96') {
               cambpmRunMaven('qa/', 'clean install -Pwildfly,postgresql,engine-integration', runtimeStash: true, archiveStash: true)
             }
           }
@@ -361,21 +284,13 @@ pipeline {
           }
         }
         stage('engine-IT-XA-wildfly-postgresql-96') {
-          options {
-            retry(3)
-          }
           when {
             branch cambpmDefaultBranch();
             beforeAgent true
           }
-          agent {
-            node {
-              label 'postgresql_96'
-              customWorkspace '/home/work/agent'
-            }
-          }
+          agent none
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'postgresql_96') {
               cambpmRunMaven('qa/', 'clean install -Pwildfly,postgresql,postgresql-xa,engine-integration', runtimeStash: true, archiveStash: true)
             }
           }
@@ -389,23 +304,15 @@ pipeline {
           }
         }
         stage('webapp-IT-tomcat-9-h2') {
-          options {
-            retry(3)
-          }
           when {
             expression {
               cambpmWithLabels('webapp-integration', 'h2')
             }
             beforeAgent true
           }
-          agent {
-            node {
-              label 'chrome_78'
-              customWorkspace '/home/work/agent'
-            }
-          }
+          agent none
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'chrome_78') {
               cambpmRunMaven('qa/', 'clean install -Ptomcat,h2,webapps-integration', runtimeStash: true, archiveStash: true)
             }
           }
@@ -416,23 +323,15 @@ pipeline {
           }
         }
         stage('webapp-IT-wildfly-h2') {
-          options {
-            retry(3)
-          }
           when {
             expression {
               cambpmWithLabels('webapp-integration', 'h2')
             }
             beforeAgent true
           }
-          agent {
-            node {
-              label 'chrome_78'
-              customWorkspace '/home/work/agent'
-            }
-          }
+          agent none
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'chrome_78') {
               cambpmRunMaven('qa/', 'clean install -Pwildfly,h2,webapps-integration', runtimeStash: true, archiveStash: true)
             }
           }
@@ -443,21 +342,13 @@ pipeline {
           }
         }
         stage('webapp-IT-standalone-tomcat-9') {
-          options {
-            retry(3)
-          }
           when {
             branch cambpmDefaultBranch();
             beforeAgent true
           }
-          agent {
-            node {
-              label 'chrome_78'
-              customWorkspace '/home/work/agent'
-            }
-          }
+          agent none
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'chrome_78') {
               cambpmRunMaven('qa/', 'clean install -Ptomcat-vanilla,webapps-integration-sa', runtimeStash: true, archiveStash: true)
             }
           }
@@ -468,21 +359,13 @@ pipeline {
           }
         }
         stage('webapp-IT-standalone-wildfly') {
-          options {
-            retry(3)
-          }
           when {
             branch cambpmDefaultBranch();
             beforeAgent true
           }
-          agent {
-            node {
-              label 'chrome_78'
-              customWorkspace '/home/work/agent'
-            }
-          }
+          agent none
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'chrome_78') {
               cambpmRunMaven('qa/', 'clean install -Pwildfly-vanilla,webapps-integration-sa', runtimeStash: true, archiveStash: true)
             }
           }
@@ -493,23 +376,15 @@ pipeline {
           }
         }
         stage('camunda-run-IT') {
-          options {
-            retry(3)
-          }
           when {
             expression {
               cambpmWithLabels('run')
             }
             beforeAgent true
           }
-          agent {
-            node {
-              label 'chrome_78'
-              customWorkspace '/home/work/agent'
-            }
-          }
+          agent none
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'chrome_78') {
               cambpmRunMaven('distro/run/', 'clean install -Pintegration-test-camunda-run', runtimeStash: true, archiveStash: true, qaStash: true)
             }
           }
@@ -520,23 +395,15 @@ pipeline {
           }
         }
         stage('spring-boot-starter-IT') {
-          options {
-            retry(3)
-          }
           when {
             expression {
               cambpmWithLabels('spring-boot')
             }
             beforeAgent true
           }
-          agent {
-            node {
-              label 'chrome_78'
-              customWorkspace '/home/work/agent'
-            }
-          }
+          agent none
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'chrome_78') {
               cambpmRunMaven('spring-boot-starter/', 'clean install -Pintegration-test-spring-boot-starter', runtimeStash: true, archiveStash: true, qaStash: true)
             }
           }
@@ -581,9 +448,6 @@ pipeline {
     stage('MISC tests') {
       parallel {
         stage('engine-api-compatibility') {
-          options {
-            retry(3)
-          }
           when {
             allOf {
               expression {
@@ -593,14 +457,9 @@ pipeline {
             }
             beforeAgent true
           }
-          agent {
-            node {
-              label 'h2'
-              customWorkspace '/home/work/agent'
-            }
-          }
+          agent none
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMaven('engine/', 'clean verify -Pcheck-api-compatibility', runtimeStash: true)
             }
           }
@@ -611,9 +470,6 @@ pipeline {
           }
         }
         stage('engine-UNIT-plugins') {
-          options {
-            retry(3)
-          }
           when {
             allOf {
               expression {
@@ -623,14 +479,9 @@ pipeline {
             }
             beforeAgent true
           }
-          agent {
-            node {
-              label 'h2'
-              customWorkspace '/home/work/agent'
-            }
-          }
+          agent none
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMaven('engine/', 'clean test -Pcheck-plugins', runtimeStash: true)
             }
           }
@@ -641,23 +492,15 @@ pipeline {
           }
         }
         stage('engine-UNIT-database-table-prefix') {
-          options {
-            retry(3)
-          }
           when {
             expression {
               cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit') && cambpmWithLabels('all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql','cockroachdb') // TODO store as param
             }
             beforeAgent true
           }
-          agent {
-            node {
-              label 'h2'
-              customWorkspace '/home/work/agent'
-            }
-          }
+          agent none
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMaven('engine/', 'clean test -Pdb-table-prefix', runtimeStash: true)
             }
           }
@@ -668,9 +511,6 @@ pipeline {
           }
         }
         stage('webapp-UNIT-database-table-prefix') {
-          options {
-            retry(3)
-          }
           when {
             allOf {
               expression {
@@ -680,14 +520,9 @@ pipeline {
             }
             beforeAgent true
           }
-          agent {
-            node {
-              label 'h2'
-              customWorkspace '/home/work/agent'
-            }
-          }
+          agent none
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMaven('webapps/', 'clean test -Pdb-table-prefix', true, runtimeStash: true)
             }
           }
@@ -698,9 +533,6 @@ pipeline {
           }
         }
         stage('engine-UNIT-wls-compatibility') {
-          options {
-            retry(3)
-          }
           when {
             allOf {
               expression {
@@ -710,14 +542,9 @@ pipeline {
             }
             beforeAgent true
           }
-          agent {
-            node {
-              label 'h2'
-              customWorkspace '/home/work/agent'
-            }
-          }
+          agent none
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMaven('.', 'clean verify -Pcheck-engine,wls-compatibility,jersey', runtimeStash: true)
             }
           }
@@ -728,23 +555,15 @@ pipeline {
           }
         }
         stage('engine-IT-wildfly-domain') {
-          options {
-            retry(3)
-          }
           when {
             expression {
               cambpmIsNotFailedStageType(failedStageTypes, 'engine-IT-wildfly') && cambpmWithLabels('wildfly')
             }
             beforeAgent true
           }
-          agent {
-            node {
-              label 'h2'
-              customWorkspace '/home/work/agent'
-            }
-          }
+          agent none
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMaven('qa/', 'clean install -Pwildfly-domain,h2,engine-integration', runtimeStash: true, archiveStash: true)
             }
           }
@@ -755,23 +574,15 @@ pipeline {
           }
         }
         stage('engine-IT-wildfly-servlet') {
-          options {
-            retry(3)
-          }
           when {
             expression {
               cambpmIsNotFailedStageType(failedStageTypes, 'engine-IT-wildfly') && cambpmWithLabels('wildfly')
             }
             beforeAgent true
           }
-          agent {
-            node {
-              label 'h2'
-              customWorkspace '/home/work/agent'
-            }
-          }
+          agent none
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMaven('qa/', 'clean install -Pwildfly,wildfly-servlet,h2,engine-integration', runtimeStash: true, archiveStash: true)
             }
           }
