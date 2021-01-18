@@ -89,7 +89,9 @@ pipeline {
           beforeAgent true
         }
         agent {
-          label env.DB
+          node {
+            label env.DB
+          }
         }
         stages {
           stage('UNIT test') {
