@@ -2,6 +2,7 @@
 // https://github.com/camunda/cambpm-jenkins-shared-library
 @Library(['camunda-ci', 'cambpm-jenkins-shared-library@INFRA-2082-fix-copy-artifacts']) _
 
+
 def failedStageTypes = []
 
 pipeline {
