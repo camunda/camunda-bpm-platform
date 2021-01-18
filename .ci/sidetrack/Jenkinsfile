@@ -25,7 +25,7 @@ boolean shouldTrigger(String stageType) {
       return unitStages.contains(stageType)
     } else {
       // Downstream PR run
-      return cambpmWithLabelsList(cambpmGetLabels(stageType))
+      return cambpmWithLabels(cambpmGetLabels(stageType))
     }
   }
 }
