@@ -83,10 +83,10 @@ pipeline {
           }
         }
         when {
+          // execute after agent is created
           expression {
             shouldTrigger(env.STAGE_TYPE)
           }
-          beforeAgent true
         }
         agent {
           label env.DB
