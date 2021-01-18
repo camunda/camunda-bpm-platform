@@ -74,7 +74,8 @@ pipeline {
               cambpmTriggerDownstream("cambpm-ce/cambpm-daily/${env.BRANCH_NAME}")
             }
 
-            if (cambpmWithLabels('master')) {
+            if (cambpmWithLabels()) {
+              // only execute on `master`
               cambpmRunMaven('.',
                   'org.sonatype.plugins:nexus-staging-maven-plugin:deploy-staged -DaltStagingDirectory=${WORKSPACE}/staging -DskipStaging=true',
                   withCatch: false,
