@@ -7,13 +7,11 @@ def failedStageTypes = []
 pipeline {
   agent none
   parameters {
-    buildSelector(
-        name: 'copyArtifactSelector',
-        description: 'A build to take the artifacts from'
-    )
-    booleanParam defaultValue: true, description: '', name: 'STANDALONE'
-    booleanParam defaultValue: false, description: 'Is the current build triggered in the scope of an upstream pull request', name: 'UPSTREAM_PR'
-    string defaultValue: '', description: 'The labels assigned to the CE pull request', name: 'PR_LABELS'
+    booleanParam name: 'STANDALONE', defaultValue: true
+    booleanParam name: 'UPSTREAM_PR', defaultValue: false, description: 'Is the current build triggered in the scope of an upstream pull request'
+    string name: 'UPSTREAM_PROJECT_NAME', defaultValue: 'cambpm-ce/cambpm-main/master'
+    string name: 'UPSTREAM_BUILD_NUMBER'
+    string name: 'PR_LABELS', defaultValue: '', description: 'The labels assigned to the CE pull request'
   }
   options {
     buildDiscarder(logRotator(numToKeepStr: '5'))
@@ -34,7 +32,7 @@ pipeline {
       }
       steps {
         cambpmConditionalRetry {
-          cambpmCopyArtifacts("cambpm-ce/cambpm-main/${env.BRANCH_NAME}")
+          cambpmCopyArtifacts(params.UPSTREAM_PROJECT_NAME, params.UPSTREAM_BUILD_NUMBER)
           cambpmStash("platform-stash-runtime",
                       ".m2/org/camunda/**/*-SNAPSHOT/**",
                       "**/qa/**,**/*qa*/**,**/*.zip,**/*.tar.gz")
