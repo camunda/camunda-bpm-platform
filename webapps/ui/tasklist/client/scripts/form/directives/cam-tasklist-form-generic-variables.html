@@ -77,7 +77,7 @@
                  ng-model="variable.name"
                  name="name"
                  cam-unique-value="{{ getVariableNames() }}"
-                 ng-readonly="variable.fixedName" />
+                 ng-readonly="variable.fixedName || variable.readonly" />
           <span ng-if="repeatForm.name.$invalid && repeatForm.name.$dirty" class="has-error">
             <span ng-if="repeatForm.name.$error.required"
                   class="help-block">
@@ -93,7 +93,7 @@
 
 
         <div class="col-xs-4">
-          <select ng-disabled="!variable.name"
+          <select ng-disabled="!variable.name || variable.readonly"
                   class="form-control"
                   ng-model="variable.type">
 
@@ -108,6 +108,8 @@
             <option value="Double">Double</option>
             <option value="String">String</option>
             <option value="Date">Date</option>
+            <option value="Object">Object</option>
+            <option value="File">File</option>
           </select>
         </div>
 
@@ -116,6 +118,40 @@
         <div class="col-xs-4"
              ng-switch="variable.type">
 
+          <div ng-switch-when="Object">
+            <label class="control-label object-type">{{ "CAM_WIDGET_VARIABLE_DIALOG_LABEL_OBJECT_TYPE" | translate }}</label>
+            <input class="form-control"
+                   required
+                   ng-model="variable.valueInfo.objectTypeName"
+                   name="objectTypeName" />
+
+            <span ng-if="repeatForm.objectTypeName.$invalid && repeatForm.objectTypeName.$dirty" class="has-error">
+              <span ng-if="repeatForm.objectTypeName.$error.required"
+                    class="help-block">
+                {{ 'REQUIRED_FIELD' | translate }}
+              </span>
+            </span>
+
+            <label class="control-label">{{ "CAM_WIDGET_VARIABLE_DIALOG_LABEL_SERIALIZATION" | translate }}</label>
+            <input class="form-control"
+                   required
+                   ng-model="variable.valueInfo.serializationDataFormat"
+                   name="serializationDataFormat" />
+
+            <span ng-if="repeatForm.serializationDataFormat.$invalid && repeatForm.serializationDataFormat.$dirty" class="has-error">
+              <span ng-if="repeatForm.serializationDataFormat.$error.required"
+                    class="help-block">
+                {{ 'REQUIRED_FIELD' | translate }}
+              </span>
+            </span>
+
+            <label class="control-label">{{ "CAM_WIDGET_VARIABLE_DIALOG_LABEL_SERIALIZED_VALUE" | translate }}</label>
+            <textarea class="form-control"
+                   required
+                   ng-model="variable.value"
+                   name="value">
+            </textarea>
+          </div>
 
           <input ng-switch-when="Boolean"
                  class="form-control"
@@ -125,6 +161,20 @@
                  cam-variable-name="{{ variable.name }}"
                  cam-variable-type="{{ variable.type }}" />
 
+          <input ng-switch-when="File"
+                 ng-if="!variable.readonly"
+                 class="form-control"
+                 type="file"                 
+                 cam-variable-name="{{ variable.name }}"
+                 cam-variable-type="File"
+                 ng-model="variable.file" />
+
+          <a ng-switch-when="File"
+             ng-if="variable.readonly"
+             href="{{variable.downloadUrl}}"
+             class="form-control-static">
+                {{ 'DOWNLOAD' | translate }}
+          </a>
 
           <input ng-switch-default
                  class="form-control"

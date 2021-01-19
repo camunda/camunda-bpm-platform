@@ -42,7 +42,7 @@ module.exports = [
 
       link: function($scope, $element, attrs, formController) {
         var formElement = $($element[0]).find('form');
-        var camForm = null;
+        var camForm = ($scope.camForm = null);
         var form = {
           $valid: false,
           $invalid: true
@@ -94,7 +94,7 @@ module.exports = [
             done: done
           });
 
-          camForm = new CamForm(params);
+          $scope.camForm = camForm = new CamForm(params);
         }
 
         var done = function(err, _camForm) {
@@ -153,6 +153,18 @@ module.exports = [
           for (var v in variables) {
             variables[v].value = null;
           }
+
+          $scope.variables
+            .filter(el => el.type === 'Object')
+            .forEach(el => {
+              camForm.variableManager.createVariable({
+                name: el.name,
+                type: 'Object',
+                value: el.value,
+                valueInfo: el.valueInfo
+              });
+            });
+
           camForm.submit(localCallback);
         };
 

@@ -30,7 +30,8 @@ module.exports = [
   'Notifications',
   '$translate',
   'unfixDate',
-  function(camAPI, Notifications, $translate, unfixDate) {
+  'Uri',
+  function(camAPI, Notifications, $translate, unfixDate, Uri) {
     return {
       restrict: 'A',
 
@@ -159,6 +160,32 @@ module.exports = [
                     fixedName: true
                   });
                   variableAdded = true;
+                }
+
+                if (value.type === 'Object') {
+                  $scope.variables.push({
+                    name: name,
+                    value: value.value,
+                    type: value.type,
+                    valueInfo: value.valueInfo
+                  });
+                  variableAdded = true;
+                }
+
+                if (value.type === 'File') {
+                  variableAdded = true;
+                  $scope.variables.push({
+                    name: name,
+                    type: value.type,
+                    downloadUrl: Uri.appUri(
+                      'engine://engine/:engine/task/' +
+                        formController.getParams().taskId +
+                        '/variables/' +
+                        name +
+                        '/data'
+                    ),
+                    readonly: true
+                  });
                 }
               });
               if (!variableAdded) {
