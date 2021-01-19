@@ -25,7 +25,6 @@ pipeline {
         }
         beforeAgent true
       }
-      agent none
       steps {
         cambpmConditionalRetry(agentLabel: 'h2_perf32') {
           cambpmRunMaven('.',
@@ -103,7 +102,6 @@ pipeline {
             }
             beforeAgent true
           }
-          agent none
           steps {
             cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMavenByStageType('engine-unit', 'h2')
@@ -125,7 +123,6 @@ pipeline {
             }
             beforeAgent true
           }
-          agent none
           steps {
             cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMavenByStageType('engine-unit-authorizations', 'h2')
@@ -147,7 +144,6 @@ pipeline {
             }
             beforeAgent true
           }
-          agent none
           steps {
             cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMavenByStageType('webapp-unit', 'h2')
@@ -168,7 +164,6 @@ pipeline {
               cambpmWithLabels('default-build')
             }
           }
-          agent none
           steps {
             cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMavenByStageType('webapp-unit-authorizations', 'h2')
@@ -190,7 +185,6 @@ pipeline {
             }
             beforeAgent true
           }
-          agent none
           steps {
             cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMaven('engine/', 'verify -Pcfghistorynone', runtimeStash: true)
@@ -209,7 +203,6 @@ pipeline {
             }
             beforeAgent true
           }
-          agent none
           steps {
             cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMaven('engine/', 'verify -Pcfghistoryaudit', runtimeStash: true)
@@ -228,7 +221,6 @@ pipeline {
             }
             beforeAgent true
           }
-          agent none
           steps {
             cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMaven('engine/', 'verify -Pcfghistoryactivity', runtimeStash: true)
@@ -247,7 +239,6 @@ pipeline {
             }
             beforeAgent true
           }
-          agent none
           steps {
             cambpmConditionalRetry(agentLabel: 'postgresql_96') {
               cambpmRunMaven('qa/', 'clean install -Ptomcat,postgresql,engine-integration', runtimeStash: true, archiveStash: true)
@@ -266,7 +257,6 @@ pipeline {
             }
             beforeAgent true
           }
-          agent none
           steps {
             cambpmConditionalRetry(agentLabel: 'postgresql_96') {
               cambpmRunMaven('qa/', 'clean install -Pwildfly,postgresql,engine-integration', runtimeStash: true, archiveStash: true)
@@ -287,7 +277,6 @@ pipeline {
             branch cambpmDefaultBranch();
             beforeAgent true
           }
-          agent none
           steps {
             cambpmConditionalRetry(agentLabel: 'postgresql_96') {
               cambpmRunMaven('qa/', 'clean install -Pwildfly,postgresql,postgresql-xa,engine-integration', runtimeStash: true, archiveStash: true)
@@ -309,7 +298,6 @@ pipeline {
             }
             beforeAgent true
           }
-          agent none
           steps {
             cambpmConditionalRetry(agentLabel: 'chrome_78') {
               cambpmRunMaven('qa/', 'clean install -Ptomcat,h2,webapps-integration', runtimeStash: true, archiveStash: true)
@@ -328,7 +316,6 @@ pipeline {
             }
             beforeAgent true
           }
-          agent none
           steps {
             cambpmConditionalRetry(agentLabel: 'chrome_78') {
               cambpmRunMaven('qa/', 'clean install -Pwildfly,h2,webapps-integration', runtimeStash: true, archiveStash: true)
@@ -345,7 +332,6 @@ pipeline {
             branch cambpmDefaultBranch();
             beforeAgent true
           }
-          agent none
           steps {
             cambpmConditionalRetry(agentLabel: 'chrome_78') {
               cambpmRunMaven('qa/', 'clean install -Ptomcat-vanilla,webapps-integration-sa', runtimeStash: true, archiveStash: true)
@@ -362,7 +348,6 @@ pipeline {
             branch cambpmDefaultBranch();
             beforeAgent true
           }
-          agent none
           steps {
             cambpmConditionalRetry(agentLabel: 'chrome_78') {
               cambpmRunMaven('qa/', 'clean install -Pwildfly-vanilla,webapps-integration-sa', runtimeStash: true, archiveStash: true)
@@ -381,7 +366,6 @@ pipeline {
             }
             beforeAgent true
           }
-          agent none
           steps {
             cambpmConditionalRetry(agentLabel: 'chrome_78') {
               cambpmRunMaven('distro/run/', 'clean install -Pintegration-test-camunda-run', runtimeStash: true, archiveStash: true, qaStash: true)
@@ -400,7 +384,6 @@ pipeline {
             }
             beforeAgent true
           }
-          agent none
           steps {
             cambpmConditionalRetry(agentLabel: 'chrome_78') {
               cambpmRunMaven('spring-boot-starter/', 'clean install -Pintegration-test-spring-boot-starter', runtimeStash: true, archiveStash: true, qaStash: true)
@@ -456,7 +439,6 @@ pipeline {
             }
             beforeAgent true
           }
-          agent none
           steps {
             cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMaven('engine/', 'clean verify -Pcheck-api-compatibility', runtimeStash: true)
@@ -478,7 +460,6 @@ pipeline {
             }
             beforeAgent true
           }
-          agent none
           steps {
             cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMaven('engine/', 'clean test -Pcheck-plugins', runtimeStash: true)
@@ -497,7 +478,6 @@ pipeline {
             }
             beforeAgent true
           }
-          agent none
           steps {
             cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMaven('engine/', 'clean test -Pdb-table-prefix', runtimeStash: true)
@@ -519,7 +499,6 @@ pipeline {
             }
             beforeAgent true
           }
-          agent none
           steps {
             cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMaven('webapps/', 'clean test -Pdb-table-prefix', true, runtimeStash: true)
@@ -541,7 +520,6 @@ pipeline {
             }
             beforeAgent true
           }
-          agent none
           steps {
             cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMaven('.', 'clean verify -Pcheck-engine,wls-compatibility,jersey', runtimeStash: true)
@@ -560,7 +538,6 @@ pipeline {
             }
             beforeAgent true
           }
-          agent none
           steps {
             cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMaven('qa/', 'clean install -Pwildfly-domain,h2,engine-integration', runtimeStash: true, archiveStash: true)
@@ -579,7 +556,6 @@ pipeline {
             }
             beforeAgent true
           }
-          agent none
           steps {
             cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMaven('qa/', 'clean install -Pwildfly,wildfly-servlet,h2,engine-integration', runtimeStash: true, archiveStash: true)
