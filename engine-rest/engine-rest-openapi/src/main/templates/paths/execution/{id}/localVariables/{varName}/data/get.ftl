@@ -1,7 +1,7 @@
 <#-- Generated From File: camunda-docs-manual/public/reference/rest/execution/local-variables/get-local-variable-binary/index.html -->
 {
   <@lib.endpointInfo
-      id = "getVariableBinary"
+      id = "getLocalExecutionVariableBinary"
       tag = "Execution"
       summary = "Get Local Execution Variable (Binary)"
       desc = "Retrieves a binary variable from the context of a given execution by id. Does not

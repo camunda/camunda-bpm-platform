@@ -1,7 +1,7 @@
 <#-- Generated From File: camunda-docs-manual/public/reference/rest/execution/local-variables/put-local-variable-binary/index.html -->
 {
   <@lib.endpointInfo
-      id = "setBinaryVariable"
+      id = "setLocalExecutionVariableBinary"
       tag = "Execution"
       summary = "Post Local Execution Variable (Binary)"
       desc = "Sets the serialized value for a binary variable or the binary value for a file

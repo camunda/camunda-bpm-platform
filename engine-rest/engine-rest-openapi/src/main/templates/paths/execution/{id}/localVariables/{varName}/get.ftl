@@ -1,7 +1,7 @@
 <#-- Generated From File: camunda-docs-manual/public/reference/rest/execution/local-variables/get-local-variable/index.html -->
 {
   <@lib.endpointInfo
-      id = "getVariable"
+      id = "getLocalExecutionVariable"
       tag = "Execution"
       summary = "Get Local Execution Variable"
       desc = "Retrieves a variable from the context of a given execution by id. Does not traverse

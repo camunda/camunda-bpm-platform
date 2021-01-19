@@ -1,7 +1,7 @@
 <#-- Generated From File: camunda-docs-manual/public/reference/rest/execution/local-variables/put-local-variable/index.html -->
 {
   <@lib.endpointInfo
-      id = "putVariable"
+      id = "putLocalExecutionVariable"
       tag = "Execution"
       summary = "Put Local Execution Variable"
       desc = "Sets a variable in the context of a given execution by id. Update does not
