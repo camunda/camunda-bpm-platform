@@ -7,7 +7,7 @@ def failedStageTypes = []
 pipeline {
   agent {
     node {
-      label 'centos-stable'
+      label 'jenkins-job-runner'
     }
   }
   options {
