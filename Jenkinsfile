@@ -1,11 +1,15 @@
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
-@Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library@INFRA-2082-fix-copy-artifacts']) _
 
 def failedStageTypes = []
 
 pipeline {
-  agent none
+  agent {
+    node {
+      label 'jenkins-job-runner'
+    }
+  }
   options {
     buildDiscarder(logRotator(numToKeepStr: '5'))
     copyArtifactPermission('*');
@@ -21,12 +25,8 @@ pipeline {
         }
         beforeAgent true
       }
-      agent {
-        label 'h2_perf32'
-      }
       steps {
-        cambpmConditionalRetry {
-
+        cambpmConditionalRetry(agentLabel: 'h2_perf32') {
           cambpmRunMaven('.',
               'clean install source:jar -Pdistro,distro-ce,distro-wildfly,distro-webjar com.mycila:license-maven-plugin:check',
               withCatch: false,
@@ -50,8 +50,8 @@ pipeline {
           cambpmStash("platform-stash-archives",
                       ".m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.zip,.m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.tar.gz")
           cambpmStash("platform-stash-qa",
-                      ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**",
-                      "**/*.zip,**/*.tar.gz")
+                     ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**",
+                     "**/*.zip,**/*.tar.gz")
 
           script {
             if (env.BRANCH_NAME == cambpmDefaultBranch()) {
@@ -108,11 +108,8 @@ pipeline {
             }
             beforeAgent true
           }
-          agent {
-            label 'h2'
-          }
           steps {
-            cambpmConditionalRetry {
+            cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMavenByStageType('engine-unit', 'h2')
             }
           }
@@ -132,11 +129,8 @@ pipeline {
             }
             beforeAgent true
           }
-          agent {
-            label 'h2'
-          }
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMavenByStageType('engine-unit-authorizations', 'h2')
             }
           }
@@ -156,11 +150,8 @@ pipeline {
             }
             beforeAgent true
           }
-          agent {
-            label 'h2'
-          }
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMavenByStageType('webapp-unit', 'h2')
             }
           }
@@ -179,11 +170,8 @@ pipeline {
               cambpmWithLabels('default-build')
             }
           }
-          agent {
-            label 'h2'
-          }
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMavenByStageType('webapp-unit-authorizations', 'h2')
             }
           }
@@ -203,13 +191,8 @@ pipeline {
             }
             beforeAgent true
           }
-          agent {
-            node {
-              label 'h2'
-            }
-          }
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMaven('engine/', 'verify -Pcfghistorynone', runtimeStash: true)
             }
           }
@@ -226,13 +209,8 @@ pipeline {
             }
             beforeAgent true
           }
-          agent {
-            node {
-              label 'h2'
-            }
-          }
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMaven('engine/', 'verify -Pcfghistoryaudit', runtimeStash: true)
             }
           }
@@ -249,13 +227,8 @@ pipeline {
             }
             beforeAgent true
           }
-          agent {
-            node {
-              label 'h2'
-            }
-          }
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMaven('engine/', 'verify -Pcfghistoryactivity', runtimeStash: true)
             }
           }
@@ -272,11 +245,8 @@ pipeline {
             }
             beforeAgent true
           }
-          agent {
-            label 'postgresql_96'
-          }
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'postgresql_96') {
               cambpmRunMaven('qa/', 'clean install -Ptomcat,postgresql,engine-integration', runtimeStash: true, archiveStash: true)
             }
           }
@@ -293,11 +263,8 @@ pipeline {
             }
             beforeAgent true
           }
-          agent {
-            label 'postgresql_96'
-          }
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'postgresql_96') {
               cambpmRunMaven('qa/', 'clean install -Pwildfly,postgresql,engine-integration', runtimeStash: true, archiveStash: true)
             }
           }
@@ -316,11 +283,8 @@ pipeline {
             branch cambpmDefaultBranch();
             beforeAgent true
           }
-          agent {
-            label 'postgresql_96'
-          }
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'postgresql_96') {
               cambpmRunMaven('qa/', 'clean install -Pwildfly,postgresql,postgresql-xa,engine-integration', runtimeStash: true, archiveStash: true)
             }
           }
@@ -340,11 +304,8 @@ pipeline {
             }
             beforeAgent true
           }
-          agent {
-            label 'chrome_78'
-          }
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'chrome_78') {
               cambpmRunMaven('qa/', 'clean install -Ptomcat,h2,webapps-integration', runtimeStash: true, archiveStash: true)
             }
           }
@@ -361,11 +322,8 @@ pipeline {
             }
             beforeAgent true
           }
-          agent {
-            label 'chrome_78'
-          }
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'chrome_78') {
               cambpmRunMaven('qa/', 'clean install -Pwildfly,h2,webapps-integration', runtimeStash: true, archiveStash: true)
             }
           }
@@ -380,11 +338,8 @@ pipeline {
             branch cambpmDefaultBranch();
             beforeAgent true
           }
-          agent {
-            label 'chrome_78'
-          }
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'chrome_78') {
               cambpmRunMaven('qa/', 'clean install -Ptomcat-vanilla,webapps-integration-sa', runtimeStash: true, archiveStash: true)
             }
           }
@@ -399,11 +354,8 @@ pipeline {
             branch cambpmDefaultBranch();
             beforeAgent true
           }
-          agent {
-            label 'chrome_78'
-          }
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'chrome_78') {
               cambpmRunMaven('qa/', 'clean install -Pwildfly-vanilla,webapps-integration-sa', runtimeStash: true, archiveStash: true)
             }
           }
@@ -420,11 +372,8 @@ pipeline {
             }
             beforeAgent true
           }
-          agent {
-            label 'chrome_78'
-          }
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'chrome_78') {
               cambpmRunMaven('distro/run/', 'clean install -Pintegration-test-camunda-run', runtimeStash: true, archiveStash: true, qaStash: true)
             }
           }
@@ -441,11 +390,8 @@ pipeline {
             }
             beforeAgent true
           }
-          agent {
-            label 'chrome_78'
-          }
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'chrome_78') {
               cambpmRunMaven('spring-boot-starter/', 'clean install -Pintegration-test-spring-boot-starter', runtimeStash: true, archiveStash: true, qaStash: true)
             }
           }
@@ -458,9 +404,6 @@ pipeline {
       }
     }
     stage('Engine Rest UNIT tests') {
-      agent {
-        label 'centos'
-      }
       steps {
         script {
           parallel(cambpmGetMatrixStages('engine-rest', failedStageTypes, { allowedStageLabels, dbLabel ->
@@ -470,9 +413,6 @@ pipeline {
       }
     }
     stage('UNIT DB tests') {
-      agent {
-        label 'centos'
-      }
       steps {
         script {
           parallel(cambpmGetMatrixStages('engine-webapp-unit', failedStageTypes, { allowedStageLabels, dbLabel ->
@@ -493,11 +433,8 @@ pipeline {
             }
             beforeAgent true
           }
-          agent {
-            label 'h2'
-          }
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMaven('engine/', 'clean verify -Pcheck-api-compatibility', runtimeStash: true)
             }
           }
@@ -517,11 +454,8 @@ pipeline {
             }
             beforeAgent true
           }
-          agent {
-            label 'h2'
-          }
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMaven('engine/', 'clean test -Pcheck-plugins', runtimeStash: true)
             }
           }
@@ -538,11 +472,8 @@ pipeline {
             }
             beforeAgent true
           }
-          agent {
-            label 'h2'
-          }
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMaven('engine/', 'clean test -Pdb-table-prefix', runtimeStash: true)
             }
           }
@@ -562,11 +493,8 @@ pipeline {
             }
             beforeAgent true
           }
-          agent {
-            label 'h2'
-          }
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMaven('webapps/', 'clean test -Pdb-table-prefix', true, runtimeStash: true)
             }
           }
@@ -586,11 +514,8 @@ pipeline {
             }
             beforeAgent true
           }
-          agent {
-            label 'h2'
-          }
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMaven('.', 'clean verify -Pcheck-engine,wls-compatibility,jersey', runtimeStash: true)
             }
           }
@@ -607,11 +532,8 @@ pipeline {
             }
             beforeAgent true
           }
-          agent {
-            label 'h2'
-          }
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMaven('qa/', 'clean install -Pwildfly-domain,h2,engine-integration', runtimeStash: true, archiveStash: true)
             }
           }
@@ -628,11 +550,8 @@ pipeline {
             }
             beforeAgent true
           }
-          agent {
-            label 'h2'
-          }
           steps {
-            cambpmConditionalRetry() {
+            cambpmConditionalRetry(agentLabel: 'h2') {
               cambpmRunMaven('qa/', 'clean install -Pwildfly,wildfly-servlet,h2,engine-integration', runtimeStash: true, archiveStash: true)
             }
           }
@@ -650,13 +569,6 @@ pipeline {
       script {
         if (!agentDisconnected()){
           cambpmSendEmailNotification()
-        }
-      }
-    }
-    always {
-      script {
-        if (agentDisconnected()) {// Retrigger the build if the slave disconnected
-          build job: currentBuild.projectName, propagate: false, quietPeriod: 60, wait: false
         }
       }
     }
