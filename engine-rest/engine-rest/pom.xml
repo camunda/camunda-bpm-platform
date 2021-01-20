@@ -548,6 +548,9 @@
     
     <profile>
       <id>resteasy3</id>
+      <properties>
+        <version.resteasy>${version.resteasy3}</version.resteasy>
+      </properties>
       <dependencies>
         <dependency>
           <groupId>org.jboss.spec.javax.ws.rs</groupId>
