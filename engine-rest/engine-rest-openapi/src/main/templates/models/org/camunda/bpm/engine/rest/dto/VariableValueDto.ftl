@@ -31,7 +31,7 @@
 
                 * `transient`: Indicates whether the variable should be transient or
                 not. See [documentation](${docsUrl}/user-guide/process-engine/variables#transient-variables) for more informations.
-                (Not applicable for `decision-definition` endpoints)"
+                (Not applicable for `decision-definition` and ` /process-instance/variables-async` endpoints)"
     />
 
 
