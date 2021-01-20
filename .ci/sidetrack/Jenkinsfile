@@ -1,6 +1,6 @@
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
-@Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library@INFRA-2114-fix-agent-disconnect']) _
 
 /**
  * A method to perform a custom evaluation if certain stages in the Side track pipeline
@@ -31,7 +31,11 @@ boolean shouldTrigger(String stageType) {
 }
 
 pipeline {
-  agent none
+  agent {
+    node {
+      label 'jenkins-job-runner'
+    }
+  }
   parameters {
     booleanParam name: 'STANDALONE', defaultValue: true
     booleanParam name: 'UPSTREAM_PR', defaultValue: false, description: 'Is the current build triggered in the scope of an upstream pull request'
@@ -51,21 +55,20 @@ pipeline {
         expression {
           !cambpmWithLabels('standalone')
         }
-        beforeAgent true
-      }
-      agent {
-        label 'centos-stable'
       }
       steps {
-        cambpmConditionalRetry {
-          cambpmCopyArtifacts(params.UPSTREAM_PROJECT_NAME, params.UPSTREAM_BUILD_NUMBER)
-          cambpmStash("platform-stash-runtime",
-                      ".m2/org/camunda/**/*-SNAPSHOT/**",
-                      "**/qa/**,**/*qa*/**,**/*.zip,**/*.tar.gz")
-          cambpmStash("platform-stash-qa",
-                      ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**",
-                      "**/*.zip,**/*.tar.gz")
-        }
+        cambpmConditionalRetry([
+          agentLabel: 'centos-stable',
+          runSteps: {
+            cambpmCopyArtifacts(params.UPSTREAM_PROJECT_NAME, params.UPSTREAM_BUILD_NUMBER)
+            cambpmStash("platform-stash-runtime",
+                        ".m2/org/camunda/**/*-SNAPSHOT/**",
+                        "**/qa/**,**/*qa*/**,**/*.zip,**/*.tar.gz")
+            cambpmStash("platform-stash-qa",
+                        ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**",
+                        "**/*.zip,**/*.tar.gz")
+          }
+        ])
       }
     }
     stage('UNIT DB tests') {
@@ -86,25 +89,23 @@ pipeline {
             shouldTrigger(env.STAGE_TYPE)
           }
         }
-        agent {
-          label env.DB
-        }
         stages {
           stage('UNIT test') {
             steps {
-              cambpmConditionalRetry {
-                echo("UNIT DB Test Stage: ${env.STAGE_TYPE}-${env.DB}")
-                cambpmRunMavenByStageType(env.STAGE_TYPE, env.DB)
-              }
-            }
-            post {
-              always {
-                script {
-                  if (!env.STAGE_TYPE.equals('sql-scripts')) {
-                    cambpmPublishTestResult();
+              cambpmConditionalRetry([
+                agentLabel: env.DB,
+                runSteps: {
+                  echo("UNIT DB Test Stage: ${env.STAGE_TYPE}-${env.DB}")
+                  cambpmRunMavenByStageType(env.STAGE_TYPE, env.DB)
+                },
+                postAlways: {
+                  script {
+                    if (!env.STAGE_TYPE.equals('sql-scripts')) {
+                      cambpmPublishTestResult();
+                    }
                   }
                 }
-              }
+              ])
             }
           }
         }
@@ -120,8 +121,9 @@ pipeline {
       }
     }
     always {
+      // Retrigger the build if the agent of jenkins-job-runner disconnected.
       script {
-        if (agentDisconnected()) {// Retrigger the build if the slave disconnected
+        if (agentDisconnected()) {
           build job: currentBuild.projectName, propagate: false, quietPeriod: 60, wait: false
         }
       }

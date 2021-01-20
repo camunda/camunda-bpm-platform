@@ -1,11 +1,15 @@
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
-@Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library@INFRA-2114-fix-agent-disconnect']) _
 
 def failedStageTypes = []
 
 pipeline {
-  agent none
+  agent {
+    node {
+      label 'jenkins-job-runner'
+    }
+  }
   parameters {
     booleanParam name: 'STANDALONE', defaultValue: true
     booleanParam name: 'UPSTREAM_PR', defaultValue: false, description: 'Is the current build triggered in the scope of an upstream pull request'
@@ -25,31 +29,30 @@ pipeline {
         expression {
           !cambpmWithLabels('standalone')
         }
-        beforeAgent true
-      }
-      agent {
-        label 'centos-stable'
       }
       steps {
-        cambpmConditionalRetry {
-          cambpmCopyArtifacts(params.UPSTREAM_PROJECT_NAME, params.UPSTREAM_BUILD_NUMBER)
-          cambpmStash("platform-stash-runtime",
-                      ".m2/org/camunda/**/*-SNAPSHOT/**",
-                      "**/qa/**,**/*qa*/**,**/*.zip,**/*.tar.gz")
-          cambpmStash("platform-stash-qa",
-                      ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**",
-                      "**/*.zip,**/*.tar.gz")
-        }
+        cambpmConditionalRetry([
+          agentLabel: 'centos-stable',
+          runSteps: {
+            cambpmCopyArtifacts(params.UPSTREAM_PROJECT_NAME, params.UPSTREAM_BUILD_NUMBER)
+            cambpmStash("platform-stash-runtime",
+                        ".m2/org/camunda/**/*-SNAPSHOT/**",
+                        "**/qa/**,**/*qa*/**,**/*.zip,**/*.tar.gz")
+            cambpmStash("platform-stash-qa",
+                        ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**",
+                        "**/*.zip,**/*.tar.gz")
+          }
+        ])
       }
     }
     stage('check-sql-scripts') {
-      agent {
-        label 'centos-stable'
-      }
       steps {
-        cambpmConditionalRetry {
-          sh '.ci/scripts/check-sql-scripts.sh'
-        }
+        cambpmConditionalRetry([
+          agentLabel: 'centos-stable',
+          runSteps: {
+            sh '.ci/scripts/check-sql-scripts.sh'
+          }
+        ])
       }
     }
     stage('Standalone QA tests') {
@@ -59,39 +62,33 @@ pipeline {
             expression {
               cambpmWithLabels('h2', 'all-db')
             }
-            beforeAgent true
-          }
-          agent {
-            label 'h2'
-          }
+              }
           steps {
-            cambpmConditionalRetry {
-              cambpmRunMavenByStageType('sql-scripts', 'h2')
-            }
-          }
-          post {
-            failure {
-              cambpmAddFailedStageType(failedStageTypes, 'sql-scripts')
-            }
+            cambpmConditionalRetry([
+              agentLabel: 'h2',
+              runSteps: {
+                cambpmRunMavenByStageType('sql-scripts', 'h2')
+              },
+              postFailure: {
+                cambpmAddFailedStageType(failedStageTypes, 'sql-scripts')
+              }
+            ])
           }
         }
         stage('wildfly-subsystem-UNIT-wildfly') {
           when {
             branch cambpmDefaultBranch();
-            beforeAgent true
-          }
-          agent {
-            label 'h2'
-          }
+              }
           steps {
-            cambpmConditionalRetry {
-              cambpmRunMaven('distro/wildfly/subsystem', 'test', runtimeStash: true)
-            }
-          }
-          post {
-            always {
-              cambpmPublishTestResult();
-            }
+            cambpmConditionalRetry([
+              agentLabel: 'h2',
+              runSteps: {
+                cambpmRunMaven('distro/wildfly/subsystem', 'test', runtimeStash: true)
+              },
+              postAlways: {
+                cambpmPublishTestResult()
+              }
+            ])
           }
         }
         stage('UPGRADE-databases-from-714-h2') {
@@ -99,23 +96,20 @@ pipeline {
             expression {
               cambpmWithLabels('h2', 'all-db')
             }
-            beforeAgent true
-          }
-          agent {
-            label 'h2'
-          }
+              }
           steps {
-            cambpmConditionalRetry {
-              cambpmRunMavenByStageType('upgrade-database', 'h2')
-            }
-          }
-          post {
-            always {
-              cambpmPublishTestResult();
-            }
-            failure {
-              cambpmAddFailedStageType(failedStageTypes, 'upgrade-database')
-            }
+            cambpmConditionalRetry([
+              agentLabel: 'h2',
+              runSteps: {
+                cambpmRunMavenByStageType('upgrade-database', 'h2')
+              },
+              postAlways: {
+                cambpmPublishTestResult()
+              },
+              postFailure: {
+                cambpmAddFailedStageType(failedStageTypes, 'upgrade-database')
+              }
+            ])
           }
         }
         stage('UPGRADE-instance-migration-h2') {
@@ -123,23 +117,20 @@ pipeline {
             expression {
               cambpmWithLabels('default-build', 'migration')
             }
-            beforeAgent true
-          }
-          agent {
-            label 'h2'
-          }
+              }
           steps {
-            cambpmConditionalRetry {
-              cambpmRunMavenByStageType('instance-migration', 'h2')
-            }
-          }
-          post {
-            always {
-              cambpmPublishTestResult();
-            }
-            failure {
-              cambpmAddFailedStageType(failedStageTypes, 'instance-migration')
-            }
+            cambpmConditionalRetry([
+              agentLabel: 'h2',
+              runSteps: {
+                cambpmRunMavenByStageType('instance-migration', 'h2')
+              },
+              postAlways: {
+                cambpmPublishTestResult()
+              },
+              postFailure: {
+                cambpmAddFailedStageType(failedStageTypes, 'instance-migration')
+              }
+            ])
           }
         }
         stage('UPGRADE-old-engine-from-714-h2') {
@@ -147,23 +138,20 @@ pipeline {
             expression {
               cambpmWithLabels('h2', 'all-db')
             }
-            beforeAgent true
-          }
-          agent {
-            label 'h2'
-          }
+              }
           steps {
-            cambpmConditionalRetry {
-              cambpmRunMavenByStageType('old-engine', 'h2')
-            }
-          }
-          post {
-            always {
-              cambpmPublishTestResult();
-            }
-            failure {
-              cambpmAddFailedStageType(failedStageTypes, 'old-engine')
-            }
+            cambpmConditionalRetry([
+              agentLabel: 'h2',
+              runSteps: {
+                cambpmRunMavenByStageType('old-engine', 'h2')
+              },
+              postAlways: {
+                cambpmPublishTestResult()
+              },
+              postFailure: {
+                cambpmAddFailedStageType(failedStageTypes, 'old-engine')
+              }
+            ])
           }
         }
         stage('UPGRADE-rolling-update-h2') {
@@ -171,53 +159,44 @@ pipeline {
             expression {
               cambpmWithLabels('rolling-update', 'default-build')
             }
-            beforeAgent true
-          }
-          agent {
-            label 'h2'
-          }
+              }
           steps {
-            cambpmConditionalRetry {
-              cambpmRunMavenByStageType('rolling-update', 'h2')
-            }
-          }
-          post {
-            always {
-              cambpmPublishTestResult();
-            }
-            failure {
-              cambpmAddFailedStageType(failedStageTypes, 'rolling-update')
-            }
+            cambpmConditionalRetry([
+              agentLabel: 'h2',
+              runSteps: {
+                cambpmRunMavenByStageType('rolling-update', 'h2')
+              },
+              postAlways: {
+                cambpmPublishTestResult()
+              },
+              postFailure: {
+                cambpmAddFailedStageType(failedStageTypes, 'rolling-update')
+              }
+            ])
           }
         }
         stage('PERFORMANCE-large-data-h2') {
           when {
             branch cambpmDefaultBranch();
-            beforeAgent true
-          }
-          agent {
-            label 'h2'
-          }
+              }
           steps {
-            cambpmConditionalRetry {
-              cambpmRunMavenByStageType('large-data-tests', 'h2')
-            }
-          }
-          post {
-            always {
-              cambpmPublishTestResult();
-            }
-            failure {
-              cambpmAddFailedStageType(failedStageTypes, 'large-data-tests')
-            }
+            cambpmConditionalRetry([
+              agentLabel: 'h2',
+              runSteps: {
+                cambpmRunMavenByStageType('large-data-tests', 'h2')
+              },
+              postAlways: {
+                cambpmPublishTestResult()
+              },
+              postFailure: {
+                cambpmAddFailedStageType(failedStageTypes, 'large-data-tests')
+              }
+            ])
           }
         }
       }
     }
     stage('QA DB tests') {
-      agent {
-        label 'centos'
-      }
       steps {
         script {
           parallel(cambpmGetMatrixStages('daily-stages', failedStageTypes, { allowedStageLabels, dbLabel ->
@@ -240,25 +219,22 @@ pipeline {
           expression {
             cambpmWithLabels('default-build')
           }
-          beforeAgent true
-        }
-        agent {
-          label 'h2'
-        }
+          }
         stages {
           stage('JDK') {
             steps {
-              cambpmConditionalRetry {
-                cambpmRunMaven('.',
-                    'install source:jar source:test-jar -pl \'!webapps\',\'!distro/jbossas7/subsystem\' -Pdistro,distro-ce,distro-wildfly',
-                    jdkVersion: env.JDK,
-                    runtimeStash: true)
-              }
-            }
-            post {
-              always {
-                cambpmPublishTestResult();
-              }
+              cambpmConditionalRetry([
+                agentLabel: 'h2',
+                runSteps: {
+                  cambpmRunMaven('.',
+                      'install source:jar source:test-jar -pl \'!webapps\',\'!distro/jbossas7/subsystem\' -Pdistro,distro-ce,distro-wildfly',
+                      jdkVersion: env.JDK,
+                      runtimeStash: true)
+                },
+                postAlways: {
+                  cambpmPublishTestResult()
+                }
+              ])
             }
           }
         }
@@ -274,8 +250,9 @@ pipeline {
       }
     }
     always {
+      // Retrigger the build if the agent of jenkins-job-runner disconnected.
       script {
-        if (agentDisconnected()) {// Retrigger the build if the slave disconnected
+        if (agentDisconnected()) {
           build job: currentBuild.projectName, propagate: false, quietPeriod: 60, wait: false
         }
       }
