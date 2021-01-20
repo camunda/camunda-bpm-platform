@@ -66,7 +66,7 @@ pipeline {
               cambpmTriggerDownstream(
                 "cambpm-ee/" + eeMainProjectBranch,
                 [string(name: 'UPSTREAM_PROJECT_NAME', value: env.JOB_NAME),
-                 string(name: 'UPSTREAM_BUILD_NUMBER', value: env.BUILD_NUMBER)]
+                 string(name: 'UPSTREAM_BUILD_NUMBER', value: env.BUILD_NUMBER)],
                  true, true, true
               )
             }
