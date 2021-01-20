@@ -18,7 +18,7 @@ package org.camunda.bpm.model.dmn.impl.instance;
 
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.CAMUNDA_ATTRIBUTE_INPUT_VARIABLE;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.CAMUNDA_NS;
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.LATEST_DMN_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_INPUT_CLAUSE;
 
 import org.camunda.bpm.model.dmn.instance.DmnElement;
@@ -74,7 +74,7 @@ public class InputClauseImpl extends DmnElementImpl implements InputClause {
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(InputClause.class, DMN_ELEMENT_INPUT_CLAUSE)
-      .namespaceUri(DMN11_NS)
+      .namespaceUri(LATEST_DMN_NS)
       .extendsType(DmnElement.class)
       .instanceProvider(new ModelTypeInstanceProvider<InputClause>() {
         public InputClause newInstance(ModelTypeInstanceContext instanceContext) {

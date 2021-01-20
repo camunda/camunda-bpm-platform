@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.LATEST_DMN_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_BUSINESS_KNOWLEDGE_MODEL;
 
 import java.util.Collection;
@@ -72,7 +72,7 @@ public class BusinessKnowledgeModelImpl extends DrgElementImpl implements Busine
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(BusinessKnowledgeModel.class, DMN_ELEMENT_BUSINESS_KNOWLEDGE_MODEL)
-      .namespaceUri(DMN11_NS)
+      .namespaceUri(LATEST_DMN_NS)
       .extendsType(DrgElement.class)
       .instanceProvider(new ModelTypeInstanceProvider<BusinessKnowledgeModel>() {
         public BusinessKnowledgeModel newInstance(ModelTypeInstanceContext instanceContext) {

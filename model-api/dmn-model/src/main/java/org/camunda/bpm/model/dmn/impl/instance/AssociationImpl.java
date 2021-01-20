@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.LATEST_DMN_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ATTRIBUTE_ASSOCIATION_DIRECTION;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_ASSOCIATION;
 
@@ -71,7 +71,7 @@ public class AssociationImpl extends ArtifactImpl implements Association {
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Association.class, DMN_ELEMENT_ASSOCIATION)
-      .namespaceUri(DMN11_NS)
+      .namespaceUri(LATEST_DMN_NS)
       .extendsType(Artifact.class)
       .instanceProvider(new ModelTypeInstanceProvider<Association>() {
         public Association newInstance(ModelTypeInstanceContext instanceContext) {

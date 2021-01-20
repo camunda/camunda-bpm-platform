@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.LATEST_DMN_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_PARAMETER;
 
 import org.camunda.bpm.model.dmn.instance.InformationItem;
@@ -34,7 +34,7 @@ public class ParameterImpl extends InformationItemImpl implements Parameter {
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Parameter.class, DMN_ELEMENT_PARAMETER)
-      .namespaceUri(DMN11_NS)
+      .namespaceUri(LATEST_DMN_NS)
       .extendsType(InformationItem.class)
       .instanceProvider(new ModelTypeInstanceProvider<Parameter>() {
         @Override

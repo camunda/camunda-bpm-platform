@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.LATEST_DMN_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ATTRIBUTE_EXPRESSION_LANGUAGE;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_IMPORTED_VALUES;
 
@@ -59,7 +59,7 @@ public class ImportedValuesImpl extends ImportImpl implements ImportedValues {
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(ImportedValues.class, DMN_ELEMENT_IMPORTED_VALUES)
-      .namespaceUri(DMN11_NS)
+      .namespaceUri(LATEST_DMN_NS)
       .extendsType(Import.class)
       .instanceProvider(new ModelTypeInstanceProvider<ImportedValues>() {
         public ImportedValues newInstance(ModelTypeInstanceContext instanceContext) {

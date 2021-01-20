@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.LATEST_DMN_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_ELEMENT_COLLECTION;
 
 import java.util.Collection;
@@ -46,7 +46,7 @@ public class ElementCollectionImpl extends NamedElementImpl implements ElementCo
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(ElementCollection.class, DMN_ELEMENT_ELEMENT_COLLECTION)
-      .namespaceUri(DMN11_NS)
+      .namespaceUri(LATEST_DMN_NS)
       .extendsType(NamedElement.class)
       .instanceProvider(new ModelTypeInstanceProvider<ElementCollection>() {
         public ElementCollection newInstance(ModelTypeInstanceContext instanceContext) {

@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.LATEST_DMN_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_INFORMATION_REQUIREMENT;
 
 import org.camunda.bpm.model.dmn.instance.Decision;
@@ -58,7 +58,7 @@ public class InformationRequirementImpl extends DmnModelElementInstanceImpl impl
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(InformationRequirement.class, DMN_ELEMENT_INFORMATION_REQUIREMENT)
-      .namespaceUri(DMN11_NS)
+      .namespaceUri(LATEST_DMN_NS)
       .instanceProvider(new ModelTypeInstanceProvider<InformationRequirement>() {
         public InformationRequirement newInstance(ModelTypeInstanceContext instanceContext) {
           return new InformationRequirementImpl(instanceContext);

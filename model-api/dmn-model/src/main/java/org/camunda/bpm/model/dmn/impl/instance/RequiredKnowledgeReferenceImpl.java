@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.LATEST_DMN_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_REQUIRED_KNOWLEDGE;
 
 import org.camunda.bpm.model.dmn.instance.DmnElementReference;
@@ -34,7 +34,7 @@ public class RequiredKnowledgeReferenceImpl extends DmnElementReferenceImpl impl
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(RequiredKnowledgeReference.class, DMN_ELEMENT_REQUIRED_KNOWLEDGE)
-      .namespaceUri(DMN11_NS)
+      .namespaceUri(LATEST_DMN_NS)
       .extendsType(DmnElementReference.class)
       .instanceProvider(new ModelTypeInstanceProvider<RequiredKnowledgeReference>() {
         public RequiredKnowledgeReference newInstance(ModelTypeInstanceContext instanceContext) {

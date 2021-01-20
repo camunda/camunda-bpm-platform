@@ -22,11 +22,17 @@ public final class DmnModelConstants {
   public static final String DMN11_NS = "http://www.omg.org/spec/DMN/20151101/dmn.xsd";
   public static final String DMN12_NS = "http://www.omg.org/spec/DMN/20180521/MODEL/";
   public static final String DMN13_NS = "https://www.omg.org/spec/DMN/20191111/MODEL/";
+  public static final String LATEST_DMN_NS = DMN13_NS;
 
   /**
    * The DMN 1.1 namespace URL release with Camunda 7.4.0
    */
   public static final String DMN11_ALTERNATIVE_NS = "http://www.omg.org/spec/DMN/20151101/dmn11.xsd";
+
+  /**
+   * The DMN 1.3 namespace URL release with Camunda 7.13.0
+   */
+  public static final String DMN13_ALTERNATIVE_NS = "https://www.omg.org/spec/DMN/20191111/DMN13.xsd";
 
   /** The location of the DMN 1.1 XML schema. */
   public static final String DMN_11_SCHEMA_LOCATION = "org/camunda/bpm/model/dmn/schema/DMN11.xsd";

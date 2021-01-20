@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.LATEST_DMN_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_DEFAULT_OUTPUT_ENTRY;
 
 import org.camunda.bpm.model.dmn.instance.DefaultOutputEntry;
@@ -34,7 +34,7 @@ public class DefaultOutputEntryImpl extends LiteralExpressionImpl implements Def
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(DefaultOutputEntry.class, DMN_ELEMENT_DEFAULT_OUTPUT_ENTRY)
-      .namespaceUri(DMN11_NS)
+      .namespaceUri(LATEST_DMN_NS)
       .extendsType(LiteralExpression.class)
       .instanceProvider(new ModelTypeInstanceProvider<DefaultOutputEntry>() {
         public DefaultOutputEntry newInstance(ModelTypeInstanceContext instanceContext) {
