@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.LATEST_DMN_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_OUTPUT_VALUES;
 
 import org.camunda.bpm.model.dmn.instance.OutputValues;
@@ -34,7 +34,7 @@ public class OutputValuesImpl extends UnaryTestsImpl implements OutputValues {
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(OutputValues.class, DMN_ELEMENT_OUTPUT_VALUES)
-      .namespaceUri(DMN11_NS)
+      .namespaceUri(LATEST_DMN_NS)
       .extendsType(UnaryTests.class)
       .instanceProvider(new ModelTypeInstanceProvider<OutputValues>() {
         public OutputValues newInstance(ModelTypeInstanceContext instanceContext) {
