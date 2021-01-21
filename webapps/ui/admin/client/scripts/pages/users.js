@@ -134,10 +134,9 @@ var Controller = [
         })
         .catch(angular.noop)
         .finally(function() {
-          var phase = $scope.$root.$$phase;
-          if (phase !== '$apply' && phase !== '$digest') {
+          setTimeout(() => {
             $scope.$apply();
-          }
+          }, 0);
         });
     }
 

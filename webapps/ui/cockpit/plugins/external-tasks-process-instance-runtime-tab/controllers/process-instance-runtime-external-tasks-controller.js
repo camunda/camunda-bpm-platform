@@ -123,9 +123,9 @@ ProcessInstanceRuntimeTab.prototype.onLoad = function(pages, activityIds) {
       function(data) {
         this.tasks = data.list;
 
-        window.setImmediate(() => {
+        setTimeout(() => {
           this.scope.$apply();
-        });
+        }, 0);
 
         return data;
       }.bind(this)

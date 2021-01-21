@@ -91,10 +91,9 @@ var Controller = [
               $scope.groupList = data;
               $scope.loadingState = data.length ? 'LOADED' : 'EMPTY';
 
-              var phase = $scope.$root.$$phase;
-              if (phase !== '$apply' && phase !== '$digest') {
+              setTimeout(() => {
                 $scope.$apply();
-              }
+              }, 0);
 
               return total;
             })

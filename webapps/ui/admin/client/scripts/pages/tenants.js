@@ -89,7 +89,7 @@ var Controller = [
       return debounceCount(
         TenantResource.count(angular.extend({}, $scope.query)).$promise
       )
-        .$promise.then(function(data) {
+        .then(function(data) {
           var total = data.count;
 
           return debounceQuery(
@@ -106,10 +106,9 @@ var Controller = [
         })
         .catch(angular.noop)
         .finally(function() {
-          var phase = $scope.$root.$$phase;
-          if (phase !== '$apply' && phase !== '$digest') {
+          setTimeout(() => {
             $scope.$apply();
-          }
+          }, 0);
         });
     }
 
