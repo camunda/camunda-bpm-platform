@@ -264,11 +264,16 @@ function getSearchValue(search) {
     return true;
   }
 
-  return sanitizeValue(search.value.value, search.operator.value.key, search);
+  return sanitizeValue(
+    search.value.key,
+    search.value.value,
+    search.operator.value.key,
+    search
+  );
 }
 
 var simpleDateExp = /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(|\.[0-9]{0,4})$/;
-function sanitizeValue(value, operator, search) {
+function sanitizeValue(key, value, operator, search) {
   // Regex for '\_' and '\%' epxressions
   var specialWildCardCharExp = /(\\%)|(\\_)/g;
   // Regex for '_' and '%' special characters
@@ -281,7 +286,7 @@ function sanitizeValue(value, operator, search) {
   } else if (search.allowDates && simpleDateExp.test(value)) {
     return moment(value, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss.SSSZZ');
   }
-  return value;
+  return key ? key : value;
 }
 
 function parseValue(value) {
