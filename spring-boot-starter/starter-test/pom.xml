@@ -10,7 +10,7 @@
 
   <groupId>org.camunda.bpm.springboot</groupId>
   <artifactId>camunda-bpm-spring-boot-starter-test</artifactId>
-  <name>camunda BPM - Spring Boot Starter - Test</name>
+  <name>Camunda Platform - Spring Boot Starter - Test</name>
 
   <properties>
     <camunda-assert.artifact>camunda-bpm-assert-assertj3-11-1</camunda-assert.artifact>

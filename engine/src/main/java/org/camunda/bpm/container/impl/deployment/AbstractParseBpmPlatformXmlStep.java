@@ -61,7 +61,7 @@ public abstract class AbstractParseBpmPlatformXmlStep extends DeploymentOperatio
   public void performOperationStep(DeploymentOperation operationContext) {
 
     URL bpmPlatformXmlSource = getBpmPlatformXmlStream(operationContext);
-    ensureNotNull("Unable to find bpm-platform.xml. This file is necessary for deploying the camunda BPM platform", "bpmPlatformXmlSource", bpmPlatformXmlSource);
+    ensureNotNull("Unable to find bpm-platform.xml. This file is necessary for deploying the Camunda Platform", "bpmPlatformXmlSource", bpmPlatformXmlSource);
 
     // parse the bpm platform xml
     BpmPlatformXml bpmPlatformXml = new BpmPlatformXmlParser().createParse()
@@ -86,7 +86,7 @@ public abstract class AbstractParseBpmPlatformXmlStep extends DeploymentOperatio
       }
     }
     catch (MalformedURLException e) {
-      throw new ProcessEngineException("'" + url + "' is not a valid camunda bpm platform configuration resource location.", e);
+      throw new ProcessEngineException("'" + url + "' is not a valid Camunda Platform configuration resource location.", e);
     }
 
     return fileLocation;

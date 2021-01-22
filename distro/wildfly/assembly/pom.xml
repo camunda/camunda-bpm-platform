@@ -10,10 +10,10 @@
   <artifactId>camunda-wildfly-assembly</artifactId>
   <packaging>pom</packaging>
 
-  <name>camunda BPM - Wildfly Assembly</name>
+  <name>Camunda Platform - Wildfly Assembly</name>
 
   <description>
-    Assembles the camunda BPM platform and makes it ready for qa.
+    Assembles the Camunda Platform and makes it ready for qa.
     The assembly is installed to maven later in the reactor, if the integration tests pass successfully
   </description>
   

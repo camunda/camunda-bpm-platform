@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>camunda-bpm-run</artifactId>
-  <name>Camunda BPM - Run - Distribution</name>
+  <name>Camunda Platform - Run - Distribution</name>
   <packaging>pom</packaging>
 
   <dependencies>

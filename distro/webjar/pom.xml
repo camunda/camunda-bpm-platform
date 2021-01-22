@@ -13,7 +13,7 @@
   <groupId>org.camunda.bpm.webapp</groupId>
   <artifactId>camunda-webapp-webjar</artifactId>
   <packaging>jar</packaging>
-  <name>camunda BPM - webapp - webjar</name>
+  <name>Camunda Platform - webapp - webjar</name>
 
   <properties>
     <skipTests>true</skipTests>

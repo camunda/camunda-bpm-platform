@@ -44,7 +44,7 @@ import java.util.logging.Logger;
 
 
 /**
- * <p>Bootstrap for the camunda BPM platform using a singleton EJB</p>
+ * <p>Bootstrap for the Camunda Platform using a singleton EJB</p>
  *
  * @author Daniel Meyer
  */
@@ -66,7 +66,7 @@ public class EjbBpmPlatformBootstrap {
 
     final RuntimeContainerDelegateImpl containerDelegate = getContainerDelegate();
 
-    containerDelegate.getServiceContainer().createDeploymentOperation("deploying camunda BPM platform")
+    containerDelegate.getServiceContainer().createDeploymentOperation("deploying Camunda Platform")
       .addStep(new EjbJarParsePlatformXmlStep())
       .addStep(new DiscoverBpmPlatformPluginsStep())
       .addStep(new StartJcaExecutorServiceStep(executorServiceBean))
@@ -77,7 +77,7 @@ public class EjbBpmPlatformBootstrap {
     processEngineService = containerDelegate.getProcessEngineService();
     processApplicationService = containerDelegate.getProcessApplicationService();
 
-    LOGGER.log(Level.INFO, "camunda BPM platform started successfully.");
+    LOGGER.log(Level.INFO, "Camunda Platform started successfully.");
   }
 
   @PreDestroy
@@ -85,7 +85,7 @@ public class EjbBpmPlatformBootstrap {
 
     final RuntimeContainerDelegateImpl containerDelegate = getContainerDelegate();
 
-    containerDelegate.getServiceContainer().createUndeploymentOperation("undeploying camunda BPM platform")
+    containerDelegate.getServiceContainer().createUndeploymentOperation("undeploying Camunda Platform")
       .addStep(new StopProcessApplicationsStep())
       .addStep(new StopProcessEnginesStep())
       .addStep(new StopJobExecutorStep())
@@ -93,7 +93,7 @@ public class EjbBpmPlatformBootstrap {
       .addStep(new UnregisterBpmPlatformPluginsStep())
       .execute();
 
-    LOGGER.log(Level.INFO, "camunda BPM platform stopped.");
+    LOGGER.log(Level.INFO, "Camunda Platform stopped.");
 
   }
 

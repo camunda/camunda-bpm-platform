@@ -408,7 +408,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public static final int DEFAULT_INVOCATIONS_PER_BATCH_JOB = 1;
 
 
-  protected static final String PRODUCT_NAME = "Camunda BPM Runtime";
+  protected static final String PRODUCT_NAME = "Camunda Platform Runtime";
 
   public static SqlSessionFactory cachedSqlSessionFactory;
 

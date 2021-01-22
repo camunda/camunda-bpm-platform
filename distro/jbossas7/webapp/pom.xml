@@ -8,7 +8,7 @@
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.camunda.bpm.webapp</groupId>
-  <name>camunda BPM - webapp - JBoss</name>
+  <name>Camunda Platform - webapp - JBoss</name>
   <artifactId>camunda-webapp-jboss</artifactId>
   <packaging>war</packaging>
   

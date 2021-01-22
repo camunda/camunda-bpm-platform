@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>camunda-qa-ensure-clean-db</artifactId>
   <packaging>jar</packaging>
-  <name>camunda BPM - QA - ensure clean db plugin</name>
+  <name>Camunda Platform - QA - ensure clean db plugin</name>
   
   <parent>
     <artifactId>camunda-qa</artifactId>

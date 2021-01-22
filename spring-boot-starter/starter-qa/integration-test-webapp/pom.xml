@@ -12,7 +12,7 @@
   <packaging>pom</packaging>
 
   <artifactId>qa-webapp</artifactId>
-  <name>camunda BPM - Spring Boot Starter - QA - Webapps</name>
+  <name>Camunda Platform - Spring Boot Starter - QA - Webapps</name>
 
   <modules>
     <module>invoice-example</module>

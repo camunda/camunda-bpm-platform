@@ -12,7 +12,7 @@
   <packaging>pom</packaging>
 
   <artifactId>qa-plugins</artifactId>
-  <name>camunda BPM - Spring Boot Starter - QA - Plugins</name>
+  <name>Camunda Platform - Spring Boot Starter - QA - Plugins</name>
 
   <dependencyManagement>
 

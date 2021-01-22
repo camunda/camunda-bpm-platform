@@ -22,7 +22,7 @@
 
   <artifactId>camunda-qa-db-upgrade</artifactId>
   <packaging>jar</packaging>
-  <name>camunda BPM - QA - upgrade - database</name>
+  <name>Camunda Platform - QA - upgrade - database</name>
 
   <build>
     <testSourceDirectory>${project.build.directory}/engine-test-sources</testSourceDirectory>

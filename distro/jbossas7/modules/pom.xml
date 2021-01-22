@@ -3,7 +3,7 @@
 
   <artifactId>camunda-jboss-modules</artifactId>
   <packaging>pom</packaging>
-  <name>camunda BPM - jBoss7 Modules</name>
+  <name>Camunda Platform - jBoss7 Modules</name>
 
   <parent>
     <groupId>org.camunda.bpm.jboss</groupId>

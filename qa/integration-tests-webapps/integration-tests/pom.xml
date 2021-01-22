@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>camunda-qa-integration-tests-webapps</artifactId>
-  <name>camunda BPM - QA Integration Tests - Webapps ITs</name>
+  <name>Camunda Platform - QA Integration Tests - Webapps ITs</name>
 
   <parent>
     <groupId>org.camunda.bpm.qa</groupId>

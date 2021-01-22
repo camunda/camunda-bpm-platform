@@ -56,7 +56,7 @@ public class PaContextCacheTest2 extends AbstractContextCacheTest {
     this.testName = "paTest2";
     this.contextMap.put(this.testName, applicationContext.hashCode());
 
-    // ensure that Camunda BPM Assert is using the non-default engine
+    // ensure that Camunda Platform Assert is using the non-default engine
     init(processEngine);
   }
 

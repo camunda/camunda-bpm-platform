@@ -11,7 +11,7 @@
   <artifactId>camunda-cmmn-model</artifactId>
   <packaging>jar</packaging>
 
-  <name>camunda BPM - CMMN Model API</name>
+  <name>Camunda Platform - CMMN Model API</name>
   <inceptionYear>2014</inceptionYear>
   <properties>
     <camunda.artifact>org.camunda.bpm.model.cmmn</camunda.artifact>

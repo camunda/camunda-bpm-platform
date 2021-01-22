@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>camunda-bpm-run-modules</artifactId>
-  <name>Camunda BPM - Run - Modules</name>
+  <name>Camunda Platform - Run - Modules</name>
   <packaging>pom</packaging>
 
   <!-- define provided dependencies that will already be present in the Spring 

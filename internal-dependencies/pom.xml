@@ -11,9 +11,9 @@
 
   <artifactId>camunda-core-internal-dependencies</artifactId>
   <packaging>pom</packaging>
-  <name>camunda BPM - Core - Internal Dependencies</name>
+  <name>Camunda Platform - Core - Internal Dependencies</name>
 
-  <description>camunda BPM core internal bill of material for dependencies</description>
+  <description>Camunda Platform core internal bill of material for dependencies</description>
 
   <dependencyManagement>
     <dependencies>

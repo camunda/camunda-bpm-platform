@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>qa-simple</artifactId>
-  <name>camunda BPM - Spring Boot Starter - QA - Simple</name>
+  <name>Camunda Platform - Spring Boot Starter - QA - Simple</name>
 
   <dependencies>
 

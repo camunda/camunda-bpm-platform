@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>camunda-bpm-run-assembly</artifactId>
-  <name>Camunda BPM - Run - Assembly</name>
+  <name>Camunda Platform - Run - Assembly</name>
   <packaging>pom</packaging>
   
   <properties>

@@ -41,7 +41,7 @@ each server runtime we support. These projects are responsible for taking a runt
 distribution (ie. Apache Tomcat, WildFly AS ...) and configuring it for integration testing. The 
 actual integration tests are located in the `qa/integration-tests-engine` and `qa/integration-tests-webapps` modules.
  * *integration-tests-engine*: This module contains an extensive testsuite that test the integration of the process engine within a particular runtime container. For example, such tests will ensure that if you use the Job Executor Service inside a Java EE Container, you get a proper CDI request context spanning multiple EJB invocations or that EE resource injection works as expected. These integration tests are executed in-container, using [JBoss Arquillian](http://arquillian.org/).
- * *integration-tests-webapps*: This module tests the camunda BPM webapplications inside the runtime containers. These integration tests run inside a client / server setting: the webapplication is deployed to the runtime container, the runtime container is started and the tests running inside a client VM perform requests against the deployed applications.
+ * *integration-tests-webapps*: This module tests the Camunda Platform webapplications inside the runtime containers. These integration tests run inside a client / server setting: the webapplication is deployed to the runtime container, the runtime container is started and the tests running inside a client VM perform requests against the deployed applications.
 
 In order to run the integration tests, first perform a full install build. Then navigate to the `qa` folder.
 

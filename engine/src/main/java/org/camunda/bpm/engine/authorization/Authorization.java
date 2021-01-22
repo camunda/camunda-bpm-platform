@@ -34,7 +34,7 @@ import java.util.Date;
  * </ul>
  *
  * <h2>Identities</h2>
- * <p>camunda BPM distinguished two types of identities: <em>users</em> and
+ * <p>Camunda Platform distinguished two types of identities: <em>users</em> and
  * <em>groups</em>. Authorizations can either range over all users
  * (userId = {@link #ANY}), an individual {@link User} or a {@link Group} of users.</p>
  *
@@ -52,14 +52,14 @@ import java.util.Date;
  * authorization.addPermission(Permissions.UPDATE);
  * authorization.addPermission(Permissions.DELETE);
  * </pre>
- * <p>On top of the built-in permissions, camunda BPM allows using custom
+ * <p>On top of the built-in permissions, Camunda Platform allows using custom
  * permission types.</p>
  *
  * <h2>Resources</h2>
  * <p>Resources are the entities the user interacts with. Examples of resources are
  * {@link Resources#GROUP GROUPS}, {@link Resources#USER USERS},
  * process-definitions, process-instances, tasks ... See {@link Resources} for a set
- * of built-in resource. The camunda BPM framework supports custom resources.</p>
+ * of built-in resource. The Camunda Platform framework supports custom resources.</p>
  *
  * <h2>Authorization Type</h2>
  * <p>There are three types of authorizations:

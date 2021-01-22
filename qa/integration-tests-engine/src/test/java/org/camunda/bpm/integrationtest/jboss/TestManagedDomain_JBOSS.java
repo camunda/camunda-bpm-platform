@@ -48,7 +48,7 @@ public class TestManagedDomain_JBOSS {
     try {
       Assert.assertNotNull(InitialContext.doLookup("java:global/camunda-bpm-platform/process-engine/default"));
     } catch (NamingException e) {
-      Assert.fail("Could not lookup default process engine");
+      Assert.fail("Could not lookup default process engine" + e.getMessage());
     }
 
     try {

@@ -28,7 +28,7 @@ import javax.servlet.http.HttpSession;
 /**
  * <p>Wrapper around current authentications.</p>
  *
- * <p>In camunda BPM rest and web applications, authentications are managed per
+ * <p>In Camunda Platform rest and web applications, authentications are managed per
  * process engine: at a given point in time, there might be multiple authentications
  * active for different users and process engines in a single session. The situation
  * is that a "physical" user may possess credentials for different process engines,

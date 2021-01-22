@@ -2,7 +2,7 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <name>camunda BPM - engine</name>
+  <name>Camunda Platform - engine</name>
   <artifactId>camunda-engine</artifactId>
 
   <parent>

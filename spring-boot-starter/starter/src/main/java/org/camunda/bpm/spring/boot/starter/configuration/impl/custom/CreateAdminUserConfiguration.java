@@ -66,7 +66,7 @@ public class CreateAdminUserConfiguration extends AbstractCamundaConfiguration {
     // create group
     if (identityService.createGroupQuery().groupId(CAMUNDA_ADMIN).count() == 0) {
       Group camundaAdminGroup = identityService.newGroup(CAMUNDA_ADMIN);
-      camundaAdminGroup.setName("camunda BPM Administrators");
+      camundaAdminGroup.setName("Camunda Platform Administrators");
       camundaAdminGroup.setType(Groups.GROUP_TYPE_SYSTEM);
       identityService.saveGroup(camundaAdminGroup);
     }

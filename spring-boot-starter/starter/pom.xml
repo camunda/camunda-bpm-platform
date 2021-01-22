@@ -8,7 +8,7 @@
 
   <groupId>org.camunda.bpm.springboot</groupId>
   <artifactId>camunda-bpm-spring-boot-starter</artifactId>
-  <name>camunda BPM - Spring Boot Starter</name>
+  <name>Camunda Platform - Spring Boot Starter</name>
 
   <dependencies>
     <dependency>

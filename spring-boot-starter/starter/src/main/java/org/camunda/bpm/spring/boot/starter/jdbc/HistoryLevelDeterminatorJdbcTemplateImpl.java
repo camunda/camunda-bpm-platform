@@ -92,7 +92,7 @@ public class HistoryLevelDeterminatorJdbcTemplateImpl implements HistoryLevelDet
   @Override
   public void afterPropertiesSet() throws Exception {
     Assert.notNull(jdbcTemplate, "a jdbc template must be set");
-    Assert.notNull(camundaBpmProperties, "camunda bpm properties must be set");
+    Assert.notNull(camundaBpmProperties, "Camunda Platform properties must be set");
     String historyLevelDefault = camundaBpmProperties.getHistoryLevelDefault();
     if (StringUtils.hasText(historyLevelDefault)) {
       defaultHistoryLevel = historyLevelDefault;

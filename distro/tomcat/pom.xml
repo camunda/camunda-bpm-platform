@@ -12,7 +12,7 @@
   <groupId>org.camunda.bpm.tomcat</groupId>
   <packaging>pom</packaging>
 
-  <name>camunda BPM - tomcat</name>
+  <name>Camunda Platform - tomcat</name>
 
   <dependencyManagement>
     <dependencies>

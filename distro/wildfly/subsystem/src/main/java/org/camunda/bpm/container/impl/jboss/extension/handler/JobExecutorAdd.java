@@ -45,7 +45,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class JobExecutorAdd extends AbstractAddStepHandler {
 
-    public static final String THREAD_POOL_GRP_NAME = "Camunda BPM ";
+    public static final String THREAD_POOL_GRP_NAME = "Camunda Platform";
 
     public static final JobExecutorAdd INSTANCE = new JobExecutorAdd();
 

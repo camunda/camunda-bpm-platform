@@ -43,7 +43,7 @@ public class ExternalScriptTaskTest extends PluggableProcessEngineTest {
 
     String greeting = (String) runtimeService.getVariable(processInstance.getId(), "greeting");
     assertNotNull(greeting);
-    assertEquals("Greetings camunda BPM speaking", greeting);
+    assertEquals("Greetings Camunda Platform speaking", greeting);
   }
 
   @Deployment
@@ -55,7 +55,7 @@ public class ExternalScriptTaskTest extends PluggableProcessEngineTest {
 
     String greeting = (String) runtimeService.getVariable(processInstance.getId(), "greeting");
     assertNotNull(greeting);
-    assertEquals("Greetings camunda BPM speaking", greeting);
+    assertEquals("Greetings Camunda Platform speaking", greeting);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/scripttask/ExternalScriptTaskTest.testDefaultExternalScriptAsVariable.bpmn20.xml"})
@@ -79,7 +79,7 @@ public class ExternalScriptTaskTest extends PluggableProcessEngineTest {
 
     String greeting = (String) runtimeService.getVariable(processInstance.getId(), "greeting");
     assertNotNull(greeting);
-    assertEquals("Greetings camunda BPM speaking", greeting);
+    assertEquals("Greetings Camunda Platform speaking", greeting);
   }
 
   @Deployment
@@ -89,7 +89,7 @@ public class ExternalScriptTaskTest extends PluggableProcessEngineTest {
 
     String greeting = (String) runtimeService.getVariable(processInstance.getId(), "greeting");
     assertNotNull(greeting);
-    assertEquals("Greetings camunda BPM speaking", greeting);
+    assertEquals("Greetings Camunda Platform speaking", greeting);
   }
 
   @Deployment
@@ -101,7 +101,7 @@ public class ExternalScriptTaskTest extends PluggableProcessEngineTest {
 
     String greeting = (String) runtimeService.getVariable(processInstance.getId(), "greeting");
     assertNotNull(greeting);
-    assertEquals("Greetings camunda BPM speaking", greeting);
+    assertEquals("Greetings Camunda Platform speaking", greeting);
   }
 
   @Deployment
@@ -113,7 +113,7 @@ public class ExternalScriptTaskTest extends PluggableProcessEngineTest {
 
     String greeting = (String) runtimeService.getVariable(processInstance.getId(), "greeting");
     assertNotNull(greeting);
-    assertEquals("Greetings camunda BPM speaking", greeting);
+    assertEquals("Greetings Camunda Platform speaking", greeting);
   }
 
   @Deployment
@@ -138,7 +138,7 @@ public class ExternalScriptTaskTest extends PluggableProcessEngineTest {
 
     String greeting = (String) runtimeService.getVariable(processInstance.getId(), "greeting");
     assertNotNull(greeting);
-    assertEquals("Greetings camunda BPM speaking", greeting);
+    assertEquals("Greetings Camunda Platform speaking", greeting);
   }
 
   @Deployment(resources = {
@@ -153,7 +153,7 @@ public class ExternalScriptTaskTest extends PluggableProcessEngineTest {
 
     String greeting = (String) runtimeService.getVariable(processInstance.getId(), "greeting");
     assertNotNull(greeting);
-    assertEquals("Greetings camunda BPM speaking", greeting);
+    assertEquals("Greetings Camunda Platform speaking", greeting);
   }
 
   @Deployment(resources = {
@@ -168,7 +168,7 @@ public class ExternalScriptTaskTest extends PluggableProcessEngineTest {
 
     String greeting = (String) runtimeService.getVariable(processInstance.getId(), "greeting");
     assertNotNull(greeting);
-    assertEquals("Greetings camunda BPM speaking", greeting);
+    assertEquals("Greetings Camunda Platform speaking", greeting);
   }
 
   @Deployment(resources = {
@@ -183,7 +183,7 @@ public class ExternalScriptTaskTest extends PluggableProcessEngineTest {
 
     String greeting = (String) runtimeService.getVariable(processInstance.getId(), "greeting");
     assertNotNull(greeting);
-    assertEquals("Greetings camunda BPM speaking", greeting);
+    assertEquals("Greetings Camunda Platform speaking", greeting);
   }
 
   @Deployment

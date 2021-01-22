@@ -128,7 +128,7 @@ public class JcaExecutorServiceConnector implements ResourceAdapter, Serializabl
       executorServiceWrapper.setExecutorService(new JcaWorkManagerExecutorService(this, ctx.getWorkManager()));
     }
 
-    log.log(Level.INFO, "camunda BPM executor service started.");
+    log.log(Level.INFO, "Camunda Platform executor service started.");
   }
 
   public void stop() {
@@ -138,7 +138,7 @@ public class JcaExecutorServiceConnector implements ResourceAdapter, Serializabl
       return;
     }
 
-    log.log(Level.INFO, "camunda BPM executor service stopped.");
+    log.log(Level.INFO, "Camunda Platform executor service stopped.");
 
   }
 
@@ -146,7 +146,7 @@ public class JcaExecutorServiceConnector implements ResourceAdapter, Serializabl
 
   public void endpointActivation(MessageEndpointFactory endpointFactory, ActivationSpec spec) throws ResourceException {
     if(jobHandlerActivation != null) {
-      throw new ResourceException("The camunda BPM job executor can only service a single MessageEndpoint for job execution. " +
+      throw new ResourceException("The Camunda Platform job executor can only service a single MessageEndpoint for job execution. " +
       		"Make sure not to deploy more than one MDB implementing the '"+JobExecutionHandler.class.getName()+"' interface.");
     }
     JobExecutionHandlerActivation activation = new JobExecutionHandlerActivation(this, endpointFactory, (JobExecutionHandlerActivationSpec) spec);

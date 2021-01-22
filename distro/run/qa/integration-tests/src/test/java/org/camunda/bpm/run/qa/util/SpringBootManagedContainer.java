@@ -79,7 +79,7 @@ public class SpringBootManagedContainer {
   }
 
   /**
-   * @return the home directory of Camunda BPM Run based on the
+   * @return the home directory of Camunda Platform Run based on the
    *         "camunda.run.home" system property.
    */
   public static String getRunHome() {

@@ -10,7 +10,7 @@
 
   <artifactId>camunda-qa-db-test-old-engine</artifactId>
   <packaging>jar</packaging>
-  <name>camunda BPM - QA - upgrade - rolling update - test old engine</name>
+  <name>Camunda Platform - QA - upgrade - rolling update - test old engine</name>
 
   <dependencyManagement>
     <dependencies>

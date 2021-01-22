@@ -9,7 +9,7 @@
 
   <artifactId>camunda-qa-upgrade-test-migration</artifactId>
   <packaging>jar</packaging>
-  <name>camunda BPM - QA - upgrade - instance migration - test</name>
+  <name>Camunda Platform - QA - upgrade - instance migration - test</name>
 
   <dependencies>
 

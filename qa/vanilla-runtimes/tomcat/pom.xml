@@ -4,7 +4,7 @@
   <artifactId>camunda-qa-tomcat-vanilla-runtime</artifactId>
   <packaging>pom</packaging>
 
-  <name>camunda BPM - QA Tomcat Vanilla Test Runtime</name>
+  <name>Camunda Platform - QA Tomcat Vanilla Test Runtime</name>
 
   <parent>
     <groupId>org.camunda.bpm.qa</groupId>

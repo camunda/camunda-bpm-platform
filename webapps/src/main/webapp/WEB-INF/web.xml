@@ -6,7 +6,7 @@
   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
 
   <!-- development web.xml -->
-  <display-name>camunda bpm webapp</display-name>
+  <display-name>Camunda Platform webapp</display-name>
 
   <!-- cockpit bootstrap listener -->
   <listener>

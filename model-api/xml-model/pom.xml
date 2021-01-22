@@ -11,7 +11,7 @@
   <artifactId>camunda-xml-model</artifactId>
   <packaging>jar</packaging>
 
-  <name>camunda BPM - Xml Model API</name>
+  <name>Camunda Platform - Xml Model API</name>
   <inceptionYear>2014</inceptionYear>
   <properties>
     <camunda.artifact>org.camunda.bpm.model.xml</camunda.artifact>

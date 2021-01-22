@@ -9,7 +9,7 @@
 
   <groupId>org.camunda.bpm.springboot</groupId>
   <artifactId>camunda-bpm-spring-boot-starter-webapp-core</artifactId>
-  <name>camunda BPM - Spring Boot Starter - Webapps Core</name>
+  <name>Camunda Platform - Spring Boot Starter - Webapps Core</name>
 
   <properties>
     <powermock.version>2.0.2</powermock.version>

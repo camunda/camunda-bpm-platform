@@ -10,7 +10,7 @@
   <artifactId>camunda-wildfly-subsystem</artifactId>
   <packaging>jar</packaging>
 
-  <name>camunda BPM - Wildfly Subsystem</name>
+  <name>Camunda Platform - Wildfly Subsystem</name>
 
   <dependencies>
 

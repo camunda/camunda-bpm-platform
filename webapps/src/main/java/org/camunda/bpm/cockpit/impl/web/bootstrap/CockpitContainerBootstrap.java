@@ -26,7 +26,7 @@ import org.camunda.bpm.engine.rest.util.WebApplicationUtil;
 
 /**
  * A servlet context listener that bootstraps cockpit on a
- * running camunda bpm platform.
+ * running Camunda Platform.
  *
  * @author nico.rehwaldt
  */

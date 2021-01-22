@@ -11,7 +11,7 @@
   <groupId>org.camunda.bpm.webapp</groupId>
   <artifactId>camunda-webapp-tomcat-standalone</artifactId>
   <packaging>war</packaging>
-  <name>camunda BPM - webapp - Tomcat Standalone</name>
+  <name>Camunda Platform - webapp - Tomcat Standalone</name>
 
   <properties>
     <skip-third-party-bom>false</skip-third-party-bom>

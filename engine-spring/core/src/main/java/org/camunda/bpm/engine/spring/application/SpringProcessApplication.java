@@ -44,7 +44,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
  * <p>The SpringProcessApplication will use the Bean Name assigned to the bean in the spring
  * application context (see {@link BeanNameAware}). You should always assign a unique bean name
  * to a process application bean. That is, the bean name must be unique accross all applications
- * deployed to the camunda BPM platform.</p>
+ * deployed to the Camunda Platform.</p>
  *
  * @author Daniel Meyer
  *

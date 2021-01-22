@@ -126,7 +126,7 @@ public class SetupResource {
     // create group
     if(identityService.createGroupQuery().groupId(Groups.CAMUNDA_ADMIN).count() == 0) {
       Group camundaAdminGroup = identityService.newGroup(Groups.CAMUNDA_ADMIN);
-      camundaAdminGroup.setName("camunda BPM Administrators");
+      camundaAdminGroup.setName("Camunda Platform Administrators");
       camundaAdminGroup.setType(Groups.GROUP_TYPE_SYSTEM);
       identityService.saveGroup(camundaAdminGroup);
     }

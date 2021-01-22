@@ -9,12 +9,12 @@
   </parent>
 
   <artifactId>camunda-parent</artifactId>
-  <name>camunda BPM - Parent Pom</name>
+  <name>Camunda Platform - Parent Pom</name>
   <inceptionYear>2013</inceptionYear>
   <packaging>pom</packaging>
 
   <description>
-    This pom is the parent of all camunda BPM platform projects
+    This pom is the parent of all Camunda Platform projects
   </description>
 
   <properties>

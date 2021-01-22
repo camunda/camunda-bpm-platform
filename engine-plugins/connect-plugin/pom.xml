@@ -9,7 +9,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>camunda-engine-plugin-connect</artifactId>
-  <name>camunda BPM - engine plugins - connect</name>
+  <name>Camunda Platform - engine plugins - connect</name>
 
   <dependencies>
 

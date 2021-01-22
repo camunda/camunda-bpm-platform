@@ -95,7 +95,7 @@ public class TelemetryReporter {
     if (!isScheduled()) { // initialize timer only if not scheduled yet
       initTelemetrySendingTask(sendInitialMessage);
 
-      timer = new Timer("Camunda BPM Runtime Telemetry Reporter", true);
+      timer = new Timer("Camunda Platform Runtime Telemetry Reporter", true);
       long reportingIntervalInMillis =  reportingIntervalInSeconds * 1000;
       long initialReportingDelay = getInitialReportingDelaySeconds() * 1000;
 
