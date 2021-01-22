@@ -147,7 +147,7 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
   public void setJobDuedate(String jobId, Date newDuedate) {
     setJobDuedate(jobId, newDuedate, false);
   }
-  
+
   public void setJobDuedate(String jobId, Date newDuedate, boolean cascade) {
     commandExecutor.execute(new SetJobDuedateCmd(jobId, newDuedate, cascade));
   }
@@ -466,6 +466,16 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
 
   public void reportDbMetricsNow() {
     commandExecutor.execute(new ReportDbMetricsCmd());
+  }
+
+  @Override
+  public long getUniqueTaskWorkerCount(Date startTime, Date endTime) {
+    return commandExecutor.execute(new GetUniqueTaskWorkerCountCmd(startTime, endTime));
+  }
+
+  @Override
+  public void deleteTaskMetrics(Date timestamp) {
+    commandExecutor.execute(new DeleteTaskMetricsCmd(timestamp));
   }
 
   public void setOverridingJobPriorityForJobDefinition(String jobDefinitionId, long priority) {

@@ -56,6 +56,7 @@
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/SchemaLogEntry.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Resource.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/TableData.xml" />
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/TaskMetrics.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Task.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/User.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/VariableInstance.xml" />

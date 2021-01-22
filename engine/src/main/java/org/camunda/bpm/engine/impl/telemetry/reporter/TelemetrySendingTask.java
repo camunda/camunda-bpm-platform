@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.telemetry.reporter;
 
-import static org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry.UNIQUE_TASK_WORKERS;
 import static org.camunda.bpm.engine.impl.util.ConnectUtil.METHOD_NAME_POST;
 import static org.camunda.bpm.engine.impl.util.ConnectUtil.PARAM_NAME_RESPONSE_STATUS_CODE;
 import static org.camunda.bpm.engine.impl.util.ConnectUtil.addRequestTimeoutConfiguration;
@@ -27,8 +26,6 @@ import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_INSTAN
 import static org.camunda.bpm.engine.management.Metrics.ROOT_PROCESS_INSTANCE_START;
 
 import java.net.HttpURLConnection;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -37,11 +34,9 @@ import java.util.TimerTask;
 
 import javax.ws.rs.core.MediaType;
 
-import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmd.IsTelemetryEnabledCmd;
-import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.metrics.Meter;
@@ -56,7 +51,6 @@ import org.camunda.bpm.engine.impl.telemetry.dto.Data;
 import org.camunda.bpm.engine.impl.telemetry.dto.Internals;
 import org.camunda.bpm.engine.impl.telemetry.dto.Metric;
 import org.camunda.bpm.engine.impl.telemetry.dto.Product;
-import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
 import org.camunda.bpm.engine.impl.util.TelemetryUtil;
@@ -319,8 +313,6 @@ public class TelemetrySendingTask extends TimerTask {
 
   protected Map<String, Metric> calculateMetrics() {
 
-    Date currentTime = ClockUtil.getCurrentTime();
-
     Map<String, Metric> metrics = new HashMap<>();
 
     if (metricsRegistry != null) {
@@ -332,44 +324,7 @@ public class TelemetrySendingTask extends TimerTask {
       }
     }
 
-    Long taskWorkers = commandExecutor.execute(c -> {
-      return calculateUniqueUserCount(c, c.getProcessEngineConfiguration().getHistoryLevel(), currentTime);
-    });
-    metrics.put(UNIQUE_TASK_WORKERS, new Metric(taskWorkers));
-
     return metrics;
-  }
-
-  protected long calculateMetricCount(ManagementService managementService,
-                                      Date startReportTime,
-                                      Date currentTime,
-                                      String metricName) {
-    return managementService.createMetricsQuery()
-        .name(metricName)
-        .startDate(startReportTime)
-        .endDate(currentTime)
-        .sum();
-  }
-
-  protected long calculateUniqueUserCount(CommandContext commandContext,
-                                          HistoryLevel historyLevel,
-                                          Date currentTime) {
-    if (historyLevel.equals(HistoryLevel.HISTORY_LEVEL_NONE)) {
-      return 0;
-    } else {
-      Date previousDay = previousDay(currentTime);
-      long workerCount = commandContext.getHistoricTaskInstanceManager()
-          .findUniqueTaskWorkerCount(previousDay, currentTime);
-      return workerCount;
-    }
-  }
-
-  protected Date previousDay(Date date) {
-    Calendar calendar = Calendar.getInstance();
-    calendar.setTime(date);
-    calendar.add(Calendar.DAY_OF_YEAR, -1);
-    Date result = calendar.getTime();
-    return result;
   }
 
   protected void updateTelemetryFlag(boolean enabled) {

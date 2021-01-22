@@ -22,55 +22,60 @@ package org.camunda.bpm.engine.management;
  */
 public class Metrics {
 
-  public final static String ACTIVTY_INSTANCE_START = "activity-instance-start";
-  public final static String ACTIVTY_INSTANCE_END = "activity-instance-end";
+  public static final String ACTIVTY_INSTANCE_START = "activity-instance-start";
+  public static final String ACTIVTY_INSTANCE_END = "activity-instance-end";
 
   /**
    * Number of times job acqusition is performed
    */
-  public final static String JOB_ACQUISITION_ATTEMPT = "job-acquisition-attempt";
+  public static final String JOB_ACQUISITION_ATTEMPT = "job-acquisition-attempt";
 
   /**
    * Number of jobs successfully acquired (i.e. selected + locked)
    */
-  public final static String JOB_ACQUIRED_SUCCESS = "job-acquired-success";
+  public static final String JOB_ACQUIRED_SUCCESS = "job-acquired-success";
   /**
    * Number of jobs attempted to acquire but with failure (i.e. selected + lock failed)
    */
-  public final static String JOB_ACQUIRED_FAILURE = "job-acquired-failure";
+  public static final String JOB_ACQUIRED_FAILURE = "job-acquired-failure";
 
   /**
    * Number of jobs that were submitted for execution but were rejected due to
    * resource shortage. In the default job executor, this is the case when
    * the execution queue is full.
    */
-  public final static String JOB_EXECUTION_REJECTED = "job-execution-rejected";
+  public static final String JOB_EXECUTION_REJECTED = "job-execution-rejected";
 
-  public final static String JOB_SUCCESSFUL = "job-successful";
-  public final static String JOB_FAILED = "job-failed";
+  public static final String JOB_SUCCESSFUL = "job-successful";
+  public static final String JOB_FAILED = "job-failed";
 
   /**
    * Number of jobs that are immediately locked and executed because they are exclusive
    * and created in the context of job execution
    */
-  public final static String JOB_LOCKED_EXCLUSIVE = "job-locked-exclusive";
+  public static final String JOB_LOCKED_EXCLUSIVE = "job-locked-exclusive";
 
   /**
    * Number of executed Root Process Instance executions.
    */
-  public final static String ROOT_PROCESS_INSTANCE_START = "root-process-instance-start";
+  public static final String ROOT_PROCESS_INSTANCE_START = "root-process-instance-start";
 
   /**
    * Number of executed decision elements in the DMN engine.
    */
-  public final static String EXECUTED_DECISION_INSTANCES = "executed-decision-instances";
-  public final static String EXECUTED_DECISION_ELEMENTS = "executed-decision-elements";
+  public static final String EXECUTED_DECISION_INSTANCES = "executed-decision-instances";
+  public static final String EXECUTED_DECISION_ELEMENTS = "executed-decision-elements";
 
   /**
    * Number of instances removed by history cleanup.
    */
-  public final static String HISTORY_CLEANUP_REMOVED_PROCESS_INSTANCES = "history-cleanup-removed-process-instances";
-  public final static String HISTORY_CLEANUP_REMOVED_CASE_INSTANCES = "history-cleanup-removed-case-instances";
-  public final static String HISTORY_CLEANUP_REMOVED_DECISION_INSTANCES = "history-cleanup-removed-decision-instances";
-  public final static String HISTORY_CLEANUP_REMOVED_BATCH_OPERATIONS = "history-cleanup-removed-batch-operations";
+  public static final String HISTORY_CLEANUP_REMOVED_PROCESS_INSTANCES = "history-cleanup-removed-process-instances";
+  public static final String HISTORY_CLEANUP_REMOVED_CASE_INSTANCES = "history-cleanup-removed-case-instances";
+  public static final String HISTORY_CLEANUP_REMOVED_DECISION_INSTANCES = "history-cleanup-removed-decision-instances";
+  public static final String HISTORY_CLEANUP_REMOVED_BATCH_OPERATIONS = "history-cleanup-removed-batch-operations";
+
+  /**
+   * Number of unique task workers
+   */
+  public static final String UNIQUE_TASK_WORKERS = "unique-task-workers";
 }
