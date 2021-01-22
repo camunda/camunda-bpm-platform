@@ -24,9 +24,9 @@ import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry.UNIQUE_TASK_WORKERS;
 import static org.camunda.bpm.engine.management.Metrics.ACTIVTY_INSTANCE_START;
+import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_ELEMENTS;
 import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_INSTANCES;
 import static org.camunda.bpm.engine.management.Metrics.ROOT_PROCESS_INSTANCE_START;
 
@@ -43,13 +43,9 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.metrics.Meter;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
-import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServer;
-import org.camunda.bpm.engine.impl.telemetry.dto.Command;
 import org.camunda.bpm.engine.impl.telemetry.dto.Data;
 import org.camunda.bpm.engine.impl.telemetry.dto.Internals;
 import org.camunda.bpm.engine.impl.telemetry.dto.Metric;
-import org.camunda.bpm.engine.impl.telemetry.dto.Product;
-import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
@@ -65,9 +61,6 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.google.gson.Gson;
 
-/**
- * Uses Wiremock so should be run as part of {@link TelemetrySuiteTest}.
- */
 public class TelemetryTaskWorkerMetricsTest {
 
   protected static final String TELEMETRY_ENDPOINT = "http://localhost:8083/pings";
@@ -111,7 +104,7 @@ public class TelemetryTaskWorkerMetricsTest {
   @After
   public void tearDown() {
     managementService.toggleTelemetry(false);
-
+    configuration.setTaskMetricsEnabled(false);
     clearMetrics();
   }
 
@@ -121,6 +114,7 @@ public class TelemetryTaskWorkerMetricsTest {
       meter.getAndClear();
     }
     managementService.deleteMetrics(null);
+    managementService.deleteTaskMetrics(null);
   }
 
 
@@ -129,63 +123,74 @@ public class TelemetryTaskWorkerMetricsTest {
   public void shouldNotSendTelemetryWithTaskWorkersMetrics() {
     // given default telemetry data
     managementService.toggleTelemetry(true);
+
+    Data expectedData = adjustData(configuration.getTelemetryData(), 3, 0, 6, 0);
+    String requestBody = new Gson().toJson(expectedData);
+    stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+        .willReturn(aResponse()
+            .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
+
     for (int i = 0; i < 3; i++) {
       String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
       String taskId = taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult().getId();
       taskService.setAssignee(taskId, "user" + i);
     }
 
-    Data data = adjustData(configuration.getTelemetryData(), 3, 0, 6, 0);
-
-    String requestBody = new Gson().toJson(data);
-    stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
-            .willReturn(aResponse()
-                        .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
+    configuration.getTelemetryRegistry().getCommands().clear();
 
     // when
-    new TelemetryReporter(configuration.getCommandExecutorSchemaOperations(),
-                          TELEMETRY_ENDPOINT,
-                          0,
-                          1000,
-                          data,
-                          configuration.getTelemetryHttpConnector(),
-                          configuration.getTelemetryRegistry(),
-                          configuration.getMetricsRegistry(),
-                          configuration.getTelemetryRequestTimeout()).reportNow();
+    configuration.getTelemetryReporter().reportNow();
 
     // then
     verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
         .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
         .withHeader("Content-Type",  equalTo("application/json")));
-    Map<String, Metric> metrics = configuration.getTelemetryData().getProduct().getInternals().getMetrics();
-    assertThat(metrics.get(UNIQUE_TASK_WORKERS).getCount()).isEqualTo(0);
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void shouldSendTelemetryWithTaskWorkersMetricsIfEnabled() {
+    // given default telemetry data and task metrics enabled
+    configuration.setTaskMetricsEnabled(true);
+    managementService.toggleTelemetry(true);
+
+    Data expectedData = adjustData(configuration.getTelemetryData(), 3, 0, 6, 3);
+    String requestBody = new Gson().toJson(expectedData);
+    stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+        .willReturn(aResponse()
+            .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
+
+    for (int i = 0; i < 3; i++) {
+      String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
+      String taskId = taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult().getId();
+      taskService.setAssignee(taskId, "user" + i);
+    }
+
+    configuration.getTelemetryRegistry().getCommands().clear();
+
+    // when
+    configuration.getTelemetryReporter().reportNow();
+
+    // then
+    verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+        .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
+        .withHeader("Content-Type",  equalTo("application/json")));
   }
 
   protected Data adjustData(Data telemetryData, int processCount, int decisionCount, int flowNodeCount, int workerCount) {
-    Data result = new Data(telemetryData.getInstallation(), telemetryData.getProduct());
-
-    Product product = result.getProduct();
-    product.setVersion("7.14.0");
-    result.setProduct(product);
+    Data result = new Data(telemetryData);
 
     Internals internals = result.getProduct().getInternals();
 
-    internals.setApplicationServer(new ApplicationServer("WAS 8.5"));
-
-
-    // to clean up the recorded commands
-    configuration.getTelemetryRegistry().getCommands().clear();
-
-    Map<String, Command> commands = new HashMap<>();
-    commands.put("IsTelemetryEnabledCmd", new Command(1));
-    internals.setCommands(commands);
-
     Map<String, Metric> metrics = new HashMap<>();
     metrics.put(ROOT_PROCESS_INSTANCE_START, new Metric(processCount));
+    metrics.put(EXECUTED_DECISION_ELEMENTS, new Metric(decisionCount));
     metrics.put(EXECUTED_DECISION_INSTANCES, new Metric(decisionCount));
     metrics.put(ACTIVTY_INSTANCE_START, new Metric(flowNodeCount));
     metrics.put(UNIQUE_TASK_WORKERS, new Metric(workerCount));
     internals.setMetrics(metrics);
+
+    internals.setTelemetryEnabled(true);
 
     return result;
   }

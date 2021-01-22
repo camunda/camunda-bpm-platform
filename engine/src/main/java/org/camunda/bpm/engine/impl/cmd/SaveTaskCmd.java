@@ -29,7 +29,6 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.TaskState;
-import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.task.Task;
 
@@ -59,14 +58,13 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
         task.propagateParentTaskTenantId();
         task.insert();
         operation = UserOperationLogEntry.OPERATION_TYPE_CREATE;
-        task.executeMetrics(Metrics.ACTIVTY_INSTANCE_START);
+        task.executeMetrics(Metrics.ACTIVTY_INSTANCE_START, commandContext);
       } catch (NullValueException e) {
         throw new NotValidException(e.getMessage(), e);
       }
 
       task.fireAuthorizationProvider();
       task.transitionTo(TaskState.STATE_CREATED);
-
     } else {
       checkTaskAssign(task, commandContext);
       task.update();
@@ -76,6 +74,7 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
       task.triggerUpdateEvent();
     }
 
+    task.executeMetrics(Metrics.UNIQUE_TASK_WORKERS, commandContext);
     task.logUserOperation(operation);
 
     return null;

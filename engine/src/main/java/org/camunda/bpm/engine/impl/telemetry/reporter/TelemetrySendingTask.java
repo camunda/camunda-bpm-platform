@@ -41,7 +41,6 @@ import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmd.IsTelemetryEnabledCmd;
-import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.metrics.Meter;
@@ -332,9 +331,7 @@ public class TelemetrySendingTask extends TimerTask {
       }
     }
 
-    Long taskWorkers = commandExecutor.execute(c -> {
-      return calculateUniqueUserCount(c, c.getProcessEngineConfiguration().getHistoryLevel(), currentTime);
-    });
+    Long taskWorkers = commandExecutor.execute(c -> calculateUniqueUserCount(c, currentTime));
     metrics.put(UNIQUE_TASK_WORKERS, new Metric(taskWorkers));
 
     return metrics;
@@ -351,17 +348,9 @@ public class TelemetrySendingTask extends TimerTask {
         .sum();
   }
 
-  protected long calculateUniqueUserCount(CommandContext commandContext,
-                                          HistoryLevel historyLevel,
-                                          Date currentTime) {
-    if (historyLevel.equals(HistoryLevel.HISTORY_LEVEL_NONE)) {
-      return 0;
-    } else {
+  protected long calculateUniqueUserCount(CommandContext commandContext, Date currentTime) {
       Date previousDay = previousDay(currentTime);
-      long workerCount = commandContext.getHistoricTaskInstanceManager()
-          .findUniqueTaskWorkerCount(previousDay, currentTime);
-      return workerCount;
-    }
+      return commandContext.getMeterLogManager().findUniqueTaskWorkerCount(previousDay, currentTime);
   }
 
   protected Date previousDay(Date date) {

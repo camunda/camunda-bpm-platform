@@ -17,3 +17,12 @@
 
 insert into ACT_GE_SCHEMA_LOG
 values ('400', CURRENT_TIMESTAMP, '7.15.0');
+
+-- https://jira.camunda.com/browse/CAM-12230
+
+create table ACT_RU_TASK_METER_LOG (
+  ID_ varchar(64) not null,
+  ASSIGNEE_HASH_ bigint,
+  TIMESTAMP_ datetime(3),
+  primary key (ID_)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;

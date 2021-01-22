@@ -785,6 +785,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected MetricsReporterIdProvider metricsReporterIdProvider;
 
+  protected boolean isTaskMetricsEnabled = false;
+
   /**
    * the historic job log host name
    */
@@ -4185,6 +4187,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfigurationImpl setHostnameProvider(HostnameProvider hostnameProvider) {
     this.hostnameProvider = hostnameProvider;
+    return this;
+  }
+
+  public boolean isTaskMetricsEnabled() {
+    return isTaskMetricsEnabled;
+  }
+
+  public ProcessEngineConfigurationImpl setTaskMetricsEnabled(boolean isTaskMetricsEnabled) {
+    this.isTaskMetricsEnabled = isTaskMetricsEnabled;
     return this;
   }
 

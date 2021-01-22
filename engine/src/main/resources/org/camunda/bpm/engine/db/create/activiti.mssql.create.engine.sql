@@ -297,6 +297,13 @@ create table ACT_RU_METER_LOG (
   primary key (ID_)
 );
 
+create table ACT_RU_TASK_METER_LOG (
+  ID_ nvarchar(64) not null,
+  ASSIGNEE_HASH_ numeric(19,0),
+  TIMESTAMP_ datetime2,
+  primary key (ID_)
+);
+
 create table ACT_RU_EXT_TASK (
   ID_ nvarchar(64) not null,
   REV_ integer not null,

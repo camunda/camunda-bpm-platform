@@ -194,6 +194,7 @@ drop table ACT_RU_INCIDENT if exists;
 drop table ACT_RU_AUTHORIZATION if exists;
 drop table ACT_RU_FILTER if exists;
 drop table ACT_RU_METER_LOG if exists;
+drop table ACT_RU_TASK_METER_LOG if exists;
 drop table ACT_RU_EXT_TASK if exists;
 drop table ACT_RU_BATCH if exists;
 drop table ACT_GE_SCHEMA_LOG if exists;

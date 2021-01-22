@@ -985,7 +985,7 @@ public interface ManagementService {
   void setJobDuedate(String jobId, Date newDuedate);
 
   /**
-   * Sets a new due date for the provided id. The offset between 
+   * Sets a new due date for the provided id. The offset between
    * the old and the new due date can be cascaded to all follow-up
    * jobs. Cascading only works with timer jobs.
    * When newDuedate is null, the job is executed with the next
@@ -1002,12 +1002,12 @@ public interface ManagementService {
   void setJobDuedate(String jobId, Date newDuedate, boolean cascade);
   /**
    * Triggers the recalculation for the job with the provided id.
-   * 
+   *
    * @param jobId id of job to recalculate, must neither be null nor empty.
    * @param creationDateBased
    *          indicates whether the recalculation should be based on the
    *          creation date of the job or the current date
-   * 
+   *
    * @throws AuthorizationException
    *           If the user has no {@link Permissions#UPDATE} permission on
    *           {@link Resources#PROCESS_INSTANCE} or no
@@ -1162,7 +1162,7 @@ public interface ManagementService {
    *          If the user is not a member of the group {@link Groups#CAMUNDA_ADMIN}.
    */
   String getLicenseKey();
-  
+
   /**
    * Deletes the stored license key. If no license key is set, the request is ignored.
    *
@@ -1272,6 +1272,23 @@ public interface ManagementService {
   void reportDbMetricsNow();
 
   /**
+   * Calculates the number of unique task workers based on user task assignees.
+   *
+   * @param startTime restrict to data collected after the given date (inclusive), can be <code>null</code>
+   * @param endTime restrict to data collected before the given date (exclusive), can be <code>null</code>
+   * @return the aggregated number of unique task workers (may be restricted to a certain interval)
+   */
+  long getUniqueTaskWorkerCount(Date startTime, Date endTime);
+
+  /**
+   * Deletes all task metrics which are older than the specified timestamp.
+   * If the timestamp is null, all metrics will be deleted
+   *
+   * @param timestamp or <code>null</code>
+   */
+  void deleteTaskMetrics(Date timestamp);
+
+  /**
    * Creates a query to search for {@link org.camunda.bpm.engine.batch.Batch} instances.
    *
    * @since 7.5
@@ -1338,14 +1355,14 @@ public interface ManagementService {
 
   /**
    * Query for entries of the database schema log.
-   * 
+   *
    * @since 7.11
    */
   SchemaLogQuery createSchemaLogQuery();
 
   /**
    * Enable/disable sending telemetry data to Camunda
-   * 
+   *
    * @throws AuthorizationException
    *          If the user is not a member of the group {@link Groups#CAMUNDA_ADMIN}.
    */

@@ -877,6 +877,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
   @Override
   public void setAssignee(String assignee) {
+    Date timestamp = ClockUtil.getCurrentTime();
     ensureTaskActive();
     registerCommandContextCloseListener();
 
@@ -896,6 +897,10 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
       if (commandContext.getDbEntityManager().contains(this)) {
         fireAssigneeAuthorizationProvider(oldAssignee, assignee);
         fireHistoricIdentityLinks();
+      }
+      if (commandContext.getProcessEngineConfiguration().isTaskMetricsEnabled() && assignee != null && !assignee.equals(oldAssignee)) {
+        // assignee has changed and is not null, so mark a new task worker
+        commandContext.getMeterLogManager().insert(new TaskMeterLogEntity(assignee, timestamp));
       }
     }
   }
@@ -1636,10 +1641,15 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     return true;
   }
 
-  public void executeMetrics(String metricsName) {
+  public void executeMetrics(String metricsName, CommandContext commandContext) {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
-    if(processEngineConfiguration.isMetricsEnabled()) {
+    if (Metrics.ACTIVTY_INSTANCE_START.equals(metricsName) && processEngineConfiguration.isMetricsEnabled()) {
       processEngineConfiguration.getMetricsRegistry().markOccurrence(Metrics.ACTIVTY_INSTANCE_START);
+    }
+    if (Metrics.UNIQUE_TASK_WORKERS.equals(metricsName) && processEngineConfiguration.isTaskMetricsEnabled() &&
+        assignee != null && propertyChanges.containsKey(ASSIGNEE)) {
+      // assignee has changed and is not null, so mark a new task worker
+      commandContext.getMeterLogManager().insert(new TaskMeterLogEntity(assignee, ClockUtil.getCurrentTime()));
     }
   }
 
