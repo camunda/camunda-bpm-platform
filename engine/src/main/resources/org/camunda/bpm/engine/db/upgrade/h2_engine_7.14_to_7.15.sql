@@ -17,3 +17,14 @@
 
 insert into ACT_GE_SCHEMA_LOG
 values ('400', CURRENT_TIMESTAMP, '7.15.0');
+
+-- https://jira.camunda.com/browse/CAM-13013
+
+create table ACT_RU_TASK_METER_LOG (
+  ID_ varchar(64) not null,
+  ASSIGNEE_HASH_ long,
+  TIMESTAMP_ timestamp,
+  primary key (ID_)
+);
+
+create index ACT_IDX_TASK_METER_LOG_TIME on ACT_RU_TASK_METER_LOG(TIMESTAMP_);

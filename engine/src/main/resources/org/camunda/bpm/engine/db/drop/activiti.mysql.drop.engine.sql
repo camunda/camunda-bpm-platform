@@ -39,6 +39,9 @@ DROP INDEX ACT_IDX_METER_LOG_REPORT ON ACT_RU_METER_LOG;
 DROP INDEX ACT_IDX_METER_LOG_TIME ON ACT_RU_METER_LOG;
 DROP INDEX ACT_IDX_METER_LOG ON ACT_RU_METER_LOG;
 
+-- task metric timestamp column
+drop index ACT_IDX_TASK_METER_LOG_TIME on ACT_RU_TASK_METER_LOG;
+
 drop index ACT_IDX_EXT_TASK_TOPIC on ACT_RU_EXT_TASK;
 
 drop index ACT_IDX_JOB_EXECUTION_ID on ACT_RU_JOB;
@@ -185,6 +188,7 @@ drop table if exists ACT_RU_INCIDENT;
 drop table if exists ACT_RU_AUTHORIZATION;
 drop table if exists ACT_RU_FILTER;
 drop table if exists ACT_RU_METER_LOG;
+drop table if exists ACT_RU_TASK_METER_LOG;
 drop table if exists ACT_RU_EXT_TASK;
 drop table if exists ACT_RU_BATCH;
 drop table if exists ACT_GE_SCHEMA_LOG;

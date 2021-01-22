@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +41,7 @@ public class MeterLogManager extends AbstractManager {
   public static final String SELECT_METER_SUM = "selectMeterLogSum";
   public static final String DELETE_ALL_METER = "deleteAllMeterLogEntries";
   public static final String DELETE_ALL_METER_BY_TIMESTAMP_AND_REPORTER = "deleteMeterLogEntriesByTimestampAndReporter";
+  public static final String DELETE_ALL_TASK_METER_BY_TIMESTAMP = "deleteTaskMeterLogEntriesByTimestamp";
 
   public void insert(MeterLogEntity meterLogEntity) {
     getDbEntityManager()
@@ -65,7 +67,7 @@ public class MeterLogManager extends AbstractManager {
 
   public List<MetricIntervalValue> executeSelectInterval(MetricsQueryImpl query) {
     List<MetricIntervalValue> intervalResult = getDbEntityManager().selectList(SELECT_METER_INTERVAL, query);
-    intervalResult = intervalResult != null ? intervalResult : new ArrayList<MetricIntervalValue>();
+    intervalResult = intervalResult != null ? intervalResult : new ArrayList<>();
 
     String reporterId = Context.getProcessEngineConfiguration().getDbMetricsReporter().getMetricsCollectionTask().getReporter();
     if (!intervalResult.isEmpty() && isEndTimeAfterLastReportInterval(query) && reporterId != null) {
@@ -115,7 +117,7 @@ public class MeterLogManager extends AbstractManager {
   }
 
   public void deleteByTimestampAndReporter(Date timestamp, String reporter) {
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     if (timestamp != null) {
       parameters.put("milliseconds", timestamp.getTime());
     }
@@ -123,4 +125,18 @@ public class MeterLogManager extends AbstractManager {
     getDbEntityManager().delete(MeterLogEntity.class, DELETE_ALL_METER_BY_TIMESTAMP_AND_REPORTER, parameters);
   }
 
+  // TASK METER LOG
+
+  public long findUniqueTaskWorkerCount(Date startTime, Date endTime) {
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("startTime", startTime);
+    parameters.put("endTime", endTime);
+
+    return (Long) getDbEntityManager().selectOne("selectUniqueTaskWorkerCount", parameters);
+  }
+
+  public void deleteTaskMetricsByTimestamp(Date timestamp) {
+    Map<String, Object> parameters = Collections.singletonMap("timestamp", timestamp);
+    getDbEntityManager().delete(TaskMeterLogEntity.class, DELETE_ALL_TASK_METER_BY_TIMESTAMP, parameters);
+  }
 }

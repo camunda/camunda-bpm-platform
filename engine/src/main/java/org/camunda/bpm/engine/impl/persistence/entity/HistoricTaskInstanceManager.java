@@ -257,12 +257,4 @@ public class HistoricTaskInstanceManager extends AbstractHistoricManager {
         new ListQueryParameterObject(parameters, 0, batchSize));
   }
 
-  public long findUniqueTaskWorkerCount(Date startTime, Date endTime) {
-    Map<String, Object> parameters = new HashMap<>();
-    parameters.put("startTime", startTime);
-    parameters.put("endTime", endTime);
-
-    return (Long) getDbEntityManager().selectOne("selectUniqueTaskWorkerCount", parameters);
-  }
-
 }
