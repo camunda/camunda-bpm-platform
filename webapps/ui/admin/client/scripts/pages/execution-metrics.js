@@ -95,34 +95,14 @@ var Controller = [
     }
 
     function fetchTaskWorkerMetric(cb) {
-      fetch(
-        Uri.appUri('plugin://base/:engine/metrics/task-worker/sum') +
-          `?startDate=${encodeURIComponent(
-            fixDate($scope.startDate)
-          )}&endDate=${encodeURIComponent(fixDate($scope.endDate))}`,
+      MetricsResource.sum(
         {
-          headers: {
-            method: 'GET',
-            'Content-Type': 'application/json'
-          }
-        }
-      ).then(
-        function(res) {
-          if (res.status >= 200 && res.status < 300) {
-            res.json().then(
-              function(res) {
-                cb(null, res.result);
-              },
-              function(err) {
-                cb(err, null);
-              }
-            );
-          } else {
-            cb(res, null);
-          }
+          name: 'unique-task-workers',
+          startDate: fixDate($scope.startDate),
+          endDate: fixDate($scope.endDate)
         },
-        function(err) {
-          cb(err, null);
+        function(err, res) {
+          cb(err, !err ? res.result : null);
         }
       );
     }

@@ -20,7 +20,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.camunda.bpm.admin.impl.plugin.resources.AdminPluginsRootResource;
-import org.camunda.bpm.admin.impl.plugin.resources.BaseRootResource;
 import org.camunda.bpm.admin.plugin.spi.impl.AbstractAdminPlugin;
 
 /**
@@ -41,7 +40,6 @@ public class AdminPlugins extends AbstractAdminPlugin {
     HashSet<Class<?>> classes = new HashSet<Class<?>>();
 
     classes.add(AdminPluginsRootResource.class);
-    classes.add(BaseRootResource.class);
 
     return classes;
   }
