@@ -63,7 +63,7 @@ public class MetricsRestService extends AbstractAdminPluginResource {
       Date endDate = convertToDate(dateConverter, endDateAsString);
 
       MetricsResultDto result = new MetricsResultDto();
-      long count = commandContext.getHistoricTaskInstanceManager()
+      long count = commandContext.getMeterLogManager()
         .findUniqueTaskWorkerCount(startDate, endDate);
 
       result.setResult(count);
