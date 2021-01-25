@@ -46,6 +46,7 @@ import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
 import org.camunda.bpm.engine.impl.telemetry.dto.Data;
 import org.camunda.bpm.engine.impl.telemetry.dto.Internals;
 import org.camunda.bpm.engine.impl.telemetry.dto.Metric;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
@@ -167,6 +168,8 @@ public class TelemetryTaskWorkerMetricsTest {
     }
 
     configuration.getTelemetryRegistry().getCommands().clear();
+
+    ClockUtil.offset(5000L);// move the clock a bit to ensure we fetch all UTWs
 
     // when
     configuration.getTelemetryReporter().reportNow();

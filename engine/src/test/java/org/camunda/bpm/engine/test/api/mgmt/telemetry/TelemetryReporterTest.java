@@ -172,6 +172,8 @@ public class TelemetryReporterTest {
       managementService.toggleTelemetry(false);
     }
 
+    managementService.deleteTaskMetrics(null);
+
     clearMetrics();
 
     if (standaloneReporter != null) {
@@ -194,7 +196,7 @@ public class TelemetryReporterTest {
     WireMock.resetAllRequests();
 
     configuration.setTelemetryData(defaultTelemetryData);
-
+    configuration.setTaskMetricsEnabled(false);
   }
 
   protected void clearMetrics() {
@@ -776,11 +778,11 @@ public class TelemetryReporterTest {
   }
 
   @Test
-  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
   public void shouldSendTelemetryWithTaskWorkersMetrics() {
     // given
     managementService.toggleTelemetry(true);
+    configuration.setTaskMetricsEnabled(true);
 
     ClockUtil.setCurrentTime(addHour(ClockUtil.getCurrentTime()));
 
