@@ -64,6 +64,7 @@ public class MetricsRestServiceInteractionTest extends AbstractRestServiceTest {
     meterQueryMock = MockProvider.createMockMeterQuery();
     when(managementServiceMock.createMetricsQuery()).thenReturn(meterQueryMock);
 
+    when(managementServiceMock.getUniqueTaskWorkerCount(any(), any())).thenReturn(10L);
   }
 
   @Test
@@ -318,5 +319,50 @@ public class MetricsRestServiceInteractionTest extends AbstractRestServiceTest {
 
   }
 
+  @Test
+  public void testGetUtw() {
+
+    given()
+      .pathParam("name", Metrics.UNIQUE_TASK_WORKERS)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body("result", equalTo(10))
+     .when()
+      .get(SUM_URL);
+
+    verify(managementServiceMock, times (1)).getUniqueTaskWorkerCount(null, null);
+    verifyNoMoreInteractions(managementServiceMock);
+  }
+
+  @Test
+  public void testGetUtwWithTimestamps() {
+
+    given()
+      .pathParam("name", Metrics.UNIQUE_TASK_WORKERS)
+      .queryParam("startDate", MockProvider.EXAMPLE_METRICS_START_DATE)
+      .queryParam("endDate", MockProvider.EXAMPLE_METRICS_END_DATE)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body("result", equalTo(10))
+     .when()
+      .get(SUM_URL);
+
+    verify(managementServiceMock, times(1)).getUniqueTaskWorkerCount(any(Date.class), any(Date.class));
+    verifyNoMoreInteractions(managementServiceMock);
+  }
+
+  @Test
+  public void testGetUtwWithInvalidTimestamp() {
+
+    given()
+      .pathParam("name", Metrics.UNIQUE_TASK_WORKERS)
+      .queryParam("startDate", "INVALID-TIME-STAMP")
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+     .when()
+      .get(SUM_URL);
+
+    verifyNoMoreInteractions(managementServiceMock);
+  }
 
 }
