@@ -354,25 +354,24 @@ module.exports = [
               diagram = diagramData.diagrams[0];
             }
 
-            importFunction(diagram, function(err, warn) {
-              var applyFunction = useDefinitions
-                ? function(fn) {
-                    fn();
-                  }
-                : $scope.$apply.bind($scope);
+            importFunction(diagram)
+              .then(function({warnings: warn}) {
+                var applyFunction = useDefinitions
+                  ? function(fn) {
+                      fn();
+                    }
+                  : $scope.$apply.bind($scope);
 
-              applyFunction(function() {
-                if (err) {
-                  $scope.error = err;
-                  return;
-                }
+                applyFunction(function() {
+                  $scope.warn = warn;
 
-                $scope.warn = warn;
-
-                handleViewerLoad();
-                return $scope.onLoad();
+                  handleViewerLoad();
+                  return $scope.onLoad();
+                });
+              })
+              .catch(err => {
+                $scope.error = err;
               });
-            });
           }
         }
 

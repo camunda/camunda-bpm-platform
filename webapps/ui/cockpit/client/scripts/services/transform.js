@@ -30,16 +30,14 @@ var Service = [
         var moddle = BpmnIO.prototype._createModdle({
           moddleExtensions: window.bpmnJsModdleExtensions || {}
         });
-        moddle.fromXML(bpmn20Xml, 'bpmn:Definitions', function(
-          err,
-          definitions,
-          context
-        ) {
-          deferred.resolve({
-            definitions: definitions,
-            bpmnElements: context.elementsById
+        moddle
+          .fromXML(bpmn20Xml, 'bpmn:Definitions')
+          .then(function({rootElement: definitions, elementsById}) {
+            deferred.resolve({
+              definitions: definitions,
+              bpmnElements: elementsById
+            });
           });
-        });
 
         return deferred.promise;
       }
