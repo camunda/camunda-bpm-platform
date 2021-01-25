@@ -22,6 +22,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.management.MetricsQuery;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.metrics.MetricsResultDto;
@@ -45,30 +46,51 @@ public class MetricsResourceImpl implements MetricsResource {
 
   @Override
   public MetricsResultDto sum(UriInfo uriInfo) {
-    MetricsQuery query = processEngine.getManagementService()
-      .createMetricsQuery()
-      .name(metricsName);
-
-    applyQueryParams(query, uriInfo);
-
-    return new MetricsResultDto(query.sum());
-  }
-
-  protected void applyQueryParams(MetricsQuery query, UriInfo uriInfo) {
     MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
 
     DateConverter dateConverter = new DateConverter();
     dateConverter.setObjectMapper(objectMapper);
 
-    if(queryParameters.getFirst("startDate") != null) {
-      Date startDate = dateConverter.convertQueryParameterToType(queryParameters.getFirst("startDate"));
+    Number result = null;
+
+    if (Metrics.UNIQUE_TASK_WORKERS.equals(metricsName)) {
+      result = processEngine.getManagementService().getUniqueTaskWorkerCount(
+          extractStartDate(queryParameters, dateConverter),
+          extractEndDate(queryParameters, dateConverter));
+    } else {
+      MetricsQuery query = processEngine.getManagementService()
+        .createMetricsQuery()
+        .name(metricsName);
+
+      applyQueryParams(queryParameters, dateConverter, query);
+      result = query.sum();
+    }
+    return new MetricsResultDto(result);
+  }
+
+  protected void applyQueryParams(MultivaluedMap<String, String> queryParameters, DateConverter dateConverter, MetricsQuery query) {
+    Date startDate = extractStartDate(queryParameters, dateConverter);
+    Date endDate = extractEndDate(queryParameters, dateConverter);
+    if (startDate != null) {
       query.startDate(startDate);
     }
-
-    if(queryParameters.getFirst("endDate") != null) {
-      Date endDate = dateConverter.convertQueryParameterToType(queryParameters.getFirst("endDate"));
+    if (endDate != null) {
       query.endDate(endDate);
     }
+  }
+
+  protected Date extractEndDate(MultivaluedMap<String, String> queryParameters, DateConverter dateConverter) {
+    if(queryParameters.getFirst("endDate") != null) {
+      return dateConverter.convertQueryParameterToType(queryParameters.getFirst("endDate"));
+    }
+    return null;
+  }
+
+  protected Date extractStartDate(MultivaluedMap<String, String> queryParameters, DateConverter dateConverter) {
+    if(queryParameters.getFirst("startDate") != null) {
+      return dateConverter.convertQueryParameterToType(queryParameters.getFirst("startDate"));
+    }
+    return null;
   }
 
 }
