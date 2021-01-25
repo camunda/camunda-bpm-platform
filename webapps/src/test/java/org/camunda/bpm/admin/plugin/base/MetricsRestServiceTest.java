@@ -22,10 +22,10 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.rest.dto.metrics.MetricsResultDto;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,7 +36,6 @@ import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
 public class MetricsRestServiceTest extends AbstractAdminPluginTest {
 
   public static final SimpleDateFormat DATE_FORMAT =
@@ -56,11 +55,13 @@ public class MetricsRestServiceTest extends AbstractAdminPluginTest {
     ObjectMapper objectMapper = new ObjectMapper();
     resource.setObjectMapper(objectMapper);
     taskService = processEngine.getTaskService();
+    ((ProcessEngineConfigurationImpl) processEngine.getprocessEngineConfiguration()).setTaskMetricsEnabled(true);
   }
 
   @After
   public void reset() {
     ClockUtil.reset();
+    ((ProcessEngineConfigurationImpl) processEngine.getprocessEngineConfiguration()).setTaskMetricsEnabled(false);
   }
 
   @Test
