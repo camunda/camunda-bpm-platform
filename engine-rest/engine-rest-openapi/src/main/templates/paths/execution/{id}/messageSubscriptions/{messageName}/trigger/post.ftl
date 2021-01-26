@@ -5,7 +5,7 @@
       tag = "Execution"
       summary = "Trigger Message Event Subscription"
       desc = "Delivers a message to a specific execution by id, to trigger an existing message
-              event subscription. Inject process variables as the message’s
+              event subscription. Inject process variables as the message's
               payload."
   />
 
