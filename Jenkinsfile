@@ -30,6 +30,7 @@ pipeline {
       steps {
         cambpmConditionalRetry([
           agentLabel: 'h2_perf32',
+          suppressErrors: false,
           runSteps: {
             cambpmRunMaven('.',
                 'clean install source:jar -Pdistro,distro-ce,distro-wildfly,distro-webjar com.mycila:license-maven-plugin:check',
