@@ -10,12 +10,12 @@ pipeline {
       label 'jenkins-job-runner'
     }
   }
+  environment {
+    CAMBPM_LOGGER_LOG_LEVEL = 'DEBUG'
+  }
   options {
     buildDiscarder(logRotator(numToKeepStr: '5'))
     copyArtifactPermission('*')
-  }
-  environment {
-    CAMBPM_LOGGER_LOG_LEVEL = 'DEBUG'
   }
   parameters {
     string defaultValue: 'cambpm-ee-main-pr/master', description: 'The name of the EE branch/PR to run the EE pipeline on, e.g. cambpm-ee-main/PR-333', name: 'EE_DOWNSTREAM'
@@ -575,14 +575,6 @@ pipeline {
       script {
         if (!agentDisconnected()){
           cambpmSendEmailNotification()
-        }
-      }
-    }
-    always {
-      // Retrigger the build if the agent of jenkins-job-runner disconnected.
-      script {
-        if (agentDisconnected()) {
-          build job: currentBuild.projectName, propagate: false, quietPeriod: 60, wait: false
         }
       }
     }

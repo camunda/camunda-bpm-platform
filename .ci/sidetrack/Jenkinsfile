@@ -36,6 +36,9 @@ pipeline {
       label 'jenkins-job-runner'
     }
   }
+  environment {
+    CAMBPM_LOGGER_LOG_LEVEL = 'DEBUG'
+  }
   parameters {
     booleanParam name: 'STANDALONE', defaultValue: true
     booleanParam name: 'UPSTREAM_PR', defaultValue: false, description: 'Is the current build triggered in the scope of an upstream pull request'
@@ -117,14 +120,6 @@ pipeline {
       script {
         if (!agentDisconnected()){
           cambpmSendEmailNotification()
-        }
-      }
-    }
-    always {
-      // Retrigger the build if the agent of jenkins-job-runner disconnected.
-      script {
-        if (agentDisconnected()) {
-          build job: currentBuild.projectName, propagate: false, quietPeriod: 60, wait: false
         }
       }
     }
