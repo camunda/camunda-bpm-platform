@@ -39,14 +39,20 @@ export default class Viewer extends Manager {
         id: 'literalExpression',
         constructor: LiteralExpressionViewer,
         opens(element) {
-          return is(element, 'dmn:Decision') && element.literalExpression;
+          return (
+            is(element, 'dmn:Decision') &&
+            is(element.decisionLogic, 'dmn:LiteralExpression')
+          );
         }
       },
       {
         id: 'decisionTable',
         constructor: DecisionTableViewer,
         opens(element) {
-          return is(element, 'dmn:Decision') && element.decisionTable;
+          return (
+            is(element, 'dmn:Decision') &&
+            is(element.decisionLogic, 'dmn:DecisionTable')
+          );
         }
       }
     ];
