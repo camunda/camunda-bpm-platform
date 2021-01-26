@@ -25,6 +25,17 @@
 
                 * `filename`: The name of the file. This is not the variable name but the name that will be used when downloading the file again.
                 * `mimetype`: The MIME type of the file that is being uploaded.
-                * `encoding`: The encoding of the file that is being uploaded."/>
+                * `encoding`: The encoding of the file that is being uploaded.
+
+                The following property can be provided for all value types:
+
+                * `transient`: Indicates whether the variable should be transient or
+                not. See [documentation](${docsUrl}/user-guide/process-engine/variables#transient-variables) for more informations.
+                (Not applicable for `decision-definition` and ` /process-instance/variables-async` endpoints)"
+    />
+
+
+
+
 
 </@lib.dto>
