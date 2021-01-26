@@ -331,9 +331,11 @@ module.exports = [
                 }
                 value = options.map(option => option.value).join(', ');
               } else {
-                value = (mappedOptions || []).find(
+                const option = (mappedOptions || []).find(
                   option => option.key === search.value
-                )?.value;
+                );
+                key = option?.key;
+                value = option?.value;
               }
             }
 
