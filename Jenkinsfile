@@ -11,7 +11,7 @@ pipeline {
     copyArtifactPermission('*');
   }
   parameters {
-    string defaultValue: 'cambpm-ee-main-pr/master', description: 'The name of the EE branch/PR to run the EE pipeline on, e.g. cambpm-ee-main/PR-333', name: 'EE_DOWNSTREAM'
+    string name: 'EE_DOWNSTREAM', defaultValue: 'cambpm-ee-main-pr/master', description: 'The name of the EE branch/PR to run the EE pipeline on, e.g. cambpm-ee-main/PR-333'
   }
   stages {
     stage('ASSEMBLY') {
