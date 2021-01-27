@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.ImmutableList;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -117,7 +118,7 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
 
     // when
     List<HistoricVariableUpdate> historicVariableUpdates =
-      optimizeService.getHistoricVariableUpdates(new Date(1L), null, 10);
+      optimizeService.getHistoricVariableUpdates(new Date(1L), null, false, 10);
 
     // then
     assertThat(historicVariableUpdates.size()).isEqualTo(1);
@@ -144,7 +145,7 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
 
     // when
     List<HistoricVariableUpdate> variableUpdates =
-      optimizeService.getHistoricVariableUpdates(now, null, 10);
+      optimizeService.getHistoricVariableUpdates(now, null, false, 10);
 
     // then
     assertThat(variableUpdates.size()).isEqualTo(1);
@@ -171,7 +172,7 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
 
     // when
     List<HistoricVariableUpdate> variableUpdates =
-      optimizeService.getHistoricVariableUpdates(null, now, 10);
+      optimizeService.getHistoricVariableUpdates(null, now, false, 10);
 
     // then
     assertThat(variableUpdates.size()).isEqualTo(1);
@@ -198,10 +199,69 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
 
     // when
     List<HistoricVariableUpdate> variableUpdates =
-      optimizeService.getHistoricVariableUpdates(now, now, 10);
+      optimizeService.getHistoricVariableUpdates(now, now, false, 10);
 
     // then
     assertThat(variableUpdates.size()).isEqualTo(0);
+  }
+
+  @Test
+  public void objectValueIsNotFetchedWhenExcludedByParameter() {
+    // given
+    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .endEvent()
+      .done();
+    testHelper.deploy(simpleDefinition);
+
+    List<String> serializable = ImmutableList.of("one", "two", "three");
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("var", serializable);
+    runtimeService.startProcessInstanceByKey("process", variables);
+
+    // when
+    List<HistoricVariableUpdate> historicVariableUpdates =
+      optimizeService.getHistoricVariableUpdates(new Date(1L), null, true, 10);
+
+    // then
+    assertThat(historicVariableUpdates.size()).isEqualTo(1);
+
+    for (HistoricVariableUpdate variableUpdate : historicVariableUpdates) {
+      ObjectValue typedValue = (ObjectValue) variableUpdate.getTypedValue();
+      // for not fetched values this flag is set true
+      assertThat(typedValue.isDeserialized()).isTrue();
+      assertThat(typedValue.getValueSerialized()).isNull();
+    }
+
+  }
+
+  @Test
+  public void objectValueIsFetchedWhenNotExcludedByParameter() {
+    // given
+    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .endEvent()
+      .done();
+    testHelper.deploy(simpleDefinition);
+
+    List<String> serializable = ImmutableList.of("one", "two", "three");
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("var", serializable);
+    runtimeService.startProcessInstanceByKey("process", variables);
+
+    // when
+    List<HistoricVariableUpdate> historicVariableUpdates =
+      optimizeService.getHistoricVariableUpdates(new Date(1L), null, false, 10);
+
+    // then
+    assertThat(historicVariableUpdates.size()).isEqualTo(1);
+
+    for (HistoricVariableUpdate variableUpdate : historicVariableUpdates) {
+      ObjectValue typedValue = (ObjectValue) variableUpdate.getTypedValue();
+      assertThat(typedValue.isDeserialized()).isFalse();
+      assertThat(typedValue.getValueSerialized()).isNotNull();
+    }
+
   }
 
   @Test
@@ -223,7 +283,7 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
 
     // when
     List<HistoricVariableUpdate> variableUpdates =
-      optimizeService.getHistoricVariableUpdates(pastDate(), null, 3);
+      optimizeService.getHistoricVariableUpdates(pastDate(), null, false, 3);
 
     // then
     assertThat(variableUpdates.size()).isEqualTo(3);
@@ -256,7 +316,7 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
 
     // when
     List<HistoricVariableUpdate> variableUpdates =
-      optimizeService.getHistoricVariableUpdates(now, null, 10);
+      optimizeService.getHistoricVariableUpdates(now, null, false, 10);
 
     // then
     assertThat(variableUpdates.size()).isEqualTo(3);
@@ -277,55 +337,18 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
     runtimeService.startProcessInstanceByKey("process");
 
     Task task = taskService.createTaskQuery().singleResult();
-    Map<String, String> formFields = new HashMap<>();
+    Map<String, Object> formFields = new HashMap<>();
     formFields.put("var", "foo");
-    engineRule.getFormService().submitTaskFormData(task.getId(), formFields);
+    engineRule.getFormService().submitTaskForm(task.getId(), formFields);
     long detailCount = engineRule.getHistoryService().createHistoricDetailQuery().count();
     assertThat(detailCount).isEqualTo(2L); // variable update + form property
 
     // when
     List<HistoricVariableUpdate> variableUpdates =
-      optimizeService.getHistoricVariableUpdates(pastDate(), null, 10);
+      optimizeService.getHistoricVariableUpdates(pastDate(), null, false, 10);
 
     // then
     assertThat(variableUpdates.size()).isEqualTo(1);
-  }
-
-  @Test
-  public void getHistoricVariableByteArrayUpdates() {
-     // given
-    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .endEvent()
-      .done();
-    testHelper.deploy(simpleDefinition);
-
-    List<String> serializable = new ArrayList<>();
-    serializable.add("one");
-    serializable.add("two");
-    serializable.add("three");
-
-    Map<String, Object> variables = new HashMap<>();
-    variables.put("var", serializable);
-
-    runtimeService.startProcessInstanceByKey("process", variables);
-    runtimeService.startProcessInstanceByKey("process", variables);
-    runtimeService.startProcessInstanceByKey("process", variables);
-    runtimeService.startProcessInstanceByKey("process", variables);
-
-    // when
-    List<HistoricVariableUpdate> historicVariableUpdates =
-      optimizeService.getHistoricVariableUpdates(new Date(1L), null, 10);
-
-    // then
-    assertThat(historicVariableUpdates.size()).isEqualTo(4);
-
-    for (HistoricVariableUpdate variableUpdate : historicVariableUpdates) {
-      ObjectValue typedValue = (ObjectValue) variableUpdate.getTypedValue();
-      assertThat(typedValue.isDeserialized()).isFalse();
-      assertThat(typedValue.getValueSerialized()).isNotNull();
-    }
-
   }
 
   /**
@@ -357,7 +380,7 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
 
     // when
     List<HistoricVariableUpdate> historicVariableUpdates =
-        optimizeService.getHistoricVariableUpdates(new Date(1L), null, 10000);
+        optimizeService.getHistoricVariableUpdates(new Date(1L), null, false, 10000);
 
     // then
     assertThat(historicVariableUpdates).hasSize(numberOfVariables);
@@ -393,7 +416,7 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
     assertThat(variableUpdate.getProcessDefinitionKey()).isEqualTo("process");
     assertThat(variableUpdate.getProcessDefinitionId()).isNotNull();
     assertThat(variableUpdate.getVariableName()).isEqualTo("stringVar");
-    assertThat(variableUpdate.getValue().toString()).isEqualTo("foo");
+    assertThat(variableUpdate.getValue()).hasToString("foo");
     assertThat(variableUpdate.getTypeName()).isEqualTo("string");
     assertThat(variableUpdate.getTime()).isNotNull();
   }

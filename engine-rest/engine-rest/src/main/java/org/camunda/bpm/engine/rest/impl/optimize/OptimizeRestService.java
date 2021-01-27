@@ -252,6 +252,7 @@ public class OptimizeRestService extends AbstractRestProcessEngineAware {
   @Path("/variable-update")
   public List<OptimizeHistoricVariableUpdateDto> getHistoricVariableUpdates(@QueryParam("occurredAfter") String occurredAfterAsString,
                                                                             @QueryParam("occurredAt") String occurredAtAsString,
+                                                                            @QueryParam("excludeObjectValues") boolean excludeObjectValues,
                                                                             @QueryParam("maxResults") int maxResults) {
     Date occurredAfter = dateConverter.convertQueryParameterToType(occurredAfterAsString);
     Date occurredAt = dateConverter.convertQueryParameterToType(occurredAtAsString);
@@ -260,7 +261,7 @@ public class OptimizeRestService extends AbstractRestProcessEngineAware {
     ProcessEngineConfigurationImpl config =
       (ProcessEngineConfigurationImpl) getProcessEngine().getProcessEngineConfiguration();
     List<HistoricVariableUpdate> historicVariableUpdates =
-      config.getOptimizeService().getHistoricVariableUpdates(occurredAfter, occurredAt, maxResults);
+      config.getOptimizeService().getHistoricVariableUpdates(occurredAfter, occurredAt, excludeObjectValues, maxResults);
 
     List<OptimizeHistoricVariableUpdateDto> result = new ArrayList<>();
     for (HistoricVariableUpdate instance : historicVariableUpdates) {
