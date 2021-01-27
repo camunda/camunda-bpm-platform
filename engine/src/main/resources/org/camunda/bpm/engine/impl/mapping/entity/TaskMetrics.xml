@@ -42,6 +42,46 @@
       </if>
     </where>
   </delete>
+  
+  <delete id="deleteTaskMeterLogEntriesByIds" parameterType="string">
+    delete from ${prefix}ACT_RU_TASK_METER_LOG
+    where
+      <bind name="listOfIds" value="list"/>
+      <bind name="fieldName" value="'ID_'"/>
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
+  </delete>
+  
+  <delete id="deleteTaskMetricsByRemovalTime"
+          parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    <bind name="date" value="'TIMESTAMP_'"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    delete ${limitBeforeWithoutOffset} from ${prefix}ACT_RU_TASK_METER_LOG
+    where TIMESTAMP_ &lt;= #{parameter.removalTime}
+    <include refid="andWhereMinuteInDateBetweenSql"/>
+    ${limitAfterWithoutOffset}
+  </delete>
+
+  <delete id="deleteTaskMetricsByRemovalTime_oracle"
+          parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    <bind name="date" value="'TIMESTAMP_'"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    delete ${limitBeforeWithoutOffset} from ${prefix}ACT_RU_TASK_METER_LOG
+    where TIMESTAMP_ &lt;= #{parameter.removalTime}
+    <include refid="andWhereMinuteInDateBetweenSql_oracle"/>
+    ${limitAfterWithoutOffset}
+  </delete>
+
+  <delete id="deleteTaskMetricsByRemovalTime_postgres_or_db2"
+          parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    <bind name="date" value="'TIMESTAMP_'"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    delete ${limitBeforeWithoutOffset} from ${prefix}ACT_RU_TASK_METER_LOG
+    where ID_ IN
+      (SELECT ID_
+       FROM ${prefix}ACT_RU_TASK_METER_LOG
+       WHERE TIMESTAMP_ &lt;= #{parameter.removalTime} <include refid="andWhereMinuteInDateBetweenSql"/>
+       ${limitAfterWithoutOffset})
+  </delete>
 
   <!-- SELECT -->
 
@@ -58,5 +98,47 @@
     </where>
     ${countDistinctAfterEnd}
   </select>
+  
+  <!-- Select ids for async history cleanup -->
+  <select id="selectTaskMetricIdsForCleanup" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
+    <include refid="selectTaskMetricIdsForCleanupSql"/>
+    <include refid="andWhereMinuteInDateBetweenSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <select id="selectTaskMetricIdsForCleanup_oracle" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
+    <include refid="selectTaskMetricIdsForCleanupSql"/>
+    <include refid="andWhereMinuteInDateBetweenSql_oracle"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <sql id="selectTaskMetricIdsForCleanupSql">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    <bind name="date" value="'RES.TIMESTAMP_'"/>
+    <bind name="days" value="parameter.timeToLive"/>
+    <bind name="currentTimestamp" value="parameter.currentTimestamp"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    ${limitBefore}
+    SELECT RES.ID_, RES.TIMESTAMP_
+    ${limitBetween}
+    FROM ${prefix}ACT_RU_TASK_METER_LOG RES
+    WHERE ${dayComparator}
+  </sql>
+
+  <sql id="andWhereMinuteInDateBetweenSql">
+    <if test="parameter.minuteFrom != null and parameter.minuteTo != null">
+      AND ${datepart1}<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.periodUnitFunction"/>${datepart2}${date}${datepart3}
+      between #{parameter.minuteFrom, jdbcType=INTEGER} and #{parameter.minuteTo, jdbcType=INTEGER}
+    </if>
+  </sql>
+
+  <sql id="andWhereMinuteInDateBetweenSql_oracle">
+    <if test="parameter.minuteFrom != null and parameter.minuteTo != null">
+      AND ${datepart1}${date}${datepart2}<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.periodUnitFunction"/>${datepart3}
+      between #{parameter.minuteFrom, jdbcType=INTEGER} and #{parameter.minuteTo, jdbcType=INTEGER}
+    </if>
+  </sql>
 
 </mapper>

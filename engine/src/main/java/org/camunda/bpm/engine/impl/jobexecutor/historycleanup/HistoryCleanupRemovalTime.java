@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskMeterLogEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.Metrics;
 
@@ -43,8 +44,12 @@ public class HistoryCleanupRemovalTime extends HistoryCleanupHandler {
     }
 
     DbOperation batchCleanup = performBatchCleanup();
-
     deleteOperations.put(batchCleanup.getEntityType(), batchCleanup);
+
+    if (getTaskMetricsTimeToLive() != null) {
+      DbOperation taskMetricsCleanup = performTaskMetricsCleanup();
+      deleteOperations.put(taskMetricsCleanup.getEntityType(), taskMetricsCleanup);
+    }
   }
 
   protected Map<Class<? extends DbEntity>, DbOperation> performDmnCleanup() {
@@ -71,6 +76,14 @@ public class HistoryCleanupRemovalTime extends HistoryCleanupHandler {
             configuration.getMinuteFrom(), configuration.getMinuteTo(), getBatchSize());
   }
 
+  protected DbOperation performTaskMetricsCleanup() {
+    return Context
+        .getCommandContext()
+        .getMeterLogManager()
+        .deleteTaskMetricsByRemovalTime(ClockUtil.getCurrentTime(), getTaskMetricsTimeToLive(),
+            configuration.getMinuteFrom(), configuration.getMinuteTo(), getBatchSize());
+  }
+
   protected Map<String, Long> reportMetrics() {
     Map<String, Long> reports = new HashMap<>();
 
@@ -89,6 +102,11 @@ public class HistoryCleanupRemovalTime extends HistoryCleanupHandler {
       reports.put(Metrics.HISTORY_CLEANUP_REMOVED_BATCH_OPERATIONS, (long) deleteOperationBatch.getRowsAffected());
     }
 
+    DbOperation deleteOperationTaskMetric = deleteOperations.get(TaskMeterLogEntity.class);
+    if (deleteOperationTaskMetric != null) {
+      reports.put(Metrics.HISTORY_CLEANUP_REMOVED_TASK_METRICS, (long) deleteOperationTaskMetric.getRowsAffected());
+    }
+
     return reports;
   }
 
@@ -96,6 +114,12 @@ public class HistoryCleanupRemovalTime extends HistoryCleanupHandler {
     return Context
         .getProcessEngineConfiguration()
         .isDmnEnabled();
+  }
+
+  protected Integer getTaskMetricsTimeToLive() {
+    return Context
+        .getProcessEngineConfiguration()
+        .getParsedTaskMetricsTimeToLive();
   }
 
   protected boolean shouldRescheduleNow() {

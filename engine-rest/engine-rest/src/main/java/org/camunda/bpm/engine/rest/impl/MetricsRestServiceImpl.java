@@ -25,9 +25,16 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.management.MetricsQuery;
+import org.camunda.bpm.engine.rest.dto.metrics.DeleteTaskMetricsDto;
 import org.camunda.bpm.engine.rest.dto.metrics.MetricsIntervalResultDto;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.management.MetricIntervalValue;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.converter.IntegerConverter;
@@ -78,6 +85,19 @@ public class MetricsRestServiceImpl extends AbstractRestProcessEngineAware imple
     }
 
     return convertToDtos(metrics);
+  }
+
+  @Override
+  public Response deleteTaskMetrics(DeleteTaskMetricsDto dto) {
+    try {
+      processEngine.getManagementService().deleteTaskMetrics(dto.getDate());
+    } catch (AuthorizationException e) {
+      throw e;
+    } catch (ProcessEngineException e) {
+      throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, e.getMessage());
+    }
+    // return no content (204) since resource is deleted
+    return Response.noContent().build();
   }
 
   protected void applyQueryParams(MetricsQuery query, MultivaluedMap<String, String> queryParameters) {

@@ -20,17 +20,22 @@ import static org.camunda.bpm.engine.rest.util.DateTimeUtils.DATE_FORMAT_WITH_TI
 import static org.camunda.bpm.engine.rest.util.DateTimeUtils.withTimezone;
 import static org.hamcrest.Matchers.*;
 import static io.restassured.RestAssured.given;
-import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.ws.rs.core.Response.Status;
 
-
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.management.MetricsQuery;
@@ -39,6 +44,8 @@ import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
+
+import io.restassured.http.ContentType;
 
 /**
  * @author Daniel Meyer
@@ -49,6 +56,7 @@ public class MetricsRestServiceInteractionTest extends AbstractRestServiceTest {
   public static TestContainerRule rule = new TestContainerRule();
 
   public static final String METRICS_URL = TEST_RESOURCE_ROOT_PATH + MetricsRestService.PATH;
+  public static final String DELETE_UTW_URL = METRICS_URL + "/task-worker";
   public static final String SINGLE_METER_URL = METRICS_URL + "/{name}";
   public static final String SUM_URL = SINGLE_METER_URL + "/sum";
 
@@ -363,6 +371,54 @@ public class MetricsRestServiceInteractionTest extends AbstractRestServiceTest {
       .get(SUM_URL);
 
     verifyNoMoreInteractions(managementServiceMock);
+  }
+
+  @Test
+  public void testDeleteUtwWithTimestamp() {
+    Date date = MockProvider.createMockDuedate();
+    Map<String, Object> deleteJson = new HashMap<>();
+    deleteJson.put("date", date);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(deleteJson)
+    .then().expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+     .when()
+      .delete(DELETE_UTW_URL);
+
+    verify(managementServiceMock, times(1)).deleteTaskMetrics(date);
+    verifyNoMoreInteractions(managementServiceMock);
+  }
+
+  @Test
+  public void testDeleteUtwWithoutTimestamp() {
+    given()
+      .contentType(ContentType.JSON)
+      .body(Collections.emptyMap())
+    .then().expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .delete(DELETE_UTW_URL);
+
+    verify(managementServiceMock, times(1)).deleteTaskMetrics(null);
+    verifyNoMoreInteractions(managementServiceMock);
+  }
+
+  @Test
+  public void testDeleteUtwThrowsAuthorizationException() {
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(managementServiceMock).deleteTaskMetrics(any(Date.class));
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(Collections.emptyMap())
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .delete(DELETE_UTW_URL);
   }
 
 }
