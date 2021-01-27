@@ -150,6 +150,14 @@ module.exports = [
                 return op;
               });
             }
+
+            if (el.options && typeof el.options[0] === 'object') {
+              el.mappedOptions = el.options.map(({key, value}) => {
+                return {key: key, value: $translate.instant(value)};
+              });
+
+              el.options = el.mappedOptions.map(({value}) => value);
+            }
             return el;
           });
 
@@ -308,6 +316,36 @@ module.exports = [
         };
 
         var filteredSearches = function(original) {
+          const getKeyAndValue = (mappedOptions, search) => {
+            let key = null;
+            let value = null;
+            if (mappedOptions) {
+              const inOperator = search.operator === 'In';
+              const options = mappedOptions.filter(
+                option => inOperator && search.value.includes(option.key)
+              );
+              if (inOperator) {
+                const keys = options.map(option => option.key);
+                if (keys.length) {
+                  key = keys;
+                }
+                value = options.map(option => option.value).join(', ');
+              } else {
+                const option = (mappedOptions || []).find(
+                  option => option.key === search.value
+                );
+                key = option?.key;
+                value = option?.value;
+              }
+            }
+
+            if (!value) {
+              value = search.value;
+            }
+
+            return {key: key, value: value};
+          };
+
           return original
             .map(function(search) {
               var config = getConfigByTypeKey(search.type);
@@ -335,7 +373,7 @@ module.exports = [
                   },
 
                   value: {
-                    value: search.value,
+                    ...getKeyAndValue(config.mappedOptions, search),
                     tooltip: $scope.translations.value
                   },
                   allowDates: config.allowDates,
@@ -490,6 +528,13 @@ module.exports = [
           });
         };
 
+        const hasOption = (string, value) =>
+          string
+            .toUpperCase()
+            .split(',')
+            .map(strOpt => strOpt.trim())
+            .includes(value.toUpperCase());
+
         $scope.handleChange = function(idx, field, before, value, evt) {
           var config;
           var search = $scope.searches[idx];
@@ -525,6 +570,22 @@ module.exports = [
           if (evt && evt.keyCode === 13) {
             selectNextInvalidElement(idx, field);
           }
+
+          const mappedOptions = $scope.types.find(
+            type => type.id.key === search.type.value.key
+          )?.mappedOptions;
+          if (mappedOptions) {
+            if (search.operator.value.key === 'In') {
+              const keys = mappedOptions
+                .filter(option => hasOption(search.value.value, option.value))
+                .map(option => option.key);
+              search.value.key = keys.length ? keys : undefined;
+            } else {
+              search.value.key = mappedOptions.find(
+                option => search.value.value === option.value
+              )?.key;
+            }
+          }
         };
 
         $scope.onKeydown = function(evt) {
@@ -541,12 +602,41 @@ module.exports = [
         };
 
         var extractSearches = function(searches) {
+          const getValue = search => {
+            const mappedOptions = $scope.types.find(
+              type => type.id.key === search.type.value.key
+            ).mappedOptions;
+
+            let value = null;
+            if (mappedOptions) {
+              if (search.operator.value.key === 'In') {
+                const values = mappedOptions
+                  .filter(option => hasOption(search.value.value, option.value))
+                  .map(option => option.key);
+
+                if (values.length) {
+                  value = values;
+                }
+              } else {
+                value = mappedOptions.find(
+                  option => search.value.value === option.value
+                )?.key;
+              }
+            }
+
+            if (!value) {
+              value = search.value.value;
+            }
+
+            return value;
+          };
+
           var out = [];
           angular.forEach(searches, function(search) {
             out.push({
               type: search.type.value.key,
               operator: search.operator.value.key,
-              value: search.value.value,
+              value: getValue(search),
               name: search.name.value
             });
           });
