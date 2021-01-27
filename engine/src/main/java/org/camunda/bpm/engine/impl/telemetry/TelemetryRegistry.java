@@ -26,8 +26,6 @@ import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyData;
 
 public class TelemetryRegistry {
 
-  public static final String UNIQUE_TASK_WORKERS = "unique-task-workers";
-
   protected Map<String, CommandCounter> commands = new HashMap<>();
   protected ApplicationServer applicationServer;
   protected LicenseKeyData licenseKey;

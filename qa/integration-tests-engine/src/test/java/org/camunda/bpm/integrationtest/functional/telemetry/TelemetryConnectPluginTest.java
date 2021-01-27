@@ -24,7 +24,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.camunda.bpm.engine.management.Metrics.ACTIVTY_INSTANCE_START;
 import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_INSTANCES;
-import static org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry.UNIQUE_TASK_WORKERS;
 import static org.junit.Assert.assertNotNull;
 
 import java.net.HttpURLConnection;
@@ -168,14 +167,13 @@ public class TelemetryConnectPluginTest extends AbstractFoxPlatformIntegrationTe
   }
 
   protected Map<String, Metric> getDefaultMetrics() {
-    return assembleMetrics(0, 0, 0, 0);
+    return assembleMetrics(0, 0, 0);
   }
-  protected Map<String, Metric> assembleMetrics(long processCount, long decisionCount, long flowNodeCount, long workerCount) {
+  protected Map<String, Metric> assembleMetrics(long processCount, long decisionCount, long flowNodeCount) {
     Map<String, Metric> metrics = new HashMap<>();
     metrics.put(ACTIVTY_INSTANCE_START, new Metric(processCount));
     metrics.put(EXECUTED_DECISION_INSTANCES, new Metric(decisionCount));
     metrics.put(ACTIVTY_INSTANCE_START, new Metric(flowNodeCount));
-    metrics.put(UNIQUE_TASK_WORKERS, new Metric(workerCount));
     return metrics;
   }
 
