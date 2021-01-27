@@ -108,9 +108,10 @@ public class OptimizeService extends ServiceImpl {
 
   public List<HistoricVariableUpdate> getHistoricVariableUpdates(Date occurredAfter,
                                                                  Date occurredAt,
+                                                                 boolean shouldFetchObjectValues,
                                                                  int maxResults) {
     return commandExecutor.execute(
-      new OptimizeHistoricVariableUpdateQueryCmd(occurredAfter, occurredAt, maxResults)
+      new OptimizeHistoricVariableUpdateQueryCmd(occurredAfter, occurredAt, shouldFetchObjectValues, maxResults)
     );
   }
 

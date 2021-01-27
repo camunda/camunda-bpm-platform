@@ -119,7 +119,7 @@ public class OptimizeServiceAuthorizationTest {
         optimizeService.getHistoricUserOperationLogs(new Date(0L), null, 10)},
 
       {(Function<OptimizeService, List<?>>) optimizeService ->
-        optimizeService.getHistoricVariableUpdates(new Date(0L), null, 10)},
+        optimizeService.getHistoricVariableUpdates(new Date(0L), null, false,10)},
 
       {(Function<OptimizeService, List<?>>) optimizeService ->
         optimizeService.getHistoricDecisionInstances(new Date(0L), null, 10)},
