@@ -98,7 +98,7 @@ public class OptimizeApiPageSizeTest {
         "historic user operation logs"
       ),
       new TestScenario(
-        (pageSize) -> optimizeService.getHistoricVariableUpdates(null, null, pageSize),
+        (pageSize) -> optimizeService.getHistoricVariableUpdates(null, null, true, pageSize),
         "historic variable updates"
       ),
       new TestScenario(
