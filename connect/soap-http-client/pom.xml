@@ -8,7 +8,7 @@
   </parent>
 
   <artifactId>camunda-connect-soap-http-client</artifactId>
-  <name>camunda BPM - connect - soap http client</name>
+  <name>Camunda Platform - connect - soap http client</name>
 
   <dependencies>
 

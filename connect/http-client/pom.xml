@@ -9,7 +9,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>camunda-connect-http-client</artifactId>
-  <name>camunda BPM - connect - http client</name>
+  <name>Camunda Platform - connect - http client</name>
 
   <dependencies>
 

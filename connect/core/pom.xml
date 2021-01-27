@@ -8,7 +8,7 @@
   </parent>
 
   <artifactId>camunda-connect-core</artifactId>
-  <name>camunda BPM - connect - core</name>
+  <name>Camunda Platform - connect - core</name>
 
   <dependencies>
 

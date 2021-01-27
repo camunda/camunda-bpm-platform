@@ -12,7 +12,7 @@
   <groupId>org.camunda.connect</groupId>
   <artifactId>camunda-connect-bom</artifactId>
   <version>1.6.0-SNAPSHOT</version>
-  <name>camunda BPM - connect - bom</name>
+  <name>Camunda Platform - connect - bom</name>
   <packaging>pom</packaging>
 
   <dependencyManagement>

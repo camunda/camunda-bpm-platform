@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>camunda-connect-root</artifactId>
-  <name>camunda BPM - connect - root</name>
+  <name>Camunda Platform - connect - root</name>
   <inceptionYear>2014</inceptionYear>
   <packaging>pom</packaging>
 
