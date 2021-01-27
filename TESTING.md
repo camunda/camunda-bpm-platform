@@ -75,18 +75,17 @@ There is a special profile for the WildFly Application Servers:
 
 # Testing a Given Database
 
-Camunda supports all database technologies listed in https://docs.camunda.org/manual/latest/introduction/supported-environments/#supported-database-products in all environments they work in as specified. Support means, that we guarantee that the Camunda BPM platform integrates well with that technology’s JDBC behavior (with potential restrictions documented in https://docs.camunda.org/manual/latest/user-guide/process-engine/database/, e.g. that we work with isolation level READ COMMITTED on all databases except CockroachDB)
-Camunda tests a database technology with a specific database, i.e. we test it in one environment, not all possible environments that you can imagine (e.g. we test Postgres on local Docker containers, not as hosted databases on AWS or Azure)
+Camunda supports all database technologies listed on [Supported Database Products](https://docs.camunda.org/manual/latest/introduction/supported-environments/#supported-database-products), and in all environments they are operating in as specified. Support means we guarantee the Camunda Platform integrates well with the database technology’s JDBC behavior (there exist some limitations which are [documented](https://docs.camunda.org/manual/latest/user-guide/process-engine/database/), e.g., isolation level `READ_COMMITTED` is required for all databases except CockroachDB which in turns requires `SERIALIZABLE`). We test a database technology with a specific database, i.e., we test it in one environment, not all possible environments that you can imagine (e.g., we test Postgres on local Docker containers, but not as hosted databases on AWS or Azure).
 
 ## What about database technology X in environment Y?
 
-In order to make a statement regarding Camunda support, we need to understand if technology X is one of the technologies we already support, or if it is a distinct technology. Different databases may share the same or a similar name, but they can still be different technologies: For example, IBM DB2 z/OS behaves quite different to IBM DB2 on Linux, Unix, Windows. Amazon Aurora Postgres is different to a standard Postgres. 
+To make a statement regarding Camunda Platform support, we need to understand if technology X is one of the technologies we already support or different technology. Several databases may share the same or a similar name, but they can still be different technologies: For example, IBM DB2 z/OS behaves quite differently from IBM DB2 on Linux, Unix, Windows. Amazon Aurora Postgres is different from a standard Postgres.
 
-If you want to become sure that a given database works well with the Camunda BPM platform, you can run the test suite against this database.
+If you want to make sure that a given database works well with the Camunda Platform, you can run the test suite against this database.
 
-In `pom.xml` in the `database` folder, several database profiles are defined with a matching database driver.
+In the `pom.xml` file located in the `./database` folder, several database profiles are defined with a matching database driver.
 
-To run the test suite against a given database, select the `database` profile and your database profile and provide the connection parameters:
+To run the test suite against a given database, select the `database` profile and your desired database profile and provide the connection parameters:
 
 ```
 mvn test -Pdatabase,postgresql -Ddatabase.url=jdbc:postgresql:pgdb -Ddatabase.username=pguser -Ddatabase.password=pgpassword
