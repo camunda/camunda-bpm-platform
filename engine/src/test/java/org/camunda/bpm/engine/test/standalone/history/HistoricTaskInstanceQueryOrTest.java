@@ -853,6 +853,7 @@ public class HistoricTaskInstanceQueryOrTest {
   }
 
   @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void shouldReturnHistoricTasksWithHadCandidateUserOrHadCandidateGroup() {
     // given
     Task task1 = taskService.newTask();
@@ -876,6 +877,7 @@ public class HistoricTaskInstanceQueryOrTest {
   }
 
   @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void shouldReturnHistoricTasksWithCandidateCandidateUserInvolvedOrCandidateGroupInvolved() {
     // given
     Task task1 = taskService.newTask();
