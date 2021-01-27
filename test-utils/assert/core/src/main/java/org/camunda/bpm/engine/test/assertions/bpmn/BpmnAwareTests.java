@@ -44,14 +44,14 @@ import static java.lang.String.format;
 /**
  * Convenience class to access only camunda *BPMN* related Assertions 
  * PLUS helper methods. Usage is possible, if you only need BPMN Tests and 
- * mandatory if you still use Camunda BPM lower than 7.2 version. 
+ * mandatory if you still use Camunda Platform lower than 7.2 version. 
  * 
  * Use it with a static import:
  *
  * import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.*;
  *
  * @see org.camunda.bpm.engine.test.assertions.ProcessEngineTests
- *      for full Camunda BPM Assertions functionality
+ *      for full Camunda Platform Assertions functionality
  *
  * @author Martin Schimak (martin.schimak@plexiti.com)
  * @author Ingo Richtsmeier (ingo.richtsmeier@camunda.com)
