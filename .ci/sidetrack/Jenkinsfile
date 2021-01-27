@@ -62,6 +62,7 @@ pipeline {
       steps {
         cambpmConditionalRetry([
           agentLabel: 'centos-stable',
+          suppressErrors: false,
           runSteps: {
             cambpmCopyArtifacts(params.UPSTREAM_PROJECT_NAME, params.UPSTREAM_BUILD_NUMBER)
             cambpmStash("platform-stash-runtime",
