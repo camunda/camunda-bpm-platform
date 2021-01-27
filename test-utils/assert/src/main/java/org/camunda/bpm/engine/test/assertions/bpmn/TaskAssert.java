@@ -84,7 +84,7 @@ public class TaskAssert extends AbstractProcessAssert<TaskAssert, Task> {
    * 
    * @param   candidateGroupId id of a candidate group the task is waiting to be assigned to
    * @return  this {@link TaskAssert}
-   * @since   Camunda BPM 7.0
+   * @since   Camunda Platform 7.0
    */
   public TaskAssert hasCandidateGroup(final String candidateGroupId) {
     return hasCandidateGroup(candidateGroupId, true);
@@ -97,7 +97,7 @@ public class TaskAssert extends AbstractProcessAssert<TaskAssert, Task> {
    * 
    * @param   candidateGroupId id of a candidate group the task is associated to
    * @return  this {@link TaskAssert}
-   * @since   Camunda BPM 7.3
+   * @since   Camunda Platform 7.3
    */
   public TaskAssert hasCandidateGroupAssociated(final String candidateGroupId) {
     return hasCandidateGroup(candidateGroupId, false);
@@ -110,7 +110,7 @@ public class TaskAssert extends AbstractProcessAssert<TaskAssert, Task> {
     if (unassignedOnly) {
       isNotAssigned(); // Useful for better assertion error message in case of assigned task
     } else {
-      taskQuery.includeAssignedTasks(); // Available from Camunda BPM 7.3 onwards
+      taskQuery.includeAssignedTasks(); // Available from Camunda Platform 7.3 onwards
     }
     final Task inGroup = taskQuery.singleResult();
     Assertions.assertThat(inGroup)
@@ -127,7 +127,7 @@ public class TaskAssert extends AbstractProcessAssert<TaskAssert, Task> {
    * 
    * @param   candidateUserId id of a candidate user the task is waiting to be assigned to
    * @return  this {@link TaskAssert}
-   * @since   Camunda BPM 7.0
+   * @since   Camunda Platform 7.0
    */
   public TaskAssert hasCandidateUser(final String candidateUserId) {
     return hasCandidateUser(candidateUserId, true);
@@ -140,7 +140,7 @@ public class TaskAssert extends AbstractProcessAssert<TaskAssert, Task> {
    *
    * @param   candidateUserId id of a candidate user the task is associated to
    * @return  this {@link TaskAssert}
-   * @since   Camunda BPM 7.3
+   * @since   Camunda Platform 7.3
    */
   public TaskAssert hasCandidateUserAssociated(final String candidateUserId) {
     return hasCandidateUser(candidateUserId, false);
@@ -153,7 +153,7 @@ public class TaskAssert extends AbstractProcessAssert<TaskAssert, Task> {
     if (unassignedOnly) {
       isNotAssigned(); // Useful for better assertion error message in case of assigned task
     } else {
-      taskQuery.includeAssignedTasks(); // Available from Camunda BPM 7.3 onwards
+      taskQuery.includeAssignedTasks(); // Available from Camunda Platform 7.3 onwards
     }
     final Task withUser = taskQuery.singleResult();
     Assertions.assertThat(withUser)
