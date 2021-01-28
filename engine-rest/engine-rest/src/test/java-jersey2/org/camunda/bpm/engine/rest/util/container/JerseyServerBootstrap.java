@@ -61,7 +61,8 @@ public class JerseyServerBootstrap extends EmbeddedServerBootstrap {
     int port = Integer.parseInt(serverProperties.getProperty(PORT_PROPERTY));
     URI serverUri = UriBuilder.fromPath(ROOT_RESOURCE_PATH).scheme("http").host("localhost").port(port).build();
     try {
-      server = GrizzlyHttpServerFactory.createHttpServer(serverUri, rc);
+      server = GrizzlyHttpServerFactory.createHttpServer(serverUri, rc, false);
+      server.getServerConfiguration().setAllowPayloadForUndefinedHttpMethods(true);
     } catch (IllegalArgumentException e) {
       throw new ServerBootstrapException(e);
     } catch (NullPointerException e) {
