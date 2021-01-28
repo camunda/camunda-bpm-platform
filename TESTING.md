@@ -73,6 +73,24 @@ There is a special profile for the WildFly Application Servers:
 
 * WildFly Domain mode: `mvn clean install -Pengine-integration,h2,wildfly-domain`
 
+# Testing a Given Database
+
+Camunda supports all database technologies listed on [Supported Database Products](https://docs.camunda.org/manual/latest/introduction/supported-environments/#supported-database-products), and in all environments, they are operating in as specified. Support means we guarantee the Camunda Platform integrates well with the database technology’s JDBC behavior (there are some [documented](https://docs.camunda.org/manual/latest/user-guide/process-engine/database/) limitations, e.g., isolation level `READ_COMMITTED` is required for all databases except CockroachDB, which in turns requires `SERIALIZABLE`). We test a database technology with a specific database, i.e., we test it in one environment, not all possible environments that you can imagine (e.g., we test Postgres on local Docker containers, but not as hosted databases on AWS or Azure).
+
+## What about database technology X in environment Y?
+
+To make a statement regarding Camunda Platform support, we need to understand if technology X is one of the technologies we already support or different technology. Several databases may share the same or a similar name, but they can still be different technologies: For example, IBM DB2 z/OS behaves quite differently from IBM DB2 on Linux, Unix, Windows. Amazon Aurora Postgres is different from a standard Postgres.
+
+If you want to make sure that a given database works well with the Camunda Platform, you can run the test suite against this database.
+
+In the `pom.xml` file located in the `./database` folder, several database profiles are defined with a matching database driver.
+
+To run the test suite against a given database, select the `database` profile and your desired database profile and provide the connection parameters:
+
+```
+mvn test -Pdatabase,postgresql -Ddatabase.url=jdbc:postgresql:pgdb -Ddatabase.username=pguser -Ddatabase.password=pgpassword
+```
+
 # Limiting the Number of Engine Unit Tests
 
 Due to the fact that the number of unit tests in the camunda engine increases daily and that you might just want to test a certain subset of tests the maven-surefire-plugin is configured in a way that you can include/exclude certain packages in your tests.
