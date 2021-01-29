@@ -152,7 +152,7 @@ describe('Admin Groups Spec', function() {
       // then
       testHelper.expectStringEqual(
         groupsPage.editGroup.pageHeader(),
-        'Camunda Platform Administrators'
+        'camunda BPM Administrators'
       );
       groupsPage.editGroup.isActive({group: 'camunda-admin'});
       expect(
@@ -168,7 +168,7 @@ describe('Admin Groups Spec', function() {
       // then
       testHelper.expectStringEqual(
         groupsPage.editGroup.pageHeader(),
-        'Camunda Platform Administratorsi'
+        'camunda BPM Administratorsi'
       );
     });
 
@@ -200,7 +200,7 @@ describe('Admin Groups Spec', function() {
       // then
       groupsPage.editGroupTenants.isActive({group: 'camunda-admin'});
       expect(groupsPage.editGroupTenants.subHeader()).to.eventually.eql(
-        "Camunda Platform Administrators's" + ' ' + 'Tenants'
+        "camunda BPM Administrators's" + ' ' + 'Tenants'
       );
       expect(
         groupsPage.editGroupTenants.tenantList().count()

@@ -160,7 +160,7 @@
                       <message>
                         *****************************************************************************************************
                         *                                                                                                   *
-                        *               You must use at least JDK 1.8 to start Camunda Platform Wildfly!!!                       *
+                        *               You must use at least JDK 1.8 to start Camunda Platform Wildfly!!!                  *
                         *                                                                                                   *
                         *****************************************************************************************************
                       </message>
