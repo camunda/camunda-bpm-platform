@@ -33,7 +33,7 @@ pipeline {
           suppressErrors: false,
           runSteps: {
             cambpmRunMaven('.',
-                'clean install source:jar -Pdistro,distro-ce,distro-wildfly,distro-webjar com.mycila:license-maven-plugin:check',
+                'clean install source:jar -Pdistro,distro-ce,distro-wildfly,distro-webjar com.mycila:license-maven-plugin:check -DskipTests',
                 withCatch: false,
                 withNpm: true)
 
