@@ -166,6 +166,7 @@ public class MeterLogManager extends AbstractManager {
         new ListQueryParameterObject(parameters, 0, batchSize));
   }
 
+  @SuppressWarnings("unchecked")
   public List<String> findTaskMetricsForCleanup(int batchSize, Integer timeToLive, int minuteFrom, int minuteTo) {
     Map<String, Object> queryParameters = new HashMap<>();
     queryParameters.put("currentTimestamp", ClockUtil.getCurrentTime());

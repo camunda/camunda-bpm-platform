@@ -20,7 +20,7 @@ import java.util.Date;
 
 public class DeleteTaskMetricsDto {
 
-  private Date date;
+  protected Date date;
 
   public Date getDate() {
     return date;
