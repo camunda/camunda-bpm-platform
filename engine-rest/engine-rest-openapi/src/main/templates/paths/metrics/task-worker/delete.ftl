@@ -5,16 +5,17 @@
       summary = "Delete Task Worker Metrics"
       desc = "Deletes all task worker metrics prior to the given date or all if no date is provided." />
 
-  <@lib.requestBody
-      mediaType = "application/json"
-      dto = "DeleteTaskMetricsDto"
-      examples = ['"example-1": {
-                     "summary": "DELETE `/metrics/task-worker`",
-                     "value": {
-                       "date": "2020-01-13T18:43:28.000+0200"
-                     }
-                   }']
-  />
+  "parameters" : [
+
+    <@lib.parameter
+        name = "date"
+        location = "query"
+        type = "string"
+        format = "date-time"
+        last = true
+        desc = "The date prior to which all task worker metrics should be deleted."/>
+
+  ],
 
   "responses": {
 
