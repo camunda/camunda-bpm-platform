@@ -25,7 +25,7 @@ pipeline {
       steps {
         script {
           parallel(cambpmGetMatrixStages('engine-webapp-unit', failedStageTypes, { allowedStageLabels, dbLabel ->
-            return cambpmWithLabels(allowedStageLabels.minus('cockroachdb')) && cambpmWithLabels(cambpmGetDbType(dbLabel))
+            return cambpmWithLabels(allowedStageLabels.minus('cockroachdb'), cambpmGetDbType(dbLabel))
           }))
         }
       }
