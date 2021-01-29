@@ -18,7 +18,6 @@ package org.camunda.bpm.engine.rest;
 
 import java.util.List;
 
-import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -29,7 +28,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.camunda.bpm.engine.rest.dto.metrics.DeleteTaskMetricsDto;
 import org.camunda.bpm.engine.rest.dto.metrics.MetricsIntervalResultDto;
 
 import org.camunda.bpm.engine.rest.sub.metrics.MetricsResource;
@@ -52,6 +50,5 @@ public interface MetricsRestService {
 
   @DELETE
   @Path("/task-worker")
-  @Consumes(MediaType.APPLICATION_JSON)
-  Response deleteTaskMetrics(DeleteTaskMetricsDto dto);
+  Response deleteTaskMetrics(@Context UriInfo uriInfo);
 }

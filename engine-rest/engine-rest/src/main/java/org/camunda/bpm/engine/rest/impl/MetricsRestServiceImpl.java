@@ -30,7 +30,6 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.management.MetricsQuery;
-import org.camunda.bpm.engine.rest.dto.metrics.DeleteTaskMetricsDto;
 import org.camunda.bpm.engine.rest.dto.metrics.MetricsIntervalResultDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.AuthorizationException;
@@ -53,6 +52,7 @@ public class MetricsRestServiceImpl extends AbstractRestProcessEngineAware imple
   public static final String QUERY_PARAM_FIRST_RESULT = "firstResult";
   public static final String QUERY_PARAM_MAX_RESULTS = "maxResults";
   public static final String QUERY_PARAM_INTERVAL = "interval";
+  public static final String QUERY_PARAM_DATE = "date";
   public static final String QUERY_PARAM_AGG_BY_REPORTER = "aggregateByReporter";
 
   public MetricsRestServiceImpl(String engineName, ObjectMapper objectMapper) {
@@ -88,9 +88,13 @@ public class MetricsRestServiceImpl extends AbstractRestProcessEngineAware imple
   }
 
   @Override
-  public Response deleteTaskMetrics(DeleteTaskMetricsDto dto) {
+  public Response deleteTaskMetrics(UriInfo uriInfo) {
     try {
-      processEngine.getManagementService().deleteTaskMetrics(dto.getDate());
+      MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
+      DateConverter dateConverter = new DateConverter();
+      dateConverter.setObjectMapper(objectMapper);
+      Date date = dateConverter.convertQueryParameterToType(queryParameters.getFirst(QUERY_PARAM_DATE));
+      processEngine.getManagementService().deleteTaskMetrics(date);
     } catch (AuthorizationException e) {
       throw e;
     } catch (ProcessEngineException e) {

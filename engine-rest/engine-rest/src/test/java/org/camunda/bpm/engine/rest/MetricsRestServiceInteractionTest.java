@@ -28,11 +28,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.AuthorizationException;
@@ -44,8 +40,6 @@ import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
-
-import io.restassured.http.ContentType;
 
 /**
  * @author Daniel Meyer
@@ -376,12 +370,9 @@ public class MetricsRestServiceInteractionTest extends AbstractRestServiceTest {
   @Test
   public void testDeleteUtwWithTimestamp() {
     Date date = MockProvider.createMockDuedate();
-    Map<String, Object> deleteJson = new HashMap<>();
-    deleteJson.put("date", date);
 
     given()
-      .contentType(ContentType.JSON)
-      .body(deleteJson)
+      .queryParam("date", DATE_FORMAT_WITH_TIMEZONE.format(date))
     .then().expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
      .when()
@@ -394,8 +385,6 @@ public class MetricsRestServiceInteractionTest extends AbstractRestServiceTest {
   @Test
   public void testDeleteUtwWithoutTimestamp() {
     given()
-      .contentType(ContentType.JSON)
-      .body(Collections.emptyMap())
     .then().expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
@@ -411,8 +400,6 @@ public class MetricsRestServiceInteractionTest extends AbstractRestServiceTest {
     doThrow(new AuthorizationException(message)).when(managementServiceMock).deleteTaskMetrics(any(Date.class));
 
     given()
-      .contentType(ContentType.JSON)
-      .body(Collections.emptyMap())
     .then().expect()
       .statusCode(Status.FORBIDDEN.getStatusCode())
       .body("type", equalTo(AuthorizationException.class.getSimpleName()))

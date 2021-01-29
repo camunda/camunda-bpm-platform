@@ -31,11 +31,11 @@ import org.camunda.bpm.engine.management.Metrics;
  */
 public class HistoryCleanupBatch extends HistoryCleanupHandler {
 
-  private List<String> historicProcessInstanceIds = Collections.emptyList();
-  private List<String> historicDecisionInstanceIds = Collections.emptyList();
-  private List<String> historicCaseInstanceIds = Collections.emptyList();
-  private List<String> historicBatchIds = Collections.emptyList();
-  private List<String> taskMetricIds = Collections.emptyList();
+  protected List<String> historicProcessInstanceIds = Collections.emptyList();
+  protected List<String> historicDecisionInstanceIds = Collections.emptyList();
+  protected List<String> historicCaseInstanceIds = Collections.emptyList();
+  protected List<String> historicBatchIds = Collections.emptyList();
+  protected List<String> taskMetricIds = Collections.emptyList();
 
   public List<String> getHistoricProcessInstanceIds() {
     return historicProcessInstanceIds;
