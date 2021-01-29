@@ -33,6 +33,7 @@
         <!-- turn off metrics reporter -->
         <property name="dbMetricsReporterActivate" value="false" />
         <property name="telemetryReporterActivate" value="false" />
+        <property name="taskMetricsEnabled" value="false" />
         <property name="deploymentResources">
             <list>
                 <value>classpath:/org/camunda/bpm/engine/spring/test/autodeployment/autodeploy.*.bpmn20.xml</value>
