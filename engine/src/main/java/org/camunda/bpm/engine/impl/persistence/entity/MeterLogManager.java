@@ -47,7 +47,12 @@ public class MeterLogManager extends AbstractManager {
   public static final String SELECT_METER_SUM = "selectMeterLogSum";
   public static final String DELETE_ALL_METER = "deleteAllMeterLogEntries";
   public static final String DELETE_ALL_METER_BY_TIMESTAMP_AND_REPORTER = "deleteMeterLogEntriesByTimestampAndReporter";
-  public static final String DELETE_ALL_TASK_METER_BY_TIMESTAMP = "deleteTaskMeterLogEntriesByTimestamp";
+
+  public static final String SELECT_UNIQUE_TASK_WORKER = "selectUniqueTaskWorkerCount";
+  public static final String SELECT_TASK_METER_FOR_CLEANUP = "selectTaskMetricIdsForCleanup";
+  public static final String DELETE_TASK_METER_BY_TIMESTAMP = "deleteTaskMeterLogEntriesByTimestamp";
+  public static final String DELETE_TASK_METER_BY_REMOVAL_TIME = "deleteTaskMetricsByRemovalTime";
+  public static final String DELETE_TASK_METER_BY_IDS = "deleteTaskMeterLogEntriesByIds";
 
   public void insert(MeterLogEntity meterLogEntity) {
     getDbEntityManager()
@@ -138,16 +143,16 @@ public class MeterLogManager extends AbstractManager {
     parameters.put("startTime", startTime);
     parameters.put("endTime", endTime);
 
-    return (Long) getDbEntityManager().selectOne("selectUniqueTaskWorkerCount", parameters);
+    return (Long) getDbEntityManager().selectOne(SELECT_UNIQUE_TASK_WORKER, parameters);
   }
 
   public void deleteTaskMetricsByTimestamp(Date timestamp) {
     Map<String, Object> parameters = Collections.singletonMap("timestamp", timestamp);
-    getDbEntityManager().delete(TaskMeterLogEntity.class, DELETE_ALL_TASK_METER_BY_TIMESTAMP, parameters);
+    getDbEntityManager().delete(TaskMeterLogEntity.class, DELETE_TASK_METER_BY_TIMESTAMP, parameters);
   }
 
   public void deleteTaskMetricsById(List<String> taskMetricIds) {
-    getDbEntityManager().deletePreserveOrder(TaskMeterLogEntity.class, "deleteTaskMeterLogEntriesByIds", taskMetricIds);
+    getDbEntityManager().deletePreserveOrder(TaskMeterLogEntity.class, DELETE_TASK_METER_BY_IDS, taskMetricIds);
   }
 
   public DbOperation deleteTaskMetricsByRemovalTime(Date currentTimestamp, Integer timeToLive, int minuteFrom, int minuteTo, int batchSize) {
@@ -162,7 +167,7 @@ public class MeterLogManager extends AbstractManager {
     parameters.put("batchSize", batchSize);
 
     return getDbEntityManager()
-      .deletePreserveOrder(TaskMeterLogEntity.class, "deleteTaskMetricsByRemovalTime",
+      .deletePreserveOrder(TaskMeterLogEntity.class, DELETE_TASK_METER_BY_REMOVAL_TIME,
         new ListQueryParameterObject(parameters, 0, batchSize));
   }
 
@@ -178,7 +183,7 @@ public class MeterLogManager extends AbstractManager {
     ListQueryParameterObject parameterObject = new ListQueryParameterObject(queryParameters, 0, batchSize);
     parameterObject.getOrderingProperties().add(new QueryOrderingProperty(new QueryPropertyImpl("TIMESTAMP_"), Direction.ASCENDING));
 
-    return (List<String>) getDbEntityManager().selectList("selectTaskMetricIdsForCleanup", parameterObject);
+    return (List<String>) getDbEntityManager().selectList(SELECT_TASK_METER_FOR_CLEANUP, parameterObject);
   }
 
 }
