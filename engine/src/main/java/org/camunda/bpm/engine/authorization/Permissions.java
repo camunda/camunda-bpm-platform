@@ -19,7 +19,7 @@ package org.camunda.bpm.engine.authorization;
 import java.util.EnumSet;
 
 /**
- * The set of built-in {@link Permission Permissions} for camunda BPM.
+ * The set of built-in {@link Permission Permissions} for Camunda Platform.
  *
  * @author Daniel Meyer
  *

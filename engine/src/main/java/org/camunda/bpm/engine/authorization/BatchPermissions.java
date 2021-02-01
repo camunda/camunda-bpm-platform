@@ -17,7 +17,7 @@
 package org.camunda.bpm.engine.authorization;
 
 /**
- * The set of built-in {@link Permission Permissions} for {@link Resources#BATCH Batch operations} in Camunda BPM.
+ * The set of built-in {@link Permission Permissions} for {@link Resources#BATCH Batch operations} in Camunda Platform.
  *
  * @author Yana Vasileva
  *

@@ -17,7 +17,7 @@
 package org.camunda.bpm.engine.authorization;
 
 /**
- * The set of built-in {@link Permission Permissions} for {@link Resources#PROCESS_INSTANCE Process instances} in Camunda BPM.
+ * The set of built-in {@link Permission Permissions} for {@link Resources#PROCESS_INSTANCE Process instances} in Camunda Platform.
  *
  * @author Yana Vasileva
  *

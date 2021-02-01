@@ -31,7 +31,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * <p>Class providing static methods returning all the resource classes provided by camunda BPM.</p>
+ * <p>Class providing static methods returning all the resource classes provided by Camunda Platform.</p>
  *
  * @author Daniel Meyer
  *
@@ -58,7 +58,7 @@ public class CamundaRestResources {
   }
 
   /**
-   * Returns a set containing all resource classes provided by camunda BPM.
+   * Returns a set containing all resource classes provided by Camunda Platform.
    * @return a set of resource classes.
    */
   public static Set<Class<?>> getResourceClasses() {

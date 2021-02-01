@@ -18,7 +18,7 @@ package org.camunda.bpm.engine.authorization;
 
 /**
  * The set of built-in {@link Permission Permissions} for
- * {@link Resources#HISTORIC_TASK Historic Task} in Camunda BPM.
+ * {@link Resources#HISTORIC_TASK Historic Task} in Camunda Platform.
  */
 public enum HistoricTaskPermissions implements Permission {
 
