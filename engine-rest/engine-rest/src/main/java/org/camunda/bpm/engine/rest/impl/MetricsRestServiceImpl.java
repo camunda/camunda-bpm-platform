@@ -50,8 +50,12 @@ public class MetricsRestServiceImpl extends AbstractRestProcessEngineAware imple
   public static final String QUERY_PARAM_DATE = "date";
   public static final String QUERY_PARAM_AGG_BY_REPORTER = "aggregateByReporter";
 
+  protected final DateConverter dateConverter;
+
   public MetricsRestServiceImpl(String engineName, ObjectMapper objectMapper) {
     super(engineName, objectMapper);
+    dateConverter = new DateConverter();
+    dateConverter.setObjectMapper(objectMapper);
   }
 
   @Override
@@ -83,12 +87,8 @@ public class MetricsRestServiceImpl extends AbstractRestProcessEngineAware imple
   }
 
   @Override
-  public Response deleteTaskMetrics(UriInfo uriInfo) {
-    MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
-    DateConverter dateConverter = new DateConverter();
-    dateConverter.setObjectMapper(objectMapper);
-
-    Date date = dateConverter.convertQueryParameterToType(queryParameters.getFirst(QUERY_PARAM_DATE));
+  public Response deleteTaskMetrics(String dateString) {
+    Date date = dateConverter.convertQueryParameterToType(dateString);
     processEngine.getManagementService().deleteTaskMetrics(date);
 
     // return no content (204) since resource is deleted
@@ -96,10 +96,6 @@ public class MetricsRestServiceImpl extends AbstractRestProcessEngineAware imple
   }
 
   protected void applyQueryParams(MetricsQuery query, MultivaluedMap<String, String> queryParameters) {
-
-    DateConverter dateConverter = new DateConverter();
-    dateConverter.setObjectMapper(objectMapper);
-
     if(queryParameters.getFirst(QUERY_PARAM_START_DATE) != null) {
       Date startDate = dateConverter.convertQueryParameterToType(queryParameters.getFirst(QUERY_PARAM_START_DATE));
       query.startDate(startDate);
