@@ -110,9 +110,9 @@ pipeline {
         stage('engine-UNIT-h2') {
           when {
             expression {
-              cambpmWithLabels('h2', 'rolling-update', 'migration')
+              cambpmWithLabels('h2', 'rolling-update', 'migration', 'all-db', 'default-build', 'authorizations')
             }
-              }
+          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'h2',
@@ -133,7 +133,7 @@ pipeline {
             expression {
               cambpmWithLabels('h2', 'authorizations')
             }
-              }
+          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'h2',
@@ -154,7 +154,7 @@ pipeline {
             expression {
               cambpmWithLabels('default-build')
             }
-              }
+          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'h2',
@@ -196,7 +196,7 @@ pipeline {
             expression {
               cambpmWithLabels('default-build')
             }
-              }
+          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'h2',
@@ -214,7 +214,7 @@ pipeline {
             expression {
               cambpmWithLabels('default-build')
             }
-              }
+          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'h2',
@@ -232,7 +232,7 @@ pipeline {
             expression {
               cambpmWithLabels('default-build')
             }
-              }
+          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'h2',
@@ -250,7 +250,7 @@ pipeline {
             expression {
               cambpmWithLabels('all-as', 'tomcat')
             }
-              }
+          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'postgresql_96',
@@ -268,7 +268,7 @@ pipeline {
             expression {
               cambpmWithLabels('all-as', 'wildfly')
             }
-              }
+          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'postgresql_96',
@@ -288,7 +288,7 @@ pipeline {
         stage('engine-IT-XA-wildfly-postgresql-96') {
           when {
             branch cambpmDefaultBranch();
-              }
+          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'postgresql_96',
@@ -309,7 +309,7 @@ pipeline {
             expression {
               cambpmWithLabels('webapp-integration', 'h2')
             }
-              }
+          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'chrome_78',
@@ -327,7 +327,7 @@ pipeline {
             expression {
               cambpmWithLabels('webapp-integration', 'h2')
             }
-              }
+          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'chrome_78',
@@ -343,7 +343,7 @@ pipeline {
         stage('webapp-IT-standalone-tomcat-9') {
           when {
             branch cambpmDefaultBranch();
-              }
+          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'chrome_78',
@@ -359,7 +359,7 @@ pipeline {
         stage('webapp-IT-standalone-wildfly') {
           when {
             branch cambpmDefaultBranch();
-              }
+          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'chrome_78',
@@ -377,7 +377,7 @@ pipeline {
             expression {
               cambpmWithLabels('run')
             }
-              }
+          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'chrome_78',
@@ -395,7 +395,7 @@ pipeline {
             expression {
               cambpmWithLabels('spring-boot')
             }
-              }
+          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'chrome_78',
@@ -438,7 +438,7 @@ pipeline {
               }
               branch cambpmDefaultBranch();
             }
-              }
+          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'h2',
@@ -459,7 +459,7 @@ pipeline {
               }
               branch cambpmDefaultBranch();
             }
-              }
+          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'h2',
@@ -475,9 +475,9 @@ pipeline {
         stage('engine-UNIT-database-table-prefix') {
           when {
             expression {
-              cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit') && cambpmWithLabels('all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql','cockroachdb') // TODO store as param
+              cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit') && cambpmWithLabels('all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql','cockroachdb')
             }
-              }
+          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'h2',
@@ -498,7 +498,7 @@ pipeline {
               }
               branch cambpmDefaultBranch();
             }
-              }
+          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'h2',
@@ -519,7 +519,7 @@ pipeline {
               }
               branch cambpmDefaultBranch();
             }
-              }
+          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'h2',
@@ -537,7 +537,7 @@ pipeline {
             expression {
               cambpmIsNotFailedStageType(failedStageTypes, 'engine-IT-wildfly') && cambpmWithLabels('wildfly')
             }
-              }
+          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'h2',
@@ -555,7 +555,7 @@ pipeline {
             expression {
               cambpmIsNotFailedStageType(failedStageTypes, 'engine-IT-wildfly') && cambpmWithLabels('wildfly')
             }
-              }
+          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'h2',
