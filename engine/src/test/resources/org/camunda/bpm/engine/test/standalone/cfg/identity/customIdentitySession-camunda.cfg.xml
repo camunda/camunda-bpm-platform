@@ -23,6 +23,7 @@
     <!-- turn off metrics reporter -->
     <property name="dbMetricsReporterActivate" value="false" />
     <property name="telemetryReporterActivate" value="false" />
+    <property name="taskMetricsEnabled" value="false" />
 
     <!-- provide a custom IdentitySessionFactory that returns a custom IdentitySession -->
     <property name="customSessionFactories">

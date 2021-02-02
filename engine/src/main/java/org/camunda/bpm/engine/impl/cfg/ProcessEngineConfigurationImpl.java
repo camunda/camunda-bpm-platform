@@ -785,7 +785,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected MetricsReporterIdProvider metricsReporterIdProvider;
 
-  protected boolean isTaskMetricsEnabled = false;
+  protected boolean isTaskMetricsEnabled = true;
 
   /**
    * the historic job log host name
