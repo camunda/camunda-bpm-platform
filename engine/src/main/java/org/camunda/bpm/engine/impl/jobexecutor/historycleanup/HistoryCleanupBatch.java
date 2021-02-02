@@ -31,10 +31,11 @@ import org.camunda.bpm.engine.management.Metrics;
  */
 public class HistoryCleanupBatch extends HistoryCleanupHandler {
 
-  private List<String> historicProcessInstanceIds = Collections.emptyList();
-  private List<String> historicDecisionInstanceIds = Collections.emptyList();
-  private List<String> historicCaseInstanceIds = Collections.emptyList();
-  private List<String> historicBatchIds = Collections.emptyList();
+  protected List<String> historicProcessInstanceIds = Collections.emptyList();
+  protected List<String> historicDecisionInstanceIds = Collections.emptyList();
+  protected List<String> historicCaseInstanceIds = Collections.emptyList();
+  protected List<String> historicBatchIds = Collections.emptyList();
+  protected List<String> taskMetricIds = Collections.emptyList();
 
   public List<String> getHistoricProcessInstanceIds() {
     return historicProcessInstanceIds;
@@ -68,11 +69,19 @@ public class HistoryCleanupBatch extends HistoryCleanupHandler {
     this.historicBatchIds = historicBatchIds;
   }
 
+  public List<String> getTaskMetricIds() {
+    return taskMetricIds;
+  }
+
+  public void setTaskMetricIds(List<String> taskMetricIds) {
+    this.taskMetricIds = taskMetricIds;
+  }
+
   /**
    * Size of the batch.
    */
   public int size() {
-    return historicProcessInstanceIds.size() + historicDecisionInstanceIds.size() + historicCaseInstanceIds.size() + historicBatchIds.size();
+    return historicProcessInstanceIds.size() + historicDecisionInstanceIds.size() + historicCaseInstanceIds.size() + historicBatchIds.size() + taskMetricIds.size();
   }
 
   public void performCleanup() {
@@ -92,6 +101,9 @@ public class HistoryCleanupBatch extends HistoryCleanupHandler {
       if (historicBatchIds.size() > 0) {
         commandContext.getHistoricBatchManager().deleteHistoricBatchesByIds(historicBatchIds);
       }
+      if (taskMetricIds.size() > 0) {
+        commandContext.getMeterLogManager().deleteTaskMetricsById(taskMetricIds);
+      }
     }
   }
 
@@ -110,6 +122,9 @@ public class HistoryCleanupBatch extends HistoryCleanupHandler {
     }
     if (historicBatchIds.size() > 0) {
       reports.put(Metrics.HISTORY_CLEANUP_REMOVED_BATCH_OPERATIONS, (long) historicBatchIds.size());
+    }
+    if (taskMetricIds.size() > 0) {
+      reports.put(Metrics.HISTORY_CLEANUP_REMOVED_TASK_METRICS, (long) taskMetricIds.size());
     }
 
     return reports;

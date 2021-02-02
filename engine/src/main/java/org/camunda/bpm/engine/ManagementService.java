@@ -1247,6 +1247,9 @@ public interface ManagementService {
    * Deletes all metrics events which are older than the specified timestamp.
    * If the timestamp is null, all metrics will be deleted
    *
+   * @throws AuthorizationException
+   *          If the user is not a member of the group {@link Groups#CAMUNDA_ADMIN}.
+   *
    * @param timestamp or null
    * @since 7.3
    */
@@ -1256,6 +1259,9 @@ public interface ManagementService {
    * Deletes all metrics events which are older than the specified timestamp
    * and reported by the given reporter. If a parameter is null, all metric events
    * are matched in that regard.
+   *
+   * @throws AuthorizationException
+   *          If the user is not a member of the group {@link Groups#CAMUNDA_ADMIN}.
    *
    * @param timestamp or null
    * @param reporter or null
@@ -1283,6 +1289,9 @@ public interface ManagementService {
   /**
    * Deletes all task metrics which are older than the specified timestamp.
    * If the timestamp is null, all metrics will be deleted
+   *
+   * @throws AuthorizationException
+   *          If the user is not a member of the group {@link Groups#CAMUNDA_ADMIN}.
    *
    * @param timestamp or <code>null</code>
    */

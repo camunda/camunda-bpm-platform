@@ -43,8 +43,10 @@ public class DeleteMetricsCmd implements Command<Void>, Serializable {
   }
 
   public Void execute(CommandContext commandContext) {
+    commandContext.getAuthorizationManager().checkCamundaAdmin();
+
     writeUserOperationLog(commandContext);
-    
+
     if(timestamp == null && reporter == null) {
       commandContext.getMeterLogManager()
        .deleteAll();

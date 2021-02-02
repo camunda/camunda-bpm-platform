@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -24,7 +25,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.camunda.bpm.engine.impl.Direction;
+import org.camunda.bpm.engine.impl.QueryOrderingProperty;
+import org.camunda.bpm.engine.impl.QueryPropertyImpl;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
+import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
 import org.camunda.bpm.engine.impl.metrics.Meter;
 import org.camunda.bpm.engine.impl.metrics.MetricsQueryImpl;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
@@ -41,7 +47,12 @@ public class MeterLogManager extends AbstractManager {
   public static final String SELECT_METER_SUM = "selectMeterLogSum";
   public static final String DELETE_ALL_METER = "deleteAllMeterLogEntries";
   public static final String DELETE_ALL_METER_BY_TIMESTAMP_AND_REPORTER = "deleteMeterLogEntriesByTimestampAndReporter";
-  public static final String DELETE_ALL_TASK_METER_BY_TIMESTAMP = "deleteTaskMeterLogEntriesByTimestamp";
+
+  public static final String SELECT_UNIQUE_TASK_WORKER = "selectUniqueTaskWorkerCount";
+  public static final String SELECT_TASK_METER_FOR_CLEANUP = "selectTaskMetricIdsForCleanup";
+  public static final String DELETE_TASK_METER_BY_TIMESTAMP = "deleteTaskMeterLogEntriesByTimestamp";
+  public static final String DELETE_TASK_METER_BY_REMOVAL_TIME = "deleteTaskMetricsByRemovalTime";
+  public static final String DELETE_TASK_METER_BY_IDS = "deleteTaskMeterLogEntriesByIds";
 
   public void insert(MeterLogEntity meterLogEntity) {
     getDbEntityManager()
@@ -132,11 +143,47 @@ public class MeterLogManager extends AbstractManager {
     parameters.put("startTime", startTime);
     parameters.put("endTime", endTime);
 
-    return (Long) getDbEntityManager().selectOne("selectUniqueTaskWorkerCount", parameters);
+    return (Long) getDbEntityManager().selectOne(SELECT_UNIQUE_TASK_WORKER, parameters);
   }
 
   public void deleteTaskMetricsByTimestamp(Date timestamp) {
     Map<String, Object> parameters = Collections.singletonMap("timestamp", timestamp);
-    getDbEntityManager().delete(TaskMeterLogEntity.class, DELETE_ALL_TASK_METER_BY_TIMESTAMP, parameters);
+    getDbEntityManager().delete(TaskMeterLogEntity.class, DELETE_TASK_METER_BY_TIMESTAMP, parameters);
   }
+
+  public void deleteTaskMetricsById(List<String> taskMetricIds) {
+    getDbEntityManager().deletePreserveOrder(TaskMeterLogEntity.class, DELETE_TASK_METER_BY_IDS, taskMetricIds);
+  }
+
+  public DbOperation deleteTaskMetricsByRemovalTime(Date currentTimestamp, Integer timeToLive, int minuteFrom, int minuteTo, int batchSize) {
+    Map<String, Object> parameters = new HashMap<>();
+    // data inserted prior to now minus timeToLive-days can be removed
+    Date removalTime = Date.from(currentTimestamp.toInstant().minus(timeToLive, ChronoUnit.DAYS));
+    parameters.put("removalTime", removalTime);
+    if (minuteTo - minuteFrom + 1 < 60) {
+      parameters.put("minuteFrom", minuteFrom);
+      parameters.put("minuteTo", minuteTo);
+    }
+    parameters.put("batchSize", batchSize);
+
+    return getDbEntityManager()
+      .deletePreserveOrder(TaskMeterLogEntity.class, DELETE_TASK_METER_BY_REMOVAL_TIME,
+        new ListQueryParameterObject(parameters, 0, batchSize));
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<String> findTaskMetricsForCleanup(int batchSize, Integer timeToLive, int minuteFrom, int minuteTo) {
+    Map<String, Object> queryParameters = new HashMap<>();
+    queryParameters.put("currentTimestamp", ClockUtil.getCurrentTime());
+    queryParameters.put("timeToLive", timeToLive);
+    if (minuteTo - minuteFrom + 1 < 60) {
+      queryParameters.put("minuteFrom", minuteFrom);
+      queryParameters.put("minuteTo", minuteTo);
+    }
+    ListQueryParameterObject parameterObject = new ListQueryParameterObject(queryParameters, 0, batchSize);
+    parameterObject.getOrderingProperties().add(new QueryOrderingProperty(new QueryPropertyImpl("TIMESTAMP_"), Direction.ASCENDING));
+
+    return (List<String>) getDbEntityManager().selectList(SELECT_TASK_METER_FOR_CLEANUP, parameterObject);
+  }
+
 }

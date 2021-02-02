@@ -893,6 +893,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    */
   protected String historyCleanupJobLogTimeToLive;
 
+  protected String taskMetricsTimeToLive;
+  protected Integer parsedTaskMetricsTimeToLive;
+
   protected BatchWindowManager batchWindowManager = new DefaultBatchWindowManager();
 
   protected HistoryRemovalTimeProvider historyRemovalTimeProvider;
@@ -1114,6 +1117,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initBatchOperationsHistoryTimeToLive();
 
     initHistoryCleanupJobLogTimeToLive();
+
+    initTaskMetricsTimeToLive();
   }
 
   protected void initHistoryCleanupStrategy() {
@@ -1248,6 +1253,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       ParseUtil.parseHistoryTimeToLive(historyCleanupJobLogTimeToLive);
     } catch (Exception e) {
       throw LOG.invalidPropertyValue("historyCleanupJobLogTimeToLive", historyCleanupJobLogTimeToLive, e);
+    }
+  }
+
+  protected void initTaskMetricsTimeToLive() {
+    try {
+      parsedTaskMetricsTimeToLive = ParseUtil.parseHistoryTimeToLive(taskMetricsTimeToLive);
+    } catch (Exception e) {
+      throw LOG.invalidPropertyValue("taskMetricsTimeToLive", taskMetricsTimeToLive, e);
     }
   }
 
@@ -4668,6 +4681,24 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfigurationImpl setHistoryCleanupJobLogTimeToLive(String historyCleanupJobLogTimeToLive) {
     this.historyCleanupJobLogTimeToLive = historyCleanupJobLogTimeToLive;
+    return this;
+  }
+
+  public String getTaskMetricsTimeToLive() {
+    return taskMetricsTimeToLive;
+  }
+
+  public ProcessEngineConfigurationImpl setTaskMetricsTimeToLive(String taskMetricsTimeToLive) {
+    this.taskMetricsTimeToLive = taskMetricsTimeToLive;
+    return this;
+  }
+
+  public Integer getParsedTaskMetricsTimeToLive() {
+    return parsedTaskMetricsTimeToLive;
+  }
+
+  public ProcessEngineConfigurationImpl setParsedTaskMetricsTimeToLive(Integer parsedTaskMetricsTimeToLive) {
+    this.parsedTaskMetricsTimeToLive = parsedTaskMetricsTimeToLive;
     return this;
   }
 

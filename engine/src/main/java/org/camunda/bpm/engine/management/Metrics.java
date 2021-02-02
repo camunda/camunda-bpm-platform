@@ -73,6 +73,7 @@ public class Metrics {
   public static final String HISTORY_CLEANUP_REMOVED_CASE_INSTANCES = "history-cleanup-removed-case-instances";
   public static final String HISTORY_CLEANUP_REMOVED_DECISION_INSTANCES = "history-cleanup-removed-decision-instances";
   public static final String HISTORY_CLEANUP_REMOVED_BATCH_OPERATIONS = "history-cleanup-removed-batch-operations";
+  public static final String HISTORY_CLEANUP_REMOVED_TASK_METRICS = "history-cleanup-removed-task-metrics";
 
   /**
    * Number of unique task workers
