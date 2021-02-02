@@ -16,30 +16,32 @@
  */
 
 //  Camunda-Cockpit-Bootstrap is copied as-is, so we have to inline everything
-const baseImportPath = document.querySelector("base").href + "../";
+const baseImportPath = document.querySelector('base').href + '../';
 
 function withSuffix(string, suffix) {
   return !string.endsWith(suffix) ? string + suffix : string;
 }
 
 function addCssSource(url) {
-  var link = document.createElement("link");
-  link.rel = "stylesheet";
-  link.type = "text/css";
+  var link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.type = 'text/css';
   link.href = url;
   document.head.appendChild(link);
 }
 
 async function loadPlugins(config) {
   const customScripts = config.customScripts || [];
-  const JARScripts = window.PLUGIN_PACKAGES
-    .filter(el => 
-      el.name !== "cockpit-plugin-cockpitPlugins" && 
-      el.name !== "cockpit-plugin-cockpitEE")
-    .map(el => {
-      addCssSource(`${el.location}/plugin.css`);
-      return `${el.location}/${el.main}`;
-    });
+
+  const JARScripts = window.PLUGIN_PACKAGES.filter(
+    el =>
+      el.name !== 'cockpit-plugin-cockpitPlugins' &&
+      el.name !== 'cockpit-plugin-cockpitEE' &&
+      !el.name.startsWith('cockpit-plugin-legacy')
+  ).map(el => {
+    addCssSource(`${el.location}/plugin.css`);
+    return `${el.location}/${el.main}`;
+  });
 
   const fetchers = customScripts.map(url =>
     // eslint-disable-next-line
@@ -47,7 +49,13 @@ async function loadPlugins(config) {
   );
 
   fetchers.push(
-    ...JARScripts.map(url => {try {return import(url)} catch (e) {}})
+    ...JARScripts.map(url => {
+      try {
+        return import(url);
+      } catch (e) {
+        // Do nothing
+      }
+    })
   );
 
   const loadedPlugins = (await Promise.all(fetchers)).reduce((acc, module) => {
@@ -66,38 +74,36 @@ async function loadPlugins(config) {
   config.plugins = loadedPlugins;
 }
 
-
 const loadConfig = (async function() {
   // eslint-disable-next-line
   const config = (await import(
-     baseImportPath  +
-      "scripts/config.js?bust=" +
-      new Date().getTime()
+    baseImportPath + 'scripts/config.js?bust=' + new Date().getTime()
   )).default;
-  
+
   await loadPlugins(config);
   window.camCockpitConf = config;
-  })();
+  return config;
+})();
 
 window.__define(
   'camunda-cockpit-bootstrap',
   ['./scripts/camunda-cockpit-ui'],
   function() {
-    const bootstrap = function() {
+    const bootstrap = function(config) {
       'use strict';
-         
+
       var camundaCockpitUi = window.CamundaCockpitUi;
-    
+
       requirejs.config({
         baseUrl: '../../../lib'
       });
-    
+
       var requirePackages = window;
       camundaCockpitUi.exposePackages(requirePackages);
-    
+
       window.define = window.__define;
       window.require = window.__require;
-    
+
       requirejs(['globalize'], function(globalize) {
         globalize(
           requirejs,
@@ -112,17 +118,20 @@ window.__define(
           ],
           requirePackages
         );
-    
         var pluginPackages = window.PLUGIN_PACKAGES || [];
         var pluginDependencies = window.PLUGIN_DEPENDENCIES || [];
-    
-        pluginPackages = pluginPackages.filter(el => 
-          el.name === "cockpit-plugin-cockpitPlugins" || 
-          el.name === "cockpit-plugin-cockpitEE"
+
+        pluginPackages = pluginPackages.filter(
+          el =>
+            el.name === 'cockpit-plugin-cockpitPlugins' ||
+            el.name === 'cockpit-plugin-cockpitEE' ||
+            el.name.startsWith('cockpit-plugin-legacy')
         );
-        pluginDependencies = pluginDependencies.filter(el => 
-          el.requirePackageName === "cockpit-plugin-cockpitPlugins" || 
-          el.requirePackageName === "cockpit-plugin-cockpitEE"
+        pluginDependencies = pluginDependencies.filter(
+          el =>
+            el.requirePackageName === 'cockpit-plugin-cockpitPlugins' ||
+            el.requirePackageName === 'cockpit-plugin-cockpitEE' ||
+            el.requirePackageName.startsWith('cockpit-plugin-legacy')
         );
 
         pluginPackages.forEach(function(plugin) {
@@ -131,7 +140,7 @@ window.__define(
           node.setAttribute('href', plugin.location + '/plugin.css');
           document.head.appendChild(node);
         });
-    
+
         requirejs.config({
           packages: pluginPackages,
           baseUrl: '../',
@@ -139,18 +148,18 @@ window.__define(
             ngDefine: '../../lib/ngDefine'
           }
         });
-    
+
         var dependencies = ['jquery', 'angular', 'ngDefine', 'moment'].concat(
           pluginDependencies.map(function(plugin) {
             return plugin.requirePackageName;
           })
         );
-    
+
         requirejs(dependencies, function(jquery, angular) {
           // we now loaded the cockpit and the plugins, great
           // before we start initializing the cockpit though (and leave the requirejs context),
           // lets see if we should load some custom scripts first
-    
+
           if (window.camCockpitConf && window.camCockpitConf.csrfCookieName) {
             angular.module('cam.commons').config([
               '$httpProvider',
@@ -160,14 +169,13 @@ window.__define(
               }
             ]);
           }
-    
+
           if (
-            typeof window.camCockpitConf !== 'undefined' &&
-            (window.camCockpitConf.customScripts ||
-              window.camCockpitConf.bpmnJs)
+            typeof config !== 'undefined' &&
+            (config.requireJsConfig || config.bpmnJs)
           ) {
-            var custom = window.camCockpitConf.customScripts || {};
-    
+            var custom = config.requireJsConfig || {};
+
             // copy the relevant RequireJS configuration in a empty object
             // see: http://requirejs.org/docs/api.html#config
             var conf = {};
@@ -194,28 +202,27 @@ window.__define(
                 conf[prop] = custom[prop];
               }
             });
-    
+
             conf['paths'] = conf['paths'] || {};
-    
+
             custom['deps'] = custom['deps'] || [];
             custom['ngDeps'] = custom['ngDeps'] || [];
-    
-            var bpmnJsAdditionalModules = (window.camCockpitConf.bpmnJs || {})
+
+            var bpmnJsAdditionalModules = (config.bpmnJs || {})
               .additionalModules;
-    
+
             if (bpmnJsAdditionalModules) {
               angular.forEach(bpmnJsAdditionalModules, function(module, name) {
                 conf['paths'][name] = bpmnJsAdditionalModules[name];
                 custom['deps'].push(name);
               });
             }
-    
-            var bpmnJsModdleExtensions = (window.camCockpitConf.bpmnJs || {})
-              .moddleExtensions;
-    
+
+            var bpmnJsModdleExtensions = (config.bpmnJs || {}).moddleExtensions;
+
             if (bpmnJsModdleExtensions) {
               var moddleExtensions = {};
-    
+
               angular.forEach(bpmnJsModdleExtensions, function(
                 path,
                 extensionName
@@ -227,15 +234,15 @@ window.__define(
                   }
                 );
               });
-    
+
               window.bpmnJsModdleExtensions = {};
-    
+
               var promises = Object.keys(moddleExtensions).map(function(
                 extensionName
               ) {
                 return moddleExtensions[extensionName];
               });
-    
+
               jquery.when(promises).then(function() {
                 // wait until promises are resolved: fail || success
                 angular.forEach(moddleExtensions, function(
@@ -266,7 +273,7 @@ window.__define(
                       }
                     });
                 });
-    
+
                 loadRequireJsDeps();
               });
             } else {
@@ -275,7 +282,7 @@ window.__define(
           } else {
             // for consistency, also create a empty module
             angular.module('cam.cockpit.custom', []);
-    
+
             // make sure that we are at the end of the require-js callback queue.
             // Why? => the plugins will also execute require(..) which will place new
             // entries into the queue.  if we bootstrap the angular app
@@ -287,35 +294,35 @@ window.__define(
               initCockpitUi(pluginDependencies);
             });
           }
-    
+
           function loadRequireJsDeps() {
             // configure RequireJS
             requirejs.config(conf);
-    
+
             // load the dependencies and bootstrap the AngularJS application
             requirejs(custom.deps || [], function() {
               // create a AngularJS module (with possible AngularJS module dependencies)
               // on which the custom scripts can register their
               // directives, controllers, services and all when loaded
               angular.module('cam.cockpit.custom', custom.ngDeps);
-    
+
               initCockpitUi(pluginDependencies);
             });
           }
-    
+
           function initCockpitUi(pluginDependencies) {
             window.define = undefined;
             window.require = undefined;
-    
+
             // now that we loaded the plugins and the additional modules, we can finally
             // initialize Cockpit
             camundaCockpitUi(pluginDependencies);
           }
         });
       });
-    }
-    loadConfig.then(() => {
-      bootstrap();
+    };
+    loadConfig.then(config => {
+      bootstrap(config);
     });
   }
 );
