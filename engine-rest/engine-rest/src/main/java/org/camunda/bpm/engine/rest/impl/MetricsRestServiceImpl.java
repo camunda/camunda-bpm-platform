@@ -27,13 +27,8 @@ import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.core.Response.Status;
-
 import org.camunda.bpm.engine.management.MetricsQuery;
 import org.camunda.bpm.engine.rest.dto.metrics.MetricsIntervalResultDto;
-import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.AuthorizationException;
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.management.MetricIntervalValue;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.converter.IntegerConverter;
@@ -89,17 +84,13 @@ public class MetricsRestServiceImpl extends AbstractRestProcessEngineAware imple
 
   @Override
   public Response deleteTaskMetrics(UriInfo uriInfo) {
-    try {
-      MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
-      DateConverter dateConverter = new DateConverter();
-      dateConverter.setObjectMapper(objectMapper);
-      Date date = dateConverter.convertQueryParameterToType(queryParameters.getFirst(QUERY_PARAM_DATE));
-      processEngine.getManagementService().deleteTaskMetrics(date);
-    } catch (AuthorizationException e) {
-      throw e;
-    } catch (ProcessEngineException e) {
-      throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, e.getMessage());
-    }
+    MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
+    DateConverter dateConverter = new DateConverter();
+    dateConverter.setObjectMapper(objectMapper);
+
+    Date date = dateConverter.convertQueryParameterToType(queryParameters.getFirst(QUERY_PARAM_DATE));
+    processEngine.getManagementService().deleteTaskMetrics(date);
+
     // return no content (204) since resource is deleted
     return Response.noContent().build();
   }
