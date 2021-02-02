@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
@@ -66,14 +65,12 @@ public class MetricsManagerForCleanupTest {
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
-  protected HistoryService historyService;
   protected ManagementService managementService;
   protected RuntimeService runtimeService;
   protected TaskService taskService;
 
   @Before
   public void init() {
-    historyService = engineRule.getHistoryService();
     runtimeService = engineRule.getRuntimeService();
     managementService = engineRule.getManagementService();
     taskService = engineRule.getTaskService();
