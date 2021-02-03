@@ -23,6 +23,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,6 +38,7 @@ import org.camunda.bpm.engine.impl.cfg.TransactionListener;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.jobexecutor.ExclusiveJobAddedNotification;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorContext;
@@ -47,6 +49,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandler;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.impl.util.ImmutablePair;
 import org.camunda.bpm.engine.runtime.Job;
 
@@ -262,7 +265,19 @@ public class JobManager extends AbstractManager {
   @SuppressWarnings("unchecked")
   public List<ImmutablePair<String, String>> findDeploymentIdMappingsByQueryCriteria(JobQueryImpl jobQuery) {
     configureQuery(jobQuery);
-    return getDbEntityManager().selectList("selectJobDeploymentIdMappingsByQueryCriteria", jobQuery);
+    Set<String> processInstanceIds = jobQuery.getProcessInstanceIds();
+    if (processInstanceIds != null && !processInstanceIds.isEmpty()) {
+      List<List<String>> partitions = CollectionUtil
+          .partition(new ArrayList<>(processInstanceIds), DbSqlSessionFactory.MAXIMUM_NUMBER_PARAMS);
+      List<ImmutablePair<String, String>> result = new ArrayList<>();
+      partitions.stream().forEach(partition -> {
+        jobQuery.processInstanceIds(new HashSet<>(partition));
+        result.addAll(getDbEntityManager().selectList("selectJobDeploymentIdMappingsByQueryCriteria", jobQuery));
+      });
+      return result;
+    } else {
+      return getDbEntityManager().selectList("selectJobDeploymentIdMappingsByQueryCriteria", jobQuery);
+    }
   }
 
   @SuppressWarnings("unchecked")
