@@ -17,9 +17,12 @@
 
 var addApiAttributes = require('./getApiAttributes');
 var getPassthroughData = require('./getPassthroughData');
+var loadPlugins = require('./loadPlugins');
 
-module.exports = function(module) {
-  window.camCockpitConf.plugins.forEach(plugin => {
+module.exports = async function(config, module, appName) {
+  const plugins = await loadPlugins(config, appName);
+
+  plugins.forEach(plugin => {
     const pluginDirectiveUID = Math.random()
       .toString(36)
       .substring(2);
@@ -31,7 +34,10 @@ module.exports = function(module) {
       ({getViewer}, scope) => {
         plugin.render(
           getViewer(),
-          addApiAttributes(getPassthroughData(plugin.pluginPoint, scope)),
+          addApiAttributes(
+            getPassthroughData(plugin.pluginPoint, scope, appName),
+            config.csrfCookieName
+          ),
           scope // The 'scope' argument is deprecated and should not be used - it will be removed in future releases
         );
 
@@ -48,7 +54,11 @@ module.exports = function(module) {
             const isolatedContainer = document.createElement('div');
             plugin.render(
               isolatedContainer,
-              addApiAttributes(getPassthroughData(plugin.pluginPoint, scope)),
+              addApiAttributes(
+                getPassthroughData(plugin.pluginPoint, scope, appName),
+                config.csrfCookieName,
+                appName
+              ),
               scope // The 'scope' argument is deprecated and should not be used - it will be removed in future releases
             );
 

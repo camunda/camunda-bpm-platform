@@ -157,7 +157,11 @@ module.exports = function(pluginDependencies) {
     require('./controller/cam-tasklist-view-ctrl')
   );
 
-  bootstrapApp();
+  require('../../../common/scripts/services/plugins/addPlugins')(
+    window.camTasklistConf,
+    tasklistApp,
+    'tasklist'
+  ).then(bootstrapApp);
 };
 
 module.exports.exposePackages = function(container) {

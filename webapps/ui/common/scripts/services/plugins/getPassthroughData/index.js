@@ -15,27 +15,13 @@
  * limitations under the License.
  */
 
-function getCSRFToken() {
-  const CSRFCookieName = window.camCockpitConf.csrfCookieName || 'XSRF-TOKEN';
-  return document.cookie.replace(
-    new RegExp(`(?:(?:^|.*;*)${CSRFCookieName}*=*([^;]*).*$)|^.*$`),
-    '$1'
-  );
-}
-
-module.exports = function(params) {
-  const base = document.querySelector('base');
-  const engine = window.location.href.replace(/.*cockpit\/([^/]*).*/, '$1');
-
-  return {
-    api: {
-      adminApi: base.getAttribute('admin-api').slice(0, -1),
-      baseApi: base.getAttribute('engine-api').slice(0, -1),
-      cockpitApi: base.getAttribute('cockpit-api').slice(0, -1),
-      engineApi: base.getAttribute('engine-api') + 'engine/' + engine,
-      engine,
-      CSRFToken: getCSRFToken()
-    },
-    ...params
-  };
+module.exports = function(pluginPoint, scope, appName) {
+  switch (appName) {
+    case 'cockpit':
+      return require('./cockpitPassthroughData')(pluginPoint, scope);
+    case 'tasklist':
+      return require('./tasklistPassthroughData')(pluginPoint, scope);
+    default:
+      return {};
+  }
 };

@@ -170,16 +170,20 @@ module.exports = function(pluginDependencies) {
     }
   ]);
 
-  require('./services/plugins/addPlugins')(appNgModule);
+  require('../../../common/scripts/services/plugins/addPlugins')(
+    window.camCockpitConf,
+    appNgModule,
+    'cockpit'
+  ).then(() => {
+    angular.bootstrap(document.documentElement, [
+      appNgModule.name,
+      'cam.cockpit.custom'
+    ]);
 
-  angular.bootstrap(document.documentElement, [
-    appNgModule.name,
-    'cam.cockpit.custom'
-  ]);
-
-  if (top !== window) {
-    window.parent.postMessage({type: 'loadamd'}, '*');
-  }
+    if (top !== window) {
+      window.parent.postMessage({type: 'loadamd'}, '*');
+    }
+  });
 };
 
 module.exports.exposePackages = function(container) {
