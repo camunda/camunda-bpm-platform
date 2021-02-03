@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.migration.MigrationPlanBuilder;
@@ -814,7 +815,7 @@ public interface RuntimeService {
    * Delete existing runtime process instances.
    *
    * Deletion propagates upward as far as necessary.
-   * 
+   *
    * Does not fail if a process instance was not found.
    *
    * @param processInstanceIds ids of process instance to delete, cannot be null.
@@ -884,12 +885,12 @@ public interface RuntimeService {
    */
   void deleteProcessInstance(String processInstanceId, String deleteReason, boolean skipCustomListeners, boolean externallyTerminated, boolean skipIoMappings,
       boolean skipSubprocesses);
-  
+
   /**
    * Delete an existing runtime process instance.
    *
    * Deletion propagates upward as far as necessary.
-   * 
+   *
    * Does not fail if a process instance was not found.
    *
    * @param processInstanceId id of process instance to delete, cannot be null.
@@ -2311,6 +2312,37 @@ public interface RuntimeService {
    *          and no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void resolveIncident(String incidentId);
+
+  /**
+   * Set an annotation to an incident.
+   *
+   * @throws NotValidException when incident id is {@code null}
+   * @throws BadUserRequestException when no incident could be found
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *
+   * @param incidentId of the incident that the annotation is updated at
+   * @param annotation that is set to the incident
+   *
+   * @since 7.15
+   */
+  void setAnnotationForIncidentById(String incidentId, String annotation);
+
+  /**
+   * Clear the annotation for an incident.
+   *
+   * @throws NotValidException when incident id is {@code null}
+   * @throws BadUserRequestException when no incident could be found
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *
+   * @param incidentId of the incident that the annotation is cleared at
+   *
+   * @since 7.15
+   */
+  void clearAnnotationForIncidentById(String incidentId);
 
   /**
    * Define a complex condition evaluation using a fluent builder.

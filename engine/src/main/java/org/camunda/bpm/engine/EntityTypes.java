@@ -55,4 +55,5 @@ public class EntityTypes {
   public static final String OPERATION_LOG_CATEGORY = "OperationLogCatgeory";
   public static final String OPTIMIZE = "Optimize";
   public static final String OPERATION_LOG = "OperationLog";
+  public static final String INCIDENT = "Incident";
 }

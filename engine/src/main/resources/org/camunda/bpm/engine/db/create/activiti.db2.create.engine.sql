@@ -259,6 +259,7 @@ create table ACT_RU_INCIDENT (
   CONFIGURATION_ varchar(255),
   TENANT_ID_ varchar(64),
   JOB_DEF_ID_ varchar(64),
+  ANNOTATION_ varchar(4000),
   primary key (ID_)
 );
 

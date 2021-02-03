@@ -145,4 +145,9 @@ public interface Incident {
    */
   String getHistoryConfiguration();
 
+  /**
+   * Returns the annotation of this incident
+   */
+  String getAnnotation();
+
 }

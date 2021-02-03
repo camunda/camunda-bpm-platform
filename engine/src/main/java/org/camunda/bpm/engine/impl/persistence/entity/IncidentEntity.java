@@ -65,9 +65,10 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
   protected String jobDefinitionId;
   protected String historyConfiguration;
   protected String failedActivityId;
+  protected String annotation;
 
   public List<IncidentEntity> createRecursiveIncidents() {
-    List<IncidentEntity> createdIncidents = new ArrayList<IncidentEntity>();
+    List<IncidentEntity> createdIncidents = new ArrayList<>();
     createRecursiveIncidents(id, createdIncidents);
     return createdIncidents;
   }
@@ -249,7 +250,7 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
 
   @Override
   public Set<String> getReferencedEntityIds() {
-    Set<String> referenceIds = new HashSet<String>();
+    Set<String> referenceIds = new HashSet<>();
 
     if (causeIncidentId != null) {
       referenceIds.add(causeIncidentId);
@@ -260,7 +261,7 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
 
   @Override
   public Map<String, Class> getReferencedEntitiesIdAndClass() {
-    Map<String, Class> referenceIdAndClass = new HashMap<String, Class>();
+    Map<String, Class> referenceIdAndClass = new HashMap<>();
 
     if (causeIncidentId != null) {
       referenceIdAndClass.put(causeIncidentId, IncidentEntity.class);
@@ -448,11 +449,12 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
 
   @Override
   public Object getPersistentState() {
-    Map<String, Object> persistentState = new HashMap<String, Object>();
+    Map<String, Object> persistentState = new HashMap<>();
     persistentState.put("executionId", executionId);
     persistentState.put("processDefinitionId", processDefinitionId);
     persistentState.put("activityId", activityId);
     persistentState.put("jobDefinitionId", jobDefinitionId);
+    persistentState.put("annotation", annotation);
     return persistentState;
   }
 
@@ -487,6 +489,14 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
     this.failedActivityId = failedActivityId;
   }
 
+  public String getAnnotation() {
+    return annotation;
+  }
+
+  public void setAnnotation(String annotation) {
+    this.annotation = annotation;
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
@@ -504,6 +514,7 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
            + ", incidentMessage=" + incidentMessage
            + ", jobDefinitionId=" + jobDefinitionId
            + ", failedActivityId=" + failedActivityId
+           + ", annotation=" + annotation
            + "]";
   }
 

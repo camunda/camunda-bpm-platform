@@ -256,6 +256,7 @@ create table ACT_HI_INCIDENT (
   INCIDENT_STATE_ integer,
   TENANT_ID_ varchar(64),
   JOB_DEF_ID_ varchar(64),
+  ANNOTATION_ varchar(4000),
   REMOVAL_TIME_ datetime(3),
   primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;

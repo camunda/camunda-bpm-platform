@@ -257,6 +257,7 @@ create table ACT_HI_INCIDENT (
   INCIDENT_STATE_ integer,
   TENANT_ID_ varchar(64),
   JOB_DEF_ID_ varchar(64),
+  ANNOTATION_ varchar(4000),
   REMOVAL_TIME_ timestamp,
   primary key (ID_)
 );

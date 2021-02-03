@@ -106,7 +106,7 @@ public class UserOperationLogManager extends AbstractHistoricManager {
   }
 
   public DbOperation deleteOperationLogByRemovalTime(Date removalTime, int minuteFrom, int minuteTo, int batchSize) {
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("removalTime", removalTime);
     if (minuteTo - minuteFrom + 1 < 60) {
       parameters.put("minuteFrom", minuteFrom);
@@ -666,19 +666,27 @@ public class UserOperationLogManager extends AbstractHistoricManager {
   }
 
   public void logSetAnnotationOperation(String operationId) {
-    logAnnotationOperation(operationId, UserOperationLogEntry.OPERATION_TYPE_SET_ANNOTATION);
+    logAnnotationOperation(operationId, EntityTypes.OPERATION_LOG, "operationId", UserOperationLogEntry.OPERATION_TYPE_SET_ANNOTATION);
   }
 
   public void logClearAnnotationOperation(String operationId) {
-    logAnnotationOperation(operationId, UserOperationLogEntry.OPERATION_TYPE_CLEAR_ANNOTATION);
+    logAnnotationOperation(operationId, EntityTypes.OPERATION_LOG, "operationId", UserOperationLogEntry.OPERATION_TYPE_CLEAR_ANNOTATION);
   }
 
-  protected void logAnnotationOperation(String operationId, String operationType) {
+  public void logSetIncidentAnnotationOperation(String incidentId) {
+    logAnnotationOperation(incidentId, EntityTypes.INCIDENT, "incidentId", UserOperationLogEntry.OPERATION_TYPE_SET_ANNOTATION);
+  }
+
+  public void logClearIncidentAnnotationOperation(String incidentId) {
+    logAnnotationOperation(incidentId, EntityTypes.INCIDENT, "incidentId", UserOperationLogEntry.OPERATION_TYPE_CLEAR_ANNOTATION);
+  }
+
+  protected void logAnnotationOperation(String id, String type, String idProperty, String operationType) {
     if (isUserOperationLogEnabled()) {
 
       UserOperationLogContextEntryBuilder entryBuilder =
-          UserOperationLogContextEntryBuilder.entry(operationType, EntityTypes.OPERATION_LOG)
-              .propertyChanges(new PropertyChange("operationId", null, operationId))
+          UserOperationLogContextEntryBuilder.entry(operationType, type)
+              .propertyChanges(new PropertyChange(idProperty, null, id))
               .category(UserOperationLogEntry.CATEGORY_OPERATOR);
 
       UserOperationLogContext context = new UserOperationLogContext();

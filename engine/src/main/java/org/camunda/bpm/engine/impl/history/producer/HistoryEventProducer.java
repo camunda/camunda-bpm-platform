@@ -230,6 +230,8 @@ public interface HistoryEventProducer {
 
   HistoryEvent createHistoricIncidentMigrateEvt(Incident incident);
 
+  HistoryEvent createHistoricIncidentUpdateEvt(Incident incident);
+
   // Job Log ///////////////////////////////////////////
 
   /**

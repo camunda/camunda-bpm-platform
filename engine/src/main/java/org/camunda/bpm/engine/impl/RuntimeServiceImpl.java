@@ -43,6 +43,7 @@ import org.camunda.bpm.engine.impl.cmd.MessageEventReceivedCmd;
 import org.camunda.bpm.engine.impl.cmd.PatchExecutionVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.RemoveExecutionVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.ResolveIncidentCmd;
+import org.camunda.bpm.engine.impl.cmd.SetAnnotationForIncidentCmd;
 import org.camunda.bpm.engine.impl.cmd.SetExecutionVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.SignalCmd;
 import org.camunda.bpm.engine.impl.cmd.batch.DeleteProcessInstanceBatchCmd;
@@ -752,16 +753,29 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
     return new RestartProcessInstanceBuilderImpl(commandExecutor, processDefinitionId);
   }
 
+  @Override
   public Incident createIncident(String incidentType, String executionId, String configuration) {
     return createIncident(incidentType, executionId, configuration, null);
   }
 
+  @Override
   public Incident createIncident(String incidentType, String executionId, String configuration, String message) {
     return commandExecutor.execute(new CreateIncidentCmd(incidentType, executionId, configuration, message));
   }
 
+  @Override
   public void resolveIncident(String incidentId) {
     commandExecutor.execute(new ResolveIncidentCmd(incidentId));
+  }
+
+  @Override
+  public void setAnnotationForIncidentById(String incidentId, String annotation) {
+    commandExecutor.execute(new SetAnnotationForIncidentCmd(incidentId, annotation));
+  }
+
+  @Override
+  public void clearAnnotationForIncidentById(String incidentId) {
+    commandExecutor.execute(new SetAnnotationForIncidentCmd(incidentId, null));
   }
 
   @Override
