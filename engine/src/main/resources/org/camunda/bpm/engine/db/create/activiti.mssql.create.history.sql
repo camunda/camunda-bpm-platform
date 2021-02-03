@@ -255,7 +255,8 @@ create table ACT_HI_INCIDENT (
   INCIDENT_STATE_ integer,
   TENANT_ID_ nvarchar(64),
   JOB_DEF_ID_ nvarchar(64),
-    REMOVAL_TIME_ datetime2,
+  ANNOTATION_ nvarchar(4000),
+  REMOVAL_TIME_ datetime2,
   primary key (ID_)
 );
 

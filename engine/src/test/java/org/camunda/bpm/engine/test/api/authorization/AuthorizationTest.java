@@ -586,4 +586,8 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTest {
   protected VariableMap getVariables() {
     return Variables.createVariables().putValue(VARIABLE_NAME, VARIABLE_VALUE);
   }
+
+  protected String getMissingPermissionMessageRegex(Permission permission, Resource resource) {
+    return ".*'"+ permission.getName() + "' permission .* type '" + resource.resourceName() + "'.*";
+  }
 }

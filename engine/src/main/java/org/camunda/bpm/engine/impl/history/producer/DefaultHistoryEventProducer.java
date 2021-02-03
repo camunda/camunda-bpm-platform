@@ -90,7 +90,7 @@ import org.camunda.bpm.engine.task.IdentityLink;
 public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
   protected final static ConfigurationLogger LOG = ProcessEngineLogger.CONFIG_LOGGER;
-  
+
   protected void initActivityInstanceEvent(HistoricActivityInstanceEventEntity evt, ExecutionEntity execution, HistoryEventType eventType) {
     PvmScope eventSource = execution.getActivity();
     if (eventSource == null) {
@@ -375,6 +375,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setJobDefinitionId(incident.getJobDefinitionId());
     evt.setHistoryConfiguration(incident.getHistoryConfiguration());
     evt.setFailedActivityId(incident.getFailedActivityId());
+    evt.setAnnotation(incident.getAnnotation());
 
     String jobId = incident.getConfiguration();
     if (jobId != null && isHistoryRemovalTimeStrategyStart()) {
@@ -883,7 +884,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
     // initialize sequence counter
     initSequenceCounter(execution, historicFormPropertyEntity);
-    
+
     if (execution.isProcessInstanceStarting()) {
       // instantiate activity instance id as process instance id when starting a process instance
       // via a form
@@ -899,6 +900,10 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
   public HistoryEvent createHistoricIncidentCreateEvt(Incident incident) {
     return createHistoricIncidentEvt(incident, HistoryEventTypes.INCIDENT_CREATE);
+  }
+
+  public HistoryEvent createHistoricIncidentUpdateEvt(Incident incident) {
+    return createHistoricIncidentEvt(incident, HistoryEventTypes.INCIDENT_UPDATE);
   }
 
   public HistoryEvent createHistoricIncidentResolveEvt(Incident incident) {

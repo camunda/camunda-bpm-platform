@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.history;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -473,6 +474,45 @@ public class HistoricIncidentTest extends PluggableProcessEngineTest {
     assertTrue(tmp.isResolved());
 
     testRule.assertProcessEnded(pi.getId());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml"})
+  @Test
+  public void shouldPropagateSetAnnotationToHistoricIncident() {
+    // given
+    String annotation = "my annotation";
+    startProcessInstance(PROCESS_DEFINITION_KEY);
+    HistoricIncidentQuery historicIncidentQuery = historyService.createHistoricIncidentQuery();
+    HistoricIncident historicIncident = historicIncidentQuery.singleResult();
+
+    // assume
+    assertThat(historicIncident.getAnnotation()).isNull();
+
+    // when
+    runtimeService.setAnnotationForIncidentById(historicIncident.getId(), annotation);
+
+    // then
+    assertThat(historicIncidentQuery.singleResult().getAnnotation()).isEqualTo(annotation);
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml"})
+  @Test
+  public void shouldPropagateClearAnnotationToHistoricIncident() {
+    // given
+    String annotation = "my annotation";
+    startProcessInstance(PROCESS_DEFINITION_KEY);
+    HistoricIncidentQuery historicIncidentQuery = historyService.createHistoricIncidentQuery();
+    HistoricIncident historicIncident = historicIncidentQuery.singleResult();
+    runtimeService.setAnnotationForIncidentById(historicIncident.getId(), annotation);
+
+    // assume
+    assertThat(historicIncidentQuery.singleResult().getAnnotation()).isEqualTo(annotation);
+
+    // when
+    runtimeService.clearAnnotationForIncidentById(historicIncident.getId());
+
+    // then
+    assertThat(historicIncidentQuery.singleResult().getAnnotation()).isNull();
   }
 
   protected void startProcessInstance(String key) {

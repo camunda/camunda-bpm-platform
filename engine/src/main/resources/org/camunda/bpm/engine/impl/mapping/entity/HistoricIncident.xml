@@ -44,6 +44,7 @@
         INCIDENT_STATE_,
         TENANT_ID_,
         JOB_DEF_ID_,
+        ANNOTATION_,
         REMOVAL_TIME_
       ) values (
         #{id ,jdbcType=VARCHAR},
@@ -65,6 +66,7 @@
         #{incidentState, jdbcType=INTEGER},
         #{tenantId, jdbcType=VARCHAR},
         #{jobDefinitionId, jdbcType=VARCHAR},
+        #{annotation, jdbcType=VARCHAR},
         #{removalTime, jdbcType=TIMESTAMP}
       )
   </insert>
@@ -85,7 +87,8 @@
       EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
       ACTIVITY_ID_ = #{activityId, jdbcType=VARCHAR},
       FAILED_ACTIVITY_ID_ = #{failedActivityId, jdbcType=VARCHAR},
-      JOB_DEF_ID_ = #{jobDefinitionId, jdbcType=VARCHAR}
+      JOB_DEF_ID_ = #{jobDefinitionId, jdbcType=VARCHAR},
+      ANNOTATION_ = #{annotation, jdbcType=VARCHAR}
     where
       ID_ = #{id, jdbcType=VARCHAR}
   </update>
@@ -264,6 +267,7 @@
     <result property="incidentState" column="INCIDENT_STATE_" jdbcType="INTEGER" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="jobDefinitionId" column="JOB_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="annotation" column="ANNOTATION_" jdbcType="VARCHAR" />
     <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP"/>
   </resultMap>
 
