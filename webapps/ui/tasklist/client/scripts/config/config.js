@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-window.camTasklistConf = {
+export default {
   // change the app name and vendor
   // app: {
   //   name: 'Todos',
@@ -35,7 +35,7 @@ window.camTasklistConf = {
   //
   // // custom libraries and scripts loading and initialization,
   // // see: http://docs.camunda.org/guides/user-guide/#tasklist-customizing-custom-scripts
-  // customScripts: {
+  // requireJsConfig: {
   //   // AngularJS module names
   //   ngDeps: ['ui.bootstrap'],
   //   // RequireJS configuration for a complete configuration documentation see:
