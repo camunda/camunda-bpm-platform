@@ -9,7 +9,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>camunda-engine-plugin-spin</artifactId>
-  <name>camunda BPM - engine plugins - spin</name>
+  <name>Camunda Platform - engine plugins - spin</name>
 
   <dependencies>
 

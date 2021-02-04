@@ -4,7 +4,7 @@
   <artifactId>camunda-jboss-subsystem</artifactId>
   <packaging>jar</packaging>
 
-  <name>camunda BPM - jBoss7 Subsystem</name>
+  <name>Camunda Platform - jBoss7 Subsystem</name>
 
   <parent>
     <groupId>org.camunda.bpm.jboss</groupId>

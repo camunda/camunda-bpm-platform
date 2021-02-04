@@ -37,7 +37,7 @@ import org.jboss.vfs.VirtualFile;
  * @author Daniel Meyer
  *
  */
-public class ContainerIntegrationLogger extends ProcessEngineLogger { 
+public class ContainerIntegrationLogger extends ProcessEngineLogger {
 
   public ProcessEngineException couldNotInstantiateJobExecutorClass(Exception e) {
     return new ProcessEngineException(exceptionMessage(
@@ -146,19 +146,19 @@ public class ContainerIntegrationLogger extends ProcessEngineLogger {
   public void foundConfigJndi(String jndi, String string) {
     logInfo(
         "018",
-        "Found camunda bpm platform configuration in JNDI [{}] at {}", jndi, string);
+        "Found Camunda Platform configuration in JNDI [{}] at {}", jndi, string);
   }
 
   public void debugExceptionWhileGettingConfigFromJndi(String jndi, NamingException e) {
     logDebug(
         "019",
-        "Failed to look up camunda bpm platform configuration in JNDI [{}]: {}", jndi, e);
+        "Failed to look up Camunda Platform configuration in JNDI [{}]: {}", jndi, e);
   }
 
   public void foundConfigAtLocation(String logStatement, String string) {
     logInfo(
         "020",
-        "Found camunda bpm platform configuration through {}  at {} " , logStatement, string);
+        "Found Camunda Platform configuration through {}  at {} " , logStatement, string);
   }
 
   public void notCreatingPaDeployment(String name) {
@@ -333,26 +333,26 @@ public class ContainerIntegrationLogger extends ProcessEngineLogger {
   public void foundTomcatDeploymentDescriptor(String bpmPlatformFileLocation, String fileLocation) {
     logInfo(
         "046",
-        "Found camunda bpm platform configuration in CATALINA_BASE/CATALINA_HOME conf directory [{}] at '{}'", bpmPlatformFileLocation, fileLocation);
+        "Found Camunda Platform configuration in CATALINA_BASE/CATALINA_HOME conf directory [{}] at '{}'", bpmPlatformFileLocation, fileLocation);
 
   }
 
   public ProcessEngineException invalidDeploymentDescriptorLocation(String bpmPlatformFileLocation, MalformedURLException e) {
     throw new ProcessEngineException(exceptionMessage(
         "047",
-        "'{} is not a valid camunda bpm platform configuration resource location.", bpmPlatformFileLocation), e);
+        "'{} is not a valid Camunda Platform configuration resource location.", bpmPlatformFileLocation), e);
   }
 
   public void camundaBpmPlatformSuccessfullyStarted(String serverInfo) {
     logInfo(
         "048",
-        "Camunda BPM platform sucessfully started at '{}'.", serverInfo);
+        "Camunda Platform sucessfully started at '{}'.", serverInfo);
   }
 
   public void camundaBpmPlatformStopped(String serverInfo) {
     logInfo(
         "049",
-        "Camunda BPM platform stopped at '{}'", serverInfo);
+        "Camunda Platform stopped at '{}'", serverInfo);
   }
 
   public void paDeployed(String name) {

@@ -1,18 +1,18 @@
 This is a distribution of
 
-       Camunda BPM platform v${project.version}
+       Camunda Platform v${project.version}
 
 visit
        http://docs.camunda.org/
 
-The Camunda BPM platform is a dual-license Java-based framework.
-This particular copy of the Camunda BPM Platform is released either
+The Camunda Platform is a dual-license Java-based framework.
+This particular copy of the Camunda Platform is released either
 under the Apache License 2.0 (Community Platform) OR a commercial
 license agreement (Enterprise Platform).
 
 License information can be found in the LICENSE file.
  
-The Camunda BPM platform includes libraries developed by third
+The Camunda Platform includes libraries developed by third
 parties. For license and attribution notices for these libraries,
 please refer to the documentation that accompanies this distribution
 (see the LICENSE_BOOK-${project.version} file).
@@ -34,7 +34,7 @@ Contents:
 
   internal/
         This directory contains the Java application and optional components
-        that Camunda BPM Run consists of.
+        that Camunda Platform Run consists of.
 
   configuration/
         This directory contains all resources to configure the distro.
@@ -45,6 +45,6 @@ Contents:
 
 ==================
 
-Camunda BPM platform version: ${project.version}
+Camunda Platform version: ${project.version}
 
 =================

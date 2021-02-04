@@ -4,7 +4,7 @@
   <groupId>org.camunda.bpm.example</groupId>
   <artifactId>camunda-example-invoice</artifactId>
   <packaging>war</packaging>
-  <name>camunda BPM - example - invoice</name>
+  <name>Camunda Platform - example - invoice</name>
 
   <parent>
     <groupId>org.camunda.bpm</groupId>

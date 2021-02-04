@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <description>
-    Assembles the camunda BPM platform and makes it ready for qa. 
+    Assembles the Camunda Platform and makes it ready for qa. 
     The assembly is installed to maven later in the reactor, if the integration tests pass sucessfully
   </description>
 
@@ -19,7 +19,7 @@
     <skip-third-party-bom>false</skip-third-party-bom>
   </properties>
 
-  <name>camunda BPM - tomcat Assembly</name>
+  <name>Camunda Platform - tomcat Assembly</name>
 
   <dependencies>
     <dependency>

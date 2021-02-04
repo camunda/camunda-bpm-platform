@@ -18,7 +18,7 @@ package org.camunda.bpm.engine.authorization;
 
 /**
  * The set of built-in {@link Permission Permissions} for
- * {@link Resources#HISTORIC_PROCESS_INSTANCE Historic Process Instance} in Camunda BPM.
+ * {@link Resources#HISTORIC_PROCESS_INSTANCE Historic Process Instance} in Camunda Platform.
  */
 public enum HistoricProcessInstancePermissions implements Permission {
 

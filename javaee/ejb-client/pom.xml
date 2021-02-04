@@ -3,7 +3,7 @@
 
   <artifactId>camunda-ejb-client</artifactId>
   <groupId>org.camunda.bpm.javaee</groupId>
-  <name>camunda BPM - Client</name>
+  <name>Camunda Platform - Client</name>
   <packaging>jar</packaging>
 
   <parent>

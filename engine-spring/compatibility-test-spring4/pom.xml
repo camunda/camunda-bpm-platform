@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <name>camunda BPM - engine - Compatbility Test Spring 4</name>
+  <name>Camunda Platform - engine - Compatbility Test Spring 4</name>
   <artifactId>camunda-engine-spring-compatibility-test-spring4</artifactId>
 
   <parent>

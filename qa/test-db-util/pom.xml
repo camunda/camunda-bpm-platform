@@ -10,7 +10,7 @@
   <groupId>org.camunda.bpm.qa.upgrade</groupId>
   <artifactId>camunda-qa-upgrade-scenario-util</artifactId>
   <packaging>jar</packaging>
-  <name>camunda BPM - QA - upgrade - scenario util</name>
+  <name>Camunda Platform - QA - upgrade - scenario util</name>
 
   <dependencyManagement>
     <dependencies>

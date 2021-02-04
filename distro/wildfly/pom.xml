@@ -12,7 +12,7 @@
   <artifactId>camunda-wildfly</artifactId>
   <packaging>pom</packaging>
 
-  <name>camunda BPM - Wildfly</name>
+  <name>Camunda Platform - Wildfly</name>
 
   <dependencyManagement>
     <dependencies>
@@ -45,7 +45,7 @@
                   <message>
                     *****************************************************************************************************
                     *                                                                                                   *
-                    *                    You must use at least JDK 1.8 to compile Camunda Bpm Wildfly!!!                *
+                    *                You must use at least JDK 1.8 to compile Camunda Platform Wildfly!!!               *
                     *                                                                                                   *
                     *****************************************************************************************************
                   </message>

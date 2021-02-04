@@ -12,7 +12,7 @@
   <packaging>pom</packaging>
 
   <artifactId>qa-plugins-spin</artifactId>
-  <name>camunda BPM - Spring Boot Starter - QA - Plugins - Spin</name>
+  <name>Camunda Platform - Spring Boot Starter - QA - Plugins - Spin</name>
 
   <modules>
     <module>spin-dataformat-json-jackson</module>

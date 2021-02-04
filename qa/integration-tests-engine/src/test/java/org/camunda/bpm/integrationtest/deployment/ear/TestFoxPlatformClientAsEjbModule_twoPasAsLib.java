@@ -35,20 +35,20 @@ import org.junit.runner.RunWith;
 
 
 /**
- * This test verifies that a process archive packaging the camunda BPM platform client
+ * This test verifies that a process archive packaging the Camunda Platform client
  * can be packaged inside an EAR application.
- * 
+ *
  * @author Daniel Meyer
- * 
+ *
  */
 @RunWith(Arquillian.class)
 public class TestFoxPlatformClientAsEjbModule_twoPasAsLib extends AbstractFoxPlatformIntegrationTest {
 
-  
+
   /**
    * Deployment layout
-   * 
-   * test-application.ear    
+   *
+   * test-application.ear
    *    |-- lib /
    *        |-- processes1.jar
    *          |-- META-INF/processes.xml
@@ -56,42 +56,42 @@ public class TestFoxPlatformClientAsEjbModule_twoPasAsLib extends AbstractFoxPla
    *        |-- processes2.jar
    *          |-- META-INF/processes.xml
    *          |-- org/camunda/bpm/integrationtest/deployment/ear/process2.bpmn20.xml
-   *          
-   *    |-- fox-platform-client.jar  <<===============================||      
+   *
+   *    |-- fox-platform-client.jar  <<===============================||
    *                                                                  ||  Class-Path reference
    *    |-- test.war (contains the test-class but also processes)     ||
    *        |-- META-INF/MANIFEST.MF =================================||
    *        |-- WEB-INF/beans.xml
    *        |-- + test classes
-   *        
-   */   
+   *
+   */
   @Deployment
-  public static EnterpriseArchive twoPasAsLib() {    
-    
+  public static EnterpriseArchive twoPasAsLib() {
+
     JavaArchive processArchive1Jar = ShrinkWrap.create(JavaArchive.class, "processes1.jar")
       .addAsResource("org/camunda/bpm/integrationtest/deployment/ear/process1.bpmn20.xml")
       .addAsResource("org/camunda/bpm/integrationtest/deployment/ear/pa1.xml", "META-INF/processes.xml");
-    
+
     JavaArchive processArchive2Jar = ShrinkWrap.create(JavaArchive.class, "processes.jar")
       .addAsResource("org/camunda/bpm/integrationtest/deployment/ear/process2.bpmn20.xml")
       .addAsResource("org/camunda/bpm/integrationtest/deployment/ear/pa2.xml", "META-INF/processes.xml");
-    
+
     JavaArchive foxPlatformClientJar = DeploymentHelper.getEjbClient();
-    
+
     WebArchive testJar = ShrinkWrap.create(WebArchive.class, "client-test.war")
       .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
       .setManifest(new ByteArrayAsset(("Class-Path: " + foxPlatformClientJar.getName()+"\n").getBytes()))
       .addClass(AbstractFoxPlatformIntegrationTest.class)
       .addClass(TestFoxPlatformClientAsEjbModule_twoPasAsLib.class);
 
-    return ShrinkWrap.create(EnterpriseArchive.class, "twoPasAsLib.ear")            
+    return ShrinkWrap.create(EnterpriseArchive.class, "twoPasAsLib.ear")
       .addAsLibrary(processArchive1Jar)
       .addAsLibrary(processArchive2Jar)
       .addAsModule(foxPlatformClientJar)
       .addAsModule(testJar)
       .addAsLibrary(DeploymentHelper.getEngineCdi());
   }
-  
+
   @Test
   public void testTwoPasAsLib() {
     ProcessEngine processEngine = ProgrammaticBeanLookup.lookup(ProcessEngine.class);
@@ -99,13 +99,13 @@ public class TestFoxPlatformClientAsEjbModule_twoPasAsLib extends AbstractFoxPla
     RepositoryService repositoryService = processEngine.getRepositoryService();
     long count = repositoryService.createProcessDefinitionQuery()
       .processDefinitionKey("process1")
-      .count();    
+      .count();
     Assert.assertEquals(1, count);
-    
+
     count = repositoryService.createProcessDefinitionQuery()
       .processDefinitionKey("process2")
-      .count();    
+      .count();
     Assert.assertEquals(1, count);
   }
-  
+
 }

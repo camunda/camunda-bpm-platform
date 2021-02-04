@@ -9,7 +9,7 @@
 
   <artifactId>camunda-qa-old-engine</artifactId>
   <packaging>jar</packaging>
-  <name>camunda BPM - QA - test new schema with old engine</name>
+  <name>Camunda Platform - QA - test new schema with old engine</name>
 
   <properties>
     <camunda.old.engine.version>7.14.0</camunda.old.engine.version>

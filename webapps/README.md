@@ -1,6 +1,6 @@
 # Camunda Webapp
 
-This is the Camunda BPM web application source.
+This is the Camunda Platform web application source.
 Clean, package and install it via [Maven](https://maven.apache.org/).
 
 ## Structure of this project
@@ -13,7 +13,7 @@ The structure is as follows:
 
 ## UI
 
-There are 3 web applications available for the Camunda BPM platform:
+There are 3 web applications available for the Camunda Platform :
 
 * __cockpit__: an administration interface for processes and decisions
 * __tasklist__: provides an interface to process user tasks

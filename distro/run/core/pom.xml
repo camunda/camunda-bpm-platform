@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>camunda-bpm-run-core</artifactId>
-  <name>Camunda BPM - Run - Core</name>
+  <name>Camunda Platform - Run - Core</name>
   <packaging>jar</packaging>
 
   <properties>

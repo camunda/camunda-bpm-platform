@@ -55,7 +55,7 @@ public class CamundaRestResources {
   }
 
   /**
-   * Returns a set containing all resource classes provided by camunda BPM.
+   * Returns a set containing all resource classes provided by Camunda Platform.
    * @return a set of resource classes.
    */
   public static Set<Class<?>> getResourceClasses() {

@@ -13,12 +13,12 @@
   <artifactId>camunda-root</artifactId>
   <version>7.15.0-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <name>camunda BPM - Root Pom</name>
+  <name>Camunda Platform - Root Pom</name>
   <inceptionYear>2013</inceptionYear>
 
   <description>
     This pom defines the modules that make up the build.
-    The parent pom for all camunda BPM projects can be found in the parent directory relative to this file.
+    The parent pom for all Camunda Platform projects can be found in the parent directory relative to this file.
   </description>
 
   <properties>
@@ -296,7 +296,7 @@
   <developers>
     <developer>
       <id>camunda.org</id>
-      <name>camunda BPM Community</name>
+      <name>Camunda Platform Community</name>
       <organization>camunda.org</organization>
       <organizationUrl>http://camunda.org</organizationUrl>
     </developer>

@@ -9,7 +9,7 @@
 
   <artifactId>camunda-qa-upgrade-test-fixture-74</artifactId>
   <packaging>jar</packaging>
-  <name>camunda BPM - QA - upgrade - instance migration - test fixture - 7.4.0</name>
+  <name>Camunda Platform - QA - upgrade - instance migration - test fixture - 7.4.0</name>
 
   <!-- Due to https://issues.apache.org/jira/browse/MRELEASE-799 the release test fails when
      the version is managed in a property. Thus we use explicit versions everywhere. -->

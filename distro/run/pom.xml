@@ -11,8 +11,8 @@
 
   <groupId>org.camunda.bpm.run</groupId>
   <artifactId>camunda-bpm-run-root</artifactId>
-  <name>Camunda BPM - Run - Root</name>
-  <description>This is the root of Camunda BPM Run</description>
+  <name>Camunda Platform - Run - Root</name>
+  <description>This is the root of Camunda Platform Run</description>
   <packaging>pom</packaging>
 
   <dependencyManagement>

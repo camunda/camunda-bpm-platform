@@ -27,7 +27,7 @@ import org.camunda.bpm.engine.history.UserOperationLogQuery;
 /** Exposes twitter-like feeds for tasks and process instances.
  *
  * <p><strong>Deprecation</strong>
- * This class has been deprecated as of camunda BPM 7.1. It has been replaced with
+ * This class has been deprecated as of Camunda Platform 7.1. It has been replaced with
  * the operation log. See {@link UserOperationLogEntry} and {@link UserOperationLogQuery}.</p>
  *
  * @see {@link TaskService#getTaskEvents(String)

@@ -13,7 +13,7 @@
   <artifactId>camunda-webapp</artifactId>
   <groupId>org.camunda.bpm.webapp</groupId>
   <packaging>war</packaging>
-  <name>camunda BPM - webapp - app</name>
+  <name>Camunda Platform - webapp - app</name>
   <inceptionYear>2014</inceptionYear>
 
   <properties>
@@ -83,7 +83,7 @@
   <repositories>
     <repository>
       <id>camunda-nexus</id>
-      <name>camunda BPM Maven Repository</name>
+      <name>Camunda Platform Maven Repository</name>
       <url>https://app.camunda.com/nexus/content/groups/public</url>
       <releases>
         <enabled>true</enabled>

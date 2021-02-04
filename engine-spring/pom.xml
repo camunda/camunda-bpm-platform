@@ -11,7 +11,7 @@
   <artifactId>camunda-spring-compatibility-root</artifactId>
 
   <packaging>pom</packaging>
-  <name>camunda BPM - engine - Spring - Root</name>
+  <name>Camunda Platform - engine - Spring - Root</name>
 
   <!--
   Why this module structure?

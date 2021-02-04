@@ -1071,12 +1071,12 @@ public interface TaskService {
   /**
    * <p>The all events related to the given task.</p>
    *
-   * <p>As of Camunda BPM 7.4 task events are only written in context of a logged in
+   * <p>As of Camunda Platform 7.4 task events are only written in context of a logged in
    * user. This behavior can be toggled in the process engine configuration using the
    * property <code>legacyUserOperationLog</code> (default false). To restore the engine's
    * previous behavior, set the flag to <code>true</code>.</p>
    *
-   * @deprecated This method has been deprecated as of camunda BPM 7.1. It has been replaced with
+   * @deprecated This method has been deprecated as of Camunda Platform 7.1. It has been replaced with
    * the operation log. See {@link UserOperationLogEntry} and {@link UserOperationLogQuery}.
    *
    * @see HistoryService#createUserOperationLogQuery()

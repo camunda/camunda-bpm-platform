@@ -11,7 +11,7 @@
   <artifactId>camunda-engine-plugins</artifactId>
   <packaging>pom</packaging>
 
-  <name>camunda BPM - engine plugins</name>
+  <name>Camunda Platform - engine plugins</name>
 
   <modules>
     <module>identity-ldap</module>

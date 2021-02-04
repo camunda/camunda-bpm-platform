@@ -23,35 +23,35 @@ import org.camunda.bpm.engine.ProcessEngine;
 
 /**
  * <p>The {@link ProcessEngineService} provides access to the list of Managed Process Engines.</p>
- * 
+ *
  * <p>Users of this class may look up an instance of the service through a lookup strategy
  * appropriate for the platform they are using (Examples: Jndi, OSGi Service Registry ...)</p>
- * 
+ *
  * @author Daniel Meyer
  */
 public interface ProcessEngineService {
-  
+
   /**
-   * 
+   *
    * @return the default process engine.
    */
   public ProcessEngine getDefaultProcessEngine();
 
   /**
-   * @return all {@link ProcessEngine ProcessEngines} managed by the camunda BPM platform.
+   * @return all {@link ProcessEngine ProcessEngines} managed by the Camunda Platform.
    */
   public List<ProcessEngine> getProcessEngines();
 
   /**
-   * 
-   * @return the names of all {@link ProcessEngine ProcessEngines} managed by the camunda BPM platform.
+   *
+   * @return the names of all {@link ProcessEngine ProcessEngines} managed by the Camunda Platform.
    */
   public Set<String> getProcessEngineNames();
-  
+
   /**
-   * 
+   *
    * @return the {@link ProcessEngine} for the given name or null if no such process engine exists.
    */
   public ProcessEngine getProcessEngine(String name);
-  
+
 }

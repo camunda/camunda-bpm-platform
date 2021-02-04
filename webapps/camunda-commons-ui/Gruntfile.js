@@ -24,7 +24,7 @@ var fs = require('fs');
 
 /**
   This file is used to configure the [grunt](http://gruntjs.com/) tasks
-  aimed to generate the web frontend of the camunda BPM platform.
+  aimed to generate the web frontend of the Camunda Platform.
   @author Valentin Vago <valentin.vago@camunda.com>
   @author Sebastian Stamm  <sebastian.stamm@camunda.com>
  */

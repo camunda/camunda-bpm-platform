@@ -9,7 +9,7 @@
 
   <artifactId>camunda-qa-upgrade-test-fixture-711</artifactId>
   <packaging>jar</packaging>
-  <name>camunda BPM - QA - upgrade - instance migration - test fixture - 7.11.0</name>
+  <name>Camunda Platform - QA - upgrade - instance migration - test fixture - 7.11.0</name>
 
   <properties>
     <camunda.version.previous>7.10.0</camunda.version.previous>

@@ -11,10 +11,10 @@
 
   <artifactId>camunda-bom</artifactId>
   <packaging>pom</packaging>
-  <name>camunda BPM - Bom</name>
+  <name>Camunda Platform - Bom</name>
   <url>http://camunda.org</url>
 
-  <description>camunda BPM bill of material</description>
+  <description>Camunda Platform bill of material</description>
 
   <licenses>
     <license>
@@ -47,7 +47,7 @@
         <version>${version.uuid-generator}</version>
       </dependency>
 
-      <!-- camunda BPM public artifacts -->
+      <!-- Camunda Platform public artifacts -->
       <dependency>
         <groupId>org.camunda.bpm</groupId>
         <artifactId>camunda-engine</artifactId>

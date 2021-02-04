@@ -11,7 +11,7 @@
   <artifactId>license-book</artifactId>
   <packaging>pom</packaging>
 
-  <name>camunda BPM - License Book</name>
+  <name>Camunda Platform - License Book</name>
 
   <dependencyManagement>
     <dependencies>

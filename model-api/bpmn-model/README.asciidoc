@@ -4,7 +4,7 @@ The camunda BPMN model API is a simple, lightweight Java library for parsing, cr
 
 [NOTE]
 ====
-camunda BPMN model can be used standalone, independenly of camunda BPM platform / process engine.
+camunda BPMN model can be used standalone, independenly of Camunda Platform / process engine.
 ====
 
 * Web Site: https://camunda.com/
@@ -19,7 +19,7 @@ camunda BPMN model can be used standalone, independenly of camunda BPM platform 
 
 To easily create simple BPMN 2.0 processes we provide the fluent builder API. It supports most BPMN 2.0
 elements and allows you to set attributes and add some child elements. The following process is deployable
-and can be executed by the camunda BPM platform.
+and can be executed by the Camunda Platform.
 
 [source,java]
 ----

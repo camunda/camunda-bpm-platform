@@ -12,7 +12,7 @@
   <artifactId>camunda-jboss</artifactId>
   <packaging>pom</packaging>
 
-  <name>camunda BPM - jBoss7</name>
+  <name>Camunda Platform - jBoss7</name>
 
   <dependencyManagement>
     <dependencies>

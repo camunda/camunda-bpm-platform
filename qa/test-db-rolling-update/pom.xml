@@ -5,7 +5,7 @@
   <artifactId>camunda-qa-db-rolling-update</artifactId>
 
   <packaging>pom</packaging>
-  <name>camunda BPM - QA - upgrade - rolling update</name>
+  <name>Camunda Platform - QA - upgrade - rolling update</name>
 
   <parent>
     <groupId>org.camunda.bpm.qa</groupId>

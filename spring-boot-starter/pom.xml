@@ -10,7 +10,7 @@
 
   <groupId>org.camunda.bpm.springboot.project</groupId>
   <artifactId>camunda-bpm-spring-boot-starter-root</artifactId>
-  <name>camunda BPM - Spring Boot Starter - Root Pom</name>
+  <name>Camunda Platform - Spring Boot Starter - Root Pom</name>
   <inceptionYear>2015</inceptionYear>
 
   <packaging>pom</packaging>

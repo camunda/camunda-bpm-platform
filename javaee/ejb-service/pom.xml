@@ -5,7 +5,7 @@
   <artifactId>camunda-ejb-service</artifactId>
   <packaging>ejb</packaging>
 
-  <name>camunda BPM - EJB Service</name>
+  <name>Camunda Platform - EJB Service</name>
 
   <parent>
     <groupId>org.camunda.bpm</groupId>

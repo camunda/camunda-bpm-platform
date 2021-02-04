@@ -9,7 +9,7 @@
 
   <artifactId>camunda-qa-db-rolling-update-util</artifactId>
   <packaging>jar</packaging>
-  <name>camunda BPM - QA - upgrade - rolling update util</name>
+  <name>Camunda Platform - QA - upgrade - rolling update util</name>
 
   <dependencyManagement>
     <dependencies>

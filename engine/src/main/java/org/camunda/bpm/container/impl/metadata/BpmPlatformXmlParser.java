@@ -30,7 +30,7 @@ import org.camunda.bpm.engine.impl.util.xml.Parser;
 public class BpmPlatformXmlParser extends Parser {
 
   /**
-   * The bpm platform namespace
+   * The Camunda Platform namespace
    */
   public static final String BPM_PLATFORM_NS = "http://www.camunda.org/schema/1.0/BpmPlatform";
 

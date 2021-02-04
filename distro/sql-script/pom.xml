@@ -12,7 +12,7 @@
   <artifactId>camunda-sql-scripts</artifactId>
   <packaging>jar</packaging>
 
-  <name>camunda BPM - SQL scripts</name>
+  <name>Camunda Platform - SQL scripts</name>
 
   <dependencyManagement>
     <dependencies>

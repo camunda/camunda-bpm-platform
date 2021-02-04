@@ -125,7 +125,7 @@ public class TemplateParser {
   }
 
   /**
-   * Resolve the Camunda BPM version and the respective documentation version used in the links.
+   * Resolve the Camunda Platform version and the respective documentation version used in the links.
    */
   protected static void resolveVersions(Map<String, Object> templateData) {
     String version = TemplateParser.class.getPackage().getImplementationVersion();

@@ -11,7 +11,7 @@
   <artifactId>camunda-dmn-model</artifactId>
   <packaging>jar</packaging>
 
-  <name>camunda BPM - DMN Model API</name>
+  <name>Camunda Platform - DMN Model API</name>
   <inceptionYear>2015</inceptionYear>
   <properties>
     <camunda.artifact>org.camunda.bpm.model.dmn</camunda.artifact>

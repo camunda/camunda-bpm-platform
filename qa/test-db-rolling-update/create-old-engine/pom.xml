@@ -9,7 +9,7 @@
 
   <artifactId>camunda-qa-db-create-old-engine</artifactId>
   <packaging>jar</packaging>
-  <name>camunda BPM - QA - upgrade - rolling update - create old engine</name>
+  <name>Camunda Platform - QA - upgrade - rolling update - create old engine</name>
 
   <dependencyManagement>
     <dependencies>

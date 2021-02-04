@@ -7,7 +7,7 @@
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
-  <name>camunda BPM - webapp - Tomcat</name>
+  <name>Camunda Platform - webapp - Tomcat</name>
   <groupId>org.camunda.bpm.webapp</groupId>
   <artifactId>camunda-webapp-tomcat</artifactId>
   <packaging>war</packaging>

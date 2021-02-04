@@ -1,7 +1,7 @@
 REST API
 ========
 
-A JAX-RS-based REST API for Camunda BPM.
+A JAX-RS-based REST API for Camunda Platform.
 
 Running Tests
 -------------

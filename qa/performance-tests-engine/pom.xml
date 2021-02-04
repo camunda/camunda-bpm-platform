@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>camunda-qa-performance-tests-engine</artifactId>
   <packaging>jar</packaging>
-  <name>camunda BPM - QA Performance Tests Engine</name>
+  <name>Camunda Platform - QA Performance Tests Engine</name>
 
   <parent>
     <groupId>org.camunda.bpm.qa</groupId>

@@ -17,7 +17,7 @@
 package org.camunda.bpm.engine.authorization;
 
 /**
- * The set of built-in {@link Permission Permissions} for {@link Resources#OPERATION_LOG_CATEGORY User operation log based on categories} in Camunda BPM.
+ * The set of built-in {@link Permission Permissions} for {@link Resources#OPERATION_LOG_CATEGORY User operation log based on categories} in Camunda Platform.
  *
  * @author Tobias Metzke
  *

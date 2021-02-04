@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>camunda-bpm-run-modules-webapps</artifactId>
-  <name>camunda BPM - Run - Module Webapps</name>
+  <name>Camunda Platform - Run - Module Webapps</name>
   <packaging>pom</packaging>
   
   <properties>

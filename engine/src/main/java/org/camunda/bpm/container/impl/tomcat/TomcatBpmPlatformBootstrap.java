@@ -38,7 +38,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
 /**
- * <p>Apache Tomcat server listener responsible for deploying the bpm platform.</p>
+ * <p>Apache Tomcat server listener responsible for deploying the Camunda Platform.</p>
  *
  * @author Daniel Meyer
  *

@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>camunda-qa-integration-tests-webapps-standalone-engine</artifactId>
-  <name>camunda BPM - QA Integration Tests - Webapps Standalone Engine</name>
+  <name>Camunda Platform - QA Integration Tests - Webapps Standalone Engine</name>
 
   <parent>
     <groupId>org.camunda.bpm.qa</groupId>

@@ -18,7 +18,7 @@ package org.camunda.bpm.engine.authorization;
 
 /**
  * The set of built-in {@link Permission Permissions} for
- * {@link Resources#OPTIMIZE Optimize resource} in Camunda BPM.
+ * {@link Resources#OPTIMIZE Optimize resource} in Camunda Platform.
  *
  * @deprecated These permissions have no effect
  */
