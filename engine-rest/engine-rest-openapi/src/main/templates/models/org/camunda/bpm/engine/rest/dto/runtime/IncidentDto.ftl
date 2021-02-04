@@ -71,6 +71,11 @@
     <@lib.property
         name = "jobDefinitionId"
         type = "string"
-        last = true
         desc = "The job definition id the incident is associated with." />
+        
+    <@lib.property
+        name = "annotation"
+        type = "string"
+        last = true
+        desc = "The annotation set to the incident." />
 </@lib.dto>

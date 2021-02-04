@@ -354,6 +354,7 @@ public class IncidentRestServiceQueryTest extends AbstractRestServiceTest {
     String returnedIncidentMessage = from(content).getString("[0].incidentMessage");
     String returnedTenantId = from(content).getString("[0].tenantId");
     String returnedJobDefinitionId = from(content).getString("[0].jobDefinitionId");
+    String returnedAnnotation = from(content).getString("[0].annotation");
 
     Assert.assertEquals(MockProvider.EXAMPLE_INCIDENT_ID, returnedId);
     Assert.assertEquals(MockProvider.EXAMPLE_INCIDENT_PROC_INST_ID, returnedProcessInstanceId);
@@ -369,6 +370,7 @@ public class IncidentRestServiceQueryTest extends AbstractRestServiceTest {
     Assert.assertEquals(MockProvider.EXAMPLE_INCIDENT_MESSAGE, returnedIncidentMessage);
     Assert.assertEquals(MockProvider.EXAMPLE_TENANT_ID, returnedTenantId);
     Assert.assertEquals(MockProvider.EXAMPLE_JOB_DEFINITION_ID, returnedJobDefinitionId);
+    Assert.assertEquals(MockProvider.EXAMPLE_USER_OPERATION_ANNOTATION, returnedAnnotation);
   }
 
   @Test
