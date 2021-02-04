@@ -41,7 +41,8 @@
                              "configuration": "aConfiguration",
                              "tenantId": null,
                              "incidentMessage": "anIncidentMessage",
-                             "jobDefinitionId": "aJobDefinitionId"
+                             "jobDefinitionId": "aJobDefinitionId",
+                             "annotation": "an annotation"
                            },
                            {
                              "id": "anIncidentId",
@@ -57,7 +58,8 @@
                              "configuration": "anotherConfiguration",
                              "tenantId": null,
                              "incidentMessage": "anotherIncidentMessage",
-                             "jobDefinitionId": null
+                             "jobDefinitionId": null,
+                             "annotation": "another annotation"
                            }
                          ]
                      }'] />

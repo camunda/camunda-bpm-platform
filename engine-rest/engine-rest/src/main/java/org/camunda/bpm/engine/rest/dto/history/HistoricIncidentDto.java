@@ -48,6 +48,7 @@ public class HistoricIncidentDto {
   protected Boolean open;
   protected Boolean deleted;
   protected Boolean resolved;
+  protected String annotation;
 
   public String getId() {
     return id;
@@ -137,6 +138,10 @@ public class HistoricIncidentDto {
     return resolved;
   }
 
+  public String getAnnotation() {
+    return annotation;
+  }
+
   public static HistoricIncidentDto fromHistoricIncident(HistoricIncident historicIncident) {
     HistoricIncidentDto dto = new HistoricIncidentDto();
 
@@ -162,6 +167,7 @@ public class HistoricIncidentDto {
     dto.jobDefinitionId = historicIncident.getJobDefinitionId();
     dto.removalTime = historicIncident.getRemovalTime();
     dto.rootProcessInstanceId = historicIncident.getRootProcessInstanceId();
+    dto.annotation = historicIncident.getAnnotation();
 
     return dto;
   }
