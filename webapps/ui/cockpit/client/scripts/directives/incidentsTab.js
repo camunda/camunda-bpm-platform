@@ -21,6 +21,7 @@ var angular = require('angular');
 var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/incidents-tab.html', 'utf8');
+var incidentsAnnotationModal = require('./incidentsAnnotationModal');
 var inspectTemplate = fs.readFileSync(
   __dirname + '/incidents-tab-stacktrace.html',
   'utf8'
@@ -66,6 +67,7 @@ var Directive = [
         {class: 'cause instance-id uuid', request: 'causeIncidentProcessInstanceId', sortable: false, content: $translate.instant('PLUGIN_INCIDENTS_TAB_CAUSE_INSTANCE_ID')},
         {class: 'cause-root instance-id uuid', request: 'rootCauseIncidentProcessInstanceId', sortable: false, content: $translate.instant('PLUGIN_INCIDENTS_TAB_CAUSE_ROOT_INSTANCE_ID')},
         {class: 'type', request: 'incidentType', sortable: true, content: $translate.instant('PLUGIN_INCIDENTS_TAB_TYPE')},
+        {class: 'annotation', request: '', sortable: false, content: $translate.instant('PLUGIN_INCIDENTS_TAB_ANNOTATION')},
         {class: 'action', request: '', sortable: false, content: $translate.instant('PLUGIN_INCIDENTS_TAB_ACTION')}
       ];
 
@@ -78,6 +80,7 @@ var Directive = [
         'cause instance-id uuid',
         'cause-root instance-id uuid',
         'type',
+        'annotation',
         'action'
       ];
       var PInstanceClass = scope.processDefinition && 'process-instance';
@@ -341,6 +344,15 @@ var Directive = [
               $location.search('incidentStacktrace', null);
             });
         });
+      };
+
+      scope.editAnnotation = function(incident) {
+        $modal.open(
+          incidentsAnnotationModal(
+            incident,
+            scope.incidentsContext === 'history'
+          )
+        );
       };
 
       if ($location.search().incidentStacktrace) {

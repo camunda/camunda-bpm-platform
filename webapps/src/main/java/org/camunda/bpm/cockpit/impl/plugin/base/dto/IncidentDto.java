@@ -35,6 +35,7 @@ public class IncidentDto {
   protected String causeIncidentId;
   protected String rootCauseIncidentId;
   protected String configuration;
+  protected String annotation;
 
   // additional properties
   protected String causeIncidentProcessInstanceId;
@@ -144,6 +145,14 @@ public class IncidentDto {
     this.configuration = configuration;
   }
 
+  public String getAnnotation() {
+    return annotation;
+  }
+
+  public void setAnnotation(String annotation) {
+    this.annotation = annotation;
+  }
+  
   public String getCauseIncidentProcessInstanceId() {
     return causeIncidentProcessInstanceId;
   }
