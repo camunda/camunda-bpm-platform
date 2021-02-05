@@ -1,0 +1,7 @@
+{
+  "name": "$name$",
+  "version": "$version$",
+  "dependencies": {
+    $END$
+  }
+}
