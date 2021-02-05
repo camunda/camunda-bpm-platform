@@ -19,6 +19,7 @@ fi
 # set environment parameters
 webappsPath=$BASEDIR/internal/webapps/
 restPath=$BASEDIR/internal/rest/
+swaggerPath=$BASEDIR/internal/swaggerui
 classPath=$BASEDIR/configuration/userlib/,$BASEDIR/configuration/keystore/
 optionalComponentChosen=false
 configuration=$BASEDIR/configuration/default.yml
@@ -46,10 +47,10 @@ done
 if [ "$optionalComponentChosen" = "false" ]; then
   echo REST API enabled
   echo WebApps enabled
-  classPath=$webappsPath,$restPath,$classPath
+  classPath=$webappsPath,$restPath,$swaggerPath,$classPath
 fi
 
 echo classpath: $classPath
 
 # start the application
-"$JAVA" -Dloader.path="$classPath" -Dcamunda.deploymentDir="$deploymentDir" -jar "$BASEDIR/internal/camunda-bpm-run-core.jar" --spring.config.location=file:"$configuration"
+"$JAVA" -Dloader.path="$classPath" -Dcamunda.deploymentDir="$deploymentDir" -jar "$BASEDIR/internal/camunda-bpm-run-core.jar" --spring.config.location=file:"$configuration" --debug
