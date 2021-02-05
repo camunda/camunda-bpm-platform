@@ -38,6 +38,20 @@
 
     <dependency>
       <groupId>org.camunda.bpm.run</groupId>
+      <artifactId>camunda-bpm-run-modules-swaggerui</artifactId>
+      <version>${project.version}</version>
+      <type>jar</type>
+      <exclusions>
+        <!-- do not add transitive dependencies to generated dependency list -->
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm.run</groupId>
       <artifactId>camunda-bpm-run-core</artifactId>
       <version>${project.version}</version>
       <exclusions>
