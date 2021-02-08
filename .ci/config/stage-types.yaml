@@ -170,7 +170,7 @@ engine-rest-unit-jaxrs2-resteasy3:
   - 'rest-api'
   nodeLabel: 'h2'
 engine-rest-unit-compatibility-wildfly:
-  directory: 'engine-rest/engine-rest-jaxrs2'
+  directory: 'engine-rest/engine-rest'
   command: 'clean install -Pwildfly-compatibility,resteasy'
   stash:
     runtimeStash: true
