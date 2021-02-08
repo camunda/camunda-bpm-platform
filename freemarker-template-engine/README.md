@@ -1,4 +1,4 @@
-camunda-template-engines-jsr223
+﻿camunda-template-engines-jsr223
 ===============================
 
 <p>
@@ -11,7 +11,7 @@ camunda-template-engines-jsr223
 Modules which contains wrappers of Java template engines as
 [JSR 223](https://www.jcp.org/en/jsr/detail?id=223) compatible
 [script engines](http://docs.oracle.com/javase/7/docs/api/javax/script/ScriptEngine.html).
-Therefore they can be used in the [camunda BPM platform](http://camunda.org) as scripting languages.
+Therefore they can be used in the [Camunda Platform](https://camunda.com/products/camunda-bpm/) as scripting languages.
 
 ## Contributing
 
