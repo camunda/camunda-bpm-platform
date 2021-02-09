@@ -157,7 +157,7 @@ window.__define(
 
           if (
             typeof window.camTasklistConf !== 'undefined' &&
-            window.camTasklistConf.customScripts
+            window.camTasklistConf.requireJsConfig
           ) {
             var custom = config.requireJsConfig || {};
 
