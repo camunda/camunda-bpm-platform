@@ -1,6 +1,6 @@
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
-@Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library@CAM-13059-refactor-matrices']) _
 
 def failedStageTypes = []
 
@@ -413,8 +413,10 @@ pipeline {
     stage('Engine Rest UNIT tests') {
       steps {
         script {
-          parallel(cambpmGetMatrixStages('engine-rest', failedStageTypes, { allowedStageLabels, dbLabel ->
-            return cambpmWithLabels(allowedStageLabels)
+          // see the .ci/config/matrices.yaml for the stage generation values
+          // see .ci/config/stage-types.yaml for the stage configurations
+          parallel(cambpmGetMatrixStages('engine-rest', failedStageTypes, { stageInfo ->
+            return cambpmWithLabels(stageInfo.allowedLabels)
           }))
         }
       }
@@ -422,7 +424,11 @@ pipeline {
     stage('UNIT DB tests') {
       steps {
         script {
-          parallel(cambpmGetMatrixStages('engine-webapp-unit', failedStageTypes, { allowedStageLabels, dbLabel ->
+          // see the .ci/config/matrices.yaml for the stage generation values
+          // see .ci/config/stage-types.yaml for the stage configurations
+          parallel(cambpmGetMatrixStages('engine-webapp-unit', failedStageTypes, { stageInfo ->
+            List allowedStageLabels = stageInfo.allowedLabels
+            String dbLabel = stageInfo.nodeType
             return cambpmWithLabels(allowedStageLabels.minus('cockroachdb'), cambpmGetDbType(dbLabel))
           }))
         }

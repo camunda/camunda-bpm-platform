@@ -1,6 +1,6 @@
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
-@Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library@CAM-13059-refactor-matrices']) _
 
 def failedStageTypes = []
 
@@ -203,44 +203,24 @@ pipeline {
     stage('QA DB tests') {
       steps {
         script {
-          parallel(cambpmGetMatrixStages('daily-stages', failedStageTypes, { allowedStageLabels, dbLabel ->
+          // see the .ci/config/matrices.yaml for the stage generation values
+          // see .ci/config/stage-types.yaml for the stage configurations
+          parallel(cambpmGetMatrixStages('daily-stages', failedStageTypes, { stageInfo ->
+            List allowedStageLabels = stageInfo.allowedLabels
+            String dbLabel = stageInfo.nodeType
             return cambpmWithLabels(allowedStageLabels.minus('cockroachdb'), cambpmGetDbType(dbLabel))
           }))
         }
       }
     }
     stage('JDKs') {
-      matrix {
-        axes {
-          axis {
-            name 'JDK'
-            values 'openjdk-jdk-14-latest', 'openjdk-jdk-13-latest', 'openjdk-jdk-12-latest', 'openjdk-jdk-11-latest',
-                   'openjdk-jdk-8-latest', 'jdk-14-latest', 'jdk-13-latest', 'jdk-12-latest', 'jdk-11-latest',
-                   'jdk-8-latest', 'ibm-jdk-8-latest'
-          }
-        }
-        when {
-          expression {
-            cambpmWithLabels('default-build')
-          }
-        }
-        stages {
-          stage('JDK') {
-            steps {
-              cambpmConditionalRetry([
-                agentLabel: 'h2',
-                runSteps: {
-                  cambpmRunMaven('.',
-                      'install source:jar source:test-jar -pl \'!webapps\',\'!distro/jbossas7/subsystem\' -Pdistro,distro-ce,distro-wildfly',
-                      jdkVersion: env.JDK,
-                      runtimeStash: true)
-                },
-                postAlways: {
-                  cambpmPublishTestResult()
-                }
-              ])
-            }
-          }
+      steps {
+        script {
+          // see the .ci/config/matrices.yaml for the stage generation values
+          // see .ci/config/stage-types.yaml for the stage configurations
+          parallel(cambpmGetMatrixStages('jdk-ce-stages', failedStageTypes, { stageInfo ->
+            return cambpmWithLabels('default-build')
+          }))
         }
       }
     }
