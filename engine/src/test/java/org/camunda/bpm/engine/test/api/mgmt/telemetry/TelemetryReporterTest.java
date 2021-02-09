@@ -38,6 +38,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -94,6 +95,8 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.http.Fault;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.google.gson.Gson;
+
+import ch.qos.logback.classic.spi.ILoggingEvent;
 
 public class TelemetryReporterTest {
 
@@ -920,9 +923,10 @@ public class TelemetryReporterTest {
     standaloneReporter.reportNow();
 
     // then
-    assertThat(loggingRule.getFilteredLog("Could not send telemetry data. "
-        + "Reason: NullPointerException with message 'null'. "
-        + "Set this logger to DEBUG/FINE for the full stacktrace.").size()).isOne();
+    List<ILoggingEvent> warningLog = loggingRule.getFilteredLog("Could not send telemetry data. ");
+    assertThat(warningLog.size()).isOne();
+    assertThat(warningLog.get(0).toString().contains("Set this logger to DEBUG/FINE for the full stacktrace.")).isTrue();
+    assertThat(loggingRule.getFilteredLog("java.lang.NullPointerException occurred while sending telemetry data.").size()).isOne();
   }
 
   @Test
