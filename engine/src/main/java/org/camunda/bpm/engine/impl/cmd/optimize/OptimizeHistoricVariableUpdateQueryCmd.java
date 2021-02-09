@@ -16,10 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.cmd.optimize;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
@@ -29,6 +25,10 @@ import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInst
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.impl.variable.serializer.AbstractTypedValueSerializer;
 import org.camunda.bpm.engine.variable.type.ValueType;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class OptimizeHistoricVariableUpdateQueryCmd implements Command<List<HistoricVariableUpdate>> {
 
@@ -75,7 +75,7 @@ public class OptimizeHistoricVariableUpdateQueryCmd implements Command<List<Hist
     // do no fetch values for byte arrays/blob variables (e.g. files or bytes)
     return !AbstractTypedValueSerializer.BINARY_VALUE_TYPES.contains(entityType.getName())
         // nor object values unless enabled
-        && !ValueType.OBJECT.equals(entityType) || !excludeObjectValues;
+        && (!ValueType.OBJECT.equals(entityType) || !excludeObjectValues);
   }
 
   protected boolean isHistoricDetailVariableInstanceUpdateEntity(HistoricVariableUpdate variableUpdate) {

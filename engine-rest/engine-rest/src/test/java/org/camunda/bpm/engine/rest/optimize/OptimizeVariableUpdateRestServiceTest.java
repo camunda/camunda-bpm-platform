@@ -129,11 +129,11 @@ public class OptimizeVariableUpdateRestServiceTest extends AbstractRestServiceTe
   public void testExcludeObjectValuesQueryParameter() {
     given()
       .queryParam("excludeObjectValues", true)
-      .then()
+    .then()
       .expect()
-      .statusCode(Status.OK.getStatusCode())
-      .contentType(MediaType.APPLICATION_JSON)
-      .when()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(MediaType.APPLICATION_JSON)
+    .when()
       .get(OPTIMIZE_VARIABLE_UPDATE_PATH);
 
     verify(mockedOptimizeService).getHistoricVariableUpdates(null, null, true, Integer.MAX_VALUE);
