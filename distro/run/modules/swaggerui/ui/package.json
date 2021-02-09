@@ -1,7 +1,15 @@
 {
-  "name": "$name$",
-  "version": "$version$",
+  "name": "ui",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "parcel index.html",
+    "build": "parcel build index.html --out-dir ../target/classes/openapi --public-url ./"
+  },
   "dependencies": {
-    $END$
+    "swagger-ui": "~3.42.0"
+  },
+  "devDependencies": {
+    "parcel-bundler": "~1.12.4"
   }
 }

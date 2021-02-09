@@ -16,7 +16,7 @@
   <name>camunda BPM - Run - Module Swagger UI</name>
   <packaging>jar</packaging>
 
-  <!-- TODO: do i need this here -->
+  <!-- TODO: do i need this here? -->
   <properties>
     <!-- generate a bom of compile time dependencies for the license book.
     Note: Every compile time dependency will end up in the license book. Please
@@ -36,7 +36,90 @@
     </dependency>
   </dependencies>
 
+  <profiles>
+    <!--<profile>
+      <id>swaggerui-build-windows</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>generate-swaggerui</id>
+                <phase>generate-resources</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <inherited>false</inherited>
+                <configuration>
+                  <target>
+                    &lt;!&ndash; run node build &ndash;&gt;
+                    <exec executable = "cmd" failonerror = "true" dir="${project.basedir}/ui">
+                      <arg value = "/c" />
+                      <arg value = "npm" />
+                      <arg value = "install" />
+                    </exec>
+                    <exec executable = "cmd" failonerror = "true">
+                      <arg value = "/c" />
+                      <arg value = "npm" />
+                      <arg value = "run" />
+                      <arg value = "build" />
+                    </exec>
+                  </target>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>-->
 
+    <profile>
+      <id>swaggerui-build-unix</id>
+      <activation>
+        <os>
+          <family>!windows</family>
+        </os>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>generate-swaggerui</id>
+                <phase>generate-resources</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <inherited>false</inherited>
+                <configuration>
+                  <target>
+                    <!-- run node build -->
+                    <exec executable = "npm" failonerror = "true" dir="${project.basedir}/ui">
+                      <arg value = "install" />
+                    </exec>
+                    <exec executable = "npm" failonerror = "true" dir="${project.basedir}/ui">
+                      <arg value = "run" />
+                      <arg value = "build" />
+                    </exec>
+                  </target>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+  </profiles>
 
 
 </project>
