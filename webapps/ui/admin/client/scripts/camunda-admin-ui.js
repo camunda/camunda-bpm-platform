@@ -173,15 +173,21 @@ module.exports = function(pluginDependencies) {
     }
   ]);
 
-  $(document).ready(function() {
-    angular.bootstrap(document.documentElement, [
-      appNgModule.name,
-      'cam.admin.custom'
-    ]);
+  require('../../../common/scripts/services/plugins/addPlugins')(
+    window.camAdminConf,
+    appNgModule,
+    'admin'
+  ).then(() => {
+    $(document).ready(function() {
+      angular.bootstrap(document.documentElement, [
+        appNgModule.name,
+        'cam.admin.custom'
+      ]);
 
-    if (top !== window) {
-      window.parent.postMessage({type: 'loadamd'}, '*');
-    }
+      if (top !== window) {
+        window.parent.postMessage({type: 'loadamd'}, '*');
+      }
+    });
   });
 };
 

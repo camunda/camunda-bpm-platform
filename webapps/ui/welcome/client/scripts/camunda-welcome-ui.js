@@ -116,14 +116,20 @@ module.exports = function(pluginDependencies) {
     'welcome'
   );
 
-  angular.bootstrap(document.documentElement, [
-    appNgModule.name,
-    'cam.welcome.custom'
-  ]);
+  require('../../../common/scripts/services/plugins/addPlugins')(
+    window.camWelcomeConf,
+    appNgModule,
+    'welcome'
+  ).then(() => {
+    angular.bootstrap(document.documentElement, [
+      appNgModule.name,
+      'cam.welcome.custom'
+    ]);
 
-  if (top !== window) {
-    window.parent.postMessage({type: 'loadamd'}, '*');
-  }
+    if (top !== window) {
+      window.parent.postMessage({type: 'loadamd'}, '*');
+    }
+  });
 };
 
 module.exports.exposePackages = function(container) {

@@ -15,138 +15,171 @@
  * limitations under the License.
  */
 
+// Dynamic import for use within browserify
+window._import = path => {
+  return import(path);
+};
+
+// camunda-admin-bootstrap is copied as-is, so we have to inline everything
+const baseImportPath = document.querySelector('base').href + '../';
+
+const loadConfig = (async function() {
+  // eslint-disable-next-line
+  const config = (await import(
+      baseImportPath + 'scripts/config.js?bust=' + new Date().getTime()
+    )).default || {};
+
+  window.camAdminConf = config;
+  return config;
+})();
+
 window.__define(
   'camunda-admin-bootstrap',
   ['./scripts/camunda-admin-ui'],
   function() {
     'use strict';
-
-    var camundaAdminUi = window.CamundaAdminUi;
-
-    requirejs.config({
-      baseUrl: '../../../lib'
-    });
-
-    var requirePackages = window;
-    camundaAdminUi.exposePackages(requirePackages);
-
-    window.define = window.__define;
-    window.require = window.__require;
-
-    requirejs(['globalize'], function(globalize) {
-      globalize(
-        requirejs,
-        ['angular', 'camunda-commons-ui', 'camunda-bpm-sdk-js', 'jquery'],
-        requirePackages
-      );
-
-      var pluginPackages = window.PLUGIN_PACKAGES || [];
-      var pluginDependencies = window.PLUGIN_DEPENDENCIES || [];
-
-      pluginPackages.forEach(function(plugin) {
-        var node = document.createElement('link');
-        node.setAttribute('rel', 'stylesheet');
-        node.setAttribute('href', plugin.location + '/plugin.css');
-        document.head.appendChild(node);
-      });
+    const bootstrap = function(config) {
+      var camundaAdminUi = window.CamundaAdminUi;
 
       requirejs.config({
-        packages: pluginPackages,
-        baseUrl: '../',
-        paths: {
-          ngDefine: '../../lib/ngDefine'
-        }
+        baseUrl: '../../../lib'
       });
 
-      var dependencies = ['angular', 'ngDefine'].concat(
-        pluginDependencies.map(function(plugin) {
-          return plugin.requirePackageName;
-        })
-      );
+      var requirePackages = window;
+      camundaAdminUi.exposePackages(requirePackages);
 
-      requirejs(dependencies, function(angular) {
-        // we now loaded admin and the plugins, great
-        // before we start initializing admin though (and leave the requirejs context),
-        // lets see if we should load some custom scripts first
+      window.define = window.__define;
+      window.require = window.__require;
 
-        if (window.camAdminConf && window.camAdminConf.csrfCookieName) {
-          angular.module('cam.commons').config([
-            '$httpProvider',
-            function($httpProvider) {
-              $httpProvider.defaults.xsrfCookieName =
-                window.camAdminConf.csrfCookieName;
-            }
-          ]);
-        }
+      requirejs(['globalize'], function(globalize) {
+        globalize(
+          requirejs,
+          ['angular', 'camunda-commons-ui', 'camunda-bpm-sdk-js', 'jquery'],
+          requirePackages
+        );
 
-        if (
-          typeof window.camAdminConf !== 'undefined' &&
-          window.camAdminConf.customScripts
-        ) {
-          var custom = window.camAdminConf.customScripts || {};
+        var pluginPackages = window.PLUGIN_PACKAGES || [];
+        var pluginDependencies = window.PLUGIN_DEPENDENCIES || [];
 
-          // copy the relevant RequireJS configuration in a empty object
-          // see: http://requirejs.org/docs/api.html#config
-          var conf = {};
-          [
-            'baseUrl',
-            'paths',
-            'bundles',
-            'shim',
-            'map',
-            'config',
-            'packages',
-            // 'nodeIdCompat',
-            'waitSeconds',
-            'context',
-            // 'deps', // not relevant in this case
-            'callback',
-            'enforceDefine',
-            'xhtml',
-            'urlArgs',
-            'scriptType'
-            // 'skipDataMain' // not relevant either
-          ].forEach(function(prop) {
-            if (custom[prop]) {
-              conf[prop] = custom[prop];
-            }
-          });
+        pluginPackages = pluginPackages.filter(
+          el =>
+            el.name === 'admin-plugin-adminPlugins' ||
+            el.name === 'admin-plugin-adminEE' ||
+            el.name.startsWith('admin-plugin-legacy')
+        );
 
-          // configure RequireJS
-          requirejs.config(conf);
+        pluginDependencies = pluginDependencies.filter(
+          el =>
+            el.requirePackageName === 'admin-plugin-adminPlugins' ||
+            el.requirePackageName === 'admin-plugin-adminEE' ||
+            el.requirePackageName.startsWith('admin-plugin-legacy')
+        );
 
-          // load the dependencies and bootstrap the AngularJS application
-          requirejs(custom.deps || [], function() {
-            // create a AngularJS module (with possible AngularJS module dependencies)
-            // on which the custom scripts can register their
-            // directives, controllers, services and all when loaded
-            angular.module('cam.admin.custom', custom.ngDeps);
+        pluginPackages.forEach(function(plugin) {
+          var node = document.createElement('link');
+          node.setAttribute('rel', 'stylesheet');
+          node.setAttribute('href', plugin.location + '/plugin.css');
+          document.head.appendChild(node);
+        });
 
-            window.define = undefined;
-            window.require = undefined;
+        requirejs.config({
+          packages: pluginPackages,
+          baseUrl: '../',
+          paths: {
+            ngDefine: '../../lib/ngDefine'
+          }
+        });
 
-            // now that we loaded the plugins and the additional modules, we can finally
-            // initialize Admin
-            camundaAdminUi(pluginDependencies);
-          });
-        } else {
-          // for consistency, also create a empty module
-          angular.module('cam.admin.custom', []);
+        var dependencies = ['angular', 'ngDefine'].concat(
+          pluginDependencies.map(function(plugin) {
+            return plugin.requirePackageName;
+          })
+        );
 
-          // make sure that we are at the end of the require-js callback queue.
-          // Why? => the plugins will also execute require(..) which will place new
-          // entries into the queue.  if we bootstrap the angular app
-          // synchronously, the plugins' require callbacks will not have been
-          // executed yet and the angular modules provided by those plugins will
-          // not have been defined yet. Placing a new require call here will put
-          // the bootstrapping of the angular app at the end of the queue
-          require([], function() {
-            window.define = undefined;
-            window.require = undefined;
-            camundaAdminUi(pluginDependencies);
-          });
-        }
+        requirejs(dependencies, function(angular) {
+          // we now loaded admin and the plugins, great
+          // before we start initializing admin though (and leave the requirejs context),
+          // lets see if we should load some custom scripts first
+
+          if (config && config.csrfCookieName) {
+            angular.module('cam.commons').config([
+              '$httpProvider',
+              function($httpProvider) {
+                $httpProvider.defaults.xsrfCookieName = config.csrfCookieName;
+              }
+            ]);
+          }
+
+          if (typeof config !== 'undefined' && config.requireJsConfig) {
+            var custom = config.requireJsConfig || {};
+
+            // copy the relevant RequireJS configuration in a empty object
+            // see: http://requirejs.org/docs/api.html#config
+            var conf = {};
+            [
+              'baseUrl',
+              'paths',
+              'bundles',
+              'shim',
+              'map',
+              'config',
+              'packages',
+              // 'nodeIdCompat',
+              'waitSeconds',
+              'context',
+              // 'deps', // not relevant in this case
+              'callback',
+              'enforceDefine',
+              'xhtml',
+              'urlArgs',
+              'scriptType'
+              // 'skipDataMain' // not relevant either
+            ].forEach(function(prop) {
+              if (custom[prop]) {
+                conf[prop] = custom[prop];
+              }
+            });
+
+            // configure RequireJS
+            requirejs.config(conf);
+
+            // load the dependencies and bootstrap the AngularJS application
+            requirejs(custom.deps || [], function() {
+              // create a AngularJS module (with possible AngularJS module dependencies)
+              // on which the custom scripts can register their
+              // directives, controllers, services and all when loaded
+              angular.module('cam.admin.custom', custom.ngDeps);
+
+              window.define = undefined;
+              window.require = undefined;
+
+              // now that we loaded the plugins and the additional modules, we can finally
+              // initialize Admin
+              camundaAdminUi(pluginDependencies);
+            });
+          } else {
+            // for consistency, also create a empty module
+            angular.module('cam.admin.custom', []);
+
+            // make sure that we are at the end of the require-js callback queue.
+            // Why? => the plugins will also execute require(..) which will place new
+            // entries into the queue.  if we bootstrap the angular app
+            // synchronously, the plugins' require callbacks will not have been
+            // executed yet and the angular modules provided by those plugins will
+            // not have been defined yet. Placing a new require call here will put
+            // the bootstrapping of the angular app at the end of the queue
+            require([], function() {
+              window.define = undefined;
+              window.require = undefined;
+              camundaAdminUi(pluginDependencies);
+            });
+          }
+        });
       });
+    };
+
+    loadConfig.then(config => {
+      bootstrap(config);
     });
   }
 );
