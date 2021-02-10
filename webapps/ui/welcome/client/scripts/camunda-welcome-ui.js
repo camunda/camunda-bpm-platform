@@ -116,6 +116,12 @@ module.exports = function(pluginDependencies) {
     'welcome'
   );
 
+  require('../../../common/scripts/services/plugins/addPlugins')(
+    window.camWelcomeConf,
+    appNgModule,
+    'welcome'
+  );
+
   angular.bootstrap(document.documentElement, [
     appNgModule.name,
     'cam.welcome.custom'
