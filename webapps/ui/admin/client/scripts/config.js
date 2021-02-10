@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-window.camAdminConf = {
+export default {
   // // change the app name and vendor
   // app: {
   //   name: 'Admin',
@@ -23,7 +23,12 @@ window.camAdminConf = {
   // },
   // // custom libraries and scripts loading and initialization,
   // // see: http://docs.camunda.org/guides/user-guide/#tasklist-customizing-custom-scripts
-  // customScripts: {
+  // customScripts: [
+  //   // If you have a folder called 'my-custom-script' (in the 'admin' folder)
+  //   // with a file called 'customScript.js' in it
+  //   // 'my-custom-script/customScript'
+  // ],
+  // requireJsConfig: {
   //   // AngularJS module names
   //   ngDeps: ['ui.bootstrap'],
   //   // RequireJS configuration for a complete configuration documentation see:

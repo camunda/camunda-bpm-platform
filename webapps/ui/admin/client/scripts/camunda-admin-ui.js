@@ -173,6 +173,12 @@ module.exports = function(pluginDependencies) {
     }
   ]);
 
+  require('../../../common/scripts/services/plugins/addPlugins')(
+    window.camAdminConf,
+    appNgModule,
+    'admin'
+  );
+
   $(document).ready(function() {
     angular.bootstrap(document.documentElement, [
       appNgModule.name,

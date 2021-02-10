@@ -82,7 +82,7 @@ module.exports = async function(config, module, appName) {
       }
     ]);
 
-    if (plugin.pluginPoint === 'cockpit.route') {
+    if (plugin.pluginPoint === `${appName}.route`) {
       module.config([
         '$routeProvider',
         function($routeProvider) {
