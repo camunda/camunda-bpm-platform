@@ -119,6 +119,18 @@ window.__define(
         var pluginPackages = window.PLUGIN_PACKAGES || [];
         var pluginDependencies = window.PLUGIN_DEPENDENCIES || [];
 
+        pluginPackages = pluginPackages.filter(
+          el =>
+            el.name === 'tasklist-plugin-tasklistPlugins' ||
+            el.name.startsWith('tasklist-plugin-legacy')
+        );
+
+        pluginDependencies = pluginDependencies.filter(
+          el =>
+            el.requirePackageName === 'tasklist-plugin-tasklistPlugins' ||
+            el.requirePackageName.startsWith('tasklist-plugin-legacy')
+        );
+
         pluginPackages.forEach(function(plugin) {
           var node = document.createElement('link');
           node.setAttribute('rel', 'stylesheet');
