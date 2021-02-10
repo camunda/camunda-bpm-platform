@@ -21,9 +21,13 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-@Configuration @EnableWebMvc public class CamundaOpenApiConfiguration implements WebMvcConfigurer {
+@Configuration
+@EnableWebMvc
+public class CamundaOpenApiConfiguration implements WebMvcConfigurer {
   @Override
   public void addResourceHandlers(ResourceHandlerRegistry registry) {
-    registry.addResourceHandler("/openapi/**").addResourceLocations("classpath:/openapi/");
+    registry.addResourceHandler("/swaggerui/**")
+        .addResourceLocations("classpath:/swaggerui/", "classpath:openapi.json");
+
   }
 }
