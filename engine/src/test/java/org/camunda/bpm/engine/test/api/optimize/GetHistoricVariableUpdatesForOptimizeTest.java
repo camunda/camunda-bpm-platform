@@ -16,14 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.optimize;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.collect.ImmutableList;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -45,7 +38,10 @@ import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.FileValue;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
+import org.camunda.bpm.engine.variable.value.TypedValue;
+import org.camunda.bpm.engine.variable.value.builder.ObjectValueBuilder;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
@@ -54,27 +50,39 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class GetHistoricVariableUpdatesForOptimizeTest {
 
-  public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
+  private static final String USER_ID = "test";
+
+  private static final TypedValue STRING_VARIABLE_DEFAULT_VALUE = Variables.stringValue("aString");
+  private static final ObjectValueBuilder OBJECT_VARIABLE_DEFAULT_VALUE = Variables
+    .objectValue(ImmutableList.of("one", "two", "three"));
+  private static final TypedValue BYTE_VARIABLE_DEFAULT_VALUE = Variables
+    .byteArrayValue(new byte[]{8, 6, 3, 4, 2, 6, 7, 8});
+  private static final FileValue FILE_VARIABLE_DEFAULT_VALUE = Variables.fileValue("test.txt")
+    .file("some bytes".getBytes())
+    .mimeType("text/plain")
+    .create();
+
+  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testHelper = new ProcessEngineTestRule(engineRule);
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testHelper);
 
   private OptimizeService optimizeService;
-
-  protected String userId = "test";
-
-  protected static final String VARIABLE_NAME = "aVariableName";
-  protected static final String VARIABLE_VALUE = "aVariableValue";
-
   private IdentityService identityService;
   private RuntimeService runtimeService;
   private AuthorizationService authorizationService;
   private TaskService taskService;
-
 
   @Before
   public void init() {
@@ -86,7 +94,7 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
     authorizationService = engineRule.getAuthorizationService();
     taskService = engineRule.getTaskService();
 
-    createUser(userId);
+    createUser(USER_ID);
   }
 
   @After
@@ -105,7 +113,7 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
 
   @Test
   public void getHistoricVariableUpdates() {
-     // given
+    // given
     BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
       .startEvent()
       .endEvent()
@@ -117,7 +125,7 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
 
     // when
     List<HistoricVariableUpdate> historicVariableUpdates =
-      optimizeService.getHistoricVariableUpdates(new Date(1L), null, 10);
+      optimizeService.getHistoricVariableUpdates(new Date(1L), null, false, 10);
 
     // then
     assertThat(historicVariableUpdates.size()).isEqualTo(1);
@@ -126,7 +134,7 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
 
   @Test
   public void occurredAfterParameterWorks() {
-     // given
+    // given
     BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
       .startEvent()
       .endEvent()
@@ -144,7 +152,7 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
 
     // when
     List<HistoricVariableUpdate> variableUpdates =
-      optimizeService.getHistoricVariableUpdates(now, null, 10);
+      optimizeService.getHistoricVariableUpdates(now, null, false, 10);
 
     // then
     assertThat(variableUpdates.size()).isEqualTo(1);
@@ -153,7 +161,7 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
 
   @Test
   public void occurredAtParameterWorks() {
-     // given
+    // given
     BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
       .startEvent()
       .endEvent()
@@ -171,7 +179,7 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
 
     // when
     List<HistoricVariableUpdate> variableUpdates =
-      optimizeService.getHistoricVariableUpdates(null, now, 10);
+      optimizeService.getHistoricVariableUpdates(null, now, false, 10);
 
     // then
     assertThat(variableUpdates.size()).isEqualTo(1);
@@ -180,7 +188,7 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
 
   @Test
   public void occurredAfterAndOccurredAtParameterWorks() {
-     // given
+    // given
     BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
       .startEvent()
       .endEvent()
@@ -198,15 +206,74 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
 
     // when
     List<HistoricVariableUpdate> variableUpdates =
-      optimizeService.getHistoricVariableUpdates(now, now, 10);
+      optimizeService.getHistoricVariableUpdates(now, now, false, 10);
 
     // then
     assertThat(variableUpdates.size()).isEqualTo(0);
   }
 
   @Test
+  public void mixedTypeVariablesByDefaultAllNonBinaryValuesAreFetched() {
+    // given
+    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .endEvent()
+      .done();
+    testHelper.deploy(simpleDefinition);
+
+    final Map<String, Object> mixedTypeVariableMap = createMixedTypeVariableMap();
+    runtimeService.startProcessInstanceByKey("process", mixedTypeVariableMap);
+
+    // when
+    List<HistoricVariableUpdate> historicVariableUpdates =
+      optimizeService.getHistoricVariableUpdates(new Date(1L), null, false, 10);
+
+    // then
+    assertThat(historicVariableUpdates)
+      .extracting(HistoricVariableUpdate::getVariableName)
+      .containsExactlyInAnyOrderElementsOf(mixedTypeVariableMap.keySet());
+
+    assertThat(historicVariableUpdates)
+      .extracting(this::extractVariableValue)
+      .containsExactlyInAnyOrder(
+        STRING_VARIABLE_DEFAULT_VALUE.getValue(),
+        OBJECT_VARIABLE_DEFAULT_VALUE.create().getValueSerialized(),
+        null,
+        null
+      );
+
+  }
+
+  @Test
+  public void mixedTypeVariablesExcludeObjectValueDiscardsObjectValue() {
+    // given
+    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .endEvent()
+      .done();
+    testHelper.deploy(simpleDefinition);
+
+    final Map<String, Object> mixedTypeVariableMap = createMixedTypeVariableMap();
+    runtimeService.startProcessInstanceByKey("process", mixedTypeVariableMap);
+
+    // when
+    List<HistoricVariableUpdate> historicVariableUpdates =
+      optimizeService.getHistoricVariableUpdates(new Date(1L), null, true, 10);
+
+    // then
+    assertThat(historicVariableUpdates)
+      .extracting(HistoricVariableUpdate::getVariableName)
+      .containsExactlyInAnyOrderElementsOf(mixedTypeVariableMap.keySet());
+
+    assertThat(historicVariableUpdates)
+      .extracting(this::extractVariableValue)
+      .containsExactlyInAnyOrder(STRING_VARIABLE_DEFAULT_VALUE.getValue(), null, null, null);
+
+  }
+
+  @Test
   public void maxResultsParameterWorks() {
-     // given
+    // given
     BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
       .startEvent()
       .endEvent()
@@ -223,7 +290,7 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
 
     // when
     List<HistoricVariableUpdate> variableUpdates =
-      optimizeService.getHistoricVariableUpdates(pastDate(), null, 3);
+      optimizeService.getHistoricVariableUpdates(pastDate(), null, false, 3);
 
     // then
     assertThat(variableUpdates.size()).isEqualTo(3);
@@ -231,7 +298,7 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
 
   @Test
   public void resultIsSortedByTime() {
-     // given
+    // given
     BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
       .startEvent()
       .endEvent()
@@ -242,21 +309,21 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
     ClockUtil.setCurrentTime(nowPlus1Second);
     Map<String, Object> variables = new HashMap<>();
     variables.put("var1", "value1");
-      runtimeService.startProcessInstanceByKey("process", variables);
+    runtimeService.startProcessInstanceByKey("process", variables);
     Date nowPlus2Seconds = new Date(now.getTime() + 2000L);
     ClockUtil.setCurrentTime(nowPlus2Seconds);
     variables.clear();
     variables.put("var2", "value2");
-      runtimeService.startProcessInstanceByKey("process", variables);
+    runtimeService.startProcessInstanceByKey("process", variables);
     Date nowPlus4Seconds = new Date(nowPlus2Seconds.getTime() + 2000L);
     ClockUtil.setCurrentTime(nowPlus4Seconds);
     variables.clear();
     variables.put("var3", "value3");
-      runtimeService.startProcessInstanceByKey("process", variables);
+    runtimeService.startProcessInstanceByKey("process", variables);
 
     // when
     List<HistoricVariableUpdate> variableUpdates =
-      optimizeService.getHistoricVariableUpdates(now, null, 10);
+      optimizeService.getHistoricVariableUpdates(now, null, false, 10);
 
     // then
     assertThat(variableUpdates.size()).isEqualTo(3);
@@ -267,7 +334,7 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
 
   @Test
   public void fetchOnlyVariableUpdates() {
-     // given
+    // given
     BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
       .startEvent()
       .userTask()
@@ -277,67 +344,30 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
     runtimeService.startProcessInstanceByKey("process");
 
     Task task = taskService.createTaskQuery().singleResult();
-    Map<String, String> formFields = new HashMap<>();
+    Map<String, Object> formFields = new HashMap<>();
     formFields.put("var", "foo");
-    engineRule.getFormService().submitTaskFormData(task.getId(), formFields);
+    engineRule.getFormService().submitTaskForm(task.getId(), formFields);
     long detailCount = engineRule.getHistoryService().createHistoricDetailQuery().count();
     assertThat(detailCount).isEqualTo(2L); // variable update + form property
 
     // when
     List<HistoricVariableUpdate> variableUpdates =
-      optimizeService.getHistoricVariableUpdates(pastDate(), null, 10);
+      optimizeService.getHistoricVariableUpdates(pastDate(), null, false, 10);
 
     // then
     assertThat(variableUpdates.size()).isEqualTo(1);
   }
 
-  @Test
-  public void getHistoricVariableByteArrayUpdates() {
-     // given
-    BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .endEvent()
-      .done();
-    testHelper.deploy(simpleDefinition);
-
-    List<String> serializable = new ArrayList<>();
-    serializable.add("one");
-    serializable.add("two");
-    serializable.add("three");
-
-    Map<String, Object> variables = new HashMap<>();
-    variables.put("var", serializable);
-
-    runtimeService.startProcessInstanceByKey("process", variables);
-    runtimeService.startProcessInstanceByKey("process", variables);
-    runtimeService.startProcessInstanceByKey("process", variables);
-    runtimeService.startProcessInstanceByKey("process", variables);
-
-    // when
-    List<HistoricVariableUpdate> historicVariableUpdates =
-      optimizeService.getHistoricVariableUpdates(new Date(1L), null, 10);
-
-    // then
-    assertThat(historicVariableUpdates.size()).isEqualTo(4);
-
-    for (HistoricVariableUpdate variableUpdate : historicVariableUpdates) {
-      ObjectValue typedValue = (ObjectValue) variableUpdate.getTypedValue();
-      assertThat(typedValue.isDeserialized()).isFalse();
-      assertThat(typedValue.getValueSerialized()).isNotNull();
-    }
-
-  }
-
   /**
    * Excluded on h2, because the test takes quite some time there (30-40 seconds)
    * and the fixed problem did not occur on h2.
-   *
+   * <p>
    * Excluded on CRDB since the problem does not occur on it. The test also times out
    * when INSERT-ing the Process Variables due the the slowness of the SQL statements on CRDB.
    * See CAM-12239 for the performance.
    */
   @Test
-  @RequiredDatabase(excludes = { DbSqlSessionFactory.H2, DbSqlSessionFactory.CRDB })
+  @RequiredDatabase(excludes = {DbSqlSessionFactory.H2, DbSqlSessionFactory.CRDB})
   public void testFetchLargeNumberOfObjectVariables() {
     // given
     BpmnModelInstance simpleDefinition = Bpmn.createExecutableProcess("process")
@@ -357,7 +387,7 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
 
     // when
     List<HistoricVariableUpdate> historicVariableUpdates =
-        optimizeService.getHistoricVariableUpdates(new Date(1L), null, 10000);
+      optimizeService.getHistoricVariableUpdates(new Date(1L), null, false, 10000);
 
     // then
     assertThat(historicVariableUpdates).hasSize(numberOfVariables);
@@ -366,6 +396,27 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
       ObjectValue typedValue = (ObjectValue) update.getTypedValue();
       assertThat(typedValue.getValueSerialized()).isNotNull();
     }
+  }
+
+  private Object extractVariableValue(HistoricVariableUpdate variableUpdate) {
+    final TypedValue typedValue = variableUpdate.getTypedValue();
+    if (typedValue instanceof ObjectValue) {
+      ObjectValue objectValue = (ObjectValue) typedValue;
+      return objectValue.isDeserialized() ? objectValue.getValue() : objectValue.getValueSerialized();
+    } else {
+      return typedValue.getValue();
+    }
+  }
+
+  private Map<String, Object> createMixedTypeVariableMap() {
+    Map<String, Object> variables = new HashMap<>();
+    // non binary values
+    variables.put("stringVar", STRING_VARIABLE_DEFAULT_VALUE);
+    variables.put("objVar", OBJECT_VARIABLE_DEFAULT_VALUE);
+    // binary values
+    variables.put("byteVar", BYTE_VARIABLE_DEFAULT_VALUE);
+    variables.put("fileVar", FILE_VARIABLE_DEFAULT_VALUE);
+    return variables;
   }
 
   private VariableMap createVariables(int num) {
@@ -393,7 +444,7 @@ public class GetHistoricVariableUpdatesForOptimizeTest {
     assertThat(variableUpdate.getProcessDefinitionKey()).isEqualTo("process");
     assertThat(variableUpdate.getProcessDefinitionId()).isNotNull();
     assertThat(variableUpdate.getVariableName()).isEqualTo("stringVar");
-    assertThat(variableUpdate.getValue().toString()).isEqualTo("foo");
+    assertThat(variableUpdate.getValue()).hasToString("foo");
     assertThat(variableUpdate.getTypeName()).isEqualTo("string");
     assertThat(variableUpdate.getTime()).isNotNull();
   }

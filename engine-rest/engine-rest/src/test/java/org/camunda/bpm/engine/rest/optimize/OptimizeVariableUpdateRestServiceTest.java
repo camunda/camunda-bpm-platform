@@ -42,6 +42,7 @@ import static io.restassured.path.json.JsonPath.from;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_PRIMITIVE_VARIABLE_VALUE;
 import static org.camunda.bpm.engine.rest.util.DateTimeUtils.DATE_FORMAT_WITH_TIMEZONE;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -71,7 +72,7 @@ public class OptimizeVariableUpdateRestServiceTest extends AbstractRestServiceTe
     mockedOptimizeService = mock(OptimizeService.class);
     ProcessEngineConfigurationImpl mockedConfig = mock(ProcessEngineConfigurationImpl.class);
 
-    when(mockedOptimizeService.getHistoricVariableUpdates(any(Date.class), any(Date.class), anyInt())).thenReturn(Arrays.asList(historicUpdateMock));
+    when(mockedOptimizeService.getHistoricVariableUpdates(any(Date.class), any(Date.class), anyBoolean(), anyInt())).thenReturn(Arrays.asList(historicUpdateMock));
 
     namedProcessEngine = getProcessEngine(MockProvider.EXAMPLE_PROCESS_ENGINE_NAME);
     when(namedProcessEngine.getProcessEngineConfiguration()).thenReturn(mockedConfig);
@@ -88,7 +89,7 @@ public class OptimizeVariableUpdateRestServiceTest extends AbstractRestServiceTe
     .when()
       .get(OPTIMIZE_VARIABLE_UPDATE_PATH);
 
-    verify(mockedOptimizeService).getHistoricVariableUpdates(null, null, Integer.MAX_VALUE);
+    verify(mockedOptimizeService).getHistoricVariableUpdates(null, null, false, Integer.MAX_VALUE);
     verifyNoMoreInteractions(mockedOptimizeService);
   }
 
@@ -104,7 +105,7 @@ public class OptimizeVariableUpdateRestServiceTest extends AbstractRestServiceTe
     .when()
       .get(OPTIMIZE_VARIABLE_UPDATE_PATH);
 
-    verify(mockedOptimizeService).getHistoricVariableUpdates(now, null, Integer.MAX_VALUE);
+    verify(mockedOptimizeService).getHistoricVariableUpdates(now, null, false, Integer.MAX_VALUE);
     verifyNoMoreInteractions(mockedOptimizeService);
   }
 
@@ -120,7 +121,22 @@ public class OptimizeVariableUpdateRestServiceTest extends AbstractRestServiceTe
     .when()
       .get(OPTIMIZE_VARIABLE_UPDATE_PATH);
 
-    verify(mockedOptimizeService).getHistoricVariableUpdates(null, now, Integer.MAX_VALUE);
+    verify(mockedOptimizeService).getHistoricVariableUpdates(null, now, false, Integer.MAX_VALUE);
+    verifyNoMoreInteractions(mockedOptimizeService);
+  }
+
+  @Test
+  public void testExcludeObjectValuesQueryParameter() {
+    given()
+      .queryParam("excludeObjectValues", true)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(MediaType.APPLICATION_JSON)
+    .when()
+      .get(OPTIMIZE_VARIABLE_UPDATE_PATH);
+
+    verify(mockedOptimizeService).getHistoricVariableUpdates(null, null, true, Integer.MAX_VALUE);
     verifyNoMoreInteractions(mockedOptimizeService);
   }
 
@@ -135,7 +151,7 @@ public class OptimizeVariableUpdateRestServiceTest extends AbstractRestServiceTe
     .when()
       .get(OPTIMIZE_VARIABLE_UPDATE_PATH);
 
-    verify(mockedOptimizeService).getHistoricVariableUpdates(null, null, 10);
+    verify(mockedOptimizeService).getHistoricVariableUpdates(null, null, false, 10);
     verifyNoMoreInteractions(mockedOptimizeService);
   }
 
@@ -145,6 +161,7 @@ public class OptimizeVariableUpdateRestServiceTest extends AbstractRestServiceTe
     given()
       .queryParam("occurredAfter", DATE_FORMAT_WITH_TIMEZONE.format(now))
       .queryParam("occurredAt", DATE_FORMAT_WITH_TIMEZONE.format(now))
+      .queryParam("excludeObjectValues", true)
       .queryParam("maxResults", 10)
     .then()
       .expect()
@@ -153,7 +170,7 @@ public class OptimizeVariableUpdateRestServiceTest extends AbstractRestServiceTe
     .when()
       .get(OPTIMIZE_VARIABLE_UPDATE_PATH);
 
-    verify(mockedOptimizeService).getHistoricVariableUpdates(now, now, 10);
+    verify(mockedOptimizeService).getHistoricVariableUpdates(now, now, true, 10);
     verifyNoMoreInteractions(mockedOptimizeService);
   }
 
@@ -169,7 +186,7 @@ public class OptimizeVariableUpdateRestServiceTest extends AbstractRestServiceTe
     .when()
       .get(OPTIMIZE_VARIABLE_UPDATE_PATH);
 
-    verify(mockedOptimizeService).getHistoricVariableUpdates(null, null, Integer.MAX_VALUE);
+    verify(mockedOptimizeService).getHistoricVariableUpdates(null, null, false, Integer.MAX_VALUE);
     verifyNoMoreInteractions(mockedOptimizeService);
   }
 
@@ -178,7 +195,7 @@ public class OptimizeVariableUpdateRestServiceTest extends AbstractRestServiceTe
     final HistoricDetailVariableInstanceUpdateEntity mock = mock(HistoricDetailVariableInstanceUpdateEntity.class);
     when(mock.getSequenceCounter()).thenReturn(MockProvider.EXAMPLE_HISTORIC_ACTIVITY_SEQUENCE_COUNTER);
     when(mock.getTypedValue()).thenReturn(EXAMPLE_PRIMITIVE_VARIABLE_VALUE);
-    when(mockedOptimizeService.getHistoricVariableUpdates(null, null, Integer.MAX_VALUE))
+    when(mockedOptimizeService.getHistoricVariableUpdates(null, null, false, Integer.MAX_VALUE))
       .thenReturn(Collections.singletonList(mock));
 
     final Response response = given()
