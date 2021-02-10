@@ -192,74 +192,74 @@ openjdk-14-ce:
   stash:
     runtimeStash: true
   nodeLabel: 'h2'
-  jdkLabel: 'openjdk-jdk-14-latest'
+  jdkVersion: 'openjdk-jdk-14-latest'
 openjdk-13-ce:
   directory: '.'
   command: 'install source:jar source:test-jar -pl ''!webapps'',''!distro/jbossas7/subsystem'' -Pdistro,distro-ce,distro-wildfly'
   stash:
     runtimeStash: true
   nodeLabel: 'h2'
-  jdkLabel: 'openjdk-jdk-13-latest'
+  jdkVersion: 'openjdk-jdk-13-latest'
 openjdk-12-ce:
   directory: '.'
   command: 'install source:jar source:test-jar -pl ''!webapps'',''!distro/jbossas7/subsystem'' -Pdistro,distro-ce,distro-wildfly'
   stash:
     runtimeStash: true
   nodeLabel: 'h2'
-  jdkLabel: 'openjdk-jdk-12-latest'
+  jdkVersion: 'openjdk-jdk-12-latest'
 openjdk-11-ce:
   directory: '.'
   command: 'install source:jar source:test-jar -pl ''!webapps'',''!distro/jbossas7/subsystem'' -Pdistro,distro-ce,distro-wildfly'
   stash:
     runtimeStash: true
   nodeLabel: 'h2'
-  jdkLabel: 'openjdk-jdk-11-latest'
+  jdkVersion: 'openjdk-jdk-11-latest'
 openjdk-8-ce:
   directory: '.'
   command: 'install source:jar source:test-jar -pl ''!webapps'',''!distro/jbossas7/subsystem'' -Pdistro,distro-ce,distro-wildfly'
   stash:
     runtimeStash: true
   nodeLabel: 'h2'
-  jdkLabel: 'openjdk-jdk-8-latest'
+  jdkVersion: 'openjdk-jdk-8-latest'
 jdk-14-ce:
   directory: '.'
   command: 'install source:jar source:test-jar -pl ''!webapps'',''!distro/jbossas7/subsystem'' -Pdistro,distro-ce,distro-wildfly'
   stash:
     runtimeStash: true
   nodeLabel: 'h2'
-  jdkLabel: 'jdk-14-latest'
+  jdkVersion: 'jdk-14-latest'
 jdk-13-ce:
   directory: '.'
   command: 'install source:jar source:test-jar -pl ''!webapps'',''!distro/jbossas7/subsystem'' -Pdistro,distro-ce,distro-wildfly'
   stash:
     runtimeStash: true
   nodeLabel: 'h2'
-  jdkLabel: 'jdk-13-latest'
+  jdkVersion: 'jdk-13-latest'
 jdk-12-ce:
   directory: '.'
   command: 'install source:jar source:test-jar -pl ''!webapps'',''!distro/jbossas7/subsystem'' -Pdistro,distro-ce,distro-wildfly'
   stash:
     runtimeStash: true
   nodeLabel: 'h2'
-  jdkLabel: 'jdk-12-latest'
+  jdkVersion: 'jdk-12-latest'
 jdk-11-ce:
   directory: '.'
   command: 'install source:jar source:test-jar -pl ''!webapps'',''!distro/jbossas7/subsystem'' -Pdistro,distro-ce,distro-wildfly'
   stash:
     runtimeStash: true
   nodeLabel: 'h2'
-  jdkLabel: 'jdk-11-latest'
+  jdkVersion: 'jdk-11-latest'
 jdk-8-ce:
   directory: '.'
   command: 'install source:jar source:test-jar -pl ''!webapps'',''!distro/jbossas7/subsystem'' -Pdistro,distro-ce,distro-wildfly'
   stash:
     runtimeStash: true
   nodeLabel: 'h2'
-  jdkLabel: 'jdk-8-latest'
+  jdkVersion: 'jdk-8-latest'
 ibm-jdk-8-ce:
   directory: '.'
   command: 'install source:jar source:test-jar -pl ''!webapps'',''!distro/jbossas7/subsystem'' -Pdistro,distro-ce,distro-wildfly'
   stash:
     runtimeStash: true
   nodeLabel: 'h2'
-  jdkLabel: 'ibm-jdk-8-latest'
+  jdkVersion: 'ibm-jdk-8-latest'
