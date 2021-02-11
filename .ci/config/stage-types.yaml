@@ -8,6 +8,8 @@
 #     qaStash: [BOOLEAN; OPTIONAL;]
 #     archiveStash: [BOOLEAN; OPTIONAL;]
 #   nodeLabel: [STRING; OPTIONAL; Doc: specifies the node/agent label for this stage, if this type of stage is not combined with a database label ]
+#   jdkVersion: [STRING; OPTIONAL; Doc: specifies the label for the JDK version to be used in this stage. Default is `jdk-8-latest`. ]
+#   withNpm: [BOOLEAN; OPTIONAL; Doc: defines if the stage should set up NodeJS or not. Default is `false`.]
 #   labels: [LIST; OPTIONAL; Doc: defines the PR labels for which this stage type should run. ]
 #   timeout: [MAP; OPTIONAL - default timeout is 3600 seconds; Doc: defines a map containing Job timeouts (in seconds) for each DB type.]
 #     postgresql: [INT; OPTIONAL;]
