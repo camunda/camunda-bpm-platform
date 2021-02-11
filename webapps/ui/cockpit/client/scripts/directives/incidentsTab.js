@@ -21,7 +21,6 @@ var angular = require('angular');
 var fs = require('fs');
 
 var template = fs.readFileSync(__dirname + '/incidents-tab.html', 'utf8');
-var incidentsAnnotationModal = require('./incidentsAnnotationModal');
 var inspectTemplate = fs.readFileSync(
   __dirname + '/incidents-tab-stacktrace.html',
   'utf8'
@@ -41,6 +40,7 @@ var Directive = [
   '$translate',
   'localConf',
   '$location',
+  'camAPI',
   function(
     $http,
     $q,
@@ -50,7 +50,8 @@ var Directive = [
     Views,
     $translate,
     localConf,
-    $location
+    $location,
+    camAPI
   ) {
     var Link = function linkFunction(scope) {
       // ordered available columns
@@ -346,13 +347,14 @@ var Directive = [
         });
       };
 
-      scope.editAnnotation = function(incident) {
-        $modal.open(
-          incidentsAnnotationModal(
-            incident,
-            scope.incidentsContext === 'history'
-          )
-        );
+      const incidentResource = camAPI.resource('incident');
+      scope.getAnnotationHandler = function(incident) {
+        return function(annotation) {
+          return incidentResource.setAnnotation({
+            id: incident.id,
+            annotation
+          });
+        };
       };
 
       if ($location.search().incidentStacktrace) {

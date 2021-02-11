@@ -133,18 +133,11 @@
       </td>
       
       <td class="annotation">
-        <span ng-if="incident.annotation"
-              cam-widget-clipboard="incident.annotation">
-          <span ng-if="incidentsContext !== 'history'" ng-click="editAnnotation(incident)" uib-tooltip="{{'PLGN_AUDIT_EDIT_ANNOTATION' | translate}}" tooltip-placement="top-left">
-            {{incident.annotation}}
-          </span>
-          <span ng-if="incidentsContext === 'history'" ng-click="editAnnotation(incident)" uib-tooltip="{{'PLGN_AUDIT_SHOW_ANNOTATION' | translate}}" tooltip-placement="top-left">
-            {{incident.annotation}}
-          </span>
+        <span cam-annotation-edit 
+              annotation="incident.annotation" 
+              on-submit="getAnnotationHandler(incident)" 
+              readonly="incidentsContext === 'history'">
         </span>
-        <a class="edit" ng-click="editAnnotation(incident)" ng-if="!incident.annotation && incidentsContext !== 'history'" uib-tooltip="{{'PLGN_AUDIT_ADD_ANNOTATION' | translate}}">
-          <span class="glyphicon glyphicon-pencil"></span>
-        </a>
       </td>
 
       <td class="action">

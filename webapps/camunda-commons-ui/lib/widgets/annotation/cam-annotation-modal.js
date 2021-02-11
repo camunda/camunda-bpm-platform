@@ -20,11 +20,11 @@
 var fs = require('fs');
 
 var template = fs.readFileSync(
-  __dirname + '/incidents-tab-annotation.html',
+  __dirname + '/cam-annotation-modal.html',
   'utf8'
 );
 
-module.exports = (incident, readOnly) => {
+module.exports = (annotation, readOnly, callback) => {
   return {
     template,
 
@@ -35,33 +35,17 @@ module.exports = (incident, readOnly) => {
       'camAPI',
       '$translate',
       function($scope, Notifications, configuration, camAPI, $translate) {
-        const incidentResource = camAPI.resource('incident');
         $scope.readOnly = readOnly;
         $scope.maxAnnotationLength = configuration.getUserOperationLogAnnotationLength();
-        $scope.text = incident.annotation || '';
+        $scope.text = annotation || '';
         $scope.dirty = false;
         $scope.valid = true;
 
         $scope.loadingState = 'INITIAL';
 
         $scope.updateAnnotation = () => {
-          incidentResource.setAnnotation(
-            {
-              id: incident.id,
-              annotation: $scope.text
-            },
-            err => {
-              $scope.loadingState = 'DONE';
-              if (err) {
-                Notifications.addError({
-                  status: $translate.instant('ERROR'),
-                  message:
-                    $translate.instant('PLGN_AUDIT_EDIT_NOTIFICATION_FAILURE') +
-                    err,
-                  exclusive: true
-                });
-                return;
-              }
+          callback($scope.text)
+            .then(() => {
               Notifications.addMessage({
                 status: $translate.instant('SUCCESS'),
                 message: $translate.instant(
@@ -69,10 +53,21 @@ module.exports = (incident, readOnly) => {
                 ),
                 exclusive: true
               });
-              incident.annotation = $scope.text;
               $scope.dirty = false;
-            }
-          );
+            })
+            .catch(err => {
+              Notifications.addError({
+                status: $translate.instant('ERROR'),
+                message:
+                  $translate.instant('PLGN_AUDIT_EDIT_NOTIFICATION_FAILURE') +
+                  err,
+                exclusive: true
+              });
+              $scope.text = annotation;
+            })
+            .finally(() => {
+              $scope.loadingState = 'DONE';
+            });
         };
       }
     ]
