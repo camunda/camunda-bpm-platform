@@ -19,7 +19,6 @@ module.exports = function(pluginPoint, scope) {
   let result = {};
 
   switch (pluginPoint) {
-    case 'tasklist.task.action':
     case 'tasklist.task.detail':
     case 'tasklist.card':
       result.taskId = scope.task.id;
