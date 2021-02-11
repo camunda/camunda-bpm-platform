@@ -334,14 +334,14 @@
             </if>
 
             <if test="query.withoutCandidateGroups">
-              ${queryType} RES.ID_ not in (
-              select
-              TASK_ID_
+              ${queryType} not exists (
+              select 1
               from
               ${prefix}ACT_HI_IDENTITYLINK HIL
               <where>
                 HIL.TYPE_ = 'candidate' and HIL.GROUP_ID_ is not null
               </where>
+              AND HIL.TASK_ID_ = RES.ID_
               )
             </if>
 
