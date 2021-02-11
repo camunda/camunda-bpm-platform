@@ -61,6 +61,7 @@ import org.mockito.Matchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 import java.io.*;
 import java.net.URISyntaxException;
@@ -3939,6 +3940,29 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     .then().expect()
     .statusCode(Status.OK.getStatusCode())
     .body(equalTo("Test"))
+    .contentType(MediaType.APPLICATION_XHTML_XML)
+    .when()
+    .get(DEPLOYED_START_FORM_URL);
+
+    verify(formServiceMock).getDeployedStartForm(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+  }
+
+  @Test
+  public void testGetDeployedStartFormJson() {
+    InputStream deployedStartFormMock = new ByteArrayInputStream("Test".getBytes());
+    StartFormData mockedStartFormData = mock(StartFormData.class);
+    when(mockedStartFormData.getFormKey()).thenReturn("test.json");
+    when(formServiceMock.getDeployedStartForm(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
+        .thenReturn(deployedStartFormMock);
+    when(formServiceMock.getStartFormData(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
+        .thenReturn(mockedStartFormData);
+
+    given()
+    .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+    .then().expect()
+    .statusCode(Status.OK.getStatusCode())
+    .body(equalTo("Test"))
+    .contentType(MediaType.APPLICATION_JSON)
     .when()
     .get(DEPLOYED_START_FORM_URL);
 

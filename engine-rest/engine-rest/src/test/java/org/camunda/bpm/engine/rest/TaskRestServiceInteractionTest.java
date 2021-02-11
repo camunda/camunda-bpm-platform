@@ -3249,6 +3249,27 @@ public class TaskRestServiceInteractionTest extends
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
       .body(equalTo("Test"))
+      .contentType(MediaType.APPLICATION_XHTML_XML)
+    .when()
+      .get(DEPLOYED_TASK_FORM_URL);
+
+    verify(formServiceMock).getDeployedTaskForm(MockProvider.EXAMPLE_TASK_ID);
+  }
+
+  @Test
+  public void testGetDeployedTaskFormJson() {
+    InputStream deployedFormMock = new ByteArrayInputStream("Test".getBytes());
+    TaskFormData mockedTaskFormData = mock(TaskFormData.class);
+    when(mockedTaskFormData.getFormKey()).thenReturn("test.json");
+    when(formServiceMock.getDeployedTaskForm(anyString())).thenReturn(deployedFormMock);
+    when(formServiceMock.getTaskFormData(anyString())).thenReturn(mockedTaskFormData);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body(equalTo("Test"))
+      .contentType(MediaType.APPLICATION_JSON)
     .when()
       .get(DEPLOYED_TASK_FORM_URL);
 

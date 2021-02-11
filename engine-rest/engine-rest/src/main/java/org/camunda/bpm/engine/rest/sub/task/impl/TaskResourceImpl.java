@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
@@ -39,6 +40,7 @@ import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.form.FormData;
+import org.camunda.bpm.engine.impl.form.validator.FormFieldValidationException;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
@@ -58,11 +60,11 @@ import org.camunda.bpm.engine.rest.sub.task.TaskAttachmentResource;
 import org.camunda.bpm.engine.rest.sub.task.TaskCommentResource;
 import org.camunda.bpm.engine.rest.sub.task.TaskResource;
 import org.camunda.bpm.engine.rest.util.ApplicationContextPathUtil;
+import org.camunda.bpm.engine.rest.util.ContentTypeUtil;
 import org.camunda.bpm.engine.rest.util.EncodingUtil;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.variable.VariableMap;
-import org.camunda.bpm.engine.impl.form.validator.FormFieldValidationException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -131,6 +133,7 @@ public class TaskResourceImpl implements TaskResource {
     }
   }
 
+  @Override
   public Response submit(CompleteTaskDto dto) {
     FormService formService = engine.getFormService();
 
@@ -172,6 +175,7 @@ public class TaskResourceImpl implements TaskResource {
     engine.getTaskService().delegateTask(taskId, delegatedUser.getUserId());
   }
 
+  @Override
   public Object getTask(Request request) {
     Variant variant = request.selectVariant(VARIANTS);
     if (variant != null) {
@@ -232,10 +236,7 @@ public class TaskResourceImpl implements TaskResource {
     // -> running the following lines with authorization would lead
     // to an AuthorizationException because the user 'demo' does not
     // have READ permission on the corresponding process definition
-    IdentityService identityService = engine.getIdentityService();
-    Authentication currentAuthentication = identityService.getCurrentAuthentication();
-    try {
-      identityService.clearAuthentication();
+    runWithoutAuthorization(() -> {
       String processDefinitionId = task.getProcessDefinitionId();
       String caseDefinitionId = task.getCaseDefinitionId();
       if (processDefinitionId != null) {
@@ -244,13 +245,13 @@ public class TaskResourceImpl implements TaskResource {
       } else if (caseDefinitionId != null) {
         dto.setContextPath(ApplicationContextPathUtil.getApplicationPathByCaseDefinitionId(engine, caseDefinitionId));
       }
-    } finally {
-      identityService.setAuthentication(currentAuthentication);
-    }
+      return null;
+    });
 
     return dto;
   }
 
+  @Override
   public Response getRenderedForm() {
     FormService formService = engine.getFormService();
 
@@ -281,17 +282,6 @@ public class TaskResourceImpl implements TaskResource {
 
     }
 
-  }
-
-
-  /**
-   * Returns the task with the given id
-   *
-   * @param id
-   * @return
-   */
-  protected Task getTaskById(String id) {
-    return engine.getTaskService().createTaskQuery().taskId(id).initializeFormKeys().singleResult();
   }
 
   public void setAssignee(UserIdDto dto) {
@@ -400,9 +390,9 @@ public class TaskResourceImpl implements TaskResource {
 
   @Override
   public Response getDeployedForm() {
-    InputStream deployedTaskForm = null;
     try {
-      deployedTaskForm = engine.getFormService().getDeployedTaskForm(taskId);
+      InputStream deployedTaskForm = engine.getFormService().getDeployedTaskForm(taskId);
+      return Response.ok(deployedTaskForm, getTaskFormMediaType(taskId)).build();
     } catch (NotFoundException e) {
       throw new InvalidRequestException(Status.NOT_FOUND, e.getMessage());
     } catch (NullValueException e) {
@@ -412,7 +402,6 @@ public class TaskResourceImpl implements TaskResource {
     } catch (BadUserRequestException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
     }
-    return Response.ok(deployedTaskForm, MediaType.APPLICATION_XHTML_XML).build();
   }
 
   @Override
@@ -439,6 +428,31 @@ public class TaskResourceImpl implements TaskResource {
       throw new RestException(Status.NOT_FOUND, e, "Task with id " + taskId + " does not exist");
     } catch (BadUserRequestException e) {
       throw new RestException(Status.BAD_REQUEST, e, e.getMessage());
+    }
+  }
+
+  protected Task getTaskById(String id) {
+    return engine.getTaskService().createTaskQuery().taskId(id).initializeFormKeys().singleResult();
+  }
+
+  protected String getTaskFormMediaType(String taskId) {
+    // retrieving the form data can require permission to the task variables which is not necessary
+    // for retrieving the deployed form data that uses this method here - we should not enforce
+    // this permission requirement on the user to retrieve the correct content type
+    String formKey = runWithoutAuthorization(() -> engine.getFormService().getTaskFormData(taskId).getFormKey());
+    return ContentTypeUtil.getFormContentType(formKey);
+  }
+
+  protected <V extends Object> V runWithoutAuthorization(Supplier<V> action) {
+    IdentityService identityService = engine.getIdentityService();
+    Authentication currentAuthentication = identityService.getCurrentAuthentication();
+    try {
+      identityService.clearAuthentication();
+      return action.get();
+    } catch (Exception e) {
+      throw e;
+    } finally {
+      identityService.setAuthentication(currentAuthentication);
     }
   }
 
