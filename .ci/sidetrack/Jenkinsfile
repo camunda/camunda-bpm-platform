@@ -78,7 +78,9 @@ pipeline {
     stage('UNIT DB tests') {
       steps {
         script {
-          // TODO: check stage
+          // see #shouldTrigger() at the beginning of the file
+          // see the .ci/config/matrices.yaml for the stage generation values
+          // see .ci/config/stage-types.yaml for the stage configurations
           parallel(cambpmGetMatrixStages('sidetrack-stages', [], { stageInfo ->
             return shouldTrigger(stageInfo.stageType)
           }))
