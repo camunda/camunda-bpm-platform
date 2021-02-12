@@ -925,7 +925,7 @@ public class TelemetryReporterTest {
     // then
     List<ILoggingEvent> warningLog = loggingRule.getFilteredLog("Could not send telemetry data. ");
     assertThat(warningLog.size()).isOne();
-    assertThat(warningLog.get(0).toString().contains("Set this logger to DEBUG/FINE for the full stacktrace.")).isTrue();
+    assertThat(warningLog.get(0).toString()).contains("Set this logger to DEBUG/FINE for the full stacktrace.");
     assertThat(loggingRule.getFilteredLog("java.lang.NullPointerException occurred while sending telemetry data.").size()).isOne();
   }
 
