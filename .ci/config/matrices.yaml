@@ -74,3 +74,30 @@ daily-stages:
   - 'old-engine'
   - 'rolling-update'
   - 'large-data-tests'
+sidetrack-stages:
+  databases:
+  - 'cockroachdb_201'
+  stages:
+  - 'engine-unit'
+  - 'engine-unit-authorizations'
+  - 'webapp-unit'
+  - 'webapp-unit-authorizations'
+  - 'sql-scripts'
+  - 'upgrade-database'
+  - 'instance-migration'
+  - 'old-engine'
+  - 'rolling-update'
+  - 'large-data-tests'
+jdk-ce-stages:
+  stages:
+  - 'platform-jdk-openjdk-jdk-14-latest'
+  - 'platform-jdk-openjdk-jdk-13-latest'
+  - 'platform-jdk-openjdk-jdk-12-latest'
+  - 'platform-jdk-openjdk-jdk-11-latest'
+  - 'platform-jdk-openjdk-jdk-8-latest'
+  - 'platform-jdk-jdk-14-latest'
+  - 'platform-jdk-jdk-13-latest'
+  - 'platform-jdk-jdk-12-latest'
+  - 'platform-jdk-jdk-11-latest'
+  - 'platform-jdk-jdk-8-latest'
+  - 'platform-jdk-ibm-jdk-8-latest'

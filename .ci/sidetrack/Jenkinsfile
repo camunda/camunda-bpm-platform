@@ -76,42 +76,14 @@ pipeline {
       }
     }
     stage('UNIT DB tests') {
-      matrix {
-        axes {
-          axis {
-            name 'DB'
-            values 'cockroachdb_201'
-          }
-          axis {
-            name 'STAGE_TYPE'
-            values 'engine-unit', 'engine-unit-authorizations', 'webapp-unit', 'webapp-unit-authorizations', 'sql-scripts', 'upgrade-database', 'instance-migration', 'old-engine', 'rolling-update', 'large-data-tests'
-          }
-        }
-        when {
-          // execute after agent is created
-          expression {
-            shouldTrigger(env.STAGE_TYPE)
-          }
-        }
-        stages {
-          stage('UNIT test') {
-            steps {
-              cambpmConditionalRetry([
-                agentLabel: env.DB,
-                runSteps: {
-                  echo("UNIT DB Test Stage: ${env.STAGE_TYPE}-${env.DB}")
-                  cambpmRunMavenByStageType(env.STAGE_TYPE, env.DB)
-                },
-                postAlways: {
-                  script {
-                    if (!env.STAGE_TYPE.equals('sql-scripts')) {
-                      cambpmPublishTestResult();
-                    }
-                  }
-                }
-              ])
-            }
-          }
+      steps {
+        script {
+          // see #shouldTrigger() at the beginning of the file
+          // see the .ci/config/matrices.yaml for the stage generation values
+          // see .ci/config/stage-types.yaml for the stage configurations
+          parallel(cambpmGetMatrixStages('sidetrack-stages', [], { stageInfo ->
+            return shouldTrigger(stageInfo.stageType)
+          }))
         }
       }
     }
