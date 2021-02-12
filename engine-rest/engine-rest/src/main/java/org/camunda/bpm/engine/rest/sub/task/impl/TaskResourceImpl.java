@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.rest.sub.task.impl;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -436,10 +438,13 @@ public class TaskResourceImpl implements TaskResource {
   }
 
   protected String getTaskFormMediaType(String taskId) {
-    // retrieving the form data can require permission to the task variables which is not necessary
-    // for retrieving the deployed form data that uses this method here - we should not enforce
-    // this permission requirement on the user to retrieve the correct content type
-    String formKey = runWithoutAuthorization(() -> engine.getFormService().getTaskFormData(taskId).getFormKey());
+    // retrieving the task and the form key can require additional permissions (e.g. READ on ProcessDefinition)
+    // that we should not force on the user additionally just to retrieve the correct content type
+    String formKey = runWithoutAuthorization(() -> {
+      Task task = engine.getTaskService().createTaskQuery().taskId(taskId).singleResult();
+      ensureNotNull("No task found for taskId '" + taskId + "'", "task", task);
+      return engine.getFormService().getTaskFormKey(task.getProcessDefinitionId(), task.getTaskDefinitionKey());
+    });
     return ContentTypeUtil.getFormContentType(formKey);
   }
 

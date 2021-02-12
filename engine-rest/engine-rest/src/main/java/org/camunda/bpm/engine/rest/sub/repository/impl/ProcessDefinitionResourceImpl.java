@@ -433,7 +433,7 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
   public Response getDeployedStartForm() {
     try {
       InputStream deployedStartForm = engine.getFormService().getDeployedStartForm(processDefinitionId);
-      String formKey = engine.getFormService().getStartFormData(processDefinitionId).getFormKey();
+      String formKey = engine.getFormService().getStartFormKey(processDefinitionId);
       return Response.ok(deployedStartForm, ContentTypeUtil.getFormContentType(formKey)).build();
     } catch (NotFoundException e) {
       throw new InvalidRequestException(Status.NOT_FOUND, e.getMessage());

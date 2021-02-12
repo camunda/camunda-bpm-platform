@@ -174,11 +174,13 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     formServiceMock = mock(FormService.class);
     when(processEngine.getFormService()).thenReturn(formServiceMock);
     when(formServiceMock.getStartFormData(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))).thenReturn(formDataMock);
+    when(formServiceMock.getStartFormKey(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))).thenReturn(MockProvider.EXAMPLE_FORM_KEY);
     when(formServiceMock.submitStartForm(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID),  Matchers.<Map<String, Object>>any())).thenReturn(mockInstance);
     when(formServiceMock.submitStartForm(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID),  anyString(), Matchers.<Map<String, Object>>any())).thenReturn(mockInstance);
 
     VariableMap startFormVariablesMock = MockProvider.createMockFormVariables();
     when(formServiceMock.getStartFormVariables(eq(EXAMPLE_PROCESS_DEFINITION_ID), Matchers.<Collection<String>>any(), anyBoolean())).thenReturn(startFormVariablesMock);
+
   }
 
   private InputStream createMockProcessDefinionBpmn20Xml() {
@@ -517,7 +519,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
         .variable("anotherVariable", 42)
         .variable("aThirdValue", Boolean.TRUE).getVariables();
 
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put("variables", variables);
 
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -531,7 +533,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
         .body("suspended", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED))
       .when().post(SUBMIT_FORM_URL);
 
-    Map<String, Object> expectedVariables = new HashMap<String, Object>();
+    Map<String, Object> expectedVariables = new HashMap<>();
     expectedVariables.put("aVariable", "aStringValue");
     expectedVariables.put("anotherVariable", 42);
     expectedVariables.put("aThirdValue", Boolean.TRUE);
@@ -549,7 +551,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
         .variable("aSerializedVariable", ValueType.OBJECT.getName(), jsonValue, "aFormat", "aRootType")
         .getVariables();
 
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put("variables", variables);
 
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -581,7 +583,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
         .variable("aVariable", Base64.encodeBase64String("someBytes".getBytes()), ValueType.BYTES.getName())
         .getVariables();
 
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put("variables", variables);
 
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -603,7 +605,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testSubmitStartFormWithBusinessKey() {
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put("businessKey", "myBusinessKey");
 
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -622,7 +624,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testSubmitStartFormWithBusinessKeyAndParameters() {
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put("businessKey", "myBusinessKey");
 
     Map<String, Object> variables = VariablesBuilder.create()
@@ -643,7 +645,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
         .body("suspended", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED))
       .when().post(SUBMIT_FORM_URL);
 
-    Map<String, Object> expectedVariables = new HashMap<String, Object>();
+    Map<String, Object> expectedVariables = new HashMap<>();
     expectedVariables.put("aVariable", "aStringValue");
     expectedVariables.put("anotherVariable", 42);
     expectedVariables.put("aThirdValue", Boolean.TRUE);
@@ -659,7 +661,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
     Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("variables", variableJson);
 
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -680,7 +682,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
     Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("variables", variableJson);
 
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -701,7 +703,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
     Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("variables", variableJson);
 
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -722,7 +724,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
     Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("variables", variableJson);
 
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -743,7 +745,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
     Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("variables", variableJson);
 
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -764,7 +766,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
     Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("variables", variableJson);
 
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -917,11 +919,11 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     when(runtimeServiceMock.createProcessInstanceById(anyString())).thenReturn(mockInstantiationBuilder);
 
     //given request with parameter withVariables to get variables in return
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put("withVariablesInReturn", true);
 
     //when request then return process instance with serialized variables
-    Response response = given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
             .contentType(POST_JSON_CONTENT_TYPE).body(json)
             .then().expect()
             .statusCode(Status.OK.getStatusCode())
@@ -958,7 +960,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
         .variable("aString", "aStringVariableValue")
         .variable("anInteger", 42).getVariables();
 
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put("variables", parameters);
 
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -968,7 +970,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
         .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
       .when().post(START_PROCESS_INSTANCE_URL);
 
-    Map<String, Object> expectedParameters = new HashMap<String, Object>();
+    Map<String, Object> expectedParameters = new HashMap<>();
     expectedParameters.put("aBoolean", Boolean.TRUE);
     expectedParameters.put("aString", "aStringVariableValue");
     expectedParameters.put("anInteger", 42);
@@ -980,7 +982,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testProcessInstantiationWithBusinessKey() throws IOException {
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put("businessKey", "myBusinessKey");
 
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -997,7 +999,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testProcessInstantiationWithBusinessKeyAndParameters() throws IOException {
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put("businessKey", "myBusinessKey");
 
     Map<String, Object> parameters = VariablesBuilder.create()
@@ -1014,7 +1016,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
         .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
       .when().post(START_PROCESS_INSTANCE_URL);
 
-    Map<String, Object> expectedParameters = new HashMap<String, Object>();
+    Map<String, Object> expectedParameters = new HashMap<>();
     expectedParameters.put("aBoolean", Boolean.TRUE);
     expectedParameters.put("aString", "aStringVariableValue");
     expectedParameters.put("anInteger", 42);
@@ -1027,7 +1029,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testProcessInstantiationWithTransientVariables() throws IOException {
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
 
     json.put("variables", VariablesBuilder.create().variableTransient("foo", "bar", "string").getVariables());
 
@@ -1058,13 +1060,13 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
   @Test
   public void testProcessInstantiationAtActivitiesById() {
 
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put("variables", VariablesBuilder.create()
         .variable("processVariable", "aString", "String").getVariables());
     json.put("businessKey", "aBusinessKey");
     json.put("caseInstanceId", "aCaseInstanceId");
 
-    List<Map<String, Object>> startInstructions = new ArrayList<Map<String, Object>>();
+    List<Map<String, Object>> startInstructions = new ArrayList<>();
 
     startInstructions.add(
         ModificationInstructionBuilder.startBefore()
@@ -1133,7 +1135,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
   @Test
   public void testProcessInstantiationAtActivitiesByIdWithVariablesInReturn() {
     //set up variables and parameters
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put("variables", VariablesBuilder.create()
         .variable("processVariable", "aString", "String").getVariables());
     json.put("businessKey", "aBusinessKey");
@@ -1153,7 +1155,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     when(runtimeServiceMock.createProcessInstanceById(anyString())).thenReturn(mockInstantiationBuilder);
 
     //create instructions
-    List<Map<String, Object>> startInstructions = new ArrayList<Map<String, Object>>();
+    List<Map<String, Object>> startInstructions = new ArrayList<>();
 
     startInstructions.add(
         ModificationInstructionBuilder.startBefore()
@@ -1207,13 +1209,13 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     ProcessInstantiationBuilder mockInstantiationBuilder = setUpMockInstantiationBuilder();
     when(runtimeServiceMock.createProcessInstanceById(anyString())).thenReturn(mockInstantiationBuilder);
 
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put("variables", VariablesBuilder.create()
         .variable("processVariable", "aString", "String").getVariables());
     json.put("businessKey", "aBusinessKey");
     json.put("caseInstanceId", "aCaseInstanceId");
 
-    List<Map<String, Object>> startInstructions = new ArrayList<Map<String, Object>>();
+    List<Map<String, Object>> startInstructions = new ArrayList<>();
 
     startInstructions.add(
         ModificationInstructionBuilder.startBefore()
@@ -1284,9 +1286,9 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     ProcessInstantiationBuilder mockInstantiationBuilder = setUpMockInstantiationBuilder();
     when(runtimeServiceMock.createProcessInstanceById(anyString())).thenReturn(mockInstantiationBuilder);
 
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
 
-    List<Map<String, Object>> startInstructions = new ArrayList<Map<String, Object>>();
+    List<Map<String, Object>> startInstructions = new ArrayList<>();
 
     startInstructions.add(
         ModificationInstructionBuilder.startBefore()
@@ -1319,10 +1321,10 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     ProcessInstantiationBuilder mockInstantiationBuilder = setUpMockInstantiationBuilder();
     when(runtimeServiceMock.createProcessInstanceById(anyString())).thenReturn(mockInstantiationBuilder);
 
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
 
     // start before: missing activity id
-    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+    List<Map<String, Object>> instructions = new ArrayList<>();
     instructions.add(ModificationInstructionBuilder.startBefore().getJson());
     json.put("startInstructions", instructions);
 
@@ -1339,7 +1341,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
       .post(START_PROCESS_INSTANCE_URL);
 
     // start after: missing ancestor activity instance id
-    instructions = new ArrayList<Map<String, Object>>();
+    instructions = new ArrayList<>();
     instructions.add(ModificationInstructionBuilder.startAfter().getJson());
     json.put("startInstructions", instructions);
 
@@ -1356,7 +1358,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
       .post(START_PROCESS_INSTANCE_URL);
 
     // start transition: missing ancestor activity instance id
-    instructions = new ArrayList<Map<String, Object>>();
+    instructions = new ArrayList<>();
     instructions.add(ModificationInstructionBuilder.startTransition().getJson());
     json.put("startInstructions", instructions);
 
@@ -1862,7 +1864,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
     Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("variables", variableJson);
 
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -1883,7 +1885,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
     Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("variables", variableJson);
 
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -1904,7 +1906,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
     Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("variables", variableJson);
 
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -1925,7 +1927,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
     Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("variables", variableJson);
 
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -1946,7 +1948,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
     Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("variables", variableJson);
 
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -1967,7 +1969,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
     Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("variables", variableJson);
 
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -1981,7 +1983,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testActivateProcessDefinitionExcludingInstances() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("includeProcessInstances", false);
 
@@ -2000,7 +2002,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testDelayedActivateProcessDefinitionExcludingInstances() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("includeProcessInstances", false);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
@@ -2022,7 +2024,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testActivateProcessDefinitionIncludingInstances() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("includeProcessInstances", true);
 
@@ -2041,7 +2043,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testDelayedActivateProcessDefinitionIncludingInstances() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("includeProcessInstances", true);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
@@ -2063,7 +2065,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testActivateThrowsProcessEngineException() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("includeProcessInstances", false);
 
@@ -2088,7 +2090,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testActivateNonParseableDateFormat() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("includeProcessInstances", false);
     params.put("executionDate", "a");
@@ -2111,7 +2113,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testActivateProcessDefinitionThrowsAuthorizationException() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
 
     String message = "expected exception";
@@ -2132,7 +2134,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testSuspendProcessDefinitionExcludingInstances() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("includeProcessInstances", false);
 
@@ -2151,7 +2153,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testDelayedSuspendProcessDefinitionExcludingInstances() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("includeProcessInstances", false);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
@@ -2173,7 +2175,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testSuspendProcessDefinitionIncludingInstances() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("includeProcessInstances", true);
 
@@ -2192,7 +2194,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testDelayedSuspendProcessDefinitionIncludingInstances() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("includeProcessInstances", true);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
@@ -2214,7 +2216,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testSuspendThrowsProcessEngineException() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("includeProcessInstances", false);
 
@@ -2239,7 +2241,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testSuspendNonParseableDateFormat() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("includeProcessInstances", false);
     params.put("executionDate", "a");
@@ -2262,7 +2264,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testSuspendWithMultipleByParameters() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
 
@@ -2283,7 +2285,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testSuspendProcessDefinitionThrowsAuthorizationException() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
 
     String message = "expected exception";
@@ -2304,7 +2306,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testActivateProcessDefinitionByKey() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
 
@@ -2322,7 +2324,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testActivateProcessDefinitionByKeyIncludingInstaces() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("includeProcessInstances", true);
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
@@ -2341,7 +2343,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testDelayedActivateProcessDefinitionByKey() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
@@ -2362,7 +2364,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testDelayedActivateProcessDefinitionByKeyIncludingInstaces() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("includeProcessInstances", true);
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
@@ -2384,7 +2386,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testActivateProcessDefinitionByKeyWithUnparseableDate() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
     params.put("executionDate", "a");
@@ -2405,7 +2407,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testActivateProcessDefinitionByKeyWithException() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
 
@@ -2428,7 +2430,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testActivateProcessDefinitionByKeyThrowsAuthorizationException() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
 
@@ -2449,7 +2451,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testSuspendProcessDefinitionByKey() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
 
@@ -2467,7 +2469,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testSuspendProcessDefinitionByKeyIncludingInstaces() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("includeProcessInstances", true);
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
@@ -2486,7 +2488,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testDelayedSuspendProcessDefinitionByKey() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
@@ -2507,7 +2509,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testDelayedSuspendProcessDefinitionByKeyIncludingInstaces() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("includeProcessInstances", true);
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
@@ -2529,7 +2531,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testSuspendProcessDefinitionByKeyWithUnparseableDate() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
     params.put("executionDate", "a");
@@ -2550,7 +2552,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testSuspendProcessDefinitionByKeyWithException() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
 
@@ -2573,7 +2575,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testSuspendProcessDefinitionByKeyThrowsAuthorizationException() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
 
@@ -2594,7 +2596,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testActivateProcessDefinitionByIdShouldThrowException() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
 
@@ -2614,7 +2616,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testActivateProcessDefinitionByNothing() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
 
     String message = "Either processDefinitionId or processDefinitionKey should be set to update the suspension state.";
@@ -2633,7 +2635,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testSuspendProcessDefinitionByIdShouldThrowException() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
 
@@ -2653,7 +2655,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testSuspendProcessDefinitionByNothing() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
 
     String message = "Either processDefinitionId or processDefinitionKey should be set to update the suspension state.";
@@ -2672,7 +2674,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testSuspendProcessDefinitionThrowsAuthorizationExcpetion() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
 
     String message = "Either processDefinitionId or processDefinitionKey should be set to update the suspension state.";
@@ -2862,7 +2864,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
         .variable("anotherVariable", 42)
         .variable("aThirdValue", Boolean.TRUE).getVariables();
 
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put("variables", variables);
 
     given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
@@ -2876,7 +2878,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
         .body("suspended", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED))
       .when().post(SUBMIT_FORM_BY_KEY_URL);
 
-    Map<String, Object> expectedVariables = new HashMap<String, Object>();
+    Map<String, Object> expectedVariables = new HashMap<>();
     expectedVariables.put("aVariable", "aStringValue");
     expectedVariables.put("anotherVariable", 42);
     expectedVariables.put("aThirdValue", Boolean.TRUE);
@@ -2886,7 +2888,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testSubmitStartFormWithBusinessKey_ByKey() {
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put("businessKey", "myBusinessKey");
 
     given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
@@ -2905,7 +2907,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testSubmitStartFormWithBusinessKeyAndParameters_ByKey() {
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put("businessKey", "myBusinessKey");
 
     Map<String, Object> variables = VariablesBuilder.create()
@@ -2926,7 +2928,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
         .body("suspended", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED))
       .when().post(SUBMIT_FORM_BY_KEY_URL);
 
-    Map<String, Object> expectedVariables = new HashMap<String, Object>();
+    Map<String, Object> expectedVariables = new HashMap<>();
     expectedVariables.put("aVariable", "aStringValue");
     expectedVariables.put("anotherVariable", 42);
     expectedVariables.put("aThirdValue", Boolean.TRUE);
@@ -2942,7 +2944,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
     Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("variables", variableJson);
 
     given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
@@ -2963,7 +2965,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
     Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("variables", variableJson);
 
     given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
@@ -2984,7 +2986,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
     Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("variables", variableJson);
 
     given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
@@ -3005,7 +3007,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
     Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("variables", variableJson);
 
     given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
@@ -3026,7 +3028,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
     Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("variables", variableJson);
 
     given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
@@ -3047,7 +3049,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
     Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("variables", variableJson);
 
     given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
@@ -3123,7 +3125,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
         .variable("aString", "aStringVariableValue")
         .variable("anInteger", 42).getVariables();
 
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put("variables", parameters);
 
     given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
@@ -3133,7 +3135,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
         .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
       .when().post(START_PROCESS_INSTANCE_BY_KEY_URL);
 
-    Map<String, Object> expectedParameters = new HashMap<String, Object>();
+    Map<String, Object> expectedParameters = new HashMap<>();
     expectedParameters.put("aBoolean", Boolean.TRUE);
     expectedParameters.put("aString", "aStringVariableValue");
     expectedParameters.put("anInteger", 42);
@@ -3145,7 +3147,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testProcessInstantiationWithBusinessKey_ByKey() throws IOException {
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put("businessKey", "myBusinessKey");
 
     given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
@@ -3162,7 +3164,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testProcessInstantiationWithBusinessKeyAndParameters_ByKey() throws IOException {
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put("businessKey", "myBusinessKey");
 
     Map<String, Object> parameters = VariablesBuilder.create()
@@ -3179,7 +3181,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
         .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
       .when().post(START_PROCESS_INSTANCE_BY_KEY_URL);
 
-    Map<String, Object> expectedParameters = new HashMap<String, Object>();
+    Map<String, Object> expectedParameters = new HashMap<>();
     expectedParameters.put("aBoolean", Boolean.TRUE);
     expectedParameters.put("aString", "aStringVariableValue");
     expectedParameters.put("anInteger", 42);
@@ -3335,7 +3337,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
     Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("variables", variableJson);
 
     given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
@@ -3356,7 +3358,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
     Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("variables", variableJson);
 
     given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
@@ -3377,7 +3379,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
     Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("variables", variableJson);
 
     given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
@@ -3398,7 +3400,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
     Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("variables", variableJson);
 
     given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
@@ -3419,7 +3421,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
     Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("variables", variableJson);
 
     given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
@@ -3440,7 +3442,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
     Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("variables", variableJson);
 
     given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
@@ -3457,7 +3459,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
   public void testUpdateHistoryTimeToLive() {
     given()
         .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
-        .content(new HistoryTimeToLiveDto(5))
+        .body(new HistoryTimeToLiveDto(5))
         .contentType(ContentType.JSON)
         .then().expect()
           .statusCode(Status.NO_CONTENT.getStatusCode())
@@ -3471,7 +3473,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
   public void testUpdateHistoryTimeToLiveNullValue() {
     given()
         .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
-        .content(new HistoryTimeToLiveDto())
+        .body(new HistoryTimeToLiveDto())
         .contentType(ContentType.JSON)
         .then().expect()
           .statusCode(Status.NO_CONTENT.getStatusCode())
@@ -3491,7 +3493,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
     given()
         .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
-        .content(new HistoryTimeToLiveDto(-1))
+        .body(new HistoryTimeToLiveDto(-1))
         .contentType(ContentType.JSON)
         .then().expect()
           .statusCode(Status.BAD_REQUEST.getStatusCode())
@@ -3513,7 +3515,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
     given()
         .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
-        .content(new HistoryTimeToLiveDto(5))
+        .body(new HistoryTimeToLiveDto(5))
         .contentType(ContentType.JSON)
         .then().expect()
         .statusCode(Status.FORBIDDEN.getStatusCode())
@@ -3527,7 +3529,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testActivateProcessDefinitionExcludingInstances_ByKey() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("includeProcessInstances", false);
 
@@ -3546,7 +3548,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testDelayedActivateProcessDefinitionExcludingInstances_ByKey() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("includeProcessInstances", false);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
@@ -3568,7 +3570,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testActivateProcessDefinitionIncludingInstances_ByKey() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("includeProcessInstances", true);
 
@@ -3587,7 +3589,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testDelayedActivateProcessDefinitionIncludingInstances_ByKey() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("includeProcessInstances", true);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
@@ -3609,7 +3611,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testActivateThrowsProcessEngineException_ByKey() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("includeProcessInstances", false);
 
@@ -3634,7 +3636,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testActivateNonParseableDateFormat_ByKey() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("includeProcessInstances", false);
     params.put("executionDate", "a");
@@ -3657,7 +3659,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testActivateProcessDefinitionThrowsAuthorizationException_ByKey() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
 
     String message = "expected exception";
@@ -3678,7 +3680,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testSuspendProcessDefinitionExcludingInstances_ByKey() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("includeProcessInstances", false);
 
@@ -3697,7 +3699,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testDelayedSuspendProcessDefinitionExcludingInstances_ByKey() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("includeProcessInstances", false);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
@@ -3719,7 +3721,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testSuspendProcessDefinitionIncludingInstances_ByKey() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("includeProcessInstances", true);
 
@@ -3740,7 +3742,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testDelayedSuspendProcessDefinitionIncludingInstances_ByKey() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("includeProcessInstances", true);
     params.put("executionDate", MockProvider.EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION);
@@ -3762,7 +3764,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testSuspendThrowsProcessEngineException_ByKey() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("includeProcessInstances", false);
 
@@ -3787,7 +3789,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testSuspendNonParseableDateFormat_ByKey() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("includeProcessInstances", false);
     params.put("executionDate", "a");
@@ -3810,7 +3812,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testSuspendProcessDefinitionThrowsAuthorizationException_ByKey() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
 
     String message = "expected exception";
@@ -3831,7 +3833,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testProcessInstantiationWithCaseInstanceId() throws IOException {
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put("caseInstanceId", "myCaseInstanceId");
 
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -3848,7 +3850,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testProcessInstantiationWithCaseInstanceIdAndBusinessKey() throws IOException {
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put("caseInstanceId", "myCaseInstanceId");
     json.put("businessKey", "myBusinessKey");
 
@@ -3867,7 +3869,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testProcessInstantiationWithCaseInstanceIdAndBusinessKeyAndParameters() throws IOException {
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put("caseInstanceId", "myCaseInstanceId");
     json.put("businessKey", "myBusinessKey");
 
@@ -3885,7 +3887,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
         .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
       .when().post(START_PROCESS_INSTANCE_URL);
 
-    Map<String, Object> expectedParameters = new HashMap<String, Object>();
+    Map<String, Object> expectedParameters = new HashMap<>();
     expectedParameters.put("aBoolean", Boolean.TRUE);
     expectedParameters.put("aString", "aStringVariableValue");
     expectedParameters.put("anInteger", 42);
@@ -3950,12 +3952,10 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
   @Test
   public void testGetDeployedStartFormJson() {
     InputStream deployedStartFormMock = new ByteArrayInputStream("Test".getBytes());
-    StartFormData mockedStartFormData = mock(StartFormData.class);
-    when(mockedStartFormData.getFormKey()).thenReturn("test.json");
     when(formServiceMock.getDeployedStartForm(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
         .thenReturn(deployedStartFormMock);
-    when(formServiceMock.getStartFormData(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
-        .thenReturn(mockedStartFormData);
+    when(formServiceMock.getStartFormKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
+        .thenReturn("test.json");
 
     given()
     .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)

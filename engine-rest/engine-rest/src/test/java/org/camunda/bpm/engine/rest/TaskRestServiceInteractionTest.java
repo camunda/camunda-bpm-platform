@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.rest;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.path.json.JsonPath.from;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_CASE_DEFINITION_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_CASE_EXECUTION_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_CASE_INSTANCE_ID;
@@ -46,12 +47,9 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
@@ -250,6 +248,7 @@ public class TaskRestServiceInteractionTest extends
     when(processEngine.getFormService()).thenReturn(formServiceMock);
     TaskFormData mockFormData = MockProvider.createMockTaskFormData();
     when(formServiceMock.getTaskFormData(anyString())).thenReturn(mockFormData);
+    when(formServiceMock.getTaskFormKey(anyString(), anyString())).thenReturn(MockProvider.EXAMPLE_FORM_KEY);
 
     VariableMap variablesMock = MockProvider.createMockFormVariables();
     when(formServiceMock.getTaskFormVariables(eq(EXAMPLE_TASK_ID), Matchers.<Collection<String>>any(), anyBoolean())).thenReturn(variablesMock);
@@ -808,9 +807,9 @@ public class TaskRestServiceInteractionTest extends
     verify(formServiceMock).submitTaskForm(eq(EXAMPLE_TASK_ID), captor.capture());
     VariableMap map = captor.getValue();
     FileValue fileValue = (FileValue) map.getValueTyped(variableKey);
-    assertThat(fileValue, is(notNullValue()));
-    assertThat(fileValue.getFilename(), is(filename));
-    assertThat(IoUtil.readInputStream(fileValue.getValue(), null), is("someBytes".getBytes()));
+    assertThat(fileValue).isNotNull();
+    assertThat(fileValue.getFilename()).isEqualTo(filename);
+    assertThat(IoUtil.readInputStream(fileValue.getValue(), null)).isEqualTo("someBytes".getBytes());
   }
 
   @Test
@@ -3259,10 +3258,8 @@ public class TaskRestServiceInteractionTest extends
   @Test
   public void testGetDeployedTaskFormJson() {
     InputStream deployedFormMock = new ByteArrayInputStream("Test".getBytes());
-    TaskFormData mockedTaskFormData = mock(TaskFormData.class);
-    when(mockedTaskFormData.getFormKey()).thenReturn("test.json");
     when(formServiceMock.getDeployedTaskForm(anyString())).thenReturn(deployedFormMock);
-    when(formServiceMock.getTaskFormData(anyString())).thenReturn(mockedTaskFormData);
+    when(formServiceMock.getTaskFormKey(anyString(), anyString())).thenReturn("test.json");
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_TASK_ID)
@@ -3322,8 +3319,23 @@ public class TaskRestServiceInteractionTest extends
   }
 
   @Test
+  public void testGetDeployedTaskFormWithUnexistingTask() {
+    InputStream deployedFormMock = new ByteArrayInputStream("Test".getBytes());
+    when(formServiceMock.getDeployedTaskForm(anyString())).thenReturn(deployedFormMock);
+    when(mockQuery.singleResult()).thenReturn(null);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("message", containsString("No task found for taskId"))
+    .when()
+      .get(DEPLOYED_TASK_FORM_URL);
+  }
+
+  @Test
   public void testHandleBpmnError() {
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("errorCode", "anErrorCode");
     parameters.put("errorMessage", "anErrorMessage");
 
@@ -3343,7 +3355,7 @@ public class TaskRestServiceInteractionTest extends
 
   @Test
   public void testHandleBpmnErrorWithVariables() {
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("errorCode", "anErrorCode");
     Map<String, Object> variables = VariablesBuilder
         .create()
@@ -3385,7 +3397,7 @@ public class TaskRestServiceInteractionTest extends
       .when(taskServiceMock)
       .handleBpmnError(anyString(), anyString(), anyString(), anyMapOf(String.class, Object.class));
 
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("errorCode", "anErrorCode");
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
@@ -3405,7 +3417,7 @@ public class TaskRestServiceInteractionTest extends
         .when(taskServiceMock)
         .handleBpmnError(anyString(), anyString(), anyString(), anyMapOf(String.class, Object.class));
 
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("errorCode", "");
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
@@ -3425,7 +3437,7 @@ public class TaskRestServiceInteractionTest extends
       .when(taskServiceMock)
       .handleBpmnError(any(String.class), any(String.class), any(String.class), anyMapOf(String.class, Object.class));
 
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("errorCode", "errorCode");
 
     given()
@@ -3447,7 +3459,7 @@ public class TaskRestServiceInteractionTest extends
       .when(taskServiceMock)
       .handleBpmnError(any(String.class), any(String.class), any(String.class), anyMapOf(String.class, Object.class));
 
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("errorCode", "errorCode");
 
     given()
@@ -3466,7 +3478,7 @@ public class TaskRestServiceInteractionTest extends
 
   @Test
   public void testHandleBpmnEscalation() {
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("escalationCode", "anEscalationCode");
 
     given()
@@ -3485,7 +3497,7 @@ public class TaskRestServiceInteractionTest extends
 
   @Test
   public void testHandleBpmnEscalationWithVariables() {
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("escalationCode", "anEscalationCode");
     Map<String, Object> variables = VariablesBuilder
         .create()
@@ -3526,7 +3538,7 @@ public class TaskRestServiceInteractionTest extends
       .when(taskServiceMock)
       .handleEscalation(anyString(), anyString(), anyMapOf(String.class, Object.class));
 
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("escalationCode", "anEscalationCode");
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
@@ -3547,7 +3559,7 @@ public class TaskRestServiceInteractionTest extends
       .when(taskServiceMock)
       .handleEscalation(any(String.class), any(String.class),anyMapOf(String.class, Object.class));
 
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("escalationCode", "escalationCode");
 
     given()
@@ -3569,7 +3581,7 @@ public class TaskRestServiceInteractionTest extends
       .when(taskServiceMock)
       .handleEscalation(any(String.class), any(String.class), anyMapOf(String.class, Object.class));
 
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("escalationCode", "escalationCode");
 
     given()
