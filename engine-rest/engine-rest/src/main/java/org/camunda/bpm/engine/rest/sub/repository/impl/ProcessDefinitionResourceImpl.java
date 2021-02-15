@@ -55,6 +55,7 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.repository.ProcessDefinitionResource;
 import org.camunda.bpm.engine.rest.util.ApplicationContextPathUtil;
+import org.camunda.bpm.engine.rest.util.ContentTypeUtil;
 import org.camunda.bpm.engine.rest.util.EncodingUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
@@ -430,9 +431,10 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
   }
 
   public Response getDeployedStartForm() {
-    InputStream deployedStartForm = null;
     try {
-      deployedStartForm = engine.getFormService().getDeployedStartForm(processDefinitionId);
+      InputStream deployedStartForm = engine.getFormService().getDeployedStartForm(processDefinitionId);
+      String formKey = engine.getFormService().getStartFormKey(processDefinitionId);
+      return Response.ok(deployedStartForm, ContentTypeUtil.getFormContentType(formKey)).build();
     } catch (NotFoundException e) {
       throw new InvalidRequestException(Status.NOT_FOUND, e.getMessage());
     } catch (NullValueException e) {
@@ -442,6 +444,5 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
     } catch (BadUserRequestException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
     }
-    return Response.ok(deployedStartForm, MediaType.APPLICATION_XHTML_XML).build();
   }
 }

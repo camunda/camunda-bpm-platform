@@ -52,6 +52,11 @@
                      }'] />
 
     <@lib.response
+        code = "200"
+        mediaType = "application/json"
+        desc = "Request successful." />
+
+    <@lib.response
         code = "400"
         dto = "ExceptionDto"
         desc = "The form key has wrong format. See the

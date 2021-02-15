@@ -1,0 +1,73 @@
+{
+  "display": "form",
+  "components": [
+    {
+      "label": "Columns",
+      "key": "columns",
+      "columns": [
+        {
+          "components": [
+            {
+              "label": "Creditor",
+              "validate": {
+                "required": true,
+                "pattern": "^Camunda"
+              },
+              "key": "creditor",
+              "type": "textfield"
+            }
+          ]
+        },
+        {
+          "components": [
+            {
+              "label": "Amount",
+              "validate": {
+                "required": true
+              },
+              "key": "amount",
+              "type": "number"
+            }
+          ]
+        }
+      ],
+      "type": "columns"
+    },
+    {
+      "label": "Invoice Number",
+      "key": "invoiceNumber",
+      "type": "textfield",
+      "description": "An invoice code of the format C-1313.",
+      "validate": {
+        "pattern": "^C-[0-9]+$"
+      }
+    },
+    {
+      "label": "Columns",
+      "columns": [
+        {
+          "components": [
+            {
+              "label": "Submit",
+              "action": "submit",
+              "key": "submit",
+              "type": "button"
+            }
+          ]
+        },
+        {
+          "components": [
+            {
+              "label": "Reset",
+              "action": "reset",
+              "key": "reset",
+              "type": "button"
+            }
+          ]
+        }
+      ],
+      "key": "columns1",
+      "type": "columns"
+    }
+  ]
+}
