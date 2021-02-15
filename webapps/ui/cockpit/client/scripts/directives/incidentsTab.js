@@ -40,6 +40,7 @@ var Directive = [
   '$translate',
   'localConf',
   '$location',
+  'camAPI',
   function(
     $http,
     $q,
@@ -49,7 +50,8 @@ var Directive = [
     Views,
     $translate,
     localConf,
-    $location
+    $location,
+    camAPI
   ) {
     var Link = function linkFunction(scope) {
       // ordered available columns
@@ -66,6 +68,7 @@ var Directive = [
         {class: 'cause instance-id uuid', request: 'causeIncidentProcessInstanceId', sortable: false, content: $translate.instant('PLUGIN_INCIDENTS_TAB_CAUSE_INSTANCE_ID')},
         {class: 'cause-root instance-id uuid', request: 'rootCauseIncidentProcessInstanceId', sortable: false, content: $translate.instant('PLUGIN_INCIDENTS_TAB_CAUSE_ROOT_INSTANCE_ID')},
         {class: 'type', request: 'incidentType', sortable: true, content: $translate.instant('PLUGIN_INCIDENTS_TAB_TYPE')},
+        {class: 'annotation', request: '', sortable: false, content: $translate.instant('PLUGIN_INCIDENTS_TAB_ANNOTATION')},
         {class: 'action', request: '', sortable: false, content: $translate.instant('PLUGIN_INCIDENTS_TAB_ACTION')}
       ];
 
@@ -78,6 +81,7 @@ var Directive = [
         'cause instance-id uuid',
         'cause-root instance-id uuid',
         'type',
+        'annotation',
         'action'
       ];
       var PInstanceClass = scope.processDefinition && 'process-instance';
@@ -341,6 +345,16 @@ var Directive = [
               $location.search('incidentStacktrace', null);
             });
         });
+      };
+
+      const incidentResource = camAPI.resource('incident');
+      scope.getAnnotationHandler = function(incident) {
+        return function(annotation) {
+          return incidentResource.setAnnotation({
+            id: incident.id,
+            annotation
+          });
+        };
       };
 
       if ($location.search().incidentStacktrace) {

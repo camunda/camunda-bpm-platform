@@ -84,6 +84,10 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
 
     executeAvailableJobs();
 
+    String incidentId = runtimeService.createIncidentQuery().processInstanceId(processInstance1.getId()).singleResult().getId();
+
+    runtimeService.setAnnotationForIncidentById(incidentId, "an Annotation");
+
     String[] processInstanceIds= {processInstance1.getId()};
 
     IncidentQueryDto queryParameter = new IncidentQueryDto();
@@ -105,6 +109,7 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
     assertThat(incident.getProcessDefinitionId()).isEqualTo(processInstance1.getProcessDefinitionId());
     assertThat(incident.getExecutionId()).isEqualTo(processInstance1.getId());
     assertThat(incident.getConfiguration()).isNotNull();
+    assertThat(incident.getAnnotation()).isEqualTo("an Annotation");
     assertThat(incident.getCauseIncidentId()).isEqualTo(incident.getId());
     assertThat(incident.getCauseIncidentProcessInstanceId()).isEqualTo(processInstance1.getId());
     assertThat(incident.getCauseIncidentProcessDefinitionId()).isEqualTo(processInstance1.getProcessDefinitionId());

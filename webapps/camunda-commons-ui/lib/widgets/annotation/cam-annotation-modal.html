@@ -1,0 +1,44 @@
+<!-- # CE - ui/cockpit/client/scripts/directives/incidents-tab-annotation.html -->
+<div class="modal-header">
+  <h3 ng-if="!readOnly" translate="PLGN_AUDIT_EDIT_MODAL_HEADER"></h3>
+  <h3 ng-if="readOnly" translate="PLGN_AUDIT_VIEW_MODAL_HEADER"></h3>
+</div>
+
+<div class="modal-body annotation-edit">
+    <div notifications-panel></div>
+  <div class="form-group"
+       ng-show="loadingState === 'INITIAL'">
+    <div class="textarea-container">
+      <textarea ng-model="text"
+                id="value"
+                rows="10"
+                class="form-control cam-string-variable"
+                ng-change="dirty = true"
+                ng-class="{'ng-invalid': text.length > maxAnnotationLength}"
+                ng-readonly="readOnly"></textarea>
+
+      <span class="pull-right label label-default character-count">{{text.length}}/{{maxAnnotationLength}}</span>
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer" ng-if="loadingState === 'INITIAL'">
+  <button class="btn btn-link"
+          ng-click="$dismiss('close')">
+    {{ 'CLOSE' | translate }}
+  </button>
+  <button class="btn btn-primary"
+          ng-show="!readOnly"
+          ng-disabled="!dirty || text.length > maxAnnotationLength"
+          ng-click="updateAnnotation()">
+    {{ 'SAVE' | translate }}
+  </button>
+</div>
+
+<div class="modal-footer" ng-if="loadingState !== 'INITIAL'">
+  <button class="btn btn-primary"
+          ng-click="$close(text)">
+    {{ 'OK' | translate }}
+  </button>
+</div>
+<!-- / CE - ui/cockpit/client/scripts/directives/incidents-tab-annotation.html -->

@@ -131,6 +131,14 @@
       <td class="type">
         {{ getIncidentType(incident) }}
       </td>
+      
+      <td class="annotation">
+        <span cam-annotation-edit 
+              annotation="incident.annotation" 
+              on-submit="getAnnotationHandler(incident)" 
+              readonly="incidentsContext === 'history'">
+        </span>
+      </td>
 
       <td class="action">
         <span ng-if="incidentHasActions(incident)"

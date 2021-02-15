@@ -117,4 +117,33 @@ Incident.count = function(params, done) {
   });
 };
 
+/**
+ *  Set the annotation of an incident with the given id.
+ *
+ * @param {Object}   [params]
+ * @param {String}   [params.id]            Incident ID to set the Annotation
+ * @param {String}   [params.annotation]    An arbitrary text annotation set by a user.
+ * @param {Function} done
+ */
+
+Incident.setAnnotation = function(params, done) {
+  return this.http.put(this.path + '/' + params.id + '/annotation', {
+    data: params,
+    done: done
+  });
+};
+
+/**
+ *  Clear the annotation of an incident with the given id.
+ *
+ * @param {String}   [id]                   The Incident id to be updated.
+ * @param {Function} done
+ */
+
+Incident.clearAnnotation = function(id, done) {
+  return this.http.delete(this.path + '/' + id + '/annotation', {
+    done: done
+  });
+};
+
 module.exports = Incident;

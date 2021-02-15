@@ -18,6 +18,7 @@
 'use strict';
 
 var angular = require('../../../camunda-bpm-sdk-js/vendor/angular'),
+  annotationEdit = require('./annotation/cam-annotation-edit'),
   inlineField = require('./inline-field/cam-widget-inline-field'),
   searchPill = require('./search-pill/cam-widget-search-pill'),
   camQueryComponent = require('./search-pill/cam-query-component'),
@@ -71,6 +72,7 @@ widgetModule.directive('camShareLink', camShareLink);
 widgetModule.directive('camWidgetPassword', password);
 
 widgetModule.directive('camVariableValidator', variableValidator);
+widgetModule.directive('camAnnotationEdit', annotationEdit);
 
 widgetModule.filter('camQueryComponent', camQueryComponent);
 

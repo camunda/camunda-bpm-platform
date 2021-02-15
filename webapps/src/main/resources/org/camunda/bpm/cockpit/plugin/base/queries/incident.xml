@@ -27,6 +27,7 @@
     <result property="rootCauseIncidentFailedActivityId" column="ROOT_FAILED_ACTIVITY_ID_" jdbcType="VARCHAR" />
     <result property="rootCauseIncidentMessage" column="ROOT_INC_MSG_" jdbcType="VARCHAR" />
     <result property="rootCauseIncidentConfiguration" column="ROOT_INC_CONF_" jdbcType="VARCHAR" />
+    <result property="annotation" column="ANNOTATION_" jdbcType="VARCHAR" />
   </resultMap>
 
   <select id="selectIncidentWithCauseAndRootCauseIncidentsCount" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.dto.query.IncidentQueryDto"
