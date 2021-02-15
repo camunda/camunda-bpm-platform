@@ -6,5 +6,5 @@
 \____/\__,_|_| |_| |_|\__,_|_| |_|\__,_|\__,_| |_|   |_|\__,_|\__|_|  \___/|_|  |_| |_| |_|
 
   Spring-Boot: ${spring-boot.formatted-version}
-  Camunda BPM: ${camunda.bpm.formatted-version}
+  Camunda Platform: ${camunda.bpm.formatted-version}
   Camunda Platform Spring Boot Starter: (v@project.version@)
