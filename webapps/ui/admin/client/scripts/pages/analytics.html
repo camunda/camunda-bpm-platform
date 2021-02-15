@@ -3,7 +3,7 @@
   <h3>{{ 'TELEMETRY_SETTINGS' | translate }}</h3>
 
   <div uib-alert class="alert alert-info">
-    {{ 'TELEMETRY_INFO' | translate}}
+    {{ 'TELEMETRY_INTRODUCTION' | translate}}
   </div>
 
 
@@ -13,16 +13,16 @@
         <input type="checkbox" ng-model="enableUsage" class="form-control usage-statistics" id="usage-statistics">
       </div>
       <div class="col-xs-10 col-sm-10 form-control-static ">
-        <label for="usage-statistics">{{ 'TELEMETRY_USAGE_TITLE' | translate}}</label>
+        <label for="usage-statistics">{{ 'TELEMETRY_ENABLE' | translate}}</label>
         <p class="details">
-          {{ 'TELEMETRY_USAGE_DETAILS' | translate}}
+          {{ 'TELEMETRY_DETAILS' | translate}}
         </p>
 
       </div>
     </div>
     <div class="text-right">
       <button ng-click="submit()" class="btn btn-default">
-        {{ 'TELEMETRY_SAVE_CONFIGURATION' | translate}}
+        {{ 'TELEMETRY_SAVE' | translate}}
       </button>
     </div>
   </form>
