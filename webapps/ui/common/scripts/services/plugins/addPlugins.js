@@ -17,9 +17,12 @@
 
 var addApiAttributes = require('./getApiAttributes');
 var getPassthroughData = require('./getPassthroughData');
+var loadPlugins = require('./loadPlugins');
 
-module.exports = function(config, module, appName) {
-  config.plugins.forEach(plugin => {
+module.exports = async function(config, module, appName) {
+  const plugins = await loadPlugins(config, appName);
+
+  plugins.forEach(plugin => {
     const pluginDirectiveUID = Math.random()
       .toString(36)
       .substring(2);
@@ -53,7 +56,8 @@ module.exports = function(config, module, appName) {
               isolatedContainer,
               addApiAttributes(
                 getPassthroughData(plugin.pluginPoint, scope, appName),
-                config.csrfCookieName
+                config.csrfCookieName,
+                appName
               ),
               scope // The 'scope' argument is deprecated and should not be used - it will be removed in future releases
             );

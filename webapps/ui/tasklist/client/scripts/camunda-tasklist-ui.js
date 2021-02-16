@@ -161,9 +161,7 @@ module.exports = function(pluginDependencies) {
     window.camTasklistConf,
     tasklistApp,
     'tasklist'
-  );
-
-  bootstrapApp();
+  ).then(bootstrapApp);
 };
 
 module.exports.exposePackages = function(container) {

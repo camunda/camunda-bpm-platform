@@ -22,9 +22,10 @@ function getCSRFToken(CSRFCookieName) {
   );
 }
 
-module.exports = function(params, CSRFCookieName = 'XSRF-TOKEN') {
+module.exports = function(params, CSRFCookieName = 'XSRF-TOKEN', appName) {
   const base = document.querySelector('base');
-  const engine = window.location.href.replace(/.*cockpit\/([^/]*).*/, '$1');
+  const regex = new RegExp(`.*${appName}\/([^/]*).*`);
+  const engine = window.location.href.replace(regex, '$1');
 
   return {
     api: {
