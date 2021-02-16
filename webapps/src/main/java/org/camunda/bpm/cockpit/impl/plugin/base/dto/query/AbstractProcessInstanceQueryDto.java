@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.ConditionQueryParameterDto;
 import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
+import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
 import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
@@ -58,6 +59,7 @@ public abstract class AbstractProcessInstanceQueryDto<T extends ProcessInstanceD
   protected String parentProcessInstanceId;
   protected Date startedBefore;
   protected Date startedAfter;
+  protected Boolean withIncident;
 
   private List<VariableQueryParameterDto> variables;
 
@@ -156,6 +158,15 @@ public abstract class AbstractProcessInstanceQueryDto<T extends ProcessInstanceD
   @CamundaQueryParam(value="startedAfter", converter = DateConverter.class)
   public void setStartedAfter(Date startedAfter) {
     this.startedAfter = startedAfter;
+  }
+
+  public Boolean getWithIncident() {
+    return withIncident;
+  }
+
+  @CamundaQueryParam(value="withIncident", converter = BooleanConverter.class)
+  public void setWithIncident(Boolean withIncident) {
+    this.withIncident = withIncident;
   }
 
   @Override

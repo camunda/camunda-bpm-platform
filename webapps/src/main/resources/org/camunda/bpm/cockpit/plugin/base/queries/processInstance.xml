@@ -61,7 +61,14 @@
         ${innerLimitAfter}
       ) INSTANCE
     <!-- The set of process instances will be (left) joined with a set of incidents. -->
-    left join
+    <choose>
+      <when test="withIncident != null &amp;&amp; withIncident">
+        join
+      </when>
+      <otherwise>
+        left join
+      </otherwise>
+    </choose>
       (
         <!-- to avoid to have a list of incidents with only one item which type is null and count is zero an extra subselect is needed -->
         <!-- this subselect selects all incidents to the assigned process definition id -->
@@ -91,6 +98,13 @@
       ${prefix}ACT_HI_PROCINST HISTORY
     ON
       RES.ID_ = HISTORY.PROC_INST_ID_
+    </if>
+    
+    <if test="withIncident != null &amp;&amp; withIncident">
+    join
+      ${prefix}ACT_RU_INCIDENT INCIDENT
+    ON
+      RES.ID_ = INCIDENT.PROC_INST_ID_
     </if>
 
     <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
