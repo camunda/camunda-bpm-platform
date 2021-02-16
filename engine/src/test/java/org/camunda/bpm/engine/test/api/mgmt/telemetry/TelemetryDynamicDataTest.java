@@ -26,6 +26,8 @@ import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.metrics.Meter;
 import org.camunda.bpm.engine.impl.telemetry.CommandCounter;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
@@ -181,9 +183,81 @@ public class TelemetryDynamicDataTest {
 
   }
 
+  @Test
+  public void shouldCollectInnerClasses() {
+    // given
+    managementService.toggleTelemetry(true);
+
+    // when
+    configuration.getCommandExecutorTxRequired().execute(new InnerClassCmd());
+    configuration.getCommandExecutorTxRequired().execute(new InnerClassCmd());
+
+    // then
+    // the class is properly formatted
+    Map<String, CommandCounter> commands = configuration.getTelemetryRegistry().getCommands();
+    String [] expectedExcutedCommands = {"TelemetryDynamicDataTest_InnerClassCmd"};
+    assertThat(commands.keySet()).contains(expectedExcutedCommands);
+    assertThat(commands.get("TelemetryDynamicDataTest_InnerClassCmd").get()).isEqualTo(2L);
+  }
+
+  @Test
+  public void shouldNotCollectAnonymousClasses() {
+    // given
+    managementService.toggleTelemetry(true);
+
+    // when
+    // execute anonymous class
+    configuration.getCommandExecutorTxRequired().execute(new Command<Void>() {
+
+      @Override
+      public Void execute(CommandContext commandContext) {
+        System.out.println("Test anonymous command.");
+        return null;
+      }
+    });
+    configuration.getCommandExecutorTxRequired().execute(new Command<Void>() {
+
+      @Override
+      public Void execute(CommandContext commandContext) {
+        System.out.println("Test anonymous command.");
+        return null;
+      }
+    });
+
+    // then
+    // the class is not collected
+    Map<String, CommandCounter> commands = configuration.getTelemetryRegistry().getCommands();
+    assertThat(commands.keySet()).containsExactly("TelemetryConfigureCmd");
+  }
+
+  @Test
+  public void shouldNotCollectLambdas() {
+    // given
+    managementService.toggleTelemetry(true);
+
+    // when
+    // execute command as lambda
+    configuration.getCommandExecutorTxRequired().execute((Command<Void>) commandContext -> {
+      System.out.println("Test lambda as command.");
+      return null;
+    });
+
+    // then
+    // the class is not collected
+    Map<String, CommandCounter> commands = configuration.getTelemetryRegistry().getCommands();
+    assertThat(commands.keySet()).containsExactly("TelemetryConfigureCmd");
+  }
 
   protected void clearCommandCounts() {
     configuration.getTelemetryRegistry().clear();
   }
 
+  protected static class InnerClassCmd implements Command<Void> {
+
+    @Override
+    public Void execute(CommandContext commandContext) {
+      System.out.println("Test inner class command.");
+      return null;
+    }
+  }
 }
