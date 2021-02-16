@@ -3456,6 +3456,50 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     }
   }
 
+  @Test
+  @Deployment(resources = {
+    "processes/failing-process.bpmn",
+    "processes/user-task-process.bpmn"
+  })
+  public void shouldFilterWithIncident() {
+    startProcessInstances("FailingProcess", 1);
+    startProcessInstances("userTaskProcess", 1);
+
+    ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
+    queryParameter.setWithIncident(true);
+
+    List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
+
+    assertThat(result).hasSize(1);
+
+    List<IncidentStatisticsDto> incidents = result.get(0).getIncidents();
+
+    assertThat(incidents).isNotEmpty();
+    assertThat(incidents).hasSize(1);
+
+    IncidentStatisticsDto incident = incidents.get(0);
+
+    assertThat(incident.getIncidentType()).isEqualTo("failedJob");
+    assertThat(incident.getIncidentCount()).isEqualTo(1);
+  }
+
+  @Test
+  @Deployment(resources = {
+    "processes/failing-process.bpmn",
+    "processes/user-task-process.bpmn"
+  })
+  public void shouldFilterWithIncidentOnCount() {
+    startProcessInstances("FailingProcess", 1);
+    startProcessInstances("userTaskProcess", 1);
+
+    ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto();
+    queryParameter.setWithIncident(true);
+
+    CountResultDto result = resource.queryProcessInstancesCount(queryParameter);
+
+    assertThat(result.getCount()).isEqualTo(1L);
+  }
+
   private VariableQueryParameterDto createVariableParameter(String name, String operator, Object value) {
     VariableQueryParameterDto variable = new VariableQueryParameterDto();
     variable.setName(name);
