@@ -15,38 +15,13 @@
  * limitations under the License.
  */
 
-// camunda-admin-bootstrap is copied as-is, so we have to inline everything
+// Dynamic import for use within browserify
+window._import = path => {
+  return import(path);
+};
+
+// camunda-welcome-bootstrap is copied as-is, so we have to inline everything
 const baseImportPath = document.querySelector('base').href + '../';
-
-function withSuffix(string, suffix) {
-  return !string.endsWith(suffix) ? string + suffix : string;
-}
-
-async function loadPlugins(config) {
-  const customScripts = config.customScripts || [];
-
-  // Welcome does not support backend plugins
-
-  const fetchers = customScripts.map(url =>
-    // eslint-disable-next-line
-    import(baseImportPath + withSuffix(url, ".js"))
-  );
-
-  const loadedPlugins = (await Promise.all(fetchers)).reduce((acc, module) => {
-    const plugins = module.default;
-    if (!plugins) {
-      return acc;
-    }
-
-    if (Array.isArray(plugins)) {
-      acc.push(...plugins);
-    } else {
-      acc.push(plugins);
-    }
-    return acc;
-  }, []);
-  config.plugins = loadedPlugins;
-}
 
 const loadConfig = (async function() {
   // eslint-disable-next-line
@@ -54,7 +29,6 @@ const loadConfig = (async function() {
       baseImportPath + 'scripts/config.js?bust=' + new Date().getTime()
     )).default || {};
 
-  await loadPlugins(config);
   window.camWelcomeConf = config;
   return config;
 })();

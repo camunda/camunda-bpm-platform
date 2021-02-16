@@ -177,17 +177,17 @@ module.exports = function(pluginDependencies) {
     window.camAdminConf,
     appNgModule,
     'admin'
-  );
+  ).then(() => {
+    $(document).ready(function() {
+      angular.bootstrap(document.documentElement, [
+        appNgModule.name,
+        'cam.admin.custom'
+      ]);
 
-  $(document).ready(function() {
-    angular.bootstrap(document.documentElement, [
-      appNgModule.name,
-      'cam.admin.custom'
-    ]);
-
-    if (top !== window) {
-      window.parent.postMessage({type: 'loadamd'}, '*');
-    }
+      if (top !== window) {
+        window.parent.postMessage({type: 'loadamd'}, '*');
+      }
+    });
   });
 };
 

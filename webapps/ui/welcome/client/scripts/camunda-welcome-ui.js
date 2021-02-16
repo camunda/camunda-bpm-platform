@@ -120,16 +120,16 @@ module.exports = function(pluginDependencies) {
     window.camWelcomeConf,
     appNgModule,
     'welcome'
-  );
+  ).then(() => {
+    angular.bootstrap(document.documentElement, [
+      appNgModule.name,
+      'cam.welcome.custom'
+    ]);
 
-  angular.bootstrap(document.documentElement, [
-    appNgModule.name,
-    'cam.welcome.custom'
-  ]);
-
-  if (top !== window) {
-    window.parent.postMessage({type: 'loadamd'}, '*');
-  }
+    if (top !== window) {
+      window.parent.postMessage({type: 'loadamd'}, '*');
+    }
+  });
 };
 
 module.exports.exposePackages = function(container) {
