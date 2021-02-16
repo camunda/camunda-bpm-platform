@@ -3,13 +3,14 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "parcel index.html",
-    "build": "parcel build index.html --out-dir ../target/classes/openapi --public-url ./"
+    "build": "parcel build index.html --out-dir ../target/classes/swaggerui --public-url ./ --no-cache",
+    "license": "license-checker --production"
   },
   "dependencies": {
     "swagger-ui": "~3.42.0"
   },
   "devDependencies": {
+    "license-checker": "~25.0.1",
     "parcel-bundler": "~1.12.4"
   }
 }
