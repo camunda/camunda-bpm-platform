@@ -193,6 +193,12 @@
       </dependency>
 
       <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-external-task-client</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
         <!--
             make sure everybody uses the same commons version
         -->

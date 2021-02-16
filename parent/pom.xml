@@ -44,8 +44,6 @@
     <version.wildfly>21.0.2.Final</version.wildfly>
     <version.wildfly.core>13.0.3.Final</version.wildfly.core>
 
-    <!-- This version is mirrored in the external task client.
-    If you change it here, also change it there -->
     <version.tomcat>9.0.41</version.tomcat>
 
     <version.arquillian>1.1.10.Final</version.arquillian>

@@ -84,7 +84,6 @@
       <groupId>org.skyscreamer</groupId>
       <artifactId>jsonassert</artifactId>
       <scope>test</scope>
-      <version>1.5.0</version>
     </dependency>
 
     <dependency>

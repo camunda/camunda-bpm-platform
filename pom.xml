@@ -94,6 +94,8 @@
         <module>distro/sql-script</module>
         <module>distro/run</module>
 
+        <module>clients/java</module>
+
         <module>internal-dependencies</module>
         <module>database</module>
         <module>parent</module>
@@ -257,6 +259,8 @@
         <module>engine-plugins</module>
 
         <module>distro/webjar</module>
+
+        <module>clients/java</module>
 
         <module>internal-dependencies</module>
         <module>database</module>
