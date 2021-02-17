@@ -72,12 +72,14 @@ window.__define(
         pluginPackages = pluginPackages.filter(
           el =>
             el.name === 'cockpit-plugin-cockpitPlugins' ||
-            el.name === 'cockpit-plugin-cockpitEE'
+            el.name === 'cockpit-plugin-cockpitEE' ||
+            el.name.startsWith('cockpit-plugin-legacy')
         );
         pluginDependencies = pluginDependencies.filter(
           el =>
             el.requirePackageName === 'cockpit-plugin-cockpitPlugins' ||
-            el.requirePackageName === 'cockpit-plugin-cockpitEE'
+            el.requirePackageName === 'cockpit-plugin-cockpitEE' ||
+            el.requirePackageName.startsWith('cockpit-plugin-legacy')
         );
 
         pluginPackages.forEach(function(plugin) {
