@@ -200,18 +200,8 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
     commandExecutor.execute(new DeleteLicenseKeyCmd(true));
   }
 
-  public String databaseSchemaUpgrade(final Connection connection, final String catalog, final String schema) {
-    return commandExecutor.execute(new Command<String>() {
-      public String execute(CommandContext commandContext) {
-        commandContext.getAuthorizationManager().checkCamundaAdmin();
-        DbSqlSessionFactory dbSqlSessionFactory = (DbSqlSessionFactory) commandContext.getSessionFactories().get(DbSqlSession.class);
-        DbSqlSession dbSqlSession = dbSqlSessionFactory.openSession(connection, catalog, schema);
-        commandContext.getSessions().put(DbSqlSession.class, dbSqlSession);
-        dbSqlSession.dbSchemaUpdate();
-
-        return "";
-      }
-    });
+  public String databaseSchemaUpgrade(Connection connection, String catalog, String schema) {
+    return commandExecutor.execute(new DbSchemaUpgradeCmd(connection, catalog, schema));
   }
 
   /**
@@ -235,13 +225,7 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
   }
 
   public Set<String> getRegisteredDeployments() {
-    return commandExecutor.execute(new Command<Set<String>>() {
-      public Set<String> execute(CommandContext commandContext) {
-        commandContext.getAuthorizationManager().checkCamundaAdmin();
-        Set<String> registeredDeployments = Context.getProcessEngineConfiguration().getRegisteredDeployments();
-        return new HashSet<>(registeredDeployments);
-      }
-    });
+    return commandExecutor.execute(new GetRegisteredDeploymentsCmd());
   }
 
   public void registerDeploymentForJobExecutor(final String deploymentId) {
@@ -520,6 +504,49 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
 
   public Boolean isTelemetryEnabled() {
     return commandExecutor.execute(new IsTelemetryEnabledCmd());
+  }
+
+  /*
+    The Command interface should always be implemented as a regular,
+    or inner class so that invoked commands are correctly counted with Telemetry.
+   */
+  protected class DbSchemaUpgradeCmd implements Command<String> {
+
+    protected Connection connection;
+    protected String catalog;
+    protected String schema;
+
+    public DbSchemaUpgradeCmd(Connection connection, String catalog, String schema) {
+      this.connection = connection;
+      this.catalog = catalog;
+      this.schema = schema;
+    }
+
+    @Override
+    public String execute(CommandContext commandContext) {
+      commandContext.getAuthorizationManager().checkCamundaAdmin();
+      DbSqlSessionFactory dbSqlSessionFactory = (DbSqlSessionFactory) commandContext.getSessionFactories().get(DbSqlSession.class);
+      DbSqlSession dbSqlSession = dbSqlSessionFactory.openSession(connection, catalog, schema);
+      commandContext.getSessions().put(DbSqlSession.class, dbSqlSession);
+      dbSqlSession.dbSchemaUpdate();
+
+      return "";
+    }
+
+  }
+
+  /*
+    The Command interface should always be implemented as a regular,
+    or inner class so that invoked commands are correctly counted with Telemetry.
+   */
+  protected class GetRegisteredDeploymentsCmd implements Command<Set<String>> {
+
+    @Override
+    public Set<String> execute(CommandContext commandContext) {
+      commandContext.getAuthorizationManager().checkCamundaAdmin();
+      Set<String> registeredDeployments = Context.getProcessEngineConfiguration().getRegisteredDeployments();
+      return new HashSet<>(registeredDeployments);
+    }
   }
 
 }

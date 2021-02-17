@@ -43,19 +43,25 @@ public class DeploymentFailListener implements TransactionListener {
 
   public void execute(CommandContext commandContext) {
     //unregister deployment without authorization
-    commandExecutor.execute(new Command<Void>() {
-      @Override
-      public Void execute(final CommandContext commandContext) {
-        commandContext.runWithoutAuthorization(new Callable<Void>() {
-          @Override
-          public Void call() throws Exception {
-            new UnregisterDeploymentCmd(deploymentIds).execute(commandContext);
-            return null;
-          }
-        });
+    commandExecutor.execute(new DeleteDeploymentListenerCmd());
+  }
+
+  /*
+    The Command interface should always be implemented as a regular,
+    or inner class so that invoked commands are correctly counted with Telemetry.
+   */
+  protected class DeleteDeploymentListenerCmd implements Command<Void> {
+
+    @Override
+    public Void execute(final CommandContext commandContext) {
+
+      commandContext.runWithoutAuthorization((Callable<Void>) () -> {
+        new UnregisterDeploymentCmd(deploymentIds).execute(commandContext);
         return null;
-      }
-    });
+      });
+
+      return null;
+    }
   }
 
 }

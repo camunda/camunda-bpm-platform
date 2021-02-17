@@ -53,12 +53,17 @@ public class TaskReportImpl implements Serializable, TaskReport {
   }
 
   public List<TaskCountByCandidateGroupResult> taskCountByCandidateGroup() {
-    return commandExecutor.execute(new Command<List<TaskCountByCandidateGroupResult>>() {
-      @Override
-      public List<TaskCountByCandidateGroupResult> execute(CommandContext commandContext) {
-        return createTaskCountByCandidateGroupReport(commandContext);
-      }
-    });
+    return commandExecutor.execute(new TaskCountByCandidateGroupCmd());
   }
 
+  /*
+    The Command interface should always be implemented as a regular,
+    or inner class so that invoked commands are correctly counted with Telemetry.
+   */
+  protected class TaskCountByCandidateGroupCmd implements Command<List<TaskCountByCandidateGroupResult>> {
+    @Override
+    public List<TaskCountByCandidateGroupResult> execute(CommandContext commandContext) {
+      return createTaskCountByCandidateGroupReport(commandContext);
+    }
+  }
 }

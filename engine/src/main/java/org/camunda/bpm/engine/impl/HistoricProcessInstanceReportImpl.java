@@ -95,14 +95,7 @@ public class HistoricProcessInstanceReportImpl implements HistoricProcessInstanc
     CommandContext commandContext = Context.getCommandContext();
 
     if(commandContext == null) {
-      return commandExecutor.execute(new Command<List<DurationReportResult>>() {
-
-        @Override
-        public List<DurationReportResult> execute(CommandContext commandContext) {
-          return executeDurationReport(commandContext);
-        }
-
-      });
+      return commandExecutor.execute(new ExecuteDurationReportCmd());
     }
     else {
       return executeDurationReport(commandContext);
@@ -182,4 +175,15 @@ public class HistoricProcessInstanceReportImpl implements HistoricProcessInstanc
     return durationPeriodUnit.name();
   }
 
+  /*
+    The Command interface should always be implemented as a regular,
+    or inner class so that invoked commands are correctly counted with Telemetry.
+   */
+  protected class ExecuteDurationReportCmd implements Command<List<DurationReportResult>> {
+
+    @Override
+    public List<DurationReportResult> execute(CommandContext commandContext) {
+      return executeDurationReport(commandContext);
+    }
+  }
 }

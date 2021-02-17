@@ -56,14 +56,7 @@ public class HistoricTaskInstanceReportImpl implements HistoricTaskInstanceRepor
     CommandContext commandContext = Context.getCommandContext();
 
     if(commandContext == null) {
-      return commandExecutor.execute(new Command<List<HistoricTaskInstanceReportResult>>() {
-
-        @Override
-        public List<HistoricTaskInstanceReportResult> execute(CommandContext commandContext) {
-          return executeCountByProcessDefinitionKey(commandContext);
-        }
-
-      });
+      return commandExecutor.execute(new HistoricTaskInstanceCountByProcessDefinitionKey());
     }
     else {
       return executeCountByProcessDefinitionKey(commandContext);
@@ -80,14 +73,7 @@ public class HistoricTaskInstanceReportImpl implements HistoricTaskInstanceRepor
     CommandContext commandContext = Context.getCommandContext();
 
     if(commandContext == null) {
-      return commandExecutor.execute(new Command<List<HistoricTaskInstanceReportResult>>() {
-
-        @Override
-        public List<HistoricTaskInstanceReportResult> execute(CommandContext commandContext) {
-          return executeCountByTaskName(commandContext);
-        }
-
-      });
+      return commandExecutor.execute(new HistoricTaskInstanceCountByNameCmd());
     }
     else {
       return executeCountByTaskName(commandContext);
@@ -107,14 +93,7 @@ public class HistoricTaskInstanceReportImpl implements HistoricTaskInstanceRepor
     CommandContext commandContext = Context.getCommandContext();
 
     if(commandContext == null) {
-      return commandExecutor.execute(new Command<List<DurationReportResult>>() {
-
-        @Override
-        public List<DurationReportResult> execute(CommandContext commandContext) {
-          return executeDuration(commandContext);
-        }
-
-      });
+      return commandExecutor.execute(new ExecuteDurationCmd());
     }
     else {
       return executeDuration(commandContext);
@@ -155,6 +134,42 @@ public class HistoricTaskInstanceReportImpl implements HistoricTaskInstanceRepor
 
   public String getReportPeriodUnitName() {
     return durationPeriodUnit.name();
+  }
+
+  /*
+    The Command interface should always be implemented as a regular,
+    or inner class so that invoked commands are correctly counted with Telemetry.
+   */
+  protected class ExecuteDurationCmd implements Command<List<DurationReportResult>> {
+
+    @Override
+    public List<DurationReportResult> execute(CommandContext commandContext) {
+      return executeDuration(commandContext);
+    }
+  }
+
+  /*
+    The Command interface should always be implemented as a regular,
+    or inner class so that invoked commands are correctly counted with Telemetry.
+   */
+  protected class HistoricTaskInstanceCountByNameCmd implements Command<List<HistoricTaskInstanceReportResult>> {
+
+    @Override
+    public List<HistoricTaskInstanceReportResult> execute(CommandContext commandContext) {
+      return executeCountByTaskName(commandContext);
+    }
+  }
+
+  /*
+    The Command interface should always be implemented as a regular,
+    or inner class so that invoked commands are correctly counted with Telemetry.
+   */
+  protected class HistoricTaskInstanceCountByProcessDefinitionKey implements Command<List<HistoricTaskInstanceReportResult>> {
+
+    @Override
+    public List<HistoricTaskInstanceReportResult> execute(CommandContext commandContext) {
+      return executeCountByProcessDefinitionKey(commandContext);
+    }
   }
 
 }

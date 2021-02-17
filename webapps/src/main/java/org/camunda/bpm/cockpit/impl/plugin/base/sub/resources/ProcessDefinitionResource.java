@@ -62,16 +62,8 @@ public class ProcessDefinitionResource extends AbstractPluginResource {
   @Path("/called-process-definitions")
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes(MediaType.APPLICATION_JSON)
-  public List<ProcessDefinitionDto> queryCalledProcessDefinitions(final ProcessDefinitionQueryDto queryParameter) {
-    return getCommandExecutor().executeCommand(new Command<List<ProcessDefinitionDto>>() {
-      public List<ProcessDefinitionDto> execute(CommandContext commandContext) {
-        queryParameter.setParentProcessDefinitionId(id);
-        injectEngineConfig(queryParameter);
-        configureExecutionQuery(queryParameter);
-        queryParameter.disableMaxResultsLimit();
-        return getQueryService().executeQuery("selectCalledProcessDefinitions", queryParameter);
-      }
-    });
+  public List<ProcessDefinitionDto> queryCalledProcessDefinitions(ProcessDefinitionQueryDto queryParameter) {
+    return getCommandExecutor().executeCommand(new QueryCalledProcessDefinitionsCmd(queryParameter));
   }
 
   private void injectEngineConfig(ProcessDefinitionQueryDto parameter) {
@@ -91,4 +83,25 @@ public class ProcessDefinitionResource extends AbstractPluginResource {
     addPermissionCheck(query, PROCESS_DEFINITION, "PROCDEF.KEY_", READ_INSTANCE);
   }
 
+  /*
+    The Command interface should always be implemented as a regular,
+    or inner class so that invoked commands are correctly counted with Telemetry.
+   */
+  protected class QueryCalledProcessDefinitionsCmd implements Command<List<ProcessDefinitionDto>> {
+
+    protected ProcessDefinitionQueryDto queryParameter;
+
+    public QueryCalledProcessDefinitionsCmd(ProcessDefinitionQueryDto queryParameter) {
+      this.queryParameter = queryParameter;
+    }
+
+    @Override
+    public List<ProcessDefinitionDto> execute(CommandContext commandContext) {
+      queryParameter.setParentProcessDefinitionId(id);
+      injectEngineConfig(queryParameter);
+      configureExecutionQuery(queryParameter);
+      queryParameter.disableMaxResultsLimit();
+      return getQueryService().executeQuery("selectCalledProcessDefinitions", queryParameter);
+    }
+  }
 }
