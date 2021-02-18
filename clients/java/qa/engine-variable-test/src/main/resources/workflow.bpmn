@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_0jpt5q3" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="1.12.0-alpha-3">
+  <bpmn:process id="KYsKNUbyVawGRt6H" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>SequenceFlow_1mlu92f</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_1mlu92f" sourceRef="StartEvent_1" targetRef="Task_18223gw" />
+    <bpmn:endEvent id="EndEvent_0pa177a">
+      <bpmn:incoming>SequenceFlow_1jvw6i9</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_1qfygn1" sourceRef="Task_18223gw" targetRef="ExclusiveGateway_1hmw1xo" />
+    <bpmn:serviceTask id="Task_18223gw" camunda:type="external" camunda:topic="qYeiKGuhqXGx3ate">
+      <bpmn:incoming>SequenceFlow_1mlu92f</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1qfygn1</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="ExclusiveGateway_1hmw1xo">
+      <bpmn:incoming>SequenceFlow_1qfygn1</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1jvw6i9</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_1nolqzh</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_1jvw6i9" sourceRef="ExclusiveGateway_1hmw1xo" targetRef="EndEvent_0pa177a">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${bean.getValue() == 'foo'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:endEvent id="EndEvent_15hqcv3">
+      <bpmn:incoming>SequenceFlow_1nolqzh</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_1nolqzh" sourceRef="ExclusiveGateway_1hmw1xo" targetRef="EndEvent_15hqcv3">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${bean.getValue() == 'bar'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+  </bpmn:process>
+</bpmn:definitions>
