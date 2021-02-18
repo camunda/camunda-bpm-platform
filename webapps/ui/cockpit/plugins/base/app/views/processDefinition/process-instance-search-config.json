@@ -79,6 +79,13 @@
           "value": "PROCESS_INSTANCE_OPERATOR_LIKE"
         }
       ]
+    },
+    {
+      "id": {
+        "key": "withIncident",
+        "value": "PLUGIN_PROCESS_INSTANCE_WITH_INCIDENTS"
+      },
+      "basic": true
     }
   ],
   "operators": {
