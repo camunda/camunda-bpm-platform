@@ -81,25 +81,27 @@
 
   <update id="updateJobLogByRootProcessInstanceId"
           parameterType="java.util.Map">
-      update ${prefix}ACT_HI_JOB_LOG set
-      REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
-
-      where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+      update RES set
+      RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      FROM ${prefix}ACT_HI_JOB_LOG RES ${removalTimeUpdateHints}
+      where RES.ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
   </update>
 
   <update id="updateJobLogByProcessInstanceId"
           parameterType="java.util.Map">
-    update ${prefix}ACT_HI_JOB_LOG
-      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
-      where PROCESS_INSTANCE_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+    update RES set
+      RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      FROM ${prefix}ACT_HI_JOB_LOG RES ${removalTimeUpdateHints}
+      where RES.PROCESS_INSTANCE_ID_ = #{processInstanceId, jdbcType=VARCHAR}
   </update>
 
   <update id="updateJobLogByBatchId"
           parameterType="java.util.Map">
-      update ${prefix}ACT_HI_JOB_LOG set
-      REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      update RES set
+      RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      FROM ${prefix}ACT_HI_JOB_LOG RES ${removalTimeUpdateHints}
 
-      where JOB_DEF_CONFIGURATION_ = #{batchId, jdbcType=VARCHAR}
+      where RES.JOB_DEF_CONFIGURATION_ = #{batchId, jdbcType=VARCHAR}
   </update>
 
   <!-- DELETE -->

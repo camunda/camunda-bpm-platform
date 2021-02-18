@@ -58,26 +58,27 @@
 
   <update id="updateIdentityLinkLogByRootProcessInstanceId"
           parameterType="java.util.Map">
-      update ${prefix}ACT_HI_IDENTITYLINK set
-      REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
-
-      where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+      update RES set
+      RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      FROM ${prefix}ACT_HI_IDENTITYLINK RES ${removalTimeUpdateHints}
+      where RES.ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
   </update>
 
   <update id="updateIdentityLinkLogByRootProcessInstanceId_mysql"
           parameterType="java.util.Map">
-      update ${prefix}ACT_HI_IDENTITYLINK set
-      REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP},
-      TIMESTAMP_ = TIMESTAMP_
-
-      where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+      update RES set
+      RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP},
+      RES.TIMESTAMP_ = RES.TIMESTAMP_
+      FROM ${prefix}ACT_HI_IDENTITYLINK RES ${removalTimeUpdateHints}
+      where RES.ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
   </update>
 
   <update id="updateIdentityLinkLogByProcessInstanceId"
           parameterType="java.util.Map">
-    update ${prefix}ACT_HI_IDENTITYLINK
-      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
-      where TASK_ID_ IN (
+    update RES set
+      RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      FROM ${prefix}ACT_HI_IDENTITYLINK RES ${removalTimeUpdateHints}
+      where RES.TASK_ID_ IN (
         SELECT ID_
         FROM ${prefix}ACT_HI_TASKINST
         WHERE PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
@@ -86,10 +87,11 @@
 
   <update id="updateIdentityLinkLogByProcessInstanceId_mysql"
           parameterType="java.util.Map">
-    update ${prefix}ACT_HI_IDENTITYLINK
-      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP},
-          TIMESTAMP_ = TIMESTAMP_
-      where TASK_ID_ IN (
+    update RES set
+      RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP},
+      RES.TIMESTAMP_ = RES.TIMESTAMP_
+      FROM ${prefix}ACT_HI_IDENTITYLINK RES ${removalTimeUpdateHints}
+      where RES.TASK_ID_ IN (
         SELECT ID_
         FROM ${prefix}ACT_HI_TASKINST
         WHERE PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}

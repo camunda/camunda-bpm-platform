@@ -60,17 +60,18 @@
   <!-- update -->
   <update id="updateHistoricDecisionInputInstancesByRootProcessInstanceId"
           parameterType="java.util.Map">
-      update ${prefix}ACT_HI_DEC_IN set
-      REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
-
-      where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_HI_DEC_IN RES ${removalTimeUpdateHints}
+    where RES.ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
   </update>
 
   <update id="updateHistoricDecisionInputInstancesByProcessInstanceId"
           parameterType="java.util.Map">
-    update ${prefix}ACT_HI_DEC_IN
-      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
-      where DEC_INST_ID_ IN (
+    update RES set
+      RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      from ${prefix}ACT_HI_DEC_IN RES ${removalTimeUpdateHints}
+      where RES.DEC_INST_ID_ IN (
         SELECT ID_
         FROM ${prefix}ACT_HI_DECINST
         WHERE PROC_INST_ID_ = #{processInstanceId, jdbcType=TIMESTAMP}
@@ -79,10 +80,10 @@
 
   <update id="updateHistoricDecisionInputInstancesByRootDecisionInstanceId"
           parameterType="java.util.Map">
-      update ${prefix}ACT_HI_DEC_IN set
-      REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
-
-      where DEC_INST_ID_ IN (
+    update RES set
+      RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      FROM ${prefix}ACT_HI_DEC_IN RES ${removalTimeUpdateHints}
+      where RES.DEC_INST_ID_ IN (
         SELECT ID_
         FROM ${prefix}ACT_HI_DECINST
         WHERE ROOT_DEC_INST_ID_ = #{rootDecisionInstanceId, jdbcType=VARCHAR}) <!-- null for root dec instances -->
@@ -91,10 +92,10 @@
 
   <update id="updateHistoricDecisionInputInstancesByDecisionInstanceId"
           parameterType="java.util.Map">
-      update ${prefix}ACT_HI_DEC_IN set
-      REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
-
-      where DEC_INST_ID_ = #{decisionInstanceId, jdbcType=VARCHAR}
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_HI_DEC_IN RES ${removalTimeUpdateHints}
+    where RES.DEC_INST_ID_ = #{decisionInstanceId, jdbcType=VARCHAR}
   </update>
 
   <!-- delete -->

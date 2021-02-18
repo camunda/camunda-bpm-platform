@@ -102,17 +102,18 @@
 
   <update id="updateHistoricActivityInstancesByRootProcessInstanceId"
           parameterType="java.util.Map">
-    update ${prefix}ACT_HI_ACTINST set
-    REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
-
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_HI_ACTINST RES ${removalTimeUpdateHints}
     where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
   </update>
 
   <update id="updateHistoricActivityInstancesByProcessInstanceId"
           parameterType="java.util.Map">
-    update ${prefix}ACT_HI_ACTINST
-      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
-      where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_HI_ACTINST RES ${removalTimeUpdateHints}
+    where RES.PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
   </update>
 
   <!-- HISTORIC ACTIVITY INSTANCE SELECT -->

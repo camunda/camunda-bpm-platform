@@ -107,42 +107,44 @@
   
   <update id="updateHistoricIncidentsByRootProcessInstanceId"
           parameterType="java.util.Map">
-    update ${prefix}ACT_HI_INCIDENT set
-    REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
-
-    where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_HI_INCIDENT RES ${removalTimeUpdateHints}
+    where RES.ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
   </update>
 
   <update id="updateHistoricIncidentsByRootProcessInstanceId_mysql"
           parameterType="java.util.Map">
-    update ${prefix}ACT_HI_INCIDENT set
-    REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP},
-    CREATE_TIME_ = CREATE_TIME_
-
-    where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP},
+    RES.CREATE_TIME_ = RES.CREATE_TIME_
+    FROM ${prefix}ACT_HI_INCIDENT RES ${removalTimeUpdateHints}
+    where RES.ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
   </update>
 
   <update id="updateHistoricIncidentsByProcessInstanceId"
           parameterType="java.util.Map">
-    update ${prefix}ACT_HI_INCIDENT
-      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
-      where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_HI_INCIDENT RES ${removalTimeUpdateHints}
+    where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
   </update>
 
   <update id="updateHistoricIncidentsByProcessInstanceId_mysql"
           parameterType="java.util.Map">
-    update ${prefix}ACT_HI_INCIDENT
-      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP},
-          CREATE_TIME_ = CREATE_TIME_
-      where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP},
+    RES.CREATE_TIME_ = RES.CREATE_TIME_
+    FROM ${prefix}ACT_HI_INCIDENT RES ${removalTimeUpdateHints}
+    where RES.PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
   </update>
 
   <update id="updateHistoricIncidentsByBatchId"
           parameterType="java.util.Map">
-    update ${prefix}ACT_HI_INCIDENT set
-    REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
-
-    where ID_ in (SELECT HI.ID_ from ${prefix}ACT_HI_INCIDENT HI
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_HI_INCIDENT RES ${removalTimeUpdateHints}
+    where RES.ID_ in (SELECT HI.ID_ from ${prefix}ACT_HI_INCIDENT HI
       inner join ${prefix}ACT_HI_BATCH HB
       on HI.JOB_DEF_ID_ in
         (HB.SEED_JOB_DEF_ID_,

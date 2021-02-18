@@ -68,26 +68,26 @@
 
   <update id="updateAuthorizationsByRootProcessInstanceId"
           parameterType="java.util.Map">
-    update ${prefix}ACT_RU_AUTHORIZATION set
-    REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
-
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_RU_AUTHORIZATION RES ${removalTimeUpdateHints}
     where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
   </update>
 
   <update id="updateAuthorizationsByProcessInstanceId"
           parameterType="java.util.Map">
-    update ${prefix}ACT_RU_AUTHORIZATION set
-    REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
-
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_RU_AUTHORIZATION RES ${removalTimeUpdateHints}
     where
       <!-- task instances -->
-      RESOURCE_ID_ IN (
+      RES.RESOURCE_ID_ IN (
         SELECT ID_
         FROM ${prefix}ACT_HI_TASKINST
         WHERE PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
       )
       <!-- process instances -->
-      or RESOURCE_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+      or RES.RESOURCE_ID_ = #{processInstanceId, jdbcType=VARCHAR}
   </update>
 
   <!-- AUTHORIZATION DELETE -->

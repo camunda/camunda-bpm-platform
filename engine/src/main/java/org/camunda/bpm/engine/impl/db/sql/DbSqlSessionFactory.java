@@ -95,6 +95,8 @@ public class DbSqlSessionFactory implements SessionFactory {
 
   public static final Map<String, String> databaseSpecificCollationForCaseSensitivity = new HashMap<>();
 
+  public static final Map<String, String> databaseSpecificRemovalTimeUpdateHints = new HashMap<>();
+
   /*
    * On SQL server, the overall maximum number of parameters in a prepared statement
    * is 2100.
@@ -149,6 +151,8 @@ public class DbSqlSessionFactory implements SessionFactory {
 
     databaseSpecificCollationForCaseSensitivity.put(H2, "");
 
+    databaseSpecificRemovalTimeUpdateHints.put(H2, "");
+
     HashMap<String, String> constants = new HashMap<>();
     constants.put("constant.event", "'event'");
     constants.put("constant.op_message", "NEW_VALUE_ || '_|_' || PROPERTY_");
@@ -202,6 +206,8 @@ public class DbSqlSessionFactory implements SessionFactory {
       databaseSpecificDaysComparator.put(mysqlLikeDatabase, "DATEDIFF(#{currentTimestamp}, ${date}) >= ${days}");
 
       databaseSpecificCollationForCaseSensitivity.put(mysqlLikeDatabase, "");
+
+      databaseSpecificRemovalTimeUpdateHints.put(mysqlLikeDatabase, "");
 
       addDatabaseSpecificStatement(mysqlLikeDatabase, "toggleForeignKey", "toggleForeignKey_mysql");
       addDatabaseSpecificStatement(mysqlLikeDatabase, "selectDeploymentsByQueryCriteria", "selectDeploymentsByQueryCriteria_mysql");
@@ -293,6 +299,8 @@ public class DbSqlSessionFactory implements SessionFactory {
       databaseSpecificIfNull.put(postgresLikeDatabase, "COALESCE");
 
       databaseSpecificCollationForCaseSensitivity.put(postgresLikeDatabase, "");
+
+      databaseSpecificRemovalTimeUpdateHints.put(postgresLikeDatabase, "");
 
       addDatabaseSpecificStatement(postgresLikeDatabase, "insertByteArray", "insertByteArray_postgres");
       addDatabaseSpecificStatement(postgresLikeDatabase, "updateByteArray", "updateByteArray_postgres");
@@ -398,6 +406,8 @@ public class DbSqlSessionFactory implements SessionFactory {
 
     databaseSpecificCollationForCaseSensitivity.put(ORACLE, "");
 
+    databaseSpecificRemovalTimeUpdateHints.put(ORACLE, "");
+
     addDatabaseSpecificStatement(ORACLE, "selectHistoricProcessInstanceDurationReport", "selectHistoricProcessInstanceDurationReport_oracle");
     addDatabaseSpecificStatement(ORACLE, "selectHistoricTaskInstanceDurationReport", "selectHistoricTaskInstanceDurationReport_oracle");
     addDatabaseSpecificStatement(ORACLE, "selectHistoricTaskInstanceCountByTaskNameReport", "selectHistoricTaskInstanceCountByTaskNameReport_oracle");
@@ -480,6 +490,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificDaysComparator.put(DB2, "${date} + ${days} DAYS <= #{currentTimestamp}");
 
     databaseSpecificCollationForCaseSensitivity.put(DB2, "");
+
+    databaseSpecificRemovalTimeUpdateHints.put(DB2, "");
 
     addDatabaseSpecificStatement(DB2, "selectMeterLogAggregatedByTimeInterval", "selectMeterLogAggregatedByTimeInterval_db2_or_mssql");
     addDatabaseSpecificStatement(DB2, "selectExecutionByNativeQuery", "selectExecutionByNativeQuery_mssql_or_db2");
@@ -566,6 +578,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificDaysComparator.put(MSSQL, "DATEDIFF(DAY, ${date}, #{currentTimestamp}) >= ${days}");
 
     databaseSpecificCollationForCaseSensitivity.put(MSSQL, "COLLATE Latin1_General_CS_AS");
+
+    databaseSpecificRemovalTimeUpdateHints.put(MSSQL, "WITH (FORCESEEK)");
 
     addDatabaseSpecificStatement(MSSQL, "selectMeterLogAggregatedByTimeInterval", "selectMeterLogAggregatedByTimeInterval_db2_or_mssql");
     addDatabaseSpecificStatement(MSSQL, "selectExecutionByNativeQuery", "selectExecutionByNativeQuery_mssql_or_db2");

@@ -71,34 +71,36 @@
 
   <update id="updateExternalTaskLogByRootProcessInstanceId"
           parameterType="java.util.Map">
-      update ${prefix}ACT_HI_EXT_TASK_LOG set
-      REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
-
-      where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+      update RES set
+      RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      FROM ${prefix}ACT_HI_EXT_TASK_LOG RES ${removalTimeUpdateHints}
+      where RES.ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
   </update>
 
   <update id="updateExternalTaskLogByRootProcessInstanceId_mysql"
           parameterType="java.util.Map">
-      update ${prefix}ACT_HI_EXT_TASK_LOG set
-      REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP},
-      TIMESTAMP_ = TIMESTAMP_
-
+      update RES set
+      RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP},
+      RES.TIMESTAMP_ = RES.TIMESTAMP_
+      FROM ${prefix}ACT_HI_EXT_TASK_LOG RES ${removalTimeUpdateHints}
       where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
   </update>
 
   <update id="updateExternalTaskLogByProcessInstanceId"
           parameterType="java.util.Map">
-    update ${prefix}ACT_HI_EXT_TASK_LOG
-      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
-      where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+    update RES set
+      RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      FROM ${prefix}ACT_HI_EXT_TASK_LOG RES ${removalTimeUpdateHints}
+      where RES.PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
   </update>
 
   <update id="updateExternalTaskLogByProcessInstanceId_mysql"
           parameterType="java.util.Map">
-    update ${prefix}ACT_HI_EXT_TASK_LOG
-      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP},
-          TIMESTAMP_ = TIMESTAMP_
-      where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+    update RES set
+      RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP},
+      RES.TIMESTAMP_ = RES.TIMESTAMP_
+      FROM ${prefix}ACT_HI_EXT_TASK_LOG RES ${removalTimeUpdateHints}
+      where RES.PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
   </update>
 
   <!-- DELETE -->

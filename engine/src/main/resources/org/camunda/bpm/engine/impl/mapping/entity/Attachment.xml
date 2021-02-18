@@ -56,18 +56,19 @@
 
   <update id="updateAttachmentsByRootProcessInstanceId"
           parameterType="java.util.Map">
-      update ${prefix}ACT_HI_ATTACHMENT set
-      REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
-
-      where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_HI_ATTACHMENT RES ${removalTimeUpdateHints}
+    where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
   </update>
 
   <update id="updateAttachmentsByProcessInstanceId"
           parameterType="java.util.Map">
-    update ${prefix}ACT_HI_ATTACHMENT
-      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
-      where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
-        or TASK_ID_ in (
+    update RES set
+      RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      FROM ${prefix}ACT_HI_ATTACHMENT RES ${removalTimeUpdateHints}
+      where RES.PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+        or RES.TASK_ID_ in (
           SELECT ID_
           FROM ${prefix}ACT_HI_TASKINST
           WHERE PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}

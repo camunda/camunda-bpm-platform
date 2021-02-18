@@ -1756,6 +1756,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
       properties.put("collationForCaseSensitivity", DbSqlSessionFactory.databaseSpecificCollationForCaseSensitivity.get(databaseType));
 
+      properties.put("removalTimeUpdateHints", DbSqlSessionFactory.databaseSpecificRemovalTimeUpdateHints.get(databaseType));
+
       Map<String, String> constants = DbSqlSessionFactory.dbSpecificConstants.get(databaseType);
       for (Entry<String, String> entry : constants.entrySet()) {
         properties.put(entry.getKey(), entry.getValue());
