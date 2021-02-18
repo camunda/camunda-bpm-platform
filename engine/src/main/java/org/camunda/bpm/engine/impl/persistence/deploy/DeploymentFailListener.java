@@ -46,10 +46,6 @@ public class DeploymentFailListener implements TransactionListener {
     commandExecutor.execute(new DeleteDeploymentListenerCmd());
   }
 
-  /*
-    The Command interface should always be implemented as a regular,
-    or inner class so that invoked commands are correctly counted with Telemetry.
-   */
   protected class DeleteDeploymentListenerCmd implements Command<Void> {
 
     @Override

@@ -148,10 +148,6 @@ public class HistoricTaskInstanceReportImpl implements HistoricTaskInstanceRepor
     }
   }
 
-  /*
-    The Command interface should always be implemented as a regular,
-    or inner class so that invoked commands are correctly counted with Telemetry.
-   */
   protected class HistoricTaskInstanceCountByNameCmd implements Command<List<HistoricTaskInstanceReportResult>> {
 
     @Override
@@ -160,10 +156,6 @@ public class HistoricTaskInstanceReportImpl implements HistoricTaskInstanceRepor
     }
   }
 
-  /*
-    The Command interface should always be implemented as a regular,
-    or inner class so that invoked commands are correctly counted with Telemetry.
-   */
   protected class HistoricTaskInstanceCountByProcessDefinitionKey implements Command<List<HistoricTaskInstanceReportResult>> {
 
     @Override

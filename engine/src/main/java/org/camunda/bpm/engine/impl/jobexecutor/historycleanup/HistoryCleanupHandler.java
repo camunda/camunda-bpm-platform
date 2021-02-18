@@ -67,10 +67,6 @@ public abstract class HistoryCleanupHandler implements TransactionListener {
     return this;
   }
 
-  /*
-    The Command interface should always be implemented as a regular,
-    or inner class so that invoked commands are correctly counted with Telemetry.
-   */
   protected class HistoryCleanupHandlerCmd implements Command<Void> {
     @Override
     public Void execute(CommandContext commandContext) {

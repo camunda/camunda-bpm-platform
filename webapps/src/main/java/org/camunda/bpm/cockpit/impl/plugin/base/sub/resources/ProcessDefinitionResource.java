@@ -83,10 +83,6 @@ public class ProcessDefinitionResource extends AbstractPluginResource {
     addPermissionCheck(query, PROCESS_DEFINITION, "PROCDEF.KEY_", READ_INSTANCE);
   }
 
-  /*
-    The Command interface should always be implemented as a regular,
-    or inner class so that invoked commands are correctly counted with Telemetry.
-   */
   protected class QueryCalledProcessDefinitionsCmd implements Command<List<ProcessDefinitionDto>> {
 
     protected ProcessDefinitionQueryDto queryParameter;

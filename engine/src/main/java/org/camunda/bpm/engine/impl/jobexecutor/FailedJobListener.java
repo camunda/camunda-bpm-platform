@@ -89,10 +89,6 @@ public class FailedJobListener implements Command<Void> {
     return Math.max(0, totalRetries - countRetries);
   }
 
-  /*
-    The Command interface should always be implemented as a regular,
-    or inner class so that invoked commands are correctly counted with Telemetry.
-   */
   protected class FailedJobListenerCmd implements Command<Void> {
 
     protected String jobId;

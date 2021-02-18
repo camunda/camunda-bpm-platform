@@ -177,10 +177,6 @@ public class MetricsQueryImpl extends ListQueryParameterObject implements Serial
     return super.getMaxResults();
   }
 
-  /*
-    The Command interface should always be implemented as a regular,
-    or inner class so that invoked commands are correctly counted with Telemetry.
-   */
   protected class MetricsQueryIntervalCmd implements Command<Object> {
 
     protected MetricsQueryImpl metricsQuery;

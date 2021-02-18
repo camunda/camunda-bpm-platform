@@ -535,10 +535,6 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
 
   }
 
-  /*
-    The Command interface should always be implemented as a regular,
-    or inner class so that invoked commands are correctly counted with Telemetry.
-   */
   protected class GetRegisteredDeploymentsCmd implements Command<Set<String>> {
 
     @Override

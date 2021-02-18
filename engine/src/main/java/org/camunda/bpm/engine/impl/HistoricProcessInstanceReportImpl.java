@@ -175,10 +175,6 @@ public class HistoricProcessInstanceReportImpl implements HistoricProcessInstanc
     return durationPeriodUnit.name();
   }
 
-  /*
-    The Command interface should always be implemented as a regular,
-    or inner class so that invoked commands are correctly counted with Telemetry.
-   */
   protected class ExecuteDurationReportCmd implements Command<List<DurationReportResult>> {
 
     @Override

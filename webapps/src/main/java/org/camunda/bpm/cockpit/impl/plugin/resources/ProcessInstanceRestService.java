@@ -159,10 +159,6 @@ public class ProcessInstanceRestService extends AbstractPluginResource {
     }
   }
 
-  /*
-    The Command interface should always be implemented as a regular,
-    or inner class so that invoked commands are correctly counted with Telemetry.
-   */
   protected class QueryProcessInstancesCountCmd implements Command<CountResultDto> {
 
     protected ProcessInstanceQueryDto queryParameter;

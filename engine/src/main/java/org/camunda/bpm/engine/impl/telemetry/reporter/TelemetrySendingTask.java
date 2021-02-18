@@ -328,10 +328,6 @@ public class TelemetrySendingTask extends TimerTask {
     TelemetryUtil.updateCollectingTelemetryDataEnabled(telemetryRegistry, metricsRegistry, enabled);
   }
 
-  /*
-    The Command interface should always be implemented as a regular,
-    or inner class so that invoked commands are correctly counted with Telemetry.
-   */
   protected class SendInitialMsgCmd implements org.camunda.bpm.engine.impl.interceptor.Command<Void> {
     @Override
     public Void execute(CommandContext commandContext) {

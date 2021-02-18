@@ -112,10 +112,6 @@ public class DbMetricsReporter {
     }
   }
 
-  /*
-    The Command interface should always be implemented as a regular,
-    or inner class so that invoked commands are correctly counted with Telemetry.
-   */
   protected class ReportDbMetricsValueCmd implements Command<Void> {
 
     protected String name;
