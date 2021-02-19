@@ -16,7 +16,7 @@
  */
 
 import SwaggerUI from 'swagger-ui'
-
+import './style.css'
 SwaggerUI({
     dom_id: '#swagger-ui',
     deepLinking: true,
