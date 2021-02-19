@@ -40,22 +40,22 @@ public class DeleteDeploymentFailListener implements TransactionListener {
   public void execute(CommandContext commandContext) {
 
     //we can not use commandContext parameter here, as it can be in inconsistent state
-    commandExecutor.execute(new Command<Void>() {
-      @Override
-      public Void execute(final CommandContext commandContext) {
-        commandContext.runWithoutAuthorization(new Callable<Void>() {
-          @Override
-          public Void call() throws Exception {
-            new RegisterDeploymentCmd(deploymentId).execute(commandContext);
-            if (processApplicationReference != null) {
-              new RegisterProcessApplicationCmd(deploymentId, processApplicationReference).execute(commandContext);
-            }
-            return null;
-          }
-        });
-        return null;
-      }
-    });
+    commandExecutor.execute(new DeleteDeploymentFailCmd());
   }
 
+  protected class DeleteDeploymentFailCmd implements Command<Void> {
+
+    @Override
+    public Void execute(final CommandContext commandContext) {
+      commandContext.runWithoutAuthorization((Callable<Void>) () -> {
+        new RegisterDeploymentCmd(deploymentId).execute(commandContext);
+        if (processApplicationReference != null) {
+          new RegisterProcessApplicationCmd(deploymentId, processApplicationReference).execute(commandContext);
+        }
+        return null;
+      });
+      return null;
+    }
+
+  }
 }

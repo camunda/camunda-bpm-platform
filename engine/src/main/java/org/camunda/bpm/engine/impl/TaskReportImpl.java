@@ -53,12 +53,13 @@ public class TaskReportImpl implements Serializable, TaskReport {
   }
 
   public List<TaskCountByCandidateGroupResult> taskCountByCandidateGroup() {
-    return commandExecutor.execute(new Command<List<TaskCountByCandidateGroupResult>>() {
-      @Override
-      public List<TaskCountByCandidateGroupResult> execute(CommandContext commandContext) {
-        return createTaskCountByCandidateGroupReport(commandContext);
-      }
-    });
+    return commandExecutor.execute(new TaskCountByCandidateGroupCmd());
   }
 
+  protected class TaskCountByCandidateGroupCmd implements Command<List<TaskCountByCandidateGroupResult>> {
+    @Override
+    public List<TaskCountByCandidateGroupResult> execute(CommandContext commandContext) {
+      return createTaskCountByCandidateGroupReport(commandContext);
+    }
+  }
 }

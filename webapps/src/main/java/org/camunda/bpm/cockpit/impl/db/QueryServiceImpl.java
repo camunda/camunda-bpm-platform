@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.db.AuthorizationCheck;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
+import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.util.QueryMaxResultsLimitUtil;
 
@@ -37,33 +38,15 @@ public class QueryServiceImpl implements QueryService {
   }
 
   public <T> List<T> executeQuery(final String statement, final QueryParameters<T> parameter) {
-    return commandExecutor.executeCommand(commandContext -> {
-      ProcessEngineConfigurationImpl engineConfig = getProcessEngineConfiguration(commandContext);
-
-      configureAuthCheck(parameter, engineConfig, commandContext);
-
-      if (parameter.isMaxResultsLimitEnabled()) {
-        QueryMaxResultsLimitUtil.checkMaxResultsLimit(parameter.getMaxResults(), engineConfig);
-      }
-
-      return (List<T>) commandContext.getDbSqlSession()
-        .selectList(statement, parameter);
-    });
+    return commandExecutor.executeCommand(new ExecuteListQueryCmd<T>(statement, parameter));
   }
 
-  public <T> T executeQuery(final String statement, final Object parameter, final Class<T> clazz) {
-    return commandExecutor.executeCommand(commandContext -> (T) commandContext.getDbSqlSession()
-      .selectOne(statement, parameter));
+  public <T> T executeQuery(String statement, Object parameter, Class<T> clazz) {
+    return commandExecutor.executeCommand(new ExecuteSingleQueryCmd<T>(statement, parameter, clazz));
   }
 
-  public Long executeQueryRowCount(final String statement, final ListQueryParameterObject parameter) {
-    return commandExecutor.executeCommand(commandContext -> {
-      ProcessEngineConfigurationImpl engineConfig = getProcessEngineConfiguration(commandContext);
-
-      configureAuthCheck(parameter, engineConfig, commandContext);
-
-      return (Long) commandContext.getDbSqlSession().selectOne(statement, parameter);
-    });
+  public Long executeQueryRowCount(String statement, ListQueryParameterObject parameter) {
+    return commandExecutor.executeCommand(new QueryServiceRowCountCmd(statement, parameter));
   }
 
   protected ProcessEngineConfigurationImpl getProcessEngineConfiguration(
@@ -95,4 +78,65 @@ public class QueryServiceImpl implements QueryService {
     authCheck.setHistoricInstancePermissionsEnabled(isEnableHistoricInstancePermissions);
   }
 
+  protected class QueryServiceRowCountCmd implements Command<Long> {
+
+    protected String statement;
+    protected ListQueryParameterObject parameter;
+
+    public QueryServiceRowCountCmd(String statement, ListQueryParameterObject parameter) {
+      this.statement = statement;
+      this.parameter = parameter;
+    }
+
+    @Override
+    public Long execute(CommandContext commandContext) {
+      ProcessEngineConfigurationImpl engineConfig = getProcessEngineConfiguration(commandContext);
+
+      configureAuthCheck(parameter, engineConfig, commandContext);
+
+      return (Long) commandContext.getDbSqlSession().selectOne(statement, parameter);
+    }
+  }
+
+  protected class ExecuteListQueryCmd<T> implements Command<List<T>> {
+
+    protected String statement;
+    protected QueryParameters parameter;
+
+    public ExecuteListQueryCmd(String statement, QueryParameters parameter) {
+      this.statement = statement;
+      this.parameter = parameter;
+    }
+
+    @Override
+    public List<T> execute(CommandContext commandContext) {
+      ProcessEngineConfigurationImpl engineConfig = getProcessEngineConfiguration(commandContext);
+
+      configureAuthCheck(parameter, engineConfig, commandContext);
+
+      if (parameter.isMaxResultsLimitEnabled()) {
+        QueryMaxResultsLimitUtil.checkMaxResultsLimit(parameter.getMaxResults(), engineConfig);
+      }
+
+      return (List<T>) commandContext.getDbSqlSession().selectList(statement, parameter);
+    }
+  }
+
+  protected class ExecuteSingleQueryCmd<T> implements Command<T> {
+
+    protected String statement;
+    protected Object parameter;
+    protected Class clazz;
+
+    public <T> ExecuteSingleQueryCmd(String statement, Object parameter, Class<T> clazz) {
+      this.statement = statement;
+      this.parameter = parameter;
+      this.clazz = clazz;
+    }
+
+    @Override
+    public T execute(CommandContext commandContext) {
+      return (T) commandContext.getDbSqlSession().selectOne(statement, parameter);
+    }
+  }
 }

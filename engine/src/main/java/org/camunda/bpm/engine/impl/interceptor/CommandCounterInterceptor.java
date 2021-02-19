@@ -36,9 +36,18 @@ public class CommandCounterInterceptor extends CommandInterceptor {
     } finally {
       TelemetryRegistry telemetryRegistry = processEngineConfiguration.getTelemetryRegistry();
       if (telemetryRegistry != null && telemetryRegistry.isCollectingTelemetryDataEnabled()) {
-        telemetryRegistry.markOccurrence(ClassNameUtil.getClassNameWithoutPackage(command));
+        String className = ClassNameUtil.getClassNameWithoutPackage(command);
+        // anonymous class/lambda implementations of the Command interface are excluded
+        if (!command.getClass().isAnonymousClass() && !className.contains("$$Lambda$")) {
+          className = parseLocalClassName(className);
+          telemetryRegistry.markOccurrence(className);
+        }
       }
     }
+  }
+
+  protected String parseLocalClassName(String className) {
+    return className.replace("$", "_");
   }
 
 }

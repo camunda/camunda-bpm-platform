@@ -87,13 +87,7 @@ public class MetricsQueryImpl extends ListQueryParameterObject implements Serial
 
   @Override
   public List<MetricIntervalValue> interval() {
-    callback = new Command() {
-      @Override
-      public Object execute(CommandContext commandContext) {
-        return commandContext.getMeterLogManager()
-          .executeSelectInterval(MetricsQueryImpl.this);
-      }
-    };
+    callback = new MetricsQueryIntervalCmd(this);
 
     return (List<MetricIntervalValue>) commandExecutor.execute(this);
   }
@@ -105,13 +99,7 @@ public class MetricsQueryImpl extends ListQueryParameterObject implements Serial
   }
 
   public long sum() {
-    callback = new Command() {
-      @Override
-      public Object execute(CommandContext commandContext) {
-        return commandContext.getMeterLogManager()
-          .executeSelectSum(MetricsQueryImpl.this);
-      }
-    };
+    callback = new MetricsQuerySumCmd(this);
 
     return (Long) commandExecutor.execute(this);
   }
@@ -189,4 +177,33 @@ public class MetricsQueryImpl extends ListQueryParameterObject implements Serial
     return super.getMaxResults();
   }
 
+  protected class MetricsQueryIntervalCmd implements Command<Object> {
+
+    protected MetricsQueryImpl metricsQuery;
+
+    public MetricsQueryIntervalCmd(MetricsQueryImpl metricsQuery) {
+      this.metricsQuery = metricsQuery;
+    }
+
+    @Override
+    public Object execute(CommandContext commandContext) {
+      return commandContext.getMeterLogManager()
+          .executeSelectInterval(metricsQuery);
+    }
+  }
+
+  protected class MetricsQuerySumCmd implements Command<Object> {
+
+    protected MetricsQueryImpl metricsQuery;
+
+    public MetricsQuerySumCmd(MetricsQueryImpl metricsQuery) {
+      this.metricsQuery = metricsQuery;
+    }
+
+    @Override
+    public Object execute(CommandContext commandContext) {
+      return commandContext.getMeterLogManager()
+          .executeSelectSum(metricsQuery);
+    }
+  }
 }

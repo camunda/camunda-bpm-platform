@@ -145,10 +145,7 @@ public class TelemetrySendingTask extends TimerTask {
 
   protected void sendInitialMessage() {
     try {
-      commandExecutor.execute(commandContext -> {
-          sendInitialMessage(commandContext);
-          return null;
-      });
+      commandExecutor.execute(new SendInitialMsgCmd());
     } catch (ProcessEngineException pex) {
       // the property might have been inserted already by another cluster node after we checked it, ignore that
       if (!ExceptionUtil.checkConstraintViolationException(pex)) {
@@ -331,4 +328,11 @@ public class TelemetrySendingTask extends TimerTask {
     TelemetryUtil.updateCollectingTelemetryDataEnabled(telemetryRegistry, metricsRegistry, enabled);
   }
 
+  protected class SendInitialMsgCmd implements org.camunda.bpm.engine.impl.interceptor.Command<Void> {
+    @Override
+    public Void execute(CommandContext commandContext) {
+      sendInitialMessage(commandContext);
+      return null;
+    }
+  }
 }

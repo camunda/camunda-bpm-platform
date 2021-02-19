@@ -75,18 +75,9 @@ public class ProcessInstanceRestService extends AbstractPluginResource {
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes(MediaType.APPLICATION_JSON)
   public List<ProcessInstanceDto> queryProcessInstances(final ProcessInstanceQueryDto queryParameter,
-      final @QueryParam("firstResult") Integer firstResult, final @QueryParam("maxResults") Integer maxResults) {
+      @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults) {
 
-    return getCommandExecutor().executeCommand(new Command<List<ProcessInstanceDto>>() {
-      public List<ProcessInstanceDto> execute(CommandContext commandContext) {
-        injectObjectMapper(queryParameter);
-        injectEngineConfig(queryParameter);
-        paginate(queryParameter, firstResult, maxResults);
-        configureExecutionQuery(queryParameter);
-        return getQueryService().executeQuery("selectRunningProcessInstancesIncludingIncidents", queryParameter);
-      }
-    });
-
+    return getCommandExecutor().executeCommand(new QueryProcessInstancesCmd(queryParameter, firstResult, maxResults));
   }
 
   @GET
@@ -101,17 +92,9 @@ public class ProcessInstanceRestService extends AbstractPluginResource {
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes(MediaType.APPLICATION_JSON)
   @Path("/count")
-  public CountResultDto queryProcessInstancesCount(final ProcessInstanceQueryDto queryParameter) {
+  public CountResultDto queryProcessInstancesCount(ProcessInstanceQueryDto queryParameter) {
 
-    return getCommandExecutor().executeCommand(new Command<CountResultDto>() {
-      public CountResultDto execute(CommandContext commandContext) {
-        injectEngineConfig(queryParameter);
-        configureExecutionQuery(queryParameter);
-        long result = getQueryService().executeQueryRowCount("selectRunningProcessInstancesCount", queryParameter);
-        return new CountResultDto(result);
-      }
-    });
-
+    return getCommandExecutor().executeCommand(new QueryProcessInstancesCountCmd(queryParameter));
   }
 
   private void paginate(ProcessInstanceQueryDto queryParameter, Integer firstResult, Integer maxResults) {
@@ -148,6 +131,49 @@ public class ProcessInstanceRestService extends AbstractPluginResource {
 
   public void setObjectMapper(ObjectMapper objectMapper) {
     this.objectMapper = objectMapper;
+  }
+
+  /*
+    The Command interface should always be implemented as a regular,
+    or inner class so that invoked commands are correctly counted with Telemetry.
+   */
+  protected class QueryProcessInstancesCmd implements Command<List<ProcessInstanceDto>> {
+
+    protected ProcessInstanceQueryDto queryParameter;
+    protected Integer firstResult;
+    protected Integer maxResults;
+
+    public QueryProcessInstancesCmd(ProcessInstanceQueryDto queryParameter, Integer firstResult, Integer maxResults) {
+      this.queryParameter = queryParameter;
+      this.firstResult = firstResult;
+      this.maxResults = maxResults;
+    }
+
+    @Override
+    public List<ProcessInstanceDto> execute(CommandContext commandContext) {
+      injectObjectMapper(queryParameter);
+      injectEngineConfig(queryParameter);
+      paginate(queryParameter, firstResult, maxResults);
+      configureExecutionQuery(queryParameter);
+      return getQueryService().executeQuery("selectRunningProcessInstancesIncludingIncidents", queryParameter);
+    }
+  }
+
+  protected class QueryProcessInstancesCountCmd implements Command<CountResultDto> {
+
+    protected ProcessInstanceQueryDto queryParameter;
+
+    public QueryProcessInstancesCountCmd(ProcessInstanceQueryDto queryParameter) {
+      this.queryParameter = queryParameter;
+    }
+
+    @Override
+    public CountResultDto execute(CommandContext commandContext) {
+      injectEngineConfig(queryParameter);
+      configureExecutionQuery(queryParameter);
+      long result = getQueryService().executeQueryRowCount("selectRunningProcessInstancesCount", queryParameter);
+      return new CountResultDto(result);
+    }
   }
 
 }

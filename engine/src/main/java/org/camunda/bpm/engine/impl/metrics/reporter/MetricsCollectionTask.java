@@ -64,7 +64,7 @@ public class MetricsCollectionTask extends TimerTask {
 
   protected void collectMetrics() {
 
-    final List<MeterLogEntity> logs = new ArrayList<MeterLogEntity>();
+    List<MeterLogEntity> logs = new ArrayList<>();
     for (Meter meter : metricsRegistry.getDbMeters().values()) {
       logs.add(new MeterLogEntity(meter.getName(),
           reporterId,
@@ -73,15 +73,7 @@ public class MetricsCollectionTask extends TimerTask {
 
     }
 
-    commandExecutor.execute(new Command<Void>() {
-
-      public Void execute(CommandContext commandContext) {
-        for (MeterLogEntity meterLogEntity : logs) {
-          commandContext.getMeterLogManager().insert(meterLogEntity);
-        }
-        return null;
-      }
-    });
+    commandExecutor.execute(new MetricsCollectionCmd(logs));
   }
 
   public String getReporter() {
@@ -92,6 +84,21 @@ public class MetricsCollectionTask extends TimerTask {
     this.reporterId = reporterId;
   }
 
+  protected class MetricsCollectionCmd implements Command<Void> {
 
+    protected List<MeterLogEntity> logs;
+
+    public MetricsCollectionCmd(List<MeterLogEntity> logs) {
+      this.logs = logs;
+    }
+
+    @Override
+    public Void execute(CommandContext commandContext) {
+      for (MeterLogEntity meterLogEntity : logs) {
+        commandContext.getMeterLogManager().insert(meterLogEntity);
+      }
+      return null;
+    }
+  }
 
 }

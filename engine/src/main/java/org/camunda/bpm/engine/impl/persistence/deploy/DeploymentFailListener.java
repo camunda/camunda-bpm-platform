@@ -43,19 +43,21 @@ public class DeploymentFailListener implements TransactionListener {
 
   public void execute(CommandContext commandContext) {
     //unregister deployment without authorization
-    commandExecutor.execute(new Command<Void>() {
-      @Override
-      public Void execute(final CommandContext commandContext) {
-        commandContext.runWithoutAuthorization(new Callable<Void>() {
-          @Override
-          public Void call() throws Exception {
-            new UnregisterDeploymentCmd(deploymentIds).execute(commandContext);
-            return null;
-          }
-        });
+    commandExecutor.execute(new DeleteDeploymentListenerCmd());
+  }
+
+  protected class DeleteDeploymentListenerCmd implements Command<Void> {
+
+    @Override
+    public Void execute(final CommandContext commandContext) {
+
+      commandContext.runWithoutAuthorization((Callable<Void>) () -> {
+        new UnregisterDeploymentCmd(deploymentIds).execute(commandContext);
         return null;
-      }
-    });
+      });
+
+      return null;
+    }
   }
 
 }
