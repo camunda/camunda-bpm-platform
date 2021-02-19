@@ -506,10 +506,6 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
     return commandExecutor.execute(new IsTelemetryEnabledCmd());
   }
 
-  /*
-    The Command interface should always be implemented as a regular,
-    or inner class so that invoked commands are correctly counted with Telemetry.
-   */
   protected class DbSchemaUpgradeCmd implements Command<String> {
 
     protected Connection connection;
