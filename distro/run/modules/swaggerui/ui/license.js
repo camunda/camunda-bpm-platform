@@ -82,7 +82,6 @@ checker.init(
     {
         start: '.',
         excludePrivatePackages: true,
-        production: true
     },
     parseResults(PRODUCTION_LICENSES, ()=>console.log("gg"), warn => console.log(warn))
 );
