@@ -88,5 +88,6 @@ export default {
   // },
   // csrfCookieName: 'XSRF-TOKEN',
   // disableWelcomeMessage: false,
-  // userOperationLogAnnotationLength: 5000
+  // userOperationLogAnnotationLength: 5000,
+  // previewHtml: true
 };

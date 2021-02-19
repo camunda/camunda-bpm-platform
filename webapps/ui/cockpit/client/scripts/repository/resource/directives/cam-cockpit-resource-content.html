@@ -25,6 +25,13 @@
     <img ng-src="{{ imageLink(deployment, resource) }}">
   </div>
 
+  <div ng-if="isHtmlResource(resource)"
+       class="html-resource">
+    <div cam-html-source
+         name="resource.name"
+         source="binary">
+    </div>
+  </div>
 
   <div ng-if="isUnkownResource(resource)"
        class="unkown-resource">

@@ -55,7 +55,8 @@ var defaultConfig = {
   },
   csrfCookieName: 'XSRF-TOKEN',
   disableWelcomeMessage: false,
-  userOperationLogAnnotationLength: 4000
+  userOperationLogAnnotationLength: 4000,
+  previewHtml: true
 };
 
 module.exports = function(config, app) {
@@ -195,6 +196,14 @@ module.exports = function(config, app) {
       this.getUserOperationLogAnnotationLength = function() {
         var param = 'userOperationLogAnnotationLength';
         return config[param] || defaultConfig[param];
+      };
+
+      this.getPreviewHtml = function() {
+        var param = 'previewHtml';
+        // 'false' is a valid config option
+        return typeof config[param] !== 'undefined'
+          ? config[param]
+          : defaultConfig[param];
       };
 
       this.$get = function() {

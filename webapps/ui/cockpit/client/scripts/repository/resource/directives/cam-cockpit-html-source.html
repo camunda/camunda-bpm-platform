@@ -1,0 +1,8 @@
+<!-- # cockpit client/scripts/repository/resource/directives/cam-cockpit-html-source.html -->
+<fieldset class="disabled-form" disabled ng-if="showHtml">
+  <div ng-bind-html="trustedHtml"></div>
+</fieldset>
+
+<h4 class="subheading" ng-if="showHtml">{{'REPOSITORY_RESOURCES_SOURCE' | translate}}</h4>
+<div cam-source name="name" source="source"></div>
+<!-- / cockpit client/scripts/repository/resource/directives/cam-cockpit-html-source.html -->
