@@ -112,11 +112,27 @@
     where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
   </update>
 
+  <update id="updateHistoricProcessInstanceEventsByRootProcessInstanceId_mssql"
+          parameterType="java.util.Map">
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_HI_PROCINST RES WITH (FORCESEEK)
+    where RES.ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+  </update>
+
   <update id="updateHistoricProcessInstanceByProcessInstanceId"
           parameterType="java.util.Map">
     update ${prefix}ACT_HI_PROCINST
       set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
       where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+  </update>
+
+  <update id="updateHistoricProcessInstanceByProcessInstanceId_mssql"
+          parameterType="java.util.Map">
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_HI_PROCINST RES WITH (FORCESEEK)
+    where RES.PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
   </update>
 
   <!-- HISTORIC PROCESS INSTANCE SELECT -->

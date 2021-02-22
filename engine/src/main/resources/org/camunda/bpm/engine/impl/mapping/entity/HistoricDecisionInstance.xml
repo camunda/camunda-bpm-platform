@@ -91,11 +91,27 @@
       where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
   </update>
 
+  <update id="updateHistoricDecisionInstancesByRootProcessInstanceId_mssql"
+          parameterType="java.util.Map">
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_HI_DECINST RES WITH (FORCESEEK)
+    where RES.ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+  </update>
+
   <update id="updateHistoricDecisionInstancesByProcessInstanceId"
           parameterType="java.util.Map">
     update ${prefix}ACT_HI_DECINST
       set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
       where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+  </update>
+
+  <update id="updateHistoricDecisionInstancesByProcessInstanceId_mssql"
+          parameterType="java.util.Map">
+    update RES
+    set RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_HI_DECINST RES WITH (FORCESEEK)
+    where RES.PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
   </update>
 
   <update id="updateHistoricDecisionInstancesByRootDecisionInstanceId"
@@ -107,12 +123,29 @@
          or ID_ = #{rootDecisionInstanceId, jdbcType=VARCHAR}
   </update>
 
+  <update id="updateHistoricDecisionInstancesByRootDecisionInstanceId_mssql"
+          parameterType="java.util.Map">
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_HI_DECINST RES WITH (FORCESEEK)
+    where RES.ROOT_DEC_INST_ID_ = #{rootDecisionInstanceId, jdbcType=VARCHAR} <!-- null for root dec instances -->
+    or RES.ID_ = #{rootDecisionInstanceId, jdbcType=VARCHAR}
+  </update>
+
   <update id="updateHistoricDecisionInstancesByDecisionInstanceId"
           parameterType="java.util.Map">
       update ${prefix}ACT_HI_DECINST set
       REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
 
       where ID_ = #{decisionInstanceId, jdbcType=VARCHAR}
+  </update>
+
+  <update id="updateHistoricDecisionInstancesByDecisionInstanceId_mssql"
+          parameterType="java.util.Map">
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_HI_DECINST RES WITH (FORCESEEK)
+    where RES.ID_ = #{decisionInstanceId, jdbcType=VARCHAR}
   </update>
 
   <!-- delete -->

@@ -113,6 +113,14 @@
     where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
   </update>
 
+  <update id="updateHistoricIncidentsByRootProcessInstanceId_mssql"
+          parameterType="java.util.Map">
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_HI_INCIDENT RES WITH (FORCESEEK)
+    where RES.ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+  </update>
+
   <update id="updateHistoricIncidentsByRootProcessInstanceId_mysql"
           parameterType="java.util.Map">
     update ${prefix}ACT_HI_INCIDENT set
@@ -129,6 +137,14 @@
       where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
   </update>
 
+  <update id="updateHistoricIncidentsByProcessInstanceId_mssql"
+          parameterType="java.util.Map">
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_HI_INCIDENT RES WITH (FORCESEEK)
+    where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+  </update>
+
   <update id="updateHistoricIncidentsByProcessInstanceId_mysql"
           parameterType="java.util.Map">
     update ${prefix}ACT_HI_INCIDENT
@@ -143,6 +159,20 @@
     REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
 
     where ID_ in (SELECT HI.ID_ from ${prefix}ACT_HI_INCIDENT HI
+      inner join ${prefix}ACT_HI_BATCH HB
+      on HI.JOB_DEF_ID_ in
+        (HB.SEED_JOB_DEF_ID_,
+         HB.MONITOR_JOB_DEF_ID_,
+         HB.BATCH_JOB_DEF_ID_)
+      where HB.ID_ = #{batchId})
+  </update>
+
+  <update id="updateHistoricIncidentsByBatchId_mssql"
+          parameterType="java.util.Map">
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_HI_INCIDENT RES WITH (FORCESEEK)
+    where RES.ID_ in (SELECT HI.ID_ from ${prefix}ACT_HI_INCIDENT HI
       inner join ${prefix}ACT_HI_BATCH HB
       on HI.JOB_DEF_ID_ in
         (HB.SEED_JOB_DEF_ID_,

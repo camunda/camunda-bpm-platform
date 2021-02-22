@@ -87,11 +87,27 @@
       where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
   </update>
 
+  <update id="updateJobLogByRootProcessInstanceId_mssql"
+          parameterType="java.util.Map">
+      update RES set
+      RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      FROM ${prefix}ACT_HI_JOB_LOG RES WITH (FORCESEEK)
+      where RES.ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+  </update>
+
   <update id="updateJobLogByProcessInstanceId"
           parameterType="java.util.Map">
     update ${prefix}ACT_HI_JOB_LOG
       set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
       where PROCESS_INSTANCE_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+  </update>
+
+  <update id="updateJobLogByProcessInstanceId_mssql"
+          parameterType="java.util.Map">
+    update RES set
+      RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      FROM ${prefix}ACT_HI_JOB_LOG RES WITH (FORCESEEK)
+      where RES.PROCESS_INSTANCE_ID_ = #{processInstanceId, jdbcType=VARCHAR}
   </update>
 
   <update id="updateJobLogByBatchId"
@@ -100,6 +116,15 @@
       REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
 
       where JOB_DEF_CONFIGURATION_ = #{batchId, jdbcType=VARCHAR}
+  </update>
+
+  <update id="updateJobLogByBatchId_mssql"
+          parameterType="java.util.Map">
+      update RES set
+      RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      FROM ${prefix}ACT_HI_JOB_LOG RES WITH (FORCESEEK)
+
+      where RES.JOB_DEF_CONFIGURATION_ = #{batchId, jdbcType=VARCHAR}
   </update>
 
   <!-- DELETE -->
