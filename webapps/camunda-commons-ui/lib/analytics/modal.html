@@ -4,7 +4,7 @@
   <h3 class="modal-title">{{ 'TELEMETRY_SETTINGS' | translate }}</h3>
 </div>
 
-<div class="modal-body analytics-body" ng-if="loadingState !== 'DONE'">
+<div class="modal-body analytics-body" ng-show="loadingState !== 'DONE'">
   <div notifications-panel></div>
 
   {{ 'TELEMETRY_INTRODUCTION' | translate }}
@@ -34,21 +34,21 @@
   </a>.
 </div>
   
-<div class="modal-body analytics-body" ng-if="loadingState === 'DONE'">
+<div class="modal-body analytics-body" ng-show="loadingState === 'DONE'">
   {{'TELEMETRY_SUCCESS' | translate}} 
 </div>
 
 
 <div class="modal-footer">
   <div class="col-xs-12 text-right">
-    <button class="btn btn-link modal-close" ng-click="close()" ng-if="loadingState !== 'DONE'">
+    <button class="btn btn-link modal-close" ng-click="close()" ng-show="loadingState !== 'DONE'">
       {{ 'TELEMETRY_CANCEL' | translate }}
     </button>
 
-    <button class="btn btn-primary" ng-click="save()" ng-if="loadingState !== 'DONE'" ng-disabled="loadingState === 'LOADING'">
+    <button class="btn btn-primary" ng-click="save()" ng-show="loadingState !== 'DONE'" ng-disabled="loadingState === 'LOADING'">
       {{ 'TELEMETRY_SAVE' | translate }}
     </button>
-    <button class="btn btn-primary" ng-click="close()" ng-if="loadingState === 'DONE'">
+    <button class="btn btn-primary" ng-click="close()" ng-show="loadingState === 'DONE'">
       {{ 'CLOSE' | translate }}
     </button>
   </div>
