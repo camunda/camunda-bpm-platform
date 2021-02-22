@@ -148,12 +148,35 @@
     where ID_= #{id, jdbcType=VARCHAR}
   </update>
 
+  <update id="updateHistoricBatch_mssql" parameterType="org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity">
+    update RES
+    <set>
+      <if test="endTime != null">
+        RES.END_TIME_ = #{endTime, jdbcType=TIMESTAMP},
+      </if>
+      <if test="removalTime != null">
+        RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      </if>
+    </set>
+    FROM ${prefix}ACT_HI_BATCH RES WITH (FORCESEEK)
+    where RES.ID_= #{id, jdbcType=VARCHAR}
+  </update>
+
   <update id="updateHistoricBatchRemovalTimeById" parameterType="org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity">
     update ${prefix}ACT_HI_BATCH
     <set>
         REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
     </set>
     where ID_ = #{id, jdbcType=VARCHAR}
+  </update>
+
+  <update id="updateHistoricBatchRemovalTimeById_mssql" parameterType="org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity">
+    update RES
+    <set>
+      RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    </set>
+    FROM ${prefix}ACT_HI_BATCH RES WITH (FORCESEEK)
+    where RES.ID_ = #{id, jdbcType=VARCHAR}
   </update>
 
   <!-- SELECT -->

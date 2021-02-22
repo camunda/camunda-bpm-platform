@@ -74,6 +74,14 @@
     where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
   </update>
 
+  <update id="updateAuthorizationsByRootProcessInstanceId_mssql"
+          parameterType="java.util.Map">
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_RU_AUTHORIZATION RES WITH (FORCESEEK)
+    where RES.ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+  </update>
+
   <update id="updateAuthorizationsByProcessInstanceId"
           parameterType="java.util.Map">
     update ${prefix}ACT_RU_AUTHORIZATION set
@@ -88,6 +96,22 @@
       )
       <!-- process instances -->
       or RESOURCE_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+  </update>
+
+  <update id="updateAuthorizationsByProcessInstanceId_mssql"
+          parameterType="java.util.Map">
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_RU_AUTHORIZATION RES WITH (FORCESEEK)
+    where
+      <!-- task instances -->
+      RES.RESOURCE_ID_ IN (
+        SELECT ID_
+        FROM ${prefix}ACT_HI_TASKINST
+        WHERE PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+      )
+      <!-- process instances -->
+      or RES.RESOURCE_ID_ = #{processInstanceId, jdbcType=VARCHAR}
   </update>
 
   <!-- AUTHORIZATION DELETE -->
