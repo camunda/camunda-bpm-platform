@@ -64,11 +64,10 @@
       <ul cam-if-logged-in
           ng-controller="camHeaderViewsCtrl">
         <li ng-repeat="actionProvider in menuActions"
-            ng-if="actionProvider.pagePath && actionProvider.accessible"
+            ng-if="actionProvider.accessible"
             ng-class="activeClass(actionProvider)">
-          <a ng-href="{{ actionProvider.pagePath }}">{{ actionProvider.label | translate}}</a>
+            <view provider="actionProvider"></view>
         </li>
-
         <li class="dropdown"
             ng-if="dropdownActions.length"
             uib-dropdown>
@@ -77,9 +76,9 @@
              href>{{ 'COCKPIT_MORE' | translate}} <i class="caret"></i></a>
           <ul class="dropdown-menu" uib-dropdown-menu>
             <li ng-repeat="actionProvider in dropdownActions"
-                ng-if="actionProvider.pagePath && actionProvider.accessible"
+                ng-if="actionProvider.accessible"
                 ng-class="activeClass(actionProvider)">
-              <a ng-href="{{ actionProvider.pagePath }}">{{ actionProvider.label | translate}}</a>
+                <view provider="actionProvider"></view>
             </li>
           </ul>
         </li>
