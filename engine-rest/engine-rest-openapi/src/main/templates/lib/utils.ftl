@@ -255,15 +255,61 @@
         examples=[]
         last=false >
     "${code}": {
+        <#if code != "204">
+          "content": {
+            <@lib.responseContentMediaType
+                flatType = flatType
+                dto = dto
+                array = array
+                additionalProperties = additionalProperties
+                mediaType = mediaType
+                examples = examples />
+          },
+        </#if>
+          "description": "${removeIndentation(desc)}"
+    }
 
-       <#if code != "204">
-         "content": {
-           <#if mediaType == "application/xhtml+xml">
+    <#if !last> , </#if> <#-- if not a last response, add a comma-->
+</#macro>
+
+<#macro multiTypeResponse 
+        code 
+        desc
+        types=[]
+        last=false >
+    "${code}": {
+        <#if code != "204">
+          "content": {
+            <#list types as type >
+              <@lib.responseContentMediaType
+                  flatType = type["flatType"]
+                  dto = type["dto"]
+                  array = type["array"]
+                  additionalProperties = type["additionalProperties"]
+                  mediaType = type["mediaType"]
+                  examples = type["examples"] /><#sep>,
+            </#list>
+          },
+        </#if>
+          "description": "${removeIndentation(desc)}"
+     }
+
+    <#if !last> , </#if> <#-- if not a last response, add a comma-->
+</#macro>
+
+<#macro responseContentMediaType
+        flatType=""
+        dto=""
+        array=false
+        additionalProperties=false
+        mediaType="application/json"
+        examples=[] >
+           <#if mediaType == "application/xhtml+xml" | (mediaType == "application/json" & !array & flatType == "string")>
              "${mediaType}": {
                "schema": {
                  "type": "string",
                  "format": "binary",
-                 "description": "For `application/xhtml+xml` Responses, a byte stream is returned."
+                 "description": "For `${mediaType}` Responses, a byte stream is returned."
                }
            <#else>
              "${mediaType}": {
@@ -300,21 +346,15 @@
            </#if>
 
            <#if examples?size != 0>,
-             "examples": {
-               ${examples?join(", ")}
-             }
+               "examples": {
+                 ${examples?join(", ")}
+               }
            </#if>
 
-           }
-         },
-       </#if>
-
-       "description": "${removeIndentation(desc)}"
-     }
-
-    <#if !last> , </#if> <#-- if not a last response, add a comma-->
+             }
 </#macro>
 
+<#-- Generates a Server JSON object -->
 <#macro server
         url
         variables
