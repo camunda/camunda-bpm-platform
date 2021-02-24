@@ -20,7 +20,7 @@
 var angular = require('../../../../../../camunda-commons-ui/vendor/angular');
 
 function checkActive(plugin, path) {
-  return path.indexOf(plugin.id) > -1;
+  return path.indexOf(plugin.id) > -1 || path.indexOf(plugin.path) > -1;
 }
 
 module.exports = [
@@ -52,6 +52,12 @@ module.exports = [
       // accessible by default in case there's no callback
       else {
         plugin.accessible = true;
+      }
+
+      // "Legacy" Plugins
+      if (!plugin.render) {
+        plugin.template = `<a ng-href="${plugin.pagePath}">
+        {{'${plugin.label}' | translate}}</a>`;
       }
 
       (plugin.priority >= 0 ? $scope.menuActions : $scope.dropdownActions).push(

@@ -35,8 +35,8 @@ body {
       }
     }
 
-    li {
-      > view > a {
+    :not(.dropdown-menu) > li {
+      > view a {
         .cam-corporate-header-menu-item-link();
       }
 
@@ -48,7 +48,7 @@ body {
       &:focus {
         background-color: transparent;
 
-        > view > a {
+        > view a {
           background-color: transparent;
         }
       }
@@ -56,7 +56,7 @@ body {
       &.active {
         background-color: @gray-lighter;
 
-        > view > a {
+        > view a {
           color: @gray-base;
         }
       }

@@ -1,7 +1,7 @@
 /* stylelint-disable no-descending-specificity -- contains non-trivial nesting */
 
-@import "shared/bootstrap.less";
-@import "shared/base.less";
+@import 'shared/bootstrap.less';
+@import 'shared/base.less';
 
 .align-left {
   text-align: left;
@@ -27,14 +27,15 @@
     padding: 0;
     margin: 2px 0;
 
-    > a {
+    a {
       padding: 2px 9px;
+      display: block;
     }
   }
 
   > .active,
   > li:hover {
-    > a {
+    a {
       padding-left: 4px;
       border-width: 0 0 0 3px;
       margin-left: 2px;
@@ -45,7 +46,7 @@
   }
 
   > li:hover {
-    > a {
+    a {
       color: @gray-base;
       border-color: @link-color;
     }
@@ -198,12 +199,12 @@
   }
 }
 
-@import "shared/animation-spin.less";
-@import "./modal.less";
-@import "directives/notifications-panel.less";
-@import "directives/pagination.less";
-@import "../../lib/auth/page/login.less";
-@import "clipboard/cam-widget-clipboard.less";
-@import "header/cam-widget-header.less";
-@import "footer/cam-widget-footer.less";
-@import "./glyphicon-overrides.less";
+@import 'shared/animation-spin.less';
+@import './modal.less';
+@import 'directives/notifications-panel.less';
+@import 'directives/pagination.less';
+@import '../../lib/auth/page/login.less';
+@import 'clipboard/cam-widget-clipboard.less';
+@import 'header/cam-widget-header.less';
+@import 'footer/cam-widget-footer.less';
+@import './glyphicon-overrides.less';
