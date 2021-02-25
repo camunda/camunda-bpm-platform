@@ -272,6 +272,7 @@
     <#if !last> , </#if> <#-- if not a last response, add a comma-->
 </#macro>
 
+<#-- Generates an HTTP multi type Response JSON object -->
 <#macro multiTypeResponse 
         code 
         desc
@@ -291,12 +292,13 @@
             </#list>
           },
         </#if>
-          "description": "${removeIndentation(desc)}"
-     }
+        "description": "${removeIndentation(desc)}"
+    }
 
     <#if !last> , </#if> <#-- if not a last response, add a comma-->
 </#macro>
 
+<#-- Generates a content media type JSON object for HTTP response -->
 <#macro responseContentMediaType
         flatType=""
         dto=""
