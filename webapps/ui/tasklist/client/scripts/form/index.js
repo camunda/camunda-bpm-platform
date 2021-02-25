@@ -23,6 +23,7 @@ var angular = require('../../../../../camunda-commons-ui/vendor/angular'),
   camTasklistFormGenericVariables = require('./directives/cam-tasklist-form-generic-variables'),
   camTasklistFormEmbedded = require('./directives/cam-tasklist-form-embedded'),
   camTasklistFormExternal = require('./directives/cam-tasklist-form-external'),
+  camTasklistFormCamunda = require('./directives/cam-tasklist-form-camunda'),
   camTasklistUniqueValue = require('./directives/cam-tasklist-unique-value');
 
 var formModule = angular.module('cam.tasklist.form', ['ui.bootstrap']);
@@ -35,6 +36,8 @@ formModule.directive(
 );
 formModule.directive('camTasklistFormEmbedded', camTasklistFormEmbedded);
 formModule.directive('camTasklistFormExternal', camTasklistFormExternal);
+formModule.directive('camTasklistFormCamunda', camTasklistFormCamunda);
+
 formModule.directive('camUniqueValue', camTasklistUniqueValue);
 
 module.exports = formModule;

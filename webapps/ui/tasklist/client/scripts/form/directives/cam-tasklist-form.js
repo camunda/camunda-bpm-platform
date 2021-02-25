@@ -23,7 +23,8 @@ var template = fs.readFileSync(__dirname + '/cam-tasklist-form.html', 'utf8');
 var EMBEDDED_KEY = 'embedded:',
   APP_KEY = 'app:',
   ENGINE_KEY = 'engine:',
-  DEPLOYMENT_KEY = 'deployment:';
+  DEPLOYMENT_KEY = 'deployment:',
+  CAMUNDA_FORMS_KEY = 'camunda-forms:';
 
 function compact(arr) {
   var a = [];
@@ -141,10 +142,12 @@ module.exports = function() {
             form.type = 'generic';
             return;
           }
-
           if (key.indexOf(EMBEDDED_KEY) === 0) {
             key = key.substring(EMBEDDED_KEY.length);
             form.type = 'embedded';
+          } else if (key.indexOf(CAMUNDA_FORMS_KEY) === 0) {
+            key = key.substring(CAMUNDA_FORMS_KEY.length);
+            form.type = 'camunda-forms';
           } else {
             form.type = 'external';
           }
@@ -237,6 +240,11 @@ module.exports = function() {
 
         this.notifyFormInitialized = function() {
           $scope.$loaded = true;
+
+          var phase = $scope.$root.$$phase;
+          if (phase !== '$apply' && phase !== '$digest') {
+            $scope.$apply();
+          }
         };
 
         this.notifyFormInitializationFailed = function(error) {
