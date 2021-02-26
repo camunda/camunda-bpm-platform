@@ -23,7 +23,6 @@
     <@lib.response
         code = "200"
         dto = "DeploymentDto"
-        array = true
         desc = "Request successful."
         examples = ['"example-1": {
                        "summary": "GET `/deployments/someDeploymentId`",
