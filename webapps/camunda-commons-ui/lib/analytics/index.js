@@ -22,7 +22,9 @@ var modalTemplate = fs.readFileSync(__dirname + '/modal.html', 'utf8');
 var camundaLogo = fs.readFileSync(__dirname + '/../auth/page/logo.svg', 'utf8');
 
 // CAMUNDA_VERSION has a structure of 'major.minor.patch[-SNAPSHOT]', but we only need 'major.minor' for doc links
-var camundaVersion = (process.env.CAMUNDA_VERSION || '').match(/([0-9]+.[0-9]+)/);
+var camundaVersion = (process.env.CAMUNDA_VERSION || '').match(
+  /([0-9]+.[0-9]+)/
+);
 camundaVersion = camundaVersion ? camundaVersion[0] : 'latest'; // if 'latest' is chosen, something went wrong
 
 var modalController = [
@@ -33,34 +35,27 @@ var modalController = [
   '$translate',
   function(scope, $sce, Notifications, telemetryResource, $translate) {
     scope.camundaVersion = camundaVersion;
-    scope.loadingState = "INITIAL";
+    scope.loadingState = 'INITIAL';
     scope.logo = $sce.trustAsHtml(camundaLogo);
     scope.enableUsage = false;
 
-
-    scope.page = 1;
     scope.close = function() {
       scope.$dismiss();
     };
-    scope.next = function() {
-      scope.page++;
-    };
     scope.save = function() {
-      scope.loadingState = "LOADING";
+      scope.loadingState = 'LOADING';
       telemetryResource.configure(!!scope.enableUsage, function(err) {
-        scope.loadingState = "DONE"
         if (!err) {
-          scope.page++;
+          scope.loadingState = 'DONE';
         } else {
+          scope.loadingState = 'ERROR';
           Notifications.addError({
-            status: $translate.instant(
-              'TELEMETRY_ERROR_STATUS'
-            ),
+            status: $translate.instant('TELEMETRY_ERROR_STATUS'),
             message: $translate.instant('TELEMETRY_ERROR_MESSAGE')
-          })
+          });
         }
       });
-    }
+    };
   }
 ];
 
@@ -85,7 +80,7 @@ module.exports = angular
                 $modal.open({
                   template: modalTemplate,
                   controller: modalController,
-                  size: 'lg',
+                  size: 'md',
                   resolve: {
                     telemetryResource: function() {
                       return telemetryResource;
@@ -95,7 +90,7 @@ module.exports = angular
               }
             })
             .catch(() => {});
-          }
+        }
       });
     }
   ]);

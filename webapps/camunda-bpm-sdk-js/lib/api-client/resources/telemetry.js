@@ -52,8 +52,8 @@ Telemetry.get = function(done) {
  * @param  {Function} done
  */
 Telemetry.configure = function(payload, done) {
-  if( typeof payload === 'boolean') {
-    payload = {'enableTelemetry': payload}
+  if (typeof payload === 'boolean') {
+    payload = {enableTelemetry: payload};
   }
 
   return this.http.post(this.path + '/configuration', {
