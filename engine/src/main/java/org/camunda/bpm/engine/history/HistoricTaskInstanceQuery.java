@@ -323,6 +323,11 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
   HistoricTaskInstanceQuery taskDueAfter(Date dueDate);
 
   /**
+   * Only select select historic task instances that have no due date.
+   */
+  HistoricTaskInstanceQuery withoutTaskDueDate();
+
+  /**
    * Only select select historic task instances with the given follow-up date.
    */
   HistoricTaskInstanceQuery taskFollowUpDate(Date followUpDate);

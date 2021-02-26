@@ -488,6 +488,9 @@
                 and RES.DUE_DATE_ is not null
               </trim>
             </if>
+            <if test="query.withoutTaskDueDate">
+              ${queryType} RES.DUE_DATE_ is null
+            </if>
             <if test="query.followUpDate != null || query.followUpBefore != null || query.followUpAfter != null">
               ${queryType}
               <trim prefix="(" suffix=")" prefixOverrides="and|or">

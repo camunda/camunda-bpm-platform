@@ -1115,11 +1115,20 @@ public class TaskQueryOrTest {
   @Test
   public void shouldTestDueDateCombinations() throws ParseException {
     HashMap<String, Date> dates = createFollowUpAndDueDateTasks();
+    taskService.saveTask(taskService.newTask());
 
     assertEquals(2, taskService.createTaskQuery()
       .or()
         .dueDate(dates.get("date"))
         .dueBefore(dates.get("oneHourAgo"))
+      .endOr()
+      .count());
+
+    assertEquals(3, taskService.createTaskQuery()
+      .or()
+        .dueDate(dates.get("date"))
+        .dueBefore(dates.get("oneHourAgo"))
+        .withoutDueDate()
       .endOr()
       .count());
 
@@ -1130,10 +1139,26 @@ public class TaskQueryOrTest {
       .endOr()
       .count());
 
+    assertEquals(3, taskService.createTaskQuery()
+      .or()
+        .dueDate(dates.get("date"))
+        .dueAfter(dates.get("oneHourLater"))
+        .withoutDueDate()
+      .endOr()
+      .count());
+
     assertEquals(2, taskService.createTaskQuery()
       .or()
         .dueBefore(dates.get("oneHourAgo"))
         .dueAfter(dates.get("oneHourLater"))
+      .endOr()
+      .count());
+
+    assertEquals(3, taskService.createTaskQuery()
+      .or()
+        .dueBefore(dates.get("oneHourAgo"))
+        .dueAfter(dates.get("oneHourLater"))
+        .withoutDueDate()
       .endOr()
       .count());
 
@@ -1144,11 +1169,28 @@ public class TaskQueryOrTest {
       .endOr()
       .count());
 
+    assertEquals(4, taskService.createTaskQuery()
+      .or()
+        .dueBefore(dates.get("oneHourLater"))
+        .dueAfter(dates.get("oneHourAgo"))
+        .withoutDueDate()
+      .endOr()
+      .count());
+
     assertEquals(3, taskService.createTaskQuery()
       .or()
         .dueDate(dates.get("date"))
         .dueBefore(dates.get("oneHourAgo"))
         .dueAfter(dates.get("oneHourLater"))
+      .endOr()
+      .count());
+
+    assertEquals(4, taskService.createTaskQuery()
+      .or()
+        .dueDate(dates.get("date"))
+        .dueBefore(dates.get("oneHourAgo"))
+        .dueAfter(dates.get("oneHourLater"))
+        .withoutDueDate()
       .endOr()
       .count());
   }

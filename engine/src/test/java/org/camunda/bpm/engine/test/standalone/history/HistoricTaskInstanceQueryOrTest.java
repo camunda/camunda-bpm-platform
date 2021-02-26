@@ -649,6 +649,7 @@ public class HistoricTaskInstanceQueryOrTest {
   @Test
   public void shouldTestDueDateCombinations() throws ParseException {
     HashMap<String, Date> dates = createFollowUpAndDueDateTasks();
+    taskService.saveTask(taskService.newTask());
 
     assertEquals(2, historyService.createHistoricTaskInstanceQuery()
       .or()
@@ -657,6 +658,14 @@ public class HistoricTaskInstanceQueryOrTest {
       .endOr()
       .count());
 
+    assertEquals(3, historyService.createHistoricTaskInstanceQuery()
+        .or()
+          .taskDueDate(dates.get("date"))
+          .taskDueBefore(dates.get("oneHourAgo"))
+          .withoutTaskDueDate()
+        .endOr()
+        .count());
+
     assertEquals(2, historyService.createHistoricTaskInstanceQuery()
       .or()
         .taskDueDate(dates.get("date"))
@@ -664,12 +673,28 @@ public class HistoricTaskInstanceQueryOrTest {
       .endOr()
       .count());
 
+    assertEquals(3, historyService.createHistoricTaskInstanceQuery()
+        .or()
+          .taskDueDate(dates.get("date"))
+          .taskDueAfter(dates.get("oneHourLater"))
+          .withoutTaskDueDate()
+        .endOr()
+        .count());
+
     assertEquals(2, historyService.createHistoricTaskInstanceQuery()
       .or()
         .taskDueBefore(dates.get("oneHourAgo"))
         .taskDueAfter(dates.get("oneHourLater"))
       .endOr()
       .count());
+
+    assertEquals(3, historyService.createHistoricTaskInstanceQuery()
+        .or()
+          .taskDueBefore(dates.get("oneHourAgo"))
+          .taskDueAfter(dates.get("oneHourLater"))
+          .withoutTaskDueDate()
+        .endOr()
+        .count());
 
     assertEquals(3, historyService.createHistoricTaskInstanceQuery()
       .or()
@@ -678,6 +703,14 @@ public class HistoricTaskInstanceQueryOrTest {
       .endOr()
       .count());
 
+    assertEquals(4, historyService.createHistoricTaskInstanceQuery()
+        .or()
+          .taskDueBefore(dates.get("oneHourLater"))
+          .taskDueAfter(dates.get("oneHourAgo"))
+          .withoutTaskDueDate()
+        .endOr()
+        .count());
+
     assertEquals(3, historyService.createHistoricTaskInstanceQuery()
       .or()
         .taskDueDate(dates.get("date"))
@@ -685,6 +718,15 @@ public class HistoricTaskInstanceQueryOrTest {
         .taskDueAfter(dates.get("oneHourLater"))
       .endOr()
       .count());
+
+    assertEquals(4, historyService.createHistoricTaskInstanceQuery()
+        .or()
+          .taskDueDate(dates.get("date"))
+          .taskDueBefore(dates.get("oneHourAgo"))
+          .taskDueAfter(dates.get("oneHourLater"))
+          .withoutTaskDueDate()
+        .endOr()
+        .count());
   }
 
   @Test

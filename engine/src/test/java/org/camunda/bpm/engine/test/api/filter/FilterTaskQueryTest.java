@@ -79,7 +79,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
   protected Date testDate = new Date(0);
   protected String[] testActivityInstances = new String[] {"a", "b", "c"};
   protected String[] testKeys = new String[] {"d", "e"};
-  protected List<String> testCandidateGroups = new ArrayList<String>();
+  protected List<String> testCandidateGroups = new ArrayList<>();
   protected String[] testInstances = new String[] {"x", "y", "z"};
 
   protected String[] variableNames = new String[] {"a", "b", "c", "d", "e", "f"};
@@ -815,7 +815,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
   public void testExtendingTaskQueryListWithCandidateGroups() {
     TaskQuery query = taskService.createTaskQuery();
 
-    List<String> candidateGroups = new ArrayList<String>();
+    List<String> candidateGroups = new ArrayList<>();
     candidateGroups.add("accounting");
     query.taskCandidateGroupIn(candidateGroups);
 
@@ -1206,7 +1206,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     query = extendedFilter.getQuery();
 
     List<QueryOrderingProperty> expectedOrderingProperties =
-        new ArrayList<QueryOrderingProperty>(sortQuery.getOrderingProperties());
+        new ArrayList<>(sortQuery.getOrderingProperties());
 
     verifyOrderingProperties(expectedOrderingProperties, query.getOrderingProperties());
 
@@ -1597,7 +1597,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     String variableName = "variableName";
     String variableValueCamelCase = "someVariableValue";
     String variableValueLowerCase = variableValueCamelCase.toLowerCase();
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
 
     String caseDefinitionId = repositoryService.createCaseDefinitionQuery().singleResult().getId();
 
@@ -1688,7 +1688,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     String variableName = "variableName";
     String variableValueCamelCase = "someVariableValue";
     String variableValueLowerCase = variableValueCamelCase.toLowerCase();
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
 
     variables.put(variableName, variableValueCamelCase);
     ProcessInstance instanceCamelCase = runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
@@ -1879,7 +1879,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
 
     // then
     List<QueryOrderingProperty> expectedOrderingProperties =
-        new ArrayList<QueryOrderingProperty>(query.getOrderingProperties());
+        new ArrayList<>(query.getOrderingProperties());
 
     verifyOrderingProperties(expectedOrderingProperties, ((TaskQueryImpl) filter.getQuery()).getOrderingProperties());
 
@@ -2034,6 +2034,25 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
 
     // then
     assertThat(filterService.count(filter.getId())).isEqualTo(1L);
+  }
+
+  @Test
+  public void testWithoutDueDate() {
+    // given
+    Task task = taskService.newTask();
+    task.setDueDate(new Date());
+    taskService.saveTask(task);
+
+    TaskQuery query = taskService.createTaskQuery()
+      .withoutDueDate();
+
+    filter.setQuery(query);
+
+    // when
+    filterService.saveFilter(filter);
+
+    // then
+    assertThat(filterService.count(filter.getId())).isEqualTo(3L);
   }
 
   @Test
@@ -2245,7 +2264,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
   }
 
 
-  protected void saveQuery(Query query) {
+  protected void saveQuery(TaskQuery query) {
     filter.setQuery(query);
     filterService.saveFilter(filter);
     filter = filterService.getFilter(filter.getId());

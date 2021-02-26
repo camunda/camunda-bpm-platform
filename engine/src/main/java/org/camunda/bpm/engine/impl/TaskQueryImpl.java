@@ -155,6 +155,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   protected String parentTaskId;
   protected boolean isWithoutTenantId = false;
+  protected boolean isWithoutDueDate = false;
 
   protected String[] tenantIds;
   // case management /////////////////////////////
@@ -871,6 +872,14 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery dueDate(Date dueDate) {
+    // The dueDate filter can't be used in an AND query with
+    // the withoutDueDate filter. They can be combined in an OR query
+    if (!isOrQueryActive) {
+      if (TRUE.equals(isWithoutDueDate)) {
+        throw new ProcessEngineException("Invalid query usage: cannot set both dueDate and withoutDueDate filters.");
+      }
+    }
+
     this.dueDate = dueDate;
     expressions.remove("dueDate");
     return this;
@@ -878,12 +887,28 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery dueDateExpression(String dueDateExpression) {
+    // The dueDateExpression filter can't be used in an AND query with
+    // the withoutDueDate filter. They can be combined in an OR query
+    if (!isOrQueryActive) {
+      if (TRUE.equals(isWithoutDueDate)) {
+        throw new ProcessEngineException("Invalid query usage: cannot set both dueDateExpression and withoutDueDate filters.");
+      }
+    }
+
     expressions.put("dueDate", dueDateExpression);
     return this;
   }
 
   @Override
   public TaskQuery dueBefore(Date dueBefore) {
+    // The dueBefore filter can't be used in an AND query with
+    // the withoutDueDate filter. They can be combined in an OR query
+    if (!isOrQueryActive) {
+      if (TRUE.equals(isWithoutDueDate)) {
+        throw new ProcessEngineException("Invalid query usage: cannot set both dueBefore and withoutDueDate filters.");
+      }
+    }
+
     this.dueBefore = dueBefore;
     expressions.remove("dueBefore");
     return this;
@@ -891,12 +916,28 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery dueBeforeExpression(String dueDate) {
+    // The dueBeforeExpression filter can't be used in an AND query with
+    // the withoutDueDate filter. They can be combined in an OR query
+    if (!isOrQueryActive) {
+      if (TRUE.equals(isWithoutDueDate)) {
+        throw new ProcessEngineException("Invalid query usage: cannot set both dueBeforeExpression and withoutDueDate filters.");
+      }
+    }
+
     expressions.put("dueBefore", dueDate);
     return this;
   }
 
   @Override
   public TaskQuery dueAfter(Date dueAfter) {
+    // The dueAfter filter can't be used in an AND query with
+    // the withoutDueDate filter. They can be combined in an OR query
+    if (!isOrQueryActive) {
+      if (TRUE.equals(isWithoutDueDate)) {
+        throw new ProcessEngineException("Invalid query usage: cannot set both dueAfter and withoutDueDate filters.");
+      }
+    }
+
     this.dueAfter = dueAfter;
     expressions.remove("dueAfter");
     return this;
@@ -904,7 +945,30 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery dueAfterExpression(String dueDateExpression) {
+    // The dueAfterExpression filter can't be used in an AND query with
+    // the withoutDueDate filter. They can be combined in an OR query
+    if (!isOrQueryActive) {
+      if (TRUE.equals(isWithoutDueDate)) {
+        throw new ProcessEngineException("Invalid query usage: cannot set both dueAfterExpression and withoutDueDate filters.");
+      }
+    }
+
     expressions.put("dueAfter", dueDateExpression);
+    return this;
+  }
+
+  @Override
+  public TaskQuery withoutDueDate() {
+    // The due date filters can't be used in an AND query with
+    // the withoutDueDate filter. They can be combined in an OR query
+    if (!isOrQueryActive) {
+      if (dueAfter != null || dueBefore != null || dueDate != null || expressions.containsKey("dueDate")
+          || expressions.containsKey("dueBefore") || expressions.containsKey("dueAfter")) {
+        throw new ProcessEngineException("Invalid query usage: cannot set both due date (equal to, before, or after) and withoutDueDate filters.");
+      }
+    }
+
+    this.isWithoutDueDate = true;
     return this;
   }
 
@@ -1727,6 +1791,10 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return isWithoutTenantId;
   }
 
+  public boolean isWithoutDueDate() {
+    return isWithoutDueDate;
+  }
+
   public String[] getTaskDefinitionKeys() {
     return taskDefinitionKeys;
   }
@@ -1768,7 +1836,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     // only add the base query's validators to the new query;
     // this is because the extending query's validators may not be applicable to the base
     // query and should therefore be executed before extending the query
-    extendedQuery.validators = new HashSet<Validator<AbstractQuery<?, ?>>>(validators);
+    extendedQuery.validators = new HashSet<>(validators);
 
     if (extendingQuery.getName() != null) {
       extendedQuery.taskName(extendingQuery.getName());
