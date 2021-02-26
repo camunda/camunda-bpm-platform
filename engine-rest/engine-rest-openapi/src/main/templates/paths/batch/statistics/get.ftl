@@ -34,7 +34,7 @@
         desc = "Request successful."
         examples = ['"example-1": {
                        "description": "Response for GET `/batch/statistics?type=aBatchType&sortBy=batchId&sortOrder=asc`",
-                       "value": {
+                       "value": [{
                          "id": "aBatchId",
                          "type": "aBatchType",
                          "totalJobs": 10,
@@ -50,7 +50,7 @@
                          "suspended": false,
                          "tenantId": "aTenantId",
                          "createUserId": "aUserId"
-                       }
+                       }]
                      }'] />
 
     <@lib.response
