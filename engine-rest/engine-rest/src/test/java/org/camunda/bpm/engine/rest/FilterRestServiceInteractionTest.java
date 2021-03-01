@@ -296,6 +296,7 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
     when(query.getOwner()).thenReturn(MockProvider.EXAMPLE_TASK_OWNER);
     when(query.getParentTaskId()).thenReturn(MockProvider.EXAMPLE_TASK_PARENT_TASK_ID);
     when(query.getTenantIds()).thenReturn(MockProvider.EXAMPLE_TENANT_ID_LIST.split(","));
+    when(query.isWithoutDueDate()).thenReturn(true);
     when(query.isWithoutTenantId()).thenReturn(true);
     when(query.isAssignedInternal()).thenReturn(true);
     when(query.isUnassignedInternal()).thenReturn(false);
@@ -342,6 +343,7 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
       .body("query.owner", equalTo(MockProvider.EXAMPLE_TASK_OWNER))
       .body("query.parentTaskId", equalTo(MockProvider.EXAMPLE_TASK_PARENT_TASK_ID))
       .body("query.tenantIdIn", hasItems(MockProvider.EXAMPLE_TENANT_ID, MockProvider.ANOTHER_EXAMPLE_TENANT_ID))
+      .body("query.withoutDueDate", equalTo(true))
       .body("query.assigned", equalTo(true))
       .body("query.unassigned", equalTo(false))
     .when()

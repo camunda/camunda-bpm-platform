@@ -171,6 +171,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   private String dueBeforeExpression;
   private Date dueDate;
   private String dueDateExpression;
+  private Boolean withoutDueDate;
   private Date followUpAfter;
   private String followUpAfterExpression;
   private Date followUpBefore;
@@ -197,7 +198,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   protected Boolean withoutCandidateGroups;
   protected Boolean withCandidateUsers;
   protected Boolean withoutCandidateUsers;
-  
+
   protected Boolean variableNamesIgnoreCase;
   protected Boolean variableValuesIgnoreCase;
 
@@ -526,6 +527,11 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     this.dueDateExpression = dueDateExpression;
   }
 
+  @CamundaQueryParam(value = "withoutDueDate", converter = BooleanConverter.class)
+  public void setWithoutDueDate(boolean withoutDueDate) {
+    this.withoutDueDate = withoutDueDate;
+  }
+
   @CamundaQueryParam(value = "followUpAfter", converter = DateConverter.class)
   public void setFollowUpAfter(Date followUpAfter) {
     this.followUpAfter = followUpAfter;
@@ -677,7 +683,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   public void setCaseInstanceVariables(List<VariableQueryParameterDto> caseInstanceVariables) {
     this.caseInstanceVariables = caseInstanceVariables;
   }
-  
+
   @CamundaQueryParam(value = "variableNamesIgnoreCase", converter = BooleanConverter.class)
   public void setVariableNamesIgnoreCase(Boolean variableNamesCaseInsensitive) {
     this.variableNamesIgnoreCase = variableNamesCaseInsensitive;
@@ -954,6 +960,10 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     return dueDateExpression;
   }
 
+  public boolean getWithoutDueDate() {
+    return withoutDueDate;
+  }
+
   public Date getFollowUpAfter() {
     return followUpAfter;
   }
@@ -1037,7 +1047,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   public List<TaskQueryDto> getOrQueries() {
     return orQueries;
   }
-  
+
   public Boolean isVariableNamesIgnoreCase() {
     return variableNamesIgnoreCase;
   }
@@ -1226,6 +1236,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     }
     if (dueDateExpression != null) {
       query.dueDateExpression(dueDateExpression);
+    }
+    if (TRUE.equals(withoutDueDate)) {
+      query.withoutDueDate();
     }
     if (followUpAfter != null) {
       query.followUpAfter(followUpAfter);
@@ -1563,8 +1576,10 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     dto.dueAfter = taskQuery.getDueAfter();
     dto.dueBefore = taskQuery.getDueBefore();
     dto.dueDate = taskQuery.getDueDate();
+    dto.withoutDueDate = taskQuery.isWithoutDueDate();
+
     dto.followUpAfter = taskQuery.getFollowUpAfter();
-    
+
     dto.variableNamesIgnoreCase = taskQuery.isVariableNamesIgnoreCase();
     dto.variableValuesIgnoreCase = taskQuery.isVariableValuesIgnoreCase();
 

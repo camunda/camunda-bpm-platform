@@ -363,6 +363,13 @@
               for more information on available functions. The expression must evaluate to a
               `java.util.Date` or `org.joda.time.DateTime` object." />
 
+  <@lib.parameter name = "withoutDueDate"
+      location = "query"
+      type = "boolean"
+      defaultValue = "false"
+      desc = "Only include tasks which have no due date. Value may only be `true`, 
+              as `false` is the default behavior." />
+
   <@lib.parameter name = "followUpDate"
       location = "query"
       type = "string"

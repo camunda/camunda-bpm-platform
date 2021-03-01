@@ -84,12 +84,12 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
 
   protected static final String TASK_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/task";
   protected static final String TASK_COUNT_QUERY_URL = TASK_QUERY_URL + "/count";
-  
+
   private static final String SAMPLE_VAR_NAME = "varName";
   private static final String SAMPLE_VAR_VALUE = "varValue";
-  
+
   private TaskQuery mockQuery;
-  
+
   @Before
   public void setUpRuntimeData() {
     mockQuery = setUpMockTaskQuery(MockProvider.createMockTasks());
@@ -428,7 +428,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
   }
 
   private Map<String, Integer> getCompleteIntQueryParameters() {
-    Map<String, Integer> parameters = new HashMap<String, Integer>();
+    Map<String, Integer> parameters = new HashMap<>();
 
     parameters.put("maxPriority", 10);
     parameters.put("minPriority", 9);
@@ -438,7 +438,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
   }
 
   private Map<String, String[]> getCompleteStringArrayQueryParameters() {
-    Map<String, String[]> parameters = new HashMap<String, String[]>();
+    Map<String, String[]> parameters = new HashMap<>();
 
     String[] activityInstanceIds = { "anActivityInstanceId", "anotherActivityInstanceId" };
     String[] taskDefinitionKeys = { "aTaskDefinitionKey", "anotherTaskDefinitionKey" };
@@ -465,7 +465,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
   }
 
   private Map<String, String> getCompleteStringQueryParameters() {
-    Map<String, String> parameters = new HashMap<String, String>();
+    Map<String, String> parameters = new HashMap<>();
 
     parameters.put("processInstanceBusinessKey", "aBusinessKey");
     parameters.put("processInstanceBusinessKeyLike", "aBusinessKeyLike");
@@ -505,7 +505,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
   }
 
   private Map<String, Boolean> getCompleteBooleanQueryParameters() {
-    Map<String, Boolean> parameters = new HashMap<String, Boolean>();
+    Map<String, Boolean> parameters = new HashMap<>();
 
     parameters.put("assigned", true);
     parameters.put("unassigned", true);
@@ -516,6 +516,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     parameters.put("withoutCandidateGroups", true);
     parameters.put("withCandidateUsers", true);
     parameters.put("withoutCandidateUsers", true);
+    parameters.put("withoutDueDate", true);
 
     return parameters;
   }
@@ -580,6 +581,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     verify(mockQuery).withoutCandidateGroups();
     verify(mockQuery).withCandidateUsers();
     verify(mockQuery).withoutCandidateUsers();
+    verify(mockQuery).withoutDueDate();
   }
 
   @Test
@@ -630,7 +632,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
 
   @Test
   public void testDeprecatedDateParameters() {
-    Map<String, String> queryParameters = new HashMap<String, String>();
+    Map<String, String> queryParameters = new HashMap<>();
     queryParameters.put("due", withTimezone("2013-01-23T14:42:44"));
     queryParameters.put("created", withTimezone("2013-01-23T14:42:47"));
     queryParameters.put("followUp", withTimezone("2013-01-23T14:42:50"));
@@ -649,7 +651,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
   }
 
   private Map<String, String> getDateParameters() {
-    Map<String, String> parameters = new HashMap<String, String>();
+    Map<String, String> parameters = new HashMap<>();
     parameters.put("dueAfter", withTimezone("2013-01-23T14:42:42"));
     parameters.put("dueBefore", withTimezone("2013-01-23T14:42:43"));
     parameters.put("dueDate", withTimezone("2013-01-23T14:42:44"));
@@ -665,7 +667,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
 
   @Test
   public void testCandidateGroupInList() {
-    List<String> candidateGroups = new ArrayList<String>();
+    List<String> candidateGroups = new ArrayList<>();
     candidateGroups.add("boss");
     candidateGroups.add("worker");
     String queryParam = candidateGroups.get(0) + "," + candidateGroups.get(1);
@@ -847,7 +849,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
   }
 
   protected void executeAndVerifySortingAsPost(List<Map<String, Object>> sortingJson, Status expectedStatus) {
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put("sorting", sortingJson);
 
     given().contentType(POST_JSON_CONTENT_TYPE).body(json)
@@ -935,7 +937,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
 
     verify(mockQuery).taskVariableValueEquals(variableName, variableValue);
     reset(mockQuery);
-    
+
     given()
     .queryParam("taskVariables", queryValue)
     .queryParam("variableValuesIgnoreCase", true)
@@ -945,11 +947,11 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
       .statusCode(Status.OK.getStatusCode())
     .when()
       .get(TASK_QUERY_URL);
-    
+
     verify(mockQuery).matchVariableValuesIgnoreCase();
     verify(mockQuery).taskVariableValueEquals(variableName, variableValue);
     reset(mockQuery);
-    
+
     given()
     .queryParam("taskVariables", queryValue)
     .queryParam("variableNamesIgnoreCase", true)
@@ -959,11 +961,11 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     .statusCode(Status.OK.getStatusCode())
     .when()
     .get(TASK_QUERY_URL);
-    
+
     verify(mockQuery).matchVariableNamesIgnoreCase();
     verify(mockQuery).taskVariableValueEquals(variableName, variableValue);
     reset(mockQuery);
-    
+
     given()
     .queryParam("taskVariables", queryValue)
     .queryParam("variableNamesIgnoreCase", true)
@@ -974,7 +976,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     .statusCode(Status.OK.getStatusCode())
     .when()
     .get(TASK_QUERY_URL);
-    
+
     verify(mockQuery).matchVariableNamesIgnoreCase();
     verify(mockQuery).matchVariableValuesIgnoreCase();
     verify(mockQuery).taskVariableValueEquals(variableName, variableValue);
@@ -1051,7 +1053,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
 
     // like case-insensitive
     queryValue = variableName + "_like_" + variableValue;
-    
+
     given()
     .queryParam("taskVariables", queryValue)
     .queryParam("variableValuesIgnoreCase", true)
@@ -1061,7 +1063,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     .statusCode(Status.OK.getStatusCode())
     .when()
     .get(TASK_QUERY_URL);
-    
+
     verify(mockQuery).matchVariableValuesIgnoreCase();
     verify(mockQuery).taskVariableValueLike(variableName, variableValue);
 
@@ -1082,7 +1084,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
 
     // not equals case-insensitive
     queryValue = variableName + "_neq_" + variableValue;
-    
+
     given()
     .queryParam("taskVariables", queryValue)
     .queryParam("variableValuesIgnoreCase", true)
@@ -1092,22 +1094,22 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     .statusCode(Status.OK.getStatusCode())
     .when()
     .get(TASK_QUERY_URL);
-    
+
     verify(mockQuery).matchVariableValuesIgnoreCase();
     verify(mockQuery).taskVariableValueNotEquals(variableName, variableValue);
   }
-  
+
   @Test
   public void testTaskVariableValueEqualsIgnoreCaseAsPost() {
-    Map<String, Object> variableJson = new HashMap<String, Object>();
+    Map<String, Object> variableJson = new HashMap<>();
     variableJson.put("name", SAMPLE_VAR_NAME);
     variableJson.put("operator", "eq");
     variableJson.put("value", SAMPLE_VAR_VALUE.toLowerCase());
 
-    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    List<Map<String, Object>> variables = new ArrayList<>();
     variables.add(variableJson);
 
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put("taskVariables", variables);
     json.put("variableValuesIgnoreCase", true);
 
@@ -1119,25 +1121,25 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
       .statusCode(Status.OK.getStatusCode())
       .when()
       .post(TASK_QUERY_URL);
-    
+
     verify(mockQuery).matchVariableValuesIgnoreCase();
     verify(mockQuery).taskVariableValueEquals(SAMPLE_VAR_NAME, SAMPLE_VAR_VALUE.toLowerCase());
   }
-  
+
   @Test
   public void testTaskVariableNameEqualsIgnoreCaseAsPost() {
-    Map<String, Object> variableJson = new HashMap<String, Object>();
+    Map<String, Object> variableJson = new HashMap<>();
     variableJson.put("name", SAMPLE_VAR_NAME.toLowerCase());
     variableJson.put("operator", "eq");
     variableJson.put("value", SAMPLE_VAR_VALUE);
-    
-    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+
+    List<Map<String, Object>> variables = new ArrayList<>();
     variables.add(variableJson);
-    
-    Map<String, Object> json = new HashMap<String, Object>();
+
+    Map<String, Object> json = new HashMap<>();
     json.put("taskVariables", variables);
     json.put("variableNamesIgnoreCase", true);
-    
+
     given()
     .contentType(POST_JSON_CONTENT_TYPE)
     .body(json)
@@ -1146,13 +1148,13 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     .statusCode(Status.OK.getStatusCode())
     .when()
     .post(TASK_QUERY_URL);
-    
+
     verify(mockQuery).matchVariableNamesIgnoreCase();
     verify(mockQuery).taskVariableValueEquals(SAMPLE_VAR_NAME.toLowerCase(), SAMPLE_VAR_VALUE);
     reset(mockQuery);
-    
+
     json.put("variableValuesIgnoreCase", true);
-    
+
     given()
     .contentType(POST_JSON_CONTENT_TYPE)
     .body(json)
@@ -1161,23 +1163,23 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     .statusCode(Status.OK.getStatusCode())
     .when()
     .post(TASK_QUERY_URL);
-    
+
     verify(mockQuery).matchVariableNamesIgnoreCase();
     verify(mockQuery).matchVariableValuesIgnoreCase();
     verify(mockQuery).taskVariableValueEquals(SAMPLE_VAR_NAME.toLowerCase(), SAMPLE_VAR_VALUE);
   }
-  
+
   @Test
   public void testTaskVariableValueNotEqualsIgnoreCaseAsPost() {
-    Map<String, Object> variableJson = new HashMap<String, Object>();
+    Map<String, Object> variableJson = new HashMap<>();
     variableJson.put("name", SAMPLE_VAR_NAME);
     variableJson.put("operator", "neq");
     variableJson.put("value", SAMPLE_VAR_VALUE.toLowerCase());
 
-    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    List<Map<String, Object>> variables = new ArrayList<>();
     variables.add(variableJson);
 
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put("taskVariables", variables);
     json.put("variableValuesIgnoreCase", true);
 
@@ -1189,25 +1191,25 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
       .statusCode(Status.OK.getStatusCode())
       .when()
       .post(TASK_QUERY_URL);
-    
+
     verify(mockQuery).matchVariableValuesIgnoreCase();
     verify(mockQuery).taskVariableValueNotEquals(SAMPLE_VAR_NAME, SAMPLE_VAR_VALUE.toLowerCase());
   }
 
   @Test
   public void testTaskVariableValueLikeIgnoreCaseAsPost() {
-    Map<String, Object> variableJson = new HashMap<String, Object>();
+    Map<String, Object> variableJson = new HashMap<>();
     variableJson.put("name", SAMPLE_VAR_NAME);
     variableJson.put("operator", "like");
     variableJson.put("value", SAMPLE_VAR_VALUE.toLowerCase());
 
-    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    List<Map<String, Object>> variables = new ArrayList<>();
     variables.add(variableJson);
 
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put("taskVariables", variables);
     json.put("variableValuesIgnoreCase", true);
-    
+
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
       .body(json)
@@ -1216,7 +1218,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
       .statusCode(Status.OK.getStatusCode())
       .when()
       .post(TASK_QUERY_URL);
-    
+
     verify(mockQuery).matchVariableValuesIgnoreCase();
     verify(mockQuery).taskVariableValueLike(SAMPLE_VAR_NAME, SAMPLE_VAR_VALUE.toLowerCase());
   }
@@ -1242,7 +1244,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
 
     //equals case-insensitive
     queryValue = variableName + "_eq_" + variableValue;
-    
+
     given()
     .queryParam("processVariables", queryValue)
     .queryParam("variableValuesIgnoreCase", true)
@@ -1252,11 +1254,11 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     .statusCode(Status.OK.getStatusCode())
     .when()
     .get(TASK_QUERY_URL);
-    
+
     verify(mockQuery).matchVariableValuesIgnoreCase();
     verify(mockQuery).processVariableValueEquals(variableName, variableValue);
     reset(mockQuery);
-    
+
     given()
     .queryParam("processVariables", queryValue)
     .queryParam("variableNamesIgnoreCase", true)
@@ -1266,11 +1268,11 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     .statusCode(Status.OK.getStatusCode())
     .when()
     .get(TASK_QUERY_URL);
-    
+
     verify(mockQuery).matchVariableNamesIgnoreCase();
     verify(mockQuery).processVariableValueEquals(variableName, variableValue);
     reset(mockQuery);
-    
+
     given()
     .queryParam("processVariables", queryValue)
     .queryParam("variableNamesIgnoreCase", true)
@@ -1281,7 +1283,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     .statusCode(Status.OK.getStatusCode())
     .when()
     .get(TASK_QUERY_URL);
-    
+
     verify(mockQuery).matchVariableNamesIgnoreCase();
     verify(mockQuery).matchVariableValuesIgnoreCase();
     verify(mockQuery).processVariableValueEquals(variableName, variableValue);
@@ -1359,7 +1361,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
 
     // like case-insensitive
     queryValue = variableName + "_like_" + variableValue;
-    
+
     given()
     .queryParam("processVariables", queryValue)
     .queryParam("variableValuesIgnoreCase", true)
@@ -1369,7 +1371,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     .statusCode(Status.OK.getStatusCode())
     .when()
     .get(TASK_QUERY_URL);
-    
+
     verify(mockQuery).matchVariableValuesIgnoreCase();
     verify(mockQuery).processVariableValueLike(variableName, variableValue);
 
@@ -1390,7 +1392,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
 
     // not equals case-insensitive
     queryValue = variableName + "_neq_" + variableValue;
-    
+
     given()
     .queryParam("processVariables", queryValue)
     .queryParam("variableValuesIgnoreCase", true)
@@ -1400,25 +1402,25 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     .statusCode(Status.OK.getStatusCode())
     .when()
     .get(TASK_QUERY_URL);
-    
+
     verify(mockQuery).matchVariableValuesIgnoreCase();
     verify(mockQuery).processVariableValueNotEquals(variableName, variableValue);
   }
 
   @Test
   public void testProcessVariableValueEqualsIgnoreCaseAsPost() {
-    Map<String, Object> variableJson = new HashMap<String, Object>();
+    Map<String, Object> variableJson = new HashMap<>();
     variableJson.put("name", SAMPLE_VAR_NAME);
     variableJson.put("operator", "eq");
     variableJson.put("value", SAMPLE_VAR_VALUE.toLowerCase());
 
-    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    List<Map<String, Object>> variables = new ArrayList<>();
     variables.add(variableJson);
 
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put("processVariables", variables);
     json.put("variableValuesIgnoreCase", true);
-    
+
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
       .body(json)
@@ -1427,25 +1429,25 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
       .statusCode(Status.OK.getStatusCode())
       .when()
       .post(TASK_QUERY_URL);
-    
+
     verify(mockQuery).matchVariableValuesIgnoreCase();
     verify(mockQuery).processVariableValueEquals(SAMPLE_VAR_NAME, SAMPLE_VAR_VALUE.toLowerCase());
   }
-  
+
   @Test
   public void testProcessVariableNameEqualsIgnoreCaseAsPost() {
-    Map<String, Object> variableJson = new HashMap<String, Object>();
+    Map<String, Object> variableJson = new HashMap<>();
     variableJson.put("name", SAMPLE_VAR_NAME.toLowerCase());
     variableJson.put("operator", "eq");
     variableJson.put("value", SAMPLE_VAR_VALUE);
-    
-    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+
+    List<Map<String, Object>> variables = new ArrayList<>();
     variables.add(variableJson);
-    
-    Map<String, Object> json = new HashMap<String, Object>();
+
+    Map<String, Object> json = new HashMap<>();
     json.put("processVariables", variables);
     json.put("variableNamesIgnoreCase", true);
-    
+
     given()
     .contentType(POST_JSON_CONTENT_TYPE)
     .body(json)
@@ -1454,11 +1456,11 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     .statusCode(Status.OK.getStatusCode())
     .when()
     .post(TASK_QUERY_URL);
-    
+
     verify(mockQuery).matchVariableNamesIgnoreCase();
     verify(mockQuery).processVariableValueEquals(SAMPLE_VAR_NAME.toLowerCase(), SAMPLE_VAR_VALUE);
     reset(mockQuery);
-    
+
     json.put("variableValuesIgnoreCase", true);
     given()
     .contentType(POST_JSON_CONTENT_TYPE)
@@ -1468,27 +1470,27 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     .statusCode(Status.OK.getStatusCode())
     .when()
     .post(TASK_QUERY_URL);
-    
+
     verify(mockQuery).matchVariableNamesIgnoreCase();
     verify(mockQuery).matchVariableValuesIgnoreCase();
     verify(mockQuery).processVariableValueEquals(SAMPLE_VAR_NAME.toLowerCase(), SAMPLE_VAR_VALUE);
-    
+
   }
-  
+
   @Test
   public void testProcessVariableValueNotEqualsIgnoreCaseAsPost() {
-    Map<String, Object> variableJson = new HashMap<String, Object>();
+    Map<String, Object> variableJson = new HashMap<>();
     variableJson.put("name", SAMPLE_VAR_NAME);
     variableJson.put("operator", "neq");
     variableJson.put("value", SAMPLE_VAR_VALUE.toLowerCase());
-    
-    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+
+    List<Map<String, Object>> variables = new ArrayList<>();
     variables.add(variableJson);
-    
-    Map<String, Object> json = new HashMap<String, Object>();
+
+    Map<String, Object> json = new HashMap<>();
     json.put("processVariables", variables);
     json.put("variableValuesIgnoreCase", true);
-    
+
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
       .body(json)
@@ -1497,21 +1499,21 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
       .statusCode(Status.OK.getStatusCode())
       .when()
       .post(TASK_QUERY_URL);
-    
+
     verify(mockQuery).matchVariableValuesIgnoreCase();
     verify(mockQuery).processVariableValueNotEquals(SAMPLE_VAR_NAME, SAMPLE_VAR_VALUE.toLowerCase());
   }
   @Test
   public void testProcessVariableValueLikeIgnoreCaseAsPost() {
-    Map<String, Object> variableJson = new HashMap<String, Object>();
+    Map<String, Object> variableJson = new HashMap<>();
     variableJson.put("name", SAMPLE_VAR_NAME);
     variableJson.put("operator", "like");
     variableJson.put("value", SAMPLE_VAR_VALUE.toLowerCase());
-    
-    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+
+    List<Map<String, Object>> variables = new ArrayList<>();
     variables.add(variableJson);
-    
-    Map<String, Object> json = new HashMap<String, Object>();
+
+    Map<String, Object> json = new HashMap<>();
     json.put("processVariables", variables);
     json.put("variableValuesIgnoreCase", true);
 
@@ -1527,7 +1529,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     verify(mockQuery).matchVariableValuesIgnoreCase();
     verify(mockQuery).processVariableValueLike(SAMPLE_VAR_NAME, SAMPLE_VAR_VALUE.toLowerCase());
   }
-  
+
   @Test
   public void testCaseVariableParameters() {
     // equals
@@ -1549,7 +1551,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
 
     // equals case-insensitive
     queryValue = variableName + "_eq_" + variableValue;
-    
+
     given()
     .queryParam("caseInstanceVariables", queryValue)
     .queryParam("variableValuesIgnoreCase", true)
@@ -1559,7 +1561,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     .statusCode(Status.OK.getStatusCode())
     .when()
     .get(TASK_QUERY_URL);
-    
+
     verify(mockQuery).matchVariableValuesIgnoreCase();
     verify(mockQuery).caseInstanceVariableValueEquals(variableName, variableValue);
     reset(mockQuery);
@@ -1573,11 +1575,11 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     .statusCode(Status.OK.getStatusCode())
     .when()
     .get(TASK_QUERY_URL);
-    
+
     verify(mockQuery).matchVariableNamesIgnoreCase();
     verify(mockQuery).caseInstanceVariableValueEquals(variableName, variableValue);
     reset(mockQuery);
-    
+
     given()
     .queryParam("caseInstanceVariables", queryValue)
     .queryParam("variableNamesIgnoreCase", true)
@@ -1588,7 +1590,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     .statusCode(Status.OK.getStatusCode())
     .when()
     .get(TASK_QUERY_URL);
-    
+
     verify(mockQuery).matchVariableNamesIgnoreCase();
     verify(mockQuery).matchVariableValuesIgnoreCase();
     verify(mockQuery).caseInstanceVariableValueEquals(variableName, variableValue);
@@ -1666,7 +1668,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
 
     // like case-insensitive
     queryValue = variableName + "_like_" + variableValue;
-    
+
     given()
     .queryParam("caseInstanceVariables", queryValue)
     .queryParam("variableValuesIgnoreCase", true)
@@ -1676,7 +1678,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     .statusCode(Status.OK.getStatusCode())
     .when()
     .get(TASK_QUERY_URL);
-    
+
     verify(mockQuery).matchVariableValuesIgnoreCase();
     verify(mockQuery).caseInstanceVariableValueLike(variableName, variableValue);
 
@@ -1697,7 +1699,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
 
     // not equals case-insensitive
     queryValue = variableName + "_neq_" + variableValue;
-    
+
     given()
     .queryParam("caseInstanceVariables", queryValue)
     .queryParam("variableValuesIgnoreCase", true)
@@ -1707,22 +1709,22 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     .statusCode(Status.OK.getStatusCode())
     .when()
     .get(TASK_QUERY_URL);
-    
+
     verify(mockQuery).matchVariableValuesIgnoreCase();
     verify(mockQuery).caseInstanceVariableValueNotEquals(variableName, variableValue);
   }
-  
+
   @Test
   public void testCaseInstanceVariableValueEqualsIgnoreCaseAsPost() {
-    Map<String, Object> variableJson = new HashMap<String, Object>();
+    Map<String, Object> variableJson = new HashMap<>();
     variableJson.put("name", SAMPLE_VAR_NAME);
     variableJson.put("operator", "eq");
     variableJson.put("value", SAMPLE_VAR_VALUE.toLowerCase());
-    
-    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+
+    List<Map<String, Object>> variables = new ArrayList<>();
     variables.add(variableJson);
-    
-    Map<String, Object> json = new HashMap<String, Object>();
+
+    Map<String, Object> json = new HashMap<>();
     json.put("caseInstanceVariables", variables);
     json.put("variableValuesIgnoreCase", true);
 
@@ -1734,25 +1736,25 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
       .statusCode(Status.OK.getStatusCode())
       .when()
       .post(TASK_QUERY_URL);
-    
+
     verify(mockQuery).matchVariableValuesIgnoreCase();
     verify(mockQuery).caseInstanceVariableValueEquals(SAMPLE_VAR_NAME, SAMPLE_VAR_VALUE.toLowerCase());
   }
 
   @Test
   public void testCaseInstanceVariableNameEqualsIgnoreCaseAsPost() {
-    Map<String, Object> variableJson = new HashMap<String, Object>();
+    Map<String, Object> variableJson = new HashMap<>();
     variableJson.put("name", SAMPLE_VAR_NAME.toLowerCase());
     variableJson.put("operator", "eq");
     variableJson.put("value", SAMPLE_VAR_VALUE);
-    
-    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+
+    List<Map<String, Object>> variables = new ArrayList<>();
     variables.add(variableJson);
-    
-    Map<String, Object> json = new HashMap<String, Object>();
+
+    Map<String, Object> json = new HashMap<>();
     json.put("caseInstanceVariables", variables);
     json.put("variableNamesIgnoreCase", true);
-    
+
     given()
     .contentType(POST_JSON_CONTENT_TYPE)
     .body(json)
@@ -1761,11 +1763,11 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     .statusCode(Status.OK.getStatusCode())
     .when()
     .post(TASK_QUERY_URL);
-    
+
     verify(mockQuery).matchVariableNamesIgnoreCase();
     verify(mockQuery).caseInstanceVariableValueEquals(SAMPLE_VAR_NAME.toLowerCase(), SAMPLE_VAR_VALUE);
     reset(mockQuery);
-    
+
     json.put("variableValuesIgnoreCase", true);
     given()
     .contentType(POST_JSON_CONTENT_TYPE)
@@ -1780,18 +1782,18 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     verify(mockQuery).matchVariableValuesIgnoreCase();
     verify(mockQuery).caseInstanceVariableValueEquals(SAMPLE_VAR_NAME.toLowerCase(), SAMPLE_VAR_VALUE);
   }
-  
+
   @Test
   public void testCaseInstanceVariableValueNotEqualsIgnoreCaseAsPost() {
-    Map<String, Object> variableJson = new HashMap<String, Object>();
+    Map<String, Object> variableJson = new HashMap<>();
     variableJson.put("name", SAMPLE_VAR_NAME);
     variableJson.put("operator", "neq");
     variableJson.put("value", SAMPLE_VAR_VALUE.toLowerCase());
-    
-    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+
+    List<Map<String, Object>> variables = new ArrayList<>();
     variables.add(variableJson);
-    
-    Map<String, Object> json = new HashMap<String, Object>();
+
+    Map<String, Object> json = new HashMap<>();
     json.put("caseInstanceVariables", variables);
     json.put("variableValuesIgnoreCase", true);
 
@@ -1803,22 +1805,22 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
       .statusCode(Status.OK.getStatusCode())
       .when()
       .post(TASK_QUERY_URL);
-    
+
     verify(mockQuery).matchVariableValuesIgnoreCase();
     verify(mockQuery).caseInstanceVariableValueNotEquals(SAMPLE_VAR_NAME, SAMPLE_VAR_VALUE.toLowerCase());
   }
-  
+
   @Test
   public void testCaseInstanceVariableValueLikeIgnoreCaseAsPost() {
-    Map<String, Object> variableJson = new HashMap<String, Object>();
+    Map<String, Object> variableJson = new HashMap<>();
     variableJson.put("name", SAMPLE_VAR_NAME);
     variableJson.put("operator", "like");
     variableJson.put("value", SAMPLE_VAR_VALUE.toLowerCase());
-    
-    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+
+    List<Map<String, Object>> variables = new ArrayList<>();
     variables.add(variableJson);
-    
-    Map<String, Object> json = new HashMap<String, Object>();
+
+    Map<String, Object> json = new HashMap<>();
     json.put("caseInstanceVariables", variables);
     json.put("variableValuesIgnoreCase", true);
 
@@ -1830,7 +1832,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
       .statusCode(Status.OK.getStatusCode())
       .when()
       .post(TASK_QUERY_URL);
-    
+
     verify(mockQuery).matchVariableValuesIgnoreCase();
     verify(mockQuery).caseInstanceVariableValueLike(SAMPLE_VAR_NAME, SAMPLE_VAR_VALUE.toLowerCase());
   }
@@ -1863,21 +1865,21 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     String anotherVariableName = "anotherVarName";
     Integer anotherVariableValue = 30;
 
-    Map<String, Object> variableJson = new HashMap<String, Object>();
+    Map<String, Object> variableJson = new HashMap<>();
     variableJson.put("name", variableName);
     variableJson.put("operator", "eq");
     variableJson.put("value", variableValue);
 
-    Map<String, Object> anotherVariableJson = new HashMap<String, Object>();
+    Map<String, Object> anotherVariableJson = new HashMap<>();
     anotherVariableJson.put("name", anotherVariableName);
     anotherVariableJson.put("operator", "neq");
     anotherVariableJson.put("value", anotherVariableValue);
 
-    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    List<Map<String, Object>> variables = new ArrayList<>();
     variables.add(variableJson);
     variables.add(anotherVariableJson);
 
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put("taskVariables", variables);
 
     given().contentType(POST_JSON_CONTENT_TYPE).body(json)
@@ -1918,21 +1920,21 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     String anotherVariableName = "anotherVarName";
     Integer anotherVariableValue = 30;
 
-    Map<String, Object> variableJson = new HashMap<String, Object>();
+    Map<String, Object> variableJson = new HashMap<>();
     variableJson.put("name", variableName);
     variableJson.put("operator", "eq");
     variableJson.put("value", variableValue);
 
-    Map<String, Object> anotherVariableJson = new HashMap<String, Object>();
+    Map<String, Object> anotherVariableJson = new HashMap<>();
     anotherVariableJson.put("name", anotherVariableName);
     anotherVariableJson.put("operator", "neq");
     anotherVariableJson.put("value", anotherVariableValue);
 
-    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    List<Map<String, Object>> variables = new ArrayList<>();
     variables.add(variableJson);
     variables.add(anotherVariableJson);
 
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put("processVariables", variables);
 
     given()
@@ -1977,21 +1979,21 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     String anotherVariableName = "anotherVarName";
     Integer anotherVariableValue = 30;
 
-    Map<String, Object> variableJson = new HashMap<String, Object>();
+    Map<String, Object> variableJson = new HashMap<>();
     variableJson.put("name", variableName);
     variableJson.put("operator", "eq");
     variableJson.put("value", variableValue);
 
-    Map<String, Object> anotherVariableJson = new HashMap<String, Object>();
+    Map<String, Object> anotherVariableJson = new HashMap<>();
     anotherVariableJson.put("name", anotherVariableName);
     anotherVariableJson.put("operator", "neq");
     anotherVariableJson.put("value", anotherVariableValue);
 
-    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    List<Map<String, Object>> variables = new ArrayList<>();
     variables.add(variableJson);
     variables.add(anotherVariableJson);
 
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put("caseInstanceVariables", variables);
 
     given()
@@ -2011,7 +2013,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
   @Test
   public void testCompletePostParameters() {
 
-    Map<String, Object> queryParameters = new HashMap<String, Object>();
+    Map<String, Object> queryParameters = new HashMap<>();
     Map<String, String> stringQueryParameters = getCompleteStringQueryParameters();
     Map<String, Integer> intQueryParameters = getCompleteIntQueryParameters();
     Map<String, Boolean> booleanQueryParameters = getCompleteBooleanQueryParameters();
@@ -2022,7 +2024,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     queryParameters.putAll(booleanQueryParameters);
     queryParameters.putAll(stringArrayQueryParameters);
 
-    List<String> candidateGroups = new ArrayList<String>();
+    List<String> candidateGroups = new ArrayList<>();
     candidateGroups.add("boss");
     candidateGroups.add("worker");
 
@@ -2074,7 +2076,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
 
     ValueGenerator generator = new ValueGenerator(testExpression);
 
-    Map<String, String> params = new HashMap<String, String>();
+    Map<String, String> params = new HashMap<>();
     params.put("assigneeExpression", generator.getValue("assigneeExpression"));
     params.put("assigneeLikeExpression", generator.getValue("assigneeLikeExpression"));
     params.put("ownerExpression", generator.getValue("ownerExpression"));
