@@ -247,12 +247,20 @@ module.exports = [
         var bpmnJsConf = $scope.bpmnJsConf;
 
         var bpmnJsModules = [];
-        if (bpmnJsConf && bpmnJsConf.additionalModules) {
+        if (
+          bpmnJsConf &&
+          bpmnJsConf.additionalModules &&
+          !Array.isArray(bpmnJsConf.additionalModules)
+        ) {
           angular.forEach(ModuleLoader.load(), function(module, name) {
             if (bpmnJsConf.additionalModules[name]) {
               bpmnJsModules.push(module);
             }
           });
+        }
+
+        if (Array.isArray(bpmnJsConf?.additionalModules)) {
+          bpmnJsModules.push(...bpmnJsConf.additionalModules);
         }
 
         viewer = Viewer.generateViewer({
