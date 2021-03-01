@@ -38,12 +38,15 @@ while [ "$1" != "" ]; do
                    ;;
     --production ) configuration=$BASEDIR/configuration/production.yml
                    ;;
+    --swaggerui )  classPath=$swaggerPath,$classPath
+                   echo Swagger UI enabled. You can access it under /swaggerui/
+                   ;;
     * )            exit 1
   esac
   shift
 done
 
-# if neither REST nor Webapps are explicitly chosen, enable both
+# if neither REST nor Webapps are explicitly chosen, enable both, as well as Swagger UI
 if [ "$optionalComponentChosen" = "false" ]; then
   echo REST API enabled
   echo WebApps enabled
