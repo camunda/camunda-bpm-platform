@@ -16,6 +16,7 @@
  */
 
 const checker = require('license-checker');
+const fs = require('fs')
 
 const PRODUCTION_LICENSES = [
     '0BSD',
@@ -24,7 +25,8 @@ const PRODUCTION_LICENSES = [
     'BSD-3-Clause',
     'ISC',
     'MIT',
-    'Unlicense'
+    'Unlicense',
+    'CC0-1.0'
 ];
 
 
@@ -39,10 +41,11 @@ const parseResults = (ALLOWED_LICENSES, resolve, reject) =>
         } else {
             const entries = Object.entries(packages);
             let licenseWarning = '';
+            const licenseBook = {}
 
             for (const [id, info] of entries) {
                 if (ALLOWED_PACKAGES.includes(id)) {
-                    continue;
+                    continue; // todo add extension here
                 }
 
                 let licenses = info.licenses;
@@ -66,8 +69,26 @@ const parseResults = (ALLOWED_LICENSES, resolve, reject) =>
 
                 if (!approved) {
                     licenseWarning += `${id} uses ${licenses.join(' OR/AND ')}\n`;
+                } else {
+                    const splitIndex = id.lastIndexOf('@');
+                    const name = id.substr(0, splitIndex)
+                    const version = id.substr(splitIndex + 1)
+                    const bookEntry = {
+                        name: name,
+                        version: version,
+                        repository: info.repository,
+                        licenseShort: info.licenses,
+                        licenseText: fs.readFileSync(info.licenseFile).toString(),
+                        outdated: false //todo check what this value is for
+                    }
+                    licenseBook[id] = bookEntry
                 }
+                // write json here
             }
+            fs.writeFileSync(
+                '../../target/THIRD-PARTY-NOTICEx.json',
+                JSON.stringify(licenseBook, null, 2)
+            );
 
             if (licenseWarning) {
                 reject(licenseWarning);
@@ -82,6 +103,7 @@ checker.init(
     {
         start: '.',
         excludePrivatePackages: true,
+        production: true
     },
     parseResults(PRODUCTION_LICENSES, ()=>console.log("gg"), warn => console.log(warn))
 );
