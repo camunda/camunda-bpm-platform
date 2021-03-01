@@ -5,7 +5,7 @@
   <name>Camunda Platform - Java External Task Client - QA</name>
 
   <groupId>org.camunda.bpm.qa</groupId>
-  <artifactId>qa</artifactId>
+  <artifactId>camunda-external-task-client-qa</artifactId>
 
   <packaging>pom</packaging>
 

@@ -21,15 +21,6 @@
     <module>client</module>
   </modules>
 
-  <properties>
-    <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
-
-    <!-- disable javadoc linter for JDK8 to not fail on incomplete javadoc -->
-    <additionalparam>-Xdoclint:none</additionalparam>
-
-    <version.plugin.license>1.14</version.plugin.license>
-  </properties>
-
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -41,35 +32,6 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-
-  <build>
-    <plugins>
-        <!-- LICENSE PLUGIN -->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>license-maven-plugin</artifactId>
-        <version>${version.plugin.license}</version>
-        <configuration>
-          <acceptPomPackaging>true</acceptPomPackaging>
-          <excludedScopes>test</excludedScopes>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-
-  <profiles>
-    <profile>
-      <id>license-header-check</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>com.mycila</groupId>
-            <artifactId>license-maven-plugin</artifactId>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 
   <scm>
     <url>http://github.com/camunda/camunda-external-task-client-java</url>
