@@ -2421,6 +2421,10 @@ public abstract class MockProvider {
   }
 
   public static HistoricTaskInstance createMockHistoricTaskInstance(String tenantId) {
+    return createMockHistoricTaskInstance(tenantId, EXAMPLE_HISTORIC_TASK_INST_DUE_DATE);
+  }
+
+  public static HistoricTaskInstance createMockHistoricTaskInstance(String tenantId, String dueDateString) {
     HistoricTaskInstance taskInstance = mock(HistoricTaskInstance.class);
 
     when(taskInstance.getId()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_ID);
@@ -2439,7 +2443,7 @@ public abstract class MockProvider {
     when(taskInstance.getDurationInMillis()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_DURATION);
     when(taskInstance.getTaskDefinitionKey()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_DEF_KEY);
     when(taskInstance.getPriority()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_PRIORITY);
-    when(taskInstance.getDueDate()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_TASK_INST_DUE_DATE));
+    when(taskInstance.getDueDate()).thenReturn(dueDateString == null ? null : DateTimeUtil.parseDate(dueDateString));
     when(taskInstance.getFollowUpDate()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_TASK_INST_FOLLOW_UP_DATE));
     when(taskInstance.getParentTaskId()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_PARENT_TASK_ID);
     when(taskInstance.getCaseDefinitionKey()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_CASE_DEF_KEY);

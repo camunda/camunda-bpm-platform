@@ -364,6 +364,13 @@
                 `java.util.Date` or `org.joda.time.DateTime` object." />
   
     <@lib.property
+        name = "withoutDueDate"
+        type = "boolean"
+        defaultValue = "false"
+        desc = "Only include tasks which have no due date. Value may only be `true`, 
+                as `false` is the default behavior." />
+  
+    <@lib.property
         name = "followUpDate"
         type = "string"
         format = "date-time"
