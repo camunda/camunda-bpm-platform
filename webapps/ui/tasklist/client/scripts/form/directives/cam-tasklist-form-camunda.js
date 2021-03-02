@@ -47,7 +47,6 @@ module.exports = [
         let triggerSubmit = true;
 
         formController.notifyFormValidated(false);
-        formController.notifyFormDirty(true);
 
         const loadVariables = function() {
           if (!taskId) {
@@ -104,6 +103,13 @@ module.exports = [
               formController.attemptComplete();
             }
           });
+
+          form.on('changed', evt => {
+            formController.notifyFormDirty(true);
+
+            const hasError = !!Object.keys(evt.errors).length;
+            formController.notifyFormValidated(hasError);
+          });
         }
 
         function getFormData() {
@@ -117,6 +123,7 @@ module.exports = [
         function handleSave() {
           const {data} = getFormData();
           localStorage.setItem(`camunda-form:${taskId}`, JSON.stringify(data));
+          formController.notifyFormDirty(false);
         }
 
         function clearSave() {
@@ -164,12 +171,20 @@ module.exports = [
         });
 
         function handleAsynchronousFormKey(formInfo) {
-          fetch(formInfo.key).then(async res => {
-            const json = await res.json();
+          fetch(formInfo.key + `?noCache=${Date.now()}`)
+            .then(async res => {
+              if (res.status !== 200) {
+                throw new Error(res.statusText);
+              }
 
-            await loadVariables();
-            renderForm(json);
-          });
+              const json = await res.json();
+
+              await loadVariables();
+              renderForm(json);
+            })
+            .catch(err => {
+              formController.notifyFormInitializationFailed(err);
+            });
         }
 
         $scope.$watch('asynchronousFormKey', handleAsynchronousFormKey, true);

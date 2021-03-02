@@ -88,6 +88,13 @@ module.exports = function() {
           $scope.taskRemoved = true;
         });
 
+        const apply = () => {
+          var phase = $scope.$root.$$phase;
+          if (phase !== '$apply' && phase !== '$digest') {
+            $scope.$apply();
+          }
+        };
+
         // setup //////////////////////////////////////////////////////////////////
 
         $scope.onFormCompletionCallback =
@@ -241,10 +248,7 @@ module.exports = function() {
         this.notifyFormInitialized = function() {
           $scope.$loaded = true;
 
-          var phase = $scope.$root.$$phase;
-          if (phase !== '$apply' && phase !== '$digest') {
-            $scope.$apply();
-          }
+          apply();
         };
 
         this.notifyFormInitializationFailed = function(error) {
@@ -264,10 +268,12 @@ module.exports = function() {
         this.notifyFormValidated = function(invalid) {
           $scope.$invalid = invalid;
           $scope.onFormValidation(invalid);
+          apply();
         };
 
         this.notifyFormDirty = function(dirty) {
           $scope.$dirty = dirty;
+          apply();
         };
 
         this.getOptions = function() {
