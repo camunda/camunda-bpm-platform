@@ -50,10 +50,10 @@ done
 if [ "$optionalComponentChosen" = "false" ]; then
   echo REST API enabled
   echo WebApps enabled
-  classPath=$webappsPath,$restPath,$swaggerPath,$classPath
+  classPath=$webappsPath,$restPath,$classPath
 fi
 
 echo classpath: $classPath
 
 # start the application
-"$JAVA" -Dloader.path="$classPath" -Dcamunda.deploymentDir="$deploymentDir" -jar "$BASEDIR/internal/camunda-bpm-run-core.jar" --spring.config.location=file:"$configuration" --debug
+"$JAVA" -Dloader.path="$classPath" -Dcamunda.deploymentDir="$deploymentDir" -jar "$BASEDIR/internal/camunda-bpm-run-core.jar" --spring.config.location=file:"$configuration"
