@@ -1,0 +1,28 @@
+# This workflow is triggered by pushing commits to branches and/or Pull Requests.
+# It will also trigger daily to provide a nightly build status.
+name: Build project with Maven
+on:
+  pull_request:
+  push:
+  schedule:
+  - cron: '2 2 * * 1-5' # run nightly master builds on weekdays
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Java setup
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+    - name: Cache
+      uses: actions/cache@v1
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+    - name: Run Maven
+      run: mvn -B clean install com.mycila:license-maven-plugin:check

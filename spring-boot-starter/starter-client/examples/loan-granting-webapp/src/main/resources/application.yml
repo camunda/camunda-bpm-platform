@@ -1,0 +1,6 @@
+camunda:
+  bpm:
+    admin-user:
+      id: admin
+      password: s3cr3t
+   
