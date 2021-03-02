@@ -131,6 +131,29 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTest {
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
   @Test
+  public void testProcessVariableValueNotLike() throws Exception {
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+            Collections.<String, Object>singletonMap("requester", "vahid alizadeh"));
+
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery().processVariableValueNotLike("requester", "vahid%").count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery().processVariableValueNotLike("requester", "%alizadeh").count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery().processVariableValueNotLike("requester", "%ali%").count());
+
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().processVariableValueNotLike("requester", "requester%").count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().processVariableValueNotLike("requester", "%ali").count());
+
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().processVariableValueNotLike("requester", "vahid").count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery().processVariableValueNotLike("nonExistingVar", "string%").count());
+
+    // test with null value
+    try {
+      historyService.createHistoricTaskInstanceQuery().processVariableValueNotLike("requester", null).count();
+      fail("expected exception");
+    } catch (final ProcessEngineException e) {/*OK*/}
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  @Test
   public void testProcessVariableValueGreaterThan() throws Exception {
     runtimeService.startProcessInstanceByKey("oneTaskProcess",
             Collections.<String, Object>singletonMap("requestNumber", 123));
@@ -252,6 +275,24 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTest {
     // then
     assertThatListContainsOnlyExpectedElement(like, instance);
     assertThatListContainsOnlyExpectedElement(likeValueLC, instance);
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testProcessVariableValueNotLikeIgnoreCase() {
+    // given
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess", VARIABLES);
+    // when
+    List<HistoricTaskInstance> notLike = queryValueIgnoreCase().processVariableValueNotLike(VARIABLE_NAME, VARIABLE_VALUE).list();
+    List<HistoricTaskInstance> notLikeValueNE = queryValueIgnoreCase().processVariableValueNotLike(VARIABLE_NAME, VARIABLE_VALUE_NE).list();
+    List<HistoricTaskInstance> notLikeNameLC = queryValueIgnoreCase().processVariableValueNotLike(VARIABLE_NAME_LC, VARIABLE_VALUE).list();
+    List<HistoricTaskInstance> notLikeNameLCValueNE = queryValueIgnoreCase().processVariableValueNotLike(VARIABLE_NAME_LC, VARIABLE_VALUE_NE).list();
+
+    // then
+    assertThat(notLike).isEmpty();
+    assertThatListContainsOnlyExpectedElement(notLikeValueNE, instance);
+    assertThat(notLikeNameLC).isEmpty();
+    assertThat(notLikeNameLCValueNE).isEmpty();
   }
 
   @Test

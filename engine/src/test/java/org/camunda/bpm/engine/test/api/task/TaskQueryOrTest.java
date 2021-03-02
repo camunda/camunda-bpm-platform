@@ -43,6 +43,7 @@ import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
@@ -593,6 +594,34 @@ public class TaskQueryOrTest {
       .or()
         .taskVariableValueEquals("aLongValue", 789L)
         .taskVariableValueGreaterThan("anEvenLongerValue", 999L)
+      .endOr();
+
+    // then
+    assertEquals(2, query.count());
+  }
+
+  @Test
+  public void shouldReturnTasksWithProcessVariableValueNotLikeOrEquals() {
+    // given
+    BpmnModelInstance aProcessDefinition = Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .userTask()
+      .endEvent()
+      .done();
+
+    repositoryService
+      .createDeployment()
+      .addModelInstance("foo.bpmn", aProcessDefinition)
+      .deploy();
+
+    runtimeService.startProcessInstanceByKey("process", Variables.createVariables().putValue("stringVar", "stringVal"));
+    runtimeService.startProcessInstanceByKey("process", Variables.createVariables().putValue("stringVar", "stringVar"));
+
+    // when
+    TaskQuery query = taskService.createTaskQuery()
+      .or()
+        .processVariableValueNotLike("stringVar", "%Val")
+        .processVariableValueEquals("stringVar", "stringVal")
       .endOr();
 
     // then
