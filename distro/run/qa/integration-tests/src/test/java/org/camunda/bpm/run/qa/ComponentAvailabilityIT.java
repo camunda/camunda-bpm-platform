@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.run.qa;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static io.restassured.RestAssured.*;
@@ -46,21 +47,25 @@ public class ComponentAvailabilityIT {
   public boolean restAvailable;
   @Parameter(2)
   public boolean webappsAvailable;
+  @Parameter(3)
+  public boolean swaggerUIAvailable;
 
-  @Parameters
+  @Parameters()
   public static Collection<Object[]> commands() {
     return Arrays.asList(new Object[][] {
-      { new String[0], true, true },
-      { new String[]{"--rest"}, true, false },
-      { new String[]{"--rest", "--webapps"}, true, true },
-      { new String[]{"--webapps"}, false, true }
+      { new String[0], true, true, false },
+      { new String[]{"--rest"}, true, false, false },
+      { new String[]{"--rest", "--webapps"}, true, true, false},
+      { new String[]{"--webapps"}, false, true, false},
+      { new String[]{"--swaggerui"}, true, true, true },
+      { new String[]{"--rest", "--webapps", "--swaggerui"}, true, true, true}
     });
   }
 
   private static SpringBootManagedContainer container;
 
   @BeforeParam
-  public static void runStartScript(String[] commands, boolean restAvailable, boolean webappsAvailable) {
+  public static void runStartScript(String[] commands, boolean restAvailable, boolean webappsAvailable, boolean swaggerUIAvailable) {
     container = new SpringBootManagedContainer(commands);
     try {
       container.start();
@@ -105,6 +110,19 @@ public class ComponentAvailabilityIT {
     } else {
       response.then()
         .statusCode(404);
+    }
+  }
+
+  @Test
+  public void shouldFindSwaggerUI() {
+    Response response = when().get(container.getBaseUrl() + "/swaggerui/");
+    if (swaggerUIAvailable) {
+      response.then()
+          .statusCode(200)
+          .body("html.head.title", equalTo("Camunda Platform REST API"));
+    } else {
+      response.then()
+          .statusCode(404);
     }
   }
 
