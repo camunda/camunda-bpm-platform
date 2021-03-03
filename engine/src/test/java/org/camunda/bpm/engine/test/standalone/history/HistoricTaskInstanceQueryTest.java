@@ -22,6 +22,7 @@ import static org.junit.Assert.fail;
 
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -697,6 +698,29 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTest {
     taskService.deleteTask("taskOne",true);
 
     ClockUtil.reset();
+  }
+
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void shouldQueryForTasksWithoutDueDate() {
+    // given
+    Task taskOne = taskService.newTask("taskOne");
+    taskOne.setDueDate(new Date());
+    taskService.saveTask(taskOne);
+    Task taskTwo = taskService.newTask("taskTwo");
+    taskService.saveTask(taskTwo);
+
+    // when
+    taskService.complete(taskOne.getId());
+    taskService.complete(taskTwo.getId());
+
+    // then
+    assertThat(historyService.createHistoricTaskInstanceQuery().withoutTaskDueDate().count())
+      .isEqualTo(1L);
+
+    // cleanup
+    taskService.deleteTask("taskOne", true);
+    taskService.deleteTask("taskTwo", true);
   }
 
   private void assertThatListContainsOnlyExpectedElement(List<HistoricTaskInstance> instances, ProcessInstance instance) {

@@ -847,6 +847,11 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    */
   TaskQuery withoutTenantId();
 
+  /**
+   * Only select tasks which have no due date.
+   */
+  TaskQuery withoutDueDate();
+
   // ordering ////////////////////////////////////////////////////////////
 
   /**

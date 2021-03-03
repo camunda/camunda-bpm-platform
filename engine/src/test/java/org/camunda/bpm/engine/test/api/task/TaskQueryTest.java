@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.task;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.taskByAssignee;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.taskByCaseExecutionId;
@@ -1974,6 +1975,61 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
         .dueAfter(oneHourLater).dueDate(dueDate).count());
     assertEquals(0, taskService.createTaskQuery()
         .dueDate(dueDate).dueBefore(oneHourAgo).count());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml"})
+  @Test
+  public void shouldQueryForTasksWithoutDueDate() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    task.setDueDate(ClockUtil.now());
+    taskService.saveTask(task);
+
+    // then
+    assertEquals(12, taskService.createTaskQuery().withoutDueDate().count());
+  }
+
+  @Test
+  public void shouldRejectDueDateAndWithoutDueDateCombination() {
+    assertThatThrownBy(() -> taskService.createTaskQuery().dueDate(ClockUtil.now()).withoutDueDate())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Invalid query usage");
+  }
+
+  @Test
+  public void shouldRejectWithoutDueDateAndDueDateCombination() {
+    assertThatThrownBy(() -> taskService.createTaskQuery().withoutDueDate().dueDate(ClockUtil.now()))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Invalid query usage");
+  }
+
+  @Test
+  public void shouldRejectDueBeforeAndWithoutDueDateCombination() {
+    assertThatThrownBy(() -> taskService.createTaskQuery().dueBefore(ClockUtil.now()).withoutDueDate())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Invalid query usage");
+  }
+
+  @Test
+  public void shouldRejectWithoutDueDateAndDueBeforeCombination() {
+    assertThatThrownBy(() -> taskService.createTaskQuery().withoutDueDate().dueBefore(ClockUtil.now()))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Invalid query usage");
+  }
+
+  @Test
+  public void shouldRejectDueAfterAndWithoutDueDateCombination() {
+    assertThatThrownBy(() -> taskService.createTaskQuery().dueAfter(ClockUtil.now()).withoutDueDate())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Invalid query usage");
+  }
+
+  @Test
+  public void shouldRejectWithoutDueDateAndDueAfterCombination() {
+    assertThatThrownBy(() -> taskService.createTaskQuery().withoutDueDate().dueAfter(ClockUtil.now()))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Invalid query usage");
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml"})

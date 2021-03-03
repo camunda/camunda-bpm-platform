@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.impl;
 
+import static java.lang.Boolean.TRUE;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.ArrayList;
@@ -79,12 +80,14 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   protected List<TaskQueryVariableValue> variables = new ArrayList<>();
   protected Boolean variableNamesIgnoreCase;
   protected Boolean variableValuesIgnoreCase;
+
   protected Date dueDate;
   protected Date dueAfter;
   protected Date dueBefore;
+  protected boolean isWithoutTaskDueDate;
+
   protected Date followUpDate;
   protected Date followUpBefore;
-
   protected Date followUpAfter;
 
   protected String[] tenantIds;
@@ -462,17 +465,55 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   }
 
   public HistoricTaskInstanceQuery taskDueDate(Date dueDate) {
+    // The taskDueDate filter can't be used in an AND query with
+    // the withoutTaskDueDate filter. They can be combined in an OR query
+    if (!isOrQueryActive) {
+      if (TRUE.equals(isWithoutTaskDueDate)) {
+        throw new ProcessEngineException("Invalid query usage: cannot set both taskDueDate and withoutTaskDueDate filters.");
+      }
+    }
+
     this.dueDate = dueDate;
     return this;
   }
 
   public HistoricTaskInstanceQuery taskDueAfter(Date dueAfter) {
+    // The taskDueAfter filter can't be used in an AND query with
+    // the withoutTaskDueDate filter. They can be combined in an OR query
+    if (!isOrQueryActive) {
+      if (TRUE.equals(isWithoutTaskDueDate)) {
+        throw new ProcessEngineException("Invalid query usage: cannot set both taskDueAfter and withoutTaskDueDate filters.");
+      }
+    }
+
     this.dueAfter = dueAfter;
     return this;
   }
 
   public HistoricTaskInstanceQuery taskDueBefore(Date dueBefore) {
+    // The taskDueBefore filter can't be used in an AND query with
+    // the withoutTaskDueDate filter. They can be combined in an OR query
+    if (!isOrQueryActive) {
+      if (TRUE.equals(isWithoutTaskDueDate)) {
+        throw new ProcessEngineException("Invalid query usage: cannot set both taskDueBefore and withoutTaskDueDate filters.");
+      }
+    }
+
     this.dueBefore = dueBefore;
+    return this;
+  }
+
+  @Override
+  public HistoricTaskInstanceQuery withoutTaskDueDate() {
+    // The due date filters can't be used in an AND query with
+    // the withoutTaskDueDate filter. They can be combined in an OR query
+    if (!isOrQueryActive) {
+      if (dueAfter != null || dueBefore != null || dueDate != null) {
+        throw new ProcessEngineException("Invalid query usage: cannot set both task due date (equal to, before, or after) and withoutTaskDueDate filters.");
+      }
+    }
+
+    this.isWithoutTaskDueDate = true;
     return this;
   }
 
@@ -811,6 +852,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
 
   public Date getDueAfter() {
     return dueAfter;
+  }
+
+  public boolean isWithoutTaskDueDate() {
+    return isWithoutTaskDueDate;
   }
 
   public Date getFollowUpDate() {

@@ -92,6 +92,7 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
   public static final String DUE_DATE = "dueDate";
   public static final String DUE_BEFORE = "dueBefore";
   public static final String DUE_AFTER = "dueAfter";
+  public static final String WITHOUT_DUE_DATE = "withoutDueDate";
   public static final String FOLLOW_UP = "followUp";
   public static final String FOLLOW_UP_DATE = "followUpDate";
   public static final String FOLLOW_UP_BEFORE = "followUpBefore";
@@ -195,6 +196,7 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     JsonUtil.addDateField(json, DUE, query.getDueDate());
     JsonUtil.addDateField(json, DUE_BEFORE, query.getDueBefore());
     JsonUtil.addDateField(json, DUE_AFTER, query.getDueAfter());
+    JsonUtil.addDefaultField(json, WITHOUT_DUE_DATE, false, query.isWithoutDueDate());
     JsonUtil.addDateField(json, FOLLOW_UP, query.getFollowUpDate());
     JsonUtil.addDateField(json, FOLLOW_UP_BEFORE, query.getFollowUpBefore());
     JsonUtil.addDefaultField(json, FOLLOW_UP_NULL_ACCEPTED, false, query.isFollowUpNullAccepted());
@@ -445,6 +447,9 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     }
     if (json.has(DUE_AFTER)) {
       query.dueAfter(new Date(JsonUtil.getLong(json, DUE_AFTER)));
+    }
+    if (json.has(WITHOUT_DUE_DATE)) {
+      query.withoutDueDate();
     }
     if (json.has(FOLLOW_UP)) {
       query.followUpDate(new Date(JsonUtil.getLong(json, FOLLOW_UP)));
