@@ -19,7 +19,7 @@ package org.camunda.bpm.engine.impl;
 
 /**
  * Used to indicate the operator that should be used to comparing values in a query clause.
- * 
+ *
  * @author Frederik Heremans
  */
 public enum QueryOperator {
@@ -29,5 +29,6 @@ public enum QueryOperator {
   GREATER_THAN_OR_EQUAL,
   LESS_THAN,
   LESS_THAN_OR_EQUAL,
-  LIKE
+  LIKE,
+  NOT_LIKE
 }

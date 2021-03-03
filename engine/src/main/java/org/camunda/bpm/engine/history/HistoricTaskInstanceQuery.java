@@ -285,6 +285,13 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
 
   /**
    * Only select historic task instances which are part of a process that have a variable
+   * with the given name and not matching the given value.
+   * The syntax is that of SQL: for example usage: valueNotLike(%value%)
+   * */
+  HistoricTaskInstanceQuery processVariableValueNotLike(String variableName, Object variableValue);
+
+  /**
+   * Only select historic task instances which are part of a process that have a variable
    * with the given name and a value greater than the given one.
    */
   HistoricTaskInstanceQuery processVariableValueGreaterThan(String variableName, Object variableValue);

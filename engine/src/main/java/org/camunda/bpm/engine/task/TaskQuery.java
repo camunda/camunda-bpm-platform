@@ -540,6 +540,12 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
 
   /**
    * Only select tasks which are part of a process that have a variable
+   * with the given name and not matching the given value.
+   * The syntax is that of SQL: for example usage: valueNotLike(%value%)*/
+  TaskQuery processVariableValueNotLike(String variableName, String variableValue);
+
+  /**
+   * Only select tasks which are part of a process that have a variable
    * with the given name and a value greater than the given one.
    */
   TaskQuery processVariableValueGreaterThan(String variableName, Object variableValue);

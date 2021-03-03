@@ -775,6 +775,12 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
 
   @Override
+  public TaskQuery processVariableValueNotLike(String variableName, String variableValue) {
+    addVariable(variableName, variableValue, QueryOperator.NOT_LIKE, false, true);
+    return this;
+  }
+
+  @Override
   public TaskQuery processVariableValueGreaterThan(String variableName, Object variableValue) {
     addVariable(variableName, variableValue, QueryOperator.GREATER_THAN, false, true);
   	return this;
@@ -1231,6 +1237,8 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
         throw new ProcessEngineException("Booleans and null cannot be used in 'less than or equal' condition");
       case LIKE:
         throw new ProcessEngineException("Booleans and null cannot be used in 'like' condition");
+      case NOT_LIKE:
+        throw new ProcessEngineException("Booleans and null cannot be used in 'not like' condition");
       default:
         break;
       }

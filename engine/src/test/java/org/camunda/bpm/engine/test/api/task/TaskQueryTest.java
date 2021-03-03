@@ -1446,6 +1446,55 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
 
   @Deployment(resources="org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessVariableValueEquals.bpmn20.xml")
   @Test
+  public void testProcessVariableValueNotLike() throws Exception {
+
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("stringVar", "stringValue");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
+
+    assertEquals(0, taskService.createTaskQuery().processVariableValueNotLike("stringVar", "stringVal%").count());
+    assertEquals(0, taskService.createTaskQuery().processVariableValueNotLike("stringVar", "%ngValue").count());
+    assertEquals(0, taskService.createTaskQuery().processVariableValueNotLike("stringVar", "%ngVal%").count());
+
+    assertEquals(1, taskService.createTaskQuery().processVariableValueNotLike("stringVar", "stringVar%").count());
+    assertEquals(1, taskService.createTaskQuery().processVariableValueNotLike("stringVar", "%ngVar").count());
+    assertEquals(1, taskService.createTaskQuery().processVariableValueNotLike("stringVar", "%ngVar%").count());
+
+    assertEquals(1, taskService.createTaskQuery().processVariableValueNotLike("stringVar", "stringVal").count());
+    assertEquals(0, taskService.createTaskQuery().processVariableValueNotLike("nonExistingVar", "string%").count());
+
+    // test with null value
+    assertThatThrownBy(() -> taskService.createTaskQuery().processVariableValueNotLike("stringVar", null).count())
+      .isInstanceOf(ProcessEngineException.class);
+  }
+
+  @Deployment(resources="org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessVariableValueEquals.bpmn20.xml")
+  @Test
+  public void testProcessVariableValueNotLikeIgnoreCase() throws Exception {
+
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("stringVar", "stringValue");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
+
+    assertEquals(1, taskService.createTaskQuery().processVariableValueNotLike("stringVar", "stringVal%".toLowerCase()).count());
+    assertEquals(0, taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueNotLike("stringVar", "stringVal%".toLowerCase()).count());
+    assertEquals(0, taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueNotLike("stringVar", "%ngValue".toLowerCase()).count());
+    assertEquals(0, taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueNotLike("stringVar", "%ngVal%".toLowerCase()).count());
+
+    assertEquals(1, taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueNotLike("stringVar", "stringVar%".toLowerCase()).count());
+    assertEquals(1, taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueNotLike("stringVar", "%ngVar".toLowerCase()).count());
+    assertEquals(1, taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueNotLike("stringVar", "%ngVar%".toLowerCase()).count());
+
+    assertEquals(1, taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueNotLike("stringVar", "stringVal".toLowerCase()).count());
+    assertEquals(0, taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueNotLike("nonExistingVar", "stringVal%".toLowerCase()).count());
+
+    // test with null value
+    assertThatThrownBy(() -> taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueNotLike("stringVar", null).count())
+      .isInstanceOf(ProcessEngineException.class);
+  }
+
+  @Deployment(resources="org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessVariableValueEquals.bpmn20.xml")
+  @Test
   public void testProcessVariableValueCompare() throws Exception {
 
   	Map<String, Object> variables = new HashMap<String, Object>();

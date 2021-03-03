@@ -325,6 +325,11 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
     return this;
   }
 
+  public HistoricTaskInstanceQuery processVariableValueNotLike(String variableName, Object variableValue) {
+    addVariable(variableName, variableValue, QueryOperator.NOT_LIKE, false, true);
+    return this;
+  }
+
   @Override
   public HistoricTaskInstanceQuery processVariableValueGreaterThan(String variableName, Object variableValue) {
     addVariable(variableName, variableValue, QueryOperator.GREATER_THAN, false, true);
@@ -444,6 +449,8 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
           throw new ProcessEngineException("Booleans and null cannot be used in 'less than or equal' condition");
         case LIKE:
           throw new ProcessEngineException("Booleans and null cannot be used in 'like' condition");
+        case NOT_LIKE:
+          throw new ProcessEngineException("Booleans and null cannot be used in 'not like' condition");
         default:
           break;
       }
