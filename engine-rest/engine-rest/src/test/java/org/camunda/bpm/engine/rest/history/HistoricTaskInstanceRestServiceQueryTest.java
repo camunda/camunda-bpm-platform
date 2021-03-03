@@ -2016,6 +2016,25 @@ public class HistoricTaskInstanceRestServiceQueryTest extends AbstractRestServic
   }
 
   @Test
+  public void testQueryByProcessVariableNotLike() {
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String variableParameter = variableName + "_notLike_" + variableValue;
+
+    String queryValue = variableParameter;
+
+    given()
+      .queryParam("processVariables", queryValue)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(HISTORIC_TASK_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).processVariableValueNotLike(variableName, variableValue);
+  }
+
+  @Test
   public void testQueryByProcessVariableNotEquals() {
     String variableName = "varName";
     String variableValue = "varValue";

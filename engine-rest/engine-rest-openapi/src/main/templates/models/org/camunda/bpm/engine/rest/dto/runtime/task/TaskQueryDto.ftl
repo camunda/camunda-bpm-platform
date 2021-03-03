@@ -591,7 +591,8 @@
                 `gteq` - greater than or equal to;
                 `lt` - lower than;
                 `lteq` - lower than or equal to;
-                `like`.
+                `like`;
+                `notLike`.
                 `key` and `value` may not contain underscore or comma characters." />
   
     <@lib.property
