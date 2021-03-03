@@ -2159,6 +2159,10 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
       extendedQuery.dueAfter(this.getDueAfter());
     }
 
+    if (extendingQuery.isWithoutDueDate() || this.isWithoutDueDate()) {
+      extendedQuery.withoutDueDate();
+    }
+
     if (extendingQuery.getFollowUpDate() != null) {
       extendedQuery.followUpDate(extendingQuery.getFollowUpDate());
     }

@@ -2056,6 +2056,26 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
   }
 
   @Test
+  public void testExtendQueryByWithoutDueDate() {
+    // given
+    Task task = taskService.newTask();
+    task.setDueDate(new Date());
+    taskService.saveTask(task);
+
+    TaskQuery query = taskService.createTaskQuery();
+    saveQuery(query);
+
+    // assume
+    assertThat(filterService.count(filter.getId())).isEqualTo(4L);
+
+    // when
+    TaskQuery extendingQuery = taskService.createTaskQuery().withoutDueDate();
+
+    // then
+    assertThat(filterService.count(filter.getId(), extendingQuery)).isEqualTo(3L);
+  }
+
+  @Test
   public void testTaskIdInPositive() {
     // given
     List<Task> existingTasks = taskService.createTaskQuery().list();
