@@ -1503,6 +1503,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     verify(mockQuery).matchVariableValuesIgnoreCase();
     verify(mockQuery).processVariableValueNotEquals(SAMPLE_VAR_NAME, SAMPLE_VAR_VALUE.toLowerCase());
   }
+
   @Test
   public void testProcessVariableValueLikeIgnoreCaseAsPost() {
     Map<String, Object> variableJson = new HashMap<>();
@@ -1528,6 +1529,33 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
 
     verify(mockQuery).matchVariableValuesIgnoreCase();
     verify(mockQuery).processVariableValueLike(SAMPLE_VAR_NAME, SAMPLE_VAR_VALUE.toLowerCase());
+  }
+
+  @Test
+  public void testProcessVariableValueNotLikeIgnoreCaseAsPost() {
+    Map<String, Object> variableJson = new HashMap<>();
+    variableJson.put("name", SAMPLE_VAR_NAME);
+    variableJson.put("operator", "notLike");
+    variableJson.put("value", SAMPLE_VAR_VALUE.toLowerCase());
+
+    List<Map<String, Object>> variables = new ArrayList<>();
+    variables.add(variableJson);
+
+    Map<String, Object> json = new HashMap<>();
+    json.put("processVariables", variables);
+    json.put("variableValuesIgnoreCase", true);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(json)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .when()
+      .post(TASK_QUERY_URL);
+
+    verify(mockQuery).matchVariableValuesIgnoreCase();
+    verify(mockQuery).processVariableValueNotLike(SAMPLE_VAR_NAME, SAMPLE_VAR_VALUE.toLowerCase());
   }
 
   @Test
