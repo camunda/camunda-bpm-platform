@@ -16,13 +16,15 @@
  */
 package org.camunda.bpm.client.spring.impl.client.util;
 
+import org.camunda.bpm.client.ExternalTaskClient;
+import org.camunda.bpm.client.spring.exception.SpringExternalTaskClientException;
 import org.camunda.bpm.client.spring.impl.util.LoggerUtil;
 
 public class ClientLoggerUtil extends LoggerUtil {
 
-  public void beanCreationSkipped(String className, String beanName, String factoryBeanName) {
-    logDebug("001", "Skipping creation of bean for factory '{}'. " +
-            "A bean with name '{}' created by '{}' already exists", className, beanName, factoryBeanName);
+  public void beanCreationSkipped(String className, String beanName) {
+    logDebug("001", "Skipping creation of bean '{}' for factory '{}'. " +
+            "A bean of type '{}' already exists", beanName, className, ExternalTaskClient.class);
   }
 
   public void registered(String beanName) {
@@ -39,6 +41,18 @@ public class ClientLoggerUtil extends LoggerUtil {
 
   public void backoffStrategyFound() {
     logDebug("005", "Client backoff strategy found");
+  }
+
+  public SpringExternalTaskClientException noUniqueClientException() {
+    return new SpringExternalTaskClientException(exceptionMessage(
+        "006", "Multiple matching client bean candidates have been found " +
+            "when only one matching client bean was expected."));
+  }
+
+  public SpringExternalTaskClientException noUniqueAnnotation() {
+    return new SpringExternalTaskClientException(exceptionMessage(
+        "007", "Multiple matching client annotation candidates have been found " +
+            "when only one matching client annotation was expected."));
   }
 
 }

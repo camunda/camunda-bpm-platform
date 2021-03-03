@@ -52,9 +52,13 @@ public class ClientFactory
   @Override
   public ExternalTaskClient getObject() {
     if (client == null) {
-      ExternalTaskClientBuilder clientBuilder = ExternalTaskClient.create()
-          .baseUrl(resolve(clientConfiguration.getBaseUrl()))
-          .workerId(resolve(clientConfiguration.getWorkerId()));
+      ExternalTaskClientBuilder clientBuilder = ExternalTaskClient.create();
+      if (clientConfiguration.getBaseUrl() != null) {
+          clientBuilder.baseUrl(resolve(clientConfiguration.getBaseUrl()));
+      }
+      if (clientConfiguration.getWorkerId() != null) {
+        clientBuilder.workerId(resolve(clientConfiguration.getWorkerId()));
+      }
 
       addClientRequestInterceptors(clientBuilder);
 
@@ -107,7 +111,7 @@ public class ClientFactory
   }
 
   @Autowired(required = false)
-  public void setClientBackoffStrategies(BackoffStrategy backoffStrategy) {
+  public void setClientBackoffStrategy(BackoffStrategy backoffStrategy) {
     this.backoffStrategy = backoffStrategy;
     LOG.backoffStrategyFound();
   }

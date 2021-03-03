@@ -14,27 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.client.spring.boot.starter.impl.properties;
+package org.camunda.bpm.client.spring.impl;
 
-public class BasicAuthProperties {
+import org.camunda.bpm.client.spring.impl.client.ClientFactory;
+import org.camunda.bpm.client.spring.impl.client.ClientPostProcessor;
+import org.camunda.bpm.client.spring.impl.subscription.SpringTopicSubscriptionImpl;
+import org.camunda.bpm.client.spring.impl.subscription.SubscriptionPostProcessor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-  protected String username;
-  protected String password;
+@Configuration
+public class PostProcessorConfiguration {
 
-  public String getUsername() {
-    return username;
+  @Bean
+  public SubscriptionPostProcessor subscriptionPostprocessor() {
+    return new SubscriptionPostProcessor(SpringTopicSubscriptionImpl.class);
   }
 
-  public String getPassword() {
-    return password;
-  }
-
-  public void setUsername(String username) {
-    this.username = username;
-  }
-
-  public void setPassword(String password) {
-    this.password = password;
+  @Bean
+  public ClientPostProcessor clientPostProcessor() {
+    return new ClientPostProcessor(ClientFactory.class);
   }
 
 }

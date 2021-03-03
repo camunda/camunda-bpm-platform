@@ -152,11 +152,17 @@ public class SpringTopicSubscriptionImpl
   }
 
   public void close() {
+    String topicName = subscriptionConfiguration.getTopicName();
+    if (topicSubscriptionBuilder == null) {
+      throw LOG.notInitializedException(topicName);
+    }
+
     if (topicSubscription != null) {
       topicSubscription.close();
 
-      String topicName = topicSubscription.getTopicName();
       LOG.closed(topicName);
+    } else {
+      throw LOG.notOpenedException(topicName);
     }
   }
 

@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.client.spring.boot.starter.impl;
 
-import org.camunda.bpm.client.spring.boot.starter.impl.properties.CamundaBpmClientProperties;
+import org.camunda.bpm.client.spring.boot.starter.impl.properties.ClientProperties;
 import org.camunda.bpm.client.spring.impl.subscription.SpringTopicSubscriptionImpl;
 import org.camunda.bpm.client.spring.impl.subscription.SubscriptionConfiguration;
 
@@ -30,7 +30,7 @@ import java.util.function.Predicate;
 public class PropertiesAwareSpringTopicSubscription extends SpringTopicSubscriptionImpl {
 
   @Autowired
-  protected CamundaBpmClientProperties camundaBpmClientProperties;
+  protected ClientProperties clientProperties;
 
   @Override
   public void afterPropertiesSet() throws Exception {
@@ -48,7 +48,7 @@ public class PropertiesAwareSpringTopicSubscription extends SpringTopicSubscript
 
     String topicName = merge.getTopicName();
     SubscriptionConfiguration subscriptionProperties =
-        camundaBpmClientProperties.findSubscriptionPropsByTopicName(topicName);
+        clientProperties.findSubscriptionPropsByTopicName(topicName);
 
     if (subscriptionProperties != null) {
       if (subscriptionProperties.getAutoOpen() != null) {

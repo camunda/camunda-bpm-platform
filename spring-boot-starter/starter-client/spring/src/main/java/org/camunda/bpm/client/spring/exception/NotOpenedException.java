@@ -14,27 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.client.spring.boot.starter.impl.properties;
+package org.camunda.bpm.client.spring.exception;
 
-public class BasicAuthProperties {
+/**
+ * <p>
+ * Exception is thrown when subscription has not yet been opened
+ */
+public class NotOpenedException extends SpringExternalTaskClientException {
 
-  protected String username;
-  protected String password;
-
-  public String getUsername() {
-    return username;
+  public NotOpenedException(String message) {
+    super(message);
   }
 
-  public String getPassword() {
-    return password;
-  }
-
-  public void setUsername(String username) {
-    this.username = username;
-  }
-
-  public void setPassword(String password) {
-    this.password = password;
+  public NotOpenedException(String message, Throwable e) {
+    super(message, e);
   }
 
 }

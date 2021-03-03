@@ -18,6 +18,7 @@ package org.camunda.bpm.client.spring.impl.subscription.util;
 
 import org.camunda.bpm.client.spring.annotation.ExternalTaskSubscription;
 import org.camunda.bpm.client.spring.exception.NotInitializedException;
+import org.camunda.bpm.client.spring.exception.NotOpenedException;
 import org.camunda.bpm.client.spring.impl.util.LoggerUtil;
 import org.camunda.bpm.client.task.ExternalTaskHandler;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -59,6 +60,11 @@ public class SubscriptionLoggerUtil extends LoggerUtil {
   public NotInitializedException notInitializedException(String topicName) {
     return new NotInitializedException(exceptionMessage(
         "008", "Subscription with topic name '{}' has yet not  been initialized", topicName));
+  }
+
+  public NotOpenedException notOpenedException(String topicName) {
+    return new NotOpenedException(exceptionMessage(
+        "009", "Subscription with topic name '{}' has yet not  been opened", topicName));
   }
 
 }

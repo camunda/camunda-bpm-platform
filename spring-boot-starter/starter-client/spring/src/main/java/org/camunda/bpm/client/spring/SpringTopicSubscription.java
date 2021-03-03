@@ -19,6 +19,7 @@ package org.camunda.bpm.client.spring;
 import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.spring.event.SubscriptionInitializedEvent;
 import org.camunda.bpm.client.spring.exception.NotInitializedException;
+import org.camunda.bpm.client.spring.exception.NotOpenedException;
 import org.camunda.bpm.client.topic.TopicSubscription;
 
 /**
@@ -63,5 +64,15 @@ public interface SpringTopicSubscription extends TopicSubscription {
    * call {@link #open()} to release the topic for execution
    */
   boolean isOpen();
+
+  /**
+   * Delegates to {@link TopicSubscription#close()}.
+   *
+   * @throws NotInitializedException if called before fully initialized
+   * @throws NotOpenedException      if called before subscription has been opened
+   * @see TopicSubscription#close()
+   */
+  @Override
+  void close();
 
 }

@@ -25,13 +25,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 @ConfigurationProperties(prefix = "camunda.bpm.client")
-public class CamundaBpmClientProperties extends ClientConfiguration {
+public class ClientProperties extends ClientConfiguration {
 
   @NestedConfigurationProperty
   protected Map<String, SubscriptionConfiguration> subscriptions = new HashMap<>();
 
   @NestedConfigurationProperty
-  protected BasicAuthProperties basicAuth = new BasicAuthProperties();
+  protected BasicAuthProperties basicAuth;
 
   public SubscriptionConfiguration findSubscriptionPropsByTopicName(String topic) {
     return subscriptions.get(topic);
@@ -47,6 +47,10 @@ public class CamundaBpmClientProperties extends ClientConfiguration {
 
   public BasicAuthProperties getBasicAuth() {
     return basicAuth;
+  }
+
+  public void setBasicAuth(BasicAuthProperties basicAuth) {
+    this.basicAuth = basicAuth;
   }
 
 }

@@ -16,13 +16,11 @@
  */
 package org.camunda.bpm.client.spring.exception;
 
-import org.camunda.bpm.client.exception.ExternalTaskClientException;
-
 /**
  * <p>
  * Exception is thrown when subscription has not yet been initialized
  */
-public class NotInitializedException extends ExternalTaskClientException {
+public class NotInitializedException extends SpringExternalTaskClientException {
 
   public NotInitializedException(String message) {
     super(message);

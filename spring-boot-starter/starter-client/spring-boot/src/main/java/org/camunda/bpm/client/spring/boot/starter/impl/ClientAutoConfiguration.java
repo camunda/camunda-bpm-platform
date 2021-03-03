@@ -16,32 +16,26 @@
  */
 package org.camunda.bpm.client.spring.boot.starter.impl;
 
-import org.camunda.bpm.client.spring.boot.starter.impl.CamundaBpmClientAutoConfiguration.PropertiesAwareClientRegistrar;
-import org.camunda.bpm.client.spring.boot.starter.impl.CamundaBpmClientAutoConfiguration.PropertiesAwareSubscriptionPostProcessor;
-import org.camunda.bpm.client.spring.boot.starter.impl.properties.CamundaBpmClientProperties;
-import org.camunda.bpm.client.spring.impl.client.ClientRegistrar;
+import org.camunda.bpm.client.spring.boot.starter.impl.properties.ClientProperties;
+import org.camunda.bpm.client.spring.impl.client.ClientPostProcessor;
 import org.camunda.bpm.client.spring.impl.subscription.SubscriptionPostProcessor;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 
-@EnableConfigurationProperties({CamundaBpmClientProperties.class})
-@Import({PropertiesAwareClientRegistrar.class, PropertiesAwareSubscriptionPostProcessor.class})
 @Configuration
-public class CamundaBpmClientAutoConfiguration {
+@EnableConfigurationProperties({ClientProperties.class})
+public class ClientAutoConfiguration {
 
-  static class PropertiesAwareClientRegistrar extends ClientRegistrar {
-    public PropertiesAwareClientRegistrar() {
-      super(PropertiesAwareClientFactory.class);
-    }
-
+  @Bean
+  public SubscriptionPostProcessor subscriptionPostprocessor() {
+    return new SubscriptionPostProcessor(PropertiesAwareSpringTopicSubscription.class);
   }
 
-  static class PropertiesAwareSubscriptionPostProcessor extends SubscriptionPostProcessor {
-    public PropertiesAwareSubscriptionPostProcessor() {
-      super(PropertiesAwareSpringTopicSubscription.class);
-    }
-
+  @Bean
+  public ClientPostProcessor clientPostProcessor() {
+    return new ClientPostProcessor(PropertiesAwareClientFactory.class);
   }
+
 }

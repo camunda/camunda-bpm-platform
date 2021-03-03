@@ -48,23 +48,21 @@ public class SubscriptionPostProcessor implements BeanDefinitionRegistryPostProc
 
   @Override
   public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
-    if (registry instanceof ListableBeanFactory) {
-      ListableBeanFactory listableBeanFactory = (ListableBeanFactory) registry;
-      String[] handlerBeans = listableBeanFactory.getBeanNamesForType(ExternalTaskHandler.class);
-      LOG.handlerBeansFound(ExternalTaskHandler.class, handlerBeans);
+    ListableBeanFactory listableBeanFactory = (ListableBeanFactory) registry;
+    String[] handlerBeans = listableBeanFactory.getBeanNamesForType(ExternalTaskHandler.class);
+    LOG.handlerBeansFound(ExternalTaskHandler.class, handlerBeans);
 
-      for (String handlerBeanName : handlerBeans) {
-        BeanDefinition beanDefinition = registry.getBeanDefinition(handlerBeanName);
-        ExternalTaskSubscription subscriptionAnnotation = findSubscriptionAnnotation(beanDefinition);
-        if (subscriptionAnnotation != null) {
-          SubscriptionConfiguration subscriptionConfiguration = new SubscriptionConfiguration();
-          subscriptionConfiguration.fromAnnotation(subscriptionAnnotation);
-          BeanDefinition subscriptionBeanDefinition = getBeanDefinition(handlerBeanName, subscriptionConfiguration);
+    for (String handlerBeanName : handlerBeans) {
+      BeanDefinition handlerBeanDefinition = registry.getBeanDefinition(handlerBeanName);
+      ExternalTaskSubscription subscriptionAnnotation = findSubscriptionAnnotation(handlerBeanDefinition);
+      if (subscriptionAnnotation != null) {
+        SubscriptionConfiguration subscriptionConfiguration = new SubscriptionConfiguration();
+        subscriptionConfiguration.fromAnnotation(subscriptionAnnotation);
+        BeanDefinition subscriptionBeanDefinition = getBeanDefinition(handlerBeanName, subscriptionConfiguration);
 
-          String subscriptionBeanName = handlerBeanName + "Subscription";
-          registry.registerBeanDefinition(subscriptionBeanName, subscriptionBeanDefinition);
-          LOG.beanRegistered(subscriptionBeanName, handlerBeanName);
-        }
+        String subscriptionBeanName = handlerBeanName + "Subscription";
+        registry.registerBeanDefinition(subscriptionBeanName, subscriptionBeanDefinition);
+        LOG.beanRegistered(subscriptionBeanName, handlerBeanName);
       }
     }
   }
@@ -100,7 +98,6 @@ public class SubscriptionPostProcessor implements BeanDefinitionRegistryPostProc
 
   @Override
   public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-    // nothing to do
   }
 
 }

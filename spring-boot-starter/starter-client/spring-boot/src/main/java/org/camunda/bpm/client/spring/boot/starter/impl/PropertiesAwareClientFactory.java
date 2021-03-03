@@ -19,7 +19,7 @@ package org.camunda.bpm.client.spring.boot.starter.impl;
 import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
 import org.camunda.bpm.client.interceptor.auth.BasicAuthProvider;
 import org.camunda.bpm.client.spring.boot.starter.impl.properties.BasicAuthProperties;
-import org.camunda.bpm.client.spring.boot.starter.impl.properties.CamundaBpmClientProperties;
+import org.camunda.bpm.client.spring.boot.starter.impl.properties.ClientProperties;
 import org.camunda.bpm.client.spring.impl.client.ClientConfiguration;
 import org.camunda.bpm.client.spring.impl.client.ClientFactory;
 
@@ -31,18 +31,18 @@ import java.util.List;
 public class PropertiesAwareClientFactory extends ClientFactory {
 
   @Autowired
-  protected CamundaBpmClientProperties camundaBpmClientProperties;
+  protected ClientProperties clientProperties;
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    applyPropertiesFrom(camundaBpmClientProperties);
+    applyPropertiesFrom(clientProperties);
     addBasicAuthInterceptor();
     super.afterPropertiesSet();
   }
 
   protected void addBasicAuthInterceptor() {
-    BasicAuthProperties basicAuth = camundaBpmClientProperties.getBasicAuth();
-    if (basicAuth.isEnabled()) {
+    BasicAuthProperties basicAuth = clientProperties.getBasicAuth();
+    if (basicAuth != null) {
       List<ClientRequestInterceptor> interceptors = getRequestInterceptors();
 
       String username = basicAuth.getUsername();
@@ -53,7 +53,7 @@ public class PropertiesAwareClientFactory extends ClientFactory {
     }
   }
 
-  public void applyPropertiesFrom(CamundaBpmClientProperties clientConfigurationProps) {
+  public void applyPropertiesFrom(ClientProperties clientConfigurationProps) {
     ClientConfiguration clientConfiguration = new ClientConfiguration();
     if (clientConfigurationProps.getBaseUrl() != null) {
       clientConfiguration.setBaseUrl(clientConfigurationProps.getBaseUrl());

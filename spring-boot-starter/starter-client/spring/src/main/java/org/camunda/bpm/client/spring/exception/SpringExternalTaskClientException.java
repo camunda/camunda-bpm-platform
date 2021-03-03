@@ -14,27 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.client.spring.boot.starter.impl.properties;
+package org.camunda.bpm.client.spring.exception;
 
-public class BasicAuthProperties {
+import org.camunda.bpm.client.exception.ExternalTaskClientException;
 
-  protected String username;
-  protected String password;
+/**
+ * <p>
+ * Spring External Task Client Exception
+ */
+public class SpringExternalTaskClientException extends ExternalTaskClientException {
 
-  public String getUsername() {
-    return username;
+  public SpringExternalTaskClientException(String message) {
+    super(message);
   }
 
-  public String getPassword() {
-    return password;
-  }
-
-  public void setUsername(String username) {
-    this.username = username;
-  }
-
-  public void setPassword(String password) {
-    this.password = password;
+  public SpringExternalTaskClientException(String message, Throwable e) {
+    super(message, e);
   }
 
 }

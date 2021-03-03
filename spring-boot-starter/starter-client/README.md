@@ -1,7 +1,7 @@
 # Camunda External Task Client as Spring Boot Starter
 
-This project provides a Spring Boot starter that allows you to implement an external task worker for Camunda. It uses the Camunda REST API to fetch, lock and complete external services tasks. 
-It is based on the [Camunda External Task Client](https://github.com/camunda/camunda-bpm-platform/clients/java)
+This project provides a Spring Boot starter that allows you to implement an external task worker for Camunda. It uses the Camunda REST API to fetch, lock and complete external service tasks. 
+It is based on the [Camunda External Task Client](../../clients/java)
 
 ## Dependency
 

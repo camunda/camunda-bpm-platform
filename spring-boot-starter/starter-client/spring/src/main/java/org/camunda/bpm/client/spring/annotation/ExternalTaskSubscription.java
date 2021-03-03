@@ -41,7 +41,7 @@ import java.lang.annotation.Target;
 public @interface ExternalTaskSubscription {
 
   String STRING_NULL_VALUE = "$null$";
-  long LONG_NULL_VALUE = -1;
+  long LONG_NULL_VALUE = Long.MIN_VALUE;
 
   /**
    * @return autoOpen <ul>

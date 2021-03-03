@@ -18,8 +18,8 @@ package org.camunda.bpm.client.spring.annotation;
 
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.backoff.BackoffStrategy;
-import org.camunda.bpm.client.spring.impl.client.ClientRegistrar;
-import org.camunda.bpm.client.spring.impl.subscription.SubscriptionPostProcessor;
+import org.camunda.bpm.client.spring.impl.PostProcessorConfiguration;
+import org.camunda.bpm.client.spring.impl.subscription.SubscriptionConfiguration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.AliasFor;
 
@@ -43,12 +43,12 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 @Target(TYPE)
 @Retention(RUNTIME)
-@Import({ClientRegistrar.class, SubscriptionPostProcessor.class})
+@Import(PostProcessorConfiguration.class)
 public @interface EnableExternalTaskClient {
 
   String STRING_NULL_VALUE = "$null$";
-  long LONG_NULL_VALUE = -1;
-  int INT_NULL_VALUE = -1;
+  long LONG_NULL_VALUE = Long.MIN_VALUE;
+  int INT_NULL_VALUE = Integer.MIN_VALUE;
 
   /**
    * Base url of the Camunda Runtime Platform REST API. This information is mandatory.
