@@ -1464,10 +1464,8 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
     assertEquals(0, taskService.createTaskQuery().processVariableValueNotLike("nonExistingVar", "string%").count());
 
     // test with null value
-    try {
-      taskService.createTaskQuery().processVariableValueNotLike("stringVar", null).count();
-      fail("expected exception");
-    } catch (final ProcessEngineException e) {/*OK*/}
+    assertThatThrownBy(() -> taskService.createTaskQuery().processVariableValueNotLike("stringVar", null).count())
+      .isInstanceOf(ProcessEngineException.class);
   }
 
   @Deployment(resources="org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessVariableValueEquals.bpmn20.xml")
