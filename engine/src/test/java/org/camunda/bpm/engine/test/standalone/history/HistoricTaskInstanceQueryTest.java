@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.standalone.history;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -146,10 +147,8 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTest {
     assertEquals(0, historyService.createHistoricTaskInstanceQuery().processVariableValueNotLike("nonExistingVar", "string%").count());
 
     // test with null value
-    try {
-      historyService.createHistoricTaskInstanceQuery().processVariableValueNotLike("requester", null).count();
-      fail("expected exception");
-    } catch (final ProcessEngineException e) {/*OK*/}
+    assertThatThrownBy(() -> historyService.createHistoricTaskInstanceQuery().processVariableValueNotLike("requester", null).count())
+      .isInstanceOf(ProcessEngineException.class);
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")

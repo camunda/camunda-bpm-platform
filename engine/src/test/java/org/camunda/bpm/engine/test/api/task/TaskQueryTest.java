@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.task;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.taskByAssignee;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.taskByCaseExecutionId;
@@ -1490,10 +1491,8 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
     assertEquals(0, taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueNotLike("nonExistingVar", "stringVal%".toLowerCase()).count());
 
     // test with null value
-    try {
-      taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueNotLike("stringVar", null).count();
-      fail("expected exception");
-    } catch (final ProcessEngineException e) {/*OK*/}
+    assertThatThrownBy(() -> taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueNotLike("stringVar", null).count())
+      .isInstanceOf(ProcessEngineException.class);
   }
 
   @Deployment(resources="org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessVariableValueEquals.bpmn20.xml")
