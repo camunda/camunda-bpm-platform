@@ -24,24 +24,29 @@
   </properties>
 
   <dependencies>
+
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-autoconfigure</artifactId>
       <version>${version.spring-boot}</version>
     </dependency>
+
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-webmvc</artifactId>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-rest-openapi</artifactId>
       <version>${project.version}</version>
     </dependency>
+
   </dependencies>
 
   <profiles>
+
     <profile>
       <id>swaggerui-build-windows</id>
       <activation>
@@ -63,8 +68,7 @@
                 </goals>
                 <inherited>false</inherited>
                 <configuration>
-                  <target>
-                    <!-- run node build -->
+                  <target description = "Build Swagger UI npm project">
                     <exec executable = "cmd" failonerror = "true" dir="${project.basedir}/ui">
                       <arg value = "/c" />
                       <arg value = "npm" />
@@ -106,8 +110,7 @@
                 </goals>
                 <inherited>false</inherited>
                 <configuration>
-                  <target>
-                    <!-- run node build -->
+                  <target description = "Build Swagger UI npm project">
                     <exec executable = "npm" failonerror = "true" dir="${project.basedir}/ui">
                       <arg value = "install" />
                     </exec>
@@ -125,6 +128,5 @@
     </profile>
 
   </profiles>
-
 
 </project>

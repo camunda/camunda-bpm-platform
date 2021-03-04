@@ -22,7 +22,7 @@ const config = {
     },
     plugins: [
         new CopyPlugin({
-            patterns: [{from: 'src/index.html'}],
+            patterns: [{from: 'src/index.html'}, {from: 'src/favicon.ico'}],
         })
     ],
     optimization: {
