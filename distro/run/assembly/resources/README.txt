@@ -32,6 +32,10 @@ Contents:
         webapps: http://localhost:8080/
         rest: http://localhost:8080/engine-rest/
 
+        If you append the --swaggerui flag, a Swagger UI web application where you
+        can try out the REST endpoints will become available here:
+        swaggerui: http://localhost:8080/swaggerui/
+
   internal/
         This directory contains the Java application and optional components
         that Camunda Platform Run consists of.

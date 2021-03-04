@@ -22,6 +22,8 @@ restPath=$BASEDIR/internal/rest/
 swaggerPath=$BASEDIR/internal/swaggerui
 classPath=$BASEDIR/configuration/userlib/,$BASEDIR/configuration/keystore/
 optionalComponentChosen=false
+restEnabled=false
+swaggeruiEnabled=false
 configuration=$BASEDIR/configuration/default.yml
 
 
@@ -33,24 +35,32 @@ while [ "$1" != "" ]; do
                    echo WebApps enabled
                    ;;
     --rest )       optionalComponentChosen=true
+                   restEnabled=true
                    classPath=$restPath,$classPath
                    echo REST API enabled
                    ;;
     --production ) configuration=$BASEDIR/configuration/production.yml
                    ;;
     --swaggerui )  classPath=$swaggerPath,$classPath
-                   echo Swagger UI enabled. You can access it under /swaggerui/
+                   swaggeruiEnabled=true
+                   echo Swagger UI enabled
                    ;;
     * )            exit 1
   esac
   shift
 done
 
-# if neither REST nor Webapps are explicitly chosen, enable both, as well as Swagger UI
+# if neither REST nor Webapps are explicitly chosen, enable both
 if [ "$optionalComponentChosen" = "false" ]; then
+  restEnabled=true
   echo REST API enabled
   echo WebApps enabled
   classPath=$webappsPath,$restPath,$classPath
+fi
+
+# if Swagger UI is enabled but REST is not, warn the user
+if [ "$swaggeruiEnabled" = "true" ] && [ "$restEnabled" = "false" ]; then
+  echo You did not enable the REST API. Swagger UI will not be able to send any requests to this web service.
 fi
 
 echo classpath: $classPath
