@@ -528,7 +528,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   }
 
   @CamundaQueryParam(value = "withoutDueDate", converter = BooleanConverter.class)
-  public void setWithoutDueDate(boolean withoutDueDate) {
+  public void setWithoutDueDate(Boolean withoutDueDate) {
     this.withoutDueDate = withoutDueDate;
   }
 
@@ -960,7 +960,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     return dueDateExpression;
   }
 
-  public boolean getWithoutDueDate() {
+  public Boolean getWithoutDueDate() {
     return withoutDueDate;
   }
 
@@ -1578,7 +1578,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     dto.dueAfter = taskQuery.getDueAfter();
     dto.dueBefore = taskQuery.getDueBefore();
     dto.dueDate = taskQuery.getDueDate();
-    dto.withoutDueDate = taskQuery.isWithoutDueDate();
+    if (taskQuery.isWithoutDueDate()) {
+      dto.withoutDueDate = taskQuery.isWithoutDueDate();
+    }
 
     dto.followUpAfter = taskQuery.getFollowUpAfter();
 
