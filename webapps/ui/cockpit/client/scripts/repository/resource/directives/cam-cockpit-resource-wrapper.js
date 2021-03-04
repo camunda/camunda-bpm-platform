@@ -130,47 +130,6 @@ module.exports = [
           $scope.resourceDetailTabs = Views.getProviders({
             component: PLUGIN_DETAILS_COMPONENT
           });
-
-          $scope.selectedResourceDetailTab = $scope.resourceDetailTabs[0];
-
-          $scope.selectResourceDetailTab = function(tab) {
-            $scope.selectedResourceDetailTab = tab;
-
-            search.updateSilently({
-              detailsTab: tab.id
-            });
-          };
-
-          function setDefaultResourceDetailTab(tabs) {
-            var selectedResourceId = search().detailsTab;
-
-            if (!tabs || !tabs.length) {
-              return;
-            }
-
-            if (selectedResourceId) {
-              var provider = Views.getProvider({
-                component: PLUGIN_DETAILS_COMPONENT,
-                id: selectedResourceId
-              });
-              if (provider && tabs.indexOf(provider) !== -1) {
-                $scope.selectedResourceDetailTab = provider;
-                return;
-              }
-            }
-
-            search.updateSilently({
-              detailsTab: null
-            });
-
-            $scope.selectedResourceDetailTab = tabs[0];
-          }
-
-          setDefaultResourceDetailTab($scope.resResourceDetailTabs);
-
-          $scope.$on('$routeChanged', function() {
-            setDefaultResourceDetailTab($scope.resResourceDetailTabs);
-          });
         }
       ]
     };

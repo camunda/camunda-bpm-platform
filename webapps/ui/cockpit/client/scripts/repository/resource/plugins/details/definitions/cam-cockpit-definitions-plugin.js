@@ -90,6 +90,10 @@ var Controller = [
 
     definitionsData.observe('resource', function(_resource) {
       resource = $scope.resource = _resource;
+      $scope.hasDefinitions =
+        isBpmnResource(resource) ||
+        isCmmnResource(resource) ||
+        isDmnResource(resource);
     });
 
     // instances ///////////////////////////////////////////////////
@@ -191,7 +195,6 @@ var Controller = [
 var Configuration = function PluginConfiguration(ViewsProvider) {
   ViewsProvider.registerDefaultView('cockpit.repository.resource.detail', {
     id: 'resource-details',
-    label: 'DEFINITIONS_DEFINITIONS',
     template: template,
     controller: Controller,
     priority: 1000

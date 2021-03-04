@@ -1,7 +1,10 @@
+<h4 ng-show="hasDefinitions">{{ 'DEFINITIONS_DEFINITIONS' | translate }}:</h4>
+
 <div cam-widget-loader
      loading-state="{{ loadingState }}"
      text-empty="{{ 'REPOSITORY_DEPLOYMENT_DEFINITIONS_TEXT_EMPTY_1' | translate }}"
-     text-error="{{ textError }}">
+     text-error="{{ textError }}"
+     ng-show="hasDefinitions">
   <table class="definitions cam-table">
     <thead>
       <tr>

@@ -34,21 +34,9 @@
       <div ng-show="resourceDetailTabs.length"
            class="col-xs-12 ctn-tabbed-content">
 
-        <ul ng-if="resourceDetailTabs.length > 1"
-            class="nav nav-tabs">
-          <li ng-class="{ active: selectedResourceDetailTab == resourceDetailTab }"
-              ng-repeat="resourceDetailTab in resourceDetailTabs">
-            <a href
-               ng-click="selectResourceDetailTab(resourceDetailTab)">{{ resourceDetailTab.label }}</a>
-          </li>
-        </ul>
-
-        <h4 ng-if="resourceDetailTabs.length === 1">{{ resourceDetailTabs[0].label | translate }}:</h4>
-
-        <div class="tab-content">
-          <view provider="selectedResourceDetailTab"
-                vars="resourceVars" />
-        </div>
+        <view ng-repeat="resourceDetailTab in resourceDetailTabs"
+              provider="resourceDetailTab"
+              vars="resourceVars" />
 
       </div><!-- / !!resourceDetailTabs -->
 
