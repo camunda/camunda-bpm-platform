@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
-<domain xmlns="urn:jboss:domain:14.0">
+<domain xmlns="urn:jboss:domain:15.0">
     <extensions>
         <extension module="org.jboss.as.clustering.infinispan"/>
         <extension module="org.jboss.as.clustering.jgroups"/>
@@ -134,10 +134,10 @@
             <subsystem xmlns="urn:jboss:domain:discovery:1.0"/>
             <subsystem xmlns="urn:jboss:domain:distributable-web:2.0" default-session-management="default" default-single-sign-on-management="default">
                 <infinispan-session-management name="default" cache-container="web" granularity="SESSION">
-                    <primary-owner-affinity/>
+                    <local-affinity/>
                 </infinispan-session-management>
                 <infinispan-single-sign-on-management name="default" cache-container="web" cache="sso"/>
-                <infinispan-routing cache-container="web" cache="routing"/>
+                <local-routing/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:ee:5.0">
                 <spec-descriptor-property-replacement>false</spec-descriptor-property-replacement>
@@ -201,7 +201,7 @@
                 <statistics enabled="${wildfly.ejb3.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
                 <log-system-exceptions value="true"/>
             </subsystem>
-            <subsystem xmlns="urn:wildfly:elytron:11.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
+            <subsystem xmlns="urn:wildfly:elytron:12.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
                 <providers>
                     <aggregate-providers name="combined-providers">
                         <providers name="elytron"/>
@@ -284,35 +284,41 @@
                     </mechanism-provider-filtering-sasl-server-factory>
                     <provider-sasl-server-factory name="global"/>
                 </sasl>
+                <tls>
+                    <key-stores>
+                        <key-store name="applicationKS">
+                            <credential-reference clear-text="password"/>
+                            <implementation type="JKS"/>
+                            <file path="application.keystore" relative-to="jboss.domain.config.dir"/>
+                        </key-store>
+                    </key-stores>
+                    <key-managers>
+                        <key-manager name="applicationKM" key-store="applicationKS" generate-self-signed-certificate-host="localhost">
+                            <credential-reference clear-text="password"/>
+                        </key-manager>
+                    </key-managers>
+                    <server-ssl-contexts>
+                        <server-ssl-context name="applicationSSC" key-manager="applicationKM"/>
+                    </server-ssl-contexts>
+                </tls>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:infinispan:11.0">
-                <cache-container name="web" default-cache="passivation" module="org.wildfly.clustering.web.infinispan">
-                    <local-cache name="passivation">
-                        <locking isolation="REPEATABLE_READ"/>
-                        <transaction mode="BATCH"/>
-                        <file-store passivation="true" purge="false"/>
-                    </local-cache>
-                    <local-cache name="sso">
-                        <locking isolation="REPEATABLE_READ"/>
-                        <transaction mode="BATCH"/>
-                    </local-cache>
-                    <local-cache name="routing"/>
-                </cache-container>
-                <cache-container name="server" default-cache="default" module="org.wildfly.clustering.server">
-                    <local-cache name="default">
-                        <transaction mode="BATCH"/>
-                    </local-cache>
-                </cache-container>
                 <cache-container name="ejb" aliases="sfsb" default-cache="passivation" module="org.wildfly.clustering.ejb.infinispan">
                     <local-cache name="passivation">
-                        <locking isolation="REPEATABLE_READ"/>
-                        <transaction mode="BATCH"/>
                         <file-store passivation="true" purge="false"/>
                     </local-cache>
+                </cache-container>
+                <cache-container name="web" default-cache="passivation" module="org.wildfly.clustering.web.infinispan">
+                    <local-cache name="passivation">
+                        <file-store passivation="true" purge="false"/>
+                    </local-cache>
+                    <local-cache name="sso"/>
+                </cache-container>
+                <cache-container name="server" default-cache="default" module="org.wildfly.clustering.server">
+                    <local-cache name="default"/>
                 </cache-container>
                 <cache-container name="hibernate" module="org.infinispan.hibernate-cache">
                     <local-cache name="entity">
-                        <transaction mode="NON_XA"/>
                         <heap-memory size="10000"/>
                         <expiration max-idle="100000"/>
                     </local-cache>
@@ -321,6 +327,9 @@
                         <expiration max-idle="100000"/>
                     </local-cache>
                     <local-cache name="timestamps"/>
+                    <local-cache name="pending-puts">
+                        <expiration max-idle="60000"/>
+                    </local-cache>
                 </cache-container>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:io:3.0">
@@ -631,7 +640,7 @@
                 <statistics enabled="${wildfly.ejb3.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
                 <log-system-exceptions value="true"/>
             </subsystem>
-            <subsystem xmlns="urn:wildfly:elytron:11.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
+            <subsystem xmlns="urn:wildfly:elytron:12.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
                 <providers>
                     <aggregate-providers name="combined-providers">
                         <providers name="elytron"/>
@@ -714,27 +723,25 @@
                     </mechanism-provider-filtering-sasl-server-factory>
                     <provider-sasl-server-factory name="global"/>
                 </sasl>
+                <tls>
+                    <key-stores>
+                        <key-store name="applicationKS">
+                            <credential-reference clear-text="password"/>
+                            <implementation type="JKS"/>
+                            <file path="application.keystore" relative-to="jboss.domain.config.dir"/>
+                        </key-store>
+                    </key-stores>
+                    <key-managers>
+                        <key-manager name="applicationKM" key-store="applicationKS" generate-self-signed-certificate-host="localhost">
+                            <credential-reference clear-text="password"/>
+                        </key-manager>
+                    </key-managers>
+                    <server-ssl-contexts>
+                        <server-ssl-context name="applicationSSC" key-manager="applicationKM"/>
+                    </server-ssl-contexts>
+                </tls>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:infinispan:11.0">
-                <cache-container name="web" default-cache="dist" module="org.wildfly.clustering.web.infinispan">
-                    <transport lock-timeout="60000"/>
-                    <replicated-cache name="sso">
-                        <locking isolation="REPEATABLE_READ"/>
-                        <transaction mode="BATCH"/>
-                    </replicated-cache>
-                    <replicated-cache name="routing"/>
-                    <distributed-cache name="dist">
-                        <locking isolation="REPEATABLE_READ"/>
-                        <transaction mode="BATCH"/>
-                        <file-store/>
-                    </distributed-cache>
-                </cache-container>
-                <cache-container name="server" aliases="singleton cluster" default-cache="default" module="org.wildfly.clustering.server">
-                    <transport lock-timeout="60000"/>
-                    <replicated-cache name="default">
-                        <transaction mode="BATCH"/>
-                    </replicated-cache>
-                </cache-container>
                 <cache-container name="ejb" aliases="sfsb" default-cache="dist" module="org.wildfly.clustering.ejb.infinispan">
                     <transport lock-timeout="60000"/>
                     <distributed-cache name="dist">
@@ -749,6 +756,19 @@
                         <transaction mode="BATCH"/>
                     </replicated-cache>
                 </cache-container>
+                <cache-container name="web" default-cache="dist" module="org.wildfly.clustering.web.infinispan">
+                    <transport lock-timeout="60000"/>
+                    <replicated-cache name="sso">
+                        <locking isolation="REPEATABLE_READ"/>
+                        <transaction mode="BATCH"/>
+                    </replicated-cache>
+                    <replicated-cache name="routing"/>
+                    <distributed-cache name="dist">
+                        <locking isolation="REPEATABLE_READ"/>
+                        <transaction mode="BATCH"/>
+                        <file-store/>
+                    </distributed-cache>
+                </cache-container>
                 <cache-container name="hibernate" module="org.infinispan.hibernate-cache">
                     <transport lock-timeout="60000"/>
                     <local-cache name="local-query">
@@ -757,9 +777,8 @@
                     </local-cache>
                     <local-cache name="pending-puts">
                         <expiration max-idle="60000"/>
-                    </local-cache>  
+                    </local-cache>
                     <invalidation-cache name="entity">
-                        <transaction mode="NON_XA"/>
                         <heap-memory size="10000"/>
                         <expiration max-idle="100000"/>
                     </invalidation-cache>
@@ -1019,10 +1038,10 @@
             <subsystem xmlns="urn:jboss:domain:discovery:1.0"/>
             <subsystem xmlns="urn:jboss:domain:distributable-web:2.0" default-session-management="default" default-single-sign-on-management="default">
                 <infinispan-session-management name="default" cache-container="web" granularity="SESSION">
-                    <primary-owner-affinity/>
+                    <local-affinity/>
                 </infinispan-session-management>
                 <infinispan-single-sign-on-management name="default" cache-container="web" cache="sso"/>
-                <infinispan-routing cache-container="web" cache="routing"/>
+                <local-routing/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:ee:5.0">
                 <spec-descriptor-property-replacement>false</spec-descriptor-property-replacement>
@@ -1091,7 +1110,7 @@
                 <statistics enabled="${wildfly.ejb3.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
                 <log-system-exceptions value="true"/>
             </subsystem>
-            <subsystem xmlns="urn:wildfly:elytron:11.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
+            <subsystem xmlns="urn:wildfly:elytron:12.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
                 <providers>
                     <aggregate-providers name="combined-providers">
                         <providers name="elytron"/>
@@ -1174,6 +1193,23 @@
                     </mechanism-provider-filtering-sasl-server-factory>
                     <provider-sasl-server-factory name="global"/>
                 </sasl>
+                <tls>
+                    <key-stores>
+                        <key-store name="applicationKS">
+                            <credential-reference clear-text="password"/>
+                            <implementation type="JKS"/>
+                            <file path="application.keystore" relative-to="jboss.domain.config.dir"/>
+                        </key-store>
+                    </key-stores>
+                    <key-managers>
+                        <key-manager name="applicationKM" key-store="applicationKS" generate-self-signed-certificate-host="localhost">
+                            <credential-reference clear-text="password"/>
+                        </key-manager>
+                    </key-managers>
+                    <server-ssl-contexts>
+                        <server-ssl-context name="applicationSSC" key-manager="applicationKM"/>
+                    </server-ssl-contexts>
+                </tls>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:iiop-openjdk:2.1">
                 <orb socket-binding="iiop"/>
@@ -1181,36 +1217,22 @@
                 <security server-requires-ssl="false" client-requires-ssl="false"/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:infinispan:11.0">
-                <cache-container name="web" default-cache="passivation" module="org.wildfly.clustering.web.infinispan">
-                    <local-cache name="passivation">
-                        <locking isolation="REPEATABLE_READ"/>
-                        <transaction mode="BATCH"/>
-                        <file-store passivation="true" purge="false"/>
-                    </local-cache>
-                    <local-cache name="sso">
-                        <locking isolation="REPEATABLE_READ"/>
-                        <transaction mode="BATCH"/>
-                    </local-cache>
-                    <local-cache name="routing"/>
-                </cache-container>
-                <cache-container name="server" default-cache="default" module="org.wildfly.clustering.server">
-                    <local-cache name="default">
-                        <transaction mode="BATCH"/>
-                    </local-cache>
-                </cache-container>
                 <cache-container name="ejb" aliases="sfsb" default-cache="passivation" module="org.wildfly.clustering.ejb.infinispan">
                     <local-cache name="passivation">
-                        <locking isolation="REPEATABLE_READ"/>
-                        <transaction mode="BATCH"/>
                         <file-store passivation="true" purge="false"/>
                     </local-cache>
+                </cache-container>
+                <cache-container name="web" default-cache="passivation" module="org.wildfly.clustering.web.infinispan">
+                    <local-cache name="passivation">
+                        <file-store passivation="true" purge="false"/>
+                    </local-cache>
+                    <local-cache name="sso"/>
                 </cache-container>
                 <cache-container name="server" default-cache="default" module="org.wildfly.clustering.server">
                     <local-cache name="default"/>
-                </cache-container>  
+                </cache-container>
                 <cache-container name="hibernate" module="org.infinispan.hibernate-cache">
                     <local-cache name="entity">
-                        <transaction mode="NON_XA"/>
                         <heap-memory size="10000"/>
                         <expiration max-idle="100000"/>
                     </local-cache>
@@ -1221,7 +1243,7 @@
                     <local-cache name="timestamps"/>
                     <local-cache name="pending-puts">
                         <expiration max-idle="60000"/>
-                    </local-cache>	  
+                    </local-cache>
                 </cache-container>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:io:3.0">
@@ -1263,7 +1285,7 @@
                     <smtp-server outbound-socket-binding-ref="mail-smtp"/>
                 </mail-session>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:messaging-activemq:11.0">
+            <subsystem xmlns="urn:jboss:domain:messaging-activemq:12.0">
                 <server name="default">
                     <statistics enabled="${wildfly.messaging-activemq.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
                     <security-setting name="#">
@@ -1528,7 +1550,7 @@
                 <statistics enabled="${wildfly.ejb3.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
                 <log-system-exceptions value="true"/>
             </subsystem>
-            <subsystem xmlns="urn:wildfly:elytron:11.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
+            <subsystem xmlns="urn:wildfly:elytron:12.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
                 <providers>
                     <aggregate-providers name="combined-providers">
                         <providers name="elytron"/>
@@ -1611,6 +1633,23 @@
                     </mechanism-provider-filtering-sasl-server-factory>
                     <provider-sasl-server-factory name="global"/>
                 </sasl>
+                <tls>
+                    <key-stores>
+                        <key-store name="applicationKS">
+                            <credential-reference clear-text="password"/>
+                            <implementation type="JKS"/>
+                            <file path="application.keystore" relative-to="jboss.domain.config.dir"/>
+                        </key-store>
+                    </key-stores>
+                    <key-managers>
+                        <key-manager name="applicationKM" key-store="applicationKS" generate-self-signed-certificate-host="localhost">
+                            <credential-reference clear-text="password"/>
+                        </key-manager>
+                    </key-managers>
+                    <server-ssl-contexts>
+                        <server-ssl-context name="applicationSSC" key-manager="applicationKM"/>
+                    </server-ssl-contexts>
+                </tls>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:iiop-openjdk:2.1">
                 <orb socket-binding="iiop"/>
@@ -1618,25 +1657,6 @@
                 <security server-requires-ssl="false" client-requires-ssl="false"/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:infinispan:11.0">
-                <cache-container name="web" default-cache="dist" module="org.wildfly.clustering.web.infinispan">
-                    <transport lock-timeout="60000"/>
-                    <replicated-cache name="sso">
-                        <locking isolation="REPEATABLE_READ"/>
-                        <transaction mode="BATCH"/>
-                    </replicated-cache>
-                    <replicated-cache name="routing"/>
-                    <distributed-cache name="dist">
-                        <locking isolation="REPEATABLE_READ"/>
-                        <transaction mode="BATCH"/>
-                        <file-store/>
-                    </distributed-cache>
-                </cache-container>
-                <cache-container name="server" aliases="singleton cluster" default-cache="default" module="org.wildfly.clustering.server">
-                    <transport lock-timeout="60000"/>
-                    <replicated-cache name="default">
-                        <transaction mode="BATCH"/>
-                    </replicated-cache>
-                </cache-container>
                 <cache-container name="ejb" aliases="sfsb" default-cache="dist" module="org.wildfly.clustering.ejb.infinispan">
                     <transport lock-timeout="60000"/>
                     <distributed-cache name="dist">
@@ -1650,7 +1670,20 @@
                     <replicated-cache name="default">
                         <transaction mode="BATCH"/>
                     </replicated-cache>
-                </cache-container>	  
+                </cache-container>
+                <cache-container name="web" default-cache="dist" module="org.wildfly.clustering.web.infinispan">
+                    <transport lock-timeout="60000"/>
+                    <replicated-cache name="sso">
+                        <locking isolation="REPEATABLE_READ"/>
+                        <transaction mode="BATCH"/>
+                    </replicated-cache>
+                    <replicated-cache name="routing"/>
+                    <distributed-cache name="dist">
+                        <locking isolation="REPEATABLE_READ"/>
+                        <transaction mode="BATCH"/>
+                        <file-store/>
+                    </distributed-cache>
+                </cache-container>
                 <cache-container name="hibernate" module="org.infinispan.hibernate-cache">
                     <transport lock-timeout="60000"/>
                     <local-cache name="local-query">
@@ -1659,9 +1692,8 @@
                     </local-cache>
                     <local-cache name="pending-puts">
                         <expiration max-idle="60000"/>
-                    </local-cache>				  
+                    </local-cache>
                     <invalidation-cache name="entity">
-                        <transaction mode="NON_XA"/>
                         <heap-memory size="10000"/>
                         <expiration max-idle="100000"/>
                     </invalidation-cache>
@@ -1743,7 +1775,7 @@
                     <smtp-server outbound-socket-binding-ref="mail-smtp"/>
                 </mail-session>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:messaging-activemq:11.0">
+            <subsystem xmlns="urn:jboss:domain:messaging-activemq:12.0">
                 <server name="default">
                     <cluster password="${jboss.messaging.cluster.password:CHANGE ME!!}"/>
                     <statistics enabled="${wildfly.messaging-activemq.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
@@ -2043,6 +2075,8 @@
                 <extension module="org.wildfly.extension.discovery"/>
                 <extension module="org.wildfly.extension.ee-security"/>
                 <extension module="org.wildfly.extension.elytron"/>
+                <extension module="org.wildfly.extension.health"/>
+                <extension module="org.wildfly.extension.metrics"/>
                 <extension module="org.wildfly.extension.microprofile.config-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.health-smallrye"/>
@@ -2061,6 +2095,8 @@
                 <extension module="org.wildfly.extension.discovery"/>
                 <extension module="org.wildfly.extension.ee-security"/>
                 <extension module="org.wildfly.extension.elytron"/>
+                <extension module="org.wildfly.extension.health"/>
+                <extension module="org.wildfly.extension.metrics"/>
                 <extension module="org.wildfly.extension.microprofile.config-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.health-smallrye"/>
@@ -2076,6 +2112,8 @@
                 <extension module="org.wildfly.extension.clustering.web"/>
                 <extension module="org.wildfly.extension.datasources-agroal"/>
                 <extension module="org.wildfly.extension.ee-security"/>
+                <extension module="org.wildfly.extension.health"/>
+                <extension module="org.wildfly.extension.metrics"/>
                 <extension module="org.wildfly.extension.microprofile.config-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.health-smallrye"/>
@@ -2091,6 +2129,8 @@
                 <extension module="org.wildfly.extension.clustering.web"/>
                 <extension module="org.wildfly.extension.datasources-agroal"/>
                 <extension module="org.wildfly.extension.ee-security"/>
+                <extension module="org.wildfly.extension.health"/>
+                <extension module="org.wildfly.extension.metrics"/>
                 <extension module="org.wildfly.extension.microprofile.config-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.health-smallrye"/>
@@ -2105,6 +2145,8 @@
             <excluded-extensions>
                 <extension module="org.wildfly.extension.clustering.web"/>
                 <extension module="org.wildfly.extension.datasources-agroal"/>
+                <extension module="org.wildfly.extension.health"/>
+                <extension module="org.wildfly.extension.metrics"/>
                 <extension module="org.wildfly.extension.microprofile.config-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.health-smallrye"/>
@@ -2118,6 +2160,8 @@
             <host-release id="WildFly14.0"/>
             <excluded-extensions>
                 <extension module="org.wildfly.extension.clustering.web"/>
+                <extension module="org.wildfly.extension.health"/>
+                <extension module="org.wildfly.extension.metrics"/>
                 <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.jwt-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.metrics-smallrye"/>
@@ -2128,6 +2172,8 @@
             <host-release id="WildFly15.0"/>
             <excluded-extensions>
                 <extension module="org.wildfly.extension.clustering.web"/>
+                <extension module="org.wildfly.extension.health"/>
+                <extension module="org.wildfly.extension.metrics"/>
                 <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.jwt-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.openapi-smallrye"/>
@@ -2136,6 +2182,8 @@
         <host-exclude name="WildFly16.0">
             <host-release id="WildFly16.0"/>
             <excluded-extensions>
+                <extension module="org.wildfly.extension.health"/>
+                <extension module="org.wildfly.extension.metrics"/>
                 <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.jwt-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.openapi-smallrye"/>
@@ -2144,6 +2192,8 @@
         <host-exclude name="WildFly17.0">
             <host-release id="WildFly17.0"/>
             <excluded-extensions>
+                <extension module="org.wildfly.extension.health"/>
+                <extension module="org.wildfly.extension.metrics"/>
                 <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.jwt-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.openapi-smallrye"/>
@@ -2152,9 +2202,32 @@
         <host-exclude name="WildFly18.0">
             <host-release id="WildFly18.0"/>
             <excluded-extensions>
+                <extension module="org.wildfly.extension.health"/>
+                <extension module="org.wildfly.extension.metrics"/>
                 <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.jwt-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.openapi-smallrye"/>
+            </excluded-extensions>
+        </host-exclude>
+        <host-exclude name="WildFly19.0">
+            <host-release id="WildFly19.0"/>
+            <excluded-extensions>
+                <extension module="org.wildfly.extension.health"/>
+                <extension module="org.wildfly.extension.metrics"/>
+            </excluded-extensions>
+        </host-exclude>
+        <host-exclude name="WildFly20.0">
+            <host-release id="WildFly20.0"/>
+            <excluded-extensions>
+                <extension module="org.wildfly.extension.health"/>
+                <extension module="org.wildfly.extension.metrics"/>
+            </excluded-extensions>
+        </host-exclude>
+        <host-exclude name="WildFly21.0">
+            <host-release id="WildFly21.0"/>
+            <excluded-extensions>
+                <extension module="org.wildfly.extension.health"/>
+                <extension module="org.wildfly.extension.metrics"/>
             </excluded-extensions>
         </host-exclude>
     </host-excludes>
