@@ -75,7 +75,7 @@ IF [%optionalComponentChosen%]==[false] (
 REM if Swagger UI is enabled but REST is not, warn the user
 IF [%swaggeruiEnabled%]==[true] (
   IF [%restEnabled%]==[false] (
-    ECHO You did not enable the REST API. Swagger UI will not be able to send any requests to this Camunda Platfrom Run instance.
+    ECHO You did not enable the REST API. Swagger UI will not be able to send any requests to this Camunda Platform Run instance.
   )
 )
 
