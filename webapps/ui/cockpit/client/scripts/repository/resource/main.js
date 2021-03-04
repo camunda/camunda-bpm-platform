@@ -25,6 +25,7 @@ var angular = require('../../../../../../camunda-commons-ui/vendor/angular'),
   camCockpitResourceMeta = require('./directives/cam-cockpit-resource-meta'),
   camCockpitResourceContent = require('./directives/cam-cockpit-resource-content'),
   camCockpitSource = require('./directives/cam-cockpit-source'),
+  camCockpitForm = require('./directives/cam-cockpit-form'),
   /* plugins */
   camCockpitDefinitionsPlugin = require('./plugins/details/definitions/cam-cockpit-definitions-plugin'),
   camCockpitResourceDownloadPlugin = require('./plugins/actions/download/cam-cockpit-resource-action-download-plugin');
@@ -38,6 +39,7 @@ resourceModule.controller('camResourceDetailsCtrl', camResourceDetailsCtrl);
 resourceModule.directive('camResourceWrapper', camCockpitResourceWrapper);
 resourceModule.directive('camResourceMeta', camCockpitResourceMeta);
 resourceModule.directive('camResourceContent', camCockpitResourceContent);
+resourceModule.directive('camForm', camCockpitForm);
 resourceModule.directive('camSource', camCockpitSource);
 
 /* plugins */

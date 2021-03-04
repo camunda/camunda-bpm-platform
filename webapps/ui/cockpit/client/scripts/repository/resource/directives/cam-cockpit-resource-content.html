@@ -25,6 +25,12 @@
     <img ng-src="{{ imageLink(deployment, resource) }}">
   </div>
 
+  <div ng-if="isFormResource(resource)"
+       class="json-resource">
+     <div cam-form
+          source="binary"
+          name="resource.name"></div>
+  </div>
 
   <div ng-if="isUnkownResource(resource)"
        class="unkown-resource">
