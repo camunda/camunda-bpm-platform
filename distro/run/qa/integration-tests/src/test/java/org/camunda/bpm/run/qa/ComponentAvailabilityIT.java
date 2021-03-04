@@ -16,14 +16,7 @@
  */
 package org.camunda.bpm.run.qa;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static io.restassured.RestAssured.*;
-
-import java.util.Arrays;
-import java.util.Collection;
-
+import io.restassured.response.Response;
 import org.camunda.bpm.run.qa.util.SpringBootManagedContainer;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,7 +26,12 @@ import org.junit.runners.Parameterized.BeforeParam;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
-import io.restassured.response.Response;
+import java.util.Arrays;
+import java.util.Collection;
+
+import static io.restassured.RestAssured.when;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 
 /**
  * Test cases for ensuring connectivity to REST API based on startup parameters
@@ -50,15 +48,15 @@ public class ComponentAvailabilityIT {
   @Parameter(3)
   public boolean swaggerUIAvailable;
 
-  @Parameters()
+  @Parameters
   public static Collection<Object[]> commands() {
     return Arrays.asList(new Object[][] {
       { new String[0], true, true, false },
       { new String[]{"--rest"}, true, false, false },
-      { new String[]{"--rest", "--webapps"}, true, true, false},
-      { new String[]{"--webapps"}, false, true, false},
+      { new String[]{"--rest", "--webapps"}, true, true, false },
+      { new String[]{"--webapps"}, false, true, false },
       { new String[]{"--swaggerui"}, true, true, true },
-      { new String[]{"--rest", "--webapps", "--swaggerui"}, true, true, true}
+      { new String[]{"--rest", "--webapps", "--swaggerui"}, true, true, true }
     });
   }
 
@@ -118,11 +116,11 @@ public class ComponentAvailabilityIT {
     Response response = when().get(container.getBaseUrl() + "/swaggerui/");
     if (swaggerUIAvailable) {
       response.then()
-          .statusCode(200)
-          .body("html.head.title", equalTo("Camunda Platform REST API"));
+        .statusCode(200)
+        .body("html.head.title", equalTo("Camunda Platform REST API"));
     } else {
       response.then()
-          .statusCode(404);
+        .statusCode(404);
     }
   }
 
