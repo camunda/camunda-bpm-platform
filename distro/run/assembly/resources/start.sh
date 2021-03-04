@@ -60,7 +60,7 @@ fi
 
 # if Swagger UI is enabled but REST is not, warn the user
 if [ "$swaggeruiEnabled" = "true" ] && [ "$restEnabled" = "false" ]; then
-  echo You did not enable the REST API. Swagger UI will not be able to send any requests to this web service.
+  echo You did not enable the REST API. Swagger UI will not be able to send any requests to this Camunda Platfrom Run instance.
 fi
 
 echo classpath: $classPath

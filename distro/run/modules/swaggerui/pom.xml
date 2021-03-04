@@ -42,7 +42,7 @@
   </dependencies>
 
   <profiles>
-    <!--<profile>
+    <profile>
       <id>swaggerui-build-windows</id>
       <activation>
         <os>
@@ -64,13 +64,13 @@
                 <inherited>false</inherited>
                 <configuration>
                   <target>
-                    &lt;!&ndash; run node build &ndash;&gt;
+                    <!-- run node build -->
                     <exec executable = "cmd" failonerror = "true" dir="${project.basedir}/ui">
                       <arg value = "/c" />
                       <arg value = "npm" />
                       <arg value = "install" />
                     </exec>
-                    <exec executable = "cmd" failonerror = "true">
+                    <exec executable = "cmd" failonerror = "true" dir="${project.basedir}/ui">
                       <arg value = "/c" />
                       <arg value = "npm" />
                       <arg value = "run" />
@@ -83,7 +83,7 @@
           </plugin>
         </plugins>
       </build>
-    </profile>-->
+    </profile>
 
     <profile>
       <id>swaggerui-build-unix</id>
