@@ -26,6 +26,5 @@ SwaggerUI({
     url: './openapi.json',
     layout: 'BaseLayout',
     docExpansion: 'none',
-    tryItOutEnabled: true
-    //filter: true, would be cool but only allows filter by tag, which is confusing.
+    tryItOutEnabled: true // allows the user to immediately click on execute, however, the schema is no longer visible without pressing cancel first.
 })

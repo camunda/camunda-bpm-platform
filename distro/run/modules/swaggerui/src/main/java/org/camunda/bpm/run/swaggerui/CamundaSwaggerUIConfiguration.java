@@ -32,7 +32,8 @@ public class CamundaSwaggerUIConfiguration implements WebMvcConfigurer {
 
   @Override
   public void addViewControllers(ViewControllerRegistry registry) {
-    // Map "/swaggerui/ to the index.html directly"
+    // Map /swaggerui and /swaggerui/ to the index.html directly
+    registry.addRedirectViewController("/swaggerui", "/swaggerui/");
     registry.addViewController("/swaggerui/").setViewName("forward:/swaggerui/index.html");
   }
 }

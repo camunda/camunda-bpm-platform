@@ -60,7 +60,7 @@ public class SwaggerUIGetRequestIT extends AbstractWebappUiIT {
   @Test
   public void submitPostRequest() {
     driver.manage().deleteAllCookies();
-    String path = testProperties.getApplicationPath("/swaggerui/");
+    String path = testProperties.getApplicationPath("/swaggerui");
     driver.get(path);
 
     WebDriverWait wait = new WebDriverWait(driver, 10);
@@ -72,6 +72,9 @@ public class SwaggerUIGetRequestIT extends AbstractWebappUiIT {
     wait.until(visibilityOfElementLocated(By.cssSelector(".execute"))).click();
     // there should be a response to the request
     wait.until(textToBePresentInElementLocated(By.tagName("h5"), "Response body"));
+    // the response should have status 200
+    wait.until(textToBePresentInElementLocated(
+      By.cssSelector(".live-responses-table .response > .response-col_status"), "200"));
 
   }
 }
