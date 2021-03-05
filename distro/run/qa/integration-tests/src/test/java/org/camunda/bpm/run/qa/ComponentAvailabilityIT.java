@@ -113,7 +113,7 @@ public class ComponentAvailabilityIT {
 
   @Test
   public void shouldFindSwaggerUI() {
-    Response response = when().get(container.getBaseUrl() + "/swaggerui/");
+    Response response = when().get(container.getBaseUrl() + "/swaggerui");
     if (swaggerUIAvailable) {
       response.then()
         .statusCode(200)
