@@ -29,8 +29,9 @@ SET restPath=%BASEDIR%internal\rest
 SET swaggerPath=%BASEDIR%internal\swaggerui
 SET classPath=%BASEDIR%configuration\userlib,%BASEDIR%configuration\keystore
 SET optionalComponentChosen=false
-SET restEnabled=false
-SET swaggeruiEnabled=false
+SET restChosen=false
+SET swaggeruiChosen=false
+SET productionChosen=false
 SET configuration=%BASEDIR%configuration\default.yml
 
 
@@ -46,19 +47,20 @@ IF [%~1]==[--webapps] (
 
 IF [%~1]==[--rest] (
   SET optionalComponentChosen=true
-  SET restEnabled=true
+  SET restChosen=true
   SET classPath=%restPath%,%classPath%
   ECHO REST API enabled
 )
 
 IF [%~1]==[--swaggerui] (
   SET optionalComponentChosen=true
-  SET swaggeruiEnabled=true
+  SET swaggeruiChosen=true
   SET classPath=%swaggerPath%,%classPath%
   ECHO Swagger UI enabled
 )
 
 IF [%~1]==[--production] (
+  SET productionChosen=true
   SET configuration=%BASEDIR%configuration\production.yml
 )
 
@@ -68,17 +70,20 @@ GOTO Loop
 
 REM if neither REST, Webapps nor are explicitly chosen, enable all three
 IF [%optionalComponentChosen%]==[false] (
-  SET restEnabled=true
-  SET swaggeruiEnabled=true
+  SET restChosen=true
   ECHO REST API enabled
   ECHO WebApps enabled
-  ECHO Swagger UI enabled
-  SET classPath=%webappsPath%,%restPath%,%swaggerPath%,%classPath%
+  IF [%productionChosen%]==[false] (
+    SET swaggeruiChosen=true
+    ECHO Swagger UI enabled
+    SET classPath=%swaggerPath%,%classPath%
+  )
+  SET classPath=%webappsPath%,%restPath%,%classPath%
 )
 
 REM if Swagger UI is enabled but REST is not, warn the user
-IF [%swaggeruiEnabled%]==[true] (
-  IF [%restEnabled%]==[false] (
+IF [%swaggeruiChosen%]==[true] (
+  IF [%restChosen%]==[false] (
     ECHO You did not enable the REST API. Swagger UI will not be able to send any requests to this Camunda Platform Run instance.
   )
 )

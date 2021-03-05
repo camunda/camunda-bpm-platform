@@ -22,8 +22,9 @@ restPath=$BASEDIR/internal/rest/
 swaggerPath=$BASEDIR/internal/swaggerui
 classPath=$BASEDIR/configuration/userlib/,$BASEDIR/configuration/keystore/
 optionalComponentChosen=false
-restEnabled=false
-swaggeruiEnabled=false
+restChosen=false
+swaggeruiChosen=false
+productionChosen=false
 configuration=$BASEDIR/configuration/default.yml
 
 
@@ -35,34 +36,38 @@ while [ "$1" != "" ]; do
                    echo WebApps enabled
                    ;;
     --rest )       optionalComponentChosen=true
-                   restEnabled=true
+                   restChosen=true
                    classPath=$restPath,$classPath
                    echo REST API enabled
                    ;;
     --swaggerui )  optionalComponentChosen=true
-                   swaggeruiEnabled=true
+                   swaggeruiChosen=true
                    classPath=$swaggerPath,$classPath
                    echo Swagger UI enabled
                    ;;
     --production ) configuration=$BASEDIR/configuration/production.yml
+                   productionChosen=true
                    ;;
     * )            exit 1
   esac
   shift
 done
 
-# if neither REST, Webapps nor Swagger UI are explicitly chosen, enable all three
+# if neither REST nor Webapps are chosen, enable both, as well as Swagger UI iff production mode is not choose
 if [ "$optionalComponentChosen" = "false" ]; then
-  restEnabled=true
-  swaggeruiEnabled=true
+  restChosen=true
   echo REST API enabled
   echo WebApps enabled
-  echo Swagger UI enabled
-  classPath=$webappsPath,$restPath,$swaggerPath,$classPath
+  if [ "$productionChosen" = "false" ]; then
+    swaggeruiChosen=true
+    echo Swagger UI enabled
+    classPath=$swaggerPath,$classPath
+  fi
+  classPath=$webappsPath,$restPath,$classPath
 fi
 
 # if Swagger UI is enabled but REST is not, warn the user
-if [ "$swaggeruiEnabled" = "true" ] && [ "$restEnabled" = "false" ]; then
+if [ "$swaggeruiChosen" = "true" ] && [ "$restChosen" = "false" ]; then
   echo You did not enable the REST API. Swagger UI will not be able to send any requests to this Camunda Platform Run instance.
 fi
 
