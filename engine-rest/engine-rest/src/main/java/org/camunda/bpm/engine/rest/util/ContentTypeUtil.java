@@ -20,14 +20,14 @@ import javax.ws.rs.core.MediaType;
 
 public class ContentTypeUtil {
 
-  private static final String SUFFIX_JSON_FILE = ".json";
+  private static final String SUFFIX_FORM_FILE = ".form";
 
   /**
    * @return the content type to use for the provided form's key
    *
    */
   public static String getFormContentType(String formKey) {
-    if (formKey.endsWith(SUFFIX_JSON_FILE)) {
+    if (formKey.endsWith(SUFFIX_FORM_FILE)) {
       return MediaType.APPLICATION_JSON;
     }
     return MediaType.APPLICATION_XHTML_XML;

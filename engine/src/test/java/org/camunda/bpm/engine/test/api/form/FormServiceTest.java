@@ -1454,8 +1454,8 @@ public class FormServiceTest {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/form/DeployedCamundaFormsProcess.bpmn20.xml",
-      "org/camunda/bpm/engine/test/api/form/start.form.json",
-      "org/camunda/bpm/engine/test/api/form/task.form.json" })
+      "org/camunda/bpm/engine/test/api/form/start.form",
+      "org/camunda/bpm/engine/test/api/form/task.form" })
   @Test
   public void testGetDeployedCamundaStartForm() {
     // given
@@ -1466,7 +1466,7 @@ public class FormServiceTest {
 
     // then
     assertNotNull(deployedStartForm);
-    String fileAsString = IoUtil.fileAsString("org/camunda/bpm/engine/test/api/form/start.form.json");
+    String fileAsString = IoUtil.fileAsString("org/camunda/bpm/engine/test/api/form/start.form");
     String deployedStartFormAsString = IoUtil.inputStreamAsString(deployedStartForm);
     assertEquals(deployedStartFormAsString, fileAsString);
   }
@@ -1538,8 +1538,8 @@ public class FormServiceTest {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/form/DeployedCamundaFormsProcess.bpmn20.xml",
-      "org/camunda/bpm/engine/test/api/form/start.form.json",
-      "org/camunda/bpm/engine/test/api/form/task.form.json" })
+      "org/camunda/bpm/engine/test/api/form/start.form",
+      "org/camunda/bpm/engine/test/api/form/task.form" })
   @Test
   public void testGetDeployedCamundaTaskForm() {
     // given
@@ -1551,7 +1551,7 @@ public class FormServiceTest {
 
     // then
     assertNotNull(deployedTaskForm);
-    String fileAsString = IoUtil.fileAsString("org/camunda/bpm/engine/test/api/form/task.form.json");
+    String fileAsString = IoUtil.fileAsString("org/camunda/bpm/engine/test/api/form/task.form");
     String deployedStartFormAsString = IoUtil.inputStreamAsString(deployedTaskForm);
     assertEquals(deployedStartFormAsString, fileAsString);
   }
