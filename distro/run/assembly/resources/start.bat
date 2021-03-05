@@ -51,25 +51,29 @@ IF [%~1]==[--rest] (
   ECHO REST API enabled
 )
 
-IF [%~1]==[--production] (
-  SET configuration=%BASEDIR%configuration\production.yml
-)
-
 IF [%~1]==[--swaggerui] (
+  SET optionalComponentChosen=true
   SET swaggeruiEnabled=true
   SET classPath=%swaggerPath%,%classPath%
   ECHO Swagger UI enabled
+)
+
+IF [%~1]==[--production] (
+  SET configuration=%BASEDIR%configuration\production.yml
 )
 
 SHIFT
 GOTO Loop
 :Continue
 
-REM if neither REST nor Webapps are explicitly chosen, enable both
+REM if neither REST, Webapps nor are explicitly chosen, enable all three
 IF [%optionalComponentChosen%]==[false] (
+  SET restEnabled=true
+  SET swaggeruiEnabled=true
   ECHO REST API enabled
   ECHO WebApps enabled
-  SET classPath=%webappsPath%,%restPath%,%classPath%
+  ECHO Swagger UI enabled
+  SET classPath=%webappsPath%,%restPath%,%swaggerPath%,%classPath%
 )
 
 REM if Swagger UI is enabled but REST is not, warn the user

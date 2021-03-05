@@ -48,14 +48,14 @@ public class ComponentAvailabilityIT {
   @Parameter(3)
   public boolean swaggerUIAvailable;
 
-  @Parameters
+  @Parameters(name = "Test instance: {index}. Rest: {1}, Webapps: {2}, SwaggerUI: {3}")
   public static Collection<Object[]> commands() {
     return Arrays.asList(new Object[][] {
-      { new String[0], true, true, false },
+      { new String[0], true, true, true },
       { new String[]{"--rest"}, true, false, false },
       { new String[]{"--rest", "--webapps"}, true, true, false },
       { new String[]{"--webapps"}, false, true, false },
-      { new String[]{"--swaggerui"}, true, true, true },
+      { new String[]{"--swaggerui"}, false, false, true },
       { new String[]{"--rest", "--webapps", "--swaggerui"}, true, true, true }
     });
   }

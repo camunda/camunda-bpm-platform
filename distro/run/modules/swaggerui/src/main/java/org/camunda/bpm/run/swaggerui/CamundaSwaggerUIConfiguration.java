@@ -23,10 +23,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class CamundaSwaggerUIConfiguration implements WebMvcConfigurer {
+
   @Override
   public void addResourceHandlers(ResourceHandlerRegistry registry) {
     registry.addResourceHandler("/swaggerui/**")
-        .addResourceLocations("classpath:/swaggerui/", "classpath:openapi.json");
+      .addResourceLocations("classpath:/swaggerui/", "classpath:openapi.json");
   }
 
   @Override
