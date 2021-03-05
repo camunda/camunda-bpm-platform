@@ -3259,7 +3259,7 @@ public class TaskRestServiceInteractionTest extends
   public void testGetDeployedTaskFormJson() {
     InputStream deployedFormMock = new ByteArrayInputStream("Test".getBytes());
     when(formServiceMock.getDeployedTaskForm(anyString())).thenReturn(deployedFormMock);
-    when(formServiceMock.getTaskFormKey(anyString(), anyString())).thenReturn("test.json");
+    when(formServiceMock.getTaskFormKey(anyString(), anyString())).thenReturn("test.form");
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_TASK_ID)

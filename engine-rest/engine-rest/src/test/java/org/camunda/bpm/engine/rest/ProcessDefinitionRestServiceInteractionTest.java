@@ -3955,7 +3955,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     when(formServiceMock.getDeployedStartForm(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
         .thenReturn(deployedStartFormMock);
     when(formServiceMock.getStartFormKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
-        .thenReturn("test.json");
+        .thenReturn("test.form");
 
     given()
     .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
