@@ -49,6 +49,7 @@ module.exports = [
     var CMMN_PATTERN = /\.(cmmn\d*.xml|cmmn)$/;
     var DMN_PATTERN = /\.(dmn\d*.xml|dmn)$/;
     var IMAGE_PATTERN = /\.(gif|jpg|jpeg|jpe|png|svg|tif|tiff)$/;
+    var HTML_PATTERN = /\.html$/;
 
     var PLUGIN_ACTION_COMPONENT = 'cockpit.repository.resource.action';
 
@@ -89,12 +90,20 @@ module.exports = [
       return checkResource(resourceName, IMAGE_PATTERN);
     });
 
+    var isHtmlResource = (control.isHtmlResource = $scope.isHtmlResource = function(
+      resource
+    ) {
+      var resourceName = getResourceName(resource);
+      return checkResource(resourceName, HTML_PATTERN);
+    });
+
     control.isUnkownResource = $scope.isUnkownResource = function(resource) {
       return (
         !isBpmnResource(resource) &&
         !isCmmnResource(resource) &&
         !isDmnResource(resource) &&
-        !isImageResource(resource)
+        !isImageResource(resource) &&
+        !isHtmlResource(resource)
       );
     };
 
