@@ -36,8 +36,7 @@ public class SwaggerUIGetRequestIT extends AbstractWebappUiIT {
 
   @Before
   public void runStartScript() {
-    String[] commands = { "--swaggerui" };
-    container = new SpringBootManagedContainer(commands);
+    container = new SpringBootManagedContainer();
     try {
       container.start();
     } catch (Exception e) {
@@ -65,13 +64,13 @@ public class SwaggerUIGetRequestIT extends AbstractWebappUiIT {
     driver.get(path);
 
     WebDriverWait wait = new WebDriverWait(driver, 10);
-
+    // click on Batch resource
     wait.until(visibilityOfElementLocated(By.id("operations-tag-Batch"))).click();
-
+    // click on get batches endpoint
     wait.until(visibilityOfElementLocated(By.cssSelector("#operations-Batch-getBatches > .opblock-summary"))).click();;
-
+    // click on execute request
     wait.until(visibilityOfElementLocated(By.cssSelector(".execute"))).click();
-
+    // there should be a response to the request
     wait.until(textToBePresentInElementLocated(By.tagName("h5"), "Response body"));
 
   }

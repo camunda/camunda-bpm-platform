@@ -39,23 +39,26 @@ while [ "$1" != "" ]; do
                    classPath=$restPath,$classPath
                    echo REST API enabled
                    ;;
-    --production ) configuration=$BASEDIR/configuration/production.yml
-                   ;;
-    --swaggerui )  classPath=$swaggerPath,$classPath
+    --swaggerui )  optionalComponentChosen=true
                    swaggeruiEnabled=true
+                   classPath=$swaggerPath,$classPath
                    echo Swagger UI enabled
+                   ;;
+    --production ) configuration=$BASEDIR/configuration/production.yml
                    ;;
     * )            exit 1
   esac
   shift
 done
 
-# if neither REST nor Webapps are explicitly chosen, enable both
+# if neither REST, Webapps nor Swagger UI are explicitly chosen, enable all three
 if [ "$optionalComponentChosen" = "false" ]; then
   restEnabled=true
+  swaggeruiEnabled=true
   echo REST API enabled
   echo WebApps enabled
-  classPath=$webappsPath,$restPath,$classPath
+  echo Swagger UI enabled
+  classPath=$webappsPath,$restPath,$swaggerPath,$classPath
 fi
 
 # if Swagger UI is enabled but REST is not, warn the user
