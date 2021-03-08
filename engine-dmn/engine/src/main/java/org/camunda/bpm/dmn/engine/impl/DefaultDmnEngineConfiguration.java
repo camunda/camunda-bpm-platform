@@ -16,10 +16,8 @@
  */
 package org.camunda.bpm.dmn.engine.impl;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
+import org.camunda.bpm.dmn.engine.DmnDecisionContext;
+import org.camunda.bpm.dmn.engine.DmnDecisionContextFactory;
 import org.camunda.bpm.dmn.engine.DmnEngine;
 import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.delegate.DmnDecisionEvaluationListener;
@@ -39,6 +37,11 @@ import org.camunda.bpm.dmn.feel.impl.juel.FeelEngineFactoryImpl;
 import org.camunda.bpm.dmn.feel.impl.scala.ScalaFeelEngineFactory;
 import org.camunda.bpm.dmn.feel.impl.scala.function.FeelCustomFunctionProvider;
 import org.camunda.bpm.model.dmn.impl.DmnModelConstants;
+import org.camunda.commons.utils.EnsureUtil;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
 
@@ -80,6 +83,7 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
   protected String defaultLiteralExpressionLanguage = null;
 
   protected DmnTransformer transformer = new DefaultDmnTransformer();
+  protected DmnDecisionContextFactory dmnDecisionContextFactory = DefaultDmnDecisionContext::new;
 
   @Override
   public DmnEngine buildEngine() {
@@ -174,7 +178,7 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
   }
 
   protected void initElProvider() {
-    if(elProvider == null) {
+    if (elProvider == null) {
       elProvider = new JuelElProvider();
     }
   }
@@ -280,6 +284,7 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
     setCustomPostDecisionEvaluationListeners(decisionEvaluationListeners);
     return this;
   }
+
   /**
    * The list of decision table evaluation listeners of the configuration. Contains
    * the pre, default and post decision table evaluation listeners. Is set during
@@ -603,4 +608,35 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
     return this;
   }
 
+  /**
+   * @return factory used to create new decision context.
+   */
+  public DmnDecisionContextFactory getDmnDecisionContextFactory() {
+    return dmnDecisionContextFactory;
+  }
+
+  /**
+   * @param dmnDecisionContextFactory the factory to create new {@link DmnDecisionContext}
+   */
+  public void setDmnDecisionContextFactory(DmnDecisionContextFactory dmnDecisionContextFactory) {
+    this.dmnDecisionContextFactory = dmnDecisionContextFactory;
+  }
+
+  /**
+   * @param dmnDecisionContextFactory the factory to create new {@link DmnDecisionContext}
+   * @return this
+   * @see #setDmnDecisionContextFactory(DmnDecisionContextFactory)
+   */
+  public DefaultDmnEngineConfiguration dmnDecisionContextFactory(DmnDecisionContextFactory dmnDecisionContextFactory) {
+    setDmnDecisionContextFactory(dmnDecisionContextFactory);
+    return this;
+  }
+
+  /**
+   * @return a new {@link DmnDecisionContext instance.}
+   */
+  public DmnDecisionContext createDecisionContext() {
+    EnsureUtil.ensureNotNull("dmnDecisionContextFactory", dmnDecisionContextFactory);
+    return dmnDecisionContextFactory.createDecisionContext(this);
+  }
 }

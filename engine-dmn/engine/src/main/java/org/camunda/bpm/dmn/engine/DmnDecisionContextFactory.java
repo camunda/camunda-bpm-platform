@@ -16,23 +16,16 @@
  */
 package org.camunda.bpm.dmn.engine;
 
-import org.camunda.bpm.engine.variable.context.VariableContext;
+import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
 
 /**
- * Worker responsible for evaluating a decision.
- * Created during {@link DmnEngine#evaluateDecision(DmnDecision, VariableContext)}.
- *
- * Which concrete implementation is created can be configured in
+ * Creates a new {@link DmnDecisionContext}.
  */
-public interface DmnDecisionContext {
+public interface DmnDecisionContextFactory {
 
   /**
-   * Evaluate a decision with the given {@link VariableContext}
-   *
-   * @param decision the decision to evaluate
-   * @param variableContext the available variable context
-   * @return the result of the decision evaluation
+   * @return new instance of {@link DmnDecisionContext}, defaults to {@link org.camunda.bpm.dmn.engine.impl.DefaultDmnDecisionContext}.
    */
-  DmnDecisionResult evaluateDecision(DmnDecision decision, VariableContext variableContext);
+  DmnDecisionContext createDecisionContext(DefaultDmnEngineConfiguration dmnEngineConfiguration);
 
 }

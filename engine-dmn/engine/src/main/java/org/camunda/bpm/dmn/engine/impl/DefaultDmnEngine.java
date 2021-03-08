@@ -22,12 +22,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.dmn.engine.DmnDecision;
-import org.camunda.bpm.dmn.engine.DmnDecisionRequirementsGraph;
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
-import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
-import org.camunda.bpm.dmn.engine.DmnEngine;
-import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
+import org.camunda.bpm.dmn.engine.*;
 import org.camunda.bpm.dmn.engine.impl.spi.transform.DmnTransformer;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.context.VariableContext;
@@ -119,7 +114,7 @@ public class DefaultDmnEngine implements DmnEngine {
     ensureNotNull("variableContext", variableContext);
 
     if (decision instanceof DmnDecisionImpl && decision.isDecisionTable()) {
-      DefaultDmnDecisionContext decisionContext = new DefaultDmnDecisionContext(dmnEngineConfiguration);
+      DmnDecisionContext decisionContext = dmnEngineConfiguration.createDecisionContext();
 
       DmnDecisionResult decisionResult = decisionContext.evaluateDecision(decision, variableContext);
       return DmnDecisionTableResultImpl.wrap(decisionResult);
@@ -178,7 +173,7 @@ public class DefaultDmnEngine implements DmnEngine {
     ensureNotNull("variableContext", variableContext);
 
     if (decision instanceof DmnDecisionImpl) {
-      DefaultDmnDecisionContext decisionContext = new DefaultDmnDecisionContext(dmnEngineConfiguration);
+      DmnDecisionContext decisionContext = dmnEngineConfiguration.createDecisionContext();
       return decisionContext.evaluateDecision(decision, variableContext);
     }
     else {
