@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.camunda.bpm.dmn.engine.DmnDecision;
+import org.camunda.bpm.dmn.engine.DmnDecisionContext;
 import org.camunda.bpm.dmn.engine.DmnDecisionLogic;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.delegate.DmnDecisionEvaluationListener;
@@ -41,7 +42,7 @@ import org.camunda.bpm.model.dmn.HitPolicy;
 /**
  * Context which evaluates a decision on a given input
  */
-public class DefaultDmnDecisionContext {
+public class DefaultDmnDecisionContext implements DmnDecisionContext {
 
   protected static final DmnEngineLogger LOG = DmnEngineLogger.ENGINE_LOGGER;
 
@@ -60,13 +61,7 @@ public class DefaultDmnDecisionContext {
     evaluationHandlers.put(DmnDecisionLiteralExpressionImpl.class, new DecisionLiteralExpressionEvaluationHandler(configuration));
   }
 
-  /**
-   * Evaluate a decision with the given {@link VariableContext}
-   *
-   * @param decision the decision to evaluate
-   * @param variableContext the available variable context
-   * @return the result of the decision evaluation
-   */
+  @Override
   public DmnDecisionResult evaluateDecision(DmnDecision decision, VariableContext variableContext) {
 
     if(decision.getKey() == null) {
