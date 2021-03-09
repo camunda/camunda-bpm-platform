@@ -276,7 +276,7 @@ public abstract class SpinJsonNode extends Spin<SpinJsonNode> {
   public abstract Boolean isString();
 
   /**
-   * Get this node as a number value.
+   * Get this node as a string value.
    *
    * @return the string value of this node
    * @throws SpinDataFormatException if this node is not a string value
