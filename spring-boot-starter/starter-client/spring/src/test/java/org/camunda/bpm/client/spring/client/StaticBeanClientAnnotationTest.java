@@ -14,35 +14,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.client.spring;
+package org.camunda.bpm.client.spring.client;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.List;
-
-import org.assertj.core.api.Assertions;
 import org.camunda.bpm.client.ExternalTaskClient;
+import org.camunda.bpm.client.spring.MockedTest;
+import org.camunda.bpm.client.spring.client.configuration.PropertyPlaceholderConfiguration;
+import org.camunda.bpm.client.spring.client.configuration.StaticBeanConfiguration;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 
-@SuppressWarnings("ALL")
-@RunWith(SpringRunner.class)
-@ContextConfiguration(classes = { SimpleConfiguration.class })
-public class SimpleContextTest {
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-  @Autowired
-  protected ExternalTaskClient externalTaskClient;
+@ContextConfiguration(classes = {StaticBeanConfiguration.class})
+public class StaticBeanClientAnnotationTest extends MockedTest {
 
   @Autowired
-  protected List<SpringTopicSubscription> subscriptions;
+  public ExternalTaskClient client;
 
+  /**
+   * ListableBeanFactory#getBeanNamesForAnnotation(class annotation) returns static methods
+   * defined in a class with class level. Make sure that static methods are filtered out.
+   */
   @Test
-  public void startup() {
-    assertThat(externalTaskClient).isNotNull();
-    Assertions.assertThat(subscriptions).hasSize(2);
-    subscriptions.stream().forEach(subscription -> assertThat(subscription.isOpen()));
+  public void shouldVerifyStaticBeanIsNotInterpretedAsClientBean() {
+    verify(clientBuilder).baseUrl("http://localhost:8080/engine-rest");
+    verify(clientBuilder).build();
+    verifyNoMoreInteractions(clientBuilder);
   }
+
 }

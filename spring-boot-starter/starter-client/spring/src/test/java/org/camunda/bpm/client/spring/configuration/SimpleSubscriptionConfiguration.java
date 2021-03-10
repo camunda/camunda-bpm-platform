@@ -14,39 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.client.spring;
+package org.camunda.bpm.client.spring.configuration;
 
-import org.camunda.bpm.client.spring.annotation.EnableExternalTaskClient;
 import org.camunda.bpm.client.spring.annotation.ExternalTaskSubscription;
-import org.camunda.bpm.client.spring.subscription.TestClassSubscription;
 import org.camunda.bpm.client.task.ExternalTaskHandler;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 
 @Configuration
-@ComponentScan(basePackageClasses = { TestClassSubscription.class })
-@EnableExternalTaskClient(baseUrl = "${client.baseUrl}")
-public class PropertyPlaceholderConfiguration {
+public class SimpleSubscriptionConfiguration {
 
+  @ExternalTaskSubscription("topic-name")
   @Bean
-  static PropertySourcesPlaceholderConfigurer propertyPlaceholderConfigurer() {
-    PropertySourcesPlaceholderConfigurer configurer = new PropertySourcesPlaceholderConfigurer();
-    Resource location = new ClassPathResource("client.properties");
-    configurer.setLocation(location);
-    return configurer;
-  }
-
-  @ExternalTaskSubscription(topicName = "methodSubscription")
-  @Bean
-  public ExternalTaskHandler methodSubscription() {
+  public ExternalTaskHandler handler() {
     return (externalTask, externalTaskService) -> {
 
       // interact with the external task
 
     };
   }
+
 }

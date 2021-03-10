@@ -14,43 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.client.spring;
+package org.camunda.bpm.client.spring.client.configuration;
 
-import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
 import org.camunda.bpm.client.spring.annotation.EnableExternalTaskClient;
-import org.camunda.bpm.client.spring.annotation.ExternalTaskSubscription;
-import org.camunda.bpm.client.spring.extendedsubscription.ExtendedTestClassSubscription;
-import org.camunda.bpm.client.task.ExternalTaskHandler;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
 @Configuration
-@ComponentScan(basePackageClasses = { ExtendedTestClassSubscription.class })
-public class ExtendedConfiguration {
+@EnableExternalTaskClient(
+    baseUrl = "${client.baseUrl}",
+    workerId = "${client.workerId}",
+    dateFormat = "${client.dateFormat}",
+    defaultSerializationFormat = "${client.serializationFormat}"
+)
+public class PropertyPlaceholderConfiguration {
 
   @Bean
-  @Primary
-  public ClientRequestInterceptor clientRequestInterceptor() {
-    return requestContext -> {
-      //
-    };
-  }
-
-  @Configuration
-  @EnableExternalTaskClient(baseUrl = "http://localhost:8080/rest")
-  static class FirstConfig {
-
-    @ExternalTaskSubscription("methodSubscription")
-    @Bean
-    public ExternalTaskHandler methodSubscription() {
-      return (externalTask, externalTaskService) -> {
-
-        // interact with the external task
-
-      };
-    }
+  public PropertySourcesPlaceholderConfigurer propertyPlaceholderConfigurer() {
+    PropertySourcesPlaceholderConfigurer configurer = new PropertySourcesPlaceholderConfigurer();
+    Resource location = new ClassPathResource("client.properties");
+    configurer.setLocation(location);
+    return configurer;
   }
 
 }

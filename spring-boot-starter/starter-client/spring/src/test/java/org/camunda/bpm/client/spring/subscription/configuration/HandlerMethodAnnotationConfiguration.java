@@ -14,28 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.client.spring;
+package org.camunda.bpm.client.spring.subscription.configuration;
 
-import org.camunda.bpm.client.spring.annotation.EnableExternalTaskClient;
 import org.camunda.bpm.client.spring.annotation.ExternalTaskSubscription;
-import org.camunda.bpm.client.spring.subscription.TestClassSubscription;
+import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskHandler;
+import org.camunda.bpm.client.task.ExternalTaskService;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ComponentScan(basePackageClasses = { TestClassSubscription.class })
-@EnableExternalTaskClient(baseUrl = "http://localhost:8080/rest")
-public class SimpleConfiguration {
+public class HandlerMethodAnnotationConfiguration {
 
-  @ExternalTaskSubscription(topicName = "methodSubscription")
   @Bean
-  public ExternalTaskHandler methodSubscription() {
-    return (externalTask, externalTaskService) -> {
-
-      // interact with the external task
+  @ExternalTaskSubscription("topic-name")
+  public ExternalTaskHandler externalTaskHandler() {
+    return (ExternalTask externalTask, ExternalTaskService externalTaskService) -> {
 
     };
   }
+
 }

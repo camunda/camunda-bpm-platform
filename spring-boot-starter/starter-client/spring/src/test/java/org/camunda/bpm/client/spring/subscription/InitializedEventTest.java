@@ -16,20 +16,27 @@
  */
 package org.camunda.bpm.client.spring.subscription;
 
-import org.camunda.bpm.client.spring.annotation.ExternalTaskSubscription;
-import org.camunda.bpm.client.task.ExternalTask;
-import org.camunda.bpm.client.task.ExternalTaskHandler;
-import org.camunda.bpm.client.task.ExternalTaskService;
-import org.springframework.stereotype.Component;
+import org.camunda.bpm.client.spring.SpringTopicSubscription;
+import org.camunda.bpm.client.spring.MockedTest;
+import org.camunda.bpm.client.spring.subscription.configuration.InitializedEventConfiguration;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
 
-@ExternalTaskSubscription(topicName = "testClassSubscription")
-@Component
-public class TestClassSubscription implements ExternalTaskHandler {
+import static org.assertj.core.api.Assertions.assertThat;
 
-  @Override
-  public void execute(ExternalTask externalTask, ExternalTaskService externalTaskService) {
-    // TODO Auto-generated method stub
+@ContextConfiguration(classes = {
+    InitializedEventConfiguration.class
+})
+public class InitializedEventTest extends MockedTest {
 
+  @Autowired
+  protected SpringTopicSubscription subscription;
+
+  @Test
+  public void shouldOpenTopicSubscription() {
+    assertThat(subscription.isAutoOpen()).isFalse();
+    assertThat(subscription.isOpen()).isTrue();
   }
 
 }

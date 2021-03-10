@@ -14,35 +14,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.client.spring;
+package org.camunda.bpm.client.spring.subscription;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.List;
-
-import org.assertj.core.api.Assertions;
 import org.camunda.bpm.client.ExternalTaskClient;
+import org.camunda.bpm.client.spring.MockedTest;
+import org.camunda.bpm.client.spring.configuration.SimpleClientConfiguration;
+import org.camunda.bpm.client.spring.subscription.configuration.HandlerMethodAnnotationConfiguration;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 
-@SuppressWarnings("ALL")
-@RunWith(SpringRunner.class)
-@ContextConfiguration(classes = { CustomClientConfiguration.class })
-public class CustomClientTest {
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+
+@ContextConfiguration(classes = {
+    SimpleClientConfiguration.class,
+    HandlerMethodAnnotationConfiguration.class
+})
+public class HandlerMethodAnnotationTest extends MockedTest {
 
   @Autowired
-  protected ExternalTaskClient externalTaskClient;
-
-  @Autowired
-  protected SpringTopicSubscription subscription;
+  public ExternalTaskClient externalTaskClient;
 
   @Test
-  public void startup() {
-    assertThat(externalTaskClient).isNotNull();
-    assertThat(subscription.isOpen()).isTrue();
+  public void shouldSubscribeByMethodAnnotation() {
+    verify(client, times(1)).subscribe("topic-name");
+    verifyNoMoreInteractions(client);
   }
 
 }
