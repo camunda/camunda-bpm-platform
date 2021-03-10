@@ -76,7 +76,10 @@ import org.junit.runners.model.Statement;
  * You can declare a deployment with the {@link Deployment} annotation. This
  * base class will make sure that this deployment gets deployed before the setUp
  * and {@link RepositoryService#deleteDeployment(String, boolean) cascade
- * deleted} after the tearDown.
+ * deleted} after the tearDown. If you add a deployment programmatically in your
+ * test, you have to make it known to the processEngineRule by calling 
+ * {@link ProcessEngineRule#manageDeployment(Deployment)} to have it cleaned up
+ * automatically.
  * </p>
  * <p>
  * The processEngineRule also lets you
