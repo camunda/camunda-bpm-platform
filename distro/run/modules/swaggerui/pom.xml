@@ -13,7 +13,7 @@
   </parent>
 
   <artifactId>camunda-bpm-run-modules-swaggerui</artifactId>
-  <name>camunda BPM - Run - Module Swagger UI</name>
+  <name>camunda Platform - Run - Module Swagger UI</name>
   <packaging>jar</packaging>
 
   <properties>

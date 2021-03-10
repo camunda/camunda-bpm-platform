@@ -53,7 +53,7 @@ while [ "$1" != "" ]; do
   shift
 done
 
-# if neither REST nor Webapps are chosen, enable both, as well as Swagger UI iff production mode is not choose
+# if neither REST nor Webapps are chosen, enable both as well as Swagger UI if production mode is not chosen
 if [ "$optionalComponentChosen" = "false" ]; then
   restChosen=true
   echo REST API enabled
