@@ -68,7 +68,8 @@ SHIFT
 GOTO Loop
 :Continue
 
-REM if neither REST, Webapps nor are explicitly chosen, enable all three
+REM if neither REST nor Webapps are chosen, enable both as well as Swagger UI if production mode is not chosen
+setlocal enabledelayedexpansion
 IF [%optionalComponentChosen%]==[false] (
   SET restChosen=true
   ECHO REST API enabled
@@ -78,8 +79,9 @@ IF [%optionalComponentChosen%]==[false] (
     ECHO Swagger UI enabled
     SET classPath=%swaggerPath%,%classPath%
   )
-  SET classPath=%webappsPath%,%restPath%,%classPath%
+  SET classPath=%webappsPath%,%restPath%,!classPath!
 )
+setlocal disabledelayedexpansion
 
 REM if Swagger UI is enabled but REST is not, warn the user
 IF [%swaggeruiChosen%]==[true] (
