@@ -19,19 +19,18 @@ const checker = require('license-checker');
 const path = require("path");
 
 const PRODUCTION_LICENSES = [
-    '0BSD',
     'Apache-2.0',
+    '0BSD',
     'BSD-2-Clause',
     'BSD-3-Clause',
     'ISC',
     'MIT',
     'Unlicense',
-    'CC0-1.0'
 ];
 
 
 const ALLOWED_PACKAGES = [
-    'emitter-component@1.1.1' // uses MIT, but uses wrong licenseFile field
+    'emitter-component@1.1.1' // uses MIT, but uses wrong licenseFile field https://github.com/component/emitter/blob/master/LICENSE
 ];
 
 const parseResults = (ALLOWED_LICENSES, resolve, reject) =>
@@ -79,19 +78,48 @@ const parseResults = (ALLOWED_LICENSES, resolve, reject) =>
         }
     };
 
-
-checker.init(
-    {
-        start: path.resolve(__dirname, ".."),
-        excludePrivatePackages: true,
-        production: true
-    },
-    parseResults(PRODUCTION_LICENSES,
-        () => console.log("License check passed"),
+/*
+Main entry point for license check
+ */
+if (require.main === module) {
+    checker.init(
+        {
+            start: path.resolve(__dirname, ".."),
+            excludePrivatePackages: true,
+            production: true
+        },
+        parseResults(PRODUCTION_LICENSES,
+            () => console.log("License check passed"),
             warn => {
-            console.warn("License check did not pass");
-            console.warn(warn);
-            process.exit(1)
-        })
-);
+                console.warn("License check did not pass");
+                console.warn(warn);
+                process.exit(1)
+            })
+    );
+}
 
+/*
+Main entry point for license book generation
+ */
+module.exports.writeThirdPartyNotice = function (dependencies){
+    const licenseBook = {};
+    const licenses = dependencies.dependencies;
+    for (const license of licenses) {
+        if (license.name === "swagger-ui") {
+            // see https://jira.camunda.com/browse/OB-16
+            license.licenseText =
+                "NOTICE" +
+                "-----------------------------------------------------------------------\n" +
+                `swagger-UI-dist (Licensed under ${PRODUCTION_LICENSES.join(', ')}) \n` +
+                "The swagger-ui-dist NPM webjar is comprised of a multitude of minified ECMAscript and CSS libraries " +
+                "aggregated from several projects, under different licences. " +
+                "For license information please see swagger-ui-es-bundle.js.LICENSE.txt.\n" +
+                "------------------------------------------------------------------------\n" +
+                license.licenseText
+        }
+
+        license.outdated = false;
+        licenseBook[license.name + '@' + license.version] = license;
+    }
+    return JSON.stringify(licenseBook, null, 2)
+}
