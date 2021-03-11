@@ -14,24 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.client.spring.boot.starter;
+package org.camunda.bpm.client.spring.boot.starter.it.subscription;
 
 import org.camunda.bpm.client.spring.annotation.ExternalTaskSubscription;
+import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskHandler;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
+import org.camunda.bpm.client.task.ExternalTaskService;
+import org.springframework.stereotype.Component;
 
-@SpringBootApplication
-public class TestApplication {
+@ExternalTaskSubscription(
+    topicName = "topic-two",
+    autoOpen = false,
+    businessKey = "business-key"
+)
+@Component
+public class TestClassSubscription implements ExternalTaskHandler {
 
-  @ExternalTaskSubscription(topicName = "methodSubscription", autoOpen = false)
-  @Bean
-  public ExternalTaskHandler methodSubscription() {
-    return (externalTask, externalTaskService) -> {
-
-      // interact with the external task
-
-    };
+  @Override
+  public void execute(ExternalTask externalTask, ExternalTaskService externalTaskService) {
   }
 
 }

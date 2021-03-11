@@ -1,12 +1,14 @@
 camunda:
   bpm:
     client:
-      base-url: http://localhost:8081/rest
+      base-url: http://localhost:8081/engine-rest
+      default-serialization-format: application/javascript
       subscriptions:
-        methodSubscription:
-          auto-open: true
-        testClassSubscription:
-          auto-open: true
+        topic-one:
+          auto-open: false
+          lock-duration: 33
+        topic-two:
+          process-definition-key: proc-def-key
 logging:
   level:
     org.camunda.bpm.client: debug

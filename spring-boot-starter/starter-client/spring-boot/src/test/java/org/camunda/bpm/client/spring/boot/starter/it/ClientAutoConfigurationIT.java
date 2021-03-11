@@ -14,34 +14,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.client.spring.boot.starter;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.List;
+package org.camunda.bpm.client.spring.boot.starter.it;
 
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.spring.SpringTopicSubscription;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Answers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 @SuppressWarnings("ALL")
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class CamundaBpmClientAutoConfigurationIT {
+public class ClientAutoConfigurationIT {
 
-  @Autowired
+  @MockBean(answer = Answers.RETURNS_DEEP_STUBS)
   protected ExternalTaskClient externalTaskClient;
 
   @Autowired
-  protected List<SpringTopicSubscription> scheduledExternalTasks;
+  protected List<SpringTopicSubscription> topicSubscriptions;
 
   @Test
   public void startup() {
-    assertThat(externalTaskClient).isNotNull();
-    assertThat(scheduledExternalTasks).isNotEmpty();
+    assertThat(topicSubscriptions.size()).isEqualTo(2);
+    assertThat(topicSubscriptions)
+        .extracting("topicName", "autoOpen", "businessKey", "lockDuration", "processDefinitionKey")
+        .containsExactlyInAnyOrder(
+            tuple("topic-one", false, null, 33L, null),
+            tuple("topic-two", false, "business-key", null, "proc-def-key"));
   }
+
 }
