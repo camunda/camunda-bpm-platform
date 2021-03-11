@@ -72,7 +72,7 @@ public class SubscriptionPostProcessor implements BeanDefinitionRegistryPostProc
     return BeanDefinitionBuilder.genericBeanDefinition(springTopicSubscription)
         .addPropertyReference("externalTaskHandler", beanName)
         .addPropertyValue("subscriptionConfiguration", subscriptionConfiguration)
-        .setDestroyMethodName("close")
+        .setDestroyMethodName("closeInternally")
         .getBeanDefinition();
   }
 

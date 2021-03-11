@@ -79,7 +79,7 @@ public class SubscriptionConfiguration {
     this.variableNames = variableNames;
   }
 
-  public Boolean isLocalVariables() {
+  public Boolean getLocalVariables() {
     return localVariables;
   }
 

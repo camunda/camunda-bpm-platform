@@ -77,7 +77,7 @@ public class SpringTopicSubscriptionImpl
     if (lockDuration != null) {
       topicSubscriptionBuilder.lockDuration(lockDuration);
     }
-    Boolean localVariables = subscriptionConfiguration.isLocalVariables();
+    Boolean localVariables = subscriptionConfiguration.getLocalVariables();
     if (localVariables != null && localVariables) {
       topicSubscriptionBuilder.localVariables(true);
     }
@@ -151,6 +151,15 @@ public class SpringTopicSubscriptionImpl
     return topicSubscription != null;
   }
 
+  public void closeInternally() {
+    if (topicSubscription != null) {
+      topicSubscription.close();
+
+      String topicName = subscriptionConfiguration.getTopicName();
+      LOG.closed(topicName);
+    }
+  }
+
   public void close() {
     String topicName = subscriptionConfiguration.getTopicName();
     if (topicSubscriptionBuilder == null) {
@@ -158,9 +167,7 @@ public class SpringTopicSubscriptionImpl
     }
 
     if (topicSubscription != null) {
-      topicSubscription.close();
-
-      LOG.closed(topicName);
+      closeInternally();
     } else {
       throw LOG.notOpenedException(topicName);
     }
@@ -205,7 +212,7 @@ public class SpringTopicSubscriptionImpl
 
   @Override
   public boolean isLocalVariables() {
-    return subscriptionConfiguration.isLocalVariables();
+    return subscriptionConfiguration.getLocalVariables();
   }
 
   @Override
