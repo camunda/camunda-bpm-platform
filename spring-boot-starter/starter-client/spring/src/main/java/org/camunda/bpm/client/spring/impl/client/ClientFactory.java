@@ -105,9 +105,10 @@ public class ClientFactory
 
   @Autowired(required = false)
   public void setRequestInterceptors(List<ClientRequestInterceptor> requestInterceptors) {
-    this.requestInterceptors = CollectionUtils.isEmpty(requestInterceptors) ?
-        new ArrayList<>() : requestInterceptors;
-    LOG.requestInterceptorsFound(this.requestInterceptors.size());
+    if (requestInterceptors != null) {
+      this.requestInterceptors.addAll(requestInterceptors);
+      LOG.requestInterceptorsFound(this.requestInterceptors.size());
+    }
   }
 
   @Autowired(required = false)

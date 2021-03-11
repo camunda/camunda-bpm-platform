@@ -43,13 +43,12 @@ public class PropertiesAwareClientFactory extends ClientFactory {
   protected void addBasicAuthInterceptor() {
     BasicAuthProperties basicAuth = clientProperties.getBasicAuth();
     if (basicAuth != null) {
-      List<ClientRequestInterceptor> interceptors = getRequestInterceptors();
 
       String username = basicAuth.getUsername();
       String password = basicAuth.getPassword();
       BasicAuthProvider basicAuthProvider = new BasicAuthProvider(username, password);
 
-      interceptors.add(basicAuthProvider);
+      getRequestInterceptors().add(basicAuthProvider);
     }
   }
 
