@@ -15,6 +15,10 @@
 
   <packaging>pom</packaging>
 
+  <properties>
+    <version.powermock>2.0.9</version.powermock>
+  </properties>
+
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -24,6 +28,18 @@
         <version>${version.spring-boot}</version>
         <scope>import</scope>
         <type>pom</type>
+      </dependency>
+      <dependency>
+        <groupId>org.powermock</groupId>
+        <artifactId>powermock-module-junit4</artifactId>
+        <version>${version.powermock}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.powermock</groupId>
+        <artifactId>powermock-api-mockito2</artifactId>
+        <version>${version.powermock}</version>
+        <scope>test</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>

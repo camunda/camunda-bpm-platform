@@ -1,22 +1,16 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.camunda.bpm.springboot.project</groupId>
     <artifactId>camunda-bpm-spring-boot-starter-root</artifactId>
     <version>7.15.0-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
   </parent>
 
   <groupId>org.camunda.bpm</groupId>
   <artifactId>camunda-external-task-client-spring</artifactId>
   <name>Camunda Platform - Spring Boot Starter - Client - Spring</name>
-
-  <properties>
-    <version.mockito>3.6.28</version.mockito>
-    <version.powermock>2.0.9</version.powermock>
-  </properties>
 
   <dependencies>
     <dependency>
@@ -70,22 +64,17 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-inline</artifactId>
-      <version>${version.mockito}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.powermock</groupId>
       <artifactId>powermock-module-junit4</artifactId>
-      <version>${version.powermock}</version>
-      <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.powermock</groupId>
       <artifactId>powermock-api-mockito2</artifactId>
-      <version>${version.powermock}</version>
-      <scope>test</scope>
     </dependency>
 
   </dependencies>
