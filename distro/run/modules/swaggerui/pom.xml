@@ -43,7 +43,34 @@
     </dependency>
 
   </dependencies>
-
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <!-- attaches the generated license book
+              as a Maven artifact -->
+            <id>attach-license-book</id>
+            <phase>package</phase>
+            <goals>
+              <goal>attach-artifact</goal>
+            </goals>
+            <configuration>
+              <artifacts>
+                <artifact>
+                  <file>${project.build.directory}/THIRD-PARTY-NOTICE.json</file>
+                  <type>json</type>
+                  <classifier>run-swaggerui-license-book-json</classifier>
+                </artifact>
+              </artifacts>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
   <profiles>
 
     <profile>

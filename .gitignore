@@ -19,5 +19,6 @@ faces-config.NavData
 *.h2.db
 *.lock.db
 **/overlays
+**/node_modules
 
 *.DS_Store
