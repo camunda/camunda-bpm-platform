@@ -30,7 +30,7 @@ const PRODUCTION_LICENSES = [
 
 
 const ALLOWED_PACKAGES = [
-    'emitter-component@1.1.1' // uses MIT, but uses wrong licenseFile field https://github.com/component/emitter/blob/master/LICENSE
+    'emitter-component@1.1.1' // uses MIT, but does not provide license field https://github.com/component/emitter/blob/master/LICENSE
 ];
 
 const parseResults = (ALLOWED_LICENSES, resolve, reject) =>
