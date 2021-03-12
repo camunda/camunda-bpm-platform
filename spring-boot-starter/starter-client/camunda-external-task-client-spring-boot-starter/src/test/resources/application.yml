@@ -1,0 +1,13 @@
+camunda:
+  bpm:
+    client:
+      base-url: http://localhost:8080/rest
+      subscriptions:
+        test:
+          auto-open: true
+        methodSubscription:
+          auto-open: true
+logging:
+  level:
+    org.camunda.bpm.client: debug
+      
