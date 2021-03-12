@@ -110,7 +110,8 @@ public class BreakingScalaFeelBehaviorTest extends DmnEngineTest {
 
     // then
     thrown.expect(FeelException.class);
-    thrown.expectMessage("failed to parse expression ''Hello World'': [1.1] failure: '-' expected but ''' found");
+    thrown.expectMessage("failed to parse expression ''Hello World'': " +
+      "Expected (\"not\" | positiveUnaryTests | unaryTests):1:1, found \"'Hello Wor\"");
 
     // when
     engine.evaluateDecision(decision, Variables.createVariables().putValue("input", "Hello World"));
