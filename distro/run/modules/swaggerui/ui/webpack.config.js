@@ -28,7 +28,12 @@ const config = {
         }),
         new LicenseCheckerWebpackPlugin({
             outputFilename: path.join( "..", "..", "THIRD-PARTY-NOTICE.json"),
-            outputWriter: writeThirdPartyNotice
+            outputWriter: writeThirdPartyNotice,
+            override: {
+                "swagger-ui@~3.43.0": { repository: "https://github.com/swagger-api/swagger-ui" },
+                "css-loader@~5.1.1": { repository: "https://github.com/webpack-contrib/css-loader" },
+                "style-loader@~2.0.0": { repository: "https://github.com/webpack-contrib/style-loader" }
+            },
         })
     ],
     optimization: {

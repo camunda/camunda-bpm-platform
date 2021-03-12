@@ -108,16 +108,16 @@ module.exports.writeThirdPartyNotice = function (dependencies){
         if (license.name === "swagger-ui") {
             // see https://jira.camunda.com/browse/OB-16
             license.licenseText =
-                "NOTICE" +
-                "-----------------------------------------------------------------------\n" +
+                "\n-----------------------------------------------------------\n" +
                 `swagger-UI-dist (Licensed under ${PRODUCTION_LICENSES.join(', ')}) \n` +
-                "The swagger-ui-dist NPM webjar is comprised of a multitude of minified ECMAscript and CSS libraries " +
-                "aggregated from several projects, under different licences. " +
+                "The swagger-ui-dist NPM webjar is comprised of a multitude of minified ECMAscript \n" +
+                "and CSS libraries aggregated from several projects, under different licences. \n" +
                 "For license information please see swagger-ui-es-bundle.js.LICENSE.txt.\n" +
-                "------------------------------------------------------------------------\n" +
+                "------------------------------------------------------------\n\n" +
                 license.licenseText
         }
-
+        license.licenseShort = license.licenseName;
+        delete license.licenseName;
         license.outdated = false;
         licenseBook[license.name + '@' + license.version] = license;
     }
