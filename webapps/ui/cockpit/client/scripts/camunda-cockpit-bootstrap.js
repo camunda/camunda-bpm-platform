@@ -23,13 +23,25 @@ window._import = path => {
 //  Camunda-Cockpit-Bootstrap is copied as-is, so we have to inline everything
 const baseImportPath = document.querySelector('base').href + '../';
 
+function withSuffix(string, suffix) {
+  return !string.endsWith(suffix) ? string + suffix : string;
+}
+
 const loadConfig = (async function() {
-  // eslint-disable-next-line
   const config = (await import(
     baseImportPath + 'scripts/config.js?bust=' + new Date().getTime()
   )).default;
 
+  if (Array.isArray(config.bpmnJs?.additionalModules)) {
+    const fetchers = config.bpmnJs.additionalModules.map(el =>
+      import(withSuffix(baseImportPath + el, '.js'))
+    );
+    const bpmnJsModules = await Promise.all(fetchers);
+    config.bpmnJs.additionalModules = bpmnJsModules.map(el => el.default);
+  }
+
   window.camCockpitConf = config;
+
   return config;
 })();
 

@@ -74,11 +74,11 @@ export default {
   //     // with a file called 'camunda.json' in it defining the 'camunda' moddle extension
   //     camunda: 'my-custom-moddle/camunda'
   //   },
-  //   additionalModules: {
+  //   additionalModules: [
   //     // if you have a folder called 'my-custom-module' (in the 'cockpit' folder)
-  //     // with a file called 'module.js' in it defining the 'my-custom-module' AMD module
-  //     myCustomModule: 'my-custom-module/module'
-  //   }
+  //     // with a file called 'module.js' in it
+  //     'my-custom-module/module'
+  //   ],
   // },
   // defaultFilter: {
   //   historicProcessDefinitionInstancesSearch: {
