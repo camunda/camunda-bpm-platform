@@ -99,6 +99,9 @@ module.exports = [
             $scope.includeAssignedTasks = $scope.filter.includeAssignedTasks =
               item.value;
           }
+          if (booleanCriterion[item.key] && item.value === false) {
+            return false;
+          }
           return item.key !== 'includeAssignedTasks';
         });
 

@@ -315,6 +315,12 @@
       ],
       "allowDates": true,
       "enforceDates": true
+    },  {
+      "id": {
+        "key": "withoutDueDate",
+        "value": "WITHOUT_DUE_DATE"
+      },
+      "basic": true      
     },    {
       "id": {
         "key": "followUp",

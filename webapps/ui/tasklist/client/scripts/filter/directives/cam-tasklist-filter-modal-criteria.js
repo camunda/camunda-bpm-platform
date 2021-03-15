@@ -286,6 +286,11 @@ var criteria = [
         name: 'withoutTenantId',
         label: 'Without Tenant ID',
         bool: true
+      },
+      {
+        name: 'withoutDueDate',
+        label: 'Without Due Date',
+        bool: true
       }
     ]
   },
