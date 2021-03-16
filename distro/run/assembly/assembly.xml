@@ -4,11 +4,11 @@
     xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.0.0 http://maven.apache.org/xsd/assembly-2.0.0.xsd">
 
   <id>assembly</id>
-  
+
   <formats>
     <format>tar.gz</format>
   </formats>
-  
+
   <includeBaseDirectory>false</includeBaseDirectory>
 
   <dependencySets>
@@ -19,7 +19,14 @@
       </includes>
       <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
     </dependencySet>
-     <dependencySet>
+    <dependencySet>
+      <outputDirectory>internal/swaggerui/</outputDirectory>
+      <includes>
+        <include>org.camunda.bpm.run:camunda-bpm-run-modules-swaggerui</include>
+      </includes>
+      <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
+    </dependencySet>
+    <dependencySet>
       <outputDirectory />
       <includes>
         <include>org.camunda.bpm:license-book:zip</include>
@@ -78,13 +85,17 @@
       <outputDirectory />
     </file>
   </files>
-  
+
   <fileSets>
     <fileSet>
       <directory>../modules/rest/target/dependency/</directory>
       <outputDirectory>internal/rest/</outputDirectory>
     </fileSet>
-        <!-- create empty resource folder -->
+    <fileSet>
+      <directory>../modules/swaggerui/target/dependency/</directory>
+      <outputDirectory>internal/swaggerui/</outputDirectory>
+    </fileSet>
+    <!-- create empty resource folder -->
     <fileSet>
       <directory>resources/dummyResource</directory>
       <outputDirectory>configuration/resources/</outputDirectory>

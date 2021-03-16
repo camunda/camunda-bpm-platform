@@ -18,3 +18,9 @@ spring.datasource:
   driver-class-name: org.h2.Driver
   username: sa
   password: sa
+
+# By default, Spring Boot serves static content from any directories called /static or /public or /resources or
+# /META-INF/resources in the classpath. To prevent users from accidentally sharing files, this is disabled here by setting static locations to NULL.
+# https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#boot-features-spring-mvc-static-content
+spring.web.resources:
+  static-locations: NULL

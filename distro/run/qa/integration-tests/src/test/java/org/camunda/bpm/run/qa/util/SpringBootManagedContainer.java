@@ -180,16 +180,12 @@ public class SpringBootManagedContainer {
 
   protected boolean isRunning() {
     try {
+      //There might not be a resource at the base url, but at this point we just want to know that the server is up.
       processOptionsRequests(this.baseUrl);
       return true;
     } catch (Exception e) {
-      try {
-        processOptionsRequests(this.baseUrl + "/engine-rest/engine");
-      } catch (Exception ex) {
         return false;
-      }
     }
-    return true;
   }
 
   protected void processOptionsRequests(String urlToCall) throws IOException {
@@ -203,18 +199,7 @@ public class SpringBootManagedContainer {
     hconn.setRequestProperty("User-Agent", "Camunda-Managed-SpringBoot-Container/1.0");
     hconn.setRequestProperty("Accept", "text/plain");
     hconn.connect();
-    processResponse(hconn);
-  }
-
-  protected void processResponse(HttpURLConnection hconn) throws IOException {
-    int httpResponseCode = hconn.getResponseCode();
-    if (httpResponseCode >= 400 && httpResponseCode < 500) {
-      throw new RuntimeException(String.format("Unable to connect to server, it failed with responseCode (%s) and responseMessage (%s).", httpResponseCode,
-          hconn.getResponseMessage()));
-    } else if (httpResponseCode >= 300) {
-      throw new IllegalStateException(
-          String.format("The server request failed with responseCode (%s) and responseMessage (%s).", httpResponseCode, hconn.getResponseMessage()));
-    }
+    hconn.disconnect();
   }
 
   // ---------------------------
