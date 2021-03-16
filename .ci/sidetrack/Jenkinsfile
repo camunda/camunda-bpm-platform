@@ -16,10 +16,7 @@
 boolean shouldTrigger(String stageType) {
   def qaStages = ['sql-scripts', 'upgrade-database', 'instance-migration', 'old-engine', 'rolling-update', 'large-data-tests']
   def unitStages = ['engine-unit', 'engine-unit-authorizations', 'webapp-unit', 'webapp-unit-authorizations']
-  if (params.STANDALONE) {
-    // Daily run
-    return qaStages.contains(stageType)
-  } else {
+  if (params.UPSTREAM_PR) {
     if (env.BRANCH_NAME == cambpmDefaultBranch()) {
       // Downstream master run
       return unitStages.contains(stageType)
@@ -27,6 +24,9 @@ boolean shouldTrigger(String stageType) {
       // Downstream PR run
       return cambpmWithLabels(cambpmGetLabels(stageType))
     }
+  } else {
+    // Daily run
+    return qaStages.contains(stageType)
   }
 }
 
@@ -40,7 +40,6 @@ pipeline {
     CAMBPM_LOGGER_LOG_LEVEL = 'DEBUG'
   }
   parameters {
-    booleanParam name: 'STANDALONE', defaultValue: true
     booleanParam name: 'UPSTREAM_PR', defaultValue: false, description: 'Is the current build triggered in the scope of an upstream pull request'
     string name: 'UPSTREAM_PROJECT_NAME', defaultValue: 'cambpm-ce/cambpm-main/master'
     string name: 'UPSTREAM_BUILD_NUMBER', defaultValue: ''
@@ -56,7 +55,7 @@ pipeline {
     stage('Prepare') {
       when {
         expression {
-          !cambpmWithLabels('standalone')
+          cambpmWithLabels('upstream')
         }
       }
       steps {
