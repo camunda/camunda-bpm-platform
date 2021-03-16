@@ -41,8 +41,6 @@ module.exports = [
       $scope
     ));
 
-    var Deployment = camAPI.resource('deployment');
-
     var control = ($scope.control = {});
 
     var BPMN_PATTERN = /\.(bpmn\d*.xml|bpmn)$/;
@@ -50,6 +48,7 @@ module.exports = [
     var DMN_PATTERN = /\.(dmn\d*.xml|dmn)$/;
     var IMAGE_PATTERN = /\.(gif|jpg|jpeg|jpe|png|svg|tif|tiff)$/;
     var HTML_PATTERN = /\.html$/;
+    var FORM_PATTERN = /\.(form)$/;
 
     var PLUGIN_ACTION_COMPONENT = 'cockpit.repository.resource.action';
 
@@ -97,13 +96,21 @@ module.exports = [
       return checkResource(resourceName, HTML_PATTERN);
     });
 
+    var isFormResource = (control.isFormResource = $scope.isFormResource = function(
+      resource
+    ) {
+      var resourceName = getResourceName(resource);
+      return checkResource(resourceName, FORM_PATTERN);
+    });
+
     control.isUnkownResource = $scope.isUnkownResource = function(resource) {
       return (
         !isBpmnResource(resource) &&
         !isCmmnResource(resource) &&
         !isDmnResource(resource) &&
         !isImageResource(resource) &&
-        !isHtmlResource(resource)
+        !isHtmlResource(resource) &&
+        !isFormResource(resource)
       );
     };
 
@@ -146,16 +153,22 @@ module.exports = [
           // do not load image twice
           deferred.resolve(null);
         } else {
-          Deployment.getResourceData(deployment.id, resource.id, function(
-            err,
-            res
-          ) {
-            if (err) {
+          fetch(
+            Uri.appUri(
+              'engine://engine/:engine/deployment/' +
+                deployment.id +
+                '/resources/' +
+                resource.id +
+                '/data'
+            )
+          )
+            .then(async res => {
+              const result = await res.text();
+              deferred.resolve({data: result});
+            })
+            .catch(err => {
               deferred.reject(err);
-            } else {
-              deferred.resolve({data: res});
-            }
-          });
+            });
         }
 
         return deferred.promise;

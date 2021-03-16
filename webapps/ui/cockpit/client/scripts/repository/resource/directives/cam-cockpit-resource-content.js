@@ -51,6 +51,7 @@ module.exports = [
           $scope.isDmnResource = $scope.control.isDmnResource;
           $scope.isImageResource = $scope.control.isImageResource;
           $scope.isHtmlResource = $scope.control.isHtmlResource;
+          $scope.isFormResource = $scope.control.isFormResource;
           $scope.isUnkownResource = $scope.control.isUnkownResource;
           $scope.imageLink = $scope.control.downloadLink;
 
