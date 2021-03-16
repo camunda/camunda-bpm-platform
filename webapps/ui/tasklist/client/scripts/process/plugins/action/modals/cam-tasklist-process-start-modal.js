@@ -19,6 +19,15 @@
 
 var angular = require('../../../../../../../../camunda-commons-ui/vendor/angular');
 
+var DEFAULT_OPTIONS = {
+  hideCompleteButton: true,
+  hideStartButton: false,
+  hideLoadVariablesButton: true,
+  autoFocus: true,
+  disableForm: false,
+  disableAddVariableButton: false
+};
+
 module.exports = [
   '$rootScope',
   '$scope',
@@ -78,14 +87,7 @@ module.exports = [
     // initially always reset the current selected process definition id to null
     processStartData.set('currentProcessDefinitionId', {id: null});
 
-    var DEFAULT_OPTIONS = ($scope.options = {
-      hideCompleteButton: true,
-      hideStartButton: false,
-      hideLoadVariablesButton: true,
-      autoFocus: true,
-      disableForm: false,
-      disableAddVariableButton: false
-    });
+    $scope.options = angular.copy(DEFAULT_OPTIONS);
 
     $scope.PROCESS_TO_START_SELECTED = false;
 
