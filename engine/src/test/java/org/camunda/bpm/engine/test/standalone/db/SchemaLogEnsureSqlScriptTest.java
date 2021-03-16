@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.camunda.bpm.engine.management.SchemaLogEntry;
+import org.camunda.bpm.engine.test.util.TestconfigProperties;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -115,18 +116,7 @@ public class SchemaLogEnsureSqlScriptTest extends SchemaLogTestCase {
   }
 
   protected String getCurrentMinorVersion() throws IOException {
-    if (connectionProperties == null) {
-      InputStream propStream = null;
-      try {
-        propStream = SchemaLogEnsureSqlScriptTest.class.getResourceAsStream(PROPERTIES_FILE_PATH);
-        connectionProperties = new Properties();
-        connectionProperties.load(propStream);
-      } finally {
-        propStream.close();
-      }
-    }
-
-    String version = connectionProperties.getProperty(VERSION_PROPERTY);
+    String version = TestconfigProperties.getEngineVersion();
     // remove the patch version, and create a "clean" minor version
     int lastPos = version.lastIndexOf(".");
     version = version.substring(0, lastPos);

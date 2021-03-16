@@ -54,6 +54,7 @@ import org.camunda.bpm.engine.impl.telemetry.dto.Product;
 import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
 import org.camunda.bpm.engine.impl.util.TelemetryUtil;
+import org.camunda.commons.utils.StringUtil;
 import org.camunda.connect.spi.CloseableConnectorResponse;
 import org.camunda.connect.spi.Connector;
 import org.camunda.connect.spi.ConnectorRequest;
@@ -63,6 +64,7 @@ public class TelemetrySendingTask extends TimerTask {
   protected static final TelemetryLogger LOG = ProcessEngineLogger.TELEMETRY_LOGGER;
   protected static final Set<String> METRICS_TO_REPORT = new HashSet<>();
   protected static final String TELEMETRY_INIT_MESSAGE_SENT_NAME = "camunda.telemetry.initial.message.sent";
+  protected static final String UUID4_PATTERN = "^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$";
 
   static {
     METRICS_TO_REPORT.add(ROOT_PROCESS_INSTANCE_START);
@@ -334,5 +336,24 @@ public class TelemetrySendingTask extends TimerTask {
       sendInitialMessage(commandContext);
       return null;
     }
+  }
+
+  protected Boolean validateData(Data dataToSend) {
+    // validate product data
+    Product product = dataToSend.getProduct();
+    String edition = product.getEdition();
+    String version = product.getVersion();
+    String name = product.getName();
+    boolean validProductData = hasText(name) && hasText(version) && hasText(edition);
+
+    // validate installation id
+    String installationId = dataToSend.getInstallation();
+    boolean correctId = installationId.matches(UUID4_PATTERN);
+
+    return validProductData && correctId;
+  }
+
+  protected boolean hasText(String valid) {
+    return valid != null && !valid.isEmpty();
   }
 }

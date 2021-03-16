@@ -113,6 +113,8 @@ public class ParseUtil {
       if (trimSuffixEE) {
         version = version.replace("-ee", ""); // trim `-ee` suffix
       }
+    } else {
+      version = ProductPropertiesUtil.getProductVersion();
     }
 
     return new ProcessEngineDetails(version, edition);
