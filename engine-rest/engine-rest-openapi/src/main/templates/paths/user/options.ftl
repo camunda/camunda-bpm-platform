@@ -9,7 +9,7 @@
               available operations that the currently authenticated user can perform on the /user resource.
               If the user can perform an operation or not may depend on various things, including the user's
               authorizations to interact with this resource and the internal configuration of the process
-              engine." />
+              engine. `OPTIONS /user` returns available interactions on the resource."/>
 
   "responses" : {
 
@@ -20,14 +20,26 @@
         last = true
         desc = "Request successful."
         examples = ['"example-1": {
-                       "summary": "GET `/user/aUserId`",
+                       "summary": "GET `/user`",
                        "value": {
-                         "links":[
-                          {"method":"GET","href":"http://localhost:8080/camunda/api/engine/engine/default/user/peter/profile","rel":"self"},
-                          {"method":"DELETE","href":"http://localhost:8080/camunda/api/engine/engine/default/user/peter","rel":"delete"},
-                          {"method":"PUT","href":"http://localhost:8080/camunda/api/engine/engine/default/user/peter/profile","rel":"update"}
+                          "links": [
+                            {
+                              "method": "GET",
+                              "href": "http://localhost:8080/engine-rest/user",
+                              "rel": "list"
+                            },
+                            {
+                              "method": "GET",
+                              "href": "http://localhost:8080/engine-rest/user/count",
+                              "rel": "count"
+                            },
+                            {
+                              "method": "POST",
+                              "href": "http://localhost:8080/engine-rest/user/create",
+                              "rel": "create"
+                            }
                           ]
-                          }
+                        }
                      }'] />
     }
 }
