@@ -297,7 +297,62 @@ public class TelemetryReporterTest {
 
     // then
     verify(1, postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
-        .withHeader("Content-Type",  equalTo("application/json")));  }
+        .withHeader("Content-Type",  equalTo("application/json")));
+  }
+
+  @Test
+  @WatchLogger(loggerNames = {"org.camunda.bpm.engine.telemetry"}, level = "DEBUG")
+  public void shouldNotReportInitialDataWhenProductNameIsNull() {
+    executeDataValidationTest(null, "7.15.0", "community", "f5b19e2e-b49a-11ea-b3de-0242ac130004");
+  }
+
+  @Test
+  @WatchLogger(loggerNames = {"org.camunda.bpm.engine.telemetry"}, level = "DEBUG")
+  public void shouldNotReportInitialDataWhenProductNameIsEmpty() {
+    executeDataValidationTest("", "7.15.0", "community", "f5b19e2e-b49a-11ea-b3de-0242ac130004");
+  }
+
+  @Test
+  @WatchLogger(loggerNames = {"org.camunda.bpm.engine.telemetry"}, level = "DEBUG")
+  public void shouldNotReportInitialDataWhenProductVersionIsNull() {
+    executeDataValidationTest("Runtime", null, "community", "f5b19e2e-b49a-11ea-b3de-0242ac130004");
+  }
+
+  @Test
+  @WatchLogger(loggerNames = {"org.camunda.bpm.engine.telemetry"}, level = "DEBUG")
+  public void shouldNotReportInitialDataWhenProductVersionIsEmpty() {
+    executeDataValidationTest("Runtime", "", "community", "f5b19e2e-b49a-11ea-b3de-0242ac130004");
+  }
+
+  @Test
+  @WatchLogger(loggerNames = {"org.camunda.bpm.engine.telemetry"}, level = "DEBUG")
+  public void shouldNotReportInitialDataWhenProductEditionIsNull() {
+    executeDataValidationTest("Runtime", "7.15.0", null, "f5b19e2e-b49a-11ea-b3de-0242ac130004");
+  }
+
+  @Test
+  @WatchLogger(loggerNames = {"org.camunda.bpm.engine.telemetry"}, level = "DEBUG")
+  public void shouldNotReportInitialDataWhenProductEditionIsEmpty() {
+    executeDataValidationTest("Runtime", "7.15.0", null, "f5b19e2e-b49a-11ea-b3de-0242ac130004");
+  }
+
+  @Test
+  @WatchLogger(loggerNames = {"org.camunda.bpm.engine.telemetry"}, level = "DEBUG")
+  public void shouldNotReportInitialDataWhenInstallationIdIsNull() {
+    executeDataValidationTest("Runtime", "7.15.0", "community", null);
+  }
+
+  @Test
+  @WatchLogger(loggerNames = {"org.camunda.bpm.engine.telemetry"}, level = "DEBUG")
+  public void shouldNotReportInitialDataWhenInstallationIdIsEmpty() {
+    executeDataValidationTest("Runtime", "7.15.0", "community", "");
+  }
+
+  @Test
+  @WatchLogger(loggerNames = {"org.camunda.bpm.engine.telemetry"}, level = "DEBUG")
+  public void shouldNotReportInitialDataWhenInstallationIdIsInvalid() {
+    executeDataValidationTest("Runtime", "7.15.0", "community", "123-456-789");
+  }
 
   @Test
   public void shouldReportInitialDataWhenReporterActivatedAndInitTelemetryUndefined() {
@@ -1135,6 +1190,10 @@ public class TelemetryReporterTest {
   }
 
   protected Data createDataToSend() {
+    return createDataToSendWithCustomVals("Runtime", "7.14.0", "special", "f5b19e2e-b49a-11ea-b3de-0242ac130004");
+  }
+
+  protected Data createDataToSendWithCustomVals(String name, String version, String edition, String installationId) {
     Database database = new Database("mySpecialDb", "v.1.2.3");
     Jdk jdk = ParseUtil.parseJdkDetails();
     Internals internals = new Internals(database, new ApplicationServer("Apache Tomcat/10.0.1"), null, jdk);
@@ -1146,8 +1205,8 @@ public class TelemetryReporterTest {
     Map<String, Metric> metrics = getDefaultMetrics();
     internals.setMetrics(metrics);
 
-    Product product = new Product("Runtime", "7.14.0", "special", internals);
-    Data data = new Data("f5b19e2e-b49a-11ea-b3de-0242ac130004", product);
+    Product product = new Product(name, version, edition, internals);
+    Data data = new Data(installationId, product);
     return data;
   }
 
@@ -1285,5 +1344,30 @@ public class TelemetryReporterTest {
     return modelInstance;
   }
 
+  protected void executeDataValidationTest(String name, String version, String edition, String installationId) {
+    managementService.toggleTelemetry(true);
+    Data invalidData = createDataToSendWithCustomVals(name, version, edition, installationId);
+    stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+      .willReturn(aResponse()
+        .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
+
+    standaloneReporter = new TelemetryReporter(configuration.getCommandExecutorTxRequired(),
+      TELEMETRY_ENDPOINT,
+      0,
+      1000,
+      invalidData,
+      configuration.getTelemetryHttpConnector(),
+      configuration.getTelemetryRegistry(),
+      configuration.getMetricsRegistry(),
+      configuration.getTelemetryRequestTimeout());
+
+    // when
+    standaloneReporter.reportNow();
+
+    // then
+    verify(0, postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH)));
+    assertThat(loggingRule.getFilteredLog("Cannot send the telemetry task data. Some of the data is invalid. " +
+      "Please check the product name, version, edition and installation id.").size()).isOne();
+  }
 
 }

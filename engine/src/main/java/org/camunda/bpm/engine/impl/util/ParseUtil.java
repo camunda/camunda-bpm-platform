@@ -108,7 +108,11 @@ public class ParseUtil {
     String version = packageImplementationVersion;
     String edition = ProcessEngineDetails.EDITION_COMMUNITY;
 
-    if (version != null && version.contains("-ee")) {
+    if (version == null){
+      version = ProductPropertiesUtil.getProductVersion();
+    }
+
+    if (version.contains("-ee")) {
       edition = ProcessEngineDetails.EDITION_ENTERPRISE;
       if (trimSuffixEE) {
         version = version.replace("-ee", ""); // trim `-ee` suffix

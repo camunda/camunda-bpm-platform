@@ -110,6 +110,11 @@ public class TelemetryLogger extends ProcessEngineLogger {
         "016", "{} request was successful.", getInitialMessageTextCapitalized(isInitialMessage));
   }
 
+  public void sendingTelemetryDataFails() {
+    logWarn("017","Cannot send the telemetry task data. Some of the data is invalid. " +
+        "Please check the product name, version, edition and installation id.");
+  }
+
   protected String getInitialMessageText(boolean isInitialMessage) {
     return isInitialMessage ? "initial " : "";
   }

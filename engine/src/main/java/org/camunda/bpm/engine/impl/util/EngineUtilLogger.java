@@ -234,4 +234,9 @@ public class EngineUtilLogger extends ProcessEngineLogger {
         + "This indicates that this is not supported by your JAXP implementation: {}",
         e.getMessage());
   }
+
+  public void logMissingProductInformationPropertiesFile() {
+    logWarn("032", "Could not find the product-info.properties file. " +
+      "This file is used to determine the product version. If you have removed it, please restore it.");
+  }
 }

@@ -24,6 +24,7 @@ import static org.camunda.bpm.engine.management.Metrics.ACTIVTY_INSTANCE_START;
 import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_ELEMENTS;
 import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_INSTANCES;
 import static org.camunda.bpm.engine.management.Metrics.ROOT_PROCESS_INSTANCE_START;
+import static org.springframework.util.StringUtils.hasText;
 
 import java.net.HttpURLConnection;
 import java.util.HashMap;
@@ -63,6 +64,7 @@ public class TelemetrySendingTask extends TimerTask {
   protected static final TelemetryLogger LOG = ProcessEngineLogger.TELEMETRY_LOGGER;
   protected static final Set<String> METRICS_TO_REPORT = new HashSet<>();
   protected static final String TELEMETRY_INIT_MESSAGE_SENT_NAME = "camunda.telemetry.initial.message.sent";
+  protected static final String UUID4_PATTERN = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}";
 
   static {
     METRICS_TO_REPORT.add(ROOT_PROCESS_INSTANCE_START);
@@ -117,30 +119,20 @@ public class TelemetrySendingTask extends TimerTask {
 
     updateTelemetryFlag(true);
 
-    int triesLeft = telemetryRequestRetries + 1;
-    boolean requestSuccessful = false;
-    do {
+    performDataSend(false, () -> {
+      updateStaticData();
+      Internals dynamicData = resolveDynamicData();
+      Data mergedData = new Data(staticData);
+      mergedData.mergeInternals(dynamicData);
+
       try {
-        triesLeft--;
-
-        updateStaticData();
-        Internals dynamicData = resolveDynamicData();
-        Data mergedData = new Data(staticData);
-        mergedData.mergeInternals(dynamicData);
-
-        try {
-          sendData(mergedData, false);
-        } catch (Exception e) {
-          // so that we send it again the next time
-          restoreDynamicData(dynamicData);
-          throw e;
-        }
-
-        requestSuccessful = true;
+        sendData(mergedData, false);
       } catch (Exception e) {
-        LOG.exceptionWhileSendingTelemetryData(e, false);
+        // so that we send it again the next time
+        restoreDynamicData(dynamicData);
+        throw e;
       }
-    } while (!requestSuccessful && triesLeft > 0);
+    });
   }
 
   protected void sendInitialMessage() {
@@ -165,25 +157,16 @@ public class TelemetrySendingTask extends TimerTask {
      */
     if (null == commandContext.getPropertyManager().findPropertyById(TELEMETRY_INIT_MESSAGE_SENT_NAME)) {
       // message has not been sent yet
-      int triesLeft = telemetryRequestRetries + 1;
-      boolean requestSuccessful = false;
-      do {
-        try {
-          triesLeft--;
+      performDataSend(true, () -> {
+        Data initData = new Data(staticData.getInstallation(), new Product(staticData.getProduct()));
+        Internals internals = new Internals();
+        internals.setTelemetryEnabled(new IsTelemetryEnabledCmd().execute(commandContext));
+        initData.getProduct().setInternals(internals);
 
-          Data initData = new Data(staticData.getInstallation(), new Product(staticData.getProduct()));
-          Internals internals = new Internals();
-          internals.setTelemetryEnabled(new IsTelemetryEnabledCmd().execute(commandContext));
-          initData.getProduct().setInternals(internals);
-
-          sendData(initData, true);
-          requestSuccessful = true;
-          sendInitialMessage = false;
-          commandContext.getPropertyManager().insert(new PropertyEntity(TELEMETRY_INIT_MESSAGE_SENT_NAME, "true"));
-        } catch (Exception e) {
-          LOG.exceptionWhileSendingTelemetryData(e, true);
-        }
-      } while (!requestSuccessful && triesLeft > 0);
+        sendData(initData, true);
+        sendInitialMessage = false;
+        commandContext.getPropertyManager().insert(new PropertyEntity(TELEMETRY_INIT_MESSAGE_SENT_NAME, "true"));
+      });
     } else {
       // message has already been sent by another node
       sendInitialMessage = false;
@@ -335,4 +318,44 @@ public class TelemetrySendingTask extends TimerTask {
       return null;
     }
   }
+
+  protected void performDataSend(Boolean isInitialMessage, Runnable runnable) {
+    if (validateData(staticData)) {
+      int triesLeft = telemetryRequestRetries + 1;
+      boolean requestSuccessful = false;
+      do {
+        try {
+          triesLeft--;
+
+          runnable.run();
+
+          requestSuccessful = true;
+        } catch (Exception e) {
+          LOG.exceptionWhileSendingTelemetryData(e, isInitialMessage);
+        }
+      } while (!requestSuccessful && triesLeft > 0);
+    } else {
+      LOG.sendingTelemetryDataFails();
+    }
+  }
+
+  protected Boolean validateData(Data dataToSend) {
+    // validate product data
+    Product product = dataToSend.getProduct();
+    String installationId = dataToSend.getInstallation();
+    String edition = product.getEdition();
+    String version = product.getVersion();
+    String name = product.getName();
+
+    // ensure that data is not null or empty strings
+    boolean validProductData = hasText(name) && hasText(version) && hasText(edition) && hasText(installationId);
+
+    // validate installation id
+    if (validProductData) {
+      validProductData = validProductData && installationId.matches(UUID4_PATTERN);
+    }
+
+    return validProductData;
+  }
+
 }
