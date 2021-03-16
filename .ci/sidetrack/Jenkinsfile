@@ -16,7 +16,7 @@
 boolean shouldTrigger(String stageType) {
   def qaStages = ['sql-scripts', 'upgrade-database', 'instance-migration', 'old-engine', 'rolling-update', 'large-data-tests']
   def unitStages = ['engine-unit', 'engine-unit-authorizations', 'webapp-unit', 'webapp-unit-authorizations']
-  if (params.STANDALONE) {
+  if (!params.UPSTREAM_PR) {
     // Daily run
     return qaStages.contains(stageType)
   } else {
