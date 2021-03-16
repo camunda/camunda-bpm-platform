@@ -1,6 +1,6 @@
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
-@Library(['camunda-ci', 'cambpm-jenkins-shared-library@CAM-13270']) _
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
 
 /**
  * A method to perform a custom evaluation if certain stages in the Side track pipeline
@@ -16,10 +16,7 @@
 boolean shouldTrigger(String stageType) {
   def qaStages = ['sql-scripts', 'upgrade-database', 'instance-migration', 'old-engine', 'rolling-update', 'large-data-tests']
   def unitStages = ['engine-unit', 'engine-unit-authorizations', 'webapp-unit', 'webapp-unit-authorizations']
-  if (!params.UPSTREAM_PR) {
-    // Daily run
-    return qaStages.contains(stageType)
-  } else {
+  if (params.UPSTREAM_PR) {
     if (env.BRANCH_NAME == cambpmDefaultBranch()) {
       // Downstream master run
       return unitStages.contains(stageType)
@@ -27,6 +24,9 @@ boolean shouldTrigger(String stageType) {
       // Downstream PR run
       return cambpmWithLabels(cambpmGetLabels(stageType))
     }
+  } else {
+    // Daily run
+    return qaStages.contains(stageType)
   }
 }
 
