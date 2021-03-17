@@ -33,8 +33,26 @@ pipeline {
           suppressErrors: false,
           runSteps: {
             script {
+              platformVersion = env.JOB_NAME.split('/')[0]
+              echo platformVersion
               echo 'my test'
               sh 'printenv'
+              eeMainProjectBranch = "cambpm-ee-main-pr/master"
+
+              cambpmTriggerDownstream(
+                  platformVersion + "/cambpm-ce/cambpm-daily/${env.BRANCH_NAME}",
+                  [string(name: 'UPSTREAM_PROJECT_NAME', value: env.JOB_NAME),
+                  string(name: 'UPSTREAM_BUILD_NUMBER', value: env.BUILD_NUMBER)]
+                )
+
+              cambpmTriggerDownstream(
+                  platformVersion + "/cambpm-ee/" + eeMainProjectBranch,
+                  [string(name: 'UPSTREAM_PROJECT_NAME', value: env.JOB_NAME),
+                  string(name: 'UPSTREAM_BUILD_NUMBER', value: env.BUILD_NUMBER)],
+                  true, true, true
+                )
+
+
             }
           }
         ])
