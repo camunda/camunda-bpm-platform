@@ -34,6 +34,7 @@ pipeline {
           runSteps: {
             script {
               echo 'my test'
+              sh 'printenv'
             }
           }
         ])
