@@ -19,6 +19,7 @@ package org.camunda.bpm.client.spring.boot.starter.client;
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.ExternalTaskClientBuilder;
 import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
+import org.camunda.bpm.client.spring.boot.starter.MockHelper;
 import org.camunda.bpm.client.spring.boot.starter.ParsePropertiesHelper;
 import org.camunda.bpm.client.spring.boot.starter.client.configuration.SimpleSubscriptionConfiguration;
 import org.camunda.bpm.client.spring.boot.starter.impl.ClientAutoConfiguration;
@@ -27,7 +28,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.MockedStatic;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.modules.junit4.PowerMockRunnerDelegate;
@@ -36,11 +36,9 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.RETURNS_SELF;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
+import static org.camunda.bpm.client.spring.boot.starter.MockHelper.jdkSupportsMockito;
+import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @TestPropertySource(properties = {
     "camunda.bpm.client.basic-auth.username=my-username",
@@ -56,21 +54,17 @@ import static org.mockito.Mockito.when;
 @PrepareForTest(ExternalTaskClient.class)
 public class BasicAuthConfigurationTest extends ParsePropertiesHelper {
 
-  protected static MockedStatic<ExternalTaskClient> mockedStatic;
   protected static ExternalTaskClientBuilder clientBuilder;
 
   @BeforeClass
   public static void initMocks() {
-    mockedStatic = mockStatic(ExternalTaskClient.class);
-    clientBuilder = mock(ExternalTaskClientBuilder.class, RETURNS_SELF);
-    when(ExternalTaskClient.create()).thenReturn(clientBuilder);
-    ExternalTaskClient client = mock(ExternalTaskClient.class);
-    when(clientBuilder.build()).thenReturn(client);
+    MockHelper.initMocks();
+    clientBuilder = MockHelper.getClientBuilder();
   }
 
   @AfterClass
   public static void reset() {
-    mockedStatic.close();
+    MockHelper.reset();
   }
 
   @Test
