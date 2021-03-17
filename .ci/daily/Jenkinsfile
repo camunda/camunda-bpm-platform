@@ -15,7 +15,7 @@ pipeline {
   }
   parameters {
     booleanParam name: 'UPSTREAM_PR', defaultValue: false, description: 'Is the current build triggered in the scope of an upstream pull request'
-    string name: 'UPSTREAM_PROJECT_NAME', defaultValue: 'cambpm-ce/cambpm-main/master'
+    string name: 'UPSTREAM_PROJECT_NAME', defaultValue: '7.XX/cambpm-ce/cambpm-main/master'
     string name: 'UPSTREAM_BUILD_NUMBER', defaultValue: ''
     string name: 'PR_LABELS', defaultValue: '', description: 'The labels assigned to the CE pull request'
   }
