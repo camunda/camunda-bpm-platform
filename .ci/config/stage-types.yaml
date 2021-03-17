@@ -195,6 +195,7 @@ platform-jdk-openjdk-jdk-14-latest:
     runtimeStash: true
   nodeLabel: 'h2'
   jdkVersion: 'openjdk-jdk-14-latest'
+  withNpm: true
 platform-jdk-openjdk-jdk-13-latest:
   directory: '.'
   command: 'install source:jar source:test-jar -pl ''!webapps'',''!distro/jbossas7/subsystem'' -Pdistro,distro-ce,distro-wildfly'
@@ -202,6 +203,7 @@ platform-jdk-openjdk-jdk-13-latest:
     runtimeStash: true
   nodeLabel: 'h2'
   jdkVersion: 'openjdk-jdk-13-latest'
+  withNpm: true
 platform-jdk-openjdk-jdk-12-latest:
   directory: '.'
   command: 'install source:jar source:test-jar -pl ''!webapps'',''!distro/jbossas7/subsystem'' -Pdistro,distro-ce,distro-wildfly'
@@ -209,6 +211,7 @@ platform-jdk-openjdk-jdk-12-latest:
     runtimeStash: true
   nodeLabel: 'h2'
   jdkVersion: 'openjdk-jdk-12-latest'
+  withNpm: true
 platform-jdk-openjdk-jdk-11-latest:
   directory: '.'
   command: 'install source:jar source:test-jar -pl ''!webapps'',''!distro/jbossas7/subsystem'' -Pdistro,distro-ce,distro-wildfly'
@@ -216,6 +219,7 @@ platform-jdk-openjdk-jdk-11-latest:
     runtimeStash: true
   nodeLabel: 'h2'
   jdkVersion: 'openjdk-jdk-11-latest'
+  withNpm: true
 platform-jdk-openjdk-jdk-8-latest:
   directory: '.'
   command: 'install source:jar source:test-jar -pl ''!webapps'',''!distro/jbossas7/subsystem'' -Pdistro,distro-ce,distro-wildfly'
@@ -223,6 +227,7 @@ platform-jdk-openjdk-jdk-8-latest:
     runtimeStash: true
   nodeLabel: 'h2'
   jdkVersion: 'openjdk-jdk-8-latest'
+  withNpm: true
 platform-jdk-jdk-14-latest:
   directory: '.'
   command: 'install source:jar source:test-jar -pl ''!webapps'',''!distro/jbossas7/subsystem'' -Pdistro,distro-ce,distro-wildfly'
@@ -230,6 +235,7 @@ platform-jdk-jdk-14-latest:
     runtimeStash: true
   nodeLabel: 'h2'
   jdkVersion: 'jdk-14-latest'
+  withNpm: true
 platform-jdk-jdk-13-latest:
   directory: '.'
   command: 'install source:jar source:test-jar -pl ''!webapps'',''!distro/jbossas7/subsystem'' -Pdistro,distro-ce,distro-wildfly'
@@ -237,6 +243,7 @@ platform-jdk-jdk-13-latest:
     runtimeStash: true
   nodeLabel: 'h2'
   jdkVersion: 'jdk-13-latest'
+  withNpm: true
 platform-jdk-jdk-12-latest:
   directory: '.'
   command: 'install source:jar source:test-jar -pl ''!webapps'',''!distro/jbossas7/subsystem'' -Pdistro,distro-ce,distro-wildfly'
@@ -244,6 +251,7 @@ platform-jdk-jdk-12-latest:
     runtimeStash: true
   nodeLabel: 'h2'
   jdkVersion: 'jdk-12-latest'
+  withNpm: true
 platform-jdk-jdk-11-latest:
   directory: '.'
   command: 'install source:jar source:test-jar -pl ''!webapps'',''!distro/jbossas7/subsystem'' -Pdistro,distro-ce,distro-wildfly'
@@ -251,6 +259,7 @@ platform-jdk-jdk-11-latest:
     runtimeStash: true
   nodeLabel: 'h2'
   jdkVersion: 'jdk-11-latest'
+  withNpm: true
 platform-jdk-jdk-8-latest:
   directory: '.'
   command: 'install source:jar source:test-jar -pl ''!webapps'',''!distro/jbossas7/subsystem'' -Pdistro,distro-ce,distro-wildfly'
@@ -258,6 +267,7 @@ platform-jdk-jdk-8-latest:
     runtimeStash: true
   nodeLabel: 'h2'
   jdkVersion: 'jdk-8-latest'
+  withNpm: true
 platform-jdk-ibm-jdk-8-latest:
   directory: '.'
   command: 'install source:jar source:test-jar -pl ''!webapps'',''!distro/jbossas7/subsystem'' -Pdistro,distro-ce,distro-wildfly'
@@ -265,3 +275,4 @@ platform-jdk-ibm-jdk-8-latest:
     runtimeStash: true
   nodeLabel: 'h2'
   jdkVersion: 'ibm-jdk-8-latest'
+  withNpm: true
