@@ -21,8 +21,6 @@ import static org.camunda.bpm.engine.impl.util.ParseUtil.parseProcessEngineVersi
 import static org.camunda.bpm.engine.impl.util.ProcessEngineDetails.EDITION_COMMUNITY;
 import static org.camunda.bpm.engine.impl.util.ProcessEngineDetails.EDITION_ENTERPRISE;
 
-import java.io.IOException;
-
 import org.camunda.bpm.engine.impl.util.ProcessEngineDetails;
 import org.camunda.bpm.engine.test.util.TestconfigProperties;
 import org.junit.Test;
@@ -152,10 +150,10 @@ public class ProcessEngineDetailsTest {
   }
 
   @Test
-  public void shouldAssertCurrentProcessEngineVersionFromPropertiesFile() throws IOException {
+  public void shouldAssertCurrentProcessEngineVersionFromPropertiesFile() {
     // when
     // the version is not available from the package
-    ProcessEngineDetails engineInfo = parseProcessEngineVersion(null, false);
+    ProcessEngineDetails engineInfo = parseProcessEngineVersion(false);
 
     // then
     // the version is read from the product-info.properties file

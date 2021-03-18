@@ -235,8 +235,8 @@ public class EngineUtilLogger extends ProcessEngineLogger {
         e.getMessage());
   }
 
-  public void logMissingProductInformationPropertiesFile() {
-    logWarn("032", "Could not find the product-info.properties file. " +
-      "This file is used to determine the product version. If you have removed it, please restore it.");
+  public void logMissingPropertiesFile(String file) {
+    logWarn("032", "Could not find the '{}' file on the classpath. " +
+      "This file is used to determine the product version. If you have removed it, please restore it.", file);
   }
 }

@@ -18,6 +18,8 @@ package org.camunda.bpm.engine.impl.telemetry;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.telemetry.dto.Data;
+import org.camunda.bpm.engine.impl.telemetry.dto.Product;
 
 public class TelemetryLogger extends ProcessEngineLogger {
 
@@ -110,9 +112,17 @@ public class TelemetryLogger extends ProcessEngineLogger {
         "016", "{} request was successful.", getInitialMessageTextCapitalized(isInitialMessage));
   }
 
-  public void sendingTelemetryDataFails() {
+  public void sendingTelemetryDataFails(Data productData) {
+    Product product = productData.getProduct();
+    String installationId = productData.getInstallation();
     logWarn("017","Cannot send the telemetry task data. Some of the data is invalid. " +
         "Please check the product name, version, edition and installation id.");
+    logDebug("018", "Cannot send the telemetry task data. Some of the following product data is invalid: " +
+        "'{}' (name), '{}' (version), '{}' (edition), '{}' (UUIDv4 installation id). Please check it for errors.",
+      product.getName(),
+      product.getVersion(),
+      product.getEdition(),
+      installationId);
   }
 
   protected String getInitialMessageText(boolean isInitialMessage) {

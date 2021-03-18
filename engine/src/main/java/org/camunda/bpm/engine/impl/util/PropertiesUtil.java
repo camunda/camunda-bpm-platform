@@ -16,25 +16,27 @@
  */
 package org.camunda.bpm.engine.impl.util;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
-/**
- * Provides product information data loaded from a *.properties file.
- */
-public class ProductPropertiesUtil {
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
-  protected static final String PROPERTIES_FILE_PATH = "/org/camunda/bpm/engine/product-info.properties";
-  protected static final String VERSION_PROPERTY = "camunda.version";
-  protected static final Properties INSTANCE = PropertiesUtil.getProperties(PROPERTIES_FILE_PATH);
+public class PropertiesUtil {
 
-  protected ProductPropertiesUtil() {
-  }
+  protected static final EngineUtilLogger LOG = ProcessEngineLogger.UTIL_LOGGER;
 
   /**
-   * @return the current version of the product (e.g. <code>7.15.0-SNAPSHOT</code>)
+   * Reads a <code>.properties</code> file from the classpath and provides a {@link Properties} object.
    */
-  public static String getProductVersion() {
-    return INSTANCE.getProperty(VERSION_PROPERTY);
-  }
+  public static Properties getProperties(String propertiesFile) {
+    Properties productProperties = new Properties();
+    try (InputStream inputStream = ProductPropertiesUtil.class.getResourceAsStream(propertiesFile)) {
+      productProperties.load(inputStream);
+    } catch (IOException e) {
+      LOG.logMissingPropertiesFile(propertiesFile);
+    }
 
+    return productProperties;
+  }
 }

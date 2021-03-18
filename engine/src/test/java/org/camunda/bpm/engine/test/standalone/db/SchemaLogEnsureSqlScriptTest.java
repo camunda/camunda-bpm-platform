@@ -18,7 +18,6 @@ package org.camunda.bpm.engine.test.standalone.db;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,7 +47,7 @@ public class SchemaLogEnsureSqlScriptTest extends SchemaLogTestCase {
   }
 
   @Test
-  public void ensureUpgradeScriptsUpdateSchemaLogVersion() throws IOException {
+  public void ensureUpgradeScriptsUpdateSchemaLogVersion() {
     List<String> scriptsForDB = new ArrayList<>();
     for (String file : folderContents.get(UPGRADE_SCRIPT_FOLDER)) {
       if (file.startsWith(dataBaseType)) {
@@ -109,7 +108,7 @@ public class SchemaLogEnsureSqlScriptTest extends SchemaLogTestCase {
     return false;
   }
 
-  protected String getCurrentMinorVersion() throws IOException {
+  protected String getCurrentMinorVersion() {
     String version = TestconfigProperties.getEngineVersion();
     // remove the patch version, and create a "clean" minor version
     int lastPos = version.lastIndexOf(".");

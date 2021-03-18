@@ -104,13 +104,13 @@ public class ParseUtil {
     }
   }
 
-  public static ProcessEngineDetails parseProcessEngineVersion(String packageImplementationVersion, boolean trimSuffixEE) {
-    String version = packageImplementationVersion;
-    String edition = ProcessEngineDetails.EDITION_COMMUNITY;
+  public static ProcessEngineDetails parseProcessEngineVersion(boolean trimSuffixEE) {
+    String version = ProductPropertiesUtil.getProductVersion();
+    return parseProcessEngineVersion(version, trimSuffixEE);
+  }
 
-    if (version == null){
-      version = ProductPropertiesUtil.getProductVersion();
-    }
+  public static ProcessEngineDetails parseProcessEngineVersion(String version, boolean trimSuffixEE) {
+    String edition = ProcessEngineDetails.EDITION_COMMUNITY;
 
     if (version.contains("-ee")) {
       edition = ProcessEngineDetails.EDITION_ENTERPRISE;
