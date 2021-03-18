@@ -14,63 +14,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.client.spring;
+package org.camunda.bpm.client.spring.boot.starter;
 
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.ExternalTaskClientBuilder;
-import org.camunda.bpm.client.topic.TopicSubscription;
-import org.camunda.bpm.client.topic.TopicSubscriptionBuilder;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
 import org.mockito.MockedStatic;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.modules.junit4.PowerMockRunnerDelegate;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.junit.Assume.assumeTrue;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.RETURNS_SELF;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
-@RunWith(PowerMockRunner.class)
-@PowerMockRunnerDelegate(SpringRunner.class)
-@PrepareForTest({ExternalTaskClient.class})
-public abstract class MockedTest {
-
-  protected static ExternalTaskClient client;
-  protected static ExternalTaskClientBuilder clientBuilder;
-  protected static TopicSubscriptionBuilder subscriptionBuilder;
+public class MockHelper {
 
   protected static MockedStatic<ExternalTaskClient> mockedStatic;
+  protected static ExternalTaskClientBuilder clientBuilder;
 
-  @BeforeClass
-  public static void mockClient() {
+  public static void initMocks() {
     assumeTrue(jdkSupportsMockito());
 
     mockedStatic = mockStatic(ExternalTaskClient.class);
     clientBuilder = mock(ExternalTaskClientBuilder.class, RETURNS_SELF);
-    PowerMockito.when(ExternalTaskClient.create()).thenReturn(clientBuilder);
-    client = mock(ExternalTaskClient.class);
-    PowerMockito.when(clientBuilder.build()).thenReturn(client);
-    subscriptionBuilder = mock(TopicSubscriptionBuilder.class, RETURNS_SELF);
-    PowerMockito.when(client.subscribe(anyString())).thenReturn(subscriptionBuilder);
-    TopicSubscription topicSubscription = mock(TopicSubscription.class);
-    when(subscriptionBuilder.open()).thenReturn(topicSubscription);
+    when(ExternalTaskClient.create()).thenReturn(clientBuilder);
+    ExternalTaskClient client = mock(ExternalTaskClient.class);
+    when(clientBuilder.build()).thenReturn(client);
   }
 
-  @AfterClass
-  public static void close() {
+  public static void reset() {
     if(jdkSupportsMockito()) {
       mockedStatic.close();
     }
   }
 
-  protected static boolean jdkSupportsMockito() {
+  public static ExternalTaskClientBuilder getClientBuilder() {
+    return clientBuilder;
+  }
+
+  public static boolean jdkSupportsMockito() {
     String jvmVendor = System.getProperty("java.vm.vendor");
     String javaVersion = System.getProperty("java.version");
 
