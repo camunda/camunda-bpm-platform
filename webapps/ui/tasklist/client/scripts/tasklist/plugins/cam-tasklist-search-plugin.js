@@ -64,7 +64,8 @@ var sanitizeValue = function(value, operator, search) {
   // Regex for '_' and '%' special characters
   var wildCardExp = /(%)|(_)/;
   if (
-    operator.toLowerCase() === 'like' &&
+    (operator.toLowerCase() === 'like' ||
+      operator.toLowerCase() === 'notlike') &&
     !wildCardExp.test(value.replace(specialWildCardCharExp, ''))
   ) {
     return '%' + value + '%';

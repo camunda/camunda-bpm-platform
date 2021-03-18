@@ -5,6 +5,40 @@
         "key": "processVariables",
         "value": "PROCESS_VARIABLE"
       },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        },
+        {
+          "key": "neq",
+          "value": "!="
+        },
+        {
+          "key": "gt",
+          "value": ">"
+        },
+        {
+          "key": "gteq",
+          "value": ">="
+        },
+        {
+          "key": "lt",
+          "value": "<"
+        },
+        {
+          "key": "lteq",
+          "value": "<="
+        },
+        {
+          "key": "like",
+          "value": "like"
+        },
+        {
+          "key": "notLike",
+          "value": "not like"
+        }
+      ],
       "extended": true,
       "caseOptions": true,
       "allowDates": true
