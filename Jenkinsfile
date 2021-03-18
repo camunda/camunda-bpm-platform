@@ -67,6 +67,8 @@ pipeline {
               } else {
                 eeMainProjectBranch = params.EE_DOWNSTREAM
               }
+
+              // JOB_NAME, e.g.: '7.15/cambpm-ce/cambpm-main/PR-1373'
               platformVersion = env.JOB_NAME.split('/')[0]
 
               if (cambpmWithLabels('webapp-integration', 'all-as', 'h2', 'websphere', 'weblogic', 'jbosseap', 'run', 'spring-boot', 'authorizations', 'e2e')) {
