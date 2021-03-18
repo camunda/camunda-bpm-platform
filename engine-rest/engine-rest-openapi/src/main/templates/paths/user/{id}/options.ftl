@@ -34,9 +34,9 @@
                        "summary": "GET `/user/peter`",
                        "value": {
                          "links":[
-                          {"method":"GET","href":"http://localhost:8080/camunda/api/engine/engine/default/user/peter/profile","rel":"self"},
-                          {"method":"DELETE","href":"http://localhost:8080/camunda/api/engine/engine/default/user/peter","rel":"delete"},
-                          {"method":"PUT","href":"http://localhost:8080/camunda/api/engine/engine/default/user/peter/profile","rel":"update"}
+                          {"method":"GET","href":"http://localhost:8080/engine-rest/user/peter/profile","rel":"self"},
+                          {"method":"DELETE","href":"http://localhost:8080/engine-rest/user/peter","rel":"delete"},
+                          {"method":"PUT","href":"http://localhost:8080/engine-rest/user/peter/profile","rel":"update"}
                           ]
                           }
                      }'] />
