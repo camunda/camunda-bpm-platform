@@ -19,7 +19,7 @@
 
   <properties>
     <version.spring.framework>5.2.8.RELEASE</version.spring.framework>
-    <version.spring-boot>2.4.2</version.spring-boot>
+    <version.spring-boot>2.4.3</version.spring-boot>
     <version.cxf>3.0.3</version.cxf>
     <version.resteasy>2.3.5.Final</version.resteasy>
     <version.resteasy3>3.14.0.Final</version.resteasy3>
@@ -44,7 +44,7 @@
     <version.wildfly>22.0.1.Final</version.wildfly>
     <version.wildfly.core>14.0.1.Final</version.wildfly.core>
 
-    <version.tomcat>9.0.41</version.tomcat>
+    <version.tomcat>9.0.43</version.tomcat>
 
     <version.arquillian>1.1.10.Final</version.arquillian>
     <version.shrinkwrap.resolvers>2.2.2</version.shrinkwrap.resolvers>
