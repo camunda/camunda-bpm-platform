@@ -13,7 +13,7 @@
     <#assign last = false >
     <#include "/lib/commons/user-query-params.ftl" >
 
-    <#assign sortBy = [ '"userId"', '"firstName"', '"lastName"', '"email"' ] >
+    <#assign sortByValues = [ '"userId"', '"firstName"', '"lastName"', '"email"' ] >
     <#include "/lib/commons/sort-params.ftl" >
 
     <#assign last = true >

@@ -9,7 +9,7 @@
               available operations that the currently authenticated user can perform on the /user resource.
               If the user can perform an operation or not may depend on various things, including the user's
               authorizations to interact with this resource and the internal configuration of the process
-              engine." />
+              engine. `OPTIONS /user/{id}` returns available interactions on a resource instance." />
 
   "parameters" : [
 
@@ -31,12 +31,12 @@
         last = true
         desc = "Request successful."
         examples = ['"example-1": {
-                       "summary": "GET `/user`",
+                       "summary": "GET `/user/peter`",
                        "value": {
                          "links":[
-                          {"method":"GET","href":"http://localhost:8080/camunda/api/engine/engine/default/user/peter/profile","rel":"self"},
-                          {"method":"DELETE","href":"http://localhost:8080/camunda/api/engine/engine/default/user/peter","rel":"delete"},
-                          {"method":"PUT","href":"http://localhost:8080/camunda/api/engine/engine/default/user/peter/profile","rel":"update"}
+                          {"method":"GET","href":"http://localhost:8080/engine-rest/user/peter/profile","rel":"self"},
+                          {"method":"DELETE","href":"http://localhost:8080/engine-rest/user/peter","rel":"delete"},
+                          {"method":"PUT","href":"http://localhost:8080/engine-rest/user/peter/profile","rel":"update"}
                           ]
                           }
                      }'] />
