@@ -68,9 +68,12 @@ pipeline {
                 eeMainProjectBranch = params.EE_DOWNSTREAM
               }
 
+              // JOB_NAME, e.g.: '7.15/cambpm-ce/cambpm-main/PR-1373'
+              platformVersion = env.JOB_NAME.split('/')[0]
+
               if (cambpmWithLabels('webapp-integration', 'all-as', 'h2', 'websphere', 'weblogic', 'jbosseap', 'run', 'spring-boot', 'authorizations', 'e2e')) {
                 cambpmTriggerDownstream(
-                  "cambpm-ee/" + eeMainProjectBranch,
+                  platformVersion + "/cambpm-ee/" + eeMainProjectBranch,
                   [string(name: 'UPSTREAM_PROJECT_NAME', value: env.JOB_NAME),
                   string(name: 'UPSTREAM_BUILD_NUMBER', value: env.BUILD_NUMBER)],
                   true, true, true
@@ -79,7 +82,7 @@ pipeline {
 
               if (cambpmWithLabels('all-db', 'cockroachdb', 'authorizations')) {
                 cambpmTriggerDownstream(
-                  "cambpm-ce/cambpm-sidetrack/${env.BRANCH_NAME}",
+                  platformVersion + "/cambpm-ce/cambpm-sidetrack/${env.BRANCH_NAME}",
                   [string(name: 'UPSTREAM_PROJECT_NAME', value: env.JOB_NAME),
                   string(name: 'UPSTREAM_BUILD_NUMBER', value: env.BUILD_NUMBER)]
                 )
@@ -87,7 +90,7 @@ pipeline {
 
               if (cambpmWithLabels('daily', 'default-build', 'rolling-update', 'migration', 'all-db', 'h2', 'db2', 'mysql', 'oracle', 'mariadb', 'sqlserver', 'postgresql')) {
                 cambpmTriggerDownstream(
-                  "cambpm-ce/cambpm-daily/${env.BRANCH_NAME}",
+                  platformVersion + "/cambpm-ce/cambpm-daily/${env.BRANCH_NAME}",
                   [string(name: 'UPSTREAM_PROJECT_NAME', value: env.JOB_NAME),
                   string(name: 'UPSTREAM_BUILD_NUMBER', value: env.BUILD_NUMBER)]
                 )
