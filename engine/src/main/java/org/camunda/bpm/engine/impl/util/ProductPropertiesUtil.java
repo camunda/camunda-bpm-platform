@@ -34,7 +34,9 @@ public class ProductPropertiesUtil {
    * @return the current version of the product (e.g. <code>7.15.0-SNAPSHOT</code>)
    */
   public static String getProductVersion() {
-    return INSTANCE.getProperty(VERSION_PROPERTY);
+    // in case the `product-info.properties` file is missing,
+    // try to get the product version from the manifest
+    return INSTANCE.getProperty(VERSION_PROPERTY, ProductPropertiesUtil.class.getPackage().getImplementationVersion());
   }
 
 }

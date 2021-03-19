@@ -1368,10 +1368,10 @@ public class TelemetryReporterTest {
 
     // then
     verify(0, postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH)));
-    String warnLogMessage = "Cannot send the telemetry task data. Some of the data is invalid. " +
-        "Please check the product name, version, edition and installation id.";
-    String debugLogMessage = String.format("Cannot send the telemetry task data. Some of the following product data is " +
-      "invalid: '%s' (name), '%s' (version), '%s' (edition), '%s' (UUIDv4 installation id). Please check it for errors.",
+    String warnLogMessage = "Cannot send the telemetry data. Some of the data is invalid. " +
+        "Set this logger to DEBUG/FINE to see more details.";
+    String debugLogMessage = String.format("Cannot send the telemetry task data. The following values must be " +
+        "non-empty Strings: '%s' (name), '%s' (version), '%s' (edition), '%s' (UUIDv4 installation id).",
       name,
       version,
       edition,

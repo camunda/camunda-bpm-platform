@@ -16,29 +16,32 @@
  */
 package org.camunda.bpm.engine.impl.util;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Properties;
 
-import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.commons.testing.ProcessEngineLoggingRule;
+import org.camunda.commons.testing.WatchLogger;
+import org.junit.Rule;
+import org.junit.Test;
 
-public class PropertiesUtil {
+public class PropertiesUtilTest {
 
-  protected static final EngineUtilLogger LOG = ProcessEngineLogger.UTIL_LOGGER;
+  @Rule
+  public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule();
 
-  /**
-   * Reads a <code>.properties</code> file from the classpath and provides a {@link Properties} object.
-   */
-  public static Properties getProperties(String propertiesFile) {
-    Properties productProperties = new Properties();
-    try (InputStream inputStream = ProductPropertiesUtil.class.getResourceAsStream(propertiesFile)) {
-      productProperties.load(inputStream);
-    } catch (IOException | NullPointerException e) {
-      // if `propertiesFile` is null, the file is missing, or an error occurs during reading
-      LOG.logMissingPropertiesFile(propertiesFile);
-    }
+  @Test
+  @WatchLogger(loggerNames = {"org.camunda.bpm.engine.util"}, level = "DEBUG")
+  public void shouldLogMissingFile() {
+    // given
+    String invalidFile = "/missingProps.properties";
 
-    return productProperties;
+    // when
+    PropertiesUtil.getProperties(invalidFile);
+
+    // then
+    String logMessage = String.format("Could not find the '%s' file on the classpath. " +
+        "If you have removed it, please restore it.", invalidFile);
+    assertThat(loggingRule.getFilteredLog(logMessage)).hasSize(1);
   }
 }

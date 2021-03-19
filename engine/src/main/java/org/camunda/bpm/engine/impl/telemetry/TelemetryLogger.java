@@ -115,10 +115,10 @@ public class TelemetryLogger extends ProcessEngineLogger {
   public void sendingTelemetryDataFails(Data productData) {
     Product product = productData.getProduct();
     String installationId = productData.getInstallation();
-    logWarn("017","Cannot send the telemetry task data. Some of the data is invalid. " +
-        "Please check the product name, version, edition and installation id.");
-    logDebug("018", "Cannot send the telemetry task data. Some of the following product data is invalid: " +
-        "'{}' (name), '{}' (version), '{}' (edition), '{}' (UUIDv4 installation id). Please check it for errors.",
+    logWarn("017","Cannot send the telemetry data. Some of the data is invalid. " +
+        "Set this logger to DEBUG/FINE to see more details.");
+    logDebug("018", "Cannot send the telemetry task data. The following values must be non-empty " +
+        "Strings: '{}' (name), '{}' (version), '{}' (edition), '{}' (UUIDv4 installation id).",
       product.getName(),
       product.getVersion(),
       product.getEdition(),

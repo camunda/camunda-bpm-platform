@@ -237,6 +237,6 @@ public class EngineUtilLogger extends ProcessEngineLogger {
 
   public void logMissingPropertiesFile(String file) {
     logWarn("032", "Could not find the '{}' file on the classpath. " +
-      "This file is used to determine the product version. If you have removed it, please restore it.", file);
+      "If you have removed it, please restore it.", file);
   }
 }
