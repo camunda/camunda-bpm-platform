@@ -27,12 +27,12 @@ import org.springframework.context.annotation.Configuration;
 public class PostProcessorConfiguration {
 
   @Bean
-  public SubscriptionPostProcessor subscriptionPostprocessor() {
+  public static SubscriptionPostProcessor subscriptionPostprocessor() {
     return new SubscriptionPostProcessor(SpringTopicSubscriptionImpl.class);
   }
 
   @Bean
-  public ClientPostProcessor clientPostProcessor() {
+  public static ClientPostProcessor clientPostProcessor() {
     return new ClientPostProcessor(ClientFactory.class);
   }
 

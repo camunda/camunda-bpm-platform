@@ -33,7 +33,7 @@ import org.springframework.core.io.Resource;
 public class PropertyPlaceholderConfiguration {
 
   @Bean
-  public PropertySourcesPlaceholderConfigurer propertyPlaceholderConfigurer() {
+  public static PropertySourcesPlaceholderConfigurer propertyPlaceholderConfigurer() {
     PropertySourcesPlaceholderConfigurer configurer = new PropertySourcesPlaceholderConfigurer();
     Resource location = new ClassPathResource("client.properties");
     configurer.setLocation(location);
