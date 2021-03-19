@@ -29,12 +29,12 @@ import org.springframework.context.annotation.Configuration;
 public class ClientAutoConfiguration {
 
   @Bean
-  public SubscriptionPostProcessor subscriptionPostprocessor() {
+  public static SubscriptionPostProcessor subscriptionPostprocessor() {
     return new SubscriptionPostProcessor(PropertiesAwareSpringTopicSubscription.class);
   }
 
   @Bean
-  public ClientPostProcessor clientPostProcessor() {
+  public static ClientPostProcessor clientPostProcessor() {
     return new ClientPostProcessor(PropertiesAwareClientFactory.class);
   }
 
