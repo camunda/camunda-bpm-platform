@@ -153,6 +153,7 @@ public class SpringTopicSubscriptionImpl
   public void closeInternally() {
     if (topicSubscription != null) {
       topicSubscription.close();
+      topicSubscription = null;
 
       String topicName = subscriptionConfiguration.getTopicName();
       LOG.closed(topicName);

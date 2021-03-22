@@ -39,11 +39,23 @@ public class AutoOpenFalseTest extends MockedTest {
     assertThat(subscription.isOpen()).isFalse();
     assertThat(subscription.isAutoOpen()).isFalse();
 
-    // when
+    // when opened initially
     subscription.open();
 
     // then
     assertThat(subscription.isAutoOpen()).isFalse();
+    assertThat(subscription.isOpen()).isTrue();
+
+    // when closed
+    subscription.close();
+
+    // then
+    assertThat(subscription.isOpen()).isFalse();
+
+    // when reopened
+    subscription.open();
+
+    // then
     assertThat(subscription.isOpen()).isTrue();
   }
 
