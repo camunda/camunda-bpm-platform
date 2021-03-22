@@ -66,8 +66,6 @@ public class GroupMembersResourceImpl extends AbstractIdentityResource implement
         .path(PATH)
         .build();
 
-    dto.addReflexiveLink(uri, HttpMethod.GET, "self");
-
     if (!identityService.isReadOnly() && isAuthorized(DELETE)) {
       dto.addReflexiveLink(uri, HttpMethod.DELETE, "delete");
     }
