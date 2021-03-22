@@ -34,10 +34,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *
  * <p>Heads-up: <ul><li>for attributes of type {@link String}, the string <strong>$null$</strong>
  * is reserved  and used as default value
- * <li>for attributes of type {@link Long}, the value <strong>-1</strong> is reserved and used as
+ * <li>for attributes of type {@link Long}, the value {@link Long#MIN_VALUE} is reserved and used as
  * default value
- * <li>for attributes of type {@link Integer}, the value <strong>-1</strong> is reserved and used as
- * default value
+ * <li>for attributes of type {@link Integer}, the value {@link Integer#MIN_VALUE} is reserved and
+ * used as default value
  */
 @Documented
 @Target(TYPE)
@@ -137,6 +137,7 @@ public @interface EnableExternalTaskClient {
 
   /**
    * Specifies the date format to de-/serialize date variables.
+   * The option defaults to <code>yyyy-MM-dd'T'HH:mm:ss.SSSZ</code>
    *
    * @return dateFormat date format to be used
    */

@@ -32,7 +32,7 @@ import java.lang.annotation.Target;
  *
  * <p>Heads-up: <ul><li>for attributes of type {@link String}, the string <strong>$null$</strong>
  * is reserved and used as default value
- * <li>for attributes of type {@link Long}, the value <strong>-1</strong> is reserved and used as
+ * <li>for attributes of type {@link Long}, the value {@link Long#MIN_VALUE} is reserved and used as
  * default value
  */
 @Documented
@@ -45,16 +45,16 @@ public @interface ExternalTaskSubscription {
 
   /**
    * @return autoOpen <ul>
-   * <li>{@code true} when the topic subscription is automatically released for execution
-   * <li>{@code false} when you need to call {@link SpringTopicSubscription#open()} to release
-   * the topic for execution
+   * <li>{@code true}: the client immediately starts to fetch for External Tasks
+   * <li>{@code false}: topic subscription can be opened after application start by calling
+   * {@link SpringTopicSubscription#open()}
    */
   boolean autoOpen() default true;
 
   /**
    * Alias for {@link #value()}.
    *
-   * @return topicName the client subscribes to
+   * @return topicName of the Service Task in the BPMN process model the client subscribes to
    */
   @AliasFor("value")
   String topicName() default STRING_NULL_VALUE;
@@ -62,7 +62,7 @@ public @interface ExternalTaskSubscription {
   /**
    * Alias for {@link #topicName()}.
    *
-   * @return topicName the client subscribes to
+   * @return topicName of the Service Task in the BPMN process model the client subscribes to
    */
   @AliasFor("topicName")
   String value() default STRING_NULL_VALUE;
@@ -78,7 +78,8 @@ public @interface ExternalTaskSubscription {
   long lockDuration() default LONG_NULL_VALUE;
 
   /**
-   * @return variableNames of variables which are supposed to be retrieved
+   * @return variableNames of variables which are supposed to be retrieved. All variables are
+   * retrieved by default.
    */
   String[] variableNames() default {STRING_NULL_VALUE};
 
