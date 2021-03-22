@@ -823,6 +823,12 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
 
   @Override
+  public TaskQuery caseInstanceVariableValueNotLike(String variableName, String variableValue) {
+    addVariable(variableName, variableValue, QueryOperator.NOT_LIKE, false, false);
+    return this;
+  }
+
+  @Override
   public TaskQuery caseInstanceVariableValueGreaterThan(String variableName, Object variableValue) {
     addVariable(variableName, variableValue, QueryOperator.GREATER_THAN, false, false);
     return this;

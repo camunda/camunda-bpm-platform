@@ -4142,6 +4142,25 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   @Test
+  public void testQueryByNullCaseInstanceVariableValueNotLike() {
+    String caseDefinitionId = getCaseDefinitionId();
+
+    caseService
+            .withCaseDefinition(caseDefinitionId)
+            .setVariable("aNullValue", null)
+            .create();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    try {
+      query.caseInstanceVariableValueNotLike("aNullValue", null).list();
+      fail();
+    } catch (ProcessEngineException e) {}
+
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
   public void testQueryByStringCaseInstanceVariableValueLike() {
     String caseDefinitionId = getCaseDefinitionId();
 
@@ -4188,6 +4207,85 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
     query = taskService.createTaskQuery().matchVariableValuesIgnoreCase().caseInstanceVariableValueLike("aStringVariable", "aString%".toLowerCase());
 
     verifyQueryResults(query, 1);
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
+  public void testQueryByStringCaseInstanceVariableValueNotLike() {
+    String caseDefinitionId = getCaseDefinitionId();
+
+    caseService
+            .withCaseDefinition(caseDefinitionId)
+            .setVariable("aStringValue", "abc")
+            .create();
+
+    TaskQuery query = taskService.createTaskQuery();
+    query.caseInstanceVariableValueNotLike("aStringValue", "abc%");
+    verifyQueryResults(query, 0);
+
+    query = taskService.createTaskQuery();
+    query.caseInstanceVariableValueNotLike("aStringValue", "%bc");
+    verifyQueryResults(query, 0);
+
+    query = taskService.createTaskQuery();
+    query.caseInstanceVariableValueNotLike("aStringValue", "%b%");
+    verifyQueryResults(query, 0);
+
+    query = taskService.createTaskQuery();
+    query.caseInstanceVariableValueNotLike("aStringValue", "abx%");
+    verifyQueryResults(query, 1);
+
+    query = taskService.createTaskQuery();
+    query.caseInstanceVariableValueNotLike("aStringValue", "%be");
+    verifyQueryResults(query, 1);
+
+    query = taskService.createTaskQuery();
+    query.caseInstanceVariableValueNotLike("aStringValue", "abd");
+    verifyQueryResults(query, 1);
+
+    query = taskService.createTaskQuery();
+    query.caseInstanceVariableValueNotLike("nonExistingVar", "%b%");
+    verifyQueryResults(query, 0);
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  @Test
+  public void testQueryByStringCaseInstanceVariableValueNotLikeIgnoreCase() {
+    String caseDefinitionId = getCaseDefinitionId();
+
+    caseService
+            .withCaseDefinition(caseDefinitionId)
+            .setVariable("aStringVariable", "aStringValue")
+            .create();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    query.caseInstanceVariableValueNotLike("aStringVariable", "aString%".toLowerCase());
+    verifyQueryResults(query, 1);
+
+    query = taskService.createTaskQuery().matchVariableValuesIgnoreCase().caseInstanceVariableValueNotLike("aStringVariable", "aString%".toLowerCase());
+    verifyQueryResults(query, 0);
+
+    query = taskService.createTaskQuery().matchVariableValuesIgnoreCase().caseInstanceVariableValueNotLike("aStringVariable", "%ringValue".toLowerCase());
+    verifyQueryResults(query, 0);
+
+    query = taskService.createTaskQuery().matchVariableValuesIgnoreCase().caseInstanceVariableValueNotLike("aStringVariable", "%ngVal%".toLowerCase());
+    verifyQueryResults(query, 0);
+
+    query = taskService.createTaskQuery().matchVariableValuesIgnoreCase().caseInstanceVariableValueNotLike("aStringVariable", "aStrong%".toLowerCase());
+    verifyQueryResults(query, 1);
+
+    query = taskService.createTaskQuery().matchVariableValuesIgnoreCase().caseInstanceVariableValueNotLike("aStringVariable", "%Strong".toLowerCase());
+    verifyQueryResults(query, 1);
+
+    query = taskService.createTaskQuery().matchVariableValuesIgnoreCase().caseInstanceVariableValueNotLike("aStringVariable", "%ngVar%".toLowerCase());
+    verifyQueryResults(query, 1);
+
+    query = taskService.createTaskQuery().matchVariableValuesIgnoreCase().caseInstanceVariableValueNotLike("aStringVariable", "stringVal".toLowerCase());
+    verifyQueryResults(query, 1);
+
+    query = taskService.createTaskQuery().matchVariableValuesIgnoreCase().caseInstanceVariableValueNotLike("nonExistingVar", "%String%".toLowerCase());
+    verifyQueryResults(query, 0);
   }
 
   @Deployment

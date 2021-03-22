@@ -608,6 +608,20 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   TaskQuery caseInstanceVariableValueLike(String variableName, String variableValue);
 
   /**
+   * Only select tasks which are part of a case instance that have a variable value
+   * not like the given value.
+   *
+   * This be used on string variables only.
+   *
+   * @param name variable name, cannot be null.
+   *
+   * @param value variable value. The string can include the
+   * wildcard character '%' to express like-strategy:
+   * starts with (string%), ends with (%string) or contains (%string%).
+   */
+  TaskQuery caseInstanceVariableValueNotLike(String variableName, String variableValue);
+
+  /**
    * Only select tasks which are part of a case instance that have a variable
    * with the given name and a variable value greater than the passed value.
    *

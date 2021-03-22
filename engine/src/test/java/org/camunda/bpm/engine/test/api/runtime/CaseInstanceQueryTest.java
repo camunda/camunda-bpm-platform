@@ -1412,6 +1412,50 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTest {
   }
 
   @Test
+  public void testQueryByNullVariableValueNotLike() {
+    caseService
+            .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
+            .setVariable("aNullValue", null)
+            .create();
+
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery();
+
+    try {
+      query.variableValueNotLike("aNullValue", null).list();
+      fail();
+    } catch (ProcessEngineException e) {}
+
+  }
+
+  @Test
+  public void testQueryByStringVariableValueNotLike() {
+    caseService
+            .withCaseDefinitionByKey(CASE_DEFINITION_KEY)
+            .setVariable("aStringValue", "abc")
+            .create();
+
+    CaseInstanceQuery query = caseService.createCaseInstanceQuery();
+    query.variableValueNotLike("aStringValue", "abc%");
+    verifyQueryResults(query, 0);
+
+    query = caseService.createCaseInstanceQuery();
+    query.variableValueNotLike("aStringValue", "abd%");
+    verifyQueryResults(query, 1);
+
+    query = caseService.createCaseInstanceQuery();
+    query.variableValueNotLike("aStringValue", "%bd");
+    verifyQueryResults(query, 1);
+
+    query = caseService.createCaseInstanceQuery();
+    query.variableValueNotLike("aStringValue", "%d%");
+    verifyQueryResults(query, 1);
+
+    query = caseService.createCaseInstanceQuery();
+    query.variableValueNotLike("nonExistentValue", "%abc%");
+    verifyQueryResults(query, 0);
+  }
+
+  @Test
   public void testQuerySorting() {
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
