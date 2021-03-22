@@ -234,4 +234,9 @@ public class EngineUtilLogger extends ProcessEngineLogger {
         + "This indicates that this is not supported by your JAXP implementation: {}",
         e.getMessage());
   }
+
+  public void logMissingPropertiesFile(String file) {
+    logWarn("032", "Could not find the '{}' file on the classpath. " +
+      "If you have removed it, please restore it.", file);
+  }
 }

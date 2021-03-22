@@ -22,6 +22,7 @@ import static org.camunda.bpm.engine.impl.util.ProcessEngineDetails.EDITION_COMM
 import static org.camunda.bpm.engine.impl.util.ProcessEngineDetails.EDITION_ENTERPRISE;
 
 import org.camunda.bpm.engine.impl.util.ProcessEngineDetails;
+import org.camunda.bpm.engine.test.util.TestconfigProperties;
 import org.junit.Test;
 
 public class ProcessEngineDetailsTest {
@@ -146,5 +147,17 @@ public class ProcessEngineDetailsTest {
     // then
     assertThat(engineInfo.getVersion()).isEqualTo("7.14.1-ee");
     assertThat(engineInfo.getEdition()).isEqualTo(EDITION_ENTERPRISE);
+  }
+
+  @Test
+  public void shouldAssertCurrentProcessEngineVersionFromPropertiesFile() {
+    // when
+    // the version is not available from the package
+    ProcessEngineDetails engineInfo = parseProcessEngineVersion(false);
+
+    // then
+    // the version is read from the product-info.properties file
+    assertThat(engineInfo.getVersion()).isEqualTo(TestconfigProperties.getEngineVersion());
+    assertThat(engineInfo.getEdition()).isEqualTo(EDITION_COMMUNITY);
   }
 }

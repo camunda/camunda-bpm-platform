@@ -104,11 +104,15 @@ public class ParseUtil {
     }
   }
 
-  public static ProcessEngineDetails parseProcessEngineVersion(String packageImplementationVersion, boolean trimSuffixEE) {
-    String version = packageImplementationVersion;
+  public static ProcessEngineDetails parseProcessEngineVersion(boolean trimSuffixEE) {
+    String version = ProductPropertiesUtil.getProductVersion();
+    return parseProcessEngineVersion(version, trimSuffixEE);
+  }
+
+  public static ProcessEngineDetails parseProcessEngineVersion(String version, boolean trimSuffixEE) {
     String edition = ProcessEngineDetails.EDITION_COMMUNITY;
 
-    if (version != null && version.contains("-ee")) {
+    if (version.contains("-ee")) {
       edition = ProcessEngineDetails.EDITION_ENTERPRISE;
       if (trimSuffixEE) {
         version = version.replace("-ee", ""); // trim `-ee` suffix
