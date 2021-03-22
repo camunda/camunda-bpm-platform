@@ -162,7 +162,7 @@ public class TelemetryConnectPluginTest extends AbstractFoxPlatformIntegrationTe
 
     internals.setWebapps(Collections.emptySet());
     Product product = new Product("Runtime", "7.14.0", "special", internals);
-    Data data = new Data("f5b19e2e-b49a-11ea-b3de-0242ac130004", product);
+    Data data = new Data("cb07ce31-c8e3-4f5f-94c2-1b28175c2022", product);
     return data;
   }
 
