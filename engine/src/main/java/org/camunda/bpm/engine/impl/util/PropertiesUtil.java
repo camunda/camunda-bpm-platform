@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.util;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
