@@ -51,6 +51,7 @@ import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.history.DefaultHistoryRemovalTimeProvider;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInputInstanceEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionOutputInstanceEntity;
@@ -60,6 +61,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
 import org.camunda.bpm.engine.runtime.Job;
@@ -332,7 +334,12 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
     assertThat(historicActivityInstance.getRemovalTime(), is(removalTime));
   }
 
+  /**
+   * Test excluded on MariaDB, MySQL and CRDB for now since it is failing randomly there.
+   * See CAM-13291 for details.
+   */
   @Test
+  @RequiredDatabase(excludes = {DbSqlSessionFactory.MARIADB, DbSqlSessionFactory.MYSQL, DbSqlSessionFactory.CRDB})
   public void shouldResolveHistoricActivityInstanceInConcurrentEnvironment() {
     // given
     int degreeOfParallelism = 30;
