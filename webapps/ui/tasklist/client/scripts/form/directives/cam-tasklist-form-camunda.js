@@ -16,7 +16,7 @@
  */
 
 'use strict';
-const createForm = require('@bpmn-io/form-js').createForm;
+const createForm = require('@bpmn-io/form-js-viewer').createForm;
 
 var angular = require('../../../../../../camunda-commons-ui/vendor/angular');
 

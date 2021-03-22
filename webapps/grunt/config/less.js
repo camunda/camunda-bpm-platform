@@ -44,6 +44,7 @@ module.exports = function(config, lessConfig, pathConfig) {
     '<%= pkg.gruntConfig.commonsUiDir %>/resources/less',
     '<%= pkg.gruntConfig.commonsUiDir %>/resources/css',
     'node_modules',
+    eePrefix + 'node_modules/',
     eePrefix + 'ui/common/styles',
     eePrefix + 'ui/' + pathConfig.appName + '/client/styles',
     eePrefix + 'ui/' + pathConfig.appName + '/client/scripts'

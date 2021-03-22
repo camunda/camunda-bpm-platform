@@ -36,14 +36,19 @@ module.exports = [
       template: template,
 
       link: function($scope, $element) {
-        const json = JSON.parse($scope.source);
+        $scope.formValid = true;
 
-        const form = createForm({
-          container: $element.find('.camundaForm')[0],
-          schema: json,
-          data: {}
-        });
-        form.setProperty('readOnly', true);
+        try {
+          const json = JSON.parse($scope.source);
+          const form = createForm({
+            container: $element.find('.camundaForm')[0],
+            schema: json,
+            data: {}
+          });
+          form.setProperty('readOnly', true);
+        } catch (e) {
+          $scope.formValid = false;
+        }
       }
     };
   }
