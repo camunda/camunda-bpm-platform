@@ -281,6 +281,8 @@ public class HistoricCaseInstanceTest extends CmmnTest {
     assertCount(0, historicQuery().variableValueEquals("foo", "lol"));
     assertCount(1, historicQuery().variableValueLike("foo", "%a%"));
     assertCount(0, historicQuery().variableValueLike("foo", "%lol%"));
+    assertCount(0, historicQuery().variableValueNotLike("foo", "%a%"));
+    assertCount(1, historicQuery().variableValueNotLike("foo", "%lol%"));
 
     assertCount(1, historicQuery().variableValueEquals("number", 10));
     assertCount(0, historicQuery().variableValueNotEquals("number", 10));

@@ -82,8 +82,8 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
   protected List<String> testCandidateGroups = new ArrayList<>();
   protected String[] testInstances = new String[] {"x", "y", "z"};
 
-  protected String[] variableNames = new String[] {"a", "b", "c", "d", "e", "f", "g"};
-  protected Object[] variableValues = new Object[] {1, 2, "3", "4", "5", 6, 7};
+  protected String[] variableNames = new String[] {"a", "b", "c", "d", "e", "f", "g", "h", "i"};
+  protected Object[] variableValues = new Object[] {1, 2, "3", "4", "5", 6, 7, "8", "9"};
   protected QueryOperator[] variableOperators = new QueryOperator[] {
       QueryOperator.EQUALS,
       QueryOperator.GREATER_THAN_OR_EQUAL,
@@ -91,10 +91,12 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
       QueryOperator.LIKE,
       QueryOperator.NOT_LIKE,
       QueryOperator.NOT_EQUALS,
-      QueryOperator.LESS_THAN_OR_EQUAL
+      QueryOperator.LESS_THAN_OR_EQUAL,
+      QueryOperator.LIKE,
+      QueryOperator.NOT_LIKE
   };
-  protected boolean[] isTaskVariable = new boolean[] {true, true, false, false, false, false, false};
-  protected boolean[] isProcessVariable = new boolean[] {false, false, true, true, true, false, false};
+  protected boolean[] isTaskVariable = new boolean[] {true, true, false, false, false, false, false, false, false};
+  protected boolean[] isProcessVariable = new boolean[] {false, false, true, true, true, false, false, false, false};
   protected User testUser;
   protected Group testGroup;
 
@@ -220,6 +222,8 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     query.processVariableValueNotLike(variableNames[4], (String) variableValues[4]);
     query.caseInstanceVariableValueNotEquals(variableNames[5], variableValues[5]);
     query.caseInstanceVariableValueLessThanOrEquals(variableNames[6], variableValues[6]);
+    query.caseInstanceVariableValueLike(variableNames[7], (String) variableValues[7]);
+    query.caseInstanceVariableValueNotLike(variableNames[8], (String) variableValues[8]);
 
     query.dueDate(testDate);
     query.dueDateExpression(testString);
@@ -1662,6 +1666,20 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     tasks = filterService.list(filter.getId(), extendingQuery);
     assertTrue(tasks.contains(taskCamelCase));
     assertTrue(tasks.contains(taskLowerCase));
+    assertFalse(tasks.contains(taskWithNoVariable));
+
+    // not like case-sensitive for comparison
+    extendingQuery = taskService.createTaskQuery().caseInstanceVariableValueNotLike(variableName, "somevariable%");
+    tasks = filterService.list(filter.getId(), extendingQuery);
+    assertTrue(tasks.contains(taskCamelCase));
+    assertFalse(tasks.contains(taskLowerCase));
+    assertFalse(tasks.contains(taskWithNoVariable));
+
+    // not like case-insensitive
+    extendingQuery = taskService.createTaskQuery().matchVariableValuesIgnoreCase().caseInstanceVariableValueNotLike(variableName, "somevariable%");
+    tasks = filterService.list(filter.getId(), extendingQuery);
+    assertFalse(tasks.contains(taskCamelCase));
+    assertFalse(tasks.contains(taskLowerCase));
     assertFalse(tasks.contains(taskWithNoVariable));
 
     // variable name case-insensitive

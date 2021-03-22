@@ -16,11 +16,11 @@
  */
 package org.camunda.bpm.engine.runtime;
 
-import java.io.Serializable;
-
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.query.Query;
+
+import java.io.Serializable;
 
 /**
  * @author Roman Smirnov
@@ -227,6 +227,18 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
    *
    */
   CaseInstanceQuery variableValueLike(String name, String value);
+
+  /**
+   * Only select case instances which have a global variable
+   * with the given name and not matching the given value.
+   * The syntax is that of SQL: for example usage: valueNotLike(%value%)
+   * @param name the name of the variable
+   * @param value the value of the variable, it can include the wildcard character '%'
+   *              to express like-strategy: starts with (string%), ends with (%string),
+   *              contains (%string%)
+   * @throws NotValidException if the name or value is null or a null-value or a boolean-value is used
+   */
+  CaseInstanceQuery variableValueNotLike(String name, String value);
 
   /** Only select case instances with one of the given tenant ids. */
   CaseInstanceQuery tenantIdIn(String... tenantIds);

@@ -101,6 +101,12 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?,?>, U> extends
   }
 
   @SuppressWarnings("unchecked")
+  public T variableValueNotLike(String name, String value) {
+    addVariable(name, value, QueryOperator.NOT_LIKE, true);
+    return (T)this;
+  }
+
+  @SuppressWarnings("unchecked")
   public T matchVariableNamesIgnoreCase() {
     this.variableNamesIgnoreCase = true;
     for (QueryVariableValue variable : this.queryVariableValues) {
@@ -123,16 +129,20 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?,?>, U> extends
     if(value == null || isBoolean(value)) {
       // Null-values and booleans can only be used in EQUALS and NOT_EQUALS
       switch(operator) {
-      case GREATER_THAN:
-        throw new NotValidException("Booleans and null cannot be used in 'greater than' condition");
-      case LESS_THAN:
-        throw new NotValidException("Booleans and null cannot be used in 'less than' condition");
-      case GREATER_THAN_OR_EQUAL:
-        throw new NotValidException("Booleans and null cannot be used in 'greater than or equal' condition");
-      case LESS_THAN_OR_EQUAL:
-        throw new NotValidException("Booleans and null cannot be used in 'less than or equal' condition");
-      case LIKE:
-        throw new NotValidException("Booleans and null cannot be used in 'like' condition");
+        case GREATER_THAN:
+          throw new NotValidException("Booleans and null cannot be used in 'greater than' condition");
+        case LESS_THAN:
+          throw new NotValidException("Booleans and null cannot be used in 'less than' condition");
+        case GREATER_THAN_OR_EQUAL:
+          throw new NotValidException("Booleans and null cannot be used in 'greater than or equal' condition");
+        case LESS_THAN_OR_EQUAL:
+          throw new NotValidException("Booleans and null cannot be used in 'less than or equal' condition");
+        case LIKE:
+          throw new NotValidException("Booleans and null cannot be used in 'like' condition");
+        case NOT_LIKE:
+          throw new NotValidException("Booleans and null cannot be used in 'not like' condition");
+        default:
+          break;
       }
     }
 
