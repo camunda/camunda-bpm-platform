@@ -63,7 +63,7 @@ pipeline {
               if (env.BRANCH_NAME == cambpmDefaultBranch()) {
                 // CE master triggers EE master
                 // otherwise CE PR branch triggers EE PR branch
-                eeMainProjectBranch = "cambpm-ee-main/pipeline-master"
+                eeMainProjectBranch = "cambpm-ee-main/master"
               } else {
                 eeMainProjectBranch = params.EE_DOWNSTREAM
               }
