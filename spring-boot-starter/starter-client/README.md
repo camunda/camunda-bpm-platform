@@ -1,65 +1,64 @@
 # Camunda External Task Client as Spring Boot Starter
 
-This project provides a Spring Boot starter that allows you to implement an external task worker for Camunda. It uses the Camunda REST API to fetch, lock and complete external service tasks. 
-It is based on the [Camunda External Task Client](../../clients/java)
+This project provides a Spring Boot Starter that allows you to implement an External Task Worker for Camunda. It uses the Camunda REST API to fetch, lock, and complete External Service Tasks. It is based on the [Java External Task Client](../../clients/java).
 
 ## Dependency
 
 You need this dependency to get started:
 
 ```xml
-<dependencies>
-  ...
-  <dependency>
-    <groupId>org.camunda.bpm.springboot</groupId>
-    <artifactId>camunda-bpm-spring-boot-starter-external-task-client</artifactId>
-    <version>...</version>
-  </dependency>
-  ...
-</dependencies>
+<dependency>
+  <groupId>org.camunda.bpm.springboot</groupId>
+  <artifactId>camunda-bpm-spring-boot-starter-external-task-client</artifactId>
+  <version>...</version>
+</dependency>
 ```
 
 ## Configuration
 
-You can configure the Camunda endpoint and other properties in the `application.yml` file:
+You can configure the Camunda Platform Runtime REST API endpoint and other properties in the `application.yml` file:
 
 ```yaml
-camunda:
-  bpm:
-    client:
-      base-url: http://localhost:8080/engine-rest
+org.camunda.bpm.client:
+  base-url: http://localhost:8080/engine-rest
+  subscriptions:
+    creditScoreChecker:
+        process-definition-key: loan_process
+        include-extension-properties: true
+        variable-names: defaultScore
 ```
 
-## External Task Subscription
+## Topic Subscription
 
-  ```java
-  @ExternalTaskSubscription("invoiceCreator")
-  @Component
-  public class InvoiceCreator implements ExternalTaskHandler {
-      void execute(ExternalTask externalTask, ExternalTaskService externalTaskService);
+```java
+@Configuraton
+@ExternalTaskSubscription("creditScoreChecker")
+public class CreditScoreCheckerHandler implements ExternalTaskHandler {
+
+  @Override
+  public void execute(ExternalTask externalTask, 
+                      ExternalTaskService externalTaskService) {
+    // add your business logic here
   }
-  ```
+
+}
+```
 
 ## Use Spring (not Spring Boot)
 
 You can also use the basic Spring integration without the Spring Boot Starter:
 
 ```xml
-<dependencies>
-  ...
-  <dependency>
-    <groupId>org.camunda.bpm</groupId>
-    <artifactId>camunda-external-task-client-spring</artifactId>
-    <version>...</version>
-  </dependency>
-  ...
-</dependencies>
+<dependency>
+  <groupId>org.camunda.bpm</groupId>
+  <artifactId>camunda-external-task-client-spring</artifactId>
+  <version>...</version>
+</dependency>
 ```
 
 ### Configuration
 
-In order to enable the external task subscriptions you have to use the `EnableExternalTaskClient` annotation. 
-You can configure the Camunda endpoint and other properties there.
+To enable the External Task Subscriptions and bootstrap the Client, add the `EnableExternalTaskClient` annotation and configure the REST API endpoint and other configuration options.
 
 ```java
 @Configuration
@@ -67,3 +66,7 @@ You can configure the Camunda endpoint and other properties there.
 public class SimpleConfiguration {
 }
 ```
+
+## Credits
+
+The Camunda External Task Client Spring Boot Starter project used to be a community extension initially created by [Oliver Steinhauer](https://github.com/osteinhauer).
