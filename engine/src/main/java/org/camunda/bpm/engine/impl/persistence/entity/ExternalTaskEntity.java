@@ -368,7 +368,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity,
 
     ensureVariablesSet(associatedExecution, variables, localVariables);
 
-    if(evaluateThrowBpmnError(associatedExecution)) {
+    if(evaluateThrowBpmnError(associatedExecution, false)) {
       return;
     }
 
@@ -401,7 +401,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity,
       setErrorDetails(errorDetails);
     }
 
-    if(evaluateThrowBpmnError(associatedExecution)) {
+    if(evaluateThrowBpmnError(associatedExecution, true)) {
       return;
     }
 
@@ -505,17 +505,29 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity,
     }
   }
 
-  protected boolean evaluateThrowBpmnError(ExecutionEntity execution) {
+  protected boolean evaluateThrowBpmnError(ExecutionEntity execution, boolean continueOnException) {
     List<CamundaErrorEventDefinition> camundaErrorEventDefinitions = (List<CamundaErrorEventDefinition>) execution.getActivity().getProperty(BpmnProperties.CAMUNDA_ERROR_EVENT_DEFINITION.getName());
     if (camundaErrorEventDefinitions != null && !camundaErrorEventDefinitions.isEmpty()) {
       for (CamundaErrorEventDefinition camundaErrorEventDefinition : camundaErrorEventDefinitions) {
-        if (camundaErrorEventDefinition.getExpression() != null && Boolean.TRUE.equals(camundaErrorEventDefinition.getExpression().getValue(getExecution()))) {
+        if (errorEventDefinitionMatches(camundaErrorEventDefinition, continueOnException)) {
           bpmnError(camundaErrorEventDefinition.getErrorCode(), errorMessage, null);
           return true;
         }
       }
     }
     return false;
+  }
+
+  protected boolean errorEventDefinitionMatches(CamundaErrorEventDefinition camundaErrorEventDefinition, boolean continueOnException) {
+    try {
+      return camundaErrorEventDefinition.getExpression() != null && Boolean.TRUE.equals(camundaErrorEventDefinition.getExpression().getValue(getExecution()));
+    } catch (Exception exception) {
+      if (continueOnException) {
+        LOG.errorEventDefinitionEvaluationException(id, camundaErrorEventDefinition, exception);
+        return false;
+      }
+      throw exception;
+    }
   }
 
   @Override

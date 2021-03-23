@@ -194,6 +194,9 @@ public interface ExternalTaskService {
    * <p>If <code>retries</code> is 0, an incident with the given error message is created. The incident gets resolved,
    * once the number of retries is increased again.</p>
    *
+   * <p>Exceptions raised in evaluating expressions of error event definitions attached to the task will be ignored by this method
+   * and the event definitions considered as not-matching.</p>
+   *
    * @param externalTaskId the id of the external task to report a failure for
    * @param workerId the id of the worker that reports the failure
    * @param errorMessage short error message related to this failure. This message can be retrieved via
@@ -220,6 +223,9 @@ public interface ExternalTaskService {
    *
    * <p>If <code>retries</code> is 0, an incident with the given error message is created. The incident gets resolved,
    * once the number of retries is increased again.</p>
+   *
+   * <p>Exceptions raised in evaluating expressions of error event definitions attached to the task will be ignored by this method
+   * and the event definitions considered as not-matching.</p>
    *
    * @param externalTaskId the id of the external task to report a failure for
    * @param workerId the id of the worker that reports the failure
@@ -249,7 +255,10 @@ public interface ExternalTaskService {
    *
    * <p>If <code>retries</code> is 0, an incident with the given error message is created. The incident gets resolved,
    * once the number of retries is increased again.</p>
-   * 
+   *
+   * <p>Exceptions raised in evaluating expressions of error event definitions attached to the task will be ignored by this method
+   * and the event definitions considered as not-matching.</p>
+   *
    * Variables passed with the <code>variables</code> or <code>localVariables</code> parameter will be set before any
    * output mapping is performed.
    *

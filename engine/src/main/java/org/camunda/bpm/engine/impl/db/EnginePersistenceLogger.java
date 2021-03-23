@@ -30,6 +30,7 @@ import org.camunda.bpm.engine.SuspendedEntityInteractionException;
 import org.camunda.bpm.engine.WrongDbException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.bpmn.parser.CamundaErrorEventDefinition;
 import org.camunda.bpm.engine.impl.db.entitymanager.cache.CachedDbEntity;
 import org.camunda.bpm.engine.impl.db.entitymanager.cache.DbEntityState;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
@@ -837,11 +838,16 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
         "Error while fetching the telemetry initial message status property from the database: {}", exception.getMessage());
   }
 
-	
+
   public void logTaskWithoutExecution(String taskId) {
     logDebug("108",
       "Execution of external task {} is null. This indicates that the task was concurrently completed or deleted. "
       + "It is not returned by the current fetch and lock command.",
       taskId);
+  }
+
+  public void errorEventDefinitionEvaluationException(String taskId, CamundaErrorEventDefinition errorEventDefinition, Exception exception) {
+    logDebug("109", "Evaluation of error event definition's expression {} on external task {} failed and will be considered as not-fulfilled. "
+        + "Received exception: {}", errorEventDefinition.getExpression(), taskId, exception.getMessage());
   }
 }
