@@ -49,6 +49,14 @@
         desc = "Request successful." />
 
     <@lib.response
+        code = "400"
+        dto = "ExceptionDto"
+        desc = "Returned if the <code>escalationCode</code> is not provided in
+                the request. See the
+                [Introduction](${docsUrl}/reference/rest/overview/#error-handling)
+                for the error response format." />
+
+    <@lib.response
         code = "403"
         dto = "AuthorizationExceptionDto"
         desc = "If the authenticated user is unauthorized to update the process instance. See the
@@ -59,8 +67,7 @@
         code = "404"
         dto = "ExceptionDto"
         last = true
-        desc = "Returned if the task does not exist or <code>errorCode</code> is not presented in
-                the request. See the
+        desc = "Returned if the task does not exist. See the
                 [Introduction](${docsUrl}/reference/rest/overview/#error-handling)
                 for the error response format." />
 
