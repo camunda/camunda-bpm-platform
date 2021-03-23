@@ -2618,8 +2618,30 @@ public class TaskServiceTest {
 
     // when/then
     assertThatThrownBy(() -> taskService.handleEscalation("non-existing", ESCALATION_CODE))
-      .isInstanceOf(NullValueException.class)
+      .isInstanceOf(NotFoundException.class)
       .hasMessageContaining("Cannot find task with id non-existing: task is null");
+  }
+
+  @Test
+  public void testHandleEscalationWithoutEscalationCode() {
+    // given
+    BpmnModelInstance model = Bpmn.createExecutableProcess(PROCESS_KEY).startEvent()
+      .userTask(USER_TASK_THROW_ESCALATION).boundaryEvent("catch-escalation").escalation(ESCALATION_CODE)
+      .userTask(USER_TASK_AFTER_CATCH).endEvent().moveToActivity(USER_TASK_THROW_ESCALATION)
+      .userTask(USER_TASK_AFTER_THROW).endEvent().done();
+    testRule.deploy(model);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals(USER_TASK_THROW_ESCALATION, task.getTaskDefinitionKey());
+
+    // when/then
+    assertThatThrownBy(() -> taskService.handleEscalation(task.getId(), ""))
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("escalationCode is empty");
+
+    assertThatThrownBy(() -> taskService.handleEscalation(task.getId(), null))
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("escalationCode is null");
   }
 
   @Test

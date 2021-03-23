@@ -16,11 +16,14 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 import java.util.Map;
 
+import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -49,8 +52,8 @@ public class HandleTaskEscalationCmd implements Command<Void>, Serializable{
   }
 
   protected void validateInput() {
-    ensureNotNull("taskId", taskId);
-    ensureNotNull("escalationCode", escalationCode);
+    ensureNotEmpty(BadUserRequestException.class,"taskId", taskId);
+    ensureNotEmpty(BadUserRequestException.class,"escalationCode", escalationCode);
   }
 
   @Override
@@ -58,7 +61,7 @@ public class HandleTaskEscalationCmd implements Command<Void>, Serializable{
     validateInput();
 
     TaskEntity task = commandContext.getTaskManager().findTaskById(taskId);
-    ensureNotNull("Cannot find task with id " + taskId, "task", task);
+    ensureNotNull(NotFoundException.class,"Cannot find task with id " + taskId, "task", task);
 
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkTaskWork(task);
