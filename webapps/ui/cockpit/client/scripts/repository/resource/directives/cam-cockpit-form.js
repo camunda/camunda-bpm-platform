@@ -36,7 +36,7 @@ module.exports = [
       template: template,
 
       link: function($scope, $element) {
-        $scope.formValid = true;
+        $scope.error = null;
 
         try {
           const json = JSON.parse($scope.source);
@@ -47,7 +47,7 @@ module.exports = [
           });
           form.setProperty('readOnly', true);
         } catch (e) {
-          $scope.formValid = false;
+          $scope.error = e;
         }
       }
     };
