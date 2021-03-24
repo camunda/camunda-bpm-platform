@@ -313,16 +313,12 @@ public class GroupRestServiceInteractionTest extends AbstractRestServiceTest {
       .expect().statusCode(Status.OK.getStatusCode())
 
       .body("links[0].href", equalTo(fullMembersUrl))
-      .body("links[0].method", equalTo(HttpMethod.GET))
-      .body("links[0].rel", equalTo("self"))
+      .body("links[0].method", equalTo(HttpMethod.DELETE))
+      .body("links[0].rel", equalTo("delete"))
 
       .body("links[1].href", equalTo(fullMembersUrl))
-      .body("links[1].method", equalTo(HttpMethod.DELETE))
-      .body("links[1].rel", equalTo("delete"))
-
-      .body("links[2].href", equalTo(fullMembersUrl))
-      .body("links[2].method", equalTo(HttpMethod.PUT))
-      .body("links[2].rel", equalTo("create"))
+      .body("links[1].method", equalTo(HttpMethod.PUT))
+      .body("links[1].rel", equalTo("create"))
 
       .when()
       .options(GROUP_MEMBERS_URL);
@@ -353,16 +349,12 @@ public class GroupRestServiceInteractionTest extends AbstractRestServiceTest {
       .expect().statusCode(Status.OK.getStatusCode())
 
       .body("links[0].href", equalTo(fullMembersUrl))
-      .body("links[0].method", equalTo(HttpMethod.GET))
-      .body("links[0].rel", equalTo("self"))
+      .body("links[0].method", equalTo(HttpMethod.DELETE))
+      .body("links[0].rel", equalTo("delete"))
 
       .body("links[1].href", equalTo(fullMembersUrl))
-      .body("links[1].method", equalTo(HttpMethod.DELETE))
-      .body("links[1].rel", equalTo("delete"))
-
-      .body("links[2].href", equalTo(fullMembersUrl))
-      .body("links[2].method", equalTo(HttpMethod.PUT))
-      .body("links[2].rel", equalTo("create"))
+      .body("links[1].method", equalTo(HttpMethod.PUT))
+      .body("links[1].rel", equalTo("create"))
 
     .when()
       .options(GROUP_MEMBERS_URL);
@@ -374,8 +366,6 @@ public class GroupRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void testGroupMembersResourceOptionsUnauthorized() {
-    String fullMembersUrl = "http://localhost:" + PORT + TEST_RESOURCE_ROOT_PATH + "/group/" + MockProvider.EXAMPLE_GROUP_ID + "/members";
-
     Authentication authentication = new Authentication(MockProvider.EXAMPLE_USER_ID, null);
     when(identityServiceMock.getCurrentAuthentication()).thenReturn(authentication);
     when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, DELETE, GROUP_MEMBERSHIP, MockProvider.EXAMPLE_GROUP_ID)).thenReturn(false);
@@ -394,13 +384,9 @@ public class GroupRestServiceInteractionTest extends AbstractRestServiceTest {
     .then()
       .expect().statusCode(Status.OK.getStatusCode())
 
-      .body("links[0].href", equalTo(fullMembersUrl))
-      .body("links[0].method", equalTo(HttpMethod.GET))
-      .body("links[0].rel", equalTo("self"))
+      .body("links[0]", nullValue())
 
       .body("links[1]", nullValue())
-
-      .body("links[2]", nullValue())
 
     .when()
       .options(GROUP_MEMBERS_URL);
@@ -422,16 +408,12 @@ public class GroupRestServiceInteractionTest extends AbstractRestServiceTest {
       .expect().statusCode(Status.OK.getStatusCode())
 
       .body("links[0].href", equalTo(fullMembersUrl))
-      .body("links[0].method", equalTo(HttpMethod.GET))
-      .body("links[0].rel", equalTo("self"))
+      .body("links[0].method", equalTo(HttpMethod.DELETE))
+      .body("links[0].rel", equalTo("delete"))
 
       .body("links[1].href", equalTo(fullMembersUrl))
-      .body("links[1].method", equalTo(HttpMethod.DELETE))
-      .body("links[1].rel", equalTo("delete"))
-
-      .body("links[2].href", equalTo(fullMembersUrl))
-      .body("links[2].method", equalTo(HttpMethod.PUT))
-      .body("links[2].rel", equalTo("create"))
+      .body("links[1].method", equalTo(HttpMethod.PUT))
+      .body("links[1].rel", equalTo("create"))
 
     .when()
       .options(GROUP_MEMBERS_URL);

@@ -29,9 +29,8 @@
         desc = "Request successful."
         examples = ['"example-1": {
                        "summary": "Status 200 response",
-                       "description": "OPTIONS /group/sales/members",
+                       "description": "OPTIONS `/group/sales/members`",
                        "value": {"links":[
-                                    {"method":"GET","href":"http://localhost:8080/engine-rest/group/sales/members","rel":"self"},
                                     {"method":"DELETE","href":"http://localhost:8080/engine-rest/group/sales/members","rel":"delete"},
                                     {"method":"PUT","href":"http://localhost:8080/engine-rest/group/sales/members","rel":"create"}]
                                 }

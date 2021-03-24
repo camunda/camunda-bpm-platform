@@ -36,11 +36,6 @@
                        "value": {
                          "links": [
                            {
-                             "method": "GET",
-                             "href": "http://localhost:8080/engine-rest/tenant/tenantOne/group-members",
-                             "rel": "self"
-                           },
-                           {
                              "method": "DELETE",
                              "href": "http://localhost:8080/engine-rest/tenant/tenantOne/group-members",
                              "rel": "delete"
