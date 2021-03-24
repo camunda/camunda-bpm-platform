@@ -1195,7 +1195,8 @@ public interface TaskService {
    * @param escalationCode the escalation code of the corresponding escalation
    * @param variables the variables to pass to the execution
    *
-   * @throws NullValueException if no task with the given id exists
+   * @throws NotFoundException if no task with the given id exists
+   * @throws BadUserRequestException if task id or escalation code were null or empty
    * @throws SuspendedEntityInteractionException if the task is suspended
    * @throws AuthorizationException if the user has none of the following permissions:
    * <li>{@link Permissions#TASK_WORK} permission on {@link Resources#TASK} or
@@ -1212,7 +1213,8 @@ public interface TaskService {
    * @param escalationCode the escalation code of the corresponding escalation
    * @param variables the variables to pass to the execution
    *
-   * @throws NullValueException if no task with the given id exists
+   * @throws NotFoundException if no task with the given id exists
+   * @throws BadUserRequestException if task id or escalation code were null or empty
    * @throws SuspendedEntityInteractionException if the task is suspended
    * @throws AuthorizationException if the user has none of the following permissions:
    * <li>{@link Permissions#TASK_WORK} permission on {@link Resources#TASK} or

@@ -426,8 +426,8 @@ public class TaskResourceImpl implements TaskResource {
 
     try {
       taskService.handleEscalation(taskId, dto.getEscalationCode(), VariableValueDto.toMap(dto.getVariables(), engine, objectMapper));
-    } catch (NullValueException e) {
-      throw new RestException(Status.NOT_FOUND, e, "Task with id " + taskId + " does not exist");
+    } catch (NotFoundException e) {
+      throw new RestException(Status.NOT_FOUND, e, e.getMessage());
     } catch (BadUserRequestException e) {
       throw new RestException(Status.BAD_REQUEST, e, e.getMessage());
     }

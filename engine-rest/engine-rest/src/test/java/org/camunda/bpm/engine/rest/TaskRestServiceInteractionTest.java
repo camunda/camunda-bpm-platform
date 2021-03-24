@@ -3534,7 +3534,7 @@ public class TaskRestServiceInteractionTest extends
 
   @Test
   public void testHandleBpmnEscalationNonExistingTask() {
-    doThrow(new NullValueException())
+    doThrow(new NotFoundException("Task with id aTaskId does not exist"))
       .when(taskServiceMock)
       .handleEscalation(anyString(), anyString(), anyMapOf(String.class, Object.class));
 
@@ -3594,6 +3594,27 @@ public class TaskRestServiceInteractionTest extends
       .body("type", equalTo(RestException.class.getSimpleName()))
       .body("message", equalTo("aMessage"))
     .when()
+      .post(HANDLE_BPMN_ESCALATION_URL);
+  }
+
+  @Test
+  public void testHandleBpmnEscalationMissingEscalationCode() {
+    doThrow(new BadUserRequestException("aMessage"))
+      .when(taskServiceMock)
+      .handleEscalation(any(String.class), any(String.class), anyMapOf(String.class, Object.class));
+
+    Map<String, Object> parameters = new HashMap<>();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+      .pathParam("id", "aTaskId")
+      .then()
+      .expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("aMessage"))
+      .when()
       .post(HANDLE_BPMN_ESCALATION_URL);
   }
 
