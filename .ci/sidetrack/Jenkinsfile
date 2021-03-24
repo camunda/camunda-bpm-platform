@@ -53,7 +53,7 @@ pipeline {
           // see the .ci/config/matrices.yaml for the stage generation values
           // see .ci/config/stage-types.yaml for the stage configurations
           parallel(cambpmGetMatrixStages('sidetrack-stages', [], { stageInfo ->
-            return cambpmWithLabels(cambpmGetLabels(stageType))
+            return cambpmWithLabels(cambpmGetLabels(stageInfo.stageType))
           }))
         }
       }
