@@ -523,7 +523,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity,
       return camundaErrorEventDefinition.getExpression() != null && Boolean.TRUE.equals(camundaErrorEventDefinition.getExpression().getValue(getExecution()));
     } catch (Exception exception) {
       if (continueOnException) {
-        LOG.errorEventDefinitionEvaluationException(id, camundaErrorEventDefinition, exception);
+        ProcessEngineLogger.EXTERNAL_TASK_LOGGER.errorEventDefinitionEvaluationException(id, camundaErrorEventDefinition, exception);
         return false;
       }
       throw exception;
