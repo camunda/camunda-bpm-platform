@@ -722,8 +722,6 @@ public class TenantRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void tenantUserMembershipResourceOptionsUnauthorized() {
-    String fullMembersUrl =  getFullAuthorizationTenantUrl() + "/user-members";
-
     Authentication authentication = new Authentication(MockProvider.EXAMPLE_USER_ID, null);
     when(identityServiceMock.getCurrentAuthentication()).thenReturn(authentication);
     when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, DELETE, TENANT_MEMBERSHIP, MockProvider.EXAMPLE_TENANT_ID)).thenReturn(false);
@@ -750,8 +748,6 @@ public class TenantRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void tenantGroupMembershipResourceOptionsUnauthorized() {
-    String fullMembersUrl =  getFullAuthorizationTenantUrl() + "/group-members";
-
     Authentication authentication = new Authentication(MockProvider.EXAMPLE_USER_ID, null);
     when(identityServiceMock.getCurrentAuthentication()).thenReturn(authentication);
     when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, DELETE, TENANT_MEMBERSHIP, MockProvider.EXAMPLE_TENANT_ID)).thenReturn(false);

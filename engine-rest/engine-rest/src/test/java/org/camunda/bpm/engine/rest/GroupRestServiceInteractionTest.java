@@ -366,8 +366,6 @@ public class GroupRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void testGroupMembersResourceOptionsUnauthorized() {
-    String fullMembersUrl = "http://localhost:" + PORT + TEST_RESOURCE_ROOT_PATH + "/group/" + MockProvider.EXAMPLE_GROUP_ID + "/members";
-
     Authentication authentication = new Authentication(MockProvider.EXAMPLE_USER_ID, null);
     when(identityServiceMock.getCurrentAuthentication()).thenReturn(authentication);
     when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, DELETE, GROUP_MEMBERSHIP, MockProvider.EXAMPLE_GROUP_ID)).thenReturn(false);
