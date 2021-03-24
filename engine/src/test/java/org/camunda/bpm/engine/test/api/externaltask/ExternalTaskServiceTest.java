@@ -1440,6 +1440,25 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
   }
 
   @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.externalTaskWithNestedErrorEventDefinitionVariableExpression.bpmn20.xml")
+  public void shouldFailNestedErrorEventDefinitionsWhenVariableWasNotProvidedByClientOnComplete() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskWithNestedErrorEventDefinition");
+    List<LockedExternalTask> externalTasks = externalTaskService
+        .fetchAndLock(1, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    LockedExternalTask task = externalTasks.get(0);
+
+    // then
+    // expression evaluation failed due to missing variable
+    assertThatThrownBy(() -> externalTaskService.complete(task.getId(), WORKER_ID))
+        .isInstanceOf(ProcessEngineException.class)
+        .hasMessageContaining("Unknown property used in expression");
+  }
+
+  @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.externalTaskWithNestedErrorEventDefinitionVariableExpression.bpmn20.xml"})
   public void shouldKeepVariablesAfterEvaluateNestedErrorEventDefinitionsOnCompleteWithVariables() {
     // given
@@ -1621,6 +1640,47 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     List<Task> tasks = taskService.createTaskQuery().list();
     assertThat(tasks).hasSize(1);
     assertThat(tasks.get(0).getName()).isEqualTo("userTask");
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.externalTaskWithNestedErrorEventDefinitionVariableExpression.bpmn20.xml")
+  public void shouldNotFailNestedErrorEventDefinitionsWhenVariableWasNotProvidedByClientOnFail() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskWithNestedErrorEventDefinition");
+    List<LockedExternalTask> externalTasks = externalTaskService
+        .fetchAndLock(1, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    LockedExternalTask task = externalTasks.get(0);
+
+    // when
+    externalTaskService.handleFailure(task.getId(), WORKER_ID, ERROR_MESSAGE, ERROR_DETAILS, 0, 3000L, null, null);
+
+    // then
+    // expression evaluation failed due to missing variable
+    // initial handleFailure was executed
+    Incident incident = runtimeService.createIncidentQuery().singleResult();
+
+    if (processEngineConfiguration.getHistoryLevel().getId() >= HistoryLevel.HISTORY_LEVEL_FULL.getId()) {
+      HistoricIncident historicIncident = historyService.createHistoricIncidentQuery().singleResult();
+      assertNotNull(historicIncident);
+      assertEquals(incident.getId(), historicIncident.getId());
+      assertTrue(historicIncident.isOpen());
+    }
+
+    assertNotNull(incident);
+    assertNotNull(incident.getId());
+    assertEquals(ERROR_MESSAGE, incident.getIncidentMessage());
+    assertEquals(task.getExecutionId(), incident.getExecutionId());
+    assertEquals("externalTask", incident.getActivityId());
+    assertEquals(incident.getId(), incident.getCauseIncidentId());
+    assertEquals("failedExternalTask", incident.getIncidentType());
+    assertEquals(task.getProcessDefinitionId(), incident.getProcessDefinitionId());
+    assertEquals(task.getProcessInstanceId(), incident.getProcessInstanceId());
+    assertEquals(incident.getId(), incident.getRootCauseIncidentId());
+    assertEquals(task.getId(), incident.getConfiguration());
+    assertNull(incident.getJobDefinitionId());
   }
 
   @Test
