@@ -13,7 +13,6 @@
   <files>
     <file>
       <source>src/main/resources/license-book.txt</source>
-      <filtered>true</filtered>
       <lineEnding>crlf</lineEnding>
       <outputDirectory></outputDirectory>
       <destName>LICENSE_BOOK-${project.version}.txt</destName>
