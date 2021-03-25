@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns = "http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation = "http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.camunda.bpm.run</groupId>
     <artifactId>camunda-bpm-run-modules</artifactId>
-    <version>7.15.0-SNAPSHOT</version>
+    <version>7.15.0-alpha5</version>
   </parent>
 
   <artifactId>camunda-bpm-run-modules-swaggerui</artifactId>
@@ -94,17 +92,17 @@
                 </goals>
                 <inherited>false</inherited>
                 <configuration>
-                  <target description = "Build Swagger UI npm project">
-                    <exec executable = "cmd" failonerror = "true" dir="${project.basedir}/ui">
-                      <arg value = "/c" />
-                      <arg value = "npm" />
-                      <arg value = "install" />
+                  <target description="Build Swagger UI npm project">
+                    <exec executable="cmd" failonerror="true" dir="${project.basedir}/ui">
+                      <arg value="/c" />
+                      <arg value="npm" />
+                      <arg value="install" />
                     </exec>
-                    <exec executable = "cmd" failonerror = "true" dir="${project.basedir}/ui">
-                      <arg value = "/c" />
-                      <arg value = "npm" />
-                      <arg value = "run" />
-                      <arg value = "build" />
+                    <exec executable="cmd" failonerror="true" dir="${project.basedir}/ui">
+                      <arg value="/c" />
+                      <arg value="npm" />
+                      <arg value="run" />
+                      <arg value="build" />
                     </exec>
                   </target>
                 </configuration>
@@ -136,13 +134,13 @@
                 </goals>
                 <inherited>false</inherited>
                 <configuration>
-                  <target description = "Build Swagger UI npm project">
-                    <exec executable = "npm" failonerror = "true" dir="${project.basedir}/ui">
-                      <arg value = "install" />
+                  <target description="Build Swagger UI npm project">
+                    <exec executable="npm" failonerror="true" dir="${project.basedir}/ui">
+                      <arg value="install" />
                     </exec>
-                    <exec executable = "npm" failonerror = "true" dir="${project.basedir}/ui">
-                      <arg value = "run" />
-                      <arg value = "build" />
+                    <exec executable="npm" failonerror="true" dir="${project.basedir}/ui">
+                      <arg value="run" />
+                      <arg value="build" />
                     </exec>
                   </target>
                 </configuration>
