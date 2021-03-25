@@ -1,7 +1,7 @@
 {
   "name": "camunda-bpm-webapp",
   "private": true,
-  "version": "7.15.0-alpha5",
+  "version": "7.15.0-SNAPSHOT",
   "gruntConfig": {
     "connectPort": 8020,
     "livereloadPort": 8021,
@@ -41,7 +41,7 @@
     "bootstrap": "3.4.1",
     "bpmn-font": "0.10.0",
     "bpmn-js": "8.1.0",
-    "camunda-webapp-translations": "git://github.com/camunda/camunda-webapp-translations#7.15.0-alpha5",
+    "camunda-webapp-translations": "git://github.com/camunda/camunda-webapp-translations#master",
     "clipboard": "2.0.6",
     "cmmn-js": "0.20.0",
     "dmn-js": "10.0.0",
