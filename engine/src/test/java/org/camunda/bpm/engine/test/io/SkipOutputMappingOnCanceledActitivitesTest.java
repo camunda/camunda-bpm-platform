@@ -21,11 +21,16 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
+import org.camunda.bpm.engine.history.HistoricProcessInstance;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.camunda.bpm.model.bpmn.Bpmn;
 import org.junit.After;
 import org.junit.Test;
 
@@ -60,6 +65,75 @@ public class SkipOutputMappingOnCanceledActitivitesTest extends PluggableProcess
     // output mapping is skipped
     Task userTask = taskService.createTaskQuery().singleResult();
     assertThat(userTask).isNotNull();
+  }
+
+
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void shouldSkipOutputMappingOnBpmnErrorAtExternalTaskWithUncaughtError() {
+    // given a process with one external task which has output mapping configured
+    processEngineConfiguration.setSkipOutputMappingOnCanceledActivities(true);
+    testRule.deploy(Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .serviceTask("service")
+          .camundaExternalTask(TOPIC_NAME)
+          .camundaOutputParameter("foo", "bar")
+          .camundaErrorEventDefinition().expression("${true}").error("501", "intentionally").errorEventDefinitionDone()
+        .userTask()
+        .endEvent("regular")
+        .done());
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("process");
+
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
+      .topic(TOPIC_NAME, LOCK_TIME)
+      .execute();
+    assertThat(externalTasks).hasSize(1);
+
+    // when an uncaught BPMN error is thrown
+//    externalTaskService.handleFailure(externalTasks.get(0).getId(), WORKER_ID, null, 0, 0);
+    externalTaskService.complete(externalTasks.get(0).getId(), WORKER_ID);
+
+    // then the process instance ended
+    assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(0L);
+    HistoricProcessInstance historicInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(instance.getId()).singleResult();
+    assertThat(historicInstance).isNotNull();
+    assertThat(historicInstance.getState()).isEqualTo(HistoricProcessInstance.STATE_COMPLETED);
+  }
+
+  @Test
+  public void shouldSkipOutputMappingOnBpmnErrorAtExternalTasWithUncaughtErrorAsyncAfter() {
+    // given a process with one async-after external task which has output mapping configured
+    processEngineConfiguration.setSkipOutputMappingOnCanceledActivities(true);
+    testRule.deploy(Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .serviceTask("service")
+          .camundaExternalTask(TOPIC_NAME)
+          .camundaOutputParameter("foo", "bar")
+          .camundaAsyncAfter()
+          .camundaExclusive(true)
+          .camundaErrorEventDefinition().expression("${true}").error("501", "intentionally").errorEventDefinitionDone()
+        .userTask()
+        .endEvent("regular")
+        .done());
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("process");
+
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
+      .topic(TOPIC_NAME, LOCK_TIME)
+      .execute();
+    assertThat(externalTasks).hasSize(1);
+
+//    externalTaskService.handleFailure(externalTasks.get(0).getId(), WORKER_ID, null, 0, 0);
+    externalTaskService.complete(externalTasks.get(0).getId(), WORKER_ID);
+    assertThat(managementService.createJobQuery().count()).isEqualTo(1L);
+
+    // when an uncaught BPMN error is thrown
+    testRule.executeAvailableJobs();
+
+    // then no incident is created and the instance has ended
+    assertThat(runtimeService.createIncidentQuery().count()).isEqualTo(0L);
+    HistoricProcessInstance historicInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(instance.getId()).singleResult();
+    assertThat(historicInstance).isNotNull();
+    assertThat(historicInstance.getState()).isEqualTo(HistoricProcessInstance.STATE_COMPLETED);
   }
 
   @Test
