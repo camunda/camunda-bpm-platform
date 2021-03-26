@@ -82,6 +82,7 @@ public class PvmAtomicOperationActivityEnd implements PvmAtomicOperation {
       }
       else {
         // 1.2 Process End
+        propagatingExecution.setActivity(null);
         propagatingExecution.setEnded(true);
         if (!propagatingExecution.isPreserveScope()) {
           propagatingExecution.performOperation(PROCESS_END);
