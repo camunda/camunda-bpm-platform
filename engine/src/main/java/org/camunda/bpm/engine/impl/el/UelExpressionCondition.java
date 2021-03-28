@@ -20,9 +20,12 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureInstanceOf;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
+import org.camunda.bpm.engine.delegate.ConditionDelegate;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.Condition;
+import org.camunda.bpm.engine.impl.bpmn.delegate.ConditionDelegateInvocation;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.javax.el.PropertyNotFoundException;
 
 
@@ -48,6 +51,23 @@ public class UelExpressionCondition implements Condition {
   @Override
   public boolean evaluate(VariableScope scope, DelegateExecution execution) {
     Object result = expression.getValue(scope, execution);
+
+    if (result instanceof ConditionDelegate){
+      ConditionDelegateInvocation invocation = new ConditionDelegateInvocation((ConditionDelegate)result, execution);
+
+      try {
+        Context.getProcessEngineConfiguration()
+                .getDelegateInterceptor()
+                .handleInvocation(invocation);
+      } catch (RuntimeException e) {
+        throw e;
+      } catch (Exception e) {
+        throw new ProcessEngineException(e);
+      }
+
+      result = invocation.getInvocationResult();
+    }
+
     ensureNotNull("condition expression returns null", "result", result);
     ensureInstanceOf("condition expression returns non-Boolean", "result", result, Boolean.class);
     return (Boolean) result;
