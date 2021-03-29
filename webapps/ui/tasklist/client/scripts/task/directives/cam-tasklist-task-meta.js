@@ -334,8 +334,8 @@ module.exports = [
           $scope.submitInProgress = true;
           Task.claim($scope.task.id, assignee, function(err) {
             doAfterAssigneeLoaded.push(focusAssignee);
+            doAfterAssigneeLoaded.push(() => ($scope.submitInProgress = false));
             notify('claimed')(err);
-            $scope.submitInProgress = false;
           });
         });
         $scope.$on('shortcut:claimTask', claim);
@@ -344,8 +344,8 @@ module.exports = [
           $scope.submitInProgress = true;
           Task.unclaim($scope.task.id, function(err) {
             doAfterAssigneeLoaded.push(focusAssignee);
+            doAfterAssigneeLoaded.push(() => ($scope.submitInProgress = false));
             notify('unclaimed')(err);
-            $scope.submitInProgress = false;
           });
         });
 
