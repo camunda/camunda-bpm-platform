@@ -49,16 +49,14 @@ module.exports = async function loadPlugins(config, appName) {
   });
 
   const fetchers = customScripts.map(url =>
-    window._import(baseImportPath + withSuffix(url, '.js'))
+    window
+      ._import(baseImportPath + withSuffix(url, '.js'))
+      .catch(e => console.error(e))
   );
 
   fetchers.push(
     ...JARScripts.map(url => {
-      try {
-        return import(url);
-      } catch (e) {
-        // Do nothing
-      }
+      return window._import(url).catch(e => console.error(e));
     })
   );
 
