@@ -162,6 +162,29 @@
     from ${prefix}ACT_RU_JOB RES
 
     where (RES.RETRIES_ &gt; 0)
+
+      <!-- Tenants Enabled -->
+      <if test="parameter.tenantIdsIn != null &amp;&amp; parameter.tenantIdsIn.length > 0">
+
+        and ( RES.TENANT_ID_ in
+        <foreach item="tenantId" index="index" collection="parameter.tenantIdsIn" open="(" separator="," close=")">
+          #{tenantId}
+        </foreach>
+        )
+
+      </if>
+
+      <!-- Tenants Disabled -->
+      <if test="parameter.tenantIdsNotIn != null &amp;&amp; parameter.tenantIdsNotIn.length > 0">
+
+        and ( RES.TENANT_ID_ not in
+        <foreach item="tenantId" index="index" collection="parameter.tenantIdsNotIn" open="(" separator="," close=")">
+          #{tenantId}
+        </foreach>
+        )
+
+      </if>
+
       and (RES.DUEDATE_ is null or RES.DUEDATE_ &lt;= #{parameter.now, jdbcType=TIMESTAMP})
       and (RES.LOCK_OWNER_ is null or RES.LOCK_EXP_TIME_ &lt; #{parameter.now, jdbcType=TIMESTAMP})
       and RES.SUSPENSION_STATE_ = 1

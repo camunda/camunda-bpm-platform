@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 import static org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler.JOB_HANDLER_CONFIG_PROPERTY_DELIMITER;
 import static org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler.JOB_HANDLER_CONFIG_PROPERTY_FOLLOW_UP_JOB_CREATED;
@@ -38,15 +39,57 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
  */
 public class JobManager extends AbstractManager {
 
+  public static Logger LOGGER = Logger.getLogger("JobManager");
+
   public static QueryOrderingProperty JOB_PRIORITY_ORDERING_PROPERTY = new QueryOrderingProperty(null, JobQueryProperty.PRIORITY);
   public static QueryOrderingProperty JOB_TYPE_ORDERING_PROPERTY = new QueryOrderingProperty(null, JobQueryProperty.TYPE);
   public static QueryOrderingProperty JOB_DUEDATE_ORDERING_PROPERTY = new QueryOrderingProperty(null, JobQueryProperty.DUEDATE);
+
+  private static String[] _tenantIdsIn;
+  private static String[] _tenantIdsNotIn;
 
   static {
     JOB_PRIORITY_ORDERING_PROPERTY.setDirection(Direction.DESCENDING);
     JOB_TYPE_ORDERING_PROPERTY.setDirection(Direction.DESCENDING);
     JOB_DUEDATE_ORDERING_PROPERTY.setDirection(Direction.ASCENDING);
+
+    _tenantIdsIn = getTenantIds(System.getenv("TENANTS_ENABLED"));
+    _tenantIdsNotIn = getTenantIds(System.getenv("TENANTS_DISABLED"));
+
+    LOGGER.info("Tenants enabled (" +  _tenantIdsIn.length + "):");
+    for (String tenantId : _tenantIdsIn) {
+      LOGGER.info(" - " + tenantId);
+    }
+
+    LOGGER.info("Tenants disabled (" + _tenantIdsNotIn.length + "):");
+    for (String tenantId : _tenantIdsNotIn) {
+      LOGGER.info(" - " + tenantId);
+    }
   }
+
+  public static String[] getTenantIds(String envVar)
+  {
+    ArrayList<String> result = new ArrayList<String>();
+
+    if (envVar == null) {
+      return result.toArray(new String[0]);
+    }
+
+    String[] tenantIds = envVar.split(",");
+
+    for (String tenantId : tenantIds) {
+      tenantId = tenantId.trim();
+
+      if(tenantId.isEmpty()) {
+        continue;
+      }
+
+      result.add(tenantId);
+    }
+
+    return result.toArray(new String[result.size()]);
+  }
+
 
   public void updateJob(JobEntity job) {
     getDbEntityManager().merge(job);
@@ -169,6 +212,10 @@ public class JobManager extends AbstractManager {
     Map<String,Object> params = new HashMap<String, Object>();
     Date now = ClockUtil.getCurrentTime();
     params.put("now", now);
+
+    params.put("tenantIdsIn", _tenantIdsIn);
+    params.put("tenantIdsNotIn", _tenantIdsNotIn);
+
     params.put("deploymentAware", Context.getProcessEngineConfiguration().isJobExecutorDeploymentAware());
     if (Context.getProcessEngineConfiguration().isJobExecutorDeploymentAware()) {
       Set<String> registeredDeployments = Context.getProcessEngineConfiguration().getRegisteredDeployments();
@@ -192,7 +239,11 @@ public class JobManager extends AbstractManager {
     // don't apply default sorting
     params.put("applyOrdering", !orderingProperties.isEmpty());
 
-    return getDbEntityManager().selectList("selectNextJobsToExecute", params, page);
+    List<JobEntity> jobs = getDbEntityManager().selectList("selectNextJobsToExecute", params, page);
+
+    LOGGER.info("Got " + jobs.size() + " jobs");
+
+    return jobs;
   }
 
   @SuppressWarnings("unchecked")
