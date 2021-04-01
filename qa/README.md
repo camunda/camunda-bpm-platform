@@ -38,3 +38,10 @@ mvn clean install -Pengine-integration,webapps-integration,tomcat,postgresql
 There is a special profile for Wildfly Application Server:
 
 * Domain mode: `mvn clean install -Pengine-integration,h2,wildfly-domain`
+
+### Running tests with the Maven Wrapper
+
+With `mvnw`, from the root of the project,
+run: `./mvnw clean install -f qa/pom.xml -P${integration-test-id},${application-server-id},${database-id}`
+where `${database-id}` is for example `h2`, `${application-server-id}` is for e.g. `wildfly,wildfly-domain`,
+and `${integration-test-id}` can be either `engine-integration` or `webapps-integration`.

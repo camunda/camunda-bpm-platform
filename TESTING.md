@@ -77,6 +77,35 @@ There is a special profile for the WildFly Application Servers:
 
 Camunda supports all database technologies listed on [Supported Database Products](https://docs.camunda.org/manual/latest/introduction/supported-environments/#supported-database-products), and in all environments, they are operating in as specified. Support means we guarantee the Camunda Platform integrates well with the database technology’s JDBC behavior (there are some [documented](https://docs.camunda.org/manual/latest/user-guide/process-engine/database/) limitations, e.g., isolation level `READ_COMMITTED` is required for all databases except CockroachDB, which in turns requires `SERIALIZABLE`). We test a database technology with a specific database, i.e., we test it in one environment, not all possible environments that you can imagine (e.g., we test Postgres on local Docker containers, but not as hosted databases on AWS or Azure).
 
+# No Maven? No problem!
+
+This project provides a [Maven Wrapper](https://github.com/takari/maven-wrapper). This feature is useful for developers
+to build and test the project with the same version that Camunda uses. It's also useful for developers that don't want
+to install Maven at all. By executing the `mvnw` script (Unix), or `mvnw.cmd` script (Windows), a Maven distro will be 
+downloaded and installed in the `$USER_HOME/.m2/wrapper/dists` folder of the system. You can check the download URL in
+the [.mvn/wrapper/maven-wrapper.properties](.mvn/wrapper/maven-wrapper.properties) file.
+
+The Maven Wrapper requires Maven commands to be executed from the root of the project. As the Camunda Platform project
+is a multi-module (Maven Reactor) project, this is also a good best practice to apply.
+
+To build the whole project, or just a module, one of the following commands may be executed:
+
+```shell
+# build the whole project
+./mvnw clean install
+
+# build the engine module
+./mvnw clean install -f engine/pom.xml
+
+# run the rolling-update IT tests with the H2 database
+./mvnw verify -f qa/test-db-rolling-update/pom.xml -Prolling-update,h2
+```
+
+> Note: Above the `mvn -f` command line option is recommended over the `mvn -pl` option. The reason is that `-pl` will
+build only the specified module, and will ignore any sub-modules that it might contain (unless the `-amd` option is also
+added). As the Camunda Platform project has a multi-tiered module hierarchy (e.g. the [qa](qa/) module has modules of 
+it's own), the `mvn -f` command option is simpler. 
+
 ## What about database technology X in environment Y?
 
 To make a statement regarding Camunda Platform support, we need to understand if technology X is one of the technologies we already support or different technology. Several databases may share the same or a similar name, but they can still be different technologies: For example, IBM DB2 z/OS behaves quite differently from IBM DB2 on Linux, Unix, Windows. Amazon Aurora Postgres is different from a standard Postgres.

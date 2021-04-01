@@ -19,3 +19,9 @@ The test suite is executed like this:
 ```
 mvn clean install -Pold-engine,${DATABASE}
 ```
+
+### Running tests with the Maven Wrapper
+
+With `mvnw`, from the root of the project,
+run: `./mvnw clean install -f qa/test-old-engine/pom.xml -Pold-engine,${database-id}`
+where `${database-id}` is for example `h2`.
