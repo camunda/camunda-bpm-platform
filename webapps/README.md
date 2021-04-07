@@ -46,11 +46,6 @@ Contains resources like images, [`.less`](http://lesscss.org) stylesheets as wel
 
 Contains the translation files for all application texts in different languages.
 
-
-## Development
-
-**Please note that with Camunda 7.14.0 we moved Cockpit to a separate build step. Check out the development build and prerequisites in the [Cockpit directory](https://github.com/camunda/camunda-bpm-platform/tree/master/webapps/ui/cockpit).** 
-
 ### Prerequisite
 
 You need [node.js](http://nodejs.org) and npm. You will also need to install [grunt](http://gruntjs.com) globally using `npm install -g grunt-cli`.
