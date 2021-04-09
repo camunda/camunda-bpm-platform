@@ -456,9 +456,6 @@ pipeline {
               agentLabel: 'h2',
               runSteps: {
                 cambpmRunMaven('engine/', 'clean verify -Pcheck-api-compatibility', runtimeStash: true)
-              },
-              postAlways: {
-                cambpmPublishTestResult()
               }
             ])
           }
