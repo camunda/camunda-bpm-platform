@@ -966,9 +966,14 @@ public class BpmnParse extends Parse {
         if (startEventElement.attribute("id").equals(processDefinition.getInitial().getId())) {
 
           StartFormHandler startFormHandler;
-          String startFormHandlerClassName = startEventElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "formHandlerClass");
-          if (startFormHandlerClassName != null) {
-            startFormHandler = (StartFormHandler) ReflectUtil.instantiate(startFormHandlerClassName);
+          String startFormHandlerAttributeValue = startEventElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "formHandlerClass");
+          if (startFormHandlerAttributeValue != null) {
+            Object expressionResult = expressionManager.createExpression(startFormHandlerAttributeValue).getValue(StartProcessVariableScope.getSharedInstance());
+            if (expressionResult instanceof StartFormHandler){
+              startFormHandler = (StartFormHandler) expressionResult;
+            } else {
+              startFormHandler = (StartFormHandler) ReflectUtil.instantiate((String) expressionResult);
+            }
           } else {
             startFormHandler = new DefaultStartFormHandler();
           }
@@ -2633,9 +2638,14 @@ public class BpmnParse extends Parse {
 
   public TaskDefinition parseTaskDefinition(Element taskElement, String taskDefinitionKey, ActivityImpl activity, ProcessDefinitionEntity processDefinition) {
     TaskFormHandler taskFormHandler;
-    String taskFormHandlerClassName = taskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "formHandlerClass");
-    if (taskFormHandlerClassName != null) {
-      taskFormHandler = (TaskFormHandler) ReflectUtil.instantiate(taskFormHandlerClassName);
+    String taskFormHandlerAttributeValue = taskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "formHandlerClass");
+    if (taskFormHandlerAttributeValue != null) {
+      Object expressionResult = expressionManager.createExpression(taskFormHandlerAttributeValue).getValue(StartProcessVariableScope.getSharedInstance());
+      if (expressionResult instanceof StartFormHandler){
+        taskFormHandler = (TaskFormHandler) expressionResult;
+      } else {
+        taskFormHandler = (TaskFormHandler) ReflectUtil.instantiate((String) expressionResult);
+      }
     } else {
       taskFormHandler = new DefaultTaskFormHandler();
     }
