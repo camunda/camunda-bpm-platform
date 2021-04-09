@@ -17,10 +17,8 @@
 package org.camunda.bpm.qa.rolling.update.variable;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
-import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.qa.rolling.update.AbstractRollingUpdateTestCase;
@@ -43,14 +41,9 @@ public class EmptyStringVariableTest extends AbstractRollingUpdateTestCase {
     VariableInstance variableInstance = rule.getRuntimeService().createVariableInstanceQuery()
         .variableName("myStringVar")
         .singleResult();
-    String databaseType = rule.getProcessEngineConfiguration().getDatabaseType();
 
     // then
-    if (DbSqlSessionFactory.ORACLE.equals(databaseType)) {
-      assertThat(variableInstance.getValue(), nullValue());
-    } else {
-      assertThat(variableInstance.getValue(), is(""));
-    }
+    assertThat(variableInstance.getValue(), is(""));
   }
 
   @Test
@@ -59,14 +52,9 @@ public class EmptyStringVariableTest extends AbstractRollingUpdateTestCase {
     //given
     VariableInstanceQuery variableInstanceQuery = rule.getRuntimeService().createVariableInstanceQuery()
         .variableValueEquals("myStringVar", "");
-    String databaseType = rule.getProcessEngineConfiguration().getDatabaseType();
 
     // then
-    if (DbSqlSessionFactory.ORACLE.equals(databaseType)) {
-      assertThat(variableInstanceQuery.count(), is(0L));
-    } else {
-      assertThat(variableInstanceQuery.count(), is(1L));
-    }
+    assertThat(variableInstanceQuery.count(), is(1L));
   }
 
   @Test
@@ -75,14 +63,9 @@ public class EmptyStringVariableTest extends AbstractRollingUpdateTestCase {
     //given
     VariableInstanceQuery variableInstanceQuery = rule.getRuntimeService().createVariableInstanceQuery()
         .variableValueNotEquals("myStringVar", "");
-    String databaseType = rule.getProcessEngineConfiguration().getDatabaseType();
 
     // then
-    if (DbSqlSessionFactory.ORACLE.equals(databaseType)) {
-      assertThat(variableInstanceQuery.count(), is(1L));
-    } else {
-      assertThat(variableInstanceQuery.count(), is(0L));
-    }
+    assertThat(variableInstanceQuery.count(), is(0L));
   }
 
 }
