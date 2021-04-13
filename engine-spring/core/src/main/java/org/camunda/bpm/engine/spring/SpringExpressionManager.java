@@ -54,6 +54,15 @@ public class SpringExpressionManager extends ExpressionManager {
     super(beans);
     this.applicationContext = applicationContext;
   }
+  
+  /**
+   * @param applicationContext
+   *          the applicationContext to use.
+   * @see #SpringExpressionManager(ApplicationContext, Map)
+   */
+  public SpringExpressionManager(ApplicationContext applicationContext) {
+    this(applicationContext, null);
+  }
 
   @Override
   protected ELResolver createElResolver() {
