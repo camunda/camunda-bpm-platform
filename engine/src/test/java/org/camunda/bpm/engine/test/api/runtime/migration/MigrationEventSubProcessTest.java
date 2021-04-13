@@ -29,8 +29,10 @@ import static org.junit.Assert.assertNotNull;
 import java.util.Date;
 import java.util.HashMap;
 
+import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandler;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.migration.MigrationPlanValidationException;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -689,4 +691,104 @@ public class MigrationEventSubProcessTest {
     testHelper.completeTask(EVENT_SUB_PROCESS_TASK_ID);
     testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
+
+  @Test
+  public void shouldRemainActiveAfterUserTaskBecomesNoneScope() {
+    BpmnModelInstance sourceModel = modify(ProcessModels.ONE_TASK_PROCESS)
+          .addSubProcessTo(ProcessModels.PROCESS_KEY)
+            .id(EventSubProcessModels.EVENT_SUB_PROCESS_ID)
+            .triggerByEvent()
+            .embeddedSubProcess()
+              .startEvent(EVENT_SUB_PROCESS_START_ID).message(EventSubProcessModels.MESSAGE_NAME)
+              .userTask(EVENT_SUB_PROCESS_TASK_ID)
+                .boundaryEvent().condition("${true == false}")
+              .endEvent()
+            .endEvent()
+          .subProcessDone()
+          .done();
+
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(sourceModel);
+    ProcessDefinition targetProcessDefinition =
+        testHelper.deployAndGetDefinition(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS);
+
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
+    rule.getRuntimeService().correlateMessage("Message");
+
+    ActivityStatistics activityStatistics = rule.getManagementService()
+        .createActivityStatisticsQuery(sourceProcessDefinition.getId())
+        .singleResult();
+
+    // assume
+    Assertions.assertThat(activityStatistics.getId()).isEqualTo(EVENT_SUB_PROCESS_TASK_ID);
+    Assertions.assertThat(activityStatistics.getInstances()).isEqualTo(1);
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapEqualActivities()
+        .build();
+
+    // when
+    testHelper.migrateProcessInstance(migrationPlan, processInstance);
+
+    // then
+    activityStatistics = rule.getManagementService()
+        .createActivityStatisticsQuery(targetProcessDefinition.getId())
+        .singleResult();
+
+    // assume
+    Assertions.assertThat(activityStatistics.getId()).isEqualTo(EVENT_SUB_PROCESS_TASK_ID);
+    Assertions.assertThat(activityStatistics.getInstances()).isEqualTo(1);
+  }
+
+  @Test
+  public void shouldRemainActiveAfterUserTaskBecomesScope() {
+    ProcessDefinition sourceProcessDefinition =
+        testHelper.deployAndGetDefinition(EventSubProcessModels.MESSAGE_EVENT_SUBPROCESS_PROCESS);
+
+        BpmnModelInstance targetModel = modify(ProcessModels.ONE_TASK_PROCESS)
+          .addSubProcessTo(ProcessModels.PROCESS_KEY)
+            .id(EventSubProcessModels.EVENT_SUB_PROCESS_ID)
+            .triggerByEvent()
+            .embeddedSubProcess()
+              .startEvent(EVENT_SUB_PROCESS_START_ID).message(EventSubProcessModels.MESSAGE_NAME)
+              .userTask(EVENT_SUB_PROCESS_TASK_ID)
+                .boundaryEvent().condition("${true == false}")
+              .endEvent()
+            .endEvent()
+          .subProcessDone()
+          .done();
+
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(targetModel);
+
+    ProcessInstance processInstance = rule.getRuntimeService()
+        .startProcessInstanceById(sourceProcessDefinition.getId());
+    rule.getRuntimeService().correlateMessage("Message");
+
+    ActivityStatistics activityStatistics = rule.getManagementService()
+        .createActivityStatisticsQuery(sourceProcessDefinition.getId())
+        .singleResult();
+
+    // assume
+    Assertions.assertThat(activityStatistics.getId()).isEqualTo(EVENT_SUB_PROCESS_TASK_ID);
+    Assertions.assertThat(activityStatistics.getInstances()).isEqualTo(1);
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapEqualActivities()
+        .build();
+
+    // when
+    testHelper.migrateProcessInstance(migrationPlan, processInstance);
+
+    // then
+    activityStatistics = rule.getManagementService()
+        .createActivityStatisticsQuery(targetProcessDefinition.getId())
+        .singleResult();
+
+    // assume
+    Assertions.assertThat(activityStatistics.getId()).isEqualTo(EVENT_SUB_PROCESS_TASK_ID);
+    Assertions.assertThat(activityStatistics.getInstances()).isEqualTo(1);
+  }
+
 }
