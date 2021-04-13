@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto
     desc = 'Mandatory when `sortBy` is one of the following values: `processVariable`, `executionVariable`,
            `taskVariable`, `caseExecutionVariable` or `caseInstanceVariable`. Must be a JSON object with the properties
@@ -15,3 +16,4 @@
         desc = "The name of the type of the variable value." />
 
 </@lib.dto>
+</#macro>

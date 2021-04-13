@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -18,3 +19,5 @@
         desc = "The version of the schema." />
 
 </@lib.dto>
+
+</#macro>

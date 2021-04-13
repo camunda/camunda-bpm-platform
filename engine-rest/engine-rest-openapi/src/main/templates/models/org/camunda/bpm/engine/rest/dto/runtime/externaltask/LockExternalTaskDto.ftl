@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto extends = "HandleExternalTaskDto" >
 
   <@lib.property
@@ -11,3 +12,5 @@
               will succeed and a new lock duration will be set, starting from the current moment." />
 
 </@lib.dto>
+
+</#macro>

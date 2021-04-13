@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -17,3 +18,5 @@
         The object contains the following property: password (String).  "/>
 
 </@lib.dto>
+
+</#macro>

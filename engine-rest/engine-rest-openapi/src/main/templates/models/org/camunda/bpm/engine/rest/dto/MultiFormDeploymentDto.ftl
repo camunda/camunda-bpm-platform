@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -41,3 +42,5 @@
                 It is possible to have more than one form part with different form part names for the binary data to create a deployment."/>
 
 </@lib.dto>
+
+</#macro>

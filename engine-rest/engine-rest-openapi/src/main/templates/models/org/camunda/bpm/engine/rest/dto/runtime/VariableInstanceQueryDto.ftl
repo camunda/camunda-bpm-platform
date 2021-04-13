@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto
     desc = "A variable instance query which defines a list of variable instances" >
     <#assign requestMethod="POST"/>
@@ -17,3 +18,4 @@
     }
 
 </@lib.dto>
+</#macro>

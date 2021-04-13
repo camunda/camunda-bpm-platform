@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto
     desc = "An activity instance, incident pair." >
 
@@ -13,3 +14,5 @@
         desc = "The activity id in which the incident happened."/>
 
 </@lib.dto>
+
+</#macro>

@@ -84,7 +84,8 @@
     "schemas": {
 
     <#list models as name, package>
-        "${name}": <#include "/models/${package}/${name}.ftl"><#sep>,
+        <#import "/models/${package}/${name}.ftl" as schema>
+        "${name}": <@schema.dto_macro docsUrl=docsUrl/><#sep>,
     </#list>
 
     }

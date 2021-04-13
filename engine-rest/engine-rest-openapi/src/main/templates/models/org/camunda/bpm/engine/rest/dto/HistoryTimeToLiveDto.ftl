@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -10,3 +11,4 @@
                 Can be `null`. Can not be negative."/>
 
 </@lib.dto>
+</#macro>

@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto extends = "AbstractSetRemovalTimeDto">
 
   <@lib.property
@@ -20,3 +21,4 @@
               Value may only be `true`, as `false` is the default behavior."/>
 
 </@lib.dto>
+</#macro>

@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 {
   "title": "FormDto",
   "type": "object",
@@ -18,3 +19,4 @@
 
   }
 }
+</#macro>

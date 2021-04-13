@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto
     required = [ "type" ] >
 
@@ -26,3 +27,4 @@
                 Specifies the sequence flow to start." />
 
 </@lib.dto>
+</#macro>

@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto
     title = "ExternalTaskQueryDto"
     desc = "A JSON object with the following properties:" >
@@ -142,3 +143,5 @@
     }
 
 </@lib.dto>
+
+</#macro>

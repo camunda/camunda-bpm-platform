@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -114,3 +115,4 @@
         desc = "The process instance id of the root process instance that initiated the process containing this activity instance."/>
 
 </@lib.dto>
+</#macro>

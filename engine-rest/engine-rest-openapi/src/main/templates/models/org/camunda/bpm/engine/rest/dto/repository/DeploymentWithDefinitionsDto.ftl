@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto
     extends = "DeploymentDto" >
 
@@ -39,3 +40,4 @@
                 The key is the case definition id, the value is a JSON Object corresponding to the case definition." />
 
 </@lib.dto>
+</#macro>

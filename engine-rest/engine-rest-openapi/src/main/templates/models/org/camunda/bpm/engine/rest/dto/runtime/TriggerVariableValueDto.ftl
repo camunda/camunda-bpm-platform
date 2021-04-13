@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto
     extends = "VariableValueDto" >
 
@@ -10,3 +11,4 @@
                     entering the target activity." />
 
 </@lib.dto>
+</#macro>

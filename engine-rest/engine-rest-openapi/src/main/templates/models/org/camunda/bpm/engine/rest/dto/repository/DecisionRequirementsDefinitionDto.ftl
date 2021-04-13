@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -43,3 +44,4 @@
         desc = "The tenant id of the decisionrequirements definition." />
 
 </@lib.dto>
+</#macro>

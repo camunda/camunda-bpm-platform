@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
     <#-- Note: If you are here from Job endpoints, see JobConditionQueryParameterDto which has a reduced set of operators -->
     <@lib.property
@@ -13,3 +14,5 @@
         desc = "The variable value, could be of type boolean, string or number"/>
 
 </@lib.dto>
+
+</#macro>

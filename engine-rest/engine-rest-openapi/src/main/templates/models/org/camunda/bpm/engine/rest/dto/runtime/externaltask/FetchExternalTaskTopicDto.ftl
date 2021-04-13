@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto
     required = [ "topicName", "lockDuration" ] >
 
@@ -103,3 +104,5 @@
 
 
 </@lib.dto>
+
+</#macro>

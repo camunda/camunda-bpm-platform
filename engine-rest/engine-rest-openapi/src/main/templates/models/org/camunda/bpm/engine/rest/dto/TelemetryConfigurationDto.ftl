@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -7,3 +8,5 @@
         desc = "Specifies if the telemetry data should be sent or not."/>
 
 </@lib.dto>
+
+</#macro>

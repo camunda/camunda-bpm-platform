@@ -1,6 +1,8 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto
     desc = "A historic activity instance query which defines a group of historic activity instances" >
 
+    <#assign requestMethod="POST"/>
     <#include "/lib/commons/history-activity-instance.ftl" >
 
     <@lib.properties params />
@@ -16,3 +18,4 @@
     }
 
 </@lib.dto>
+</#macro>

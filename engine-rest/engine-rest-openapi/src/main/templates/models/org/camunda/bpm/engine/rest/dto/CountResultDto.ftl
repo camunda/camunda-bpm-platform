@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -9,3 +10,4 @@
         desc = "The number of matching instances."/>
 
 </@lib.dto>
+</#macro>

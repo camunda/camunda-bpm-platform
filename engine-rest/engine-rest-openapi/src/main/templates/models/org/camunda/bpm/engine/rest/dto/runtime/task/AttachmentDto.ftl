@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto extends = "LinkableDto" >
 
     <@lib.property
@@ -54,3 +55,4 @@
         desc = "The process instance id of the root process instance that initiated the process containing the task." />
 
 </@lib.dto>
+</#macro>

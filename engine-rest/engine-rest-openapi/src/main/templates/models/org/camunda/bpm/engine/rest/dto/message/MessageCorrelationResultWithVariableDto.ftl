@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto
     desc="The `processInstance` property only has a value if the resultType is set to `ProcessDefinition`.
           The processInstance with the properties as described in the
@@ -35,3 +36,5 @@
                 Contains a list of the process variables. "/>
 
 </@lib.dto>
+
+</#macro>

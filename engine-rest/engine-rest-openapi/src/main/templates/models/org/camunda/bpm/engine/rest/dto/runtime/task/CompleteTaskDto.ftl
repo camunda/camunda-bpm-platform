@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -19,3 +20,5 @@
                 variables will be returned." />
 
 </@lib.dto>
+
+</#macro>

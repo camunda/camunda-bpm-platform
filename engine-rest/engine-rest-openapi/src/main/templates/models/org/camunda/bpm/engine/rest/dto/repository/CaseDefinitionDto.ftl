@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -51,3 +52,4 @@
                 Is used within [History cleanup](${docsUrl}/user-guide/process-engine/history/#history-cleanup)." />
 
 </@lib.dto>
+</#macro>

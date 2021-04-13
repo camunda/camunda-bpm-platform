@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -76,3 +77,4 @@
         desc = "A flag indicating whether the process definition is startable in Tasklist or not." />
 
 </@lib.dto>
+</#macro>

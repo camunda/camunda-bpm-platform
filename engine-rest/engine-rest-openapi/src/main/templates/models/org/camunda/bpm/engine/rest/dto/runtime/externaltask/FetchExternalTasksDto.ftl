@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto
     title = ""
     required = [ "workerId", "maxTasks" ] >
@@ -39,3 +40,5 @@
                 arbitrarily distributed among these topics. Each topic object has the following properties:" />
 
 </@lib.dto>
+
+</#macro>

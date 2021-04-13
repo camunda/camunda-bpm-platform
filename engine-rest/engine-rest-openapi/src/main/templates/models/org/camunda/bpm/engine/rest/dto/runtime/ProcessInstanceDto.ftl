@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto
     extends = "LinkableDto" >
 
@@ -39,3 +40,4 @@
         desc = "The tenant id of the process instance." />
 
 </@lib.dto>
+</#macro>

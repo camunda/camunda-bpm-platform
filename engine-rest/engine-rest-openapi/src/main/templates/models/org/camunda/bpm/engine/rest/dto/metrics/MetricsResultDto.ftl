@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -8,3 +9,5 @@
         desc = "The current sum (count) for the selected metric."/>
 
 </@lib.dto>
+
+</#macro>

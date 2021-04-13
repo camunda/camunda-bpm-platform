@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -23,3 +24,4 @@
                 if the execution belongs to no single tenant."/>
 
 </@lib.dto>
+</#macro>

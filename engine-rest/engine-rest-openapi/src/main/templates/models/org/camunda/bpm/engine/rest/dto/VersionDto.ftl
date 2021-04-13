@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -7,3 +8,4 @@
         desc = "The version of the Rest API." />
 
 </@lib.dto>
+</#macro>

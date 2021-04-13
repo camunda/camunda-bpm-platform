@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto
     title = "RedeploymentDto"
     desc = "A JSON object with the following properties:" >
@@ -21,3 +22,5 @@
         desc = "Sets the source of the deployment." />
 
 </@lib.dto>
+
+</#macro>

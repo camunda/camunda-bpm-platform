@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
     <@lib.property
         name = "id"
@@ -79,3 +80,5 @@
         last = true
         desc = "The annotation set to the incident." />
 </@lib.dto>
+
+</#macro>

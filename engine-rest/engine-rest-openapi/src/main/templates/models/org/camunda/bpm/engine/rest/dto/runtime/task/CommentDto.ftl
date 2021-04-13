@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto
     extends = "LinkableDto" >
 
@@ -45,3 +46,4 @@
                 containing the task." />
 
 </@lib.dto>
+</#macro>

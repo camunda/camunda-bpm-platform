@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto
     desc = "A Task query which defines a group of Tasks." >
   
@@ -663,3 +664,4 @@
     }
 
 </@lib.dto>
+</#macro>
