@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 {
   <@lib.endpointInfo
       id = "updateSuspensionState"
@@ -70,3 +71,4 @@
                 for example if the provided processDefinitionId or processDefinitionKey parameter is null."/>
   }
 }
+</#macro>

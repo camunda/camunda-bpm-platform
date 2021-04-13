@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
@@ -32,3 +33,4 @@
         desc = "If the user who perform the operation is not a <b>camunda-admin</b> user." />
   }
 }
+</#macro>

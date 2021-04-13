@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 {
   <@lib.endpointInfo
       id = "deleteTaskMetrics"
@@ -31,3 +32,4 @@
 
   }
 }
+</#macro>

@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 {
   <@lib.endpointInfo
       id = "getGroup"
@@ -42,3 +43,5 @@
                 for the error response format." />
   }
 }
+
+</#macro>

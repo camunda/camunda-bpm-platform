@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 <#-- Generated From File: camunda-docs-manual/public/reference/rest/variable-instance/post-query-count/index.html -->
 {
   <@lib.endpointInfo
@@ -66,3 +67,5 @@
   }
 
 }
+
+</#macro>

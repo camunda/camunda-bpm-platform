@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 {
   <@lib.endpointInfo
       id = "setProcessInstanceVariable"
@@ -64,3 +65,4 @@
                 the passed variable type is not supported."/>
   }
 }
+</#macro>

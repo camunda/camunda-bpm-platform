@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 {
   <@lib.endpointInfo
       id = "getActivityInstanceTree"
@@ -71,3 +72,4 @@
 
   }
 }
+</#macro>

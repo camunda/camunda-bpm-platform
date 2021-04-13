@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 <#-- Generated From File: camunda-docs-manual/public/reference/rest/identity/verify-user/index.html -->
 {
   <@lib.endpointInfo
@@ -45,3 +46,4 @@
   }
 
 }
+</#macro>

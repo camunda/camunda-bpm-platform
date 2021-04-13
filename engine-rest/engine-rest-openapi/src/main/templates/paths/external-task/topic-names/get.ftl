@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
@@ -60,3 +61,4 @@
         desc = "Returned if some of the query parameters are invalid." />
   }
 }
+</#macro>

@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
@@ -45,3 +46,5 @@
                 for the error response format." />
   }
 }
+
+</#macro>

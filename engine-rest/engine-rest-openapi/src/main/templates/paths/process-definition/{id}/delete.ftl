@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 {
   <@lib.endpointInfo
       id = "deleteProcessDefinition"
@@ -55,3 +56,4 @@
 
   }
 }
+</#macro>

@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 {
   <@lib.endpointInfo
       id = "updateBatchSuspensionState"
@@ -42,3 +43,4 @@
 
       }
 }
+</#macro>

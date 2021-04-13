@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 <#-- Generated From File: camunda-docs-manual/public/reference/rest/tenant/group-members/options/index.html -->
 {
   <@lib.endpointInfo
@@ -54,3 +55,4 @@
   }
 
 }
+</#macro>

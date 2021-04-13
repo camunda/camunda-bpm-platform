@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
@@ -35,3 +36,5 @@
                [Incident Types](${docsUrl}/user-guide/process-engine/incidents/#incident-types) section." />
     }
 }
+
+</#macro>

@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 {
   <@lib.endpointInfo
       id = "queryProcessInstancesCount"
@@ -52,3 +53,4 @@
 
   }
 }
+</#macro>

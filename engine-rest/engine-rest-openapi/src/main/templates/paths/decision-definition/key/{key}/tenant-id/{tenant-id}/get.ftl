@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 {
   <@lib.endpointInfo
       id = "getDecisionDefinitionByKeyAndTenantId"
@@ -56,3 +57,4 @@
                 See the [Introduction](${docsUrl}/reference/rest/overview/#error-handling) for the error response format."/>
   }
 }
+</#macro>

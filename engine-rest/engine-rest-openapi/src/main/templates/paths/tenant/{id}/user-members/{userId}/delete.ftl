@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 <#-- Generated From File: camunda-docs-manual/public/reference/rest/tenant/user-members/delete/index.html -->
 {
   <@lib.endpointInfo
@@ -53,3 +54,4 @@
   }
 
 }
+</#macro>

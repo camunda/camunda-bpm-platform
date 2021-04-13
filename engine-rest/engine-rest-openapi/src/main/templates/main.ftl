@@ -73,8 +73,9 @@
     <#list endpoints as path, methods>
         "${path}": {
             <#list methods as method>
+                <#import "/paths${path}/${method}.ftl" as endpoint>
                 "${method}":
-                <#include "/paths${path}/${method}.ftl"><#sep>,
+                <@endpoint.endpoint_macro docsUrl=docsUrl/><#sep>,
             </#list>
         }<#sep>,
     </#list>

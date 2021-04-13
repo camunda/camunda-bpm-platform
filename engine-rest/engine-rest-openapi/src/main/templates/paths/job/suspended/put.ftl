@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 <#-- Generated From File: camunda-docs-manual/public/reference/rest/job/put-activate-suspend-by-proc-def-key/index.html -->
 <#-- This file is actually based on four doc files found under put-activate-suspend-by-* as they all describe the same endpoint -->
 {
@@ -70,3 +71,4 @@
   }
 
 }
+</#macro>

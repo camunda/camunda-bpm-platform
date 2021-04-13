@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 {
   <@lib.endpointInfo
       id = "getProcessInstancesCount"
@@ -30,3 +31,4 @@
                 Returned if some of the query parameters are invalid, for example an invalid operator for variable comparison is used."/>
   }
 }
+</#macro>
