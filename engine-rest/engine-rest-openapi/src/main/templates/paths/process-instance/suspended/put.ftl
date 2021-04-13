@@ -42,7 +42,7 @@
                        "processDefinitionKey" : "aProcDefKey",
                        "suspended" : true
                      }
-                   }'
+                   }',
                  '"example-3": {
                      "summary": "PUT `/process-instance/suspended`",
                      "description": "Suspend Process Instance In Group",
