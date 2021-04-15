@@ -40,6 +40,7 @@ public class StartEventImpl extends CatchEventImpl implements StartEvent {
 
   protected static Attribute<Boolean> camundaAsyncAttribute;
   protected static Attribute<String> camundaFormHandlerClassAttribute;
+  protected static Attribute<String> camundaFormHandlerDelegateExpressionAttribute;
   protected static Attribute<String> camundaFormKeyAttribute;
   protected static Attribute<String> camundaInitiatorAttribute;
 
@@ -66,6 +67,10 @@ public class StartEventImpl extends CatchEventImpl implements StartEvent {
       .build();
 
     camundaFormHandlerClassAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_FORM_HANDLER_CLASS)
+      .namespace(CAMUNDA_NS)
+      .build();
+
+    camundaFormHandlerDelegateExpressionAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_FORM_HANDLER_DELEGATE_EXPRESSION)
       .namespace(CAMUNDA_NS)
       .build();
 
@@ -121,6 +126,14 @@ public class StartEventImpl extends CatchEventImpl implements StartEvent {
 
   public void setCamundaFormHandlerClass(String camundaFormHandlerClass) {
     camundaFormHandlerClassAttribute.setValue(this, camundaFormHandlerClass);
+  }
+
+  public String getCamundaFormHandlerDelegateExpression() {
+    return camundaFormHandlerDelegateExpressionAttribute.getValue(this);
+  }
+
+  public void setCamundaFormHandlerDelegateExpression(String camundaFormHandlerDelegateExpression) {
+    camundaFormHandlerDelegateExpressionAttribute.setValue(this, camundaFormHandlerDelegateExpression);
   }
 
   public String getCamundaFormKey() {

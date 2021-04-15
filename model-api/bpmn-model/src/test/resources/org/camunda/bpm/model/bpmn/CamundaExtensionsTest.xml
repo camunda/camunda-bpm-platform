@@ -22,6 +22,7 @@
     <startEvent id="startEvent"
         camunda:initiator="test"
         camunda:formHandlerClass="org.camunda.test.Test"
+        camunda:formHandlerDelegateExpression="${org.camunda.test.Test}"
         camunda:formKey="test"
         camunda:asyncBefore="true"
         camunda:asyncAfter="true"
@@ -56,6 +57,7 @@
         camunda:dueDate="2014-02-27"
         camunda:exclusive="false"
         camunda:formHandlerClass="org.camunda.test.Test"
+        camunda:formHandlerDelegateExpression="${org.camunda.test.Test}"
         camunda:formKey="test"
         camunda:priority="12"
         camunda:jobPriority="${test}">

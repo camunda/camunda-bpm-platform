@@ -50,6 +50,10 @@ public interface StartEvent extends CatchEvent {
 
   void setCamundaFormHandlerClass(String camundaFormHandlerClass);
 
+  String getCamundaFormHandlerDelegateExpression();
+
+  void setCamundaFormHandlerDelegateExpression(String camundaFormHandlerDelegateExpression);
+
   String getCamundaFormKey();
 
   void setCamundaFormKey(String camundaFormKey);

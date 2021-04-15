@@ -25,6 +25,7 @@ import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBU
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_DUE_DATE;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_FOLLOW_UP_DATE;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_FORM_HANDLER_CLASS;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_FORM_HANDLER_DELEGATE_EXPRESSION;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_FORM_KEY;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_PRIORITY;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
@@ -64,6 +65,7 @@ public class UserTaskImpl extends TaskImpl implements UserTask {
   protected static Attribute<String> camundaDueDateAttribute;
   protected static Attribute<String> camundaFollowUpDateAttribute;
   protected static Attribute<String> camundaFormHandlerClassAttribute;
+  protected static Attribute<String> camundaFormHandlerDelegateExpressionAttribute;
   protected static Attribute<String> camundaFormKeyAttribute;
   protected static Attribute<String> camundaPriorityAttribute;
 
@@ -109,6 +111,10 @@ public class UserTaskImpl extends TaskImpl implements UserTask {
       .build();
 
     camundaFormHandlerClassAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_FORM_HANDLER_CLASS)
+      .namespace(CAMUNDA_NS)
+      .build();
+
+    camundaFormHandlerDelegateExpressionAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_FORM_HANDLER_DELEGATE_EXPRESSION)
       .namespace(CAMUNDA_NS)
       .build();
 
@@ -212,6 +218,14 @@ public class UserTaskImpl extends TaskImpl implements UserTask {
 
   public void setCamundaFormHandlerClass(String camundaFormHandlerClass) {
     camundaFormHandlerClassAttribute.setValue(this, camundaFormHandlerClass);
+  }
+
+  public String getCamundaFormHandlerDelegateExpression() {
+    return camundaFormHandlerDelegateExpressionAttribute.getValue(this);
+  }
+
+  public void setCamundaFormHandlerDelegateExpression(String camundaFormHandlerDelegateExpression) {
+    camundaFormHandlerDelegateExpressionAttribute.setValue(this, camundaFormHandlerDelegateExpression);
   }
 
   public String getCamundaFormKey() {

@@ -40,6 +40,7 @@ public class StartEventTest extends BpmnModelElementInstanceTest {
       /** camunda extensions */
       new AttributeAssumption(CAMUNDA_NS, "async", false, false, false),
       new AttributeAssumption(CAMUNDA_NS, "formHandlerClass"),
+      new AttributeAssumption(CAMUNDA_NS, "formHandlerDelegateExpression"),
       new AttributeAssumption(CAMUNDA_NS, "formKey"),
       new AttributeAssumption(CAMUNDA_NS, "initiator")
     );

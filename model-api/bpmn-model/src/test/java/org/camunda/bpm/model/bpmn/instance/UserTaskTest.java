@@ -46,6 +46,7 @@ public class UserTaskTest extends BpmnModelElementInstanceTest {
       new AttributeAssumption(CAMUNDA_NS, "dueDate"),
       new AttributeAssumption(CAMUNDA_NS, "followUpDate"),
       new AttributeAssumption(CAMUNDA_NS, "formHandlerClass"),
+      new AttributeAssumption(CAMUNDA_NS, "formHandlerDelegateExpression"),
       new AttributeAssumption(CAMUNDA_NS, "formKey"),
       new AttributeAssumption(CAMUNDA_NS, "priority")
     );

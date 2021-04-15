@@ -510,6 +510,16 @@ public class CamundaExtensionsTest {
   }
 
   @Test
+  public void testFormHandlerDelegateExpression() {
+    assertThat(startEvent.getCamundaFormHandlerDelegateExpression()).isEqualTo(TEST_DELEGATE_EXPRESSION_XML);
+    assertThat(userTask.getCamundaFormHandlerDelegateExpression()).isEqualTo(TEST_DELEGATE_EXPRESSION_XML);
+    startEvent.setCamundaFormHandlerDelegateExpression(TEST_DELEGATE_EXPRESSION_API);
+    userTask.setCamundaFormHandlerDelegateExpression(TEST_DELEGATE_EXPRESSION_API);
+    assertThat(startEvent.getCamundaFormHandlerDelegateExpression()).isEqualTo(TEST_DELEGATE_EXPRESSION_API);
+    assertThat(userTask.getCamundaFormHandlerDelegateExpression()).isEqualTo(TEST_DELEGATE_EXPRESSION_API);
+  }
+
+  @Test
   public void testFormKey() {
     assertThat(startEvent.getCamundaFormKey()).isEqualTo(TEST_STRING_XML);
     assertThat(userTask.getCamundaFormKey()).isEqualTo(TEST_STRING_XML);

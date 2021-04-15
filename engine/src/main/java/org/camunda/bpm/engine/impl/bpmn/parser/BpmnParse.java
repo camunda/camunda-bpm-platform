@@ -974,9 +974,17 @@ public class BpmnParse extends Parse {
             } else {
               startFormHandler = (StartFormHandler) ReflectUtil.instantiate((String) expressionResult);
             }
+          String startFormHandlerClassName = startEventElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "formHandlerClass");
+          String startFormHandlerDelegateExpression = startEventElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "formHandlerDelegateExpression");
+
+          if (startFormHandlerClassName != null) {
+            startFormHandler = (StartFormHandler) ReflectUtil.instantiate(startFormHandlerClassName);
+          } else if (startFormHandlerDelegateExpression != null) {
+            startFormHandler = (StartFormHandler) expressionManager.createExpression(startFormHandlerDelegateExpression).getValue(StartProcessVariableScope.getSharedInstance());
           } else {
             startFormHandler = new DefaultStartFormHandler();
           }
+
           startFormHandler.parseConfiguration(startEventElement, deployment, processDefinition, this);
 
           processDefinition.setStartFormHandler(new DelegateStartFormHandler(startFormHandler, deployment));
