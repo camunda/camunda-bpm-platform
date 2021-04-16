@@ -21,6 +21,7 @@ pipeline {
   }
   options {
     buildDiscarder(logRotator(numToKeepStr: '5'))
+    disableConcurrentBuilds() // TODO https://jira.camunda.com/browse/CAM-13403
   }
   triggers {
     pollSCM('H H(0-7) * * *')
