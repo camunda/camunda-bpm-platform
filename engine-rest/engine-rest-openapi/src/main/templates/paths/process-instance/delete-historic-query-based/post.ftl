@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 {
   <@lib.endpointInfo
       id = "deleteAsyncHistoricQueryBased"
@@ -57,3 +58,4 @@
 
   }
 }
+</#macro>

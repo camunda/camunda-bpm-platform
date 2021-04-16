@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -66,3 +67,4 @@
         desc = "The version tag of the decision definition." />
 
 </@lib.dto>
+</#macro>

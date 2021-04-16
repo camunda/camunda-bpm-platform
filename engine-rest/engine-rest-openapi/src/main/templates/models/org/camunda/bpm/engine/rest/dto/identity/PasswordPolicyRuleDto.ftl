@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto desc = "Describes a rule of a password policy.">
 
     <@lib.property
@@ -15,3 +16,4 @@
     />
 
 </@lib.dto>
+</#macro>

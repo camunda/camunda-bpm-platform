@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto
     required = [ "type" ] >
 
@@ -65,3 +66,5 @@
         desc = "Can be used with instructions of type cancel. Prevents the deletion of new created activity instances." />
 
 </@lib.dto>
+
+</#macro>

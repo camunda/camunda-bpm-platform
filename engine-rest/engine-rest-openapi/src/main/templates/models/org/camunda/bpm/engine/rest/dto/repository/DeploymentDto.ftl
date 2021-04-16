@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto
     extends = "LinkableDto" >
 
@@ -29,3 +30,4 @@
         desc = "The name of the deployment." />
 
 </@lib.dto>
+</#macro>

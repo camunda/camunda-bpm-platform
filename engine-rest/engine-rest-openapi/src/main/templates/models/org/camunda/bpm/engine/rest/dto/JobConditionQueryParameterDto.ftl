@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
     <#-- Note: this is an extra Dto for the POST Job endpoints as it allows fewer comparison operators than the ConditionQueryParameterDto -->
     <@lib.property
@@ -14,3 +15,5 @@
         desc = "Date value to compare with."/>
 
 </@lib.dto>
+
+</#macro>

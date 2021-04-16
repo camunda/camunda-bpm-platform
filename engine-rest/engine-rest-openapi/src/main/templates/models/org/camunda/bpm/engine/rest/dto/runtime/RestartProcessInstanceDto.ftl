@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -44,3 +45,4 @@
                 If this property is omitted, the process instance starts at its default blank start event." />
 
 </@lib.dto>
+</#macro>

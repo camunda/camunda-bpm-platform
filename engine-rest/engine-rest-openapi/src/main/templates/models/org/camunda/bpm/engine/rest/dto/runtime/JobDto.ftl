@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <#-- Generated From File: camunda-docs-manual/public/reference/rest/job/get/index.html -->
 <@lib.dto>
     
@@ -93,3 +94,4 @@
     />
 
 </@lib.dto>
+</#macro>

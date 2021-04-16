@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <#assign last = false >
@@ -12,3 +13,4 @@
         desc = "The process definition."/>
 
 </@lib.dto>
+</#macro>

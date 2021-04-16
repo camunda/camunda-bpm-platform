@@ -73,8 +73,9 @@
     <#list endpoints as path, methods>
         "${path}": {
             <#list methods as method>
+                <#import "/paths${path}/${method}.ftl" as endpoint>
                 "${method}":
-                <#include "/paths${path}/${method}.ftl"><#sep>,
+                <@endpoint.endpoint_macro docsUrl=docsUrl/><#sep>,
             </#list>
         }<#sep>,
     </#list>
@@ -84,7 +85,8 @@
     "schemas": {
 
     <#list models as name, package>
-        "${name}": <#include "/models/${package}/${name}.ftl"><#sep>,
+        <#import "/models/${package}/${name}.ftl" as schema>
+        "${name}": <@schema.dto_macro docsUrl=docsUrl/><#sep>,
     </#list>
 
     }

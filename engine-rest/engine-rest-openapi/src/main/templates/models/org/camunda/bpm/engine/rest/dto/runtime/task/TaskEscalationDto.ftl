@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
   <@lib.property
@@ -15,3 +16,5 @@
         desc = "A JSON object containing variable key-value pairs." />
 
 </@lib.dto>
+
+</#macro>

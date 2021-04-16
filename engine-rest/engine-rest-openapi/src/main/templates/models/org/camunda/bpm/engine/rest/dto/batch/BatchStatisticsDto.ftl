@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto extends = "BatchDto">
 
     <@lib.property
@@ -21,3 +22,4 @@
         desc = "The number of failed batch execution jobs. This does not include aborted or deleted batch execution jobs." />
 
 </@lib.dto>
+</#macro>

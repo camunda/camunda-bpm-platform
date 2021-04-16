@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto
     desc = "A process instance query which defines a group of process instances" >
 
@@ -193,3 +194,5 @@
     }
 
 </@lib.dto>
+
+</#macro>

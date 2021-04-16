@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -14,3 +15,4 @@
         desc = "The total number of incidents for the corresponding incident type."/>
 
 </@lib.dto>
+</#macro>

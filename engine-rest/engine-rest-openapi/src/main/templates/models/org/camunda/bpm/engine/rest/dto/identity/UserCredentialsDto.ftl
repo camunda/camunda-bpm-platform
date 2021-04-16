@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -13,3 +14,4 @@
                           (i.e., the user with passed id as path parameter)." />
 
 </@lib.dto>
+</#macro>

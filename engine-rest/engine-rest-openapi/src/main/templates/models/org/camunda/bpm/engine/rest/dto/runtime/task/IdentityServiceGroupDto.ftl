@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -14,3 +15,4 @@
     />
 
 </@lib.dto>
+</#macro>

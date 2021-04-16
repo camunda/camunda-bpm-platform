@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 {
   <@lib.endpointInfo
       id = "getProcessInstances"
@@ -51,3 +52,5 @@
                 for example if a sortOrder parameter is supplied, but no sortBy, or if an invalid operator for variable comparison is used."/>
   }
 }
+
+</#macro>

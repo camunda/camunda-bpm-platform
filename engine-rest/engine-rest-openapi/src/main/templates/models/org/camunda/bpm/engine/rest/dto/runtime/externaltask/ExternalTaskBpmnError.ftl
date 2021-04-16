@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto
     extends = "TaskBpmnErrorDto" >
 
@@ -9,3 +10,5 @@
               locked the task." />
 
 </@lib.dto>
+
+</#macro>

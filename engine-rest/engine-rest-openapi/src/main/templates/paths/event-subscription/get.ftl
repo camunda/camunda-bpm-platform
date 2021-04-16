@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 {
   <@lib.endpointInfo
       id = "getEventSubscriptions"
@@ -62,3 +63,5 @@
                 for the error response format."/>
   }
 }
+
+</#macro>

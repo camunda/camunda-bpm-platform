@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -24,3 +25,4 @@
         desc = "An arbitrary text annotation set by a user for auditing reasons." />
 
 </@lib.dto>
+</#macro>

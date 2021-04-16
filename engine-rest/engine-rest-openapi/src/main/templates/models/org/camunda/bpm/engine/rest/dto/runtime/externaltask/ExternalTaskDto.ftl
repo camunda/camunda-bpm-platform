@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto
     title = "ExternalTaskDto"
     desc = "An External Task object with the following properties" >
@@ -94,3 +95,5 @@
 
 
 </@lib.dto>
+
+</#macro>

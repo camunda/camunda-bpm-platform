@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -42,3 +43,5 @@
                 **Note**: Cannot be used in combination with `executionId`."/>
 
 </@lib.dto>
+
+</#macro>

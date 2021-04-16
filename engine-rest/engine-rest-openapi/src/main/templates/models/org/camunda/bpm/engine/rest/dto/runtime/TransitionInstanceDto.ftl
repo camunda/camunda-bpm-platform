@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto
     desc = "A JSON object corresponding to the Activity Instance tree of the given process instance." >
 
@@ -57,3 +58,5 @@
                 * `activityId`: the activity id in which the incident occurred"/>
 
 </@lib.dto>
+
+</#macro>

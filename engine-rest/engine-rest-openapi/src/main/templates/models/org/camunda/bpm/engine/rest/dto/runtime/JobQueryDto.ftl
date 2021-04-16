@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <#-- Generated From File: camunda-docs-manual/public/reference/rest/job/post-query/index.html -->
 <@lib.dto desc = "A Job instance query which defines a list of Job instances">
 
@@ -16,3 +17,4 @@
     }
 
 </@lib.dto>
+</#macro>

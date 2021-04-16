@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
   <@lib.property
@@ -33,3 +34,4 @@
       desc = "The average duration in milliseconds of all completed process instances which were started in the given period."/>
 
 </@lib.dto>
+</#macro>

@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
@@ -49,3 +50,5 @@
         desc = "Returned if an incident with given id does not exist." />
     }
 }
+
+</#macro>

@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto extends="PasswordPolicyDto">
 
     <@lib.property
@@ -8,3 +9,5 @@
     />
 
 </@lib.dto>
+
+</#macro>

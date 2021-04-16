@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 {
   <@lib.endpointInfo
       id = "interval"
@@ -95,3 +96,5 @@
         desc = "Returned if some of the query parameters are invalid." />
   }
 }
+
+</#macro>

@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto extends = "SuspensionStateDto">
 
     <@lib.property
@@ -50,3 +51,4 @@
         dto = "HistoricProcessInstanceQueryDto" />
 
 </@lib.dto>
+</#macro>

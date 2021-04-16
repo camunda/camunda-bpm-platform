@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 {
   <@lib.endpointInfo
       id = "createDeployment"
@@ -104,3 +105,4 @@
 
   }
 }
+</#macro>

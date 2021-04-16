@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
     <#-- In the java code this inherits from UserCredentialsDto, but that brings the unnecessary
     attribute authenticatedUserPassword -->
@@ -16,3 +17,4 @@
     />
 
 </@lib.dto>
+</#macro>

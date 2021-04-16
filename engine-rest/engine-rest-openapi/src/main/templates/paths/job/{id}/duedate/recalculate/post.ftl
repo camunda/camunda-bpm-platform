@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 <#-- Generated From File: camunda-docs-manual/public/reference/rest/job/post-recalculate-job-duedate/index.html -->
 {
   <@lib.endpointInfo
@@ -55,3 +56,4 @@
   }
 
 }
+</#macro>

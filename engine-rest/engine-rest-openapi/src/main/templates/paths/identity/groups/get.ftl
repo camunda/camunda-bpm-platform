@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 <#-- Generated From File: camunda-docs-manual/public/reference/rest/identity/get-group-info/index.html -->
 {
   <@lib.endpointInfo
@@ -58,3 +59,4 @@
   }
 
 }
+</#macro>

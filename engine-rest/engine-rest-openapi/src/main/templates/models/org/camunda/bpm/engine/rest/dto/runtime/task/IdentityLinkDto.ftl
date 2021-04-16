@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto required = ["type"] >
 
     <@lib.property
@@ -24,3 +25,4 @@
                 **Note**: When adding or removing an Identity Link, the `type` property must be defined." />
 
 </@lib.dto>
+</#macro>

@@ -1,6 +1,8 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto
     desc = "A group instance query which defines a list of group instances" >
 
+    <#assign requestMethod="POST"/>
     <#include "/lib/commons/group-query-params.ftl" >
     <@lib.properties params />
 
@@ -14,3 +16,4 @@
     }
 
 </@lib.dto>
+</#macro>

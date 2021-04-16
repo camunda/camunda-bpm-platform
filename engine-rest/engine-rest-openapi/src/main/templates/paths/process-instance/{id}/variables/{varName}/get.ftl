@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 {
   <@lib.endpointInfo
       id = "getProcessInstanceVariable"
@@ -83,3 +84,4 @@
 
   }
 }
+</#macro>

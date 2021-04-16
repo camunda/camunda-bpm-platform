@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <#assign last = true >
@@ -5,3 +6,4 @@
     <#include "/lib/commons/statistics-result-props.ftl" >
 
 </@lib.dto>
+</#macro>

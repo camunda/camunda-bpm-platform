@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <#-- NOTE: Please consider adjusting the StartProcessInstanceFormsDto
@@ -51,3 +52,4 @@
                 Default value: `false`" />
 
 </@lib.dto>
+</#macro>

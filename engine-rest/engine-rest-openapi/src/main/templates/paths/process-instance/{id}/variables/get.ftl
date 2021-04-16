@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 {
   <@lib.endpointInfo
       id = "getProcessInstanceVariables"
@@ -80,3 +81,4 @@
         desc = "Process instance with given id does not exist."/>
   }
 }
+</#macro>

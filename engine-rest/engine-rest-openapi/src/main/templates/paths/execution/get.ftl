@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 <#-- Generated From File: camunda-docs-manual/public/reference/rest/execution/get-query/index.html -->
 {
   <@lib.endpointInfo
@@ -62,3 +63,4 @@
   }
 
 }
+</#macro>

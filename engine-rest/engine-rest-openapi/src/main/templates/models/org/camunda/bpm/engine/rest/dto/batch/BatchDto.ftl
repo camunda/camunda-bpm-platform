@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -71,3 +72,4 @@
         desc = "The id of the user that created the batch." />
 
 </@lib.dto>
+</#macro>

@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
   <#assign dateFormatDescription = "Default [format](${docsUrl}/reference/rest/overview/date-format/) `yyyy-MM-dd'T'HH:mm:ss.SSSZ`."/>
 
@@ -114,3 +115,4 @@
               `INTERNALLY_TERMINATED` - terminated internally, for instance by terminating boundary event"/>
 
 </@lib.dto>
+</#macro>

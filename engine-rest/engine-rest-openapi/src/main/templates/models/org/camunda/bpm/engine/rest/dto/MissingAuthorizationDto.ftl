@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -17,3 +18,4 @@
         desc = "The id of the resource that the user is missing permission for." />
 
 </@lib.dto>
+</#macro>

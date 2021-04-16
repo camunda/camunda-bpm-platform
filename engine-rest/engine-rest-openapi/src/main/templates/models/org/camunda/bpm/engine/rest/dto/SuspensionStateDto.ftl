@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <#-- NOTE: Please adding any changes, if necessary, to:
@@ -12,3 +13,5 @@
         last = true />
 
 </@lib.dto>
+
+</#macro>

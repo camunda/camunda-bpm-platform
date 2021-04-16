@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -24,3 +25,5 @@
         desc = "The value of the metric aggregated by the interval."/>
 
 </@lib.dto>
+
+</#macro>

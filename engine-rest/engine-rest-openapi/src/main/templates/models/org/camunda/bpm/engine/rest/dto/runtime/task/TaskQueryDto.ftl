@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto
     desc = "A Task query which defines a group of Tasks." >
   
@@ -659,7 +660,7 @@
                                   '"caseExecutionVariable"', '"caseInstanceVariable"' ] >
         <#assign sortParamsDto = "SortTaskQueryParametersDto" >
         <#include "/lib/commons/sort-props.ftl" >
-        <#assign sortParamsDto = "" >
     }
 
 </@lib.dto>
+</#macro>

@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -31,3 +32,4 @@
           desc= "A variables the operation will set in the root scope of the process instances." />
 
 </@lib.dto>
+</#macro>

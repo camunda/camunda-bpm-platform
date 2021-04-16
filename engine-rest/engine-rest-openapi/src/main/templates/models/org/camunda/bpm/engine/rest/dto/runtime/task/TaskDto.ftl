@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -114,7 +115,8 @@
     <@lib.property
         name = "tenantId"
         type = "string"
-        last = last
+        last = true
         desc = "If not `null`, the tenant id of the task." />
 
 </@lib.dto>
+</#macro>

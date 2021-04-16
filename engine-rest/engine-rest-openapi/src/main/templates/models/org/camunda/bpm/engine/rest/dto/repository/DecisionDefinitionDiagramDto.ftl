@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -13,3 +14,5 @@
                 Carriage returns, line feeds and quotation marks are escaped." />
 
 </@lib.dto>
+
+</#macro>

@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 {
   <@lib.endpointInfo
       id = "setRetriesByProcessHistoricQueryBased"
@@ -56,3 +57,4 @@
 
   }
 }
+</#macro>

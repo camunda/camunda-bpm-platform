@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
@@ -33,3 +34,5 @@
                 response format." />
     }
 }
+
+</#macro>
