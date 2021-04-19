@@ -19,13 +19,13 @@ pipeline {
     disableConcurrentBuilds() // TODO https://jira.camunda.com/browse/CAM-13403
   }
   parameters {
-    string name: 'EE_DOWNSTREAM', defaultValue: 'cambpm-ee-main-pr/master', description: 'The name of the EE branch/PR to run the EE pipeline on, e.g. cambpm-ee-main/PR-333'
+    string name: 'EE_DOWNSTREAM', defaultValue: 'cambpm-ee-main-pr/' + cambpmDefaultBranch(), description: 'The name of the EE branch/PR to run the EE pipeline on, e.g. cambpm-ee-main/PR-333'
   }
   stages {
     stage('ASSEMBLY') {
       when {
         expression {
-          env.BRANCH_NAME == cambpmDefaultBranch() || !pullRequest.labels.contains('no-build')
+          env.BRANCH_NAME == cambpmDefaultBranch() || (changeRequest() && !pullRequest.labels.contains('no-build'))
         }
       }
       steps {
@@ -64,7 +64,7 @@ pipeline {
               if (env.BRANCH_NAME == cambpmDefaultBranch()) {
                 // CE master triggers EE master
                 // otherwise CE PR branch triggers EE PR branch
-                eeMainProjectBranch = "cambpm-ee-main/master"
+                eeMainProjectBranch = "cambpm-ee-main/" + cambpmDefaultBranch()
               } else {
                 eeMainProjectBranch = params.EE_DOWNSTREAM
               }
@@ -99,13 +99,14 @@ pipeline {
                 )
               }
 
-              if (cambpmWithLabels()) {
-                // only execute on `master`
-                cambpmRunMaven('.',
-                    'org.sonatype.plugins:nexus-staging-maven-plugin:deploy-staged -DaltStagingDirectory=${WORKSPACE}/staging -DskipStaging=true',
-                    withCatch: false,
-                    withNpm: true)
-              }
+              // TODO: https://jira.camunda.com/browse/CAM-13409
+              // only execute on `master`
+              // if (cambpmWithLabels()) {
+              //   cambpmRunMaven('.',
+              //       'org.sonatype.plugins:nexus-staging-maven-plugin:deploy-staged -DaltStagingDirectory=${WORKSPACE}/staging -DskipStaging=true',
+              //       withCatch: false,
+              //       withNpm: true)
+              // }
             }
           }
         ])
