@@ -98,13 +98,14 @@ pipeline {
                 )
               }
 
+              // TODO: https://jira.camunda.com/browse/CAM-13409
               // only execute on `master`
-              if (env.BRANCH_NAME == 'master') {
-                cambpmRunMaven('.',
-                    'org.sonatype.plugins:nexus-staging-maven-plugin:deploy-staged -DaltStagingDirectory=${WORKSPACE}/staging -DskipStaging=true',
-                    withCatch: false,
-                    withNpm: true)
-              }
+              // if (cambpmWithLabels()) {
+              //   cambpmRunMaven('.',
+              //       'org.sonatype.plugins:nexus-staging-maven-plugin:deploy-staged -DaltStagingDirectory=${WORKSPACE}/staging -DskipStaging=true',
+              //       withCatch: false,
+              //       withNpm: true)
+              // }
             }
           }
         ])
