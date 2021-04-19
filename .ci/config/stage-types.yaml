@@ -21,8 +21,8 @@
 #     db2: [INT; OPTIONAL;]
 #     sqlserver: [INT; OPTIONAL;]
 engine-unit:
-  directory: 'engine'
-  command: 'clean test -P'
+  directory: '.'
+  command: 'clean test -pl "engine,webapps" -Dskip.frontend.build=true -P'
   stash:
     runtimeStash: true
   labels:
@@ -36,8 +36,8 @@ engine-unit:
   - 'cockroachdb'
   - 'authorizations'
 engine-unit-authorizations:
-  directory: 'engine'
-  command: 'clean test -PcfgAuthorizationCheckRevokesAlways,'
+  directory: '.'
+  command: 'clean test -pl "engine,webapps" -Dskip.frontend.build=true -PcfgAuthorizationCheckRevokesAlways,'
   stash:
     runtimeStash: true
   labels:
