@@ -26,22 +26,14 @@ engine-unit:
   stash:
     runtimeStash: true
   labels:
-  - 'all-db'
-  - 'db2'
-  - 'mysql'
-  - 'oracle'
-  - 'mariadb'
-  - 'sqlserver'
-  - 'postgresql'
-  - 'cockroachdb'
-  - 'authorizations'
+  - 'eng-web'
 engine-unit-authorizations:
   directory: '.'
   command: 'clean test -pl "engine,webapps" -Dskip.frontend.build=true -PcfgAuthorizationCheckRevokesAlways,'
   stash:
     runtimeStash: true
   labels:
-  - 'authorizations'
+  - 'eng-web'
 webapp-unit:
   directory: 'webapps'
   command: 'clean test -Dskip.frontend.build=true -P'
