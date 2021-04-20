@@ -14,7 +14,7 @@ pipeline {
     CAMBPM_LOGGER_LOG_LEVEL = 'DEBUG'
   }
   parameters {
-    booleanParam name: 'UPSTREAM_PR', defaultValue: false, description: 'Is the current build triggered in the scope of an upstream pull request'
+    booleanParam name: 'TRIGGERED_BY_UPSTREAM', defaultValue: false, description: 'Is the current build triggered in the scope of an upstream pipeline (pull request or default branch)'
     string name: 'UPSTREAM_PROJECT_NAME', defaultValue: '7.XX/cambpm-ce/cambpm-main/master', description: 'Not used on standalone runs. This property is passed by the upstream build that triggers this one.'
     string name: 'UPSTREAM_BUILD_NUMBER', defaultValue: '', description: 'Not used on standalone runs. This property is passed by the upstream build that triggers this one.'
     string name: 'PR_LABELS', defaultValue: '', description: 'The labels assigned to the CE pull request'
