@@ -8,7 +8,6 @@
         desc = "The id of the process definition for the modification"
     />
 
-    
     <@lib.property
         name = "skipCustomListeners"
         type = "boolean"
@@ -16,7 +15,6 @@
                 of this request."
     />
 
-    
     <@lib.property
         name = "skipIoMappings"
         type = "boolean"
@@ -24,7 +22,6 @@
                 activities that are started or ended as part of this request."
     />
 
-    
     <@lib.property
         name = "processInstanceIds"
         type = "array"
