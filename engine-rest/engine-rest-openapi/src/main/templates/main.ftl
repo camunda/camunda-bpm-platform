@@ -36,6 +36,7 @@
 
   ],
   "tags": [
+    {"name": "Authorization"},
     {"name": "Batch"},
     {"name": "Condition"},
     {"name": "Decision Definition"},
