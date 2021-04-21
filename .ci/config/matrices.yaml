@@ -32,7 +32,6 @@ engine-webapp-unit:
   - 'sqlserver_2019'
   stages: 
   - 'engine-unit'
-  - 'engine-unit-authorizations'
 engine-rest:
   stages:
   - 'engine-rest-unit-jersey-2'
