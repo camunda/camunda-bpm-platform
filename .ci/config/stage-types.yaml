@@ -27,6 +27,7 @@ engine-unit:
     runtimeStash: true
   labels:
   - 'eng-web'
+  - 'oracle'
 engine-unit-authorizations:
   directory: '.'
   command: 'clean test -pl "engine,webapps" -Dskip.frontend.build=true -PcfgAuthorizationCheckRevokesAlways,'
@@ -34,6 +35,7 @@ engine-unit-authorizations:
     runtimeStash: true
   labels:
   - 'eng-web'
+  - 'oracle'
 webapp-unit:
   directory: 'webapps'
   command: 'clean test -Dskip.frontend.build=true -P'
