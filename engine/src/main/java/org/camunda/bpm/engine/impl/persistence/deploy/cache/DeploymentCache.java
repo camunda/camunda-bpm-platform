@@ -309,13 +309,13 @@ public class DeploymentCache {
 
   public void removeDeployment(String deploymentId) {
     bpmnModelInstanceCache.removeAllDefinitionsByDeploymentId(deploymentId);
-    if(Context.getProcessEngineConfiguration().isCmmnEnabled()) {
+    if (Context.getProcessEngineConfiguration().isCmmnEnabled()) {
       cmmnModelInstanceCache.removeAllDefinitionsByDeploymentId(deploymentId);
     }
-    if(Context.getProcessEngineConfiguration().isDmnEnabled()) {
+    if (Context.getProcessEngineConfiguration().isDmnEnabled()) {
       dmnModelInstanceCache.removeAllDefinitionsByDeploymentId(deploymentId);
+      removeAllDecisionRequirementsDefinitionsByDeploymentId(deploymentId);
     }
-    removeAllDecisionRequirementsDefinitionsByDeploymentId(deploymentId);
   }
 
   protected void removeAllDecisionRequirementsDefinitionsByDeploymentId(String deploymentId) {
