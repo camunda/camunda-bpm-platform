@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<process-application
+  xmlns="http://www.camunda.org/schema/1.0/ProcessApplication"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.camunda.org/schema/1.0/ProcessApplication http://www.camunda.org/schema/1.0/ProcessApplication ">
+
+  <process-engine name="embeddedEngine">
+
+    <configuration>org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration</configuration>
+    
+    <properties>
+        <property name="jdbcUrl">jdbc:h2:mem:embeddedEngine</property>
+        <property name="jobExecutorDeploymentAware">true</property>
+        <property name="jobExecutorPreferTimerJobs">true</property>
+        <property name="jobExecutorAcquireByDueDate">true</property>
+        <property name="jdbcMaxActiveConnections">5</property>
+        <property name="dmnEnabled">false</property>
+    </properties>
+    
+  </process-engine>
+
+    <process-archive name="pa1">
+
+        <resource>org/camunda/bpm/application/impl/embedded/StartToEndTest.testStartToEnd.bpmn20.xml</resource>
+
+        <properties>
+            <property name="isScanForProcessDefinitions">false</property>
+            <property name="isDeleteUponUndeploy">true</property>
+        </properties>
+
+    </process-archive>
+
+</process-application>
