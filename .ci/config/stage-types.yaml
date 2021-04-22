@@ -23,8 +23,6 @@
 engine-unit:
   directory: '.'
   command: 'clean test -pl "engine,webapps" -Dskip.frontend.build=true -P'
-  stash:
-    runtimeStash: true
   labels:
   - 'eng-web'
   - 'oracle'
