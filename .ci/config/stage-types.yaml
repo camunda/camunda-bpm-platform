@@ -22,7 +22,7 @@
 #     sqlserver: [INT; OPTIONAL;]
 engine-unit:
   directory: 'engine'
-  command: 'clean test -P'
+  command: '--quiet clean test -P'
   stash:
     runtimeStash: true
   labels:
@@ -37,7 +37,7 @@ engine-unit:
   - 'authorizations'
 engine-unit-authorizations:
   directory: 'engine'
-  command: 'clean test -PcfgAuthorizationCheckRevokesAlways,'
+  command: '--quiet clean test -PcfgAuthorizationCheckRevokesAlways,'
   stash:
     runtimeStash: true
   labels:
