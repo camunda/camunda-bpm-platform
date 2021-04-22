@@ -16,10 +16,7 @@
  */
 package org.camunda.bpm.application.impl.embedded;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.List;
 import java.util.Set;
@@ -29,6 +26,7 @@ import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
 import org.camunda.bpm.engine.repository.Resource;
@@ -106,6 +104,29 @@ public class EmbeddedProcessApplicationTest extends PluggableProcessEngineTest {
     assertTrue(configuration.isJobExecutorPreferTimerJobs());
     assertTrue(configuration.isJobExecutorAcquireByDueDate());
     assertEquals(5, configuration.getJdbcMaxActiveConnections());
+
+    processApplication.undeploy();
+
+  }
+
+  @Test
+  public void testDeployAppWithoutDmn() {
+
+    TestApplicationWithoutDmn processApplication = new TestApplicationWithoutDmn();
+    processApplication.deploy();
+
+    ProcessEngine processEngine = BpmPlatform.getProcessEngineService().getProcessEngine("embeddedEngine");
+    assertNotNull(processEngine);
+    assertEquals("embeddedEngine", processEngine.getName());
+
+    ProcessEngineConfigurationImpl configuration = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration();
+
+    // assert engine properties specified
+    assertTrue(configuration.isJobExecutorDeploymentAware());
+    assertTrue(configuration.isJobExecutorPreferTimerJobs());
+    assertTrue(configuration.isJobExecutorAcquireByDueDate());
+    assertEquals(5, configuration.getJdbcMaxActiveConnections());
+    assertFalse(configuration.isDmnEnabled());
 
     processApplication.undeploy();
 
