@@ -1,6 +1,6 @@
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
-@Library(['camunda-ci', 'cambpm-jenkins-shared-library@CAM-13417']) _
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
 
 def failedStageTypes = []
 
@@ -73,6 +73,11 @@ pipeline {
             String dbLabel = stageInfo.nodeType
             return cambpmWithLabels(allowedStageLabels.minus('cockroachdb'), cambpmGetDbType(dbLabel))
           }))
+        }
+      }
+      post {
+        success {
+          deleteDir()
         }
       }
     }
