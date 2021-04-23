@@ -48,6 +48,7 @@
     {"name": "Group"},
     {"name": "Historic Activity Instance"},
     {"name": "Historic Decision Definition"},
+    {"name": "Historic Decision Requirements Definition"},
     {"name": "Historic Process Instance"},
     {"name": "Identity"},
     {"name": "Incident"},
