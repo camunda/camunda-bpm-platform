@@ -6,12 +6,15 @@
       tag = "Modification"
       summary = "Execute Modification"
       desc = "Executes a modification synchronously for multiple process instances.
-              To modify a single process instance, use the [Modify Process Instance Execution State](${docsUrl}/reference/rest/process-instance/post-modification/) method.
-              To execute a modification asynchronously, use the [Execute Modification Async (Batch)](${docsUrl}/reference/rest/modification/post-modification-async/) method.
+              To modify a single process instance, use the
+              [Modify Process Instance Execution State](${docsUrl}/reference/rest/process-instance/post-modification/) method.
+              To execute a modification asynchronously, use the
+              [Execute Modification Async (Batch)](${docsUrl}/reference/rest/modification/post-modification-async/) method.
 
               For more information about the difference between synchronous and
               asynchronous execution of a modification, please refer to the related
-              section of the [user guide](${docsUrl}/user-guide/process-engine/process-instance-migration.md#executing-a-migration-plan)."
+              section of the
+              [user guide](${docsUrl}/user-guide/process-engine/process-instance-migration.md#executing-a-migration-plan)."
   />
 
   <@lib.requestBody

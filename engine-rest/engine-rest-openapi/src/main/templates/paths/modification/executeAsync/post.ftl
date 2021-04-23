@@ -6,11 +6,13 @@
       tag = "Modification"
       summary = "Execute Modification Async (Batch)"
       desc = "Executes a modification asynchronously for multiple process instances. To execute a
-              modification synchronously, use the [Execute Modification](${docsUrl}/reference/rest/modification/post-modification-sync/) method.
+              modification synchronously, use the
+              [Execute Modification](${docsUrl}/reference/rest/modification/post-modification-sync/) method.
 
               For more information about the difference between synchronous and
               asynchronous execution of a modification, please refer to the related
-              section of the [user guide](${docsUrl}/user-guide/process-engine/process-instance-migration.md#executing-a-migration-plan)."
+              section of the
+              [user guide](${docsUrl}/user-guide/process-engine/process-instance-migration.md#executing-a-migration-plan)."
   />
 
   <@lib.requestBody
