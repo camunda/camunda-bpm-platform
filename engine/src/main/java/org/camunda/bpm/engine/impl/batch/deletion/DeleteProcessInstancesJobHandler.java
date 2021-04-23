@@ -18,7 +18,7 @@ package org.camunda.bpm.engine.impl.batch.deletion;
 
 import java.util.HashSet;
 import java.util.List;
-import org.camunda.bpm.engine.RuntimeService;
+
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.batch.AbstractBatchJobHandler;
@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.impl.batch.BatchJobConfiguration;
 import org.camunda.bpm.engine.impl.batch.BatchJobContext;
 import org.camunda.bpm.engine.impl.batch.BatchJobDeclaration;
 import org.camunda.bpm.engine.impl.batch.BatchElementConfiguration;
+import org.camunda.bpm.engine.impl.cmd.DeleteProcessInstancesCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
@@ -67,20 +68,14 @@ public class DeleteProcessInstancesJobHandler extends AbstractBatchJobHandler<De
 
     DeleteProcessInstanceBatchConfiguration batchConfiguration = readConfiguration(configurationEntity.getBytes());
 
-    boolean initialLegacyRestrictions = commandContext.isRestrictUserOperationLogToAuthenticatedUsers();
-    commandContext.disableUserOperationLog();
-    commandContext.setRestrictUserOperationLogToAuthenticatedUsers(true);
-    try {
-      RuntimeService runtimeService = commandContext.getProcessEngineConfiguration().getRuntimeService();
-      if(batchConfiguration.isFailIfNotExists()) {
-        runtimeService.deleteProcessInstances(batchConfiguration.getIds(), batchConfiguration.deleteReason, batchConfiguration.isSkipCustomListeners(), true, batchConfiguration.isSkipSubprocesses());
-      } else {
-        runtimeService.deleteProcessInstancesIfExists(batchConfiguration.getIds(), batchConfiguration.deleteReason, batchConfiguration.isSkipCustomListeners(), true, batchConfiguration.isSkipSubprocesses());
-      }
-    } finally {
-      commandContext.enableUserOperationLog();
-      commandContext.setRestrictUserOperationLogToAuthenticatedUsers(initialLegacyRestrictions);
-    }
+    commandContext.executeWithOperationLogPrevented(
+        new DeleteProcessInstancesCmd(
+            batchConfiguration.getIds(),
+            batchConfiguration.getDeleteReason(),
+            batchConfiguration.isSkipCustomListeners(),
+            true,
+            batchConfiguration.isSkipSubprocesses(),
+            batchConfiguration.isFailIfNotExists()));
 
     commandContext.getByteArrayManager().delete(configurationEntity);
   }

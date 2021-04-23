@@ -28,15 +28,25 @@ public class MigrationBatchConfiguration extends BatchConfiguration {
   protected boolean isSkipCustomListeners;
   protected boolean isSkipIoMappings;
 
-  public MigrationBatchConfiguration(List<String> ids) {
-    super(ids);
+  public MigrationBatchConfiguration(List<String> ids,
+                                     MigrationPlan migrationPlan,
+                                     boolean isSkipCustomListeners,
+                                     boolean isSkipIoMappings,
+                                     String batchId) {
+    this(ids, null, migrationPlan, isSkipCustomListeners, isSkipIoMappings, batchId);
   }
 
   public MigrationBatchConfiguration(List<String> ids,
-      MigrationPlan migrationPlan,
-      boolean isSkipCustomListeners,
-      boolean isSkipIoMappings) {
-    this(ids, null, migrationPlan, isSkipCustomListeners, isSkipIoMappings);
+                                     DeploymentMappings mappings,
+                                     MigrationPlan migrationPlan,
+                                     boolean isSkipCustomListeners,
+                                     boolean isSkipIoMappings,
+                                     String batchId) {
+    super(ids, mappings);
+    this.migrationPlan = migrationPlan;
+    this.isSkipCustomListeners = isSkipCustomListeners;
+    this.isSkipIoMappings = isSkipIoMappings;
+    this.batchId = batchId;
   }
 
   public MigrationBatchConfiguration(List<String> ids,
@@ -44,10 +54,7 @@ public class MigrationBatchConfiguration extends BatchConfiguration {
                                      MigrationPlan migrationPlan,
                                      boolean isSkipCustomListeners,
                                      boolean isSkipIoMappings) {
-    super(ids, mappings);
-    this.migrationPlan = migrationPlan;
-    this.isSkipCustomListeners = isSkipCustomListeners;
-    this.isSkipIoMappings = isSkipIoMappings;
+    this(ids, mappings, migrationPlan, isSkipCustomListeners, isSkipIoMappings, null);
   }
 
   public MigrationPlan getMigrationPlan() {

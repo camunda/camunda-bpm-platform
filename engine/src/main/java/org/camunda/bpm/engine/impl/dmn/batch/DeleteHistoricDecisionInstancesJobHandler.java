@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
 import org.camunda.bpm.engine.impl.batch.BatchJobConfiguration;
 import org.camunda.bpm.engine.impl.batch.BatchJobContext;
 import org.camunda.bpm.engine.impl.batch.BatchJobDeclaration;
+import org.camunda.bpm.engine.impl.dmn.cmd.DeleteHistoricDecisionInstancesBulkCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
@@ -61,17 +62,8 @@ public class DeleteHistoricDecisionInstancesJobHandler extends AbstractBatchJobH
 
     BatchConfiguration batchConfiguration = readConfiguration(configurationEntity.getBytes());
 
-    boolean initialLegacyRestrictions = commandContext.isRestrictUserOperationLogToAuthenticatedUsers();
-    commandContext.disableUserOperationLog();
-    commandContext.setRestrictUserOperationLogToAuthenticatedUsers(true);
-    try {
-      commandContext.getProcessEngineConfiguration()
-          .getHistoryService()
-          .deleteHistoricDecisionInstancesBulk(batchConfiguration.getIds());
-    } finally {
-      commandContext.enableUserOperationLog();
-      commandContext.setRestrictUserOperationLogToAuthenticatedUsers(initialLegacyRestrictions);
-    }
+    commandContext.executeWithOperationLogPrevented(
+        new DeleteHistoricDecisionInstancesBulkCmd(batchConfiguration.getIds()));
 
     commandContext.getByteArrayManager().delete(configurationEntity);
   }

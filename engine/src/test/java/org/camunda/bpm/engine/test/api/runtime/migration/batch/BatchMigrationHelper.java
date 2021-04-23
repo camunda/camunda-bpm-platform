@@ -18,12 +18,13 @@ package org.camunda.bpm.engine.test.api.runtime.migration.batch;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.management.JobDefinition;
-import org.camunda.bpm.engine.migration.MigrationPlan;
+import org.camunda.bpm.engine.migration.MigrationInstructionsBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.BatchHelper;
@@ -75,21 +76,44 @@ public class BatchMigrationHelper extends BatchHelper{
     return migrateProcessInstancesAsync(1, sourceProcessDefinition, targetProcessDefinition);
   }
 
-  public Batch migrateProcessInstancesAsync(int numberOfProcessInstances, ProcessDefinition sourceProcessDefinition, ProcessDefinition targetProcessDefinition) {
+  public Batch migrateProcessInstancesAsync(int numberOfProcessInstances,
+                                            ProcessDefinition sourceProcessDefinition,
+                                            ProcessDefinition targetProcessDefinition,
+                                            Map<String, Object> variables,
+                                            boolean authenticated) {
     RuntimeService runtimeService = engineRule.getRuntimeService();
 
-    List<String> processInstanceIds = new ArrayList<String>(numberOfProcessInstances);
+    List<String> processInstanceIds = new ArrayList<>(numberOfProcessInstances);
     for (int i = 0; i < numberOfProcessInstances; i++) {
-      processInstanceIds.add(
-        runtimeService.startProcessInstanceById(sourceProcessDefinition.getId()).getId());
+      String srcProcessDefinitionId = sourceProcessDefinition.getId();
+      String processInstanceId =
+          runtimeService.startProcessInstanceById(srcProcessDefinitionId).getId();
+      processInstanceIds.add(processInstanceId);
     }
 
-    MigrationPlan migrationPlan = engineRule.getRuntimeService()
-      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapEqualActivities()
-      .build();
+    if (authenticated) {
+      engineRule.getIdentityService().setAuthenticatedUserId("user");
+    }
 
-    return runtimeService.newMigration(migrationPlan).processInstanceIds(processInstanceIds).executeAsync();
+    MigrationInstructionsBuilder planBuilder = engineRule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapEqualActivities();
+
+    if (variables != null) {
+      planBuilder.setVariables(variables);
+    }
+
+    return runtimeService.newMigration(planBuilder.build())
+        .processInstanceIds(processInstanceIds)
+        .executeAsync();
+  }
+
+  public Batch migrateProcessInstancesAsync(int numberOfProcessInstances, ProcessDefinition sourceProcessDefinition, ProcessDefinition targetProcessDefinition, Map<String, Object> variables) {
+    return migrateProcessInstancesAsync(numberOfProcessInstances, sourceProcessDefinition, targetProcessDefinition, variables, false);
+  }
+
+  public Batch migrateProcessInstancesAsync(int numberOfProcessInstances, ProcessDefinition sourceProcessDefinition, ProcessDefinition targetProcessDefinition) {
+    return migrateProcessInstancesAsync(numberOfProcessInstances, sourceProcessDefinition, targetProcessDefinition, null, false);
   }
 
   @Override

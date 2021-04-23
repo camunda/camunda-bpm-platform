@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.impl.core.variable;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.CoreLogger;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -30,7 +31,6 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.SerializableValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
-import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collector;
@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 
 public class VariableUtil {
 
+  public static final CommandLogger CMD_LOGGER = ProcessEngineLogger.CMD_LOGGER;
   public static final CoreLogger CORE_LOGGER = ProcessEngineLogger.CORE_LOGGER;
 
   public static final String ERROR_MSG = "Cannot set variable with name {0}. Java serialization format is prohibited";
@@ -79,8 +80,7 @@ public class VariableUtil {
 
   public static void checkJavaSerialization(String variableName, TypedValue value) {
     if (isJavaSerializationProhibited(value)) {
-      String message = MessageFormat.format(ERROR_MSG, variableName);
-      throw CORE_LOGGER.javaSerializationProhibitedException(message);
+      throw CORE_LOGGER.javaSerializationProhibitedException(variableName);
     }
   }
 
@@ -100,6 +100,27 @@ public class VariableUtil {
         setVariableFunction.apply(variableName, value);
       }
     }
+  }
+
+  public static void setVariablesByBatchId(Map<String, ?> variables, String batchId) {
+    setVariables(variables, (name, value) -> setVariableByBatchId(batchId, name, value));
+  }
+
+  public static void setVariableByBatchId(String batchId, String variableName, Object variableValue) {
+    TypedValue variableTypedValue = Variables.untypedValue(variableValue);
+
+    boolean isTransient = variableTypedValue.isTransient();
+    if (isTransient) {
+      throw CMD_LOGGER.exceptionSettingTransientVariablesAsyncNotSupported(variableName);
+    }
+
+    checkJavaSerialization(variableName, variableTypedValue);
+
+    VariableInstanceEntity variableInstance =
+        VariableInstanceEntity.createAndInsert(variableName, variableTypedValue);
+
+    variableInstance.setVariableScopeId(batchId);
+    variableInstance.setBatchId(batchId);
   }
 
   public static Map<String, ?> findBatchVariablesSerialized(String batchId, CommandContext commandContext) {

@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.impl.batch.builder.BatchBuilder;
 import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
 import org.camunda.bpm.engine.impl.batch.DeploymentMapping;
 import org.camunda.bpm.engine.impl.batch.DeploymentMappings;
+import org.camunda.bpm.engine.impl.core.variable.VariableUtil;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.migration.AbstractMigrationCmd;
@@ -32,6 +33,7 @@ import org.camunda.bpm.engine.migration.MigrationPlan;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsNull;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
@@ -63,17 +65,24 @@ public class MigrateProcessInstanceBatchCmd extends AbstractMigrationCmd impleme
 
     String tenantId = sourceDefinition.getTenantId();
 
-    return new BatchBuilder(commandContext)
+    Map<String, Object> variables = migrationPlan.getVariables();
+
+    Batch batch = new BatchBuilder(commandContext)
         .type(Batch.TYPE_PROCESS_INSTANCE_MIGRATION)
         .config(getConfiguration(collectedInstanceIds, sourceDefinition.getDeploymentId()))
         .permission(BatchPermissions.CREATE_BATCH_MIGRATE_PROCESS_INSTANCES)
-        .permissionHandler(ctx ->
-            checkAuthorizations(ctx, sourceDefinition, targetDefinition))
+        .permissionHandler(ctx -> checkAuthorizations(ctx, sourceDefinition, targetDefinition))
         .tenantId(tenantId)
         .operationLogHandler((ctx, instanceCount) ->
-            writeUserOperationLog(ctx, sourceDefinition, targetDefinition,
-                instanceCount, true))
+            writeUserOperationLog(ctx, sourceDefinition, targetDefinition, instanceCount, variables, true))
         .build();
+
+    if (variables != null) {
+      String batchId = batch.getId();
+      VariableUtil.setVariablesByBatchId(variables, batchId);
+    }
+
+    return batch;
   }
 
   public BatchConfiguration getConfiguration(Collection<String> instanceIds, String deploymentId) {

@@ -339,7 +339,8 @@ public class BatchEntity implements Batch, DbEntity, HasDbReferences, Nameable, 
   public void delete(boolean cascadeToHistory, boolean deleteJobs) {
     CommandContext commandContext = Context.getCommandContext();
 
-    if (Batch.TYPE_SET_VARIABLES.equals(type)) {
+    if (Batch.TYPE_SET_VARIABLES.equals(type) ||
+        Batch.TYPE_PROCESS_INSTANCE_MIGRATION.equals(type)) {
       deleteVariables(commandContext);
     }
 

@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.migration.MigrationInstruction;
 import org.camunda.bpm.engine.migration.MigrationPlan;
+import org.camunda.bpm.engine.variable.VariableMap;
 
 /**
  * @author Thorben Lindhauer
@@ -32,6 +33,8 @@ public class MigrationPlanImpl implements MigrationPlan {
   protected String targetProcessDefinitionId;
 
   protected List<MigrationInstruction> instructions;
+
+  protected VariableMap variables;
 
   public MigrationPlanImpl(String sourceProcessDefinitionId, String targetProcessDefinitionId) {
     this.sourceProcessDefinitionId = sourceProcessDefinitionId;
@@ -49,6 +52,15 @@ public class MigrationPlanImpl implements MigrationPlan {
 
   public String getTargetProcessDefinitionId() {
     return targetProcessDefinitionId;
+  }
+
+  @Override
+  public VariableMap getVariables() {
+    return variables;
+  }
+
+  public void setVariables(VariableMap variables) {
+    this.variables = variables;
   }
 
   public void setTargetProcessDefinitionId(String targetProcessDefinitionId) {

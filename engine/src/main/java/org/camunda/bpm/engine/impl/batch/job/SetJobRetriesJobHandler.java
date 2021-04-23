@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.impl.batch.BatchJobConfiguration;
 import org.camunda.bpm.engine.impl.batch.BatchJobContext;
 import org.camunda.bpm.engine.impl.batch.BatchJobDeclaration;
 import org.camunda.bpm.engine.impl.batch.SetRetriesBatchConfiguration;
+import org.camunda.bpm.engine.impl.cmd.SetJobsRetriesCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
@@ -64,17 +65,8 @@ public class SetJobRetriesJobHandler extends AbstractBatchJobHandler<SetRetriesB
 
     SetRetriesBatchConfiguration batchConfiguration = readConfiguration(configurationEntity.getBytes());
 
-    boolean initialLegacyRestrictions = commandContext.isRestrictUserOperationLogToAuthenticatedUsers();
-    commandContext.disableUserOperationLog();
-    commandContext.setRestrictUserOperationLogToAuthenticatedUsers(true);
-    try {
-      commandContext.getProcessEngineConfiguration()
-          .getManagementService()
-          .setJobRetries(batchConfiguration.getIds(), batchConfiguration.getRetries());
-    } finally {
-      commandContext.enableUserOperationLog();
-      commandContext.setRestrictUserOperationLogToAuthenticatedUsers(initialLegacyRestrictions);
-    }
+    commandContext.executeWithOperationLogPrevented(
+        new SetJobsRetriesCmd(batchConfiguration.getIds(), batchConfiguration.getRetries()));
 
     commandContext.getByteArrayManager().delete(configurationEntity);
   }

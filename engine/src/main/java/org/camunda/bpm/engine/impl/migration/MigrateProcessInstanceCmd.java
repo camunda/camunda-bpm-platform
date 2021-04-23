@@ -33,7 +33,7 @@ import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
-import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.cmd.SetExecutionVariablesCmd;
 import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -57,7 +57,6 @@ import org.camunda.bpm.engine.impl.migration.validation.instance.MigratingTransi
 import org.camunda.bpm.engine.impl.migration.validation.instance.MigratingTransitionInstanceValidator;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.camunda.bpm.engine.impl.tree.ReferenceWalker;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 
 /**
@@ -78,12 +77,12 @@ public class MigrateProcessInstanceCmd extends AbstractMigrationCmd implements C
 
   protected static final MigrationLogger LOGGER = ProcessEngineLogger.MIGRATION_LOGGER;
 
-  protected boolean writeOperationLog;
+  protected boolean skipJavaSerializationFormatCheck;
 
   public MigrateProcessInstanceCmd(MigrationPlanExecutionBuilderImpl migrationPlanExecutionBuilder,
-                                   boolean writeOperationLog) {
+                                   boolean skipJavaSerializationFormatCheck) {
     super(migrationPlanExecutionBuilder);
-    this.writeOperationLog = writeOperationLog;
+    this.skipJavaSerializationFormatCheck = skipJavaSerializationFormatCheck;
   }
 
   @Override
@@ -103,17 +102,13 @@ public class MigrateProcessInstanceCmd extends AbstractMigrationCmd implements C
 
     checkAuthorizations(commandContext, sourceDefinition, targetDefinition);
 
-    if (writeOperationLog) {
-      writeUserOperationLog(commandContext,
-          sourceDefinition,
-          targetDefinition,
-          processInstanceIds.size(),
-          false);
-    }
+    writeUserOperationLog(commandContext, sourceDefinition, targetDefinition,
+        processInstanceIds.size(), migrationPlan.getVariables(), false);
 
     commandContext.runWithoutAuthorization((Callable<Void>) () -> {
       for (String processInstanceId : processInstanceIds) {
-        migrateProcessInstance(commandContext, processInstanceId, migrationPlan, targetDefinition);
+        migrateProcessInstance(commandContext, processInstanceId, migrationPlan,
+            targetDefinition, skipJavaSerializationFormatCheck);
       }
       return null;
     });
@@ -124,7 +119,8 @@ public class MigrateProcessInstanceCmd extends AbstractMigrationCmd implements C
   public Void migrateProcessInstance(CommandContext commandContext,
                                      String processInstanceId,
                                      MigrationPlan migrationPlan,
-                                     ProcessDefinitionEntity targetProcessDefinition) {
+                                     ProcessDefinitionEntity targetProcessDefinition,
+                                     boolean skipJavaSerializationFormatCheck) {
     ensureNotNull(BadUserRequestException.class,
         "Process instance id cannot be null", "process instance id", processInstanceId);
 
@@ -158,6 +154,15 @@ public class MigrateProcessInstanceCmd extends AbstractMigrationCmd implements C
 
     executeInContext(() -> migrateProcessInstance(migratingProcessInstance),
       migratingProcessInstance.getTargetDefinition());
+
+    Map<String, ?> variables = migrationPlan.getVariables();
+    if (variables != null) {
+      // we don't need a context switch here since when setting an execution triggering variable,
+      // a context switch is performed at a later point via command invocation context
+      commandContext.executeWithOperationLogPrevented(
+        new SetExecutionVariablesCmd(processInstanceId, variables,
+            false, skipJavaSerializationFormatCheck));
+    }
 
     return null;
   }

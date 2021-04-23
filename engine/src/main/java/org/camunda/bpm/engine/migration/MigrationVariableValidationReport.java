@@ -16,43 +16,29 @@
  */
 package org.camunda.bpm.engine.migration;
 
+import org.camunda.bpm.engine.variable.value.TypedValue;
+
 import java.util.List;
-import java.util.Map;
 
 /**
- * Collects the migration validation reports for
- * all instructions and variables of the migration plan which contain failures.
+ * Collects the validation failures for a single migration
+ * variable.
  */
-public interface MigrationPlanValidationReport {
+public interface MigrationVariableValidationReport {
 
   /**
-   * @return the migration plan of the validation report
+   * @return the variable's {@link TypedValue}
    */
-  MigrationPlan getMigrationPlan();
+  <T extends TypedValue> T getTypedValue();
 
   /**
-   * @return {@code true} if either instruction or variable reports exist, {@code false} otherwise
+   * @return {@code true} if the report contains failures, {@code false} otherwise
    */
-  boolean hasReports();
+  boolean hasFailures();
 
   /**
-   * @return true if instructions reports exist, false otherwise
+   * @return the list of failure messages
    */
-  boolean hasInstructionReports();
-
-  /**
-   * @return {@code true} if variable reports exist, {@code false} otherwise
-   */
-  boolean hasVariableReports();
-
-  /**
-   * @return all instruction reports
-   */
-  List<MigrationInstructionValidationReport> getInstructionReports();
-
-  /**
-   * @return all variable reports
-   */
-  Map<String, MigrationVariableValidationReport> getVariableReports();
+  List<String> getFailures();
 
 }

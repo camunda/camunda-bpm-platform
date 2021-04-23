@@ -17,7 +17,9 @@
 package org.camunda.bpm.engine.impl.migration;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.migration.MigrationPlanBuilder;
 import org.camunda.bpm.engine.impl.cmd.CreateMigrationPlanCmd;
@@ -25,6 +27,8 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.migration.MigrationInstructionBuilder;
 import org.camunda.bpm.engine.migration.MigrationInstructionsBuilder;
 import org.camunda.bpm.engine.migration.MigrationPlan;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
 
 /**
  * @author Thorben Lindhauer
@@ -40,6 +44,7 @@ public class MigrationPlanBuilderImpl implements MigrationInstructionBuilder, Mi
 
   protected boolean mapEqualActivities = false;
   protected boolean updateEventTriggersForGeneratedInstructions = false;
+  protected VariableMap variables;
 
   public MigrationPlanBuilderImpl(CommandExecutor commandExecutor, String sourceProcessDefinitionId,
       String targetProcessDefinitionId) {
@@ -51,6 +56,16 @@ public class MigrationPlanBuilderImpl implements MigrationInstructionBuilder, Mi
 
   public MigrationInstructionsBuilder mapEqualActivities() {
     this.mapEqualActivities = true;
+    return this;
+  }
+
+  @Override
+  public MigrationPlanBuilder setVariables(Map<String, ?> variables) {
+    if (variables instanceof VariableMapImpl) {
+      this.variables = (VariableMapImpl) variables;
+    } else if (variables != null) {
+      this.variables = new VariableMapImpl(new HashMap<>(variables));
+    }
     return this;
   }
 
@@ -83,6 +98,10 @@ public class MigrationPlanBuilderImpl implements MigrationInstructionBuilder, Mi
 
   public boolean isMapEqualActivities() {
     return mapEqualActivities;
+  }
+
+  public VariableMap getVariables() {
+    return variables;
   }
 
   public boolean isUpdateEventTriggersForGeneratedInstructions() {

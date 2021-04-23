@@ -21,8 +21,11 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.operation.CoreAtomicOperation;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
-import org.camunda.bpm.engine.impl.core.variable.VariableUtil;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
+
+import java.text.MessageFormat;
+
+import static org.camunda.bpm.engine.impl.core.variable.VariableUtil.ERROR_MSG;
 
 /**
  * @author Daniel Meyer
@@ -58,14 +61,6 @@ public class CoreLogger extends ProcessEngineLogger {
       ));
   }
 
-  public ProcessEngineException missingVariableInstanceException(CoreVariableInstance variableInstance) {
-    return new ProcessEngineException(exceptionMessage(
-        "005",
-        "Cannot update variable instance with name {}. Variable does not exist",
-        variableInstance.getName()
-      ));
-  }
-
   public ProcessEngineException transientVariableException(String variableName) {
     return new ProcessEngineException(exceptionMessage(
         "006",
@@ -74,8 +69,9 @@ public class CoreLogger extends ProcessEngineLogger {
       ));
   }
 
-  public ProcessEngineException javaSerializationProhibitedException(String message) {
-    return new ProcessEngineException(exceptionMessage("007", message));
+  public ProcessEngineException javaSerializationProhibitedException(String variableName) {
+    return new ProcessEngineException(exceptionMessage("007",
+        MessageFormat.format(ERROR_MSG, variableName)));
   }
 
 }
