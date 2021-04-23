@@ -31,7 +31,8 @@
         dto = "ResourceOptionsDto"
         desc = "Request successful."
         examples = ['"example-1": {
-                       "summary": "OPTIONS `/filter/aFilterId`",
+                       "summary": "request",
+                       "description": "OPTIONS `/filter/aFilterId`",
                        "value": {
                          "links":[
                            {

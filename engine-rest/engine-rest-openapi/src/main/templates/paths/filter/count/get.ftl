@@ -28,7 +28,8 @@
         dto = "CountResultDto"
         desc = "Request successful."
         examples = ['"example-1": {
-                       "summary": "GET `/filter/count?resourceType=Task&owner=aUserId`",
+                       "summary": "request",
+                       "description": "GET `/filter/count?resourceType=Task&owner=aUserId`",
                        "value": {
                          "count": 3
                        }

@@ -31,8 +31,8 @@
         array = true
         desc = "Request successful. A JSON array containing JSON objects corresponding to the matching entity interface in the engine. This depends on the saved query in the filter. Therefore it is not possible to specify a generic result format, i.e., if the resource type of the filter is Task the result will correspond to the Task interface in the engine."
         examples = ['"example-1": {
-                       "summary": "GET `/filter/aTaskFilterId/list/?firstResult=0&maxResults=2`",
-                       "description": "**Note**: The examples show the result of a task filter. So the response corresponds to a task, but for other filters the response format will differ.",
+                       "summary": "request",
+                       "description": "GET `/filter/aTaskFilterId/list/?firstResult=0&maxResults=2`. **Note**: The examples show the result of a task filter. So the response corresponds to a task, but for other filters the response format will differ.",
                        "value": [
                          {
                            "assignee": "jonny1",

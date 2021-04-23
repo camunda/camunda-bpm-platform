@@ -28,8 +28,8 @@
       flatType = "object"
       requestDesc = "A JSON object which corresponds to the type of the saved query of the filter, i.e., if the resource type of the filter is Task the body should form a valid task query corresponding to the Task resource."
       examples = ['"example-1": {
-                     "summary": "POST `filter/aTaskFilterId/singleResult`",
-                     "description": "Note: The examples show a task filter. So the request body corresponds to a task query. For other resource types the request body will differ.",
+                     "summary": "request",
+                     "description": "POST `filter/aTaskFilterId/singleResult`. Note: The examples show a task filter. So the request body corresponds to a task query. For other resource types the request body will differ.",
                      "value": {
                        "assignee": "jonny1",
                        "taskDefinitionKey": "aTaskKey"
@@ -44,7 +44,8 @@
         dto = "CountResultDto"
         desc = "Request successful."
         examples = ['"example-1": {
-                       "summary": "POST `filter/aTaskFilterId/singleResult`",
+                       "summary": "request",
+                       "description": "POST `filter/aTaskFilterId/singleResult`",
                        "value": {
                          "count": 1
                        }

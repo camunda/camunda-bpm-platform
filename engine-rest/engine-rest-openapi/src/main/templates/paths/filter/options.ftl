@@ -19,7 +19,8 @@
         dto = "ResourceOptionsDto"
         desc = "Request successful."
         examples = ['"example-1": {
-                       "summary": "OPTIONS `/filter`",
+                       "summary": "request",
+                       "description": "OPTIONS `/filter`",
                        "value": {
                          "links": [
                            {

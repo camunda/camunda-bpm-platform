@@ -25,7 +25,8 @@
       mediaType = "application/json"
       dto = "CreateFilterDto"
       examples = ['"example-1": {
-                     "summary": "PUT `/filter/aFilterID`",
+                     "summary": "request",
+                     "description": "PUT `/filter/aFilterID`",
                      "value": {
                        "resourceType": "Task",
                        "name": "My Tasks",

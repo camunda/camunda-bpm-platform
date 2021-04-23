@@ -12,7 +12,8 @@
       mediaType = "application/json"
       dto = "CreateFilterDto"
       examples = ['"example-1": {
-                     "summary": "POST `/filter/create`",
+                     "summary": "request",
+                     "description": "POST `/filter/create`",
                      "value": {
                        "resourceType": "Task",
                        "name": "Accounting Tasks",
@@ -36,7 +37,8 @@
         dto = "FilterDto"
         desc = "Request successful."
         examples = ['"example-1": {
-                       "summary": "POST `/filter/create`",
+                       "summary": "request",
+                       "description": "POST `/filter/create`",
                        "value": {
                          "id": "aFilterId",
                          "resourceType": "Task",

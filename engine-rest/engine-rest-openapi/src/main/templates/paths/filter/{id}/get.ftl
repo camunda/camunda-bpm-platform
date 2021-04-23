@@ -36,7 +36,8 @@
         dto = "FilterDto"
         desc = "Request successful."
         examples = ['"example-1": {
-                       "summary": "GET `/filter/aFilterId`",
+                       "summary": "request",
+                       "description": "GET `/filter/aFilterId`",
                        "value": {
                          "id": "9917d731-3cde-11e4-b704-f0def1e59da8",
                          "name": "Accounting Tasks",
@@ -53,7 +54,8 @@
                        }
                      }',
                      '"example-2": {
-                       "summary": "GET `/filter/aFilterId?itemCount=true`",
+                       "summary": "request with itemCount",
+                       "description": "GET `/filter/aFilterId?itemCount=true`",
                        "value": {
                          "id": "9917d731-3cde-11e4-b704-f0def1e59da8",
                          "name": "Accounting Tasks",

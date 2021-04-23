@@ -38,7 +38,8 @@
         array = true
         desc = "Request successful."
         examples = ['"example-1": {
-                       "summary": "GET `/filter?resourceType=Task`",
+                       "summary": "request",
+                       "description": "GET `/filter?resourceType=Task`",
                        "value": [
                          {
                            "id": "aFilter",
@@ -69,7 +70,8 @@
                        ]
                      }',
                      '"example-2": {
-                       "summary": "GET `/filter?resourceType=Task&itemCount=true`",
+                       "summary": "request with itemCount",
+                       "description": "GET `/filter?resourceType=Task&itemCount=true`",
                        "value": [
                          {
                            "id": "aFilter",

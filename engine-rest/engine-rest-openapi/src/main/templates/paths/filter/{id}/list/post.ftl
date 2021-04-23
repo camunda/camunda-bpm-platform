@@ -31,8 +31,8 @@
       flatType = "object"
       requestDesc= "A JSON object which corresponds to the type of the saved query of the filter, i.e., if the resource type of the filter is Task the body should form a valid task query corresponding to the Task resource."
       examples = ['"example-1": {
-                     "summary": "POST `/filter/aTaskFilterId/list/?firstResult=0&maxResults=2`",
-                     "description": "**Note**: The examples show a task filter. So the request body corresponds to a task query. For other resource types the request body will differ.",
+                     "summary": "request",
+                     "description": "POST `/filter/aTaskFilterId/list/?firstResult=0&maxResults=2`. **Note**: The examples show a task filter. So the request body corresponds to a task query. For other resource types the request body will differ.",
                      "value": {
                        "assignee": "jonny1",
                        "taskDefinitionKey": "aTaskKey"
@@ -48,8 +48,8 @@
         array = true
         desc = "Request successful. A JSON array containing JSON objects corresponding to the matching entity interface in the engine. This depends on the saved query in the filter. Therefore it is not possible to specify a generic result format, i.e., if the resource type of the filter is Task the result will correspond to the Task interface in the engine."
         examples = ['"example-1": {
-                       "summary": "POST `/filter/aTaskFilterId/list/?firstResult=0&maxResults=2`",
-                       "description": "**Note**: The examples show the result of a task filter. So the response corresponds to a task, but for other filters the response format will differ.",
+                       "summary": "request",
+                       "description": "POST `/filter/aTaskFilterId/list/?firstResult=0&maxResults=2`. **Note**: The examples show the result of a task filter. So the response corresponds to a task, but for other filters the response format will differ.",
                        "value": [
                          {
                            "assignee": "jonny1",
