@@ -2,7 +2,7 @@
 <@lib.dto
     required = [ "type" ] >
 
-    <#-- NOTE: This DTO is usesd for the Modification Endpoints. For other endpoints that requre this DTO, check the other files.
+    <#-- NOTE: This DTO is used for the Modification Endpoints. For other endpoints that require this DTO, check the other files.
          The DTOs are duplicated because there are significant differences in the wording and properties.-->
 
     <@lib.property

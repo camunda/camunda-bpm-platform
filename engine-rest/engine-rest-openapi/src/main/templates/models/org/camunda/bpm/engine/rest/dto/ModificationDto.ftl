@@ -18,7 +18,7 @@
     <@lib.property
         name = "skipIoMappings"
         type = "boolean"
-        desc = "Skip execution of [input/output variable mappings](/manual/latest/user-guide/process-engine/variables/#input-output-variable-mapping) for
+        desc = "Skip execution of [input/output variable mappings](${docsUrl}/user-guide/process-engine/variables/#input-output-variable-mapping) for
                 activities that are started or ended as part of this request."
     />
 
@@ -40,7 +40,7 @@
     <@lib.property
         name = "instructions"
         type = "array"
-        dto = "ProcessInstanceModificationExecutionDto"
+        dto = "MultipleProcessInstanceModificationInstructionDto"
         desc = "An array of modification instructions. The instructions are executed in the order they are in. "
     />
 
