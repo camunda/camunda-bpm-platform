@@ -17,9 +17,9 @@
   <!-- wiremock logger -->
   <logger name="org.mortbay.log" level="info" />
 
-  <logger name="org.camunda" level="info" />
+  <logger name="org.camunda" level="warn" />
 
-  <logger name="org.camunda.bpm.engine.test" level="debug" />
+  <logger name="org.camunda.bpm.engine.test" level="warn" />
 
 <!--  <logger name="org.camunda.bpm.engine.impl.persistence.entity" level="debug" />-->
 <!--  <logger name="org.camunda.bpm.engine.impl.persistence.entity.JobEntity" level="debug" />-->
@@ -52,7 +52,7 @@
 <!--   <logger name="org.camunda.bpm.container" level="debug" /> -->
 
 
-  <root level="debug">
+  <root level="warn">
     <appender-ref ref="STDOUT" />
   </root>
 

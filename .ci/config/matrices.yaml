@@ -33,8 +33,6 @@ engine-webapp-unit:
   stages: 
   - 'engine-unit'
   - 'engine-unit-authorizations'
-  - 'webapp-unit'
-  - 'webapp-unit-authorizations'
 engine-rest:
   stages:
   - 'engine-rest-unit-jersey-2'
