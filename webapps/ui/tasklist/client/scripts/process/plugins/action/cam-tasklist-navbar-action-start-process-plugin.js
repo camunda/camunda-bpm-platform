@@ -118,6 +118,8 @@ var Controller = [
       modalResolved = false;
       var modalInstance = $modal.open({
         size: 'lg',
+        backdrop: 'static',
+        keyboard: false,
         controller: 'camProcessStartModalCtrl',
         template: template,
         resolve: {
