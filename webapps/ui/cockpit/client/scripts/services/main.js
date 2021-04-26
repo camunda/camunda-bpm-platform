@@ -22,6 +22,7 @@ var angular = require('../../../../../camunda-commons-ui/vendor/angular'),
   variables = require('./variables'),
   breadcrumbTrails = require('./breadcrumbTrails'),
   queryMaxResults = require('./query-max-results'),
+  variableUtils = require('./variable-utils'),
   routeUtil = require('./../../../../common/scripts/services/routeUtil'),
   page = require('./../../../../common/scripts/services/page'),
   camAPI = require('./../../../../common/scripts/services/cam-api'),
@@ -37,6 +38,7 @@ servicesModule.factory('Variables', variables);
 servicesModule.service('page', page);
 servicesModule.factory('breadcrumbTrails', breadcrumbTrails);
 servicesModule.factory('queryMaxResults', queryMaxResults);
+servicesModule.factory('varUtils', variableUtils);
 servicesModule.factory('routeUtil', routeUtil);
 servicesModule.factory('camAPI', camAPI);
 servicesModule.factory('hasPlugin', hasPlugin);

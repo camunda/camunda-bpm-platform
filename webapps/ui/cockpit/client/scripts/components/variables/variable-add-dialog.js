@@ -27,26 +27,24 @@ var Controller = [
   '$scope',
   'Notifications',
   'Uri',
-  'instance',
-  'isProcessInstance',
   'fixDate',
   '$translate',
   'camAPI',
-  'operation',
+  'resolved',
   function(
     $modalInstance,
     $scope,
     Notifications,
     Uri,
-    instance,
-    isProcessInstance,
     fixDate,
     $translate,
     camAPI,
-    operation
+    resolved
   ) {
-    $scope.isProcessInstance = isProcessInstance;
-    $scope.isBatchOperation = !!operation;
+    $scope.isProcessInstance = resolved.type === 'PROCESS_INSTANCE';
+    $scope.isBatchOperation = resolved.type === 'BATCH_OPERATION';
+    $scope.isMigration = resolved.type === 'MIGRATION';
+    $scope.isCaseInstance = resolved.type === 'CASE_INSTANCE';
 
     $scope.variableTypes = [
       'String',
@@ -103,18 +101,22 @@ var Controller = [
 
       var data = angular.extend({}, newVariable);
 
-      if (operation.variables) {
-        operation.variables = operation.variables.filter(variable => {
-          return data.name !== variable.variable.name;
-        });
+      const variables = resolved.variables;
+      if (variables && ($scope.isBatchOperation || $scope.isMigration)) {
+        for (let i = 0; i < variables.length; i++) {
+          if (data.name === variables[i].variable.name) {
+            variables.splice(i, 1);
+          }
+        }
 
-        operation.variables.push({
+        variables.push({
           variable: data,
           valid: true,
-          changed: false
+          changed: false,
+          showFailures: true
         });
 
-        $scope.$root.$broadcast('variable.added');
+        $scope.$root.$broadcast('variable.added', data.name);
 
         $scope.status = SUCCESS;
       } else {
@@ -122,9 +124,11 @@ var Controller = [
           data.value = fixDate(data.value);
         }
 
-        var instanceAPI = isProcessInstance ? processInstance : caseInstance;
+        var instanceAPI = $scope.isProcessInstance
+          ? processInstance
+          : caseInstance;
         instanceAPI
-          .setVariable(instance.id, data)
+          .setVariable(resolved.instanceId, data)
           .then(function() {
             $scope.status = SUCCESS;
 

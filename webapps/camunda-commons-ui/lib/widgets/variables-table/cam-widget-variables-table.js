@@ -57,7 +57,8 @@ function noopPromise(info /*, i*/) {
 module.exports = [
   '$uibModal',
   '$translate',
-  function($modal, $translate) {
+  '$document',
+  function($modal, $translate, $document) {
     return {
       template: template,
 
@@ -65,10 +66,12 @@ module.exports = [
         variables: '=?camVariables',
         headers: '=?camHeaders',
         editable: '=?camEditable',
+        validatable: '@',
 
         isVariableEditable: '=?',
         deleteVar: '=?onDelete',
         saveVar: '=?onSave',
+        onSaved: '=?',
         editVar: '=?onEdit',
         downloadVar: '=?onDownload',
         uploadVar: '=?onUpload',
@@ -76,11 +79,32 @@ module.exports = [
         onValidation: '&',
         onChangeStart: '&',
         onChangeEnd: '&',
+        onToggleEditMode: '=?',
         defaultSort: '=?',
         ignoreTypes: '=?'
       },
 
       link: function($scope) {
+        if ($scope.validatable) {
+          $document.on('click', e => {
+            const modalWindow = angular.element('.modal');
+            const modalBackdrop = angular.element('.modal-backdrop');
+            if (
+              (modalWindow.length === 0 && modalBackdrop.length === 0) ||
+              (modalWindow !== e.target &&
+                modalBackdrop !== e.target &&
+                !modalWindow[0].contains(e.target) &&
+                !modalBackdrop[0].contains(e.target))
+            ) {
+              $scope.$apply(() => {
+                $scope.variables.forEach(
+                  variable => (variable.showFailures = false)
+                );
+              });
+            }
+          });
+        }
+
         var backups = [];
 
         function _getVar(v) {
@@ -189,10 +213,11 @@ module.exports = [
               var readonly = function() {
                 return !$scope.isEditable('value', $scope.variables[v]);
               };
-
-              return $modal.open(
+              const result = $modal.open(
                 variableModalConfig(v, varUtils.templateDialog, readonly)
               ).result;
+              result.then(() => (info.changed = true)).catch(angular.noop);
+              return result;
             };
 
         $scope.readStringVar = angular.isFunction($scope.readStringVar)
@@ -298,6 +323,7 @@ module.exports = [
           });
         }
         $scope.$watch('variables', initVariables);
+        $scope.$on('variable.added', () => initVariables());
         initVariables();
 
         $scope.canEditVariable = angular.isFunction($scope.isVariableEditable)
@@ -405,7 +431,6 @@ module.exports = [
         $scope.saveVariable = function(v) {
           var info = $scope.variables[v];
           $scope.enableEditMode(info, false);
-
           $scope.saveVar(info, v).then(
             function(saved) {
               info.variable.name = saved.name;
@@ -418,6 +443,7 @@ module.exports = [
               } else {
                 info.variable.valueInfo = saved.valueInfo;
               }
+              $scope.onSaved && $scope.onSaved(v, info);
             },
             function(/*err*/) {
               // console.error(err);
@@ -442,6 +468,8 @@ module.exports = [
         };
 
         $scope.enableEditMode = function(info, enableEditMode) {
+          $scope.onToggleEditMode &&
+            $scope.onToggleEditMode(info, enableEditMode);
           info.editMode = enableEditMode;
           if (enableEditMode) {
             var uncompletedCount = 0;
