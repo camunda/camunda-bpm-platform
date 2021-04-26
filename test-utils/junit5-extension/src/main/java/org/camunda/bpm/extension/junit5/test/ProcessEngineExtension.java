@@ -82,6 +82,11 @@ public class ProcessEngineExtension implements TestWatcher,
     return this;
   }
   
+  public ProcessEngineExtension useProcessEngine(ProcessEngine engine) {
+    this.setProcessEngine(engine);
+    return this;
+  }
+  
   public ProcessEngine getProcessEngine() {
     return processEngine;
   }
