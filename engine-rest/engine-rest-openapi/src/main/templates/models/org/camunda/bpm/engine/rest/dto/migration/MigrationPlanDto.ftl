@@ -18,11 +18,8 @@
         name = "instructions"
         type = "array"
         dto = "MigrationInstructionDto"
-        desc = "
-                A list of migration instructions which map equal activities. Each
-                      migration instruction is a JSON object with the following
-                properties:
-                "
+        desc = "A list of migration instructions which map equal activities. Each
+                migration instruction is a JSON object with the following properties:"
         last = true
     />
 
