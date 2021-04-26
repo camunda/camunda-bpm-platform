@@ -44,6 +44,7 @@
     {"name": "Event Subscription"},
     {"name": "Execution"},
     {"name": "External Task"},
+    {"name": "Filter"},
     {"name": "Group"},
     {"name": "Historic Activity Instance"},
     {"name": "Historic Process Instance"},

@@ -217,7 +217,9 @@
 </#macro>
 
 <#-- Generates a Request Body JSON object -->
-<#macro requestBody mediaType dto
+<#macro requestBody mediaType 
+        dto=""
+        flatType=""
         requestDesc=""
         examples=[] >
   "requestBody" : {
@@ -230,7 +232,11 @@
       "${mediaType}" : {
 
         "schema" : {
-          "$ref" : "#/components/schemas/${dto}"
+          <#if dto?has_content >
+            "$ref" : "#/components/schemas/${dto}"
+          <#elseif flatType?has_content >
+            "type": "${flatType}"
+          </#if>
         }
 
         <#if examples?size != 0>,
