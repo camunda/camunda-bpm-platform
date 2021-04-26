@@ -35,7 +35,7 @@ engine-unit:
   - 'postgresql'
   - 'cockroachdb'
   - 'authorizations'
-  - 'eng-web' 
+  - 'eng-web'
 engine-unit-authorizations:
   directory: 'engine'
   command: 'clean test -PcfgAuthorizationCheckRevokesAlways,'
