@@ -14,7 +14,9 @@
         name = "type"
         type = "integer"
         format = "int32"
-        desc = "The type of the authorization (0=global, 1=grant, 2=revoke)."
+        desc = "The type of the authorization (0=global, 1=grant, 2=revoke). See the
+                [User Guide](${docsUrl}/user-guide/process-engine/authorization-service.md#authorization-type)
+                for more information about authorization types."
     />
     
     <@lib.property
@@ -56,6 +58,7 @@
     <@lib.property
         name = "removalTime"
         type = "string"
+        format = "date-time"
         desc = "The removal time indicates the date a historic instance
                 authorization is cleaned up. A removal time can only be assigned to a historic
                 instance authorization. Can be `null` when not related to a historic instance

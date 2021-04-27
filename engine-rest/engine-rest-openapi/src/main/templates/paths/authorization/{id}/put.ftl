@@ -47,8 +47,8 @@
         dto = "ExceptionDto"
         desc = "Returned if some of the properties in the request body are invalid, for example if
                 a permission parameter is not valid for the provided resourceType.
-                See the [Introduction](${docsUrl}/reference/rest/overview/#error-
-                handling) for the error response format."
+                See the [Introduction](${docsUrl}/reference/rest/overview/#error-handling)
+                for the error response format."
     />
 
     <@lib.response

@@ -7,14 +7,10 @@
       id = "availableOperationsAuthorizationInstance"
       tag = "Authorization"
       summary = "Authorization Resource Options"
-      desc = "The `/authorization` resource supports two custom OPTIONS requests, one for the
-              resource as such and one for individual authorization instances. The
-              OPTIONS request allows you to check for the set of available
-              operations that the currently authenticated user can perform on the
-              `/authorization` resource. Whether the user can perform an operation
-              or not may depend on various factors, including the users
-              authorizations to interact with this resource and the internal
-              configuration of the process engine."
+      desc = "The OPTIONS request allows you to check for the set of available operations that the currently
+              authenticated user can perform on a given instance of the `/authorization` resource.
+              Whether the user can perform an operation or not may depend on various factors, including the users
+              authorizations to interact with this resource and the internal configuration of the process engine."
   />
 
   "parameters" : [
@@ -38,7 +34,26 @@
         desc = "Request successful."
         examples = ['"example-1": {
                        "summary": "Status 200.",
-                       "description": "OPTIONS `/authorization/anAuthorizationId`"
+                       "description": "OPTIONS `/authorization/anAuthorizationId`",
+                       "value": {
+                         "links": [
+                           {
+                             "method":"GET",
+                             "href":"http://localhost:8080/engine-rest/authorization/anAuthorizationId",
+                             "rel":"self"
+                           },
+                           {
+                             "method":"PUT",
+                             "href":"http://localhost:8080/engine-rest/authorization/anAuthorizationId",
+                             "rel":"update"
+                           },
+                           {
+                             "method":"DELETE",
+                             "href":"http://localhost:8080/engine-rest/authorization/anAuthorizationId",
+                             "rel":"delete"
+                           }
+                         ]
+                       }
                      }']
         last = true
     />

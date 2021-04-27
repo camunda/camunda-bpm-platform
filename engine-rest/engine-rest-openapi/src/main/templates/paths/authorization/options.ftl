@@ -7,14 +7,10 @@
       id = "availableOperationsAuthorization"
       tag = "Authorization"
       summary = "Authorization Resource Options"
-      desc = "The `/authorization` resource supports two custom OPTIONS requests, one for the
-              resource as such and one for individual authorization instances. The
-              OPTIONS request allows you to check for the set of available
-              operations that the currently authenticated user can perform on the
-              `/authorization` resource. Whether the user can perform an operation
-              or not may depend on various factors, including the users
-              authorizations to interact with this resource and the internal
-              configuration of the process engine."
+      desc = "The OPTIONS request allows you to check for the set of available operations that the currently
+              authenticated user can perform on the `/authorization` resource. Whether the user can perform an operation
+              or not may depend on various factors, including the users authorizations to interact with this
+              resource and the internal configuration of the process engine."
   />
 
   "responses": {
@@ -25,7 +21,26 @@
         desc = "Request successful."
         examples = ['"example-1": {
                        "summary": "Status 200.",
-                       "description": "OPTIONS `/authorization`"
+                       "description": "OPTIONS `/authorization`",
+                       "value": {
+                         "links": [
+                           {
+                             "method":"GET",
+                             "href":"http://localhost:8080/engine-rest/authorization",
+                             "rel":"list"
+                           },
+                           {
+                             "method":"GET",
+                             "href":"http://localhost:8080/engine-rest/authorization/count",
+                             "rel":"count"
+                           },
+                           {
+                             "method":"POST",
+                             "href":"http://localhost:8080/engine-rest/authorization/create",
+                             "rel":"create"
+                           }
+                         ]
+                       }
                      }']
         last = true
     />
