@@ -29,8 +29,9 @@
         mediaType= "text/plain"
         desc = "Request successful."
         examples = ['"example-1": {
-                       "summary": "response`",
+                       "summary": "response",
                        "description": "GET `history/job-log/someId/stacktrace`
+
                                        The result is the corresponding stacktrace as plain text.",
                        "value": "java.lang.RuntimeException: A exception message!
                                   at org.camunda.bpm.pa.service.FailingDelegate.execute(FailingDelegate.java:10)

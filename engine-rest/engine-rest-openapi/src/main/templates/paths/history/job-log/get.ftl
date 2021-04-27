@@ -3,7 +3,7 @@
 {
   <@lib.endpointInfo
       id = "getHistoricJobLogs"
-      tag = "Historic Job-log"
+      tag = "Historic Job Log"
       summary = "Get Job Logs"
       desc = "Queries for historic job logs that fulfill the given parameters.
               The size of the result set can be retrieved by using the
