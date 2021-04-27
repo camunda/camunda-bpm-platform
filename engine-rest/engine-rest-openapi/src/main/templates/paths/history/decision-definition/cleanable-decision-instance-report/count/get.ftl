@@ -2,7 +2,7 @@
 <#macro endpoint_macro docsUrl="">
 {
   <@lib.endpointInfo
-      id = "getCleanableDecisionInstanceReportCount"
+      id = "getCleanableHistoricDecisionInstanceReportCount"
       tag = "Historic Decision Definition"
       summary = "Get Cleanable Decision Instance Report Count"
       desc = "Queries for the number of report results about a decision definition and finished
