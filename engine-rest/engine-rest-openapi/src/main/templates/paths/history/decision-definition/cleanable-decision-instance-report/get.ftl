@@ -2,7 +2,7 @@
 <#macro endpoint_macro docsUrl="">
 {
   <@lib.endpointInfo
-      id = "getCleanableDecisionInstanceReport"
+      id = "getCleanableHistoricDecisionInstanceReport"
       tag = "Historic Decision Definition"
       summary = "Get Cleanable Decision Instance Report"
       desc = "Retrieves a report about a decision definition and finished decision instances
