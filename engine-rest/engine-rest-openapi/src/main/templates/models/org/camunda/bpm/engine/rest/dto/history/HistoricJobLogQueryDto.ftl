@@ -1,6 +1,6 @@
 <#-- Generated From File: camunda-docs-manual/public/reference/rest/history/job-log/post-job-log-query/index.html -->
 <#macro dto_macro docsUrl="">
-<@lib.dto desc = "A Historic Job-log instance query which defines a list of Historic Job-log instances">
+<@lib.dto desc = "A Historic Job Log instance query which defines a list of Historic Job Log instances">
     
 <#assign requestMethod="POST">
     <#include "/lib/commons/history-job-log-params.ftl">
