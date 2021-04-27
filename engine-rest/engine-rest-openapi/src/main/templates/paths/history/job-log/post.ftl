@@ -1,30 +1,34 @@
-<#-- Generated From File: camunda-docs-manual/public/reference/rest/history/job-log/get-job-log-query/index.html -->
+<#-- Generated From File: camunda-docs-manual/public/reference/rest/history/job-log/post-job-log-query/index.html -->
 <#macro endpoint_macro docsUrl="">
 {
   <@lib.endpointInfo
-      id = "getHistoricJobLogs"
-      tag = "Historic Job-log"
-      summary = "Get Job Logs"
+      id = "queryHistoricJobLogs"
+      tag = "Historic Job Log"
+      summary = "Get Job Logs (POST)"
       desc = "Queries for historic job logs that fulfill the given parameters.
-              The size of the result set can be retrieved by using the
-              [Get Job Log Count](${docsUrl}/reference/rest/history/job-log/get-job-log-query-count/)
-              method."
+              This method is slightly more powerful than the
+              [Get Job Logs](${docsUrl}/reference/rest/history/job-log/get-job-log-query/)
+              method because it allows filtering by historic job logs values of the
+              different types `String`, `Number` or `Boolean`."
   />
 
   "parameters" : [
 
-    <#assign last = false >
-    <#assign requestMethod="GET"/>
-    <#include "/lib/commons/history-job-log-params.ftl">
-    <@lib.parameters
-        object = params
-        last = last
-    />
-    <#include "/lib/commons/sort-params.ftl">
     <#assign last = true >
     <#include "/lib/commons/pagination-params.ftl">
 
   ],
+
+  <@lib.requestBody
+      mediaType = "application/json"
+      dto = "HistoricJobLogQueryDto"
+      examples = ['"example-1": {
+                     "summary": "POST `/history/job-log`",
+                     "value": {
+                       "jobId": "aJobId"
+                     }
+                   }']
+  />
 
   "responses": {
 
@@ -34,8 +38,8 @@
         array = true
         desc = "Request successful."
         examples = ['"example-1": {
-                       "summary": "GET `/history/job-log?jobId=aJobId`",
-                       "description": "GET `/history/job-log?jobId=aJobId`",
+                       "summary": "POST `/history/job-log`",
+                       "description": "POST `/history/job-log`",
                        "value": [
                          {
                            "id": "someId",
@@ -81,4 +85,4 @@
   }
 
 }
-</#macro>d
+</#macro>

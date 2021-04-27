@@ -20,7 +20,8 @@
         type = "string"
         format = "date-time"
         desc = "The time after which the log entry should be removed by the History Cleanup job.
-                Default format* `yyyy-MM-dd'T'HH:mm:ss.SSSZ`."
+                Default format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`. For further info see the
+                [docs](${docsUrl}/reference/rest/overview/date-format/)"
     />
     
     <@lib.property

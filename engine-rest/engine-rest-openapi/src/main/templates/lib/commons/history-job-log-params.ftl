@@ -15,14 +15,8 @@
   '"deploymentId"',
   '"hostname"',
   '"occurrence"',
-  '"tenantId"',
+  '"tenantId"'
 ]>
-
-<#if requestMethod == "GET">
-  <#assign specialWording = "TOD"O>
-<#elseif requestMethod == "POST">
-  <#assign specialWording = "TOD"O>
-</#if>
             
 <#assign params = {
   "logId": {
