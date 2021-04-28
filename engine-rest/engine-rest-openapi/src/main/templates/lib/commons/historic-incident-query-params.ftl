@@ -2,6 +2,7 @@
 
 <#assign sortByValues = [
   '"incidentId"',
+  '"incidentMessage"',
   '"createTime"',
   '"endTime"',
   '"incidentType"',
@@ -14,7 +15,8 @@
   '"rootCauseIncidentId"',
   '"configuration"',
   '"historyConfiguration"',
-  '"tenantId"'
+  '"tenantId"',
+  '"incidentState"'
 ]>
 
 <#assign params = {

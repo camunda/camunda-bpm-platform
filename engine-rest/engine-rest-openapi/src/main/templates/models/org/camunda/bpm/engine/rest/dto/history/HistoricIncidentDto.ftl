@@ -105,7 +105,7 @@
     <@lib.property
         name = "historyConfiguration"
         type = "string"
-        desc = "The payload of the incident at "
+        desc = "The payload of this incident at the time when it occurred."
     />
 
     <@lib.property
