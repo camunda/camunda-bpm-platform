@@ -58,8 +58,8 @@
         code = "400"
         dto = "ExceptionDto"
         desc = "
-                Request was unsuccessfull due to a bad user request. This occurs if
-                some of the query parameters are invalid, e. g. if neither
+                Request was unsuccessful due to a bad user request. This occurs if
+                some of the query parameters are invalid, e.g. if neither
                 historicBatchIds nor historicBatchQuery is present or if no mode is
                 specified.
 
