@@ -6,10 +6,9 @@
       tag = "Migration"
       summary = "Validate Migration Plan"
       desc = "Validates a migration plan statically without executing it. This
-              corresponds to the [creation time validation](/manual/develop/user-
-              guide/process-engine/process-instance-migration/#creation-time-
-              validation) described in the user
-              guide."
+              corresponds to the
+              [creation time validation](/manual/develop/user-guide/process-engine/process-instance-migration/#creation-time-validation)
+              described in the user guide."
   />
 
   <@lib.requestBody

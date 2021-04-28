@@ -4,9 +4,8 @@
     
     <@lib.property
         name = "migrationPlan"
-        type = "object"
+        type = "ref"
         dto = "MigrationPlanDto"
-        additionalProperties = true
         desc = "The migration plan to execute. A JSON object corresponding to
                 the migration plan interface in the engine as explained below."
     />
@@ -21,7 +20,7 @@
     
     <@lib.property
         name = "processInstanceQuery"
-        type = "object"
+        type = "ref"
         dto = "ProcessInstanceQueryDto"
         desc = "A process instance query like the request body described by
                 [POST /process-instance](${docsUrl}/reference/rest/process-instance/post-query/#request-body)."

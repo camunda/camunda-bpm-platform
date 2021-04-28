@@ -5,6 +5,7 @@
     <@lib.property
         name = "instructionReports"
         type = "array"
+        dto = "MigrationInstructionValidationReportDto"
         desc = "The list of instruction validation reports. If no validation
                 errors are detected it is an empty list."
         last = true
