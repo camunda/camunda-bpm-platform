@@ -55,6 +55,7 @@
     {"name": "Job"},
     {"name": "Message"},
     {"name": "Metrics"},
+    {"name": "Modification"},
     {"name": "Process Definition"},
     {"name": "Process Instance"},
     {"name": "Signal"},

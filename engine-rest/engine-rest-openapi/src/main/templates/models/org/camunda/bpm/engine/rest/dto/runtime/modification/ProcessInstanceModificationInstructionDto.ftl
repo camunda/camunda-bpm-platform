@@ -5,7 +5,9 @@
     <#-- NOTE: Please consider adjusting the RestartProcessInstanceModificationInstructionDto
          if the properties are valid there as well.
          The DTO was created separately as it does not contain
-         all of these properties and the description differs too much. -->
+         all of these properties and the description differs too much.
+         Also check the MultipleProcessInstanceModifcationInstructionDto if you need changes for the Modification endpoints.
+         -->
 
     <@lib.property
         name = "type"
