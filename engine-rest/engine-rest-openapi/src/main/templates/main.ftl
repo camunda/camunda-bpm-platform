@@ -50,6 +50,7 @@
     {"name": "Historic Decision Definition"},
     {"name": "Historic Decision Requirements Definition"},
     {"name": "Historic Incident"},
+    {"name": "Historic Job Log"},
     {"name": "Historic Process Instance"},
     {"name": "Identity"},
     {"name": "Incident"},
