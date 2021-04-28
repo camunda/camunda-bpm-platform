@@ -53,6 +53,7 @@
     {"name": "Historic Incident"},
     {"name": "Historic Job Log"},
     {"name": "Historic Process Instance"},
+    {"name": "Historic Task Instance"},
     {"name": "Identity"},
     {"name": "Incident"},
     {"name": "Job"},
