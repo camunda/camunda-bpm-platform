@@ -15,8 +15,8 @@
         type = "array"
         itemType = "string"
         desc = "The ids of the historic batches to set the removal time for."
+        last = true
     />
-
 
 </@lib.dto>
 </#macro>

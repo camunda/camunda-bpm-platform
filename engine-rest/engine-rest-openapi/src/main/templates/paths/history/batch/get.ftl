@@ -15,8 +15,8 @@
   "parameters" : [
 
     <#assign last = false >
-    <#assign requestMethod="TOD"O/>
-    <#include "/lib/commons/TODO.ft"l >
+    <#assign requestMethod="GET"/>
+    <#include "/lib/commons/historic-batch-params.ftl" >
     <@lib.parameters
         object = params
         last = last
@@ -31,7 +31,7 @@
 
     <@lib.response
         code = "200"
-        dto = "TOD"O
+        dto = "HistoricBatchDto"
         array = true
         desc = "Request successful."
         examples = ['"example-1": {
