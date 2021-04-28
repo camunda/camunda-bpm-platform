@@ -22,17 +22,17 @@ import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
 import org.camunda.bpm.engine.impl.batch.BatchJobConfiguration;
 import org.camunda.bpm.engine.impl.batch.BatchJobContext;
 import org.camunda.bpm.engine.impl.batch.BatchJobDeclaration;
+import org.camunda.bpm.engine.impl.cmd.SetExecutionVariablesCmd;
+import org.camunda.bpm.engine.impl.core.variable.VariableUtil;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.json.JsonObjectConverter;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class BatchSetVariablesHandler extends AbstractBatchJobHandler<BatchConfiguration> {
 
@@ -52,12 +52,7 @@ public class BatchSetVariablesHandler extends AbstractBatchJobHandler<BatchConfi
     BatchConfiguration batchConfiguration = readConfiguration(configurationByteArray);
 
     String batchId = batchConfiguration.getBatchId();
-    List<VariableInstanceEntity> variableInstances = commandContext.getVariableInstanceManager()
-        .findVariableInstancesByBatchId(batchId);
-
-    Map<String, Object> variables = variableInstances.stream()
-        .collect(Collectors.toMap(VariableInstanceEntity::getName,
-            VariableInstanceEntity::getTypedValueWithImplicitUpdatesSkipped));
+    Map<String, ?> variables = VariableUtil.findBatchVariablesSerialized(batchId, commandContext);
 
     List<String> processInstanceIds = batchConfiguration.getIds();
 
@@ -69,9 +64,8 @@ public class BatchSetVariablesHandler extends AbstractBatchJobHandler<BatchConfi
 
     try {
       for (String processInstanceId : processInstanceIds) {
-          commandContext.getProcessEngineConfiguration()
-              .getRuntimeService()
-              .setVariables(processInstanceId, variables);
+        new SetExecutionVariablesCmd(processInstanceId, variables, false, true)
+            .execute(commandContext);
       }
 
     } finally {

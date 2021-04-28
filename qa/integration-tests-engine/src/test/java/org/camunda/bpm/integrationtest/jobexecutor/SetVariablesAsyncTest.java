@@ -14,15 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.integrationtest.functional.migration;
+package org.camunda.bpm.integrationtest.jobexecutor;
 
-import java.io.ByteArrayOutputStream;
-import java.util.Arrays;
-
-import org.camunda.bpm.engine.migration.MigrationPlan;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
-import org.camunda.bpm.integrationtest.functional.migration.beans.TimerBean;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.integrationtest.jobexecutor.classes.MyPojo;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.camunda.bpm.integrationtest.util.TestContainer;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -38,46 +36,34 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-/**
- * @author Thorben Lindhauer
- *
- */
+import java.io.ByteArrayOutputStream;
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.Assert.fail;
+
 @RunWith(Arquillian.class)
-public class MigrationContextSwitchBeansTest extends AbstractFoxPlatformIntegrationTest {
+public class SetVariablesAsyncTest extends AbstractFoxPlatformIntegrationTest {
 
-  public static final BpmnModelInstance ONE_TASK_PROCESS = Bpmn.createExecutableProcess("oneTaskProcess")
-    .startEvent()
-    .userTask("userTask")
-    .endEvent()
-    .done();
-
-  public static final BpmnModelInstance BOUNDARY_EVENT_PROCESS = Bpmn.createExecutableProcess("boundaryProcess")
-    .startEvent()
-    .userTask("userTask")
-    .boundaryEvent()
-    .timerWithDuration("${timerBean.duration}")
-    .endEvent()
-    .moveToNode("userTask")
-    .endEvent()
-    .done();
-
-  @Deployment(name = "sourceDeployment")
-  public static WebArchive createSourceDeplyoment() {
-    return initWebArchiveDeployment("source.war")
-      .addAsResource(modelAsAsset(ONE_TASK_PROCESS), "oneTaskProcess.bpmn20.xml");
+  public static BpmnModelInstance oneTaskProcess(String key) {
+    return Bpmn.createExecutableProcess(key)
+      .startEvent()
+      .userTask("userTask")
+      .endEvent()
+      .done();
   }
 
-  @Deployment(name = "targetDeployment")
-  public static WebArchive createTargetDeplyoment() {
-    return initWebArchiveDeployment("target.war")
-      .addClass(TimerBean.class)
-      .addAsResource(modelAsAsset(BOUNDARY_EVENT_PROCESS), "boundaryProcess.bpmn20.xml");
+  @Deployment(name = "deployment")
+  public static WebArchive createDeployment() {
+    return initWebArchiveDeployment("deployment.war")
+        .addClass(MyPojo.class)
+        .addAsResource(modelAsAsset(oneTaskProcess("oneTaskProcess")), "oneTaskProcess.bpmn20.xml");
   }
 
   @Deployment(name="clientDeployment")
   public static WebArchive clientDeployment() {
     WebArchive webArchive = ShrinkWrap.create(WebArchive.class, "client.war")
-            .addClass(AbstractFoxPlatformIntegrationTest.class);
+        .addClass(AbstractFoxPlatformIntegrationTest.class);
 
     TestContainer.addContainerSpecificResources(webArchive);
 
@@ -87,33 +73,40 @@ public class MigrationContextSwitchBeansTest extends AbstractFoxPlatformIntegrat
 
   @Test
   @OperateOnDeployment("clientDeployment")
-  public void testCreateBoundaryTimer() {
+  public void shouldDeserializeObjectVariable() {
     // given
-    ProcessDefinition sourceDefinition = repositoryService
+    ProcessDefinition processDefinition = repositoryService
         .createProcessDefinitionQuery()
         .processDefinitionKey("oneTaskProcess")
         .singleResult();
 
-    ProcessDefinition targetDefinition = repositoryService
-        .createProcessDefinitionQuery()
-        .processDefinitionKey("boundaryProcess")
-        .singleResult();
+    String pi = runtimeService.startProcessInstanceById(processDefinition.getId()).getId();
 
-    String pi = runtimeService.startProcessInstanceById(sourceDefinition.getId()).getId();
+    runtimeService.setVariablesAsync(Collections.singletonList(pi),
+        Variables.putValue("foo", Variables.serializedObjectValue()
+            .objectTypeName("org.camunda.bpm.integrationtest.functional.context.classes.MyPojo")
+            .serializedValue("{\"name\": \"myName\", \"prio\": 5}")
+            .serializationDataFormat("application/json")
+            .create()));
 
-    MigrationPlan migrationPlan = runtimeService.createMigrationPlan(sourceDefinition.getId(), targetDefinition.getId())
-      .mapActivities("userTask", "userTask")
-      .build();
+    // execute seed jobs
+    List<Job> jobs = managementService.createJobQuery().list();
+    for (Job job : jobs) {
+      managementService.executeJob(job.getId());
+    }
 
-    // when
-    runtimeService.newMigration(migrationPlan)
-      .processInstanceIds(Arrays.asList(pi))
-      .execute();
+    // when: execute remaining batch jobs
+    jobs = managementService.createJobQuery().list();
+    for (Job job : jobs) {
+      try {
+        managementService.executeJob(job.getId());
+      } catch (ProcessEngineException ex) {
+        fail("No exception expected: " + ex.getMessage());
+      }
+    }
 
     // then
-    Job timerJob = managementService.createJobQuery().singleResult();
-    Assert.assertNotNull(timerJob);
-    Assert.assertNotNull(timerJob.getDuedate());
+    Assert.assertNotNull(runtimeService.getVariableTyped(pi, "foo", false));
   }
 
   protected static Asset modelAsAsset(BpmnModelInstance modelInstance) {

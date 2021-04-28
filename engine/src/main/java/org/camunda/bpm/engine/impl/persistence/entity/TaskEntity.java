@@ -1658,8 +1658,8 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   }
 
   @Override
-  public void setVariablesLocal(Map<String, ?> variables) {
-    super.setVariablesLocal(variables);
+  public void setVariablesLocal(Map<String, ?> variables, boolean skipJavaSerializationFormatCheck) {
+    super.setVariablesLocal(variables, skipJavaSerializationFormatCheck);
     Context.getCommandContext().getDbEntityManager().forceUpdate(this);
   }
 

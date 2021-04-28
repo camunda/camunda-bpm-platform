@@ -240,12 +240,22 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
     return getVariableStore().getKeys();
   }
 
+  public void setVariables(Map<String, ?> variables, boolean skipJavaSerializationFormatCheck) {
+    VariableUtil.setVariables(variables,
+        (name, value) -> setVariable(name, value, skipJavaSerializationFormatCheck));
+  }
+
   public void setVariables(Map<String, ?> variables) {
-    VariableUtil.setVariables(variables, this::setVariable);
+    setVariables(variables, false);
+  }
+
+  public void setVariablesLocal(Map<String, ?> variables, boolean skipJavaSerializationFormatCheck) {
+    VariableUtil.setVariables(variables,
+        (name, value) -> setVariableLocal(name, value, skipJavaSerializationFormatCheck));
   }
 
   public void setVariablesLocal(Map<String, ?> variables) {
-    VariableUtil.setVariables(variables, this::setVariableLocal);
+    setVariablesLocal(variables, false);
   }
 
   public void removeVariables() {
@@ -279,33 +289,50 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
     }
   }
 
-  public void setVariable(String variableName, Object value) {
+  public void setVariable(String variableName, Object value, boolean skipJavaSerializationFormatCheck) {
     TypedValue typedValue = Variables.untypedValue(value);
-    setVariable(variableName, typedValue, getSourceActivityVariableScope());
-
+    setVariable(variableName, typedValue, getSourceActivityVariableScope(), skipJavaSerializationFormatCheck);
   }
 
-  protected void setVariable(String variableName, TypedValue value, AbstractVariableScope sourceActivityVariableScope) {
+  public void setVariable(String variableName, Object value) {
+    setVariable(variableName, value, false);
+  }
+
+  protected void setVariable(String variableName,
+                             TypedValue value,
+                             AbstractVariableScope sourceActivityVariableScope,
+                             boolean skipJavaSerializationFormatCheck) {
     if (hasVariableLocal(variableName)) {
-      setVariableLocal(variableName, value, sourceActivityVariableScope);
+      setVariableLocal(variableName, value, sourceActivityVariableScope, skipJavaSerializationFormatCheck);
       return;
     }
     AbstractVariableScope parentVariableScope = getParentVariableScope();
     if (parentVariableScope!=null) {
       if (sourceActivityVariableScope==null) {
-        parentVariableScope.setVariable(variableName, value);
+        parentVariableScope.setVariable(variableName, value, skipJavaSerializationFormatCheck);
       } else {
-        parentVariableScope.setVariable(variableName, value, sourceActivityVariableScope);
+        parentVariableScope.setVariable(variableName, value, sourceActivityVariableScope, skipJavaSerializationFormatCheck);
       }
       return;
     }
 
-    setVariableLocal(variableName, value, sourceActivityVariableScope);
+    setVariableLocal(variableName, value, sourceActivityVariableScope, skipJavaSerializationFormatCheck);
   }
 
-  public void setVariableLocal(String variableName, TypedValue value, AbstractVariableScope sourceActivityExecution) {
+  protected void setVariable(String variableName,
+                             TypedValue value,
+                             AbstractVariableScope sourceActivityVariableScope) {
+    setVariable(variableName, value, sourceActivityVariableScope, false);
+  }
 
-    VariableUtil.checkJavaSerialization(variableName, value);
+  public void setVariableLocal(String variableName,
+                               TypedValue value,
+                               AbstractVariableScope sourceActivityExecution,
+                               boolean skipJavaSerializationFormatCheck) {
+
+    if (!skipJavaSerializationFormatCheck) {
+      VariableUtil.checkJavaSerialization(variableName, value);
+    }
 
     VariableStore<CoreVariableInstance> variableStore = getVariableStore();
 
@@ -372,10 +399,13 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
     }
   }
 
-  public void setVariableLocal(String variableName, Object value) {
+  public void setVariableLocal(String variableName, Object value, boolean skipJavaSerializationFormatCheck) {
     TypedValue typedValue = Variables.untypedValue(value);
-    setVariableLocal(variableName, typedValue, getSourceActivityVariableScope());
+    setVariableLocal(variableName, typedValue, getSourceActivityVariableScope(), skipJavaSerializationFormatCheck);
+  }
 
+  public void setVariableLocal(String variableName, Object value) {
+    setVariableLocal(variableName, value, false);
   }
 
   public void removeVariable(String variableName) {
