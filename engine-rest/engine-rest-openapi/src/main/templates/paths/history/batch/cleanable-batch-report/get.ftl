@@ -40,7 +40,9 @@
         desc = "Request successful."
         examples = ['"example-1": {
                        "summary": "GET `/history/batch/cleanable-batch-report`",
-                       "description": "GET `/history/batch/cleanable-batch-report`",
+                       "description": "GET `/history/batch/cleanable-batch-report`
+
+                                      An array containing finished batches information relevant to history cleanup.",
                        "value": [
                          {
                            "batchType": "instance-modification",
