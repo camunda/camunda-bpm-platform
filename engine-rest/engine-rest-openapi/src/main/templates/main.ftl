@@ -49,6 +49,7 @@
     {"name": "Filter"},
     {"name": "Group"},
     {"name": "Historic Activity Instance"},
+    {"name": "Historic Batch"},
     {"name": "Historic Decision Definition"},
     {"name": "Historic Decision Instance"},
     {"name": "Historic Decision Requirements Definition"},
