@@ -2,7 +2,6 @@
 <#macro dto_macro docsUrl="">
 <@lib.dto desc = "A Historic Job Log instance query which defines a list of Historic Job Log instances">
     
-<#assign requestMethod="POST">
     <#include "/lib/commons/history-job-log-params.ftl">
     <@lib.properties params/>    
     "sorting": {
