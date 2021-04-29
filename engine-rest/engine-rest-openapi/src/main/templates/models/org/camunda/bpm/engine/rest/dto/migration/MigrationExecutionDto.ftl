@@ -14,6 +14,7 @@
     <@lib.property
         name = "processInstanceIds"
         type = "array"
+        itemType = "string"
         desc = "A list of process instance ids to migrate."
     />
 
