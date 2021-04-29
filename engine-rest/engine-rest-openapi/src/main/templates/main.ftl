@@ -57,6 +57,7 @@
     {"name": "Job"},
     {"name": "Message"},
     {"name": "Metrics"},
+    {"name": "Migration"},
     {"name": "Modification"},
     {"name": "Process Definition"},
     {"name": "Process Instance"},
