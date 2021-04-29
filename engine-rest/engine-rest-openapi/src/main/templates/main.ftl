@@ -61,6 +61,7 @@
     {"name": "Historic Process Definition"},
     {"name": "Historic Process Instance"},
     {"name": "Historic Task Instance"},
+    {"name": "Historic User Operation Log"},
     {"name": "History Cleanup"},
     {"name": "Identity"},
     {"name": "Incident"},
