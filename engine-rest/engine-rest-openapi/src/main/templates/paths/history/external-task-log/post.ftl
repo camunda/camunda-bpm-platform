@@ -1,29 +1,27 @@
-<#-- Generated From File: camunda-docs-manual/public/reference/rest/history/external-task-log/get-external-task-log-query/index.html -->
+<#-- Generated From File: camunda-docs-manual/public/reference/rest/history/external-task-log/post-external-task-log-query/index.html -->
 <#macro endpoint_macro docsUrl="">
 {
   <@lib.endpointInfo
-      id = "getHistoricExternalTaskLogs"
+      id = "queryHistoricExternalTaskLogs"
       tag = "Historic External Task Log"
-      summary = "Get External Task Logs"
+      summary = "Get External Task Logs (POST)"
       desc = "Queries for historic external task logs that fulfill the given parameters.
-              The size of the result set can be retrieved by using the
-              [Get External Task Log Count](${docsUrl}/reference/rest/history/external-task-log/get-external-task-log-query-count/)
-              method."
+              This method is slightly more powerful than the
+              [Get External Task Logs](${docsUrl}/reference/rest/history/external-task-log/get-external-task-log-query/)
+              method because it allows filtering by historic external task logs
+              values of the different types `String`, `Number` or `Boolean`."
   />
 
-  "parameters" : [
-
-    <#assign last = false >
-    <#include "/lib/commons/historic-external-task-log-query-params.ftl">
-    <@lib.parameters
-        object = params
-        last = last
-    />
-    <#include "/lib/commons/sort-params.ftl">
-    <#assign last = true >
-    <#include "/lib/commons/pagination-params.ftl">
-
-  ],
+  <@lib.requestBody
+      mediaType = "application/json"
+      dto = "HistoricExternalTaskLogQueryDto"
+      examples = ['"example-1": {
+                     "summary": "POST `/history/external-task-log`",
+                     "value": {
+                       "externalTaskId": "anExternalTaskId"
+                     }
+                   }']
+  />
 
   "responses": {
 
@@ -33,8 +31,8 @@
         array = true
         desc = "Request successful."
         examples = ['"example-1": {
-                       "summary": "GET `/history/external-task-log?externalTaskId=anExternalTaskId`",
-                       "description": "GET `/history/external-task-log?externalTaskId=anExternalTaskId`",
+                       "summary": "POST `/history/external-task-log`",
+                       "description": "POST `/history/external-task-log`",
                        "value": [
                          {
                            "id": "someId",
