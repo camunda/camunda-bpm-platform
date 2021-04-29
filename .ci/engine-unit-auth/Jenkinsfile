@@ -48,7 +48,7 @@ pipeline {
         script {
           // see the .ci/config/matrices.yaml for the stage generation values
           // see .ci/config/stage-types.yaml for the stage configurations
-          parallel(cambpmGetMatrixStages('engine-unit', [], { stageInfo ->
+          parallel(cambpmGetMatrixStages('engine-unit-authorizations', [], { stageInfo ->
             List allowedStageLabels = stageInfo.allowedLabels
             String dbLabel = stageInfo.nodeType
             return cambpmWithLabels(allowedStageLabels.minus('cockroachdb'), cambpmGetDbType(dbLabel))

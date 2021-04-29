@@ -420,21 +420,27 @@ pipeline {
     }
     stage('UNIT DB tests') {
       when {
-        anyOf
-        allOf {
-          expression {
-            cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit')
-          }
-          cambpmWithLabels('eng-web', 'all-db', 'db2', 'mysql', 'oracle', 'mariadb', 'sqlserver', 'postgresql')
+        expression {
+          cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit') && cambpmWithLabels('eng-web', 'all-db', 'db2', 'mysql', 'oracle', 'mariadb', 'sqlserver', 'postgresql')
         }
       }
       steps {
         script {
-          cambpmTriggerDownstream(
-            platformVersion + "/cambpm-ce/engine-unit/${env.BRANCH_NAME}",
-            [string(name: 'UPSTREAM_PROJECT_NAME', value: env.JOB_NAME),
-            string(name: 'UPSTREAM_BUILD_NUMBER', value: env.BUILD_NUMBER)]
-          )
+          if (cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit')) {
+            cambpmTriggerDownstream(
+              platformVersion + "/cambpm-ce/engine-unit/${env.BRANCH_NAME}",
+              [string(name: 'UPSTREAM_PROJECT_NAME', value: env.JOB_NAME),
+              string(name: 'UPSTREAM_BUILD_NUMBER', value: env.BUILD_NUMBER)]
+            )
+          }
+
+          if (cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit-authorizations')) {
+            cambpmTriggerDownstream(
+              platformVersion + "/cambpm-ce/engine-unit-auth/${env.BRANCH_NAME}",
+              [string(name: 'UPSTREAM_PROJECT_NAME', value: env.JOB_NAME),
+              string(name: 'UPSTREAM_BUILD_NUMBER', value: env.BUILD_NUMBER)]
+            )
+          }
         }
       }
     }
