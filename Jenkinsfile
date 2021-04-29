@@ -13,13 +13,13 @@ pipeline {
   environment {
     CAMBPM_LOGGER_LOG_LEVEL = 'DEBUG'
   }
+  parameters {
+    string name: 'EE_DOWNSTREAM', defaultValue: 'cambpm-ee-main-pr/' + cambpmDefaultBranch(), description: 'The name of the EE branch/PR to run the EE pipeline on, e.g. cambpm-ee-main/PR-333'
+  }
   options {
     buildDiscarder(logRotator(numToKeepStr: '5'))
     copyArtifactPermission('*')
     disableConcurrentBuilds() // TODO https://jira.camunda.com/browse/CAM-13403
-  }
-  parameters {
-    string name: 'EE_DOWNSTREAM', defaultValue: 'cambpm-ee-main-pr/' + cambpmDefaultBranch(), description: 'The name of the EE branch/PR to run the EE pipeline on, e.g. cambpm-ee-main/PR-333'
   }
   stages {
     stage('ASSEMBLY') {
@@ -34,7 +34,7 @@ pipeline {
           suppressErrors: false,
           runSteps: {
             cambpmRunMaven('.',
-                'clean source:jar deploy source:test-jar com.mycila:license-maven-plugin:check -Pdistro,distro-ce,distro-wildfly,distro-webjar -DaltStagingDirectory=${WORKSPACE}/staging -DskipRemoteStaging=true',
+                'clean source:jar deploy source:test-jar com.mycila:license-maven-plugin:check -Pdistro,distro-ce,distro-wildfly,distro-webjar -DaltStagingDirectory=${WORKSPACE}/staging -DskipRemoteStaging=true -DskipTests',
                 withCatch: false,
                 withNpm: true)
 
@@ -418,6 +418,26 @@ pipeline {
         }
       }
     }
+    stage('UNIT DB tests') {
+      when {
+        anyOf
+        allOf {
+          expression {
+            cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit')
+          }
+          cambpmWithLabels('eng-web', 'all-db', 'db2', 'mysql', 'oracle', 'mariadb', 'sqlserver', 'postgresql')
+        }
+      }
+      steps {
+        script {
+          cambpmTriggerDownstream(
+            platformVersion + "/cambpm-ce/engine-unit/${env.BRANCH_NAME}",
+            [string(name: 'UPSTREAM_PROJECT_NAME', value: env.JOB_NAME),
+            string(name: 'UPSTREAM_BUILD_NUMBER', value: env.BUILD_NUMBER)]
+          )
+        }
+      }
+    }
     stage('Engine Rest UNIT tests') {
       steps {
         script {
@@ -425,19 +445,6 @@ pipeline {
           // see .ci/config/stage-types.yaml for the stage configurations
           parallel(cambpmGetMatrixStages('engine-rest', failedStageTypes, { stageInfo ->
             return cambpmWithLabels(stageInfo.allowedLabels)
-          }))
-        }
-      }
-    }
-    stage('UNIT DB tests') {
-      steps {
-        script {
-          // see the .ci/config/matrices.yaml for the stage generation values
-          // see .ci/config/stage-types.yaml for the stage configurations
-          parallel(cambpmGetMatrixStages('engine-webapp-unit', failedStageTypes, { stageInfo ->
-            List allowedStageLabels = stageInfo.allowedLabels
-            String dbLabel = stageInfo.nodeType
-            return cambpmWithLabels(allowedStageLabels.minus('cockroachdb'), cambpmGetDbType(dbLabel))
           }))
         }
       }

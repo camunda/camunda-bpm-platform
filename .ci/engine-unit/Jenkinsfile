@@ -1,0 +1,69 @@
+// https://github.com/camunda/jenkins-global-shared-library
+// https://github.com/camunda/cambpm-jenkins-shared-library
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
+
+def failedStageTypes = []
+
+pipeline {
+  agent {
+    node {
+      label 'jenkins-job-runner'
+    }
+  }
+  environment {
+    CAMBPM_LOGGER_LOG_LEVEL = 'DEBUG'
+  }
+  options {
+    buildDiscarder(logRotator(numToKeepStr: '5'))
+    disableConcurrentBuilds() // TODO https://jira.camunda.com/browse/CAM-13403
+  }
+  parameters {
+    booleanParam name: 'TRIGGERED_BY_UPSTREAM', defaultValue: false, description: 'Is the current build triggered in the scope of an upstream pipeline (pull request or default branch)'
+    string name: 'UPSTREAM_PROJECT_NAME', defaultValue: '7.XX/cambpm-ce/cambpm-main/master', description: 'Not used on standalone runs. This property is passed by the upstream build that triggers this one.'
+    string name: 'UPSTREAM_BUILD_NUMBER', defaultValue: '', description: 'Not used on standalone runs. This property is passed by the upstream build that triggers this one.'
+    string name: 'PR_LABELS', defaultValue: '', description: 'The labels assigned to the CE pull request'
+  }
+  stages {
+    stage('Prepare') {
+      when {
+        expression {
+          cambpmWithLabels('upstream')
+        }
+      }
+      steps {
+        cambpmConditionalRetry([
+          agentLabel: 'centos-stable',
+          suppressErrors: false,
+          runSteps: {
+            cambpmCopyArtifacts(params.UPSTREAM_PROJECT_NAME, params.UPSTREAM_BUILD_NUMBER)
+            cambpmStash("platform-stash-runtime",
+                        ".m2/org/camunda/**/*-SNAPSHOT/**",
+                        "**/qa/**,**/*qa*/**,**/*.zip,**/*.tar.gz")
+          }
+        ])
+      }
+    }
+    stage('UNIT DB tests') {
+      steps {
+        script {
+          // see the .ci/config/matrices.yaml for the stage generation values
+          // see .ci/config/stage-types.yaml for the stage configurations
+          parallel(cambpmGetMatrixStages('engine-webapp-unit', failedStageTypes, { stageInfo ->
+            List allowedStageLabels = stageInfo.allowedLabels
+            String dbLabel = stageInfo.nodeType
+            return cambpmWithLabels(allowedStageLabels.minus('cockroachdb'), cambpmGetDbType(dbLabel))
+          }))
+        }
+      }
+    }
+  }
+  post {
+    changed {
+      script {
+        if (!agentDisconnected()){
+          cambpmSendEmailNotification()
+        }
+      }
+    }
+  }
+}
