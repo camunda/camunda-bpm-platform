@@ -53,6 +53,7 @@
     {"name": "Identity"},
     {"name": "Incident"},
     {"name": "Job"},
+    {"name": "Job Definition"},
     {"name": "Message"},
     {"name": "Metrics"},
     {"name": "Modification"},
