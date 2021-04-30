@@ -355,7 +355,7 @@ public interface HistoryService {
   Job findHistoryCleanupJob();
 
   /**
-   * Finds history cleanup job if present.
+   * Finds history cleanup jobs if present.
    * @return job entity
    */
   List<Job> findHistoryCleanupJobs();

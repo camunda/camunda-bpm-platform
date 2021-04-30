@@ -387,11 +387,18 @@
         id
         tag
         desc
+        deprecated = false
         summary = "" >
+
+    <#if deprecated>
+      "deprecated": true,
+    </#if>
+
     "operationId": "${id}",
     "tags": [
       "${tag}"
     ],
+
 
     <#if summary?has_content>
       "summary": "${summary}",
