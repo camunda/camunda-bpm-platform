@@ -10,7 +10,7 @@
 
   <@lib.requestBody
       mediaType = "application/json"
-      dto = "JobDefinitionSuspensionStateDto"
+      dto = "JobDefinitionsSuspensionStateDto"
       examples = ['"example-1": {
                      "summary": "suspend by process definition id",
                      "description": "PUT `/job-definition/suspended`",
