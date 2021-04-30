@@ -31,8 +31,7 @@ engine-unit:
   - 'sqlserver_2017'
   - 'sqlserver_2019'
   stages: 
-  - 'engine-unit'
-#  - 'webapp-unit'
+  - 'db-unit'
 engine-unit-authorizations:
   databases:
   - 'postgresql_96'
@@ -61,8 +60,7 @@ engine-unit-authorizations:
   - 'sqlserver_2017'
   - 'sqlserver_2019'
   stages: 
-  - 'engine-unit-authorizations'
-#  - 'webapp-unit-authorizations'
+  - 'db-unit-authorizations'
 engine-rest:
   stages:
   - 'engine-rest-unit-jersey-2'

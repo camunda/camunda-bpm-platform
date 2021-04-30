@@ -43,12 +43,38 @@ pipeline {
         ])
       }
     }
-    stage('UNIT DB tests') {
+
+    stage('h2 UNIT') {
+      parallel {
+        stage('engine-UNIT-authorizations-h2') {
+          when {
+            expression {
+              cambpmWithLabels('h2', 'authorizations')
+            }
+          }
+          steps {
+            cambpmConditionalRetry([
+              agentLabel: 'h2',
+              runSteps: {
+                cambpmRunMavenByStageType('engine-unit-authorizations', 'h2')
+              },
+              postAlways: {
+                cambpmPublishTestResult()
+              },
+              postFailure: {
+                cambpmAddFailedStageType(failedStageTypes, 'engine-unit-authorizations')
+              }
+            ])
+          }
+        }
+      }
+    }
+    stage('DB UNIT Authorizations tests') {
       steps {
         script {
           // see the .ci/config/matrices.yaml for the stage generation values
           // see .ci/config/stage-types.yaml for the stage configurations
-          parallel(cambpmGetMatrixStages('engine-unit-authorizations', [], { stageInfo ->
+          parallel(cambpmGetMatrixStages('engine-unit-authorizations', failedStageTypes, { stageInfo ->
             List allowedStageLabels = stageInfo.allowedLabels
             String dbLabel = stageInfo.nodeType
             return cambpmWithLabels(allowedStageLabels.minus('cockroachdb'), cambpmGetDbType(dbLabel))

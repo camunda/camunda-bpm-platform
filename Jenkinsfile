@@ -113,92 +113,29 @@ pipeline {
 
       }
     }
-    stage('h2 UNIT, engine IT, webapp IT') {
+    stage('DB UNIT tests') {
+      steps {
+        script {
+          if(cambpmWithLabels('eng-web', 'h2', 'rolling-update', 'migration', 'default-build', 'authorizations', 'all-db', 'db2', 'mysql', 'oracle', 'mariadb', 'sqlserver', 'postgresql')) {
+            cambpmTriggerDownstream(
+              platformVersion + "/cambpm-ce/db-unit/${env.BRANCH_NAME}",
+              [string(name: 'UPSTREAM_PROJECT_NAME', value: env.JOB_NAME),
+              string(name: 'UPSTREAM_BUILD_NUMBER', value: env.BUILD_NUMBER)]
+            )
+          }
+
+          if(cambpmWithLabels('eng-web', 'h2', 'authorizations')) {
+            cambpmTriggerDownstream(
+              platformVersion + "/cambpm-ce/db-unit-auth/${env.BRANCH_NAME}",
+              [string(name: 'UPSTREAM_PROJECT_NAME', value: env.JOB_NAME),
+              string(name: 'UPSTREAM_BUILD_NUMBER', value: env.BUILD_NUMBER)]
+            )
+          }
+        }
+      }
+    }
+    stage('UNIT history level, engine IT, webapp IT') {
       parallel {
-        stage('engine-UNIT-h2') {
-          when {
-            expression {
-              cambpmWithLabels('h2', 'rolling-update', 'migration', 'all-db', 'default-build', 'authorizations')
-            }
-          }
-          steps {
-            cambpmConditionalRetry([
-              agentLabel: 'h2',
-              runSteps: {
-                cambpmRunMavenByStageType('engine-unit', 'h2')
-              },
-              postAlways: {
-                cambpmPublishTestResult()
-              },
-              postFailure: {
-                cambpmAddFailedStageType(failedStageTypes, 'engine-unit')
-              }
-            ])
-          }
-        }
-        stage('engine-UNIT-authorizations-h2') {
-          when {
-            expression {
-              cambpmWithLabels('h2', 'authorizations')
-            }
-          }
-          steps {
-            cambpmConditionalRetry([
-              agentLabel: 'h2',
-              runSteps: {
-                cambpmRunMavenByStageType('engine-unit-authorizations', 'h2')
-              },
-              postAlways: {
-                cambpmPublishTestResult()
-              },
-              postFailure: {
-                cambpmAddFailedStageType(failedStageTypes, 'engine-unit-authorizations')
-              }
-            ])
-          }
-        }
-        stage('webapp-UNIT-h2') {
-          when {
-            expression {
-              cambpmWithLabels('default-build')
-            }
-          }
-          steps {
-            cambpmConditionalRetry([
-              agentLabel: 'h2',
-              runSteps: {
-                cambpmRunMavenByStageType('webapp-unit', 'h2')
-              },
-              postAlways: {
-                cambpmPublishTestResult()
-              },
-              postFailure: {
-                cambpmAddFailedStageType(failedStageTypes, 'webapp-unit')
-              }
-            ])
-          }
-        }
-        stage('webapp-UNIT-authorizations-h2') {
-          when {
-            expression {
-              cambpmWithLabels('default-build')
-            }
-          }
-          steps {
-            cambpmConditionalRetry([
-              agentLabel: 'h2',
-              runSteps: {
-                cambpmRunMavenByStageType('webapp-unit-authorizations', 'h2')
-              },
-              postAlways: {
-                cambpmPublishTestResult()
-              },
-              postFailure: {
-                cambpmAddFailedStageType(failedStageTypes, 'webapp-unit-authorizations')
-              }
-            ])
-          }
-        }
         stage('engine-UNIT-historylevel-none') {
           when {
             expression {
@@ -414,32 +351,6 @@ pipeline {
                 cambpmPublishTestResult()
               }
             ])
-          }
-        }
-      }
-    }
-    stage('UNIT DB tests') {
-      when {
-        expression {
-          cambpmWithLabels('eng-web', 'all-db', 'db2', 'mysql', 'oracle', 'mariadb', 'sqlserver', 'postgresql')
-        }
-      }
-      steps {
-        script {
-          if (cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit')) {
-            cambpmTriggerDownstream(
-              platformVersion + "/cambpm-ce/engine-unit/${env.BRANCH_NAME}",
-              [string(name: 'UPSTREAM_PROJECT_NAME', value: env.JOB_NAME),
-              string(name: 'UPSTREAM_BUILD_NUMBER', value: env.BUILD_NUMBER)]
-            )
-          }
-
-          if (cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit-authorizations')) {
-            cambpmTriggerDownstream(
-              platformVersion + "/cambpm-ce/engine-unit-auth/${env.BRANCH_NAME}",
-              [string(name: 'UPSTREAM_PROJECT_NAME', value: env.JOB_NAME),
-              string(name: 'UPSTREAM_BUILD_NUMBER', value: env.BUILD_NUMBER)]
-            )
           }
         }
       }

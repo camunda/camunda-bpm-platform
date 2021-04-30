@@ -20,9 +20,9 @@
 #     h2: [INT; OPTIONAL;]
 #     db2: [INT; OPTIONAL;]
 #     sqlserver: [INT; OPTIONAL;]
-engine-unit:
+db-unit:
   directory: 'engine'
-  command: 'clean test -P'
+  command: 'clean test -pl "engine,webapps" -Dskip.frontend.build=true -P'
   stash:
     runtimeStash: true
   labels:
@@ -36,25 +36,13 @@ engine-unit:
   - 'cockroachdb'
   - 'authorizations'
   - 'eng-web'
-engine-unit-authorizations:
+db-unit-authorizations:
   directory: 'engine'
-  command: 'clean test -PcfgAuthorizationCheckRevokesAlways,'
+  command: 'clean test -pl "engine,webapps" -Dskip.frontend.build=true -PcfgAuthorizationCheckRevokesAlways,'
   stash:
     runtimeStash: true
   labels:
   - 'authorizations'
-webapp-unit:
-  directory: 'webapps'
-  command: 'clean test -Dskip.frontend.build=true -P'
-  stash:
-    runtimeStash: true
-  labels:
-  - 'default-build'
-webapp-unit-authorizations:
-  directory: 'webapps'
-  command: 'clean test -Dskip.frontend.build=true -PcfgAuthorizationCheckRevokesAlways,'
-  stash:
-    runtimeStash: true
 sql-scripts:
   directory: 'distro/sql-script'
   command: 'install -Pcheck-sql,'
