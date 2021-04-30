@@ -75,7 +75,7 @@
     "desc": "Filter by the type of the entity that was affected by this operation, possible values are
              `Task`, `Attachment` or `IdentityLink`."
   },
-  "entityTypes": {
+  "entityTypeIn": {
     "type": "array",
     "itemType": "string",
     "desc": "Filter by a ${listType}list of types of the entities that was affected by this operation,
@@ -86,7 +86,7 @@
     "desc": "Filter by the category that this operation is associated with, possible values are
              `TaskWorker`, `Admin` or `Operator`."
   },
-  "categories": {
+  "categoryIn": {
     "type": "array",
     "itemType": "string",
     "desc": "Filter by a ${listType}list of categories that this operation is associated with, possible values are
