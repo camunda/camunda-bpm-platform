@@ -1,7 +1,9 @@
 <#-- Generated From File: camunda-docs-manual/public/reference/rest/job-definition/put-activate-suspend-by-id/index.html -->
 <#macro dto_macro docsUrl="">
 
-
+<#-- This DTO is also used in JobDefinitionsSuspensionStateDto that caters updating multiple definitions at once and 
+     provides additional parameters for that which don't make sense here. Please also consider this other DTO when
+     making changes here -->
 <@lib.dto extends="SuspensionStateDto">
     
     <@lib.property

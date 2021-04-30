@@ -4,6 +4,8 @@
 <#assign noteProcessDefinitionKey = "Note that this parameter will only be considered 
                                      in combination with `processDefinitionKey`." >
 
+<#-- This DTO provides additional parameters that only make sense in the context of updating multiple
+     definitions at once. Please also consider the parent DTO when making changes here -->
 <@lib.dto extends="JobDefinitionSuspensionStateDto"
           desc = "Defines by which selection criterion to activate or suspend job definitions.
                   The selection criteria are mutually exclusive and can only be one of:
