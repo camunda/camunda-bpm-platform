@@ -8,7 +8,7 @@ The **Camunda External Task Client (Java)** allows to set up remote Service Task
 
 * [Quick Start](https://docs.camunda.org/get-started/quick-start/)
 * [Documentation](https://docs.camunda.org/manual/develop/user-guide/ext-client/)
-* [Examples](https://github.com/camunda/camunda-external-task-client-java/tree/master/examples)
+* [Examples](https://github.com/camunda/camunda-bpm-examples/tree/master/clients/java)
 
 ## Features
 * Complete External Tasks
