@@ -43,29 +43,25 @@ pipeline {
         ])
       }
     }
-    stage('h2 UNIT') {
-      parallel {
-        stage('db-UNIT-h2') {
-          when {
-            expression {
-              cambpmWithLabels('h2', 'rolling-update', 'migration', 'all-db', 'default-build', 'authorizations')
-            }
-          }
-          steps {
-            cambpmConditionalRetry([
-              agentLabel: 'h2',
-              runSteps: {
-                cambpmRunMavenByStageType('db-unit', 'h2')
-              },
-              postAlways: {
-                cambpmPublishTestResult()
-              },
-              postFailure: {
-                cambpmAddFailedStageType(failedStageTypes, 'db-unit')
-              }
-            ])
-          }
+    stage('DB-UNIT-h2') {
+      when {
+        expression {
+          cambpmWithLabels('h2', 'rolling-update', 'migration', 'all-db', 'default-build', 'authorizations')
         }
+      }
+      steps {
+        cambpmConditionalRetry([
+          agentLabel: 'h2',
+          runSteps: {
+            cambpmRunMavenByStageType('db-unit', 'h2')
+          },
+          postAlways: {
+            cambpmPublishTestResult()
+          },
+          postFailure: {
+            cambpmAddFailedStageType(failedStageTypes, 'db-unit')
+          }
+        ])
       }
     }
     stage('DB UNIT tests') {
