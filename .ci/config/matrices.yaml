@@ -3,7 +3,7 @@
 # $matrixId:
 #   stages: [LIST; REQUIRED; Doc: defines the stage types to be used in the matrix generation ]
 #   databases: [LIST; OPTIONAL; Doc: defines the databases to be used in the stage generation ]
-engine-unit:
+db-unit:
   databases:
   - 'postgresql_96'
   - 'postgresql_94'
@@ -32,7 +32,7 @@ engine-unit:
   - 'sqlserver_2019'
   stages: 
   - 'db-unit'
-engine-unit-authorizations:
+db-unit-authorizations:
   databases:
   - 'postgresql_96'
   - 'postgresql_94'

@@ -46,7 +46,7 @@ pipeline {
 
     stage('h2 UNIT') {
       parallel {
-        stage('engine-UNIT-authorizations-h2') {
+        stage('db-UNIT-authorizations-h2') {
           when {
             expression {
               cambpmWithLabels('h2', 'authorizations')

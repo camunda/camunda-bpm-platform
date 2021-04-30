@@ -45,7 +45,7 @@ pipeline {
     }
     stage('h2 UNIT') {
       parallel {
-        stage('engine-UNIT-h2') {
+        stage('db-UNIT-h2') {
           when {
             expression {
               cambpmWithLabels('h2', 'rolling-update', 'migration', 'all-db', 'default-build', 'authorizations')
