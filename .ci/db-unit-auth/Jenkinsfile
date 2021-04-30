@@ -56,13 +56,13 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel: 'h2',
               runSteps: {
-                cambpmRunMavenByStageType('engine-unit-authorizations', 'h2')
+                cambpmRunMavenByStageType('db-unit-authorizations', 'h2')
               },
               postAlways: {
                 cambpmPublishTestResult()
               },
               postFailure: {
-                cambpmAddFailedStageType(failedStageTypes, 'engine-unit-authorizations')
+                cambpmAddFailedStageType(failedStageTypes, 'db-unit-authorizations')
               }
             ])
           }
@@ -74,7 +74,7 @@ pipeline {
         script {
           // see the .ci/config/matrices.yaml for the stage generation values
           // see .ci/config/stage-types.yaml for the stage configurations
-          parallel(cambpmGetMatrixStages('engine-unit-authorizations', failedStageTypes, { stageInfo ->
+          parallel(cambpmGetMatrixStages('db-unit-authorizations', failedStageTypes, { stageInfo ->
             List allowedStageLabels = stageInfo.allowedLabels
             String dbLabel = stageInfo.nodeType
             return cambpmWithLabels(allowedStageLabels.minus('cockroachdb'), cambpmGetDbType(dbLabel))
