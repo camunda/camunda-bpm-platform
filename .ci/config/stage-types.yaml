@@ -21,7 +21,7 @@
 #     db2: [INT; OPTIONAL;]
 #     sqlserver: [INT; OPTIONAL;]
 db-unit:
-  directory: 'engine'
+  directory: '.'
   command: 'clean test -pl "engine,webapps" -Dskip.frontend.build=true -P'
   stash:
     runtimeStash: true
@@ -37,7 +37,7 @@ db-unit:
   - 'authorizations'
   - 'eng-web'
 db-unit-authorizations:
-  directory: 'engine'
+  directory: '.'
   command: 'clean test -pl "engine,webapps" -Dskip.frontend.build=true -PcfgAuthorizationCheckRevokesAlways,'
   stash:
     runtimeStash: true
