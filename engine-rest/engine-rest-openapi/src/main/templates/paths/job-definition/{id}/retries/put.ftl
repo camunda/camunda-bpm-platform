@@ -16,7 +16,7 @@
           location = "path"
           type = "string"
           required = true
-          desc = "The id of the job definition to be retrieved."
+          desc = "The id of the job definition to be updated."
           last = true
       />
 
