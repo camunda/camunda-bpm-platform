@@ -421,7 +421,7 @@ pipeline {
     stage('UNIT DB tests') {
       when {
         expression {
-          cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit') && cambpmWithLabels('eng-web', 'all-db', 'db2', 'mysql', 'oracle', 'mariadb', 'sqlserver', 'postgresql')
+          cambpmWithLabels('eng-web', 'all-db', 'db2', 'mysql', 'oracle', 'mariadb', 'sqlserver', 'postgresql')
         }
       }
       steps {
