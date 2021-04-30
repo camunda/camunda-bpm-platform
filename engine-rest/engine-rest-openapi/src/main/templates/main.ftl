@@ -49,6 +49,7 @@
     {"name": "Group"},
     {"name": "Historic Activity Instance"},
     {"name": "Historic Decision Definition"},
+    {"name": "Historic Decision Instance"},
     {"name": "Historic Decision Requirements Definition"},
     {"name": "Historic Incident"},
     {"name": "Historic Job Log"},
