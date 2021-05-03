@@ -30,7 +30,8 @@
         name = "evaluationTime"
         type = "string"
         format = "date-time"
-        desc = "The time the instance was evaluated. Default format* `yyyy-MM-dd'T'HH:mm:ss.SSSZ`."
+        desc = "The time the instance was evaluated. 
+                [Default format](${docsUrl}/reference/rest/overview/date-format/) `yyyy-MM-dd'T'HH:mm:ss.SSSZ`."
     />
     
     <@lib.property
@@ -38,7 +39,7 @@
         type = "string"
         format = "date-time"
         desc = "The time after which the instance should be removed by the History Cleanup job.
-                Default format* `yyyy-MM-dd'T'HH:mm:ss.SSSZ`."
+                [Default format](${docsUrl}/reference/rest/overview/date-format/) `yyyy-MM-dd'T'HH:mm:ss.SSSZ`."
     />
     
     <@lib.property

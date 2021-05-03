@@ -19,6 +19,9 @@
   '"incidentState"'
 ]>
 
+<#assign dateDefault = "By [default](${docsUrl}/reference/rest/overview/date-format/), the date must have the format
+                        `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.000+0200`.">
+
 <#assign params = {
   "incidentId": {
     "type": "string",
@@ -66,34 +69,22 @@
   "createTimeBefore": {
     "type": "string",
     "format": "date-time",
-    "desc": "Restricts to incidents that have a createTime date before the given date.
-                  By default*, the date must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`,
-             e.g.,
-             `2013-01-23T14:42:45.000+0200`."
+    "desc": "Restricts to incidents that have a createTime date before the given date. ${dateDefault}"
   },
   "createTimeAfter": {
     "type": "string",
     "format": "date-time",
-    "desc": "Restricts to incidents that have a createTime date after the given date.
-                  By default*, the date must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`,
-             e.g.,
-             `2013-01-23T14:42:45.000+0200`."
+    "desc": "Restricts to incidents that have a createTime date after the given date. ${dateDefault}"
   },
   "endTimeBefore": {
     "type": "string",
     "format": "date-time",
-    "desc": "Restricts to incidents that have an endTimeBefore date before the given date.
-                  By default*, the date must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`,
-             e.g.,
-             `2013-01-23T14:42:45.000+0200`."
+    "desc": "Restricts to incidents that have an endTimeBefore date before the given date. ${dateDefault}"
   },
   "endTimeAfter": {
     "type": "string",
     "format": "date-time",
-    "desc": "Restricts to incidents that have an endTimeAfter date after the given date.
-                  By default*, the date must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`,
-             e.g.,
-             `2013-01-23T14:42:45.000+0200`."
+    "desc": "Restricts to incidents that have an endTimeAfter date after the given date. ${dateDefault}"
   },
   "activityId": {
     "type": "string",

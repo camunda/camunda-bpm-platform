@@ -61,7 +61,8 @@
         name = "createTime"
         type = "string"
         format = "date-time"
-        desc = "The time the variable was inserted. Default format* `yyyy-MM-dd'T'HH:mm:ss.SSSZ`."
+        desc = "The time the variable was inserted. 
+                [Default format](${docsUrl}/reference/rest/overview/date-format/) `yyyy-MM-dd'T'HH:mm:ss.SSSZ`."
     />
     
     <@lib.property
@@ -69,7 +70,7 @@
         type = "string"
         format = "date-time"
         desc = "The time after which the entry should be removed by the History Cleanup job.
-                Default format* `yyyy-MM-dd'T'HH:mm:ss.SSSZ`."
+                [Default format](${docsUrl}/reference/rest/overview/date-format/) `yyyy-MM-dd'T'HH:mm:ss.SSSZ`."
     />
     
     <@lib.property
