@@ -46,7 +46,7 @@ pipeline {
     stage('DB-UNIT-h2') {
       when {
         expression {
-          cambpmWithLabels('h2', 'rolling-update', 'migration', 'all-db', 'default-build', 'authorizations')
+          env.BRANCH_NAME == cambpmDefaultBranch() || cambpmWithLabels('h2', 'rolling-update', 'migration', 'all-db', 'default-build', 'authorizations')
         }
       }
       steps {
@@ -72,7 +72,7 @@ pipeline {
           parallel(cambpmGetMatrixStages('db-unit', failedStageTypes, { stageInfo ->
             List allowedStageLabels = stageInfo.allowedLabels
             String dbLabel = stageInfo.nodeType
-            return cambpmWithLabels(allowedStageLabels.minus('cockroachdb'), cambpmGetDbType(dbLabel))
+            return env.BRANCH_NAME == cambpmDefaultBranch() || cambpmWithLabels(allowedStageLabels.minus('cockroachdb'), cambpmGetDbType(dbLabel))
           }))
         }
       }
