@@ -20,6 +20,15 @@
         dto = "MigrationInstructionDto"
         desc = "A list of migration instructions which map equal activities. Each
                 migration instruction is a JSON object with the following properties:"
+    />
+
+    <@lib.property
+        name = "variables"
+        type = "object"
+        additionalProperties = true
+        dto = "VariableValueDto"
+        desc = "A map of variables which will be set into the process instances' scope.
+                Each key is a variable name and each value a JSON variable value object."
         last = true
     />
 

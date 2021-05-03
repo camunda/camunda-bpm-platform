@@ -21,9 +21,17 @@
         type = "boolean"
         desc = "A boolean flag indicating whether instructions between events should be configured
                 to update the event triggers."
-        last = true
     />
 
+    <@lib.property
+        name = "variables"
+        type = "object"
+        additionalProperties = true
+        dto = "VariableValueDto"
+        desc = "A map of variables which will be set into the process instances' scope.
+                Each key is a variable name and each value a JSON variable value object."
+        last = true
+    />
 
 </@lib.dto>
 </#macro>

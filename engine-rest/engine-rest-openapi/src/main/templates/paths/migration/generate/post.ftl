@@ -19,7 +19,17 @@
                      "value": {
                        "sourceProcessDefinitionId": "aProcessDefinitionId1",
                        "targetProcessDefinitionId": "aProcessDefinitionId2",
-                       "updateEventTriggers": true
+                       "updateEventTriggers": true,
+                       "variables": {
+                         "foo": {
+                           "type": "Object",
+                           "value": "[5,6]",
+                           "valueInfo": {
+                             "objectTypeName": "java.util.ArrayList",
+                             "serializationDataFormat": "application/json"
+                           }
+                         }
+                       }
                      }
                    }']
   />
@@ -55,9 +65,26 @@
                              ],
                              "updateEventTrigger": true
                            }
-                         ]
+                         ],
+                         "variables": {
+                           "foo": {
+                             "type": "Object",
+                             "value": "[5,6]",
+                             "valueInfo": {
+                               "objectTypeName": "java.util.ArrayList",
+                               "serializationDataFormat": "application/json"
+                             }
+                           }
+                         }
                        }
                      }']
+    />
+
+    <@lib.response
+        code = "400"
+        dto = "ExceptionDto"
+        desc = "Invalid variable value, for example if the value could not be parsed to an Integer value or the passed variable type is not supported.
+                See the  [Introduction](${docsUrl}/reference/rest/overview/#error-handling) for the error response format."
     />
 
     <@lib.response
