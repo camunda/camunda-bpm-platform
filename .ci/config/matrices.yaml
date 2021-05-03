@@ -110,10 +110,8 @@ sidetrack-stages:
   databases:
   - 'cockroachdb_201'
   stages:
-  - 'engine-unit'
-  - 'engine-unit-authorizations'
-  - 'webapp-unit'
-  - 'webapp-unit-authorizations'
+  - 'db-unit'
+  - 'db-unit-authorizations'
   - 'sql-scripts'
   - 'upgrade-database'
   - 'instance-migration'
