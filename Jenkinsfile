@@ -514,7 +514,7 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel: 'h2',
               runSteps: {
-                cambpmRunMaven('webapps/', 'clean test -Pdb-table-prefix', true, runtimeStash: true)
+                cambpmRunMaven('webapps/', 'clean test -Pdb-table-prefix -Dskip.frontend.build=true', runtimeStash: true)
               },
               postAlways: {
                 cambpmPublishTestResult()
