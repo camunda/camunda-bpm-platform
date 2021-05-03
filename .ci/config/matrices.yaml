@@ -101,11 +101,8 @@ daily-stages:
   - 'sqlserver_2019'
   stages: 
   - 'sql-scripts'
-  - 'upgrade-database'
   - 'instance-migration'
-  - 'old-engine'
   - 'rolling-update'
-  - 'large-data-tests'
 sidetrack-stages:
   databases:
   - 'cockroachdb_201'

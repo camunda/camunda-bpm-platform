@@ -1,6 +1,6 @@
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
-@Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library@CAM-13442-fix']) _
 
 def failedStageTypes = []
 
@@ -64,7 +64,7 @@ pipeline {
         stage('sql-scripts-h2') {
           when {
             expression {
-              cambpmWithLabels('h2', 'all-db')
+              cambpmWithLabels('h2', 'all-db', 'eng-web')
             }
           }
           steps {
@@ -119,7 +119,7 @@ pipeline {
         stage('UPGRADE-instance-migration-h2') {
           when {
             expression {
-              cambpmWithLabels('default-build', 'migration')
+              cambpmWithLabels('default-build', 'migration', 'eng-web')
             }
           }
           steps {
@@ -161,7 +161,7 @@ pipeline {
         stage('UPGRADE-rolling-update-h2') {
           when {
             expression {
-              cambpmWithLabels('rolling-update', 'default-build')
+              cambpmWithLabels('rolling-update', 'default-build', 'eng-web')
             }
           }
           steps {

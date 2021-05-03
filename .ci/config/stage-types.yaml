@@ -57,6 +57,7 @@ sql-scripts:
   - 'sqlserver'
   - 'postgresql'
   - 'cockroachdb'
+  - 'eng-web'
 upgrade-database:
   directory: 'qa/test-db-upgrade'
   command: 'verify -Pupgrade-db,'
@@ -77,6 +78,8 @@ instance-migration:
   stash:
     runtimeStash: true
     qaStash: true
+  labels:
+  - 'eng-web'
 old-engine:
   directory: 'qa'
   command: 'verify -Pold-engine,'
@@ -97,6 +100,8 @@ rolling-update:
   stash:
     runtimeStash: true
     qaStash: true
+  labels:
+  - 'eng-web'
 large-data-tests:
   directory: 'qa/large-data-tests'
   command: 'verify -Plarge-data-tests,'
