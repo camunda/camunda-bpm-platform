@@ -40,6 +40,7 @@
     {"name": "Batch"},
     {"name": "Condition"},
     {"name": "Decision Definition"},
+    {"name": "Decision Requirements Definition"},
     {"name": "Deployment"},
     {"name": "Engine"},
     {"name": "Event Subscription"},

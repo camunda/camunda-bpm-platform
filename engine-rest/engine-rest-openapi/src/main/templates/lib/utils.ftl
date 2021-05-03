@@ -258,6 +258,7 @@
         array=false
         additionalProperties=false
         mediaType="application/json"
+        binary = false
         examples=[]
         last=false >
     "${code}": {
@@ -269,6 +270,7 @@
                 array = array
                 additionalProperties = additionalProperties
                 mediaType = mediaType
+                binary = binary
                 examples = examples />
           },
         </#if>
@@ -294,6 +296,7 @@
                   array = type["array"]
                   additionalProperties = type["additionalProperties"]
                   mediaType = type["mediaType"]
+                  binary = type["binary"]
                   examples = type["examples"] /><#sep>,
             </#list>
           },
@@ -311,8 +314,9 @@
         array=false
         additionalProperties=false
         mediaType="application/json"
+        binary = false
         examples=[] >
-           <#if mediaType == "application/xhtml+xml" | (mediaType == "application/json" & !array & flatType == "string")>
+           <#if mediaType == "application/xhtml+xml" | (mediaType == "application/json" & !array & flatType == "string") | binary>
              "${mediaType}": {
                "schema": {
                  "type": "string",
