@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.operation.CoreAtomicOperation;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
+import org.camunda.bpm.engine.impl.core.variable.VariableUtil;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 
 /**
@@ -73,12 +74,8 @@ public class CoreLogger extends ProcessEngineLogger {
       ));
   }
 
-  public ProcessEngineException javaSerializationProhibitedException(String variableName) {
-    return new ProcessEngineException(exceptionMessage(
-        "007",
-        "Cannot set variable with name {}. Java serialization format is prohibited",
-        variableName
-      ));
+  public ProcessEngineException javaSerializationProhibitedException(String message) {
+    return new ProcessEngineException(exceptionMessage("007", message));
   }
 
 }

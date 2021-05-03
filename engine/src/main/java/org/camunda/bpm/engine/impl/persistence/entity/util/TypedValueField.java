@@ -79,20 +79,10 @@ public class TypedValueField implements DbEntityLifecycleAware, CommandContextLi
   }
 
   public TypedValue getTypedValue(boolean asTransientValue) {
-    return getTypedValue(true, asTransientValue, false);
-  }
-
-  public TypedValue getTypedValueWithImplicitUpdatesSkipped(boolean asTransientValue) {
-    return getTypedValue(true, asTransientValue, true);
+    return getTypedValue(true, asTransientValue);
   }
 
   public TypedValue getTypedValue(boolean deserializeValue, boolean asTransientValue) {
-    return getTypedValue(deserializeValue, asTransientValue, false);
-  }
-
-  public TypedValue getTypedValue(boolean deserializeValue,
-                                  boolean asTransientValue,
-                                  boolean skipImplicitUpdates) {
     if (Context.getCommandContext() != null) {
       // in some circumstances we must invalidate the cached value instead of returning it
 
@@ -114,7 +104,7 @@ public class TypedValueField implements DbEntityLifecycleAware, CommandContextLi
       try {
         cachedValue = getSerializer().readValue(valueFields, deserializeValue, asTransientValue);
 
-        if (!skipImplicitUpdates && notifyOnImplicitUpdates && isMutableValue(cachedValue)) {
+        if (notifyOnImplicitUpdates && isMutableValue(cachedValue)) {
           Context.getCommandContext().registerCommandContextListener(this);
         }
 

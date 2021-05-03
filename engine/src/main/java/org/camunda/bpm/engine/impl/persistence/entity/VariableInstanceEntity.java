@@ -274,12 +274,8 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
     return typedValueField.getTypedValue(isTransient);
   }
 
-  public TypedValue getTypedValueWithImplicitUpdatesSkipped() {
-    return typedValueField.getTypedValueWithImplicitUpdatesSkipped(isTransient);
-  }
-
   public TypedValue getTypedValue(boolean deserializeValue) {
-    return typedValueField.getTypedValue(deserializeValue, isTransient, false);
+    return typedValueField.getTypedValue(deserializeValue, isTransient);
   }
 
   public void setValue(TypedValue value) {
