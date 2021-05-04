@@ -14,7 +14,6 @@
   "parameters" : [
 
     <#assign last = true >
-    <#assign requestMethod="GET"/>
     <#include "/lib/commons/historic-batch-params.ftl" >
     <@lib.parameters
         object = params

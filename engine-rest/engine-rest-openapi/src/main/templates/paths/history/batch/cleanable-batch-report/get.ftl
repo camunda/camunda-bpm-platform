@@ -23,7 +23,9 @@
   />
 
   "parameters" : [
-
+    <#assign sortByValues = [
+        '"finished"'
+    ]>
     <#assign last = false >
     <#include "/lib/commons/sort-params.ftl">
     <#assign last = true >

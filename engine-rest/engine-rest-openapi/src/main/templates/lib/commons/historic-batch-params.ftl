@@ -35,7 +35,6 @@
   },
   "withoutTenantId": {
     "type": "boolean",
-    "desc": "Only include batches which belong to no tenant. Value can effectively only be `true`, as
-             `false` is the default behavior."
+    "desc": "Only include batches which belong to no tenant. Value can effectively only be `true`, as `false` is the default behavior."
   }
 }>
