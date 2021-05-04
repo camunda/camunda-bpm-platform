@@ -55,6 +55,7 @@
     {"name": "Historic Job Log"},
     {"name": "Historic Process Instance"},
     {"name": "Historic Task Instance"},
+    {"name": "History Cleanup"},
     {"name": "Identity"},
     {"name": "Incident"},
     {"name": "Job"},
