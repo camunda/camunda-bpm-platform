@@ -2,7 +2,7 @@
 
 <#assign sortByValues = [
   '"timestamp"',
-  '"taskId"',
+  '"externalTaskId"',
   '"topicName"',
   '"workerId"',
   '"retries"',
