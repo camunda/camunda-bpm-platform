@@ -81,24 +81,6 @@ pipeline {
                 )
               }
 
-              // the sidetrack pipeline should be triggered on daily,
-              // or PR builds only, master builds should be excluded
-              if (env.BRANCH_NAME != cambpmDefaultBranch() && cambpmWithLabels('all-db', 'cockroachdb', 'authorizations')) {
-                cambpmTriggerDownstream(
-                  platformVersion + "/cambpm-ce/cambpm-sidetrack/${env.BRANCH_NAME}",
-                  [string(name: 'UPSTREAM_PROJECT_NAME', value: env.JOB_NAME),
-                  string(name: 'UPSTREAM_BUILD_NUMBER', value: env.BUILD_NUMBER)]
-                )
-              }
-
-              if (cambpmWithLabels('daily', 'default-build', 'rolling-update', 'migration', 'all-db', 'h2', 'db2', 'mysql', 'oracle', 'mariadb', 'sqlserver', 'postgresql')) {
-                cambpmTriggerDownstream(
-                  platformVersion + "/cambpm-ce/cambpm-daily/${env.BRANCH_NAME}",
-                  [string(name: 'UPSTREAM_PROJECT_NAME', value: env.JOB_NAME),
-                  string(name: 'UPSTREAM_BUILD_NUMBER', value: env.BUILD_NUMBER)]
-                )
-              }
-
               // TODO: https://jira.camunda.com/browse/CAM-13409
               // only execute on `master`
               // if (cambpmWithLabels()) {
