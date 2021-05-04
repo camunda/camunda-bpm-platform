@@ -1,6 +1,6 @@
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
-@Library(['camunda-ci', 'cambpm-jenkins-shared-library@CAM-13442-fix']) _
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library@reduce-test-output']) _
 
 def failedStageTypes = []
 
