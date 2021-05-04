@@ -9,7 +9,7 @@
       desc = "**Deprecated!** Use `GET /history/cleanup/jobs` instead.
 
               Finds history cleanup job (See
-              [History cleanup](${docsUrl}/user-guide/process-engine/history/#job-progress))."
+              [History cleanup](${docsUrl}/user-guide/process-engine/history/#history-cleanup))."
   />
 
   "responses": {

@@ -6,7 +6,7 @@
       tag = "History Cleanup"
       summary = "Find clean up history jobs (GET)"
       desc = "Finds history cleanup jobs (See
-              [History cleanup](${docsUrl}/user-guide/process-engine/history/#job-progress))."
+              [History cleanup](${docsUrl}/user-guide/process-engine/history/#history-cleanup))."
   />
 
   "responses": {
