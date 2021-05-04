@@ -31,7 +31,7 @@
     <@lib.response
         code = "404"
         dto = "ExceptionDto"
-        desc = "Deployment with id 'aDeploymentId' does not exist. See the
+        desc = "Historic batch with given id does not exist. See the
                 [Introduction](${docsUrl}/reference/rest/overview/#error-handling)
                 for the error response format."
         last = true

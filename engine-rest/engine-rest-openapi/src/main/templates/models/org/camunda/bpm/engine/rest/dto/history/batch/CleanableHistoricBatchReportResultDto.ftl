@@ -16,14 +16,14 @@
     />
     
     <@lib.property
-        name = "finishedBatchCount"
+        name = "finishedBatchesCount"
         type = "integer"
         format = "int64"
         desc = "The count of the finished batch operations."
     />
     
     <@lib.property
-        name = "cleanableBatchCount"
+        name = "cleanableBatchesCount"
         type = "integer"
         format = "int64"
         desc = "The count of the cleanable historic batch operations, referring to history time to
