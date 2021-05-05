@@ -47,6 +47,14 @@
     "type": "string",
     "desc": "Only include operations on this task."
   },
+  "externalTaskId": {
+    "type": "string",
+    "desc": "Only include operations on this external task."
+  },
+  "batchId": {
+    "type": "string",
+    "desc": "Only include operations on this batch."
+  },
   "jobId": {
     "type": "string",
     "desc": "Filter by job id."
