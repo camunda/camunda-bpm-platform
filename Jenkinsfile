@@ -122,93 +122,66 @@ pipeline {
     stage('UNIT history level, engine IT, webapp IT') {
       parallel {
         stage('engine-UNIT-historylevel-none') {
-          when {
-            expression {
-              cambpmWithLabels('default-build')
-            }
-          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'h2',
               runSteps: {
                 cambpmRunMaven('engine/', 'verify -Pcfghistorynone', runtimeStash: true)
               },
-              postAlways: {
+              postFailure: {
                 cambpmPublishTestResult()
               }
             ])
           }
         }
         stage('engine-UNIT-historylevel-audit') {
-          when {
-            expression {
-              cambpmWithLabels('default-build')
-            }
-          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'h2',
               runSteps: {
                 cambpmRunMaven('engine/', 'verify -Pcfghistoryaudit', runtimeStash: true)
               },
-              postAlways: {
+              postFailure: {
                 cambpmPublishTestResult()
               },
             ])
           }
         }
         stage('engine-UNIT-historylevel-activity') {
-          when {
-            expression {
-              cambpmWithLabels('default-build')
-            }
-          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'h2',
               runSteps: {
                 cambpmRunMaven('engine/', 'verify -Pcfghistoryactivity', runtimeStash: true)
               },
-              postAlways: {
+              postFailure: {
                 cambpmPublishTestResult()
               }
             ])
           }
         }
         stage('engine-IT-tomcat-9-postgresql-96') {
-          when {
-            expression {
-              cambpmWithLabels('all-as', 'tomcat')
-            }
-          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'postgresql_96',
               runSteps: {
                 cambpmRunMaven('qa/', 'clean install -Ptomcat,postgresql,engine-integration', runtimeStash: true, archiveStash: true)
               },
-              postAlways: {
+              postFailure: {
                 cambpmPublishTestResult()
               }
             ])
           }
         }
         stage('engine-IT-wildfly-postgresql-96') {
-          when {
-            expression {
-              cambpmWithLabels('all-as', 'wildfly')
-            }
-          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'postgresql_96',
               runSteps: {
                 cambpmRunMaven('qa/', 'clean install -Pwildfly,postgresql,engine-integration', runtimeStash: true, archiveStash: true)
               },
-              postAlways: {
-                cambpmPublishTestResult()
-              },
               postFailure: {
+                cambpmPublishTestResult()
                 cambpmAddFailedStageType(failedStageTypes, 'engine-IT-wildfly')
                 cambpmArchiveArtifacts('qa/wildfly-runtime/target/**/standalone/log/server.log')
               }
@@ -216,123 +189,92 @@ pipeline {
           }
         }
         stage('engine-IT-XA-wildfly-postgresql-96') {
-          when {
-            branch cambpmDefaultBranch();
-          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'postgresql_96',
               runSteps: {
                 cambpmRunMaven('qa/', 'clean install -Pwildfly,postgresql,postgresql-xa,engine-integration', runtimeStash: true, archiveStash: true)
               },
-              postAlways: {
-                cambpmPublishTestResult()
-              },
               postFailure: {
+                cambpmPublishTestResult()
                 cambpmArchiveArtifacts('qa/wildfly-runtime/target/**/standalone/log/server.log')
               }
             ])
           }
         }
         stage('webapp-IT-tomcat-9-h2') {
-          when {
-            expression {
-              cambpmWithLabels('webapp-integration', 'h2')
-            }
-          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'chrome_78',
               runSteps: {
                 cambpmRunMaven('qa/', 'clean install -Ptomcat,h2,webapps-integration', runtimeStash: true, archiveStash: true)
               },
-              postAlways: {
+              postFailure: {
                 cambpmPublishTestResult()
               }
             ])
           }
         }
         stage('webapp-IT-wildfly-h2') {
-          when {
-            expression {
-              cambpmWithLabels('webapp-integration', 'h2')
-            }
-          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'chrome_78',
               runSteps: {
                 cambpmRunMaven('qa/', 'clean install -Pwildfly,h2,webapps-integration', runtimeStash: true, archiveStash: true)
               },
-              postAlways: {
+              postFailure: {
                 cambpmPublishTestResult()
               }
             ])
           }
         }
         stage('webapp-IT-standalone-tomcat-9') {
-          when {
-            branch cambpmDefaultBranch();
-          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'chrome_78',
               runSteps: {
                 cambpmRunMaven('qa/', 'clean install -Ptomcat-vanilla,webapps-integration-sa', runtimeStash: true, archiveStash: true)
               },
-              postAlways: {
+              postFailure: {
                 cambpmPublishTestResult()
               }
             ])
           }
         }
         stage('webapp-IT-standalone-wildfly') {
-          when {
-            branch cambpmDefaultBranch();
-          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'chrome_78',
               runSteps: {
                 cambpmRunMaven('qa/', 'clean install -Pwildfly-vanilla,webapps-integration-sa', runtimeStash: true, archiveStash: true)
               },
-              postAlways: {
+              postFailure: {
                 cambpmPublishTestResult()
               }
             ])
           }
         }
         stage('camunda-run-IT') {
-          when {
-            expression {
-              cambpmWithLabels('run')
-            }
-          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'chrome_78',
               runSteps: {
                 cambpmRunMaven('distro/run/', 'clean install -Pintegration-test-camunda-run', runtimeStash: true, archiveStash: true, qaStash: true)
               },
-              postAlways: {
+              postFailure: {
                 cambpmPublishTestResult()
               }
             ])
           }
         }
         stage('spring-boot-starter-IT') {
-          when {
-            expression {
-              cambpmWithLabels('spring-boot')
-            }
-          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'chrome_78',
               runSteps: {
                 cambpmRunMaven('spring-boot-starter/', 'clean install -Pintegration-test-spring-boot-starter', runtimeStash: true, archiveStash: true, qaStash: true)
               },
-              postAlways: {
+              postFailure: {
                 cambpmPublishTestResult()
               }
             ])
@@ -354,14 +296,6 @@ pipeline {
     stage('MISC tests') {
       parallel {
         stage('engine-api-compatibility') {
-          when {
-            allOf {
-              expression {
-                cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit')
-              }
-              branch cambpmDefaultBranch();
-            }
-          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'h2',
@@ -372,117 +306,78 @@ pipeline {
           }
         }
         stage('engine-UNIT-plugins') {
-          when {
-            allOf {
-              expression {
-                cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit')
-              }
-              branch cambpmDefaultBranch();
-            }
-          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'h2',
               runSteps: {
                 cambpmRunMaven('engine/', 'clean test -Pcheck-plugins', runtimeStash: true)
               },
-              postAlways: {
+              postFailure: {
                 cambpmPublishTestResult()
               }
             ])
           }
         }
         stage('engine-UNIT-database-table-prefix') {
-          when {
-            expression {
-              cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit') && cambpmWithLabels('all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql','cockroachdb')
-            }
-          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'h2',
               runSteps: {
                 cambpmRunMaven('engine/', 'clean test -Pdb-table-prefix', runtimeStash: true)
               },
-              postAlways: {
+              postFailure: {
                 cambpmPublishTestResult()
               }
             ])
           }
         }
         stage('webapp-UNIT-database-table-prefix') {
-          when {
-            allOf {
-              expression {
-                cambpmIsNotFailedStageType(failedStageTypes, 'webapp-unit')
-              }
-              branch cambpmDefaultBranch();
-            }
-          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'h2',
               runSteps: {
                 cambpmRunMaven('webapps/', 'clean test -Pdb-table-prefix -Dskip.frontend.build=true', runtimeStash: true)
               },
-              postAlways: {
+              postFailure: {
                 cambpmPublishTestResult()
               }
             ])
           }
         }
         stage('engine-UNIT-wls-compatibility') {
-          when {
-            allOf {
-              expression {
-                cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit')
-              }
-              branch cambpmDefaultBranch();
-            }
-          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'h2',
               runSteps: {
                 cambpmRunMaven('.', 'clean verify -Pcheck-engine,wls-compatibility,jersey', runtimeStash: true)
               },
-              postAlways: {
+              postFailure: {
                 cambpmPublishTestResult()
               }
             ])
           }
         }
         stage('engine-IT-wildfly-domain') {
-          when {
-            expression {
-              cambpmIsNotFailedStageType(failedStageTypes, 'engine-IT-wildfly') && cambpmWithLabels('wildfly')
-            }
-          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'h2',
               runSteps: {
                 cambpmRunMaven('qa/', 'clean install -Pwildfly-domain,h2,engine-integration', runtimeStash: true, archiveStash: true)
               },
-              postAlways: {
+              postFailure: {
                 cambpmPublishTestResult()
               }
             ])
           }
         }
         stage('engine-IT-wildfly-servlet') {
-          when {
-            expression {
-              cambpmIsNotFailedStageType(failedStageTypes, 'engine-IT-wildfly') && cambpmWithLabels('wildfly')
-            }
-          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'h2',
               runSteps: {
                 cambpmRunMaven('qa/', 'clean install -Pwildfly,wildfly-servlet,h2,engine-integration', runtimeStash: true, archiveStash: true)
               },
-              postAlways: {
+              postFailure: {
                 cambpmPublishTestResult()
               }
             ])
