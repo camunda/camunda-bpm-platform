@@ -19,9 +19,9 @@
         object = params
         last = last
     />
-    <#assign last = true >
     <#include "/lib/commons/sort-params.ftl">
-
+    <#assign last = true >
+    <#include "/lib/commons/pagination-params.ftl">
   ],
 
   "responses": {
