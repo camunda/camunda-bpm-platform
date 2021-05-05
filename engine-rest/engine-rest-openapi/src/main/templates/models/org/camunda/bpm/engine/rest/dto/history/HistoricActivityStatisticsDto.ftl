@@ -44,7 +44,7 @@
         name = "openIncidents"
         type = "integer"
         format = "int64"
-        desc = "The total number of open incident for the activity. **Note:** Will be `0` (not
+        desc = "The total number of open incidents for the activity. **Note:** Will be `0` (not
                 `null`), if `incidents` is set to `false`."
     />
     
@@ -52,7 +52,7 @@
         name = "resolvedIncidents"
         type = "integer"
         format = "int64"
-        desc = "The total number of resolved incident for the activity. **Note:** Will be `0` (not
+        desc = "The total number of resolved incidents for the activity. **Note:** Will be `0` (not
                 `null`), if `incidents` is set to `false`."
     />
     
@@ -60,7 +60,7 @@
         name = "deletedIncidents"
         type = "integer"
         format = "int64"
-        desc = "The total number of deleted incident for the activity. **Note:** Will be `0` (not
+        desc = "The total number of deleted incidents for the activity. **Note:** Will be `0` (not
                 `null`), if `incidents` is set to `false`."
         last = true
     />
