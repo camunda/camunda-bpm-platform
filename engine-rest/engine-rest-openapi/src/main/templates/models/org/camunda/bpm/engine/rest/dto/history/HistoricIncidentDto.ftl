@@ -43,15 +43,16 @@
         name = "createTime"
         type = "string"
         format = "date-time"
-        desc = "The time this incident happened. Default format* `yyyy-MM-dd'T'HH:mm:ss.SSSZ`."
+        desc = "The time this incident happened. 
+                [Default format](${docsUrl}/reference/rest/overview/date-format/) `yyyy-MM-dd'T'HH:mm:ss.SSSZ`."
     />
 
     <@lib.property
         name = "endTime"
         type = "string"
         format = "date-time"
-        desc = "The time this incident has been deleted or resolved. Default format* `yyyy-MM-
-                dd'T'HH:mm:ss.SSSZ`."
+        desc = "The time this incident has been deleted or resolved. 
+                [Default format](${docsUrl}/reference/rest/overview/date-format/) `yyyy-MM-dd'T'HH:mm:ss.SSSZ`."
     />
 
     <@lib.property
@@ -59,7 +60,7 @@
         type = "string"
         format = "date-time"
         desc = "The time after which the incident should be removed by the History Cleanup job.
-                Default format* `yyyy-MM-dd'T'HH:mm:ss.SSSZ`."
+                [Default format](${docsUrl}/reference/rest/overview/date-format/) `yyyy-MM-dd'T'HH:mm:ss.SSSZ`."
     />
 
     <@lib.property
