@@ -1,6 +1,6 @@
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
-@Library(['camunda-ci', 'cambpm-jenkins-shared-library@reduce-test-output']) _
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library@record-only-failing-tests']) _
 
 def failedStageTypes = []
 
@@ -90,6 +90,9 @@ pipeline {
               //       withNpm: true)
               // }
             }
+          },
+          postFailure: {
+            cambpmPublishTestResult()
           }
         ])
 
