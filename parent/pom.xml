@@ -39,6 +39,7 @@
     <version.assertj>2.9.1</version.assertj>
     <version.mockito>1.9.5</version.mockito>
     <version.wiremock>1.58</version.wiremock>
+    <version.testcontainers>1.15.2</version.testcontainers>
 
     <version.commonj>1.1.0</version.commonj>
     <version.bouncycastle>1.47</version.bouncycastle>

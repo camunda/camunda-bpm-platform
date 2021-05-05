@@ -104,5 +104,13 @@
         <database.password>Camunda-BPM123</database.password>
       </properties>
     </profile>
+    <profile>
+      <!-- This profile must always be put last to ensure that
+      the correct DB url is set when Testcontainers is used -->
+      <id>testcontainers</id>
+      <properties>
+        <database.url>jdbc:tc:${database.tc.url}://localhost:${database.port}${database.tc.params}</database.url>
+      </properties>
+    </profile>
   </profiles>
 </settings>

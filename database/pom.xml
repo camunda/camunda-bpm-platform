@@ -135,7 +135,6 @@
         <database.type>db2</database.type>
         <database.driver>com.ibm.db2.jcc.DB2Driver</database.driver>
         <database.datasource.class>com.ibm.db2.jcc.DB2SimpleDataSource</database.datasource.class>
-        <database.url>jdbc:db2://${database.host}:${database.port}/${database.name}</database.url>
       </properties>
 
       <dependencies>
@@ -263,7 +262,6 @@
         <database.type>mariadb</database.type>
         <database.driver>org.mariadb.jdbc.Driver</database.driver>
         <database.datasource.class>org.mariadb.jdbc.MySQLDataSource</database.datasource.class>
-        <database.url>jdbc:mariadb://${database.host}:${database.port}/${database.name}</database.url>
         <database.tc.url>cammariadb:10.3</database.tc.url>
         <database.tc.params>/${database.name}?user=${database.username}&amp;amp;password=${database.password}</database.tc.params>
       </properties>
@@ -312,7 +310,6 @@
         <database.type>mysql</database.type>
         <database.driver>com.mysql.cj.jdbc.Driver</database.driver>
         <database.datasource.class>com.mysql.cj.jdbc.MysqlDataSource</database.datasource.class>
-        <database.url>jdbc:mysql://${database.host}:${database.port}/${database.name}?sendFractionalSeconds=false</database.url>
         <database.tc.url>cammysql:8.0</database.tc.url>
         <database.tc.params>/${database.name}?sendFractionalSeconds=false&amp;amp;user=${database.username}&amp;amp;password=${database.password}</database.tc.params>
       </properties>
@@ -355,7 +352,6 @@
         <database.type>oracle</database.type>
         <database.driver>oracle.jdbc.OracleDriver</database.driver>
         <database.datasource.class>oracle.jdbc.pool.OracleDataSource</database.datasource.class>
-        <database.url>jdbc:oracle:thin:@${database.host}:${database.port}:${database.name}</database.url>
       </properties>
     </profile>
     <profile>
@@ -459,7 +455,6 @@
         <database.datasource.class>org.postgresql.ds.PGSimpleDataSource</database.datasource.class>
         <jboss.datasource.filename>postgresql-ds.xml</jboss.datasource.filename>
         <hibernate.dialect>org.hibernate.dialect.PostgreSQLDialect</hibernate.dialect>
-        <database.url>jdbc:postgresql://${database.host}:${database.port}/${database.name}</database.url>
         <database.tc.url>campostgresql:13.2</database.tc.url>
       </properties>
 
@@ -503,7 +498,6 @@
         <database.datasource.class>org.postgresql.ds.PGSimpleDataSource</database.datasource.class>
         <jboss.datasource.filename>postgresql-ds.xml</jboss.datasource.filename>
         <hibernate.dialect>org.hibernate.dialect.PostgreSQLDialect</hibernate.dialect>
-        <database.url>jdbc:postgresql://${database.host}:${database.port}/${database.name}</database.url>
         <database.tc.url>camcockroachdb:20.1.3</database.tc.url>
       </properties>
 
@@ -540,7 +534,6 @@
         <database.type>mssql</database.type>
         <database.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</database.driver>
         <database.datasource.class>com.microsoft.sqlserver.jdbc.SQLServerDataSource</database.datasource.class>
-        <database.url>jdbc:sqlserver://${database.host}:${database.port};DatabaseName=${database.name}</database.url>
         <database.tc.url>camsqlserver:2019</database.tc.url>
         <database.tc.params>;DatabaseName=${database.name};user=${database.username};password=${database.password};</database.tc.params>
       </properties>
@@ -579,9 +572,6 @@
 
     <profile>
       <id>testcontainers</id>
-      <properties>
-        <database.url>jdbc:tc:${database.tc.url}://localhost:${database.port}${database.tc.params}</database.url>
-      </properties>
       <dependencies>
         <!-- Testcontainers depends on docker-java which depends on jackson-annotations -->
         <dependency>
