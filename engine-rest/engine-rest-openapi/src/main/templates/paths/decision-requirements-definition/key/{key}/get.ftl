@@ -8,7 +8,7 @@
       desc = "Retrieves a decision requirements definition according to the
               `DecisionRequirementsDefinition` interface in the engine. 
               Returns the latest version of the decision requirements definition 
-              which belongs to no tenant"
+              which belongs to no tenant."
   />
 
   "parameters" : [

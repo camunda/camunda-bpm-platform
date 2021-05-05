@@ -30,7 +30,7 @@
   },
   "deploymentId": {
     "type": "string",
-    "desc": "Filter by the deployment the id belongs to."
+    "desc": "Filter by the id of the deployment a decision requirement definition belongs to."
   },
   "key": {
     "type": "string",

@@ -7,7 +7,7 @@
       summary = "Get DMN XML by Key and Tenant ID"
       desc = "Retrieves the DMN XML of a decision requirements definition.
               Returns the XML of the latest version of the decision requirements 
-              definition for a tenant"
+              definition for a tenant."
   />
 
   "parameters" : [

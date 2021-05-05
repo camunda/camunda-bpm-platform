@@ -7,7 +7,7 @@
       summary = "Get Decision Requirements Diagram by Key"
       desc = "Retrieves the diagram of a decision requirements definition.
               Returns the diagram for the latest version of the decision requirements 
-              definition which belongs to no tenant"
+              definition which belongs to no tenant."
   />
 
   "parameters" : [
