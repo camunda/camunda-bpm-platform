@@ -52,6 +52,7 @@
     {"name": "Historic Decision Definition"},
     {"name": "Historic Decision Instance"},
     {"name": "Historic Decision Requirements Definition"},
+    {"name": "Historic External Task Log"},
     {"name": "Historic Incident"},
     {"name": "Historic Job Log"},
     {"name": "Historic Process Definition"},
