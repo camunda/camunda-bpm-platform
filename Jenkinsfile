@@ -90,9 +90,9 @@ pipeline {
               //       withNpm: true)
               // }
             }
-          },
-          postAlways: {
-            cambpmPublishTestResult()
+          //},
+          //postAlways: {
+          //  cambpmPublishTestResult()
           }
         ])
 
