@@ -42,7 +42,17 @@
                              ],
                              "updateEventTrigger": true
                            }
-                         ]
+                         ],
+                         "variables": {
+                           "foo": {
+                             "type": "Object",
+                             "value": "[5,9]",
+                             "valueInfo": {
+                               "objectTypeName": "java.util.ArrayList",
+                               "serializationDataFormat": "application/json"
+                             }
+                           }
+                         }
                        },
                        "processInstanceIds": [
                          "aProcessInstance",
@@ -77,6 +87,13 @@
                          "tenantId": "aTenantId"
                        }
                      }']
+    />
+
+    <@lib.response
+        code = "400"
+        dto = "ExceptionDto"
+        desc = "Invalid variable value, for example if the value could not be parsed to an Integer value or the passed variable type is not supported.
+                See the  [Introduction](${docsUrl}/reference/rest/overview/#error-handling) for the error response format."
     />
 
     <@lib.response
