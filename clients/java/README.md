@@ -3,12 +3,13 @@
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm/camunda-external-task-client/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm/camunda-external-task-client)
 
+> Are you looking for the Spring Boot External Task Client? This way please: [Spring Boot External Task Client](../../spring-boot-starter/starter-client)
 
 The **Camunda External Task Client (Java)** allows to set up remote Service Tasks for your workflow.
 
 * [Quick Start](https://docs.camunda.org/get-started/quick-start/)
 * [Documentation](https://docs.camunda.org/manual/develop/user-guide/ext-client/)
-* [Examples](https://github.com/camunda/camunda-external-task-client-java/tree/master/examples)
+* [Examples](https://github.com/camunda/camunda-bpm-examples/tree/master/clients/java)
 
 ## Features
 * Complete External Tasks
