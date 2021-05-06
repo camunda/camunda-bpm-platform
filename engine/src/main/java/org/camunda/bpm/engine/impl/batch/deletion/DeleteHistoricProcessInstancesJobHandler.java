@@ -16,13 +16,13 @@
  */
 package org.camunda.bpm.engine.impl.batch.deletion;
 
-import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.batch.AbstractBatchJobHandler;
 import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
 import org.camunda.bpm.engine.impl.batch.BatchJobConfiguration;
 import org.camunda.bpm.engine.impl.batch.BatchJobContext;
 import org.camunda.bpm.engine.impl.batch.BatchJobDeclaration;
+import org.camunda.bpm.engine.impl.cmd.DeleteHistoricProcessInstancesCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
@@ -65,20 +65,10 @@ public class DeleteHistoricProcessInstancesJobHandler extends AbstractBatchJobHa
 
     BatchConfiguration batchConfiguration = readConfiguration(configurationEntity.getBytes());
 
-    boolean initialLegacyRestrictions = commandContext.isRestrictUserOperationLogToAuthenticatedUsers();
-    commandContext.disableUserOperationLog();
-    commandContext.setRestrictUserOperationLogToAuthenticatedUsers(true);
-    try {
-      HistoryService historyService = commandContext.getProcessEngineConfiguration().getHistoryService();
-      if(batchConfiguration.isFailIfNotExists()) {
-        historyService.deleteHistoricProcessInstances(batchConfiguration.getIds());
-      }else {
-        historyService.deleteHistoricProcessInstancesIfExists(batchConfiguration.getIds());
-      }
-    } finally {
-      commandContext.enableUserOperationLog();
-      commandContext.setRestrictUserOperationLogToAuthenticatedUsers(initialLegacyRestrictions);
-    }
+    commandContext.executeWithOperationLogPrevented(
+        new DeleteHistoricProcessInstancesCmd(
+            batchConfiguration.getIds(),
+            batchConfiguration.isFailIfNotExists()));
 
     commandContext.getByteArrayManager().delete(configurationEntity);
   }

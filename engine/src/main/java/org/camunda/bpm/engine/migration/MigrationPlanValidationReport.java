@@ -17,10 +17,11 @@
 package org.camunda.bpm.engine.migration;
 
 import java.util.List;
+import java.util.Map;
 
 /**
- * Collects the migration instruction validation reports for
- * all instructions of the migration plan which contain failures.
+ * Collects the migration validation reports for
+ * all instructions and variables of the migration plan which contain failures.
  */
 public interface MigrationPlanValidationReport {
 
@@ -30,13 +31,28 @@ public interface MigrationPlanValidationReport {
   MigrationPlan getMigrationPlan();
 
   /**
+   * @return {@code true} if either instruction or variable reports exist, {@code false} otherwise
+   */
+  boolean hasReports();
+
+  /**
    * @return true if instructions reports exist, false otherwise
    */
   boolean hasInstructionReports();
 
   /**
+   * @return {@code true} if variable reports exist, {@code false} otherwise
+   */
+  boolean hasVariableReports();
+
+  /**
    * @return all instruction reports
    */
   List<MigrationInstructionValidationReport> getInstructionReports();
+
+  /**
+   * @return all variable reports
+   */
+  Map<String, MigrationVariableValidationReport> getVariableReports();
 
 }

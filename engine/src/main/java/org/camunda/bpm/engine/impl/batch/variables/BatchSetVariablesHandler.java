@@ -56,22 +56,9 @@ public class BatchSetVariablesHandler extends AbstractBatchJobHandler<BatchConfi
 
     List<String> processInstanceIds = batchConfiguration.getIds();
 
-    boolean initialLegacyRestrictions =
-        commandContext.isRestrictUserOperationLogToAuthenticatedUsers();
-
-    commandContext.disableUserOperationLog();
-    commandContext.setRestrictUserOperationLogToAuthenticatedUsers(true);
-
-    try {
-      for (String processInstanceId : processInstanceIds) {
-        new SetExecutionVariablesCmd(processInstanceId, variables, false, true)
-            .execute(commandContext);
-      }
-
-    } finally {
-      commandContext.enableUserOperationLog();
-      commandContext.setRestrictUserOperationLogToAuthenticatedUsers(initialLegacyRestrictions);
-
+    for (String processInstanceId : processInstanceIds) {
+      commandContext.executeWithOperationLogPrevented(
+          new SetExecutionVariablesCmd(processInstanceId, variables, false, true));
     }
 
     commandContext.getByteArrayManager().delete(byteArray);

@@ -27,17 +27,13 @@ import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
 import org.camunda.bpm.engine.impl.batch.BatchElementConfiguration;
 import org.camunda.bpm.engine.impl.batch.DeploymentMappings;
 import org.camunda.bpm.engine.impl.batch.builder.BatchBuilder;
-import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.core.variable.VariableUtil;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
-import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.impl.util.ImmutablePair;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
-import org.camunda.bpm.engine.variable.Variables;
-import org.camunda.bpm.engine.variable.value.TypedValue;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -49,8 +45,6 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 public class SetVariablesToProcessInstancesBatchCmd implements Command<Batch> {
-
-  protected static final CommandLogger LOGGER = CommandLogger.CMD_LOGGER;
 
   protected List<String> processInstanceIds;
   protected ProcessInstanceQuery processInstanceQuery;
@@ -93,7 +87,7 @@ public class SetVariablesToProcessInstancesBatchCmd implements Command<Batch> {
         .build();
 
     String batchId = batch.getId();
-    VariableUtil.setVariables(variables, (name, value) -> setVariable(batchId, name, value));
+    VariableUtil.setVariablesByBatchId(variables, batchId);
 
     return batch;
   }
@@ -108,23 +102,6 @@ public class SetVariablesToProcessInstancesBatchCmd implements Command<Batch> {
 
     commandContext.getOperationLogManager()
         .logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_SET_VARIABLES, propChanges);
-  }
-
-  protected void setVariable(String batchId, String variableName, Object variableValue) {
-    TypedValue variableTypedValue = Variables.untypedValue(variableValue);
-
-    boolean isTransient = variableTypedValue.isTransient();
-    if (isTransient) {
-      throw LOGGER.exceptionSettingTransientVariablesAsyncNotSupported(variableName);
-    }
-
-    VariableUtil.checkJavaSerialization(variableName, variableTypedValue);
-
-    VariableInstanceEntity variableInstance =
-        VariableInstanceEntity.createAndInsert(variableName, variableTypedValue);
-
-    variableInstance.setVariableScopeId(batchId);
-    variableInstance.setBatchId(batchId);
   }
 
   public BatchConfiguration getConfiguration(BatchElementConfiguration elementConfiguration) {

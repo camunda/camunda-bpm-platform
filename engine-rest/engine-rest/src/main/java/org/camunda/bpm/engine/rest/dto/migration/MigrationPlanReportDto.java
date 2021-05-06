@@ -18,12 +18,14 @@ package org.camunda.bpm.engine.rest.dto.migration;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.migration.MigrationPlanValidationReport;
 
 public class MigrationPlanReportDto {
 
   protected List<MigrationInstructionValidationReportDto> instructionReports;
+  protected Map<String, MigrationVariableValidationReportDto> variableReports;
 
   public List<MigrationInstructionValidationReportDto> getInstructionReports() {
     return instructionReports;
@@ -33,15 +35,25 @@ public class MigrationPlanReportDto {
     this.instructionReports = instructionReports;
   }
 
+  public Map<String, MigrationVariableValidationReportDto> getVariableReports() {
+    return variableReports;
+  }
+
+  public void setVariableReports(Map<String, MigrationVariableValidationReportDto> variableReports) {
+    this.variableReports = variableReports;
+  }
+
   public static MigrationPlanReportDto form(MigrationPlanValidationReport validationReport) {
     MigrationPlanReportDto dto = new MigrationPlanReportDto();
     dto.setInstructionReports(MigrationInstructionValidationReportDto.from(validationReport.getInstructionReports()));
+    dto.setVariableReports(MigrationVariableValidationReportDto.from(validationReport.getVariableReports()));
     return dto;
   }
 
   public static MigrationPlanReportDto emptyReport() {
     MigrationPlanReportDto dto = new MigrationPlanReportDto();
-    dto.setInstructionReports(Collections.<MigrationInstructionValidationReportDto>emptyList());
+    dto.setInstructionReports(Collections.emptyList());
+    dto.setVariableReports(Collections.emptyMap());
     return dto;
   }
 

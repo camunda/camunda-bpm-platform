@@ -23,8 +23,10 @@ import org.camunda.bpm.engine.impl.batch.AbstractBatchJobHandler;
 import org.camunda.bpm.engine.impl.batch.BatchJobConfiguration;
 import org.camunda.bpm.engine.impl.batch.BatchJobContext;
 import org.camunda.bpm.engine.impl.batch.BatchJobDeclaration;
+import org.camunda.bpm.engine.impl.cmd.RestartProcessInstancesCmd;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -64,40 +66,34 @@ public class RestartProcessInstancesJobHandler extends AbstractBatchJobHandler<R
 
     RestartProcessInstancesBatchConfiguration batchConfiguration = readConfiguration(configurationEntity.getBytes());
 
-    boolean initialLegacyRestrictions = commandContext.isRestrictUserOperationLogToAuthenticatedUsers();
-    commandContext.disableUserOperationLog();
-    commandContext.setRestrictUserOperationLogToAuthenticatedUsers(true);
-    try {
+    String processDefinitionId = batchConfiguration.getProcessDefinitionId();
+    RestartProcessInstanceBuilderImpl builder =
+        new RestartProcessInstanceBuilderImpl(processDefinitionId);
 
-      RestartProcessInstanceBuilderImpl builder = (RestartProcessInstanceBuilderImpl) commandContext.getProcessEngineConfiguration()
-          .getRuntimeService()
-          .restartProcessInstances(batchConfiguration.getProcessDefinitionId())
-          .processInstanceIds(batchConfiguration.getIds());
+    builder.processInstanceIds(batchConfiguration.getIds());
 
-      builder.setInstructions(batchConfiguration.getInstructions());
+    builder.setInstructions(batchConfiguration.getInstructions());
 
-      if (batchConfiguration.isInitialVariables()) {
-        builder.initialSetOfVariables();
-      }
-
-      if (batchConfiguration.isSkipCustomListeners()) {
-        builder.skipCustomListeners();
-      }
-
-      if (batchConfiguration.isWithoutBusinessKey()) {
-        builder.withoutBusinessKey();
-      }
-
-      if (batchConfiguration.isSkipIoMappings()) {
-        builder.skipIoMappings();
-      }
-
-      builder.execute(false);
-
-    } finally {
-      commandContext.enableUserOperationLog();
-      commandContext.setRestrictUserOperationLogToAuthenticatedUsers(initialLegacyRestrictions);
+    if (batchConfiguration.isInitialVariables()) {
+      builder.initialSetOfVariables();
     }
+
+    if (batchConfiguration.isSkipCustomListeners()) {
+      builder.skipCustomListeners();
+    }
+
+    if (batchConfiguration.isWithoutBusinessKey()) {
+      builder.withoutBusinessKey();
+    }
+
+    if (batchConfiguration.isSkipIoMappings()) {
+      builder.skipIoMappings();
+    }
+
+    CommandExecutor commandExecutor = commandContext.getProcessEngineConfiguration()
+        .getCommandExecutorTxRequired();
+    commandContext.executeWithOperationLogPrevented(
+        new RestartProcessInstancesCmd(commandExecutor, builder));
 
     commandContext.getByteArrayManager().delete(configurationEntity);
 

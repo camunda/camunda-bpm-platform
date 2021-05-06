@@ -24,6 +24,8 @@ import org.camunda.bpm.engine.impl.batch.BatchJobConfiguration;
 import org.camunda.bpm.engine.impl.batch.BatchJobContext;
 import org.camunda.bpm.engine.impl.batch.BatchJobDeclaration;
 import org.camunda.bpm.engine.impl.batch.SetRetriesBatchConfiguration;
+import org.camunda.bpm.engine.impl.cmd.SetExternalTasksRetriesCmd;
+import org.camunda.bpm.engine.impl.cmd.UpdateExternalTaskRetriesBuilderImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
@@ -47,17 +49,11 @@ public class SetExternalTaskRetriesJobHandler extends AbstractBatchJobHandler<Se
 
     SetRetriesBatchConfiguration batchConfiguration = readConfiguration(configurationEntity.getBytes());
 
-    boolean initialLegacyRestrictions = commandContext.isRestrictUserOperationLogToAuthenticatedUsers();
-    commandContext.disableUserOperationLog();
-    commandContext.setRestrictUserOperationLogToAuthenticatedUsers(true);
-    try {
-      commandContext.getProcessEngineConfiguration()
-          .getExternalTaskService()
-          .setRetries(batchConfiguration.getIds(), batchConfiguration.getRetries());
-    } finally {
-      commandContext.enableUserOperationLog();
-      commandContext.setRestrictUserOperationLogToAuthenticatedUsers(initialLegacyRestrictions);
-    }
+    commandContext.executeWithOperationLogPrevented(
+        new SetExternalTasksRetriesCmd(
+            new UpdateExternalTaskRetriesBuilderImpl(
+                batchConfiguration.getIds(),
+                batchConfiguration.getRetries())));
 
     commandContext.getByteArrayManager().delete(configurationEntity);
     

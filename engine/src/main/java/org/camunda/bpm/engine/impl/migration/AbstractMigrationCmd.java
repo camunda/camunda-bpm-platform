@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -82,6 +83,7 @@ public abstract class AbstractMigrationCmd {
       ProcessDefinitionEntity sourceProcessDefinition,
       ProcessDefinitionEntity targetProcessDefinition,
       int numInstances,
+      Map<String, Object> variables,
       boolean async) {
 
     List<PropertyChange> propertyChanges = new ArrayList<PropertyChange>();
@@ -91,6 +93,10 @@ public abstract class AbstractMigrationCmd {
     propertyChanges.add(new PropertyChange("nrOfInstances",
         null,
         numInstances));
+
+    if (variables != null) {
+      propertyChanges.add(new PropertyChange("nrOfSetVariables", null, variables.size()));
+    }
     propertyChanges.add(new PropertyChange("async", null, async));
 
     commandContext.getOperationLogManager()

@@ -33,6 +33,7 @@ public class MigrationBatchConfigurationJsonConverter extends JsonObjectConverte
   public static final String PROCESS_INSTANCE_ID_MAPPINGS = "processInstanceIdMappings";
   public static final String SKIP_LISTENERS = "skipListeners";
   public static final String SKIP_IO_MAPPINGS = "skipIoMappings";
+  public static final String BATCH_ID = "batchId";
 
   public JsonObject toJsonObject(MigrationBatchConfiguration configuration) {
     JsonObject json = JsonUtil.createObject();
@@ -42,16 +43,19 @@ public class MigrationBatchConfigurationJsonConverter extends JsonObjectConverte
     JsonUtil.addListField(json, PROCESS_INSTANCE_ID_MAPPINGS, DeploymentMappingJsonConverter.INSTANCE, configuration.getIdMappings());
     JsonUtil.addField(json, SKIP_LISTENERS, configuration.isSkipCustomListeners());
     JsonUtil.addField(json, SKIP_IO_MAPPINGS, configuration.isSkipIoMappings());
+    JsonUtil.addField(json, BATCH_ID, configuration.getBatchId());
 
     return json;
   }
 
   public MigrationBatchConfiguration toObject(JsonObject json) {
-    MigrationBatchConfiguration configuration = new MigrationBatchConfiguration(readProcessInstanceIds(json), readIdMappings(json),
+    return new MigrationBatchConfiguration(
+        readProcessInstanceIds(json),
+        readIdMappings(json),
         JsonUtil.asJavaObject(JsonUtil.getObject(json, MIGRATION_PLAN), MigrationPlanJsonConverter.INSTANCE),
-        JsonUtil.getBoolean(json, SKIP_LISTENERS), JsonUtil.getBoolean(json, SKIP_IO_MAPPINGS));
-
-    return configuration;
+        JsonUtil.getBoolean(json, SKIP_LISTENERS),
+        JsonUtil.getBoolean(json, SKIP_IO_MAPPINGS),
+        JsonUtil.getString(json, BATCH_ID));
   }
 
   protected List<String> readProcessInstanceIds(JsonObject jsonObject) {

@@ -21,18 +21,21 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.migration.MigrationInstruction;
 import org.camunda.bpm.engine.migration.MigrationInstructionBuilder;
 import org.camunda.bpm.engine.migration.MigrationInstructionsBuilder;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.migration.MigrationPlanBuilder;
+import org.camunda.bpm.engine.variable.VariableMap;
 
 public class MockMigrationPlanBuilder {
 
   protected String sourceProcessDefinitionId;
   protected String targetProcessDefinitionId;
   protected List<MigrationInstruction> instructions = new ArrayList<MigrationInstruction>();
+  protected VariableMap variables;
 
   public MockMigrationPlanBuilder sourceProcessDefinitionId(String sourceProcessDefinitionId) {
     this.sourceProcessDefinitionId = sourceProcessDefinitionId;
@@ -81,6 +84,7 @@ public class MockMigrationPlanBuilder {
     when(migrationPlanMock.getSourceProcessDefinitionId()).thenReturn(sourceProcessDefinitionId);
     when(migrationPlanMock.getTargetProcessDefinitionId()).thenReturn(targetProcessDefinitionId);
     when(migrationPlanMock.getInstructions()).thenReturn(instructions);
+    when(migrationPlanMock.getVariables()).thenReturn(variables);
     return migrationPlanMock;
   }
 
@@ -94,6 +98,11 @@ public class MockMigrationPlanBuilder {
       .thenReturn(migrationPlanMock);
 
     return migrationPlanBuilderMock;
+  }
+
+  public MockMigrationPlanBuilder variables(VariableMap variables) {
+    this.variables = variables;
+    return this;
   }
 
   public static interface JoinedMigrationPlanBuilderMock extends MigrationPlanBuilder, MigrationInstructionBuilder, MigrationInstructionsBuilder {

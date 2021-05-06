@@ -40,6 +40,10 @@ public class UpdateProcessInstancesSuspensionStateBuilderImpl implements UpdateP
     this.commandExecutor = commandExecutor;
   }
 
+  public UpdateProcessInstancesSuspensionStateBuilderImpl(List<String> processInstanceIds) {
+    this.processInstanceIds = processInstanceIds;
+  }
+
   @Override
   public UpdateProcessInstancesSuspensionStateBuilder byProcessInstanceIds(List<String> processInstanceIds) {
     this.processInstanceIds.addAll(processInstanceIds);

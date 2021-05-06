@@ -42,7 +42,17 @@
                              ],
                              "updateEventTrigger": true
                            }
-                         ]
+                         ],
+                         "variables": {
+                           "foo": {
+                             "type": "Object",
+                             "value": "[5,9]",
+                             "valueInfo": {
+                               "objectTypeName": "java.util.ArrayList",
+                               "serializationDataFormat": "application/json"
+                             }
+                           }
+                         }
                        },
                        "processInstanceIds": [
                          "aProcessInstance",
@@ -66,13 +76,20 @@
     <@lib.response
         code = "400"
         dto = "ExceptionDto"
+        desc = "Invalid variable value, for example if the value could not be parsed to an Integer value or the passed variable type is not supported.
+                See the  [Introduction](${docsUrl}/reference/rest/overview/#error-handling) for the error response format."
+    />
+
+    <@lib.response
+        code = "400"
+        dto = "ExceptionDto"
         desc = "The request is not valid if one or more of the following statements apply:
 
                 * The provided migration plan is not valid, so an exception of type
                 `MigrationPlanValidationException` is returned.
                 * The provided migration plan is not valid for a specific process
                 instance it is applied to, so an exception of type
-                `MigrationInstructionInstanceValidationException` is returned.
+                `MigratingProcessInstanceValidationException` is returned.
                 * In case additional parameters of the request are unexpected, an
                 exception of type `InvalidRequestException` is returned.
 

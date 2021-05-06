@@ -9,7 +9,7 @@
         desc = "A migration instruction JSON object."
     />
 
-        <@lib.property
+    <@lib.property
         name = "failures"
         type = "array"
         itemType = "string"

@@ -42,6 +42,26 @@ public class MigrationPlanValidationReportAssert {
     return this;
   }
 
+  public MigrationPlanValidationReportAssert hasVariableFailures(String name,
+                                                                 String... expectedFailures) {
+    isNotNull();
+
+    List<String> failuresFound = new ArrayList<>();
+
+    actual.getVariableReports().entrySet()
+        .stream()
+        .filter(entry -> entry.getKey().equals(name))
+        .findFirst()
+        .ifPresent(entry -> failuresFound.addAll(entry.getValue().getFailures()));
+
+    org.assertj.core.api.Assertions.assertThat(failuresFound)
+        .as("Expected failures for variable name '%s':\n%sBut found failures:\n%s",
+            name, joinFailures(expectedFailures), joinFailures(failuresFound.toArray()))
+        .containsExactlyInAnyOrder(expectedFailures);
+
+    return this;
+  }
+
   public MigrationPlanValidationReportAssert hasInstructionFailures(String activityId, String... expectedFailures) {
     isNotNull();
 

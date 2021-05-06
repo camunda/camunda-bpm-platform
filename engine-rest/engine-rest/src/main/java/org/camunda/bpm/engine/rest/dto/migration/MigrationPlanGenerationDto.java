@@ -16,6 +16,10 @@
  */
 package org.camunda.bpm.engine.rest.dto.migration;
 
+import org.camunda.bpm.engine.rest.dto.VariableValueDto;
+
+import java.util.Map;
+
 /**
  * @author Thorben Lindhauer
  *
@@ -25,6 +29,7 @@ public class MigrationPlanGenerationDto {
   protected String sourceProcessDefinitionId;
   protected String targetProcessDefinitionId;
   protected boolean updateEventTriggers;
+  protected Map<String, VariableValueDto> variables;
 
   public String getSourceProcessDefinitionId() {
     return sourceProcessDefinitionId;
@@ -48,6 +53,14 @@ public class MigrationPlanGenerationDto {
 
   public void setUpdateEventTriggers(boolean updateEventTriggers) {
     this.updateEventTriggers = updateEventTriggers;
+  }
+
+  public void setVariables(Map<String, VariableValueDto> variables) {
+    this.variables = variables;
+  }
+
+  public Map<String, VariableValueDto> getVariables() {
+    return variables;
   }
 
 }

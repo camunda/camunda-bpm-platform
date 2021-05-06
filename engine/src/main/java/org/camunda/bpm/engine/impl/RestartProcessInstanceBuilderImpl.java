@@ -57,6 +57,10 @@ public class RestartProcessInstanceBuilderImpl implements RestartProcessInstance
     this.processInstanceIds = new ArrayList<String>();
   }
 
+  public RestartProcessInstanceBuilderImpl(String processDefinitionId) {
+    this(null, processDefinitionId);
+  }
+
   @Override
   public RestartProcessInstanceBuilder startBeforeActivity(String activityId) {
     ensureNotNull(NotValidException.class, "activityId", activityId);
@@ -79,11 +83,7 @@ public class RestartProcessInstanceBuilderImpl implements RestartProcessInstance
   }
 
   public void execute() {
-    execute(true);
-  }
-
-  public void execute(boolean writeUserOperationLog) {
-    commandExecutor.execute(new RestartProcessInstancesCmd(commandExecutor, this, writeUserOperationLog));
+    commandExecutor.execute(new RestartProcessInstancesCmd(commandExecutor, this));
   }
 
   public Batch executeAsync() {

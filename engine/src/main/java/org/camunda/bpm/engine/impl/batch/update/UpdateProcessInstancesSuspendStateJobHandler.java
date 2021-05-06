@@ -18,11 +18,14 @@ package org.camunda.bpm.engine.impl.batch.update;
 
 import java.util.List;
 import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.impl.UpdateProcessInstancesSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.batch.AbstractBatchJobHandler;
 import org.camunda.bpm.engine.impl.batch.BatchJobConfiguration;
 import org.camunda.bpm.engine.impl.batch.BatchJobContext;
 import org.camunda.bpm.engine.impl.batch.BatchJobDeclaration;
+import org.camunda.bpm.engine.impl.cmd.UpdateProcessInstancesSuspendStateCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -59,23 +62,12 @@ public class UpdateProcessInstancesSuspendStateJobHandler extends AbstractBatchJ
 
     UpdateProcessInstancesSuspendStateBatchConfiguration batchConfiguration = readConfiguration(configurationEntity.getBytes());
 
-    boolean initialLegacyRestrictions = commandContext.isRestrictUserOperationLogToAuthenticatedUsers();
-    commandContext.disableUserOperationLog();
-    commandContext.setRestrictUserOperationLogToAuthenticatedUsers(true);
-    try {
-      if(batchConfiguration.getSuspended()) {
-        commandContext.getProcessEngineConfiguration()
-          .getRuntimeService()
-          .updateProcessInstanceSuspensionState().byProcessInstanceIds(batchConfiguration.getIds()).suspend();
-      } else {
-         commandContext.getProcessEngineConfiguration()
-           .getRuntimeService()
-           .updateProcessInstanceSuspensionState().byProcessInstanceIds(batchConfiguration.getIds()).activate();
-      }
-    } finally {
-      commandContext.enableUserOperationLog();
-      commandContext.setRestrictUserOperationLogToAuthenticatedUsers(initialLegacyRestrictions);
-    }
+    CommandExecutor commandExecutor = commandContext.getProcessEngineConfiguration()
+        .getCommandExecutorTxRequired();
+    commandContext.executeWithOperationLogPrevented(new UpdateProcessInstancesSuspendStateCmd(
+        commandExecutor,
+        new UpdateProcessInstancesSuspensionStateBuilderImpl(batchConfiguration.getIds()),
+        batchConfiguration.getSuspended()));
   }
 
 }

@@ -44,7 +44,7 @@ import org.junit.Test;
 import org.junit.rules.RuleChain;
 
 /**
- * 
+ *
  * @author Anna Pazola
  *
  */
@@ -70,6 +70,12 @@ public class RestartProcessInstanceUserOperationLogTest {
   @Before
   public void setClock() {
     ClockUtil.setCurrentTime(START_DATE);
+  }
+
+  @After
+  public void resetEngineConfig() {
+    rule.getProcessEngineConfiguration()
+        .setRestrictUserOperationLogToAuthenticatedUsers(true);
   }
 
   @Before
@@ -100,7 +106,7 @@ public class RestartProcessInstanceUserOperationLogTest {
 
     ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("process1");
     ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("process1");
-    
+
     runtimeService.deleteProcessInstance(processInstance1.getId(), "test");
     runtimeService.deleteProcessInstance(processInstance2.getId(), "test");
 
@@ -209,6 +215,26 @@ public class RestartProcessInstanceUserOperationLogTest {
   }
 
   @Test
+  public void shouldNotLogOnSyncExecutionUnauthenticated() {
+    // given
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+    runtimeService.deleteProcessInstance(processInstance.getId(), "test");
+    Batch batch = runtimeService.restartProcessInstances(processDefinition.getId()).startBeforeActivity("user1").processInstanceIds(processInstance.getId()).executeAsync();
+
+    helper.completeSeedJobs(batch);
+
+    rule.getProcessEngineConfiguration().setRestrictUserOperationLogToAuthenticatedUsers(false);
+
+    // when
+    helper.executeJobs(batch);
+
+    // then
+    Assert.assertEquals(0, rule.getHistoryService().createUserOperationLogQuery().entityType(EntityTypes.PROCESS_INSTANCE).count());
+  }
+
+  @Test
   public void testNoCreationOnJobExecutorBatchJobExecution() {
     // given
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
@@ -219,6 +245,27 @@ public class RestartProcessInstanceUserOperationLogTest {
       .startAfterActivity("user1")
       .processInstanceIds(Arrays.asList(processInstance.getId()))
       .executeAsync();
+
+    // when
+    testRule.waitForJobExecutorToProcessAllJobs(5000L);
+
+    // then
+    Assert.assertEquals(0, rule.getHistoryService().createUserOperationLogQuery().count());
+  }
+
+  @Test
+  public void shouldNotLogOnExecutionUnauthenticated() {
+    // given
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+    runtimeService.deleteProcessInstance(processInstance.getId(), "test");
+    runtimeService.restartProcessInstances(processDefinition.getId())
+      .startAfterActivity("user1")
+      .processInstanceIds(Arrays.asList(processInstance.getId()))
+      .executeAsync();
+
+    rule.getProcessEngineConfiguration().setRestrictUserOperationLogToAuthenticatedUsers(false);
 
     // when
     testRule.waitForJobExecutorToProcessAllJobs(5000L);

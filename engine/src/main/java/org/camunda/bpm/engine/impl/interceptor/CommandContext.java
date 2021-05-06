@@ -44,7 +44,6 @@ import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartManager;
 import org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
-import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSession;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionManager;
@@ -656,4 +655,22 @@ public class CommandContext {
   public OptimizeManager getOptimizeManager() {
     return getSession(OptimizeManager.class);
   }
+
+  public <T> void executeWithOperationLogPrevented(Command<T> command) {
+    boolean initialLegacyRestrictions =
+        isRestrictUserOperationLogToAuthenticatedUsers();
+
+    disableUserOperationLog();
+    setRestrictUserOperationLogToAuthenticatedUsers(true);
+
+    try {
+      command.execute(this);
+
+    } finally {
+      enableUserOperationLog();
+      setRestrictUserOperationLogToAuthenticatedUsers(initialLegacyRestrictions);
+
+    }
+  }
+
 }
