@@ -89,7 +89,7 @@ pipeline {
               runSteps: {
                 cambpmRunMaven('distro/wildfly/subsystem', 'test', runtimeStash: true)
               },
-              postAlways: {
+              postFailure: {
                 cambpmPublishTestResult()
               }
             ])
@@ -107,10 +107,8 @@ pipeline {
               runSteps: {
                 cambpmRunMavenByStageType('upgrade-database', 'h2')
               },
-              postAlways: {
-                cambpmPublishTestResult()
-              },
               postFailure: {
+                cambpmPublishTestResult()
                 cambpmAddFailedStageType(failedStageTypes, 'upgrade-database')
               }
             ])
@@ -128,10 +126,8 @@ pipeline {
               runSteps: {
                 cambpmRunMavenByStageType('instance-migration', 'h2')
               },
-              postAlways: {
-                cambpmPublishTestResult()
-              },
               postFailure: {
+                cambpmPublishTestResult()
                 cambpmAddFailedStageType(failedStageTypes, 'instance-migration')
               }
             ])
@@ -149,10 +145,8 @@ pipeline {
               runSteps: {
                 cambpmRunMavenByStageType('old-engine', 'h2')
               },
-              postAlways: {
-                cambpmPublishTestResult()
-              },
               postFailure: {
+                cambpmPublishTestResult()
                 cambpmAddFailedStageType(failedStageTypes, 'old-engine')
               }
             ])
@@ -170,10 +164,8 @@ pipeline {
               runSteps: {
                 cambpmRunMavenByStageType('rolling-update', 'h2')
               },
-              postAlways: {
-                cambpmPublishTestResult()
-              },
               postFailure: {
+                cambpmPublishTestResult()
                 cambpmAddFailedStageType(failedStageTypes, 'rolling-update')
               }
             ])
@@ -189,10 +181,8 @@ pipeline {
               runSteps: {
                 cambpmRunMavenByStageType('large-data-tests', 'h2')
               },
-              postAlways: {
-                cambpmPublishTestResult()
-              },
               postFailure: {
+                cambpmPublishTestResult()
                 cambpmAddFailedStageType(failedStageTypes, 'large-data-tests')
               }
             ])
