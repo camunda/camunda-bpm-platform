@@ -254,7 +254,7 @@ public class RestartProcessInstanceUserOperationLogTest {
   }
 
   @Test
-  public void shouldLogOnExecutionUnauthenticated() {
+  public void shouldNotLogOnExecutionUnauthenticated() {
     // given
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(instance);
 

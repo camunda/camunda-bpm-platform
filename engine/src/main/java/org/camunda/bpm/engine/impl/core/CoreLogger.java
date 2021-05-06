@@ -61,6 +61,9 @@ public class CoreLogger extends ProcessEngineLogger {
       ));
   }
 
+  // We left out id 005!
+  // please skip it unless you backport it to all maintained versions to avoid inconsistencies
+
   public ProcessEngineException transientVariableException(String variableName) {
     return new ProcessEngineException(exceptionMessage(
         "006",
