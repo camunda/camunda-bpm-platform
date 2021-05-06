@@ -2,6 +2,9 @@
 
 This project provides a Spring Boot Starter that allows you to implement an External Task Worker for Camunda. It uses the Camunda REST API to fetch, lock, and complete External Service Tasks. It is based on the [Java External Task Client](../../clients/java).
 
+* [Documentation](https://docs.camunda.org/manual/develop/user-guide/ext-client/spring-boot-starter/)
+* [Examples](https://github.com/camunda/camunda-bpm-examples/tree/master/spring-boot-starter/external-task-client)
+
 ## Dependency
 
 You need this dependency to get started:
