@@ -108,6 +108,9 @@ pipeline {
               //       withNpm: true)
               // }
             }
+          },
+          postFailure: {
+            cambpmPublishTestResult()
           }
         ])
 
@@ -127,10 +130,8 @@ pipeline {
               runSteps: {
                 cambpmRunMavenByStageType('engine-unit', 'h2')
               },
-              postAlways: {
-                cambpmPublishTestResult()
-              },
               postFailure: {
+                cambpmPublishTestResult()
                 cambpmAddFailedStageType(failedStageTypes, 'engine-unit')
               }
             ])
@@ -148,10 +149,8 @@ pipeline {
               runSteps: {
                 cambpmRunMavenByStageType('engine-unit-authorizations', 'h2')
               },
-              postAlways: {
-                cambpmPublishTestResult()
-              },
               postFailure: {
+                cambpmPublishTestResult()
                 cambpmAddFailedStageType(failedStageTypes, 'engine-unit-authorizations')
               }
             ])
@@ -169,10 +168,8 @@ pipeline {
               runSteps: {
                 cambpmRunMavenByStageType('webapp-unit', 'h2')
               },
-              postAlways: {
-                cambpmPublishTestResult()
-              },
               postFailure: {
+                cambpmPublishTestResult()
                 cambpmAddFailedStageType(failedStageTypes, 'webapp-unit')
               }
             ])
@@ -190,10 +187,8 @@ pipeline {
               runSteps: {
                 cambpmRunMavenByStageType('webapp-unit-authorizations', 'h2')
               },
-              postAlways: {
-                cambpmPublishTestResult()
-              },
               postFailure: {
+                cambpmPublishTestResult()
                 cambpmAddFailedStageType(failedStageTypes, 'webapp-unit-authorizations')
               }
             ])
@@ -211,7 +206,7 @@ pipeline {
               runSteps: {
                 cambpmRunMaven('engine/', 'verify -Pcfghistorynone', runtimeStash: true)
               },
-              postAlways: {
+              postFailure: {
                 cambpmPublishTestResult()
               }
             ])
@@ -229,7 +224,7 @@ pipeline {
               runSteps: {
                 cambpmRunMaven('engine/', 'verify -Pcfghistoryaudit', runtimeStash: true)
               },
-              postAlways: {
+              postFailure: {
                 cambpmPublishTestResult()
               },
             ])
@@ -247,7 +242,7 @@ pipeline {
               runSteps: {
                 cambpmRunMaven('engine/', 'verify -Pcfghistoryactivity', runtimeStash: true)
               },
-              postAlways: {
+              postFailure: {
                 cambpmPublishTestResult()
               }
             ])
@@ -265,7 +260,7 @@ pipeline {
               runSteps: {
                 cambpmRunMaven('qa/', 'clean install -Ptomcat,postgresql,engine-integration', runtimeStash: true, archiveStash: true)
               },
-              postAlways: {
+              postFailure: {
                 cambpmPublishTestResult()
               }
             ])
@@ -283,10 +278,8 @@ pipeline {
               runSteps: {
                 cambpmRunMaven('qa/', 'clean install -Pwildfly,postgresql,engine-integration', runtimeStash: true, archiveStash: true)
               },
-              postAlways: {
-                cambpmPublishTestResult()
-              },
               postFailure: {
+                cambpmPublishTestResult()
                 cambpmAddFailedStageType(failedStageTypes, 'engine-IT-wildfly')
                 cambpmArchiveArtifacts('qa/wildfly-runtime/target/**/standalone/log/server.log')
               }
@@ -303,10 +296,8 @@ pipeline {
               runSteps: {
                 cambpmRunMaven('qa/', 'clean install -Pwildfly,postgresql,postgresql-xa,engine-integration', runtimeStash: true, archiveStash: true)
               },
-              postAlways: {
-                cambpmPublishTestResult()
-              },
               postFailure: {
+                cambpmPublishTestResult()
                 cambpmArchiveArtifacts('qa/wildfly-runtime/target/**/standalone/log/server.log')
               }
             ])
@@ -324,7 +315,7 @@ pipeline {
               runSteps: {
                 cambpmRunMaven('qa/', 'clean install -Ptomcat,h2,webapps-integration', runtimeStash: true, archiveStash: true)
               },
-              postAlways: {
+              postFailure: {
                 cambpmPublishTestResult()
               }
             ])
@@ -342,7 +333,7 @@ pipeline {
               runSteps: {
                 cambpmRunMaven('qa/', 'clean install -Pwildfly,h2,webapps-integration', runtimeStash: true, archiveStash: true)
               },
-              postAlways: {
+              postFailure: {
                 cambpmPublishTestResult()
               }
             ])
@@ -358,7 +349,7 @@ pipeline {
               runSteps: {
                 cambpmRunMaven('qa/', 'clean install -Ptomcat-vanilla,webapps-integration-sa', runtimeStash: true, archiveStash: true)
               },
-              postAlways: {
+              postFailure: {
                 cambpmPublishTestResult()
               }
             ])
@@ -374,7 +365,7 @@ pipeline {
               runSteps: {
                 cambpmRunMaven('qa/', 'clean install -Pwildfly-vanilla,webapps-integration-sa', runtimeStash: true, archiveStash: true)
               },
-              postAlways: {
+              postFailure: {
                 cambpmPublishTestResult()
               }
             ])
@@ -392,7 +383,7 @@ pipeline {
               runSteps: {
                 cambpmRunMaven('distro/run/', 'clean install -Pintegration-test-camunda-run', runtimeStash: true, archiveStash: true, qaStash: true)
               },
-              postAlways: {
+              postFailure: {
                 cambpmPublishTestResult()
               }
             ])
@@ -410,7 +401,7 @@ pipeline {
               runSteps: {
                 cambpmRunMaven('spring-boot-starter/', 'clean install -Pintegration-test-spring-boot-starter', runtimeStash: true, archiveStash: true, qaStash: true)
               },
-              postAlways: {
+              postFailure: {
                 cambpmPublishTestResult()
               }
             ])
@@ -477,7 +468,7 @@ pipeline {
               runSteps: {
                 cambpmRunMaven('engine/', 'clean test -Pcheck-plugins', runtimeStash: true)
               },
-              postAlways: {
+              postFailure: {
                 cambpmPublishTestResult()
               }
             ])
@@ -495,7 +486,7 @@ pipeline {
               runSteps: {
                 cambpmRunMaven('engine/', 'clean test -Pdb-table-prefix', runtimeStash: true)
               },
-              postAlways: {
+              postFailure: {
                 cambpmPublishTestResult()
               }
             ])
@@ -516,7 +507,7 @@ pipeline {
               runSteps: {
                 cambpmRunMaven('webapps/', 'clean test -Pdb-table-prefix -Dskip.frontend.build=true', runtimeStash: true)
               },
-              postAlways: {
+              postFailure: {
                 cambpmPublishTestResult()
               }
             ])
@@ -537,7 +528,7 @@ pipeline {
               runSteps: {
                 cambpmRunMaven('.', 'clean verify -Pcheck-engine,wls-compatibility,jersey', runtimeStash: true)
               },
-              postAlways: {
+              postFailure: {
                 cambpmPublishTestResult()
               }
             ])
@@ -555,7 +546,7 @@ pipeline {
               runSteps: {
                 cambpmRunMaven('qa/', 'clean install -Pwildfly-domain,h2,engine-integration', runtimeStash: true, archiveStash: true)
               },
-              postAlways: {
+              postFailure: {
                 cambpmPublishTestResult()
               }
             ])
@@ -573,7 +564,7 @@ pipeline {
               runSteps: {
                 cambpmRunMaven('qa/', 'clean install -Pwildfly,wildfly-servlet,h2,engine-integration', runtimeStash: true, archiveStash: true)
               },
-              postAlways: {
+              postFailure: {
                 cambpmPublishTestResult()
               }
             ])
