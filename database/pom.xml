@@ -21,8 +21,7 @@
     <version.oracle-12>12.1.0.2</version.oracle-12>
     <version.oracle-18>18.3.0.0</version.oracle-18>
     <version.oracle-19>19.3.0.0</version.oracle-19>
-    <version.oracle-11>11.2.0.4</version.oracle-11>
-    <version.oracle>${version.oracle-11}</version.oracle>
+    <version.oracle>${version.oracle-12}</version.oracle>
     <version.mariadb>1.1.8</version.mariadb>
     <version.mariadb.galera>1.6.3</version.mariadb.galera>
     <version.mysql>8.0.23</version.mysql>
@@ -30,11 +29,11 @@
     <version.db2-11.1>11.1.1.1</version.db2-11.1>
     <version.db2-10.5>10.5.0.5</version.db2-10.5>
     <version.db2>${version.db2-10.5}</version.db2>
-    <version.postgresql>9.4.1212</version.postgresql>
+    <version.postgresql>42.0.0</version.postgresql>
 
     <!-- CockroachDB is compatible with PostgreSQL 9.5,
     so a different version of the JDBC driver needs to be used -->
-    <version.cockroachdb>42.0.0</version.cockroachdb>
+    <version.cockroachdb>42.2.5</version.cockroachdb>
 
     <!-- needed for sql script and backward compatibility checks -->
     <camunda.version.old>7.15.0</camunda.version.old>
@@ -321,36 +320,6 @@
         <database.driver>oracle.jdbc.OracleDriver</database.driver>
         <database.datasource.class>oracle.jdbc.pool.OracleDataSource</database.datasource.class>
       </properties>
-    </profile>
-    <profile>
-      <id>oracle-11</id>
-      <properties>
-        <version.oracle>${version.oracle-11}</version.oracle>
-      </properties>
-      <dependencies>
-        <dependency>
-          <groupId>com.oracle.jdbc</groupId>
-          <artifactId>ojdbc6</artifactId>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.codehaus.mojo</groupId>
-              <artifactId>sql-maven-plugin</artifactId>
-              <dependencies>
-                <dependency>
-                  <groupId>com.oracle.jdbc</groupId>
-                  <artifactId>ojdbc6</artifactId>
-                  <version>${version.oracle}</version>
-                </dependency>
-              </dependencies>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
     </profile>
     <profile>
       <id>oracle-12</id>
