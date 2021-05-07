@@ -6,7 +6,6 @@
 engine-webapp-unit:
   databases:
   - 'postgresql_96'
-  - 'postgresql_94'
   - 'postgresql_1013'
   - 'postgresql_112'
   - 'postgresql_122'
@@ -14,13 +13,11 @@ engine-webapp-unit:
   - 'aws_aurora_postgresql_96'
   - 'aws_aurora_postgresql_1013'
   - 'aws_aurora_postgresql_124'
-  - 'mariadb_100'
   - 'mariadb_102'
   - 'mariadb_103'
   - 'mariadb_galera'
   - 'mysql_57'
   - 'mysql_80'
-  - 'oracle_11'
   - 'oracle_12'
   - 'oracle_18'
   - 'oracle_19'
@@ -49,7 +46,6 @@ engine-rest:
 daily-stages:
   databases: 
   - 'postgresql_96'
-  - 'postgresql_94'
   - 'postgresql_1013'
   - 'postgresql_112'
   - 'postgresql_122'
@@ -57,13 +53,11 @@ daily-stages:
   - 'aws_aurora_postgresql_96'
   - 'aws_aurora_postgresql_1013'
   - 'aws_aurora_postgresql_124'
-  - 'mariadb_100'
   - 'mariadb_102'
   - 'mariadb_103'
   - 'mariadb_galera'
   - 'mysql_57'
   - 'mysql_80'
-  - 'oracle_11'
   - 'oracle_12'
   - 'oracle_18'
   - 'oracle_19'
