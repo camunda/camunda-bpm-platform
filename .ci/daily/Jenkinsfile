@@ -24,7 +24,7 @@ pipeline {
     disableConcurrentBuilds() // TODO https://jira.camunda.com/browse/CAM-13403
   }
   triggers {
-    pollSCM('H H(0-7) * * *')
+    pollSCM('H H(0-3) * * *') // CE daily runs after EE daily and Sidetrack daily
   }
   stages {
     stage('Prepare') {
