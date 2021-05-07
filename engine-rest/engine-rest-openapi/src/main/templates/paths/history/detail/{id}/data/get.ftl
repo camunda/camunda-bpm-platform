@@ -51,7 +51,7 @@
             "example-1": {
               "summary": "GET `/history/detail/someId/data`",
               "value": "file variable: Status 200. Content-Type: text/plain; charset=UTF-8.
-                        Content-Disposition: attachment; filename=“someFile.txt”"
+                        Content-Disposition: attachment; filename='someFile.txt'"
             }
           }
         }
