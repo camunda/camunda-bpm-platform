@@ -15,12 +15,6 @@
   "parameters" : [
 
     <#assign last = false >
-    <#assign requestMethod="POST"/>
-    <#include "/lib/commons/historic-variable-instance-query-params.ftl" >
-    <@lib.parameters
-        object = params
-        last = last
-    />
     <#include "/lib/commons/pagination-params.ftl">
     <#assign last = true >
     <#include "/lib/commons/deserialize-values-parameter.ftl">
