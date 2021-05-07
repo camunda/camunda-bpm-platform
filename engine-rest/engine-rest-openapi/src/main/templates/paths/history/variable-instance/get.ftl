@@ -50,6 +50,7 @@
                            "executionId": "aVariableInstanceExecutionId",
                            "activityInstanceId": "aVariableInstanceActivityInstId",
                            "caseDefinitionKey": null,
+                           "caseDefinitionId": null,
                            "caseInstanceId": null,
                            "caseExecutionId": null,
                            "taskId": null,

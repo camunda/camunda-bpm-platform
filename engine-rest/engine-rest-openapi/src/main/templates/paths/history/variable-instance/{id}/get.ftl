@@ -65,6 +65,7 @@
                          "executionId": "aExecutionId",
                          "activityInstanceId": "Task_1:b68b71ca-e310-11e2-beb0-f0def1557726",
                          "caseDefinitionKey": null,
+                         "caseDefinitionId": null,
                          "caseInstanceId": null,
                          "caseExecutionId": null,
                          "taskId": null,

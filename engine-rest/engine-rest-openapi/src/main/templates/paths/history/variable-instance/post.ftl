@@ -73,6 +73,7 @@
                            "executionId": "aExecutionId",
                            "activityInstanceId": "aActivityInstId",
                            "caseDefinitionKey": null,
+                           "caseDefinitionId": null,
                            "caseInstanceId": null,
                            "caseExecutionId": null,
                            "taskId": null,
