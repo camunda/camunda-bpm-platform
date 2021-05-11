@@ -1,6 +1,10 @@
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
+<<<<<<< HEAD
 @Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
+=======
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library@CAM-13440']) _
+>>>>>>> d02f282370... test(ci): test disable fingerprints
 
 pipeline {
   agent {
