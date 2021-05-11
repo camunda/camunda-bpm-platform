@@ -19,7 +19,7 @@
 
   <properties>
     <version.spring.framework>5.2.14.RELEASE</version.spring.framework>
-    <version.spring-boot>2.4.3</version.spring-boot>
+    <version.spring-boot>2.4.5</version.spring-boot>
     <version.cxf>3.0.3</version.cxf>
     <version.resteasy>2.3.5.Final</version.resteasy>
     <version.resteasy3>3.14.0.Final</version.resteasy3>
