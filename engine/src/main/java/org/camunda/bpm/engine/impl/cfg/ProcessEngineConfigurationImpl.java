@@ -583,6 +583,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected boolean enableScriptCompilation = true;
   protected boolean enableScriptEngineCaching = true;
   protected boolean enableFetchScriptEngineFromProcessApplication = true;
+  protected String scriptEngineNameJavaScript;
 
   /**
    * When set to false, the following behavior changes:
@@ -4227,6 +4228,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfigurationImpl setEnableFetchScriptEngineFromProcessApplication(boolean enable) {
     this.enableFetchScriptEngineFromProcessApplication = enable;
+    return this;
+  }
+
+  public String getScriptEngineNameJavaScript() {
+    return scriptEngineNameJavaScript;
+  }
+
+  public ProcessEngineConfigurationImpl setScriptEngineNameJavaScript(String scriptEngineNameJavaScript) {
+    this.scriptEngineNameJavaScript = scriptEngineNameJavaScript;
     return this;
   }
 
