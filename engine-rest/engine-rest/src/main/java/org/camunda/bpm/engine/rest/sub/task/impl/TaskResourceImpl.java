@@ -438,13 +438,9 @@ public class TaskResourceImpl implements TaskResource {
   }
 
   protected String getTaskFormMediaType(String taskId) {
-    // retrieving the task and the form key can require additional permissions (e.g. READ on ProcessDefinition)
-    // that we should not force on the user additionally just to retrieve the correct content type
-    String formKey = runWithoutAuthorization(() -> {
-      Task task = engine.getTaskService().createTaskQuery().taskId(taskId).singleResult();
-      ensureNotNull("No task found for taskId '" + taskId + "'", "task", task);
-      return engine.getFormService().getTaskFormKey(task.getProcessDefinitionId(), task.getTaskDefinitionKey());
-    });
+    Task task = engine.getTaskService().createTaskQuery().initializeFormKeys().taskId(taskId).singleResult();
+    ensureNotNull("No task found for taskId '" + taskId + "'", "task", task);
+    String formKey = task.getFormKey();
     return ContentTypeUtil.getFormContentType(formKey);
   }
 
