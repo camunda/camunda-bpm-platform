@@ -118,7 +118,7 @@ pipeline {
     }
     stage('h2 UNIT, engine IT, webapp IT') {
       parallel {
-        stage('engine-UNIT-h2') {
+        stage('db-UNIT-h2') {
           when {
             expression {
               cambpmWithLabels('h2', 'rolling-update', 'migration', 'all-db', 'default-build', 'authorizations')
@@ -128,16 +128,16 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel: 'h2',
               runSteps: {
-                cambpmRunMavenByStageType('engine-unit', 'h2')
+                cambpmRunMavenByStageType('db-unit', 'h2')
               },
               postFailure: {
                 cambpmPublishTestResult()
-                cambpmAddFailedStageType(failedStageTypes, 'engine-unit')
+                cambpmAddFailedStageType(failedStageTypes, 'db-unit')
               }
             ])
           }
         }
-        stage('engine-UNIT-authorizations-h2') {
+        stage('db-UNIT-authorizations-h2') {
           when {
             expression {
               cambpmWithLabels('h2', 'authorizations')
@@ -147,67 +147,11 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel: 'h2',
               runSteps: {
-                cambpmRunMavenByStageType('engine-unit-authorizations', 'h2')
+                cambpmRunMavenByStageType('db-unit-authorizations', 'h2')
               },
               postFailure: {
                 cambpmPublishTestResult()
-                cambpmAddFailedStageType(failedStageTypes, 'engine-unit-authorizations')
-              }
-            ])
-          }
-        }
-        stage('webapp-UNIT-h2') {
-          when {
-            expression {
-              cambpmWithLabels('default-build')
-            }
-          }
-          steps {
-            cambpmConditionalRetry([
-              agentLabel: 'h2',
-              runSteps: {
-                cambpmRunMavenByStageType('webapp-unit', 'h2')
-              },
-              postFailure: {
-                cambpmPublishTestResult()
-                cambpmAddFailedStageType(failedStageTypes, 'webapp-unit')
-              }
-            ])
-          }
-        }
-        stage('webapp-UNIT-authorizations-h2') {
-          when {
-            expression {
-              cambpmWithLabels('default-build')
-            }
-          }
-          steps {
-            cambpmConditionalRetry([
-              agentLabel: 'h2',
-              runSteps: {
-                cambpmRunMavenByStageType('webapp-unit-authorizations', 'h2')
-              },
-              postFailure: {
-                cambpmPublishTestResult()
-                cambpmAddFailedStageType(failedStageTypes, 'webapp-unit-authorizations')
-              }
-            ])
-          }
-        }
-        stage('engine-UNIT-historylevel-none') {
-          when {
-            expression {
-              cambpmWithLabels('default-build')
-            }
-          }
-          steps {
-            cambpmConditionalRetry([
-              agentLabel: 'h2',
-              runSteps: {
-                cambpmRunMaven('engine/', 'verify -Pcfghistorynone', runtimeStash: true)
-              },
-              postFailure: {
-                cambpmPublishTestResult()
+                cambpmAddFailedStageType(failedStageTypes, 'db-unit-authorizations')
               }
             ])
           }

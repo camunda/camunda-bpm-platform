@@ -28,10 +28,8 @@ engine-webapp-unit:
   - 'sqlserver_2017'
   - 'sqlserver_2019'
   stages: 
-  - 'engine-unit'
-  - 'engine-unit-authorizations'
-  - 'webapp-unit'
-  - 'webapp-unit-authorizations'
+  - 'db-unit'
+  - 'db-unit-authorizations'
 engine-rest:
   stages:
   - 'engine-rest-unit-jersey-2'
@@ -78,11 +76,8 @@ sidetrack-stages:
   databases:
   - 'cockroachdb_201'
   stages:
-  - 'engine-unit'
-  - 'engine-unit-authorizations'
-  - 'webapp-unit'
-  - 'webapp-unit-authorizations'
-  - 'sql-scripts'
+  - 'db-unit'
+  - 'db-unit-authorizations'
   - 'upgrade-database'
   - 'instance-migration'
   - 'old-engine'
