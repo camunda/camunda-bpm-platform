@@ -18,6 +18,7 @@
     <#include "/lib/commons/history-task-instance-query-params.ftl" >
     <@lib.parameters
         object = params
+        skip = ["orQueries"]  <#-- OR Queries not avaialble in GET -->
         last = last
     />
 
