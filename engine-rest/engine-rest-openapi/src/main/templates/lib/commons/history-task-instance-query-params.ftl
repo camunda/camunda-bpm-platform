@@ -334,5 +334,19 @@
     "type": "boolean",
     "desc": "Only include tasks which have no candidate group. Value may only be `true`,
              as `false` is the default behavior."
+  },
+  "orQueries": {
+    "type": "array",
+    "dto": "HistoricTaskInstanceQueryDto",
+    "desc": "A JSON array of nested historic task instance queries with OR semantics.
+
+             A task instance matches a nested query if it fulfills at least one of the query's predicates.
+
+             With multiple nested queries, a task instance must fulfill at least one predicate of each query
+             ([Conjunctive Normal Form](https://en.wikipedia.org/wiki/Conjunctive_normal_form)).
+
+             All task instance query properties can be used except for: `sorting`, `withCandidateGroups`, ` withoutCandidateGroups`.
+
+             See the [User Guide](${docsUrl}/user-guide/process-engine/process-engine-api/#or-queries) for more information about OR queries."
   }
 }>
