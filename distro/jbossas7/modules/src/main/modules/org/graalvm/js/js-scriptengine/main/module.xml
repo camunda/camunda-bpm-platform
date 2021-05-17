@@ -1,0 +1,11 @@
+<module xmlns="urn:jboss:module:1.0" name="org.graalvm.js.js-scriptengine">
+  <resources>
+    <resource-root path="js-scriptengine-21.1.0.jar" />
+  </resources>
+
+  <dependencies>
+    <module name="javax.api" />
+    <module name="org.camunda.spin.camunda-spin-core" />
+    <module name="org.graalvm.sdk.graal-sdk" />
+  </dependencies>
+</module>
