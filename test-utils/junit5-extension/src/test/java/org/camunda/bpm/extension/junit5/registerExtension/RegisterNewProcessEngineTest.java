@@ -10,16 +10,16 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.extension.junit5.test.ProcessEngineExtension;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-@TestInstance(Lifecycle.PER_CLASS)
 public class RegisterNewProcessEngineTest {
   
-  private ProcessEngine testEngine = ProcessEngineConfiguration
+  private static ProcessEngine testEngine = ProcessEngineConfiguration
       .createStandaloneInMemProcessEngineConfiguration()
       .setProcessEngineName("testEngine")
+      // Use a new database to resolve the conflict with existing 
+      // in-memory-database. The tables will be removed after the test.
+      .setJdbcUrl("jdbc:h2:mem:camunda-test")
       .buildProcessEngine();
   
   @RegisterExtension
@@ -28,7 +28,7 @@ public class RegisterNewProcessEngineTest {
       .build();
   
   @AfterAll
-  public void closeProcessEngine() {
+  public static void closeProcessEngine() {
     testEngine.close();
   }
   
