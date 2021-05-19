@@ -5020,6 +5020,20 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
     }
   }
 
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithFormKey.cmmn"})
+  @Test
+  public void testInitializeFormKeysForCaseInstance() {
+    String caseDefinitionId = getCaseDefinitionId();
+
+    CaseInstance caseInstance = caseService
+      .withCaseDefinition(caseDefinitionId)
+      .create();
+
+    Task task = taskService.createTaskQuery().initializeFormKeys().caseInstanceId(caseInstance.getId()).singleResult();
+    assertEquals("aFormKey", task.getFormKey());
+
+  }
+
   @Deployment(resources = "org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml")
   @Test
   public void testQueryOrderByProcessVariableInteger() {
