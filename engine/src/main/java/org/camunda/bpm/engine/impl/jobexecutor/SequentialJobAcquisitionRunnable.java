@@ -19,9 +19,11 @@ package org.camunda.bpm.engine.impl.jobexecutor;
 import java.util.Iterator;
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
 
 
 /**
@@ -65,6 +67,8 @@ public class SequentialJobAcquisitionRunnable extends AcquireJobsRunnable {
 
       Iterator<ProcessEngineImpl> engineIterator = jobExecutor.engineIterator();
 
+      // See https://jira.camunda.com/browse/CAM-9913
+      ClassLoader classLoaderBeforeExecution = ClassLoaderUtil.switchToProcessEngineClassloader();
       try {
         while (engineIterator.hasNext()) {
           ProcessEngineImpl currentProcessEngine = engineIterator.next();
@@ -80,6 +84,8 @@ public class SequentialJobAcquisitionRunnable extends AcquireJobsRunnable {
         LOG.exceptionDuringJobAcquisition(e);
 
         acquisitionContext.setAcquisitionException(e);
+      } finally {
+        ClassLoaderUtil.setContextClassloader(classLoaderBeforeExecution);
       }
 
       acquisitionContext.setJobAdded(isJobAdded);
