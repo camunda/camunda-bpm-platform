@@ -25,9 +25,12 @@ const baseImportPath = document.querySelector('base').href + '../';
 
 const loadConfig = (async function() {
   // eslint-disable-next-line
-  const config = (await import(
-      baseImportPath + 'scripts/config.js?bust=' + new Date().getTime()
-    )).default || {};
+  const config =
+    (
+      await import(
+        baseImportPath + 'scripts/config.js?bust=' + new Date().getTime()
+      )
+    ).default || {};
 
   window.camTasklistConf = config;
   return config;

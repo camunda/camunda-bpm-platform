@@ -128,9 +128,9 @@ module.exports = [
         $scope.processInstanceCountState &&
         ($scope.processInstanceCountState.$loaded ||
           $scope.processInstanceCountState.$error) &&
-        ($scope.caseInstanceCountState &&
-          ($scope.caseInstanceCountState.$loaded ||
-            $scope.caseInstanceCountState.$error))
+        $scope.caseInstanceCountState &&
+        ($scope.caseInstanceCountState.$loaded ||
+          $scope.caseInstanceCountState.$error)
       );
     };
 
