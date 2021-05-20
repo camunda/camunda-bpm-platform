@@ -43,7 +43,10 @@ public class JobExecutorStartTest {
 
   @Test
   public void shouldUseDefaultInitialization() {
+    //when
     jobExecutor.start();
+
+    //then
     assertThat(jobExecutor.getAcquireJobsCmdFactory()).isNotNull();
     assertThat(jobExecutor.getAcquireJobsRunnable()).isNotNull();
     assertThat(jobExecutor.isActive()).isTrue();
@@ -51,15 +54,9 @@ public class JobExecutorStartTest {
 
   @Test
   public void shouldUseCustomJobsCmdFactoryAfterInitialization() {
-    class MyAcquireJobCmdFactory implements AcquireJobsCommandFactory {
 
-      @Override
-      public Command<AcquiredJobs> getCommand(int numJobsToAcquire) {
-        return null;
-      }
-    }
     // given
-    MyAcquireJobCmdFactory myFactory = new MyAcquireJobCmdFactory();
+    MyAcquireJobsCmdFactory myFactory = new MyAcquireJobsCmdFactory();
     jobExecutor.setAcquireJobsCmdFactory(myFactory);
 
     // when
@@ -68,5 +65,12 @@ public class JobExecutorStartTest {
     // then
     assertThat(jobExecutor.getAcquireJobsCmdFactory()).isSameAs(myFactory);
     assertThat(jobExecutor.isActive()).isTrue();
+  }
+
+  public static class MyAcquireJobsCmdFactory implements AcquireJobsCommandFactory {
+    @Override
+    public Command<AcquiredJobs> getCommand(int numJobsToAcquire) {
+      return null;
+    }
   }
 }
