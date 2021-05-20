@@ -96,7 +96,9 @@ public abstract class JobExecutor {
   }
 
   protected void ensureInitialization() {
-    acquireJobsCmdFactory = acquireJobsCmdFactory == null ? new DefaultAcquireJobsCommandFactory(this) : acquireJobsCmdFactory;
+  if (acquireJobsCmdFactory == null) {
+    acquireJobsCmdFactory =  new DefaultAcquireJobsCommandFactory(this);
+  }
     acquireJobsRunnable = new SequentialJobAcquisitionRunnable(this);
   }
 
