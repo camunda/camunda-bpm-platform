@@ -22,7 +22,7 @@
     <version.oracle-18>18.3.0.0</version.oracle-18>
     <version.oracle-19>19.3.0.0</version.oracle-19>
     <version.oracle>${version.oracle-12}</version.oracle>
-    <version.mariadb>2.0.1</version.mariadb>
+    <version.mariadb>1.8.0</version.mariadb>
     <version.mariadb.galera>1.6.3</version.mariadb.galera>
     <version.mysql>8.0.23</version.mysql>
     <version.sqlserver>8.2.2.jre8</version.sqlserver>
