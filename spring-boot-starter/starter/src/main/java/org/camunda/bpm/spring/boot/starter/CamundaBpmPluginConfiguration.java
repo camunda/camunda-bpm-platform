@@ -19,7 +19,9 @@ package org.camunda.bpm.spring.boot.starter;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+
 import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
+import org.camunda.bpm.spring.boot.starter.plugin.ApplicationContextClassloaderSwitchPlugin;
 import org.camunda.bpm.spring.boot.starter.spin.CamundaJacksonFormatConfiguratorJSR310;
 import org.camunda.bpm.spring.boot.starter.spin.CamundaJacksonFormatConfiguratorJdk8;
 import org.camunda.bpm.spring.boot.starter.spin.CamundaJacksonFormatConfiguratorParameterNames;
@@ -30,6 +32,7 @@ import org.camunda.spin.plugin.impl.SpinProcessEnginePlugin;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
+import org.springframework.boot.devtools.restart.ConditionalOnInitializedRestarter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -105,4 +108,23 @@ public class CamundaBpmPluginConfiguration {
       return new ConnectProcessEnginePlugin();
     }
   }
+
+
+  /*
+    Provide option to apply application context classloader switch when Spring
+    Spring Developer tools are enabled
+    For more details: https://jira.camunda.com/browse/CAM-9043
+   */
+  @ConditionalOnInitializedRestarter
+  @Configuration
+  static class InitializedRestarterConfiguration {
+
+    @Bean
+    @ConditionalOnMissingBean(name = "applicationContextClassloaderSwitchPlugin")
+    public ApplicationContextClassloaderSwitchPlugin applicationContextClassloaderSwitchPlugin() {
+      return new ApplicationContextClassloaderSwitchPlugin();
+    }
+  }
+
+
 }
