@@ -13,7 +13,7 @@ the suspended attribute. Should you need to extend it, it is probably a good ide
                   * `processDefinitionKey`">
 
     <@lib.property
-        name = "jobDefinitionId	"
+        name = "jobDefinitionId"
         type = "string"
         desc = "The job definition id of the jobs to activate or suspend."
     />
