@@ -1,4 +1,4 @@
-package org.camunda.bpm.extension.junit5;
+package org.camunda.bpm.extension.junit5.deployment;
 
 import org.camunda.bpm.extension.junit5.test.ProcessEngineExtension;
 import org.junit.jupiter.api.Test;

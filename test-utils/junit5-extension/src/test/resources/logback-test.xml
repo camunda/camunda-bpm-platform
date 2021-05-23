@@ -11,4 +11,6 @@
   <root level="info">
     <appender-ref ref="STDOUT" />
   </root>
+  
+  <logger name="org.camunda.bpm.extension.junit5" level="debug"/>
 </configuration>
