@@ -63,7 +63,7 @@ public class ProcessEngineExtension implements TestWatcher,
   
   protected String configurationResource = "camunda.cfg.xml";
   
-  private String deploymentId;
+  protected String deploymentId;
 
   public final static List<String> RESOURCE_SUFFIXES = new ArrayList<>();
 
@@ -96,6 +96,10 @@ public class ProcessEngineExtension implements TestWatcher,
 
   public ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
     return processEngineConfiguration;
+  }
+
+  public String getDeploymentId() {
+    return deploymentId;
   }
 
   @Override
