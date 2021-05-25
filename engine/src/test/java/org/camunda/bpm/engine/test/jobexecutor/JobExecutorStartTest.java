@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.test.jobexecutor;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.jobexecutor.AcquireJobsCommandFactory;
 import org.camunda.bpm.engine.impl.jobexecutor.AcquiredJobs;
+import org.camunda.bpm.engine.impl.jobexecutor.DefaultAcquireJobsCommandFactory;
 import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.junit.After;
@@ -49,6 +50,7 @@ public class JobExecutorStartTest {
     //then
     assertThat(jobExecutor.getAcquireJobsCmdFactory()).isNotNull();
     assertThat(jobExecutor.getAcquireJobsRunnable()).isNotNull();
+    assertThat(jobExecutor.getAcquireJobsCmdFactory()).isInstanceOf(DefaultAcquireJobsCommandFactory.class);
     assertThat(jobExecutor.isActive()).isTrue();
   }
 
