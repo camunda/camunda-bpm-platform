@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
+import org.camunda.bpm.integrationtest.util.TestContainer;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -52,10 +53,14 @@ public class ClassloadingByJobPriorityTest extends AbstractFoxPlatformIntegratio
 
   @Deployment(name= "engineWithPriorityJobAcquisition")
   public static WebArchive processArchive() {
-    return initWebArchiveDeployment("processApp.war",
+    WebArchive webArchive = initWebArchiveDeployment("processApp.war",
         "org/camunda/bpm/integrationtest/functional/classloading/jobexecution/engineWithAcquireJobsByPriority.xml")
+               .addClass(AbstractFoxPlatformIntegrationTest.class)
                .addAsResource(modelAsAsset(process), "ClassloadingByJobPriorityTest.testDeployProcessArchive.bpmn");
+    TestContainer.addContainerSpecificResources(webArchive);
+    TestContainer.addContainerSpecificProcessEngineConfigurationClass(webArchive);
 
+    return webArchive;
   }
 
   @Test
