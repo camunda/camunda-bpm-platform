@@ -945,7 +945,7 @@
     <profile>
       <id>wildfly-compatibility</id>
       <properties>
-        <resteasy.version>3.0.8.Final</resteasy.version>
+        <resteasy.version>3.0.14.Final</resteasy.version>
         <resteasy.netty.version>${resteasy.version}</resteasy.netty.version>
       </properties>
     </profile>

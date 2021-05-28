@@ -18,7 +18,7 @@
 
   <properties>
     <version.jetty>9.4.31.v20200723</version.jetty>
-    <version.tomcat>8.5.57</version.tomcat>
+    <version.tomcat>9.0.43</version.tomcat>
 
     <web.resources.override>src/main/runtime/default/webapp</web.resources.override>
     <java.resources.override>src/main/runtime/default/resources</java.resources.override>

@@ -233,7 +233,7 @@ Databases are selected using maven profiles:
 mvn clean install -Pbenchmark,h2
 mvn clean install -Pbenchmark,mysql
 mvn clean install -Pbenchmark,postgresql
-mvn clean install -Pbenchmark,oracle,oracle-11
+mvn clean install -Pbenchmark,oracle,oracle-12
 mvn clean install -Pbenchmark,db2
 ```
 
