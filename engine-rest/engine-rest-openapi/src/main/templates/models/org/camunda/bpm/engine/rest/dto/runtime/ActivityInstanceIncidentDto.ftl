@@ -8,7 +8,7 @@
         desc = "The id of the incident."/>
 
     <@lib.property
-        name="parentActivityInstanceId"
+        name="activityId"
         type = "string"
         last = true
         desc = "The activity id in which the incident happened."/>
