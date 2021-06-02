@@ -177,11 +177,12 @@
                 class="btn btn-link"
                 type="button"
                 uib-popover-template="'validation-error-popover'"
-                popover-title="Validation Errors"
+                popover-title="{{ 'CAM_WIDGET_VARIABLES_TABLE_VALIDATION_ERRORS' | translate }}"
                 popover-class="cam-widget-variables-popover"
                 popover-trigger="'none'"
                 popover-is-open="info.showFailures"
                 popover-enable="true">
+          <!-- use glyphicon-error when CAM-13580 is fixed -->
           <span class="error-sign"></span>
         </button>
         <span ng-if="info.failures.length === 0 && !info.editMode"

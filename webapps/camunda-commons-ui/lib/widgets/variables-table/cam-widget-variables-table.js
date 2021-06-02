@@ -86,7 +86,7 @@ module.exports = [
 
       link: function($scope) {
         if ($scope.validatable) {
-          $document.on('click', e => {
+          const onHideValidationPopover = e => {
             const modalWindow = angular.element('.modal');
             const modalBackdrop = angular.element('.modal-backdrop');
             if (
@@ -102,7 +102,11 @@ module.exports = [
                 );
               });
             }
-          });
+          };
+          $document.on('click', onHideValidationPopover);
+          $scope.$on('$destroy', () =>
+            $document.off('click', onHideValidationPopover)
+          );
         }
 
         var backups = [];

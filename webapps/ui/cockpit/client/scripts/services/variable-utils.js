@@ -24,6 +24,10 @@ module.exports = [
   fixDate => {
     const generatePayload = ({payload = {variables: {}}, variables}) => {
       if (variables) {
+        if (!payload.variables) {
+          payload.variables = {};
+        }
+
         variables.forEach(variable => {
           const name = variable.variable.name;
           payload.variables[name] = angular.copy(variable.variable);
