@@ -161,4 +161,27 @@
       margin-left: 0.25em;
     }
   }
+
+  .valid {
+    button {
+      padding: 0;
+    }
+    // Remove/fix .error-sign class when CAM-13580 is fixed
+    .error-sign {
+      display: block;
+      width:15px;
+      height:15px;
+      background-color: #d9534f;
+      -webkit-mask: url(../assets/images/error-sign.svg) no-repeat center;
+      mask: url(../assets/images/error-sign.svg) no-repeat center;
+    }
+    .glyphicon-ok {
+      color: #5cb85c
+    }
+  }
+}
+
+.cam-widget-variables-popover {
+  word-break: break-all;
+  z-index: 1039;
 }

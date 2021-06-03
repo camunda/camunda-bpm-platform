@@ -1,9 +1,10 @@
 <!-- # CE - camunda-bpm-webapp/ui/cockpit/client/scripts/components/variables/variable-add-dialog.html -->
 <div class="modal-header">
   <h3>
-    {{ isProcessInstance && !isBatchOperation ? 'VARIABLE_ADD_MODAL_TITLE_PROCESS' : '' | translate }}
+    {{ isProcessInstance ? 'VARIABLE_ADD_MODAL_TITLE_PROCESS' : '' | translate }}
     {{ isBatchOperation ? 'VARIABLE_ADD_MODAL_TITLE_BATCH' : '' | translate }}
-    {{ !isProcessInstance && !isBatchOperation ? 'VARIABLE_ADD_MODAL_TITLE_CASE' : '' | translate }}
+    {{ isMigration ? 'VARIABLE_ADD_MODAL_TITLE_MIGRATION' : '' | translate }}
+    {{ isCaseInstance ? 'VARIABLE_ADD_MODAL_TITLE_CASE' : '' | translate }}
   </h3>
 </div>
 
@@ -77,22 +78,22 @@
        translate-values="{ name: newVariable.name }">
   </div>
 
-  <div ng-if="status === 'SUCCESS' && isProcessInstance && !isBatchOperation"
+  <div ng-if="status === 'SUCCESS' && isProcessInstance"
        translate="VARIABLE_ADD_STATUS_SUCCESS_PROCESS"
        translate-values="{ name: newVariable.name }">
   </div>
 
-  <div ng-if="status === 'SUCCESS' && !isProcessInstance && !isBatchOperation"
+  <div ng-if="status === 'SUCCESS' && isCaseInstance"
        translate="VARIABLE_ADD_STATUS_SUCCESS_CASE"
        translate-values="{ name: newVariable.name }">
   </div>
 
-  <div ng-show="status === 'FAIL' && isProcessInstance && !isBatchOperation"
+  <div ng-show="status === 'FAIL' && isProcessInstance"
        translate="VARIABLE_ADD_STATUS_FAIL_PROCESS"
        translate-values="{ name: newVariable.name }">
   </div>
 
-  <div ng-show="status === 'FAIL' && !isProcessInstance && !isBatchOperation"
+  <div ng-show="status === 'FAIL' && isProcessInstance"
        translate="VARIABLE_ADD_STATUS_FAIL_CASE"
        translate-values="{ name: newVariable.name }">
   </div>

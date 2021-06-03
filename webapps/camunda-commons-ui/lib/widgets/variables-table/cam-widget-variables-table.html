@@ -8,6 +8,10 @@
         <span class="glyphicon" ng-class="orderClass(column.request)"></span>
       </a>
     </td>
+    <td class="valid"
+        ng-if="validatable">
+      {{ 'CAM_WIDGET_VARIABLES_TABLE_VALID' | translate }}
+    </td>
     <td class="actions"
         ng-if="editable.length">
       Actions
@@ -159,6 +163,35 @@
         </div>
       </td>
 
+      <td class="valid"
+          ng-if="validatable">
+        <script type="text/ng-template" id="validation-error-popover">
+          <ul ng-if="info.failures.length > 0">
+            <li ng-repeat="failure in info.failures">
+              {{failure}}
+            </li>
+          </ul>
+        </script>
+        <button ng-if="info.failures.length > 0 && !info.editMode"
+                ng-click="info.showFailures = true"
+                class="btn btn-link"
+                type="button"
+                uib-popover-template="'validation-error-popover'"
+                popover-title="{{ 'CAM_WIDGET_VARIABLES_TABLE_VALIDATION_ERRORS' | translate }}"
+                popover-class="cam-widget-variables-popover"
+                popover-trigger="'none'"
+                popover-is-open="info.showFailures"
+                popover-enable="true">
+          <!-- use glyphicon-error when CAM-13580 is fixed -->
+          <span class="error-sign"></span>
+        </button>
+        <span ng-if="info.failures.length === 0 && !info.editMode"
+              class="glyphicon glyphicon-ok"
+              uib-tooltip="{{ 'CAM_WIDGET_VARIABLES_TABLE_TOOLTIP_VALID' | translate }}"></span>
+        <span ng-if="info.editMode"
+              class="glyphicon glyphicon-question-sign"
+              uib-tooltip="{{ 'CAM_WIDGET_VARIABLES_TABLE_TOOLTIP_VALID_PENDING' | translate }}"></span>
+      </td>
       <td class="actions"
           ng-if="editable.length">
         <div ng-if="!info.editMode"
