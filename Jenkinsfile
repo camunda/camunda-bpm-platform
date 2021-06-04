@@ -70,7 +70,7 @@ pipeline {
               }
 
               // JOB_NAME, e.g.: '7.15/cambpm-ce/cambpm-main/PR-1373'
-              // add leading slash for the abosolute path creation
+              // keep leading slash for the abosolute project path
               platformVersionDir = "/" + env.JOB_NAME.split('/')[0]
               upstreamProjectName = "/" + env.JOB_NAME
               upstreamBuildNumber = env.BUILD_NUMBER
