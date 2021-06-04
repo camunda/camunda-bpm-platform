@@ -21,6 +21,7 @@ import static org.camunda.bpm.engine.impl.cmd.HistoryCleanupCmd.MAX_THREADS_NUMB
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import javax.naming.InitialContext;
+import javax.script.ScriptEngineManager;
 import javax.sql.DataSource;
 
 import java.io.InputStream;
@@ -331,8 +332,10 @@ import org.camunda.bpm.engine.impl.runtime.DefaultCorrelationHandler;
 import org.camunda.bpm.engine.impl.runtime.DefaultDeserializationTypeValidator;
 import org.camunda.bpm.engine.impl.scripting.ScriptFactory;
 import org.camunda.bpm.engine.impl.scripting.engine.BeansResolverFactory;
+import org.camunda.bpm.engine.impl.scripting.engine.DefaultScriptEngineResolver;
 import org.camunda.bpm.engine.impl.scripting.engine.ResolverFactory;
 import org.camunda.bpm.engine.impl.scripting.engine.ScriptBindingsFactory;
+import org.camunda.bpm.engine.impl.scripting.engine.ScriptEngineResolver;
 import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
 import org.camunda.bpm.engine.impl.scripting.engine.VariableScopeResolverFactory;
 import org.camunda.bpm.engine.impl.scripting.env.ScriptEnvResolver;
@@ -579,6 +582,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected ScriptingEnvironment scriptingEnvironment;
   protected List<ScriptEnvResolver> scriptEnvResolvers;
   protected ScriptFactory scriptFactory;
+  protected ScriptEngineResolver scriptEngineResolver;
   protected String scriptEngineNameJavaScript;
   protected boolean autoStoreScriptVariables = false;
   protected boolean enableScriptCompilation = true;
@@ -2436,8 +2440,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       resolverFactories.add(new VariableScopeResolverFactory());
       resolverFactories.add(new BeansResolverFactory());
     }
+    if (scriptEngineResolver == null) {
+      scriptEngineResolver = new DefaultScriptEngineResolver(new ScriptEngineManager());
+    }
     if (scriptingEngines == null) {
-      scriptingEngines = new ScriptingEngines(new ScriptBindingsFactory(resolverFactories));
+      scriptingEngines = new ScriptingEngines(new ScriptBindingsFactory(resolverFactories), scriptEngineResolver);
       scriptingEngines.setEnableScriptEngineCaching(enableScriptEngineCaching);
     }
     if (scriptFactory == null) {
@@ -4033,6 +4040,18 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setScriptFactory(ScriptFactory scriptFactory) {
     this.scriptFactory = scriptFactory;
+  }
+
+  public ScriptEngineResolver getScriptEngineResolver() {
+    return scriptEngineResolver;
+  }
+
+  public ProcessEngineConfigurationImpl setScriptEngineResolver(ScriptEngineResolver scriptEngineResolver) {
+    this.scriptEngineResolver = scriptEngineResolver;
+    if (scriptingEngines != null) {
+      scriptingEngines.setScriptEngineResolver(scriptEngineResolver);
+    }
+    return this;
   }
 
   public void setScriptingEnvironment(ScriptingEnvironment scriptingEnvironment) {

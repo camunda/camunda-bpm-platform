@@ -28,7 +28,7 @@ public class PythonScriptEngineSupportTest extends AbstractScriptEngineSupportTe
   public static WebArchive createProcessApplication() {
     return initWebArchiveDeployment()
       .addClass(AbstractScriptEngineSupportTest.class)
-      .addAsResource(createScriptTaskProcess("python", EXAMPLE_SCRIPT), "process.bpmn20.xml");
+      .addAsResource(createScriptTaskProcess("python", EXAMPLE_SCRIPT, EXAMPLE_SPIN_SCRIPT), "process.bpmn20.xml");
   }
 
 }

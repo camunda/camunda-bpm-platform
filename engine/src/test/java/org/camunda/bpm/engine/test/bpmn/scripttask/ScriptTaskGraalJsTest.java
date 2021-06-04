@@ -29,10 +29,8 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
 import org.camunda.bpm.engine.ScriptEvaluationException;
-import org.camunda.bpm.engine.impl.scripting.engine.ScriptBindingsFactory;
+import org.camunda.bpm.engine.impl.scripting.engine.DefaultScriptEngineResolver;
 import org.camunda.bpm.engine.impl.scripting.engine.ScriptEngineResolver;
-import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
-import org.camunda.bpm.engine.impl.scripting.env.ScriptingEnvironment;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.junit.After;
 import org.junit.Before;
@@ -50,19 +48,17 @@ public class ScriptTaskGraalJsTest extends AbstractScriptTaskTest {
 
   private static final String GRAALJS = "graal.js";
 
-  protected ScriptingEnvironment defaultScriptingEnvironment;
+  protected ScriptEngineResolver defaultScriptEngineResolver;
 
   @Before
   public void setup() {
-    defaultScriptingEnvironment = processEngineConfiguration.getScriptingEnvironment();
+    defaultScriptEngineResolver = processEngineConfiguration.getScriptEngineResolver();
     processEngineConfiguration.setConfigureScriptEngineHostAccess(configureHostAccess);
     processEngineConfiguration.setEnableScriptEngineLoadExternalResources(enableExternalResources);
     processEngineConfiguration.setEnableScriptEngineNashornCompatibility(enableNashornCompat);
     // create custom script engine lookup to receive a fresh GraalVM JavaScript engine
-    ScriptingEngines customScriptingEngines = new TestScriptingEngines(new ScriptBindingsFactory(processEngineConfiguration.getResolverFactories()));
-    customScriptingEngines.setEnableScriptEngineCaching(processEngineConfiguration.isEnableScriptEngineCaching());
-    processEngineConfiguration.setScriptingEnvironment(new ScriptingEnvironment(processEngineConfiguration.getScriptFactory(),
-        processEngineConfiguration.getEnvScriptResolvers(), customScriptingEngines));
+    processEngineConfiguration.setScriptEngineResolver(new TestScriptEngineResolver(
+        processEngineConfiguration.getScriptEngineResolver().getScriptEngineManager()));
   }
 
   @After
@@ -70,7 +66,7 @@ public class ScriptTaskGraalJsTest extends AbstractScriptTaskTest {
     processEngineConfiguration.setConfigureScriptEngineHostAccess(true);
     processEngineConfiguration.setEnableScriptEngineNashornCompatibility(false);
     processEngineConfiguration.setEnableScriptEngineLoadExternalResources(false);
-    processEngineConfiguration.setScriptingEnvironment(defaultScriptingEnvironment);
+    processEngineConfiguration.setScriptEngineResolver(defaultScriptEngineResolver);
   }
 
   @Parameters
@@ -265,21 +261,7 @@ public class ScriptTaskGraalJsTest extends AbstractScriptTaskTest {
       }
   }
 
-  protected static class TestScriptingEngines extends ScriptingEngines {
-
-    public TestScriptingEngines(ScriptBindingsFactory scriptBindingsFactory) {
-      this(new ScriptEngineManager());
-      this.scriptBindingsFactory = scriptBindingsFactory;
-    }
-
-    public TestScriptingEngines(ScriptEngineManager scriptEngineManager) {
-      super(scriptEngineManager);
-      this.scriptEngineResolver = new TestScriptEngineResolver(scriptEngineManager);
-    }
-
-  }
-
-  protected static class TestScriptEngineResolver extends ScriptEngineResolver {
+  protected static class TestScriptEngineResolver extends DefaultScriptEngineResolver {
 
     public TestScriptEngineResolver(ScriptEngineManager scriptEngineManager) {
       super(scriptEngineManager);
@@ -289,7 +271,7 @@ public class ScriptTaskGraalJsTest extends AbstractScriptTaskTest {
     protected ScriptEngine getScriptEngine(String language) {
       if (GRAALJS.equalsIgnoreCase(language)) {
         GraalJSScriptEngine scriptEngine = new GraalJSEngineFactory().getScriptEngine();
-        configureGraalJsScriptEngine(scriptEngine);
+        configureScriptEngines(language, scriptEngine);
         return scriptEngine;
       }
       return super.getScriptEngine(language);

@@ -30,6 +30,7 @@ import org.camunda.bpm.application.impl.EmbeddedProcessApplication;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.scripting.engine.DefaultScriptEngineResolver;
 import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
@@ -129,13 +130,13 @@ public class ScriptEngineNameJavaScriptTest {
   @Test
   public void shouldFallbackToAnyEngineForJavaScriptIfDefaultUnavailable() {
     // given
-    ScriptEngineManager scriptEngineManager = mock(ScriptEngineManager.class);
+    ScriptEngineManager mockScriptEngineManager = mock(ScriptEngineManager.class);
     ScriptEngine mockScriptEngine = mock(ScriptEngine.class);
     ScriptEngineFactory mockScriptEngineFactory = mock(ScriptEngineFactory.class);
-    ScriptingEngines scriptingEngines = new ScriptingEngines(scriptEngineManager);
+    ScriptingEngines scriptingEngines = new ScriptingEngines(new DefaultScriptEngineResolver(mockScriptEngineManager));
 
-    when(scriptEngineManager.getEngineByName(ScriptingEngines.GRAAL_JS_SCRIPT_ENGINE_NAME)).thenReturn(null);
-    when(scriptEngineManager.getEngineByName(ScriptingEngines.JAVASCRIPT_SCRIPTING_LANGUAGE)).thenReturn(mockScriptEngine);
+    when(mockScriptEngineManager.getEngineByName(ScriptingEngines.GRAAL_JS_SCRIPT_ENGINE_NAME)).thenReturn(null);
+    when(mockScriptEngineManager.getEngineByName(ScriptingEngines.JAVASCRIPT_SCRIPTING_LANGUAGE)).thenReturn(mockScriptEngine);
     when(mockScriptEngine.getFactory()).thenReturn(mockScriptEngineFactory);
     when(mockScriptEngineFactory.getEngineName()).thenReturn("foo");
 

@@ -28,7 +28,7 @@ public class GroovyScriptEngineSupportTest extends AbstractScriptEngineSupportTe
   public static WebArchive createProcessApplication() {
     return initWebArchiveDeployment()
       .addClass(AbstractScriptEngineSupportTest.class)
-      .addAsResource(createScriptTaskProcess("groovy", EXAMPLE_SCRIPT), "process.bpmn20.xml");
+      .addAsResource(createScriptTaskProcess("groovy", EXAMPLE_SCRIPT, EXAMPLE_SPIN_SCRIPT), "process.bpmn20.xml");
   }
 
 }

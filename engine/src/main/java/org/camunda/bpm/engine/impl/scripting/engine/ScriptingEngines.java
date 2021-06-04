@@ -64,13 +64,13 @@ public class ScriptingEngines implements DmnScriptEngineResolver {
 
   protected boolean enableScriptEngineCaching = true;
 
-  public ScriptingEngines(ScriptBindingsFactory scriptBindingsFactory) {
-    this(new ScriptEngineManager());
+  public ScriptingEngines(ScriptBindingsFactory scriptBindingsFactory, ScriptEngineResolver scriptEngineResolver) {
+    this(scriptEngineResolver);
     this.scriptBindingsFactory = scriptBindingsFactory;
   }
 
-  public ScriptingEngines(ScriptEngineManager scriptEngineManager) {
-    this.scriptEngineResolver = new ScriptEngineResolver(scriptEngineManager);
+  public ScriptingEngines(ScriptEngineResolver scriptEngineResolver) {
+    this.scriptEngineResolver = scriptEngineResolver;
   }
 
   public boolean isEnableScriptEngineCaching() {
@@ -158,5 +158,9 @@ public class ScriptingEngines implements DmnScriptEngineResolver {
 
   public void setScriptBindingsFactory(ScriptBindingsFactory scriptBindingsFactory) {
     this.scriptBindingsFactory = scriptBindingsFactory;
+  }
+
+  public void setScriptEngineResolver(ScriptEngineResolver scriptEngineResolver) {
+    this.scriptEngineResolver = scriptEngineResolver;
   }
 }
