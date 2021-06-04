@@ -70,13 +70,16 @@ pipeline {
               }
 
               // JOB_NAME, e.g.: '7.15/cambpm-ce/cambpm-main/PR-1373'
-              platformVersion = env.JOB_NAME.split('/')[0]
+              // keep leading slash for the abosolute project path
+              platformVersionDir = "/" + env.JOB_NAME.split('/')[0]
+              upstreamProjectName = "/" + env.JOB_NAME
+              upstreamBuildNumber = env.BUILD_NUMBER
 
               if (cambpmWithLabels('webapp-integration', 'all-as', 'h2', 'websphere', 'weblogic', 'jbosseap', 'run', 'spring-boot', 'authorizations', 'e2e')) {
                 cambpmTriggerDownstream(
-                  platformVersion + "/cambpm-ee/" + eeMainProjectBranch,
-                  [string(name: 'UPSTREAM_PROJECT_NAME', value: env.JOB_NAME),
-                  string(name: 'UPSTREAM_BUILD_NUMBER', value: env.BUILD_NUMBER)],
+                  platformVersionDir + "/cambpm-ee/" + eeMainProjectBranch,
+                  [string(name: 'UPSTREAM_PROJECT_NAME', value: upstreamProjectName),
+                  string(name: 'UPSTREAM_BUILD_NUMBER', value: upstreamBuildNumber)],
                   true, true, true
                 )
               }
@@ -85,17 +88,17 @@ pipeline {
               // or PR builds only, master builds should be excluded
               if (env.BRANCH_NAME != cambpmDefaultBranch() && cambpmWithLabels('all-db', 'cockroachdb', 'authorizations')) {
                 cambpmTriggerDownstream(
-                  platformVersion + "/cambpm-ce/cambpm-sidetrack/${env.BRANCH_NAME}",
-                  [string(name: 'UPSTREAM_PROJECT_NAME', value: env.JOB_NAME),
-                  string(name: 'UPSTREAM_BUILD_NUMBER', value: env.BUILD_NUMBER)]
+                  platformVersionDir + "/cambpm-ce/cambpm-sidetrack/${env.BRANCH_NAME}",
+                  [string(name: 'UPSTREAM_PROJECT_NAME', value: upstreamProjectName),
+                  string(name: 'UPSTREAM_BUILD_NUMBER', value: upstreamBuildNumber)]
                 )
               }
 
               if (cambpmWithLabels('daily', 'default-build', 'rolling-update', 'migration', 'all-db', 'h2', 'db2', 'mysql', 'oracle', 'mariadb', 'sqlserver', 'postgresql')) {
                 cambpmTriggerDownstream(
-                  platformVersion + "/cambpm-ce/cambpm-daily/${env.BRANCH_NAME}",
-                  [string(name: 'UPSTREAM_PROJECT_NAME', value: env.JOB_NAME),
-                  string(name: 'UPSTREAM_BUILD_NUMBER', value: env.BUILD_NUMBER)]
+                  platformVersionDir + "/cambpm-ce/cambpm-daily/${env.BRANCH_NAME}",
+                  [string(name: 'UPSTREAM_PROJECT_NAME', value: upstreamProjectName),
+                  string(name: 'UPSTREAM_BUILD_NUMBER', value: upstreamBuildNumber)]
                 )
               }
 
