@@ -16,11 +16,9 @@
  */
 package org.camunda.bpm.engine.test.standalone.scripting;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
@@ -28,19 +26,16 @@ import org.camunda.bpm.engine.impl.scripting.env.ScriptEnvResolver;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
 import org.junit.Test;
 
-/**
- * @author Roman Smirnov
- *
- */
-public class EnvScriptCachingTest extends AbstractScriptEnvironmentTest {
+public class EnvScriptResolutionTest extends AbstractScriptEnvironmentTest {
 
-  protected static final String SCRIPT_LANGUAGE = "groovy";
-  protected static final String SCRIPT = "println 'hello world'";
-  protected static final String ENV_SCRIPT = "println 'hello world from env script'";
+  protected static final String SCRIPT_LANGUAGE = "graal.js";
+  protected static final String ECMASCRIPT_LANGUAGE = "ecmascript";
+  protected static final String SCRIPT = "print('hello world');";
+  protected static final String ENV_SCRIPT = "print('hello world from env script');";
 
   @Override
   protected ScriptEnvResolver getResolver() {
-    return language -> new String[] { ENV_SCRIPT };
+    return language -> ECMASCRIPT_LANGUAGE.equals(language) ? new String[] { ENV_SCRIPT } : null;
   }
 
   @Override
@@ -49,33 +44,29 @@ public class EnvScriptCachingTest extends AbstractScriptEnvironmentTest {
   }
 
   @Test
-  public void testEnabledPaEnvScriptCaching() {
+  public void shouldFindEnvScriptForLanguage() {
     // given
     ProcessApplicationDeployment deployment = repositoryService.createDeployment(processApplication.getReference())
         .addClasspathResource(processPath)
         .deploy();
 
     // when
-    executeScript(processApplication, SCRIPT_LANGUAGE);
+    executeScript(processApplication, ECMASCRIPT_LANGUAGE);
 
     // then
     Map<String, List<ExecutableScript>> environmentScripts = processApplication.getEnvironmentScripts();
-    assertNotNull(environmentScripts);
-
-    List<ExecutableScript> groovyEnvScripts = environmentScripts.get(SCRIPT_LANGUAGE);
-
-    assertNotNull(groovyEnvScripts);
-    assertFalse(groovyEnvScripts.isEmpty());
-    assertEquals(processEngineConfiguration.getEnvScriptResolvers().size(), groovyEnvScripts.size());
+    assertThat(environmentScripts)
+      .hasSize(1)
+      .containsKey(ECMASCRIPT_LANGUAGE)
+      .extracting(ECMASCRIPT_LANGUAGE)
+        .hasSize(1);
 
     repositoryService.deleteDeployment(deployment.getId(), true);
   }
 
   @Test
-  public void testDisabledPaEnvScriptCaching() {
+  public void shouldFindEnvScriptForScriptEngineLanguageIfLanguageNotFound() {
     // given
-    processEngineConfiguration.setEnableFetchScriptEngineFromProcessApplication(false);
-
     ProcessApplicationDeployment deployment = repositoryService.createDeployment(processApplication.getReference())
         .addClasspathResource(processPath)
         .deploy();
@@ -85,12 +76,14 @@ public class EnvScriptCachingTest extends AbstractScriptEnvironmentTest {
 
     // then
     Map<String, List<ExecutableScript>> environmentScripts = processApplication.getEnvironmentScripts();
-    assertNotNull(environmentScripts);
-    assertNull(environmentScripts.get(SCRIPT_LANGUAGE));
+    assertThat(environmentScripts)
+      .hasSize(2)
+      .containsKeys(ECMASCRIPT_LANGUAGE, SCRIPT_LANGUAGE)
+      .containsEntry(SCRIPT_LANGUAGE, Collections.emptyList())
+      .extracting(ECMASCRIPT_LANGUAGE)
+        .hasSize(1);
 
     repositoryService.deleteDeployment(deployment.getId(), true);
-
-    processEngineConfiguration.setEnableFetchScriptEngineFromProcessApplication(true);
   }
 
 }
