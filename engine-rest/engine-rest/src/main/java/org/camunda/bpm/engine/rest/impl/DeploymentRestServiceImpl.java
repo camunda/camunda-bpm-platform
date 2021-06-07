@@ -28,14 +28,13 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.repository.*;
 import org.camunda.bpm.engine.rest.DeploymentRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.DeploymentDto;
 import org.camunda.bpm.engine.rest.dto.repository.DeploymentQueryDto;
 import org.camunda.bpm.engine.rest.dto.repository.DeploymentWithDefinitionsDto;
-import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.mapper.MultipartFormData;
 import org.camunda.bpm.engine.rest.mapper.MultipartFormData.FormPart;
@@ -47,6 +46,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class DeploymentRestServiceImpl extends AbstractRestProcessEngineAware implements DeploymentRestService {
 
   public final static String DEPLOYMENT_NAME = "deployment-name";
+  public final static String DEPLOYMENT_ACTIVATION_TIME = "deployment-activation-time";
   public final static String ENABLE_DUPLICATE_FILTERING = "enable-duplicate-filtering";
   public final static String DEPLOY_CHANGED_ONLY = "deploy-changed-only";
   public final static String DEPLOYMENT_SOURCE = "deployment-source";
@@ -56,6 +56,7 @@ public class DeploymentRestServiceImpl extends AbstractRestProcessEngineAware im
 
   static {
     RESERVED_KEYWORDS.add(DEPLOYMENT_NAME);
+    RESERVED_KEYWORDS.add(DEPLOYMENT_ACTIVATION_TIME);
     RESERVED_KEYWORDS.add(ENABLE_DUPLICATE_FILTERING);
     RESERVED_KEYWORDS.add(DEPLOY_CHANGED_ONLY);
     RESERVED_KEYWORDS.add(DEPLOYMENT_SOURCE);
@@ -137,6 +138,11 @@ public class DeploymentRestServiceImpl extends AbstractRestProcessEngineAware im
     FormPart deploymentName = payload.getNamedPart(DEPLOYMENT_NAME);
     if (deploymentName != null) {
       deploymentBuilder.name(deploymentName.getTextContent());
+    }
+
+    FormPart deploymentActivationTime = payload.getNamedPart(DEPLOYMENT_ACTIVATION_TIME);
+    if (deploymentActivationTime != null) {
+      deploymentBuilder.activateProcessDefinitionsOn(DateTimeUtil.parseDate(deploymentActivationTime.getTextContent()));
     }
 
     FormPart deploymentSource = payload.getNamedPart(DEPLOYMENT_SOURCE);

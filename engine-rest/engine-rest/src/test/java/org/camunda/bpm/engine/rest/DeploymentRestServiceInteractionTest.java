@@ -1232,6 +1232,23 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
   }
 
   @Test
+  public void testCreateDeploymentWithActivationTime() throws Exception {
+
+    resourceNames.addAll( Arrays.asList("data", "more-data") );
+
+    given()
+        .multiPart("data", "unspecified", createMockDeploymentResourceByteData())
+        .multiPart("deployment-activation-time", "2030-11-11T11:11:11Z")
+        .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .post(CREATE_DEPLOYMENT_URL);
+
+    verify(mockDeploymentBuilder).activateProcessDefinitionsOn(DateTimeUtil.parseDate("2030-11-11T11:11:11Z"));
+
+  }
+
+  @Test
   public void testCreateDeploymentWithTenantId() throws Exception {
 
     resourceNames.addAll( Arrays.asList("data", "more-data") );
