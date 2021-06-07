@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.rest.dto.repository;
 
 import org.camunda.bpm.engine.repository.*;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,7 @@ public class DeploymentWithDefinitionsDto extends DeploymentDto {
   protected Map<String, CaseDefinitionDto> deployedCaseDefinitions;
   protected Map<String, DecisionDefinitionDto> deployedDecisionDefinitions;
   protected Map<String, DecisionRequirementsDefinitionDto> deployedDecisionRequirementsDefinitions;
+  protected Date activationTime;
 
   public Map<String, ProcessDefinitionDto> getDeployedProcessDefinitions() {
     return deployedProcessDefinitions;
@@ -47,6 +49,12 @@ public class DeploymentWithDefinitionsDto extends DeploymentDto {
   public Map<String, DecisionRequirementsDefinitionDto> getDeployedDecisionRequirementsDefinitions() {
     return deployedDecisionRequirementsDefinitions;
   }
+
+  public Date getActivationTime() { return activationTime; }
+
+  // DB Entity Deployment does not have a suitable attribute which can be mapped
+  public void setActivationTime(Date activationTime) { this.activationTime = activationTime; }
+
 
   public static DeploymentWithDefinitionsDto fromDeployment(DeploymentWithDefinitions deployment) {
     DeploymentWithDefinitionsDto dto = new DeploymentWithDefinitionsDto();
@@ -67,7 +75,7 @@ public class DeploymentWithDefinitionsDto extends DeploymentDto {
       dto.deployedProcessDefinitions = new HashMap<String, ProcessDefinitionDto>();
       for (ProcessDefinition processDefinition : deployedProcessDefinitions) {
         dto.deployedProcessDefinitions
-          .put(processDefinition.getId(), ProcessDefinitionDto.fromProcessDefinition(processDefinition));
+            .put(processDefinition.getId(), ProcessDefinitionDto.fromProcessDefinition(processDefinition));
       }
     }
 
@@ -76,7 +84,7 @@ public class DeploymentWithDefinitionsDto extends DeploymentDto {
       dto.deployedCaseDefinitions = new HashMap<String, CaseDefinitionDto>();
       for (CaseDefinition caseDefinition : deployedCaseDefinitions) {
         dto.deployedCaseDefinitions
-          .put(caseDefinition.getId(), CaseDefinitionDto.fromCaseDefinition(caseDefinition));
+            .put(caseDefinition.getId(), CaseDefinitionDto.fromCaseDefinition(caseDefinition));
       }
     }
 
@@ -85,7 +93,7 @@ public class DeploymentWithDefinitionsDto extends DeploymentDto {
       dto.deployedDecisionDefinitions = new HashMap<String, DecisionDefinitionDto>();
       for (DecisionDefinition decisionDefinition : deployedDecisionDefinitions) {
         dto.deployedDecisionDefinitions
-          .put(decisionDefinition.getId(), DecisionDefinitionDto.fromDecisionDefinition(decisionDefinition));
+            .put(decisionDefinition.getId(), DecisionDefinitionDto.fromDecisionDefinition(decisionDefinition));
       }
     }
 
@@ -94,7 +102,7 @@ public class DeploymentWithDefinitionsDto extends DeploymentDto {
       dto.deployedDecisionRequirementsDefinitions = new HashMap<String, DecisionRequirementsDefinitionDto>();
       for (DecisionRequirementsDefinition drd : deployedDecisionRequirementsDefinitions) {
         dto.deployedDecisionRequirementsDefinitions
-          .put(drd.getId(), DecisionRequirementsDefinitionDto.fromDecisionRequirementsDefinition(drd));
+            .put(drd.getId(), DecisionRequirementsDefinitionDto.fromDecisionRequirementsDefinition(drd));
       }
     }
   }

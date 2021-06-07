@@ -1232,6 +1232,26 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
   }
 
   @Test
+  public void testCreateDeploymentWithDeploymentSourceAndActivationTime() throws Exception {
+
+    resourceNames.addAll( Arrays.asList("data", "more-data") );
+
+    // deploy-changed-only should override enable-duplicate-filtering
+    given()
+        .multiPart("data", "unspecified", createMockDeploymentResourceByteData())
+        .multiPart("enable-duplicate-filtering", "false")
+        .multiPart("deployment-source", "my-deployment-source")
+        .multiPart("deployment-activation-time", "2030-11-11T11:11:11Z")
+        .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .post(CREATE_DEPLOYMENT_URL);
+
+    verify(mockDeploymentBuilder).source("my-deployment-source");
+
+  }
+
+  @Test
   public void testCreateDeploymentWithTenantId() throws Exception {
 
     resourceNames.addAll( Arrays.asList("data", "more-data") );
