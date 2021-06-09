@@ -26,12 +26,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.camunda.bpm.application.ProcessApplicationInterface;
+import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
+import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.container.impl.jboss.util.Tccl;
 import org.camunda.bpm.container.impl.metadata.PropertyHelper;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeploymentBuilder;
 import org.camunda.bpm.engine.repository.ResumePreviousBy;
@@ -171,11 +174,18 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
       Collection<String> resourceNames = deploymentBuilder.getResourceNames();
       if(!resourceNames.isEmpty()) {
         logDeploymentSummary(resourceNames, deploymentName, processApplicationName);
+        ProcessApplicationReference paReference = processApplication.getReference();
         // perform the actual deployment
-        deployment = Tccl.runUnderClassloader(new Tccl.Operation<ProcessApplicationDeployment>() {
+        deployment = Tccl.runUnderClassloader(() -> {
+          try {
+            Context.setCurrentProcessApplication(paReference);
 
-          public ProcessApplicationDeployment run() {
+            // deploy the application
             return deploymentBuilder.deploy();
+
+          } finally {
+            Context.removeCurrentProcessApplication();
+
           }
 
         }, module.getClassLoader());

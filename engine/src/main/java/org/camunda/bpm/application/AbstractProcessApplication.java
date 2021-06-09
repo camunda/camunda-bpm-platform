@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.javax.el.BeanELResolver;
 import org.camunda.bpm.engine.impl.javax.el.ELResolver;
 import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
@@ -62,9 +63,18 @@ public abstract class AbstractProcessApplication implements ProcessApplicationIn
     if (isDeployed) {
       LOG.alreadyDeployed();
     } else {
-      // deploy the application
-      RuntimeContainerDelegate.INSTANCE.get().deployProcessApplication(this);
-      isDeployed = true;
+      try {
+        ProcessApplicationReference reference = getReference();
+        Context.setCurrentProcessApplication(reference);
+
+        // deploy the application
+        RuntimeContainerDelegate.INSTANCE.get().deployProcessApplication(this);
+        isDeployed = true;
+
+      } finally {
+        Context.removeCurrentProcessApplication();
+
+      }
     }
   }
 
