@@ -22,11 +22,12 @@
   <@lib.requestBody
       mediaType = "application/json"
       dto = "CommentDto"
-      requestDesc = "**Note:** Only the `message` property will be used. Every other property passed to this endpoint will be ignored."
+      requestDesc = "**Note:** Only the `message` and `processInstanceId` properties will be used. Every other property passed to this endpoint will be ignored."
       examples = ['"example-1": {
                        "summary": "POST /task/aTaskId/comment/create",
                        "value": {
-                         "message": "a task comment"
+                         "message": "a task comment",
+                         "processInstanceId": 96dc383f-23eb-11e6-8e4a-f6aefe19b687"
                        }
                      }'] />
 
@@ -49,6 +50,7 @@
                          "id": "aTaskCommentId",
                          "userId": "userId",
                          "taskId": "aTaskId",
+                         "processInstanceId": "96dc383f-23eb-11e6-8e4a-f6aefe19b687",
                          "time": "2013-01-02T21:37:03.887+0200",
                          "message": "comment message",
                          "removalTime": "2018-02-10T14:33:19.000+0200",

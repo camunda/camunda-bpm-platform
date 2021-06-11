@@ -83,8 +83,9 @@ public class TaskCommentResourceImpl implements TaskCommentResource {
 
     Comment comment;
 
+    String processInstanceId = commentDto.getProcessInstanceId();
     try {
-      comment = engine.getTaskService().createComment(taskId, null, commentDto.getMessage());
+      comment = engine.getTaskService().createComment(taskId, processInstanceId, commentDto.getMessage());
     }
     catch (ProcessEngineException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, e, "Not enough parameters submitted");
