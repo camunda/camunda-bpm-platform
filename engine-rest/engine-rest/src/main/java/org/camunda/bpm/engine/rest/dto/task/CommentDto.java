@@ -23,13 +23,14 @@ import java.util.Date;
 
 public class CommentDto extends LinkableDto {
 
-  private String id;
-  private String userId;
-  private Date time;
-  private String taskId;
-  private String message;
-  private Date removalTime;
-  private String rootProcessInstanceId;
+  protected String id;
+  protected String userId;
+  protected Date time;
+  protected String taskId;
+  protected String message;
+  protected Date removalTime;
+  protected String rootProcessInstanceId;
+  protected String processInstanceId;
 
   public CommentDto() {
   }
@@ -86,6 +87,14 @@ public class CommentDto extends LinkableDto {
     this.rootProcessInstanceId = rootProcessInstanceId;
   }
 
+  public String getProcessInstanceId() {
+    return this.processInstanceId;
+  }
+
+  public void setProcessInstanceId(String processInstanceId) {
+    this.processInstanceId = processInstanceId;
+  }
+
   public static CommentDto fromComment(Comment comment) {
     CommentDto dto = new CommentDto();
     dto.id = comment.getId();
@@ -95,7 +104,9 @@ public class CommentDto extends LinkableDto {
     dto.message = comment.getFullMessage();
     dto.removalTime = comment.getRemovalTime();
     dto.rootProcessInstanceId = comment.getRootProcessInstanceId();
+    dto.processInstanceId = comment.getProcessInstanceId();
 
     return dto;
   }
+
 }

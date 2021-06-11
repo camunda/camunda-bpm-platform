@@ -2059,6 +2059,7 @@ public class TaskRestServiceInteractionTest extends
       .body("userId", equalTo(EXAMPLE_USER_ID))
       .body("time", equalTo(EXAMPLE_TASK_COMMENT_TIME))
       .body("message", equalTo(EXAMPLE_TASK_COMMENT_FULL_MESSAGE))
+      .body("processInstanceId", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
       .body("removalTime", equalTo(EXAMPLE_TASK_COMMENT_TIME))
       .body("rootProcessInstanceId", equalTo(EXAMPLE_TASK_COMMENT_ROOT_PROCESS_INSTANCE_ID))
     .when()
@@ -2243,6 +2244,32 @@ public class TaskRestServiceInteractionTest extends
       .post(SINGLE_TASK_ADD_COMMENT_URL);
 
     verify(taskServiceMock).createComment(EXAMPLE_TASK_ID, null, EXAMPLE_TASK_COMMENT_FULL_MESSAGE);
+
+    verifyCreatedTaskComment(mockTaskComment, response);
+  }
+
+  @Test
+  public void shouldAssignProcessInstanceIdToComment() {
+    when(taskServiceMock.createComment(EXAMPLE_TASK_ID, EXAMPLE_PROCESS_INSTANCE_ID,
+        EXAMPLE_TASK_COMMENT_FULL_MESSAGE)).thenReturn(mockTaskComment);
+
+    Map<String, Object> json = new HashMap<>();
+    json.put("message", EXAMPLE_TASK_COMMENT_FULL_MESSAGE);
+    json.put("processInstanceId", EXAMPLE_PROCESS_INSTANCE_ID);
+
+    Response response = given()
+        .pathParam("id", EXAMPLE_TASK_ID)
+        .header("accept", MediaType.APPLICATION_JSON)
+        .contentType(ContentType.JSON)
+        .body(json)
+        .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(ContentType.JSON)
+        .when()
+        .post(SINGLE_TASK_ADD_COMMENT_URL);
+
+    verify(taskServiceMock).createComment(EXAMPLE_TASK_ID, EXAMPLE_PROCESS_INSTANCE_ID,
+        EXAMPLE_TASK_COMMENT_FULL_MESSAGE);
 
     verifyCreatedTaskComment(mockTaskComment, response);
   }
@@ -3651,11 +3678,13 @@ public class TaskRestServiceInteractionTest extends
     String returnedId = path.get("id");
     String returnedUserId = path.get("userId");
     String returnedTaskId = path.get("taskId");
+    String returnedProcessInstanceId = path.get("processInstanceId");
     Date returnedTime = DateTimeUtil.parseDate(path.<String>get("time"));
     String returnedFullMessage = path.get("message");
 
     assertEquals(mockTaskComment.getId(), returnedId);
     assertEquals(mockTaskComment.getTaskId(), returnedTaskId);
+    assertEquals(mockTaskComment.getProcessInstanceId(), returnedProcessInstanceId);
     assertEquals(mockTaskComment.getUserId(), returnedUserId);
     assertEquals(mockTaskComment.getTime(), returnedTime);
     assertEquals(mockTaskComment.getFullMessage(), returnedFullMessage);

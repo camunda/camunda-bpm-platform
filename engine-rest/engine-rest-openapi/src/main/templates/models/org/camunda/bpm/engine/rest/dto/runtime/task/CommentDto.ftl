@@ -18,6 +18,11 @@
         desc = "The id of the task to which the comment belongs." />
 
     <@lib.property
+        name = "processInstanceId"
+        type = "string"
+        desc = "The id of the process instance the comment is related to." />
+
+    <@lib.property
         name = "time"
         type = "string"
         format = "date-time"
