@@ -56,7 +56,8 @@ var defaultConfig = {
   csrfCookieName: 'XSRF-TOKEN',
   disableWelcomeMessage: false,
   userOperationLogAnnotationLength: 4000,
-  previewHtml: true
+  previewHtml: true,
+  assignProcessInstanceIdToTaskComment: false
 };
 
 module.exports = function(config, app) {
@@ -200,6 +201,14 @@ module.exports = function(config, app) {
 
       this.getPreviewHtml = function() {
         var param = 'previewHtml';
+        // 'false' is a valid config option
+        return typeof config[param] !== 'undefined'
+          ? config[param]
+          : defaultConfig[param];
+      };
+
+      this.getAssignProcessInstanceIdToTaskComment = function() {
+        var param = 'assignProcessInstanceIdToTaskComment';
         // 'false' is a valid config option
         return typeof config[param] !== 'undefined'
           ? config[param]
