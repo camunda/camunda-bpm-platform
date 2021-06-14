@@ -23,7 +23,8 @@ module.exports = [
   'Notifications',
   'camAPI',
   'task',
-  function($scope, $translate, Notifications, camAPI, task) {
+  'configuration',
+  function($scope, $translate, Notifications, camAPI, task, configuration) {
     var Task = camAPI.resource('task');
 
     $scope.comment = {message: ''};
@@ -46,7 +47,15 @@ module.exports = [
     }
 
     $scope.submit = function() {
-      Task.createComment(task.id, $scope.comment.message, function(err) {
+      let data = {message: $scope.comment.message};
+      if (
+        configuration.getAssignProcessInstanceIdToTaskComment() &&
+        task.processInstanceId
+      ) {
+        data = {...data, processInstanceId: task.processInstanceId};
+      }
+
+      Task.createComment(task.id, data, function(err) {
         if (err) {
           return errorNotification('COMMENT_SAVE_ERROR', err);
         }

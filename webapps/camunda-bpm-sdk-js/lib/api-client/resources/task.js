@@ -229,14 +229,14 @@ Task.identityLinksDelete = function(taskId, params, done) {
  * Create a comment for a task.
  *
  * @param  {String}   taskId  The id of the task to add the comment to.
- * @param  {String}   message The message of the task comment to create.
+ * @param  {Object}   [params]
+ * @param  {String}   [params.message] The message of the task comment to create.
+ * @param  {String}   [params.processInstanceId] The id of the process instance the comment is related to.
  * @param  {Function} done
  */
-Task.createComment = function(taskId, message, done) {
+Task.createComment = function(taskId, params, done) {
   return this.http.post(this.path + '/' + taskId + '/comment/create', {
-    data: {
-      message: message
-    },
+    data: typeof params === 'string' ? {message: params} : params,
     done: done
   });
 };
