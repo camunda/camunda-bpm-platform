@@ -112,6 +112,31 @@ public class ConcurrentJobExecutorTest {
   }
 
   @Test
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/concurrency/SUPPORT-10025/leaf-process.bpmn",
+      "org/camunda/bpm/engine/test/concurrency/SUPPORT-10025/intermediate-process.bpmn",
+      "org/camunda/bpm/engine/test/concurrency/SUPPORT-10025/root-process.bpmn"
+  })
+  public void shouldNotCompactExecution() {
+    String rootProcessInstanceId = runtimeService.startProcessInstanceByKey("root-process").getId();
+    Job currentJob = managementService.createJobQuery().processInstanceId(rootProcessInstanceId).singleResult();
+
+    JobExecutionThread threadOne = new JobExecutionThread(currentJob.getId());
+
+    currentJob = managementService.createJobQuery().processDefinitionKey("leaf-process").singleResult();
+
+    JobExecutionThread threadTwo = new JobExecutionThread(currentJob.getId());
+    threadOne.startAndWaitUntilControlIsReturned();
+    threadTwo.startAndWaitUntilControlIsReturned();
+
+    threadOne.proceedAndWaitTillDone();
+    threadTwo.proceedAndWaitTillDone();
+
+    assertThat(threadOne.exception).isNull();
+    assertThat(threadTwo.exception).isNull();
+  }
+
+  @Test
   public void testCompetingJobExecutionDeleteJobDuringExecution() {
     //given a simple process with a async service task
     testRule.deploy(Bpmn
