@@ -377,7 +377,6 @@
                 <!-- CAM-1778 -->
                 <exclude>**/TestWarDeploymentWithProcessEnginePlugin.java</exclude>
                 <exclude>**/TestWarDeploymentWithProcessEnginePlugin.exclude</exclude>
-                <exclude>**/JavascriptScriptEngineSupportTest.java</exclude>
               </excludes>
               <redirectTestOutputToFile>${redirect.test.output}</redirectTestOutputToFile>
             </configuration>
@@ -492,7 +491,6 @@
                 <exclude>**/BusinessRuleTaskVersionTagTest.java</exclude>
                 <!-- CAM-1778 -->
                 <exludes>**/TestWarDeploymentWithProcessEnginePlugin.java</exludes>
-                <exclude>**/JavascriptScriptEngineSupportTest.java</exclude>
               </excludes>
               <redirectTestOutputToFile>${redirect.test.output}</redirectTestOutputToFile>
             </configuration>

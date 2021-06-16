@@ -24,6 +24,9 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.context.Context;
+
 /**
  * @author Thorben Lindhauer
  *
@@ -32,7 +35,7 @@ public class ScriptEngineResolver {
 
   protected final ScriptEngineManager scriptEngineManager;
 
-  protected Map<String, ScriptEngine> cachedEngines = new HashMap<String, ScriptEngine>();
+  protected Map<String, ScriptEngine> cachedEngines = new HashMap<>();
 
   public ScriptEngineResolver(ScriptEngineManager scriptEngineManager) {
     this.scriptEngineManager = scriptEngineManager;
@@ -60,27 +63,56 @@ public class ScriptEngineResolver {
     if (resolveFromCache) {
       scriptEngine = cachedEngines.get(language);
 
-      if(scriptEngine == null) {
-        scriptEngine = scriptEngineManager.getEngineByName(language);
+      if (scriptEngine == null) {
+        scriptEngine = getScriptEngine(language);
 
-        if(scriptEngine != null) {
-
-          if(ScriptingEngines.GROOVY_SCRIPTING_LANGUAGE.equals(language)) {
-            configureGroovyScriptEngine(scriptEngine);
-          }
-
-          if(isCachable(scriptEngine)) {
-            cachedEngines.put(language, scriptEngine);
-          }
-
+        if (scriptEngine != null && isCachable(scriptEngine)) {
+          cachedEngines.put(language, scriptEngine);
         }
-
       }
 
+    } else {
+      scriptEngine = getScriptEngine(language);
+    }
+
+    return scriptEngine;
+  }
+
+  protected ScriptEngine getScriptEngine(String language) {
+    ScriptEngine scriptEngine = null;
+    if (ScriptingEngines.JAVASCRIPT_SCRIPTING_LANGUAGE.equalsIgnoreCase(language) ||
+        ScriptingEngines.ECMASCRIPT_SCRIPTING_LANGUAGE.equalsIgnoreCase(language)) {
+      scriptEngine = getJavaScriptScriptEngine(language);
     } else {
       scriptEngine = scriptEngineManager.getEngineByName(language);
     }
 
+    if (scriptEngine != null) {
+
+      if (ScriptingEngines.GROOVY_SCRIPTING_LANGUAGE.equals(language)) {
+        configureGroovyScriptEngine(scriptEngine);
+      }
+
+      if (ScriptingEngines.GRAAL_JS_SCRIPT_ENGINE_NAME.equals(scriptEngine.getFactory().getEngineName())) {
+        configureGraalJsScriptEngine(scriptEngine);
+      }
+
+    }
+    return scriptEngine;
+  }
+
+  protected ScriptEngine getJavaScriptScriptEngine(String language) {
+    ScriptEngine scriptEngine = null;
+    ProcessEngineConfigurationImpl config = Context.getProcessEngineConfiguration();
+    if (config != null && config.getScriptEngineNameJavaScript() != null) {
+      scriptEngine = scriptEngineManager.getEngineByName(config.getScriptEngineNameJavaScript());
+    } else {
+      scriptEngine = scriptEngineManager.getEngineByName(ScriptingEngines.DEFAULT_JS_SCRIPTING_LANGUAGE);
+      if (scriptEngine == null) {
+        // default engine is not available, try to fetch any existing JS script engine
+        scriptEngine = scriptEngineManager.getEngineByName(language);
+      }
+    }
     return scriptEngine;
   }
 
@@ -106,5 +138,19 @@ public class ScriptEngineResolver {
     scriptEngine.getContext().setAttribute("#jsr223.groovy.engine.keep.globals", "weak", ScriptContext.ENGINE_SCOPE);
   }
 
+  /**
+   * Allows providing custom configuration for the Graal JS script engine.
+   * @param scriptEngine the Graal JS script engine to configure.
+   */
+  protected void configureGraalJsScriptEngine(ScriptEngine scriptEngine) {
+    // make sure Graal JS can provide access to the host and can lookup classes
+    scriptEngine.getContext().setAttribute("polyglot.js.allowHostAccess", true, ScriptContext.ENGINE_SCOPE);
+    scriptEngine.getContext().setAttribute("polyglot.js.allowHostClassLookup", true, ScriptContext.ENGINE_SCOPE);
+    // make sure Graal JS can load external scripts
+    ProcessEngineConfigurationImpl config = Context.getProcessEngineConfiguration();
+    if (config != null && config.isEnableScriptEngineLoadExternalResources()) {
+      scriptEngine.getContext().setAttribute("polyglot.js.allowIO", true, ScriptContext.ENGINE_SCOPE);
+    }
+  }
 
 }

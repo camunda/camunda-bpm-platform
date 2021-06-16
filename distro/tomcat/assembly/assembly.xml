@@ -43,6 +43,11 @@
         <include>com.fasterxml.uuid:java-uuid-generator:jar:*</include>
         <include>joda-time:joda-time:jar:*</include>
         <include>org.codehaus.groovy:groovy-all:jar:*</include>
+        <include>org.graalvm.js:*</include>
+        <include>org.graalvm.regex:regex:jar:*</include>
+        <include>org.graalvm.truffle:truffle-api:jar:*</include>
+        <include>org.graalvm.sdk:graal-sdk:jar:*</include>
+        <include>com.ibm.icu:icu4j:jar:*</include>
         <include>org.slf4j:slf4j-api:jar:*</include>
         <include>org.slf4j:slf4j-jdk14:jar:*</include>
 
@@ -74,6 +79,11 @@
         <include>com.fasterxml.uuid:java-uuid-generator:jar:*</include>
         <include>joda-time:joda-time:jar:*</include>
         <include>org.codehaus.groovy:groovy-all:jar:*</include>
+        <include>org.graalvm.js:*</include>
+        <include>org.graalvm.regex:regex:jar:*</include>
+        <include>org.graalvm.truffle:truffle-api:jar:*</include>
+        <include>org.graalvm.sdk:graal-sdk:jar:*</include>
+        <include>com.ibm.icu:icu4j:jar:*</include>
         <include>org.slf4j:slf4j-api:jar:*</include>
         <include>org.slf4j:slf4j-jdk14:jar:*</include>
 

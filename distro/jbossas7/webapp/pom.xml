@@ -40,7 +40,7 @@
           <archive>
             <manifestEntries>
               <!-- module dependencies for deployment on AS 7 -->
-              <Dependencies>org.camunda.bpm.camunda-engine,org.camunda.bpm.dmn.camunda-engine-dmn,org.camunda.bpm.model.camunda-bpmn-model,org.camunda.bpm.model.camunda-cmmn-model,org.camunda.bpm.model.camunda-dmn-model,org.camunda.bpm.model.camunda-xml-model,org.camunda.commons.camunda-commons-logging</Dependencies>
+              <Dependencies>org.camunda.bpm.camunda-engine,org.camunda.bpm.dmn.camunda-engine-dmn,org.camunda.bpm.model.camunda-bpmn-model,org.camunda.bpm.model.camunda-cmmn-model,org.camunda.bpm.model.camunda-dmn-model,org.camunda.bpm.model.camunda-xml-model,org.camunda.commons.camunda-commons-logging,org.camunda.spin.camunda-spin-core,org.graalvm.js.js-scriptengine services</Dependencies>
             </manifestEntries>
           </archive>          
         </configuration>

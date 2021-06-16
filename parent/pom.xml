@@ -25,6 +25,7 @@
     <version.resteasy3>3.14.0.Final</version.resteasy3>
     <version.jersey2>2.25.1</version.jersey2>
     <version.groovy>2.4.13</version.groovy>
+    <version.graal.js>21.1.0</version.graal.js>
     <version.gson>2.8.5</version.gson>
     <version.openjpa>2.4.3</version.openjpa>
     <version.hibernate>5.4.18.Final</version.hibernate>
