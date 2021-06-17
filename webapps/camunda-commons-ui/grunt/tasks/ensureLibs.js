@@ -60,15 +60,14 @@ var included = [
   'dmn-js/lib/Modeler'
 ];
 
-
 module.exports = function(grunt, dirname, licensebookConfig) {
   grunt.registerMultiTask('ensureLibs', function() {
-
     var done = this.async();
 
     var browserifyOptions = {
       transform: [
-        ['envify',
+        [
+          'envify',
           {
             global: true,
             NODE_ENV: 'production'
@@ -85,7 +84,7 @@ module.exports = function(grunt, dirname, licensebookConfig) {
                 '@babel/preset-env',
                 {
                   targets:
-                  'last 1 chrome version, last 1 firefox version, last 1 edge version',
+                    'last 1 chrome version, last 1 firefox version, last 1 edge version',
                   forceAllTransforms: true,
                   useBuiltIns: 'usage',
                   corejs: 3
@@ -93,7 +92,8 @@ module.exports = function(grunt, dirname, licensebookConfig) {
               ]
             ]
           }
-        ]],
+        ]
+      ],
       paths: [
         'node_modules',
         'node_modules/camunda-bpm-webapp',
@@ -110,56 +110,65 @@ module.exports = function(grunt, dirname, licensebookConfig) {
     var dest = __dirname + '/../../cache/deps.js';
     var cacheDest = __dirname + '/../../cache/deps.json';
 
-    var b = require(dirname + '/node_modules/persistify')( browserifyOptions, persistifyOptions );
-
+    var b = require(dirname + '/node_modules/persistify')(
+      browserifyOptions,
+      persistifyOptions
+    );
 
     const includedFiles = licensebookConfig.includedFiles;
-    if(licensebookConfig.enabled) {
-      b.pipeline.get("deps").push(through.obj(function(row, enc, next) {
-        includedFiles.add(row.file);
-        this.push(row);
-        next();
-      }));
+    if (licensebookConfig.enabled) {
+      b.pipeline.get('deps').push(
+        through.obj(function(row, enc, next) {
+          includedFiles.add(row.file);
+          this.push(row);
+          next();
+        })
+      );
     }
 
     var cacheData = {};
 
-    for(var i = 0; i < included.length; i++) {
+    for (var i = 0; i < included.length; i++) {
       // Non-linked path
-      includedFiles.add(__dirname + '/../../../../../node_modules/' + included[i] + '/index.js');
+      includedFiles.add(
+        './node_modules/camunda-bpm-webapp/node_modules/' +
+          included[i] +
+          '/index.js'
+      );
 
       b.require(included[i]);
       cacheData[included[i]] = 'no idea ¯\\_(ツ)_/¯';
     }
 
     fs.readFile(cacheDest, 'utf8', function(err, previousCache) {
-      if(!err && JSON.stringify(cacheData, null, '  ') === previousCache) {
-        if (!licensebookConfig.enabled) {   
+      if (!err && JSON.stringify(cacheData, null, '  ') === previousCache) {
+        if (!licensebookConfig.enabled) {
           console.log('everything up to date');
           done();
           return;
         }
-       }
+      }
 
-      b.on( 'bundle:done', function( time ) {
+      b.on('bundle:done', function(time) {
         console.log(dest + ' written in ' + time + 'ms');
-      } );
+      });
 
-      b.on( 'error', function( err ) {
-        console.log( 'error', err );
-      } );
+      b.on('error', function(err) {
+        console.log('error', err);
+      });
 
       function doBundle(cb) {
-        b.bundle( function( err, buff ) {
-          if ( err ) {
+        b.bundle(function(err, buff) {
+          if (err) {
             throw err;
           }
-          require(dirname + '/node_modules/mkdirp')(dest.substr(0, dest.lastIndexOf('/')), function(err) {
-            if(err) {
+          require(dirname +
+            '/node_modules/mkdirp')(dest.substr(0, dest.lastIndexOf('/')), function(err) {
+            if (err) {
               throw err;
             }
-            fs.writeFileSync( dest, buff.toString() );
-            fs.writeFileSync( cacheDest, JSON.stringify(cacheData, null, '  '));
+            fs.writeFileSync(dest, buff.toString());
+            fs.writeFileSync(cacheDest, JSON.stringify(cacheData, null, '  '));
             done();
           });
         });
