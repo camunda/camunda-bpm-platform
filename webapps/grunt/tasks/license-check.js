@@ -44,7 +44,9 @@ const ALLOWED_PACKAGES = [
   'desired-capabilities@0.1.0', // uses the CC0, but has wrong license field
   'jsonify@0.0.0', // uses the unlicense, but has wrong license field
   'map-stream@0.1.0', // uses the MIT, but has wrong license field
-  'stackframe@0.3.1' // uses the MIT, but has wrong license field
+  'stackframe@0.3.1', // uses the MIT, but has wrong license field
+  'argparse@2.0.1',
+  'jetpack-id@1.0.0'
 ];
 
 const parseResults = (ALLOWED_LICENSES, resolve, reject) =>

@@ -31,7 +31,11 @@ function PieChart(options, $translate) {
   this.lineWidth = options.lineWidth || 1;
 
   this.missingData = [
-    {color: '#959595', label: $translate.instant('PIE_CHART_NO_DATA'), value: 1}
+    {
+      color: '#959595',
+      label: $translate.instant('PIE_CHART_NO_DATA'),
+      value: 1
+    }
   ];
 
   this.setData(this.missingData);
@@ -219,6 +223,7 @@ module.exports = [
           );
           pieChart.resize(container.clientWidth, height).draw();
         }
+
         resize();
 
         var _resize = throttle(resize, 100);

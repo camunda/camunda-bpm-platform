@@ -31,8 +31,8 @@ module.exports = function(ngModule, appRoot, appName) {
       return function(options) {
         if (
           !options ||
-          (!angular.isString(options.prefix) ||
-            !angular.isString(options.suffix))
+          !angular.isString(options.prefix) ||
+          !angular.isString(options.suffix)
         ) {
           throw new Error(
             "Couldn't load static files, no prefix or suffix specified!"

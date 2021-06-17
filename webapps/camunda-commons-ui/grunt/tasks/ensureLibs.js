@@ -162,15 +162,22 @@ module.exports = function(grunt, dirname, licensebookConfig) {
           if (err) {
             throw err;
           }
-          require(dirname +
-            '/node_modules/mkdirp')(dest.substr(0, dest.lastIndexOf('/')), function(err) {
-            if (err) {
-              throw err;
-            }
-            fs.writeFileSync(dest, buff.toString());
-            fs.writeFileSync(cacheDest, JSON.stringify(cacheData, null, '  '));
-            done();
-          });
+          require(dirname + '/node_modules/mkdirp')(
+            dest.substr(0, dest.lastIndexOf('/'))
+          )
+            .then(() => {
+              fs.writeFileSync(dest, buff.toString());
+              fs.writeFileSync(
+                cacheDest,
+                JSON.stringify(cacheData, null, '  ')
+              );
+              done();
+            })
+            .catch(err => {
+              if (err) {
+                throw err;
+              }
+            });
         });
       }
 

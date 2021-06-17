@@ -18,7 +18,7 @@
 'use strict';
 
 var angular = require('../../../camunda-bpm-sdk-js/vendor/angular');
-var CamSDK = require('camunda-bpm-sdk-js/lib/angularjs/index');
+var CamSDK = require('../../../camunda-bpm-sdk-js/lib/angularjs/index');
 
 module.exports = [
   '$rootScope',
