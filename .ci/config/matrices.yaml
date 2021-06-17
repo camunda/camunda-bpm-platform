@@ -90,6 +90,7 @@ jdk-ce-stages:
   - 'platform-jdk-openjdk-jdk-12-latest'
   - 'platform-jdk-openjdk-jdk-11-latest'
   - 'platform-jdk-openjdk-jdk-8-latest'
+  - 'platform-jdk-jdk-15-latest'
   - 'platform-jdk-jdk-14-latest'
   - 'platform-jdk-jdk-13-latest'
   - 'platform-jdk-jdk-12-latest'
