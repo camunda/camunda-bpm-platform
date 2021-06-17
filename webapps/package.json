@@ -50,7 +50,7 @@
     "dmn-js-literal-expression": "10.0.0",
     "dmn-js-shared": "10.0.0",
     "dom4": "2.1.6",
-    "events": "3.0.0",
+    "events": "3.3.0",
     "fast-xml-parser": "3.17.6",
     "jquery": "3.5.1",
     "jquery-ui": "1.12.1",
