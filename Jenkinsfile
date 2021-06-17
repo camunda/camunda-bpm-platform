@@ -28,6 +28,10 @@ pipeline {
           env.BRANCH_NAME == cambpmDefaultBranch() || (changeRequest() && !pullRequest.labels.contains('no-build'))
         }
       }
+      environment {
+        NEXUS_SNAPSHOT_REPOSITORY = cambpmConfig.nexusSnapshotRepository()
+        NEXUS_SNAPSHOT_REPOSITORY_ID = cambpmConfig.nexusSnapshotRepositoryId()
+      }
       steps {
         cambpmConditionalRetry([
           agentLabel: 'h2_perf32',
