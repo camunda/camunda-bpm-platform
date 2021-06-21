@@ -315,9 +315,12 @@ public abstract class SpinJsonNode extends Spin<SpinJsonNode> {
 
   /**
    * Get this node as list.
+   * If the current node is an array, this method returns a {@link SpinList} which contains copies of all
+   * JSON nodes contained in the current node. Changes to the the elements in the list will not propagate
+   * to the original nodes.
    *
    * @return the list value of this node
-   * @throws SpinDataFormatException if this node is not a array value
+   * @throws SpinDataFormatException if this node is not an array
    */
   public abstract SpinList<SpinJsonNode> elements();
 
