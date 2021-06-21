@@ -588,9 +588,6 @@
 
     <profile>
       <id>h2-in-memory</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
       <properties>
         <forkCount>0.5C</forkCount>
       </properties>
