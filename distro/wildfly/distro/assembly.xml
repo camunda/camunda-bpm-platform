@@ -24,11 +24,6 @@
     <dependencySet>
       <outputDirectory />
       <unpack>true</unpack>
-      <unpackOptions>
-        <includes>
-          <include>**/*.sql</include>
-        </includes>
-      </unpackOptions>
       <includes>
         <include>org.camunda.bpm.distro:camunda-sql-scripts:jar:*</include>
       </includes>
