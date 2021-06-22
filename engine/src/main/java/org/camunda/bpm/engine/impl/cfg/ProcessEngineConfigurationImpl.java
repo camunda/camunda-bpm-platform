@@ -585,6 +585,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected boolean enableScriptEngineCaching = true;
   protected boolean enableFetchScriptEngineFromProcessApplication = true;
   protected boolean enableScriptEngineLoadExternalResources = false;
+  protected boolean configureScriptEngineHostAccess = true;
 
   /**
    * When set to false, the following behavior changes:
@@ -4247,6 +4248,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfigurationImpl setEnableScriptEngineLoadExternalResources(boolean enableScriptEngineLoadExternalResources) {
     this.enableScriptEngineLoadExternalResources = enableScriptEngineLoadExternalResources;
+    return this;
+  }
+
+  public boolean isConfigureScriptEngineHostAccess() {
+    return configureScriptEngineHostAccess;
+  }
+
+  public ProcessEngineConfigurationImpl setConfigureScriptEngineHostAccess(boolean configureScriptEngineHostAccess) {
+    this.configureScriptEngineHostAccess = configureScriptEngineHostAccess;
     return this;
   }
 

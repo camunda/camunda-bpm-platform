@@ -143,13 +143,17 @@ public class ScriptEngineResolver {
    * @param scriptEngine the Graal JS script engine to configure.
    */
   protected void configureGraalJsScriptEngine(ScriptEngine scriptEngine) {
-    // make sure Graal JS can provide access to the host and can lookup classes
-    scriptEngine.getContext().setAttribute("polyglot.js.allowHostAccess", true, ScriptContext.ENGINE_SCOPE);
-    scriptEngine.getContext().setAttribute("polyglot.js.allowHostClassLookup", true, ScriptContext.ENGINE_SCOPE);
-    // make sure Graal JS can load external scripts
     ProcessEngineConfigurationImpl config = Context.getProcessEngineConfiguration();
-    if (config != null && config.isEnableScriptEngineLoadExternalResources()) {
-      scriptEngine.getContext().setAttribute("polyglot.js.allowIO", true, ScriptContext.ENGINE_SCOPE);
+    if (config != null) {
+      if (config.isConfigureScriptEngineHostAccess()) {
+        // make sure Graal JS can provide access to the host and can lookup classes
+        scriptEngine.getContext().setAttribute("polyglot.js.allowHostAccess", true, ScriptContext.ENGINE_SCOPE);
+        scriptEngine.getContext().setAttribute("polyglot.js.allowHostClassLookup", true, ScriptContext.ENGINE_SCOPE);
+      }
+      if (config.isEnableScriptEngineLoadExternalResources()) {
+        // make sure Graal JS can load external scripts
+        scriptEngine.getContext().setAttribute("polyglot.js.allowIO", true, ScriptContext.ENGINE_SCOPE);
+      }
     }
   }
 
