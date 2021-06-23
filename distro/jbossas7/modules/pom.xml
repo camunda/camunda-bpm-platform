@@ -235,6 +235,14 @@
                   <include name="**/module.xml" />
                 </replace>
 
+                <replace dir="target/modules" token="@version.graal.js@" value="${version.graal.js}">
+                  <include name="**/module.xml" />
+                </replace>
+
+                <replace dir="target/modules" token="@version.icu.icu4j@" value="${version.icu.icu4j}">
+                  <include name="**/module.xml" />
+                </replace>
+
               </target>
             </configuration>
           </execution>
