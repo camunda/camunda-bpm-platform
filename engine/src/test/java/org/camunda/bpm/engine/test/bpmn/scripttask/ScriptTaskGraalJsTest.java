@@ -21,15 +21,80 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 
-import org.camunda.bpm.engine.ScriptEvaluationException;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.junit.Test;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 
+import org.camunda.bpm.engine.ScriptEvaluationException;
+import org.camunda.bpm.engine.impl.scripting.engine.ScriptBindingsFactory;
+import org.camunda.bpm.engine.impl.scripting.engine.ScriptEngineResolver;
+import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
+import org.camunda.bpm.engine.impl.scripting.env.ScriptingEnvironment;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
+
+import com.oracle.truffle.js.scriptengine.GraalJSEngineFactory;
+import com.oracle.truffle.js.scriptengine.GraalJSScriptEngine;
+
+@RunWith(Parameterized.class)
 public class ScriptTaskGraalJsTest extends AbstractScriptTaskTest {
 
   private static final String GRAALJS = "graal.js";
+
+  protected ScriptingEnvironment defaultScriptingEnvironment;
+
+  @Before
+  public void setup() {
+    defaultScriptingEnvironment = processEngineConfiguration.getScriptingEnvironment();
+    processEngineConfiguration.setConfigureScriptEngineHostAccess(configureHostAccess);
+    processEngineConfiguration.setEnableScriptEngineLoadExternalResources(enableExternalResources);
+    processEngineConfiguration.setEnableScriptEngineNashornCompatibility(enableNashornCompat);
+    // create custom script engine lookup to receive a fresh GraalVM JavaScript engine
+    ScriptingEngines customScriptingEngines = new TestScriptingEngines(new ScriptBindingsFactory(processEngineConfiguration.getResolverFactories()));
+    customScriptingEngines.setEnableScriptEngineCaching(processEngineConfiguration.isEnableScriptEngineCaching());
+    processEngineConfiguration.setScriptingEnvironment(new ScriptingEnvironment(processEngineConfiguration.getScriptFactory(),
+        processEngineConfiguration.getEnvScriptResolvers(), customScriptingEngines));
+  }
+
+  @After
+  public void resetConfiguration() {
+    processEngineConfiguration.setConfigureScriptEngineHostAccess(true);
+    processEngineConfiguration.setEnableScriptEngineNashornCompatibility(false);
+    processEngineConfiguration.setEnableScriptEngineLoadExternalResources(false);
+    processEngineConfiguration.setScriptingEnvironment(defaultScriptingEnvironment);
+  }
+
+  @Parameters
+  public static Collection<Object[]> setups() {
+    return Arrays.asList(new Object[][] {
+      {false, false, false},
+      {true, false, false},
+      {false, true, false},
+      {false, false, true},
+      {true, true, false},
+      {true, false, true},
+      {false, true, true},
+      {true, true, true},
+    });
+  }
+
+  @Parameter(0)
+  public boolean configureHostAccess;
+
+  @Parameter(1)
+  public boolean enableExternalResources;
+
+  @Parameter(2)
+  public boolean enableNashornCompat;
 
   @Test
   public void testJavascriptProcessVarVisibility() {
@@ -64,16 +129,25 @@ public class ScriptTaskGraalJsTest extends AbstractScriptTaskTest {
 
     );
 
-    // GIVEN
-    // that we start an instance of this process
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
+    if (enableNashornCompat || configureHostAccess) {
+      // WHEN
+      // we start an instance of this process
+      ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
 
-    // THEN
-    // the script task can be executed without exceptions
-    // the execution variable is stored and has the correct value
-    Object variableValue = runtimeService.getVariable(pi.getId(), "foo");
-    assertEquals("a", variableValue);
-
+      // THEN
+      // the script task can be executed without exceptions
+      // the execution variable is stored and has the correct value
+      Object variableValue = runtimeService.getVariable(pi.getId(), "foo");
+      assertEquals("a", variableValue);
+    } else {
+      // WHEN
+      // we start an instance of this process
+      assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("testProcess"))
+      // THEN
+      // this is not allowed in the JS ScriptEngine
+        .isInstanceOf(ScriptEvaluationException.class)
+        .hasMessageContaining("TypeError");
+    }
   }
 
   @Test
@@ -95,14 +169,24 @@ public class ScriptTaskGraalJsTest extends AbstractScriptTaskTest {
 
     );
 
-    // GIVEN
-    // that we start an instance of this process
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
+    if (enableNashornCompat || configureHostAccess) {
+      // WHEN
+      // we start an instance of this process
+      ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
 
-    // THEN
-    // the variable is defined
-    Object variable = runtimeService.getVariable(pi.getId(), "foo");
-    assertThat(variable).isIn(3, 3.0);
+      // THEN
+      // the variable is defined
+      Object variable = runtimeService.getVariable(pi.getId(), "foo");
+      assertThat(variable).isIn(3, 3.0);
+    } else {
+      // WHEN
+      // we start an instance of this process
+      assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("testProcess"))
+      // THEN
+      // this is not allowed in the JS ScriptEngine
+        .isInstanceOf(ScriptEvaluationException.class)
+        .hasMessageContaining("TypeError");
+    }
 
   }
 
@@ -121,29 +205,36 @@ public class ScriptTaskGraalJsTest extends AbstractScriptTaskTest {
 
   @Test
   public void testJavascriptVariableSerialization() {
-    deployProcess(GRAALJS, "execution.setVariable('date', new java.util.Date(0));");
+    deployProcess(GRAALJS,
+        // GIVEN
+        // setting Java classes as variables
+        "execution.setVariable('date', new java.util.Date(0));"
+      + "execution.setVariable('myVar', new org.camunda.bpm.engine.test.bpmn.scripttask.MySerializable('test'));");
 
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
+    if (enableNashornCompat || configureHostAccess) {
+      // WHEN
+      ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
 
-    Date date = (Date) runtimeService.getVariable(pi.getId(), "date");
-    assertEquals(0, date.getTime());
-
-    deployProcess(GRAALJS, "execution.setVariable('myVar', new org.camunda.bpm.engine.test.bpmn.scripttask.MySerializable('test'));");
-
-    pi = runtimeService.startProcessInstanceByKey("testProcess");
-
-    MySerializable myVar = (MySerializable) runtimeService.getVariable(pi.getId(), "myVar");
-    assertEquals("test", myVar.getName());
+      // THEN
+      Date date = (Date) runtimeService.getVariable(pi.getId(), "date");
+      assertEquals(0, date.getTime());
+      MySerializable myVar = (MySerializable) runtimeService.getVariable(pi.getId(), "myVar");
+      assertEquals("test", myVar.getName());
+    } else {
+      // WHEN
+      // we start an instance of this process
+      assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("testProcess"))
+      // THEN
+      // this is not allowed in the JS ScriptEngine
+        .isInstanceOf(ScriptEvaluationException.class)
+        .hasMessageContaining("ReferenceError");
+    }
   }
 
   @Test
   public void shouldLoadExternalScript() {
-    try {
       // GIVEN
       // an external JS file with a function
-      // and external file loading being allowed
-      processEngineConfiguration.setEnableScriptEngineLoadExternalResources(true);
-
       deployProcess(GRAALJS,
           // WHEN
           // we load a function from an external file
@@ -153,37 +244,56 @@ public class ScriptTaskGraalJsTest extends AbstractScriptTaskTest {
         + "execution.setVariable('foo', sum(3, 4));"
       );
 
-      // WHEN
-      // we start an instance of this process
-      ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
+      if (enableNashornCompat || (enableExternalResources && configureHostAccess)) {
+        // WHEN
+        // we start an instance of this process
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
 
-      // THEN
-      // the script task can be executed without exceptions
-      // the execution variable is stored and has the correct value
-      Object variableValue = runtimeService.getVariable(pi.getId(), "foo");
-      assertEquals(7, variableValue);
-    } finally {
-      processEngineConfiguration.setEnableScriptEngineLoadExternalResources(false);
-    }
+        // THEN
+        // the script task can be executed without exceptions
+        // the execution variable is stored and has the correct value
+        Object variableValue = runtimeService.getVariable(pi.getId(), "foo");
+        assertEquals(7, variableValue);
+      } else {
+        // WHEN
+        // we start an instance of this process
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("testProcess"))
+        // THEN
+        // this is not allowed in the JS ScriptEngine
+          .isInstanceOf(ScriptEvaluationException.class)
+          .hasMessageContaining(enableExternalResources && !configureHostAccess ? "TypeError" : "Operation is not allowed");
+      }
   }
 
-  @Test
-  public void shouldFailOnLoadExternalScriptIfNotEnabled() {
-    // GIVEN
-    // an external JS file with a function
-    deployProcess(GRAALJS,
-        // WHEN
-        // we load a function from an external file
-        "load(\"" + getNormalizedResourcePath("/org/camunda/bpm/engine/test/bpmn/scripttask/sum.js") + "\");"
-    );
+  protected static class TestScriptingEngines extends ScriptingEngines {
 
-    // WHEN
-    // we start an instance of this process
-    assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("testProcess"))
-    // THEN
-    // this is not allowed in the JS ScriptEngine
-      .isInstanceOf(ScriptEvaluationException.class)
-      .hasMessageContaining("Operation is not allowed");
+    public TestScriptingEngines(ScriptBindingsFactory scriptBindingsFactory) {
+      this(new ScriptEngineManager());
+      this.scriptBindingsFactory = scriptBindingsFactory;
+    }
+
+    public TestScriptingEngines(ScriptEngineManager scriptEngineManager) {
+      super(scriptEngineManager);
+      this.scriptEngineResolver = new TestScriptEngineResolver(scriptEngineManager);
+    }
+
+  }
+
+  protected static class TestScriptEngineResolver extends ScriptEngineResolver {
+
+    public TestScriptEngineResolver(ScriptEngineManager scriptEngineManager) {
+      super(scriptEngineManager);
+    }
+
+    @Override
+    protected ScriptEngine getScriptEngine(String language) {
+      if (GRAALJS.equalsIgnoreCase(language)) {
+        GraalJSScriptEngine scriptEngine = new GraalJSEngineFactory().getScriptEngine();
+        configureGraalJsScriptEngine(scriptEngine);
+        return scriptEngine;
+      }
+      return super.getScriptEngine(language);
+    }
   }
 
 }

@@ -585,6 +585,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected boolean enableScriptEngineCaching = true;
   protected boolean enableFetchScriptEngineFromProcessApplication = true;
   protected boolean enableScriptEngineLoadExternalResources = false;
+  protected boolean enableScriptEngineNashornCompatibility = false;
   protected boolean configureScriptEngineHostAccess = true;
 
   /**
@@ -4248,6 +4249,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfigurationImpl setEnableScriptEngineLoadExternalResources(boolean enableScriptEngineLoadExternalResources) {
     this.enableScriptEngineLoadExternalResources = enableScriptEngineLoadExternalResources;
+    return this;
+  }
+
+  public boolean isEnableScriptEngineNashornCompatibility() {
+    return enableScriptEngineNashornCompatibility;
+  }
+
+  public ProcessEngineConfigurationImpl setEnableScriptEngineNashornCompatibility(boolean enableScriptEngineNashornCompatibility) {
+    this.enableScriptEngineNashornCompatibility = enableScriptEngineNashornCompatibility;
     return this;
   }
 

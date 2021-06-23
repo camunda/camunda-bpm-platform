@@ -154,6 +154,10 @@ public class ScriptEngineResolver {
         // make sure Graal JS can load external scripts
         scriptEngine.getContext().setAttribute("polyglot.js.allowIO", true, ScriptContext.ENGINE_SCOPE);
       }
+      if (config.isEnableScriptEngineNashornCompatibility()) {
+        // enable Nashorn compatibility mode
+        scriptEngine.getContext().setAttribute("polyglot.js.nashorn-compat", true, ScriptContext.ENGINE_SCOPE);
+      }
     }
   }
 
