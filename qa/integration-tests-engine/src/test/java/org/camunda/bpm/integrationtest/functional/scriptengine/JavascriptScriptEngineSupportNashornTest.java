@@ -19,9 +19,6 @@ package org.camunda.bpm.integrationtest.functional.scriptengine;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 
-/**
- * @author Sebastian Menski
- */
 public class JavascriptScriptEngineSupportNashornTest extends AbstractScriptEngineSupportTest {
 
   @Deployment
