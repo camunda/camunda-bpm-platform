@@ -21,7 +21,11 @@ pipeline {
   }
   options {
     buildDiscarder(logRotator(numToKeepStr: '5'))
-    disableConcurrentBuilds() // TODO https://jira.camunda.com/browse/CAM-13403
+    throttleJobProperty(
+      throttleEnabled: true,
+      throttleOption: 'category',
+      categories: ['restrictedConcurrency']
+    )
   }
   triggers {
     pollSCM('H H(0-3) * * *') // CE daily runs after EE daily and Sidetrack daily
