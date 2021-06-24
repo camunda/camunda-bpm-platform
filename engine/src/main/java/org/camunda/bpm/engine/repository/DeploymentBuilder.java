@@ -252,11 +252,6 @@ public interface DeploymentBuilder {
   Collection<String> getResourceNames();
 
   /**
-   *  @return the activation date for the deployment which was added to this builder.
-   */
-  public Date getProcessDefinitionsActivationDate();
-
-  /**
    * Sets the tenant id of a deployment.
    */
   DeploymentBuilder tenantId(String tenantId);
