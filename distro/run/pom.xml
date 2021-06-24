@@ -25,6 +25,17 @@
         <scope>import</scope>
         <type>pom</type>
       </dependency>
+      
+      <dependency>
+        <groupId>org.graalvm.js</groupId>
+        <artifactId>js</artifactId>
+        <version>${version.graal.js}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.graalvm.js</groupId>
+        <artifactId>js-scriptengine</artifactId>
+        <version>${version.graal.js}</version>
+      </dependency>
 
     </dependencies>
   </dependencyManagement>

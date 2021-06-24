@@ -83,6 +83,15 @@
       <groupId>org.codehaus.groovy</groupId>
       <artifactId>groovy-all</artifactId>
     </dependency>
+    
+    <dependency>
+      <groupId>org.graalvm.js</groupId>
+      <artifactId>js</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.graalvm.js</groupId>
+      <artifactId>js-scriptengine</artifactId>
+    </dependency>
 
     <!-- template engine dependencies -->
     <dependency>
@@ -281,6 +290,14 @@
                 </replace>
 
                 <replace dir="target/modules" token="@version.feel-scala@" value="${version.feel-scala}">
+                  <include name="**/module.xml" />
+                </replace>
+
+                <replace dir="target/modules" token="@version.graal.js@" value="${version.graal.js}">
+                  <include name="**/module.xml" />
+                </replace>
+
+                <replace dir="target/modules" token="@version.icu.icu4j@" value="${version.icu.icu4j}">
                   <include name="**/module.xml" />
                 </replace>
 

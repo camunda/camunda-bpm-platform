@@ -53,6 +53,11 @@ public class ScriptingEngines implements DmnScriptEngineResolver {
 
   public static final String DEFAULT_SCRIPTING_LANGUAGE = "juel";
   public static final String GROOVY_SCRIPTING_LANGUAGE = "groovy";
+  public static final String JAVASCRIPT_SCRIPTING_LANGUAGE = "javascript";
+  public static final String ECMASCRIPT_SCRIPTING_LANGUAGE = "ecmascript";
+
+  public static final String GRAAL_JS_SCRIPT_ENGINE_NAME = "Graal.js";
+  public static final String DEFAULT_JS_SCRIPTING_LANGUAGE = GRAAL_JS_SCRIPT_ENGINE_NAME;
 
   protected ScriptEngineResolver scriptEngineResolver;
   protected ScriptBindingsFactory scriptBindingsFactory;

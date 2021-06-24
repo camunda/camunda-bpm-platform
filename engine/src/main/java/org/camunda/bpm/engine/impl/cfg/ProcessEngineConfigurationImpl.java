@@ -579,10 +579,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected ScriptingEnvironment scriptingEnvironment;
   protected List<ScriptEnvResolver> scriptEnvResolvers;
   protected ScriptFactory scriptFactory;
+  protected String scriptEngineNameJavaScript;
   protected boolean autoStoreScriptVariables = false;
   protected boolean enableScriptCompilation = true;
   protected boolean enableScriptEngineCaching = true;
   protected boolean enableFetchScriptEngineFromProcessApplication = true;
+  protected boolean enableScriptEngineLoadExternalResources = false;
+  protected boolean enableScriptEngineNashornCompatibility = false;
+  protected boolean configureScriptEngineHostAccess = true;
 
   /**
    * When set to false, the following behavior changes:
@@ -4043,6 +4047,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.scriptEnvResolvers = scriptEnvResolvers;
   }
 
+  public String getScriptEngineNameJavaScript() {
+    return scriptEngineNameJavaScript;
+  }
+
+  public ProcessEngineConfigurationImpl setScriptEngineNameJavaScript(String scriptEngineNameJavaScript) {
+    this.scriptEngineNameJavaScript = scriptEngineNameJavaScript;
+    return this;
+  }
+
   public ProcessEngineConfiguration setArtifactFactory(ArtifactFactory artifactFactory) {
     this.artifactFactory = artifactFactory;
     return this;
@@ -4227,6 +4240,33 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfigurationImpl setEnableFetchScriptEngineFromProcessApplication(boolean enable) {
     this.enableFetchScriptEngineFromProcessApplication = enable;
+    return this;
+  }
+
+  public boolean isEnableScriptEngineLoadExternalResources() {
+    return enableScriptEngineLoadExternalResources;
+  }
+
+  public ProcessEngineConfigurationImpl setEnableScriptEngineLoadExternalResources(boolean enableScriptEngineLoadExternalResources) {
+    this.enableScriptEngineLoadExternalResources = enableScriptEngineLoadExternalResources;
+    return this;
+  }
+
+  public boolean isEnableScriptEngineNashornCompatibility() {
+    return enableScriptEngineNashornCompatibility;
+  }
+
+  public ProcessEngineConfigurationImpl setEnableScriptEngineNashornCompatibility(boolean enableScriptEngineNashornCompatibility) {
+    this.enableScriptEngineNashornCompatibility = enableScriptEngineNashornCompatibility;
+    return this;
+  }
+
+  public boolean isConfigureScriptEngineHostAccess() {
+    return configureScriptEngineHostAccess;
+  }
+
+  public ProcessEngineConfigurationImpl setConfigureScriptEngineHostAccess(boolean configureScriptEngineHostAccess) {
+    this.configureScriptEngineHostAccess = configureScriptEngineHostAccess;
     return this;
   }
 
