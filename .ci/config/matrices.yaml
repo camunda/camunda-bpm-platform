@@ -85,6 +85,7 @@ sidetrack-stages:
   - 'large-data-tests'
 jdk-ce-stages:
   stages:
+  - 'platform-jdk-openjdk-jdk-15-latest'
   - 'platform-jdk-openjdk-jdk-14-latest'
   - 'platform-jdk-openjdk-jdk-13-latest'
   - 'platform-jdk-openjdk-jdk-12-latest'
