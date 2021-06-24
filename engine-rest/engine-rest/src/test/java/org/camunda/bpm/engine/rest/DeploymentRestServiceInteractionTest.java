@@ -1247,7 +1247,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
         .when()
         .post(CREATE_DEPLOYMENT_URL);
 
-    verify(mockDeploymentBuilder).source("my-deployment-source");
+    verify(mockDeploymentBuilder).activateProcessDefinitionsOn(DateTimeUtil.parseDate("2030-11-11T11:11:11Z"));
 
   }
 
