@@ -18,4 +18,4 @@
 /**
  * Bind the Spin S function to the variable S.
  */
-var S = org.camunda.spin.Spin.S;
+var S = Java.type('org.camunda.spin.Spin').S;

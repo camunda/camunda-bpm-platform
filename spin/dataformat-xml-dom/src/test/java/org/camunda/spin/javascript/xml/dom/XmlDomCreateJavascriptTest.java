@@ -23,7 +23,7 @@ import org.camunda.spin.xml.dom.XmlDomCreateScriptTest;
  * @author Daniel Meyer
  *
  */
-@ScriptEngine("javascript")
+@ScriptEngine("graal.js")
 public class XmlDomCreateJavascriptTest extends XmlDomCreateScriptTest {
 
 }

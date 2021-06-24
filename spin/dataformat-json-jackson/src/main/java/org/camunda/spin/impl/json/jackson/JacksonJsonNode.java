@@ -232,6 +232,10 @@ public class JacksonJsonNode extends SpinJsonNode {
     return this;
   }
 
+  public SpinJsonNode propList(String name, List<Object> newProperty) {
+    return prop(name, newProperty);
+  }
+
   public SpinJsonNode prop(String name, Map<String, Object> newProperty) {
     ObjectNode node = (ObjectNode) jsonNode;
 

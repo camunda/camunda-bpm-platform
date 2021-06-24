@@ -23,7 +23,7 @@ import org.camunda.spin.json.tree.JsonTreeRemovePropertyScriptTest;
  * @author Thorben Lindhauer
  *
  */
-@ScriptEngine("javascript")
+@ScriptEngine("graal.js")
 public class JsonTreeRemovePropertyJavascriptTest extends JsonTreeRemovePropertyScriptTest {
 
 }

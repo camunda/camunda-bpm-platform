@@ -25,7 +25,7 @@ import org.junit.Test;
  * @author Stefan Hentschel
  *
  */
-@ScriptEngine("javascript")
+@ScriptEngine("graal.js")
 public class JsonTreeEditListPropertyJavascriptTest extends JsonTreeEditListPropertyScriptTest {
 
   /**

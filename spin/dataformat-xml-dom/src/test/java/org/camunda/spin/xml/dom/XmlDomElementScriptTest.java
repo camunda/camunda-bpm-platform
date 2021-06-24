@@ -16,6 +16,18 @@
  */
 package org.camunda.spin.xml.dom;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+import static org.camunda.spin.Spin.S;
+import static org.camunda.spin.Spin.XML;
+import static org.camunda.spin.xml.XmlTestConstants.EXAMPLE_NAMESPACE;
+import static org.camunda.spin.xml.XmlTestConstants.EXAMPLE_XML_FILE_NAME;
+import static org.camunda.spin.xml.XmlTestConstants.NON_EXISTING;
+import static org.camunda.spin.xml.XmlTestConstants.exampleXmlFileAsReader;
+
+import java.util.HashMap;
+import java.util.List;
+
 import org.camunda.spin.SpinList;
 import org.camunda.spin.impl.test.Script;
 import org.camunda.spin.impl.test.ScriptTest;
@@ -25,15 +37,6 @@ import org.camunda.spin.xml.SpinXmlAttributeException;
 import org.camunda.spin.xml.SpinXmlElement;
 import org.camunda.spin.xml.SpinXmlElementException;
 import org.junit.Test;
-
-import java.util.HashMap;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
-import static org.camunda.spin.Spin.S;
-import static org.camunda.spin.Spin.XML;
-import static org.camunda.spin.xml.XmlTestConstants.*;
 
 /**
  * @author Sebastian Menski
@@ -162,7 +165,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     },
     execute = false
   )
-  public void canReadAttributeByName() {
+  public void canReadAttributeByName() throws Throwable {
     script.setVariable("variables", new HashMap<String, Object>());
     script.execute();
     String value = script.getVariable("value");
@@ -861,7 +864,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     },
     execute = false
   )
-  public void canRemoveAChildElement() {
+  public void canRemoveAChildElement() throws Throwable {
     SpinXmlElement element = XML(exampleXmlFileAsReader());
     SpinXmlElement child = XML("<child/>");
     element.append(child);
@@ -917,7 +920,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     },
     execute = false
   )
-  public void canRemoveMultipleChildElements() {
+  public void canRemoveMultipleChildElements() throws Throwable {
     SpinXmlElement element = XML(exampleXmlFileAsReader());
     SpinXmlElement child1 = XML("<child/>");
     SpinXmlElement child2 = XML("<child/>");
@@ -948,7 +951,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     },
     execute = false
   )
-  public void canRemoveChildElementCollection() {
+  public void canRemoveChildElementCollection() throws Throwable {
     SpinXmlElement element = XML(exampleXmlFileAsReader());
     element.append(XML("<child/>"), XML("<child/>"), XML("<child/>"));
 
@@ -1117,7 +1120,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     },
     execute = false
   )
-  public void canReplaceAChildElement() {
+  public void canReplaceAChildElement() throws Throwable {
     SpinXmlElement element = XML(exampleXmlFileAsReader());
     SpinXmlElement date = element.childElement("date");
 
@@ -1192,7 +1195,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     },
     execute = false
   )
-  public void canReplaceElement() {
+  public void canReplaceElement() throws Throwable {
     SpinXmlElement element = XML(exampleXmlFileAsReader());
     script
       .setVariable("oldElement", element.childElement("date"))
@@ -1215,7 +1218,7 @@ public abstract class XmlDomElementScriptTest extends ScriptTest {
     },
     execute = false
   )
-  public void canReplaceRootElement() {
+  public void canReplaceRootElement() throws Throwable {
     SpinXmlElement element = XML(exampleXmlFileAsReader());
     element = script
       .setVariable("oldElement", element)

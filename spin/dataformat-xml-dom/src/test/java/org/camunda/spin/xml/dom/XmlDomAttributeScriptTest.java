@@ -16,15 +16,15 @@
  */
 package org.camunda.spin.xml.dom;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.spin.xml.XmlTestConstants.EXAMPLE_XML_FILE_NAME;
+
 import org.camunda.spin.impl.test.Script;
 import org.camunda.spin.impl.test.ScriptTest;
 import org.camunda.spin.impl.test.ScriptVariable;
 import org.camunda.spin.xml.SpinXmlAttributeException;
 import org.camunda.spin.xml.SpinXmlElement;
 import org.junit.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.camunda.spin.xml.XmlTestConstants.EXAMPLE_XML_FILE_NAME;
 
 /**
  * @author Sebastian Menski

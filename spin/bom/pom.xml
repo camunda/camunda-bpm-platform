@@ -23,6 +23,13 @@
         <artifactId>camunda-spin-core</artifactId>
         <version>${project.version}</version>
       </dependency>
+      
+      <dependency>
+        <groupId>org.camunda.spin</groupId>
+        <artifactId>camunda-spin-core</artifactId>
+        <type>test-jar</type>
+        <version>${project.version}</version>
+      </dependency>
 
       <dependency>
         <groupId>org.camunda.spin</groupId>

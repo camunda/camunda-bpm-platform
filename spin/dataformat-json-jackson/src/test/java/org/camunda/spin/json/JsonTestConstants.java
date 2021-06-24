@@ -16,14 +16,18 @@
  */
 package org.camunda.spin.json;
 
-import org.camunda.spin.impl.util.SpinIoUtil;
-import org.camunda.spin.json.mapping.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
+import org.camunda.spin.impl.util.SpinIoUtil;
+import org.camunda.spin.json.mapping.Customer;
+import org.camunda.spin.json.mapping.Invoice;
+import org.camunda.spin.json.mapping.Order;
+import org.camunda.spin.json.mapping.OrderDetails;
+import org.camunda.spin.json.mapping.RegularCustomer;
 
 public class JsonTestConstants {
 

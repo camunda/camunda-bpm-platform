@@ -16,6 +16,11 @@
  */
 package org.camunda.spin.json.tree;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+import static org.camunda.spin.Spin.JSON;
+import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_JSON;
+
 import org.camunda.spin.SpinList;
 import org.camunda.spin.impl.util.SpinIoUtil;
 import org.camunda.spin.json.SpinJsonDataFormatException;
@@ -24,11 +29,6 @@ import org.camunda.spin.json.SpinJsonPropertyException;
 import org.camunda.spin.spi.SpinDataFormatException;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
-import static org.camunda.spin.Spin.JSON;
-import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_JSON;
 
 /**
  * @author Stefan Hentschel

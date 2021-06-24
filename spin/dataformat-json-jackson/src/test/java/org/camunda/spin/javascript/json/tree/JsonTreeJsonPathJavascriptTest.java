@@ -23,7 +23,7 @@ import org.camunda.spin.json.tree.JsonTreeJsonPathScriptTest;
  * @author Thorben Lindhauer
  *
  */
-@ScriptEngine("javascript")
+@ScriptEngine("graal.js")
 public class JsonTreeJsonPathJavascriptTest extends JsonTreeJsonPathScriptTest {
 
 }

@@ -21,13 +21,13 @@ import org.camunda.spin.json.tree.JsonTreeMapObjectToJsonScriptTest;
 import org.junit.Ignore;
 
 /**
- * Note: Jackson is apparently not able to map Nashorn's internal representations
+ * Note: Jackson is apparently not able to map graal.js's internal representations
  * of javascript objects and arrays.
  *
  * @author Thorben Lindhauer
  */
 @Ignore
-@ScriptEngine("javascript")
+@ScriptEngine("graal.js")
 public class JsonTreeMapObjectToJsonJavascriptTest extends JsonTreeMapObjectToJsonScriptTest {
 
 }

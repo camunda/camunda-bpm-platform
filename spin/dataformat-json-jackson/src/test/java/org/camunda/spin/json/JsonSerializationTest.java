@@ -16,6 +16,11 @@
  */
 package org.camunda.spin.json;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.spin.DataFormats.json;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
@@ -25,6 +30,7 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
 import org.camunda.spin.json.mapping.CustomerList;
 import org.camunda.spin.json.mapping.GenericCustomerList;
 import org.camunda.spin.json.mapping.Order;
@@ -36,10 +42,6 @@ import org.camunda.spin.spi.DataFormatMapper;
 import org.camunda.spin.spi.DataFormatReader;
 import org.camunda.spin.spi.DataFormatWriter;
 import org.junit.Test;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.camunda.spin.DataFormats.json;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class JsonSerializationTest {
 

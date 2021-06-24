@@ -17,7 +17,6 @@
 package org.camunda.spin.impl.logging;
 
 import org.camunda.commons.logging.BaseLogger;
-import org.camunda.spin.impl.test.SpinTestLogger;
 
 /**
  * @author Daniel Meyer
@@ -28,5 +27,5 @@ public abstract class SpinLogger extends BaseLogger {
   public static final String PROJECT_CODE = "SPIN";
 
   public static final SpinCoreLogger CORE_LOGGER = BaseLogger.createLogger(SpinCoreLogger.class, PROJECT_CODE, "org.camunda.spin", "01");
-  public static final SpinTestLogger TEST_LOGGER = BaseLogger.createLogger(SpinTestLogger.class, PROJECT_CODE, "org.camunda.spin.test", "02");
+
 }

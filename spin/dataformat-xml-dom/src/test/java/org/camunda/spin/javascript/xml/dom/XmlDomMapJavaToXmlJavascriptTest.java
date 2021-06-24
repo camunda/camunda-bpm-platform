@@ -22,6 +22,6 @@ import org.camunda.spin.xml.dom.XmlDomMapJavaToXmlScriptTest;
 /**
  * @author Stefan Hentschel.
  */
-@ScriptEngine("javascript")
+@ScriptEngine("graal.js")
 public class XmlDomMapJavaToXmlJavascriptTest extends XmlDomMapJavaToXmlScriptTest {
 }

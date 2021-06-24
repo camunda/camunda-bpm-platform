@@ -29,7 +29,7 @@ public abstract class XmlDomMapJavaToXmlScriptTest extends ScriptTest{
 
   @Test
   @Script(execute = false)
-  public void shouldMapJavaToXml() {
+  public void shouldMapJavaToXml() throws Throwable {
     Order order = createExampleOrder();
 
     script.setVariable("input", order);

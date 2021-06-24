@@ -23,6 +23,7 @@ import static org.camunda.spin.impl.xml.dom.util.DomXmlEnsure.ensureChildElement
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -127,15 +128,15 @@ public class DomXmlElement extends SpinXmlElement {
   }
 
   public SpinList<SpinXmlAttribute> attrs() {
-    return new SpinListImpl<SpinXmlAttribute>(new DomXmlAttributeMapIterable(domElement, dataFormat));
+    return new SpinListImpl<>(new DomXmlAttributeMapIterable(domElement, dataFormat));
   }
 
   public SpinList<SpinXmlAttribute> attrs(String namespace) {
-    return new SpinListImpl<SpinXmlAttribute>(new DomXmlAttributeMapIterable(domElement, dataFormat, namespace));
+    return new SpinListImpl<>(new DomXmlAttributeMapIterable(domElement, dataFormat, namespace));
   }
 
   public List<String> attrNames() {
-    List<String> attributeNames = new ArrayList<String>();
+    List<String> attributeNames = new ArrayList<>();
     for (SpinXmlAttribute attribute : attrs()) {
       attributeNames.add(attribute.name());
     }
@@ -143,7 +144,7 @@ public class DomXmlElement extends SpinXmlElement {
   }
 
   public List<String> attrNames(String namespace) {
-    List<String> attributeNames = new ArrayList<String>();
+    List<String> attributeNames = new ArrayList<>();
     for (SpinXmlAttribute attribute : attrs(namespace)) {
       attributeNames.add(attribute.name());
     }
@@ -176,7 +177,7 @@ public class DomXmlElement extends SpinXmlElement {
   }
 
   public SpinList<SpinXmlElement> childElements() {
-    return new SpinListImpl<SpinXmlElement>(new DomXmlElementIterable(domElement, dataFormat));
+    return new SpinListImpl<>(new DomXmlElementIterable(domElement, dataFormat));
   }
 
   public SpinList<SpinXmlElement> childElements(String elementName) {
@@ -185,7 +186,7 @@ public class DomXmlElement extends SpinXmlElement {
 
   public SpinList<SpinXmlElement> childElements(String namespace, String elementName) {
     ensureNotNull("elementName", elementName);
-    SpinList<SpinXmlElement> childs = new SpinListImpl<SpinXmlElement>(new DomXmlElementIterable(domElement, dataFormat, namespace, elementName));
+    SpinList<SpinXmlElement> childs = new SpinListImpl<>(new DomXmlElementIterable(domElement, dataFormat, namespace, elementName));
     if (childs.isEmpty()) {
       throw LOG.unableToFindChildElementWithNamespaceAndName(namespace, elementName);
     }
@@ -236,9 +237,13 @@ public class DomXmlElement extends SpinXmlElement {
     return this;
   }
 
+  public SpinXmlElement append(SpinXmlElement childElement) {
+    return append(Arrays.asList(childElement));
+  }
+
   public SpinXmlElement append(Collection<SpinXmlElement> childElements) {
     ensureNotNull("childElements", childElements);
-    return append(childElements.toArray(new SpinXmlElement[childElements.size()]));
+    return append(childElements.toArray(new SpinXmlElement[0]));
   }
 
   public SpinXmlElement appendBefore(SpinXmlElement childElement, SpinXmlElement existingChildElement) {
@@ -302,9 +307,13 @@ public class DomXmlElement extends SpinXmlElement {
     return this;
   }
 
+  public SpinXmlElement remove(SpinXmlElement childElement) {
+    return remove(Arrays.asList(childElement));
+  }
+
   public SpinXmlElement remove(Collection<SpinXmlElement> childElements) {
     ensureNotNull("childElements", childElements);
-    return remove(childElements.toArray(new SpinXmlElement[childElements.size()]));
+    return remove(childElements.toArray(new SpinXmlElement[0]));
   }
 
   public SpinXmlElement replace(SpinXmlElement newElement) {

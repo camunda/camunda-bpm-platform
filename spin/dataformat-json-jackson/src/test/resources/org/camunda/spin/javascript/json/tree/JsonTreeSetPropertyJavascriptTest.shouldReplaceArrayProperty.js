@@ -6,5 +6,5 @@ var list = [];
 list.push("test");
 list.push("test2");
 
-node.prop("order", list);
+node.propList("order", list);
 newValue = node.prop("order");

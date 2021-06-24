@@ -22,6 +22,6 @@ import org.camunda.spin.json.tree.JsonTreeMapJsonToJavaScriptTest;
 /**
  * @author Sebastian Menski
  */
-@ScriptEngine("javascript")
+@ScriptEngine("graal.js")
 public class JsonTreeMapJsonToJavaJavascriptTest extends JsonTreeMapJsonToJavaScriptTest {
 }

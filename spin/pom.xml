@@ -28,6 +28,7 @@
     <commons.version>1.9.0</commons.version>
     <spin.version.old>1.10.0</spin.version.old>
     <groovy.version>2.4.13</groovy.version>
+    <graal.js.version>21.1.0</graal.js.version>
     <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
     <powermock.version>1.7.4</powermock.version>
     <additionalparam>-Xdoclint:none</additionalparam>
@@ -84,6 +85,18 @@
         <groupId>org.jruby</groupId>
         <artifactId>jruby-complete</artifactId>
         <version>9.1.17.0</version>
+      </dependency>
+      
+      <dependency>
+        <groupId>org.graalvm.js</groupId>
+        <artifactId>js</artifactId>
+        <version>${graal.js.version}</version>
+      </dependency>
+      
+      <dependency>
+        <groupId>org.graalvm.js</groupId>
+        <artifactId>js-scriptengine</artifactId>
+        <version>${graal.js.version}</version>
       </dependency>
 
       <dependency>

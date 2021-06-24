@@ -23,7 +23,7 @@ import org.camunda.spin.json.tree.JsonTreeSetPropertyScriptTest;
  * @author Thorben Lindhauer
  *
  */
-@ScriptEngine("javascript")
+@ScriptEngine("graal.js")
 public class JsonTreeSetPropertyJavascriptTest extends JsonTreeSetPropertyScriptTest {
 
 }

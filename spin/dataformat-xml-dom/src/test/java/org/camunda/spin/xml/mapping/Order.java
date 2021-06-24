@@ -16,12 +16,13 @@
  */
 package org.camunda.spin.xml.mapping;
 
+import java.util.Date;
+import java.util.LinkedList;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import java.util.Date;
-import java.util.LinkedList;
 
 /**
  * @author Stefan Hentschel.

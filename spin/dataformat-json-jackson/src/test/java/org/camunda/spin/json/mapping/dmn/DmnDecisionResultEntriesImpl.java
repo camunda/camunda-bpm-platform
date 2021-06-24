@@ -20,7 +20,6 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
  * @author Svetlana Dorokhova.

@@ -35,8 +35,6 @@ import org.camunda.spin.json.mapping.Order;
 import org.camunda.spin.json.mapping.RegularCustomer;
 import org.junit.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 public abstract class JsonTreeMapJsonToJavaScriptTest extends ScriptTest {
 
   @Test
@@ -45,7 +43,7 @@ public abstract class JsonTreeMapJsonToJavaScriptTest extends ScriptTest {
     execute = false
   )
   @ScriptVariable(name = "input", file=EXAMPLE_JSON_FILE_NAME)
-  public void shouldMapJsonObjectToJavaObject() {
+  public void shouldMapJsonObjectToJavaObject() throws Throwable {
     Map<String, Object> variables = newMap("mapToType", Order.class);
     Order order = script.execute(variables).getVariable("result");
     assertIsExampleOrder(order);
@@ -68,7 +66,7 @@ public abstract class JsonTreeMapJsonToJavaScriptTest extends ScriptTest {
     execute = false
   )
   @ScriptVariable(name = "input", file=EXAMPLE_JSON_FILE_NAME)
-  public void shouldMapByCanonicalString() {
+  public void shouldMapByCanonicalString() throws Throwable {
     Map<String, Object> variables = newMap("mapToType", Order.class.getCanonicalName());
     Order order = script.execute(variables).getVariable("result");
     assertIsExampleOrder(order);
@@ -79,7 +77,7 @@ public abstract class JsonTreeMapJsonToJavaScriptTest extends ScriptTest {
     name = "JsonTreeMapJsonToJavaScriptTest.mapToCollection",
     execute = false
   )
-  public void shouldMapListByCanonicalString() throws JsonProcessingException {
+  public void shouldMapListByCanonicalString() throws Throwable {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("input", EXAMPLE_JSON_COLLECTION);
     variables.put("collectionType", ArrayList.class);

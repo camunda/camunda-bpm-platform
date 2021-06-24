@@ -23,7 +23,7 @@ import org.camunda.spin.json.tree.JsonTreeCreateScriptTest;
  * @author Thorben Lindhauer
  *
  */
-@ScriptEngine("javascript")
+@ScriptEngine("graal.js")
 public class JsonTreeCreateJavascriptTest extends JsonTreeCreateScriptTest {
 
 }

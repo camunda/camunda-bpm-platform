@@ -16,18 +16,18 @@
  */
 package org.camunda.spin.json.tree;
 
-import org.camunda.spin.json.SpinJsonNode;
-import org.camunda.spin.json.SpinJsonException;
-import org.camunda.spin.json.SpinJsonPropertyException;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.util.Date;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.camunda.spin.Spin.JSON;
 import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_JSON;
+
+import java.util.Date;
+
+import org.camunda.spin.json.SpinJsonException;
+import org.camunda.spin.json.SpinJsonNode;
+import org.camunda.spin.json.SpinJsonPropertyException;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Index:

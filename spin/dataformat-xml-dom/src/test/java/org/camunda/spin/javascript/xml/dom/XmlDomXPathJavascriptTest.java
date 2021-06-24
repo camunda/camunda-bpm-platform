@@ -22,6 +22,6 @@ import org.camunda.spin.xml.dom.XmlDomXPathScriptTest;
 /**
  * @author Sebastian Menski
  */
-@ScriptEngine("javascript")
+@ScriptEngine("graal.js")
 public class XmlDomXPathJavascriptTest extends XmlDomXPathScriptTest {
 }
