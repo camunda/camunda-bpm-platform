@@ -1232,7 +1232,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
   }
 
   @Test
-  public void testCreateDeploymentWithDeploymentSourceAndActivationTime() throws Exception {
+  public void testCreateDeploymentWithActivationTime() throws Exception {
 
     resourceNames.addAll( Arrays.asList("data", "more-data") );
 
