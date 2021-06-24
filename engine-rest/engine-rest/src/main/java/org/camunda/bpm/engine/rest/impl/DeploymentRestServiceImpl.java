@@ -99,7 +99,6 @@ public class DeploymentRestServiceImpl extends AbstractRestProcessEngineAware im
       DeploymentWithDefinitions deployment = deploymentBuilder.deployWithResult();
 
       DeploymentWithDefinitionsDto deploymentDto = DeploymentWithDefinitionsDto.fromDeployment(deployment);
-      deploymentDto.setActivationTime(deploymentBuilder.getProcessDefinitionsActivationDate());
 
       URI uri = uriInfo.getBaseUriBuilder()
         .path(relativeRootResourcePath)
