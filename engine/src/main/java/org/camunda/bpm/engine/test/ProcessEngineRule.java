@@ -85,7 +85,7 @@ import org.junit.runners.model.Statement;
  * The processEngineRule also lets you
  * {@link ProcessEngineRule#setCurrentTime(Date) set the current time used by
  * the process engine}. This can be handy to control the exact time that is used
- * by the engine in order to verify e.g. e.g. due dates of timers. Or start, end
+ * by the engine in order to verify e.g., due dates of timers. Or start, end
  * and duration times in the history service. In the tearDown, the internal
  * clock will automatically be reset to use the current system time rather then
  * the time that was set during a test method. In other words, you don't have to

@@ -28,13 +28,17 @@ pipeline {
           env.BRANCH_NAME == cambpmDefaultBranch() || (changeRequest() && !pullRequest.labels.contains('no-build'))
         }
       }
+      environment {
+        NEXUS_SNAPSHOT_REPOSITORY = cambpmConfig.nexusSnapshotRepository()
+        NEXUS_SNAPSHOT_REPOSITORY_ID = cambpmConfig.nexusSnapshotRepositoryId()
+      }
       steps {
         cambpmConditionalRetry([
           agentLabel: 'h2_perf32',
           suppressErrors: false,
           runSteps: {
             cambpmRunMaven('.',
-                'clean source:jar deploy source:test-jar com.mycila:license-maven-plugin:check -Pdistro,distro-ce,distro-wildfly,distro-webjar -DaltStagingDirectory=${WORKSPACE}/staging -DskipRemoteStaging=true',
+                'clean source:jar deploy source:test-jar com.mycila:license-maven-plugin:check -Pdistro,distro-ce,distro-wildfly,distro-webjar,h2-in-memory -DaltStagingDirectory=${WORKSPACE}/staging -DskipRemoteStaging=true',
                 withCatch: false,
                 withNpm: true)
 
@@ -102,14 +106,13 @@ pipeline {
                 )
               }
 
-              // TODO: https://jira.camunda.com/browse/CAM-13409
-              // only execute on `master`
-              // if (cambpmWithLabels()) {
-              //   cambpmRunMaven('.',
-              //       'org.sonatype.plugins:nexus-staging-maven-plugin:deploy-staged -DaltStagingDirectory=${WORKSPACE}/staging -DskipStaging=true',
-              //       withCatch: false,
-              //       withNpm: true)
-              // }
+              // only execute on version (default) branch (e.g. master, 7.15)
+              if (cambpmWithLabels()) {
+                cambpmRunMaven('.',
+                    'org.sonatype.plugins:nexus-staging-maven-plugin:deploy-staged -DaltStagingDirectory=${WORKSPACE}/staging -DskipStaging=true',
+                    withCatch: false,
+                    withNpm: true)
+              }
             }
           },
           postFailure: {

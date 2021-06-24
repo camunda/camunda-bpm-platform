@@ -25,90 +25,98 @@ var packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
 module.exports = function(grunt, dirname, licensebookConfig) {
   'use strict';
   grunt.registerMultiTask('persistify', function() {
-
     var done = this.async();
 
-    var externalModules = JSON.parse(fs.readFileSync(__dirname + '/../../cache/deps.json', 'utf8'));
+    var externalModules = JSON.parse(
+      fs.readFileSync(__dirname + '/../../cache/deps.json', 'utf8')
+    );
 
     var firstRun = true;
     var dest = this.data.dest;
     var opts = this.data.options;
 
-    this.data.options.neverCache = [
-      /\.html$/,
-      /\.json$/
-    ];
+    this.data.options.neverCache = [/\.html$/, /\.json$/];
 
     this.data.options.recreate = !process.env.FAST_BUILD;
 
     // backwards compatibility with grunt-browserify
-    if(this.data.options.transform) {
+    if (this.data.options.transform) {
       this.data.options.browserifyOptions.transform = this.data.options.transform;
     }
 
-    var b = require(dirname + '/node_modules/persistify')( this.data.options.browserifyOptions, this.data.options, { "ignore-watch": false } );
+    var b = require(dirname + '/node_modules/persistify')(
+      this.data.options.browserifyOptions,
+      this.data.options,
+      {'ignore-watch': false}
+    );
 
-    b.transform('brfs', { global: true });
-    b.transform(envify({
-      CAMUNDA_VERSION: packageJson.version
-    }))
+    b.transform('brfs', {global: true});
+    b.transform(
+      envify({
+        CAMUNDA_VERSION: packageJson.version
+      })
+    );
 
-
-    for(var key in externalModules) {
+    for (var key in externalModules) {
       b.external(key);
     }
 
-    b.add( this.data.src );
+    b.add(this.data.src);
 
-    if(licensebookConfig.enabled) {
-      b.pipeline.get("deps").push(through.obj(function(row, enc, next) {
-        licensebookConfig.includedFiles.add(row.file);
-        this.push(row);
-        next();
-      }));
+    if (licensebookConfig.enabled) {
+      b.pipeline.get('deps').push(
+        through.obj(function(row, enc, next) {
+          licensebookConfig.includedFiles.add(row.file);
+          this.push(row);
+          next();
+        })
+      );
     }
 
-    b.on( 'bundle:done', function( time ) {
+    b.on('bundle:done', function(time) {
       console.log(dest + ' written in ' + time + 'ms');
-    } );
+    });
 
-    b.on( 'error', function( err ) {
-      console.log( 'error', err );
-    } );
+    b.on('error', function(err) {
+      console.log('error', err);
+    });
 
     function bundleComplete(err, buff) {
-      if ( err ) {
+      if (err) {
         throw err;
       }
-      require(dirname + '/node_modules/mkdirp')(dest.substr(0, dest.lastIndexOf('/')), function(err) {
-        if(err) {
-          throw err;
-        }
-        fs.writeFileSync( dest, buff.toString() );
-        if(firstRun) {
-          firstRun = false;
-          done();
-        }
-      });
+      require(dirname + '/node_modules/mkdirp')(
+        dest.substr(0, dest.lastIndexOf('/'))
+      )
+        .then(() => {
+          fs.writeFileSync(dest, buff.toString());
+          if (firstRun) {
+            firstRun = false;
+            done();
+          }
+        })
+        .catch(err => {
+          if (err) {
+            throw err;
+          }
+        });
     }
 
     function doBundle() {
-      b.bundle( function( err, buff ) {
+      b.bundle(function(err, buff) {
         if (opts.postBundleCB) {
           opts.postBundleCB(err, buff, bundleComplete);
-        }
-        else {
+        } else {
           bundleComplete(err, buff);
         }
       });
     }
 
-    b.on( 'update', function() {
+    b.on('update', function() {
       console.log('change detected, updating ' + dest);
       doBundle();
     });
 
     doBundle();
-
   });
 };

@@ -154,8 +154,8 @@ var Controller = [
         type: 'decisionDefinition',
         label:
           decisionInstance.decisionDefinitionName ||
-          (decisionInstance.decisionDefinitionKey ||
-            decisionInstance.decisionDefinitionId),
+          decisionInstance.decisionDefinitionKey ||
+          decisionInstance.decisionDefinitionId,
         href: '#/decision-definition/' + decisionInstance.decisionDefinitionId
       },
       {

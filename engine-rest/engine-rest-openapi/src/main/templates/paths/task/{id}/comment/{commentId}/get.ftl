@@ -38,6 +38,7 @@
                          "id": "aTaskCommentId",
                          "userId": "userId",
                          "taskId": "aTaskId",
+                         "processInstanceId": "96dc383f-23eb-11e6-8e4a-f6aefe19b687",
                          "time": "2013-01-02T21:37:03.664+0200",
                          "message": "comment content",
                          "removalTime": "2018-02-10T14:33:19.000+0200",
