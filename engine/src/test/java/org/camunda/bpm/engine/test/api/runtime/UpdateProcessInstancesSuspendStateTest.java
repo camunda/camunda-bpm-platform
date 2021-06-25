@@ -36,7 +36,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
-import org.python.google.common.collect.Sets;
+import com.google.common.collect.Sets;
 
 public class UpdateProcessInstancesSuspendStateTest {
 

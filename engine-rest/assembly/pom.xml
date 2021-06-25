@@ -83,7 +83,7 @@
               <archive>
                 <manifestEntries>
                   <!-- module dependencies for deployment on jboss AS 7  -->
-                  <Dependencies>org.camunda.bpm.camunda-engine,org.camunda.bpm.dmn.camunda-engine-dmn,org.camunda.commons.camunda-commons-logging</Dependencies>
+                  <Dependencies>org.camunda.bpm.camunda-engine,org.camunda.bpm.dmn.camunda-engine-dmn,org.camunda.commons.camunda-commons-logging,org.camunda.spin.camunda-spin-core,org.graalvm.js.js-scriptengine services</Dependencies>
                 </manifestEntries>
               </archive>
               <descriptors>
@@ -107,7 +107,7 @@
               <archive>
                 <manifestEntries>
                   <!-- module dependencies for deployment on wildfly  -->
-                  <Dependencies>org.camunda.bpm.camunda-engine,org.camunda.bpm.dmn.camunda-engine-dmn,org.camunda.commons.camunda-commons-logging</Dependencies>
+                  <Dependencies>org.camunda.bpm.camunda-engine,org.camunda.bpm.dmn.camunda-engine-dmn,org.camunda.commons.camunda-commons-logging,org.camunda.spin.camunda-spin-core,org.graalvm.js.js-scriptengine services</Dependencies>
                 </manifestEntries>
               </archive>
               <descriptors>

@@ -28,7 +28,7 @@ public class JavascriptScriptEngineSupportTest extends AbstractScriptEngineSuppo
   public static WebArchive createProcessApplication() {
     return initWebArchiveDeployment()
       .addClass(AbstractScriptEngineSupportTest.class)
-      .addAsResource(createScriptTaskProcess("javascript", EXAMPLE_SCRIPT), "process.bpmn20.xml");
+      .addAsResource(createScriptTaskProcess("javascript", EXAMPLE_SCRIPT, EXAMPLE_SPIN_SCRIPT), "process.bpmn20.xml");
   }
 
 }

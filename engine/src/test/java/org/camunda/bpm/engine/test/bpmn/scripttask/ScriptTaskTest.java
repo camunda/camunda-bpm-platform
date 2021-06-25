@@ -17,16 +17,15 @@
 package org.camunda.bpm.engine.test.bpmn.scripttask;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -34,14 +33,10 @@ import org.camunda.bpm.engine.ScriptCompilationException;
 import org.camunda.bpm.engine.ScriptEvaluationException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
-import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
-import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.model.bpmn.Bpmn;
-import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.junit.After;
 import org.junit.Test;
 
 /**
@@ -52,20 +47,13 @@ import org.junit.Test;
  * @author Christian Lipphardt (Groovy)
  *
  */
-public class ScriptTaskTest extends PluggableProcessEngineTest {
+public class ScriptTaskTest extends AbstractScriptTaskTest {
 
   private static final String JAVASCRIPT = "javascript";
   private static final String PYTHON = "python";
   private static final String RUBY = "ruby";
   private static final String GROOVY = "groovy";
   private static final String JUEL = "juel";
-
-  private List<String> deploymentIds = new ArrayList<String>();
-
-  @After
-  public void tearDown() throws Exception {
-    deploymentIds.forEach(deploymentId -> repositoryService.deleteDeployment(deploymentId, true));
-  }
 
   @Test
   public void testJavascriptProcessVarVisibility() {
@@ -436,7 +424,7 @@ public class ScriptTaskTest extends PluggableProcessEngineTest {
   public void testSourceAsExpressionAsVariable() {
     deployProcess(PYTHON, "${scriptSource}");
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("scriptSource", "execution.setVariable('foo', 'bar')");
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess", variables);
 
@@ -461,7 +449,7 @@ public class ScriptTaskTest extends PluggableProcessEngineTest {
   public void testSourceAsExpressionAsBean() {
     deployProcess(PYTHON, "#{scriptResourceBean.getSource()}");
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("scriptResourceBean", new ScriptResourceBean());
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess", variables);
 
@@ -473,7 +461,7 @@ public class ScriptTaskTest extends PluggableProcessEngineTest {
   public void testSourceAsExpressionWithWhitespace() {
     deployProcess(PYTHON, "\t\n  \t \n  ${scriptSource}");
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("scriptSource", "execution.setVariable('foo', 'bar')");
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess", variables);
 
@@ -616,31 +604,6 @@ public class ScriptTaskTest extends PluggableProcessEngineTest {
     assertNotNull(task);
   }
 
-  protected void deployProcess(BpmnModelInstance process) {
-    Deployment deployment = repositoryService.createDeployment()
-        .addModelInstance("testProcess.bpmn", process)
-        .deploy();
-      deploymentIds.add(deployment.getId());
-  }
-
-  protected void deployProcess(String scriptFormat, String scriptText) {
-    BpmnModelInstance process = createProcess(scriptFormat, scriptText);
-    deployProcess(process);
-  }
-
-  protected BpmnModelInstance createProcess(String scriptFormat, String scriptText) {
-
-    return Bpmn.createExecutableProcess("testProcess")
-      .startEvent()
-      .scriptTask()
-        .scriptFormat(scriptFormat)
-        .scriptText(scriptText)
-      .userTask()
-      .endEvent()
-    .done();
-
-  }
-
   @Test
   public void testAutoStoreScriptVarsOff() {
     assertFalse(processEngineConfiguration.isAutoStoreScriptVariables());
@@ -665,7 +628,7 @@ public class ScriptTaskTest extends PluggableProcessEngineTest {
   @org.camunda.bpm.engine.test.Deployment
   @Test
   public void testSetScriptResultToProcessVariable() {
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("echo", "hello");
     variables.put("existingProcessVariableName", "one");
 
@@ -713,4 +676,55 @@ public class ScriptTaskTest extends PluggableProcessEngineTest {
       testRule.assertTextPresent("Unable to evaluate script while executing activity 'Failing' in the process definition with id '" + processDefinition.getId() + "'", e.getMessage());
     }
   }
+
+  @Test
+  public void shouldLoadExternalScriptJavascript() {
+    try {
+      // GIVEN
+      // an external JS file with a function
+      // and external file loading being allowed
+      processEngineConfiguration.setEnableScriptEngineLoadExternalResources(true);
+
+      deployProcess(JAVASCRIPT,
+          // WHEN
+          // we load a function from an external file
+          "load(\"" + getNormalizedResourcePath("/org/camunda/bpm/engine/test/bpmn/scripttask/sum.js") + "\");"
+          // THEN
+          // we can use that function
+        + "execution.setVariable('foo', sum(3, 4));"
+      );
+
+      // WHEN
+      // we start an instance of this process
+      ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
+
+      // THEN
+      // the script task can be executed without exceptions
+      // the execution variable is stored and has the correct value
+      Object variableValue = runtimeService.getVariable(pi.getId(), "foo");
+      assertEquals(7, variableValue);
+    } finally {
+      processEngineConfiguration.setEnableScriptEngineLoadExternalResources(false);
+    }
+  }
+
+  @Test
+  public void shouldFailOnLoadExternalScriptJavascriptIfNotEnabled() {
+    // GIVEN
+    // an external JS file with a function
+    deployProcess(JAVASCRIPT,
+        // WHEN
+        // we load a function from an external file
+        "load(\"" + getNormalizedResourcePath("/org/camunda/bpm/engine/test/bpmn/scripttask/sum.js") + "\");"
+    );
+
+    // WHEN
+    // we start an instance of this process
+    assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("testProcess"))
+    // THEN
+    // this is not allowed in the JS ScriptEngine
+      .isInstanceOf(ScriptEvaluationException.class)
+      .hasMessageContaining("Operation is not allowed");
+  }
+
 }

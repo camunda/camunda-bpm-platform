@@ -56,6 +56,7 @@ public class ModuleDependencyProcessor implements DeploymentUnitProcessor {
   public static ModuleIdentifier MODULE_IDENTIFYER_SPIN = ModuleIdentifier.create("org.camunda.spin.camunda-spin-core");
   public static ModuleIdentifier MODULE_IDENTIFYER_CONNECT = ModuleIdentifier.create("org.camunda.connect.camunda-connect-core");
   public static ModuleIdentifier MODULE_IDENTIFYER_ENGINE_DMN = ModuleIdentifier.create("org.camunda.bpm.dmn.camunda-engine-dmn");
+  public static ModuleIdentifier MODULE_IDENTIFYER_GRAAL_JS = ModuleIdentifier.create("org.graalvm.js.js-scriptengine");
 
   public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
 
@@ -122,10 +123,15 @@ public class ModuleDependencyProcessor implements DeploymentUnitProcessor {
     addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFYER_SPIN);
     addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFYER_CONNECT);
     addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFYER_ENGINE_DMN);
+    addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFYER_GRAAL_JS, true);
   }
 
   private void addSystemDependency(ModuleLoader moduleLoader, final ModuleSpecification moduleSpecification, ModuleIdentifier dependency) {
-    moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, dependency, false, false, false, false));
+    addSystemDependency(moduleLoader, moduleSpecification, dependency, false);
+  }
+
+  private void addSystemDependency(ModuleLoader moduleLoader, final ModuleSpecification moduleSpecification, ModuleIdentifier dependency, boolean importServices) {
+    moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, dependency, false, false, importServices, false));
   }
 
   public void undeploy(DeploymentUnit context) {

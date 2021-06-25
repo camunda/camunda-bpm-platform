@@ -28,7 +28,7 @@ public class RubyScriptEngineSupportTest extends AbstractScriptEngineSupportTest
   public static WebArchive createProcessApplication() {
     return initWebArchiveDeployment()
       .addClass(AbstractScriptEngineSupportTest.class)
-      .addAsResource(createScriptTaskProcess("ruby", "$" + EXAMPLE_SCRIPT), "process.bpmn20.xml");
+      .addAsResource(createScriptTaskProcess("ruby", "$" + EXAMPLE_SCRIPT, "$" + EXAMPLE_SPIN_SCRIPT), "process.bpmn20.xml");
   }
 
 }

@@ -21,6 +21,7 @@ import static org.camunda.bpm.engine.impl.cmd.HistoryCleanupCmd.MAX_THREADS_NUMB
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import javax.naming.InitialContext;
+import javax.script.ScriptEngineManager;
 import javax.sql.DataSource;
 
 import java.io.InputStream;
@@ -331,8 +332,10 @@ import org.camunda.bpm.engine.impl.runtime.DefaultCorrelationHandler;
 import org.camunda.bpm.engine.impl.runtime.DefaultDeserializationTypeValidator;
 import org.camunda.bpm.engine.impl.scripting.ScriptFactory;
 import org.camunda.bpm.engine.impl.scripting.engine.BeansResolverFactory;
+import org.camunda.bpm.engine.impl.scripting.engine.DefaultScriptEngineResolver;
 import org.camunda.bpm.engine.impl.scripting.engine.ResolverFactory;
 import org.camunda.bpm.engine.impl.scripting.engine.ScriptBindingsFactory;
+import org.camunda.bpm.engine.impl.scripting.engine.ScriptEngineResolver;
 import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
 import org.camunda.bpm.engine.impl.scripting.engine.VariableScopeResolverFactory;
 import org.camunda.bpm.engine.impl.scripting.env.ScriptEnvResolver;
@@ -579,10 +582,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected ScriptingEnvironment scriptingEnvironment;
   protected List<ScriptEnvResolver> scriptEnvResolvers;
   protected ScriptFactory scriptFactory;
+  protected ScriptEngineResolver scriptEngineResolver;
+  protected String scriptEngineNameJavaScript;
   protected boolean autoStoreScriptVariables = false;
   protected boolean enableScriptCompilation = true;
   protected boolean enableScriptEngineCaching = true;
   protected boolean enableFetchScriptEngineFromProcessApplication = true;
+  protected boolean enableScriptEngineLoadExternalResources = false;
+  protected boolean enableScriptEngineNashornCompatibility = false;
+  protected boolean configureScriptEngineHostAccess = true;
 
   /**
    * When set to false, the following behavior changes:
@@ -2432,8 +2440,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       resolverFactories.add(new VariableScopeResolverFactory());
       resolverFactories.add(new BeansResolverFactory());
     }
+    if (scriptEngineResolver == null) {
+      scriptEngineResolver = new DefaultScriptEngineResolver(new ScriptEngineManager());
+    }
     if (scriptingEngines == null) {
-      scriptingEngines = new ScriptingEngines(new ScriptBindingsFactory(resolverFactories));
+      scriptingEngines = new ScriptingEngines(new ScriptBindingsFactory(resolverFactories), scriptEngineResolver);
       scriptingEngines.setEnableScriptEngineCaching(enableScriptEngineCaching);
     }
     if (scriptFactory == null) {
@@ -4031,6 +4042,18 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.scriptFactory = scriptFactory;
   }
 
+  public ScriptEngineResolver getScriptEngineResolver() {
+    return scriptEngineResolver;
+  }
+
+  public ProcessEngineConfigurationImpl setScriptEngineResolver(ScriptEngineResolver scriptEngineResolver) {
+    this.scriptEngineResolver = scriptEngineResolver;
+    if (scriptingEngines != null) {
+      scriptingEngines.setScriptEngineResolver(scriptEngineResolver);
+    }
+    return this;
+  }
+
   public void setScriptingEnvironment(ScriptingEnvironment scriptingEnvironment) {
     this.scriptingEnvironment = scriptingEnvironment;
   }
@@ -4041,6 +4064,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setEnvScriptResolvers(List<ScriptEnvResolver> scriptEnvResolvers) {
     this.scriptEnvResolvers = scriptEnvResolvers;
+  }
+
+  public String getScriptEngineNameJavaScript() {
+    return scriptEngineNameJavaScript;
+  }
+
+  public ProcessEngineConfigurationImpl setScriptEngineNameJavaScript(String scriptEngineNameJavaScript) {
+    this.scriptEngineNameJavaScript = scriptEngineNameJavaScript;
+    return this;
   }
 
   public ProcessEngineConfiguration setArtifactFactory(ArtifactFactory artifactFactory) {
@@ -4227,6 +4259,33 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfigurationImpl setEnableFetchScriptEngineFromProcessApplication(boolean enable) {
     this.enableFetchScriptEngineFromProcessApplication = enable;
+    return this;
+  }
+
+  public boolean isEnableScriptEngineLoadExternalResources() {
+    return enableScriptEngineLoadExternalResources;
+  }
+
+  public ProcessEngineConfigurationImpl setEnableScriptEngineLoadExternalResources(boolean enableScriptEngineLoadExternalResources) {
+    this.enableScriptEngineLoadExternalResources = enableScriptEngineLoadExternalResources;
+    return this;
+  }
+
+  public boolean isEnableScriptEngineNashornCompatibility() {
+    return enableScriptEngineNashornCompatibility;
+  }
+
+  public ProcessEngineConfigurationImpl setEnableScriptEngineNashornCompatibility(boolean enableScriptEngineNashornCompatibility) {
+    this.enableScriptEngineNashornCompatibility = enableScriptEngineNashornCompatibility;
+    return this;
+  }
+
+  public boolean isConfigureScriptEngineHostAccess() {
+    return configureScriptEngineHostAccess;
+  }
+
+  public ProcessEngineConfigurationImpl setConfigureScriptEngineHostAccess(boolean configureScriptEngineHostAccess) {
+    this.configureScriptEngineHostAccess = configureScriptEngineHostAccess;
     return this;
   }
 

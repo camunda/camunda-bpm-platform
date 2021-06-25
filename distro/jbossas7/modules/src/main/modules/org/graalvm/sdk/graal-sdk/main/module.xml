@@ -1,0 +1,10 @@
+<module xmlns="urn:jboss:module:1.0" name="org.graalvm.sdk.graal-sdk">
+  <resources>
+    <resource-root path="graal-sdk-@version.graal.js@.jar" />
+  </resources>
+
+  <dependencies>
+    <module name="javax.api" />
+    <module name="sun.jdk" />
+  </dependencies>
+</module>
