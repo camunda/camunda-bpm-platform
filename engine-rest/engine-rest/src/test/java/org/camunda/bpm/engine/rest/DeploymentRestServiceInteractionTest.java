@@ -1236,7 +1236,6 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
 
     resourceNames.addAll( Arrays.asList("data", "more-data") );
 
-    // deploy-changed-only should override enable-duplicate-filtering
     given()
         .multiPart("data", "unspecified", createMockDeploymentResourceByteData())
         .multiPart("deployment-activation-time", "2030-11-11T11:11:11Z")
