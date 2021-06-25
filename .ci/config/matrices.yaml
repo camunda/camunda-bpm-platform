@@ -27,6 +27,7 @@ engine-webapp-unit:
   - 'sqlserver_2016'
   - 'sqlserver_2017'
   - 'sqlserver_2019'
+  - 'azure_sql_db'
   stages: 
   - 'db-unit'
   - 'db-unit-authorizations'
@@ -65,6 +66,7 @@ daily-stages:
   - 'sqlserver_2016'
   - 'sqlserver_2017'
   - 'sqlserver_2019'
+  - 'azure_sql_db'
   stages: 
   - 'sql-scripts'
   - 'upgrade-database'
