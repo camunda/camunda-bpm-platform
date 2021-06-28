@@ -50,7 +50,7 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
   protected String workerId;
   protected int maxResults;
   protected boolean usePriority;
-  protected Map<String, TopicFetchInstruction> fetchInstructions = new HashMap<String, TopicFetchInstruction>();
+  protected Map<String, TopicFetchInstruction> fetchInstructions = new HashMap<>();
 
   public FetchExternalTasksCmd(String workerId, int maxResults, Map<String, TopicFetchInstruction> instructions) {
     this(workerId, maxResults, instructions, false);
@@ -73,22 +73,22 @@ public class FetchExternalTasksCmd implements Command<List<LockedExternalTask>> 
 
     List<ExternalTaskEntity> externalTasks = commandContext
       .getExternalTaskManager()
-      .selectExternalTasksForTopics(fetchInstructions.values(), maxResults, usePriority);
+      .selectExternalTasksForTopics(new ArrayList<>(fetchInstructions.values()), maxResults, usePriority);
 
-    final List<LockedExternalTask> result = new ArrayList<LockedExternalTask>();
+    final List<LockedExternalTask> result = new ArrayList<>();
 
     for (ExternalTaskEntity entity : externalTasks) {
-      
+
       TopicFetchInstruction fetchInstruction = fetchInstructions.get(entity.getTopicName());
-      
+
       // retrieve the execution first to detect concurrent modifications @https://jira.camunda.com/browse/CAM-10750
       ExecutionEntity execution = entity.getExecution(false);
-      
+
       if (execution != null) {
         entity.lock(workerId, fetchInstruction.getLockDuration());
         LockedExternalTaskImpl resultTask = LockedExternalTaskImpl.fromEntity(entity, fetchInstruction.getVariablesToFetch(), fetchInstruction.isLocalVariables(),
               fetchInstruction.isDeserializeVariables(), fetchInstruction.isIncludeExtensionProperties());
-        result.add(resultTask); 
+        result.add(resultTask);
       } else {
         LOG.logTaskWithoutExecution(workerId);
       }
