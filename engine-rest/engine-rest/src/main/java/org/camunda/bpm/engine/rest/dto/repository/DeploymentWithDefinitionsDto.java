@@ -18,7 +18,6 @@ package org.camunda.bpm.engine.rest.dto.repository;
 
 import org.camunda.bpm.engine.repository.*;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +31,6 @@ public class DeploymentWithDefinitionsDto extends DeploymentDto {
   protected Map<String, CaseDefinitionDto> deployedCaseDefinitions;
   protected Map<String, DecisionDefinitionDto> deployedDecisionDefinitions;
   protected Map<String, DecisionRequirementsDefinitionDto> deployedDecisionRequirementsDefinitions;
-  protected Date activationTime;
 
   public Map<String, ProcessDefinitionDto> getDeployedProcessDefinitions() {
     return deployedProcessDefinitions;
@@ -49,12 +47,6 @@ public class DeploymentWithDefinitionsDto extends DeploymentDto {
   public Map<String, DecisionRequirementsDefinitionDto> getDeployedDecisionRequirementsDefinitions() {
     return deployedDecisionRequirementsDefinitions;
   }
-
-  public Date getActivationTime() { return activationTime; }
-
-  // DB Entity Deployment does not have a suitable attribute which can be mapped
-  public void setActivationTime(Date activationTime) { this.activationTime = activationTime; }
-
 
   public static DeploymentWithDefinitionsDto fromDeployment(DeploymentWithDefinitions deployment) {
     DeploymentWithDefinitionsDto dto = new DeploymentWithDefinitionsDto();
