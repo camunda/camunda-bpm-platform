@@ -22,6 +22,9 @@ IF "x%JAVA_HOME%" == "x" (
   )
 )
 
+IF NOT "x%JAVA_OPTS%" == "x" (
+  ECHO JAVA_OPTS: %JAVA_OPTS%
+)
 
 REM set environment parameters
 SET webappsPath=%BASEDIR%internal\webapps
@@ -92,6 +95,5 @@ IF [%swaggeruiChosen%]==[true] (
 
 ECHO classpath: %classPath%
 
-
 REM start the application
-call %JAVA% -Dloader.path="%classPath%" -Dcamunda.deploymentDir="%deploymentDir%" -jar "%BASEDIR%internal\camunda-bpm-run-core.jar" --spring.config.location=file:"%configuration%"
+call %JAVA% -Dloader.path="%classPath%" -Dcamunda.deploymentDir="%deploymentDir%" %JAVA_OPTS% -jar "%BASEDIR%internal\camunda-bpm-run-core.jar" --spring.config.location=file:"%configuration%"

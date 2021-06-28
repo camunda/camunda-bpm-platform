@@ -15,6 +15,9 @@ if [ "x$JAVA" = "x" ]; then
   fi
 fi
 
+if [ "x$JAVA_OPTS" != "x" ]; then
+  echo JAVA_OPTS: $JAVA_OPTS
+fi
 
 # set environment parameters
 webappsPath=$BASEDIR/internal/webapps/
@@ -74,4 +77,4 @@ fi
 echo classpath: $classPath
 
 # start the application
-"$JAVA" -Dloader.path="$classPath" -Dcamunda.deploymentDir="$deploymentDir" -jar "$BASEDIR/internal/camunda-bpm-run-core.jar" --spring.config.location=file:"$configuration"
+"$JAVA" -Dloader.path="$classPath" -Dcamunda.deploymentDir="$deploymentDir" $JAVA_OPTS -jar "$BASEDIR/internal/camunda-bpm-run-core.jar" --spring.config.location=file:"$configuration"
