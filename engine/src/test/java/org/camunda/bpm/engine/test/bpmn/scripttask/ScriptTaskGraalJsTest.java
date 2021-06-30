@@ -49,9 +49,12 @@ public class ScriptTaskGraalJsTest extends AbstractScriptTaskTest {
   private static final String GRAALJS = "graal.js";
 
   protected ScriptEngineResolver defaultScriptEngineResolver;
+  protected boolean spinEnabled = false;
 
   @Before
   public void setup() {
+    spinEnabled = processEngineConfiguration.getEnvScriptResolvers().stream()
+                    .anyMatch(resolver -> resolver.getClass().getSimpleName().equals("SpinScriptEnvResolver"));
     defaultScriptEngineResolver = processEngineConfiguration.getScriptEngineResolver();
     processEngineConfiguration.setConfigureScriptEngineHostAccess(configureHostAccess);
     processEngineConfiguration.setEnableScriptEngineLoadExternalResources(enableExternalResources);
@@ -142,7 +145,7 @@ public class ScriptTaskGraalJsTest extends AbstractScriptTaskTest {
       // THEN
       // this is not allowed in the JS ScriptEngine
         .isInstanceOf(ScriptEvaluationException.class)
-        .hasMessageContaining("TypeError");
+        .hasMessageContaining(spinEnabled ? "ReferenceError" : "TypeError");
     }
   }
 
@@ -181,7 +184,7 @@ public class ScriptTaskGraalJsTest extends AbstractScriptTaskTest {
       // THEN
       // this is not allowed in the JS ScriptEngine
         .isInstanceOf(ScriptEvaluationException.class)
-        .hasMessageContaining("TypeError");
+        .hasMessageContaining(spinEnabled ? "ReferenceError" : "TypeError");
     }
 
   }
@@ -193,9 +196,19 @@ public class ScriptTaskGraalJsTest extends AbstractScriptTaskTest {
 
     deployProcess(GRAALJS, scriptText);
 
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
-    Object variableValue = runtimeService.getVariable(pi.getId(), "foo");
-    assertNull(variableValue);
+    if (spinEnabled && !enableNashornCompat && !configureHostAccess) {
+      // WHEN
+      // we start an instance of this process
+      assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("testProcess"))
+      // THEN
+      // this Java access is not allowed for Spin Environment Script
+        .isInstanceOf(ScriptEvaluationException.class)
+        .hasMessageContaining("ReferenceError");
+    } else {
+      ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
+      Object variableValue = runtimeService.getVariable(pi.getId(), "foo");
+      assertNull(variableValue);
+    }
 
   }
 
@@ -257,7 +270,10 @@ public class ScriptTaskGraalJsTest extends AbstractScriptTaskTest {
         // THEN
         // this is not allowed in the JS ScriptEngine
           .isInstanceOf(ScriptEvaluationException.class)
-          .hasMessageContaining(enableExternalResources && !configureHostAccess ? "TypeError" : "Operation is not allowed");
+          .hasMessageContaining(
+              (spinEnabled && !configureHostAccess) ? "ReferenceError" :
+              (enableExternalResources && !configureHostAccess) ? "TypeError" :
+              "Operation is not allowed");
       }
   }
 
