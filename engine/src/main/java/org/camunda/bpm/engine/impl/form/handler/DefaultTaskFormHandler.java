@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.form.handler;
 
-import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.impl.form.TaskFormDataImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
@@ -29,8 +28,6 @@ public class DefaultTaskFormHandler extends DefaultFormHandler implements TaskFo
 
   public TaskFormData createTaskForm(TaskEntity task) {
     TaskFormDataImpl taskFormData = new TaskFormDataImpl();
-
-    Expression formKey = task.getTaskDefinition().getFormKey();
 
     if (formKey != null) {
       Object formValue = formKey.getValue(task);
