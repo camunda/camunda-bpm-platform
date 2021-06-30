@@ -95,7 +95,7 @@ public class DefaultFormHandler implements FormHandler {
     String formRefAttribute = activityElement.attributeNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "formRef");
 
     if(formKeyAttribute != null && formRefAttribute != null) {
-      bpmnParse.addError("Invalid task definition: only one of the attributes formKey and formRef is allowed.", activityElement);
+      bpmnParse.addError("Invalid element definition: only one of the attributes formKey and formRef is allowed.", activityElement);
     }
 
     if (formKeyAttribute != null) {
@@ -108,7 +108,7 @@ public class DefaultFormHandler implements FormHandler {
           "formRefBinding");
       List<String> allowedBindings = Arrays.asList("deployment", "latest", "version");
       if (formRefBindingAttribute == null || !allowedBindings.contains(formRefBindingAttribute)) {
-        bpmnParse.addError("Invalid task definition: value for formRefBinding attribute has to be one of "
+        bpmnParse.addError("Invalid element definition: value for formRefBinding attribute has to be one of "
             + allowedBindings + " but was " + formRefBindingAttribute, activityElement);
       }
       this.camundaFormDefinitionBinding = formRefBindingAttribute;

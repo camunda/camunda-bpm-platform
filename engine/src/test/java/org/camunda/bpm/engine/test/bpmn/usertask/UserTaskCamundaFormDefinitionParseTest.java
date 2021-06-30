@@ -160,7 +160,7 @@ public class UserTaskCamundaFormDefinitionParseTest {
     // when/then expect parse exception
     assertThatThrownBy(() -> repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy())
       .isInstanceOf(ParseException.class)
-      .hasMessageContaining("Invalid task definition: value for formRefBinding attribute has to be one of [deployment, latest, version] but was unsupported");
+      .hasMessageContaining("Invalid element definition: value for formRefBinding attribute has to be one of [deployment, latest, version] but was unsupported");
   }
 
   @Test
@@ -171,7 +171,7 @@ public class UserTaskCamundaFormDefinitionParseTest {
     // when/then expect parse exception
     assertThatThrownBy(() -> repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy())
       .isInstanceOf(ParseException.class)
-      .hasMessageContaining("Invalid task definition: only one of the attributes formKey and formRef is allowed.");
+      .hasMessageContaining("Invalid element definition: only one of the attributes formKey and formRef is allowed.");
   }
 
   private TaskDefinition findUserTaskDefinition(String activityId) {
