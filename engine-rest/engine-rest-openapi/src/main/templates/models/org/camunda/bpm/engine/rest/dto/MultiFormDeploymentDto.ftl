@@ -34,6 +34,13 @@
         desc = "The name for the deployment to be created."/>
 
     <@lib.property
+        name = "deployment-activation-time"
+        type = "string"
+        format = "date-time"
+        desc = "Sets the date on which the process definitions contained in this deployment will be activated. This means that all process
+                definitions will be deployed as usual, but they will be suspended from the start until the given activation date."/>
+
+    <@lib.property
         name = "data"
         type = "string"
         format = "binary"
