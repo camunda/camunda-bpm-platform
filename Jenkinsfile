@@ -18,8 +18,8 @@ pipeline {
     copyArtifactPermission('*')
     throttleJobProperty(
       throttleEnabled: true,
-      throttleOption: 'category',
-      categories: ['restrictedConcurrency']
+      throttleOption: 'project',
+      maxConcurrentTotal: 2
     )
   }
   parameters {
