@@ -29,6 +29,12 @@ public class DefaultTaskFormHandler extends DefaultFormHandler implements TaskFo
   public TaskFormData createTaskForm(TaskEntity task) {
     TaskFormDataImpl taskFormData = new TaskFormDataImpl();
 
+    // for CMMN task the form key has to be set here
+    // for BPMN, the parser will already take care of it
+    if(task.getCaseDefinitionId() != null) {
+      formKey = task.getTaskDefinition().getFormKey();
+    }
+
     if (formKey != null) {
       Object formValue = formKey.getValue(task);
       if (formValue != null) {
