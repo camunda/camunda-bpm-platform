@@ -141,7 +141,7 @@ public class DeploymentRestServiceImpl extends AbstractRestProcessEngineAware im
     }
 
     FormPart deploymentActivationTime = payload.getNamedPart(DEPLOYMENT_ACTIVATION_TIME);
-    if (deploymentActivationTime != null) {
+    if (deploymentActivationTime != null && !deploymentActivationTime.getTextContent().isEmpty()) {
       deploymentBuilder.activateProcessDefinitionsOn(DateTimeUtil.parseDate(deploymentActivationTime.getTextContent()));
     }
 
