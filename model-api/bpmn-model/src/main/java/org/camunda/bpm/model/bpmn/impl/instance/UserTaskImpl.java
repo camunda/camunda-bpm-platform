@@ -26,6 +26,9 @@ import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBU
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_FOLLOW_UP_DATE;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_FORM_HANDLER_CLASS;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_FORM_KEY;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_FORM_REF;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_FORM_REF_BINDING;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_FORM_REF_VERSION;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_PRIORITY;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
 
@@ -65,6 +68,9 @@ public class UserTaskImpl extends TaskImpl implements UserTask {
   protected static Attribute<String> camundaFollowUpDateAttribute;
   protected static Attribute<String> camundaFormHandlerClassAttribute;
   protected static Attribute<String> camundaFormKeyAttribute;
+  protected static Attribute<String> camundaFormRefAttribute;
+  protected static Attribute<String> camundaFormRefBindingAttribute;
+  protected static Attribute<String> camundaFormRefVersionAttribute;
   protected static Attribute<String> camundaPriorityAttribute;
 
   public static void registerType(ModelBuilder modelBuilder) {
@@ -115,6 +121,18 @@ public class UserTaskImpl extends TaskImpl implements UserTask {
     camundaFormKeyAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_FORM_KEY)
       .namespace(CAMUNDA_NS)
       .build();
+
+    camundaFormRefAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_FORM_REF)
+        .namespace(CAMUNDA_NS)
+        .build();
+
+    camundaFormRefBindingAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_FORM_REF_BINDING)
+        .namespace(CAMUNDA_NS)
+        .build();
+
+    camundaFormRefVersionAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_FORM_REF_VERSION)
+        .namespace(CAMUNDA_NS)
+        .build();
 
     camundaPriorityAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_PRIORITY)
       .namespace(CAMUNDA_NS)
@@ -222,6 +240,30 @@ public class UserTaskImpl extends TaskImpl implements UserTask {
     camundaFormKeyAttribute.setValue(this, camundaFormKey);
   }
 
+  public String getCamundaFormRef() {
+    return camundaFormRefAttribute.getValue(this);
+  }
+
+  public void setCamundaFormRef(String camundaFormRef) {
+    camundaFormRefAttribute.setValue(this, camundaFormRef);
+  }
+
+  public String getCamundaFormRefBinding() {
+    return camundaFormRefBindingAttribute.getValue(this);
+  }
+
+  public void setCamundaFormRefBinding(String camundaFormRefBinding) {
+    camundaFormRefBindingAttribute.setValue(this, camundaFormRefBinding);
+  }
+
+  public String getCamundaFormRefVersion() {
+    return camundaFormRefVersionAttribute.getValue(this);
+  }
+
+  public void setCamundaFormRefVersion(String camundaFormRefVersion) {
+    camundaFormRefVersionAttribute.setValue(this, camundaFormRefVersion);
+  }
+
   public String getCamundaPriority() {
     return camundaPriorityAttribute.getValue(this);
   }
@@ -229,5 +271,4 @@ public class UserTaskImpl extends TaskImpl implements UserTask {
   public void setCamundaPriority(String camundaPriority) {
     camundaPriorityAttribute.setValue(this, camundaPriority);
   }
-
 }

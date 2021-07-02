@@ -41,6 +41,9 @@ public class StartEventImpl extends CatchEventImpl implements StartEvent {
   protected static Attribute<Boolean> camundaAsyncAttribute;
   protected static Attribute<String> camundaFormHandlerClassAttribute;
   protected static Attribute<String> camundaFormKeyAttribute;
+  protected static Attribute<String> camundaFormRefAttribute;
+  protected static Attribute<String> camundaFormRefBindingAttribute;
+  protected static Attribute<String> camundaFormRefVersionAttribute;
   protected static Attribute<String> camundaInitiatorAttribute;
 
   public static void registerType(ModelBuilder modelBuilder) {
@@ -72,6 +75,18 @@ public class StartEventImpl extends CatchEventImpl implements StartEvent {
     camundaFormKeyAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_FORM_KEY)
       .namespace(CAMUNDA_NS)
       .build();
+
+    camundaFormRefAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_FORM_REF)
+        .namespace(CAMUNDA_NS)
+        .build();
+
+    camundaFormRefBindingAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_FORM_REF_BINDING)
+        .namespace(CAMUNDA_NS)
+        .build();
+
+    camundaFormRefVersionAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_FORM_REF_VERSION)
+        .namespace(CAMUNDA_NS)
+        .build();
 
     camundaInitiatorAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_INITIATOR)
       .namespace(CAMUNDA_NS)
@@ -129,6 +144,31 @@ public class StartEventImpl extends CatchEventImpl implements StartEvent {
 
   public void setCamundaFormKey(String camundaFormKey) {
     camundaFormKeyAttribute.setValue(this, camundaFormKey);
+  }
+
+
+  public String getCamundaFormRef() {
+    return camundaFormRefAttribute.getValue(this);
+  }
+
+  public void setCamundaFormRef(String camundaFormRef) {
+    camundaFormRefAttribute.setValue(this, camundaFormRef);
+  }
+
+  public String getCamundaFormRefBinding() {
+    return camundaFormRefBindingAttribute.getValue(this);
+  }
+
+  public void setCamundaFormRefBinding(String camundaFormRefBinding) {
+    camundaFormRefBindingAttribute.setValue(this, camundaFormRefBinding);
+  }
+
+  public String getCamundaFormRefVersion() {
+    return camundaFormRefVersionAttribute.getValue(this);
+  }
+
+  public void setCamundaFormRefVersion(String camundaFormRefVersion) {
+    camundaFormRefVersionAttribute.setValue(this, camundaFormRefVersion);
   }
 
   public String getCamundaInitiator() {

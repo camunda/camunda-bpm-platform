@@ -640,6 +640,9 @@ public class ProcessBuilderTest {
         .camundaFollowUpDate(TEST_FOLLOW_UP_DATE_API)
         .camundaFormHandlerClass(TEST_CLASS_API)
         .camundaFormKey(TEST_STRING_API)
+        .camundaFormRef(FORM_ID)
+        .camundaFormRefBinding(TEST_STRING_FORM_REF_BINDING)
+        .camundaFormRefVersion(TEST_STRING_FORM_REF_VERSION)
         .camundaPriority(TEST_PRIORITY_API)
         .camundaFailedJobRetryTimeCycle(FAILED_JOB_RETRY_TIME_CYCLE)
       .endEvent()
@@ -655,6 +658,9 @@ public class ProcessBuilderTest {
     assertThat(userTask.getCamundaFollowUpDate()).isEqualTo(TEST_FOLLOW_UP_DATE_API);
     assertThat(userTask.getCamundaFormHandlerClass()).isEqualTo(TEST_CLASS_API);
     assertThat(userTask.getCamundaFormKey()).isEqualTo(TEST_STRING_API);
+    assertThat(userTask.getCamundaFormRef()).isEqualTo(FORM_ID);
+    assertThat(userTask.getCamundaFormRefBinding()).isEqualTo(TEST_STRING_FORM_REF_BINDING);
+    assertThat(userTask.getCamundaFormRefVersion()).isEqualTo(TEST_STRING_FORM_REF_VERSION);
     assertThat(userTask.getCamundaPriority()).isEqualTo(TEST_PRIORITY_API);
 
     assertCamundaFailedJobRetryTimeCycle(userTask);
@@ -739,6 +745,9 @@ public class ProcessBuilderTest {
         .notCamundaExclusive()
         .camundaFormHandlerClass(TEST_CLASS_API)
         .camundaFormKey(TEST_STRING_API)
+        .camundaFormRef(FORM_ID)
+        .camundaFormRefBinding(TEST_STRING_FORM_REF_BINDING)
+        .camundaFormRefVersion(TEST_STRING_FORM_REF_VERSION)
         .camundaInitiator(TEST_STRING_API)
         .camundaFailedJobRetryTimeCycle(FAILED_JOB_RETRY_TIME_CYCLE)
       .done();
@@ -748,6 +757,9 @@ public class ProcessBuilderTest {
     assertThat(startEvent.isCamundaExclusive()).isFalse();
     assertThat(startEvent.getCamundaFormHandlerClass()).isEqualTo(TEST_CLASS_API);
     assertThat(startEvent.getCamundaFormKey()).isEqualTo(TEST_STRING_API);
+    assertThat(startEvent.getCamundaFormRef()).isEqualTo(FORM_ID);
+    assertThat(startEvent.getCamundaFormRefBinding()).isEqualTo(TEST_STRING_FORM_REF_BINDING);
+    assertThat(startEvent.getCamundaFormRefVersion()).isEqualTo(TEST_STRING_FORM_REF_VERSION);
     assertThat(startEvent.getCamundaInitiator()).isEqualTo(TEST_STRING_API);
 
     assertCamundaFailedJobRetryTimeCycle(startEvent);
@@ -2939,6 +2951,40 @@ public class ProcessBuilderTest {
 
     StartEvent startEvent = modelInstance.getModelElementById(START_EVENT_ID);
     assertCamundaFormField(startEvent);
+  }
+
+  @Test
+  public void testUserTaskCamundaFormRef() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .userTask(TASK_ID)
+        .camundaFormRef(FORM_ID)
+        .camundaFormRefBinding(TEST_STRING_FORM_REF_BINDING)
+        .camundaFormRefVersion(TEST_STRING_FORM_REF_VERSION)
+      .endEvent()
+      .done();
+
+    UserTask userTask = modelInstance.getModelElementById(TASK_ID);
+    assertThat(userTask.getCamundaFormRef()).isEqualTo(FORM_ID);
+    assertThat(userTask.getCamundaFormRefBinding()).isEqualTo(TEST_STRING_FORM_REF_BINDING);
+    assertThat(userTask.getCamundaFormRefVersion()).isEqualTo(TEST_STRING_FORM_REF_VERSION);
+  }
+
+  @Test
+  public void testStartEventCamundaFormRef() {
+    modelInstance = Bpmn.createProcess()
+        .startEvent(START_EVENT_ID)
+          .camundaFormRef(FORM_ID)
+          .camundaFormRefBinding(TEST_STRING_FORM_REF_BINDING)
+          .camundaFormRefVersion(TEST_STRING_FORM_REF_VERSION)
+        .userTask()
+        .endEvent()
+        .done();
+
+    StartEvent startEvent = modelInstance.getModelElementById(START_EVENT_ID);
+    assertThat(startEvent.getCamundaFormRef()).isEqualTo(FORM_ID);
+    assertThat(startEvent.getCamundaFormRefBinding()).isEqualTo(TEST_STRING_FORM_REF_BINDING);
+    assertThat(startEvent.getCamundaFormRefVersion()).isEqualTo(TEST_STRING_FORM_REF_VERSION);
   }
 
   @Test

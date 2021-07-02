@@ -85,6 +85,39 @@ public abstract class AbstractStartEventBuilder<B extends AbstractStartEventBuil
   }
 
   /**
+   * Sets the camunda form ref attribute.
+   *
+   * @param camundaFormRef the form ref to set
+   * @return the builder object
+   */
+  public B camundaFormRef(String camundaFormRef) {
+    element.setCamundaFormRef(camundaFormRef);
+    return myself;
+  }
+
+  /**
+   * Sets the camunda form ref binding attribute.
+   *
+   * @param camundaFormRef the form ref binding to set
+   * @return the builder object
+   */
+  public B camundaFormRefBinding(String camundaFormRefBinding) {
+    element.setCamundaFormRefBinding(camundaFormRefBinding);
+    return myself;
+  }
+
+  /**
+   * Sets the camunda form ref version attribute.
+   *
+   * @param camundaFormRef the form ref version to set
+   * @return the builder object
+   */
+  public B camundaFormRefVersion(String camundaFormRefVersion) {
+    element.setCamundaFormRefVersion(camundaFormRefVersion);
+    return myself;
+  }
+
+  /**
    * Sets the camunda initiator attribute.
    *
    * @param camundaInitiator  the initiator to set
@@ -128,7 +161,7 @@ public abstract class AbstractStartEventBuilder<B extends AbstractStartEventBuil
   public B error(String errorCode) {
     return error(errorCode, null);
   }
-  
+
   /**
    * Sets an error definition for the given error code. If already an error
    * with this code exists it will be used, otherwise a new error is created
@@ -142,7 +175,7 @@ public abstract class AbstractStartEventBuilder<B extends AbstractStartEventBuil
   public B error(String errorCode, String errorMessage) {
     ErrorEventDefinition errorEventDefinition = createErrorEventDefinition(errorCode, errorMessage);
     element.getEventDefinitions().add(errorEventDefinition);
-    
+
     return myself;
   }
 

@@ -451,6 +451,9 @@ public final class BpmnModelConstants {
   public static final String CAMUNDA_ATTRIBUTE_EXPRESSION = "expression";
   public static final String CAMUNDA_ATTRIBUTE_FORM_HANDLER_CLASS = "formHandlerClass";
   public static final String CAMUNDA_ATTRIBUTE_FORM_KEY = "formKey";
+  public static final String CAMUNDA_ATTRIBUTE_FORM_REF = "formRef";
+  public static final String CAMUNDA_ATTRIBUTE_FORM_REF_BINDING = "formRefBinding";
+  public static final String CAMUNDA_ATTRIBUTE_FORM_REF_VERSION = "formRefVersion";
   public static final String CAMUNDA_ATTRIBUTE_ID = "id";
   public static final String CAMUNDA_ATTRIBUTE_INITIATOR = "initiator";
   public static final String CAMUNDA_ATTRIBUTE_JOB_PRIORITY = "jobPriority";
