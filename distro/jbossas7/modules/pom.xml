@@ -13,6 +13,8 @@
 
   <properties>
     <org.jboss.shrinkwrap.resolver.version>1.0.0-beta-5</org.jboss.shrinkwrap.resolver.version>
+    <version.json-path>2.6.0</version.json-path>
+    <version.json-smart>2.4.7</version.json-smart>
     <!-- generate a bom of compile time dependencies for the license book.
     Note: Every compile time dependency will end up in the license book. Please
     declare only dependencies that are actually needed -->
@@ -240,6 +242,14 @@
                 </replace>
 
                 <replace dir="target/modules" token="@version.icu.icu4j@" value="${version.icu.icu4j}">
+                  <include name="**/module.xml" />
+                </replace>
+
+                <replace dir="target/modules" token="@version.json-path@" value="${version.json-path}">
+                  <include name="**/module.xml" />
+                </replace>
+
+                <replace dir="target/modules" token="@version.json-smart@" value="${version.json-smart}">
                   <include name="**/module.xml" />
                 </replace>
 
