@@ -162,8 +162,10 @@ public class BaseCallableElement {
     return tenantIdProvider;
   }
 
-
-  public boolean hasDynamicBindings() {
+  /**
+   * @return true if any of the references that specify the callable element are non-literal and need to be resolved.
+   */
+  public boolean hasDynamicReferences() {
     return isProviderDynamic(getTenantIdProvider())
       || isProviderDynamic(getDefinitionKeyValueProvider())
       || isProviderDynamic(getVersionValueProvider())

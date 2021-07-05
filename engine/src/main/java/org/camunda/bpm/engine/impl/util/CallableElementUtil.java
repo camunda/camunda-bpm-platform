@@ -47,7 +47,7 @@ public class CallableElementUtil {
   }
 
   public static ProcessDefinitionEntity getStaticallyBoundProcessDefinition(BaseCallableElement callableElement, String tenantId) {
-    if(callableElement.hasDynamicBindings()){
+    if(callableElement.hasDynamicReferences()){
       return null;
     }
 
