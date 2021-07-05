@@ -16,25 +16,6 @@
  */
 package org.camunda.bpm.engine.test.api.repository;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -45,12 +26,15 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.impl.RepositoryServiceImpl;
+import org.camunda.bpm.engine.impl.bpmn.behavior.CallActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.core.model.CallableElement;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -61,8 +45,12 @@ import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.ReadOnlyProcessDefinition;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
+import org.camunda.bpm.engine.impl.repository.CallActivityMappingImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.IoUtil;
+import org.camunda.bpm.engine.repository.CallActivityMapping;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
@@ -83,6 +71,29 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Frederik Heremans
@@ -1254,6 +1265,120 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
     assertEquals(1, processDefinition.getVersion());
 
     deleteDeployments(deploymentIds);
+  }
+
+  @Test
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/api/repository/call-activities-with-references.bpmn",
+    "org/camunda/bpm/engine/test/api/repository/failingProcessCreateOneIncident.bpmn20.xml",
+    "org/camunda/bpm/engine/test/api/repository/first-process.bpmn20.xml",
+    "org/camunda/bpm/engine/test/api/repository/three_.cmmn"
+  })
+  public void shouldReturnStaticCallActivityMappings() {
+    //given
+    String firstProcessRedeployment = repositoryService.createDeployment()
+      .addClasspathResource("org/camunda/bpm/engine/test/api/repository/second-process.bpmn20.xml").deploy().getId();
+
+    String deploymentWithTenant = repositoryService.createDeployment()
+      .addClasspathResource("org/camunda/bpm/engine/test/api/repository/processOne.bpmn20.xml").tenantId("someTenant").deploy().getId();
+
+    ProcessDefinition processDefinition = repositoryService
+      .createProcessDefinitionQuery()
+      .processDefinitionKey("TestCallActivitiesWithReferences")
+      .singleResult();
+
+    //when
+    List<CallActivityMapping> mappings = repositoryService.getStaticCallActivityMappings(processDefinition.getId());
+
+    // then
+    assertThat(mappings).hasSize(8); //cmmn tasks are not resolved, as cmmn is deprecated
+    assertThat(mappings).usingElementComparator((result, testValue) -> {
+      if (result.getCallActivityId().equals(testValue.getCallActivityId()) &&
+        ((result.getProcessDefinitionId() == null && testValue.getProcessDefinitionId() == null) ||
+          (result.getProcessDefinitionId().startsWith(testValue.getProcessDefinitionId())))
+      ) {
+        return 0;
+      } else {
+        return -1;
+      }
+    }).contains(
+      new CallActivityMappingImpl("latest_reference_1","process:2:"),
+      new CallActivityMappingImpl("version_1","process:1:"),
+      new CallActivityMappingImpl("deployment_1","process:1:"),
+      new CallActivityMappingImpl("version_tag_reference_1","failingProcess:1:"),
+      new CallActivityMappingImpl("no_reference_1",null),
+      new CallActivityMappingImpl("incorrect_reference_1",null),
+      new CallActivityMappingImpl("dynamic_reference_1",null),
+      new CallActivityMappingImpl("tenant_reference_1","processOne:1:")
+    );
+
+    // clean-up
+    repositoryService.deleteDeployment(firstProcessRedeployment, true, true);
+    repositoryService.deleteDeployment(deploymentWithTenant, true, true);
+
+  }
+
+  @Test
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/repository/dynamic-call-activities.bpmn" })
+  public void shouldNotTryToResolveDynamicCalledElementBinding() {
+    //given
+    ProcessDefinition processDefinition = repositoryService
+      .createProcessDefinitionQuery()
+      .processDefinitionKey("DynamicCallActivities")
+      .singleResult();
+
+    List<ActivityImpl> callActivities = ((ProcessDefinitionImpl) repositoryService
+      .getProcessDefinition(processDefinition.getId())).getActivities().stream()
+      .filter(act -> act.getActivityBehavior() instanceof CallActivityBehavior)
+      .map(activity -> {
+        CallableElement callableElement = ((CallActivityBehavior) activity.getActivityBehavior()).getCallableElement();
+        CallableElement spy = Mockito.spy(callableElement);
+        ((CallActivityBehavior) activity.getActivityBehavior()).setCallableElement(spy);
+        return activity;
+      }).collect(Collectors.toList());
+
+    //when
+    List<CallActivityMapping> mappings = repositoryService.getStaticCallActivityMappings(processDefinition.getId());
+
+    //then
+    //check that we never try to resolve any of the dynamic bindings
+    for (ActivityImpl activity : callActivities) {
+      CallableElement callableElement = ((CallActivityBehavior) activity.getActivityBehavior()).getCallableElement();
+      Mockito.verify(callableElement, Mockito.never()).getDefinitionKey(Mockito.anyObject());
+      Mockito.verify(callableElement, Mockito.never()).getVersion(Mockito.anyObject());
+      Mockito.verify(callableElement, Mockito.never()).getVersionTag(Mockito.anyObject());
+      Mockito.verify(callableElement, Mockito.never()).getDefinitionTenantId(Mockito.anyObject());
+      Mockito.verify(callableElement, Mockito.times(1)).hasDynamicBindings();
+    }
+
+    for (CallActivityMapping mapping: mappings) {
+      assertThat(mapping.getProcessDefinitionId()).isNull();
+    }
+    assertThat(mappings).hasSize(4); //cmmn tasks are not resolved, as cmmn is deprecated
+
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/repository/first-process.bpmn20.xml" )
+  public void shouldReturnEmptyListIfNoCallActivityExists(){
+    //given
+    ProcessDefinition processDefinition = repositoryService
+      .createProcessDefinitionQuery()
+      .processDefinitionKey("process")
+      .singleResult();
+
+    //when
+    List<CallActivityMapping> maps = repositoryService.getStaticCallActivityMappings(processDefinition.getId());
+
+    //then
+    assertThat(maps).isEmpty();
+  }
+
+  @Test
+  public void testGetStaticCallActivityMappingShouldThrowIfProcessDoesNotExist(){
+    //given //when //then
+    assertThrows(NullValueException.class, () -> repositoryService.getStaticCallActivityMappings("notExistingId"));
+
   }
 
   private String deployProcessString(String processString) {

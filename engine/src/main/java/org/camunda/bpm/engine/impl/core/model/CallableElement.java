@@ -136,4 +136,8 @@ public class CallableElement extends BaseCallableElement {
 
   // deployment id //////////////////////////////////////////////////////////////
 
+  @Override
+  public boolean hasDynamicBindings() {
+    return super.hasDynamicBindings() || isProviderDynamic(getBusinessKeyValueProvider());
+  }
 }

@@ -16,11 +16,6 @@
  */
 package org.camunda.bpm.engine.impl;
 
-import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.util.Date;
-import java.util.List;
-
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.exception.DeploymentResourceNotFoundException;
@@ -45,6 +40,7 @@ import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourceForIdCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourceNamesCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourcesCmd;
 import org.camunda.bpm.engine.impl.cmd.GetIdentityLinksForProcessDefinitionCmd;
+import org.camunda.bpm.engine.impl.cmd.GetStaticCallActivityMappingsCmd;
 import org.camunda.bpm.engine.impl.cmd.UpdateDecisionDefinitionHistoryTimeToLiveCmd;
 import org.camunda.bpm.engine.impl.cmd.UpdateProcessDefinitionHistoryTimeToLiveCmd;
 import org.camunda.bpm.engine.impl.cmmn.cmd.GetDeploymentCaseDefinitionCmd;
@@ -67,11 +63,33 @@ import org.camunda.bpm.engine.impl.repository.DeleteProcessDefinitionsBuilderImp
 import org.camunda.bpm.engine.impl.repository.DeploymentBuilderImpl;
 import org.camunda.bpm.engine.impl.repository.ProcessApplicationDeploymentBuilderImpl;
 import org.camunda.bpm.engine.impl.repository.UpdateProcessDefinitionSuspensionStateBuilderImpl;
-import org.camunda.bpm.engine.repository.*;
+import org.camunda.bpm.engine.repository.CallActivityMapping;
+import org.camunda.bpm.engine.repository.CaseDefinition;
+import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
+import org.camunda.bpm.engine.repository.DecisionDefinition;
+import org.camunda.bpm.engine.repository.DecisionDefinitionQuery;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinitionQuery;
+import org.camunda.bpm.engine.repository.DeleteProcessDefinitionsBuilder;
+import org.camunda.bpm.engine.repository.DeleteProcessDefinitionsSelectBuilder;
+import org.camunda.bpm.engine.repository.DeploymentBuilder;
+import org.camunda.bpm.engine.repository.DeploymentQuery;
+import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
+import org.camunda.bpm.engine.repository.DiagramLayout;
+import org.camunda.bpm.engine.repository.ProcessApplicationDeploymentBuilder;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
+import org.camunda.bpm.engine.repository.Resource;
+import org.camunda.bpm.engine.repository.UpdateProcessDefinitionSuspensionStateSelectBuilder;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 import org.camunda.bpm.model.dmn.DmnModelInstance;
+
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author Tom Baeyens
@@ -433,4 +451,10 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
   public InputStream getDecisionRequirementsDiagram(String decisionRequirementsDefinitionId) {
     return commandExecutor.execute(new GetDeploymentDecisionRequirementsDiagramCmd(decisionRequirementsDefinitionId));
   }
+
+  @Override
+  public List<CallActivityMapping> getStaticCallActivityMappings(String processDefinitionId) {
+    return commandExecutor.execute(new GetStaticCallActivityMappingsCmd(processDefinitionId));
+  }
+
 }

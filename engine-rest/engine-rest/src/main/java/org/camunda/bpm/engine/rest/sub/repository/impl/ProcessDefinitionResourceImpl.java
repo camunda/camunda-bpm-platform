@@ -42,6 +42,7 @@ import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 import org.camunda.bpm.engine.rest.dto.repository.ActivityStatisticsResultDto;
+import org.camunda.bpm.engine.rest.dto.repository.CallActivityMappingDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDiagramDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionSuspensionStateDto;
@@ -75,6 +76,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource {
 
@@ -376,6 +378,17 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
     VariableMap startFormVariables = formService.getStartFormVariables(processDefinitionId, formVariables, deserializeValues);
 
     return VariableValueDto.fromMap(startFormVariables);
+  }
+
+  @Override
+  public List<CallActivityMappingDto> getCallActivityMappings() {
+    try {
+      return engine.getRepositoryService().getStaticCallActivityMappings(processDefinitionId).stream()
+        .map(CallActivityMappingDto::from)
+        .collect(Collectors.toList());
+    } catch (NullValueException e) {
+      throw new InvalidRequestException(Status.NOT_FOUND, e.getMessage());
+    }
   }
 
   @Override
