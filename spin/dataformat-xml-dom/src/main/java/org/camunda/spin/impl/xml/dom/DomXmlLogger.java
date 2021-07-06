@@ -188,4 +188,12 @@ public class DomXmlLogger extends SpinLogger {
     ));
   }
 
+  public SpinXmlDataFormatException unableToFindStripSpaceXsl(String expression) {
+    return new SpinXmlDataFormatException(exceptionMessage("037", "Unable to find strip-space.xsl '{}'", expression));
+  }
+
+  public SpinXmlDataFormatException unableToLoadFormattingTemplates(Throwable cause) {
+    return new SpinXmlDataFormatException(exceptionMessage("038", "Failed to get formatting templates"), cause);
+  }
+
 }
