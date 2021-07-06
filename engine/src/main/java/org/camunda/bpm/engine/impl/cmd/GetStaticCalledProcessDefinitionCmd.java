@@ -16,7 +16,14 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.impl.bpmn.behavior.CallActivityBehavior;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.core.model.CallableElement;
@@ -24,25 +31,21 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
-import org.camunda.bpm.engine.impl.repository.CallActivityMappingImpl;
+import org.camunda.bpm.engine.impl.repository.StaticCalledProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.util.CallableElementUtil;
-import org.camunda.bpm.engine.repository.CallActivityMapping;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.repository.StaticCalledProcessDefinition;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-public class GetStaticCallActivityMappingsCmd implements Command<List<CallActivityMapping>> {
+public class GetStaticCalledProcessDefinitionCmd implements Command<Collection<StaticCalledProcessDefinition>> {
 
   protected String processDefinitionId;
 
-  public GetStaticCallActivityMappingsCmd(String processDefinitionId) {
+  public GetStaticCalledProcessDefinitionCmd(String processDefinitionId) {
     this.processDefinitionId = processDefinitionId;
   }
 
   @Override
-  public List<CallActivityMapping> execute(CommandContext commandContext) {
+  public Collection<StaticCalledProcessDefinition> execute(CommandContext commandContext) {
     ProcessDefinition definition = commandContext.getProcessEngineConfiguration().getRepositoryService()
       .getProcessDefinition(processDefinitionId);
 
@@ -52,30 +55,36 @@ public class GetStaticCallActivityMappingsCmd implements Command<List<CallActivi
     List<ActivityImpl> callActivities = activities.stream()
       .filter(act -> act.getActivityBehavior() instanceof CallActivityBehavior).collect(Collectors.toList());
 
-    List<CallActivityMapping> mappings = new ArrayList<>();
+    Map<String, StaticCalledProcessDefinitionImpl> map = new HashMap<>();
 
     for (ActivityImpl activity : callActivities) {
       CallActivityBehavior behavior = (CallActivityBehavior) activity.getActivityBehavior();
       CallableElement callableElement = behavior.getCallableElement();
 
-      try {
-        String tenantId = definition.getTenantId();
-        ProcessDefinitionEntity calledProcessDefinition = CallableElementUtil
-          .getStaticallyBoundProcessDefinition(callableElement, tenantId);
+      String tenantId = definition.getTenantId();
+      ProcessDefinitionEntity calledProcessDefinition = null;
+      calledProcessDefinition = CallableElementUtil.getStaticallyBoundProcessDefinition(callableElement, tenantId);
 
-        if (calledProcessDefinition == null) {
-          mappings.add(new CallActivityMappingImpl(activity.getActivityId(), null));
-        } else {
-          for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
-            checker.checkReadProcessDefinition(calledProcessDefinition);
+      if (calledProcessDefinition != null) {
+        if (!map.containsKey(calledProcessDefinition.getId())) {
+          try {
+            for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+              checker.checkReadProcessDefinition(calledProcessDefinition);
+            }
+            StaticCalledProcessDefinitionImpl result =
+              new StaticCalledProcessDefinitionImpl(calledProcessDefinition, processDefinitionId);
+            result.addCallingCallActivity(activity.getActivityId());
+
+            map.put(calledProcessDefinition.getId(), result);
+          } catch (AuthorizationException e) {
+            // unauthorized Process definitions will not be added.
           }
-          mappings.add(new CallActivityMappingImpl(activity.getActivityId(), calledProcessDefinition.getId()));
-        }
 
-      } catch (ProcessEngineException e) {
-        mappings.add(new CallActivityMappingImpl(activity.getActivityId(), null));
+        } else {
+          map.get(calledProcessDefinition.getId()).addCallingCallActivity(activity.getActivityId());
+        }
       }
     }
-    return mappings;
+    return new ArrayList<>(map.values());
   }
 }

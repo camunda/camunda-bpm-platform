@@ -16,10 +16,20 @@
  */
 package org.camunda.bpm.engine.repository;
 
-public interface CallActivityMapping {
+import java.util.List;
 
-  String getCallActivityId();
+public interface StaticCalledProcessDefinition {
 
-  String getProcessDefinitionId();
+  String getId();
+
+  String getName();
+
+  String getKey();
+
+  int getVersion();
+
+  String getCallingProcessDefinitionId();
+
+  List<String> getCallingCallActivityIds();
 
 }

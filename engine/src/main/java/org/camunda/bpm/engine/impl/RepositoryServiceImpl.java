@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.impl;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -45,7 +46,7 @@ import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourceForIdCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourceNamesCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourcesCmd;
 import org.camunda.bpm.engine.impl.cmd.GetIdentityLinksForProcessDefinitionCmd;
-import org.camunda.bpm.engine.impl.cmd.GetStaticCallActivityMappingsCmd;
+import org.camunda.bpm.engine.impl.cmd.GetStaticCalledProcessDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmd.UpdateDecisionDefinitionHistoryTimeToLiveCmd;
 import org.camunda.bpm.engine.impl.cmd.UpdateProcessDefinitionHistoryTimeToLiveCmd;
 import org.camunda.bpm.engine.impl.cmmn.cmd.GetDeploymentCaseDefinitionCmd;
@@ -436,8 +437,8 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
   }
 
   @Override
-  public List<CallActivityMapping> getStaticCallActivityMappings(String processDefinitionId) {
-    return commandExecutor.execute(new GetStaticCallActivityMappingsCmd(processDefinitionId));
+  public Collection<StaticCalledProcessDefinition> getStaticCalledProcessDefinition(String processDefinitionId) {
+    return commandExecutor.execute(new GetStaticCalledProcessDefinitionCmd(processDefinitionId));
   }
 
 }

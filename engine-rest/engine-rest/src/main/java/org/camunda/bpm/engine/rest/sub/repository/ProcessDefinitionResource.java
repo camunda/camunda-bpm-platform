@@ -20,7 +20,7 @@ import org.camunda.bpm.engine.rest.dto.StatisticsResultDto;
 import org.camunda.bpm.engine.rest.dto.HistoryTimeToLiveDto;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
-import org.camunda.bpm.engine.rest.dto.repository.CallActivityMappingDto;
+import org.camunda.bpm.engine.rest.dto.repository.StaticCalledProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDiagramDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionSuspensionStateDto;
@@ -117,7 +117,7 @@ public interface ProcessDefinitionResource {
       @QueryParam(VariableResource.DESERIALIZE_VALUES_QUERY_PARAM) @DefaultValue("true") boolean deserializeValues);
 
   @GET
-  @Path("/call-activity-mappings")
+  @Path("/static-called-process-definitions")
   @Produces(MediaType.APPLICATION_JSON)
-  List<CallActivityMappingDto> getCallActivityMappings();
+  List<StaticCalledProcessDefinitionDto> getStaticCalledProcessDefinitions();
 }

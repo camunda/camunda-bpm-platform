@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.impl.util;
 
 import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.model.BaseCallableElement;
@@ -58,7 +59,12 @@ public class CallableElementUtil {
     }
 
     String processDefinitionKey = callableElement.getDefinitionKey(emptyVariableScope);
-    return getCalledProcessDefinition(emptyVariableScope, callableElement, processDefinitionKey, tenantId);
+    try {
+      return getCalledProcessDefinition(emptyVariableScope, callableElement,
+        processDefinitionKey, tenantId);
+    } catch (NullValueException e) {
+      return null;
+    }
   }
 
   private static ProcessDefinitionEntity getCalledProcessDefinition(VariableScope execution,

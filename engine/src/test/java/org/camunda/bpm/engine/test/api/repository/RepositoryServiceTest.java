@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.assertj.core.groups.Tuple;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -69,10 +70,8 @@ import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.ReadOnlyProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
-import org.camunda.bpm.engine.impl.repository.CallActivityMappingImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.IoUtil;
-import org.camunda.bpm.engine.repository.CallActivityMapping;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
@@ -81,6 +80,7 @@ import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinitionQuery;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.repository.StaticCalledProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -90,7 +90,6 @@ import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.test.util.TestExecutionListener;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
@@ -1289,29 +1288,23 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
       .singleResult();
 
     //when
-    List<CallActivityMapping> mappings = repositoryService.getStaticCallActivityMappings(processDefinition.getId());
+    Collection<StaticCalledProcessDefinition> mappings = repositoryService.getStaticCalledProcessDefinition(processDefinition.getId());
 
     // then
-    assertThat(mappings).hasSize(8); //cmmn tasks are not resolved, as cmmn is deprecated
-    assertThat(mappings).usingElementComparator((result, testValue) -> {
-      if (result.getCallActivityId().equals(testValue.getCallActivityId()) &&
-        ((result.getProcessDefinitionId() == null && testValue.getProcessDefinitionId() == null) ||
-          (result.getProcessDefinitionId().startsWith(testValue.getProcessDefinitionId())))
-      ) {
-        return 0;
-      } else {
-        return -1;
-      }
-    }).contains(
-      new CallActivityMappingImpl("latest_reference_1","process:2:"),
-      new CallActivityMappingImpl("version_1","process:1:"),
-      new CallActivityMappingImpl("deployment_1","process:1:"),
-      new CallActivityMappingImpl("version_tag_reference_1","failingProcess:1:"),
-      new CallActivityMappingImpl("no_reference_1",null),
-      new CallActivityMappingImpl("incorrect_reference_1",null),
-      new CallActivityMappingImpl("dynamic_reference_1",null),
-      new CallActivityMappingImpl("tenant_reference_1","processOne:1:")
-    );
+    //cmmn tasks are not resolved, as cmmn is deprecated
+    assertThat(mappings).hasSize(4);
+
+    assertThat(mappings.stream()
+      .filter(def -> def.getId().startsWith("process:1:"))
+      .flatMap(def -> def.getCallingCallActivityIds().stream())
+      .collect(Collectors.toList()))
+      .containsExactlyInAnyOrder("deployment_1", "version_1");
+
+    assertThat(mappings).extracting("name", "version", "key","callActivityIds")
+      .contains(
+        Tuple.tuple("Process One", 1, "processOne", Arrays.asList("tenant_reference_1")),
+        Tuple.tuple("Second Test Process", 2, "process", Arrays.asList("latest_reference_1")),
+        Tuple.tuple("Failing Process", 1, "failingProcess", Arrays.asList("version_tag_reference_1")));
 
     // clean-up
     repositoryService.deleteDeployment(firstProcessRedeployment, true, true);
@@ -1339,7 +1332,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
       }).collect(Collectors.toList());
 
     //when
-    List<CallActivityMapping> mappings = repositoryService.getStaticCallActivityMappings(processDefinition.getId());
+    Collection<StaticCalledProcessDefinition> mappings = repositoryService.getStaticCalledProcessDefinition(processDefinition.getId());
 
     //then
     //check that we never try to resolve any of the dynamic bindings
@@ -1352,10 +1345,10 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
       Mockito.verify(callableElement, Mockito.times(1)).hasDynamicReferences();
     }
 
-    for (CallActivityMapping mapping: mappings) {
-      assertThat(mapping.getProcessDefinitionId()).isNull();
+    for (StaticCalledProcessDefinition mapping: mappings) {
+      assertThat(mapping.getId()).isNull();
     }
-    assertThat(mappings).hasSize(4); //cmmn tasks are not resolved, as cmmn is deprecated
+    assertThat(mappings).isEmpty();
 
   }
 
@@ -1369,7 +1362,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
       .singleResult();
 
     //when
-    List<CallActivityMapping> maps = repositoryService.getStaticCallActivityMappings(processDefinition.getId());
+    Collection<StaticCalledProcessDefinition> maps = repositoryService.getStaticCalledProcessDefinition(processDefinition.getId());
 
     //then
     assertThat(maps).isEmpty();
@@ -1378,7 +1371,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
   @Test
   public void testGetStaticCallActivityMappingShouldThrowIfProcessDoesNotExist(){
     //given //when //then
-    assertThrows(NullValueException.class, () -> repositoryService.getStaticCallActivityMappings("notExistingId"));
+    assertThrows(NullValueException.class, () -> repositoryService.getStaticCalledProcessDefinition("notExistingId"));
 
   }
 

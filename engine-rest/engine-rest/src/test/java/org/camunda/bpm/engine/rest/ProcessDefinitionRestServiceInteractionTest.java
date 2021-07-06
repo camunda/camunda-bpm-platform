@@ -27,10 +27,10 @@ import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
-import org.camunda.bpm.engine.impl.repository.CallActivityMappingImpl;
+import org.camunda.bpm.engine.impl.repository.StaticCalledProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
-import org.camunda.bpm.engine.repository.CallActivityMapping;
+import org.camunda.bpm.engine.repository.StaticCalledProcessDefinition;
 import org.camunda.bpm.engine.repository.DeleteProcessDefinitionsBuilder;
 import org.camunda.bpm.engine.repository.DeleteProcessDefinitionsSelectBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -120,7 +120,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
   protected static final String SINGLE_PROCESS_DEFINITION_BY_KEY_DELETE_URL = SINGLE_PROCESS_DEFINITION_BY_KEY_URL + "/delete";
   protected static final String SINGLE_PROCESS_DEFINITION_BY_KEY_AND_TENANT_ID_DELETE_URL = SINGLE_PROCESS_DEFINITION_BY_KEY_AND_TENANT_ID_URL + "/delete";
 
-  protected static final String PROCESS_DEFINITION_CALL_ACTIVITY_MAPPINGS = SINGLE_PROCESS_DEFINITION_URL + "/call-activity-mappings";
+  protected static final String PROCESS_DEFINITION_CALL_ACTIVITY_MAPPINGS = SINGLE_PROCESS_DEFINITION_URL + "/static-called-process-definitions";
 
   private RuntimeService runtimeServiceMock;
   private RepositoryService repositoryServiceMock;
@@ -4021,31 +4021,43 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testGetCallActivityMappings() {
-    List<CallActivityMapping> result = Collections
-      .singletonList(new CallActivityMappingImpl("anActivityId", "aProcDefId"));
-    when(repositoryServiceMock.getStaticCallActivityMappings(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)).thenReturn(result);
+    StaticCalledProcessDefinition mock = mock(StaticCalledProcessDefinitionImpl.class);
+    when(mock.getCallingCallActivityIds()).thenReturn(Arrays.asList("anActivity", "anotherActivity"));
+    when(mock.getId()).thenReturn("aKey:1:123");
+    when(mock.getCallingProcessDefinitionId()).thenReturn("aCallingId");
+    when(mock.getName()).thenReturn("a Name");
+    when(mock.getKey()).thenReturn("aKey");
+    when(mock.getVersion()).thenReturn(1);
+    List<StaticCalledProcessDefinition> result = Collections
+      .singletonList(mock);
+    when(repositoryServiceMock.getStaticCalledProcessDefinition(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)).thenReturn(result);
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
-      .then().expect()
+    .then().expect()
       .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
-      .body("[0].callActivityId", equalTo(result.get(0).getCallActivityId()))
-      .body("[0].processDefinitionId", equalTo(result.get(0).getProcessDefinitionId()))
-      .when()
+      .body("[0].callingProcessDefinitionId", equalTo(mock.getCallingProcessDefinitionId()))
+      .body("[0].id", equalTo(mock.getId()))
+      .body("[0].key", equalTo(mock.getKey()))
+      .body("[0].name", equalTo(mock.getName()))
+      .body("[0].version", equalTo(mock.getVersion()))
+      .body("[0].callActivityIds[0]", equalTo("anActivity"))
+      .body("[0].callActivityIds[1]", equalTo("anotherActivity"))
+    .when()
       .get(PROCESS_DEFINITION_CALL_ACTIVITY_MAPPINGS);
   }
 
   @Test
   public void testGetCallActivityMappingsNonExistingProcess() {
 
-    when(repositoryServiceMock.getStaticCallActivityMappings("NonExistingId")).thenThrow(
+    when(repositoryServiceMock.getStaticCalledProcessDefinition("NonExistingId")).thenThrow(
       new NullValueException());
 
     given()
       .pathParam("id", "NonExistingId")
-      .then().expect()
+    .then().expect()
       .statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
-      .when()
+    .when()
       .get(PROCESS_DEFINITION_CALL_ACTIVITY_MAPPINGS);
   }
 

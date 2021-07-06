@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine;
 
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -28,7 +29,6 @@ import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
-import org.camunda.bpm.engine.repository.CallActivityMapping;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
@@ -44,6 +44,7 @@ import org.camunda.bpm.engine.repository.ProcessApplicationDeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.repository.Resource;
+import org.camunda.bpm.engine.repository.StaticCalledProcessDefinition;
 import org.camunda.bpm.engine.repository.UpdateProcessDefinitionSuspensionStateBuilder;
 import org.camunda.bpm.engine.repository.UpdateProcessDefinitionSuspensionStateSelectBuilder;
 import org.camunda.bpm.engine.task.IdentityLink;
@@ -798,26 +799,21 @@ public interface RepositoryService {
   InputStream getDecisionRequirementsDiagram(String decisionRequirementsDefinitionId);
 
   /**
-   * Returns the mappings between call activities and called processes that are inferrable without runtime information.
-   *
-   * For each call activity contained in the process identified by the processDefinitionId, this method returns a
-   * mapping with the id of the call activity and the id of the called process.
-   * The id of the called process is only resolved if it is resolvable without any runtime information.
-   * E.g., processes that are referenced with an expressions will not be resolved. In that case, the process definition id
-   * of the returned mapping will be <code>null</code>.
-   *
-   * This method does not resolve mappings to case definitions.
+   * For the given process, returns a list of {@link StaticCalledProcessDefinition}.
+   * The list contains all processes that are referenced statically by call activities in the given process.
+   * This method does not resolve process definitions that are referenced with expressions.
+   * Each {@link StaticCalledProcessDefinition} contains a list of call activity ids, which specifies the call activities
+   * that are calling that process.
+   * This method does not resolve references to case definitions.
    *
    * @param processDefinitionId id of a {@link ProcessDefinition}
-   * @return a list of {@link CallActivityMapping}.
-   * <code>CallActivityMapping#getProcessDefinitionId</code> will be <code>null</code> if
-   * the called process could not be resolved without runtime information.
+   * @return a list of {@link StaticCalledProcessDefinition}.
    *
    * @throws ProcessEngineException
    *          When the process definition doesn't exist.
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_DEFINITION}.
    */
-  List<CallActivityMapping> getStaticCallActivityMappings(String processDefinitionId);
+  Collection<StaticCalledProcessDefinition> getStaticCalledProcessDefinition(String processDefinitionId);
 }
 
