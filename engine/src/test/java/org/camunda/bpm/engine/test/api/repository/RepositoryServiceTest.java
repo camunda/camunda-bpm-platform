@@ -1274,7 +1274,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
     "org/camunda/bpm/engine/test/api/repository/first-process.bpmn20.xml",
     "org/camunda/bpm/engine/test/api/repository/three_.cmmn"
   })
-  public void shouldReturnStaticCallActivityMappings() {
+  public void shouldReturnStaticCalledProcessDefinition() {
     //given
     String firstProcessRedeployment = repositoryService.createDeployment()
       .addClasspathResource("org/camunda/bpm/engine/test/api/repository/second-process.bpmn20.xml").deploy().getId();

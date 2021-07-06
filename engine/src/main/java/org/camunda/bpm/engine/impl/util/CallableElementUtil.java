@@ -67,8 +67,12 @@ public class CallableElementUtil {
     }
   }
 
-  private static ProcessDefinitionEntity getCalledProcessDefinition(VariableScope execution,
-    BaseCallableElement callableElement, String processDefinitionKey, String tenantId) {
+  private static ProcessDefinitionEntity getCalledProcessDefinition(
+    VariableScope execution,
+    BaseCallableElement callableElement,
+    String processDefinitionKey,
+    String tenantId) {
+
     DeploymentCache deploymentCache = getDeploymentCache();
 
     ProcessDefinitionEntity processDefinition = null;

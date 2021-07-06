@@ -1,9 +1,3 @@
-package org.camunda.bpm.engine.rest.dto.repository;
-
-import java.util.List;
-
-import org.camunda.bpm.engine.repository.StaticCalledProcessDefinition;
-
 /*
  * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
  * under one or more contributor license agreements. See the NOTICE file
@@ -20,6 +14,12 @@ import org.camunda.bpm.engine.repository.StaticCalledProcessDefinition;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.camunda.bpm.engine.rest.dto.repository;
+
+import java.util.List;
+
+import org.camunda.bpm.engine.repository.StaticCalledProcessDefinition;
+
 public class StaticCalledProcessDefinitionDto {
 
   private String name;

@@ -4020,7 +4020,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
   }
 
   @Test
-  public void testGetCallActivityMappings() {
+  public void testGetStaticCalledProcessDefinition() {
     StaticCalledProcessDefinition mock = mock(StaticCalledProcessDefinitionImpl.class);
     when(mock.getCallingCallActivityIds()).thenReturn(Arrays.asList("anActivity", "anotherActivity"));
     when(mock.getId()).thenReturn("aKey:1:123");
@@ -4048,7 +4048,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
   }
 
   @Test
-  public void testGetCallActivityMappingsNonExistingProcess() {
+  public void testGetStaticCalledProcessDefinitionNonExistingProcess() {
 
     when(repositoryServiceMock.getStaticCalledProcessDefinition("NonExistingId")).thenThrow(
       new NullValueException());
