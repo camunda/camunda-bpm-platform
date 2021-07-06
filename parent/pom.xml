@@ -30,6 +30,7 @@
     <version.gson>2.8.5</version.gson>
     <version.openjpa>2.4.3</version.openjpa>
     <version.hibernate>5.4.18.Final</version.hibernate>
+    <version.hikaricp>4.0.3</version.hikaricp>
 
     <version.slf4j>1.7.26</version.slf4j>
     <version.logback>1.1.2</version.logback>
