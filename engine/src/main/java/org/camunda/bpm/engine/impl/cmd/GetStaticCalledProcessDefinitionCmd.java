@@ -62,26 +62,26 @@ public class GetStaticCalledProcessDefinitionCmd implements Command<Collection<S
       CallableElement callableElement = behavior.getCallableElement();
 
       String tenantId = definition.getTenantId();
-      ProcessDefinitionEntity calledProcessDefinition = null;
-      calledProcessDefinition = CallableElementUtil.getStaticallyBoundProcessDefinition(callableElement, tenantId);
+      ProcessDefinitionEntity calledProcess =
+        CallableElementUtil.getStaticallyBoundProcessDefinition(callableElement, tenantId);
 
-      if (calledProcessDefinition != null) {
-        if (!map.containsKey(calledProcessDefinition.getId())) {
+      if (calledProcess != null) {
+        if (!map.containsKey(calledProcess.getId())) {
           try {
             for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
-              checker.checkReadProcessDefinition(calledProcessDefinition);
+              checker.checkReadProcessDefinition(calledProcess);
             }
             StaticCalledProcessDefinitionImpl result =
-              new StaticCalledProcessDefinitionImpl(calledProcessDefinition, processDefinitionId);
+              new StaticCalledProcessDefinitionImpl(calledProcess, processDefinitionId);
             result.addCallingCallActivity(activity.getActivityId());
 
-            map.put(calledProcessDefinition.getId(), result);
+            map.put(calledProcess.getId(), result);
           } catch (AuthorizationException e) {
             // unauthorized Process definitions will not be added.
           }
 
         } else {
-          map.get(calledProcessDefinition.getId()).addCallingCallActivity(activity.getActivityId());
+          map.get(calledProcess.getId()).addCallingCallActivity(activity.getActivityId());
         }
       }
     }

@@ -1345,11 +1345,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
       Mockito.verify(callableElement, Mockito.times(1)).hasDynamicReferences();
     }
 
-    for (StaticCalledProcessDefinition mapping: mappings) {
-      assertThat(mapping.getId()).isNull();
-    }
     assertThat(mappings).isEmpty();
-
   }
 
   @Test
@@ -1372,7 +1368,6 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
   public void testGetStaticCallActivityMappingShouldThrowIfProcessDoesNotExist(){
     //given //when //then
     assertThrows(NullValueException.class, () -> repositoryService.getStaticCalledProcessDefinition("notExistingId"));
-
   }
 
   private String deployProcessString(String processString) {
