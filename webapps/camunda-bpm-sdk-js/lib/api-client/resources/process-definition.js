@@ -469,6 +469,19 @@ var ProcessDefinition = AbstractClientResource.extend(
       });
     },
 
+    /**
+     * todo
+     * @param  {uuid} id of the process definition to be requested
+     * @param  {Function} [done]
+     */
+    linkedCallableElements: function(id, done) {
+      const path = this.path +'/' + id + '/static-called-process-definitions' ;
+
+      return this.http.get(path, {
+        done: done
+      });
+    },
+
     restartAsync: function(id, params, done) {
       var url = this.path + '/' + id + '/restart-async';
 
@@ -476,7 +489,9 @@ var ProcessDefinition = AbstractClientResource.extend(
         data: params,
         done: done
       });
-    }
+    },
+
+
   }
 );
 

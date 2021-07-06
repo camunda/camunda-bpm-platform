@@ -47,7 +47,7 @@ module.exports = function(viewContext) {
       /**
        * @returns {Array} BPMN Elements that are flow nodes
        */
-      function getFlowNodes() {
+      function getCallActivityFlowNodes() {
         var nodes = [];
 
         elementRegistry.forEach(function(shape) {
@@ -196,7 +196,7 @@ module.exports = function(viewContext) {
       var overlays = control.getViewer().get('overlays');
       var elementRegistry = control.getViewer().get('elementRegistry');
       var TAB_NAME = 'called-process-instances-tab';
-      var flowNodes = getFlowNodes();
+      var callActivityFlowNodes = getCallActivityFlowNodes();
       var callActivityToInstancesMap = {};
 
       /**
@@ -214,7 +214,7 @@ module.exports = function(viewContext) {
 
       /**
        * returns activityIdToInstancesMap but with only non empty callActivities
-       * @param flowNodes (flowNodes of type CallActivity only)
+       * @param flowNodes (callActivityFlowNodes of type CallActivity only)
        * @param activityIdToInstancesMap
        */
       var getCallActivitiesMap = function(flowNodes, activityIdToInstancesMap) {
@@ -230,23 +230,23 @@ module.exports = function(viewContext) {
       };
 
       if (viewContext === 'history') {
-        flowNodes.length &&
+        callActivityFlowNodes.length &&
           processData.observe('activityIdToInstancesMap', function(
             activityIdToInstancesMap
           ) {
             callActivityToInstancesMap = getCallActivitiesMap(
-              flowNodes,
+              callActivityFlowNodes,
               activityIdToInstancesMap
             );
             addOverlays(callActivityToInstancesMap);
           });
       } else {
-        flowNodes.length &&
+        callActivityFlowNodes.length &&
           processData.observe(
             ['activityIdToInstancesMap', 'processInstance'],
             function(activityIdToInstancesMap, processInstance) {
               callActivityToInstancesMap = getCallActivitiesMap(
-                flowNodes,
+                callActivityFlowNodes,
                 activityIdToInstancesMap
               );
 

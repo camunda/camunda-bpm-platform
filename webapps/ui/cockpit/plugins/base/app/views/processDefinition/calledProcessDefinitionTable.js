@@ -112,10 +112,13 @@ module.exports = [
           ]);
 
           processData.observe(
-            ['calledProcessDefinitions', 'bpmnElements'],
-            function(calledProcessDefinitions, bpmnElements) {
+            ['calledProcessDefinitions', 'staticCalledProcessDefinitions', 'bpmnElements'],
+            function(calledProcessDefinitions, staticCalledProcessDefinitions, bpmnElements) {
+              console.log(staticCalledProcessDefinitions)
+              // todo check who else uses this
               $scope.calledProcessDefinitions = attachCalledFromActivities(
                 calledProcessDefinitions,
+                staticCalledProcessDefinitions,
                 bpmnElements
               ).map(function(calledProcessDefinition) {
                 return angular.extend({}, calledProcessDefinition, {
@@ -131,13 +134,16 @@ module.exports = [
 
           function attachCalledFromActivities(
             processDefinitions,
+            staticCalledProcesses,
             bpmnElements
           ) {
             var result = [];
 
-            angular.forEach(processDefinitions, function(d) {
-              var calledFromActivityIds = d.calledFromActivityIds,
-                calledFromActivities = [];
+            const definitions = [].concat(processDefinitions, staticCalledProcesses);
+
+            definitions.forEach(function(d) {
+              var calledFromActivityIds = d.calledFromActivityIds || d.callActivityIds;
+              const calledFromActivities = [];
 
               angular.forEach(calledFromActivityIds, function(activityId) {
                 var bpmnElement = bpmnElements[activityId];

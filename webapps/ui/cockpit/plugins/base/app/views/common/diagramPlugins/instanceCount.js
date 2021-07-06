@@ -50,7 +50,7 @@ module.exports = function(
         if (!overlaysNodes[element.id]) {
           nodes = getOverlayNodes(element, data);
 
-          overlays.add(element.id, {
+          const overlayId = overlays.add(element.id, {
             position: {
               bottom: 0,
               left: 0
@@ -61,7 +61,8 @@ module.exports = function(
             },
             html: nodes.html
           });
-
+          $scope.countOverlayIds = $scope.countOverlayIds? $scope.countOverlayIds: []
+          $scope.countOverlayIds.push(overlayId)
           overlaysNodes[element.id] = nodes;
         }
 
