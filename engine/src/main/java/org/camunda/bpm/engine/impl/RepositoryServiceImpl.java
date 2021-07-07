@@ -437,7 +437,7 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
   }
 
   @Override
-  public Collection<StaticCalledProcessDefinition> getStaticCalledProcessDefinition(String processDefinitionId) {
+  public Collection<CalledProcessDefinition> getStaticCalledProcessDefinitions(String processDefinitionId) {
     return commandExecutor.execute(new GetStaticCalledProcessDefinitionCmd(processDefinitionId));
   }
 

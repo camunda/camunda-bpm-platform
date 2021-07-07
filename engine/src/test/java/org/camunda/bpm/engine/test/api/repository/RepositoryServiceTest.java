@@ -80,7 +80,7 @@ import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinitionQuery;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.repository.StaticCalledProcessDefinition;
+import org.camunda.bpm.engine.repository.CalledProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -1276,11 +1276,10 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
   })
   public void shouldReturnStaticCalledProcessDefinition() {
     //given
-    String firstProcessRedeployment = repositoryService.createDeployment()
-      .addClasspathResource("org/camunda/bpm/engine/test/api/repository/second-process.bpmn20.xml").deploy().getId();
-
-    String deploymentWithTenant = repositoryService.createDeployment()
-      .addClasspathResource("org/camunda/bpm/engine/test/api/repository/processOne.bpmn20.xml").tenantId("someTenant").deploy().getId();
+    String firstProcessRedeployment = testRule
+      .deploy("org/camunda/bpm/engine/test/api/repository/second-process.bpmn20.xml").getId();
+    String deploymentWithTenant = testRule
+      .deployForTenant("someTenant", "org/camunda/bpm/engine/test/api/repository/processOne.bpmn20.xml").getId();
 
     ProcessDefinition processDefinition = repositoryService
       .createProcessDefinitionQuery()
@@ -1288,9 +1287,9 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
       .singleResult();
 
     //when
-    Collection<StaticCalledProcessDefinition> mappings = repositoryService.getStaticCalledProcessDefinition(processDefinition.getId());
+    Collection<CalledProcessDefinition> mappings = repositoryService.getStaticCalledProcessDefinitions(processDefinition.getId());
 
-    // then
+    //then
     //cmmn tasks are not resolved
     assertThat(mappings).hasSize(4);
 
@@ -1305,10 +1304,6 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
         Tuple.tuple("Process One", 1, "processOne", Arrays.asList("tenant_reference_1")),
         Tuple.tuple("Second Test Process", 2, "process", Arrays.asList("latest_reference_1")),
         Tuple.tuple("Failing Process", 1, "failingProcess", Arrays.asList("version_tag_reference_1")));
-
-    // clean-up
-    repositoryService.deleteDeployment(firstProcessRedeployment, true, true);
-    repositoryService.deleteDeployment(deploymentWithTenant, true, true);
 
   }
 
@@ -1332,7 +1327,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
       }).collect(Collectors.toList());
 
     //when
-    Collection<StaticCalledProcessDefinition> mappings = repositoryService.getStaticCalledProcessDefinition(processDefinition.getId());
+    Collection<CalledProcessDefinition> mappings = repositoryService.getStaticCalledProcessDefinitions(processDefinition.getId());
 
     //then
     //check that we never try to resolve any of the dynamic bindings
@@ -1358,7 +1353,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
       .singleResult();
 
     //when
-    Collection<StaticCalledProcessDefinition> maps = repositoryService.getStaticCalledProcessDefinition(processDefinition.getId());
+    Collection<CalledProcessDefinition> maps = repositoryService.getStaticCalledProcessDefinitions(processDefinition.getId());
 
     //then
     assertThat(maps).isEmpty();
@@ -1367,7 +1362,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
   @Test
   public void testGetStaticCallActivityMappingShouldThrowIfProcessDoesNotExist(){
     //given //when //then
-    assertThrows(NullValueException.class, () -> repositoryService.getStaticCalledProcessDefinition("notExistingId"));
+    assertThrows(NullValueException.class, () -> repositoryService.getStaticCalledProcessDefinitions("notExistingId"));
   }
 
   private String deployProcessString(String processString) {

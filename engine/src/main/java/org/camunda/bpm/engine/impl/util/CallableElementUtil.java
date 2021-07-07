@@ -16,8 +16,10 @@
  */
 package org.camunda.bpm.engine.impl.util;
 
+import static org.camunda.bpm.engine.impl.ProcessEngineLogger.UTIL_LOGGER;
+
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.VariableScope;
-import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.model.BaseCallableElement;
@@ -27,6 +29,7 @@ import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 
 /**
  * @author Roman Smirnov
@@ -47,7 +50,7 @@ public class CallableElementUtil {
     return getCalledProcessDefinition(execution, callableElement, processDefinitionKey, tenantId);
   }
 
-  public static ProcessDefinitionEntity getStaticallyBoundProcessDefinition(BaseCallableElement callableElement, String tenantId) {
+  public static ProcessDefinition getStaticallyBoundProcessDefinition(BaseCallableElement callableElement, String tenantId) {
     if(callableElement.hasDynamicReferences()){
       return null;
     }
@@ -60,9 +63,9 @@ public class CallableElementUtil {
 
     String processDefinitionKey = callableElement.getDefinitionKey(emptyVariableScope);
     try {
-      return getCalledProcessDefinition(emptyVariableScope, callableElement,
-        processDefinitionKey, tenantId);
-    } catch (NullValueException e) {
+      return getCalledProcessDefinition(emptyVariableScope, callableElement, processDefinitionKey, tenantId);
+    } catch (ProcessEngineException e) {
+      UTIL_LOGGER.debugCouldNotResolveCallableElement(e);
       return null;
     }
   }

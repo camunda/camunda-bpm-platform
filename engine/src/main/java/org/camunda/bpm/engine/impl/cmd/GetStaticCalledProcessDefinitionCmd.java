@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.ProcessEngineLogger.CMD_LOGGER;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -31,12 +33,12 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
-import org.camunda.bpm.engine.impl.repository.StaticCalledProcessDefinitionImpl;
+import org.camunda.bpm.engine.impl.repository.CalledProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.util.CallableElementUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.repository.StaticCalledProcessDefinition;
+import org.camunda.bpm.engine.repository.CalledProcessDefinition;
 
-public class GetStaticCalledProcessDefinitionCmd implements Command<Collection<StaticCalledProcessDefinition>> {
+public class GetStaticCalledProcessDefinitionCmd implements Command<Collection<CalledProcessDefinition>> {
 
   protected String processDefinitionId;
 
@@ -45,7 +47,7 @@ public class GetStaticCalledProcessDefinitionCmd implements Command<Collection<S
   }
 
   @Override
-  public Collection<StaticCalledProcessDefinition> execute(CommandContext commandContext) {
+  public Collection<CalledProcessDefinition> execute(CommandContext commandContext) {
     ProcessDefinitionEntity processDefinition = new GetDeployedProcessDefinitionCmd(processDefinitionId, true).execute(commandContext);
 
     List<ActivityImpl> activities = processDefinition.getActivities();
@@ -53,15 +55,14 @@ public class GetStaticCalledProcessDefinitionCmd implements Command<Collection<S
     List<ActivityImpl> callActivities = activities.stream()
       .filter(act -> act.getActivityBehavior() instanceof CallActivityBehavior).collect(Collectors.toList());
 
-    Map<String, StaticCalledProcessDefinitionImpl> map = new HashMap<>();
+    Map<String, CalledProcessDefinitionImpl> map = new HashMap<>();
 
     for (ActivityImpl activity : callActivities) {
       CallActivityBehavior behavior = (CallActivityBehavior) activity.getActivityBehavior();
       CallableElement callableElement = behavior.getCallableElement();
 
-      String tenantId = definition.getTenantId();
-      ProcessDefinitionEntity calledProcess =
-        CallableElementUtil.getStaticallyBoundProcessDefinition(callableElement, tenantId);
+      String tenantId = processDefinition.getTenantId();
+      ProcessDefinition calledProcess = CallableElementUtil.getStaticallyBoundProcessDefinition(callableElement, tenantId);
 
       if (calledProcess != null) {
         if (!map.containsKey(calledProcess.getId())) {
@@ -69,13 +70,14 @@ public class GetStaticCalledProcessDefinitionCmd implements Command<Collection<S
             for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
               checker.checkReadProcessDefinition(calledProcess);
             }
-            StaticCalledProcessDefinitionImpl result =
-              new StaticCalledProcessDefinitionImpl(calledProcess, processDefinitionId);
+            CalledProcessDefinitionImpl result =
+              new CalledProcessDefinitionImpl(calledProcess, processDefinitionId);
             result.addCallingCallActivity(activity.getActivityId());
 
             map.put(calledProcess.getId(), result);
           } catch (AuthorizationException e) {
             // unauthorized Process definitions will not be added.
+            CMD_LOGGER.debugCouldNotResolveCalledProcess(processDefinitionId, e);
           }
 
         } else {

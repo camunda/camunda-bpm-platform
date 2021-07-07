@@ -42,7 +42,7 @@ import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 import org.camunda.bpm.engine.rest.dto.repository.ActivityStatisticsResultDto;
-import org.camunda.bpm.engine.rest.dto.repository.StaticCalledProcessDefinitionDto;
+import org.camunda.bpm.engine.rest.dto.repository.CalledProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDiagramDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionSuspensionStateDto;
@@ -381,10 +381,10 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
   }
 
   @Override
-  public List<StaticCalledProcessDefinitionDto> getStaticCalledProcessDefinitions() {
+  public List<CalledProcessDefinitionDto> getStaticCalledProcessDefinitions() {
     try {
       return engine.getRepositoryService().getStaticCalledProcessDefinitions(processDefinitionId).stream()
-        .map(StaticCalledProcessDefinitionDto::from)
+        .map(CalledProcessDefinitionDto::from)
         .collect(Collectors.toList());
     } catch (NullValueException e) {
       throw new InvalidRequestException(Status.NOT_FOUND, e.getMessage());

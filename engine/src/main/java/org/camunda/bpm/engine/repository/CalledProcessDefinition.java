@@ -18,7 +18,7 @@ package org.camunda.bpm.engine.repository;
 
 import java.util.List;
 
-public interface StaticCalledProcessDefinition {
+public interface CalledProcessDefinition {
 
   String getId();
 

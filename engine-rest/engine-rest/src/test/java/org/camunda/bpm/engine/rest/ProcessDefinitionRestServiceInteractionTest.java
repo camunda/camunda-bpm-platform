@@ -27,10 +27,10 @@ import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
-import org.camunda.bpm.engine.impl.repository.StaticCalledProcessDefinitionImpl;
+import org.camunda.bpm.engine.impl.repository.CalledProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
-import org.camunda.bpm.engine.repository.StaticCalledProcessDefinition;
+import org.camunda.bpm.engine.repository.CalledProcessDefinition;
 import org.camunda.bpm.engine.repository.DeleteProcessDefinitionsBuilder;
 import org.camunda.bpm.engine.repository.DeleteProcessDefinitionsSelectBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -4021,14 +4021,14 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
 
   @Test
   public void testGetStaticCalledProcessDefinition() {
-    StaticCalledProcessDefinition mock = mock(StaticCalledProcessDefinitionImpl.class);
+    CalledProcessDefinition mock = mock(CalledProcessDefinitionImpl.class);
     when(mock.getCallingCallActivityIds()).thenReturn(Arrays.asList("anActivity", "anotherActivity"));
     when(mock.getId()).thenReturn("aKey:1:123");
     when(mock.getCallingProcessDefinitionId()).thenReturn("aCallingId");
     when(mock.getName()).thenReturn("a Name");
     when(mock.getKey()).thenReturn("aKey");
     when(mock.getVersion()).thenReturn(1);
-    List<StaticCalledProcessDefinition> result = Collections.singletonList(mock);
+    List<CalledProcessDefinition> result = Collections.singletonList(mock);
     when(repositoryServiceMock.getStaticCalledProcessDefinition(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)).thenReturn(result);
 
     given()

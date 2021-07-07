@@ -18,9 +18,9 @@ package org.camunda.bpm.engine.rest.dto.repository;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.repository.StaticCalledProcessDefinition;
+import org.camunda.bpm.engine.repository.CalledProcessDefinition;
 
-public class StaticCalledProcessDefinitionDto {
+public class CalledProcessDefinitionDto {
 
   private String name;
   private int version;
@@ -53,8 +53,8 @@ public class StaticCalledProcessDefinitionDto {
     return callingProcessDefinitionId;
   }
 
-  public static StaticCalledProcessDefinitionDto from(StaticCalledProcessDefinition calledDefinition){
-    StaticCalledProcessDefinitionDto dto = new StaticCalledProcessDefinitionDto();
+  public static CalledProcessDefinitionDto from(CalledProcessDefinition calledDefinition){
+    CalledProcessDefinitionDto dto = new CalledProcessDefinitionDto();
     dto.callingProcessDefinitionId = calledDefinition.getCallingProcessDefinitionId();
     dto.callActivityIds = calledDefinition.getCallingCallActivityIds();
     dto.id = calledDefinition.getId();

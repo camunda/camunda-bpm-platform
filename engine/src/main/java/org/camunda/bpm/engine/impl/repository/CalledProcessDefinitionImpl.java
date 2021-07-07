@@ -20,9 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.repository.StaticCalledProcessDefinition;
+import org.camunda.bpm.engine.repository.CalledProcessDefinition;
 
-public class StaticCalledProcessDefinitionImpl implements StaticCalledProcessDefinition {
+public class CalledProcessDefinitionImpl implements CalledProcessDefinition {
   protected String name;
   protected int version;
   protected String key;
@@ -30,7 +30,7 @@ public class StaticCalledProcessDefinitionImpl implements StaticCalledProcessDef
   protected String id;
   protected String callingProcessDefinitionId;
 
-  public StaticCalledProcessDefinitionImpl(ProcessDefinition calledProcessDefinition, String callingProcessDefinitionId) {
+  public CalledProcessDefinitionImpl(ProcessDefinition calledProcessDefinition, String callingProcessDefinitionId) {
     this.callActivityIds = new ArrayList<>();
     this.id = calledProcessDefinition.getId();
     this.key = calledProcessDefinition.getKey();
