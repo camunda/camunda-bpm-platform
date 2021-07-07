@@ -4028,8 +4028,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     when(mock.getName()).thenReturn("a Name");
     when(mock.getKey()).thenReturn("aKey");
     when(mock.getVersion()).thenReturn(1);
-    List<StaticCalledProcessDefinition> result = Collections
-      .singletonList(mock);
+    List<StaticCalledProcessDefinition> result = Collections.singletonList(mock);
     when(repositoryServiceMock.getStaticCalledProcessDefinition(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)).thenReturn(result);
 
     given()

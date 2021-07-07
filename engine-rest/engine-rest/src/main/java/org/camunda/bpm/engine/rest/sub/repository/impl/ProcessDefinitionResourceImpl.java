@@ -383,7 +383,7 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
   @Override
   public List<StaticCalledProcessDefinitionDto> getStaticCalledProcessDefinitions() {
     try {
-      return engine.getRepositoryService().getStaticCalledProcessDefinition(processDefinitionId).stream()
+      return engine.getRepositoryService().getStaticCalledProcessDefinitions(processDefinitionId).stream()
         .map(StaticCalledProcessDefinitionDto::from)
         .collect(Collectors.toList());
     } catch (NullValueException e) {

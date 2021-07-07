@@ -166,13 +166,13 @@ public class BaseCallableElement {
    * @return true if any of the references that specify the callable element are non-literal and need to be resolved.
    */
   public boolean hasDynamicReferences() {
-    return isProviderDynamic(getTenantIdProvider())
-      || isProviderDynamic(getDefinitionKeyValueProvider())
-      || isProviderDynamic(getVersionValueProvider())
-      || isProviderDynamic(getVersionTagValueProvider());
+    return isDynamicProvider(getTenantIdProvider())
+      || isDynamicProvider(getDefinitionKeyValueProvider())
+      || isDynamicProvider(getVersionValueProvider())
+      || isDynamicProvider(getVersionTagValueProvider());
   }
 
-  protected boolean isProviderDynamic(ParameterValueProvider provider){
+  protected boolean isDynamicProvider(ParameterValueProvider provider){
     if (provider instanceof ElValueProvider){
       return !((ElValueProvider) provider).getExpression().isLiteralText();
     } else if (provider instanceof NullValueProvider

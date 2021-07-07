@@ -1291,7 +1291,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
     Collection<StaticCalledProcessDefinition> mappings = repositoryService.getStaticCalledProcessDefinition(processDefinition.getId());
 
     // then
-    //cmmn tasks are not resolved, as cmmn is deprecated
+    //cmmn tasks are not resolved
     assertThat(mappings).hasSize(4);
 
     assertThat(mappings.stream()

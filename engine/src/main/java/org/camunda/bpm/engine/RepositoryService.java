@@ -814,6 +814,5 @@ public interface RepositoryService {
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_DEFINITION}.
    */
-  Collection<StaticCalledProcessDefinition> getStaticCalledProcessDefinition(String processDefinitionId);
+  Collection<StaticCalledProcessDefinition> getStaticCalledProcessDefinitions(String processDefinitionId);
 }
-

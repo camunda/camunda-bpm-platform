@@ -46,11 +46,9 @@ public class GetStaticCalledProcessDefinitionCmd implements Command<Collection<S
 
   @Override
   public Collection<StaticCalledProcessDefinition> execute(CommandContext commandContext) {
-    ProcessDefinition definition = commandContext.getProcessEngineConfiguration().getRepositoryService()
-      .getProcessDefinition(processDefinitionId);
+    ProcessDefinitionEntity processDefinition = new GetDeployedProcessDefinitionCmd(processDefinitionId, true).execute(commandContext);
 
-    List<ActivityImpl> activities = commandContext.getProcessEngineConfiguration().getDeploymentCache()
-      .findDeployedProcessDefinitionById(processDefinitionId).getActivities();
+    List<ActivityImpl> activities = processDefinition.getActivities();
 
     List<ActivityImpl> callActivities = activities.stream()
       .filter(act -> act.getActivityBehavior() instanceof CallActivityBehavior).collect(Collectors.toList());
