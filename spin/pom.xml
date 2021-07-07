@@ -26,7 +26,7 @@
     <jackson.version>2.12.1</jackson.version>
     <jackson.version.databind>${jackson.version}</jackson.version.databind>
     <commons.version>1.9.0</commons.version>
-    <spin.version.old>1.10.0</spin.version.old>
+    <spin.version.old>1.11.0</spin.version.old>
     <groovy.version>2.4.13</groovy.version>
     <graal.js.version>21.1.0</graal.js.version>
     <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
