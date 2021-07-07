@@ -4029,7 +4029,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     when(mock.getKey()).thenReturn("aKey");
     when(mock.getVersion()).thenReturn(1);
     List<CalledProcessDefinition> result = Collections.singletonList(mock);
-    when(repositoryServiceMock.getStaticCalledProcessDefinition(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)).thenReturn(result);
+    when(repositoryServiceMock.getStaticCalledProcessDefinitions(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)).thenReturn(result);
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -4049,7 +4049,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
   @Test
   public void testGetStaticCalledProcessDefinitionNonExistingProcess() {
 
-    when(repositoryServiceMock.getStaticCalledProcessDefinition("NonExistingId")).thenThrow(
+    when(repositoryServiceMock.getStaticCalledProcessDefinitions("NonExistingId")).thenThrow(
       new NullValueException());
 
     given()
