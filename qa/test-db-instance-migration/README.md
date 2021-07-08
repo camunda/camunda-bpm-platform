@@ -8,6 +8,12 @@ Executing Tests
 
 Run `mvn clean install -Pinstance-migration,${database-id}` where `${database-id}` is for example `h2`.
 
+### Running tests with the Maven Wrapper
+
+With `mvnw`, from the root of the project, 
+run: `./mvnw clean install -f qa/test-db-instance-migration/pom.xml -Pinstance-migration,${database-id}` 
+where `${database-id}` is for example `h2`.
+
 Project Structure
 -----------------
 
