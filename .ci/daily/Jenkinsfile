@@ -85,7 +85,9 @@ pipeline {
         }
         stage('wildfly-subsystem-UNIT-wildfly') {
           when {
-            branch cambpmDefaultBranch();
+            expression {
+              cambpmWithLabels('wildfly')
+            }
           }
           steps {
             cambpmConditionalRetry([
