@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
-<domain xmlns="urn:jboss:domain:16.0">
+<domain xmlns="urn:jboss:domain:17.0">
     <extensions>
         <extension module="org.jboss.as.clustering.infinispan"/>
         <extension module="org.jboss.as.clustering.jgroups"/>
@@ -201,7 +201,7 @@
                 <statistics enabled="${wildfly.ejb3.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
                 <log-system-exceptions value="true"/>
             </subsystem>
-            <subsystem xmlns="urn:wildfly:elytron:13.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
+            <subsystem xmlns="urn:wildfly:elytron:14.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
                 <providers>
                     <aggregate-providers name="combined-providers">
                         <providers name="elytron"/>
@@ -302,22 +302,22 @@
                     </server-ssl-contexts>
                 </tls>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:infinispan:12.0">
-                <cache-container name="ejb" default-cache="passivation" aliases="sfsb" modules="org.wildfly.clustering.ejb.infinispan">
+            <subsystem xmlns="urn:jboss:domain:infinispan:13.0">
+                <cache-container name="ejb" default-cache="passivation" marshaller="PROTOSTREAM" aliases="sfsb" modules="org.wildfly.clustering.ejb.infinispan">
                     <local-cache name="passivation">
                         <file-store passivation="true" purge="false"/>
                     </local-cache>
                 </cache-container>
-                <cache-container name="web" default-cache="passivation" modules="org.wildfly.clustering.web.infinispan">
+                <cache-container name="web" default-cache="passivation" marshaller="PROTOSTREAM" modules="org.wildfly.clustering.web.infinispan">
                     <local-cache name="passivation">
                         <file-store passivation="true" purge="false"/>
                     </local-cache>
                     <local-cache name="sso"/>
                 </cache-container>
-                <cache-container name="server" default-cache="default" modules="org.wildfly.clustering.server">
+                <cache-container name="server" default-cache="default" marshaller="PROTOSTREAM" modules="org.wildfly.clustering.server">
                     <local-cache name="default"/>
                 </cache-container>
-                <cache-container name="hibernate" modules="org.infinispan.hibernate-cache">
+                <cache-container name="hibernate" marshaller="JBOSS" modules="org.infinispan.hibernate-cache">
                     <local-cache name="entity">
                         <heap-memory size="10000"/>
                         <expiration max-idle="100000"/>
@@ -640,7 +640,7 @@
                 <statistics enabled="${wildfly.ejb3.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
                 <log-system-exceptions value="true"/>
             </subsystem>
-            <subsystem xmlns="urn:wildfly:elytron:13.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
+            <subsystem xmlns="urn:wildfly:elytron:14.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
                 <providers>
                     <aggregate-providers name="combined-providers">
                         <providers name="elytron"/>
@@ -741,8 +741,8 @@
                     </server-ssl-contexts>
                 </tls>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:infinispan:12.0">
-                <cache-container name="ejb" default-cache="dist" aliases="sfsb" modules="org.wildfly.clustering.ejb.infinispan">
+            <subsystem xmlns="urn:jboss:domain:infinispan:13.0">
+                <cache-container name="ejb" default-cache="dist" marshaller="PROTOSTREAM" aliases="sfsb" modules="org.wildfly.clustering.ejb.infinispan">
                     <transport lock-timeout="60000"/>
                     <distributed-cache name="dist">
                         <locking isolation="REPEATABLE_READ"/>
@@ -750,13 +750,13 @@
                         <file-store/>
                     </distributed-cache>
                 </cache-container>
-                <cache-container name="server" default-cache="default" aliases="singleton cluster" modules="org.wildfly.clustering.server">
+                <cache-container name="server" default-cache="default" marshaller="PROTOSTREAM" aliases="singleton cluster" modules="org.wildfly.clustering.server">
                     <transport lock-timeout="60000"/>
                     <replicated-cache name="default">
                         <transaction mode="BATCH"/>
                     </replicated-cache>
                 </cache-container>
-                <cache-container name="web" default-cache="dist" modules="org.wildfly.clustering.web.infinispan">
+                <cache-container name="web" default-cache="dist" marshaller="PROTOSTREAM" modules="org.wildfly.clustering.web.infinispan">
                     <transport lock-timeout="60000"/>
                     <replicated-cache name="sso">
                         <locking isolation="REPEATABLE_READ"/>
@@ -769,7 +769,7 @@
                         <file-store/>
                     </distributed-cache>
                 </cache-container>
-                <cache-container name="hibernate" modules="org.infinispan.hibernate-cache">
+                <cache-container name="hibernate" marshaller="JBOSS" modules="org.infinispan.hibernate-cache">
                     <transport lock-timeout="60000"/>
                     <local-cache name="local-query">
                         <heap-memory size="10000"/>
@@ -1110,7 +1110,7 @@
                 <statistics enabled="${wildfly.ejb3.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
                 <log-system-exceptions value="true"/>
             </subsystem>
-            <subsystem xmlns="urn:wildfly:elytron:13.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
+            <subsystem xmlns="urn:wildfly:elytron:14.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
                 <providers>
                     <aggregate-providers name="combined-providers">
                         <providers name="elytron"/>
@@ -1216,22 +1216,22 @@
                 <initializers security="identity" transactions="spec"/>
                 <security server-requires-ssl="false" client-requires-ssl="false"/>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:infinispan:12.0">
-                <cache-container name="ejb" default-cache="passivation" aliases="sfsb" modules="org.wildfly.clustering.ejb.infinispan">
+            <subsystem xmlns="urn:jboss:domain:infinispan:13.0">
+                <cache-container name="ejb" default-cache="passivation" marshaller="PROTOSTREAM" aliases="sfsb" modules="org.wildfly.clustering.ejb.infinispan">
                     <local-cache name="passivation">
                         <file-store passivation="true" purge="false"/>
                     </local-cache>
                 </cache-container>
-                <cache-container name="web" default-cache="passivation" modules="org.wildfly.clustering.web.infinispan">
+                <cache-container name="web" default-cache="passivation" marshaller="PROTOSTREAM" modules="org.wildfly.clustering.web.infinispan">
                     <local-cache name="passivation">
                         <file-store passivation="true" purge="false"/>
                     </local-cache>
                     <local-cache name="sso"/>
                 </cache-container>
-                <cache-container name="server" default-cache="default" modules="org.wildfly.clustering.server">
+                <cache-container name="server" default-cache="default" marshaller="PROTOSTREAM" modules="org.wildfly.clustering.server">
                     <local-cache name="default"/>
                 </cache-container>
-                <cache-container name="hibernate" modules="org.infinispan.hibernate-cache">
+                <cache-container name="hibernate" marshaller="JBOSS" modules="org.infinispan.hibernate-cache">
                     <local-cache name="entity">
                         <heap-memory size="10000"/>
                         <expiration max-idle="100000"/>
@@ -1550,7 +1550,7 @@
                 <statistics enabled="${wildfly.ejb3.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
                 <log-system-exceptions value="true"/>
             </subsystem>
-            <subsystem xmlns="urn:wildfly:elytron:13.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
+            <subsystem xmlns="urn:wildfly:elytron:14.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
                 <providers>
                     <aggregate-providers name="combined-providers">
                         <providers name="elytron"/>
@@ -1656,8 +1656,8 @@
                 <initializers security="identity" transactions="spec"/>
                 <security server-requires-ssl="false" client-requires-ssl="false"/>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:infinispan:12.0">
-                <cache-container name="ejb" default-cache="dist" aliases="sfsb" modules="org.wildfly.clustering.ejb.infinispan">
+            <subsystem xmlns="urn:jboss:domain:infinispan:13.0">
+                <cache-container name="ejb" default-cache="dist" marshaller="PROTOSTREAM" aliases="sfsb" modules="org.wildfly.clustering.ejb.infinispan">
                     <transport lock-timeout="60000"/>
                     <distributed-cache name="dist">
                         <locking isolation="REPEATABLE_READ"/>
@@ -1665,13 +1665,13 @@
                         <file-store/>
                     </distributed-cache>
                 </cache-container>
-                <cache-container name="server" default-cache="default" aliases="singleton cluster" modules="org.wildfly.clustering.server">
+                <cache-container name="server" default-cache="default" marshaller="PROTOSTREAM" aliases="singleton cluster" modules="org.wildfly.clustering.server">
                     <transport lock-timeout="60000"/>
                     <replicated-cache name="default">
                         <transaction mode="BATCH"/>
                     </replicated-cache>
                 </cache-container>
-                <cache-container name="web" default-cache="dist" modules="org.wildfly.clustering.web.infinispan">
+                <cache-container name="web" default-cache="dist" marshaller="PROTOSTREAM" modules="org.wildfly.clustering.web.infinispan">
                     <transport lock-timeout="60000"/>
                     <replicated-cache name="sso">
                         <locking isolation="REPEATABLE_READ"/>
@@ -1684,7 +1684,7 @@
                         <file-store/>
                     </distributed-cache>
                 </cache-container>
-                <cache-container name="hibernate" modules="org.infinispan.hibernate-cache">
+                <cache-container name="hibernate" marshaller="JBOSS" modules="org.infinispan.hibernate-cache">
                     <transport lock-timeout="60000"/>
                     <local-cache name="local-query">
                         <heap-memory size="10000"/>
@@ -2252,6 +2252,13 @@
             <excluded-extensions>
                 <extension module="org.wildfly.extension.health"/>
                 <extension module="org.wildfly.extension.metrics"/>
+                <extension module="org.wildfly.extension.microprofile.reactive-messaging-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.reactive-streams-operators-smallrye"/>
+            </excluded-extensions>
+        </host-exclude>
+        <host-exclude name="WildFly22.0">
+            <host-release id="WildFly22.0"/>
+            <excluded-extensions>
                 <extension module="org.wildfly.extension.microprofile.reactive-messaging-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.reactive-streams-operators-smallrye"/>
             </excluded-extensions>
