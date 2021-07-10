@@ -23,6 +23,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
+import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -58,7 +59,7 @@ public class DatabaseTableSchemaTest {
 
     ProcessEngineConfigurationImpl config1 = createCustomProcessEngineConfiguration().setProcessEngineName("DatabaseTablePrefixTest-engine1")
     // disable auto create/drop schema
-        .setDataSource(pooledDataSource).setDatabaseSchemaUpdate("NO_CHECK");
+        .setDataSource(pooledDataSource).setDatabaseSchemaUpdate(ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_DROP_CREATE);
     config1.setDatabaseTablePrefix(SCHEMA_NAME + ".");
     config1.setDatabaseSchema(SCHEMA_NAME);
     config1.setDbMetricsReporterActivate(false);
@@ -91,7 +92,7 @@ public class DatabaseTableSchemaTest {
 
     ProcessEngineConfigurationImpl config1 = createCustomProcessEngineConfiguration().setProcessEngineName("DatabaseTablePrefixTest-engine1")
     // disable auto create/drop schema
-        .setDataSource(pooledDataSource).setDatabaseSchemaUpdate("NO_CHECK");
+        .setDataSource(pooledDataSource).setDatabaseSchemaUpdate(ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_DROP_CREATE);
     config1.setDatabaseTablePrefix(SCHEMA_NAME + "." + PREFIX_NAME);
     config1.setDatabaseSchema(SCHEMA_NAME);
     config1.setDbMetricsReporterActivate(false);
@@ -102,6 +103,7 @@ public class DatabaseTableSchemaTest {
       public Void execute(CommandContext commandContext) {
         DbSqlSession sqlSession = commandContext.getSession(DbSqlSession.class);
         assertTrue(sqlSession.isTablePresent("SOME_TABLE"));
+        assertTrue(sqlSession.isTablePresent("ACT_GE_PROPERTY"));
         return null;
       }
     });
@@ -155,7 +157,18 @@ public class DatabaseTableSchemaTest {
       }
 
       protected void executeSchemaOperations() {
-        // nop - do not execute create schema operations
+        this.commandExecutorSchemaOperations.execute(this.processEngineConfiguration.getSchemaOperationsCommand());
+        this.commandExecutorSchemaOperations.execute(this.processEngineConfiguration.getHistoryLevelCommand());
+
+        try {
+          this.commandExecutorSchemaOperations.execute(this.processEngineConfiguration.getProcessEngineBootstrapCommand());
+        } catch (OptimisticLockingException var3) {
+          LOG.historyCleanupJobReconfigurationFailure(var3);
+          String databaseType = this.getProcessEngineConfiguration().getDatabaseType();
+          if ("cockroachdb".equals(databaseType)) {
+            throw var3;
+          }
+        }
       }
     }
 

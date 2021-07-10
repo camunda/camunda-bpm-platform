@@ -4,18 +4,18 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-  <bean id="processEngineConfiguration" class="org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration" depends-on="dbSchemaPrefixTestHelper">
+  <bean id="processEngineConfiguration" class="org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
 
-    <property name="jdbcUrl" value="jdbc:h2:mem:DatabaseTablePrefixTest;DB_CLOSE_DELAY=1000;MVCC=TRUE;" />
-    <property name="jdbcDriver" value="org.h2.Driver" />
-    <property name="jdbcUsername" value="sa" />
-    <property name="jdbcPassword" value="" />
+    <property name="jdbcUrl" value="${database.url}" />
+    <property name="jdbcDriver" value="${database.driver}" />
+    <property name="jdbcUsername" value="${database.username}" />
+    <property name="jdbcPassword" value="${database.password}" />
 
     <!-- Note: The database is created within dbSchemaPrefixTestHelper (org.camunda.bpm.webapp.impl.test.util.DbSchemaPrefixTestHelper)-->
     <!-- If some database changes are required during the database setup, they should be performed in the DbSchemaPrefixTestHelper -->
 
     <!-- Database configurations -->
-    <property name="databaseSchemaUpdate" value="NO_CHECK" />
+    <property name="databaseSchemaUpdate" value="true" />
 
     <!-- Empty beans map to for testing purpose -->
     <property name="beans">
@@ -40,7 +40,8 @@
 
     <!--<property name="idGenerator" ref="uuidGenerator" />-->
 
-    <property name="databaseTablePrefix" value="SCHEMA1." />
+    <!--<property name="databaseSchema" value="MY_SCHEMA" />-->
+    <property name="databaseTablePrefix" value="MY_PREFIX_FOO_" />
 
     <!-- telemetry configuration -->
     <property name="telemetryEndpoint" value="http://localhost:8081/pings"/>
@@ -49,6 +50,6 @@
 
   <!--<bean id="uuidGenerator" class="org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator" />-->
 
-  <bean id="dbSchemaPrefixTestHelper" class="org.camunda.bpm.engine.test.util.DbSchemaPrefixTestHelper" />
+  <!--<bean id="dbSchemaPrefixTestHelper" class="org.camunda.bpm.engine.test.util.DbSchemaPrefixTestHelper" />-->
 
 </beans>
