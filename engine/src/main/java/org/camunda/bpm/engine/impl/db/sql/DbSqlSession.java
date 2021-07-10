@@ -824,6 +824,21 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
               Statement jdbcStatement = connection.createStatement();
               // no logging needed as the connection will log it
               logLines.add(sqlStatement);
+              String databaseTablePrefix = this.dbSqlSessionFactory.getDatabaseTablePrefix();
+              if (databaseTablePrefix != null && databaseTablePrefix.length() > 0) {
+                  if (component.equals("identity"))
+                      sqlStatement = sqlStatement.replaceAll(" (ACT_ID_)", String.format(" %s$1", databaseTablePrefix));
+                  else
+                      sqlStatement = sqlStatement.replaceAll(" (ACT_GE_|ACT_RE_|ACT_RU_|ACT_HI_)", String.format(" %s$1", databaseTablePrefix));
+
+                  if (operation.equals("drop") && sqlStatement.startsWith("if exists")) {
+                      String[] parts = databaseTablePrefix.split("[.]");
+                      sqlStatement = sqlStatement.replaceAll(
+                        " (INFORMATION_SCHEMA\\.TABLES where) (TABLE_NAME = ')", 
+                        String.format(" $1 TABLE_SCHEMA = '%s' and $2%s", parts[0], parts.length == 1 ? "" : parts[1])
+                      );
+                  }
+              }
               jdbcStatement.execute(sqlStatement);
               jdbcStatement.close();
             } catch (Exception e) {
