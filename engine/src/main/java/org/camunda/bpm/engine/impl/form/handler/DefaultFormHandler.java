@@ -60,6 +60,11 @@ public class DefaultFormHandler implements FormHandler {
   public static final String FORM_PROPERTY_ELEMENT = "formProperty";
   private static final String BUSINESS_KEY_ATTRIBUTE = "businessKey";
 
+  public static final String FORM_REF_BINDING_DEPLOYMENT = "deployment";
+  public static final String FORM_REF_BINDING_LATEST = "latest";
+  public static final String FORM_REF_BINDING_VERSION = "version";
+  public static final List<String> ALLOWED_FORM_REF_BINDINGS = Arrays.asList(FORM_REF_BINDING_DEPLOYMENT, FORM_REF_BINDING_LATEST, FORM_REF_BINDING_VERSION);
+
   protected String deploymentId;
   protected String businessKeyFieldId;
 
@@ -106,15 +111,14 @@ public class DefaultFormHandler implements FormHandler {
       // formRefBinding
       String formRefBindingAttribute = activityElement.attributeNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS,
           "formRefBinding");
-      List<String> allowedBindings = Arrays.asList("deployment", "latest", "version");
-      if (formRefBindingAttribute == null || !allowedBindings.contains(formRefBindingAttribute)) {
+      if (formRefBindingAttribute == null || !ALLOWED_FORM_REF_BINDINGS.contains(formRefBindingAttribute)) {
         bpmnParse.addError("Invalid element definition: value for formRefBinding attribute has to be one of "
-            + allowedBindings + " but was " + formRefBindingAttribute, activityElement);
+            + ALLOWED_FORM_REF_BINDINGS + " but was " + formRefBindingAttribute, activityElement);
       }
       this.camundaFormDefinitionBinding = formRefBindingAttribute;
 
       // formRefVersion
-      if ("version".equals(formRefBindingAttribute)) {
+      if (FORM_REF_BINDING_VERSION.equals(formRefBindingAttribute)) {
         String formRefVersionAttribute = activityElement.attributeNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS,
             "formRefVersion");
         this.camundaFormDefinitionVersion = expressionManager.createExpression(formRefVersionAttribute);
