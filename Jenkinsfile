@@ -102,7 +102,7 @@ pipeline {
                 )
               }
 
-              if (cambpmWithLabels('daily', 'default-build', 'rolling-update', 'migration', 'all-db', 'h2', 'db2', 'mysql', 'oracle', 'mariadb', 'sqlserver', 'postgresql')) {
+              if (cambpmWithLabels('daily', 'default-build', 'rolling-update', 'migration', 'wildfly', 'all-db', 'h2', 'db2', 'mysql', 'oracle', 'mariadb', 'sqlserver', 'postgresql')) {
                 cambpmTriggerDownstream(
                   platformVersionDir + "/cambpm-ce/cambpm-daily/${env.BRANCH_NAME}",
                   [string(name: 'UPSTREAM_PROJECT_NAME', value: upstreamProjectName),
@@ -242,7 +242,9 @@ pipeline {
         }
         stage('engine-IT-XA-wildfly-postgresql-96') {
           when {
-            branch cambpmDefaultBranch();
+            expression {
+              cambpmWithLabels('wildfly')
+            }
           }
           steps {
             cambpmConditionalRetry([
@@ -278,7 +280,7 @@ pipeline {
         stage('webapp-IT-wildfly-h2') {
           when {
             expression {
-              cambpmWithLabels('webapp-integration', 'h2')
+              cambpmWithLabels('webapp-integration', 'h2', 'wildfly')
             }
           }
           steps {
@@ -311,7 +313,9 @@ pipeline {
         }
         stage('webapp-IT-standalone-wildfly') {
           when {
-            branch cambpmDefaultBranch();
+            expression {
+              cambpmWithLabels('wildfly')
+            }
           }
           steps {
             cambpmConditionalRetry([
