@@ -30,7 +30,7 @@
         <button class="btn btn-link"
                 ng-click="addGroup()"
                 type="button"
-                ng-disabled="!isValid()">
+                ng-disabled="!isEnabled()">
           <span class="hidden-sm hidden-xs">{{ 'GROUP_ADD' | translate }}</span>
           <span class="glyphicon glyphicon-plus-sign"></span>
         </button>
@@ -41,6 +41,7 @@
         <input type="text"
                name="newGroup"
                required
+               ng-disabled="loading"
                placeholder="{{ 'GROUP_ID' | translate }}"
                class="form-control"
                ng-model="newGroup.groupId"
