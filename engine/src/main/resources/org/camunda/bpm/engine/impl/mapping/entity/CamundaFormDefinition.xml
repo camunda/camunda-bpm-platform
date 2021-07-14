@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+
+    Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+    under one or more contributor license agreements. See the NOTICE file
+    distributed with this work for additional information regarding copyright
+    ownership. Camunda licenses this file to you under the Apache License,
+    Version 2.0; you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.CamundaFormDefinitionEntity">
+
+  <!-- CAMUNDA FORM DEFINITION INSERT -->
+
+  <insert id="insertCamundaFormDefinition" parameterType="org.camunda.bpm.engine.impl.persistence.entity.CamundaFormDefinitionEntity">
+    insert into ${prefix}ACT_RE_CAMFORMDEF(
+      ID_,
+      KEY_,
+      VERSION_,
+      DEPLOYMENT_ID_,
+      RESOURCE_NAME_,
+      TENANT_ID_,
+      REV_)
+    values (#{id, jdbcType=VARCHAR},
+            #{key, jdbcType=VARCHAR},
+            #{version, jdbcType=INTEGER},
+            #{deploymentId, jdbcType=VARCHAR},
+            #{resourceName, jdbcType=VARCHAR},
+            #{tenantId, jdbcType=VARCHAR},
+            1
+           )
+  </insert>
+
+  <!-- CAMUNDA FORM DEFINITION UPDATE -->
+
+  <update id="updateCamundaFormDefinition" parameterType="org.camunda.bpm.engine.impl.persistence.entity.CamundaFormDefinitionEntity">
+    update ${prefix}ACT_RE_CAMFORMDEF set
+      REV_ = #{revisionNext, jdbcType=INTEGER}
+    where ID_ = #{id, jdbcType=VARCHAR}
+      and REV_ = #{revision, jdbcType=INTEGER}
+  </update>
+
+  <!-- CAMUNDA FORM DEFINITION DELETE -->
+
+  <delete id="deleteCamundaFormDefinitionsByDeploymentId" parameterType="string">
+    delete from ${prefix}ACT_RE_CAMFORMDEF where DEPLOYMENT_ID_ = #{deploymentId}
+  </delete>
+
+  <!-- CAMUNDA FORM DEFINITION RESULTMAP -->
+
+  <resultMap id="camundaFormDefinitionResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.CamundaFormDefinitionEntity">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="revision" column="REV_" />
+    <result property="key" column="KEY_" jdbcType="VARCHAR" />
+    <result property="version" column="VERSION_" jdbcType="INTEGER"/>
+    <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR"/>
+    <result property="resourceName" column="RESOURCE_NAME_" jdbcType="VARCHAR"/>
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
+  </resultMap>
+
+  <!-- CAMUNDA FORM DEFINITION SELECT -->
+
+  <select id="selectAllCamundaFormDefinitions" resultMap="camundaFormDefinitionResultMap">
+    select * from ${prefix}ACT_RE_CAMFORMDEF
+  </select>
+
+  <select id="selectCamundaFormDefinition" parameterType="string" resultMap="camundaFormDefinitionResultMap">
+    select * from ${prefix}ACT_RE_CAMFORMDEF where ID_ = #{camundaFormDefinitionId}
+  </select>
+
+  <select id="selectCamundaFormDefinitionByDeploymentId" parameterType="string" resultMap="camundaFormDefinitionResultMap">
+    select * from ${prefix}ACT_RE_CAMFORMDEF where DEPLOYMENT_ID_ = #{parameter}
+  </select>
+
+  <select id="selectCamundaFormDefinitionByDeploymentAndKey" parameterType="map" resultMap="camundaFormDefinitionResultMap">
+    select *
+    from ${prefix}ACT_RE_CAMFORMDEF
+    where DEPLOYMENT_ID_ = #{deploymentId}
+      and KEY_ = #{camundaFormDefinitionKey}
+  </select>
+
+  <select id="selectLatestCamundaFormDefinitionByKey" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="camundaFormDefinitionResultMap">
+    select *
+    from ${prefix}ACT_RE_CAMFORMDEF d1
+      inner join
+          (select KEY_, TENANT_ID_, max(VERSION_) as MAX_VERSION
+          from ${prefix}ACT_RE_CAMFORMDEF RES
+          where KEY_ = #{parameter}
+            <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+          group by TENANT_ID_, KEY_) d2
+        on d1.KEY_ = d2.KEY_
+    where d1.VERSION_ = d2.MAX_VERSION and 
+          (d1.TENANT_ID_ = d2.TENANT_ID_ or (d1.TENANT_ID_ is null and d2.TENANT_ID_ is null))
+  </select>
+
+  <select id="selectLatestCamundaFormDefinitionByKeyWithoutTenantId" parameterType="map" resultMap="camundaFormDefinitionResultMap">
+    select *
+    from ${prefix}ACT_RE_CAMFORMDEF 
+    where KEY_ = #{camundaFormDefinitionKey}
+          and TENANT_ID_ is null
+          and VERSION_ = (
+              select max(VERSION_) 
+              from ${prefix}ACT_RE_CAMFORMDEF 
+              where KEY_ = #{camundaFormDefinitionKey} and TENANT_ID_ is null)
+  </select>
+
+  <select id="selectLatestCamundaDefinitionByKeyAndTenantId" parameterType="map" resultMap="camundaFormDefinitionResultMap">
+    select *
+    from ${prefix}ACT_RE_CAMFORMDEF RES
+    where KEY_ = #{camundaFormDefinitionKey}
+          and TENANT_ID_ = #{tenantId}
+          and VERSION_ = (
+              select max(VERSION_) 
+              from ${prefix}ACT_RE_CAMFORMDEF 
+              where KEY_ = #{key} and TENANT_ID_ = #{tenantId})
+  </select>
+
+  <select id="selectCamundaFormDefinitionByKeyVersionWithoutTenantId" parameterType="map" resultMap="camundaFormDefinitionResultMap">
+    select *
+    from ${prefix}ACT_RE_CAMFORMDEF
+    where KEY_ = #{camundaFormDefinitionKey}
+          and VERSION_ = #{camundaFormDefinitionVersion}
+          and TENANT_ID_ is null
+  </select>
+
+  <select id="selectCamundaFormDefinitionByKeyVersionAndTenantId" parameterType="map" resultMap="camundaFormDefinitionResultMap">
+    select *
+    from ${prefix}ACT_RE_CAMFORMDEF
+    where KEY_ = #{camundaFormDefinitionKey}
+          and VERSION_ = #{camundaFormDefinitionVersion}
+          and TENANT_ID_ = #{tenantId}
+  </select>
+
+  <select id="selectCamundaFormDefinitionByKeyVersionTag" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="camundaFormDefinitionResultMap">
+    select *
+    from ${prefix}ACT_RE_CAMFORMDEF
+    where KEY_ = #{parameter.camundaFormDefinitionKey}
+          and VERSION_TAG_ = #{parameter.camundaFormDefinitionVersionTag}
+          <if test="parameter.tenantId == null">
+                and TENANT_ID_ is null
+          </if>
+          <if test="parameter.tenantId != null">
+                and TENANT_ID_ = #{parameter.tenantId}
+          </if>
+  </select>
+
+  <select id="selectPreviousCamundaFormDefinitionId" parameterType="map" resultType="string">
+    select distinct RES.*
+      from ${prefix}ACT_RE_CAMFORMDEF RES
+     where RES.KEY_ = #{key}
+       <if test="tenantId != null">
+          AND TENANT_ID_ = #{tenantId}
+        </if>
+        <if test="tenantId == null">
+          AND TENANT_ID_ is null
+        </if>
+       and RES.VERSION_ = (
+        select MAX(VERSION_) 
+        from ${prefix}ACT_RE_CAMFORMDEF 
+        where KEY_ = #{key} 
+          <if test="tenantId != null">
+            AND TENANT_ID_ = #{tenantId}
+          </if>
+          <if test="tenantId == null">
+            AND TENANT_ID_ is null
+          </if>
+          AND VERSION_ &lt; #{version})
+  </select>
+
+</mapper>

@@ -136,7 +136,7 @@ public class TenantIdProviderTest {
 
     // given a deployment without a tenant id
     testRule.deploy(Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY).startEvent().done(),
-                                            "org/camunda/bpm/engine/test/api/form/util/request.form");
+                                            "org/camunda/bpm/engine/test/api/form/util/request.html");
 
     // when a process instance is started with a start form
     String processDefinitionId = engineRule.getRepositoryService()
@@ -144,7 +144,7 @@ public class TenantIdProviderTest {
                                            .singleResult()
                                            .getId();
 
-    Map<String, Object> properties = new HashMap<String, Object>();
+    Map<String, Object> properties = new HashMap<>();
     properties.put("employeeName", "demo");
 
     ProcessInstance procInstance = engineRule.getFormService().submitStartForm(processDefinitionId, properties);
@@ -162,7 +162,7 @@ public class TenantIdProviderTest {
 
     // given a deployment with a tenant id
     testRule.deployForTenant(TENANT_ID, Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY).startEvent().done(),
-                                            "org/camunda/bpm/engine/test/api/form/util/request.form");
+                                            "org/camunda/bpm/engine/test/api/form/util/request.html");
 
     // when a process instance is started with a start form
     String processDefinitionId = engineRule.getRepositoryService()
@@ -170,7 +170,7 @@ public class TenantIdProviderTest {
                                            .singleResult()
                                            .getId();
 
-    Map<String, Object> properties = new HashMap<String, Object>();
+    Map<String, Object> properties = new HashMap<>();
     properties.put("employeeName", "demo");
 
     ProcessInstance procInstance = engineRule.getFormService().submitStartForm(processDefinitionId, properties);
@@ -188,7 +188,7 @@ public class TenantIdProviderTest {
     testRule.deploy(Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
                                                 .startEvent().userTask("task")
                                                 .endEvent().done(),
-                                            "org/camunda/bpm/engine/test/api/form/util/request.form");
+                                            "org/camunda/bpm/engine/test/api/form/util/request.html");
 
     // when a process instance is created and the instance is set to a starting point
     String processInstanceId = engineRule.getRuntimeService()
@@ -208,7 +208,7 @@ public class TenantIdProviderTest {
     testRule.deployForTenant(TENANT_ID, Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
                                                                    .startEvent().userTask("task")
                                                                    .endEvent().done(),
-                                            "org/camunda/bpm/engine/test/api/form/util/request.form");
+                                            "org/camunda/bpm/engine/test/api/form/util/request.html");
 
     // when a process instance is created and the instance is set to a starting point
     String processInstanceId = engineRule.getRuntimeService()
@@ -1081,9 +1081,9 @@ public class TenantIdProviderTest {
 
   public static class ContextLoggingTenantIdProvider implements TenantIdProvider {
 
-    protected List<TenantIdProviderProcessInstanceContext> parameters = new ArrayList<TenantIdProviderProcessInstanceContext>();
-    protected List<TenantIdProviderHistoricDecisionInstanceContext> dmnParameters = new ArrayList<TenantIdProviderHistoricDecisionInstanceContext>();
-    protected List<TenantIdProviderCaseInstanceContext> caseParameters = new ArrayList<TenantIdProviderCaseInstanceContext>();
+    protected List<TenantIdProviderProcessInstanceContext> parameters = new ArrayList<>();
+    protected List<TenantIdProviderHistoricDecisionInstanceContext> dmnParameters = new ArrayList<>();
+    protected List<TenantIdProviderCaseInstanceContext> caseParameters = new ArrayList<>();
 
     public String provideTenantIdForProcessInstance(TenantIdProviderProcessInstanceContext ctx) {
       parameters.add(ctx);

@@ -167,9 +167,11 @@ import org.camunda.bpm.engine.impl.event.EventHandlerImpl;
 import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.event.SignalEventHandler;
 import org.camunda.bpm.engine.impl.externaltask.DefaultExternalTaskPriorityProvider;
+import org.camunda.bpm.engine.impl.form.deployer.CamundaFormDefinitionDeployer;
 import org.camunda.bpm.engine.impl.form.engine.FormEngine;
 import org.camunda.bpm.engine.impl.form.engine.HtmlFormEngine;
 import org.camunda.bpm.engine.impl.form.engine.JuelFormEngine;
+import org.camunda.bpm.engine.impl.form.entity.CamundaFormDefinitionManager;
 import org.camunda.bpm.engine.impl.form.type.AbstractFormFieldType;
 import org.camunda.bpm.engine.impl.form.type.BooleanFormType;
 import org.camunda.bpm.engine.impl.form.type.DateFormType;
@@ -1841,6 +1843,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       addSessionFactory(new GenericManagerFactory(DecisionRequirementsDefinitionManager.class));
       addSessionFactory(new GenericManagerFactory(HistoricDecisionInstanceManager.class));
 
+      addSessionFactory(new GenericManagerFactory(CamundaFormDefinitionManager.class));
+
       addSessionFactory(new GenericManagerFactory(OptimizeManager.class));
 
       sessionFactories.put(ReadOnlyIdentityProvider.class, identityProviderSessionFactory);
@@ -2007,6 +2011,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     BpmnDeployer bpmnDeployer = getBpmnDeployer();
     defaultDeployers.add(bpmnDeployer);
 
+    defaultDeployers.add(getCamundaFormDeployer());
+
     if (isCmmnEnabled()) {
       CmmnDeployer cmmnDeployer = getCmmnDeployer();
       defaultDeployers.add(cmmnDeployer);
@@ -2056,6 +2062,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       defaultListeners.add(new MetricsBpmnParseListener());
     }
     return defaultListeners;
+  }
+
+  protected CamundaFormDefinitionDeployer getCamundaFormDeployer() {
+    CamundaFormDefinitionDeployer deployer = new CamundaFormDefinitionDeployer();
+    deployer.setIdGenerator(idGenerator);
+    return deployer;
   }
 
   protected CmmnDeployer getCmmnDeployer() {

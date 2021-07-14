@@ -17,3 +17,14 @@
 
 insert into ACT_GE_SCHEMA_LOG
 values ('500', CURRENT_TIMESTAMP, '7.16.0');
+
+create table ACT_RE_CAMFORMDEF (
+    ID_ varchar(64) not null,
+    REV_ integer,
+    KEY_ varchar(255) not null,
+    VERSION_ integer not null,
+    DEPLOYMENT_ID_ varchar(64),
+    RESOURCE_NAME_ varchar(4000),
+    TENANT_ID_ varchar(64),
+    primary key (ID_)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;

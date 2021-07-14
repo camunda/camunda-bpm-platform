@@ -3,7 +3,7 @@
 <cmmn:case id="Case_1">
   <cmmn:casePlanModel id="CasePlanModel_1" name="A CasePlanModel">
     <cmmn:planItem id="PlanItem_1" definitionRef="HumanTask_0xijr4e" />
-    <cmmn:humanTask id="HumanTask_0xijr4e" camunda:formKey="deployment:org/camunda/bpm/engine/test/api/form/task.form" />
+    <cmmn:humanTask id="HumanTask_0xijr4e" camunda:formKey="deployment:org/camunda/bpm/engine/test/api/form/task.html" />
   </cmmn:casePlanModel>
 </cmmn:case>
 <cmmndi:CMMNDI>

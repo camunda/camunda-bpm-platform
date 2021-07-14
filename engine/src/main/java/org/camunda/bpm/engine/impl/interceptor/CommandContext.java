@@ -48,6 +48,7 @@ import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSession;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionManager;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionManager;
+import org.camunda.bpm.engine.impl.form.entity.CamundaFormDefinitionManager;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInstanceManager;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
@@ -113,14 +114,14 @@ public class CommandContext {
 
   protected TransactionContext transactionContext;
   protected Map<Class< ? >, SessionFactory> sessionFactories;
-  protected Map<Class< ? >, Session> sessions = new HashMap<Class< ? >, Session>();
-  protected List<Session> sessionList = new ArrayList<Session>();
+  protected Map<Class< ? >, Session> sessions = new HashMap<>();
+  protected List<Session> sessionList = new ArrayList<>();
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
   protected FailedJobCommandFactory failedJobCommandFactory;
 
   protected JobEntity currentJob = null;
 
-  protected List<CommandContextListener> commandContextListeners = new LinkedList<CommandContextListener>();
+  protected List<CommandContextListener> commandContextListeners = new LinkedList<>();
 
   protected String operationId;
 
@@ -196,11 +197,11 @@ public class CommandContext {
               transactionContext.commit();
             }
           } catch (Throwable exception) {
-            
+
             if (DbSqlSession.isCrdbConcurrencyConflict(exception)) {
               exception = ProcessEngineLogger.PERSISTENCE_LOGGER.crdbTransactionRetryExceptionOnCommit(exception);
             }
-            
+
             commandInvocationContext.trySetThrowable(exception);
           }
 
@@ -467,9 +468,13 @@ public class CommandContext {
   public TenantManager getTenantManager() {
     return getSession(TenantManager.class);
   }
-  
+
   public SchemaLogManager getSchemaLogManager() {
     return getSession(SchemaLogManager.class);
+  }
+
+  public CamundaFormDefinitionManager getCamundaFormDefinitionManager() {
+    return getSession(CamundaFormDefinitionManager.class);
   }
 
   // CMMN /////////////////////////////////////////////////////////////////////
@@ -651,7 +656,7 @@ public class CommandContext {
   public void setOperationId(String operationId) {
     this.operationId = operationId;
   }
-  
+
   public OptimizeManager getOptimizeManager() {
     return getSession(OptimizeManager.class);
   }

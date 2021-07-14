@@ -76,8 +76,8 @@ public class TableDataManager extends AbstractManager {
 
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
-  public static Map<Class<?>, String> apiTypeToTableNameMap = new HashMap<Class<?>, String>();
-  public static Map<Class<? extends DbEntity>, String> persistentObjectToTableNameMap = new HashMap<Class<? extends DbEntity>, String>();
+  public static Map<Class<?>, String> apiTypeToTableNameMap = new HashMap<>();
+  public static Map<Class<? extends DbEntity>, String> persistentObjectToTableNameMap = new HashMap<>();
 
   static {
     // runtime
@@ -101,6 +101,8 @@ public class TableDataManager extends AbstractManager {
 
     persistentObjectToTableNameMap.put(MeterLogEntity.class, "ACT_RU_METER_LOG");
     persistentObjectToTableNameMap.put(TaskMeterLogEntity.class, "ACT_RU_TASK_METER_LOG");
+
+    persistentObjectToTableNameMap.put(CamundaFormDefinitionEntity.class, "ACT_RE_CAMFORMDEF");
     // repository
     persistentObjectToTableNameMap.put(DeploymentEntity.class, "ACT_RE_DEPLOYMENT");
     persistentObjectToTableNameMap.put(ProcessDefinitionEntity.class, "ACT_RE_PROCDEF");
@@ -188,7 +190,7 @@ public class TableDataManager extends AbstractManager {
   }
 
   public Map<String, Long> getTableCount() {
-    Map<String, Long> tableCount = new HashMap<String, Long>();
+    Map<String, Long> tableCount = new HashMap<>();
     try {
       for (String tableName: getDbEntityManager().getTableNamesPresentInDatabase()) {
         tableCount.put(tableName, getTableCount(tableName));
@@ -225,7 +227,7 @@ public class TableDataManager extends AbstractManager {
 
   public List<Class<? extends DbEntity>> getEntities(String tableName) {
     String databaseTablePrefix = getDbSqlSession().getDbSqlSessionFactory().getDatabaseTablePrefix();
-    List<Class<? extends DbEntity>> entities = new ArrayList<Class<? extends DbEntity>>();
+    List<Class<? extends DbEntity>> entities = new ArrayList<>();
 
     Set<Class<? extends DbEntity>> entityClasses = persistentObjectToTableNameMap.keySet();
     for (Class<? extends DbEntity> entityClass : entityClasses) {

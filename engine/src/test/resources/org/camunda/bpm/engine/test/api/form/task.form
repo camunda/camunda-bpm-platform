@@ -1,1 +1,16 @@
-${speaker} is speaking in room ${room}
+{
+  "id": "myTaskForm",
+  "type": "default",
+  "components": [
+    {
+      "key": "variable",
+      "label": "String Variable",
+      "type": "textfield"
+    },
+    {
+      "key": "button5",
+      "label": "Start",
+      "type": "button"
+    }
+  ]
+}
