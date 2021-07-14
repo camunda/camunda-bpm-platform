@@ -168,6 +168,18 @@ create table ACT_RE_PROCDEF (
     primary key (ID_)
 );
 
+create table ACT_RE_CAMFORMDEF (
+    ID_ nvarchar(64) not null,
+    REV_ int,
+    NAME_ nvarchar(255),
+    KEY_ nvarchar(255) not null,
+    VERSION_ int not null,
+    DEPLOYMENT_ID_ nvarchar(64),
+    RESOURCE_NAME_ nvarchar(4000),
+    TENANT_ID_ nvarchar(64),
+    primary key (ID_)
+);
+
 create table ACT_RU_TASK (
     ID_ nvarchar(64),
     REV_ int,

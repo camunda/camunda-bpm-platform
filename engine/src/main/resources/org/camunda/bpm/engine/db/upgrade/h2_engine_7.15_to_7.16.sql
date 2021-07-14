@@ -17,3 +17,12 @@
 
 insert into ACT_GE_SCHEMA_LOG
 values ('500', CURRENT_TIMESTAMP, '7.16.0');
+
+create table ACT_RE_CAMFORMDEF (
+    ID_ varchar(64) NOT NULL,
+    KEY_ varchar(255) NOT NULL,
+    VERSION_ integer NOT NULL,
+    NAME_ varchar(255),
+    RESOURCE_NAME_ varchar(4000),
+    primary key (ID_)
+);
