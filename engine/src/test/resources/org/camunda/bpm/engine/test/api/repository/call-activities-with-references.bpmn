@@ -47,15 +47,29 @@
     <bpmn2:sequenceFlow id="Flow_1gizwns" sourceRef="cmmn_reference_1" targetRef="tenant_reference_1" />
     <bpmn2:callActivity id="tenant_reference_1" name="tenant" calledElement="processOne" camunda:calledElementTenantId="someTenant">
       <bpmn2:incoming>Flow_1gizwns</bpmn2:incoming>
-      <bpmn2:outgoing>Flow_1pbppvw</bpmn2:outgoing>
+      <bpmn2:outgoing>Flow_10tdxwm</bpmn2:outgoing>
     </bpmn2:callActivity>
-    <bpmn2:endEvent id="Event_0r1fu75">
-      <bpmn2:incoming>Flow_1pbppvw</bpmn2:incoming>
+    <bpmn2:sequenceFlow id="Flow_10tdxwm" sourceRef="tenant_reference_1" targetRef="non_existing_tenant_reference_1" />
+    <bpmn2:callActivity id="non_existing_tenant_reference_1" name="non-existing tenant" calledElement="processOne" camunda:calledElementTenantId="nonExistingTenant">
+      <bpmn2:incoming>Flow_10tdxwm</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_10nemiq</bpmn2:outgoing>
+    </bpmn2:callActivity>
+    <bpmn2:sequenceFlow id="Flow_10nemiq" sourceRef="non_existing_tenant_reference_1" targetRef="missing-tenant-reference-1" />
+    <bpmn2:callActivity id="missing-tenant-reference-1" name="missing tenant" calledElement="processOne">
+      <bpmn2:incoming>Flow_10nemiq</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0bkhhzr</bpmn2:outgoing>
+    </bpmn2:callActivity>
+    <bpmn2:endEvent id="Event_1kqdnnx">
+      <bpmn2:incoming>Flow_0bkhhzr</bpmn2:incoming>
     </bpmn2:endEvent>
-    <bpmn2:sequenceFlow id="Flow_1pbppvw" sourceRef="tenant_reference_1" targetRef="Event_0r1fu75" />
+    <bpmn2:sequenceFlow id="Flow_0bkhhzr" sourceRef="missing-tenant-reference-1" targetRef="Event_1kqdnnx" />
   </bpmn2:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1" name="CallActivity">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="TestCallActivitiesWithReferences">
+      <bpmndi:BPMNEdge id="Flow_1gizwns_di" bpmnElement="Flow_1gizwns">
+        <di:waypoint x="1390" y="125" />
+        <di:waypoint x="1450" y="125" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0d9nvtl_di" bpmnElement="Flow_0d9nvtl">
         <di:waypoint x="1230" y="125" />
         <di:waypoint x="1260" y="125" />
@@ -92,13 +106,17 @@
         <di:waypoint x="203" y="125" />
         <di:waypoint x="253" y="125" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1gizwns_di" bpmnElement="Flow_1gizwns">
-        <di:waypoint x="1390" y="125" />
-        <di:waypoint x="1450" y="125" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1pbppvw_di" bpmnElement="Flow_1pbppvw">
+      <bpmndi:BPMNEdge id="Flow_10tdxwm_di" bpmnElement="Flow_10tdxwm">
         <di:waypoint x="1550" y="125" />
-        <di:waypoint x="1612" y="125" />
+        <di:waypoint x="1610" y="125" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_10nemiq_di" bpmnElement="Flow_10nemiq">
+        <di:waypoint x="1710" y="125" />
+        <di:waypoint x="1770" y="125" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0bkhhzr_di" bpmnElement="Flow_0bkhhzr">
+        <di:waypoint x="1870" y="125" />
+        <di:waypoint x="1932" y="125" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_17" bpmnElement="StartEvent_1">
         <dc:Bounds x="167" y="107" width="36" height="36" />
@@ -133,8 +151,14 @@
       <bpmndi:BPMNShape id="Activity_0arj7g7_di" bpmnElement="tenant_reference_1">
         <dc:Bounds x="1450" y="85" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0r1fu75_di" bpmnElement="Event_0r1fu75">
-        <dc:Bounds x="1612" y="107" width="36" height="36" />
+      <bpmndi:BPMNShape id="Activity_1ax22vd_di" bpmnElement="non_existing_tenant_reference_1">
+        <dc:Bounds x="1610" y="85" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_17canph_di" bpmnElement="missing-tenant-reference-1">
+        <dc:Bounds x="1770" y="85" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1kqdnnx_di" bpmnElement="Event_1kqdnnx">
+        <dc:Bounds x="1932" y="107" width="36" height="36" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

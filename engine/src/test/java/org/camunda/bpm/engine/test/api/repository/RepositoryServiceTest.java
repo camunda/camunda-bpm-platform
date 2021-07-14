@@ -72,6 +72,7 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.IoUtil;
+import org.camunda.bpm.engine.repository.CalledProcessDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
@@ -80,7 +81,6 @@ import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinitionQuery;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.repository.CalledProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -1276,16 +1276,13 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
   })
   public void shouldReturnStaticCalledProcessDefinition() {
     //given
-    String firstProcessRedeployment = testRule
-      .deploy("org/camunda/bpm/engine/test/api/repository/second-process.bpmn20.xml").getId();
-    String deploymentWithTenant = testRule
-      .deployForTenant("someTenant", "org/camunda/bpm/engine/test/api/repository/processOne.bpmn20.xml").getId();
+    testRule.deploy("org/camunda/bpm/engine/test/api/repository/second-process.bpmn20.xml");
+    testRule.deployForTenant("someTenant", "org/camunda/bpm/engine/test/api/repository/processOne.bpmn20.xml");
 
     ProcessDefinition processDefinition = repositoryService
       .createProcessDefinitionQuery()
       .processDefinitionKey("TestCallActivitiesWithReferences")
       .singleResult();
-
     //when
     Collection<CalledProcessDefinition> mappings = repositoryService.getStaticCalledProcessDefinitions(processDefinition.getId());
 
@@ -1363,6 +1360,41 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
   public void testGetStaticCallActivityMappingShouldThrowIfProcessDoesNotExist(){
     //given //when //then
     assertThrows(NullValueException.class, () -> repositoryService.getStaticCalledProcessDefinitions("notExistingId"));
+  }
+
+  @Test
+  public void shouldReturnCorrectProcessesForCallActiveWithTenantId(){
+    //given
+    final String processOne = "org/camunda/bpm/engine/test/api/repository/processOne.bpmn20.xml";
+    final String processTwo = "org/camunda/bpm/engine/test/api/repository/processTwo.bpmn20.xml";
+
+    final String aTenant = "aTenant";
+    final String anotherTenant = "anotherTenant";
+
+    String id = testRule.deployForTenantAndGetDefinition(aTenant,
+      "org/camunda/bpm/engine/test/api/repository/call_activities_with_tenants.bpmn").getId();
+    testRule.deploy(processOne);
+    testRule.deploy(processTwo);
+    testRule.deployForTenant(anotherTenant, processTwo);
+    String sameTenantProcessOne = testRule.deployForTenantAndGetDefinition(aTenant, processOne).getId();
+    String otherTenantProcessOne = testRule.deployForTenantAndGetDefinition(anotherTenant, processOne).getId();
+
+
+    //when
+    Collection<CalledProcessDefinition> mappings = repositoryService.getStaticCalledProcessDefinitions(id);
+
+    //then
+    assertThat(mappings).hasSize(2);
+
+    assertThat(mappings.stream()
+      .filter(def -> def.getId().equals(sameTenantProcessOne))
+      .flatMap(def -> def.getCallingCallActivityIds().stream())
+      .collect(Collectors.toList()))
+      .containsExactlyInAnyOrder("null_tenant_reference_same_tenant", "explicit_same_tenant_reference");
+
+    assertThat(mappings).extracting("id","callActivityIds")
+      .contains(
+        Tuple.tuple(otherTenantProcessOne, Arrays.asList("explicit_other_tenant_reference")));
   }
 
   private String deployProcessString(String processString) {
