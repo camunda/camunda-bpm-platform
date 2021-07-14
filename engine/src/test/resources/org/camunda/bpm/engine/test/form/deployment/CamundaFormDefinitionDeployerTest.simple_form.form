@@ -1,0 +1,16 @@
+{
+  "id": "formId",
+  "type": "default",
+  "components": [
+    {
+      "key": "textfield1",
+      "label": "Text Field",
+      "type": "textfield"
+    },
+    {
+      "key": "button1",
+      "label": "Button",
+      "type": "button"
+    }
+  ]
+}

@@ -8,12 +8,12 @@
   
   <process id="vacationRequest" name="Vacation request" isExecutable="true">
   
-    <startEvent id="request" camunda:formKey="org/camunda/bpm/engine/test/api/form/util/request.form" />
+    <startEvent id="request" camunda:formKey="org/camunda/bpm/engine/test/api/form/util/request.html" />
 
     <sequenceFlow id="flow1" sourceRef="request" targetRef="handleRequest" />
     
     <userTask id="handleRequest" name="Handle vacation request"
-              camunda:formKey="org/camunda/bpm/engine/test/api/form/util/approve.form" >
+              camunda:formKey="org/camunda/bpm/engine/test/api/form/util/approve.html" >
       <documentation>
         Vacation request by ${employeeName}
       </documentation> 
@@ -43,7 +43,7 @@
     </sequenceFlow>
     
     <userTask id="adjustVacationRequestTask" name="Adjust vacation request" 
-              camunda:formKey="org/camunda/bpm/engine/test/api/form/util/adjustRequest.form">
+              camunda:formKey="org/camunda/bpm/engine/test/api/form/util/adjustRequest.html">
       <documentation>
         Your manager has not approved your vacation request.
       </documentation>

@@ -1,0 +1,36 @@
+{
+  "id": "complexForm",
+  "type": "default",
+  "components": [
+    {
+      "key": "textfield1",
+      "label": "Text Field",
+      "type": "textfield"
+    },
+    {
+      "key": "textfield2",
+      "label": "Text Field",
+      "type": "textfield"
+    },
+    {
+      "key": "textfield3",
+      "label": "Text Field",
+      "type": "textfield"
+    },
+    {
+      "key": "button1",
+      "label": "Button",
+      "type": "button"
+    },
+    {
+      "key": "textfield4",
+      "label": "Text Field",
+      "type": "textfield"
+    },
+    {
+      "key": "button2",
+      "label": "Button",
+      "type": "button"
+    }
+  ]
+}
