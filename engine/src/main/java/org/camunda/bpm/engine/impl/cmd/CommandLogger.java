@@ -308,10 +308,12 @@ public class CommandLogger extends ProcessEngineLogger {
       cause.getMessage());
   }
 
-  public void debugCouldNotResolveCalledProcess(String processDefinitionId, Throwable cause) {
+  public void debugNotAllowedToResolveCalledProcess(String calledProcessId, String callingProcessId, String callActivityId, Throwable cause) {
     logDebug("046",
-      "Resolving a called process definition for {} was not possible. Reason: {}",
-      processDefinitionId,
+      "Resolving a called process definition {} for {} in {} was not possible. Reason: {}",
+      calledProcessId,
+      callActivityId,
+      callingProcessId,
       cause.getMessage());
   }
 
