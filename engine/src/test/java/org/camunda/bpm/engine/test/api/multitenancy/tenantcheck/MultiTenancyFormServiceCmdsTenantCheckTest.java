@@ -145,7 +145,7 @@ public class MultiTenancyFormServiceCmdsTenantCheckTest {
 
     testRule.deployForTenant(TENANT_ONE,
       "org/camunda/bpm/engine/test/api/form/util/VacationRequest_deprecated_forms.bpmn20.xml",
-      "org/camunda/bpm/engine/test/api/form/util/request.form");
+      "org/camunda/bpm/engine/test/api/form/util/request.html");
 
     String processDefinitionId = repositoryService.createProcessDefinitionQuery()
       .singleResult().getId();
@@ -160,7 +160,7 @@ public class MultiTenancyFormServiceCmdsTenantCheckTest {
 
     testRule.deployForTenant(TENANT_ONE,
       "org/camunda/bpm/engine/test/api/form/util/VacationRequest_deprecated_forms.bpmn20.xml",
-      "org/camunda/bpm/engine/test/api/form/util/request.form");
+      "org/camunda/bpm/engine/test/api/form/util/request.html");
 
     String processDefinitionId = repositoryService.createProcessDefinitionQuery()
       .singleResult().getId();
@@ -179,7 +179,7 @@ public class MultiTenancyFormServiceCmdsTenantCheckTest {
 
     testRule.deployForTenant(TENANT_ONE,
       "org/camunda/bpm/engine/test/api/form/util/VacationRequest_deprecated_forms.bpmn20.xml",
-      "org/camunda/bpm/engine/test/api/form/util/request.form");
+      "org/camunda/bpm/engine/test/api/form/util/request.html");
 
     String processDefinitionId = repositoryService.createProcessDefinitionQuery()
       .singleResult().getId();
@@ -196,12 +196,12 @@ public class MultiTenancyFormServiceCmdsTenantCheckTest {
 
     testRule.deployForTenant(TENANT_ONE,
       "org/camunda/bpm/engine/test/api/form/util/VacationRequest_deprecated_forms.bpmn20.xml",
-      "org/camunda/bpm/engine/test/api/form/util/request.form");
+      "org/camunda/bpm/engine/test/api/form/util/request.html");
 
     String processDefinitionId = repositoryService.createProcessDefinitionQuery()
       .singleResult().getId();
 
-    Map<String, Object> properties = new HashMap<String, Object>();
+    Map<String, Object> properties = new HashMap<>();
     properties.put("employeeName", "demo");
 
     identityService.setAuthentication("aUserId", null, Arrays.asList(TENANT_ONE));
@@ -214,12 +214,12 @@ public class MultiTenancyFormServiceCmdsTenantCheckTest {
 
     testRule.deployForTenant(TENANT_ONE,
       "org/camunda/bpm/engine/test/api/form/util/VacationRequest_deprecated_forms.bpmn20.xml",
-      "org/camunda/bpm/engine/test/api/form/util/request.form");
+      "org/camunda/bpm/engine/test/api/form/util/request.html");
 
     String processDefinitionId = repositoryService.createProcessDefinitionQuery()
       .singleResult().getId();
 
-    Map<String, Object> properties = new HashMap<String, Object>();
+    Map<String, Object> properties = new HashMap<>();
     properties.put("employeeName", "demo");
 
     identityService.setAuthentication("aUserId", null);
@@ -237,12 +237,12 @@ public class MultiTenancyFormServiceCmdsTenantCheckTest {
 
     testRule.deployForTenant(TENANT_ONE,
       "org/camunda/bpm/engine/test/api/form/util/VacationRequest_deprecated_forms.bpmn20.xml",
-      "org/camunda/bpm/engine/test/api/form/util/request.form");
+      "org/camunda/bpm/engine/test/api/form/util/request.html");
 
     String processDefinitionId = repositoryService.createProcessDefinitionQuery()
       .singleResult().getId();
 
-    Map<String, Object> properties = new HashMap<String, Object>();
+    Map<String, Object> properties = new HashMap<>();
     properties.put("employeeName", "demo");
 
     identityService.setAuthentication("aUserId", null);
@@ -429,11 +429,11 @@ public class MultiTenancyFormServiceCmdsTenantCheckTest {
     // deploy tenants
     testRule.deployForTenant(TENANT_ONE,
       "org/camunda/bpm/engine/test/api/form/FormsProcess.bpmn20.xml",
-      "org/camunda/bpm/engine/test/api/form/task.form").getId();
+      "org/camunda/bpm/engine/test/api/form/task.html").getId();
 
     String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
 
-    Map<String, Object> properties = new HashMap<String, Object>();
+    Map<String, Object> properties = new HashMap<>();
     properties.put("room", "5b");
     properties.put("speaker", "Mike");
     formService.submitStartForm(procDefId, properties).getId();
@@ -451,11 +451,11 @@ public class MultiTenancyFormServiceCmdsTenantCheckTest {
     // deploy tenants
     testRule.deployForTenant(TENANT_ONE,
       "org/camunda/bpm/engine/test/api/form/FormsProcess.bpmn20.xml",
-      "org/camunda/bpm/engine/test/api/form/task.form").getId();
+      "org/camunda/bpm/engine/test/api/form/task.html").getId();
 
     String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
 
-    Map<String, Object> properties = new HashMap<String, Object>();
+    Map<String, Object> properties = new HashMap<>();
     properties.put("room", "5b");
     properties.put("speaker", "Mike");
     formService.submitStartForm(procDefId, properties);
@@ -476,11 +476,11 @@ public class MultiTenancyFormServiceCmdsTenantCheckTest {
     // deploy tenants
     testRule.deployForTenant(TENANT_ONE,
       "org/camunda/bpm/engine/test/api/form/FormsProcess.bpmn20.xml",
-      "org/camunda/bpm/engine/test/api/form/task.form").getId();
+      "org/camunda/bpm/engine/test/api/form/task.html").getId();
 
     String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
 
-    Map<String, Object> properties = new HashMap<String, Object>();
+    Map<String, Object> properties = new HashMap<>();
     properties.put("room", "5b");
     properties.put("speaker", "Mike");
     formService.submitStartForm(procDefId, properties);
