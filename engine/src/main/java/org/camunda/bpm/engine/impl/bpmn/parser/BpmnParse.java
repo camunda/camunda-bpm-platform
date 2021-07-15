@@ -2659,7 +2659,7 @@ public class BpmnParse extends Parse {
       if(formRefBindingAttribute != null) {
         taskDefinition.setCamundaFormDefinitionBinding(formRefBindingAttribute);
       }
-      if(formRefAttribute.equals(DefaultTaskFormHandler.FORM_REF_BINDING_VERSION)) {
+      if(formRefBindingAttribute.equals(DefaultTaskFormHandler.FORM_REF_BINDING_VERSION)) {
         String formRefVersionAttribute = taskElement.attributeNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "formRefVersion");
         if(formRefVersionAttribute != null) {
           taskDefinition.setCamundaFormDefinitionVersion(expressionManager.createExpression(formRefVersionAttribute));
