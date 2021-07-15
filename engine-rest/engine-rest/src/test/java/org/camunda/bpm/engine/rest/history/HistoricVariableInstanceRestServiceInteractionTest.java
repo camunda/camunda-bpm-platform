@@ -293,7 +293,9 @@ public class HistoricVariableInstanceRestServiceInteractionTest extends Abstract
       .statusCode(Status.OK.getStatusCode())
     .and()
       .body(is(equalTo(new String(byteContent))))
-      .header("Content-Disposition", "attachment; filename=\"" + filename + "\"")
+      .header("Content-Disposition", "attachment; " +
+              "filename=\"" + filename + "\"; " +
+              "filename*=UTF-8''" + filename)
     .when().get(VARIABLE_INSTANCE_BINARY_DATA_URL);
     //due to some problems with wildfly we gotta check this separately
     String contentType = response.getContentType();
