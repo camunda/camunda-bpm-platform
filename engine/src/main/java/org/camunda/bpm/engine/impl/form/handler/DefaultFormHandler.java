@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.impl.form.handler;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,12 +60,24 @@ public class DefaultFormHandler implements FormHandler {
   public static final String FORM_PROPERTY_ELEMENT = "formProperty";
   private static final String BUSINESS_KEY_ATTRIBUTE = "businessKey";
 
+  public static final String FORM_REF_BINDING_DEPLOYMENT = "deployment";
+  public static final String FORM_REF_BINDING_LATEST = "latest";
+  public static final String FORM_REF_BINDING_VERSION = "version";
+  public static final List<String> ALLOWED_FORM_REF_BINDINGS = Arrays.asList(FORM_REF_BINDING_DEPLOYMENT, FORM_REF_BINDING_LATEST, FORM_REF_BINDING_VERSION);
+
   protected String deploymentId;
   protected String businessKeyFieldId;
 
-  protected List<FormPropertyHandler> formPropertyHandlers = new ArrayList<FormPropertyHandler>();
+  protected Expression formKey;
 
-  protected List<FormFieldHandler> formFieldHandlers = new ArrayList<FormFieldHandler>();
+  // Camunda Form Definition
+  protected Expression camundaFormDefinitionKey;
+  protected String camundaFormDefinitionBinding;
+  protected Expression camundaFormDefinitionVersion;
+
+  protected List<FormPropertyHandler> formPropertyHandlers = new ArrayList<>();
+
+  protected List<FormFieldHandler> formFieldHandlers = new ArrayList<>();
 
   public void parseConfiguration(Element activityElement, DeploymentEntity deployment, ProcessDefinitionEntity processDefinition, BpmnParse bpmnParse) {
     this.deploymentId = deployment.getId();
@@ -81,6 +94,35 @@ public class DefaultFormHandler implements FormHandler {
 
       // provide support for new form field metadata
       parseFormData(bpmnParse, expressionManager, extensionElement);
+    }
+
+    String formKeyAttribute = activityElement.attributeNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "formKey");
+    String formRefAttribute = activityElement.attributeNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "formRef");
+
+    if(formKeyAttribute != null && formRefAttribute != null) {
+      bpmnParse.addError("Invalid element definition: only one of the attributes formKey and formRef is allowed.", activityElement);
+    }
+
+    if (formKeyAttribute != null) {
+      this.formKey = expressionManager.createExpression(formKeyAttribute);
+    } else if(formRefAttribute != null) {
+      // formRef
+      this.camundaFormDefinitionKey = expressionManager.createExpression(formRefAttribute);
+      // formRefBinding
+      String formRefBindingAttribute = activityElement.attributeNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS,
+          "formRefBinding");
+      if (formRefBindingAttribute == null || !ALLOWED_FORM_REF_BINDINGS.contains(formRefBindingAttribute)) {
+        bpmnParse.addError("Invalid element definition: value for formRefBinding attribute has to be one of "
+            + ALLOWED_FORM_REF_BINDINGS + " but was " + formRefBindingAttribute, activityElement);
+      }
+      this.camundaFormDefinitionBinding = formRefBindingAttribute;
+
+      // formRefVersion
+      if (FORM_REF_BINDING_VERSION.equals(formRefBindingAttribute)) {
+        String formRefVersionAttribute = activityElement.attributeNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS,
+            "formRefVersion");
+        this.camundaFormDefinitionVersion = expressionManager.createExpression(formRefVersionAttribute);
+      }
     }
   }
 
@@ -153,7 +195,7 @@ public class DefaultFormHandler implements FormHandler {
       List<Element> propertyElements = propertiesElement.elementsNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "property");
 
       // use linked hash map to preserve item ordering as provided in XML
-      Map<String, String> propertyMap = new LinkedHashMap<String, String>();
+      Map<String, String> propertyMap = new LinkedHashMap<>();
       for (Element property : propertyElements) {
         String id = property.attribute("id");
         String value = property.attribute("value");
@@ -262,7 +304,7 @@ public class DefaultFormHandler implements FormHandler {
   }
 
   protected void initializeFormProperties(FormDataImpl formData, ExecutionEntity execution) {
-    List<FormProperty> formProperties = new ArrayList<FormProperty>();
+    List<FormProperty> formProperties = new ArrayList<>();
     for (FormPropertyHandler formPropertyHandler: formPropertyHandlers) {
       if (formPropertyHandler.isReadable()) {
         FormProperty formProperty = formPropertyHandler.createFormProperty(execution);
@@ -340,7 +382,7 @@ public class DefaultFormHandler implements FormHandler {
           if (!(value instanceof SerializableValue)
               && value.getValue() != null && value.getValue() instanceof String) {
             final String stringValue = (String) value.getValue();
-            
+
             HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
               @Override
               public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
@@ -378,5 +420,21 @@ public class DefaultFormHandler implements FormHandler {
 
   public void setBusinessKeyFieldId(String businessKeyFieldId) {
     this.businessKeyFieldId = businessKeyFieldId;
+  }
+
+  public Expression getFormKey() {
+    return formKey;
+  }
+
+  public Expression getCamundaFormDefinitionKey() {
+    return camundaFormDefinitionKey;
+  }
+
+  public String getCamundaFormDefinitionBinding() {
+    return camundaFormDefinitionBinding;
+  }
+
+  public Expression getCamundaFormDefinitionVersion() {
+    return camundaFormDefinitionVersion;
   }
 }
