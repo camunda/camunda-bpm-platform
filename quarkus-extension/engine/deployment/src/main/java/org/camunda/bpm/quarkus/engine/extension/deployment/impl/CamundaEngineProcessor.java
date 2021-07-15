@@ -17,6 +17,8 @@
 package org.camunda.bpm.quarkus.engine.extension.deployment.impl;
 
 import io.quarkus.deployment.annotations.BuildStep;
+import io.quarkus.deployment.annotations.Record;
+import io.quarkus.deployment.annotations.ExecutionTime;
 import io.quarkus.deployment.builditem.FeatureBuildItem;
 
 public class CamundaEngineProcessor {
@@ -24,6 +26,7 @@ public class CamundaEngineProcessor {
   protected static final String FEATURE = "camunda-platform-engine";
 
   @BuildStep
+  @Record(ExecutionTime.STATIC_INIT)
   protected FeatureBuildItem feature() {
     return new FeatureBuildItem(FEATURE);
   }
