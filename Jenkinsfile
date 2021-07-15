@@ -44,7 +44,8 @@ pipeline {
             cambpmRunMaven('.',
                 'clean source:jar deploy source:test-jar com.mycila:license-maven-plugin:check -Pdistro,distro-ce,distro-wildfly,distro-webjar,h2-in-memory -DaltStagingDirectory=${WORKSPACE}/staging -DskipRemoteStaging=true',
                 withCatch: false,
-                withNpm: true)
+                withNpm: true,
+                jdkVersion: 'jdk-11-latest')
 
             // archive all .jar, .pom, .xml, .txt runtime artifacts + required .war/.zip/.tar.gz for EE pipeline
             // add a new line for each group of artifacts

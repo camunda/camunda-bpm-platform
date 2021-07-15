@@ -64,6 +64,8 @@
           they usually define which modules are covered by the distro profile -->
         <module>spring-boot-starter</module>
 
+        <module>quarkus-extension</module>
+
         <module>qa</module>
 
         <module>distro/h2-webapp</module>
@@ -242,6 +244,7 @@
       <id>sonatype-oss-release</id>
       <modules>
         <module>spring-boot-starter</module>
+        <module>quarkus-extension</module>
         <module>model-api</module>
 
         <module>engine</module>
