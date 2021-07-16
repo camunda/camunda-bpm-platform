@@ -29,7 +29,7 @@ pipeline {
     stage('ASSEMBLY') {
       when {
         expression {
-          env.BRANCH_NAME == cambpmDefaultBranch() || (changeRequest() && !pullRequest.labels.contains('no-build'))
+          env.BRANCH_NAME == cambpmDefaultBranch() || (changeRequest() && (!pullRequest.labels.contains('no-build') || pullRequest.labels.contains('sqlserver')))
         }
       }
       environment {
@@ -386,7 +386,8 @@ pipeline {
           parallel(cambpmGetMatrixStages('engine-webapp-unit', failedStageTypes, { stageInfo ->
             List allowedStageLabels = stageInfo.allowedLabels
             String dbLabel = stageInfo.nodeType
-            return cambpmWithLabels(allowedStageLabels.minus('cockroachdb'), cambpmGetDbType(dbLabel))
+            // return cambpmWithLabels(allowedStageLabels.minus('cockroachdb'), cambpmGetDbType(dbLabel))
+            return true
           }))
         }
       }
