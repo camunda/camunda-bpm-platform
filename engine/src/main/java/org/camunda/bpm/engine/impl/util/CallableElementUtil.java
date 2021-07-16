@@ -55,10 +55,13 @@ public class CallableElementUtil {
       return null;
     }
 
-    VariableScope emptyVariableScope = new StartProcessVariableScope();
+    VariableScope emptyVariableScope = StartProcessVariableScope.getSharedInstance();
 
-    if (callableElement.getTenantIdProvider() instanceof ElValueProvider) {
-      tenantId = callableElement.getDefinitionTenantId(emptyVariableScope);
+    String targetTenantId = tenantId;
+    try {
+      targetTenantId = callableElement.getDefinitionTenantId(emptyVariableScope);
+    } catch (Exception ex) {
+      // no tenant id found, let's keep using the calling process' tenant id
     }
 
     String processDefinitionKey = callableElement.getDefinitionKey(emptyVariableScope);
