@@ -195,7 +195,6 @@ module.exports = function(viewContext) {
         processData.observe(
           ['processDefinition', 'staticCalledProcessDefinitions'],
           function (processDefinition, staticCalledProcessDefinitions) {
-            const ProcessDefinition = camAPI.resource('process-definition');
             const callActivityToProcessMap = {};
             const drawStaticLinks = function (staticProcDefs) {
               for (const dto of staticProcDefs) {

@@ -114,7 +114,7 @@ module.exports = [
           processData.observe(
             ['calledProcessDefinitions', 'staticCalledProcessDefinitions', 'bpmnElements'],
             function(calledProcessDefinitions, staticCalledProcessDefinitions, bpmnElements) {
-              console.log(staticCalledProcessDefinitions)
+              console.log(staticCalledProcessDefinitions);
               // todo check who else uses this
               $scope.calledProcessDefinitions = attachCalledFromActivities(
                 calledProcessDefinitions,
