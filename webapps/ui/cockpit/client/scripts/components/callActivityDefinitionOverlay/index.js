@@ -19,6 +19,7 @@
 
 var fs = require('fs');
 var angular = require('angular');
+const {getSearchQueryForSearchType} = require("../../../../../common/scripts/util/search-widget-utils");
 
 var template = fs.readFileSync(__dirname + '/template.html', 'utf8');
 
@@ -31,7 +32,6 @@ module.exports = function(viewContext) {
     'search',
     'control',
     'processData',
-    'camAPI',
     function(
       $scope,
       $timeout,
@@ -40,7 +40,6 @@ module.exports = function(viewContext) {
       search,
       control,
       processData,
-      camAPI,
     ) {
       /**
        * @returns {Array} BPMN Elements that are flow nodes
@@ -101,12 +100,12 @@ module.exports = function(viewContext) {
           applyFunction(cancelHide);
         };
 
-        var redirectToCalledPInstance = function(id) {
+        var redirectToCalledPInstance = function(calledProcessId) {
           const url =
             '/process-definition/' +
-            id +
-            '/' +
-            viewContext;
+            calledProcessId +
+            '/runtime?parentProcessDefinitionId=' +
+            $scope.key;
           $location.url(url);
         };
 
@@ -189,7 +188,7 @@ module.exports = function(viewContext) {
             const callActivityToProcessMap = {};
             const drawStaticLinks = function (staticProcDefs) {
               for (const dto of staticProcDefs) {
-                dto.callActivityIds.forEach(callerId => callActivityToProcessMap[callerId] = dto)
+                dto.callActivityIds.forEach(callerId => callActivityToProcessMap[callerId] = dto);
               }
               for (const activity of callActivityFlowNodes) {
                 if(callActivityToProcessMap[activity]){
@@ -198,7 +197,7 @@ module.exports = function(viewContext) {
                   addOverlayForSingleElement(activity, undefined);
                 }
               }
-            }
+            };
             drawStaticLinks(staticCalledProcessDefinitions);
           }
         );

@@ -394,6 +394,8 @@ var Controller = [
           // technically we dont even need this because the provide is only called if someone isactually observing. which we dont do unless there is a call activity
           if(Object.values(bpmnElements).some(element => element.$type === "bpmn:CallActivity")){
             return camAPI.resource('process-definition').linkedCallableElements(processDefinition.id);
+          } else {
+            return [];
           }
         }
         ]
