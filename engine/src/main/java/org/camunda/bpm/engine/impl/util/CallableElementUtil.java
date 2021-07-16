@@ -62,11 +62,12 @@ public class CallableElementUtil {
       targetTenantId = callableElement.getDefinitionTenantId(emptyVariableScope);
     } catch (Exception ex) {
       // no tenant id found, let's keep using the calling process' tenant id
+      // https://docs.camunda.org/manual/7.15/reference/bpmn20/subprocesses/call-activity/#calledelement-tenant-id
     }
 
     String processDefinitionKey = callableElement.getDefinitionKey(emptyVariableScope);
     try {
-      return getCalledProcessDefinition(emptyVariableScope, callableElement, processDefinitionKey, tenantId);
+      return getCalledProcessDefinition(emptyVariableScope, callableElement, processDefinitionKey, targetTenantId);
     } catch (ProcessEngineException e) {
       UTIL_LOGGER.debugCouldNotResolveCallableElement(e);
       return null;

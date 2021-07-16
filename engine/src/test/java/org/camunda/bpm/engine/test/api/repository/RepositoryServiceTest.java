@@ -1363,7 +1363,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
   }
 
   @Test
-  public void shouldReturnCorrectProcessesForCallActiveWithTenantId(){
+  public void shouldReturnCorrectProcessesForCallActivityWithTenantId(){
     //given
     final String processOne = "org/camunda/bpm/engine/test/api/repository/processOne.bpmn20.xml";
     final String processTwo = "org/camunda/bpm/engine/test/api/repository/processTwo.bpmn20.xml";
@@ -1373,12 +1373,12 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
 
     String id = testRule.deployForTenantAndGetDefinition(aTenant,
       "org/camunda/bpm/engine/test/api/repository/call_activities_with_tenants.bpmn").getId();
-    testRule.deploy(processOne);
-    testRule.deploy(processTwo);
     testRule.deployForTenant(anotherTenant, processTwo);
     String sameTenantProcessOne = testRule.deployForTenantAndGetDefinition(aTenant, processOne).getId();
     String otherTenantProcessOne = testRule.deployForTenantAndGetDefinition(anotherTenant, processOne).getId();
-
+    // these two processes should not be picked up even though they are newer because they are not deployed for a tenant.
+    testRule.deploy(processOne);
+    testRule.deploy(processTwo);
 
     //when
     Collection<CalledProcessDefinition> mappings = repositoryService.getStaticCalledProcessDefinitions(id);
