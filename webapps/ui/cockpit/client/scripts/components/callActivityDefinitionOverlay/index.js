@@ -183,15 +183,6 @@ module.exports = function(viewContext) {
 
 
       if(callActivityFlowNodes.length) {
-        processData.provide(
-          'staticCalledProcessDefinitions',
-          ['processDefinition',
-          function (processDefinition) {
-            const ProcessDefinition = camAPI.resource('process-definition');
-            return ProcessDefinition.linkedCallableElements(processDefinition.id);
-          }]
-        )
-
         processData.observe(
           ['processDefinition', 'staticCalledProcessDefinitions'],
           function (processDefinition, staticCalledProcessDefinitions) {
