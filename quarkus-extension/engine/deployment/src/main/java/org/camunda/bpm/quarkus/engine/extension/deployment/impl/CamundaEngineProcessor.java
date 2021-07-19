@@ -24,10 +24,13 @@ import io.quarkus.arc.deployment.UnremovableBeanBuildItem;
 import io.quarkus.arc.processor.DotNames;
 import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
+import io.quarkus.deployment.annotations.Consume;
 import io.quarkus.deployment.annotations.Record;
 import io.quarkus.deployment.builditem.FeatureBuildItem;
 import io.quarkus.deployment.builditem.ShutdownContextBuildItem;
+import io.quarkus.runtime.RuntimeValue;
 import org.camunda.bpm.engine.cdi.BusinessProcess;
+import org.camunda.bpm.engine.cdi.CdiStandaloneProcessEngineConfiguration;
 import org.camunda.bpm.engine.cdi.ProcessVariables;
 import org.camunda.bpm.engine.cdi.compat.CamundaTaskForm;
 import org.camunda.bpm.engine.cdi.compat.FoxTaskForm;
@@ -35,6 +38,7 @@ import org.camunda.bpm.engine.cdi.impl.ProcessVariableLocalMap;
 import org.camunda.bpm.engine.cdi.impl.ProcessVariableMap;
 import org.camunda.bpm.engine.cdi.impl.context.DefaultContextAssociationManager;
 import org.camunda.bpm.engine.cdi.jsf.TaskForm;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.quarkus.engine.extension.impl.CamundaEngineRecorder;
 import org.jboss.jandex.DotName;
 
@@ -52,6 +56,8 @@ public class CamundaEngineProcessor {
     unremovableBeansProducer.produce(
         UnremovableBeanBuildItem.beanTypes(
             DotName.createSimple(DefaultContextAssociationManager.class.getName() + "$RequestScopedAssociation")));
+    // TODO: replace Standalone with JTA configuration
+    unremovableBeansProducer.produce(UnremovableBeanBuildItem.beanTypes(CdiStandaloneProcessEngineConfiguration.class));
   }
 
   @BuildStep
@@ -73,15 +79,39 @@ public class CamundaEngineProcessor {
 
   @BuildStep
   @Record(RUNTIME_INIT)
-  protected ProcessEngineBuildItem processEngine(CamundaEngineRecorder recorder,
-                                                 BeanContainerBuildItem beanContainerBuildItem) {
+  protected void cdiConfig(CamundaEngineRecorder recorder, BeanContainerBuildItem beanContainer) {
+    recorder.configureProcessEngineCdiBeans(beanContainer.getValue());
+  }
 
-    return new ProcessEngineBuildItem(recorder.createProcessEngine(beanContainerBuildItem.getValue()));
+  @Consume(AdditionalBeanBuildItem.class)
+  @BuildStep
+  @Record(RUNTIME_INIT)
+  protected void processEngineConfiguration(CamundaEngineRecorder recorder,
+                                            BeanContainerBuildItem beanContainer,
+                                            BuildProducer<ProcessEngineConfigurationBuildItem> configurationProducer) {
+
+    recorder.configureProcessEngineCdiBeans(beanContainer.getValue());
+    RuntimeValue<ProcessEngineConfigurationImpl> processEngineConfiguration =
+        recorder.createProcessEngineConfiguration(beanContainer.getValue());
+    configurationProducer.produce(new ProcessEngineConfigurationBuildItem(processEngineConfiguration));
   }
 
   @BuildStep
   @Record(RUNTIME_INIT)
-  void shutdown(CamundaEngineRecorder recorder,
+  protected void processEngine(CamundaEngineRecorder recorder,
+                               BeanContainerBuildItem beanContainerBuildItem,
+                               ProcessEngineConfigurationBuildItem processEngineConfigurationBuildItem,
+                               BuildProducer<ProcessEngineBuildItem> processEngineProducer) {
+
+    RuntimeValue<ProcessEngineConfigurationImpl> processEngineConfiguration =
+        processEngineConfigurationBuildItem.getProcessEngineConfiguration();
+    processEngineProducer.produce(new ProcessEngineBuildItem(
+        recorder.createProcessEngine(processEngineConfiguration)));
+  }
+
+  @BuildStep
+  @Record(RUNTIME_INIT)
+  protected void shutdown(CamundaEngineRecorder recorder,
                 ProcessEngineBuildItem processEngine,
                 ShutdownContextBuildItem shutdownContext) {
 
