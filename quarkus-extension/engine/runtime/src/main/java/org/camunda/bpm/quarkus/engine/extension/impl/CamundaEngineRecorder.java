@@ -26,6 +26,7 @@ import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.cdi.CdiStandaloneProcessEngineConfiguration;
 import org.camunda.bpm.engine.cdi.impl.util.BeanManagerLookup;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 
 @Recorder
 public class CamundaEngineRecorder {
@@ -33,19 +34,31 @@ public class CamundaEngineRecorder {
   protected static final String DEFAULT_JDBC_URL =
       "jdbc:h2:mem:camunda;MVCC=TRUE;TRACE_LEVEL_FILE=0;DB_CLOSE_ON_EXIT=FALSE";
 
-  public RuntimeValue<ProcessEngine> createProcessEngine(BeanContainer beanContainer) {
-
-    // TODO: replace hardcoded DB configuration with Agroal code
-    CdiStandaloneProcessEngineConfiguration configuration =
-        beanContainer.instance(CdiStandaloneProcessEngineConfiguration.class);
-    configuration.setJdbcUrl(DEFAULT_JDBC_URL);
-    configuration.setDatabaseSchemaUpdate("true");
+  public void configureProcessEngineCdiBeans(BeanContainer beanContainer) {
 
     if (BeanManagerLookup.localInstance == null) {
       BeanManagerLookup.localInstance = beanContainer.instance(BeanManager.class);
     }
+  }
+
+  public RuntimeValue<ProcessEngineConfigurationImpl> createProcessEngineConfiguration(BeanContainer beanContainer) {
+
+    // TODO: replace Standalone with JTA configuration
+    ProcessEngineConfigurationImpl configuration =
+        beanContainer.instance(CdiStandaloneProcessEngineConfiguration.class);
+
+    // TODO: replace hardcoded DB configuration with Agroal code
+    configuration.setJdbcUrl(DEFAULT_JDBC_URL);
+    configuration.setDatabaseSchemaUpdate("true");
+
+    return new RuntimeValue<>(configuration);
+  }
+
+  public RuntimeValue<ProcessEngine> createProcessEngine(
+      RuntimeValue<ProcessEngineConfigurationImpl> configurationRuntimeValue) {
 
     // build process engine
+    ProcessEngineConfigurationImpl configuration = configurationRuntimeValue.getValue();
     ProcessEngine processEngine = configuration.buildProcessEngine();
 
     // register process engine with the runtime container delegate
@@ -58,7 +71,9 @@ public class CamundaEngineRecorder {
   public void registerShutdownTask(ShutdownContext shutdownContext,
                                    RuntimeValue<ProcessEngine> processEngine) {
 
+    // cleanup on application shutdown
     shutdownContext.addShutdownTask(() -> {
+
       RuntimeContainerDelegate runtimeContainerDelegate = RuntimeContainerDelegate.INSTANCE.get();
       runtimeContainerDelegate.unregisterProcessEngine(processEngine.getValue());
     });
