@@ -34,7 +34,7 @@ org.camunda.bpm.client:
 ## Topic Subscription
 
 ```java
-@Configuraton
+@Configuration
 @ExternalTaskSubscription("creditScoreChecker")
 public class CreditScoreCheckerHandler implements ExternalTaskHandler {
 
