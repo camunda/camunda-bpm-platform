@@ -17,6 +17,10 @@
           </a>
         </td>
 
+        <td class="process-definition-running" >
+          <span>{{ calledProcessDefinition.running }}</span>
+        </td>
+
         <td class="activity">
           <span ng-show="calledProcessDefinition.calledFromActivities.length === 1"
                 cam-widget-clipboard="calledProcessDefinition.calledFromActivities[0].id">
@@ -25,7 +29,7 @@
             </a>
           </span>
 
-          <ul ng-show="calledProcessDefinition.calledFromActivities.length > 1">
+          <ul id="call-activity-list" ng-show="calledProcessDefinition.calledFromActivities.length > 1">
             <li ng-repeat="activity in calledProcessDefinition.calledFromActivities"
                 cam-widget-clipboard="activity.id">
               <a ng-href="#/process-definition/{{ processDefinition.id }}/runtime?{{ getSearchQueryForSearchType(activity.id) }}&amp;detailsTab=call-process-definitions-table">

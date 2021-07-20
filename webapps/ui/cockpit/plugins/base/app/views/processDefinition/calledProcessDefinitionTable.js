@@ -53,8 +53,9 @@ module.exports = [
 
           // prettier-ignore
           $scope.headColumns = [
-          { class: 'process-definition', request: 'label', sortable: true, content: $translate.instant('PLUGIN_CALLED_PROCESS')},
-          { class: 'activity', request: 'name', sortable: true, content: $translate.instant('PLUGIN_ACTIVITY')}
+            { class: 'process-definition', request: 'label', sortable: true, content: $translate.instant('PLUGIN_CALLED_PROCESS')},
+            { class: 'process-definition-running', request: 'running', sortable: true, content: $translate.instant('PLUGIN_CALLED_PROCESS_RUNNING')},
+            { class: 'activity', request: 'name', sortable: true, content: $translate.instant('PLUGIN_ACTIVITY')}
         ];
 
           // Default sorting
@@ -115,17 +116,29 @@ module.exports = [
             ['calledProcessDefinitions', 'staticCalledProcessDefinitions', 'bpmnElements'],
             function(calledProcessDefinitions, staticCalledProcessDefinitions, bpmnElements) {
               console.log(staticCalledProcessDefinitions);
-              // todo check who else uses this
+              let staticCalled = [...staticCalledProcessDefinitions];
+              if(filter.activityIdIn && filter.activityIdIn.length) {
+                const filteredIds = new Set(filter.activityIdIn)
+                staticCalled = staticCalled.map(dto => {
+                    const newDto = angular.copy(dto)
+                    const intersection = dto.callActivityIds.filter(e => filteredIds.has(e))
+                    if (intersection.length) {
+                      newDto.callActivityIds = intersection;
+                      return newDto
+                    }
+                  }
+                ).filter(e => e !== undefined);
+              }
               $scope.calledProcessDefinitions = attachCalledFromActivities(
                 calledProcessDefinitions,
-                staticCalledProcessDefinitions,
+                staticCalled,
                 bpmnElements
               ).map(function(calledProcessDefinition) {
                 return angular.extend({}, calledProcessDefinition, {
                   label:
                     calledProcessDefinition.name || calledProcessDefinition.key
                 });
-              });
+              } );
               $scope.loadingState = $scope.calledProcessDefinitions.length
                 ? 'LOADED'
                 : 'EMPTY';
@@ -133,16 +146,42 @@ module.exports = [
           );
 
           function attachCalledFromActivities(
-            processDefinitions,
+            runningProcessDefinitions,
             staticCalledProcesses,
             bpmnElements
           ) {
-            var result = [];
+            const result = [];
 
-            const definitions = [].concat(processDefinitions, staticCalledProcesses);
+            const map = {}
+            runningProcessDefinitions.forEach(
+              dto => {
+                const newDto = angular.extend({}, dto);
+                newDto.running = true;
+                map[newDto.id] = newDto;
+              }
+            )
+
+            staticCalledProcesses.forEach(
+              dto => {
+                const newDto = angular.extend({}, dto);
+                newDto.calledFromActivityIds = newDto.callActivityIds;
+                delete newDto.callActivityIds;
+                if(map[dto.id]){
+                  const merged = new Set([...map[newDto.id].calledFromActivityIds, ...newDto.calledFromActivityIds])
+                  map[dto.id].calledFromActivityIds = Array.from(merged).sort();
+                  // add static flag?
+                } else {
+                  map[newDto.id] = newDto;
+                  newDto.running = false;
+                  newDto.calledFromActivityIds.sort();
+                }
+              }
+            )
+
+            const definitions = Object.values(map);
 
             definitions.forEach(function(d) {
-              var calledFromActivityIds = d.calledFromActivityIds || d.callActivityIds;
+              var calledFromActivityIds = d.calledFromActivityIds;
               const calledFromActivities = [];
 
               angular.forEach(calledFromActivityIds, function(activityId) {
