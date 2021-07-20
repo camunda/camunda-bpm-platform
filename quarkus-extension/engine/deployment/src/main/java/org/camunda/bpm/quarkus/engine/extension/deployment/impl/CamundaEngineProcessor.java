@@ -26,7 +26,6 @@ public class CamundaEngineProcessor {
   protected static final String FEATURE = "camunda-platform-engine";
 
   @BuildStep
-  @Record(ExecutionTime.STATIC_INIT)
   protected FeatureBuildItem feature() {
     return new FeatureBuildItem(FEATURE);
   }
