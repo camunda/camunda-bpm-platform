@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntit
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionEntity;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
+import org.camunda.bpm.engine.impl.persistence.entity.CamundaFormDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
@@ -46,6 +47,8 @@ public class DeploymentCache {
   protected CaseDefinitionCache caseDefinitionCache;
   protected DecisionDefinitionCache decisionDefinitionCache;
   protected DecisionRequirementsDefinitionCache decisionRequirementsDefinitionCache;
+  protected CamundaFormDefinitionCache camundaFormDefinitionCache;
+
 
   protected BpmnModelInstanceCache bpmnModelInstanceCache;
   protected CmmnModelInstanceCache cmmnModelInstanceCache;
@@ -57,6 +60,7 @@ public class DeploymentCache {
     caseDefinitionCache = new CaseDefinitionCache(factory, cacheCapacity, cacheDeployer);
     decisionDefinitionCache = new DecisionDefinitionCache(factory, cacheCapacity, cacheDeployer);
     decisionRequirementsDefinitionCache = new DecisionRequirementsDefinitionCache(factory, cacheCapacity, cacheDeployer);
+    camundaFormDefinitionCache = new CamundaFormDefinitionCache(factory, cacheCapacity, cacheDeployer);
 
     bpmnModelInstanceCache = new BpmnModelInstanceCache(factory, cacheCapacity, processDefinitionEntityCache);
     cmmnModelInstanceCache = new CmmnModelInstanceCache(factory, cacheCapacity, caseDefinitionCache);
@@ -129,6 +133,20 @@ public class DeploymentCache {
   public void discardProcessDefinitionCache() {
     processDefinitionEntityCache.clear();
     bpmnModelInstanceCache.clear();
+  }
+
+  // CAMUNDA FORM DEFINITION ////////////////////////////////////////////////////////////////////////
+
+  public void addCamundaFormDefinition(CamundaFormDefinitionEntity camundaFormDefinition) {
+    camundaFormDefinitionCache.addDefinition(camundaFormDefinition);
+  }
+
+  public void removeCamundaFormDefinition(String camundaFormDefinitionId) {
+    camundaFormDefinitionCache.removeDefinitionFromCache(camundaFormDefinitionId);
+  }
+
+  public void discardCamundaFormDefinitionCache() {
+    camundaFormDefinitionCache.clear();
   }
 
   // CASE DEFINITION ////////////////////////////////////////////////////////////////////////////////

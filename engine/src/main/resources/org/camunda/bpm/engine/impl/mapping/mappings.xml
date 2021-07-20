@@ -71,7 +71,8 @@
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/HistoricBatch.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Tenant.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/TenantMembership.xml" />
-    
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/CamundaFormDefinition.xml" />
+
     <!-- CMMN -->
 
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/CaseDefinition.xml" />

@@ -88,6 +88,11 @@ public class CamundaFormDefinitionManager extends AbstractManager implements Abs
     return (CamundaFormDefinitionEntity) getDbEntityManager().selectOne("selectCamundaFormDefinitionByDeploymentAndKey", parameters);
   }
 
+  @SuppressWarnings("unchecked")
+  public List<CamundaFormDefinitionEntity> findDefinitionsByDeploymentId(String deploymentId){
+    return getDbEntityManager().selectList("selectCamundaFormDefinitionByDeploymentId", deploymentId);
+  }
+
   @Override
   public CamundaFormDefinitionEntity getCachedResourceDefinitionEntity(String definitionId) {
     return getDbEntityManager().getCachedEntity(CamundaFormDefinitionEntity.class, definitionId);
@@ -97,6 +102,10 @@ public class CamundaFormDefinitionManager extends AbstractManager implements Abs
   public CamundaFormDefinitionEntity findDefinitionByKeyVersionTagAndTenantId(String definitionKey,
       String definitionVersionTag, String tenantId) {
     throw new UnsupportedOperationException("Currently finding Camunda Form definition by version tag and tenant is not implemented.");
+  }
+
+  public void deleteCamundaFormDefinitionsByDeploymentId(String deploymentId) {
+    getDbEntityManager().delete(CamundaFormDefinitionEntity.class, "deleteCamundaFormDefinitionsByDeploymentId", deploymentId);
   }
 
   protected ListQueryParameterObject configureParameterizedQuery(Object parameter) {

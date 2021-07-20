@@ -17,7 +17,6 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.io.Serializable;
-
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
@@ -30,12 +29,19 @@ public class CamundaFormDefinitionEntity implements CamundaFormDefinition,
 
   protected String id;
   protected int revision = 1;
-  protected String name;
   protected String key;
   protected int version;
   protected String deploymentId;
   protected String resourceName;
   protected String tenantId;
+
+
+  public CamundaFormDefinitionEntity(String key, String deploymentId, String resourceName, String tenantId) {
+    this.key = key;
+    this.deploymentId = deploymentId;
+    this.resourceName = resourceName;
+    this.tenantId = tenantId;
+  }
 
   public String getId() {
     return id;
@@ -55,14 +61,6 @@ public class CamundaFormDefinitionEntity implements CamundaFormDefinition,
 
   public int getRevisionNext() {
     return revision + 1;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
   }
 
   public String getKey() {
@@ -140,11 +138,21 @@ public class CamundaFormDefinitionEntity implements CamundaFormDefinition,
 
   @Override
   public Object getPersistentState() {
-    return null;
+    // properties of this entity are immutable
+    return CamundaFormDefinitionEntity.class;
   }
 
   @Override
   public void updateModifiableFieldsFromEntity(CamundaFormDefinitionEntity updatingDefinition) {
+  }
+
+  @Override
+  public String getName() {
+    return null;
+  }
+
+  @Override
+  public void setName(String name) {
   }
 
 }

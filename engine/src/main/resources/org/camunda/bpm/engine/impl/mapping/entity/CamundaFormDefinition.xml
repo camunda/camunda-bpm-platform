@@ -19,14 +19,13 @@
 -->
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="org.camunda.bpm.engine.impl.dmn.entity.repository.CamundaFormDefinitionEntity">
+<mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.CamundaFormDefinitionEntity">
 
   <!-- CAMUNDA FORM DEFINITION INSERT -->
 
-  <insert id="insertCamundaFormDefinition" parameterType="org.camunda.bpm.engine.impl.dmn.entity.repository.CamundaFormDefinitionEntity">
+  <insert id="insertCamundaFormDefinition" parameterType="org.camunda.bpm.engine.impl.persistence.entity.CamundaFormDefinitionEntity">
     insert into ${prefix}ACT_RE_CAMFORMDEF(
       ID_,
-      NAME_,
       KEY_,
       VERSION_,
       DEPLOYMENT_ID_,
@@ -34,7 +33,6 @@
       TENANT_ID_,
       REV_)
     values (#{id, jdbcType=VARCHAR},
-            #{name, jdbcType=VARCHAR},
             #{key, jdbcType=VARCHAR},
             #{version, jdbcType=INTEGER},
             #{deploymentId, jdbcType=VARCHAR},
@@ -46,7 +44,7 @@
 
   <!-- CAMUNDA FORM DEFINITION UPDATE -->
 
-  <update id="updateCamundaFormDefinition" parameterType="org.camunda.bpm.engine.impl.dmn.entity.repository.CamundaFormDefinitionEntity">
+  <update id="updateCamundaFormDefinition" parameterType="org.camunda.bpm.engine.impl.persistence.entity.CamundaFormDefinitionEntity">
     update ${prefix}ACT_RE_CAMFORMDEF set
       REV_ = #{revisionNext, jdbcType=INTEGER}
     where ID_ = #{id, jdbcType=VARCHAR}
@@ -61,10 +59,9 @@
 
   <!-- CAMUNDA FORM DEFINITION RESULTMAP -->
 
-  <resultMap id="camundaFormDefinitionResultMap" type="org.camunda.bpm.engine.impl.dmn.entity.repository.CamundaFormDefinitionEntity">
+  <resultMap id="camundaFormDefinitionResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.CamundaFormDefinitionEntity">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" />
-    <result property="name" column="NAME_" />
     <result property="key" column="KEY_" jdbcType="VARCHAR" />
     <result property="version" column="VERSION_" jdbcType="INTEGER"/>
     <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR"/>
@@ -74,12 +71,16 @@
 
   <!-- CAMUNDA FORM DEFINITION SELECT -->
 
+  <select id="selectAllCamundaFormDefinitions" resultMap="camundaFormDefinitionResultMap">
+    select * from ${prefix}ACT_RE_CAMFORMDEF
+  </select>
+
   <select id="selectCamundaFormDefinition" parameterType="string" resultMap="camundaFormDefinitionResultMap">
     select * from ${prefix}ACT_RE_CAMFORMDEF where ID_ = #{camundaFormDefinitionId}
   </select>
 
   <select id="selectCamundaFormDefinitionByDeploymentId" parameterType="string" resultMap="camundaFormDefinitionResultMap">
-    select * from ${prefix}ACT_RE_CAMFORMDEF where DEPLOYMENT_ID_ = #{deploymentId}
+    select * from ${prefix}ACT_RE_CAMFORMDEF where DEPLOYMENT_ID_ = #{parameter}
   </select>
 
   <select id="selectCamundaFormDefinitionByDeploymentAndKey" parameterType="map" resultMap="camundaFormDefinitionResultMap">
@@ -114,7 +115,7 @@
               where KEY_ = #{camundaFormDefinitionKey} and TENANT_ID_ is null)
   </select>
 
-  <select id="selectLatestCamundaDefinitionByKeyAndTenantId" parameterType="map" resultMap="camundaDefinitionResultMap">
+  <select id="selectLatestCamundaDefinitionByKeyAndTenantId" parameterType="map" resultMap="camundaFormDefinitionResultMap">
     select *
     from ${prefix}ACT_RE_CAMFORMDEF RES
     where KEY_ = #{camundaFormDefinitionKey}
@@ -122,7 +123,7 @@
           and VERSION_ = (
               select max(VERSION_) 
               from ${prefix}ACT_RE_CAMFORMDEF 
-              where KEY_ = #{decisionDefinitionKey} and TENANT_ID_ = #{tenantId})
+              where KEY_ = #{key} and TENANT_ID_ = #{tenantId})
   </select>
 
   <select id="selectCamundaFormDefinitionByKeyVersionWithoutTenantId" parameterType="map" resultMap="camundaFormDefinitionResultMap">
