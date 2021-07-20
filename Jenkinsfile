@@ -44,7 +44,10 @@ pipeline {
             cambpmRunMaven('.',
                 'clean source:jar deploy source:test-jar com.mycila:license-maven-plugin:check -Pdistro,distro-ce,distro-wildfly,distro-webjar,h2-in-memory -DaltStagingDirectory=${WORKSPACE}/staging -DskipRemoteStaging=true',
                 withCatch: false,
-                withNpm: true)
+                withNpm: true,
+                // we use JDK 11 to build the artifacts, as it is required by the Quarkus extension
+                // the compiler source and target is set to JDK 8 in the release parents
+                jdkVersion: 'jdk-11-latest')
 
             // archive all .jar, .pom, .xml, .txt runtime artifacts + required .war/.zip/.tar.gz for EE pipeline
             // add a new line for each group of artifacts

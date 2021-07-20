@@ -104,6 +104,13 @@
       <groupId>org.jboss.as</groupId>
       <artifactId>jboss-as-weld</artifactId>
       <scope>provided</scope>
+      <exclusions>
+        <!-- exclusion is fine since this dependency is a transitive one of a provided dependency -->
+        <exclusion>
+          <groupId>com.sun</groupId>
+          <artifactId>tools</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <!-- test dependencies -->
     <dependency>

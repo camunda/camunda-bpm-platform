@@ -30,6 +30,7 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
@@ -205,14 +206,12 @@ public class ContainerAuthenticationFilterTest {
     when(mockTenantQuery.list()).thenReturn(new ArrayList<Tenant>());
 
     mockStatic(ServiceLoader.class);
-    when(ServiceLoader.load(ArgumentMatchers.eq(ProcessEngineProvider.class))).thenReturn(serviceLoader);
+    when(ServiceLoader.load(ArgumentMatchers.eq(ProcessEngineProvider.class)))
+      .thenAnswer((Answer<ServiceLoader>) invocation -> serviceLoader);
 
-    when(serviceLoader.iterator()).thenAnswer(new Answer<Iterator<ProcessEngineProvider>>() {
-      @Override
-      public Iterator<ProcessEngineProvider> answer(InvocationOnMock invocation) throws Throwable {
-        return Arrays.asList(provider).iterator();
-      }
-    });
+    when(serviceLoader.iterator())
+      .thenAnswer((Answer<Iterator<ProcessEngineProvider>>) invocation ->
+        Collections.singletonList(provider).iterator());
   }
 
   protected void setupAuthentications() {
@@ -220,7 +219,8 @@ public class ContainerAuthenticationFilterTest {
     mockStatic(Authentications.class);
     authentications = mock(Authentications.class);
 
-    when(Authentications.getFromSession(any(HttpSession.class))).thenReturn(authentications);
+    when(Authentications.getFromSession(any(HttpSession.class)))
+      .thenAnswer((Answer<Authentications>) invocation -> authentications);
   }
 
   protected void setupFilter() throws ServletException {
