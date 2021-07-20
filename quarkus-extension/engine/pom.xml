@@ -20,4 +20,17 @@
     <module>deployment</module>
     <module>runtime</module>
   </modules>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <!-- Quarkus requires version 3.8+ for Maven plugins. -->
+          <version>3.8.1</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
 </project>

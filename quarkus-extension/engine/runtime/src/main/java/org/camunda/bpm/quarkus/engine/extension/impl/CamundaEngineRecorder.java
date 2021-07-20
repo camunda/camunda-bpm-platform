@@ -19,7 +19,6 @@ package org.camunda.bpm.quarkus.engine.extension.impl;
 import javax.enterprise.inject.spi.BeanManager;
 
 import io.quarkus.arc.runtime.BeanContainer;
-import io.quarkus.arc.runtime.BeanContainerListener;
 import io.quarkus.runtime.RuntimeValue;
 import io.quarkus.runtime.ShutdownContext;
 import io.quarkus.runtime.annotations.Recorder;
