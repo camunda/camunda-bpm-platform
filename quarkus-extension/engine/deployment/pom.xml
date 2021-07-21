@@ -15,6 +15,15 @@
   <name>Camunda Platform - Quarkus Extension - Engine - Deployment</name>
 
   <dependencies>
+
+    <!-- Camunda dependencies -->
+    <dependency>
+      <groupId>org.camunda.bpm.quarkus</groupId>
+      <artifactId>camunda-bpm-quarkus-engine</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- Quarkus dependencies -->
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-arc-deployment</artifactId>
@@ -25,35 +34,31 @@
       <artifactId>quarkus-agroal-deployment</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>org.camunda.bpm.quarkus</groupId>
-      <artifactId>camunda-bpm-quarkus-engine</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
+    <!-- Test dependencies -->
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-junit5-internal</artifactId>
       <scope>test</scope>
     </dependency>
 
-    <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-jdbc-h2-deployment</artifactId>
-      <scope>test</scope>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>io.quarkus</groupId>-->
+<!--      <artifactId>quarkus-jdbc-h2-deployment</artifactId>-->
+<!--      <scope>test</scope>-->
+<!--    </dependency>-->
 
-    <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-test-h2</artifactId>
-      <scope>test</scope>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>io.quarkus</groupId>-->
+<!--      <artifactId>quarkus-test-h2</artifactId>-->
+<!--      <scope>test</scope>-->
+<!--    </dependency>-->
 
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
       <scope>test</scope>
     </dependency>
+
   </dependencies>
 
   <build>

@@ -16,23 +16,34 @@
  */
 package org.camunda.bpm.quarkus.engine.test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import javax.inject.Inject;
+
 import io.quarkus.test.QuarkusUnitTest;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-public class UnitTest {
+public class EmbeddedProcessEngineTest {
 
   @RegisterExtension
   protected static final QuarkusUnitTest unitTest = new QuarkusUnitTest()
       .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class));
 
+  @Inject
+  public ProcessEngine processEngine;
+
   @Test
-  public void shouldCheckJunitExtensionNotNull() {
-    assertThat(unitTest).isNotNull();
+  public void shouldProvideEmbeddedProcessEngine() {
+    // given no process engine configuration
+
+    // then
+    // the default process engine is available
+    assertThat(processEngine).isNotNull();
+    assertThat(processEngine.getName()).isEqualTo("default");
   }
 
 }
