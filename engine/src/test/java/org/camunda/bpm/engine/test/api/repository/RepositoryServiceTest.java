@@ -1274,7 +1274,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
     "org/camunda/bpm/engine/test/api/repository/first-process.bpmn20.xml",
     "org/camunda/bpm/engine/test/api/repository/three_.cmmn"
   })
-  public void shouldReturnStaticCalledProcessDefinition() {
+  public void shouldReturnStaticCalledProcessDefinitions() {
     //given
     testRule.deploy("org/camunda/bpm/engine/test/api/repository/second-process.bpmn20.xml");
     testRule.deployForTenant("someTenant", "org/camunda/bpm/engine/test/api/repository/processOne.bpmn20.xml");
@@ -1283,8 +1283,11 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
       .createProcessDefinitionQuery()
       .processDefinitionKey("TestCallActivitiesWithReferences")
       .singleResult();
+
+    String callingProcessId = processDefinition.getId();
+
     //when
-    Collection<CalledProcessDefinition> mappings = repositoryService.getStaticCalledProcessDefinitions(processDefinition.getId());
+    Collection<CalledProcessDefinition> mappings = repositoryService.getStaticCalledProcessDefinitions(callingProcessId);
 
     //then
     //cmmn tasks are not resolved
@@ -1296,11 +1299,16 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
       .collect(Collectors.toList()))
       .containsExactlyInAnyOrder("deployment_1", "version_1");
 
-    assertThat(mappings).extracting("name", "version", "key","callActivityIds")
+    assertThat(mappings).extracting("name", "version", "key","callActivityIds", "versionTag", "callingProcessDefinitionId")
       .contains(
-        Tuple.tuple("Process One", 1, "processOne", Arrays.asList("tenant_reference_1")),
-        Tuple.tuple("Second Test Process", 2, "process", Arrays.asList("latest_reference_1")),
-        Tuple.tuple("Failing Process", 1, "failingProcess", Arrays.asList("version_tag_reference_1")));
+        Tuple.tuple("Process One", 1, "processOne", Arrays.asList("tenant_reference_1"), null, callingProcessId),
+        Tuple.tuple("Second Test Process", 2, "process", Arrays.asList("latest_reference_1"), null, callingProcessId),
+        Tuple.tuple("Failing Process", 1, "failingProcess", Arrays.asList("version_tag_reference_1"), "ver_tag_2", callingProcessId));
+
+    for (CalledProcessDefinition called : mappings) {
+      assertThat(called).isEqualToIgnoringGivenFields(repositoryService.getProcessDefinition(called.getId()), "callActivityIds", "callingProcessDefinitionId");
+    }
+
 
   }
 
@@ -1396,6 +1404,8 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
       .contains(
         Tuple.tuple(otherTenantProcessOne, Arrays.asList("explicit_other_tenant_reference")));
   }
+
+  // todo assert new class type values are not empty
 
   private String deployProcessString(String processString) {
     String resourceName = "xmlString." + BpmnDeployer.BPMN_RESOURCE_SUFFIXES[0];

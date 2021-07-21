@@ -20,47 +20,38 @@ import java.util.List;
 
 import org.camunda.bpm.engine.repository.CalledProcessDefinition;
 
-public class CalledProcessDefinitionDto {
+public class CalledProcessDefinitionDto extends ProcessDefinitionDto {
 
-  private String name;
-  private int version;
-  private String key;
   private List<String> callActivityIds;
-  private String id;
   private String callingProcessDefinitionId;
-
-  public String getName() {
-    return name;
-  }
-
-  public int getVersion() {
-    return version;
-  }
-
-  public String getKey() {
-    return key;
-  }
 
   public List<String> getCallActivityIds() {
     return callActivityIds;
-  }
-
-  public String getId() {
-    return id;
   }
 
   public String getCallingProcessDefinitionId() {
     return callingProcessDefinitionId;
   }
 
-  public static CalledProcessDefinitionDto from(CalledProcessDefinition calledDefinition){
+  public static CalledProcessDefinitionDto from(CalledProcessDefinition definition){
     CalledProcessDefinitionDto dto = new CalledProcessDefinitionDto();
-    dto.callingProcessDefinitionId = calledDefinition.getCallingProcessDefinitionId();
-    dto.callActivityIds = calledDefinition.getCallingCallActivityIds();
-    dto.id = calledDefinition.getId();
-    dto.key = calledDefinition.getKey();
-    dto.name = calledDefinition.getName();
-    dto.version = calledDefinition.getVersion();
+    dto.callingProcessDefinitionId = definition.getCallingProcessDefinitionId();
+    dto.callActivityIds = definition.getCallingCallActivityIds();
+
+    dto.id = definition.getId();
+    dto.key = definition.getKey();
+    dto.category = definition.getCategory();
+    dto.description = definition.getDescription();
+    dto.name = definition.getName();
+    dto.version = definition.getVersion();
+    dto.resource = definition.getResourceName();
+    dto.deploymentId = definition.getDeploymentId();
+    dto.diagram = definition.getDiagramResourceName();
+    dto.suspended = definition.isSuspended();
+    dto.tenantId = definition.getTenantId();
+    dto.versionTag = definition.getVersionTag();
+    dto.historyTimeToLive = definition.getHistoryTimeToLive();
+    dto.isStartableInTasklist = definition.isStartableInTasklist();
 
     return dto;
   }

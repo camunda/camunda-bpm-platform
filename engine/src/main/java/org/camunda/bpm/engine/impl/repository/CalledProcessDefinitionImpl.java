@@ -23,45 +23,51 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.CalledProcessDefinition;
 
 public class CalledProcessDefinitionImpl implements CalledProcessDefinition {
-  protected String name;
-  protected int version;
-  protected String key;
+  private final String id;
+  private final String key;
+  private final String category;
+  private final String description;
+  private final String name;
+  private final int version;
+  private final String deploymentId;
+  private final boolean suspended;
+  private final String tenantId;
+  private final String versionTag;
+  private final Integer historyTimeToLive;
+  private final boolean isStartableInTasklist;
+  private final boolean hasStartFormKey;
+  private final String diagramResourceName;
+  private final String resourceName;
+
   protected List<String> callActivityIds;
-  protected String id;
   protected String callingProcessDefinitionId;
 
-  public CalledProcessDefinitionImpl(ProcessDefinition calledProcessDefinition, String callingProcessDefinitionId) {
+
+  public CalledProcessDefinitionImpl(ProcessDefinition definition, String callingProcessDefinitionId) {
     this.callActivityIds = new ArrayList<>();
-    this.id = calledProcessDefinition.getId();
-    this.key = calledProcessDefinition.getKey();
-    this.version = calledProcessDefinition.getVersion();
-    this.name = calledProcessDefinition.getName();
     this.callingProcessDefinitionId = callingProcessDefinitionId;
+
+    this.id = definition.getId();
+    this.key = definition.getKey();
+    this.category = definition.getCategory();
+    this.description = definition.getDescription();
+    this.name = definition.getName();
+    this.version = definition.getVersion();
+    this.deploymentId = definition.getDeploymentId();
+    this.suspended = definition.isSuspended();
+    this.tenantId = definition.getTenantId();
+    this.versionTag = definition.getVersionTag();
+    this.historyTimeToLive = definition.getHistoryTimeToLive();
+    this.isStartableInTasklist = definition.isStartableInTasklist();
+    this.hasStartFormKey = definition.hasStartFormKey();
+    this.diagramResourceName = definition.getDiagramResourceName();
+    this.resourceName = definition.getResourceName();
   }
 
-  @Override
-  public String getId() {
-    return this.id;
-  }
-
-  @Override
-  public String getName() {
-    return this.name;
-  }
-
-  @Override
-  public String getKey() {
-    return this.key;
-  }
-
-  @Override
-  public int getVersion() {
-    return this.version;
-  }
 
   @Override
   public String getCallingProcessDefinitionId() {
-    return null;
+    return this.callingProcessDefinitionId;
   }
 
   @Override
@@ -73,4 +79,78 @@ public class CalledProcessDefinitionImpl implements CalledProcessDefinition {
     this.callActivityIds.add(activityId);
   }
 
+  @Override
+  public String getId() {
+    return id;
+  }
+
+  @Override
+  public String getKey() {
+    return key;
+  }
+
+  @Override
+  public String getCategory() {
+    return category;
+  }
+
+  @Override
+  public String getDescription() {
+    return description;
+  }
+
+  @Override
+  public boolean hasStartFormKey() {
+    return hasStartFormKey;
+  }
+
+  @Override
+  public String getName() {
+    return name;
+  }
+
+  @Override
+  public int getVersion() {
+    return version;
+  }
+
+  @Override
+  public String getResourceName() {
+    return resourceName;
+  }
+
+  @Override
+  public String getDeploymentId() {
+    return deploymentId;
+  }
+
+  @Override
+  public String getDiagramResourceName() {
+    return diagramResourceName;
+  }
+
+  @Override
+  public boolean isSuspended() {
+    return suspended;
+  }
+
+  @Override
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  @Override
+  public String getVersionTag() {
+    return versionTag;
+  }
+
+  @Override
+  public Integer getHistoryTimeToLive() {
+    return historyTimeToLive;
+  }
+
+  @Override
+  public boolean isStartableInTasklist() {
+    return isStartableInTasklist;
+  }
 }

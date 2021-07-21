@@ -18,15 +18,7 @@ package org.camunda.bpm.engine.repository;
 
 import java.util.List;
 
-public interface CalledProcessDefinition {
-
-  String getId();
-
-  String getName();
-
-  String getKey();
-
-  int getVersion();
+public interface CalledProcessDefinition extends ProcessDefinition {
 
   String getCallingProcessDefinitionId();
 
