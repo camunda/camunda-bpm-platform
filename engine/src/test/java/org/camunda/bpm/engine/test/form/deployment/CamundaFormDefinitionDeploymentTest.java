@@ -19,6 +19,10 @@ package org.camunda.bpm.engine.test.form.deployment;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -34,19 +38,20 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
+import org.junit.rules.TemporaryFolder;
 
 public class CamundaFormDefinitionDeploymentTest {
 
   protected static final String SIMPLE_FORM = "org/camunda/bpm/engine/test/form/deployment/CamundaFormDefinitionDeploymentTest.simple_form.form";
   protected static final String SIMPLE_FORM_DUPLICATE = "org/camunda/bpm/engine/test/form/deployment/CamundaFormDefinitionDeploymentTest.simple_form_duplicate.form";
   protected static final String COMPLEX_FORM = "org/camunda/bpm/engine/test/form/deployment/CamundaFormDefinitionDeploymentTest.complex_form.form";
-  protected static final String BPMN_USER_TASK_FORM_REF_DEPLOYMENT = "org/camunda/bpm/engine/test/form/deployment/CamundaFormDefinitionDeploymentTest.formBindingDeployment.bpmn";
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+  protected TemporaryFolder tempFolder = new TemporaryFolder();
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule).around(tempFolder);
 
   RepositoryService repositoryService;
 
@@ -103,14 +108,14 @@ public class CamundaFormDefinitionDeploymentTest {
     // when
     createDeploymentBuilder(true).addClasspathResource(SIMPLE_FORM).deploy();
     createDeploymentBuilder(true).addClasspathResource(SIMPLE_FORM)
-        .addClasspathResource(BPMN_USER_TASK_FORM_REF_DEPLOYMENT).deploy();
+        .addClasspathResource(COMPLEX_FORM).deploy();
 
     // then
     List<Deployment> deployments = repositoryService.createDeploymentQuery().orderByDeploymentTime().asc().list();
     assertThat(deployments).hasSize(2);
 
     List<CamundaFormDefinition> definitions = findAllCamundaFormDefinitionEntities();
-    assertThat(definitions).hasSize(1);
+    assertThat(definitions).hasSize(2);
     CamundaFormDefinition definition = definitions.get(0);
     assertThat(definition.getVersion()).isEqualTo(1);
     assertThat(definition.getDeploymentId()).isEqualTo(deployments.get(0).getId());
@@ -160,6 +165,49 @@ public class CamundaFormDefinitionDeploymentTest {
     .hasMessageContaining("The deployment contains definitions with the same key 'simpleForm' (id attribute), this is not allowed");
   }
 
+  @Test
+  public void shouldDeleteFormDefinitionWhenDeletingDeployment() {
+    // given
+    Deployment deployment = createDeploymentBuilder(true).addClasspathResource(SIMPLE_FORM).addClasspathResource(COMPLEX_FORM).deploy();
+    List<CamundaFormDefinition> formDefinitions = findAllCamundaFormDefinitionEntities();
+    List<Deployment> deployments = repositoryService.createDeploymentQuery().list();
+
+    // when
+    repositoryService.deleteDeployment(deployment.getId());
+
+    // then
+    // before deletion of deployment
+    assertThat(formDefinitions).hasSize(2);
+    assertThat(deployments).hasSize(1);
+
+    // after deletion of deployment
+    assertThat(findAllCamundaFormDefinitionEntities()).hasSize(0);
+    assertThat(repositoryService.createDeploymentQuery().list()).hasSize(0);
+  }
+
+  @Test
+  public void shouldUpdateVersionForChangedFormResource() throws IOException {
+    // given
+    String fileName = "myForm.form";
+    String formContent1 = "{\"id\"=\"myForm\",\"type\": \"default\",\"components\":[{\"key\": \"button3\",\"label\": \"Button\",\"type\": \"button\"}]}";
+    String formContent2 = "{\"id\"=\"myForm\",\"type\": \"default\",\"components\": []}";
+
+    createDeploymentBuilder(true).addInputStream(fileName, writeTempFormFile(fileName, formContent1)).deploy();
+
+    // when deploy changed file
+    createDeploymentBuilder(true).addInputStream(fileName, writeTempFormFile(fileName, formContent2)).deploy();
+
+    // then
+    List<Deployment> deployments = repositoryService.createDeploymentQuery().list();
+    assertThat(deployments).hasSize(2);
+    assertThat(deployments).extracting("tenantId").containsExactly(null, null);
+    List<CamundaFormDefinition> formDefinitions = findAllCamundaFormDefinitionEntities();
+    assertThat(formDefinitions).extracting("version").containsExactlyInAnyOrder(1, 2);
+    assertThat(formDefinitions).extracting("resourceName").containsExactly(fileName, fileName);
+    assertThat(formDefinitions).extracting("deploymentId").containsExactlyInAnyOrder(deployments.stream().map(Deployment::getId).toArray());
+
+  }
+
   private List<CamundaFormDefinition> findAllCamundaFormDefinitionEntities() {
     return engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired()
         .execute(new FindCamundaFormDefinitionsCmd());
@@ -171,5 +219,17 @@ public class CamundaFormDefinitionDeploymentTest {
       deploymentBuilder.enableDuplicateFiltering(filterDuplicates);
     }
     return deploymentBuilder;
+  }
+
+  private FileInputStream writeTempFormFile(String fileName, String content) throws IOException {
+    File formFile = new File(tempFolder.getRoot(), fileName);
+    if(!formFile.exists()) {
+      formFile = tempFolder.newFile(fileName);
+    }
+
+    FileWriter writer = new FileWriter(formFile, false);
+    writer.write(content);
+    writer.close();
+    return new FileInputStream(formFile.getAbsolutePath());
   }
 }
