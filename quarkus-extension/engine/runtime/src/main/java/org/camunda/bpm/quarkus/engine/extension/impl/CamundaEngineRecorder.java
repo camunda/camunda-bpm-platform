@@ -17,6 +17,8 @@
 package org.camunda.bpm.quarkus.engine.extension.impl;
 
 import javax.enterprise.inject.spi.BeanManager;
+import java.util.ArrayList;
+import java.util.List;
 
 import io.quarkus.arc.runtime.BeanContainer;
 import io.quarkus.runtime.RuntimeValue;
@@ -29,9 +31,8 @@ import org.camunda.bpm.engine.cdi.impl.event.CdiEventSupportBpmnParseListener;
 import org.camunda.bpm.engine.cdi.impl.util.BeanManagerLookup;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
+import org.eclipse.microprofile.context.ManagedExecutor;
 
 @Recorder
 public class CamundaEngineRecorder {
@@ -46,7 +47,9 @@ public class CamundaEngineRecorder {
     }
   }
 
-  public RuntimeValue<ProcessEngineConfigurationImpl> createProcessEngineConfiguration(BeanContainer beanContainer) {
+  public RuntimeValue<ProcessEngineConfigurationImpl> createProcessEngineConfiguration(
+      BeanContainer beanContainer,
+      CamundaEngineConfig camundaEngineConfig) {
 
     // TODO: replace Standalone with JTA configuration
     ProcessEngineConfigurationImpl configuration =
@@ -55,6 +58,24 @@ public class CamundaEngineRecorder {
     // TODO: replace hardcoded DB configuration with Agroal code
     configuration.setJdbcUrl(DEFAULT_JDBC_URL);
     configuration.setDatabaseSchemaUpdate("true");
+
+    // configure job executor,
+    // if not already configured by a custom configuration
+    if (configuration.getJobExecutor() == null) {
+
+      int threadPoolSize = camundaEngineConfig.threadPool.size;
+      int executorQueueSize = camundaEngineConfig.threadPool.queueSize;
+
+      // create a non-bean ManagedExecutor instance. This instance
+      // delegates tasks to the Quarkus core Executor/thread pool.
+      ManagedExecutor managedExecutor = ManagedExecutor.builder()
+          .maxQueued(executorQueueSize)
+          .maxAsync(threadPoolSize)
+          .build();
+
+      ManagedJobExecutor quarkusJobExecutor = new ManagedJobExecutor(managedExecutor);
+      configuration.setJobExecutor(quarkusJobExecutor);
+    }
 
     List<BpmnParseListener> postBPMNParseListeners = configuration.getCustomPostBPMNParseListeners();
     if (postBPMNParseListeners == null) {
@@ -89,9 +110,18 @@ public class CamundaEngineRecorder {
 
     // cleanup on application shutdown
     shutdownContext.addShutdownTask(() -> {
+      ProcessEngine engine = processEngine.getValue();
 
+      // shutdown the JobExecutor
+      ProcessEngineConfigurationImpl configuration
+          = (ProcessEngineConfigurationImpl) engine.getProcessEngineConfiguration();
+      JobExecutor executor = configuration.getJobExecutor();
+      executor.shutdown();
+
+      // deregister the Process Engine from the runtime container delegate
       RuntimeContainerDelegate runtimeContainerDelegate = RuntimeContainerDelegate.INSTANCE.get();
       runtimeContainerDelegate.unregisterProcessEngine(processEngine.getValue());
+
     });
   }
 
