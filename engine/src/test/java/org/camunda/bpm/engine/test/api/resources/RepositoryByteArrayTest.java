@@ -95,8 +95,8 @@ public class RepositoryByteArrayTest {
     ClockUtil.setCurrentTime(fixedDate);
 
     String deploymentId = testRule.deploy("org/camunda/bpm/engine/test/api/form/DeployedFormsProcess.bpmn20.xml",
-        "org/camunda/bpm/engine/test/api/form/start.form",
-        "org/camunda/bpm/engine/test/api/form/task.form",
+        "org/camunda/bpm/engine/test/api/form/start.html",
+        "org/camunda/bpm/engine/test/api/form/task.html",
         "org/camunda/bpm/engine/test/api/authorization/renderedFormProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/api/authorization/oneTaskCase.cmmn").getId();
 

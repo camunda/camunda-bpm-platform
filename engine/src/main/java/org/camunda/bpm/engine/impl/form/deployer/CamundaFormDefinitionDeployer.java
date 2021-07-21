@@ -21,11 +21,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.AbstractDefinitionDeployer;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.core.model.Properties;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.CamundaFormDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
+import org.camunda.bpm.engine.impl.util.EngineUtilLogger;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
 
 import com.google.gson.Gson;
@@ -33,6 +35,7 @@ import com.google.gson.JsonObject;
 
 public class CamundaFormDefinitionDeployer extends AbstractDefinitionDeployer<CamundaFormDefinitionEntity> {
 
+  protected static final EngineUtilLogger LOG = ProcessEngineLogger.UTIL_LOGGER;
   public static final String[] FORM_RESOURCE_SUFFIXES = new String[] { "form" };
 
   @Override
@@ -44,13 +47,15 @@ public class CamundaFormDefinitionDeployer extends AbstractDefinitionDeployer<Ca
   protected List<CamundaFormDefinitionEntity> transformDefinitions(DeploymentEntity deployment, ResourceEntity resource,
       Properties properties) {
     String formContent = new String(resource.getBytes(), StandardCharsets.UTF_8);
-    JsonObject formJsonObject = new Gson().fromJson(formContent, JsonObject.class);
 
-    String camundaFormDefinitionKey = JsonUtil.getString(formJsonObject, "id");
-
-    CamundaFormDefinitionEntity definition = new CamundaFormDefinitionEntity(camundaFormDefinitionKey, deployment.getId(), resource.getName(), deployment.getTenantId());
-
-    return Arrays.asList(definition);
+    try {
+      JsonObject formJsonObject = new Gson().fromJson(formContent, JsonObject.class);
+      String camundaFormDefinitionKey = JsonUtil.getString(formJsonObject, "id");
+      CamundaFormDefinitionEntity definition = new CamundaFormDefinitionEntity(camundaFormDefinitionKey, deployment.getId(), resource.getName(), deployment.getTenantId());
+      return Arrays.asList(definition);
+    } catch (Exception e) {
+      throw LOG.exceptionDuringFormParsing(e.getMessage(), resource.getName());
+    }
   }
 
   @Override

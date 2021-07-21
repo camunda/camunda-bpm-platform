@@ -72,7 +72,6 @@ public class EngineUtilLogger extends ProcessEngineLogger {
         warnings);
   }
 
-
   public void unableToSetSchemaResource(Throwable cause) {
     logWarn(
         "006",
@@ -238,5 +237,10 @@ public class EngineUtilLogger extends ProcessEngineLogger {
   public void logMissingPropertiesFile(String file) {
     logWarn("032", "Could not find the '{}' file on the classpath. " +
       "If you have removed it, please restore it.", file);
+  }
+
+  public ProcessEngineException exceptionDuringFormParsing(String cause, String resourceName) {
+    return new ProcessEngineException(
+        exceptionMessage("033", "Could not parse Camunda Form resource {}. Cause: {}", resourceName, cause));
   }
 }
