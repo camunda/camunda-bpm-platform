@@ -1308,8 +1308,6 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
     for (CalledProcessDefinition called : mappings) {
       assertThat(called).isEqualToIgnoringGivenFields(repositoryService.getProcessDefinition(called.getId()), "callActivityIds", "callingProcessDefinitionId");
     }
-
-
   }
 
   @Test
@@ -1400,12 +1398,10 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
       .collect(Collectors.toList()))
       .containsExactlyInAnyOrder("null_tenant_reference_same_tenant", "explicit_same_tenant_reference");
 
-    assertThat(mappings).extracting("id","callActivityIds")
+    assertThat(mappings).extracting("id","callActivityIds", "callingProcessDefinitionId")
       .contains(
-        Tuple.tuple(otherTenantProcessOne, Arrays.asList("explicit_other_tenant_reference")));
+        Tuple.tuple(otherTenantProcessOne, Arrays.asList("explicit_other_tenant_reference"), id));
   }
-
-  // todo assert new class type values are not empty
 
   private String deployProcessString(String processString) {
     String resourceName = "xmlString." + BpmnDeployer.BPMN_RESOURCE_SUFFIXES[0];

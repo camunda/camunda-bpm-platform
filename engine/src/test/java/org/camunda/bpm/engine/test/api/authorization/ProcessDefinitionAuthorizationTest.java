@@ -34,6 +34,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.List;
 
 import org.camunda.bpm.engine.AuthorizationException;
@@ -43,6 +44,8 @@ import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.RepositoryServiceImpl;
 import org.camunda.bpm.engine.impl.pvm.ReadOnlyProcessDefinition;
+import org.camunda.bpm.engine.repository.CalledProcessDefinition;
+import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DiagramLayout;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
@@ -1309,6 +1312,32 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     // then
     assertNotNull(processDefinitions);
     assertEquals(0, processDefinitions.size());
+  }
+
+  @Test
+  public void shouldNotResolveUnauthorizedCalledProcessDefinitions() {
+    Deployment deployment = createDeployment("test",
+      "org/camunda/bpm/engine/test/api/repository/call-activities-with-references.bpmn",
+      "org/camunda/bpm/engine/test/api/repository/first-process.bpmn20.xml");
+    try {
+      //given
+      String parentKey = "TestCallActivitiesWithReferences";
+      createGrantAuthorization(PROCESS_DEFINITION, parentKey, userId, READ);
+      ProcessDefinition parentDefinition = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey(parentKey).singleResult();
+
+      //when
+      createGrantAuthorization(PROCESS_DEFINITION, "process", userId, READ);
+
+      Collection<CalledProcessDefinition> mappings = repositoryService
+        .getStaticCalledProcessDefinitions(parentDefinition.getId());
+
+      //then
+      assertTrue(mappings.isEmpty());
+    } finally {
+      deleteDeployment(deployment.getId());
+    }
+
   }
 
   // helper /////////////////////////////////////////////////////////////////////
