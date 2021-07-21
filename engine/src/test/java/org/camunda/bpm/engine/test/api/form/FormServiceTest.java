@@ -76,6 +76,7 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
+import org.camunda.bpm.engine.test.form.deployment.FindCamundaFormDefinitionsCmd;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
@@ -1661,5 +1662,47 @@ public class FormServiceTest {
     } catch (BadUserRequestException e) {
       testRule.assertTextPresent("The form key 'formKey' does not reference a deployed form.", e.getMessage());
     }
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/form/FormServiceTest.shouldSubmitStartFormUsingFormKeyAndCamundaFormDefinition.bpmn",
+      "org/camunda/bpm/engine/test/api/form/start.form" })
+  @Test
+  public void shouldSubmitStartFormUsingFormKeyAndCamundaFormDefinition() {
+    // given
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("CamundaStartFormProcess").singleResult();
+
+    // when
+    ProcessInstance processInstance = formService.submitStartForm(processDefinition.getId(),
+        Variables.createVariables());
+
+    // then
+    assertThat(repositoryService.createDeploymentQuery().list()).hasSize(1);
+    assertThat(engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired()
+        .execute(new FindCamundaFormDefinitionsCmd())).hasSize(1);
+    assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).list()).hasSize(0);
+    assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).list()).hasSize(1);
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/form/FormServiceTest.shouldSubmitTaskFormUsingFormKeyAndCamundaFormDefinition.bpmn",
+  "org/camunda/bpm/engine/test/api/form/task.form" })
+  @Test
+  public void shouldSubmitTaskFormUsingFormKeyAndCamundaFormDefinition() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("CamundaTaskFormProcess");
+
+    // when
+    Task task = taskService.createTaskQuery().singleResult();
+    formService.submitTaskForm(task.getId(), Variables.createVariables().putValue("variable", "my variable"));
+
+    // then
+    assertThat(repositoryService.createDeploymentQuery().list()).hasSize(1);
+    assertThat(engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired()
+        .execute(new FindCamundaFormDefinitionsCmd())).hasSize(1);
+    assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).list()).hasSize(0);
+    assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).list()).hasSize(1);
+    assertThat(taskService.createTaskQuery().list()).hasSize(0);
   }
 }

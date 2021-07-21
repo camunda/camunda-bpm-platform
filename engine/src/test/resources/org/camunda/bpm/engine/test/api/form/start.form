@@ -1,0 +1,11 @@
+{
+  "id": "myStartForm",
+  "type": "default",
+  "components": [
+    {
+      "key": "button5",
+      "label": "Start",
+      "type": "button"
+    }
+  ]
+}
