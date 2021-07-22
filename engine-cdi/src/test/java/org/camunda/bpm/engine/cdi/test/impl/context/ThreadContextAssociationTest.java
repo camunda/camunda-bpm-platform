@@ -22,12 +22,15 @@ import static org.junit.Assert.assertNull;
 import org.camunda.bpm.engine.cdi.test.CdiProcessEngineTestCase;
 import org.camunda.bpm.engine.cdi.test.impl.beans.ProcessScopedMessageBean;
 import org.camunda.bpm.engine.test.Deployment;
+import org.jboss.arquillian.junit.Arquillian;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * 
  * @author Daniel Meyer
  */
+@RunWith(Arquillian.class)
 public class ThreadContextAssociationTest extends CdiProcessEngineTestCase {
   
   @Test

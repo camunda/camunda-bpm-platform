@@ -19,7 +19,9 @@ package org.camunda.bpm.engine.cdi.test.impl.el;
 import org.camunda.bpm.engine.cdi.test.CdiProcessEngineTestCase;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.jboss.arquillian.junit.Arquillian;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +32,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Sebastian Menski
  */
+@RunWith(Arquillian.class)
 public class TaskListenerInvocationTest extends CdiProcessEngineTestCase {
 
   @Test

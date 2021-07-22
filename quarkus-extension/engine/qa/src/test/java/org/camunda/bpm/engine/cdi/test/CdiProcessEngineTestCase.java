@@ -16,15 +16,8 @@
  */
 package org.camunda.bpm.engine.cdi.test;
 
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.Callable;
-import java.util.logging.Logger;
-
-import javax.enterprise.inject.spi.BeanManager;
-
+import io.quarkus.arc.Arc;
 import org.camunda.bpm.BpmPlatform;
-import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.DecisionService;
@@ -39,43 +32,21 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
-import org.camunda.bpm.engine.cdi.BusinessProcess;
 import org.camunda.bpm.engine.cdi.impl.util.ProgrammaticBeanLookup;
-import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
-import org.camunda.bpm.engine.impl.util.LogUtil;
-import org.camunda.bpm.engine.test.ProcessEngineRule;
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
-import org.junit.runner.RunWith;
 
-/**
- * @author Daniel Meyer
- */
-public abstract class CdiProcessEngineTestCase {
+import javax.enterprise.inject.spi.BeanManager;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.Callable;
 
-  static {
-    LogUtil.readJavaUtilLoggingConfigFromClasspath();
-  }
+public class CdiProcessEngineTestCase {
 
-  protected Logger logger = Logger.getLogger(getClass().getName());
-
-  @Deployment
-  public static JavaArchive createDeployment() {
-
-    return ShrinkWrap.create(JavaArchive.class)
-      .addPackages(true, "org.camunda.bpm.engine.cdi")
-      .addAsManifestResource("META-INF/beans.xml", "beans.xml");
-  }
-
-  @Rule
-  public ProcessEngineRule processEngineRule = new ProcessEngineRule();
+  protected String deploymentId;
 
   protected BeanManager beanManager;
 
@@ -96,15 +67,13 @@ public abstract class CdiProcessEngineTestCase {
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
   @Before
-  public void setUpCdiProcessEngineTestCase() throws Exception {
-
-    if(BpmPlatform.getProcessEngineService().getDefaultProcessEngine() == null) {
-      RuntimeContainerDelegate.INSTANCE.get().registerProcessEngine(processEngineRule.getProcessEngine());
-    }
-
-    beanManager = ProgrammaticBeanLookup.lookup(BeanManager.class);
-    processEngine = processEngineRule.getProcessEngine();
-    processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngineRule.getProcessEngine().getProcessEngineConfiguration();
+  public void before() {
+    processEngine = BpmPlatform.getProcessEngineService().getDefaultProcessEngine();
+    Arc.container().requestContext().activate();
+    beanManager = Arc.container().beanManager();
+    processEngineConfiguration =
+        (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
+    processEngineConfiguration.setEnableExpressionsInAdhocQueries(true);
     formService = processEngine.getFormService();
     historyService = processEngine.getHistoryService();
     identityService = processEngine.getIdentityService();
@@ -120,10 +89,15 @@ public abstract class CdiProcessEngineTestCase {
   }
 
   @After
-  public void tearDownCdiProcessEngineTestCase() throws Exception {
-    RuntimeContainerDelegate.INSTANCE.get().unregisterProcessEngine(processEngine);
+  public void after() {
+    Arc.container().requestContext().deactivate();
+
+    if (deploymentId != null) {
+      repositoryService.deleteDeployment(deploymentId, true, true, true);
+      deploymentId = null;
+    }
+
     beanManager = null;
-    processEngine = null;
     processEngineConfiguration = null;
     formService = null;
     historyService = null;
@@ -137,11 +111,6 @@ public abstract class CdiProcessEngineTestCase {
     externalTaskService = null;
     caseService = null;
     decisionService = null;
-    processEngineRule = null;
-  }
-
-  protected void endConversationAndBeginNew(String processInstanceId) {
-    getBeanInstance(BusinessProcess.class).associateExecutionById(processInstanceId);
   }
 
   protected <T> T getBeanInstance(Class<T> clazz) {
@@ -152,7 +121,11 @@ public abstract class CdiProcessEngineTestCase {
     return ProgrammaticBeanLookup.lookup(name);
   }
 
-  //////////////////////// copied from AbstractActivitiTestcase
+  public void deploy(Class<?> testClass, String methodName, String[] resources) {
+    if (resources != null) {
+      deploymentId = TestHelper.annotationDeploymentSetUp(processEngine, resources, testClass, methodName);
+    }
+  }
 
   public void waitForJobExecutorToProcessAllJobs(long maxMillisToWait, long intervalMillis) {
     JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
@@ -212,10 +185,10 @@ public abstract class CdiProcessEngineTestCase {
 
   public boolean areJobsAvailable() {
     return !managementService
-      .createJobQuery()
-      .executable()
-      .list()
-      .isEmpty();
+        .createJobQuery()
+        .executable()
+        .list()
+        .isEmpty();
   }
 
   private static class InteruptTask extends TimerTask {
@@ -233,4 +206,5 @@ public abstract class CdiProcessEngineTestCase {
       thread.interrupt();
     }
   }
+
 }

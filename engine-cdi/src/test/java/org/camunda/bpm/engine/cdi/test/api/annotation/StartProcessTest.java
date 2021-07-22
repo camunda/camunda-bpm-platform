@@ -29,7 +29,9 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.StringValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
+import org.jboss.arquillian.junit.Arquillian;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Testcase for assuring that the {@link StartProcessInterceptor} behaves as
@@ -37,6 +39,7 @@ import org.junit.Test;
  *
  * @author Daniel Meyer
  */
+@RunWith(Arquillian.class)
 public class StartProcessTest extends CdiProcessEngineTestCase {
 
   @Test

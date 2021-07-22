@@ -25,8 +25,13 @@ import io.quarkus.runtime.annotations.Recorder;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.cdi.CdiStandaloneProcessEngineConfiguration;
+import org.camunda.bpm.engine.cdi.impl.event.CdiEventSupportBpmnParseListener;
 import org.camunda.bpm.engine.cdi.impl.util.BeanManagerLookup;
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Recorder
 public class CamundaEngineRecorder {
@@ -50,6 +55,17 @@ public class CamundaEngineRecorder {
     // TODO: replace hardcoded DB configuration with Agroal code
     configuration.setJdbcUrl(DEFAULT_JDBC_URL);
     configuration.setDatabaseSchemaUpdate("true");
+
+    List<BpmnParseListener> postBPMNParseListeners = configuration.getCustomPostBPMNParseListeners();
+    if (postBPMNParseListeners == null) {
+      ArrayList<BpmnParseListener> parseListeners = new ArrayList<>();
+      parseListeners.add(new CdiEventSupportBpmnParseListener());
+      configuration.setCustomPostBPMNParseListeners(parseListeners);
+
+    } else {
+      postBPMNParseListeners.add(new CdiEventSupportBpmnParseListener());
+
+    }
 
     return new RuntimeValue<>(configuration);
   }

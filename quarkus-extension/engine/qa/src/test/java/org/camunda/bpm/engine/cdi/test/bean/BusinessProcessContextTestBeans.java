@@ -14,32 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.cdi.test.impl.context;
+package org.camunda.bpm.engine.cdi.test.bean;
 
-import java.util.Arrays;
+import org.camunda.bpm.engine.cdi.test.impl.beans.CreditCard;
+import org.camunda.bpm.engine.cdi.test.impl.beans.ProcessScopedMessageBean;
 
-import org.camunda.bpm.engine.cdi.BusinessProcess;
-import org.camunda.bpm.engine.cdi.test.CdiProcessEngineTestCase;
-import org.camunda.bpm.engine.test.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Named;
 
-/**
- * @author Daniel Meyer
- *
- */
-@RunWith(Arquillian.class)
-public class MultiInstanceTest extends CdiProcessEngineTestCase {
+public class BusinessProcessContextTestBeans {
 
-  @Test
-  @Deployment
-  public void testParallelMultiInstanceServiceTasks() {
+  @ApplicationScoped
+  @Named("creditCard")
+  public static class QuarkusCreditCard extends CreditCard {
+  }
 
-    BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
-    businessProcess.setVariable("list", Arrays.asList(new String[]{"1","2"}));
-    businessProcess.startProcessByKey("miParallelScriptTask");
-
+  @ApplicationScoped
+  @Named("processScopedMessageBean")
+  public static class QuarkusProcessScopedMessageBean extends ProcessScopedMessageBean {
   }
 
 }
