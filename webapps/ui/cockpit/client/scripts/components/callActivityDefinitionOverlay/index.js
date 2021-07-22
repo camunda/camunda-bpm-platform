@@ -188,7 +188,7 @@ module.exports = function(viewContext) {
             const callActivityToProcessMap = {};
             const drawStaticLinks = function (staticProcDefs) {
               for (const dto of staticProcDefs) {
-                dto.callActivityIds.forEach(callerId => callActivityToProcessMap[callerId] = dto);
+                dto.calledFromActivityIds.forEach(callerId => callActivityToProcessMap[callerId] = dto);
               }
               for (const activity of callActivityFlowNodes) {
                 if(callActivityToProcessMap[activity]){

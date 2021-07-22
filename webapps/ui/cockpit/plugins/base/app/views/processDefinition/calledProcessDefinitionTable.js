@@ -121,15 +121,15 @@ module.exports = [
                 const filteredIds = new Set(filter.activityIdIn)
                 staticCalled = staticCalled.map(dto => {
                     const newDto = angular.copy(dto)
-                    const intersection = dto.callActivityIds.filter(e => filteredIds.has(e))
+                    const intersection = dto.calledFromActivityIds.filter(e => filteredIds.has(e))
                     if (intersection.length) {
-                      newDto.callActivityIds = intersection;
+                      newDto.calledFromActivityIds = intersection;
                       return newDto
                     }
                   }
                 ).filter(e => e !== undefined);
               }
-              $scope.calledProcessDefinitions = attachCalledFromActivities(
+              let mergedDefinitions =  attachCalledFromActivities(
                 calledProcessDefinitions,
                 staticCalled,
                 bpmnElements
@@ -171,8 +171,6 @@ module.exports = [
             staticCalledProcesses.forEach(
               dto => {
                 const newDto = angular.copy(dto);
-                newDto.calledFromActivityIds = newDto.callActivityIds;
-                delete newDto.callActivityIds;
                 if(map[dto.id]){
                   const merged = new Set([...map[newDto.id].calledFromActivityIds, ...newDto.calledFromActivityIds])
                   map[dto.id].calledFromActivityIds = Array.from(merged).sort();
