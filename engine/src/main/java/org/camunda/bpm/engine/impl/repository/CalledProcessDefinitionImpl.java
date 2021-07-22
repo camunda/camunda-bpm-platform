@@ -23,28 +23,28 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.CalledProcessDefinition;
 
 public class CalledProcessDefinitionImpl implements CalledProcessDefinition {
-  private final String id;
-  private final String key;
-  private final String category;
-  private final String description;
-  private final String name;
-  private final int version;
-  private final String deploymentId;
-  private final boolean suspended;
-  private final String tenantId;
-  private final String versionTag;
-  private final Integer historyTimeToLive;
-  private final boolean isStartableInTasklist;
-  private final boolean hasStartFormKey;
-  private final String diagramResourceName;
-  private final String resourceName;
+  protected String id;
+  protected String key;
+  protected String category;
+  protected String description;
+  protected String name;
+  protected int version;
+  protected String deploymentId;
+  protected boolean suspended;
+  protected String tenantId;
+  protected String versionTag;
+  protected Integer historyTimeToLive;
+  protected boolean isStartableInTasklist;
+  protected boolean hasStartFormKey;
+  protected String diagramResourceName;
+  protected String resourceName;
 
-  protected List<String> callActivityIds;
+  protected List<String> calledFromActivityIds;
   protected String callingProcessDefinitionId;
 
 
   public CalledProcessDefinitionImpl(ProcessDefinition definition, String callingProcessDefinitionId) {
-    this.callActivityIds = new ArrayList<>();
+    this.calledFromActivityIds = new ArrayList<>();
     this.callingProcessDefinitionId = callingProcessDefinitionId;
 
     this.id = definition.getId();
@@ -71,12 +71,12 @@ public class CalledProcessDefinitionImpl implements CalledProcessDefinition {
   }
 
   @Override
-  public List<String> getCallingCallActivityIds() {
-    return this.callActivityIds;
+  public List<String> getCalledFromActivityIds() {
+    return this.calledFromActivityIds;
   }
 
   public void addCallingCallActivity(String activityId) {
-    this.callActivityIds.add(activityId);
+    this.calledFromActivityIds.add(activityId);
   }
 
   @Override

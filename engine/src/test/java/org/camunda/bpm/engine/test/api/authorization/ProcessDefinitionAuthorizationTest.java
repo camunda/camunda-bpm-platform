@@ -1327,8 +1327,6 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
         .processDefinitionKey(parentKey).singleResult();
 
       //when
-      createGrantAuthorization(PROCESS_DEFINITION, "process", userId, READ);
-
       Collection<CalledProcessDefinition> mappings = repositoryService
         .getStaticCalledProcessDefinitions(parentDefinition.getId());
 

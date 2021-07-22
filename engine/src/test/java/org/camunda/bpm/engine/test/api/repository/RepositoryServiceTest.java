@@ -1295,18 +1295,18 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
 
     assertThat(mappings.stream()
       .filter(def -> def.getId().startsWith("process:1:"))
-      .flatMap(def -> def.getCallingCallActivityIds().stream())
+      .flatMap(def -> def.getCalledFromActivityIds().stream())
       .collect(Collectors.toList()))
       .containsExactlyInAnyOrder("deployment_1", "version_1");
 
-    assertThat(mappings).extracting("name", "version", "key","callActivityIds", "versionTag", "callingProcessDefinitionId")
+    assertThat(mappings).extracting("name", "version", "key","calledFromActivityIds", "versionTag", "callingProcessDefinitionId")
       .contains(
         Tuple.tuple("Process One", 1, "processOne", Arrays.asList("tenant_reference_1"), null, callingProcessId),
         Tuple.tuple("Second Test Process", 2, "process", Arrays.asList("latest_reference_1"), null, callingProcessId),
         Tuple.tuple("Failing Process", 1, "failingProcess", Arrays.asList("version_tag_reference_1"), "ver_tag_2", callingProcessId));
 
     for (CalledProcessDefinition called : mappings) {
-      assertThat(called).isEqualToIgnoringGivenFields(repositoryService.getProcessDefinition(called.getId()), "callActivityIds", "callingProcessDefinitionId");
+      assertThat(called).isEqualToIgnoringGivenFields(repositoryService.getProcessDefinition(called.getId()), "calledFromActivityIds", "callingProcessDefinitionId");
     }
   }
 
@@ -1394,11 +1394,11 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
 
     assertThat(mappings.stream()
       .filter(def -> def.getId().equals(sameTenantProcessOne))
-      .flatMap(def -> def.getCallingCallActivityIds().stream())
+      .flatMap(def -> def.getCalledFromActivityIds().stream())
       .collect(Collectors.toList()))
       .containsExactlyInAnyOrder("null_tenant_reference_same_tenant", "explicit_same_tenant_reference");
 
-    assertThat(mappings).extracting("id","callActivityIds", "callingProcessDefinitionId")
+    assertThat(mappings).extracting("id","calledFromActivityIds", "callingProcessDefinitionId")
       .contains(
         Tuple.tuple(otherTenantProcessOne, Arrays.asList("explicit_other_tenant_reference"), id));
   }

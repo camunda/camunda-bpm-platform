@@ -22,6 +22,6 @@ public interface CalledProcessDefinition extends ProcessDefinition {
 
   String getCallingProcessDefinitionId();
 
-  List<String> getCallingCallActivityIds();
+  List<String> getCalledFromActivityIds();
 
 }

@@ -22,11 +22,11 @@ import org.camunda.bpm.engine.repository.CalledProcessDefinition;
 
 public class CalledProcessDefinitionDto extends ProcessDefinitionDto {
 
-  private List<String> callActivityIds;
-  private String callingProcessDefinitionId;
+  protected List<String> calledFromActivityIds;
+  protected String callingProcessDefinitionId;
 
-  public List<String> getCallActivityIds() {
-    return callActivityIds;
+  public List<String> getCalledFromActivityIds() {
+    return calledFromActivityIds;
   }
 
   public String getCallingProcessDefinitionId() {
@@ -36,7 +36,7 @@ public class CalledProcessDefinitionDto extends ProcessDefinitionDto {
   public static CalledProcessDefinitionDto from(CalledProcessDefinition definition){
     CalledProcessDefinitionDto dto = new CalledProcessDefinitionDto();
     dto.callingProcessDefinitionId = definition.getCallingProcessDefinitionId();
-    dto.callActivityIds = definition.getCallingCallActivityIds();
+    dto.calledFromActivityIds = definition.getCalledFromActivityIds();
 
     dto.id = definition.getId();
     dto.key = definition.getKey();

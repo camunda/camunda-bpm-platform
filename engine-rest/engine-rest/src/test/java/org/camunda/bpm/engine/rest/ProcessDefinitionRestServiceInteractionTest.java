@@ -4020,16 +4020,17 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
   }
 
   @Test
-  public void testGetStaticCalledProcessDefinition() {
+  public void testGetStaticCalledProcessDefinitions() {
     CalledProcessDefinition mock = mock(CalledProcessDefinitionImpl.class);
-    when(mock.getCallingCallActivityIds()).thenReturn(Arrays.asList("anActivity", "anotherActivity"));
+    when(mock.getCalledFromActivityIds()).thenReturn(Arrays.asList("anActivity", "anotherActivity"));
     when(mock.getId()).thenReturn("aKey:1:123");
     when(mock.getCallingProcessDefinitionId()).thenReturn("aCallingId");
     when(mock.getName()).thenReturn("a Name");
     when(mock.getKey()).thenReturn("aKey");
     when(mock.getVersion()).thenReturn(1);
     List<CalledProcessDefinition> result = Collections.singletonList(mock);
-    when(repositoryServiceMock.getStaticCalledProcessDefinitions(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)).thenReturn(result);
+    when(repositoryServiceMock.getStaticCalledProcessDefinitions(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
+      .thenReturn(result);
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -4040,8 +4041,8 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
       .body("[0].key", equalTo(mock.getKey()))
       .body("[0].name", equalTo(mock.getName()))
       .body("[0].version", equalTo(mock.getVersion()))
-      .body("[0].callActivityIds[0]", equalTo("anActivity"))
-      .body("[0].callActivityIds[1]", equalTo("anotherActivity"))
+      .body("[0].calledFromActivityIds[0]", equalTo("anActivity"))
+      .body("[0].calledFromActivityIds[1]", equalTo("anotherActivity"))
     .when()
       .get(PROCESS_DEFINITION_CALL_ACTIVITY_MAPPINGS);
   }
