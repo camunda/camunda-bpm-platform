@@ -139,6 +139,13 @@ module.exports = [
                     calledProcessDefinition.name || calledProcessDefinition.key
                 });
               } );
+              mergedDefinitions = mergedDefinitions.map(dto => {
+                if(mergedDefinitions.find(e => e.id !== dto.id && dto.name === e.name)){
+                  dto.label = dto.label + ":"  + dto.version;
+                }
+                return dto;
+              })
+              $scope.calledProcessDefinitions = mergedDefinitions;
               $scope.loadingState = $scope.calledProcessDefinitions.length
                 ? 'LOADED'
                 : 'EMPTY';
@@ -151,28 +158,29 @@ module.exports = [
             bpmnElements
           ) {
             const result = [];
-
+            /// merge todo factor out
             const map = {}
             runningProcessDefinitions.forEach(
               dto => {
-                const newDto = angular.extend({}, dto);
-                newDto.running = true;
+                const newDto = angular.copy(dto);
+                newDto.running = "Running";
                 map[newDto.id] = newDto;
               }
             )
 
             staticCalledProcesses.forEach(
               dto => {
-                const newDto = angular.extend({}, dto);
+                const newDto = angular.copy(dto);
                 newDto.calledFromActivityIds = newDto.callActivityIds;
                 delete newDto.callActivityIds;
                 if(map[dto.id]){
                   const merged = new Set([...map[newDto.id].calledFromActivityIds, ...newDto.calledFromActivityIds])
                   map[dto.id].calledFromActivityIds = Array.from(merged).sort();
+                  map[dto.id].running = "Running and Referenced";
                   // add static flag?
                 } else {
                   map[newDto.id] = newDto;
-                  newDto.running = false;
+                  newDto.running = "Referenced";
                   newDto.calledFromActivityIds.sort();
                 }
               }
