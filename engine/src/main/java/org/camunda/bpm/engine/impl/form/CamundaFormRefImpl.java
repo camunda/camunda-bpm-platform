@@ -14,52 +14,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest.dto.task;
+package org.camunda.bpm.engine.impl.form;
 
 import org.camunda.bpm.engine.form.CamundaFormRef;
-import org.camunda.bpm.engine.form.FormData;
 
-/**
- *
- * @author nico.rehwaldt
- */
-public class FormDto {
+public class CamundaFormRefImpl implements CamundaFormRef {
 
-  private String key;
-  private CamundaFormRef camundaFormRef;
-  private String contextPath;
+  String key;
+  String binding;
+  Integer version;
 
-  public void setKey(String form) {
-    this.key = form;
+  public CamundaFormRefImpl(String key, String binding) {
+    this.key = key;
+    this.binding = binding;
   }
 
   public String getKey() {
     return key;
   }
 
-  public CamundaFormRef getCamundaFormRef() {
-    return camundaFormRef;
+  public void setKey(String key) {
+    this.key = key;
   }
 
-  public void setCamundaFormRef(CamundaFormRef camundaFormRef) {
-    this.camundaFormRef = camundaFormRef;
+  public String getBinding() {
+    return binding;
   }
 
-  public void setContextPath(String contextPath) {
-    this.contextPath = contextPath;
+  public void setBinding(String binding) {
+    this.binding = binding;
   }
 
-  public String getContextPath() {
-    return contextPath;
+  public Integer getVersion() {
+    return version;
   }
 
-  public static FormDto fromFormData(FormData formData) {
-    FormDto dto = new FormDto();
+  public void setVersion(Integer version) {
+    this.version = version;
+  }
 
-    if (formData != null) {
-      dto.key = formData.getFormKey();
-    }
-
-    return dto;
+  @Override
+  public String toString() {
+    return "CamundaFormRefImpl [key=" + key + ", binding=" + binding + ", version=" + version + "]";
   }
 }

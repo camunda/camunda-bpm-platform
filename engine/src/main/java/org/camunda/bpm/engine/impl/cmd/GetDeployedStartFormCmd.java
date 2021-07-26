@@ -23,13 +23,12 @@ import org.camunda.bpm.engine.form.FormData;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 /**
- * 
+ *
  * @author Anna Pazola
  *
  */
@@ -43,7 +42,7 @@ public class GetDeployedStartFormCmd extends AbstractGetDeployedFormCmd {
   }
 
   @Override
-  protected FormData getFormData(final CommandContext commandContext) {
+  protected FormData getFormData() {
     return commandContext.runWithoutAuthorization(new Callable<FormData>() {
       @Override
       public FormData call() throws Exception {
@@ -53,7 +52,7 @@ public class GetDeployedStartFormCmd extends AbstractGetDeployedFormCmd {
   }
 
   @Override
-  protected void checkAuthorization(CommandContext commandContext) {
+  protected void checkAuthorization() {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
     DeploymentCache deploymentCache = processEngineConfiguration.getDeploymentCache();
     ProcessDefinitionEntity processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);

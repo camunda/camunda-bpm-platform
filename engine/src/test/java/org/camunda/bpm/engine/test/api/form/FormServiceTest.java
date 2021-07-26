@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.test.api.form;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static org.camunda.bpm.engine.test.util.CamundaFormUtils.findAllCamundaFormDefinitionEntities;
 import static org.camunda.bpm.engine.variable.Variables.booleanValue;
 import static org.camunda.bpm.engine.variable.Variables.createVariables;
 import static org.camunda.bpm.engine.variable.Variables.objectValue;
@@ -76,7 +77,6 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
-import org.camunda.bpm.engine.test.form.deployment.FindCamundaFormDefinitionsCmd;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
@@ -1679,8 +1679,7 @@ public class FormServiceTest {
 
     // then
     assertThat(repositoryService.createDeploymentQuery().list()).hasSize(1);
-    assertThat(engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired()
-        .execute(new FindCamundaFormDefinitionsCmd())).hasSize(1);
+    assertThat(findAllCamundaFormDefinitionEntities(processEngineConfiguration)).hasSize(1);
     assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).list()).hasSize(0);
     assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).list()).hasSize(1);
   }
@@ -1699,8 +1698,7 @@ public class FormServiceTest {
 
     // then
     assertThat(repositoryService.createDeploymentQuery().list()).hasSize(1);
-    assertThat(engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired()
-        .execute(new FindCamundaFormDefinitionsCmd())).hasSize(1);
+    assertThat(findAllCamundaFormDefinitionEntities(processEngineConfiguration)).hasSize(1);
     assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).list()).hasSize(0);
     assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).list()).hasSize(1);
     assertThat(taskService.createTaskQuery().list()).hasSize(0);

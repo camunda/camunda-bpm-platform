@@ -380,6 +380,9 @@ public abstract class MockProvider {
   public static final String EXAMPLE_DEPLOYMENT_TXT_RESOURCE_ID = "aDeploymentTxtResourceId";
   public static final String EXAMPLE_DEPLOYMENT_TXT_RESOURCE_NAME = "a-txt-resource.txt";
 
+  public static final String EXAMPLE_DEPLOYMENT_CAMFORM_RESOURCE_ID = "aDeploymentCamundaFormResourceId";
+  public static final String EXAMPLE_DEPLOYMENT_CAMFORM_RESOURCE_NAME = "a-camunda-form-resource.form";
+
   public static final String EXAMPLE_DEPLOYMENT_RESOURCE_FILENAME_ID = "aDeploymentResourceFilenameId";
   public static final String EXAMPLE_DEPLOYMENT_RESOURCE_FILENAME_PATH = "my/path/to/my/bpmn/";
   public static final String EXAMPLE_DEPLOYMENT_RESOURCE_FILENAME_PATH_BACKSLASH = "my\\path\\to\\my\\bpmn\\";
@@ -1648,6 +1651,14 @@ public abstract class MockProvider {
     return mockResource;
   }
 
+  public static Resource createMockDeploymentCamundaFormResource() {
+    Resource mockResource = mock(ResourceEntity.class);
+    when(mockResource.getId()).thenReturn(EXAMPLE_DEPLOYMENT_CAMFORM_RESOURCE_ID);
+    when(mockResource.getName()).thenReturn(EXAMPLE_DEPLOYMENT_CAMFORM_RESOURCE_NAME);
+    when(mockResource.getDeploymentId()).thenReturn(EXAMPLE_DEPLOYMENT_ID);
+    return mockResource;
+  }
+
   public static Resource createMockDeploymentResourceFilename() {
     Resource mockResource = mock(ResourceEntity.class);
     when(mockResource.getId()).thenReturn(EXAMPLE_DEPLOYMENT_RESOURCE_FILENAME_ID);
@@ -1813,19 +1824,19 @@ public abstract class MockProvider {
   }
 
   public static List<Authorization> createMockAuthorizations() {
-    return Arrays.asList(new Authorization[] { createMockGlobalAuthorization(), createMockGrantAuthorization(), createMockRevokeAuthorization() });
+    return Arrays.asList(createMockGlobalAuthorization(), createMockGrantAuthorization(), createMockRevokeAuthorization());
   }
 
   public static List<Authorization> createMockGrantAuthorizations() {
-    return Arrays.asList(new Authorization[] { createMockGrantAuthorization() });
+    return Arrays.asList(createMockGrantAuthorization());
   }
 
   public static List<Authorization> createMockRevokeAuthorizations() {
-    return Arrays.asList(new Authorization[]{createMockRevokeAuthorization()});
+    return Arrays.asList(createMockRevokeAuthorization());
   }
 
   public static List<Authorization> createMockGlobalAuthorizations() {
-    return Arrays.asList(new Authorization[] { createMockGlobalAuthorization() });
+    return Arrays.asList(createMockGlobalAuthorization());
   }
 
   public static Date createMockDuedate() {

@@ -29,11 +29,35 @@ import java.util.List;
  */
 public interface FormData {
 
-  /** User-defined reference to a form. In the camunda tasklist application,
+  /** User-defined reference to a form. In the Camunda Tasklist application,
    * it is assumed that the form key specifies a resource in the deployment
    * which is the template for the form.  But users are free to
-   * use this property differently. */
+   * use this property differently.
+   *
+   * A form can be referenced either through a form key or through a {@link CamundaFormRef}.
+   *
+   */
   String getFormKey();
+
+  /**
+   * @see #getFormKey()
+   */
+  void setFormKey(String formKey);
+
+  /**
+   * User-defined reference to a form. A {@link CamundaFormRef} can specify any
+   * Camunda Form deployed to the engine with any deployment. It is also possible
+   * to specify a specific version of a deployed form.
+   *
+   * A form can be referenced either through a form key or through a {@link CamundaFormRef}.
+   *
+   */
+  CamundaFormRef getCamundaFormRef();
+
+  /**
+   * @see #getCamundaFormRef()
+   */
+  void setCamundaFormRef(CamundaFormRef camundaFormRef);
 
   /** The deployment id of the process definition to which this form is related
    *  */

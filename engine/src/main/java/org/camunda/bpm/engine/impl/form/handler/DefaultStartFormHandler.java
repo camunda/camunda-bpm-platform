@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.impl.form.handler;
 
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
+import org.camunda.bpm.engine.impl.form.CamundaFormRefImpl;
 import org.camunda.bpm.engine.impl.form.StartFormDataImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -45,7 +46,14 @@ public class DefaultStartFormHandler extends DefaultFormHandler implements Start
 
     if (formKey != null) {
       startFormData.setFormKey(formKey.getExpressionText());
+    } else if (camundaFormDefinitionKey != null && camundaFormDefinitionBinding != null) {
+      CamundaFormRefImpl ref = new CamundaFormRefImpl(camundaFormDefinitionKey.getExpressionText(), camundaFormDefinitionBinding);
+      if (camundaFormDefinitionBinding.equals(FORM_REF_BINDING_VERSION) && camundaFormDefinitionVersion != null) {
+        ref.setVersion(Integer.parseInt(camundaFormDefinitionVersion.getExpressionText()));
+      }
+      startFormData.setCamundaFormRef(ref);
     }
+
     startFormData.setDeploymentId(deploymentId);
     startFormData.setProcessDefinition(processDefinition);
     initializeFormProperties(startFormData, null);

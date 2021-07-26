@@ -23,8 +23,10 @@ import java.util.List;
 
 import org.assertj.core.util.Arrays;
 import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.repository.CamundaFormDefinition;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.CamundaFormUtils;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Before;
@@ -51,6 +53,7 @@ public class CamundaFormDefinitionDeployerTest {
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   RepositoryService repositoryService;
+  ProcessEngineConfigurationImpl processEngineConfiguration;
 
   @Parameter(0)
   public String bpmnResource;
@@ -66,6 +69,7 @@ public class CamundaFormDefinitionDeployerTest {
   @Before
   public void init() {
     repositoryService = engineRule.getRepositoryService();
+    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
   }
 
   @Test
@@ -77,9 +81,9 @@ public class CamundaFormDefinitionDeployerTest {
     assertThat(deploymentCount).isEqualTo(1);
 
     // there should only be one CamundaFormDefinition
-    List<CamundaFormDefinition> definitions = engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired()
-        .execute(new FindCamundaFormDefinitionsCmd());
+    List<CamundaFormDefinition> definitions = CamundaFormUtils.findAllCamundaFormDefinitionEntities(processEngineConfiguration);
     assertThat(definitions).hasSize(1);
     assertThat(definitions.get(0).getDeploymentId()).isEqualTo(deploymentId);
   }
+
 }

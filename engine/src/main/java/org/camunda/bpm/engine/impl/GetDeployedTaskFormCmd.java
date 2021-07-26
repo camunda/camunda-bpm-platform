@@ -23,12 +23,11 @@ import org.camunda.bpm.engine.form.FormData;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.cmd.AbstractGetDeployedFormCmd;
 import org.camunda.bpm.engine.impl.cmd.GetTaskFormCmd;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 /**
- * 
+ *
  * @author Anna Pazola
  *
  */
@@ -42,7 +41,7 @@ public class GetDeployedTaskFormCmd extends AbstractGetDeployedFormCmd {
   }
 
   @Override
-  protected FormData getFormData(final CommandContext commandContext) {
+  protected FormData getFormData() {
     return commandContext.runWithoutAuthorization(new Callable<FormData>() {
 
       @Override
@@ -53,7 +52,7 @@ public class GetDeployedTaskFormCmd extends AbstractGetDeployedFormCmd {
   }
 
   @Override
-  protected void checkAuthorization(CommandContext commandContext) {
+  protected void checkAuthorization() {
     TaskEntity taskEntity = commandContext.getTaskManager().findTaskById(taskId);
     for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkReadTask(taskEntity);
