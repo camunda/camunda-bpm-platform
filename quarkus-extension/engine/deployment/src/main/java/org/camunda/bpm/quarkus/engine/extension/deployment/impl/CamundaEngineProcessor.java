@@ -16,10 +16,12 @@
  */
 package org.camunda.bpm.quarkus.engine.extension.deployment.impl;
 
+import static io.quarkus.arc.deployment.ContextRegistrationPhaseBuildItem.*;
 import static io.quarkus.deployment.annotations.ExecutionTime.RUNTIME_INIT;
 
 import io.quarkus.arc.deployment.AdditionalBeanBuildItem;
 import io.quarkus.arc.deployment.BeanContainerBuildItem;
+import io.quarkus.arc.deployment.ContextRegistrationPhaseBuildItem;
 import io.quarkus.arc.deployment.UnremovableBeanBuildItem;
 import io.quarkus.arc.processor.DotNames;
 import io.quarkus.deployment.annotations.BuildProducer;
@@ -32,6 +34,7 @@ import io.quarkus.runtime.RuntimeValue;
 import org.camunda.bpm.engine.cdi.BusinessProcess;
 import org.camunda.bpm.engine.cdi.CdiStandaloneProcessEngineConfiguration;
 import org.camunda.bpm.engine.cdi.ProcessVariables;
+import org.camunda.bpm.engine.cdi.annotation.BusinessProcessScoped;
 import org.camunda.bpm.engine.cdi.compat.CamundaTaskForm;
 import org.camunda.bpm.engine.cdi.compat.FoxTaskForm;
 import org.camunda.bpm.engine.cdi.impl.ProcessVariableLocalMap;
@@ -40,7 +43,10 @@ import org.camunda.bpm.engine.cdi.impl.context.DefaultContextAssociationManager;
 import org.camunda.bpm.engine.cdi.jsf.TaskForm;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.quarkus.engine.extension.impl.CamundaEngineRecorder;
+import org.camunda.bpm.quarkus.engine.extension.impl.InjectableBusinessProcessContext;
 import org.jboss.jandex.DotName;
+
+import javax.enterprise.context.Dependent;
 
 public class CamundaEngineProcessor {
 
@@ -61,10 +67,18 @@ public class CamundaEngineProcessor {
   }
 
   @BuildStep
+  ContextConfiguratorBuildItem registerBusinessProcessScoped(ContextRegistrationPhaseBuildItem phase) {
+    return new ContextConfiguratorBuildItem(phase.getContext()
+        .configure(BusinessProcessScoped.class)
+        .normal()
+        .contextClass(InjectableBusinessProcessContext.class));
+  }
+
+  @BuildStep
   protected void additionalBeans(BuildProducer<AdditionalBeanBuildItem> additionalBeansProducer) {
     additionalBeansProducer.produce(
         AdditionalBeanBuildItem.builder()
-            .setDefaultScope(DotNames.APPLICATION_SCOPED)
+            .setDefaultScope(DotName.createSimple(Dependent.class.getName()))
             .addBeanClasses(
                 DefaultContextAssociationManager.class,
                 BusinessProcess.class,
