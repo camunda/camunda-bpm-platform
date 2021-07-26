@@ -834,8 +834,9 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   TaskQuery active();
 
   /**
-   * If called, the form keys of the fetched tasks are initialized and
-   * {@link Task#getFormKey()} will return a value (in case the task has a form key).
+   * If called, the form keys and form references of the fetched tasks are initialized and
+   * {@link Task#getFormKey()} and {@link Task#getCamundaFormRef()} will return a value (in
+   * case the task has is linked to a form).
    *
    * @throws ProcessEngineException
    *   When method has been executed within "or query". Method must be executed on the base query.

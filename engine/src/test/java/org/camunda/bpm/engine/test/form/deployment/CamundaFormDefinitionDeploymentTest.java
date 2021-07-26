@@ -18,6 +18,8 @@ package org.camunda.bpm.engine.test.form.deployment;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.camunda.bpm.engine.test.util.CamundaFormUtils.findAllCamundaFormDefinitionEntities;
+import static org.camunda.bpm.engine.test.util.CamundaFormUtils.writeTempFormFile;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,6 +29,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.repository.CamundaFormDefinition;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
@@ -55,10 +58,12 @@ public class CamundaFormDefinitionDeploymentTest {
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule).around(tempFolder);
 
   RepositoryService repositoryService;
+  ProcessEngineConfigurationImpl processEngineConfiguration;
 
   @Before
   public void init() {
     repositoryService = engineRule.getRepositoryService();
+    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
   }
 
   @After
@@ -79,7 +84,7 @@ public class CamundaFormDefinitionDeploymentTest {
     List<Deployment> deployments = repositoryService.createDeploymentQuery().list();
     assertThat(deployments).hasSize(2);
 
-    List<CamundaFormDefinition> definitions = findAllCamundaFormDefinitionEntities();
+    List<CamundaFormDefinition> definitions = findAllCamundaFormDefinitionEntities(processEngineConfiguration);
     assertThat(definitions).hasSize(2);
     assertThat(definitions).extracting("version").containsExactlyInAnyOrder(1, 2);
     assertThat(definitions).extracting("deploymentId").containsExactlyInAnyOrder(deployments.stream().map(Deployment::getId).toArray());
@@ -96,7 +101,7 @@ public class CamundaFormDefinitionDeploymentTest {
     List<Deployment> deployments = repositoryService.createDeploymentQuery().list();
     assertThat(deployments).hasSize(1);
 
-    List<CamundaFormDefinition> definitions = findAllCamundaFormDefinitionEntities();
+    List<CamundaFormDefinition> definitions = findAllCamundaFormDefinitionEntities(processEngineConfiguration);
     assertThat(definitions).hasSize(1);
     CamundaFormDefinition definition = definitions.get(0);
     assertThat(definition.getVersion()).isEqualTo(1);
@@ -115,7 +120,7 @@ public class CamundaFormDefinitionDeploymentTest {
     List<Deployment> deployments = repositoryService.createDeploymentQuery().list();
     assertThat(deployments).hasSize(2);
 
-    List<CamundaFormDefinition> definitions = findAllCamundaFormDefinitionEntities();
+    List<CamundaFormDefinition> definitions = findAllCamundaFormDefinitionEntities(processEngineConfiguration);
     assertThat(definitions).hasSize(1);
     CamundaFormDefinition definition = definitions.get(0);
     assertThat(definition.getVersion()).isEqualTo(1);
@@ -133,7 +138,7 @@ public class CamundaFormDefinitionDeploymentTest {
     List<Deployment> deployments = repositoryService.createDeploymentQuery().list();
     assertThat(deployments).hasSize(2);
 
-    List<CamundaFormDefinition> definitions = findAllCamundaFormDefinitionEntities();
+    List<CamundaFormDefinition> definitions = findAllCamundaFormDefinitionEntities(processEngineConfiguration);
     assertThat(definitions).hasSize(2);
     assertThat(definitions).extracting("version").containsExactly(1, 1);
     assertThat(definitions).extracting("deploymentId").containsExactlyInAnyOrder(deployments.stream().map(Deployment::getId).toArray());
@@ -150,7 +155,7 @@ public class CamundaFormDefinitionDeploymentTest {
     assertThat(deployments).hasSize(1);
     String deploymentId = deployments.get(0).getId();
 
-    List<CamundaFormDefinition> definitions = findAllCamundaFormDefinitionEntities();
+    List<CamundaFormDefinition> definitions = findAllCamundaFormDefinitionEntities(processEngineConfiguration);
     assertThat(definitions).hasSize(2);
     assertThat(definitions).extracting("version").containsExactly(1, 1);
     assertThat(definitions).extracting("deploymentId").containsExactly(deploymentId, deploymentId);
@@ -170,7 +175,7 @@ public class CamundaFormDefinitionDeploymentTest {
   public void shouldDeleteFormDefinitionWhenDeletingDeployment() {
     // given
     Deployment deployment = createDeploymentBuilder(true).addClasspathResource(SIMPLE_FORM).addClasspathResource(COMPLEX_FORM).deploy();
-    List<CamundaFormDefinition> formDefinitions = findAllCamundaFormDefinitionEntities();
+    List<CamundaFormDefinition> formDefinitions = findAllCamundaFormDefinitionEntities(processEngineConfiguration);
     List<Deployment> deployments = repositoryService.createDeploymentQuery().list();
 
     // when
@@ -182,7 +187,7 @@ public class CamundaFormDefinitionDeploymentTest {
     assertThat(deployments).hasSize(1);
 
     // after deletion of deployment
-    assertThat(findAllCamundaFormDefinitionEntities()).hasSize(0);
+    assertThat(findAllCamundaFormDefinitionEntities(processEngineConfiguration)).hasSize(0);
     assertThat(repositoryService.createDeploymentQuery().list()).hasSize(0);
   }
 
@@ -193,25 +198,20 @@ public class CamundaFormDefinitionDeploymentTest {
     String formContent1 = "{\"id\"=\"myForm\",\"type\": \"default\",\"components\":[{\"key\": \"button3\",\"label\": \"Button\",\"type\": \"button\"}]}";
     String formContent2 = "{\"id\"=\"myForm\",\"type\": \"default\",\"components\": []}";
 
-    createDeploymentBuilder(true).addInputStream(fileName, writeTempFormFile(fileName, formContent1)).deploy();
+    createDeploymentBuilder(true).addInputStream(fileName, writeTempFormFile(fileName, formContent1, tempFolder)).deploy();
 
     // when deploy changed file
-    createDeploymentBuilder(true).addInputStream(fileName, writeTempFormFile(fileName, formContent2)).deploy();
+    createDeploymentBuilder(true).addInputStream(fileName, writeTempFormFile(fileName, formContent2, tempFolder)).deploy();
 
     // then
     List<Deployment> deployments = repositoryService.createDeploymentQuery().list();
     assertThat(deployments).hasSize(2);
     assertThat(deployments).extracting("tenantId").containsExactly(null, null);
-    List<CamundaFormDefinition> formDefinitions = findAllCamundaFormDefinitionEntities();
+    List<CamundaFormDefinition> formDefinitions = findAllCamundaFormDefinitionEntities(processEngineConfiguration);
     assertThat(formDefinitions).extracting("version").containsExactlyInAnyOrder(1, 2);
     assertThat(formDefinitions).extracting("resourceName").containsExactly(fileName, fileName);
     assertThat(formDefinitions).extracting("deploymentId").containsExactlyInAnyOrder(deployments.stream().map(Deployment::getId).toArray());
 
-  }
-
-  private List<CamundaFormDefinition> findAllCamundaFormDefinitionEntities() {
-    return engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired()
-        .execute(new FindCamundaFormDefinitionsCmd());
   }
 
   private DeploymentBuilder createDeploymentBuilder(boolean filterDuplicates) {
@@ -220,17 +220,5 @@ public class CamundaFormDefinitionDeploymentTest {
       deploymentBuilder.enableDuplicateFiltering(filterDuplicates);
     }
     return deploymentBuilder;
-  }
-
-  private FileInputStream writeTempFormFile(String fileName, String content) throws IOException {
-    File formFile = new File(tempFolder.getRoot(), fileName);
-    if(!formFile.exists()) {
-      formFile = tempFolder.newFile(fileName);
-    }
-
-    FileWriter writer = new FileWriter(formFile, false);
-    writer.write(content);
-    writer.close();
-    return new FileInputStream(formFile.getAbsolutePath());
   }
 }
