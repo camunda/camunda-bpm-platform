@@ -67,7 +67,7 @@ public class CamundaEngineProcessor {
   }
 
   @BuildStep
-  ContextConfiguratorBuildItem registerBusinessProcessScoped(ContextRegistrationPhaseBuildItem phase) {
+  protected ContextConfiguratorBuildItem registerBusinessProcessScoped(ContextRegistrationPhaseBuildItem phase) {
     return new ContextConfiguratorBuildItem(phase.getContext()
         .configure(BusinessProcessScoped.class)
         .normal()

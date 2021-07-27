@@ -44,7 +44,7 @@ public class BusinessProcessContextConversationScopeTest extends CdiProcessEngin
     assertEquals("testValue", runtimeService.getVariable(pid, "testVariable"));
 
     // assert that the value set to the message bean in the first service task is flushed
-    assertEquals("Hello from Activiti", getBeanInstance(ProcessScopedMessageBean.class).getMessage());
+    assertEquals("Greetings from Berlin", getBeanInstance(ProcessScopedMessageBean.class).getMessage());
 
     // complete the task to allow the process instance to terminate
     taskService.complete(taskService.createTaskQuery().singleResult().getId());

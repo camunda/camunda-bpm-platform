@@ -14,28 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.cdi.test.impl.context.beans;
+package org.camunda.bpm.engine.cdi.test.impl.el;
+
+import org.camunda.bpm.engine.cdi.test.impl.el.beans.DependentScopedBean;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
 
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.camunda.bpm.engine.cdi.BusinessProcess;
-import org.junit.Assert;
-
-/**
- * @author Daniel Meyer
- *
- */
-@Named("MultiInstanceTestLocalVariableBean")
+@Named
 @Dependent
-public class LocalVariableBean {
-  
+public class DependentScopedBeanDelegate implements JavaDelegate {
+
   @Inject
-  private BusinessProcess businessProcess;
-  
-  public void test() {
-    Assert.assertNotNull("local variable should be set", businessProcess.getVariable("localVar"));
+  protected DependentScopedBean dependentScopedBean;
+
+  @Override
+  public void execute(DelegateExecution delegateExecution) throws Exception {
+    dependentScopedBean.invoke();
   }
 
 }

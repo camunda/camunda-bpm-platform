@@ -14,42 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.cdi.test.impl.el.beans;
+package org.camunda.bpm.engine.cdi.test;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.jboss.arquillian.container.test.api.DeploymentConfiguration;
+import org.jboss.arquillian.container.test.api.DeploymentConfiguration.DeploymentContentBuilder;
+import org.jboss.arquillian.container.test.spi.client.deployment.AutomaticDeployment;
+import org.jboss.arquillian.test.spi.TestClass;
+import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.spec.JavaArchive;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.enterprise.context.Dependent;
-import javax.inject.Named;
+public class ArquillianAutomaticDeployment implements AutomaticDeployment {
 
-/**
- * @author Daniel Meyer
- *
- */
-@Named
-@Dependent
-public class DependentScopedBean {
+  @Override
+  public DeploymentConfiguration generateDeploymentScenario(TestClass testClass) {
+    JavaArchive jar = ShrinkWrap.create(JavaArchive.class)
+        .addPackages(true, Package.getPackage("org.camunda.bpm.engine.cdi.test"));
 
-  public static List<String> lifecycle = new ArrayList<String>();
-
-  public void invoke() {
-    lifecycle.add("bean-invoked");
-  }
-
-  public static void reset() {
-    lifecycle.clear();
-  }
-
-  @PreDestroy
-  public void preDestroy() {
-    lifecycle.add("pre-destroy-invoked");
-  }
-
-  @PostConstruct
-  public void postContruct() {
-    lifecycle.add("post-construct-invoked");
+    return new DeploymentContentBuilder(jar).get();
   }
 
 }

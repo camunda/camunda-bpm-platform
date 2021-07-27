@@ -14,42 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.cdi.test.impl.el.beans;
+package org.camunda.bpm.engine.cdi.test.impl.context;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.camunda.bpm.engine.cdi.BusinessProcess;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.junit.Assert;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import javax.inject.Named;
 
-/**
- * @author Daniel Meyer
- *
- */
 @Named
 @Dependent
-public class DependentScopedBean {
+public class MultiInstanceDelegate implements JavaDelegate {
 
-  public static List<String> lifecycle = new ArrayList<String>();
+  @Inject
+  protected BusinessProcess businessProcess;
 
-  public void invoke() {
-    lifecycle.add("bean-invoked");
-  }
-
-  public static void reset() {
-    lifecycle.clear();
-  }
-
-  @PreDestroy
-  public void preDestroy() {
-    lifecycle.add("pre-destroy-invoked");
-  }
-
-  @PostConstruct
-  public void postContruct() {
-    lifecycle.add("post-construct-invoked");
+  @Override
+  public void execute(DelegateExecution delegateExecution) {
+    Assert.assertNotNull("local variable should be set", businessProcess.getVariable("localVar"));
   }
 
 }

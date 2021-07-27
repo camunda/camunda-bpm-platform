@@ -14,42 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.cdi.test.impl.el.beans;
+package org.camunda.bpm.quarkus.engine.test.lookup;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.enterprise.context.Dependent;
+import javax.enterprise.inject.Produces;
 import javax.inject.Named;
 
-/**
- * @author Daniel Meyer
- *
- */
-@Named
-@Dependent
-public class DependentScopedBean {
+public class BeanWithProducerMethods {
 
-  public static List<String> lifecycle = new ArrayList<String>();
-
-  public void invoke() {
-    lifecycle.add("bean-invoked");
-  }
-
-  public static void reset() {
-    lifecycle.clear();
-  }
-
-  @PreDestroy
-  public void preDestroy() {
-    lifecycle.add("pre-destroy-invoked");
-  }
-
-  @PostConstruct
-  public void postContruct() {
-    lifecycle.add("post-construct-invoked");
+  @Produces
+  @Named("producedString")
+  @Dependent
+  public String defaultProducedString() {
+    return "exampleString";
   }
 
 }

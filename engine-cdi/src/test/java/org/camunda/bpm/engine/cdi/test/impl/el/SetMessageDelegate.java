@@ -14,42 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.cdi.test.impl.el.beans;
+package org.camunda.bpm.engine.cdi.test.impl.el;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.camunda.bpm.engine.cdi.annotation.BusinessProcessScoped;
+import org.camunda.bpm.engine.cdi.test.impl.beans.MessageBean;
+import org.camunda.bpm.engine.cdi.test.impl.beans.ProcessScopedMessageBean;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import javax.inject.Named;
+import java.io.Serializable;
 
-/**
- * @author Daniel Meyer
- *
- */
 @Named
 @Dependent
-public class DependentScopedBean {
+public class SetMessageDelegate implements JavaDelegate {
 
-  public static List<String> lifecycle = new ArrayList<String>();
+  @Inject
+  protected MessageBean messageBean;
 
-  public void invoke() {
-    lifecycle.add("bean-invoked");
-  }
-
-  public static void reset() {
-    lifecycle.clear();
-  }
-
-  @PreDestroy
-  public void preDestroy() {
-    lifecycle.add("pre-destroy-invoked");
-  }
-
-  @PostConstruct
-  public void postContruct() {
-    lifecycle.add("post-construct-invoked");
+  @Override
+  public void execute(DelegateExecution delegateExecution) {
+    messageBean.setMessage("Greetings from Berlin");
   }
 
 }
