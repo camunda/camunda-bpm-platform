@@ -10,6 +10,14 @@
     <version>7.16.0-SNAPSHOT</version>
     <relativePath>../</relativePath>
   </parent>
+  
+  <!-- 
+    Maven modules running these tests with the failsafe plugin should declare the following system property:
+    
+    * selenium.screenshot.directory: defines where to store screenshots on test failures 
+        (e.g. set to "${project.build.directory}/selenium-screenshots"); 
+        no screenshots created if not set
+   -->
 
   <dependencies>
     <!-- set shrinkwrap artifacts -->
