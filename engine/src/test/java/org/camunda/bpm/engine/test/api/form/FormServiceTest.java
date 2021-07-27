@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.form;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 import static org.camunda.bpm.engine.test.util.CamundaFormUtils.findAllCamundaFormDefinitionEntities;
 import static org.camunda.bpm.engine.variable.Variables.booleanValue;
@@ -1574,14 +1575,11 @@ public class FormServiceTest {
     // given
     String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
 
-    try {
-      // when
+    // when
+    assertThatThrownBy(() -> {
       formService.getDeployedStartForm(procDefId);
-      fail("Exception expected");
-    } catch (NotFoundException e) {
-      // then
-      testRule.assertTextPresent("The form with the resource name 'org/camunda/bpm/engine/test/api/form/start.html' cannot be found in deployment.", e.getMessage());
-    }
+    }).isInstanceOf(NotFoundException.class)
+    .hasMessageContaining("The form with the resource name 'org/camunda/bpm/engine/test/api/form/start.html' cannot be found in deployment");
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/form/DeployedFormsProcess.bpmn20.xml",
@@ -1592,14 +1590,11 @@ public class FormServiceTest {
     runtimeService.startProcessInstanceByKey("FormsProcess");
     String taskId = taskService.createTaskQuery().singleResult().getId();
 
-    try {
-      // when
+    // when
+    assertThatThrownBy(() -> {
       formService.getDeployedTaskForm(taskId);
-      fail("Exception expected");
-    } catch (NotFoundException e) {
-      // then
-      testRule.assertTextPresent("The form with the resource name 'org/camunda/bpm/engine/test/api/form/task.html' cannot be found in deployment.", e.getMessage());
-    }
+    }).isInstanceOf(NotFoundException.class)
+    .hasMessageContaining("The form with the resource name 'org/camunda/bpm/engine/test/api/form/task.html' cannot be found in deployment");
   }
 
   @Test
@@ -1609,13 +1604,10 @@ public class FormServiceTest {
     String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
 
     // when
-    try {
+    assertThatThrownBy(() -> {
       formService.getDeployedStartForm(processDefinitionId);
-      fail("Exception expected");
-    } catch (BadUserRequestException e) {
-      // then
-      testRule.assertTextPresent("The form key is not set.", e.getMessage());
-    }
+    }).isInstanceOf(BadUserRequestException.class)
+    .hasMessage("One of the attributes 'formKey' and 'camunda:formRef' must be supplied but none were set.");
   }
 
   @Test
@@ -1626,13 +1618,10 @@ public class FormServiceTest {
     String taskId = taskService.createTaskQuery().singleResult().getId();
 
     // when
-    try {
+    assertThatThrownBy(() -> {
       formService.getDeployedTaskForm(taskId);
-      fail("Exception expected");
-    } catch (BadUserRequestException e) {
-      // then
-      testRule.assertTextPresent("The form key is not set.", e.getMessage());
-    }
+    }).isInstanceOf(BadUserRequestException.class)
+    .hasMessage("One of the attributes 'formKey' and 'camunda:formRef' must be supplied but none were set.");
   }
 
   @Deployment(resources = {
