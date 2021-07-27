@@ -25,15 +25,17 @@ import org.camunda.bpm.engine.cdi.test.CdiProcessEngineTestCase;
 import org.camunda.bpm.engine.cdi.test.impl.beans.CreditCard;
 import org.camunda.bpm.engine.cdi.test.impl.beans.ProcessScopedMessageBean;
 import org.camunda.bpm.engine.test.Deployment;
+import org.jboss.arquillian.junit.Arquillian;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * 
  * @author Daniel Meyer
  */
+@RunWith(Arquillian.class)
 public class BusinessProcessContextTest extends CdiProcessEngineTestCase {
-
-
+  
   @Test
   @Deployment
   public void testResolution() throws Exception {
@@ -49,25 +51,6 @@ public class BusinessProcessContextTest extends CdiProcessEngineTestCase {
   public void testResolutionBeforeProcessStart() throws Exception {
     // assert that @BusinessProcessScoped beans can be resolved in the absence of an underlying process instance:
     assertNotNull(getBeanInstance(CreditCard.class));
-  }
-
-  @Test
-  @Deployment
-  public void testConversationalBeanStoreFlush() throws Exception {
-    
-    getBeanInstance(BusinessProcess.class).setVariable("testVariable", "testValue");
-    String pid =  getBeanInstance(BusinessProcess.class).startProcessByKey("testConversationalBeanStoreFlush").getId();
-
-    getBeanInstance(BusinessProcess.class).associateExecutionById(pid);
-
-    // assert that the variable assigned on the businessProcess bean is flushed 
-    assertEquals("testValue", runtimeService.getVariable(pid, "testVariable"));
-
-    // assert that the value set to the message bean in the first service task is flushed
-    assertEquals("Hello from Activiti", getBeanInstance(ProcessScopedMessageBean.class).getMessage());
-    
-    // complete the task to allow the process instance to terminate
-    taskService.complete(taskService.createTaskQuery().singleResult().getId());
   }
 
   @Test

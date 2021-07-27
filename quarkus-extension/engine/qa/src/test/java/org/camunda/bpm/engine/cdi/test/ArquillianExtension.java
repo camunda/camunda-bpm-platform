@@ -14,32 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.cdi.test.impl.context;
+package org.camunda.bpm.engine.cdi.test;
 
-import java.util.Arrays;
+import org.jboss.arquillian.core.spi.LoadableExtension;
 
-import org.camunda.bpm.engine.cdi.BusinessProcess;
-import org.camunda.bpm.engine.cdi.test.CdiProcessEngineTestCase;
-import org.camunda.bpm.engine.test.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+public class ArquillianExtension implements LoadableExtension {
 
-/**
- * @author Daniel Meyer
- *
- */
-@RunWith(Arquillian.class)
-public class MultiInstanceTest extends CdiProcessEngineTestCase {
-
-  @Test
-  @Deployment
-  public void testParallelMultiInstanceServiceTasks() {
-
-    BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
-    businessProcess.setVariable("list", Arrays.asList(new String[]{"1","2"}));
-    businessProcess.startProcessByKey("miParallelScriptTask");
-
+  @Override
+  public void register(ExtensionBuilder builder) {
+    builder.observer(ProcessEngineDeployment.class);
   }
 
 }

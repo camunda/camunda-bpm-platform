@@ -218,7 +218,7 @@ platform-jdk-openjdk-jdk-11-latest:
   withNpm: true
 platform-jdk-openjdk-jdk-8-latest:
   directory: '.'
-  command: 'install source:jar source:test-jar -pl ''!webapps'',''!distro/jbossas7/subsystem'',''!quarkus-extension/engine/deployment'',''!quarkus-extension/engine/runtime'' -Pdistro,distro-ce,distro-wildfly'
+  command: 'install source:jar source:test-jar -pl ''!webapps'',''!distro/jbossas7/subsystem'',''!quarkus-extension/engine/deployment'',''!quarkus-extension/engine/runtime'',''!quarkus-extension/engine/qa'' -Pdistro,distro-ce,distro-wildfly'
   stash:
     runtimeStash: true
   nodeLabel: 'h2'
@@ -266,7 +266,7 @@ platform-jdk-jdk-11-latest:
   withNpm: true
 platform-jdk-jdk-8-latest:
   directory: '.'
-  command: 'install source:jar source:test-jar -pl ''!webapps'',''!distro/jbossas7/subsystem'',''!quarkus-extension/engine/deployment'',''!quarkus-extension/engine/runtime'' -Pdistro,distro-ce,distro-wildfly'
+  command: 'install source:jar source:test-jar -pl ''!webapps'',''!distro/jbossas7/subsystem'',''!quarkus-extension/engine/deployment'',''!quarkus-extension/engine/runtime'',''!quarkus-extension/engine/qa'' -Pdistro,distro-ce,distro-wildfly'
   stash:
     runtimeStash: true
   nodeLabel: 'h2'
@@ -274,7 +274,7 @@ platform-jdk-jdk-8-latest:
   withNpm: true
 platform-jdk-ibm-jdk-8-latest:
   directory: '.'
-  command: 'install source:jar source:test-jar -pl ''!webapps'',''!distro/jbossas7/subsystem'',''!quarkus-extension/engine/deployment'',''!quarkus-extension/engine/runtime'' -Pdistro,distro-ce,distro-wildfly'
+  command: 'install source:jar source:test-jar -pl ''!webapps'',''!distro/jbossas7/subsystem'',''!quarkus-extension/engine/deployment'',''!quarkus-extension/engine/runtime'',''!quarkus-extension/engine/qa'' -Pdistro,distro-ce,distro-wildfly'
   stash:
     runtimeStash: true
   nodeLabel: 'h2'

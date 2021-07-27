@@ -25,12 +25,15 @@ import org.camunda.bpm.engine.cdi.compat.CamundaTaskForm;
 import org.camunda.bpm.engine.cdi.compat.FoxTaskForm;
 import org.camunda.bpm.engine.cdi.jsf.TaskForm;
 import org.camunda.bpm.engine.cdi.test.CdiProcessEngineTestCase;
+import org.jboss.arquillian.junit.Arquillian;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * @author Daniel Meyer
  */
+@RunWith(Arquillian.class)
 public class TaskFormTest extends CdiProcessEngineTestCase {
 
   @Test

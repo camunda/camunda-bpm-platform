@@ -27,11 +27,14 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.TypedValue;
+import org.jboss.arquillian.junit.Arquillian;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * @author Michael Scholz
  */
+@RunWith(Arquillian.class)
 public class ProcessVariableMapTest extends CdiProcessEngineTestCase {
 
   private static final String VARNAME_1 = "aVariable";

@@ -14,32 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.cdi.test.impl.context;
+package org.camunda.bpm.engine.cdi.test.bean;
 
-import java.util.Arrays;
+import io.quarkus.arc.Unremovable;
+import org.camunda.bpm.engine.cdi.test.impl.beans.DeclarativeProcessController;
 
-import org.camunda.bpm.engine.cdi.BusinessProcess;
-import org.camunda.bpm.engine.cdi.test.CdiProcessEngineTestCase;
-import org.camunda.bpm.engine.test.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import javax.enterprise.context.Dependent;
 
-/**
- * @author Daniel Meyer
- *
- */
-@RunWith(Arquillian.class)
-public class MultiInstanceTest extends CdiProcessEngineTestCase {
-
-  @Test
-  @Deployment
-  public void testParallelMultiInstanceServiceTasks() {
-
-    BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
-    businessProcess.setVariable("list", Arrays.asList(new String[]{"1","2"}));
-    businessProcess.startProcessByKey("miParallelScriptTask");
-
-  }
-
+@Dependent
+@Unremovable
+public class QuarkusDeclarativeProcessController extends DeclarativeProcessController {
 }

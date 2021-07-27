@@ -16,30 +16,38 @@
  */
 package org.camunda.bpm.engine.cdi.test.impl.context;
 
-import java.util.Arrays;
-
 import org.camunda.bpm.engine.cdi.BusinessProcess;
 import org.camunda.bpm.engine.cdi.test.CdiProcessEngineTestCase;
+import org.camunda.bpm.engine.cdi.test.impl.beans.CreditCard;
+import org.camunda.bpm.engine.cdi.test.impl.beans.ProcessScopedMessageBean;
 import org.camunda.bpm.engine.test.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-/**
- * @author Daniel Meyer
- *
- */
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 @RunWith(Arquillian.class)
-public class MultiInstanceTest extends CdiProcessEngineTestCase {
+public class BusinessProcessContextConversationScopeTest extends CdiProcessEngineTestCase {
 
   @Test
   @Deployment
-  public void testParallelMultiInstanceServiceTasks() {
+  public void testConversationalBeanStoreFlush() throws Exception {
 
-    BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
-    businessProcess.setVariable("list", Arrays.asList(new String[]{"1","2"}));
-    businessProcess.startProcessByKey("miParallelScriptTask");
+    getBeanInstance(BusinessProcess.class).setVariable("testVariable", "testValue");
+    String pid =  getBeanInstance(BusinessProcess.class).startProcessByKey("testConversationalBeanStoreFlush").getId();
 
+    getBeanInstance(BusinessProcess.class).associateExecutionById(pid);
+
+    // assert that the variable assigned on the businessProcess bean is flushed
+    assertEquals("testValue", runtimeService.getVariable(pid, "testVariable"));
+
+    // assert that the value set to the message bean in the first service task is flushed
+    assertEquals("Hello from Activiti", getBeanInstance(ProcessScopedMessageBean.class).getMessage());
+
+    // complete the task to allow the process instance to terminate
+    taskService.complete(taskService.createTaskQuery().singleResult().getId());
   }
-
+    
 }

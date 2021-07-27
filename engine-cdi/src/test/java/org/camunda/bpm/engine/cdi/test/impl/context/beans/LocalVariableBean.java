@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.cdi.test.impl.context.beans;
 
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -27,6 +28,7 @@ import org.junit.Assert;
  *
  */
 @Named("MultiInstanceTestLocalVariableBean")
+@Dependent
 public class LocalVariableBean {
   
   @Inject

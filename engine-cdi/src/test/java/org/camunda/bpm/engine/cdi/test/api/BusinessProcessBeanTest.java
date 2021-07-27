@@ -36,11 +36,14 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.TypedValue;
+import org.jboss.arquillian.junit.Arquillian;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * @author Daniel Meyer
  */
+@RunWith(Arquillian.class)
 public class BusinessProcessBeanTest extends CdiProcessEngineTestCase {
 
   /* General test asserting that the business process bean is functional */
