@@ -269,7 +269,7 @@ public class TaskMetricsTest {
   public void shouldCreateTaskMetricsWithinErrorMarginWithHigherLoadOfAssignments() {
     // given
     long taskWorkers = 3500L;
-    long lowerErrorBoundary = Math.floorDiv(taskWorkers * 90, 100);// 10% off is acceptable
+    long lowerErrorBoundary = Math.floorDiv((int)(taskWorkers * 90), 100);// 10% off is acceptable
     testRule.deploy(Bpmn.createExecutableProcess(PROCESS_KEY)
         .startEvent()
         .userTask("task")
