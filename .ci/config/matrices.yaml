@@ -32,15 +32,16 @@ daily-stages:
   - 'large-data-tests'
 sidetrack-stages:
   databases:
-  - 'cockroachdb_201'
+  - 'azure_sql_db'
+  #- 'cockroachdb_201'
   stages:
   - 'db-unit'
-  - 'db-unit-authorizations'
-  - 'upgrade-database'
-  - 'instance-migration'
-  - 'old-engine'
-  - 'rolling-update'
-  - 'large-data-tests'
+  #- 'db-unit-authorizations'
+  #- 'upgrade-database'
+  #- 'instance-migration'
+  #- 'old-engine'
+  #- 'rolling-update'
+  #- 'large-data-tests'
 jdk-ce-stages:
   stages:
   - 'platform-jdk-openjdk-jdk-15-latest'

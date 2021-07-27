@@ -1,6 +1,6 @@
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
-@Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library@test-azure-db']) _
 
 pipeline {
   agent {
@@ -58,7 +58,8 @@ pipeline {
           // see the .ci/config/matrices.yaml for the stage generation values
           // see .ci/config/stage-types.yaml for the stage configurations
           parallel(cambpmGetMatrixStages('sidetrack-stages', [], { stageInfo ->
-            return cambpmWithLabels(cambpmGetLabels(stageInfo.stageType))
+            // return cambpmWithLabels(cambpmGetLabels(stageInfo.stageType))
+            return true
           }))
         }
       }
