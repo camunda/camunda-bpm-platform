@@ -23,13 +23,13 @@ import org.camunda.bpm.engine.cdi.test.api.annotation.ProcessVariableTypedTest;
 import org.camunda.bpm.engine.cdi.test.bean.QuarkusDeclarativeProcessController;
 import org.camunda.bpm.engine.cdi.test.api.annotation.StartProcessTest;
 import org.camunda.bpm.engine.cdi.test.bpmn.SignalEventTest;
-import org.camunda.bpm.engine.cdi.test.bean.SignalEventTestBeans;
+import org.camunda.bpm.engine.cdi.test.impl.beans.DeclarativeProcessController;
 import org.camunda.bpm.engine.cdi.test.impl.context.BusinessProcessContextTest;
 import org.camunda.bpm.engine.cdi.test.bean.BusinessProcessContextTestBeans;
 import org.camunda.bpm.engine.cdi.test.impl.context.MultiInstanceTest;
-import org.camunda.bpm.engine.cdi.test.bean.QuarkusLocalVariableBean;
-import org.camunda.bpm.engine.cdi.test.bean.QuarkusCdiTaskListenerBean;
+import org.camunda.bpm.engine.cdi.test.impl.context.beans.LocalVariableBean;
 import org.camunda.bpm.engine.cdi.test.impl.el.TaskListenerInvocationTest;
+import org.camunda.bpm.engine.cdi.test.impl.el.beans.CdiTaskListenerBean;
 import org.camunda.bpm.engine.cdi.test.impl.event.EventNotificationTest;
 import org.camunda.bpm.engine.cdi.test.impl.event.TestEventListener;
 import org.jboss.arquillian.container.test.api.DeploymentConfiguration;
@@ -48,6 +48,9 @@ import java.util.Set;
 
 public class QuarkusAutomaticDeployment implements AutomaticDeployment {
 
+  /**
+   * Specify additional classes that should be deployed to Quarkus.
+   */
   protected Map<Class<?>, Set<Class<?>>> beanDefinitions = new HashMap<Class<?>, Set<Class<?>>>() {{
 
     Set<Class<?>> processControllerBean = asSet(QuarkusDeclarativeProcessController.class);
@@ -61,9 +64,10 @@ public class QuarkusAutomaticDeployment implements AutomaticDeployment {
     put(BusinessProcessBeanTest.class, businessProcessContextBeans);
     put(BusinessProcessContextTest.class, businessProcessContextBeans);
 
-    put(SignalEventTest.class, asSet(SignalEventTestBeans.class));
-    put(MultiInstanceTest.class, asSet(QuarkusLocalVariableBean.class));
-    put(TaskListenerInvocationTest.class, asSet(QuarkusCdiTaskListenerBean.class));
+    put(SignalEventTest.class, asSet(SignalEventTest.SendSignalDelegate.class,
+        SignalEventTest.SignalReceivedDelegate.class));
+    put(MultiInstanceTest.class, asSet(LocalVariableBean.class));
+    put(TaskListenerInvocationTest.class, asSet(CdiTaskListenerBean.class));
     put(EventNotificationTest.class, asSet(TestEventListener.class));
   }};
 

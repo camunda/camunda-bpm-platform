@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.cdi.test.impl.beans.ProcessScopedMessageBean;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 
+// TODO: Remove with CAM-13754
 public class BusinessProcessContextTestBeans {
 
   @ApplicationScoped

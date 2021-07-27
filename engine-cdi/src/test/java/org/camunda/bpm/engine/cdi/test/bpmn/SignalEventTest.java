@@ -20,6 +20,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.HashMap;
 
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -39,6 +40,7 @@ public class SignalEventTest extends CdiProcessEngineTestCase {
   
   
   @Named
+  @Dependent
   public static class SignalReceivedDelegate implements JavaDelegate {    
     
     @Inject
@@ -50,6 +52,7 @@ public class SignalEventTest extends CdiProcessEngineTestCase {
   }
 
   @Named
+  @Dependent
   public static class SendSignalDelegate implements JavaDelegate {
 
     @Inject

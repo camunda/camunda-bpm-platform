@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.cdi.BusinessProcess;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.TaskListener;
 
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -29,6 +30,7 @@ import static org.junit.Assert.assertEquals;
  * @author Sebastian Menski
  */
 @Named
+@Dependent
 public class CdiTaskListenerBean implements TaskListener {
 
   public static final String VARIABLE_NAME = "variable";

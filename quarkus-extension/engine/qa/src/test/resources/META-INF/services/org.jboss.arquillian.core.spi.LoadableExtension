@@ -1,1 +1,1 @@
-io.quarkus.arquillian.QuarkusExtension
+org.camunda.bpm.engine.cdi.test.ArquillianExtension

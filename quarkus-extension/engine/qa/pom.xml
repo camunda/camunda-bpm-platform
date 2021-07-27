@@ -10,6 +10,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>camunda-bpm-quarkus-engine-qa</artifactId>
+  <name>Camunda Platform - Quarkus Extension - Engine - CDI QA</name>
 
   <properties>
     <arquillian.version>1.5.0.Final</arquillian.version>

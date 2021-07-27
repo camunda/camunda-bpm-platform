@@ -14,23 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.cdi.test.bean;
+package org.camunda.bpm.engine.cdi.test;
 
-import org.camunda.bpm.engine.cdi.test.bpmn.SignalEventTest;
+import org.jboss.arquillian.core.spi.LoadableExtension;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Named;
+public class ArquillianExtension implements LoadableExtension {
 
-public class SignalEventTestBeans {
-
-  @ApplicationScoped
-  @Named("sendSignalDelegate")
-  public static class SendSignalDelegate extends SignalEventTest.SendSignalDelegate {
-  }
-
-  @ApplicationScoped
-  @Named("signalReceivedDelegate")
-  public static class SignalReceivedDelegate extends SignalEventTest.SignalReceivedDelegate {
+  @Override
+  public void register(ExtensionBuilder builder) {
+    builder.observer(ProcessEngineDeployment.class);
   }
 
 }
