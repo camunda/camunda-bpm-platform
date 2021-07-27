@@ -58,6 +58,7 @@ import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.filter.Filter;
+import org.camunda.bpm.engine.form.CamundaFormRef;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
@@ -1007,7 +1008,7 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
     assertEquals(0, taskService.createTaskQuery().taskVariableValueEquals("unexistingVar", "value").count());
 
     // Create a map with a variable for all default types
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("longVar", 928374L);
     variables.put("shortVar", (short) 123);
     variables.put("integerVar", 1234);
@@ -1107,7 +1108,7 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
   	ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
   	Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
-  	Map<String, Object> variables = new HashMap<String, Object>();
+  	Map<String, Object> variables = new HashMap<>();
   	variables.put("stringVar", "stringValue");
 
   	taskService.setVariablesLocal(task.getId(), variables);
@@ -1137,7 +1138,7 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("stringVar", "stringValue");
 
     taskService.setVariablesLocal(task.getId(), variables);
@@ -1168,7 +1169,7 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
   	ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
   	Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
-  	Map<String, Object> variables = new HashMap<String, Object>();
+  	Map<String, Object> variables = new HashMap<>();
   	variables.put("numericVar", 928374);
   	Date date = new GregorianCalendar(2014, 2, 2, 2, 2, 2).getTime();
   	variables.put("dateVar", date);
@@ -1274,7 +1275,7 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
   @Deployment
   @Test
   public void testProcessVariableValueEquals() throws Exception {
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("longVar", 928374L);
     variables.put("shortVar", (short) 123);
     variables.put("integerVar", 1234);
@@ -1347,7 +1348,7 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
   public void testProcessVariableNameEqualsIgnoreCase() throws Exception {
     String variableName = "someVariable";
     String variableValue = "someCamelCaseValue";
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put(variableName, variableValue);
 
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
@@ -1365,7 +1366,7 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
   public void testProcessVariableValueEqualsIgnoreCase() throws Exception {
     String variableName = "someVariable";
     String variableValue = "someCamelCaseValue";
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put(variableName, variableValue);
 
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
@@ -1395,7 +1396,7 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
   @Test
   public void testProcessVariableValueLike() throws Exception {
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("stringVar", "stringValue");
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
 
@@ -1421,7 +1422,7 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
   @Test
   public void testProcessVariableValueLikeIgnoreCase() throws Exception {
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("stringVar", "stringValue");
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
 
@@ -1497,7 +1498,7 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
   @Test
   public void testProcessVariableValueCompare() throws Exception {
 
-  	Map<String, Object> variables = new HashMap<String, Object>();
+  	Map<String, Object> variables = new HashMap<>();
   	variables.put("numericVar", 928374);
   	Date date = new GregorianCalendar(2014, 2, 2, 2, 2, 2).getTime();
   	variables.put("dateVar", date);
@@ -1806,7 +1807,7 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
     assertNotNull(tasks);
     assertEquals(3, tasks.size());
 
-    Set<String> keysFound = new HashSet<String>();
+    Set<String> keysFound = new HashSet<>();
     for (Task task : tasks) {
       keysFound.add(task.getTaskDefinitionKey());
     }
@@ -2338,7 +2339,7 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
   }
 
   public List<String> getTaskNamesFromTasks(List<Task> tasks) {
-    List<String> names = new ArrayList<String>();
+    List<String> names = new ArrayList<>();
     for (Task task : tasks) {
       names.add(task.getName());
     }
@@ -2927,7 +2928,7 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
   public void testQueryBySerializableCaseInstanceVariableValueEquals() {
     String caseDefinitionId = getCaseDefinitionId();
 
-    List<String> serializable = new ArrayList<String>();
+    List<String> serializable = new ArrayList<>();
     serializable.add("one");
     serializable.add("two");
     serializable.add("three");
@@ -2986,7 +2987,7 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
    * @return the case definition ids
    */
   protected List<String> getCaseDefinitionIds() {
-    List<String> caseDefinitionIds = new ArrayList<String>();
+    List<String> caseDefinitionIds = new ArrayList<>();
     List<CaseDefinition> caseDefinitions = repositoryService.createCaseDefinitionQuery().list();
     for (CaseDefinition caseDefinition: caseDefinitions) {
       caseDefinitionIds.add(caseDefinition.getId());
@@ -3172,7 +3173,7 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
   public void testQueryBySerializableCaseInstanceVariableValueNotEquals() {
     String caseDefinitionId = getCaseDefinitionId();
 
-    List<String> serializable = new ArrayList<String>();
+    List<String> serializable = new ArrayList<>();
     serializable.add("one");
     serializable.add("two");
     serializable.add("three");
@@ -3385,7 +3386,7 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
   public void testQueryBySerializableCaseInstanceVariableGreaterThan() {
     String caseDefinitionId = getCaseDefinitionId();
 
-    List<String> serializable = new ArrayList<String>();
+    List<String> serializable = new ArrayList<>();
     serializable.add("one");
     serializable.add("two");
     serializable.add("three");
@@ -3632,7 +3633,7 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
   public void testQueryBySerializableCaseInstanceVariableGreaterThanOrEqual() {
     String caseDefinitionId = getCaseDefinitionId();
 
-    List<String> serializable = new ArrayList<String>();
+    List<String> serializable = new ArrayList<>();
     serializable.add("one");
     serializable.add("two");
     serializable.add("three");
@@ -3842,7 +3843,7 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
   public void testQueryBySerializableCaseInstanceVariableLessThan() {
     String caseDefinitionId = getCaseDefinitionId();
 
-    List<String> serializable = new ArrayList<String>();
+    List<String> serializable = new ArrayList<>();
     serializable.add("one");
     serializable.add("two");
     serializable.add("three");
@@ -4087,7 +4088,7 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
   public void testQueryBySerializableCaseInstanceVariableLessThanOrEqual() {
     String caseDefinitionId = getCaseDefinitionId();
 
-    List<String> serializable = new ArrayList<String>();
+    List<String> serializable = new ArrayList<>();
     serializable.add("one");
     serializable.add("two");
     serializable.add("three");
@@ -4959,7 +4960,7 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
       List<Task> actualTasks) {
 
     assertEquals(expectedProcessInstances.size(), actualTasks.size());
-    List<ProcessInstance> instances = new ArrayList<ProcessInstance>(expectedProcessInstances);
+    List<ProcessInstance> instances = new ArrayList<>(expectedProcessInstances);
 
     Collections.sort(instances, new Comparator<ProcessInstance>() {
       public int compare(ProcessInstance p1, ProcessInstance p2) {
@@ -5016,8 +5017,36 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
       task.getFormKey();
       fail("exception expected.");
     } catch (BadUserRequestException e) {
-      assertEquals("ENGINE-03052 The form key is not initialized. You must call initializeFormKeys() on the task query before you can retrieve the form key.", e.getMessage());
+      assertEquals("ENGINE-03052 The form key / form reference is not initialized. You must call initializeFormKeys() on the task query before you can retrieve the form key or the form reference.", e.getMessage());
     }
+  }
+
+  @Test
+  @Deployment
+  public void testInitializeFormKeysCamundaFormRef() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("formRefProcess");
+
+    // if initializeFormKeys
+    Task task = taskService.createTaskQuery()
+        .processInstanceId(processInstance.getId())
+        .initializeFormKeys()
+        .singleResult();
+
+    // then the form key is present
+    CamundaFormRef camundaFormRef = task.getCamundaFormRef();
+    assertThat(camundaFormRef.getKey()).isEqualTo("myForm");
+    assertThat(camundaFormRef.getBinding()).isEqualTo("latest");
+    assertThat(camundaFormRef.getVersion()).isNull();
+
+    // if NOT initializeFormKeys
+    Task task2 = taskService.createTaskQuery()
+        .processInstanceId(processInstance.getId())
+        .singleResult();
+
+    assertThatThrownBy(() -> {
+      task2.getCamundaFormRef();
+    }).isInstanceOf(BadUserRequestException.class)
+    .hasMessage("ENGINE-03052 The form key / form reference is not initialized. You must call initializeFormKeys() on the task query before you can retrieve the form key or the form reference.");
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCaseWithFormKey.cmmn"})
@@ -5351,7 +5380,7 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
    * - 1 task assigned to fozzie and to both the management and accountancy group
    */
   private List<String> generateTestTasks() throws Exception {
-    List<String> ids = new ArrayList<String>();
+    List<String> ids = new ArrayList<>();
 
     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss.SSS");
     // 6 tasks for kermit

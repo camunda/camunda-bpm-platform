@@ -97,7 +97,6 @@ import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
-import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
@@ -108,6 +107,7 @@ import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
+import org.camunda.bpm.engine.impl.form.CamundaFormRefImpl;
 import org.camunda.bpm.engine.impl.form.validator.FormFieldValidationException;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.repository.CaseDefinition;
@@ -545,6 +545,7 @@ public class TaskRestServiceInteractionTest extends
       .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .body("key", equalTo(MockProvider.EXAMPLE_FORM_KEY))
+      .body("camundaFormRef", nullValue())
       .body("contextPath", equalTo(MockProvider.EXAMPLE_PROCESS_APPLICATION_CONTEXT_PATH))
       .when().get(TASK_FORM_URL);
   }
@@ -562,6 +563,22 @@ public class TaskRestServiceInteractionTest extends
       .body("key", equalTo(MockProvider.EXAMPLE_FORM_KEY))
       .body("contextPath", nullValue())
       .when().get(TASK_FORM_URL);
+  }
+
+  @Test
+  public void testGetForm_shouldReturnFormRef() {
+    TaskFormData mockTaskFormData = MockProvider.createMockTaskFormDataUsingFormRef();
+    when(formServiceMock.getTaskFormData(EXAMPLE_TASK_ID)).thenReturn(mockTaskFormData);
+
+    given().pathParam("id", EXAMPLE_TASK_ID)
+     .header("accept", MediaType.APPLICATION_JSON)
+     .then().expect().statusCode(Status.OK.getStatusCode())
+     .body("camundaFormRef.key", equalTo(MockProvider.EXAMPLE_FORM_REF))
+     .body("camundaFormRef.binding", equalTo(MockProvider.EXAMPLE_FORM_REF_BINDING))
+     .body("camundaFormRef.version", equalTo(MockProvider.EXAMPLE_FORM_REF_VERSION))
+     .body("key", nullValue())
+     .body("contextPath", equalTo(MockProvider.EXAMPLE_PROCESS_APPLICATION_CONTEXT_PATH))
+     .when().get(TASK_FORM_URL);
   }
 
   /**
@@ -1023,7 +1040,7 @@ public class TaskRestServiceInteractionTest extends
         .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
       .when().get(FORM_VARIABLES_URL);
 
-    verify(formServiceMock, times(1)).getTaskFormVariables(EXAMPLE_TASK_ID, Arrays.asList(new String[]{"a","b","c"}), true);
+    verify(formServiceMock, times(1)).getTaskFormVariables(EXAMPLE_TASK_ID, Arrays.asList("a", "b", "c"), true);
   }
 
   @Test
@@ -1056,7 +1073,7 @@ public class TaskRestServiceInteractionTest extends
         .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
       .when().get(FORM_VARIABLES_URL);
 
-    verify(formServiceMock, times(1)).getTaskFormVariables(EXAMPLE_TASK_ID, Arrays.asList(new String[]{"a","b","c"}), false);
+    verify(formServiceMock, times(1)).getTaskFormVariables(EXAMPLE_TASK_ID, Arrays.asList("a", "b", "c"), false);
   }
 
   @Test
@@ -3293,6 +3310,25 @@ public class TaskRestServiceInteractionTest extends
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
       .body(equalTo("Test"))
+      .contentType(MediaType.APPLICATION_JSON)
+    .when()
+      .get(DEPLOYED_TASK_FORM_URL);
+
+    verify(formServiceMock).getDeployedTaskForm(MockProvider.EXAMPLE_TASK_ID);
+  }
+
+  @Test
+  public void testGetDeployedTaskFormJsonUsingFormRef() {
+    InputStream deployedFormMock = new ByteArrayInputStream("{\"id\":\"myForm\"}".getBytes());
+    when(formServiceMock.getDeployedTaskForm(anyString())).thenReturn(deployedFormMock);
+    when(mockTask.getFormKey()).thenReturn(null);
+    when(mockTask.getCamundaFormRef()).thenReturn(new CamundaFormRefImpl("myForm", "latest"));
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body(equalTo("{\"id\":\"myForm\"}"))
       .contentType(MediaType.APPLICATION_JSON)
     .when()
       .get(DEPLOYED_TASK_FORM_URL);

@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.form.CamundaFormRef;
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.impl.form.validator.FormFieldValidationException;
 import org.camunda.bpm.engine.impl.util.IoUtil;
@@ -321,7 +322,7 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
       throw new InvalidRequestException(Status.BAD_REQUEST, e, "Cannot get start form data for process definition " + processDefinitionId);
     }
     FormDto dto = FormDto.fromFormData(formData);
-    if(dto.getKey() == null || dto.getKey().isEmpty()) {
+    if((dto.getKey() == null || dto.getKey().isEmpty()) && dto.getCamundaFormRef() == null) {
       if(formData != null && formData.getFormFields() != null && !formData.getFormFields().isEmpty()) {
         dto.setKey("embedded:engine://engine/:engine/process-definition/"+processDefinitionId+"/rendered-form");
       }
@@ -433,8 +434,7 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
   public Response getDeployedStartForm() {
     try {
       InputStream deployedStartForm = engine.getFormService().getDeployedStartForm(processDefinitionId);
-      String formKey = engine.getFormService().getStartFormKey(processDefinitionId);
-      return Response.ok(deployedStartForm, ContentTypeUtil.getFormContentType(formKey)).build();
+      return Response.ok(deployedStartForm, getStartFormMediaType(processDefinitionId)).build();
     } catch (NotFoundException e) {
       throw new InvalidRequestException(Status.NOT_FOUND, e.getMessage());
     } catch (NullValueException e) {
@@ -444,5 +444,16 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
     } catch (BadUserRequestException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
     }
+  }
+
+  protected String getStartFormMediaType(String processDefinitionId) {
+    String formKey = engine.getFormService().getStartFormKey(processDefinitionId);
+    CamundaFormRef camundaFormRef = engine.getFormService().getStartFormData(processDefinitionId).getCamundaFormRef();
+    if(formKey != null) {
+      return ContentTypeUtil.getFormContentType(formKey);
+    } else if(camundaFormRef != null) {
+      return ContentTypeUtil.getFormContentType(camundaFormRef);
+    }
+    return MediaType.APPLICATION_XHTML_XML;
   }
 }

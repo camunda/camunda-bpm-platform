@@ -458,8 +458,8 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
   public BadUserRequestException uninitializedFormKeyException() {
     return new BadUserRequestException(exceptionMessage(
       "052",
-      "The form key is not initialized. You must call initializeFormKeys() on the task query before you can " +
-      "retrieve the form key."
+      "The form key / form reference is not initialized. You must call initializeFormKeys() on the task query before you can " +
+      "retrieve the form key or the form reference."
     ));
   }
 

@@ -16,6 +16,13 @@
  */
 package org.camunda.bpm.engine.rest.helper;
 
+import static org.camunda.bpm.engine.rest.util.DateTimeUtils.withTimezone;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -26,6 +33,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.engine.EntityTypes;
@@ -73,6 +81,7 @@ import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
+import org.camunda.bpm.engine.impl.form.CamundaFormRefImpl;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.persistence.entity.MetricIntervalEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
@@ -84,7 +93,13 @@ import org.camunda.bpm.engine.management.MetricsQuery;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
 import org.camunda.bpm.engine.query.PeriodUnit;
 import org.camunda.bpm.engine.query.Query;
-import org.camunda.bpm.engine.repository.*;
+import org.camunda.bpm.engine.repository.CaseDefinition;
+import org.camunda.bpm.engine.repository.DecisionDefinition;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
+import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.repository.Resource;
 import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
@@ -112,12 +127,6 @@ import org.camunda.bpm.engine.variable.value.BytesValue;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.engine.variable.value.StringValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
-import static org.camunda.bpm.engine.rest.util.DateTimeUtils.withTimezone;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * Provides mocks for the basic engine entities, such as
@@ -195,6 +204,9 @@ public abstract class MockProvider {
   public static final String EXAMPLE_FORM_KEY = "aFormKey";
   public static final String EXAMPLE_DEPLOYMENT_ID = "aDeploymentId";
   public static final String EXAMPLE_RE_DEPLOYMENT_ID = "aReDeploymentId";
+  public static final String EXAMPLE_FORM_REF = "aFormRef";
+  public static final String EXAMPLE_FORM_REF_BINDING = "version";
+  public static final int EXAMPLE_FORM_REF_VERSION = 3;
 
   // form property data
   public static final String EXAMPLE_FORM_PROPERTY_ID = "aFormPropertyId";
@@ -1025,6 +1037,20 @@ public abstract class MockProvider {
     return mockFormData;
   }
 
+  public static TaskFormData createMockTaskFormDataUsingFormRef() {
+    FormType mockFormType = mock(FormType.class);
+    when(mockFormType.getName()).thenReturn(EXAMPLE_FORM_PROPERTY_TYPE_NAME);
+
+    TaskFormData mockFormData = mock(TaskFormData.class);
+    when(mockFormData.getDeploymentId()).thenReturn(EXAMPLE_DEPLOYMENT_ID);
+
+    CamundaFormRefImpl formRef = new CamundaFormRefImpl(EXAMPLE_FORM_REF, EXAMPLE_FORM_REF_BINDING);
+    formRef.setVersion(EXAMPLE_FORM_REF_VERSION);
+    when(mockFormData.getCamundaFormRef()).thenReturn(formRef);
+
+    return mockFormData;
+  }
+
   // task comment
   public static Comment createMockTaskComment() {
     Comment mockComment = mock(Comment.class);
@@ -1158,6 +1184,20 @@ public abstract class MockProvider {
     List<FormField> mockFormFields = new ArrayList<>();
     mockFormFields.add(mockFormField);
     when(mockFormData.getFormFields()).thenReturn(mockFormFields);
+
+    return mockFormData;
+  }
+
+  public static StartFormData createMockStartFormDataUsingFormRef() {
+    FormType mockFormType = mock(FormType.class);
+    when(mockFormType.getName()).thenReturn(EXAMPLE_FORM_PROPERTY_TYPE_NAME);
+
+    StartFormData mockFormData = mock(StartFormData.class);
+    when(mockFormData.getDeploymentId()).thenReturn(EXAMPLE_DEPLOYMENT_ID);
+
+    CamundaFormRefImpl formRef = new CamundaFormRefImpl(EXAMPLE_FORM_REF, EXAMPLE_FORM_REF_BINDING);
+    formRef.setVersion(EXAMPLE_FORM_REF_VERSION);
+    when(mockFormData.getCamundaFormRef()).thenReturn(formRef);
 
     return mockFormData;
   }

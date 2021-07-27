@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import static org.camunda.bpm.engine.delegate.TaskListener.EVENTNAME_DELETE;
+import static org.camunda.bpm.engine.impl.form.handler.DefaultFormHandler.FORM_REF_BINDING_VERSION;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
@@ -40,6 +41,7 @@ import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.form.CamundaFormRef;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnExceptionHandler;
@@ -63,6 +65,7 @@ import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.HasDbReferences;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
+import org.camunda.bpm.engine.impl.form.CamundaFormRefImpl;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextListener;
@@ -153,6 +156,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   protected String eventName;
   protected boolean isFormKeyInitialized = false;
   protected String formKey;
+  protected CamundaFormRef camundaFormRef;
 
   @SuppressWarnings({ "unchecked" })
   protected transient VariableStore<VariableInstanceEntity> variableStore
@@ -1409,9 +1413,26 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     if(taskDefinitionKey != null) {
       TaskDefinition taskDefinition = getTaskDefinition();
       if(taskDefinition != null) {
+        // initialize formKey
         Expression formKey = taskDefinition.getFormKey();
         if(formKey != null) {
           this.formKey = (String) formKey.getValue(this);
+        } else {
+          // initialize form reference
+          Expression formRef = taskDefinition.getCamundaFormDefinitionKey();
+          String formRefBinding = taskDefinition.getCamundaFormDefinitionBinding();
+          Expression formRefVersion = taskDefinition.getCamundaFormDefinitionVersion();
+          if (formRef != null && formRefBinding != null) {
+            String formRefValue = (String) formRef.getValue(this);
+            if (formRefValue != null) {
+              CamundaFormRefImpl camFormRef = new CamundaFormRefImpl(formRefValue, formRefBinding);
+              if (formRefBinding.equals(FORM_REF_BINDING_VERSION) && formRefVersion != null) {
+                Integer formRefVersionValue = (Integer) formRefVersion.getValue(this);
+                camFormRef.setVersion(formRefVersionValue);
+              }
+              this.camundaFormRef = camFormRef;
+            }
+          }
         }
       }
     }
@@ -1423,6 +1444,13 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
       throw LOG.uninitializedFormKeyException();
     }
     return formKey;
+  }
+
+  public CamundaFormRef getCamundaFormRef() {
+    if(!isFormKeyInitialized) {
+      throw LOG.uninitializedFormKeyException();
+    }
+    return camundaFormRef;
   }
 
   public void setProcessDefinitionId(String processDefinitionId) {
