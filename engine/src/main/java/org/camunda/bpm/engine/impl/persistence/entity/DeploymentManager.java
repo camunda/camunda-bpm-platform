@@ -49,7 +49,6 @@ import org.camunda.bpm.engine.repository.ResourceTypes;
  */
 public class DeploymentManager extends AbstractManager {
 
-  private Object getCa;
   public void insertDeployment(DeploymentEntity deployment) {
     getDbEntityManager().insert(deployment);
     createDefaultAuthorizations(deployment);

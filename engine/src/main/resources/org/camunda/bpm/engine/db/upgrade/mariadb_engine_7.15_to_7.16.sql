@@ -21,7 +21,6 @@ values ('500', CURRENT_TIMESTAMP, '7.16.0');
 create table ACT_RE_CAMFORMDEF (
     ID_ varchar(64) not null,
     REV_ integer,
-    NAME_ varchar(255),
     KEY_ varchar(255) not null,
     VERSION_ integer not null,
     DEPLOYMENT_ID_ varchar(64),

@@ -105,35 +105,37 @@ public class CamundaFormDefinitionEntity implements CamundaFormDefinition,
 
   @Override
   public String getCategory() {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public CamundaFormDefinitionEntity getPreviousDefinition() {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public void setCategory(String category) {
+    throw new UnsupportedOperationException();
   }
 
-  // deployment of diagrams not supported for Camunda Forms
   @Override
   public String getDiagramResourceName() {
-    return null;
+    throw new UnsupportedOperationException("deployment of diagrams not supported for Camunda Forms");
   }
 
   @Override
   public void setDiagramResourceName(String diagramResourceName) {
+    throw new UnsupportedOperationException("deployment of diagrams not supported for Camunda Forms");
   }
 
   @Override
   public Integer getHistoryTimeToLive() {
-    return null;
+    throw new UnsupportedOperationException("history time to live not supported for Camunda Forms");
   }
 
   @Override
   public void setHistoryTimeToLive(Integer historyTimeToLive) {
+    throw new UnsupportedOperationException("history time to live not supported for Camunda Forms");
   }
 
   @Override
@@ -144,15 +146,17 @@ public class CamundaFormDefinitionEntity implements CamundaFormDefinition,
 
   @Override
   public void updateModifiableFieldsFromEntity(CamundaFormDefinitionEntity updatingDefinition) {
+    throw new UnsupportedOperationException("properties of Camunda Form Definitions are immutable");
   }
 
   @Override
   public String getName() {
-    return null;
+    throw new UnsupportedOperationException("name property not supported for Camunda Forms");
   }
 
   @Override
   public void setName(String name) {
+    throw new UnsupportedOperationException("name property not supported for Camunda Forms");
   }
 
 }

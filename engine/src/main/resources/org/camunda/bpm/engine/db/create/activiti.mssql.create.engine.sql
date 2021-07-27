@@ -171,7 +171,6 @@ create table ACT_RE_PROCDEF (
 create table ACT_RE_CAMFORMDEF (
     ID_ nvarchar(64) not null,
     REV_ int,
-    NAME_ nvarchar(255),
     KEY_ nvarchar(255) not null,
     VERSION_ int not null,
     DEPLOYMENT_ID_ nvarchar(64),

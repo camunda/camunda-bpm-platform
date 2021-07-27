@@ -17,7 +17,7 @@
 package org.camunda.bpm.engine.impl.form.deployer;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.AbstractDefinitionDeployer;
@@ -52,7 +52,7 @@ public class CamundaFormDefinitionDeployer extends AbstractDefinitionDeployer<Ca
       JsonObject formJsonObject = new Gson().fromJson(formContent, JsonObject.class);
       String camundaFormDefinitionKey = JsonUtil.getString(formJsonObject, "id");
       CamundaFormDefinitionEntity definition = new CamundaFormDefinitionEntity(camundaFormDefinitionKey, deployment.getId(), resource.getName(), deployment.getTenantId());
-      return Arrays.asList(definition);
+      return Collections.singletonList(definition);
     } catch (Exception e) {
       throw LOG.exceptionDuringFormParsing(e.getMessage(), resource.getName());
     }
