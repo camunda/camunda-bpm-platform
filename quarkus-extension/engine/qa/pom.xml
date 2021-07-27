@@ -19,6 +19,13 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-core-internal-dependencies</artifactId>
+        <version>${project.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+      <dependency>
         <groupId>org.jboss.arquillian</groupId>
         <artifactId>arquillian-bom</artifactId>
         <version>${arquillian.version}</version>
@@ -36,7 +43,7 @@
         <configuration>
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
           <trimStackTrace>false</trimStackTrace>
-          <argLine>-Xmx1024m</argLine>
+          <argLine>-Xmx2048m</argLine>
 
           <systemPropertyVariables>
             <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
@@ -47,13 +54,10 @@
           </dependenciesToScan>
 
           <excludes>
-            <exclude>**/DmnJuelTest.java</exclude>
-            <exclude>**/BusinessProcessContextConversationScopeTest.java</exclude>
-            <exclude>**/ThreadContextAssociationTest.java</exclude>
-            <exclude>**/MultiInstanceTest.java</exclude>
-            <exclude>**/ElTest.java</exclude>
-            <exclude>**/InjectCustomProcessEngineTest.java</exclude>
-            <exclude>**/InjectDefaultProcessEngineTest.java</exclude>
+            <!-- See https://jira.camunda.com/browse/CAM-13751 -->
+            <exclude>**/SetBeanPropertyElTest.java</exclude>
+
+            <!-- See ProgrammaticBeanLookupTest in quarkus-extension/engine/deployment module -->
             <exclude>**/ProgrammaticBeanLookupTest.java</exclude>
           </excludes>
         </configuration>
@@ -97,6 +101,12 @@
     <dependency>
       <groupId>org.jboss.arquillian.junit</groupId>
       <artifactId>arquillian-junit-container</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

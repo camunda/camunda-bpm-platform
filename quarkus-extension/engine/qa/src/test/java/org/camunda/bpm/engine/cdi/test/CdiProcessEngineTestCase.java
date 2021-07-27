@@ -40,6 +40,7 @@ import org.junit.After;
 import org.junit.Before;
 
 import javax.enterprise.inject.spi.BeanManager;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Callable;
@@ -68,7 +69,11 @@ public class CdiProcessEngineTestCase {
 
   @Before
   public void before() {
-    processEngine = BpmPlatform.getProcessEngineService().getDefaultProcessEngine();
+    Set<String> processEngineNames = BpmPlatform.getProcessEngineService()
+        .getProcessEngineNames();
+    if (processEngineNames.size() > 1) throw new RuntimeException("More than one process engines registered");
+    processEngine =
+        BpmPlatform.getProcessEngineService().getProcessEngine(processEngineNames.stream().findFirst().get());
     Arc.container().requestContext().activate();
     beanManager = Arc.container().beanManager();
     processEngineConfiguration =

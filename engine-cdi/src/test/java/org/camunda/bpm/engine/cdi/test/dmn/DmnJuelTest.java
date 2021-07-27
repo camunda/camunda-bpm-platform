@@ -23,6 +23,7 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import javax.enterprise.context.Dependent;
 import javax.inject.Named;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,11 +32,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class DmnJuelTest extends CdiProcessEngineTestCase {
 
   @Named
+  @Dependent
   public static class BeanFoo {
 
     protected String bar = "baz";
 
-    public String getBar() {
+    @Override
+    public String toString() {
       return bar;
     }
 

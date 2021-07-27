@@ -14,25 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.cdi.test.bean;
+package org.camunda.bpm.engine.cdi.test.impl.beans;
 
-import org.camunda.bpm.engine.cdi.test.impl.beans.CreditCard;
-import org.camunda.bpm.engine.cdi.test.impl.beans.ProcessScopedMessageBean;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
 
-import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
 import javax.inject.Named;
+import java.io.Serializable;
 
-// TODO: Remove with CAM-13754
-public class BusinessProcessContextTestBeans {
+@Dependent
+@Named
+public class SetProcessScopedMessageDelegate implements JavaDelegate, Serializable {
 
-  @ApplicationScoped
-  @Named("creditCard")
-  public static class QuarkusCreditCard extends CreditCard {
-  }
+  @Inject
+  protected ProcessScopedMessageBean processScopedMessageBean;
 
-  @ApplicationScoped
-  @Named("processScopedMessageBean")
-  public static class QuarkusProcessScopedMessageBean extends ProcessScopedMessageBean {
+  @Override
+  public void execute(DelegateExecution delegateExecution) {
+    processScopedMessageBean.setMessage("Greetings from Berlin");
   }
 
 }

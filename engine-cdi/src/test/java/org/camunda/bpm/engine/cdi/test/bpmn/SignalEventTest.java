@@ -37,8 +37,7 @@ import org.junit.runner.RunWith;
 
 @RunWith(Arquillian.class)
 public class SignalEventTest extends CdiProcessEngineTestCase {
-  
-  
+
   @Named
   @Dependent
   public static class SignalReceivedDelegate implements JavaDelegate {    

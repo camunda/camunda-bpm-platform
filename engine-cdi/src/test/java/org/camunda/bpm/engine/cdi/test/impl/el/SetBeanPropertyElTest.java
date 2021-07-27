@@ -14,39 +14,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.cdi.test.impl.context;
+package org.camunda.bpm.engine.cdi.test.impl.el;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.cdi.BusinessProcess;
 import org.camunda.bpm.engine.cdi.test.CdiProcessEngineTestCase;
-import org.camunda.bpm.engine.cdi.test.impl.beans.ProcessScopedMessageBean;
+import org.camunda.bpm.engine.cdi.test.impl.el.beans.DependentScopedBean;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.camunda.bpm.engine.cdi.test.impl.beans.MessageBean;
 
-/**
- * 
- * @author Daniel Meyer
- */
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.util.Arrays;
+import java.util.HashMap;
+
+import static org.junit.Assert.assertEquals;
+
 @RunWith(Arquillian.class)
-public class ThreadContextAssociationTest extends CdiProcessEngineTestCase {
-  
+public class SetBeanPropertyElTest extends CdiProcessEngineTestCase {
+
   @Test
   @Deployment
-  public void testBusinessProcessScopedWithJobExecutor() throws InterruptedException {
-    String pid = runtimeService.startProcessInstanceByKey("processkey").getId();
-        
-    waitForJobExecutorToProcessAllJobs(5000l, 25l);
-        
-    assertNull(managementService.createJobQuery().singleResult());
-    
-    ProcessScopedMessageBean messageBean = (ProcessScopedMessageBean) runtimeService.getVariable(pid, "processScopedMessageBean");
+  public void shouldSetBeanProperty() {
+    MessageBean messageBean = getBeanInstance(MessageBean.class);
+    runtimeService.startProcessInstanceByKey("setBeanProperty");
     assertEquals("Greetings from Berlin", messageBean.getMessage());
-    
-    runtimeService.signal(pid);
-    
   }
 
 }

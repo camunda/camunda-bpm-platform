@@ -5,7 +5,7 @@
 
     <startEvent id="startEvent1" />
 
-    <serviceTask id="service1" camunda:expression="${dependentScopedBean.invoke()}" />
+    <serviceTask id="service1" camunda:delegateExpression="${dependentScopedBeanDelegate}" />
 
     <endEvent id="endEvent1" />
 

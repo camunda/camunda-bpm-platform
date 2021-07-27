@@ -37,7 +37,7 @@ public class MultiInstanceTest extends CdiProcessEngineTestCase {
   public void testParallelMultiInstanceServiceTasks() {
 
     BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
-    businessProcess.setVariable("list", Arrays.asList(new String[]{"1","2"}));
+    businessProcess.setVariable("list", Arrays.asList("1","2"));
     businessProcess.startProcessByKey("miParallelScriptTask");
 
   }
