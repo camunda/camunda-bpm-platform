@@ -97,10 +97,6 @@
               </deployables>
             </configuration>
           </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-failsafe-plugin</artifactId>
-          </plugin>
         </plugins>
       </build>
     </profile>
@@ -215,6 +211,9 @@
               <dependenciesToScan>
                 <dependency>org.camunda.bpm.qa:camunda-qa-integration-tests-webapps</dependency>
               </dependenciesToScan>
+              <systemPropertyVariables>
+                <selenium.screenshot.directory>${project.build.directory}/selenium-screenshots</selenium.screenshot.directory>
+              </systemPropertyVariables>
             </configuration>
             <executions>
               <execution>

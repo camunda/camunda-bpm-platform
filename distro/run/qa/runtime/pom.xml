@@ -141,6 +141,7 @@
               </dependenciesToScan>
               <systemPropertyVariables>
                 <camunda.run.home>${run-home}</camunda.run.home>
+                <selenium.screenshot.directory>${project.build.directory}/selenium-screenshots</selenium.screenshot.directory>
               </systemPropertyVariables>
             </configuration>
             <executions>
