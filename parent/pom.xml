@@ -254,7 +254,7 @@
           <artifactId>maven-javadoc-plugin</artifactId>
           <configuration>
             <failOnError>false</failOnError>
-            <additionalparam>-Xdoclint:none</additionalparam>
+            <doclint>none</doclint>
             <quiet>true</quiet>
           </configuration>
         </plugin>
