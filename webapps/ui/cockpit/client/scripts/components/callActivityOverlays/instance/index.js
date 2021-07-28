@@ -19,11 +19,9 @@
 
 var angular = require('angular');
 const {
-  getCallActivityFlowNodes
-} = require('../callActivityOverlays/callActivityOverlay');
-const {
+  getCallActivityFlowNodes,
   addOverlayForSingleElement
-} = require('../callActivityOverlays/callActivityOverlay');
+} = require('../callActivityOverlay');
 
 module.exports = function(viewContext) {
   return [

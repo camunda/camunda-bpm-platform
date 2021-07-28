@@ -17,11 +17,10 @@
 
 'use strict';
 
-var fs = require('fs');
-const util = require('../callActivityOverlays/callActivityOverlay');
 const {
-  getCallActivityFlowNodes
-} = require('../callActivityOverlays/callActivityOverlay');
+  getCallActivityFlowNodes,
+  addOverlayForSingleElement
+} = require('../callActivityOverlay');
 
 module.exports = function() {
   return [
@@ -81,7 +80,7 @@ module.exports = function() {
                   ? callActivityToProcessMap[activity].id
                   : undefined;
                 // todo set title
-                util.addOverlayForSingleElement(
+                addOverlayForSingleElement(
                   overlaysNodes,
                   activity,
                   calledProcess,
