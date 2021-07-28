@@ -18,12 +18,12 @@
 'use strict';
 
 var fs = require('fs');
-var angular = require('angular');
-const util = require('../callActivityOverlays/callActivityOverlay')
+const util = require('../callActivityOverlays/callActivityOverlay');
+const {
+  getCallActivityFlowNodes
+} = require('../callActivityOverlays/callActivityOverlay');
 
-var template = fs.readFileSync(__dirname + '/template.html', 'utf8');
-
-module.exports = function(viewContext) {
+module.exports = function() {
   return [
     '$scope',
     '$timeout',
@@ -39,10 +39,9 @@ module.exports = function(viewContext) {
       $translate,
       search,
       control,
-      processData,
+      processData
     ) {
-
-      const redirectToCalledPInstance = function (calledProcessId) {
+      const redirectToCalledDefinition = function(calledProcessId) {
         const url =
           '/process-definition/' +
           calledProcessId +
@@ -51,40 +50,54 @@ module.exports = function(viewContext) {
         $location.url(url);
       };
 
-      const clickListener = function (buttonOverlay, applyFunction, calledProcessDefinitionId) {
+      const clickListener = function(buttonOverlay, calledProcessDefinitionId) {
         buttonOverlay.tooltip('hide');
-        return applyFunction(redirectToCalledPInstance, calledProcessDefinitionId);
+        return $scope.$apply(() =>
+          redirectToCalledDefinition(calledProcessDefinitionId)
+        );
       };
-
 
       const overlaysNodes = {};
       const overlays = control.getViewer().get('overlays');
       const elementRegistry = control.getViewer().get('elementRegistry');
-      const callActivityFlowNodes = util.getCallActivityFlowNodes(elementRegistry);
+      const callActivityFlowNodes = getCallActivityFlowNodes(elementRegistry);
 
-
-      if(callActivityFlowNodes.length) {
+      if (callActivityFlowNodes.length) {
         processData.observe(
           ['processDefinition', 'staticCalledProcessDefinitions'],
-          function (processDefinition, staticCalledProcessDefinitions) {
+          function(processDefinition, staticCalledProcessDefinitions) {
             const callActivityToProcessMap = {};
-            const drawStaticLinks = function (staticProcDefs) {
+            const drawStaticLinks = function(staticProcDefs) {
               for (const dto of staticProcDefs) {
-                dto.calledFromActivityIds.forEach(callerId => callActivityToProcessMap[callerId] = dto);
+                dto.calledFromActivityIds.forEach(
+                  callerId => (callActivityToProcessMap[callerId] = dto)
+                );
               }
+              const title = $translate.instant(
+                'PLUGIN_ACTIVITY_INSTANCE_SHOW_CALLED_PROCESS_INSTANCES'
+              );
               for (const activity of callActivityFlowNodes) {
-                if(callActivityToProcessMap[activity]){
-                  util.addOverlayForSingleElement(overlaysNodes, activity, callActivityToProcessMap[activity].id, control, clickListener, $translate,  $scope, $timeout);
-                } else {
-                  util.addOverlayForSingleElement(overlaysNodes, activity, undefined, control, clickListener, $translate, $scope, $timeout);
-                }
+                const calledProcess = callActivityToProcessMap[activity]
+                  ? callActivityToProcessMap[activity].id
+                  : undefined;
+                // todo set title
+                util.addOverlayForSingleElement(
+                  overlaysNodes,
+                  activity,
+                  calledProcess,
+                  overlays,
+                  clickListener,
+                  title,
+                  $scope,
+                  $timeout
+                );
               }
             };
+
             drawStaticLinks(staticCalledProcessDefinitions);
           }
         );
       }
-
     }
   ];
 };

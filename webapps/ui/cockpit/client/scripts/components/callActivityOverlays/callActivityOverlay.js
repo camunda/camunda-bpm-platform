@@ -1,13 +1,29 @@
+/*
+ * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. Camunda licenses this file to you under the Apache License,
+ * Version 2.0; you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 'use strict';
 const fs = require('fs');
 const angular = require('angular');
 const template = fs.readFileSync(__dirname + '/template.html', 'utf8');
 
-
 module.exports = {
   getCallActivityFlowNodes: getCallActivityFlowNodes,
   addOverlayForSingleElement: addOverlayForSingleElement
-}
+};
 
 /**
  *
@@ -36,27 +52,25 @@ function getCallActivityFlowNodes(elementRegistry) {
  * @param $scope
  * @param $timeout
  */
-function addInteractions(buttonOverlay, id, calledProcesses, clickListener, $scope, $timeout) {
+function addInteractions(
+  buttonOverlay,
+  id,
+  calledProcesses,
+  clickListener,
+  $scope,
+  $timeout
+) {
   const diagramNode = angular.element('[data-element-id="' + id + '"]');
-  let hideTimeout = null;
-
-  /**
-   * calls function dynamically and make sure to call $scope.apply
-   */
-  const applyFunction = function() {
-    arguments[0].apply(this, Array.prototype.slice.call(arguments, 1));
-    const phase = $scope.$root.$$phase;
-    if (phase !== '$apply' && phase !== '$digest') {
-      $scope.$apply();
-    }
-  };
+  let timeoutPromise = null;
 
   /**
    * hide buttonOverlay after delay time
    * @param delay
    */
-  const delayHide = function(delay) {
-    hideTimeout = $timeout(function() {
+  const hideWithDelay = function(delay) {
+    console.trace();
+    timeoutPromise = $timeout(function() {
+      console.log('hideWithDelay');
       buttonOverlay.hide();
     }, delay);
   };
@@ -65,28 +79,35 @@ function addInteractions(buttonOverlay, id, calledProcesses, clickListener, $sco
    * cancels timeout object
    */
   const cancelHide = function() {
-    return hideTimeout && $timeout.cancel(hideTimeout);
+    console.log('cancelHide', timeoutPromise);
+    console.trace();
+    return timeoutPromise && $timeout.cancel(timeoutPromise);
   };
 
-  const mouseoverListener = function() {
+  const mouseoverListener = function(e) {
     buttonOverlay.show();
-    applyFunction(cancelHide);
+    console.log(e);
+    cancelHide();
+    //$scope.$applyAsync(cancelHide);
+    //applyFunction(cancelHide);
   };
 
   // attach diagramNode listeners
-  diagramNode.on('mouseover', mouseoverListener);
-  diagramNode.on('mouseout', function() {
-    delayHide(50);
+  diagramNode.on('mouseenter', mouseoverListener);
+  diagramNode.on('mouseleave', function() {
+    hideWithDelay(50);
   });
 
   // attach buttonOverlay listeners
-  buttonOverlay.on('mouseover', mouseoverListener);
-  buttonOverlay.on('mouseout', function() {
-    delayHide(100);
+  buttonOverlay.on('mouseenter', mouseoverListener);
+  buttonOverlay.on('mouseleave', function() {
+    hideWithDelay(100);
   });
 
   if (calledProcesses) {
-    buttonOverlay.on('click', () => clickListener(buttonOverlay, applyFunction, calledProcesses));
+    buttonOverlay.on('click', () =>
+      clickListener(buttonOverlay, calledProcesses)
+    );
   } else {
     buttonOverlay.css('opacity', '0.6');
     //buttonOverlay.prop('disabled', true);
@@ -94,31 +115,36 @@ function addInteractions(buttonOverlay, id, calledProcesses, clickListener, $sco
 
   // clear listeners
   $scope.$on('$destroy', function() {
-    buttonOverlay.off('mouseover mouseout click');
-    diagramNode.off('mouseover mouseout');
+    buttonOverlay.off('mouseenter mouseleave click');
+    diagramNode.off('mouseenter mouseleave');
   });
 }
-//check outside that overlays is not set yet????
 /**
- *
  * @param {object} overlaysNodes
  * @param {string} activityId
- * @param calledProcesses
- * @param control
+ * @param {string|object} calledProcesses
+ * @param overlays
  * @param {function} clickListener
- * @param $translate
+ * @param {string} tooltipTitle
+ * @param $scope
+ * @param $timeout
  */
-function addOverlayForSingleElement(overlaysNodes, activityId, calledProcesses, control, clickListener, $translate,  $scope, $timeout) {
-  const overlays = control.getViewer().get('overlays');
-
+function addOverlayForSingleElement(
+  overlaysNodes,
+  activityId,
+  calledProcesses,
+  overlays,
+  clickListener,
+  tooltipTitle,
+  $scope,
+  $timeout
+) {
   if (!overlaysNodes[activityId]) {
     overlaysNodes[activityId] = angular.element(template).hide();
 
     overlaysNodes[activityId].tooltip({
       container: 'body',
-      title: $translate.instant(
-        'PLUGIN_ACTIVITY_INSTANCE_SHOW_CALLED_PROCESS_INSTANCES'
-      ),
+      title: tooltipTitle,
       placement: 'top',
       animation: false
     });
@@ -135,9 +161,13 @@ function addOverlayForSingleElement(overlaysNodes, activityId, calledProcesses, 
       html: overlaysNodes[activityId]
     });
 
-    addInteractions(overlaysNodes[activityId], activityId, calledProcesses, clickListener, $scope, $timeout);
-
-    //maybe just return overlay instead of passing all functions?
-
+    addInteractions(
+      overlaysNodes[activityId],
+      activityId,
+      calledProcesses,
+      clickListener,
+      $scope,
+      $timeout
+    );
   }
 }

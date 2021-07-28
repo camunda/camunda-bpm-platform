@@ -17,12 +17,13 @@
 
 'use strict';
 
-var fs = require('fs');
 var angular = require('angular');
-const {getCallActivityFlowNodes} = require("../callActivityOverlays/callActivityOverlay");
-const {addOverlayForSingleElement} = require("../callActivityOverlays/callActivityOverlay");
-
-var template = fs.readFileSync(__dirname + '/template.html', 'utf8');
+const {
+  getCallActivityFlowNodes
+} = require('../callActivityOverlays/callActivityOverlay');
+const {
+  addOverlayForSingleElement
+} = require('../callActivityOverlays/callActivityOverlay');
 
 module.exports = function(viewContext) {
   return [
@@ -46,13 +47,11 @@ module.exports = function(viewContext) {
       processDiagram,
       PluginProcessInstanceResource
     ) {
-
-
       /**
        * shows calledProcessInstances tab filtered by activityId
        * @param activities
        */
-      function showCalledPInstances(activities) {
+      function showCalledInstances(activities) {
         var params = angular.copy(search());
         viewContext === 'history'
           ? (params.detailsTab = TAB_NAME)
@@ -67,7 +66,7 @@ module.exports = function(viewContext) {
         });
       }
 
-      var redirectToCalledPInstance = function(activityInstance) {
+      var redirectToCalledInstance = function(activityInstance) {
         var url =
           '/process-instance/' +
           activityInstance.calledProcessInstanceId +
@@ -76,11 +75,11 @@ module.exports = function(viewContext) {
         $location.url(url);
       };
 
-      var clickListener = function(buttonOverlay, applyFunction, activityInstances) {
+      var clickListener = function(buttonOverlay, activityInstances) {
         buttonOverlay.tooltip('hide');
         return activityInstances.length > 1
-          ? applyFunction(showCalledPInstances, activityInstances)
-          : applyFunction(redirectToCalledPInstance, activityInstances[0]);
+          ? $scope.$apply(() => showCalledInstances(activityInstances))
+          : $scope.$apply(() => redirectToCalledInstance(activityInstances[0]));
       };
 
       var overlaysNodes = {};
@@ -89,6 +88,9 @@ module.exports = function(viewContext) {
       var TAB_NAME = 'called-process-instances-tab';
       var callActivityFlowNodes = getCallActivityFlowNodes(elementRegistry);
       var callActivityToInstancesMap = {};
+      const tooltipText = $translate.instant(
+        'PLUGIN_ACTIVITY_INSTANCE_SHOW_CALLED_PROCESS_INSTANCES'
+      );
 
       /**
        * adds the callActivity overlay to each callActivity to a processInstance
@@ -98,7 +100,16 @@ module.exports = function(viewContext) {
         Object.keys(callActivityToInstancesMap).map(function(id) {
           return (
             callActivityToInstancesMap[id][0].calledProcessInstanceId &&
-            addOverlayForSingleElement(overlaysNodes, id, callActivityToInstancesMap[id], control, clickListener, $translate, $scope, $timeout)
+            addOverlayForSingleElement(
+              overlaysNodes,
+              id,
+              callActivityToInstancesMap[id],
+              overlays,
+              clickListener,
+              tooltipText,
+              $scope,
+              $timeout
+            )
           );
         });
       };

@@ -61,8 +61,10 @@ module.exports = function(
             },
             html: nodes.html
           });
-          $scope.countOverlayIds = $scope.countOverlayIds? $scope.countOverlayIds: []
-          $scope.countOverlayIds.push(overlayId)
+          $scope.countOverlayIds = $scope.countOverlayIds
+            ? $scope.countOverlayIds
+            : [];
+          $scope.countOverlayIds.push(overlayId);
           overlaysNodes[element.id] = nodes;
         }
 
