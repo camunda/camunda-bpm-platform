@@ -113,23 +113,34 @@ module.exports = [
           ]);
 
           processData.observe(
-            ['calledProcessDefinitions', 'staticCalledProcessDefinitions', 'bpmnElements'],
-            function(calledProcessDefinitions, staticCalledProcessDefinitions, bpmnElements) {
+            [
+              'calledProcessDefinitions',
+              'staticCalledProcessDefinitions',
+              'bpmnElements'
+            ],
+            function(
+              calledProcessDefinitions,
+              staticCalledProcessDefinitions,
+              bpmnElements
+            ) {
               console.log(staticCalledProcessDefinitions);
               let staticCalled = [...staticCalledProcessDefinitions];
-              if(filter.activityIdIn && filter.activityIdIn.length) {
-                const filteredIds = new Set(filter.activityIdIn)
-                staticCalled = staticCalled.map(dto => {
-                    const newDto = angular.copy(dto)
-                    const intersection = dto.calledFromActivityIds.filter(e => filteredIds.has(e))
+              if (filter.activityIdIn && filter.activityIdIn.length) {
+                const filteredIds = new Set(filter.activityIdIn);
+                staticCalled = staticCalled
+                  .map(dto => {
+                    const newDto = angular.copy(dto);
+                    const intersection = dto.calledFromActivityIds.filter(e =>
+                      filteredIds.has(e)
+                    );
                     if (intersection.length) {
                       newDto.calledFromActivityIds = intersection;
-                      return newDto
+                      return newDto;
                     }
-                  }
-                ).filter(e => e !== undefined);
+                  })
+                  .filter(e => e !== undefined);
               }
-              let mergedDefinitions =  attachCalledFromActivities(
+              let mergedDefinitions = attachCalledFromActivities(
                 calledProcessDefinitions,
                 staticCalled,
                 bpmnElements
@@ -138,13 +149,17 @@ module.exports = [
                   label:
                     calledProcessDefinition.name || calledProcessDefinition.key
                 });
-              } );
+              });
               mergedDefinitions = mergedDefinitions.map(dto => {
-                if(mergedDefinitions.find(e => e.id !== dto.id && dto.name === e.name)){
-                  dto.label = dto.label + ":"  + dto.version;
+                if (
+                  mergedDefinitions.find(
+                    e => e.id !== dto.id && dto.name === e.name
+                  )
+                ) {
+                  dto.label = dto.label + ':' + dto.version;
                 }
                 return dto;
-              })
+              });
               $scope.calledProcessDefinitions = mergedDefinitions;
               $scope.loadingState = $scope.calledProcessDefinitions.length
                 ? 'LOADED'
@@ -159,30 +174,29 @@ module.exports = [
           ) {
             const result = [];
             /// merge todo factor out
-            const map = {}
-            runningProcessDefinitions.forEach(
-              dto => {
-                const newDto = angular.copy(dto);
-                newDto.running = "Running";
-                map[newDto.id] = newDto;
-              }
-            )
+            const map = {};
+            runningProcessDefinitions.forEach(dto => {
+              const newDto = angular.copy(dto);
+              newDto.running = 'Running';
+              map[newDto.id] = newDto;
+            });
 
-            staticCalledProcesses.forEach(
-              dto => {
-                const newDto = angular.copy(dto);
-                if(map[dto.id]){
-                  const merged = new Set([...map[newDto.id].calledFromActivityIds, ...newDto.calledFromActivityIds])
-                  map[dto.id].calledFromActivityIds = Array.from(merged).sort();
-                  map[dto.id].running = "Running and Referenced";
-                  // add static flag?
-                } else {
-                  map[newDto.id] = newDto;
-                  newDto.running = "Referenced";
-                  newDto.calledFromActivityIds.sort();
-                }
+            staticCalledProcesses.forEach(dto => {
+              const newDto = angular.copy(dto);
+              if (map[dto.id]) {
+                const merged = new Set([
+                  ...map[newDto.id].calledFromActivityIds,
+                  ...newDto.calledFromActivityIds
+                ]);
+                map[dto.id].calledFromActivityIds = Array.from(merged).sort();
+                map[dto.id].running = 'Running and Referenced';
+                // add static flag?
+              } else {
+                map[newDto.id] = newDto;
+                newDto.running = 'Referenced';
+                newDto.calledFromActivityIds.sort();
               }
-            )
+            });
 
             const definitions = Object.values(map);
 
