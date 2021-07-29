@@ -54,7 +54,7 @@ module.exports = [
           // prettier-ignore
           $scope.headColumns = [
             { class: 'process-definition', request: 'label', sortable: true, content: $translate.instant('PLUGIN_CALLED_PROCESS')},
-            { class: 'process-definition-running', request: 'running', sortable: true, content: $translate.instant('PLUGIN_CALLED_PROCESS_RUNNING')},
+            { class: 'process-definition-running', request: 'running', sortable: true, content: $translate.instant('PLUGIN_CALLED_PROCESS_STATE')},
             { class: 'activity', request: 'name', sortable: true, content: $translate.instant('PLUGIN_ACTIVITY')}
         ];
 
@@ -123,43 +123,15 @@ module.exports = [
               staticCalledProcessDefinitions,
               bpmnElements
             ) {
-              console.log(staticCalledProcessDefinitions);
-              let staticCalled = [...staticCalledProcessDefinitions];
-              if (filter.activityIdIn && filter.activityIdIn.length) {
-                const filteredIds = new Set(filter.activityIdIn);
-                staticCalled = staticCalled
-                  .map(dto => {
-                    const newDto = angular.copy(dto);
-                    const intersection = dto.calledFromActivityIds.filter(e =>
-                      filteredIds.has(e)
-                    );
-                    if (intersection.length) {
-                      newDto.calledFromActivityIds = intersection;
-                      return newDto;
-                    }
-                  })
-                  .filter(e => e !== undefined);
-              }
-              let mergedDefinitions = attachCalledFromActivities(
+              const staticCalled = applyFilterToStaticCalled([
+                ...staticCalledProcessDefinitions
+              ]);
+              let mergedDefinitions = createTableEntries(
                 calledProcessDefinitions,
                 staticCalled,
                 bpmnElements
-              ).map(function(calledProcessDefinition) {
-                return angular.extend({}, calledProcessDefinition, {
-                  label:
-                    calledProcessDefinition.name || calledProcessDefinition.key
-                });
-              });
-              mergedDefinitions = mergedDefinitions.map(dto => {
-                if (
-                  mergedDefinitions.find(
-                    e => e.id !== dto.id && dto.name === e.name
-                  )
-                ) {
-                  dto.label = dto.label + ':' + dto.version;
-                }
-                return dto;
-              });
+              );
+
               $scope.calledProcessDefinitions = mergedDefinitions;
               $scope.loadingState = $scope.calledProcessDefinitions.length
                 ? 'LOADED'
@@ -167,17 +139,21 @@ module.exports = [
             }
           );
 
-          function attachCalledFromActivities(
+          /**
+           * Merges Dtos for currently running and statically linked called processes by their id.
+           * @param runningProcessDefinitions
+           * @param staticCalledProcesses
+           * @returns {array}
+           */
+          function mergeInstanceAndDefinitionDtos(
             runningProcessDefinitions,
-            staticCalledProcesses,
-            bpmnElements
+            staticCalledProcesses
           ) {
-            const result = [];
-            /// merge todo factor out
             const map = {};
             runningProcessDefinitions.forEach(dto => {
               const newDto = angular.copy(dto);
-              newDto.running = 'Running';
+              newDto.running =
+                'PLUGIN_CALLED_PROCESS_DEFINITIONS_RUNNING_LABEL';
               map[newDto.id] = newDto;
             });
 
@@ -189,40 +165,88 @@ module.exports = [
                   ...newDto.calledFromActivityIds
                 ]);
                 map[dto.id].calledFromActivityIds = Array.from(merged).sort();
-                map[dto.id].running = 'Running and Referenced';
-                // add static flag?
+                map[dto.id].running =
+                  'PLUGIN_CALLED_PROCESS_DEFINITIONS_RUNNING_AND_REFERENCED_LABEL';
               } else {
                 map[newDto.id] = newDto;
-                newDto.running = 'Referenced';
+                newDto.running =
+                  'PLUGIN_CALLED_PROCESS_DEFINITIONS_REFERENCED_LABEL';
                 newDto.calledFromActivityIds.sort();
               }
             });
+            return Object.values(map);
+          }
 
-            const definitions = Object.values(map);
+          function applyFilterToStaticCalled(staticCalled) {
+            if (filter.activityIdIn && filter.activityIdIn.length) {
+              const filteredIds = new Set(filter.activityIdIn);
+              staticCalled = staticCalled
+                .map(dto => {
+                  const newDto = angular.copy(dto);
+                  const intersection = dto.calledFromActivityIds.filter(e =>
+                    filteredIds.has(e)
+                  );
+                  if (intersection.length) {
+                    newDto.calledFromActivityIds = intersection;
+                    return newDto;
+                  }
+                })
+                .filter(e => e !== undefined);
+            }
+            return staticCalled;
+          }
 
-            definitions.forEach(function(d) {
-              var calledFromActivityIds = d.calledFromActivityIds;
+          function createTableEntries(
+            runningProcessDefinitions,
+            staticCalledProcesses,
+            bpmnElements
+          ) {
+            let tableEntries = [];
+            const definitions = mergeInstanceAndDefinitionDtos(
+              runningProcessDefinitions,
+              staticCalledProcesses
+            );
+
+            definitions.forEach(function addCalledActivities(dto) {
+              const calledFromActivityIds = dto.calledFromActivityIds;
               const calledFromActivities = [];
 
-              angular.forEach(calledFromActivityIds, function(activityId) {
-                var bpmnElement = bpmnElements[activityId];
+              angular.forEach(
+                calledFromActivityIds,
+                function extractActivityName(activityId) {
+                  const activityBpmnElement = bpmnElements[activityId];
 
-                var activity = {
-                  id: activityId,
-                  name: (bpmnElement && bpmnElement.name) || activityId
-                };
+                  const activity = {
+                    id: activityId,
+                    name:
+                      (activityBpmnElement && activityBpmnElement.name) ||
+                      activityId
+                  };
 
-                calledFromActivities.push(activity);
-              });
+                  calledFromActivities.push(activity);
+                }
+              );
 
-              result.push(
-                angular.extend({}, d, {
-                  calledFromActivities: calledFromActivities
+              tableEntries.push(
+                angular.extend({}, dto, {
+                  calledFromActivities: calledFromActivities,
+                  label: dto.name || dto.key
                 })
               );
             });
 
-            return result;
+            tableEntries = tableEntries.map(function addVersionForDuplicateName(
+              dto
+            ) {
+              if (
+                tableEntries.find(e => e.id !== dto.id && dto.name === e.name)
+              ) {
+                dto.label = dto.label + ':' + dto.version;
+              }
+              return dto;
+            });
+
+            return tableEntries;
           }
         }
       ],

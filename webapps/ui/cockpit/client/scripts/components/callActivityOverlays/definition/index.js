@@ -74,21 +74,26 @@ module.exports = function(viewContext) {
                   callerId => (callActivityToProcessMap[callerId] = dto)
                 );
               }
-              const title = $translate.instant(
-                'PLUGIN_ACTIVITY_INSTANCE_SHOW_CALLED_PROCESS_INSTANCES'
+              const resolvable = $translate.instant(
+                'PLUGIN_ACTIVITY_DEFINITION_SHOW_CALLED_PROCESS_DEFINITION'
+              );
+              const notResolvable = $translate.instant(
+                'PLUGIN_ACTIVITY_DEFINITION_CALLED_NOT_RESOLVABLE'
               );
               for (const activity of callActivityFlowNodes) {
                 const calledProcess = callActivityToProcessMap[activity]
                   ? callActivityToProcessMap[activity].id
                   : undefined;
-                // todo set title
+
+                const toolTipTitle = calledProcess ? resolvable : notResolvable;
+
                 addOverlayForSingleElement(
                   overlaysNodes,
                   activity,
                   calledProcess,
                   overlays,
                   clickListener,
-                  title,
+                  toolTipTitle,
                   $scope,
                   $timeout
                 );
