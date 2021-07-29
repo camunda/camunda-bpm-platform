@@ -22,7 +22,7 @@ const {
   addOverlayForSingleElement
 } = require('../callActivityOverlay');
 
-module.exports = function() {
+module.exports = function(viewContext) {
   return [
     '$scope',
     '$timeout',
@@ -44,7 +44,9 @@ module.exports = function() {
         const url =
           '/process-definition/' +
           calledProcessId +
-          '/runtime?parentProcessDefinitionId=' +
+          '/' +
+          viewContext +
+          '?parentProcessDefinitionId=' +
           $scope.key;
         $location.url(url);
       };

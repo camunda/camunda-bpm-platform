@@ -17,18 +17,19 @@
 
 'use strict';
 
-var angular = require('angular');
-var camCommon = require('cam-common');
-
-var instanceCount = require('./instanceCount');
-var callActivity = require('./callActivity');
-
-var ngModule = angular.module(
-  'cockpit.plugin.base.views.definition.diagram-plugins',
-  [camCommon.name]
+const callActivityDefinitionOverlay = require('../../../../../../client/scripts/components/callActivityOverlays/definition')(
+  'runtime'
 );
 
-ngModule.config(instanceCount);
-ngModule.config(callActivity);
-
-module.exports = ngModule;
+module.exports = [
+  'ViewsProvider',
+  function(ViewsProvider) {
+    ViewsProvider.registerDefaultView(
+      'cockpit.processDefinition.diagram.plugin',
+      {
+        id: 'activity-definition-call-activity-overlay',
+        overlay: callActivityDefinitionOverlay
+      }
+    );
+  }
+];

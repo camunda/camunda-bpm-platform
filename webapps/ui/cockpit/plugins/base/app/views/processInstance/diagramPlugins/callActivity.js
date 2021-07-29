@@ -21,8 +21,6 @@ var callActivityInstanceOverlay = require('../../../../../../client/scripts/comp
   'runtime'
 );
 
-var callActivityDefinitionOverlay = require('../../../../../../client/scripts/components/callActivityOverlays/definition')();
-
 module.exports = [
   'ViewsProvider',
   function(ViewsProvider) {
@@ -31,13 +29,6 @@ module.exports = [
       {
         id: 'activity-instance-call-activity-overlay',
         overlay: callActivityInstanceOverlay
-      }
-    );
-    ViewsProvider.registerDefaultView(
-      'cockpit.processDefinition.diagram.plugin',
-      {
-        id: 'activity-definition-call-activity-overlay',
-        overlay: callActivityDefinitionOverlay
       }
     );
   }
