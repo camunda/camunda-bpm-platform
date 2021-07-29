@@ -17,6 +17,8 @@
 package org.camunda.bpm.engine.cdi.test;
 
 import io.quarkus.arc.Arc;
+import io.quarkus.arc.InjectableInstance;
+import io.quarkus.arc.InstanceHandle;
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.CaseService;
@@ -28,22 +30,17 @@ import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
-import org.camunda.bpm.engine.cdi.impl.util.ProgrammaticBeanLookup;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.junit.After;
 import org.junit.Before;
 
 import javax.enterprise.inject.spi.BeanManager;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.Callable;
 
 public class CdiProcessEngineTestCase {
 
@@ -66,6 +63,8 @@ public class CdiProcessEngineTestCase {
   protected DecisionService decisionService;
 
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
+
+  protected Set<InstanceHandle<?>> beanInstanceHandles = new HashSet<>();
 
   @Before
   public void before() {
@@ -97,6 +96,17 @@ public class CdiProcessEngineTestCase {
   public void after() {
     Arc.container().requestContext().deactivate();
 
+    beanInstanceHandles.forEach(bean -> {
+      try {
+        bean.destroy();
+      } catch (UnsupportedOperationException ignored) {
+        // Eagerly destroying InjectableBusinessProcessContext is unsupported
+        // See https://jira.camunda.com/browse/CAM-13755
+      }
+    });
+
+    beanInstanceHandles.clear();
+
     if (deploymentId != null) {
       repositoryService.deleteDeployment(deploymentId, true, true, true);
       deploymentId = null;
@@ -119,11 +129,16 @@ public class CdiProcessEngineTestCase {
   }
 
   protected <T> T getBeanInstance(Class<T> clazz) {
-    return ProgrammaticBeanLookup.lookup(clazz);
+    InjectableInstance<T> select = Arc.container().select(clazz);
+    InstanceHandle<T> handle = select.getHandle();
+    beanInstanceHandles.add(handle);
+    return handle.get();
   }
 
   protected Object getBeanInstance(String name) {
-    return ProgrammaticBeanLookup.lookup(name);
+    InstanceHandle<Object> instance = Arc.container().instance(name);
+    beanInstanceHandles.add(instance);
+    return instance.get();
   }
 
   public void deploy(Class<?> testClass, String methodName, String[] resources) {
@@ -133,83 +148,7 @@ public class CdiProcessEngineTestCase {
   }
 
   public void waitForJobExecutorToProcessAllJobs(long maxMillisToWait, long intervalMillis) {
-    JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
-    jobExecutor.start();
-
-    try {
-      Timer timer = new Timer();
-      InteruptTask task = new InteruptTask(Thread.currentThread());
-      timer.schedule(task, maxMillisToWait);
-      boolean areJobsAvailable = true;
-      try {
-        while (areJobsAvailable && !task.isTimeLimitExceeded()) {
-          Thread.sleep(intervalMillis);
-          areJobsAvailable = areJobsAvailable();
-        }
-      } catch (InterruptedException e) {
-      } finally {
-        timer.cancel();
-      }
-      if (areJobsAvailable) {
-        throw new ProcessEngineException("time limit of " + maxMillisToWait + " was exceeded");
-      }
-
-    } finally {
-      jobExecutor.shutdown();
-    }
-  }
-
-  public void waitForJobExecutorOnCondition(long maxMillisToWait, long intervalMillis, Callable<Boolean> condition) {
-    JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
-    jobExecutor.start();
-
-    try {
-      Timer timer = new Timer();
-      InteruptTask task = new InteruptTask(Thread.currentThread());
-      timer.schedule(task, maxMillisToWait);
-      boolean conditionIsViolated = true;
-      try {
-        while (conditionIsViolated) {
-          Thread.sleep(intervalMillis);
-          conditionIsViolated = !condition.call();
-        }
-      } catch (InterruptedException e) {
-      } catch (Exception e) {
-        throw new ProcessEngineException("Exception while waiting on condition: "+e.getMessage(), e);
-      } finally {
-        timer.cancel();
-      }
-      if (conditionIsViolated) {
-        throw new ProcessEngineException("time limit of " + maxMillisToWait + " was exceeded");
-      }
-
-    } finally {
-      jobExecutor.shutdown();
-    }
-  }
-
-  public boolean areJobsAvailable() {
-    return !managementService
-        .createJobQuery()
-        .executable()
-        .list()
-        .isEmpty();
-  }
-
-  private static class InteruptTask extends TimerTask {
-    protected boolean timeLimitExceeded = false;
-    protected Thread thread;
-    public InteruptTask(Thread thread) {
-      this.thread = thread;
-    }
-    public boolean isTimeLimitExceeded() {
-      return timeLimitExceeded;
-    }
-    @Override
-    public void run() {
-      timeLimitExceeded = true;
-      thread.interrupt();
-    }
+    TestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, maxMillisToWait, intervalMillis);
   }
 
 }
