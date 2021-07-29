@@ -16,14 +16,13 @@
  */
 package org.camunda.bpm.quarkus.engine.extension.deployment.impl;
 
-import static io.quarkus.arc.deployment.ContextRegistrationPhaseBuildItem.*;
+import static io.quarkus.arc.deployment.ContextRegistrationPhaseBuildItem.ContextConfiguratorBuildItem;
 import static io.quarkus.deployment.annotations.ExecutionTime.RUNTIME_INIT;
 
 import io.quarkus.arc.deployment.AdditionalBeanBuildItem;
 import io.quarkus.arc.deployment.BeanContainerBuildItem;
 import io.quarkus.arc.deployment.ContextRegistrationPhaseBuildItem;
 import io.quarkus.arc.deployment.UnremovableBeanBuildItem;
-import io.quarkus.arc.processor.DotNames;
 import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.deployment.annotations.Consume;
@@ -40,6 +39,7 @@ import org.camunda.bpm.engine.cdi.compat.FoxTaskForm;
 import org.camunda.bpm.engine.cdi.impl.ProcessVariableLocalMap;
 import org.camunda.bpm.engine.cdi.impl.ProcessVariableMap;
 import org.camunda.bpm.engine.cdi.impl.context.DefaultContextAssociationManager;
+import org.camunda.bpm.engine.cdi.impl.context.RequestScopedAssociation;
 import org.camunda.bpm.engine.cdi.jsf.TaskForm;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.quarkus.engine.extension.impl.CamundaEngineRecorder;
@@ -61,7 +61,7 @@ public class CamundaEngineProcessor {
   protected void unremovableBeans(BuildProducer<UnremovableBeanBuildItem> unremovableBeansProducer) {
     unremovableBeansProducer.produce(
         UnremovableBeanBuildItem.beanTypes(
-            DotName.createSimple(DefaultContextAssociationManager.class.getName() + "$RequestScopedAssociation")));
+            DotName.createSimple(RequestScopedAssociation.class.getName())));
     // TODO: replace Standalone with JTA configuration
     unremovableBeansProducer.produce(UnremovableBeanBuildItem.beanTypes(CdiStandaloneProcessEngineConfiguration.class));
   }
