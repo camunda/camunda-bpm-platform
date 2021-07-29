@@ -45,6 +45,7 @@ public class CamundaFormDefinitionDeploymentTest {
   protected static final String SIMPLE_FORM = "org/camunda/bpm/engine/test/form/deployment/CamundaFormDefinitionDeploymentTest.simple_form.form";
   protected static final String SIMPLE_FORM_DUPLICATE = "org/camunda/bpm/engine/test/form/deployment/CamundaFormDefinitionDeploymentTest.simple_form_duplicate.form";
   protected static final String COMPLEX_FORM = "org/camunda/bpm/engine/test/form/deployment/CamundaFormDefinitionDeploymentTest.complex_form.form";
+  protected static final String SIMPLE_BPMN = "org/camunda/bpm/engine/test/form/deployment/CamundaFormDefinitionDeploymentTest.simpleBPMN.bpmn";
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
@@ -106,19 +107,19 @@ public class CamundaFormDefinitionDeploymentTest {
   @Test
   public void shouldNotDeployTheSameFormTwiceWithDuplicateFilteringAndAdditionalResources() {
     // when
-    createDeploymentBuilder(true).addClasspathResource(SIMPLE_FORM).deploy();
+    Deployment firstDeployment = createDeploymentBuilder(true).addClasspathResource(SIMPLE_FORM).deploy();
     createDeploymentBuilder(true).addClasspathResource(SIMPLE_FORM)
-        .addClasspathResource(COMPLEX_FORM).deploy();
+        .addClasspathResource(SIMPLE_BPMN).deploy();
 
     // then
-    List<Deployment> deployments = repositoryService.createDeploymentQuery().orderByDeploymentTime().asc().list();
+    List<Deployment> deployments = repositoryService.createDeploymentQuery().list();
     assertThat(deployments).hasSize(2);
 
     List<CamundaFormDefinition> definitions = findAllCamundaFormDefinitionEntities();
-    assertThat(definitions).hasSize(2);
+    assertThat(definitions).hasSize(1);
     CamundaFormDefinition definition = definitions.get(0);
     assertThat(definition.getVersion()).isEqualTo(1);
-    assertThat(definition.getDeploymentId()).isEqualTo(deployments.get(0).getId());
+    assertThat(definition.getDeploymentId()).isEqualTo(firstDeployment.getId());
     assertThat(definition.getResourceName()).isEqualTo(SIMPLE_FORM);
   }
 
