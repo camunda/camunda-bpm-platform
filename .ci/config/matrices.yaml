@@ -5,8 +5,8 @@
 #   databases: [LIST; OPTIONAL; Doc: defines the databases to be used in the stage generation ]
 engine-webapp-unit:
   databases:
-  - 'azure_sql_db'
-  stages: 
+  - 'azure_sql_db_150'
+  stages:
   - 'db-unit'
   - 'db-unit-authorizations'
 engine-rest:
@@ -22,8 +22,8 @@ engine-rest:
   - 'engine-rest-IT-embedded-wildfly'
 daily-stages:
   databases:
-  - 'azure_sql_db'
-  stages: 
+  - 'azure_sql_db_150'
+  stages:
   - 'sql-scripts'
   - 'upgrade-database'
   - 'instance-migration'
@@ -32,7 +32,7 @@ daily-stages:
   - 'large-data-tests'
 sidetrack-stages:
   databases:
-  - 'azure_sql_db'
+  - 'azure_sql_db_150'
   #- 'cockroachdb_201'
   stages:
   - 'db-unit'
