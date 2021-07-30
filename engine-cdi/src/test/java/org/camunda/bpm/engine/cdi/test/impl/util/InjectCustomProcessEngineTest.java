@@ -43,7 +43,7 @@ public class InjectCustomProcessEngineTest extends CdiProcessEngineTestCase {
   @Before
   public void init() {
     processEngine = TestHelper.getProcessEngine("org/camunda/bpm/engine/cdi/test/impl/util/camunda.cfg.xml");
-    ProcessEngine defaultProcessEngine = BpmPlatform.getProcessEngineService().getDefaultProcessEngine();
+    defaultProcessEngine = BpmPlatform.getProcessEngineService().getDefaultProcessEngine();
 
     if (defaultProcessEngine != null) {
       RuntimeContainerDelegate.INSTANCE.get().unregisterProcessEngine(defaultProcessEngine);

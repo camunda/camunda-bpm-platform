@@ -43,7 +43,7 @@ public class InjectDefaultProcessEngineTest extends CdiProcessEngineTestCase {
   @Before
   public void init() {
     processEngine = TestHelper.getProcessEngine("activiti.cfg.xml");
-    ProcessEngine defaultProcessEngine = BpmPlatform.getProcessEngineService().getDefaultProcessEngine();
+    defaultProcessEngine = BpmPlatform.getProcessEngineService().getDefaultProcessEngine();
 
     if (defaultProcessEngine != null) {
       RuntimeContainerDelegate.INSTANCE.get().unregisterProcessEngine(defaultProcessEngine);
