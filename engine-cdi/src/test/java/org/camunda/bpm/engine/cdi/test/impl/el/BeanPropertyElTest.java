@@ -16,29 +16,18 @@
  */
 package org.camunda.bpm.engine.cdi.test.impl.el;
 
-import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.cdi.BusinessProcess;
 import org.camunda.bpm.engine.cdi.test.CdiProcessEngineTestCase;
-import org.camunda.bpm.engine.cdi.test.impl.el.beans.DependentScopedBean;
-import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.delegate.JavaDelegate;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.cdi.test.impl.beans.MessageBean;
 import org.camunda.bpm.engine.test.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.camunda.bpm.engine.cdi.test.impl.beans.MessageBean;
-
-import javax.enterprise.context.Dependent;
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.util.Arrays;
-import java.util.HashMap;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 @RunWith(Arquillian.class)
-public class SetBeanPropertyElTest extends CdiProcessEngineTestCase {
+public class BeanPropertyElTest extends CdiProcessEngineTestCase {
 
   @Test
   @Deployment
@@ -46,6 +35,17 @@ public class SetBeanPropertyElTest extends CdiProcessEngineTestCase {
     MessageBean messageBean = getBeanInstance(MessageBean.class);
     runtimeService.startProcessInstanceByKey("setBeanProperty");
     assertEquals("Greetings from Berlin", messageBean.getMessage());
+  }
+
+  @Test
+  @Deployment
+  public void shouldGetBeanProperty() {
+    MessageBean messageBean = getBeanInstance(MessageBean.class);
+    messageBean.setMessage("Greetings from Berlin");
+    runtimeService.startProcessInstanceByKey("getBeanProperty");
+
+    messageBean = getBeanInstance(MessageBean.class);
+    assertNull(messageBean.getMessage());
   }
 
 }
