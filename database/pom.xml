@@ -118,6 +118,7 @@
             <username>${database.username}</username>
             <password>${database.password}</password>
             <hubMode>off</hubMode>
+            <promptOnNonLocalDatabase>false</promptOnNonLocalDatabase>
           </configuration>
         </plugin>
       </plugins>
