@@ -30,6 +30,7 @@
     <version.db2-10.5>10.5.0.5</version.db2-10.5>
     <version.db2>${version.db2-10.5}</version.db2>
     <version.postgresql>42.1.0</version.postgresql>
+    <version.liquibase>4.4.0</version.liquibase>
 
     <!-- CockroachDB is compatible with PostgreSQL 9.5,
     so a different version of the JDBC driver needs to be used -->
@@ -105,6 +106,18 @@
             <url>${database.url}</url>
             <username>${database.username}</username>
             <password>${database.password}</password>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.liquibase</groupId>
+          <artifactId>liquibase-maven-plugin</artifactId>
+          <version>${version.liquibase}</version>
+          <configuration>
+            <driver>${database.driver}</driver>
+            <url>${database.url}</url> 
+            <username>${database.username}</username>
+            <password>${database.password}</password>
+            <hubMode>off</hubMode>
           </configuration>
         </plugin>
       </plugins>
