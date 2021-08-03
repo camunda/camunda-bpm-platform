@@ -16,13 +16,19 @@
  */
 package org.camunda.bpm.engine.impl.util;
 
+import static org.camunda.bpm.engine.impl.ProcessEngineLogger.UTIL_LOGGER;
+
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.model.BaseCallableElement;
+import org.camunda.bpm.engine.impl.el.StartProcessVariableScope;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 
 /**
  * @author Roman Smirnov
@@ -40,9 +46,46 @@ public class CallableElementUtil {
     String processDefinitionKey = callableElement.getDefinitionKey(execution);
     String tenantId = callableElement.getDefinitionTenantId(execution);
 
+    return getCalledProcessDefinition(execution, callableElement, processDefinitionKey, tenantId);
+  }
+
+  public static ProcessDefinition getStaticallyBoundProcessDefinition(
+      String callingProcessDefinitionId,
+      String activityId,
+      BaseCallableElement callableElement,
+      String tenantId) {
+    if(callableElement.hasDynamicReferences()){
+      return null;
+    }
+
+    VariableScope emptyVariableScope = StartProcessVariableScope.getSharedInstance();
+
+    String targetTenantId = tenantId;
+    try {
+      targetTenantId = callableElement.getDefinitionTenantId(emptyVariableScope);
+    } catch (Exception ex) {
+      // no tenant id found, let's keep using the calling process' tenant id
+      // https://docs.camunda.org/manual/7.15/reference/bpmn20/subprocesses/call-activity/#calledelement-tenant-id
+    }
+
+    try {
+      String processDefinitionKey = callableElement.getDefinitionKey(emptyVariableScope);
+      return getCalledProcessDefinition(emptyVariableScope, callableElement, processDefinitionKey, targetTenantId);
+    } catch (ProcessEngineException e) {
+      UTIL_LOGGER.debugCouldNotResolveCallableElement(callingProcessDefinitionId, activityId, e);
+      return null;
+    }
+  }
+
+  private static ProcessDefinitionEntity getCalledProcessDefinition(
+    VariableScope execution,
+    BaseCallableElement callableElement,
+    String processDefinitionKey,
+    String tenantId) {
+
     DeploymentCache deploymentCache = getDeploymentCache();
 
-    ProcessDefinitionImpl processDefinition = null;
+    ProcessDefinitionEntity processDefinition = null;
 
     if (callableElement.isLatestBinding()) {
       processDefinition = deploymentCache.findDeployedLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);

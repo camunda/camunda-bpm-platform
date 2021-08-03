@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine;
 
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -43,6 +44,7 @@ import org.camunda.bpm.engine.repository.ProcessApplicationDeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.repository.Resource;
+import org.camunda.bpm.engine.repository.CalledProcessDefinition;
 import org.camunda.bpm.engine.repository.UpdateProcessDefinitionSuspensionStateBuilder;
 import org.camunda.bpm.engine.repository.UpdateProcessDefinitionSuspensionStateSelectBuilder;
 import org.camunda.bpm.engine.task.IdentityLink;
@@ -796,5 +798,21 @@ public interface RepositoryService {
    */
   InputStream getDecisionRequirementsDiagram(String decisionRequirementsDefinitionId);
 
+  /**
+   * For the given process, returns a list of {@link CalledProcessDefinition}.
+   * The list contains all processes that are referenced statically by call activities in the given process.
+   * This method does not resolve process definitions that are referenced with expressions.
+   * Each {@link CalledProcessDefinition} contains a list of call activity ids, which specifies the call activities
+   * that are calling that process.
+   * This method does not resolve references to case definitions.
+   *
+   * @param processDefinitionId id of a {@link ProcessDefinition}
+   * @return a list of {@link CalledProcessDefinition}.
+   *
+   * @throws ProcessEngineException
+   *          When the process definition doesn't exist.
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_DEFINITION}.
+   */
+  Collection<CalledProcessDefinition> getStaticCalledProcessDefinitions(String processDefinitionId);
 }
-
