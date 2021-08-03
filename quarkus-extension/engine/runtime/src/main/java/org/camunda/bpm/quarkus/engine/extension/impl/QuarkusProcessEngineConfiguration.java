@@ -16,14 +16,52 @@
  */
 package org.camunda.bpm.quarkus.engine.extension.impl;
 
-import org.camunda.bpm.engine.cdi.CdiStandaloneProcessEngineConfiguration;
+import org.camunda.bpm.engine.cdi.CdiJtaProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.interceptor.CommandContextInterceptor;
+import org.camunda.bpm.engine.impl.interceptor.CommandCounterInterceptor;
+import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
+import org.camunda.bpm.engine.impl.interceptor.JtaTransactionInterceptor;
+import org.camunda.bpm.engine.impl.interceptor.LogInterceptor;
 import org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator;
 
-// TODO: extend CdiJtaProcessEngineConfiguration when Agroal support is added
-public class QuarkusProcessEngineConfiguration extends CdiStandaloneProcessEngineConfiguration {
+import javax.transaction.TransactionManager;
+import java.util.ArrayList;
+import java.util.List;
 
+public class QuarkusProcessEngineConfiguration extends CdiJtaProcessEngineConfiguration {
+
+  /**
+   * Default values.
+   */
   public QuarkusProcessEngineConfiguration() {
     setJobExecutorActivate(true);
+
+    setJdbcUrl(null);
+    setJdbcUsername(null);
+    setJdbcPassword(null);
+    setJdbcDriver(null);
+    setDatabaseSchemaUpdate(DB_SCHEMA_UPDATE_TRUE); // automatic schema update
+    setTransactionsExternallyManaged(true);
+
     setIdGenerator(new StrongUuidGenerator());
   }
+
+  /**
+   * We need to make sure, that the root command always calls {@link TransactionManager#begin} in its interceptor chain
+   * since Agroal does not support deferred/lazy enlistment. This is why we override this method to add
+   * the {@link JtaTransactionInterceptor} to the interceptor chain.
+   */
+  @Override
+  protected void initCommandExecutorDbSchemaOperations() {
+    if (commandExecutorSchemaOperations == null) {
+      List<CommandInterceptor> commandInterceptorsDbSchemaOperations = new ArrayList<>();
+      commandInterceptorsDbSchemaOperations.add(new LogInterceptor());
+      commandInterceptorsDbSchemaOperations.add(new CommandCounterInterceptor(this));
+      commandInterceptorsDbSchemaOperations.add(new JtaTransactionInterceptor(transactionManager, false, this));
+      commandInterceptorsDbSchemaOperations.add(new CommandContextInterceptor(dbSchemaOperationsCommandContextFactory, this));
+      commandInterceptorsDbSchemaOperations.add(actualCommandExecutor);
+      commandExecutorSchemaOperations = initInterceptorChain(commandInterceptorsDbSchemaOperations);
+    }
+  }
+
 }

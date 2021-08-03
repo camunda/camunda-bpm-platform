@@ -20,6 +20,8 @@ import io.quarkus.runtime.annotations.ConfigItem;
 import io.quarkus.runtime.annotations.ConfigPhase;
 import io.quarkus.runtime.annotations.ConfigRoot;
 
+import java.util.Optional;
+
 @ConfigRoot(phase = ConfigPhase.RUN_TIME, name = "camunda.bpm")
 public class CamundaEngineConfig {
 
@@ -31,5 +33,11 @@ public class CamundaEngineConfig {
    */
   @ConfigItem
   public CamundaJobExecutorConfig jobExecutor;
+
+  /**
+   * Select a datasource by name or the default datasource is used.
+   */
+  @ConfigItem
+  public Optional<String> datasource;
 
 }

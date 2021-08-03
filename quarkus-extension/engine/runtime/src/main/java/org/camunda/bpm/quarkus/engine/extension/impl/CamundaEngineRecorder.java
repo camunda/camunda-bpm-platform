@@ -16,17 +16,14 @@
  */
 package org.camunda.bpm.quarkus.engine.extension.impl;
 
-import javax.enterprise.inject.spi.BeanManager;
-import java.util.ArrayList;
-import java.util.List;
-
+import io.agroal.api.AgroalDataSource;
+import io.quarkus.agroal.runtime.DataSources;
 import io.quarkus.arc.runtime.BeanContainer;
 import io.quarkus.runtime.RuntimeValue;
 import io.quarkus.runtime.ShutdownContext;
 import io.quarkus.runtime.annotations.Recorder;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.cdi.CdiStandaloneProcessEngineConfiguration;
 import org.camunda.bpm.engine.cdi.impl.event.CdiEventSupportBpmnParseListener;
 import org.camunda.bpm.engine.cdi.impl.util.BeanManagerLookup;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
@@ -34,11 +31,15 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.eclipse.microprofile.context.ManagedExecutor;
 
+import javax.enterprise.inject.spi.BeanManager;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.arjuna.ats.jta.TransactionManager.transactionManager;
+import static io.quarkus.datasource.common.runtime.DataSourceUtil.DEFAULT_DATASOURCE_NAME;
+
 @Recorder
 public class CamundaEngineRecorder {
-
-  protected static final String DEFAULT_JDBC_URL =
-      "jdbc:h2:mem:camunda;MVCC=TRUE;TRACE_LEVEL_FILE=0;DB_CLOSE_ON_EXIT=FALSE";
 
   public void configureProcessEngineCdiBeans(BeanContainer beanContainer) {
 
@@ -47,23 +48,25 @@ public class CamundaEngineRecorder {
     }
   }
 
-  public RuntimeValue<ProcessEngineConfigurationImpl> createProcessEngineConfiguration(
-      BeanContainer beanContainer,
-      CamundaEngineConfig camundaEngineConfig) {
+  public RuntimeValue<ProcessEngineConfigurationImpl> createProcessEngineConfiguration(BeanContainer beanContainer,
+                                                                                       CamundaEngineConfig config) {
+    QuarkusProcessEngineConfiguration configuration = beanContainer.instance(QuarkusProcessEngineConfiguration.class);
 
-    ProcessEngineConfigurationImpl configuration =
-        beanContainer.instance(QuarkusProcessEngineConfiguration.class);
+    if (configuration.getDataSource() == null) {
+      String datasource = config.datasource.orElse(null);
+      configureDatasource(configuration, datasource);
+    }
 
-    // TODO: replace hardcoded DB configuration with Agroal code
-    configuration.setJdbcUrl(DEFAULT_JDBC_URL);
-    configuration.setDatabaseSchemaUpdate("true");
+    if (configuration.getTransactionManager() == null) {
+      configuration.setTransactionManager(transactionManager());
+    }
 
     // configure job executor,
     // if not already configured by a custom configuration
     if (configuration.getJobExecutor() == null) {
 
-      int maxPoolSize = camundaEngineConfig.jobExecutor.threadPool.maxPoolSize;
-      int queueSize = camundaEngineConfig.jobExecutor.threadPool.queueSize;
+      int maxPoolSize = config.jobExecutor.threadPool.maxPoolSize;
+      int queueSize = config.jobExecutor.threadPool.queueSize;
 
       // create a non-bean ManagedExecutor instance. This instance
       // delegates tasks to the Quarkus core Executor/thread pool.
@@ -72,11 +75,28 @@ public class CamundaEngineRecorder {
           .maxAsync(maxPoolSize)
           .build();
 
-      ManagedJobExecutor quarkusJobExecutor
-          = new ManagedJobExecutor(managedExecutor, camundaEngineConfig);
+      ManagedJobExecutor quarkusJobExecutor = new ManagedJobExecutor(managedExecutor, config);
       configuration.setJobExecutor(quarkusJobExecutor);
     }
 
+    configureCdiEventBridge(configuration);
+
+    return new RuntimeValue<>(configuration);
+  }
+
+  protected void configureDatasource(QuarkusProcessEngineConfiguration configuration, String datasourceName) {
+    AgroalDataSource dataSource = null;
+    if (datasourceName != null) {
+      dataSource = DataSources.fromName(datasourceName);
+
+    } else {
+      dataSource = DataSources.fromName(DEFAULT_DATASOURCE_NAME);
+
+    }
+    configuration.setDataSource(dataSource);
+  }
+
+  protected void configureCdiEventBridge(QuarkusProcessEngineConfiguration configuration) {
     List<BpmnParseListener> postBPMNParseListeners = configuration.getCustomPostBPMNParseListeners();
     if (postBPMNParseListeners == null) {
       ArrayList<BpmnParseListener> parseListeners = new ArrayList<>();
@@ -87,8 +107,6 @@ public class CamundaEngineRecorder {
       postBPMNParseListeners.add(new CdiEventSupportBpmnParseListener());
 
     }
-
-    return new RuntimeValue<>(configuration);
   }
 
   public RuntimeValue<ProcessEngine> createProcessEngine(

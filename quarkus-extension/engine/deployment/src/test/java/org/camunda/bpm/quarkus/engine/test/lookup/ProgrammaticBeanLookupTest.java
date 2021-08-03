@@ -17,6 +17,7 @@
 package org.camunda.bpm.quarkus.engine.test.lookup;
 
 import io.quarkus.test.QuarkusUnitTest;
+import org.camunda.bpm.quarkus.engine.test.helper.ProcessEngineAwareExtension;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.Disabled;
@@ -39,7 +40,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ProgrammaticBeanLookupTest {
 
   @RegisterExtension
-  static final QuarkusUnitTest unitTest = new QuarkusUnitTest()
+  static final QuarkusUnitTest unitTest = new ProcessEngineAwareExtension()
       .withConfigurationResource("application.properties")
       .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class)
           .addClass(TestBean.class)

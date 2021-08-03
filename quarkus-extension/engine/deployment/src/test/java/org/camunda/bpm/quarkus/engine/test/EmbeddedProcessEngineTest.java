@@ -22,6 +22,7 @@ import javax.inject.Inject;
 
 import io.quarkus.test.QuarkusUnitTest;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.quarkus.engine.test.helper.ProcessEngineAwareExtension;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.Test;
@@ -30,7 +31,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 public class EmbeddedProcessEngineTest {
 
   @RegisterExtension
-  protected static final QuarkusUnitTest unitTest = new QuarkusUnitTest()
+  protected static final QuarkusUnitTest unitTest = new ProcessEngineAwareExtension()
       .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class));
 
   @Inject

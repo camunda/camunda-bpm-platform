@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.quarkus.engine.test.helper.ProcessEngineAwareExtension;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.Test;
@@ -34,7 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class DefaultIdGeneratorTest {
 
   @RegisterExtension
-  static final QuarkusUnitTest unitTest = new QuarkusUnitTest()
+  static final QuarkusUnitTest unitTest = new ProcessEngineAwareExtension()
       .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class));
 
 
