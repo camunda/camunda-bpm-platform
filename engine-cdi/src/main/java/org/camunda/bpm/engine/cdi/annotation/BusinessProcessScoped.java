@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.cdi.annotation;
 
+import java.io.Serializable;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -23,14 +24,15 @@ import java.lang.annotation.Target;
 
 import javax.enterprise.context.ConversationScoped;
 import javax.enterprise.context.RequestScoped;
-import javax.enterprise.inject.spi.PassivationCapable;
 
 /**
  * Declare a bean to be BusinessProcessScoped. Instances of
  * BusinessProcessScoped beans are stored as process variables in a
  * ProcessInstance.
  * <p />
- * Note: BusinessProcessScoped beans need to be {@link PassivationCapable}.
+ * Note: {@code @BusinessProcessScoped} bean instances must be "passivation capable", 
+ *       meaning the bean defining classes must implement the {@link Serializable} 
+ *       interface and their references (dependencies) must be "passivation capable" as well.
  * <p />
  * Note: BusinessProcessScoped is not capable of managing local process variables,
  * and there is currently also no respective other implementation for that. Please use
