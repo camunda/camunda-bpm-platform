@@ -77,7 +77,6 @@ module.exports = function(pluginDependencies) {
     '$locationProvider',
     '$animateProvider',
     '$qProvider',
-    '$compileProvider',
     function(
       $routeProvider,
       UriProvider,

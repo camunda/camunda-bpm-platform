@@ -398,7 +398,7 @@ var Controller = [
         ) {
           return camAPI
             .resource('process-definition')
-            .linkedCallableElements(processDefinition.id);
+            .staticCalledProcessDefinitions(processDefinition.id);
         } else {
           return [];
         }

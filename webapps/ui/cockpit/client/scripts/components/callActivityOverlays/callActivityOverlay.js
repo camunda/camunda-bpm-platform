@@ -68,9 +68,7 @@ function addInteractions(
    * @param delay
    */
   const hideWithDelay = function(delay) {
-    console.trace();
     timeoutPromise = $timeout(function() {
-      console.log('hideWithDelay');
       buttonOverlay.hide();
     }, delay);
   };
@@ -79,17 +77,12 @@ function addInteractions(
    * cancels timeout object
    */
   const cancelHide = function() {
-    console.log('cancelHide', timeoutPromise);
-    console.trace();
     return timeoutPromise && $timeout.cancel(timeoutPromise);
   };
 
-  const mouseoverListener = function(e) {
-    buttonOverlay.show();
-    console.log(e);
+  const mouseoverListener = function() {
     cancelHide();
-    //$scope.$applyAsync(cancelHide);
-    //applyFunction(cancelHide);
+    buttonOverlay.show();
   };
 
   // attach diagramNode listeners
