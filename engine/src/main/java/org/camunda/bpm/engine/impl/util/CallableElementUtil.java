@@ -49,7 +49,11 @@ public class CallableElementUtil {
     return getCalledProcessDefinition(execution, callableElement, processDefinitionKey, tenantId);
   }
 
-  public static ProcessDefinition getStaticallyBoundProcessDefinition(BaseCallableElement callableElement, String tenantId) {
+  public static ProcessDefinition getStaticallyBoundProcessDefinition(
+      String callingProcessDefinitionId,
+      String activityId,
+      BaseCallableElement callableElement,
+      String tenantId) {
     if(callableElement.hasDynamicReferences()){
       return null;
     }
@@ -64,11 +68,11 @@ public class CallableElementUtil {
       // https://docs.camunda.org/manual/7.15/reference/bpmn20/subprocesses/call-activity/#calledelement-tenant-id
     }
 
-    String processDefinitionKey = callableElement.getDefinitionKey(emptyVariableScope);
     try {
+      String processDefinitionKey = callableElement.getDefinitionKey(emptyVariableScope);
       return getCalledProcessDefinition(emptyVariableScope, callableElement, processDefinitionKey, targetTenantId);
     } catch (ProcessEngineException e) {
-      UTIL_LOGGER.debugCouldNotResolveCallableElement(e);
+      UTIL_LOGGER.debugCouldNotResolveCallableElement(callingProcessDefinitionId, activityId, e);
       return null;
     }
   }

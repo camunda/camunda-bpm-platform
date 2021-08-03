@@ -55,7 +55,7 @@ public class GetStaticCalledProcessDefinitionCmd implements Command<Collection<C
     List<ActivityImpl> callActivities = activities.stream()
       .filter(act -> act.getActivityBehavior() instanceof CallActivityBehavior).collect(Collectors.toList());
 
-    Map<String, CalledProcessDefinitionImpl> map = new HashMap<>();
+    Map<String, CalledProcessDefinitionImpl> calledProcessDefinitionsById = new HashMap<>();
 
     for (ActivityImpl activity : callActivities) {
       CallActivityBehavior behavior = (CallActivityBehavior) activity.getActivityBehavior();
@@ -63,10 +63,14 @@ public class GetStaticCalledProcessDefinitionCmd implements Command<Collection<C
       String activityId = activity.getActivityId();
 
       String tenantId = processDefinition.getTenantId();
-      ProcessDefinition calledProcess = CallableElementUtil.getStaticallyBoundProcessDefinition(callableElement, tenantId);
+      ProcessDefinition calledProcess = CallableElementUtil.getStaticallyBoundProcessDefinition(
+          processDefinitionId,
+          activityId,
+          callableElement,
+          tenantId);
 
       if (calledProcess != null) {
-        if (!map.containsKey(calledProcess.getId())) {
+        if (!calledProcessDefinitionsById.containsKey(calledProcess.getId())) {
           try {
             for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
               checker.checkReadProcessDefinition(calledProcess);
@@ -74,17 +78,17 @@ public class GetStaticCalledProcessDefinitionCmd implements Command<Collection<C
             CalledProcessDefinitionImpl result = new CalledProcessDefinitionImpl(calledProcess, processDefinitionId);
             result.addCallingCallActivity(activityId);
 
-            map.put(calledProcess.getId(), result);
+            calledProcessDefinitionsById.put(calledProcess.getId(), result);
           } catch (AuthorizationException e) {
             // unauthorized Process definitions will not be added.
             CMD_LOGGER.debugNotAllowedToResolveCalledProcess(calledProcess.getId(), processDefinitionId, activityId, e);
           }
 
         } else {
-          map.get(calledProcess.getId()).addCallingCallActivity(activityId);
+          calledProcessDefinitionsById.get(calledProcess.getId()).addCallingCallActivity(activityId);
         }
       }
     }
-    return new ArrayList<>(map.values());
+    return new ArrayList<>(calledProcessDefinitionsById.values());
   }
 }
