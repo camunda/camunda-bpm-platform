@@ -34,6 +34,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * This test is copied and adjusted from the engine-cdi module to work with Quarkus.
+ * See https://jira.camunda.com/browse/CAM-13747 for the reasoning.
  */
 public class ProgrammaticBeanLookupTest {
 
