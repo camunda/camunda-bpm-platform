@@ -5362,13 +5362,42 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
   @Test
   public void testQueryByProcessInstanceIdInNonExisting() {
     // given
-    runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
     // when
     List<Task> tasks = taskService.createTaskQuery().processInstanceIdIn("nonexisting").list();
 
     // then
     assertThat(tasks.size()).isZero();
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/task/TaskQueryTest.shouldContainCamundaFormRefIfInitialized.bpmn")
+  @Test
+  public void shouldContainCamundaFormRefIfInitialized() {
+    // given
+    String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskFormRefVersion").getId();
+
+    // when
+    List<Task> withoutFormKeys = taskService.createTaskQuery().processInstanceId(processInstanceId).list();
+    List<Task> withFormKeys = taskService.createTaskQuery().processInstanceId(processInstanceId).initializeFormKeys().list();
+
+    // then
+    assertThat(withoutFormKeys).hasSize(1);
+    assertThat(withFormKeys).hasSize(1);
+
+    Task taskWithoutFormKey = withoutFormKeys.get(0);
+    assertThatThrownBy(() -> {
+      taskWithoutFormKey.getCamundaFormRef();
+    }).isInstanceOf(BadUserRequestException.class)
+    .hasMessage("ENGINE-03052 The form key / form reference is not initialized. You must call initializeFormKeys() on the task query before you can retrieve the form key or the form reference.");
+
+    Task taskWithFormKey = withFormKeys.get(0);
+    CamundaFormRef camundaFormRefWithFormKey = taskWithFormKey.getCamundaFormRef();
+
+    assertThat(camundaFormRefWithFormKey).isNotNull();
+    assertThat(camundaFormRefWithFormKey.getKey()).isEqualTo("key");
+    assertThat(camundaFormRefWithFormKey.getBinding()).isEqualTo("version");
+    assertThat(camundaFormRefWithFormKey.getVersion()).isEqualTo(3);
   }
 
   /**

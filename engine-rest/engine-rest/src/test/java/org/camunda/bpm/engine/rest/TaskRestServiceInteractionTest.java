@@ -550,6 +550,19 @@ public class TaskRestServiceInteractionTest extends
       .when().get(TASK_FORM_URL);
   }
 
+  @Test
+  public void testGetTaskshouldContainCamundaFormRef() {
+    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("camundaFormRef.key", equalTo(MockProvider.EXAMPLE_FORM_KEY))
+        .body("camundaFormRef.binding", equalTo(MockProvider.EXAMPLE_FORM_REF_BINDING))
+        .body("camundaFormRef.version", equalTo(MockProvider.EXAMPLE_FORM_REF_VERSION))
+        .body("key", nullValue())
+      .when().get(SINGLE_TASK_URL);
+  }
+
   /**
    * Assuming the task belongs to a deployment that does not belong to any process application
    */
@@ -572,12 +585,13 @@ public class TaskRestServiceInteractionTest extends
 
     given().pathParam("id", EXAMPLE_TASK_ID)
      .header("accept", MediaType.APPLICATION_JSON)
-     .then().expect().statusCode(Status.OK.getStatusCode())
-     .body("camundaFormRef.key", equalTo(MockProvider.EXAMPLE_FORM_REF))
-     .body("camundaFormRef.binding", equalTo(MockProvider.EXAMPLE_FORM_REF_BINDING))
-     .body("camundaFormRef.version", equalTo(MockProvider.EXAMPLE_FORM_REF_VERSION))
-     .body("key", nullValue())
-     .body("contextPath", equalTo(MockProvider.EXAMPLE_PROCESS_APPLICATION_CONTEXT_PATH))
+     .then().expect()
+       .statusCode(Status.OK.getStatusCode())
+       .body("camundaFormRef.key", equalTo(MockProvider.EXAMPLE_FORM_KEY))
+       .body("camundaFormRef.binding", equalTo(MockProvider.EXAMPLE_FORM_REF_BINDING))
+       .body("camundaFormRef.version", equalTo(MockProvider.EXAMPLE_FORM_REF_VERSION))
+       .body("key", nullValue())
+       .body("contextPath", equalTo(MockProvider.EXAMPLE_PROCESS_APPLICATION_CONTEXT_PATH))
      .when().get(TASK_FORM_URL);
   }
 

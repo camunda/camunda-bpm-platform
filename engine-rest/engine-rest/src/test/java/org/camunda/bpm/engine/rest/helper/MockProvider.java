@@ -204,7 +204,6 @@ public abstract class MockProvider {
   public static final String EXAMPLE_FORM_KEY = "aFormKey";
   public static final String EXAMPLE_DEPLOYMENT_ID = "aDeploymentId";
   public static final String EXAMPLE_RE_DEPLOYMENT_ID = "aReDeploymentId";
-  public static final String EXAMPLE_FORM_REF = "aFormRef";
   public static final String EXAMPLE_FORM_REF_BINDING = "version";
   public static final int EXAMPLE_FORM_REF_VERSION = 3;
 
@@ -986,6 +985,7 @@ public abstract class MockProvider {
       .caseInstanceId(EXAMPLE_CASE_INSTANCE_ID)
       .caseExecutionId(EXAMPLE_CASE_EXECUTION_ID)
       .formKey(EXAMPLE_FORM_KEY)
+      .camundaFormRef(EXAMPLE_FORM_KEY, EXAMPLE_FORM_REF_BINDING, EXAMPLE_FORM_REF_VERSION)
       .tenantId(EXAMPLE_TENANT_ID);
   }
 
@@ -1044,7 +1044,7 @@ public abstract class MockProvider {
     TaskFormData mockFormData = mock(TaskFormData.class);
     when(mockFormData.getDeploymentId()).thenReturn(EXAMPLE_DEPLOYMENT_ID);
 
-    CamundaFormRefImpl formRef = new CamundaFormRefImpl(EXAMPLE_FORM_REF, EXAMPLE_FORM_REF_BINDING);
+    CamundaFormRefImpl formRef = new CamundaFormRefImpl(EXAMPLE_FORM_KEY, EXAMPLE_FORM_REF_BINDING);
     formRef.setVersion(EXAMPLE_FORM_REF_VERSION);
     when(mockFormData.getCamundaFormRef()).thenReturn(formRef);
 
@@ -1195,7 +1195,7 @@ public abstract class MockProvider {
     StartFormData mockFormData = mock(StartFormData.class);
     when(mockFormData.getDeploymentId()).thenReturn(EXAMPLE_DEPLOYMENT_ID);
 
-    CamundaFormRefImpl formRef = new CamundaFormRefImpl(EXAMPLE_FORM_REF, EXAMPLE_FORM_REF_BINDING);
+    CamundaFormRefImpl formRef = new CamundaFormRefImpl(EXAMPLE_FORM_KEY, EXAMPLE_FORM_REF_BINDING);
     formRef.setVersion(EXAMPLE_FORM_REF_VERSION);
     when(mockFormData.getCamundaFormRef()).thenReturn(formRef);
 

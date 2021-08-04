@@ -1427,8 +1427,8 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
             if (formRefValue != null) {
               CamundaFormRefImpl camFormRef = new CamundaFormRefImpl(formRefValue, formRefBinding);
               if (formRefBinding.equals(FORM_REF_BINDING_VERSION) && formRefVersion != null) {
-                Integer formRefVersionValue = (Integer) formRefVersion.getValue(this);
-                camFormRef.setVersion(formRefVersionValue);
+                String formRefVersionValue = (String) formRefVersion.getValue(this);
+                camFormRef.setVersion(Integer.parseInt(formRefVersionValue));
               }
               this.camundaFormRef = camFormRef;
             }
