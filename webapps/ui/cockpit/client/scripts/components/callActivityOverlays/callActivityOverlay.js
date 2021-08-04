@@ -42,6 +42,61 @@ function getCallActivityFlowNodes(elementRegistry) {
 
   return nodes;
 }
+/**
+ * @param {object} overlaysNodes
+ * @param {string} activityId
+ * @param {string|object} calledProcesses
+ * @param overlays
+ * @param {function} clickListener
+ * @param {string} tooltipTitle
+ * @param $scope
+ * @param $timeout
+ */
+function addOverlayForSingleElement(
+  overlaysNodes,
+  activityId,
+  calledProcesses,
+  overlays,
+  clickListener,
+  tooltipTitle,
+  $scope,
+  $timeout
+) {
+  if (!overlaysNodes[activityId]) {
+    const wrapper = angular.element(template).hide();
+    const button = wrapper.children().first();
+    overlaysNodes[activityId] = wrapper;
+
+    wrapper.tooltip({
+      container: 'body',
+      title: tooltipTitle,
+      placement: 'top',
+      animation: false
+    });
+
+    overlays.add(activityId, {
+      position: {
+        top: 0,
+        right: 0
+      },
+      show: {
+        minZoom: -Infinity,
+        maxZoom: +Infinity
+      },
+      html: wrapper
+    });
+
+    addInteractions(
+      wrapper,
+      button,
+      activityId,
+      calledProcesses,
+      clickListener,
+      $scope,
+      $timeout
+    );
+  }
+}
 
 /**
  * add hover and click interactions to buttonOverlay and diagramNode (BPMN diagram node that contains the buttonOverlay)
@@ -54,6 +109,7 @@ function getCallActivityFlowNodes(elementRegistry) {
  */
 function addInteractions(
   buttonOverlay,
+  button,
   id,
   calledProcesses,
   clickListener,
@@ -98,69 +154,20 @@ function addInteractions(
   });
 
   if (calledProcesses) {
-    buttonOverlay.on('click', () =>
-      clickListener(buttonOverlay, calledProcesses)
-    );
+    button.on('click', () => {
+      buttonOverlay.tooltip('hide');
+      clickListener(calledProcesses);
+    });
   } else {
-    buttonOverlay.css('opacity', '0.6');
-    //buttonOverlay.prop('disabled', true);
+    button.prop('disabled', true);
+    button.css('pointer-events', 'none');
+    buttonOverlay.css('cursor', 'not-allowed');
   }
 
   // clear listeners
   $scope.$on('$destroy', function() {
-    buttonOverlay.off('mouseenter mouseleave click');
+    button.off('click');
+    buttonOverlay.off('mouseenter mouseleave');
     diagramNode.off('mouseenter mouseleave');
   });
-}
-/**
- * @param {object} overlaysNodes
- * @param {string} activityId
- * @param {string|object} calledProcesses
- * @param overlays
- * @param {function} clickListener
- * @param {string} tooltipTitle
- * @param $scope
- * @param $timeout
- */
-function addOverlayForSingleElement(
-  overlaysNodes,
-  activityId,
-  calledProcesses,
-  overlays,
-  clickListener,
-  tooltipTitle,
-  $scope,
-  $timeout
-) {
-  if (!overlaysNodes[activityId]) {
-    overlaysNodes[activityId] = angular.element(template).hide();
-
-    overlaysNodes[activityId].tooltip({
-      container: 'body',
-      title: tooltipTitle,
-      placement: 'top',
-      animation: false
-    });
-
-    overlays.add(activityId, {
-      position: {
-        top: 0,
-        right: 0
-      },
-      show: {
-        minZoom: -Infinity,
-        maxZoom: +Infinity
-      },
-      html: overlaysNodes[activityId]
-    });
-
-    addInteractions(
-      overlaysNodes[activityId],
-      activityId,
-      calledProcesses,
-      clickListener,
-      $scope,
-      $timeout
-    );
-  }
 }

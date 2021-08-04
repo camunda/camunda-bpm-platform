@@ -51,8 +51,7 @@ module.exports = function(viewContext) {
         $location.url(url);
       };
 
-      const clickListener = function(buttonOverlay, calledProcessDefinitionId) {
-        buttonOverlay.tooltip('hide');
+      const clickListener = function(calledProcessDefinitionId) {
         return $scope.$apply(() =>
           redirectToCalledDefinition(calledProcessDefinitionId)
         );

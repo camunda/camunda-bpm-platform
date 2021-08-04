@@ -73,8 +73,7 @@ module.exports = function(viewContext) {
         $location.url(url);
       };
 
-      var clickListener = function(buttonOverlay, activityInstances) {
-        buttonOverlay.tooltip('hide');
+      var clickListener = function(activityInstances) {
         return activityInstances.length > 1
           ? $scope.$apply(() => showCalledInstances(activityInstances))
           : $scope.$apply(() => redirectToCalledInstance(activityInstances[0]));
