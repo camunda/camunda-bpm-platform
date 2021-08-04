@@ -123,16 +123,16 @@ module.exports = [
               staticCalledProcessDefinitions,
               bpmnElements
             ) {
-              const staticCalled = applyFilterToStaticCalled([
-                ...staticCalledProcessDefinitions
-              ]);
-              let mergedDefinitions = createTableEntries(
+              const filteredStaticCalledDefs = applyFilterToStaticCalled(
+                staticCalledProcessDefinitions
+              );
+              let tableEntries = createTableEntries(
                 calledProcessDefinitions,
-                staticCalled,
+                filteredStaticCalledDefs,
                 bpmnElements
               );
 
-              $scope.calledProcessDefinitions = mergedDefinitions;
+              $scope.calledProcessDefinitions = tableEntries;
               $scope.loadingState = $scope.calledProcessDefinitions.length
                 ? 'LOADED'
                 : 'EMPTY';
@@ -177,23 +177,23 @@ module.exports = [
             return Object.values(map);
           }
 
-          function applyFilterToStaticCalled(staticCalled) {
+          function applyFilterToStaticCalled(staticCalledDefinitions) {
             if (filter.activityIdIn && filter.activityIdIn.length) {
-              const filteredIds = new Set(filter.activityIdIn);
-              staticCalled = staticCalled
+              const selectedIds = new Set(filter.activityIdIn);
+              return staticCalledDefinitions
                 .map(dto => {
                   const newDto = angular.copy(dto);
                   const intersection = dto.calledFromActivityIds.filter(e =>
-                    filteredIds.has(e)
+                    selectedIds.has(e)
                   );
                   if (intersection.length) {
                     newDto.calledFromActivityIds = intersection;
                     return newDto;
                   }
                 })
-                .filter(e => e !== undefined);
+                .filter(dto => dto !== undefined);
             }
-            return staticCalled;
+            return [];
           }
 
           function createTableEntries(
@@ -201,52 +201,44 @@ module.exports = [
             staticCalledProcesses,
             bpmnElements
           ) {
-            let tableEntries = [];
-            const definitions = mergeInstanceAndDefinitionDtos(
+            const mergedDefinitions = mergeInstanceAndDefinitionDtos(
               runningProcessDefinitions,
               staticCalledProcesses
             );
 
-            definitions.forEach(function addCalledActivities(dto) {
-              const calledFromActivityIds = dto.calledFromActivityIds;
-              const calledFromActivities = [];
-
-              angular.forEach(
-                calledFromActivityIds,
-                function extractActivityName(activityId) {
-                  const activityBpmnElement = bpmnElements[activityId];
-
-                  const activity = {
-                    id: activityId,
-                    name:
-                      (activityBpmnElement && activityBpmnElement.name) ||
-                      activityId
-                  };
-
-                  calledFromActivities.push(activity);
-                }
+            const tableEntries = mergedDefinitions.map(dto => {
+              const calledFromActivities = dto.calledFromActivityIds.map(id =>
+                extractActivityFromDiagram(bpmnElements, id)
               );
-
-              tableEntries.push(
-                angular.extend({}, dto, {
-                  calledFromActivities: calledFromActivities,
-                  label: dto.name || dto.key
-                })
-              );
+              return angular.extend({}, dto, {
+                calledFromActivities: calledFromActivities,
+                label: dto.name || dto.key
+              });
             });
 
-            tableEntries = tableEntries.map(function addVersionForDuplicateName(
-              dto
-            ) {
+            const augmentedTableEntries = tableEntries.map(dto => {
               if (
-                tableEntries.find(e => e.id !== dto.id && dto.name === e.name)
+                tableEntries.find(
+                  otherDto =>
+                    dto.name === otherDto.name && otherDto.id !== dto.id
+                )
               ) {
                 dto.label = dto.label + ':' + dto.version;
               }
               return dto;
             });
 
-            return tableEntries;
+            return augmentedTableEntries;
+          }
+
+          function extractActivityFromDiagram(bpmnElements, activityId) {
+            const activityBpmnElement = bpmnElements[activityId];
+
+            return {
+              id: activityId,
+              name:
+                (activityBpmnElement && activityBpmnElement.name) || activityId
+            };
           }
         }
       ],

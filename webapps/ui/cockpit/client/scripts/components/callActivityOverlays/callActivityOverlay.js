@@ -100,7 +100,8 @@ function addOverlayForSingleElement(
 
 /**
  * add hover and click interactions to buttonOverlay and diagramNode (BPMN diagram node that contains the buttonOverlay)
- * @param buttonOverlay
+ * @param buttonOverlay anchor for the tooltip so the actual button can be disabled
+ * @param button
  * @param id
  * @param calledProcesses
  * @param clickListener

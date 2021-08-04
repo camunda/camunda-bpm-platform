@@ -390,7 +390,6 @@ var Controller = [
       'processDefinition',
       'bpmnElements',
       function(processDefinition, bpmnElements) {
-        console.log(processDefinition, bpmnElements);
         if (
           Object.values(bpmnElements).some(
             element => element.$type === 'bpmn:CallActivity'
