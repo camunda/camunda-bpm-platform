@@ -28,7 +28,8 @@ public class ArquillianAutomaticDeployment implements AutomaticDeployment {
   @Override
   public DeploymentConfiguration generateDeploymentScenario(TestClass testClass) {
     JavaArchive jar = ShrinkWrap.create(JavaArchive.class)
-        .addPackages(true, Package.getPackage("org.camunda.bpm.engine.cdi.test"));
+        .addPackages(true, Package.getPackage("org.camunda.bpm.engine.cdi.test"))
+        .addAsResource("application.properties");
 
     return new DeploymentContentBuilder(jar).get();
   }
