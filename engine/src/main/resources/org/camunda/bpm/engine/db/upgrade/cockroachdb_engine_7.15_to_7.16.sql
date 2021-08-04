@@ -15,9 +15,6 @@
 -- limitations under the License.
 --
 
-insert into ACT_GE_SCHEMA_LOG
-values ('500', CURRENT_TIMESTAMP, '7.16.0');
-
 create table ACT_RE_CAMFORMDEF (
     ID_ varchar(64) NOT NULL,
     REV_ integer,
@@ -28,3 +25,6 @@ create table ACT_RE_CAMFORMDEF (
     TENANT_ID_ varchar(64),
     primary key (ID_)
 );
+
+insert into ACT_GE_SCHEMA_LOG
+values ('500', CURRENT_TIMESTAMP, '7.16.0');
