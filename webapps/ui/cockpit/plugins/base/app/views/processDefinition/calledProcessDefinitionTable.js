@@ -193,7 +193,7 @@ module.exports = [
                 })
                 .filter(dto => dto !== undefined);
             }
-            return [];
+            return staticCalledDefinitions;
           }
 
           function createTableEntries(
