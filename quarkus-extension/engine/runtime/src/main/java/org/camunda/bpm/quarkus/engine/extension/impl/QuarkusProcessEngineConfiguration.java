@@ -16,20 +16,12 @@
  */
 package org.camunda.bpm.quarkus.engine.extension.impl;
 
-import io.quarkus.runtime.annotations.ConfigItem;
-import io.quarkus.runtime.annotations.ConfigPhase;
-import io.quarkus.runtime.annotations.ConfigRoot;
+import org.camunda.bpm.engine.cdi.CdiStandaloneProcessEngineConfiguration;
 
-@ConfigRoot(phase = ConfigPhase.RUN_TIME, name = "camunda.bpm")
-public class CamundaEngineConfig {
+// TODO: extend CdiJtaProcessEngineConfiguration when Agroal support is added
+public class QuarkusProcessEngineConfiguration extends CdiStandaloneProcessEngineConfiguration {
 
-  /**
-   * The Camunda JobExecutor config. It provides available job acquisition thread configuration
-   * properties. These properties only take effect in a Quarkus environment.
-   *
-   * The JobExecutor is responsible for running Camunda jobs.
-   */
-  @ConfigItem
-  public CamundaJobExecutorConfig jobExecutor;
-
+  public QuarkusProcessEngineConfiguration() {
+    setJobExecutorActivate(true);
+  }
 }

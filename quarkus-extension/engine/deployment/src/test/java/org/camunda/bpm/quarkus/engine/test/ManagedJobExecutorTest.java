@@ -18,8 +18,6 @@ package org.camunda.bpm.quarkus.engine.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 
 import io.quarkus.test.QuarkusUnitTest;
@@ -27,7 +25,6 @@ import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.cdi.CdiStandaloneProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.test.TestHelper;
@@ -45,22 +42,8 @@ public class ManagedJobExecutorTest {
   @RegisterExtension
   static final QuarkusUnitTest unitTest = new QuarkusUnitTest()
       .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class)
-          .addClass(ExecutorConfig.class)
+          .addAsResource("application.properties")
           .addAsResource("org/camunda/bpm/quarkus/engine/test/asyncServiceTask.bpmn20.xml"));
-
-  @ApplicationScoped
-  static class ExecutorConfig {
-
-    @Produces
-    public CdiStandaloneProcessEngineConfiguration getCustomProcessEngineConfig() {
-
-      CdiStandaloneProcessEngineConfiguration executorConfiguration = new CdiStandaloneProcessEngineConfiguration();
-      executorConfiguration.setJobExecutorActivate(true);
-
-      return executorConfiguration;
-    }
-
-  }
 
   @Inject
   ManagedExecutor managedExecutor;
@@ -89,16 +72,36 @@ public class ManagedJobExecutorTest {
   }
 
   @Test
+  public void shouldActivateJobExecutorByDefault() {
+    // then
+    assertThat(processEngineConfiguration.isJobExecutorActivate()).isTrue();
+  }
+
+  @Test
   public void shouldCreateManagedExecutor() {
     // given a process engine configuration
-    ProcessEngineConfigurationImpl configuration =
-        (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
 
     // then
     // an quarkus managed executor is created
-    JobExecutor jobExecutor = configuration.getJobExecutor();
+    JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
     assertThat(jobExecutor).isNotNull();
     assertThat(jobExecutor).isInstanceOf(ManagedJobExecutor.class);
+  }
+
+  @Test
+  public void shouldUseCustomJobAcquisitionProperties() {
+    // given a custom application.properties file
+    JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
+
+    // then
+    assertThat(jobExecutor.getMaxJobsPerAcquisition()).isEqualTo(5);
+    assertThat(jobExecutor.getLockTimeInMillis()).isEqualTo(500000);
+    assertThat(jobExecutor.getWaitTimeInMillis()).isEqualTo(7000);
+    assertThat(jobExecutor.getMaxWait()).isEqualTo(65000);
+    assertThat(jobExecutor.getBackoffTimeInMillis()).isEqualTo(5);
+    assertThat(jobExecutor.getMaxBackoff()).isEqualTo(5);
+    assertThat(jobExecutor.getBackoffDecreaseThreshold()).isEqualTo(120);
+    assertThat(jobExecutor.getWaitIncreaseFactor()).isEqualTo(3);
   }
 
   @Test

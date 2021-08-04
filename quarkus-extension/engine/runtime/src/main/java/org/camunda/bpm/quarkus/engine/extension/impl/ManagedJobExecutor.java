@@ -19,6 +19,7 @@ package org.camunda.bpm.quarkus.engine.extension.impl;
 import java.util.List;
 import java.util.concurrent.RejectedExecutionException;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.eclipse.microprofile.context.ManagedExecutor;
@@ -33,6 +34,23 @@ public class ManagedJobExecutor extends JobExecutor {
 
   /**
    * Constructs a new QuarkusJobExecutor with the provided
+   * {@link ManagedExecutor} instance and a {@link CamundaEngineConfig} instance.
+   */
+  public ManagedJobExecutor(ManagedExecutor taskExecutor, CamundaEngineConfig config) {
+    this(taskExecutor);
+    // set Job Acquisition  properties
+    this.maxJobsPerAcquisition = config.jobExecutor.maxJobsPerAcquisition;
+    this.lockTimeInMillis = config.jobExecutor.lockTimeInMillis;
+    this.waitTimeInMillis = config.jobExecutor.waitTimeInMillis;
+    this.maxWait = config.jobExecutor.maxWait;
+    this.backoffTimeInMillis = config.jobExecutor.backoffTimeInMillis;
+    this.maxBackoff = config.jobExecutor.maxBackoff;
+    this.backoffDecreaseThreshold = config.jobExecutor.backoffDecreaseThreshold;
+    this.waitIncreaseFactor = config.jobExecutor.waitIncreaseFactor;
+  }
+
+  /**
+   * Constructs a new QuarkusJobExecutor with the provided
    * {@link ManagedExecutor} instance.
    */
   public ManagedJobExecutor(ManagedExecutor taskExecutor) {
@@ -41,12 +59,17 @@ public class ManagedJobExecutor extends JobExecutor {
 
   @Override
   protected void startExecutingJobs() {
-    startJobAcquisitionThread();
+    try {
+      this.taskExecutor.execute(acquireJobsRunnable);
+    } catch (Exception e) {
+      throw new ProcessEngineException("Could not schedule AcquireJobsRunnable for execution.", e);
+    }
   }
 
   @Override
   protected void stopExecutingJobs() {
-    stopJobAcquisitionThread();
+    // nothing to do, the AcquireJobsRunnable instance will
+    // be stopped when the ManagedExecutor instance is shut down.
   }
 
   @Override

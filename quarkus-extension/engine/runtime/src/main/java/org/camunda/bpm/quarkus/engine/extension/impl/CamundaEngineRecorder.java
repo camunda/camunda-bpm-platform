@@ -51,9 +51,8 @@ public class CamundaEngineRecorder {
       BeanContainer beanContainer,
       CamundaEngineConfig camundaEngineConfig) {
 
-    // TODO: replace Standalone with JTA configuration
     ProcessEngineConfigurationImpl configuration =
-        beanContainer.instance(CdiStandaloneProcessEngineConfiguration.class);
+        beanContainer.instance(QuarkusProcessEngineConfiguration.class);
 
     // TODO: replace hardcoded DB configuration with Agroal code
     configuration.setJdbcUrl(DEFAULT_JDBC_URL);
@@ -63,17 +62,18 @@ public class CamundaEngineRecorder {
     // if not already configured by a custom configuration
     if (configuration.getJobExecutor() == null) {
 
-      int threadPoolSize = camundaEngineConfig.threadPool.size;
-      int executorQueueSize = camundaEngineConfig.threadPool.queueSize;
+      int maxPoolSize = camundaEngineConfig.jobExecutor.threadPool.maxPoolSize;
+      int queueSize = camundaEngineConfig.jobExecutor.threadPool.queueSize;
 
       // create a non-bean ManagedExecutor instance. This instance
       // delegates tasks to the Quarkus core Executor/thread pool.
       ManagedExecutor managedExecutor = ManagedExecutor.builder()
-          .maxQueued(executorQueueSize)
-          .maxAsync(threadPoolSize)
+          .maxQueued(queueSize)
+          .maxAsync(maxPoolSize)
           .build();
 
-      ManagedJobExecutor quarkusJobExecutor = new ManagedJobExecutor(managedExecutor);
+      ManagedJobExecutor quarkusJobExecutor
+          = new ManagedJobExecutor(managedExecutor, camundaEngineConfig);
       configuration.setJobExecutor(quarkusJobExecutor);
     }
 
@@ -120,7 +120,7 @@ public class CamundaEngineRecorder {
 
       // deregister the Process Engine from the runtime container delegate
       RuntimeContainerDelegate runtimeContainerDelegate = RuntimeContainerDelegate.INSTANCE.get();
-      runtimeContainerDelegate.unregisterProcessEngine(processEngine.getValue());
+      runtimeContainerDelegate.unregisterProcessEngine(engine);
 
     });
   }

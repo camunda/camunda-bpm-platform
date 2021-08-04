@@ -38,11 +38,26 @@ public class CamundaEngineConfigTest {
   CamundaEngineConfig config;
 
   @Test
-  public void shouldLoadThreadPoolProperties() {
+  public void shouldLoadJobExecutorThreadPoolProperties() {
     // given a custom application.properties file
 
     // then
-    assertThat(config.threadPool.size).isEqualTo(12);
-    assertThat(config.threadPool.queueSize).isEqualTo(5);
+    assertThat(config.jobExecutor.threadPool.maxPoolSize).isEqualTo(12);
+    assertThat(config.jobExecutor.threadPool.queueSize).isEqualTo(5);
+  }
+
+  @Test
+  public void shouldLoadJobAcquisitionProperties() {
+    // given a custom application.properties file
+
+    // then
+    assertThat(config.jobExecutor.maxJobsPerAcquisition).isEqualTo(5);
+    assertThat(config.jobExecutor.lockTimeInMillis).isEqualTo(500000);
+    assertThat(config.jobExecutor.waitTimeInMillis).isEqualTo(7000);
+    assertThat(config.jobExecutor.maxWait).isEqualTo(65000);
+    assertThat(config.jobExecutor.backoffTimeInMillis).isEqualTo(5);
+    assertThat(config.jobExecutor.maxBackoff).isEqualTo(5);
+    assertThat(config.jobExecutor.backoffDecreaseThreshold).isEqualTo(120);
+    assertThat(config.jobExecutor.waitIncreaseFactor).isEqualTo(3);
   }
 }
