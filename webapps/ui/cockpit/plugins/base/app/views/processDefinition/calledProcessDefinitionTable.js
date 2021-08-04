@@ -55,7 +55,7 @@ module.exports = [
           $scope.headColumns = [
             { class: 'process-definition', request: 'label', sortable: true, content: $translate.instant('PLUGIN_CALLED_PROCESS')},
             { class: 'process-definition-running', request: 'running', sortable: true, content: $translate.instant('PLUGIN_CALLED_PROCESS_STATE')},
-            { class: 'activity', request: 'name', sortable: true, content: $translate.instant('PLUGIN_ACTIVITY')}
+            { class: 'activity', request: '[0].name', sortable: true, content: $translate.instant('PLUGIN_ACTIVITY')}
         ];
 
           // Default sorting
@@ -210,6 +210,7 @@ module.exports = [
               const calledFromActivities = dto.calledFromActivityIds.map(id =>
                 extractActivityFromDiagram(bpmnElements, id)
               );
+
               return angular.extend({}, dto, {
                 calledFromActivities: calledFromActivities,
                 label: dto.name || dto.key
@@ -231,6 +232,11 @@ module.exports = [
             return augmentedTableEntries;
           }
 
+          /**
+           * @param bpmnElements
+           * @param activityId
+           * @returns {{name: string, id: string}}
+           */
           function extractActivityFromDiagram(bpmnElements, activityId) {
             const activityBpmnElement = bpmnElements[activityId];
 
