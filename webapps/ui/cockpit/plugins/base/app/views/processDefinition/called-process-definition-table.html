@@ -29,7 +29,7 @@
             </a>
           </span>
 
-          <ul id="call-activity-list" ng-show="calledProcessDefinition.calledFromActivities.length > 1">
+          <ul class="call-activity-list" ng-show="calledProcessDefinition.calledFromActivities.length > 1">
             <li ng-repeat="activity in calledProcessDefinition.calledFromActivities"
                 cam-widget-clipboard="activity.id">
               <a ng-href="#/process-definition/{{ processDefinition.id }}/runtime?{{ getSearchQueryForSearchType(activity.id) }}&amp;detailsTab=call-process-definitions-table">
