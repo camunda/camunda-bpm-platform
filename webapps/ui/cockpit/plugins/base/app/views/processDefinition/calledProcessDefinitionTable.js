@@ -54,7 +54,7 @@ module.exports = [
           // prettier-ignore
           $scope.headColumns = [
             { class: 'process-definition', request: 'label', sortable: true, content: $translate.instant('PLUGIN_CALLED_PROCESS')},
-            { class: 'process-definition-running', request: 'running', sortable: true, content: $translate.instant('PLUGIN_CALLED_PROCESS_STATE')},
+            { class: 'called-process-state', request: 'state', sortable: true, content: $translate.instant('PLUGIN_CALLED_PROCESS_STATE')},
             { class: 'activity', request: '[0].name', sortable: true, content: $translate.instant('PLUGIN_ACTIVITY')}
         ];
 
@@ -152,8 +152,7 @@ module.exports = [
             const map = {};
             runningProcessDefinitions.forEach(dto => {
               const newDto = angular.copy(dto);
-              newDto.running =
-                'PLUGIN_CALLED_PROCESS_DEFINITIONS_RUNNING_LABEL';
+              newDto.state = 'PLUGIN_CALLED_PROCESS_DEFINITIONS_RUNNING_LABEL';
               map[newDto.id] = newDto;
             });
 
@@ -165,11 +164,11 @@ module.exports = [
                   ...newDto.calledFromActivityIds
                 ]);
                 map[dto.id].calledFromActivityIds = Array.from(merged).sort();
-                map[dto.id].running =
+                map[dto.id].state =
                   'PLUGIN_CALLED_PROCESS_DEFINITIONS_RUNNING_AND_REFERENCED_LABEL';
               } else {
                 map[newDto.id] = newDto;
-                newDto.running =
+                newDto.state =
                   'PLUGIN_CALLED_PROCESS_DEFINITIONS_REFERENCED_LABEL';
                 newDto.calledFromActivityIds.sort();
               }
