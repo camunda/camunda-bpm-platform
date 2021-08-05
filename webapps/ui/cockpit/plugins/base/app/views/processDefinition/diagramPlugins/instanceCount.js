@@ -89,10 +89,11 @@ module.exports = [
             }
 
             function removeOverlays() {
-              Object.values($scope.countOverlayIds).forEach(id => {
-                const overlays = $scope.viewer.get('overlays');
+              const overlays = $scope.viewer.get('overlays');
+              $scope.countOverlayIds.forEach(id => {
                 overlays.remove(id);
               });
+              $scope.countOverlayIds = [];
             }
 
             $scope.processData.observe('processDiagram', function(
