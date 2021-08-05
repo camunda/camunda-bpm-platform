@@ -59,11 +59,10 @@ public class CamundaEngineProcessor {
 
   @BuildStep
   protected void unremovableBeans(BuildProducer<UnremovableBeanBuildItem> unremovableBeansProducer) {
-    unremovableBeansProducer.produce(
-        UnremovableBeanBuildItem.beanTypes(
-            DotName.createSimple(RequestScopedAssociation.class.getName())));
-    // TODO: replace Standalone with JTA configuration
-    unremovableBeansProducer.produce(UnremovableBeanBuildItem.beanTypes(CdiStandaloneProcessEngineConfiguration.class));
+    unremovableBeansProducer.produce(UnremovableBeanBuildItem.beanTypes(
+        RequestScopedAssociation.class,
+        CdiStandaloneProcessEngineConfiguration.class // TODO: replace Standalone with JTA configuration
+    ));
   }
 
   @BuildStep
