@@ -96,9 +96,9 @@ public class CamundaJobExecutorConfig {
   public static class ThreadPoolConfig {
     /**
      * Sets the maximum number of threads that can be present in the Quarkus-managed
-     * thread pool for the Camunda JobExecutor. The default value is -1, i.e. unlimited.
+     * thread pool for the Camunda JobExecutor. The default value is 10.
      */
-    @ConfigItem(defaultValue = "-1")
+    @ConfigItem(defaultValue = "10")
     public int maxPoolSize;
 
     /**
