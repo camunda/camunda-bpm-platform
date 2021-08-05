@@ -91,6 +91,15 @@
     <resource>pa4/process-with-http-form.bpmn</resource>
     <resource>pa4/process-with-invalid-form.bpmn</resource>
     <resource>pa4/deployed-form.html</resource>
+    <properties>
+      <property name="resourceRootPath">pa:pa4</property>
+    </properties>
+  </process-archive>
+
+  <process-archive name="call-activity-test-process">
+    <properties>
+      <property name="resourceRootPath">pa:pa5</property>
+    </properties>
   </process-archive>
 
 </process-application>
