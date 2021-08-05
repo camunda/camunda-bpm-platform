@@ -17,12 +17,15 @@
 package org.camunda.bpm.sql.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+import java.util.SortedSet;
 
 import org.camunda.commons.utils.IoUtil;
 import org.junit.Before;
@@ -34,6 +37,7 @@ import liquibase.change.core.SQLFileChange;
 import liquibase.changelog.ChangeSet;
 import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
+import liquibase.database.OfflineConnection;
 import liquibase.diff.DiffResult;
 import liquibase.diff.ObjectDifferences;
 import liquibase.diff.compare.CompareControl;
@@ -42,8 +46,16 @@ import liquibase.diff.output.ObjectChangeFilter;
 import liquibase.diff.output.changelog.DiffToChangeLog;
 import liquibase.exception.DatabaseException;
 import liquibase.exception.LiquibaseException;
+import liquibase.exception.LiquibaseParseException;
+import liquibase.parser.SnapshotParser;
+import liquibase.parser.SnapshotParserFactory;
 import liquibase.resource.ClassLoaderResourceAccessor;
 import liquibase.resource.FileSystemResourceAccessor;
+import liquibase.resource.InputStreamList;
+import liquibase.resource.ResourceAccessor;
+import liquibase.snapshot.DatabaseSnapshot;
+import liquibase.snapshot.SnapshotControl;
+import liquibase.snapshot.SnapshotGeneratorFactory;
 import liquibase.structure.DatabaseObject;
 import liquibase.structure.core.UniqueConstraint;
 
@@ -61,48 +73,70 @@ public class SqlScriptTest {
       "ACT_UNIQ_TENANT_MEMB_USER",
       "ACT_UNIQ_TENANT_MEMB_GROUP");
 
+  protected Properties properties;
+  protected Database database;
+  protected String databaseType;
   protected String projectVersion;
 
   @Before
   public void setup() throws Exception {
     InputStream is = getClass().getClassLoader().getResourceAsStream("properties-from-pom.properties");
-    Properties properties = new Properties();
+    properties = new Properties();
     properties.load(is);
 
+    databaseType = properties.getProperty("database.type");
     projectVersion = properties.getProperty("project.version");
   }
 
   @Test
   public void shouldEqualLiquibaseChangelogAndCreateScripts() throws Exception {
     // given
-    Database manualScriptsDatabase = getDatabase("manual");
-    Database liquibaseChangelogDatabase = getDatabase("liquibase");
+    SnapshotParserFactory.getInstance().register(new DirectAccessSnapshotParser());
+    database = getDatabase();
 
-    executeSqlScript("create", "engine", manualScriptsDatabase);
-    executeSqlScript("create", "identity", manualScriptsDatabase);
+    executeSqlScript("create", "engine");
+    executeSqlScript("create", "identity");
 
-    try (Liquibase liquibase = new Liquibase("changelog.xml", getAccessorForChangelogDirectory(), liquibaseChangelogDatabase)) {
+    try (Liquibase liquibase = getLiquibase()) {
+      //   snapshot created of the database for manual scripts
+      DatabaseSnapshot snapshotManualScripts = createCurrentDatabaseSnapshot();
+      //   database cleared and set up with Liquibase changelog
+      liquibase.dropAll();
       liquibase.update(new Contexts());
-      DiffResult diffResult =  liquibase.diff(manualScriptsDatabase, liquibaseChangelogDatabase, new CompareControl());
+      //   snapshot created of the database for Liquibase changelog
+      DatabaseSnapshot snapshotLiquibaseChangelog = createCurrentDatabaseSnapshot();
 
-      // when
+      //   diff created for both snapshot
+      DiffResult diffResult =  liquibase.diff(getDatabaseForSnapshot(snapshotManualScripts),
+          getDatabaseForSnapshot(snapshotLiquibaseChangelog), new CompareControl());
+
+      // when generating changes to apply between both databases
       List<ChangeSet> changeSetsToApply = new DiffToChangeLog(diffResult, new CustomDiffOutputControl()).generateChangeSets();
 
       // then
       assertThat(changeSetsToApply).isEmpty();
+    } finally {
+      database = getDatabase();
+      try (Liquibase liquibase = getLiquibase()){
+        liquibase.dropAll();
+      }
     }
   }
 
-  protected Database getDatabase(String databaseName) throws DatabaseException {
-    String databaseUrl = "jdbc:h2:mem:" + databaseName + ";DB_CLOSE_DELAY=1000;MVCC=true;LOCK_TIMEOUT=10000;MV_STORE=false";
-    String databaseUser = "sa";
-    String databasePassword = "";
-    String databaseClass = "org.h2.Driver";
+  protected Liquibase getLiquibase() throws URISyntaxException {
+    return new Liquibase("camunda-changelog.xml", getAccessorForChangelogDirectory(), database);
+  }
+
+  protected Database getDatabase() throws DatabaseException {
+    String databaseUrl = properties.getProperty("database.url");
+    String databaseUser = properties.getProperty("database.username");
+    String databasePassword = properties.getProperty("database.password");
+    String databaseClass = properties.getProperty("database.driver");
     return DatabaseFactory.getInstance().openDatabase(databaseUrl, databaseUser, databasePassword, databaseClass,
         null, null, null, new ClassLoaderResourceAccessor());
   }
 
-  protected void executeSqlScript(String sqlFolder, String sqlScript, Database database) throws LiquibaseException {
+  protected void executeSqlScript(String sqlFolder, String sqlScript) throws LiquibaseException {
     String statements = IoUtil.inputStreamAsString(getClass().getClassLoader().getResourceAsStream(
         String.format("sql/%s/%s_%s_%s.sql", sqlFolder, "h2", sqlScript, projectVersion)));
     SQLFileChange sqlFileChange = new SQLFileChange();
@@ -114,7 +148,69 @@ public class SqlScriptTest {
     return new FileSystemResourceAccessor(Paths.get(getClass().getClassLoader().getResource("sql/liquibase").toURI()).toAbsolutePath().toFile());
   }
 
-  private static class CustomDiffOutputControl extends DiffOutputControl {
+  protected DatabaseSnapshot createCurrentDatabaseSnapshot() throws Exception {
+    return SnapshotGeneratorFactory.getInstance().createSnapshot(database.getDefaultSchema(), database, new SnapshotControl(database));
+  }
+
+  protected Database getDatabaseForSnapshot(DatabaseSnapshot snapshot) throws Exception {
+    String offlineDatabaseUrl = "offline:" + databaseType + "?snapshot=foo";
+    OfflineConnection offlineDatabaseConnection = new OfflineConnection(offlineDatabaseUrl, new SnapshotResourceAccessor(snapshot));
+    return DatabaseFactory.getInstance().findCorrectDatabaseImplementation(offlineDatabaseConnection);
+  }
+
+  protected static class DirectAccessSnapshotParser implements SnapshotParser {
+
+    @Override
+    public int getPriority() {
+      return 0;
+    }
+
+    @Override
+    public DatabaseSnapshot parse(String path, ResourceAccessor resourceAccessor) throws LiquibaseParseException {
+      return ((SnapshotResourceAccessor) resourceAccessor).getSnapshot();
+    }
+
+    @Override
+    public boolean supports(String path, ResourceAccessor resourceAccessor) {
+      return resourceAccessor instanceof SnapshotResourceAccessor;
+    }
+  }
+
+  protected static class SnapshotResourceAccessor implements ResourceAccessor {
+
+    private DatabaseSnapshot snapshot;
+
+    public SnapshotResourceAccessor(DatabaseSnapshot snapshot) {
+      this.snapshot = snapshot;
+    }
+
+    @Override
+    public InputStreamList openStreams(String relativeTo, String streamPath) throws IOException {
+      return null;
+    }
+
+    @Override
+    public InputStream openStream(String relativeTo, String streamPath) throws IOException {
+      return null;
+    }
+
+    @Override
+    public SortedSet<String> list(String relativeTo, String path, boolean recursive, boolean includeFiles,
+        boolean includeDirectories) throws IOException {
+      return null;
+    }
+
+    @Override
+    public SortedSet<String> describeLocations() {
+      return null;
+    }
+
+    public DatabaseSnapshot getSnapshot() {
+      return snapshot;
+    }
+  }
+
+  protected static class CustomDiffOutputControl extends DiffOutputControl {
 
     public CustomDiffOutputControl() {
       setObjectChangeFilter(new IgnoreUniqueConstraintsChangeFilter());
