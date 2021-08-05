@@ -558,7 +558,7 @@
                   <goal>update</goal>
                 </goals>
                 <configuration>
-                  <changeLogFile>changelog.xml</changeLogFile>
+                  <changeLogFile>camunda-changelog.xml</changeLogFile>
                   <changeLogDirectory>${project.build.directory}/sql/liquibase/</changeLogDirectory>
                 </configuration>
               </execution>
