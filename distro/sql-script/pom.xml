@@ -132,6 +132,7 @@
                 <artifactItem>
                   <groupId>org.camunda.bpm.distro</groupId>
                   <artifactId>camunda-sql-scripts</artifactId>
+                  <!-- this is the baseline for the Liquibase changelog, do not change -->
                   <version>7.15.0</version>
                   <type>jar</type>
                   <overWrite>true</overWrite>
