@@ -607,20 +607,30 @@
                 <if test="!query.includeAssignedTasks">
                   and RES.ASSIGNEE_ is null
                 </if>
-                and NOT EXISTS (
+
+                <if test="query.withoutCandidateGroups">
+                  and NOT EXISTS (
                   select 1
                   from ${prefix}ACT_RU_IDENTITYLINK I
                   <where>
                     I.TYPE_ = 'candidate'
-                    <if test="query.withoutCandidateGroups">
-                      and I.GROUP_ID_ is not null
-                    </if>
-                    <if test="query.withoutCandidateUsers">
-                      and I.USER_ID_ is not null
-                    </if>
+                    and I.GROUP_ID_ is not null
                     AND I.TASK_ID_ = RES.ID_
                   </where>
-                )
+                  )
+                </if>
+
+                <if test="query.withoutCandidateUsers">
+                  and NOT EXISTS (
+                  select 1
+                  from ${prefix}ACT_RU_IDENTITYLINK I
+                  <where>
+                    I.TYPE_ = 'candidate'
+                    and I.USER_ID_ is not null
+                    AND I.TASK_ID_ = RES.ID_
+                  </where>
+                  )
+                </if>
               </trim>
             </if>
 
