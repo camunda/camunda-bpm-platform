@@ -349,7 +349,7 @@ CamundaForm.prototype.store = function(callback) {
     // build the local storage object
     var store = {date: Date.now(), vars: {}};
     for (var name in this.variableManager.variables) {
-      if (this.variableManager.variables[name].type !== 'Bytes') {
+      if (!['Bytes', 'File'].includes(this.variableManager.variables[name].type)) {
         store.vars[name] = this.variableManager.variables[name].value;
       }
     }
