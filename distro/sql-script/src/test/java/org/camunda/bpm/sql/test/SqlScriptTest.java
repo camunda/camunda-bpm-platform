@@ -69,7 +69,8 @@ public class SqlScriptTest {
    */
   protected static final List<String> IGNORED_CONSTRAINTS = Arrays.asList(
       "ACT_UNIQ_VARIABLE",
-      "CONSTRAINT_8D1",
+      "CONSTRAINT_8D1",// used on all but PostgreSQL
+      "ACT_HI_PROCINST_PROC_INST_ID__KEY",// used on PostgreSQL
       "ACT_UNIQ_TENANT_MEMB_USER",
       "ACT_UNIQ_TENANT_MEMB_GROUP");
 
@@ -235,7 +236,7 @@ public class SqlScriptTest {
 
       @Override
       public boolean include(DatabaseObject object) {
-        if (object instanceof UniqueConstraint && IGNORED_CONSTRAINTS.contains(object.getName())) {
+        if (object instanceof UniqueConstraint && IGNORED_CONSTRAINTS.contains(object.getName().toUpperCase())) {
           return false;
         }
         return true;
