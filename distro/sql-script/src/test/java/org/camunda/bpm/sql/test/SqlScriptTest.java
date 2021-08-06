@@ -138,7 +138,7 @@ public class SqlScriptTest {
 
   protected void executeSqlScript(String sqlFolder, String sqlScript) throws LiquibaseException {
     String statements = IoUtil.inputStreamAsString(getClass().getClassLoader().getResourceAsStream(
-        String.format("sql/%s/%s_%s_%s.sql", sqlFolder, "h2", sqlScript, projectVersion)));
+        String.format("sql/%s/%s_%s_%s.sql", sqlFolder, databaseType, sqlScript, projectVersion)));
     SQLFileChange sqlFileChange = new SQLFileChange();
     sqlFileChange.setSql(statements);
     database.execute(sqlFileChange.generateStatements(database), null);
