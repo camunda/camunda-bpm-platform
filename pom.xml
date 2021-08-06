@@ -125,6 +125,27 @@
     </profile>
 
     <profile>
+      <id>javadocs</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <configuration>
+              <failOnError>false</failOnError>
+              <additionalJOptions>
+                <additionalJOption>-Xdoclint:none</additionalJOption>
+                <additionalJOption>--ignore-source-errors</additionalJOption>
+              </additionalJOptions>
+              <doctitle>Camunda Platform Javadocs ${project.version}</doctitle>
+              <windowtitle>Camunda Platform Javadocs ${project.version}</windowtitle>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
       <id>distro-serverless</id>
       <modules>
         <module>qa</module>
