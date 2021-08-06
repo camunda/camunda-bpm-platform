@@ -41,8 +41,8 @@ public class ManagedJobExecutorTest {
 
   @RegisterExtension
   static final QuarkusUnitTest unitTest = new QuarkusUnitTest()
+      .withConfigurationResource("job-executor-application.properties")
       .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class)
-          .addAsResource("application.properties")
           .addAsResource("org/camunda/bpm/quarkus/engine/test/asyncServiceTask.bpmn20.xml"));
 
   @Inject
