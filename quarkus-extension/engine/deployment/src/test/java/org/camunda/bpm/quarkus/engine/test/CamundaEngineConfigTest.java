@@ -18,51 +18,46 @@ package org.camunda.bpm.quarkus.engine.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 
 import io.quarkus.test.QuarkusUnitTest;
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.quarkus.engine.extension.impl.QuarkusProcessEngineConfiguration;
+import org.camunda.bpm.quarkus.engine.extension.impl.CamundaEngineConfig;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ConfigurableProcessEngineTest {
+public class CamundaEngineConfigTest {
 
   @RegisterExtension
   static final QuarkusUnitTest unitTest = new QuarkusUnitTest()
-      .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class)
-                                    .addClass(MyConfig.class));
-
-  @ApplicationScoped
-  static class MyConfig {
-
-    @Produces
-    public QuarkusProcessEngineConfiguration getCustomProcessEngineConfig() {
-
-      QuarkusProcessEngineConfiguration quarkusProcessEngineConfiguration = new QuarkusProcessEngineConfiguration();
-      quarkusProcessEngineConfiguration.setProcessEngineName("customEngine");
-
-      return quarkusProcessEngineConfiguration;
-    }
-
-  }
+      .withConfigurationResource("job-executor-application.properties")
+      .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class));
 
   @Inject
-  public ProcessEngine processEngine;
+  CamundaEngineConfig config;
 
   @Test
-  public void shouldProvideCustomEmbeddedProcessEngine() {
-    // given a custom process engine configuration
+  public void shouldLoadJobExecutorThreadPoolProperties() {
+    // given a custom application.properties file
 
     // then
-    // an embedded process engine is available
-    assertThat(processEngine).isNotNull();
-    // with a custom name
-    assertThat(processEngine.getName()).isEqualTo("customEngine");
+    assertThat(config.jobExecutor.threadPool.maxPoolSize).isEqualTo(12);
+    assertThat(config.jobExecutor.threadPool.queueSize).isEqualTo(5);
   }
 
+  @Test
+  public void shouldLoadJobAcquisitionProperties() {
+    // given a custom application.properties file
+
+    // then
+    assertThat(config.jobExecutor.maxJobsPerAcquisition).isEqualTo(5);
+    assertThat(config.jobExecutor.lockTimeInMillis).isEqualTo(500000);
+    assertThat(config.jobExecutor.waitTimeInMillis).isEqualTo(7000);
+    assertThat(config.jobExecutor.maxWait).isEqualTo(65000);
+    assertThat(config.jobExecutor.backoffTimeInMillis).isEqualTo(5);
+    assertThat(config.jobExecutor.maxBackoff).isEqualTo(5);
+    assertThat(config.jobExecutor.backoffDecreaseThreshold).isEqualTo(120);
+    assertThat(config.jobExecutor.waitIncreaseFactor).isEqualTo(3);
+  }
 }
