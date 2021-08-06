@@ -31,8 +31,8 @@ public class CamundaEngineConfigTest {
 
   @RegisterExtension
   static final QuarkusUnitTest unitTest = new QuarkusUnitTest()
-      .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class)
-          .addAsResource("application.properties"));
+      .withConfigurationResource("job-executor-application.properties")
+      .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class));
 
   @Inject
   CamundaEngineConfig config;
