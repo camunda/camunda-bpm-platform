@@ -13,6 +13,13 @@
   <packaging>jar</packaging>
 
   <name>Camunda Platform - SQL scripts</name>
+  
+  <properties>
+    <!-- exclude tests by default, only run in check-sql profile -->
+    <skipTests>true</skipTests>
+
+    <version.liquibase>4.4.2</version.liquibase>
+  </properties>
 
   <dependencyManagement>
     <dependencies>
@@ -30,7 +37,6 @@
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
-      <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -40,6 +46,25 @@
       <version>7.15.0</version>
       <scope>provided</scope>
     </dependency>
+
+    <!-- test dependencies -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.liquibase</groupId>
+      <artifactId>liquibase-core</artifactId>
+      <version>${version.liquibase}</version>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -77,6 +102,13 @@
         <directory>target/upgrade-test/sql/upgrade</directory>
         <includes>
           <include>*.sql</include>
+        </includes>
+      </testResource>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/properties-from-pom.properties</include>
         </includes>
       </testResource>
     </testResources>
@@ -487,7 +519,9 @@
   <profiles>
     <profile>
       <id>check-sql</id>
-
+      <properties>
+        <skipTests>false</skipTests>
+      </properties>
       <build>
         <plugins>
           <plugin>
