@@ -826,18 +826,24 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
               logLines.add(sqlStatement);
               String databaseTablePrefix = this.dbSqlSessionFactory.getDatabaseTablePrefix();
               if (databaseTablePrefix != null && databaseTablePrefix.length() > 0) {
-                  if (component.equals("identity"))
-                      sqlStatement = sqlStatement.replaceAll(" (ACT_ID_)", String.format(" %s$1", databaseTablePrefix));
-                  else
-                      sqlStatement = sqlStatement.replaceAll(" (ACT_GE_|ACT_RE_|ACT_RU_|ACT_HI_)", String.format(" %s$1", databaseTablePrefix));
+                String commandPrefix = "table|TABLE|references|REFERENCES|on|ON|into|INTO|exists|EXISTS";
 
-                  if (operation.equals("drop") && sqlStatement.startsWith("if exists")) {
-                      String[] parts = databaseTablePrefix.split("[.]");
-                      sqlStatement = sqlStatement.replaceAll(
-                        " (INFORMATION_SCHEMA\\.TABLES where) (TABLE_NAME = ')", 
-                        String.format(" $1 TABLE_SCHEMA = '%s' and $2%s", parts[0], parts.length == 1 ? "" : parts[1])
-                      );
+                String databaseType = dbSqlSessionFactory.getDatabaseType();
+                if (databaseType.equals(DbSqlSessionFactory.MSSQL) && operation.equals("drop")) {
+                  commandPrefix += "|index|INDEX";
+
+                  if (sqlStatement.startsWith("if exists")) {
+                    String[] parts = databaseTablePrefix.split("[.]");
+                    sqlStatement = sqlStatement.replaceAll(
+                            " (INFORMATION_SCHEMA\\.TABLES where) (TABLE_NAME = ')",
+                            String.format(" $1 TABLE_SCHEMA = '%s' and $2%s", parts[0], parts.length == 1 ? "" : parts[1])
+                    );
                   }
+                }
+                sqlStatement = sqlStatement.replaceAll(
+                  String.format("(%s) (ACT_GE_|ACT_RE_|ACT_RU_|ACT_HI_|ACT_ID_)", commandPrefix),
+                  String.format("$1 %s$2", databaseTablePrefix)
+                );
               }
               jdbcStatement.execute(sqlStatement);
               jdbcStatement.close();
