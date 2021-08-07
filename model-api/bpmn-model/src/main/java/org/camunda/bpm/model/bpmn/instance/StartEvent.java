@@ -54,6 +54,18 @@ public interface StartEvent extends CatchEvent {
 
   void setCamundaFormKey(String camundaFormKey);
 
+  String getCamundaFormRef();
+
+  void setCamundaFormRef(String camundaFormRef);
+
+  String getCamundaFormRefBinding();
+
+  void setCamundaFormRefBinding(String camundaFormRefBinding);
+
+  String getCamundaFormRefVersion();
+
+  void setCamundaFormRefVersion(String camundaFormRefVersion);
+
   String getCamundaInitiator();
 
   void setCamundaInitiator(String camundaInitiator);

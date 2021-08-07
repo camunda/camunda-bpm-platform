@@ -24,7 +24,9 @@ import org.camunda.bpm.engine.cdi.test.CdiProcessEngineTestCase;
 import org.camunda.bpm.engine.cdi.test.impl.beans.DeclarativeProcessController;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.jboss.arquillian.junit.Arquillian;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Testcase for assuring that the {@link CompleteTaskInterceptor} works as
@@ -32,6 +34,7 @@ import org.junit.Test;
  * 
  * @author Daniel Meyer
  */
+@RunWith(Arquillian.class)
 public class CompleteTaskTest extends CdiProcessEngineTestCase {
 
   @Test

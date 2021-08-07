@@ -18,6 +18,7 @@
   </description>
 
   <properties>
+    <version.quarkus>2.1.0.Final</version.quarkus>
     <version.spring.framework>5.2.14.RELEASE</version.spring.framework>
     <version.spring-boot>2.5.0</version.spring-boot>
     <version.cxf>3.0.3</version.cxf>
@@ -44,8 +45,8 @@
 
     <!-- application servers -->
     <version.jboss.as>7.2.0.Final</version.jboss.as>
-    <version.wildfly>22.0.1.Final</version.wildfly>
-    <version.wildfly.core>14.0.1.Final</version.wildfly.core>
+    <version.wildfly>23.0.2.Final</version.wildfly>
+    <version.wildfly.core>15.0.1.Final</version.wildfly.core>
 
     <version.tomcat>9.0.43</version.tomcat>
 
@@ -253,7 +254,7 @@
           <artifactId>maven-javadoc-plugin</artifactId>
           <configuration>
             <failOnError>false</failOnError>
-            <additionalparam>-Xdoclint:none</additionalparam>
+            <doclint>none</doclint>
             <quiet>true</quiet>
           </configuration>
         </plugin>

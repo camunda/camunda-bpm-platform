@@ -93,7 +93,10 @@ module.exports = [
       groupsChanged();
 
       delete newGroup.error;
+
+      $scope.loading = true;
       Task.identityLinksAdd(taskId, newGroup, function(err) {
+        $scope.loading = false;
         if (err) {
           return errorHandler('TASK_UPDATE_ERROR', err);
         }
@@ -151,6 +154,10 @@ module.exports = [
           }
         }
       }
+    };
+
+    $scope.isEnabled = function() {
+      return !$scope.loading && $scope.isValid();
     };
 
     $scope.isValid = function() {

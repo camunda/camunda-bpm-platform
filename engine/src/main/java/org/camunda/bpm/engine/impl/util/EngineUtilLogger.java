@@ -239,4 +239,14 @@ public class EngineUtilLogger extends ProcessEngineLogger {
     logWarn("032", "Could not find the '{}' file on the classpath. " +
       "If you have removed it, please restore it.", file);
   }
+
+  public void debugCouldNotResolveCallableElement(
+      String callingProcessDefinitionId,
+      String activityId,
+      Throwable cause) {
+    logDebug("046", "Could not resolve a callable element for activity {} in process {}. Reason: {}",
+        activityId,
+        callingProcessDefinitionId,
+        cause.getMessage());
+  }
 }

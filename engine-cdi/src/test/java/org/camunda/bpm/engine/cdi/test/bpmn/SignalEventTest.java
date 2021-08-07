@@ -20,6 +20,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.HashMap;
 
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -30,12 +31,15 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.jboss.arquillian.junit.Arquillian;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+@RunWith(Arquillian.class)
 public class SignalEventTest extends CdiProcessEngineTestCase {
-  
-  
+
   @Named
+  @Dependent
   public static class SignalReceivedDelegate implements JavaDelegate {    
     
     @Inject
@@ -47,6 +51,7 @@ public class SignalEventTest extends CdiProcessEngineTestCase {
   }
 
   @Named
+  @Dependent
   public static class SendSignalDelegate implements JavaDelegate {
 
     @Inject

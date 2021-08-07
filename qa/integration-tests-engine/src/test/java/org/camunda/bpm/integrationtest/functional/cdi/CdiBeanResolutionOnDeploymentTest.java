@@ -36,7 +36,6 @@ import org.junit.runner.RunWith;
  * @author Thorben Lindhauer
  *
  */
-@Ignore
 @RunWith(Arquillian.class)
 public class CdiBeanResolutionOnDeploymentTest extends AbstractFoxPlatformIntegrationTest {
 

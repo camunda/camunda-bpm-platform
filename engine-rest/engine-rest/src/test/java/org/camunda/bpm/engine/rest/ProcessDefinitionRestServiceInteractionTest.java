@@ -23,11 +23,14 @@ import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.engine.*;
 import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
+import org.camunda.bpm.engine.impl.repository.CalledProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
+import org.camunda.bpm.engine.repository.CalledProcessDefinition;
 import org.camunda.bpm.engine.repository.DeleteProcessDefinitionsBuilder;
 import org.camunda.bpm.engine.repository.DeleteProcessDefinitionsSelectBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -116,6 +119,8 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
   protected static final String PROCESS_DEFINITION_SUSPENDED_URL = PROCESS_DEFINITION_URL + "/suspended";
   protected static final String SINGLE_PROCESS_DEFINITION_BY_KEY_DELETE_URL = SINGLE_PROCESS_DEFINITION_BY_KEY_URL + "/delete";
   protected static final String SINGLE_PROCESS_DEFINITION_BY_KEY_AND_TENANT_ID_DELETE_URL = SINGLE_PROCESS_DEFINITION_BY_KEY_AND_TENANT_ID_URL + "/delete";
+
+  protected static final String PROCESS_DEFINITION_CALL_ACTIVITY_MAPPINGS = SINGLE_PROCESS_DEFINITION_URL + "/static-called-process-definitions";
 
   private RuntimeService runtimeServiceMock;
   private RepositoryService repositoryServiceMock;
@@ -4012,6 +4017,48 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     .body("message", equalTo(message))
     .when()
     .get(DEPLOYED_START_FORM_URL);
+  }
+
+  @Test
+  public void testGetStaticCalledProcessDefinitions() {
+    CalledProcessDefinition mock = mock(CalledProcessDefinitionImpl.class);
+    when(mock.getCalledFromActivityIds()).thenReturn(Arrays.asList("anActivity", "anotherActivity"));
+    when(mock.getId()).thenReturn("aKey:1:123");
+    when(mock.getCallingProcessDefinitionId()).thenReturn("aCallingId");
+    when(mock.getName()).thenReturn("a Name");
+    when(mock.getKey()).thenReturn("aKey");
+    when(mock.getVersion()).thenReturn(1);
+    List<CalledProcessDefinition> result = Collections.singletonList(mock);
+    when(repositoryServiceMock.getStaticCalledProcessDefinitions(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
+      .thenReturn(result);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
+      .body("[0].callingProcessDefinitionId", equalTo(mock.getCallingProcessDefinitionId()))
+      .body("[0].id", equalTo(mock.getId()))
+      .body("[0].key", equalTo(mock.getKey()))
+      .body("[0].name", equalTo(mock.getName()))
+      .body("[0].version", equalTo(mock.getVersion()))
+      .body("[0].calledFromActivityIds[0]", equalTo("anActivity"))
+      .body("[0].calledFromActivityIds[1]", equalTo("anotherActivity"))
+    .when()
+      .get(PROCESS_DEFINITION_CALL_ACTIVITY_MAPPINGS);
+  }
+
+  @Test
+  public void testGetStaticCalledProcessDefinitionNonExistingProcess() {
+
+    when(repositoryServiceMock.getStaticCalledProcessDefinitions("NonExistingId")).thenThrow(
+      new NullValueException());
+
+    given()
+      .pathParam("id", "NonExistingId")
+    .then().expect()
+      .statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
+    .when()
+      .get(PROCESS_DEFINITION_CALL_ACTIVITY_MAPPINGS);
   }
 
 }

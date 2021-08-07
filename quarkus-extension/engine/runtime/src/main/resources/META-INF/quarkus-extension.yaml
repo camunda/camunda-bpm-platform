@@ -1,0 +1,16 @@
+---
+artifact: ${project.groupId}:${project.artifactId}:${project.version}
+name: "Camunda Platform Engine"
+description: "Quarkus Extension for the Camunda Platform Engine"
+metadata:
+  keywords:
+    - "camunda"
+    - "camunda-platform"
+    - "processes"
+    - "decisions"
+    - "bpmn"
+    - "dmn"
+  guide: "https://docs.camunda.org/manual/"
+  categories:
+    - "business-automation"
+  status: "preview"

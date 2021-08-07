@@ -13,6 +13,13 @@
   <packaging>jar</packaging>
 
   <name>Camunda Platform - SQL scripts</name>
+  
+  <properties>
+    <!-- exclude tests by default, only run in check-sql profile -->
+    <skipTests>true</skipTests>
+
+    <version.liquibase>4.4.2</version.liquibase>
+  </properties>
 
   <dependencyManagement>
     <dependencies>
@@ -27,12 +34,37 @@
   </dependencyManagement>
 
   <dependencies>
-      <dependency>
-         <groupId>org.camunda.bpm</groupId>
-         <artifactId>camunda-engine</artifactId>
-         <version>${project.version}</version>
-         <scope>provided</scope>
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine</artifactId>
+      <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.camunda.bpm.distro</groupId>
+      <artifactId>camunda-sql-scripts</artifactId>
+      <!-- this is the baseline for the Liquibase changelog, do not change -->
+      <version>7.15.0</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- test dependencies -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.liquibase</groupId>
+      <artifactId>liquibase-core</artifactId>
+      <version>${version.liquibase}</version>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -58,6 +90,10 @@
           <include>*.sql</include>
         </includes>
       </resource>
+      <resource>
+        <targetPath>sql/liquibase</targetPath>
+        <directory>target/sql/liquibase</directory>
+      </resource>
     </resources>
 
     <testResources>
@@ -66,6 +102,13 @@
         <directory>target/upgrade-test/sql/upgrade</directory>
         <includes>
           <include>*.sql</include>
+        </includes>
+      </testResource>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/properties-from-pom.properties</include>
         </includes>
       </testResource>
     </testResources>
@@ -118,8 +161,17 @@
                   <overWrite>true</overWrite>
                   <outputDirectory>target/camunda-engine-${project.version}</outputDirectory>
                 </artifactItem>
+                <artifactItem>
+                  <groupId>org.camunda.bpm.distro</groupId>
+                  <artifactId>camunda-sql-scripts</artifactId>
+                  <!-- this is the baseline for the Liquibase changelog, do not change -->
+                  <version>7.15.0</version>
+                  <type>jar</type>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>target/camunda-liquibase-baseline</outputDirectory>
+                </artifactItem>
               </artifactItems>
-              <includes>**/create/*.sql, **/drop/*.sql, **/upgrade/*.sql</includes>
+              <includes>**/create/*.sql, **/drop/*.sql, **/upgrade/*.sql, **/liquibase/**/*</includes>
             </configuration>
           </execution>
         </executions>
@@ -237,6 +289,15 @@
                   <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade">
                     <include name="*.sql" />
                   </fileset>
+                </copy>
+                
+                <!-- liquibase -->
+
+                <copy todir="target/sql/liquibase">
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/liquibase" includes="**/*" />
+                </copy>
+                <copy todir="target/sql/liquibase/baseline">
+                  <fileset dir="target/camunda-liquibase-baseline/sql/create" includes="*.sql" />
                 </copy>
 
               </target>
@@ -404,6 +465,9 @@
                     <include name="*.sql" />
                   </fileset>
                 </copy>
+                <copy todir="target/upgrade-test/sql/liquibase">
+                  <fileset dir="target/sql/liquibase" includes="**/*" />
+                </copy>
 
               </target>
             </configuration>
@@ -455,7 +519,9 @@
   <profiles>
     <profile>
       <id>check-sql</id>
-
+      <properties>
+        <skipTests>false</skipTests>
+      </properties>
       <build>
         <plugins>
           <plugin>
@@ -513,6 +579,30 @@
                   </srcFiles>
                   <autocommit>true</autocommit>
                 </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-maven-plugin</artifactId>
+            <executions> 
+              <execution>
+                <id>create-engine-liquibase</id>
+                <phase>generate-test-sources</phase>
+                <goals>
+                  <goal>update</goal>
+                </goals>
+                <configuration>
+                  <changeLogFile>camunda-changelog.xml</changeLogFile>
+                  <changeLogDirectory>${project.build.directory}/sql/liquibase/</changeLogDirectory>
+                </configuration>
+              </execution>
+              <execution>
+                <id>drop-engine-liquibase</id>
+                <phase>generate-test-sources</phase>
+                <goals>
+                  <goal>dropAll</goal>
+                </goals>
               </execution>
             </executions>
           </plugin>

@@ -14,26 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.cdi.test.impl.context.beans;
+package org.camunda.bpm.engine.repository;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import java.util.List;
 
-import org.camunda.bpm.engine.cdi.BusinessProcess;
-import org.junit.Assert;
+public interface CalledProcessDefinition extends ProcessDefinition {
 
-/**
- * @author Daniel Meyer
- *
- */
-@Named("MultiInstanceTestLocalVariableBean")
-public class LocalVariableBean {
-  
-  @Inject
-  private BusinessProcess businessProcess;
-  
-  public void test() {
-    Assert.assertNotNull("local variable should be set", businessProcess.getVariable("localVar"));
-  }
+  String getCallingProcessDefinitionId();
+
+  List<String> getCalledFromActivityIds();
 
 }

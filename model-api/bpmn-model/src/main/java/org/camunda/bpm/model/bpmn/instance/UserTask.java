@@ -74,6 +74,18 @@ public interface UserTask extends Task {
 
   void setCamundaFormKey(String camundaFormKey);
 
+  String getCamundaFormRef();
+
+  void setCamundaFormRef(String camundaFormRef);
+
+  String getCamundaFormRefBinding();
+
+  void setCamundaFormRefBinding(String camundaFormRefBinding);
+
+  String getCamundaFormRefVersion();
+
+  void setCamundaFormRefVersion(String camundaFormRefVersion);
+
   String getCamundaPriority();
 
   void setCamundaPriority(String camundaPriority);

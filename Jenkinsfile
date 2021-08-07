@@ -44,7 +44,10 @@ pipeline {
             cambpmRunMaven('.',
                 'clean source:jar deploy source:test-jar com.mycila:license-maven-plugin:check -Pdistro,distro-ce,distro-wildfly,distro-webjar,h2-in-memory -DaltStagingDirectory=${WORKSPACE}/staging -DskipRemoteStaging=true',
                 withCatch: false,
-                withNpm: true)
+                withNpm: true,
+                // we use JDK 11 to build the artifacts, as it is required by the Quarkus extension
+                // the compiler source and target is set to JDK 8 in the release parents
+                jdkVersion: 'jdk-11-latest')
 
             // archive all .jar, .pom, .xml, .txt runtime artifacts + required .war/.zip/.tar.gz for EE pipeline
             // add a new line for each group of artifacts
@@ -102,7 +105,7 @@ pipeline {
                 )
               }
 
-              if (cambpmWithLabels('daily', 'default-build', 'rolling-update', 'migration', 'all-db', 'h2', 'db2', 'mysql', 'oracle', 'mariadb', 'sqlserver', 'postgresql')) {
+              if (cambpmWithLabels('daily', 'default-build', 'rolling-update', 'migration', 'wildfly', 'all-db', 'h2', 'db2', 'mysql', 'oracle', 'mariadb', 'sqlserver', 'postgresql')) {
                 cambpmTriggerDownstream(
                   platformVersionDir + "/cambpm-ce/cambpm-daily/${env.BRANCH_NAME}",
                   [string(name: 'UPSTREAM_PROJECT_NAME', value: upstreamProjectName),
@@ -242,7 +245,9 @@ pipeline {
         }
         stage('engine-IT-XA-wildfly-postgresql-96') {
           when {
-            branch cambpmDefaultBranch();
+            expression {
+              cambpmWithLabels('wildfly')
+            }
           }
           steps {
             cambpmConditionalRetry([
@@ -278,7 +283,7 @@ pipeline {
         stage('webapp-IT-wildfly-h2') {
           when {
             expression {
-              cambpmWithLabels('webapp-integration', 'h2')
+              cambpmWithLabels('webapp-integration', 'h2', 'wildfly')
             }
           }
           steps {
@@ -311,7 +316,9 @@ pipeline {
         }
         stage('webapp-IT-standalone-wildfly') {
           when {
-            branch cambpmDefaultBranch();
+            expression {
+              cambpmWithLabels('wildfly')
+            }
           }
           steps {
             cambpmConditionalRetry([

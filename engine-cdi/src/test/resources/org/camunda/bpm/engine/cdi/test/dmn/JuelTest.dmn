@@ -4,7 +4,7 @@
     <decisionTable id="DecisionTable_1ju7hid">
       <input id="Input_1">
         <inputExpression expressionLanguage="juel" id="InputExpression_1" typeRef="string">
-          <text>${beanFoo.getBar()}</text>
+          <text>${beanFoo}</text>
         </inputExpression>
       </input>
       <output id="Output_1" typeRef="string" />

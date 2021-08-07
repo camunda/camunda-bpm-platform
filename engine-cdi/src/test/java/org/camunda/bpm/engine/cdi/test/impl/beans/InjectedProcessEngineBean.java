@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.cdi.test.impl.beans;
 
 import org.camunda.bpm.engine.ProcessEngine;
 
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -25,6 +26,7 @@ import javax.inject.Named;
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
 @Named
+@Dependent
 public class InjectedProcessEngineBean {
 
   @Inject

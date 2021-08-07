@@ -40,14 +40,17 @@ public class BusinessProcessContext implements Context {
 
   final static Logger logger = Logger.getLogger(BusinessProcessContext.class.getName());
   
-  private final BeanManager beanManager;  
-  
+  protected BeanManager beanManager;
+
+  public BusinessProcessContext() {
+  }
+
   public BusinessProcessContext(BeanManager beanManager) {
     this.beanManager = beanManager;
   }
 
   protected BusinessProcess getBusinessProcess() {
-    return ProgrammaticBeanLookup.lookup(BusinessProcess.class, beanManager);
+    return ProgrammaticBeanLookup.lookup(BusinessProcess.class, getBeanManager());
   }
 
   @Override
@@ -60,12 +63,16 @@ public class BusinessProcessContext implements Context {
     Bean<T> bean = (Bean<T>) contextual;
     String variableName = bean.getName();
 
+    return get(variableName);
+  }
+
+  protected <T> T get(String variableName) {
     BusinessProcess businessProcess = getBusinessProcess();
     Object variable = businessProcess.getVariable(variableName);
     if (variable != null) {
 
       if (logger.isLoggable(Level.FINE)) {
-        if(businessProcess.isAssociated()) {        
+        if(businessProcess.isAssociated()) {
           logger.fine("Getting instance of bean '" + variableName + "' from Execution[" + businessProcess.getExecutionId() + "].");
         } else {
           logger.fine("Getting instance of bean '" + variableName + "' from transient bean store");
@@ -76,21 +83,25 @@ public class BusinessProcessContext implements Context {
     } else {
       return null;
     }
-
   }
 
   @Override
   public <T> T get(Contextual<T> contextual, CreationalContext<T> arg1) {
-
     Bean<T> bean = (Bean<T>) contextual;
-    String variableName = bean.getName();
 
+    String variableName = bean.getName();
+    T beanInstance = bean.create(arg1);
+
+    return get(variableName, beanInstance);
+  }
+
+  protected  <T> T get(String variableName, T beanInstance) {
     BusinessProcess businessProcess = getBusinessProcess();
     Object variable = businessProcess.getVariable(variableName);
     if (variable != null) {
 
       if (logger.isLoggable(Level.FINE)) {
-        if(businessProcess.isAssociated()) {        
+        if(businessProcess.isAssociated()) {
           logger.fine("Getting instance of bean '" + variableName + "' from Execution[" + businessProcess.getExecutionId() + "].");
         } else {
           logger.fine("Getting instance of bean '" + variableName + "' from transient bean store");
@@ -100,19 +111,17 @@ public class BusinessProcessContext implements Context {
       return (T) variable;
     } else {
       if (logger.isLoggable(Level.FINE)) {
-        if(businessProcess.isAssociated()) {        
+        if(businessProcess.isAssociated()) {
           logger.fine("Creating instance of bean '" + variableName + "' in business process context representing Execution["
-                  + businessProcess.getExecutionId() + "].");
+              + businessProcess.getExecutionId() + "].");
         } else {
           logger.fine("Creating instance of bean '" + variableName + "' in transient bean store");
         }
       }
 
-      T beanInstance = bean.create(arg1);
       businessProcess.setVariable(variableName, beanInstance);
       return beanInstance;
     }
-
   }
 
   @Override
@@ -121,6 +130,10 @@ public class BusinessProcessContext implements Context {
     // associated, temporary instances of @BusinessProcesScoped beans are cached in the 
     // conversation / request 
     return true;
+  }
+
+  protected BeanManager getBeanManager() {
+    return beanManager;
   }
 
 }

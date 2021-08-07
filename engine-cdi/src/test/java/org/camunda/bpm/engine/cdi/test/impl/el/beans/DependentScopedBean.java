@@ -21,6 +21,7 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.enterprise.context.Dependent;
 import javax.inject.Named;
 
 /**
@@ -28,6 +29,7 @@ import javax.inject.Named;
  *
  */
 @Named
+@Dependent
 public class DependentScopedBean {
 
   public static List<String> lifecycle = new ArrayList<String>();

@@ -18,7 +18,10 @@ package org.camunda.bpm.engine.impl.core.model;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.impl.core.variable.mapping.value.ConstantValueProvider;
+import org.camunda.bpm.engine.impl.core.variable.mapping.value.NullValueProvider;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
+import org.camunda.bpm.engine.impl.el.ElValueProvider;
 
 public class BaseCallableElement {
 
@@ -158,5 +161,29 @@ public class BaseCallableElement {
   public ParameterValueProvider getTenantIdProvider() {
     return tenantIdProvider;
   }
+
+  /**
+   * @return true if any of the references that specify the callable element are non-literal and need to be resolved.
+   */
+  public boolean hasDynamicReferences() {
+    return isDynamicProvider(getTenantIdProvider())
+      || isDynamicProvider(getDefinitionKeyValueProvider())
+      || isDynamicProvider(getVersionValueProvider())
+      || isDynamicProvider(getVersionTagValueProvider());
+  }
+
+  protected boolean isDynamicProvider(ParameterValueProvider provider){
+    if (provider instanceof ElValueProvider){
+      return !((ElValueProvider) provider).getExpression().isLiteralText();
+    } else if (provider instanceof NullValueProvider
+      || provider instanceof ConstantValueProvider
+      || provider instanceof DefaultCallableElementTenantIdProvider
+      || provider == null){
+      return false;
+    } else {
+      return true;
+    }
+  }
+
 
 }
