@@ -822,8 +822,6 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
             sqlStatement = addSqlStatementPiece(sqlStatement, line.substring(0, line.length()-1));
             try {
               Statement jdbcStatement = connection.createStatement();
-              // no logging needed as the connection will log it
-              logLines.add(sqlStatement);
               String databaseTablePrefix = this.dbSqlSessionFactory.getDatabaseTablePrefix();
               if (databaseTablePrefix != null && databaseTablePrefix.length() > 0) {
                 String commandPrefix = "table|TABLE|references|REFERENCES|on|ON|into|INTO|exists|EXISTS";
@@ -845,6 +843,8 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
                   String.format("$1 %s$2", databaseTablePrefix)
                 );
               }
+              // no logging needed as the connection will log it
+              logLines.add(sqlStatement);
               jdbcStatement.execute(sqlStatement);
               jdbcStatement.close();
             } catch (Exception e) {
