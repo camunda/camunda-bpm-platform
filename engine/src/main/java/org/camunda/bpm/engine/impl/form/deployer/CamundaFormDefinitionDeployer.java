@@ -54,7 +54,11 @@ public class CamundaFormDefinitionDeployer extends AbstractDefinitionDeployer<Ca
       CamundaFormDefinitionEntity definition = new CamundaFormDefinitionEntity(camundaFormDefinitionKey, deployment.getId(), resource.getName(), deployment.getTenantId());
       return Collections.singletonList(definition);
     } catch (Exception e) {
-      throw LOG.exceptionDuringFormParsing(e.getMessage(), resource.getName());
+      // form could not be parsed, throw exception if strict parsing is not disabled
+      if (!getCommandContext().getProcessEngineConfiguration().isDisableStrictCamundaFormParsing()) {
+        throw LOG.exceptionDuringFormParsing(e.getMessage(), resource.getName());
+      }
+      return Collections.emptyList();
     }
   }
 
