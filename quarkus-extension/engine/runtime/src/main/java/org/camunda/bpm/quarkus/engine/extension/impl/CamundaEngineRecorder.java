@@ -17,6 +17,7 @@
 package org.camunda.bpm.quarkus.engine.extension.impl;
 
 import io.quarkus.agroal.runtime.DataSources;
+import io.quarkus.arc.Arc;
 import io.quarkus.arc.runtime.BeanContainer;
 import io.quarkus.runtime.RuntimeValue;
 import io.quarkus.runtime.ShutdownContext;
@@ -100,6 +101,12 @@ public class CamundaEngineRecorder {
     runtimeContainerDelegate.registerProcessEngine(processEngine);
 
     return new RuntimeValue<>(processEngine);
+  }
+
+  public void fireProcessEngineStartEvent() {
+    // the 'fireEvent()' method is deprecated in CDI 2.0,
+    // but our CDI integration still supports CDI 1.0, so we continue to use it
+    Arc.container().beanManager().fireEvent(new ProcessEngineStartEvent());
   }
 
   public void registerShutdownTask(ShutdownContext shutdownContext,

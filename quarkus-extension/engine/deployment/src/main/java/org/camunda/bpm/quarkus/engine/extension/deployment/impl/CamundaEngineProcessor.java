@@ -125,6 +125,13 @@ public class CamundaEngineProcessor {
         recorder.createProcessEngine(processEngineConfiguration)));
   }
 
+  @Consume(ProcessEngineBuildItem.class)
+  @BuildStep
+  @Record(RUNTIME_INIT)
+  protected void deployProcessEngineResources(CamundaEngineRecorder recorder) {
+    recorder.fireProcessEngineStartEvent();
+  }
+
   @BuildStep
   @Record(RUNTIME_INIT)
   protected void shutdown(CamundaEngineRecorder recorder,
