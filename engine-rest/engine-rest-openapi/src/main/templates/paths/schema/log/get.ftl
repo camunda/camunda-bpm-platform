@@ -12,6 +12,11 @@
         location = "query"
         type = "string"
         desc = "Only return schema log entries with a specific version."/>
+
+    <#assign sortByValues = [
+      '"timestamp"'
+    ]>
+    <#include "/lib/commons/sort-params.ftl">
     <#assign last = true >
     <#include "/lib/commons/pagination-params.ftl" >
   ],
