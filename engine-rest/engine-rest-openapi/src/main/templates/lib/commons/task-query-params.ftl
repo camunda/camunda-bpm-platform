@@ -177,6 +177,12 @@
       desc = "Only include tasks which are assigned to one of the passed and 
               comma-separated user ids." />
 
+  <@lib.parameter name = "assigneeNotIn"
+      location = "query"
+      type = "string"
+      desc = "Only include tasks which are not assigned to one of the passed and
+              comma-separated user ids." />
+
   <@lib.parameter name = "owner"
       location = "query"
       type = "string"
