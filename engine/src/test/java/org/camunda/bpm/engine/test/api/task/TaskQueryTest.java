@@ -676,6 +676,7 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
     // given
     Task task = taskService.newTask();
     taskService.saveTask(task);
+    taskIds.add(task.getId());
 
     // when
     TaskQuery query = taskService.createTaskQuery()
@@ -684,9 +685,6 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
 
     // then
     assertThat(query.list()).extracting("id").containsExactly(task.getId());
-
-    // clear
-    taskService.deleteTask(task.getId(), true);
   }
 
   @Test
