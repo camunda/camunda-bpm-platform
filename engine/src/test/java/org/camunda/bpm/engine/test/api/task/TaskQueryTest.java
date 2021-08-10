@@ -672,6 +672,22 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
   }
 
   @Test
+  public void shouldQueryWithoutCandidateGroupsAndUsers() {
+    // given
+    Task task = taskService.newTask();
+    taskService.saveTask(task);
+    taskIds.add(task.getId());
+
+    // when
+    TaskQuery query = taskService.createTaskQuery()
+        .withoutCandidateGroups()
+        .withoutCandidateUsers();
+
+    // then
+    assertThat(query.list()).extracting("id").containsExactly(task.getId());
+  }
+
+  @Test
   public void testQueryByNullCandidateGroup() {
     try {
       taskService.createTaskQuery().taskCandidateGroup(null).list();
