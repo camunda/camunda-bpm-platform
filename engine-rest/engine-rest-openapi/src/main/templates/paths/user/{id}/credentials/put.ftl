@@ -14,23 +14,9 @@
          location = "path"
          type = "string"
          required = true
+         last = true
          desc = "The id of the user to be updated." />
 
-     <@lib.parameter
-         name = "password"
-         location = "query"
-         type = "string"
-         required = true
-         desc = "The users new password." />
-
-     <@lib.parameter
-         name = "authenticatedUserPassword"
-         location = "query"
-         type = "string"
-         required = true
-         last = true
-         desc = "The password of the authenticated user who changes the password of the user
-                 (i.e., the user with passed id as path parameter)." />
   ],
 
   <@lib.requestBody
