@@ -113,6 +113,14 @@
         desc = "If not `null`, the form key for the task." />
 
     <@lib.property
+        name = "camundaFormRef"
+        type = "object"
+        additionalProperties = true
+        dto = "CamundaFormRef"
+        desc = "A reference to a specific version of a Camunda Form."
+    />
+
+    <@lib.property
         name = "tenantId"
         type = "string"
         last = true
