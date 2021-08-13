@@ -1,0 +1,212 @@
+// https://github.com/camunda/jenkins-global-shared-library
+// https://github.com/camunda/cambpm-jenkins-shared-library
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library@release-ci']) _
+
+pipeline {
+  agent {
+    node {
+      label 'jenkins-job-runner'
+    }
+  }
+  environment {
+    CAMBPM_LOGGER_LOG_LEVEL = 'DEBUG'
+  }
+  parameters {
+    string name: 'RELEASE_VERSION', defaultValue: '7.16.99-TEST', description: 'The version to be released.'
+    string name: 'MAJOR_VERSION', defaultValue: '7.16', description: 'The current major version of the project.'
+    string name: 'NEXT_DEVELOPMENT_VERSION', defaultValue: '7.16.0-SNAPSHOT', description: 'The next development version to set.'
+    booleanParam name: 'PUSH_TO_REMOTE', defaultValue: false, description: 'Push the changes back to remote repositories.'
+    booleanParam name: 'DEPLOY_ARTIFACTS', defaultValue: false, description: 'When checked, job deploys maven artifacts to Nexus.'
+    booleanParam name: 'SKIP_TESTS', defaultValue: true, description: 'Skip Unit tests.'
+    choice name: 'RELEASE_TYPE', choices: ['ALPHA', 'FINAL'], description: 'In case of ALPHA release, all artifacts will be uploaded to nightly folders, otherwise to GA folder locations.'
+  }
+  options {
+    buildDiscarder(logRotator(numToKeepStr: '2'))
+    copyArtifactPermission('*')
+    throttleJobProperty(
+        throttleEnabled: true,
+        throttleOption: 'project',
+        maxConcurrentTotal: 1
+    )
+  }
+  stages {
+    stage('Create Version Tags') {
+      agent {
+        node {
+          label 'centos-stable'
+        }
+      }
+      steps {
+        cambpmGitCheckout([branch: env.BRANCH_NAME, credentialsId: 'github-cambpm-ci-pipeline-app'])
+        cambpmUpdateProjectVersion([
+            newVersion: RELEASE_VERSION,
+            commit    : true,
+            tag       : true,
+            updateMvn : true,
+            updateNpm : true,
+            commitMsg : "\"chore(release): Prepare release: set version to $RELEASE_VERSION\""
+        ])
+        cambpmUpdateProjectVersion([
+            newVersion: NEXT_DEVELOPMENT_VERSION,
+            commit    : true,
+            tag       : false,
+            updateMvn : true,
+            updateNpm : true,
+            commitMsg : "\"chore(release): Prepare next development version: $NEXT_DEVELOPMENT_VERSION\""
+        ])
+      }
+      post {
+        success {
+          script {
+            if (PUSH_TO_REMOTE) {
+              cambpmGitPush([branch: env.BRANCH_NAME, pushTags: true])
+            }
+          }
+        }
+      }
+    }
+    stage('Build CE Artifacts') {
+      agent {
+        node {
+          label 'centos-stable'
+        }
+      }
+      steps {
+        // build with maven
+        cambpmGitCheckout([branch: RELEASE_VERSION, credentialsId: 'github-cambpm-ci-pipeline-app'])
+        cambpmRunMaven(".",
+            "source:jar source:test-jar javadoc:jar deploy -Pdistro,distro-ce,distro-wildfly,distro-webjar,release-community " +
+            "-Dmaven.javadoc.failOnError=false -Dadditionalparam=-Xdoclint:none -DskipTests=true -Dskip.camunda.release=false " +
+            "-DaltStagingDirectory=${WORKSPACE}/staging -DskipRemoteStaging=true",
+            withCatch: false,
+            withNpm: true,
+            // we use JDK 11 to build the artifacts, as it is required by the Quarkus extension
+            // the compiler source and target is set to JDK 8 in the release parents
+            jdkVersion: 'jdk-11-latest')
+
+        // archive artifacts for downstream pipelines
+        cambpmArchiveArtifacts(".m2/org/camunda/**/${RELEASE_VERSION}/**/*.jar,.m2/org/camunda/**/${RELEASE_VERSION}/**/*.pom,.m2/org/camunda/**/${RELEASE_VERSION}/**/*.xml,.m2/org/camunda/**/${RELEASE_VERSION}/**/*.txt",
+            ".m2/org/camunda/**/${RELEASE_VERSION}/**/camunda-webapp*frontend-sources.zip",
+            ".m2/org/camunda/**/${RELEASE_VERSION}/**/license-book*.zip",
+            ".m2/org/camunda/**/${RELEASE_VERSION}/**/camunda-jboss-modules*.zip",
+            ".m2/org/camunda/**/${RELEASE_VERSION}/**/camunda-*-assembly*.tar.gz",
+            ".m2/org/camunda/**/${RELEASE_VERSION}/**/camunda-webapp*.war",
+            ".m2/org/camunda/**/${RELEASE_VERSION}/**/camunda-engine-rest*.war",
+            ".m2/org/camunda/**/${RELEASE_VERSION}/**/camunda-example-invoice*.war",
+            ".m2/org/camunda/**/${RELEASE_VERSION}/**/camunda-h2-webapp*.war",
+            ".m2/org/camunda/**/${RELEASE_VERSION}/**/camunda-bpm-run-modules-swaggerui-*-run-swaggerui-license-book-json.json")
+      }
+      post {
+        success {
+          script {
+            // get job info
+            // JOB_NAME, e.g.: '7.15/cambpm-ce/cambpm-main/PR-1373'
+            // keep leading slash for the abosolute project path
+            platformVersionDir = "/" + env.JOB_NAME.split('/')[0]
+            upstreamProjectName = "/" + env.JOB_NAME
+            upstreamBuildNumber = env.BUILD_NUMBER
+
+            // trigger EE release
+            cambpmTriggerDownstream(
+                platformVersionDir + "/cambpm-ee/cambpm-ee-release/" + env.BRANCH_NAME,
+                [string(name: 'UPSTREAM_PROJECT_NAME', value: upstreamProjectName),
+                 string(name: 'UPSTREAM_BUILD_NUMBER', value: upstreamBuildNumber),
+                 string(name: 'RELEASE_VERSION', value: RELEASE_VERSION),
+                 string(name: 'NEXT_DEVELOPMENT_VERSION', value: NEXT_DEVELOPMENT_VERSION),
+                 string(name: 'MAJOR_VERSION', value: MAJOR_VERSION),
+                 booleanParam(name: 'PUSH_TO_REMOTE', value: PUSH_TO_REMOTE),
+                 booleanParam(name: 'DEPLOY_ARTIFACTS', value: DEPLOY_ARTIFACTS),
+                 string(name: 'RELEASE_TYPE', value: RELEASE_TYPE)
+                ],
+                false, true, false
+            )
+
+            // trigger Webapp translations release
+            cambpmTriggerDownstream(
+                platformVersionDir + "/cambpm-ce/cambpm-ce-release-translations/" + env.BRANCH_NAME,
+                [string(name: 'UPSTREAM_PROJECT_NAME', value: upstreamProjectName),
+                 string(name: 'UPSTREAM_BUILD_NUMBER', value: upstreamBuildNumber),
+                 string(name: 'RELEASE_VERSION', value: RELEASE_VERSION),
+                 string(name: 'NEXT_DEVELOPMENT_VERSION', value: NEXT_DEVELOPMENT_VERSION),
+                 string(name: 'MAJOR_VERSION', value: MAJOR_VERSION),
+                 booleanParam(name: 'PUSH_TO_REMOTE', value: PUSH_TO_REMOTE),
+                 booleanParam(name: 'DEPLOY_ARTIFACTS', value: DEPLOY_ARTIFACTS),
+                 string(name: 'RELEASE_TYPE', value: RELEASE_TYPE)
+                ],
+                false, true, false
+            )
+
+            if (DEPLOY_ARTIFACTS) {
+              echo "deploy to nexus"
+//              cambpmRunMaven(".",
+//                      "org.sonatype.plugins:nexus-staging-maven-plugin:deploy-staged " +
+//                      "-DaltStagingDirectory=${WORKSPACE}/staging -DskipStaging=true -",
+//                      withCatch: false,
+//                      withNpm: true)
+            }
+          }
+        }
+      }
+    }
+    stage('Javadocs, Docker') {
+      parallel {
+        stage('Stage Javadocs') {
+          agent {
+            node {
+              label 'centos-stable'
+            }
+          }
+          steps {
+            sh 'mkdir -p ./webapps/target/webapp'
+            // TODO: uncomment when javadoc changes are merged from CAM-13784
+//            cambpmRunMaven('.',
+//                'package javadoc:javadoc javadoc:aggregate -Pdistro,distro-wildfly,distro-webjar,javadocs -DskipTests=true -Dskip.frontend.build=true',
+//                withNpm: true,
+//                jdkVersion: 'jdk-11-latest')
+          }
+          post {
+            success {
+              script {
+                if (PUSH_TO_REMOTE) {
+                  def projectVersion = cambpmUtils.getMavenProjectVersion()
+                  // TODO: uncomment when javadoc changes are merged from CAM-13784
+//                  cambpmPublishJavadocs([source: "\"target/site/apidocs/\"", version: projectVersion, pushTo: 'stage'])
+                }
+              }
+            }
+          }
+        }
+        stage('Trigger CE Docker Image') {
+          agent {
+            node {
+              label 'centos-stable'
+            }
+          }
+          environment {
+            DOCKER_IMAGE_TYPE = 'ce'
+          }
+          steps {
+            script {
+              if (PUSH_TO_REMOTE) {
+                withCredentials([usernamePassword(credentialsId: 'jenkins_ldap',
+                    usernameVariable: 'JENKINS_USR',
+                    passwordVariable: 'JENKINS_PSW')]) {
+                  sh libraryResource('cambpm/scripts/trigger-docker-build.sh')
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  post {
+    changed {
+      script {
+        if (!agentDisconnected()) {
+          cambpmSendEmailNotification()
+        }
+      }
+    }
+  }
+}
