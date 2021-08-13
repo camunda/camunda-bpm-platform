@@ -18,6 +18,7 @@ faces-config.NavData
 *.sublime-workspace
 *.h2.db
 *.lock.db
+*.versionsBackup
 **/overlays
 **/node_modules
 camunda-h2-dbs

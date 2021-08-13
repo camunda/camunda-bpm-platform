@@ -1,0 +1,104 @@
+// https://github.com/camunda/jenkins-global-shared-library
+// https://github.com/camunda/cambpm-jenkins-shared-library
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
+
+pipeline {
+  agent {
+    node {
+      label 'jenkins-job-runner'
+    }
+  }
+  environment {
+    CAMBPM_LOGGER_LOG_LEVEL = 'DEBUG'
+  }
+  parameters {
+    string name: 'RELEASE_BRANCH', defaultValue: 'release-ci', description: 'The git repository branch to check out.'
+    string name: 'RELEASE_VERSION', defaultValue: '7.16.99', description: 'The version to be released.'
+    string name: 'MAJOR_VERSION', defaultValue: '7.16', description: 'The current major version of the project.'
+    string name: 'NEXT_DEVELOPMENT_VERSION', defaultValue: '7.16.0-SNAPSHOT', description: 'The next development version to set.'
+    booleanParam name: 'PUSH_TO_REMOTE', defaultValue: true, description: 'Push the changes back to remote repositories.'
+    booleanParam name: 'DEPLOY_ARTIFACTS', defaultValue: false, description: 'When checked, job deploys maven artifacts to Nexus.'
+    booleanParam name: 'SKIP_TESTS', defaultValue: true, description: 'Skip Unit tests.'
+    choice name: 'RELEASE_TYPE', choices: ['ALPHA', 'FINAL'], description: 'In case of ALPHA release, all artifacts will be uploaded to nightly folders, otherwise to GA folder locations.'
+  }
+  options {
+    buildDiscarder(logRotator(numToKeepStr: '2'))
+    throttleJobProperty(
+            throttleEnabled: true,
+            throttleOption: 'project',
+            maxConcurrentTotal: 1
+    )
+  }
+  stages {
+    stage('Create Version Tags') {
+      agent {
+        node {
+          label 'centos-stable'
+        }
+      }
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'github-cambpm-ci-pipeline-app',
+                usernameVariable: 'GITHUB_TOKEN_USR',
+                passwordVariable: 'GITHUB_TOKEN_PSW')]) {
+          sh "git remote add origin https://$GITHUB_TOKEN_USR:$GITHUB_TOKEN_PSW@github.com/camunda/camunda-bpm-platform.git"
+          sh "git fetch"
+          // TODO: review fetch part
+          sh "git remote remove origin"
+          sh "git checkout $CHANGE_BRANCH"
+        }
+
+        sh "./mvnw versions:set -DnewVersion=$RELEASE_VERSION"
+        sh "git commit -am \"chore(release): Prepare release: set version to $RELEASE_VERSION\""
+        sh "git tag -a $RELEASE_VERSION -m \"$RELEASE_VERSION\""
+        sh "./mvnw versions:set -DnewVersion=$NEXT_DEVELOPMENT_VERSION"
+        sh "git commit -am \"chore(release): Prepare next development version: $NEXT_DEVELOPMENT_VERSION\""
+      }
+      post {
+        success {
+          script {
+            if (PUSH_TO_REMOTE) {
+              sh "git push origin $CHANGE_BRANCH"
+              sh "git push origin --tags"
+            }
+          }
+        }
+      }
+    }
+    stage('Build CE Artifacts') {
+      agent {
+        node {
+          label 'centos-stable'
+        }
+      }
+      steps {
+        // build with maven
+        cambpmRunMaven(".",
+                "-DSKIP_DEPLOY=${!DEPLOY} -DBRANCH=${RELEASE_BRANCH} -DSKIP_TESTS=${SKIP_TESTS} -DPUSH_REMOTE=${PUST_TO_REMOTE} -DMAJOR_VERSION=${MAJOR_VERSION} -DRELEASE_VERSION=${RELEASE_VERSION} source:jar source:test-jar javadoc:jar deploy -Pdistro,distro-ce,distro-wildfly,distro-webjar,release-community -Dmaven.javadoc.failOnError=false -Dadditionalparam=-Xdoclint:none -DskipTests=true -Dskip.camunda.release=false -DaltStagingDirectory=${WORKSPACE}/staging -DskipRemoteStaging=true",
+                withCatch: false,
+                withNpm: true,
+                // we use JDK 11 to build the artifacts, as it is required by the Quarkus extension
+                // the compiler source and target is set to JDK 8 in the release parents
+                jdkVersion: 'jdk-11-latest')
+      }
+      post {
+        success {
+          script {
+            if (DEPLOY_ARTIFACTS) {
+              echo "deploy to nexus"
+              cambpmRunMaven(".", "-DSKIP_DEPLOY=${!DEPLOY} -DBRANCH=${RELEASE_BRANCH} -DSKIP_TESTS=${SKIP_TESTS} -DPUSH_REMOTE=${PUST_TO_REMOTE} -DMAJOR_VERSION=${MAJOR_VERSION} -DRELEASE_VERSION=${RELEASE_VERSION} org.sonatype.plugins:nexus-staging-maven-plugin:deploy-staged -DaltStagingDirectory=${WORKSPACE}/staging -DskipStaging=true -")
+            }
+          }
+        }
+      }
+    }
+  }
+  post {
+    changed {
+      script {
+        if (!agentDisconnected()) {
+          cambpmSendEmailNotification()
+        }
+      }
+    }
+  }
+}
