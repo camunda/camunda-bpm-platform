@@ -103,6 +103,7 @@ public class JtaProcessEngineConfiguration extends ProcessEngineConfigurationImp
       List<CommandInterceptor> commandInterceptorsDbSchemaOperations = new ArrayList<CommandInterceptor>();
       commandInterceptorsDbSchemaOperations.add(new LogInterceptor());
       commandInterceptorsDbSchemaOperations.add(new CommandCounterInterceptor(this));
+      commandInterceptorsDbSchemaOperations.add(new JtaTransactionInterceptor(this.transactionManager, false, this));
       commandInterceptorsDbSchemaOperations.add(new CommandContextInterceptor(dbSchemaOperationsCommandContextFactory, this));
       commandInterceptorsDbSchemaOperations.add(actualCommandExecutor);
       commandExecutorSchemaOperations = initInterceptorChain(commandInterceptorsDbSchemaOperations);
