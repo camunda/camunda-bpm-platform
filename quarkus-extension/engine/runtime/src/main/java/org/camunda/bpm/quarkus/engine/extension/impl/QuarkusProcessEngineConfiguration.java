@@ -17,11 +17,13 @@
 package org.camunda.bpm.quarkus.engine.extension.impl;
 
 import org.camunda.bpm.engine.cdi.CdiStandaloneProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator;
 
 // TODO: extend CdiJtaProcessEngineConfiguration when Agroal support is added
 public class QuarkusProcessEngineConfiguration extends CdiStandaloneProcessEngineConfiguration {
 
   public QuarkusProcessEngineConfiguration() {
     setJobExecutorActivate(true);
+    setIdGenerator(new StrongUuidGenerator());
   }
 }
