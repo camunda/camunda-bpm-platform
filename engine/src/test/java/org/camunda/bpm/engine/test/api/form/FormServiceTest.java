@@ -1705,4 +1705,46 @@ public class FormServiceTest {
     assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).list()).hasSize(1);
     assertThat(taskService.createTaskQuery().list()).hasSize(0);
   }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/form/FormServiceTest.shouldSubmitStartFormUsingFormRefAndCamundaFormDefinition.bpmn",
+  "org/camunda/bpm/engine/test/api/form/start.form" })
+  @Test
+  public void shouldSubmitStartFormUsingFormRefAndCamundaFormDefinition() {
+    // given
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("CamundaStartFormProcess").singleResult();
+
+    // when
+    ProcessInstance processInstance = formService.submitStartForm(processDefinition.getId(),
+        Variables.createVariables());
+
+    // then
+    assertThat(repositoryService.createDeploymentQuery().list()).hasSize(1);
+    assertThat(engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired()
+        .execute(new FindCamundaFormDefinitionsCmd())).hasSize(1);
+    assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).list()).hasSize(0);
+    assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).list()).hasSize(1);
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/form/FormServiceTest.shouldSubmitTaskFormUsingFormRefAndCamundaFormDefinition.bpmn",
+  "org/camunda/bpm/engine/test/api/form/task.form" })
+  @Test
+  public void shouldSubmitTaskFormUsingFormRefAndCamundaFormDefinition() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("CamundaTaskFormProcess");
+
+    // when
+    Task task = taskService.createTaskQuery().singleResult();
+    formService.submitTaskForm(task.getId(), Variables.createVariables().putValue("variable", "my variable"));
+
+    // then
+    assertThat(repositoryService.createDeploymentQuery().list()).hasSize(1);
+    assertThat(engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired()
+        .execute(new FindCamundaFormDefinitionsCmd())).hasSize(1);
+    assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).list()).hasSize(0);
+    assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).list()).hasSize(1);
+    assertThat(taskService.createTaskQuery().list()).hasSize(0);
+  }
 }
