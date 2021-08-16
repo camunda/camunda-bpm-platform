@@ -21,7 +21,9 @@ import io.quarkus.arc.runtime.BeanContainer;
 import io.quarkus.runtime.RuntimeValue;
 import io.quarkus.runtime.ShutdownContext;
 import io.quarkus.runtime.annotations.Recorder;
+import io.smallrye.context.SmallRyeManagedExecutor;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
+import org.camunda.bpm.container.impl.metadata.PropertyHelper;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.cdi.impl.event.CdiEventSupportBpmnParseListener;
 import org.camunda.bpm.engine.cdi.impl.util.BeanManagerLookup;
@@ -69,12 +71,17 @@ public class CamundaEngineRecorder {
 
       // create a non-bean ManagedExecutor instance. This instance
       // delegates tasks to the Quarkus core Executor/thread pool.
-      ManagedExecutor managedExecutor = ManagedExecutor.builder()
+      ManagedExecutor managedExecutor = SmallRyeManagedExecutor.builder()
           .maxQueued(queueSize)
           .maxAsync(maxPoolSize)
+          .withNewExecutorService()
           .build();
+      ManagedJobExecutor quarkusJobExecutor = new ManagedJobExecutor(managedExecutor);
 
-      ManagedJobExecutor quarkusJobExecutor = new ManagedJobExecutor(managedExecutor, config);
+      // apply job executor configuration properties
+      PropertyHelper
+          .applyProperties(quarkusJobExecutor, config.jobExecutor.configuration, PropertyHelper.KEBAB_CASE);
+
       configuration.setJobExecutor(quarkusJobExecutor);
     }
 

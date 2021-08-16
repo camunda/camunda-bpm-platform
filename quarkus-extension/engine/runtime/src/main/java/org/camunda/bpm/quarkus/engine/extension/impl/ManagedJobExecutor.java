@@ -18,10 +18,13 @@ package org.camunda.bpm.quarkus.engine.extension.impl;
 
 import java.util.List;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
+import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorLogger;
 import org.eclipse.microprofile.context.ManagedExecutor;
 
 /**
@@ -30,24 +33,9 @@ import org.eclipse.microprofile.context.ManagedExecutor;
  */
 public class ManagedJobExecutor extends JobExecutor {
 
-  protected ManagedExecutor taskExecutor;
+  protected final static JobExecutorLogger LOG = ProcessEngineLogger.JOB_EXECUTOR_LOGGER;
 
-  /**
-   * Constructs a new QuarkusJobExecutor with the provided
-   * {@link ManagedExecutor} instance and a {@link CamundaEngineConfig} instance.
-   */
-  public ManagedJobExecutor(ManagedExecutor taskExecutor, CamundaEngineConfig config) {
-    this(taskExecutor);
-    // set Job Acquisition  properties
-    this.maxJobsPerAcquisition = config.jobExecutor.maxJobsPerAcquisition;
-    this.lockTimeInMillis = config.jobExecutor.lockTimeInMillis;
-    this.waitTimeInMillis = config.jobExecutor.waitTimeInMillis;
-    this.maxWait = config.jobExecutor.maxWait;
-    this.backoffTimeInMillis = config.jobExecutor.backoffTimeInMillis;
-    this.maxBackoff = config.jobExecutor.maxBackoff;
-    this.backoffDecreaseThreshold = config.jobExecutor.backoffDecreaseThreshold;
-    this.waitIncreaseFactor = config.jobExecutor.waitIncreaseFactor;
-  }
+  protected ManagedExecutor taskExecutor;
 
   /**
    * Constructs a new QuarkusJobExecutor with the provided
@@ -68,8 +56,18 @@ public class ManagedJobExecutor extends JobExecutor {
 
   @Override
   protected void stopExecutingJobs() {
-    // nothing to do, the AcquireJobsRunnable instance will
-    // be stopped when the ManagedExecutor instance is shut down.
+
+    // Ask the thread pool to finish and exit
+    taskExecutor.shutdown();
+
+    // Waits for 1 minute to finish all currently executing jobs
+    try {
+      if(!taskExecutor.awaitTermination(60L, TimeUnit.SECONDS)) {
+        LOG.timeoutDuringShutdown();
+      }
+    } catch (InterruptedException e) {
+      LOG.interruptedWhileShuttingDownjobExecutor(e);
+    }
   }
 
   @Override

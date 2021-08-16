@@ -52,13 +52,13 @@ public class CamundaEngineConfigTest {
     // given a custom application.properties file
 
     // then
-    assertThat(config.jobExecutor.maxJobsPerAcquisition).isEqualTo(5);
-    assertThat(config.jobExecutor.lockTimeInMillis).isEqualTo(500000);
-    assertThat(config.jobExecutor.waitTimeInMillis).isEqualTo(7000);
-    assertThat(config.jobExecutor.maxWait).isEqualTo(65000);
-    assertThat(config.jobExecutor.backoffTimeInMillis).isEqualTo(5);
-    assertThat(config.jobExecutor.maxBackoff).isEqualTo(5);
-    assertThat(config.jobExecutor.backoffDecreaseThreshold).isEqualTo(120);
-    assertThat(config.jobExecutor.waitIncreaseFactor).isEqualTo(3);
+    assertThat(config.jobExecutor.configuration.get("max-jobs-per-acquisition")).isEqualTo("5");
+    assertThat(config.jobExecutor.configuration.get("lock-time-in-millis")).isEqualTo("500000");
+    assertThat(config.jobExecutor.configuration.get("wait-time-in-millis")).isEqualTo("7000");
+    assertThat(config.jobExecutor.configuration.get("max-wait")).isEqualTo("65000");
+    assertThat(config.jobExecutor.configuration.get("backoff-time-in-millis")).isEqualTo("5");
+    assertThat(config.jobExecutor.configuration.get("max-backoff")).isEqualTo("5");
+    assertThat(config.jobExecutor.configuration.get("backoff-decrease-threshold")).isEqualTo("120");
+    assertThat(config.jobExecutor.configuration.get("wait-increase-factor")).isEqualTo("3");
   }
 }

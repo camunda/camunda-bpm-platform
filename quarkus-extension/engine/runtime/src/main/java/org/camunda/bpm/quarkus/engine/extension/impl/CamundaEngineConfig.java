@@ -22,7 +22,7 @@ import io.quarkus.runtime.annotations.ConfigRoot;
 
 import java.util.Optional;
 
-@ConfigRoot(phase = ConfigPhase.RUN_TIME, name = "camunda.bpm")
+@ConfigRoot(phase = ConfigPhase.RUN_TIME, name = "camunda")
 public class CamundaEngineConfig {
 
   /**

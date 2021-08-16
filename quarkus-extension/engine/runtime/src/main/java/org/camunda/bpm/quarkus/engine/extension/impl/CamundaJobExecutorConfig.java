@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.quarkus.engine.extension.impl;
 
+import java.util.Map;
+
 import io.quarkus.runtime.annotations.ConfigGroup;
 import io.quarkus.runtime.annotations.ConfigItem;
 
@@ -23,67 +25,11 @@ import io.quarkus.runtime.annotations.ConfigItem;
 public class CamundaJobExecutorConfig {
 
   /**
-   * Sets the maximal number of jobs to be acquired at once. The default value is 3.
+   * The Camunda JobExecutor configuration properties. For more details, see
+   * {@link https://docs.camunda.org/manual/latest/reference/deployment-descriptors/tags/job-executor/#job-acquisition-configuration-properties}
    */
-  @ConfigItem(defaultValue = "3")
-  public int maxJobsPerAcquisition;
-
-  /**
-   * Specifies the time in milliseconds an acquired job is locked for execution. During that time,
-   * no other job executor can acquire the job. The default value is 300000.
-   */
-  @ConfigItem(defaultValue = "300000")
-  public int lockTimeInMillis;
-
-  /**
-   * Specifies the wait time of the job acquisition thread in milliseconds in case there are less
-   * jobs available for execution than requested during acquisition. If this is repeatedly the
-   * case, the wait time is increased exponentially by the factor <code>waitIncreaseFactor</code>.
-   * The wait time is capped by <code>maxWait</code>. The default value is 5000.
-   */
-  @ConfigItem(defaultValue = "5000")
-  public int waitTimeInMillis;
-
-  /**
-   * Specifies the maximum wait time of the job acquisition thread in milliseconds in case there
-   * are less jobs available for execution than requested during acquisition. The default value
-   * is 60000.
-   */
-  @ConfigItem(defaultValue = "60000")
-  public long maxWait;
-
-  /**
-   * Specifies the wait time of the job acquisition thread in milliseconds in case jobs were
-   * acquired but could not be locked. This condition indicates that there are other job
-   * acquisition threads acquiring jobs in parallel. If this is repeatedly the case, the backoff
-   * time is increased exponentially by the factor waitIncreaseFactor. The time is capped by
-   * <code>maxBackoff</code>. With every increase in backoff time, the number of jobs acquired
-   * increases by <code>waitIncreaseFactor</code> as well. The default value is 0.
-   */
-  @ConfigItem(defaultValue = "0")
-  public int backoffTimeInMillis;
-
-  /**
-   * Specifies the maximum wait time of the job acquisition thread in milliseconds in case jobs
-   * were acquired but could not be locked. The default value is 0.
-   */
-  @ConfigItem(defaultValue = "0")
-  public long maxBackoff;
-
-  /**
-   * Specifies the number of successful job acquisition cycles without a job locking failure
-   * before the backoff time is decreased again. In that case, the backoff time is reduced by
-   * <code>waitIncreaseFactor</code>. The default value is 100.
-   */
-  @ConfigItem(defaultValue = "100")
-  public int backoffDecreaseThreshold;
-
-  /**
-   * Specifies the factor by which wait and backoff time are increased in case their activation
-   * conditions are repeatedly met. The default value is 2.
-   */
-  @ConfigItem(defaultValue = "2")
-  public float waitIncreaseFactor;
+  @ConfigItem(name = ConfigItem.PARENT)
+  public Map<String, String> configuration;
 
   /**
    * The Camunda JobExecutor thread pool config. This thread pool is responsible for running
