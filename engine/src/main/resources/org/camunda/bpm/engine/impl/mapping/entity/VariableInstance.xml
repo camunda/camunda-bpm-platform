@@ -884,6 +884,17 @@
        ${limitAfterWithoutOffset})
   </delete>
 
+  <delete id="deleteByteArraysByRemovalTime_mssql"
+          parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    <bind name="date" value="'REMOVAL_TIME_'"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    delete ${limitBeforeWithoutOffset} from ${prefix}ACT_GE_BYTEARRAY
+    where REMOVAL_TIME_ &lt;= #{parameter.removalTime}
+    <include refid="andWhereMinuteInDateBetweenSql"/>
+    ${limitAfterWithoutOffset}
+    OPTION (LOOP JOIN)
+  </delete>
+
   <!-- BYTE ARRAY RESULTMAP -->
 
   <resultMap id="byteArrayResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity">
