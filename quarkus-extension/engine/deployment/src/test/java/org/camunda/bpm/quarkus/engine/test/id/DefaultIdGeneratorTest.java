@@ -17,7 +17,10 @@
 package org.camunda.bpm.quarkus.engine.test.id;
 
 import io.quarkus.test.QuarkusUnitTest;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator;
 import org.camunda.bpm.engine.task.Task;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -38,6 +41,9 @@ public class DefaultIdGeneratorTest {
   @Inject
   public TaskService taskService;
 
+  @Inject
+  protected ProcessEngine processEngine;
+
   @Test
   public void shouldConfigureStrongIdGenerator() {
     Task task = taskService.newTask();
@@ -45,6 +51,10 @@ public class DefaultIdGeneratorTest {
 
     String id = taskService.createTaskQuery().singleResult().getId();
     assertThat(id).matches("\\b[0-9a-f]{8}\\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\\b[0-9a-f]{12}\\b");
+
+    ProcessEngineConfigurationImpl engineConfig =
+        (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
+    assertThat(engineConfig.getIdGenerator()).isInstanceOf(StrongUuidGenerator.class);
   }
 
 }

@@ -17,7 +17,9 @@
 package org.camunda.bpm.quarkus.engine.test.id;
 
 import io.quarkus.test.QuarkusUnitTest;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.db.DbIdGenerator;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.quarkus.engine.extension.impl.QuarkusProcessEngineConfiguration;
@@ -42,6 +44,9 @@ public class ConfigureDbIdGeneratorTest {
   @Inject
   public TaskService taskService;
 
+  @Inject
+  protected ProcessEngine processEngine;
+
   @ApplicationScoped
   public static class EngineConfigurer {
 
@@ -61,6 +66,10 @@ public class ConfigureDbIdGeneratorTest {
 
     String id = taskService.createTaskQuery().singleResult().getId();
     assertThat(Long.parseLong(id)).isGreaterThan(0);
+
+    ProcessEngineConfigurationImpl engineConfig =
+        (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
+    assertThat(engineConfig.getIdGenerator()).isInstanceOf(DbIdGenerator.class);
   }
 
 }
