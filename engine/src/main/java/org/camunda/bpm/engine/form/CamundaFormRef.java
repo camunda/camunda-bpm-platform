@@ -14,31 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest.util;
+package org.camunda.bpm.engine.form;
 
-import javax.ws.rs.core.MediaType;
-
-import org.camunda.bpm.engine.form.CamundaFormRef;
-
-public class ContentTypeUtil {
-
-  private static final String SUFFIX_FORM_FILE = ".form";
+/**
+ * A {@link CamundaFormRef} represents a reference to a deployed Camunda Form.
+ */
+public interface CamundaFormRef {
 
   /**
-   * @return the content type to use for the provided form's key
-   *
+   * The key of a {@link CamundaFormRef} corresponds to the {@code id} attribute
+   * in the Camunda Forms JSON.
    */
-  public static String getFormContentType(String formKey) {
-    if (formKey.endsWith(SUFFIX_FORM_FILE)) {
-      return MediaType.APPLICATION_JSON;
-    }
-    return MediaType.APPLICATION_XHTML_XML;
-  }
+  String getKey();
 
-  public static String getFormContentType(CamundaFormRef formRef) {
-    if(formRef != null && formRef.getKey() != null && formRef.getBinding() != null) {
-      return MediaType.APPLICATION_JSON;
-    }
-    return MediaType.APPLICATION_XHTML_XML;
-  }
+  /**
+   * The binding of {@link CamundaFormRef} specifies which version of the form
+   * to reference. Possible values are: {@code latest}, {@code deployment} and
+   * {@code version} (specific version value can be retrieved with {@link #getVersion()}).
+   */
+  String getBinding();
+
+  /**
+   * If the {@link #getBinding() binding} of a {@link CamundaFormRef} is set to
+   * {@code version}, the specific version is returned.
+   */
+  Integer getVersion();
 }

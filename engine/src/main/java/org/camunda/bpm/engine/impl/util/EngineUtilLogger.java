@@ -242,7 +242,7 @@ public class EngineUtilLogger extends ProcessEngineLogger {
   public ProcessEngineException exceptionDuringFormParsing(String cause, String resourceName) {
     return new ProcessEngineException(
         exceptionMessage("033", "Could not parse Camunda Form resource {}. Cause: {}", resourceName, cause));
-
+  }
 
   public void debugCouldNotResolveCallableElement(
       String callingProcessDefinitionId,

@@ -48,6 +48,11 @@
                          "taskDefinitionKey":"aTaskDefinitionKey",
                          "suspended": false,
                          "formKey":"aFormKey",
+                         "camundaFormRef":{
+                           "key": "aCamundaFormKey",
+                           "binding": "version",
+                           "version": 2
+                         },
                          "tenantId":"aTenantId"
                        }
                      }'] />

@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.impl.form.handler;
 
 import org.camunda.bpm.engine.form.TaskFormData;
+import org.camunda.bpm.engine.impl.form.CamundaFormRefImpl;
 import org.camunda.bpm.engine.impl.form.TaskFormDataImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 
@@ -39,6 +40,18 @@ public class DefaultTaskFormHandler extends DefaultFormHandler implements TaskFo
       Object formValue = formKey.getValue(task);
       if (formValue != null) {
         taskFormData.setFormKey(formValue.toString());
+      }
+    } else if (camundaFormDefinitionKey != null && camundaFormDefinitionBinding != null) {
+      Object formRefKeyValue = camundaFormDefinitionKey.getValue(task);
+      if(formRefKeyValue != null) {
+        CamundaFormRefImpl ref = new CamundaFormRefImpl(formRefKeyValue.toString(), camundaFormDefinitionBinding);
+        if(camundaFormDefinitionBinding.equals(FORM_REF_BINDING_VERSION) && camundaFormDefinitionVersion != null) {
+          Object formRefVersionValue = camundaFormDefinitionVersion.getValue(task);
+          if(formRefVersionValue != null) {
+            ref.setVersion(Integer.parseInt((String)formRefVersionValue));
+          }
+        }
+        taskFormData.setCamundaFormRef(ref);
       }
     }
 

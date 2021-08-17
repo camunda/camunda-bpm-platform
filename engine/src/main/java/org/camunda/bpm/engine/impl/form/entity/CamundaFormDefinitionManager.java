@@ -27,14 +27,16 @@ import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.persistence.AbstractResourceDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.CamundaFormDefinitionEntity;
 
-public class CamundaFormDefinitionManager extends AbstractManager implements AbstractResourceDefinitionManager<CamundaFormDefinitionEntity> {
+public class CamundaFormDefinitionManager extends AbstractManager
+    implements AbstractResourceDefinitionManager<CamundaFormDefinitionEntity> {
 
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
   @Override
   public CamundaFormDefinitionEntity findLatestDefinitionByKey(String key) {
     @SuppressWarnings("unchecked")
-    List<CamundaFormDefinitionEntity> camundaFormDefinitions = getDbEntityManager().selectList("selectLatestCamundaFormDefinitionByKey", configureParameterizedQuery(key));
+    List<CamundaFormDefinitionEntity> camundaFormDefinitions = getDbEntityManager()
+        .selectList("selectLatestCamundaFormDefinitionByKey", configureParameterizedQuery(key));
 
     if (camundaFormDefinitions.isEmpty()) {
       return null;
@@ -59,9 +61,11 @@ public class CamundaFormDefinitionManager extends AbstractManager implements Abs
     parameters.put("tenantId", tenantId);
 
     if (tenantId == null) {
-      return (CamundaFormDefinitionEntity) getDbEntityManager().selectOne("selectLatestCamundaFormDefinitionByKeyWithoutTenantId", parameters);
+      return (CamundaFormDefinitionEntity) getDbEntityManager()
+          .selectOne("selectLatestCamundaFormDefinitionByKeyWithoutTenantId", parameters);
     } else {
-      return (CamundaFormDefinitionEntity) getDbEntityManager().selectOne("selectLatestCamundaDefinitionByKeyAndTenantId", parameters);
+      return (CamundaFormDefinitionEntity) getDbEntityManager()
+          .selectOne("selectLatestCamundaDefinitionByKeyAndTenantId", parameters);
     }
   }
 
@@ -74,9 +78,11 @@ public class CamundaFormDefinitionManager extends AbstractManager implements Abs
     parameters.put("camundaFormDefinitionKey", definitionKey);
     parameters.put("tenantId", tenantId);
     if (tenantId == null) {
-      return (CamundaFormDefinitionEntity) getDbEntityManager().selectOne("selectCamundaFormDefinitionByKeyVersionWithoutTenantId", parameters);
+      return (CamundaFormDefinitionEntity) getDbEntityManager()
+          .selectOne("selectCamundaFormDefinitionByKeyVersionWithoutTenantId", parameters);
     } else {
-      return (CamundaFormDefinitionEntity) getDbEntityManager().selectOne("selectCamundaFormDefinitionByKeyVersionAndTenantId", parameters);
+      return (CamundaFormDefinitionEntity) getDbEntityManager()
+          .selectOne("selectCamundaFormDefinitionByKeyVersionAndTenantId", parameters);
     }
   }
 
@@ -85,11 +91,12 @@ public class CamundaFormDefinitionManager extends AbstractManager implements Abs
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("deploymentId", deploymentId);
     parameters.put("camundaFormDefinitionKey", definitionKey);
-    return (CamundaFormDefinitionEntity) getDbEntityManager().selectOne("selectCamundaFormDefinitionByDeploymentAndKey", parameters);
+    return (CamundaFormDefinitionEntity) getDbEntityManager().selectOne("selectCamundaFormDefinitionByDeploymentAndKey",
+        parameters);
   }
 
   @SuppressWarnings("unchecked")
-  public List<CamundaFormDefinitionEntity> findDefinitionsByDeploymentId(String deploymentId){
+  public List<CamundaFormDefinitionEntity> findDefinitionsByDeploymentId(String deploymentId) {
     return getDbEntityManager().selectList("selectCamundaFormDefinitionByDeploymentId", deploymentId);
   }
 
@@ -101,11 +108,13 @@ public class CamundaFormDefinitionManager extends AbstractManager implements Abs
   @Override
   public CamundaFormDefinitionEntity findDefinitionByKeyVersionTagAndTenantId(String definitionKey,
       String definitionVersionTag, String tenantId) {
-    throw new UnsupportedOperationException("Currently finding Camunda Form definition by version tag and tenant is not implemented.");
+    throw new UnsupportedOperationException(
+        "Currently finding Camunda Form definition by version tag and tenant is not implemented.");
   }
 
   public void deleteCamundaFormDefinitionsByDeploymentId(String deploymentId) {
-    getDbEntityManager().delete(CamundaFormDefinitionEntity.class, "deleteCamundaFormDefinitionsByDeploymentId", deploymentId);
+    getDbEntityManager().delete(CamundaFormDefinitionEntity.class, "deleteCamundaFormDefinitionsByDeploymentId",
+        deploymentId);
   }
 
   protected ListQueryParameterObject configureParameterizedQuery(Object parameter) {
