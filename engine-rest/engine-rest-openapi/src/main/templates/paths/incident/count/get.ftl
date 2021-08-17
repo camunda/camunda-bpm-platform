@@ -20,10 +20,10 @@
         desc = "Request successful."
         examples = ['"example-1": {
                        "summary": "GET `/incident/count?processInstanceId=aProcInstId`",
-                       "value": [
+                       "value":
                            {
                              "count": 2
-                           }]}'] />
+                           }}'] />
 
     <@lib.response
         code = "400"
