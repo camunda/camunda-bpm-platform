@@ -441,7 +441,12 @@ public class TaskResourceImpl implements TaskResource {
     Task task = engine.getTaskService().createTaskQuery().initializeFormKeys().taskId(taskId).singleResult();
     ensureNotNull("No task found for taskId '" + taskId + "'", "task", task);
     String formKey = task.getFormKey();
-    return ContentTypeUtil.getFormContentType(formKey);
+    if(formKey != null) {
+      return ContentTypeUtil.getFormContentType(formKey);
+    } else if(task.getCamundaFormRef() != null) {
+      return ContentTypeUtil.getFormContentType(task.getCamundaFormRef());
+    }
+    return MediaType.APPLICATION_XHTML_XML;
   }
 
   protected <V extends Object> V runWithoutAuthorization(Supplier<V> action) {

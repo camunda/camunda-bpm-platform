@@ -14,31 +14,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest.util;
-
-import javax.ws.rs.core.MediaType;
+package org.camunda.bpm.engine.impl.form;
 
 import org.camunda.bpm.engine.form.CamundaFormRef;
 
-public class ContentTypeUtil {
+public class CamundaFormRefImpl implements CamundaFormRef {
 
-  private static final String SUFFIX_FORM_FILE = ".form";
+  String key;
+  String binding;
+  Integer version;
 
-  /**
-   * @return the content type to use for the provided form's key
-   *
-   */
-  public static String getFormContentType(String formKey) {
-    if (formKey.endsWith(SUFFIX_FORM_FILE)) {
-      return MediaType.APPLICATION_JSON;
-    }
-    return MediaType.APPLICATION_XHTML_XML;
+  public CamundaFormRefImpl(String key, String binding) {
+    this.key = key;
+    this.binding = binding;
   }
 
-  public static String getFormContentType(CamundaFormRef formRef) {
-    if(formRef != null && formRef.getKey() != null && formRef.getBinding() != null) {
-      return MediaType.APPLICATION_JSON;
-    }
-    return MediaType.APPLICATION_XHTML_XML;
+  public String getKey() {
+    return key;
+  }
+
+  public void setKey(String key) {
+    this.key = key;
+  }
+
+  public String getBinding() {
+    return binding;
+  }
+
+  public void setBinding(String binding) {
+    this.binding = binding;
+  }
+
+  public Integer getVersion() {
+    return version;
+  }
+
+  public void setVersion(Integer version) {
+    this.version = version;
+  }
+
+  @Override
+  public String toString() {
+    return "CamundaFormRefImpl [key=" + key + ", binding=" + binding + ", version=" + version + "]";
   }
 }
