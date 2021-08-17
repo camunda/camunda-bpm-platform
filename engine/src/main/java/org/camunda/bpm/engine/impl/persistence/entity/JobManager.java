@@ -205,6 +205,9 @@ public class JobManager extends AbstractManager {
       }
     }
 
+    params.put("jobPriorityMin", engineConfiguration.getJobExecutorPriorityRangeMin());
+    params.put("jobPriorityMax", engineConfiguration.getJobExecutorPriorityRangeMax());
+
     params.put("historyCleanupEnabled", engineConfiguration.isHistoryCleanupEnabled());
 
     List<QueryOrderingProperty> orderingProperties = new ArrayList<>();
@@ -404,13 +407,13 @@ public class JobManager extends AbstractManager {
   }
 
   /**
-   * Sometimes we get a notification of a job that is not yet due, so we 
+   * Sometimes we get a notification of a job that is not yet due, so we
    * should not execute it immediately
    */
   protected boolean isJobDue(JobEntity job) {
     Date duedate = job.getDuedate();
     Date now = ClockUtil.getCurrentTime();
-    
+
     return duedate == null || duedate.getTime() <= now.getTime();
   }
 }

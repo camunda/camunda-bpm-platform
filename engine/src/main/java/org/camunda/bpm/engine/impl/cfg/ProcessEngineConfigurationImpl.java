@@ -508,6 +508,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected PriorityProvider<JobDeclaration<?, ?>> jobPriorityProvider;
 
+  protected Long jobExecutorPriorityRangeMin = null;
+  protected Long jobExecutorPriorityRangeMax = null;
+
   // EXTERNAL TASK /////////////////////////////////////////////////////////////
   protected PriorityProvider<ExternalTaskActivityBehavior> externalTaskPriorityProvider;
 
@@ -3009,6 +3012,22 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setJobPriorityProvider(PriorityProvider<JobDeclaration<?, ?>> jobPriorityProvider) {
     this.jobPriorityProvider = jobPriorityProvider;
+  }
+
+  public Long getJobExecutorPriorityRangeMin() {
+    return jobExecutorPriorityRangeMin;
+  }
+
+  public void setJobExecutorPriorityRangeMin(Long jobExecutorPriorityRangeMin) {
+    this.jobExecutorPriorityRangeMin = jobExecutorPriorityRangeMin;
+  }
+
+  public Long getJobExecutorPriorityRangeMax() {
+    return jobExecutorPriorityRangeMax;
+  }
+
+  public void setJobExecutorPriorityRangeMax(Long jobExecutorPriorityRangeMax) {
+    this.jobExecutorPriorityRangeMax = jobExecutorPriorityRangeMax;
   }
 
   public PriorityProvider<ExternalTaskActivityBehavior> getExternalTaskPriorityProvider() {
