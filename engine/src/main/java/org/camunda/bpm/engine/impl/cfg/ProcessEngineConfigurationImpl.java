@@ -512,6 +512,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected PriorityProvider<JobDeclaration<?, ?>> jobPriorityProvider;
 
+  protected Long jobExecutorPriorityRangeMin = null;
+  protected Long jobExecutorPriorityRangeMax = null;
+
   // EXTERNAL TASK /////////////////////////////////////////////////////////////
   protected PriorityProvider<ExternalTaskActivityBehavior> externalTaskPriorityProvider;
 
@@ -892,7 +895,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected String sundayHistoryCleanupBatchWindowStartTime;
   protected String sundayHistoryCleanupBatchWindowEndTime;
 
-
   protected int historyCleanupDegreeOfParallelism = 1;
 
   protected String historyTimeToLive;
@@ -900,6 +902,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected String batchOperationHistoryTimeToLive;
   protected Map<String, String> batchOperationsForHistoryCleanup;
   protected Map<String, Integer> parsedBatchOperationsForHistoryCleanup;
+
+  /**
+   * Default priority for history cleanup jobs. */
+  protected long historyCleanupJobPriority = DefaultJobPriorityProvider.DEFAULT_PRIORITY;
 
   /**
    * Time to live for historic job log entries written by history cleanup jobs.
@@ -2217,6 +2223,25 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       }
     }
 
+    long effectiveJobExecutorPriorityRangeMin = jobExecutorPriorityRangeMin == null ? 0 : jobExecutorPriorityRangeMin;
+    long effectiveJobExecutorPriorityRangeMax = jobExecutorPriorityRangeMax == null ? Long.MAX_VALUE : jobExecutorPriorityRangeMax;
+
+    // verify job executor priority range is configured correctly
+    if (effectiveJobExecutorPriorityRangeMin > effectiveJobExecutorPriorityRangeMax) {
+      throw ProcessEngineLogger.JOB_EXECUTOR_LOGGER.jobExecutorPriorityRangeException(
+          "jobExecutorPriorityRangeMin can not be greater than jobExecutorPriorityRangeMax");
+    }
+    if (effectiveJobExecutorPriorityRangeMin < 0) {
+      throw ProcessEngineLogger.JOB_EXECUTOR_LOGGER
+          .jobExecutorPriorityRangeException("job executor priority range can not be negative");
+    }
+
+    if (effectiveJobExecutorPriorityRangeMin > historyCleanupJobPriority || effectiveJobExecutorPriorityRangeMax < historyCleanupJobPriority) {
+      ProcessEngineLogger.JOB_EXECUTOR_LOGGER.infoJobExecutorDoesNotHandleHistoryCleanupJobs(this);
+    }
+    if (effectiveJobExecutorPriorityRangeMin > batchJobPriority || effectiveJobExecutorPriorityRangeMax < batchJobPriority) {
+      ProcessEngineLogger.JOB_EXECUTOR_LOGGER.infoJobExecutorDoesNotHandleBatchJobs(this);
+    }
   }
 
   protected void initJobProvider() {
@@ -3030,6 +3055,24 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.jobPriorityProvider = jobPriorityProvider;
   }
 
+  public Long getJobExecutorPriorityRangeMin() {
+    return jobExecutorPriorityRangeMin;
+  }
+
+  public ProcessEngineConfigurationImpl setJobExecutorPriorityRangeMin(Long jobExecutorPriorityRangeMin) {
+    this.jobExecutorPriorityRangeMin = jobExecutorPriorityRangeMin;
+    return this;
+  }
+
+  public Long getJobExecutorPriorityRangeMax() {
+    return jobExecutorPriorityRangeMax;
+  }
+
+  public ProcessEngineConfigurationImpl setJobExecutorPriorityRangeMax(Long jobExecutorPriorityRangeMax) {
+    this.jobExecutorPriorityRangeMax = jobExecutorPriorityRangeMax;
+    return this;
+  }
+
   public PriorityProvider<ExternalTaskActivityBehavior> getExternalTaskPriorityProvider() {
     return externalTaskPriorityProvider;
   }
@@ -3815,6 +3858,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setBatchJobPriority(long batchJobPriority) {
     this.batchJobPriority = batchJobPriority;
+  }
+
+  public long getHistoryCleanupJobPriority() {
+    return historyCleanupJobPriority;
+  }
+
+  public ProcessEngineConfigurationImpl setHistoryCleanupJobPriority(long historyCleanupJobPriority) {
+    this.historyCleanupJobPriority = historyCleanupJobPriority;
+    return this;
   }
 
   public SessionFactory getIdentityProviderSessionFactory() {

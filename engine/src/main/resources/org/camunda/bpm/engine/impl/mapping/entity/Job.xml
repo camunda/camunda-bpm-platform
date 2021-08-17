@@ -201,6 +201,13 @@
         )
       </if>
 
+      <if test="parameter.jobPriorityMin != null">
+        and RES.PRIORITY_ &gt;= #{parameter.jobPriorityMin}
+      </if>
+      <if test="parameter.jobPriorityMax != null">
+        and RES.PRIORITY_ &lt;= #{parameter.jobPriorityMax}
+      </if>
+
       and (<include refid="AtomicExclusiveOrNonExclusiveJobs"/>)
 
       <if test="!parameter.historyCleanupEnabled">
