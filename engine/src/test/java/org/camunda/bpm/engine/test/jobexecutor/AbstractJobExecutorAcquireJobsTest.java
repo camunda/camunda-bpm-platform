@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AcquirableJobEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ClockTestUtil;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
@@ -47,6 +48,8 @@ public abstract class AbstractJobExecutorAcquireJobsTest {
   private boolean jobExecutorAcquireByPriority;
   private boolean jobExecutorPreferTimerJobs;
   private boolean jobEnsureDueDateSet;
+  private Long jobExecutorPriorityRangeMin;
+  private Long jobExecutorPriorityRangeMax;
 
   @Before
   public void initServices() {
@@ -61,6 +64,8 @@ public abstract class AbstractJobExecutorAcquireJobsTest {
     jobExecutorAcquireByPriority = configuration.isJobExecutorAcquireByPriority();
     jobExecutorPreferTimerJobs = configuration.isJobExecutorPreferTimerJobs();
     jobEnsureDueDateSet = configuration.isEnsureJobDueDateNotNull();
+    jobExecutorPriorityRangeMin = configuration.getJobExecutorPriorityRangeMin();
+    jobExecutorPriorityRangeMax = configuration.getJobExecutorPriorityRangeMax();
   }
 
   @Before
@@ -74,6 +79,8 @@ public abstract class AbstractJobExecutorAcquireJobsTest {
     configuration.setJobExecutorAcquireByPriority(jobExecutorAcquireByPriority);
     configuration.setJobExecutorPreferTimerJobs(jobExecutorPreferTimerJobs);
     configuration.setEnsureJobDueDateNotNull(jobEnsureDueDateSet);
+    configuration.setJobExecutorPriorityRangeMin(jobExecutorPriorityRangeMin);
+    configuration.setJobExecutorPriorityRangeMax(jobExecutorPriorityRangeMax);
   }
 
   @After
@@ -104,6 +111,10 @@ public abstract class AbstractJobExecutorAcquireJobsTest {
     for (int i = 0; i < times; i++) {
       startProcess(processDefinitionKey, activity);
     }
+  }
+
+  protected Job findJobById(String id) {
+    return managementService.createJobQuery().jobId(id).singleResult();
   }
 
 }

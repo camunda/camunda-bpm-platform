@@ -20,6 +20,8 @@ import java.util.Date;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.core.variable.mapping.value.ConstantValueProvider;
+import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.persistence.entity.EverLivingJobEntity;
@@ -87,5 +89,11 @@ public class HistoryCleanupJobDeclaration extends JobDeclaration<HistoryCleanupC
         return null;
       }
     }
+  }
+
+  public ParameterValueProvider getJobPriorityProvider() {
+    long historyCleanupJobPriority = Context.getProcessEngineConfiguration()
+        .getHistoryCleanupJobPriority();
+    return new ConstantValueProvider(historyCleanupJobPriority);
   }
 }

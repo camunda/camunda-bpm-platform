@@ -141,26 +141,28 @@ public class JobManager extends AbstractManager {
 
     JobExecutorContext jobExecutorContext = Context.getJobExecutorContext();
     TransactionListener transactionListener = null;
-    // add job to be executed in the current processor
-    if(!job.isSuspended()
-            && job.isExclusive()
-            && isJobDue(job)
-            && jobExecutorContext != null
-            && jobExecutorContext.isExecutingExclusiveJob()
-            && areInSameProcessInstance(job, jobExecutorContext.getCurrentJob())) {
-      // lock job & add to the queue of the current processor
-      Date currentTime = ClockUtil.getCurrentTime();
-      job.setLockExpirationTime(new Date(currentTime.getTime() + jobExecutor.getLockTimeInMillis()));
-      job.setLockOwner(jobExecutor.getLockOwner());
-      transactionListener = new ExclusiveJobAddedNotification(job.getId(), jobExecutorContext);
-    } else {
-      // reset Acquisition strategy and notify the JobExecutor that
-      // a new Job is available for execution on future runs
-      transactionListener = new MessageAddedNotification(jobExecutor);
-    }
-    Context.getCommandContext()
+    if (isJobPriorityInJobExecutorPriorityRange(job.getPriority())) {
+      // add job to be executed in the current processor
+      if (!job.isSuspended()
+         && job.isExclusive()
+         && isJobDue(job)
+         && jobExecutorContext != null
+         && jobExecutorContext.isExecutingExclusiveJob()
+         && areInSameProcessInstance(job, jobExecutorContext.getCurrentJob())) {
+        // lock job & add to the queue of the current processor
+        Date currentTime = ClockUtil.getCurrentTime();
+        job.setLockExpirationTime(new Date(currentTime.getTime() + jobExecutor.getLockTimeInMillis()));
+        job.setLockOwner(jobExecutor.getLockOwner());
+        transactionListener = new ExclusiveJobAddedNotification(job.getId(), jobExecutorContext);
+      } else {
+        // reset Acquisition strategy and notify the JobExecutor that
+        // a new Job is available for execution on future runs
+        transactionListener = new MessageAddedNotification(jobExecutor);
+      }
+      Context.getCommandContext()
       .getTransactionContext()
       .addTransactionListener(TransactionState.COMMITTED, transactionListener);
+    }
   }
 
   protected boolean areInSameProcessInstance(JobEntity job1, JobEntity job2) {
@@ -172,6 +174,14 @@ public class JobManager extends AbstractManager {
     String instance2 = job2.getProcessInstanceId();
 
     return instance1 != null && instance1.equals(instance2);
+  }
+
+  protected boolean isJobPriorityInJobExecutorPriorityRange(long jobPriority) {
+    ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
+    Long jobExecutorPriorityRangeMin = configuration.getJobExecutorPriorityRangeMin();
+    Long jobExecutorPriorityRangeMax = configuration.getJobExecutorPriorityRangeMax();
+    return (jobExecutorPriorityRangeMin == null || jobExecutorPriorityRangeMin <= jobPriority)
+        && (jobExecutorPriorityRangeMax == null || jobExecutorPriorityRangeMax >= jobPriority);
   }
 
   public void cancelTimers(ExecutionEntity execution) {
@@ -204,6 +214,9 @@ public class JobManager extends AbstractManager {
         params.put("deploymentIds", registeredDeployments);
       }
     }
+
+    params.put("jobPriorityMin", engineConfiguration.getJobExecutorPriorityRangeMin());
+    params.put("jobPriorityMax", engineConfiguration.getJobExecutorPriorityRangeMax());
 
     params.put("historyCleanupEnabled", engineConfiguration.isHistoryCleanupEnabled());
 
@@ -404,13 +417,13 @@ public class JobManager extends AbstractManager {
   }
 
   /**
-   * Sometimes we get a notification of a job that is not yet due, so we 
+   * Sometimes we get a notification of a job that is not yet due, so we
    * should not execute it immediately
    */
   protected boolean isJobDue(JobEntity job) {
     Date duedate = job.getDuedate();
     Date now = ClockUtil.getCurrentTime();
-    
+
     return duedate == null || duedate.getTime() <= now.getTime();
   }
 }
