@@ -168,6 +168,11 @@
         <artifactId>camunda-bpm-spring-boot-starter-test</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm.quarkus</groupId>
+        <artifactId>camunda-bpm-quarkus-engine</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
       <!-- dmn engine dependencies
        -->
