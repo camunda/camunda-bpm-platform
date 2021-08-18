@@ -28,12 +28,12 @@ import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorLogger;
 import org.eclipse.microprofile.context.ManagedExecutor;
 
 /**
- * A {@link JobExecutor} implementation that utilises the Quarkus
- * container-managed thread pool to acquire and execute jobs.
+ * A {@link JobExecutor} implementation that utilises a separate thread pool
+ * to acquire and execute jobs.
  */
 public class ManagedJobExecutor extends JobExecutor {
 
-  protected final static JobExecutorLogger LOG = ProcessEngineLogger.JOB_EXECUTOR_LOGGER;
+  protected static final JobExecutorLogger LOG = ProcessEngineLogger.JOB_EXECUTOR_LOGGER;
 
   protected ManagedExecutor taskExecutor;
 

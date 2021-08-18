@@ -30,6 +30,8 @@ import org.camunda.bpm.engine.cdi.impl.util.BeanManagerLookup;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
+import org.camunda.bpm.quarkus.engine.extension.CamundaEngineConfig;
+import org.camunda.bpm.quarkus.engine.extension.QuarkusProcessEngineConfiguration;
 import org.eclipse.microprofile.context.ManagedExecutor;
 
 import javax.enterprise.inject.spi.BeanManager;
@@ -65,24 +67,7 @@ public class CamundaEngineRecorder {
     // configure job executor,
     // if not already configured by a custom configuration
     if (configuration.getJobExecutor() == null) {
-
-      int maxPoolSize = config.jobExecutor.threadPool.maxPoolSize;
-      int queueSize = config.jobExecutor.threadPool.queueSize;
-
-      // create a non-bean ManagedExecutor instance. This instance
-      // delegates tasks to the Quarkus core Executor/thread pool.
-      ManagedExecutor managedExecutor = SmallRyeManagedExecutor.builder()
-          .maxQueued(queueSize)
-          .maxAsync(maxPoolSize)
-          .withNewExecutorService()
-          .build();
-      ManagedJobExecutor quarkusJobExecutor = new ManagedJobExecutor(managedExecutor);
-
-      // apply job executor configuration properties
-      PropertyHelper
-          .applyProperties(quarkusJobExecutor, config.jobExecutor.configuration, PropertyHelper.KEBAB_CASE);
-
-      configuration.setJobExecutor(quarkusJobExecutor);
+      configureJobExecutor(configuration, config);
     }
 
     configureCdiEventBridge(configuration);
@@ -137,4 +122,25 @@ public class CamundaEngineRecorder {
     });
   }
 
+  protected void configureJobExecutor(ProcessEngineConfigurationImpl configuration,
+                                      CamundaEngineConfig config) {
+
+    int maxPoolSize = config.jobExecutor.threadPool.maxPoolSize;
+    int queueSize = config.jobExecutor.threadPool.queueSize;
+
+    // create a non-bean ManagedExecutor instance. This instance
+    // uses it's own Executor/thread pool.
+    ManagedExecutor managedExecutor = SmallRyeManagedExecutor.builder()
+        .maxQueued(queueSize)
+        .maxAsync(maxPoolSize)
+        .withNewExecutorService()
+        .build();
+    ManagedJobExecutor quarkusJobExecutor = new ManagedJobExecutor(managedExecutor);
+
+    // apply job executor configuration properties
+    PropertyHelper
+        .applyProperties(quarkusJobExecutor, config.jobExecutor.genericConfig, PropertyHelper.KEBAB_CASE);
+
+    configuration.setJobExecutor(quarkusJobExecutor);
+  }
 }

@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import javax.inject.Inject;
 
 import io.quarkus.test.QuarkusUnitTest;
-import org.camunda.bpm.quarkus.engine.extension.impl.CamundaEngineConfig;
+import org.camunda.bpm.quarkus.engine.extension.CamundaEngineConfig;
 import org.camunda.bpm.quarkus.engine.test.helper.ProcessEngineAwareExtension;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -52,13 +52,13 @@ public class CamundaEngineConfigTest {
     // given a custom application.properties file
 
     // then
-    assertThat(config.jobExecutor.configuration.get("max-jobs-per-acquisition")).isEqualTo("5");
-    assertThat(config.jobExecutor.configuration.get("lock-time-in-millis")).isEqualTo("500000");
-    assertThat(config.jobExecutor.configuration.get("wait-time-in-millis")).isEqualTo("7000");
-    assertThat(config.jobExecutor.configuration.get("max-wait")).isEqualTo("65000");
-    assertThat(config.jobExecutor.configuration.get("backoff-time-in-millis")).isEqualTo("5");
-    assertThat(config.jobExecutor.configuration.get("max-backoff")).isEqualTo("5");
-    assertThat(config.jobExecutor.configuration.get("backoff-decrease-threshold")).isEqualTo("120");
-    assertThat(config.jobExecutor.configuration.get("wait-increase-factor")).isEqualTo("3");
+    assertThat(config.jobExecutor.genericConfig.get("max-jobs-per-acquisition")).isEqualTo("5");
+    assertThat(config.jobExecutor.genericConfig.get("lock-time-in-millis")).isEqualTo("500000");
+    assertThat(config.jobExecutor.genericConfig.get("wait-time-in-millis")).isEqualTo("7000");
+    assertThat(config.jobExecutor.genericConfig.get("max-wait")).isEqualTo("65000");
+    assertThat(config.jobExecutor.genericConfig.get("backoff-time-in-millis")).isEqualTo("5");
+    assertThat(config.jobExecutor.genericConfig.get("max-backoff")).isEqualTo("5");
+    assertThat(config.jobExecutor.genericConfig.get("backoff-decrease-threshold")).isEqualTo("120");
+    assertThat(config.jobExecutor.genericConfig.get("wait-increase-factor")).isEqualTo("3");
   }
 }

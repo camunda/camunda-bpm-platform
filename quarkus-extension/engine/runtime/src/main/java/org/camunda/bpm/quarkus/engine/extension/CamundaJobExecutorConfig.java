@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.quarkus.engine.extension.impl;
+package org.camunda.bpm.quarkus.engine.extension;
 
 import java.util.Map;
 
@@ -29,7 +29,7 @@ public class CamundaJobExecutorConfig {
    * {@link https://docs.camunda.org/manual/latest/reference/deployment-descriptors/tags/job-executor/#job-acquisition-configuration-properties}
    */
   @ConfigItem(name = ConfigItem.PARENT)
-  public Map<String, String> configuration;
+  public Map<String, String> genericConfig;
 
   /**
    * The Camunda JobExecutor thread pool config. This thread pool is responsible for running
