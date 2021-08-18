@@ -18,13 +18,10 @@ package org.camunda.bpm.quarkus.engine.extension.impl;
 
 import java.util.List;
 import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.TimeUnit;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
-import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
-import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorLogger;
 import org.eclipse.microprofile.context.ManagedExecutor;
 
 /**
@@ -32,8 +29,6 @@ import org.eclipse.microprofile.context.ManagedExecutor;
  * to acquire and execute jobs.
  */
 public class ManagedJobExecutor extends JobExecutor {
-
-  protected static final JobExecutorLogger LOG = ProcessEngineLogger.JOB_EXECUTOR_LOGGER;
 
   protected ManagedExecutor taskExecutor;
 

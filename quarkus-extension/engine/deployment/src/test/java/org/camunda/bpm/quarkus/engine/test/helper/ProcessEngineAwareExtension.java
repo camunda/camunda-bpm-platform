@@ -16,12 +16,6 @@
  */
 package org.camunda.bpm.quarkus.engine.test.helper;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Produces;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.function.Supplier;
-
 import io.quarkus.arc.Arc;
 import io.quarkus.test.QuarkusUnitTest;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -31,6 +25,12 @@ import org.camunda.bpm.quarkus.engine.extension.QuarkusProcessEngineConfiguratio
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtensionContext;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Produces;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.function.Supplier;
 
 public class ProcessEngineAwareExtension extends QuarkusUnitTest {
 

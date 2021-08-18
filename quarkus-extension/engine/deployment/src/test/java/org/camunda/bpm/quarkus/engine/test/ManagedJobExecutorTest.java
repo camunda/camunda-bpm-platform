@@ -16,10 +16,6 @@
  */
 package org.camunda.bpm.quarkus.engine.test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import javax.inject.Inject;
-
 import io.quarkus.test.QuarkusUnitTest;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -38,6 +34,10 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+
+import javax.inject.Inject;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ManagedJobExecutorTest {
 
