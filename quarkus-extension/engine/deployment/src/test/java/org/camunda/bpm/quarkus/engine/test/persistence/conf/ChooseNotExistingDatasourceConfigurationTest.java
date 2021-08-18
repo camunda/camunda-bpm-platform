@@ -38,6 +38,8 @@ public class ChooseNotExistingDatasourceConfigurationTest {
 
   @Test
   public void shouldExpectException() {
+    // Exception is raised during application bootstrap.
+    // See assertion in the extension registration above.
   }
 
 }

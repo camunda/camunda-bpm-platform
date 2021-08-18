@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.quarkus.engine.extension.impl;
 
-import io.agroal.api.AgroalDataSource;
 import io.quarkus.agroal.runtime.DataSources;
 import io.quarkus.arc.runtime.BeanContainer;
 import io.quarkus.runtime.RuntimeValue;
@@ -53,8 +52,8 @@ public class CamundaEngineRecorder {
     QuarkusProcessEngineConfiguration configuration = beanContainer.instance(QuarkusProcessEngineConfiguration.class);
 
     if (configuration.getDataSource() == null) {
-      String datasource = config.datasource.orElse(null);
-      configureDatasource(configuration, datasource);
+      String datasource = config.datasource.orElse(DEFAULT_DATASOURCE_NAME);
+      configuration.setDataSource(DataSources.fromName(datasource));
     }
 
     if (configuration.getTransactionManager() == null) {
@@ -82,18 +81,6 @@ public class CamundaEngineRecorder {
     configureCdiEventBridge(configuration);
 
     return new RuntimeValue<>(configuration);
-  }
-
-  protected void configureDatasource(QuarkusProcessEngineConfiguration configuration, String datasourceName) {
-    AgroalDataSource dataSource = null;
-    if (datasourceName != null) {
-      dataSource = DataSources.fromName(datasourceName);
-
-    } else {
-      dataSource = DataSources.fromName(DEFAULT_DATASOURCE_NAME);
-
-    }
-    configuration.setDataSource(dataSource);
   }
 
   protected void configureCdiEventBridge(QuarkusProcessEngineConfiguration configuration) {

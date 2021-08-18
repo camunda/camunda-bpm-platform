@@ -108,7 +108,7 @@ public class TransactionIntegrationTest {
   @Test
   @Deployment
   public void shouldRollbackOnException() {
-
+    // given
     try {
       try (Connection connection = dataSource.getConnection()) {
         try (Statement statement = connection.createStatement()) {
@@ -129,6 +129,7 @@ public class TransactionIntegrationTest {
         }
 
         try {
+          // when
           userBean.completeTask(taskService.createTaskQuery().singleResult().getId());
           Assertions.fail();
         } catch (ProcessEngineException ignored) {
@@ -136,6 +137,7 @@ public class TransactionIntegrationTest {
           fail(e.getMessage());
         }
 
+        // then
         assertThat(taskService.createTaskQuery().singleResult().getName()).isEqualTo("My Task");
         try (Statement statement = connection.createStatement()) {
           try (ResultSet resultSet = statement.executeQuery("select count(*) as count from MY_TABLE")) {
@@ -161,8 +163,13 @@ public class TransactionIntegrationTest {
   })
   @Test
   public void shouldPropagateErrorOnException() {
+    // given
     runtimeService.startProcessInstanceByKey("process");
+
+    // when
     TestHelper.waitForJobExecutorToProcessAllJobs(configuration, 20_000, 1000);
+
+    // then
     Incident incident = runtimeService.createIncidentQuery().activityId("servicetask").singleResult();
     assertThat(incident.getIncidentMessage()).isEqualTo("error");
   }
@@ -170,10 +177,13 @@ public class TransactionIntegrationTest {
   @Deployment
   @Test
   public void shouldRollbackInServiceTask() {
+    // given
     runtimeService.startProcessInstanceByKey("txRollbackServiceTask");
 
+    // when
     TestHelper.waitForJobExecutorToProcessAllJobs(configuration, 20_000, 1_000);
 
+    // then
     Job job = managementService.createJobQuery().singleResult();
 
     assertThat(job.getRetries()).isEqualTo(0);
@@ -186,10 +196,13 @@ public class TransactionIntegrationTest {
   @Deployment
   @Test
   public void shouldRollbackInServiceTaskWithCustomRetryCycle() {
+    // given
     runtimeService.startProcessInstanceByKey("txRollbackServiceTaskWithCustomRetryCycle");
 
+    // when
     TestHelper.waitForJobExecutorToProcessAllJobs(configuration, 20_000, 1_000);
 
+    // then
     Job job = managementService.createJobQuery().singleResult();
 
     assertThat(job.getRetries()).isEqualTo(0);
@@ -202,10 +215,13 @@ public class TransactionIntegrationTest {
   @Deployment
   @Test
   public void shouldRollbackOnExceptionInTransactionListener() {
+    // given
     runtimeService.startProcessInstanceByKey("failingTransactionListener");
 
+    // when
     TestHelper.waitForJobExecutorToProcessAllJobs(configuration, 20_000, 1_000);
 
+    // then
     Job job = managementService.createJobQuery().singleResult();
 
     assertThat(job.getRetries()).isEqualTo(0);
