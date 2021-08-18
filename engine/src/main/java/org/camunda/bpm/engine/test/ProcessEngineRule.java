@@ -165,8 +165,10 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
 
     initializeServices();
 
-    final boolean hasRequiredHistoryLevel = TestHelper.annotationRequiredHistoryLevelCheck(processEngine, description);
-    final boolean runsWithRequiredDatabase = TestHelper.annotationRequiredDatabaseCheck(processEngine, description);
+    final boolean hasRequiredHistoryLevel =
+        TestHelper.annotationRequiredHistoryLevelCheck(processEngine, description.getTestClass(), description.getMethodName());
+    final boolean runsWithRequiredDatabase =
+        TestHelper.annotationRequiredDatabaseCheck(processEngine, description.getTestClass(), description.getMethodName());
     return new Statement() {
 
       @Override

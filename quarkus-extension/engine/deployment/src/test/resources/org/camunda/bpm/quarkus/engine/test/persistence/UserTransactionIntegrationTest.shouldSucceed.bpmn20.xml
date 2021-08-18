@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" targetNamespace="Examples">
+  <process id="testTxSuccess" isExecutable="true">
+    <startEvent id="theStart" name="Start">
+      <outgoing>flow12</outgoing>
+    </startEvent>
+    <endEvent id="endevent1" name="End">
+      <incoming>SequenceFlow_1</incoming>
+    </endEvent>
+    <sequenceFlow id="flow12" name="" sourceRef="theStart" targetRef="UserTask_1"/>
+    <userTask id="UserTask_1" name="User Task">
+      <incoming>flow12</incoming>
+      <outgoing>SequenceFlow_1</outgoing>
+    </userTask>
+    <sequenceFlow id="SequenceFlow_1" name="" sourceRef="UserTask_1" targetRef="endevent1"/>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_testDeployProcessArchive">
+    <bpmndi:BPMNPlane id="BPMNPlane_testDeployProcessArchive" bpmnElement="testDeployProcessArchive">
+      <bpmndi:BPMNShape id="BPMNShape_theStart" bpmnElement="theStart" isHorizontal="true">
+        <omgdc:Bounds height="35.0" width="35.0" x="30.0" y="200.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endevent1" bpmnElement="endevent1" isHorizontal="true">
+        <omgdc:Bounds height="35.0" width="35.0" x="250.0" y="200.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_UserTask_1" bpmnElement="UserTask_1">
+        <omgdc:Bounds height="50.0" width="110.0" x="110.0" y="193.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow12" bpmnElement="flow12" sourceElement="BPMNShape_theStart" targetElement="BPMNShape_UserTask_1">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="65.0" y="217.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="110.0" y="218.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1" bpmnElement="SequenceFlow_1" sourceElement="BPMNShape_UserTask_1" targetElement="BPMNShape_endevent1">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="220.0" y="218.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="250.0" y="217.0"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

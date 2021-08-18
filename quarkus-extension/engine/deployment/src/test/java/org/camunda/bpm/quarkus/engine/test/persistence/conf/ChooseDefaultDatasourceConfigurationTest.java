@@ -14,15 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.quarkus.engine.test.id;
+package org.camunda.bpm.quarkus.engine.test.persistence.conf;
 
 import io.quarkus.test.QuarkusUnitTest;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.TaskService;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.db.DbIdGenerator;
-import org.camunda.bpm.engine.task.Task;
-import org.camunda.bpm.quarkus.engine.extension.impl.QuarkusProcessEngineConfiguration;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.quarkus.engine.test.helper.ProcessEngineAwareExtension;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -30,34 +26,26 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import javax.inject.Inject;
+import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ConfigureDbIdGeneratorTest {
+public class ChooseDefaultDatasourceConfigurationTest {
 
   @RegisterExtension
-  static final QuarkusUnitTest unitTest = new ProcessEngineAwareExtension()
-      .engineConfig(() -> (QuarkusProcessEngineConfiguration) new QuarkusProcessEngineConfiguration()
-          .setIdGenerator(null))
+  static QuarkusUnitTest unitTest = new ProcessEngineAwareExtension()
+      .withConfigurationResource("persistence/multiple-datasources-application.properties")
+      .overrideConfigKey("quarkus.camunda.bpm.datasource", "<default>")
       .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class));
-
-  @Inject
-  public TaskService taskService;
 
   @Inject
   protected ProcessEngine processEngine;
 
   @Test
-  public void shouldConfigureDbIdGenerator() {
-    Task task = taskService.newTask();
-    taskService.saveTask(task);
-
-    String id = taskService.createTaskQuery().singleResult().getId();
-    assertThat(Long.parseLong(id)).isGreaterThan(0);
-
-    ProcessEngineConfigurationImpl engineConfig =
-        (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
-    assertThat(engineConfig.getIdGenerator()).isInstanceOf(DbIdGenerator.class);
+  public void shouldChooseDefaultDatasource() throws SQLException {
+    ProcessEngineConfiguration configuration = processEngine.getProcessEngineConfiguration();
+    assertThat(configuration.getDataSource().getConnection()).asString()
+        .contains("jdbc:h2:./camunda-h2-dbs/process-engine");
   }
 
 }

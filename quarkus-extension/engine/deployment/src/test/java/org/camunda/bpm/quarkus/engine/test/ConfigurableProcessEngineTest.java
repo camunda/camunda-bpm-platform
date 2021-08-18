@@ -16,12 +16,6 @@
  */
 package org.camunda.bpm.quarkus.engine.test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Produces;
-import javax.inject.Inject;
-
 import io.quarkus.test.QuarkusUnitTest;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.quarkus.engine.extension.impl.QuarkusProcessEngineConfiguration;
@@ -29,6 +23,12 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Produces;
+import javax.inject.Inject;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ConfigurableProcessEngineTest {
 
@@ -41,12 +41,13 @@ public class ConfigurableProcessEngineTest {
   static class MyConfig {
 
     @Produces
-    public QuarkusProcessEngineConfiguration getCustomProcessEngineConfig() {
+    public QuarkusProcessEngineConfiguration customEngineConfig() {
 
-      QuarkusProcessEngineConfiguration quarkusProcessEngineConfiguration = new QuarkusProcessEngineConfiguration();
-      quarkusProcessEngineConfiguration.setProcessEngineName("customEngine");
+      QuarkusProcessEngineConfiguration engineConfig = new QuarkusProcessEngineConfiguration();
+      engineConfig.setProcessEngineName("customEngine");
+      engineConfig.setJobExecutorActivate(false);
 
-      return quarkusProcessEngineConfiguration;
+      return engineConfig;
     }
 
   }
