@@ -16,14 +16,22 @@
  */
 package org.camunda.bpm.quarkus.engine.extension;
 
+import java.util.Map;
+import java.util.Optional;
+
 import io.quarkus.runtime.annotations.ConfigItem;
 import io.quarkus.runtime.annotations.ConfigPhase;
 import io.quarkus.runtime.annotations.ConfigRoot;
 
-import java.util.Optional;
-
 @ConfigRoot(phase = ConfigPhase.RUN_TIME, name = "camunda")
 public class CamundaEngineConfig {
+
+  /**
+   * The Camunda ProcessEngineConfiguration properties. For more details,
+   * @see <a href="https://docs.camunda.org/manual/latest/reference/deployment-descriptors/tags/process-engine/#configuration-properties">Process Engine Configuration Properties</a>.
+   */
+  @ConfigItem(name = "generic-properties")
+  public Map<String, String> genericConfig;
 
   /**
    * The Camunda JobExecutor config. It provides available job acquisition thread configuration

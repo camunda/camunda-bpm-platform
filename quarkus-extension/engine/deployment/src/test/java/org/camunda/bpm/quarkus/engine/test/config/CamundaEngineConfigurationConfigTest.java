@@ -14,51 +14,58 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.quarkus.engine.test;
+package org.camunda.bpm.quarkus.engine.test.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.inject.Inject;
 
 import io.quarkus.test.QuarkusUnitTest;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.quarkus.engine.extension.CamundaEngineConfig;
+import org.camunda.bpm.quarkus.engine.extension.QuarkusProcessEngineConfiguration;
 import org.camunda.bpm.quarkus.engine.test.helper.ProcessEngineAwareExtension;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class CamundaEngineConfigTest {
+public class CamundaEngineConfigurationConfigTest {
 
   @RegisterExtension
   static final QuarkusUnitTest unitTest = new ProcessEngineAwareExtension()
-      .withConfigurationResource("job-executor-application.properties")
+      .withConfigurationResource("process-engine-config-application.properties")
       .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class));
 
   @Inject
   CamundaEngineConfig config;
 
+  @Inject
+  ProcessEngine processEngine;
+
   @Test
-  public void shouldLoadJobExecutorThreadPoolProperties() {
+  public void shouldLoadProcessEngineConfigurationProperties() {
     // given a custom application.properties file
 
     // then
-    assertThat(config.jobExecutor.threadPool.maxPoolSize).isEqualTo(12);
-    assertThat(config.jobExecutor.threadPool.queueSize).isEqualTo(5);
+    assertThat(config.genericConfig.get("cmmn-enabled")).isEqualTo("false");
+    assertThat(config.genericConfig.get("dmn-enabled")).isEqualTo("false");
+    assertThat(config.genericConfig.get("history")).isEqualTo("none");
+    assertThat(config.genericConfig.get("initialize-telemetry")).isEqualTo("false");
   }
 
   @Test
-  public void shouldLoadJobAcquisitionProperties() {
-    // given a custom application.properties file
+  public void shouldApplyProcessEngineConfigurationProperties() {
+    // given
+    // a ProcessEngineConfiguration instance
+    QuarkusProcessEngineConfiguration configuration
+        = (QuarkusProcessEngineConfiguration) processEngine.getProcessEngineConfiguration();
 
     // then
-    assertThat(config.jobExecutor.genericConfig.get("max-jobs-per-acquisition")).isEqualTo("5");
-    assertThat(config.jobExecutor.genericConfig.get("lock-time-in-millis")).isEqualTo("500000");
-    assertThat(config.jobExecutor.genericConfig.get("wait-time-in-millis")).isEqualTo("7000");
-    assertThat(config.jobExecutor.genericConfig.get("max-wait")).isEqualTo("65000");
-    assertThat(config.jobExecutor.genericConfig.get("backoff-time-in-millis")).isEqualTo("5");
-    assertThat(config.jobExecutor.genericConfig.get("max-backoff")).isEqualTo("5");
-    assertThat(config.jobExecutor.genericConfig.get("backoff-decrease-threshold")).isEqualTo("120");
-    assertThat(config.jobExecutor.genericConfig.get("wait-increase-factor")).isEqualTo("3");
+    assertThat(configuration.isCmmnEnabled()).isEqualTo(false);
+    assertThat(configuration.isDmnEnabled()).isEqualTo(false);
+    assertThat(configuration.getHistory()).isEqualTo("none");
+    assertThat(configuration.isInitializeTelemetry()).isEqualTo(false);
   }
+
 }
