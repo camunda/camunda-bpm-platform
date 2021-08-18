@@ -661,4 +661,54 @@ public class SetVariablesBatchTest {
     assertThat(logs.size()).isEqualTo(0);
   }
 
+  @Test
+  public void shouldCreateProcessInstanceRelatedBatchJobsForSingleInvocations() {
+    // given
+    engineRule.getProcessEngineConfiguration().setInvocationsPerBatchJob(1);
+
+    String processInstanceIdOne = runtimeService.startProcessInstanceByKey(PROCESS_KEY).getId();
+    String processInstanceIdTwo = runtimeService.startProcessInstanceByKey(PROCESS_KEY).getId();
+
+    List<String> processInstanceIds = Arrays.asList(processInstanceIdOne, processInstanceIdTwo);
+
+    // when
+    Batch batch = runtimeService.setVariablesAsync(processInstanceIds, SINGLE_VARIABLE);
+
+    rule.executeSeedJobs(batch);
+
+    // then
+    List<Job> executionJobs = rule.getExecutionJobs(batch);
+    assertThat(executionJobs)
+        .extracting("processInstanceId")
+        .containsExactlyInAnyOrder(processInstanceIdOne, processInstanceIdTwo);
+
+    // clear
+    managementService.deleteBatch(batch.getId(), true);
+  }
+
+  @Test
+  public void shouldNotCreateProcessInstanceRelatedBatchJobsForMultipleInvocations() {
+    // given
+    engineRule.getProcessEngineConfiguration().setInvocationsPerBatchJob(2);
+
+    String processInstanceIdOne = runtimeService.startProcessInstanceByKey(PROCESS_KEY).getId();
+    String processInstanceIdTwo = runtimeService.startProcessInstanceByKey(PROCESS_KEY).getId();
+
+    List<String> processInstanceIds = Arrays.asList(processInstanceIdOne, processInstanceIdTwo);
+
+    // when
+    Batch batch = runtimeService.setVariablesAsync(processInstanceIds, SINGLE_VARIABLE);
+
+    rule.executeSeedJobs(batch);
+
+    // then
+    List<Job> executionJobs = rule.getExecutionJobs(batch);
+    assertThat(executionJobs)
+        .extracting("processInstanceId")
+        .containsOnlyNulls();
+
+    // clear
+    managementService.deleteBatch(batch.getId(), true);
+  }
+
 }

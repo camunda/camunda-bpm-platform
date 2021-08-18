@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.json.JsonObjectConverter;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 
 import java.util.List;
@@ -83,6 +84,14 @@ public class BatchSetVariablesHandler extends AbstractBatchJobHandler<BatchConfi
   @Override
   public String getType() {
     return Batch.TYPE_SET_VARIABLES;
+  }
+
+  @Override
+  protected void postProcessJob(BatchConfiguration configuration, JobEntity job, BatchConfiguration jobConfiguration) {
+    // if there is only one process instance to adjust, set its ID to the job so exclusive scheduling is possible
+    if (jobConfiguration.getIds() != null && jobConfiguration.getIds().size() == 1) {
+      job.setProcessInstanceId(jobConfiguration.getIds().get(0));
+    }
   }
 
   protected ByteArrayEntity findByteArrayById(String byteArrayId, CommandContext commandContext) {
