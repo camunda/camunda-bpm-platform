@@ -56,18 +56,8 @@ public class ManagedJobExecutor extends JobExecutor {
 
   @Override
   protected void stopExecutingJobs() {
-
-    // Ask the thread pool to finish and exit
-    taskExecutor.shutdown();
-
-    // Waits for 1 minute to finish all currently executing jobs
-    try {
-      if(!taskExecutor.awaitTermination(60L, TimeUnit.SECONDS)) {
-        LOG.timeoutDuringShutdown();
-      }
-    } catch (InterruptedException e) {
-      LOG.interruptedWhileShuttingDownjobExecutor(e);
-    }
+    // nothing to do, the AcquireJobsRunnable instance will
+    // be stopped when the ManagedExecutor instance is shut down.
   }
 
   @Override

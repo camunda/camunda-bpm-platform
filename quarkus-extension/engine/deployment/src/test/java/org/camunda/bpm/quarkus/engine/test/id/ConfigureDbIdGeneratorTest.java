@@ -16,22 +16,22 @@
  */
 package org.camunda.bpm.quarkus.engine.test.id;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import javax.inject.Inject;
+
 import io.quarkus.test.QuarkusUnitTest;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.db.DbIdGenerator;
 import org.camunda.bpm.engine.task.Task;
-import org.camunda.bpm.quarkus.engine.extension.impl.QuarkusProcessEngineConfiguration;
+import org.camunda.bpm.quarkus.engine.extension.QuarkusProcessEngineConfiguration;
 import org.camunda.bpm.quarkus.engine.test.helper.ProcessEngineAwareExtension;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-
-import javax.inject.Inject;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class ConfigureDbIdGeneratorTest {
 

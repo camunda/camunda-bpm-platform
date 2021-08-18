@@ -29,8 +29,8 @@ import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.quarkus.engine.extension.QuarkusProcessEngineConfiguration;
 import org.camunda.bpm.quarkus.engine.extension.impl.ManagedJobExecutor;
-import org.camunda.bpm.quarkus.engine.extension.impl.QuarkusProcessEngineConfiguration;
 import org.camunda.bpm.quarkus.engine.test.helper.ProcessEngineAwareExtension;
 import org.eclipse.microprofile.context.ManagedExecutor;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -38,10 +38,6 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
-
-import javax.inject.Inject;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class ManagedJobExecutorTest {
 

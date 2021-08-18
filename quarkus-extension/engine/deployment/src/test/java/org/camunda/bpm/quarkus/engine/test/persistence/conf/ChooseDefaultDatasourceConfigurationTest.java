@@ -35,7 +35,7 @@ public class ChooseDefaultDatasourceConfigurationTest {
   @RegisterExtension
   static QuarkusUnitTest unitTest = new ProcessEngineAwareExtension()
       .withConfigurationResource("persistence/multiple-datasources-application.properties")
-      .overrideConfigKey("quarkus.camunda.bpm.datasource", "<default>")
+      .overrideConfigKey("quarkus.camunda.datasource", "<default>")
       .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class));
 
   @Inject

@@ -30,7 +30,7 @@ public class ChooseNotExistingDatasourceConfigurationTest {
   @RegisterExtension
   static QuarkusUnitTest unitTest = new ProcessEngineAwareExtension()
       .withConfigurationResource("persistence/multiple-datasources-application.properties")
-      .overrideConfigKey("quarkus.camunda.bpm.datasource", "quaternary")
+      .overrideConfigKey("quarkus.camunda.datasource", "quaternary")
       .assertException(throwable -> assertThat(throwable)
           .hasMessage("No datasource named 'quaternary' exists")
           .isInstanceOf(IllegalArgumentException.class))
