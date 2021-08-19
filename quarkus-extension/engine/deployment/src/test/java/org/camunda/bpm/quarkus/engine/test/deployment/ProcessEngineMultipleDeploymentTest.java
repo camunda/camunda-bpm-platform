@@ -31,7 +31,7 @@ import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.camunda.bpm.quarkus.engine.extension.impl.ProcessEngineStartEvent;
+import org.camunda.bpm.quarkus.engine.extension.event.CamundaEngineStartupEvent;
 import org.camunda.bpm.quarkus.engine.test.helper.ProcessEngineAwareExtension;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -43,7 +43,6 @@ public class ProcessEngineMultipleDeploymentTest {
   @RegisterExtension
   protected static final QuarkusUnitTest unitTest = new ProcessEngineAwareExtension()
       .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class)
-          .addClass(MyConfig.class)
           .addAsResource("org/camunda/bpm/quarkus/engine/test/deployment/simpleServiceTaskProcess.bpmn"));
 
   @ApplicationScoped
@@ -65,7 +64,7 @@ public class ProcessEngineMultipleDeploymentTest {
     @Inject
     RepositoryService repositoryService;
 
-    public void createDeployment1(@Observes ProcessEngineStartEvent event) {
+    public void createDeployment1(@Observes CamundaEngineStartupEvent event) {
       repositoryService.createDeployment()
           .name("deployment-1")
           .addModelInstance("process-one.bpmn", process1)
@@ -73,7 +72,7 @@ public class ProcessEngineMultipleDeploymentTest {
           .deploy();
     }
 
-    public void createDeployment2(@Observes ProcessEngineStartEvent event) {
+    public void createDeployment2(@Observes CamundaEngineStartupEvent event) {
       repositoryService.createDeployment()
           .name("deployment-2")
           .addClasspathResource("org/camunda/bpm/quarkus/engine/test/deployment/simpleServiceTaskProcess.bpmn")

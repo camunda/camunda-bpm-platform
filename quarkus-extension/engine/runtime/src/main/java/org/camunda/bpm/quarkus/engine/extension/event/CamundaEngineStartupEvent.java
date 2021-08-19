@@ -14,10 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.quarkus.engine.extension.impl;
+package org.camunda.bpm.quarkus.engine.extension.event;
 
 /**
- * A CDI Event class fired when the Camunda process engine is bootstrapped successfully.
+ * Event class that is fired after Camunda engine startup.
+ *
+ * The event is fired after the Camunda engine has been bootstrapped,
+ * so it can be used to perform deployments to the engine.
+ *
+ * This event is observed in the following way:
+ *
+ * <code><pre>
+ *     void onCamundaEngineStart(@Observes CamundaEngineStartupEvent event) {
+ *         LOGGER.info("The Camunda engine is started");
+ *     }
+ * </pre></code>
  */
-public class ProcessEngineStartEvent {
+public class CamundaEngineStartupEvent {
 }

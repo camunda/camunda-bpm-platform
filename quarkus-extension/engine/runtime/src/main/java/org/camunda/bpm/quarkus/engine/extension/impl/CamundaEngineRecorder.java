@@ -33,6 +33,7 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.quarkus.engine.extension.CamundaEngineConfig;
 import org.camunda.bpm.quarkus.engine.extension.QuarkusProcessEngineConfiguration;
+import org.camunda.bpm.quarkus.engine.extension.event.CamundaEngineStartupEvent;
 import org.eclipse.microprofile.context.ManagedExecutor;
 
 import javax.enterprise.inject.spi.BeanManager;
@@ -103,10 +104,11 @@ public class CamundaEngineRecorder {
     return new RuntimeValue<>(processEngine);
   }
 
-  public void fireProcessEngineStartEvent() {
-    // the 'fireEvent()' method is deprecated in CDI 2.0,
-    // but our CDI integration still supports CDI 1.0, so we continue to use it
-    Arc.container().beanManager().fireEvent(new ProcessEngineStartEvent());
+  public void fireCamundaEngineStartEvent() {
+    Arc.container().beanManager()
+        .getEvent()
+        .select(CamundaEngineStartupEvent.class)
+        .fire(new CamundaEngineStartupEvent());
   }
 
   public void registerShutdownTask(ShutdownContext shutdownContext,

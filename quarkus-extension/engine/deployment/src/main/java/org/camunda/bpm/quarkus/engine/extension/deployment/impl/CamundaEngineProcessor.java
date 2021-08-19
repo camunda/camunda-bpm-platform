@@ -129,7 +129,7 @@ public class CamundaEngineProcessor {
   @BuildStep
   @Record(RUNTIME_INIT)
   protected void deployProcessEngineResources(CamundaEngineRecorder recorder) {
-    recorder.fireProcessEngineStartEvent();
+    recorder.fireCamundaEngineStartEvent();
   }
 
   @BuildStep
