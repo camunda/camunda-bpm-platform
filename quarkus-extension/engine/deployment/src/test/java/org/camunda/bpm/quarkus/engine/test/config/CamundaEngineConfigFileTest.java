@@ -19,8 +19,12 @@ package org.camunda.bpm.quarkus.engine.test.config;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.inject.Inject;
+import java.sql.SQLException;
 
 import io.quarkus.test.QuarkusUnitTest;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.quarkus.engine.extension.CamundaEngineConfig;
 import org.camunda.bpm.quarkus.engine.test.helper.ProcessEngineAwareExtension;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -28,38 +32,46 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class CamundaEngineJobExecutorConfigTest {
+public class CamundaEngineConfigFileTest {
 
   @RegisterExtension
   static final QuarkusUnitTest unitTest = new ProcessEngineAwareExtension()
-      .withConfigurationResource("org/camunda/bpm/quarkus/engine/test/config/" +
-                                     "job-executor-application.properties")
+      .withConfigurationResource("org/camunda/bpm/quarkus/engine/test/config/mixed-application.properties")
       .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class));
 
   @Inject
   CamundaEngineConfig config;
 
+  @Inject
+  ProcessEngine processEngine;
+
   @Test
-  public void shouldLoadJobExecutorThreadPoolProperties() {
-    // given a custom application.properties file
+  public void shouldLoadAllConfigProperties() throws SQLException {
+    // given
+    // a .properties file with process engine and job executor configuration
+
+    // when
+    ProcessEngineConfigurationImpl configuration
+        = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
+    JobExecutor jobExecutor = configuration.getJobExecutor();
 
     // then
+    // assert engine config properties
+    assertThat(configuration.isCmmnEnabled()).isFalse();
+    assertThat(configuration.isDmnEnabled()).isFalse();
+    assertThat(configuration.getHistory()).isEqualTo("none");
+    assertThat(configuration.isInitializeTelemetry()).isFalse();
+    // assert job executor properties
+    assertThat(jobExecutor.getMaxJobsPerAcquisition()).isEqualTo(5);
+    assertThat(jobExecutor.getLockTimeInMillis()).isEqualTo(500000);
+    assertThat(jobExecutor.getWaitTimeInMillis()).isEqualTo(7000);
+    assertThat(jobExecutor.getMaxWait()).isEqualTo(65000);
+    assertThat(jobExecutor.getBackoffTimeInMillis()).isEqualTo(5);
+    // assert correct thread pool config
     assertThat(config.jobExecutor.threadPool.maxPoolSize).isEqualTo(12);
     assertThat(config.jobExecutor.threadPool.queueSize).isEqualTo(5);
-  }
-
-  @Test
-  public void shouldLoadJobAcquisitionProperties() {
-    // given a custom application.properties file
-
-    // then
-    assertThat(config.jobExecutor.genericConfig.get("max-jobs-per-acquisition")).isEqualTo("5");
-    assertThat(config.jobExecutor.genericConfig.get("lock-time-in-millis")).isEqualTo("500000");
-    assertThat(config.jobExecutor.genericConfig.get("wait-time-in-millis")).isEqualTo("7000");
-    assertThat(config.jobExecutor.genericConfig.get("max-wait")).isEqualTo("65000");
-    assertThat(config.jobExecutor.genericConfig.get("backoff-time-in-millis")).isEqualTo("5");
-    assertThat(config.jobExecutor.genericConfig.get("max-backoff")).isEqualTo("5");
-    assertThat(config.jobExecutor.genericConfig.get("backoff-decrease-threshold")).isEqualTo("120");
-    assertThat(config.jobExecutor.genericConfig.get("wait-increase-factor")).isEqualTo("3");
+    // assert correct datasource
+    assertThat(config.datasource.get()).isEqualTo("camunda");
+    assertThat(configuration.getDataSource().getConnection()).asString().contains("h2:mem:camunda");
   }
 }
