@@ -39,10 +39,10 @@ import org.camunda.bpm.engine.cdi.impl.context.DefaultContextAssociationManager;
 import org.camunda.bpm.engine.cdi.impl.context.RequestScopedAssociation;
 import org.camunda.bpm.engine.cdi.jsf.TaskForm;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.quarkus.engine.extension.impl.CamundaEngineConfig;
+import org.camunda.bpm.quarkus.engine.extension.CamundaEngineConfig;
 import org.camunda.bpm.quarkus.engine.extension.impl.CamundaEngineRecorder;
 import org.camunda.bpm.quarkus.engine.extension.impl.InjectableBusinessProcessContext;
-import org.camunda.bpm.quarkus.engine.extension.impl.QuarkusProcessEngineConfiguration;
+import org.camunda.bpm.quarkus.engine.extension.QuarkusProcessEngineConfiguration;
 import org.jboss.jandex.DotName;
 
 import javax.enterprise.context.Dependent;

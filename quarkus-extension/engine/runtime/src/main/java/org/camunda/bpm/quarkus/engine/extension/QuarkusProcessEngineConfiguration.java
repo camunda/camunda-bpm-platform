@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.quarkus.engine.extension.impl;
+package org.camunda.bpm.quarkus.engine.extension;
 
 import org.camunda.bpm.engine.cdi.CdiJtaProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextInterceptor;

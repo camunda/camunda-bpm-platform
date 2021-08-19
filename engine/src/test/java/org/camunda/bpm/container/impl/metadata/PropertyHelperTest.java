@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import junit.framework.TestCase;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
@@ -47,6 +46,18 @@ public class PropertyHelperTest {
   protected static final String MAX_WAIT = "maxWait";
   protected static final String WAIT_INCREASE_FACTOR = "waitIncreaseFactor";
   protected static final String BACKOFF_TIME_IN_MILLIS = "backoffTimeInMillis";
+
+  // kebab case properties
+  protected static final String KC_JDBC_URL_PROP = "jdbc-url";
+  protected static final String KC_DB_IDENTITY_USED_PROP = "db-identity-used";
+  protected static final String KC_WAIT_INCREASE_FACTOR = "wait-increase-factor";
+  protected static final String KC_BACKOFF_TIME_IN_MILLIS = "backoff-time-in-millis";
+
+  // snake case properties
+  protected static final String SC_JDBC_URL_PROP = "jdbc_url";
+  protected static final String SC_DB_IDENTITY_USED_PROP = "db_identity_used";
+  protected static final String SC_WAIT_INCREASE_FACTOR = "wait_increase_factor";
+  protected static final String SC_BACKOFF_TIME_IN_MILLIS = "backoff_time_in_millis";
 
 
   /**
@@ -165,5 +176,55 @@ public class PropertyHelperTest {
     source.put("camunda.test.someKey", "1234");
     String result = PropertyHelper.resolveProperty(source, "camunda.test.someKey");
     Assert.assertEquals("camunda.test.someKey", result);
+  }
+
+  @Test
+  public void shouldResolveKebabCaseProperties() {
+    // given
+    ProcessEngineConfigurationImpl engineConfiguration = new StandaloneProcessEngineConfiguration();
+    JobExecutor jobExecutor = new DefaultJobExecutor();
+
+    Map<String, String> configProperties = new HashMap<>();
+    configProperties.put(KC_JDBC_URL_PROP, "someUrl");
+    configProperties.put(KC_DB_IDENTITY_USED_PROP, "true");
+
+    Map<String, String> executorProperties = new HashMap<>();
+    executorProperties.put(KC_BACKOFF_TIME_IN_MILLIS, Integer.toString(Integer.MAX_VALUE));
+    executorProperties.put(KC_WAIT_INCREASE_FACTOR, Float.toString(Float.MAX_VALUE));
+
+    // when
+    PropertyHelper.applyProperties(engineConfiguration, configProperties, PropertyHelper.KEBAB_CASE);
+    PropertyHelper.applyProperties(jobExecutor, executorProperties, PropertyHelper.KEBAB_CASE);
+
+    // then
+    Assert.assertEquals(Integer.MAX_VALUE, jobExecutor.getBackoffTimeInMillis());
+    Assert.assertEquals(Float.MAX_VALUE, jobExecutor.getWaitIncreaseFactor(), 0.0001d);
+    Assert.assertEquals(true, engineConfiguration.isDbIdentityUsed());
+    Assert.assertEquals("someUrl", engineConfiguration.getJdbcUrl());
+  }
+
+  @Test
+  public void shouldResolveSnakeCaseProperties() {
+    // given
+    ProcessEngineConfigurationImpl engineConfiguration = new StandaloneProcessEngineConfiguration();
+    JobExecutor jobExecutor = new DefaultJobExecutor();
+
+    Map<String, String> configProperties = new HashMap<>();
+    configProperties.put(SC_JDBC_URL_PROP, "someUrl");
+    configProperties.put(SC_DB_IDENTITY_USED_PROP, "true");
+
+    Map<String, String> executorProperties = new HashMap<>();
+    executorProperties.put(SC_BACKOFF_TIME_IN_MILLIS, Integer.toString(Integer.MAX_VALUE));
+    executorProperties.put(SC_WAIT_INCREASE_FACTOR, Float.toString(Float.MAX_VALUE));
+
+    // when
+    PropertyHelper.applyProperties(engineConfiguration, configProperties, PropertyHelper.SNAKE_CASE);
+    PropertyHelper.applyProperties(jobExecutor, executorProperties, PropertyHelper.SNAKE_CASE);
+
+    // then
+    Assert.assertEquals(Integer.MAX_VALUE, jobExecutor.getBackoffTimeInMillis());
+    Assert.assertEquals(Float.MAX_VALUE, jobExecutor.getWaitIncreaseFactor(), 0.0001d);
+    Assert.assertEquals(true, engineConfiguration.isDbIdentityUsed());
+    Assert.assertEquals("someUrl", engineConfiguration.getJdbcUrl());
   }
 }

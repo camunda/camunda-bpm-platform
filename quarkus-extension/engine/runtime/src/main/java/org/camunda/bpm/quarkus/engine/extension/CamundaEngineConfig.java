@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.quarkus.engine.extension.impl;
+package org.camunda.bpm.quarkus.engine.extension;
 
 import io.quarkus.runtime.annotations.ConfigItem;
 import io.quarkus.runtime.annotations.ConfigPhase;
@@ -22,7 +22,7 @@ import io.quarkus.runtime.annotations.ConfigRoot;
 
 import java.util.Optional;
 
-@ConfigRoot(phase = ConfigPhase.RUN_TIME, name = "camunda.bpm")
+@ConfigRoot(phase = ConfigPhase.RUN_TIME, name = "camunda")
 public class CamundaEngineConfig {
 
   /**
