@@ -30,7 +30,7 @@ public class CamundaEngineConfig {
    * The Camunda ProcessEngineConfiguration properties. For more details,
    * @see <a href="https://docs.camunda.org/manual/latest/reference/deployment-descriptors/tags/process-engine/#configuration-properties">Process Engine Configuration Properties</a>.
    */
-  @ConfigItem(name = "generic-properties")
+  @ConfigItem(name = ConfigItem.PARENT)
   public Map<String, String> genericConfig;
 
   /**

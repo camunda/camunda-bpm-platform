@@ -55,8 +55,7 @@ public class CamundaEngineRecorder {
                                                                                        CamundaEngineConfig config) {
     QuarkusProcessEngineConfiguration configuration = beanContainer.instance(QuarkusProcessEngineConfiguration.class);
 
-    // apply properties from config before the datasource configuration.
-    // We always want to use a Quarkus datasource.
+    // apply properties from config before any other configuration.
     PropertyHelper.applyProperties(configuration, config.genericConfig, PropertyHelper.KEBAB_CASE);
 
     if (configuration.getDataSource() == null) {
