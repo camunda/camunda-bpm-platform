@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.quarkus.agroal.runtime.DataSources;
+import io.quarkus.arc.Arc;
 import io.quarkus.arc.runtime.BeanContainer;
 import io.quarkus.runtime.RuntimeValue;
 import io.quarkus.runtime.ShutdownContext;
@@ -39,6 +40,7 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.quarkus.engine.extension.CamundaEngineConfig;
 import org.camunda.bpm.quarkus.engine.extension.QuarkusProcessEngineConfiguration;
+import org.camunda.bpm.quarkus.engine.extension.event.CamundaEngineStartupEvent;
 import org.eclipse.microprofile.context.ManagedExecutor;
 
 @Recorder
@@ -103,6 +105,13 @@ public class CamundaEngineRecorder {
     runtimeContainerDelegate.registerProcessEngine(processEngine);
 
     return new RuntimeValue<>(processEngine);
+  }
+
+  public void fireCamundaEngineStartEvent() {
+    Arc.container().beanManager()
+        .getEvent()
+        .select(CamundaEngineStartupEvent.class)
+        .fire(new CamundaEngineStartupEvent());
   }
 
   public void registerShutdownTask(ShutdownContext shutdownContext,
