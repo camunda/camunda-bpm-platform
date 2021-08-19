@@ -30,6 +30,7 @@ import java.io.Reader;
 import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -1641,11 +1642,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected String checkForCrdb(Connection connection) {
     try {
-      ResultSet result = connection.prepareStatement("select version() as version;").executeQuery();
-      if (result.next()) {
-        String versionData = result.getString(1);
-        if (versionData != null && versionData.toLowerCase().contains("cockroachdb")) {
-          return CRDB_DB_PRODUCT_NAME;
+      try (PreparedStatement preparedStatement = connection.prepareStatement("select version() as version;")) {
+        ResultSet result = preparedStatement.executeQuery();
+        if (result.next()) {
+          String versionData = result.getString(1);
+          if (versionData != null && versionData.toLowerCase().contains("cockroachdb")) {
+            return CRDB_DB_PRODUCT_NAME;
+          }
         }
       }
     } catch (SQLException ignore) {
