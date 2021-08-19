@@ -44,7 +44,8 @@ public class ManagedJobExecutorTest {
   @RegisterExtension
   static final QuarkusUnitTest unitTest = new ProcessEngineAwareExtension()
       .engineConfig(QuarkusProcessEngineConfiguration::new) // Use default config with Job Executor enabled
-      .withConfigurationResource("job-executor-application.properties")
+      .withConfigurationResource("org/camunda/bpm/quarkus/engine/test/config/" +
+                                     "job-executor-application.properties")
       .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class));
 
   @Inject

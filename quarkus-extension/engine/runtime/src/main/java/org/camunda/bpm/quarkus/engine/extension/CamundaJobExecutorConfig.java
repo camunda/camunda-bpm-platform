@@ -25,8 +25,8 @@ import io.quarkus.runtime.annotations.ConfigItem;
 public class CamundaJobExecutorConfig {
 
   /**
-   * The Camunda JobExecutor configuration properties. For more details, see
-   * {@link https://docs.camunda.org/manual/latest/reference/deployment-descriptors/tags/job-executor/#job-acquisition-configuration-properties}
+   * The Camunda JobExecutor configuration properties. For more details,
+   * @see <a href="https://docs.camunda.org/manual/latest/reference/deployment-descriptors/tags/job-executor/#job-acquisition-configuration-properties">Job-Acquisition Configuration Properties</a>
    */
   @ConfigItem(name = ConfigItem.PARENT)
   public Map<String, String> genericConfig;

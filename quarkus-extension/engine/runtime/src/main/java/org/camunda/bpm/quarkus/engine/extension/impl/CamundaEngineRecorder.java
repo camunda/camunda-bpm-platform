@@ -16,6 +16,13 @@
  */
 package org.camunda.bpm.quarkus.engine.extension.impl;
 
+import static com.arjuna.ats.jta.TransactionManager.transactionManager;
+import static io.quarkus.datasource.common.runtime.DataSourceUtil.DEFAULT_DATASOURCE_NAME;
+
+import javax.enterprise.inject.spi.BeanManager;
+import java.util.ArrayList;
+import java.util.List;
+
 import io.quarkus.agroal.runtime.DataSources;
 import io.quarkus.arc.runtime.BeanContainer;
 import io.quarkus.runtime.RuntimeValue;
@@ -34,13 +41,6 @@ import org.camunda.bpm.quarkus.engine.extension.CamundaEngineConfig;
 import org.camunda.bpm.quarkus.engine.extension.QuarkusProcessEngineConfiguration;
 import org.eclipse.microprofile.context.ManagedExecutor;
 
-import javax.enterprise.inject.spi.BeanManager;
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.arjuna.ats.jta.TransactionManager.transactionManager;
-import static io.quarkus.datasource.common.runtime.DataSourceUtil.DEFAULT_DATASOURCE_NAME;
-
 @Recorder
 public class CamundaEngineRecorder {
 
@@ -54,6 +54,9 @@ public class CamundaEngineRecorder {
   public RuntimeValue<ProcessEngineConfigurationImpl> createProcessEngineConfiguration(BeanContainer beanContainer,
                                                                                        CamundaEngineConfig config) {
     QuarkusProcessEngineConfiguration configuration = beanContainer.instance(QuarkusProcessEngineConfiguration.class);
+
+    // apply properties from config before any other configuration.
+    PropertyHelper.applyProperties(configuration, config.genericConfig, PropertyHelper.KEBAB_CASE);
 
     if (configuration.getDataSource() == null) {
       String datasource = config.datasource.orElse(DEFAULT_DATASOURCE_NAME);

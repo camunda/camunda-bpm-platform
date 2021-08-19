@@ -122,7 +122,7 @@ public class ProcessEngineAwareExtension extends QuarkusUnitTest {
   }
 
   @Override
-  public QuarkusUnitTest withConfigurationResource(String resourceName) {
+  public ProcessEngineAwareExtension withConfigurationResource(String resourceName) {
     this.withConfigurationResource = resourceName;
     return this;
   }
