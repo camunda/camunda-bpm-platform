@@ -508,8 +508,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected PriorityProvider<JobDeclaration<?, ?>> jobPriorityProvider;
 
-  protected Long jobExecutorPriorityRangeMin = null;
-  protected Long jobExecutorPriorityRangeMax = null;
+  protected Long jobExecutorPriorityRangeMin = 0L;
+  protected Long jobExecutorPriorityRangeMax = Long.MAX_VALUE;
 
   // EXTERNAL TASK /////////////////////////////////////////////////////////////
   protected PriorityProvider<ExternalTaskActivityBehavior> externalTaskPriorityProvider;
@@ -888,7 +888,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected String sundayHistoryCleanupBatchWindowStartTime;
   protected String sundayHistoryCleanupBatchWindowEndTime;
 
-
   protected int historyCleanupDegreeOfParallelism = 1;
 
   protected String historyTimeToLive;
@@ -896,6 +895,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected String batchOperationHistoryTimeToLive;
   protected Map<String, String> batchOperationsForHistoryCleanup;
   protected Map<String, Integer> parsedBatchOperationsForHistoryCleanup;
+
+  /**
+   * Default priority for history cleanup jobs. */
+  protected long historyCleanupJobPriority = DefaultJobPriorityProvider.DEFAULT_PRIORITY;
 
   /**
    * Time to live for historic job log entries written by history cleanup jobs.
@@ -2201,6 +2204,21 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       }
     }
 
+    // verify job executor priority range is configured correctly
+    if (jobExecutorPriorityRangeMin > jobExecutorPriorityRangeMax) {
+      throw ProcessEngineLogger.JOB_EXECUTOR_LOGGER.jobExecutorPriorityRangeException(
+          "jobExecutorPriorityRangeMin can not be greater than jobExecutorPriorityRangeMax");
+    }
+    if (jobExecutorPriorityRangeMin < 0) {
+      throw ProcessEngineLogger.JOB_EXECUTOR_LOGGER
+          .jobExecutorPriorityRangeException("job executor priority range can not be negative");
+    }
+    if(jobExecutorPriorityRangeMin > historyCleanupJobPriority || jobExecutorPriorityRangeMax < historyCleanupJobPriority) {
+      ProcessEngineLogger.JOB_EXECUTOR_LOGGER.infoJobExecutorDoesNotHandleHistoryCleanupJobs(this);
+    }
+    if(jobExecutorPriorityRangeMin > batchJobPriority || jobExecutorPriorityRangeMax < batchJobPriority) {
+      ProcessEngineLogger.JOB_EXECUTOR_LOGGER.infoJobExecutorDoesNotHandleBatchJobs(this);
+    }
   }
 
   protected void initJobProvider() {
@@ -3815,6 +3833,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setBatchJobPriority(long batchJobPriority) {
     this.batchJobPriority = batchJobPriority;
+  }
+
+  public long getHistoryCleanupJobPriority() {
+    return historyCleanupJobPriority;
+  }
+
+  public void setHistoryCleanupJobPriority(long historyCleanupJobPriority) {
+    this.historyCleanupJobPriority = historyCleanupJobPriority;
   }
 
   public SessionFactory getIdentityProviderSessionFactory() {
