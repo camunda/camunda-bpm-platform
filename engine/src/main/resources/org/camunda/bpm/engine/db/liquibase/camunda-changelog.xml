@@ -29,37 +29,37 @@
     <property  name="db.name"  value="postgres"  dbms="postgresql"/>
 
     <changeSet author="Camunda" id="7.16.0-baseline">
-        <sqlFile path="baseline/activiti.${db.name}.create.engine.sql"
+        <sqlFile path="baseline/liquibase.${db.name}.create.engine.sql"
                  encoding="UTF-8"
                  relativeToChangelogFile="true"
                  splitStatements="true"
                  stripComments="true"/>
-        <sqlFile path="baseline/activiti.${db.name}.create.history.sql"
+        <sqlFile path="baseline/liquibase.${db.name}.create.history.sql"
                  encoding="UTF-8"
                  relativeToChangelogFile="true"
                  splitStatements="true"
                  stripComments="true"/>
-        <sqlFile path="baseline/activiti.${db.name}.create.identity.sql"
+        <sqlFile path="baseline/liquibase.${db.name}.create.identity.sql"
                  encoding="UTF-8"
                  relativeToChangelogFile="true"
                  splitStatements="true"
                  stripComments="true"/>
-        <sqlFile path="baseline/activiti.${db.name}.create.case.engine.sql"
+        <sqlFile path="baseline/liquibase.${db.name}.create.case.engine.sql"
                  encoding="UTF-8"
                  relativeToChangelogFile="true"
                  splitStatements="true"
                  stripComments="true"/>
-        <sqlFile path="baseline/activiti.${db.name}.create.case.history.sql"
+        <sqlFile path="baseline/liquibase.${db.name}.create.case.history.sql"
                  encoding="UTF-8"
                  relativeToChangelogFile="true"
                  splitStatements="true"
                  stripComments="true"/>
-        <sqlFile path="baseline/activiti.${db.name}.create.decision.engine.sql"
+        <sqlFile path="baseline/liquibase.${db.name}.create.decision.engine.sql"
                  encoding="UTF-8"
                  relativeToChangelogFile="true"
                  splitStatements="true"
                  stripComments="true"/>
-        <sqlFile path="baseline/activiti.${db.name}.create.decision.history.sql"
+        <sqlFile path="baseline/liquibase.${db.name}.create.decision.history.sql"
                  encoding="UTF-8"
                  relativeToChangelogFile="true"
                  splitStatements="true"
