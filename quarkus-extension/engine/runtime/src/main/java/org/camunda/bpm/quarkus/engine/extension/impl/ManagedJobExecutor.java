@@ -25,29 +25,12 @@ import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.eclipse.microprofile.context.ManagedExecutor;
 
 /**
- * A {@link JobExecutor} implementation that utilises the Quarkus
- * container-managed thread pool to acquire and execute jobs.
+ * A {@link JobExecutor} implementation that utilises a separate thread pool
+ * to acquire and execute jobs.
  */
 public class ManagedJobExecutor extends JobExecutor {
 
   protected ManagedExecutor taskExecutor;
-
-  /**
-   * Constructs a new QuarkusJobExecutor with the provided
-   * {@link ManagedExecutor} instance and a {@link CamundaEngineConfig} instance.
-   */
-  public ManagedJobExecutor(ManagedExecutor taskExecutor, CamundaEngineConfig config) {
-    this(taskExecutor);
-    // set Job Acquisition  properties
-    this.maxJobsPerAcquisition = config.jobExecutor.maxJobsPerAcquisition;
-    this.lockTimeInMillis = config.jobExecutor.lockTimeInMillis;
-    this.waitTimeInMillis = config.jobExecutor.waitTimeInMillis;
-    this.maxWait = config.jobExecutor.maxWait;
-    this.backoffTimeInMillis = config.jobExecutor.backoffTimeInMillis;
-    this.maxBackoff = config.jobExecutor.maxBackoff;
-    this.backoffDecreaseThreshold = config.jobExecutor.backoffDecreaseThreshold;
-    this.waitIncreaseFactor = config.jobExecutor.waitIncreaseFactor;
-  }
 
   /**
    * Constructs a new QuarkusJobExecutor with the provided

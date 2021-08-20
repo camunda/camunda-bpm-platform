@@ -22,6 +22,7 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.form.CamundaFormRef;
 import org.camunda.bpm.engine.rest.CaseDefinitionRestService;
 import org.camunda.bpm.engine.rest.CaseExecutionRestService;
 import org.camunda.bpm.engine.rest.CaseInstanceRestService;
@@ -86,6 +87,7 @@ public class HalTask extends HalResource<HalTask> {
   private String caseDefinitionId;
   private boolean suspended;
   private String formKey;
+  private CamundaFormRef camundaFormRef;
   private String tenantId;
 
   public static HalTask generate(Task task, ProcessEngine engine) {
@@ -123,6 +125,7 @@ public class HalTask extends HalResource<HalTask> {
     dto.tenantId = task.getTenantId();
     try {
       dto.formKey = task.getFormKey();
+      dto.camundaFormRef = task.getCamundaFormRef();
     }
     catch (BadUserRequestException e) {
       // ignore (initializeFormKeys was not called)
@@ -223,6 +226,10 @@ public class HalTask extends HalResource<HalTask> {
 
   public String getFormKey() {
     return formKey;
+  }
+
+  public CamundaFormRef getCamundaFormRef() {
+    return camundaFormRef;
   }
 
   public String getTenantId() {

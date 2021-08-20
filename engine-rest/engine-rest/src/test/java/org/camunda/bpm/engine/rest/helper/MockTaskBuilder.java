@@ -21,6 +21,8 @@ import static org.mockito.Mockito.when;
 
 import java.util.Date;
 
+import org.camunda.bpm.engine.form.CamundaFormRef;
+import org.camunda.bpm.engine.impl.form.CamundaFormRefImpl;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
 
@@ -45,6 +47,7 @@ public class MockTaskBuilder {
   private String caseInstanceId;
   private String caseExecutionId;
   private String formKey;
+  private CamundaFormRef camundaFormRef;
   private String tenantId;
 
   public MockTaskBuilder id(String id) {
@@ -142,6 +145,13 @@ public class MockTaskBuilder {
     return this;
   }
 
+  public MockTaskBuilder camundaFormRef(String key, String binding, Integer version) {
+    CamundaFormRefImpl camundaFormRef = new CamundaFormRefImpl(key, binding);
+    camundaFormRef.setVersion(version);
+    this.camundaFormRef = camundaFormRef;
+    return this;
+  }
+
   public MockTaskBuilder tenantId(String tenantId) {
     this.tenantId = tenantId;
     return this;
@@ -168,6 +178,7 @@ public class MockTaskBuilder {
     when(mockTask.getCaseInstanceId()).thenReturn(caseInstanceId);
     when(mockTask.getCaseExecutionId()).thenReturn(caseExecutionId);
     when(mockTask.getFormKey()).thenReturn(formKey);
+    when(mockTask.getCamundaFormRef()).thenReturn(camundaFormRef);
     when(mockTask.getTenantId()).thenReturn(tenantId);
     return mockTask;
   }

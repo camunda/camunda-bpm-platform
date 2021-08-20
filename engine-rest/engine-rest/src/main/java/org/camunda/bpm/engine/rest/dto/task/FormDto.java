@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.rest.dto.task;
 
+import org.camunda.bpm.engine.form.CamundaFormRef;
 import org.camunda.bpm.engine.form.FormData;
 
 /**
@@ -25,6 +26,7 @@ import org.camunda.bpm.engine.form.FormData;
 public class FormDto {
 
   private String key;
+  private CamundaFormRef camundaFormRef;
   private String contextPath;
 
   public void setKey(String form) {
@@ -33,6 +35,14 @@ public class FormDto {
 
   public String getKey() {
     return key;
+  }
+
+  public CamundaFormRef getCamundaFormRef() {
+    return camundaFormRef;
+  }
+
+  public void setCamundaFormRef(CamundaFormRef camundaFormRef) {
+    this.camundaFormRef = camundaFormRef;
   }
 
   public void setContextPath(String contextPath) {
@@ -48,6 +58,7 @@ public class FormDto {
 
     if (formData != null) {
       dto.key = formData.getFormKey();
+      dto.camundaFormRef = formData.getCamundaFormRef();
     }
 
     return dto;

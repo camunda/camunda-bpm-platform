@@ -20,5 +20,6 @@ faces-config.NavData
 *.lock.db
 **/overlays
 **/node_modules
+camunda-h2-dbs
 
 *.DS_Store

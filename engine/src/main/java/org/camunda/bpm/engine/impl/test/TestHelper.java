@@ -60,7 +60,6 @@ import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.junit.Assert;
-import org.junit.runner.Description;
 import org.slf4j.Logger;
 
 
@@ -206,17 +205,6 @@ public abstract class TestHelper {
     return r.append("." + suffix).toString();
   }
 
-  public static boolean annotationRequiredHistoryLevelCheck(ProcessEngine processEngine, Description description) {
-    RequiredHistoryLevel annotation = description.getAnnotation(RequiredHistoryLevel.class);
-
-    if (annotation != null) {
-      return historyLevelCheck(processEngine, annotation);
-
-    } else {
-      return annotationRequiredHistoryLevelCheck(processEngine, description.getTestClass(), description.getMethodName());
-    }
-  }
-
   private static boolean historyLevelCheck(ProcessEngine processEngine, RequiredHistoryLevel annotation) {
     ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
 
@@ -243,17 +231,6 @@ public abstract class TestHelper {
       return historyLevelCheck(processEngine, annotation);
     } else {
       return true;
-    }
-  }
-
-  public static boolean annotationRequiredDatabaseCheck(ProcessEngine processEngine, Description description) {
-    RequiredDatabase annotation = description.getAnnotation(RequiredDatabase.class);
-
-    if (annotation != null) {
-      return databaseCheck(processEngine, annotation);
-
-    } else {
-      return annotationRequiredDatabaseCheck(processEngine, description.getTestClass(), description.getMethodName());
     }
   }
 

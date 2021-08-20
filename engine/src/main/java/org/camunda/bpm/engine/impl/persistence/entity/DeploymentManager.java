@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.impl.cmd.DeleteProcessDefinitionsByIdsCmd;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionManager;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionManager;
+import org.camunda.bpm.engine.impl.form.entity.CamundaFormDefinitionManager;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
@@ -128,6 +129,8 @@ public class DeploymentManager extends AbstractManager {
     deleteDecisionDeployment(deploymentId, cascade);
     deleteDecisionRequirementDeployment(deploymentId);
 
+    deleteCamundaFormDefinitionDeployment(deploymentId);
+
     getResourceManager().deleteResourcesByDeploymentId(deploymentId);
 
     deleteAuthorizations(Resources.DEPLOYMENT, deploymentId);
@@ -215,6 +218,22 @@ public class DeploymentManager extends AbstractManager {
         // remove decision requirements definitions from cache:
         deploymentCache.removeDecisionRequirementsDefinition(decisionDefinitionId);
       }
+    }
+  }
+
+  protected void deleteCamundaFormDefinitionDeployment(String deploymentId) {
+    CamundaFormDefinitionManager manager = getCamundaFormDefinitionManager();
+
+    List<CamundaFormDefinitionEntity> camundaFormDefinitions = manager.findDefinitionsByDeploymentId(deploymentId);
+
+    // delete definitions from db
+    manager.deleteCamundaFormDefinitionsByDeploymentId(deploymentId);
+
+    // delete definitions from deployment cache
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    DeploymentCache deploymentCache = processEngineConfiguration.getDeploymentCache();
+    for (CamundaFormDefinitionEntity camundaFormDefinition : camundaFormDefinitions) {
+      deploymentCache.removeCamundaFormDefinition(camundaFormDefinition.getId());
     }
   }
 

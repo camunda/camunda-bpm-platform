@@ -35,9 +35,12 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.TestHelper;
+import org.camunda.bpm.quarkus.engine.extension.QuarkusProcessEngineConfiguration;
 import org.junit.After;
 import org.junit.Before;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.BeanManager;
 import java.util.HashSet;
 import java.util.Set;
@@ -149,6 +152,20 @@ public class CdiProcessEngineTestCase {
 
   public void waitForJobExecutorToProcessAllJobs(long maxMillisToWait, long intervalMillis) {
     TestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, maxMillisToWait, intervalMillis);
+  }
+
+  @ApplicationScoped
+  static class EngineConfigurer {
+
+    @Produces
+    public QuarkusProcessEngineConfiguration customEngineConfig() {
+
+      QuarkusProcessEngineConfiguration engineConfig = new QuarkusProcessEngineConfiguration();
+      engineConfig.setJobExecutorActivate(false);
+
+      return engineConfig;
+    }
+
   }
 
 }

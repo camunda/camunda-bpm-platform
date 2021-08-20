@@ -16,13 +16,11 @@
  */
 package org.camunda.bpm.quarkus.engine.extension.deployment.impl;
 
-import static io.quarkus.arc.deployment.ContextRegistrationPhaseBuildItem.ContextConfiguratorBuildItem;
-import static io.quarkus.deployment.annotations.ExecutionTime.RUNTIME_INIT;
-
 import io.quarkus.arc.deployment.AdditionalBeanBuildItem;
 import io.quarkus.arc.deployment.BeanContainerBuildItem;
 import io.quarkus.arc.deployment.ContextRegistrationPhaseBuildItem;
 import io.quarkus.arc.deployment.UnremovableBeanBuildItem;
+import io.quarkus.arc.runtime.BeanContainer;
 import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.deployment.annotations.Consume;
@@ -31,7 +29,6 @@ import io.quarkus.deployment.builditem.FeatureBuildItem;
 import io.quarkus.deployment.builditem.ShutdownContextBuildItem;
 import io.quarkus.runtime.RuntimeValue;
 import org.camunda.bpm.engine.cdi.BusinessProcess;
-import org.camunda.bpm.engine.cdi.CdiStandaloneProcessEngineConfiguration;
 import org.camunda.bpm.engine.cdi.ProcessVariables;
 import org.camunda.bpm.engine.cdi.annotation.BusinessProcessScoped;
 import org.camunda.bpm.engine.cdi.compat.CamundaTaskForm;
@@ -42,12 +39,16 @@ import org.camunda.bpm.engine.cdi.impl.context.DefaultContextAssociationManager;
 import org.camunda.bpm.engine.cdi.impl.context.RequestScopedAssociation;
 import org.camunda.bpm.engine.cdi.jsf.TaskForm;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.quarkus.engine.extension.impl.CamundaEngineConfig;
+import org.camunda.bpm.quarkus.engine.extension.CamundaEngineConfig;
 import org.camunda.bpm.quarkus.engine.extension.impl.CamundaEngineRecorder;
 import org.camunda.bpm.quarkus.engine.extension.impl.InjectableBusinessProcessContext;
+import org.camunda.bpm.quarkus.engine.extension.QuarkusProcessEngineConfiguration;
 import org.jboss.jandex.DotName;
 
 import javax.enterprise.context.Dependent;
+
+import static io.quarkus.arc.deployment.ContextRegistrationPhaseBuildItem.ContextConfiguratorBuildItem;
+import static io.quarkus.deployment.annotations.ExecutionTime.RUNTIME_INIT;
 
 public class CamundaEngineProcessor {
 
@@ -62,7 +63,7 @@ public class CamundaEngineProcessor {
   protected void unremovableBeans(BuildProducer<UnremovableBeanBuildItem> unremovableBeansProducer) {
     unremovableBeansProducer.produce(UnremovableBeanBuildItem.beanTypes(
         RequestScopedAssociation.class,
-        CdiStandaloneProcessEngineConfiguration.class // TODO: replace Standalone with JTA configuration
+        QuarkusProcessEngineConfiguration.class
     ));
   }
 
@@ -101,20 +102,20 @@ public class CamundaEngineProcessor {
   @BuildStep
   @Record(RUNTIME_INIT)
   protected void processEngineConfiguration(CamundaEngineRecorder recorder,
-                                            BeanContainerBuildItem beanContainer,
+                                            BeanContainerBuildItem beanContainerBuildItem,
                                             CamundaEngineConfig camundaEngineConfig,
                                             BuildProducer<ProcessEngineConfigurationBuildItem> configurationProducer) {
 
-    recorder.configureProcessEngineCdiBeans(beanContainer.getValue());
+    BeanContainer beanContainer = beanContainerBuildItem.getValue();
+    recorder.configureProcessEngineCdiBeans(beanContainer);
     RuntimeValue<ProcessEngineConfigurationImpl> processEngineConfiguration =
-        recorder.createProcessEngineConfiguration(beanContainer.getValue(), camundaEngineConfig);
+        recorder.createProcessEngineConfiguration(beanContainer, camundaEngineConfig);
     configurationProducer.produce(new ProcessEngineConfigurationBuildItem(processEngineConfiguration));
   }
 
   @BuildStep
   @Record(RUNTIME_INIT)
   protected void processEngine(CamundaEngineRecorder recorder,
-                               BeanContainerBuildItem beanContainerBuildItem,
                                ProcessEngineConfigurationBuildItem processEngineConfigurationBuildItem,
                                BuildProducer<ProcessEngineBuildItem> processEngineProducer) {
 
@@ -122,6 +123,13 @@ public class CamundaEngineProcessor {
         processEngineConfigurationBuildItem.getProcessEngineConfiguration();
     processEngineProducer.produce(new ProcessEngineBuildItem(
         recorder.createProcessEngine(processEngineConfiguration)));
+  }
+
+  @Consume(ProcessEngineBuildItem.class)
+  @BuildStep
+  @Record(RUNTIME_INIT)
+  protected void deployProcessEngineResources(CamundaEngineRecorder recorder) {
+    recorder.fireCamundaEngineStartEvent();
   }
 
   @BuildStep

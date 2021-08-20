@@ -75,9 +75,11 @@ daily-stages:
 sidetrack-stages:
   databases:
   - 'cockroachdb_201'
+  - 'azure_sql_db_150'
   stages:
   - 'db-unit'
   - 'db-unit-authorizations'
+  - 'sql-scripts'
   - 'upgrade-database'
   - 'instance-migration'
   - 'old-engine'

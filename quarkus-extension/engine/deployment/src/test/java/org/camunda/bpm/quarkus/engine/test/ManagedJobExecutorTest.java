@@ -16,20 +16,18 @@
  */
 package org.camunda.bpm.quarkus.engine.test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import javax.inject.Inject;
-
 import io.quarkus.test.QuarkusUnitTest;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.quarkus.engine.extension.QuarkusProcessEngineConfiguration;
 import org.camunda.bpm.quarkus.engine.extension.impl.ManagedJobExecutor;
+import org.camunda.bpm.quarkus.engine.test.helper.ProcessEngineAwareExtension;
 import org.eclipse.microprofile.context.ManagedExecutor;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -37,13 +35,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
+import javax.inject.Inject;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class ManagedJobExecutorTest {
 
   @RegisterExtension
-  static final QuarkusUnitTest unitTest = new QuarkusUnitTest()
-      .withConfigurationResource("job-executor-application.properties")
-      .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class)
-          .addAsResource("org/camunda/bpm/quarkus/engine/test/asyncServiceTask.bpmn20.xml"));
+  static final QuarkusUnitTest unitTest = new ProcessEngineAwareExtension()
+      .engineConfig(QuarkusProcessEngineConfiguration::new) // Use default config with Job Executor enabled
+      .withConfigurationResource("org/camunda/bpm/quarkus/engine/test/config/" +
+                                     "job-executor-application.properties")
+      .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class));
 
   @Inject
   ManagedExecutor managedExecutor;
@@ -57,16 +60,10 @@ public class ManagedJobExecutorTest {
   @Inject
   protected ManagementService managementService;
 
-  @Inject
-  protected RepositoryService repositoryService;
-
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
   @BeforeEach
   protected void setUp() {
-    repositoryService.createDeployment()
-        .addClasspathResource("org/camunda/bpm/quarkus/engine/test/asyncServiceTask.bpmn20.xml")
-        .deploy();
     processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine
         .getProcessEngineConfiguration();
   }
@@ -118,7 +115,8 @@ public class ManagedJobExecutorTest {
   }
 
   @Test
-  public void shouldExecuteJob() throws InterruptedException {
+  @Deployment
+  public void shouldExecuteJob() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncTaskProcess");
 

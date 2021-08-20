@@ -180,8 +180,8 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     when(processEngine.getFormService()).thenReturn(formServiceMock);
     when(formServiceMock.getStartFormData(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))).thenReturn(formDataMock);
     when(formServiceMock.getStartFormKey(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))).thenReturn(MockProvider.EXAMPLE_FORM_KEY);
-    when(formServiceMock.submitStartForm(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID),  Matchers.<Map<String, Object>>any())).thenReturn(mockInstance);
-    when(formServiceMock.submitStartForm(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID),  anyString(), Matchers.<Map<String, Object>>any())).thenReturn(mockInstance);
+    when(formServiceMock.submitStartForm(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), Matchers.<Map<String, Object>>any())).thenReturn(mockInstance);
+    when(formServiceMock.submitStartForm(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), anyString(), Matchers.<Map<String, Object>>any())).thenReturn(mockInstance);
 
     VariableMap startFormVariablesMock = MockProvider.createMockFormVariables();
     when(formServiceMock.getStartFormVariables(eq(EXAMPLE_PROCESS_DEFINITION_ID), Matchers.<Collection<String>>any(), anyBoolean())).thenReturn(startFormVariablesMock);
@@ -408,6 +408,21 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
       .body("key", equalTo("embedded:engine://engine/:engine/process-definition/" + mockDefinition.getId() + "/rendered-form"))
       .body("contextPath", equalTo(MockProvider.EXAMPLE_PROCESS_APPLICATION_CONTEXT_PATH))
       .when().get(START_FORM_URL);
+  }
+
+  @Test
+  public void testGetStartForm_shouldReturnCamundaFormRef() {
+    StartFormData mockStartFormData = MockProvider.createMockStartFormDataUsingFormRef();
+    when(formServiceMock.getStartFormData(anyString())).thenReturn(mockStartFormData);
+
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body("key", nullValue())
+      .body("camundaFormRef.key", equalTo(MockProvider.EXAMPLE_FORM_KEY))
+      .body("camundaFormRef.binding", equalTo(MockProvider.EXAMPLE_FORM_REF_BINDING))
+      .body("camundaFormRef.version", equalTo(MockProvider.EXAMPLE_FORM_REF_VERSION))
+    .when().get(START_FORM_URL);
   }
 
   @Test
@@ -855,7 +870,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
       .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
     .when().get(START_FORM_VARIABLES_URL);
 
-    verify(formServiceMock, times(1)).getStartFormVariables(EXAMPLE_PROCESS_DEFINITION_ID, Arrays.asList(new String[]{"a","b","c"}), true);
+    verify(formServiceMock, times(1)).getStartFormVariables(EXAMPLE_PROCESS_DEFINITION_ID, Arrays.asList("a", "b", "c"), true);
   }
 
   @Test
@@ -887,7 +902,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
       .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
     .when().get(START_FORM_VARIABLES_URL);
 
-    verify(formServiceMock, times(1)).getStartFormVariables(EXAMPLE_PROCESS_DEFINITION_ID, Arrays.asList(new String[]{"a","b","c"}), false);
+    verify(formServiceMock, times(1)).getStartFormVariables(EXAMPLE_PROCESS_DEFINITION_ID, Arrays.asList("a", "b", "c"), false);
   }
 
   @Test

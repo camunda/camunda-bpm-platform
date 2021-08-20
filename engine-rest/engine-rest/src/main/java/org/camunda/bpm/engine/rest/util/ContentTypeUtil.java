@@ -18,6 +18,8 @@ package org.camunda.bpm.engine.rest.util;
 
 import javax.ws.rs.core.MediaType;
 
+import org.camunda.bpm.engine.form.CamundaFormRef;
+
 public class ContentTypeUtil {
 
   private static final String SUFFIX_FORM_FILE = ".form";
@@ -28,6 +30,13 @@ public class ContentTypeUtil {
    */
   public static String getFormContentType(String formKey) {
     if (formKey.endsWith(SUFFIX_FORM_FILE)) {
+      return MediaType.APPLICATION_JSON;
+    }
+    return MediaType.APPLICATION_XHTML_XML;
+  }
+
+  public static String getFormContentType(CamundaFormRef formRef) {
+    if(formRef != null && formRef.getKey() != null && formRef.getBinding() != null) {
       return MediaType.APPLICATION_JSON;
     }
     return MediaType.APPLICATION_XHTML_XML;

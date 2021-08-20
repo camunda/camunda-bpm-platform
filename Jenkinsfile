@@ -96,8 +96,10 @@ pipeline {
               }
 
               // the sidetrack pipeline should be triggered on daily,
-              // or PR builds only, master builds should be excluded
-              if (env.BRANCH_NAME != cambpmDefaultBranch() && cambpmWithLabels('all-db', 'cockroachdb', 'authorizations')) {
+              // or PR builds only, master builds should be excluded.
+              // The Sidetrack pipeline contains CRDB and Azure DB stages,
+              // triggered with the cockroachdb and sqlserver PR labels.
+              if (env.BRANCH_NAME != cambpmDefaultBranch() && cambpmWithLabels('all-db', 'cockroachdb', 'sqlserver', 'authorizations')) {
                 cambpmTriggerDownstream(
                   platformVersionDir + "/cambpm-ce/cambpm-sidetrack/${env.BRANCH_NAME}",
                   [string(name: 'UPSTREAM_PROJECT_NAME', value: upstreamProjectName),

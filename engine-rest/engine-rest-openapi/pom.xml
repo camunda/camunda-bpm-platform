@@ -219,4 +219,35 @@
     </plugins>
   </build>
 
+  <profiles>
+    <profile>
+      <id>javadocs</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.openapitools</groupId>
+            <artifactId>openapi-generator-maven-plugin</artifactId>
+            <version>${openapi.generator.version}</version>
+            <configuration>
+              <skip>true</skip>
+            </configuration>
+          </plugin>
+          
+          <plugin>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>default-testCompile</id>
+                <goals>
+                  <goal>testCompile</goal>
+                </goals>
+                <phase>not-existing</phase>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
 </project>

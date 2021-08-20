@@ -458,8 +458,8 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
   public BadUserRequestException uninitializedFormKeyException() {
     return new BadUserRequestException(exceptionMessage(
       "052",
-      "The form key is not initialized. You must call initializeFormKeys() on the task query before you can " +
-      "retrieve the form key."
+      "The form key / form reference is not initialized. You must call initializeFormKeys() on the task query before you can " +
+      "retrieve the form key or the form reference."
     ));
   }
 
@@ -843,6 +843,14 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
       "Execution of external task {} is null. This indicates that the task was concurrently completed or deleted. "
       + "It is not returned by the current fetch and lock command.",
       taskId);
+  }
+
+  public ProcessEngineException multipleTenantsForCamundaFormDefinitionKeyException(String camundaFormDefinitionKey) {
+    return new ProcessEngineException(exceptionMessage(
+        "109",
+        "Cannot resolve a unique Camunda Form definition for key '{}' because it exists for multiple tenants.",
+        camundaFormDefinitionKey
+        ));
   }
 
 }

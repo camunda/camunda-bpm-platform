@@ -21,6 +21,7 @@ import io.quarkus.arc.InjectableContext;
 import io.quarkus.arc.InjectableInstance;
 import io.quarkus.test.QuarkusUnitTest;
 import org.camunda.bpm.engine.cdi.annotation.BusinessProcessScoped;
+import org.camunda.bpm.quarkus.engine.test.helper.ProcessEngineAwareExtension;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.Test;
@@ -34,7 +35,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 public class BusinessProcessContextTest {
 
   @RegisterExtension
-  protected static final QuarkusUnitTest unitTest = new QuarkusUnitTest()
+  protected static final QuarkusUnitTest unitTest = new ProcessEngineAwareExtension()
       .withConfigurationResource("application.properties")
       .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class));
 

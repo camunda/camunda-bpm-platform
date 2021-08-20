@@ -14,14 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.quarkus.engine.extension.impl;
+package org.camunda.bpm.engine.form;
 
-import org.camunda.bpm.engine.cdi.CdiStandaloneProcessEngineConfiguration;
+/**
+ * A {@link CamundaFormRef} represents a reference to a deployed Camunda Form.
+ */
+public interface CamundaFormRef {
 
-// TODO: extend CdiJtaProcessEngineConfiguration when Agroal support is added
-public class QuarkusProcessEngineConfiguration extends CdiStandaloneProcessEngineConfiguration {
+  /**
+   * The key of a {@link CamundaFormRef} corresponds to the {@code id} attribute
+   * in the Camunda Forms JSON.
+   */
+  String getKey();
 
-  public QuarkusProcessEngineConfiguration() {
-    setJobExecutorActivate(true);
-  }
+  /**
+   * The binding of {@link CamundaFormRef} specifies which version of the form
+   * to reference. Possible values are: {@code latest}, {@code deployment} and
+   * {@code version} (specific version value can be retrieved with {@link #getVersion()}).
+   */
+  String getBinding();
+
+  /**
+   * If the {@link #getBinding() binding} of a {@link CamundaFormRef} is set to
+   * {@code version}, the specific version is returned.
+   */
+  Integer getVersion();
 }

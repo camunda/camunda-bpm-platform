@@ -26,6 +26,8 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 
+import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.history.HistoricCaseActivityStatistics;
 import org.camunda.bpm.engine.history.HistoricCaseActivityStatisticsQuery;
 import org.camunda.bpm.engine.impl.HistoricCaseActivityStatisticsQueryImpl;
@@ -33,11 +35,9 @@ import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
-
-import javax.ws.rs.core.Response.Status;
 
 import io.restassured.response.Response;
 
@@ -55,8 +55,8 @@ public class HistoricCaseActivityStatisticsRestServiceQueryTest extends Abstract
 
   protected static HistoricCaseActivityStatisticsQuery historicCaseActivityStatisticsQuery;
 
-  @BeforeClass
-  public static void setUpRuntimeData() {
+  @Before
+  public void setUpRuntimeData() {
     List<HistoricCaseActivityStatistics> mocks = MockProvider.createMockHistoricCaseActivityStatistics();
 
     historicCaseActivityStatisticsQuery = mock(HistoricCaseActivityStatisticsQueryImpl.class);
