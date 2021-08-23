@@ -28,6 +28,7 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.net.URI;
@@ -97,17 +98,23 @@ public class LoginIT extends AbstractWebappUiIT {
 
     wait = new WebDriverWait(driver, 10);
 
-    wait.until(visibilityOfElementLocated(By.cssSelector("input[type=\"text\"]")))
-        .sendKeys("demo");
+    WebElement userNameInput = wait.until(visibilityOfElementLocated(By.cssSelector("input[type=\"text\"]")));
+    sendKeys(userNameInput, "demo");
 
-    wait.until(visibilityOfElementLocated(By.cssSelector("input[type=\"password\"]")))
-        .sendKeys("demo");
+    WebElement passwordInput = wait.until(visibilityOfElementLocated(By.cssSelector("input[type=\"password\"]")));
+    sendKeys(passwordInput, "demo");
 
     wait.until(visibilityOfElementLocated(By.cssSelector("button[type=\"submit\"]")))
         .submit();
 
     wait.until(visibilityOfElementLocated(By.cssSelector(".modal-close")))
         .click();
+  }
+
+  public void sendKeys(WebElement element, String keys)  {
+
+    // fix for CAM-13548
+    Arrays.stream(keys.split("")).forEach(c -> element.sendKeys(c));
   }
 
   @Test
