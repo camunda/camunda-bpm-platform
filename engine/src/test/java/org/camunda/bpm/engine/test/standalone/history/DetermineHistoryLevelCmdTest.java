@@ -38,18 +38,13 @@ public class DetermineHistoryLevelCmdTest {
 
   private ProcessEngineImpl processEngineImpl;
 
-
-  private static ProcessEngineConfigurationImpl config(final String historyLevel) {
-    return config("false", historyLevel);
-  }
-
   private static ProcessEngineConfigurationImpl config(final String schemaUpdate, final String historyLevel) {
     StandaloneInMemProcessEngineConfiguration engineConfiguration = new StandaloneInMemProcessEngineConfiguration();
     engineConfiguration.setProcessEngineName(UUID.randomUUID().toString());
     engineConfiguration.setDatabaseSchemaUpdate(schemaUpdate);
     engineConfiguration.setHistory(historyLevel);
     engineConfiguration.setDbMetricsReporterActivate(false);
-    engineConfiguration.setJdbcUrl("jdbc:h2:mem:DatabaseHistoryPropertyAutoTest");
+    engineConfiguration.setJdbcUrl("jdbc:h2:mem:DetermineHistoryLevelCmdTest");
 
     return engineConfiguration;
   }
