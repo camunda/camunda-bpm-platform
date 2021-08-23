@@ -39,13 +39,6 @@
       <artifactId>camunda-engine</artifactId>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>org.camunda.bpm.distro</groupId>
-      <artifactId>camunda-sql-scripts</artifactId>
-      <!-- this is the baseline for the Liquibase changelog, do not change -->
-      <version>7.15.0</version>
-      <scope>provided</scope>
-    </dependency>
 
     <!-- test dependencies -->
     <dependency>
@@ -160,15 +153,6 @@
                   <type>jar</type>
                   <overWrite>true</overWrite>
                   <outputDirectory>target/camunda-engine-${project.version}</outputDirectory>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.camunda.bpm.distro</groupId>
-                  <artifactId>camunda-sql-scripts</artifactId>
-                  <!-- this is the baseline for the Liquibase changelog, do not change -->
-                  <version>7.15.0</version>
-                  <type>jar</type>
-                  <overWrite>true</overWrite>
-                  <outputDirectory>target/camunda-liquibase-baseline</outputDirectory>
                 </artifactItem>
               </artifactItems>
               <includes>**/create/*.sql, **/drop/*.sql, **/upgrade/*.sql, **/liquibase/**/*</includes>
@@ -295,9 +279,6 @@
 
                 <copy todir="target/sql/liquibase">
                   <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/liquibase" includes="**/*" />
-                </copy>
-                <copy todir="target/sql/liquibase/baseline">
-                  <fileset dir="target/camunda-liquibase-baseline/sql/create" includes="*.sql" />
                 </copy>
 
               </target>

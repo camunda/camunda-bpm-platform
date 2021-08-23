@@ -28,21 +28,38 @@
     <property  name="db.name"  value="oracle"  dbms="oracle"/>
     <property  name="db.name"  value="postgres"  dbms="postgresql"/>
 
-    <changeSet author="Camunda" id="7.15.0-baseline">
-        <sqlFile path="baseline/${db.name}_engine_7.15.0.sql"
+    <changeSet author="Camunda" id="7.16.0-baseline">
+        <sqlFile path="baseline/liquibase.${db.name}.create.engine.sql"
                  encoding="UTF-8"
                  relativeToChangelogFile="true"
                  splitStatements="true"
                  stripComments="true"/>
-        <sqlFile path="baseline/${db.name}_identity_7.15.0.sql"
+        <sqlFile path="baseline/liquibase.${db.name}.create.history.sql"
                  encoding="UTF-8"
                  relativeToChangelogFile="true"
                  splitStatements="true"
                  stripComments="true"/>
-    </changeSet>
-
-    <changeSet author="Camunda" id="7.15-to-7.16">
-        <sqlFile path="../upgrade/${db.name}_engine_7.15_to_7.16.sql"
+        <sqlFile path="baseline/liquibase.${db.name}.create.identity.sql"
+                 encoding="UTF-8"
+                 relativeToChangelogFile="true"
+                 splitStatements="true"
+                 stripComments="true"/>
+        <sqlFile path="baseline/liquibase.${db.name}.create.case.engine.sql"
+                 encoding="UTF-8"
+                 relativeToChangelogFile="true"
+                 splitStatements="true"
+                 stripComments="true"/>
+        <sqlFile path="baseline/liquibase.${db.name}.create.case.history.sql"
+                 encoding="UTF-8"
+                 relativeToChangelogFile="true"
+                 splitStatements="true"
+                 stripComments="true"/>
+        <sqlFile path="baseline/liquibase.${db.name}.create.decision.engine.sql"
+                 encoding="UTF-8"
+                 relativeToChangelogFile="true"
+                 splitStatements="true"
+                 stripComments="true"/>
+        <sqlFile path="baseline/liquibase.${db.name}.create.decision.history.sql"
                  encoding="UTF-8"
                  relativeToChangelogFile="true"
                  splitStatements="true"
