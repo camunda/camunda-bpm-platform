@@ -16,16 +16,18 @@
  */
 package org.camunda.bpm;
 
-import org.junit.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import static org.openqa.selenium.support.ui.ExpectedConditions.textToBePresentInElementLocated;
+import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 
-import static org.openqa.selenium.support.ui.ExpectedConditions.textToBePresentInElementLocated;
-import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated;
+import org.junit.Test;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class LoginIT extends AbstractWebappUiIntegrationTest {
 
@@ -38,17 +40,23 @@ public class LoginIT extends AbstractWebappUiIntegrationTest {
 
     wait = new WebDriverWait(driver, 10);
 
-    wait.until(visibilityOfElementLocated(By.cssSelector("input[type=\"text\"]")))
-        .sendKeys("demo");
+    WebElement userNameInput = wait.until(visibilityOfElementLocated(By.cssSelector("input[type=\"text\"]")));
+    sendKeys(userNameInput, "demo");
 
-    wait.until(visibilityOfElementLocated(By.cssSelector("input[type=\"password\"]")))
-        .sendKeys("demo");
+    WebElement passwordInput = wait.until(visibilityOfElementLocated(By.cssSelector("input[type=\"password\"]")));
+    sendKeys(passwordInput, "demo");
 
     wait.until(visibilityOfElementLocated(By.cssSelector("button[type=\"submit\"]")))
         .submit();
 
     wait.until(visibilityOfElementLocated(By.cssSelector(".modal-close")))
         .click();
+  }
+
+  public void sendKeys(WebElement element, String keys)  {
+
+    // fix for CAM-13548
+    Arrays.stream(keys.split("")).forEach(c -> element.sendKeys(c));
   }
 
   @Test
