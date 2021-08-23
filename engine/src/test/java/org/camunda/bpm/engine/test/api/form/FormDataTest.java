@@ -263,7 +263,14 @@ public class FormDataTest extends PluggableProcessEngineTest {
     assertEquals(5, taskFormData.getFormFields().size());
     for (FormField field : taskFormData.getFormFields()) {
       assertNotNull(field);
-      assertNull(field.getValue().getValue());
+
+      if (field.getType() instanceof DateFormType) {
+        assertEquals("", field.getValue().getValue());
+
+      } else {
+        assertNull(field.getValue().getValue());
+
+      }
     }
   }
 
