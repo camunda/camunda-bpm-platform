@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0fq6hhw" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.8.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+  <bpmn:escalation id="Escalation_1ntnzkr" name="Escalation_11gl7ql" />
+  <bpmn:collaboration id="Collaboration_133lzok">
+    <bpmn:participant id="Participant_15inkfh" processRef="nested-call-activities" />
+  </bpmn:collaboration>
+  <bpmn:process id="nested-call-activities" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_08za13c</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:callActivity id="para-multi-instance-call" name="Parallel Multi Instance" calledElement="failingProcess">
+      <bpmn:incoming>Flow_08za13c</bpmn:incoming>
+      <bpmn:outgoing>Flow_1s1ayca</bpmn:outgoing>
+      <bpmn:multiInstanceLoopCharacteristics>
+        <bpmn:loopCardinality xsi:type="bpmn:tFormalExpression">5</bpmn:loopCardinality>
+      </bpmn:multiInstanceLoopCharacteristics>
+    </bpmn:callActivity>
+    <bpmn:callActivity id="seq-multi-instance" name="Sequential Multi Instance" calledElement="failingProcess">
+      <bpmn:incoming>Flow_1s1ayca</bpmn:incoming>
+      <bpmn:outgoing>Flow_148kfpx</bpmn:outgoing>
+      <bpmn:multiInstanceLoopCharacteristics isSequential="true">
+        <bpmn:loopCardinality xsi:type="bpmn:tFormalExpression">4</bpmn:loopCardinality>
+      </bpmn:multiInstanceLoopCharacteristics>
+    </bpmn:callActivity>
+    <bpmn:callActivity id="loop-marker-call-activity" name="Loop Marker Instance" calledElement="failingProcess" camunda:variableMappingDelegateExpression="${&#39;4&#39;}">
+      <bpmn:incoming>Flow_148kfpx</bpmn:incoming>
+      <bpmn:outgoing>Flow_0p4dg9h</bpmn:outgoing>
+      <bpmn:standardLoopCharacteristics />
+    </bpmn:callActivity>
+    <bpmn:subProcess id="expanded-subprocess">
+      <bpmn:incoming>Flow_0p4dg9h</bpmn:incoming>
+      <bpmn:outgoing>Flow_0ygw7ti</bpmn:outgoing>
+      <bpmn:startEvent id="Event_0ikkcxf">
+        <bpmn:outgoing>Flow_1rd42ra</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:sequenceFlow id="Flow_1rd42ra" sourceRef="Event_0ikkcxf" targetRef="nested-call-activity" />
+      <bpmn:callActivity id="nested-call-activity" name="Nested Call Activity" calledElement="failingProcess">
+        <bpmn:incoming>Flow_1rd42ra</bpmn:incoming>
+        <bpmn:outgoing>Flow_09dlbvc</bpmn:outgoing>
+      </bpmn:callActivity>
+      <bpmn:endEvent id="Event_1675hqp">
+        <bpmn:incoming>Flow_1ud53js</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:subProcess id="nested-subprocess">
+        <bpmn:incoming>Flow_09dlbvc</bpmn:incoming>
+        <bpmn:outgoing>Flow_1ud53js</bpmn:outgoing>
+        <bpmn:startEvent id="Event_1yzep99">
+          <bpmn:outgoing>Flow_0xbei88</bpmn:outgoing>
+        </bpmn:startEvent>
+        <bpmn:callActivity id="double-nested-call-activity" name="Nested Nested Call Activity" calledElement="failingProcess">
+          <bpmn:incoming>Flow_0xbei88</bpmn:incoming>
+          <bpmn:outgoing>Flow_1ppnb7i</bpmn:outgoing>
+        </bpmn:callActivity>
+        <bpmn:sequenceFlow id="Flow_0xbei88" sourceRef="Event_1yzep99" targetRef="double-nested-call-activity" />
+        <bpmn:callActivity id="seq-multi-instance-nested" name="Sequential Multi Instance Nested" calledElement="failingProcess">
+          <bpmn:incoming>Flow_1ppnb7i</bpmn:incoming>
+          <bpmn:outgoing>Flow_1g9qc9u</bpmn:outgoing>
+          <bpmn:multiInstanceLoopCharacteristics isSequential="true">
+            <bpmn:loopCardinality xsi:type="bpmn:tFormalExpression">4</bpmn:loopCardinality>
+          </bpmn:multiInstanceLoopCharacteristics>
+        </bpmn:callActivity>
+        <bpmn:sequenceFlow id="Flow_1ppnb7i" sourceRef="double-nested-call-activity" targetRef="seq-multi-instance-nested" />
+        <bpmn:sequenceFlow id="Flow_1g9qc9u" sourceRef="seq-multi-instance-nested" targetRef="not-a-call-activity" />
+        <bpmn:task id="not-a-call-activity" name="not a call activity">
+          <bpmn:incoming>Flow_1g9qc9u</bpmn:incoming>
+          <bpmn:outgoing>Flow_1dz65cm</bpmn:outgoing>
+        </bpmn:task>
+        <bpmn:endEvent id="Event_1kt6bks">
+          <bpmn:incoming>Flow_1dz65cm</bpmn:incoming>
+        </bpmn:endEvent>
+        <bpmn:sequenceFlow id="Flow_1dz65cm" sourceRef="not-a-call-activity" targetRef="Event_1kt6bks" />
+      </bpmn:subProcess>
+      <bpmn:sequenceFlow id="Flow_09dlbvc" sourceRef="nested-call-activity" targetRef="nested-subprocess" />
+      <bpmn:sequenceFlow id="Flow_1ud53js" sourceRef="nested-subprocess" targetRef="Event_1675hqp" />
+    </bpmn:subProcess>
+    <bpmn:sequenceFlow id="Flow_0ygw7ti" sourceRef="expanded-subprocess" targetRef="event-call-activity" />
+    <bpmn:sequenceFlow id="Flow_0p4dg9h" sourceRef="loop-marker-call-activity" targetRef="expanded-subprocess" />
+    <bpmn:sequenceFlow id="Flow_148kfpx" sourceRef="seq-multi-instance" targetRef="loop-marker-call-activity" />
+    <bpmn:sequenceFlow id="Flow_1s1ayca" sourceRef="para-multi-instance-call" targetRef="seq-multi-instance" />
+    <bpmn:sequenceFlow id="Flow_08za13c" sourceRef="StartEvent_1" targetRef="para-multi-instance-call" />
+    <bpmn:callActivity id="event-call-activity" name="Event Call Activity" calledElement="failingProcess">
+      <bpmn:incoming>Flow_0ygw7ti</bpmn:incoming>
+      <bpmn:outgoing>Flow_1aaeovx</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:boundaryEvent id="border-event" cancelActivity="false" attachedToRef="event-call-activity">
+      <bpmn:escalationEventDefinition id="EscalationEventDefinition_1rh0zwi" escalationRef="Escalation_1ntnzkr" />
+    </bpmn:boundaryEvent>
+    <bpmn:subProcess id="collapsed-sub-process" name="Collapsed Subprocess">
+      <bpmn:incoming>Flow_1aaeovx</bpmn:incoming>
+      <bpmn:outgoing>Flow_1tx9ad7</bpmn:outgoing>
+      <bpmn:startEvent id="Event_0yv11yn">
+        <bpmn:outgoing>Flow_071s6e2</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:sequenceFlow id="Flow_071s6e2" sourceRef="Event_0yv11yn" targetRef="hidden-call-activity" />
+      <bpmn:callActivity id="hidden-call-activity" name="hidden call activity" calledElement="failingProcess">
+        <bpmn:incoming>Flow_071s6e2</bpmn:incoming>
+        <bpmn:outgoing>Flow_15verag</bpmn:outgoing>
+      </bpmn:callActivity>
+      <bpmn:endEvent id="Event_1fawp1j">
+        <bpmn:incoming>Flow_15verag</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="Flow_15verag" sourceRef="hidden-call-activity" targetRef="Event_1fawp1j" />
+    </bpmn:subProcess>
+    <bpmn:sequenceFlow id="Flow_1aaeovx" sourceRef="event-call-activity" targetRef="collapsed-sub-process" />
+    <bpmn:endEvent id="Event_0w3ddt7">
+      <bpmn:incoming>Flow_1tx9ad7</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1tx9ad7" sourceRef="collapsed-sub-process" targetRef="Event_0w3ddt7" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_133lzok">
+      <bpmndi:BPMNShape id="Participant_15inkfh_di" bpmnElement="Participant_15inkfh" isHorizontal="true">
+        <dc:Bounds x="129" y="60" width="2339" height="380" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1tx9ad7_di" bpmnElement="Flow_1tx9ad7">
+        <di:waypoint x="2280" y="247" />
+        <di:waypoint x="2332" y="247" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1aaeovx_di" bpmnElement="Flow_1aaeovx">
+        <di:waypoint x="1880" y="247" />
+        <di:waypoint x="1930" y="247" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_08za13c_di" bpmnElement="Flow_08za13c">
+        <di:waypoint x="215" y="247" />
+        <di:waypoint x="270" y="247" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1s1ayca_di" bpmnElement="Flow_1s1ayca">
+        <di:waypoint x="370" y="247" />
+        <di:waypoint x="430" y="247" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_148kfpx_di" bpmnElement="Flow_148kfpx">
+        <di:waypoint x="530" y="247" />
+        <di:waypoint x="590" y="247" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0p4dg9h_di" bpmnElement="Flow_0p4dg9h">
+        <di:waypoint x="690" y="247" />
+        <di:waypoint x="740" y="247" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ygw7ti_di" bpmnElement="Flow_0ygw7ti">
+        <di:waypoint x="1740" y="250" />
+        <di:waypoint x="1780" y="250" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="229" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1dgqbqs_di" bpmnElement="para-multi-instance-call">
+        <dc:Bounds x="270" y="207" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0r2af97_di" bpmnElement="seq-multi-instance">
+        <dc:Bounds x="430" y="207" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_05lmrf2_di" bpmnElement="loop-marker-call-activity">
+        <dc:Bounds x="590" y="207" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0m675aj_di" bpmnElement="expanded-subprocess" isExpanded="true">
+        <dc:Bounds x="740" y="80" width="1000" height="340" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1ud53js_di" bpmnElement="Flow_1ud53js">
+        <di:waypoint x="1520" y="247" />
+        <di:waypoint x="1552" y="247" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_09dlbvc_di" bpmnElement="Flow_09dlbvc">
+        <di:waypoint x="970" y="247" />
+        <di:waypoint x="990" y="247" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1rd42ra_di" bpmnElement="Flow_1rd42ra">
+        <di:waypoint x="816" y="247" />
+        <di:waypoint x="870" y="247" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_0ikkcxf_di" bpmnElement="Event_0ikkcxf">
+        <dc:Bounds x="780" y="229" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1e5780z_di" bpmnElement="nested-call-activity">
+        <dc:Bounds x="870" y="207" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1675hqp_di" bpmnElement="Event_1675hqp">
+        <dc:Bounds x="1552" y="229" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0nesyt2_di" bpmnElement="nested-subprocess" isExpanded="true">
+        <dc:Bounds x="990" y="147" width="530" height="253" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1dz65cm_di" bpmnElement="Flow_1dz65cm">
+        <di:waypoint x="1440" y="247" />
+        <di:waypoint x="1462" y="247" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1g9qc9u_di" bpmnElement="Flow_1g9qc9u">
+        <di:waypoint x="1320" y="247" />
+        <di:waypoint x="1340" y="247" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ppnb7i_di" bpmnElement="Flow_1ppnb7i">
+        <di:waypoint x="1190" y="247" />
+        <di:waypoint x="1205" y="247" />
+        <di:waypoint x="1205" y="250" />
+        <di:waypoint x="1220" y="250" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0xbei88_di" bpmnElement="Flow_0xbei88">
+        <di:waypoint x="1066" y="247" />
+        <di:waypoint x="1078" y="247" />
+        <di:waypoint x="1078" y="250" />
+        <di:waypoint x="1090" y="250" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_1yzep99_di" bpmnElement="Event_1yzep99">
+        <dc:Bounds x="1030" y="229" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1ytyf20_di" bpmnElement="double-nested-call-activity">
+        <dc:Bounds x="1090" y="207" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0umii0b_di" bpmnElement="seq-multi-instance-nested">
+        <dc:Bounds x="1220" y="207" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1efz5jr_di" bpmnElement="not-a-call-activity">
+        <dc:Bounds x="1340" y="207" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1kt6bks_di" bpmnElement="Event_1kt6bks">
+        <dc:Bounds x="1462" y="229" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_17a6tvl_di" bpmnElement="event-call-activity">
+        <dc:Bounds x="1780" y="207" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1stfs9x_di" bpmnElement="collapsed-sub-process" isExpanded="false">
+        <dc:Bounds x="1930" y="147" width="350" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_15verag_di" bpmnElement="Flow_15verag">
+        <di:waypoint x="2160" y="247" />
+        <di:waypoint x="2222" y="247" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_071s6e2_di" bpmnElement="Flow_071s6e2">
+        <di:waypoint x="2006" y="247" />
+        <di:waypoint x="2060" y="247" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_0yv11yn_di" bpmnElement="Event_0yv11yn">
+        <dc:Bounds x="1970" y="229" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_11g5gio_di" bpmnElement="hidden-call-activity">
+        <dc:Bounds x="2060" y="207" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1fawp1j_di" bpmnElement="Event_1fawp1j">
+        <dc:Bounds x="2222" y="229" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0w3ddt7_di" bpmnElement="Event_0w3ddt7">
+        <dc:Bounds x="2332" y="229" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0ayxm3h_di" bpmnElement="border-event">
+        <dc:Bounds x="1862" y="189" width="36" height="36" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
