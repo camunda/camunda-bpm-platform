@@ -46,7 +46,7 @@ public class QuarkusProcessEngineConfiguration extends CdiJtaProcessEngineConfig
 
     setIdGenerator(new StrongUuidGenerator());
 
-    setHistoryLevel(HistoryLevel.HISTORY_LEVEL_FULL); // Cockpit needs it
+    setHistory(HistoryLevel.HISTORY_LEVEL_FULL.getName()); // Cockpit needs it
   }
 
   /**
