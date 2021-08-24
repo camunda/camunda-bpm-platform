@@ -16,13 +16,10 @@
  */
 package org.camunda.bpm.quarkus.engine.test.config;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import javax.inject.Inject;
-
 import io.quarkus.test.QuarkusUnitTest;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.quarkus.engine.extension.CamundaEngineConfig;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
+import org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator;
 import org.camunda.bpm.quarkus.engine.extension.QuarkusProcessEngineConfiguration;
 import org.camunda.bpm.quarkus.engine.test.helper.ProcessEngineAwareExtension;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -30,43 +27,42 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class CamundaEngineConfigurationConfigTest {
+import javax.inject.Inject;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE;
+
+public class CamundaEngineDefaultConfigTest {
 
   @RegisterExtension
   static final QuarkusUnitTest unitTest = new ProcessEngineAwareExtension()
-      .withConfigurationResource("org/camunda/bpm/quarkus/engine/test/config/" +
-                                     "process-engine-config-application.properties")
+      .engineConfig(QuarkusProcessEngineConfiguration::new)
       .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class));
 
   @Inject
-  CamundaEngineConfig config;
-
-  @Inject
-  ProcessEngine processEngine;
+  public ProcessEngine processEngine;
 
   @Test
-  public void shouldLoadProcessEngineConfigurationProperties() {
-    // given a custom application.properties file
-
-    // then
-    assertThat(config.genericConfig.get("cmmn-enabled")).isEqualTo("false");
-    assertThat(config.genericConfig.get("dmn-enabled")).isEqualTo("false");
-    assertThat(config.genericConfig.get("history")).isEqualTo("none");
-    assertThat(config.genericConfig.get("initialize-telemetry")).isEqualTo("false");
-  }
-
-  @Test
-  public void shouldApplyProcessEngineConfigurationProperties() {
+  public void shouldApplyDefaults() {
     // given
     // a ProcessEngineConfiguration instance
     QuarkusProcessEngineConfiguration configuration
         = (QuarkusProcessEngineConfiguration) processEngine.getProcessEngineConfiguration();
 
     // then
-    assertThat(configuration.isCmmnEnabled()).isEqualTo(false);
-    assertThat(configuration.isDmnEnabled()).isEqualTo(false);
+    assertThat(configuration.isJobExecutorActivate()).isTrue();
+
+    assertThat(configuration.getJdbcUrl()).isNull();
+    assertThat(configuration.getJdbcUsername()).isNull();
+    assertThat(configuration.getJdbcPassword()).isNull();
+    assertThat(configuration.getJdbcDriver()).isNull();
+    assertThat(configuration.getDatabaseSchemaUpdate()).isEqualTo(DB_SCHEMA_UPDATE_TRUE);
+    assertThat(configuration.isTransactionsExternallyManaged()).isTrue();
+
+    assertThat(configuration.getIdGenerator()).isInstanceOf(StrongUuidGenerator.class);
+
     assertThat(configuration.getHistory()).isEqualTo("full");
-    assertThat(configuration.isInitializeTelemetry()).isEqualTo(false);
+    assertThat(configuration.getHistoryLevel()).isEqualTo(HistoryLevel.HISTORY_LEVEL_FULL);
   }
 
 }

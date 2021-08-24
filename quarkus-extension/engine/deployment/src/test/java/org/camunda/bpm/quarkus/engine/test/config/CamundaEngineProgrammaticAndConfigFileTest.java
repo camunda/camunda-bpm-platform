@@ -71,7 +71,7 @@ public class CamundaEngineProgrammaticAndConfigFileTest {
     // assert engine config properties
     assertThat(configuration.isCmmnEnabled()).isFalse();
     assertThat(configuration.isDmnEnabled()).isFalse();
-    assertThat(configuration.getHistory()).isEqualTo("none");
+    assertThat(configuration.getHistory()).isEqualTo("full");
     assertThat(configuration.isInitializeTelemetry()).isFalse();
     // assert job executor properties
     assertThat(jobExecutor.getMaxJobsPerAcquisition()).isEqualTo(5);
