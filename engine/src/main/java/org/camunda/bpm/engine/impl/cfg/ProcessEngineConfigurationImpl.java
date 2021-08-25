@@ -413,6 +413,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public static final int DEFAULT_INVOCATIONS_PER_BATCH_JOB = 1;
 
+  protected static final Map<Object, Object> DEFAULT_BEANS_MAP = new HashMap<>();
 
   protected static final String PRODUCT_NAME = "Camunda BPM Runtime";
 
@@ -2584,7 +2585,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected void initBeans() {
     if (beans == null) {
-      beans = new HashMap<>();
+      beans = DEFAULT_BEANS_MAP;
     }
   }
 
