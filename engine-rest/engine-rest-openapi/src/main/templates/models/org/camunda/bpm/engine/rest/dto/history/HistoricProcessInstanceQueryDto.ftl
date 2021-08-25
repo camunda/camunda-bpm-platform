@@ -8,6 +8,7 @@
 
     "sorting": {
       "type": "array",
+      "nullable": true,
       "description": "Apply sorting of the result",
       "items":
 
