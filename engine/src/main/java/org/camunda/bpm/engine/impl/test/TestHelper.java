@@ -205,6 +205,16 @@ public abstract class TestHelper {
     return r.append("." + suffix).toString();
   }
 
+  public static boolean annotationRequiredHistoryLevelCheck(ProcessEngine processEngine, RequiredHistoryLevel annotation, Class<?> testClass, String methodName) {
+
+    if (annotation != null) {
+      return historyLevelCheck(processEngine, annotation);
+
+    } else {
+      return annotationRequiredHistoryLevelCheck(processEngine, testClass, methodName);
+    }
+  }
+
   private static boolean historyLevelCheck(ProcessEngine processEngine, RequiredHistoryLevel annotation) {
     ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
 
@@ -231,6 +241,16 @@ public abstract class TestHelper {
       return historyLevelCheck(processEngine, annotation);
     } else {
       return true;
+    }
+  }
+
+  public static boolean annotationRequiredDatabaseCheck(ProcessEngine processEngine, RequiredDatabase annotation, Class<?> testClass, String methodName) {
+
+    if (annotation != null) {
+      return databaseCheck(processEngine, annotation);
+
+    } else {
+      return annotationRequiredDatabaseCheck(processEngine, testClass, methodName);
     }
   }
 
