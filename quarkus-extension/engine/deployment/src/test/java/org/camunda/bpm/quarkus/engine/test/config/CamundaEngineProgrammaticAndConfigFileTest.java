@@ -83,7 +83,7 @@ public class CamundaEngineProgrammaticAndConfigFileTest {
     assertThat(config.jobExecutor.threadPool.maxPoolSize).isEqualTo(12);
     assertThat(config.jobExecutor.threadPool.queueSize).isEqualTo(5);
     // assert correct datasource
-    assertThat(config.datasource.get()).isEqualTo("camunda");
+    assertThat(config.datasource).hasValue("camunda");
     assertThat(configuration.getDataSource().getConnection()).asString().contains("h2:mem:camunda");
   }
 }
