@@ -9,7 +9,8 @@
 
     <@lib.property
         name = "value"
-        type = "object"
+        type = "ref"
+        dto = "AnyValue"
         last = true
         desc = "The variable value, could be of type boolean, string or number"/>
 
