@@ -43,7 +43,7 @@ public class ModificationBatchJobHandler extends AbstractBatchJobHandler<Modific
   }
 
   @Override
-  protected void postProcessJob(ModificationBatchConfiguration configuration, JobEntity job) {
+  protected void postProcessJob(ModificationBatchConfiguration configuration, JobEntity job, ModificationBatchConfiguration jobConfiguration) {
     if (job.getDeploymentId() == null) {
       CommandContext commandContext = Context.getCommandContext();
       ProcessDefinitionEntity processDefinitionEntity = commandContext.getProcessEngineConfiguration().getDeploymentCache()
