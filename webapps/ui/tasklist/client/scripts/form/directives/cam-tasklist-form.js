@@ -137,6 +137,7 @@ module.exports = function() {
           }
 
           var key = form.key,
+            camundaFormRef = form.camundaFormRef,
             applicationContextPath = form.contextPath;
 
           // structure may be [embedded:][app:]formKey
@@ -145,10 +146,34 @@ module.exports = function() {
           // structure may be [app:]formKey
           // structure may be [deployment:]formKey
 
-          if (!key) {
+          if (!key && !camundaFormRef) {
             form.type = 'generic';
             return;
           }
+
+          if (camundaFormRef) {
+            form.type = 'camunda-forms';
+
+            if ($scope.params.taskId) {
+              key = Uri.appUri(
+                'engine://engine/:engine/task/' +
+                  $scope.params.taskId +
+                  '/deployed-form'
+              );
+            } else {
+              key = Uri.appUri(
+                'engine://engine/:engine/process-definition/' +
+                  $scope.params.processDefinitionId +
+                  '/deployed-start-form'
+              );
+            }
+
+            setAsynchronousFormKey(key);
+            form.key = key;
+
+            return;
+          }
+
           if (key.indexOf(EMBEDDED_KEY) === 0) {
             key = key.substring(EMBEDDED_KEY.length);
             form.type = 'embedded';
