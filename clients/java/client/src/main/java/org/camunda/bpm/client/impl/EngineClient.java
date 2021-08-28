@@ -22,11 +22,7 @@ import java.util.Map;
 
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.impl.ExternalTaskImpl;
-import org.camunda.bpm.client.task.impl.dto.BpmnErrorRequestDto;
-import org.camunda.bpm.client.task.impl.dto.CompleteRequestDto;
-import org.camunda.bpm.client.task.impl.dto.ExtendLockRequestDto;
-import org.camunda.bpm.client.task.impl.dto.FailureRequestDto;
-import org.camunda.bpm.client.task.impl.dto.LockRequestDto;
+import org.camunda.bpm.client.task.impl.dto.*;
 import org.camunda.bpm.client.topic.impl.dto.FetchAndLockRequestDto;
 import org.camunda.bpm.client.topic.impl.dto.TopicRequestDto;
 import org.camunda.bpm.client.variable.impl.TypedValueField;
@@ -38,11 +34,13 @@ import org.camunda.bpm.client.variable.impl.TypedValues;
 public class EngineClient {
 
   protected static final String EXTERNAL_TASK_RESOURCE_PATH = "/external-task";
+  protected static final String EXTERNAL_TASK__PROCESS_RESOURCE_PATH = "/process-instance";
   protected static final String FETCH_AND_LOCK_RESOURCE_PATH = EXTERNAL_TASK_RESOURCE_PATH + "/fetchAndLock";
   public static final String ID_PATH_PARAM = "{id}";
   protected static final String ID_RESOURCE_PATH = EXTERNAL_TASK_RESOURCE_PATH + "/" + ID_PATH_PARAM;
   public static final String LOCK_RESOURCE_PATH = ID_RESOURCE_PATH + "/lock";
   public static final String EXTEND_LOCK_RESOURCE_PATH = ID_RESOURCE_PATH + "/extendLock";
+  public static final String SET_VARIABLES_RESOURCE_PATH = EXTERNAL_TASK__PROCESS_RESOURCE_PATH + "/" + ID_PATH_PARAM + "/variables";
   public static final String UNLOCK_RESOURCE_PATH = ID_RESOURCE_PATH + "/unlock";
   public static final String COMPLETE_RESOURCE_PATH = ID_RESOURCE_PATH + "/complete";
   public static final String FAILURE_RESOURCE_PATH = ID_RESOURCE_PATH + "/failure";
@@ -104,6 +102,15 @@ public class EngineClient {
     engineInteraction.postRequest(resourceUrl, payload, Void.class);
   }
 
+  public void setVariables(String proccessId,Map<String, Object> variables) throws EngineClientException {
+    Map<String, TypedValueField> typedValueDtoMap = typedValues.serializeVariables(variables);
+    SetVariablesRequestDto payload = new SetVariablesRequestDto(workerId, typedValueDtoMap);
+    String resourcePath = SET_VARIABLES_RESOURCE_PATH.replace("{id}", proccessId);
+    String resourceUrl = baseUrl + resourcePath;
+    engineInteraction.postRequest(resourceUrl, payload, Void.class);
+  }
+
+
   public void failure(String taskId, String errorMessage, String errorDetails, int retries, long retryTimeout, Map<String, Object> variables, Map<String, Object> localVariables) throws EngineClientException {
     Map<String, TypedValueField> typedValueDtoMap = typedValues.serializeVariables(variables);
     Map<String, TypedValueField> localTypedValueDtoMap = typedValues.serializeVariables(localVariables);
@@ -131,8 +138,8 @@ public class EngineClient {
 
   public byte[] getLocalBinaryVariable(String variableName, String processInstanceId) throws EngineClientException {
     String resourcePath = baseUrl + GET_LOCAL_BINARY_VARIABLE
-      .replace(ID_PATH_PARAM, processInstanceId)
-      .replace(NAME_PATH_PARAM, variableName);
+            .replace(ID_PATH_PARAM, processInstanceId)
+            .replace(NAME_PATH_PARAM, variableName);
 
     return engineInteraction.getRequest(resourcePath);
   }

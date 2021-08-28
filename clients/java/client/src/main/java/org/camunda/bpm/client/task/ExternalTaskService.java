@@ -91,6 +91,48 @@ public interface ExternalTaskService {
   void complete(ExternalTask externalTask);
 
   /**
+   * Set variables
+   *
+   * @param variables     are set in the tasks ancestor execution hierarchy The key and the value represent
+   *                      the variable name and its value. Map can consist of both typed and untyped variables.
+   *
+   * @throws NotFoundException if the task has been canceled and therefore does not exist anymore
+   * @throws NotAcquiredException if the task's most recent lock could not be acquired
+   * @throws NotResumedException if the corresponding process instance could not be resumed
+   * @throws ConnectionLostException if the connection could not be established
+   * @throws ValueMapperException
+   * <ul>
+   *   <li> if an object cannot be serialized
+   *   <li> if no 'objectTypeName' is provided for non-null value
+   *   <li> if value is of type abstract
+   *   <li> if no suitable serializer could be found
+   * </ul>
+   */
+  public void setVariables(String processInstanceId, Map<String, Object> variables);
+
+
+  /**
+   * Set variables
+   *
+   * @param variables     are set in the tasks ancestor execution hierarchy The key and the value represent
+   *                      the variable name and its value. Map can consist of both typed and untyped variables.
+   *
+   * @throws NotFoundException if the task has been canceled and therefore does not exist anymore
+   * @throws NotAcquiredException if the task's most recent lock could not be acquired
+   * @throws NotResumedException if the corresponding process instance could not be resumed
+   * @throws ConnectionLostException if the connection could not be established
+   * @throws ValueMapperException
+   * <ul>
+   *   <li> if an object cannot be serialized
+   *   <li> if no 'objectTypeName' is provided for non-null value
+   *   <li> if value is of type abstract
+   *   <li> if no suitable serializer could be found
+   * </ul>
+   */
+  public void setVariables(ExternalTask externalTask, Map<String, Object> variables);
+
+
+  /**
    * Completes a task.
    *
    * @param externalTask  which will be completed

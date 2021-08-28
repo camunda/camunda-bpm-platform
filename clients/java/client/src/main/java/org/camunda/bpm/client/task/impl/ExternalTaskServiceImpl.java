@@ -66,6 +66,25 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
   }
 
   @Override
+  public void setVariables(String processInstanceId, Map<String, Object> variables) {
+    try {
+      engineClient.setVariables(processInstanceId, variables);
+    } catch (EngineClientException e) {
+      throw LOG.externalTaskServiceException("setting variables for external task", e);
+    }
+  }
+
+  @Override
+  public void setVariables(ExternalTask externalTask, Map<String, Object> variables) {
+    String processId = externalTask.getProcessInstanceId();
+    try {
+      engineClient.setVariables(processId, variables);
+    } catch (EngineClientException e) {
+      throw LOG.externalTaskServiceException("setting variables for external task", e);
+    }
+  }
+
+  @Override
   public void complete(ExternalTask externalTask, Map<String, Object> variables) {
     complete(externalTask, variables, null);
   }
@@ -82,6 +101,8 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
       throw LOG.externalTaskServiceException("completing the external task", e);
     }
   }
+
+
 
   @Override
   public void handleFailure(ExternalTask externalTask, String errorMessage, String errorDetails, int retries, long retryTimeout) {
