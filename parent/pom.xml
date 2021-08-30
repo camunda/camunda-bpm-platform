@@ -24,7 +24,7 @@
     <version.cxf>3.0.3</version.cxf>
     <version.resteasy>2.3.5.Final</version.resteasy>
     <version.resteasy3>3.14.0.Final</version.resteasy3>
-    <version.jersey2>2.25.1</version.jersey2>
+    <version.jersey2>2.34</version.jersey2>
     <version.groovy>2.4.13</version.groovy>
     <version.graal.js>21.1.0</version.graal.js>
     <version.icu.icu4j>68.2</version.icu.icu4j>
