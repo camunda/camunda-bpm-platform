@@ -14,16 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.test.utils.testcontainers;
+package org.camunda.impl.test.utils.testcontainers;
 
-import org.testcontainers.containers.CockroachContainer;
-import org.testcontainers.containers.CockroachContainerProvider;
 import org.testcontainers.containers.JdbcDatabaseContainer;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.containers.PostgreSQLContainerProvider;
 import org.testcontainers.utility.DockerImageName;
 
-public class CamundaCockroachDBContainerProvider extends CockroachContainerProvider {
+public class CamundaPostgreSQLContainerProvider extends PostgreSQLContainerProvider {
 
-  private static final String NAME = "camcockroachdb";
+  protected static final String NAME = "campostgresql";
 
   @Override
   public boolean supports(String databaseType) {
@@ -33,7 +33,7 @@ public class CamundaCockroachDBContainerProvider extends CockroachContainerProvi
   @Override
   public JdbcDatabaseContainer newInstance(String tag) {
     DockerImageName dockerImageName = TestcontainersHelper
-      .resolveDockerImageName("cockroachdb", tag, "cockroachdb/cockroach");
-    return new CockroachContainer(dockerImageName);
+      .resolveDockerImageName("postgresql", tag, "postgres");
+    return new PostgreSQLContainer(dockerImageName);
   }
 }

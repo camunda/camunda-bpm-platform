@@ -14,16 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.test.utils.testcontainers;
+package org.camunda.impl.test.utils.testcontainers;
 
+import org.testcontainers.containers.CockroachContainer;
+import org.testcontainers.containers.CockroachContainerProvider;
 import org.testcontainers.containers.JdbcDatabaseContainer;
-import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.containers.MySQLContainerProvider;
 import org.testcontainers.utility.DockerImageName;
 
-public class CamundaMySqlContainerProvider extends MySQLContainerProvider {
+public class CamundaCockroachDBContainerProvider extends CockroachContainerProvider {
 
-  private static final String NAME = "cammysql";
+  private static final String NAME = "camcockroachdb";
 
   @Override
   public boolean supports(String databaseType) {
@@ -33,7 +33,7 @@ public class CamundaMySqlContainerProvider extends MySQLContainerProvider {
   @Override
   public JdbcDatabaseContainer newInstance(String tag) {
     DockerImageName dockerImageName = TestcontainersHelper
-      .resolveDockerImageName("mysql", tag, "mysql");
-    return new MySQLContainer(dockerImageName);
+      .resolveDockerImageName("cockroachdb", tag, "cockroachdb/cockroach");
+    return new CockroachContainer(dockerImageName);
   }
 }

@@ -14,16 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.test.utils.testcontainers;
+package org.camunda.impl.test.utils.testcontainers;
 
 import org.testcontainers.containers.JdbcDatabaseContainer;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.containers.PostgreSQLContainerProvider;
+import org.testcontainers.containers.MSSQLServerContainer;
+import org.testcontainers.containers.MSSQLServerContainerProvider;
 import org.testcontainers.utility.DockerImageName;
 
-public class CamundaPostgreSQLContainerProvider extends PostgreSQLContainerProvider {
+public class CamundaMSSQLContainerProvider extends MSSQLServerContainerProvider {
 
-  protected static final String NAME = "campostgresql";
+  private static final String NAME = "camsqlserver";
 
   @Override
   public boolean supports(String databaseType) {
@@ -33,7 +33,7 @@ public class CamundaPostgreSQLContainerProvider extends PostgreSQLContainerProvi
   @Override
   public JdbcDatabaseContainer newInstance(String tag) {
     DockerImageName dockerImageName = TestcontainersHelper
-      .resolveDockerImageName("postgresql", tag, "postgres");
-    return new PostgreSQLContainer(dockerImageName);
+      .resolveDockerImageName("mssql", tag, "mcr.microsoft.com/mssql/server");
+    return new MSSQLServerContainer(dockerImageName);
   }
 }
