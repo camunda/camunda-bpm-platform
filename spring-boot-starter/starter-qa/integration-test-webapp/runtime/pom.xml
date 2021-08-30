@@ -13,7 +13,6 @@
   <name>Camunda Platform - Spring Boot Starter - QA - Webapps Runtime</name>
 
   <properties>
-    <version.selenium>2.45.0</version.selenium>
     <version.jersey-json>1.15</version.jersey-json>
     <version.h2>1.4.199</version.h2>
     <version.glassfish-jaxb>2.3.1</version.glassfish-jaxb>
