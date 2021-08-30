@@ -79,6 +79,7 @@
         <module>model-api</module>
         <module>typed-values</module>
         <module>engine-dmn</module>
+        <module>test-utils/testcontainers</module>
 
         <module>engine</module>
         <module>engine-cdi</module>

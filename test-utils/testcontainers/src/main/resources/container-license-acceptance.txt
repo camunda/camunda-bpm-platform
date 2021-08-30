@@ -1,0 +1,2 @@
+registry.camunda.cloud/team-cambpm/camunda-ci-sqlserver:2017
+registry.camunda.cloud/team-cambpm/camunda-ci-sqlserver:2019

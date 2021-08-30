@@ -1,0 +1,5 @@
+org.camunda.impl.test.utils.testcontainers.CamundaPostgreSQLContainerProvider
+org.camunda.impl.test.utils.testcontainers.CamundaMariaDBContainerProvider
+org.camunda.impl.test.utils.testcontainers.CamundaMySqlContainerProvider
+org.camunda.impl.test.utils.testcontainers.CamundaCockroachDBContainerProvider
+org.camunda.impl.test.utils.testcontainers.CamundaMSSQLContainerProvider
