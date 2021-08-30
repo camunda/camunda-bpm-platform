@@ -130,6 +130,7 @@ Docker image can be used this way, please perform the following steps:
    * If you use a private Docker repository, please include it in the Docker image name (e.g. private.registry.org/postgres)
 1. In the `pom.xml` file located in the `./database` folder, check out the `database.tc.url` property to ensure that 
    the Docker tags match.
+1. Make sure that the `testcontainers` profile is added to your Maven `settings.xml` (you can find it [here](settings/maven/nexus-settings.xml)).
 
 At the moment, Testcontainers can be used with the Camunda-supported versions of the following databases. Please make 
 sure that the database image is configured according to [this guide](https://docs.camunda.org/manual/latest/user-guide/process-engine/database/database-configuration/#isolation-level-configuration):
@@ -138,6 +139,12 @@ sure that the database image is configured according to [this guide](https://doc
 * MySQL
 * CockroachDB
 * MS-SQL 2017/2019 ([MSSQL-specific configuraion guide](https://docs.camunda.org/manual/latest/user-guide/process-engine/database/mssql-configuration/))
+
+To execute the process engine test suite with a certain database (e.g. PostgreSQL), you should call Maven in the 
+engine directory with
+```shell
+mvn clean test -Ppostgresql,testcontainers
+```
 
 # Limiting the Number of Engine Unit Tests
 
