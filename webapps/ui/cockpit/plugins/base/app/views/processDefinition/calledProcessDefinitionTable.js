@@ -126,13 +126,12 @@ module.exports = [
               const filteredStaticCalledDefs = applyFilterToStaticCalled(
                 staticCalledProcessDefinitions
               );
-              let tableEntries = createTableEntries(
+              $scope.calledProcessDefinitions = createTableEntries(
                 calledProcessDefinitions,
                 filteredStaticCalledDefs,
                 bpmnElements
               );
 
-              $scope.calledProcessDefinitions = tableEntries;
               $scope.loadingState = $scope.calledProcessDefinitions.length
                 ? 'LOADED'
                 : 'EMPTY';
@@ -216,7 +215,7 @@ module.exports = [
               });
             });
 
-            const augmentedTableEntries = tableEntries.map(dto => {
+            return tableEntries.map(dto => {
               if (
                 tableEntries.find(
                   otherDto =>
@@ -227,8 +226,6 @@ module.exports = [
               }
               return dto;
             });
-
-            return augmentedTableEntries;
           }
 
           /**
