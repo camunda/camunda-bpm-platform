@@ -481,10 +481,10 @@ var ProcessDefinition = AbstractClientResource.extend(
     /**
      * For the given process, returns a list of statically referenced called process definitions
      * @param  {uuid} id of the process definition to be requested
-     * @param  {Function} [done]
+     * @param  {requestCallback} [done]
      */
     staticCalledProcessDefinitions: function(id, done) {
-      const path = this.path + '/' + id + '/static-called-process-definitions';
+      const path = `${this.path}/${id}/static-called-process-definitions`;
 
       return this.http.get(path, {
         done: done

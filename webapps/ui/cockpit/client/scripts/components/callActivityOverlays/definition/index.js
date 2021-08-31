@@ -41,13 +41,7 @@ module.exports = function(viewContext) {
       processData
     ) {
       const redirectToCalledDefinition = function(calledProcessId) {
-        const url =
-          '/process-definition/' +
-          calledProcessId +
-          '/' +
-          viewContext +
-          '?parentProcessDefinitionId=' +
-          $scope.key;
+        const url = `/process-definition/${calledProcessId}/${viewContext}?parentProcessDefinitionId=${$scope.key}`;
         $location.url(url);
       };
 
@@ -80,9 +74,7 @@ module.exports = function(viewContext) {
                 'PLUGIN_ACTIVITY_DEFINITION_CALLED_NOT_RESOLVABLE'
               );
               for (const activity of callActivityFlowNodes) {
-                const calledProcess = callActivityToProcessMap[activity]
-                  ? callActivityToProcessMap[activity].id
-                  : undefined;
+                const calledProcess = callActivityToProcessMap[activity]?.id
 
                 const toolTipTitle = calledProcess ? resolvable : notResolvable;
 
