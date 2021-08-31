@@ -16,11 +16,14 @@
  */
 package org.camunda.bpm.engine.test.jobexecutor;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.concurrency.ConcurrencyTestHelper.ThreadControl;
@@ -30,7 +33,6 @@ import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -53,6 +55,19 @@ public class JobExecutorFollowUpTest {
       .camundaClass(SyncDelegate.class.getName())
     .endEvent()
     .done();
+
+  protected static final BpmnModelInstance TWO_TASKS_DIFFERENT_PRIORITIES_PROCESS = Bpmn.createExecutableProcess("prioritizedTasksProcess")
+      .startEvent()
+      .serviceTask("prio20serviceTask")
+        .camundaAsyncBefore()
+        .camundaClass(SyncDelegate.class.getName())
+        .camundaJobPriority("20")
+      .serviceTask("prio10serviceTask")
+        .camundaAsyncBefore()
+        .camundaClass(SyncDelegate.class.getName())
+        .camundaJobPriority("10")
+      .endEvent()
+      .done();
 
   protected static final BpmnModelInstance CALL_ACTIVITY_PROCESS = Bpmn.createExecutableProcess("callActivityProcess")
       .startEvent()
@@ -88,6 +103,10 @@ public class JobExecutorFollowUpTest {
   protected ThreadControl acquisitionThread;
   protected static ThreadControl executionThread;
 
+  protected ProcessEngineConfigurationImpl configuration;
+  protected Long defaultJobExecutorPriorityRangeMin;
+  protected Long defaultJobExecutorPriorityRangeMax;
+
   @Before
   public void setUp() throws Exception {
     jobExecutor = (ControllableJobExecutor)
@@ -95,15 +114,22 @@ public class JobExecutorFollowUpTest {
     jobExecutor.setMaxJobsPerAcquisition(2);
     acquisitionThread = jobExecutor.getAcquisitionThreadControl();
     executionThread = jobExecutor.getExecutionThreadControl();
+
+    configuration = engineRule.getProcessEngineConfiguration();
+    defaultJobExecutorPriorityRangeMin = configuration.getJobExecutorPriorityRangeMin();
+    defaultJobExecutorPriorityRangeMax = configuration.getJobExecutorPriorityRangeMax();
   }
 
   @After
-  public void shutdownJobExecutor() {
+  public void tearDown() {
     jobExecutor.shutdown();
+
+    configuration.setJobExecutorPriorityRangeMin(defaultJobExecutorPriorityRangeMin);
+    configuration.setJobExecutorPriorityRangeMax(defaultJobExecutorPriorityRangeMax);
   }
 
   @Test
-  public void testExecuteExclusiveFollowUpJobInSameProcessInstance() {
+  public void shouldExecuteExclusiveFollowUpJobInSameProcessInstance() {
     testHelper.deploy(TWO_TASKS_PROCESS);
 
     // given
@@ -128,13 +154,13 @@ public class JobExecutorFollowUpTest {
     // the follow-up job should be executed right away
     // i.e., there is a transition instance for the second service task
     ActivityInstance activityInstance = engineRule.getRuntimeService().getActivityInstance(processInstance.getId());
-    Assert.assertEquals(1, activityInstance.getTransitionInstances("serviceTask2").length);
+    assertThat(activityInstance.getTransitionInstances("serviceTask2")).hasSize(1);
 
     // and the corresponding job is locked
     JobEntity followUpJob = (JobEntity) engineRule.getManagementService().createJobQuery().singleResult();
-    Assert.assertNotNull(followUpJob);
-    Assert.assertNotNull(followUpJob.getLockOwner());
-    Assert.assertNotNull(followUpJob.getLockExpirationTime());
+    assertThat(followUpJob).isNotNull();
+    assertThat(followUpJob.getLockOwner()).isNotNull();
+    assertThat(followUpJob.getLockExpirationTime()).isNotNull();
 
     // and the job can be completed successfully such that the process instance ends
     executionThread.makeContinue();
@@ -145,7 +171,7 @@ public class JobExecutorFollowUpTest {
   }
 
   @Test
-  public void testExecuteExclusiveFollowUpJobInDifferentProcessInstance() {
+  public void shouldExecuteExclusiveFollowUpJobInDifferentProcessInstance() {
     testHelper.deploy(CALL_ACTIVITY_PROCESS, ONE_TASK_PROCESS);
 
     // given
@@ -166,19 +192,73 @@ public class JobExecutorFollowUpTest {
       .createProcessInstanceQuery()
       .superProcessInstanceId(processInstance.getId())
       .singleResult();
-    Assert.assertNotNull(calledInstance);
+    assertThat(calledInstance).isNotNull();
 
     // and there is a transition instance for the service task
     ActivityInstance activityInstance = engineRule.getRuntimeService().getActivityInstance(calledInstance.getId());
-    Assert.assertEquals(1, activityInstance.getTransitionInstances("serviceTask").length);
+    assertThat(activityInstance.getTransitionInstances("serviceTask")).hasSize(1);
 
     // but the corresponding job is not locked
     JobEntity followUpJob = (JobEntity) engineRule.getManagementService().createJobQuery().singleResult();
-    Assert.assertNotNull(followUpJob);
-    Assert.assertNull(followUpJob.getLockOwner());
-    Assert.assertNull(followUpJob.getLockExpirationTime());
+    assertThat(followUpJob).isNotNull();
+    assertThat(followUpJob.getLockOwner()).isNull();
+    assertThat(followUpJob.getLockExpirationTime()).isNull();
   }
 
+  @Test
+  public void shouldNotExecuteExclusiveFollowUpJobWithOutOfRangePriority() throws InterruptedException {
+    // given
+    // first job priority = 20, second job priority = 10
+    testHelper.deploy(TWO_TASKS_DIFFERENT_PRIORITIES_PROCESS);
+
+    // allow job executor to execute only the first job
+    configuration.setJobExecutorPriorityRangeMin(15L);
+
+    // when
+    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("prioritizedTasksProcess");
+    jobExecutor.start();
+    acquireAndCompleteJob();
+
+    // then
+    ActivityInstance activityInstance = engineRule.getRuntimeService().getActivityInstance(processInstance.getId());
+    assertThat(activityInstance.getTransitionInstances("prio10serviceTask")).hasSize(0);
+    Execution execution = engineRule.getRuntimeService().createExecutionQuery().activityId("prio10serviceTask").singleResult();
+
+    JobEntity followUpJob = (JobEntity) engineRule.getManagementService().createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+    // the job corresponds to the second service task
+    assertThat(followUpJob.getExecutionId()).isEqualTo(execution.getId());
+    // the job is not locked
+    assertThat(followUpJob).isNotNull();
+    assertThat(followUpJob.getLockOwner()).isNull();
+    assertThat(followUpJob.getLockExpirationTime()).isNull();
+
+    // simulate another job executor with different priority range
+    configuration.setJobExecutorPriorityRangeMin(5L);
+    configuration.setJobExecutorPriorityRangeMax(15L);
+
+    // complete job with modified priority range
+    acquireAndCompleteJob();
+
+    acquisitionThread.waitForSync();
+
+    // and the process instance has finished
+    testHelper.assertProcessEnded(processInstance.getId());
+  }
+
+  private void acquireAndCompleteJob() throws InterruptedException {
+    // job acquisition acquires the job
+    acquisitionThread.waitForSync();
+    acquisitionThread.makeContinueAndWaitForSync();
+
+    // first job execution
+    acquisitionThread.makeContinue();
+
+    // waiting inside delegate
+    executionThread.waitForSync();
+
+    // completing delegate
+    executionThread.makeContinue();
+  }
 
   public static class SyncDelegate implements JavaDelegate {
 

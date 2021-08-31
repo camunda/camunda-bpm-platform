@@ -141,26 +141,30 @@ public class JobManager extends AbstractManager {
 
     JobExecutorContext jobExecutorContext = Context.getJobExecutorContext();
     TransactionListener transactionListener = null;
-    // add job to be executed in the current processor
-    if(!job.isSuspended()
-            && job.isExclusive()
-            && isJobDue(job)
-            && jobExecutorContext != null
-            && jobExecutorContext.isExecutingExclusiveJob()
-            && areInSameProcessInstance(job, jobExecutorContext.getCurrentJob())) {
-      // lock job & add to the queue of the current processor
-      Date currentTime = ClockUtil.getCurrentTime();
-      job.setLockExpirationTime(new Date(currentTime.getTime() + jobExecutor.getLockTimeInMillis()));
-      job.setLockOwner(jobExecutor.getLockOwner());
-      transactionListener = new ExclusiveJobAddedNotification(job.getId(), jobExecutorContext);
-    } else {
-      // reset Acquisition strategy and notify the JobExecutor that
-      // a new Job is available for execution on future runs
-      transactionListener = new MessageAddedNotification(jobExecutor);
+    if(isJobPriorityInJobExecutorPriorityRange(job.getPriority())) {
+      // add job to be executed in the current processor
+      if(!job.isSuspended()
+         && job.isExclusive()
+         && isJobDue(job)
+         && jobExecutorContext != null
+         && jobExecutorContext.isExecutingExclusiveJob()
+         && areInSameProcessInstance(job, jobExecutorContext.getCurrentJob())) {
+        // lock job & add to the queue of the current processor
+        Date currentTime = ClockUtil.getCurrentTime();
+        job.setLockExpirationTime(new Date(currentTime.getTime() + jobExecutor.getLockTimeInMillis()));
+        job.setLockOwner(jobExecutor.getLockOwner());
+        transactionListener = new ExclusiveJobAddedNotification(job.getId(), jobExecutorContext);
+      } else {
+        // reset Acquisition strategy and notify the JobExecutor that
+        // a new Job is available for execution on future runs
+        transactionListener = new MessageAddedNotification(jobExecutor);
+      }
     }
-    Context.getCommandContext()
+    if(transactionListener != null) {
+      Context.getCommandContext()
       .getTransactionContext()
       .addTransactionListener(TransactionState.COMMITTED, transactionListener);
+    }
   }
 
   protected boolean areInSameProcessInstance(JobEntity job1, JobEntity job2) {
@@ -172,6 +176,11 @@ public class JobManager extends AbstractManager {
     String instance2 = job2.getProcessInstanceId();
 
     return instance1 != null && instance1.equals(instance2);
+  }
+
+  protected boolean isJobPriorityInJobExecutorPriorityRange(long jobPriority) {
+    ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
+    return configuration.getJobExecutorPriorityRangeMin() <= jobPriority && configuration.getJobExecutorPriorityRangeMax() >= jobPriority;
   }
 
   public void cancelTimers(ExecutionEntity execution) {
