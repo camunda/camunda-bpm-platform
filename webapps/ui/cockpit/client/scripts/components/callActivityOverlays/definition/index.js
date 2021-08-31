@@ -74,7 +74,7 @@ module.exports = function(viewContext) {
                 'PLUGIN_ACTIVITY_DEFINITION_CALLED_NOT_RESOLVABLE'
               );
               for (const activity of callActivityFlowNodes) {
-                const calledProcess = callActivityToProcessMap[activity]?.id
+                const calledProcess = callActivityToProcessMap[activity]?.id;
 
                 const toolTipTitle = calledProcess ? resolvable : notResolvable;
 
