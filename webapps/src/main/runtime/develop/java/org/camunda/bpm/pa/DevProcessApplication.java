@@ -265,7 +265,10 @@ public class DevProcessApplication extends ServletProcessApplication {
     // redeploy process to get a different 'latest' reference in static call activity navigation
     RepositoryService repositoryService = engine.getRepositoryService();
     repositoryService.createDeployment().addClasspathResource("pa5/failing-process.bpmn").deploy();
-    runtimeService.startProcessInstanceByKey("CallActivitiesWithReferences");
+    runtimeService.createProcessInstanceByKey("CallActivitiesWithReferences")
+      .setVariable("calledProcessVar", "parallel-user-tasks").execute();
+    runtimeService.createProcessInstanceByKey("CallActivitiesWithReferences")
+      .setVariable("calledProcessVar", "my-reporting-process").execute();
 
     new Thread(){
       @Override

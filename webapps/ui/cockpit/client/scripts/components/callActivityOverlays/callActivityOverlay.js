@@ -45,7 +45,7 @@ function getCallActivityFlowNodes(elementRegistry) {
 /**
  * @param {object} overlaysNodes
  * @param {string} activityId
- * @param {string|object} calledProcesses
+ * @param {string|object} redirectionTarget
  * @param overlays
  * @param {function} clickListener
  * @param {string} tooltipTitle
@@ -55,7 +55,7 @@ function getCallActivityFlowNodes(elementRegistry) {
 function addOverlayForSingleElement(
   overlaysNodes,
   activityId,
-  calledProcesses,
+  redirectionTarget,
   overlays,
   clickListener,
   tooltipTitle,
@@ -90,7 +90,7 @@ function addOverlayForSingleElement(
       wrapper,
       button,
       activityId,
-      calledProcesses,
+      redirectionTarget,
       clickListener,
       $scope,
       $timeout
@@ -103,7 +103,7 @@ function addOverlayForSingleElement(
  * @param buttonOverlay anchor for the tooltip so the actual button can be disabled
  * @param button
  * @param id
- * @param calledProcesses
+ * @param redirectionTarget
  * @param clickListener
  * @param $scope
  * @param $timeout
@@ -112,7 +112,7 @@ function addInteractions(
   buttonOverlay,
   button,
   id,
-  calledProcesses,
+  redirectionTarget,
   clickListener,
   $scope,
   $timeout
@@ -154,10 +154,10 @@ function addInteractions(
     hideWithDelay(100);
   });
 
-  if (calledProcesses) {
+  if (redirectionTarget) {
     button.on('click', () => {
       buttonOverlay.tooltip('hide');
-      clickListener(calledProcesses);
+      clickListener(redirectionTarget);
     });
   } else {
     button.prop('disabled', true);
