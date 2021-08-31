@@ -1363,6 +1363,27 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
   }
 
   @Test
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/repository/nested-call-activities.bpmn",
+      "org/camunda/bpm/engine/test/api/repository/failingProcessCreateOneIncident.bpmn20.xml" })
+  public void shouldReturnCalledProcessDefinitionsForNestedCallActivities() {
+    //given
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("nested-call-activities")
+        .singleResult();
+
+    //when
+    Collection<CalledProcessDefinition> calledProcessDefinitions = repositoryService
+        .getStaticCalledProcessDefinitions(processDefinition.getId());
+
+    //then
+    assertThat(calledProcessDefinitions).hasSize(1);
+    CalledProcessDefinition calledProcessDefinition = new ArrayList<>(calledProcessDefinitions).get(0);
+    assertThat(calledProcessDefinition.getKey()).isEqualTo("failingProcess");
+    assertThat(
+        calledProcessDefinition.getCalledFromActivityIds().stream().distinct().collect(Collectors.toList())).hasSize(8);
+  }
+
+  @Test
   public void testGetStaticCallActivityMappingShouldThrowIfProcessDoesNotExist(){
     //given //when //then
     assertThrows(NullValueException.class, () -> repositoryService.getStaticCalledProcessDefinitions("notExistingId"));

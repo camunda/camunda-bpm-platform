@@ -21,9 +21,10 @@ import static org.camunda.bpm.engine.impl.ProcessEngineLogger.CMD_LOGGER;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Queue;
 
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.impl.bpmn.behavior.CallActivityBehavior;
@@ -46,14 +47,28 @@ public class GetStaticCalledProcessDefinitionCmd implements Command<Collection<C
     this.processDefinitionId = processDefinitionId;
   }
 
+  protected List<ActivityImpl> findCallActivitiesInProcess(ProcessDefinitionEntity processDefinition) {
+    List<ActivityImpl> callActivities = new ArrayList<>();
+
+    Queue<ActivityImpl> toCheck = new LinkedList<>(processDefinition.getActivities());
+    while (!toCheck.isEmpty()) {
+      ActivityImpl candidate = toCheck.poll();
+
+      if (!candidate.getActivities().isEmpty()) {
+        toCheck.addAll(candidate.getActivities());
+      }
+      if (candidate.getActivityBehavior() instanceof CallActivityBehavior) {
+        callActivities.add(candidate);
+      }
+    }
+    return callActivities;
+  }
+
   @Override
   public Collection<CalledProcessDefinition> execute(CommandContext commandContext) {
     ProcessDefinitionEntity processDefinition = new GetDeployedProcessDefinitionCmd(processDefinitionId, true).execute(commandContext);
 
-    List<ActivityImpl> activities = processDefinition.getActivities();
-
-    List<ActivityImpl> callActivities = activities.stream()
-      .filter(act -> act.getActivityBehavior() instanceof CallActivityBehavior).collect(Collectors.toList());
+    List<ActivityImpl> callActivities = findCallActivitiesInProcess(processDefinition);
 
     Map<String, CalledProcessDefinitionImpl> calledProcessDefinitionsById = new HashMap<>();
 
