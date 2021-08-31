@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.spring.test.scripttask;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -24,6 +25,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.ScriptEvaluationException;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -87,8 +89,8 @@ public abstract class AbstractScriptTaskTest {
     // scriptText code)
     deployProcess(scriptFormat, scriptText);
 
-    // GIVEN
-    // that we start an instance of this process
+    // WHEN
+    // we start an instance of this process
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
 
     // THEN
@@ -100,6 +102,21 @@ public abstract class AbstractScriptTaskTest {
     } else {
       assertNull(variableValue);
     }
+  }
+
+  protected void testNoSpringBean(String scriptFormat, String scriptText) {
+    // GIVEN
+    // accessing a bean that cannot be resolved in a script
+    deployProcess(scriptFormat, scriptText);
+
+    // THEN
+    // an exception is thrown
+    assertThatThrownBy(() -> {
+        // WHEN
+        // we start an instance of this process
+        runtimeService.startProcessInstanceByKey("testProcess");})
+      .isInstanceOf(ScriptEvaluationException.class)
+      .hasMessageContaining("testbean");
   }
 
 }
