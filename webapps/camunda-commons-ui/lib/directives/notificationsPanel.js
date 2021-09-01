@@ -31,9 +31,9 @@ var notificationsTemplate =
   '<div class="notifications">' +
   '  <div uib-alert ng-repeat="notification in notifications" class="alert" ng-class="notificationClass(notification)">' +
   '    <button type="button" class="close" ng-click="removeNotification(notification)">&times;</button>' +
-  '    <strong class="status" ng-bind-html="trustHTML(notification.status)" compile-template></strong> ' +
+  '    <strong class="status" ng-bind-html="trustHTML(notification.status)"></strong> ' +
   '    <strong ng-if="notification.message">:</strong>' +
-  '    <span class="message" ng-bind-html="trustHTML(notification.message)" compile-template></span>' +
+  '    <span class="message" ng-bind-html="trustHTML(notification.message)"></span>' +
   '  </div>' +
   '</div>';
 
