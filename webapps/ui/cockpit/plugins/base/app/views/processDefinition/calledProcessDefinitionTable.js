@@ -53,8 +53,9 @@ module.exports = [
 
           // prettier-ignore
           $scope.headColumns = [
-          { class: 'process-definition', request: 'label', sortable: true, content: $translate.instant('PLUGIN_CALLED_PROCESS')},
-          { class: 'activity', request: 'name', sortable: true, content: $translate.instant('PLUGIN_ACTIVITY')}
+            { class: 'process-definition', request: 'label', sortable: true, content: $translate.instant('PLUGIN_CALLED_PROCESS')},
+            { class: 'called-process-state', request: 'state', sortable: true, content: $translate.instant('PLUGIN_CALLED_PROCESS_STATE')},
+            { class: 'activity', request: '[0].name', sortable: true, content: $translate.instant('PLUGIN_ACTIVITY')}
         ];
 
           // Default sorting
@@ -112,52 +113,134 @@ module.exports = [
           ]);
 
           processData.observe(
-            ['calledProcessDefinitions', 'bpmnElements'],
-            function(calledProcessDefinitions, bpmnElements) {
-              $scope.calledProcessDefinitions = attachCalledFromActivities(
+            [
+              'calledProcessDefinitions',
+              'staticCalledProcessDefinitions',
+              'bpmnElements'
+            ],
+            function(
+              calledProcessDefinitions,
+              staticCalledProcessDefinitions,
+              bpmnElements
+            ) {
+              const filteredStaticCalledDefs = applyFilterToStaticCalled(
+                staticCalledProcessDefinitions
+              );
+              $scope.calledProcessDefinitions = createTableEntries(
                 calledProcessDefinitions,
+                filteredStaticCalledDefs,
                 bpmnElements
-              ).map(function(calledProcessDefinition) {
-                return angular.extend({}, calledProcessDefinition, {
-                  label:
-                    calledProcessDefinition.name || calledProcessDefinition.key
-                });
-              });
+              );
+
               $scope.loadingState = $scope.calledProcessDefinitions.length
                 ? 'LOADED'
                 : 'EMPTY';
             }
           );
 
-          function attachCalledFromActivities(
-            processDefinitions,
-            bpmnElements
+          /**
+           * Merges Dtos for currently running and statically linked called processes by their id.
+           * @param runningProcessDefinitions
+           * @param staticCalledProcesses
+           * @returns {array}
+           */
+          function mergeInstanceAndDefinitionDtos(
+            runningProcessDefinitions,
+            staticCalledProcesses
           ) {
-            var result = [];
-
-            angular.forEach(processDefinitions, function(d) {
-              var calledFromActivityIds = d.calledFromActivityIds,
-                calledFromActivities = [];
-
-              angular.forEach(calledFromActivityIds, function(activityId) {
-                var bpmnElement = bpmnElements[activityId];
-
-                var activity = {
-                  id: activityId,
-                  name: (bpmnElement && bpmnElement.name) || activityId
-                };
-
-                calledFromActivities.push(activity);
-              });
-
-              result.push(
-                angular.extend({}, d, {
-                  calledFromActivities: calledFromActivities
-                })
-              );
+            const map = {};
+            runningProcessDefinitions.forEach(dto => {
+              const newDto = angular.copy(dto);
+              newDto.state = 'PLUGIN_CALLED_PROCESS_DEFINITIONS_RUNNING_LABEL';
+              map[newDto.id] = newDto;
             });
 
-            return result;
+            staticCalledProcesses.forEach(dto => {
+              const newDto = angular.copy(dto);
+              if (map[dto.id]) {
+                const merged = new Set([
+                  ...map[newDto.id].calledFromActivityIds,
+                  ...newDto.calledFromActivityIds
+                ]);
+                map[dto.id].calledFromActivityIds = Array.from(merged).sort();
+                map[dto.id].state =
+                  'PLUGIN_CALLED_PROCESS_DEFINITIONS_RUNNING_AND_REFERENCED_LABEL';
+              } else {
+                map[newDto.id] = newDto;
+                newDto.state =
+                  'PLUGIN_CALLED_PROCESS_DEFINITIONS_REFERENCED_LABEL';
+                newDto.calledFromActivityIds.sort();
+              }
+            });
+            return Object.values(map);
+          }
+
+          function applyFilterToStaticCalled(staticCalledDefinitions) {
+            if (filter.activityIdIn && filter.activityIdIn.length) {
+              const selectedIds = new Set(filter.activityIdIn);
+              return staticCalledDefinitions
+                .map(dto => {
+                  const newDto = angular.copy(dto);
+                  const intersection = dto.calledFromActivityIds.filter(e =>
+                    selectedIds.has(e)
+                  );
+                  if (intersection.length) {
+                    newDto.calledFromActivityIds = intersection;
+                    return newDto;
+                  }
+                })
+                .filter(dto => dto !== undefined);
+            }
+            return staticCalledDefinitions;
+          }
+
+          function createTableEntries(
+            runningProcessDefinitions,
+            staticCalledProcesses,
+            bpmnElements
+          ) {
+            const mergedDefinitions = mergeInstanceAndDefinitionDtos(
+              runningProcessDefinitions,
+              staticCalledProcesses
+            );
+
+            const tableEntries = mergedDefinitions.map(dto => {
+              const calledFromActivities = dto.calledFromActivityIds.map(id =>
+                extractActivityFromDiagram(bpmnElements, id)
+              );
+
+              return angular.extend({}, dto, {
+                calledFromActivities: calledFromActivities,
+                label: dto.name || dto.key
+              });
+            });
+
+            return tableEntries.map(dto => {
+              if (
+                tableEntries.find(
+                  otherDto =>
+                    dto.name === otherDto.name && otherDto.id !== dto.id
+                )
+              ) {
+                dto.label = dto.label + ':' + dto.version;
+              }
+              return dto;
+            });
+          }
+
+          /**
+           * @param bpmnElements
+           * @param activityId
+           * @returns {{name: string, id: string}}
+           */
+          function extractActivityFromDiagram(bpmnElements, activityId) {
+            const activityBpmnElement = bpmnElements[activityId];
+
+            return {
+              id: activityId,
+              name:
+                (activityBpmnElement && activityBpmnElement.name) || activityId
+            };
           }
         }
       ],

@@ -39,6 +39,7 @@ import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.authorization.Groups;
@@ -260,6 +261,11 @@ public class DevProcessApplication extends ServletProcessApplication {
     startInvoiceInstancesForTenant(engine, "tenant1");
     startInvoiceInstancesForTenant(engine, "tenant1");
     startInvoiceInstancesForTenant(engine, "tenant2");
+
+    // redeploy process to get a different 'latest' reference in static call activity navigation
+    RepositoryService repositoryService = engine.getRepositoryService();
+    repositoryService.createDeployment().addClasspathResource("pa5/failing-process.bpmn").deploy();
+    runtimeService.startProcessInstanceByKey("CallActivitiesWithReferences");
 
     new Thread(){
       @Override
