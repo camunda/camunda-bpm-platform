@@ -70,16 +70,16 @@ module.exports = function(viewContext) {
       const overlays = control.getViewer().get('overlays');
       const elementRegistry = control.getViewer().get('elementRegistry');
       const callActivityFlowNodes = getCallActivityFlowNodes(elementRegistry);
-      const resolvable = $translate.instant(
+      const resolvableTooltip = $translate.instant(
         'PLUGIN_ACTIVITY_DEFINITION_SHOW_CALLED_PROCESS_DEFINITION'
       );
-      const notResolvable = $translate.instant(
+      const notResolvableTooltip = $translate.instant(
         'PLUGIN_ACTIVITY_DEFINITION_CALLED_NOT_RESOLVABLE'
       );
-      const dynamicResolve = $translate.instant(
+      const dynamicResolveTooltip = $translate.instant(
         'PLUGIN_ACTIVITY_DEFINITION_CALLED_DYNAMIC_RESOLVABLE'
       );
-      const dynamicMultipleResolve = $translate.instant(
+      const dynamicMultipleResolveTooltip = $translate.instant(
         'PLUGIN_ACTIVITY_DEFINITION_CALLED_DYNAMIC_MULTI_RESOLVABLE'
       );
 
@@ -123,13 +123,20 @@ module.exports = function(viewContext) {
           const dynamicCallActivityProcess =
             dynamicCallActivityToProcessesMap[activityId];
           const overlayProps = {
-            overlaysNodes: {},
+            overlaysNodes: overlaysNodes,
             activityId,
-            overlays: control.getViewer().get('overlays'),
+            overlays: overlays,
             $scope,
             $timeout
           };
-          if (
+          if (callActivityProcess) {
+            addOverlayForSingleElement({
+              redirectionTarget: callActivityProcess.id,
+              clickListener: redirectToCalledDefinition,
+              tooltipTitle: resolvableTooltip,
+              ...overlayProps
+            });
+          } else if (
             !callActivityProcess &&
             dynamicCallActivityProcess &&
             viewContext === 'runtime'
@@ -149,13 +156,6 @@ module.exports = function(viewContext) {
                 ...overlayProps
               });
             }
-          } else if (callActivityProcess) {
-            addOverlayForSingleElement({
-              redirectionTarget: callActivityProcess.id,
-              clickListener: redirectToCalledDefinition,
-              tooltipTitle: resolvableTooltip,
-              ...overlayProps
-            });
           } else {
             addOverlayForSingleElement({
               tooltipTitle: notResolvableTooltip,
@@ -163,6 +163,7 @@ module.exports = function(viewContext) {
             });
           }
         }
+      };
     }
   ];
 };

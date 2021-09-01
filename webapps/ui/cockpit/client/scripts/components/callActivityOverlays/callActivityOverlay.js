@@ -52,7 +52,7 @@ function getCallActivityFlowNodes(elementRegistry) {
  * @param $scope
  * @param $timeout
  */
-function addOverlayForSingleElement(
+function addOverlayForSingleElement({
   overlaysNodes,
   activityId,
   redirectionTarget,
@@ -61,7 +61,7 @@ function addOverlayForSingleElement(
   tooltipTitle,
   $scope,
   $timeout
-) {
+}) {
   if (!overlaysNodes[activityId]) {
     const wrapper = angular.element(template).hide();
     const button = wrapper.children().first();
