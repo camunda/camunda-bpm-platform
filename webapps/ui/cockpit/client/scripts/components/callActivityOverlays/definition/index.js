@@ -123,9 +123,9 @@ module.exports = function(viewContext) {
           const dynamicCallActivityProcess =
             dynamicCallActivityToProcessesMap[activityId];
           const overlayProps = {
-            overlaysNodes: overlaysNodes,
+            overlaysNodes,
             activityId,
-            overlays: overlays,
+            overlays,
             $scope,
             $timeout
           };

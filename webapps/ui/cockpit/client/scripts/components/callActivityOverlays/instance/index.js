@@ -98,14 +98,14 @@ module.exports = function(viewContext) {
           return (
             callActivityToInstancesMap[id][0].calledProcessInstanceId &&
             addOverlayForSingleElement({
-              overlaysNodes: overlaysNodes,
+              overlaysNodes,
               activityId: id,
               redirectionTarget: callActivityToInstancesMap[id],
-              overlays: overlays,
+              overlays,
               clickListener: clickListener,
               tooltipTitle: tooltipText,
-              $scope: $scope,
-              $timeout: $timeout
+              $scope,
+              $timeout
             })
           );
         });
