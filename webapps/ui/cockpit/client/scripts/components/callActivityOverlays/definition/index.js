@@ -118,42 +118,51 @@ module.exports = function(viewContext) {
           });
         }
 
-        for (const activity of callActivityFlowNodes) {
-          let redirectToId = callActivityToProcessMap[activity]
-            ? callActivityToProcessMap[activity].id
-            : undefined;
-          let toolTipTitle = redirectToId ? resolvable : notResolvable;
-          let clickListener = redirectToCalledDefinition;
-          if (!redirectToId && viewContext === 'runtime') {
-            /* We only link currently running dynamic call activities in the runtime view,
-            because the history view has no calledProcessDefinitionTable we can redirect to if there are different
-            process definitions called by one dynamic call activity.
-             */
-            if (dynamicCallActivityToProcessesMap[activity]) {
-              if (dynamicCallActivityToProcessesMap[activity].length > 1) {
-                redirectToId = activity;
-                clickListener = showCalledDefinitionsInTable;
-                toolTipTitle = dynamicMultipleResolve;
-              } else {
-                redirectToId =
-                  dynamicCallActivityToProcessesMap[activity][0].id;
-                toolTipTitle = dynamicResolve;
-              }
-            }
-          }
-
-          addOverlayForSingleElement(
-            overlaysNodes,
-            activity,
-            redirectToId,
-            overlays,
-            clickListener,
-            toolTipTitle,
+        for (const activityId of callActivityFlowNodes) {
+          const callActivityProcess = callActivityToProcessMap[activityId];
+          const dynamicCallActivityProcess =
+            dynamicCallActivityToProcessesMap[activityId];
+          const overlayProps = {
+            overlaysNodes: {},
+            activityId,
+            overlays: control.getViewer().get('overlays'),
             $scope,
             $timeout
-          );
+          };
+          if (
+            !callActivityProcess &&
+            dynamicCallActivityProcess &&
+            viewContext === 'runtime'
+          ) {
+            if (dynamicCallActivityProcess.length > 1) {
+              addOverlayForSingleElement({
+                redirectionTarget: activityId,
+                clickListener: showCalledDefinitionsInTable,
+                tooltipTitle: dynamicMultipleResolveTooltip,
+                ...overlayProps
+              });
+            } else {
+              addOverlayForSingleElement({
+                redirectionTarget: dynamicCallActivityProcess[0].id,
+                clickListener: redirectToCalledDefinition,
+                tooltipTitle: dynamicResolveTooltip,
+                ...overlayProps
+              });
+            }
+          } else if (callActivityProcess) {
+            addOverlayForSingleElement({
+              redirectionTarget: callActivityProcess.id,
+              clickListener: redirectToCalledDefinition,
+              tooltipTitle: resolvableTooltip,
+              ...overlayProps
+            });
+          } else {
+            addOverlayForSingleElement({
+              tooltipTitle: notResolvableTooltip,
+              ...overlayProps
+            });
+          }
         }
-      };
     }
   ];
 };
