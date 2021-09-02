@@ -21,6 +21,7 @@ const {
   getCallActivityFlowNodes,
   addOverlayForSingleElement
 } = require('../callActivityOverlay');
+const angular = require('angular');
 
 module.exports = function(viewContext) {
   return [
@@ -31,6 +32,7 @@ module.exports = function(viewContext) {
     'search',
     'control',
     'processData',
+    'PluginProcessDefinitionResource',
     function(
       $scope,
       $timeout,
@@ -38,65 +40,130 @@ module.exports = function(viewContext) {
       $translate,
       search,
       control,
-      processData
+      processData,
+      PluginProcessDefinitionResource
     ) {
       const redirectToCalledDefinition = function(calledProcessId) {
-        const url = `/process-definition/${calledProcessId}/${viewContext}?parentProcessDefinitionId=${$scope.key}`;
-        $location.url(url);
+        return $scope.$apply(() => {
+          const url = `/process-definition/${calledProcessId}/${viewContext}?parentProcessDefinitionId=${$scope.key}`;
+          $location.url(url);
+        });
       };
 
-      const clickListener = function(calledProcessDefinitionId) {
-        return $scope.$apply(() =>
-          redirectToCalledDefinition(calledProcessDefinitionId)
-        );
+      /**
+       * shows calledProcessDefinitions tab filtered by activityId. This is used in case a currently calling activity
+       * calls different process definitions.
+       * @param activityId
+       */
+      const showCalledDefinitionsInTable = function(activityId) {
+        return $scope.$apply(() => {
+          const params = angular.copy(search());
+          params.detailsTab = 'call-process-definitions-table';
+          search.updateSilently(params);
+          $scope.processData.set('filter', {
+            activityIds: [activityId]
+          });
+        });
       };
 
       const overlaysNodes = {};
       const overlays = control.getViewer().get('overlays');
       const elementRegistry = control.getViewer().get('elementRegistry');
       const callActivityFlowNodes = getCallActivityFlowNodes(elementRegistry);
+      const resolvableTooltip = $translate.instant(
+        'PLUGIN_ACTIVITY_DEFINITION_SHOW_CALLED_PROCESS_DEFINITION'
+      );
+      const notResolvableTooltip = $translate.instant(
+        'PLUGIN_ACTIVITY_DEFINITION_CALLED_NOT_RESOLVABLE'
+      );
+      const dynamicResolveTooltip = $translate.instant(
+        'PLUGIN_ACTIVITY_DEFINITION_CALLED_DYNAMIC_RESOLVABLE'
+      );
+      const dynamicMultipleResolveTooltip = $translate.instant(
+        'PLUGIN_ACTIVITY_DEFINITION_CALLED_DYNAMIC_MULTI_RESOLVABLE'
+      );
 
       if (callActivityFlowNodes.length) {
         processData.observe(
           ['processDefinition', 'staticCalledProcessDefinitions'],
           function(processDefinition, staticCalledProcessDefinitions) {
-            const callActivityToProcessMap = {};
-            const drawStaticLinks = function(staticProcDefs) {
-              for (const dto of staticProcDefs) {
-                dto.calledFromActivityIds.forEach(
-                  callerId => (callActivityToProcessMap[callerId] = dto)
-                );
-              }
-              const resolvable = $translate.instant(
-                'PLUGIN_ACTIVITY_DEFINITION_SHOW_CALLED_PROCESS_DEFINITION'
-              );
-              const notResolvable = $translate.instant(
-                'PLUGIN_ACTIVITY_DEFINITION_CALLED_NOT_RESOLVABLE'
-              );
-              for (const activity of callActivityFlowNodes) {
-                const calledProcess = callActivityToProcessMap[activity]
-                  ? callActivityToProcessMap[activity].id
-                  : undefined;
-
-                const toolTipTitle = calledProcess ? resolvable : notResolvable;
-
-                addOverlayForSingleElement(
-                  overlaysNodes,
-                  activity,
-                  calledProcess,
-                  overlays,
-                  clickListener,
-                  toolTipTitle,
-                  $scope,
-                  $timeout
-                );
-              }
-            };
-
-            drawStaticLinks(staticCalledProcessDefinitions);
+            PluginProcessDefinitionResource.getCalledProcessDefinitions({
+              id: processDefinition.id
+            })
+              .$promise.then(dynamicCalledProcessDefinitions =>
+                drawLinks(
+                  staticCalledProcessDefinitions,
+                  dynamicCalledProcessDefinitions
+                )
+              )
+              .catch(angular.noop);
           }
         );
       }
+      const drawLinks = function(staticProcDefs, dynamicProcDefs) {
+        const callActivityToProcessMap = {};
+        for (const dto of staticProcDefs) {
+          dto.calledFromActivityIds.forEach(
+            callerId => (callActivityToProcessMap[callerId] = dto)
+          );
+        }
+        const dynamicCallActivityToProcessesMap = {};
+        for (const dto of dynamicProcDefs) {
+          dto.calledFromActivityIds.forEach(callerId => {
+            if (dynamicCallActivityToProcessesMap[callerId]) {
+              dynamicCallActivityToProcessesMap[callerId].push(dto);
+            } else {
+              dynamicCallActivityToProcessesMap[callerId] = [dto];
+            }
+          });
+        }
+
+        for (const activityId of callActivityFlowNodes) {
+          const callActivityProcess = callActivityToProcessMap[activityId];
+          const dynamicCallActivityProcess =
+            dynamicCallActivityToProcessesMap[activityId];
+          const overlayProps = {
+            overlaysNodes,
+            activityId,
+            overlays,
+            $scope,
+            $timeout
+          };
+          if (callActivityProcess) {
+            addOverlayForSingleElement({
+              redirectionTarget: callActivityProcess.id,
+              clickListener: redirectToCalledDefinition,
+              tooltipTitle: resolvableTooltip,
+              ...overlayProps
+            });
+          } else if (
+            !callActivityProcess &&
+            dynamicCallActivityProcess &&
+            viewContext === 'runtime'
+          ) {
+            if (dynamicCallActivityProcess.length > 1) {
+              addOverlayForSingleElement({
+                redirectionTarget: activityId,
+                clickListener: showCalledDefinitionsInTable,
+                tooltipTitle: dynamicMultipleResolveTooltip,
+                ...overlayProps
+              });
+            } else {
+              addOverlayForSingleElement({
+                redirectionTarget: dynamicCallActivityProcess[0].id,
+                clickListener: redirectToCalledDefinition,
+                tooltipTitle: dynamicResolveTooltip,
+                ...overlayProps
+              });
+            }
+          } else {
+            addOverlayForSingleElement({
+              tooltipTitle: notResolvableTooltip,
+              ...overlayProps
+            });
+          }
+        }
+      };
     }
   ];
 };

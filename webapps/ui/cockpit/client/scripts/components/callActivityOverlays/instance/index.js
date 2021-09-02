@@ -97,16 +97,16 @@ module.exports = function(viewContext) {
         Object.keys(callActivityToInstancesMap).map(function(id) {
           return (
             callActivityToInstancesMap[id][0].calledProcessInstanceId &&
-            addOverlayForSingleElement(
+            addOverlayForSingleElement({
               overlaysNodes,
-              id,
-              callActivityToInstancesMap[id],
+              activityId: id,
+              redirectionTarget: callActivityToInstancesMap[id],
               overlays,
-              clickListener,
-              tooltipText,
+              clickListener: clickListener,
+              tooltipTitle: tooltipText,
               $scope,
               $timeout
-            )
+            })
           );
         });
       };
