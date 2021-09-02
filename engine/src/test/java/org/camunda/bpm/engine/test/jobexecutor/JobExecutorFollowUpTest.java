@@ -21,12 +21,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.interceptor.CommandContextFactory;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.concurrency.ConcurrencyTestHelper.ThreadControl;
+import org.camunda.bpm.engine.test.concurrency.ControllableThread;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
@@ -37,6 +40,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
+
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Test cases for handling of new jobs created while a job is executed
@@ -84,8 +90,18 @@ public class JobExecutorFollowUpTest {
       .endEvent()
       .done();
 
-  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration ->
-      configuration.setJobExecutor(buildControllableJobExecutor()));
+  protected boolean skipFlushControl = true;
+
+  protected ProcessEngineBootstrapRule bootstrapRule =
+      new ProcessEngineBootstrapRule(configuration -> {
+        configuration.setJobExecutor(buildControllableJobExecutor());
+        configuration.setCommandContextFactory(new CommandContextFactory() {
+          public CommandContext createCommandContext() {
+            return new ControllableCommandContext(configuration, executionThread, skipFlushControl);
+          }
+        });
+      });
+
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
   protected ProcessEngineTestRule testHelper = new ProcessEngineTestRule(engineRule);
 
@@ -221,7 +237,7 @@ public class JobExecutorFollowUpTest {
 
     // then
     ActivityInstance activityInstance = engineRule.getRuntimeService().getActivityInstance(processInstance.getId());
-    assertThat(activityInstance.getTransitionInstances("prio10serviceTask")).hasSize(0);
+    assertThat(activityInstance.getTransitionInstances("prio10serviceTask")).hasSize(1);
     Execution execution = engineRule.getRuntimeService().createExecutionQuery().activityId("prio10serviceTask").singleResult();
 
     JobEntity followUpJob = (JobEntity) engineRule.getManagementService().createJobQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -257,6 +273,9 @@ public class JobExecutorFollowUpTest {
     executionThread.waitForSync();
 
     // completing delegate
+    skipFlushControl = false;
+    executionThread.makeContinueAndWaitForSync();
+    skipFlushControl = true;
     executionThread.makeContinue();
   }
 
