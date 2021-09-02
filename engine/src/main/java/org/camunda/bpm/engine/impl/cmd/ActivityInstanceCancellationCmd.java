@@ -16,8 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.util.concurrent.Callable;
-
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.ActivityExecutionTreeMapping;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -53,11 +51,7 @@ public class ActivityInstanceCancellationCmd extends AbstractInstanceCancellatio
     // rebuild the mapping because the execution tree changes with every iteration
     ActivityExecutionTreeMapping mapping = new ActivityExecutionTreeMapping(commandContext, processInstanceId);
 
-    ActivityInstance instance = commandContext.runWithoutAuthorization(new Callable<ActivityInstance>() {
-      public ActivityInstance call() throws Exception {
-        return new GetActivityInstanceCmd(processInstanceId).execute(commandContext);
-      }
-    });
+    ActivityInstance instance = commandContext.runWithoutAuthorization(new GetActivityInstanceCmd(processInstanceId));
 
     ActivityInstance instanceToCancel = findActivityInstance(instance, activityInstanceId);
     EnsureUtil.ensureNotNull(NotValidException.class,

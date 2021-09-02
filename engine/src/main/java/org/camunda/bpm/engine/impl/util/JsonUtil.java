@@ -596,11 +596,15 @@ public final class JsonUtil {
   }
 
   public static String getString(JsonObject json, String memberName) {
+    return getString(json, memberName, "");
+  }
+
+  public static String getString(JsonObject json, String memberName, String defaultString) {
     if (json != null && memberName != null && json.has(memberName)) {
       return getString(json.get(memberName));
 
     } else {
-      return "";
+      return defaultString;
 
     }
   }

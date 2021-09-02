@@ -18,8 +18,6 @@ package org.camunda.bpm.engine.impl.dmn.cmd;
 
 import java.io.InputStream;
 import java.io.Serializable;
-import java.util.concurrent.Callable;
-
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourceCmd;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -44,11 +42,7 @@ public class GetDeploymentDecisionRequirementsModelCmd implements Command<InputS
     final String deploymentId = decisionRequirementsDefinition.getDeploymentId();
     final String resourceName = decisionRequirementsDefinition.getResourceName();
 
-    return commandContext.runWithoutAuthorization(new Callable<InputStream>() {
-      public InputStream call() throws Exception {
-        return new GetDeploymentResourceCmd(deploymentId, resourceName).execute(commandContext);
-      }
-    });
+    return commandContext.runWithoutAuthorization(new GetDeploymentResourceCmd(deploymentId, resourceName));
   }
 
 }

@@ -50,9 +50,11 @@ public class DefaultCorrelationHandler implements CorrelationHandler {
 
     if (correlations.size() > 1) {
       throw LOG.exceptionCorrelateMessageToSingleExecution(messageName, correlations.size(), correlationSet);
-
     } else if (correlations.size() == 1) {
       return correlations.get(0);
+    } else if (correlationSet.isExecutionsOnly()) {
+      // no correlation to an execution found
+      return null;
     }
 
     // then try to correlate to process definition
@@ -70,12 +72,14 @@ public class DefaultCorrelationHandler implements CorrelationHandler {
   }
 
   public List<CorrelationHandlerResult> correlateMessages(CommandContext commandContext, String messageName, CorrelationSet correlationSet) {
-    List<CorrelationHandlerResult> results = new ArrayList<CorrelationHandlerResult>();
+    List<CorrelationHandlerResult> results = new ArrayList<>();
 
     // first collect correlations to executions
     results.addAll(correlateMessageToExecutions(commandContext, messageName, correlationSet));
-    // now collect correlations to process definition
-    results.addAll(correlateStartMessages(commandContext, messageName, correlationSet));
+    // now collect correlations to process definition, if enabled
+    if (!correlationSet.isExecutionsOnly()) {
+      results.addAll(correlateStartMessages(commandContext, messageName, correlationSet));
+    }
 
     return results;
   }
@@ -128,7 +132,7 @@ public class DefaultCorrelationHandler implements CorrelationHandler {
 
     List<Execution> matchingExecutions = query.evaluateExpressionsAndExecuteList(commandContext, null);
 
-    List<CorrelationHandlerResult> result = new ArrayList<CorrelationHandlerResult>(matchingExecutions.size());
+    List<CorrelationHandlerResult> result = new ArrayList<>(matchingExecutions.size());
 
     for (Execution matchingExecution : matchingExecutions) {
       CorrelationHandlerResult correlationResult = CorrelationHandlerResult.matchedExecution((ExecutionEntity) matchingExecution);
@@ -161,7 +165,7 @@ public class DefaultCorrelationHandler implements CorrelationHandler {
   }
 
   protected List<CorrelationHandlerResult> correlateStartMessageByEventSubscription(CommandContext commandContext, String messageName, CorrelationSet correlationSet) {
-    List<CorrelationHandlerResult> results = new ArrayList<CorrelationHandlerResult>();
+    List<CorrelationHandlerResult> results = new ArrayList<>();
     DeploymentCache deploymentCache = commandContext.getProcessEngineConfiguration().getDeploymentCache();
 
     List<EventSubscriptionEntity> messageEventSubscriptions = findMessageStartEventSubscriptions(commandContext, messageName, correlationSet);

@@ -340,7 +340,8 @@ public class BatchEntity implements Batch, DbEntity, HasDbReferences, Nameable, 
     CommandContext commandContext = Context.getCommandContext();
 
     if (Batch.TYPE_SET_VARIABLES.equals(type) ||
-        Batch.TYPE_PROCESS_INSTANCE_MIGRATION.equals(type)) {
+        Batch.TYPE_PROCESS_INSTANCE_MIGRATION.equals(type) ||
+        Batch.TYPE_CORRELATE_MESSAGE.equals(type)) {
       deleteVariables(commandContext);
     }
 

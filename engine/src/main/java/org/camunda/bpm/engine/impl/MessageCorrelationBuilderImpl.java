@@ -16,10 +16,11 @@
  */
 package org.camunda.bpm.engine.impl;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureFalse;
+
 import java.util.Arrays;
 import java.util.List;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-
 import java.util.Map;
 
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
@@ -63,6 +64,7 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
   protected boolean isTenantIdSet = false;
 
   protected boolean startMessagesOnly = false;
+  protected boolean executionsOnly = false;
 
   public MessageCorrelationBuilderImpl(CommandExecutor commandExecutor, String messageName) {
     this(messageName);
@@ -203,7 +205,14 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
 
   @Override
   public MessageCorrelationBuilder startMessageOnly() {
+    ensureFalse("Either startMessageOnly or executionsOnly can be set", executionsOnly);
     startMessagesOnly = true;
+    return this;
+  }
+
+  public MessageCorrelationBuilder executionsOnly() {
+    ensureFalse("Either startMessageOnly or executionsOnly can be set", startMessagesOnly);
+    executionsOnly = true;
     return this;
   }
 
@@ -368,6 +377,10 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
 
   public boolean isTenantIdSet() {
     return isTenantIdSet;
+  }
+
+  public boolean isExecutionsOnly() {
+    return executionsOnly;
   }
 
 }

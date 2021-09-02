@@ -20,8 +20,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.ActivityExecutionTreeMapping;
@@ -146,11 +144,7 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
       scopeExecution = flowScopeExecutions.iterator().next();
     }
     else {
-      ActivityInstance tree = commandContext.runWithoutAuthorization(new Callable<ActivityInstance>() {
-        public ActivityInstance call() throws Exception {
-          return new GetActivityInstanceCmd(processInstanceId).execute(commandContext);
-        }
-      });
+      ActivityInstance tree = commandContext.runWithoutAuthorization(new GetActivityInstanceCmd(processInstanceId));
 
       ActivityInstance ancestorInstance = findActivityInstance(tree, ancestorActivityInstanceId);
       EnsureUtil.ensureNotNull(NotValidException.class,

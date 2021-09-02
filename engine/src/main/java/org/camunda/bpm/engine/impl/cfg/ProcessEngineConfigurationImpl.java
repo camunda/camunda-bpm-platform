@@ -107,6 +107,7 @@ import org.camunda.bpm.engine.impl.batch.deletion.DeleteHistoricProcessInstances
 import org.camunda.bpm.engine.impl.batch.deletion.DeleteProcessInstancesJobHandler;
 import org.camunda.bpm.engine.impl.batch.externaltask.SetExternalTaskRetriesJobHandler;
 import org.camunda.bpm.engine.impl.batch.job.SetJobRetriesJobHandler;
+import org.camunda.bpm.engine.impl.batch.message.MessageCorrelationBatchJobHandler;
 import org.camunda.bpm.engine.impl.batch.removaltime.BatchSetRemovalTimeJobHandler;
 import org.camunda.bpm.engine.impl.batch.removaltime.DecisionSetRemovalTimeJobHandler;
 import org.camunda.bpm.engine.impl.batch.removaltime.ProcessSetRemovalTimeJobHandler;
@@ -1380,6 +1381,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
       BatchSetVariablesHandler batchSetVariablesHandler = new BatchSetVariablesHandler();
       batchHandlers.put(batchSetVariablesHandler.getType(), batchSetVariablesHandler);
+
+      MessageCorrelationBatchJobHandler messageCorrelationJobHandler = new MessageCorrelationBatchJobHandler();
+      batchHandlers.put(messageCorrelationJobHandler.getType(), messageCorrelationJobHandler);
     }
 
     if (customBatchJobHandlers != null) {
