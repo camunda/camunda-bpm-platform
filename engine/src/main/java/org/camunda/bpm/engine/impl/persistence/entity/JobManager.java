@@ -141,9 +141,9 @@ public class JobManager extends AbstractManager {
 
     JobExecutorContext jobExecutorContext = Context.getJobExecutorContext();
     TransactionListener transactionListener = null;
-    if(isJobPriorityInJobExecutorPriorityRange(job.getPriority())) {
+    if (isJobPriorityInJobExecutorPriorityRange(job.getPriority())) {
       // add job to be executed in the current processor
-      if(!job.isSuspended()
+      if (!job.isSuspended()
          && job.isExclusive()
          && isJobDue(job)
          && jobExecutorContext != null
