@@ -18,8 +18,6 @@ package org.camunda.bpm.engine.impl.persistence.deploy;
 
 import java.util.Collections;
 import java.util.Set;
-import java.util.concurrent.Callable;
-
 import org.camunda.bpm.engine.impl.cfg.TransactionListener;
 import org.camunda.bpm.engine.impl.cmd.UnregisterDeploymentCmd;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -51,10 +49,7 @@ public class DeploymentFailListener implements TransactionListener {
     @Override
     public Void execute(final CommandContext commandContext) {
 
-      commandContext.runWithoutAuthorization((Callable<Void>) () -> {
-        new UnregisterDeploymentCmd(deploymentIds).execute(commandContext);
-        return null;
-      });
+      commandContext.runWithoutAuthorization(new UnregisterDeploymentCmd(deploymentIds));
 
       return null;
     }

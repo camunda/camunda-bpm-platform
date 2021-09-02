@@ -18,8 +18,6 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.Callable;
-
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
@@ -62,12 +60,7 @@ public abstract class AbstractSetStateCmd implements Command<Void> {
           // pre-requirement: the necessary authorization check
           // for included resources should be done before this
           // call.
-          commandContext.runWithoutAuthorization(new Callable<Void>() {
-            public Void call() throws Exception {
-              cmd.execute(commandContext);
-              return null;
-            }
-          });
+          commandContext.runWithoutAuthorization(cmd);
         }
       }
 

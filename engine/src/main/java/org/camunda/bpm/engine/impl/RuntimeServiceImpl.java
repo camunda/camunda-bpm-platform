@@ -46,6 +46,7 @@ import org.camunda.bpm.engine.impl.cmd.ResolveIncidentCmd;
 import org.camunda.bpm.engine.impl.cmd.SetAnnotationForIncidentCmd;
 import org.camunda.bpm.engine.impl.cmd.SetExecutionVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.SignalCmd;
+import org.camunda.bpm.engine.impl.cmd.batch.CorrelateAllMessageBatchCmd;
 import org.camunda.bpm.engine.impl.cmd.batch.DeleteProcessInstanceBatchCmd;
 import org.camunda.bpm.engine.impl.cmd.batch.variables.SetVariablesToProcessInstancesBatchCmd;
 import org.camunda.bpm.engine.impl.migration.MigrationPlanBuilderImpl;
@@ -61,6 +62,7 @@ import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.IncidentQuery;
+import org.camunda.bpm.engine.runtime.MessageCorrelationAsyncBuilder;
 import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
 import org.camunda.bpm.engine.runtime.ModificationBuilder;
 import org.camunda.bpm.engine.runtime.NativeExecutionQuery;
@@ -716,6 +718,11 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
       .processInstanceBusinessKey(businessKey)
       .setVariables(processVariables)
       .correlate();
+  }
+
+  @Override
+  public MessageCorrelationAsyncBuilder createMessageCorrelationAsync(String messageName) {
+    return new MessageCorrelationAsyncBuilderImpl(commandExecutor, messageName);
   }
 
   @Override

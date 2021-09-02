@@ -43,6 +43,7 @@ import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.IncidentQuery;
+import org.camunda.bpm.engine.runtime.MessageCorrelationAsyncBuilder;
 import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
 import org.camunda.bpm.engine.runtime.ModificationBuilder;
 import org.camunda.bpm.engine.runtime.NativeExecutionQuery;
@@ -2168,6 +2169,17 @@ public interface RuntimeService {
    *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void correlateMessage(String messageName, String businessKey, Map<String, Object> correlationKeys, Map<String, Object> processVariables);
+
+  /**
+   * Define a complex asynchronous message correlation using a fluent builder.
+   *
+   * @param messageName the name of the message. Corresponds to the 'name' element
+   * of the message defined in BPMN 2.0 Xml.
+   * Can be null to correlate by other criteria only.
+   *
+   * @return the fluent builder for defining the asynchronous message correlation.
+   */
+  MessageCorrelationAsyncBuilder createMessageCorrelationAsync(String messageName);
 
   /**
    * Define a modification of a process instance in terms of activity cancellations

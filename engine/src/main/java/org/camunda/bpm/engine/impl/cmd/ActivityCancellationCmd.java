@@ -21,8 +21,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Callable;
-
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
@@ -117,12 +115,7 @@ public class ActivityCancellationCmd extends AbstractProcessInstanceModification
   }
 
   public ActivityInstance getActivityInstanceTree(final CommandContext commandContext) {
-    return commandContext.runWithoutAuthorization(new Callable<ActivityInstance>() {
-      @Override
-      public ActivityInstance call() throws Exception {
-        return new GetActivityInstanceCmd(processInstanceId).execute(commandContext);
-      }
-    });
+    return commandContext.runWithoutAuthorization(new GetActivityInstanceCmd(processInstanceId));
   }
 
   public String getActivityId() {

@@ -18,8 +18,6 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Callable;
-
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.impl.DeploymentQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
@@ -110,18 +108,12 @@ public class DeploymentManager extends AbstractManager {
       // Represents no problem if only one process definition is deleted
       // in a transaction! We have to set the instances flag to false.
       final CommandContext commandContext = Context.getCommandContext();
-      commandContext.runWithoutAuthorization(new Callable<Void>() {
-        public Void call() throws Exception {
-          DeleteProcessDefinitionsByIdsCmd cmd = new DeleteProcessDefinitionsByIdsCmd(
+      commandContext.runWithoutAuthorization(new DeleteProcessDefinitionsByIdsCmd(
               Arrays.asList(processDefinitionId),
               cascade,
               false,
               skipCustomListeners,
-              false);
-          cmd.execute(commandContext);
-          return null;
-        }
-      });
+              false));
     }
 
     deleteCaseDeployment(deploymentId, cascade);

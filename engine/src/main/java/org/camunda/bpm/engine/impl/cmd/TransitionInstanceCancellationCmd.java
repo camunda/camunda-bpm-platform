@@ -16,8 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.util.concurrent.Callable;
-
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -44,11 +42,7 @@ public class TransitionInstanceCancellationCmd extends AbstractInstanceCancellat
   }
 
   protected ExecutionEntity determineSourceInstanceExecution(final CommandContext commandContext) {
-    ActivityInstance instance = commandContext.runWithoutAuthorization(new Callable<ActivityInstance>() {
-      public ActivityInstance call() throws Exception {
-        return new GetActivityInstanceCmd(processInstanceId).execute(commandContext);
-      }
-    });
+    ActivityInstance instance = commandContext.runWithoutAuthorization(new GetActivityInstanceCmd(processInstanceId));
     TransitionInstance instanceToCancel = findTransitionInstance(instance, transitionInstanceId);
     EnsureUtil.ensureNotNull(NotValidException.class,
         describeFailure("Transition instance '" + transitionInstanceId + "' does not exist"),

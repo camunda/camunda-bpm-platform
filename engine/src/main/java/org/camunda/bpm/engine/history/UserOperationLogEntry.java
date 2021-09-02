@@ -66,74 +66,76 @@ public interface UserOperationLogEntry {
 
   /** @deprecated Please use {@link EntityTypes#TASK} instead. */
   @Deprecated
-  public static String ENTITY_TYPE_TASK = EntityTypes.TASK;
+  String ENTITY_TYPE_TASK = EntityTypes.TASK;
   /** @deprecated Please use {@link EntityTypes#IDENTITY_LINK} instead. */
   @Deprecated
-  public static String ENTITY_TYPE_IDENTITY_LINK = EntityTypes.IDENTITY_LINK;
+  String ENTITY_TYPE_IDENTITY_LINK = EntityTypes.IDENTITY_LINK;
   /** @deprecated Please use {@link EntityTypes#ATTACHMENT} instead. */
   @Deprecated
-  public static String ENTITY_TYPE_ATTACHMENT = EntityTypes.ATTACHMENT;
+  String ENTITY_TYPE_ATTACHMENT = EntityTypes.ATTACHMENT;
 
-  public static String OPERATION_TYPE_ASSIGN = "Assign";
-  public static String OPERATION_TYPE_CLAIM = "Claim";
-  public static String OPERATION_TYPE_COMPLETE = "Complete";
-  public static String OPERATION_TYPE_CREATE = "Create";
-  public static String OPERATION_TYPE_DELEGATE = "Delegate";
-  public static String OPERATION_TYPE_DELETE = "Delete";
-  public static String OPERATION_TYPE_RESOLVE = "Resolve";
-  public static String OPERATION_TYPE_SET_OWNER = "SetOwner";
-  public static String OPERATION_TYPE_SET_PRIORITY = "SetPriority";
-  public static String OPERATION_TYPE_UPDATE = "Update";
-  public static String OPERATION_TYPE_ACTIVATE = "Activate";
-  public static String OPERATION_TYPE_SUSPEND = "Suspend";
-  public static String OPERATION_TYPE_MIGRATE = "Migrate";
-  public static String OPERATION_TYPE_ADD_USER_LINK = "AddUserLink";
-  public static String OPERATION_TYPE_DELETE_USER_LINK = "DeleteUserLink";
-  public static String OPERATION_TYPE_ADD_GROUP_LINK = "AddGroupLink";
-  public static String OPERATION_TYPE_DELETE_GROUP_LINK = "DeleteGroupLink";
-  public static String OPERATION_TYPE_SET_DUEDATE = "SetDueDate";
-  public static String OPERATION_TYPE_RECALC_DUEDATE = "RecalculateDueDate";
-  public static String OPERATION_TYPE_UNLOCK = "Unlock";
-  public static String OPERATION_TYPE_EXECUTE = "Execute";
-  public static String OPERATION_TYPE_EVALUATE = "Evaluate";
+  String OPERATION_TYPE_ASSIGN = "Assign";
+  String OPERATION_TYPE_CLAIM = "Claim";
+  String OPERATION_TYPE_COMPLETE = "Complete";
+  String OPERATION_TYPE_CREATE = "Create";
+  String OPERATION_TYPE_DELEGATE = "Delegate";
+  String OPERATION_TYPE_DELETE = "Delete";
+  String OPERATION_TYPE_RESOLVE = "Resolve";
+  String OPERATION_TYPE_SET_OWNER = "SetOwner";
+  String OPERATION_TYPE_SET_PRIORITY = "SetPriority";
+  String OPERATION_TYPE_UPDATE = "Update";
+  String OPERATION_TYPE_ACTIVATE = "Activate";
+  String OPERATION_TYPE_SUSPEND = "Suspend";
+  String OPERATION_TYPE_MIGRATE = "Migrate";
+  String OPERATION_TYPE_ADD_USER_LINK = "AddUserLink";
+  String OPERATION_TYPE_DELETE_USER_LINK = "DeleteUserLink";
+  String OPERATION_TYPE_ADD_GROUP_LINK = "AddGroupLink";
+  String OPERATION_TYPE_DELETE_GROUP_LINK = "DeleteGroupLink";
+  String OPERATION_TYPE_SET_DUEDATE = "SetDueDate";
+  String OPERATION_TYPE_RECALC_DUEDATE = "RecalculateDueDate";
+  String OPERATION_TYPE_UNLOCK = "Unlock";
+  String OPERATION_TYPE_EXECUTE = "Execute";
+  String OPERATION_TYPE_EVALUATE = "Evaluate";
 
-  public static String OPERATION_TYPE_ADD_ATTACHMENT = "AddAttachment";
-  public static String OPERATION_TYPE_DELETE_ATTACHMENT = "DeleteAttachment";
+  String OPERATION_TYPE_ADD_ATTACHMENT = "AddAttachment";
+  String OPERATION_TYPE_DELETE_ATTACHMENT = "DeleteAttachment";
 
-  public static String OPERATION_TYPE_SUSPEND_JOB_DEFINITION = "SuspendJobDefinition";
-  public static String OPERATION_TYPE_ACTIVATE_JOB_DEFINITION = "ActivateJobDefinition";
-  public static String OPERATION_TYPE_SUSPEND_PROCESS_DEFINITION = "SuspendProcessDefinition";
-  public static String OPERATION_TYPE_ACTIVATE_PROCESS_DEFINITION = "ActivateProcessDefinition";
+  String OPERATION_TYPE_SUSPEND_JOB_DEFINITION = "SuspendJobDefinition";
+  String OPERATION_TYPE_ACTIVATE_JOB_DEFINITION = "ActivateJobDefinition";
+  String OPERATION_TYPE_SUSPEND_PROCESS_DEFINITION = "SuspendProcessDefinition";
+  String OPERATION_TYPE_ACTIVATE_PROCESS_DEFINITION = "ActivateProcessDefinition";
 
-  public static String OPERATION_TYPE_CREATE_HISTORY_CLEANUP_JOB = "CreateHistoryCleanupJobs";
-  public static String OPERATION_TYPE_UPDATE_HISTORY_TIME_TO_LIVE = "UpdateHistoryTimeToLive";
-  public static String OPERATION_TYPE_DELETE_HISTORY = "DeleteHistory";
+  String OPERATION_TYPE_CREATE_HISTORY_CLEANUP_JOB = "CreateHistoryCleanupJobs";
+  String OPERATION_TYPE_UPDATE_HISTORY_TIME_TO_LIVE = "UpdateHistoryTimeToLive";
+  String OPERATION_TYPE_DELETE_HISTORY = "DeleteHistory";
 
-  public static String OPERATION_TYPE_MODIFY_PROCESS_INSTANCE = "ModifyProcessInstance";
-  public static String OPERATION_TYPE_RESTART_PROCESS_INSTANCE  = "RestartProcessInstance";
-  public static String OPERATION_TYPE_SUSPEND_JOB = "SuspendJob";
-  public static String OPERATION_TYPE_ACTIVATE_JOB = "ActivateJob";
-  public static String OPERATION_TYPE_SET_JOB_RETRIES = "SetJobRetries";
-  public static String OPERATION_TYPE_SET_EXTERNAL_TASK_RETRIES = "SetExternalTaskRetries";
-  public static String OPERATION_TYPE_SET_VARIABLE = "SetVariable";
+  String OPERATION_TYPE_MODIFY_PROCESS_INSTANCE = "ModifyProcessInstance";
+  String OPERATION_TYPE_RESTART_PROCESS_INSTANCE  = "RestartProcessInstance";
+  String OPERATION_TYPE_SUSPEND_JOB = "SuspendJob";
+  String OPERATION_TYPE_ACTIVATE_JOB = "ActivateJob";
+  String OPERATION_TYPE_SET_JOB_RETRIES = "SetJobRetries";
+  String OPERATION_TYPE_SET_EXTERNAL_TASK_RETRIES = "SetExternalTaskRetries";
+  String OPERATION_TYPE_SET_VARIABLE = "SetVariable";
   String OPERATION_TYPE_SET_VARIABLES = "SetVariables";
 
-  public static String OPERATION_TYPE_REMOVE_VARIABLE = "RemoveVariable";
-  public static String OPERATION_TYPE_MODIFY_VARIABLE = "ModifyVariable";
+  String OPERATION_TYPE_REMOVE_VARIABLE = "RemoveVariable";
+  String OPERATION_TYPE_MODIFY_VARIABLE = "ModifyVariable";
 
-  public static String OPERATION_TYPE_SUSPEND_BATCH = "SuspendBatch";
-  public static String OPERATION_TYPE_ACTIVATE_BATCH = "ActivateBatch";
-  
-  public static String OPERATION_TYPE_CREATE_INCIDENT = "CreateIncident";
+  String OPERATION_TYPE_SUSPEND_BATCH = "SuspendBatch";
+  String OPERATION_TYPE_ACTIVATE_BATCH = "ActivateBatch";
 
-  public static String OPERATION_TYPE_SET_REMOVAL_TIME = "SetRemovalTime";
+  String OPERATION_TYPE_CREATE_INCIDENT = "CreateIncident";
+
+  String OPERATION_TYPE_SET_REMOVAL_TIME = "SetRemovalTime";
 
   String OPERATION_TYPE_SET_ANNOTATION = "SetAnnotation";
   String OPERATION_TYPE_CLEAR_ANNOTATION = "ClearAnnotation";
 
-  public static String CATEGORY_ADMIN = "Admin";
-  public static String CATEGORY_OPERATOR = "Operator";
-  public static String CATEGORY_TASK_WORKER = "TaskWorker";
+  String OPERATION_TYPE_CORRELATE_MESSAGE = "CorrelateMessage";
+
+  String CATEGORY_ADMIN = "Admin";
+  String CATEGORY_OPERATOR = "Operator";
+  String CATEGORY_TASK_WORKER = "TaskWorker";
 
   /** The unique identifier of this log entry. */
   String getId();
@@ -192,7 +194,7 @@ public interface UserOperationLogEntry {
    * created with a common operationId. This allows grouping multiple entries which are part of a composite operation.
    */
   String getOperationId();
-  
+
   /** External task reference. */
   String getExternalTaskId();
 
@@ -221,7 +223,7 @@ public interface UserOperationLogEntry {
 
   /** The time the historic user operation log will be removed. */
   Date getRemovalTime();
-  
+
   /** The category this entry is associated with */
   String getCategory();
 

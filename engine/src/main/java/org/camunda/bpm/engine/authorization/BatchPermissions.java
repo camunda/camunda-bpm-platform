@@ -92,7 +92,10 @@ public enum BatchPermissions implements Permission {
   CREATE_BATCH_SET_REMOVAL_TIME("CREATE_BATCH_SET_REMOVAL_TIME", 65536),
 
   /** Indicates that CREATE_BATCH_SET_VARIABLES interactions are permitted */
-  CREATE_BATCH_SET_VARIABLES("CREATE_BATCH_SET_VARIABLES", 131_072);
+  CREATE_BATCH_SET_VARIABLES("CREATE_BATCH_SET_VARIABLES", 131_072),
+
+  /** Indicates that CREATE_BATCH_CORRELATE_MESSAGE interactions are permitted */
+  CREATE_BATCH_CORRELATE_MESSAGE("CREATE_BATCH_CORRELATE_MESSAGE", 262_144);
 
   protected static final Resource[] RESOURCES = new Resource[] { Resources.BATCH };
 
