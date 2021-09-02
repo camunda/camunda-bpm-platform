@@ -159,8 +159,6 @@ public class JobManager extends AbstractManager {
         // a new Job is available for execution on future runs
         transactionListener = new MessageAddedNotification(jobExecutor);
       }
-    }
-    if(transactionListener != null) {
       Context.getCommandContext()
       .getTransactionContext()
       .addTransactionListener(TransactionState.COMMITTED, transactionListener);
@@ -180,7 +178,10 @@ public class JobManager extends AbstractManager {
 
   protected boolean isJobPriorityInJobExecutorPriorityRange(long jobPriority) {
     ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
-    return configuration.getJobExecutorPriorityRangeMin() <= jobPriority && configuration.getJobExecutorPriorityRangeMax() >= jobPriority;
+    Long jobExecutorPriorityRangeMin = configuration.getJobExecutorPriorityRangeMin();
+    Long jobExecutorPriorityRangeMax = configuration.getJobExecutorPriorityRangeMax();
+    return (jobExecutorPriorityRangeMin == null || jobExecutorPriorityRangeMin <= jobPriority)
+        && (jobExecutorPriorityRangeMax == null || jobExecutorPriorityRangeMax >= jobPriority);
   }
 
   public void cancelTimers(ExecutionEntity execution) {
