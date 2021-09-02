@@ -31,7 +31,7 @@
       <dependency>
         <groupId>org.camunda.commons</groupId>
         <artifactId>camunda-commons-bom</artifactId>
-        <version>1.9.0</version>
+        <version>1.10.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -39,13 +39,13 @@
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>4.13.1</version>
+        <version>4.13.2</version>
       </dependency>
 
       <dependency>
         <groupId>org.assertj</groupId>
         <artifactId>assertj-core</artifactId>
-        <version>1.5.0</version>
+        <version>3.20.2</version>
       </dependency>
 
       <dependency>
@@ -58,12 +58,6 @@
         <groupId>org.apache.velocity</groupId>
         <artifactId>velocity-engine-core</artifactId>
         <version>2.3</version>
-      </dependency>
-
-      <dependency>
-        <groupId>ch.qos.logback</groupId>
-        <artifactId>logback-classic</artifactId>
-        <version>1.2.3</version>
       </dependency>
 
       <dependency>
