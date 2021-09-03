@@ -41,7 +41,7 @@
     <!--<property name="idGenerator" ref="uuidGenerator" />-->
 
     <!--<property name="databaseSchema" value="MY_SCHEMA" />-->
-    <property name="databaseTablePrefix" value="MY_PREFIX_FOO_" />
+    <property name="databaseTablePrefix" value="MY_" />
 
     <!-- telemetry configuration -->
     <property name="telemetryEndpoint" value="http://localhost:8081/pings"/>
