@@ -18,6 +18,15 @@
   <dependencyManagement>
     <dependencies>
 
+      <!-- https://jira.camunda.com/browse/CAM-13717 -->
+      <dependency>
+        <groupId>org.glassfish.jersey</groupId>
+        <artifactId>jersey-bom</artifactId>
+        <version>${version.jersey2}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
@@ -25,7 +34,7 @@
         <scope>import</scope>
         <type>pom</type>
       </dependency>
-      
+
       <dependency>
         <groupId>org.graalvm.js</groupId>
         <artifactId>js</artifactId>

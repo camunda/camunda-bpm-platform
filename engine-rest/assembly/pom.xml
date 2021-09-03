@@ -64,6 +64,12 @@
       <version>${version.jersey2}</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.inject</groupId>
+      <artifactId>jersey-hk2</artifactId>
+      <version>${version.jersey2}</version>
+      <scope>provided</scope>
+    </dependency>
 
   </dependencies>
 
