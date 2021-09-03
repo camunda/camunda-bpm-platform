@@ -16,17 +16,23 @@
  */
 package org.camunda.bpm.engine.test.jobexecutor;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.jobexecutor.AcquiredJobs;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.concurrency.ConcurrencyTestHelper.ThreadControl;
+import org.camunda.bpm.engine.test.jobexecutor.RecordingAcquireJobsRunnable.RecordedAcquisitionEvent;
 import org.camunda.bpm.engine.test.jobexecutor.RecordingAcquireJobsRunnable.RecordedWaitEvent;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -123,5 +129,70 @@ public class JobAcquisitionTest {
       // This causes the BackoffJobAcquisitionStrategy to propose an Idle time of 5000ms.
       Assert.assertEquals(5000, jobExecutor2WaitEvents.get(0).getTimeBetweenAcquisitions());
     }
+  }
+
+  @Test
+  public void testConcurrentAcquisitionWithPriorityRange() {
+    // given
+    String processKey = "foo";
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(processKey).startEvent()
+      .parallelGateway("split")
+      .serviceTask()
+        .camundaExpression("${true}")
+        .camundaAsyncBefore()
+        .camundaJobPriority("50")
+        .camundaExclusive(true)
+      .parallelGateway("join")
+      .endEvent()
+      .moveToNode("split")
+      .serviceTask()
+        .camundaExpression("${true}")
+        .camundaAsyncBefore()
+        .camundaJobPriority("100")
+        .camundaExclusive(true)
+        .connectTo("join")
+      .done();
+
+    testRule.deploy(modelInstance);
+
+    engineRule.getRuntimeService().startProcessInstanceByKey(processKey);
+
+    ProcessEngineConfigurationImpl configuration = engineRule.getProcessEngineConfiguration();
+    configuration.setJobExecutorPriorityRangeMax(70L);
+
+    // when starting job execution, both acquisition threads wait before acquiring something
+    jobExecutor1.start();
+    acquisitionThread1.waitForSync();
+    jobExecutor2.start();
+    acquisitionThread2.waitForSync();
+
+    // acquisition 1 waits before committing the job acquisition command
+    acquisitionThread1.makeContinueAndWaitForSync();
+
+    // simulating that acqusition 2 uses a different priority range
+    configuration.setJobExecutorPriorityRangeMin(80L);
+    configuration.setJobExecutorPriorityRangeMax(120L);
+
+    // acquisition 2 waits before committing job acquisition command
+    acquisitionThread2.makeContinueAndWaitForSync();
+
+    // when both threads complete the acquisition command (and wait before the next acquisition cycle)
+    acquisitionThread1.makeContinueAndWaitForSync();
+    acquisitionThread2.makeContinueAndWaitForSync();
+
+    // Then
+    // acquisition 1 has acquired a job batch
+    List<RecordedAcquisitionEvent> jobExecutor1AcquisitionEvents = jobExecutor1.getAcquireJobsRunnable().getAcquisitionEvents();
+    assertThat(jobExecutor1AcquisitionEvents).hasSize(1);
+
+    AcquiredJobs jobExecutor1AcquiredJobs = jobExecutor1AcquisitionEvents.get(0).getAcquiredJobs();
+    assertThat(jobExecutor1AcquiredJobs.getJobIdBatches()).hasSize(1);
+
+    // and acqusition 2 has not
+    List<RecordedAcquisitionEvent> jobExecutor2AcquisitionEvents = jobExecutor2.getAcquireJobsRunnable().getAcquisitionEvents();
+    assertThat(jobExecutor2AcquisitionEvents).hasSize(1);
+
+    AcquiredJobs jobExecutor2AcquiredJobs = jobExecutor2AcquisitionEvents.get(0).getAcquiredJobs();
+    assertThat(jobExecutor2AcquiredJobs.getJobIdBatches()).isEmpty();
   }
 }

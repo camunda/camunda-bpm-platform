@@ -51,8 +51,13 @@ public class RecordingAcquireJobsRunnable extends SequentialJobAcquisitionRunnab
 
   @Override
   protected AcquiredJobs acquireJobs(JobAcquisitionContext context, JobAcquisitionStrategy configuration, ProcessEngineImpl currentProcessEngine) {
-    acquisitionEvents.add(new RecordedAcquisitionEvent(System.currentTimeMillis(), configuration.getNumJobsToAcquire(currentProcessEngine.getName())));
-    return super.acquireJobs(context, configuration, currentProcessEngine);
+    long acquisitionStart = System.currentTimeMillis();
+    int numJobsToAcquire = configuration.getNumJobsToAcquire(currentProcessEngine.getName());
+
+    AcquiredJobs acquiredJobs = super.acquireJobs(context, configuration, currentProcessEngine);
+
+    acquisitionEvents.add(new RecordedAcquisitionEvent(acquisitionStart, numJobsToAcquire, acquiredJobs));
+    return acquiredJobs;
   }
 
   @Override
@@ -100,10 +105,12 @@ public class RecordingAcquireJobsRunnable extends SequentialJobAcquisitionRunnab
   public static class RecordedAcquisitionEvent {
     protected long timestamp;
     protected int numJobsToAcquire;
+    protected AcquiredJobs acquiredJobs;
 
-    public RecordedAcquisitionEvent(long timestamp, int numJobsToAcquire) {
+    public RecordedAcquisitionEvent(long timestamp, int numJobsToAcquire, AcquiredJobs acquiredJobs) {
       this.timestamp = timestamp;
       this.numJobsToAcquire = numJobsToAcquire;
+      this.acquiredJobs = acquiredJobs;
     }
 
     public long getTimestamp() {
@@ -112,6 +119,10 @@ public class RecordingAcquireJobsRunnable extends SequentialJobAcquisitionRunnab
 
     public int getNumJobsToAcquire() {
       return numJobsToAcquire;
+    }
+
+    public AcquiredJobs getAcquiredJobs() {
+      return acquiredJobs;
     }
   }
 
