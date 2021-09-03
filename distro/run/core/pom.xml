@@ -77,6 +77,13 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-webmvc</artifactId>
+      <exclusions>
+        <!-- This artifact is also excluded by the Spring Boot starter for Tomcat -->
+        <exclusion>
+          <artifactId>tomcat-annotations-api</artifactId>
+          <groupId>org.apache.tomcat</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     
     <!-- Graal.js -->

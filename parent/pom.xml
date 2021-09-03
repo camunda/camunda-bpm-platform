@@ -20,7 +20,7 @@
   <properties>
     <version.quarkus>2.1.2.Final</version.quarkus>
     <version.spring.framework>5.2.14.RELEASE</version.spring.framework>
-    <version.spring-boot>2.5.0</version.spring-boot>
+    <version.spring-boot>2.5.4</version.spring-boot>
     <version.cxf>3.0.3</version.cxf>
     <version.resteasy>2.3.5.Final</version.resteasy>
     <version.resteasy3>3.14.0.Final</version.resteasy3>
@@ -49,7 +49,7 @@
     <version.wildfly>23.0.2.Final</version.wildfly>
     <version.wildfly.core>15.0.1.Final</version.wildfly.core>
 
-    <version.tomcat>9.0.43</version.tomcat>
+    <version.tomcat>9.0.52</version.tomcat>
 
     <version.arquillian>1.1.10.Final</version.arquillian>
     <version.shrinkwrap.resolvers>2.2.2</version.shrinkwrap.resolvers>
