@@ -163,7 +163,7 @@
 
   <delete id="deleteHistoricIdentityLinksByTaskCaseInstanceIds_mysql">
     delete I from ${prefix}ACT_HI_IDENTITYLINK I
-    inner join ACT_HI_TASKINST T
+    inner join ${prefix}ACT_HI_TASKINST T
       on I.TASK_ID_ = T.ID_
       and T.CASE_INST_ID_ in
         <foreach item="caseInstanceId" index="index" collection="list" open="(" separator="," close=")">
