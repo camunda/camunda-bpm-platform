@@ -4,8 +4,8 @@
     <@lib.property
         name = "operator"
         type = "string"
-        enumValues = ['"eq"', '"neq"', '"gt"', '"gteq"', '"lt"', '"lteq"', '"like"']
-        desc = "Comparison operator to be used"/>
+        enumValues = ['"eq"', '"neq"', '"gt"', '"gteq"', '"lt"', '"lteq"', '"like"', '"notLike"']
+        desc = "Comparison operator to be used. `notLike` is not supported by all endpoints."/>
 
     <@lib.property
         name = "value"
