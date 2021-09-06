@@ -3,7 +3,8 @@
 
     <@lib.property
         name = "value"
-        type = "object"
+        type = "ref"
+        dto = "AnyValue"
         desc = "The variable's value. Value differs depending on the variable's type and on the deserializeValues parameter."/>
 
     <@lib.property
