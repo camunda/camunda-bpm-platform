@@ -93,7 +93,7 @@ public interface ExternalTaskService {
   /**
    * Set variables
    *
-   * @param variables     are set in the tasks ancestor execution hierarchy The key and the value represent
+   * @param variables     are set in the tasks ancestor execution hierarchy. The key and the value represent
    *                      the variable name and its value. Map can consist of both typed and untyped variables.
    *
    * @throws NotFoundException if the task has been canceled and therefore does not exist anymore
@@ -114,7 +114,7 @@ public interface ExternalTaskService {
   /**
    * Set variables
    *
-   * @param variables     are set in the tasks ancestor execution hierarchy The key and the value represent
+   * @param variables     are set in the tasks ancestor execution hierarchy. The key and the value represent
    *                      the variable name and its value. Map can consist of both typed and untyped variables.
    *
    * @throws NotFoundException if the task has been canceled and therefore does not exist anymore

@@ -22,7 +22,12 @@ import java.util.Map;
 
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.impl.ExternalTaskImpl;
-import org.camunda.bpm.client.task.impl.dto.*;
+import org.camunda.bpm.client.task.impl.dto.BpmnErrorRequestDto;
+import org.camunda.bpm.client.task.impl.dto.CompleteRequestDto;
+import org.camunda.bpm.client.task.impl.dto.ExtendLockRequestDto;
+import org.camunda.bpm.client.task.impl.dto.FailureRequestDto;
+import org.camunda.bpm.client.task.impl.dto.LockRequestDto;
+import org.camunda.bpm.client.task.impl.dto.SetVariablesRequestDto;
 import org.camunda.bpm.client.topic.impl.dto.FetchAndLockRequestDto;
 import org.camunda.bpm.client.topic.impl.dto.TopicRequestDto;
 import org.camunda.bpm.client.variable.impl.TypedValueField;

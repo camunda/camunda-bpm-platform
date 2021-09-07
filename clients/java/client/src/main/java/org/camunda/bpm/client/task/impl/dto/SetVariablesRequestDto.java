@@ -6,9 +6,6 @@ import org.camunda.bpm.client.variable.impl.TypedValueField;
 
 import java.util.Map;
 
-/**
- * @author Taha Arian
- */
 public class SetVariablesRequestDto extends RequestDto {
 
     protected Map<String, TypedValueField> variables;
