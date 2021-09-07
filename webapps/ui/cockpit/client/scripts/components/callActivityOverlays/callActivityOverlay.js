@@ -156,7 +156,6 @@ function addInteractions(
 
   if (redirectionTarget) {
     button.on('click', () => {
-      buttonOverlay.tooltip('hide');
       clickListener(redirectionTarget);
     });
   } else {
@@ -165,9 +164,11 @@ function addInteractions(
     buttonOverlay.css('cursor', 'not-allowed');
   }
 
-  // clear listeners
   $scope.$on('$destroy', function() {
+    // as these buttons happen outside of angular,
+    // we need to clean up listeners and tooltip once we leave to avoid memory leaks
     button.off('click');
+    buttonOverlay.tooltip('destroy');
     buttonOverlay.off('mouseenter mouseleave');
     diagramNode.off('mouseenter mouseleave');
   });
