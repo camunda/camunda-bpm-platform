@@ -93,8 +93,8 @@ public class ExternalTaskHandlerIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .handler(handler)
-      .open();
+            .handler(handler)
+            .open();
 
     // then
     clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
@@ -126,8 +126,8 @@ public class ExternalTaskHandlerIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .handler(handler)
-      .open();
+            .handler(handler)
+            .open();
 
     // then
     clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
@@ -136,6 +136,68 @@ public class ExternalTaskHandlerIT {
     assertThat(task).isNotNull();
     assertThat(task.getProcessInstanceId()).isEqualTo(processInstance.getId());
     assertThat(task.getTaskDefinitionKey()).isEqualTo(USER_TASK_ID);
+  }
+
+  @Test
+  public void shouldSetVariablesByProcessInstanceId() {
+    // given
+    String variableName = "progress";
+    Integer variableValue = 10;
+
+    RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler((task, client) -> {
+      Map<String, Object> variables = new HashMap<>();
+      variables.put(variableName, variableValue);
+
+      client.setVariables(task.getProcessInstanceId(), variables);
+      client.complete(task, variables);
+    });
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+            .handler(handler)
+            .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    VariableInstanceDto variable = engineRule.getVariableByProcessInstanceId(processInstance.getId());
+    assertThat(variable).isNotNull();
+    assertThat(variable.getProcessInstanceId()).isEqualTo(processInstance.getId());
+
+    assertThat(variable.getName()).isEqualTo(variableName);
+    assertThat(variable.getValue()).isEqualTo(variableValue);
+
+  }
+
+  @Test
+  public void shouldSetVariablesByExternalTask() {
+    // given
+    String variableName = "progress";
+    Integer variableValue = 10;
+
+    RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler((task, client) -> {
+      Map<String, Object> variables = new HashMap<>();
+      variables.put(variableName, variableValue);
+
+      client.setVariables(task, variables);
+      client.complete(task, variables);
+    });
+
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+            .handler(handler)
+            .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+    VariableInstanceDto variable = engineRule.getVariableByProcessInstanceId(processInstance.getId());
+    assertThat(variable).isNotNull();
+    assertThat(variable.getProcessInstanceId()).isEqualTo(processInstance.getId());
+
+    assertThat(variable.getName()).isEqualTo(variableName);
+    assertThat(variable.getValue()).isEqualTo(variableValue);
+
   }
 
   @Test
@@ -152,8 +214,8 @@ public class ExternalTaskHandlerIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .handler(handler)
-      .open();
+            .handler(handler)
+            .open();
 
     // then
     clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
@@ -183,8 +245,8 @@ public class ExternalTaskHandlerIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .handler(handler)
-      .open();
+            .handler(handler)
+            .open();
 
     // then
     clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
@@ -220,8 +282,8 @@ public class ExternalTaskHandlerIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .handler(handler)
-      .open();
+            .handler(handler)
+            .open();
 
     // then
     clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
@@ -257,8 +319,8 @@ public class ExternalTaskHandlerIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .handler(handler)
-      .open();
+            .handler(handler)
+            .open();
 
     // then
     clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
@@ -281,8 +343,8 @@ public class ExternalTaskHandlerIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .handler(handler)
-      .open();
+            .handler(handler)
+            .open();
 
     // then
     clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
@@ -303,8 +365,8 @@ public class ExternalTaskHandlerIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .handler(handler)
-      .open();
+            .handler(handler)
+            .open();
 
     // then
     clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
@@ -323,8 +385,8 @@ public class ExternalTaskHandlerIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .handler(handler)
-      .open();
+            .handler(handler)
+            .open();
 
     // then
     clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
@@ -342,8 +404,8 @@ public class ExternalTaskHandlerIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .handler(handler)
-      .open();
+            .handler(handler)
+            .open();
 
     // then
     clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
@@ -363,8 +425,8 @@ public class ExternalTaskHandlerIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-    .handler(handler)
-    .open();
+            .handler(handler)
+            .open();
 
     // then
     clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
@@ -387,8 +449,8 @@ public class ExternalTaskHandlerIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .handler(handler)
-      .open();
+            .handler(handler)
+            .open();
 
     // then
     clientRule.waitForFetchAndLockUntil(() -> handler.getHandledTasks().size() >= 2);
@@ -407,8 +469,8 @@ public class ExternalTaskHandlerIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .handler(handler)
-      .open();
+            .handler(handler)
+            .open();
 
     // then
     clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
@@ -432,8 +494,8 @@ public class ExternalTaskHandlerIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .handler(handler)
-      .open();
+            .handler(handler)
+            .open();
 
     // then
     clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
@@ -460,8 +522,8 @@ public class ExternalTaskHandlerIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .handler(handler)
-      .open();
+            .handler(handler)
+            .open();
 
     // then
     clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
@@ -485,8 +547,8 @@ public class ExternalTaskHandlerIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-    .handler(handler)
-    .open();
+            .handler(handler)
+            .open();
 
     // then
     clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
@@ -506,8 +568,8 @@ public class ExternalTaskHandlerIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .handler(handler)
-      .open();
+            .handler(handler)
+            .open();
 
     // then
     clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
@@ -527,9 +589,9 @@ public class ExternalTaskHandlerIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .lockDuration(1000)
-      .handler(handler)
-      .open();
+            .lockDuration(1000)
+            .handler(handler)
+            .open();
 
 
     clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
@@ -554,8 +616,8 @@ public class ExternalTaskHandlerIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .handler(handler)
-      .open();
+            .handler(handler)
+            .open();
 
     // then
     clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
@@ -583,8 +645,8 @@ public class ExternalTaskHandlerIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .handler(handler)
-      .open();
+            .handler(handler)
+            .open();
 
     // then
     clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
@@ -618,8 +680,8 @@ public class ExternalTaskHandlerIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .handler(handler)
-      .open();
+            .handler(handler)
+            .open();
 
     // then
     clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
@@ -659,8 +721,8 @@ public class ExternalTaskHandlerIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .handler(handler)
-      .open();
+            .handler(handler)
+            .open();
 
     // then
     clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
@@ -690,8 +752,8 @@ public class ExternalTaskHandlerIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .handler(handler)
-      .open();
+            .handler(handler)
+            .open();
 
     // then
     List<ExternalTask> handledTasks = handler.getHandledTasks();
@@ -711,8 +773,8 @@ public class ExternalTaskHandlerIT {
 
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .handler(handler)
-      .open();
+            .handler(handler)
+            .open();
 
     // then
     clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
@@ -728,8 +790,8 @@ public class ExternalTaskHandlerIT {
     RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler();
     // when
     client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
-      .handler(handler)
-      .open();
+            .handler(handler)
+            .open();
 
     // then
     clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
