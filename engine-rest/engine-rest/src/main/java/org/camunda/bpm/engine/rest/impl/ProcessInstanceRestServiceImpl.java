@@ -45,12 +45,14 @@ import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceSuspensionStateAsyncDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceSuspensionStateDto;
 import org.camunda.bpm.engine.rest.dto.runtime.SetJobRetriesByProcessDto;
+import org.camunda.bpm.engine.rest.dto.runtime.batch.CorrelationMessageAsyncDto;
 import org.camunda.bpm.engine.rest.dto.runtime.batch.DeleteProcessInstancesDto;
 import org.camunda.bpm.engine.rest.dto.runtime.batch.SetVariablesAsyncDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.runtime.ProcessInstanceResource;
 import org.camunda.bpm.engine.rest.sub.runtime.impl.ProcessInstanceResourceImpl;
+import org.camunda.bpm.engine.runtime.MessageCorrelationAsyncBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
@@ -86,7 +88,7 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
       matchingInstances = query.list();
     }
 
-    List<ProcessInstanceDto> instanceResults = new ArrayList<ProcessInstanceDto>();
+    List<ProcessInstanceDto> instanceResults = new ArrayList<>();
     for (ProcessInstance instance : matchingInstances) {
       ProcessInstanceDto resultInstance = ProcessInstanceDto.fromProcessInstance(instance);
       instanceResults.add(resultInstance);
@@ -270,6 +272,48 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
       // 2) null value is given
       throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
 
+    }
+
+    return BatchDto.fromBatch(batch);
+  }
+
+  @Override
+  public BatchDto correlateMessageAsync(CorrelationMessageAsyncDto correlationMessageAsyncDto) {
+    Map<String, VariableValueDto> variables = correlationMessageAsyncDto.getVariables();
+
+    VariableMap variableMap = null;
+    try {
+      variableMap = VariableValueDto.toMap(variables, processEngine, objectMapper);
+    } catch (RestException e) {
+      String errorMessage = String.format("Cannot set variables: %s", e.getMessage());
+      throw new InvalidRequestException(e.getStatus(), e, errorMessage);
+    }
+
+    String messageName = correlationMessageAsyncDto.getMessageName();
+    List<String> ids = correlationMessageAsyncDto.getProcessInstanceIds();
+    ProcessInstanceQuery runtimeQuery = toQuery(correlationMessageAsyncDto.getProcessInstanceQuery());
+    HistoricProcessInstanceQuery historyQuery = toQuery(correlationMessageAsyncDto.getHistoricProcessInstanceQuery());
+
+    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
+
+    Batch batch = null;
+    try {
+      MessageCorrelationAsyncBuilder messageCorrelationBuilder = runtimeService
+        .createMessageCorrelationAsync(messageName)
+        .setVariables(variableMap);
+      if (ids != null) {
+        messageCorrelationBuilder.processInstanceIds(ids);
+      }
+      if (runtimeQuery != null) {
+        messageCorrelationBuilder.processInstanceQuery(runtimeQuery);
+      }
+      if (historyQuery != null) {
+        messageCorrelationBuilder.historicProcessInstanceQuery(historyQuery);
+      }
+      batch = messageCorrelationBuilder.correlateAllAsync();
+    } catch (NullValueException e) {
+      // null values are given
+      throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
     }
 
     return BatchDto.fromBatch(batch);

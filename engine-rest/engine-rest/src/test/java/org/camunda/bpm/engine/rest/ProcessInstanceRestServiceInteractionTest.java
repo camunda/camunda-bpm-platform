@@ -61,6 +61,7 @@ import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceSuspensionStateDto;
 import org.camunda.bpm.engine.rest.dto.runtime.SetJobRetriesByProcessDto;
+import org.camunda.bpm.engine.rest.dto.runtime.batch.CorrelationMessageAsyncDto;
 import org.camunda.bpm.engine.rest.dto.runtime.batch.DeleteProcessInstancesDto;
 import org.camunda.bpm.engine.rest.dto.runtime.batch.SetVariablesAsyncDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -80,6 +81,7 @@ import org.camunda.bpm.engine.rest.util.JsonPathUtil;
 import org.camunda.bpm.engine.rest.util.ModificationInstructionBuilder;
 import org.camunda.bpm.engine.rest.util.VariablesBuilder;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
+import org.camunda.bpm.engine.runtime.MessageCorrelationAsyncBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceModificationInstantiationBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
@@ -105,6 +107,7 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.mockito.Mockito;
+import org.mockito.stubbing.Answer;
 
 public class ProcessInstanceRestServiceInteractionTest extends
     AbstractRestServiceTest {
@@ -133,8 +136,16 @@ public class ProcessInstanceRestServiceInteractionTest extends
   protected static final String PROCESS_INSTANCE_SUSPENDED_ASYNC_URL = PROCESS_INSTANCE_URL + "/suspended-async";
   protected static final String PROCESS_INSTANCE_MODIFICATION_URL = SINGLE_PROCESS_INSTANCE_URL + "/modification";
   protected static final String PROCESS_INSTANCE_MODIFICATION_ASYNC_URL = SINGLE_PROCESS_INSTANCE_URL + "/modification-async";
-  protected static final String PROCESS_INSTANCE_SET_VARIABLES_ASYNC_URL =
-      PROCESS_INSTANCE_URL + "/variables-async";
+  protected static final String PROCESS_INSTANCE_SET_VARIABLES_ASYNC_URL = PROCESS_INSTANCE_URL + "/variables-async";
+  protected static final String PROCESS_INSTANCE_CORRELATE_MESSAGE_ASYNC_URL = PROCESS_INSTANCE_URL + "/message-async";
+
+  protected static final Answer<Object> RETURNS_SELF = invocation -> {
+    Object mock = invocation.getMock();
+    if(invocation.getMethod().getReturnType().isInstance(mock)){
+        return mock;
+    }
+    return RETURNS_DEFAULTS.answer(invocation);
+  };
 
   protected static final VariableMap EXAMPLE_OBJECT_VARIABLES = Variables.createVariables();
   static {
@@ -3614,7 +3625,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
     verify(mockModificationBuilder).cancellationSourceExternal(true);
   }
-  
+
   @Test
   public void testAsyncProcessInstanceModificationCancellationSource() {
     ProcessInstanceModificationInstantiationBuilder mockModificationBuilder = setUpMockModificationBuilder();
@@ -3705,7 +3716,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
   }
 
   /**
-   * Thrown when java serialization format is prohibited and java serialized variable is set 
+   * Thrown when java serialization format is prohibited and java serialized variable is set
    * or null value is given.
    */
   @Test
@@ -3888,6 +3899,205 @@ public class ProcessInstanceRestServiceInteractionTest extends
         eq(null),
         eq(null)
     );
+
+    verifyBatchJson(response.asString());
+  }
+
+  @Test
+  public void shouldCorrelateMessageAsync() {
+    // given
+    Batch batchMock = createMockBatch();
+    MessageCorrelationAsyncBuilder builderMock = mock(MessageCorrelationAsyncBuilder.class, RETURNS_SELF);
+    when(builderMock.correlateAllAsync()).thenReturn(batchMock);
+    when(runtimeServiceMock.createMessageCorrelationAsync(any())).thenReturn(builderMock);
+
+    CorrelationMessageAsyncDto body = new CorrelationMessageAsyncDto();
+
+    // when
+    Response response = given()
+      .contentType(ContentType.JSON)
+      .body(body)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(PROCESS_INSTANCE_CORRELATE_MESSAGE_ASYNC_URL);
+
+    // then
+    verify(runtimeServiceMock).createMessageCorrelationAsync(null);
+    verify(builderMock).correlateAllAsync();
+
+    verifyBatchJson(response.asString());
+  }
+
+  @Test
+  public void shouldNotTransformProcessEngineExceptionToInvalidRequestExceptionWhenCorrelateMessageAsync() {
+    // given
+    doThrow(new ProcessEngineException("message")).when(runtimeServiceMock).createMessageCorrelationAsync(any());
+
+    // when + then
+    given()
+      .contentType(ContentType.JSON)
+      .body("{}")
+    .then().expect()
+      .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+      .body(containsString("{\"type\":\"ProcessEngineException\"," +
+          "\"message\":\"message\"}"))
+    .when()
+      .post(PROCESS_INSTANCE_CORRELATE_MESSAGE_ASYNC_URL);
+  }
+
+  @Test
+  public void shouldThrowExceptionWhenCorrelateMessageAsync_AuthorizationException() {
+    // given
+    doThrow(new AuthorizationException("message")).when(runtimeServiceMock).createMessageCorrelationAsync(any());
+
+    // when + then
+    given()
+      .contentType(ContentType.JSON)
+      .body("{}")
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body(containsString("{\"type\":\"AuthorizationException\""))
+    .when()
+      .post(PROCESS_INSTANCE_CORRELATE_MESSAGE_ASYNC_URL);
+  }
+
+  @Test
+  public void shouldThrowExceptionWhenCorrelateMessageAsync_NullValueException() {
+    // given
+    doThrow(new NullValueException("message")).when(runtimeServiceMock).createMessageCorrelationAsync(any());
+
+    // when + then
+    given()
+      .contentType(ContentType.JSON)
+      .body("{}")
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body(containsString("{\"type\":\"InvalidRequestException\",\"message\":\"message\"}"))
+    .when()
+      .post(PROCESS_INSTANCE_CORRELATE_MESSAGE_ASYNC_URL);
+  }
+
+  @Test
+  public void shouldThrowExceptionWhenCorrelateMessageAsync_BadUserRequestException() {
+    // given
+    doThrow(new BadUserRequestException("message")).when(runtimeServiceMock).createMessageCorrelationAsync(any());
+
+    // when + then
+    given()
+      .contentType(ContentType.JSON)
+      .body("{}")
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body(containsString("{\"type\":\"BadUserRequestException\",\"message\":\"message\"}"))
+    .when()
+      .post(PROCESS_INSTANCE_CORRELATE_MESSAGE_ASYNC_URL);
+  }
+
+  @Test
+  public void shouldCorrelateMessageAsync_RuntimeQuery() {
+    // given
+    Batch batchMock = createMockBatch();
+    MessageCorrelationAsyncBuilder builderMock = mock(MessageCorrelationAsyncBuilder.class, RETURNS_SELF);
+    when(builderMock.correlateAllAsync()).thenReturn(batchMock);
+    when(runtimeServiceMock.createMessageCorrelationAsync(any())).thenReturn(builderMock);
+
+    ProcessInstanceQuery mockedProcessInstanceQuery = mock(ProcessInstanceQuery.class);
+    when(runtimeServiceMock.createProcessInstanceQuery()).thenReturn(mockedProcessInstanceQuery);
+
+    CorrelationMessageAsyncDto body = new CorrelationMessageAsyncDto();
+
+    ProcessInstanceQueryDto processInstanceQueryDto = new ProcessInstanceQueryDto();
+    processInstanceQueryDto.setProcessDefinitionId("foo");
+    body.setProcessInstanceQuery(processInstanceQueryDto);
+
+    // when
+    Response response = given()
+      .contentType(ContentType.JSON)
+      .body(body)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(PROCESS_INSTANCE_CORRELATE_MESSAGE_ASYNC_URL);
+
+    // then
+
+    verify(mockedProcessInstanceQuery)
+        .processDefinitionId("foo");
+
+    verify(runtimeServiceMock).createMessageCorrelationAsync(null);
+    verify(builderMock).processInstanceQuery(mockedProcessInstanceQuery);
+    verify(builderMock).correlateAllAsync();
+
+    verifyBatchJson(response.asString());
+  }
+
+  @Test
+  public void shouldCorrelateMessageAsync_HistoryQuery() {
+    // given
+    Batch batchMock = createMockBatch();
+    MessageCorrelationAsyncBuilder builderMock = mock(MessageCorrelationAsyncBuilder.class, RETURNS_SELF);
+    when(builderMock.correlateAllAsync()).thenReturn(batchMock);
+    when(runtimeServiceMock.createMessageCorrelationAsync(any())).thenReturn(builderMock);
+
+    HistoricProcessInstanceQuery mockedHistoricProcessInstanceQuery =
+        mock(HistoricProcessInstanceQuery.class);
+    when(historyServiceMock.createHistoricProcessInstanceQuery())
+        .thenReturn(mockedHistoricProcessInstanceQuery);
+
+    CorrelationMessageAsyncDto body = new CorrelationMessageAsyncDto();
+
+    HistoricProcessInstanceQueryDto historicProcessInstanceQueryDto =
+        new HistoricProcessInstanceQueryDto();
+    historicProcessInstanceQueryDto.setProcessDefinitionId("foo");
+    body.setHistoricProcessInstanceQuery(historicProcessInstanceQueryDto);
+
+    // when
+    Response response = given()
+      .contentType(ContentType.JSON)
+      .body(body)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(PROCESS_INSTANCE_CORRELATE_MESSAGE_ASYNC_URL);
+
+    // then
+    verify(mockedHistoricProcessInstanceQuery)
+        .processDefinitionId("foo");
+
+    verify(runtimeServiceMock).createMessageCorrelationAsync(null);
+    verify(builderMock).historicProcessInstanceQuery(mockedHistoricProcessInstanceQuery);
+    verify(builderMock).correlateAllAsync();
+
+    verifyBatchJson(response.asString());
+  }
+
+  @Test
+  public void shouldCorrelateMessageAsync_ByIds() {
+    // given
+    Batch batchMock = createMockBatch();
+    MessageCorrelationAsyncBuilder builderMock = mock(MessageCorrelationAsyncBuilder.class, RETURNS_SELF);
+    when(builderMock.correlateAllAsync()).thenReturn(batchMock);
+    when(runtimeServiceMock.createMessageCorrelationAsync(any())).thenReturn(builderMock);
+
+    CorrelationMessageAsyncDto body = new CorrelationMessageAsyncDto();
+
+    List<String> processInstanceIds = Arrays.asList("foo", "bar");
+    body.setProcessInstanceIds(processInstanceIds);
+
+    // when
+    Response response = given()
+      .contentType(ContentType.JSON)
+      .body(body)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(PROCESS_INSTANCE_CORRELATE_MESSAGE_ASYNC_URL);
+
+    // then
+    verify(runtimeServiceMock).createMessageCorrelationAsync(null);
+    verify(builderMock).processInstanceIds(processInstanceIds);
+    verify(builderMock).correlateAllAsync();
 
     verifyBatchJson(response.asString());
   }
