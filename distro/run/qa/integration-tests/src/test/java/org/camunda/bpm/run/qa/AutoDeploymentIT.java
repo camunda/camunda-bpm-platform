@@ -65,6 +65,8 @@ public class AutoDeploymentIT {
 
   public void runStartScript() throws IOException {
     container = new SpringBootManagedContainer();
+    container.replaceConfigurationYml(SpringBootManagedContainer.APPLICATION_YML_PATH,
+        AutoDeploymentIT.class.getClassLoader().getResourceAsStream("example-disabled.yml"));
     try {
       container.start();
     } catch (Exception e) {
@@ -73,7 +75,7 @@ public class AutoDeploymentIT {
   }
 
   public void createBPMNFile(String path, String processDefinitionId) throws IOException {
-    Path resourcesDir = Paths.get(baseDirectory, "configuration", "resources", path);
+    Path resourcesDir = Paths.get(baseDirectory, SpringBootManagedContainer.RESOURCES_PATH, path);
     resourcesDir.toFile().mkdirs();
     File bpmnFile = Paths.get(resourcesDir.toString(), "process.bpmn").toFile();
     bpmnFile.createNewFile();

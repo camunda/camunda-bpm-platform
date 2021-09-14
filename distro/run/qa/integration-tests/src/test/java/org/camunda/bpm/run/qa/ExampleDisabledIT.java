@@ -19,21 +19,19 @@ package org.camunda.bpm.run.qa;
 import static io.restassured.RestAssured.when;
 import static org.hamcrest.CoreMatchers.is;
 import java.io.IOException;
-import javax.ws.rs.core.Response.Status;
-
 import org.camunda.bpm.run.qa.util.SpringBootManagedContainer;
-import org.junit.AfterClass;
+import org.junit.After;
 import org.junit.Test;
-import org.junit.BeforeClass;
+import org.junit.Before;
 
 import io.restassured.response.Response;
 
-public class ProductionConfigurationIT {
+public class ExampleDisabledIT {
 
   static SpringBootManagedContainer container;
 
-  @AfterClass
-  public static void stopApp() {
+  @After
+  public void stopApp() {
     try {
       if (container != null) {
         container.stop();
@@ -45,12 +43,12 @@ public class ProductionConfigurationIT {
     }
   }
 
-  @BeforeClass
-  public static void runStartScript() throws IOException {
-    container = new SpringBootManagedContainer("--production");
+  @Before
+  public void runStartScript() throws IOException {
+    container = new SpringBootManagedContainer();
 
-    container.createConfigurationYml("configuration/production.yml",
-        ProductionConfigurationIT.class.getClassLoader().getResourceAsStream("ProductionConfigurationIntegrationTest_production.yml"));
+    container.replaceConfigurationYml(SpringBootManagedContainer.APPLICATION_YML_PATH,
+        ExampleDisabledIT.class.getClassLoader().getResourceAsStream("example-disabled.yml"));
 
     try {
       container.start();
@@ -60,31 +58,9 @@ public class ProductionConfigurationIT {
   }
 
   @Test
-  public void shouldStartWithProductionConfiguration() {
+  public void shouldNotProvideExample() {
     // when
-    Response engineResponse = when().get(container.getBaseUrl() + "/engine-rest/engine");
-
-    // then
-    engineResponse.then()
-      .statusCode(Status.OK.getStatusCode())
-      .body("size()", is(1))
-      .body("[0].name", is("production"));
-  }
-
-  @Test
-  public void shouldNotProvideSwaggerUIInProductionConfiguration() {
-    // when
-    Response engineResponse = when().get(container.getBaseUrl() + "/swaggerui");
-
-    // then
-    engineResponse.then()
-      .statusCode(Status.NOT_FOUND.getStatusCode());
-  }
-
-  @Test
-  public void shouldNotProvideExampleInProductionConfiguration() {
-    // when
-    Response response = when().get(container.getBaseUrl() + "/engine-rest/engine/production/process-definition");
+    Response response = when().get(container.getBaseUrl() + "/engine-rest/process-definition");
 
     // then
     response.then()

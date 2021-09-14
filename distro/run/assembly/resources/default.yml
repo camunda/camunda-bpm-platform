@@ -11,6 +11,9 @@ camunda.bpm:
     cors:
       enabled: true
       allowed-origins: "*"
+# https://docs.camunda.org/manual/latest/user-guide/camunda-bpm-run/#example-application
+    example:
+      enabled: true
 
 # datasource configuration is required
 spring.datasource:
