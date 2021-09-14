@@ -46,9 +46,10 @@ import com.sun.jna.platform.win32.WinNT;
  */
 public class SpringBootManagedContainer {
 
+  public static final String APPLICATION_YML_PATH = "configuration/default.yml";
+  public static final String RESOURCES_PATH = "configuration/resources";
+
   protected static final String BASE_TEST_APPLICATION_YML = "base-test-application.yml";
-  protected static final String APPLICATION_YML_PATH = "configuration/default.yml";
-  protected static final String RESOURCES_PATH = "configuration/resources";
   protected static final String RUN_HOME_VARIABLE = "camunda.run.home";
 
   protected static final long RAMP_UP_SECONDS = 40;
@@ -275,6 +276,15 @@ public class SpringBootManagedContainer {
       }
     }
     return null;
+  }
+
+  public void replaceConfigurationYml(String filePath, InputStream source) {
+    try {
+      Files.deleteIfExists(Paths.get(baseDirectory, filePath));
+      createConfigurationYml(filePath, source);
+    } catch (IOException e) {
+      log.error("Could not replace " + filePath, e);
+    }
   }
 
   public void createConfigurationYml(String filePath, InputStream source) {

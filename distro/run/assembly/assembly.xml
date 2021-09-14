@@ -27,6 +27,13 @@
       <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
     </dependencySet>
     <dependencySet>
+      <outputDirectory>internal/example/</outputDirectory>
+      <includes>
+        <include>org.camunda.bpm.run:camunda-bpm-run-modules-example-invoice</include>
+      </includes>
+      <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
+    </dependencySet>
+    <dependencySet>
       <outputDirectory />
       <includes>
         <include>org.camunda.bpm:license-book:zip</include>

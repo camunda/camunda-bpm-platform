@@ -23,6 +23,7 @@ fi
 webappsPath=$BASEDIR/internal/webapps/
 restPath=$BASEDIR/internal/rest/
 swaggerPath=$BASEDIR/internal/swaggerui
+examplePath=$BASEDIR/internal/example
 classPath=$BASEDIR/configuration/userlib/,$BASEDIR/configuration/keystore/
 optionalComponentChosen=false
 restChosen=false
@@ -48,6 +49,10 @@ while [ "$1" != "" ]; do
                    classPath=$swaggerPath,$classPath
                    echo Swagger UI enabled
                    ;;
+    --example )    optionalComponentChosen=true
+                   classPath=$examplePath,$classPath
+                   echo Invoice Example included - needs to be enabled in application configuration as well
+                   ;;
     --production ) configuration=$BASEDIR/configuration/production.yml
                    productionChosen=true
                    ;;
@@ -56,7 +61,8 @@ while [ "$1" != "" ]; do
   shift
 done
 
-# if neither REST nor Webapps are chosen, enable both as well as Swagger UI if production mode is not chosen
+# If no optional component is chosen, enable REST and Webapps.
+# If production mode is not chosen, also enable Swagger UI and the example application.
 if [ "$optionalComponentChosen" = "false" ]; then
   restChosen=true
   echo REST API enabled
@@ -64,7 +70,8 @@ if [ "$optionalComponentChosen" = "false" ]; then
   if [ "$productionChosen" = "false" ]; then
     swaggeruiChosen=true
     echo Swagger UI enabled
-    classPath=$swaggerPath,$classPath
+    echo Invoice Example included - needs to be enabled in application configuration as well
+    classPath=$swaggerPath,$examplePath,$classPath
   fi
   classPath=$webappsPath,$restPath,$classPath
 fi

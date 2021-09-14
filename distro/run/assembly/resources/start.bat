@@ -30,6 +30,7 @@ REM set environment parameters
 SET webappsPath=%BASEDIR%internal\webapps
 SET restPath=%BASEDIR%internal\rest
 SET swaggerPath=%BASEDIR%internal\swaggerui
+SET examplePath=%BASEDIR%internal\example
 SET classPath=%BASEDIR%configuration\userlib,%BASEDIR%configuration\keystore
 SET optionalComponentChosen=false
 SET restChosen=false
@@ -62,6 +63,12 @@ IF [%~1]==[--swaggerui] (
   ECHO Swagger UI enabled
 )
 
+IF [%~1]==[--example] (
+  SET optionalComponentChosen=true
+  SET classPath=%examplePath%,%classPath%
+  ECHO Invoice Example included - needs to be enabled in application configuration as well
+)
+
 IF [%~1]==[--production] (
   SET productionChosen=true
   SET configuration=%BASEDIR%configuration\production.yml
@@ -71,7 +78,8 @@ SHIFT
 GOTO Loop
 :Continue
 
-REM if neither REST nor Webapps are chosen, enable both as well as Swagger UI if production mode is not chosen
+REM If no optional component is chosen, enable REST and Webapps.
+REM If production mode is not chosen, also enable Swagger UI and the example application.
 setlocal enabledelayedexpansion
 IF [%optionalComponentChosen%]==[false] (
   SET restChosen=true
@@ -80,7 +88,8 @@ IF [%optionalComponentChosen%]==[false] (
   IF [%productionChosen%]==[false] (
     SET swaggeruiChosen=true
     ECHO Swagger UI enabled
-    SET classPath=%swaggerPath%,%classPath%
+    ECHO Invoice Example included - needs to be enabled in application configuration as well
+    SET classPath=%swaggerPath%,%examplePath%,%classPath%
   )
   SET classPath=%webappsPath%,%restPath%,!classPath!
 )
