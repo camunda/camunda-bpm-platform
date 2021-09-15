@@ -212,7 +212,7 @@ var ProcessInstance = AbstractClientResource.extend(
     /**
      * Sets variables to process instances (batch).
      *
-     * @see https://docs.camunda.org/manual/develop/reference/rest/process-instance/post-set-variables-async/
+     * @see https://docs.camunda.org/manual/latest/reference/rest/process-instance/post-set-variables-async/
      *
      * @param   {Object}            payload
      * @param   {requestCallback}   done
@@ -227,7 +227,7 @@ var ProcessInstance = AbstractClientResource.extend(
     /**
      * Correlates a message against process instances (batch).
      *
-     * @see https://docs.camunda.org/manual/develop/reference/rest/process-instance/post-message-async/
+     * @see https://docs.camunda.org/manual/latest/reference/rest/process-instance/post-message-async/
      *
      * @param   {Object}            payload
      * @param   {requestCallback}   done
