@@ -16,12 +16,16 @@
  */
 package org.camunda.bpm.spring.boot.starter.webapp;
 
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import org.camunda.bpm.admin.impl.web.AdminApplication;
 import org.camunda.bpm.admin.impl.web.bootstrap.AdminContainerBootstrap;
 import org.camunda.bpm.cockpit.impl.web.CockpitApplication;
 import org.camunda.bpm.cockpit.impl.web.bootstrap.CockpitContainerBootstrap;
 import org.camunda.bpm.engine.rest.filter.CacheControlFilter;
 import org.camunda.bpm.engine.rest.filter.EmptyBodyFilter;
+import org.camunda.bpm.engine.rest.mapper.JacksonConfigurator;
 import org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties;
 import org.camunda.bpm.spring.boot.starter.property.WebappProperty;
 import org.camunda.bpm.spring.boot.starter.webapp.filter.LazyProcessEnginesFilter;
@@ -127,6 +131,12 @@ public class CamundaBpmWebappInitializer implements ServletContextInitializer {
         applicationPath + "/api/engine/*");
     registerServlet("Welcome Api", WelcomeApplication.class,
         applicationPath + "/api/welcome/*");
+
+    JacksonConfigurator.setModules(
+        new JavaTimeModule(),
+        new Jdk8Module(),
+        new ParameterNamesModule()
+    );
   }
 
   private FilterRegistration registerFilter(final String filterName, final Class<? extends Filter> filterClass, final String... urlPatterns) {

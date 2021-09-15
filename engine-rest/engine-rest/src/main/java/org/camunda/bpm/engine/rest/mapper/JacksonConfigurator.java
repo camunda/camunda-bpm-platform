@@ -23,6 +23,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 
+import com.fasterxml.jackson.databind.Module;
 import org.camunda.bpm.engine.rest.hal.Hal;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -35,12 +36,14 @@ public class JacksonConfigurator implements ContextResolver<ObjectMapper> {
 
   public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
   public static String dateFormatString = DEFAULT_DATE_FORMAT;
+  public static Module[] modules = new Module[0];
 
   public static ObjectMapper configureObjectMapper(ObjectMapper mapper) {
     SimpleDateFormat dateFormat = new SimpleDateFormat(dateFormatString);
     mapper.setDateFormat(dateFormat);
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+    mapper.registerModules(modules);
 
     return mapper;
   }
@@ -52,6 +55,10 @@ public class JacksonConfigurator implements ContextResolver<ObjectMapper> {
 
   public static void setDateFormatString(String dateFormatString) {
     JacksonConfigurator.dateFormatString = dateFormatString;
+  }
+
+  public static void setModules(Module... modules) {
+    JacksonConfigurator.modules = modules;
   }
 
 }
