@@ -53,14 +53,39 @@ pipeline {
         ])
       }
     }
-    stage('check-sql-scripts') {
-      steps {
-        cambpmConditionalRetry([
-          agentLabel: 'centos-stable',
-          runSteps: {
-            sh '.ci/scripts/check-sql-scripts.sh'
+    stage('Misc') {
+      parallel {
+        stage('check-sql-scripts') {
+          steps {
+            cambpmConditionalRetry([
+              agentLabel: 'centos-stable',
+              runSteps: {
+                sh '.ci/scripts/check-sql-scripts.sh'
+              }
+            ])
           }
-        ])
+        }
+        stage('stage-javadocs') {
+          when {
+            branch cambpmDefaultBranch();
+          }
+          steps {
+            cambpmConditionalRetry([
+              agentLabel : 'centos-stable',
+              runSteps   : {
+                sh 'mkdir -p ./webapps/target/webapp'
+                cambpmRunMaven('.',
+                  'package javadoc:javadoc javadoc:aggregate -Pdistro,distro-wildfly,distro-webjar,javadocs -DskipTests=true -Dskip.frontend.build=true',
+                  withNpm: true,
+                  jdkVersion: 'jdk-11-latest')
+              },
+              postSuccess: {
+                def projectVersion = cambpmUtils.getMavenProjectVersion()
+                cambpmPublishJavadocs("\"target/site/apidocs/\"", projectVersion)
+              }
+            ])
+          }
+        }
       }
     }
     stage('Standalone QA tests') {

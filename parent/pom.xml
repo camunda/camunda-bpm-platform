@@ -255,8 +255,12 @@
           <artifactId>maven-javadoc-plugin</artifactId>
           <configuration>
             <failOnError>false</failOnError>
-            <doclint>none</doclint>
-            <quiet>true</quiet>
+            <additionalJOptions>
+              <additionalJOption>-Xdoclint:none</additionalJOption>
+              <additionalJOption>--ignore-source-errors</additionalJOption>
+            </additionalJOptions>
+            <doctitle>Camunda Platform Javadocs ${project.version}</doctitle>
+            <windowtitle>Camunda Platform Javadocs ${project.version}</windowtitle>
           </configuration>
         </plugin>
       </plugins>
