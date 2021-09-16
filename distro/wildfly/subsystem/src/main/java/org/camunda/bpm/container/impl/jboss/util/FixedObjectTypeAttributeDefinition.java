@@ -102,8 +102,7 @@ public class FixedObjectTypeAttributeDefinition extends ObjectTypeAttributeDefin
     }
 
     public FixedObjectTypeAttributeDefinition build() {
-      if (validator == null) { validator = new ObjectTypeValidator(allowNull, valueTypes); }
-//      attributeMarshaller = new Object
+      if (getValidator() == null) { setValidator(new ObjectTypeValidator(isAllowNull(), valueTypes)); }
       return new FixedObjectTypeAttributeDefinition(this, suffix, valueTypes);
     }
 
@@ -111,15 +110,5 @@ public class FixedObjectTypeAttributeDefinition extends ObjectTypeAttributeDefin
       this.suffix = suffix;
       return this;
     }
-
-    /*
-   --------------------------
-   added for binary compatibility for running compatibilty tests
-    */
-    @Override
-    public Builder setAllowNull(boolean allowNull) {
-      return super.setAllowNull(allowNull);
-    }
   }
-
 }
