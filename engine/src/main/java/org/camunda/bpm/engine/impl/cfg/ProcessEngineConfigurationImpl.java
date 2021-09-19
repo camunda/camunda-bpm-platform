@@ -751,6 +751,20 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected boolean isExecutionTreePrefetchEnabled = true;
 
+  /**
+   * If true, the incident handlers init as {@link CompositeIncidentHandler} and
+   * multiple incident handlers can be added for the same Incident type.
+   * However, only the result from the "main" incident handler will be returned.
+   *
+   * All {@link customIncidentHandlers} will be added as sub handlers to {@link CompositeIncidentHandler} for same handler type.
+   *
+   * By default, main handler is {@link DefaultIncidentHandler}.
+   * To override the main handler you need create {@link CompositeIncidentHandler} with your main IncidentHandler and
+   * init {@link incidentHandlers} before setting up the engine.
+   *
+   * @see CompositeIncidentHandler
+   * @see #initIncidentHandlers
+   */
   protected boolean isCompositeIncidentHandlersEnabled = false;
 
   /**
