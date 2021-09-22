@@ -23,6 +23,7 @@ import org.camunda.bpm.client.impl.EngineClientException;
 import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
+import org.camunda.bpm.engine.variable.VariableMap;
 
 /**
  * @author Tassilo Weidner
@@ -137,6 +138,15 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
       engineClient.extendLock(externalTaskId, newDuration);
     } catch (EngineClientException e) {
       throw LOG.externalTaskServiceException("extending lock", e);
+    }
+  }
+
+  @Override
+  public void sendMessage(ExternalTask externalTask, String message, VariableMap correlationKeys, VariableMap processVariables, Boolean all) {
+    try {
+      engineClient.sendMessage(externalTask, message, correlationKeys, processVariables, all);
+    } catch (EngineClientException e) {
+      throw LOG.externalTaskServiceException("sending message", e);
     }
   }
 }

@@ -21,6 +21,7 @@ import org.camunda.bpm.client.exception.NotAcquiredException;
 import org.camunda.bpm.client.exception.NotFoundException;
 import org.camunda.bpm.client.exception.NotResumedException;
 import org.camunda.bpm.client.exception.ValueMapperException;
+import org.camunda.bpm.engine.variable.VariableMap;
 
 import java.util.Map;
 
@@ -301,5 +302,26 @@ public interface ExternalTaskService {
    * @throws ConnectionLostException if the connection could not be established
    */
   void extendLock(String externalTaskId, long newDuration);
+
+  /**
+   * Send Message
+   *
+   * @param message     which message string that you need to send to engine
+   * @param correlationKeys indicates the master keys for correlation.
+   * @param processVariables provides related variables to the process.
+   * @param all      specifies which params should be send (all or not).
+   *
+   * @throws NotFoundException if the task has been canceled and therefore does not exist anymore
+   * @throws NotAcquiredException if the task's most recent lock could not be acquired
+   * @throws ConnectionLostException if the connection could not be established
+   * @throws ValueMapperException
+   * <ul>
+   *   <li> if an object cannot be serialized
+   *   <li> if no 'objectTypeName' is provided for non-null value
+   *   <li> if value is of type abstract
+   *   <li> if no suitable serializer could be found
+   * </ul>
+   */
+  void sendMessage(ExternalTask externalTask, String message, VariableMap correlationKeys, VariableMap processVariables, Boolean all);
 
 }

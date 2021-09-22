@@ -28,9 +28,11 @@ import org.camunda.bpm.client.task.impl.dto.ExtendLockRequestDto;
 import org.camunda.bpm.client.task.impl.dto.FailureRequestDto;
 import org.camunda.bpm.client.task.impl.dto.LockRequestDto;
 import org.camunda.bpm.client.topic.impl.dto.FetchAndLockRequestDto;
+import org.camunda.bpm.client.task.impl.dto.SendMessageRequestDto;
 import org.camunda.bpm.client.topic.impl.dto.TopicRequestDto;
 import org.camunda.bpm.client.variable.impl.TypedValueField;
 import org.camunda.bpm.client.variable.impl.TypedValues;
+import org.camunda.bpm.engine.variable.VariableMap;
 
 /**
  * @author Tassilo Weidner
@@ -52,7 +54,7 @@ public class EngineClient {
   public static final String EXECUTION_ID_RESOURCE_PATH = EXECUTION_RESOURCE_PATH + "/" + ID_PATH_PARAM;
   public static final String GET_LOCAL_VARIABLE =  EXECUTION_ID_RESOURCE_PATH + "/localVariables/" + NAME_PATH_PARAM;
   public static final String GET_LOCAL_BINARY_VARIABLE =  GET_LOCAL_VARIABLE + "/data";
-
+  public static final String SEND_MESSAGE =  "/message";
   protected String baseUrl;
   protected String workerId;
   protected int maxTasks;
@@ -111,6 +113,12 @@ public class EngineClient {
     FailureRequestDto payload = new FailureRequestDto(workerId, errorMessage, errorDetails, retries, retryTimeout, typedValueDtoMap, localTypedValueDtoMap);
     String resourcePath = FAILURE_RESOURCE_PATH.replace("{id}", taskId);
     String resourceUrl = baseUrl + resourcePath;
+    engineInteraction.postRequest(resourceUrl, payload, Void.class);
+  }
+
+  public void sendMessage(ExternalTask externalTask, String message, VariableMap correlationKeys, VariableMap processVariables, Boolean all) throws EngineClientException {
+    SendMessageRequestDto payload = new SendMessageRequestDto(workerId,externalTask, message, correlationKeys, processVariables, all);
+    String resourceUrl = baseUrl + SEND_MESSAGE;
     engineInteraction.postRequest(resourceUrl, payload, Void.class);
   }
 

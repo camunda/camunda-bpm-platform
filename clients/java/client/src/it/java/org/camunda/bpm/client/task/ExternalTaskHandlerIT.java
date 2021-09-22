@@ -44,7 +44,11 @@ import org.camunda.bpm.client.rule.ClientRule;
 import org.camunda.bpm.client.rule.EngineRule;
 import org.camunda.bpm.client.util.ProcessModels;
 import org.camunda.bpm.client.util.RecordingExternalTaskHandler;
+import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
+import org.camunda.bpm.engine.variable.value.BooleanValue;
+import org.camunda.bpm.engine.variable.value.StringValue;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.BoundaryEvent;
 import org.camunda.bpm.model.bpmn.instance.ErrorEventDefinition;
@@ -272,6 +276,61 @@ public class ExternalTaskHandlerIT {
     assertThat(variables).isEmpty();
   }
 
+  @Test
+  public void shouldSendMessageByExternalTask() {
+    String variableName1 = "aCorrelation";
+    StringValue variableValue1 = Variables.stringValue("aCorrelationValue", true);
+
+    String variableName2 = "aProcessVariables";
+    StringValue variableValue2 = Variables.stringValue("aProcessVariablesValue", true);
+
+    String variableName3 = "anotherProcessVariables";
+    BooleanValue variableValue3 = Variables.booleanValue(true, true);
+
+
+    RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler((task, client) -> {
+      VariableMap correlationKeys = new VariableMapImpl();
+      correlationKeys.putValueTyped(variableName1, variableValue1);
+
+      VariableMap processVariables = new VariableMapImpl();
+      processVariables.putValueTyped(variableName2, variableValue2);
+      processVariables.putValueTyped(variableName3, variableValue3);
+
+      client.sendMessage(task, "aMessage", correlationKeys, processVariables, null);
+    });
+    // when
+    client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
+            .handler(handler)
+            .open();
+
+    // then
+    clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+
+
+    TaskDto task = engineRule.getTaskByProcessInstanceId(processInstance.getId());
+    assertThat(task).isNotNull();
+    assertThat(task.getProcessInstanceId()).isEqualTo(processInstance.getId());
+
+    VariableInstanceDto variable1 = engineRule.getVariableByProcessInstanceId(processInstance.getId(), "aCorrelation");
+    assertThat(variable1).isNotNull();
+
+    assertThat(variable1.getName()).isEqualTo(variableName1);
+    assertThat(variable1.getValue()).isEqualTo(variableValue1);
+
+    VariableInstanceDto variable2 = engineRule.getVariableByProcessInstanceId(processInstance.getId(), "aProcessVariables");
+    assertThat(variable2).isNotNull();
+
+    assertThat(variable2.getName()).isEqualTo(variableName2);
+    assertThat(variable2.getValue()).isEqualTo(variableValue2);
+
+
+    VariableInstanceDto variable3 = engineRule.getVariableByProcessInstanceId(processInstance.getId(), "anotherProcessVariables");
+    assertThat(variable3).isNotNull();
+
+    assertThat(variable3.getName()).isEqualTo(variableName3);
+    assertThat(variable3.getValue()).isEqualTo(variableValue3);
+
+  }
   @Test
   public void shouldCompleteById() {
     // given
