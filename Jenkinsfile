@@ -304,7 +304,9 @@ pipeline {
         }
         stage('webapp-IT-standalone-tomcat-9') {
           when {
-            branch cambpmDefaultBranch();
+            expression {
+              cambpmWithLabels('tomcat', 'webapp-integration')
+            }
           }
           steps {
             cambpmConditionalRetry([
@@ -322,7 +324,7 @@ pipeline {
         stage('webapp-IT-standalone-wildfly') {
           when {
             expression {
-              cambpmWithLabels('wildfly')
+              cambpmWithLabels('wildfly', 'webapp-integration')
             }
           }
           steps {
