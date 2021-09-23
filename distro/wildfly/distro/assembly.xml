@@ -24,6 +24,11 @@
     <dependencySet>
       <outputDirectory />
       <unpack>true</unpack>
+      <unpackOptions>
+        <excludes>
+          <exclude>**/META-INF/**</exclude>
+        </excludes>
+      </unpackOptions>
       <includes>
         <include>org.camunda.bpm.distro:camunda-sql-scripts:jar:*</include>
       </includes>
