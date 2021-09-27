@@ -116,7 +116,14 @@ module.exports = function(config, copyConf) {
       {
         expand: true,
         cwd: 'node_modules/bpmn-font/dist/font',
-        src: ['*.{eot,ttf,svg,woff}'],
+        src: ['*.{eot,svg,ttf,woff,woff2}'],
+        dest: '<%= pkg.gruntConfig.cockpitBuildTarget %>/fonts/'
+      },
+      // dmn fonts
+      {
+        expand: true,
+        cwd: 'node_modules/dmn-font/dist/font',
+        src: ['*.{eot,svg,ttf,woff,woff2}'],
         dest: '<%= pkg.gruntConfig.cockpitBuildTarget %>/fonts/'
       },
       // open sans
@@ -124,14 +131,6 @@ module.exports = function(config, copyConf) {
         expand: true,
         cwd: '<%= pkg.gruntConfig.commonsUiDir %>/vendor/fonts',
         src: ['*.{eot,svg,ttf,woff,woff2,otf}'],
-        dest: '<%= pkg.gruntConfig.cockpitBuildTarget %>/fonts/'
-      },
-      // dmn
-      {
-        expand: true,
-        cwd:
-          'node_modules/dmn-js/dist/assets/dmn-font/font/',
-        src: ['*.{eot,svg,ttf,woff,woff2}'],
         dest: '<%= pkg.gruntConfig.cockpitBuildTarget %>/fonts/'
       }
     ]

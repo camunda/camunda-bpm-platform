@@ -44,6 +44,7 @@
     "camunda-webapp-translations": "git://github.com/camunda/camunda-webapp-translations#master",
     "clipboard": "2.0.6",
     "cmmn-js": "0.20.0",
+    "dmn-font": "0.5.0",
     "dmn-js": "10.0.0",
     "dmn-js-decision-table": "10.0.0",
     "dmn-js-drd": "10.0.0",
