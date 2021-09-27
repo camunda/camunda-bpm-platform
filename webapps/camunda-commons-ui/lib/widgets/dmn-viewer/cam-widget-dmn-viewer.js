@@ -214,13 +214,19 @@ module.exports = [
         viewer.on('import.done', function() {
           viewer.getActiveViewer().on('element.click', function(e) {
             $scope.$apply(function() {
-              $scope.onClick({element: e.element, $event: e.originalEvent});
+              $scope.onClick({
+                element: e.element,
+                $event: e.originalEvent
+              });
             });
           });
 
           viewer.getActiveViewer().on('element.dblclick', function(e) {
             $scope.$apply(function() {
-              $scope.onDblClick({element: e.element, $event: e.originalEvent});
+              $scope.onDblClick({
+                element: e.element,
+                $event: e.originalEvent
+              });
             });
           });
         });
@@ -303,8 +309,9 @@ module.exports = [
             $scope.loaded = false;
 
             viewer.importXML(correctedXML, function(err) {
+              const isTable = () => angular.isDefined($scope.table); // variable can be empty if table name is yet not initialized (e.g., pending request)
               $scope.isDrd =
-                viewer.getDefinitions().drgElement.length > 1 && !$scope.table;
+                viewer.getDefinitions().drgElement.length > 1 && !isTable();
 
               if ($scope.isDrd) {
                 canvas = viewer.getActiveViewer().get('canvas');
