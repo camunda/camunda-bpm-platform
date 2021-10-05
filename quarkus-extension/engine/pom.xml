@@ -6,7 +6,7 @@
   <parent>
     <artifactId>camunda-bpm-quarkus-parent</artifactId>
     <groupId>org.camunda.bpm.quarkus</groupId>
-    <version>7.16.0</version>
+    <version>7.16.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-bpm-quarkus-engine-parent</artifactId>
