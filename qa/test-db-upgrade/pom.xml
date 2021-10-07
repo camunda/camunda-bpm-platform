@@ -17,7 +17,7 @@
 
          See CAM-6338
     -->
-    <camunda.version.old>7.15.0</camunda.version.old>
+    <camunda.version.old>7.16.0</camunda.version.old>
   </properties>
 
   <artifactId>camunda-qa-db-upgrade</artifactId>

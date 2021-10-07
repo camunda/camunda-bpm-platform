@@ -37,7 +37,7 @@
     <version.cockroachdb>42.2.9</version.cockroachdb>
 
     <!-- needed for sql script and backward compatibility checks -->
-    <camunda.version.old>7.15.0</camunda.version.old>
+    <camunda.version.old>7.16.0</camunda.version.old>
 
     <!-- Testcontainers JDBC URL parameters. By default, an empty string -->
     <database.tc.params />
