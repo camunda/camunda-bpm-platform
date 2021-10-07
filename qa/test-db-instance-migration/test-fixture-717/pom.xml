@@ -7,7 +7,7 @@
     <version>7.17.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>camunda-qa-upgrade-test-fixture-716</artifactId>
+  <artifactId>camunda-qa-upgrade-test-fixture-717</artifactId>
   <packaging>jar</packaging>
   <name>camunda BPM - QA - upgrade - instance migration - test fixture - 7.17.0</name>
 
