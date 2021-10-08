@@ -32,6 +32,7 @@ import org.camunda.bpm.engine.repository.Resource;
 import org.camunda.bpm.engine.rest.dto.repository.DeploymentResourceDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.repository.DeploymentResourcesResource;
+import org.camunda.bpm.engine.rest.util.URLEncodingUtil;
 
 /**
  * @author Sebastian Menski
@@ -145,7 +146,7 @@ public class DeploymentResourcesResourceImpl implements DeploymentResourcesResou
 
       return Response
           .ok(resourceAsStream, mediaType)
-          .header("Content-Disposition", "attachment; filename=\"" + filename + "\"")
+          .header("Content-Disposition", URLEncodingUtil.buildAttachmentValue(filename))
           .build();
     }
     else {

@@ -314,7 +314,9 @@ public class HistoricProcessInstanceRestServiceReportTest extends AbstractRestSe
       .expect()
         .statusCode(Status.OK.getStatusCode())
         .contentType("text/csv")
-        .header("Content-Disposition", "attachment; filename=\"process-instance-report.csv\"")
+        .header("Content-Disposition", "attachment; " +
+                "filename=\"process-instance-report.csv\"; " +
+                "filename*=UTF-8''process-instance-report.csv")
       .when()
         .get(HISTORIC_PROCESS_INSTANCE_REPORT_URL);
 
@@ -332,7 +334,9 @@ public class HistoricProcessInstanceRestServiceReportTest extends AbstractRestSe
       .expect()
         .statusCode(Status.OK.getStatusCode())
         .contentType("text/csv")
-        .header("Content-Disposition", "attachment; filename=\"process-instance-report.csv\"")
+        .header("Content-Disposition", "attachment; " +
+                "filename=\"process-instance-report.csv\"; " +
+                "filename*=UTF-8''process-instance-report.csv")
       .when()
         .get(HISTORIC_PROCESS_INSTANCE_REPORT_URL);
 
@@ -419,8 +423,10 @@ public class HistoricProcessInstanceRestServiceReportTest extends AbstractRestSe
         .expect()
           .statusCode(Status.OK.getStatusCode())
           .contentType("text/csv")
-          .header("Content-Disposition", "attachment; filename=\"process-instance-report.csv\"")
-      .when().get(HISTORIC_PROCESS_INSTANCE_REPORT_URL);
+            .header("Content-Disposition", "attachment; " +
+                    "filename=\"process-instance-report.csv\"; " +
+                    "filename*=UTF-8''process-instance-report.csv")
+        .when().get(HISTORIC_PROCESS_INSTANCE_REPORT_URL);
 
     String responseContent = response.asString();
     assertTrue(responseContent.contains(ReportResultToCsvConverter.DURATION_HEADER));
@@ -440,7 +446,9 @@ public class HistoricProcessInstanceRestServiceReportTest extends AbstractRestSe
         .expect()
           .statusCode(Status.OK.getStatusCode())
           .contentType("text/csv")
-          .header("Content-Disposition", "attachment; filename=\"process-instance-report.csv\"")
+            .header("Content-Disposition", "attachment; " +
+                    "filename=\"process-instance-report.csv\"; " +
+                    "filename*=UTF-8''process-instance-report.csv")
       .when().get(HISTORIC_PROCESS_INSTANCE_REPORT_URL);
 
     String responseContent = response.asString();
@@ -461,8 +469,10 @@ public class HistoricProcessInstanceRestServiceReportTest extends AbstractRestSe
         .expect()
           .statusCode(Status.OK.getStatusCode())
           .contentType("application/csv")
-          .header("Content-Disposition", "attachment; filename=\"process-instance-report.csv\"")
-      .when().get(HISTORIC_PROCESS_INSTANCE_REPORT_URL);
+            .header("Content-Disposition", "attachment; " +
+                    "filename=\"process-instance-report.csv\"; " +
+                    "filename*=UTF-8''process-instance-report.csv")
+        .when().get(HISTORIC_PROCESS_INSTANCE_REPORT_URL);
 
     String responseContent = response.asString();
     assertTrue(responseContent.contains(ReportResultToCsvConverter.DURATION_HEADER));
@@ -482,7 +492,9 @@ public class HistoricProcessInstanceRestServiceReportTest extends AbstractRestSe
         .expect()
           .statusCode(Status.OK.getStatusCode())
           .contentType("application/csv")
-          .header("Content-Disposition", "attachment; filename=\"process-instance-report.csv\"")
+            .header("Content-Disposition", "attachment; " +
+                    "filename=\"process-instance-report.csv\"; " +
+                    "filename*=UTF-8''process-instance-report.csv")
       .when().get(HISTORIC_PROCESS_INSTANCE_REPORT_URL);
 
     String responseContent = response.asString();
@@ -511,7 +523,9 @@ public class HistoricProcessInstanceRestServiceReportTest extends AbstractRestSe
       .expect()
         .statusCode(Status.OK.getStatusCode())
         .contentType("text/csv")
-        .header("Content-Disposition", "attachment; filename=\"process-instance-report.csv\"")
+            .header("Content-Disposition", "attachment; " +
+                    "filename=\"process-instance-report.csv\"; " +
+                    "filename*=UTF-8''process-instance-report.csv")
       .when()
         .get(HISTORIC_PROCESS_INSTANCE_REPORT_URL);
 
@@ -532,9 +546,11 @@ public class HistoricProcessInstanceRestServiceReportTest extends AbstractRestSe
       .expect()
         .statusCode(Status.OK.getStatusCode())
         .contentType("text/csv")
-        .header("Content-Disposition", "attachment; filename=\"process-instance-report.csv\"")
-    .when()
-      .get(HISTORIC_PROCESS_INSTANCE_REPORT_URL);
+            .header("Content-Disposition", "attachment; " +
+                    "filename=\"process-instance-report.csv\"; " +
+                    "filename*=UTF-8''process-instance-report.csv")
+      .when()
+        .get(HISTORIC_PROCESS_INSTANCE_REPORT_URL);
 
     verifyStringStartParameterQueryInvocations();
   }

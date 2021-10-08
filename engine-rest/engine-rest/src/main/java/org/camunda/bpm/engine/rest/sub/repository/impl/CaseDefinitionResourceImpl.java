@@ -36,6 +36,7 @@ import org.camunda.bpm.engine.rest.dto.runtime.CreateCaseInstanceDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.repository.CaseDefinitionResource;
+import org.camunda.bpm.engine.rest.util.URLEncodingUtil;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.variable.VariableMap;
 
@@ -173,7 +174,7 @@ public class CaseDefinitionResourceImpl implements CaseDefinitionResource {
       return Response.noContent().build();
     } else {
       String fileName = definition.getDiagramResourceName();
-      return Response.ok(caseDiagram).header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+      return Response.ok(caseDiagram).header("Content-Disposition", URLEncodingUtil.buildAttachmentValue(fileName))
           .type(ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix(fileName)).build();
     }
   }
