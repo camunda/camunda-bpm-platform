@@ -22,7 +22,7 @@ You need this dependency to get started:
 You can configure the Camunda Platform Runtime REST API endpoint and other properties in the `application.yml` file:
 
 ```yaml
-org.camunda.bpm.client:
+camunda.bpm.client:
   base-url: http://localhost:8080/engine-rest
   subscriptions:
     creditScoreChecker:
