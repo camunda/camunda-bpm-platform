@@ -755,9 +755,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    * If true, the incident handlers init as {@link CompositeIncidentHandler} and
    * multiple incident handlers can be added for the same Incident type.
    * However, only the result from the "main" incident handler will be returned.
-   *
+   * <p>
    * All {@link customIncidentHandlers} will be added as sub handlers to {@link CompositeIncidentHandler} for same handler type.
-   *
+   * <p>
    * By default, main handler is {@link DefaultIncidentHandler}.
    * To override the main handler you need create {@link CompositeIncidentHandler} with your main IncidentHandler and
    * init {@link incidentHandlers} before setting up the engine.
@@ -1328,7 +1328,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       incidentHandlers = new HashMap<>();
 
       DefaultIncidentHandler failedJobIncidentHandler = new DefaultIncidentHandler(Incident.FAILED_JOB_HANDLER_TYPE);
-      DefaultIncidentHandler failedExternalTaskIncidentHandler = new DefaultIncidentHandler(Incident.EXTERNAL_TASK_HANDLER_TYPE);
+      DefaultIncidentHandler failedExternalTaskIncidentHandler = new DefaultIncidentHandler(
+          Incident.EXTERNAL_TASK_HANDLER_TYPE);
 
       if (isCompositeIncidentHandlersEnabled) {
         addIncidentHandler(new CompositeIncidentHandler(failedJobIncidentHandler));
