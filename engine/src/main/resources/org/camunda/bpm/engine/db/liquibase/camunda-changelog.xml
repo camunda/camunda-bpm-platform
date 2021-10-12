@@ -17,57 +17,72 @@
     limitations under the License.
 
 -->
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
 
-    <property  name="db.name"  value="cockroachdb"  dbms="cockroachdb"/>
-    <property  name="db.name"  value="db2"  dbms="db2"/>
-    <property  name="db.name"  value="h2"  dbms="h2"/>
-    <property  name="db.name"  value="mariadb"  dbms="mariadb"/>
-    <property  name="db.name"  value="mssql"  dbms="mssql"/>
-    <property  name="db.name"  value="mysql"  dbms="mysql"/>
-    <property  name="db.name"  value="oracle"  dbms="oracle"/>
-    <property  name="db.name"  value="postgres"  dbms="postgresql"/>
+  <property name="db.name" value="cockroachdb" dbms="cockroachdb"/>
+  <property name="db.name" value="db2" dbms="db2"/>
+  <property name="db.name" value="h2" dbms="h2"/>
+  <property name="db.name" value="mariadb" dbms="mariadb"/>
+  <property name="db.name" value="mssql" dbms="mssql"/>
+  <property name="db.name" value="mysql" dbms="mysql"/>
+  <property name="db.name" value="oracle" dbms="oracle"/>
+  <property name="db.name" value="postgres" dbms="postgresql"/>
 
-    <changeSet author="Camunda" id="7.16.0-baseline">
-        <sqlFile path="baseline/liquibase.${db.name}.create.engine.sql"
-                 encoding="UTF-8"
-                 relativeToChangelogFile="true"
-                 splitStatements="true"
-                 stripComments="true"/>
-        <sqlFile path="baseline/liquibase.${db.name}.create.history.sql"
-                 encoding="UTF-8"
-                 relativeToChangelogFile="true"
-                 splitStatements="true"
-                 stripComments="true"/>
-        <sqlFile path="baseline/liquibase.${db.name}.create.identity.sql"
-                 encoding="UTF-8"
-                 relativeToChangelogFile="true"
-                 splitStatements="true"
-                 stripComments="true"/>
-        <sqlFile path="baseline/liquibase.${db.name}.create.case.engine.sql"
-                 encoding="UTF-8"
-                 relativeToChangelogFile="true"
-                 splitStatements="true"
-                 stripComments="true"/>
-        <sqlFile path="baseline/liquibase.${db.name}.create.case.history.sql"
-                 encoding="UTF-8"
-                 relativeToChangelogFile="true"
-                 splitStatements="true"
-                 stripComments="true"/>
-        <sqlFile path="baseline/liquibase.${db.name}.create.decision.engine.sql"
-                 encoding="UTF-8"
-                 relativeToChangelogFile="true"
-                 splitStatements="true"
-                 stripComments="true"/>
-        <sqlFile path="baseline/liquibase.${db.name}.create.decision.history.sql"
-                 encoding="UTF-8"
-                 relativeToChangelogFile="true"
-                 splitStatements="true"
-                 stripComments="true"/>
-    </changeSet>
+  <changeSet author="Camunda" id="7.16.0-baseline">
+    <sqlFile path="baseline/liquibase.${db.name}.create.engine.sql"
+             encoding="UTF-8"
+             relativeToChangelogFile="true"
+             splitStatements="true"
+             stripComments="true"/>
+    <sqlFile path="baseline/liquibase.${db.name}.create.history.sql"
+             encoding="UTF-8"
+             relativeToChangelogFile="true"
+             splitStatements="true"
+             stripComments="true"/>
+    <sqlFile path="baseline/liquibase.${db.name}.create.identity.sql"
+             encoding="UTF-8"
+             relativeToChangelogFile="true"
+             splitStatements="true"
+             stripComments="true"/>
+    <sqlFile path="baseline/liquibase.${db.name}.create.case.engine.sql"
+             encoding="UTF-8"
+             relativeToChangelogFile="true"
+             splitStatements="true"
+             stripComments="true"/>
+    <sqlFile path="baseline/liquibase.${db.name}.create.case.history.sql"
+             encoding="UTF-8"
+             relativeToChangelogFile="true"
+             splitStatements="true"
+             stripComments="true"/>
+    <sqlFile path="baseline/liquibase.${db.name}.create.decision.engine.sql"
+             encoding="UTF-8"
+             relativeToChangelogFile="true"
+             splitStatements="true"
+             stripComments="true"/>
+    <sqlFile path="baseline/liquibase.${db.name}.create.decision.history.sql"
+             encoding="UTF-8"
+             relativeToChangelogFile="true"
+             splitStatements="true"
+             stripComments="true"/>
+  </changeSet>
 
-    <changeSet author="Camunda" id="7.16.0-tag">
-      <tagDatabase tag="7.16.0"/>
-    </changeSet>
+  <changeSet author="Camunda" id="7.16.0-tag">
+    <tagDatabase tag="7.16.0"/>
+  </changeSet>
+
+  <changeSet author="Camunda" id="7.16-to-7.17">
+    <sqlFile path="../upgrade/${db.name}_engine_7.16_to_7.17.sql"
+             encoding="UTF-8"
+             relativeToChangelogFile="true"
+             splitStatements="true"
+             stripComments="true"/>
+  </changeSet>
+
+  <changeSet author="Camunda" id="7.17.0-tag">
+    <tagDatabase tag="7.17.0"/>
+  </changeSet>
 
 </databaseChangeLog>

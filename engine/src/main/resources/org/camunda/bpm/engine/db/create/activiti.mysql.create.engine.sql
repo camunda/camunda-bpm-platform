@@ -69,7 +69,7 @@ create table ACT_GE_SCHEMA_LOG (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
 insert into ACT_GE_SCHEMA_LOG
-values ('0', CURRENT_TIMESTAMP, '7.16.0');
+values ('0', CURRENT_TIMESTAMP, '7.17.0');
 
 create table ACT_RE_DEPLOYMENT (
     ID_ varchar(64),

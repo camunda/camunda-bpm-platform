@@ -13,7 +13,7 @@
 
   <properties>
     <camunda.version.current>${project.version}</camunda.version.current>
-    <camunda.version.previous>7.15.0</camunda.version.previous>
+    <camunda.version.previous>7.16.0</camunda.version.previous>
   </properties>
 
   <dependencies>

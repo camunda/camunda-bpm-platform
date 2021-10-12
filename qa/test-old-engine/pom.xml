@@ -12,7 +12,7 @@
   <name>Camunda Platform - QA - test new schema with old engine</name>
 
   <properties>
-    <camunda.old.engine.version>7.15.0</camunda.old.engine.version>
+    <camunda.old.engine.version>7.16.0</camunda.old.engine.version>
   </properties>
 
   <build>
@@ -122,7 +122,7 @@
             <groupId>org.camunda.bpm</groupId>
             <artifactId>camunda-bom</artifactId>
             <!-- Cannot use variables due to bug in Maven Release Plugin -->
-            <version>7.15.0</version>
+            <version>7.16.0</version>
             <scope>import</scope>
             <type>pom</type>
           </dependency>
@@ -249,6 +249,18 @@
         <dependency>
           <groupId>com.github.tomakehurst</groupId>
           <artifactId>wiremock</artifactId>
+          <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+          <groupId>org.graalvm.js</groupId>
+          <artifactId>js</artifactId>
+          <scope>test</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.graalvm.js</groupId>
+          <artifactId>js-scriptengine</artifactId>
           <scope>test</scope>
         </dependency>
       </dependencies>
