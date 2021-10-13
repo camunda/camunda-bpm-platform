@@ -372,47 +372,4 @@ public class PvmEmbeddedSubProcessTest {
     assertTrue(processInstance.isEnded());
   }
 
-  /**
-   *           +------------------------------+
-   *           | embedded subprocess          |
-   * +-----+   |  +-----------+   +---------+ |   +---+
-   * |start|-->|  |startInside|-->|endInside| |-->|end|
-   * +-----+   |  +-----------+   +---------+ |   +---+
-   *           +------------------------------+
-   */
-  @Test
-  public void testStartInScope() {
-    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
-      .createActivity("start")
-        .initial()
-        .behavior(new Automatic())
-        .transition("embeddedsubprocess")
-      .endActivity()
-      .createActivity("embeddedsubprocess")
-        .scope()
-        .behavior(new EmbeddedSubProcess())
-        .createActivity("startInside")
-          .behavior(new Automatic())
-          .transition("endInside")
-        .endActivity()
-        .createActivity("endInside")
-          .behavior(new End())
-        .endActivity()
-        .transition("end")
-      .endActivity()
-      .createActivity("end")
-        .behavior(new WaitState())
-      .endActivity()
-    .buildProcessDefinition();
-
-    PvmProcessInstance processInstance = ((ProcessDefinitionImpl) processDefinition)
-        .createProcessInstanceForInitial((ActivityImpl) processDefinition.findActivity("startInside"));
-    processInstance.start();
-
-    List<String> expectedActiveActivityIds = new ArrayList<String>();
-    expectedActiveActivityIds.add("end");
-
-    assertEquals(expectedActiveActivityIds, processInstance.findActiveActivityIds());
-  }
-
 }

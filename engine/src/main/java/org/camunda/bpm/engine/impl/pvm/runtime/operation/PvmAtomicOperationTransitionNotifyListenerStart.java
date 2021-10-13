@@ -20,7 +20,7 @@ import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
-import org.camunda.bpm.engine.impl.pvm.runtime.ExecutionStartContext;
+import org.camunda.bpm.engine.impl.pvm.runtime.ScopeInstantiationContext;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 
@@ -51,10 +51,11 @@ public class PvmAtomicOperationTransitionNotifyListenerStart extends PvmAtomicOp
     execution.setTransition(null);
     execution.setActivity(destination);
 
-    ExecutionStartContext executionStartContext = execution.getExecutionStartContext();
-    if (executionStartContext != null) {
-      executionStartContext.executionStarted(execution);
-      execution.disposeExecutionStartContext();
+    if (execution.isProcessInstanceStarting()) {
+      // only call this method if we are currently in the starting phase;
+      // if not, this may make an unnecessary request to fetch the process
+      // instance from the database
+      execution.setProcessInstanceStarting(false);
     }
 
     execution.dispatchDelayedEventsAndPerformOperation(ACTIVITY_EXECUTE);

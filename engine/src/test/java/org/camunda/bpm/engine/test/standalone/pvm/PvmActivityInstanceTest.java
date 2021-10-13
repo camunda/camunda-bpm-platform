@@ -481,60 +481,6 @@ public class PvmActivityInstanceTest {
 
   }
 
-  @Test
-  public void testStartInSubProcess() {
-
-    ActivityInstanceVerification verifier = new ActivityInstanceVerification();
-
-    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
-      .createActivity("start")
-        .initial()
-        .behavior(new Automatic())
-        .executionListener(ExecutionListener.EVENTNAME_START, verifier)
-        .executionListener(ExecutionListener.EVENTNAME_END, verifier)
-        .transition("embeddedsubprocess")
-      .endActivity()
-      .createActivity("embeddedsubprocess")
-        .scope()
-        .behavior(new EmbeddedSubProcess())
-        .executionListener(ExecutionListener.EVENTNAME_START, verifier)
-        .executionListener(ExecutionListener.EVENTNAME_END, verifier)
-        .createActivity("startInside")
-          .behavior(new Automatic())
-          .executionListener(ExecutionListener.EVENTNAME_START, verifier)
-          .executionListener(ExecutionListener.EVENTNAME_END, verifier)
-          .transition("endInside")
-        .endActivity()
-        .createActivity("endInside")
-          .behavior(new End())
-          .executionListener(ExecutionListener.EVENTNAME_START, verifier)
-          .executionListener(ExecutionListener.EVENTNAME_END, verifier)
-        .endActivity()
-        .transition("end")
-      .endActivity()
-      .executionListener(ExecutionListener.EVENTNAME_START, verifier)
-      .executionListener(ExecutionListener.EVENTNAME_END, verifier)
-      .createActivity("end")
-        .behavior(new End())
-        .executionListener(ExecutionListener.EVENTNAME_START, verifier)
-        .executionListener(ExecutionListener.EVENTNAME_END, verifier)
-      .endActivity()
-    .buildProcessDefinition();
-
-    PvmProcessInstance processInstance = ((ProcessDefinitionImpl) processDefinition)
-        .createProcessInstanceForInitial((ActivityImpl) processDefinition.findActivity("endInside"));
-    processInstance.start();
-
-    assertTrue(processInstance.isEnded());
-
-    verifier.assertStartInstanceCount(0, "start");
-    verifier.assertStartInstanceCount(1, "embeddedsubprocess");
-    verifier.assertProcessInstanceParent("embeddedsubprocess", processInstance);
-    verifier.assertStartInstanceCount(0, "startInside");
-    verifier.assertIsCompletingActivityInstance("endInside", 1);
-    verifier.assertStartInstanceCount(1, "end");
-  }
-
 
   /**
    * +-----+   +-----+   +-------+
