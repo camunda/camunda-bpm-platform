@@ -22,6 +22,7 @@ import org.junit.Test;
 import org.junit.rules.RuleChain;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,17 +36,11 @@ public class IncidentMultipleProcessingTest {
 
   private static final StubIncidentHandler JOB_HANDLER = new StubIncidentHandler(Incident.FAILED_JOB_HANDLER_TYPE);
 
-  private static final List<IncidentHandler> HANDLERS = new ArrayList<>();
-
-  static {
-    HANDLERS.add(JOB_HANDLER);
-  }
-
   @ClassRule
   public static ProcessEngineBootstrapRule processEngineBootstrapRule = new ProcessEngineBootstrapRule(
       configuration -> {
         configuration.setCompositeIncidentHandlersEnabled(true);
-        configuration.setCustomIncidentHandlers(HANDLERS);
+        configuration.setCustomIncidentHandlers(Collections.singletonList(JOB_HANDLER));
       });
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule(processEngineBootstrapRule);
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
@@ -58,10 +53,24 @@ public class IncidentMultipleProcessingTest {
 
   @Before
   public void init() {
-    HANDLERS.forEach(h -> ((StubIncidentHandler) h).reset());
+    JOB_HANDLER.reset();
 
     runtimeService = engineRule.getRuntimeService();
     managementService = engineRule.getManagementService();
+  }
+
+  @Test
+  public void jobHandlerShouldBeCompositeHandler() {
+    IncidentHandler incidentHandler = engineRule.getProcessEngineConfiguration().getIncidentHandler(Incident.FAILED_JOB_HANDLER_TYPE);
+    assertNotNull(incidentHandler);
+    assertTrue(incidentHandler instanceof CompositeIncidentHandler);
+  }
+
+  @Test
+  public void externalTaskHandlerShouldBeCompositeHandler() {
+    IncidentHandler incidentHandler = engineRule.getProcessEngineConfiguration().getIncidentHandler(Incident.EXTERNAL_TASK_HANDLER_TYPE);
+    assertNotNull(incidentHandler);
+    assertTrue(incidentHandler instanceof CompositeIncidentHandler);
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/mgmt/IncidentTest.testShouldCreateOneIncident.bpmn" })
@@ -79,10 +88,6 @@ public class IncidentMultipleProcessingTest {
     assertThat(JOB_HANDLER.getCreateEvents()).hasSize(1);
     assertThat(JOB_HANDLER.getResolveEvents()).isEmpty();
     assertThat(JOB_HANDLER.getDeleteEvents()).isEmpty();
-
-    IncidentHandler incidentHandler = engineRule.getProcessEngineConfiguration().getIncidentHandler(Incident.FAILED_JOB_HANDLER_TYPE);
-    assertNotNull(incidentHandler);
-    assertTrue(incidentHandler instanceof CompositeIncidentHandler);
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/mgmt/IncidentTest.testShouldCreateOneIncident.bpmn" })
@@ -110,10 +115,6 @@ public class IncidentMultipleProcessingTest {
     assertThat(JOB_HANDLER.getCreateEvents()).hasSize(1);
     assertThat(JOB_HANDLER.getResolveEvents()).hasSize(1);
     assertThat(JOB_HANDLER.getDeleteEvents()).isEmpty();
-
-    IncidentHandler incidentHandler = engineRule.getProcessEngineConfiguration().getIncidentHandler(Incident.FAILED_JOB_HANDLER_TYPE);
-    assertNotNull(incidentHandler);
-    assertTrue(incidentHandler instanceof CompositeIncidentHandler);
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/mgmt/IncidentTest.testShouldCreateOneIncident.bpmn" })
@@ -142,10 +143,6 @@ public class IncidentMultipleProcessingTest {
     assertThat(JOB_HANDLER.getCreateEvents()).hasSize(1);
     assertThat(JOB_HANDLER.getResolveEvents()).isEmpty();
     assertThat(JOB_HANDLER.getDeleteEvents()).hasSize(1);
-
-    IncidentHandler incidentHandler = engineRule.getProcessEngineConfiguration().getIncidentHandler(Incident.FAILED_JOB_HANDLER_TYPE);
-    assertNotNull(incidentHandler);
-    assertTrue(incidentHandler instanceof CompositeIncidentHandler);
   }
 
   public static class StubIncidentHandler implements IncidentHandler {
