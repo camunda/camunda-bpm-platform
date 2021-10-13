@@ -90,7 +90,16 @@ public abstract class PvmExecutionImpl extends CoreExecution implements
 
   protected transient ProcessDefinitionImpl processDefinition;
 
-  protected transient ExecutionStartContext startContext;
+  protected transient ScopeInstantiationContext scopeInstantiationContext;
+
+  protected transient boolean ignoreAsync = false;
+
+  /**
+   * true for process instances in the initial phase. Currently
+   * this controls that historic variable updates created during this phase receive
+   * the <code>initial</code> flag (see {@link HistoricVariableUpdateEventEntity#isInitial}).
+   */
+  protected transient boolean isStarting = false;
 
   // current position /////////////////////////////////////////////////////////
 
@@ -176,12 +185,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements
    * creates a new execution. properties processDefinition, processInstance and activity will be initialized.
    */
   @Override
-  public PvmExecutionImpl createExecution() {
-    return createExecution(false);
-  }
-
-  @Override
-  public abstract PvmExecutionImpl createExecution(boolean initStartContext);
+  public abstract PvmExecutionImpl createExecution();
 
   // sub process instance
 
@@ -269,7 +273,6 @@ public abstract class PvmExecutionImpl extends CoreExecution implements
   }
 
   protected void start(Map<String, Object> variables, VariableMap formProperties) {
-    startContext = new ProcessInstanceStartContext(getActivity());
 
     initialize();
 
@@ -891,7 +894,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements
     this.skipCustomListeners = skipCustomListeners;
     this.skipIoMapping = skipIoMappings;
 
-    ExecutionStartContext executionStartContext = new ExecutionStartContext();
+    ScopeInstantiationContext executionStartContext = new ScopeInstantiationContext();
 
     InstantiationStack instantiationStack = new InstantiationStack(new LinkedList<>(activityStack));
     executionStartContext.setInstantiationStack(instantiationStack);
@@ -935,7 +938,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements
     this.isEnded = false;
 
     if (!activityStack.isEmpty()) {
-      ExecutionStartContext executionStartContext = new ExecutionStartContext();
+      ScopeInstantiationContext executionStartContext = new ScopeInstantiationContext();
 
       InstantiationStack instantiationStack = new InstantiationStack(activityStack, targetActivity, targetTransition);
       executionStartContext.setInstantiationStack(instantiationStack);
@@ -1842,16 +1845,17 @@ public abstract class PvmExecutionImpl extends CoreExecution implements
     this.isEventScope = isEventScope;
   }
 
-  public ExecutionStartContext getExecutionStartContext() {
-    return startContext;
+  public ScopeInstantiationContext getScopeInstantiationContext() {
+    return scopeInstantiationContext;
   }
 
-  public void disposeProcessInstanceStartContext() {
-    startContext = null;
-  }
+  public void disposeScopeInstantiationContext() {
+    scopeInstantiationContext = null;
 
-  public void disposeExecutionStartContext() {
-    startContext = null;
+    PvmExecutionImpl parent = this;
+    while ((parent = parent.getParent()) != null && parent.scopeInstantiationContext != null) {
+      parent.scopeInstantiationContext = null;
+    }
   }
 
   @Override
@@ -1864,19 +1868,32 @@ public abstract class PvmExecutionImpl extends CoreExecution implements
     return getParent() == null;
   }
 
-  public ProcessInstanceStartContext getProcessInstanceStartContext() {
-    if (startContext != null && startContext instanceof ProcessInstanceStartContext) {
-      return (ProcessInstanceStartContext) startContext;
-    }
-    return null;
+  public void setStartContext(ScopeInstantiationContext startContext) {
+    this.scopeInstantiationContext = startContext;
   }
 
-  public boolean hasProcessInstanceStartContext() {
-    return startContext != null && startContext instanceof ProcessInstanceStartContext;
+  public void setIgnoreAsync(boolean ignoreAsync) {
+    this.ignoreAsync = ignoreAsync;
   }
 
-  public void setStartContext(ExecutionStartContext startContext) {
-    this.startContext = startContext;
+  public boolean isIgnoreAsync() {
+    return ignoreAsync;
+  }
+
+  public void setStarting(boolean isStarting) {
+    this.isStarting = isStarting;
+  }
+
+  public boolean isStarting() {
+    return isStarting;
+  }
+
+  public boolean isProcessInstanceStarting() {
+    return getProcessInstance().isStarting();
+  }
+
+  public void setProcessInstanceStarting(boolean starting) {
+    getProcessInstance().setStarting(starting);
   }
 
   public void setNextActivity(PvmActivity nextActivity) {

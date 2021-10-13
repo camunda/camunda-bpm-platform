@@ -21,23 +21,21 @@ import java.util.Map;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 
 /**
+ * Keeps track of the execution state when a hierarchy of
+ * scopes is instantiated at once (e.g. during process instance modification
+ * or process instance migration).
+ *
+ * State is for example the scopes that need to be instantiated or the
+ * variables that need to be set after the scopes are created.
+ *
  * @author Sebastian Menski
  */
-public class ExecutionStartContext {
+public class ScopeInstantiationContext {
 
 
   protected InstantiationStack instantiationStack;
   protected Map<String, Object> variables;
   protected Map<String, Object> variablesLocal;
-
-
-  public void executionStarted(PvmExecutionImpl execution) {
-    PvmExecutionImpl parent = execution;
-    while (parent != null && parent.getExecutionStartContext() != null) {
-      parent.disposeExecutionStartContext();
-      parent = parent.getParent();
-    }
-  }
 
   public void applyVariables(CoreExecution execution) {
     execution.setVariables(variables);

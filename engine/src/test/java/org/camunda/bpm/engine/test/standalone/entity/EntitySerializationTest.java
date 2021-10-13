@@ -80,7 +80,6 @@ public class EntitySerializationTest {
    transitionImpl.addExecutionListener(new TestExecutionListener());
    execution.setTransition(transitionImpl);
 
-   execution.getProcessInstanceStartContext().setInitial(activityImpl);
    execution.setSuperExecution(new ExecutionEntity());
 
    execution.setActive(true);

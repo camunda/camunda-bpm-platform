@@ -92,6 +92,7 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
 
     PvmExecutionImpl processInstance = newProcessInstance();
 
+    processInstance.setStarting(true);
     processInstance.setProcessDefinition(this);
 
     processInstance.setProcessInstance(processInstance);
