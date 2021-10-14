@@ -27,8 +27,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -168,8 +166,8 @@ public class CompositeIncidentHandlerTest {
 
     Incident result = compositeIncidentHandler.handleIncident(incidentContext, "Incident message");
 
-    assertNotNull(result);
-    assertEquals(incident, result);
+    assertThat(result).isNotNull();
+    assertThat(result).isEqualTo(incident);
 
     verify(mainHandler).handleIncident(eq(incidentContext), eq("Incident message"));
     verify(subHandler, new Times(3)).handleIncident(eq(incidentContext), eq("Incident message"));
