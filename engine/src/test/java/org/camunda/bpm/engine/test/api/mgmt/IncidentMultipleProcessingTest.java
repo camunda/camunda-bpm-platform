@@ -5,8 +5,6 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.incident.CompositeIncidentHandler;
 import org.camunda.bpm.engine.impl.incident.IncidentContext;
 import org.camunda.bpm.engine.impl.incident.IncidentHandler;
-import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -23,7 +21,9 @@ import org.junit.rules.RuleChain;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -86,29 +86,30 @@ public class IncidentMultipleProcessingTest {
     assertThat(JOB_HANDLER.getDeleteEvents()).isEmpty();
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/mgmt/IncidentTest.testShouldCreateOneIncident.bpmn" })
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/IncidentTest.testShouldDeleteIncidentAfterJobWasSuccessfully.bpmn"})
   @Test
-  public void shouldResolveIncidentAfterJobWasSuccessfully() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("failingProcess");
+  public void shouldResolveIncidentAfterJobRetriesRefresh() {
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("fail", true);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("failingProcessWithUserTask", parameters);
 
     testRule.executeAvailableJobs();
 
-    // there exists one incident to failed
+    Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertThat(job).isNotNull();
+
     Incident incident = runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).singleResult();
     assertThat(incident).isNotNull();
 
-    engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired().execute((Command<Void>) commandContext -> {
-      ProcessInstance innerProcessInstance = runtimeService.createProcessInstanceQuery()
-          .processInstanceId(processInstance.getId())
-          .singleResult();
-      assertThat(innerProcessInstance).isInstanceOf(ExecutionEntity.class);
-      ExecutionEntity exec = (ExecutionEntity) innerProcessInstance;
+    runtimeService.setVariable(processInstance.getId(), "fail", Boolean.FALSE);
 
-      exec.resolveIncident(incident.getId());
-      return null;
-    });
+    managementService.setJobRetries(job.getId(), 1);
+
+    incident = runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertThat(incident).isNull();
 
     assertThat(JOB_HANDLER.getCreateEvents()).hasSize(1);
+    // incidents resolved when job retries update
     assertThat(JOB_HANDLER.getResolveEvents()).hasSize(1);
     assertThat(JOB_HANDLER.getDeleteEvents()).isEmpty();
   }
