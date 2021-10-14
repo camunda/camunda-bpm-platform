@@ -21,9 +21,7 @@ import org.junit.rules.RuleChain;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -86,12 +84,10 @@ public class IncidentMultipleProcessingTest {
     assertThat(JOB_HANDLER.getDeleteEvents()).isEmpty();
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/IncidentTest.testShouldDeleteIncidentAfterJobWasSuccessfully.bpmn"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/mgmt/IncidentTest.testShouldCreateOneIncident.bpmn" })
   @Test
   public void shouldResolveIncidentAfterJobRetriesRefresh() {
-    Map<String, Object> parameters = new HashMap<>();
-    parameters.put("fail", true);
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("failingProcessWithUserTask", parameters);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("failingProcess");
 
     testRule.executeAvailableJobs();
 
@@ -100,8 +96,6 @@ public class IncidentMultipleProcessingTest {
 
     Incident incident = runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).singleResult();
     assertThat(incident).isNotNull();
-
-    runtimeService.setVariable(processInstance.getId(), "fail", Boolean.FALSE);
 
     managementService.setJobRetries(job.getId(), 1);
 
