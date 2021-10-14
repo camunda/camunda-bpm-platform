@@ -26,11 +26,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 public class IncidentMultipleProcessingTest {
 
@@ -62,15 +57,17 @@ public class IncidentMultipleProcessingTest {
   @Test
   public void jobHandlerShouldBeCompositeHandler() {
     IncidentHandler incidentHandler = engineRule.getProcessEngineConfiguration().getIncidentHandler(Incident.FAILED_JOB_HANDLER_TYPE);
-    assertNotNull(incidentHandler);
-    assertTrue(incidentHandler instanceof CompositeIncidentHandler);
+
+    assertThat(incidentHandler).isNotNull();
+    assertThat(incidentHandler).isInstanceOf(CompositeIncidentHandler.class);
   }
 
   @Test
   public void externalTaskHandlerShouldBeCompositeHandler() {
     IncidentHandler incidentHandler = engineRule.getProcessEngineConfiguration().getIncidentHandler(Incident.EXTERNAL_TASK_HANDLER_TYPE);
-    assertNotNull(incidentHandler);
-    assertTrue(incidentHandler instanceof CompositeIncidentHandler);
+
+    assertThat(incidentHandler).isNotNull();
+    assertThat(incidentHandler).isInstanceOf(CompositeIncidentHandler.class);
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/mgmt/IncidentTest.testShouldCreateOneIncident.bpmn" })
@@ -82,8 +79,7 @@ public class IncidentMultipleProcessingTest {
 
     List<Incident> incidents = runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).list();
 
-    assertFalse(incidents.isEmpty());
-    assertEquals(1, incidents.size());
+    assertThat(incidents).hasSize(1);
 
     assertThat(JOB_HANDLER.getCreateEvents()).hasSize(1);
     assertThat(JOB_HANDLER.getResolveEvents()).isEmpty();
@@ -99,13 +95,13 @@ public class IncidentMultipleProcessingTest {
 
     // there exists one incident to failed
     Incident incident = runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).singleResult();
-    assertNotNull(incident);
+    assertThat(incident).isNotNull();
 
     engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired().execute((Command<Void>) commandContext -> {
       ProcessInstance innerProcessInstance = runtimeService.createProcessInstanceQuery()
           .processInstanceId(processInstance.getId())
           .singleResult();
-      assertTrue(innerProcessInstance instanceof ExecutionEntity);
+      assertThat(innerProcessInstance).isInstanceOf(ExecutionEntity.class);
       ExecutionEntity exec = (ExecutionEntity) innerProcessInstance;
 
       exec.resolveIncident(incident.getId());
@@ -127,18 +123,18 @@ public class IncidentMultipleProcessingTest {
 
     // get the job
     Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
-    assertNotNull(job);
+    assertThat(job).isNotNull();
 
     // there exists one incident to failed
     Incident incident = runtimeService.createIncidentQuery().processInstanceId(processInstance.getId()).singleResult();
-    assertNotNull(incident);
+    assertThat(incident).isNotNull();
 
     // delete the job
     managementService.deleteJob(job.getId());
 
     // the incident has been deleted too.
     incident = runtimeService.createIncidentQuery().incidentId(incident.getId()).singleResult();
-    assertNull(incident);
+    assertThat(incident).isNull();
 
     assertThat(JOB_HANDLER.getCreateEvents()).hasSize(1);
     assertThat(JOB_HANDLER.getResolveEvents()).isEmpty();
