@@ -210,6 +210,7 @@ import org.camunda.bpm.engine.impl.identity.DefaultPasswordPolicyImpl;
 import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
 import org.camunda.bpm.engine.impl.identity.WritableIdentityProvider;
 import org.camunda.bpm.engine.impl.identity.db.DbIdentityServiceProvider;
+import org.camunda.bpm.engine.impl.incident.CompositeIncidentHandler;
 import org.camunda.bpm.engine.impl.incident.DefaultIncidentHandler;
 import org.camunda.bpm.engine.impl.incident.IncidentHandler;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextFactory;
@@ -760,6 +761,22 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected PermissionProvider permissionProvider;
 
   protected boolean isExecutionTreePrefetchEnabled = true;
+
+  /**
+   * If true, the incident handlers init as {@link CompositeIncidentHandler} and
+   * multiple incident handlers can be added for the same Incident type.
+   * However, only the result from the "main" incident handler will be returned.
+   * <p>
+   * All {@link customIncidentHandlers} will be added as sub handlers to {@link CompositeIncidentHandler} for same handler type.
+   * <p>
+   * By default, main handler is {@link DefaultIncidentHandler}.
+   * To override the main handler you need create {@link CompositeIncidentHandler} with your main IncidentHandler and
+   * init {@link incidentHandlers} before setting up the engine.
+   *
+   * @see CompositeIncidentHandler
+   * @see #initIncidentHandlers
+   */
+  protected boolean isCompositeIncidentHandlersEnabled = false;
 
   /**
    * If true the process engine will attempt to acquire an exclusive lock before
@@ -1325,14 +1342,21 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       incidentHandlers = new HashMap<>();
 
       DefaultIncidentHandler failedJobIncidentHandler = new DefaultIncidentHandler(Incident.FAILED_JOB_HANDLER_TYPE);
-      incidentHandlers.put(failedJobIncidentHandler.getIncidentHandlerType(), failedJobIncidentHandler);
+      DefaultIncidentHandler failedExternalTaskIncidentHandler = new DefaultIncidentHandler(
+          Incident.EXTERNAL_TASK_HANDLER_TYPE);
 
-      DefaultIncidentHandler failedExternalTaskIncidentHandler = new DefaultIncidentHandler(Incident.EXTERNAL_TASK_HANDLER_TYPE);
-      incidentHandlers.put(failedExternalTaskIncidentHandler.getIncidentHandlerType(), failedExternalTaskIncidentHandler);
+      if (isCompositeIncidentHandlersEnabled) {
+        addIncidentHandler(new CompositeIncidentHandler(failedJobIncidentHandler));
+        addIncidentHandler(new CompositeIncidentHandler(failedExternalTaskIncidentHandler));
+      } else {
+        addIncidentHandler(failedJobIncidentHandler);
+        addIncidentHandler(failedExternalTaskIncidentHandler);
+      }
+
     }
     if (customIncidentHandlers != null) {
       for (IncidentHandler incidentHandler : customIncidentHandlers) {
-        incidentHandlers.put(incidentHandler.getIncidentHandlerType(), incidentHandler);
+        addIncidentHandler(incidentHandler);
       }
     }
   }
@@ -3791,6 +3815,16 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return incidentHandlers.get(incidentType);
   }
 
+  public void addIncidentHandler(IncidentHandler incidentHandler) {
+    IncidentHandler existsHandler = incidentHandlers.get(incidentHandler.getIncidentHandlerType());
+
+    if (existsHandler instanceof CompositeIncidentHandler) {
+      ((CompositeIncidentHandler) existsHandler).add(incidentHandler);
+    } else {
+      incidentHandlers.put(incidentHandler.getIncidentHandlerType(), incidentHandler);
+    }
+  }
+
   public Map<String, IncidentHandler> getIncidentHandlers() {
     return incidentHandlers;
   }
@@ -4111,6 +4145,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfigurationImpl setStandaloneTasksEnabled(boolean standaloneTasksEnabled) {
     this.standaloneTasksEnabled = standaloneTasksEnabled;
+    return this;
+  }
+
+  public boolean isCompositeIncidentHandlersEnabled() {
+    return isCompositeIncidentHandlersEnabled;
+  }
+
+  public ProcessEngineConfigurationImpl setCompositeIncidentHandlersEnabled(boolean compositeIncidentHandlersEnabled) {
+    this.isCompositeIncidentHandlersEnabled = compositeIncidentHandlersEnabled;
     return this;
   }
 
