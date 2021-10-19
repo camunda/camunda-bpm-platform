@@ -978,8 +978,8 @@
           parameterType="java.util.Map">
     update ${prefix}ACT_GE_BYTEARRAY BA
       INNER JOIN ${prefix}ACT_HI_JOB_LOG JL
-    ON BA.ID_ = JL.JOB_EXCEPTION_STACK_ID_
-      AND JL.JOB_DEF_CONFIGURATION_ = #{batchId, jdbcType=VARCHAR}
+        ON BA.ID_ = JL.JOB_EXCEPTION_STACK_ID_
+        AND JL.JOB_DEF_CONFIGURATION_ = #{batchId, jdbcType=VARCHAR}
       SET BA.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
   </update>
 </mapper>
