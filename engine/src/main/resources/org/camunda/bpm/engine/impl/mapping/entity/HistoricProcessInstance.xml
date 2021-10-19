@@ -296,6 +296,43 @@
         </if>
         SELF.PROC_DEF_KEY_, '*'))
     </if>
+    
+    <include refid="selectHistoricProcessInstancesByQueryCriteriaSql_2" />
+  </sql>
+
+  <sql id="selectHistoricProcessInstancesByQueryCriteriaSql_mysql">
+
+    from (
+
+    SELECT SELF.*, DEF.NAME_, DEF.VERSION_, DEF.DEPLOYMENT_ID_
+    FROM ${prefix}ACT_HI_PROCINST SELF
+
+    LEFT JOIN ${prefix}ACT_RE_PROCDEF DEF
+    ON SELF.PROC_DEF_ID_ = DEF.ID_
+
+
+    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+        <!--
+          HEADS-UP!!!
+          If you change something here, you should probably also change it the EE Webapp
+          See camunda-bpm-platform-ee/webapps/camunda-webapp/plugins/src/main/resources/org/camunda/bpm/cockpit/impl/plugin/history/historicProcessInstance.xml
+        -->
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause"/>
+
+        AUTH ON (
+        AUTH.RESOURCE_ID_ = SELF.PROC_DEF_KEY_
+        OR
+        <if test="authCheck.isHistoricInstancePermissionsEnabled">
+            AUTH.RESOURCE_ID_ = SELF.ID_
+            OR
+        </if>
+        AUTH.RESOURCE_ID_ = '*')
+    </if>
+    
+    <include refid="selectHistoricProcessInstancesByQueryCriteriaSql_2" />
+  </sql>
+
+  <sql id="selectHistoricProcessInstancesByQueryCriteriaSql_2">
 
     <bind name="INC_JOIN" value="false" />
     <bind name="HAI_JOIN" value="false" />

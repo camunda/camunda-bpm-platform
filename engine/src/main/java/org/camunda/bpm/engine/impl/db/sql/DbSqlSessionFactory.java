@@ -243,6 +243,10 @@ public class DbSqlSessionFactory implements SessionFactory {
       // related to CAM-12070
       addDatabaseSpecificStatement(mysqlLikeDatabase, "updateByteArraysByBatchId", "updateByteArraysByBatchId_mysql");
 
+      // related to SUPPORT-11943
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "selectHistoricProcessInstancesSql", "selectHistoricProcessInstancesSql_mysql");
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "selectHistoricProcessInstancesByQueryCriteriaSql", "selectHistoricProcessInstancesByQueryCriteriaSql_mysql");
+
       constants = new HashMap<>();
       constants.put("constant.event", "'event'");
       constants.put("constant.op_message", "CONCAT(NEW_VALUE_, '_|_', PROPERTY_)");
