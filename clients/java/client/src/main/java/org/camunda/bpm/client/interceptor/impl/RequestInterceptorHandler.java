@@ -24,6 +24,7 @@ import org.apache.http.protocol.HttpContext;
 import org.camunda.bpm.client.impl.EngineClientLogger;
 import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
 import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
+import org.camunda.bpm.client.listener.ExternalTaskClientListener;
 
 import java.io.IOException;
 import java.util.List;
@@ -38,6 +39,8 @@ public class RequestInterceptorHandler implements HttpRequestInterceptor {
 
   protected List<ClientRequestInterceptor> interceptors;
 
+  protected ExternalTaskClientListener externalTaskClientListener;
+
   public RequestInterceptorHandler(List<ClientRequestInterceptor> interceptors) {
     this.interceptors = interceptors;
   }
@@ -51,6 +54,7 @@ public class RequestInterceptorHandler implements HttpRequestInterceptor {
       }
       catch (Throwable e) {
         LOG.requestInterceptorException(e);
+        externalTaskClientListener.requestInterceptorException(e);
       }
     });
 

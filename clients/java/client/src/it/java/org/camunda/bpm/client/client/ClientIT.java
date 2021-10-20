@@ -21,12 +21,16 @@ import org.camunda.bpm.client.ExternalTaskClientBuilder;
 import org.camunda.bpm.client.backoff.BackoffStrategy;
 import org.camunda.bpm.client.dto.ProcessDefinitionDto;
 import org.camunda.bpm.client.exception.ExternalTaskClientException;
+import org.camunda.bpm.client.impl.EngineClientException;
+import org.camunda.bpm.client.listener.DefaultExternalTaskClientListener;
 import org.camunda.bpm.client.rule.ClientRule;
 import org.camunda.bpm.client.rule.EngineRule;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.topic.TopicSubscription;
+import org.camunda.bpm.client.topic.impl.dto.TopicRequestDto;
 import org.camunda.bpm.client.util.PropertyUtil;
 import org.camunda.bpm.client.util.RecordingExternalTaskHandler;
+import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -39,12 +43,7 @@ import org.junit.rules.RuleChain;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -250,6 +249,64 @@ public class ClientIT {
         client.stop();
       }
     }
+  }
+
+
+  @Test
+  public void shouldUseExternalTaskClientListener() {
+    // given
+    engineRule.startProcessInstance(processDefinition.getId());
+
+    ClientRule clientRule = new ClientRule(() -> ExternalTaskClient.create()
+            .externalTaskClientListener(new DefaultExternalTaskClientListener() {
+
+              @Override
+              public void onFetchAndLock(List<TopicRequestDto> topics) {
+                System.out.println("state: onFetchAndLock");
+              }
+
+              @Override
+              public void fetchAndLockDone(List<TopicRequestDto> topics, List<ExternalTask> externalTasks) {
+                System.out.println("state: fetchAndLockDone");
+              }
+
+              @Override
+              public void fetchAndLockFail(List<TopicRequestDto> topics, EngineClientException e) {
+                System.out.println("state: fetchAndLockFail");
+              }
+
+              @Override
+              public void onSetVariable(String processInstanceId, Map<String, Object> variables) {
+                System.out.println("state: onSetVariable");
+              }
+
+              @Override
+              public void setVariableDone(String processInstanceId, Map<String, Object> variables) {
+                System.out.println("state: setVariableDone");
+              }
+
+              @Override
+              public void setVariableFail(String processInstanceId, Map<String, Object> variables, EngineClientException e) {
+                System.out.println("state: setvariableFail");
+              }
+
+            })
+            .baseUrl(BASE_URL));
+
+    try {
+      clientRule.before();
+
+      // when
+      clientRule.client().subscribe(EXTERNAL_TASK_TOPIC_FOO)
+              .handler(handler)
+              .open();
+
+      // then
+      clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+    } finally {
+      clientRule.after();
+    }
+
   }
 
   @Test

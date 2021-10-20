@@ -32,6 +32,7 @@ import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.impl.EngineClient;
 import org.camunda.bpm.client.impl.EngineClientException;
 import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
+import org.camunda.bpm.client.listener.ExternalTaskClientListener;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskHandler;
 import org.camunda.bpm.client.task.impl.ExternalTaskImpl;
@@ -70,6 +71,8 @@ public class TopicSubscriptionManager implements Runnable {
 
   protected long clientLockDuration;
 
+  protected ExternalTaskClientListener externalTaskClientListener;
+
   public TopicSubscriptionManager(EngineClient engineClient, TypedValues typedValues, long clientLockDuration) {
     this.engineClient = engineClient;
     this.subscriptions = new CopyOnWriteArrayList<>();
@@ -88,6 +91,7 @@ public class TopicSubscriptionManager implements Runnable {
       }
       catch (Throwable e) {
         LOG.exceptionWhileAcquiringTasks(e);
+        externalTaskClientListener.exceptionWhileAcquiringTasks(e);
       }
     }
   }
@@ -109,6 +113,7 @@ public class TopicSubscriptionManager implements Runnable {
         }
         else {
           LOG.taskHandlerIsNull(topicName);
+          externalTaskClientListener.taskHandlerIsNull(topicName);
         }
       });
 
@@ -132,8 +137,11 @@ public class TopicSubscriptionManager implements Runnable {
 
     try {
       LOG.fetchAndLock(subscriptions);
+      externalTaskClientListener.onFetchAndLock(subscriptions);
       externalTasks = engineClient.fetchAndLock(subscriptions);
+      externalTaskClientListener.fetchAndLockDone(subscriptions, externalTasks);
     } catch (EngineClientException e) {
+      externalTaskClientListener.fetchAndLockFail(subscriptions, e);
       LOG.exceptionWhilePerformingFetchAndLock(e);
     }
 
@@ -152,8 +160,10 @@ public class TopicSubscriptionManager implements Runnable {
       taskHandler.execute(task, externalTaskService);
     } catch (ExternalTaskClientException e) {
       LOG.exceptionOnExternalTaskServiceMethodInvocation(task.getTopicName(), e);
+      externalTaskClientListener.exceptionOnExternalTaskServiceMethodInvocation(task.getTopicName(), e);
     } catch (Throwable e) {
       LOG.exceptionWhileExecutingExternalTaskHandler(task.getTopicName(), e);
+      externalTaskClientListener.exceptionWhileExecutingExternalTaskHandler(task.getTopicName(), e);
     }
   }
 
@@ -166,6 +176,7 @@ public class TopicSubscriptionManager implements Runnable {
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt();
         LOG.exceptionWhileShuttingDown(e);
+        externalTaskClientListener.exceptionWhileShuttingDown(e);
       }
     }
   }

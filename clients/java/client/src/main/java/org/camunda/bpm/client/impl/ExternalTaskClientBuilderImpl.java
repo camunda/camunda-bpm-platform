@@ -32,6 +32,7 @@ import org.camunda.bpm.client.backoff.BackoffStrategy;
 import org.camunda.bpm.client.backoff.ExponentialBackoffStrategy;
 import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
 import org.camunda.bpm.client.interceptor.impl.RequestInterceptorHandler;
+import org.camunda.bpm.client.listener.ExternalTaskClientListener;
 import org.camunda.bpm.client.spi.DataFormat;
 import org.camunda.bpm.client.spi.DataFormatConfigurator;
 import org.camunda.bpm.client.spi.DataFormatProvider;
@@ -141,6 +142,12 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
 
   public ExternalTaskClientBuilder backoffStrategy(BackoffStrategy backoffStrategy) {
     this.backoffStrategy = backoffStrategy;
+    return this;
+  }
+
+  @Override
+  public ExternalTaskClientBuilder externalTaskClientListener(ExternalTaskClientListener externalTaskClientListener) {
+
     return this;
   }
 
