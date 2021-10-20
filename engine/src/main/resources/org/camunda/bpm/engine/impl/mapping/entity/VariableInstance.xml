@@ -976,13 +976,10 @@
 <!--  MySQL specific configuration -->
   <update id="updateByteArraysByBatchId_mysql"
           parameterType="java.util.Map">
-    update ${prefix}ACT_GE_BYTEARRAY
-      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
-      where ID_ IN (
-        SELECT JOB_EXCEPTION_STACK_ID_
-        FROM ${prefix}ACT_HI_JOB_LOG
-        WHERE JOB_DEF_CONFIGURATION_ = #{batchId, jdbcType=VARCHAR}
-          AND JOB_EXCEPTION_STACK_ID_ IS NOT NULL
-      )
+    update ${prefix}ACT_GE_BYTEARRAY BA
+      INNER JOIN ${prefix}ACT_HI_JOB_LOG JL
+        ON BA.ID_ = JL.JOB_EXCEPTION_STACK_ID_
+        AND JL.JOB_DEF_CONFIGURATION_ = #{batchId, jdbcType=VARCHAR}
+      SET BA.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
   </update>
 </mapper>
