@@ -59,7 +59,9 @@ public class SpringBootProcessEngineLogger extends BaseLogger {
     // therefore consume the input stream make the deployment fail since the input stream has
     // already been consumed.
     Set<String> resourceDescriptions = resources.stream()
+        .filter(Objects::nonNull)
         .map(Resource::getDescription)
+        .filter(Objects::nonNull)
         .collect(Collectors.toSet());
 
     logInfo("021", "Auto-Deploying resources: {}", resourceDescriptions);
