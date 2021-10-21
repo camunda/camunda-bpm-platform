@@ -22,6 +22,7 @@ import org.camunda.commons.logging.BaseLogger;
 import org.springframework.core.io.Resource;
 
 import java.net.URL;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
