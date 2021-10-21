@@ -53,4 +53,9 @@ public class DefaultCallableElementTenantIdProvider implements ParameterValuePro
     return caseDefinition.getTenantId();
   }
 
+  @Override
+  public boolean isDynamic() {
+    return false;
+  }
+
 }
