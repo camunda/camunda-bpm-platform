@@ -31,4 +31,23 @@ public interface ParameterValueProvider {
    */
   Object getValue(VariableScope variableScope);
 
+  /**
+  * @return true if the value provider:
+  *
+  * <ul>
+  *   <li>Can return a different value depending on the passed variable scope
+  *   <li>May uses external data for its resolution
+  *   <li>May have side effects
+  * </ul>
+  *
+  * If true, a caller of {@link #getValue(VariableScope)} can assume that:
+  *
+  * <ul>
+  *   <li>passing an empty variable scope returns the same value as passing any other variable scope
+  *   <li>Calling {@link #getValue(VariableScope)} multiple times always returns the same value
+  *   <li>Calling {@link #getValue(VariableScope)} does not have side effects
+  * </ul>
+  */
+  boolean isDynamic();
+
 }

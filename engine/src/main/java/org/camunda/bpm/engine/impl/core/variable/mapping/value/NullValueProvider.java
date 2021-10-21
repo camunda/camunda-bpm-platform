@@ -28,4 +28,8 @@ public class NullValueProvider implements ParameterValueProvider {
     return null;
   }
 
+  @Override
+  public boolean isDynamic() {
+    return false;
+  }
 }
