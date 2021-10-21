@@ -267,8 +267,7 @@ function getSearchValue(search) {
   return sanitizeValue(
     search.value.key,
     search.value.value,
-    search.operator.value.key,
-    search
+    search.operator.value.key
   );
 }
 
