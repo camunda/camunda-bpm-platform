@@ -222,7 +222,7 @@ CamundaForm.prototype.renderForm = function(formHtmlSource) {
   // extract and validate form element
   var formElement = (this.formElement = $('form', this.containerElement));
   if (formElement.length !== 1) {
-    throw new Error('Form must provide exaclty one element <form ..>');
+    throw new Error('Form must provide exactly one element <form ..>');
   }
   if (!formElement.attr('name')) {
     formElement.attr('name', '$$camForm');
