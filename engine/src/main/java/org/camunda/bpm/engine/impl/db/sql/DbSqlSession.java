@@ -832,10 +832,18 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
 
                   if (sqlStatement.startsWith("if exists")) {
                     String[] parts = databaseTablePrefix.split("[.]");
-                    sqlStatement = sqlStatement.replaceAll(
-                            " (INFORMATION_SCHEMA\\.TABLES where) (TABLE_NAME = ')",
-                            String.format(" $1 TABLE_SCHEMA = '%s' and $2%s", parts[0], parts.length == 1 ? "" : parts[1])
-                    );
+                    if (parts.length == 2) {
+                      sqlStatement = sqlStatement.replaceAll(
+                              " (INFORMATION_SCHEMA\\.TABLES where) (TABLE_NAME = ')",
+                              String.format(" $1 TABLE_SCHEMA = '%s' and $2%s", parts[0], parts.length == 1 ? "" : parts[1])
+                      );
+                    }
+                    else {
+                      sqlStatement = sqlStatement.replaceAll(
+                        "(where TABLE_NAME = ')",
+                        String.format("$1%s", databaseTablePrefix)
+                      );
+                    }
                   }
                 }
                 sqlStatement = sqlStatement.replaceAll(
