@@ -22,7 +22,7 @@ import org.camunda.bpm.client.backoff.BackoffStrategy;
 import org.camunda.bpm.client.dto.ProcessDefinitionDto;
 import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.impl.EngineClientException;
-import org.camunda.bpm.client.listener.DefaultExternalTaskClientListener;
+import org.camunda.bpm.client.listener.DefaultClientInteractionListener;
 import org.camunda.bpm.client.rule.ClientRule;
 import org.camunda.bpm.client.rule.EngineRule;
 import org.camunda.bpm.client.task.ExternalTask;
@@ -30,11 +30,11 @@ import org.camunda.bpm.client.topic.TopicSubscription;
 import org.camunda.bpm.client.topic.impl.dto.TopicRequestDto;
 import org.camunda.bpm.client.util.PropertyUtil;
 import org.camunda.bpm.client.util.RecordingExternalTaskHandler;
-import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -50,7 +50,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.client.util.ProcessModels.BPMN_ERROR_EXTERNAL_TASK_PROCESS;
 import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_PRIORITY;
 import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_TOPIC_FOO;
-import static org.camunda.bpm.client.util.ProcessModels.TWO_EXTERNAL_TASK_PROCESS;
 import static org.camunda.bpm.client.util.ProcessModels.TWO_PRIORITISED_EXTERNAL_TASKS_PROCESS;
 import static org.camunda.bpm.client.util.PropertyUtil.DEFAULT_PROPERTIES_PATH;
 import static org.camunda.bpm.client.util.PropertyUtil.loadProperties;
@@ -254,59 +253,87 @@ public class ClientIT {
 
   @Test
   public void shouldUseExternalTaskClientListener() {
+
+    ExternalTaskClient client = null;
+    List<String> states = new LinkedList<>();
+
+    try {
     // given
     engineRule.startProcessInstance(processDefinition.getId());
 
-    ClientRule clientRule = new ClientRule(() -> ExternalTaskClient.create()
-            .externalTaskClientListener(new DefaultExternalTaskClientListener() {
+    ExternalTaskClientBuilder clientBuilder = ExternalTaskClient.create()
+            .externalTaskClientListener(new DefaultClientInteractionListener() {
 
               @Override
               public void onFetchAndLock(List<TopicRequestDto> topics) {
                 System.out.println("state: onFetchAndLock");
+                states.add("onFetchAndLock");
               }
 
               @Override
               public void fetchAndLockDone(List<TopicRequestDto> topics, List<ExternalTask> externalTasks) {
                 System.out.println("state: fetchAndLockDone");
+                states.add("fetchAndLockDone");
               }
 
               @Override
               public void fetchAndLockFail(List<TopicRequestDto> topics, EngineClientException e) {
                 System.out.println("state: fetchAndLockFail");
+                states.add("fetchAndLockFail");
               }
 
               @Override
               public void onSetVariable(String processInstanceId, Map<String, Object> variables) {
                 System.out.println("state: onSetVariable");
+                states.add("onSetVariable");
               }
 
               @Override
               public void setVariableDone(String processInstanceId, Map<String, Object> variables) {
                 System.out.println("state: setVariableDone");
+                states.add("setVariableDone");
               }
 
               @Override
               public void setVariableFail(String processInstanceId, Map<String, Object> variables, EngineClientException e) {
                 System.out.println("state: setvariableFail");
+                states.add("setvariableFail");
               }
 
             })
-            .baseUrl(BASE_URL));
-
-    try {
-      clientRule.before();
+            .baseUrl(BASE_URL);
+      // then
+      thrown.expect(ExternalTaskClientException.class);
 
       // when
-      clientRule.client().subscribe(EXTERNAL_TASK_TOPIC_FOO)
+      client = clientBuilder.build();
+      client.subscribe(EXTERNAL_TASK_TOPIC_FOO)
               .handler(handler)
               .open();
 
-      // then
-      clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
-    } finally {
-      clientRule.after();
-    }
+      Object[] assertStates = {
+              "onFetchAndLock", "fetchAndLockDone",
+              "onSetVariable", "setVariableDone"
+      };
 
+      while (states.size() < assertStates.length)
+        try {
+          Thread.sleep(10);
+        } catch (InterruptedException ignored) {
+        }
+
+      List<String> firstStates = new ArrayList<>(assertStates.length);
+
+      for (int i = 0; i < assertStates.length; i++) firstStates.add(states.get(i));
+
+      Assert.assertArrayEquals(firstStates.toArray(), assertStates);
+
+    }
+    finally {
+      if (client != null) {
+        client.stop();
+      }
+    }
   }
 
   @Test

@@ -21,7 +21,7 @@ import java.util.Map;
 import org.camunda.bpm.client.impl.EngineClient;
 import org.camunda.bpm.client.impl.EngineClientException;
 import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
-import org.camunda.bpm.client.listener.ExternalTaskClientListener;
+import org.camunda.bpm.client.listener.ClientInteractionListener;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 
@@ -34,10 +34,11 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
 
   protected EngineClient engineClient;
 
-  protected ExternalTaskClientListener externalTaskClientListener;
+  protected ClientInteractionListener clientInteractionListener;
 
-  public ExternalTaskServiceImpl(EngineClient engineClient) {
+  public ExternalTaskServiceImpl(EngineClient engineClient,ClientInteractionListener clientInteractionListener) {
     this.engineClient = engineClient;
+    this.clientInteractionListener = clientInteractionListener;
   }
 
   @Override
@@ -57,11 +58,11 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
   @Override
   public void unlock(ExternalTask externalTask) {
     try {
-      externalTaskClientListener.onUnlock(externalTask.getId());
+      clientInteractionListener.onUnlock(externalTask.getId());
       engineClient.unlock(externalTask.getId());
-      externalTaskClientListener.unlockDone(externalTask.getId());
+      clientInteractionListener.unlockDone(externalTask.getId());
     } catch (EngineClientException e) {
-      externalTaskClientListener.unlockFail(externalTask.getId(), e);
+      clientInteractionListener.unlockFail(externalTask.getId(), e);
       throw LOG.externalTaskServiceException("unlocking the external task", e);
     }
   }
@@ -74,11 +75,11 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
   @Override
   public void setVariables(String processInstanceId, Map<String, Object> variables) {
     try {
-      externalTaskClientListener.onSetVariable(processInstanceId, variables);
+      clientInteractionListener.onSetVariable(processInstanceId, variables);
       engineClient.setVariables(processInstanceId, variables);
-      externalTaskClientListener.setVariableDone(processInstanceId, variables);
+      clientInteractionListener.setVariableDone(processInstanceId, variables);
     } catch (EngineClientException e) {
-      externalTaskClientListener.setVariableFail(processInstanceId, variables, e);
+      clientInteractionListener.setVariableFail(processInstanceId, variables, e);
       throw LOG.externalTaskServiceException("setting variables for external task", e);
     }
   }
@@ -87,11 +88,11 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
   public void setVariables(ExternalTask externalTask, Map<String, Object> variables) {
     String processId = externalTask.getProcessInstanceId();
     try {
-      externalTaskClientListener.onSetVariable(processId, variables);
+      clientInteractionListener.onSetVariable(processId, variables);
       engineClient.setVariables(processId, variables);
-      externalTaskClientListener.setVariableDone(processId, variables);
+      clientInteractionListener.setVariableDone(processId, variables);
     } catch (EngineClientException e) {
-      externalTaskClientListener.setVariableFail(processId, variables, e);
+      clientInteractionListener.setVariableFail(processId, variables, e);
       throw LOG.externalTaskServiceException("setting variables for external task", e);
     }
   }
@@ -108,11 +109,11 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
 
   public void complete(String externalTaskId, Map<String, Object> variables, Map<String, Object> localVariables) {
     try {
-      externalTaskClientListener.onComplete(externalTaskId, variables, localVariables);
+      clientInteractionListener.onComplete(externalTaskId, variables, localVariables);
       engineClient.complete(externalTaskId, variables, localVariables);
-      externalTaskClientListener.completeDone(externalTaskId, variables, localVariables);
+      clientInteractionListener.completeDone(externalTaskId, variables, localVariables);
     } catch (EngineClientException e) {
-      externalTaskClientListener.completeFail(externalTaskId, variables, localVariables, e);
+      clientInteractionListener.completeFail(externalTaskId, variables, localVariables, e);
       throw LOG.externalTaskServiceException("completing the external task", e);
     }
   }
@@ -132,11 +133,11 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
   @Override
   public void handleFailure(String externalTaskId, String errorMessage, String errorDetails, int retries, long retryTimeout, Map<String, Object> variables, Map<String, Object> locaclVariables) {
     try {
-      externalTaskClientListener.onFailure(externalTaskId, errorMessage, errorDetails, retries, retryTimeout);
+      clientInteractionListener.onFailure(externalTaskId, errorMessage, errorDetails, retries, retryTimeout);
       engineClient.failure(externalTaskId, errorMessage, errorDetails, retries, retryTimeout, variables, locaclVariables);
-      externalTaskClientListener.failureDone(externalTaskId, errorMessage, errorDetails, retries, retryTimeout);
+      clientInteractionListener.failureDone(externalTaskId, errorMessage, errorDetails, retries, retryTimeout);
     } catch (EngineClientException e) {
-      externalTaskClientListener.failureFail(externalTaskId, errorMessage, errorDetails, retries, retryTimeout, e);
+      clientInteractionListener.failureFail(externalTaskId, errorMessage, errorDetails, retries, retryTimeout, e);
       throw LOG.externalTaskServiceException("notifying a failure", e);
     }
   }
@@ -159,11 +160,11 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
   @Override
   public void handleBpmnError(String externalTaskId, String errorCode, String errorMessage, Map<String, Object> variables) {
     try {
-      externalTaskClientListener.onBpmnError(externalTaskId, errorCode, errorMessage, variables);
+      clientInteractionListener.onBpmnError(externalTaskId, errorCode, errorMessage, variables);
       engineClient.bpmnError(externalTaskId, errorCode, errorMessage, variables);
-      externalTaskClientListener.bpmnErrorDone(externalTaskId, errorCode, errorMessage, variables);
+      clientInteractionListener.bpmnErrorDone(externalTaskId, errorCode, errorMessage, variables);
     } catch (EngineClientException e) {
-      externalTaskClientListener.bpmnErrorFail(externalTaskId, errorCode, errorMessage, variables, e);
+      clientInteractionListener.bpmnErrorFail(externalTaskId, errorCode, errorMessage, variables, e);
       throw LOG.externalTaskServiceException("notifying a BPMN error", e);
     }
   }
@@ -176,11 +177,11 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
   @Override
   public void extendLock(String externalTaskId, long newDuration) {
     try {
-      externalTaskClientListener.onExtendLock(externalTaskId, newDuration);
+      clientInteractionListener.onExtendLock(externalTaskId, newDuration);
       engineClient.extendLock(externalTaskId, newDuration);
-      externalTaskClientListener.extendLockDone(externalTaskId, newDuration);
+      clientInteractionListener.extendLockDone(externalTaskId, newDuration);
     } catch (EngineClientException e) {
-      externalTaskClientListener.extendLockFail(externalTaskId, newDuration, e);
+      clientInteractionListener.extendLockFail(externalTaskId, newDuration, e);
       throw LOG.externalTaskServiceException("extending lock", e);
     }
   }

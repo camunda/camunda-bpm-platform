@@ -20,7 +20,7 @@ import org.camunda.bpm.client.backoff.BackoffStrategy;
 import org.camunda.bpm.client.backoff.ExponentialBackoffStrategy;
 import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
-import org.camunda.bpm.client.listener.ExternalTaskClientListener;
+import org.camunda.bpm.client.listener.ClientInteractionListener;
 
 /**
  * <p>A fluent builder to configure the Camunda client</p>
@@ -135,10 +135,10 @@ public interface ExternalTaskClientBuilder {
   /**
    * Adds a listener for report exceptions and events
    *
-   * @param externalTaskClientListener is a listener for report exceptions and events
+   * @param clientInteractionListener is a listener for report exceptions and events
    * @return the builder
    */
-  ExternalTaskClientBuilder externalTaskClientListener(ExternalTaskClientListener externalTaskClientListener);
+  ExternalTaskClientBuilder externalTaskClientListener(ClientInteractionListener clientInteractionListener);
 
   /**
    * Disables the client-side backoff strategy. On invocation, the configuration option {@link #backoffStrategy} is ignored.

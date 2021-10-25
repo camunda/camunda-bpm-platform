@@ -1,8 +1,5 @@
 package org.camunda.bpm.client.listener;
 
-import org.apache.http.HttpRequest;
-import org.apache.http.client.HttpResponseException;
-import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.impl.EngineClientException;
 import org.camunda.bpm.client.task.ExternalTask;
@@ -12,61 +9,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-public class DefaultExternalTaskClientListener implements ExternalTaskClientListener {
-    @Override
-    public void exceptionWhileClosingResourceStream(Object response, IOException e) {
-
-    }
-
-    @Override
-    public void requestInterceptorException(Throwable e) {
-
-    }
-
-    @Override
-    public void exceptionWhileExecutingExternalTaskHandler(String topicName, Throwable e) {
-
-    }
-
-    @Override
-    public void exceptionWhileShuttingDown(InterruptedException e) {
-
-    }
-
-    @Override
-    public void exceptionOnExternalTaskServiceMethodInvocation(String topicName, ExternalTaskClientException e) {
-
-    }
-
-    @Override
-    public void exceptionWhileAcquiringTasks(Throwable e) {
-
-    }
-
-    @Override
-    public void exceptionWhileParsingJsonObject(Class<?> responseDtoClass, Throwable t) {
-
-    }
-
-    @Override
-    public void exceptionWhileMappingJsonObject(Class<?> responseDtoClass, Throwable t) {
-
-    }
-
-    @Override
-    public void exceptionWhileDeserializingJsonObject(Class<?> responseDtoClass, Throwable t) {
-
-    }
-
-    @Override
-    public void exceptionWhileSerializingJsonObject(Object dto, Throwable t) {
-
-    }
-
-    @Override
-    public void taskHandlerIsNull(String topicName) {
-
-    }
+public class DefaultClientInteractionListener implements ClientInteractionListener {
 
     @Override
     public void onFetchAndLock(List<TopicRequestDto> topics) {

@@ -1,26 +1,13 @@
 package org.camunda.bpm.client.listener;
 
-import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.impl.EngineClientException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.topic.impl.dto.TopicRequestDto;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-public interface ExternalTaskClientListener {
-     void exceptionWhileClosingResourceStream(Object response, IOException e);
-     void requestInterceptorException(Throwable e);
-     void exceptionWhileExecutingExternalTaskHandler(String topicName, Throwable e);
-     void exceptionWhileShuttingDown(InterruptedException e);
-     void exceptionOnExternalTaskServiceMethodInvocation(String topicName, ExternalTaskClientException e);
-     void exceptionWhileAcquiringTasks(Throwable e);
-     void exceptionWhileParsingJsonObject(Class<?> responseDtoClass, Throwable t);
-     void exceptionWhileMappingJsonObject(Class<?> responseDtoClass, Throwable t);
-     void exceptionWhileDeserializingJsonObject(Class<?> responseDtoClass, Throwable t);
-     void exceptionWhileSerializingJsonObject(Object dto, Throwable t);
-     void taskHandlerIsNull(String topicName);
+public interface ClientInteractionListener {
 
      void onFetchAndLock(List<TopicRequestDto> topics);
      void fetchAndLockDone(List<TopicRequestDto> topics, List<ExternalTask> externalTasks);

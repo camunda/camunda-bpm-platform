@@ -32,7 +32,7 @@ import org.camunda.bpm.client.backoff.BackoffStrategy;
 import org.camunda.bpm.client.backoff.ExponentialBackoffStrategy;
 import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
 import org.camunda.bpm.client.interceptor.impl.RequestInterceptorHandler;
-import org.camunda.bpm.client.listener.ExternalTaskClientListener;
+import org.camunda.bpm.client.listener.ClientInteractionListener;
 import org.camunda.bpm.client.spi.DataFormat;
 import org.camunda.bpm.client.spi.DataFormatConfigurator;
 import org.camunda.bpm.client.spi.DataFormatProvider;
@@ -86,6 +86,7 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
   protected List<ClientRequestInterceptor> interceptors;
   protected boolean isAutoFetchingEnabled;
   protected BackoffStrategy backoffStrategy;
+  protected ClientInteractionListener clientInteractionListener;
   protected boolean isBackoffStrategyDisabled;
 
   public ExternalTaskClientBuilderImpl() {
@@ -146,8 +147,8 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
   }
 
   @Override
-  public ExternalTaskClientBuilder externalTaskClientListener(ExternalTaskClientListener externalTaskClientListener) {
-
+  public ExternalTaskClientBuilder externalTaskClientListener(ClientInteractionListener clientInteractionListener) {
+    this.clientInteractionListener = clientInteractionListener;
     return this;
   }
 
@@ -274,7 +275,7 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
   }
 
   protected void initTopicSubscriptionManager() {
-    topicSubscriptionManager = new TopicSubscriptionManager(engineClient, typedValues, lockDuration);
+    topicSubscriptionManager = new TopicSubscriptionManager(engineClient,clientInteractionListener, typedValues, lockDuration);
     topicSubscriptionManager.setBackoffStrategy(getBackoffStrategy());
 
     if (isBackoffStrategyDisabled) {

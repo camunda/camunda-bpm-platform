@@ -37,7 +37,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 import org.camunda.bpm.client.interceptor.impl.RequestInterceptorHandler;
-import org.camunda.bpm.client.listener.ExternalTaskClientListener;
+import org.camunda.bpm.client.listener.ClientInteractionListener;
 import org.camunda.commons.utils.IoUtil;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -58,7 +58,7 @@ public class RequestExecutor {
   protected HttpClient httpClient;
   protected ObjectMapper objectMapper;
 
-  protected ExternalTaskClientListener externalTaskClientListener;
+  protected ClientInteractionListener clientInteractionListener;
 
   protected RequestExecutor(RequestInterceptorHandler requestInterceptorHandler, ObjectMapper objectMapper) {
     this.objectMapper = objectMapper;
@@ -132,7 +132,6 @@ public class RequestExecutor {
         }
         catch (IOException e) {
           LOG.exceptionWhileClosingResourceStream(response, e);
-          externalTaskClientListener.exceptionWhileClosingResourceStream(response, e);
         }
 
         return response;
@@ -163,13 +162,10 @@ public class RequestExecutor {
       InputStream responseBody = httpEntity.getContent();
       return objectMapper.readValue(responseBody, responseClass);
     } catch (JsonParseException e) {
-      externalTaskClientListener.exceptionWhileParsingJsonObject(responseClass, e);
       throw LOG.exceptionWhileParsingJsonObject(responseClass, e);
     } catch (JsonMappingException e) {
-      externalTaskClientListener.exceptionWhileMappingJsonObject(responseClass, e);
       throw LOG.exceptionWhileMappingJsonObject(responseClass, e);
     } catch (IOException e) {
-      externalTaskClientListener.exceptionWhileDeserializingJsonObject(responseClass, e);
       throw LOG.exceptionWhileDeserializingJsonObject(responseClass, e);
     }
   }
@@ -180,7 +176,6 @@ public class RequestExecutor {
     try {
       serializedRequest = objectMapper.writeValueAsBytes(dto);
     } catch (JsonProcessingException e) {
-      externalTaskClientListener.exceptionWhileSerializingJsonObject(dto, e);
       throw LOG.exceptionWhileSerializingJsonObject(dto, e);
     }
 
