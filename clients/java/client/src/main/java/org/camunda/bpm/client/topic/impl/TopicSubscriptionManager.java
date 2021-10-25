@@ -137,7 +137,7 @@ public class TopicSubscriptionManager implements Runnable {
       externalTasks = engineClient.fetchAndLock(subscriptions);
     } catch (EngineClientException e) {
       LOG.exceptionWhilePerformingFetchAndLock(e);
-      return new FetchAndLockResponseDto(e);
+      return new FetchAndLockResponseDto(LOG.fetchAndLockException(e));
     }
 
     return new FetchAndLockResponseDto(externalTasks);
