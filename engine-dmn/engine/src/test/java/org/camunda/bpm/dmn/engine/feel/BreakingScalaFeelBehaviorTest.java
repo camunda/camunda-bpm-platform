@@ -58,7 +58,6 @@ public class BreakingScalaFeelBehaviorTest extends DmnEngineTest {
       .hasSingleEntry(true);
   }
 
-  @Ignore("CAM-11269")
   @Test
   @DecisionResource(resource = "breaking_unary_test_boolean.dmn")
   public void shouldEqualBoolean() {
