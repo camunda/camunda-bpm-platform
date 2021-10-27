@@ -316,6 +316,22 @@ public class IdentityServiceTest {
   }
 
   @Test
+  public void testUpdateGroupID() {
+    Group group = identityService.newGroup("sales");
+    group.setName("Sales");
+    identityService.saveGroup(group);
+
+    group = identityService.createGroupQuery().groupId("sales").singleResult();
+    group.setId(("SomeNewId"));
+    identityService.saveGroup(group);
+
+    group = identityService.createGroupQuery().groupId("sales").singleResult();
+    assertEquals("Updated", group.getName());
+
+    identityService.deleteGroup(group.getId());
+  }
+
+  @Test
   public void findUserByUnexistingId() {
     User user = identityService.createUserQuery().userId("unexistinguser").singleResult();
     assertNull(user);
