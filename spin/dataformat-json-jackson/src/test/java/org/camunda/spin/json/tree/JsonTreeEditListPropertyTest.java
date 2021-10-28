@@ -40,6 +40,7 @@ import org.junit.Test;
  * 7) remove
  * 8) removeLast
  * 9) removeAt
+ * 10) contains
  *
  * @author Stefan Hentschel
  */
@@ -598,5 +599,41 @@ public class JsonTreeEditListPropertyTest {
     } catch(IndexOutOfBoundsException e){
       // expected
     }
+  }
+
+  // ----------------- 10) contains ----------------------
+
+  @Test
+  public void containsOfNonArray() {
+    try {
+      jsonNode.contains("n");
+      fail("Expected: SpinJsonTreeNodeException");
+    } catch(SpinJsonException e) {
+      // expected
+    }
+  }
+
+  @Test
+  public void containsWithoutSearchNode() {
+    try {
+      jsonNode.contains(null);
+      fail("Expected: IllegalArgumentException");
+    } catch(IllegalArgumentException e) {
+      // expected
+    }
+  }
+
+  @Test
+  public void containsNonExistentValue() {
+    boolean res = customers.contains("n");
+
+    assertThat(res).isFalse();
+  }
+
+  @Test
+  public void containsOfExistentValue() {
+    boolean res = currencies.contains("euro");
+
+    assertThat(res).isTrue();
   }
 }

@@ -111,47 +111,44 @@ public class JacksonJsonNode extends SpinJsonNode {
     return newIndex;
   }
 
-  public Integer indexOf(Object searchObject) {
-    ensureNotNull("searchObject", searchObject);
-    if(this.isArray()) {
-      Integer i = 0;
-      JsonNode node = dataFormat.createJsonNode(searchObject);
-      for (Iterator<JsonNode> nodeIterator = jsonNode.elements(); nodeIterator.hasNext(); i++) {
-        JsonNode n = nodeIterator.next();
-        if (n.equals(node)) {
-          return i;
-        }
-      }
-
-      // when searchObject is not found
-      throw LOG.unableToFindProperty(node.asText());
-    } else {
+  protected int lookupArray(JsonNode searchNode, int direction) {
+    if(!this.isArray()) {
       throw LOG.unableToGetIndex(jsonNode.getNodeType().name());
     }
+    int i = direction>0 ? 0 : jsonNode.size() - 1;
+    for (; i < jsonNode.size() && i >= 0; i += direction) {
+      if (jsonNode.get(i).equals(searchNode)){
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  public Integer indexOf(Object searchObject) {
+    ensureNotNull("searchObject", searchObject);
+    JsonNode node = dataFormat.createJsonNode(searchObject);
+    int res = lookupArray(node, 1);
+    if(res == -1){
+      throw LOG.unableToFindProperty(node.asText());
+    }
+    return res;
   }
 
   public Integer lastIndexOf(Object searchObject) {
     ensureNotNull("searchObject", searchObject);
-    if(this.isArray()) {
-      Integer i = 0;
-      Integer j = -1;
-      JsonNode node = dataFormat.createJsonNode(searchObject);
-      for (Iterator<JsonNode> nodeIterator = jsonNode.elements(); nodeIterator.hasNext(); i++) {
-        JsonNode n = nodeIterator.next();
-        if (n.equals(node)) {
-          j = i;
-        }
-      }
-
-      // when searchObject is not found
-      if(j == -1) {
-        throw LOG.unableToFindProperty(node.getNodeType().name());
-      }
-
-      return j;
-    } else {
-      throw LOG.unableToGetIndex(jsonNode.getNodeType().name());
+    JsonNode node = dataFormat.createJsonNode(searchObject);
+    int res = lookupArray(node, -1);
+    if(res == -1){
+      throw LOG.unableToFindProperty(node.asText());
     }
+    return res;
+  }
+
+  public boolean contains(Object searchObject) {
+    ensureNotNull("searchObject", searchObject);
+    JsonNode node = dataFormat.createJsonNode(searchObject);
+    int res = lookupArray(node, 1);
+    return res != -1;
   }
 
   public boolean isObject() {
