@@ -249,6 +249,54 @@ public class IdentityServiceTest {
   }
 
   @Test
+  public void testUpdateUserId() {
+    // First, create a new user
+    User user = identityService.newUser("johndoe");
+    user.setFirstName("John");
+    user.setLastName("Doe");
+    user.setEmail("johndoe@alfresco.com");
+    user.setPassword("s3cret");
+    identityService.saveUser(user);
+
+    // Fetch and update the user
+    user = identityService.createUserQuery().userId("johndoe").singleResult();
+    user.setId("JaneDonnel");
+    user.setEmail("updated@alfresco.com");
+    user.setFirstName("Jane");
+    user.setLastName("Donnel");
+    identityService.saveUser(user);
+
+    user = identityService.createUserQuery().userId("johndoe").singleResult();
+    assertEquals("JaneDonnel", user.getFirstName());
+    assertEquals("Jane", user.getFirstName());
+    assertEquals("Donnel", user.getLastName());
+    assertEquals("updated@alfresco.com", user.getEmail());
+    assertTrue(identityService.checkPassword("johndoe", "s3cret"));
+
+    identityService.deleteUser(user.getId());
+  }
+
+  @Test
+  public void testUpdateTenantId() {
+    // First, create a new user
+    Tenant tenant = identityService.newTenant("tenantId1");
+    tenant.setName("tenant1");
+
+    identityService.saveTenant(tenant);
+
+    // Fetch and update the user
+    tenant = identityService.createTenantQuery().tenantId("tenantId1").singleResult();
+    tenant.setId("newTenantId1");
+    identityService.saveTenant(tenant);
+
+    tenant = identityService.createTenantQuery().tenantId("newTenantId1").singleResult();
+    assertEquals("tenantId1", tenant.getId());
+
+
+    identityService.deleteTenant(tenant.getId());
+  }
+
+  @Test
   public void testUserPicture() {
     // First, create a new user
     User user = identityService.newUser("johndoe");
@@ -322,7 +370,7 @@ public class IdentityServiceTest {
     identityService.saveGroup(group);
 
     group = identityService.createGroupQuery().groupId("sales").singleResult();
-    group.setId(("SomeNewId"));
+    group.setId("SomeNewId");
     identityService.saveGroup(group);
 
     group = identityService.createGroupQuery().groupId("sales").singleResult();
