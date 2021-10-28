@@ -11,4 +11,10 @@
     <differenceType>7012</differenceType>
     <method>*</method>
   </difference>
+  <difference>
+    <!-- It is okay to add abstract methods to an abstract class -->
+    <className>**</className>
+    <differenceType>7013</differenceType>
+    <method>*</method>
+  </difference>
 </differences>
