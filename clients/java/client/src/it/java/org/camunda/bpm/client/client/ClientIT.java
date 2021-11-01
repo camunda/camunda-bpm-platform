@@ -408,11 +408,8 @@ public class ClientIT {
               "onComplete","completeDone"
       };
 
-      while (states.size() < assertStates.length)
-        try {
-          Thread.sleep(10);
-        } catch (InterruptedException ignored) {
-        }
+        // then
+        clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
 
       List<String> firstStates = new ArrayList<>(assertStates.length);
 
