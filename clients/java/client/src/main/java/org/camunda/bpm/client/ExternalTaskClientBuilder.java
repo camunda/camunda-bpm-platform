@@ -135,7 +135,7 @@ public interface ExternalTaskClientBuilder {
   /**
    * Adds a listener for report exceptions and events
    *
-   * @param clientInteractionListener is a listener for report exceptions and events
+   * @param clientInteractionListener for API interactions
    * @return the builder
    */
   ExternalTaskClientBuilder externalTaskClientListener(ClientInteractionListener clientInteractionListener);
