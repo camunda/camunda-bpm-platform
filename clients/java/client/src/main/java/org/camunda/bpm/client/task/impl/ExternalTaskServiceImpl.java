@@ -36,7 +36,7 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
 
   protected ClientInteractionListener clientInteractionListener;
 
-  public ExternalTaskServiceImpl(EngineClient engineClient,ClientInteractionListener clientInteractionListener) {
+  public ExternalTaskServiceImpl(EngineClient engineClient, ClientInteractionListener clientInteractionListener) {
     this.engineClient = engineClient;
     this.clientInteractionListener = clientInteractionListener;
   }
