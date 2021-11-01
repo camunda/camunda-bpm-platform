@@ -35,7 +35,7 @@ function getCallActivityFlowNodes(elementRegistry) {
 
   elementRegistry.forEach(function(shape) {
     const bo = shape.businessObject;
-    if (bo.$instanceOf('bpmn:CallActivity')) {
+    if (bo && bo.$instanceOf('bpmn:CallActivity')) {
       nodes.push(bo.id);
     }
   });

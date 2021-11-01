@@ -42,6 +42,9 @@ module.exports = function(
     stopLoading();
 
     elementRegistry.forEach(function(shape) {
+      if (shape.isImplicit) {
+        return;
+      }
       var element = processDiagram.bpmnElements[shape.businessObject.id];
       var data = callbacks.getData.apply(null, [element].concat(sources));
       var nodes;
@@ -49,7 +52,6 @@ module.exports = function(
       if (callbacks.isActive(data)) {
         if (!overlaysNodes[element.id]) {
           nodes = getOverlayNodes(element, data);
-
           const overlayId = overlays.add(element.id, {
             position: {
               bottom: 0,
