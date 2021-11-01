@@ -82,8 +82,9 @@ public class TopicSubscriptionManager implements Runnable {
     this.clientLockDuration = clientLockDuration;
     this.typedValues = typedValues;
     this.clientInteractionListener = clientInteractionListener;
-    if(clientInteractionListener == null)
+    if (clientInteractionListener == null) {
       clientInteractionListener = new DefaultClientInteractionListener();
+    }
 
     this.externalTaskService = new ExternalTaskServiceImpl(engineClient, clientInteractionListener);
     this.isBackoffStrategyDisabled = new AtomicBoolean(false);
