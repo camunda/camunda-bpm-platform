@@ -328,8 +328,7 @@ public class ClientIT {
 
       Assert.assertArrayEquals(firstStates.toArray(), assertStates);
 
-    }
-    finally {
+    } finally {
       if (client != null) {
         client.stop();
       }
