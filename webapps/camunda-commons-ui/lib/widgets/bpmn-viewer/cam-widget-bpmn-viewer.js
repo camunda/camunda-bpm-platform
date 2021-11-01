@@ -73,6 +73,8 @@ module.exports = [
         $scope.control = $scope.control || {};
 
         $scope.control.highlight = function(id) {
+          // console.log('highlight', id);
+          // canvas.scrollToElement(id);
           canvas.addMarker(id, 'highlight');
 
           $element.find('[data-element-id="' + id + '"]>.djs-outline').attr({
@@ -142,29 +144,7 @@ module.exports = [
         };
 
         $scope.control.scrollToElement = function(element) {
-          var height, width, x, y;
-
-          var elem = viewer.get('elementRegistry').get(element);
-          var viewbox = canvas.viewbox();
-
-          height = Math.max(viewbox.height, elem.height);
-          width = Math.max(viewbox.width, elem.width);
-
-          x = Math.min(
-            Math.max(viewbox.x, elem.x - viewbox.width + elem.width),
-            elem.x
-          );
-          y = Math.min(
-            Math.max(viewbox.y, elem.y - viewbox.height + elem.height),
-            elem.y
-          );
-
-          canvas.viewbox({
-            x: x,
-            y: y,
-            width: width,
-            height: height
-          });
+          canvas.scrollToElement(element);
         };
 
         $scope.control.getElement = function(elementId) {
@@ -359,11 +339,19 @@ module.exports = [
             var diagram = diagramData;
             if (useDefinitions) {
               viewer._setDefinitions(diagramData);
-              diagram = diagramData.diagrams[0];
+              diagram = undefined;
             }
+
+            console.log(diagram, diagramData);
+
+            viewer.on('import.render.complete', function(e) {
+              viewer.get('eventBus').fire('import.done');
+            });
 
             importFunction(diagram)
               .then(function({warnings: warn}) {
+                console.log('done');
+
                 var applyFunction = useDefinitions
                   ? function(fn) {
                       fn();
@@ -378,6 +366,8 @@ module.exports = [
                 });
               })
               .catch(err => {
+                console.error(err);
+                debugger;
                 $scope.error = err;
               });
           }
