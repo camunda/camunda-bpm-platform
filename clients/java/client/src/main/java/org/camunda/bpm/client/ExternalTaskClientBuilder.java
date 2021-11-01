@@ -133,7 +133,7 @@ public interface ExternalTaskClientBuilder {
   ExternalTaskClientBuilder backoffStrategy(BackoffStrategy backoffStrategy);
 
   /**
-   * Adds a listener for report exceptions and events
+   * Adds a listener for interactions of the client with the External Task API of the engine
    *
    * @param clientInteractionListener for API interactions
    * @return the builder

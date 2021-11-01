@@ -86,8 +86,8 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
   protected List<ClientRequestInterceptor> interceptors;
   protected boolean isAutoFetchingEnabled;
   protected BackoffStrategy backoffStrategy;
-  protected ClientInteractionListener clientInteractionListener;
   protected boolean isBackoffStrategyDisabled;
+  protected ClientInteractionListener clientInteractionListener;
 
   public ExternalTaskClientBuilderImpl() {
     // default values
