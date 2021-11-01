@@ -37,7 +37,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 import org.camunda.bpm.client.interceptor.impl.RequestInterceptorHandler;
-import org.camunda.bpm.client.listener.ClientInteractionListener;
 import org.camunda.commons.utils.IoUtil;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -58,7 +57,6 @@ public class RequestExecutor {
   protected HttpClient httpClient;
   protected ObjectMapper objectMapper;
 
-  protected ClientInteractionListener clientInteractionListener;
 
   protected RequestExecutor(RequestInterceptorHandler requestInterceptorHandler, ObjectMapper objectMapper) {
     this.objectMapper = objectMapper;

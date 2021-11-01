@@ -24,8 +24,6 @@ import org.apache.http.protocol.HttpContext;
 import org.camunda.bpm.client.impl.EngineClientLogger;
 import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
 import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
-import org.camunda.bpm.client.listener.ClientInteractionListener;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
