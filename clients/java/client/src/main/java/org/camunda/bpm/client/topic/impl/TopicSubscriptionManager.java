@@ -74,7 +74,7 @@ public class TopicSubscriptionManager implements Runnable {
 
   protected ClientInteractionListener clientInteractionListener;
 
-  public TopicSubscriptionManager(EngineClient engineClient,ClientInteractionListener clientInteractionListener, TypedValues typedValues, long clientLockDuration) {
+  public TopicSubscriptionManager(EngineClient engineClient, ClientInteractionListener clientInteractionListener, TypedValues typedValues, long clientLockDuration) {
     this.engineClient = engineClient;
     this.subscriptions = new CopyOnWriteArrayList<>();
     this.taskTopicRequests = new ArrayList<>();
