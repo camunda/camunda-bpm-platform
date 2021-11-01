@@ -296,8 +296,98 @@ public class ClientIT {
 
               @Override
               public void setVariableFail(String processInstanceId, Map<String, Object> variables, EngineClientException e) {
-                System.out.println("state: setvariableFail");
+                System.out.println("state: setVariableFail");
                 states.add("setvariableFail");
+              }
+
+              @Override
+              public void onComplete(String taskId, Map<String, Object> variables, Map<String, Object> localVariables){
+                System.out.println("state: onComplete");
+                states.add("onComplete");
+              }
+
+              @Override
+              public void completeDone(String taskId, Map<String, Object> variables, Map<String, Object> localVariables){
+                System.out.println("state: completeDone");
+                states.add("completeDone");
+              }
+
+              @Override
+              public void completeFail(String taskId, Map<String, Object> variables, Map<String, Object> localVariables, EngineClientException e){
+                System.out.println("state: completeFail");
+                states.add("completeFail");
+              }
+
+              @Override
+              public void onFailure(String taskId, String errorMessage, String errorDetails, int retries, long retryTimeout){
+                System.out.println("state: onFailure");
+                states.add("onFailure");
+              }
+
+              @Override
+              public void failureDone(String taskId, String errorMessage, String errorDetails, int retries, long retryTimeout){
+                System.out.println("state: failureDone");
+                states.add("failureDone");
+              }
+
+              @Override
+              public void failureFail(String taskId, String errorMessage, String errorDetails, int retries, long retryTimeout, EngineClientException e){
+                System.out.println("state: failureFail");
+                states.add("failureFail");
+              }
+
+              @Override
+              public void onBpmnError(String taskId, String errorCode, String errorMessage, Map<String, Object> variables){
+                System.out.println("state: onBpmnError");
+                states.add("onBpmnError");
+              }
+
+              @Override
+              public void bpmnErrorDone(String taskId, String errorCode, String errorMessage, Map<String, Object> variables){
+                System.out.println("state: bpmnErrorDone");
+                states.add("bpmnErrorDone");
+              }
+
+              @Override
+              public void bpmnErrorFail(String taskId, String errorCode, String errorMessage, Map<String, Object> variables, EngineClientException e){
+                System.out.println("state: bpmnErrorFail");
+                states.add("bpmnErrorFail");
+              }
+
+              @Override
+              public void onExtendLock(String taskId, long newDuration){
+                System.out.println("state: onExtendLock");
+                states.add("onExtendLock");
+              }
+
+              @Override
+              public void extendLockDone(String taskId, long newDuration){
+                System.out.println("state: extendLockDone");
+                states.add("extendLockDone");
+              }
+
+              @Override
+              public void extendLockFail(String taskId, long newDuration, EngineClientException e){
+                System.out.println("state: extendLockFail");
+                states.add("extendLockFail");
+              }
+
+              @Override
+              public void onUnlock(String taskId){
+                System.out.println("state: onUnlock");
+                states.add("onUnlock");
+              }
+
+              @Override
+              public void unlockDone(String taskId){
+                System.out.println("state: unlockDone");
+                states.add("unlockDone");
+              }
+
+              @Override
+              public void unlockFail(String taskId, EngineClientException e){
+                System.out.println("state: unlockFail");
+                states.add("unlockFail");
               }
 
             })
@@ -313,7 +403,9 @@ public class ClientIT {
 
       Object[] assertStates = {
               "onFetchAndLock", "fetchAndLockDone",
-              "onSetVariable", "setVariableDone"
+              "onUnlock","unlockDone",
+              "onSetVariable", "setVariableDone",
+              "onComplete","completeDone"
       };
 
       while (states.size() < assertStates.length)
