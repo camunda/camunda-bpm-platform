@@ -11,7 +11,7 @@ pipeline {
     }
   }
   environment {
-    CAMBPM_LOGGER_LOG_LEVEL = 'DEBUG'
+    LOGGER_LOG_LEVEL = 'DEBUG'
   }
   options {
     buildDiscarder(logRotator(numToKeepStr: '5'))
