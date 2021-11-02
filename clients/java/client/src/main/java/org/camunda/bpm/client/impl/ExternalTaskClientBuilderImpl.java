@@ -275,7 +275,7 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
   }
 
   protected void initTopicSubscriptionManager() {
-    topicSubscriptionManager = new TopicSubscriptionManager(engineClient,clientInteractionListener, typedValues, lockDuration);
+    topicSubscriptionManager = new TopicSubscriptionManager(engineClient, clientInteractionListener, typedValues, lockDuration);
     topicSubscriptionManager.setBackoffStrategy(getBackoffStrategy());
 
     if (isBackoffStrategyDisabled) {
