@@ -34,7 +34,6 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -43,9 +42,15 @@ import org.junit.rules.RuleChain;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
+import java.util.LinkedList;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.client.util.ProcessModels.BPMN_ERROR_EXTERNAL_TASK_PROCESS;
 import static org.camunda.bpm.client.util.ProcessModels.EXTERNAL_TASK_PRIORITY;
@@ -189,10 +194,10 @@ public class ClientIT {
     try {
       // given
       ExternalTaskClientBuilder externalTaskClientBuilder = ExternalTaskClient.create();
-      
+
       // then
       thrown.expect(ExternalTaskClientException.class);
-      
+
       // when
       client = externalTaskClientBuilder.build();
     }
@@ -210,10 +215,10 @@ public class ClientIT {
     try {
       // given
       ExternalTaskClientBuilder externalTaskClientBuilder = ExternalTaskClient.create();
-      
+
       // then
       thrown.expect(ExternalTaskClientException.class);
-      
+
       // when
       client = externalTaskClientBuilder
           .baseUrl(null)
@@ -234,10 +239,10 @@ public class ClientIT {
       // given
       ExternalTaskClientBuilder externalTaskClientBuilder = ExternalTaskClient.create()
           .baseUrl("http://camunda.com/engine-rest");
-      
+
       // then
       thrown.expect(ExternalTaskClientException.class);
-      
+
       // when
       client = externalTaskClientBuilder
           .maxTasks(0)
@@ -401,21 +406,15 @@ public class ClientIT {
               .handler(handler)
               .open();
 
-      Object[] assertStates = {
-              "onFetchAndLock", "fetchAndLockDone",
+      List<String> assertStates = Arrays.asList("onFetchAndLock", "fetchAndLockDone",
               "onUnlock","unlockDone",
               "onSetVariable", "setVariableDone",
-              "onComplete","completeDone"
-      };
+              "onComplete","completeDone");
 
         // then
-        clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
+      clientRule.waitForFetchAndLockUntil(() -> !handler.getHandledTasks().isEmpty());
 
-      List<String> firstStates = new ArrayList<>(assertStates.length);
-
-      for (int i = 0; i < assertStates.length; i++) firstStates.add(states.get(i));
-
-      Assert.assertArrayEquals(firstStates.toArray(), assertStates);
+      assertThat(states).containsExactlyInAnyOrderElementsOf(assertStates);
 
     } finally {
       if (client != null) {
@@ -460,10 +459,10 @@ public class ClientIT {
       ExternalTaskClientBuilder clientBuilder = ExternalTaskClient.create()
           .baseUrl("http://camunda.com/engine-rest")
           .asyncResponseTimeout(0);
-      
+
       // then
       thrown.expect(ExternalTaskClientException.class);
-      
+
       // when
       client = clientBuilder.build();
     }
@@ -534,10 +533,10 @@ public class ClientIT {
       ExternalTaskClientBuilder externalTaskClientBuilder = ExternalTaskClient.create()
           .baseUrl("http://camunda.com/engine-rest")
           .lockDuration(0);
-      
+
       // then
       thrown.expect(ExternalTaskClientException.class);
-      
+
       // when
       client = externalTaskClientBuilder.build();
     }

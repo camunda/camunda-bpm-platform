@@ -57,7 +57,6 @@ public class RequestExecutor {
   protected HttpClient httpClient;
   protected ObjectMapper objectMapper;
 
-
   protected RequestExecutor(RequestInterceptorHandler requestInterceptorHandler, ObjectMapper objectMapper) {
     this.objectMapper = objectMapper;
 
@@ -67,20 +66,20 @@ public class RequestExecutor {
   protected <T> T postRequest(String resourceUrl, RequestDto requestDto, Class<T> responseClass) throws EngineClientException {
     ByteArrayEntity serializedRequest = serializeRequest(requestDto);
     HttpUriRequest httpRequest = RequestBuilder.post(resourceUrl)
-      .addHeader(HEADER_USER_AGENT)
-      .addHeader(HEADER_CONTENT_TYPE_JSON)
-      .setEntity(serializedRequest)
-      .build();
-    
+            .addHeader(HEADER_USER_AGENT)
+            .addHeader(HEADER_CONTENT_TYPE_JSON)
+            .setEntity(serializedRequest)
+            .build();
+
     return executeRequest(httpRequest, responseClass);
   }
 
   protected byte[] getRequest(String resourceUrl) throws EngineClientException {
     HttpUriRequest httpRequest = RequestBuilder.get(resourceUrl)
-      .addHeader(HEADER_USER_AGENT)
-      .addHeader(HEADER_CONTENT_TYPE_JSON)
-      .build();
-    
+            .addHeader(HEADER_USER_AGENT)
+            .addHeader(HEADER_CONTENT_TYPE_JSON)
+            .build();
+
     return executeRequest(httpRequest, byte[].class);
   }
 
@@ -187,8 +186,8 @@ public class RequestExecutor {
 
   protected void initHttpClient(RequestInterceptorHandler requestInterceptorHandler) {
     HttpClientBuilder httpClientBuilder = HttpClients.custom()
-      .useSystemProperties()
-      .addInterceptorLast(requestInterceptorHandler);
+            .useSystemProperties()
+            .addInterceptorLast(requestInterceptorHandler);
 
     this.httpClient = httpClientBuilder.build();
   }
