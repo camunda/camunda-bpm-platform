@@ -346,7 +346,7 @@ import org.camunda.bpm.engine.impl.scripting.engine.VariableScopeResolverFactory
 import org.camunda.bpm.engine.impl.scripting.env.ScriptEnvResolver;
 import org.camunda.bpm.engine.impl.scripting.env.ScriptingEnvironment;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
-import org.camunda.bpm.engine.impl.telemetry.dto.Data;
+import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryData;
 import org.camunda.bpm.engine.impl.telemetry.dto.Database;
 import org.camunda.bpm.engine.impl.telemetry.dto.Internals;
 import org.camunda.bpm.engine.impl.telemetry.dto.Jdk;
@@ -1002,7 +1002,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected Connector<? extends ConnectorRequest<?>> telemetryHttpConnector;
   /** default: once every 24 hours */
   protected long telemetryReportingPeriod = 24 * 60 * 60;
-  protected Data telemetryData;
+  protected TelemetryData telemetryData;
   /** the connection and socket timeout configuration of the telemetry request
    * in milliseconds
    *  default: 15 seconds */
@@ -2833,7 +2833,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     Product product = new Product(PRODUCT_NAME, engineInfo.getVersion(), engineInfo.getEdition(), internals);
 
     // installationId=null, the id will be fetched later from database
-    telemetryData = new Data(null, product);
+    telemetryData = new TelemetryData(null, product);
   }
 
   // getters and setters //////////////////////////////////////////////////////
@@ -5131,11 +5131,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
-  public Data getTelemetryData() {
+  public TelemetryData getTelemetryData() {
     return telemetryData;
   }
 
-  public ProcessEngineConfigurationImpl setTelemetryData(Data telemetryData) {
+  public ProcessEngineConfigurationImpl setTelemetryData(TelemetryData telemetryData) {
     this.telemetryData = telemetryData;
     return this;
   }

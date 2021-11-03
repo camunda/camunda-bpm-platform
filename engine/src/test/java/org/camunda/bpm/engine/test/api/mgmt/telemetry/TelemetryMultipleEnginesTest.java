@@ -30,7 +30,7 @@ import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration
 import org.camunda.bpm.engine.impl.metrics.Meter;
 import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
 import org.camunda.bpm.engine.impl.metrics.reporter.DbMetricsReporter;
-import org.camunda.bpm.engine.impl.telemetry.dto.Data;
+import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryData;
 import org.camunda.bpm.engine.impl.telemetry.dto.Internals;
 import org.camunda.bpm.engine.impl.telemetry.dto.Metric;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
@@ -134,11 +134,11 @@ public class TelemetryMultipleEnginesTest {
     Gson gson = new Gson();
 
     LoggedRequest defaultRequest = requests.get(0);
-    Data defaultRequestBody = gson.fromJson(defaultRequest.getBodyAsString(), Data.class);
+    TelemetryData defaultRequestBody = gson.fromJson(defaultRequest.getBodyAsString(), TelemetryData.class);
     assertReportedMetrics(defaultRequestBody, 0, 1, 0);
 
     LoggedRequest secondRequest = requests.get(1);
-    Data secondRequestBody = gson.fromJson(secondRequest.getBodyAsString(), Data.class);
+    TelemetryData secondRequestBody = gson.fromJson(secondRequest.getBodyAsString(), TelemetryData.class);
     assertReportedMetrics(secondRequestBody, 1, 0, 0);
   }
 
@@ -203,7 +203,7 @@ public class TelemetryMultipleEnginesTest {
   }
 
   private void assertReportedMetrics(
-      Data data,
+      TelemetryData data,
       int expectedRootInstances,
       int expectedDecisionInstances,
       int expectedFlowNodeInstances) {

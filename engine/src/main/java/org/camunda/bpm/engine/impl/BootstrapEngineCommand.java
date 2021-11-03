@@ -30,7 +30,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.EverLivingJobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyManager;
-import org.camunda.bpm.engine.impl.telemetry.dto.Data;
+import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryData;
 import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyData;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 import org.camunda.bpm.engine.impl.util.LicenseKeyUtil;
@@ -232,7 +232,7 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
     ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
     String installationId = processEngineConfiguration.getInstallationId();
 
-    Data telemetryData = processEngineConfiguration.getTelemetryData();
+    TelemetryData telemetryData = processEngineConfiguration.getTelemetryData();
 
     // set installationId in the telemetry data
     telemetryData.setInstallation(installationId);

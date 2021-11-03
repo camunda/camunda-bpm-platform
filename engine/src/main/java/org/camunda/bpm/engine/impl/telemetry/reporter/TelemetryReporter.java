@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
-import org.camunda.bpm.engine.impl.telemetry.dto.Data;
+import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryData;
 import org.camunda.connect.spi.Connector;
 import org.camunda.connect.spi.ConnectorRequest;
 
@@ -52,7 +52,7 @@ public class TelemetryReporter {
   protected CommandExecutor commandExecutor;
   protected String telemetryEndpoint;
   protected int telemetryRequestRetries;
-  protected Data data;
+  protected TelemetryData data;
   protected Connector<? extends ConnectorRequest<?>> httpConnector;
   protected TelemetryRegistry telemetryRegistry;
   protected MetricsRegistry metricsRegistry;
@@ -62,7 +62,7 @@ public class TelemetryReporter {
                            String telemetryEndpoint,
                            int telemetryRequestRetries,
                            long telemetryReportingPeriod,
-                           Data data,
+                           TelemetryData data,
                            Connector<? extends ConnectorRequest<?>> httpConnector,
                            TelemetryRegistry telemetryRegistry,
                            MetricsRegistry metricsRegistry,

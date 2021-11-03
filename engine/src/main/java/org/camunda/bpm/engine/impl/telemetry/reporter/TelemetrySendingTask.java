@@ -48,7 +48,7 @@ import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
 import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServer;
 import org.camunda.bpm.engine.impl.telemetry.dto.Command;
-import org.camunda.bpm.engine.impl.telemetry.dto.Data;
+import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryData;
 import org.camunda.bpm.engine.impl.telemetry.dto.Internals;
 import org.camunda.bpm.engine.impl.telemetry.dto.Metric;
 import org.camunda.bpm.engine.impl.telemetry.dto.Product;
@@ -75,7 +75,7 @@ public class TelemetrySendingTask extends TimerTask {
 
   protected CommandExecutor commandExecutor;
   protected String telemetryEndpoint;
-  protected Data staticData;
+  protected TelemetryData staticData;
   protected Connector<? extends ConnectorRequest<?>> httpConnector;
   protected int telemetryRequestRetries;
   protected TelemetryRegistry telemetryRegistry;
@@ -86,7 +86,7 @@ public class TelemetrySendingTask extends TimerTask {
   public TelemetrySendingTask(CommandExecutor commandExecutor,
                               String telemetryEndpoint,
                               int telemetryRequestRetries,
-                              Data data,
+                              TelemetryData data,
                               Connector<? extends ConnectorRequest<?>> httpConnector,
                               TelemetryRegistry telemetryRegistry,
                               MetricsRegistry metricsRegistry,
@@ -122,7 +122,7 @@ public class TelemetrySendingTask extends TimerTask {
     performDataSend(false, () -> {
       updateStaticData();
       Internals dynamicData = resolveDynamicData();
-      Data mergedData = new Data(staticData);
+      TelemetryData mergedData = new TelemetryData(staticData);
       mergedData.mergeInternals(dynamicData);
 
       try {
@@ -158,7 +158,7 @@ public class TelemetrySendingTask extends TimerTask {
     if (null == commandContext.getPropertyManager().findPropertyById(TELEMETRY_INIT_MESSAGE_SENT_NAME)) {
       // message has not been sent yet
       performDataSend(true, () -> {
-        Data initData = new Data(staticData.getInstallation(), new Product(staticData.getProduct()));
+        TelemetryData initData = new TelemetryData(staticData.getInstallation(), new Product(staticData.getProduct()));
         Internals internals = new Internals();
         internals.setTelemetryEnabled(new IsTelemetryEnabledCmd().execute(commandContext));
         initData.getProduct().setInternals(internals);
@@ -195,7 +195,7 @@ public class TelemetrySendingTask extends TimerTask {
     return telemetryEnabled != null && telemetryEnabled.booleanValue();
   }
 
-  protected void sendData(Data dataToSend, boolean isInitialMessage) {
+  protected void sendData(TelemetryData dataToSend, boolean isInitialMessage) {
 
       String telemetryData = JsonUtil.asString(dataToSend);
       Map<String, Object> requestParams = assembleRequestParameters(METHOD_NAME_POST,
@@ -339,7 +339,7 @@ public class TelemetrySendingTask extends TimerTask {
     }
   }
 
-  protected Boolean validateData(Data dataToSend) {
+  protected Boolean validateData(TelemetryData dataToSend) {
     // validate product data
     Product product = dataToSend.getProduct();
     String installationId = dataToSend.getInstallation();

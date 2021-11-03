@@ -18,17 +18,17 @@ package org.camunda.bpm.engine.impl.telemetry.dto;
 
 import org.camunda.bpm.engine.impl.util.JsonUtil;
 
-public class Data {
+public class TelemetryData {
 
   protected String installation;
   protected Product product;
 
-  public Data(String installation, Product product) {
+  public TelemetryData(String installation, Product product) {
     this.installation = installation;
     this.product = product;
   }
 
-  public Data(Data other) {
+  public TelemetryData(TelemetryData other) {
     this(other.installation, new Product(other.product));
   }
 
