@@ -138,7 +138,7 @@ public interface ExternalTaskClientBuilder {
    * @param clientInteractionListener for API interactions
    * @return the builder
    */
-  ExternalTaskClientBuilder externalTaskClientListener(ClientInteractionListener clientInteractionListener);
+  ExternalTaskClientBuilder clientInteractionListener(ClientInteractionListener clientInteractionListener);
 
   /**
    * Disables the client-side backoff strategy. On invocation, the configuration option {@link #backoffStrategy} is ignored.
