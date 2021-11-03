@@ -27,7 +27,7 @@ import org.camunda.bpm.engine.ProcessEngine;
  * <p>The {@link RuntimeContainerDelegate} in an SPI that allows the process engine to integrate with the
  * runtime container in which it is deployed. Examples of "runtime containers" are
  * <ul>
- *  <li>JBoss AS 7 (Module Service Container),</li>
+ *  <li>WildFly (Module Service Container),</li>
  *  <li>The JMX Container,</li>
  *  <li>An OSGi Runtime,</li>
  *  <li>...</li>
