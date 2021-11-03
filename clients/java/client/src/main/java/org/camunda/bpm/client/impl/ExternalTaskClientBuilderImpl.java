@@ -147,7 +147,7 @@ public class ExternalTaskClientBuilderImpl implements ExternalTaskClientBuilder 
   }
 
   @Override
-  public ExternalTaskClientBuilder externalTaskClientListener(ClientInteractionListener clientInteractionListener) {
+  public ExternalTaskClientBuilder clientInteractionListener(ClientInteractionListener clientInteractionListener) {
     this.clientInteractionListener = clientInteractionListener;
     return this;
   }
