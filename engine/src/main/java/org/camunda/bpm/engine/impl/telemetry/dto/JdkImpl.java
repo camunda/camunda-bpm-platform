@@ -16,20 +16,32 @@
  */
 package org.camunda.bpm.engine.impl.telemetry.dto;
 
-public class Metric {
+import org.camunda.bpm.engine.telemetry.Jdk;
 
-  protected long count;
+public class JdkImpl implements Jdk {
 
-  public Metric(long count) {
-    this.count = count;
+  protected String version;
+  protected String vendor;
+
+  public JdkImpl(String version, String vendor) {
+    this.version = version;
+    this.vendor = vendor;
   }
 
-  public long getCount() {
-    return count;
+  public String getVersion() {
+    return version;
   }
 
-  public void setCount(long count) {
-    this.count = count;
+  public void setVersion(String version) {
+    this.version = version;
+  }
+
+  public String getVendor() {
+    return vendor;
+  }
+
+  public void setVendor(String vendor) {
+    this.vendor = vendor;
   }
 
 }

@@ -18,8 +18,8 @@ package org.camunda.bpm.engine.impl.telemetry;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.telemetry.dto.Data;
-import org.camunda.bpm.engine.impl.telemetry.dto.Product;
+import org.camunda.bpm.engine.telemetry.Product;
+import org.camunda.bpm.engine.telemetry.TelemetryData;
 
 public class TelemetryLogger extends ProcessEngineLogger {
 
@@ -112,7 +112,7 @@ public class TelemetryLogger extends ProcessEngineLogger {
         "016", "{} request was successful.", getInitialMessageTextCapitalized(isInitialMessage));
   }
 
-  public void sendingTelemetryDataFails(Data productData) {
+  public void sendingTelemetryDataFails(TelemetryData productData) {
     Product product = productData.getProduct();
     String installationId = productData.getInstallation();
     logWarn("017","Cannot send the telemetry data. Some of the data is invalid. " +
@@ -123,6 +123,11 @@ public class TelemetryLogger extends ProcessEngineLogger {
       product.getVersion(),
       product.getEdition(),
       installationId);
+  }
+
+  public ProcessEngineException exceptionWhileRetrievingTelemetryDataRegistryNull() {
+    return new ProcessEngineException(
+        exceptionMessage("019", "Error while retrieving telemetry data. Telemetry registry was not initialized."));
   }
 
   protected String getInitialMessageText(boolean isInitialMessage) {

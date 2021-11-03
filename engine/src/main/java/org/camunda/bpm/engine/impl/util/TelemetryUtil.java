@@ -21,12 +21,21 @@ import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
 
 public class TelemetryUtil {
 
-  public static void updateCollectingTelemetryDataEnabled(TelemetryRegistry telemetryRegistry, MetricsRegistry metricsRegistry, boolean enabled) {
-    if (telemetryRegistry != null) {
-      telemetryRegistry.setCollectingTelemetryDataEnabled(enabled);
+  public static void toggleLocalTelemetry(
+      boolean telemetryActivated,
+      TelemetryRegistry telemetryRegistry,
+      MetricsRegistry metricsRegistry) {
+
+    boolean previouslyActivated = telemetryRegistry.setTelemetryLocallyActivated(telemetryActivated);
+
+    if (!previouslyActivated && telemetryActivated) {
+      if (telemetryRegistry != null) {
+        telemetryRegistry.clearCommandCounts();
+      }
+      if (metricsRegistry != null) {
+        metricsRegistry.clearTelemetryMetrics();
+      }
     }
-    if (metricsRegistry != null) {
-      metricsRegistry.setCollectingTelemetryMetrics(enabled);
-    }
+
   }
 }

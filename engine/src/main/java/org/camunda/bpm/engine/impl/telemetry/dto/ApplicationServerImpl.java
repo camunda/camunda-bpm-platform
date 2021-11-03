@@ -16,13 +16,22 @@
  */
 package org.camunda.bpm.engine.impl.telemetry.dto;
 
-public class Database {
+import static org.camunda.bpm.engine.impl.util.ParseUtil.parseServerVendor;
+
+import org.camunda.bpm.engine.telemetry.ApplicationServer;
+
+public class ApplicationServerImpl implements ApplicationServer {
 
   protected String vendor;
   protected String version;
 
-  public Database(String vendor, String version) {
+  public ApplicationServerImpl(String vendor, String version) {
     this.vendor = vendor;
+    this.version = version;
+  }
+
+  public ApplicationServerImpl(String version) {
+    this.vendor = parseServerVendor(version);
     this.version = version;
   }
 

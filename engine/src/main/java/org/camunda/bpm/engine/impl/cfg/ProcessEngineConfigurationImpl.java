@@ -346,11 +346,11 @@ import org.camunda.bpm.engine.impl.scripting.engine.VariableScopeResolverFactory
 import org.camunda.bpm.engine.impl.scripting.env.ScriptEnvResolver;
 import org.camunda.bpm.engine.impl.scripting.env.ScriptingEnvironment;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
-import org.camunda.bpm.engine.impl.telemetry.dto.Data;
-import org.camunda.bpm.engine.impl.telemetry.dto.Database;
-import org.camunda.bpm.engine.impl.telemetry.dto.Internals;
-import org.camunda.bpm.engine.impl.telemetry.dto.Jdk;
-import org.camunda.bpm.engine.impl.telemetry.dto.Product;
+import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.DatabaseImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.InternalsImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.JdkImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.ProductImpl;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ParseUtil;
@@ -1002,7 +1002,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected Connector<? extends ConnectorRequest<?>> telemetryHttpConnector;
   /** default: once every 24 hours */
   protected long telemetryReportingPeriod = 24 * 60 * 60;
-  protected Data telemetryData;
+  protected TelemetryDataImpl telemetryData;
   /** the connection and socket timeout configuration of the telemetry request
    * in milliseconds
    *  default: 15 seconds */
@@ -2816,11 +2816,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   }
 
   protected void initTelemetryData() {
-    Database database = new Database(databaseVendor, databaseVersion);
+    DatabaseImpl database = new DatabaseImpl(databaseVendor, databaseVersion);
 
-    Jdk jdk = ParseUtil.parseJdkDetails();
+    JdkImpl jdk = ParseUtil.parseJdkDetails();
 
-    Internals internals = new Internals(database, telemetryRegistry.getApplicationServer(), telemetryRegistry.getLicenseKey(), jdk);
+    InternalsImpl internals = new InternalsImpl(database, telemetryRegistry.getApplicationServer(), telemetryRegistry.getLicenseKey(), jdk);
 
     String camundaIntegration = telemetryRegistry.getCamundaIntegration();
     if (camundaIntegration != null && !camundaIntegration.isEmpty()) {
@@ -2830,10 +2830,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     ProcessEngineDetails engineInfo = ParseUtil
         .parseProcessEngineVersion(true);
 
-    Product product = new Product(PRODUCT_NAME, engineInfo.getVersion(), engineInfo.getEdition(), internals);
+    ProductImpl product = new ProductImpl(PRODUCT_NAME, engineInfo.getVersion(), engineInfo.getEdition(), internals);
 
     // installationId=null, the id will be fetched later from database
-    telemetryData = new Data(null, product);
+    telemetryData = new TelemetryDataImpl(null, product);
   }
 
   // getters and setters //////////////////////////////////////////////////////
@@ -3040,12 +3040,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return decisionService;
   }
 
-  public OptimizeService getOptimizeService() {
-    return optimizeService;
-  }
-
   public void setDecisionService(DecisionService decisionService) {
     this.decisionService = decisionService;
+  }
+
+  public OptimizeService getOptimizeService() {
+    return optimizeService;
   }
 
   public Map<Class<?>, SessionFactory> getSessionFactories() {
@@ -5131,11 +5131,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
-  public Data getTelemetryData() {
+  public TelemetryDataImpl getTelemetryData() {
     return telemetryData;
   }
 
-  public ProcessEngineConfigurationImpl setTelemetryData(Data telemetryData) {
+  public ProcessEngineConfigurationImpl setTelemetryData(TelemetryDataImpl telemetryData) {
     this.telemetryData = telemetryData;
     return this;
   }

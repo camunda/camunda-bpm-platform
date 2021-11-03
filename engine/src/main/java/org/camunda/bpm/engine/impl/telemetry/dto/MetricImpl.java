@@ -16,11 +16,13 @@
  */
 package org.camunda.bpm.engine.impl.telemetry.dto;
 
-public class Command {
+import org.camunda.bpm.engine.telemetry.Metric;
+
+public class MetricImpl implements Metric {
 
   protected long count;
 
-  public Command(long count) {
+  public MetricImpl(long count) {
     this.count = count;
   }
 

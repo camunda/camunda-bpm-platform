@@ -14,46 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.telemetry;
+package org.camunda.bpm.engine.telemetry;
 
-import java.util.concurrent.atomic.AtomicLong;
+/**
+ * This class represents the data structure used for collecting information
+ * about the installed Java runtime environment.
+ *
+ * This information is sent to Camunda when telemetry is enabled.
+ *
+ * @see <a href=
+ *      "https://docs.camunda.org/manual/latest/introduction/telemetry/#collected-data">Camunda
+ *      Documentation: Collected Telemetry Data</a>
+ */
+public interface Jdk {
 
-public class CommandCounter {
+  /**
+   * The vendor of the Java runtime environment.
+   */
+  public String getVendor();
 
-  protected String name;
-  protected AtomicLong count = new AtomicLong(0);
-
-  public CommandCounter(String name) {
-    this.name = name;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-
-  public void mark() {
-    count.incrementAndGet();
-  }
-
-  public void mark(long times) {
-    count.addAndGet(times);
-  }
-
-  public long getAndClear() {
-    return count.getAndSet(0);
-  }
-
-  public long get(boolean clear) {
-    return clear ? getAndClear() : get();
-  }
-
-  public long get() {
-    return count.get();
-  }
-
+  /**
+   * The version of the Java runtime environment.
+   */
+  public String getVersion();
 }

@@ -16,44 +16,22 @@
  */
 package org.camunda.bpm.engine.impl.telemetry.dto;
 
-import org.camunda.bpm.engine.impl.util.JsonUtil;
+import org.camunda.bpm.engine.telemetry.Command;
 
-public class Data {
+public class CommandImpl implements Command {
 
-  protected String installation;
-  protected Product product;
+  protected long count;
 
-  public Data(String installation, Product product) {
-    this.installation = installation;
-    this.product = product;
+  public CommandImpl(long count) {
+    this.count = count;
   }
 
-  public Data(Data other) {
-    this(other.installation, new Product(other.product));
+  public long getCount() {
+    return count;
   }
 
-  public String getInstallation() {
-    return installation;
+  public void setCount(long count) {
+    this.count = count;
   }
 
-  public void setInstallation(String installation) {
-    this.installation = installation;
-  }
-
-  public Product getProduct() {
-    return product;
-  }
-
-  public void setProduct(Product product) {
-    this.product = product;
-  }
-
-  public void mergeInternals(Internals other) {
-    product.getInternals().mergeDynamicData(other);
-  }
-
-  @Override
-  public String toString() {
-    return JsonUtil.asString(this);
-  }
 }

@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
-import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServer;
+import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServerImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +55,7 @@ public class SimpleApplicationIT {
     TelemetryRegistry telemetryRegistry = processEngine.getProcessEngineConfiguration().getTelemetryRegistry();
 
     // then
-    ApplicationServer applicationServer = telemetryRegistry.getApplicationServer();
+    ApplicationServerImpl applicationServer = telemetryRegistry.getApplicationServer();
     assertThat(applicationServer).isNull();
   }
 

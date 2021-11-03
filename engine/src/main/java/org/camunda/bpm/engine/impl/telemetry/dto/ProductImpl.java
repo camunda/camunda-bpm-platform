@@ -16,22 +16,24 @@
  */
 package org.camunda.bpm.engine.impl.telemetry.dto;
 
-public class Product {
+import org.camunda.bpm.engine.telemetry.Product;
+
+public class ProductImpl implements Product {
 
   protected String name;
   protected String version;
   protected String edition;
-  protected Internals internals;
+  protected InternalsImpl internals;
 
-  public Product(String name, String version, String edition, Internals internals) {
+  public ProductImpl(String name, String version, String edition, InternalsImpl internals) {
     this.name = name;
     this.version = version;
     this.edition = edition;
     this.internals = internals;
   }
 
-  public Product(Product other) {
-    this(other.name, other.version, other.edition, new Internals(other.internals));
+  public ProductImpl(ProductImpl other) {
+    this(other.name, other.version, other.edition, new InternalsImpl(other.internals));
   }
 
   public String getName() {
@@ -58,11 +60,11 @@ public class Product {
     this.edition = edition;
   }
 
-  public Internals getInternals() {
+  public InternalsImpl getInternals() {
     return internals;
   }
 
-  public void setInternals(Internals internals) {
+  public void setInternals(InternalsImpl internals) {
     this.internals = internals;
   }
 

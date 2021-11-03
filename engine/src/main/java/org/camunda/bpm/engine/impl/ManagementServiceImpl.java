@@ -49,6 +49,7 @@ import org.camunda.bpm.engine.management.UpdateJobDefinitionSuspensionStateSelec
 import org.camunda.bpm.engine.management.UpdateJobSuspensionStateSelectBuilder;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
+import org.camunda.bpm.engine.telemetry.TelemetryData;
 
 import java.sql.Connection;
 import java.util.Date;
@@ -504,6 +505,11 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
 
   public Boolean isTelemetryEnabled() {
     return commandExecutor.execute(new IsTelemetryEnabledCmd());
+  }
+
+  @Override
+  public TelemetryData getTelemetryData() {
+    return commandExecutor.execute(new GetTelemetryDataCmd());
   }
 
   protected class DbSchemaUpgradeCmd implements Command<String> {
