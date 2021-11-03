@@ -173,18 +173,6 @@
     </profile>
 
     <profile>
-      <id>distro-jbossas7</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <modules>
-        <module>javaee/ejb-client</module>
-        <module>distro/license-book</module>
-        <module>distro/jbossas7</module>
-      </modules>
-    </profile>
-
-    <profile>
       <id>distro-tomcat</id>
       <activation>
         <activeByDefault>true</activeByDefault>
