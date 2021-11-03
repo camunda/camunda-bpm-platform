@@ -267,7 +267,7 @@ public class ClientIT {
     engineRule.startProcessInstance(processDefinition.getId());
 
     ExternalTaskClientBuilder clientBuilder = ExternalTaskClient.create()
-            .externalTaskClientListener(new DefaultClientInteractionListener() {
+            .clientInteractionListener(new DefaultClientInteractionListener() {
 
               @Override
               public void onFetchAndLock(List<TopicRequestDto> topics) {
