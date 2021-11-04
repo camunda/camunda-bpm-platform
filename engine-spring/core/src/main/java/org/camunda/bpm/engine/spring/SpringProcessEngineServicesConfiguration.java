@@ -30,6 +30,7 @@ import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.TelemetryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -115,6 +116,12 @@ public class SpringProcessEngineServicesConfiguration implements ProcessEngineSe
   @Override
   public DecisionService getDecisionService() {
     return processEngine.getDecisionService();
+  }
+
+  @Bean(name = "telemetryService")
+  @Override
+  public TelemetryService getTelemetryService() {
+    return processEngine.getTelemetryService();
   }
 
 }
