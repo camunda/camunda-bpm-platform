@@ -46,7 +46,7 @@ public class TestFoxPlatformClientAsEjbModule_pasAsEjbModule extends AbstractFox
 
 
   /**
-   * This only works if EAR classloader isolation is turned OFF (which is the default in AS7)
+   * This only works if EAR classloader isolation is turned OFF (which is the default in WildFly)
    *
    * test-application.ear
    *    |-- pa.jar
