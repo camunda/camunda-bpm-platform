@@ -33,6 +33,7 @@ import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.TelemetryService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.TransactionContextFactory;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
@@ -71,6 +72,7 @@ public class ProcessEngineImpl implements ProcessEngine {
   protected FilterService filterService;
   protected ExternalTaskService externalTaskService;
   protected DecisionService decisionService;
+  protected TelemetryService telemetryService;
 
   protected String databaseSchemaUpdate;
   protected JobExecutor jobExecutor;
@@ -99,6 +101,7 @@ public class ProcessEngineImpl implements ProcessEngine {
     this.filterService = processEngineConfiguration.getFilterService();
     this.externalTaskService = processEngineConfiguration.getExternalTaskService();
     this.decisionService = processEngineConfiguration.getDecisionService();
+    this.telemetryService = processEngineConfiguration.getTelemetryService();
 
     this.databaseSchemaUpdate = processEngineConfiguration.getDatabaseSchemaUpdate();
     this.jobExecutor = processEngineConfiguration.getJobExecutor();
@@ -132,7 +135,7 @@ public class ProcessEngineImpl implements ProcessEngine {
           && processEngineConfiguration.getHostnameProvider() instanceof SimpleIpBasedProvider) {
         reporterId = processEngineConfiguration.getMetricsReporterIdProvider().provideId(this);
       } else {
-        reporterId = processEngineConfiguration.getHostname();;
+        reporterId = processEngineConfiguration.getHostname();
       }
 
       DbMetricsReporter dbMetricsReporter = processEngineConfiguration.getDbMetricsReporter();
@@ -257,6 +260,11 @@ public class ProcessEngineImpl implements ProcessEngine {
   @Override
   public DecisionService getDecisionService() {
     return decisionService;
+  }
+
+  @Override
+  public TelemetryService getTelemetryService() {
+    return telemetryService;
   }
 
 }

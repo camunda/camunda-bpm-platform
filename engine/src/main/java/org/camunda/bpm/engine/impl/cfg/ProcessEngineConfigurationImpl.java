@@ -77,6 +77,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.TelemetryService;
 import org.camunda.bpm.engine.authorization.Groups;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
@@ -99,6 +100,7 @@ import org.camunda.bpm.engine.impl.RestartProcessInstancesJobHandler;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
 import org.camunda.bpm.engine.impl.ServiceImpl;
 import org.camunda.bpm.engine.impl.TaskServiceImpl;
+import org.camunda.bpm.engine.impl.TelemetryServiceImpl;
 import org.camunda.bpm.engine.impl.application.ProcessApplicationManager;
 import org.camunda.bpm.engine.impl.batch.BatchJobHandler;
 import org.camunda.bpm.engine.impl.batch.BatchMonitorJobHandler;
@@ -436,6 +438,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected ExternalTaskService externalTaskService = new ExternalTaskServiceImpl();
   protected DecisionService decisionService = new DecisionServiceImpl();
   protected OptimizeService optimizeService = new OptimizeService();
+  protected TelemetryService telemetryService = new TelemetryServiceImpl();
 
   // COMMAND EXECUTORS ////////////////////////////////////////////////////////
 
@@ -1513,6 +1516,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initService(externalTaskService);
     initService(decisionService);
     initService(optimizeService);
+    initService(telemetryService);
   }
 
   protected void initService(Object service) {
@@ -3040,12 +3044,20 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return decisionService;
   }
 
+  public void setDecisionService(DecisionService decisionService) {
+    this.decisionService = decisionService;
+  }
+
   public OptimizeService getOptimizeService() {
     return optimizeService;
   }
 
-  public void setDecisionService(DecisionService decisionService) {
-    this.decisionService = decisionService;
+  public TelemetryService getTelemetryService() {
+    return telemetryService;
+  }
+
+  public void setTelemetryService(TelemetryService telemetryService) {
+    this.telemetryService = telemetryService;
   }
 
   public Map<Class<?>, SessionFactory> getSessionFactories() {

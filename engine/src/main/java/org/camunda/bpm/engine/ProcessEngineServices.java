@@ -112,4 +112,11 @@ public interface ProcessEngineServices {
    */
   DecisionService getDecisionService();
 
+  /**
+   * Returns the engine's {@link TelemetryService}.
+   *
+   * @return the {@link TelemetryService} object.
+   */
+  TelemetryService getTelemetryService();
+
 }
