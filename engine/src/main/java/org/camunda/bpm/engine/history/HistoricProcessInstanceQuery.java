@@ -374,4 +374,6 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
    * this exception, {@link #or()} must be invoked first.
    * */
   HistoricProcessInstanceQuery endOr();
+
+  HistoricProcessInstanceQuery variableValueIncludesAny(String name, Object... values);
 }

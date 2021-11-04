@@ -110,6 +110,23 @@ public class HistoricProcessInstanceTest {
 
   @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  public void shouldQueryByVariableValueIncludesAny() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        "myBusinessKey", Variables.createVariables()
+            .putValue("my-var-name-one", "value-three")
+            .putValue("my-var-name-two", 6));
+
+    List<HistoricProcessInstance> list = historyService.createHistoricProcessInstanceQuery()
+        .processInstanceBusinessKey("myBusinessKey").processDefinitionKey("oneTaskProcess")
+        .variableValueIncludesAny("my-var-name-two", "value-foo", 6, "value-four")
+        .variableValueIncludesAny("my-var-name-one", "value-foo", "value-two", "value-three")
+        .list();
+
+    assertThat(list).extracting("processInstanceId").containsExactly(processInstance.getId());
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
   public void testHistoricDataCreatedForProcessExecution() {
 
     Calendar calendar = new GregorianCalendar();

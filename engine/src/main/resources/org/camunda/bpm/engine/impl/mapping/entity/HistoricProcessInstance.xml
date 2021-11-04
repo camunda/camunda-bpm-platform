@@ -328,15 +328,23 @@
        It is important that in the WHERE part we use the same table
        names for the respective conditions (i.e. VI0, VI1, VI2, ...) -->
     <bind name="variableConditionCounter" value="0" />
+    <bind name="variableConditionAnyCounter" value="0" />
     <foreach collection="queries" item="query">
       <foreach collection="query.queryVariableValues" item="value">
         LEFT JOIN ${prefix}ACT_HI_VARINST VI${variableConditionCounter}
         ON SELF.PROC_INST_ID_ = VI${variableConditionCounter}.PROC_INST_ID_
         <bind name="variableConditionCounter" value="variableConditionCounter + 1" />
       </foreach>
+
+      <foreach collection="query.queryVariableValuesIncludesAny" index="name">
+        LEFT JOIN ${prefix}ACT_HI_VARINST VI_ANY${variableConditionAnyCounter}
+        ON SELF.PROC_INST_ID_ = VI_ANY${variableConditionAnyCounter}.PROC_INST_ID_
+        <bind name="variableConditionAnyCounter" value="variableConditionAnyCounter + 1" />
+      </foreach>
     </foreach>
 
     <bind name="variableConditionCounter" value="0" />
+    <bind name="variableConditionAnyCounter" value="0" />
     <where>
       <foreach collection="queries" item="query" index="i">
         <choose>
@@ -496,6 +504,34 @@
               </if>
               )
               <bind name="variableConditionCounter" value="variableConditionCounter + 1" />
+            </foreach>
+            <foreach collection="query.queryVariableValuesIncludesAny" index="variableName" item="variableValues">
+              AND (
+              <trim prefixOverrides="or">
+                <foreach collection="variableValues" item="queryVariableValue">
+                  <bind name="varPrefix" value="'VI_ANY' + variableConditionAnyCounter + '.'"/>
+                  or (${varPrefix}ID_ IS NOT NULL
+                  AND
+
+                  <choose>
+                    <when test="queryVariableValue.variableNameIgnoreCase">
+                      UPPER(${varPrefix}NAME_)= UPPER(#{variableName})
+                    </when>
+                    <otherwise>
+                      ${varPrefix}NAME_= #{variableName}
+                    </otherwise>
+                  </choose>
+                  ${collationForCaseSensitivity}
+
+                  <bind name="varTypeField" value="'VAR_TYPE_'"/>
+                  <if test="queryVariableValue.valueConditions != null">
+                    and <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableValueConditions"/>
+                  </if>
+                  )
+                </foreach>
+              </trim>
+              )
+              <bind name="variableConditionAnyCounter" value="variableConditionAnyCounter + 1" />
             </foreach>
 
             <if test="query.executedActivityAfter != null || query.executedActivityBefore != null">

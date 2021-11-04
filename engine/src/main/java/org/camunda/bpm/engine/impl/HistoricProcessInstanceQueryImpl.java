@@ -26,7 +26,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.camunda.bpm.engine.BadUserRequestException;
@@ -91,6 +93,8 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
   protected List<HistoricProcessInstanceQueryImpl> queries = new ArrayList<>(Arrays.asList(this));
   protected boolean isOrQueryActive = false;
+
+  protected Map<String, List<QueryVariableValue>> queryVariableValuesIncludesAny = new HashMap<>();
 
   public HistoricProcessInstanceQueryImpl() {
   }
@@ -399,7 +403,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   protected void ensureVariablesInitialized() {
     super.ensureVariablesInitialized();
 
-    if (!queries.isEmpty()) {
+    if (!queries.isEmpty() || !queryVariableValuesIncludesAny.isEmpty()) {
       ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
       VariableSerializers variableSerializers = processEngineConfiguration.getVariableSerializers();
       String dbType = processEngineConfiguration.getDatabaseType();
@@ -409,6 +413,11 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
           var.initialize(variableSerializers, dbType);
         }
       }
+
+      queryVariableValuesIncludesAny.forEach(
+          (name, variableValues) ->
+              variableValues.forEach(variableValue ->
+                  variableValue.initialize(variableSerializers, dbType)));
     }
   }
 
@@ -783,6 +792,25 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     }
 
     return queries.get(0);
+  }
+
+  @SuppressWarnings("unchecked")
+  public HistoricProcessInstanceQuery variableValueIncludesAny(String name, Object... values) {
+    Arrays.stream(values).forEach(value -> {
+      boolean shouldMatchVariableValuesIgnoreCase = Boolean.TRUE.equals(variableValuesIgnoreCase) && value != null && String.class.isAssignableFrom(value.getClass());
+      boolean shouldMatchVariableNamesIgnoreCase = Boolean.TRUE.equals(variableNamesIgnoreCase);
+      List<QueryVariableValue> variableValues = queryVariableValuesIncludesAny.get(name);
+      if (variableValues == null) {
+        variableValues = new ArrayList<>();
+      }
+      variableValues.add(new QueryVariableValue(name, value, QueryOperator.EQUALS, true, shouldMatchVariableNamesIgnoreCase, shouldMatchVariableValuesIgnoreCase));
+      queryVariableValuesIncludesAny.put(name, variableValues);
+    });
+    return this;
+  }
+
+  public Map<String, List<QueryVariableValue>> getVariableValuesIncludesAny() {
+    return queryVariableValuesIncludesAny;
   }
 
 }
