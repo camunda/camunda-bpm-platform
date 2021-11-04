@@ -93,7 +93,7 @@
         <module>engine-plugins</module>
 
         <module>distro/license-book</module>
-        <module>distro/jbossas7</module>
+        <module>distro/jboss</module>
         <module>distro/tomcat</module>
         <module>distro/sql-script</module>
         <module>distro/run</module>
@@ -118,7 +118,7 @@
         <module>spring-boot-starter</module>
 
         <module>distro/license-book</module>
-        <module>distro/jbossas7</module>
+        <module>distro/jboss</module>
         <module>distro/tomcat</module>
         <module>distro/run</module>
       </modules>
