@@ -37,11 +37,11 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServer;
 import org.camunda.bpm.engine.impl.telemetry.dto.Command;
-import org.camunda.bpm.engine.impl.telemetry.dto.Data;
 import org.camunda.bpm.engine.impl.telemetry.dto.Database;
 import org.camunda.bpm.engine.impl.telemetry.dto.Internals;
 import org.camunda.bpm.engine.impl.telemetry.dto.Metric;
 import org.camunda.bpm.engine.impl.telemetry.dto.Product;
+import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryData;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
 import org.camunda.bpm.engine.impl.util.ParseUtil;
@@ -123,7 +123,7 @@ public class TelemetryConnectPluginTest extends AbstractFoxPlatformIntegrationTe
     configuration.getManagementService().toggleTelemetry(true);
     wireMockServer = new WireMockServer(WireMockConfiguration.options().port(18090));
     wireMockServer.start();
-    Data data = createDataToSend();
+    TelemetryData data = createDataToSend();
 
     String requestBody = JsonUtil.asString(data);
     wireMockServer.stubFor(post(urlEqualTo("/pings"))
@@ -149,7 +149,7 @@ public class TelemetryConnectPluginTest extends AbstractFoxPlatformIntegrationTe
               .withHeader("Content-Type",  equalTo("application/json")));
   }
 
-  protected Data createDataToSend() {
+  protected TelemetryData createDataToSend() {
     Database database = new Database("mySpecialDb", "v.1.2.3");
     Internals internals = new Internals(database, new ApplicationServer("Apache Tomcat/10.0.1"), null, ParseUtil.parseJdkDetails());
 
@@ -162,7 +162,7 @@ public class TelemetryConnectPluginTest extends AbstractFoxPlatformIntegrationTe
 
     internals.setWebapps(Collections.emptySet());
     Product product = new Product("Runtime", "7.14.0", "special", internals);
-    Data data = new Data("cb07ce31-c8e3-4f5f-94c2-1b28175c2022", product);
+    TelemetryData data = new TelemetryData("cb07ce31-c8e3-4f5f-94c2-1b28175c2022", product);
     return data;
   }
 
