@@ -53,7 +53,12 @@ public class CallActivityBehavior extends CallableElementActivityBehavior implem
 
   @Override
   protected void startInstance(ActivityExecution execution, VariableMap variables, String businessKey) {
-    ProcessDefinitionImpl definition = getProcessDefinitionToCall(execution, getCallableElement());
+    ExecutionEntity executionEntity = (ExecutionEntity) execution;
+
+    ProcessDefinitionImpl definition = getProcessDefinitionToCall(
+        executionEntity,
+        executionEntity.getProcessDefinitionTenantId(),
+        getCallableElement());
     PvmProcessInstance processInstance = execution.createSubProcessInstance(definition, businessKey);
     processInstance.start(variables);
   }

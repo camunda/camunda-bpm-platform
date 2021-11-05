@@ -887,6 +887,11 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
     return Context.getProcessEngineConfiguration().getProcessEngine();
   }
 
+  public String getCaseDefinitionTenantId() {
+    CaseDefinitionEntity caseDefinition = (CaseDefinitionEntity) getCaseDefinition();
+    return caseDefinition.getTenantId();
+  }
+
   public <T extends CoreExecution> void performOperation(CoreAtomicOperation<T> operation) {
     Context.getCommandContext()
       .performOperation((CmmnAtomicOperation) operation, this);

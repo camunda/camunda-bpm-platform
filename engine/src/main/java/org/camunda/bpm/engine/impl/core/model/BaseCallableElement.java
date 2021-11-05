@@ -151,8 +151,12 @@ public class BaseCallableElement {
     this.deploymentId = deploymentId;
   }
 
-  public String getDefinitionTenantId(VariableScope variableScope) {
-    return (String) tenantIdProvider.getValue(variableScope);
+  public String getDefinitionTenantId(VariableScope variableScope, String defaultTenantId) {
+    if (tenantIdProvider != null) {
+      return (String) tenantIdProvider.getValue(variableScope);
+    } else {
+      return defaultTenantId;
+    }
   }
 
   public ParameterValueProvider getTenantIdProvider() {
@@ -164,7 +168,7 @@ public class BaseCallableElement {
    * potential side effects to determine the process or case definition that is to be called.
    */
   public boolean hasDynamicReferences() {
-    return tenantIdProvider.isDynamic()
+    return (tenantIdProvider != null && tenantIdProvider.isDynamic())
       || definitionKeyValueProvider.isDynamic()
       || versionValueProvider.isDynamic()
       || versionTagValueProvider.isDynamic();
