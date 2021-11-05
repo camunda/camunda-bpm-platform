@@ -25,8 +25,6 @@ import java.util.List;
  *
  * <p>Note: Since an implementation of this interface may be executed by multiple threads,
  * it is recommended to implement the custom backoff strategy in a thread-safe manner.
- *
- * @author Samuel Tannous
  */
 public interface ErrorAwareBackoffStrategy extends BackoffStrategy {
 

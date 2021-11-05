@@ -26,9 +26,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * @author Samuel Tannous
- */
 public class ExponentialErrorBackoffStrategyTest {
 
   protected ExponentialErrorBackoffStrategy backoffStrategy;

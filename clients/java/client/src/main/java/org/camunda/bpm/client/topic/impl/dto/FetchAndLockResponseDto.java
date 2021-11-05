@@ -23,9 +23,6 @@ import org.camunda.bpm.client.task.ExternalTask;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * @author Samuel Tannous
- */
 public class FetchAndLockResponseDto {
 
   protected List<ExternalTask> externalTasks;

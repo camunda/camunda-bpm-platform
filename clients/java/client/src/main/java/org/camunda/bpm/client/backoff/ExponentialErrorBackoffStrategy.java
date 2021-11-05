@@ -26,8 +26,6 @@ import java.util.List;
  * <p>Note this strategy does not provide any backoff when no external tasks are received. It
  * should therefore only be used with long polling (asyncResponseTimeout) to ensure appropriate
  * throttling of requests.
- *
- * @author Samuel Tannous
  */
 public class ExponentialErrorBackoffStrategy implements ErrorAwareBackoffStrategy {
 
