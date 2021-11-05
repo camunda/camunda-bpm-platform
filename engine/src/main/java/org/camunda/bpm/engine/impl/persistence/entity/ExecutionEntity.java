@@ -1956,4 +1956,8 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   public ProcessEngine getProcessEngine() {
     return Context.getProcessEngineConfiguration().getProcessEngine();
   }
+
+  public String getProcessDefinitionTenantId() {
+    return getProcessDefinition().getTenantId();
+  }
 }

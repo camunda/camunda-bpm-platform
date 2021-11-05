@@ -65,10 +65,13 @@ public class DecisionEvaluationUtil {
     }
   }
 
-  public static void evaluateDecision(AbstractVariableScope execution, BaseCallableElement callableElement,
-      String resultVariable, DecisionResultMapper decisionResultMapper) throws Exception {
+  public static void evaluateDecision(AbstractVariableScope execution,
+      String defaultTenantId,
+      BaseCallableElement callableElement,
+      String resultVariable,
+      DecisionResultMapper decisionResultMapper) throws Exception {
 
-    DecisionDefinition decisionDefinition = resolveDecisionDefinition(callableElement, execution);
+    DecisionDefinition decisionDefinition = resolveDecisionDefinition(callableElement, execution, defaultTenantId);
     DecisionInvocation invocation = createInvocation(decisionDefinition, execution);
 
     invoke(invocation);
@@ -115,8 +118,8 @@ public class DecisionEvaluationUtil {
     return new DecisionInvocation(decisionDefinition, variableContext);
   }
 
-  protected static DecisionDefinition resolveDecisionDefinition(BaseCallableElement callableElement, AbstractVariableScope execution) {
-    return CallableElementUtil.getDecisionDefinitionToCall(execution, callableElement);
+  protected static DecisionDefinition resolveDecisionDefinition(BaseCallableElement callableElement, AbstractVariableScope execution, String defaultTenantId) {
+    return CallableElementUtil.getDecisionDefinitionToCall(execution, defaultTenantId, callableElement);
   }
 
 }

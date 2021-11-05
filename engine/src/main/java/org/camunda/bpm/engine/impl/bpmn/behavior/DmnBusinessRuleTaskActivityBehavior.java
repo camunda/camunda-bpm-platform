@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.core.model.BaseCallableElement;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.dmn.result.DecisionResultMapper;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 
 /**
@@ -53,7 +54,13 @@ public class DmnBusinessRuleTaskActivityBehavior extends AbstractBpmnActivityBeh
     executeWithErrorPropagation(execution, new Callable<Void>() {
 
       public Void call() throws Exception {
-        evaluateDecision((AbstractVariableScope) execution, callableElement, resultVariable, decisionResultMapper);
+        ExecutionEntity executionEntity = (ExecutionEntity) execution;
+
+        evaluateDecision(executionEntity,
+            executionEntity.getProcessDefinitionTenantId(),
+            callableElement,
+            resultVariable,
+            decisionResultMapper);
         leave(execution);
         return null;
       }

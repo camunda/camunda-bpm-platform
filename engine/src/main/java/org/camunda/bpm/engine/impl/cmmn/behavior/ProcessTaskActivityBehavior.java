@@ -21,6 +21,7 @@ import static org.camunda.bpm.engine.impl.util.CallableElementUtil.getProcessDef
 import java.util.Map;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
@@ -34,7 +35,9 @@ public class ProcessTaskActivityBehavior extends ProcessOrCaseTaskActivityBehavi
   protected static final CmmnBehaviorLogger LOG = ProcessEngineLogger.CMNN_BEHAVIOR_LOGGER;
 
   protected void triggerCallableElement(CmmnActivityExecution execution, Map<String, Object> variables, String businessKey) {
-    ProcessDefinitionImpl definition = getProcessDefinitionToCall(execution, getCallableElement());
+    CaseExecutionEntity executionEntity = (CaseExecutionEntity) execution;
+
+    ProcessDefinitionImpl definition = getProcessDefinitionToCall(execution, executionEntity.getCaseDefinitionTenantId(), getCallableElement());
     PvmProcessInstance processInstance = execution.createSubProcessInstance(definition, businessKey);
     processInstance.start(variables);
   }
