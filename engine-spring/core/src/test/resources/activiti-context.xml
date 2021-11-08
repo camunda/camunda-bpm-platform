@@ -1,0 +1,25 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="processEngineConfiguration"
+          class="org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration"
+          init-method="init">
+
+        <property name="jdbcUrl" value="jdbc:h2:mem:camunda;DB_CLOSE_DELAY=-1" />
+        <property name="jdbcDriver" value="org.h2.Driver" />
+        <property name="jdbcUsername" value="sa" />
+        <property name="jdbcPassword" value="" />
+
+        <property name="processEngineName" value="activitiContextProcessName"/>
+
+        <property name="databaseSchemaUpdate" value="true"/>
+
+        <property name="jobExecutorActivate" value="false"/>
+    </bean>
+
+    <bean id="processEngine" class="org.camunda.bpm.engine.impl.ProcessEngineImpl">
+        <constructor-arg ref="processEngineConfiguration"/>
+    </bean>
+
+</beans>
