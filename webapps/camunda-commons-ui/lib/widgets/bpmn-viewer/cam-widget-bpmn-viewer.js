@@ -342,16 +342,14 @@ module.exports = [
               diagram = undefined;
             }
 
-            console.log(diagram, diagramData);
-
             viewer.on('import.render.complete', function(e) {
-              viewer.get('eventBus').fire('import.done');
+              if (!diagram) {
+                viewer.get('eventBus').fire('import.done');
+              }
             });
 
             importFunction(diagram)
               .then(function({warnings: warn}) {
-                console.log('done');
-
                 var applyFunction = useDefinitions
                   ? function(fn) {
                       fn();
