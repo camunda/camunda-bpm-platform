@@ -319,8 +319,8 @@ module.exports = [
           const getKeyAndValue = (mappedOptions, search) => {
             let key = null;
             let value = null;
+            const inOperator = search.operator === 'In';
             if (mappedOptions) {
-              const inOperator = search.operator === 'In';
               const options = mappedOptions.filter(
                 option => inOperator && search.value.includes(option.key)
               );
@@ -336,6 +336,10 @@ module.exports = [
                 );
                 key = option?.key;
                 value = option?.value;
+              }
+            } else {
+              if (inOperator) {
+                value = search.value.join(',');
               }
             }
 
@@ -585,6 +589,12 @@ module.exports = [
                 option => search.value.value === option.value
               )?.key;
             }
+          } else {
+            if (search.operator.value.key === 'In') {
+              search.value.key = search.value.value.split(',');
+            } else {
+              search.value.key = search.value.value;
+            }
           }
         };
 
@@ -622,12 +632,17 @@ module.exports = [
                   option => search.value.value === option.value
                 )?.key;
               }
+            } else {
+              if (search.operator.value.key === 'In') {
+                value = search.value.value.split(',');
+              }
             }
 
             if (!value) {
               value = search.value.value;
             }
 
+            console.log(value);
             return value;
           };
 
