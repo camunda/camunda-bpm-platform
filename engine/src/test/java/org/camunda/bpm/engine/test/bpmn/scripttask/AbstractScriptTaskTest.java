@@ -55,6 +55,9 @@ public abstract class AbstractScriptTaskTest extends PluggableProcessEngineTest 
       .scriptTask()
         .scriptFormat(scriptFormat)
         .scriptText(scriptText)
+      .scriptTask("bar")
+        .scriptFormat("javascript")
+        .scriptText("")
       .userTask()
       .endEvent()
     .done();

@@ -732,7 +732,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected ResourceAuthorizationProvider resourceAuthorizationProvider;
 
-  protected List<ProcessEnginePlugin> processEnginePlugins = new ArrayList<>();
+  protected List<ProcessEnginePlugin> processEnginePlugins = new ArrayList<ProcessEnginePlugin>() {{
+    add(new org.camunda.spin.plugin.impl.SpinProcessEnginePlugin());
+  }};
 
   protected HistoryEventProducer historyEventProducer;
 

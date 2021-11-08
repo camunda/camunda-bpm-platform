@@ -32,6 +32,7 @@ import org.camunda.bpm.engine.ScriptEvaluationException;
 import org.camunda.bpm.engine.impl.scripting.engine.DefaultScriptEngineResolver;
 import org.camunda.bpm.engine.impl.scripting.engine.ScriptEngineResolver;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -237,6 +238,26 @@ public class ScriptTaskGraalJsTest extends AbstractScriptTaskTest {
       // this is not allowed in the JS ScriptEngine
         .isInstanceOf(ScriptEvaluationException.class)
         .hasMessageContaining("ReferenceError");
+    }
+  }
+
+  @Test
+  public void shouldNotThrowNullPointerException() {
+    deployProcess("graal.js",
+        // GIVEN
+        "var SpinValues = Java.type('org.camunda.spin.plugin.variable.SpinValues');\n" + "\n"
+            + "\n"
+            + "var jsonNullValue = SpinValues[\"jsonValue(java.lang.String)\"](null).create();\n"
+            + "\n" + "execution.setVariable(\"aNullJsonVariable\", jsonNullValue);\n" + "\n"
+            + "\"test\";");
+
+    if (!enableExternalResources && configureHostAccess && !enableNashornCompat) {
+      // WHEN
+      ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
+
+      // THEN
+      TypedValue variable = runtimeService.getVariableTyped(pi.getId(), "aNullJsonVariable");
+      assertThat(variable).isNotNull();
     }
   }
 
