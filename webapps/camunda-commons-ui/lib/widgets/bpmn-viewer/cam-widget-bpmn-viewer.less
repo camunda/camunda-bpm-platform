@@ -1,3 +1,6 @@
+@import (less) "bpmn-js/dist/assets/bpmn-js.css";
+@import (less) "bpmn-js/dist/assets/diagram-js.css";
+
 @bpmn-nav-radius: 3px;
 
 [cam-widget-bpmn-viewer] {
@@ -22,7 +25,7 @@
     font-size: 20px;
   }
 
-  .diagram-holder .bjs-container > a {
+  .bjs-powered-by {
     display: none;
   }
 
@@ -119,6 +122,31 @@
     div {
       padding: 1px;
     }
+  }
+
+  .bjs-breadcrumbs {
+    font-size: 14px;
+    left: 25px;
+    top: 15px;
+    padding-left: 0;
+
+    li {
+      a {
+        color: @link-color;
+      }
+
+      &::before {
+        height: 14px;
+      }
+
+      &:last-of-type a {
+        color: inherit;
+      }
+    }
+  }
+
+  .bjs-drilldown {
+    margin-top: 5px;
   }
 }
 
