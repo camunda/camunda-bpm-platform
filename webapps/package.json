@@ -40,7 +40,7 @@
     "angular-translate": "2.18.4",
     "bootstrap": "3.4.1",
     "bpmn-font": "0.10.0",
-    "bpmn-js": "8.1.0",
+    "bpmn-js": "9.0.0-subprocesses.3",
     "camunda-webapp-translations": "git://github.com/camunda/camunda-webapp-translations#master",
     "clipboard": "2.0.6",
     "cmmn-js": "0.20.0",
