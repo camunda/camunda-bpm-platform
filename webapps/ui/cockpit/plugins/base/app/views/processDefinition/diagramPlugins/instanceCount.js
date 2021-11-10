@@ -156,16 +156,25 @@ module.exports = [
                 return entry.id === id;
               })[0];
             }
+
+            function setTextContent(node, number, childNumber) {
+              node.text($filter('abbreviateNumber')(number || childNumber));
+            }
+
             function updateOverlayNodes(nodes, data) {
-              nodes.instancesNode.text(
-                $filter('abbreviateNumber')(data.instances)
+              setTextContent(
+                nodes.instancesNode,
+                data.instances,
+                data.childInstances && '...'
               );
 
-              nodes.incidentsNode.text(
-                $filter('abbreviateNumber')(data.incidents)
+              setTextContent(
+                nodes.incidentsNode,
+                data.incidents,
+                data.childIncidents
               );
 
-              if (data.instances <= 0) {
+              if (!data.instances && !data.childInstances) {
                 nodes.instancesNode.hide();
               } else {
                 nodes.instancesNode.show();
@@ -179,7 +188,7 @@ module.exports = [
                 });
               }
 
-              if (data.incidents) {
+              if (data.incidents || data.childIncidents) {
                 nodes.incidentsNode.show();
                 nodes.incidentsNode.tooltip({
                   container: 'body',

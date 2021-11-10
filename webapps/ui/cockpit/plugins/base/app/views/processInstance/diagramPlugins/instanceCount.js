@@ -134,7 +134,9 @@ module.exports = [
               );
 
               nodes.incidentsNode.text(
-                $filter('abbreviateNumber')(data.incidents)
+                $filter('abbreviateNumber')(
+                  data.incidents || data.childIncidents
+                )
               );
 
               if (data.instanceCount <= 0) {
@@ -151,7 +153,7 @@ module.exports = [
                 });
               }
 
-              if (!data.incidents) {
+              if (!data.incidents && !data.childIncidents) {
                 nodes.incidentsNode.hide();
               } else {
                 nodes.incidentsNode.show();
