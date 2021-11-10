@@ -17,6 +17,7 @@
 package org.camunda.bpm.quarkus.engine.extension;
 
 import org.camunda.bpm.engine.cdi.CdiJtaProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.CommandCounterInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
@@ -44,6 +45,8 @@ public class QuarkusProcessEngineConfiguration extends CdiJtaProcessEngineConfig
     setTransactionsExternallyManaged(true);
 
     setIdGenerator(new StrongUuidGenerator());
+
+    setHistory(HistoryLevel.HISTORY_LEVEL_FULL.getName()); // Cockpit needs it
   }
 
   /**

@@ -79,7 +79,7 @@ public class DateFormType extends AbstractFormFieldType {
 
   public TypedValue convertToFormValue(TypedValue modelValue) {
     if(modelValue.getValue() == null) {
-      return Variables.stringValue(null, modelValue.isTransient());
+      return Variables.stringValue("", modelValue.isTransient());
     } else if(modelValue.getType() == ValueType.DATE) {
       return Variables.stringValue(dateFormat.format(modelValue.getValue()), modelValue.isTransient());
     }

@@ -22,8 +22,6 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Callable;
-
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -84,13 +82,8 @@ public class DeleteDeploymentCmd implements Command<Void>, Serializable {
       Context.getProcessEngineConfiguration().getCommandExecutorTxRequiresNew());
 
     try {
-      commandContext.runWithoutAuthorization(new Callable<Void>() {
-        public Void call() throws Exception {
-          new UnregisterProcessApplicationCmd(deploymentId, false).execute(commandContext);
-          new UnregisterDeploymentCmd(Collections.singleton(deploymentId)).execute(commandContext);
-          return null;
-        }
-      });
+      commandContext.runWithoutAuthorization(new UnregisterProcessApplicationCmd(deploymentId, false));
+      commandContext.runWithoutAuthorization(new UnregisterDeploymentCmd(Collections.singleton(deploymentId)));
     } finally {
       try {
         commandContext.getTransactionContext().addTransactionListener(TransactionState.ROLLED_BACK, listener);

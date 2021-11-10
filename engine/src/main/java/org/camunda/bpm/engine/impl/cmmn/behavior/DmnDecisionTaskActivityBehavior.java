@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.impl.cmmn.behavior;
 
 import static org.camunda.bpm.engine.impl.util.DecisionEvaluationUtil.evaluateDecision;
 
+import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.dmn.result.DecisionResultMapper;
@@ -33,7 +34,13 @@ public class DmnDecisionTaskActivityBehavior extends DecisionTaskActivityBehavio
   @Override
   protected void performStart(CmmnActivityExecution execution) {
     try {
-      evaluateDecision((AbstractVariableScope) execution, callableElement, resultVariable, decisionResultMapper);
+      CaseExecutionEntity executionEntity = (CaseExecutionEntity) execution;
+
+      evaluateDecision(executionEntity,
+          executionEntity.getCaseDefinitionTenantId(),
+          callableElement,
+          resultVariable,
+          decisionResultMapper);
 
       if (execution.isActive()) {
         execution.complete();

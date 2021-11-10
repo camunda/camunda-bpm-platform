@@ -26,6 +26,7 @@
       <includes>
         <include>org.camunda.bpm:camunda-engine-rest-jaxrs2:jar:*</include>
         <include>org.glassfish.jersey.containers:jersey-container-servlet:*</include>
+        <include>org.glassfish.jersey.inject:jersey-hk2:*</include>
       </includes>
     </dependencySet>
 

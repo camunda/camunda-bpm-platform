@@ -18,8 +18,6 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.InputStream;
 import java.io.Serializable;
-import java.util.concurrent.Callable;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -64,11 +62,8 @@ public class GetDeploymentProcessDiagramCmd implements Command<InputStream>, Ser
       return null;
     } else {
 
-      InputStream processDiagramStream = commandContext.runWithoutAuthorization(new Callable<InputStream>() {
-        public InputStream call() throws Exception {
-          return new GetDeploymentResourceCmd(deploymentId, resourceName).execute(commandContext);
-        }
-      });
+      InputStream processDiagramStream = commandContext.runWithoutAuthorization(
+          new GetDeploymentResourceCmd(deploymentId, resourceName));
 
       return processDiagramStream;
     }

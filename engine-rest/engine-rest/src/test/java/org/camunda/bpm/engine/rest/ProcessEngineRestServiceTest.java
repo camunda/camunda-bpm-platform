@@ -673,7 +673,9 @@ public class ProcessEngineRestServiceTest extends
       .statusCode(Status.OK.getStatusCode())
       . body(is(equalTo(new String(byteContent))))
       .and()
-        .header("Content-Disposition", "attachment; filename=\"" + filename + "\"")
+        .header("Content-Disposition", "attachment; " +
+                "filename=\"" + filename + "\"; " +
+                "filename*=UTF-8''" + filename)
         .contentType(CoreMatchers.<String>either(equalTo(ContentType.TEXT.toString() + ";charset=UTF-8")).or(equalTo(ContentType.TEXT.toString() + " ;charset=UTF-8")))
       .when()
         .get(HISTORY_BINARY_VARIABLE_INSTANCE_URL);
@@ -744,7 +746,9 @@ public class ProcessEngineRestServiceTest extends
       .statusCode(Status.OK.getStatusCode())
       . body(is(equalTo(new String(byteContent))))
       .and()
-        .header("Content-Disposition", "attachment; filename=\"" + filename + "\"")
+        .header("Content-Disposition", "attachment; " +
+                "filename=\"" + filename + "\"; " +
+                "filename*=UTF-8''" + filename)
         .contentType(CoreMatchers.<String>either(equalTo(ContentType.TEXT.toString() + ";charset=UTF-8")).or(equalTo(ContentType.TEXT.toString() + " ;charset=UTF-8")))
       .when()
         .get(HISTORY_BINARY_DETAIL_URL);

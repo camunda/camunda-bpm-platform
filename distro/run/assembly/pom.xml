@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.camunda.bpm.run</groupId>
     <artifactId>camunda-bpm-run-root</artifactId>
-    <version>7.16.0-SNAPSHOT</version>
+    <version>7.17.0-SNAPSHOT</version>
     <relativePath>..</relativePath>
   </parent>
 
@@ -39,6 +39,20 @@
     <dependency>
       <groupId>org.camunda.bpm.run</groupId>
       <artifactId>camunda-bpm-run-modules-swaggerui</artifactId>
+      <version>${project.version}</version>
+      <type>jar</type>
+      <exclusions>
+        <!-- do not add transitive dependencies to generated dependency list -->
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm.run</groupId>
+      <artifactId>camunda-bpm-run-modules-example-invoice</artifactId>
       <version>${project.version}</version>
       <type>jar</type>
       <exclusions>

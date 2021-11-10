@@ -386,6 +386,24 @@ var Controller = [
       ]
     );
 
+    processData.provide('staticCalledProcessDefinitions', [
+      'processDefinition',
+      'bpmnElements',
+      function(processDefinition, bpmnElements) {
+        if (
+          Object.values(bpmnElements).some(
+            element => element.$type === 'bpmn:CallActivity'
+          )
+        ) {
+          return camAPI
+            .resource('process-definition')
+            .staticCalledProcessDefinitions(processDefinition.id);
+        } else {
+          return [];
+        }
+      }
+    ]);
+
     // end data definition /////////////////////////
 
     // begin data usage ////////////////////////////

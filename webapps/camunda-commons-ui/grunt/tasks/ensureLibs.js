@@ -131,9 +131,7 @@ module.exports = function(grunt, dirname, licensebookConfig) {
     for (var i = 0; i < included.length; i++) {
       // Non-linked path
       includedFiles.add(
-        './node_modules/camunda-bpm-webapp/node_modules/' +
-          included[i] +
-          '/index.js'
+        __dirname + '/../../../../../' + included[i] + '/index.js'
       );
 
       b.require(included[i]);

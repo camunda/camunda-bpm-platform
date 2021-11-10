@@ -120,6 +120,32 @@ To run the test suite against a given database, select the `database` profile an
 mvn test -Pdatabase,postgresql -Ddatabase.url=jdbc:postgresql:pgdb -Ddatabase.username=pguser -Ddatabase.password=pgpassword
 ```
 
+## Testing a Camunda-supported Database with Testcontainers
+
+It is also possible to use Testcontainers to run the test suite agains a given database. To ensure that your database 
+Docker image can be used this way, please perform the following steps:
+
+1. Ensure that your Docker image is compatible with Testcontainers;
+1. Provide the repository name of your Docker image in the [testcontainers.properties](./engine/src/test/resources/testcontainers.properties) file;
+   * If you use a private Docker repository, please include it in the Docker image name (e.g. private.registry.org/postgres)
+1. In the `pom.xml` file located in the `./database` folder, check out the `database.tc.url` property to ensure that 
+   the Docker tags match.
+1. Make sure that the `testcontainers` profile is added to your Maven `settings.xml` (you can find it [here](settings/maven/nexus-settings.xml)).
+
+At the moment, Testcontainers can be used with the Camunda-supported versions of the following databases. Please make 
+sure that the database image is configured according to [this guide](https://docs.camunda.org/manual/latest/user-guide/process-engine/database/database-configuration/#isolation-level-configuration):
+* PostgreSQL
+* MariaDB
+* MySQL
+* CockroachDB
+* MS-SQL 2017/2019 ([MSSQL-specific configuraion guide](https://docs.camunda.org/manual/latest/user-guide/process-engine/database/mssql-configuration/))
+
+To execute the process engine test suite with a certain database (e.g. PostgreSQL), you should call Maven in the 
+engine directory with
+```shell
+mvn clean test -Ppostgresql,testcontainers
+```
+
 # Limiting the Number of Engine Unit Tests
 
 Due to the fact that the number of unit tests in the camunda engine increases daily and that you might just want to test a certain subset of tests the maven-surefire-plugin is configured in a way that you can include/exclude certain packages in your tests.

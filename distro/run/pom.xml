@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-database-settings</artifactId>
-    <version>7.16.0-SNAPSHOT</version>
+    <version>7.17.0-SNAPSHOT</version>
     <relativePath>../../database</relativePath>
   </parent>
 
@@ -18,6 +18,15 @@
   <dependencyManagement>
     <dependencies>
 
+      <!-- https://jira.camunda.com/browse/CAM-13717 -->
+      <dependency>
+        <groupId>org.glassfish.jersey</groupId>
+        <artifactId>jersey-bom</artifactId>
+        <version>${version.jersey2}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
@@ -25,7 +34,7 @@
         <scope>import</scope>
         <type>pom</type>
       </dependency>
-      
+
       <dependency>
         <groupId>org.graalvm.js</groupId>
         <artifactId>js</artifactId>
@@ -62,6 +71,7 @@
         <module>modules</module>
         <module>modules/rest</module>
         <module>modules/swaggerui</module>
+        <module>modules/example</module>
         <module>core</module>
         <module>assembly</module>
         <module>qa</module>

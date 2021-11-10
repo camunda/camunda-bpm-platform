@@ -17,7 +17,7 @@
 
 'use strict';
 
-var callActivityOverlay = require('../../../../../../client/scripts/components/callActivityOverlay')(
+var callActivityInstanceOverlay = require('../../../../../../client/scripts/components/callActivityOverlays/instance')(
   'runtime'
 );
 
@@ -28,7 +28,7 @@ module.exports = [
       'cockpit.processInstance.diagram.plugin',
       {
         id: 'activity-instance-call-activity-overlay',
-        overlay: callActivityOverlay
+        overlay: callActivityInstanceOverlay
       }
     );
   }

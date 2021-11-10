@@ -8,7 +8,7 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-database-settings</artifactId>
     <relativePath>../../database</relativePath>
-    <version>7.16.0-SNAPSHOT</version>
+    <version>7.17.0-SNAPSHOT</version>
   </parent>
 
   <dependencyManagement>
@@ -164,7 +164,6 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
-          <argLine>-Xmx768m</argLine>
           <classpathDependencyExcludes>
             <!-- JPA 2.0 is for compile time, upon testing we use the environment defined by the hibernate and spring context (e.g. JPA 2.2) -->
             <classpathDependencyExclude>org.hibernate.javax.persistence:hibernate-jpa-2.0-api</classpathDependencyExclude>

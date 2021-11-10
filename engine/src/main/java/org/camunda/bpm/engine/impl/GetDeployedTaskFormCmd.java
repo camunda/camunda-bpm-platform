@@ -16,8 +16,6 @@
  */
 package org.camunda.bpm.engine.impl;
 
-import java.util.concurrent.Callable;
-
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.form.FormData;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
@@ -42,13 +40,7 @@ public class GetDeployedTaskFormCmd extends AbstractGetDeployedFormCmd {
 
   @Override
   protected FormData getFormData() {
-    return commandContext.runWithoutAuthorization(new Callable<FormData>() {
-
-      @Override
-      public FormData call() throws Exception {
-        return new GetTaskFormCmd(taskId).execute(commandContext);
-      }
-    });
+    return commandContext.runWithoutAuthorization(new GetTaskFormCmd(taskId));
   }
 
   @Override

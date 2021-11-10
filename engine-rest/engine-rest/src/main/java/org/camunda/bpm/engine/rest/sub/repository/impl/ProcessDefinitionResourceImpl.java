@@ -59,6 +59,7 @@ import org.camunda.bpm.engine.rest.sub.repository.ProcessDefinitionResource;
 import org.camunda.bpm.engine.rest.util.ApplicationContextPathUtil;
 import org.camunda.bpm.engine.rest.util.ContentTypeUtil;
 import org.camunda.bpm.engine.rest.util.EncodingUtil;
+import org.camunda.bpm.engine.rest.util.URLEncodingUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
 import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
@@ -280,7 +281,7 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
     } else {
       String fileName = definition.getDiagramResourceName();
       return Response.ok(processDiagram)
-          .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+          .header("Content-Disposition", URLEncodingUtil.buildAttachmentValue(fileName))
           .type(getMediaTypeForFileSuffix(fileName)).build();
     }
   }

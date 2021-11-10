@@ -38,6 +38,7 @@ import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.telemetry.PlatformTelemetryRegistry;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.junit.Assume;
@@ -78,8 +79,8 @@ import org.junit.runners.model.Statement;
  * and {@link RepositoryService#deleteDeployment(String, boolean) cascade
  * deleted} after the tearDown. If you add a deployment programmatically in your
  * test, you have to make it known to the processEngineRule by calling 
- * {@link ProcessEngineRule#manageDeployment(Deployment)} to have it cleaned up
- * automatically.
+ * {@link ProcessEngineRule#manageDeployment(org.camunda.bpm.engine.repository.Deployment)}
+ * to have it cleaned up automatically.
  * </p>
  * <p>
  * The processEngineRule also lets you
@@ -165,10 +166,16 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
 
     initializeServices();
 
-    final boolean hasRequiredHistoryLevel =
-        TestHelper.annotationRequiredHistoryLevelCheck(processEngine, description.getTestClass(), description.getMethodName());
-    final boolean runsWithRequiredDatabase =
-        TestHelper.annotationRequiredDatabaseCheck(processEngine, description.getTestClass(), description.getMethodName());
+    Class<?> testClass = description.getTestClass();
+    String methodName = description.getMethodName();
+
+    RequiredHistoryLevel reqHistoryLevel = description.getAnnotation(RequiredHistoryLevel.class);
+    boolean hasRequiredHistoryLevel = TestHelper.annotationRequiredHistoryLevelCheck(processEngine,
+        reqHistoryLevel, testClass, methodName);
+
+    RequiredDatabase requiredDatabase = description.getAnnotation(RequiredDatabase.class);
+    boolean runsWithRequiredDatabase = TestHelper.annotationRequiredDatabaseCheck(processEngine,
+        requiredDatabase, testClass, methodName);
     return new Statement() {
 
       @Override

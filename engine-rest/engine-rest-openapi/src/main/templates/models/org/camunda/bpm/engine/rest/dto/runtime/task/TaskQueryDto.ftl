@@ -174,6 +174,12 @@
         type = "array"
         itemType = "string"
         desc = "Only include tasks which are assigned to one of the passed and comma-separated user ids." />
+
+    <@lib.property
+        name = "assigneeNotIn"
+        type = "array"
+        itemType = "string"
+        desc = "Only include tasks which are not assigned to one of the passed and comma-separated user ids." />
   
     <@lib.property
         name = "owner"
@@ -650,6 +656,7 @@
 
     "sorting": {
       "type": "array",
+      "nullable": true,
       "description": "Apply sorting of the result",
       "items":
 

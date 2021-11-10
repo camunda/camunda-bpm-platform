@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.camunda.bpm.run</groupId>
+    <artifactId>camunda-bpm-run-modules</artifactId>
+    <version>7.17.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>camunda-bpm-run-modules-example-invoice</artifactId>
+  <name>Camunda Platform - Run - Module Example Invoice</name>
+  
+  <properties>
+    <!-- generate a bom of compile time dependencies for the license book.
+    Note: Every compile time dependency will end up in the license book. Please
+    declare only dependencies that are actually needed -->
+    <skip-third-party-bom>false</skip-third-party-bom>
+  </properties>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>org.camunda.bpm.springboot</groupId>
+      <artifactId>camunda-bpm-spring-boot-starter-webapp</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm.example</groupId>
+      <artifactId>camunda-example-invoice</artifactId>
+      <version>${project.version}</version>
+      <classifier>classes</classifier>
+      <scope>provided</scope>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <!-- override version to use fileMappers -->
+        <version>3.2.0</version>
+        <executions>
+          <execution>
+            <id>unpack-invoice</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.camunda.bpm.example</groupId>
+                  <artifactId>camunda-example-invoice</artifactId>
+                  <version>${project.version}</version>
+                  <type>war</type>
+                  <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                  <excludes>
+                    assets/**,META-INF/**,*.html,WEB-INF/*.xml,WEB-INF
+                  </excludes>
+                  <fileMappers>
+                    <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                       <pattern>^\QWEB-INF/classes/\E</pattern>
+                       <replacement>./</replacement>
+                     </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                  </fileMappers>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

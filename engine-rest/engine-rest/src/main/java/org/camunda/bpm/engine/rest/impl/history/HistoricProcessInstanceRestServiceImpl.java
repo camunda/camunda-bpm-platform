@@ -39,6 +39,7 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.history.HistoricProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.sub.history.HistoricProcessInstanceResource;
 import org.camunda.bpm.engine.rest.sub.history.impl.HistoricProcessInstanceResourceImpl;
+import org.camunda.bpm.engine.rest.util.URLEncodingUtil;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -144,7 +145,7 @@ import java.util.List;
         String csv = getReportResultAsCsv(uriInfo);
         return Response
             .ok(csv, mediaType)
-            .header("Content-Disposition", "attachment; filename=\"process-instance-report.csv\"")
+            .header("Content-Disposition", URLEncodingUtil.buildAttachmentValue("process-instance-report.csv"))
             .build();
       }
     }

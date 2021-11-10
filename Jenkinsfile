@@ -11,7 +11,7 @@ pipeline {
     }
   }
   environment {
-    CAMBPM_LOGGER_LOG_LEVEL = 'DEBUG'
+    LOGGER_LOG_LEVEL = 'DEBUG'
   }
   options {
     buildDiscarder(logRotator(numToKeepStr: '5'))
@@ -278,6 +278,7 @@ pipeline {
               },
               postFailure: {
                 cambpmPublishTestResult()
+                cambpmArchiveArtifacts('qa/integration-tests-webapps/shared-engine/target/selenium-screenshots/*')
               }
             ])
           }
@@ -296,13 +297,16 @@ pipeline {
               },
               postFailure: {
                 cambpmPublishTestResult()
+                cambpmArchiveArtifacts('qa/integration-tests-webapps/shared-engine/target/selenium-screenshots/*')
               }
             ])
           }
         }
         stage('webapp-IT-standalone-tomcat-9') {
           when {
-            branch cambpmDefaultBranch();
+            expression {
+              cambpmWithLabels('tomcat', 'webapp-integration')
+            }
           }
           steps {
             cambpmConditionalRetry([
@@ -312,6 +316,7 @@ pipeline {
               },
               postFailure: {
                 cambpmPublishTestResult()
+                cambpmArchiveArtifacts('qa/integration-tests-webapps/standalone-engine/target/selenium-screenshots/*')
               }
             ])
           }
@@ -319,7 +324,7 @@ pipeline {
         stage('webapp-IT-standalone-wildfly') {
           when {
             expression {
-              cambpmWithLabels('wildfly')
+              cambpmWithLabels('wildfly', 'webapp-integration')
             }
           }
           steps {
@@ -330,6 +335,7 @@ pipeline {
               },
               postFailure: {
                 cambpmPublishTestResult()
+                cambpmArchiveArtifacts('qa/integration-tests-webapps/standalone-engine/target/selenium-screenshots/*')
               }
             ])
           }
@@ -348,6 +354,7 @@ pipeline {
               },
               postFailure: {
                 cambpmPublishTestResult()
+                cambpmArchiveArtifacts('distro/run/qa/runtime/target/selenium-screenshots/*')
               }
             ])
           }

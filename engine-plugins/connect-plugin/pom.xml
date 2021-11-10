@@ -4,7 +4,7 @@
   <parent>
     <artifactId>camunda-engine-plugins</artifactId>
     <groupId>org.camunda.bpm</groupId>
-    <version>7.16.0-SNAPSHOT</version>
+    <version>7.17.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 

@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.persistence.deploy;
 
-import java.util.concurrent.Callable;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.impl.cfg.TransactionListener;
 import org.camunda.bpm.engine.impl.cmd.RegisterDeploymentCmd;
@@ -47,13 +46,10 @@ public class DeleteDeploymentFailListener implements TransactionListener {
 
     @Override
     public Void execute(final CommandContext commandContext) {
-      commandContext.runWithoutAuthorization((Callable<Void>) () -> {
-        new RegisterDeploymentCmd(deploymentId).execute(commandContext);
-        if (processApplicationReference != null) {
-          new RegisterProcessApplicationCmd(deploymentId, processApplicationReference).execute(commandContext);
-        }
-        return null;
-      });
+      commandContext.runWithoutAuthorization(new RegisterDeploymentCmd(deploymentId));
+      if (processApplicationReference != null) {
+        commandContext.runWithoutAuthorization(new RegisterProcessApplicationCmd(deploymentId, processApplicationReference));
+      }
       return null;
     }
 

@@ -107,5 +107,10 @@
     "type": "boolean",
     "desc": "Match all variable values provided in `variableValues` case-insensitively. If set to
             `true` **variableValue** and **variablevalue** are treated as equal."
+  },
+  "variableScopeIdIn": {
+    "type": "array",
+    "itemType": "string",
+    "desc": "Only include variable instances which belong to one of passed scope ids."
   }
 }>

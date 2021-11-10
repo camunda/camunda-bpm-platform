@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-root</artifactId>
-    <version>7.16.0-SNAPSHOT</version>
+    <version>7.17.0-SNAPSHOT</version>
     <relativePath>../</relativePath>
   </parent>
 
@@ -20,11 +20,11 @@
   <properties>
     <version.quarkus>2.1.2.Final</version.quarkus>
     <version.spring.framework>5.2.14.RELEASE</version.spring.framework>
-    <version.spring-boot>2.5.0</version.spring-boot>
+    <version.spring-boot>2.5.4</version.spring-boot>
     <version.cxf>3.0.3</version.cxf>
     <version.resteasy>2.3.5.Final</version.resteasy>
     <version.resteasy3>3.14.0.Final</version.resteasy3>
-    <version.jersey2>2.25.1</version.jersey2>
+    <version.jersey2>2.34</version.jersey2>
     <version.groovy>2.4.13</version.groovy>
     <version.graal.js>21.1.0</version.graal.js>
     <version.icu.icu4j>68.2</version.icu.icu4j>
@@ -39,6 +39,7 @@
     <version.assertj>2.9.1</version.assertj>
     <version.mockito>1.9.5</version.mockito>
     <version.wiremock>1.58</version.wiremock>
+    <version.testcontainers>1.16.0</version.testcontainers>
 
     <version.commonj>1.1.0</version.commonj>
     <version.bouncycastle>1.47</version.bouncycastle>
@@ -48,12 +49,12 @@
     <version.wildfly>23.0.2.Final</version.wildfly>
     <version.wildfly.core>15.0.1.Final</version.wildfly.core>
 
-    <version.tomcat>9.0.43</version.tomcat>
+    <version.tomcat>9.0.52</version.tomcat>
 
     <version.arquillian>1.1.10.Final</version.arquillian>
     <version.shrinkwrap.resolvers>2.2.2</version.shrinkwrap.resolvers>
-    <version.selenium>2.45.0</version.selenium>
-    <version.freemarker>2.3.29</version.freemarker>
+    <version.selenium>3.141.59</version.selenium>
+    <version.freemarker>2.3.31</version.freemarker>
 
     <version.jboss-javaee-spec>3.0.2.Final</version.jboss-javaee-spec>
 
@@ -254,8 +255,12 @@
           <artifactId>maven-javadoc-plugin</artifactId>
           <configuration>
             <failOnError>false</failOnError>
-            <doclint>none</doclint>
-            <quiet>true</quiet>
+            <additionalJOptions>
+              <additionalJOption>-Xdoclint:none</additionalJOption>
+              <additionalJOption>--ignore-source-errors</additionalJOption>
+            </additionalJOptions>
+            <doctitle>Camunda Platform Javadocs ${project.version}</doctitle>
+            <windowtitle>Camunda Platform Javadocs ${project.version}</windowtitle>
           </configuration>
         </plugin>
       </plugins>

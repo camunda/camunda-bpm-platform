@@ -21,6 +21,7 @@ var angular = require('angular');
 var camCommon = require('cam-common');
 
 var instanceCount = require('./instanceCount');
+var callActivity = require('./callActivity');
 
 var ngModule = angular.module(
   'cockpit.plugin.base.views.definition.diagram-plugins',
@@ -28,5 +29,6 @@ var ngModule = angular.module(
 );
 
 ngModule.config(instanceCount);
+ngModule.config(callActivity);
 
 module.exports = ngModule;

@@ -328,8 +328,9 @@ public class DecisionDefinitionRestServiceInteractionTest extends AbstractRestSe
         .expect()
           .statusCode(Status.OK.getStatusCode())
           .contentType("image/png")
-          .header("Content-Disposition", "attachment; filename=\"" +
-              MockProvider.EXAMPLE_DECISION_DEFINITION_DIAGRAM_RESOURCE_NAME + "\"")
+          .header("Content-Disposition", "attachment; " +
+                  "filename=\"" + MockProvider.EXAMPLE_DECISION_DEFINITION_DIAGRAM_RESOURCE_NAME + "\"; " +
+                  "filename*=UTF-8''" + MockProvider.EXAMPLE_DECISION_DEFINITION_DIAGRAM_RESOURCE_NAME)
         .when().get(DIAGRAM_DEFINITION_URL).getBody().asByteArray();
 
     // verify service interaction
@@ -355,7 +356,9 @@ public class DecisionDefinitionRestServiceInteractionTest extends AbstractRestSe
       .expect()
       .statusCode(Status.OK.getStatusCode())
       .contentType("application/octet-stream")
-      .header("Content-Disposition", "attachment; filename=\"" + null + "\"")
+      .header("Content-Disposition", "attachment; " +
+              "filename=\"" + null + "\"; "+
+              "filename*=UTF-8''" + null)
       .when().get(DIAGRAM_DEFINITION_URL).getBody().asByteArray();
 
     // verify service interaction

@@ -37,7 +37,7 @@
     
     <@lib.property
         name = "processDefinitionWithoutTenantId"
-        type = "string"
+        type = "boolean"
         desc = "Only activate or suspend job definitions of a process definition which belongs to
                 no tenant. Value may only be `true`, as `false` is the default
                 behavior.

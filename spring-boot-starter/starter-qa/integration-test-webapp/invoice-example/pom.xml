@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.camunda.bpm.springboot.project</groupId>
     <artifactId>qa-webapp</artifactId>
-    <version>7.16.0-SNAPSHOT</version>
+    <version>7.17.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>qa-webapp-invoice-example</artifactId>

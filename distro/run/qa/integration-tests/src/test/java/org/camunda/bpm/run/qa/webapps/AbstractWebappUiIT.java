@@ -25,6 +25,7 @@ import org.junit.Rule;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
 import java.io.File;
@@ -62,7 +63,11 @@ public class AbstractWebappUiIT extends AbstractWebIT {
         .usingDriverExecutable(chromeDriver)
         .build();
 
-    driver = new ChromeDriver(chromeDriverService);
+    ChromeOptions chromeOptions = new ChromeOptions()
+        .setHeadless(true)
+        .addArguments("--window-size=1920,1200");
+
+    driver = new ChromeDriver(chromeDriverService, chromeOptions);
   }
 
   public static ExpectedCondition<Boolean> currentURIIs(final URI pageURI) {

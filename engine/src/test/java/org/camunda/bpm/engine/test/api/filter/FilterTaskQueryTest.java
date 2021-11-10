@@ -1333,7 +1333,6 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
       orderingProperty.getQueryProperty().getFunction());
   }
 
-
   @Deployment(resources={"org/camunda/bpm/engine/test/api/task/oneTaskWithFormKeyProcess.bpmn20.xml"})
   @Test
     public void testInitializeFormKeysEnabled() {
@@ -2317,6 +2316,20 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     assertEquals(2, extendingQueryTasks.size());
   }
 
+  @Test
+  public void shouldDeserializeOrQueryWithCandidateGroupAndUser() {
+    // given
+    TaskQuery query = taskService.createTaskQuery()
+        .or()
+          .taskCandidateGroup("foo")
+          .taskCandidateUser("bar")
+        .endOr();
+    JsonObject jsonObject = queryConverter.toJsonObject(query);
+
+    // when deserializing the query
+    // then there is no exception
+    queryConverter.toObject(jsonObject);
+  }
 
   protected void saveQuery(TaskQuery query) {
     filter.setQuery(query);

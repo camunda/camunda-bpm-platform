@@ -544,6 +544,15 @@ public class CommandContext {
 
   public <T> T runWithoutAuthorization(Callable<T> runnable) {
     CommandContext commandContext = Context.getCommandContext();
+    return runWithoutAuthorization(runnable, commandContext);
+  }
+
+  public <T> T runWithoutAuthorization(Command<T> command) {
+    CommandContext commandContext = Context.getCommandContext();
+    return runWithoutAuthorization(() -> command.execute(commandContext), commandContext);
+  }
+
+  protected <T> T runWithoutAuthorization(Callable<T> runnable, CommandContext commandContext) {
     boolean authorizationEnabled = commandContext.isAuthorizationCheckEnabled();
     try {
       commandContext.disableAuthorizationCheck();

@@ -16,7 +16,7 @@
  */
 
 'use strict';
-const createForm = require('@bpmn-io/form-js-viewer').createForm;
+const Form = require('@bpmn-io/form-js').Form;
 
 var angular = require('../../../../../../camunda-commons-ui/vendor/angular');
 
@@ -85,17 +85,17 @@ module.exports = [
             });
         };
 
-        function renderForm(schema) {
+        async function renderForm(schema) {
           const data = variables.reduce((res, variable) => {
             res[variable.name] = variable.value;
             return res;
           }, {});
 
-          form = createForm({
-            container: $element[0],
-            schema,
-            data: {...data, ...savedState}
+          form = new Form({
+            container: $element[0]
           });
+
+          await form.importSchema(schema, {...data, ...savedState});
           formController.notifyFormInitialized();
 
           form.on('submit', () => {
@@ -180,7 +180,7 @@ module.exports = [
               const json = await res.json();
 
               await loadVariables();
-              renderForm(json);
+              await renderForm(json);
             })
             .catch(err => {
               formController.notifyFormInitializationFailed(err);

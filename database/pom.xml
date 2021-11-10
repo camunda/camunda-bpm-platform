@@ -6,7 +6,7 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-parent</artifactId>
     <relativePath>../parent</relativePath>
-    <version>7.16.0-SNAPSHOT</version>
+    <version>7.17.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-database-settings</artifactId>
@@ -37,7 +37,10 @@
     <version.cockroachdb>42.2.9</version.cockroachdb>
 
     <!-- needed for sql script and backward compatibility checks -->
-    <camunda.version.old>7.15.0</camunda.version.old>
+    <camunda.version.old>7.16.0</camunda.version.old>
+
+    <!-- Testcontainers JDBC URL parameters. By default, an empty string -->
+    <database.tc.params />
   </properties>
 
   <dependencyManagement>
@@ -259,6 +262,8 @@
         <database.type>mariadb</database.type>
         <database.driver>org.mariadb.jdbc.Driver</database.driver>
         <database.datasource.class>org.mariadb.jdbc.MySQLDataSource</database.datasource.class>
+        <database.tc.url>cammariadb:10.3</database.tc.url>
+        <database.tc.params>/${database.name}?user=${database.username}&amp;amp;password=${database.password}</database.tc.params>
       </properties>
 
       <dependencies>
@@ -292,6 +297,12 @@
         <version.mariadb>${version.mariadb.galera}</version.mariadb>
       </properties>
     </profile>
+    <profile>
+      <id>mariadb-10.2</id>
+      <properties>
+        <database.tc.url>cammariadb:10.2</database.tc.url>
+      </properties>
+    </profile>
 
     <profile>
       <id>mysql</id>
@@ -299,6 +310,8 @@
         <database.type>mysql</database.type>
         <database.driver>com.mysql.cj.jdbc.Driver</database.driver>
         <database.datasource.class>com.mysql.cj.jdbc.MysqlDataSource</database.datasource.class>
+        <database.tc.url>cammysql:8.0</database.tc.url>
+        <database.tc.params>/${database.name}?sendFractionalSeconds=false&amp;amp;user=${database.username}&amp;amp;password=${database.password}</database.tc.params>
       </properties>
 
       <dependencies>
@@ -325,6 +338,12 @@
           </plugins>
         </pluginManagement>
       </build>
+    </profile>
+    <profile>
+      <id>mysql-5.7</id>
+      <properties>
+        <database.tc.url>cammysql:5.7</database.tc.url>
+      </properties>
     </profile>
 
     <profile>
@@ -436,6 +455,7 @@
         <database.datasource.class>org.postgresql.ds.PGSimpleDataSource</database.datasource.class>
         <jboss.datasource.filename>postgresql-ds.xml</jboss.datasource.filename>
         <hibernate.dialect>org.hibernate.dialect.PostgreSQLDialect</hibernate.dialect>
+        <database.tc.url>campostgresql:13.2</database.tc.url>
       </properties>
 
       <dependencies>
@@ -478,6 +498,7 @@
         <database.datasource.class>org.postgresql.ds.PGSimpleDataSource</database.datasource.class>
         <jboss.datasource.filename>postgresql-ds.xml</jboss.datasource.filename>
         <hibernate.dialect>org.hibernate.dialect.PostgreSQLDialect</hibernate.dialect>
+        <database.tc.url>camcockroachdb:20.1.3</database.tc.url>
       </properties>
 
       <dependencies>
@@ -513,6 +534,8 @@
         <database.type>mssql</database.type>
         <database.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</database.driver>
         <database.datasource.class>com.microsoft.sqlserver.jdbc.SQLServerDataSource</database.datasource.class>
+        <database.tc.url>camsqlserver:2019</database.tc.url>
+        <database.tc.params>;DatabaseName=${database.name};user=${database.username};password=${database.password};</database.tc.params>
       </properties>
 
       <dependencies>
@@ -540,6 +563,26 @@
         </pluginManagement>
       </build>
     </profile>
+    <profile>
+      <id>sqlserver-2017</id>
+      <properties>
+        <database.tc.url>camsqlserver:2017</database.tc.url>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>testcontainers</id>
+      <dependencies>
+        <!-- Testcontainers depends on docker-java which depends on jackson-annotations -->
+        <dependency>
+          <artifactId>jackson-annotations</artifactId>
+          <groupId>com.fasterxml.jackson.core</groupId>
+          <version>2.12.1</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+
   </profiles>
 
 </project>

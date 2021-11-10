@@ -17,8 +17,6 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.InputStream;
-import java.util.concurrent.Callable;
-
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.exception.DeploymentResourceNotFoundException;
 import org.camunda.bpm.engine.exception.NotFoundException;
@@ -82,12 +80,8 @@ public abstract class AbstractGetDeployedFormCmd implements Command<InputStream>
 
   protected InputStream getResourceForCamundaFormRef(CamundaFormRef camundaFormRef,
       String deploymentId) {
-    CamundaFormDefinition definition = commandContext.runWithoutAuthorization(new Callable<CamundaFormDefinition>() {
-      @Override
-      public CamundaFormDefinition call() throws Exception {
-        return new GetCamundaFormDefinitionCmd(camundaFormRef, deploymentId).execute(commandContext);
-      }
-    });
+    CamundaFormDefinition definition = commandContext.runWithoutAuthorization(
+        new GetCamundaFormDefinitionCmd(camundaFormRef, deploymentId));
 
     if (definition == null) {
       throw new NotFoundException("No Camunda Form Definition was found for Camunda Form Ref: " + camundaFormRef);
@@ -99,14 +93,8 @@ public abstract class AbstractGetDeployedFormCmd implements Command<InputStream>
   protected InputStream getDeploymentResource(String deploymentId, String resourceName) {
     GetDeploymentResourceCmd getDeploymentResourceCmd = new GetDeploymentResourceCmd(deploymentId, resourceName);
     try {
-      return commandContext.runWithoutAuthorization(new Callable<InputStream>() {
-        @Override
-        public InputStream call() throws Exception {
-          return getDeploymentResourceCmd.execute(commandContext);
-        }
-      });
-    }
-    catch (DeploymentResourceNotFoundException e) {
+      return commandContext.runWithoutAuthorization(getDeploymentResourceCmd);
+    } catch (DeploymentResourceNotFoundException e) {
       throw new NotFoundException("The form with the resource name '" + resourceName + "' cannot be found in deployment with id " + deploymentId, e);
     }
   }

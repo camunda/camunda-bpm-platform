@@ -282,11 +282,17 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
 
   @Override
   public TaskQuery toObject(JsonObject json) {
-    TaskQueryImpl query = new TaskQueryImpl();
+    return toObject(json, false);
+  }
 
+  protected TaskQuery toObject(JsonObject json, boolean isOrQuery) {
+    TaskQueryImpl query = new TaskQueryImpl();
+    if (isOrQuery) {
+      query.setOrQueryActive();
+    }
     if (json.has(OR_QUERIES)) {
       for (JsonElement jsonElement : JsonUtil.getArray(json, OR_QUERIES)) {
-        query.addOrQuery((TaskQueryImpl) toObject(JsonUtil.getObject(jsonElement)));
+        query.addOrQuery((TaskQueryImpl) toObject(JsonUtil.getObject(jsonElement), true));
       }
     }
     if (json.has(TASK_ID)) {

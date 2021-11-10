@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.rest.dto.converter.TaskReportResultToCsvConverter;
 import org.camunda.bpm.engine.rest.dto.task.TaskCountByCandidateGroupResultDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.task.TaskReportResource;
+import org.camunda.bpm.engine.rest.util.URLEncodingUtil;
 import org.camunda.bpm.engine.task.TaskCountByCandidateGroupResult;
 
 import javax.ws.rs.core.MediaType;
@@ -56,7 +57,7 @@ public class TaskReportResourceImpl implements TaskReportResource {
         String csv = getReportResultAsCsv();
         return Response
           .ok(csv, mediaType)
-          .header("Content-Disposition", "attachment; filename=\"task-count-by-candidate-group.csv\"")
+          .header("Content-Disposition", URLEncodingUtil.buildAttachmentValue("task-count-by-candidate-group.csv"))
           .build();
       }
     }

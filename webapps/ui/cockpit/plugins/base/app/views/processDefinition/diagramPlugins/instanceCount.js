@@ -51,6 +51,7 @@ module.exports = [
 
             $scope.toggle = $scope.enabled;
             $scope.isLoading = false;
+            $scope.countOverlayIds = [];
 
             $scope.toggleOverlay = function() {
               $scope.toggle = !$scope.toggle;
@@ -88,11 +89,11 @@ module.exports = [
             }
 
             function removeOverlays() {
-              Array.from(
-                document.getElementsByClassName('djs-overlay')
-              ).forEach(function(element) {
-                element.remove();
+              const overlays = $scope.viewer.get('overlays');
+              $scope.countOverlayIds.forEach(id => {
+                overlays.remove(id);
               });
+              $scope.countOverlayIds = [];
             }
 
             $scope.processData.observe('processDiagram', function(

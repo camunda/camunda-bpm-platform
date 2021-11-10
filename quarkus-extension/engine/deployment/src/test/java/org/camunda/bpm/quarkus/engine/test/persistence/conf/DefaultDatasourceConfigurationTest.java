@@ -34,7 +34,7 @@ public class DefaultDatasourceConfigurationTest {
 
   @RegisterExtension
   static QuarkusUnitTest unitTest = new ProcessEngineAwareExtension()
-      .withConfigurationResource("persistence/secondary-datasource-application.properties")
+      .withConfigurationResource("org/camunda/bpm/quarkus/engine/test/persistence/conf/secondary-datasource-application.properties")
       .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class));
 
   @Inject

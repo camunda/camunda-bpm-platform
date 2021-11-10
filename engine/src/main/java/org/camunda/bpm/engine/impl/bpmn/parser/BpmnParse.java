@@ -3815,13 +3815,11 @@ public class BpmnParse extends Parse {
   }
 
   protected void parseTenantId(Element callingActivityElement, ActivityImpl activity, BaseCallableElement callableElement, String attrName) {
-    ParameterValueProvider tenantIdValueProvider;
+    ParameterValueProvider tenantIdValueProvider = null;
 
     String tenantId = callingActivityElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, attrName);
     if (tenantId != null && tenantId.length() > 0) {
       tenantIdValueProvider = createParameterValueProvider(tenantId, expressionManager);
-    } else {
-      tenantIdValueProvider = new DefaultCallableElementTenantIdProvider();
     }
 
     callableElement.setTenantIdProvider(tenantIdValueProvider);

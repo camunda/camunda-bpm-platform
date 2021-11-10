@@ -2,7 +2,7 @@
   <parent>
     <groupId>org.camunda.bpm.quarkus</groupId>
     <artifactId>camunda-bpm-quarkus-engine-parent</artifactId>
-    <version>7.16.0-SNAPSHOT</version>
+    <version>7.17.0-SNAPSHOT</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
@@ -39,10 +39,6 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <redirectTestOutputToFile>true</redirectTestOutputToFile>
-          <trimStackTrace>false</trimStackTrace>
-          <argLine>-Xmx2048m</argLine>
-
           <systemPropertyVariables>
             <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
           </systemPropertyVariables>

@@ -25,7 +25,6 @@ var angular = require('../../../camunda-bpm-sdk-js/vendor/angular'),
   notificationsPanel = require('./notificationsPanel'),
   passwordRepeat = require('./passwordRepeat'),
   showIfAuthorized = require('./showIfAuthorized'),
-  compileTemplate = require('./compileTemplate'),
   nl2br = require('./nl2br'),
   instantTypeahead = require('./instantTypeahead'),
   util = require('../util/index');
@@ -44,7 +43,6 @@ directivesModule.directive('camInPlaceTextField', inPlaceTextField);
 directivesModule.directive('notificationsPanel', notificationsPanel);
 directivesModule.directive('passwordRepeat', passwordRepeat);
 directivesModule.directive('showIfAuthorized', showIfAuthorized);
-directivesModule.directive('compileTemplate', compileTemplate);
 directivesModule.directive('nl2br', nl2br);
 directivesModule.directive('instantTypeahead', instantTypeahead);
 

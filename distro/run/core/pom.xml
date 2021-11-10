@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.camunda.bpm.run</groupId>
     <artifactId>camunda-bpm-run-root</artifactId>
-    <version>7.16.0-SNAPSHOT</version>
+    <version>7.17.0-SNAPSHOT</version>
     <relativePath>..</relativePath>
   </parent>
 
@@ -70,6 +70,13 @@
     <dependency>
       <groupId>org.apache.tomcat.embed</groupId>
       <artifactId>tomcat-embed-core</artifactId>
+      <exclusions>
+        <!-- This artifact is also excluded by the Spring Boot starter for Tomcat -->
+        <exclusion>
+          <artifactId>tomcat-annotations-api</artifactId>
+          <groupId>org.apache.tomcat</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!-- spring-webmvc is not a direct requirement of run-core, but is required by modules/swaggerui and modules/webapps.

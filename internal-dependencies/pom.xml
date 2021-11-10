@@ -6,7 +6,7 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-parent</artifactId>
     <relativePath>../parent</relativePath>
-    <version>7.16.0-SNAPSHOT</version>
+    <version>7.17.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-core-internal-dependencies</artifactId>
@@ -37,6 +37,17 @@
         <groupId>com.zaxxer</groupId>
         <artifactId>HikariCP</artifactId>
         <version>${version.hikaricp}</version>
+        <exclusions>
+          <!-- When building with Java 8, hikari has a dependency to SLF4j 1.7.
+          When building with Java 11 or higher, Hikari has a dependency to SLF4j 
+          2.0.0-alpha1 instead. We are therefore excluding this dependency here
+          and assume that it comes from other dependencies where it is used 
+          (for example camunda-commons-logging). -->
+          <exclusion>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>commons-logging</groupId>
@@ -347,6 +358,37 @@
         <version>1.5.0</version>
       </dependency>
 
+      <!-- TestContainers dependencies -->
+      <dependency>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>testcontainers</artifactId>
+        <version>${version.testcontainers}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>mysql</artifactId>
+        <version>${version.testcontainers}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>mariadb</artifactId>
+        <version>${version.testcontainers}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>${version.testcontainers}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>mssqlserver</artifactId>
+        <version>${version.testcontainers}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>cockroachdb</artifactId>
+        <version>${version.testcontainers}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 </project>

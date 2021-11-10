@@ -24,7 +24,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.persistence.entity.AcquirableJobEntity;
-import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Before;
 import org.junit.Test;
@@ -93,10 +92,6 @@ public class JobExecutorAcquireJobsByPriorityTest extends AbstractJobExecutorAcq
     startProcess("jobPrioProcess", "task2", 5);
 
     // set some job priorities to NULL indicating that they were produced without priorities
-  }
-
-  protected Job findJobById(String id) {
-    return managementService.createJobQuery().jobId(id).singleResult();
   }
 
 }

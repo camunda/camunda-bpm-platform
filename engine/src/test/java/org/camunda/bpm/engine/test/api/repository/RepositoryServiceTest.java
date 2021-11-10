@@ -1339,7 +1339,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
       Mockito.verify(callableElement, Mockito.never()).getDefinitionKey(Mockito.anyObject());
       Mockito.verify(callableElement, Mockito.never()).getVersion(Mockito.anyObject());
       Mockito.verify(callableElement, Mockito.never()).getVersionTag(Mockito.anyObject());
-      Mockito.verify(callableElement, Mockito.never()).getDefinitionTenantId(Mockito.anyObject());
+      Mockito.verify(callableElement, Mockito.never()).getDefinitionTenantId(Mockito.anyObject(), Mockito.anyString());
       Mockito.verify(callableElement, Mockito.times(1)).hasDynamicReferences();
     }
 
@@ -1360,6 +1360,27 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
 
     //then
     assertThat(maps).isEmpty();
+  }
+
+  @Test
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/repository/nested-call-activities.bpmn",
+      "org/camunda/bpm/engine/test/api/repository/failingProcessCreateOneIncident.bpmn20.xml" })
+  public void shouldReturnCalledProcessDefinitionsForNestedCallActivities() {
+    //given
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("nested-call-activities")
+        .singleResult();
+
+    //when
+    Collection<CalledProcessDefinition> calledProcessDefinitions = repositoryService
+        .getStaticCalledProcessDefinitions(processDefinition.getId());
+
+    //then
+    assertThat(calledProcessDefinitions).hasSize(1);
+    CalledProcessDefinition calledProcessDefinition = new ArrayList<>(calledProcessDefinitions).get(0);
+    assertThat(calledProcessDefinition.getKey()).isEqualTo("failingProcess");
+    assertThat(
+        calledProcessDefinition.getCalledFromActivityIds().stream().distinct().collect(Collectors.toList())).hasSize(8);
   }
 
   @Test
