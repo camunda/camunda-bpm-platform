@@ -38,6 +38,7 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
@@ -250,6 +251,144 @@ public class HistoricProcessInstanceQueryOrTest {
 
     // then
     assertEquals(2, processInstances.size());
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void shouldQueryByVariableValue_1() {
+    // GIVEN
+    String processInstanceIdOne = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.putValue("foo", "bar")).getProcessInstanceId();
+
+    String processInstanceIdTwo = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.putValue("bar", "foo")).getProcessInstanceId();
+
+    // WHEN
+    List<HistoricProcessInstance> processInstances = historyService.createHistoricProcessInstanceQuery()
+        .or()
+          .variableValueEquals("foo", "bar")
+          .variableValueEquals("bar", "foo")
+        .endOr()
+        .list();
+
+    // THEN
+    assertThat(processInstances)
+        .extracting("processInstanceId")
+        .containsExactlyInAnyOrder(processInstanceIdOne, processInstanceIdTwo);
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void shouldQueryByVariableValue_2() {
+    // GIVEN
+    String processInstanceIdOne = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.putValue("foo", "bar").putValue("bar", "foo")).getProcessInstanceId();
+    String processInstanceIdTwo = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.putValue("foo", "bar").putValue("bar", "foo")).getProcessInstanceId();
+
+    // WHEN
+    List<HistoricProcessInstance> processInstances = historyService.createHistoricProcessInstanceQuery()
+        .or()
+          .variableValueEquals("foo", "bar")
+          .variableValueEquals("bar", "foo")
+        .endOr()
+        .list();
+
+    // THEN
+    assertThat(processInstances)
+        .extracting("processInstanceId")
+        .containsExactlyInAnyOrder(processInstanceIdOne, processInstanceIdTwo);
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void shouldQueryByVariableValue_3() {
+    // GIVEN
+    String processInstanceIdOne = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.putValue("foo", "bar")).getProcessInstanceId();
+    String processInstanceIdTwo = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.putValue("foo", "bar")).getProcessInstanceId();
+
+    // WHEN
+    List<HistoricProcessInstance> processInstances = historyService.createHistoricProcessInstanceQuery()
+        .or()
+          .variableValueEquals("foo", "bar")
+        .endOr()
+        .list();
+
+    // THEN
+    assertThat(processInstances)
+        .extracting("processInstanceId")
+        .containsExactlyInAnyOrder(processInstanceIdOne, processInstanceIdTwo);
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void shouldQueryByVariableValue_4() {
+    // GIVEN
+    String processInstanceIdOne = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.putValue("foo", "bar")).getProcessInstanceId();
+    String processInstanceIdTwo = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.putValue("foo", "bar")).getProcessInstanceId();
+
+    // WHEN
+    List<HistoricProcessInstance> processInstances = historyService.createHistoricProcessInstanceQuery()
+        .or()
+          .variableValueEquals("foo", "bar")
+          .variableValueEquals("foo", "bar")
+        .endOr()
+        .list();
+
+    // THEN
+    assertThat(processInstances)
+        .extracting("processInstanceId")
+        .containsExactlyInAnyOrder(processInstanceIdOne, processInstanceIdTwo);
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void shouldQueryByVariableValue_5() {
+    // GIVEN
+    String processInstanceIdOne = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.putValue("foo", "bar")).getProcessInstanceId();
+    String processInstanceIdTwo = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.putValue("foo", "bar").putValue("bar", 5)).getProcessInstanceId();
+
+    // WHEN
+    List<HistoricProcessInstance> processInstances = historyService.createHistoricProcessInstanceQuery()
+        .or()
+          .variableValueEquals("foo", "bar")
+          .variableValueEquals("foo", "baz")
+          .variableValueEquals("bar", 5)
+        .endOr()
+        .list();
+
+    // THEN
+    assertThat(processInstances)
+        .extracting("processInstanceId")
+        .containsExactlyInAnyOrder(processInstanceIdOne, processInstanceIdTwo);
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void shouldQueryByVariableValue_6() {
+    // GIVEN
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", Variables.putValue("foo", "bar"));
+    String processInstanceIdTwo = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.putValue("foo", "bar").putValue("bar", 5)).getProcessInstanceId();
+
+    // WHEN
+    List<HistoricProcessInstance> processInstances = historyService.createHistoricProcessInstanceQuery()
+        .or()
+          .variableValueEquals("foo", "baz")
+          .variableValueEquals("bar", 5)
+        .endOr()
+        .list();
+
+    // THEN
+    assertThat(processInstances)
+        .extracting("processInstanceId")
+        .containsExactlyInAnyOrder(processInstanceIdTwo);
   }
 
   @Test

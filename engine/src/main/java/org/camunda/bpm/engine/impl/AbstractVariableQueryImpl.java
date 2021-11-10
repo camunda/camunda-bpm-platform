@@ -39,7 +39,7 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?,?>, U> extends
 
   private static final long serialVersionUID = 1L;
 
-  protected List<QueryVariableValue> queryVariableValues = new ArrayList<QueryVariableValue>();
+  protected List<QueryVariableValue> queryVariableValues = new ArrayList<>();
 
   protected Boolean variableNamesIgnoreCase;
   protected Boolean variableValuesIgnoreCase;
@@ -109,7 +109,7 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?,?>, U> extends
   @SuppressWarnings("unchecked")
   public T matchVariableNamesIgnoreCase() {
     this.variableNamesIgnoreCase = true;
-    for (QueryVariableValue variable : this.queryVariableValues) {
+    for (QueryVariableValue variable : getQueryVariableValues()) {
       variable.setVariableNameIgnoreCase(true);
     }
     return (T)this;
@@ -118,13 +118,27 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?,?>, U> extends
   @SuppressWarnings("unchecked")
   public T matchVariableValuesIgnoreCase() {
     this.variableValuesIgnoreCase = true;
-    for (QueryVariableValue variable : this.queryVariableValues) {
+    for (QueryVariableValue variable : getQueryVariableValues()) {
       variable.setVariableValueIgnoreCase(true);
     }
     return (T)this;
   }
 
   protected void addVariable(String name, Object value, QueryOperator operator, boolean processInstanceScope) {
+    QueryVariableValue queryVariableValue = createQueryVariableValue(name, value, operator, processInstanceScope);
+    getQueryVariableValues().add(queryVariableValue);
+  }
+
+  protected QueryVariableValue createQueryVariableValue(String name, Object value, QueryOperator operator, boolean processInstanceScope) {
+    validateVariable(name, value, operator);
+
+    boolean shouldMatchVariableValuesIgnoreCase = Boolean.TRUE.equals(variableValuesIgnoreCase) && value != null && String.class.isAssignableFrom(value.getClass());
+    boolean shouldMatchVariableNamesIgnoreCase = Boolean.TRUE.equals(variableNamesIgnoreCase);
+
+    return new QueryVariableValue(name, value, operator, processInstanceScope, shouldMatchVariableNamesIgnoreCase, shouldMatchVariableValuesIgnoreCase);
+  }
+
+  protected void validateVariable(String name, Object value, QueryOperator operator) {
     ensureNotNull(NotValidException.class, "name", name);
     if(value == null || isBoolean(value)) {
       // Null-values and booleans can only be used in EQUALS and NOT_EQUALS
@@ -145,10 +159,6 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?,?>, U> extends
           break;
       }
     }
-
-    boolean shouldMatchVariableValuesIgnoreCase = Boolean.TRUE.equals(variableValuesIgnoreCase) && value != null && String.class.isAssignableFrom(value.getClass());
-    boolean shouldMatchVariableNamesIgnoreCase = Boolean.TRUE.equals(variableNamesIgnoreCase);
-    queryVariableValues.add(new QueryVariableValue(name, value, operator, processInstanceScope, shouldMatchVariableNamesIgnoreCase, shouldMatchVariableValuesIgnoreCase));
   }
 
   private boolean isBoolean(Object value) {
@@ -159,11 +169,11 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?,?>, U> extends
   }
 
   protected void ensureVariablesInitialized() {
-    if (!queryVariableValues.isEmpty()) {
+    if (!getQueryVariableValues().isEmpty()) {
       ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
       VariableSerializers variableSerializers = processEngineConfiguration.getVariableSerializers();
       String dbType = processEngineConfiguration.getDatabaseType();
-      for(QueryVariableValue queryVariableValue : queryVariableValues) {
+      for(QueryVariableValue queryVariableValue : getQueryVariableValues()) {
         queryVariableValue.initialize(variableSerializers, dbType);
       }
     }

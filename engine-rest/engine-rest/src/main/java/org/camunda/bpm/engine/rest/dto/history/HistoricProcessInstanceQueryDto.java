@@ -58,7 +58,7 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
 
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
-    VALID_SORT_BY_VALUES = new ArrayList<String>();
+    VALID_SORT_BY_VALUES = new ArrayList<>();
     VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_INSTANCE_ID_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_DEFINITION_ID_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_INSTANCE_BUSINESS_KEY_VALUE);
@@ -80,6 +80,7 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   private String processDefinitionNameLike;
   private List<String> processDefinitionKeyNotIn;
   private String processInstanceBusinessKey;
+  private List<String> processInstanceBusinessKeyIn;
   private String processInstanceBusinessKeyLike;
   private Boolean rootProcessInstances;
   private Boolean finished;
@@ -179,6 +180,11 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
   @CamundaQueryParam("processInstanceBusinessKey")
   public void setProcessInstanceBusinessKey(String processInstanceBusinessKey) {
     this.processInstanceBusinessKey = processInstanceBusinessKey;
+  }
+
+  @CamundaQueryParam(value = "processInstanceBusinessKeyIn", converter = StringListConverter.class)
+  public void setProcessInstanceBusinessKeyIn(List<String> processInstanceBusinessKeyIn) {
+    this.processInstanceBusinessKeyIn = processInstanceBusinessKeyIn;
   }
 
   @CamundaQueryParam("processInstanceBusinessKeyLike")
@@ -402,7 +408,7 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
       query.processDefinitionKey(processDefinitionKey);
     }
     if (processDefinitionKeys != null && !processDefinitionKeys.isEmpty()) {
-      query.processDefinitionKeyIn(processDefinitionKeys.toArray(new String[processDefinitionKeys.size()]));
+      query.processDefinitionKeyIn(processDefinitionKeys.toArray(new String[0]));
     }
     if (processDefinitionName != null) {
       query.processDefinitionName(processDefinitionName);
@@ -415,6 +421,9 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     }
     if (processInstanceBusinessKey != null) {
       query.processInstanceBusinessKey(processInstanceBusinessKey);
+    }
+    if (processInstanceBusinessKeyIn != null && !processInstanceBusinessKeyIn.isEmpty()) {
+      query.processInstanceBusinessKeyIn(processInstanceBusinessKeyIn.toArray(new String[0]));
     }
     if (processInstanceBusinessKeyLike != null) {
       query.processInstanceBusinessKeyLike(processInstanceBusinessKeyLike);
@@ -477,7 +486,7 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
       query.caseInstanceId(caseInstanceId);
     }
     if (tenantIds != null && !tenantIds.isEmpty()) {
-      query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+      query.tenantIdIn(tenantIds.toArray(new String[0]));
     }
     if (TRUE.equals(withoutTenantId)) {
       query.withoutTenantId();
@@ -523,11 +532,11 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
     }
 
     if (executedActivityIdIn != null && !executedActivityIdIn.isEmpty()) {
-      query.executedActivityIdIn(executedActivityIdIn.toArray(new String[executedActivityIdIn.size()]));
+      query.executedActivityIdIn(executedActivityIdIn.toArray(new String[0]));
     }
 
     if (activeActivityIdIn != null && !activeActivityIdIn.isEmpty()) {
-      query.activeActivityIdIn(activeActivityIdIn.toArray(new String[activeActivityIdIn.size()]));
+      query.activeActivityIdIn(activeActivityIdIn.toArray(new String[0]));
     }
 
     if (executedJobAfter != null) {
