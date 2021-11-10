@@ -47,6 +47,7 @@ public class SessionCookieSecurityIT extends AbstractWebIntegrationTest {
     // then
     assertEquals(200, response.getStatus());
     assertTrue(isCookieHeaderValuePresent("HttpOnly", response));
+    assertTrue(isCookieHeaderValuePresent("SameSite=Lax", response));
     assertFalse(isCookieHeaderValuePresent("Secure", response));
 
     // cleanup

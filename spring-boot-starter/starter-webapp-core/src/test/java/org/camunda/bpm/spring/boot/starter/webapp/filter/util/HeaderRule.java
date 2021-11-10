@@ -17,6 +17,7 @@
 package org.camunda.bpm.spring.boot.starter.webapp.filter.util;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.rules.ExternalResource;
 
 import java.io.IOException;
@@ -121,6 +122,10 @@ public class HeaderRule extends ExternalResource {
   public String getXsrfCookieValue() {
     return getCookieValue("XSRF-TOKEN");
   }
+  
+  public String getSessionCookieValue() {
+    return getCookieValue("JSESSIONID");
+  }
 
   public String getErrorResponseContent() {
     try {
@@ -146,4 +151,31 @@ public class HeaderRule extends ExternalResource {
     return getHeaders(name) != null;
   }
 
+  public String getSessionCookieRegex(String sameSite) {
+    return getSessionCookieRegex(null, null, sameSite, false);
+  }
+  
+  public String getSessionCookieRegex(String cookieName, String sameSite) {
+    return getSessionCookieRegex(null, cookieName, sameSite, false);
+  }
+  
+  public String getSessionCookieRegex(String sameSite, boolean secure) {
+    return getSessionCookieRegex(null, null, sameSite, secure);
+  }
+  
+  public String getSessionCookieRegex(String path, String cookieNameInput, String sameSite, boolean secure) {
+    String cookieName = StringUtils.isBlank(cookieNameInput) ? "JSESSIONID" : cookieNameInput;
+    StringBuilder regex = new StringBuilder(cookieName + "=.*;\\W*Path=/");
+    if (path != null) {
+      regex.append(path);
+    }
+    regex.append(";\\W*HttpOnly");
+    if (sameSite != null) {
+      regex.append(";\\W*SameSite=").append(sameSite);
+    }
+    if (secure) {
+      regex.append(";\\W*Secure");
+    }
+    return regex.toString();
+  }
 }

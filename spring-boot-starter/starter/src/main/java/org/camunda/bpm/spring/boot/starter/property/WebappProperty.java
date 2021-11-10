@@ -36,6 +36,9 @@ public class WebappProperty {
 
   @NestedConfigurationProperty
   private CsrfProperties csrf = new CsrfProperties();
+  
+  @NestedConfigurationProperty
+  private SessionCookieProperties sessionCookie = new SessionCookieProperties();
 
   @NestedConfigurationProperty
   protected HeaderSecurityProperties headerSecurity = new HeaderSecurityProperties();
@@ -95,6 +98,14 @@ public class WebappProperty {
   public void setCsrf(CsrfProperties csrf) {
     this.csrf = csrf;
   }
+  
+  public SessionCookieProperties getSessionCookie() {
+    return sessionCookie;
+  }
+  
+  public void setSessionCookie(SessionCookieProperties sessionCookie) {
+    this.sessionCookie = sessionCookie;
+  }
 
   public HeaderSecurityProperties getHeaderSecurity() {
     return headerSecurity;
@@ -113,6 +124,7 @@ public class WebappProperty {
       .add("webappPath='" + applicationPath + '\'')
       .add("csrf='" + csrf + '\'')
       .add("headerSecurityProperties='" + headerSecurity + '\'')
+      .add("sessionCookie='" + sessionCookie + '\'')
       .toString();
   }
 }

@@ -16,13 +16,14 @@
  */
 package org.camunda.bpm.webapp.impl.security.filter;
 
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.webapp.impl.security.filter.util.CsrfConstants;
-
-import javax.servlet.FilterConfig;
 import java.util.Arrays;
 
-public class CsrfPreventionCookieConfigurator {
+import javax.servlet.FilterConfig;
+
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.webapp.impl.security.filter.util.CookieConstants;
+
+public class CookieConfigurator {
 
   protected static final String ENABLE_SECURE_PARAM = "enableSecureCookie";
   protected static final String ENABLE_SAME_SITE_PARAM = "enableSameSiteCookie";
@@ -31,14 +32,19 @@ public class CsrfPreventionCookieConfigurator {
 
   protected boolean isSecureCookieEnabled;
   protected boolean isSameSiteCookieEnabled;
-
   protected String sameSiteCookieValue;
+  protected String cookieName;
 
   public void parseParams(FilterConfig filterConfig) {
 
     String enableSecureCookie = filterConfig.getInitParameter(ENABLE_SECURE_PARAM);
     if (!isEmpty(enableSecureCookie)) {
       isSecureCookieEnabled = Boolean.valueOf(enableSecureCookie);
+    }
+    
+    String cookieNameInput = filterConfig.getInitParameter("cookieName");
+    if (!isBlank(cookieNameInput)) {
+      cookieName = cookieNameInput;
     }
 
     String enableSameSiteCookie = filterConfig.getInitParameter(ENABLE_SAME_SITE_PARAM);
@@ -79,23 +85,39 @@ public class CsrfPreventionCookieConfigurator {
   }
 
   public String getConfig() {
-    StringBuilder stringBuilder = new StringBuilder();
-
+    return getConfig(null);
+  }
+  
+  public String getConfig(String currentHeader) {
+    StringBuilder stringBuilder = new StringBuilder(currentHeader == null ? "" : currentHeader);
+    
     if (isSameSiteCookieEnabled) {
-      stringBuilder
-        .append(CsrfConstants.CSRF_SAME_SITE_FIELD_NAME)
-        .append(sameSiteCookieValue);
+      if (currentHeader == null || !CookieConstants.SAME_SITE_FIELD_NAME_REGEX.matcher(currentHeader).find()) {
+        stringBuilder
+          .append(CookieConstants.SAME_SITE_FIELD_NAME)
+          .append(sameSiteCookieValue);
+      }
     }
-
+    
     if (isSecureCookieEnabled) {
-      stringBuilder.append(CsrfConstants.CSRF_SECURE_FLAG_NAME);
+      if (currentHeader == null || !CookieConstants.SECURE_FLAG_NAME_REGEX.matcher(currentHeader).find()) {
+        stringBuilder.append(CookieConstants.SECURE_FLAG_NAME);
+      }
     }
-
+    
     return stringBuilder.toString();
+  }
+  
+  public String getCookieName(String defaultName) {
+    return isBlank(cookieName) ? defaultName : cookieName;
   }
 
   protected boolean isEmpty(String string) {
     return string == null || string.trim().isEmpty();
+  }
+  
+  protected boolean isBlank(String s) {
+    return s == null || s.trim().isEmpty();
   }
 
   public enum SameSiteOption {

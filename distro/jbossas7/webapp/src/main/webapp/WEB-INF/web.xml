@@ -93,6 +93,20 @@
     <filter-name>CsrfPreventionFilter</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
+  
+  <!-- Session Cookie filter -->
+  <filter>
+    <filter-name>SessionCookieFilter</filter-name>
+    <filter-class>org.camunda.bpm.webapp.impl.security.filter.SessionCookieFilter</filter-class>
+    <!--<init-param>-->
+    <!--<param-name>enableSecureCookie</param-name>-->
+    <!--<param-value>true</param-value>-->
+    <!--</init-param>-->
+  </filter>
+  <filter-mapping>
+    <filter-name>SessionCookieFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
 
   <!-- HTTP Header Security Filter -->
   <filter>

@@ -21,20 +21,13 @@ import java.util.regex.Pattern;
 /**
  * @author Nikola Koevski
  */
-public final class CsrfConstants {
+public final class CookieConstants {
 
-  public static final String CSRF_SESSION_MUTEX = "CAMUNDA_SESSION_MUTEX";
+  public static final String SET_COOKIE_HEADER_NAME = "Set-Cookie";
 
-  public static final String CSRF_TOKEN_SESSION_ATTR_NAME = "CAMUNDA_CSRF_TOKEN";
+  public static final String SAME_SITE_FIELD_NAME = ";SameSite=";
+  public static final Pattern SAME_SITE_FIELD_NAME_REGEX = Pattern.compile(";\\w*SameSite\\w*=");
 
-  public static final String CSRF_TOKEN_HEADER_NAME = "X-XSRF-TOKEN";
-
-  public static final String CSRF_TOKEN_HEADER_REQUIRED = "Required";
-
-  public static final String CSRF_TOKEN_DEFAULT_COOKIE_NAME = "XSRF-TOKEN";
-
-  public static final Pattern CSRF_NON_MODIFYING_METHODS_PATTERN = Pattern.compile("GET|HEAD|OPTIONS");
-
-  public static final String CSRF_PATH_FIELD_NAME = ";Path=";
-
+  public static final String SECURE_FLAG_NAME = ";Secure";
+  public static final Pattern SECURE_FLAG_NAME_REGEX = Pattern.compile(";\\w*Secure");
 }
