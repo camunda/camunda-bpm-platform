@@ -43,6 +43,7 @@ module.exports = [
         disableNavigation: '&',
         onLoad: '&',
         onClick: '&',
+        onPlaneSet: '&',
         onMouseEnter: '&',
         onMouseLeave: '&',
         bpmnJsConf: '=?'
@@ -442,9 +443,10 @@ module.exports = [
           }
         }, 500);
 
-        var onPlaneChange = function(e, context) {
+        var onPlaneSet = function(e, context) {
           var newPlane = context.plane;
 
+          $scope.onPlaneSet();
           if (!newPlane) {
             return;
           }
@@ -467,7 +469,7 @@ module.exports = [
           eventBus.on('element.out', onOut);
           eventBus.on('element.mousedown', onMousedown);
           eventBus.on('canvas.viewbox.changed', onViewboxChange);
-          eventBus.on('plane.set', onPlaneChange);
+          eventBus.on('plane.set', onPlaneSet);
         }
 
         function clearEventListeners() {
@@ -477,7 +479,7 @@ module.exports = [
           eventBus.off('element.out', onOut);
           eventBus.off('element.mousedown', onMousedown);
           eventBus.off('canvas.viewbox.changed', onViewboxChange);
-          eventBus.off('plane.set', onPlaneChange);
+          eventBus.off('plane.set', onPlaneSet);
 
           search.updateSilently({
             plane: null

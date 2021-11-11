@@ -86,6 +86,16 @@ var Controller = [
       }
     };
 
+    $scope.callbacks = {
+      handlePlaneChange: function(selectionOnPlane) {
+        var newFilter = angular.copy($scope.filter);
+
+        newFilter.activityIds = selectionOnPlane || [];
+
+        processData.set('filter', newFilter);
+      }
+    };
+
     // utilities ///////////////////////
     $scope.hovered = null;
     $scope.hoverTitle = function(id) {

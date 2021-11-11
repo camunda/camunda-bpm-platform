@@ -123,7 +123,11 @@ var DirectiveController = [
 
     $scope.onClick = function(element, $event) {
       safeApply(function() {
+        // don't select invisible elements (process, collaboration, subprocess-plane)
+        var isRoot = !element.parent;
+
         if (
+          !isRoot &&
           bpmnElements[element.businessObject.id] &&
           isElementSelectable(bpmnElements[element.businessObject.id])
         ) {
@@ -269,6 +273,15 @@ var DirectiveController = [
       selection = newSelection;
     }
 
+    $scope.onPlaneSet = function() {
+      var canvas = $scope.control.getViewer().get('canvas');
+      var activePlane = canvas.getActivePlane();
+      var elementsOnPlane =
+        selection?.filter(el => canvas.findPlane(el) === activePlane) || [];
+
+      $scope.callbacks?.handlePlaneChange?.(elementsOnPlane, canvas);
+    };
+
     /*------------------- Handle scroll to bpmn element ---------------------*/
 
     $scope.$watch('selection.scrollToBpmnElement', function(newValue) {
@@ -304,6 +317,7 @@ var Directive = function() {
       processDiagramOverlay: '=',
       onElementClick: '&',
       selection: '=',
+      callbacks: '=',
       processData: '=',
       pageData: '=',
       overlayProviderComponent: '@',
