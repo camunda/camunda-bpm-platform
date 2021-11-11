@@ -1,17 +1,18 @@
 <div ng-if="diagramEnabled" style="position: relative; height: 100%">
-  <div diagram-statistics-loader>
-  </div>
-  <div cam-widget-bpmn-viewer
-    diagram-data='diagramData'
-    key='{{key}}'
-    control='control'
-    on-load='onLoad()'
-    on-click='onClick(element, $event)'
-    on-mouse-enter='onMouseEnter(element, $event)'
-    on-mouse-leave='onMouseLeave(element, $event)'
+  <div diagram-statistics-loader></div>
+  <div
+    cam-widget-bpmn-viewer
+    diagram-data="diagramData"
+    key="{{key}}"
+    control="control"
+    on-load="onLoad()"
+    on-click="onClick(element, $event)"
+    on-plane-set="onPlaneSet()"
+    on-mouse-enter="onMouseEnter(element, $event)"
+    on-mouse-leave="onMouseLeave(element, $event)"
     bpmn-js-conf="bpmnJsConf"
-    style='height: 100%'>
-  </div>
+    style="height: 100%"
+  ></div>
 </div>
 <div ng-if="!diagramEnabled" class="placeholder-container">
   <div class="placeholder-content">
