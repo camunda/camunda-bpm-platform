@@ -31,6 +31,7 @@ import org.camunda.bpm.tasklist.impl.web.bootstrap.TasklistContainerBootstrap;
 import org.camunda.bpm.webapp.impl.engine.EngineRestApplication;
 import org.camunda.bpm.webapp.impl.security.auth.AuthenticationFilter;
 import org.camunda.bpm.webapp.impl.security.filter.CsrfPreventionFilter;
+import org.camunda.bpm.webapp.impl.security.filter.SessionCookieFilter;
 import org.camunda.bpm.webapp.impl.security.filter.headersec.HttpHeaderSecurityFilter;
 import org.camunda.bpm.webapp.impl.security.filter.util.HttpSessionMutexListener;
 import org.camunda.bpm.webapp.impl.util.ServletContextUtil;
@@ -45,7 +46,6 @@ import javax.servlet.DispatcherType;
 import javax.servlet.Filter;
 import javax.servlet.FilterRegistration;
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
 import javax.servlet.SessionTrackingMode;
 import java.util.Collections;
@@ -98,6 +98,9 @@ public class CamundaBpmWebappInitializer implements ServletContextInitializer {
         applicationPath + "/api/*", applicationPath + "/app/*");
     registerFilter("CsrfPreventionFilter", CsrfPreventionFilter.class,
         webapp.getCsrf().getInitParams(),
+        applicationPath + "/api/*", applicationPath + "/app/*");
+    registerFilter("SessionCookieFilter", SessionCookieFilter.class,
+        webapp.getSessionCookie().getInitParams(),
         applicationPath + "/api/*", applicationPath + "/app/*");
 
     Map<String, String> headerSecurityProperties = webapp

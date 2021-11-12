@@ -97,6 +97,16 @@
               </deployables>
             </configuration>
           </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <excludes combine.children="append">
+                <!-- CAM-14109 -->
+                <exclude>**/SessionCookieSameSiteIT.java</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
         </plugins>
       </build>
     </profile>
@@ -221,7 +231,7 @@
                 <phase>integration-test</phase>
                 <configuration>
                   <skipTests>false</skipTests>
-                  <excludes>
+                  <excludes combine.children="append">
                     <exclude>**/RestIT.*</exclude>
                     <exclude>**/RestJaxRs2IT.*</exclude>
                   </excludes>
