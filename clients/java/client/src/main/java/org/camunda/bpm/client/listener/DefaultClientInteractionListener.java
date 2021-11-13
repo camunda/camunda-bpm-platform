@@ -37,7 +37,7 @@ public class DefaultClientInteractionListener implements ClientInteractionListen
     }
 
     @Override
-    public void unlockFail(String taskId, EngineClientException e) {
+    public void unlockFail(String taskId) {
 
     }
 
@@ -52,7 +52,7 @@ public class DefaultClientInteractionListener implements ClientInteractionListen
     }
 
     @Override
-    public void setVariableFail(String processInstanceId, Map<String, Object> variables, EngineClientException e) {
+    public void setVariableFail(String processInstanceId, Map<String, Object> variables) {
 
     }
 
@@ -67,7 +67,7 @@ public class DefaultClientInteractionListener implements ClientInteractionListen
     }
 
     @Override
-    public void completeFail(String taskId, Map<String, Object> variables, Map<String, Object> localVariables, EngineClientException e) {
+    public void completeFail(String taskId, Map<String, Object> variables, Map<String, Object> localVariables) {
 
     }
 
@@ -82,7 +82,7 @@ public class DefaultClientInteractionListener implements ClientInteractionListen
     }
 
     @Override
-    public void failureFail(String taskId, String errorMessage, String errorDetails, int retries, long retryTimeout, EngineClientException e) {
+    public void failureFail(String taskId, String errorMessage, String errorDetails, int retries, long retryTimeout) {
 
     }
 
@@ -97,7 +97,7 @@ public class DefaultClientInteractionListener implements ClientInteractionListen
     }
 
     @Override
-    public void bpmnErrorFail(String taskId, String errorCode, String errorMessage, Map<String, Object> variables, EngineClientException e) {
+    public void bpmnErrorFail(String taskId, String errorCode, String errorMessage, Map<String, Object> variables) {
 
     }
 
@@ -112,7 +112,7 @@ public class DefaultClientInteractionListener implements ClientInteractionListen
     }
 
     @Override
-    public void extendLockFail(String taskId, long newDuration, EngineClientException e) {
+    public void extendLockFail(String taskId, long newDuration) {
 
     }
 }

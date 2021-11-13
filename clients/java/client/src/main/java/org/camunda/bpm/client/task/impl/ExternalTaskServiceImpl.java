@@ -62,7 +62,7 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
       engineClient.unlock(externalTask.getId());
       clientInteractionListener.unlockDone(externalTask.getId());
     } catch (EngineClientException e) {
-      clientInteractionListener.unlockFail(externalTask.getId(), e);
+      clientInteractionListener.unlockFail(externalTask.getId());
       throw LOG.externalTaskServiceException("unlocking the external task", e);
     }
   }
@@ -79,7 +79,7 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
       engineClient.setVariables(processInstanceId, variables);
       clientInteractionListener.setVariableDone(processInstanceId, variables);
     } catch (EngineClientException e) {
-      clientInteractionListener.setVariableFail(processInstanceId, variables, e);
+      clientInteractionListener.setVariableFail(processInstanceId, variables);
       throw LOG.externalTaskServiceException("setting variables for external task", e);
     }
   }
@@ -92,7 +92,7 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
       engineClient.setVariables(processId, variables);
       clientInteractionListener.setVariableDone(processId, variables);
     } catch (EngineClientException e) {
-      clientInteractionListener.setVariableFail(processId, variables, e);
+      clientInteractionListener.setVariableFail(processId, variables);
       throw LOG.externalTaskServiceException("setting variables for external task", e);
     }
   }
@@ -113,7 +113,7 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
       engineClient.complete(externalTaskId, variables, localVariables);
       clientInteractionListener.completeDone(externalTaskId, variables, localVariables);
     } catch (EngineClientException e) {
-      clientInteractionListener.completeFail(externalTaskId, variables, localVariables, e);
+      clientInteractionListener.completeFail(externalTaskId, variables, localVariables);
       throw LOG.externalTaskServiceException("completing the external task", e);
     }
   }
@@ -137,7 +137,7 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
       engineClient.failure(externalTaskId, errorMessage, errorDetails, retries, retryTimeout, variables, locaclVariables);
       clientInteractionListener.failureDone(externalTaskId, errorMessage, errorDetails, retries, retryTimeout);
     } catch (EngineClientException e) {
-      clientInteractionListener.failureFail(externalTaskId, errorMessage, errorDetails, retries, retryTimeout, e);
+      clientInteractionListener.failureFail(externalTaskId, errorMessage, errorDetails, retries, retryTimeout);
       throw LOG.externalTaskServiceException("notifying a failure", e);
     }
   }
@@ -164,7 +164,7 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
       engineClient.bpmnError(externalTaskId, errorCode, errorMessage, variables);
       clientInteractionListener.bpmnErrorDone(externalTaskId, errorCode, errorMessage, variables);
     } catch (EngineClientException e) {
-      clientInteractionListener.bpmnErrorFail(externalTaskId, errorCode, errorMessage, variables, e);
+      clientInteractionListener.bpmnErrorFail(externalTaskId, errorCode, errorMessage, variables);
       throw LOG.externalTaskServiceException("notifying a BPMN error", e);
     }
   }
@@ -181,7 +181,7 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
       engineClient.extendLock(externalTaskId, newDuration);
       clientInteractionListener.extendLockDone(externalTaskId, newDuration);
     } catch (EngineClientException e) {
-      clientInteractionListener.extendLockFail(externalTaskId, newDuration, e);
+      clientInteractionListener.extendLockFail(externalTaskId, newDuration);
       throw LOG.externalTaskServiceException("extending lock", e);
     }
   }
