@@ -37,7 +37,7 @@ import org.jboss.vfs.VirtualFileFilter;
  * <p>A {@link ProcessArchiveScanner} which uses Jboss VFS for
  * scanning the process archive for processes.</p>
  *
- * <p>This implementation should be used on Jboss AS 7</p>
+ * <p>This implementation should be used on WildFly</p>
  *
  * @author Daniel Meyer
  * @author Falko Menge

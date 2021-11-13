@@ -53,4 +53,8 @@ public class ElValueProvider implements ParameterValueProvider, Comparable<ElVal
     return expression.getExpressionText().compareTo(o.getExpression().getExpressionText());
   }
 
+  @Override
+  public boolean isDynamic() {
+    return !getExpression().isLiteralText();
+  }
 }

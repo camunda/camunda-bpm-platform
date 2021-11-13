@@ -40,4 +40,9 @@ public class ConstantValueProvider implements ParameterValueProvider {
     this.value = value;
   }
 
+  @Override
+  public boolean isDynamic() {
+    return false;
+  }
+
 }

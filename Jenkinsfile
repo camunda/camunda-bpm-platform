@@ -11,7 +11,7 @@ pipeline {
     }
   }
   environment {
-    CAMBPM_LOGGER_LOG_LEVEL = 'DEBUG'
+    LOGGER_LOG_LEVEL = 'DEBUG'
   }
   options {
     buildDiscarder(logRotator(numToKeepStr: '5'))
@@ -54,7 +54,6 @@ pipeline {
             cambpmArchiveArtifacts('.m2/org/camunda/**/*-SNAPSHOT/**/*.jar,.m2/org/camunda/**/*-SNAPSHOT/**/*.pom,.m2/org/camunda/**/*-SNAPSHOT/**/*.xml,.m2/org/camunda/**/*-SNAPSHOT/**/*.txt',
                                   '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*frontend-sources.zip',
                                   '.m2/org/camunda/**/*-SNAPSHOT/**/license-book*.zip',
-                                  '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-jboss-modules*.zip',
                                   '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-*-assembly*.tar.gz',
                                   '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*.war',
                                   '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-engine-rest*.war',

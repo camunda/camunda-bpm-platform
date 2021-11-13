@@ -49,4 +49,13 @@ public class ListValueProvider implements ParameterValueProvider {
     this.providerList = providerList;
   }
 
+  /**
+   * @return this method currently always returns false, but that might change in the future.
+   */
+  @Override
+  public boolean isDynamic() {
+    // This implementation is currently not needed and therefore returns a defensive default value
+    return true;
+  }
+
 }

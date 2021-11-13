@@ -1339,7 +1339,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
       Mockito.verify(callableElement, Mockito.never()).getDefinitionKey(Mockito.anyObject());
       Mockito.verify(callableElement, Mockito.never()).getVersion(Mockito.anyObject());
       Mockito.verify(callableElement, Mockito.never()).getVersionTag(Mockito.anyObject());
-      Mockito.verify(callableElement, Mockito.never()).getDefinitionTenantId(Mockito.anyObject());
+      Mockito.verify(callableElement, Mockito.never()).getDefinitionTenantId(Mockito.anyObject(), Mockito.anyString());
       Mockito.verify(callableElement, Mockito.times(1)).hasDynamicReferences();
     }
 

@@ -14,22 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.core.variable.mapping.value;
+package org.camunda.bpm.client.exception;
 
-import org.camunda.bpm.engine.delegate.VariableScope;
+public class FetchAndLockException extends ExternalTaskClientException {
 
-/**
- * @author Daniel Meyer
- *
- */
-public class NullValueProvider implements ParameterValueProvider {
+  private static final long serialVersionUID = 1L;
 
-  public Object getValue(VariableScope variableScope) {
-    return null;
+  public FetchAndLockException(String message) {
+    super(message);
   }
 
-  @Override
-  public boolean isDynamic() {
-    return false;
+  public FetchAndLockException(String message, Throwable e) {
+    super(message, e);
   }
+
 }

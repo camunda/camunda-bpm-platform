@@ -28,6 +28,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.camunda.bpm.client.backoff.BackoffStrategy;
+import org.camunda.bpm.client.backoff.ErrorAwareBackoffStrategy;
 import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.impl.EngineClient;
 import org.camunda.bpm.client.impl.EngineClientException;
@@ -39,6 +40,7 @@ import org.camunda.bpm.client.task.ExternalTaskHandler;
 import org.camunda.bpm.client.task.impl.ExternalTaskImpl;
 import org.camunda.bpm.client.task.impl.ExternalTaskServiceImpl;
 import org.camunda.bpm.client.topic.TopicSubscription;
+import org.camunda.bpm.client.topic.impl.dto.FetchAndLockResponseDto;
 import org.camunda.bpm.client.topic.impl.dto.TopicRequestDto;
 import org.camunda.bpm.client.variable.impl.TypedValueField;
 import org.camunda.bpm.client.variable.impl.TypedValues;
@@ -107,9 +109,9 @@ public class TopicSubscriptionManager implements Runnable {
     subscriptions.forEach(this::prepareAcquisition);
 
     if (!taskTopicRequests.isEmpty()) {
-      List<ExternalTask> externalTasks = fetchAndLock(taskTopicRequests);
+      FetchAndLockResponseDto fetchAndLockResponse = fetchAndLock(taskTopicRequests);
 
-      externalTasks.forEach(externalTask -> {
+      fetchAndLockResponse.getExternalTasks().forEach(externalTask -> {
         String topicName = externalTask.getTopicName();
         ExternalTaskHandler taskHandler = externalTaskHandlers.get(topicName);
 
@@ -122,7 +124,7 @@ public class TopicSubscriptionManager implements Runnable {
       });
 
       if (!isBackoffStrategyDisabled.get()) {
-        runBackoffStrategy(externalTasks);
+        runBackoffStrategy(fetchAndLockResponse);
       }
     }
   }
@@ -136,8 +138,8 @@ public class TopicSubscriptionManager implements Runnable {
     externalTaskHandlers.put(topicName, externalTaskHandler);
   }
 
-  protected List<ExternalTask> fetchAndLock(List<TopicRequestDto> subscriptions) {
-    List<ExternalTask> externalTasks = Collections.emptyList();
+  protected FetchAndLockResponseDto fetchAndLock(List<TopicRequestDto> subscriptions) {
+    List<ExternalTask> externalTasks;
 
     try {
       LOG.fetchAndLock(subscriptions);
@@ -147,9 +149,10 @@ public class TopicSubscriptionManager implements Runnable {
     } catch (EngineClientException e) {
       clientInteractionListener.fetchAndLockFail(subscriptions, e);
       LOG.exceptionWhilePerformingFetchAndLock(e);
+      return new FetchAndLockResponseDto(LOG.fetchAndLockException(e));
     }
 
-    return externalTasks;
+    return new FetchAndLockResponseDto(externalTasks);
   }
 
   @SuppressWarnings("rawtypes")
@@ -218,9 +221,14 @@ public class TopicSubscriptionManager implements Runnable {
     this.backoffStrategy = backOffStrategy;
   }
 
-  protected void runBackoffStrategy(List<ExternalTask> externalTasks) {
+  protected void runBackoffStrategy(FetchAndLockResponseDto fetchAndLockResponse) {
     try {
-      backoffStrategy.reconfigure(externalTasks);
+      if (backoffStrategy instanceof ErrorAwareBackoffStrategy) {
+        ((ErrorAwareBackoffStrategy) backoffStrategy)
+                .reconfigure(fetchAndLockResponse.getExternalTasks(), fetchAndLockResponse.getError());
+      } else {
+        backoffStrategy.reconfigure(fetchAndLockResponse.getExternalTasks());
+      }
       long waitTime = backoffStrategy.calculateBackoffTime();
       suspend(waitTime);
     } catch (Throwable e) {

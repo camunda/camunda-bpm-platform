@@ -21,9 +21,6 @@
     <!-- override mail port so subethawiser does not try to bind itself on port 25 -->
     <mail.server.port>5025</mail.server.port>
 
-    <!-- jboss -->
-    <jboss.runtime.location>../jboss7-runtime/target/server/jboss-as-${version.jboss.as}/</jboss.runtime.location>
-
     <!-- wildfly -->
     <wildfly.runtime.location>../wildfly-runtime/target/server/wildfly-${version.wildfly}/</wildfly.runtime.location>
 

@@ -45,7 +45,6 @@
     <version.bouncycastle>1.47</version.bouncycastle>
 
     <!-- application servers -->
-    <version.jboss.as>7.2.0.Final</version.jboss.as>
     <version.wildfly>23.0.2.Final</version.wildfly>
     <version.wildfly.core>15.0.1.Final</version.wildfly.core>
 

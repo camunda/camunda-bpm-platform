@@ -66,7 +66,7 @@ import org.camunda.bpm.engine.repository.DeploymentBuilder;
  * different environments (e.g. Servlet vs. EJB Container):
  * <ul>
  *  <li> {@link ServletProcessApplication}: To be used for Process Applications is a Servlet Container like Apache Tomcat.</li>
- *  <li> {@link EjbProcessApplication}: To be used in a Java EE application server like JBoss, Glassfish or WebSphere Application Server.</li>
+ *  <li> {@link EjbProcessApplication}: To be used in a Java EE application server like WildFly, Glassfish or WebSphere Application Server.</li>
  *  <li> {@link EmbeddedProcessApplication}: To be used when embedding the process engine is an ordinary Java SE application.</li>
  *  <li> org.camunda.bpm.engine.spring.application.SpringProcessApplication: To be used for bootstrapping the process application from a Spring Application Context.</li>
  * </ul>
@@ -85,7 +85,7 @@ public interface ProcessApplicationInterface {
   /**
    * <p>Deploy this process application into the runtime container.</p>
    *
-   * <strong>NOTE:</strong> on some containers (like JBoss AS 7) the deployment of
+   * <strong>NOTE:</strong> on some containers (like WildFly) the deployment of
    * the process application is performed asynchronously and via introspection at deployment
    * time. This means that there is no guarantee that the process application is fully
    * deployed after this method returns.

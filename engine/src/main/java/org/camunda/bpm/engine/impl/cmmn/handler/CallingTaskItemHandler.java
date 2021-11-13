@@ -20,14 +20,12 @@ import org.camunda.bpm.engine.impl.cmmn.behavior.CallingTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.core.model.BaseCallableElement;
 import org.camunda.bpm.engine.impl.core.model.BaseCallableElement.CallableElementBinding;
-import org.camunda.bpm.engine.impl.core.model.DefaultCallableElementTenantIdProvider;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ConstantValueProvider;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.NullValueProvider;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
 import org.camunda.bpm.engine.impl.el.ElValueProvider;
 import org.camunda.bpm.engine.impl.el.Expression;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
-import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 
@@ -100,14 +98,12 @@ public abstract class CallingTaskItemHandler extends TaskItemHandler {
   }
 
   protected void initializeTenantId(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context, BaseCallableElement callableElement) {
-    ParameterValueProvider tenantIdProvider;
+    ParameterValueProvider tenantIdProvider = null;
 
     ExpressionManager expressionManager = context.getExpressionManager();
     String tenantId = getTenantId(element, activity, context);
     if (tenantId != null && tenantId.length() > 0) {
       tenantIdProvider = createParameterValueProvider(tenantId, expressionManager);
-    } else {
-      tenantIdProvider = new DefaultCallableElementTenantIdProvider();
     }
 
     callableElement.setTenantIdProvider(tenantIdProvider);
