@@ -42,7 +42,7 @@ public class SpringProcessEngineInitializationTest {
   }
 
   @Test
-  public void testProcessEnginesInitializingByActivitiContext() {
+  public void shouldInitializeProcessEngineFromActivitiContext() {
     //given
     existActivitiContext();
     //when
