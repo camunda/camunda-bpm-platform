@@ -40,7 +40,16 @@ module.exports = [
         'search',
         'Views',
         '$timeout',
-        function($element, $scope, $location, search, Views, $timeout) {
+        'Notifications',
+        function(
+          $element,
+          $scope,
+          $location,
+          search,
+          Views,
+          $timeout,
+          Notifications
+        ) {
           function updateSilently(params) {
             search.updateSilently(params);
           }
@@ -159,6 +168,7 @@ module.exports = [
 
               // only clear the task if the filter changed
               if (forceDisplayTask) {
+                Notifications.clearAll();
                 delete searchParams.forceDisplayTask;
                 return search.updateSilently(searchParams);
               }
