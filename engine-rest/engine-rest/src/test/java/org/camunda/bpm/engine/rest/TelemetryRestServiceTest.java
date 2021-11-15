@@ -18,10 +18,15 @@ package org.camunda.bpm.engine.rest;
 
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.TelemetryService;
+import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryData;
+import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
+
+import com.google.gson.Gson;
 
 import io.restassured.http.ContentType;
 import java.util.HashMap;
@@ -42,21 +47,25 @@ public class TelemetryRestServiceTest extends AbstractRestServiceTest {
 
   protected static final String TELEMETRY_URL = TEST_RESOURCE_ROOT_PATH +  TelemetryRestService.PATH;
   protected static final String TELEMETRY_CONFIG_URL = TELEMETRY_URL + "/configuration";
+  protected static final String TELEMETRY_DATA_URL = TELEMETRY_URL + "/data";
 
   protected ManagementService managementServiceMock;
+  protected TelemetryService telemetryServiceMock;
 
 
   @Before
   public void setupMocks() {
     managementServiceMock = mock(ManagementService.class);
+    telemetryServiceMock = mock(TelemetryService.class);
     when(processEngine.getManagementService()).thenReturn(managementServiceMock);
+    when(processEngine.getTelemetryService()).thenReturn(telemetryServiceMock);
   }
-  
+
   @Test
   public void shouldDisableTelemetry() {
-    Map<String, Object> requestBody = new HashMap<String, Object>();
+    Map<String, Object> requestBody = new HashMap<>();
     requestBody.put("enableTelemetry", false);
-    
+
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
       .body(requestBody)
@@ -65,13 +74,13 @@ public class TelemetryRestServiceTest extends AbstractRestServiceTest {
         .statusCode(Status.NO_CONTENT.getStatusCode())
       .when()
     .post(TELEMETRY_CONFIG_URL);
-    
+
     verify(managementServiceMock).toggleTelemetry(false);
   }
 
   @Test
   public void shouldEnableTelemetry() {
-    Map<String, Object> requestBody = new HashMap<String, Object>();
+    Map<String, Object> requestBody = new HashMap<>();
     requestBody.put("enableTelemetry", true);
 
     given()
@@ -91,7 +100,7 @@ public class TelemetryRestServiceTest extends AbstractRestServiceTest {
     String message = "Required admin authenticated group or user.";
     doThrow(new AuthorizationException(message)).when(managementServiceMock).toggleTelemetry(anyBoolean());
 
-    Map<String, Object> requestBody = new HashMap<String, Object>();
+    Map<String, Object> requestBody = new HashMap<>();
     requestBody.put("enableTelemetry", true);
 
     given()
@@ -172,6 +181,22 @@ public class TelemetryRestServiceTest extends AbstractRestServiceTest {
       .get(TELEMETRY_CONFIG_URL);
 
     verify(managementServiceMock).isTelemetryEnabled();
+  }
+
+  @Test
+  public void shouldGetTelemetryData() {
+    TelemetryData exampleTelemetryData = MockProvider.EXAMPLE_TELEMETRY_DATA;
+    when(telemetryServiceMock.getData()).thenReturn(exampleTelemetryData);
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(ContentType.JSON)
+          .body(equalTo(new Gson().toJson(exampleTelemetryData)))
+    .when()
+      .get(TELEMETRY_DATA_URL);
   }
 
 }

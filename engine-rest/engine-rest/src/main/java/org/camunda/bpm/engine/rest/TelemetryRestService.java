@@ -40,4 +40,8 @@ public interface TelemetryRestService {
   @Produces(MediaType.APPLICATION_JSON)
   TelemetryConfigurationDto getTelemetryConfiguration();
 
+  @GET
+  @Path("/data")
+  @Produces(MediaType.APPLICATION_JSON)
+  String getTelemetryData();
 }

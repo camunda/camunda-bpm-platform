@@ -33,6 +33,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
@@ -85,6 +87,15 @@ import org.camunda.bpm.engine.impl.form.CamundaFormRefImpl;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.persistence.entity.MetricIntervalEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
+import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServer;
+import org.camunda.bpm.engine.impl.telemetry.dto.Command;
+import org.camunda.bpm.engine.impl.telemetry.dto.Database;
+import org.camunda.bpm.engine.impl.telemetry.dto.Internals;
+import org.camunda.bpm.engine.impl.telemetry.dto.Jdk;
+import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyData;
+import org.camunda.bpm.engine.impl.telemetry.dto.Metric;
+import org.camunda.bpm.engine.impl.telemetry.dto.Product;
+import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryData;
 import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.management.IncidentStatistics;
 import org.camunda.bpm.engine.management.JobDefinition;
@@ -962,6 +973,55 @@ public abstract class MockProvider {
   public static final String EXAMPLE_PROBLEM_ELEMENT_ID_2 = "element_89";
   public static final String EXAMPLE_RESOURCE_NAME = "abc";
   public static final List<String> EXAMPLE_ELEMENT_IDS = Arrays.asList(EXAMPLE_PROBLEM_ELEMENT_ID, EXAMPLE_PROBLEM_ELEMENT_ID_2);
+
+  // Telemetry
+  public static final String EXAMPLE_TELEMETRY_INSTALLATION_ID = "8343cc7a-8ad1-42d4-97d2-43452c0bdfa3";
+  public static final String EXAMPLE_TELEMETRY_PRODUCT_NAME = "Camunda BPM Runtime";
+  public static final String EXAMPLE_TELEMETRY_PRODUCT_VERSION = "7.14.0";
+  public static final String EXAMPLE_TELEMETRY_PRODUCT_EDITION = "enterprise";
+  public static final String EXAMPLE_TELEMETRY_DB_VENDOR = "h2";
+  public static final String EXAMPLE_TELEMETRY_DB_VERSION = "1.4.190 (2015-10-11)";
+  public static final String EXAMPLE_TELEMETRY_APP_SERVER_VENDOR = "Wildfly";
+  public static final String EXAMPLE_TELEMETRY_APP_SERVER_VERSION = "WildFly Full 19.0.0.Final (WildFly Core 11.0.0.Final) - 2.0.30.Final";
+  public static final String EXAMPLE_TELEMETRY_TELEMETRY_CONFIGURE_CMD = "TelemetryConfigureCmd";
+  public static final String EXAMPLE_TELEMETRY_IS_TELEMETRY_ENABLED_CMD = "IsTelemetryEnabledCmd";
+  public static final String EXAMPLE_TELEMETRY_GET_TELEMETRY_DATA_CMD = "GetTelemetryDataCmd";
+  public static final String EXAMPLE_TELEMETRY_LICENSE_CUSTOMER_NAME = "customer name";
+  public static final String EXAMPLE_TELEMETRY_LICENSE_TYPE = "UNIFIED";
+  public static final String EXAMPLE_TELEMETRY_LICENSE_VALID_UNTIL = "2022-09-30";
+  public static final boolean EXAMPLE_TELEMETRY_LICENSE_UNLIMITED = false;
+  public static final Map<String, String> EXAMPLE_TELEMETRY_LICENSE_FEATURES = Collections.singletonMap("camundaBPM", "true");
+  public static final String EXAMPLE_TELEMETRY_LICENSE_RAW = "customer=customer name;expiryDate=2022-09-30;camundaBPM=true;optimize=false;cawemo=false";
+  public static final String EXAMPLE_TELEMETRY_JDK_VERSION = "14.0.2";
+  public static final String EXAMPLE_TELEMETRY_JDK_VENDOR = "Oracle Corporation";
+
+  public static final Database EXAMPLE_TELEMETRY_DATABASE = new Database(EXAMPLE_TELEMETRY_DB_VENDOR,
+      EXAMPLE_TELEMETRY_DB_VERSION);
+  public static final ApplicationServer EXAMPLE_TELEMETRY_SERVER = new ApplicationServer(
+      EXAMPLE_TELEMETRY_APP_SERVER_VENDOR, EXAMPLE_TELEMETRY_APP_SERVER_VERSION);
+  public static final LicenseKeyData EXAMPLE_TELEMETRY_LICENSE = new LicenseKeyData(
+      EXAMPLE_TELEMETRY_LICENSE_CUSTOMER_NAME, EXAMPLE_TELEMETRY_LICENSE_TYPE, EXAMPLE_TELEMETRY_LICENSE_VALID_UNTIL,
+      EXAMPLE_TELEMETRY_LICENSE_UNLIMITED, EXAMPLE_TELEMETRY_LICENSE_FEATURES, EXAMPLE_TELEMETRY_LICENSE_RAW);
+  public static final Jdk EXAMPLE_TELEMETRY_JDK = new Jdk(EXAMPLE_TELEMETRY_JDK_VERSION, EXAMPLE_TELEMETRY_JDK_VENDOR);
+  public static final Internals EXAMPLE_TELEMETRY_INTERNALS = new Internals(EXAMPLE_TELEMETRY_DATABASE,
+      EXAMPLE_TELEMETRY_SERVER, EXAMPLE_TELEMETRY_LICENSE, EXAMPLE_TELEMETRY_JDK);
+  static {
+    EXAMPLE_TELEMETRY_INTERNALS.setTelemetryEnabled(false);
+    EXAMPLE_TELEMETRY_INTERNALS.setCamundaIntegration(
+        Stream.of("spring-boot-starter", "camunda-bpm-run").collect(Collectors.toCollection(HashSet::new)));
+    EXAMPLE_TELEMETRY_INTERNALS
+        .setWebapps(Stream.of("cockpit", "admin").collect(Collectors.toCollection(HashSet::new)));
+    EXAMPLE_TELEMETRY_INTERNALS
+        .setCommands(Stream.of(new Object[][] { { "StartProcessInstanceCmd", 40 }, { "FetchExternalTasksCmd", 100 } })
+            .collect(Collectors.toMap(data -> (String) data[0], data -> new Command((Integer) data[1]))));
+    EXAMPLE_TELEMETRY_INTERNALS.setMetrics(Stream
+        .of(new Object[][] { { "root-process-instance-start", 936L }, { "activity-instance-start", 6125L },
+            { "executed-decision-instances", 140L }, { "executed-decision-elements", 732L } })
+        .collect(Collectors.toMap(data -> (String) data[0], data -> new Metric((Long) data[1]))));
+  }
+  public static final Product EXAMPLE_TELEMETRY_PRODUCT = new Product(EXAMPLE_TELEMETRY_PRODUCT_NAME,
+      EXAMPLE_TELEMETRY_PRODUCT_VERSION, EXAMPLE_TELEMETRY_PRODUCT_EDITION, EXAMPLE_TELEMETRY_INTERNALS);
+  public static final TelemetryData EXAMPLE_TELEMETRY_DATA = new TelemetryData(EXAMPLE_TELEMETRY_INSTALLATION_ID, EXAMPLE_TELEMETRY_PRODUCT);
 
   public static Task createMockTask() {
     return mockTask().build();
