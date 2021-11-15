@@ -217,6 +217,28 @@
               -->
             </executions>
           </plugin>
+          
+          <!-- Initialize Liquibase so that we can make updates to higher 
+            versions in following test fixtures -->
+          <plugin>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>initialize-liquibase</id>
+                <phase>test-compile</phase>
+                <goals>
+                  <goal>changelogSyncToTag</goal>
+                </goals>
+                <configuration>
+                  <toTag>7.16.0</toTag>
+                  <changeLogFile>camunda-changelog.xml</changeLogFile>
+                  <changeLogDirectory>${project.build.directory}/scripts-current/sql/liquibase/</changeLogDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
