@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.telemetry;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.camunda.bpm.engine.management.Metrics.ACTIVTY_INSTANCE_START;
 import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_ELEMENTS;
 import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_INSTANCES;
@@ -25,7 +26,10 @@ import static org.camunda.bpm.engine.management.Metrics.ROOT_PROCESS_INSTANCE_ST
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.TelemetryService;
@@ -57,10 +61,17 @@ public class TelemetryServiceTest {
   protected static final String DB_VERSION = "v.1.2.3";
   protected static final String APP_SERVER_VENDOR = "Apache Tomcat";
   protected static final String APP_SERVER_VERSION = "Apache Tomcat/10.0.1";
-  protected static final String TELEMETRY_CONFIGURE_CMD = "TelemetryConfigureCmd";
-  protected static final String IS_TELEMETRY_ENABLED_CMD = "IsTelemetryEnabledCmd";
-  protected static final String GET_TELEMETRY_DATA_CMD = "GetTelemetryDataCmd";
+  protected static final String TELEMETRY_CONFIGURE_CMD_NAME = "TelemetryConfigureCmd";
+  protected static final Command TELEMETRY_CONFIGURE_CMD = new Command(56);
+  protected static final String IS_TELEMETRY_ENABLED_CMD_NAME = "IsTelemetryEnabledCmd";
+  protected static final Command IS_TELEMETRY_ENABLED_CMD = new Command(78);
+  protected static final String GET_TELEMETRY_DATA_CMD_NAME = "GetTelemetryDataCmd";
+  protected static final Command GET_TELEMETRY_DATA_CMD = new Command(452);
   protected static final String LICENSE_CUSTOMER_NAME = "customer a";
+  protected static final Metric ROOT_PROCESS_INSTANCE_START_METRIC = new Metric(3);
+  protected static final Metric ACTIVTY_INSTANCE_START_METRIC = new Metric(110);
+  protected static final Metric EXECUTED_DECISION_ELEMENTS_METRIC = new Metric(1678);
+  protected static final Metric EXECUTED_DECISION_INSTANCES_METRIC = new Metric(267);
 
   @Rule
   public ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule();
@@ -115,17 +126,19 @@ public class TelemetryServiceTest {
     internals.setLicenseKey(licenseKey);
 
     Map<String, Command> commands = new HashMap<>();
-    commands.put(TELEMETRY_CONFIGURE_CMD, new Command(1));
-    commands.put(IS_TELEMETRY_ENABLED_CMD, new Command(1));
-    commands.put(GET_TELEMETRY_DATA_CMD, new Command(1));
+    commands.put(TELEMETRY_CONFIGURE_CMD_NAME, TELEMETRY_CONFIGURE_CMD);
+    commands.put(IS_TELEMETRY_ENABLED_CMD_NAME, IS_TELEMETRY_ENABLED_CMD);
+    commands.put(GET_TELEMETRY_DATA_CMD_NAME, GET_TELEMETRY_DATA_CMD);
     internals.setCommands(commands);
 
     Map<String, Metric> metrics = new HashMap<>();
-    metrics.put(ROOT_PROCESS_INSTANCE_START, new Metric(0));
-    metrics.put(EXECUTED_DECISION_ELEMENTS, new Metric(0));
-    metrics.put(EXECUTED_DECISION_INSTANCES, new Metric(0));
-    metrics.put(ACTIVTY_INSTANCE_START, new Metric(0));
+    metrics.put(ACTIVTY_INSTANCE_START, ACTIVTY_INSTANCE_START_METRIC);
+    metrics.put(ROOT_PROCESS_INSTANCE_START, ROOT_PROCESS_INSTANCE_START_METRIC);
+    metrics.put(EXECUTED_DECISION_ELEMENTS, EXECUTED_DECISION_ELEMENTS_METRIC);
+    metrics.put(EXECUTED_DECISION_INSTANCES, EXECUTED_DECISION_INSTANCES_METRIC);
     internals.setMetrics(metrics);
+
+    internals.setWebapps(Stream.of("cockpit", "admin").collect(Collectors.toCollection(HashSet::new)));
 
     Product product = new Product(PRODUCT_NAME, PRODUCT_VERSION, PRODUCT_EDITION, internals);
     return new TelemetryData(INSTALLATION_ID, product);
@@ -169,7 +182,17 @@ public class TelemetryServiceTest {
     assertThat(data.getProduct().getInternals().getJdk().getVersion()).isNotNull();
     assertThat(data.getProduct().getInternals().getLicenseKey().getCustomer()).isEqualTo(LICENSE_CUSTOMER_NAME);
     assertThat(data.getProduct().getInternals().getTelemetryEnabled()).isTrue();
-    assertThat(data.getProduct().getInternals().getCommands()).hasSize(3);
+    assertThat(data.getProduct().getInternals().getCommands()).containsExactly(
+        entry(TELEMETRY_CONFIGURE_CMD_NAME, TELEMETRY_CONFIGURE_CMD),
+        entry(IS_TELEMETRY_ENABLED_CMD_NAME, IS_TELEMETRY_ENABLED_CMD),
+        entry(GET_TELEMETRY_DATA_CMD_NAME, GET_TELEMETRY_DATA_CMD));
     assertThat(data.getProduct().getInternals().getMetrics()).hasSize(4);
+    assertThat(data.getProduct().getInternals().getMetrics()).containsExactly(
+        entry(ROOT_PROCESS_INSTANCE_START, ROOT_PROCESS_INSTANCE_START_METRIC),
+        entry(ACTIVTY_INSTANCE_START, ACTIVTY_INSTANCE_START_METRIC),
+        entry(EXECUTED_DECISION_ELEMENTS, EXECUTED_DECISION_ELEMENTS_METRIC),
+        entry(EXECUTED_DECISION_INSTANCES, EXECUTED_DECISION_INSTANCES_METRIC)
+        );
+    assertThat(data.getProduct().getInternals().getWebapps()).containsExactlyInAnyOrder("cockpit", "admin");
   }
 }
