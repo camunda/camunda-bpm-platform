@@ -132,6 +132,7 @@
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP" />
     <result property="sequenceCounter" column="SEQUENCE_COUNTER_" jdbcType="BIGINT" />
+    <result property="lastFailureLogId" column="LAST_FAILURE_LOG_ID_" jdbcType="VARCHAR" />
     <discriminator javaType="string" column="TYPE_">
       <case value="message" resultMap="messageResultMap"/>
       <case value="timer" resultMap="timerResultMap"/>
@@ -522,7 +523,8 @@
        DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR},
        HANDLER_CFG_ = #{jobHandlerConfigurationRaw, jdbcType=VARCHAR},
        PRIORITY_ = #{priority, jdbcType=BIGINT},
-       SEQUENCE_COUNTER_ = #{sequenceCounter, jdbcType=BIGINT}
+       SEQUENCE_COUNTER_ = #{sequenceCounter, jdbcType=BIGINT},
+       LAST_FAILURE_LOG_ID_ = #{lastFailureLogId, jdbcType=VARCHAR}
     </set>
     where ID_= #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
@@ -625,7 +627,8 @@
        DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR},
        HANDLER_CFG_ = #{jobHandlerConfigurationRaw, jdbcType=VARCHAR},
        PRIORITY_ = #{priority, jdbcType=BIGINT},
-       SEQUENCE_COUNTER_ = #{sequenceCounter, jdbcType=BIGINT}
+       SEQUENCE_COUNTER_ = #{sequenceCounter, jdbcType=BIGINT},
+       LAST_FAILURE_LOG_ID_ = #{lastFailureLogId, jdbcType=VARCHAR}
     </set>
     where ID_= #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
@@ -705,7 +708,8 @@
             DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR},
             HANDLER_CFG_ = #{jobHandlerConfigurationRaw, jdbcType=VARCHAR},
             PRIORITY_ = #{priority, jdbcType=BIGINT},
-            SEQUENCE_COUNTER_ = #{sequenceCounter, jdbcType=BIGINT}
+            SEQUENCE_COUNTER_ = #{sequenceCounter, jdbcType=BIGINT},
+            LAST_FAILURE_LOG_ID_ = #{lastFailureLogId, jdbcType=VARCHAR}
         </set>
         where ID_= #{id, jdbcType=VARCHAR}
         and REV_ = #{revision, jdbcType=INTEGER}

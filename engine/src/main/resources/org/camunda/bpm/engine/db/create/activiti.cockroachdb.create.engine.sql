@@ -131,6 +131,7 @@ create table ACT_RU_JOB (
     SEQUENCE_COUNTER_ bigint,
     TENANT_ID_ varchar(64),
     CREATE_TIME_ timestamp,
+    LAST_FAILURE_LOG_ID_ varchar(64),
     primary key (ID_)
 );
 
