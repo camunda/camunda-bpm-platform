@@ -124,25 +124,20 @@
               </execution>
             </executions>
           </plugin>
-
+          
           <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <configuration>
-              <cleanupDaemonThreads>false</cleanupDaemonThreads>
-              <includeProjectDependencies>true</includeProjectDependencies>
-              <includePluginDependencies>false</includePluginDependencies>
-              <classpathScope>test</classpathScope>
-            </configuration>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-maven-plugin</artifactId>
             <executions>
               <execution>
                 <id>drop-upgraded-db</id>
-                <goals>
-                  <goal>java</goal>
-                </goals>
                 <phase>post-integration-test</phase>
+                <goals>
+                  <goal>dropAll</goal>
+                </goals>
                 <configuration>
-                  <mainClass>org.camunda.bpm.qa.upgrade.UpgradedDBDropper</mainClass>
+                  <changeLogFile>camunda-changelog.xml</changeLogFile>
+                  <changeLogDirectory>${project.build.directory}/scripts-current/sql/liquibase/</changeLogDirectory>
                 </configuration>
               </execution>
             </executions>
@@ -183,22 +178,18 @@
           </plugin>
 
           <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>sql-maven-plugin</artifactId>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-maven-plugin</artifactId>
             <executions>
               <execution>
                 <id>drop-db-if-present</id>
                 <phase>generate-test-resources</phase>
                 <goals>
-                  <goal>execute</goal>
+                  <goal>dropAll</goal>
                 </goals>
                 <configuration>
-                  <srcFiles>
-                    <!-- try dropping the DB if it exists. -->
-                    <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_engine_${project.version}.sql</srcFile>
-                  </srcFiles>
-                  <autocommit>true</autocommit>
-                  <onError>continue</onError>
+                  <changeLogFile>camunda-changelog.xml</changeLogFile>
+                  <changeLogDirectory>${project.build.directory}/scripts-current/sql/liquibase/</changeLogDirectory>
                 </configuration>
               </execution>
             </executions>
