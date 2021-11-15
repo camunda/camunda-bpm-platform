@@ -245,108 +245,60 @@
               </execution>
             </executions>
           </plugin>
-
-
           <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>sql-maven-plugin</artifactId>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-maven-plugin</artifactId>
             <executions>
               <execution>
                 <id>drop-db-if-present</id>
                 <phase>generate-test-resources</phase>
                 <goals>
-                  <goal>execute</goal>
+                  <goal>dropAll</goal>
                 </goals>
                 <configuration>
-                  <srcFiles>
-                    <!-- first: try dropping the DB -->
-                    <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_engine_${project.version}.sql</srcFile>
-                    <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_identity_${project.version}.sql</srcFile>
-                  </srcFiles>
-                  <autocommit>true</autocommit>
-                  <onError>continue</onError>
+                  <changeLogFile>camunda-changelog.xml</changeLogFile>
+                  <changeLogDirectory>${project.build.directory}/scripts-current/sql/liquibase/</changeLogDirectory>
                 </configuration>
               </execution>
               <execution>
-                <id>create-old-schema</id>
+                <!-- Creates the schema on the 7.x.0 version of the old version -->
+                <id>create-old-schema-liquibase</id>
                 <phase>generate-test-resources</phase>
                 <goals>
-                  <goal>execute</goal>
+                  <goal>update</goal>
                 </goals>
                 <configuration>
-                  <srcFiles>
-                    <!-- now create old version of the schema -->
-                    <srcFile>${project.build.directory}/scripts-old/sql/create/${database.type}_engine_${camunda.version.old}.sql</srcFile>
-                    <srcFile>${project.build.directory}/scripts-old/sql/create/${database.type}_identity_${camunda.version.old}.sql</srcFile>
-                  </srcFiles>
+                  <changeLogFile>camunda-changelog.xml</changeLogFile>
+                  <changeLogDirectory>${project.build.directory}/scripts-old/sql/liquibase/</changeLogDirectory>
                 </configuration>
               </execution>
               <execution>
-                <id>patch-old-schema</id>
+                <!-- Patches the schema to the latest change in the Liquibase log, including
+                  any patches we have defined for the current version -->
+                <id>patch-to-current-schema-liquibase</id>
                 <phase>generate-test-resources</phase>
                 <goals>
-                  <goal>execute</goal>
+                  <goal>update</goal>
                 </goals>
                 <configuration>
-                  <srcFiles>
-                    <!-- now patch old version of the schema -->
-                    <!-- only add patch scripts which are after the camunda.version.old -->
-                    <!-- example:
-                      <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch_${camunda.old.majorVersion}.${camunda.old.minorVersion}.X_to_${camunda.old.majorVersion}.${camunda.old.minorVersion}.Y.sql</srcFile>
-                    -->
-                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql</srcFile>
-                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql</srcFile>
-                    <!--<srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql</srcFile>-->
-                  </srcFiles>
-                </configuration>
-              </execution>
-              <execution>
-                <id>upgrade-db</id>
-                <phase>generate-test-resources</phase>
-                <goals>
-                  <goal>execute</goal>
-                </goals>
-                <configuration>
-                  <srcFiles>
-                    <!-- now perform the schema migrations -->
-                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql</srcFile>
-                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql</srcFile>
-                    <!-- clear authorization table when upgrading from 7.4 to 7.5 -->
-                    <srcFile>${project.basedir}/clear.authorization.table.sql</srcFile>
-                  </srcFiles>
-                </configuration>
-              </execution>
-              <execution>
-                <id>patch-new-schema</id>
-                <phase>generate-test-resources</phase>
-                <goals>
-                  <goal>execute</goal>
-                </goals>
-                <configuration>
-                  <srcFiles>
-                    <!-- now patch new version of the schema, apply any patches explicitly -->
-                    <!-- example:
-                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch_${camunda.current.majorVersion}.${camunda.current.minorVersion}.0_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.1.sql</srcFile>
-                    -->
-                  </srcFiles>
+                  <changeLogFile>camunda-changelog.xml</changeLogFile>
+                  <changeLogDirectory>${project.build.directory}/scripts-current/sql/liquibase/</changeLogDirectory>
                 </configuration>
               </execution>
               <execution>
                 <id>drop-db</id>
                 <phase>post-integration-test</phase>
                 <goals>
-                  <goal>execute</goal>
+                  <goal>dropAll</goal>
                 </goals>
                 <configuration>
-                  <srcFiles>
-                    <!-- finally drop db -->
-                    <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_engine_${project.version}.sql</srcFile>
-                    <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_identity_${project.version}.sql</srcFile>
-                  </srcFiles>
+                  <changeLogFile>camunda-changelog.xml</changeLogFile>
+                  <changeLogDirectory>${project.build.directory}/scripts-current/sql/liquibase/</changeLogDirectory>
                 </configuration>
               </execution>
             </executions>
           </plugin>
+          
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
