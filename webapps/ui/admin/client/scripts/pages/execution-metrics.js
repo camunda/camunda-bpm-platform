@@ -32,7 +32,8 @@ var Controller = [
   'Uri',
   'camAPI',
   'fixDate',
-  function($scope, $filter, Uri, camAPI, fixDate) {
+  'configuration',
+  function($scope, $filter, Uri, camAPI, fixDate, configuration) {
     var MetricsResource = camAPI.resource('metrics');
 
     // date variables
@@ -50,6 +51,8 @@ var Controller = [
       dateFormat
     );
     $scope.loadingState = 'INITIAL';
+    $scope.alwaysShowUTWMetrics = configuration.getAlwaysShowUniqueTaskWorkerMetrics();
+    $scope.showTaskWorkerMetric = $scope.alwaysShowUTWMetrics;
 
     // sets loading state to error and updates error message
     function setLoadingError(error) {
