@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.impl;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
 import org.camunda.bpm.engine.variable.Variables;
@@ -111,4 +112,22 @@ public class QueryVariableValue implements Serializable {
   public void setVariableValueIgnoreCase(boolean variableValueIgnoreCase) {
     this.variableValueIgnoreCase = variableValueIgnoreCase;
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
+    QueryVariableValue that = (QueryVariableValue) o;
+    return local == that.local && variableNameIgnoreCase == that.variableNameIgnoreCase
+        && variableValueIgnoreCase == that.variableValueIgnoreCase && name.equals(that.name) && value.equals(that.value)
+        && operator == that.operator && Objects.equals(valueCondition, that.valueCondition);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(name, value, operator, local, valueCondition, variableNameIgnoreCase, variableValueIgnoreCase);
+  }
+
 }

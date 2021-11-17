@@ -25,9 +25,14 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -54,6 +59,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   protected String processDefinitionName;
   protected String processDefinitionNameLike;
   protected String businessKey;
+  protected String[] businessKeyIn;
   protected String businessKeyLike;
   protected boolean finished = false;
   protected boolean unfinished = false;
@@ -89,8 +95,10 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
   protected String caseInstanceId;
 
-  protected List<HistoricProcessInstanceQueryImpl> queries = new ArrayList<>(Arrays.asList(this));
+  protected List<HistoricProcessInstanceQueryImpl> queries = new ArrayList<>(Collections.singletonList(this));
   protected boolean isOrQueryActive = false;
+
+  protected Map<String, Set<QueryVariableValue>> queryVariableNameToValuesMap = new HashMap<>();
 
   public HistoricProcessInstanceQueryImpl() {
   }
@@ -138,6 +146,11 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
   public HistoricProcessInstanceQuery processInstanceBusinessKey(String businessKey) {
     this.businessKey = businessKey;
+    return this;
+  }
+
+  public HistoricProcessInstanceQuery processInstanceBusinessKeyIn(String... businessKeyIn) {
+    this.businessKeyIn = businessKeyIn;
     return this;
   }
 
@@ -395,6 +408,17 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
         .findDeploymentIdMappingsByQueryCriteria(this);
   }
 
+  public List<QueryVariableValue> getQueryVariableValues() {
+    return queryVariableNameToValuesMap.values()
+        .stream()
+        .flatMap(Set::stream)
+        .collect(Collectors.toList());
+  }
+
+  public Map<String, Set<QueryVariableValue>> getQueryVariableNameToValuesMap() {
+    return queryVariableNameToValuesMap;
+  }
+
   @Override
   protected void ensureVariablesInitialized() {
     super.ensureVariablesInitialized();
@@ -405,10 +429,24 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
       String dbType = processEngineConfiguration.getDatabaseType();
 
       for (HistoricProcessInstanceQueryImpl orQuery: queries) {
-        for (QueryVariableValue var : orQuery.queryVariableValues) {
+        for (QueryVariableValue var : orQuery.getQueryVariableValues()) {
           var.initialize(variableSerializers, dbType);
         }
       }
+    }
+  }
+
+  @Override
+  protected void addVariable(String name, Object value, QueryOperator operator, boolean processInstanceScope) {
+    QueryVariableValue queryVariableValue = createQueryVariableValue(name, value, operator, processInstanceScope);
+
+    Set<QueryVariableValue> queryVariableValues = queryVariableNameToValuesMap.get(name);
+    if (queryVariableValues == null) {
+      queryVariableNameToValuesMap.put(name, new HashSet<>(Collections.singletonList(queryVariableValue)));
+
+    } else {
+      queryVariableValues.add(queryVariableValue);
+
     }
   }
 
@@ -435,6 +473,10 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
   public String getBusinessKey() {
     return businessKey;
+  }
+
+  public String[] getBusinessKeyIn() {
+    return businessKeyIn;
   }
 
   public String getBusinessKeyLike() {

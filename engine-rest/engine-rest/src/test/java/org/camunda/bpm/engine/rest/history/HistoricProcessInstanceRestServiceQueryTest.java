@@ -1123,6 +1123,55 @@ public class HistoricProcessInstanceRestServiceQueryTest extends AbstractRestSer
   }
 
   @Test
+  public void shouldQueryByBusinessKeyIn() {
+    given()
+        .queryParam("processInstanceBusinessKeyIn", "business-key-one,business-key-two")
+        .then()
+        .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .get(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    verifyBusinessKeyInListInvocation();
+  }
+
+  @Test
+  public void shouldQueryByBusinessKeyInAsPost() {
+    Map<String, List<String>> parameters = getCompleteBusinessKeyInListQueryParameters();
+
+    given()
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(parameters)
+        .then()
+        .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .post(HISTORIC_PROCESS_INSTANCE_RESOURCE_URL);
+
+    verifyBusinessKeyInListInvocation();
+  }
+
+  protected Map<String, List<String>> getCompleteBusinessKeyInListQueryParameters() {
+    Map<String, List<String>> parameters = new HashMap<>();
+
+    List<String> processInstanceBusinessKeys = new ArrayList<>();
+    processInstanceBusinessKeys.add("business-key-one");
+    processInstanceBusinessKeys.add("business-key-two");
+
+    parameters.put("processInstanceBusinessKeyIn", processInstanceBusinessKeys);
+
+    return parameters;
+  }
+
+  protected void verifyBusinessKeyInListInvocation() {
+    Map<String, List<String>> parameters = getCompleteBusinessKeyInListQueryParameters();
+    List<String> value = parameters.get("processInstanceBusinessKeyIn");
+
+    verify(mockedQuery).processInstanceBusinessKeyIn(value.toArray(new String[0]));
+    verify(mockedQuery).list();
+  }
+
+  @Test
   public void testQueryByProcessDefinitionKeyIn() {
     given()
       .queryParam("processDefinitionKeyIn", "firstProcessDefinitionKey,secondProcessDefinitionKey")
