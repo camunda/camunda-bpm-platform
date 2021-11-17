@@ -50,7 +50,7 @@
     </div>
   </div>
 
-  <div class="task-worker-metrics">
+  <div ng-hide="alwaysShowUTWMetrics" class="task-worker-metrics">
     <input class="tw-checkbox-show" type="checkbox" ng-model="showTaskWorkerMetric" id="show-task-worker" />
     <label class="tw-checkbox-show-label" for="show-task-worker">
       {{ 'EXECUTION_METRICS_TASK_WORKERS_SHOW' | translate }}
