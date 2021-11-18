@@ -17,7 +17,7 @@
   <inceptionYear>2014</inceptionYear>
 
   <properties>
-    <version.jetty>9.4.31.v20200723</version.jetty>
+    <version.jetty>9.4.34.v20201102</version.jetty>
     <version.tomcat>9.0.43</version.tomcat>
 
     <web.resources.override>src/main/runtime/default/webapp</web.resources.override>
