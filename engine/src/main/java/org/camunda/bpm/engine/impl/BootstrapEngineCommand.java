@@ -30,8 +30,8 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.EverLivingJobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyManager;
-import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryData;
-import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyData;
+import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyDataImpl;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 import org.camunda.bpm.engine.impl.util.LicenseKeyUtil;
 import org.camunda.bpm.engine.impl.util.TelemetryUtil;
@@ -232,7 +232,7 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
     ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
     String installationId = processEngineConfiguration.getInstallationId();
 
-    TelemetryData telemetryData = processEngineConfiguration.getTelemetryData();
+    TelemetryDataImpl telemetryData = processEngineConfiguration.getTelemetryData();
 
     // set installationId in the telemetry data
     telemetryData.setInstallation(installationId);
@@ -240,7 +240,7 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
     // set the persisted license key in the telemetry data and registry
     String licenseKey = processEngineConfiguration.getManagementService().getLicenseKey();
     if (licenseKey != null) {
-      LicenseKeyData licenseKeyData = LicenseKeyUtil.getLicenseKeyData(licenseKey);
+      LicenseKeyDataImpl licenseKeyData = LicenseKeyUtil.getLicenseKeyData(licenseKey);
       processEngineConfiguration.getTelemetryRegistry().setLicenseKey(licenseKeyData);
       telemetryData.getProduct().getInternals().setLicenseKey(licenseKeyData);
     }

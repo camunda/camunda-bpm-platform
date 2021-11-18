@@ -55,6 +55,7 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.telemetry.dto.TelemetryData;
 
 
 
@@ -1388,5 +1389,18 @@ public interface ManagementService {
    *   </ul>
    */
   Boolean isTelemetryEnabled();
+
+  /**
+   * The engine collects information about multiple aspects of the installation.
+   * If telemetry is enabled this information is sent to Camunda. If telemetry
+   * is disabled, the engine still collects this information.
+   *
+   * This method returns the current state of the collected telemetry data. For a
+   * detailed explanation on what is included, read the
+   * <a href="https://docs.camunda.org/manual/latest/introduction/telemetry/#collected-data">Telemetry</a>
+   * page in the Camunda docs.
+   * @see <a href="https://docs.camunda.org/manual/latest/introduction/telemetry/#collected-data">Camunda Documentation: Telemetry</a>
+   */
+  TelemetryData getTelemetryData();
 
 }

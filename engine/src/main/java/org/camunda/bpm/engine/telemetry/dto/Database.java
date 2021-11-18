@@ -14,17 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl;
+package org.camunda.bpm.engine.telemetry.dto;
 
-import org.camunda.bpm.engine.TelemetryService;
-import org.camunda.bpm.engine.impl.cmd.GetTelemetryDataCmd;
-import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryData;
+/**
+ * This class represents the data structure used for collecting information
+ * about the connected database.
+ *
+ * This information is sent to Camunda when telemetry is enabled.
+ *
+ * @see <a href=
+ *      "https://docs.camunda.org/manual/latest/introduction/telemetry/#collected-data">Camunda
+ *      Documentation: Collected Telemetry Data</a>
+ */
+public interface Database {
 
-public class TelemetryServiceImpl extends ServiceImpl implements TelemetryService {
+  /**
+   * The vendor of the connected database system.
+   */
+  public String getVendor();
 
-  @Override
-  public TelemetryData getData() {
-    return commandExecutor.execute(new GetTelemetryDataCmd());
-  }
-
+  /**
+   * The version of the connected database system.
+   */
+  public String getVersion();
 }

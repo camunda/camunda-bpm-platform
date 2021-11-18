@@ -14,32 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.telemetry.dto;
+package org.camunda.bpm.engine.telemetry.dto;
 
-public class Database {
+/**
+ * This class represents the data structure used for collecting information
+ * about the installed Java runtime environment.
+ *
+ * This information is sent to Camunda when telemetry is enabled.
+ *
+ * @see <a href=
+ *      "https://docs.camunda.org/manual/latest/introduction/telemetry/#collected-data">Camunda
+ *      Documentation: Collected Telemetry Data</a>
+ */
+public interface Jdk {
 
-  protected String vendor;
-  protected String version;
+  /**
+   * The vendor of the Java runtime environment.
+   */
+  public String getVendor();
 
-  public Database(String vendor, String version) {
-    this.vendor = vendor;
-    this.version = version;
-  }
-
-  public String getVendor() {
-    return vendor;
-  }
-
-  public void setVendor(String vendor) {
-    this.vendor = vendor;
-  }
-
-  public String getVersion() {
-    return version;
-  }
-
-  public void setVersion(String version) {
-    this.version = version;
-  }
-
+  /**
+   * The version of the Java runtime environment.
+   */
+  public String getVersion();
 }

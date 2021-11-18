@@ -21,20 +21,24 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.camunda.bpm.engine.telemetry.dto.Command;
+import org.camunda.bpm.engine.telemetry.dto.Internals;
+import org.camunda.bpm.engine.telemetry.dto.Metric;
+
 import com.google.gson.annotations.SerializedName;
 
-public class Internals {
+public class InternalsImpl implements Internals {
 
   public static final String SERIALIZED_APPLICATION_SERVER = "application-server";
   public static final String SERIALIZED_CAMUNDA_INTEGRATION = "camunda-integration";
   public static final String SERIALIZED_LICENSE_KEY = "license-key";
   public static final String SERIALIZED_TELEMETRY_ENABLED = "telemetry-enabled";
 
-  protected Database database;
+  protected DatabaseImpl database;
   @SerializedName(value = SERIALIZED_APPLICATION_SERVER)
-  protected ApplicationServer applicationServer;
+  protected ApplicationServerImpl applicationServer;
   @SerializedName(value = SERIALIZED_LICENSE_KEY)
-  protected LicenseKeyData licenseKey;
+  protected LicenseKeyDataImpl licenseKey;
   protected Map<String, Command> commands;
   @SerializedName(value = SERIALIZED_CAMUNDA_INTEGRATION)
   protected Set<String> camundaIntegration;
@@ -42,16 +46,16 @@ public class Internals {
   protected Map<String, Metric> metrics;
   protected Set<String> webapps;
 
-  protected Jdk jdk;
+  protected JdkImpl jdk;
 
   @SerializedName(value = SERIALIZED_TELEMETRY_ENABLED)
   protected Boolean telemetryEnabled;
 
-  public Internals() {
+  public InternalsImpl() {
     this(null, null, null, null);
   }
 
-  public Internals(Database database, ApplicationServer server, LicenseKeyData licenseKey, Jdk jdk) {
+  public InternalsImpl(DatabaseImpl database, ApplicationServerImpl server, LicenseKeyDataImpl licenseKey, JdkImpl jdk) {
     this.database = database;
     this.applicationServer = server;
     this.licenseKey = licenseKey;
@@ -60,7 +64,7 @@ public class Internals {
     this.camundaIntegration = new HashSet<>();
   }
 
-  public Internals(Internals internals) {
+  public InternalsImpl(InternalsImpl internals) {
     this(internals.database, internals.applicationServer, internals.licenseKey, internals.jdk);
     this.camundaIntegration = internals.camundaIntegration == null ? null : new HashSet<>(internals.getCamundaIntegration());
     this.commands = new HashMap<>(internals.getCommands());
@@ -69,19 +73,19 @@ public class Internals {
     this.webapps = internals.webapps;
   }
 
-  public Database getDatabase() {
+  public DatabaseImpl getDatabase() {
     return database;
   }
 
-  public void setDatabase(Database database) {
+  public void setDatabase(DatabaseImpl database) {
     this.database = database;
   }
 
-  public ApplicationServer getApplicationServer() {
+  public ApplicationServerImpl getApplicationServer() {
     return applicationServer;
   }
 
-  public void setApplicationServer(ApplicationServer applicationServer) {
+  public void setApplicationServer(ApplicationServerImpl applicationServer) {
     this.applicationServer = applicationServer;
   }
 
@@ -101,16 +105,16 @@ public class Internals {
     this.metrics = metrics;
   }
 
-  public void mergeDynamicData(Internals other) {
+  public void mergeDynamicData(InternalsImpl other) {
     this.commands = other.commands;
     this.metrics = other.metrics;
   }
 
-  public Jdk getJdk() {
+  public JdkImpl getJdk() {
     return jdk;
   }
 
-  public void setJdk(Jdk jdk) {
+  public void setJdk(JdkImpl jdk) {
     this.jdk = jdk;
   }
 
@@ -122,15 +126,15 @@ public class Internals {
     this.camundaIntegration = camundaIntegration;
   }
 
-  public LicenseKeyData getLicenseKey() {
+  public LicenseKeyDataImpl getLicenseKey() {
     return licenseKey;
   }
 
-  public void setLicenseKey(LicenseKeyData licenseKey) {
+  public void setLicenseKey(LicenseKeyDataImpl licenseKey) {
     this.licenseKey = licenseKey;
   }
 
-  public Boolean getTelemetryEnabled() {
+  public Boolean isTelemetryEnabled() {
     return telemetryEnabled;
   }
 

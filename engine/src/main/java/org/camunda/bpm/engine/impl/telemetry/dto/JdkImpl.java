@@ -16,30 +16,16 @@
  */
 package org.camunda.bpm.engine.impl.telemetry.dto;
 
-public class Product {
+import org.camunda.bpm.engine.telemetry.dto.Jdk;
 
-  protected String name;
+public class JdkImpl implements Jdk {
+
   protected String version;
-  protected String edition;
-  protected Internals internals;
+  protected String vendor;
 
-  public Product(String name, String version, String edition, Internals internals) {
-    this.name = name;
+  public JdkImpl(String version, String vendor) {
     this.version = version;
-    this.edition = edition;
-    this.internals = internals;
-  }
-
-  public Product(Product other) {
-    this(other.name, other.version, other.edition, new Internals(other.internals));
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
+    this.vendor = vendor;
   }
 
   public String getVersion() {
@@ -50,20 +36,12 @@ public class Product {
     this.version = version;
   }
 
-  public String getEdition() {
-    return edition;
+  public String getVendor() {
+    return vendor;
   }
 
-  public void setEdition(String edition) {
-    this.edition = edition;
-  }
-
-  public Internals getInternals() {
-    return internals;
-  }
-
-  public void setInternals(Internals internals) {
-    this.internals = internals;
+  public void setVendor(String vendor) {
+    this.vendor = vendor;
   }
 
 }

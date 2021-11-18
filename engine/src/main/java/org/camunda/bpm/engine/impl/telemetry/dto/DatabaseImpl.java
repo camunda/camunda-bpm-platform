@@ -16,20 +16,32 @@
  */
 package org.camunda.bpm.engine.impl.telemetry.dto;
 
-public class Command {
+import org.camunda.bpm.engine.telemetry.dto.Database;
 
-  protected long count;
+public class DatabaseImpl implements Database {
 
-  public Command(long count) {
-    this.count = count;
+  protected String vendor;
+  protected String version;
+
+  public DatabaseImpl(String vendor, String version) {
+    this.vendor = vendor;
+    this.version = version;
   }
 
-  public long getCount() {
-    return count;
+  public String getVendor() {
+    return vendor;
   }
 
-  public void setCount(long count) {
-    this.count = count;
+  public void setVendor(String vendor) {
+    this.vendor = vendor;
+  }
+
+  public String getVersion() {
+    return version;
+  }
+
+  public void setVersion(String version) {
+    this.version = version;
   }
 
 }

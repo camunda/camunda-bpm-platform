@@ -30,11 +30,12 @@ import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration
 import org.camunda.bpm.engine.impl.metrics.Meter;
 import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
 import org.camunda.bpm.engine.impl.metrics.reporter.DbMetricsReporter;
-import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryData;
-import org.camunda.bpm.engine.impl.telemetry.dto.Internals;
-import org.camunda.bpm.engine.impl.telemetry.dto.Metric;
+import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.InternalsImpl;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
+import org.camunda.bpm.engine.impl.util.JsonTestUtil;
 import org.camunda.bpm.engine.management.Metrics;
+import org.camunda.bpm.engine.telemetry.dto.Metric;
 import org.camunda.bpm.engine.test.util.NoInitMessageBootstrapEngineCommand;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.junit.After;
@@ -131,14 +132,14 @@ public class TelemetryMultipleEnginesTest {
 
     assertThat(requests).hasSize(2);
 
-    Gson gson = new Gson();
+    Gson gson = JsonTestUtil.createGsonMapper();
 
     LoggedRequest defaultRequest = requests.get(0);
-    TelemetryData defaultRequestBody = gson.fromJson(defaultRequest.getBodyAsString(), TelemetryData.class);
+    TelemetryDataImpl defaultRequestBody = gson.fromJson(defaultRequest.getBodyAsString(), TelemetryDataImpl.class);
     assertReportedMetrics(defaultRequestBody, 0, 1, 0);
 
     LoggedRequest secondRequest = requests.get(1);
-    TelemetryData secondRequestBody = gson.fromJson(secondRequest.getBodyAsString(), TelemetryData.class);
+    TelemetryDataImpl secondRequestBody = gson.fromJson(secondRequest.getBodyAsString(), TelemetryDataImpl.class);
     assertReportedMetrics(secondRequestBody, 1, 0, 0);
   }
 
@@ -203,18 +204,18 @@ public class TelemetryMultipleEnginesTest {
   }
 
   private void assertReportedMetrics(
-      TelemetryData data,
+      TelemetryDataImpl data,
       int expectedRootInstances,
       int expectedDecisionInstances,
       int expectedFlowNodeInstances) {
-    Internals internals = data.getProduct().getInternals();
+    InternalsImpl internals = data.getProduct().getInternals();
 
     assertMetric(internals, Metrics.ROOT_PROCESS_INSTANCE_START, expectedRootInstances);
     assertMetric(internals, Metrics.EXECUTED_DECISION_INSTANCES, expectedDecisionInstances);
     assertMetric(internals, Metrics.ACTIVTY_INSTANCE_START, expectedFlowNodeInstances);
   }
 
-  private void assertMetric(Internals internals, String name, int expectedCount) {
+  private void assertMetric(InternalsImpl internals, String name, int expectedCount) {
 
     Map<String, Metric> metrics = internals.getMetrics();
 

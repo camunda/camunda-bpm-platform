@@ -22,7 +22,7 @@ import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
-import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyData;
+import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyDataImpl;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.After;
@@ -74,7 +74,7 @@ public class LicenseKeyTelemetryTest {
   public void shouldNotOverrideSameLicenseKeyInTelemetryRegistry() {
     // given
     String licenseKey = "testLicenseKey";
-    LicenseKeyData licenseKeyData = new LicenseKeyData("customer", null, null, null, null, licenseKey);
+    LicenseKeyDataImpl licenseKeyData = new LicenseKeyDataImpl("customer", null, null, null, null, licenseKey);
     telemetryRegistry.setLicenseKey(licenseKeyData);
 
     // when
@@ -88,7 +88,7 @@ public class LicenseKeyTelemetryTest {
   public void shouldNotOverrideSameMultipartLicenseKeyInTelemetryRegistry() {
     // given
     String licenseKey = "signature;testLicenseKey;more;data";
-    LicenseKeyData licenseKeyData = new LicenseKeyData("customer", null, null, null, null, "testLicenseKey;more;data");
+    LicenseKeyDataImpl licenseKeyData = new LicenseKeyDataImpl("customer", null, null, null, null, "testLicenseKey;more;data");
     telemetryRegistry.setLicenseKey(licenseKeyData);
 
     // when
@@ -101,7 +101,7 @@ public class LicenseKeyTelemetryTest {
   @Test
   public void shouldRemoveLicenseKeyFromTelemetryRegistry() {
     // given
-    LicenseKeyData licenseKeyData = new LicenseKeyData("customer", null, null, null, null, "testLicenseKey");
+    LicenseKeyDataImpl licenseKeyData = new LicenseKeyDataImpl("customer", null, null, null, null, "testLicenseKey");
     telemetryRegistry.setLicenseKey(licenseKeyData);
 
     // when

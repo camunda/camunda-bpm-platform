@@ -35,7 +35,6 @@ import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
-import org.camunda.bpm.engine.TelemetryService;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.telemetry.PlatformTelemetryRegistry;
@@ -125,7 +124,6 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
   protected CaseService caseService;
   protected ExternalTaskService externalTaskService;
   protected DecisionService decisionService;
-  protected TelemetryService telemetryService;
 
   public ProcessEngineRule() {
     this(false);
@@ -215,7 +213,6 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
     filterService = processEngine.getFilterService();
     externalTaskService = processEngine.getExternalTaskService();
     decisionService = processEngine.getDecisionService();
-    telemetryService = processEngine.getTelemetryService();
   }
 
   protected void clearServiceReferences() {
@@ -232,7 +229,6 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
     filterService = null;
     externalTaskService = null;
     decisionService = null;
-    telemetryService = null;
   }
 
   @Override
@@ -401,14 +397,6 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
 
   public void setDecisionService(DecisionService decisionService) {
     this.decisionService = decisionService;
-  }
-
-  public TelemetryService getTelemetryService() {
-    return telemetryService;
-  }
-
-  public void setTelemetryService(TelemetryService telemetryService) {
-    this.telemetryService = telemetryService;
   }
 
   public void manageDeployment(org.camunda.bpm.engine.repository.Deployment deployment) {

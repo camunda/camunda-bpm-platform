@@ -18,9 +18,11 @@ package org.camunda.bpm.engine.impl.telemetry.dto;
 
 import java.util.Map;
 
+import org.camunda.bpm.engine.telemetry.dto.LicenseKeyData;
+
 import com.google.gson.annotations.SerializedName;
 
-public class LicenseKeyData {
+public class LicenseKeyDataImpl implements LicenseKeyData {
 
   public static final String SERIALIZED_VALID_UNTIL = "valid-until";
   public static final String SERIALIZED_IS_UNLIMITED = "unlimited";
@@ -34,7 +36,7 @@ public class LicenseKeyData {
   protected Map<String, String> features;
   protected String raw;
 
-  public LicenseKeyData(String customer, String type, String validUntil, Boolean isUnlimited, Map<String, String> features, String raw) {
+  public LicenseKeyDataImpl(String customer, String type, String validUntil, Boolean isUnlimited, Map<String, String> features, String raw) {
     this.customer = customer;
     this.type = type;
     this.validUntil = validUntil;

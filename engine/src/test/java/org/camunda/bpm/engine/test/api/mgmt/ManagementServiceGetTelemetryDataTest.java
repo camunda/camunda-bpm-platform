@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.test.api.telemetry;
+package org.camunda.bpm.engine.test.api.mgmt;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
@@ -32,26 +32,28 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.camunda.bpm.engine.ManagementService;
-import org.camunda.bpm.engine.TelemetryService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.metrics.Meter;
-import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServer;
-import org.camunda.bpm.engine.impl.telemetry.dto.Command;
-import org.camunda.bpm.engine.impl.telemetry.dto.Database;
-import org.camunda.bpm.engine.impl.telemetry.dto.Internals;
-import org.camunda.bpm.engine.impl.telemetry.dto.Jdk;
-import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyData;
-import org.camunda.bpm.engine.impl.telemetry.dto.Metric;
-import org.camunda.bpm.engine.impl.telemetry.dto.Product;
-import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryData;
+import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServerImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.CommandImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.DatabaseImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.InternalsImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.JdkImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyDataImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.MetricImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.ProductImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
 import org.camunda.bpm.engine.impl.util.ParseUtil;
+import org.camunda.bpm.engine.telemetry.dto.Command;
+import org.camunda.bpm.engine.telemetry.dto.Metric;
+import org.camunda.bpm.engine.telemetry.dto.TelemetryData;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class TelemetryServiceTest {
+public class ManagementServiceGetTelemetryDataTest {
 
   protected static final String INSTALLATION_ID = "cb07ce31-c8e3-4f5f-94c2-1b28175c2022";
   protected static final String PRODUCT_NAME = "Runtime";
@@ -62,38 +64,36 @@ public class TelemetryServiceTest {
   protected static final String APP_SERVER_VENDOR = "Apache Tomcat";
   protected static final String APP_SERVER_VERSION = "Apache Tomcat/10.0.1";
   protected static final String TELEMETRY_CONFIGURE_CMD_NAME = "TelemetryConfigureCmd";
-  protected static final Command TELEMETRY_CONFIGURE_CMD = new Command(56);
+  protected static final CommandImpl TELEMETRY_CONFIGURE_CMD = new CommandImpl(56);
   protected static final String IS_TELEMETRY_ENABLED_CMD_NAME = "IsTelemetryEnabledCmd";
-  protected static final Command IS_TELEMETRY_ENABLED_CMD = new Command(78);
+  protected static final CommandImpl IS_TELEMETRY_ENABLED_CMD = new CommandImpl(78);
   protected static final String GET_TELEMETRY_DATA_CMD_NAME = "GetTelemetryDataCmd";
-  protected static final Command GET_TELEMETRY_DATA_CMD = new Command(452);
+  protected static final CommandImpl GET_TELEMETRY_DATA_CMD = new CommandImpl(452);
   protected static final String LICENSE_CUSTOMER_NAME = "customer a";
-  protected static final Metric ROOT_PROCESS_INSTANCE_START_METRIC = new Metric(3);
-  protected static final Metric ACTIVTY_INSTANCE_START_METRIC = new Metric(110);
-  protected static final Metric EXECUTED_DECISION_ELEMENTS_METRIC = new Metric(1678);
-  protected static final Metric EXECUTED_DECISION_INSTANCES_METRIC = new Metric(267);
+  protected static final MetricImpl ROOT_PROCESS_INSTANCE_START_METRIC = new MetricImpl(3);
+  protected static final MetricImpl ACTIVTY_INSTANCE_START_METRIC = new MetricImpl(110);
+  protected static final MetricImpl EXECUTED_DECISION_ELEMENTS_METRIC = new MetricImpl(1678);
+  protected static final MetricImpl EXECUTED_DECISION_INSTANCES_METRIC = new MetricImpl(267);
 
   @Rule
   public ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule();
 
 
   protected ProcessEngineConfigurationImpl configuration;
-  protected TelemetryService telemetryService;
   protected ManagementService managementService;
 
-  protected TelemetryData defaultTelemetryData;
+  protected TelemetryDataImpl defaultTelemetryData;
 
   @Before
   public void setup() {
     configuration = engineRule.getProcessEngineConfiguration();
-    telemetryService = engineRule.getTelemetryService();
     managementService = engineRule.getManagementService();
 
     clearMetrics();
 
     configuration.getTelemetryRegistry().clear();
 
-    defaultTelemetryData = new TelemetryData(configuration.getTelemetryData());
+    defaultTelemetryData = new TelemetryDataImpl(configuration.getTelemetryData());
     configuration.setTelemetryData(createTestData());
   }
 
@@ -116,13 +116,13 @@ public class TelemetryServiceTest {
     managementService.deleteMetrics(null);
   }
 
-  protected TelemetryData createTestData() {
-    Database database = new Database(DB_VENDOR, DB_VERSION);
-    Jdk jdk = ParseUtil.parseJdkDetails();
-    Internals internals = new Internals(database, new ApplicationServer(APP_SERVER_VERSION), null, jdk);
+  protected TelemetryDataImpl createTestData() {
+    DatabaseImpl database = new DatabaseImpl(DB_VENDOR, DB_VERSION);
+    JdkImpl jdk = ParseUtil.parseJdkDetails();
+    InternalsImpl internals = new InternalsImpl(database, new ApplicationServerImpl(APP_SERVER_VERSION), null, jdk);
     internals.setTelemetryEnabled(true);
 
-    LicenseKeyData licenseKey = new LicenseKeyData(LICENSE_CUSTOMER_NAME, "UNIFIED", "2029-09-01", false, Collections.singletonMap("camundaBPM", "true"), "raw license");
+    LicenseKeyDataImpl licenseKey = new LicenseKeyDataImpl(LICENSE_CUSTOMER_NAME, "UNIFIED", "2029-09-01", false, Collections.singletonMap("camundaBPM", "true"), "raw license");
     internals.setLicenseKey(licenseKey);
 
     Map<String, Command> commands = new HashMap<>();
@@ -140,8 +140,8 @@ public class TelemetryServiceTest {
 
     internals.setWebapps(Stream.of("cockpit", "admin").collect(Collectors.toCollection(HashSet::new)));
 
-    Product product = new Product(PRODUCT_NAME, PRODUCT_VERSION, PRODUCT_EDITION, internals);
-    return new TelemetryData(INSTALLATION_ID, product);
+    ProductImpl product = new ProductImpl(PRODUCT_NAME, PRODUCT_VERSION, PRODUCT_EDITION, internals);
+    return new TelemetryDataImpl(INSTALLATION_ID, product);
   }
 
   @Test
@@ -150,7 +150,7 @@ public class TelemetryServiceTest {
     managementService.toggleTelemetry(true);
 
     // when
-    TelemetryData telemetryData = telemetryService.getData();
+    TelemetryData telemetryData = managementService.getTelemetryData();
 
     // then
     assertTelemetryData(telemetryData);
@@ -162,7 +162,7 @@ public class TelemetryServiceTest {
     managementService.toggleTelemetry(false);
 
     // when
-    TelemetryData telemetryData = telemetryService.getData();
+    TelemetryData telemetryData = managementService.getTelemetryData();
 
     // then
     assertTelemetryData(telemetryData);
@@ -181,7 +181,7 @@ public class TelemetryServiceTest {
     assertThat(data.getProduct().getInternals().getJdk().getVendor()).isNotNull();
     assertThat(data.getProduct().getInternals().getJdk().getVersion()).isNotNull();
     assertThat(data.getProduct().getInternals().getLicenseKey().getCustomer()).isEqualTo(LICENSE_CUSTOMER_NAME);
-    assertThat(data.getProduct().getInternals().getTelemetryEnabled()).isTrue();
+    assertThat(data.getProduct().getInternals().isTelemetryEnabled()).isTrue();
     assertThat(data.getProduct().getInternals().getCommands()).containsExactly(
         entry(TELEMETRY_CONFIGURE_CMD_NAME, TELEMETRY_CONFIGURE_CMD),
         entry(IS_TELEMETRY_ENABLED_CMD_NAME, IS_TELEMETRY_ENABLED_CMD),

@@ -14,18 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine;
+package org.camunda.bpm.engine.impl.telemetry.dto;
 
-import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryData;
+import org.camunda.bpm.engine.telemetry.dto.Metric;
 
-/**
- * Service which provides access to data collected for telemetry.
- * Telemetry data is also available if you did not opt-in to share the data with Camunda.
- */
-public interface TelemetryService {
+public class MetricImpl implements Metric {
 
-  /**
-   * Retrieves and returns the current telemetry data.
-   */
-  TelemetryData getData();
+  protected long count;
+
+  public MetricImpl(long count) {
+    this.count = count;
+  }
+
+  public long getCount() {
+    return count;
+  }
+
+  public void setCount(long count) {
+    this.count = count;
+  }
+
 }

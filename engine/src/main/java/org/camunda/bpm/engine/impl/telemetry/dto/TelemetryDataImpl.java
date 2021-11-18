@@ -17,19 +17,20 @@
 package org.camunda.bpm.engine.impl.telemetry.dto;
 
 import org.camunda.bpm.engine.impl.util.JsonUtil;
+import org.camunda.bpm.engine.telemetry.dto.TelemetryData;
 
-public class TelemetryData {
+public class TelemetryDataImpl implements TelemetryData {
 
   protected String installation;
-  protected Product product;
+  protected ProductImpl product;
 
-  public TelemetryData(String installation, Product product) {
+  public TelemetryDataImpl(String installation, ProductImpl product) {
     this.installation = installation;
     this.product = product;
   }
 
-  public TelemetryData(TelemetryData other) {
-    this(other.installation, new Product(other.product));
+  public TelemetryDataImpl(TelemetryDataImpl other) {
+    this(other.installation, new ProductImpl(other.product));
   }
 
   public String getInstallation() {
@@ -40,15 +41,15 @@ public class TelemetryData {
     this.installation = installation;
   }
 
-  public Product getProduct() {
+  public ProductImpl getProduct() {
     return product;
   }
 
-  public void setProduct(Product product) {
+  public void setProduct(ProductImpl product) {
     this.product = product;
   }
 
-  public void mergeInternals(Internals other) {
+  public void mergeInternals(InternalsImpl other) {
     product.getInternals().mergeDynamicData(other);
   }
 

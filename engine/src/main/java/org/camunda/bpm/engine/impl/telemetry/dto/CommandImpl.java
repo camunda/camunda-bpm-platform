@@ -16,37 +16,22 @@
  */
 package org.camunda.bpm.engine.impl.telemetry.dto;
 
-import static org.camunda.bpm.engine.impl.util.ParseUtil.parseServerVendor;
+import org.camunda.bpm.engine.telemetry.dto.Command;
 
-public class ApplicationServer {
+public class CommandImpl implements Command {
 
-  protected String vendor;
-  protected String version;
+  protected long count;
 
-  public ApplicationServer(String vendor, String version) {
-    this.vendor = vendor;
-    this.version = version;
+  public CommandImpl(long count) {
+    this.count = count;
   }
 
-  public ApplicationServer(String version) {
-    this.vendor = parseServerVendor(version);
-    this.version = version;
+  public long getCount() {
+    return count;
   }
 
-  public String getVendor() {
-    return vendor;
-  }
-
-  public void setVendor(String vendor) {
-    this.vendor = vendor;
-  }
-
-  public String getVersion() {
-    return version;
-  }
-
-  public void setVersion(String version) {
-    this.version = version;
+  public void setCount(long count) {
+    this.count = count;
   }
 
 }

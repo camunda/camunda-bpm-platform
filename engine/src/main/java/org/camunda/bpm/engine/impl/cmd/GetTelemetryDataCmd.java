@@ -18,12 +18,12 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryData;
+import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
 
-public class GetTelemetryDataCmd implements Command<TelemetryData> {
+public class GetTelemetryDataCmd implements Command<TelemetryDataImpl> {
 
   @Override
-  public TelemetryData execute(CommandContext commandContext) {
+  public TelemetryDataImpl execute(CommandContext commandContext) {
     return commandContext.getProcessEngineConfiguration().getTelemetryData();
   }
 

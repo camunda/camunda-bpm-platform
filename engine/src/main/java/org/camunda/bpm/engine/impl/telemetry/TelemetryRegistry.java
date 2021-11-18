@@ -21,31 +21,31 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServer;
-import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyData;
+import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServerImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyDataImpl;
 
 public class TelemetryRegistry {
 
   protected Map<String, CommandCounter> commands = new HashMap<>();
-  protected ApplicationServer applicationServer;
-  protected LicenseKeyData licenseKey;
+  protected ApplicationServerImpl applicationServer;
+  protected LicenseKeyDataImpl licenseKey;
   protected String camundaIntegration;
   protected Set<String> webapps = new HashSet<>();
   protected boolean isCollectingTelemetryDataEnabled = false;
 
-  public synchronized ApplicationServer getApplicationServer() {
+  public synchronized ApplicationServerImpl getApplicationServer() {
     if (applicationServer == null) {
       applicationServer = PlatformTelemetryRegistry.getApplicationServer();
     }
     return applicationServer;
   }
 
-  public synchronized void setApplicationServer(ApplicationServer applicationServer) {
+  public synchronized void setApplicationServer(ApplicationServerImpl applicationServer) {
     this.applicationServer = applicationServer;
   }
 
   public synchronized void setApplicationServer(String applicationServerVersion) {
-    this.applicationServer = new ApplicationServer(applicationServerVersion);
+    this.applicationServer = new ApplicationServerImpl(applicationServerVersion);
   }
 
   public Map<String, CommandCounter> getCommands() {
@@ -60,11 +60,11 @@ public class TelemetryRegistry {
     this.camundaIntegration = camundaIntegration;
   }
 
-  public LicenseKeyData getLicenseKey() {
+  public LicenseKeyDataImpl getLicenseKey() {
     return licenseKey;
   }
 
-  public void setLicenseKey(LicenseKeyData licenseKey) {
+  public void setLicenseKey(LicenseKeyDataImpl licenseKey) {
     this.licenseKey = licenseKey;
   }
 

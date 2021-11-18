@@ -46,15 +46,18 @@ import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
 import org.camunda.bpm.engine.impl.telemetry.CommandCounter;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
-import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServer;
-import org.camunda.bpm.engine.impl.telemetry.dto.Command;
-import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryData;
-import org.camunda.bpm.engine.impl.telemetry.dto.Internals;
-import org.camunda.bpm.engine.impl.telemetry.dto.Metric;
-import org.camunda.bpm.engine.impl.telemetry.dto.Product;
+import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServerImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.CommandImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.InternalsImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.MetricImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.ProductImpl;
 import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
 import org.camunda.bpm.engine.impl.util.TelemetryUtil;
+import org.camunda.bpm.engine.telemetry.dto.Command;
+import org.camunda.bpm.engine.telemetry.dto.Metric;
+import org.camunda.bpm.engine.telemetry.dto.Product;
 import org.camunda.connect.spi.CloseableConnectorResponse;
 import org.camunda.connect.spi.Connector;
 import org.camunda.connect.spi.ConnectorRequest;
@@ -75,7 +78,7 @@ public class TelemetrySendingTask extends TimerTask {
 
   protected CommandExecutor commandExecutor;
   protected String telemetryEndpoint;
-  protected TelemetryData staticData;
+  protected TelemetryDataImpl staticData;
   protected Connector<? extends ConnectorRequest<?>> httpConnector;
   protected int telemetryRequestRetries;
   protected TelemetryRegistry telemetryRegistry;
@@ -86,7 +89,7 @@ public class TelemetrySendingTask extends TimerTask {
   public TelemetrySendingTask(CommandExecutor commandExecutor,
                               String telemetryEndpoint,
                               int telemetryRequestRetries,
-                              TelemetryData data,
+                              TelemetryDataImpl data,
                               Connector<? extends ConnectorRequest<?>> httpConnector,
                               TelemetryRegistry telemetryRegistry,
                               MetricsRegistry metricsRegistry,
@@ -121,8 +124,8 @@ public class TelemetrySendingTask extends TimerTask {
 
     performDataSend(false, () -> {
       updateStaticData();
-      Internals dynamicData = resolveDynamicData();
-      TelemetryData mergedData = new TelemetryData(staticData);
+      InternalsImpl dynamicData = resolveDynamicData();
+      TelemetryDataImpl mergedData = new TelemetryDataImpl(staticData);
       mergedData.mergeInternals(dynamicData);
 
       try {
@@ -158,8 +161,8 @@ public class TelemetrySendingTask extends TimerTask {
     if (null == commandContext.getPropertyManager().findPropertyById(TELEMETRY_INIT_MESSAGE_SENT_NAME)) {
       // message has not been sent yet
       performDataSend(true, () -> {
-        TelemetryData initData = new TelemetryData(staticData.getInstallation(), new Product(staticData.getProduct()));
-        Internals internals = new Internals();
+        TelemetryDataImpl initData = new TelemetryDataImpl(staticData.getInstallation(), new ProductImpl(staticData.getProduct()));
+        InternalsImpl internals = new InternalsImpl();
         internals.setTelemetryEnabled(new IsTelemetryEnabledCmd().execute(commandContext));
         initData.getProduct().setInternals(internals);
 
@@ -174,14 +177,14 @@ public class TelemetrySendingTask extends TimerTask {
   }
 
   protected void updateStaticData() {
-    Internals internals = staticData.getProduct().getInternals();
+    InternalsImpl internals = staticData.getProduct().getInternals();
 
     if (internals.getApplicationServer() == null) {
-      ApplicationServer applicationServer = telemetryRegistry.getApplicationServer();
+      ApplicationServerImpl applicationServer = telemetryRegistry.getApplicationServer();
       internals.setApplicationServer(applicationServer);
     }
 
-    if (internals.getTelemetryEnabled() == null) {
+    if (internals.isTelemetryEnabled() == null) {
       internals.setTelemetryEnabled(true);// this can only be true, otherwise we would not collect data to send
     }
 
@@ -195,7 +198,7 @@ public class TelemetrySendingTask extends TimerTask {
     return telemetryEnabled != null && telemetryEnabled.booleanValue();
   }
 
-  protected void sendData(TelemetryData dataToSend, boolean isInitialMessage) {
+  protected void sendData(TelemetryDataImpl dataToSend, boolean isInitialMessage) {
 
       String telemetryData = JsonUtil.asString(dataToSend);
       Map<String, Object> requestParams = assembleRequestParameters(METHOD_NAME_POST,
@@ -236,7 +239,7 @@ public class TelemetrySendingTask extends TimerTask {
   }
 
   protected void clearDynamicData() {
-    Internals internals = staticData.getProduct().getInternals();
+    InternalsImpl internals = staticData.getProduct().getInternals();
 
     internals.setApplicationServer(null);
     internals.setCommands(null);
@@ -244,7 +247,7 @@ public class TelemetrySendingTask extends TimerTask {
     internals.setLicenseKey(null);
   }
 
-  protected void restoreDynamicData(Internals internals) {
+  protected void restoreDynamicData(InternalsImpl internals) {
     Map<String, Command> commands = internals.getCommands();
 
     for (Map.Entry<String, Command> entry : commands.entrySet()) {
@@ -261,8 +264,8 @@ public class TelemetrySendingTask extends TimerTask {
     }
   }
 
-  protected Internals resolveDynamicData() {
-    Internals result = new Internals();
+  protected InternalsImpl resolveDynamicData() {
+    InternalsImpl result = new InternalsImpl();
 
     Map<String, Metric> metrics = calculateMetrics();
     result.setMetrics(metrics);
@@ -284,7 +287,7 @@ public class TelemetrySendingTask extends TimerTask {
 
       for (Map.Entry<String, CommandCounter> counter : originalCounts.entrySet()) {
         long occurrences = counter.getValue().getAndClear();
-        commandsToReport.put(counter.getKey(), new Command(occurrences));
+        commandsToReport.put(counter.getKey(), new CommandImpl(occurrences));
       }
     }
 
@@ -300,7 +303,7 @@ public class TelemetrySendingTask extends TimerTask {
 
       for (String metricToReport : METRICS_TO_REPORT) {
         long value = telemetryMeters.get(metricToReport).getAndClear();
-        metrics.put(metricToReport, new Metric(value));
+        metrics.put(metricToReport, new MetricImpl(value));
       }
     }
 
@@ -339,7 +342,7 @@ public class TelemetrySendingTask extends TimerTask {
     }
   }
 
-  protected Boolean validateData(TelemetryData dataToSend) {
+  protected Boolean validateData(TelemetryDataImpl dataToSend) {
     // validate product data
     Product product = dataToSend.getProduct();
     String installationId = dataToSend.getInstallation();
