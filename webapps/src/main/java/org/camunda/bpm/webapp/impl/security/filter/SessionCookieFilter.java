@@ -57,9 +57,9 @@ public class SessionCookieFilter implements Filter {
   public void destroy() {
   }
 
-  private class SameSiteResponseProxy extends HttpServletResponseWrapper {
+  protected class SameSiteResponseProxy extends HttpServletResponseWrapper {
 
-    private HttpServletResponse response;
+    protected HttpServletResponse response;
 
     public SameSiteResponseProxy(HttpServletResponse resp) {
       super(resp);
@@ -96,7 +96,7 @@ public class SessionCookieFilter implements Filter {
       return super.getOutputStream();
     }
 
-    private void appendSameSiteIfMissing() {
+    protected void appendSameSiteIfMissing() {
       Collection<String> cookieHeaders = response.getHeaders(CookieConstants.SET_COOKIE_HEADER_NAME);
       boolean firstHeader = true;
       String cookieHeaderStart = cookieConfigurator.getCookieName("JSESSIONID") + "=";

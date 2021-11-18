@@ -102,7 +102,7 @@ public class CsrfPreventionFilter implements Filter {
 
   private int denyStatus = HttpServletResponse.SC_FORBIDDEN;
 
-  private final Set<String> entryPoints = new HashSet<>();
+  protected final Set<String> entryPoints = new HashSet<>();
 
   protected CookieConfigurator cookieConfigurator = new CookieConfigurator();
 
