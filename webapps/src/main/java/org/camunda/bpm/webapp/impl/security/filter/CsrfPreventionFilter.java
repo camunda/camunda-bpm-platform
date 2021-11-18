@@ -38,6 +38,7 @@ import javax.servlet.http.HttpSession;
 import javax.ws.rs.core.Response;
 
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.webapp.impl.security.filter.util.CookieConstants;
 import org.camunda.bpm.webapp.impl.security.filter.util.CsrfConstants;
 import org.camunda.bpm.webapp.impl.util.ServletContextUtil;
 
@@ -101,11 +102,9 @@ public class CsrfPreventionFilter implements Filter {
 
   private int denyStatus = HttpServletResponse.SC_FORBIDDEN;
 
-  private final Set<String> entryPoints = new HashSet<String>();
+  protected final Set<String> entryPoints = new HashSet<>();
 
-  protected String cookieName = CsrfConstants.CSRF_TOKEN_DEFAULT_COOKIE_NAME;
-
-  protected CsrfPreventionCookieConfigurator cookieConfigurator = new CsrfPreventionCookieConfigurator();
+  protected CookieConfigurator cookieConfigurator = new CookieConfigurator();
 
   @Override
   public void init(FilterConfig filterConfig) throws ServletException {
@@ -132,11 +131,6 @@ public class CsrfPreventionFilter implements Filter {
       String customEntryPoints = filterConfig.getInitParameter("entryPoints");
       if (!isBlank(customEntryPoints)) {
         setEntryPoints(customEntryPoints);
-      }
-
-      String cookieName = filterConfig.getInitParameter("cookieName");
-      if (!isBlank(cookieName)) {
-        setCookieName(cookieName);
       }
 
       cookieConfigurator.parseParams(filterConfig);
@@ -265,6 +259,7 @@ public class CsrfPreventionFilter implements Filter {
         if (session.getAttribute(CsrfConstants.CSRF_TOKEN_SESSION_ATTR_NAME) == null) {
           String token = generateCSRFToken();
 
+          String cookieName = cookieConfigurator.getCookieName(CsrfConstants.CSRF_TOKEN_DEFAULT_COOKIE_NAME);
           String csrfCookieValue = cookieName + "=" + token;
 
           String cookiePath = getCookiePath(request);
@@ -274,7 +269,7 @@ public class CsrfPreventionFilter implements Filter {
 
           csrfCookieValue += cookieConfigurator.getConfig();
 
-          response.addHeader(CsrfConstants.CSRF_SET_COOKIE_HEADER_NAME, csrfCookieValue);
+          response.addHeader(CookieConstants.SET_COOKIE_HEADER_NAME, csrfCookieValue);
 
           response.setHeader(CsrfConstants.CSRF_TOKEN_HEADER_NAME, token);
         }
@@ -328,10 +323,6 @@ public class CsrfPreventionFilter implements Filter {
    */
   public void setEntryPoints(String entryPoints) {
     this.entryPoints.addAll(parseURLs(entryPoints));
-  }
-
-  public void setCookieName(String cookieName) {
-    this.cookieName = cookieName;
   }
 
   /**
@@ -452,7 +443,7 @@ public class CsrfPreventionFilter implements Filter {
   }
 
   private Set<String> parseURLs(String urlString) {
-    Set<String> urlSet = new HashSet<String>();
+    Set<String> urlSet = new HashSet<>();
 
     if (urlString != null && !urlString.isEmpty()) {
       String values[] = urlString.split(",");
