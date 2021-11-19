@@ -66,6 +66,7 @@ module.exports = [
           function setLink(task) {
             var resource = '';
             var resourceId = '';
+            var plane = $location.search()?.plane;
 
             if (task.processInstanceId) {
               resource = 'process-instance';
@@ -79,9 +80,15 @@ module.exports = [
               return;
             }
 
-            $scope.instanceLink = Uri.appUri(
+            var link = Uri.appUri(
               'cockpitbase://:engine/#/' + resource + '/' + resourceId
             );
+
+            if (plane) {
+              link += '/runtime?plane=' + plane;
+            }
+
+            $scope.instanceLink = link;
           }
 
           // error handling //////////////////////////////////////////////////////////////
@@ -264,6 +271,11 @@ module.exports = [
           $scope.taskState = taskData.observe('task', function(task) {
             $scope.task = task;
             task && setLink(task);
+          });
+
+          $scope.$on('$locationChangeSuccess', function() {
+            // update link on plane load or change
+            setLink($scope.task);
           });
 
           taskData.observe('isAssignee', function(isAssignee) {
