@@ -87,15 +87,15 @@ import org.camunda.bpm.engine.impl.form.CamundaFormRefImpl;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.persistence.entity.MetricIntervalEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
-import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServer;
-import org.camunda.bpm.engine.impl.telemetry.dto.Command;
-import org.camunda.bpm.engine.impl.telemetry.dto.Database;
-import org.camunda.bpm.engine.impl.telemetry.dto.Internals;
-import org.camunda.bpm.engine.impl.telemetry.dto.Jdk;
-import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyData;
-import org.camunda.bpm.engine.impl.telemetry.dto.Metric;
-import org.camunda.bpm.engine.impl.telemetry.dto.Product;
-import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryData;
+import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServerImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.CommandImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.DatabaseImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.InternalsImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.JdkImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyDataImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.MetricImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.ProductImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
 import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.management.IncidentStatistics;
 import org.camunda.bpm.engine.management.JobDefinition;
@@ -995,15 +995,15 @@ public abstract class MockProvider {
   public static final String EXAMPLE_TELEMETRY_JDK_VERSION = "14.0.2";
   public static final String EXAMPLE_TELEMETRY_JDK_VENDOR = "Oracle Corporation";
 
-  public static final Database EXAMPLE_TELEMETRY_DATABASE = new Database(EXAMPLE_TELEMETRY_DB_VENDOR,
+  public static final DatabaseImpl EXAMPLE_TELEMETRY_DATABASE = new DatabaseImpl(EXAMPLE_TELEMETRY_DB_VENDOR,
       EXAMPLE_TELEMETRY_DB_VERSION);
-  public static final ApplicationServer EXAMPLE_TELEMETRY_SERVER = new ApplicationServer(
+  public static final ApplicationServerImpl EXAMPLE_TELEMETRY_SERVER = new ApplicationServerImpl(
       EXAMPLE_TELEMETRY_APP_SERVER_VENDOR, EXAMPLE_TELEMETRY_APP_SERVER_VERSION);
-  public static final LicenseKeyData EXAMPLE_TELEMETRY_LICENSE = new LicenseKeyData(
+  public static final LicenseKeyDataImpl EXAMPLE_TELEMETRY_LICENSE = new LicenseKeyDataImpl(
       EXAMPLE_TELEMETRY_LICENSE_CUSTOMER_NAME, EXAMPLE_TELEMETRY_LICENSE_TYPE, EXAMPLE_TELEMETRY_LICENSE_VALID_UNTIL,
       EXAMPLE_TELEMETRY_LICENSE_UNLIMITED, EXAMPLE_TELEMETRY_LICENSE_FEATURES, EXAMPLE_TELEMETRY_LICENSE_RAW);
-  public static final Jdk EXAMPLE_TELEMETRY_JDK = new Jdk(EXAMPLE_TELEMETRY_JDK_VERSION, EXAMPLE_TELEMETRY_JDK_VENDOR);
-  public static final Internals EXAMPLE_TELEMETRY_INTERNALS = new Internals(EXAMPLE_TELEMETRY_DATABASE,
+  public static final JdkImpl EXAMPLE_TELEMETRY_JDK = new JdkImpl(EXAMPLE_TELEMETRY_JDK_VERSION, EXAMPLE_TELEMETRY_JDK_VENDOR);
+  public static final InternalsImpl EXAMPLE_TELEMETRY_INTERNALS = new InternalsImpl(EXAMPLE_TELEMETRY_DATABASE,
       EXAMPLE_TELEMETRY_SERVER, EXAMPLE_TELEMETRY_LICENSE, EXAMPLE_TELEMETRY_JDK);
   static {
     EXAMPLE_TELEMETRY_INTERNALS.setTelemetryEnabled(false);
@@ -1013,15 +1013,15 @@ public abstract class MockProvider {
         .setWebapps(Stream.of("cockpit", "admin").collect(Collectors.toCollection(HashSet::new)));
     EXAMPLE_TELEMETRY_INTERNALS
         .setCommands(Stream.of(new Object[][] { { "StartProcessInstanceCmd", 40 }, { "FetchExternalTasksCmd", 100 } })
-            .collect(Collectors.toMap(data -> (String) data[0], data -> new Command((Integer) data[1]))));
+            .collect(Collectors.toMap(data -> (String) data[0], data -> new CommandImpl((Integer) data[1]))));
     EXAMPLE_TELEMETRY_INTERNALS.setMetrics(Stream
         .of(new Object[][] { { "root-process-instance-start", 936L }, { "activity-instance-start", 6125L },
             { "executed-decision-instances", 140L }, { "executed-decision-elements", 732L } })
-        .collect(Collectors.toMap(data -> (String) data[0], data -> new Metric((Long) data[1]))));
+        .collect(Collectors.toMap(data -> (String) data[0], data -> new MetricImpl((Long) data[1]))));
   }
-  public static final Product EXAMPLE_TELEMETRY_PRODUCT = new Product(EXAMPLE_TELEMETRY_PRODUCT_NAME,
+  public static final ProductImpl EXAMPLE_TELEMETRY_PRODUCT = new ProductImpl(EXAMPLE_TELEMETRY_PRODUCT_NAME,
       EXAMPLE_TELEMETRY_PRODUCT_VERSION, EXAMPLE_TELEMETRY_PRODUCT_EDITION, EXAMPLE_TELEMETRY_INTERNALS);
-  public static final TelemetryData EXAMPLE_TELEMETRY_DATA = new TelemetryData(EXAMPLE_TELEMETRY_INSTALLATION_ID, EXAMPLE_TELEMETRY_PRODUCT);
+  public static final TelemetryDataImpl EXAMPLE_TELEMETRY_DATA = new TelemetryDataImpl(EXAMPLE_TELEMETRY_INSTALLATION_ID, EXAMPLE_TELEMETRY_PRODUCT);
 
   public static Task createMockTask() {
     return mockTask().build();

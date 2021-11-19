@@ -18,8 +18,7 @@ package org.camunda.bpm.engine.rest;
 
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ManagementService;
-import org.camunda.bpm.engine.TelemetryService;
-import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryData;
+import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.junit.Before;
@@ -50,15 +49,12 @@ public class TelemetryRestServiceTest extends AbstractRestServiceTest {
   protected static final String TELEMETRY_DATA_URL = TELEMETRY_URL + "/data";
 
   protected ManagementService managementServiceMock;
-  protected TelemetryService telemetryServiceMock;
 
 
   @Before
   public void setupMocks() {
     managementServiceMock = mock(ManagementService.class);
-    telemetryServiceMock = mock(TelemetryService.class);
     when(processEngine.getManagementService()).thenReturn(managementServiceMock);
-    when(processEngine.getTelemetryService()).thenReturn(telemetryServiceMock);
   }
 
   @Test
@@ -185,8 +181,8 @@ public class TelemetryRestServiceTest extends AbstractRestServiceTest {
 
   @Test
   public void shouldGetTelemetryData() {
-    TelemetryData exampleTelemetryData = MockProvider.EXAMPLE_TELEMETRY_DATA;
-    when(telemetryServiceMock.getData()).thenReturn(exampleTelemetryData);
+    TelemetryDataImpl exampleTelemetryData = MockProvider.EXAMPLE_TELEMETRY_DATA;
+    when(managementServiceMock.getTelemetryData()).thenReturn(exampleTelemetryData);
 
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
