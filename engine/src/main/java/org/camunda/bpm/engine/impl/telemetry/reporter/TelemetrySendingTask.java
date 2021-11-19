@@ -57,7 +57,6 @@ import org.camunda.bpm.engine.impl.util.JsonUtil;
 import org.camunda.bpm.engine.impl.util.TelemetryUtil;
 import org.camunda.bpm.engine.telemetry.dto.Command;
 import org.camunda.bpm.engine.telemetry.dto.Metric;
-import org.camunda.bpm.engine.telemetry.dto.Product;
 import org.camunda.connect.spi.CloseableConnectorResponse;
 import org.camunda.connect.spi.Connector;
 import org.camunda.connect.spi.ConnectorRequest;
@@ -344,7 +343,7 @@ public class TelemetrySendingTask extends TimerTask {
 
   protected Boolean validateData(TelemetryDataImpl dataToSend) {
     // validate product data
-    Product product = dataToSend.getProduct();
+    ProductImpl product = dataToSend.getProduct();
     String installationId = dataToSend.getInstallation();
     String edition = product.getEdition();
     String version = product.getVersion();

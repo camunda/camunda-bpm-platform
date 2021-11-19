@@ -69,13 +69,11 @@ public class GetTelemetryDataCmd implements Command<TelemetryDataImpl> {
 
   protected Map<String, Metric> getMetrics() {
     Map<String, Metric> metrics = new HashMap<>();
-    if (metricsRegistry != null) {
-      Map<String, Meter> telemetryMeters = metricsRegistry.getTelemetryMeters();
+    Map<String, Meter> telemetryMeters = metricsRegistry.getTelemetryMeters();
 
-      for (String metricToReport : TelemetrySendingTask.METRICS_TO_REPORT) {
-        long value = telemetryMeters.get(metricToReport).getAndClear();
-        metrics.put(metricToReport, new MetricImpl(value));
-      }
+    for (String metricToReport : TelemetrySendingTask.METRICS_TO_REPORT) {
+      long value = telemetryMeters.get(metricToReport).get();
+      metrics.put(metricToReport, new MetricImpl(value));
     }
     return metrics;
   }

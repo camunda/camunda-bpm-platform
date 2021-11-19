@@ -89,7 +89,6 @@ public class ManagementServiceGetTelemetryDataTest {
     metricsRegistry = configuration.getMetricsRegistry();
 
     clearMetrics();
-
     configuration.getTelemetryRegistry().clear();
 
     defaultTelemetryData = new TelemetryDataImpl(configuration.getTelemetryData());
@@ -102,12 +101,13 @@ public class ManagementServiceGetTelemetryDataTest {
     }
 
     clearMetrics();
+    configuration.getTelemetryRegistry().clear();
 
     configuration.setTelemetryData(defaultTelemetryData);
   }
 
   protected void clearMetrics() {
-    Collection<Meter> meters = configuration.getMetricsRegistry().getDbMeters().values();
+    Collection<Meter> meters = configuration.getMetricsRegistry().getTelemetryMeters().values();
     for (Meter meter : meters) {
       meter.getAndClear();
     }
@@ -186,12 +186,10 @@ public class ManagementServiceGetTelemetryDataTest {
   public void shouldReturnCommands() {
     // given
     TelemetryRegistry telemetryRegistry = configuration.getTelemetryRegistry();
-    telemetryRegistry.clear();
     // create command data
     telemetryRegistry.markOccurrence(GET_TELEMETRY_DATA_CMD_NAME, 10);
     telemetryRegistry.markOccurrence(IS_TELEMETRY_ENABLED_CMD_NAME, 20);
     telemetryRegistry.markOccurrence(TELEMETRY_CONFIGURE_CMD_NAME, 30);
-    // create metrics
 
     // when
     TelemetryData telemetryData = managementService.getTelemetryData();
@@ -208,13 +206,11 @@ public class ManagementServiceGetTelemetryDataTest {
   public void shouldReturnMetrics() {
     // given
     MetricsRegistry metricsRegistry = configuration.getMetricsRegistry();
-    clearMetrics();
-    // create command data
+    // create metrics data
     metricsRegistry.markTelemetryOccurrence(ACTIVTY_INSTANCE_START, 5);
     metricsRegistry.markTelemetryOccurrence(ROOT_PROCESS_INSTANCE_START, 15);
     metricsRegistry.markTelemetryOccurrence(EXECUTED_DECISION_ELEMENTS, 25);
     metricsRegistry.markTelemetryOccurrence(EXECUTED_DECISION_INSTANCES, 35);
-    // create metrics
 
     // when
     TelemetryData telemetryData = managementService.getTelemetryData();
@@ -226,6 +222,36 @@ public class ManagementServiceGetTelemetryDataTest {
     assertThat(metrics.get(ROOT_PROCESS_INSTANCE_START).getCount()).isEqualTo(15);
     assertThat(metrics.get(EXECUTED_DECISION_ELEMENTS).getCount()).isEqualTo(25);
     assertThat(metrics.get(EXECUTED_DECISION_INSTANCES).getCount()).isEqualTo(35);
+  }
+
+  @Test
+  public void shouldNotResetCommandCount() {
+    // given
+    TelemetryRegistry telemetryRegistry = configuration.getTelemetryRegistry();
+    // create command data
+    telemetryRegistry.markOccurrence(IS_TELEMETRY_ENABLED_CMD_NAME, 10);
+
+    // when
+    TelemetryData firstTelemetryData = managementService.getTelemetryData();
+    TelemetryData secondTelemetryData = managementService.getTelemetryData();
+
+    assertThat(firstTelemetryData.getProduct().getInternals().getCommands().get(IS_TELEMETRY_ENABLED_CMD_NAME).getCount()).isEqualTo(10);
+    assertThat(secondTelemetryData.getProduct().getInternals().getCommands().get(IS_TELEMETRY_ENABLED_CMD_NAME).getCount()).isEqualTo(10);
+  }
+
+  @Test
+  public void shouldNotResetMetricsCount() {
+    // given
+    MetricsRegistry metricsRegistry = configuration.getMetricsRegistry();
+    // create command data
+    metricsRegistry.markTelemetryOccurrence(ACTIVTY_INSTANCE_START, 5);
+
+    // when
+    TelemetryData firstTelemetryData = managementService.getTelemetryData();
+    TelemetryData secondTelemetryData = managementService.getTelemetryData();
+
+    assertThat(firstTelemetryData.getProduct().getInternals().getMetrics().get(ACTIVTY_INSTANCE_START).getCount()).isEqualTo(5);
+    assertThat(secondTelemetryData.getProduct().getInternals().getMetrics().get(ACTIVTY_INSTANCE_START).getCount()).isEqualTo(5);
   }
 
   protected void assertTelemetryData(TelemetryData data, boolean telemetryEnabled) {
