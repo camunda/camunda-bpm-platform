@@ -21,3 +21,6 @@ values ('600', CURRENT_TIMESTAMP, '7.17.0');
 -- https://jira.camunda.com/browse/CAM-14006 --
 ALTER TABLE ACT_RU_JOB 
   ADD COLUMN LAST_FAILURE_LOG_ID_ varchar(64);
+  
+ALTER TABLE ACT_RU_EXT_TASK
+  ADD COLUMN LAST_FAILURE_LOG_ID_ varchar(64);

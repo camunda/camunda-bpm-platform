@@ -18,9 +18,11 @@ package org.camunda.bpm.engine.test.history;
 
 import java.util.Arrays;
 
+import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.impl.interceptor.Session;
 import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogManager;
@@ -86,6 +88,30 @@ public class HistoricIncidentAuditTest {
     // when
     managementService.setJobRetries(job.getId(), 0);
 
+
+    // then
+    Mockito.verify(sessionFactory, Mockito.never()).openSession();
+  }
+
+
+  @Test
+  public void shouldNotQueryForHistoricJobLogWhenSettingExternalTaskToZeroRetries() {
+    // given
+    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("process")
+    .startEvent().serviceTask().camundaExternalTask("topic").endEvent().done();
+
+    testRule.deploy(modelInstance);
+
+    RuntimeService runtimeService = engineRule.getRuntimeService();
+    runtimeService.startProcessInstanceByKey("process");
+
+    ExternalTaskService externalTaskService = engineRule.getExternalTaskService();
+    ExternalTask externalTask = externalTaskService.createExternalTaskQuery().singleResult();
+
+    Mockito.reset(sessionFactory);
+
+    // when
+    externalTaskService.setRetries(externalTask.getId(), 0);
 
     // then
     Mockito.verify(sessionFactory, Mockito.never()).openSession();

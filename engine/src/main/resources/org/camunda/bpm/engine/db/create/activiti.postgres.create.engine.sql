@@ -106,7 +106,7 @@ create table ACT_RU_EXECUTION (
 
 create table ACT_RU_JOB (
     ID_ varchar(64) NOT NULL,
-	  REV_ integer,
+    REV_ integer,
     TYPE_ varchar(255) NOT NULL,
     LOCK_EXP_TIME_ timestamp,
     LOCK_OWNER_ varchar(255),
@@ -335,6 +335,7 @@ create table ACT_RU_EXT_TASK (
   ACT_INST_ID_ varchar(64),
   TENANT_ID_ varchar(64),
   PRIORITY_ bigint NOT NULL DEFAULT 0,
+  LAST_FAILURE_LOG_ID_ varchar(64),
   primary key (ID_)
 );
 

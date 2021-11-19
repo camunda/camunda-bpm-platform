@@ -19,6 +19,7 @@ package org.camunda.bpm.qa.upgrade;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.qa.upgrade.externaltask.ExternalTaskFailureLogScenario;
 import org.camunda.bpm.qa.upgrade.job.JobFailureLogScenario;
 
 public class TestFixture {
@@ -36,6 +37,7 @@ public class TestFixture {
     // register test scenarios
     ScenarioRunner runner = new ScenarioRunner(processEngine, ENGINE_VERSION);
 
+    runner.setupScenarios(ExternalTaskFailureLogScenario.class);
     runner.setupScenarios(JobFailureLogScenario.class);
 
     processEngine.close();
