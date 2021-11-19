@@ -64,8 +64,8 @@ import org.camunda.connect.spi.ConnectorRequest;
 
 public class TelemetrySendingTask extends TimerTask {
 
+  public static final Set<String> METRICS_TO_REPORT = new HashSet<>();
   protected static final TelemetryLogger LOG = ProcessEngineLogger.TELEMETRY_LOGGER;
-  protected static final Set<String> METRICS_TO_REPORT = new HashSet<>();
   protected static final String TELEMETRY_INIT_MESSAGE_SENT_NAME = "camunda.telemetry.initial.message.sent";
   protected static final String UUID4_PATTERN = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}";
 

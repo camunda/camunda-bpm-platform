@@ -22,7 +22,6 @@ import static org.camunda.bpm.engine.management.Metrics.ACTIVTY_INSTANCE_START;
 import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_ELEMENTS;
 import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_INSTANCES;
 import static org.camunda.bpm.engine.management.Metrics.ROOT_PROCESS_INSTANCE_START;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -34,6 +33,8 @@ import java.util.stream.Stream;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.metrics.Meter;
+import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
+import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
 import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServerImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.CommandImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.DatabaseImpl;
@@ -94,7 +95,6 @@ public class ManagementServiceGetTelemetryDataTest {
     configuration.getTelemetryRegistry().clear();
 
     defaultTelemetryData = new TelemetryDataImpl(configuration.getTelemetryData());
-    configuration.setTelemetryData(createTestData());
   }
 
   @After
@@ -124,29 +124,35 @@ public class ManagementServiceGetTelemetryDataTest {
 
     LicenseKeyDataImpl licenseKey = new LicenseKeyDataImpl(LICENSE_CUSTOMER_NAME, "UNIFIED", "2029-09-01", false, Collections.singletonMap("camundaBPM", "true"), "raw license");
     internals.setLicenseKey(licenseKey);
-
-    Map<String, Command> commands = new HashMap<>();
-    commands.put(TELEMETRY_CONFIGURE_CMD_NAME, TELEMETRY_CONFIGURE_CMD);
-    commands.put(IS_TELEMETRY_ENABLED_CMD_NAME, IS_TELEMETRY_ENABLED_CMD);
-    commands.put(GET_TELEMETRY_DATA_CMD_NAME, GET_TELEMETRY_DATA_CMD);
-    internals.setCommands(commands);
-
-    Map<String, Metric> metrics = new HashMap<>();
-    metrics.put(ACTIVTY_INSTANCE_START, ACTIVTY_INSTANCE_START_METRIC);
-    metrics.put(ROOT_PROCESS_INSTANCE_START, ROOT_PROCESS_INSTANCE_START_METRIC);
-    metrics.put(EXECUTED_DECISION_ELEMENTS, EXECUTED_DECISION_ELEMENTS_METRIC);
-    metrics.put(EXECUTED_DECISION_INSTANCES, EXECUTED_DECISION_INSTANCES_METRIC);
-    internals.setMetrics(metrics);
-
+    internals.setCommands(createTestCommands());
+    internals.setMetrics(createTestMetrics());
     internals.setWebapps(Stream.of("cockpit", "admin").collect(Collectors.toCollection(HashSet::new)));
 
     ProductImpl product = new ProductImpl(PRODUCT_NAME, PRODUCT_VERSION, PRODUCT_EDITION, internals);
     return new TelemetryDataImpl(INSTALLATION_ID, product);
   }
 
+  private Map<String, Metric> createTestMetrics() {
+    Map<String, Metric> metrics = new HashMap<>();
+    metrics.put(ACTIVTY_INSTANCE_START, ACTIVTY_INSTANCE_START_METRIC);
+    metrics.put(ROOT_PROCESS_INSTANCE_START, ROOT_PROCESS_INSTANCE_START_METRIC);
+    metrics.put(EXECUTED_DECISION_ELEMENTS, EXECUTED_DECISION_ELEMENTS_METRIC);
+    metrics.put(EXECUTED_DECISION_INSTANCES, EXECUTED_DECISION_INSTANCES_METRIC);
+    return metrics;
+  }
+
+  private Map<String, Command> createTestCommands() {
+    Map<String, Command> commands = new HashMap<>();
+    commands.put(TELEMETRY_CONFIGURE_CMD_NAME, TELEMETRY_CONFIGURE_CMD);
+    commands.put(IS_TELEMETRY_ENABLED_CMD_NAME, IS_TELEMETRY_ENABLED_CMD);
+    commands.put(GET_TELEMETRY_DATA_CMD_NAME, GET_TELEMETRY_DATA_CMD);
+    return commands;
+  }
+
   @Test
   public void shouldReturnTelemetryData_TelemetryEnabled() {
     // given
+    configuration.setTelemetryData(createTestData());
     managementService.toggleTelemetry(true);
 
     // when
@@ -159,6 +165,7 @@ public class ManagementServiceGetTelemetryDataTest {
   @Test
   public void shouldReturnTelemetryData_TelemetryDisabled() {
     // given
+    configuration.setTelemetryData(createTestData());
     managementService.toggleTelemetry(false);
 
     // when
@@ -166,6 +173,52 @@ public class ManagementServiceGetTelemetryDataTest {
 
     // then
     assertTelemetryData(telemetryData);
+  }
+
+  @Test
+  public void shouldReturnCommands() {
+    // given
+    TelemetryRegistry telemetryRegistry = configuration.getTelemetryRegistry();
+    telemetryRegistry.clear();
+    // create command data
+    telemetryRegistry.markOccurrence(GET_TELEMETRY_DATA_CMD_NAME, 10);
+    telemetryRegistry.markOccurrence(IS_TELEMETRY_ENABLED_CMD_NAME, 20);
+    telemetryRegistry.markOccurrence(TELEMETRY_CONFIGURE_CMD_NAME, 30);
+    // create metrics
+
+    // when
+    TelemetryData telemetryData = managementService.getTelemetryData();
+
+    // then
+    Map<String, Command> commands = telemetryData.getProduct().getInternals().getCommands();
+    assertThat(commands).containsOnlyKeys(GET_TELEMETRY_DATA_CMD_NAME, IS_TELEMETRY_ENABLED_CMD_NAME, TELEMETRY_CONFIGURE_CMD_NAME);
+    assertThat(commands.get(GET_TELEMETRY_DATA_CMD_NAME).getCount()).isEqualTo(10);
+    assertThat(commands.get(IS_TELEMETRY_ENABLED_CMD_NAME).getCount()).isEqualTo(20);
+    assertThat(commands.get(TELEMETRY_CONFIGURE_CMD_NAME).getCount()).isEqualTo(30);
+  }
+
+  @Test
+  public void shouldReturnMetrics() {
+    // given
+    MetricsRegistry metricsRegistry = configuration.getMetricsRegistry();
+    clearMetrics();
+    // create command data
+    metricsRegistry.markTelemetryOccurrence(ACTIVTY_INSTANCE_START, 5);
+    metricsRegistry.markTelemetryOccurrence(ROOT_PROCESS_INSTANCE_START, 15);
+    metricsRegistry.markTelemetryOccurrence(EXECUTED_DECISION_ELEMENTS, 25);
+    metricsRegistry.markTelemetryOccurrence(EXECUTED_DECISION_INSTANCES, 35);
+    // create metrics
+
+    // when
+    TelemetryData telemetryData = managementService.getTelemetryData();
+
+    // then
+    Map<String, Metric> metrics = telemetryData.getProduct().getInternals().getMetrics();
+    assertThat(metrics).containsOnlyKeys(ACTIVTY_INSTANCE_START, ROOT_PROCESS_INSTANCE_START, EXECUTED_DECISION_ELEMENTS, EXECUTED_DECISION_INSTANCES);
+    assertThat(metrics.get(ACTIVTY_INSTANCE_START).getCount()).isEqualTo(5);
+    assertThat(metrics.get(ROOT_PROCESS_INSTANCE_START).getCount()).isEqualTo(15);
+    assertThat(metrics.get(EXECUTED_DECISION_ELEMENTS).getCount()).isEqualTo(25);
+    assertThat(metrics.get(EXECUTED_DECISION_INSTANCES).getCount()).isEqualTo(35);
   }
 
   protected void assertTelemetryData(TelemetryData data) {
