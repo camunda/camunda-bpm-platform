@@ -59,11 +59,10 @@ function addOverlayForSingleElement({
   overlays,
   clickListener,
   tooltipTitle,
-  $scope,
-  $timeout
+  $scope
 }) {
   if (!overlaysNodes[activityId]) {
-    const wrapper = angular.element(template).hide();
+    const wrapper = angular.element(template);
     const button = wrapper.children().first();
     overlaysNodes[activityId] = wrapper;
 
@@ -76,8 +75,8 @@ function addOverlayForSingleElement({
 
     overlays.add(activityId, {
       position: {
-        top: 0,
-        right: 0
+        bottom: -7,
+        right: -8
       },
       show: {
         minZoom: -Infinity,
@@ -92,8 +91,7 @@ function addOverlayForSingleElement({
       activityId,
       redirectionTarget,
       clickListener,
-      $scope,
-      $timeout
+      $scope
     );
   }
 }
@@ -114,45 +112,9 @@ function addInteractions(
   id,
   redirectionTarget,
   clickListener,
-  $scope,
-  $timeout
+  $scope
 ) {
   const diagramNode = angular.element('[data-element-id="' + id + '"]');
-  let timeoutPromise = null;
-
-  /**
-   * hide buttonOverlay after delay time
-   * @param delay
-   */
-  const hideWithDelay = function(delay) {
-    timeoutPromise = $timeout(function() {
-      buttonOverlay.hide();
-    }, delay);
-  };
-
-  /**
-   * cancels timeout object
-   */
-  const cancelHide = function() {
-    return timeoutPromise && $timeout.cancel(timeoutPromise);
-  };
-
-  const mouseoverListener = function() {
-    cancelHide();
-    buttonOverlay.show();
-  };
-
-  // attach diagramNode listeners
-  diagramNode.on('mouseenter', mouseoverListener);
-  diagramNode.on('mouseleave', function() {
-    hideWithDelay(50);
-  });
-
-  // attach buttonOverlay listeners
-  buttonOverlay.on('mouseenter', mouseoverListener);
-  buttonOverlay.on('mouseleave', function() {
-    hideWithDelay(100);
-  });
 
   if (redirectionTarget) {
     button.on('click', () => {
