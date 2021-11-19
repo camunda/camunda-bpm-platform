@@ -338,6 +338,7 @@ create table ACT_RU_EXT_TASK (
   ACT_INST_ID_ varchar(64),
   TENANT_ID_ varchar(64),
   PRIORITY_ bigint not null default 0,
+  LAST_FAILURE_LOG_ID_ varchar(64),
   primary key (ID_)
 );
 
