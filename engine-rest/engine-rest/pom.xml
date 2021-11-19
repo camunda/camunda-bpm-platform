@@ -62,6 +62,12 @@
       <version>${jackson.databind.version}</version>
     </dependency>
 
+    <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-jsr310</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
+
     <!-- provided deps -->
     <dependency>
       <groupId>org.jboss.spec.javax.servlet</groupId>

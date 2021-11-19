@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.rest.hal.Hal;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 @Provider
 @Produces({MediaType.APPLICATION_JSON, Hal.APPLICATION_HAL_JSON})
@@ -41,6 +42,8 @@ public class JacksonConfigurator implements ContextResolver<ObjectMapper> {
     mapper.setDateFormat(dateFormat);
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+    
+    mapper.registerModule(new JavaTimeModule());
 
     return mapper;
   }
