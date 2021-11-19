@@ -35,7 +35,7 @@ public class ActivityExecutionHierarchyWalker extends SingleReferenceWalker<Acti
   private Map<ScopeImpl, PvmExecutionImpl> activityExecutionMapping;
 
   public ActivityExecutionHierarchyWalker(ActivityExecution execution) {
-    super(createTupel(execution));
+    super(createTuple(execution));
 
     activityExecutionMapping = execution.createActivityExecutionMapping();
   }
@@ -64,7 +64,7 @@ public class ActivityExecutionHierarchyWalker extends SingleReferenceWalker<Acti
       if (superExecution != null) {
         // walk to parent process instance
         activityExecutionMapping = superExecution.createActivityExecutionMapping();
-        return createTupel(superExecution);
+        return createTuple(superExecution);
 
       } else {
         // this is the top level process instance
@@ -73,7 +73,7 @@ public class ActivityExecutionHierarchyWalker extends SingleReferenceWalker<Acti
     }
   }
 
-  protected static ActivityExecutionTuple createTupel(ActivityExecution execution) {
+  protected static ActivityExecutionTuple createTuple(ActivityExecution execution) {
     PvmScope flowScope = getCurrentFlowScope(execution);
     return new ActivityExecutionTuple(flowScope, execution);
   }
@@ -119,8 +119,8 @@ public class ActivityExecutionHierarchyWalker extends SingleReferenceWalker<Acti
     }
 
     @Override
-    public void visit(ActivityExecutionTuple tupel) {
-      collector.visit(tupel.getExecution());
+    public void visit(ActivityExecutionTuple tuple) {
+      collector.visit(tuple.getExecution());
     }
   }
 
@@ -133,8 +133,8 @@ public class ActivityExecutionHierarchyWalker extends SingleReferenceWalker<Acti
     }
 
     @Override
-    public void visit(ActivityExecutionTuple tupel) {
-      collector.visit(tupel.getScope());
+    public void visit(ActivityExecutionTuple tuple) {
+      collector.visit(tuple.getScope());
     }
   }
 
