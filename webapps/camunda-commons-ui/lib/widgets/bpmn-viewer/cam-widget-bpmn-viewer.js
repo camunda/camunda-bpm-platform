@@ -478,6 +478,10 @@ module.exports = [
           eventBus.off('element.mousedown', onMousedown);
           eventBus.off('canvas.viewbox.changed', onViewboxChange);
           eventBus.off('plane.set', onPlaneChange);
+
+          search.updateSilently({
+            plane: null
+          });
         }
 
         $scope.zoomIn = function() {
