@@ -68,7 +68,7 @@
       },
       "operators": [
         {
-          "key": "in",
+          "key": "In",
           "value": "in"
         }
       ]
@@ -407,7 +407,7 @@
       },
       "operators": [
         {
-          "key": "in",
+          "key": "In",
           "value": "in"
         }
       ]

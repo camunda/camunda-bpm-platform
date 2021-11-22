@@ -69,7 +69,7 @@ var sanitizeValue = function(value, operator, search) {
     !wildCardExp.test(value.replace(specialWildCardCharExp, ''))
   ) {
     return '%' + value + '%';
-  } else if (operator == 'in') {
+  } else if (operator === 'In') {
     return value.split(',');
   } else if (search.allowDates && simpleDateExp.test(value)) {
     return moment(value, moment.ISO_8601).format('YYYY-MM-DDTHH:mm:ss.SSSZZ');
