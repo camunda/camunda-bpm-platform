@@ -35,7 +35,9 @@ public interface TelemetryData {
 
   /**
    * This method returns a String which is unique for each installation of
-   * Camunda. It is used to identify a single Camunda instance.
+   * Camunda. It is stored once per database so all engines connected to the
+   * same database will have the same installation ID. The ID is used to
+   * identify a single installation of Camunda Platform.
    */
   public String getInstallation();
 
