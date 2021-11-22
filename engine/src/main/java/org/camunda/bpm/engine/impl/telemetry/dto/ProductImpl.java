@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.engine.impl.telemetry.dto;
 
-import org.camunda.bpm.engine.telemetry.dto.Product;
+import org.camunda.bpm.engine.telemetry.Product;
 
 public class ProductImpl implements Product {
 

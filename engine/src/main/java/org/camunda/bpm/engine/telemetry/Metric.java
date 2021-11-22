@@ -14,34 +14,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.telemetry.dto;
+package org.camunda.bpm.engine.telemetry;
 
 import org.camunda.bpm.engine.ManagementService;
 
 /**
- * The engine collects information about multiple aspects of the installation.
+ * This class represents the data structure used for collecting information
+ * about certain internal metrics for telemetry data. A metric is a counter for
+ * a certain action performed by the engine (e.g., start a root
+ * process-instance).
  *
- * If telemetry is enabled this information is sent to Camunda. If telemetry is
- * disabled, the engine still collects this information and provides it through
- * {@link ManagementService#getTelemetryData()}.
+ * This information is sent to Camunda when telemetry is enabled.
  *
- * This class represents the data structure used to collect telemetry data.
+ * When used for telemetry data collection, all metric counts reset on sending
+ * the data. Retrieval through {@link ManagementService#getTelemetryData()} will
+ * not reset the counter. Some metrics are used for billing purposes in
+ * enterprise setups.
  *
  * @see <a href=
  *      "https://docs.camunda.org/manual/latest/introduction/telemetry/#collected-data">Camunda
  *      Documentation: Collected Telemetry Data</a>
  */
-public interface TelemetryData {
+public interface Metric {
 
   /**
-   * This method returns a String which is unique for each installation of
-   * Camunda. It is used to identify a single Camunda instance.
+   * The count of this metric i.e., how often did the engine perform the action
+   * associated with this metric.
    */
-  public String getInstallation();
-
-  /**
-   * Returns a data object that stores information about the used Camunda
-   * product.
-   */
-  public Product getProduct();
+  public long getCount();
 }

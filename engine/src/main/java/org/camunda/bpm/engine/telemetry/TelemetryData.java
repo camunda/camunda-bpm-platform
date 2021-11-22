@@ -14,27 +14,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.telemetry.dto;
+package org.camunda.bpm.engine.telemetry;
+
+import org.camunda.bpm.engine.ManagementService;
 
 /**
- * This class represents the data structure used for collecting information
- * about the installed Java runtime environment.
+ * The engine collects information about multiple aspects of the installation.
  *
- * This information is sent to Camunda when telemetry is enabled.
+ * If telemetry is enabled this information is sent to Camunda. If telemetry is
+ * disabled, the engine still collects this information and provides it through
+ * {@link ManagementService#getTelemetryData()}.
+ *
+ * This class represents the data structure used to collect telemetry data.
  *
  * @see <a href=
  *      "https://docs.camunda.org/manual/latest/introduction/telemetry/#collected-data">Camunda
  *      Documentation: Collected Telemetry Data</a>
  */
-public interface Jdk {
+public interface TelemetryData {
 
   /**
-   * The vendor of the Java runtime environment.
+   * This method returns a String which is unique for each installation of
+   * Camunda. It is used to identify a single Camunda instance.
    */
-  public String getVendor();
+  public String getInstallation();
 
   /**
-   * The version of the Java runtime environment.
+   * Returns a data object that stores information about the used Camunda
+   * product.
    */
-  public String getVersion();
+  public Product getProduct();
 }

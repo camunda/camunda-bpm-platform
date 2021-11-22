@@ -18,7 +18,7 @@ package org.camunda.bpm.engine.impl.telemetry.dto;
 
 import java.util.Map;
 
-import org.camunda.bpm.engine.telemetry.dto.LicenseKeyData;
+import org.camunda.bpm.engine.telemetry.LicenseKeyData;
 
 import com.google.gson.annotations.SerializedName;
 

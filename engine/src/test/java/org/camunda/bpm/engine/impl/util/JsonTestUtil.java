@@ -19,8 +19,8 @@ package org.camunda.bpm.engine.impl.util;
 import java.lang.reflect.Type;
 import org.camunda.bpm.engine.impl.telemetry.dto.CommandImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.MetricImpl;
-import org.camunda.bpm.engine.telemetry.dto.Command;
-import org.camunda.bpm.engine.telemetry.dto.Metric;
+import org.camunda.bpm.engine.telemetry.Command;
+import org.camunda.bpm.engine.telemetry.Metric;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -31,7 +31,7 @@ import com.google.gson.JsonParseException;
 
 public final class JsonTestUtil {
 
-  public static Gson createGsonMapper() {
+  public static Gson createTelemetryDataMapper() {
     return new GsonBuilder()
       .registerTypeAdapter(Metric.class, new MetricDeserializer())
       .registerTypeAdapter(Command.class, new CommandDeserializer())

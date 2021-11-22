@@ -14,11 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.telemetry.dto;
+package org.camunda.bpm.engine.telemetry;
+
+import java.util.Map;
 
 /**
  * This class represents the data structure used for collecting information
- * about the connected database.
+ * about the license key issued for enterprise versions of Camunda Platform.
  *
  * This information is sent to Camunda when telemetry is enabled.
  *
@@ -26,15 +28,40 @@ package org.camunda.bpm.engine.telemetry.dto;
  *      "https://docs.camunda.org/manual/latest/introduction/telemetry/#collected-data">Camunda
  *      Documentation: Collected Telemetry Data</a>
  */
-public interface Database {
+public interface LicenseKeyData {
 
   /**
-   * The vendor of the connected database system.
+   * The name of the customer this license was issued for.
    */
-  public String getVendor();
+  public String getCustomer();
 
   /**
-   * The version of the connected database system.
+   * Camunda uses different license types e.g., when one license includes usage
+   * of Cawemo enterprise.
    */
-  public String getVersion();
+  public String getType();
+
+  /**
+   * The expiry date of the license in the format 'YYYY-MM-DD'.
+   */
+  public String getValidUntil();
+
+  /**
+   * A flag indicating if the license is unlimited or expires.
+   */
+  public Boolean isUnlimited();
+
+  /**
+   * A collection of features that are enabled through this license. Features
+   * could be Camunda BPM, Optimize or Cawemo.
+   */
+  public Map<String, String> getFeatures();
+
+  /**
+   * The raw license data. This combines all data fields also included in this
+   * class in the form which is stored in the license key String. Note, that
+   * this is not the license key as issued to the customer but only contains the
+   * plain-text part of it and not the encrypted key.
+   */
+  public String getRaw();
 }

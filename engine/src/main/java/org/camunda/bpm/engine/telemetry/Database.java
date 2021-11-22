@@ -14,32 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.telemetry.dto;
-
-import org.camunda.bpm.engine.ManagementService;
+package org.camunda.bpm.engine.telemetry;
 
 /**
  * This class represents the data structure used for collecting information
- * about certain internal metrics for telemetry data. A metric is a counter for
- * a certain action performed by the engine (e.g., start a root
- * process-instance).
+ * about the connected database.
  *
  * This information is sent to Camunda when telemetry is enabled.
- *
- * When used for telemetry data collection, all metric counts reset on sending
- * the data. Retrieval through {@link ManagementService#getTelemetryData()} will
- * not reset the counter. Some metrics are used for billing purposes in
- * enterprise setups.
  *
  * @see <a href=
  *      "https://docs.camunda.org/manual/latest/introduction/telemetry/#collected-data">Camunda
  *      Documentation: Collected Telemetry Data</a>
  */
-public interface Metric {
+public interface Database {
 
   /**
-   * The count of this metric i.e., how often did the engine perform the action
-   * associated with this metric.
+   * The vendor of the connected database system.
    */
-  public long getCount();
+  public String getVendor();
+
+  /**
+   * The version of the connected database system.
+   */
+  public String getVersion();
 }

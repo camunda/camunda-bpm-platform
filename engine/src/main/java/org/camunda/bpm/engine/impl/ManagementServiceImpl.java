@@ -49,7 +49,7 @@ import org.camunda.bpm.engine.management.UpdateJobDefinitionSuspensionStateSelec
 import org.camunda.bpm.engine.management.UpdateJobSuspensionStateSelectBuilder;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
-import org.camunda.bpm.engine.telemetry.dto.TelemetryData;
+import org.camunda.bpm.engine.telemetry.TelemetryData;
 
 import java.sql.Connection;
 import java.util.Date;

@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.engine.impl.telemetry.dto;
 
-import org.camunda.bpm.engine.telemetry.dto.Command;
+import org.camunda.bpm.engine.telemetry.Command;
 
 public class CommandImpl implements Command {
 

@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.telemetry.dto;
+package org.camunda.bpm.engine.telemetry;
 
 /**
  * This class represents the data structure used for collecting information
- * about the application server.
+ * about the installed Java runtime environment.
  *
  * This information is sent to Camunda when telemetry is enabled.
  *
@@ -26,15 +26,15 @@ package org.camunda.bpm.engine.telemetry.dto;
  *      "https://docs.camunda.org/manual/latest/introduction/telemetry/#collected-data">Camunda
  *      Documentation: Collected Telemetry Data</a>
  */
-public interface ApplicationServer {
+public interface Jdk {
 
   /**
-   * The vendor of the installed application server.
+   * The vendor of the Java runtime environment.
    */
   public String getVendor();
 
   /**
-   * The version of the installed application server.
+   * The version of the Java runtime environment.
    */
   public String getVersion();
 }

@@ -18,8 +18,8 @@ package org.camunda.bpm.engine.impl.telemetry;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.telemetry.dto.Product;
-import org.camunda.bpm.engine.telemetry.dto.TelemetryData;
+import org.camunda.bpm.engine.telemetry.Product;
+import org.camunda.bpm.engine.telemetry.TelemetryData;
 
 public class TelemetryLogger extends ProcessEngineLogger {
 

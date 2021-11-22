@@ -21,9 +21,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.camunda.bpm.engine.telemetry.dto.Command;
-import org.camunda.bpm.engine.telemetry.dto.Internals;
-import org.camunda.bpm.engine.telemetry.dto.Metric;
+import org.camunda.bpm.engine.telemetry.Command;
+import org.camunda.bpm.engine.telemetry.Internals;
+import org.camunda.bpm.engine.telemetry.Metric;
 
 import com.google.gson.annotations.SerializedName;
 

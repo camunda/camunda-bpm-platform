@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.engine.impl.telemetry.dto;
 
-import org.camunda.bpm.engine.telemetry.dto.Jdk;
+import org.camunda.bpm.engine.telemetry.Jdk;
 
 public class JdkImpl implements Jdk {
 

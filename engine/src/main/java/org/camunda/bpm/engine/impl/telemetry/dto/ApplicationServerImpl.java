@@ -18,7 +18,7 @@ package org.camunda.bpm.engine.impl.telemetry.dto;
 
 import static org.camunda.bpm.engine.impl.util.ParseUtil.parseServerVendor;
 
-import org.camunda.bpm.engine.telemetry.dto.ApplicationServer;
+import org.camunda.bpm.engine.telemetry.ApplicationServer;
 
 public class ApplicationServerImpl implements ApplicationServer {
 

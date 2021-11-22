@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.engine.impl.telemetry.dto;
 
-import org.camunda.bpm.engine.telemetry.dto.Database;
+import org.camunda.bpm.engine.telemetry.Database;
 
 public class DatabaseImpl implements Database {
 

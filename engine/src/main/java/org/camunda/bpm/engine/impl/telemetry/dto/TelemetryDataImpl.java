@@ -17,7 +17,7 @@
 package org.camunda.bpm.engine.impl.telemetry.dto;
 
 import org.camunda.bpm.engine.impl.util.JsonUtil;
-import org.camunda.bpm.engine.telemetry.dto.TelemetryData;
+import org.camunda.bpm.engine.telemetry.TelemetryData;
 
 public class TelemetryDataImpl implements TelemetryData {
 

@@ -35,7 +35,7 @@ import org.camunda.bpm.engine.impl.telemetry.dto.InternalsImpl;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 import org.camunda.bpm.engine.impl.util.JsonTestUtil;
 import org.camunda.bpm.engine.management.Metrics;
-import org.camunda.bpm.engine.telemetry.dto.Metric;
+import org.camunda.bpm.engine.telemetry.Metric;
 import org.camunda.bpm.engine.test.util.NoInitMessageBootstrapEngineCommand;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.junit.After;
@@ -132,7 +132,7 @@ public class TelemetryMultipleEnginesTest {
 
     assertThat(requests).hasSize(2);
 
-    Gson gson = JsonTestUtil.createGsonMapper();
+    Gson gson = JsonTestUtil.createTelemetryDataMapper();
 
     LoggedRequest defaultRequest = requests.get(0);
     TelemetryDataImpl defaultRequestBody = gson.fromJson(defaultRequest.getBodyAsString(), TelemetryDataImpl.class);

@@ -14,31 +14,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.telemetry.dto;
-
-import org.camunda.bpm.engine.ManagementService;
+package org.camunda.bpm.engine.telemetry;
 
 /**
- * This class represents the data structure used for collecting information
- * about executed commands for telemetry data. A command is an action usually
- * triggered by a user and performed by the engine. This class counts the number
- * of executions per command.
+ * This class represents the data structure of information about the Camunda
+ * product.
  *
  * This information is sent to Camunda when telemetry is enabled.
- *
- * When used for telemetry data collection, all command execution counts reset
- * on sending the data. Retrieval through
- * {@link ManagementService#getTelemetryData()} will not reset the counter.
  *
  * @see <a href=
  *      "https://docs.camunda.org/manual/latest/introduction/telemetry/#collected-data">Camunda
  *      Documentation: Collected Telemetry Data</a>
  */
-public interface Command {
+public interface Product {
 
   /**
-   * The count of this command i.e., how often did the engine engine execute
-   * this command.
+   * The name of the product (i.e., Camunda BPM Runtime).
    */
-  public long getCount();
+  public String getName();
+
+  /**
+   * The version of the process engine (i.e., 7.X.Y).
+   */
+  public String getVersion();
+
+  /**
+   * The edition of the product (i.e., either community or enterprise).
+   */
+  public String getEdition();
+
+  /**
+   * Information about the technical internals and the environment of the
+   * Camunda installation.
+   */
+  public Internals getInternals();
 }

@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.engine.impl.telemetry.dto;
 
-import org.camunda.bpm.engine.telemetry.dto.Metric;
+import org.camunda.bpm.engine.telemetry.Metric;
 
 public class MetricImpl implements Metric {
 
