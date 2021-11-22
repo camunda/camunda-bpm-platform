@@ -1,7 +1,17 @@
 @import (less) "bpmn-js/dist/assets/bpmn-js.css";
-@import (less) "bpmn-js/dist/assets/diagram-js.css";
 
 @bpmn-nav-radius: 3px;
+
+// todo(marstamm): remove when bpmn-js supports viewer without diagram-js.css
+.djs-element-hidden {
+  display: none;
+}
+
+.djs-container {
+  --color-blue-205-100-50: hsl(205, 100%, 50%);
+  --color-white: hsl(0, 0%, 100%);
+  --color-black: hsl(0, 0%, 0%);
+}
 
 [cam-widget-bpmn-viewer] {
   border: 1px solid @gray-lighter;
