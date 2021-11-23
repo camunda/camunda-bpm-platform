@@ -193,6 +193,8 @@ public class TelemetryRestServiceTest extends AbstractRestServiceTest {
           .body(equalTo(new Gson().toJson(exampleTelemetryData)))
     .when()
       .get(TELEMETRY_DATA_URL);
+
+    verify(managementServiceMock).getTelemetryData();
   }
 
 }
