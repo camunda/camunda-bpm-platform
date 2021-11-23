@@ -48,6 +48,10 @@ public class CommandCounter {
     return count.getAndSet(0);
   }
 
+  public long get(boolean clear) {
+    return clear ? getAndClear() : get();
+  }
+
   public long get() {
     return count.get();
   }

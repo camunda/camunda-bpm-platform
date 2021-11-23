@@ -35,7 +35,6 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.metrics.Meter;
 import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
-import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServerImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.CommandImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.DatabaseImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.InternalsImpl;
@@ -44,6 +43,7 @@ import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyDataImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.MetricImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.ProductImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
+import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 import org.camunda.bpm.engine.impl.util.ParseUtil;
 import org.camunda.bpm.engine.telemetry.Command;
 import org.camunda.bpm.engine.telemetry.Metric;
@@ -114,20 +114,34 @@ public class ManagementServiceGetTelemetryDataTest {
     managementService.deleteMetrics(null);
   }
 
-  protected TelemetryDataImpl createTestData() {
+  protected void createTestData() {
     DatabaseImpl database = new DatabaseImpl(DB_VENDOR, DB_VERSION);
     JdkImpl jdk = ParseUtil.parseJdkDetails();
-    InternalsImpl internals = new InternalsImpl(database, new ApplicationServerImpl(APP_SERVER_VERSION), null, jdk);
-    internals.setTelemetryEnabled(true);
-
-    LicenseKeyDataImpl licenseKey = new LicenseKeyDataImpl(LICENSE_CUSTOMER_NAME, "UNIFIED", "2029-09-01", false, Collections.singletonMap("camundaBPM", "true"), "raw license");
-    internals.setLicenseKey(licenseKey);
+    // app server and license key are set through TelemetryRegistry
+    InternalsImpl internals = new InternalsImpl(database, null, null, jdk);
     internals.setCommands(createTestCommands());
     internals.setMetrics(createTestMetrics());
-    internals.setWebapps(Stream.of("cockpit", "admin").collect(Collectors.toCollection(HashSet::new)));
 
     ProductImpl product = new ProductImpl(PRODUCT_NAME, PRODUCT_VERSION, PRODUCT_EDITION, internals);
-    return new TelemetryDataImpl(INSTALLATION_ID, product);
+    TelemetryDataImpl testData = new TelemetryDataImpl(INSTALLATION_ID, product);
+
+    configuration.setTelemetryData(testData);
+
+    TelemetryRegistry registry = configuration.getTelemetryRegistry();
+    registry.setApplicationServer(APP_SERVER_VERSION);
+    registry.setLicenseKey(new LicenseKeyDataImpl(LICENSE_CUSTOMER_NAME, "UNIFIED", "2029-09-01", false, Collections.singletonMap("camundaBPM", "true"), "raw license"));
+    registry.setWebapps(Stream.of("cockpit", "admin").collect(Collectors.toCollection(HashSet::new)));
+
+    configuration.setTelemetryReporter(
+        new TelemetryReporter(configuration.getCommandExecutorTxRequired(),
+            configuration.getTelemetryEndpoint(),
+            configuration.getTelemetryRequestRetries(),
+            configuration.getTelemetryReportingPeriod(),
+            testData,
+            configuration.getTelemetryHttpConnector(),
+            configuration.getTelemetryRegistry(),
+            configuration.getMetricsRegistry(),
+            configuration.getTelemetryRequestTimeout()));
   }
 
   private Map<String, Metric> createTestMetrics() {
@@ -160,7 +174,8 @@ public class ManagementServiceGetTelemetryDataTest {
   public void shouldReturnTelemetryData_TelemetryEnabled() {
     // given
     managementService.toggleTelemetry(true);
-    configuration.setTelemetryData(createTestData());
+    createTestData();
+
 
     // when
     TelemetryData telemetryData = managementService.getTelemetryData();
@@ -173,7 +188,7 @@ public class ManagementServiceGetTelemetryDataTest {
   public void shouldReturnTelemetryData_TelemetryDisabled() {
     // given
     managementService.toggleTelemetry(false);
-    configuration.setTelemetryData(createTestData());
+    createTestData();
 
     // when
     TelemetryData telemetryData = managementService.getTelemetryData();
@@ -275,7 +290,7 @@ public class ManagementServiceGetTelemetryDataTest {
 
     assertThat(data.getProduct().getInternals().getLicenseKey().getCustomer()).isEqualTo(LICENSE_CUSTOMER_NAME);
 
-    assertThat(data.getProduct().getInternals().isTelemetryEnabled()).isTrue();
+    assertThat(data.getProduct().getInternals().isTelemetryEnabled()).isEqualTo(telemetryEnabled);
 
     assertThat(data.getProduct().getInternals().getCommands()).containsKeys(GET_TELEMETRY_DATA_CMD_NAME, IS_TELEMETRY_ENABLED_CMD_NAME);
     assertThat(data.getProduct().getInternals().getCommands().get(GET_TELEMETRY_DATA_CMD_NAME).getCount()).isEqualTo(3);
@@ -283,7 +298,6 @@ public class ManagementServiceGetTelemetryDataTest {
     if(telemetryEnabled) {
       assertThat(data.getProduct().getInternals().getCommands()).containsKeys(TELEMETRY_CONFIGURE_CMD_NAME);
       assertThat(data.getProduct().getInternals().getCommands().get(TELEMETRY_CONFIGURE_CMD_NAME).getCount()).isEqualTo(1);
-
     }
 
     assertThat(data.getProduct().getInternals().getMetrics()).containsOnlyKeys(ROOT_PROCESS_INSTANCE_START, ACTIVTY_INSTANCE_START, EXECUTED_DECISION_ELEMENTS, EXECUTED_DECISION_INSTANCES);

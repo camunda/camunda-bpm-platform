@@ -63,7 +63,7 @@ import org.camunda.connect.spi.ConnectorRequest;
 
 public class TelemetrySendingTask extends TimerTask {
 
-  public static final Set<String> METRICS_TO_REPORT = new HashSet<>();
+  protected static final Set<String> METRICS_TO_REPORT = new HashSet<>();
   protected static final TelemetryLogger LOG = ProcessEngineLogger.TELEMETRY_LOGGER;
   protected static final String TELEMETRY_INIT_MESSAGE_SENT_NAME = "camunda.telemetry.initial.message.sent";
   protected static final String UUID4_PATTERN = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}";
@@ -122,11 +122,17 @@ public class TelemetrySendingTask extends TimerTask {
     updateTelemetryFlag(true);
 
     performDataSend(false, () -> {
-      updateStaticData();
-      InternalsImpl dynamicData = resolveDynamicData();
-      TelemetryDataImpl mergedData = new TelemetryDataImpl(staticData);
-      mergedData.mergeInternals(dynamicData);
+      updateAndSendData(true);
+    });
+  }
 
+  public TelemetryDataImpl updateAndSendData(boolean sendData) {
+    updateStaticData();
+    InternalsImpl dynamicData = resolveDynamicData(sendData);
+    TelemetryDataImpl mergedData = new TelemetryDataImpl(staticData);
+    mergedData.mergeInternals(dynamicData);
+
+    if(sendData) {
       try {
         sendData(mergedData, false);
       } catch (Exception e) {
@@ -134,7 +140,8 @@ public class TelemetrySendingTask extends TimerTask {
         restoreDynamicData(dynamicData);
         throw e;
       }
-    });
+    }
+    return mergedData;
   }
 
   protected void sendInitialMessage() {
@@ -184,7 +191,9 @@ public class TelemetrySendingTask extends TimerTask {
     }
 
     if (internals.isTelemetryEnabled() == null) {
-      internals.setTelemetryEnabled(true);// this can only be true, otherwise we would not collect data to send
+      // we can not assume telemetry is always enabled, this might also be
+      // triggered by an API call via ManagementService#getTelemetryData()
+      internals.setTelemetryEnabled(telemetryRegistry.isCollectingTelemetryDataEnabled());
     }
 
     // license key and Webapps data is fed from the outside to the registry but needs to be constantly updated
@@ -263,29 +272,29 @@ public class TelemetrySendingTask extends TimerTask {
     }
   }
 
-  protected InternalsImpl resolveDynamicData() {
+  protected InternalsImpl resolveDynamicData(boolean reset) {
     InternalsImpl result = new InternalsImpl();
 
-    Map<String, Metric> metrics = calculateMetrics();
+    Map<String, Metric> metrics = calculateMetrics(reset);
     result.setMetrics(metrics);
 
     // command counts are modified after the metrics are retrieved, because
     // metric retrieval can fail and resetting the command count is a side effect
     // that we would otherwise have to undo
-    Map<String, Command> commands = fetchAndResetCommandCounts();
+    Map<String, Command> commands = fetchAndResetCommandCounts(reset);
     result.setCommands(commands);
 
     return result;
   }
 
-  protected Map<String, Command> fetchAndResetCommandCounts() {
+  protected Map<String, Command> fetchAndResetCommandCounts(boolean reset) {
     Map<String, Command> commandsToReport = new HashMap<>();
     Map<String, CommandCounter> originalCounts = telemetryRegistry.getCommands();
 
     synchronized (originalCounts) {
 
       for (Map.Entry<String, CommandCounter> counter : originalCounts.entrySet()) {
-        long occurrences = counter.getValue().getAndClear();
+        long occurrences = counter.getValue().get(reset);
         commandsToReport.put(counter.getKey(), new CommandImpl(occurrences));
       }
     }
@@ -293,7 +302,7 @@ public class TelemetrySendingTask extends TimerTask {
     return commandsToReport;
   }
 
-  protected Map<String, Metric> calculateMetrics() {
+  protected Map<String, Metric> calculateMetrics(boolean reset) {
 
     Map<String, Metric> metrics = new HashMap<>();
 
@@ -301,7 +310,7 @@ public class TelemetrySendingTask extends TimerTask {
       Map<String, Meter> telemetryMeters = metricsRegistry.getTelemetryMeters();
 
       for (String metricToReport : METRICS_TO_REPORT) {
-        long value = telemetryMeters.get(metricToReport).getAndClear();
+        long value = telemetryMeters.get(metricToReport).get(reset);
         metrics.put(metricToReport, new MetricImpl(value));
       }
     }
