@@ -596,7 +596,9 @@ module.exports = [
             }
           } else {
             if (search.operator.value.key === 'In') {
-              search.value.key = search.value.value.split(',').map(value => value.trim());
+              search.value.key = search.value.value
+                .split(',')
+                .map(value => value.trim());
             } else {
               search.value.key = search.value.value;
             }
@@ -620,7 +622,7 @@ module.exports = [
           const getValue = search => {
             const mappedOptions = $scope.types.find(
               type => type.id.key === search.type.value.key
-            ).mappedOptions;
+            )?.mappedOptions;
 
             let value = null;
             if (mappedOptions) {
