@@ -185,7 +185,6 @@ public class TelemetryRestServiceTest extends AbstractRestServiceTest {
     when(managementServiceMock.getTelemetryData()).thenReturn(exampleTelemetryData);
 
     given()
-      .contentType(POST_JSON_CONTENT_TYPE)
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())

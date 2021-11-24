@@ -4,7 +4,9 @@
     <@lib.property
         name = "installation"
         type = "string"
-        desc = "An id that is stored as process engine configuration property."/>
+        desc = "An id which is unique for each installation of Camunda. It is stored once per database so all
+                engines connected to the same database will have the same installation ID.
+                The ID is used to identify a single installation of Camunda Platform."/>
 
     <@lib.property
         name = "product"

@@ -14,7 +14,7 @@
         <@lib.property
         name = "valid-until"
         type = "string"
-        format = "date-time"
+        format = "date"
         desc = "The expiration date of the license."/>
 
         <@lib.property
