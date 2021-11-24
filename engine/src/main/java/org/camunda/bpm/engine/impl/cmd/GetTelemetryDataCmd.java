@@ -16,10 +16,12 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
+import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 
 public class GetTelemetryDataCmd implements Command<TelemetryDataImpl> {
 
@@ -29,8 +31,13 @@ public class GetTelemetryDataCmd implements Command<TelemetryDataImpl> {
   public TelemetryDataImpl execute(CommandContext commandContext) {
     configuration = commandContext.getProcessEngineConfiguration();
 
-    TelemetryDataImpl telemetryData = configuration.getTelemetryReporter().getTelemetrySendingTask().updateAndSendData(false);
+    TelemetryReporter telemetryReporter = configuration.getTelemetryReporter();
+    if (telemetryReporter != null) {
+      TelemetryDataImpl telemetryData = telemetryReporter.getTelemetrySendingTask().updateAndSendData(false);
+      return telemetryData;
+    } else {
+      throw ProcessEngineLogger.TELEMETRY_LOGGER.exceptionWhileRetrievingTelemetryDataRegistryNull();
+    }
 
-    return telemetryData;
   }
 }

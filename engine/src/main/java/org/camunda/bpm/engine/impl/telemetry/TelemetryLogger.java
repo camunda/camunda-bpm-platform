@@ -125,6 +125,11 @@ public class TelemetryLogger extends ProcessEngineLogger {
       installationId);
   }
 
+  public ProcessEngineException exceptionWhileRetrievingTelemetryDataRegistryNull() {
+    return new ProcessEngineException(
+        exceptionMessage("019", "Error while retrieving telemetry data. Telemetry registry was not initialized."));
+  }
+
   protected String getInitialMessageText(boolean isInitialMessage) {
     return isInitialMessage ? "initial " : "";
   }

@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.mgmt;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.camunda.bpm.engine.management.Metrics.ACTIVTY_INSTANCE_START;
 import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_ELEMENTS;
 import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_INSTANCES;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.metrics.Meter;
 import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
@@ -48,6 +50,7 @@ import org.camunda.bpm.engine.impl.util.ParseUtil;
 import org.camunda.bpm.engine.telemetry.Command;
 import org.camunda.bpm.engine.telemetry.Metric;
 import org.camunda.bpm.engine.telemetry.TelemetryData;
+import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.After;
 import org.junit.Before;
@@ -269,6 +272,86 @@ public class ManagementServiceGetTelemetryDataTest {
     assertThat(secondTelemetryData.getProduct().getInternals().getMetrics().get(ACTIVTY_INSTANCE_START).getCount()).isEqualTo(5);
   }
 
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void shouldCollectMetrics_TelemetryEnabled() {
+    // given
+    managementService.toggleTelemetry(true);
+
+    // when
+    TelemetryData telemetryDataBeforePiStart = managementService.getTelemetryData();
+    engineRule.getRuntimeService().startProcessInstanceByKey("oneTaskProcess");
+    TelemetryData telemetryDataAfterPiStart = managementService.getTelemetryData();
+
+    // then
+    assertThat(telemetryDataBeforePiStart.getProduct().getInternals().getMetrics().get(ROOT_PROCESS_INSTANCE_START).getCount()).isEqualTo(0);
+    assertThat(telemetryDataAfterPiStart.getProduct().getInternals().getMetrics().get(ROOT_PROCESS_INSTANCE_START).getCount()).isEqualTo(1);
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void shouldCollectMetrics_TelemetryDisabled() {
+    // given
+    managementService.toggleTelemetry(false);
+
+    // when
+    TelemetryData telemetryDataBeforePiStart = managementService.getTelemetryData();
+    engineRule.getRuntimeService().startProcessInstanceByKey("oneTaskProcess");
+    TelemetryData telemetryDataAfterPiStart = managementService.getTelemetryData();
+
+    // then
+    Metric rootPiStartMetricBeforePiStart = telemetryDataBeforePiStart.getProduct().getInternals().getMetrics().get(ROOT_PROCESS_INSTANCE_START);
+    Metric rootPiStartMetricAfterPiStart = telemetryDataAfterPiStart.getProduct().getInternals().getMetrics().get(ROOT_PROCESS_INSTANCE_START);
+
+    assertThat(rootPiStartMetricBeforePiStart.getCount()).isEqualTo(0);
+    assertThat(rootPiStartMetricAfterPiStart.getCount()).isEqualTo(1);
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void shouldCollectCommands_TelemetryEnabled() {
+    // given
+    managementService.toggleTelemetry(true);
+
+    // when
+    TelemetryData telemetryDataBeforePiStart = managementService.getTelemetryData();
+    // trigger Command invocation
+    managementService.isTelemetryEnabled();
+    TelemetryData telemetryDataAfterPiStart = managementService.getTelemetryData();
+
+    // then
+    assertThat(telemetryDataBeforePiStart.getProduct().getInternals().getCommands().get(IS_TELEMETRY_ENABLED_CMD_NAME)).isNull();
+    assertThat(telemetryDataAfterPiStart.getProduct().getInternals().getCommands().get(IS_TELEMETRY_ENABLED_CMD_NAME).getCount()).isEqualTo(1);
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void shouldCollectCommands_TelemetryDisabled() {
+    // given
+    managementService.toggleTelemetry(false);
+
+    // when
+    TelemetryData telemetryDataBeforePiStart = managementService.getTelemetryData();
+    // trigger Command invocation
+    managementService.isTelemetryEnabled();
+    TelemetryData telemetryDataAfterPiStart = managementService.getTelemetryData();
+
+    // then
+    assertThat(telemetryDataBeforePiStart.getProduct().getInternals().getCommands().get(IS_TELEMETRY_ENABLED_CMD_NAME)).isNull();
+    assertThat(telemetryDataAfterPiStart.getProduct().getInternals().getCommands().get(IS_TELEMETRY_ENABLED_CMD_NAME).getCount()).isEqualTo(1);
+  }
+
+  @Test
+  public void shouldThrowExceptionOnNullTelemetryReporter() {
+    // given
+    configuration.setTelemetryReporter(null);
+
+    // when
+    assertThatThrownBy(() -> managementService.getTelemetryData())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Error while retrieving telemetry data. Telemetry registry was not initialized.");
+  }
+
   protected void assertTelemetryData(TelemetryData data, boolean telemetryEnabled) {
     assertThat(data).isNotNull();
 
@@ -289,8 +372,6 @@ public class ManagementServiceGetTelemetryDataTest {
     assertThat(data.getProduct().getInternals().getJdk().getVersion()).isNotNull();
 
     assertThat(data.getProduct().getInternals().getLicenseKey().getCustomer()).isEqualTo(LICENSE_CUSTOMER_NAME);
-
-    assertThat(data.getProduct().getInternals().isTelemetryEnabled()).isEqualTo(telemetryEnabled);
 
     assertThat(data.getProduct().getInternals().getCommands()).containsKeys(GET_TELEMETRY_DATA_CMD_NAME, IS_TELEMETRY_ENABLED_CMD_NAME);
     assertThat(data.getProduct().getInternals().getCommands().get(GET_TELEMETRY_DATA_CMD_NAME).getCount()).isEqualTo(3);

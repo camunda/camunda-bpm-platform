@@ -25,8 +25,8 @@ import java.util.Map;
  */
 public class MetricsRegistry {
 
-  protected Map<String, Meter> dbMeters = new HashMap<String, Meter>();
-  protected Map<String, Meter> telemetryMeters = new HashMap<String, Meter>();
+  protected Map<String, Meter> dbMeters = new HashMap<>();
+  protected Map<String, Meter> telemetryMeters = new HashMap<>();
 
   protected boolean isCollectingTelemetryMetrics = false;
 
@@ -56,9 +56,7 @@ public class MetricsRegistry {
 
   public void markOccurrence(String name, long times) {
     markOccurrence(dbMeters, name, times);
-    if (isCollectingTelemetryMetrics) {
-      markOccurrence(telemetryMeters, name, times);
-    }
+    markOccurrence(telemetryMeters, name, times);
   }
 
   public void markTelemetryOccurrence(String name, long times) {

@@ -89,8 +89,4 @@ public interface Internals {
    */
   public Jdk getJdk();
 
-  /**
-   * Flag that indicates if sending of telemetry data was enabled.
-   */
-  public Boolean isTelemetryEnabled();
 }
