@@ -63,13 +63,16 @@ public class TelemetryConfigureCmd implements Command<Void> {
     boolean isReportedActivated = processEngineConfiguration.isTelemetryReporterActivate();
     TelemetryReporter telemetryReporter = processEngineConfiguration.getTelemetryReporter();
 
-    if (isReportedActivated) {
-      // telemetry enabled or set for the first time
-      if (currentValue == null || (!currentValue.booleanValue() && telemetryEnabled)) {
+    // telemetry enabled or set for the first time
+    if (currentValue == null || (!currentValue.booleanValue() && telemetryEnabled)) {
+      if (isReportedActivated) {
         telemetryReporter.reschedule(currentValue == null);
       }
-
+      // reset collected data when telemetry is enabled
+      // we don't want to send data that has been collected before consent was given
+      processEngineConfiguration.getTelemetryRegistry().clear();
     }
+
 
     // update registry flags
     TelemetryUtil.updateCollectingTelemetryDataEnabled(

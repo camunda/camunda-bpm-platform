@@ -936,6 +936,42 @@ public class TelemetryReporterTest {
   }
 
   @Test
+  public void shouldNotSendTelemetryDataCollectedBeforeTelemetryEnabled() {
+    // given
+    TelemetryReporter telemetryReporter = configuration.getTelemetryReporter();
+
+    // when
+    // execute some commands
+    managementService.isTelemetryEnabled();
+    managementService.getHistoryLevel();
+    managementService.getHistoryLevel();
+    managementService.getHistoryLevel();
+
+    // enable telemetry
+    managementService.toggleTelemetry(true);
+
+    // execute another command
+    managementService.getHistoryLevel();
+    managementService.getLicenseKey();
+
+    // set up stub
+    TelemetryDataImpl expectedData = adjustDataWithCommandCounts(configuration.getTelemetryData());
+
+    String requestBody = new Gson().toJson(expectedData);
+    stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+            .willReturn(aResponse()
+                        .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
+
+    // report
+    telemetryReporter.reportNow();
+
+    // then
+    verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+        .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
+        .withHeader("Content-Type",  equalTo("application/json")));
+  }
+
+  @Test
   @WatchLogger(loggerNames = {"org.camunda.bpm.engine.telemetry"}, level = "DEBUG")
   public void shouldLogTelemetryDisabled() {
     // given default configuration

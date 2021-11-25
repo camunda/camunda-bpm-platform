@@ -17,7 +17,6 @@
 package org.camunda.bpm.engine.test.api.mgmt.telemetry;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.Map;
 
 import org.camunda.bpm.engine.ManagementService;
@@ -31,6 +30,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.metrics.Meter;
 import org.camunda.bpm.engine.impl.telemetry.CommandCounter;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
+import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -104,11 +104,14 @@ public class TelemetryDynamicDataTest {
     // then
     TelemetryRegistry telemetryRegistry = processEngineInMem.getProcessEngineConfiguration().getTelemetryRegistry();
     Map<String, CommandCounter> entries = telemetryRegistry.getCommands();
-    assertThat(entries.size()).isEqualTo(3);
     assertThat(entries.keySet()).containsExactlyInAnyOrder(
         "IsTelemetryEnabledCmd",
         "NoInitMessageBootstrapEngineCommand",
-        "GetLicenseKeyCmd");
+        "GetLicenseKeyCmd",
+        "GetTableMetaDataCmd",
+        "HistoryCleanupCmd",
+        "SchemaOperationsProcessEngineBuild",
+        "HistoryLevelSetupCommand");
     for (String commandName : entries.keySet()) {
       assertThat(entries.get(commandName).get()).isEqualTo(1);
     }
@@ -141,31 +144,38 @@ public class TelemetryDynamicDataTest {
   }
 
   @Test
-  public void shouldCollectCommandsDataOnlyWhenTelemetryEnabled() {
+  public void shouldResetCollectedCommandsDataWhenTelemetryEnabled() {
     // given default telemetry data and empty telemetry registry
 
-    // execute commands
+    // when execute commands
     managementService.getHistoryLevel();
     managementService.getLicenseKey();
+
+    // then
     Map<String, CommandCounter> commands = configuration.getTelemetryRegistry().getCommands();
-    assertThat(commands.size()).isZero();
+    assertThat(commands.size()).isEqualTo(3);
+    assertThat(commands.get("GetLicenseKeyCmd").get()).isEqualTo(1);
+    assertThat(commands.get("GetHistoryLevelCmd").get()).isEqualTo(1);
+    assertThat(commands.keySet()).contains("DeleteMetricsCmd");
 
     // when
     managementService.toggleTelemetry(true);
     // execute commands
-    managementService.getHistoryLevel();
-    managementService.getLicenseKey();
+    managementService.getTelemetryData();
+    managementService.getTelemetryData();
+    managementService.isTelemetryEnabled();
 
-    // when
+    // then
     assertThat(commands.size()).isEqualTo(3);
-    String [] expectedExcutedCommands = {"GetLicenseKeyCmd","GetHistoryLevelCmd","TelemetryConfigureCmd"};
-    assertThat(commands.keySet()).isSubsetOf(expectedExcutedCommands);
+    assertThat(commands.get("GetTelemetryDataCmd").get()).isEqualTo(2);
+    assertThat(commands.get("IsTelemetryEnabledCmd").get()).isEqualTo(1);
+    assertThat(commands.get("TelemetryConfigureCmd").get()).isEqualTo(1);
   }
 
 
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
-  public void shouldNotCollectMetricsDataWhenTelemetryDisabled() {
+  public void shouldCollectMetricsDataWhenTelemetryDisabled() {
     // given
     managementService.toggleTelemetry(false);
     for (int i = 0; i < 3; i++) {
@@ -177,10 +187,10 @@ public class TelemetryDynamicDataTest {
 
     // then
     Map<String, Meter> telemetryMeters = configuration.getMetricsRegistry().getTelemetryMeters();
-    for (String meter : telemetryMeters.keySet()) {
-      assertThat(telemetryMeters.get(meter).get()).isZero();
-    }
-
+    assertThat(telemetryMeters.get(Metrics.ROOT_PROCESS_INSTANCE_START).get()).isEqualTo(3);
+    assertThat(telemetryMeters.get(Metrics.ACTIVTY_INSTANCE_START).get()).isEqualTo(6);
+    assertThat(telemetryMeters.get(Metrics.EXECUTED_DECISION_ELEMENTS).get()).isEqualTo(0);
+    assertThat(telemetryMeters.get(Metrics.EXECUTED_DECISION_INSTANCES).get()).isEqualTo(0);
   }
 
   @Test
