@@ -14,34 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest;
+package org.camunda.bpm.engine.rest.dto.telemetry;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+public class CommandDto {
 
-import org.camunda.bpm.engine.rest.dto.TelemetryConfigurationDto;
+  protected long count;
 
-@Produces(MediaType.APPLICATION_JSON)
-public interface TelemetryRestService {
+  public CommandDto(long count) {
+    this.count = count;
+  }
 
-  String PATH = "/telemetry";
+  public long getCount() {
+    return count;
+  }
 
-  @POST
-  @Path("/configuration")
-  @Consumes(MediaType.APPLICATION_JSON)
-  void configureTelemetry(TelemetryConfigurationDto dto);
+  public void setCount(long count) {
+    this.count = count;
+  }
 
-  @GET
-  @Path("/configuration")
-  @Produces(MediaType.APPLICATION_JSON)
-  TelemetryConfigurationDto getTelemetryConfiguration();
-
-  @GET
-  @Path("/data")
-  @Produces(MediaType.APPLICATION_JSON)
-  Object getTelemetryData();
 }

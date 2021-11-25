@@ -18,15 +18,15 @@ package org.camunda.bpm.engine.rest;
 
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ManagementService;
-import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
+import org.camunda.bpm.engine.rest.dto.telemetry.TelemetryDataDto;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-import com.google.gson.Gson;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.http.ContentType;
 import java.util.HashMap;
 import java.util.Map;
@@ -180,16 +180,18 @@ public class TelemetryRestServiceTest extends AbstractRestServiceTest {
   }
 
   @Test
-  public void shouldGetTelemetryData() {
-    TelemetryDataImpl exampleTelemetryData = MockProvider.EXAMPLE_TELEMETRY_DATA;
-    when(managementServiceMock.getTelemetryData()).thenReturn(exampleTelemetryData);
+  public void shouldGetTelemetryData() throws JsonProcessingException {
+    when(managementServiceMock.getTelemetryData()).thenReturn(MockProvider.EXAMPLE_TELEMETRY_DATA);
+    TelemetryDataDto expectedTelemetryData = TelemetryDataDto.fromEngineDto(MockProvider.EXAMPLE_TELEMETRY_DATA);
+    ObjectMapper mapper = new ObjectMapper();
+    String expectedJson = mapper.writeValueAsString(expectedTelemetryData);
 
     given()
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
         .contentType(ContentType.JSON)
-          .body(equalTo(new Gson().toJson(exampleTelemetryData)))
+          .body(equalTo(expectedJson))
     .when()
       .get(TELEMETRY_DATA_URL);
 

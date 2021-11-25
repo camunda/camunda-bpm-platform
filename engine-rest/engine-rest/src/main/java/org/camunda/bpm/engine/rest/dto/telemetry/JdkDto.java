@@ -14,34 +14,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest;
+package org.camunda.bpm.engine.rest.dto.telemetry;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import org.camunda.bpm.engine.telemetry.Jdk;
 
-import org.camunda.bpm.engine.rest.dto.TelemetryConfigurationDto;
+public class JdkDto {
 
-@Produces(MediaType.APPLICATION_JSON)
-public interface TelemetryRestService {
+  protected String version;
+  protected String vendor;
 
-  String PATH = "/telemetry";
+  public JdkDto(String version, String vendor) {
+    this.version = version;
+    this.vendor = vendor;
+  }
 
-  @POST
-  @Path("/configuration")
-  @Consumes(MediaType.APPLICATION_JSON)
-  void configureTelemetry(TelemetryConfigurationDto dto);
+  public String getVersion() {
+    return version;
+  }
 
-  @GET
-  @Path("/configuration")
-  @Produces(MediaType.APPLICATION_JSON)
-  TelemetryConfigurationDto getTelemetryConfiguration();
+  public void setVersion(String version) {
+    this.version = version;
+  }
 
-  @GET
-  @Path("/data")
-  @Produces(MediaType.APPLICATION_JSON)
-  Object getTelemetryData();
+  public String getVendor() {
+    return vendor;
+  }
+
+  public void setVendor(String vendor) {
+    this.vendor = vendor;
+  }
+
+  public static JdkDto fromEngineDto(Jdk other) {
+    return new JdkDto(
+        other.getVendor(),
+        other.getVersion());
+  }
 }
