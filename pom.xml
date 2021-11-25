@@ -30,7 +30,7 @@
     <version.uuid-generator>3.2.0</version.uuid-generator>
     <version.camunda.commons>1.10.0</version.camunda.commons>
     <version.camunda.connect>1.5.2</version.camunda.connect>
-    <version.camunda.spin>1.12.0</version.camunda.spin>
+    <version.camunda.spin>1.13.0-SNAPSHOT</version.camunda.spin>
     <version.camunda.template-engines>2.1.0</version.camunda.template-engines>
     <version.camunda.ee.xslt-plugin>1.1.0</version.camunda.ee.xslt-plugin>
     <version.feel-scala>1.13.3</version.feel-scala>
