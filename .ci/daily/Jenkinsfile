@@ -229,8 +229,10 @@ pipeline {
           parallel(cambpmGetMatrixStages('daily-stages', failedStageTypes, { stageInfo ->
             List allowedStageLabels = stageInfo.allowedLabels
             String dbLabel = stageInfo.nodeType
-            echo stageInfo.stageType
-            return cambpmWithLabels(allowedStageLabels.minus('cockroachdb'), cambpmGetDbType(dbLabel))
+            boolean triggerStatus = cambpmWithLabels(allowedStageLabels.minus('cockroachdb'), cambpmGetDbType(dbLabel))
+            echo stageInfo.stageType + ' ' + stageInfo.nodeType
+            echo 'Trigger: ' + triggerStatus
+            return triggerStatus
           }))
         }
       }
