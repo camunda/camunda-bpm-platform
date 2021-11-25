@@ -53,41 +53,41 @@ pipeline {
         ])
       }
     }
-    stage('Misc') {
-      parallel {
-        stage('check-sql-scripts') {
-          steps {
-            cambpmConditionalRetry([
-              agentLabel: 'centos-stable',
-              runSteps: {
-                sh '.ci/scripts/check-sql-scripts.sh'
-              }
-            ])
-          }
-        }
-        stage('stage-javadocs') {
-          when {
-            branch cambpmDefaultBranch();
-          }
-          steps {
-            cambpmConditionalRetry([
-              agentLabel : 'centos-stable',
-              runSteps   : {
-                sh 'mkdir -p ./webapps/target/webapp'
-                cambpmRunMaven('.',
-                  'package javadoc:javadoc javadoc:aggregate -Pdistro,distro-wildfly,distro-webjar,javadocs -DskipTests=true -Dskip.frontend.build=true',
-                  withNpm: true,
-                  jdkVersion: 'jdk-11-latest')
-              },
-              postSuccess: {
-                def projectVersion = cambpmUtils.getMavenProjectVersion()
-                cambpmPublishJavadocs("\"target/site/apidocs/\"", projectVersion)
-              }
-            ])
-          }
-        }
-      }
-    }
+//    stage('Misc') {
+//      parallel {
+//        stage('check-sql-scripts') {
+//          steps {
+//            cambpmConditionalRetry([
+//              agentLabel: 'centos-stable',
+//              runSteps: {
+//                sh '.ci/scripts/check-sql-scripts.sh'
+//              }
+//            ])
+//          }
+//        }
+//        stage('stage-javadocs') {
+//          when {
+//            branch cambpmDefaultBranch();
+//          }
+//          steps {
+//            cambpmConditionalRetry([
+//              agentLabel : 'centos-stable',
+//              runSteps   : {
+//                sh 'mkdir -p ./webapps/target/webapp'
+//                cambpmRunMaven('.',
+//                  'package javadoc:javadoc javadoc:aggregate -Pdistro,distro-wildfly,distro-webjar,javadocs -DskipTests=true -Dskip.frontend.build=true',
+//                  withNpm: true,
+//                  jdkVersion: 'jdk-11-latest')
+//              },
+//              postSuccess: {
+//                def projectVersion = cambpmUtils.getMavenProjectVersion()
+//                cambpmPublishJavadocs("\"target/site/apidocs/\"", projectVersion)
+//              }
+//            ])
+//          }
+//        }
+//      }
+//    }
     stage('Standalone QA tests') {
       parallel {
         stage('sql-scripts-h2') {
@@ -229,22 +229,23 @@ pipeline {
           parallel(cambpmGetMatrixStages('daily-stages', failedStageTypes, { stageInfo ->
             List allowedStageLabels = stageInfo.allowedLabels
             String dbLabel = stageInfo.nodeType
+            echo stageInfo.stageType
             return cambpmWithLabels(allowedStageLabels.minus('cockroachdb'), cambpmGetDbType(dbLabel))
           }))
         }
       }
     }
-    stage('JDKs') {
-      steps {
-        script {
-          // see the .ci/config/matrices.yaml for the stage generation values
-          // see .ci/config/stage-types.yaml for the stage configurations
-          parallel(cambpmGetMatrixStages('jdk-ce-stages', failedStageTypes, { stageInfo ->
-            return cambpmWithLabels('default-build')
-          }))
-        }
-      }
-    }
+//    stage('JDKs') {
+//      steps {
+//        script {
+//          // see the .ci/config/matrices.yaml for the stage generation values
+//          // see .ci/config/stage-types.yaml for the stage configurations
+//          parallel(cambpmGetMatrixStages('jdk-ce-stages', failedStageTypes, { stageInfo ->
+//            return cambpmWithLabels('default-build')
+//          }))
+//        }
+//      }
+//    }
   }
   post {
     changed {
