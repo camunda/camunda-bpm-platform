@@ -88,139 +88,139 @@ pipeline {
 //        }
 //      }
 //    }
-    stage('Standalone QA tests') {
-      parallel {
-        stage('sql-scripts-h2') {
-          when {
-            expression {
-              cambpmWithLabels('h2', 'all-db')
-            }
-          }
-          steps {
-            cambpmConditionalRetry([
-              agentLabel: 'h2',
-              runSteps: {
-                cambpmRunMavenByStageType('sql-scripts', 'h2')
-              },
-              postFailure: {
-                cambpmAddFailedStageType(failedStageTypes, 'sql-scripts')
-              }
-            ])
-          }
-        }
-        stage('wildfly-subsystem-UNIT-wildfly') {
-          when {
-            expression {
-              cambpmWithLabels('wildfly')
-            }
-          }
-          steps {
-            cambpmConditionalRetry([
-              agentLabel: 'h2',
-              runSteps: {
-                cambpmRunMaven('distro/wildfly/subsystem', 'test', runtimeStash: true)
-              },
-              postFailure: {
-                cambpmPublishTestResult()
-              }
-            ])
-          }
-        }
-        stage('UPGRADE-databases-from-714-h2') {
-          when {
-            expression {
-              cambpmWithLabels('h2', 'all-db')
-            }
-          }
-          steps {
-            cambpmConditionalRetry([
-              agentLabel: 'h2',
-              runSteps: {
-                cambpmRunMavenByStageType('upgrade-database', 'h2')
-              },
-              postFailure: {
-                cambpmPublishTestResult()
-                cambpmAddFailedStageType(failedStageTypes, 'upgrade-database')
-              }
-            ])
-          }
-        }
-        stage('UPGRADE-instance-migration-h2') {
-          when {
-            expression {
-              cambpmWithLabels('default-build', 'migration')
-            }
-          }
-          steps {
-            cambpmConditionalRetry([
-              agentLabel: 'h2',
-              runSteps: {
-                cambpmRunMavenByStageType('instance-migration', 'h2')
-              },
-              postFailure: {
-                cambpmPublishTestResult()
-                cambpmAddFailedStageType(failedStageTypes, 'instance-migration')
-              }
-            ])
-          }
-        }
-        stage('UPGRADE-old-engine-from-714-h2') {
-          when {
-            expression {
-              cambpmWithLabels('h2', 'all-db')
-            }
-          }
-          steps {
-            cambpmConditionalRetry([
-              agentLabel: 'h2',
-              runSteps: {
-                cambpmRunMavenByStageType('old-engine', 'h2')
-              },
-              postFailure: {
-                cambpmPublishTestResult()
-                cambpmAddFailedStageType(failedStageTypes, 'old-engine')
-              }
-            ])
-          }
-        }
-        stage('UPGRADE-rolling-update-h2') {
-          when {
-            expression {
-              cambpmWithLabels('rolling-update', 'default-build')
-            }
-          }
-          steps {
-            cambpmConditionalRetry([
-              agentLabel: 'h2',
-              runSteps: {
-                cambpmRunMavenByStageType('rolling-update', 'h2')
-              },
-              postFailure: {
-                cambpmPublishTestResult()
-                cambpmAddFailedStageType(failedStageTypes, 'rolling-update')
-              }
-            ])
-          }
-        }
-        stage('PERFORMANCE-large-data-h2') {
-          when {
-            branch cambpmDefaultBranch();
-          }
-          steps {
-            cambpmConditionalRetry([
-              agentLabel: 'h2',
-              runSteps: {
-                cambpmRunMavenByStageType('large-data-tests', 'h2')
-              },
-              postFailure: {
-                cambpmPublishTestResult()
-                cambpmAddFailedStageType(failedStageTypes, 'large-data-tests')
-              }
-            ])
-          }
-        }
-      }
-    }
+//    stage('Standalone QA tests') {
+//      parallel {
+//        stage('sql-scripts-h2') {
+//          when {
+//            expression {
+//              cambpmWithLabels('h2', 'all-db')
+//            }
+//          }
+//          steps {
+//            cambpmConditionalRetry([
+//              agentLabel: 'h2',
+//              runSteps: {
+//                cambpmRunMavenByStageType('sql-scripts', 'h2')
+//              },
+//              postFailure: {
+//                cambpmAddFailedStageType(failedStageTypes, 'sql-scripts')
+//              }
+//            ])
+//          }
+//        }
+//        stage('wildfly-subsystem-UNIT-wildfly') {
+//          when {
+//            expression {
+//              cambpmWithLabels('wildfly')
+//            }
+//          }
+//          steps {
+//            cambpmConditionalRetry([
+//              agentLabel: 'h2',
+//              runSteps: {
+//                cambpmRunMaven('distro/wildfly/subsystem', 'test', runtimeStash: true)
+//              },
+//              postFailure: {
+//                cambpmPublishTestResult()
+//              }
+//            ])
+//          }
+//        }
+//        stage('UPGRADE-databases-from-714-h2') {
+//          when {
+//            expression {
+//              cambpmWithLabels('h2', 'all-db')
+//            }
+//          }
+//          steps {
+//            cambpmConditionalRetry([
+//              agentLabel: 'h2',
+//              runSteps: {
+//                cambpmRunMavenByStageType('upgrade-database', 'h2')
+//              },
+//              postFailure: {
+//                cambpmPublishTestResult()
+//                cambpmAddFailedStageType(failedStageTypes, 'upgrade-database')
+//              }
+//            ])
+//          }
+//        }
+//        stage('UPGRADE-instance-migration-h2') {
+//          when {
+//            expression {
+//              cambpmWithLabels('default-build', 'migration')
+//            }
+//          }
+//          steps {
+//            cambpmConditionalRetry([
+//              agentLabel: 'h2',
+//              runSteps: {
+//                cambpmRunMavenByStageType('instance-migration', 'h2')
+//              },
+//              postFailure: {
+//                cambpmPublishTestResult()
+//                cambpmAddFailedStageType(failedStageTypes, 'instance-migration')
+//              }
+//            ])
+//          }
+//        }
+//        stage('UPGRADE-old-engine-from-714-h2') {
+//          when {
+//            expression {
+//              cambpmWithLabels('h2', 'all-db')
+//            }
+//          }
+//          steps {
+//            cambpmConditionalRetry([
+//              agentLabel: 'h2',
+//              runSteps: {
+//                cambpmRunMavenByStageType('old-engine', 'h2')
+//              },
+//              postFailure: {
+//                cambpmPublishTestResult()
+//                cambpmAddFailedStageType(failedStageTypes, 'old-engine')
+//              }
+//            ])
+//          }
+//        }
+//        stage('UPGRADE-rolling-update-h2') {
+//          when {
+//            expression {
+//              cambpmWithLabels('rolling-update', 'default-build')
+//            }
+//          }
+//          steps {
+//            cambpmConditionalRetry([
+//              agentLabel: 'h2',
+//              runSteps: {
+//                cambpmRunMavenByStageType('rolling-update', 'h2')
+//              },
+//              postFailure: {
+//                cambpmPublishTestResult()
+//                cambpmAddFailedStageType(failedStageTypes, 'rolling-update')
+//              }
+//            ])
+//          }
+//        }
+//        stage('PERFORMANCE-large-data-h2') {
+//          when {
+//            branch cambpmDefaultBranch();
+//          }
+//          steps {
+//            cambpmConditionalRetry([
+//              agentLabel: 'h2',
+//              runSteps: {
+//                cambpmRunMavenByStageType('large-data-tests', 'h2')
+//              },
+//              postFailure: {
+//                cambpmPublishTestResult()
+//                cambpmAddFailedStageType(failedStageTypes, 'large-data-tests')
+//              }
+//            ])
+//          }
+//        }
+//      }
+//    }
     stage('QA DB tests') {
       steps {
         script {
