@@ -83,6 +83,7 @@ public class ManagementServiceGetTelemetryDataTest {
   protected MetricsRegistry metricsRegistry;
 
   protected TelemetryDataImpl defaultTelemetryData;
+  protected TelemetryReporter defaultTelemetryReporter;
 
   @Before
   public void setup() {
@@ -95,6 +96,7 @@ public class ManagementServiceGetTelemetryDataTest {
     configuration.getTelemetryRegistry().clear();
 
     defaultTelemetryData = new TelemetryDataImpl(configuration.getTelemetryData());
+    defaultTelemetryReporter = configuration.getTelemetryReporter();
   }
 
   @After
@@ -107,6 +109,7 @@ public class ManagementServiceGetTelemetryDataTest {
     configuration.getTelemetryRegistry().clear();
 
     configuration.setTelemetryData(defaultTelemetryData);
+    configuration.setTelemetryReporter(defaultTelemetryReporter);
   }
 
   protected void clearMetrics() {
@@ -223,6 +226,7 @@ public class ManagementServiceGetTelemetryDataTest {
   @Test
   public void shouldReturnMetrics() {
     // given
+    configuration.initDatabaseType();
     MetricsRegistry metricsRegistry = configuration.getMetricsRegistry();
     // create metrics data
     metricsRegistry.markTelemetryOccurrence(ACTIVTY_INSTANCE_START, 5);
