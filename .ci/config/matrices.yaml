@@ -60,12 +60,12 @@ daily-stages:
   - 'sqlserver_2017'
   - 'sqlserver_2019'
   stages: 
-  - 'sql-scripts'
-  - 'upgrade-database'
+#  - 'sql-scripts'
+#  - 'upgrade-database'
   - 'instance-migration'
-  - 'old-engine'
-  - 'rolling-update'
-  - 'large-data-tests'
+#  - 'old-engine'
+#  - 'rolling-update'
+#  - 'large-data-tests'
 sidetrack-stages:
   databases:
   - 'cockroachdb_201'
