@@ -25,6 +25,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -34,6 +35,7 @@ import org.springframework.test.context.junit4.SpringRunner;
   "camunda.bpm.webapp.session-cookie.cookieName=myFancyCookieName",
   "server.servlet.session.cookie.name=myFancyCookieName"
 })
+@DirtiesContext
 public class CookieNameIT {
 
   @Rule
