@@ -146,20 +146,30 @@ public class TelemetryMultipleEnginesTest {
   @Test
   public void shouldUpdateTelemetryFlagDuringReporting() {
     // given
+    MetricsRegistry secondMetricsRegistry = getMetricsRegistry(secondEngine);
+    secondMetricsRegistry.markOccurrence(Metrics.ROOT_PROCESS_INSTANCE_START);
+
     defaultEngine.getManagementService().toggleTelemetry(true);
+
+    secondMetricsRegistry.markOccurrence(Metrics.ROOT_PROCESS_INSTANCE_START);
 
     // when
     secondTelemetryReporter.reportNow();
 
     // then
-    assertThat(defaultEngine.getProcessEngineConfiguration().getTelemetryRegistry().isCollectingTelemetryDataEnabled())
-        .isTrue();
-    assertThat(secondEngine.getProcessEngineConfiguration().getTelemetryRegistry().isCollectingTelemetryDataEnabled())
-        .isTrue();
-    assertThat(((ProcessEngineConfigurationImpl) defaultEngine.getProcessEngineConfiguration()).getMetricsRegistry()
-        .isCollectingTelemetryMetrics()).isTrue();
-    assertThat(((ProcessEngineConfigurationImpl) secondEngine.getProcessEngineConfiguration()).getMetricsRegistry()
-        .isCollectingTelemetryMetrics()).isTrue();
+    // the metrics collected before the next reporting cycle were reset
+    Meter rootPiMeter = secondMetricsRegistry.getTelemetryMeters().get(Metrics.ROOT_PROCESS_INSTANCE_START);
+    assertThat(rootPiMeter.get()).isEqualTo(0);
+
+    List<LoggedRequest> requests = wireMockRule.findAll(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH)));
+
+    assertThat(requests).hasSize(1);
+
+    Gson gson = JsonTestUtil.createTelemetryDataMapper();
+
+    LoggedRequest defaultRequest = requests.get(0);
+    TelemetryDataImpl defaultRequestBody = gson.fromJson(defaultRequest.getBodyAsString(), TelemetryDataImpl.class);
+    assertReportedMetrics(defaultRequestBody, 0, 0, 0);
   }
 
   @Test
@@ -239,6 +249,11 @@ public class TelemetryMultipleEnginesTest {
   public void tearDown() {
     WireMock.resetAllRequests();
     clearMetrics();
+
+    // deactivating telemetry on both engines, so that the in-memory state
+    // is also updated
+    defaultEngine.getManagementService().toggleTelemetry(false);
+    secondEngine.getManagementService().toggleTelemetry(false);
   }
 
   protected void clearMetrics() {

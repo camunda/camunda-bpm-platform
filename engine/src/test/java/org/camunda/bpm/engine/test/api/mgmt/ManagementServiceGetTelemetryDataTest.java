@@ -22,6 +22,7 @@ import static org.camunda.bpm.engine.management.Metrics.ACTIVTY_INSTANCE_START;
 import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_ELEMENTS;
 import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_INSTANCES;
 import static org.camunda.bpm.engine.management.Metrics.ROOT_PROCESS_INSTANCE_START;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -33,6 +34,7 @@ import java.util.stream.Stream;
 
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.metrics.Meter;
 import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
@@ -47,6 +49,7 @@ import org.camunda.bpm.engine.impl.telemetry.dto.ProductImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 import org.camunda.bpm.engine.impl.util.ParseUtil;
+import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.telemetry.Command;
 import org.camunda.bpm.engine.telemetry.Metric;
 import org.camunda.bpm.engine.telemetry.TelemetryData;
@@ -78,6 +81,7 @@ public class ManagementServiceGetTelemetryDataTest {
 
   protected ProcessEngineConfigurationImpl configuration;
   protected ManagementService managementService;
+  protected RuntimeService runtimeService;
 
   protected TelemetryRegistry telemetryRegistry;
   protected MetricsRegistry metricsRegistry;
@@ -89,6 +93,7 @@ public class ManagementServiceGetTelemetryDataTest {
   public void setup() {
     configuration = engineRule.getProcessEngineConfiguration();
     managementService = engineRule.getManagementService();
+    runtimeService = engineRule.getRuntimeService();
     telemetryRegistry = configuration.getTelemetryRegistry();
     metricsRegistry = configuration.getMetricsRegistry();
 
@@ -182,7 +187,6 @@ public class ManagementServiceGetTelemetryDataTest {
     managementService.toggleTelemetry(true);
     createTestData();
 
-
     // when
     TelemetryData telemetryData = managementService.getTelemetryData();
 
@@ -253,10 +257,12 @@ public class ManagementServiceGetTelemetryDataTest {
     // create command data
     telemetryRegistry.markOccurrence(IS_TELEMETRY_ENABLED_CMD_NAME, 10);
 
-    // when
     TelemetryData firstTelemetryData = managementService.getTelemetryData();
+
+    // when
     TelemetryData secondTelemetryData = managementService.getTelemetryData();
 
+    // then
     assertThat(firstTelemetryData.getProduct().getInternals().getCommands().get(IS_TELEMETRY_ENABLED_CMD_NAME).getCount()).isEqualTo(10);
     assertThat(secondTelemetryData.getProduct().getInternals().getCommands().get(IS_TELEMETRY_ENABLED_CMD_NAME).getCount()).isEqualTo(10);
   }
@@ -268,10 +274,12 @@ public class ManagementServiceGetTelemetryDataTest {
     // create command data
     metricsRegistry.markTelemetryOccurrence(ACTIVTY_INSTANCE_START, 5);
 
-    // when
     TelemetryData firstTelemetryData = managementService.getTelemetryData();
+
+    // when
     TelemetryData secondTelemetryData = managementService.getTelemetryData();
 
+    // then
     assertThat(firstTelemetryData.getProduct().getInternals().getMetrics().get(ACTIVTY_INSTANCE_START).getCount()).isEqualTo(5);
     assertThat(secondTelemetryData.getProduct().getInternals().getMetrics().get(ACTIVTY_INSTANCE_START).getCount()).isEqualTo(5);
   }
@@ -281,10 +289,11 @@ public class ManagementServiceGetTelemetryDataTest {
   public void shouldCollectMetrics_TelemetryEnabled() {
     // given
     managementService.toggleTelemetry(true);
+    TelemetryData telemetryDataBeforePiStart = managementService.getTelemetryData();
+
+    engineRule.getRuntimeService().startProcessInstanceByKey("oneTaskProcess");
 
     // when
-    TelemetryData telemetryDataBeforePiStart = managementService.getTelemetryData();
-    engineRule.getRuntimeService().startProcessInstanceByKey("oneTaskProcess");
     TelemetryData telemetryDataAfterPiStart = managementService.getTelemetryData();
 
     // then
@@ -297,10 +306,11 @@ public class ManagementServiceGetTelemetryDataTest {
   public void shouldCollectMetrics_TelemetryDisabled() {
     // given
     managementService.toggleTelemetry(false);
+    TelemetryData telemetryDataBeforePiStart = managementService.getTelemetryData();
+
+    engineRule.getRuntimeService().startProcessInstanceByKey("oneTaskProcess");
 
     // when
-    TelemetryData telemetryDataBeforePiStart = managementService.getTelemetryData();
-    engineRule.getRuntimeService().startProcessInstanceByKey("oneTaskProcess");
     TelemetryData telemetryDataAfterPiStart = managementService.getTelemetryData();
 
     // then
@@ -317,10 +327,11 @@ public class ManagementServiceGetTelemetryDataTest {
     // given
     managementService.toggleTelemetry(true);
 
-    // when
     TelemetryData telemetryDataBeforePiStart = managementService.getTelemetryData();
     // trigger Command invocation
     managementService.isTelemetryEnabled();
+
+    // when
     TelemetryData telemetryDataAfterPiStart = managementService.getTelemetryData();
 
     // then
@@ -333,11 +344,12 @@ public class ManagementServiceGetTelemetryDataTest {
   public void shouldCollectCommands_TelemetryDisabled() {
     // given
     managementService.toggleTelemetry(false);
-
-    // when
     TelemetryData telemetryDataBeforePiStart = managementService.getTelemetryData();
+
     // trigger Command invocation
     managementService.isTelemetryEnabled();
+
+    // when
     TelemetryData telemetryDataAfterPiStart = managementService.getTelemetryData();
 
     // then
@@ -354,6 +366,58 @@ public class ManagementServiceGetTelemetryDataTest {
     assertThatThrownBy(() -> managementService.getTelemetryData())
       .isInstanceOf(ProcessEngineException.class)
       .hasMessageContaining("Error while retrieving telemetry data. Telemetry registry was not initialized.");
+  }
+
+
+  @Test
+  public void shouldResetCollectedCommandsDataWhenTelemetryEnabled() {
+    // given default telemetry data and empty telemetry registry
+
+    // executed commands before telemetry is activated
+    managementService.getHistoryLevel();
+    managementService.getLicenseKey();
+
+    managementService.toggleTelemetry(true);
+
+    // execute commands after telemetry is activated
+    managementService.getTelemetryData();
+    managementService.getTelemetryData();
+    managementService.isTelemetryEnabled();
+
+    // when
+    TelemetryData telemetryData = managementService.getTelemetryData();
+
+    // then
+    Map<String, Command> commands = telemetryData.getProduct().getInternals().getCommands();
+    assertThat(commands.size()).isEqualTo(3);
+    assertThat(commands.get("GetTelemetryDataCmd").getCount()).isEqualTo(2);
+    assertThat(commands.get("IsTelemetryEnabledCmd").getCount()).isEqualTo(1);
+    assertThat(commands.get("TelemetryConfigureCmd").getCount()).isEqualTo(1);
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void shouldResetCollectedMetricsDataWhenTelemetryEnabled() {
+    // given default telemetry data and empty telemetry registry
+    // and some counted metrics
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // activating telemetry
+    managementService.toggleTelemetry(true);
+
+    // more collected metrics commands
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // when
+    TelemetryData telemetryData = managementService.getTelemetryData();
+
+    // then
+    Map<String, Metric> metrics = telemetryData.getProduct().getInternals().getMetrics();
+    assertThat(metrics.size()).isEqualTo(4);
+    assertThat(metrics.get(Metrics.ACTIVTY_INSTANCE_START).getCount()).isEqualTo(2);
+    assertThat(metrics.get(Metrics.ROOT_PROCESS_INSTANCE_START).getCount()).isEqualTo(1);
+    assertThat(metrics.get(Metrics.EXECUTED_DECISION_INSTANCES).getCount()).isEqualTo(0);
+    assertThat(metrics.get(Metrics.EXECUTED_DECISION_ELEMENTS).getCount()).isEqualTo(0);
   }
 
   protected void assertTelemetryData(TelemetryData data, boolean telemetryEnabled) {

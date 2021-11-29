@@ -76,8 +76,6 @@ public class TelemetryConfigurationTest {
     // then
     assertThat(inMemoryConfiguration.isInitializeTelemetry()).isNull();
     assertThat(inMemoryConfiguration.getManagementService().isTelemetryEnabled()).isNull();
-    assertThat(inMemoryConfiguration.getTelemetryRegistry().isCollectingTelemetryDataEnabled()).isFalse();
-    assertThat(inMemoryConfiguration.getMetricsRegistry().isCollectingTelemetryMetrics()).isFalse();
 
     // the telemetry reporter is always scheduled
     assertThat(inMemoryConfiguration.isTelemetryReporterActivate()).isTrue();
@@ -99,8 +97,6 @@ public class TelemetryConfigurationTest {
     // then
     assertThat(inMemoryConfiguration.isInitializeTelemetry()).isFalse();
     assertThat(inMemoryConfiguration.getManagementService().isTelemetryEnabled()).isFalse();
-    assertThat(inMemoryConfiguration.getTelemetryRegistry().isCollectingTelemetryDataEnabled()).isFalse();
-    assertThat(inMemoryConfiguration.getMetricsRegistry().isCollectingTelemetryMetrics()).isFalse();
 
     // the telemetry reporter is always scheduled
     assertThat(inMemoryConfiguration.isTelemetryReporterActivate()).isTrue();
@@ -123,8 +119,6 @@ public class TelemetryConfigurationTest {
     // then
     assertThat(inMemoryConfiguration.isInitializeTelemetry()).isTrue();
     assertThat(inMemoryConfiguration.getManagementService().isTelemetryEnabled()).isTrue();
-    assertThat(inMemoryConfiguration.getTelemetryRegistry().isCollectingTelemetryDataEnabled()).isTrue();
-    assertThat(inMemoryConfiguration.getMetricsRegistry().isCollectingTelemetryMetrics()).isTrue();
     assertThat(inMemoryConfiguration.getTelemetryReporter().getInitialReportingDelaySeconds()).isEqualTo(TelemetryReporter.DEFAULT_INIT_REPORT_DELAY_SECONDS);
   }
 

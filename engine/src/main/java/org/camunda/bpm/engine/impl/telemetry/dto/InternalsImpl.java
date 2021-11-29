@@ -97,12 +97,28 @@ public class InternalsImpl implements Internals {
     this.commands = commands;
   }
 
+  public void putCommand(String commandName, int count) {
+    if (commands == null) {
+      commands = new HashMap<>();
+    }
+
+    commands.put(commandName, new CommandImpl(count));
+  }
+
   public Map<String, Metric> getMetrics() {
     return metrics;
   }
 
   public void setMetrics(Map<String, Metric> metrics) {
     this.metrics = metrics;
+  }
+
+  public void putMetric(String metricName, int count) {
+    if (metrics == null) {
+      metrics = new HashMap<>();
+    }
+
+    metrics.put(metricName, new MetricImpl(count));
   }
 
   public void mergeDynamicData(InternalsImpl other) {

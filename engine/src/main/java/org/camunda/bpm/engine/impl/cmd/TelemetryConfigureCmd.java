@@ -68,16 +68,14 @@ public class TelemetryConfigureCmd implements Command<Void> {
       if (isReportedActivated) {
         telemetryReporter.reschedule(currentValue == null);
       }
-      // reset collected data when telemetry is enabled
-      // we don't want to send data that has been collected before consent was given
-      processEngineConfiguration.getTelemetryRegistry().clear();
     }
 
-
-    // update registry flags
-    TelemetryUtil.updateCollectingTelemetryDataEnabled(
+    // reset collected data when telemetry is enabled
+    // we don't want to send data that has been collected before consent was given
+    TelemetryUtil.toggleLocalTelemetry(
+        telemetryEnabled,
         processEngineConfiguration.getTelemetryRegistry(),
-        processEngineConfiguration.getMetricsRegistry(), telemetryEnabled);
+        processEngineConfiguration.getMetricsRegistry());
   }
 
 }

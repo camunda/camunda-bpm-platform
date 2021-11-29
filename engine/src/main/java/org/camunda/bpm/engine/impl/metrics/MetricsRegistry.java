@@ -28,8 +28,6 @@ public class MetricsRegistry {
   protected Map<String, Meter> dbMeters = new HashMap<>();
   protected Map<String, Meter> telemetryMeters = new HashMap<>();
 
-  protected boolean isCollectingTelemetryMetrics = false;
-
   public Meter getDbMeterByName(String name) {
     return dbMeters.get(name);
   }
@@ -42,12 +40,8 @@ public class MetricsRegistry {
     return telemetryMeters;
   }
 
-  public boolean isCollectingTelemetryMetrics() {
-    return isCollectingTelemetryMetrics;
-  }
-
-  public void setCollectingTelemetryMetrics(boolean isCollectingTelemetryMetrics) {
-    this.isCollectingTelemetryMetrics = isCollectingTelemetryMetrics;
+  public void clearTelemetryMetrics() {
+    telemetryMeters.values().forEach(Meter::getAndClear);
   }
 
   public void markOccurrence(String name) {

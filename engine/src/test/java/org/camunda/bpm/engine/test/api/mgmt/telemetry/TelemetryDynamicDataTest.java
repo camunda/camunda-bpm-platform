@@ -17,6 +17,8 @@
 package org.camunda.bpm.engine.test.api.mgmt.telemetry;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+
 import java.util.Map;
 
 import org.camunda.bpm.engine.ManagementService;
@@ -69,7 +71,6 @@ public class TelemetryDynamicDataTest {
   @After
   public void tearDown() {
     clearMetrics();
-    configuration.setTelemetryRegistry(new TelemetryRegistry());
     managementService.toggleTelemetry(false);
 
     if (processEngineInMem != null) {
@@ -94,7 +95,7 @@ public class TelemetryDynamicDataTest {
   }
 
   @Test
-  public void shouldCountCommandsFromEngineStart() {
+  public void shouldCountCommandsFromEngineStartAfterTelemetryActivation() {
     // when
     processEngineInMem =  new NoInitMessageInMemProcessEngineConfiguration()
         .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName())
@@ -104,14 +105,13 @@ public class TelemetryDynamicDataTest {
     // then
     TelemetryRegistry telemetryRegistry = processEngineInMem.getProcessEngineConfiguration().getTelemetryRegistry();
     Map<String, CommandCounter> entries = telemetryRegistry.getCommands();
+    // note: There are more commands executed during engine start, but the
+    // telemetry registry (including the command counts) is reset when telemetry is activated
+    // during engine startup
     assertThat(entries.keySet()).containsExactlyInAnyOrder(
         "IsTelemetryEnabledCmd",
         "NoInitMessageBootstrapEngineCommand",
-        "GetLicenseKeyCmd",
-        "GetTableMetaDataCmd",
-        "HistoryCleanupCmd",
-        "SchemaOperationsProcessEngineBuild",
-        "HistoryLevelSetupCommand");
+        "GetLicenseKeyCmd");
     for (String commandName : entries.keySet()) {
       assertThat(entries.get(commandName).get()).isEqualTo(1);
     }
@@ -141,56 +141,6 @@ public class TelemetryDynamicDataTest {
     for (String commandName : expectedExcutedCommands) {
       assertThat(entries.get(commandName).get()).isEqualTo(1);
     }
-  }
-
-  @Test
-  public void shouldResetCollectedCommandsDataWhenTelemetryEnabled() {
-    // given default telemetry data and empty telemetry registry
-
-    // when execute commands
-    managementService.getHistoryLevel();
-    managementService.getLicenseKey();
-
-    // then
-    Map<String, CommandCounter> commands = configuration.getTelemetryRegistry().getCommands();
-    assertThat(commands.size()).isEqualTo(3);
-    assertThat(commands.get("GetLicenseKeyCmd").get()).isEqualTo(1);
-    assertThat(commands.get("GetHistoryLevelCmd").get()).isEqualTo(1);
-    assertThat(commands.keySet()).contains("DeleteMetricsCmd");
-
-    // when
-    managementService.toggleTelemetry(true);
-    // execute commands
-    managementService.getTelemetryData();
-    managementService.getTelemetryData();
-    managementService.isTelemetryEnabled();
-
-    // then
-    assertThat(commands.size()).isEqualTo(3);
-    assertThat(commands.get("GetTelemetryDataCmd").get()).isEqualTo(2);
-    assertThat(commands.get("IsTelemetryEnabledCmd").get()).isEqualTo(1);
-    assertThat(commands.get("TelemetryConfigureCmd").get()).isEqualTo(1);
-  }
-
-
-  @Test
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
-  public void shouldCollectMetricsDataWhenTelemetryDisabled() {
-    // given
-    managementService.toggleTelemetry(false);
-    for (int i = 0; i < 3; i++) {
-      runtimeService.startProcessInstanceByKey("oneTaskProcess");
-    }
-
-    // when
-    configuration.getDbMetricsReporter().reportNow();
-
-    // then
-    Map<String, Meter> telemetryMeters = configuration.getMetricsRegistry().getTelemetryMeters();
-    assertThat(telemetryMeters.get(Metrics.ROOT_PROCESS_INSTANCE_START).get()).isEqualTo(3);
-    assertThat(telemetryMeters.get(Metrics.ACTIVTY_INSTANCE_START).get()).isEqualTo(6);
-    assertThat(telemetryMeters.get(Metrics.EXECUTED_DECISION_ELEMENTS).get()).isEqualTo(0);
-    assertThat(telemetryMeters.get(Metrics.EXECUTED_DECISION_INSTANCES).get()).isEqualTo(0);
   }
 
   @Test
@@ -259,7 +209,7 @@ public class TelemetryDynamicDataTest {
   }
 
   protected void clearCommandCounts() {
-    configuration.getTelemetryRegistry().clear();
+    configuration.getTelemetryRegistry().clearCommandCounts();
   }
 
   protected static class InnerClassCmd implements Command<Void> {

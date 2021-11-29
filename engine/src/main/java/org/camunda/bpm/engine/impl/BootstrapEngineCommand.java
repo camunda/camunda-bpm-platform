@@ -127,13 +127,12 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
         initializeInitialTelemetryMessage();
       }
 
-      // enable collecting dynamic data in case telemetry is initialized with true
-      // or already enabled
+      // reset collected dynamic data
       if ((databaseTelemetryProperty == null && processEngineConfiguration.isInitializeTelemetry())
           || Boolean.valueOf(databaseTelemetryProperty.getValue())) {
-        TelemetryUtil.updateCollectingTelemetryDataEnabled(processEngineConfiguration.getTelemetryRegistry(),
-                                                           processEngineConfiguration.getMetricsRegistry(),
-                                                           true);
+        TelemetryUtil.toggleLocalTelemetry(true,
+            processEngineConfiguration.getTelemetryRegistry(),
+            processEngineConfiguration.getMetricsRegistry());
       }
 
     } catch (Exception e) {

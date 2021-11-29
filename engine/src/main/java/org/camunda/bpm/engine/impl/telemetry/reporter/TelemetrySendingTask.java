@@ -115,11 +115,10 @@ public class TelemetrySendingTask extends TimerTask {
 
     if (!isTelemetryEnabled()) {
       LOG.telemetryDisabled();
-      updateTelemetryFlag(false);
       return;
     }
 
-    updateTelemetryFlag(true);
+    TelemetryUtil.toggleLocalTelemetry(true, telemetryRegistry, metricsRegistry);
 
     performDataSend(false, () -> {
       updateAndSendData(true);
@@ -191,9 +190,7 @@ public class TelemetrySendingTask extends TimerTask {
     }
 
     if (internals.isTelemetryEnabled() == null) {
-      // we can not assume telemetry is always enabled, this might also be
-      // triggered by an API call via ManagementService#getTelemetryData()
-      internals.setTelemetryEnabled(telemetryRegistry.isCollectingTelemetryDataEnabled());
+      internals.setTelemetryEnabled(true);// this can only be true, otherwise we would not collect data to send
     }
 
     // license key and Webapps data is fed from the outside to the registry but needs to be constantly updated
@@ -244,15 +241,6 @@ public class TelemetrySendingTask extends TimerTask {
    */
   protected boolean isSuccessStatusCode(int statusCode) {
     return (statusCode / 100) == 2;
-  }
-
-  protected void clearDynamicData() {
-    InternalsImpl internals = staticData.getProduct().getInternals();
-
-    internals.setApplicationServer(null);
-    internals.setCommands(null);
-    internals.setMetrics(null);
-    internals.setLicenseKey(null);
   }
 
   protected void restoreDynamicData(InternalsImpl internals) {
@@ -316,10 +304,6 @@ public class TelemetrySendingTask extends TimerTask {
     }
 
     return metrics;
-  }
-
-  protected void updateTelemetryFlag(boolean enabled) {
-    TelemetryUtil.updateCollectingTelemetryDataEnabled(telemetryRegistry, metricsRegistry, enabled);
   }
 
   protected class SendInitialMsgCmd implements org.camunda.bpm.engine.impl.interceptor.Command<Void> {
