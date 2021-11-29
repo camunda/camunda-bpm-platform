@@ -27,7 +27,7 @@
     <property name="processEngineName" value="activitiContextProcessName"/>
   </bean>
 
-  <bean id="processEngine" class="org.camunda.bpm.engine.spring.container.ManagedProcessEngineFactoryBean">
+  <bean id="processEngine" class="org.camunda.bpm.engine.spring.ProcessEngineFactoryBean">
     <property name="processEngineConfiguration" ref="processEngineConfiguration"/>
   </bean>
 
