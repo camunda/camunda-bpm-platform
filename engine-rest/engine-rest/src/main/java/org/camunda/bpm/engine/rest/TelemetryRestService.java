@@ -24,6 +24,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.camunda.bpm.engine.rest.dto.TelemetryConfigurationDto;
+import org.camunda.bpm.engine.rest.dto.telemetry.TelemetryDataDto;
 
 @Produces(MediaType.APPLICATION_JSON)
 public interface TelemetryRestService {
@@ -43,5 +44,5 @@ public interface TelemetryRestService {
   @GET
   @Path("/data")
   @Produces(MediaType.APPLICATION_JSON)
-  Object getTelemetryData();
+  TelemetryDataDto getTelemetryData();
 }

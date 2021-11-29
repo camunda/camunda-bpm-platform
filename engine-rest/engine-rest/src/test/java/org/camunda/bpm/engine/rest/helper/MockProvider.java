@@ -1018,6 +1018,8 @@ public abstract class MockProvider {
         .of(new Object[][] { { "root-process-instance-start", 936L }, { "activity-instance-start", 6125L },
             { "executed-decision-instances", 140L }, { "executed-decision-elements", 732L } })
         .collect(Collectors.toMap(data -> (String) data[0], data -> new MetricImpl((Long) data[1]))));
+    EXAMPLE_TELEMETRY_INTERNALS.setCamundaIntegration(Collections.singleton("spring-boot"));
+    EXAMPLE_TELEMETRY_INTERNALS.setWebapps(Collections.singleton("cockpit"));
   }
   public static final ProductImpl EXAMPLE_TELEMETRY_PRODUCT = new ProductImpl(EXAMPLE_TELEMETRY_PRODUCT_NAME,
       EXAMPLE_TELEMETRY_PRODUCT_VERSION, EXAMPLE_TELEMETRY_PRODUCT_EDITION, EXAMPLE_TELEMETRY_INTERNALS);

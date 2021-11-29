@@ -30,11 +30,6 @@ public class ApplicationServerDto {
     this.version = version;
   }
 
-  public ApplicationServerDto(String version) {
-    this.vendor = parseServerVendor(version);
-    this.version = version;
-  }
-
   public String getVendor() {
     return vendor;
   }

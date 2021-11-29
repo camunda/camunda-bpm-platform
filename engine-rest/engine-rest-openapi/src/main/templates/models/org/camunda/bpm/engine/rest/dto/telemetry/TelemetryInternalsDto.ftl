@@ -28,14 +28,14 @@
         itemType = "string"
         desc = "List of Camunda integrations used (e.g., Camunda Spring Boot Starter, Camunda Run, WildFly/JBoss subsystem, Camunda EJB)."/>
 
-        <@lib.property
+    <@lib.property
         name = "commands"
         type = "object"
         additionalProperties = true
         dto = "TelemetryCountDto"
         desc = "The count of executed commands after the last retrieved data."/>
 
-        <@lib.property
+    <@lib.property
         name = "metrics"
         type = "object"
         additionalProperties = true
@@ -51,15 +51,10 @@
     <@lib.property
         name = "jdk"
         type = "object"
+        last = true
         additionalProperties = true
         dto = "AbstractVendorVersionInformationDto"
         desc = "Vendor and version of the installed JDK."/>
-
-        <@lib.property
-        name = "telemetry-enabled"
-        type = "boolean"
-        last = true
-        desc = "A Flag that specifies if the collected telemetry data is sent to Camunda or not."/>
 
 </@lib.dto>
 

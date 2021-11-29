@@ -182,16 +182,36 @@ public class TelemetryRestServiceTest extends AbstractRestServiceTest {
   @Test
   public void shouldGetTelemetryData() throws JsonProcessingException {
     when(managementServiceMock.getTelemetryData()).thenReturn(MockProvider.EXAMPLE_TELEMETRY_DATA);
-    TelemetryDataDto expectedTelemetryData = TelemetryDataDto.fromEngineDto(MockProvider.EXAMPLE_TELEMETRY_DATA);
-    ObjectMapper mapper = new ObjectMapper();
-    String expectedJson = mapper.writeValueAsString(expectedTelemetryData);
 
     given()
     .then()
       .expect()
         .statusCode(Status.OK.getStatusCode())
         .contentType(ContentType.JSON)
-          .body(equalTo(expectedJson))
+        .body("installation", equalTo(MockProvider.EXAMPLE_TELEMETRY_INSTALLATION_ID))
+        .body("product.name", equalTo(MockProvider.EXAMPLE_TELEMETRY_PRODUCT_NAME))
+        .body("product.version", equalTo(MockProvider.EXAMPLE_TELEMETRY_PRODUCT_VERSION))
+        .body("product.edition", equalTo(MockProvider.EXAMPLE_TELEMETRY_PRODUCT_EDITION))
+        .body("product.internals.database.vendor", equalTo(MockProvider.EXAMPLE_TELEMETRY_DB_VENDOR))
+        .body("product.internals.database.version", equalTo(MockProvider.EXAMPLE_TELEMETRY_DB_VERSION))
+        .body("product.internals.commands.FetchExternalTasksCmd.count", equalTo(100))
+        .body("product.internals.commands.StartProcessInstanceCmd.count", equalTo(40))
+        .body("product.internals.metrics.root-process-instance-start.count", equalTo(936))
+        .body("product.internals.metrics.activity-instance-start.count", equalTo(6125))
+        .body("product.internals.metrics.executed-decision-elements.count", equalTo(732))
+        .body("product.internals.metrics.executed-decision-instances.count", equalTo(140))
+        .body("product.internals.webapps[0]", equalTo("cockpit"))
+        .body("product.internals.jdk.vendor", equalTo(MockProvider.EXAMPLE_TELEMETRY_JDK_VENDOR))
+        .body("product.internals.jdk.version", equalTo(MockProvider.EXAMPLE_TELEMETRY_JDK_VERSION))
+        .body("product.internals.application-server.vendor", equalTo(MockProvider.EXAMPLE_TELEMETRY_APP_SERVER_VENDOR))
+        .body("product.internals.application-server.version", equalTo(MockProvider.EXAMPLE_TELEMETRY_APP_SERVER_VERSION))
+        .body("product.internals.license-key.customer", equalTo(MockProvider.EXAMPLE_TELEMETRY_LICENSE_CUSTOMER_NAME))
+        .body("product.internals.license-key.type", equalTo(MockProvider.EXAMPLE_TELEMETRY_LICENSE_TYPE))
+        .body("product.internals.license-key.features.camundaBPM", equalTo("true"))
+        .body("product.internals.license-key.raw", equalTo(MockProvider.EXAMPLE_TELEMETRY_LICENSE_RAW))
+        .body("product.internals.license-key.unlimited", equalTo(MockProvider.EXAMPLE_TELEMETRY_LICENSE_UNLIMITED))
+        .body("product.internals.license-key.valid-until", equalTo(MockProvider.EXAMPLE_TELEMETRY_LICENSE_VALID_UNTIL))
+        .body("product.internals.camunda-integration[0]", equalTo("spring-boot"))
     .when()
       .get(TELEMETRY_DATA_URL);
 

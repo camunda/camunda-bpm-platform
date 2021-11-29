@@ -48,7 +48,7 @@ public class TelemetryRestServiceImpl extends AbstractRestProcessEngineAware imp
   }
 
   @Override
-  public Object getTelemetryData() {
+  public TelemetryDataDto getTelemetryData() {
     ManagementService managementService = processEngine.getManagementService();
     TelemetryData data = managementService.getTelemetryData();
 

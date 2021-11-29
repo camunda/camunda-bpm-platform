@@ -23,7 +23,7 @@ public class JdkDto {
   protected String version;
   protected String vendor;
 
-  public JdkDto(String version, String vendor) {
+  public JdkDto(String vendor, String version) {
     this.version = version;
     this.vendor = vendor;
   }

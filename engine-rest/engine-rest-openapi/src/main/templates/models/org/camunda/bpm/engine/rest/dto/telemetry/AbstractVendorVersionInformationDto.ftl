@@ -6,7 +6,7 @@
         type = "string"
         desc = "Information about the vendor."/>
 
-        <@lib.property
+    <@lib.property
         name = "version"
         type = "string"
         last = true

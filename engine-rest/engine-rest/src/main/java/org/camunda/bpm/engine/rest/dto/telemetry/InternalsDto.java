@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.camunda.bpm.engine.telemetry.Command;
 import org.camunda.bpm.engine.telemetry.Internals;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -30,7 +31,6 @@ public class InternalsDto {
   public static final String SERIALIZED_APPLICATION_SERVER = "application-server";
   public static final String SERIALIZED_CAMUNDA_INTEGRATION = "camunda-integration";
   public static final String SERIALIZED_LICENSE_KEY = "license-key";
-  public static final String SERIALIZED_TELEMETRY_ENABLED = "telemetry-enabled";
 
   protected DatabaseDto database;
   @JsonProperty(value = SERIALIZED_APPLICATION_SERVER)
@@ -45,9 +45,6 @@ public class InternalsDto {
   protected Set<String> webapps;
 
   protected JdkDto jdk;
-
-  @JsonProperty(value = SERIALIZED_TELEMETRY_ENABLED)
-  protected Boolean telemetryEnabled;
 
   public InternalsDto(DatabaseDto database, ApplicationServerDto server, LicenseKeyDataDto licenseKey, JdkDto jdk) {
     this.database = database;
@@ -114,14 +111,6 @@ public class InternalsDto {
     this.licenseKey = licenseKey;
   }
 
-  public Boolean isTelemetryEnabled() {
-    return telemetryEnabled;
-  }
-
-  public void setTelemetryEnabled(Boolean telemetryEnabled) {
-    this.telemetryEnabled = telemetryEnabled;
-  }
-
   public Set<String> getWebapps() {
     return webapps;
   }
@@ -131,11 +120,23 @@ public class InternalsDto {
   }
 
   public static InternalsDto fromEngineDto(Internals other) {
-    return new InternalsDto(
+
+    InternalsDto dto = new InternalsDto(
         DatabaseDto.fromEngineDto(other.getDatabase()),
         ApplicationServerDto.fromEngineDto(other.getApplicationServer()),
         LicenseKeyDataDto.fromEngineDto(other.getLicenseKey()),
         JdkDto.fromEngineDto(other.getJdk()));
+
+    dto.commands = new HashMap<>();
+    other.getCommands().forEach((name, command) -> dto.commands.put(name, new CommandDto(command.getCount())));
+
+    dto.metrics = new HashMap<>();
+    other.getMetrics().forEach((name, metric) -> dto.metrics.put(name, new MetricDto(metric.getCount())));
+
+    dto.setWebapps(other.getWebapps());
+    dto.setCamundaIntegration(other.getCamundaIntegration());
+
+    return dto;
   }
 
 }
