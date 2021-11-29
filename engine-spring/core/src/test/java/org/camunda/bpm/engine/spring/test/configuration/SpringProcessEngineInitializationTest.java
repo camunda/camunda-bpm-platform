@@ -16,49 +16,40 @@
  */
 package org.camunda.bpm.engine.spring.test.configuration;
 
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngines;
-import org.camunda.bpm.engine.impl.util.ReflectUtil;
-import org.camunda.bpm.engine.spring.SpringConfigurationHelper;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.URL;
 
-import static org.junit.Assert.*;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngines;
+import org.camunda.bpm.engine.impl.util.ReflectUtil;
+import org.junit.After;
+import org.junit.Test;
 
 public class SpringProcessEngineInitializationTest {
-
-  @Test
-  public void testSpringConfigurationContextInitializing() {
-    //given
-    URL resource = existActivitiContext();
-    //when
-    ProcessEngine processEngine = SpringConfigurationHelper.buildProcessEngine(resource);
-    //then
-    assertNotNull(processEngine);
-    assertEquals("activitiContextProcessName", processEngine.getName());
-
-    processEngine.close();
+  
+  @After
+  public void tearDown() {
+    ProcessEngines.destroy();
   }
-
+  
   @Test
   public void shouldInitializeProcessEngineFromActivitiContext() {
-    //given
+    // given
     existActivitiContext();
-    //when
+    // when
     ProcessEngine processEngine = ProcessEngines.getProcessEngine("activitiContextProcessName");
-    //then
-    assertNotNull(processEngine);
-    assertEquals("activitiContextProcessName", processEngine.getName());
-
-    processEngine.close();
+    // then
+    assertThat(processEngine).isNotNull();
+    assertThat(processEngine.getName()).isEqualTo("activitiContextProcessName");
   }
 
-  //check exists activiti-context.xml in classpath without this check ProcessEngines will ignore parsing this file
   private URL existActivitiContext() {
     URL resource = ReflectUtil.getClassLoader().getResource("activiti-context.xml");
-    if (resource == null)
-      fail("activiti-context.xml not found on the classpath: " + System.getProperty("java.class.path"));
+    assertThat(resource)
+      .withFailMessage("activiti-context.xml not found on the classpath: " + System.getProperty("java.class.path"))
+      .isNotNull();
     return resource;
   }
+  
 }
