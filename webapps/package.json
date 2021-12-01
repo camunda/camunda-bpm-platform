@@ -53,7 +53,7 @@
     "dom4": "2.1.6",
     "events": "3.0.0",
     "fast-xml-parser": "3.17.6",
-    "jquery": "3.5.1",
+    "jquery": "3.6.0",
     "jquery-ui": "1.12.1",
     "lodash": "4.17.21",
     "moment": "2.24.0",
