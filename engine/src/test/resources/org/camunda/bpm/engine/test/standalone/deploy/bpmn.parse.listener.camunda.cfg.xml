@@ -29,7 +29,7 @@
     
     <property name="customPreBPMNParseListeners">
       <list>
-        <bean class="org.camunda.bpm.engine.test.standalone.deploy.TestBPMNParseListener" />
+        <bean class="org.camunda.bpm.engine.test.standalone.deploy.DelegatingBpmnParseListener" />
       </list>
     </property>
     

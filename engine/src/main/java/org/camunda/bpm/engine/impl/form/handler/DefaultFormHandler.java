@@ -31,6 +31,7 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.form.FormDataImpl;
+import org.camunda.bpm.engine.impl.form.FormDefinition;
 import org.camunda.bpm.engine.impl.form.type.AbstractFormFieldType;
 import org.camunda.bpm.engine.impl.form.type.FormTypes;
 import org.camunda.bpm.engine.impl.form.validator.FormFieldValidator;
@@ -68,13 +69,6 @@ public class DefaultFormHandler implements FormHandler {
   protected String deploymentId;
   protected String businessKeyFieldId;
 
-  protected Expression formKey;
-
-  // Camunda Form Definition
-  protected Expression camundaFormDefinitionKey;
-  protected String camundaFormDefinitionBinding;
-  protected Expression camundaFormDefinitionVersion;
-
   protected List<FormPropertyHandler> formPropertyHandlers = new ArrayList<>();
 
   protected List<FormFieldHandler> formFieldHandlers = new ArrayList<>();
@@ -94,35 +88,6 @@ public class DefaultFormHandler implements FormHandler {
 
       // provide support for new form field metadata
       parseFormData(bpmnParse, expressionManager, extensionElement);
-    }
-
-    String formKeyAttribute = activityElement.attributeNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "formKey");
-    String formRefAttribute = activityElement.attributeNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "formRef");
-
-    if(formKeyAttribute != null && formRefAttribute != null) {
-      bpmnParse.addError("Invalid element definition: only one of the attributes formKey and formRef is allowed.", activityElement);
-    }
-
-    if (formKeyAttribute != null) {
-      this.formKey = expressionManager.createExpression(formKeyAttribute);
-    } else if(formRefAttribute != null) {
-      // formRef
-      this.camundaFormDefinitionKey = expressionManager.createExpression(formRefAttribute);
-      // formRefBinding
-      String formRefBindingAttribute = activityElement.attributeNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS,
-          "formRefBinding");
-      if (formRefBindingAttribute == null || !ALLOWED_FORM_REF_BINDINGS.contains(formRefBindingAttribute)) {
-        bpmnParse.addError("Invalid element definition: value for formRefBinding attribute has to be one of "
-            + ALLOWED_FORM_REF_BINDINGS + " but was " + formRefBindingAttribute, activityElement);
-      }
-      this.camundaFormDefinitionBinding = formRefBindingAttribute;
-
-      // formRefVersion
-      if (FORM_REF_BINDING_VERSION.equals(formRefBindingAttribute)) {
-        String formRefVersionAttribute = activityElement.attributeNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS,
-            "formRefVersion");
-        this.camundaFormDefinitionVersion = expressionManager.createExpression(formRefVersionAttribute);
-      }
     }
   }
 
@@ -422,19 +387,4 @@ public class DefaultFormHandler implements FormHandler {
     this.businessKeyFieldId = businessKeyFieldId;
   }
 
-  public Expression getFormKey() {
-    return formKey;
-  }
-
-  public Expression getCamundaFormDefinitionKey() {
-    return camundaFormDefinitionKey;
-  }
-
-  public String getCamundaFormDefinitionBinding() {
-    return camundaFormDefinitionBinding;
-  }
-
-  public Expression getCamundaFormDefinitionVersion() {
-    return camundaFormDefinitionVersion;
-  }
 }
