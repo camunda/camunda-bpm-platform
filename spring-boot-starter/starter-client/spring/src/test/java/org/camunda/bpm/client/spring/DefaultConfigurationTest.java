@@ -21,6 +21,7 @@ import org.camunda.bpm.client.task.ExternalTaskHandler;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -34,6 +35,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @ContextConfiguration(classes = {DefaultConfiguration.class})
+@DirtiesContext
 public class DefaultConfigurationTest extends MockedTest {
 
   @Autowired
