@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.TaskListener;
+import org.camunda.bpm.engine.impl.form.FormDefinition;
 import org.camunda.bpm.engine.impl.form.handler.TaskFormHandler;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 
@@ -49,11 +50,7 @@ public class TaskDefinition {
 
   // form fields
   protected TaskFormHandler taskFormHandler;
-  protected Expression formKey;
-  // camunda form definition
-  protected Expression camundaFormDefinitionKey;
-  protected String camundaFormDefinitionBinding;
-  protected Expression camundaFormDefinitionVersion;
+  protected FormDefinition formDefinition = new FormDefinition();
 
   // task listeners
   protected Map<String, List<TaskListener>> taskListeners = new HashMap<>();
@@ -190,35 +187,32 @@ public class TaskDefinition {
     timeoutTaskListeners.put(timeoutId, taskListener);
   }
 
+  public FormDefinition getFormDefinition() {
+    return formDefinition;
+  }
+
+  public void setFormDefinition(FormDefinition formDefinition) {
+    this.formDefinition = formDefinition;
+  }
+
   public Expression getFormKey() {
-    return formKey;
+    return formDefinition.getFormKey();
   }
 
   public void setFormKey(Expression formKey) {
-    this.formKey = formKey;
+    this.formDefinition.setFormKey(formKey);
   }
 
   public Expression getCamundaFormDefinitionKey() {
-    return camundaFormDefinitionKey;
-  }
-
-  public void setCamundaFormDefinitionKey(Expression camundaFormDefinitionKey) {
-    this.camundaFormDefinitionKey = camundaFormDefinitionKey;
+    return formDefinition.getCamundaFormDefinitionKey();
   }
 
   public String getCamundaFormDefinitionBinding() {
-    return camundaFormDefinitionBinding;
-  }
-
-  public void setCamundaFormDefinitionBinding(String camundaFormDefinitionBinding) {
-    this.camundaFormDefinitionBinding = camundaFormDefinitionBinding;
+    return formDefinition.getCamundaFormDefinitionBinding();
   }
 
   public Expression getCamundaFormDefinitionVersion() {
-    return camundaFormDefinitionVersion;
+    return formDefinition.getCamundaFormDefinitionVersion();
   }
 
-  public void setCamundaFormDefinitionVersion(Expression camundaFormDefinitionVersion) {
-    this.camundaFormDefinitionVersion = camundaFormDefinitionVersion;
-  }
 }
