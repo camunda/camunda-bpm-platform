@@ -25,6 +25,12 @@ var angular = require('../../../../camunda-bpm-sdk-js/vendor/angular'),
     'utf8'
   );
 
+const dialogController = require('./dialog/controller');
+const dialogTemplate = fs.readFileSync(
+  __dirname + '/dialog/template.html',
+  'utf8'
+);
+
 function getScrollParent(element) {
   var style = getComputedStyle(element);
   var excludeStaticParent = style.position === 'absolute';
@@ -47,11 +53,13 @@ module.exports = [
   '$timeout',
   '$filter',
   '$document',
-  function($timeout, $filter, $document) {
+  '$uibModal',
+  function($timeout, $filter, $document, $modal) {
     return {
       scope: {
         varValue: '=value',
         varType: '@type',
+        inOperator: '=?',
         validator: '&validate',
         change: '&',
         onStart: '&onStartEditing',
@@ -68,6 +76,8 @@ module.exports = [
       template: template,
 
       link: function(scope, element) {
+        scope.formData = {};
+
         var $scrollableParentEl = $(getScrollParent(element[0]));
 
         var $btnsEl;
@@ -136,9 +146,10 @@ module.exports = [
         }
 
         function reset() {
+          scope.inOperator = scope.inOperator || false;
           scope.editing = false;
           scope.invalid = false;
-          scope.editValue = scope.varValue;
+          scope.formData.editValue = scope.varValue;
 
           scope.validator = scope.validator || function() {};
           scope.onStart = scope.onStart || function() {};
@@ -162,7 +173,7 @@ module.exports = [
               dateObj = new Date().setSeconds(0, 0);
             }
 
-            scope.dateValue = dateObj;
+            scope.formData.dateValue = dateObj;
           }
         }
 
@@ -331,12 +342,12 @@ module.exports = [
             scope.onStart(scope);
 
             // save the current edit value to restore later
-            var savedEditValue = scope.editValue;
+            var savedEditValue = scope.formData.editValue;
 
             // clear the edit value so that typeahead shows all options
             // should not apply to simpleFields
             if (!scope.simpleField) {
-              scope.editValue = '';
+              scope.formData.editValue = '';
             }
 
             // Here is where it gets ugly: We have to wait for angular to apply the changes to the edit value, so that the
@@ -346,7 +357,7 @@ module.exports = [
             $timeout(function() {
               $timeout(function() {
                 // and reset the edit value, so that the user can type
-                scope.editValue = savedEditValue;
+                scope.formData.editValue = savedEditValue;
 
                 // in the next apply cycle, the dropdown is open. We now have to
                 // select the default value, if it exists:
@@ -355,7 +366,9 @@ module.exports = [
                   if (isValueOfTypeObject) {
                     angular
                       .element(
-                        element[0].querySelector('[ng-model="editValue"]')
+                        element[0].querySelector(
+                          '[ng-model="formData.editValue"]'
+                        )
                       )
                       .val(savedEditValue.value);
                   }
@@ -382,12 +395,14 @@ module.exports = [
 
             $timeout(function() {
               angular
-                .element(element[0].querySelector('[ng-model="editValue"]'))
+                .element(
+                  element[0].querySelector('[ng-model="formData.editValue"]')
+                )
                 .triggerHandler('click');
 
               $timeout(function() {
-                $('[ng-model="editValue"]').focus();
-                $('[ng-model="editValue"]').select();
+                $('[ng-model="formData.editValue"]').focus();
+                $('[ng-model="formData.editValue"]').select();
                 $document.bind('click', stopEditing);
               }, 50);
             });
@@ -399,9 +414,11 @@ module.exports = [
 
           if (!scope.invalid) {
             if (scope.simpleField) {
-              scope.editValue = parseValue($('[ng-model="editValue"]').val());
+              scope.formData.editValue = parseValue(
+                $('[ng-model="formData.editValue"]').val()
+              );
 
-              scope.varValue = scope.editValue;
+              scope.varValue = scope.formData.editValue;
             } else if (scope.varType === 'option') {
               if (
                 scope.options.indexOf(selection) === -1 &&
@@ -410,10 +427,11 @@ module.exports = [
                 scope.cancelChange();
                 return;
               }
-              scope.editValue = selection || $('[ng-model="editValue"]').val();
-              scope.varValue = scope.editValue;
+              scope.formData.editValue =
+                selection || $('[ng-model="formData.editValue"]').val();
+              scope.varValue = scope.formData.editValue;
             } else if (isDate()) {
-              scope.varValue = dateFilter(scope.dateValue, dateFormat);
+              scope.varValue = dateFilter(scope.formData.dateValue, dateFormat);
             }
 
             scope.$event = evt;
@@ -447,7 +465,8 @@ module.exports = [
         };
 
         scope.changeDate = function(pickerScope) {
-          scope.editValue = scope.dateValue = pickerScope.dateValue;
+          scope.formData.editValue = scope.formData.dateValue =
+            pickerScope.formData.dateValue;
         };
 
         scope.selectNextInlineField = function(reversed) {
@@ -528,6 +547,28 @@ module.exports = [
               scope.applyChange(selection);
             }
           });
+        };
+
+        scope.expandValue = () => {
+          const modalClose = () =>
+            $timeout(() => {
+              $('[ng-model="formData.editValue"]')
+                .focus()
+                .select();
+              $document.bind('click', stopEditing);
+            });
+
+          $modal
+            .open({
+              resolve: {
+                formData: () => scope.formData
+              },
+              controller: dialogController,
+              template: dialogTemplate
+            })
+            .result.then(modalClose)
+            .catch(modalClose);
+          $document.unbind('click', stopEditing);
         };
       },
 

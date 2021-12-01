@@ -129,6 +129,7 @@
         tabindex="0"
         ng-keydown="onKeydown($event, 'value')"
         type="{{ valueType }}"
+        in-operator="operator.value.key === 'In'"
         change="changeSearch('value', varValue, $event)"
         on-start-editing="clearEditTrigger('value')"
         ng-if="!basic"
