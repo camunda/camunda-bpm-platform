@@ -77,6 +77,21 @@ public class JsonValueTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = ONE_TASK_PROCESS)
+  public void testGetNullJsonValue() {
+    // given
+    JsonValue jsonValue = jsonValue((String) null).create();
+    VariableMap variables = Variables.createVariables().putValueTyped(variableName, jsonValue);
+
+    String processInstanceId = runtimeService.startProcessInstanceByKey(ONE_TASK_PROCESS_KEY, variables).getId();
+
+    // when
+    SpinJsonNode value = (SpinJsonNode) runtimeService.getVariable(processInstanceId, variableName);
+
+    // then
+    assertThat(value).isNull();
+  }
+
+  @Deployment(resources = ONE_TASK_PROCESS)
   public void testGetTypedJsonValue() throws JSONException {
     // given
     JsonValue jsonValue = jsonValue(jsonString).create();
