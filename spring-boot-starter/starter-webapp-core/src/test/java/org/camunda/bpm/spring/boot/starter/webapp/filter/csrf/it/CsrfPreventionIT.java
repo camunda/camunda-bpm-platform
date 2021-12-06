@@ -84,6 +84,8 @@ public class CsrfPreventionIT {
       urlConnection.getContent();
       fail("Exception expected!");
     } catch (IOException e) {
+      System.out.println(headerRule.getErrorResponseContent());
+      System.out.println(e.getMessage());
       // then
       assertThat(e).hasMessageContaining("Server returned HTTP response code: 403 for URL");
       assertThat(headerRule.getHeaderXsrfToken()).isEqualTo("Required");
