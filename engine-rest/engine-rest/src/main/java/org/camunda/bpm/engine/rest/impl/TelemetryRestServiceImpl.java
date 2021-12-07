@@ -19,6 +19,9 @@ package org.camunda.bpm.engine.rest.impl;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.rest.TelemetryRestService;
 import org.camunda.bpm.engine.rest.dto.TelemetryConfigurationDto;
+import org.camunda.bpm.engine.rest.dto.telemetry.TelemetryDataDto;
+import org.camunda.bpm.engine.telemetry.TelemetryData;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class TelemetryRestServiceImpl extends AbstractRestProcessEngineAware implements TelemetryRestService {
@@ -42,5 +45,13 @@ public class TelemetryRestServiceImpl extends AbstractRestProcessEngineAware imp
 
     Boolean telemetryEnabled = managementService.isTelemetryEnabled();
     return new TelemetryConfigurationDto(telemetryEnabled);
+  }
+
+  @Override
+  public TelemetryDataDto getTelemetryData() {
+    ManagementService managementService = processEngine.getManagementService();
+    TelemetryData data = managementService.getTelemetryData();
+
+    return TelemetryDataDto.fromEngineDto(data);
   }
 }
