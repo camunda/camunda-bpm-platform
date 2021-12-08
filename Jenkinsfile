@@ -125,7 +125,6 @@ pipeline {
           },
           postFailure: {
             cambpmPublishTestResult()
-            cambpmArchiveArtifacts('spring-boot-starter/starter-webapp-core/target/failsafe-reports/*')
           }
         ])
 
