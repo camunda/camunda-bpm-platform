@@ -40,6 +40,7 @@
         <artifactId>js</artifactId>
         <version>${version.graal.js}</version>
       </dependency>
+
       <dependency>
         <groupId>org.graalvm.js</groupId>
         <artifactId>js-scriptengine</artifactId>
