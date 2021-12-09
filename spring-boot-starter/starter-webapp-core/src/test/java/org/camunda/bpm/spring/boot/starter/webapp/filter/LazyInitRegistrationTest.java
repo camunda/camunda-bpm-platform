@@ -34,16 +34,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.context.ApplicationContext;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(LazyInitRegistration.class)
-@PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*"})
+@RunWith(MockitoJUnitRunner.class)
 public class LazyInitRegistrationTest {
 
   @Mock
@@ -130,7 +126,6 @@ public class LazyInitRegistrationTest {
     LazyInitRegistration.APPLICATION_CONTEXT = applicationContextMock;
     LazyInitRegistration.register(lazyDelegateFilterMock);
     when(applicationContextMock.containsBean(LazyInitRegistration.RESOURCE_LOADER_DEPENDING_INIT_HOOK)).thenReturn(false);
-    when(applicationContextMock.getBean(LazyInitRegistration.RESOURCE_LOADER_DEPENDING_INIT_HOOK, InitHook.class)).thenReturn(initHookMock);
 
     assertTrue(LazyInitRegistration.lazyInit(lazyDelegateFilterMock));
     verify(lazyDelegateFilterMock, times(1)).setInitHook(null);
@@ -145,17 +140,16 @@ public class LazyInitRegistrationTest {
 
   @Test
   public void setApplicationContextTest() {
-    PowerMockito.mockStatic(LazyInitRegistration.class);
-
-    LazyInitRegistration.register(lazyDelegateFilterMock);
-    Set<LazyDelegateFilter<? extends Filter>> registrations = new HashSet<LazyDelegateFilter<? extends Filter>>();
-    registrations.add(lazyDelegateFilterMock);
-    when(LazyInitRegistration.getRegistrations()).thenReturn(registrations);
-
-    new LazyInitRegistration().setApplicationContext(applicationContextMock);
-
-    assertEquals(LazyInitRegistration.APPLICATION_CONTEXT, applicationContextMock);
-    PowerMockito.verifyStatic(LazyInitRegistration.class);
-    LazyInitRegistration.lazyInit(lazyDelegateFilterMock);
+    try (MockedStatic<LazyInitRegistration> theMock = Mockito.mockStatic(LazyInitRegistration.class)) {
+      LazyInitRegistration.register(lazyDelegateFilterMock);
+      Set<LazyDelegateFilter<? extends Filter>> registrations = new HashSet<>();
+      registrations.add(lazyDelegateFilterMock);
+      theMock.when(() -> LazyInitRegistration.getRegistrations()).thenReturn(registrations);
+  
+      new LazyInitRegistration().setApplicationContext(applicationContextMock);
+  
+      assertEquals(LazyInitRegistration.APPLICATION_CONTEXT, applicationContextMock);
+      theMock.verify(() -> LazyInitRegistration.lazyInit(lazyDelegateFilterMock));
+    }
   }
 }

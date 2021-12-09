@@ -21,14 +21,15 @@ import org.camunda.bpm.client.spring.MockedTest;
 import org.camunda.bpm.client.spring.configuration.DefaultConfiguration;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
 @ContextConfiguration(classes = {
     DefaultConfiguration.class
 })
+@DirtiesContext // context cannot be reused since the mocks need to be reinitialized completely
 public class AutoOpenTrueTest extends MockedTest {
 
   @Autowired

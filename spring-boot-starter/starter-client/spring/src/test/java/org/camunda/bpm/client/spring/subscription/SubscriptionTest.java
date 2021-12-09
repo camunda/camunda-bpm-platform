@@ -23,6 +23,7 @@ import org.camunda.bpm.client.task.ExternalTaskHandler;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,6 +32,7 @@ import static org.assertj.core.api.Assertions.entry;
 @ContextConfiguration(classes = {
     FullConfiguration.class
 })
+@DirtiesContext // context cannot be reused since the mocks need to be reinitialized completely
 public class SubscriptionTest extends MockedTest {
 
   @Autowired
