@@ -32,7 +32,7 @@ import static org.assertj.core.api.Assertions.entry;
 @ContextConfiguration(classes = {
     FullConfiguration.class
 })
-@DirtiesContext
+@DirtiesContext // context cannot be reused since the mocks need to be reinitialized completely
 public class SubscriptionTest extends MockedTest {
 
   @Autowired

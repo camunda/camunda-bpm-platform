@@ -29,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ContextConfiguration(classes = {
     DefaultConfiguration.class
 })
-@DirtiesContext
+@DirtiesContext // context cannot be reused since the mocks need to be reinitialized completely
 public class AutoOpenTrueTest extends MockedTest {
 
   @Autowired

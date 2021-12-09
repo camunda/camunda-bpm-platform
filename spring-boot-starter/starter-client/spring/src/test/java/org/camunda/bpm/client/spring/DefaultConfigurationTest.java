@@ -35,7 +35,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @ContextConfiguration(classes = {DefaultConfiguration.class})
-@DirtiesContext
+@DirtiesContext // context cannot be reused since the mocks need to be reinitialized completely
 public class DefaultConfigurationTest extends MockedTest {
 
   @Autowired
