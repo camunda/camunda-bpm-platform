@@ -93,7 +93,7 @@
     from
       ${prefix}ACT_RU_EXECUTION RES
 
-    <if test="historyEnabled">
+    <if test="historyEnabled &amp;&amp; (startedBefore != null || startedAfter != null)">
     left join
       ${prefix}ACT_HI_PROCINST HISTORY
     ON
