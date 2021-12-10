@@ -143,6 +143,9 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
           <version>2.16</version>
+          <configuration>
+            <argLine>-Xmx968m</argLine>
+          </configuration>
           <executions>
               <execution>
                 <goals>
