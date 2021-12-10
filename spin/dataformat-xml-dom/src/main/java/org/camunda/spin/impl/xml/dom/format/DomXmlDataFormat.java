@@ -16,8 +16,13 @@
  */
 package org.camunda.spin.impl.xml.dom.format;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerFactory;
+
+import java.util.Collections;
+import java.util.Map;
 
 import org.camunda.spin.impl.xml.dom.DomXmlAttribute;
 import org.camunda.spin.impl.xml.dom.DomXmlElement;
@@ -38,6 +43,17 @@ public class DomXmlDataFormat implements DataFormat<SpinXmlElement> {
 
   protected static final DomXmlLogger LOG = DomXmlLogger.XML_DOM_LOGGER;
 
+  protected static final String EXTERNAL_GENERAL_ENTITIES = "http://xml.org/sax/features/external-general-entities";
+  protected static final String DISALLOW_DOCTYPE_DECL = "http://apache.org/xml/features/disallow-doctype-decl";
+  protected static final String LOAD_EXTERNAL_DTD = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
+  protected static final String EXTERNAL_PARAMETER_ENTITIES = "http://xml.org/sax/features/external-parameter-entities";
+  protected static final String JAXP_ACCESS_EXTERNAL_SCHEMA = "http://javax.xml.XMLConstants/property/accessExternalSchema";
+  protected static final String JAXP_ACCESS_EXTERNAL_SCHEMA_SYSTEM_PROPERTY = "javax.xml.accessExternalSchema";
+  protected static final String JAXP_ACCESS_EXTERNAL_SCHEMA_ALL = "all";
+
+  public static final String XXE_PROPERTY = "xxe-processing";
+  public static final String SP_PROPERTY = "secure-processing";
+
   /** the DocumentBuilderFactory used by the reader */
   protected DocumentBuilderFactory documentBuilderFactory;
 
@@ -57,11 +73,17 @@ public class DomXmlDataFormat implements DataFormat<SpinXmlElement> {
     this(name, defaultDocumentBuilderFactory());
   }
 
+  public DomXmlDataFormat(String name, Map<String, Object> configurationProperties) {
+    this(name, configurableDocumentBuilderFactory(configurationProperties));
+  }
+
   public DomXmlDataFormat(String name, JaxBContextProvider contextProvider) {
     this(name, defaultDocumentBuilderFactory(), contextProvider);
   }
 
-  public DomXmlDataFormat(String name, DocumentBuilderFactory documentBuilderFactory, JaxBContextProvider contextProvider) {
+  public DomXmlDataFormat(String name,
+                          DocumentBuilderFactory documentBuilderFactory,
+                          JaxBContextProvider contextProvider) {
     this(name, documentBuilderFactory, defaultTransformerFactory(), contextProvider);
   }
 
@@ -69,7 +91,10 @@ public class DomXmlDataFormat implements DataFormat<SpinXmlElement> {
     this(name, documentBuilderFactory, defaultTransformerFactory(), defaultJaxBContextProvider());
   }
 
-  public DomXmlDataFormat(String name, DocumentBuilderFactory documentBuilderFactory, TransformerFactory transformerFactory, JaxBContextProvider contextProvider) {
+  public DomXmlDataFormat(String name,
+                          DocumentBuilderFactory documentBuilderFactory,
+                          TransformerFactory transformerFactory,
+                          JaxBContextProvider contextProvider) {
     this.name = name;
     this.documentBuilderFactory = documentBuilderFactory;
     LOG.usingDocumentBuilderFactory(documentBuilderFactory.getClass().getName());
@@ -147,6 +172,11 @@ public class DomXmlDataFormat implements DataFormat<SpinXmlElement> {
   }
 
   public static DocumentBuilderFactory defaultDocumentBuilderFactory() {
+    return configurableDocumentBuilderFactory(Collections.emptyMap());
+  }
+
+  public static DocumentBuilderFactory configurableDocumentBuilderFactory(
+      Map<String,Object> configurationProperties) {
 
     DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 
@@ -162,6 +192,14 @@ public class DomXmlDataFormat implements DataFormat<SpinXmlElement> {
     documentBuilderFactory.setIgnoringElementContentWhitespace(false);
     LOG.documentBuilderFactoryConfiguration("ignoringElementContentWhitespace", "false");
 
+    if ((boolean) configurationProperties.getOrDefault(XXE_PROPERTY, false) == false) {
+      disableXxeProcessing(documentBuilderFactory);
+    }
+
+    if ((boolean) configurationProperties.getOrDefault(SP_PROPERTY, true) == true) {
+      enableSecureProcessing(documentBuilderFactory);
+    }
+
     return documentBuilderFactory;
   }
 
@@ -169,4 +207,60 @@ public class DomXmlDataFormat implements DataFormat<SpinXmlElement> {
     return new DefaultJaxBContextProvider();
   }
 
+  /*
+   * Configures the DocumentBuilderFactory in a way, that it is protected against
+   * XML External Entity Attacks. If the implementing parser does not support one or
+   * multiple features, the failed feature is ignored. The parser might not be protected,
+   * if the feature assignment fails.
+   *
+   * @see <a href="https://www.owasp.org/index.php/XML_External_Entity_(XXE)_Prevention_Cheat_Sheet">OWASP Information of XXE attacks</a>
+   *
+   * @param dbf The factory to configure.
+   */
+  protected static void disableXxeProcessing(DocumentBuilderFactory dbf) {
+    try {
+      dbf.setFeature(EXTERNAL_GENERAL_ENTITIES, false);
+      dbf.setFeature(DISALLOW_DOCTYPE_DECL, true);
+      dbf.setFeature(LOAD_EXTERNAL_DTD, false);
+      dbf.setFeature(EXTERNAL_PARAMETER_ENTITIES, false);
+    } catch (ParserConfigurationException ignored) {
+      // ignore
+    }
+    dbf.setXIncludeAware(false);
+    dbf.setExpandEntityReferences(false);
+  }
+
+  /*
+   * Configures the DocumentBuilderFactory to process XML securely.
+   * If the implementing parser does not support one or multiple features,
+   * the failed feature is ignored. The parser might not be protected,
+   * if the feature assignment fails.
+   *
+   * @param dbf The factory to configure.
+   */
+  protected static void enableSecureProcessing(DocumentBuilderFactory dbf) {
+    try {
+      dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+      dbf.setAttribute(JAXP_ACCESS_EXTERNAL_SCHEMA, resolveAccessExternalSchemaProperty());
+    } catch (ParserConfigurationException | IllegalArgumentException ignored) {
+      // ignored
+    }
+  }
+
+  /*
+   * JAXP allows users to override the default value via system properties and
+   * a central properties file (see https://docs.oracle.com/javase/tutorial/jaxp/properties/scope.html).
+   * However, both are overridden by an explicit configuration in code, as we apply it.
+   * Since we want users to customize the value, we take the system property into account.
+   * The properties file is not supported at the moment.
+   */
+  protected static String resolveAccessExternalSchemaProperty() {
+    String systemProperty = System.getProperty(JAXP_ACCESS_EXTERNAL_SCHEMA_SYSTEM_PROPERTY);
+
+    if (systemProperty != null) {
+      return systemProperty;
+    } else {
+      return JAXP_ACCESS_EXTERNAL_SCHEMA_ALL;
+    }
+  }
 }

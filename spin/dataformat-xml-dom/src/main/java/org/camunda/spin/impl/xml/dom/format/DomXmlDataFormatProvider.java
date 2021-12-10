@@ -16,6 +16,8 @@
  */
 package org.camunda.spin.impl.xml.dom.format;
 
+import java.util.Map;
+
 import org.camunda.spin.DataFormats;
 import org.camunda.spin.spi.DataFormat;
 import org.camunda.spin.spi.DataFormatProvider;
@@ -34,6 +36,11 @@ public class DomXmlDataFormatProvider implements DataFormatProvider {
 
   public DataFormat<?> createInstance() {
     return new DomXmlDataFormat(DataFormats.XML_DATAFORMAT_NAME);
+  }
+
+  @Override
+  public DataFormat<?> createInstance(Map<String, Object> configurationProperties) {
+    return new DomXmlDataFormat(DataFormats.XML_DATAFORMAT_NAME, configurationProperties);
   }
 
 }

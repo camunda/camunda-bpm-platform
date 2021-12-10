@@ -17,6 +17,8 @@
 package org.camunda.spin.spi;
 
 
+import java.util.Map;
+
 /**
  * @author Thorben Lindhauer
  *
@@ -33,6 +35,13 @@ public class CustomDataFormatProvider implements DataFormatProvider {
 
   @Override
   public DataFormat<?> createInstance() {
+    return DATA_FORMAT;
+  }
+
+  @Override
+  public DataFormat<?> createInstance(Map<String, Object> configurationProperties) {
+    boolean conditionalProperty = (boolean) configurationProperties.getOrDefault("conditional-prop", false);
+    DATA_FORMAT.setConditionalProperty(conditionalProperty);
     return DATA_FORMAT;
   }
 

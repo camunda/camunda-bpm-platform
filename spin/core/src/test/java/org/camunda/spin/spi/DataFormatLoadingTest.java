@@ -135,6 +135,25 @@ public class DataFormatLoadingTest {
         .isEqualTo(ExampleCustomDataFormatConfigurator.UPDATED_PROPERTY);
   }
 
+  @Test
+  @PrepareForTest(DataFormats.class)
+  public void shouldPassConfiguratorPropertiesToProvider() {
+    // given a custom data format provider that is returned by the service loader API
+    mockProviders(new CustomDataFormatProvider());
+    mockConfigurators();
+
+    // when a map of configuration properties is passed to the "load" method
+    DataFormats.getInstance().registerDataFormats(DataFormats.class.getClassLoader(),
+                                                  Collections.EMPTY_LIST,
+                                                  Collections.singletonMap("conditional-prop", true));
+
+    // then the configuration property is applied
+    ExampleCustomDataFormat customFormat = (ExampleCustomDataFormat) DataFormats
+        .getDataFormat(CustomDataFormatProvider.NAME);
+    assertThat(customFormat.isConditionalProperty())
+        .isTrue();
+  }
+
   protected void mockProviders(final DataFormatProvider... providers) {
     when(mockServiceLoader.iterator()).thenAnswer(new Answer<Iterator<DataFormatProvider>>() {
 

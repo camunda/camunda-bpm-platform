@@ -16,6 +16,8 @@
  */
 package org.camunda.spin.spi;
 
+import java.util.Map;
+
 /**
  * @author Daniel Meyer
  *
@@ -31,5 +33,13 @@ public interface DataFormatProvider {
    * @return an instance of the data format provided by this implementation
    */
   DataFormat<?> createInstance();
+
+  /**
+   * @return an instance of the data format provided by this implementation configured using the
+   * passed configuration properties.
+   */
+  default DataFormat<?> createInstance(Map<String, Object> configurationProperties) {
+    return createInstance();
+  };
 
 }

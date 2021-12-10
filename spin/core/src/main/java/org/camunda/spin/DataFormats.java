@@ -120,20 +120,25 @@ public class DataFormats {
   }
 
   public void registerDataFormats(ClassLoader classloader) {
-    registerDataFormats(classloader, Collections.EMPTY_LIST);
+    registerDataFormats(classloader, Collections.EMPTY_LIST, Collections.EMPTY_MAP);
   }
 
   public void registerDataFormats(ClassLoader classloader,
                                   List<DataFormatConfigurator> configurators) {
+    registerDataFormats(classloader, configurators, Collections.EMPTY_MAP);
+  }
+  public void registerDataFormats(ClassLoader classloader,
+                                  List<DataFormatConfigurator> configurators,
+                                  Map<String, Object> configurationProperties) {
 
-    Map<String, DataFormat<?>> dataFormats = new HashMap<String, DataFormat<?>>();
+    Map<String, DataFormat<?>> dataFormats = new HashMap<>();
 
     if(classloader == null) {
       classloader = DataFormats.class.getClassLoader();
     }
 
     // discover available custom dataformat providers on the classpath
-    registerCustomDataFormats(dataFormats, classloader);
+    registerCustomDataFormats(dataFormats, classloader, configurationProperties);
 
     // discover and apply data format configurators on the classpath
     applyConfigurators(dataFormats, classloader, configurators);
@@ -144,16 +149,29 @@ public class DataFormats {
   }
 
   protected void registerCustomDataFormats(Map<String, DataFormat<?>> dataFormats, ClassLoader classloader) {
+    registerCustomDataFormats(dataFormats, classloader, Collections.EMPTY_MAP);
+  }
+  
+  protected void registerCustomDataFormats(Map<String, DataFormat<?>> dataFormats, 
+                                           ClassLoader classloader, 
+                                           Map<String, Object> configurationProperties) {
     // use java.util.ServiceLoader to load custom DataFormatProvider instances on the classpath
     ServiceLoader<DataFormatProvider> providerLoader = ServiceLoader.load(DataFormatProvider.class, classloader);
 
     for (DataFormatProvider provider : providerLoader) {
       LOG.logDataFormatProvider(provider);
-      registerProvider(dataFormats, provider);
+      registerProvider(dataFormats, provider, configurationProperties);
     }
   }
 
-  protected void registerProvider(Map<String, DataFormat<?>> dataFormats, DataFormatProvider provider) {
+  protected void registerProvider(Map<String, DataFormat<?>> dataFormats,
+                                  DataFormatProvider provider) {
+    registerProvider(dataFormats, provider, Collections.EMPTY_MAP);
+  }
+
+  protected void registerProvider(Map<String, DataFormat<?>> dataFormats,
+                                  DataFormatProvider provider,
+                                  Map<String, Object> configurationProperties) {
 
     String dataFormatName = provider.getDataFormatName();
 
@@ -161,7 +179,7 @@ public class DataFormats {
       throw LOG.multipleProvidersForDataformat(dataFormatName);
     }
     else {
-      DataFormat<?> dataFormatInstance = provider.createInstance();
+      DataFormat<?> dataFormatInstance = provider.createInstance(configurationProperties);
       dataFormats.put(dataFormatName, dataFormatInstance);
     }
   }
@@ -209,6 +227,10 @@ public class DataFormats {
 
   public static void loadDataFormats(ClassLoader classloader, List<DataFormatConfigurator> configurators) {
     INSTANCE.registerDataFormats(classloader, configurators);
+  }
+
+  public static void loadDataFormats(ClassLoader classloader, Map configurationProperties) {
+    INSTANCE.registerDataFormats(classloader, Collections.EMPTY_LIST, configurationProperties);
   }
 
 }

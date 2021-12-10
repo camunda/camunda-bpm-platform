@@ -26,6 +26,7 @@ public class ExampleCustomDataFormat implements DataFormat<SpinJsonNode> {
 
   protected String name;
   protected String property = "defaultValue";
+  protected boolean conditionalProperty = false;
 
   public ExampleCustomDataFormat(String name) {
     this.name = name;
@@ -69,4 +70,11 @@ public class ExampleCustomDataFormat implements DataFormat<SpinJsonNode> {
     this.property = property;
   }
 
+  public boolean isConditionalProperty() {
+    return conditionalProperty;
+  }
+
+  public void setConditionalProperty(boolean conditionalProperty) {
+    this.conditionalProperty = conditionalProperty;
+  }
 }
