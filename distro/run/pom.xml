@@ -15,6 +15,10 @@
   <description>This is the root of Camunda Platform Run</description>
   <packaging>pom</packaging>
 
+  <properties>
+    <version.log4j2>2.15.0</version.log4j2>
+  </properties>
+
   <dependencyManagement>
     <dependencies>
 
@@ -25,6 +29,18 @@
         <version>${version.jersey2}</version>
         <scope>import</scope>
         <type>pom</type>
+      </dependency>
+
+      <!-- https://jira.camunda.com/browse/CAM-14181 -->
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-api</artifactId>
+        <version>${version.log4j2}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-to-slf4j</artifactId>
+        <version>${version.log4j2}</version>
       </dependency>
 
       <dependency>
