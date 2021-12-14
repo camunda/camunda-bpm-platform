@@ -427,14 +427,14 @@ public class TenantCommandChecker implements CommandChecker {
       );
     }
   }
-  
+
   @Override
   public void checkDeleteHistoricVariableInstance(HistoricVariableInstanceEntity variable) {
     if (variable != null && !getTenantManager().isAuthenticatedTenant(variable.getTenantId())) {
       throw LOG.exceptionCommandWithUnauthorizedTenant("delete the historic variable instance '" + variable.getId() + "'");
     }
   }
-  
+
   @Override
   public void checkDeleteHistoricVariableInstancesByProcessInstance(HistoricProcessInstanceEntity instance) {
     if (instance != null && !getTenantManager().isAuthenticatedTenant(instance.getTenantId())) {
@@ -488,14 +488,18 @@ public class TenantCommandChecker implements CommandChecker {
   public void checkUpdateUserOperationLog(UserOperationLogEntry entry) {
     // tenant check is not available for user operation log
   }
-  
+
   @Override
   public void checkReadHistoricExternalTaskLog(HistoricExternalTaskLogEntity historicExternalTaskLog) {
     if (historicExternalTaskLog != null && !getTenantManager().isAuthenticatedTenant(historicExternalTaskLog.getTenantId())) {
       throw LOG.exceptionCommandWithUnauthorizedTenant("get the historic external task log '"+ historicExternalTaskLog.getId() + "'");
     }
   }
-  
+
+  @Override
+  public void checkReadTelemetryData() {
+  }
+
   // helper //////////////////////////////////////////////////
 
   protected TenantManager getTenantManager() {

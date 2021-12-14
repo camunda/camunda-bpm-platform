@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.authorization;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -27,9 +28,12 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.authorization.Groups;
+import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.authorization.SystemPermissions;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.management.TableMetaData;
 import org.camunda.bpm.engine.management.TablePage;
+import org.camunda.bpm.engine.telemetry.TelemetryData;
 import org.junit.Test;
 
 
@@ -259,14 +263,13 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
   public void testTelemetryEnabledWithoutAutorization() {
     // given
 
-    try {
+    assertThatThrownBy(() -> {
       // when
       managementService.toggleTelemetry(false);
-    } catch (AuthorizationException e) {
-      // then
-      String message = e.getMessage();
-      testRule.assertTextPresent(REQUIRED_ADMIN_AUTH_EXCEPTION, message);
-    }
+    })
+    // then
+    .hasMessageContaining(REQUIRED_ADMIN_AUTH_EXCEPTION);
+
   }
 
   @Test
@@ -282,6 +285,45 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
 
     // then
     assertThat(managementService.isTelemetryEnabled()).isFalse();
+  }
+
+  // get telemetry data /////////////////////////////////////
+
+  @Test
+  public void shouldNotGetTelemetryDataWithoutAuthorization() {
+    // given
+
+    assertThatThrownBy(() -> {
+      // when
+      managementService.getTelemetryData();
+    })
+    // then
+    .hasMessageContaining(REQUIRED_ADMIN_AUTH_EXCEPTION);
+  }
+
+  @Test
+  public void shouldGetTelemetryDataAsCamundaAdmin() {
+    // given
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+
+    // when
+    TelemetryData telemetryData = managementService.getTelemetryData();
+
+    // then
+    assertThat(telemetryData).isNotNull();
+  }
+
+  @Test
+  public void shouldGetTelemetryDataWithAuthorization() {
+    // given
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.READ);
+    identityService.setAuthentication(userId, null);
+
+    // when
+    TelemetryData telemetryData = managementService.getTelemetryData();
+
+    // then
+    assertThat(telemetryData).isNotNull();
   }
 
 }

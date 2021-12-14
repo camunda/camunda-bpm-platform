@@ -43,6 +43,7 @@ import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
 import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.authorization.SystemPermissions;
 import org.camunda.bpm.engine.authorization.TaskPermissions;
 import org.camunda.bpm.engine.authorization.UserOperationLogCategoryPermissions;
 
@@ -209,7 +210,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
   }
 
   public void checkDeleteProcessInstance(ExecutionEntity execution) {
-    ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
+    ProcessDefinitionEntity processDefinition = execution.getProcessDefinition();
 
     // necessary permissions:
     // - DELETE on PROCESS_INSTANCE
@@ -235,7 +236,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
 
   @Override
   public void checkUpdateProcessInstance(ExecutionEntity execution) {
-    ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
+    ProcessDefinitionEntity processDefinition = execution.getProcessDefinition();
     CompositePermissionCheck suspensionStatePermission = new PermissionCheckBuilder()
         .disjunctive()
           .atomicCheckForResourceId(PROCESS_INSTANCE, execution.getProcessInstanceId(), UPDATE)
@@ -247,7 +248,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
 
   @Override
   public void checkUpdateProcessInstanceVariables(ExecutionEntity execution) {
-    ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
+    ProcessDefinitionEntity processDefinition = execution.getProcessDefinition();
     CompositePermissionCheck suspensionStatePermission = new PermissionCheckBuilder()
         .disjunctive()
           .atomicCheckForResourceId(PROCESS_INSTANCE, execution.getProcessInstanceId(), ProcessInstancePermissions.UPDATE_VARIABLE)
@@ -268,7 +269,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
   }
 
   public void checkUpdateProcessInstanceSuspensionState(ExecutionEntity execution) {
-    ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
+    ProcessDefinitionEntity processDefinition = execution.getProcessDefinition();
     CompositePermissionCheck suspensionStatePermission = new PermissionCheckBuilder()
         .disjunctive()
           .atomicCheckForResourceId(PROCESS_INSTANCE, execution.getProcessInstanceId(), ProcessInstancePermissions.SUSPEND)
@@ -324,7 +325,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
   }
 
   public void checkReadProcessInstance(ExecutionEntity execution) {
-    ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
+    ProcessDefinitionEntity processDefinition = execution.getProcessDefinition();
 
     // necessary permissions:
     // - READ on PROCESS_INSTANCE
@@ -342,7 +343,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
   @Override
   public void checkReadProcessInstanceVariable(ExecutionEntity execution) {
     if (getAuthorizationManager().isEnsureSpecificVariablePermission()) {
-      ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
+      ProcessDefinitionEntity processDefinition = execution.getProcessDefinition();
 
       // necessary permissions:
       // - READ_INSTANCE_VARIABLE on PROCESS_DEFINITION
@@ -451,7 +452,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
       // - UPDATE_TASK on PROCESS_DEFINITION
 
       ExecutionEntity execution = task.getExecution();
-      ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
+      ProcessDefinitionEntity processDefinition = execution.getProcessDefinition();
 
       CompositePermissionCheck updateTaskPermissionCheck = new PermissionCheckBuilder()
           .disjunctive()
@@ -759,18 +760,18 @@ public class AuthorizationCommandChecker implements CommandChecker {
     /*
      * (1) if entry has a category and a process definition key:
      *   => entry in context of process definition
-     *   => check either 
+     *   => check either
      *        UPDATE_/DELETE_HISTORY on PROCESS_DEFINITION with processDefinitionKey OR
      *        UPDATE/DELETE OPERATION_LOG_CATEGORY with category
-     * 
+     *
      * (2) if entry has a category but no process definition key:
      *   => standalone entry (task, job, batch, ...), admin entry (user, tenant, ...) or CMMN related
      *   => check UPDATE/DELETE on OPERATION_LOG_CATEGORY with category
-     *   
+     *
      * (3) if entry has no category but a process definition key:
-     *   => pre-7.11.0 entry in context of process definition 
+     *   => pre-7.11.0 entry in context of process definition
      *   => check UPDATE_/DELETE_HISTORY on PROCESS_DEFINITION with processDefinitionKey
-     *   
+     *
      * (4) if entry has no category and no process definition key:
      *   => pre-7.11.0 standalone entry (task, job, batch, ...) or CMMN related
      *   => no authorization check like before 7.11.0
@@ -820,7 +821,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
       getAuthorizationManager().checkAuthorization(READ_HISTORY, PROCESS_DEFINITION, historicExternalTaskLog.getProcessDefinitionKey());
     }
   }
-  
+
   @Override
   public void checkDeleteHistoricVariableInstance(HistoricVariableInstanceEntity variable) {
     if (variable != null && variable.getProcessDefinitionKey() != null) {
@@ -828,10 +829,15 @@ public class AuthorizationCommandChecker implements CommandChecker {
     }
     // XXX if CAM-6570 is implemented, there should be a check for variables of standalone tasks here as well
   }
-  
+
   @Override
   public void checkDeleteHistoricVariableInstancesByProcessInstance(HistoricProcessInstanceEntity instance) {
     checkDeleteHistoricProcessInstance(instance);
+  }
+
+  @Override
+  public void checkReadTelemetryData() {
+    getAuthorizationManager().checkAuthorization(SystemPermissions.READ, Resources.SYSTEM);
   }
 
 }

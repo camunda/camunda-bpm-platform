@@ -17,18 +17,22 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.interceptor.AuthorizedCmd;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 
-public class GetTelemetryDataCmd implements Command<TelemetryDataImpl> {
+public class GetTelemetryDataCmd implements Command<TelemetryDataImpl>, AuthorizedCmd {
 
   ProcessEngineConfigurationImpl configuration;
 
   @Override
   public TelemetryDataImpl execute(CommandContext commandContext) {
+    commandContext.getAuthorizationManager().checkAuthorizedCommand(true, this);
+
     configuration = commandContext.getProcessEngineConfiguration();
 
     TelemetryReporter telemetryReporter = configuration.getTelemetryReporter();
@@ -38,6 +42,10 @@ public class GetTelemetryDataCmd implements Command<TelemetryDataImpl> {
     } else {
       throw ProcessEngineLogger.TELEMETRY_LOGGER.exceptionWhileRetrievingTelemetryDataRegistryNull();
     }
+  }
 
+  @Override
+  public void checkAuthorization(CommandChecker checker) {
+    checker.checkReadTelemetryData();
   }
 }
