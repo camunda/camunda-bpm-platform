@@ -14,9 +14,26 @@
   <inceptionYear>2015</inceptionYear>
 
   <packaging>pom</packaging>
+  
+  <properties>
+    <version.logback>1.2.8</version.logback>
+  </properties>
 
   <dependencyManagement>
     <dependencies>
+
+      <!-- https://jira.camunda.com/browse/CAM-14192 -->
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>${version.logback}</version>
+      </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-core</artifactId>
+        <version>${version.logback}</version>
+      </dependency>
+
       <dependency>
         <!-- Import dependency management from Spring Boot -->
         <groupId>org.springframework.boot</groupId>
