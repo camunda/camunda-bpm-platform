@@ -87,6 +87,7 @@
           <configuration>
             <!-- See CAM-11901 -->
             <useManifestOnlyJar>false</useManifestOnlyJar>
+            <argLine>-Xmx968m</argLine>
           </configuration>
         </plugin>
       </plugins>
