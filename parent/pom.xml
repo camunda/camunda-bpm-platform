@@ -20,6 +20,8 @@
   <properties>
     <version.quarkus>2.1.2.Final</version.quarkus>
     <version.spring.framework>5.2.14.RELEASE</version.spring.framework>
+    <!-- Version overrides for logback and log4j should be removed 
+         in Run and Starter after bumping the Spring Boot version -->
     <version.spring-boot>2.6.1</version.spring-boot>
     <version.cxf>3.0.3</version.cxf>
     <version.resteasy>2.3.5.Final</version.resteasy>
