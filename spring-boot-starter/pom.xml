@@ -16,6 +16,8 @@
   <packaging>pom</packaging>
   
   <properties>
+    <!-- Version overrides for logback and log4j should be removed 
+         after bumping the Spring Boot version -->
     <version.logback>1.2.8</version.logback>
   </properties>
 
