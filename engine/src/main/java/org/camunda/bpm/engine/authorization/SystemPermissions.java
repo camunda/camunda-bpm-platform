@@ -38,14 +38,11 @@ public enum SystemPermissions implements Permission {
   /** Indicates that READ interactions are permitted. */
   READ("READ", 2),
 
-  /** Indicates that UPDATE interactions are permitted. */
-  UPDATE("UPDATE", 4),
-
-  /** Indicates that CREATE interactions are permitted. */
-  CREATE("CREATE", 8),
+  /** Indicates that WRITE interactions are permitted. */
+  WRITE("WRITE", 4),
 
   /** Indicates that DELETE interactions are permitted. */
-  DELETE("DELETE", 16);
+  DELETE("DELETE", 8);
 
   private static final Resource[] RESOURCES = new Resource[] { Resources.SYSTEM };
 

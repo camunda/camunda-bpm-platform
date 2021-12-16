@@ -156,7 +156,7 @@ public class AuthorizationException extends ProcessEngineException {
     StringBuilder sBuilder = new StringBuilder();
     sBuilder.append("The user with id '");
     sBuilder.append(userId);
-    sBuilder.append(missingAdminRole ? "' is not an admin authenticated user or " : "'");
+    sBuilder.append(missingAdminRole ? "' is not an admin authenticated user or" : "'");
     sBuilder.append(" does not have one of the following permissions: ");
     boolean first = true;
     for(MissingAuthorization missingAuthorization: missingAuthorizations) {

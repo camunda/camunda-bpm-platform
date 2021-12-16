@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.impl.cmd;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
@@ -31,7 +32,7 @@ public class GetTableCountCmd implements Command<Map<String,Long>>, Serializable
   private static final long serialVersionUID = 1L;
 
   public Map<String,Long> execute(CommandContext commandContext) {
-    commandContext.getAuthorizationManager().checkCamundaAdmin();
+    commandContext.getAuthorizationManager().checkCamundaAdminOrPermission(CommandChecker::checkReadTableCount);
 
     return commandContext
       .getTableDataManager()

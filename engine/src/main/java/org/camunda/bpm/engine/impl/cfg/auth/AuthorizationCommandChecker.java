@@ -617,24 +617,6 @@ public class AuthorizationCommandChecker implements CommandChecker {
   public void checkReadCaseInstance(CaseExecution caseExecution) {
   }
 
-  // helper ////////////////////////////////////////
-
-  protected AuthorizationManager getAuthorizationManager() {
-    return Context.getCommandContext().getAuthorizationManager();
-  }
-
-  protected ProcessDefinitionEntity findLatestProcessDefinitionById(String processDefinitionId) {
-    return Context.getCommandContext().getProcessDefinitionManager().findLatestProcessDefinitionById(processDefinitionId);
-  }
-
-  protected DecisionDefinitionEntity findLatestDecisionDefinitionById(String decisionDefinitionId) {
-    return Context.getCommandContext().getDecisionDefinitionManager().findDecisionDefinitionById(decisionDefinitionId);
-  }
-
-  protected ExecutionEntity findExecutionById(String processInstanceId) {
-    return Context.getCommandContext().getExecutionManager().findExecutionById(processInstanceId);
-  }
-
   public void checkTaskAssign(TaskEntity task) {
 
     String taskId = task.getId();
@@ -838,6 +820,135 @@ public class AuthorizationCommandChecker implements CommandChecker {
   @Override
   public void checkReadTelemetryData() {
     getAuthorizationManager().checkAuthorization(SystemPermissions.READ, Resources.SYSTEM);
+  }
+
+  @Override
+  public void checkConfigureTelemetry() {
+    getAuthorizationManager().checkAuthorization(SystemPermissions.WRITE, Resources.SYSTEM);
+  }
+
+  @Override
+  public void checkReadTelemetryCollectionStatusData() {
+    getAuthorizationManager().checkAuthorization(SystemPermissions.READ, Resources.SYSTEM);
+  }
+
+  @Override
+  public void checkReadHistoryLevel() {
+    getAuthorizationManager().checkAuthorization(SystemPermissions.READ, Resources.SYSTEM);
+  }
+
+  @Override
+  public void checkReadTableCount() {
+    getAuthorizationManager().checkAuthorization(SystemPermissions.READ, Resources.SYSTEM);
+  }
+
+  @Override
+  public void checkReadTableName() {
+    getAuthorizationManager().checkAuthorization(SystemPermissions.READ, Resources.SYSTEM);
+  }
+
+  @Override
+  public void checkReadTableMetaData() {
+    getAuthorizationManager().checkAuthorization(SystemPermissions.READ, Resources.SYSTEM);
+  }
+
+  @Override
+  public void checkReadProperties() {
+    getAuthorizationManager().checkAuthorization(SystemPermissions.READ, Resources.SYSTEM);
+  }
+
+  @Override
+  public void checkSetProperty() {
+    getAuthorizationManager().checkAuthorization(SystemPermissions.WRITE, Resources.SYSTEM);
+  }
+
+  @Override
+  public void checkDeleteProperty() {
+    getAuthorizationManager().checkAuthorization(SystemPermissions.DELETE, Resources.SYSTEM);
+  }
+
+  @Override
+  public void checkDeleteLicenseKey() {
+    getAuthorizationManager().checkAuthorization(SystemPermissions.DELETE, Resources.SYSTEM);
+  }
+
+  @Override
+  public void checkSetLicenseKey() {
+    PermissionCheckBuilder builder = new PermissionCheckBuilder();
+    CompositePermissionCheck setLicenseKeyPermissionCheck = builder
+    .disjunctive()
+      .atomicCheck(Resources.SYSTEM, null, SystemPermissions.WRITE)
+      .atomicCheck(Resources.SYSTEM, null, SystemPermissions.DELETE)
+    .build();
+    getAuthorizationManager().checkAuthorization(setLicenseKeyPermissionCheck);
+  }
+
+  @Override
+  public void checkReadLicenseKey() {
+    getAuthorizationManager().checkAuthorization(SystemPermissions.READ, Resources.SYSTEM);
+  }
+
+  @Override
+  public void checkRegisterProcessApplication() {
+    getAuthorizationManager().checkAuthorization(SystemPermissions.WRITE, Resources.SYSTEM);
+  }
+
+  @Override
+  public void checkUnregisterProcessApplication() {
+    getAuthorizationManager().checkAuthorization(SystemPermissions.WRITE, Resources.SYSTEM);
+  }
+
+  @Override
+  public void checkReadRegisteredDeployments() {
+    getAuthorizationManager().checkAuthorization(SystemPermissions.READ, Resources.SYSTEM);
+  }
+
+  @Override
+  public void checkReadProcessApplicationForDeployment() {
+    getAuthorizationManager().checkAuthorization(SystemPermissions.READ, Resources.SYSTEM);
+  }
+
+  @Override
+  public void checkRegisterDeployment() {
+    getAuthorizationManager().checkAuthorization(SystemPermissions.WRITE, Resources.SYSTEM);
+  }
+
+  @Override
+  public void checkUnregisterDeployment() {
+    getAuthorizationManager().checkAuthorization(SystemPermissions.WRITE, Resources.SYSTEM);
+  }
+
+  @Override
+  public void checkDeleteMetrics() {
+    getAuthorizationManager().checkAuthorization(SystemPermissions.DELETE, Resources.SYSTEM);
+  }
+
+  @Override
+  public void checkDeleteTaskMetrics() {
+    getAuthorizationManager().checkAuthorization(SystemPermissions.DELETE, Resources.SYSTEM);
+  }
+
+  @Override
+  public void checkReadSchemaLog() {
+    getAuthorizationManager().checkAuthorization(SystemPermissions.READ, Resources.SYSTEM);
+  }
+
+  // helper ////////////////////////////////////////
+
+  protected AuthorizationManager getAuthorizationManager() {
+    return Context.getCommandContext().getAuthorizationManager();
+  }
+
+  protected ProcessDefinitionEntity findLatestProcessDefinitionById(String processDefinitionId) {
+    return Context.getCommandContext().getProcessDefinitionManager().findLatestProcessDefinitionById(processDefinitionId);
+  }
+
+  protected DecisionDefinitionEntity findLatestDecisionDefinitionById(String decisionDefinitionId) {
+    return Context.getCommandContext().getDecisionDefinitionManager().findDecisionDefinitionById(decisionDefinitionId);
+  }
+
+  protected ExecutionEntity findExecutionById(String processInstanceId) {
+    return Context.getCommandContext().getExecutionManager().findExecutionById(processInstanceId);
   }
 
 }

@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.impl.cmd;
 import java.util.Collections;
 import java.util.Set;
 
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -39,7 +40,7 @@ public class UnregisterDeploymentCmd implements Command<Void> {
   }
 
   public Void execute(CommandContext commandContext) {
-    commandContext.getAuthorizationManager().checkCamundaAdmin();
+    commandContext.getAuthorizationManager().checkCamundaAdminOrPermission(CommandChecker::checkUnregisterDeployment);
     Context.getProcessEngineConfiguration().getRegisteredDeployments().removeAll(deploymentIds);
     return null;
   }

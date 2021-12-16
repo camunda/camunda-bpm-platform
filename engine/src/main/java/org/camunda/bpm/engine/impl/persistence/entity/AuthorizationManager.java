@@ -44,6 +44,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -99,7 +100,6 @@ import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.identity.Authentication;
-import org.camunda.bpm.engine.impl.interceptor.AuthorizedCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.persistence.entity.util.AuthManagerUtil;
@@ -514,32 +514,28 @@ public class AuthorizationManager extends AbstractManager {
     }
   }
 
-  public void checkAuthorizedCommand(boolean isAdminAuthorized, AuthorizedCmd command) {
+  public void checkCamundaAdminOrPermission(Consumer<CommandChecker> permissionCheck) {
     AuthorizationException authorizationException = null;
     AuthorizationException adminException = null;
     try {
       for (CommandChecker checker : Context.getProcessEngineConfiguration().getCommandCheckers()) {
-        command.checkAuthorization(checker);
+        permissionCheck.accept(checker);
       }
     } catch (AuthorizationException e) {
       authorizationException = e;
     }
 
-    if (isAdminAuthorized) {
-      try {
-        checkCamundaAdmin();
-      } catch (AuthorizationException e) {
-        adminException = e;
-      }
+    try {
+      checkCamundaAdmin();
+    } catch (AuthorizationException e) {
+      adminException = e;
     }
 
-    if (authorizationException != null) {
-      if (isAdminAuthorized && adminException != null || !isAdminAuthorized) {
-        // throw combined exception
-        String userId = authorizationException.getUserId();
-        List<MissingAuthorization> info = authorizationException.getMissingAuthorizations();
-        throw new AuthorizationException(userId, info, adminException != null);
-      }
+    if (authorizationException != null && adminException != null) {
+      // throw combined exception
+      String userId = authorizationException.getUserId();
+      List<MissingAuthorization> info = authorizationException.getMissingAuthorizations();
+      throw new AuthorizationException(userId, info, adminException != null);
     }
   }
 

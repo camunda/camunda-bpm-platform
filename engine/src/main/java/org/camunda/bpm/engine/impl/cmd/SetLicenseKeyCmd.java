@@ -19,9 +19,10 @@ package org.camunda.bpm.engine.impl.cmd;
 import static org.camunda.bpm.engine.impl.util.LicenseKeyUtil.addToTelemetry;
 
 import java.nio.charset.StandardCharsets;
+
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceManager;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
@@ -38,8 +39,7 @@ public class SetLicenseKeyCmd extends LicenseCmd implements Command<Object> {
   public Object execute(CommandContext commandContext) {
     EnsureUtil.ensureNotNull("licenseKey", licenseKey);
 
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkCamundaAdmin();
+    commandContext.getAuthorizationManager().checkCamundaAdminOrPermission(CommandChecker::checkSetLicenseKey);
 
     final ResourceManager resourceManager = commandContext.getResourceManager();
     ResourceEntity key = resourceManager.findLicenseKeyResource();

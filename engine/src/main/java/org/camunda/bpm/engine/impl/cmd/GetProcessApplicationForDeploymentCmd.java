@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.application.ProcessApplicationReference;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -34,7 +35,7 @@ public class GetProcessApplicationForDeploymentCmd implements Command<String> {
   }
 
   public String execute(CommandContext commandContext) {
-    commandContext.getAuthorizationManager().checkCamundaAdmin();
+    commandContext.getAuthorizationManager().checkCamundaAdminOrPermission(CommandChecker::checkReadProcessApplicationForDeployment);
 
     ProcessApplicationReference reference = Context.getProcessEngineConfiguration()
       .getProcessApplicationManager()

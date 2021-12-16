@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
@@ -30,7 +31,7 @@ public class IsTelemetryEnabledCmd implements Command<Boolean> {
   public Boolean execute(CommandContext commandContext) {
 
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkCamundaAdmin();
+    authorizationManager.checkCamundaAdminOrPermission(CommandChecker::checkReadTelemetryCollectionStatusData);
 
     PropertyEntity telemetryProperty = commandContext.getPropertyManager().findPropertyById("camunda.telemetry.enabled");
     if (telemetryProperty != null) {
@@ -44,5 +45,4 @@ public class IsTelemetryEnabledCmd implements Command<Boolean> {
       return null;
     }
   }
-
 }

@@ -20,6 +20,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.management.TableMetaData;
@@ -40,7 +41,7 @@ public class GetTableMetaDataCmd implements Command<TableMetaData>, Serializable
   public TableMetaData execute(CommandContext commandContext) {
     ensureNotNull("tableName", tableName);
 
-    commandContext.getAuthorizationManager().checkCamundaAdmin();
+    commandContext.getAuthorizationManager().checkCamundaAdminOrPermission(CommandChecker::checkReadTableMetaData);
 
     return commandContext
       .getTableDataManager()

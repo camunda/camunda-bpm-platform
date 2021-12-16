@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -48,7 +49,7 @@ public class UnregisterProcessApplicationCmd implements Command<Void> {
       throw new ProcessEngineException("Deployment Ids cannot be null.");
     }
 
-    commandContext.getAuthorizationManager().checkCamundaAdmin();
+    commandContext.getAuthorizationManager().checkCamundaAdminOrPermission(CommandChecker::checkUnregisterProcessApplication);
 
     Context.getProcessEngineConfiguration()
       .getProcessApplicationManager()

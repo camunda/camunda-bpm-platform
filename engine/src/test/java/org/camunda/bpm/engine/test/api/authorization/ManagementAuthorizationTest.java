@@ -19,21 +19,22 @@ package org.camunda.bpm.engine.test.api.authorization;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.authorization.Groups;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.authorization.SystemPermissions;
+import org.camunda.bpm.engine.authorization.TaskPermissions;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.management.Metrics;
+import org.camunda.bpm.engine.management.SchemaLogEntry;
 import org.camunda.bpm.engine.management.TableMetaData;
 import org.camunda.bpm.engine.management.TablePage;
 import org.camunda.bpm.engine.telemetry.TelemetryData;
+import org.junit.After;
 import org.junit.Test;
 
 
@@ -43,27 +44,21 @@ import org.junit.Test;
  */
 public class ManagementAuthorizationTest extends AuthorizationTest {
 
-  private static final String REQUIRED_ADMIN_AUTH_EXCEPTION = "ENGINE-03029 Required admin authenticated group or user.";
+  protected static final String REQUIRED_ADMIN_AUTH_EXCEPTION = "ENGINE-03029 Required admin authenticated group or user.";
+  protected static final String DUMMY_PROPERTY = "dummy-property";
+  protected static final String DUMMY_VALUE = "aPropertyValue";
+  protected static final String DUMMY_METRIC = "dummyMetric";
+
+  @After
+  public void tearDown() {
+    super.tearDown();
+    managementService.deleteProperty(DUMMY_PROPERTY);
+  }
 
   // get table count //////////////////////////////////////////////
 
   @Test
-  public void testGetTableCountWithoutAuthorization() {
-    // given
-
-    try {
-      // when
-      managementService.getTableCount();
-      fail("Exception expected: It should not be possible to get the table count");
-    } catch (AuthorizationException e) {
-      // then
-      String message = e.getMessage();
-      testRule.assertTextPresent(REQUIRED_ADMIN_AUTH_EXCEPTION, message);
-    }
-  }
-
-  @Test
-  public void testGetTableCountAsCamundaAdmin() {
+  public void shouldGetTableCountAsCamundaAdmin() {
     // given
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
 
@@ -71,28 +66,50 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
     Map<String, Long> tableCount = managementService.getTableCount();
 
     // then
-    assertFalse(tableCount.isEmpty());
+    assertThat(tableCount).isNotEmpty();
+  }
+
+  @Test
+  public void shouldGetTableCountWithPermission() {
+    // given
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.READ);
+
+    // when
+    Map<String, Long> tableCount = managementService.getTableCount();
+
+    // then
+    assertThat(tableCount).isNotEmpty();
+  }
+
+  @Test
+  public void shouldGetTableCountWithAdminAndPermission() {
+    // given
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.READ);
+
+    // when
+    Map<String, Long> tableCount = managementService.getTableCount();
+
+    // then
+    assertThat(tableCount).isNotEmpty();
+  }
+
+  @Test
+  public void shouldNotGetTableCountWithoutAuthorization() {
+    // given
+
+    assertThatThrownBy(() -> {
+      // when
+      managementService.getTableCount();
+    })
+        // then
+        .hasMessageContaining(permissionException(Resources.SYSTEM, SystemPermissions.READ));
   }
 
   // get table name //////////////////////////////////////////////
 
   @Test
-  public void testGetTableNameWithoutAuthorization() {
-    // given
-
-    try {
-      // when
-      managementService.getTableName(ProcessDefinitionEntity.class);
-      fail("Exception expected: It should not be possible to get the table name");
-    } catch (AuthorizationException e) {
-      // then
-      String message = e.getMessage();
-      testRule.assertTextPresent(REQUIRED_ADMIN_AUTH_EXCEPTION, message);
-    }
-  }
-
-  @Test
-  public void testGetTableNameAsCamundaAdmin() {
+  public void shouldGetTableNameAsCamundaAdmin() {
     // given
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
     String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
@@ -101,28 +118,52 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
     String tableName = managementService.getTableName(ProcessDefinitionEntity.class);
 
     // then
-    assertEquals(tablePrefix + "ACT_RE_PROCDEF", tableName);
+    assertThat(tablePrefix + "ACT_RE_PROCDEF").isEqualTo(tableName);
+  }
+
+  @Test
+  public void shouldGetTableNameWithPermission() {
+    // given
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.READ);
+    String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
+
+    // when
+    String tableName = managementService.getTableName(ProcessDefinitionEntity.class);
+
+    // then
+    assertThat(tablePrefix + "ACT_RE_PROCDEF").isEqualTo(tableName);
+  }
+
+  @Test
+  public void shouldGetTableNameAdminAndWithPermission() {
+    // given
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.READ);
+    String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
+
+    // when
+    String tableName = managementService.getTableName(ProcessDefinitionEntity.class);
+
+    // then
+    assertThat(tablePrefix + "ACT_RE_PROCDEF").isEqualTo(tableName);
+  }
+
+  @Test
+  public void shouldNotGetTableNameWithoutAuthorization() {
+    // given
+
+    assertThatThrownBy(() -> {
+      // when
+      managementService.getTableName(ProcessDefinitionEntity.class);
+    })
+        // then
+        .hasMessageContaining(permissionException(Resources.SYSTEM, SystemPermissions.READ));
   }
 
   // get table meta data //////////////////////////////////////////////
 
   @Test
-  public void testGetTableMetaDataWithoutAuthorization() {
-    // given
-
-    try {
-      // when
-      managementService.getTableMetaData("ACT_RE_PROCDEF");
-      fail("Exception expected: It should not be possible to get the table meta data");
-    } catch (AuthorizationException e) {
-      // then
-      String message = e.getMessage();
-      testRule.assertTextPresent(REQUIRED_ADMIN_AUTH_EXCEPTION, message);
-    }
-  }
-
-  @Test
-  public void testGetTableMetaDataAsCamundaAdmin() {
+  public void shouldGetTableMetaDataAsCamundaAdmin() {
     // given
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
 
@@ -130,29 +171,63 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
     TableMetaData tableMetaData = managementService.getTableMetaData("ACT_RE_PROCDEF");
 
     // then
-    assertNotNull(tableMetaData);
+    assertThat(tableMetaData).isNotNull();
+  }
+
+  @Test
+  public void shouldGetTableMetaDataWithPermission() {
+    // given
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.READ);
+
+    // when
+    TableMetaData tableMetaData = managementService.getTableMetaData("ACT_RE_PROCDEF");
+
+    // then
+    assertThat(tableMetaData).isNotNull();
+  }
+
+  @Test
+  public void shouldGetTableMetaDataWithAdminAndPermission() {
+    // given
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.READ);
+
+    // when
+    TableMetaData tableMetaData = managementService.getTableMetaData("ACT_RE_PROCDEF");
+
+    // then
+    assertThat(tableMetaData).isNotNull();
+  }
+
+
+  @Test
+  public void shouldNotGetTableMetaDataWithoutAuthorization() {
+    // given
+
+    assertThatThrownBy(() -> {
+      // when
+      managementService.getTableMetaData("ACT_RE_PROCDEF");
+    })
+        // then
+        .hasMessageContaining(permissionException(Resources.SYSTEM, SystemPermissions.READ));
   }
 
   // table page query //////////////////////////////////
 
   @Test
-  public void testTablePageQueryWithoutAuthorization() {
+  public void shouldNotPerformTablePageQueryWithoutAuthorization() {
     // given
 
-    try {
+    assertThatThrownBy(() -> {
       // when
       managementService.createTablePageQuery().tableName("ACT_RE_PROCDEF").listPage(0, Integer.MAX_VALUE);
-      fail("Exception expected: It should not be possible to get a table page");
-    } catch (AuthorizationException e) {
-      // then
-      String message = e.getMessage();
-      testRule.assertTextPresent(REQUIRED_ADMIN_AUTH_EXCEPTION, message);
-    }
-
+    })
+        // then
+        .hasMessage(REQUIRED_ADMIN_AUTH_EXCEPTION);
   }
 
   @Test
-  public void testTablePageQueryAsCamundaAdmin() {
+  public void shouldPerformTablePageQueryAsCamundaAdmin() {
     // given
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
     String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
@@ -161,28 +236,13 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
     TablePage page = managementService.createTablePageQuery().tableName(tablePrefix + "ACT_RE_PROCDEF").listPage(0, Integer.MAX_VALUE);
 
     // then
-    assertNotNull(page);
+    assertThat(page).isNotNull();
   }
 
   // get history level /////////////////////////////////
 
   @Test
-  public void testGetHistoryLevelWithoutAuthorization() {
-    //given
-
-    try {
-      // when
-      managementService.getHistoryLevel();
-      fail("Exception expected: It should not be possible to get the history level");
-    } catch (AuthorizationException e) {
-      // then
-      String message = e.getMessage();
-      testRule.assertTextPresent(REQUIRED_ADMIN_AUTH_EXCEPTION, message);
-    }
-  }
-
-  @Test
-  public void testGetHistoryLevelAsCamundaAdmin() {
+  public void shouldGetHistoryLevelAsCamundaAdmin() {
     //given
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
 
@@ -193,74 +253,242 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
     assertEquals(processEngineConfiguration.getHistoryLevel().getId(), historyLevel);
   }
 
+  @Test
+  public void shouldGetHistoryLevelWithPermission() {
+    //given
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.READ);
+
+    // when
+    int historyLevel = managementService.getHistoryLevel();
+
+    // then
+    assertEquals(processEngineConfiguration.getHistoryLevel().getId(), historyLevel);
+  }
+
+  @Test
+  public void shouldGetHistoryLevelAdminAndWithPermission() {
+    //given
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.READ);
+
+    // when
+    int historyLevel = managementService.getHistoryLevel();
+
+    // then
+    assertEquals(processEngineConfiguration.getHistoryLevel().getId(), historyLevel);
+  }
+
+  @Test
+  public void shouldNotGetHistoryLevelWithoutAuthorization() {
+    // given
+    assertThatThrownBy(() -> {
+      // when
+      managementService.getHistoryLevel();
+    })
+        // then
+        .hasMessageContaining(permissionException(Resources.SYSTEM, SystemPermissions.READ));
+  }
+
   // database schema upgrade ///////////////////////////
 
   @Test
-  public void testDataSchemaUpgradeWithoutAuthorization() {
+  public void shouldNotPerformDataSchemaUpgradeWithoutAuthorization() {
     // given
 
-    try {
+    assertThatThrownBy(() -> {
       // when
       managementService.databaseSchemaUpgrade(null, null, null);
-      fail("Exception expected: It should not be possible to upgrade the database schema");
-    } catch (AuthorizationException e) {
-      // then
-      String message = e.getMessage();
-      testRule.assertTextPresent(REQUIRED_ADMIN_AUTH_EXCEPTION, message);
-    }
+    })
+        // then
+        .hasMessage(REQUIRED_ADMIN_AUTH_EXCEPTION);
   }
 
-  // get properties & set/delete property ///////////////////////////
+  // get properties  ///////////////////////////
+
 
   @Test
-  public void testGetPropertiesWithoutAuthorization() {
+  public void shouldGetPropertiesAsCamundaAdmin() {
     // given
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
 
-    try {
+    // when
+      Map<String, String> properties = managementService.getProperties();
+
+    // then
+      assertThat(properties).isNotEmpty();
+  }
+
+  @Test
+  public void shouldGetPropertiesWithPermission() {
+    // given
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.READ);
+
+    // when
+    Map<String, String> properties = managementService.getProperties();
+
+    // then
+    assertThat(properties).isNotEmpty();
+  }
+
+  @Test
+  public void shouldGetPropertiesWithAdminAndPermission() {
+    // given
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.READ);
+
+    // when
+    Map<String, String> properties = managementService.getProperties();
+
+    // then
+    assertThat(properties).isNotEmpty();
+  }
+
+  @Test
+  public void shouldNotGetPropertiesWithWrongPermission() {
+    // given
+    createGrantAuthorization(Resources.TASK, "*", userId, TaskPermissions.DELETE);
+
+    assertThatThrownBy(() -> {
       // when
       managementService.getProperties();
-      fail("Exception expected: It should not be possible to get properties");
-    } catch (AuthorizationException e) {
-      // then
-      String message = e.getMessage();
-      testRule.assertTextPresent(REQUIRED_ADMIN_AUTH_EXCEPTION, message);
-    }
+    })
+    // then
+    .hasMessageContaining(permissionException(Resources.SYSTEM, SystemPermissions.READ));
   }
 
   @Test
-  public void testSetPropertyWithoutAuthorization() {
+  public void shouldNotGetPropertiesWithoutAuthorization() {
     // given
 
-    try {
+    assertThatThrownBy(() -> {
       // when
-      managementService.setProperty("aPropertyKey", "aPropertyValue");
-      fail("Exception expected: It should not be possible to set a property");
-    } catch (AuthorizationException e) {
-      // then
-      String message = e.getMessage();
-      testRule.assertTextPresent(REQUIRED_ADMIN_AUTH_EXCEPTION, message);
-    }
+      managementService.getProperties();
+    })
+        // then
+        .hasMessageContaining(permissionException(Resources.SYSTEM, SystemPermissions.READ));
+  }
+
+  // set properties ///////////////////////////
+
+  @Test
+  public void shouldSetPropertyAsCamundaAdmin() {
+    // given
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+
+    // when
+      managementService.setProperty(DUMMY_PROPERTY, DUMMY_VALUE);
+
+    // then
+      disableAuthorization();
+      assertThat(managementService.getProperties().get(DUMMY_PROPERTY)).isEqualTo(DUMMY_VALUE);
   }
 
   @Test
-  public void testDeletePropertyWithoutAuthorization() {
+  public void shouldSetPropertyWithPermission() {
+    // given
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.WRITE);
+
+    // when
+    managementService.setProperty(DUMMY_PROPERTY, DUMMY_VALUE);
+
+    // then
+    disableAuthorization();
+    assertThat(managementService.getProperties().get(DUMMY_PROPERTY)).isEqualTo(DUMMY_VALUE);
+  }
+
+  @Test
+  public void shouldSetPropertyWithAdminAndPermission() {
+    // given
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.WRITE);
+
+    // when
+    managementService.setProperty(DUMMY_PROPERTY, DUMMY_VALUE);
+
+    // then
+    disableAuthorization();
+    assertThat(managementService.getProperties().get(DUMMY_PROPERTY)).isEqualTo(DUMMY_VALUE);
+  }
+
+  @Test
+  public void shouldNotSetPropertyWithoutAuthorization() {
     // given
 
-    try {
+    assertThatThrownBy(() -> {
       // when
-      managementService.deleteProperty("aPropertyName");
-      fail("Exception expected: It should not be possible to delete a property");
-    } catch (AuthorizationException e) {
-      // then
-      String message = e.getMessage();
-      testRule.assertTextPresent(REQUIRED_ADMIN_AUTH_EXCEPTION, message);
-    }
+      managementService.setProperty(DUMMY_PROPERTY, DUMMY_VALUE);
+    })
+        // then
+        .hasMessageContaining(permissionException(Resources.SYSTEM, SystemPermissions.WRITE));
+  }
+
+  // delete properties ///////////////////////////
+
+  @Test
+  public void shouldDeletePropertyAsCamundaAdmin() {
+    // given
+    disableAuthorization();
+    managementService.setProperty(DUMMY_VALUE, DUMMY_PROPERTY);
+    enableAuthorization();
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+
+    // when
+      managementService.deleteProperty(DUMMY_PROPERTY);
+
+    // then
+      disableAuthorization();
+      assertThat(managementService.getProperties().get(DUMMY_PROPERTY)).isNull();
+  }
+
+  @Test
+  public void shouldDeletePropertyWithPermission() {
+    // given
+    disableAuthorization();
+    managementService.setProperty(DUMMY_VALUE, DUMMY_PROPERTY);
+    enableAuthorization();
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.DELETE);
+
+    // when
+    managementService.deleteProperty(DUMMY_PROPERTY);
+
+    // then
+    disableAuthorization();
+    assertThat(managementService.getProperties().get(DUMMY_PROPERTY)).isNull();
+  }
+
+  @Test
+  public void shouldDeletePropertyWithAdminAndPermission() {
+    // given
+    disableAuthorization();
+    managementService.setProperty(DUMMY_VALUE, DUMMY_PROPERTY);
+    enableAuthorization();
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.DELETE);
+
+    // when
+    managementService.deleteProperty(DUMMY_PROPERTY);
+
+    // then
+    disableAuthorization();
+    assertThat(managementService.getProperties().get(DUMMY_PROPERTY)).isNull();
+  }
+
+  @Test
+  public void shouldNotDeletePropertyWithoutAuthorization() {
+    // given
+
+    assertThatThrownBy(() -> {
+      // when
+      managementService.deleteProperty(DUMMY_PROPERTY);
+    })
+        // then
+        .hasMessageContaining(permissionException(Resources.SYSTEM, SystemPermissions.DELETE));
   }
 
   // configure telemetry /////////////////////////////////////
 
   @Test
-  public void testTelemetryEnabledWithoutAutorization() {
+  public void shouldNotToggleTelemetryEnabledWithoutAuthorization() {
     // given
 
     assertThatThrownBy(() -> {
@@ -268,12 +496,11 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
       managementService.toggleTelemetry(false);
     })
     // then
-    .hasMessageContaining(REQUIRED_ADMIN_AUTH_EXCEPTION);
-
+        .hasMessageContaining(permissionException(Resources.SYSTEM, SystemPermissions.WRITE));
   }
 
   @Test
-  public void testTelemetryEnabledAsCamundaAdmin() {
+  public void shouldToggleTelemetryEnabledAsCamundaAdmin() {
     // given
     disableAuthorization();
     managementService.toggleTelemetry(true);
@@ -287,19 +514,38 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
     assertThat(managementService.isTelemetryEnabled()).isFalse();
   }
 
-  // get telemetry data /////////////////////////////////////
+  @Test
+  public void shouldToggleTelemetryEnabledWithPermission() {
+    // given
+    disableAuthorization();
+    managementService.toggleTelemetry(true);
+    enableAuthorization();
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.READ, SystemPermissions.WRITE);
+
+    // when
+    managementService.toggleTelemetry(false);
+
+    // then
+    assertThat(managementService.isTelemetryEnabled()).isFalse();
+  }
 
   @Test
-  public void shouldNotGetTelemetryDataWithoutAdminAndPermission() {
+  public void shouldToggleTelemetryEnabledWithAdminAndPermission() {
     // given
+    disableAuthorization();
+    managementService.toggleTelemetry(true);
+    enableAuthorization();
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.READ, SystemPermissions.WRITE);
 
-    assertThatThrownBy(() -> {
-      // when
-      managementService.getTelemetryData();
-    })
+    // when
+    managementService.toggleTelemetry(false);
+
     // then
-    .hasMessageContaining("The user with id 'test' is not an admin authenticated user or  does not have one of the following permissions: 'READ' permission on resource 'System'");
+    assertThat(managementService.isTelemetryEnabled()).isFalse();
   }
+
+  // get telemetry data /////////////////////////////////////
 
   @Test
   public void shouldGetTelemetryDataAsCamundaAdmin() {
@@ -317,7 +563,6 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
   public void shouldGetTelemetryDataWithPermission() {
     // given
     createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.READ);
-    identityService.setAuthentication(userId, null);
 
     // when
     TelemetryData telemetryData = managementService.getTelemetryData();
@@ -331,13 +576,428 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
     // given
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
     createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.READ);
-    identityService.setAuthentication(userId, null);
 
     // when
     TelemetryData telemetryData = managementService.getTelemetryData();
 
     // then
     assertThat(telemetryData).isNotNull();
+  }
+
+
+  @Test
+  public void shouldNotGetTelemetryDataWithoutAdminAndPermission() {
+    // given
+
+    assertThatThrownBy(() -> {
+      // when
+      managementService.getTelemetryData();
+    })
+    // then
+      .hasMessageContaining(permissionException(Resources.SYSTEM, SystemPermissions.READ));
+  }
+
+  // get license key /////////////////////////////////////
+
+  @Test
+  public void shouldGetLicenseKeyAsCamundaAdmin() {
+    // given
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+
+    disableAuthorization();
+    managementService.setLicenseKey("testLicenseKey");
+    enableAuthorization();
+
+    // when
+    String licenseKey = managementService.getLicenseKey();
+
+    // then
+    assertThat(licenseKey).isNotNull();
+  }
+
+  @Test
+  public void shouldGetLicenseKeyWithPermission() {
+    // given
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.READ);
+
+    disableAuthorization();
+    managementService.setLicenseKey("testLicenseKey");
+    enableAuthorization();
+
+    // when
+    String licenseKey = managementService.getLicenseKey();
+
+    // then
+    assertThat(licenseKey).isNotNull();
+  }
+
+  @Test
+  public void shouldGetLicenseKeyWithAdminAndPermission() {
+    // given
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.READ);
+
+    disableAuthorization();
+    managementService.setLicenseKey("testLicenseKey");
+    enableAuthorization();
+
+    // when
+    String licenseKey = managementService.getLicenseKey();
+
+    // then
+    assertThat(licenseKey).isEqualTo("testLicenseKey");
+  }
+
+  @Test
+  public void shouldNotGetLicenseKeyWithoutAuthorization() {
+    // given
+
+    assertThatThrownBy(() -> {
+      // when
+      managementService.getLicenseKey();
+    })
+        // then
+        .hasMessageContaining(permissionException(Resources.SYSTEM, SystemPermissions.READ));
+  }
+
+  // set license key /////////////////////////////////////
+
+  @Test
+  public void shouldSetLicenseKeyAsCamundaAdmin() {
+    // given
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+
+    // when
+    managementService.setLicenseKey("testLicenseKey");
+
+    // then
+    disableAuthorization();
+    assertThat(managementService.getLicenseKey()).isNotNull();
+    enableAuthorization();
+  }
+
+  @Test
+  public void shouldSetLicenseKeyWithPermission() {
+    // given
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.WRITE, SystemPermissions.DELETE);
+
+    // when
+    managementService.setLicenseKey("testLicenseKey");
+
+    // then
+    disableAuthorization();
+    assertThat(managementService.getLicenseKey()).isNotNull();
+    enableAuthorization();
+  }
+
+  @Test
+  public void shouldSetLicenseKeyWithAdminAndPermission() {
+    // given
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.WRITE, SystemPermissions.DELETE);
+
+    // when
+    managementService.setLicenseKey("testLicenseKey");
+
+    // then
+    disableAuthorization();
+    assertThat(managementService.getLicenseKey()).isNotNull();
+    enableAuthorization();
+  }
+
+  @Test
+  public void shouldNotSetLicenseKeyWithoutAuthorization() {
+    // given
+
+    assertThatThrownBy(() -> {
+      // when
+      managementService.setLicenseKey("testLicenseKey");
+    })
+        // then
+        .hasMessageContaining(permissionException(Resources.SYSTEM, SystemPermissions.WRITE));
+  }
+
+  // delete license key //////////////////////////////////
+
+  @Test
+  public void shouldDeleteLicenseKeyAsCamundaAdmin() {
+    // given
+    disableAuthorization();
+    managementService.setLicenseKey("testLicenseKey");
+    enableAuthorization();
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+
+    // when
+    managementService.deleteLicenseKey();
+
+    // then
+    assertThat(managementService.getLicenseKey()).isNull();
+  }
+
+  @Test
+  public void shouldDeleteLicenseKeyWithPermission() {
+    // given
+    disableAuthorization();
+    managementService.setLicenseKey("testLicenseKey");
+    enableAuthorization();
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.DELETE);
+
+    // when
+    managementService.deleteLicenseKey();
+
+    // then
+    disableAuthorization();
+    assertThat(managementService.getLicenseKey()).isNull();
+    enableAuthorization();
+  }
+
+  @Test
+  public void shouldDeleteLicenseKeyWithAdminAndPermission() {
+    // given
+    disableAuthorization();
+    managementService.setLicenseKey("testLicenseKey");
+    enableAuthorization();
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.DELETE);
+
+    // when
+    managementService.deleteLicenseKey();
+
+    // then
+    disableAuthorization();
+    assertThat(managementService.getLicenseKey()).isNull();
+    enableAuthorization();
+  }
+
+  @Test
+  public void shouldNotDeleteLicenseKeyWithoutAuthorization() {
+    // given
+
+    assertThatThrownBy(() -> {
+      // when
+      managementService.deleteLicenseKey();
+    })
+        // then
+        .hasMessageContaining(permissionException(Resources.SYSTEM, SystemPermissions.DELETE));
+  }
+
+  // delete metrics //////////////////////////////////////
+
+  @Test
+  public void shouldDeleteMetricsAsCamundaAdmin() {
+    // given
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+
+    processEngineConfiguration.getDbMetricsReporter().reportValueAtOnce(DUMMY_METRIC, 15);
+
+    // when
+    managementService.deleteMetrics(null);
+
+    // then
+    assertThat(managementService.createMetricsQuery().name(DUMMY_METRIC).sum()).isZero();
+  }
+
+  @Test
+  public void shouldDeleteMetricsWithPermission() {
+    // given
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.DELETE);
+
+    processEngineConfiguration.getDbMetricsReporter().reportValueAtOnce(DUMMY_METRIC, 15);
+
+    // when
+    managementService.deleteMetrics(null);
+
+    // then
+    assertThat(managementService.createMetricsQuery().name(DUMMY_METRIC).sum()).isZero();
+  }
+
+  @Test
+  public void shouldDeleteMetricsWithAdminAndPermission() {
+    // given
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.DELETE);
+
+    processEngineConfiguration.getDbMetricsReporter().reportValueAtOnce(DUMMY_METRIC, 15);
+
+    // when
+    managementService.deleteMetrics(null);
+
+    // then
+    assertThat(managementService.createMetricsQuery().name(DUMMY_METRIC).sum()).isZero();
+  }
+
+  @Test
+  public void shouldNotDeleteMetricsWithoutAuthorization() {
+    // given
+
+    assertThatThrownBy(() -> {
+      // when
+      managementService.deleteMetrics(null);
+    })
+        // then
+        .hasMessageContaining(permissionException(Resources.SYSTEM, SystemPermissions.DELETE));
+  }
+
+  // delete task metrics /////////////////////////////////
+
+  @Test
+  public void shouldDeleteTaskMetricsAsCamundaAdmin() {
+    // given
+    processEngineConfiguration.setTaskMetricsEnabled(true);
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+
+    // when
+    managementService.deleteTaskMetrics(null);
+
+    // then
+    // no exception
+    assertThat(managementService.createMetricsQuery().name(Metrics.UNIQUE_TASK_WORKERS).sum()).isZero();
+  }
+
+  @Test
+  public void shouldDeleteTaskMetricsWithPermission() {
+    // given
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.DELETE);
+
+    // when
+    managementService.deleteTaskMetrics(null);
+
+    // then
+    // no exception
+    assertThat(managementService.createMetricsQuery().name(Metrics.UNIQUE_TASK_WORKERS).sum()).isZero();
+  }
+
+  @Test
+  public void shouldDeleteTaskMetricsWithAdminAndPermission() {
+    // given
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.DELETE);
+
+    // when
+    managementService.deleteTaskMetrics(null);
+
+    // then
+    // no exception
+    assertThat(managementService.createMetricsQuery().name(Metrics.UNIQUE_TASK_WORKERS).sum()).isZero();
+  }
+
+  @Test
+  public void shouldNotDeleteTaskMetricsWithoutAuthorization() {
+    // given
+
+    assertThatThrownBy(() -> {
+      // when
+      managementService.deleteTaskMetrics(null);
+    })
+        // then
+        .hasMessageContaining(permissionException(Resources.SYSTEM, SystemPermissions.DELETE));
+  }
+
+  // query schema log list //////////////////////////////////////////
+
+  @Test
+  public void shouldExecuteSchemaLogListAsCamundaAdmin() {
+    // given
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+
+    // when
+    List<SchemaLogEntry> schemaLog = managementService.createSchemaLogQuery().list();
+
+    // then
+    assertThat(schemaLog).isNotNull();
+    assertThat(schemaLog).isNotEmpty();
+  }
+
+  @Test
+  public void shouldExecuteSchemaLogListWithPermission() {
+    // given
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.READ);
+
+    // when
+    List<SchemaLogEntry> schemaLog = managementService.createSchemaLogQuery().list();
+
+    // then
+    assertThat(schemaLog).isNotNull();
+    assertThat(schemaLog).isNotEmpty();
+  }
+
+  @Test
+  public void shouldExecuteSchemaLogListWithAdminAndPermission() {
+    // given
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.READ);
+
+    // when
+    List<SchemaLogEntry> schemaLog = managementService.createSchemaLogQuery().list();
+
+    // then
+    assertThat(schemaLog).isNotNull();
+    assertThat(schemaLog).isNotEmpty();
+  }
+
+  @Test
+  public void shouldNotExecuteSchemaLogListWithoutAuthorization() {
+    // given
+
+    // when
+    List<SchemaLogEntry> schemaLog = managementService.createSchemaLogQuery().list();
+
+    // then
+    assertThat(schemaLog).isEmpty();
+  }
+
+  // query schema log count //////////////////////////////////////////
+
+  @Test
+  public void shouldExecuteSchemaLogCountAsCamundaAdmin() {
+    // given
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+
+    // when
+    long schemaLog = managementService.createSchemaLogQuery().count();
+
+    // then
+    assertThat(schemaLog).isNotNull();
+    assertThat(schemaLog).isGreaterThan(0);
+  }
+
+  @Test
+  public void shouldExecuteSchemaLogCountWithPermission() {
+    // given
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.READ);
+
+    // when
+    long schemaLog = managementService.createSchemaLogQuery().count();
+
+    // then
+    assertThat(schemaLog).isNotNull();
+    assertThat(schemaLog).isGreaterThan(0);
+  }
+
+  @Test
+  public void shouldExecuteSchemaLogCountWithAdminAndPermission() {
+    // given
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.READ);
+
+    // when
+    long schemaLog = managementService.createSchemaLogQuery().count();
+
+    // then
+    assertThat(schemaLog).isNotNull();
+    assertThat(schemaLog).isGreaterThan(0);
+  }
+
+  @Test
+  public void shouldNotExecuteSchemaLogCountWithoutAuthorization() {
+    // given
+
+    // when
+    long schemaLog = managementService.createSchemaLogQuery().count();
+
+    // then
+    assertThat(schemaLog).isNotNull();
+    assertThat(schemaLog).isZero();
   }
 
 }

@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.test.api.authorization;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
@@ -41,6 +43,8 @@ import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.AuthorizationQuery;
 import org.camunda.bpm.engine.authorization.Groups;
+import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.authorization.SystemPermissions;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
@@ -53,7 +57,6 @@ import org.junit.Test;
  */
 public class DeploymentAuthorizationTest extends AuthorizationTest {
 
-  private static final String REQUIRED_ADMIN_AUTH_EXCEPTION = "ENGINE-03029 Required admin authenticated group or user.";
   protected static final String FIRST_RESOURCE = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml";
   protected static final String SECOND_RESOURCE = "org/camunda/bpm/engine/test/api/authorization/messageBoundaryEventProcess.bpmn20.xml";
 
@@ -62,15 +65,13 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
   @Test
   public void testSimpleDeploymentQueryWithoutAuthorization() {
     // given
-    String deploymentId = createDeployment(null);
+    createDeployment(null);
 
     // when
     DeploymentQuery query = repositoryService.createDeploymentQuery();
 
     // then
     verifyQueryResults(query, 0);
-
-    deleteDeployment(deploymentId);
   }
 
   @Test
@@ -84,14 +85,12 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
 
     // then
     verifyQueryResults(query, 1);
-
-    deleteDeployment(deploymentId);
   }
 
   @Test
   public void testSimpleDeploymentQueryWithReadPermissionOnAnyDeployment() {
     // given
-    String deploymentId = createDeployment(null);
+    createDeployment(null);
     createGrantAuthorization(DEPLOYMENT, ANY, userId, READ);
 
     // when
@@ -99,8 +98,6 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
 
     // then
     verifyQueryResults(query, 1);
-
-    deleteDeployment(deploymentId);
   }
 
   @Test
@@ -115,31 +112,26 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
 
     // then
     verifyQueryResults(query, 1);
-
-    deleteDeployment(deploymentId);
   }
 
   @Test
   public void testDeploymentQueryWithoutAuthorization() {
     // given
-    String deploymentId1 = createDeployment("first");
-    String deploymentId2 = createDeployment("second");
+    createDeployment("first");
+    createDeployment("second");
 
     // when
     DeploymentQuery query = repositoryService.createDeploymentQuery();
 
     // then
     verifyQueryResults(query, 0);
-
-    deleteDeployment(deploymentId1);
-    deleteDeployment(deploymentId2);
   }
 
   @Test
   public void testDeploymentQueryWithReadPermissionOnDeployment() {
     // given
     String deploymentId1 = createDeployment("first");
-    String deploymentId2 = createDeployment("second");
+    createDeployment("second");
     createGrantAuthorization(DEPLOYMENT, deploymentId1, userId, READ);
 
     // when
@@ -147,16 +139,13 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
 
     // then
     verifyQueryResults(query, 1);
-
-    deleteDeployment(deploymentId1);
-    deleteDeployment(deploymentId2);
   }
 
   @Test
   public void testDeploymentQueryWithReadPermissionOnAnyDeployment() {
     // given
-    String deploymentId1 = createDeployment("first");
-    String deploymentId2 = createDeployment("second");
+    createDeployment("first");
+    createDeployment("second");
     createGrantAuthorization(DEPLOYMENT, ANY, userId, READ);
 
     // when
@@ -164,9 +153,6 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
 
     // then
     verifyQueryResults(query, 2);
-
-    deleteDeployment(deploymentId1);
-    deleteDeployment(deploymentId2);
   }
 
   // create deployment ///////////////////////////////////////////////
@@ -202,13 +188,14 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
       .addClasspathResource(FIRST_RESOURCE)
       .deploy();
 
+    // mark deployment for cleanup
+    deploymentIds.add(deployment.getId());
+
     // then
     disableAuthorization();
     DeploymentQuery query = repositoryService.createDeploymentQuery();
     verifyQueryResults(query, 1);
     enableAuthorization();
-
-    deleteDeployment(deployment.getId());
   }
 
   // delete deployment //////////////////////////////////////////////
@@ -229,8 +216,6 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
       testRule.assertTextPresent(DELETE.getName(), message);
       testRule.assertTextPresent(DEPLOYMENT.resourceName(), message);
     }
-
-    deleteDeployment(deploymentId);
   }
 
   @Test
@@ -247,8 +232,6 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     DeploymentQuery query = repositoryService.createDeploymentQuery();
     verifyQueryResults(query, 0);
     enableAuthorization();
-
-    deleteDeployment(deploymentId);
   }
 
   @Test
@@ -265,8 +248,6 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     DeploymentQuery query = repositoryService.createDeploymentQuery();
     verifyQueryResults(query, 0);
     enableAuthorization();
-
-    deleteDeployment(deploymentId);
   }
 
   // get deployment resource names //////////////////////////////////
@@ -287,8 +268,6 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
       testRule.assertTextPresent(READ.getName(), message);
       testRule.assertTextPresent(DEPLOYMENT.resourceName(), message);
     }
-
-    deleteDeployment(deploymentId);
   }
 
   @Test
@@ -305,8 +284,6 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     assertEquals(2, names.size());
     assertTrue(names.contains(FIRST_RESOURCE));
     assertTrue(names.contains(SECOND_RESOURCE));
-
-    deleteDeployment(deploymentId);
   }
 
   @Test
@@ -323,8 +300,6 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     assertEquals(2, names.size());
     assertTrue(names.contains(FIRST_RESOURCE));
     assertTrue(names.contains(SECOND_RESOURCE));
-
-    deleteDeployment(deploymentId);
   }
 
   // get deployment resources //////////////////////////////////
@@ -345,8 +320,6 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
       testRule.assertTextPresent(READ.getName(), message);
       testRule.assertTextPresent(DEPLOYMENT.resourceName(), message);
     }
-
-    deleteDeployment(deploymentId);
   }
 
   @Test
@@ -361,8 +334,6 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     // then
     assertFalse(resources.isEmpty());
     assertEquals(2, resources.size());
-
-    deleteDeployment(deploymentId);
   }
 
   @Test
@@ -377,8 +348,6 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     // then
     assertFalse(resources.isEmpty());
     assertEquals(2, resources.size());
-
-    deleteDeployment(deploymentId);
   }
 
   // get resource as stream //////////////////////////////////
@@ -399,8 +368,6 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
       testRule.assertTextPresent(READ.getName(), message);
       testRule.assertTextPresent(DEPLOYMENT.resourceName(), message);
     }
-
-    deleteDeployment(deploymentId);
   }
 
   @Test
@@ -414,8 +381,6 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
 
     // then
     assertNotNull(stream);
-
-    deleteDeployment(deploymentId);
   }
 
   @Test
@@ -429,8 +394,6 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
 
     // then
     assertNotNull(stream);
-
-    deleteDeployment(deploymentId);
   }
 
   // get resource as stream by id//////////////////////////////////
@@ -456,8 +419,6 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
       testRule.assertTextPresent(READ.getName(), message);
       testRule.assertTextPresent(DEPLOYMENT.resourceName(), message);
     }
-
-    deleteDeployment(deploymentId);
   }
 
   @Test
@@ -476,8 +437,6 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
 
     // then
     assertNotNull(stream);
-
-    deleteDeployment(deploymentId);
   }
 
   @Test
@@ -496,8 +455,6 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
 
     // then
     assertNotNull(stream);
-
-    deleteDeployment(deploymentId);
   }
 
   // should create authorization /////////////////////////////////////
@@ -511,6 +468,9 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
       .addClasspathResource(FIRST_RESOURCE)
       .deploy();
 
+    // mark deployment for cleanup
+    deploymentIds.add(deployment.getId());
+
     // when
     Authorization authorization = authorizationService
       .createAuthorizationQuery()
@@ -523,8 +483,6 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     assertTrue(authorization.isPermissionGranted(READ));
     assertTrue(authorization.isPermissionGranted(DELETE));
     assertFalse(authorization.isPermissionGranted(UPDATE));
-
-    deleteDeployment(deployment.getId());
   }
 
   // clear authorization /////////////////////////////////////
@@ -553,35 +511,12 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
 
     authorization = query.singleResult();
     assertNull(authorization);
-
-    deleteDeployment(deploymentId);
   }
 
   // register process application ///////////////////////////////////
 
   @Test
-  public void testRegisterProcessApplicationWithoutAuthorization() {
-    // given
-    EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication();
-    ProcessApplicationReference reference = processApplication.getReference();
-    String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
-
-    try {
-      // when
-      managementService.registerProcessApplication(deploymentId, reference);
-      fail("Exception expected: It should not be possible to register a process application");
-    } catch (AuthorizationException e) {
-      //then
-      String message = e.getMessage();
-      testRule.assertTextPresent(REQUIRED_ADMIN_AUTH_EXCEPTION, message);
-
-    }
-
-    deleteDeployment(deploymentId);
-  }
-
-  @Test
-  public void testRegisterProcessApplicationAsCamundaAdmin() {
+  public void shouldRegisterProcessApplicationAsCamundaAdmin() {
     // given
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
 
@@ -593,38 +528,58 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     ProcessApplicationRegistration registration = managementService.registerProcessApplication(deploymentId, reference);
 
     // then
-    assertNotNull(registration);
-    assertNotNull(getProcessApplicationForDeployment(deploymentId));
+    assertThat(registration).isNotNull();
+    assertThat(getProcessApplicationForDeployment(deploymentId)).isNotNull();
+  }
 
-    deleteDeployment(deploymentId);
+  @Test
+  public void shouldRegisterProcessApplicationWithPermission() {
+    // given
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.WRITE);
+    EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication();
+    ProcessApplicationReference reference = processApplication.getReference();
+    String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
+
+    // when
+    ProcessApplicationRegistration registration = managementService.registerProcessApplication(deploymentId, reference);
+
+    // then
+    assertThat(registration).isNotNull();
+    assertThat(getProcessApplicationForDeployment(deploymentId)).isNotNull();
+  }
+
+  @Test
+  public void shouldRegisterProcessApplicationWithAdminAndPermission() {
+    // given
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.WRITE);
+    EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication();
+    ProcessApplicationReference reference = processApplication.getReference();
+    String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
+
+    // when
+    ProcessApplicationRegistration registration = managementService.registerProcessApplication(deploymentId, reference);
+
+    // then
+    assertThat(registration).isNotNull();
+    assertThat(getProcessApplicationForDeployment(deploymentId)).isNotNull();
+  }
+
+  @Test
+  public void shouldNotRegisterProcessApplicationWithoutAuthorization() {
+    // given
+
+    assertThatThrownBy(() -> {
+      // when
+      managementService.registerProcessApplication(null, null);
+    })
+        // then
+        .hasMessageContaining(permissionException(Resources.SYSTEM, SystemPermissions.WRITE));
   }
 
   // unregister process application ///////////////////////////////////
-
   @Test
-  public void testUnregisterProcessApplicationWithoutAuthorization() {
-    // given
-    EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication();
-    String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
-    ProcessApplicationReference reference = processApplication.getReference();
-    registerProcessApplication(deploymentId, reference);
-
-    try {
-      // when
-      managementService.unregisterProcessApplication(deploymentId, true);
-      fail("Exception expected: It should not be possible to unregister a process application");
-    } catch (AuthorizationException e) {
-      //then
-      String message = e.getMessage();
-      testRule.assertTextPresent(REQUIRED_ADMIN_AUTH_EXCEPTION, message);
-
-    }
-
-    deleteDeployment(deploymentId);
-  }
-
-  @Test
-  public void testUnregisterProcessApplicationAsCamundaAdmin() {
+  public void shouldUnregisterProcessApplicationAsCamundaAdmin() {
     // given
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
 
@@ -637,37 +592,60 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     managementService.unregisterProcessApplication(deploymentId, true);
 
     // then
-    assertNull(getProcessApplicationForDeployment(deploymentId));
-
-    deleteDeployment(deploymentId);
+    assertThat(getProcessApplicationForDeployment(deploymentId)).isNull();
   }
 
-  // get process application for deployment ///////////////////////////////////
-
   @Test
-  public void testGetProcessApplicationForDeploymentWithoutAuthorization() {
+  public void shouldUnregisterProcessApplicationWithPermission() {
     // given
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.WRITE);
+
     EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication();
     String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
     ProcessApplicationReference reference = processApplication.getReference();
     registerProcessApplication(deploymentId, reference);
 
-    try {
-      // when
-      managementService.getProcessApplicationForDeployment(deploymentId);
-      fail("Exception expected: It should not be possible to get the process application");
-    } catch (AuthorizationException e) {
-      //then
-      String message = e.getMessage();
-      testRule.assertTextPresent(REQUIRED_ADMIN_AUTH_EXCEPTION, message);
+    // when
+    managementService.unregisterProcessApplication(deploymentId, true);
 
-    }
-
-    deleteDeployment(deploymentId);
+    // then
+    assertThat(getProcessApplicationForDeployment(deploymentId)).isNull();
   }
 
   @Test
-  public void testGetProcessApplicationForDeploymentAsCamundaAdmin() {
+  public void shouldUnregisterProcessApplicationWithAdminAndPermission() {
+    // given
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.WRITE);
+
+    EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication();
+    String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
+    ProcessApplicationReference reference = processApplication.getReference();
+    registerProcessApplication(deploymentId, reference);
+
+    // when
+    managementService.unregisterProcessApplication(deploymentId, true);
+
+    // then
+    assertThat(getProcessApplicationForDeployment(deploymentId)).isNull();
+  }
+
+  @Test
+  public void shouldNotUnregisterProcessApplicationWithoutAuthorization() {
+    // given
+
+    assertThatThrownBy(() -> {
+      // when
+      managementService.unregisterProcessApplication("anyDeploymentId", true);
+    })
+        // then
+        .hasMessageContaining(permissionException(Resources.SYSTEM, SystemPermissions.WRITE));
+  }
+
+  // get process application for deployment ///////////////////////////////////
+
+  @Test
+  public void shouldGetProcessApplicationForDeploymentAsCamundaAdmin() {
     // given
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
 
@@ -680,34 +658,60 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     String application = managementService.getProcessApplicationForDeployment(deploymentId);
 
     // then
-    assertNotNull(application);
+    assertThat(application).isNotNull();
+  }
 
-    deleteDeployment(deploymentId);
+  @Test
+  public void shouldGetProcessApplicationForDeploymentWithPermission() {
+    // given
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.READ);
+
+    EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication();
+    String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
+    ProcessApplicationReference reference = processApplication.getReference();
+    registerProcessApplication(deploymentId, reference);
+
+    // when
+    String application = managementService.getProcessApplicationForDeployment(deploymentId);
+
+    // then
+    assertThat(application).isNotNull();
+  }
+
+  @Test
+  public void shouldGetProcessApplicationForDeploymentWithAdminAndPermission() {
+    // given
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.READ);
+
+    EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication();
+    String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
+    ProcessApplicationReference reference = processApplication.getReference();
+    registerProcessApplication(deploymentId, reference);
+
+    // when
+    String application = managementService.getProcessApplicationForDeployment(deploymentId);
+
+    // then
+    assertThat(application).isNotNull();
+  }
+
+  @Test
+  public void shouldNotGetProcessApplicationForDeploymentWithoutAuthorization() {
+    // given
+
+    assertThatThrownBy(() -> {
+      // when
+      managementService.getProcessApplicationForDeployment("anyDeploymentId");
+    })
+        // then
+        .hasMessageContaining(permissionException(Resources.SYSTEM, SystemPermissions.READ));
   }
 
   // get registered deployments ///////////////////////////////////
 
   @Test
-  public void testGetRegisteredDeploymentsWithoutAuthorization() {
-    // given
-    String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
-
-    try {
-      // when
-      managementService.getRegisteredDeployments();
-      fail("Exception expected: It should not be possible to get the registered deployments");
-    } catch (AuthorizationException e) {
-      //then
-      String message = e.getMessage();
-      testRule.assertTextPresent(REQUIRED_ADMIN_AUTH_EXCEPTION, message);
-
-    }
-
-    deleteDeployment(deploymentId);
-  }
-
-  @Test
-  public void testGetRegisteredDeploymentsAsCamundaAdmin() {
+  public void shouldGetRegisteredDeploymentsAsCamundaAdmin() {
     // given
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
 
@@ -717,34 +721,54 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     Set<String> deployments = managementService.getRegisteredDeployments();
 
     // then
-    assertTrue(deployments.contains(deploymentId));
+    assertThat(deployments).contains(deploymentId);
+  }
 
-    deleteDeployment(deploymentId);
+  @Test
+  public void shouldGetRegisteredDeploymentsWithPermission() {
+    // given
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.READ);
+
+    String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
+
+    // when
+    Set<String> deployments = managementService.getRegisteredDeployments();
+
+    // then
+    assertThat(deployments).contains(deploymentId);
+  }
+
+  @Test
+  public void shouldGetRegisteredDeploymentsWithAdminAndPermission() {
+    // given
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.READ);
+
+    String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
+
+    // when
+    Set<String> deployments = managementService.getRegisteredDeployments();
+
+    // then
+    assertThat(deployments).contains(deploymentId);
+  }
+
+  @Test
+  public void shouldNotGetRegisteredDeploymentsWithoutAuthorization() {
+    // given
+
+    assertThatThrownBy(() -> {
+      // when
+      managementService.getRegisteredDeployments();
+    })
+        // then
+        .hasMessageContaining(permissionException(Resources.SYSTEM, SystemPermissions.READ));
   }
 
   // register deployment for job executor ///////////////////////////////////
 
   @Test
-  public void testRegisterDeploymentForJobExecutorWithoutAuthorization() {
-    // given
-    String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
-
-    try {
-      // when
-      managementService.registerDeploymentForJobExecutor(deploymentId);
-      fail("Exception expected: It should not be possible to register the deployment");
-    } catch (AuthorizationException e) {
-      //then
-      String message = e.getMessage();
-      testRule.assertTextPresent(REQUIRED_ADMIN_AUTH_EXCEPTION, message);
-
-    }
-
-    deleteDeployment(deploymentId);
-  }
-
-  @Test
-  public void testRegisterDeploymentForJobExecutorAsCamundaAdmin() {
+  public void shouldRegisterDeploymentAsCamundaAdmin() {
     // given
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
 
@@ -754,34 +778,57 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     managementService.registerDeploymentForJobExecutor(deploymentId);
 
     // then
-    assertTrue(getRegisteredDeployments().contains(deploymentId));
+    assertThat(getRegisteredDeployments()).contains(deploymentId);
+  }
 
-    deleteDeployment(deploymentId);
+  @Test
+  public void shouldRegisterDeploymentWithPermission() {
+    // given
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.WRITE);
+
+    String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
+
+    // when
+    managementService.registerDeploymentForJobExecutor(deploymentId);
+
+    // then
+    assertThat(getRegisteredDeployments()).contains(deploymentId);
+  }
+
+  @Test
+  public void shouldRegisterDeploymentWithAdminAndPermission() {
+    // given
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.WRITE);
+
+    String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
+
+    // when
+    managementService.registerDeploymentForJobExecutor(deploymentId);
+
+    // then
+    assertThat(getRegisteredDeployments()).contains(deploymentId);
+  }
+
+  @Test
+  public void shouldNotRegisterDeploymentWithoutAuthorization() {
+    // given
+    disableAuthorization();
+    String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
+    enableAuthorization();
+
+    assertThatThrownBy(() -> {
+      // when
+      managementService.registerDeploymentForJobExecutor(deploymentId);
+    })
+        // then
+        .hasMessageContaining(permissionException(Resources.SYSTEM, SystemPermissions.WRITE));
   }
 
   // unregister deployment for job executor ///////////////////////////////////
 
   @Test
-  public void testUnregisterDeploymentForJobExecutorWithoutAuthorization() {
-    // given
-    String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
-
-    try {
-      // when
-      managementService.unregisterDeploymentForJobExecutor(deploymentId);
-      fail("Exception expected: It should not be possible to unregister the deployment");
-    } catch (AuthorizationException e) {
-      //then
-      String message = e.getMessage();
-      testRule.assertTextPresent(REQUIRED_ADMIN_AUTH_EXCEPTION, message);
-
-    }
-
-    deleteDeployment(deploymentId);
-  }
-
-  @Test
-  public void testUnregisterDeploymentForJobExecutorAsCamundaAdmin() {
+  public void shouldUnregisterDeploymentAsCamundaAdmin() {
     // given
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
 
@@ -791,9 +838,48 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     managementService.unregisterDeploymentForJobExecutor(deploymentId);
 
     // then
-    assertFalse(getRegisteredDeployments().contains(deploymentId));
+    assertThat(getRegisteredDeployments()).doesNotContain(deploymentId);
+  }
 
-    deleteDeployment(deploymentId);
+  @Test
+  public void shouldUnregisterDeploymentWithPermission() {
+    // given
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.WRITE);
+
+    String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
+
+    // when
+    managementService.unregisterDeploymentForJobExecutor(deploymentId);
+
+    // then
+    assertThat(getRegisteredDeployments()).doesNotContain(deploymentId);
+  }
+
+  @Test
+  public void shouldUnregisterDeploymentWithAdminAndPermission() {
+    // given
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.WRITE);
+
+    String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
+
+    // when
+    managementService.unregisterDeploymentForJobExecutor(deploymentId);
+
+    // then
+    assertThat(getRegisteredDeployments()).doesNotContain(deploymentId);
+  }
+
+  @Test
+  public void shouldNotUnregisterDeploymentWithoutAuthorization() {
+    // given
+
+    assertThatThrownBy(() -> {
+      // when
+      managementService.unregisterDeploymentForJobExecutor("anyDeploymentId");
+    })
+        // then
+        .hasMessageContaining(permissionException(Resources.SYSTEM, SystemPermissions.WRITE));
   }
 
   // helper /////////////////////////////////////////////////////////
