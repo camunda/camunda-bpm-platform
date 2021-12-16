@@ -39,6 +39,7 @@ public class AuthorizationException extends ProcessEngineException {
 
   protected final String userId;
   protected final List<MissingAuthorization> missingAuthorizations;
+  protected final boolean missingAdminRole;
 
   // these properties have been replaced by the list of missingAuthorizations
   // and are only left because this is a public API package and users might
@@ -53,7 +54,8 @@ public class AuthorizationException extends ProcessEngineException {
   public AuthorizationException(String message) {
     super(message);
     this.userId = null;
-    missingAuthorizations = new ArrayList<MissingAuthorization>();
+    missingAuthorizations = new ArrayList<>();
+    missingAdminRole = false;
   }
 
   public AuthorizationException(String userId, String permissionName, String resourceType, String resourceId) {
@@ -65,18 +67,20 @@ public class AuthorizationException extends ProcessEngineException {
         "The user with id '"+userId+
         "' does not have "+generateMissingAuthorizationMessage(exceptionInfo)+".");
     this.userId = userId;
-    missingAuthorizations = new ArrayList<MissingAuthorization>();
+    missingAuthorizations = new ArrayList<>();
     missingAuthorizations.add(exceptionInfo);
+    missingAdminRole = false;
 
     this.resourceType = exceptionInfo.getResourceType();
     this.permissionName = exceptionInfo.getViolatedPermissionName();
     this.resourceId = exceptionInfo.getResourceId();
   }
 
-  public AuthorizationException(String userId, List<MissingAuthorization> info) {
-    super(generateExceptionMessage(userId, info));
+  public AuthorizationException(String userId, List<MissingAuthorization> info, boolean missingAdminRole) {
+    super(generateExceptionMessage(userId, info, missingAdminRole));
     this.userId = userId;
     this.missingAuthorizations = info;
+    this.missingAdminRole = missingAdminRole;
   }
 
   /**
@@ -148,11 +152,12 @@ public class AuthorizationException extends ProcessEngineException {
    * @param missingAuthorizations to use
    * @return The prepared exception message
    */
-  private static String generateExceptionMessage(String userId, List<MissingAuthorization> missingAuthorizations) {
+  private static String generateExceptionMessage(String userId, List<MissingAuthorization> missingAuthorizations, boolean missingAdminRole) {
     StringBuilder sBuilder = new StringBuilder();
     sBuilder.append("The user with id '");
     sBuilder.append(userId);
-    sBuilder.append("' does not have one of the following permissions: ");
+    sBuilder.append(missingAdminRole ? "' is not an admin authenticated user or " : "'");
+    sBuilder.append(" does not have one of the following permissions: ");
     boolean first = true;
     for(MissingAuthorization missingAuthorization: missingAuthorizations) {
       if (!first) {

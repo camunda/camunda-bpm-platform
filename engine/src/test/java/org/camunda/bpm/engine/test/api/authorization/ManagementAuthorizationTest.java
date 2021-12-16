@@ -290,7 +290,7 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
   // get telemetry data /////////////////////////////////////
 
   @Test
-  public void shouldNotGetTelemetryDataWithoutAuthorization() {
+  public void shouldNotGetTelemetryDataWithoutAdminAndPermission() {
     // given
 
     assertThatThrownBy(() -> {
@@ -298,7 +298,7 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
       managementService.getTelemetryData();
     })
     // then
-    .hasMessageContaining(REQUIRED_ADMIN_AUTH_EXCEPTION);
+    .hasMessageContaining("The user with id 'test' is not an admin authenticated user or  does not have one of the following permissions: 'READ' permission on resource 'System'");
   }
 
   @Test
@@ -314,8 +314,22 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
   }
 
   @Test
-  public void shouldGetTelemetryDataWithAuthorization() {
+  public void shouldGetTelemetryDataWithPermission() {
     // given
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.READ);
+    identityService.setAuthentication(userId, null);
+
+    // when
+    TelemetryData telemetryData = managementService.getTelemetryData();
+
+    // then
+    assertThat(telemetryData).isNotNull();
+  }
+
+  @Test
+  public void shouldGetTelemetryDataWithAdminAndPermission() {
+    // given
+    identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
     createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.READ);
     identityService.setAuthentication(userId, null);
 

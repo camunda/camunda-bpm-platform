@@ -210,7 +210,7 @@ public class AuthorizationManager extends AbstractManager {
               check.getResourceId()));
         }
 
-        throw new AuthorizationException(userId, missingAuthorizations);
+        throw new AuthorizationException(userId, missingAuthorizations, false);
       }
     }
   }
@@ -525,18 +525,21 @@ public class AuthorizationManager extends AbstractManager {
       authorizationException = e;
     }
 
-    try {
-      checkCamundaAdmin();
-    } catch (AuthorizationException e) {
-      adminException = e;
+    if (isAdminAuthorized) {
+      try {
+        checkCamundaAdmin();
+      } catch (AuthorizationException e) {
+        adminException = e;
+      }
     }
 
-    if(authorizationException != null && adminException != null) {
-      // throw combined exception
-    } else if(authorizationException != null) {
-      throw authorizationException;
-    } else if(adminException != null) {
-      throw adminException;
+    if (authorizationException != null) {
+      if (isAdminAuthorized && adminException != null || !isAdminAuthorized) {
+        // throw combined exception
+        String userId = authorizationException.getUserId();
+        List<MissingAuthorization> info = authorizationException.getMissingAuthorizations();
+        throw new AuthorizationException(userId, info, adminException != null);
+      }
     }
   }
 
