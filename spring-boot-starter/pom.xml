@@ -18,7 +18,7 @@
   <properties>
     <!-- Version overrides for logback and log4j should be removed 
          after bumping the Spring Boot version -->
-    <version.logback>1.2.8</version.logback>
+    <version.logback>1.2.9</version.logback>
     <version.log4j2>2.17.0</version.log4j2>
   </properties>
 
@@ -38,7 +38,8 @@
         <version>${version.log4j2}</version>
       </dependency>
 
-      <!-- https://jira.camunda.com/browse/CAM-14192 -->
+      <!-- https://jira.camunda.com/browse/CAM-14192
+           https://jira.camunda.com/browse/CAM-14204 -->
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
