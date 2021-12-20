@@ -141,8 +141,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificDatepart3.put(H2, ")");
 
     databaseSpecificDummyTable.put(H2, "");
-    databaseSpecificTrueConstant.put(H2, "1");
-    databaseSpecificFalseConstant.put(H2, "0");
+    databaseSpecificTrueConstant.put(H2, "true");
+    databaseSpecificFalseConstant.put(H2, "false");
     databaseSpecificIfNull.put(H2, "IFNULL");
 
     databaseSpecificDaysComparator.put(H2, "DATEDIFF(DAY, ${date}, #{currentTimestamp}) >= ${days}");
