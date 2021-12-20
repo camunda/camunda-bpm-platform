@@ -92,7 +92,10 @@ public class JdbcStatementTimeoutTest extends ConcurrencyTestHelper {
    * (see https://github.com/cockroachdb/cockroach/issues/41335)
    */
   @Test
-  @RequiredDatabase(excludes = { DbSqlSessionFactory.MARIADB, DbSqlSessionFactory.DB2, DbSqlSessionFactory.CRDB })
+  @RequiredDatabase(excludes = { DbSqlSessionFactory.MARIADB,
+      DbSqlSessionFactory.DB2,
+      DbSqlSessionFactory.CRDB,
+      DbSqlSessionFactory.H2})
   public void testTimeoutOnUpdate() {
     createJobEntity();
 
@@ -110,9 +113,9 @@ public class JdbcStatementTimeoutTest extends ConcurrencyTestHelper {
     thread1.waitForSync();
 
     // perform FLUSH for thread 2
+    thread2.reportInterrupts();
     thread2.makeContinue();
     // wait for thread 2 to cancel FLUSH because of timeout
-    thread2.reportInterrupts();
     thread2.waitForSync(TEST_TIMEOUT_IN_MILLIS);
 
     assertNotNull("expected timeout exception", thread2.getException());

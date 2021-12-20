@@ -496,7 +496,7 @@
         <database.password>sa</database.password>
         <database.driver>org.h2.Driver</database.driver>
         <database.datasource.class>org.h2.jdbcx.JdbcDataSource</database.datasource.class>
-        <database.url>jdbc:h2:mem:performance-test;MVCC=TRUE</database.url>
+        <database.url>jdbc:h2:mem:performance-test</database.url>
       </properties>
     </profile>
 

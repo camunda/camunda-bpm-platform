@@ -39,7 +39,9 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSession;
 import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSessionFactory;
@@ -121,8 +123,10 @@ public class JPAVariableTest {
 
   @AfterClass
   public static void tearDown() throws Exception {
-    entityManagerFactory.close();
-    entityManagerFactory = null;
+    if (entityManagerFactory != null) {
+      entityManagerFactory.close();
+      entityManagerFactory = null;
+    }
   }
 
   @Deployment
@@ -145,13 +149,13 @@ public class JPAVariableTest {
     Object fieldAccessResult = runtimeService.getVariable(processInstance.getId(), "simpleEntityFieldAccess");
     assertTrue(fieldAccessResult instanceof FieldAccessJPAEntity);
     assertEquals(1L, ((FieldAccessJPAEntity)fieldAccessResult).getId().longValue());
-    assertEquals("value1", ((FieldAccessJPAEntity)fieldAccessResult).getValue());
+    assertEquals("value1", ((FieldAccessJPAEntity)fieldAccessResult).getMyValue());
 
     // Read entity with @Id on property
     Object propertyAccessResult = runtimeService.getVariable(processInstance.getId(), "simpleEntityPropertyAccess");
     assertTrue(propertyAccessResult instanceof PropertyAccessJPAEntity);
     assertEquals(1L, ((PropertyAccessJPAEntity)propertyAccessResult).getId().longValue());
-    assertEquals("value2", ((PropertyAccessJPAEntity)propertyAccessResult).getValue());
+    assertEquals("value2", ((PropertyAccessJPAEntity)propertyAccessResult).getMyValue());
 
     // Read entity with @Id on field of mapped superclass
     Object subclassFieldResult = runtimeService.getVariable(processInstance.getId(), "subclassFieldAccess");
@@ -197,7 +201,6 @@ public class JPAVariableTest {
     variables.put("stringIdJPAEntity", stringIdJPAEntity);
     variables.put("dateIdJPAEntity", dateIdJPAEntity);
     variables.put("sqlDateIdJPAEntity", sqlDateIdJPAEntity);
-    variables.put("bigDecimalIdJPAEntity", bigDecimalIdJPAEntity);
     variables.put("bigIntegerIdJPAEntity", bigIntegerIdJPAEntity);
 
     // Start the process with the JPA-entities as variables. They will be stored in the DB.
@@ -242,13 +245,22 @@ public class JPAVariableTest {
     assertTrue(sqlDateIdResult instanceof SQLDateIdJPAEntity);
     assertEquals(sqlDateIdJPAEntity.getDateId(), ((SQLDateIdJPAEntity)sqlDateIdResult).getDateId());
 
-    Object bigDecimalIdResult= runtimeService.getVariable(processInstanceAllTypes.getId(), "bigDecimalIdJPAEntity");
-    assertTrue(bigDecimalIdResult instanceof BigDecimalIdJPAEntity);
-    assertEquals(bigDecimalIdJPAEntity.getBigDecimalId(), ((BigDecimalIdJPAEntity)bigDecimalIdResult).getBigDecimalId());
-
     Object bigIntegerIdResult= runtimeService.getVariable(processInstanceAllTypes.getId(), "bigIntegerIdJPAEntity");
     assertTrue(bigIntegerIdResult instanceof BigIntegerIdJPAEntity);
     assertEquals(bigIntegerIdJPAEntity.getBigIntegerId(), ((BigIntegerIdJPAEntity)bigIntegerIdResult).getBigIntegerId());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/standalone/jpa/JPAVariableTest.testStoreJPAEntityAsVariable.bpmn20.xml")
+  @Test
+  @RequiredDatabase(excludes = { DbSqlSessionFactory.H2 })
+  public void shouldStoreJPAEntityBigDecimalAsVariable() {
+    setUpBigDecimalEntity();
+
+    ProcessInstance processInstanceAllTypes = runtimeService.startProcessInstanceByKey("JPAVariableProcess",
+        Variables.putValue("bigDecimalIdJPAEntity", bigDecimalIdJPAEntity));
+    Object bigDecimalIdResult= runtimeService.getVariable(processInstanceAllTypes.getId(), "bigDecimalIdJPAEntity");
+    assertTrue(bigDecimalIdResult instanceof BigDecimalIdJPAEntity);
+    assertEquals(bigDecimalIdJPAEntity.getBigDecimalId(), ((BigDecimalIdJPAEntity)bigDecimalIdResult).getBigDecimalId());
   }
 
   @Deployment
@@ -378,7 +390,7 @@ public class JPAVariableTest {
     // Servicetask in process 'UpdateJPAValuesProcess' should have set value on entityToUpdate.
     Object updatedEntity = runtimeService.getVariable(processInstance.getId(), "entityToUpdate");
     assertTrue(updatedEntity instanceof FieldAccessJPAEntity);
-    assertEquals("updatedValue", ((FieldAccessJPAEntity)updatedEntity).getValue());
+    assertEquals("updatedValue", ((FieldAccessJPAEntity)updatedEntity).getMyValue());
   }
 
   @Deployment(resources = ONE_TASK_PROCESS)
@@ -415,12 +427,12 @@ public class JPAVariableTest {
     // Simple test data
     simpleEntityFieldAccess = new FieldAccessJPAEntity();
     simpleEntityFieldAccess.setId(1L);
-    simpleEntityFieldAccess.setValue("value1");
+    simpleEntityFieldAccess.setMyValue("value1");
     manager.persist(simpleEntityFieldAccess);
 
     simpleEntityPropertyAccess = new PropertyAccessJPAEntity();
     simpleEntityPropertyAccess.setId(1L);
-    simpleEntityPropertyAccess.setValue("value2");
+    simpleEntityPropertyAccess.setMyValue("value2");
     manager.persist(simpleEntityPropertyAccess);
 
     subclassFieldAccess = new SubclassFieldAccessJPAEntity();
@@ -474,13 +486,23 @@ public class JPAVariableTest {
     stringIdJPAEntity.setStringId("azertyuiop");
     manager.persist(stringIdJPAEntity);
 
-    bigDecimalIdJPAEntity = new BigDecimalIdJPAEntity();
-    bigDecimalIdJPAEntity.setBigDecimalId(new BigDecimal("12345678912345678900000.123456789123456789"));
-    manager.persist(bigDecimalIdJPAEntity);
-
     bigIntegerIdJPAEntity = new BigIntegerIdJPAEntity();
     bigIntegerIdJPAEntity.setBigIntegerId(new BigInteger("12345678912345678912345678900000"));
     manager.persist(bigIntegerIdJPAEntity);
+
+    manager.flush();
+    manager.getTransaction().commit();
+    manager.close();
+  }
+
+  protected void setUpBigDecimalEntity() {
+
+    EntityManager manager = entityManagerFactory.createEntityManager();
+    manager.getTransaction().begin();
+
+    bigDecimalIdJPAEntity = new BigDecimalIdJPAEntity();
+    bigDecimalIdJPAEntity.setBigDecimalId(new BigDecimal("12345678912345678900000.123456789123456789"));
+    manager.persist(bigDecimalIdJPAEntity);
 
     manager.flush();
     manager.getTransaction().commit();

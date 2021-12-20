@@ -806,7 +806,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTest {
     assertTrue(assigneeIndex >= 0);
     assertTrue(createTimeIndex >= 0);
 
-    assertOneOf(new String[]{"VARCHAR", "NVARCHAR2", "nvarchar", "NVARCHAR"}, tableMetaData.getColumnTypes().get(assigneeIndex));
+    assertOneOf(new String[]{"CHARACTER VARYING", "VARCHAR", "NVARCHAR2", "nvarchar", "NVARCHAR"}, tableMetaData.getColumnTypes().get(assigneeIndex));
     assertOneOf(new String[]{"TIMESTAMP", "TIMESTAMP(6)", "datetime", "DATETIME", "DATETIME2"}, tableMetaData.getColumnTypes().get(createTimeIndex));
   }
 

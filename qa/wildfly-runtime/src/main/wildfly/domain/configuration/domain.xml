@@ -117,7 +117,7 @@
                         </security>
                     </datasource>
                     <datasource jndi-name="java:jboss/datasources/ProcessEngine" pool-name="ProcessEngineDS" enabled="true" use-java-context="true">
-                        <connection-url>jdbc:h2:mem:processengine;MVCC=TRUE;DB_CLOSE_DELAY=-1</connection-url>
+                        <connection-url>jdbc:h2:mem:processengine;DB_CLOSE_DELAY=-1</connection-url>
                         <driver>h2</driver>
                         <security>
                             <user-name>sa</user-name>

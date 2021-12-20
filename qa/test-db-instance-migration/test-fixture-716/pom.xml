@@ -13,6 +13,8 @@
 
   <properties>
     <camunda.version.previous>7.15.0</camunda.version.previous>
+    
+    <version.h2>${version.h2-v1}</version.h2>
   </properties>
 
   <!-- uncomment when 7.16 is released -->
@@ -257,6 +259,33 @@
                 <phase>process-test-classes</phase>
                 <configuration>
                   <mainClass>org.camunda.bpm.qa.upgrade.TestFixture</mainClass>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    
+    <profile>
+      <id>h2</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>sql-maven-plugin</artifactId>
+            <executions>
+              <!-- In order to migrate from H2 1.4 to 2.x, we
+                must make a backup of our data and import it 
+                with the new version (see 717 fixture) -->
+              <execution>
+                <id>export-database-h2-14</id>
+                <phase>post-integration-test</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <sqlCommand>SCRIPT TO '${database.host}changelog.h2.sql' CHARSET 'UTF-8'</sqlCommand>
                 </configuration>
               </execution>
             </executions>

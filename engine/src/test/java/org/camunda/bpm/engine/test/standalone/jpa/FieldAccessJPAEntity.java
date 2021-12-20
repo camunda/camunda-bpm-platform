@@ -32,7 +32,7 @@ public class FieldAccessJPAEntity {
   @Column(name = "ID_")
   private Long id;
 
-  private String value;
+  private String myValue;
 
   public FieldAccessJPAEntity() {
     // Empty constructor needed for JPA
@@ -46,12 +46,12 @@ public class FieldAccessJPAEntity {
     this.id = id;
   }
 
-  public String getValue() {
-    return value;
+  public String getMyValue() {
+    return myValue;
   }
 
-  public void setValue(String value) {
-    this.value = value;
+  public void setMyValue(String myValue) {
+    this.myValue = myValue;
   }
 
 }
