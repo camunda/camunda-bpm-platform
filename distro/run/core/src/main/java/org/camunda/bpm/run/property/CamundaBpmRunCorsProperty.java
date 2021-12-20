@@ -22,8 +22,33 @@ public class CamundaBpmRunCorsProperty {
   public static final String DEFAULT_ORIGINS = "*";
   public static final String DEFAULT_HTTP_METHODS = "GET,POST,HEAD,OPTIONS,PUT,DELETE";
 
+  // Duplicate the default values of the following CorsFilter properties,
+  // to ensure they are not changed by a (Tomcat) version bump
+  public static final String DEFAULT_PREFLIGHT_MAXAGE = "1800";
+  public static final String DEFAULT_ALLOWED_HTTP_HEADERS = "Origin,Accept,X-Requested-With,Content-Type,Access-Control-Request-Method,Access-Control-Request-Headers";
+  public static final String DEFAULT_EXPOSED_HEADERS = "";
+  public static final boolean DEFAULT_ALLOW_CREDENTIALS = false;
+  public static final boolean DEFAULT_DECORATE_REQUEST = true;
+
   boolean enabled;
+
+  // CORS properties
   String allowedOrigins;
+  String allowedHeaders;
+  String exposedHeaders;
+  boolean allowCredentials;
+  boolean decorateRequest;
+  String preflightMaxAge;
+
+
+  public CamundaBpmRunCorsProperty() {
+    this.allowedOrigins = DEFAULT_ORIGINS;
+    this.allowedHeaders = DEFAULT_ALLOWED_HTTP_HEADERS;
+    this.exposedHeaders = DEFAULT_EXPOSED_HEADERS;
+    this.allowCredentials = DEFAULT_ALLOW_CREDENTIALS;
+    this.decorateRequest = DEFAULT_DECORATE_REQUEST;
+    this.preflightMaxAge =DEFAULT_PREFLIGHT_MAXAGE;
+  }
 
   public boolean isEnabled() {
     return this.enabled;
@@ -44,8 +69,56 @@ public class CamundaBpmRunCorsProperty {
     this.allowedOrigins = allowedOrigins;
   }
 
+  public boolean getDecorateRequest() {
+    return decorateRequest;
+  }
+
+  public void setDecorateRequest(boolean decorateRequest) {
+    this.decorateRequest = decorateRequest;
+  }
+
+  public boolean getAllowCredentials() {
+    return allowCredentials;
+  }
+
+  public void setAllowCredentials(boolean allowCredentials) {
+    this.allowCredentials = allowCredentials;
+  }
+
+  public String getAllowedHeaders() {
+    return allowedHeaders;
+  }
+
+  public void setAllowedHeaders(String allowedHeaders) {
+    this.allowedHeaders = allowedHeaders;
+  }
+
+  public String getExposedHeaders() {
+    return exposedHeaders;
+  }
+
+  public void setExposedHeaders(String exposedHeaders) {
+    this.exposedHeaders = exposedHeaders;
+  }
+
+  public String getPreflightMaxAge() {
+    return preflightMaxAge;
+  }
+
+  public void setPreflightMaxAge(String preflightMaxAge) {
+    this.preflightMaxAge = preflightMaxAge;
+  }
+
   @Override
   public String toString() {
-    return "CamundaBpmRunCorsProperty [enabled=" + enabled + ", allowedOrigins=" + allowedOrigins + "]";
+    return "CamundaBpmRunCorsProperty [" +
+        "enabled=" + enabled +
+        ", decorateRequest=" + decorateRequest +
+        ", allowCredentials=" + allowCredentials +
+        ", allowedOrigins='" + allowedOrigins +
+        ", allowedHeaders='" + allowedHeaders +
+        ", exposedHeaders='" + exposedHeaders +
+        ", preflightMaxAge=" + preflightMaxAge +
+        ']';
   }
 }
