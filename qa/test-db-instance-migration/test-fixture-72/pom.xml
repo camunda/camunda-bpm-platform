@@ -11,11 +11,13 @@
   <packaging>jar</packaging>
   <name>Camunda Platform - QA - upgrade - instance migration - test fixture - 7.2.0</name>
 
+  <properties>
   <!-- Due to https://issues.apache.org/jira/browse/MRELEASE-799 the release test fails when
      the version is managed in a property. Thus we use explicit versions everywhere. -->
-<!--   <properties> -->
 <!--     <camunda.version.current>7.2.0</camunda.version.current> -->
-<!--   </properties> -->
+
+    <version.h2>1.4.190</version.h2>
+  </properties>
 
   <dependencyManagement>
     <dependencies>

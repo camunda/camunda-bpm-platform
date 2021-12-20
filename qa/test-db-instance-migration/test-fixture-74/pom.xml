@@ -16,6 +16,8 @@
   <properties>
     <!-- camunda.version.current>${project.version}</camunda.version.current-->
     <camunda.version.previous>7.3.0</camunda.version.previous>
+    
+    <version.h2>1.4.190</version.h2>
   </properties>
 
   <dependencyManagement>

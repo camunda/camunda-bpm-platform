@@ -17,8 +17,6 @@
   <properties>
     <!-- exclude tests by default, only run in check-sql profile -->
     <skipTests>true</skipTests>
-
-    <version.liquibase>4.4.2</version.liquibase>
   </properties>
 
   <dependencyManagement>

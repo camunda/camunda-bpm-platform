@@ -43,13 +43,13 @@ public class DbSchemaPrefixTestHelper implements InitializingBean, DisposableBea
 
     dataSource = new PooledDataSource(ReflectUtil.getClassLoader(),
             "org.h2.Driver",
-            "jdbc:h2:mem:DatabaseTablePrefixTest;DB_CLOSE_DELAY=1000;MVCC=TRUE;",
+            "jdbc:h2:mem:DatabaseTablePrefixTest;DB_CLOSE_DELAY=1000;",
             "sa",
             "" );
 
     // create schema in the
     Connection connection = dataSource.getConnection();
-    connection.createStatement().execute("drop schema if exists SCHEMA1");
+    connection.createStatement().execute("drop schema if exists SCHEMA1 cascade");
     connection.createStatement().execute("create schema SCHEMA1");
     connection.close();
 
@@ -73,7 +73,7 @@ public class DbSchemaPrefixTestHelper implements InitializingBean, DisposableBea
 
   public void destroy() throws Exception {
     Connection connection = dataSource.getConnection();
-    connection.createStatement().execute("drop schema if exists SCHEMA1");
+    connection.createStatement().execute("drop schema if exists SCHEMA1 cascade");
     connection.close();
   }
 
