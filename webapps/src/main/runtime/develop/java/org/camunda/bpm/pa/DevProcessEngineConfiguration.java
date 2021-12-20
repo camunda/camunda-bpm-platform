@@ -28,7 +28,7 @@ public class DevProcessEngineConfiguration extends StandaloneInMemProcessEngineC
 
   protected void initDataSource() {
     PoolProperties p = new PoolProperties();
-    p.setUrl("jdbc:h2:mem:activiti;MVCC=TRUE;TRACE_LEVEL_FILE=0;DB_CLOSE_ON_EXIT=FALSE");
+    p.setUrl("jdbc:h2:mem:activiti;TRACE_LEVEL_FILE=0;DB_CLOSE_ON_EXIT=FALSE");
     p.setDriverClassName("org.h2.Driver");
     p.setUsername("sa");
     p.setPassword("");

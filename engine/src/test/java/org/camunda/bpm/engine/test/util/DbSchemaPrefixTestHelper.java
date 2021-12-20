@@ -43,7 +43,7 @@ public class DbSchemaPrefixTestHelper implements InitializingBean, DisposableBea
 
     dataSource = new PooledDataSource(ReflectUtil.getClassLoader(),
             "org.h2.Driver",
-            "jdbc:h2:mem:DatabaseTablePrefixTest;DB_CLOSE_DELAY=1000;MVCC=TRUE;",
+            "jdbc:h2:mem:DatabaseTablePrefixTest;DB_CLOSE_DELAY=1000;",
             "sa",
             "" );
 
