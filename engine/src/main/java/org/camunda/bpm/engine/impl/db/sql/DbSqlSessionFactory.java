@@ -134,8 +134,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificEscapeChar.put(H2, defaultEscapeChar);
 
     databaseSpecificBitAnd1.put(H2, "BITAND(");
-    databaseSpecificBitAnd2.put(H2, ",");
-    databaseSpecificBitAnd3.put(H2, ")");
+    databaseSpecificBitAnd2.put(H2, ",CAST(");
+    databaseSpecificBitAnd3.put(H2, " AS BIGINT))");
     databaseSpecificDatepart1.put(H2, "");
     databaseSpecificDatepart2.put(H2, "(");
     databaseSpecificDatepart3.put(H2, ")");

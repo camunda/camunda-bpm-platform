@@ -30,7 +30,7 @@ public class PropertyAccessJPAEntity {
 
   private Long id;
 
-  private String value;
+  private String myValue;
 
   public PropertyAccessJPAEntity() {
     // Empty constructor needed for JPA
@@ -46,12 +46,12 @@ public class PropertyAccessJPAEntity {
     this.id = id;
   }
 
-  public String getValue() {
-    return value;
+  public String getMyValue() {
+    return myValue;
   }
 
-  public void setValue(String value) {
-    this.value = value;
+  public void setMyValue(String myValue) {
+    this.myValue = myValue;
   }
 
 }
