@@ -24,24 +24,32 @@ public class CamundaBpmRunCorsProperty {
   public static final String DEFAULT_ORIGINS = "*";
   public static final String DEFAULT_HTTP_METHODS = "GET,POST,HEAD,OPTIONS,PUT,DELETE";
 
+  // Duplicate the default values of the following CorsFilter properties,
+  // to ensure they are not changed by a (Tomcat) version bump
+  public static final String DEFAULT_PREFLIGHT_MAXAGE = "1800";
+  public static final String DEFAULT_ALLOWED_HTTP_HEADERS = "Origin,Accept,X-Requested-With,Content-Type,Access-Control-Request-Method,Access-Control-Request-Headers";
+  public static final String DEFAULT_EXPOSED_HEADERS = "";
+  public static final boolean DEFAULT_ALLOW_CREDENTIALS = false;
+  public static final boolean DEFAULT_DECORATE_REQUEST = true;
+
   boolean enabled;
 
   // CORS properties
   String allowedOrigins;
   String allowedHeaders;
   String exposedHeaders;
-  String allowCredentials;
-  String decorateRequest;
+  boolean allowCredentials;
+  boolean decorateRequest;
   String preflightMaxAge;
 
 
   public CamundaBpmRunCorsProperty() {
     this.allowedOrigins = DEFAULT_ORIGINS;
-    this.allowedHeaders = CorsFilter.DEFAULT_ALLOWED_HTTP_HEADERS;
-    this.exposedHeaders = CorsFilter.DEFAULT_EXPOSED_HEADERS;
-    this.allowCredentials = CorsFilter.DEFAULT_SUPPORTS_CREDENTIALS;
-    this.decorateRequest = CorsFilter.DEFAULT_DECORATE_REQUEST;
-    this.preflightMaxAge = CorsFilter.DEFAULT_PREFLIGHT_MAXAGE;
+    this.allowedHeaders = DEFAULT_ALLOWED_HTTP_HEADERS;
+    this.exposedHeaders = DEFAULT_EXPOSED_HEADERS;
+    this.allowCredentials = DEFAULT_ALLOW_CREDENTIALS;
+    this.decorateRequest = DEFAULT_DECORATE_REQUEST;
+    this.preflightMaxAge =DEFAULT_PREFLIGHT_MAXAGE;
   }
 
   public boolean isEnabled() {
@@ -63,19 +71,19 @@ public class CamundaBpmRunCorsProperty {
     this.allowedOrigins = allowedOrigins;
   }
 
-  public String getDecorateRequest() {
+  public boolean getDecorateRequest() {
     return decorateRequest;
   }
 
-  public void setDecorateRequest(String decorateRequest) {
+  public void setDecorateRequest(boolean decorateRequest) {
     this.decorateRequest = decorateRequest;
   }
 
-  public String getAllowCredentials() {
+  public boolean getAllowCredentials() {
     return allowCredentials;
   }
 
-  public void setAllowCredentials(String allowCredentials) {
+  public void setAllowCredentials(boolean allowCredentials) {
     this.allowCredentials = allowCredentials;
   }
 
