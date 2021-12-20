@@ -16,8 +16,6 @@
  */
 package org.camunda.bpm.run.property;
 
-import org.apache.catalina.filters.CorsFilter;
-
 public class CamundaBpmRunCorsProperty {
 
   public static final String PREFIX = CamundaBpmRunProperties.PREFIX + ".cors";
@@ -88,7 +86,7 @@ public class CamundaBpmRunCorsProperty {
   }
 
   public String getAllowedHeaders() {
-    return allowedHeaders == null ? CorsFilter.DEFAULT_ALLOWED_HTTP_HEADERS : allowedHeaders;
+    return allowedHeaders;
   }
 
   public void setAllowedHeaders(String allowedHeaders) {
