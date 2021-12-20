@@ -19,9 +19,10 @@ package org.camunda.spin.plugin.impl;
 import static org.camunda.spin.plugin.variable.type.SpinValueType.JSON;
 import static org.camunda.spin.plugin.variable.type.SpinValueType.XML;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.camunda.bpm.engine.impl.cfg.AbstractProcessEnginePlugin;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
 import org.camunda.bpm.engine.impl.variable.serializer.JavaObjectSerializer;
@@ -34,13 +35,19 @@ import org.camunda.spin.DataFormats;
  * @author Thorben Lindhauer
  *
  */
-public class SpinProcessEnginePlugin extends AbstractProcessEnginePlugin {
+public class SpinProcessEnginePlugin extends SpinConfiguration {
 
   @Override
   public void preInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
     // use classloader which loaded the plugin
     ClassLoader classloader = ClassLoaderUtil.getClassloader(SpinProcessEnginePlugin.class);
-    DataFormats.loadDataFormats(classloader);
+
+    // use Spin plugin configuration properties
+    Map<String, Object> configurationOptions = new HashMap<>();
+    configurationOptions.put(XXE_PROPERTY, isEnableXxeProcessing());
+    configurationOptions.put(SP_PROPERTY, isEnableSecureXmlProcessing());
+
+    DataFormats.loadDataFormats(classloader, configurationOptions);
   }
 
   @Override
