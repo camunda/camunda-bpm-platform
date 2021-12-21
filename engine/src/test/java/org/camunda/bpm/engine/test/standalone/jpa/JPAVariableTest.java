@@ -197,7 +197,6 @@ public class JPAVariableTest {
     variables.put("stringIdJPAEntity", stringIdJPAEntity);
     variables.put("dateIdJPAEntity", dateIdJPAEntity);
     variables.put("sqlDateIdJPAEntity", sqlDateIdJPAEntity);
-    variables.put("bigDecimalIdJPAEntity", bigDecimalIdJPAEntity);
     variables.put("bigIntegerIdJPAEntity", bigIntegerIdJPAEntity);
 
     // Start the process with the JPA-entities as variables. They will be stored in the DB.
@@ -242,13 +241,20 @@ public class JPAVariableTest {
     assertTrue(sqlDateIdResult instanceof SQLDateIdJPAEntity);
     assertEquals(sqlDateIdJPAEntity.getDateId(), ((SQLDateIdJPAEntity)sqlDateIdResult).getDateId());
 
-    /*Object bigDecimalIdResult= runtimeService.getVariable(processInstanceAllTypes.getId(), "bigDecimalIdJPAEntity");
-    assertTrue(bigDecimalIdResult instanceof BigDecimalIdJPAEntity);
-    assertEquals(bigDecimalIdJPAEntity.getBigDecimalId(), ((BigDecimalIdJPAEntity)bigDecimalIdResult).getBigDecimalId());*/
-
     Object bigIntegerIdResult= runtimeService.getVariable(processInstanceAllTypes.getId(), "bigIntegerIdJPAEntity");
     assertTrue(bigIntegerIdResult instanceof BigIntegerIdJPAEntity);
     assertEquals(bigIntegerIdJPAEntity.getBigIntegerId(), ((BigIntegerIdJPAEntity)bigIntegerIdResult).getBigIntegerId());
+  }
+
+  @Ignore("https://jira.camunda.com/browse/CAM-14205")
+  @Deployment(resources = "org/camunda/bpm/engine/test/standalone/jpa/JPAVariableTest.testStoreJPAEntityAsVariable.bpmn20.xml")
+  @Test
+  public void shouldStoreJPAEntityBigDecimalAsVariable() {
+    ProcessInstance processInstanceAllTypes = runtimeService.startProcessInstanceByKey("JPAVariableProcess",
+        Variables.putValue("bigDecimalIdJPAEntity", bigDecimalIdJPAEntity));
+    Object bigDecimalIdResult= runtimeService.getVariable(processInstanceAllTypes.getId(), "bigDecimalIdJPAEntity");
+    assertTrue(bigDecimalIdResult instanceof BigDecimalIdJPAEntity);
+    assertEquals(bigDecimalIdJPAEntity.getBigDecimalId(), ((BigDecimalIdJPAEntity)bigDecimalIdResult).getBigDecimalId());
   }
 
   @Deployment
