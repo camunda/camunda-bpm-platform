@@ -97,7 +97,7 @@ public class AdminUsersTest {
     // when/then
     assertThatThrownBy(() -> managementService.getProperties())
       .isInstanceOf(AuthorizationException.class)
-      .hasMessageContaining("Required admin authenticated group or user.");
+      .hasMessageContaining("The user with id 'adminUser' is not an admin authenticated user or does not have one of the following permissions:");
 
   }
 

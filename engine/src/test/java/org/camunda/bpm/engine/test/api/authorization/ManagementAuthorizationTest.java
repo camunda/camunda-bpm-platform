@@ -53,6 +53,7 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
   public void tearDown() {
     super.tearDown();
     managementService.deleteProperty(DUMMY_PROPERTY);
+    managementService.deleteLicenseKey();
   }
 
   // get table count //////////////////////////////////////////////
