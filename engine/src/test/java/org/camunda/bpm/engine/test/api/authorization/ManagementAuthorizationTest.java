@@ -843,7 +843,6 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
   @Test
   public void shouldDeleteTaskMetricsAsCamundaAdmin() {
     // given
-    processEngineConfiguration.setTaskMetricsEnabled(true);
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
 
     // when
