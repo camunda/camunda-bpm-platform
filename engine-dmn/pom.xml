@@ -65,6 +65,10 @@
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
             <redirectTestOutputToFile>true</redirectTestOutputToFile>
+            <argLine>
+              --add-opens java.base/java.lang=ALL-UNNAMED
+              --add-opens java.scripting/javax.script=ALL-UNNAMED
+            </argLine>
           </configuration>
         </plugin>
       </plugins>

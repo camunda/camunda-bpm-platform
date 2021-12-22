@@ -53,6 +53,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.notNullValue;
@@ -1601,7 +1602,7 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
     .expect()
       .statusCode(Status.OK.getStatusCode())
       .body("_embedded.containsKey('variable')", is(true))
-      .body("_embedded.variable.size", equalTo(0))
+      .body("_embedded.variable", hasSize(0))
     .when()
       .get(EXECUTE_SINGLE_RESULT_FILTER_URL);
 
@@ -1643,7 +1644,7 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
     .expect()
       .statusCode(Status.OK.getStatusCode())
       .body("_embedded.containsKey('variable')", is(true))
-      .body("_embedded.variable.size", equalTo(6))
+      .body("_embedded.variable", hasSize(6))
     .when()
       .get(EXECUTE_SINGLE_RESULT_FILTER_URL);
 
@@ -1712,7 +1713,7 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
       .header(ACCEPT_HAL_HEADER)
     .expect()
       .statusCode(Status.OK.getStatusCode())
-      .body("_embedded.task.size", equalTo(3))
+      .body("_embedded.task", hasSize(3))
       .body("_embedded.task.any { it._embedded.containsKey('variable') }", is(true))
     .when()
       .get(EXECUTE_LIST_FILTER_URL);
@@ -1785,7 +1786,7 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
       .pathParam("id", EXAMPLE_FILTER_ID)
       .header(ACCEPT_HAL_HEADER)
     .then().expect()
-      .body("_embedded.task.size", equalTo(3))
+      .body("_embedded.task", hasSize(3))
       .body("count", equalTo(3))
     .when()
       .get(EXECUTE_LIST_FILTER_URL);
@@ -1796,7 +1797,7 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
       .queryParam("maxResults", 2)
       .header(ACCEPT_HAL_HEADER)
     .then().expect()
-      .body("_embedded.task.size", equalTo(2))
+      .body("_embedded.task", hasSize(2))
       .body("count", equalTo(3))
     .when()
       .get(EXECUTE_LIST_FILTER_URL);

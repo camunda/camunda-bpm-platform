@@ -22,6 +22,7 @@ import static io.restassured.RestAssured.given;
 import static io.restassured.path.json.JsonPath.from;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.inOrder;
@@ -214,7 +215,7 @@ public class FilterRestServiceQueryTest extends AbstractRestServiceTest {
       .queryParam("itemCount", true)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
-      .body("$.size", equalTo(2))
+      .body("$", hasSize(2))
       .body("any { it.containsKey('itemCount') }", is(true))
       .body("[0].itemCount", equalTo(mockedFilterItemCount))
       .body("[1].itemCount", equalTo(anotherMockedFilterItemCount))
@@ -227,7 +228,7 @@ public class FilterRestServiceQueryTest extends AbstractRestServiceTest {
     given()
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
-      .body("$.size", equalTo(2))
+      .body("$", hasSize(2))
       .body("any { it.containsKey('itemCount') }", is(false))
     .when()
       .get(FILTER_QUERY_URL);

@@ -255,6 +255,16 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>jakarta.xml.bind</groupId>
+      <artifactId>jakarta.xml.bind-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.xml.bind</groupId>
+      <artifactId>jaxb-impl</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -344,7 +354,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
+            <configuration combine.self="append">
               <skipTests>true</skipTests>
             </configuration>
           </plugin>
@@ -397,7 +407,10 @@
                 <phase>test</phase>
                 <goals><goal>test</goal></goals>
                 <configuration>
-                  <argLine>-Dfile.encoding=ISO-8859-1</argLine>
+                  <argLine>
+                    -Dfile.encoding=ISO-8859-1
+                    --add-opens java.base/java.lang=ALL-UNNAMED
+                  </argLine>
                   <includes>
                     <include>**/ProcessDefinitionRestServiceInteractionTest.java</include>
                     <include>**/TaskRestServiceInteractionTest.java</include>
@@ -493,7 +506,10 @@
                   <goal>test</goal>
                 </goals>
                 <configuration>
-                  <argLine>-Dfile.encoding=ISO-8859-1</argLine>
+                  <argLine>
+                    -Dfile.encoding=ISO-8859-1
+                    --add-opens java.base/java.lang=ALL-UNNAMED
+                  </argLine>
                   <includes>
                     <include>**/ProcessDefinitionRestServiceInteractionTest.java</include>
                     <include>**/ResteasyTaskRestServiceInteractionTest.java</include>
@@ -601,7 +617,10 @@
                   <goal>test</goal>
                 </goals>
                 <configuration>
-                  <argLine>-Dfile.encoding=ISO-8859-1</argLine>
+                  <argLine>
+                    -Dfile.encoding=ISO-8859-1
+                    --add-opens java.base/java.lang=ALL-UNNAMED
+                  </argLine>
                   <includes>
                     <include>**/ProcessDefinitionRestServiceInteractionTest.java</include>
                     <include>**/TaskRestServiceInteractionTest.java</include>
@@ -704,7 +723,10 @@
                   <goal>test</goal>
                 </goals>
                 <configuration>
-                  <argLine>-Dfile.encoding=ISO-8859-1</argLine>
+                  <argLine>
+                    -Dfile.encoding=ISO-8859-1
+                    --add-opens java.base/java.lang=ALL-UNNAMED
+                  </argLine>
                   <includes>
                     <include>**/ProcessDefinitionRestServiceInteractionTest.java</include>
                     <include>**/TaskRestServiceInteractionTest.java</include>
@@ -798,7 +820,10 @@
                   <goal>test</goal>
                 </goals>
                 <configuration>
-                  <argLine>-Dfile.encoding=ISO-8859-1</argLine>
+                  <argLine>
+                    -Dfile.encoding=ISO-8859-1
+                    --add-opens java.base/java.lang=ALL-UNNAMED
+                  </argLine>
                   <includes>
                     <include>**/ProcessDefinitionRestServiceInteractionTest.java</include>
                     <include>**/TaskRestServiceInteractionTest.java</include>
@@ -895,7 +920,10 @@
                   <goal>test</goal>
                 </goals>
                 <configuration>
-                  <argLine>-Dfile.encoding=ISO-8859-1</argLine>
+                  <argLine>
+                    -Dfile.encoding=ISO-8859-1
+                    --add-opens java.base/java.lang=ALL-UNNAMED
+                  </argLine>
                   <includes>
                     <include>**/ProcessDefinitionRestServiceInteractionTest.java</include>
                     <include>**/TaskRestServiceInteractionTest.java</include>

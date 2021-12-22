@@ -176,6 +176,14 @@ engine-rest-IT-embedded-wildfly:
   labels:
   - 'rest-api'
   nodeLabel: 'h2'
+platform-jdk-openjdk-jdk-17-latest:
+  directory: '.'
+  command: 'install source:jar source:test-jar -pl ''!webapps'' -Pdistro,distro-ce,distro-wildfly'
+  stash:
+    runtimeStash: true
+  nodeLabel: 'h2'
+  jdkVersion: 'openjdk-jdk-17-latest'
+  withNpm: true
 platform-jdk-openjdk-jdk-15-latest:
   directory: '.'
   command: 'install source:jar source:test-jar -pl ''!webapps'' -Pdistro,distro-ce,distro-wildfly'
@@ -223,6 +231,14 @@ platform-jdk-openjdk-jdk-8-latest:
     runtimeStash: true
   nodeLabel: 'h2'
   jdkVersion: 'openjdk-jdk-8-latest'
+  withNpm: true
+platform-jdk-jdk-17-latest:
+  directory: '.'
+  command: 'install source:jar source:test-jar -pl ''!webapps'' -Pdistro,distro-ce,distro-wildfly'
+  stash:
+    runtimeStash: true
+  nodeLabel: 'h2'
+  jdkVersion: 'jdk-17-latest'
   withNpm: true
 platform-jdk-jdk-15-latest:
   directory: '.'
