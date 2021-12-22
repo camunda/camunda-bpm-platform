@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.rest;
 
 import static io.restassured.RestAssured.expect;
 import static io.restassured.RestAssured.given;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
@@ -31,13 +32,17 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
+import io.restassured.response.Response;
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.FilterService;
@@ -809,6 +814,23 @@ public class ProcessEngineRestServiceTest extends
 
     verify(mockRepoService).createDeploymentQuery();
     verifyZeroInteractions(processEngine);
+  }
+
+  @Test
+  public void testGetRegisteredDeployments() {
+    final HashSet<String> registeredDeployments = new HashSet<>(Arrays.asList("deployment1", "deployment2"));
+    when(mockManagementService.getRegisteredDeployments()).thenReturn(registeredDeployments);
+
+    final Response response = given()
+      .pathParam("name", EXAMPLE_ENGINE_NAME)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when().get(DEPLOYMENT_REST_SERVICE_URL + "/registered");
+
+    verify(mockManagementService).getRegisteredDeployments();
+    verifyZeroInteractions(processEngine);
+
+    assertThat(response.getBody().as(Set.class)).isEqualTo(registeredDeployments);
   }
 
   @Test
