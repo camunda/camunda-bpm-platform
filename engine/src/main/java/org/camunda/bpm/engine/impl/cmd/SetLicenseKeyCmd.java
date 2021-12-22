@@ -53,10 +53,10 @@ public class SetLicenseKeyCmd extends LicenseCmd implements Command<Object> {
     resourceManager.insertResource(key);
 
     // set license key byte array id property
-    new SetPropertyCmd(LICENSE_KEY_BYTE_ARRAY_ID, key.getId()).execute(commandContext);
+    commandContext.runWithoutAuthorization(new SetPropertyCmd(LICENSE_KEY_BYTE_ARRAY_ID, key.getId()));
 
     // cleanup legacy property
-    new DeletePropertyCmd(LICENSE_KEY_PROPERTY_NAME).execute(commandContext);
+    commandContext.runWithoutAuthorization(new DeletePropertyCmd(LICENSE_KEY_PROPERTY_NAME));
 
     // add raw license to telemetry data if not there already
     addToTelemetry(licenseKey, commandContext.getProcessEngineConfiguration().getTelemetryRegistry());

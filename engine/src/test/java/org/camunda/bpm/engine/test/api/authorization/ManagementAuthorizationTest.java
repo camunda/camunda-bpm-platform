@@ -428,10 +428,8 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
   @Test
   public void shouldDeletePropertyAsCamundaAdmin() {
     // given
-    disableAuthorization();
-    managementService.setProperty(DUMMY_VALUE, DUMMY_PROPERTY);
-    enableAuthorization();
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+    managementService.setProperty(DUMMY_VALUE, DUMMY_PROPERTY);
 
     // when
       managementService.deleteProperty(DUMMY_PROPERTY);
@@ -455,22 +453,20 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
     // then
     disableAuthorization();
     assertThat(managementService.getProperties().get(DUMMY_PROPERTY)).isNull();
+    enableAuthorization();
   }
 
   @Test
   public void shouldDeletePropertyWithAdminAndPermission() {
     // given
-    disableAuthorization();
-    managementService.setProperty(DUMMY_VALUE, DUMMY_PROPERTY);
-    enableAuthorization();
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
     createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.DELETE);
+    managementService.setProperty(DUMMY_VALUE, DUMMY_PROPERTY);
 
     // when
     managementService.deleteProperty(DUMMY_PROPERTY);
 
     // then
-    disableAuthorization();
     assertThat(managementService.getProperties().get(DUMMY_PROPERTY)).isNull();
   }
 
@@ -503,10 +499,8 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
   @Test
   public void shouldToggleTelemetryEnabledAsCamundaAdmin() {
     // given
-    disableAuthorization();
-    managementService.toggleTelemetry(true);
-    enableAuthorization();
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+    managementService.toggleTelemetry(true);
 
     // when
     managementService.toggleTelemetry(false);
@@ -518,10 +512,8 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
   @Test
   public void shouldToggleTelemetryEnabledWithPermission() {
     // given
-    disableAuthorization();
-    managementService.toggleTelemetry(true);
-    enableAuthorization();
     createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.READ, SystemPermissions.WRITE);
+    managementService.toggleTelemetry(true);
 
     // when
     managementService.toggleTelemetry(false);
@@ -533,11 +525,9 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
   @Test
   public void shouldToggleTelemetryEnabledWithAdminAndPermission() {
     // given
-    disableAuthorization();
-    managementService.toggleTelemetry(true);
-    enableAuthorization();
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
     createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.READ, SystemPermissions.WRITE);
+    managementService.toggleTelemetry(true);
 
     // when
     managementService.toggleTelemetry(false);
@@ -604,10 +594,7 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
   public void shouldGetLicenseKeyAsCamundaAdmin() {
     // given
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
-
-    disableAuthorization();
     managementService.setLicenseKey("testLicenseKey");
-    enableAuthorization();
 
     // when
     String licenseKey = managementService.getLicenseKey();
@@ -637,10 +624,7 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
     // given
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
     createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.READ);
-
-    disableAuthorization();
     managementService.setLicenseKey("testLicenseKey");
-    enableAuthorization();
 
     // when
     String licenseKey = managementService.getLicenseKey();
@@ -672,15 +656,13 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
     managementService.setLicenseKey("testLicenseKey");
 
     // then
-    disableAuthorization();
     assertThat(managementService.getLicenseKey()).isNotNull();
-    enableAuthorization();
   }
 
   @Test
   public void shouldSetLicenseKeyWithPermission() {
     // given
-    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.WRITE, SystemPermissions.DELETE);
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.WRITE);
 
     // when
     managementService.setLicenseKey("testLicenseKey");
@@ -695,15 +677,13 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
   public void shouldSetLicenseKeyWithAdminAndPermission() {
     // given
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
-    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.WRITE, SystemPermissions.DELETE);
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.WRITE);
 
     // when
     managementService.setLicenseKey("testLicenseKey");
 
     // then
-    disableAuthorization();
-    assertThat(managementService.getLicenseKey()).isNotNull();
-    enableAuthorization();
+    assertThat(managementService.getLicenseKey()).isEqualTo("testLicenseKey");
   }
 
   @Test
@@ -723,10 +703,8 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
   @Test
   public void shouldDeleteLicenseKeyAsCamundaAdmin() {
     // given
-    disableAuthorization();
-    managementService.setLicenseKey("testLicenseKey");
-    enableAuthorization();
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
+    managementService.setLicenseKey("testLicenseKey");
 
     // when
     managementService.deleteLicenseKey();
@@ -738,10 +716,11 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
   @Test
   public void shouldDeleteLicenseKeyWithPermission() {
     // given
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.DELETE);
+
     disableAuthorization();
     managementService.setLicenseKey("testLicenseKey");
     enableAuthorization();
-    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.DELETE);
 
     // when
     managementService.deleteLicenseKey();
@@ -755,19 +734,15 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
   @Test
   public void shouldDeleteLicenseKeyWithAdminAndPermission() {
     // given
-    disableAuthorization();
-    managementService.setLicenseKey("testLicenseKey");
-    enableAuthorization();
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
     createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.DELETE);
+    managementService.setLicenseKey("testLicenseKey");
 
     // when
     managementService.deleteLicenseKey();
 
     // then
-    disableAuthorization();
     assertThat(managementService.getLicenseKey()).isNull();
-    enableAuthorization();
   }
 
   @Test
@@ -904,7 +879,6 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
     List<SchemaLogEntry> schemaLog = managementService.createSchemaLogQuery().list();
 
     // then
-    assertThat(schemaLog).isNotNull();
     assertThat(schemaLog).isNotEmpty();
   }
 
@@ -917,7 +891,6 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
     List<SchemaLogEntry> schemaLog = managementService.createSchemaLogQuery().list();
 
     // then
-    assertThat(schemaLog).isNotNull();
     assertThat(schemaLog).isNotEmpty();
   }
 
@@ -931,7 +904,6 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
     List<SchemaLogEntry> schemaLog = managementService.createSchemaLogQuery().list();
 
     // then
-    assertThat(schemaLog).isNotNull();
     assertThat(schemaLog).isNotEmpty();
   }
 
@@ -957,7 +929,6 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
     long schemaLog = managementService.createSchemaLogQuery().count();
 
     // then
-    assertThat(schemaLog).isNotNull();
     assertThat(schemaLog).isGreaterThan(0);
   }
 
@@ -970,7 +941,6 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
     long schemaLog = managementService.createSchemaLogQuery().count();
 
     // then
-    assertThat(schemaLog).isNotNull();
     assertThat(schemaLog).isGreaterThan(0);
   }
 
@@ -984,7 +954,6 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
     long schemaLog = managementService.createSchemaLogQuery().count();
 
     // then
-    assertThat(schemaLog).isNotNull();
     assertThat(schemaLog).isGreaterThan(0);
   }
 
@@ -996,7 +965,6 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
     long schemaLog = managementService.createSchemaLogQuery().count();
 
     // then
-    assertThat(schemaLog).isNotNull();
     assertThat(schemaLog).isZero();
   }
 

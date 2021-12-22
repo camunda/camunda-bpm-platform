@@ -874,13 +874,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
 
   @Override
   public void checkSetLicenseKey() {
-    PermissionCheckBuilder builder = new PermissionCheckBuilder();
-    CompositePermissionCheck setLicenseKeyPermissionCheck = builder
-    .disjunctive()
-      .atomicCheck(Resources.SYSTEM, null, SystemPermissions.WRITE)
-      .atomicCheck(Resources.SYSTEM, null, SystemPermissions.DELETE)
-    .build();
-    getAuthorizationManager().checkAuthorization(setLicenseKeyPermissionCheck);
+    getAuthorizationManager().checkAuthorization(SystemPermissions.WRITE, Resources.SYSTEM);
   }
 
   @Override
