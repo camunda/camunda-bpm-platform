@@ -203,4 +203,8 @@ public class DeploymentRestServiceImpl extends AbstractRestProcessEngineAware im
     return result;
   }
 
+  @Override
+  public Set<String> getRegisteredDeployments(final UriInfo uriInfo) {
+    return getProcessEngine().getManagementService().getRegisteredDeployments();
+  }
 }

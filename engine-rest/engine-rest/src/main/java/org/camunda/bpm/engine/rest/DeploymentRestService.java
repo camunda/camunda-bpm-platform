@@ -26,6 +26,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 import java.util.List;
+import java.util.Set;
 
 @Produces(MediaType.APPLICATION_JSON)
 public interface DeploymentRestService {
@@ -51,5 +52,10 @@ public interface DeploymentRestService {
   @Path("/count")
   @Produces(MediaType.APPLICATION_JSON)
   CountResultDto getDeploymentsCount(@Context UriInfo uriInfo);
+
+  @GET
+  @Path("/registered")
+  @Produces(MediaType.APPLICATION_JSON)
+  Set<String> getRegisteredDeployments(@Context UriInfo uriInfo);
 
 }
