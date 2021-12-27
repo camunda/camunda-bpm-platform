@@ -34,6 +34,9 @@ public class CamundaBpmRunProperties {
   @NestedConfigurationProperty
   private CamundaBpmRunLdapProperties ldap = new CamundaBpmRunLdapProperties();
 
+  protected CamundaBpmRunAdministratorAuthorizationProperties adminAuth
+      = new CamundaBpmRunAdministratorAuthorizationProperties();
+
   public CamundaBpmRunAuthenticationProperties getAuth() {
     return auth;
   }
@@ -58,8 +61,21 @@ public class CamundaBpmRunProperties {
     this.ldap = ldap;
   }
 
+  public CamundaBpmRunAdministratorAuthorizationProperties getAdminAuth() {
+    return adminAuth;
+  }
+
+  public void setAdminAuth(CamundaBpmRunAdministratorAuthorizationProperties adminAuth) {
+    this.adminAuth = adminAuth;
+  }
+
   @Override
   public String toString() {
-    return "CamundaBpmRunProperties [auth=" + auth + ", cors=" + cors + ", ldap=" + ldap + "]";
+    return "CamundaBpmRunProperties [" +
+        "auth=" + auth +
+        ", cors=" + cors +
+        ", ldap=" + ldap +
+        ", adminAuth=" + adminAuth +
+        "]";
   }
 }

@@ -115,9 +115,9 @@ public class CamundaBpmRunCorsProperty {
         "enabled=" + enabled +
         ", decorateRequest=" + decorateRequest +
         ", allowCredentials=" + allowCredentials +
-        ", allowedOrigins='" + allowedOrigins +
-        ", allowedHeaders='" + allowedHeaders +
-        ", exposedHeaders='" + exposedHeaders +
+        ", allowedOrigins=" + allowedOrigins +
+        ", allowedHeaders=" + allowedHeaders +
+        ", exposedHeaders=" + exposedHeaders +
         ", preflightMaxAge=" + preflightMaxAge +
         ']';
   }
