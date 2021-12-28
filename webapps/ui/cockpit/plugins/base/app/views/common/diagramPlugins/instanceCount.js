@@ -38,43 +38,97 @@ module.exports = function(
   var stopLoading = Loaders.startLoading();
   var overlaysNodes = {};
 
+  var createOverlayNodes = function(element, data) {
+    var nodes = getOverlayNodes(element, data);
+
+    const overlayId = overlays.add(element.id, {
+      position: {
+        bottom: 0,
+        left: 0
+      },
+      show: {
+        minZoom: -Infinity,
+        maxZoom: +Infinity
+      },
+      html: nodes.html
+    });
+    $scope.countOverlayIds = $scope.countOverlayIds
+      ? $scope.countOverlayIds
+      : [];
+    $scope.countOverlayIds.push(overlayId);
+
+    return nodes;
+  };
+
   callbacks.observe(function(sources) {
     stopLoading();
+    var overlaysToCreate = {};
 
-    elementRegistry.forEach(function(shape) {
+    function annotateParentChain(element, parentData) {
+      var parent = element.$parent;
+      // return on root element
+      if (!parent || element.$type === 'bpmn:Process') {
+        return;
+      }
+
+      annotateParentChain(parent, parentData);
+
+      var collapsed = elementRegistry.get(element.id).collapsed;
+      if (!collapsed) {
+        return;
+      }
+
+      if (!overlaysNodes[element.id]) {
+        overlaysNodes[element.id] = createOverlayNodes(element, parentData);
+      }
+      overlaysToCreate[element.id] = overlaysToCreate[element.id] || {
+        node: overlaysNodes[element.id],
+        data: {}
+      };
+
+      var overlayData = overlaysToCreate[element.id].data;
+
+      if (parentData.instances) {
+        overlayData.childInstances = overlayData.childInstances
+          ? parentData.instances + overlayData.childInstances
+          : parentData.instances;
+      }
+
+      if (parentData.incidents) {
+        overlayData.childIncidents = overlayData.childIncidents
+          ? overlayData.childIncidents + parentData.incidents
+          : parentData.incidents;
+      }
+    }
+
+    function createOverlays(shape) {
       var element = processDiagram.bpmnElements[shape.businessObject.id];
       var data = callbacks.getData.apply(null, [element].concat(sources));
-      var nodes;
 
       if (callbacks.isActive(data)) {
         if (!overlaysNodes[element.id]) {
-          nodes = getOverlayNodes(element, data);
-
-          const overlayId = overlays.add(element.id, {
-            position: {
-              bottom: 0,
-              left: 0
-            },
-            show: {
-              minZoom: -Infinity,
-              maxZoom: +Infinity
-            },
-            html: nodes.html
-          });
-          $scope.countOverlayIds = $scope.countOverlayIds
-            ? $scope.countOverlayIds
-            : [];
-          $scope.countOverlayIds.push(overlayId);
-          overlaysNodes[element.id] = nodes;
+          overlaysNodes[element.id] = createOverlayNodes(element, data);
         }
 
         element.isSelectable = true;
       }
 
       if (overlaysNodes[element.id]) {
-        callbacks.updateOverlayNodes(overlaysNodes[element.id], data);
+        overlaysToCreate[element.id] = overlaysToCreate[element.id] || {
+          node: overlaysNodes[element.id]
+        };
+        overlaysToCreate[element.id].data = data;
+
+        annotateParentChain(element.$parent, data);
       }
+    }
+
+    elementRegistry.forEach(createOverlays);
+
+    Object.values(overlaysToCreate).forEach(({node, data}) => {
+      callbacks.updateOverlayNodes(node, data);
     });
+
     callbacks.toggleIsLoading && callbacks.toggleIsLoading();
     $rootScope.$broadcast(
       'cockpit.plugin.base.views:diagram-plugins:instance-plugin-loaded'

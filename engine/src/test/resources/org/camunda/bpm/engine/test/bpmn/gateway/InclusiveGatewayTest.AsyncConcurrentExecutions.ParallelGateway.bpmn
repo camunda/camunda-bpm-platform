@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0muexi8" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.10.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.14.0">
+  <bpmn:process id="Process_Model11842" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="Start">
+      <bpmn:outgoing>Flow_0rqk3uh</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_0rqk3uh" sourceRef="StartEvent_1" targetRef="Gateway_1" />
+    <bpmn:sequenceFlow id="Flow_1a" sourceRef="Gateway_1" targetRef="GatewayJoin_1" />
+    <bpmn:endEvent id="EndEvent_1" name="End">
+      <bpmn:incoming>Flow_1vxbfya</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0wno03o" sourceRef="GatewayJoin_1" targetRef="Gateway_2" />
+    <bpmn:sequenceFlow id="Flow_1vxbfya" sourceRef="GatewayJoin_2" targetRef="EndEvent_1" />
+    <bpmn:sequenceFlow id="Flow_3b" name="${false}" sourceRef="Gateway_2" targetRef="GatewayJoin_2">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${false}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:parallelGateway id="Gateway_1">
+      <bpmn:incoming>Flow_0rqk3uh</bpmn:incoming>
+      <bpmn:outgoing>Flow_1a</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1b</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:parallelGateway id="GatewayJoin_1" camunda:asyncAfter="true">
+      <bpmn:incoming>Flow_1a</bpmn:incoming>
+      <bpmn:incoming>Flow_1b</bpmn:incoming>
+      <bpmn:outgoing>Flow_0wno03o</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:sequenceFlow id="Flow_1b" sourceRef="Gateway_1" targetRef="GatewayJoin_1" />
+    <bpmn:sequenceFlow id="Flow_3a" name="${true}" sourceRef="Gateway_2" targetRef="GatewayJoin_2">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${true}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:inclusiveGateway id="Gateway_2">
+      <bpmn:incoming>Flow_0wno03o</bpmn:incoming>
+      <bpmn:outgoing>Flow_3b</bpmn:outgoing>
+      <bpmn:outgoing>Flow_3a</bpmn:outgoing>
+    </bpmn:inclusiveGateway>
+    <bpmn:inclusiveGateway id="GatewayJoin_2">
+      <bpmn:incoming>Flow_3a</bpmn:incoming>
+      <bpmn:incoming>Flow_3b</bpmn:incoming>
+      <bpmn:outgoing>Flow_1vxbfya</bpmn:outgoing>
+    </bpmn:inclusiveGateway>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_Model11842">
+      <bpmndi:BPMNEdge id="Flow_1vxbfya_di" bpmnElement="Flow_1vxbfya">
+        <di:waypoint x="725" y="170" />
+        <di:waypoint x="782" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1gyp8gi_di" bpmnElement="Flow_3b">
+        <di:waypoint x="560" y="145" />
+        <di:waypoint x="560" y="110" />
+        <di:waypoint x="700" y="110" />
+        <di:waypoint x="700" y="145" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="612" y="92" width="37" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1mbqv6t_di" bpmnElement="Flow_3a">
+        <di:waypoint x="560" y="195" />
+        <di:waypoint x="560" y="230" />
+        <di:waypoint x="700" y="230" />
+        <di:waypoint x="700" y="195" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="614" y="212" width="33" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0wno03o_di" bpmnElement="Flow_0wno03o">
+        <di:waypoint x="455" y="170" />
+        <di:waypoint x="535" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0edbe2p_di" bpmnElement="Flow_1b">
+        <di:waypoint x="270" y="195" />
+        <di:waypoint x="270" y="230" />
+        <di:waypoint x="430" y="230" />
+        <di:waypoint x="430" y="195" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0kyb26z_di" bpmnElement="Flow_1a">
+        <di:waypoint x="270" y="145" />
+        <di:waypoint x="270" y="110" />
+        <di:waypoint x="430" y="110" />
+        <di:waypoint x="430" y="145" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0rqk3uh_di" bpmnElement="Flow_0rqk3uh">
+        <di:waypoint x="188" y="170" />
+        <di:waypoint x="245" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="152" y="152" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="159" y="195" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_19pft0p_di" bpmnElement="Gateway_2">
+        <dc:Bounds x="535" y="145" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0wpxx6f_di" bpmnElement="GatewayJoin_2">
+        <dc:Bounds x="675" y="145" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1ha3mlr_di" bpmnElement="EndEvent_1">
+        <dc:Bounds x="782" y="152" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="790" y="195" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1v7gfv2_di" bpmnElement="Gateway_1">
+        <dc:Bounds x="245" y="145" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1d4ekhc_di" bpmnElement="GatewayJoin_1">
+        <dc:Bounds x="405" y="145" width="50" height="50" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

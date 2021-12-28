@@ -6,7 +6,7 @@
 
 <span ng-if="editing && (varType === 'datetime' || varType === 'date' || varType === 'time')"
       class="preview">
-  {{ dateValue | camDate }}
+  {{ formData.dateValue | camDate }}
 </span>
 
 <span ng-if="editing"
@@ -17,7 +17,7 @@
   <input ng-if="simpleField && !isNumber"
          class="form-control"
          type="{{ varType }}"
-         ng-model="editValue"
+         ng-model="formData.editValue"
          ng-keydown="handleKeydown($event)"
          placeholder="{{ placeholder }}" />
 
@@ -25,7 +25,7 @@
           name="numberField"
           class="form-control"
           ng-pattern="/^[0-9]{1,7}$/"
-          ng-model="editValue"
+          ng-model="formData.editValue"
           ng-keydown="handleKeydown($event)"
           placeholder="{{ placeholder }}" />
 
@@ -43,7 +43,7 @@
                 ng-click="$event.stopPropagation()"
                 ng-keydown="trapKeyboard($event, true); cancelOnEsc($event);"
 
-                ng-model="dateValue"
+                ng-model="formData.dateValue"
                 ng-change="changeDate(this)"></div>
 
     <div class="timepicker"
@@ -51,7 +51,7 @@
                 ng-if="varType === 'datetime' || varType === 'time'"
                 show-meridian="false"
 
-                ng-model="dateValue"
+                ng-model="formData.dateValue"
                 ng-keydown="cancelOnEsc($event);"
                 ng-change="changeDate(this)"></div>
   </span>
@@ -59,7 +59,7 @@
   <input ng-if="varType === 'option' && options[0].value"
          class="form-control"
          type="text"
-         ng-model="editValue"
+         ng-model="formData.editValue"
          ng-keydown="handleKeydown($event)"
          uib-typeahead="option as option.value for option in options | filter:$viewValue:instantTypeahead"
          typeahead-on-select="saveSelection($item)"
@@ -68,7 +68,7 @@
   <input ng-if="varType === 'option' && !options[0].value"
          class="form-control"
          type="text"
-         ng-model="editValue"
+         ng-model="formData.editValue"
          ng-keydown="handleKeydown($event)"
          uib-typeahead="option for option in options | filter:$viewValue:instantTypeahead"
          typeahead-on-select="saveSelection($item)"
@@ -77,6 +77,13 @@
 
   <span ng-show="varType !== 'option'"
         class="cam-widget-inline-field btn-group">
+    <button type="button"
+                ng-if="inOperator && !(varType === 'datetime' || varType === 'date' || varType === 'time')"
+                class="btn btn-xs btn-default"
+                ng-click="expandValue()">
+      <span class="glyphicon glyphicon-resize-full"></span>
+    </button>
+
     <button type="button"
             class="btn btn-xs btn-default"
             ng-click="changeType()"

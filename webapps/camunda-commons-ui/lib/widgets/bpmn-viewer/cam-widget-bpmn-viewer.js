@@ -43,6 +43,7 @@ module.exports = [
         disableNavigation: '&',
         onLoad: '&',
         onClick: '&',
+        onPlaneSet: '&',
         onMouseEnter: '&',
         onMouseLeave: '&',
         bpmnJsConf: '=?'
@@ -53,6 +54,7 @@ module.exports = [
       link: function($scope, $element) {
         var viewer = null;
         var canvas = null;
+        var visitedPlanes = [];
         var definitions;
         var diagramContainer = $element[0].querySelector('.diagram-holder');
 
@@ -141,30 +143,9 @@ module.exports = [
           return viewer;
         };
 
-        $scope.control.scrollToElement = function(element) {
-          var height, width, x, y;
-
-          var elem = viewer.get('elementRegistry').get(element);
-          var viewbox = canvas.viewbox();
-
-          height = Math.max(viewbox.height, elem.height);
-          width = Math.max(viewbox.width, elem.width);
-
-          x = Math.min(
-            Math.max(viewbox.x, elem.x - viewbox.width + elem.width),
-            elem.x
-          );
-          y = Math.min(
-            Math.max(viewbox.y, elem.y - viewbox.height + elem.height),
-            elem.y
-          );
-
-          canvas.viewbox({
-            x: x,
-            y: y,
-            width: width,
-            height: height
-          });
+        $scope.control.scrollToElement = function(elementId) {
+          var element = $scope.control.getElement(elementId);
+          canvas.scrollToElement(element);
         };
 
         $scope.control.getElement = function(elementId) {
@@ -336,7 +317,7 @@ module.exports = [
           canvas = viewer.get('canvas');
           definitions = viewer._definitions;
           setupEventListeners();
-          zoom();
+          restoreViewport();
           $scope.loaded = true;
         }
 
@@ -359,7 +340,16 @@ module.exports = [
             var diagram = diagramData;
             if (useDefinitions) {
               viewer._setDefinitions(diagramData);
-              diagram = diagramData.diagrams[0];
+
+              // collapsed subprocesses can have multiple diagrams
+              // if we don't define a diagram to open, the first one will be opened
+              diagram = undefined;
+
+              // we are using internal API, so we have to make sure the correct
+              // events are fired to add drilldown overlays
+              viewer.on('import.render.complete', function() {
+                viewer.get('eventBus').fire('import.done');
+              });
             }
 
             importFunction(diagram)
@@ -383,11 +373,17 @@ module.exports = [
           }
         }
 
-        function zoom() {
+        function restoreViewport() {
           if (canvas) {
             var viewbox = JSON.parse(
               ($location.search() || {}).viewbox || '{}'
             )[definitions.id];
+
+            var plane = ($location.search() || {}).plane;
+
+            if (plane) {
+              canvas.setActivePlane(plane);
+            }
 
             if (viewbox) {
               canvas.viewbox(viewbox);
@@ -447,6 +443,25 @@ module.exports = [
           }
         }, 500);
 
+        var onPlaneSet = function(e, context) {
+          var newPlane = context.plane;
+
+          $scope.onPlaneSet();
+          if (!newPlane) {
+            return;
+          }
+
+          search.updateSilently({
+            plane: newPlane.name
+          });
+
+          // viewport for visited planes is handled correctly by bpmn-js
+          if (!visitedPlanes.includes(newPlane)) {
+            canvas.zoom('fit-viewport', 'auto');
+            visitedPlanes.push(newPlane);
+          }
+        };
+
         function setupEventListeners() {
           var eventBus = viewer.get('eventBus');
           eventBus.on('element.click', onClick);
@@ -454,6 +469,7 @@ module.exports = [
           eventBus.on('element.out', onOut);
           eventBus.on('element.mousedown', onMousedown);
           eventBus.on('canvas.viewbox.changed', onViewboxChange);
+          eventBus.on('plane.set', onPlaneSet);
         }
 
         function clearEventListeners() {
@@ -463,6 +479,11 @@ module.exports = [
           eventBus.off('element.out', onOut);
           eventBus.off('element.mousedown', onMousedown);
           eventBus.off('canvas.viewbox.changed', onViewboxChange);
+          eventBus.off('plane.set', onPlaneSet);
+
+          search.updateSilently({
+            plane: null
+          });
         }
 
         $scope.zoomIn = function() {

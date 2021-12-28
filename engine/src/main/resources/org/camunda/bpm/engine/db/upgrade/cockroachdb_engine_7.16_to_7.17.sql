@@ -15,5 +15,12 @@
 -- limitations under the License.
 --
 
+-- https://jira.camunda.com/browse/CAM-14006 --
+ALTER TABLE ACT_RU_JOB 
+  ADD COLUMN LAST_FAILURE_LOG_ID_ varchar(64);
+  
+ALTER TABLE ACT_RU_EXT_TASK 
+  ADD COLUMN LAST_FAILURE_LOG_ID_ varchar(64);
+
 insert into ACT_GE_SCHEMA_LOG
 values ('600', CURRENT_TIMESTAMP, '7.17.0');

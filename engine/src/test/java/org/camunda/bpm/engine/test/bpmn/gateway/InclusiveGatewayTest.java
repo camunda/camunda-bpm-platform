@@ -28,9 +28,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
+import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -41,6 +44,7 @@ import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.model.bpmn.Bpmn;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -57,6 +61,11 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTest {
   private static final String BEAN_TASK1_NAME = "Basic service";
   private static final String BEAN_TASK2_NAME = "Standard service";
   private static final String BEAN_TASK3_NAME = "Gold Member service";
+
+  protected static final String ASYNC_CONCURRENT_PARALLEL_GATEWAY =
+      "org/camunda/bpm/engine/test/bpmn/gateway/InclusiveGatewayTest.AsyncConcurrentExecutions.ParallelGateway.bpmn";
+  protected static final String ASYNC_CONCURRENT_PARALLEL_INCLUSIVE_GATEWAY =
+      "org/camunda/bpm/engine/test/bpmn/gateway/InclusiveGatewayTest.AsyncConcurrentExecutions.ParallelInclusiveGateway.bpmn";
 
   @Deployment
   @Test
@@ -776,6 +785,105 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTest {
     task = taskQuery.singleResult();
     assertNotNull(task);
     assertEquals("taskAfterJoin", task.getTaskDefinitionKey());
+  }
+
+  @Ignore("https://jira.camunda.com/browse/CAM-14116")
+  @Deployment(resources = ASYNC_CONCURRENT_PARALLEL_GATEWAY)
+  @Test
+  public void shouldCompleteWithConcurrentExecution_ParallelGateway_1() {
+    runtimeService.startProcessInstanceByKey("Process_Model11842");
+
+    AtomicReference<String> jobIdNotifyListener = new AtomicReference<>();
+    AtomicReference<String> jobIdActivityEnd = new AtomicReference<>();
+    managementService.createJobQuery().list().forEach(job -> {
+      if ("transition-notify-listener-take$Flow_0wno03o".equals(((JobEntity)job).getJobHandlerConfigurationRaw())) {
+        jobIdNotifyListener.set(job.getId());
+
+      } else if ("activity-end".equals(((JobEntity)job).getJobHandlerConfigurationRaw())) {
+        jobIdActivityEnd.set(job.getId());
+
+      }
+    });
+
+    managementService.executeJob(jobIdNotifyListener.get());
+    managementService.executeJob(jobIdActivityEnd.get());
+
+    Assertions.assertThat(managementService.createJobQuery().count()).isEqualTo(0);
+    Assertions.assertThat(historyService.createHistoricProcessInstanceQuery().singleResult().getState())
+        .isEqualTo("COMPLETED");
+  }
+
+  @Deployment(resources = ASYNC_CONCURRENT_PARALLEL_GATEWAY)
+  @Test
+  public void shouldCompleteWithConcurrentExecution_ParallelGateway_2() {
+    runtimeService.startProcessInstanceByKey("Process_Model11842");
+
+    AtomicReference<String> jobIdNotifyListener = new AtomicReference<>();
+    AtomicReference<String> jobIdActivityEnd = new AtomicReference<>();
+    managementService.createJobQuery().list().forEach(job -> {
+      if ("transition-notify-listener-take$Flow_0wno03o".equals(((JobEntity)job).getJobHandlerConfigurationRaw())) {
+        jobIdNotifyListener.set(job.getId());
+      } else if ("activity-end".equals(((JobEntity)job).getJobHandlerConfigurationRaw())) {
+        jobIdActivityEnd.set(job.getId());
+      }
+    });
+
+    managementService.executeJob(jobIdActivityEnd.get());
+    managementService.executeJob(jobIdNotifyListener.get());
+
+    Assertions.assertThat(managementService.createJobQuery().count()).isEqualTo(0);
+    Assertions.assertThat(historyService.createHistoricProcessInstanceQuery().singleResult().getState())
+        .isEqualTo("COMPLETED");
+  }
+
+
+  @Ignore("https://jira.camunda.com/browse/CAM-14116")
+  @Deployment(resources = ASYNC_CONCURRENT_PARALLEL_INCLUSIVE_GATEWAY)
+  @Test
+  public void shouldCompleteWithConcurrentExecution_InclusiveGateway_1() {
+    runtimeService.startProcessInstanceByKey("Process_Model11842");
+
+    AtomicReference<String> jobIdNotifyListener = new AtomicReference<>();
+    AtomicReference<String> jobIdActivityEnd = new AtomicReference<>();
+    managementService.createJobQuery().list().forEach(job -> {
+      if ("transition-notify-listener-take$Flow_0wno03o".equals(((JobEntity)job).getJobHandlerConfigurationRaw())) {
+        jobIdNotifyListener.set(job.getId());
+
+      } else if ("activity-end".equals(((JobEntity)job).getJobHandlerConfigurationRaw())) {
+        jobIdActivityEnd.set(job.getId());
+
+      }
+    });
+
+    managementService.executeJob(jobIdNotifyListener.get());
+    managementService.executeJob(jobIdActivityEnd.get());
+
+    Assertions.assertThat(managementService.createJobQuery().count()).isEqualTo(0);
+    Assertions.assertThat(historyService.createHistoricProcessInstanceQuery().singleResult().getState())
+        .isEqualTo("COMPLETED");
+  }
+
+  @Deployment(resources = ASYNC_CONCURRENT_PARALLEL_INCLUSIVE_GATEWAY)
+  @Test
+  public void shouldCompleteWithConcurrentExecution_InclusiveGateway_2() {
+    runtimeService.startProcessInstanceByKey("Process_Model11842");
+
+    AtomicReference<String> jobIdNotifyListener = new AtomicReference<>();
+    AtomicReference<String> jobIdActivityEnd = new AtomicReference<>();
+    managementService.createJobQuery().list().forEach(job -> {
+      if ("transition-notify-listener-take$Flow_0wno03o".equals(((JobEntity)job).getJobHandlerConfigurationRaw())) {
+        jobIdNotifyListener.set(job.getId());
+      } else if ("activity-end".equals(((JobEntity)job).getJobHandlerConfigurationRaw())) {
+        jobIdActivityEnd.set(job.getId());
+      }
+    });
+
+    managementService.executeJob(jobIdActivityEnd.get());
+    managementService.executeJob(jobIdNotifyListener.get());
+
+    Assertions.assertThat(managementService.createJobQuery().count()).isEqualTo(0);
+    Assertions.assertThat(historyService.createHistoricProcessInstanceQuery().singleResult().getState())
+        .isEqualTo("COMPLETED");
   }
 
 }

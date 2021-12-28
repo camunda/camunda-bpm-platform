@@ -41,6 +41,7 @@ import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValuePro
 import org.camunda.bpm.engine.impl.dmn.result.DecisionResultMapper;
 import org.camunda.bpm.engine.impl.el.*;
 import org.camunda.bpm.engine.impl.event.EventType;
+import org.camunda.bpm.engine.impl.form.FormDefinition;
 import org.camunda.bpm.engine.impl.form.handler.*;
 import org.camunda.bpm.engine.impl.jobexecutor.*;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
@@ -972,9 +973,15 @@ public class BpmnParse extends Parse {
           } else {
             startFormHandler = new DefaultStartFormHandler();
           }
+
           startFormHandler.parseConfiguration(startEventElement, deployment, processDefinition, this);
 
           processDefinition.setStartFormHandler(new DelegateStartFormHandler(startFormHandler, deployment));
+
+          FormDefinition formDefinition = parseFormDefinition(startEventElement);
+          processDefinition.setStartFormDefinition(formDefinition);
+
+          processDefinition.setHasStartFormKey(formDefinition.getFormKey() != null);
         }
 
       }
@@ -2646,26 +2653,8 @@ public class BpmnParse extends Parse {
     taskDefinition.setKey(taskDefinitionKey);
     processDefinition.getTaskDefinitions().put(taskDefinitionKey, taskDefinition);
 
-
-    String formKeyAttribute = taskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "formKey");
-    if (formKeyAttribute != null) {
-      taskDefinition.setFormKey(expressionManager.createExpression(formKeyAttribute));
-    }
-
-    String formRefAttribute = taskElement.attributeNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "formRef");
-    if(formRefAttribute != null) {
-      taskDefinition.setCamundaFormDefinitionKey(expressionManager.createExpression(formRefAttribute));
-      String formRefBindingAttribute = taskElement.attributeNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "formRefBinding");
-      if(formRefBindingAttribute != null) {
-        taskDefinition.setCamundaFormDefinitionBinding(formRefBindingAttribute);
-      }
-      if(formRefBindingAttribute.equals(DefaultTaskFormHandler.FORM_REF_BINDING_VERSION)) {
-        String formRefVersionAttribute = taskElement.attributeNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "formRefVersion");
-        if(formRefVersionAttribute != null) {
-          taskDefinition.setCamundaFormDefinitionVersion(expressionManager.createExpression(formRefVersionAttribute));
-        }
-      }
-    }
+    FormDefinition formDefinition = parseFormDefinition(taskElement);
+    taskDefinition.setFormDefinition(formDefinition);
 
     String name = taskElement.attribute("name");
     if (name != null) {
@@ -2684,6 +2673,49 @@ public class BpmnParse extends Parse {
     parseUserTaskCustomExtensions(taskElement, activity, taskDefinition);
 
     return taskDefinition;
+  }
+
+  protected FormDefinition parseFormDefinition(Element flowNodeElement) {
+    FormDefinition formDefinition = new FormDefinition();
+
+    String formKeyAttribute = flowNodeElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "formKey");
+    String formRefAttribute = flowNodeElement.attributeNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "formRef");
+
+    if(formKeyAttribute != null && formRefAttribute != null) {
+      addError("Invalid element definition: only one of the attributes formKey and formRef is allowed.", flowNodeElement);
+    }
+
+    if (formKeyAttribute != null) {
+      formDefinition.setFormKey(expressionManager.createExpression(formKeyAttribute));
+    }
+
+    if(formRefAttribute != null) {
+      formDefinition.setCamundaFormDefinitionKey(expressionManager.createExpression(formRefAttribute));
+
+      String formRefBindingAttribute = flowNodeElement.attributeNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "formRefBinding");
+
+      if (formRefBindingAttribute == null || !DefaultTaskFormHandler.ALLOWED_FORM_REF_BINDINGS.contains(formRefBindingAttribute)) {
+        addError("Invalid element definition: value for formRefBinding attribute has to be one of "
+            + DefaultTaskFormHandler.ALLOWED_FORM_REF_BINDINGS + " but was " + formRefBindingAttribute, flowNodeElement);
+      }
+
+
+      if(formRefBindingAttribute != null) {
+        formDefinition.setCamundaFormDefinitionBinding(formRefBindingAttribute);
+      }
+
+      if(DefaultTaskFormHandler.FORM_REF_BINDING_VERSION.equals(formRefBindingAttribute)) {
+        String formRefVersionAttribute = flowNodeElement.attributeNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "formRefVersion");
+
+        Expression camundaFormDefinitionVersion = expressionManager.createExpression(formRefVersionAttribute);
+
+        if(formRefVersionAttribute != null) {
+          formDefinition.setCamundaFormDefinitionVersion(camundaFormDefinitionVersion);
+        }
+      }
+    }
+
+    return formDefinition;
   }
 
   protected void parseHumanPerformer(Element taskElement, TaskDefinition taskDefinition) {

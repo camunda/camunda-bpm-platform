@@ -24,6 +24,7 @@ var angular = require('../../../../camunda-bpm-sdk-js/vendor/angular'),
   template = fs.readFileSync(__dirname + '/cam-widget-search.html', 'utf8');
 
 var dateRegex = /(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)(?:.(\d\d\d)| )?$/;
+
 function getType(value) {
   if (value && typeof value === 'string' && value.match(dateRegex)) {
     return 'date';
@@ -153,7 +154,10 @@ module.exports = [
 
             if (el.options && typeof el.options[0] === 'object') {
               el.mappedOptions = el.options.map(({key, value}) => {
-                return {key: key, value: $translate.instant(value)};
+                return {
+                  key: key,
+                  value: $translate.instant(value)
+                };
               });
 
               el.options = el.mappedOptions.map(({value}) => value);
@@ -319,8 +323,8 @@ module.exports = [
           const getKeyAndValue = (mappedOptions, search) => {
             let key = null;
             let value = null;
+            const inOperator = search.operator === 'In';
             if (mappedOptions) {
-              const inOperator = search.operator === 'In';
               const options = mappedOptions.filter(
                 option => inOperator && search.value.includes(option.key)
               );
@@ -337,13 +341,18 @@ module.exports = [
                 key = option?.key;
                 value = option?.value;
               }
+            } else if (inOperator) {
+              value = search.value.join(',');
             }
 
             if (!value) {
               value = search.value;
             }
 
-            return {key: key, value: value};
+            return {
+              key: key,
+              value: value
+            };
           };
 
           return original
@@ -585,6 +594,14 @@ module.exports = [
                 option => search.value.value === option.value
               )?.key;
             }
+          } else {
+            if (search.operator.value.key === 'In') {
+              search.value.key = search.value.value
+                .split(',')
+                .map(value => value.trim());
+            } else {
+              search.value.key = search.value.value;
+            }
           }
         };
 
@@ -605,7 +622,7 @@ module.exports = [
           const getValue = search => {
             const mappedOptions = $scope.types.find(
               type => type.id.key === search.type.value.key
-            ).mappedOptions;
+            )?.mappedOptions;
 
             let value = null;
             if (mappedOptions) {
@@ -622,6 +639,8 @@ module.exports = [
                   option => search.value.value === option.value
                 )?.key;
               }
+            } else if (search.operator.value.key === 'In') {
+              value = search.value.value.split(',').map(value => value.trim());
             }
 
             if (!value) {
@@ -657,7 +676,10 @@ module.exports = [
             tooltip: ''
           },
           operator: {
-            value: {key: 'eq', value: '='},
+            value: {
+              key: 'eq',
+              value: '='
+            },
             values: [],
             tooltip: $scope.translations.operator
           },
@@ -914,9 +936,15 @@ module.exports = [
 
         function groupAndName(str, group) {
           if (group) {
-            return {group: group, name: str};
+            return {
+              group: group,
+              name: str
+            };
           } else if (searchCriteriaStorage.group) {
-            return {group: searchCriteriaStorage.group, name: str};
+            return {
+              group: searchCriteriaStorage.group,
+              name: str
+            };
           }
         }
 

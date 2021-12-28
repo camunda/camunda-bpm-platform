@@ -20,7 +20,7 @@
 
     <@lib.parameters
         object = params
-        skip = ["orQueries"] <#-- OR Queries not avaialble in GET -->
+        skip = ["orQueries"] <#-- OR Queries not available in GET -->
         last = true />
 
   ],

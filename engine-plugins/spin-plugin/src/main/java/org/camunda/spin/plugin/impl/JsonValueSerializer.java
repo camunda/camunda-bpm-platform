@@ -47,7 +47,7 @@ public class JsonValueSerializer extends SpinValueSerializer {
 
   protected SpinValue createDeserializedValue(Object deserializedObject, String serializedStringValue, ValueFields valueFields, boolean asTransientValue) {
     SpinJsonNode value = (SpinJsonNode) deserializedObject;
-    JsonValueImpl jsonValue = new JsonValueImpl(value, serializedStringValue, value.getDataFormatName(), true);
+    JsonValueImpl jsonValue = new JsonValueImpl(value, serializedStringValue, dataFormat.getName(), true);
     jsonValue.setTransient(asTransientValue);
     return jsonValue;
   }

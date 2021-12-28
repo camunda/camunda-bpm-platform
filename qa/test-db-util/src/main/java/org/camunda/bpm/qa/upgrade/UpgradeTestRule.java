@@ -16,12 +16,14 @@
  */
 package org.camunda.bpm.qa.upgrade;
 
+import org.camunda.bpm.engine.history.HistoricIncidentQuery;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.management.JobDefinitionQuery;
 import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.CaseInstanceQuery;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
+import org.camunda.bpm.engine.runtime.IncidentQuery;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -104,6 +106,12 @@ public class UpgradeTestRule extends ProcessEngineRule {
             .processDefinitionId(instance.getProcessDefinitionId());
   }
 
+  public IncidentQuery incidentQuery() {
+    ProcessInstance processInstance = processInstance();
+    return runtimeService.createIncidentQuery()
+        .processInstanceId(processInstance.getId());
+  }
+
   public ProcessInstanceQuery processInstanceQuery() {
     return runtimeService
             .createProcessInstanceQuery()
@@ -131,6 +139,12 @@ public class UpgradeTestRule extends ProcessEngineRule {
     }
 
     return historicProcessInstance;
+  }
+
+  public HistoricIncidentQuery historicIncidentQuery() {
+    ProcessInstance processInstance = processInstance();
+    return historyService.createHistoricIncidentQuery()
+        .processInstanceId(processInstance.getId());
   }
 
   public MessageCorrelationBuilder messageCorrelation(String messageName) {

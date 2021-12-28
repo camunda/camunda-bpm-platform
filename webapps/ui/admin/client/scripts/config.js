@@ -49,6 +49,7 @@ export default {
   //     'unit': 'day'
   //   }
   // },
+  // 'alwaysShowUniqueTaskWorkerMetrics': true,
   // 'locales': {
   //   'availableLocales': ['en', 'de'],
   //   'fallbackLocale': 'en'

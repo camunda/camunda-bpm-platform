@@ -78,7 +78,7 @@ import org.junit.runners.model.Statement;
  * base class will make sure that this deployment gets deployed before the setUp
  * and {@link RepositoryService#deleteDeployment(String, boolean) cascade
  * deleted} after the tearDown. If you add a deployment programmatically in your
- * test, you have to make it known to the processEngineRule by calling 
+ * test, you have to make it known to the processEngineRule by calling
  * {@link ProcessEngineRule#manageDeployment(org.camunda.bpm.engine.repository.Deployment)}
  * to have it cleaned up automatically.
  * </p>

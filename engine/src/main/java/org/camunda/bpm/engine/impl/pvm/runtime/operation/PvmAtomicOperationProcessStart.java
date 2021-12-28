@@ -19,9 +19,7 @@ package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.Callback;
-import org.camunda.bpm.engine.impl.pvm.runtime.InstantiationStack;
 import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
-import org.camunda.bpm.engine.impl.pvm.runtime.ProcessInstanceStartContext;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 
@@ -49,10 +47,10 @@ public class PvmAtomicOperationProcessStart extends AbstractPvmEventAtomicOperat
   }
 
   protected PvmExecutionImpl eventNotificationsStarted(PvmExecutionImpl execution) {
-    // Note: the following method call initializes the property
-    // "processInstanceStartContext" on the given execution.
-    // Do not remove it!
-    execution.getProcessInstanceStartContext();
+
+    // restoring the starting flag in case this operation is executed
+    // asynchronously
+    execution.setProcessInstanceStarting(true);
 
     if (execution.getActivity() != null && execution.getActivity().isAsyncBefore()) {
       LegacyBehavior.createMissingHistoricVariables(execution);
@@ -72,18 +70,9 @@ public class PvmAtomicOperationProcessStart extends AbstractPvmEventAtomicOperat
     }, new Callback<PvmExecutionImpl, Void>() {
       @Override
       public Void callback(PvmExecutionImpl execution) {
-        ProcessInstanceStartContext processInstanceStartContext = execution.getProcessInstanceStartContext();
-        InstantiationStack instantiationStack = processInstanceStartContext.getInstantiationStack();
 
-        if (instantiationStack.getActivities().isEmpty()) {
-          execution.setActivity(instantiationStack.getTargetActivity());
-          execution.performOperation(ACTIVITY_START_CREATE_SCOPE);
-        } else {
-          // initialize the activity instance id
-          execution.setActivityInstanceId(execution.getId());
-          execution.performOperation(ACTIVITY_INIT_STACK);
-
-        }
+        execution.setIgnoreAsync(true);
+        execution.performOperation(ACTIVITY_START_CREATE_SCOPE);
 
         return null;
       }

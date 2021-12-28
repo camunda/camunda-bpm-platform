@@ -45,7 +45,6 @@ import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.metrics.reporter.DbMetricsReporter;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 import org.camunda.bpm.engine.impl.util.CompositeCondition;
-import org.camunda.bpm.engine.impl.util.DatabaseUtil;
 
 /**
  * @author Tom Baeyens
@@ -132,7 +131,7 @@ public class ProcessEngineImpl implements ProcessEngine {
           && processEngineConfiguration.getHostnameProvider() instanceof SimpleIpBasedProvider) {
         reporterId = processEngineConfiguration.getMetricsReporterIdProvider().provideId(this);
       } else {
-        reporterId = processEngineConfiguration.getHostname();;
+        reporterId = processEngineConfiguration.getHostname();
       }
 
       DbMetricsReporter dbMetricsReporter = processEngineConfiguration.getDbMetricsReporter();

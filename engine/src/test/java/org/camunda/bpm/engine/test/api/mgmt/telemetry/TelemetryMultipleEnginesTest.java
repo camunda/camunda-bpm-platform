@@ -30,11 +30,12 @@ import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration
 import org.camunda.bpm.engine.impl.metrics.Meter;
 import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
 import org.camunda.bpm.engine.impl.metrics.reporter.DbMetricsReporter;
-import org.camunda.bpm.engine.impl.telemetry.dto.Data;
-import org.camunda.bpm.engine.impl.telemetry.dto.Internals;
-import org.camunda.bpm.engine.impl.telemetry.dto.Metric;
+import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.InternalsImpl;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
+import org.camunda.bpm.engine.impl.util.JsonTestUtil;
 import org.camunda.bpm.engine.management.Metrics;
+import org.camunda.bpm.engine.telemetry.Metric;
 import org.camunda.bpm.engine.test.util.NoInitMessageBootstrapEngineCommand;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.junit.After;
@@ -131,34 +132,44 @@ public class TelemetryMultipleEnginesTest {
 
     assertThat(requests).hasSize(2);
 
-    Gson gson = new Gson();
+    Gson gson = JsonTestUtil.createTelemetryDataMapper();
 
     LoggedRequest defaultRequest = requests.get(0);
-    Data defaultRequestBody = gson.fromJson(defaultRequest.getBodyAsString(), Data.class);
+    TelemetryDataImpl defaultRequestBody = gson.fromJson(defaultRequest.getBodyAsString(), TelemetryDataImpl.class);
     assertReportedMetrics(defaultRequestBody, 0, 1, 0);
 
     LoggedRequest secondRequest = requests.get(1);
-    Data secondRequestBody = gson.fromJson(secondRequest.getBodyAsString(), Data.class);
+    TelemetryDataImpl secondRequestBody = gson.fromJson(secondRequest.getBodyAsString(), TelemetryDataImpl.class);
     assertReportedMetrics(secondRequestBody, 1, 0, 0);
   }
 
   @Test
   public void shouldUpdateTelemetryFlagDuringReporting() {
     // given
+    MetricsRegistry secondMetricsRegistry = getMetricsRegistry(secondEngine);
+    secondMetricsRegistry.markOccurrence(Metrics.ROOT_PROCESS_INSTANCE_START);
+
     defaultEngine.getManagementService().toggleTelemetry(true);
+
+    secondMetricsRegistry.markOccurrence(Metrics.ROOT_PROCESS_INSTANCE_START);
 
     // when
     secondTelemetryReporter.reportNow();
 
     // then
-    assertThat(defaultEngine.getProcessEngineConfiguration().getTelemetryRegistry().isCollectingTelemetryDataEnabled())
-        .isTrue();
-    assertThat(secondEngine.getProcessEngineConfiguration().getTelemetryRegistry().isCollectingTelemetryDataEnabled())
-        .isTrue();
-    assertThat(((ProcessEngineConfigurationImpl) defaultEngine.getProcessEngineConfiguration()).getMetricsRegistry()
-        .isCollectingTelemetryMetrics()).isTrue();
-    assertThat(((ProcessEngineConfigurationImpl) secondEngine.getProcessEngineConfiguration()).getMetricsRegistry()
-        .isCollectingTelemetryMetrics()).isTrue();
+    // the metrics collected before the next reporting cycle were reset
+    Meter rootPiMeter = secondMetricsRegistry.getTelemetryMeters().get(Metrics.ROOT_PROCESS_INSTANCE_START);
+    assertThat(rootPiMeter.get()).isEqualTo(0);
+
+    List<LoggedRequest> requests = wireMockRule.findAll(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH)));
+
+    assertThat(requests).hasSize(1);
+
+    Gson gson = JsonTestUtil.createTelemetryDataMapper();
+
+    LoggedRequest defaultRequest = requests.get(0);
+    TelemetryDataImpl defaultRequestBody = gson.fromJson(defaultRequest.getBodyAsString(), TelemetryDataImpl.class);
+    assertReportedMetrics(defaultRequestBody, 0, 0, 0);
   }
 
   @Test
@@ -203,18 +214,18 @@ public class TelemetryMultipleEnginesTest {
   }
 
   private void assertReportedMetrics(
-      Data data,
+      TelemetryDataImpl data,
       int expectedRootInstances,
       int expectedDecisionInstances,
       int expectedFlowNodeInstances) {
-    Internals internals = data.getProduct().getInternals();
+    InternalsImpl internals = data.getProduct().getInternals();
 
     assertMetric(internals, Metrics.ROOT_PROCESS_INSTANCE_START, expectedRootInstances);
     assertMetric(internals, Metrics.EXECUTED_DECISION_INSTANCES, expectedDecisionInstances);
     assertMetric(internals, Metrics.ACTIVTY_INSTANCE_START, expectedFlowNodeInstances);
   }
 
-  private void assertMetric(Internals internals, String name, int expectedCount) {
+  private void assertMetric(InternalsImpl internals, String name, int expectedCount) {
 
     Map<String, Metric> metrics = internals.getMetrics();
 
@@ -238,6 +249,11 @@ public class TelemetryMultipleEnginesTest {
   public void tearDown() {
     WireMock.resetAllRequests();
     clearMetrics();
+
+    // deactivating telemetry on both engines, so that the in-memory state
+    // is also updated
+    defaultEngine.getManagementService().toggleTelemetry(false);
+    secondEngine.getManagementService().toggleTelemetry(false);
   }
 
   protected void clearMetrics() {

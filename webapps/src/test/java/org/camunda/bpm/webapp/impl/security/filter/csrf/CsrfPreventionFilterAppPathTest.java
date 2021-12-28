@@ -29,7 +29,7 @@ import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.webapp.impl.security.filter.util.CsrfConstants.CSRF_PATH_FIELD_NAME;
-import static org.camunda.bpm.webapp.impl.security.filter.util.CsrfConstants.CSRF_SET_COOKIE_HEADER_NAME;
+import static org.camunda.bpm.webapp.impl.security.filter.util.CookieConstants.SET_COOKIE_HEADER_NAME;
 
 public class CsrfPreventionFilterAppPathTest extends CsrfPreventionFilterTest {
 
@@ -71,7 +71,7 @@ public class CsrfPreventionFilterAppPathTest extends CsrfPreventionFilterTest {
     applyFilter(nonModifyingRequest, response);
 
     // then
-    String cookieToken = response.getHeader(CSRF_SET_COOKIE_HEADER_NAME);
+    String cookieToken = response.getHeader(SET_COOKIE_HEADER_NAME);
     String headerToken = response.getHeader(CSRF_HEADER_NAME);
 
     assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());

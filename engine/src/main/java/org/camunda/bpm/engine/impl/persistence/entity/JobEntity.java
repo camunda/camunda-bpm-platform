@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -659,23 +658,6 @@ public abstract class JobEntity extends AcquirableJobEntity
   }
 
   public String getLastFailureLogId() {
-    if (lastFailureLogId == null) {
-      // try to find the last failure log in the database,
-      // can occur if setRetries is called manually since
-      // otherwise the failure handling ensures that a log
-      // entry is written before the incident is created
-      List<HistoricJobLog> logEntries = Context.getCommandContext()
-        .getProcessEngineConfiguration()
-        .getHistoryService()
-        .createHistoricJobLogQuery()
-        .failureLog()
-        .jobId(id)
-        .orderPartiallyByOccurrence().desc()
-        .list();
-      if (!logEntries.isEmpty()) {
-        lastFailureLogId = logEntries.get(0).getId();
-      }
-    }
     return lastFailureLogId;
   }
 

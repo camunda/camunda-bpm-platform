@@ -73,8 +73,6 @@ import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.ActivityInstanceState;
 import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperation;
-import org.camunda.bpm.engine.impl.pvm.runtime.ExecutionStartContext;
-import org.camunda.bpm.engine.impl.pvm.runtime.ProcessInstanceStartContext;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
 import org.camunda.bpm.engine.impl.tree.ExecutionTopDownWalker;
@@ -248,17 +246,12 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   public ExecutionEntity() {
   }
 
-  @Override
-  public ExecutionEntity createExecution() {
-    return createExecution(false);
-  }
-
   /**
    * creates a new execution. properties processDefinition, processInstance and
    * activity will be initialized.
    */
   @Override
-  public ExecutionEntity createExecution(boolean initializeExecutionStartContext) {
+  public ExecutionEntity createExecution() {
     // create the new child execution
     ExecutionEntity createdExecution = createNewExecution();
 
@@ -283,11 +276,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     }
 
     // with the fix of CAM-9249 we presume that the parent and the child have the same startContext
-    if (initializeExecutionStartContext) {
-      createdExecution.setStartContext(new ExecutionStartContext());
-    } else if (startContext != null) {
-      createdExecution.setStartContext(startContext);
-    }
+    createdExecution.setStartContext(scopeInstantiationContext);
 
     createdExecution.skipCustomListeners = this.skipCustomListeners;
     createdExecution.skipIoMapping = this.skipIoMapping;
@@ -623,7 +612,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   @SuppressWarnings("deprecation")
   public void performOperation(AtomicOperation executionOperation) {
-    boolean async = executionOperation.isAsync(this);
+    boolean async = !isIgnoreAsync() && executionOperation.isAsync(this);
 
     if (!async && requiresUnsuspendedExecution(executionOperation)) {
       ensureNotSuspended();
@@ -800,30 +789,17 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   protected void ensureProcessInstanceInitialized() {
     if ((processInstance == null) && (processInstanceId != null)) {
 
-      if (isExecutionTreePrefetchEnabled()) {
-        ensureExecutionTreeInitialized();
-
+      if (id.equals(processInstanceId)) {
+        processInstance = this;
       } else {
-        processInstance = Context.getCommandContext().getExecutionManager().findExecutionById(processInstanceId);
+        if (isExecutionTreePrefetchEnabled()) {
+          ensureExecutionTreeInitialized();
+
+        } else {
+          processInstance = Context.getCommandContext().getExecutionManager().findExecutionById(processInstanceId);
+        }
       }
-
     }
-  }
-
-  /**
-   * returns true if a process instance is in the starting phase. During that phase,
-   * all variables that are set are considered as initial variables
-   * (see {@link HistoricVariableUpdateEventEntity#isInitial}).
-   */
-  public boolean isProcessInstanceStarting() {
-    // the process instance can only be starting if it is currently in main-memory already
-    // we never have to access the database
-
-    return
-        // case 1: processInstance reference is set
-        (processInstance != null && processInstance.getExecutionStartContext() != null) ||
-        // case 2: processInstance reference is not set, but "this" execution is the process instance
-        (id.equals(processInstanceId) && getExecutionStartContext() != null);
   }
 
   @Override
@@ -837,6 +813,12 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   @Override
   public boolean isProcessInstanceExecution() {
     return parentId == null;
+  }
+
+  public boolean isProcessInstanceStarting() {
+    // the process instance can only be starting if it is currently in main-memory already
+    // we never have to access the database
+    return processInstance != null && processInstance.isStarting;
   }
 
   // activity /////////////////////////////////////////////////////////////////
@@ -1817,6 +1799,10 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   public void setProcessInstanceId(String processInstanceId) {
     this.processInstanceId = processInstanceId;
+
+    if (id.equals(processInstanceId)) {
+      this.processInstance = this;
+    }
   }
 
   @Override
@@ -1888,19 +1874,6 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   public boolean isSuspended() {
     return suspensionState == SuspensionState.SUSPENDED.getStateCode();
-  }
-
-  @Override
-  public ProcessInstanceStartContext getProcessInstanceStartContext() {
-    if (isProcessInstanceExecution()) {
-      if (startContext == null) {
-
-        ActivityImpl activity = getActivity();
-        startContext = new ProcessInstanceStartContext(activity);
-
-      }
-    }
-    return super.getProcessInstanceStartContext();
   }
 
   @Override

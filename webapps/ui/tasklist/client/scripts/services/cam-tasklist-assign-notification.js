@@ -50,9 +50,9 @@ module.exports = [
           var msg = '';
           for (var task, i = 0; (task = data._embedded.task[i]); i++) {
             msg +=
-              '<a ng-href="#/?forceDisplayTask=true&task=' +
+              '<a href="#/?forceDisplayTask=true&task=' +
               task.id +
-              '" ng-click="removeNotification(notification)">' +
+              '">' +
               escapeHtml(task.name || task.taskDefinitionKey) +
               '</a>, ';
           }

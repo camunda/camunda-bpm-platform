@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyData;
+import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyDataImpl;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 import org.camunda.bpm.engine.test.util.NoInitMessageInMemProcessEngineConfiguration;
 import org.camunda.commons.testing.ProcessEngineLoggingRule;
@@ -76,8 +76,6 @@ public class TelemetryConfigurationTest {
     // then
     assertThat(inMemoryConfiguration.isInitializeTelemetry()).isNull();
     assertThat(inMemoryConfiguration.getManagementService().isTelemetryEnabled()).isNull();
-    assertThat(inMemoryConfiguration.getTelemetryRegistry().isCollectingTelemetryDataEnabled()).isFalse();
-    assertThat(inMemoryConfiguration.getMetricsRegistry().isCollectingTelemetryMetrics()).isFalse();
 
     // the telemetry reporter is always scheduled
     assertThat(inMemoryConfiguration.isTelemetryReporterActivate()).isTrue();
@@ -99,8 +97,6 @@ public class TelemetryConfigurationTest {
     // then
     assertThat(inMemoryConfiguration.isInitializeTelemetry()).isFalse();
     assertThat(inMemoryConfiguration.getManagementService().isTelemetryEnabled()).isFalse();
-    assertThat(inMemoryConfiguration.getTelemetryRegistry().isCollectingTelemetryDataEnabled()).isFalse();
-    assertThat(inMemoryConfiguration.getMetricsRegistry().isCollectingTelemetryMetrics()).isFalse();
 
     // the telemetry reporter is always scheduled
     assertThat(inMemoryConfiguration.isTelemetryReporterActivate()).isTrue();
@@ -123,8 +119,6 @@ public class TelemetryConfigurationTest {
     // then
     assertThat(inMemoryConfiguration.isInitializeTelemetry()).isTrue();
     assertThat(inMemoryConfiguration.getManagementService().isTelemetryEnabled()).isTrue();
-    assertThat(inMemoryConfiguration.getTelemetryRegistry().isCollectingTelemetryDataEnabled()).isTrue();
-    assertThat(inMemoryConfiguration.getMetricsRegistry().isCollectingTelemetryMetrics()).isTrue();
     assertThat(inMemoryConfiguration.getTelemetryReporter().getInitialReportingDelaySeconds()).isEqualTo(TelemetryReporter.DEFAULT_INIT_REPORT_DELAY_SECONDS);
   }
 
@@ -166,7 +160,7 @@ public class TelemetryConfigurationTest {
 
     // then the license key is picked up
     assertThat(inMemoryConfiguration.getTelemetryRegistry().getLicenseKey())
-        .isEqualToComparingFieldByField(new LicenseKeyData(null, null, null, null, null, "my company;unlimited"));
+        .isEqualToComparingFieldByField(new LicenseKeyDataImpl(null, null, null, null, null, "my company;unlimited"));
 
     // force clean up
     inMemoryConfiguration.setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP);

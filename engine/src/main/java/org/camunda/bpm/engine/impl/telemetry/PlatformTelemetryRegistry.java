@@ -16,19 +16,19 @@
  */
 package org.camunda.bpm.engine.impl.telemetry;
 
-import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServer;
+import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServerImpl;
 
 public class PlatformTelemetryRegistry {
 
-  protected static ApplicationServer applicationServer;
+  protected static ApplicationServerImpl applicationServer;
 
-  public static synchronized ApplicationServer getApplicationServer() {
+  public static synchronized ApplicationServerImpl getApplicationServer() {
     return applicationServer;
   }
 
   public static synchronized void setApplicationServer(String applicationServerVersion) {
     if (applicationServer == null) {
-      applicationServer = new ApplicationServer(applicationServerVersion);
+      applicationServer = new ApplicationServerImpl(applicationServerVersion);
     }
   }
 

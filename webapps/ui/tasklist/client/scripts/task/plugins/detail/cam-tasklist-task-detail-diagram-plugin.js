@@ -91,6 +91,7 @@ var Controller = [
     $scope.control = {};
 
     $scope.highlightTask = function() {
+      $scope.control.scrollToElement($scope.diagram.task.taskDefinitionKey);
       $scope.control.highlight($scope.diagram.task.taskDefinitionKey);
     };
   }

@@ -147,5 +147,23 @@ public class HeaderRule extends ExternalResource {
       throw new RuntimeException(e);
     }
   }
+  
+  public String getSessionCookieRegex(String path, String sameSite, boolean secure) {
+    return getSessionCookieRegex(path, "JSESSIONID", sameSite, secure);
+  }
+  
+  public String getSessionCookieRegex(String path, String cookieName, String sameSite, boolean secure) {
+    StringBuilder regex = new StringBuilder(cookieName + "=.*;\\W*Path=/");
+    if (path != null) {
+      regex.append(path);
+    }
+    if (sameSite != null) {
+      regex.append(";\\W*SameSite=").append(sameSite);
+    }
+    if (secure) {
+      regex.append(";\\W*Secure");
+    }
+    return regex.toString();
+  }
 
 }

@@ -31,6 +31,7 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
+import org.camunda.bpm.engine.impl.form.FormDefinition;
 import org.camunda.bpm.engine.impl.form.handler.StartFormHandler;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
@@ -60,6 +61,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
   protected String resourceName;
   protected Integer historyLevel;
   protected StartFormHandler startFormHandler;
+  protected FormDefinition startFormDefinition;
   protected String diagramResourceName;
   protected boolean isGraphicalNotationDefined;
   protected Map<String, TaskDefinition> taskDefinitions;
@@ -350,6 +352,14 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
 
   public void setStartFormHandler(StartFormHandler startFormHandler) {
     this.startFormHandler = startFormHandler;
+  }
+
+  public FormDefinition getStartFormDefinition() {
+    return startFormDefinition;
+  }
+
+  public void setStartFormDefinition(FormDefinition startFormDefinition) {
+    this.startFormDefinition = startFormDefinition;
   }
 
   public Map<String, TaskDefinition> getTaskDefinitions() {

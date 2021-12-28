@@ -86,6 +86,11 @@
     "type": "string",
     "desc": "Filter by process instance business key."
   },
+  "processInstanceBusinessKeyIn": {
+    "type": "array",
+    "itemType": "string",
+    "desc": "Filter by a list of business keys. A process instance must have one of the given business keys. ${listTypeDescription}"
+  },
 
   "processInstanceBusinessKeyLike": {
     "type": "string",

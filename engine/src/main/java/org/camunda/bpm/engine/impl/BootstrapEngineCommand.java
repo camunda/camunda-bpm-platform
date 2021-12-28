@@ -30,8 +30,8 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.EverLivingJobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyManager;
-import org.camunda.bpm.engine.impl.telemetry.dto.Data;
-import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyData;
+import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyDataImpl;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 import org.camunda.bpm.engine.impl.util.LicenseKeyUtil;
 import org.camunda.bpm.engine.impl.util.TelemetryUtil;
@@ -127,13 +127,12 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
         initializeInitialTelemetryMessage();
       }
 
-      // enable collecting dynamic data in case telemetry is initialized with true
-      // or already enabled
+      // reset collected dynamic data
       if ((databaseTelemetryProperty == null && processEngineConfiguration.isInitializeTelemetry())
           || Boolean.valueOf(databaseTelemetryProperty.getValue())) {
-        TelemetryUtil.updateCollectingTelemetryDataEnabled(processEngineConfiguration.getTelemetryRegistry(),
-                                                           processEngineConfiguration.getMetricsRegistry(),
-                                                           true);
+        TelemetryUtil.toggleLocalTelemetry(true,
+            processEngineConfiguration.getTelemetryRegistry(),
+            processEngineConfiguration.getMetricsRegistry());
       }
 
     } catch (Exception e) {
@@ -232,7 +231,7 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
     ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
     String installationId = processEngineConfiguration.getInstallationId();
 
-    Data telemetryData = processEngineConfiguration.getTelemetryData();
+    TelemetryDataImpl telemetryData = processEngineConfiguration.getTelemetryData();
 
     // set installationId in the telemetry data
     telemetryData.setInstallation(installationId);
@@ -240,7 +239,7 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
     // set the persisted license key in the telemetry data and registry
     String licenseKey = processEngineConfiguration.getManagementService().getLicenseKey();
     if (licenseKey != null) {
-      LicenseKeyData licenseKeyData = LicenseKeyUtil.getLicenseKeyData(licenseKey);
+      LicenseKeyDataImpl licenseKeyData = LicenseKeyUtil.getLicenseKeyData(licenseKey);
       processEngineConfiguration.getTelemetryRegistry().setLicenseKey(licenseKeyData);
       telemetryData.getProduct().getInternals().setLicenseKey(licenseKeyData);
     }

@@ -23,8 +23,8 @@ import java.util.Set;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.telemetry.CamundaIntegration;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
-import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServer;
-import org.camunda.bpm.engine.impl.telemetry.dto.Data;
+import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServerImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
 import org.camunda.bpm.spring.boot.starter.test.nonpa.TestApplication;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,7 +44,7 @@ public class TelemetryNonPaIT extends AbstractCamundaAutoConfigurationIT {
     TelemetryRegistry telemetryRegistry = processEngine.getProcessEngineConfiguration().getTelemetryRegistry();
 
     // then
-    ApplicationServer applicationServer = telemetryRegistry.getApplicationServer();
+    ApplicationServerImpl applicationServer = telemetryRegistry.getApplicationServer();
     assertThat(applicationServer).isNotNull();
     assertThat(applicationServer.getVendor()).isEqualTo("Apache Tomcat");
     assertThat(applicationServer.getVersion()).isNotNull();
@@ -56,7 +56,7 @@ public class TelemetryNonPaIT extends AbstractCamundaAutoConfigurationIT {
     ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
 
     // then
-    Data telemetryData = processEngineConfiguration.getTelemetryData();
+    TelemetryDataImpl telemetryData = processEngineConfiguration.getTelemetryData();
     Set<String> camundaIntegration = telemetryData.getProduct().getInternals().getCamundaIntegration();
     assertThat(camundaIntegration.size()).isOne();
     assertThat(camundaIntegration).containsExactly(CamundaIntegration.SPRING_BOOT_STARTER);

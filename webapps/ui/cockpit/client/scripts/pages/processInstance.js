@@ -675,6 +675,25 @@ var Controller = [
       component: 'cockpit.processInstance.runtime.action'
     });
 
+    $scope.callbacks = {
+      handlePlaneChange: function(selectionOnPlane, canvas) {
+        var newFilter = angular.copy($scope.filter);
+
+        newFilter.activityIds = selectionOnPlane || [];
+
+        newFilter.activityInstanceIds = $scope.filter.activityInstanceIds.filter(
+          instanceId => {
+            var instance = $scope.instanceIdToInstanceMap[instanceId];
+            return (
+              canvas.getActivePlane() === canvas.findPlane(instance.activityId)
+            );
+          }
+        );
+
+        processData.set('filter', newFilter);
+      }
+    };
+
     Data.instantiateProviders('cockpit.processInstance.data', {
       $scope: $scope,
       processData: processData

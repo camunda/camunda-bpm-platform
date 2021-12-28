@@ -131,6 +131,7 @@ create table ACT_RU_JOB (
     SEQUENCE_COUNTER_ bigint,
     TENANT_ID_ varchar(64),
     CREATE_TIME_ datetime,
+    LAST_FAILURE_LOG_ID_ varchar(64),
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
@@ -334,6 +335,7 @@ create table ACT_RU_EXT_TASK (
   ACT_INST_ID_ varchar(64),
   TENANT_ID_ varchar(64),
   PRIORITY_ bigint NOT NULL DEFAULT 0,
+  LAST_FAILURE_LOG_ID_ varchar(64),
   primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 

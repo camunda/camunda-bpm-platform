@@ -22,8 +22,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.form.handler.DefaultStartFormHandler;
-import org.camunda.bpm.engine.impl.form.handler.DelegateFormHandler;
+import org.camunda.bpm.engine.impl.form.FormDefinition;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -61,8 +60,8 @@ public class StartEventCamundaFormDefinitionParseTest {
     }
   }
 
-  protected DefaultStartFormHandler getStartFormHandler() {
-    return (DefaultStartFormHandler) ((DelegateFormHandler)getProcessDefinition().getStartFormHandler()).getFormHandler();
+  protected FormDefinition getStartFormDefinition() {
+    return getProcessDefinition().getStartFormDefinition();
   }
 
 private ProcessDefinitionEntity getProcessDefinition() {
@@ -77,11 +76,11 @@ private ProcessDefinitionEntity getProcessDefinition() {
   public void shouldParseCamundaFormDefinitionVersionBinding() {
     // given a deployed process with a StartEvent containing a Camunda Form definition with version binding
     // then
-    DefaultStartFormHandler startFormHandler = getStartFormHandler();
+    FormDefinition startFormDefinition = getStartFormDefinition();
 
-    assertThat(startFormHandler.getCamundaFormDefinitionKey().getExpressionText()).isEqualTo("formId");
-    assertThat(startFormHandler.getCamundaFormDefinitionBinding()).isEqualTo("version");
-    assertThat(startFormHandler.getCamundaFormDefinitionVersion().getExpressionText()).isEqualTo("1");
+    assertThat(startFormDefinition.getCamundaFormDefinitionKey().getExpressionText()).isEqualTo("formId");
+    assertThat(startFormDefinition.getCamundaFormDefinitionBinding()).isEqualTo("version");
+    assertThat(startFormDefinition.getCamundaFormDefinitionVersion().getExpressionText()).isEqualTo("1");
   }
 
   @Test
@@ -89,10 +88,10 @@ private ProcessDefinitionEntity getProcessDefinition() {
   public void shouldParseCamundaFormDefinitionLatestBinding() {
     // given a deployed process with a StartEvent containing a Camunda Form definition with latest binding
     // then
-    DefaultStartFormHandler startFormHandler = getStartFormHandler();
+    FormDefinition startFormDefinition = getStartFormDefinition();
 
-    assertThat(startFormHandler.getCamundaFormDefinitionKey().getExpressionText()).isEqualTo("formId");
-    assertThat(startFormHandler.getCamundaFormDefinitionBinding()).isEqualTo("latest");
+    assertThat(startFormDefinition.getCamundaFormDefinitionKey().getExpressionText()).isEqualTo("formId");
+    assertThat(startFormDefinition.getCamundaFormDefinitionBinding()).isEqualTo("latest");
   }
 
   @Test
@@ -100,10 +99,10 @@ private ProcessDefinitionEntity getProcessDefinition() {
   public void shouldParseCamundaFormDefinitionMultipleStartEvents() {
     // given a deployed process with a StartEvent containing a Camunda Form definition with latest binding and another StartEvent inside a subprocess
     // then
-    DefaultStartFormHandler startFormHandler = getStartFormHandler();
+    FormDefinition startFormDefinition = getStartFormDefinition();
 
-    assertThat(startFormHandler.getCamundaFormDefinitionKey().getExpressionText()).isEqualTo("formId");
-    assertThat(startFormHandler.getCamundaFormDefinitionBinding()).isEqualTo("latest");
+    assertThat(startFormDefinition.getCamundaFormDefinitionKey().getExpressionText()).isEqualTo("formId");
+    assertThat(startFormDefinition.getCamundaFormDefinitionBinding()).isEqualTo("latest");
   }
 
   @Test
@@ -111,10 +110,10 @@ private ProcessDefinitionEntity getProcessDefinition() {
   public void shouldParseCamundaFormDefinitionDeploymentBinding() {
     // given a deployed process with a StartEvent containing a Camunda Form definition with deployment binding
     // then
-    DefaultStartFormHandler startFormHandler = getStartFormHandler();
+    FormDefinition startFormDefinition = getStartFormDefinition();
 
-    assertThat(startFormHandler.getCamundaFormDefinitionKey().getExpressionText()).isEqualTo("formId");
-    assertThat(startFormHandler.getCamundaFormDefinitionBinding()).isEqualTo("deployment");
+    assertThat(startFormDefinition.getCamundaFormDefinitionKey().getExpressionText()).isEqualTo("formId");
+    assertThat(startFormDefinition.getCamundaFormDefinitionBinding()).isEqualTo("deployment");
   }
 
   @Test

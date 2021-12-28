@@ -29,7 +29,6 @@ import java.util.Set;
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
-import org.camunda.bpm.engine.history.HistoricExternalTaskLog;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnExceptionHandler;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
@@ -622,23 +621,6 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity,
   }
 
   public String getLastFailureLogId() {
-    if (lastFailureLogId == null) {
-      // try to find the last failure log in the database,
-      // can occur if setRetries is called manually since
-      // otherwise the failure handling ensures that a log
-      // entry is written before the incident is created
-      List<HistoricExternalTaskLog> logEntries = Context.getCommandContext()
-        .getProcessEngineConfiguration()
-        .getHistoryService()
-        .createHistoricExternalTaskLogQuery()
-        .failureLog()
-        .externalTaskId(id)
-        .orderByTimestamp().desc()
-        .list();
-      if (!logEntries.isEmpty()) {
-        lastFailureLogId = logEntries.get(0).getId();
-      }
-    }
     return lastFailureLogId;
   }
 

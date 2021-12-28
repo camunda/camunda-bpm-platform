@@ -17,21 +17,21 @@
 package org.camunda.bpm.engine.impl.util;
 
 import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
-import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyData;
+import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyDataImpl;
 
 public class LicenseKeyUtil {
 
   public static void addToTelemetry(String licenseKey, TelemetryRegistry telemetryRegistry) {
-    LicenseKeyData currentLicenseData = telemetryRegistry.getLicenseKey();
+    LicenseKeyDataImpl currentLicenseData = telemetryRegistry.getLicenseKey();
     // only report license body without signature, if present
-    LicenseKeyData newLicenseData = getLicenseKeyData(licenseKey);
+    LicenseKeyDataImpl newLicenseData = getLicenseKeyData(licenseKey);
     if (currentLicenseData == null || !newLicenseData.getRaw().equals(currentLicenseData.getRaw())) {
       telemetryRegistry.setLicenseKey(newLicenseData);
     }
   }
 
-  public static LicenseKeyData getLicenseKeyData(String licenseKey) {
+  public static LicenseKeyDataImpl getLicenseKeyData(String licenseKey) {
     String newLicenseData = licenseKey.contains(";") ? licenseKey.split(";", 2)[1] : licenseKey;
-    return new LicenseKeyData(null, null, null, null, null, newLicenseData);
+    return new LicenseKeyDataImpl(null, null, null, null, null, newLicenseData);
   }
 }

@@ -24,8 +24,7 @@ import org.camunda.bpm.engine.ParseException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.form.handler.DefaultTaskFormHandler;
-import org.camunda.bpm.engine.impl.form.handler.DelegateFormHandler;
+import org.camunda.bpm.engine.impl.form.FormDefinition;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
@@ -74,26 +73,22 @@ public class UserTaskCamundaFormDefinitionParseTest {
     return cachedProcessDefinition.findActivity(activityId);
   }
 
-  protected DefaultTaskFormHandler getTaskFormHandler(TaskDefinition taskDefinition) {
-    return (DefaultTaskFormHandler) ((DelegateFormHandler)taskDefinition.getTaskFormHandler()).getFormHandler();
-  }
-
   @Test
   @Deployment
   public void shouldParseCamundaFormDefinitionVersionBinding() {
     // given a deployed process with a UserTask containing a Camunda Form definition with version binding
     // then
     TaskDefinition taskDefinition = findUserTaskDefinition("UserTask");
-    DefaultTaskFormHandler taskFormHandler = getTaskFormHandler(taskDefinition);
+    FormDefinition formDefinition = taskDefinition.getFormDefinition();
 
     assertThat(taskDefinition.getCamundaFormDefinitionKey().getExpressionText()).isEqualTo("formId");
-    assertThat(taskFormHandler.getCamundaFormDefinitionKey().getExpressionText()).isEqualTo("formId");
+    assertThat(formDefinition.getCamundaFormDefinitionKey().getExpressionText()).isEqualTo("formId");
 
     assertThat(taskDefinition.getCamundaFormDefinitionBinding()).isEqualTo("version");
-    assertThat(taskFormHandler.getCamundaFormDefinitionBinding()).isEqualTo("version");
+    assertThat(formDefinition.getCamundaFormDefinitionBinding()).isEqualTo("version");
 
     assertThat(taskDefinition.getCamundaFormDefinitionVersion().getExpressionText()).isEqualTo("1");
-    assertThat(taskFormHandler.getCamundaFormDefinitionVersion().getExpressionText()).isEqualTo("1");
+    assertThat(formDefinition.getCamundaFormDefinitionVersion().getExpressionText()).isEqualTo("1");
   }
 
   @Test
@@ -102,13 +97,13 @@ public class UserTaskCamundaFormDefinitionParseTest {
     // given a deployed process with a UserTask containing a Camunda Form definition with latest binding
     // then
     TaskDefinition taskDefinition = findUserTaskDefinition("UserTask");
-    DefaultTaskFormHandler taskFormHandler = getTaskFormHandler(taskDefinition);
+    FormDefinition formDefinition = taskDefinition.getFormDefinition();
 
     assertThat(taskDefinition.getCamundaFormDefinitionKey().getExpressionText()).isEqualTo("formId");
-    assertThat(taskFormHandler.getCamundaFormDefinitionKey().getExpressionText()).isEqualTo("formId");
+    assertThat(formDefinition.getCamundaFormDefinitionKey().getExpressionText()).isEqualTo("formId");
 
     assertThat(taskDefinition.getCamundaFormDefinitionBinding()).isEqualTo("latest");
-    assertThat(taskFormHandler.getCamundaFormDefinitionBinding()).isEqualTo("latest");
+    assertThat(formDefinition.getCamundaFormDefinitionBinding()).isEqualTo("latest");
   }
 
   @Test
@@ -117,13 +112,13 @@ public class UserTaskCamundaFormDefinitionParseTest {
     // given a deployed process with a UserTask containing a Camunda Form definition with deployment binding
     // then
     TaskDefinition taskDefinition = findUserTaskDefinition("UserTask");
-    DefaultTaskFormHandler taskFormHandler = getTaskFormHandler(taskDefinition);
+    FormDefinition formDefinition = taskDefinition.getFormDefinition();
 
     assertThat(taskDefinition.getCamundaFormDefinitionKey().getExpressionText()).isEqualTo("formId");
-    assertThat(taskFormHandler.getCamundaFormDefinitionKey().getExpressionText()).isEqualTo("formId");
+    assertThat(formDefinition.getCamundaFormDefinitionKey().getExpressionText()).isEqualTo("formId");
 
     assertThat(taskDefinition.getCamundaFormDefinitionBinding()).isEqualTo("deployment");
-    assertThat(taskFormHandler.getCamundaFormDefinitionBinding()).isEqualTo("deployment");
+    assertThat(formDefinition.getCamundaFormDefinitionBinding()).isEqualTo("deployment");
   }
 
   @Test
@@ -132,24 +127,24 @@ public class UserTaskCamundaFormDefinitionParseTest {
     // given a deployed process with two UserTask containing a Camunda Form definition with deployment binding
     // then
     TaskDefinition taskDefinition1 = findUserTaskDefinition("UserTask_1");
-    DefaultTaskFormHandler taskFormHandler1 = getTaskFormHandler(taskDefinition1);
+    FormDefinition formDefinition1 = taskDefinition1.getFormDefinition();
 
     assertThat(taskDefinition1.getCamundaFormDefinitionKey().getExpressionText()).isEqualTo("formId_1");
-    assertThat(taskFormHandler1.getCamundaFormDefinitionKey().getExpressionText()).isEqualTo("formId_1");
+    assertThat(formDefinition1.getCamundaFormDefinitionKey().getExpressionText()).isEqualTo("formId_1");
 
     assertThat(taskDefinition1.getCamundaFormDefinitionBinding()).isEqualTo("deployment");
-    assertThat(taskFormHandler1.getCamundaFormDefinitionBinding()).isEqualTo("deployment");
+    assertThat(formDefinition1.getCamundaFormDefinitionBinding()).isEqualTo("deployment");
 
     TaskDefinition taskDefinition2 = findUserTaskDefinition("UserTask_2");
-    DefaultTaskFormHandler taskFormHandler2 = getTaskFormHandler(taskDefinition2);
+    FormDefinition formDefinition2 = taskDefinition2.getFormDefinition();
     assertThat(taskDefinition2.getCamundaFormDefinitionKey().getExpressionText()).isEqualTo("formId_2");
-    assertThat(taskFormHandler2.getCamundaFormDefinitionKey().getExpressionText()).isEqualTo("formId_2");
+    assertThat(formDefinition2.getCamundaFormDefinitionKey().getExpressionText()).isEqualTo("formId_2");
 
     assertThat(taskDefinition2.getCamundaFormDefinitionBinding()).isEqualTo("version");
-    assertThat(taskFormHandler2.getCamundaFormDefinitionBinding()).isEqualTo("version");
+    assertThat(formDefinition2.getCamundaFormDefinitionBinding()).isEqualTo("version");
 
     assertThat(taskDefinition2.getCamundaFormDefinitionVersion().getExpressionText()).isEqualTo("2");
-    assertThat(taskFormHandler2.getCamundaFormDefinitionVersion().getExpressionText()).isEqualTo("2");
+    assertThat(formDefinition2.getCamundaFormDefinitionVersion().getExpressionText()).isEqualTo("2");
   }
 
   @Test

@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.client.spring.boot.starter.client;
 
-import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.ExternalTaskClientBuilder;
 import org.camunda.bpm.client.interceptor.ClientRequestInterceptor;
 import org.camunda.bpm.client.spring.boot.starter.MockHelper;
@@ -25,19 +24,17 @@ import org.camunda.bpm.client.spring.boot.starter.client.configuration.SimpleSub
 import org.camunda.bpm.client.spring.boot.starter.impl.ClientAutoConfiguration;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.modules.junit4.PowerMockRunnerDelegate;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.camunda.bpm.client.spring.boot.starter.MockHelper.jdkSupportsMockito;
-import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.verify;
 
 @TestPropertySource(properties = {
@@ -49,11 +46,12 @@ import static org.mockito.Mockito.verify;
     ClientAutoConfiguration.class,
     SimpleSubscriptionConfiguration.class
 })
-@RunWith(PowerMockRunner.class)
-@PowerMockRunnerDelegate(SpringRunner.class)
-@PrepareForTest(ExternalTaskClient.class)
+@RunWith(SpringRunner.class)
 public class BasicAuthConfigurationTest extends ParsePropertiesHelper {
 
+  @Rule
+  public MockitoRule mockitoRule = MockitoJUnit.rule();
+  
   protected static ExternalTaskClientBuilder clientBuilder;
 
   @BeforeClass

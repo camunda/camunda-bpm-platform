@@ -442,7 +442,7 @@ public class RestartProcessInstanceSyncTest {
         .singleResult();
 
     assertNotNull(detail);
-    assertFalse(detail.isInitial());
+    assertTrue(detail.isInitial());
     assertEquals("var", detail.getVariableName());
     assertEquals("bar", detail.getTextValue());
   }

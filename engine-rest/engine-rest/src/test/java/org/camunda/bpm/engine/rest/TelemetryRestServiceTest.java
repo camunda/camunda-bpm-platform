@@ -18,11 +18,15 @@ package org.camunda.bpm.engine.rest;
 
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.rest.dto.telemetry.TelemetryDataDto;
+import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.http.ContentType;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,6 +46,7 @@ public class TelemetryRestServiceTest extends AbstractRestServiceTest {
 
   protected static final String TELEMETRY_URL = TEST_RESOURCE_ROOT_PATH +  TelemetryRestService.PATH;
   protected static final String TELEMETRY_CONFIG_URL = TELEMETRY_URL + "/configuration";
+  protected static final String TELEMETRY_DATA_URL = TELEMETRY_URL + "/data";
 
   protected ManagementService managementServiceMock;
 
@@ -51,12 +56,12 @@ public class TelemetryRestServiceTest extends AbstractRestServiceTest {
     managementServiceMock = mock(ManagementService.class);
     when(processEngine.getManagementService()).thenReturn(managementServiceMock);
   }
-  
+
   @Test
   public void shouldDisableTelemetry() {
-    Map<String, Object> requestBody = new HashMap<String, Object>();
+    Map<String, Object> requestBody = new HashMap<>();
     requestBody.put("enableTelemetry", false);
-    
+
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
       .body(requestBody)
@@ -65,13 +70,13 @@ public class TelemetryRestServiceTest extends AbstractRestServiceTest {
         .statusCode(Status.NO_CONTENT.getStatusCode())
       .when()
     .post(TELEMETRY_CONFIG_URL);
-    
+
     verify(managementServiceMock).toggleTelemetry(false);
   }
 
   @Test
   public void shouldEnableTelemetry() {
-    Map<String, Object> requestBody = new HashMap<String, Object>();
+    Map<String, Object> requestBody = new HashMap<>();
     requestBody.put("enableTelemetry", true);
 
     given()
@@ -91,7 +96,7 @@ public class TelemetryRestServiceTest extends AbstractRestServiceTest {
     String message = "Required admin authenticated group or user.";
     doThrow(new AuthorizationException(message)).when(managementServiceMock).toggleTelemetry(anyBoolean());
 
-    Map<String, Object> requestBody = new HashMap<String, Object>();
+    Map<String, Object> requestBody = new HashMap<>();
     requestBody.put("enableTelemetry", true);
 
     given()
@@ -172,6 +177,45 @@ public class TelemetryRestServiceTest extends AbstractRestServiceTest {
       .get(TELEMETRY_CONFIG_URL);
 
     verify(managementServiceMock).isTelemetryEnabled();
+  }
+
+  @Test
+  public void shouldGetTelemetryData() throws JsonProcessingException {
+    when(managementServiceMock.getTelemetryData()).thenReturn(MockProvider.EXAMPLE_TELEMETRY_DATA);
+
+    given()
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(ContentType.JSON)
+        .body("installation", equalTo(MockProvider.EXAMPLE_TELEMETRY_INSTALLATION_ID))
+        .body("product.name", equalTo(MockProvider.EXAMPLE_TELEMETRY_PRODUCT_NAME))
+        .body("product.version", equalTo(MockProvider.EXAMPLE_TELEMETRY_PRODUCT_VERSION))
+        .body("product.edition", equalTo(MockProvider.EXAMPLE_TELEMETRY_PRODUCT_EDITION))
+        .body("product.internals.database.vendor", equalTo(MockProvider.EXAMPLE_TELEMETRY_DB_VENDOR))
+        .body("product.internals.database.version", equalTo(MockProvider.EXAMPLE_TELEMETRY_DB_VERSION))
+        .body("product.internals.commands.FetchExternalTasksCmd.count", equalTo(100))
+        .body("product.internals.commands.StartProcessInstanceCmd.count", equalTo(40))
+        .body("product.internals.metrics.root-process-instance-start.count", equalTo(936))
+        .body("product.internals.metrics.activity-instance-start.count", equalTo(6125))
+        .body("product.internals.metrics.executed-decision-elements.count", equalTo(732))
+        .body("product.internals.metrics.executed-decision-instances.count", equalTo(140))
+        .body("product.internals.webapps[0]", equalTo("cockpit"))
+        .body("product.internals.jdk.vendor", equalTo(MockProvider.EXAMPLE_TELEMETRY_JDK_VENDOR))
+        .body("product.internals.jdk.version", equalTo(MockProvider.EXAMPLE_TELEMETRY_JDK_VERSION))
+        .body("product.internals.application-server.vendor", equalTo(MockProvider.EXAMPLE_TELEMETRY_APP_SERVER_VENDOR))
+        .body("product.internals.application-server.version", equalTo(MockProvider.EXAMPLE_TELEMETRY_APP_SERVER_VERSION))
+        .body("product.internals.license-key.customer", equalTo(MockProvider.EXAMPLE_TELEMETRY_LICENSE_CUSTOMER_NAME))
+        .body("product.internals.license-key.type", equalTo(MockProvider.EXAMPLE_TELEMETRY_LICENSE_TYPE))
+        .body("product.internals.license-key.features.camundaBPM", equalTo("true"))
+        .body("product.internals.license-key.raw", equalTo(MockProvider.EXAMPLE_TELEMETRY_LICENSE_RAW))
+        .body("product.internals.license-key.unlimited", equalTo(MockProvider.EXAMPLE_TELEMETRY_LICENSE_UNLIMITED))
+        .body("product.internals.license-key.valid-until", equalTo(MockProvider.EXAMPLE_TELEMETRY_LICENSE_VALID_UNTIL))
+        .body("product.internals.camunda-integration[0]", equalTo("spring-boot"))
+    .when()
+      .get(TELEMETRY_DATA_URL);
+
+    verify(managementServiceMock).getTelemetryData();
   }
 
 }

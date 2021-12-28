@@ -20,7 +20,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.camunda.bpm.engine.ProcessEngine;
@@ -90,7 +89,7 @@ public class ExecutionImpl extends PvmExecutionImpl implements
   }
 
   /** creates a new execution. properties processDefinition, processInstance and activity will be initialized. */
-  public ExecutionImpl createExecution(boolean initializeExecutionStartContext) {
+  public ExecutionImpl createExecution() {
     // create the new child execution
     ExecutionImpl createdExecution = newExecution();
 
@@ -109,11 +108,7 @@ public class ExecutionImpl extends PvmExecutionImpl implements
     createdExecution.activityInstanceId = activityInstanceId;
 
     // with the fix of CAM-9249 we presume that the parent and the child have the same startContext
-    if (initializeExecutionStartContext) {
-      createdExecution.setStartContext(new ExecutionStartContext());
-    } else if (startContext != null) {
-      createdExecution.setStartContext(startContext);
-    }
+    createdExecution.setStartContext(scopeInstantiationContext);
 
     createdExecution.skipCustomListeners = this.skipCustomListeners;
     createdExecution.skipIoMapping = this.skipIoMapping;
@@ -219,17 +214,6 @@ public class ExecutionImpl extends PvmExecutionImpl implements
   }
 
   // process instance /////////////////////////////////////////////////////////
-
-  public void start(Map<String, Object> variables) {
-    if (isProcessInstanceExecution()) {
-      if (startContext == null) {
-        startContext = new ProcessInstanceStartContext(processDefinition.getInitial());
-      }
-    }
-
-    super.start(variables);
-  }
-
 
   /** ensures initialization and returns the process instance. */
   public ExecutionImpl getProcessInstance() {

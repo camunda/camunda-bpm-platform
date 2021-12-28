@@ -22,12 +22,11 @@ import org.camunda.bpm.client.topic.TopicSubscription;
 import org.camunda.bpm.client.topic.TopicSubscriptionBuilder;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.mockito.MockedStatic;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.modules.junit4.PowerMockRunnerDelegate;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.junit.Assume.assumeTrue;
@@ -37,9 +36,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
-@RunWith(PowerMockRunner.class)
-@PowerMockRunnerDelegate(SpringRunner.class)
-@PrepareForTest({ExternalTaskClient.class})
+@RunWith(SpringRunner.class)
 public abstract class MockedTest {
 
   protected static ExternalTaskClient client;
@@ -47,6 +44,9 @@ public abstract class MockedTest {
   protected static TopicSubscriptionBuilder subscriptionBuilder;
 
   protected static MockedStatic<ExternalTaskClient> mockedStatic;
+  
+  @Rule
+  public MockitoRule mockitoRule = MockitoJUnit.rule();
 
   @BeforeClass
   public static void mockClient() {
@@ -54,11 +54,11 @@ public abstract class MockedTest {
 
     mockedStatic = mockStatic(ExternalTaskClient.class);
     clientBuilder = mock(ExternalTaskClientBuilder.class, RETURNS_SELF);
-    PowerMockito.when(ExternalTaskClient.create()).thenReturn(clientBuilder);
+    mockedStatic.when(() -> ExternalTaskClient.create()).thenReturn(clientBuilder);
     client = mock(ExternalTaskClient.class);
-    PowerMockito.when(clientBuilder.build()).thenReturn(client);
+    mockedStatic.when(() -> clientBuilder.build()).thenReturn(client);
     subscriptionBuilder = mock(TopicSubscriptionBuilder.class, RETURNS_SELF);
-    PowerMockito.when(client.subscribe(anyString())).thenReturn(subscriptionBuilder);
+    mockedStatic.when(() -> client.subscribe(anyString())).thenReturn(subscriptionBuilder);
     TopicSubscription topicSubscription = mock(TopicSubscription.class);
     when(subscriptionBuilder.open()).thenReturn(topicSubscription);
   }
