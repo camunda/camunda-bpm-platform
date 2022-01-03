@@ -301,7 +301,7 @@
         test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       <include
           refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause"/>
-      AUTH ON (AUTH.RESOURCE_ID_ in (RES.DEC_DEF_KEY_, '*'))
+      AUTH ON (AUTH.RESOURCE_ID_ ${authJoinStart} RES.DEC_DEF_KEY_ ${authJoinSeparator} '*' ${authJoinEnd})
     </if>
 
     <where>
@@ -515,7 +515,7 @@
           FROM ${prefix}ACT_RE_DECISION_DEF RES
           <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
             <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
-            AUTH ON (AUTH.RESOURCE_ID_ in (RES.KEY_, '*'))
+            AUTH ON (AUTH.RESOURCE_ID_ ${authJoinStart} RES.KEY_ ${authJoinSeparator} '*' ${authJoinEnd})
           </if>
           <where>
 
