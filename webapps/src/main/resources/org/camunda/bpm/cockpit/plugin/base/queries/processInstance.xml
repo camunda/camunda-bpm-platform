@@ -30,6 +30,7 @@
 
   <select id="selectRunningProcessInstancesCount" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessInstanceQueryDto"
           resultType="long">
+    <bind name="joinHistory" value="false"/>
     ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectProcessInstances" />
     ${countDistinctAfterEnd}
@@ -38,6 +39,7 @@
 
   <select id="selectRunningProcessInstancesIncludingIncidents" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessInstanceQueryDto"
           resultMap="processInstanceMap">
+    <bind name="joinHistory" value="false"/>
     select distinct
       INSTANCE.ID_,
       INSTANCE.BUSINESS_KEY_,
@@ -52,6 +54,7 @@
         select ${distinct} RES.* ${limitBetween},
         <if test="historyEnabled">
         HISTORY.START_TIME_
+        <bind name="joinHistory" value="true"/>
         </if>
         <if test="!historyEnabled">
         ${constant.null.startTime}
@@ -93,7 +96,7 @@
     from
       ${prefix}ACT_RU_EXECUTION RES
 
-    <if test="historyEnabled">
+    <if test="joinHistory || (historyEnabled &amp;&amp; (startedBefore != null || startedAfter != null))">
     left join
       ${prefix}ACT_HI_PROCINST HISTORY
     ON
