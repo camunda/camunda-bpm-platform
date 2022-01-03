@@ -331,8 +331,13 @@
     </if>
 
     <where>
+      <if test="variableNameIn != null">
+        <bind name="listOfIds" value="variableNameIn" />
+        <bind name="fieldName" value="'RES.NAME_'" />
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection" />
+      </if>
       <if test="variableId != null">
-        RES.ID_ = #{variableId}
+        and RES.ID_ = #{variableId}
       </if>
       <if test="processInstanceId != null">
         and RES.PROC_INST_ID_ = #{processInstanceId}
