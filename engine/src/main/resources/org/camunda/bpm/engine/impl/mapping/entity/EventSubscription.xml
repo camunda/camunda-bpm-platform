@@ -82,7 +82,14 @@
 
       <if test="!authCheck.revokeAuthorizationCheckEnabled">
         <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
-        AUTH ON (AUTH.RESOURCE_ID_ in (RES.ID_, EXECUTION.ID_, PROCDEF.KEY_, PROC_EXECUTION.ID_, PROCDEF.KEY_, '*'))
+        AUTH ON (AUTH.RESOURCE_ID_ ${authJoinStart} RES.ID_ 
+          ${authJoinSeparator} EXECUTION.ID_
+          ${authJoinSeparator} PROCDEF.KEY_
+          ${authJoinSeparator} PROC_EXECUTION.ID_
+          ${authJoinSeparator} PROCDEF.KEY_
+          ${authJoinSeparator} '*'
+          ${authJoinEnd}
+        )
       </if>
     </if>
 
@@ -291,7 +298,7 @@
       inner join ${prefix}ACT_RE_PROCDEF P on RES.CONFIGURATION_ = P.ID_
       <if test="!authCheck.revokeAuthorizationCheckEnabled">
         <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
-        AUTH ON (AUTH.RESOURCE_ID_ in (P.KEY_, '*'))
+        AUTH ON (AUTH.RESOURCE_ID_ ${authJoinStart} P.KEY_ ${authJoinSeparator} '*' ${authJoinEnd})
       </if>
     </if>
     <where>
@@ -310,7 +317,7 @@
     <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       inner join ${prefix}ACT_RE_PROCDEF P on RES.CONFIGURATION_ = P.ID_
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
-      AUTH ON (AUTH.RESOURCE_ID_ in (P.KEY_, '*'))
+      AUTH ON (AUTH.RESOURCE_ID_ ${authJoinStart} P.KEY_ ${authJoinSeparator} '*' ${authJoinEnd})
     </if>
     <where>
       (EVENT_TYPE_ = 'conditional')

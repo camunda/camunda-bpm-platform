@@ -261,12 +261,14 @@
       </if>
       <if test="!authCheck.revokeAuthorizationCheckEnabled">
         <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause"/>
-        AUTH ON (AUTH.RESOURCE_ID_ in (
-        <if test="authCheck.isHistoricInstancePermissionsEnabled">
-          TI.PROC_INST_ID_,
-          RES.TASK_ID_,
-        </if>
-        RES.PROC_DEF_KEY_, '*'))
+        AUTH ON (AUTH.RESOURCE_ID_ ${authJoinStart}
+          RES.PROC_DEF_KEY_ ${authJoinSeparator} '*'
+          <if test="authCheck.isHistoricInstancePermissionsEnabled">
+            ${authJoinSeparator} TI.PROC_INST_ID_
+            ${authJoinSeparator} RES.TASK_ID_
+          </if>
+          ${authJoinEnd}
+        )
       </if>
     </if>
     

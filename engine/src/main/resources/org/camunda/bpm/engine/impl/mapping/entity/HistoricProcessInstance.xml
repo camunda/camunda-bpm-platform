@@ -290,11 +290,13 @@
           See camunda-bpm-platform-ee/webapps/camunda-webapp/plugins/src/main/resources/org/camunda/bpm/cockpit/impl/plugin/history/historicProcessInstance.xml
         -->
         <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause"/>
-        AUTH ON (AUTH.RESOURCE_ID_ in (
-        <if test="authCheck.isHistoricInstancePermissionsEnabled">
-            SELF.ID_,
-        </if>
-        SELF.PROC_DEF_KEY_, '*'))
+        AUTH ON (AUTH.RESOURCE_ID_ ${authJoinStart}
+          SELF.PROC_DEF_KEY_ ${authJoinSeparator} '*'
+          <if test="authCheck.isHistoricInstancePermissionsEnabled">
+            ${authJoinSeparator} SELF.ID_
+          </if>
+          ${authJoinEnd}
+        )
     </if>
 
     <bind name="INC_JOIN" value="false" />
@@ -709,7 +711,7 @@
           FROM ${prefix}ACT_RE_PROCDEF RES
           <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
             <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
-            AUTH ON (AUTH.RESOURCE_ID_ in (RES.KEY_, '*'))
+            AUTH ON (AUTH.RESOURCE_ID_ ${authJoinStart} RES.KEY_ ${authJoinSeparator} '*' ${authJoinEnd})
           </if>
           <where>
 

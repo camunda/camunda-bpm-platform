@@ -195,21 +195,21 @@
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" /> 
       AUTH ON (
        (AUTH.RESOURCE_TYPE_ = 8 
-        AND AUTH.RESOURCE_ID_ in (RES.PROC_INST_ID_, '*') 
+        AND (AUTH.RESOURCE_ID_ ${authJoinStart} RES.PROC_INST_ID_ ${authJoinSeparator} '*' ${authJoinEnd})   
         AND ${bitand1}AUTH.PERMS_${bitand2}2${bitand3} = 2)
       OR
        (AUTH.RESOURCE_TYPE_ = 6 
-        AND AUTH.RESOURCE_ID_ in (RES.PROC_DEF_KEY_, '*') 
+        AND (AUTH.RESOURCE_ID_ ${authJoinStart} RES.PROC_DEF_KEY_ ${authJoinSeparator} '*' ${authJoinEnd}) 
         AND ${bitand1}AUTH.PERMS_${bitand2}512${bitand3} = 512) 
       )
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
       AUTH1 ON (
          (AUTH1.RESOURCE_TYPE_ = 8 
-          AND AUTH1.RESOURCE_ID_ in (RES.PROC_INST_ID_, '*') 
+          AND (AUTH1.RESOURCE_ID_ ${authJoin1Start} RES.PROC_INST_ID_ ${authJoin1Separator} '*' ${authJoin1End})
           AND ${bitand1}AUTH1.PERMS_${bitand2}4${bitand3} = 4)         
       OR
          (AUTH1.RESOURCE_TYPE_ = 6 
-          AND AUTH1.RESOURCE_ID_ in (RES.PROC_DEF_KEY_, '*') 
+          AND (AUTH1.RESOURCE_ID_ ${authJoin1Start} RES.PROC_DEF_KEY_ ${authJoin1Separator} '*' ${authJoin1End}) 
           AND ${bitand1}AUTH1.PERMS_${bitand2}1024${bitand3} = 1024)
       )    
     </if>
@@ -338,11 +338,11 @@
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" /> 
       AUTH ON (
        (AUTH.RESOURCE_TYPE_ = 8 
-        AND AUTH.RESOURCE_ID_ in (RES.PROC_INST_ID_, '*') 
+        AND AUTH.RESOURCE_ID_ ${authJoinStart} RES.PROC_INST_ID_ ${authJoinSeparator} '*' ${authJoinEnd} 
         AND ${bitand1}AUTH.PERMS_${bitand2}2${bitand3} = 2)
       OR
-       (AUTH.RESOURCE_TYPE_ = 6 
-        AND AUTH.RESOURCE_ID_ in (RES.PROC_DEF_KEY_, '*')
+       (AUTH.RESOURCE_TYPE_ = 6
+        AND AUTH.RESOURCE_ID_ ${authJoinStart} RES.PROC_DEF_KEY_ ${authJoinSeparator} '*' ${authJoinEnd} 
         AND ${bitand1}AUTH.PERMS_${bitand2}512${bitand3} = 512) 
       )
     </if>

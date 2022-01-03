@@ -241,12 +241,12 @@
 
     <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
-      AUTH ON (AUTH.RESOURCE_ID_ in (RES.ID_, RES.KEY_, '*'))
+      AUTH ON (AUTH.RESOURCE_ID_ ${authJoinStart} RES.ID_ ${authJoinSeparator} RES.KEY_ ${authJoinSeparator} '*' ${authJoinEnd})
 
       <if test="startablePermissionCheck">
         <bind name="atomicChecks" value="processDefinitionCreatePermissionChecks" />
         <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClauseWithBinding" />
-        AUTH1 ON (AUTH1.RESOURCE_ID_ in (RES.KEY_, '*'))
+        AUTH1 ON (AUTH1.RESOURCE_ID_ ${authJoin1Start} RES.KEY_ ${authJoin1Separator} '*' ${authJoin1End})
       </if>
     </if>
 

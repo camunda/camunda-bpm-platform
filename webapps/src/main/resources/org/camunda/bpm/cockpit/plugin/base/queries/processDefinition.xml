@@ -60,7 +60,7 @@
 
     <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
-      AUTH ON (AUTH.RESOURCE_ID_ in (EXEC2.PROC_INST_ID_, PROCDEF.KEY_, '*'))
+      AUTH ON (AUTH.RESOURCE_ID_ ${authJoinStart} EXEC2.PROC_INST_ID_ ${authJoinSeparator} PROCDEF.KEY_ ${authJoinSeparator} '*' ${authJoinEnd})
     </if>
 
     <where>

@@ -94,6 +94,14 @@ public class DbSqlSessionFactory implements SessionFactory {
   public static final Map<String, String> databaseSpecificDaysComparator = new HashMap<>();
 
   public static final Map<String, String> databaseSpecificCollationForCaseSensitivity = new HashMap<>();
+  
+  public static final Map<String, String> databaseSpecificAuthJoinStart = new HashMap<>();
+  public static final Map<String, String> databaseSpecificAuthJoinEnd = new HashMap<>();
+  public static final Map<String, String> databaseSpecificAuthJoinSeparator = new HashMap<>();
+  
+  public static final Map<String, String> databaseSpecificAuth1JoinStart = new HashMap<>();
+  public static final Map<String, String> databaseSpecificAuth1JoinEnd = new HashMap<>();
+  public static final Map<String, String> databaseSpecificAuth1JoinSeparator = new HashMap<>();
 
   /*
    * On SQL server, the overall maximum number of parameters in a prepared statement
@@ -110,6 +118,10 @@ public class DbSqlSessionFactory implements SessionFactory {
     String defaultDistinctCountBeforeStart = "select count(distinct";
     String defaultDistinctCountBeforeEnd = ")";
     String defaultDistinctCountAfterEnd = "";
+    
+    String defaultAuthOnStart = "IN (";
+    String defaultAuthOnEnd = ")";
+    String defaultAuthOnSeparator = ",";
 
     // h2
     databaseSpecificLimitBeforeStatements.put(H2, "");
@@ -148,6 +160,14 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificDaysComparator.put(H2, "DATEDIFF(DAY, ${date}, #{currentTimestamp}) >= ${days}");
 
     databaseSpecificCollationForCaseSensitivity.put(H2, "");
+    
+    databaseSpecificAuthJoinStart.put(H2, defaultAuthOnStart);
+    databaseSpecificAuthJoinEnd.put(H2, defaultAuthOnEnd);
+    databaseSpecificAuthJoinSeparator.put(H2, defaultAuthOnSeparator);
+    
+    databaseSpecificAuth1JoinStart.put(H2, defaultAuthOnStart);
+    databaseSpecificAuth1JoinEnd.put(H2, defaultAuthOnEnd);
+    databaseSpecificAuth1JoinSeparator.put(H2, defaultAuthOnSeparator);
 
     HashMap<String, String> constants = new HashMap<>();
     constants.put("constant.event", "'event'");
@@ -202,6 +222,14 @@ public class DbSqlSessionFactory implements SessionFactory {
       databaseSpecificDaysComparator.put(mysqlLikeDatabase, "DATEDIFF(#{currentTimestamp}, ${date}) >= ${days}");
 
       databaseSpecificCollationForCaseSensitivity.put(mysqlLikeDatabase, "");
+      
+      databaseSpecificAuthJoinStart.put(mysqlLikeDatabase, "=");
+      databaseSpecificAuthJoinEnd.put(mysqlLikeDatabase, "");
+      databaseSpecificAuthJoinSeparator.put(mysqlLikeDatabase, "OR AUTH.RESOURCE_ID_ =");
+      
+      databaseSpecificAuth1JoinStart.put(mysqlLikeDatabase, "=");
+      databaseSpecificAuth1JoinEnd.put(mysqlLikeDatabase, "");
+      databaseSpecificAuth1JoinSeparator.put(mysqlLikeDatabase, "OR AUTH1.RESOURCE_ID_ =");
 
       addDatabaseSpecificStatement(mysqlLikeDatabase, "toggleForeignKey", "toggleForeignKey_mysql");
       addDatabaseSpecificStatement(mysqlLikeDatabase, "selectDeploymentsByQueryCriteria", "selectDeploymentsByQueryCriteria_mysql");
@@ -293,6 +321,14 @@ public class DbSqlSessionFactory implements SessionFactory {
       databaseSpecificIfNull.put(postgresLikeDatabase, "COALESCE");
 
       databaseSpecificCollationForCaseSensitivity.put(postgresLikeDatabase, "");
+      
+      databaseSpecificAuthJoinStart.put(postgresLikeDatabase, defaultAuthOnStart);
+      databaseSpecificAuthJoinEnd.put(postgresLikeDatabase, defaultAuthOnEnd);
+      databaseSpecificAuthJoinSeparator.put(postgresLikeDatabase, defaultAuthOnSeparator);
+      
+      databaseSpecificAuth1JoinStart.put(postgresLikeDatabase, defaultAuthOnStart);
+      databaseSpecificAuth1JoinEnd.put(postgresLikeDatabase, defaultAuthOnEnd);
+      databaseSpecificAuth1JoinSeparator.put(postgresLikeDatabase, defaultAuthOnSeparator);
 
       addDatabaseSpecificStatement(postgresLikeDatabase, "insertByteArray", "insertByteArray_postgres");
       addDatabaseSpecificStatement(postgresLikeDatabase, "updateByteArray", "updateByteArray_postgres");
@@ -397,6 +433,14 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificDaysComparator.put(ORACLE, "${date} <= #{currentTimestamp} - ${days}");
 
     databaseSpecificCollationForCaseSensitivity.put(ORACLE, "");
+    
+    databaseSpecificAuthJoinStart.put(ORACLE, defaultAuthOnStart);
+    databaseSpecificAuthJoinEnd.put(ORACLE, defaultAuthOnEnd);
+    databaseSpecificAuthJoinSeparator.put(ORACLE, defaultAuthOnSeparator);
+    
+    databaseSpecificAuth1JoinStart.put(ORACLE, defaultAuthOnStart);
+    databaseSpecificAuth1JoinEnd.put(ORACLE, defaultAuthOnEnd);
+    databaseSpecificAuth1JoinSeparator.put(ORACLE, defaultAuthOnSeparator);
 
     addDatabaseSpecificStatement(ORACLE, "selectHistoricProcessInstanceDurationReport", "selectHistoricProcessInstanceDurationReport_oracle");
     addDatabaseSpecificStatement(ORACLE, "selectHistoricTaskInstanceDurationReport", "selectHistoricTaskInstanceDurationReport_oracle");
@@ -480,6 +524,14 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificDaysComparator.put(DB2, "${date} + ${days} DAYS <= #{currentTimestamp}");
 
     databaseSpecificCollationForCaseSensitivity.put(DB2, "");
+    
+    databaseSpecificAuthJoinStart.put(DB2, defaultAuthOnStart);
+    databaseSpecificAuthJoinEnd.put(DB2, defaultAuthOnEnd);
+    databaseSpecificAuthJoinSeparator.put(DB2, defaultAuthOnSeparator);
+    
+    databaseSpecificAuth1JoinStart.put(DB2, defaultAuthOnStart);
+    databaseSpecificAuth1JoinEnd.put(DB2, defaultAuthOnEnd);
+    databaseSpecificAuth1JoinSeparator.put(DB2, defaultAuthOnSeparator);
 
     addDatabaseSpecificStatement(DB2, "selectMeterLogAggregatedByTimeInterval", "selectMeterLogAggregatedByTimeInterval_db2_or_mssql");
     addDatabaseSpecificStatement(DB2, "selectExecutionByNativeQuery", "selectExecutionByNativeQuery_mssql_or_db2");
@@ -566,6 +618,14 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificDaysComparator.put(MSSQL, "DATEDIFF(DAY, ${date}, #{currentTimestamp}) >= ${days}");
 
     databaseSpecificCollationForCaseSensitivity.put(MSSQL, "COLLATE Latin1_General_CS_AS");
+    
+    databaseSpecificAuthJoinStart.put(MSSQL, defaultAuthOnStart);
+    databaseSpecificAuthJoinEnd.put(MSSQL, defaultAuthOnEnd);
+    databaseSpecificAuthJoinSeparator.put(MSSQL, defaultAuthOnSeparator);
+    
+    databaseSpecificAuth1JoinStart.put(MSSQL, defaultAuthOnStart);
+    databaseSpecificAuth1JoinEnd.put(MSSQL, defaultAuthOnEnd);
+    databaseSpecificAuth1JoinSeparator.put(MSSQL, defaultAuthOnSeparator);
 
     addDatabaseSpecificStatement(MSSQL, "selectMeterLogAggregatedByTimeInterval", "selectMeterLogAggregatedByTimeInterval_db2_or_mssql");
     addDatabaseSpecificStatement(MSSQL, "selectExecutionByNativeQuery", "selectExecutionByNativeQuery_mssql_or_db2");
