@@ -24,6 +24,7 @@ import java.util.StringTokenizer;
 
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.HistoricEntity;
+import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.task.Comment;
 import org.camunda.bpm.engine.task.Event;
 
@@ -32,16 +33,16 @@ import org.camunda.bpm.engine.task.Event;
  * @author Tom Baeyens
  */
 public class CommentEntity implements Comment, Event, DbEntity, HistoricEntity, Serializable {
-  
+
   private static final long serialVersionUID = 1L;
-  
+
   public static final String TYPE_EVENT = "event";
   public static final String TYPE_COMMENT = "comment";
-  
+
   protected String id;
-  
+
   // If comments would be removeable, revision needs to be added!
-  
+
   protected String type;
   protected String userId;
   protected Date time;
@@ -59,15 +60,15 @@ public class CommentEntity implements Comment, Event, DbEntity, HistoricEntity, 
   }
 
   public byte[] getFullMessageBytes() {
-    return (fullMessage!=null ? fullMessage.getBytes() : null);
+    return (fullMessage != null ? StringUtil.toByteArray(fullMessage) : null);
   }
 
   public void setFullMessageBytes(byte[] fullMessageBytes) {
-    fullMessage = (fullMessageBytes!=null ? new String(fullMessageBytes) : null );
+    fullMessage = (fullMessageBytes != null ? StringUtil.fromBytes(fullMessageBytes) : null );
   }
-  
+
   public static String MESSAGE_PARTS_MARKER = "_|_";
-  
+
   public void setMessage(String[] messageParts) {
     StringBuilder stringBuilder = new StringBuilder();
     for (String part: messageParts) {
@@ -84,12 +85,12 @@ public class CommentEntity implements Comment, Event, DbEntity, HistoricEntity, 
     }
     message = stringBuilder.toString();
   }
-  
+
   public List<String> getMessageParts() {
     if (message==null) {
       return null;
     }
-    List<String> messageParts = new ArrayList<String>();
+    List<String> messageParts = new ArrayList<>();
     StringTokenizer tokenizer = new StringTokenizer(message, MESSAGE_PARTS_MARKER);
     while (tokenizer.hasMoreTokens()) {
       String nextToken = tokenizer.nextToken();
@@ -101,53 +102,53 @@ public class CommentEntity implements Comment, Event, DbEntity, HistoricEntity, 
     }
     return messageParts;
   }
-  
+
   // getters and setters //////////////////////////////////////////////////////
 
   public String getId() {
     return id;
   }
-  
+
   public void setId(String id) {
     this.id = id;
   }
-  
+
   public String getUserId() {
     return userId;
   }
-  
+
   public void setUserId(String userId) {
     this.userId = userId;
   }
-  
+
   public String getTaskId() {
     return taskId;
   }
-  
+
   public void setTaskId(String taskId) {
     this.taskId = taskId;
   }
-  
+
   public String getMessage() {
     return message;
   }
-  
+
   public void setMessage(String message) {
     this.message = message;
   }
-  
+
   public Date getTime() {
     return time;
   }
-  
+
   public void setTime(Date time) {
     this.time = time;
   }
-  
+
   public String getProcessInstanceId() {
     return processInstanceId;
   }
-  
+
   public void setProcessInstanceId(String processInstanceId) {
     this.processInstanceId = processInstanceId;
   }
@@ -155,7 +156,7 @@ public class CommentEntity implements Comment, Event, DbEntity, HistoricEntity, 
   public String getType() {
     return type;
   }
-  
+
   public void setType(String type) {
     this.type = type;
   }
@@ -171,7 +172,7 @@ public class CommentEntity implements Comment, Event, DbEntity, HistoricEntity, 
   public String getAction() {
     return action;
   }
-  
+
   public void setAction(String action) {
     this.action = action;
   }
