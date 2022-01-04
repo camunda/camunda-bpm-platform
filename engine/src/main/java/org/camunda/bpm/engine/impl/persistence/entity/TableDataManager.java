@@ -97,7 +97,6 @@ public class TableDataManager extends AbstractManager {
 
     persistentObjectToTableNameMap.put(EventSubscriptionEntity.class, "ACT_RU_EVENT_SUBSCR");
 
-    persistentObjectToTableNameMap.put(FilterEntity.class, "ACT_RU_FILTER");
 
     persistentObjectToTableNameMap.put(MeterLogEntity.class, "ACT_RU_METER_LOG");
     persistentObjectToTableNameMap.put(TaskMeterLogEntity.class, "ACT_RU_TASK_METER_LOG");
@@ -135,7 +134,6 @@ public class TableDataManager extends AbstractManager {
     persistentObjectToTableNameMap.put(HistoricIdentityLinkLogEntity.class, "ACT_HI_IDENTITYLINK");
     // a couple of stuff goes to the same table
     persistentObjectToTableNameMap.put(HistoricFormPropertyEntity.class, "ACT_HI_DETAIL");
-    persistentObjectToTableNameMap.put(HistoricVariableInstanceEntity.class, "ACT_HI_DETAIL");
     persistentObjectToTableNameMap.put(HistoricVariableInstanceEntity.class, "ACT_HI_VARINST");
     persistentObjectToTableNameMap.put(HistoricDetailEventEntity.class, "ACT_HI_DETAIL");
 
