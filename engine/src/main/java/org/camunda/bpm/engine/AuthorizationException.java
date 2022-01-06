@@ -76,6 +76,10 @@ public class AuthorizationException extends ProcessEngineException {
     this.resourceId = exceptionInfo.getResourceId();
   }
 
+  public AuthorizationException(String userId, List<MissingAuthorization> info) {
+    this(userId, info, false);
+  }
+
   public AuthorizationException(String userId, List<MissingAuthorization> info, boolean missingAdminRole) {
     super(generateExceptionMessage(userId, info, missingAdminRole));
     this.userId = userId;

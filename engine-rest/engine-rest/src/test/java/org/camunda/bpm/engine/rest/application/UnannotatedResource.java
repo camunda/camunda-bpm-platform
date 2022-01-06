@@ -74,6 +74,6 @@ public class UnannotatedResource {
         new MissingAuthorization("somePermission1", "someResourceName1", "someResourceId1"));
     missingAuthorizations.add(
         new MissingAuthorization("somePermission2", "someResourceName2", "someResourceId2"));
-    throw new AuthorizationException("someUser", missingAuthorizations, false);
+    throw new AuthorizationException("someUser", missingAuthorizations);
   }
 }

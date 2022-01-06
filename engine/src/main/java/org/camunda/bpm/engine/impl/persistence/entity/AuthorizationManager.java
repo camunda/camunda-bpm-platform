@@ -210,7 +210,7 @@ public class AuthorizationManager extends AbstractManager {
               check.getResourceId()));
         }
 
-        throw new AuthorizationException(userId, missingAuthorizations, false);
+        throw new AuthorizationException(userId, missingAuthorizations);
       }
     }
   }
@@ -535,7 +535,7 @@ public class AuthorizationManager extends AbstractManager {
       // throw combined exception
       String userId = authorizationException.getUserId();
       List<MissingAuthorization> info = authorizationException.getMissingAuthorizations();
-      throw new AuthorizationException(userId, info, adminException != null);
+      throw new AuthorizationException(userId, info, true);
     }
   }
 
