@@ -387,7 +387,7 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
   @Test
   public void shouldSetPropertyWithPermission() {
     // given
-    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.WRITE);
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.SET);
 
     // when
     managementService.setProperty(DUMMY_PROPERTY, DUMMY_VALUE);
@@ -401,7 +401,7 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
   public void shouldSetPropertyWithAdminAndPermission() {
     // given
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
-    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.WRITE);
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.SET);
 
     // when
     managementService.setProperty(DUMMY_PROPERTY, DUMMY_VALUE);
@@ -420,7 +420,7 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
       managementService.setProperty(DUMMY_PROPERTY, DUMMY_VALUE);
     })
         // then
-        .hasMessageContaining(permissionException(Resources.SYSTEM, SystemPermissions.WRITE));
+        .hasMessageContaining(permissionException(Resources.SYSTEM, SystemPermissions.SET));
   }
 
   // delete properties ///////////////////////////
@@ -493,7 +493,7 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
       managementService.toggleTelemetry(false);
     })
     // then
-        .hasMessageContaining(permissionException(Resources.SYSTEM, SystemPermissions.WRITE));
+        .hasMessageContaining(permissionException(Resources.SYSTEM, SystemPermissions.SET));
   }
 
   @Test
@@ -512,7 +512,7 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
   @Test
   public void shouldToggleTelemetryEnabledWithPermission() {
     // given
-    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.READ, SystemPermissions.WRITE);
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.READ, SystemPermissions.SET);
     managementService.toggleTelemetry(true);
 
     // when
@@ -526,7 +526,7 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
   public void shouldToggleTelemetryEnabledWithAdminAndPermission() {
     // given
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
-    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.READ, SystemPermissions.WRITE);
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.READ, SystemPermissions.SET);
     managementService.toggleTelemetry(true);
 
     // when
@@ -662,7 +662,7 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
   @Test
   public void shouldSetLicenseKeyWithPermission() {
     // given
-    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.WRITE);
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.SET);
 
     // when
     managementService.setLicenseKey("testLicenseKey");
@@ -677,7 +677,7 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
   public void shouldSetLicenseKeyWithAdminAndPermission() {
     // given
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
-    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.WRITE);
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.SET);
 
     // when
     managementService.setLicenseKey("testLicenseKey");
@@ -695,7 +695,7 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
       managementService.setLicenseKey("testLicenseKey");
     })
         // then
-        .hasMessageContaining(permissionException(Resources.SYSTEM, SystemPermissions.WRITE));
+        .hasMessageContaining(permissionException(Resources.SYSTEM, SystemPermissions.SET));
   }
 
   // delete license key //////////////////////////////////

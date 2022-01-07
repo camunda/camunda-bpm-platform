@@ -38,8 +38,8 @@ public enum SystemPermissions implements Permission {
   /** Indicates that READ interactions are permitted. */
   READ("READ", 2),
 
-  /** Indicates that WRITE interactions are permitted. */
-  WRITE("WRITE", 4),
+  /** Indicates that SET interactions are permitted. */
+  SET("SET", 4),
 
   /** Indicates that DELETE interactions are permitted. */
   DELETE("DELETE", 8);

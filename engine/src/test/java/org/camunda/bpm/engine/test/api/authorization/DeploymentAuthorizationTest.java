@@ -535,7 +535,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
   @Test
   public void shouldRegisterProcessApplicationWithPermission() {
     // given
-    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.WRITE);
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.SET);
     EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication();
     ProcessApplicationReference reference = processApplication.getReference();
     String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
@@ -552,7 +552,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
   public void shouldRegisterProcessApplicationWithAdminAndPermission() {
     // given
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
-    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.WRITE);
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.SET);
     EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication();
     ProcessApplicationReference reference = processApplication.getReference();
     String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
@@ -574,7 +574,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
       managementService.registerProcessApplication(null, null);
     })
         // then
-        .hasMessageContaining(permissionException(Resources.SYSTEM, SystemPermissions.WRITE));
+        .hasMessageContaining(permissionException(Resources.SYSTEM, SystemPermissions.SET));
   }
 
   // unregister process application ///////////////////////////////////
@@ -598,7 +598,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
   @Test
   public void shouldUnregisterProcessApplicationWithPermission() {
     // given
-    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.WRITE);
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.SET);
 
     EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication();
     String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
@@ -616,7 +616,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
   public void shouldUnregisterProcessApplicationWithAdminAndPermission() {
     // given
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
-    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.WRITE);
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.SET);
 
     EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication();
     String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
@@ -639,7 +639,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
       managementService.unregisterProcessApplication("anyDeploymentId", true);
     })
         // then
-        .hasMessageContaining(permissionException(Resources.SYSTEM, SystemPermissions.WRITE));
+        .hasMessageContaining(permissionException(Resources.SYSTEM, SystemPermissions.SET));
   }
 
   // get process application for deployment ///////////////////////////////////
@@ -784,7 +784,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
   @Test
   public void shouldRegisterDeploymentWithPermission() {
     // given
-    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.WRITE);
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.SET);
 
     String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
 
@@ -799,7 +799,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
   public void shouldRegisterDeploymentWithAdminAndPermission() {
     // given
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
-    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.WRITE);
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.SET);
 
     String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
 
@@ -822,7 +822,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
       managementService.registerDeploymentForJobExecutor(deploymentId);
     })
         // then
-        .hasMessageContaining(permissionException(Resources.SYSTEM, SystemPermissions.WRITE));
+        .hasMessageContaining(permissionException(Resources.SYSTEM, SystemPermissions.SET));
   }
 
   // unregister deployment for job executor ///////////////////////////////////
@@ -844,7 +844,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
   @Test
   public void shouldUnregisterDeploymentWithPermission() {
     // given
-    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.WRITE);
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.SET);
 
     String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
 
@@ -859,7 +859,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
   public void shouldUnregisterDeploymentWithAdminAndPermission() {
     // given
     identityService.setAuthentication(userId, Collections.singletonList(Groups.CAMUNDA_ADMIN));
-    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.WRITE);
+    createGrantAuthorization(Resources.SYSTEM, "*", userId, SystemPermissions.SET);
 
     String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
 
@@ -879,7 +879,7 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
       managementService.unregisterDeploymentForJobExecutor("anyDeploymentId");
     })
         // then
-        .hasMessageContaining(permissionException(Resources.SYSTEM, SystemPermissions.WRITE));
+        .hasMessageContaining(permissionException(Resources.SYSTEM, SystemPermissions.SET));
   }
 
   // helper /////////////////////////////////////////////////////////

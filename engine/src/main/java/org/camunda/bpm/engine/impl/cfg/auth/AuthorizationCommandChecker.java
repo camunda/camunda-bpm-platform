@@ -824,7 +824,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
 
   @Override
   public void checkConfigureTelemetry() {
-    getAuthorizationManager().checkAuthorization(SystemPermissions.WRITE, Resources.SYSTEM);
+    getAuthorizationManager().checkAuthorization(SystemPermissions.SET, Resources.SYSTEM);
   }
 
   @Override
@@ -859,7 +859,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
 
   @Override
   public void checkSetProperty() {
-    getAuthorizationManager().checkAuthorization(SystemPermissions.WRITE, Resources.SYSTEM);
+    getAuthorizationManager().checkAuthorization(SystemPermissions.SET, Resources.SYSTEM);
   }
 
   @Override
@@ -874,7 +874,7 @@ public class AuthorizationCommandChecker implements CommandChecker {
 
   @Override
   public void checkSetLicenseKey() {
-    getAuthorizationManager().checkAuthorization(SystemPermissions.WRITE, Resources.SYSTEM);
+    getAuthorizationManager().checkAuthorization(SystemPermissions.SET, Resources.SYSTEM);
   }
 
   @Override
@@ -884,12 +884,12 @@ public class AuthorizationCommandChecker implements CommandChecker {
 
   @Override
   public void checkRegisterProcessApplication() {
-    getAuthorizationManager().checkAuthorization(SystemPermissions.WRITE, Resources.SYSTEM);
+    getAuthorizationManager().checkAuthorization(SystemPermissions.SET, Resources.SYSTEM);
   }
 
   @Override
   public void checkUnregisterProcessApplication() {
-    getAuthorizationManager().checkAuthorization(SystemPermissions.WRITE, Resources.SYSTEM);
+    getAuthorizationManager().checkAuthorization(SystemPermissions.SET, Resources.SYSTEM);
   }
 
   @Override
@@ -904,12 +904,12 @@ public class AuthorizationCommandChecker implements CommandChecker {
 
   @Override
   public void checkRegisterDeployment() {
-    getAuthorizationManager().checkAuthorization(SystemPermissions.WRITE, Resources.SYSTEM);
+    getAuthorizationManager().checkAuthorization(SystemPermissions.SET, Resources.SYSTEM);
   }
 
   @Override
   public void checkUnregisterDeployment() {
-    getAuthorizationManager().checkAuthorization(SystemPermissions.WRITE, Resources.SYSTEM);
+    getAuthorizationManager().checkAuthorization(SystemPermissions.SET, Resources.SYSTEM);
   }
 
   @Override

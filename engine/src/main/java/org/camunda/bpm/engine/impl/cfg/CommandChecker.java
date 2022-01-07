@@ -407,7 +407,7 @@ public interface CommandChecker {
   void checkReadProperties();
 
   /*
-   * Checks if it is allowed to write a system property.
+   * Checks if it is allowed to set a system property.
    */
   void checkSetProperty();
 

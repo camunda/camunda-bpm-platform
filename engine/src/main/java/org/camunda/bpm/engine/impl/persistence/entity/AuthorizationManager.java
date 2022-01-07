@@ -505,37 +505,39 @@ public class AuthorizationManager extends AbstractManager {
    */
   public void checkCamundaAdmin() {
     final Authentication currentAuthentication = getCurrentAuthentication();
-    CommandContext commandContext = Context.getCommandContext();
 
-    if (isAuthorizationEnabled() && commandContext.isAuthorizationCheckEnabled()
-        && currentAuthentication != null  && !isCamundaAdmin(currentAuthentication)) {
+    if (isAuthorizationEnabled() && getCommandContext().isAuthorizationCheckEnabled()
+        && currentAuthentication != null && !isCamundaAdmin(currentAuthentication)) {
 
-      throw LOG.requiredCamundaAdminException();
+      throw LOG.requiredCamundaAdminOrPermissionException(null);
     }
   }
 
   public void checkCamundaAdminOrPermission(Consumer<CommandChecker> permissionCheck) {
-    AuthorizationException authorizationException = null;
-    AuthorizationException adminException = null;
-    try {
-      for (CommandChecker checker : Context.getProcessEngineConfiguration().getCommandCheckers()) {
-        permissionCheck.accept(checker);
+    if (isAuthorizationEnabled() && getCommandContext().isAuthorizationCheckEnabled()) {
+
+      AuthorizationException authorizationException = null;
+      AuthorizationException adminException = null;
+
+      try {
+        for (CommandChecker checker : getCommandContext().getProcessEngineConfiguration().getCommandCheckers()) {
+          permissionCheck.accept(checker);
+        }
+      } catch (AuthorizationException e) {
+        authorizationException = e;
       }
-    } catch (AuthorizationException e) {
-      authorizationException = e;
-    }
 
-    try {
-      checkCamundaAdmin();
-    } catch (AuthorizationException e) {
-      adminException = e;
-    }
+      try {
+        checkCamundaAdmin();
+      } catch (AuthorizationException e) {
+        adminException = e;
+      }
 
-    if (authorizationException != null && adminException != null) {
-      // throw combined exception
-      String userId = authorizationException.getUserId();
-      List<MissingAuthorization> info = authorizationException.getMissingAuthorizations();
-      throw new AuthorizationException(userId, info, true);
+      if (authorizationException != null && adminException != null) {
+        // throw combined exception
+        List<MissingAuthorization> info = authorizationException.getMissingAuthorizations();
+        throw LOG.requiredCamundaAdminOrPermissionException(info);
+      }
     }
   }
 
