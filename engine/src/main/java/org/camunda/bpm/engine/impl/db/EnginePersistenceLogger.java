@@ -316,15 +316,13 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
   }
 
   public AuthorizationException requiredCamundaAdminOrPermissionException(List<MissingAuthorization> missingAuthorizations) {
-    String exceptionCode;
+    String exceptionCode = "029";
     StringBuilder sb = new StringBuilder();
     sb.append("Required admin authenticated group or user");
     if(missingAuthorizations != null && !missingAuthorizations.isEmpty()) {
       sb.append(" or any of the following permissions: ");
       sb.append(AuthorizationException.generateMissingAuthorizationsList(missingAuthorizations));
       exceptionCode = "110";
-    } else {
-      exceptionCode = "029";
     }
     sb.append(".");
     return new AuthorizationException(exceptionMessage(exceptionCode, sb.toString()));
