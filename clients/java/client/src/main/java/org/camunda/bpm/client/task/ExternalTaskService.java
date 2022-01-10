@@ -59,7 +59,9 @@ public interface ExternalTaskService {
    * @throws NotAcquiredException if the task's most recent lock could not be acquired
    * @throws ConnectionLostException if the connection could not be established
    */
-  void lock(ExternalTask externalTask, long lockDuration);
+  default void lock(ExternalTask externalTask, long lockDuration) {
+    lock(externalTask.getId(), lockDuration);
+  }
 
   /**
    * Unlocks a task and clears the tasks lock expiration time and worker id.
@@ -88,7 +90,9 @@ public interface ExternalTaskService {
    *   <li> if no suitable serializer could be found
    * </ul>
    */
-  void complete(ExternalTask externalTask);
+  default void complete(ExternalTask externalTask) {
+    complete(externalTask, null);
+  }
 
   /**
    * Set variables
@@ -108,7 +112,7 @@ public interface ExternalTaskService {
    *   <li> if no suitable serializer could be found
    * </ul>
    */
-  public void setVariables(String processInstanceId, Map<String, Object> variables);
+  void setVariables(String processInstanceId, Map<String, Object> variables);
 
 
   /**
@@ -129,7 +133,9 @@ public interface ExternalTaskService {
    *   <li> if no suitable serializer could be found
    * </ul>
    */
-  public void setVariables(ExternalTask externalTask, Map<String, Object> variables);
+  default void setVariables(ExternalTask externalTask, Map<String, Object> variables) {
+    setVariables(externalTask.getProcessInstanceId(), variables);
+  }
 
 
   /**
@@ -151,7 +157,9 @@ public interface ExternalTaskService {
    *   <li> if no suitable serializer could be found
    * </ul>
    */
-  void complete(ExternalTask externalTask, Map<String, Object> variables);
+  default void complete(ExternalTask externalTask, Map<String, Object> variables) {
+    complete(externalTask, variables, null);
+  }
 
   /**
    * Completes a task.
@@ -174,7 +182,9 @@ public interface ExternalTaskService {
    *   <li> if no suitable serializer could be found
    * </ul>
    */
-  void complete(ExternalTask externalTask, Map<String, Object> variables, Map<String, Object> localVariables);
+  default void complete(ExternalTask externalTask, Map<String, Object> variables, Map<String, Object> localVariables) {
+    complete(externalTask.getId(), variables, localVariables);
+  }
 
   /**
    * Completes a task.
@@ -207,7 +217,9 @@ public interface ExternalTaskService {
    * @throws NotResumedException if the corresponding process instance could not be resumed
    * @throws ConnectionLostException if the connection could not be established
    */
-  void handleFailure(ExternalTask externalTask, String errorMessage, String errorDetails, int retries, long retryTimeout);
+  default void handleFailure(ExternalTask externalTask, String errorMessage, String errorDetails, int retries, long retryTimeout) {
+    handleFailure(externalTask.getId(), errorMessage, errorDetails, retries, retryTimeout);
+  }
 
   /**
    * Reports a failure to execute a task. A number of retries and a timeout until
@@ -229,7 +241,9 @@ public interface ExternalTaskService {
    * @throws NotResumedException if the corresponding process instance could not be resumed
    * @throws ConnectionLostException if the connection could not be established
    */
-  void handleFailure(String externalTaskId, String errorMessage, String errorDetails, int retries, long retryTimeout);
+  default void handleFailure(String externalTaskId, String errorMessage, String errorDetails, int retries, long retryTimeout) {
+    handleFailure(externalTaskId, errorMessage, errorDetails, retries, retryTimeout, null, null);
+  }
 
   /**
    * Reports a failure to execute a task. A number of retries and a timeout until
@@ -268,7 +282,9 @@ public interface ExternalTaskService {
    * @throws NotResumedException if the corresponding process instance could not be resumed
    * @throws ConnectionLostException if the connection could not be established
    */
-  void handleBpmnError(ExternalTask externalTask, String errorCode);
+  default void handleBpmnError(ExternalTask externalTask, String errorCode) {
+    handleBpmnError(externalTask, errorCode, null);
+  }
 
   /**
    * Reports a business error in the context of a running task.
@@ -284,7 +300,9 @@ public interface ExternalTaskService {
    * @throws NotResumedException if the corresponding process instance could not be resumed
    * @throws ConnectionLostException if the connection could not be established
    */
-  void handleBpmnError(ExternalTask externalTask, String errorCode, String errorMessage);
+  default void handleBpmnError(ExternalTask externalTask, String errorCode, String errorMessage) {
+    handleBpmnError(externalTask, errorCode, errorMessage, null);
+  }
 
   /**
    * Reports a business error in the context of a running task.
@@ -301,7 +319,9 @@ public interface ExternalTaskService {
    * @throws NotResumedException if the corresponding process instance could not be resumed
    * @throws ConnectionLostException if the connection could not be established
    */
-  void handleBpmnError(ExternalTask externalTask, String errorCode, String errorMessage, Map<String, Object> variables);
+  default void handleBpmnError(ExternalTask externalTask, String errorCode, String errorMessage, Map<String, Object> variables) {
+    handleBpmnError(externalTask.getId(), errorCode, errorMessage, variables);
+  }
 
   /**
    * Reports a business error in the context of a running task.
@@ -330,7 +350,9 @@ public interface ExternalTaskService {
    * @throws NotAcquiredException if the task's most recent lock could not be acquired
    * @throws ConnectionLostException if the connection could not be established
    */
-  void extendLock(ExternalTask externalTask, long newDuration);
+  default void extendLock(ExternalTask externalTask, long newDuration) {
+    extendLock(externalTask.getId(), newDuration);
+  }
 
   /**
    * Extends the timeout of the lock by a given amount of time.

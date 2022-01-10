@@ -38,11 +38,6 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
   }
 
   @Override
-  public void lock(ExternalTask externalTask, long lockDuration) {
-    lock(externalTask.getId(), lockDuration);
-  }
-
-  @Override
   public void lock(String externalTaskId, long lockDuration) {
     try {
       engineClient.lock(externalTaskId, lockDuration);
@@ -61,11 +56,6 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
   }
 
   @Override
-  public void complete(ExternalTask externalTask) {
-    complete(externalTask, null, null);
-  }
-
-  @Override
   public void setVariables(String processInstanceId, Map<String, Object> variables) {
     try {
       engineClient.setVariables(processInstanceId, variables);
@@ -74,44 +64,12 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
     }
   }
 
-  @Override
-  public void setVariables(ExternalTask externalTask, Map<String, Object> variables) {
-    String processId = externalTask.getProcessInstanceId();
-    try {
-      engineClient.setVariables(processId, variables);
-    } catch (EngineClientException e) {
-      throw LOG.externalTaskServiceException("setting variables for external task", e);
-    }
-  }
-
-  @Override
-  public void complete(ExternalTask externalTask, Map<String, Object> variables) {
-    complete(externalTask, variables, null);
-  }
-
-  @Override
-  public void complete(ExternalTask externalTask, Map<String, Object> variables,  Map<String, Object> localVariables) {
-    complete(externalTask.getId(), variables, localVariables);
-  }
-
   public void complete(String externalTaskId, Map<String, Object> variables, Map<String, Object> localVariables) {
     try {
       engineClient.complete(externalTaskId, variables, localVariables);
     } catch (EngineClientException e) {
       throw LOG.externalTaskServiceException("completing the external task", e);
     }
-  }
-
-
-
-  @Override
-  public void handleFailure(ExternalTask externalTask, String errorMessage, String errorDetails, int retries, long retryTimeout) {
-    handleFailure(externalTask.getId(), errorMessage, errorDetails, retries, retryTimeout);
-  }
-
-  @Override
-  public void handleFailure(String externalTaskId, String errorMessage, String errorDetails, int retries, long retryTimeout) {
-    handleFailure(externalTaskId, errorMessage, errorDetails, retries, retryTimeout, null, null);
   }
 
   @Override
@@ -124,32 +82,12 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
   }
 
   @Override
-  public void handleBpmnError(ExternalTask externalTask, String errorCode) {
-    handleBpmnError(externalTask, errorCode, null, null);
-  }
-
-  @Override
-  public void handleBpmnError(ExternalTask externalTask, String errorCode, String errorMessage) {
-    handleBpmnError(externalTask, errorCode, errorMessage, null);
-  }
-
-  @Override
-  public void handleBpmnError(ExternalTask externalTask, String errorCode, String errorMessage, Map<String, Object> variables) {
-    handleBpmnError(externalTask.getId(), errorCode, errorMessage, variables);
-  }
-
-  @Override
   public void handleBpmnError(String externalTaskId, String errorCode, String errorMessage, Map<String, Object> variables) {
     try {
       engineClient.bpmnError(externalTaskId, errorCode, errorMessage, variables);
     } catch (EngineClientException e) {
       throw LOG.externalTaskServiceException("notifying a BPMN error", e);
     }
-  }
-
-  @Override
-  public void extendLock(ExternalTask externalTask, long newDuration) {
-    extendLock(externalTask.getId(), newDuration);
   }
 
   @Override
