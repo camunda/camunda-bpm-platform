@@ -71,7 +71,7 @@ public class AuthorizationLoggingTest {
     engineRule.getManagementService().toggleTelemetry(true);
 
     // then
-    String message = "ENGINE-16002 Exception while closing command context: ENGINE-03029 Required admin authenticated group or user or any of the following permissions";
+    String message = "ENGINE-16002 Exception while closing command context: Required admin authenticated group or user or any of the following permissions";
     List<ILoggingEvent> filteredLog = loggingRule.getFilteredLog(CONTEXT_LOGGER, message);
 
     assertThat(filteredLog.size()).isEqualTo(1);

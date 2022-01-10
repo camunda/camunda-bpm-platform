@@ -44,7 +44,7 @@ import org.junit.Test;
  */
 public class ManagementAuthorizationTest extends AuthorizationTest {
 
-  protected static final String REQUIRED_ADMIN_AUTH_EXCEPTION = "ENGINE-03029 Required admin authenticated group or user.";
+  protected static final String REQUIRED_ADMIN_AUTH_EXCEPTION = "Required admin authenticated group or user.";
   protected static final String DUMMY_PROPERTY = "dummy-property";
   protected static final String DUMMY_VALUE = "aPropertyValue";
   protected static final String DUMMY_METRIC = "dummyMetric";

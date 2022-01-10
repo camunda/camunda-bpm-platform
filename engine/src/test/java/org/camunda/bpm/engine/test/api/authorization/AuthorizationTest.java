@@ -117,7 +117,7 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTest {
   }
 
   protected String permissionException(Resource resource, Permission permission) {
-    return "ENGINE-03029 Required admin authenticated group or user or any of the following permissions: '"
+    return "Required admin authenticated group or user or any of the following permissions: '"
         + permission.getName() + "' permission on resource '" + resource.resourceName() + "'";
   }
 

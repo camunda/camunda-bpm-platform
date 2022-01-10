@@ -32,7 +32,6 @@ import static org.camunda.bpm.engine.authorization.Resources.TENANT;
 import static org.camunda.bpm.engine.authorization.Resources.TENANT_MEMBERSHIP;
 import static org.camunda.bpm.engine.authorization.Resources.USER;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationTestUtil.assertExceptionInfo;
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -295,7 +294,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
       identityService.unlockUser(lockedUser.getId());
       fail("expected exception");
     } catch (AuthorizationException e) {
-      assertTrue(e.getMessage().contains("ENGINE-03029 Required admin authenticated group or user."));
+      assertTrue(e.getMessage().contains("Required admin authenticated group or user."));
     }
 
     // return to god-mode
@@ -971,7 +970,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     accMaryAuth.addPermission(READ);
     authorizationService.saveAuthorization(accMaryAuth);
 
-    List<String> groups = new ArrayList<String>();
+    List<String> groups = new ArrayList<>();
     groups.add("management");
     groups.add("accounting");
     groups.add("sales");

@@ -323,7 +323,7 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
       sb.append(AuthorizationException.generateMissingAuthorizationsList(missingAuthorizations));
     }
     sb.append(".");
-    return new AuthorizationException(exceptionMessage("029", sb.toString()));
+    return new AuthorizationException(sb.toString());
   }
 
   public void createChildExecution(ExecutionEntity child, ExecutionEntity parent) {
