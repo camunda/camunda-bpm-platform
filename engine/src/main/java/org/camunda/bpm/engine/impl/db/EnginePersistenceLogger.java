@@ -315,6 +315,10 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
       exceptionMessage("028", "Illegal value '{}' for userId for GLOBAL authorization. Must be '{}'", id, expected));
   }
 
+  public AuthorizationException requiredCamundaAdmin() {
+    return requiredCamundaAdminOrPermissionException(null);
+  }
+
   public AuthorizationException requiredCamundaAdminOrPermissionException(List<MissingAuthorization> missingAuthorizations) {
     String exceptionCode = "029";
     StringBuilder sb = new StringBuilder();

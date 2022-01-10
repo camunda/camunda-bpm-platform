@@ -509,7 +509,7 @@ public class AuthorizationManager extends AbstractManager {
     if (isAuthorizationEnabled() && getCommandContext().isAuthorizationCheckEnabled()
         && currentAuthentication != null && !isCamundaAdmin(currentAuthentication)) {
 
-      throw LOG.requiredCamundaAdminOrPermissionException(null);
+      throw LOG.requiredCamundaAdmin();
     }
   }
 
