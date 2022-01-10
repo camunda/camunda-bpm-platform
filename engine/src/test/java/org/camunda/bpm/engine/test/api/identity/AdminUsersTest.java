@@ -97,7 +97,7 @@ public class AdminUsersTest {
     // when/then
     assertThatThrownBy(() -> managementService.getProperties())
       .isInstanceOf(AuthorizationException.class)
-      .hasMessageContaining("Required admin authenticated group or user or any of the following permissions");
+      .hasMessageContaining("ENGINE-03110 Required admin authenticated group or user or any of the following permissions:");
 
   }
 
