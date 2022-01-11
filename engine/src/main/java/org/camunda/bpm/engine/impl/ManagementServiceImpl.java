@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.batch.BatchQueryImpl;
 import org.camunda.bpm.engine.impl.batch.BatchStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.batch.DeleteBatchCmd;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.cmd.*;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSession;
@@ -541,7 +542,7 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
 
     @Override
     public Set<String> execute(CommandContext commandContext) {
-      commandContext.getAuthorizationManager().checkCamundaAdmin();
+      commandContext.getAuthorizationManager().checkCamundaAdminOrPermission(CommandChecker::checkReadRegisteredDeployments);
       Set<String> registeredDeployments = Context.getProcessEngineConfiguration().getRegisteredDeployments();
       return new HashSet<>(registeredDeployments);
     }

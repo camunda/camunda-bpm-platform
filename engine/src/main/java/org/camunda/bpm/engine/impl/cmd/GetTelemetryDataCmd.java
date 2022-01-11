@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -29,6 +30,8 @@ public class GetTelemetryDataCmd implements Command<TelemetryDataImpl> {
 
   @Override
   public TelemetryDataImpl execute(CommandContext commandContext) {
+    commandContext.getAuthorizationManager().checkCamundaAdminOrPermission(CommandChecker::checkReadTelemetryData);
+
     configuration = commandContext.getProcessEngineConfiguration();
 
     TelemetryReporter telemetryReporter = configuration.getTelemetryReporter();
@@ -38,6 +41,6 @@ public class GetTelemetryDataCmd implements Command<TelemetryDataImpl> {
     } else {
       throw ProcessEngineLogger.TELEMETRY_LOGGER.exceptionWhileRetrievingTelemetryDataRegistryNull();
     }
-
   }
+
 }

@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
@@ -37,7 +38,7 @@ public class DeleteTaskMetricsCmd implements Command<Void>, Serializable {
   }
 
   public Void execute(CommandContext commandContext) {
-    commandContext.getAuthorizationManager().checkCamundaAdmin();
+    commandContext.getAuthorizationManager().checkCamundaAdminOrPermission(CommandChecker::checkDeleteTaskMetrics);
 
     writeUserOperationLog(commandContext);
     commandContext.getMeterLogManager().deleteTaskMetricsByTimestamp(timestamp);

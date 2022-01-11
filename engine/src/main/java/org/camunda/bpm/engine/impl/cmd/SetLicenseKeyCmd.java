@@ -19,9 +19,10 @@ package org.camunda.bpm.engine.impl.cmd;
 import static org.camunda.bpm.engine.impl.util.LicenseKeyUtil.addToTelemetry;
 
 import java.nio.charset.StandardCharsets;
+
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceManager;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
@@ -38,8 +39,7 @@ public class SetLicenseKeyCmd extends LicenseCmd implements Command<Object> {
   public Object execute(CommandContext commandContext) {
     EnsureUtil.ensureNotNull("licenseKey", licenseKey);
 
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkCamundaAdmin();
+    commandContext.getAuthorizationManager().checkCamundaAdminOrPermission(CommandChecker::checkSetLicenseKey);
 
     final ResourceManager resourceManager = commandContext.getResourceManager();
     ResourceEntity key = resourceManager.findLicenseKeyResource();
@@ -53,10 +53,10 @@ public class SetLicenseKeyCmd extends LicenseCmd implements Command<Object> {
     resourceManager.insertResource(key);
 
     // set license key byte array id property
-    new SetPropertyCmd(LICENSE_KEY_BYTE_ARRAY_ID, key.getId()).execute(commandContext);
+    commandContext.runWithoutAuthorization(new SetPropertyCmd(LICENSE_KEY_BYTE_ARRAY_ID, key.getId()));
 
     // cleanup legacy property
-    new DeletePropertyCmd(LICENSE_KEY_PROPERTY_NAME).execute(commandContext);
+    commandContext.runWithoutAuthorization(new DeletePropertyCmd(LICENSE_KEY_PROPERTY_NAME));
 
     // add raw license to telemetry data if not there already
     addToTelemetry(licenseKey, commandContext.getProcessEngineConfiguration().getTelemetryRegistry());

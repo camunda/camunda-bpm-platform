@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.SuspendedEntityInteractionException;
 import org.camunda.bpm.engine.WrongDbException;
+import org.camunda.bpm.engine.authorization.MissingAuthorization;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.db.entitymanager.cache.CachedDbEntity;
@@ -314,9 +315,21 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
       exceptionMessage("028", "Illegal value '{}' for userId for GLOBAL authorization. Must be '{}'", id, expected));
   }
 
-  public AuthorizationException requiredCamundaAdminException() {
-    return new AuthorizationException(
-      exceptionMessage("029", "Required admin authenticated group or user."));
+  public AuthorizationException requiredCamundaAdmin() {
+    return requiredCamundaAdminOrPermissionException(null);
+  }
+
+  public AuthorizationException requiredCamundaAdminOrPermissionException(List<MissingAuthorization> missingAuthorizations) {
+    String exceptionCode = "029";
+    StringBuilder sb = new StringBuilder();
+    sb.append("Required admin authenticated group or user");
+    if(missingAuthorizations != null && !missingAuthorizations.isEmpty()) {
+      sb.append(" or any of the following permissions: ");
+      sb.append(AuthorizationException.generateMissingAuthorizationsList(missingAuthorizations));
+      exceptionCode = "110";
+    }
+    sb.append(".");
+    return new AuthorizationException(exceptionMessage(exceptionCode, sb.toString()));
   }
 
   public void createChildExecution(ExecutionEntity child, ExecutionEntity parent) {
@@ -853,4 +866,5 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
         ));
   }
 
+  // exception code 110 is already taken. See requiredCamundaAdminOrPermissionException() for details.
 }
