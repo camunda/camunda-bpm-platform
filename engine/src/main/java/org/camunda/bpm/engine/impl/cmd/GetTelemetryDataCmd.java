@@ -36,8 +36,7 @@ public class GetTelemetryDataCmd implements Command<TelemetryDataImpl> {
 
     TelemetryReporter telemetryReporter = configuration.getTelemetryReporter();
     if (telemetryReporter != null) {
-      TelemetryDataImpl telemetryData = telemetryReporter.getTelemetrySendingTask().updateAndSendData(false);
-      return telemetryData;
+      return telemetryReporter.getTelemetrySendingTask().updateAndSendData(false, false);
     } else {
       throw ProcessEngineLogger.TELEMETRY_LOGGER.exceptionWhileRetrievingTelemetryDataRegistryNull();
     }

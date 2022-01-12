@@ -100,7 +100,7 @@ var Controller = [
     function fetchTaskWorkerMetric(cb) {
       MetricsResource.sum(
         {
-          name: 'unique-task-workers',
+          name: 'task-users',
           startDate: fixDate($scope.startDate),
           endDate: fixDate($scope.endDate)
         },
@@ -134,7 +134,7 @@ var Controller = [
         flowNodes: function(cb) {
           MetricsResource.sum(
             {
-              name: 'activity-instance-start',
+              name: 'flow-node-instances-start',
               startDate: fixDate($scope.startDate),
               endDate: fixDate($scope.endDate)
             },
@@ -158,7 +158,7 @@ var Controller = [
         rootProcessInstances: function(cb) {
           MetricsResource.sum(
             {
-              name: 'root-process-instance-start',
+              name: 'process-instances',
               startDate: fixDate($scope.startDate),
               endDate: fixDate($scope.endDate)
             },
@@ -170,7 +170,7 @@ var Controller = [
         decisionInstances: function(cb) {
           MetricsResource.sum(
             {
-              name: 'executed-decision-instances',
+              name: 'decision-instances',
               startDate: fixDate($scope.startDate),
               endDate: fixDate($scope.endDate)
             },

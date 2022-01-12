@@ -1015,8 +1015,8 @@ public abstract class MockProvider {
         .setCommands(Stream.of(new Object[][] { { "StartProcessInstanceCmd", 40 }, { "FetchExternalTasksCmd", 100 } })
             .collect(Collectors.toMap(data -> (String) data[0], data -> new CommandImpl((Integer) data[1]))));
     EXAMPLE_TELEMETRY_INTERNALS.setMetrics(Stream
-        .of(new Object[][] { { "root-process-instance-start", 936L }, { "activity-instance-start", 6125L },
-            { "executed-decision-instances", 140L }, { "executed-decision-elements", 732L } })
+        .of(new Object[][] { { "process-instances", 936L }, { "flow-node-instances-start", 6125L },
+            { "decision-instances", 140L }, { "executed-decision-elements", 732L } })
         .collect(Collectors.toMap(data -> (String) data[0], data -> new MetricImpl((Long) data[1]))));
     EXAMPLE_TELEMETRY_INTERNALS.setCamundaIntegration(Collections.singleton("spring-boot"));
     EXAMPLE_TELEMETRY_INTERNALS.setWebapps(Collections.singleton("cockpit"));

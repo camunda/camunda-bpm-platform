@@ -66,9 +66,10 @@ public class MetricsRestServiceImpl extends AbstractRestProcessEngineAware imple
   @Override
   public List<MetricsIntervalResultDto> interval(UriInfo uriInfo) {
     MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
+    final String name = queryParameters.getFirst(QUERY_PARAM_NAME);
     MetricsQuery query = processEngine.getManagementService()
       .createMetricsQuery()
-      .name(queryParameters.getFirst(QUERY_PARAM_NAME))
+      .name(name)
       .reporter(queryParameters.getFirst(QUERY_PARAM_REPORTER));
 
     applyQueryParams(query, queryParameters);
@@ -83,7 +84,11 @@ public class MetricsRestServiceImpl extends AbstractRestProcessEngineAware imple
       metrics = query.interval();
     }
 
-    return convertToDtos(metrics);
+    final List<MetricsIntervalResultDto> dtoList = convertToDtos(metrics);
+    if (name != null) {
+      dtoList.forEach(dto -> dto.setName(name));
+    }
+    return dtoList;
   }
 
   @Override

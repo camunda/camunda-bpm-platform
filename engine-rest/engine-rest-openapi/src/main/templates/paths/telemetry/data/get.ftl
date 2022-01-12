@@ -43,9 +43,9 @@
                                  "FetchExternalTasksCmd":  {"count": 100}
                                },
                                "metrics": {
-                                 "root-process-instance-start": { "count": 936 },
-                                 "activity-instance-start": { "count": 6125 },
-                                 "executed-decision-instances": { "count": 140 },
+                                 "process-instances": { "count": 936 },
+                                 "flow-node-instances-start": { "count": 6125 },
+                                 "decision-instances": { "count": 140 },
                                  "executed-decision-elements": { "count": 732 }
                                },
                                "camunda-integration": [
