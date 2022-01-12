@@ -88,6 +88,7 @@ public class DecisionMetricsTest extends AbstractMetricsTest {
         .addClasspathResource(DMN_FILE));
 
     assertEquals(0l, getExecutedDecisionInstances());
+    assertEquals(0l, getDecisionInstances());
     assertEquals(0l, getExecutedDecisionElements());
     assertEquals(0l, getExecutedDecisionInstancesFromDmnEngine());
     assertEquals(0l, getExecutedDecisionElementsFromDmnEngine());
@@ -95,6 +96,7 @@ public class DecisionMetricsTest extends AbstractMetricsTest {
     runtimeService.startProcessInstanceByKey("testProcess", VARIABLES);
 
     assertEquals(1l, getExecutedDecisionInstances());
+    assertEquals(1l, getDecisionInstances());
     assertEquals(16l, getExecutedDecisionElements());
     assertEquals(1l, getExecutedDecisionInstancesFromDmnEngine());
     assertEquals(16l, getExecutedDecisionElementsFromDmnEngine());
@@ -102,6 +104,7 @@ public class DecisionMetricsTest extends AbstractMetricsTest {
     processEngineConfiguration.getDbMetricsReporter().reportNow();
 
     assertEquals(1l, getExecutedDecisionInstances());
+    assertEquals(1l, getDecisionInstances());
     assertEquals(16l, getExecutedDecisionElements());
     assertEquals(1l, getExecutedDecisionInstancesFromDmnEngine());
     assertEquals(16l, getExecutedDecisionElementsFromDmnEngine());
@@ -120,10 +123,12 @@ public class DecisionMetricsTest extends AbstractMetricsTest {
 
     // then
     assertEquals(1l, getExecutedDecisionInstances());
+    assertEquals(1l, getDecisionInstances());
 
     processEngineConfiguration.getDbMetricsReporter().reportNow();
 
     assertEquals(1l, getExecutedDecisionInstances());
+    assertEquals(1l, getDecisionInstances());
   }
 
   @Test
@@ -141,15 +146,23 @@ public class DecisionMetricsTest extends AbstractMetricsTest {
 
     // then
     assertEquals(3l, getExecutedDecisionInstances());
+    assertEquals(3l, getDecisionInstances());
 
     processEngineConfiguration.getDbMetricsReporter().reportNow();
 
     assertEquals(3l, getExecutedDecisionInstances());
+    assertEquals(3l, getDecisionInstances());
   }
 
   protected long getExecutedDecisionInstances() {
     return managementService.createMetricsQuery()
         .name(Metrics.EXECUTED_DECISION_INSTANCES)
+        .sum();
+  }
+
+  protected long getDecisionInstances() {
+    return managementService.createMetricsQuery()
+        .name(Metrics.DECISION_INSTANCES)
         .sum();
   }
 

@@ -24,9 +24,11 @@ public class Metrics {
 
   public static final String ACTIVTY_INSTANCE_START = "activity-instance-start";
   public static final String ACTIVTY_INSTANCE_END = "activity-instance-end";
+  public static final String FLOW_NODE_INSTANCES_START = "flow-node-instances-start";
+  public static final String FLOW_NODE_INSTANCES_END = "flow-node-instances-end";
 
   /**
-   * Number of times job acqusition is performed
+   * Number of times job acquisition is performed
    */
   public static final String JOB_ACQUISITION_ATTEMPT = "job-acquisition-attempt";
 
@@ -59,12 +61,14 @@ public class Metrics {
    * Number of executed Root Process Instance executions.
    */
   public static final String ROOT_PROCESS_INSTANCE_START = "root-process-instance-start";
+  public static final String PROCESS_INSTANCES = "process-instances";
 
   /**
    * Number of executed decision elements in the DMN engine.
    */
-  public static final String EXECUTED_DECISION_INSTANCES = "executed-decision-instances";
   public static final String EXECUTED_DECISION_ELEMENTS = "executed-decision-elements";
+  public static final String EXECUTED_DECISION_INSTANCES = "executed-decision-instances";
+  public static final String DECISION_INSTANCES = "decision-instances";
 
   /**
    * Number of instances removed by history cleanup.
@@ -79,4 +83,5 @@ public class Metrics {
    * Number of unique task workers
    */
   public static final String UNIQUE_TASK_WORKERS = "unique-task-workers";
+  public static final String TASK_USERS = "task-users";
 }

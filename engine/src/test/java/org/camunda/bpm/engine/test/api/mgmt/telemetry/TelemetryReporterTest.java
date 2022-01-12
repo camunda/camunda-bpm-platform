@@ -56,6 +56,7 @@ import org.camunda.bpm.engine.impl.BootstrapEngineCommand;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.metrics.Meter;
+import org.camunda.bpm.engine.impl.metrics.util.MetricsUtil;
 import org.camunda.bpm.engine.impl.telemetry.PlatformTelemetryRegistry;
 import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServerImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.CommandImpl;
@@ -64,7 +65,6 @@ import org.camunda.bpm.engine.impl.telemetry.dto.DatabaseImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.InternalsImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.JdkImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyDataImpl;
-import org.camunda.bpm.engine.impl.telemetry.dto.MetricImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.ProductImpl;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -1345,6 +1345,11 @@ public class TelemetryReporterTest {
 
     public TelemetryDataBuilder countMetric(String name, int count) {
       data.getProduct().getInternals().putMetric(name, count);
+
+      // add public name as expected
+      final String publicName = MetricsUtil.resolvePublicName(name);
+      data.getProduct().getInternals().putMetric(publicName, count);
+
       return this;
     }
 

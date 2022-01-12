@@ -14,6 +14,9 @@
         type = "string"
         enumValues = ["activity-instance-start",
                 "activity-instance-end",
+                "decision-instances",
+                "flow-node-instances-start",
+                "flow-node-instances-end",
                 "job-acquisition-attempt",
                 "job-acquired-success",
                 "job-acquired-failure",
@@ -26,7 +29,9 @@
                 "history-cleanup-removed-case-instances",
                 "history-cleanup-removed-decision-instances",
                 "history-cleanup-removed-batch-operations",
-                "history-cleanup-removed-task-metrics"]
+                "history-cleanup-removed-task-metrics",
+                "process-instances",
+                "task-users"]
         desc = "The name of the metric." />
 
     <@lib.parameter
@@ -78,11 +83,11 @@
         array = true
         desc = "Request successful."
         examples = ['"example-1": {
-                       "summary": "GET /metrics?name=activity-instance-end&startDate=1970-01-01T01:45:00.000%2b0200&endDate=1970-01-01T02:00:00.000%2b0200",
+                       "summary": "GET /metrics?name=flow-node-instances-end&startDate=1970-01-01T01:45:00.000%2b0200&endDate=1970-01-01T02:00:00.000%2b0200",
                        "value": [
                                   {
                                     "timestamp":"1970-01-01T01:45:00.000+0200",
-                                    "name":"activity-instance-end",
+                                    "name":"flow-node-instances-end",
                                     "reporter":"REPORTER",
                                     "value":23
                                   }

@@ -53,7 +53,7 @@ public class MetricsResourceImpl implements MetricsResource {
 
     Number result = null;
 
-    if (Metrics.UNIQUE_TASK_WORKERS.equals(metricsName)) {
+    if (Metrics.UNIQUE_TASK_WORKERS.equals(metricsName) || Metrics.TASK_USERS.equals(metricsName)) {
       result = processEngine.getManagementService().getUniqueTaskWorkerCount(
           extractStartDate(queryParameters, dateConverter),
           extractEndDate(queryParameters, dateConverter));

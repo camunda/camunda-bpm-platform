@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.management.MetricsQuery;
+import org.camunda.bpm.engine.impl.metrics.util.MetricsUtil;
 import org.camunda.bpm.engine.management.MetricIntervalValue;
 
 /**
@@ -56,7 +57,7 @@ public class MetricsQueryImpl extends ListQueryParameterObject implements Serial
   }
 
   public MetricsQueryImpl name(String name) {
-    this.name = name;
+    this.name = MetricsUtil.resolveInternalName(name);
     return this;
   }
 
