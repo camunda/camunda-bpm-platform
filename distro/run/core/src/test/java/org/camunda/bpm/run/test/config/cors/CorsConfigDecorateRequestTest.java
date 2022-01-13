@@ -41,6 +41,6 @@ public class CorsConfigDecorateRequestTest extends AbstractRestTest {
   @Test
   public void shouldSetDecorateRequestProperty() {
     // then
-    assertThat(camundaBpmRunProperties.getCors().getDecorateRequest()).isEqualTo("false");
+    assertThat(camundaBpmRunProperties.getCors().getDecorateRequest()).isFalse();
   }
 }
