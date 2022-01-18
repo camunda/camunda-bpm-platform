@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "@bpmn-io/dmn-migrate": "0.4.3",
-    "@bpmn-io/form-js": "0.4.1",
+    "@bpmn-io/form-js": "0.6.0",
     "angular": "1.8.2",
     "angular-animate": "1.8.2",
     "angular-cookies": "1.8.2",
