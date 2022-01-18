@@ -28,7 +28,6 @@ public class CamundaBpmRunCorsProperty {
   public static final String DEFAULT_ALLOWED_HTTP_HEADERS = "Origin,Accept,X-Requested-With,Content-Type,Access-Control-Request-Method,Access-Control-Request-Headers";
   public static final String DEFAULT_EXPOSED_HEADERS = "";
   public static final boolean DEFAULT_ALLOW_CREDENTIALS = false;
-  public static final boolean DEFAULT_DECORATE_REQUEST = true;
 
   boolean enabled;
 
@@ -37,7 +36,6 @@ public class CamundaBpmRunCorsProperty {
   String allowedHeaders;
   String exposedHeaders;
   boolean allowCredentials;
-  boolean decorateRequest;
   String preflightMaxAge;
 
 
@@ -46,7 +44,6 @@ public class CamundaBpmRunCorsProperty {
     this.allowedHeaders = DEFAULT_ALLOWED_HTTP_HEADERS;
     this.exposedHeaders = DEFAULT_EXPOSED_HEADERS;
     this.allowCredentials = DEFAULT_ALLOW_CREDENTIALS;
-    this.decorateRequest = DEFAULT_DECORATE_REQUEST;
     this.preflightMaxAge =DEFAULT_PREFLIGHT_MAXAGE;
   }
 
@@ -67,14 +64,6 @@ public class CamundaBpmRunCorsProperty {
 
   public void setAllowedOrigins(String allowedOrigins) {
     this.allowedOrigins = allowedOrigins;
-  }
-
-  public boolean getDecorateRequest() {
-    return decorateRequest;
-  }
-
-  public void setDecorateRequest(boolean decorateRequest) {
-    this.decorateRequest = decorateRequest;
   }
 
   public boolean getAllowCredentials() {
@@ -113,7 +102,6 @@ public class CamundaBpmRunCorsProperty {
   public String toString() {
     return "CamundaBpmRunCorsProperty [" +
         "enabled=" + enabled +
-        ", decorateRequest=" + decorateRequest +
         ", allowCredentials=" + allowCredentials +
         ", allowedOrigins='" + allowedOrigins +
         ", allowedHeaders='" + allowedHeaders +

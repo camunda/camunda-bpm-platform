@@ -101,8 +101,6 @@ public class CamundaBpmRunRestConfiguration {
                                   camundaBpmRunProperties.getCors().getExposedHeaders());
     registration.addInitParameter(CorsFilter.PARAM_CORS_SUPPORT_CREDENTIALS,
                                   String.valueOf(camundaBpmRunProperties.getCors().getAllowCredentials()));
-    registration.addInitParameter(CorsFilter.PARAM_CORS_REQUEST_DECORATE,
-                                  String.valueOf(camundaBpmRunProperties.getCors().getDecorateRequest()));
     registration.addInitParameter(CorsFilter.PARAM_CORS_PREFLIGHT_MAXAGE,
                                   camundaBpmRunProperties.getCors().getPreflightMaxAge());
 
