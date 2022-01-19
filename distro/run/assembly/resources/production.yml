@@ -43,7 +43,7 @@ camunda.bpm:
     auth.enabled: true
 # https://docs.camunda.org/manual/latest/user-guide/process-engine/identity-service/#configuration-properties-of-the-ldap-plugin
 # https://docs.camunda.org/manual/latest/user-guide/camunda-bpm-run/#ldap-identity-service
-# Uncomment this section in order to enable LDAP support for Camunda Run
+# Uncomment this section to enable LDAP support for Camunda Run
 #    ldap:
 #      enabled: true
 #      server-url: ldaps://localhost:4334
