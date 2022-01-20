@@ -16,6 +16,9 @@
  */
 package org.camunda.bpm.run.property;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
@@ -26,13 +29,15 @@ public class CamundaBpmRunProperties {
   public static final String PREFIX = CamundaBpmProperties.PREFIX + ".run";
 
   @NestedConfigurationProperty
-  private CamundaBpmRunAuthenticationProperties auth = new CamundaBpmRunAuthenticationProperties();
+  protected CamundaBpmRunAuthenticationProperties auth = new CamundaBpmRunAuthenticationProperties();
 
   @NestedConfigurationProperty
-  private CamundaBpmRunCorsProperty cors = new CamundaBpmRunCorsProperty();
+  protected CamundaBpmRunCorsProperty cors = new CamundaBpmRunCorsProperty();
 
   @NestedConfigurationProperty
-  private CamundaBpmRunLdapProperties ldap = new CamundaBpmRunLdapProperties();
+  protected CamundaBpmRunLdapProperties ldap = new CamundaBpmRunLdapProperties();
+
+  protected Map<String, Map<String, Object>> processEnginePlugins = new HashMap<>();
 
   protected CamundaBpmRunAdministratorAuthorizationProperties adminAuth
       = new CamundaBpmRunAdministratorAuthorizationProperties();
@@ -69,6 +74,14 @@ public class CamundaBpmRunProperties {
     this.adminAuth = adminAuth;
   }
 
+  public Map<String, Map<String, Object>> getProcessEnginePlugins() {
+    return processEnginePlugins;
+  }
+
+  public void setProcessEnginePlugins(Map<String, Map<String, Object>> processEnginePlugins) {
+    this.processEnginePlugins = processEnginePlugins;
+  }
+
   @Override
   public String toString() {
     return "CamundaBpmRunProperties [" +
@@ -76,6 +89,7 @@ public class CamundaBpmRunProperties {
         ", cors=" + cors +
         ", ldap=" + ldap +
         ", adminAuth=" + adminAuth +
+        ", plugins=" + processEnginePlugins +
         "]";
   }
 }

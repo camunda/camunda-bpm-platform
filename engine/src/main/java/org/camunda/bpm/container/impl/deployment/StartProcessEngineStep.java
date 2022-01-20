@@ -81,7 +81,7 @@ public class StartProcessEngineStep extends DeploymentOperationStep {
 
     // create & instantiate configuration class
     Class<? extends ProcessEngineConfigurationImpl> configurationClass = loadClass(configurationClassName, classLoader, ProcessEngineConfigurationImpl.class);
-    ProcessEngineConfigurationImpl configuration = createInstance(configurationClass);
+    ProcessEngineConfigurationImpl configuration = ReflectUtil.createInstance(configurationClass);
 
     // set UUid generator
     // TODO: move this to configuration and use as default?
@@ -138,7 +138,7 @@ public class StartProcessEngineStep extends DeploymentOperationStep {
     for (ProcessEnginePluginXml pluginXml : processEngineXml.getPlugins()) {
       // create plugin instance
       Class<? extends ProcessEnginePlugin> pluginClass = loadClass(pluginXml.getPluginClass(), classLoader, ProcessEnginePlugin.class);
-      ProcessEnginePlugin plugin = createInstance(pluginClass);
+      ProcessEnginePlugin plugin = ReflectUtil.createInstance(pluginClass);
 
       // apply configured properties
       Map<String, String> properties = pluginXml.getProperties();
@@ -158,22 +158,13 @@ public class StartProcessEngineStep extends DeploymentOperationStep {
     return jobExecutor;
   }
 
-  protected <T> T createInstance(Class<? extends T> clazz) {
-    return ReflectUtil.instantiate(clazz);
-  }
-
   @SuppressWarnings("unchecked")
   protected <T> Class<? extends T> loadClass(String className, ClassLoader customClassloader, Class<T> clazz) {
     try {
-      if(customClassloader != null) {
-        return (Class<? extends T>) customClassloader.loadClass(className);
-      }
-      else {
-        return (Class<? extends T>) ReflectUtil.loadClass(className);
-      }
+      return ReflectUtil.loadClass(className, customClassloader, clazz);
     }
     catch (ClassNotFoundException e) {
-      throw LOG.camnnotLoadConfigurationClass(className, e);
+      throw LOG.cannotLoadConfigurationClass(className, e);
     }
     catch (ClassCastException e) {
       throw LOG.configurationClassHasWrongType(className, clazz, e);

@@ -232,7 +232,7 @@ public class ContainerIntegrationLogger extends ProcessEngineLogger {
         "Process Application lifecycle callback method {} not found in application {}", methodName, paName);
   }
 
-  public ProcessEngineException camnnotLoadConfigurationClass(String className, Exception e) {
+  public ProcessEngineException cannotLoadConfigurationClass(String className, Exception e) {
     return new ProcessEngineException(exceptionMessage(
         "031",
         "Failed to load configuration class '{}': {}", className, e.getMessage()), e);

@@ -1,0 +1,8 @@
+camunda.bpm.run.process-engine-plugins:
+  "[org.camunda.bpm.run.test.plugins.TestFirstPlugin]":
+    parameterOne: valueOne
+    parameterTwo: true
+  "[org.camunda.bpm.run.test.plugins.TestSecondPlugin]":
+    parameterOne: 1.222
+    parameterTwo: false
+    parameterThree: 123

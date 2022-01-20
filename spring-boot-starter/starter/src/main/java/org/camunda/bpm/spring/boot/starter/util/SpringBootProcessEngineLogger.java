@@ -18,6 +18,7 @@ package org.camunda.bpm.spring.boot.starter.util;
 
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.spring.boot.starter.property.GenericProperties;
 import org.camunda.commons.logging.BaseLogger;
 import org.springframework.core.io.Resource;
 
@@ -83,6 +84,10 @@ public class SpringBootProcessEngineLogger extends BaseLogger {
   public SpringBootStarterException exceptionDuringBinding(String message) {
     return new SpringBootStarterException(exceptionMessage(
         "050", message));
+  }
+
+  public void propertiesApplied(GenericProperties genericProperties) {
+    logDebug("051", "properties bound to configuration: {}", genericProperties);
   }
 
 }
