@@ -63,13 +63,37 @@
       <outputDirectory>configuration/keystore/</outputDirectory>
     </file>
     <file>
+      <source>resources/run.sh</source>
+      <filtered>true</filtered>
+      <outputDirectory>internal/</outputDirectory>
+      <fileMode>0755</fileMode>
+    </file>
+    <file>
       <source>resources/start.sh</source>
       <filtered>true</filtered>
       <outputDirectory />
       <fileMode>0755</fileMode>
     </file>
     <file>
+      <source>resources/shutdown.sh</source>
+      <filtered>true</filtered>
+      <outputDirectory />
+      <fileMode>0755</fileMode>
+    </file>
+    <file>
+      <source>resources/run.bat</source>
+      <filtered>true</filtered>
+      <outputDirectory>internal/</outputDirectory>
+      <fileMode>0755</fileMode>
+    </file>
+    <file>
       <source>resources/start.bat</source>
+      <filtered>true</filtered>
+      <outputDirectory />
+      <fileMode>0755</fileMode>
+    </file>
+    <file>
+      <source>resources/shutdown.bat</source>
       <filtered>true</filtered>
       <outputDirectory />
       <fileMode>0755</fileMode>
