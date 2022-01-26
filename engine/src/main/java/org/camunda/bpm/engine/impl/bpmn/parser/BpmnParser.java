@@ -92,6 +92,7 @@ public class BpmnParser extends Parser {
    * Creates a new {@link BpmnParse} instance that can be used
    * to parse only one BPMN 2.0 process definition.
    */
+  @Override
   public BpmnParse createParse() {
     return bpmnParseFactory.createBpmnParse(this);
   }

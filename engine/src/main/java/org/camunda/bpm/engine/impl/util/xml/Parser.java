@@ -67,7 +67,7 @@ public abstract class Parser {
 
   protected void setXxeProcessing(SAXParserFactory saxParserFactory) {
     Boolean enableXxeProcessing = isEnableXxeProcessing();
-    if (isEnableXxeProcessing() != null) {
+    if (enableXxeProcessing != null) {
       saxParserFactory.setXIncludeAware(enableXxeProcessing);
       try {
         saxParserFactory.setFeature(EXTERNAL_GENERAL_ENTITIES, enableXxeProcessing);
