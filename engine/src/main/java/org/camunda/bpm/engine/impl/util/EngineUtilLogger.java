@@ -253,4 +253,11 @@ public class EngineUtilLogger extends ProcessEngineLogger {
         callingProcessDefinitionId,
         cause.getMessage());
   }
+
+  public ProcessEngineException exceptionWhileSettingXxeProcessing(Throwable cause) {
+    return new ProcessEngineException(exceptionMessage(
+        "047",
+        "Exception while configuring XXE processing: {}", cause.getMessage()), cause);
+  }
+
 }

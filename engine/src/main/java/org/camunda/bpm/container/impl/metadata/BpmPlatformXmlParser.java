@@ -42,6 +42,7 @@ public class BpmPlatformXmlParser extends Parser {
   /**
    * create an configure the {@link ProcessesXmlParse} object.
    */
+  @Override
   public BpmPlatformXmlParse createParse() {
     BpmPlatformXmlParse parse = new BpmPlatformXmlParse(this);
     parse.setSchemaResource(ReflectUtil.getResourceUrlAsString(BPM_PLATFORM_XSD));
