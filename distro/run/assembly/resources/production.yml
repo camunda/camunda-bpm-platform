@@ -41,6 +41,37 @@ camunda.bpm:
 # https://docs.camunda.org/manual/latest/user-guide/security/#authentication
 # https://docs.camunda.org/manual/latest/user-guide/camunda-bpm-run/#authentication
     auth.enabled: true
+# https://docs.camunda.org/manual/latest/user-guide/process-engine/identity-service/#configuration-properties-of-the-ldap-plugin
+# https://docs.camunda.org/manual/latest/user-guide/camunda-bpm-run/#ldap-identity-service
+# Uncomment this section to enable LDAP support for Camunda Run
+#    ldap:
+#      enabled: true
+#      server-url: ldaps://localhost:4334
+#      administrator-group-name: camunda-admin
+#      accept-untrusted-certificates: false
+#      manager-dn: uid=jonny,ou=office-berlin,o=camunda,c=org
+#      manager-password: s3cr3t
+#      base-dn: o=camunda,c=org
+#      user-search-base: ''
+#      user-search-filter: (objectclass=person)
+#      user-id-attribute: uid
+#      user-firstname-attribute: cn
+#      user-lastname-attribute: sn
+#      user-email-ttribute: mail
+#      user-password-attribute: userpassword
+#      group-search-base: ''
+#      group-search-filter: (objectclass=groupOfNames)
+#      group-id-attribute: cn
+#      group-name-attribute: cn
+#      group-member-attribute: member
+#      sort-control-supported: false
+# https://docs.camunda.org/manual/latest/user-guide/process-engine/authorization-service/#the-administrator-authorization-plugin
+# https://docs.camunda.org/manual/latest/user-guide/camunda-bpm-run/#ldap-administrator-authorization
+# Uncomment this section to grant administrator authorizations to an existing LDAP user or group
+#    admin-auth:
+#      enabled: true
+#      administrator-user-name: admin
+#      administrator-group-name: admins
 
 server:
 # https://docs.camunda.org/manual/latest/user-guide/camunda-bpm-run/#https

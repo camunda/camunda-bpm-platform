@@ -21,8 +21,10 @@ import java.util.List;
 import org.camunda.bpm.engine.impl.cfg.CompositeProcessEnginePlugin;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
+import org.camunda.bpm.engine.impl.plugin.AdministratorAuthorizationPlugin;
 import org.camunda.bpm.engine.spring.SpringProcessEngineConfiguration;
 import org.camunda.bpm.identity.impl.ldap.plugin.LdapIdentityProviderPlugin;
+import org.camunda.bpm.run.property.CamundaBpmRunAdministratorAuthorizationProperties;
 import org.camunda.bpm.run.property.CamundaBpmRunLdapProperties;
 import org.camunda.bpm.run.property.CamundaBpmRunProperties;
 import org.camunda.bpm.spring.boot.starter.CamundaBpmAutoConfiguration;
@@ -46,6 +48,12 @@ public class CamundaBpmRunConfiguration {
   @ConditionalOnProperty(name = "enabled", havingValue = "true", prefix = CamundaBpmRunLdapProperties.PREFIX)
   public LdapIdentityProviderPlugin ldapIdentityProviderPlugin() {
     return camundaBpmRunProperties.getLdap();
+  }
+
+  @Bean
+  @ConditionalOnProperty(name = "enabled", havingValue = "true", prefix = CamundaBpmRunAdministratorAuthorizationProperties.PREFIX)
+  public AdministratorAuthorizationPlugin administratorAuthorizationPlugin() {
+    return camundaBpmRunProperties.getAdminAuth();
   }
 
   @Bean
