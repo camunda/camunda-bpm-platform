@@ -66,20 +66,18 @@ public abstract class Parser {
   }
 
   protected void setXxeProcessing(SAXParserFactory saxParserFactory) {
-    Boolean enableXxeProcessing = isEnableXxeProcessing();
-    if (enableXxeProcessing != null) {
-      saxParserFactory.setXIncludeAware(enableXxeProcessing);
-      try {
-        saxParserFactory.setFeature(EXTERNAL_GENERAL_ENTITIES, enableXxeProcessing);
-        saxParserFactory.setFeature(DISALLOW_DOCTYPE_DECL, !enableXxeProcessing);
-        saxParserFactory.setFeature(LOAD_EXTERNAL_DTD, enableXxeProcessing);
-        saxParserFactory.setFeature(EXTERNAL_PARAMETER_ENTITIES, enableXxeProcessing);
-        saxParserFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+    boolean enableXxeProcessing = isEnableXxeProcessing();
+    saxParserFactory.setXIncludeAware(enableXxeProcessing);
+    try {
+      saxParserFactory.setFeature(EXTERNAL_GENERAL_ENTITIES, enableXxeProcessing);
+      saxParserFactory.setFeature(DISALLOW_DOCTYPE_DECL, !enableXxeProcessing);
+      saxParserFactory.setFeature(LOAD_EXTERNAL_DTD, enableXxeProcessing);
+      saxParserFactory.setFeature(EXTERNAL_PARAMETER_ENTITIES, enableXxeProcessing);
+      saxParserFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
 
-      } catch (Exception e) {
-        throw LOG.exceptionWhileSettingXxeProcessing(e);
+    } catch (Exception e) {
+      throw LOG.exceptionWhileSettingXxeProcessing(e);
 
-      }
     }
   }
 
