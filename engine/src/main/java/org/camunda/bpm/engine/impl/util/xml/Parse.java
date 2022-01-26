@@ -22,7 +22,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.XMLConstants;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
@@ -43,7 +42,7 @@ import org.xml.sax.helpers.DefaultHandler;
 /**
  * @author Tom Baeyens
  */
-public class Parse extends DefaultHandler {
+public abstract class Parse extends DefaultHandler {
 
 
   protected static final EngineUtilLogger LOG = ProcessEngineLogger.UTIL_LOGGER;
@@ -51,10 +50,6 @@ public class Parse extends DefaultHandler {
   protected static final String JAXP_SCHEMA_SOURCE = "http://java.sun.com/xml/jaxp/properties/schemaSource";
   protected static final String JAXP_SCHEMA_LANGUAGE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
   protected static final String W3C_XML_SCHEMA = "http://www.w3.org/2001/XMLSchema";
-  protected static final String EXTERNAL_GENERAL_ENTITIES = "http://xml.org/sax/features/external-general-entities";
-  protected static final String DISALLOW_DOCTYPE_DECL = "http://apache.org/xml/features/disallow-doctype-decl";
-  protected static final String LOAD_EXTERNAL_DTD = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
-  protected static final String EXTERNAL_PARAMETER_ENTITIES = "http://xml.org/sax/features/external-parameter-entities";
 
   protected static final String JAXP_ACCESS_EXTERNAL_SCHEMA = "http://javax.xml.XMLConstants/property/accessExternalSchema";
   protected static final String JAXP_ACCESS_EXTERNAL_SCHEMA_SYSTEM_PROPERTY = "javax.xml.accessExternalSchema";
@@ -67,7 +62,6 @@ public class Parse extends DefaultHandler {
   protected List<Problem> errors = new ArrayList<>();
   protected List<Problem> warnings = new ArrayList<>();
   protected String schemaResource;
-  protected boolean enableXxeProcessing = true;
 
   public Parse(Parser parser) {
     this.parser = parser;
@@ -129,26 +123,16 @@ public class Parse extends DefaultHandler {
     this.streamSource = streamSource;
   }
 
-  public void setEnableXxeProcessing(boolean enableXxeProcessing) {
-    this.enableXxeProcessing = enableXxeProcessing;
+  public void setSchemaResource(String schemaResource) {
+    boolean schemaResourceSet = schemaResource != null;
+    parser.enableSchemaValidation(schemaResourceSet);
+
+    this.schemaResource = schemaResource;
   }
 
   public Parse execute() {
     try {
       InputStream inputStream = streamSource.getInputStream();
-
-      SAXParserFactory saxParserFactory = parser.getSaxParserFactory();
-      saxParserFactory.setFeature(EXTERNAL_GENERAL_ENTITIES, enableXxeProcessing);
-      saxParserFactory.setFeature(DISALLOW_DOCTYPE_DECL, !enableXxeProcessing);
-      saxParserFactory.setFeature(LOAD_EXTERNAL_DTD, enableXxeProcessing);
-      saxParserFactory.setFeature(EXTERNAL_PARAMETER_ENTITIES, enableXxeProcessing);
-      saxParserFactory.setXIncludeAware(enableXxeProcessing);
-      saxParserFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-
-      if (schemaResource == null) { // must be done before parser is created
-        saxParserFactory.setNamespaceAware(false);
-        saxParserFactory.setValidating(false);
-      }
 
       SAXParser saxParser = parser.getSaxParser();
       try {
@@ -254,18 +238,5 @@ public class Parse extends DefaultHandler {
       strb.append(error.toString());
     }
     throw LOG.exceptionDuringParsing(strb.toString(), name, errors, warnings);
-  }
-
-  public void setSchemaResource(String schemaResource) {
-    SAXParserFactory saxParserFactory = parser.getSaxParserFactory();
-    saxParserFactory.setNamespaceAware(true);
-    saxParserFactory.setValidating(true);
-    try {
-      saxParserFactory.setFeature("http://xml.org/sax/features/namespace-prefixes", true);
-    }
-    catch (Exception e) {
-      LOG.unableToSetSchemaResource(e);
-    }
-    this.schemaResource = schemaResource;
   }
 }
