@@ -84,7 +84,7 @@
     </dependency>
     <dependency>
       <groupId>org.powermock</groupId>
-      <artifactId>powermock-api-mockito</artifactId>
+      <artifactId>powermock-api-mockito2</artifactId>
       <scope>test</scope>
     </dependency>
 
@@ -151,6 +151,30 @@
         </plugins>
       </build>
     </profile>
+
+    <profile>
+      <id>jdk-16-and-onwards</id>
+      <activation>
+        <jdk>[16,)</jdk>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <argLine>
+                -XX:MetaspaceSize=128m
+              </argLine>
+              <excludes combine.children="append">
+                <exclude>**/*NashornTest.java</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
     <!-- check for api differences between latest minor release -->
     <profile>
       <id>check-api-compatibility</id>

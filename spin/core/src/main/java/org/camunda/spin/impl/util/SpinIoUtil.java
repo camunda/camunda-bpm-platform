@@ -35,7 +35,7 @@ public class SpinIoUtil extends IoUtil {
 
   /**
    * Converts a {@link OutputStream} to an {@link InputStream} by coping the data directly.
-   * WARNING: Do not use for large data (>100MB). Only for testing purpose.
+   * WARNING: Do not use for large data (&gt;100MB). Only for testing purpose.
    *
    * @param outputStream the {@link OutputStream} to convert
    * @return the resulting {@link InputStream}

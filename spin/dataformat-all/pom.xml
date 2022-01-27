@@ -29,6 +29,11 @@
     </dependency>
 
     <dependency>
+      <groupId>jakarta.xml.bind</groupId>
+      <artifactId>jakarta.xml.bind-api</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>com.sun.xml.bind</groupId>
       <artifactId>jaxb-impl</artifactId>
     </dependency>
@@ -92,10 +97,6 @@
                   <shadedPattern>spinjar.com.sun.xml.txw2</shadedPattern>
                 </relocation>
                 <relocation>
-                  <pattern>javax.xml.stream</pattern>
-                  <shadedPattern>spinjar.javax.xml.stream</shadedPattern>
-                </relocation>
-                <relocation>
                   <pattern>javax.xml.bind</pattern>
                   <shadedPattern>spinjar.javax.xml.bind</shadedPattern>
                 </relocation>
@@ -112,6 +113,12 @@
                   <artifact>com.sun.xml.bind:*</artifact>
                   <excludes>
                     <exclude>META-INF/services/javax.xml.bind.JAXBContext</exclude>
+                  </excludes>
+                </filter>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <exclude>module-info.class</exclude>
                   </excludes>
                 </filter>
               </filters>

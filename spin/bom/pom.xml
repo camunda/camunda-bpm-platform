@@ -51,6 +51,22 @@
     </dependencies>
   </dependencyManagement>
 
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>3.3.1</version>
+          <configuration combine.children="append">
+            <doclint>none</doclint>
+            <detectJavaApiLink>false</detectJavaApiLink>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
   <scm>
     <url>https://github.com/camunda/camunda-spin</url>
     <connection>scm:git:git@github.com:camunda/camunda-spin.git</connection>
