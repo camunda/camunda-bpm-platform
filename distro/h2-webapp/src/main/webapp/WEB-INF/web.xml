@@ -11,11 +11,6 @@
     <servlet-name>H2Console</servlet-name>
     <servlet-class>org.h2.server.web.WebServlet</servlet-class>
 
-    <init-param>
-      <param-name>webAllowOthers</param-name>
-      <param-value>true</param-value>
-    </init-param>
-
     <load-on-startup>1</load-on-startup>
   </servlet>
   
