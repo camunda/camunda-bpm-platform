@@ -45,7 +45,7 @@ public interface Internals {
 
   /**
    * Information about the Camunda license key issued for enterprise editions of
-   * Camunda Platform.
+   * Camunda Platform. May be null when no license is used.
    */
   public LicenseKeyData getLicenseKey();
 
