@@ -263,5 +263,7 @@ public interface ActivityExecution extends DelegateExecution {
   public Map<ScopeImpl, PvmExecutionImpl> createActivityExecutionMapping();
 
   void setEnded(boolean b);
+  
+  void setIgnoreAsync(boolean ignoreAsync);
 
 }

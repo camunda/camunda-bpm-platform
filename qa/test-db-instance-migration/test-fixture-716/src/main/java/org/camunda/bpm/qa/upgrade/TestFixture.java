@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.qa.upgrade.externaltask.ExternalTaskFailureLogScenario;
 import org.camunda.bpm.qa.upgrade.job.JobFailureLogScenario;
+import org.camunda.bpm.qa.upgrade.pvm.AsyncJoinScenario;
 
 public class TestFixture {
 
@@ -39,6 +40,7 @@ public class TestFixture {
 
     runner.setupScenarios(ExternalTaskFailureLogScenario.class);
     runner.setupScenarios(JobFailureLogScenario.class);
+    runner.setupScenarios(AsyncJoinScenario.class);
 
     processEngine.close();
   }
