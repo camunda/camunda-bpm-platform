@@ -21,14 +21,22 @@ import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.rest.dto.telemetry.TelemetryDataDto;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
+import org.camunda.bpm.engine.telemetry.ApplicationServer;
+import org.camunda.bpm.engine.telemetry.Database;
+import org.camunda.bpm.engine.telemetry.Internals;
+import org.camunda.bpm.engine.telemetry.Jdk;
+import org.camunda.bpm.engine.telemetry.Product;
+import org.camunda.bpm.engine.telemetry.TelemetryData;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.restassured.http.ContentType;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
@@ -212,6 +220,47 @@ public class TelemetryRestServiceTest extends AbstractRestServiceTest {
         .body("product.internals.license-key.unlimited", equalTo(MockProvider.EXAMPLE_TELEMETRY_LICENSE_UNLIMITED))
         .body("product.internals.license-key.valid-until", equalTo(MockProvider.EXAMPLE_TELEMETRY_LICENSE_VALID_UNTIL))
         .body("product.internals.camunda-integration[0]", equalTo("spring-boot"))
+    .when()
+      .get(TELEMETRY_DATA_URL);
+
+    verify(managementServiceMock).getTelemetryData();
+  }
+
+  @Test
+  public void shouldGetMinimalTelemetryData() {
+
+    TelemetryData telemetryData = mock(TelemetryData.class);
+    when(telemetryData.getInstallation()).thenReturn(MockProvider.EXAMPLE_TELEMETRY_INSTALLATION_ID);
+
+    Product product = mock(Product.class);
+    when(product.getName()).thenReturn(MockProvider.EXAMPLE_TELEMETRY_PRODUCT_NAME);
+    when(product.getVersion()).thenReturn(MockProvider.EXAMPLE_TELEMETRY_PRODUCT_VERSION);
+    when(product.getEdition()).thenReturn(MockProvider.EXAMPLE_TELEMETRY_PRODUCT_EDITION);
+    when(telemetryData.getProduct()).thenReturn(product);
+
+    Internals internals = mock(Internals.class);
+    when(product.getInternals()).thenReturn(internals);
+
+    when(internals.getApplicationServer()).thenReturn(mock(ApplicationServer.class));
+    when(internals.getCamundaIntegration()).thenReturn(new HashSet<>());
+    when(internals.getCommands()).thenReturn(new HashMap<>());
+    when(internals.getDatabase()).thenReturn(mock(Database.class));
+    when(internals.getJdk()).thenReturn(mock(Jdk.class));
+    when(internals.getMetrics()).thenReturn(new HashMap<>());
+    when(internals.getWebapps()).thenReturn(new HashSet<>());
+    // license key may be null and is therefore not mocked
+
+    when(managementServiceMock.getTelemetryData()).thenReturn(telemetryData);
+
+    given()
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(ContentType.JSON)
+        .body("installation", equalTo(MockProvider.EXAMPLE_TELEMETRY_INSTALLATION_ID))
+        .body("product.name", equalTo(MockProvider.EXAMPLE_TELEMETRY_PRODUCT_NAME))
+        .body("product.version", equalTo(MockProvider.EXAMPLE_TELEMETRY_PRODUCT_VERSION))
+        .body("product.edition", equalTo(MockProvider.EXAMPLE_TELEMETRY_PRODUCT_EDITION))
     .when()
       .get(TELEMETRY_DATA_URL);
 

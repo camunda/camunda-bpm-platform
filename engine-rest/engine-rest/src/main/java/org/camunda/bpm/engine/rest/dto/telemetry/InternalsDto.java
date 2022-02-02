@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.camunda.bpm.engine.telemetry.Command;
 import org.camunda.bpm.engine.telemetry.Internals;
+import org.camunda.bpm.engine.telemetry.LicenseKeyData;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -121,10 +122,11 @@ public class InternalsDto {
 
   public static InternalsDto fromEngineDto(Internals other) {
 
+    LicenseKeyData licenseKey = other.getLicenseKey();
     InternalsDto dto = new InternalsDto(
         DatabaseDto.fromEngineDto(other.getDatabase()),
         ApplicationServerDto.fromEngineDto(other.getApplicationServer()),
-        LicenseKeyDataDto.fromEngineDto(other.getLicenseKey()),
+        licenseKey != null ? LicenseKeyDataDto.fromEngineDto(licenseKey) : null,
         JdkDto.fromEngineDto(other.getJdk()));
 
     dto.commands = new HashMap<>();
