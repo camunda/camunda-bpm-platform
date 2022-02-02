@@ -43,6 +43,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -1127,13 +1128,23 @@ public class AuthorizationManager extends AbstractManager {
       return EMPTY_LIST;
     }
     else {
-      if(availableAuthorizedGroupIds == null) {
-        availableAuthorizedGroupIds = new HashSet<String>(getDbEntityManager().selectList("selectAuthorizedGroupIds"));
-      }
-      Set<String> copy = new HashSet<>(availableAuthorizedGroupIds);
-      copy.retainAll(authenticatedGroupIds);
-      return new ArrayList<>(copy);
+      Set<String> groupIntersection = new HashSet<>(getAllGroups());
+      groupIntersection.retainAll(authenticatedGroupIds);
+      return new ArrayList<>(groupIntersection);
     }
+  }
+
+  protected Set<String> getAllGroups() {
+    if(availableAuthorizedGroupIds == null) {
+      availableAuthorizedGroupIds = new HashSet<String>();
+      List<String> groupsFromDatabase = getDbEntityManager().selectList("selectAuthorizedGroupIds");
+
+      groupsFromDatabase.stream()
+        .filter(Objects::nonNull)
+        .forEach(availableAuthorizedGroupIds::add);
+    }
+
+    return availableAuthorizedGroupIds;
   }
 
   protected boolean isAuthCheckExecuted() {
