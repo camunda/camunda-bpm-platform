@@ -44,10 +44,10 @@ public class FormPropertyAdapter implements FormField {
 
     validationConstraints = new ArrayList<FormFieldValidationConstraint>();
     if(formProperty.isRequired()) {
-      validationConstraints.add(new FormFieldValidationConstraintImpl("required", null));
+      validationConstraints.add(new FormFieldValidationConstraintImpl(HtmlFormEngine.CONSTRAINT_REQUIRED, null));
     }
     if(!formProperty.isWritable()) {
-      validationConstraints.add(new FormFieldValidationConstraintImpl("readonly", null));
+      validationConstraints.add(new FormFieldValidationConstraintImpl(HtmlFormEngine.CONSTRAINT_READONLY, null));
     }
   }
 

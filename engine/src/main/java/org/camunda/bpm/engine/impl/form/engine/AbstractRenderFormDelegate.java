@@ -468,7 +468,7 @@ public abstract class AbstractRenderFormDelegate {
     List<FormFieldValidationConstraint> validationConstraints = formField.getValidationConstraints();
     if(validationConstraints != null) {
       for (FormFieldValidationConstraint validationConstraint : validationConstraints) {
-        if("readonly".equals(validationConstraint.getName())){
+        if(HtmlFormEngine.CONSTRAINT_READONLY.equals(validationConstraint.getName())){
           return true;
         }
       }
