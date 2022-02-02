@@ -131,6 +131,11 @@ public class HtmlFormEngine implements FormEngine {
 
   protected static final String DATE_PATTERN_ATTRIBUTE = "datePattern";
 
+  /* constraints */
+  public static final String CONSTRAINT_READONLY = "readonly";
+  public static final String CONSTRAINT_REQUIRED = "required";
+  public static final String CONSTRAINT_DISABLED = "disabled";
+
   public String getName() {
     return "html";
   }
@@ -476,7 +481,7 @@ public class HtmlFormEngine implements FormEngine {
     for (FormFieldValidationConstraint constraint : formField.getValidationConstraints()) {
       String constraintName = constraint.getName();
       String configuration = (String) constraint.getConfiguration();
-      formControl.attribute(constraintName, configuration);
+      formControl.attribute(CONSTRAINT_READONLY.equals(constraintName) ? CONSTRAINT_DISABLED : constraintName, configuration);
     }
   }
 
@@ -498,7 +503,7 @@ public class HtmlFormEngine implements FormEngine {
     List<FormFieldValidationConstraint> validationConstraints = formField.getValidationConstraints();
     if(validationConstraints != null) {
       for (FormFieldValidationConstraint validationConstraint : validationConstraints) {
-        if("readonly".equals(validationConstraint.getName())){
+        if(CONSTRAINT_READONLY.equals(validationConstraint.getName())){
           return true;
         }
       }
