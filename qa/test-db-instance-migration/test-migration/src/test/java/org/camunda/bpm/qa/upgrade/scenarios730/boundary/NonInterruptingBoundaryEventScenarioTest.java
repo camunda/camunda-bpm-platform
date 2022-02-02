@@ -20,7 +20,6 @@ import java.util.List;
 
 import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.qa.upgrade.Origin;
 import org.camunda.bpm.qa.upgrade.ScenarioUnderTest;
 import org.camunda.bpm.qa.upgrade.UpgradeTestRule;
