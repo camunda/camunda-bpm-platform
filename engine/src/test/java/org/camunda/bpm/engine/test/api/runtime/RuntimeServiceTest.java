@@ -2170,12 +2170,78 @@ public class RuntimeServiceTest {
   }
 
   @Test
-  public void testActivityInstanceOnAsyncAfterMultiInstance() {
+  public void testActivityInstanceOnAsyncAfterSequentialMultiInstance() {
     // given
     String processDefinitionKey = "process";
     SubProcessBuilder subprocessBuilder = Bpmn.createExecutableProcess(processDefinitionKey)
       .startEvent()
-      .subProcess()
+      .subProcess("subprocess")
+        .multiInstance()
+          .sequential()
+          .camundaAsyncAfter()
+          .cardinality("3")
+        .multiInstanceDone();
+
+    BpmnModelInstance process = subprocessBuilder
+        .embeddedSubProcess()
+        .startEvent()
+        .endEvent()
+        .subProcessDone()
+      .endEvent()
+      .done();
+
+    testRule.deploy(process);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(processDefinitionKey);
+
+    // when
+    ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstance.getId());
+
+    // then
+    assertThat(activityInstance).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .beginMiBody("subprocess")
+          .transition("subprocess")
+      .done());
+  }
+
+  @Test
+  public void testActivityInstanceOnAsyncAfterSequentialMultiInstance_NonScopeActivity() {
+    // given
+    String processDefinitionKey = "process";
+    BpmnModelInstance process = Bpmn.createExecutableProcess(processDefinitionKey)
+      .startEvent()
+      .manualTask("task")
+        .multiInstance()
+          .sequential()
+          .camundaAsyncAfter()
+          .cardinality("3")
+        .multiInstanceDone()
+      .endEvent()
+      .done();
+
+    testRule.deploy(process);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(processDefinitionKey);
+
+    // when
+    ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstance.getId());
+
+    // then
+    assertThat(activityInstance).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .beginMiBody("task")
+          .transition("task")
+      .done());
+  }
+
+  @Test
+  public void testActivityInstanceOnAsyncAfterParallelMultiInstance() {
+    // given
+    String processDefinitionKey = "process";
+    SubProcessBuilder subprocessBuilder = Bpmn.createExecutableProcess(processDefinitionKey)
+      .startEvent()
+      .subProcess("subprocess")
         .multiInstance()
           .camundaAsyncAfter()
           .cardinality("3")
@@ -2198,10 +2264,107 @@ public class RuntimeServiceTest {
 
     // then
     assertThat(activityInstance).hasStructure(
-        // TODO: assert
       describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-        .activity("theTask")
-        .transition("asyncTask")
+      .beginMiBody("subprocess")
+        .transition("subprocess")
+        .transition("subprocess")
+        .transition("subprocess")
+      .done());
+  }
+
+
+  @Test
+  public void testActivityInstanceOnAsyncAfterScopeActivityWithOutgoingTransition() {
+    // given
+    String processDefinitionKey = "process";
+    BpmnModelInstance process = Bpmn.createExecutableProcess(processDefinitionKey)
+      .startEvent()
+      .subProcess("subprocess")
+        .embeddedSubProcess()
+        .startEvent()
+        .manualTask("task")
+          .camundaAsyncAfter()
+          .camundaInputParameter("foo", "bar")
+        .endEvent()
+        .subProcessDone()
+      .endEvent()
+      .done();
+
+    testRule.deploy(process);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(processDefinitionKey);
+
+    // when
+    ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstance.getId());
+
+    // then
+    assertThat(activityInstance).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+      .beginScope("subprocess")
+        .transition("task")
+      .done());
+  }
+
+  @Test
+  public void testActivityInstanceOnAsyncAfterScopeActivityWithoutOutgoingTransition() {
+    // given
+    String processDefinitionKey = "process";
+    BpmnModelInstance process = Bpmn.createExecutableProcess(processDefinitionKey)
+      .startEvent()
+      .subProcess("subprocess")
+        .embeddedSubProcess()
+        .startEvent()
+        .manualTask("task")
+          .camundaAsyncAfter()
+          .camundaInputParameter("foo", "bar")
+        .subProcessDone()
+      .endEvent()
+      .done();
+
+    testRule.deploy(process);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(processDefinitionKey);
+
+    // when
+    ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstance.getId());
+
+    // then
+    assertThat(activityInstance).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+      .beginScope("subprocess")
+        .transition("task")
+      .done());
+  }
+
+  @Test
+  public void testActivityInstanceOnAsyncBeforeScopeActivity() {
+    // given
+    String processDefinitionKey = "process";
+    BpmnModelInstance process = Bpmn.createExecutableProcess(processDefinitionKey)
+      .startEvent()
+      .subProcess("subprocess")
+        .embeddedSubProcess()
+        .startEvent()
+        .manualTask("task")
+          .camundaAsyncBefore()
+          .camundaInputParameter("foo", "bar")
+        .endEvent()
+        .subProcessDone()
+      .endEvent()
+      .done();
+
+    testRule.deploy(process);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(processDefinitionKey);
+
+    // when
+    ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstance.getId());
+
+    // then
+    assertThat(activityInstance).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+      .beginScope("subprocess")
+        .transition("task")
       .done());
   }
 
