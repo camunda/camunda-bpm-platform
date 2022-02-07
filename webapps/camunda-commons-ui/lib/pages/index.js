@@ -62,13 +62,6 @@ var ResponseErrorHandlerInitializer = [
     function handleHttpError(event, error) {
       var status = error.status,
         data = error.data;
-      
-      // avoid displaying any error message when performing a request against /camunda-welcome
-      // since the get request against it is only necessary to determine if deployed
-      const config = error.response.config;
-      if (config.method === 'GET' && config.url === '/camunda-welcome') {
-        return;
-      }
 
       switch (status) {
         case 500:
