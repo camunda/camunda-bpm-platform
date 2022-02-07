@@ -34,7 +34,7 @@ import java.util.Date;
  * </ul>
  *
  * <h2>Identities</h2>
- * <p>Camunda Platform distinguished two types of identities: <em>users</em> and
+ * <p>Camunda Platform distinguishes two types of identities: <em>users</em> and
  * <em>groups</em>. Authorizations can either range over all users
  * (userId = {@link #ANY}), an individual {@link User} or a {@link Group} of users.</p>
  *
