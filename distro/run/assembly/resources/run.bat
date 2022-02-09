@@ -1,7 +1,7 @@
 @echo off
 
 SET BASEDIR=%~dp0
-SET PARENTDIR=%~dp0
+SET PARENTDIR=%BASEDIR%..\
 SET deploymentDir=%PARENTDIR%configuration/resources
 
 IF [%~1]==[start] (
