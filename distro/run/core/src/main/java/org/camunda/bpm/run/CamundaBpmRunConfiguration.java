@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.spring.SpringProcessEngineConfiguration;
 import org.camunda.bpm.identity.impl.ldap.plugin.LdapIdentityProviderPlugin;
 import org.camunda.bpm.run.property.CamundaBpmRunAdministratorAuthorizationProperties;
 import org.camunda.bpm.run.property.CamundaBpmRunLdapProperties;
+import org.camunda.bpm.run.property.CamundaBpmRunProcessEnginePluginProperty;
 import org.camunda.bpm.run.property.CamundaBpmRunProperties;
 import org.camunda.bpm.run.utils.CamundaBpmRunProcessEnginePluginHelper;
 import org.camunda.bpm.spring.boot.starter.CamundaBpmAutoConfiguration;
@@ -63,7 +64,7 @@ public class CamundaBpmRunConfiguration {
     final SpringProcessEngineConfiguration configuration = new CamundaBpmRunProcessEngineConfiguration();
 
     // register process engine plugins defined in yaml
-    Map<String, Map<String, Object>> yamlPluginsInfo = camundaBpmRunProperties.getProcessEnginePlugins();
+    List<CamundaBpmRunProcessEnginePluginProperty> yamlPluginsInfo = camundaBpmRunProperties.getProcessEnginePlugins();
     CamundaBpmRunProcessEnginePluginHelper.registerYamlPlugins(processEnginePlugins, yamlPluginsInfo);
 
     configuration.getProcessEnginePlugins().add(new CompositeProcessEnginePlugin(processEnginePlugins));

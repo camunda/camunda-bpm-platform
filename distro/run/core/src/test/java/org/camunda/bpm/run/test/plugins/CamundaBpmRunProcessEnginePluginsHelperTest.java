@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
+import org.camunda.bpm.run.property.CamundaBpmRunProcessEnginePluginProperty;
 import org.camunda.bpm.run.utils.CamundaBpmRunProcessEnginePluginHelper;
 import org.junit.Test;
 
@@ -34,9 +35,12 @@ public class CamundaBpmRunProcessEnginePluginsHelperTest {
   public void shouldReportMissingPluginClass() {
     // given
     // a process engine plugins map with a class not on the classpath
-    Map<String, Map<String, Object>> plugins =
-        Collections.singletonMap("org.camunda.bpm.run.test.plugins.TestThirdPlugin",
-                                 Collections.EMPTY_MAP);
+    CamundaBpmRunProcessEnginePluginProperty pluginConfig = new CamundaBpmRunProcessEnginePluginProperty();
+    pluginConfig.setPluginClass("org.camunda.bpm.run.test.plugins.TestThirdPlugin");
+    pluginConfig.setPluginParameters(Collections.EMPTY_MAP);
+    // a process engine plugins map with a plugin not configured properly
+    List<CamundaBpmRunProcessEnginePluginProperty> plugins =
+        Collections.singletonList(pluginConfig);
     List<ProcessEnginePlugin> pluginList = Collections.EMPTY_LIST;
 
     // when
@@ -52,10 +56,13 @@ public class CamundaBpmRunProcessEnginePluginsHelperTest {
   @Test
   public void shouldReportWrongPluginClass() {
     // given
-    // a process engine plugins map with a class not on the classpath
-    Map<String, Map<String, Object>> plugins =
-        Collections.singletonMap("org.camunda.bpm.run.test.plugins.TestFalsePlugin",
-                                 Collections.EMPTY_MAP);
+    // a process engine plugins map with a class not implementing the ProcessEnginePlugin interface
+    CamundaBpmRunProcessEnginePluginProperty pluginConfig = new CamundaBpmRunProcessEnginePluginProperty();
+    pluginConfig.setPluginClass("org.camunda.bpm.run.test.plugins.TestFalsePlugin");
+    pluginConfig.setPluginParameters(Collections.EMPTY_MAP);
+    // a process engine plugins map with a plugin not configured properly
+    List<CamundaBpmRunProcessEnginePluginProperty> plugins =
+        Collections.singletonList(pluginConfig);
     List<ProcessEnginePlugin> pluginList = Collections.EMPTY_LIST;
 
     // when
@@ -71,10 +78,12 @@ public class CamundaBpmRunProcessEnginePluginsHelperTest {
   @Test
   public void shouldReportMissingPluginConfigurationProperty() {
     // given
+    CamundaBpmRunProcessEnginePluginProperty pluginConfig = new CamundaBpmRunProcessEnginePluginProperty();
+    pluginConfig.setPluginClass("org.camunda.bpm.run.test.plugins.TestFirstPlugin");
+    pluginConfig.setPluginParameters(Collections.singletonMap("wrongKey", "wrongValue"));
     // a process engine plugins map with a plugin not configured properly
-    Map<String, Map<String, Object>> plugins =
-        Collections.singletonMap("org.camunda.bpm.run.test.plugins.TestFirstPlugin",
-                                 Collections.singletonMap("wrongKey", "wrongValue"));
+    List<CamundaBpmRunProcessEnginePluginProperty> plugins =
+        Collections.singletonList(pluginConfig);
     List<ProcessEnginePlugin> pluginList = new ArrayList<>();
 
     // when

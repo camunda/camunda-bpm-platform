@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.impl.cfg.CompositeProcessEnginePlugin;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
 import org.camunda.bpm.run.CamundaBpmRun;
+import org.camunda.bpm.run.property.CamundaBpmRunProcessEnginePluginProperty;
 import org.camunda.bpm.run.property.CamundaBpmRunProperties;
 import org.junit.Before;
 import org.junit.Test;
@@ -58,23 +59,31 @@ public class CamundaRunProcessEnginePluginsRegistrationTest {
     // given a CamundaBpmRunProperties instance
     String pluginOne = "org.camunda.bpm.run.test.plugins.TestFirstPlugin";
     String pluginTwo = "org.camunda.bpm.run.test.plugins.TestSecondPlugin";
+    String pluginThree = "org.camunda.bpm.run.test.plugins.TestDefaultValuesPlugin";
+    List<CamundaBpmRunProcessEnginePluginProperty> pluginConfigs = properties
+        .getProcessEnginePlugins();
 
     // then
-    // assert that any plugin configuration properties were mapped properly
-    assertThat(properties.getProcessEnginePlugins()).hasSize(2);
-    assertThat(properties.getProcessEnginePlugins().keySet())
-        .contains(pluginOne, pluginTwo);
+    // assert that all plugin configuration properties were mapped properly
+    assertThat(pluginConfigs).hasSize(3);
+    List<String> pluginClasses = pluginConfigs.stream()
+        .map(CamundaBpmRunProcessEnginePluginProperty::getPluginClass)
+        .collect(Collectors.toList());
+    assertThat(pluginClasses)
+        .contains(pluginOne, pluginTwo, pluginThree);
 
-    Map<String, Object> firstPluginMap = properties.getProcessEnginePlugins().get(pluginOne);
-    assertThat(firstPluginMap).hasSize(2);
-    assertThat(firstPluginMap.keySet()).contains("parameterOne", "parameterTwo");
-    assertThat(firstPluginMap.values()).contains("valueOne", true);
+    CamundaBpmRunProcessEnginePluginProperty firstPlugin = pluginConfigs.get(0);
+    Map<String, Object> firstPluginParameters = firstPlugin.getPluginParameters();
+    assertThat(firstPluginParameters).hasSize(2);
+    assertThat(firstPluginParameters.keySet()).contains("parameterOne", "parameterTwo");
+    assertThat(firstPluginParameters.values()).contains("valueOne", true);
 
-    Map<String, Object> secondPluginMap = properties.getProcessEnginePlugins().get(pluginTwo);
-    assertThat(secondPluginMap).hasSize(3);
-    assertThat(secondPluginMap.keySet())
+    CamundaBpmRunProcessEnginePluginProperty secondPlugin = properties.getProcessEnginePlugins().get(1);
+    Map<String, Object> secondPluginParameters = secondPlugin.getPluginParameters();
+    assertThat(secondPluginParameters).hasSize(3);
+    assertThat(secondPluginParameters.keySet())
         .contains("parameterOne", "parameterTwo", "parameterThree");
-    assertThat(secondPluginMap.values()).contains(1.222, false, 123);
+    assertThat(secondPluginParameters.values()).contains(1.222, false, 123);
   }
 
   @Test
@@ -91,13 +100,12 @@ public class CamundaRunProcessEnginePluginsRegistrationTest {
     List<ProcessEnginePlugin> registeredPlugins = compositePlugin.getPlugins();
     List<Class> classList = registeredPlugins.stream().map(ProcessEnginePlugin::getClass)
         .collect(Collectors.toList());
-    assertThat(classList).contains(TestFirstPlugin.class, TestSecondPlugin.class);
+    assertThat(classList).contains(TestFirstPlugin.class, TestSecondPlugin.class, TestDefaultValuesPlugin.class);
   }
 
   @Test
   public void shouldInitializeRegisteredPlugins() {
     // given
-    assertThat(plugins).hasSize(1).hasOnlyElementsOfType(CompositeProcessEnginePlugin.class);
     List<ProcessEnginePlugin> registeredPlugins =
         ((CompositeProcessEnginePlugin) plugins.get(0)).getPlugins();
 

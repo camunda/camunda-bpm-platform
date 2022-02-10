@@ -58,7 +58,6 @@ public class ProcessEnginePluginsConfigurationOverrideTest {
   @Test
   public void shouldOverrideDefaultPluginConfiguration() {
     // given
-    assertThat(plugins).hasSize(1).hasOnlyElementsOfType(CompositeProcessEnginePlugin.class);
     List<ProcessEnginePlugin> registeredPlugins =
         ((CompositeProcessEnginePlugin) plugins.get(0)).getPlugins();
 

@@ -23,6 +23,7 @@ import java.util.Optional;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
+import org.camunda.bpm.run.property.CamundaBpmRunProcessEnginePluginProperty;
 import org.camunda.bpm.spring.boot.starter.util.SpringBootStarterException;
 import org.camunda.bpm.spring.boot.starter.util.SpringBootStarterPropertyHelper;
 
@@ -31,13 +32,13 @@ public class CamundaBpmRunProcessEnginePluginHelper {
   protected static final CamundaBpmRunLogger LOG = CamundaBpmRunLogger.LOG;
 
   public static void registerYamlPlugins(List<ProcessEnginePlugin> processEnginePlugins,
-                                         Map<String, Map<String, Object>> pluginsInfo) {
+                                         List<CamundaBpmRunProcessEnginePluginProperty> pluginsInfo) {
 
-    for (Map.Entry<String, Map<String, Object>> entry : pluginsInfo.entrySet()) {
-      String className = entry.getKey();
+    for (CamundaBpmRunProcessEnginePluginProperty pluginInfo : pluginsInfo) {
+      String className = pluginInfo.getPluginClass();
       ProcessEnginePlugin plugin = getOrCreatePluginInstance(processEnginePlugins, className);
 
-      Map<String, Object> pluginParameters = entry.getValue();
+      Map<String, Object> pluginParameters = pluginInfo.getPluginParameters();
       populatePluginInstance(plugin, pluginParameters);
 
       LOG.processEnginePluginRegistered(className);
