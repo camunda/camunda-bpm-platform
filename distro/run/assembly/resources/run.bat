@@ -3,6 +3,7 @@
 SET BASEDIR=%~dp0
 SET PARENTDIR=%BASEDIR%..\
 SET DEPLOYMENTDIR=%PARENTDIR%configuration/resources
+SET appName=Camunda Run
 
 IF [%~1]==[start] GOTO Startup
 IF [%~1]==[stop] GOTO Stop
@@ -47,7 +48,6 @@ SET swaggeruiChosen=false
 SET productionChosen=false
 SET detachProcess=false
 SET configuration=%PARENTDIR%configuration\default.yml
-SET appName=Camunda Run
 
 
 REM inspect arguments
@@ -144,6 +144,6 @@ TASKKILL /FI "WINDOWTITLE eq %appName%"
 GOTO End
 
 :Help
-ECHO Usage: run.bat [start|stop] (options...)
+ECHO Usage: run.bat [start^|stop] (options...)
 
 :End
