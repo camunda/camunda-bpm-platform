@@ -125,25 +125,27 @@ public class SpringBootManagedContainer {
   }
 
   public void stop() {
-
-    if (shutdownThread != null) {
+    if (commands.size == 1) {
+      // run shutdown script
+    } else {
+      if (shutdownThread != null) {
       Runtime.getRuntime().removeShutdownHook(shutdownThread);
       shutdownThread = null;
-    }
-    try {
-      if (startupProcess != null) {
-        if (isRunning()) {
-          killProcess(startupProcess, false);
-          if (!isShutDown(RAMP_DOWN_SECONDS * 1000)) {
-            throw new RuntimeException("Could not kill the application.");
-          }
-        }
-        startupProcess = null;
       }
-    } catch (final Exception e) {
-      throw new RuntimeException("Could not stop managed Spring Boot application", e);
+      try {
+        if (startupProcess != null) {
+          if (isRunning()) {
+            killProcess(startupProcess, false);
+            if (!isShutDown(RAMP_DOWN_SECONDS * 1000)) {
+              throw new RuntimeException("Could not kill the application.");
+            }
+          }
+          startupProcess = null;
+        }
+      } catch (final Exception e) {
+        throw new RuntimeException("Could not stop managed Spring Boot application", e);
+      }
     }
-
     cleanup();
   }
 

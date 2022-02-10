@@ -3,7 +3,7 @@
 SET BASEDIR=%~dp0
 SET PARENTDIR=%BASEDIR%..\
 SET DEPLOYMENTDIR=%PARENTDIR%configuration/resources
-SET appName=Camunda Run
+SET APPNAME=Camunda Run
 
 IF [%~1]==[start] GOTO Startup
 IF [%~1]==[stop] GOTO Stop
@@ -122,14 +122,14 @@ ECHO classpath: %classPath%
 REM start the application
 IF [%detachProcess%]==[true] (
   REM in the background
-  TITLE %appName%
-  %JAVA% -Dloader.path="%classPath%" -Dcamunda.DEPLOYMENTDIR=%DEPLOYMENTDIR% %JAVA_OPTS% -jar "%BASEDIR%camunda-bpm-run-core.jar" --spring.config.location=file:"%configuration%"
+  start "%APPNAME%" %JAVA% -Dloader.path="%classPath%" -Dcamunda.DEPLOYMENTDIR=%DEPLOYMENTDIR% %JAVA_OPTS% -jar "%BASEDIR%camunda-bpm-run-core.jar" --spring.config.location=file:"%configuration%"
 
   REM open a browser
   ping -n 5 localhost > NULL
   start http://localhost:8080/
+) ELSE (
+  call %JAVA% -Dloader.path="%classPath%" -Dcamunda.DEPLOYMENTDIR=%DEPLOYMENTDIR% %JAVA_OPTS% -jar "%BASEDIR%camunda-bpm-run-core.jar" --spring.config.location=file:"%configuration%"
 )
-call %JAVA% -Dloader.path="%classPath%" -Dcamunda.DEPLOYMENTDIR=%DEPLOYMENTDIR% %JAVA_OPTS% -jar "%BASEDIR%camunda-bpm-run-core.jar" --spring.config.location=file:"%configuration%"
 
 GOTO End
 
@@ -139,7 +139,7 @@ SHIFT
 
 REM shut down Camunda Run
 ECHO Camunda Run is shutting down.
-TASKKILL /FI "WINDOWTITLE eq %appName%"
+TASKKILL /FI "WINDOWTITLE eq %APPNAME%"
 
 GOTO End
 
