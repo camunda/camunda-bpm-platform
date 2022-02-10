@@ -61,7 +61,7 @@ if [ "$1" = "start" ] ; then
                      productionChosen=true
                      ;;
       # the background flag shouldn't influence the optional component flags
-      --background ) detachProcess=true
+      --detached )   detachProcess=true
                      echo Camunda Run will start in the background. Use the shutdown.sh script to stop it
                      ;;
       * )            exit 1
@@ -129,7 +129,7 @@ Please stop it or remove the file $pidPath."
     if [ -z "$BROWSER" ]; then
       (sleep 15; echo -e "We are sorry... We tried all we could do but we couldn't locate your default browser... \nIf you want to see our default website please open your browser and insert this URL:\nhttp://localhost:8080/camunda-welcome/index.html";) &
     else
-      (sleep 5; $BROWSER "http://localhost:8080/";) &
+      (sleep 15; $BROWSER "http://localhost:8080/";) &
     fi
 
   else

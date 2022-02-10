@@ -125,7 +125,7 @@ public class SpringBootManagedContainer {
   }
 
   public void stop() {
-    if (commands.size == 1) {
+    if (commands.size() == 1) {
       // run shutdown script
     } else {
       if (shutdownThread != null) {

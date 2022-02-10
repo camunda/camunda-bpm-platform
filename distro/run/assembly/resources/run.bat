@@ -85,7 +85,7 @@ IF [%~1]==[--production] (
   SET configuration=%PARENTDIR%configuration\production.yml
 )
 
-IF [%~1]==[--background] (
+IF [%~1]==[--detached] (
   SET detachProcess=true
 )
 
