@@ -7,6 +7,7 @@ SET APPNAME=Camunda Run
 
 IF [%~1]==[start] GOTO Startup
 IF [%~1]==[stop] GOTO Stop
+IF [%~1]==[help] GOTO Help
 IF [%~1]==[] GOTO Help
 
 :Startup
@@ -145,5 +146,12 @@ GOTO End
 
 :Help
 ECHO Usage: run.bat [start^|stop] (options...)
+ECHO Options:
+ECHO   --webapps    - Enables the Camunda Platform Webapps
+ECHO   --rest       - Enables the REST API
+ECHO   --swaggerui  - Enables the Swagger UI
+ECHO   --example    - Enables the example application
+ECHO   --production - Applies the production.yaml configuration file
+ECHO   --detached   - Starts Camunda Run as a detached process
 
 :End

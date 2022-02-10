@@ -151,7 +151,16 @@ elif [ "$1" = "stop" ] ; then
     exit 1
   fi
 
-else
+elif [ "$1" = "" ] || [ "$1" = "help" ] ; then
 
-  echo "Usage: run.sh [start|stop] (options...)"
+  echo "
+Usage: run.sh [start|stop] (options...)
+Options:
+  --webapps    - Enables the Camunda Platform Webapps
+  --rest       - Enables the REST API
+  --swaggerui  - Enables the Swagger UI
+  --example    - Enables the example application
+  --production - Applies the production.yaml configuration file
+  --detached   - Starts Camunda Run as a detached process
+  "
 fi
