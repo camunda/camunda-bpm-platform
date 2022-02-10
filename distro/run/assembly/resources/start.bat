@@ -15,7 +15,7 @@ SHIFT
 GOTO setArgs
 
 :StartDetached
-call "%EXECUTABLE%" start %CMD_LINE_ARGS%
+call "%EXECUTABLE%" start --detached
 GOTO Done
 
 :StartWithArguments
