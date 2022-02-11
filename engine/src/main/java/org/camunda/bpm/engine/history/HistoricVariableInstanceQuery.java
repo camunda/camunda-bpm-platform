@@ -26,6 +26,8 @@ import org.camunda.bpm.engine.query.Query;
  */
 public interface HistoricVariableInstanceQuery extends Query<HistoricVariableInstanceQuery, HistoricVariableInstance> {
 
+  HistoricVariableInstanceQuery variableNames(String... names);
+
   /** Only select the variable with the given Id
    * @param id of the variable to select
    * @return the query object */
