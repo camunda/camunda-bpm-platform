@@ -141,6 +141,15 @@ public interface ExternalTaskClientBuilder {
    */
   ExternalTaskClientBuilder disableBackoffStrategy();
 
+
+  /**
+   * Set number of threads for concurent handling of fetched tasks.
+   *
+   * @param threads size of threadpool used to handle external tasks
+   * @return the builder
+   */
+  ExternalTaskClientBuilder concurentThreadForExternalTasks(int threads);
+
   /**
    * Bootstraps the Camunda client
    *
