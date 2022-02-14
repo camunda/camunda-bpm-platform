@@ -17,13 +17,15 @@
 package org.camunda.bpm.client.topic.impl;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -72,7 +74,12 @@ public class TopicSubscriptionManager implements Runnable {
 
   protected long clientLockDuration;
 
-  public TopicSubscriptionManager(EngineClient engineClient, TypedValues typedValues, long clientLockDuration) {
+  //fetched not yet processed;
+  private AtomicInteger processingTasksCount = new AtomicInteger(0);
+  private int maxTasks;
+  private ExecutorService executorService;
+
+  public TopicSubscriptionManager(EngineClient engineClient, TypedValues typedValues, long clientLockDuration, int maxTasks, int threads) {
     this.engineClient = engineClient;
     this.subscriptions = new CopyOnWriteArrayList<>();
     this.taskTopicRequests = new ArrayList<>();
@@ -81,6 +88,8 @@ public class TopicSubscriptionManager implements Runnable {
     this.typedValues = typedValues;
     this.externalTaskService = new ExternalTaskServiceImpl(engineClient);
     this.isBackoffStrategyDisabled = new AtomicBoolean(false);
+    this.maxTasks=maxTasks;
+    this.executorService = Executors.newFixedThreadPool(threads);
   }
 
   public void run() {
@@ -100,14 +109,23 @@ public class TopicSubscriptionManager implements Runnable {
     subscriptions.forEach(this::prepareAcquisition);
 
     if (!taskTopicRequests.isEmpty()) {
-      FetchAndLockResponseDto fetchAndLockResponse = fetchAndLock(taskTopicRequests);
+      int toFetch = maxTasks - processingTasksCount.get();
+      if (toFetch==0) {
+        //already processing max tasks, wait a little for some tasks to finish
+        try {
+          Thread.sleep(1000);
+        } catch (InterruptedException e) {
+        }
+        return;
+      }
+      FetchAndLockResponseDto fetchAndLockResponse = fetchAndLock(taskTopicRequests, toFetch);
 
       fetchAndLockResponse.getExternalTasks().forEach(externalTask -> {
         String topicName = externalTask.getTopicName();
         ExternalTaskHandler taskHandler = externalTaskHandlers.get(topicName);
 
         if (taskHandler != null) {
-          handleExternalTask(externalTask, taskHandler);
+          executorService.submit(() ->handleExternalTask(externalTask, taskHandler));
         }
         else {
           LOG.taskHandlerIsNull(topicName);
@@ -129,12 +147,12 @@ public class TopicSubscriptionManager implements Runnable {
     externalTaskHandlers.put(topicName, externalTaskHandler);
   }
 
-  protected FetchAndLockResponseDto fetchAndLock(List<TopicRequestDto> subscriptions) {
+  protected FetchAndLockResponseDto fetchAndLock(List<TopicRequestDto> subscriptions, int toFetch) {
     List<ExternalTask> externalTasks;
 
     try {
       LOG.fetchAndLock(subscriptions);
-      externalTasks = engineClient.fetchAndLock(subscriptions);
+      externalTasks = engineClient.fetchAndLock(subscriptions, toFetch);
     } catch (EngineClientException e) {
       LOG.exceptionWhilePerformingFetchAndLock(e);
       return new FetchAndLockResponseDto(LOG.fetchAndLockException(e));
