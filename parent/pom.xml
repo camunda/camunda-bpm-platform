@@ -40,6 +40,7 @@
     <version.junit>4.13.1</version.junit>
     <version.assertj>2.9.1</version.assertj>
     <version.mockito>1.9.5</version.mockito>
+    <version.mockito.new>4.3.1</version.mockito.new>
     <version.wiremock>1.58</version.wiremock>
     <version.testcontainers>1.16.0</version.testcontainers>
 
