@@ -21,28 +21,30 @@ import org.camunda.bpm.dmn.feel.impl.scala.function.CustomFunctionTransformer;
 import org.camunda.bpm.dmn.feel.impl.scala.function.FeelCustomFunctionProvider;
 import org.camunda.bpm.dmn.feel.impl.scala.spin.SpinValueMapperFactory;
 import org.camunda.bpm.engine.variable.context.VariableContext;
+import org.camunda.feel.FeelEngine$;
 import org.camunda.feel.FeelEngine.Builder;
 import org.camunda.feel.FeelEngine.Failure;
-import org.camunda.feel.FeelEngine.UnaryTests$;
 import org.camunda.feel.context.CustomContext;
 import org.camunda.feel.context.VariableProvider;
 import org.camunda.feel.context.VariableProvider.StaticVariableProvider;
 import org.camunda.feel.impl.JavaValueMapper;
 import org.camunda.feel.valuemapper.CustomValueMapper;
 import org.camunda.feel.valuemapper.ValueMapper.CompositeValueMapper;
-import scala.collection.immutable.List;
-import scala.collection.immutable.Map;
-import scala.runtime.BoxesRunTime;
-import scala.util.Either;
-import scala.util.Left;
-import scala.util.Right;
+import camundajar.impl.scala.collection.immutable.List;
+import camundajar.impl.scala.collection.immutable.Map;
+import camundajar.impl.scala.runtime.BoxesRunTime;
+import camundajar.impl.scala.util.Either;
+import camundajar.impl.scala.util.Left;
+import camundajar.impl.scala.util.Right;
 
 import java.util.Arrays;
 
 import static org.camunda.feel.context.VariableProvider.CompositeVariableProvider;
-import static scala.jdk.CollectionConverters.ListHasAsScala;
+import static camundajar.impl.scala.jdk.CollectionConverters.ListHasAsScala;
 
 public class ScalaFeelEngine implements FeelEngine {
+
+  protected static final String INPUT_VARIABLE_NAME = "inputVariableName";
 
   protected static final ScalaFeelLogger LOGGER = ScalaFeelLogger.LOGGER;
 
@@ -87,7 +89,7 @@ public class ScalaFeelEngine implements FeelEngine {
   public boolean evaluateSimpleUnaryTests(String expression,
                                           String inputVariable,
                                           VariableContext variableContext) {
-    Map inputVariableMap = new Map.Map1(UnaryTests$.MODULE$.inputVariable(), inputVariable);
+    Map inputVariableMap = new Map.Map1(INPUT_VARIABLE_NAME, inputVariable);
 
     StaticVariableProvider inputVariableContext = new StaticVariableProvider(inputVariableMap);
 

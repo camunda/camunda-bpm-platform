@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -24,7 +25,6 @@
         name = "created"
         type = "string"
         format = "date-time"
-        nullable = false
         desc = "The date the task was created on.
                 [Default format](${docsUrl}/reference/rest/overview/date-format/)
                 `yyyy-MM-dd'T'HH:mm:ss.SSSZ`." />
@@ -113,9 +113,18 @@
         desc = "If not `null`, the form key for the task." />
 
     <@lib.property
+        name = "camundaFormRef"
+        type = "object"
+        additionalProperties = true
+        dto = "CamundaFormRef"
+        desc = "A reference to a specific version of a Camunda Form."
+    />
+
+    <@lib.property
         name = "tenantId"
         type = "string"
-        last = last
+        last = true
         desc = "If not `null`, the tenant id of the task." />
 
 </@lib.dto>
+</#macro>

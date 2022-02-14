@@ -16,10 +16,7 @@
  */
 package org.camunda.bpm.engine.test.history.dmn;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -136,20 +133,20 @@ public class HistoricDecisionInstanceDecisionServiceEvaluationTest {
 
     HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery().singleResult();
 
-    assertThat(historicDecisionInstance, is(notNullValue()));
-    assertThat(historicDecisionInstance.getDecisionDefinitionId(), is(decisionDefinitionId));
-    assertThat(historicDecisionInstance.getDecisionDefinitionKey(), is(DECISION_DEFINITION_KEY));
-    assertThat(historicDecisionInstance.getDecisionDefinitionName(), is("sample decision"));
+    assertThat(historicDecisionInstance).isNotNull();
+    assertThat(historicDecisionInstance.getDecisionDefinitionId()).isEqualTo(decisionDefinitionId);
+    assertThat(historicDecisionInstance.getDecisionDefinitionKey()).isEqualTo(DECISION_DEFINITION_KEY);
+    assertThat(historicDecisionInstance.getDecisionDefinitionName()).isEqualTo("sample decision");
 
     // references to process instance should be set since the decision is evaluated while executing a process instance
-    assertThat(historicDecisionInstance.getProcessDefinitionKey(), is(processDefinition.getKey()));
-    assertThat(historicDecisionInstance.getProcessDefinitionId(), is(processDefinition.getId()));
-    assertThat(historicDecisionInstance.getProcessInstanceId(), is(processInstance.getId()));
-    assertThat(historicDecisionInstance.getCaseDefinitionKey(), is(nullValue()));
-    assertThat(historicDecisionInstance.getCaseDefinitionId(), is(nullValue()));
-    assertThat(historicDecisionInstance.getCaseInstanceId(), is(nullValue()));
-    assertThat(historicDecisionInstance.getActivityId(), is(activityId));
-    assertThat(historicDecisionInstance.getEvaluationTime(), is(notNullValue()));
+    assertThat(historicDecisionInstance.getProcessDefinitionKey()).isEqualTo(processDefinition.getKey());
+    assertThat(historicDecisionInstance.getProcessDefinitionId()).isEqualTo(processDefinition.getId());
+    assertThat(historicDecisionInstance.getProcessInstanceId()).isEqualTo(processInstance.getId());
+    assertThat(historicDecisionInstance.getCaseDefinitionKey()).isNull();
+    assertThat(historicDecisionInstance.getCaseDefinitionId()).isNull();
+    assertThat(historicDecisionInstance.getCaseInstanceId()).isNull();
+    assertThat(historicDecisionInstance.getActivityId()).isEqualTo(activityId);
+    assertThat(historicDecisionInstance.getEvaluationTime()).isNotNull();
   }
 
 }

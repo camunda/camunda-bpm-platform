@@ -18,14 +18,11 @@ package org.camunda.bpm.engine.impl.form.handler;
 
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.form.StartFormData;
-import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
-import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.el.ExpressionManager;
+import org.camunda.bpm.engine.impl.form.CamundaFormRefImpl;
+import org.camunda.bpm.engine.impl.form.FormDefinition;
 import org.camunda.bpm.engine.impl.form.StartFormDataImpl;
-import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.camunda.bpm.engine.impl.util.xml.Element;
 import org.camunda.bpm.engine.variable.VariableMap;
 
 
@@ -34,33 +31,25 @@ import org.camunda.bpm.engine.variable.VariableMap;
  */
 public class DefaultStartFormHandler extends DefaultFormHandler implements StartFormHandler {
 
-  protected Expression formKey;
-
-  @Override
-  public void parseConfiguration(Element activityElement, DeploymentEntity deployment, ProcessDefinitionEntity processDefinition, BpmnParse bpmnParse) {
-    super.parseConfiguration(activityElement, deployment, processDefinition, bpmnParse);
-
-    ExpressionManager expressionManager = Context
-        .getProcessEngineConfiguration()
-        .getExpressionManager();
-
-    String formKeyAttribute = activityElement.attributeNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "formKey");
-
-    if (formKeyAttribute != null) {
-      this.formKey = expressionManager.createExpression(formKeyAttribute);
-    }
-
-    if (formKey != null) {
-      processDefinition.setStartFormKey(true);
-    }
-  }
-
   public StartFormData createStartFormData(ProcessDefinitionEntity processDefinition) {
     StartFormDataImpl startFormData = new StartFormDataImpl();
 
+    FormDefinition startFormDefinition = processDefinition.getStartFormDefinition();
+    Expression formKey = startFormDefinition.getFormKey();
+    Expression camundaFormDefinitionKey = startFormDefinition.getCamundaFormDefinitionKey();
+    String camundaFormDefinitionBinding = startFormDefinition.getCamundaFormDefinitionBinding();
+    Expression camundaFormDefinitionVersion = startFormDefinition.getCamundaFormDefinitionVersion();
+
     if (formKey != null) {
       startFormData.setFormKey(formKey.getExpressionText());
+    } else if (camundaFormDefinitionKey != null && camundaFormDefinitionBinding != null) {
+      CamundaFormRefImpl ref = new CamundaFormRefImpl(camundaFormDefinitionKey.getExpressionText(), camundaFormDefinitionBinding);
+      if (camundaFormDefinitionBinding.equals(FORM_REF_BINDING_VERSION) && camundaFormDefinitionVersion != null) {
+        ref.setVersion(Integer.parseInt(camundaFormDefinitionVersion.getExpressionText()));
+      }
+      startFormData.setCamundaFormRef(ref);
     }
+
     startFormData.setDeploymentId(deploymentId);
     startFormData.setProcessDefinition(processDefinition);
     initializeFormProperties(startFormData, null);
@@ -71,11 +60,5 @@ public class DefaultStartFormHandler extends DefaultFormHandler implements Start
   public ExecutionEntity submitStartFormData(ExecutionEntity processInstance, VariableMap properties) {
     submitFormVariables(properties, processInstance);
     return processInstance;
-  }
-
-  // getters //////////////////////////////////////////////
-
-  public Expression getFormKey() {
-    return formKey;
   }
 }

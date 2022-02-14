@@ -16,8 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy.query;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 import java.util.Arrays;
@@ -59,7 +58,7 @@ public class MultiTenancyEventSubscriptionQueryTest extends PluggableProcessEngi
     EventSubscriptionQuery query = runtimeService
         .createEventSubscriptionQuery();
 
-    assertThat(query.count(), is(3L));
+    assertThat(query.count()).isEqualTo(3L);
   }
 
   @Test
@@ -68,13 +67,13 @@ public class MultiTenancyEventSubscriptionQueryTest extends PluggableProcessEngi
         .createEventSubscriptionQuery()
         .tenantIdIn(TENANT_ONE);
 
-    assertThat(query.count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
 
     query = runtimeService
         .createEventSubscriptionQuery()
         .tenantIdIn(TENANT_TWO);
 
-    assertThat(query.count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
   }
 
   @Test
@@ -83,7 +82,7 @@ public class MultiTenancyEventSubscriptionQueryTest extends PluggableProcessEngi
         .createEventSubscriptionQuery()
         .tenantIdIn(TENANT_ONE, TENANT_TWO);
 
-    assertThat(query.count(), is(2L));
+    assertThat(query.count()).isEqualTo(2L);
   }
 
   @Test
@@ -92,7 +91,7 @@ public class MultiTenancyEventSubscriptionQueryTest extends PluggableProcessEngi
         .createEventSubscriptionQuery()
         .withoutTenantId();
 
-    assertThat(query.count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
   }
 
   @Test
@@ -102,21 +101,21 @@ public class MultiTenancyEventSubscriptionQueryTest extends PluggableProcessEngi
         .tenantIdIn(TENANT_ONE)
         .includeEventSubscriptionsWithoutTenantId();
 
-    assertThat(query.count(), is(2L));
+    assertThat(query.count()).isEqualTo(2L);
 
     query = runtimeService
         .createEventSubscriptionQuery()
         .tenantIdIn(TENANT_TWO)
         .includeEventSubscriptionsWithoutTenantId();
 
-    assertThat(query.count(), is(2L));
+    assertThat(query.count()).isEqualTo(2L);
 
     query = runtimeService
         .createEventSubscriptionQuery()
         .tenantIdIn(TENANT_ONE, TENANT_TWO)
         .includeEventSubscriptionsWithoutTenantId();
 
-    assertThat(query.count(), is(3L));
+    assertThat(query.count()).isEqualTo(3L);
   }
 
   @Test
@@ -125,7 +124,7 @@ public class MultiTenancyEventSubscriptionQueryTest extends PluggableProcessEngi
         createEventSubscriptionQuery()
         .tenantIdIn("nonExisting");
 
-    assertThat(query.count(), is(0L));
+    assertThat(query.count()).isEqualTo(0L);
   }
 
   @Test
@@ -148,9 +147,9 @@ public class MultiTenancyEventSubscriptionQueryTest extends PluggableProcessEngi
         .asc()
         .list();
 
-    assertThat(eventSubscriptions.size(), is(2));
-    assertThat(eventSubscriptions.get(0).getTenantId(), is(TENANT_ONE));
-    assertThat(eventSubscriptions.get(1).getTenantId(), is(TENANT_TWO));
+    assertThat(eventSubscriptions).hasSize(2);
+    assertThat(eventSubscriptions.get(0).getTenantId()).isEqualTo(TENANT_ONE);
+    assertThat(eventSubscriptions.get(1).getTenantId()).isEqualTo(TENANT_TWO);
   }
 
   @Test
@@ -162,9 +161,9 @@ public class MultiTenancyEventSubscriptionQueryTest extends PluggableProcessEngi
         .desc()
         .list();
 
-    assertThat(eventSubscriptions.size(), is(2));
-    assertThat(eventSubscriptions.get(0).getTenantId(), is(TENANT_TWO));
-    assertThat(eventSubscriptions.get(1).getTenantId(), is(TENANT_ONE));
+    assertThat(eventSubscriptions).hasSize(2);
+    assertThat(eventSubscriptions.get(0).getTenantId()).isEqualTo(TENANT_TWO);
+    assertThat(eventSubscriptions.get(1).getTenantId()).isEqualTo(TENANT_ONE);
   }
 
   @Test
@@ -172,7 +171,7 @@ public class MultiTenancyEventSubscriptionQueryTest extends PluggableProcessEngi
     identityService.setAuthentication("user", null, null);
 
     EventSubscriptionQuery query = runtimeService.createEventSubscriptionQuery();
-    assertThat(query.count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
   }
 
   @Test
@@ -181,10 +180,10 @@ public class MultiTenancyEventSubscriptionQueryTest extends PluggableProcessEngi
 
     EventSubscriptionQuery query = runtimeService.createEventSubscriptionQuery();
 
-    assertThat(query.count(), is(2L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
-    assertThat(query.tenantIdIn(TENANT_ONE, TENANT_TWO).includeEventSubscriptionsWithoutTenantId().count(), is(2L));
+    assertThat(query.count()).isEqualTo(2L);
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(0L);
+    assertThat(query.tenantIdIn(TENANT_ONE, TENANT_TWO).includeEventSubscriptionsWithoutTenantId().count()).isEqualTo(2L);
   }
 
   @Test
@@ -193,9 +192,9 @@ public class MultiTenancyEventSubscriptionQueryTest extends PluggableProcessEngi
 
     EventSubscriptionQuery query = runtimeService.createEventSubscriptionQuery();
 
-    assertThat(query.count(), is(3L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
+    assertThat(query.count()).isEqualTo(3L);
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(1L);
   }
 
   @Test
@@ -204,7 +203,7 @@ public class MultiTenancyEventSubscriptionQueryTest extends PluggableProcessEngi
     identityService.setAuthentication("user", null, null);
 
     EventSubscriptionQuery query = runtimeService.createEventSubscriptionQuery();
-    assertThat(query.count(), is(3L));
+    assertThat(query.count()).isEqualTo(3L);
   }
 
 }

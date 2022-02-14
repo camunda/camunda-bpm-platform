@@ -6,12 +6,12 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-parent</artifactId>
     <relativePath>../parent</relativePath>
-    <version>7.14.0-SNAPSHOT</version>
+    <version>7.17.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-database-settings</artifactId>
   <packaging>pom</packaging>
-  <name>camunda BPM - database settings</name>
+  <name>Camunda Platform - database settings</name>
   <description>Provides general dependencies and profiles for database testing</description>
 
   <properties>
@@ -21,19 +21,26 @@
     <version.oracle-12>12.1.0.2</version.oracle-12>
     <version.oracle-18>18.3.0.0</version.oracle-18>
     <version.oracle-19>19.3.0.0</version.oracle-19>
-    <version.oracle-11>11.2.0.4</version.oracle-11>
-    <version.oracle>${version.oracle-11}</version.oracle>
+    <version.oracle>${version.oracle-12}</version.oracle>
     <version.mariadb>1.1.8</version.mariadb>
     <version.mariadb.galera>1.6.3</version.mariadb.galera>
-    <version.mysql>5.1.21</version.mysql>
+    <version.mysql>8.0.23</version.mysql>
     <version.sqlserver>8.2.2.jre8</version.sqlserver>
     <version.db2-11.1>11.1.1.1</version.db2-11.1>
     <version.db2-10.5>10.5.0.5</version.db2-10.5>
     <version.db2>${version.db2-10.5}</version.db2>
-    <version.postgresql>9.4.1212</version.postgresql>
+    <version.postgresql>42.1.0</version.postgresql>
+    <version.liquibase>4.4.0</version.liquibase>
+
+    <!-- CockroachDB is compatible with PostgreSQL 9.5,
+    so a different version of the JDBC driver needs to be used -->
+    <version.cockroachdb>42.2.9</version.cockroachdb>
 
     <!-- needed for sql script and backward compatibility checks -->
-    <camunda.version.old>7.13.0</camunda.version.old>
+    <camunda.version.old>7.16.0</camunda.version.old>
+
+    <!-- Testcontainers JDBC URL parameters. By default, an empty string -->
+    <database.tc.params />
   </properties>
 
   <dependencyManagement>
@@ -102,6 +109,19 @@
             <url>${database.url}</url>
             <username>${database.username}</username>
             <password>${database.password}</password>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.liquibase</groupId>
+          <artifactId>liquibase-maven-plugin</artifactId>
+          <version>${version.liquibase}</version>
+          <configuration>
+            <driver>${database.driver}</driver>
+            <url>${database.url}</url> 
+            <username>${database.username}</username>
+            <password>${database.password}</password>
+            <hubMode>off</hubMode>
+            <promptOnNonLocalDatabase>false</promptOnNonLocalDatabase>
           </configuration>
         </plugin>
       </plugins>
@@ -242,6 +262,8 @@
         <database.type>mariadb</database.type>
         <database.driver>org.mariadb.jdbc.Driver</database.driver>
         <database.datasource.class>org.mariadb.jdbc.MySQLDataSource</database.datasource.class>
+        <database.tc.url>cammariadb:10.3</database.tc.url>
+        <database.tc.params>/${database.name}?user=${database.username}&amp;amp;password=${database.password}</database.tc.params>
       </properties>
 
       <dependencies>
@@ -275,13 +297,21 @@
         <version.mariadb>${version.mariadb.galera}</version.mariadb>
       </properties>
     </profile>
+    <profile>
+      <id>mariadb-10.2</id>
+      <properties>
+        <database.tc.url>cammariadb:10.2</database.tc.url>
+      </properties>
+    </profile>
 
     <profile>
       <id>mysql</id>
       <properties>
         <database.type>mysql</database.type>
-        <database.driver>com.mysql.jdbc.Driver</database.driver>
-        <database.datasource.class>com.mysql.jdbc.jdbc2.optional.MysqlDataSource</database.datasource.class>
+        <database.driver>com.mysql.cj.jdbc.Driver</database.driver>
+        <database.datasource.class>com.mysql.cj.jdbc.MysqlDataSource</database.datasource.class>
+        <database.tc.url>cammysql:8.0</database.tc.url>
+        <database.tc.params>/${database.name}?sendFractionalSeconds=false&amp;amp;user=${database.username}&amp;amp;password=${database.password}</database.tc.params>
       </properties>
 
       <dependencies>
@@ -309,6 +339,12 @@
         </pluginManagement>
       </build>
     </profile>
+    <profile>
+      <id>mysql-5.7</id>
+      <properties>
+        <database.tc.url>cammysql:5.7</database.tc.url>
+      </properties>
+    </profile>
 
     <profile>
       <id>oracle</id>
@@ -317,36 +353,6 @@
         <database.driver>oracle.jdbc.OracleDriver</database.driver>
         <database.datasource.class>oracle.jdbc.pool.OracleDataSource</database.datasource.class>
       </properties>
-    </profile>
-    <profile>
-      <id>oracle-11</id>
-      <properties>
-        <version.oracle>${version.oracle-11}</version.oracle>
-      </properties>
-      <dependencies>
-        <dependency>
-          <groupId>com.oracle.jdbc</groupId>
-          <artifactId>ojdbc6</artifactId>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.codehaus.mojo</groupId>
-              <artifactId>sql-maven-plugin</artifactId>
-              <dependencies>
-                <dependency>
-                  <groupId>com.oracle.jdbc</groupId>
-                  <artifactId>ojdbc6</artifactId>
-                  <version>${version.oracle}</version>
-                </dependency>
-              </dependencies>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
     </profile>
     <profile>
       <id>oracle-12</id>
@@ -449,6 +455,7 @@
         <database.datasource.class>org.postgresql.ds.PGSimpleDataSource</database.datasource.class>
         <jboss.datasource.filename>postgresql-ds.xml</jboss.datasource.filename>
         <hibernate.dialect>org.hibernate.dialect.PostgreSQLDialect</hibernate.dialect>
+        <database.tc.url>campostgresql:13.2</database.tc.url>
       </properties>
 
       <dependencies>
@@ -483,6 +490,43 @@
         <jboss.datasource.filename>postgresql-xa-ds.xml</jboss.datasource.filename>
       </properties>
     </profile>
+    <profile>
+      <id>cockroachdb</id>
+      <properties>
+        <database.type>cockroachdb</database.type>
+        <database.driver>org.postgresql.Driver</database.driver>
+        <database.datasource.class>org.postgresql.ds.PGSimpleDataSource</database.datasource.class>
+        <jboss.datasource.filename>postgresql-ds.xml</jboss.datasource.filename>
+        <hibernate.dialect>org.hibernate.dialect.PostgreSQLDialect</hibernate.dialect>
+        <database.tc.url>camcockroachdb:20.1.3</database.tc.url>
+      </properties>
+
+      <dependencies>
+        <dependency>
+          <groupId>org.postgresql</groupId>
+          <artifactId>postgresql</artifactId>
+          <version>${version.cockroachdb}</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>sql-maven-plugin</artifactId>
+              <dependencies>
+                <dependency>
+                  <groupId>org.postgresql</groupId>
+                  <artifactId>postgresql</artifactId>
+                  <version>${version.cockroachdb}</version>
+                </dependency>
+              </dependencies>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
 
     <profile>
       <id>sqlserver</id>
@@ -490,6 +534,8 @@
         <database.type>mssql</database.type>
         <database.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</database.driver>
         <database.datasource.class>com.microsoft.sqlserver.jdbc.SQLServerDataSource</database.datasource.class>
+        <database.tc.url>camsqlserver:2019</database.tc.url>
+        <database.tc.params>;DatabaseName=${database.name};user=${database.username};password=${database.password};</database.tc.params>
       </properties>
 
       <dependencies>
@@ -517,6 +563,26 @@
         </pluginManagement>
       </build>
     </profile>
+    <profile>
+      <id>sqlserver-2017</id>
+      <properties>
+        <database.tc.url>camsqlserver:2017</database.tc.url>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>testcontainers</id>
+      <dependencies>
+        <!-- Testcontainers depends on docker-java which depends on jackson-annotations -->
+        <dependency>
+          <artifactId>jackson-annotations</artifactId>
+          <groupId>com.fasterxml.jackson.core</groupId>
+          <version>2.12.1</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+
   </profiles>
 
 </project>

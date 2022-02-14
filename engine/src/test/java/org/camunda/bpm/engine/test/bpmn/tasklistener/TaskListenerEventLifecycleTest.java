@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.bpmn.tasklistener;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -24,6 +25,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -443,7 +445,6 @@ public class TaskListenerEventLifecycleTest extends AbstractTaskListenerTest{
   @Test
   public void shouldNotFireDeleteEventOnTaskDeletedInCompleteListener() {
     // given
-    thrown.expectMessage("The task cannot be deleted because is part of a running process");
     BpmnModelInstance model = createModelWithTaskEventsRecorderOnAssignedUserTask(TRACKED_EVENTS,
                                                                                   null,
                                                                                   TaskListener.EVENTNAME_COMPLETE,
@@ -454,7 +455,10 @@ public class TaskListenerEventLifecycleTest extends AbstractTaskListenerTest{
 
     // when
     try {
-      taskService.complete(task.getId());
+      // when/then
+      assertThatThrownBy(() -> taskService.complete(task.getId()))
+        .isInstanceOf(ProcessEngineException.class)
+        .hasMessageContaining("The task cannot be deleted because is part of a running process");
     } finally {
       // then
       LinkedList<String> orderedEvents = RecorderTaskListener.getOrderedEvents();
@@ -490,7 +494,6 @@ public class TaskListenerEventLifecycleTest extends AbstractTaskListenerTest{
   @Test
   public void shouldNotFireCompleteEventOnTaskCompletedInCompleteListener() {
     // given
-    thrown.expectMessage("invalid task state");
     BpmnModelInstance model = createModelWithTaskEventsRecorderOnAssignedUserTask(TRACKED_EVENTS,
                                                                                   null,
                                                                                   TaskListener.EVENTNAME_COMPLETE,
@@ -501,7 +504,10 @@ public class TaskListenerEventLifecycleTest extends AbstractTaskListenerTest{
 
     // when
     try {
-      taskService.complete(task.getId());
+      // when/then
+      assertThatThrownBy(() -> taskService.complete(task.getId()))
+        .isInstanceOf(ProcessEngineException.class)
+        .hasMessageContaining("invalid task state");
     } finally {
       // then
       LinkedList<String> orderedEvents = RecorderTaskListener.getOrderedEvents();
@@ -576,7 +582,6 @@ public class TaskListenerEventLifecycleTest extends AbstractTaskListenerTest{
   @Test
   public void shouldNotFireCompleteEventOnCompleteAttemptInDeleteListener() {
     // given
-    thrown.expectMessage("invalid task state");
     BpmnModelInstance model = createModelWithTaskEventsRecorderOnAssignedUserTask(TRACKED_EVENTS,
                                                                                   null,
                                                                                   TaskListener.EVENTNAME_DELETE,
@@ -586,7 +591,10 @@ public class TaskListenerEventLifecycleTest extends AbstractTaskListenerTest{
 
     // when
     try {
-      runtimeService.deleteProcessInstance(processInstance.getId(), "Canceled!");
+      // when/then
+      assertThatThrownBy(() -> runtimeService.deleteProcessInstance(processInstance.getId(), "Canceled!"))
+        .isInstanceOf(ProcessEngineException.class)
+        .hasMessageContaining("invalid task state");
     } finally {
       // then
       LinkedList<String> orderedEvents = RecorderTaskListener.getOrderedEvents();
@@ -600,7 +608,6 @@ public class TaskListenerEventLifecycleTest extends AbstractTaskListenerTest{
   @Test
   public void shouldNotFireDeleteEventOnTaskDeleteAttemptInDeleteListener() {
     // given
-    thrown.expectMessage("The task cannot be deleted because is part of a running process");
     BpmnModelInstance model = createModelWithTaskEventsRecorderOnAssignedUserTask(TRACKED_EVENTS,
                                                                                   null,
                                                                                   TaskListener.EVENTNAME_DELETE,
@@ -610,7 +617,10 @@ public class TaskListenerEventLifecycleTest extends AbstractTaskListenerTest{
 
     // when
     try {
-      runtimeService.deleteProcessInstance(processInstance.getId(), "Canceled!");
+      // when/then
+      assertThatThrownBy(() -> runtimeService.deleteProcessInstance(processInstance.getId(), "Canceled!"))
+        .isInstanceOf(ProcessEngineException.class)
+        .hasMessageContaining("The task cannot be deleted because is part of a running process");
     } finally {
       // then
       LinkedList<String> orderedEvents = RecorderTaskListener.getOrderedEvents();

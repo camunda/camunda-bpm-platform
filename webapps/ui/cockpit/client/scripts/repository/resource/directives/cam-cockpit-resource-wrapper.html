@@ -1,0 +1,48 @@
+<!-- # cockpit client/scripts/repository/resource/directives/cam-cockpit-resource-wrapper.html -->
+<div ng-show="!resourceState.$loaded"
+     class="loader">
+  <span class="animate-spin glyphicon glyphicon-refresh"></span>
+  {{ 'REPOSITORY_DEPLOYMENT_RESOURCE_DIRECTIVES_LOADING' | translate }}
+</div>
+
+<div ng-show="resourceState.$loaded">
+
+  <div ng-if="!resource">
+    <div class="no-resource well">
+      <span class="glyphicon glyphicon-info-sign"></span>
+      {{ 'REPOSITORY_DEPLOYMENT_RESOURCE_DIRECTIVES_SELECT_SRC' | translate }}
+    </div>
+  </div>
+
+  <section ng-if="resource" class="resource">
+
+    <header class="row">
+      <div class="col-xs-12"
+           cam-resource-meta
+           resource-data="resourceData"
+           control="control">
+      </div>
+    </header>
+
+    <div class="section-content row">
+      <div class="col-xs-12"
+           cam-resource-content
+           resource-data="resourceData"
+           control="control">
+      </div>
+
+      <div ng-show="resourceDetailTabs.length"
+           class="col-xs-12 ctn-tabbed-content">
+
+        <view ng-repeat="resourceDetailTab in resourceDetailTabs"
+              provider="resourceDetailTab"
+              vars="resourceVars" />
+
+      </div><!-- / !!resourceDetailTabs -->
+
+    </div><!-- / .section-content -->
+
+  </section>
+
+</div>
+<!-- / cockpit client/scripts/repository/resource/directives/cam-cockpit-resource-wrapper.html -->

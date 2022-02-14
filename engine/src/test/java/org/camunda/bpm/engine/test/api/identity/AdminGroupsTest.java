@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.identity;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
@@ -37,7 +38,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 public class AdminGroupsTest {
@@ -49,9 +49,6 @@ public class AdminGroupsTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
-
-  @Rule
-  public final ExpectedException thrown = ExpectedException.none();
 
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
   protected IdentityService identityService;
@@ -92,11 +89,10 @@ public class AdminGroupsTest {
     identityService.setAuthentication("nonAdmin", null, null);
     processEngineConfiguration.setAuthorizationEnabled(true);
 
-    thrown.expect(AuthorizationException.class);
-    thrown.expectMessage("Required admin authenticated group or user.");
-
-    // when
-    identityService.unlockUser("jonny1");
+    // when/then
+    assertThatThrownBy(() -> identityService.unlockUser("jonny1"))
+      .isInstanceOf(AuthorizationException.class)
+      .hasMessageContaining("Required admin authenticated group or user.");
   }
 
   @Test

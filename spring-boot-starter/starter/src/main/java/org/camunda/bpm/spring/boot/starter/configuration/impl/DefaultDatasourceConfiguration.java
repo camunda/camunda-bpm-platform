@@ -31,6 +31,10 @@ public class DefaultDatasourceConfiguration extends AbstractCamundaConfiguration
   @Autowired
   protected PlatformTransactionManager transactionManager;
 
+  @Autowired(required = false)
+  @Qualifier("camundaBpmTransactionManager")
+  protected PlatformTransactionManager camundaTransactionManager;
+
   @Autowired
   protected DataSource dataSource;
 
@@ -42,7 +46,11 @@ public class DefaultDatasourceConfiguration extends AbstractCamundaConfiguration
   public void preInit(SpringProcessEngineConfiguration configuration) {
     final DatabaseProperty database = camundaBpmProperties.getDatabase();
 
-    configuration.setTransactionManager(transactionManager);
+    if (camundaTransactionManager == null) {
+      configuration.setTransactionManager(transactionManager);
+    } else {
+      configuration.setTransactionManager(camundaTransactionManager);
+    }
 
     if (camundaDataSource == null) {
       configuration.setDataSource(dataSource);
@@ -70,6 +78,14 @@ public class DefaultDatasourceConfiguration extends AbstractCamundaConfiguration
 
   public void setTransactionManager(PlatformTransactionManager transactionManager) {
     this.transactionManager = transactionManager;
+  }
+
+  public PlatformTransactionManager getCamundaTransactionManager() {
+    return camundaTransactionManager;
+  }
+
+  public void setCamundaTransactionManager(PlatformTransactionManager camundaTransactionManager) {
+    this.camundaTransactionManager = camundaTransactionManager;
   }
 
   public DataSource getDataSource() {

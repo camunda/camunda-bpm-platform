@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.impl.variable.listener;
 
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
 import org.camunda.bpm.engine.delegate.DelegateCaseVariableInstance;
@@ -102,6 +103,11 @@ public class DelegateCaseVariableInstanceImpl implements DelegateCaseVariableIns
 
   public String getTaskId() {
     return taskId;
+  }
+
+  @Override
+  public String getBatchId() {
+    return null;
   }
 
   public String getActivityInstanceId() {

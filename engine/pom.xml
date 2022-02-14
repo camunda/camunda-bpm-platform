@@ -2,15 +2,37 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <name>camunda BPM - engine</name>
+  <name>Camunda Platform - engine</name>
   <artifactId>camunda-engine</artifactId>
 
   <parent>
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-database-settings</artifactId>
     <relativePath>../database</relativePath>
-    <version>7.14.0-SNAPSHOT</version>
+    <version>7.17.0-SNAPSHOT</version>
   </parent>
+
+  <dependencyManagement>
+    <dependencies>
+
+      <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-core-internal-dependencies</artifactId>
+        <version>${project.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-framework-bom</artifactId>
+        <version>${version.spring.framework}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
 
@@ -45,12 +67,16 @@
         <!-- these exclusions are needed when building with Maven >= 3.3
           see CAM-11822 for details -->
         <exclusion>
-          <groupId>org.camunda.feel</groupId>
-          <artifactId>feel-engine</artifactId>
+          <groupId>com.lihaoyi</groupId>
+          <artifactId>fastparse_2.13</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>org.scala-lang.modules</groupId>
-          <artifactId>scala-parser-combinators_2.13</artifactId>
+          <groupId>com.lihaoyi</groupId>
+          <artifactId>sourcecode_2.13</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.lihaoyi</groupId>
+          <artifactId>geny_2.13</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.scala-lang</groupId>
@@ -90,8 +116,14 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
+      <groupId>org.camunda.connect</groupId>
+      <artifactId>camunda-connect-core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.connect</groupId>
+      <artifactId>camunda-connect-connectors-all</artifactId>
+      <scope>runtime</scope>
     </dependency>
 
     <!-- provided dependencies -->
@@ -103,17 +135,11 @@
     </dependency>
 
     <dependency>
-      <groupId>org.codehaus.groovy</groupId>
-      <artifactId>groovy-all</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
       <groupId>org.hibernate.javax.persistence</groupId>
       <artifactId>hibernate-jpa-2.0-api</artifactId>
       <scope>provided</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.apache.geronimo.specs</groupId>
       <artifactId>geronimo-jta_1.1_spec</artifactId>
@@ -143,18 +169,6 @@
       <groupId>org.jboss</groupId>
       <artifactId>jboss-vfs</artifactId>
       <version>3.1.0.Final</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.python</groupId>
-      <artifactId>jython</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jruby</groupId>
-      <artifactId>jruby-complete</artifactId>
       <scope>provided</scope>
     </dependency>
 
@@ -210,12 +224,6 @@
     </dependency>
 
     <dependency>
-      <groupId>commons-dbcp</groupId>
-      <artifactId>commons-dbcp</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
       <scope>test</scope>
@@ -224,6 +232,13 @@
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-testing</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-test-utils-testcontainers</artifactId>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
 
@@ -260,9 +275,39 @@
     <dependency>
       <groupId>com.github.tomakehurst</groupId>
       <artifactId>wiremock</artifactId>
-      <version>${version.wiremock}</version>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-all</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.python</groupId>
+      <artifactId>jython</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jruby</groupId>
+      <artifactId>jruby-complete</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.graalvm.js</groupId>
+      <artifactId>js</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.graalvm.js</groupId>
+      <artifactId>js-scriptengine</artifactId>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
 
@@ -274,7 +319,7 @@
     <mail.server.port>5025</mail.server.port>
     <authorizationCheckRevokes>auto</authorizationCheckRevokes>
     <jdbcBatchProcessing>true</jdbcBatchProcessing>
-    
+
     <!-- We shade artifacts into the jar, so we need to generate a dependency BOM
     for the license book -->
     <skip-third-party-bom>false</skip-third-party-bom>
@@ -289,11 +334,8 @@
       ${camunda.artifact}.container.*;${camunda.osgi.version};-noimport:=true,
       ${camunda.artifact}.engine.*;${camunda.osgi.version};-noimport:=true
     </camunda.osgi.export.pkg>
-    <camunda.osgi.import.defaults>
-      org.camunda.bpm.engine.variable.*;${camunda.osgi.import.camunda.commons.version},
-      org.camunda.commons.*;${camunda.osgi.import.camunda.commons.version},
-    </camunda.osgi.import.defaults>
     <camunda.osgi.import.additional>
+      !com.google.gson.*,
       junit*;resolution:=optional,
       org.junit*;resolution:=optional,
       com.sun*;resolution:=optional,
@@ -315,6 +357,18 @@
 
   <build>
     <!-- filter test configurations to inject properties -->
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>org/camunda/bpm/engine/product-info.properties</include>
+        </includes>
+      </resource>
+    </resources>
     <testResources>
       <testResource>
         <directory>src/test/resources</directory>
@@ -325,10 +379,9 @@
         <includes>
           <include>**/camunda.cfg.xml</include>
           <include>**/*camunda.cfg.xml</include>
-          <include>**/camunda.cfg.db.xml</include>
-          <include>**/camunda.cfg.plugins.xml</include>
-          <include>**/camunda.cfg.prefix.xml</include>
-          <include>**/camunda.cfg.invocationsPerJobByBatchType.xml</include>
+          <include>**/camunda.cfg.*.xml</include>
+          <include>testconfig.properties</include>
+          <include>**/testcontainers.properties</include>
         </includes>
       </testResource>
     </testResources>
@@ -392,12 +445,16 @@
               <exclude>org.camunda.bpm.model:*</exclude>
               <exclude>org.camunda.bpm.dmn:*</exclude>
               <exclude>org.camunda.commons:*</exclude>
+              <exclude>org.camunda.connect:*</exclude>
+              <exclude>org.camunda.feel:*</exclude>
 
               <exclude>org.springframework:*</exclude>
               <exclude>org.slf4j:*</exclude>
+              <exclude>org.apache.commons:*</exclude>
               <exclude>com.sun.mail:*</exclude>
               <exclude>javax.activation:*</exclude>
               <exclude>org.mybatis:mybatis:*</exclude>
+              <exclude>commons-logging:*</exclude>
               <exclude>joda-time:*</exclude>
             </excludes>
           </artifactSet>
@@ -406,26 +463,11 @@
               <pattern>com.google.gson</pattern>
               <shadedPattern>camundajar.impl.com.google.gson</shadedPattern>
             </relocation>
-            <relocation>
-              <pattern>org.apache.http</pattern>
-              <shadedPattern>camundajar.impl.org.apache.http</shadedPattern>
-            </relocation>
-            <relocation>
-              <pattern>org.apache.commons.codec</pattern>
-              <shadedPattern>camundajar.impl.org.apache.commons.codec</shadedPattern>
-            </relocation>
-            <relocation>
-              <pattern>org.apache.commons.logging</pattern>
-              <shadedPattern>camundajar.impl.org.apache.commons.logging</shadedPattern>
-            </relocation>
           </relocations>
           <transformers>
             <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
           </transformers>
-          <!-- shading test jar is disabled due to
-               the httpclient and dependencies that it brings have *-tests.jar and we prevent their shading,
-               otherwise the tests of those libraries are unpacked and executed (via surefire plugin) in the upgrade setups -->
-          <shadeTestJar>false</shadeTestJar> 
+          <shadeTestJar>true</shadeTestJar>
         </configuration>
       </plugin>
     </plugins>
@@ -561,9 +603,6 @@
 
     <profile>
       <id>h2-in-memory</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
       <properties>
         <forkCount>0.5C</forkCount>
       </properties>
@@ -640,6 +679,22 @@
               <excludes combine.children="append">
                 <exclude>**/CompetingMessageCorrelationTest.java</exclude>
               </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>cockroachdb</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <failIfNoTests>false</failIfNoTests>
+              <trimStackTrace>false</trimStackTrace>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
           </plugin>
         </plugins>
@@ -808,10 +863,33 @@
                 <exclude>**/HistoryCleanupDisabledOnBootstrapTest.java</exclude>
                 <exclude>**/LoginAttemptsTest.java</exclude>
                 <exclude>**/ConcurrentHistoryCleanupUpdateOfFailingJobTest.java</exclude>
+                <exclude>**/TelemetryTaskWorkerMetricsTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>
         </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>java15</id>
+      <activation>
+        <jdk>[15,)</jdk>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <artifactId>maven-surefire-plugin</artifactId>
+              <configuration>
+                <!-- Nashorn is not part of the JDK anymore in Java 15+ -->
+                <excludes combine.children="append">
+                  <exclude>**/*NashornTest.java</exclude>
+                </excludes>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
       </build>
     </profile>
 

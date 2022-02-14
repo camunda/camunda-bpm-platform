@@ -1,0 +1,1 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=org.camunda.bpm.client.spring.boot.starter.impl.ClientAutoConfiguration

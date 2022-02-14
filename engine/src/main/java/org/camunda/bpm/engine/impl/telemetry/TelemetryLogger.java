@@ -16,7 +16,10 @@
  */
 package org.camunda.bpm.engine.impl.telemetry;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.telemetry.Product;
+import org.camunda.bpm.engine.telemetry.TelemetryData;
 
 public class TelemetryLogger extends ProcessEngineLogger {
 
@@ -25,42 +28,113 @@ public class TelemetryLogger extends ProcessEngineLogger {
         "001", "Start telemetry sending task.");
   }
 
-  public void exceptionWhileSendingTelemetryData(String message) {
+  public void exceptionWhileSendingTelemetryData(Exception e, boolean isInitialMessage) {
+    logWarn("002",
+        "Could not send {}telemetry data. Reason: {} with message '{}'. Set this logger to DEBUG/FINE for the full stacktrace.",
+        getInitialMessageText(isInitialMessage),
+        e.getClass().getSimpleName(),
+        e.getMessage());
     logDebug(
-        "002", "An exception occurred while sending telemetry data: {}", message);
+        "003", "{} occurred while sending telemetry data.",
+        e.getClass().getCanonicalName(),
+        e);
   }
 
-  public void unexpectedResponseWhileSendingTelemetryData() {
-    logDebug(
-        "003", "Unexpect response while sending telemetry data.");
+  public ProcessEngineException unexpectedResponseWhileSendingTelemetryData(int responseCode, boolean isInitialMessage) {
+    return new ProcessEngineException(
+      exceptionMessage("004", "Unexpected response code {} when sending {}telemetry data", responseCode, getInitialMessageText(isInitialMessage)));
   }
 
-  public void telemetryDataSent(String data) {
+  public void unexpectedResponseWhileSendingTelemetryData(boolean isInitialMessage) {
     logDebug(
-        "004", "Telemetry data sent: {}", data);
+        "005", "Unexpected 'null' response while sending {}telemetry data.", getInitialMessageText(isInitialMessage));
+  }
+
+  public void sendingTelemetryData(String data, boolean isInitialMessage) {
+    logDebug(
+        "006", "Sending {}telemetry data: {}", getInitialMessageText(isInitialMessage), data);
   }
 
   public void databaseTelemetryPropertyMissingInfo(boolean telemetryEnabled) {
     logInfo(
-        "005",
+        "007",
         "`camunda.telemetry.enabled` property is missing in the database, creating the property with value: {}",
         Boolean.toString(telemetryEnabled));
   }
 
   public void databaseTelemetryPropertyMissingInfo() {
     logInfo(
-        "006",
+        "008",
         "`camunda.telemetry.enabled` property is missing in the database");
   }
 
   public void telemetryDisabled() {
     logDebug(
-        "007", "Sending telemetry is disabled.");
+        "009", "Sending telemetry is disabled.");
   }
 
-  public void schedulingTaskFails(String message) {
+  public ProcessEngineException schedulingTaskFails(Exception e) {
+    return new ProcessEngineException(
+        exceptionMessage("010", "Cannot schedule the telemetry task."), e);
+  }
+
+  public void schedulingTaskFailsOnEngineStart(Exception e) {
+    logWarn("013",
+        "Could not start telemetry task. Reason: {} with message '{}'. Set this logger to DEBUG/FINE for the full stacktrace.",
+        e.getClass().getSimpleName(),
+        e.getMessage());
     logDebug(
-        "008", "An exception occured during scheduling telemetry task: {}", message);
+        "014", "{} occurred while starting the telemetry task.",
+        e.getClass().getCanonicalName(),
+        e);
   }
 
+  public void unableToConfigureHttpConnectorWarning() {
+    logWarn(
+        "011","The http connector used to send telemetry is `null`, telemetry data will not be sent.");
+  }
+
+  public void unexpectedExceptionDuringHttpConnectorConfiguration(Exception e) {
+    logDebug(
+        "012", "'{}' exception occurred while configuring http connector with message: {}",
+        e.getClass().getCanonicalName(),
+        e.getMessage());
+  }
+
+  public void unexpectedResponseSuccessCode(int statusCode, boolean isInitialMessage) {
+    logDebug(
+        "015", "{} request was sent, but received an unexpected response success code: {}", getInitialMessageTextCapitalized(isInitialMessage), statusCode);
+  }
+
+
+  public void telemetrySentSuccessfully(boolean isInitialMessage) {
+    logDebug(
+        "016", "{} request was successful.", getInitialMessageTextCapitalized(isInitialMessage));
+  }
+
+  public void sendingTelemetryDataFails(TelemetryData productData) {
+    Product product = productData.getProduct();
+    String installationId = productData.getInstallation();
+    logWarn("017","Cannot send the telemetry data. Some of the data is invalid. " +
+        "Set this logger to DEBUG/FINE to see more details.");
+    logDebug("018", "Cannot send the telemetry task data. The following values must be non-empty " +
+        "Strings: '{}' (name), '{}' (version), '{}' (edition), '{}' (UUIDv4 installation id).",
+      product.getName(),
+      product.getVersion(),
+      product.getEdition(),
+      installationId);
+  }
+
+  public ProcessEngineException exceptionWhileRetrievingTelemetryDataRegistryNull() {
+    return new ProcessEngineException(
+        exceptionMessage("019", "Error while retrieving telemetry data. Telemetry registry was not initialized."));
+  }
+
+  protected String getInitialMessageText(boolean isInitialMessage) {
+    return isInitialMessage ? "initial " : "";
+  }
+
+  protected String getInitialMessageTextCapitalized(boolean isInitialMessage) {
+    return isInitialMessage ? "Initial telemetry" : "Telemetry";
+  }
 }

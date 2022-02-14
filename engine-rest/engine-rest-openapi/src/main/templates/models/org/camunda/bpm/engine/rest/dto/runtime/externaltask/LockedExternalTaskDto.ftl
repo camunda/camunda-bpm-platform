@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto
     title = "LockedExternalTaskDto" >
 
@@ -106,3 +107,5 @@
               the value is a JSON object of serialized variable values with the following properties:" />
 
 </@lib.dto>
+
+</#macro>

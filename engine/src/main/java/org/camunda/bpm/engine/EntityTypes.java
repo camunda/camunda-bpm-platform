@@ -49,9 +49,12 @@ public class EntityTypes {
   public static final String REPORT = "Report";
   public static final String DASHBOARD = "Dashboard";
   public static final String METRICS = "Metrics";
+  public static final String TASK_METRICS = "TaskMetrics";
   public static final String CASE_INSTANCE = "CaseInstance";
   public static final String PROPERTY = "Property";
   public static final String OPERATION_LOG_CATEGORY = "OperationLogCatgeory";
   public static final String OPTIMIZE = "Optimize";
   public static final String OPERATION_LOG = "OperationLog";
+  public static final String INCIDENT = "Incident";
+  public static final String SYSTEM = "System";
 }

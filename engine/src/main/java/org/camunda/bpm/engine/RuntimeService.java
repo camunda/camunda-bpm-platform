@@ -27,6 +27,9 @@ import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.migration.MigrationPlanBuilder;
@@ -40,6 +43,7 @@ import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.IncidentQuery;
+import org.camunda.bpm.engine.runtime.MessageCorrelationAsyncBuilder;
 import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
 import org.camunda.bpm.engine.runtime.ModificationBuilder;
 import org.camunda.bpm.engine.runtime.NativeExecutionQuery;
@@ -589,7 +593,9 @@ public interface RuntimeService {
    * @param deleteReason reason for deleting, which will be stored in the history. Can be null.
    *
    * @throws BadUserRequestException
-   *          when no process instance is found with the given id or id is null.
+   *          when the processInstanceId is null.
+   * @throws NotFoundException
+   *          when no process instance is found with the given processInstanceId.
    * @throws AuthorizationException
    *          if the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_INSTANCE}
    *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
@@ -725,7 +731,9 @@ public interface RuntimeService {
    * are notified with the {@link ExecutionListener#EVENTNAME_END} event.
    *
    * @throws BadUserRequestException
-   *          when no process instance is found with the given id or id is null.
+   *          when the processInstanceId is null.
+   * @throws NotFoundException
+   *          when no process instance is found with the given processInstanceId.
    * @throws AuthorizationException
    *          if the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_INSTANCE}
    *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
@@ -746,7 +754,9 @@ public interface RuntimeService {
    *
    *
    * @throws BadUserRequestException
-   *          when no process instance is found with the given id or id is null.
+   *          when the processInstanceId is null.
+   * @throws NotFoundException
+   *          when no process instance is found with the given processInstanceId.
    * @throws AuthorizationException
    *          if the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_INSTANCE}
    *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
@@ -768,7 +778,9 @@ public interface RuntimeService {
    *
    *
    * @throws BadUserRequestException
-   *          when no process instance is found with the given id or id is null.
+   *          when a processInstanceId is null.
+   * @throws NotFoundException
+   *          when no process instance is found with a given processInstanceId.
    * @throws AuthorizationException
    *          if the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_INSTANCE}
    *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
@@ -790,7 +802,9 @@ public interface RuntimeService {
    *
    *
    * @throws BadUserRequestException
-   *          when no process instance is found with the given id or id is null.
+   *          when a processInstanceId is null.
+   * @throws NotFoundException
+   *          when no process instance is found with a given processInstanceId.
    * @throws AuthorizationException
    *          if the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_INSTANCE}
    *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
@@ -802,7 +816,7 @@ public interface RuntimeService {
    * Delete existing runtime process instances.
    *
    * Deletion propagates upward as far as necessary.
-   * 
+   *
    * Does not fail if a process instance was not found.
    *
    * @param processInstanceIds ids of process instance to delete, cannot be null.
@@ -815,7 +829,7 @@ public interface RuntimeService {
    *
    *
    * @throws BadUserRequestException
-   *          when no process instance is found with the given id or id is null.
+   *          when a processInstanceId is null.
    * @throws AuthorizationException
    *          if the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_INSTANCE}
    *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
@@ -838,7 +852,9 @@ public interface RuntimeService {
    *
    *
    * @throws BadUserRequestException
-   *          when no process instance is found with the given id or id is null.
+   *          when the processInstanceId is null.
+   * @throws NotFoundException
+   *          when no process instance is found with the given processInstanceId.
    * @throws AuthorizationException
    *          if the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_INSTANCE}
    *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
@@ -861,19 +877,21 @@ public interface RuntimeService {
    *
    *
    * @throws BadUserRequestException
-   *          when no process instance is found with the given id or id is null.
+   *          when the processInstanceId is null.
+   * @throws NotFoundException
+   *          when no process instance is found with the given processInstanceId.
    * @throws AuthorizationException
    *          if the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_INSTANCE}
    *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void deleteProcessInstance(String processInstanceId, String deleteReason, boolean skipCustomListeners, boolean externallyTerminated, boolean skipIoMappings,
       boolean skipSubprocesses);
-  
+
   /**
    * Delete an existing runtime process instance.
    *
    * Deletion propagates upward as far as necessary.
-   * 
+   *
    * Does not fail if a process instance was not found.
    *
    * @param processInstanceId id of process instance to delete, cannot be null.
@@ -887,7 +905,7 @@ public interface RuntimeService {
    *
    *
    * @throws BadUserRequestException
-   *          when no process instance is found with the given id or id is null.
+   *          when processInstanceId is null.
    * @throws AuthorizationException
    *          if the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_INSTANCE}
    *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
@@ -1419,6 +1437,110 @@ public interface RuntimeService {
    *          <li>{@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}</li>
    */
   void setVariablesLocal(String executionId, Map<String, ? extends Object> variables);
+
+  /**
+   * Update or create runtime process variables in the root scope of process instances.
+   *
+   * @param processInstanceIds related to the process instances the variables will be set on; cannot
+   *                           be {@code null} when processInstanceQuery and
+   *                           historicProcessInstanceQuery are {@code null}.
+   * @param processInstanceQuery to select process instances; Cannot be {@code null} when
+   *                             processInstanceIds and historicProcessInstanceQuery
+   *                             are {@code null}.
+   * @param historicProcessInstanceQuery to select process instances; Cannot be {@code null} when
+   *                                     processInstanceIds and processInstanceQuery
+   *                                     are {@code null}.
+   * @param variables that will be set to the root scope of the process instances
+   *
+   * @throws NullValueException <ul>
+   *   <li>when {@code variables} is {@code null}</li>
+   *   <li>when {@code processInstanceIds}, {@code processInstanceQuery} and
+   *   {@code historicProcessInstanceQuery} are {@code null}</li>
+   * </ul>
+   * @throws BadUserRequestException <ul>
+   *   <li>when {@code variables} is empty</li>
+   *   <li>when no process instance ids were found</li>
+   *   <li>when a transient variable is set</li>
+   * </ul>
+   * @throws ProcessEngineException when the java serialization format is prohibited
+   * @throws AuthorizationException when the user has no {@link BatchPermissions#CREATE} or
+   * {@link BatchPermissions#CREATE_BATCH_SET_VARIABLES} permission on {@link Resources#BATCH}.
+   *
+   * @return the batch which sets the variables asynchronously.
+   */
+  Batch setVariablesAsync(List<String> processInstanceIds,
+                          ProcessInstanceQuery processInstanceQuery,
+                          HistoricProcessInstanceQuery historicProcessInstanceQuery,
+                          Map<String, ?> variables);
+
+  /**
+   * Update or create runtime process variables in the root scope of process instances.
+   *
+   * @param processInstanceIds related to the process instances the variables will be set on
+   * @param variables that will be set to the root scope of the process instances
+   *
+   * @throws NullValueException <ul>
+   *   <li>when {@code variables} is {@code null}</li>
+   *   <li>when {@code processInstanceIds} is {@code null}</li>
+   * </ul>
+   * @throws BadUserRequestException <ul>
+   *   <li>when {@code variables} is empty</li>
+   *   <li>when no process instance ids were found</li>
+   *   <li>when a transient variable is set</li>
+   * </ul>
+   * @throws ProcessEngineException when the java serialization format is prohibited
+   * @throws AuthorizationException when the user has no {@link BatchPermissions#CREATE} or
+   * {@link BatchPermissions#CREATE_BATCH_SET_VARIABLES} permission on {@link Resources#BATCH}.
+   *
+   * @return the batch which sets the variables asynchronously.
+   */
+  Batch setVariablesAsync(List<String> processInstanceIds, Map<String, ?> variables);
+
+  /**
+   * Update or create runtime process variables in the root scope of process instances.
+   *
+   * @param processInstanceQuery to select process instances
+   * @param variables that will be set to the root scope of the process instances
+   *
+   * @throws NullValueException <ul>
+   *   <li>when {@code variables} is {@code null}</li>
+   *   <li>when {@code processInstanceQuery} is {@code null}</li>
+   * </ul>
+   * @throws BadUserRequestException <ul>
+   *   <li>when {@code variables} is empty</li>
+   *   <li>when no process instance ids were found</li>
+   *   <li>when a transient variable is set</li>
+   * </ul>
+   * @throws ProcessEngineException when the java serialization format is prohibited
+   * @throws AuthorizationException when the user has no {@link BatchPermissions#CREATE} or
+   * {@link BatchPermissions#CREATE_BATCH_SET_VARIABLES} permission on {@link Resources#BATCH}.
+   *
+   * @return the batch which sets the variables asynchronously.
+   */
+  Batch setVariablesAsync(ProcessInstanceQuery processInstanceQuery, Map<String, ?> variables);
+
+  /**
+   * Update or create runtime process variables in the root scope of process instances.
+   *
+   * @param historicProcessInstanceQuery to select process instances
+   * @param variables that will be set to the root scope of the process instances
+   *
+   * @throws NullValueException <ul>
+   *   <li>when {@code variables} is {@code null}</li>
+   *   <li>when {@code historicProcessInstanceQuery} is {@code null}</li>
+   * </ul>
+   * @throws BadUserRequestException <ul>
+   *   <li>when {@code variables} is empty</li>
+   *   <li>when no process instance ids were found</li>
+   *   <li>when a transient variable is set</li>
+   * </ul>
+   * @throws ProcessEngineException when the java serialization format is prohibited
+   * @throws AuthorizationException when the user has no {@link BatchPermissions#CREATE} or
+   * {@link BatchPermissions#CREATE_BATCH_SET_VARIABLES} permission on {@link Resources#BATCH}.
+   *
+   * @return the batch which sets the variables asynchronously.
+   */
+  Batch setVariablesAsync(HistoricProcessInstanceQuery historicProcessInstanceQuery, Map<String, ?> variables);
 
   /**
    * Removes a variable for an execution.
@@ -2049,6 +2171,17 @@ public interface RuntimeService {
   void correlateMessage(String messageName, String businessKey, Map<String, Object> correlationKeys, Map<String, Object> processVariables);
 
   /**
+   * Define a complex asynchronous message correlation using a fluent builder.
+   *
+   * @param messageName the name of the message. Corresponds to the 'name' element
+   * of the message defined in BPMN 2.0 Xml.
+   * Can be null to correlate by other criteria only.
+   *
+   * @return the fluent builder for defining the asynchronous message correlation.
+   */
+  MessageCorrelationAsyncBuilder createMessageCorrelationAsync(String messageName);
+
+  /**
    * Define a modification of a process instance in terms of activity cancellations
    * and instantiations via a fluent builder. Instructions are executed in the order they are specified.
    *
@@ -2191,6 +2324,37 @@ public interface RuntimeService {
    *          and no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void resolveIncident(String incidentId);
+
+  /**
+   * Set an annotation to an incident.
+   *
+   * @throws NotValidException when incident id is {@code null}
+   * @throws BadUserRequestException when no incident could be found
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *
+   * @param incidentId of the incident that the annotation is updated at
+   * @param annotation that is set to the incident
+   *
+   * @since 7.15
+   */
+  void setAnnotationForIncidentById(String incidentId, String annotation);
+
+  /**
+   * Clear the annotation for an incident.
+   *
+   * @throws NotValidException when incident id is {@code null}
+   * @throws BadUserRequestException when no incident could be found
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *
+   * @param incidentId of the incident that the annotation is cleared at
+   *
+   * @since 7.15
+   */
+  void clearAnnotationForIncidentById(String incidentId);
 
   /**
    * Define a complex condition evaluation using a fluent builder.

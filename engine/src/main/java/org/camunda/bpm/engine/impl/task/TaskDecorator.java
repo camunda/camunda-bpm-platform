@@ -89,8 +89,7 @@ public class TaskDecorator {
 
         } else if (dueDate instanceof String) {
           BusinessCalendar businessCalendar = getBusinessCalender();
-          task.setDueDate(businessCalendar.resolveDuedate((String) dueDate));
-
+          task.setDueDate(businessCalendar.resolveDuedate((String) dueDate, task));
         } else {
           throw new ProcessEngineException("Due date expression does not resolve to a Date or Date string: " +
               dueDateExpression.getExpressionText());
@@ -109,7 +108,7 @@ public class TaskDecorator {
 
         } else if (followUpDate instanceof String) {
           BusinessCalendar businessCalendar = getBusinessCalender();
-          task.setFollowUpDate(businessCalendar.resolveDuedate((String) followUpDate));
+          task.setFollowUpDate(businessCalendar.resolveDuedate((String) followUpDate, task));
 
         } else {
           throw new ProcessEngineException("Follow up date expression does not resolve to a Date or Date string: " +

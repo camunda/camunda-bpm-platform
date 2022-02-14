@@ -1,8 +1,10 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
       id = "unlock"
       tag = "External Task"
+      summary = "Unlock"
       desc = "Unlocks an external task by id. Clears the task's lock expiration time and worker id." />
 
   "parameters" : [
@@ -34,3 +36,5 @@
 
   }
 }
+
+</#macro>

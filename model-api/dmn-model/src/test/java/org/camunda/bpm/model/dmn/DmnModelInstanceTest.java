@@ -16,10 +16,9 @@
  */
 package org.camunda.bpm.model.dmn;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import org.camunda.bpm.model.dmn.impl.DmnModelConstants;
 import org.camunda.bpm.model.dmn.instance.Definitions;
 import org.junit.Test;
 
@@ -40,8 +39,25 @@ public class DmnModelInstanceTest {
     DmnModelInstance cloneInstance = modelInstance.clone();
     cloneInstance.getDefinitions().setId("TestId2");
 
-    assertThat(modelInstance.getDefinitions().getId(), is(equalTo("TestId")));
-    assertThat(cloneInstance.getDefinitions().getId(), is(equalTo("TestId2")));
+    assertThat(modelInstance.getDefinitions().getId()).isEqualTo("TestId");
+    assertThat(cloneInstance.getDefinitions().getId()).isEqualTo("TestId2");
+  }
+
+  @Test
+  public void shouldExportDmnDiagramWithLatestDmnNamespace() {
+    // given
+    DmnModelInstance modelInstance = Dmn.createEmptyModel();
+    Definitions definitions = modelInstance.newInstance(Definitions.class);
+    definitions.setNamespace("http://camunda.org/schema/1.0/dmn");
+    definitions.setName("definitions");
+    definitions.setId("definitions");
+    modelInstance.setDefinitions(definitions);
+
+    // when
+    String exportedDiagram = Dmn.convertToString(modelInstance);
+
+    // then
+    assertThat(exportedDiagram).contains(DmnModelConstants.LATEST_DMN_NS);
   }
 
 }

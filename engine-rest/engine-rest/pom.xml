@@ -1,14 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>camunda-engine-rest-core</artifactId>
-  <name>camunda BPM - engine - REST</name>
+  <name>Camunda Platform - engine - REST</name>
   <packaging>jar</packaging>
 
   <parent>
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-engine-rest-root</artifactId>
     <relativePath>../</relativePath>
-    <version>7.14.0-SNAPSHOT</version>
+    <version>7.17.0-SNAPSHOT</version>
   </parent>
 
   <properties>
@@ -29,6 +29,12 @@
       <groupId>commons-fileupload</groupId>
       <artifactId>commons-fileupload</artifactId>
     </dependency>
+    <!-- override managed version from commons-fileupload -->
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+    </dependency>
+
 
     <dependency>
       <groupId>com.fasterxml.jackson.jaxrs</groupId>
@@ -56,6 +62,12 @@
       <version>${jackson.databind.version}</version>
     </dependency>
 
+    <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-jsr310</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
+
     <!-- provided deps -->
     <dependency>
       <groupId>org.jboss.spec.javax.servlet</groupId>
@@ -67,6 +79,12 @@
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
       <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-jcl</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -83,23 +101,20 @@
     </dependency>
 
     <!--
-      needed for offline shrinkwrap
-      see src/test/java/org/camunda/bpm/engine/rest/util/container/TomcatServerBootstrap.java
-    -->
-    <dependency>
-      <groupId>org.codehaus.jackson</groupId>
-      <artifactId>jackson-jaxrs</artifactId>
-      <version>1.6.5</version>
-      <scope>test</scope>
-    </dependency>
-    
-    <!--
       needed for offline shrinkwrap (in particular CustomJacksonDateFormatTest), 
-      BOM must be installed before this module is built
+      BOMs must be installed before this module is built
     -->
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-bom</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-core-internal-dependencies</artifactId>
       <version>${project.version}</version>
       <type>pom</type>
       <scope>test</scope>
@@ -172,7 +187,7 @@
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
       <!-- override version -->
-      <version>1.11</version>
+      <version>1.15</version>
       <scope>test</scope>
     </dependency>
 
@@ -184,9 +199,15 @@
 
     <dependency>
       <groupId>org.springframework</groupId>
-      <artifactId>spring-mock</artifactId>
-      <version>2.0.8</version>
+      <artifactId>spring-test</artifactId>
+      <version>${version.spring.framework}</version>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-jcl</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!-- Tomcat for resteasy and wink -->
@@ -522,6 +543,9 @@
     
     <profile>
       <id>resteasy3</id>
+      <properties>
+        <version.resteasy>${version.resteasy3}</version.resteasy>
+      </properties>
       <dependencies>
         <dependency>
           <groupId>org.jboss.spec.javax.ws.rs</groupId>
@@ -748,6 +772,12 @@
           <version>${version.jersey2}</version>
           <scope>test</scope>
         </dependency>
+        <dependency>
+          <groupId>org.glassfish.jersey.inject</groupId>
+          <artifactId>jersey-hk2</artifactId>
+          <version>${version.jersey2}</version>
+          <scope>test</scope>
+        </dependency>
       </dependencies>
       <build>
         <plugins>
@@ -927,7 +957,7 @@
     <profile>
       <id>wildfly-compatibility</id>
       <properties>
-        <resteasy.version>3.0.8.Final</resteasy.version>
+        <resteasy.version>3.0.14.Final</resteasy.version>
         <resteasy.netty.version>${resteasy.version}</resteasy.netty.version>
       </properties>
     </profile>

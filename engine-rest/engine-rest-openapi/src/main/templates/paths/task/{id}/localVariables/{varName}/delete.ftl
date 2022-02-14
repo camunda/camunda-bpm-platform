@@ -1,8 +1,10 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
       id = "deleteTaskLocalVariable"
       tag = "Task Local Variable"
+      summary = "Delete Local Task Variable"
       desc = "Removes a local variable from a task by id." />
 
   "parameters" : [
@@ -40,3 +42,5 @@
 
   }
 }
+
+</#macro>

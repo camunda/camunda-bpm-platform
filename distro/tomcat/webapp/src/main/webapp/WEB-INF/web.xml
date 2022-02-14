@@ -5,7 +5,7 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
 
-  <display-name>camunda bpm webapp</display-name>
+  <display-name>Camunda Platform webapp</display-name>
 
   <!-- cockpit bootstrap listener -->
   <listener>
@@ -91,6 +91,20 @@
   </filter>
   <filter-mapping>
     <filter-name>CsrfPreventionFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <!-- Session Cookie filter -->
+  <filter>
+    <filter-name>SessionCookieFilter</filter-name>
+    <filter-class>org.camunda.bpm.webapp.impl.security.filter.SessionCookieFilter</filter-class>
+    <!--<init-param>-->
+    <!--<param-name>enableSecureCookie</param-name>-->
+    <!--<param-value>true</param-value>-->
+    <!--</init-param>-->
+  </filter>
+  <filter-mapping>
+    <filter-name>SessionCookieFilter</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
 

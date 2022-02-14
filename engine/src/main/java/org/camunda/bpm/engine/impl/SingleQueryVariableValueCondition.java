@@ -16,10 +16,14 @@
  */
 package org.camunda.bpm.engine.impl;
 
+import static org.camunda.bpm.engine.impl.QueryOperator.*;
+
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.variable.serializer.TypedValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.ValueFields;
 import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
@@ -40,17 +44,18 @@ public class SingleQueryVariableValueCondition extends AbstractQueryVariableValu
   protected Long longValue;
   protected Double doubleValue;
   protected String type;
+  protected boolean findNulledEmptyStrings;
 
   public SingleQueryVariableValueCondition(QueryVariableValue variableValue) {
     super(variableValue);
   }
 
-  public void initializeValue(VariableSerializers serializers) {
+  public void initializeValue(VariableSerializers serializers, String dbType) {
     TypedValue typedValue = wrappedQueryValue.getTypedValue();
-    initializeValue(serializers, typedValue);
+    initializeValue(serializers, typedValue, dbType);
   }
 
-  public void initializeValue(VariableSerializers serializers, TypedValue typedValue) {
+  public void initializeValue(VariableSerializers serializers, TypedValue typedValue, String dbType) {
     TypedValueSerializer serializer = determineSerializer(serializers, typedValue);
 
     if(typedValue instanceof UntypedValueImpl) {
@@ -59,6 +64,11 @@ public class SingleQueryVariableValueCondition extends AbstractQueryVariableValu
     }
     serializer.writeValue(typedValue, this);
     this.type = serializer.getName();
+    if (ValueType.STRING.getName().equals(type) && DbSqlSessionFactory.ORACLE.equals(dbType)) {
+      if ("".equals(textValue) && Arrays.asList(EQUALS, NOT_EQUALS).contains(wrappedQueryValue.getOperator())) {
+        this.findNulledEmptyStrings = true;
+      }
+    }
   }
 
   protected TypedValueSerializer determineSerializer(VariableSerializers serializers, TypedValue value) {
@@ -130,5 +140,12 @@ public class SingleQueryVariableValueCondition extends AbstractQueryVariableValu
     return type;
   }
 
+  public boolean getFindNulledEmptyStrings() {
+    return findNulledEmptyStrings;
+  }
+
+  public void setFindNulledEmptyStrings(boolean findNulledEmptyStrings) {
+    this.findNulledEmptyStrings = findNulledEmptyStrings;
+  }
 
 }

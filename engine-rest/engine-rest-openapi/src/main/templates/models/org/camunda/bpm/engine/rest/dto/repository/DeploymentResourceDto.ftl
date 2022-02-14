@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto
     title = "DeploymentResourceDto"
     desc = "A JSON object corresponding to the `Resource` interface in the engine.
@@ -20,3 +21,5 @@
         desc = "The id of the deployment." />
 
 </@lib.dto>
+
+</#macro>

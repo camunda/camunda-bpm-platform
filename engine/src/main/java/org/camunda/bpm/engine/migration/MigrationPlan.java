@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.migration;
 
+import org.camunda.bpm.engine.variable.VariableMap;
+
 import java.util.List;
 
 /**
@@ -25,6 +27,9 @@ import java.util.List;
  * <p>A migration plan consists of a number of {@link MigrationInstruction}s that tell which
  *   activity maps to which. The set of instructions is complete, i.e. the migration logic does not perform
  *   migration steps that are not given by the instructions
+ *
+ * <p>A migration plan can include variables which will be set into the process instance scope
+ * after the migration.
  *
  * @author Thorben Lindhauer
  */
@@ -44,5 +49,10 @@ public interface MigrationPlan {
    * @return the id of the process definition that is migrated to
    */
   String getTargetProcessDefinitionId();
+
+  /**
+   * @return the variables to be set after the migration to the process instances' scope
+   */
+  VariableMap getVariables();
 
 }

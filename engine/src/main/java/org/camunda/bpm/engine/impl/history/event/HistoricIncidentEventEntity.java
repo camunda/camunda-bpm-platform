@@ -41,6 +41,7 @@ public class HistoricIncidentEventEntity extends HistoryEvent {
   protected String jobDefinitionId;
   protected String historyConfiguration;
   protected String failedActivityId;
+  protected String annotation;
 
   public Date getCreateTime() {
     return createTime;
@@ -160,6 +161,14 @@ public class HistoricIncidentEventEntity extends HistoryEvent {
 
   public void setFailedActivityId(String failedActivityId) {
     this.failedActivityId = failedActivityId;
+  }
+
+  public String getAnnotation() {
+    return annotation;
+  }
+
+  public void setAnnotation(String annotation) {
+    this.annotation = annotation;
   }
 
 }

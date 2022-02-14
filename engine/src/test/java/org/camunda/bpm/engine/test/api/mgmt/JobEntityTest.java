@@ -63,12 +63,17 @@ public class JobEntityTest {
 
   protected static final Date CREATE_DATE = new Date(1363607000000L);
 
+  protected String activityIdLoggingProperty;
+
   @Before
   public void setUp() {
     historyService = engineRule.getHistoryService();
     managementService = engineRule.getManagementService();
     runtimeService = engineRule.getRuntimeService();
+
     jobIds = new ArrayList<>();
+
+    activityIdLoggingProperty = engineRule.getProcessEngineConfiguration().getLoggingContextActivityId();
   }
 
   @Before
@@ -90,6 +95,8 @@ public class JobEntityTest {
     if (!testRule.isHistoryLevelNone()) {
       cleanupJobLog();
     }
+
+    engineRule.getProcessEngineConfiguration().setLoggingContextActivityId(activityIdLoggingProperty);
   }
 
   @Test
@@ -155,6 +162,35 @@ public class JobEntityTest {
   @Test
   public void shouldShowFailedActivityIdPropertyForFailingAsyncTask() {
     // given
+    testRule.deploy(Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .serviceTask("theTask")
+        .camundaAsyncBefore()
+        .camundaClass(FailingDelegate.class)
+      .endEvent()
+      .done());
+
+    runtimeService.startProcessInstanceByKey("process", Variables.createVariables().putValue("fail", true));
+    JobEntity job = (JobEntity) managementService.createJobQuery().singleResult();
+
+    // when
+    try {
+      managementService.executeJob(job.getId());
+      fail("Exception expected");
+    } catch (Exception e) {
+      // exception expected
+    }
+
+    // then
+    job = (JobEntity) managementService.createJobQuery().jobId(job.getId()).singleResult();
+    assertThat(job.getFailedActivityId(), is("theTask"));
+  }
+
+  @Test
+  public void shouldShowFailedActivityIdIfActivityIdLoggingIsDisabled() {
+    // given
+    engineRule.getProcessEngineConfiguration().setLoggingContextActivityId(null);
+
     testRule.deploy(Bpmn.createExecutableProcess("process")
       .startEvent()
       .serviceTask("theTask")

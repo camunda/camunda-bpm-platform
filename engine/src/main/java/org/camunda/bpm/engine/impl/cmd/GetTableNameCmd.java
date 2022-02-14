@@ -20,6 +20,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
@@ -37,7 +38,7 @@ public class GetTableNameCmd implements Command<String>, Serializable {
   public String execute(CommandContext commandContext) {
     ensureNotNull("entityClass", entityClass);
 
-    commandContext.getAuthorizationManager().checkCamundaAdmin();
+    commandContext.getAuthorizationManager().checkCamundaAdminOrPermission(CommandChecker::checkReadTableName);
 
     return commandContext
       .getTableDataManager()

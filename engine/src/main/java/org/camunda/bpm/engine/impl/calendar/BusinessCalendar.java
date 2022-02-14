@@ -18,6 +18,8 @@ package org.camunda.bpm.engine.impl.calendar;
 
 import java.util.Date;
 
+import org.camunda.bpm.engine.task.Task;
+
 
 /**
  * @author Tom Baeyens
@@ -25,7 +27,8 @@ import java.util.Date;
 public interface BusinessCalendar {
 
   Date resolveDuedate(String duedateDescription);
-  
+
   Date resolveDuedate(String duedateDescription, Date startDate);
 
+  Date resolveDuedate(String duedateDescription, Task task);
 }

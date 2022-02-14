@@ -38,9 +38,9 @@ public class CamundaBpmRunLdapProperties extends LdapIdentityProviderPlugin {
         ", initialContextFactory=" + initialContextFactory +
         ", securityAuthentication=" + securityAuthentication +
         ", contextProperties=" + contextProperties +
-        ", serverUrl=" + serverUrl +
-        ", managerDn=" + managerDn +
-        ", managerPassword=" + managerPassword +
+        ", serverUrl=******" + // sensitive for logging
+        ", managerDn=******" + // sensitive for logging
+        ", managerPassword=******" + // sensitive for logging
         ", baseDn=" + baseDn +
         ", userDnPattern=" + userDnPattern +
         ", userSearchBase=" + userSearchBase +

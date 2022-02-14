@@ -55,7 +55,7 @@ public abstract class AbstractMetricsTest {
   protected ManagementService managementService;
 
   @Before
-  public void initializeServices() throws Exception {
+  public void initializeServices() {
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
     runtimeService = engineRule.getRuntimeService();
     taskService = engineRule.getTaskService();
@@ -68,12 +68,12 @@ public abstract class AbstractMetricsTest {
   }
 
   @After
-  public void cleanUpMetrics() throws Exception {
+  public void cleanUpMetrics() {
     clearMetrics();
   }
 
   protected void clearMetrics() {
-    Collection<Meter> meters = processEngineConfiguration.getMetricsRegistry().getMeters().values();
+    Collection<Meter> meters = processEngineConfiguration.getMetricsRegistry().getDbMeters().values();
     for (Meter meter : meters) {
       meter.getAndClear();
     }

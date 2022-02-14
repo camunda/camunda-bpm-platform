@@ -16,10 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.dmn;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
 import org.camunda.bpm.engine.DecisionService;
@@ -42,7 +39,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -66,9 +62,6 @@ public class DecisionServiceUserOperationLogTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   protected DecisionService decisionService;
   protected RepositoryService repositoryService;
@@ -127,7 +120,7 @@ public class DecisionServiceUserOperationLogTest {
   public void logCreationOnEvaluateDecisionTableByKey() {
     // given
     DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().singleResult();
-    
+
     // when
     identityService.setAuthenticatedUserId(USER_ID);
     decisionService.evaluateDecisionTableByKey(DECISION_DEFINITION_KEY, createVariables());
@@ -144,7 +137,7 @@ public class DecisionServiceUserOperationLogTest {
 
     // given
     DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().latestVersion().singleResult();
-    
+
     // when
     identityService.setAuthenticatedUserId(USER_ID);
     decisionService.evaluateDecisionTableByKey(DECISION_DEFINITION_KEY, createVariables());
@@ -161,7 +154,7 @@ public class DecisionServiceUserOperationLogTest {
 
     // given
     DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().decisionDefinitionVersion(1).singleResult();
-    
+
     // when
     identityService.setAuthenticatedUserId(USER_ID);
     decisionService.evaluateDecisionTableByKeyAndVersion(DECISION_DEFINITION_KEY, 1, createVariables());
@@ -178,7 +171,7 @@ public class DecisionServiceUserOperationLogTest {
 
     // given
     DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().latestVersion().singleResult();
-    
+
     // when
     identityService.setAuthenticatedUserId(USER_ID);
     decisionService.evaluateDecisionTableByKeyAndVersion(DECISION_DEFINITION_KEY, null, createVariables());
@@ -193,7 +186,7 @@ public class DecisionServiceUserOperationLogTest {
   public void logCreationOnEvaluateDecisionById() {
     // given
     DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().singleResult();
-    
+
     // when
     identityService.setAuthenticatedUserId(USER_ID);
     decisionService.evaluateDecisionById(decisionDefinition.getId()).variables(createVariables()).evaluate();
@@ -208,7 +201,7 @@ public class DecisionServiceUserOperationLogTest {
   public void logCreationOnEvaluateDecisionByKey() {
     // given
     DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().singleResult();
-    
+
     // when
     identityService.setAuthenticatedUserId(USER_ID);
     decisionService.evaluateDecisionByKey(DECISION_DEFINITION_KEY).variables(createVariables()).evaluate();
@@ -225,7 +218,7 @@ public class DecisionServiceUserOperationLogTest {
 
     // given
     DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().latestVersion().singleResult();
-    
+
     // when
     identityService.setAuthenticatedUserId(USER_ID);
     decisionService.evaluateDecisionByKey(DECISION_DEFINITION_KEY).variables(createVariables()).evaluate();
@@ -242,7 +235,7 @@ public class DecisionServiceUserOperationLogTest {
 
     // given
     DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().decisionDefinitionVersion(1).singleResult();
-    
+
     // when
     identityService.setAuthenticatedUserId(USER_ID);
     decisionService.evaluateDecisionByKey(DECISION_DEFINITION_KEY).version(1).variables(createVariables()).evaluate();
@@ -259,7 +252,7 @@ public class DecisionServiceUserOperationLogTest {
 
     // given
     DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().latestVersion().singleResult();
-    
+
     // when
     identityService.setAuthenticatedUserId(USER_ID);
     decisionService.evaluateDecisionByKey(DECISION_DEFINITION_KEY).version(null).variables(createVariables()).evaluate();
@@ -274,19 +267,19 @@ public class DecisionServiceUserOperationLogTest {
   }
 
   protected void assertOperationLog(DecisionDefinition definition) {
-    assertThat(historyService.createUserOperationLogQuery().count(), is(2L));
+    assertThat(historyService.createUserOperationLogQuery().count()).isEqualTo(2L);
     assertLogEntry("decisionDefinitionId", definition.getId());
     assertLogEntry("decisionDefinitionKey", definition.getKey());
   }
 
   protected void assertLogEntry(String property, Object newValue) {
     UserOperationLogEntry entry = historyService.createUserOperationLogQuery().property(property).singleResult();
-    assertThat(entry, notNullValue());
-    assertThat(entry.getOrgValue(), nullValue());
-    assertThat(entry.getNewValue(), is(String.valueOf(newValue)));
-    assertThat(entry.getCategory(), is(UserOperationLogEntry.CATEGORY_OPERATOR));
-    assertThat(entry.getEntityType(), is(EntityTypes.DECISION_DEFINITION));
-    assertThat(entry.getOperationType(), is(UserOperationLogEntry.OPERATION_TYPE_EVALUATE));
+    assertThat(entry).isNotNull();
+    assertThat(entry.getOrgValue()).isNull();
+    assertThat(entry.getNewValue()).isEqualTo(String.valueOf(newValue));
+    assertThat(entry.getCategory()).isEqualTo(UserOperationLogEntry.CATEGORY_OPERATOR);
+    assertThat(entry.getEntityType()).isEqualTo(EntityTypes.DECISION_DEFINITION);
+    assertThat(entry.getOperationType()).isEqualTo(UserOperationLogEntry.OPERATION_TYPE_EVALUATE);
   }
 
 }

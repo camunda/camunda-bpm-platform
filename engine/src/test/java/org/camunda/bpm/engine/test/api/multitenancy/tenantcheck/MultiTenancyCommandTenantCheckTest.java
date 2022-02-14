@@ -16,8 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy.tenantcheck;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collections;
 
@@ -59,7 +58,7 @@ public class MultiTenancyCommandTenantCheckTest {
       public Void execute(CommandContext commandContext) {
         // cannot enable tenant check for command when it is disabled for process engine
         commandContext.enableTenantCheck();
-        assertThat(commandContext.getTenantManager().isTenantCheckEnabled(), is(false));
+        assertThat(commandContext.getTenantManager().isTenantCheckEnabled()).isFalse();
 
         return null;
       }
@@ -75,8 +74,8 @@ public class MultiTenancyCommandTenantCheckTest {
       public Void execute(CommandContext commandContext) {
         // disable tenant check for the current command
         commandContext.disableTenantCheck();
-        assertThat(commandContext.isTenantCheckEnabled(), is(false));
-        assertThat(commandContext.getTenantManager().isTenantCheckEnabled(), is(false));
+        assertThat(commandContext.isTenantCheckEnabled()).isFalse();
+        assertThat(commandContext.getTenantManager().isTenantCheckEnabled()).isFalse();
 
         return null;
       }
@@ -87,8 +86,8 @@ public class MultiTenancyCommandTenantCheckTest {
       @Override
       public Void execute(CommandContext commandContext) {
         // assert that it is enabled again for further commands
-        assertThat(commandContext.isTenantCheckEnabled(), is(true));
-        assertThat(commandContext.getTenantManager().isTenantCheckEnabled(), is(true));
+        assertThat(commandContext.isTenantCheckEnabled()).isTrue();
+        assertThat(commandContext.getTenantManager().isTenantCheckEnabled()).isTrue();
 
         return null;
       }
@@ -104,10 +103,10 @@ public class MultiTenancyCommandTenantCheckTest {
       public Void execute(CommandContext commandContext) {
 
         commandContext.disableTenantCheck();
-        assertThat(commandContext.getTenantManager().isTenantCheckEnabled(), is(false));
+        assertThat(commandContext.getTenantManager().isTenantCheckEnabled()).isFalse();
 
         commandContext.enableTenantCheck();
-        assertThat(commandContext.getTenantManager().isTenantCheckEnabled(), is(true));
+        assertThat(commandContext.getTenantManager().isTenantCheckEnabled()).isTrue();
 
         return null;
       }
@@ -123,7 +122,7 @@ public class MultiTenancyCommandTenantCheckTest {
       @Override
       public Void execute(CommandContext commandContext) {
         // camunda-admin should access data from all tenants
-        assertThat(commandContext.getTenantManager().isTenantCheckEnabled(), is(false));
+        assertThat(commandContext.getTenantManager().isTenantCheckEnabled()).isFalse();
 
         return null;
       }

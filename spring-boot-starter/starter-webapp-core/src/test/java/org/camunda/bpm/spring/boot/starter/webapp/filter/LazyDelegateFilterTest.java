@@ -36,15 +36,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(LazyInitRegistration.class)
-@PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*"})
+@RunWith(MockitoJUnitRunner.class)
 public class LazyDelegateFilterTest {
 
   @Mock
@@ -58,69 +54,79 @@ public class LazyDelegateFilterTest {
 
   @Test
   public void initTest() throws Exception {
-    PowerMockito.mockStatic(LazyInitRegistration.class);
-    LazyDelegateFilter<Filter> delegateFilter = new LazyDelegateFilter<Filter>(filterMock.getClass());
-    delegateFilter.delegate = filterMock;
-    delegateFilter.init(filterConfigMock);
-    assertSame(filterConfigMock, delegateFilter.filterConfig);
-    verify(filterMock, times(0)).init(Mockito.any(FilterConfig.class));
-    PowerMockito.verifyStatic(LazyInitRegistration.class);
-    LazyInitRegistration.lazyInit(delegateFilter);
+    try (MockedStatic<LazyInitRegistration> theMock = Mockito.mockStatic(LazyInitRegistration.class)) {
+      LazyDelegateFilter<Filter> delegateFilter = new LazyDelegateFilter<>(filterMock.getClass());
+      delegateFilter.delegate = filterMock;
+      delegateFilter.init(filterConfigMock);
+      assertSame(filterConfigMock, delegateFilter.filterConfig);
+      verify(filterMock, times(0)).init(Mockito.any(FilterConfig.class));
+      theMock.verify(() -> LazyInitRegistration.lazyInit(delegateFilter));
+    }
   }
 
   @Test
   public void lazyInitTest() throws Exception {
-    LazyDelegateFilter<Filter> delegateFilter = spy(new LazyDelegateFilter<Filter>(filterMock.getClass()));
-    delegateFilter.init(filterConfigMock);
-    doReturn(filterMock).when(delegateFilter).createNewFilterInstance();
-    delegateFilter.lazyInit();
-    verify(filterMock).init(filterConfigMock);
+    try (MockedStatic<LazyInitRegistration> theMock = Mockito.mockStatic(LazyInitRegistration.class)) {
+      LazyDelegateFilter<Filter> delegateFilter = spy(new LazyDelegateFilter<Filter>(filterMock.getClass()));
+      delegateFilter.init(filterConfigMock);
+      doReturn(filterMock).when(delegateFilter).createNewFilterInstance();
+      delegateFilter.lazyInit();
+      verify(filterMock).init(filterConfigMock);
+    }
   }
 
   @Test
   public void lazyInitWithHookTest() throws Exception {
-    LazyDelegateFilter<Filter> delegateFilter = spy(new LazyDelegateFilter<Filter>(filterMock.getClass()));
-    delegateFilter.setInitHook(initHookMock);
-    delegateFilter.init(filterConfigMock);
-    doReturn(filterMock).when(delegateFilter).createNewFilterInstance();
-    delegateFilter.lazyInit();
-    InOrder order = inOrder(filterMock, initHookMock);
-    order.verify(initHookMock).init(filterMock);
-    order.verify(filterMock).init(filterConfigMock);
+    try (MockedStatic<LazyInitRegistration> theMock = Mockito.mockStatic(LazyInitRegistration.class)) {
+      LazyDelegateFilter<Filter> delegateFilter = spy(new LazyDelegateFilter<Filter>(filterMock.getClass()));
+      delegateFilter.setInitHook(initHookMock);
+      delegateFilter.init(filterConfigMock);
+      doReturn(filterMock).when(delegateFilter).createNewFilterInstance();
+      delegateFilter.lazyInit();
+      InOrder order = inOrder(filterMock, initHookMock);
+      order.verify(initHookMock).init(filterMock);
+      order.verify(filterMock).init(filterConfigMock);
+    }
   }
 
   @Test
   public void doFilterTest() throws Exception {
-    LazyDelegateFilter<Filter> delegateFilter = new LazyDelegateFilter<Filter>(filterMock.getClass());
-    delegateFilter.delegate = filterMock;
-    ServletRequest request = mock(ServletRequest.class);
-    ServletResponse response = mock(ServletResponse.class);
-    FilterChain chain = mock(FilterChain.class);
-    delegateFilter.doFilter(request, response, chain);
-    verify(filterMock).doFilter(request, response, chain);
+    try (MockedStatic<LazyInitRegistration> theMock = Mockito.mockStatic(LazyInitRegistration.class)) {
+      LazyDelegateFilter<Filter> delegateFilter = new LazyDelegateFilter<>(filterMock.getClass());
+      delegateFilter.delegate = filterMock;
+      ServletRequest request = mock(ServletRequest.class);
+      ServletResponse response = mock(ServletResponse.class);
+      FilterChain chain = mock(FilterChain.class);
+      delegateFilter.doFilter(request, response, chain);
+      verify(filterMock).doFilter(request, response, chain);
+    }
   }
 
   @Test
   public void destroyTest() {
-    LazyDelegateFilter<Filter> delegateFilter = new LazyDelegateFilter<Filter>(filterMock.getClass());
-    delegateFilter.delegate = filterMock;
-    delegateFilter.destroy();
-    verify(filterMock).destroy();
+    try (MockedStatic<LazyInitRegistration> theMock = Mockito.mockStatic(LazyInitRegistration.class)) {
+      LazyDelegateFilter<Filter> delegateFilter = new LazyDelegateFilter<>(filterMock.getClass());
+      delegateFilter.delegate = filterMock;
+      delegateFilter.destroy();
+      verify(filterMock).destroy();
+    }
   }
 
   @Test
   public void destroyUninitializedDelegateTest() {
-    LazyDelegateFilter<Filter> delegateFilter = new LazyDelegateFilter<Filter>(filterMock.getClass());
-    delegateFilter.destroy();
-    verify(filterMock, never()).destroy();
+    try (MockedStatic<LazyInitRegistration> theMock = Mockito.mockStatic(LazyInitRegistration.class)) {
+      LazyDelegateFilter<Filter> delegateFilter = new LazyDelegateFilter<>(filterMock.getClass());
+      delegateFilter.destroy();
+      verify(filterMock, never()).destroy();
+    }
   }
 
   @Test
   public void lazyInitRegistrationTest() {
-    PowerMockito.mockStatic(LazyInitRegistration.class);
-    LazyDelegateFilter<Filter> delegateFilter = new LazyDelegateFilter<Filter>(filterMock.getClass());
-    PowerMockito.verifyStatic(LazyInitRegistration.class);
-    LazyInitRegistration.register(delegateFilter);
+    try (MockedStatic<LazyInitRegistration> theMock = Mockito.mockStatic(LazyInitRegistration.class)) {
+      LazyDelegateFilter<Filter> delegateFilter = new LazyDelegateFilter<>(filterMock.getClass());
+      theMock.verify(() -> LazyInitRegistration.register(delegateFilter));
+    }
   }
 
 }

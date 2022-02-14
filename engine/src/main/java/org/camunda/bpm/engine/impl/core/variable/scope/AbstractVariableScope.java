@@ -26,20 +26,16 @@ import java.util.Set;
 
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
+import org.camunda.bpm.engine.impl.core.variable.VariableUtil;
 import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
 import org.camunda.bpm.engine.impl.core.variable.event.VariableEventDispatcher;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.javax.el.ELContext;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.util.TypedValueField;
-import org.camunda.bpm.engine.impl.variable.serializer.TypedValueSerializer;
-import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
-import org.camunda.bpm.engine.variable.value.SerializableValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
@@ -244,34 +240,22 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
     return getVariableStore().getKeys();
   }
 
-  public void setVariables(Map<String, ? extends Object> variables) {
-    if (variables!=null) {
-      for (String variableName : variables.keySet()) {
-        Object value = null;
-        if (variables instanceof VariableMap) {
-          value = ((VariableMap) variables).getValueTyped(variableName);
-        }
-        else {
-          value = variables.get(variableName);
-        }
-        setVariable(variableName, value);
-      }
-    }
+  public void setVariables(Map<String, ?> variables, boolean skipJavaSerializationFormatCheck) {
+    VariableUtil.setVariables(variables,
+        (name, value) -> setVariable(name, value, skipJavaSerializationFormatCheck));
   }
 
-  public void setVariablesLocal(Map<String, ? extends Object> variables) {
-    if (variables!=null) {
-      for (String variableName : variables.keySet()) {
-        Object value = null;
-        if (variables instanceof VariableMap) {
-          value = ((VariableMap) variables).getValueTyped(variableName);
-        }
-        else {
-          value = variables.get(variableName);
-        }
-        setVariableLocal(variableName, value);
-      }
-    }
+  public void setVariables(Map<String, ?> variables) {
+    setVariables(variables, false);
+  }
+
+  public void setVariablesLocal(Map<String, ?> variables, boolean skipJavaSerializationFormatCheck) {
+    VariableUtil.setVariables(variables,
+        (name, value) -> setVariableLocal(name, value, skipJavaSerializationFormatCheck));
+  }
+
+  public void setVariablesLocal(Map<String, ?> variables) {
+    setVariablesLocal(variables, false);
   }
 
   public void removeVariables() {
@@ -305,56 +289,66 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
     }
   }
 
-  public void setVariable(String variableName, Object value) {
+  public void setVariable(String variableName, Object value, boolean skipJavaSerializationFormatCheck) {
     TypedValue typedValue = Variables.untypedValue(value);
-    setVariable(variableName, typedValue, getSourceActivityVariableScope());
-
+    setVariable(variableName, typedValue, getSourceActivityVariableScope(), skipJavaSerializationFormatCheck);
   }
 
-  protected void setVariable(String variableName, TypedValue value, AbstractVariableScope sourceActivityVariableScope) {
+  public void setVariable(String variableName, Object value) {
+    setVariable(variableName, value, false);
+  }
+
+  protected void setVariable(String variableName,
+                             TypedValue value,
+                             AbstractVariableScope sourceActivityVariableScope,
+                             boolean skipJavaSerializationFormatCheck) {
     if (hasVariableLocal(variableName)) {
-      TypedValue previousTypeValue = getVariableInstanceLocal(variableName).getTypedValue(false);
-
-      if (value.isTransient() != previousTypeValue.isTransient()) {
-        throw ProcessEngineLogger.CORE_LOGGER.transientVariableException(variableName);
-      }
-
-      if (value.isTransient()) {
-        setVariableLocalTransient(variableName, value, sourceActivityVariableScope);
-      } else {
-        setVariableLocal(variableName, value, sourceActivityVariableScope);
-      }
-
+      setVariableLocal(variableName, value, sourceActivityVariableScope, skipJavaSerializationFormatCheck);
       return;
     }
     AbstractVariableScope parentVariableScope = getParentVariableScope();
     if (parentVariableScope!=null) {
       if (sourceActivityVariableScope==null) {
-        parentVariableScope.setVariable(variableName, value);
+        parentVariableScope.setVariable(variableName, value, skipJavaSerializationFormatCheck);
       } else {
-        parentVariableScope.setVariable(variableName, value, sourceActivityVariableScope);
+        parentVariableScope.setVariable(variableName, value, sourceActivityVariableScope, skipJavaSerializationFormatCheck);
       }
       return;
     }
-    if (value.isTransient()) {
-      setVariableLocalTransient(variableName, value, sourceActivityVariableScope);
-    } else {
-      setVariableLocal(variableName, value, sourceActivityVariableScope);
-    }
+
+    setVariableLocal(variableName, value, sourceActivityVariableScope, skipJavaSerializationFormatCheck);
   }
 
-  public void setVariableLocal(String variableName, TypedValue value, AbstractVariableScope sourceActivityExecution) {
+  protected void setVariable(String variableName,
+                             TypedValue value,
+                             AbstractVariableScope sourceActivityVariableScope) {
+    setVariable(variableName, value, sourceActivityVariableScope, false);
+  }
 
-    checkJavaSerialization(variableName, value);
+  public void setVariableLocal(String variableName,
+                               TypedValue value,
+                               AbstractVariableScope sourceActivityExecution,
+                               boolean skipJavaSerializationFormatCheck) {
+
+    if (!skipJavaSerializationFormatCheck) {
+      VariableUtil.checkJavaSerialization(variableName, value);
+    }
 
     VariableStore<CoreVariableInstance> variableStore = getVariableStore();
 
     if (variableStore.containsKey(variableName)) {
       CoreVariableInstance existingInstance = variableStore.getVariable(variableName);
+
+      TypedValue previousValue = existingInstance.getTypedValue(false);
+
+      if (value.isTransient() != previousValue.isTransient()) {
+        throw ProcessEngineLogger.CORE_LOGGER.transientVariableException(variableName);
+      }
+      
       existingInstance.setValue(value);
       invokeVariableLifecycleListenersUpdate(existingInstance, sourceActivityExecution);
     }
-    else if (variableStore.isRemoved(variableName)) {
+    else if (!value.isTransient() && variableStore.isRemoved(variableName)) {
 
       CoreVariableInstance existingInstance = variableStore.getRemovedVariable(variableName);
 
@@ -366,42 +360,9 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
       dbEntityManager.undoDelete((VariableInstanceEntity) existingInstance);
     }
     else {
-      CoreVariableInstance variableValue = getVariableInstanceFactory().build(variableName, value, false);
+      CoreVariableInstance variableValue = getVariableInstanceFactory().build(variableName, value, value.isTransient());
       getVariableStore().addVariable(variableValue);
       invokeVariableLifecycleListenersCreate(variableValue, sourceActivityExecution);
-    }
-  }
-
-  /**
-   * Checks, if Java serialization will be used and if it is allowed to be used.
-   * @param variableName
-   * @param value
-   */
-  protected void checkJavaSerialization(String variableName, TypedValue value) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
-    if (value instanceof SerializableValue && !processEngineConfiguration.isJavaSerializationFormatEnabled()) {
-
-      SerializableValue serializableValue = (SerializableValue) value;
-
-      // if Java serialization is prohibited
-      if (!serializableValue.isDeserialized()) {
-
-        String javaSerializationDataFormat = Variables.SerializationDataFormats.JAVA.getName();
-        String requestedDataFormat = serializableValue.getSerializationDataFormat();
-
-        if (requestedDataFormat == null) {
-          // check if Java serializer will be used
-          final TypedValueSerializer serializerForValue = TypedValueField.getSerializers()
-              .findSerializerForValue(serializableValue, processEngineConfiguration.getFallbackSerializerFactory());
-          if (serializerForValue != null) {
-            requestedDataFormat = serializerForValue.getSerializationDataformat();
-          }
-        }
-
-        if (javaSerializationDataFormat.equals(requestedDataFormat)) {
-          throw ProcessEngineLogger.CORE_LOGGER.javaSerializationProhibitedException(variableName);
-        }
-      }
     }
   }
 
@@ -438,39 +399,13 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
     }
   }
 
-  public void setVariableLocal(String variableName, Object value) {
+  public void setVariableLocal(String variableName, Object value, boolean skipJavaSerializationFormatCheck) {
     TypedValue typedValue = Variables.untypedValue(value);
-    setVariableLocal(variableName, typedValue, getSourceActivityVariableScope());
-
+    setVariableLocal(variableName, typedValue, getSourceActivityVariableScope(), skipJavaSerializationFormatCheck);
   }
 
-  /**
-   * Sets a variable in the local scope. In contrast to
-   * {@link #setVariableLocal(String, Object)}, the variable is transient that
-   * means it will not be stored in the data base. For example, a transient
-   * variable can be used for a result variable that is only available for
-   * output mapping.
-   */
-  public void setVariableLocalTransient(String variableName, Object value) {
-    TypedValue typedValue = Variables.untypedValue(value, true);
-
-    checkJavaSerialization(variableName, typedValue);
-
-    CoreVariableInstance coreVariableInstance = getVariableInstanceFactory().build(variableName, typedValue, true);
-    getVariableStore().addVariable(coreVariableInstance);
-  }
-
-  public void setVariableLocalTransient(String variableName, Object value, AbstractVariableScope sourceActivityVariableScope) {
-
-    VariableStore<CoreVariableInstance> variableStore = getVariableStore();
-    if (variableStore.containsKey(variableName)) {
-      CoreVariableInstance existingInstance = variableStore.getVariable(variableName);
-      existingInstance.setValue((TypedValue) value);
-      invokeVariableLifecycleListenersUpdate(existingInstance, sourceActivityVariableScope);
-    } else {
-      setVariableLocalTransient(variableName, value);
-      invokeVariableLifecycleListenersCreate(variableStore.getVariable(variableName), sourceActivityVariableScope);
-    }
+  public void setVariableLocal(String variableName, Object value) {
+    setVariableLocal(variableName, value, false);
   }
 
   public void removeVariable(String variableName) {

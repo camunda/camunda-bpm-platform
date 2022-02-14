@@ -1,0 +1,32 @@
+@import "./../shared/bootstrap.less";
+@import "./../shared/base.less";
+@import "./../shared/font-opensans.less";
+@import "./_mixins.less";
+
+@header-height: 65px;
+@header-site-name-size:       @header-computed-height / 3;
+@header-brand-logo-font-size: 33px; // because the font needs an adjustment
+
+@font-family-sans-serif:      'open_sansregular', Helvetica, Arial, Verdana, sans-serif;
+@font-size-base:              16px;
+@line-height-base:            1.6;
+@navbar-font-size:            14px;
+
+@headings-font-weight:        400;
+@headings-font-family:        @font-family-base;
+@link-hover-decoration:       none;
+
+.cam-header() {
+  .link(#545454, #333333);
+}
+
+.light {
+  font-family: 'open_sanslight', Helvetica, Arial, Verdana, sans-serif;
+}
+
+.brand-name {
+  position: relative;
+  top: -3px;
+}
+
+@import "./headers.less";

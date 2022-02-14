@@ -17,8 +17,6 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.util.Collection;
-import java.util.concurrent.Callable;
-
 import org.camunda.bpm.engine.form.FormField;
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
@@ -41,11 +39,7 @@ public class GetStartFormVariablesCmd extends AbstractGetFormVariablesCmd {
   }
 
   public VariableMap execute(final CommandContext commandContext) {
-    StartFormData startFormData = commandContext.runWithoutAuthorization(new Callable<StartFormData>() {
-      public StartFormData call() throws Exception {
-        return new GetStartFormCmd(resourceId).execute(commandContext);
-      }
-    });
+    StartFormData startFormData = commandContext.runWithoutAuthorization(new GetStartFormCmd(resourceId));
 
     ProcessDefinition definition = startFormData.getProcessDefinition();
     checkGetStartFormVariables((ProcessDefinitionEntity) definition, commandContext);

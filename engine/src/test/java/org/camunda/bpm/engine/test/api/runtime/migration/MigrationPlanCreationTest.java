@@ -16,11 +16,12 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import static org.camunda.bpm.engine.test.util.MigrationPlanAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.MigrationPlanAssert.migrate;
+import static org.camunda.bpm.engine.test.util.MigrationPlanAssert.variable;
 import static org.camunda.bpm.engine.test.util.MigrationPlanValidationReportAssert.assertThat;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import org.camunda.bpm.engine.BadUserRequestException;
@@ -32,13 +33,19 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.EventSubProcessModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.builder.UserTaskBuilder;
-import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Thorben Lindhauer
@@ -786,8 +793,300 @@ public class MigrationPlanCreationTest {
       );
   }
 
+  @Test
+  public void shouldSetVariable() {
+    ProcessDefinition sourceProcessDefinition =
+        testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition =
+        testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+
+    MigrationPlan migrationPlan = runtimeService
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .setVariables(Collections.singletonMap("foo", "bar"))
+        .mapEqualActivities()
+        .build();
+
+    assertThat(migrationPlan)
+        .hasSourceProcessDefinition(sourceProcessDefinition)
+        .hasTargetProcessDefinition(targetProcessDefinition)
+        .hasVariables(
+            variable().name("foo").value("bar")
+        );
+  }
+
+  @Test
+  public void shouldSetVariables() {
+    ProcessDefinition sourceProcessDefinition =
+        testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition =
+        testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("foo", "bar");
+    variables.put("bar", 5);
+
+    MigrationPlan migrationPlan = runtimeService
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .setVariables(variables)
+        .mapEqualActivities()
+        .build();
+
+    assertThat(migrationPlan)
+        .hasSourceProcessDefinition(sourceProcessDefinition)
+        .hasTargetProcessDefinition(targetProcessDefinition)
+        .hasVariables(
+            variable().name("foo").value("bar"),
+            variable().name("bar").value(5)
+        );
+  }
+
+  @Test
+  public void shouldSetUntypedVariable() {
+    ProcessDefinition sourceProcessDefinition =
+        testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition =
+        testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+
+    MigrationPlan migrationPlan = runtimeService
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .setVariables(Variables.putValue("foo", "bar"))
+        .mapEqualActivities()
+        .build();
+
+    assertThat(migrationPlan)
+      .hasSourceProcessDefinition(sourceProcessDefinition)
+      .hasTargetProcessDefinition(targetProcessDefinition)
+      .hasVariables(
+          variable().name("foo").value("bar")
+      );
+  }
+
+  @Test
+  public void shouldSetUntypedVariables() {
+    ProcessDefinition sourceProcessDefinition =
+        testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition =
+        testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+
+    MigrationPlan migrationPlan = runtimeService
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .setVariables(
+            Variables.putValue("foo", "bar")
+                .putValue("bar", 5)
+        )
+        .mapEqualActivities()
+        .build();
+
+    assertThat(migrationPlan)
+        .hasSourceProcessDefinition(sourceProcessDefinition)
+        .hasTargetProcessDefinition(targetProcessDefinition)
+        .hasVariables(
+            variable().name("foo").value("bar"),
+            variable().name("bar").value(5)
+        );
+  }
+
+  @Test
+  public void shouldSetMapOfTypedVariable() {
+    ProcessDefinition sourceProcessDefinition =
+        testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition =
+        testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+
+    MigrationPlan migrationPlan = runtimeService
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .setVariables(Collections.singletonMap("foo", Variables.stringValue("bar")))
+        .mapEqualActivities()
+        .build();
+
+    assertThat(migrationPlan)
+        .hasSourceProcessDefinition(sourceProcessDefinition)
+        .hasTargetProcessDefinition(targetProcessDefinition)
+        .hasVariables(
+            variable().name("foo").value("bar").typed()
+        );
+  }
+
+  @Test
+  public void shouldSetVariableMapOfTypedVariable() {
+    ProcessDefinition sourceProcessDefinition =
+        testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition =
+        testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+
+    MigrationPlan migrationPlan = runtimeService
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .setVariables(
+            Variables.putValueTyped("foo", Variables.stringValue("bar"))
+        )
+        .mapEqualActivities()
+        .build();
+
+    assertThat(migrationPlan)
+        .hasSourceProcessDefinition(sourceProcessDefinition)
+        .hasTargetProcessDefinition(targetProcessDefinition)
+        .hasVariables(
+            variable().name("foo").value("bar").typed()
+        );
+  }
+
+  @Test
+  public void shouldSetTypedAndUntypedVariables() {
+    ProcessDefinition sourceProcessDefinition =
+        testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition =
+        testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+
+    MigrationPlan migrationPlan = runtimeService
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .setVariables(
+            Variables.putValue("foo", "bar")
+                .putValueTyped("bar", Variables.integerValue(5))
+        )
+        .mapEqualActivities()
+        .build();
+
+    assertThat(migrationPlan)
+        .hasSourceProcessDefinition(sourceProcessDefinition)
+        .hasTargetProcessDefinition(targetProcessDefinition)
+        .hasVariables(
+            variable().name("foo").value("bar"),
+            variable().name("bar").value(5).typed()
+        );
+  }
+
+  @Test
+  public void shouldSetNullVariables() {
+    ProcessDefinition sourceProcessDefinition =
+        testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition =
+        testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+
+    MigrationPlan migrationPlan = runtimeService
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .setVariables(null)
+        .mapEqualActivities()
+        .build();
+
+    assertThat(migrationPlan)
+        .hasSourceProcessDefinition(sourceProcessDefinition)
+        .hasTargetProcessDefinition(targetProcessDefinition)
+        .variablesNull();
+  }
+
+  @Test
+  public void shouldSetEmptyVariables() {
+    ProcessDefinition sourceProcessDefinition =
+        testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition =
+        testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+
+    MigrationPlan migrationPlan = runtimeService
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .setVariables(new HashMap<>())
+        .mapEqualActivities()
+        .build();
+
+    assertThat(migrationPlan)
+        .hasSourceProcessDefinition(sourceProcessDefinition)
+        .hasTargetProcessDefinition(targetProcessDefinition)
+        .variablesEmpty();
+  }
+
+  @Test
+  public void shouldThrowValidationExceptionDueToSerializationFormatForbiddenForVariable() {
+    ProcessDefinition sourceProcessDefinition =
+        testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition =
+        testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+
+    try {
+      runtimeService
+          .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+          .setVariables(
+              Variables.putValueTyped("foo",
+                  Variables.serializedObjectValue()
+                      .serializedValue("[]")
+                      .objectTypeName(ArrayList.class.getName())
+                      .serializationDataFormat(Variables.SerializationDataFormats.JAVA.getName())
+                      .create())
+          )
+          .mapEqualActivities()
+          .build();
+      fail("Should not succeed");
+    } catch (MigrationPlanValidationException e) {
+      assertThat(e.getValidationReport())
+          .hasVariableFailures("foo",
+              "Cannot set variable with name foo. Java serialization format is prohibited");
+    }
+  }
+
+  @Test
+  public void shouldThrowValidationExceptionDueToSerializationFormatForbiddenForVariables() {
+    ProcessDefinition sourceProcessDefinition =
+        testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition =
+        testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+
+    ObjectValue objectValue = Variables.serializedObjectValue()
+        .serializedValue("[]")
+        .objectTypeName(ArrayList.class.getName())
+        .serializationDataFormat(Variables.SerializationDataFormats.JAVA.getName())
+        .create();
+
+    try {
+      runtimeService
+          .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+          .setVariables(
+              Variables.putValueTyped("foo", objectValue)
+              .putValueTyped("bar", objectValue)
+          )
+          .mapEqualActivities()
+          .build();
+      fail("Should not succeed");
+    } catch (MigrationPlanValidationException e) {
+      assertThat(e.getValidationReport())
+          .hasVariableFailures("foo",
+              "Cannot set variable with name foo. Java serialization format is prohibited")
+          .hasVariableFailures("bar",
+              "Cannot set variable with name bar. Java serialization format is prohibited");
+    }
+  }
+
+  @Test
+  public void shouldThrowExceptionDueToInstructionsAndSerializationFormatForbiddenForVariable() {
+    ProcessDefinition sourceProcessDefinition =
+        testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition =
+        testHelper.deployAndGetDefinition(ProcessModels.ONE_TASK_PROCESS);
+
+    ObjectValue objectValue = Variables.serializedObjectValue()
+        .serializedValue("[]")
+        .objectTypeName(ArrayList.class.getName())
+        .serializationDataFormat(Variables.SerializationDataFormats.JAVA.getName())
+        .create();
+
+    try {
+      runtimeService
+          .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+          .setVariables(Variables.putValueTyped("foo", objectValue))
+          .mapActivities("foo", "bar")
+          .mapActivities("bar", "foo")
+          .build();
+      fail("Should not succeed");
+    } catch (MigrationPlanValidationException e) {
+      assertThat(e.getValidationReport())
+          .hasVariableFailures("foo",
+              "Cannot set variable with name foo. Java serialization format is prohibited")
+          .hasInstructionFailures("foo",
+              "Source activity 'foo' does not exist", "Target activity 'bar' does not exist")
+          .hasInstructionFailures("bar",
+              "Source activity 'bar' does not exist", "Target activity 'foo' does not exist");
+    }
+  }
+
   protected void assertExceptionMessage(Exception e, String message) {
-    assertThat(e.getMessage(), CoreMatchers.containsString(message));
+    assertThat(e.getMessage()).contains(message);
   }
 
 }

@@ -1,0 +1,215 @@
+/* stylelint-disable no-descending-specificity -- contains non-trivial nesting */
+
+@import 'shared/bootstrap.less';
+@import 'shared/base.less';
+
+.align-left {
+  text-align: left;
+}
+
+.align-right {
+  text-align: right;
+}
+
+.text-help {
+  font-style: italic;
+  font-size: 90%;
+  color: @gray;
+  margin-bottom: (@grid-gutter-width / 2);
+}
+
+.list-inline > li {
+  padding: 1px 5px;
+}
+
+.dropdown-menu {
+  > li {
+    padding: 0;
+    margin: 2px 0;
+
+    a {
+      padding: 2px 9px;
+      display: block;
+    }
+  }
+
+  > .active,
+  > li:hover {
+    a {
+      padding-left: 4px;
+      border-width: 0 0 0 3px;
+      margin-left: 2px;
+      border-style: solid;
+      color: @gray-base;
+      border-color: @brand-primary;
+    }
+  }
+
+  > li:hover {
+    a {
+      color: @gray-base;
+      border-color: @link-color;
+    }
+  }
+}
+
+.tab-content {
+  position: relative;
+  padding-top: (@grid-gutter-width * 0.5);
+}
+
+.tooltip .tooltip-inner {
+  word-wrap: break-word;
+}
+
+.btn-link:hover {
+  color: @link-hover-color;
+}
+
+.glyphicon-fire {
+  color: @brand-danger;
+}
+
+.form-actions {
+  text-align: right;
+}
+
+/* ---------------------------------------------------------------- */
+
+// Give the tabs something to sit on
+.nav-tabs {
+  margin-top: 5px;
+
+  > li {
+    text-align: center;
+    border: none;
+
+    &:first-of-type {
+      > a {
+        margin-left: 0;
+      }
+    }
+
+    > a {
+      border: none;
+      background: none;
+      overflow: hidden;
+      margin: 0 2px;
+      display: block;
+      position: relative;
+      padding-bottom: 4px;
+      border-bottom: 3px solid transparent;
+      transition: border-bottom 0.218s ease;
+      color: @navbar-default-link-color;
+
+      &:hover,
+      &:focus {
+        background: none;
+        border-bottom: 3px solid @link-hover-color;
+        color: @navbar-default-link-hover-color;
+      }
+    }
+
+    &:hover,
+    &:focus {
+      border: none;
+      background: none;
+    }
+
+    &.active {
+      border: none;
+
+      > a {
+        &,
+        &:hover,
+        &:focus {
+          color: @gray-base;
+          background: none;
+          border: none;
+          cursor: default;
+          border-bottom: 3px solid @brand-primary;
+        }
+      }
+    }
+  }
+
+  > .active > a,
+  > .active > a:hover,
+  > .active > a:focus {
+    border-top: none;
+    border-left: none;
+    border-right: none;
+  }
+
+  @media (min-width: @screen-sm-min) {
+    > li > a {
+      border-top: none;
+      border-left: none;
+      border-right: none;
+    }
+  }
+}
+
+/* ---------------------------------------------------------------- */
+
+[cam-widget-search] .main-field,
+[cam-widget-search] [cam-widget-search-pill] {
+  max-width: 100%;
+}
+
+/* ---------------------------------------------------------------- */
+
+.modal-dialog {
+  .camunda-ee-license-missing {
+    position: relative;
+    top: 0;
+    left: 0;
+    margin: 0;
+
+    > div {
+      width: 100%;
+    }
+  }
+}
+
+.camunda-ee-license-missing {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -50px;
+  margin-left: -200px;
+
+  .alert {
+    margin: 0;
+  }
+
+  > div {
+    width: 400px;
+  }
+
+  .stats-section view > & {
+    position: relative;
+    top: 0;
+    left: 0;
+    margin: auto;
+
+    > div {
+      width: auto;
+    }
+  }
+}
+
+.fjs-powered-by {
+  display: none;
+}
+
+@import 'shared/animation-spin.less';
+@import './modal.less';
+@import 'directives/notifications-panel.less';
+@import 'directives/pagination.less';
+@import '../../lib/auth/page/login.less';
+@import 'clipboard/cam-widget-clipboard.less';
+@import 'header/cam-widget-header.less';
+@import 'footer/cam-widget-footer.less';
+@import './glyphicon-overrides.less';
+@import (less) '@bpmn-io/form-js/dist/assets/form-js.css';

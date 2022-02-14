@@ -49,13 +49,8 @@ public class OptimizeApiPageSizeTest {
 
     // given the generated engine data
     // make sure that there are at least two pages of each entity available
-    EngineDataGenerator generator = new EngineDataGenerator(processEngineRule.getProcessEngine(), OPTIMIZE_PAGE_SIZE * 2);
+    EngineDataGenerator generator = new EngineDataGenerator(processEngineRule.getProcessEngine(), OPTIMIZE_PAGE_SIZE * 2, OptimizeApiPageSizeTest.class.getSimpleName());
     generator.generateData();
-  }
-
-  @AfterClass
-  public static void tearDown() {
-    TestHelper.assertAndEnsureCleanDbAndCache(processEngineRule.getProcessEngine(), false);
   }
 
   @Test
@@ -103,7 +98,7 @@ public class OptimizeApiPageSizeTest {
         "historic user operation logs"
       ),
       new TestScenario(
-        (pageSize) -> optimizeService.getHistoricVariableUpdates(null, null, pageSize),
+        (pageSize) -> optimizeService.getHistoricVariableUpdates(null, null, true, pageSize),
         "historic variable updates"
       ),
       new TestScenario(

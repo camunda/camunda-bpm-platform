@@ -43,7 +43,7 @@ import org.camunda.bpm.engine.task.Task;
 /**
  * Process Application exposing this application's resources the process engine.
  */
-@ProcessApplication
+@ProcessApplication(name = "InvoiceProcessApplication")
 public class InvoiceProcessApplication extends ServletProcessApplication {
 
   private static final Logger LOGGER = Logger.getLogger(InvoiceProcessApplication.class.getName());
@@ -71,7 +71,10 @@ public class InvoiceProcessApplication extends ServletProcessApplication {
   @Override
   public void createDeployment(String processArchiveName, DeploymentBuilder deploymentBuilder) {
     ProcessEngine processEngine = BpmPlatform.getProcessEngineService().getProcessEngine("default");
+    createDeployment(processArchiveName, processEngine, getProcessApplicationClassloader());
+  }
 
+  public void createDeployment(String processArchiveName, ProcessEngine processEngine, ClassLoader classLoader) {
     // Hack: deploy the first version of the invoice process once before the process application
     //   is deployed the first time
     if (processEngine != null) {
@@ -79,8 +82,6 @@ public class InvoiceProcessApplication extends ServletProcessApplication {
       RepositoryService repositoryService = processEngine.getRepositoryService();
 
       if (!isProcessDeployed(repositoryService, "invoice")) {
-        ClassLoader classLoader = getProcessApplicationClassloader();
-
         repositoryService.createDeployment(this.getReference())
           .addInputStream("invoice.v1.bpmn", classLoader.getResourceAsStream("invoice.v1.bpmn"))
           .addInputStream("invoiceBusinessDecisions.dmn", classLoader.getResourceAsStream("invoiceBusinessDecisions.dmn"))

@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -99,3 +100,4 @@
                 The default value is `false`, which means the variables will not be returned."/>
 
 </@lib.dto>
+</#macro>

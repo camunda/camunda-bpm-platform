@@ -1,0 +1,3 @@
+camunda.bpm:
+  generic-properties.properties:
+    telemetry-reporter-activate: false 

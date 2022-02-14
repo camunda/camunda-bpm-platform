@@ -70,12 +70,12 @@
               
     <Resource name="global/camunda-bpm-platform/process-engine/ProcessEngineService!org.camunda.bpm.ProcessEngineService" auth="Container"
               type="org.camunda.bpm.ProcessEngineService"
-              description="camunda BPM platform Process Engine Service"
+              description="Camunda Platform Process Engine Service"
               factory="org.camunda.bpm.container.impl.jndi.ProcessEngineServiceObjectFactory" />
               
     <Resource name="global/camunda-bpm-platform/process-engine/ProcessApplicationService!org.camunda.bpm.ProcessApplicationService" auth="Container"
               type="org.camunda.bpm.ProcessApplicationService"
-              description="camunda BPM platform Process Application Service"
+              description="Camunda Platform Process Application Service"
               factory="org.camunda.bpm.container.impl.jndi.ProcessApplicationServiceObjectFactory" />              
               
   </GlobalNamingResources>

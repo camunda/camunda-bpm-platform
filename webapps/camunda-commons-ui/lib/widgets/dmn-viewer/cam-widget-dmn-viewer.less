@@ -1,0 +1,138 @@
+@import (less) "dmn-js/dist/assets/dmn-js-drd.css";
+@import (less) "dmn-js/dist/assets/dmn-js-shared.css";
+@import (less) "dmn-js/dist/assets/dmn-js-decision-table.css";
+@import (less) "dmn-js/dist/assets/dmn-js-decision-table-controls.css";
+@import (less) "dmn-js/dist/assets/dmn-js-literal-expression.css";
+@import (less) "dmn-js/dist/assets/dmn-font/css/dmn.css";
+
+@font-face {
+  font-family: 'dmn';
+  src: url('@{font-path}dmn.eot?48901938');
+  src: url('@{font-path}dmn.eot?48901938#iefix') format('embedded-opentype'), url('@{font-path}dmn.woff2?48901938') format('woff2'), url('@{font-path}dmn.woff?48901938') format('woff'), url('@{font-path}dmn.ttf?48901938') format('truetype'), url('@{font-path}dmn.svg?48901938#dmn') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+[cam-widget-dmn-viewer] {
+  &[edit-mode="true"] {
+    @import (less) "diagram-js/assets/diagram-js.css";
+  }
+
+  th {
+    text-align: center;
+  }
+
+  .highlight > td {
+    background: #e0f2fb;
+    background-clip: padding-box;
+  }
+
+  .powered-by-logo {
+    display: none;
+  }
+
+  .grab-cursor {
+    cursor: move;
+    cursor: -webkit-grab;
+    cursor: grab;
+  }
+
+  .cursor-move {
+    cursor: move;
+    cursor: -webkit-grabbing;
+    cursor: grabbing;
+  }
+
+  .table-holder {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+
+  .dmn-js-parent {
+    height: 100%;
+  }
+
+  .dmn-definitions {
+    display: none;
+  }
+
+  .dmn-js-powered-by,
+  .bjs-powered-by {
+    display: none !important;
+  }
+
+  .highlight .djs-outline {
+    stroke-width: 2px !important;
+    stroke: @bpmn-highlight-border-color !important;
+    fill: fade(@bpmn-highlight-bg, 40%) !important;
+  }
+
+  .highlight .djs-visual > :nth-child(1) {
+    fill: @bpmn-highlight-bg !important;
+  }
+
+  .dmn-decision-table-container td:not(:first-child) {
+    word-break: break-all;
+  }
+
+  .dmn-input,
+  .dmn-input-object,
+  .dmn-output,
+  .dmn-output-object {
+    font-weight: 700;
+  }
+
+  .navigation {
+    position: absolute;
+    right: (@grid-gutter-width / 2);
+    width: @grid-gutter-width;
+    min-height: @grid-gutter-width;
+
+    button {
+      font-size: 20px;
+      text-align: center;
+      position: absolute;
+      width: @grid-gutter-width;
+      height: @grid-gutter-width;
+      color: @gray;
+      padding: 0;
+      bottom: 0;
+
+      > span {
+        text-align: center;
+      }
+    }
+
+    &.reset {
+      bottom: @grid-gutter-width * 3;
+
+      span {
+        top: 3px;
+      }
+    }
+
+    &.zoom {
+      bottom: (@grid-gutter-width / 2);
+      height: (@grid-gutter-width * 2);
+
+      button.in {
+        bottom: (@grid-gutter-width * 1);
+        border-bottom: 0;
+
+        > span {
+          top: 2px;
+          left: 1px;
+        }
+      }
+
+      button.out {
+        bottom: 0;
+
+        > span {
+          top: 3px;
+        }
+      }
+    }
+  }
+}

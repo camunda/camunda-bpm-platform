@@ -427,14 +427,14 @@ public class TenantCommandChecker implements CommandChecker {
       );
     }
   }
-  
+
   @Override
   public void checkDeleteHistoricVariableInstance(HistoricVariableInstanceEntity variable) {
     if (variable != null && !getTenantManager().isAuthenticatedTenant(variable.getTenantId())) {
       throw LOG.exceptionCommandWithUnauthorizedTenant("delete the historic variable instance '" + variable.getId() + "'");
     }
   }
-  
+
   @Override
   public void checkDeleteHistoricVariableInstancesByProcessInstance(HistoricProcessInstanceEntity instance) {
     if (instance != null && !getTenantManager().isAuthenticatedTenant(instance.getTenantId())) {
@@ -488,14 +488,102 @@ public class TenantCommandChecker implements CommandChecker {
   public void checkUpdateUserOperationLog(UserOperationLogEntry entry) {
     // tenant check is not available for user operation log
   }
-  
+
   @Override
   public void checkReadHistoricExternalTaskLog(HistoricExternalTaskLogEntity historicExternalTaskLog) {
     if (historicExternalTaskLog != null && !getTenantManager().isAuthenticatedTenant(historicExternalTaskLog.getTenantId())) {
       throw LOG.exceptionCommandWithUnauthorizedTenant("get the historic external task log '"+ historicExternalTaskLog.getId() + "'");
     }
   }
-  
+
+  @Override
+  public void checkReadTelemetryData() {
+  }
+
+  @Override
+  public void checkConfigureTelemetry() {
+  }
+
+  @Override
+  public void checkReadTelemetryCollectionStatusData() {
+  }
+
+  @Override
+  public void checkReadHistoryLevel() {
+  }
+
+  @Override
+  public void checkReadTableCount() {
+  }
+
+  @Override
+  public void checkReadTableName() {
+  }
+
+  @Override
+  public void checkReadTableMetaData() {
+  }
+
+  @Override
+  public void checkReadProperties() {
+  }
+
+  @Override
+  public void checkSetProperty() {
+  }
+
+  @Override
+  public void checkDeleteProperty() {
+  }
+
+  @Override
+  public void checkDeleteLicenseKey() {
+  }
+
+  @Override
+  public void checkSetLicenseKey() {
+  }
+
+  @Override
+  public void checkReadLicenseKey() {
+  }
+
+  @Override
+  public void checkRegisterProcessApplication() {
+  }
+
+  @Override
+  public void checkUnregisterProcessApplication() {
+  }
+
+  @Override
+  public void checkReadRegisteredDeployments() {
+  }
+
+  @Override
+  public void checkReadProcessApplicationForDeployment() {
+  }
+
+  @Override
+  public void checkRegisterDeployment() {
+  }
+
+  @Override
+  public void checkUnregisterDeployment() {
+  }
+
+  @Override
+  public void checkDeleteMetrics() {
+  }
+
+  @Override
+  public void checkDeleteTaskMetrics() {
+  }
+
+  @Override
+  public void checkReadSchemaLog() {
+  }
+
   // helper //////////////////////////////////////////////////
 
   protected TenantManager getTenantManager() {
@@ -517,4 +605,5 @@ public class TenantCommandChecker implements CommandChecker {
   protected DeploymentEntity findDeploymentById(String deploymentId) {
     return Context.getCommandContext().getDeploymentManager().findDeploymentById(deploymentId);
   }
+
 }

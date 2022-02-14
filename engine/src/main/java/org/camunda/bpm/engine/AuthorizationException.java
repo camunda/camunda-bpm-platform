@@ -53,7 +53,7 @@ public class AuthorizationException extends ProcessEngineException {
   public AuthorizationException(String message) {
     super(message);
     this.userId = null;
-    missingAuthorizations = new ArrayList<MissingAuthorization>();
+    missingAuthorizations = new ArrayList<>();
   }
 
   public AuthorizationException(String userId, String permissionName, String resourceType, String resourceId) {
@@ -65,7 +65,7 @@ public class AuthorizationException extends ProcessEngineException {
         "The user with id '"+userId+
         "' does not have "+generateMissingAuthorizationMessage(exceptionInfo)+".");
     this.userId = userId;
-    missingAuthorizations = new ArrayList<MissingAuthorization>();
+    missingAuthorizations = new ArrayList<>();
     missingAuthorizations.add(exceptionInfo);
 
     this.resourceType = exceptionInfo.getResourceType();
@@ -153,6 +153,18 @@ public class AuthorizationException extends ProcessEngineException {
     sBuilder.append("The user with id '");
     sBuilder.append(userId);
     sBuilder.append("' does not have one of the following permissions: ");
+    sBuilder.append(generateMissingAuthorizationsList(missingAuthorizations));
+
+    return sBuilder.toString();
+  }
+
+  /**
+   * Generate a String containing a list of missing authorizations.
+   *
+   * @param missingAuthorizations
+   */
+  public static String generateMissingAuthorizationsList(List<MissingAuthorization> missingAuthorizations) {
+    StringBuilder sBuilder = new StringBuilder();
     boolean first = true;
     for(MissingAuthorization missingAuthorization: missingAuthorizations) {
       if (!first) {

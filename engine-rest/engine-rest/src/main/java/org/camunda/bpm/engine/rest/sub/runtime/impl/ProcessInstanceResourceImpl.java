@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.rest.dto.SuspensionStateDto;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ActivityInstanceDto;
@@ -67,15 +68,13 @@ public class ProcessInstanceResourceImpl implements ProcessInstanceResource {
   public void deleteProcessInstance(boolean skipCustomListeners, boolean skipIoMappings, boolean skipSubprocesses, boolean failIfNotExists) {
     RuntimeService runtimeService = engine.getRuntimeService();
     try {
-      if(failIfNotExists) {
-        runtimeService.deleteProcessInstance(processInstanceId, null, skipCustomListeners, true, skipIoMappings, skipSubprocesses);        
+      if (failIfNotExists) {
+        runtimeService.deleteProcessInstance(processInstanceId, null, skipCustomListeners, true, skipIoMappings, skipSubprocesses);
       } else {
-        runtimeService.deleteProcessInstanceIfExists(processInstanceId, null, skipCustomListeners, true, skipIoMappings, skipSubprocesses);        
+        runtimeService.deleteProcessInstanceIfExists(processInstanceId, null, skipCustomListeners, true, skipIoMappings, skipSubprocesses);
       }
-    } catch (AuthorizationException e) {
-      throw e;
-    } catch (ProcessEngineException e) {
-      throw new InvalidRequestException(Status.NOT_FOUND, e, "Process instance with id " + processInstanceId + " does not exist");
+    } catch (NotFoundException e) {
+      throw new InvalidRequestException(Status.NOT_FOUND, e, e.getMessage());
     }
 
   }

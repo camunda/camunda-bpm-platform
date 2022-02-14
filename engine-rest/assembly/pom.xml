@@ -1,14 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>camunda-engine-rest</artifactId>
-  <name>camunda BPM - engine - REST - Assembly</name>
+  <name>Camunda Platform - engine - REST - Assembly</name>
   <packaging>war</packaging>
 
   <parent>
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-engine-rest-root</artifactId>
     <relativePath>../</relativePath>
-    <version>7.14.0-SNAPSHOT</version>
+    <version>7.17.0-SNAPSHOT</version>
   </parent>
   
   <properties>
@@ -64,6 +64,12 @@
       <version>${version.jersey2}</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.inject</groupId>
+      <artifactId>jersey-hk2</artifactId>
+      <version>${version.jersey2}</version>
+      <scope>provided</scope>
+    </dependency>
 
   </dependencies>
 
@@ -74,30 +80,6 @@
         <artifactId>maven-assembly-plugin</artifactId>
         <executions>
           <execution>
-            <id>jbossas7</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-            <configuration>
-              <archive>
-                <manifestEntries>
-                  <!-- module dependencies for deployment on jboss AS 7  -->
-                  <Dependencies>org.camunda.bpm.camunda-engine,org.camunda.bpm.dmn.camunda-engine-dmn,org.camunda.commons.camunda-commons-logging</Dependencies>
-                </manifestEntries>
-              </archive>
-              <descriptors>
-                <descriptor>assembly-war-jbossas7.xml</descriptor>
-              </descriptors>
-              <finalName>camunda-engine-rest-${project.version}</finalName>
-              <attach>true</attach>
-              <classifier>jbossas7</classifier>
-              <outputDirectory>target/</outputDirectory>
-              <workDirectory>target/assembly/work</workDirectory>
-            </configuration>
-          </execution>
-
-          <execution>
             <id>wildfly</id>
             <phase>package</phase>
             <goals>
@@ -107,7 +89,7 @@
               <archive>
                 <manifestEntries>
                   <!-- module dependencies for deployment on wildfly  -->
-                  <Dependencies>org.camunda.bpm.camunda-engine,org.camunda.bpm.dmn.camunda-engine-dmn,org.camunda.commons.camunda-commons-logging</Dependencies>
+                  <Dependencies>org.camunda.bpm.camunda-engine,org.camunda.bpm.dmn.camunda-engine-dmn,org.camunda.commons.camunda-commons-logging,org.camunda.spin.camunda-spin-core,org.graalvm.js.js-scriptengine services</Dependencies>
                 </manifestEntries>
               </archive>
               <descriptors>

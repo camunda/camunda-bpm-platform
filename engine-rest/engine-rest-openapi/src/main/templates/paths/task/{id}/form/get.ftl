@@ -1,8 +1,10 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
       id = "getForm"
       tag = "Task"
+      summary = "Get Form Key"
       desc = "Retrieves the form key for a task. The form key corresponds to the `FormData#formKey`
               property in the engine. This key can be used to do task-specific form rendering in
               client applications. Additionally, the context path of the containing process
@@ -45,3 +47,5 @@
 
   }
 }
+
+</#macro>

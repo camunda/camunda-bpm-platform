@@ -1,0 +1,105 @@
+<!-- # CE - camunda-bpm-webapp/ui/admin/client/scripts/pages/create-group-membership.html -->
+<div class="modal-header">
+  <h3>{{ 'GROUP_MEMBERSHIP_GROUP_SELECT_GROUPS' | translate }}</h3>
+</div>
+
+<div class="create-group-membership modal-body">
+  <div notifications-panel></div>
+
+  <table class="cam-table group"
+         ng-hide="status !== 'beforeCreate' || availableGroups.length == 0">
+    <thead cam-sortable-table-header
+           default-sort-by="id"
+           default-sort-order="asc"
+           sorting-id="admin-sorting-users-edit-groups"
+           on-sort-change="onSortingChanged(sorting)"
+           on-sort-initialized="onSortingChanged(sorting)">
+      <tr>
+        <th class="select"></th>
+        <th class="group-id"
+            cam-sortable-table-column
+            sort-by-property="id">{{ 'GROUP_MEMBERSHIP_GROUP_GROUP_ID' | translate }}</th>
+        <th class="group-name"
+            cam-sortable-table-column
+            sort-by-property="name">{{ 'GROUP_MEMBERSHIP_GROUP_GROUP_NAME' | translate }}</th>
+        <th class="group-type"
+            cam-sortable-table-column
+            sort-by-property="type">{{ 'GROUP_MEMBERSHIP_GROUP_GROUP_TYPE' | translate }}</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr ng-repeat="group in availableGroups">
+        <td class="row-select">
+          <input type="checkbox"
+                 ng-model="group.checked"
+                 ng-change="selectGroup(group)" />
+        </td>
+
+        <td class="group-id">
+          <a href="#/groups/{{group.id | escape}}">{{group.id}}</a>
+        </td>
+
+        <td class="group-name">
+          {{group.name}}
+        </td>
+
+        <td class="group-type">
+          {{group.type}}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p ng-show="availableGroups.length == 0 && pages.total <= 1">
+  	{{ 'GROUP_MEMBERSHIP_GROUP_MESSAGE_AVAILABLE_GROUPS' | translate }} <a href="#/group-create" ng-click="close">{{ 'GROUP_MEMBERSHIP_GROUP_MESSAGE_HERE' | translate }}</a>.
+  </p>
+  <p ng-show="availableGroups.length == 0 && pages.total > 1">
+  	{{ 'GROUP_MEMBERSHIP_GROUP_MESSAGE_AVAILABLE_GROUPS_PAGE' | translate }}</a>.
+  </p>
+
+
+  <ul uib-pagination
+      ng-if="pages.total > pages.size && status === 'beforeCreate'"
+      class="pagination-sm"
+
+      page="pages.current"
+      ng-model="pages.current"
+      ng-change="onPaginationChange()"
+
+      total-items="pages.total"
+      items-per-page="pages.size"
+
+      max-size="7"
+      boundary-links="true"></ul>
+
+
+  <p ng-show="status === 'SUCCESS'">
+    {{ 'GROUP_MEMBERSHIP_GROUP_MESSAGE_SUCCESS' | translate }}
+  </p>
+
+
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-default"
+          ng-click="close()"
+          ng-disabled="status === 'performCreate'"
+          ng-hide="status === 'SUCCESS' || status === 'FAILED' || status === 'loadingFailed'">
+    {{ 'GROUP_MEMBERSHIP_GROUP_CLOSE' | translate }}
+  </button>
+
+  <button class="btn btn-primary"
+          ng-click="close(status)"
+          ng-show="status === 'SUCCESS' || status === 'FAILED' || status === 'loadingFailed'">
+    {{ 'GROUP_MEMBERSHIP_GROUP_OK' | translate }}
+  </button>
+
+  <button class="btn btn-primary"
+          ng-click="createGroupMemberships()"
+          ng-disabled="status !== 'beforeCreate'"
+          ng-hide="status === 'SUCCESS' || status === 'FAILED' || status === 'loadingFailed' || availableGroups.length == 0">
+    {{ 'GROUP_MEMBERSHIP_GROUP_ADD_GROUPS' | translate }}
+  </button>
+</div>
+<!-- / CE - camunda-bpm-webapp/ui/admin/client/scripts/pages/create-group-membership.html -->

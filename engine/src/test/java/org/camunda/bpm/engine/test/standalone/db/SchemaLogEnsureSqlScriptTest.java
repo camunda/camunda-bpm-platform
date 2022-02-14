@@ -16,14 +16,13 @@
  */
 package org.camunda.bpm.engine.test.standalone.db;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.isOneOf;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.management.SchemaLogEntry;
+import org.camunda.bpm.engine.test.util.TestconfigProperties;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -49,23 +48,29 @@ public class SchemaLogEnsureSqlScriptTest extends SchemaLogTestCase {
 
   @Test
   public void ensureUpgradeScriptsUpdateSchemaLogVersion() {
-    List<String> scriptsForDB = new ArrayList<String>();
+    List<String> scriptsForDB = new ArrayList<>();
     for (String file : folderContents.get(UPGRADE_SCRIPT_FOLDER)) {
       if (file.startsWith(dataBaseType)) {
         scriptsForDB.add(file);
       }
     }
-    assertThat(getLatestTargetVersion(scriptsForDB), is(currentSchemaVersion));
+
+    if (!scriptsForDB.isEmpty()) {
+      assertThat(getLatestTargetVersion(scriptsForDB)).isEqualTo(currentSchemaVersion);
+    } else {
+      // databases that are newly added have no update scripts yet
+      assertThat(getCurrentMinorVersion()).isEqualTo(currentSchemaVersion);
+    }
   }
 
   @Test
   public void ensureOnlyScriptsForValidDatabaseTypes() {
     for (String file : folderContents.get(UPGRADE_SCRIPT_FOLDER)) {
-      assertThat(file.split("_")[0], isOneOf(DATABASES));
+      assertThat(file.split("_")[0]).isIn((Object[]) DATABASES);
     }
   }
 
-  private String getTargetVersionForScript(String file) {
+  protected String getTargetVersionForScript(String file) {
     String targetVersion = file.substring(file.indexOf("to_") + 3).replace(".sql", "");
     if(isMinorLevel(targetVersion)) {
       targetVersion += ".0";
@@ -73,7 +78,7 @@ public class SchemaLogEnsureSqlScriptTest extends SchemaLogTestCase {
     return targetVersion;
   }
 
-  private String getLatestTargetVersion(List<String> scriptFiles) {
+  protected String getLatestTargetVersion(List<String> scriptFiles) {
     String latestVersion = null;
     for (String file : scriptFiles) {
       if(latestVersion == null) {
@@ -88,7 +93,7 @@ public class SchemaLogEnsureSqlScriptTest extends SchemaLogTestCase {
     return latestVersion;
   }
 
-  private boolean isLaterVersionThan(String v1, String v2) {
+  protected boolean isLaterVersionThan(String v1, String v2) {
     String[] v1_ = v1.split("\\.|_");
     String[] v2_ = v2.split("\\.|_");
 
@@ -101,5 +106,14 @@ public class SchemaLogEnsureSqlScriptTest extends SchemaLogTestCase {
       }
     }
     return false;
+  }
+
+  protected String getCurrentMinorVersion() {
+    String version = TestconfigProperties.getEngineVersion();
+    // remove the patch version, and create a "clean" minor version
+    int lastPos = version.lastIndexOf(".");
+    version = version.substring(0, lastPos);
+
+    return version + ".0";
   }
 }

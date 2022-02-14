@@ -55,6 +55,7 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.telemetry.TelemetryData;
 
 
 
@@ -985,7 +986,7 @@ public interface ManagementService {
   void setJobDuedate(String jobId, Date newDuedate);
 
   /**
-   * Sets a new due date for the provided id. The offset between 
+   * Sets a new due date for the provided id. The offset between
    * the old and the new due date can be cascaded to all follow-up
    * jobs. Cascading only works with timer jobs.
    * When newDuedate is null, the job is executed with the next
@@ -1002,12 +1003,12 @@ public interface ManagementService {
   void setJobDuedate(String jobId, Date newDuedate, boolean cascade);
   /**
    * Triggers the recalculation for the job with the provided id.
-   * 
+   *
    * @param jobId id of job to recalculate, must neither be null nor empty.
    * @param creationDateBased
    *          indicates whether the recalculation should be based on the
    *          creation date of the job or the current date
-   * 
+   *
    * @throws AuthorizationException
    *           If the user has no {@link Permissions#UPDATE} permission on
    *           {@link Resources#PROCESS_INSTANCE} or no
@@ -1162,7 +1163,7 @@ public interface ManagementService {
    *          If the user is not a member of the group {@link Groups#CAMUNDA_ADMIN}.
    */
   String getLicenseKey();
-  
+
   /**
    * Deletes the stored license key. If no license key is set, the request is ignored.
    *
@@ -1247,6 +1248,9 @@ public interface ManagementService {
    * Deletes all metrics events which are older than the specified timestamp.
    * If the timestamp is null, all metrics will be deleted
    *
+   * @throws AuthorizationException
+   *          If the user is not a member of the group {@link Groups#CAMUNDA_ADMIN}.
+   *
    * @param timestamp or null
    * @since 7.3
    */
@@ -1256,6 +1260,9 @@ public interface ManagementService {
    * Deletes all metrics events which are older than the specified timestamp
    * and reported by the given reporter. If a parameter is null, all metric events
    * are matched in that regard.
+   *
+   * @throws AuthorizationException
+   *          If the user is not a member of the group {@link Groups#CAMUNDA_ADMIN}.
    *
    * @param timestamp or null
    * @param reporter or null
@@ -1270,6 +1277,26 @@ public interface ManagementService {
    * reporter is deactivated
    */
   void reportDbMetricsNow();
+
+  /**
+   * Calculates the number of unique task workers based on user task assignees.
+   *
+   * @param startTime restrict to data collected after the given date (inclusive), can be <code>null</code>
+   * @param endTime restrict to data collected before the given date (exclusive), can be <code>null</code>
+   * @return the aggregated number of unique task workers (may be restricted to a certain interval)
+   */
+  long getUniqueTaskWorkerCount(Date startTime, Date endTime);
+
+  /**
+   * Deletes all task metrics which are older than the specified timestamp.
+   * If the timestamp is null, all metrics will be deleted
+   *
+   * @throws AuthorizationException
+   *          If the user is not a member of the group {@link Groups#CAMUNDA_ADMIN}.
+   *
+   * @param timestamp or <code>null</code>
+   */
+  void deleteTaskMetrics(Date timestamp);
 
   /**
    * Creates a query to search for {@link org.camunda.bpm.engine.batch.Batch} instances.
@@ -1338,21 +1365,43 @@ public interface ManagementService {
 
   /**
    * Query for entries of the database schema log.
-   * 
+   *
    * @since 7.11
    */
   SchemaLogQuery createSchemaLogQuery();
 
   /**
    * Enable/disable sending telemetry data to Camunda
-   * 
+   *
    * @throws AuthorizationException
    *          If the user is not a member of the group {@link Groups#CAMUNDA_ADMIN}.
    */
   void toggleTelemetry(boolean enabled);
 
   /**
-   * Checks if sending telemetry data to Camunda is enabled/disabled
+   * Checks how sending telemetry data to Camunda is configured
+   * @return
+   *   <ul>
+   *     <li><code>null</code> if the configuration is not defined so far,
+   *     treated as <code>false</code> and no data is sent,</li>
+   *     <li><code>true</code> if the telemetry sending is enabled, and</li>
+   *     <li><code>false</code> if the telemetry is disabled explicitly.</li>
+   *   </ul>
    */
-  boolean isTelemetryEnabled();
+  Boolean isTelemetryEnabled();
+
+  /**
+   * This method returns the current state of the collected telemetry data. For a
+   * detailed explanation on what is included, read the
+   * <a href="https://docs.camunda.org/manual/latest/introduction/telemetry/#collected-data">Telemetry</a>
+   * page in the Camunda docs.
+   *
+   * The engine collects information about multiple aspects of the installation.
+   * If telemetry is enabled this information is sent to Camunda. If telemetry
+   * is disabled, the engine still collects this information.
+   *
+   * @see <a href="https://docs.camunda.org/manual/latest/introduction/telemetry/#collected-data">Camunda Documentation: Telemetry</a>
+   */
+  TelemetryData getTelemetryData();
+
 }

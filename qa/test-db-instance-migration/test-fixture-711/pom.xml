@@ -4,12 +4,12 @@
   <parent>
     <groupId>org.camunda.bpm.qa.upgrade</groupId>
     <artifactId>camunda-qa-db-instance-migration</artifactId>
-    <version>7.14.0-SNAPSHOT</version>
+    <version>7.17.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-qa-upgrade-test-fixture-711</artifactId>
   <packaging>jar</packaging>
-  <name>camunda BPM - QA - upgrade - instance migration - test fixture - 7.11.0</name>
+  <name>Camunda Platform - QA - upgrade - instance migration - test fixture - 7.11.0</name>
 
   <properties>
     <camunda.version.previous>7.10.0</camunda.version.previous>
@@ -166,6 +166,9 @@
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>sql-maven-plugin</artifactId>
+            <configuration>
+              <skip>${skip-test-fixture}</skip>
+            </configuration>
             <executions>
               <execution>
                 <id>patch-previous-schema</id>
@@ -223,6 +226,7 @@
               <includeProjectDependencies>true</includeProjectDependencies>
               <includePluginDependencies>false</includePluginDependencies>
               <classpathScope>test</classpathScope>
+              <skip>${skip-test-fixture}</skip>
             </configuration>
             <executions>
               <execution>
@@ -239,6 +243,12 @@
           </plugin>
         </plugins>
       </build>
+    </profile>
+    <profile>
+      <id>cockroachdb</id>
+      <properties>
+        <skip-test-fixture>true</skip-test-fixture>
+      </properties>
     </profile>
   </profiles>
 

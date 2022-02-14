@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.history.useroperationlog;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_FULL;
 
 import java.util.Date;
@@ -37,7 +38,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 @RequiredHistoryLevel(HISTORY_FULL)
@@ -52,9 +52,6 @@ public class UserOperationLogAnnotationTest {
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule engineTestRule = new ProcessEngineTestRule(engineRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(engineTestRule);
@@ -310,24 +307,21 @@ public class UserOperationLogAnnotationTest {
   public void shouldThrowExceptionWhenOperationIdNull() {
     // given
 
-    // then
-    thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("operation id is null");
-
-    // when
-    historyService.setAnnotationForOperationLogById(null, ANNOTATION);
+    // when/then
+    assertThatThrownBy(() -> historyService.setAnnotationForOperationLogById(null, ANNOTATION))
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("operation id is null");
   }
 
   @Test
   public void shouldThrowExceptionWhenOperationsEmpty() {
     // given
 
-    // then
-    thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("operations is empty");
+    // when/then
+    assertThatThrownBy(() -> historyService.setAnnotationForOperationLogById("anOperationId", ANNOTATION))
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("operations is empty");
 
-    // when
-    historyService.setAnnotationForOperationLogById("anOperationId", ANNOTATION);
   }
 
   // helper ////////////////////////////////////////////////////////////////////////////////////////////////////////////

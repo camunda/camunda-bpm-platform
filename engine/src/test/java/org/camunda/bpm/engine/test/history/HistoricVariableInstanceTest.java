@@ -17,12 +17,10 @@
 package org.camunda.bpm.engine.test.history;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -298,7 +296,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
   })
   @Test
   public void testHistoricProcessVariableOnDeletion() {
-    HashMap<String, Object> variables = new HashMap<String,  Object>();
+    HashMap<String, Object> variables = new HashMap<>();
     variables.put("testVar", "Hallo Christian");
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
     runtimeService.deleteProcessInstance(processInstance.getId(), "deleted");
@@ -316,7 +314,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
       ProcessInstance pi = runtimeService.startProcessInstanceByKey("ProcessWithSubProcess");
 
       Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
-      Map<String, Object> variables = new HashMap<String, Object>();
+      Map<String, Object> variables = new HashMap<>();
       variables.put("test", "1");
       taskService.complete(task.getId(), variables);
 
@@ -333,7 +331,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
       List<HistoricDetail> updates = historyService.createHistoricDetailQuery().variableUpdates().list();
       assertEquals(2, updates.size());
 
-      Map<String, HistoricVariableUpdate> updatesMap = new HashMap<String, HistoricVariableUpdate>();
+      Map<String, HistoricVariableUpdate> updatesMap = new HashMap<>();
       HistoricVariableUpdate update = (HistoricVariableUpdate) updates.get(0);
       updatesMap.put((String) update.getValue(), update);
       update = (HistoricVariableUpdate) updates.get(1);
@@ -371,13 +369,13 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
   @Test
   public void testHistoricProcessInstanceDeleteCascadesCorrectly() {
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("var1", "value1");
     variables.put("var2", "value2");
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("myProcess", variables);
     assertNotNull(processInstance);
 
-    variables = new HashMap<String, Object>();
+    variables = new HashMap<>();
     variables.put("var3", "value3");
     variables.put("var4", "value4");
     ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("myProcess", variables);
@@ -431,7 +429,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
   @Test
   public void testHistoricVariableInstanceQueryByProcessIdIn() {
     // given
-    Map<String, Object> vars = new HashMap<String, Object>();
+    Map<String, Object> vars = new HashMap<>();
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("myProc",vars);
     ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("myProc",vars);
 
@@ -448,7 +446,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
   @Test
   public void testHistoricVariableInstanceQueryByInvalidProcessIdIn() {
     // given
-    Map<String, Object> vars = new HashMap<String, Object>();
+    Map<String, Object> vars = new HashMap<>();
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("myProc",vars);
 
     // check existing variables for task ID
@@ -467,7 +465,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
   @Test
   public void testHistoricVariableInstanceQueryByExecutionIds() {
     // given
-    Map<String, Object> variables1 = new HashMap<String, Object>();
+    Map<String, Object> variables1 = new HashMap<>();
     variables1.put("stringVar", "test");
     variables1.put("myVar", "test123");
     ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
@@ -480,7 +478,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
       assertEquals(processInstance1.getId(), variableInstance.getExecutionId());
     }
 
-    Map<String, Object> variables2 = new HashMap<String, Object>();
+    Map<String, Object> variables2 = new HashMap<>();
     variables2.put("myVar", "test123");
     ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess", variables2);
 
@@ -495,7 +493,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
     assertEquals(0, query.count());
 
     try {
-      historyService.createHistoricVariableInstanceQuery().executionIdIn(null);
+      historyService.createHistoricVariableInstanceQuery().executionIdIn((String[])null);
       fail("A ProcessEngineExcpetion was expected.");
     } catch (ProcessEngineException e) {}
 
@@ -511,7 +509,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
     assertEquals(0, query.count());
 
     try {
-      historyService.createHistoricVariableInstanceQuery().taskIdIn(null);
+      historyService.createHistoricVariableInstanceQuery().taskIdIn((String[])null);
       fail("A ProcessEngineExcpetion was expected.");
     } catch (ProcessEngineException e) {}
 
@@ -525,7 +523,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
   @Test
   public void testQueryByActivityInstanceIdIn() {
     // given
-    Map<String, Object> variables1 = new HashMap<String, Object>();
+    Map<String, Object> variables1 = new HashMap<>();
     variables1.put("stringVar", "test");
     variables1.put("myVar", "test123");
     ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
@@ -537,7 +535,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
     assertEquals(2, query.list().size());
     assertEquals(2, query.count());
 
-    Map<String, Object> variables2 = new HashMap<String, Object>();
+    Map<String, Object> variables2 = new HashMap<>();
     variables2.put("myVar", "test123");
     ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess", variables2);
 
@@ -555,7 +553,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
     assertEquals(0, query.count());
 
     try {
-      query.taskIdIn(null);
+      query.taskIdIn((String[])null);
       fail("A ProcessEngineExcpetion was expected.");
     } catch (ProcessEngineException e) {}
 
@@ -569,7 +567,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
   @Test
   public void testQueryByVariableTypeIn() {
     // given
-    Map<String, Object> variables1 = new HashMap<String, Object>();
+    Map<String, Object> variables1 = new HashMap<>();
     variables1.put("stringVar", "test");
     variables1.put("boolVar", true);
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
@@ -587,7 +585,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
   @Test
   public void testQueryByVariableTypeInWithCapitalLetter() {
     // given
-    Map<String, Object> variables1 = new HashMap<String, Object>();
+    Map<String, Object> variables1 = new HashMap<>();
     variables1.put("stringVar", "test");
     variables1.put("boolVar", true);
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
@@ -606,7 +604,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
   @Test
   public void testQueryByVariableTypeInWithSeveralTypes() {
     // given
-    Map<String, Object> variables1 = new HashMap<String, Object>();
+    Map<String, Object> variables1 = new HashMap<>();
     variables1.put("stringVar", "test");
     variables1.put("boolVar", true);
     variables1.put("intVar", 5);
@@ -636,7 +634,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
 
     try {
       // when
-      query.variableTypeIn(null);
+      query.variableTypeIn((String[])null);
       fail("A ProcessEngineException was expected.");
     } catch (ProcessEngineException e) {
       // then fails
@@ -742,7 +740,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
     Task newTask = taskService.newTask();
     taskService.saveTask(newTask);
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("customSerializable", new CustomSerializable());
     variables.put("failingSerializable", new FailingSerializable());
     taskService.setVariables(newTask.getId(), variables);
@@ -781,7 +779,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
     Task newTask = taskService.newTask();
     taskService.saveTask(newTask);
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("customSerializable", new CustomSerializable());
     variables.put("failingSerializable", new FailingSerializable());
     taskService.setVariables(newTask.getId(), variables);
@@ -977,6 +975,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
         .activityId("task")
         .singleResult();
 
+    @SuppressWarnings("unchecked")
     List<String> list = (List<String>) runtimeService.getVariable(instance.getId(), "listVar");
     assertNotNull(list);
     assertEquals(1, list.size());
@@ -991,6 +990,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
     assertEquals(historicServiceTask.getId(), historicVariableInstance.getActivityInstanceId());
   }
 
+  @SuppressWarnings("unchecked")
   @Deployment(resources = "org/camunda/bpm/engine/test/history/HistoricVariableInstanceTest.testImplicitVariableUpdate.bpmn20.xml")
   @Ignore
   @Test
@@ -1063,6 +1063,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
     assertEquals("newValue", typedValue.getValue());
   }
 
+  @SuppressWarnings("serial")
   public static class CustomVar implements Serializable {
     private String value;
 
@@ -1079,6 +1080,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Deployment
   @Test
   public void testNoImplicitUpdateOnHistoricValues() {
@@ -1150,6 +1152,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
 
       HistoricVariableUpdate update1 = (HistoricVariableUpdate) historicDetails.get(0);
 
+      @SuppressWarnings("unchecked")
       List<String> value1 = (List<String>) update1.getValue();
 
       assertNotNull(value1);
@@ -1196,6 +1199,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
 
     HistoricVariableUpdate update1 = (HistoricVariableUpdate) historicDetails.get(0);
 
+    @SuppressWarnings("unchecked")
     List<String> value1 = (List<String>) update1.getValue();
 
     assertNotNull(value1);
@@ -1907,7 +1911,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
     assertEquals(0, query.count());
 
     try {
-      query.caseActivityIdIn(null);
+      query.caseActivityIdIn((String[])null);
       fail("A ProcessEngineExcpetion was expected.");
     } catch (NullValueException e) {}
 
@@ -1950,7 +1954,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
     managementService.executeJob(managementService.createJobQuery().active().singleResult().getId());
 
     //then
-    assertThat(historyService.createHistoricVariableInstanceQuery().count(), is (3L));
+    assertThat(historyService.createHistoricVariableInstanceQuery().count()).isEqualTo(3L);
     repositoryService.deleteDeployment(deployment.getId(),true);
   }
 
@@ -1973,7 +1977,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
     managementService.executeJob(managementService.createJobQuery().active().singleResult().getId());
 
     //then
-    assertThat(historyService.createHistoricVariableInstanceQuery().count(), is (2L));
+    assertThat(historyService.createHistoricVariableInstanceQuery().count()).isEqualTo(2L);
     repositoryService.deleteDeployment(deployment.getId(),true);
   }
 
@@ -1996,7 +2000,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
     managementService.executeJob(managementService.createJobQuery().active().singleResult().getId());
 
     //then
-    assertThat(historyService.createHistoricVariableInstanceQuery().count(), is (2L));
+    assertThat(historyService.createHistoricVariableInstanceQuery().count()).isEqualTo(2L);
     repositoryService.deleteDeployment(deployment.getId(),true);
   }
 
@@ -2018,7 +2022,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/async/AsyncStartEventTest.testAsyncStartEvent.bpmn20.xml")
   @Test
   public void testAsyncStartEventVariableHistory() {
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("foo", "bar");
     String processInstanceId = runtimeService.startProcessInstanceByKey("asyncStartEvent", variables).getId();
 
@@ -2061,7 +2065,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/async/AsyncStartEventTest.testMultipleAsyncStartEvents.bpmn20.xml"})
   @Test
   public void testMultipleAsyncStartEventsVariableHistory() {
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("foo", "bar");
     runtimeService.correlateMessage("newInvoiceMessage", new HashMap<String, Object>(), variables);
 
@@ -2187,7 +2191,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
       .singleResult()
       .getId();
 
-    Map<String, Object> properties = new HashMap<String, Object>();
+    Map<String, Object> properties = new HashMap<>();
     properties.put("foo", "bar");
 
     formService.submitStartForm(processDefinitionId, properties);
@@ -2255,7 +2259,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
       .singleResult()
       .getId();
 
-    Map<String, Object> properties = new HashMap<String, Object>();
+    Map<String, Object> properties = new HashMap<>();
     properties.put("foo", "bar");
 
     formService.submitStartForm(processDefinitionId, properties);
@@ -2426,7 +2430,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss.SSS");
     Date fixedDate = sdf.parse("01/01/2001 01:01:01.000");
     ClockUtil.setCurrentTime(fixedDate);
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("stringVar", "test");
     // when
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
@@ -2443,7 +2447,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
   @Test
   public void testVariableNameEqualsIgnoreCase() {
     // given
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     String variableName = "variableName";
     variables.put(variableName, "variableValue");
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
@@ -2464,7 +2468,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
   @Test
   public void testVariableValueEqualsIgnoreCase() {
     // given
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     String variableName = "variableName";
     String variableValue = "variableValue";
     variables.put(variableName, variableValue);
@@ -2487,7 +2491,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
   @Test
   public void testVariableNameAndValueEqualsIgnoreCase() {
     // given
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     String variableName = "variableName";
     String variableValue = "variableValue";
     variables.put(variableName, variableValue);
@@ -2515,14 +2519,32 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   @Test
+  public void testVariableNameAndValueEqualsEmptyString() {
+    // given
+    Map<String, Object> variables = new HashMap<>();
+    String variableName = "variableName";
+    String variableValue = "";
+    variables.put(variableName, variableValue);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
+
+    // when
+    HistoricVariableInstance instance = historyService.createHistoricVariableInstanceQuery().variableValueEquals(variableName, variableValue).singleResult();
+
+    // then
+    assertThat(instance).isNotNull();
+    assertThat(instance.getValue()).isEqualTo("");
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  @Test
   public void testVariableNameLikeIgnoreCase() {
     // given
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     String variableName = "variableName";
     String variableValue = "variableValue";
     variables.put(variableName, variableValue);
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
-    
+
     // when
     HistoricVariableInstance instance = historyService.createHistoricVariableInstanceQuery().variableNameLike("variableN%").singleResult();
     HistoricVariableInstance instanceIgnoreCase = historyService.createHistoricVariableInstanceQuery().variableNameLike("variablen%").singleResult();

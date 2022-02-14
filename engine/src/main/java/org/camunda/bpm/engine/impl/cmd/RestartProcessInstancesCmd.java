@@ -55,13 +55,9 @@ public class RestartProcessInstancesCmd extends AbstractRestartProcessInstanceCm
 
   private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
-  protected boolean writeUserOperationLog;
-
   public RestartProcessInstancesCmd(CommandExecutor commandExecutor,
-                                    RestartProcessInstanceBuilderImpl builder,
-                                    boolean writeUserOperationLog) {
+                                    RestartProcessInstanceBuilderImpl builder) {
     super(commandExecutor, builder);
-    this.writeUserOperationLog = writeUserOperationLog;
   }
 
   @Override
@@ -86,10 +82,7 @@ public class RestartProcessInstancesCmd extends AbstractRestartProcessInstanceCm
 
     checkAuthorization(commandContext, processDefinition);
 
-    if (writeUserOperationLog) {
-      writeUserOperationLog(commandContext, processDefinition,
-          processInstanceIds.size(), false);
-    }
+    writeUserOperationLog(commandContext, processDefinition, processInstanceIds.size(), false);
 
     final String processDefinitionId = builder.getProcessDefinitionId();
 

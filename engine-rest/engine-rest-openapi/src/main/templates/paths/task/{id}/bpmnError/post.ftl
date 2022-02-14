@@ -1,8 +1,10 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
       id = "handleBpmnError"
       tag = "Task"
+      summary = "Handle BPMN Error"
       desc = "Reports a business error in the context of a running task by id. The error code must
               be specified to identify the BPMN error handler. See the documentation for
               [Reporting Bpmn Error](${docsUrl}/reference/bpmn20/tasks/user-task/#reporting-bpmn-error)
@@ -49,9 +51,16 @@
         desc = "Request successful." />
 
     <@lib.response
+        code = "400"
+        dto = "ExceptionDto"
+        desc = "Returned if the `errorCode` or `id` are not present in the request. See the
+                [Introduction](${docsUrl}/reference/rest/overview/#error-handling)
+                for the error response format." />
+
+    <@lib.response
         code = "403"
         dto = "AuthorizationExceptionDto"
-        desc = "If the authenticated user is unauthorized to update the process instance. See the
+        desc = "If the authenticated user is unauthorized to update the task. See the
                 [Introduction](${docsUrl}/reference/rest/overview/#error-handling)
                 for the error response format." />
 
@@ -59,10 +68,11 @@
         code = "404"
         dto = "ExceptionDto"
         last = true
-        desc = "Returned if the task does not exist or <code>errorCode</code> is not presented in
-                the request. See the
+        desc = "Returned if the task does not exist. See the
                 [Introduction](${docsUrl}/reference/rest/overview/#error-handling)
                 for the error response format." />
 
   }
 }
+
+</#macro>

@@ -85,14 +85,6 @@ public class MigrationContextSwitchBeansTest extends AbstractFoxPlatformIntegrat
 
   }
 
-  protected static Asset modelAsAsset(BpmnModelInstance modelInstance) {
-    ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-    Bpmn.writeModelToStream(byteStream, modelInstance);
-
-    byte[] bytes = byteStream.toByteArray();
-    return new ByteArrayAsset(bytes);
-  }
-
   @Test
   @OperateOnDeployment("clientDeployment")
   public void testCreateBoundaryTimer() {
@@ -124,5 +116,12 @@ public class MigrationContextSwitchBeansTest extends AbstractFoxPlatformIntegrat
     Assert.assertNotNull(timerJob.getDuedate());
   }
 
+  protected static Asset modelAsAsset(BpmnModelInstance modelInstance) {
+    ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+    Bpmn.writeModelToStream(byteStream, modelInstance);
+
+    byte[] bytes = byteStream.toByteArray();
+    return new ByteArrayAsset(bytes);
+  }
 
 }

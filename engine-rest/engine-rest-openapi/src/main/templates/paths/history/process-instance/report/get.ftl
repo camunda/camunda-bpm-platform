@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
@@ -60,14 +61,16 @@
 
   "responses" : {
 
-    <@lib.response
+    <@lib.multiTypeResponse
         code = "200"
-        dto = "DurationReportResultDto"
-        array = true
         desc = "Request successful."
-        examples = ['"example-1": {
-                       "summary": "GET `/history/process-instance/report?reportType=duration&periodUnit=quarter&processDefinitionKeyIn=invoice`",
-                       "value": [
+        types = [
+          {
+            "dto": "DurationReportResultDto",
+            "array": true,
+            "examples": ['"example-1": {
+                            "summary": "GET `/history/process-instance/report?reportType=duration&periodUnit=quarter&processDefinitionKeyIn=invoice`",
+                            "value": [
                                   {
                                     "period": 1,
                                     "periodUnit": "QUARTER",
@@ -97,17 +100,16 @@
                                     "average": 150000
                                   }
                                 ]
-                     }'] />
-
-    <@lib.response
-        code = "200"
-        mediaType = "application/csv"
-        desc = "Request successful. In case of an expected application/csv response to retrieve the result as a csv file." />
-
-    <@lib.response
-        code = "200"
-        mediaType = "text/csv"
-        desc = "Request successful. In case of an expected text/csv response to retrieve the result as a csv file." />
+                          }'
+                        ]
+          },
+          {
+            "mediaType": "application/csv"
+          },
+          {
+            "mediaType": "text/csv"
+          }
+        ] />
 
     <@lib.response
         code = "400"
@@ -124,3 +126,5 @@
 
   }
 }
+
+</#macro>

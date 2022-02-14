@@ -1,0 +1,99 @@
+<!-- # CE - camunda-bpm-webapp/ui/admin/client/scripts/pages/create-group-membership.html -->
+<div class="modal-header">
+  <h3>{{ 'USER_MEMBERSHIP_TENANT_SELECT_TENANTS' | translate }}</h3>
+</div>
+
+<div class="create-tenant-membership modal-body">
+  <div notifications-panel></div>
+
+  <table class="cam-table tenant"
+         ng-hide="status !== 'beforeCreate' || availableTenants.length == 0">
+    <thead cam-sortable-table-header
+           default-sort-by="id"
+           default-sort-order="asc"
+           sorting-id="admin-sorting-users-edit-tenants"
+           on-sort-change="onSortChanged(sorting)"
+           on-sort-initialized="onSortChanged(sorting)">
+      <tr>
+        <th class="select">
+          <input type="checkbox"
+                 ng-checked="allTenantsChecked()"
+                 ng-click="checkAllTenants()"  />
+        </th>
+        <th class="tenant-id"
+            cam-sortable-table-column
+            sort-by-property="id">{{ 'USER_MEMBERSHIP_TENANT_TENANT_ID' | translate }}</th>
+        <th class="tenant-name"
+            cam-sortable-table-column
+            sort-by-property="name">{{ 'USER_MEMBERSHIP_TENANT_TENANT_NAME' | translate }}</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr ng-repeat="tenant in availableTenants">
+        <td class="select">
+          <input type="checkbox"
+                 ng-model="tenant.checked"/>
+        </td>
+
+        <td class="tenant-id">
+          <a href="#/tenants/{{ tenant.id | escape }}">{{ tenant.id }}</a>
+        </td>
+
+        <td class="tenant-name">
+          {{ tenant.name }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <ul uib-pagination ng-if="modalPages.total > modalPages.size && status !== 'SUCCESS'"
+              class="pagination-sm"
+
+              ng-model="modalPages.current"
+              ng-change="pageChange(modalPages.current)"
+
+              total-items="modalPages.total"
+              items-per-page="modalPages.size"
+              max-size="7"
+
+              boundary-links="true"
+
+              next-text="&rsaquo;"
+              last-text="&raquo;"
+              previous-text="&lsaquo;"
+              first-text="&laquo;"></ul>
+
+  <p ng-show="availableTenants.length == 0">
+    {{ 'USER_MEMBERSHIP_TENANT_MESSAGE_AVAILABLE_TENANTS' | translate }} <a href="#/tenant-create" ng-click="close">{{ 'USER_MEMBERSHIP_TENANT_MESSAGE_HERE' | translate }}</a>.
+  </p>
+
+  <p ng-show="status === 'SUCCESS'">
+    {{ 'USER_MEMBERSHIP_TENANT_MESSAGE_SUCCESS' | translate }}
+  </p>
+
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-default"
+          ng-click="close()"
+          ng-disabled="status === 'performCreate'"
+          ng-hide="status === 'SUCCESS' || status === 'FAILED' || status === 'loadingFailed'">
+    {{ 'USER_MEMBERSHIP_TENANT_CLOSE' | translate }}
+  </button>
+
+  <button class="btn btn-primary"
+          ng-click="close(status)"
+          ng-show="status === 'SUCCESS' || status === 'FAILED' || status === 'loadingFailed'">
+    {{ 'USER_MEMBERSHIP_TENANT_OK' | translate }}
+  </button>
+
+  <button class="btn btn-primary"
+          ng-click="createUserMemberships()"
+          ng-disabled="status !== 'beforeCreate' || checkedItemsCount === 0"
+          ng-hide="status === 'SUCCESS' || status === 'FAILED' || status === 'loadingFailed' || availableTenants.length == 0"
+          translate="USER_MEMBERSHIP_TENANT_ADD"
+          translate-values="{ itemsCount: checkedItemsCount }">
+  </button>
+</div>
+<!-- / CE - camunda-bpm-webapp/ui/admin/client/scripts/pages/create-group-membership.html -->

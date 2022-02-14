@@ -67,8 +67,7 @@ public class ExecuteJobHelper {
       // preserve MDC properties before listener invocation and clear MDC for job listener
       ProcessDataContext processDataContext = null;
       if (configuration != null) {
-        processDataContext = new ProcessDataContext(configuration);
-        processDataContext.fetchCurrentContext();
+        processDataContext = new ProcessDataContext(configuration, true);
         processDataContext.clearMdc();
       }
       // invoke job listener
@@ -79,7 +78,7 @@ public class ExecuteJobHelper {
        * of the listener is preserved and used from here on
        */
       if (processDataContext != null) {
-        processDataContext.updateMdc();
+        processDataContext.updateMdcFromCurrentValues();
       }
     }
   }

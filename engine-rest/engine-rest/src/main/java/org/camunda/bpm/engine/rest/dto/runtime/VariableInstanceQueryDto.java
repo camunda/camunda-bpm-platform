@@ -65,6 +65,7 @@ public class VariableInstanceQueryDto extends AbstractQueryDto<VariableInstanceQ
   protected String[] caseExecutionIdIn;
   protected String[] caseInstanceIdIn;
   protected String[] taskIdIn;
+  protected String[] batchIdIn;
   protected String[] variableScopeIdIn;
   protected String[] activityInstanceIdIn;
   private List<String> tenantIds;
@@ -123,6 +124,11 @@ public class VariableInstanceQueryDto extends AbstractQueryDto<VariableInstanceQ
   @CamundaQueryParam(value="taskIdIn", converter = StringArrayConverter.class)
   public void setTaskIdIn(String[] taskIdIn) {
     this.taskIdIn = taskIdIn;
+  }
+
+  @CamundaQueryParam(value="batchIdIn", converter = StringArrayConverter.class)
+  public void setBatchIdIn(String[] batchIdIn) {
+    this.batchIdIn = batchIdIn;
   }
 
   @CamundaQueryParam(value="variableScopeIdIn", converter = StringArrayConverter.class)
@@ -214,6 +220,10 @@ public class VariableInstanceQueryDto extends AbstractQueryDto<VariableInstanceQ
       query.taskIdIn(taskIdIn);
     }
 
+    if (batchIdIn != null && batchIdIn.length > 0) {
+      query.batchIdIn(batchIdIn);
+    }
+
     if (variableScopeIdIn != null && variableScopeIdIn.length > 0) {
       query.variableScopeIdIn(variableScopeIdIn);
     }
@@ -222,7 +232,7 @@ public class VariableInstanceQueryDto extends AbstractQueryDto<VariableInstanceQ
       query.activityInstanceIdIn(activityInstanceIdIn);
     }
     if (tenantIds != null && !tenantIds.isEmpty()) {
-      query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+      query.tenantIdIn(tenantIds.toArray(new String[0]));
     }
   }
 

@@ -1,0 +1,414 @@
+/* stylelint-disable no-descending-specificity */
+@import "_three-cols-layout";
+
+.three-cols-layout-base();
+
+.tasks-list [cam-tasks] {
+  position: relative;
+  clear: both;
+}
+
+button {
+  &.region-toggle {
+    height: @column-top-height;
+    margin: 0;
+    padding: 0;
+
+    > .glyphicon::before {
+      content: '\e257';
+    }
+  }
+
+  &.region-toggle,
+  &.maximize,
+  &.reset-regions {
+    display: none;
+  }
+
+  &.maximize,
+  &.reset-regions {
+    margin: 0 (@grid-gutter-width / 3);
+  }
+}
+
+@media (max-width: @screen-xs-max) {
+  .three-cols-layout-handheld();
+
+  .three-cols-layout-columns {
+    > .column {
+      > .three-cols-layout-cell.top button {
+        &.region-toggle,
+        &.maximize,
+        &.reset-regions {
+          display: none;
+        }
+      }
+    }
+  }
+}
+
+.three-cols-layout-states();
+.three-cols-layout-colors(@column-left-bg, @column-center-bg, @column-right-bg);
+.three-cols-layout-header();
+
+[cam-widget-header] [ng-transclude] {
+  float: right;
+  border-right: 1px solid darken(@gray-lighter, 10%);
+
+  @media screen and (max-width: (@grid-float-breakpoint - 1)) {
+    border-right: none;
+  }
+
+  > ul > li:hover {
+    border-color: transparent;
+  }
+}
+
+.column-right .region-toggle .glyphicon::before,
+.filters-column-close .column-left .region-toggle .glyphicon::before,
+.list-column-close .column-center .region-toggle .glyphicon::before {
+  content: '\e258';
+}
+
+.task-column-close .column-right .region-toggle .glyphicon::before {
+  content: '\e257';
+}
+// prevent "tab navigation focus" glitch
+.task-column-close .column-right {
+  .three-cols-layout-cell.top {
+    .reset-regions,
+    .maximize,
+    .task-actions {
+      display: none;
+    }
+  }
+
+  .three-cols-layout-cell.content {
+    display: none;
+  }
+}
+
+.filters-column-close .column-left button:not(.region-toggle) {
+  display: none;
+}
+
+.three-cols-layout {
+  .column-left,
+  .column-center {
+    .alert,
+    .well {
+      margin: 0 (@grid-gutter-width * 0.5) (@grid-gutter-width * 0.5) (@grid-gutter-width * 0.5);
+    }
+
+    .cells-wrapper {
+      display: table;
+      width: 100%;
+
+      > * {
+        display: table-cell;
+      }
+    }
+  }
+
+  .column-left .list-unstyled > .item,
+  .column-center .list-unstyled > li {
+    .column-list-item();
+  }
+
+  .column-left .list-unstyled {
+    .first-column-list();
+
+    > .item {
+      .first-column-list-item();
+    }
+  }
+
+  .column-center .list-unstyled {
+    .second-column-list();
+
+    > li {
+      .second-column-list-item();
+    }
+  }
+
+  [cam-tasklist-form-generic] .row-action {
+    > a[ng-click],
+    .btn-link {
+      display: block;
+    }
+  }
+
+  button.maximize,
+  button.region-toggle {
+    display: inline-block;
+  }
+
+  button.reset-regions {
+    display: none;
+  }
+}
+
+.task-filter {
+  width: 100%;
+  overflow: hidden;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+
+  h4.name {
+    margin: 0;
+    line-height: 24px;
+    min-height: 24px;
+  }
+
+  .actions {
+    text-align: right;
+  }
+
+  .counter {
+    color: @gray;
+
+    &::before {
+      content: '(';
+    }
+
+    &::after {
+      content: ')';
+    }
+  }
+}
+
+.task-card {
+  .nav-tabs {
+    padding-left: (@grid-gutter-width * 0.5);
+    padding-right: (@grid-gutter-width * 0.5);
+    margin-left: 0 - (@grid-gutter-width * 0.5);
+    margin-right: 0 - (@grid-gutter-width * 0.5);
+  }
+}
+
+.column.tasks-list {
+  view {
+    display: block;
+  }
+
+  .content {
+    padding-top: 0;
+
+    view {
+      overflow: visible;
+      padding: (@grid-gutter-width * 0.5) 0;
+    }
+  }
+
+  [cam-widget-search] {
+    margin: 0 (@grid-gutter-width * 0.5);
+    padding-bottom: 0;
+  }
+
+  .names {
+    overflow: hidden;
+
+    h4,
+    h5,
+    h6 {
+      line-height: 20px;
+      margin-bottom: 5px;
+    }
+
+    h4 {
+      margin-top: 4px;
+      float: left;
+    }
+
+    h5,
+    h6 {
+      margin-top: 5px;
+      font-size: @font-size-base;
+    }
+
+    h6 {
+      float: left;
+      clear: left;
+    }
+
+    h5 {
+      float: right;
+    }
+  }
+
+  .priority,
+  .dates {
+    font-size: smaller;
+  }
+
+  .dates {
+    > span {
+      > span {
+        &:last-of-type::after {
+          content: ',';
+        }
+      }
+
+      &:last-of-type span::after {
+        display: none;
+      }
+    }
+  }
+
+  .priority {
+    text-align: right;
+  }
+}
+
+body.task-column-close [cam-widget-search].multiline-pills [cam-widget-search-pill] {
+  width: auto;
+  vertical-align: top;
+
+  .search-label {
+    display: table;
+
+    > * {
+      width: auto;
+      clear: none;
+      float: none;
+      display: table-cell;
+    }
+  }
+}
+
+// S+ (columns layout)
+@media (min-width: @screen-sm-min) {
+  .filters-column-close {
+    .task-filters {
+      .cell.content {
+        display: none;
+      }
+    }
+  }
+
+  .list-column-close {
+    .tasks-list {
+      .three-cols-layout-cell.content {
+        display: none;
+      }
+    }
+  }
+
+  .task-column-close {
+    .task-details {
+      .three-cols-layout-cell.content {
+        display: none;
+      }
+    }
+
+    [cam-tasklist-variables] .variables-list {
+      max-height: 20000px;
+
+      .shutter {
+        display: none;
+      }
+
+      .col-lg-6 {
+        width: 33%;
+      }
+
+      .variable-item {
+        > span {
+          width: 50%;
+        }
+
+        > .col-xs-4 {
+          text-align: right;
+        }
+      }
+    }
+  }
+
+  .task-column-close *,
+  .filters-column-close.list-column-close {
+    button.maximize {
+      display: none;
+    }
+
+    button.reset-regions {
+      display: block;
+    }
+  }
+
+  .task-filters,
+  .tasks-list {
+    > .cell.top,
+    .three-cols-layout-cell.top > button {
+      margin-right: (3 - (@grid-gutter-width / 2));
+    }
+  }
+
+  .tasks-list {
+    > .three-cols-layout-cell.top {
+      > div,
+      > view {
+        width: ~"calc(100% - 35px)";
+        margin-left: 0;
+        margin-right: 0;
+        padding: 0;
+      }
+
+      > view {
+        position: absolute;
+        overflow: visible;
+        display: block;
+      }
+    }
+
+    [cam-widget-search] {
+      position: relative;
+      z-index: 15;
+      padding-bottom: (@grid-gutter-width / 2);
+      overflow: visible;
+    }
+  }
+
+  .task-details {
+    > .three-cols-layout-cell.top {
+      > button {
+        float: left;
+
+        &:first-child {
+          margin-left: (3 - (@grid-gutter-width / 2));
+        }
+      }
+
+      > .task-actions {
+        float: right;
+        text-align: right;
+      }
+    }
+  }
+}
+
+// S
+@media (min-width: @screen-sm-min) and (max-width: @screen-sm-max) {
+  .three-cols-layout(180px, 300px);
+  .three-cols-layout-states(180px, 300px);
+}
+
+// M
+@media (min-width: @screen-md-min) and (max-width: @screen-md-max) {
+  .three-cols-layout(200px, 320px);
+  .three-cols-layout-states(200px, 320px);
+
+  .filters-column-close.task-column-close .variables-list .col-lg-6 {
+    width: 25%;
+  }
+}
+
+// L
+@media (min-width: @screen-lg-min) {
+  .three-cols-layout(220px, 360px);
+  .three-cols-layout-states(220px, 360px);
+
+  .filters-column-close.task-column-close .variables-list .col-lg-6 {
+    width: 20%;
+  }
+}

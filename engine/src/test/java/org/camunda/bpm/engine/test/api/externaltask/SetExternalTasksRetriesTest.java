@@ -16,11 +16,8 @@
  */
 package org.camunda.bpm.engine.test.api.externaltask;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
@@ -37,6 +34,8 @@ import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
@@ -133,7 +132,7 @@ public class SetExternalTasksRetriesTest extends AbstractAsyncOperationsTest {
       externalTaskService.setRetries(externalTaskIds, 10);
       fail("exception expected");
     } catch (NotFoundException e) {
-      Assert.assertThat(e.getMessage(), containsString("Cannot find external task with id nonExistingExternalTaskId"));
+      assertThat(e.getMessage()).contains("Cannot find external task with id nonExistingExternalTaskId");
     }
   }
 
@@ -152,7 +151,7 @@ public class SetExternalTasksRetriesTest extends AbstractAsyncOperationsTest {
       externalTaskService.setRetries(externalTaskIds, 10);
       fail("exception expected");
     } catch (BadUserRequestException e) {
-      Assert.assertThat(e.getMessage(), containsString("External task id cannot be null"));
+      assertThat(e.getMessage()).contains("External task id cannot be null");
     }
   }
 
@@ -162,7 +161,7 @@ public class SetExternalTasksRetriesTest extends AbstractAsyncOperationsTest {
       externalTaskService.setRetries((List<String>) null, 10);
       fail("exception expected");
     } catch (BadUserRequestException e) {
-      Assert.assertThat(e.getMessage(), containsString("externalTaskIds is empty"));
+      assertThat(e.getMessage()).contains("externalTaskIds is empty");
     }
   }
 
@@ -182,7 +181,7 @@ public class SetExternalTasksRetriesTest extends AbstractAsyncOperationsTest {
       executeSeedAndBatchJobs(batch);
       fail("exception expected");
     } catch (NotFoundException e) {
-      Assert.assertThat(e.getMessage(), containsString("Cannot find external task with id nonExistingExternalTaskId"));
+      assertThat(e.getMessage()).contains("Cannot find external task with id nonExistingExternalTaskId");
     }
   }
 
@@ -203,7 +202,7 @@ public class SetExternalTasksRetriesTest extends AbstractAsyncOperationsTest {
       executeSeedAndBatchJobs(batch);
       fail("exception expected");
     } catch (BadUserRequestException e) {
-      Assert.assertThat(e.getMessage(), containsString("External task id cannot be null"));
+      assertThat(e.getMessage()).contains("External task id cannot be null");
     }
   }
 
@@ -213,7 +212,7 @@ public class SetExternalTasksRetriesTest extends AbstractAsyncOperationsTest {
       externalTaskService.setRetriesAsync((List<String>) null, null, 10);
       fail("exception expected");
     } catch (BadUserRequestException e) {
-      Assert.assertThat(e.getMessage(), containsString("externalTaskIds is empty"));
+      assertThat(e.getMessage()).contains("externalTaskIds is empty");
     }
   }
 
@@ -226,7 +225,7 @@ public class SetExternalTasksRetriesTest extends AbstractAsyncOperationsTest {
       externalTaskService.setRetries(externalTaskIds, -10);
       fail("exception expected");
     } catch (BadUserRequestException e) {
-      Assert.assertThat(e.getMessage(), containsString("The number of retries cannot be negative"));
+      assertThat(e.getMessage()).contains("The number of retries cannot be negative");
     }
   }
 
@@ -240,7 +239,7 @@ public class SetExternalTasksRetriesTest extends AbstractAsyncOperationsTest {
       executeSeedAndBatchJobs(batch);
       fail("exception expected");
     } catch (BadUserRequestException e) {
-      Assert.assertThat(e.getMessage(), containsString("The number of retries cannot be negative"));
+      assertThat(e.getMessage()).contains("The number of retries cannot be negative");
     }
   }
 
@@ -302,16 +301,16 @@ public class SetExternalTasksRetriesTest extends AbstractAsyncOperationsTest {
     executeSeedJobs(batch, 2);
     // then batch jobs with different deployment ids exist
     List<Job> batchJobs = managementService.createJobQuery().jobDefinitionId(batch.getBatchJobDefinitionId()).list();
-    assertThat(batchJobs.size(), is(2));
-    assertThat(batchJobs.get(0).getDeploymentId(), IsIn.isOneOf(firstDeploymentId, secondDeploymentId));
-    assertThat(batchJobs.get(1).getDeploymentId(), IsIn.isOneOf(firstDeploymentId, secondDeploymentId));
-    assertThat(batchJobs.get(0).getDeploymentId(), is(not(batchJobs.get(1).getDeploymentId())));
+    assertThat(batchJobs).hasSize(2);
+    Assert.assertThat(batchJobs.get(0).getDeploymentId(), IsIn.isOneOf(firstDeploymentId, secondDeploymentId));
+    Assert.assertThat(batchJobs.get(1).getDeploymentId(), IsIn.isOneOf(firstDeploymentId, secondDeploymentId));
+    assertThat(batchJobs.get(0).getDeploymentId()).isNotEqualTo(batchJobs.get(1).getDeploymentId());
 
     // when the batch jobs for the first deployment are executed
-    assertThat(getTaskCountWithUnchangedRetries(), is(12L));
+    assertThat(getTaskCountWithUnchangedRetries()).isEqualTo(12L);
     getJobIdsByDeployment(batchJobs, firstDeploymentId).forEach(managementService::executeJob);
     // then the retries for jobs from process instances related to the first deployment should be changed
-    assertThat(getTaskCountWithUnchangedRetries(), is(6L));
+    assertThat(getTaskCountWithUnchangedRetries()).isEqualTo(6L);
 
     // when the remaining batch jobs are executed
     getJobIdsByDeployment(batchJobs, secondDeploymentId).forEach(managementService::executeJob);
@@ -344,8 +343,14 @@ public class SetExternalTasksRetriesTest extends AbstractAsyncOperationsTest {
     }
   }
 
+  /**
+   * Excluded on CRDB since the problem does not occur on it. The test execution also times out
+   * during test cleanup, on DELETE-ing the deployments, due the the slowness of the SQL statements on CRDB.
+   * See CAM-12239 for the performance.
+   */
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @RequiredDatabase(excludes = DbSqlSessionFactory.CRDB)
   public void shouldSetExternalTaskRetriesWithLargeList() {
     // given
     engineRule.getProcessEngineConfiguration().setBatchJobsPerSeed(1010);
@@ -618,7 +623,7 @@ public class SetExternalTasksRetriesTest extends AbstractAsyncOperationsTest {
     Batch batch = externalTaskService.setRetriesAsync(null, externalTaskQuery, RETRIES);
 
     // then
-    assertThat(batch.getInvocationsPerBatchJob(), is(42));
+    assertThat(batch.getInvocationsPerBatchJob()).isEqualTo(42);
 
     // clear
     engineRule.getProcessEngineConfiguration()

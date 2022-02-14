@@ -18,9 +18,9 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import java.nio.charset.StandardCharsets;
 
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 
@@ -28,8 +28,7 @@ public class GetLicenseKeyCmd extends LicenseCmd implements Command<String> {
 
   @Override
   public String execute(CommandContext commandContext) {
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkCamundaAdmin();
+    commandContext.getAuthorizationManager().checkCamundaAdminOrPermission(CommandChecker::checkReadLicenseKey);
 
     // case I: license is stored as BLOB
     ResourceEntity licenseResource = commandContext.getResourceManager().findLicenseKeyResource();

@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -26,7 +27,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 public class GetHistoryLevelCmd implements Command<Integer> {
 
   public Integer execute(CommandContext commandContext) {
-    commandContext.getAuthorizationManager().checkCamundaAdmin();
+    commandContext.getAuthorizationManager().checkCamundaAdminOrPermission(CommandChecker::checkReadHistoryLevel);
     return Context.getProcessEngineConfiguration().getHistoryLevel().getId();
   }
 

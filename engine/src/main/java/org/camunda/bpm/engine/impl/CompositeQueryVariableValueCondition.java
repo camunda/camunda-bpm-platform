@@ -32,13 +32,13 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
  */
 public class CompositeQueryVariableValueCondition extends AbstractQueryVariableValueCondition {
 
-  protected List<SingleQueryVariableValueCondition> aggregatedValues = new ArrayList<SingleQueryVariableValueCondition>();
+  protected List<SingleQueryVariableValueCondition> aggregatedValues = new ArrayList<>();
 
   public CompositeQueryVariableValueCondition(QueryVariableValue variableValue) {
     super(variableValue);
   }
 
-  public void initializeValue(VariableSerializers serializers) {
+  public void initializeValue(VariableSerializers serializers, String dbType) {
     TypedValue typedValue = wrappedQueryValue.getTypedValue();
 
     ValueTypeResolver resolver = Context.getProcessEngineConfiguration().getValueTypeResolver();
@@ -48,7 +48,7 @@ public class CompositeQueryVariableValueCondition extends AbstractQueryVariableV
       if (type.canConvertFromTypedValue(typedValue)) {
         TypedValue convertedValue = type.convertFromTypedValue(typedValue);
         SingleQueryVariableValueCondition aggregatedValue = new SingleQueryVariableValueCondition(wrappedQueryValue);
-        aggregatedValue.initializeValue(serializers, convertedValue);
+        aggregatedValue.initializeValue(serializers, convertedValue, dbType);
         aggregatedValues.add(aggregatedValue);
       }
     }

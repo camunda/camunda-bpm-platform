@@ -16,13 +16,10 @@
  */
 package org.camunda.bpm.engine.test.history;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasProperty;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -284,6 +281,8 @@ public class HistoricCaseInstanceTest extends CmmnTest {
     assertCount(0, historicQuery().variableValueEquals("foo", "lol"));
     assertCount(1, historicQuery().variableValueLike("foo", "%a%"));
     assertCount(0, historicQuery().variableValueLike("foo", "%lol%"));
+    assertCount(0, historicQuery().variableValueNotLike("foo", "%a%"));
+    assertCount(1, historicQuery().variableValueNotLike("foo", "%lol%"));
 
     assertCount(1, historicQuery().variableValueEquals("number", 10));
     assertCount(0, historicQuery().variableValueNotEquals("number", 10));
@@ -392,118 +391,76 @@ public class HistoricCaseInstanceTest extends CmmnTest {
     HistoricCaseInstance twoCaseInstance = queryHistoricCaseInstance(twoCaseInstanceId);
 
     // sort by case instance ids
-    String property = "id";
     List<? extends Comparable> sortedList = Arrays.asList(oneCaseInstance.getId(), twoCaseInstance.getId());
     Collections.sort(sortedList);
 
     List<HistoricCaseInstance> instances = historicQuery().orderByCaseInstanceId().asc().list();
     assertEquals(2, instances.size());
-    assertThat(instances, contains(
-      hasProperty(property, equalTo(sortedList.get(0))),
-      hasProperty(property, equalTo(sortedList.get(1)))
-    ));
+    assertThat(instances).extracting("id").containsExactly(sortedList.get(0), sortedList.get(1));
 
     instances = historicQuery().orderByCaseInstanceId().desc().list();
     assertEquals(2, instances.size());
-    assertThat(instances, contains(
-      hasProperty(property, equalTo(sortedList.get(1))),
-      hasProperty(property, equalTo(sortedList.get(0)))
-    ));
+    assertThat(instances).extracting("id").containsExactly(sortedList.get(1), sortedList.get(0));
 
     // sort by case definition ids
-    property = "caseDefinitionId";
     sortedList = Arrays.asList(oneCaseInstance.getCaseDefinitionId(), twoCaseInstance.getCaseDefinitionId());
     Collections.sort(sortedList);
 
     instances = historicQuery().orderByCaseDefinitionId().asc().list();
     assertEquals(2, instances.size());
-    assertThat(instances, contains(
-      hasProperty(property, equalTo(sortedList.get(0))),
-      hasProperty(property, equalTo(sortedList.get(1)))
-    ));
+    assertThat(instances).extracting("caseDefinitionId").containsExactly(sortedList.get(0), sortedList.get(1));
 
     instances = historicQuery().orderByCaseDefinitionId().desc().list();
     assertEquals(2, instances.size());
-    assertThat(instances, contains(
-      hasProperty(property, equalTo(sortedList.get(1))),
-      hasProperty(property, equalTo(sortedList.get(0)))
-    ));
+    assertThat(instances).extracting("caseDefinitionId").containsExactly(sortedList.get(1), sortedList.get(0));
 
     // sort by business keys
-    property = "businessKey";
     sortedList = Arrays.asList(oneCaseInstance.getBusinessKey(), twoCaseInstance.getBusinessKey());
     Collections.sort(sortedList);
 
     instances = historicQuery().orderByCaseInstanceBusinessKey().asc().list();
     assertEquals(2, instances.size());
-    assertThat(instances, contains(
-      hasProperty(property, equalTo(sortedList.get(0))),
-      hasProperty(property, equalTo(sortedList.get(1)))
-    ));
+    assertThat(instances).extracting("businessKey").containsExactly(sortedList.get(0), sortedList.get(1));
 
     instances = historicQuery().orderByCaseInstanceBusinessKey().desc().list();
     assertEquals(2, instances.size());
-    assertThat(instances, contains(
-      hasProperty(property, equalTo(sortedList.get(1))),
-      hasProperty(property, equalTo(sortedList.get(0)))
-    ));
+    assertThat(instances).extracting("businessKey").containsExactly(sortedList.get(1), sortedList.get(0));
 
     // sort by create time
-    property = "createTime";
     sortedList = Arrays.asList(oneCaseInstance.getCreateTime(), twoCaseInstance.getCreateTime());
     Collections.sort(sortedList);
 
     instances = historicQuery().orderByCaseInstanceCreateTime().asc().list();
     assertEquals(2, instances.size());
-    assertThat(instances, contains(
-      hasProperty(property, equalTo(sortedList.get(0))),
-      hasProperty(property, equalTo(sortedList.get(1)))
-    ));
+    assertThat(instances).extracting("createTime").containsExactly(sortedList.get(0), sortedList.get(1));
 
     instances = historicQuery().orderByCaseInstanceCreateTime().desc().list();
     assertEquals(2, instances.size());
-    assertThat(instances, contains(
-      hasProperty(property, equalTo(sortedList.get(1))),
-      hasProperty(property, equalTo(sortedList.get(0)))
-    ));
+    assertThat(instances).extracting("createTime").containsExactly(sortedList.get(1), sortedList.get(0));
 
     // sort by close time
-    property = "closeTime";
     sortedList = Arrays.asList(oneCaseInstance.getCloseTime(), twoCaseInstance.getCloseTime());
     Collections.sort(sortedList);
 
     instances = historicQuery().orderByCaseInstanceCloseTime().asc().list();
     assertEquals(2, instances.size());
-    assertThat(instances, contains(
-      hasProperty(property, equalTo(sortedList.get(0))),
-      hasProperty(property, equalTo(sortedList.get(1)))
-    ));
+    assertThat(instances).extracting("closeTime").containsExactly(sortedList.get(0), sortedList.get(1));
 
     instances = historicQuery().orderByCaseInstanceCloseTime().desc().list();
     assertEquals(2, instances.size());
-    assertThat(instances, contains(
-      hasProperty(property, equalTo(sortedList.get(1))),
-      hasProperty(property, equalTo(sortedList.get(0)))
-    ));
+    assertThat(instances).extracting("closeTime").containsExactly(sortedList.get(1), sortedList.get(0));
 
     // sort by duration
-    property = "durationInMillis";
     sortedList = Arrays.asList(oneCaseInstance.getDurationInMillis(), twoCaseInstance.getDurationInMillis());
     Collections.sort(sortedList);
 
     instances = historicQuery().orderByCaseInstanceDuration().asc().list();
     assertEquals(2, instances.size());
-    assertThat(instances, contains(
-      hasProperty(property, equalTo(sortedList.get(0))),
-      hasProperty(property, equalTo(sortedList.get(1)))
-    ));
+    assertThat(instances).extracting("durationInMillis").containsExactly(sortedList.get(0), sortedList.get(1));
 
     instances = historicQuery().orderByCaseInstanceDuration().desc().list();
     assertEquals(2, instances.size());
-    assertThat(instances, contains(
-      hasProperty(property, equalTo(sortedList.get(1))),
-      hasProperty(property, equalTo(sortedList.get(0)))
-    ));
+    assertThat(instances).extracting("durationInMillis").containsExactly(sortedList.get(1), sortedList.get(0));
 
   }
 
@@ -600,7 +557,7 @@ public class HistoricCaseInstanceTest extends CmmnTest {
     identityService.setAuthenticatedUserId("testUser");
     historyService.deleteHistoricCaseInstance(historicInstance.getId());
     identityService.clearAuthentication();
-    
+
     if (processEngineConfiguration.getHistoryLevel().getId() >= HistoryLevel.HISTORY_LEVEL_FULL.getId()) {
       // a user operation log should have been created
       assertEquals(1, historyService.createUserOperationLogQuery().count());

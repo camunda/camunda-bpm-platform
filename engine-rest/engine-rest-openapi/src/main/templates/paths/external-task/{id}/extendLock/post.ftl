@@ -1,8 +1,10 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
       id = "extendLock"
       tag = "External Task"
+      summary = "Extend Lock"
       desc = "Extends the timeout of the lock by a given amount of time." />
 
   "parameters" : [
@@ -53,3 +55,5 @@
 
   }
 }
+
+</#macro>

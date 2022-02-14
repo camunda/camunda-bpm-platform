@@ -10,7 +10,7 @@ else
 	BROWSERS="xdg-open gnome-www-browser x-www-browser firefox chromium chromium-browser google-chrome"
 fi
 
-echo "starting camunda BPM ${project.version} on Wildfly Application Server ${version.wildfly}";
+echo "starting Camunda Platform ${project.version} on Wildfly Application Server ${version.wildfly}";
 
 if [ -z "$BROWSER" ]; then
   for executable in $BROWSERS; do

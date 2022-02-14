@@ -16,13 +16,11 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
 import static org.camunda.bpm.engine.test.util.MigratingProcessInstanceValidationReportAssert.assertThat;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
 import java.util.Date;
 import java.util.List;
@@ -33,6 +31,7 @@ import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerTaskListenerJobHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.migration.MigratingProcessInstanceValidationException;
 import org.camunda.bpm.engine.migration.MigrationPlan;
@@ -45,6 +44,7 @@ import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.util.AccessModelInstanceTaskListener;
 import org.camunda.bpm.engine.test.util.ClockTestUtil;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaTaskListener;
@@ -441,8 +441,8 @@ public class MigrationUserTaskTest {
 
     // then
     testHelper.assertTaskListenerTimerJobCreated("userTask2");
-    assertThat(testHelper.snapshotBeforeMigration.getJobs().size(), is(0));
-    assertThat(testHelper.snapshotAfterMigration.getJobs().size(), is(1));
+    assertThat(testHelper.snapshotBeforeMigration.getJobs().size()).isEqualTo(0);
+    assertThat(testHelper.snapshotAfterMigration.getJobs().size()).isEqualTo(1);
 
     // and the task listener was able to access the bpmn model instance and set a variable
     testTimeoutListenerCanBeTriggered(processInstance, "userTask2");
@@ -467,8 +467,8 @@ public class MigrationUserTaskTest {
 
     // then
     testHelper.assertTaskListenerTimerJobRemoved("userTask2");
-    assertThat(testHelper.snapshotBeforeMigration.getJobs().size(), is(1));
-    assertThat(testHelper.snapshotAfterMigration.getJobs().size(), is(0));
+    assertThat(testHelper.snapshotBeforeMigration.getJobs().size()).isEqualTo(1);
+    assertThat(testHelper.snapshotAfterMigration.getJobs().size()).isEqualTo(0);
   }
 
   @Test
@@ -490,8 +490,8 @@ public class MigrationUserTaskTest {
 
     // then
     testHelper.assertTaskListenerTimerJobMigrated("userTask2", "userTask");
-    assertThat(testHelper.snapshotBeforeMigration.getJobs().size(), is(1));
-    assertThat(testHelper.snapshotAfterMigration.getJobs().size(), is(1));
+    assertThat(testHelper.snapshotBeforeMigration.getJobs().size()).isEqualTo(1);
+    assertThat(testHelper.snapshotAfterMigration.getJobs().size()).isEqualTo(1);
 
     // and the task listener was able to access the bpmn model instance and set a variable
     testTimeoutListenerCanBeTriggered(processInstance, "userTask");
@@ -519,8 +519,8 @@ public class MigrationUserTaskTest {
     // then
     Date newDueDate = new DateTime(ClockUtil.getCurrentTime()).plusHours(3).toDate();
     testHelper.assertTaskListenerTimerJobMigrated("userTask2", "userTask", newDueDate);
-    assertThat(testHelper.snapshotBeforeMigration.getJobs().size(), is(1));
-    assertThat(testHelper.snapshotAfterMigration.getJobs().size(), is(1));
+    assertThat(testHelper.snapshotBeforeMigration.getJobs().size()).isEqualTo(1);
+    assertThat(testHelper.snapshotAfterMigration.getJobs().size()).isEqualTo(1);
 
     // and the task listener was able to access the bpmn model instance and set a variable
     testTimeoutListenerCanBeTriggered(processInstance, "userTask");
@@ -570,11 +570,11 @@ public class MigrationUserTaskTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertThat(testHelper.snapshotBeforeMigration.getJobs().size(), is(2));
-    assertThat(testHelper.snapshotAfterMigration.getJobs().size(), is(1));
+    assertThat(testHelper.snapshotBeforeMigration.getJobs().size()).isEqualTo(2);
+    assertThat(testHelper.snapshotAfterMigration.getJobs().size()).isEqualTo(1);
     JobEntity job = (JobEntity) testHelper.snapshotAfterMigration.getJobs().get(0);
     String jobHandlerConfiguration = job.getJobHandlerConfigurationRaw();
-    assertThat(jobHandlerConfiguration, containsString("timeout-friendly"));
+    assertThat(jobHandlerConfiguration).contains("timeout-friendly");
   }
 
   @Test
@@ -595,15 +595,15 @@ public class MigrationUserTaskTest {
     testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
-    assertThat(testHelper.snapshotBeforeMigration.getJobs().size(), is(1));
+    assertThat(testHelper.snapshotBeforeMigration.getJobs().size()).isEqualTo(1);
     JobEntity job = (JobEntity) testHelper.snapshotBeforeMigration.getJobs().get(0);
     String jobHandlerConfiguration = job.getJobHandlerConfigurationRaw();
-    assertThat(jobHandlerConfiguration, containsString("timeout-friendly"));
+    assertThat(jobHandlerConfiguration).contains("timeout-friendly");
 
-    assertThat(testHelper.snapshotAfterMigration.getJobs().size(), is(2));
+    assertThat(testHelper.snapshotAfterMigration.getJobs().size()).isEqualTo(2);
     job = (JobEntity) testHelper.snapshotAfterMigration.getJobs().get(1);
     jobHandlerConfiguration = job.getJobHandlerConfigurationRaw();
-    assertThat(jobHandlerConfiguration, containsString("timeout-hard"));
+    assertThat(jobHandlerConfiguration).contains("timeout-hard");
   }
 
   @Test
@@ -621,16 +621,16 @@ public class MigrationUserTaskTest {
       .build();
 
     ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinitionId);
-    assertThat(rule.getManagementService().createJobQuery().count(), is(2L));
-    assertThat(rule.getManagementService().createJobQuery().executable().count(), is(1L));
+    assertThat(rule.getManagementService().createJobQuery().count()).isEqualTo(2L);
+    assertThat(rule.getManagementService().createJobQuery().executable().count()).isEqualTo(1L);
     testHelper.waitForJobExecutorToProcessAllJobs(5000L);
-    assertThat(rule.getManagementService().createJobQuery().count(), is(1L));
+    assertThat(rule.getManagementService().createJobQuery().count()).isEqualTo(1L);
 
     // when
     testHelper.migrateProcessInstance(migrationPlan, processInstance);
 
     // then
-    assertThat(rule.getManagementService().createJobQuery().count(), is(1L));
+    assertThat(rule.getManagementService().createJobQuery().count()).isEqualTo(1L);
   }
 
   @Test
@@ -809,6 +809,131 @@ public class MigrationUserTaskTest {
 
     // and the task listener was able to access the bpmn model instance and set a variable
     testTimeoutListenerCanBeTriggered(processInstance, "userTask");
+  }
+
+  @Test
+  public void shouldRemainActiveAfterBecomingNoneScope() {
+    // given
+    BpmnModelInstance sourceProcess = Bpmn.createExecutableProcess("source")
+        .startEvent()
+        .userTask("user-task")
+          .boundaryEvent()
+            .condition("${true == false}")
+        .endEvent()
+        .done();
+
+    String sourceProcessDefinitionId = testHelper
+        .deployAndGetDefinition(sourceProcess)
+        .getId();
+
+    BpmnModelInstance targetProcess = Bpmn.createExecutableProcess("target")
+        .startEvent()
+        .userTask("user-task")
+        .endEvent()
+        .done();
+
+    String targetProcessDefinitionId = testHelper
+        .deployAndGetDefinition(targetProcess)
+        .getId();
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinitionId, targetProcessDefinitionId)
+        .mapEqualActivities()
+        .build();
+
+    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceByKey("source");
+
+    String definitionId = rule.getRepositoryService().createProcessDefinitionQuery()
+        .processDefinitionKey("source")
+        .singleResult()
+        .getId();
+
+    ActivityStatistics activityStatistics = rule.getManagementService()
+        .createActivityStatisticsQuery(definitionId)
+        .singleResult();
+
+    // assume
+    assertThat(activityStatistics.getId()).isEqualTo("user-task");
+    assertThat(activityStatistics.getInstances()).isEqualTo(1);
+
+    // when
+    testHelper.migrateProcessInstance(migrationPlan, processInstance);
+
+    // then
+    definitionId = rule.getRepositoryService().createProcessDefinitionQuery()
+        .processDefinitionKey("target")
+        .singleResult()
+        .getId();
+
+    activityStatistics = rule.getManagementService()
+        .createActivityStatisticsQuery(definitionId)
+        .singleResult();
+
+    assertThat(activityStatistics.getId()).isEqualTo("user-task");
+    assertThat(activityStatistics.getInstances()).isEqualTo(1);
+  }
+
+  @Test
+  public void shouldRemainActiveAfterBecomingScope() {
+    // given
+    BpmnModelInstance sourceProcess = Bpmn.createExecutableProcess("source")
+        .startEvent()
+        .userTask("user-task")
+        .endEvent()
+        .done();
+
+    String sourceProcessDefinitionId = testHelper
+        .deployAndGetDefinition(sourceProcess)
+        .getId();
+
+    BpmnModelInstance targetProcess = Bpmn.createExecutableProcess("target")
+        .startEvent()
+        .userTask("user-task")
+          .boundaryEvent()
+            .condition("${true == false}")
+        .endEvent()
+        .done();
+
+    String targetProcessDefinitionId = testHelper
+        .deployAndGetDefinition(targetProcess)
+        .getId();
+
+    String definitionId = rule.getRepositoryService().createProcessDefinitionQuery()
+        .processDefinitionKey("source")
+        .singleResult()
+        .getId();
+
+    // assume
+    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceByKey("source");
+
+    ActivityStatistics activityStatistics = rule.getManagementService()
+        .createActivityStatisticsQuery(definitionId)
+        .singleResult();
+
+    assertThat(activityStatistics.getId()).isEqualTo("user-task");
+    assertThat(activityStatistics.getInstances()).isEqualTo(1);
+
+    // when
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinitionId, targetProcessDefinitionId)
+        .mapEqualActivities()
+        .updateEventTriggers()
+        .build();
+
+    testHelper.migrateProcessInstance(migrationPlan, processInstance);
+
+    // then
+    definitionId = rule.getRepositoryService().createProcessDefinitionQuery()
+        .processDefinitionKey("target")
+        .singleResult()
+        .getId();
+
+    activityStatistics = rule.getManagementService()
+        .createActivityStatisticsQuery(definitionId)
+        .singleResult();
+
+    assertThat(activityStatistics.getId()).isEqualTo("user-task");
+    assertThat(activityStatistics.getInstances()).isEqualTo(1);
   }
 
   protected static void addTaskListener(BpmnModelInstance targetModel, String activityId, String event, String className) {

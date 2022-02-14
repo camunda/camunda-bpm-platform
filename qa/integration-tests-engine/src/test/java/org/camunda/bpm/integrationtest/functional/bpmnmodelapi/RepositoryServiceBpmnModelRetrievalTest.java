@@ -40,7 +40,7 @@ public class RepositoryServiceBpmnModelRetrievalTest extends AbstractFoxPlatform
   @Deployment
   public static WebArchive createProcessApplication() {
     return initWebArchiveDeployment()
-        .addAsResource(new StringAsset(Bpmn.convertToString(Bpmn.createExecutableProcess(TEST_PROCESS).done())), "testProcess.bpmn20.xml");
+        .addAsResource(new StringAsset(Bpmn.convertToString(Bpmn.createExecutableProcess(TEST_PROCESS).startEvent().done())), "testProcess.bpmn20.xml");
   }
 
   @Test

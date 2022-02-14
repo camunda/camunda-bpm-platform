@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <bean id="dbSchemaPrefixTestHelper" class="org.camunda.bpm.webapp.impl.test.util.DbSchemaPrefixTestHelper" />
+
+  <bean id="idGenerator" class="org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator" />
+
+  <bean id="processEngineConfiguration" class="org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration" depends-on="dbSchemaPrefixTestHelper">
+
+    <property name="jdbcUrl" value="jdbc:h2:mem:DatabaseTablePrefixTest;DB_CLOSE_DELAY=1000;MVCC=TRUE;" />
+    <property name="jdbcDriver" value="org.h2.Driver" />
+    <property name="jdbcUsername" value="sa" />
+    <property name="jdbcPassword" value="" />
+
+    <!-- Note: The database is created within dbSchemaPrefixTestHelper (org.camunda.bpm.webapp.impl.test.util.DbSchemaPrefixTestHelper)-->
+    <!-- If some database changes are required during the database setup, they should be performed in the DbSchemaPrefixTestHelper -->
+
+    <!-- Database configurations -->
+    <property name="databaseSchemaUpdate" value="NO_CHECK" />
+
+    <property name="idGenerator" ref="idGenerator" />
+
+    <!-- job executor configurations -->
+    <property name="jobExecutorActivate" value="false" />
+
+    <!-- turn off metrics reporter -->
+    <property name="dbMetricsReporterActivate" value="false" />
+    <property name="telemetryReporterActivate" value="false" />
+    <property name="taskMetricsEnabled" value="false" />
+
+    <!-- mail server configurations -->
+    <property name="mailServerPort" value="5025" />
+    <property name="history" value="full" />
+
+    <property name="databaseTablePrefix" value="SCHEMA1." />
+
+    <property name="authorizationCheckRevokes" value="${authorizationCheckRevokes}"/>
+
+  </bean>
+</beans>

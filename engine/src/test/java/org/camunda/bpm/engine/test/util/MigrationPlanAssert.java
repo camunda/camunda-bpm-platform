@@ -18,17 +18,23 @@ package org.camunda.bpm.engine.test.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.impl.migration.MigrationInstructionImpl;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 public class MigrationPlanAssert {
 
@@ -66,11 +72,65 @@ public class MigrationPlanAssert {
     return this;
   }
 
+  public MigrationPlanAssert variablesNull() {
+    isNotNull();
+    assertNull(actual.getVariables());
+    return this;
+  }
+
+  public MigrationPlanAssert variablesEmpty() {
+    isNotNull();
+    assertTrue(actual.getVariables() != null && actual.getVariables().isEmpty());
+    return this;
+  }
+
+  public MigrationPlanAssert hasVariables(MigrationVariableAssert... variableAsserts) {
+    isNotNull();
+
+    Map<String, Object> notExpected = new HashMap<>(actual.getVariables());
+    List<MigrationVariableAssert> notFound = new ArrayList<>();
+    Collections.addAll(notFound, variableAsserts);
+
+    Arrays.stream(variableAsserts).forEachOrdered(variableAssert ->
+        actual.getVariables().keySet().stream()
+            .filter(name -> variableAssert.name.equals(name))
+            .forEachOrdered(name -> {
+              notFound.remove(variableAssert);
+              notExpected.remove(name);
+
+              org.assertj.core.api.Assertions.assertThat(name)
+                  .as("Variable name does not match for variable %s", name)
+                  .isEqualTo(variableAssert.name);
+
+              TypedValue typedValue = actual.getVariables().getValueTyped(name);
+              org.assertj.core.api.Assertions.assertThat(typedValue.getValue())
+                  .as("Variable value does not match for variable %s", name)
+                  .isEqualTo(variableAssert.value);
+              org.assertj.core.api.Assertions.assertThat(variableAssert.typed ? "typed" : "untyped")
+                  .as("Variable %s: value typed/untyped does not match", name)
+                  .isEqualTo(typedValue instanceof UntypedValueImpl ? "untyped" : "typed");
+            }));
+
+    if (!notExpected.isEmpty() || ! notFound.isEmpty()) {
+      StringBuilder builder = new StringBuilder();
+      builder.append("\nActual migration variables:\n\t")
+          .append(actual.getVariables()).append("\n");
+      if (!notExpected.isEmpty()) {
+        builder.append("Unexpected migration variables:\n\t").append(notExpected).append("\n");
+      }
+      if (!notFound.isEmpty()) {
+        builder.append("Migration variables missing:\n\t").append(notFound);
+      }
+      fail(builder.toString());
+    }
+    return this;
+  }
+
   public MigrationPlanAssert hasInstructions(MigrationInstructionAssert... instructionAsserts) {
     isNotNull();
 
-    List<MigrationInstruction> notExpected = new ArrayList<MigrationInstruction>(actual.getInstructions());
-    List<MigrationInstructionAssert> notFound = new ArrayList<MigrationInstructionAssert>();
+    List<MigrationInstruction> notExpected = new ArrayList<>(actual.getInstructions());
+    List<MigrationInstructionAssert> notFound = new ArrayList<>();
     Collections.addAll(notFound, instructionAsserts);
 
     for (MigrationInstructionAssert instructionAssert : instructionAsserts) {
@@ -144,6 +204,32 @@ public class MigrationPlanAssert {
       return new MigrationInstructionImpl(sourceActivityId, targetActivityId).toString();
     }
 
+  }
+
+  public static MigrationVariableAssert variable() {
+    return new MigrationVariableAssert();
+  }
+
+  public static class MigrationVariableAssert {
+
+    protected String name;
+    protected Object value;
+    protected boolean typed;
+
+    public MigrationVariableAssert name(String name) {
+      this.name = name;
+      return this;
+    }
+
+    public MigrationVariableAssert value(Object value) {
+      this.value = value;
+      return this;
+    }
+
+    public MigrationVariableAssert typed() {
+      this.typed = true;
+      return this;
+    }
   }
 
 }

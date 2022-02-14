@@ -1,8 +1,10 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
       id = "deliverMessage"
       tag = "Message"
+      summary = "Correlate"
       desc = "Correlates a message to the process engine to either trigger a message start event or an intermediate message 
               catching event. Internally this maps to the engine's message correlation builder methods
               `MessageCorrelationBuilder#correlateWithResult()` and `MessageCorrelationBuilder#correlateAllWithResult()`.
@@ -134,3 +136,5 @@
 
   }
 }
+
+</#macro>

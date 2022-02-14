@@ -1,0 +1,22 @@
+<li class="dropdown engine-select"
+    ng-show="engines.length > 1 && currentEngine"
+    uib-dropdown>
+<!-- # CE - camunda-commons-ui/lib/directives/engineSelect.html -->
+  <a href
+     class="dropdown-toggle"
+     uib-dropdown-toggle>
+    <span class="glyphicon glyphicon-info-sign glyphicon glyphicon-info-sign "
+          uib-tooltip="{{ 'DIRECTIVE_ENGINE_SELECT_TOOLTIP' | translate }}"
+          tooltip-placement="bottom"></span>
+    {{ currentEngine.name }}
+  </a>
+  <ul uib-dropdown-menu class="dropdown-menu dropdown-menu-right">
+    <li ng-repeat="(id, engine) in engines"
+        ng-class="{ active: currentEngine.name === engine.name }">
+      <a ng-href="{{ 'app://../' + engine.name + '/' | uri }}">
+        {{ engine.name }}
+      </a>
+    </li>
+  </ul>
+<!-- / CE - camunda-commons-ui/lib/directives/engineSelect.html -->
+</li>

@@ -17,7 +17,7 @@
 package org.camunda.bpm.engine.authorization;
 
 /**
- * The set of built-in {@link Permission Permissions} for {@link Resources#TASK Task} in Camunda BPM.
+ * The set of built-in {@link Permission Permissions} for {@link Resources#TASK Task} in Camunda Platform.
  *
  * @author Yana Vasileva
  *
@@ -56,8 +56,8 @@ public enum TaskPermissions implements Permission {
   /**
    * <p>Indicates that READ_HISTORY interactions are permitted.
    *
-   * @deprecated since the permission is not used by any built-in functionality of Camunda BPM
-   * */
+   * @deprecated since the permission is not used by any built-in functionality of Camunda Platform
+   */
   @Deprecated
   READ_HISTORY("READ_HISTORY", 4096),
 

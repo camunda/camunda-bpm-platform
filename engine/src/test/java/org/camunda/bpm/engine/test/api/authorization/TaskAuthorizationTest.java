@@ -342,6 +342,27 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     deleteTask(taskId, true);
   }
 
+  /**
+   * CAM-12410 implements a single join for the process definition query filters
+   * and the authorization check. This test assures that the query works when
+   * both are used.
+   */
+  @Test
+  public void testQueryWithProcessDefinitionFilter() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(TASK, taskId, userId, READ);
+
+    startProcessInstanceByKey(PROCESS_KEY);
+
+    // when
+    TaskQuery query = taskService.createTaskQuery().processDefinitionKey(PROCESS_KEY);
+
+    // then
+    verifyQueryResults(query, 1);
+  }
+
   // new task /////////////////////////////////////////////////////////////
 
   @Test

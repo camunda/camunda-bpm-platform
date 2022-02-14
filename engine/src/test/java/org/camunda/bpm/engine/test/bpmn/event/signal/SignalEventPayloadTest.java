@@ -36,7 +36,6 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -53,9 +52,6 @@ public class SignalEventPayloadTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   protected RuntimeService runtimeService;
   protected TaskService taskService;
@@ -211,7 +207,7 @@ public class SignalEventPayloadTest {
     Map<String, Object> variables = new HashMap<>();
     variables.put("payloadVar1", "payloadVal1");
     String localVar1 = "localVar1";
-    String localVal1 = "localVal1";;
+    String localVal1 = "localVal1";
     String localVar2 = "localVar2";
     String localVal2 = "localVal2";
     ProcessInstance catchingPI = runtimeService.startProcessInstanceByKey("catchIntermediatePayloadSignal");

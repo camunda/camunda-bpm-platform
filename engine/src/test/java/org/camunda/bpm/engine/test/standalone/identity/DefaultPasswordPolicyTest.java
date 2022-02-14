@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.standalone.identity;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
@@ -41,7 +42,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * @author Miklas Boskamp
@@ -50,9 +50,6 @@ public class DefaultPasswordPolicyTest {
 
   @Rule
   public ProcessEngineRule rule = new ProvidedProcessEngineRule();
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   protected IdentityService identityService;
 
@@ -149,24 +146,20 @@ public class DefaultPasswordPolicyTest {
   public void shouldThrowNullValueException_policyNull() {
     // given
 
-    // then
-    thrown.expectMessage("policy is null");
-    thrown.expect(NullValueException.class);
-
-    // when
-    identityService.checkPasswordAgainstPolicy(null, "Pas$w0rd");
+    // when/then
+    assertThatThrownBy(() -> identityService.checkPasswordAgainstPolicy(null, "Pas$w0rd"))
+      .isInstanceOf(NullValueException.class)
+      .hasMessageContaining("policy is null");
   }
 
   @Test
   public void shouldThrowNullValueException_passwordNull() {
     // given
 
-    // then
-    thrown.expectMessage("password is null");
-    thrown.expect(NullValueException.class);
-
-    // when
-    identityService.checkPasswordAgainstPolicy(policy, null);
+    // when/then
+    assertThatThrownBy(() -> identityService.checkPasswordAgainstPolicy(policy, null))
+      .isInstanceOf(NullValueException.class)
+      .hasMessageContaining("password is null");
   }
 
   @Test
@@ -230,12 +223,10 @@ public class DefaultPasswordPolicyTest {
     User user = identityService.newUser("myUserId");
     String candidatePassword = null;
 
-    // then
-    thrown.expect(NullValueException.class);
-    thrown.expectMessage("password is null");
-
-    // when
-    identityService.checkPasswordAgainstPolicy(candidatePassword, user);
+    // when/then
+    assertThatThrownBy(() -> identityService.checkPasswordAgainstPolicy(candidatePassword, user))
+      .isInstanceOf(NullValueException.class)
+      .hasMessageContaining("password is null");
   }
 
   @Test

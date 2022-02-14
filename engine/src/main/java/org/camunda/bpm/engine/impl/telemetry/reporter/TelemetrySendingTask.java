@@ -16,77 +16,346 @@
  */
 package org.camunda.bpm.engine.impl.telemetry.reporter;
 
-import java.nio.charset.StandardCharsets;
+import static org.camunda.bpm.engine.impl.util.ConnectUtil.METHOD_NAME_POST;
+import static org.camunda.bpm.engine.impl.util.ConnectUtil.PARAM_NAME_RESPONSE_STATUS_CODE;
+import static org.camunda.bpm.engine.impl.util.ConnectUtil.addRequestTimeoutConfiguration;
+import static org.camunda.bpm.engine.impl.util.ConnectUtil.assembleRequestParameters;
+import static org.camunda.bpm.engine.impl.util.StringUtil.hasText;
+import static org.camunda.bpm.engine.management.Metrics.ACTIVTY_INSTANCE_START;
+import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_ELEMENTS;
+import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_INSTANCES;
+import static org.camunda.bpm.engine.management.Metrics.ROOT_PROCESS_INSTANCE_START;
+
+import java.net.HttpURLConnection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.TimerTask;
 
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cmd.IsTelemetryEnabledCmd;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.metrics.Meter;
+import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
+import org.camunda.bpm.engine.impl.metrics.util.MetricsUtil;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
+import org.camunda.bpm.engine.impl.telemetry.CommandCounter;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
-import org.camunda.bpm.engine.impl.telemetry.dto.Data;
+import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
+import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServerImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.CommandImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.InternalsImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.MetricImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.ProductImpl;
+import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
+import org.camunda.bpm.engine.impl.util.TelemetryUtil;
+import org.camunda.bpm.engine.telemetry.Command;
+import org.camunda.bpm.engine.telemetry.Metric;
+import org.camunda.connect.spi.CloseableConnectorResponse;
+import org.camunda.connect.spi.Connector;
+import org.camunda.connect.spi.ConnectorRequest;
 
 public class TelemetrySendingTask extends TimerTask {
 
+  protected static final Set<String> METRICS_TO_REPORT = new HashSet<>();
   protected static final TelemetryLogger LOG = ProcessEngineLogger.TELEMETRY_LOGGER;
+  protected static final String TELEMETRY_INIT_MESSAGE_SENT_NAME = "camunda.telemetry.initial.message.sent";
+  protected static final String UUID4_PATTERN = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}";
+
+  static {
+    METRICS_TO_REPORT.add(ROOT_PROCESS_INSTANCE_START);
+    METRICS_TO_REPORT.add(EXECUTED_DECISION_INSTANCES);
+    METRICS_TO_REPORT.add(EXECUTED_DECISION_ELEMENTS);
+    METRICS_TO_REPORT.add(ACTIVTY_INSTANCE_START);
+  }
 
   protected CommandExecutor commandExecutor;
   protected String telemetryEndpoint;
-  protected Data data;
-  protected HttpClient httpClient;
+  protected TelemetryDataImpl staticData;
+  protected Connector<? extends ConnectorRequest<?>> httpConnector;
+  protected int telemetryRequestRetries;
+  protected TelemetryRegistry telemetryRegistry;
+  protected MetricsRegistry metricsRegistry;
+  protected int telemetryRequestTimeout;
+  protected boolean sendInitialMessage;
 
   public TelemetrySendingTask(CommandExecutor commandExecutor,
                               String telemetryEndpoint,
-                              Data data,
-                              HttpClient httpClient) {
+                              int telemetryRequestRetries,
+                              TelemetryDataImpl data,
+                              Connector<? extends ConnectorRequest<?>> httpConnector,
+                              TelemetryRegistry telemetryRegistry,
+                              MetricsRegistry metricsRegistry,
+                              int telemetryRequestTimeout,
+                              boolean sendInitialMessage) {
     this.commandExecutor = commandExecutor;
     this.telemetryEndpoint = telemetryEndpoint;
-    this.data = data;
-    this.httpClient = httpClient;
+    this.telemetryRequestRetries = telemetryRequestRetries;
+    this.staticData = data;
+    this.httpConnector = httpConnector;
+    this.telemetryRegistry = telemetryRegistry;
+    this.metricsRegistry = metricsRegistry;
+    this.telemetryRequestTimeout = telemetryRequestTimeout;
+    this.sendInitialMessage = sendInitialMessage;
   }
 
   @Override
   public void run() {
     LOG.startTelemetrySendingTask();
+
+    if (sendInitialMessage) {
+      sendInitialMessage();
+    }
+
+    if (!isTelemetryEnabled()) {
+      LOG.telemetryDisabled();
+      return;
+    }
+
+    TelemetryUtil.toggleLocalTelemetry(true, telemetryRegistry, metricsRegistry);
+
+    performDataSend(false, () -> updateAndSendData(true, true));
+  }
+
+  public TelemetryDataImpl updateAndSendData(boolean sendData, boolean addLegacyNames) {
+    updateStaticData();
+    InternalsImpl dynamicData = resolveDynamicData(sendData, addLegacyNames);
+    TelemetryDataImpl mergedData = new TelemetryDataImpl(staticData);
+    mergedData.mergeInternals(dynamicData);
+
+    if(sendData) {
+      try {
+        sendData(mergedData, false);
+      } catch (Exception e) {
+        // so that we send it again the next time
+        restoreDynamicData(dynamicData);
+        throw e;
+      }
+    }
+    return mergedData;
+  }
+
+  protected void sendInitialMessage() {
     try {
-      sendData();
+      commandExecutor.execute(new SendInitialMsgCmd());
+    } catch (ProcessEngineException pex) {
+      // the property might have been inserted already by another cluster node after we checked it, ignore that
+      if (!ExceptionUtil.checkConstraintViolationException(pex)) {
+        LOG.exceptionWhileSendingTelemetryData(pex, true);
+      }
     } catch (Exception e) {
-      LOG.exceptionWhileSendingTelemetryData(e.getMessage());
+      LOG.exceptionWhileSendingTelemetryData(e, true);
     }
   }
 
-  protected void sendData() {
-    commandExecutor.execute(commandContext -> {
-      // send data only if telemetry is enabled
-      if (commandContext.getProcessEngineConfiguration().getManagementService().isTelemetryEnabled()) {
-        try {
-          HttpPost request = new HttpPost(telemetryEndpoint);
-          String telemetryData = JsonUtil.asString(data);
-          StringEntity requestBody = new StringEntity(telemetryData, StandardCharsets.UTF_8);
-          request.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
-          request.setEntity(requestBody);
-          HttpResponse response = httpClient.execute(request);
+  protected void sendInitialMessage(CommandContext commandContext) {
+    /*
+     * check on init message property to minimize the risk of sending the
+     * message twice in case another node in the cluster toggled the value
+     * and successfully sent the message already - it is not 100% safe but
+     * good enough as sending the message twice is still OK
+     */
+    if (null == commandContext.getPropertyManager().findPropertyById(TELEMETRY_INIT_MESSAGE_SENT_NAME)) {
+      // message has not been sent yet
+      performDataSend(true, () -> {
+        TelemetryDataImpl initData = new TelemetryDataImpl(staticData.getInstallation(), new ProductImpl(staticData.getProduct()));
+        InternalsImpl internals = new InternalsImpl();
+        internals.setTelemetryEnabled(new IsTelemetryEnabledCmd().execute(commandContext));
+        initData.getProduct().setInternals(internals);
 
-          if (response == null || HttpStatus.SC_ACCEPTED != response.getStatusLine().getStatusCode()) {
-            LOG.unexpectedResponseWhileSendingTelemetryData();
-          } else {
-            LOG.telemetryDataSent(telemetryData);
-          }
-        } catch (Exception e) {
-          LOG.exceptionWhileSendingTelemetryData(e.getMessage());
-        }
+        sendData(initData, true);
+        sendInitialMessage = false;
+        commandContext.getPropertyManager().insert(new PropertyEntity(TELEMETRY_INIT_MESSAGE_SENT_NAME, "true"));
+      });
+    } else {
+      // message has already been sent by another node
+      sendInitialMessage = false;
+    }
+  }
+
+  protected void updateStaticData() {
+    InternalsImpl internals = staticData.getProduct().getInternals();
+
+    if (internals.getApplicationServer() == null) {
+      ApplicationServerImpl applicationServer = telemetryRegistry.getApplicationServer();
+      internals.setApplicationServer(applicationServer);
+    }
+
+    if (internals.isTelemetryEnabled() == null) {
+      internals.setTelemetryEnabled(true);// this can only be true, otherwise we would not collect data to send
+    }
+
+    // license key and Webapps data is fed from the outside to the registry but needs to be constantly updated
+    internals.setLicenseKey(telemetryRegistry.getLicenseKey());
+    internals.setWebapps(telemetryRegistry.getWebapps());
+  }
+
+  protected boolean isTelemetryEnabled() {
+    Boolean telemetryEnabled = commandExecutor.execute(new IsTelemetryEnabledCmd());
+    return telemetryEnabled != null && telemetryEnabled.booleanValue();
+  }
+
+  protected void sendData(TelemetryDataImpl dataToSend, boolean isInitialMessage) {
+
+      String telemetryData = JsonUtil.asString(dataToSend);
+      Map<String, Object> requestParams = assembleRequestParameters(METHOD_NAME_POST,
+          telemetryEndpoint,
+          MediaType.APPLICATION_JSON,
+          telemetryData);
+      requestParams = addRequestTimeoutConfiguration(requestParams, telemetryRequestTimeout);
+
+      ConnectorRequest<?> request = httpConnector.createRequest();
+      request.setRequestParameters(requestParams);
+
+      LOG.sendingTelemetryData(telemetryData, isInitialMessage);
+      CloseableConnectorResponse response = (CloseableConnectorResponse) request.execute();
+
+      if (response == null) {
+        LOG.unexpectedResponseWhileSendingTelemetryData(isInitialMessage);
       } else {
-        LOG.telemetryDisabled();
+        int responseCode = (int) response.getResponseParameter(PARAM_NAME_RESPONSE_STATUS_CODE);
+
+        if (isSuccessStatusCode(responseCode)) {
+          if (responseCode != HttpURLConnection.HTTP_ACCEPTED) {
+            LOG.unexpectedResponseSuccessCode(responseCode, isInitialMessage);
+          }
+
+          LOG.telemetrySentSuccessfully(isInitialMessage);
+
+        } else {
+          throw LOG.unexpectedResponseWhileSendingTelemetryData(responseCode, isInitialMessage);
+        }
       }
+  }
+
+  /**
+   * @return true if status code is 2xx
+   */
+  protected boolean isSuccessStatusCode(int statusCode) {
+    return (statusCode / 100) == 2;
+  }
+
+  protected void restoreDynamicData(InternalsImpl internals) {
+    Map<String, Command> commands = internals.getCommands();
+
+    for (Map.Entry<String, Command> entry : commands.entrySet()) {
+      telemetryRegistry.markOccurrence(entry.getKey(), entry.getValue().getCount());
+    }
+
+    if (metricsRegistry != null) {
+      Map<String, Metric> metrics = internals.getMetrics();
+
+      for (String metricToReport : METRICS_TO_REPORT) {
+        Metric metricValue = metrics.get(metricToReport);
+        metricsRegistry.markTelemetryOccurrence(metricToReport, metricValue.getCount());
+      }
+    }
+  }
+
+  protected InternalsImpl resolveDynamicData(boolean reset, boolean addLegacyNames) {
+    InternalsImpl result = new InternalsImpl();
+
+    Map<String, Metric> metrics = calculateMetrics(reset, addLegacyNames);
+    result.setMetrics(metrics);
+
+    // command counts are modified after the metrics are retrieved, because
+    // metric retrieval can fail and resetting the command count is a side effect
+    // that we would otherwise have to undo
+    Map<String, Command> commands = fetchAndResetCommandCounts(reset);
+    result.setCommands(commands);
+
+    return result;
+  }
+
+  protected Map<String, Command> fetchAndResetCommandCounts(boolean reset) {
+    Map<String, Command> commandsToReport = new HashMap<>();
+    Map<String, CommandCounter> originalCounts = telemetryRegistry.getCommands();
+
+    synchronized (originalCounts) {
+
+      for (Map.Entry<String, CommandCounter> counter : originalCounts.entrySet()) {
+        long occurrences = counter.getValue().get(reset);
+        commandsToReport.put(counter.getKey(), new CommandImpl(occurrences));
+      }
+    }
+
+    return commandsToReport;
+  }
+
+  protected Map<String, Metric> calculateMetrics(boolean reset, boolean addLegacyNames) {
+
+    Map<String, Metric> metrics = new HashMap<>();
+
+    if (metricsRegistry != null) {
+      Map<String, Meter> telemetryMeters = metricsRegistry.getTelemetryMeters();
+
+      for (String metricToReport : METRICS_TO_REPORT) {
+        long value = telemetryMeters.get(metricToReport).get(reset);
+
+        if (addLegacyNames) {
+          metrics.put(metricToReport, new MetricImpl(value));
+        }
+
+        // add public names
+        metrics.put(MetricsUtil.resolvePublicName(metricToReport), new MetricImpl(value));
+      }
+    }
+
+    return metrics;
+  }
+
+  protected class SendInitialMsgCmd implements org.camunda.bpm.engine.impl.interceptor.Command<Void> {
+    @Override
+    public Void execute(CommandContext commandContext) {
+      sendInitialMessage(commandContext);
       return null;
-    });
+    }
+  }
+
+  protected void performDataSend(Boolean isInitialMessage, Runnable runnable) {
+    if (validateData(staticData)) {
+      int triesLeft = telemetryRequestRetries + 1;
+      boolean requestSuccessful = false;
+      do {
+        try {
+          triesLeft--;
+
+          runnable.run();
+
+          requestSuccessful = true;
+        } catch (Exception e) {
+          LOG.exceptionWhileSendingTelemetryData(e, isInitialMessage);
+        }
+      } while (!requestSuccessful && triesLeft > 0);
+    } else {
+      LOG.sendingTelemetryDataFails(staticData);
+    }
+  }
+
+  protected Boolean validateData(TelemetryDataImpl dataToSend) {
+    // validate product data
+    ProductImpl product = dataToSend.getProduct();
+    String installationId = dataToSend.getInstallation();
+    String edition = product.getEdition();
+    String version = product.getVersion();
+    String name = product.getName();
+
+    // ensure that data is not null or empty strings
+    boolean validProductData = hasText(name) && hasText(version) && hasText(edition) && hasText(installationId);
+
+    // validate installation id
+    if (validProductData) {
+      validProductData = validProductData && installationId.matches(UUID4_PATTERN);
+    }
+
+    return validProductData;
   }
 
 }

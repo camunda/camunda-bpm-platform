@@ -1,0 +1,45 @@
+[state-circle] {
+  display: inline-block;
+  width: @state-circle-size;
+  height: @state-circle-size;
+  position: relative;
+  border: 2px solid;
+  border-radius: 50%;
+
+  &::before {
+    /* stylelint-disable-next-line font-family-no-missing-generic-family-keyword -- Icon Font */
+    font-family: 'Glyphicons Halflings';
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    width: @state-circle-size - 2;
+    height: @state-circle-size - 2;
+    text-align: center;
+    line-height: @state-circle-size - 2;
+    font-size: @state-circle-size * (14 / 20);
+  }
+
+  &.circle-red {
+    color: @brand-danger;
+
+    &::before {
+      content: '\e014';
+    }
+  }
+
+  &.circle-green {
+    color: @brand-success;
+
+    &::before {
+      content: '\e013';
+    }
+  }
+
+  &.circle-blue {
+    color: darken(#428bca, 6.5%);
+
+    &::before {
+      content: '\e031';
+    }
+  }
+}

@@ -63,8 +63,6 @@ public class TenantGroupMembersResourceImpl extends AbstractIdentityResource imp
         .path(TenantGroupMembersResource.PATH)
         .build();
 
-    dto.addReflexiveLink(uri, HttpMethod.GET, "self");
-
     if (!identityService.isReadOnly() && isAuthorized(DELETE)) {
       dto.addReflexiveLink(uri, HttpMethod.DELETE, "delete");
     }

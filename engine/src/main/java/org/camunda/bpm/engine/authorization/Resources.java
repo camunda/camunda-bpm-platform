@@ -47,7 +47,8 @@ public enum Resources implements Resource {
   @Deprecated
   OPTIMIZE(EntityTypes.OPTIMIZE, 18),
   HISTORIC_TASK(EntityTypes.HISTORIC_TASK, 19),
-  HISTORIC_PROCESS_INSTANCE(EntityTypes.HISTORIC_PROCESS_INSTANCE, 20);
+  HISTORIC_PROCESS_INSTANCE(EntityTypes.HISTORIC_PROCESS_INSTANCE, 20),
+  SYSTEM(EntityTypes.SYSTEM, 21);
 
   String name;
   int id;

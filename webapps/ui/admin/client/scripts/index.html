@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible"
+          content="IE=edge" />
+
+    <title>Camunda Admin</title>
+
+    <meta charset="utf-8" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <meta name="description"
+          content="camunda Admin" />
+    <meta name="author"
+          content="camunda services GmbH" />
+
+    <!-- settings the base path for relative links -->
+    <base href="$BASE"
+          admin-api="$APP_ROOT/api/admin/"
+          cockpit-api="$APP_ROOT/api/cockpit/"
+          tasklist-api="$APP_ROOT/api/tasklist/"
+          welcome-api="$APP_ROOT/api/welcome/"
+          engine-api="$APP_ROOT/api/engine/"
+          app-root="$APP_ROOT" />
+
+    <!-- an example of plugin/feature exclusion -->
+    <!--
+    <base href="$BASE"
+          admin-api="$APP_ROOT/api/admin/"
+          cockpit-api="$APP_ROOT/api/cockpit/"
+          tasklist-api="$APP_ROOT/api/tasklist/"
+          welcome-api="$APP_ROOT/api/welcome/"
+          engine-api="$APP_ROOT/api/engine/"
+          app-root="$APP_ROOT"
+          cam-exclude-plugins="admin.dashboard:process-definition-tiles" />
+    -->
+
+
+    <!-- styles -->
+    <link href="$APP_ROOT/app/admin/styles/styles.css?bust=$GRUNT_CACHE_BUST"
+          rel="stylesheet" />
+    <link rel="stylesheet"
+          type="text/css"
+          href="$APP_ROOT/app/admin/styles/user-styles.css?bust=$GRUNT_CACHE_BUST">
+
+    <!-- favicon -->
+    <link rel="shortcut icon"
+          href="$APP_ROOT/app/admin/assets/images/favicon.ico"
+          type="image/x-icon" />
+  </head>
+  <body ng-controller="camAdminAppCtrl" ng-class="{'no-breadcrumbs': !$root.showBreadcrumbs}">
+    <!-- navigation -->
+    <div cam-widget-header
+         authentication="authentication"
+         user-name="userFullName"
+         current-app="admin"
+         ng-cloak>
+      <ul cam-if-logged-in
+          ng-controller="NavigationController">
+
+        <li ng-class="activeClass('#/user')">
+          <a href="#/users">{{ 'USERS_USERS' | translate }}</a>
+        </li>
+
+        <li ng-class="activeClass('#/group')">
+          <a href="#/groups">{{ 'GROUPS_GROUPS' | translate }}</a>
+        </li>
+
+        <li ng-class="activeClass('#/tenant')">
+          <a href="#/tenants">{{ 'TENANTS_TENANTS' | translate }}</a>
+        </li>
+
+        <li ng-class="activeClass('#/authorization')"
+            show-if-authorized
+            auth-permission="READ"
+            auth-resource-name="authorization">
+          <a href="#/authorization?resource=0">{{ 'AUTHORIZATION_AUTHORIZATIONS' | translate }}</a>
+        </li>
+        <li ng-class="activeClass('#/system')">
+          <a href="#/system?section=system-settings-general">{{ 'SYSTEM_SYSTEM' | translate }}</a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- content -->
+    <div class="ctn-main">
+      <div class="ctn-wrapper">
+        <div ng-if="showBreadcrumbs"
+             cam-breadcrumbs-panel
+             divider="&raquo;"
+             ng-cloak
+             class="breadcrumbs-panel"></div>
+
+        <div notifications-panel
+             class="page-notifications"></div>
+
+        <!-- view body provided by ngView -->
+        <div ng-view>
+          <style type="text/css">
+            .app-splash { position: absolute; width: 100%; height: 100%; top: 0; left: 0; display: table; }
+            .app-splash > div { display: table-cell; vertical-align: middle; text-align: center; }
+
+            .spinner {
+              display: inline-block;
+            }
+
+            @keyframes spinner {
+              0% {
+                transform: rotate(0deg);
+              }
+
+              100% {
+                transform: rotate(360deg);
+              }
+            }
+
+            .spinner-big::after {
+              box-sizing: content-box;
+              width: 22px;
+              height: 22px;
+              border: 4px solid #666;
+              content: " ";
+              display: block;
+              border-radius: 50%;
+              border-color: #666 #666 #666 transparent;
+              animation: spinner 0.7s linear infinite;
+            }
+          </style>
+          <div class="app-splash"><div>
+            <div class="spinner spinner-big"></div>
+          </div></div><!-- / .app-splash -->
+        </div>
+      </div>
+    </div>
+
+    <!-- footer -->
+    <footer cam-widget-footer
+            version="v${project.version}"></footer>
+
+    <script type="application/javascript">
+      var adminConf = window.camAdminConf = {};
+
+      window.PLUGIN_DEPENDENCIES = $PLUGIN_DEPENDENCIES || [];
+      window.PLUGIN_PACKAGES = $PLUGIN_PACKAGES || [];
+
+      window.require = {
+          waitSeconds: 0
+      };
+    </script>
+
+    <!--[if lte IE 9]><script type="text/javascript">
+      adminConf.polyfills = adminConf.polyfills || [];
+      adminConf.polyfills.push('placeholder');
+    </script><![endif]-->
+
+    <script type="application/javascript"
+            src="$APP_ROOT/lib/require.js"></script>
+    <script type="text/javascript">
+
+window.__define = window.define;
+window.__require = window.require;
+window.define = undefined;
+window.require = undefined;
+window.bust = '$GRUNT_CACHE_BUST';
+
+requirejs.config({
+  baseUrl: '$APP_ROOT/app/admin',
+  urlArgs: 'bust=$GRUNT_CACHE_BUST'
+});
+requirejs(['$APP_ROOT/lib/deps.js'], function () {
+  requirejs(['$APP_ROOT/app/admin/camunda-admin-bootstrap.js'], function () {});
+});
+    </script>
+  </body>
+</html>

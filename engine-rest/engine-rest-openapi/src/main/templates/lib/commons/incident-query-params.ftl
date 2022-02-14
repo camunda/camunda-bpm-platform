@@ -56,7 +56,8 @@
         location = "query"
         type = "string"
         format = "date-time"
-        desc = "Restricts to incidents that have an incidentTimestamp date before the given date. By default, the date
+        desc = "Restricts to incidents that have an incidentTimestamp date before the given date. 
+                By [default](${docsUrl}/reference/rest/overview/date-format/), the date
                 must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.000+0200`." />
 
     <@lib.parameter
@@ -64,7 +65,8 @@
         location = "query"
         type = "string"
         format = "date-time"
-        desc = "Restricts to incidents that have an incidentTimestamp date after the given date. By default*, the date
+        desc = "Restricts to incidents that have an incidentTimestamp date after the given date. 
+                By [default](${docsUrl}/reference/rest/overview/date-format/), the date
                 must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.000+0200`." />
 
     <@lib.parameter

@@ -77,14 +77,8 @@ public class DbMetricsReporter {
     }
   }
 
-  public void reportValueAtOnce(final String name, final long value) {
-    commandExecutor.execute(new Command<Void>() {
-      @Override
-      public Void execute(CommandContext commandContext) {
-        commandContext.getMeterLogManager().insert(new MeterLogEntity(name, reporterId, value, ClockUtil.getCurrentTime()));
-        return null;
-      }
-    });
+  public void reportValueAtOnce(String name, long value) {
+    commandExecutor.execute(new ReportDbMetricsValueCmd(name, value));
   }
 
   public long getReportingIntervalInSeconds() {
@@ -115,6 +109,23 @@ public class DbMetricsReporter {
     this.reporterId = reporterId;
     if (metricsCollectionTask != null) {
       metricsCollectionTask.setReporter(reporterId);
+    }
+  }
+
+  protected class ReportDbMetricsValueCmd implements Command<Void> {
+
+    protected String name;
+    protected long value;
+
+    public ReportDbMetricsValueCmd(String name, long value) {
+      this.name = name;
+      this.value = value;
+    }
+
+    @Override
+    public Void execute(CommandContext commandContext) {
+      commandContext.getMeterLogManager().insert(new MeterLogEntity(name, reporterId, value, ClockUtil.getCurrentTime()));
+      return null;
     }
   }
 

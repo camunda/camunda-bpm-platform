@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.rest.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
@@ -28,6 +29,7 @@ import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.migration.MigrationPlanExecutionBuilder;
 import org.camunda.bpm.engine.migration.MigrationPlanValidationException;
 import org.camunda.bpm.engine.rest.MigrationRestService;
+import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.migration.MigrationExecutionDto;
 import org.camunda.bpm.engine.rest.dto.migration.MigrationPlanDto;
@@ -38,6 +40,8 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import static org.camunda.bpm.engine.rest.dto.VariableValueDto.toMap;
 
 public class MigrationRestServiceImpl extends AbstractRestProcessEngineAware implements MigrationRestService {
 
@@ -57,6 +61,11 @@ public class MigrationRestServiceImpl extends AbstractRestProcessEngineAware imp
 
       if (generationDto.isUpdateEventTriggers()) {
         instructionsBuilder = instructionsBuilder.updateEventTriggers();
+      }
+
+      Map<String, VariableValueDto> variableDtos = generationDto.getVariables();
+      if (variableDtos != null) {
+        instructionsBuilder.setVariables(toMap(variableDtos, processEngine, objectMapper));
       }
 
       MigrationPlan migrationPlan = instructionsBuilder.build();
@@ -114,7 +123,7 @@ public class MigrationRestServiceImpl extends AbstractRestProcessEngineAware imp
 
   protected MigrationPlan createMigrationPlan(MigrationPlanDto migrationPlanDto) {
     try {
-      return MigrationPlanDto.toMigrationPlan(processEngine, migrationPlanDto);
+      return MigrationPlanDto.toMigrationPlan(processEngine, objectMapper, migrationPlanDto);
     }
     catch (MigrationPlanValidationException e) {
       throw e;

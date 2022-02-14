@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.authorization.optimize;
 
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Permissions.ALL;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
@@ -26,8 +27,6 @@ import static org.camunda.bpm.engine.authorization.Resources.DECISION_DEFINITION
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.TENANT;
 import static org.camunda.bpm.engine.authorization.Resources.USER;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.fail;
 
 import java.util.Arrays;
@@ -41,6 +40,7 @@ import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
@@ -55,6 +55,7 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.authorization.util.AuthorizationTestBaseRule;
+import org.camunda.bpm.engine.test.api.runtime.FailingDelegate;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ResetDmnConfigUtil;
@@ -76,6 +77,7 @@ public class OptimizeServiceAuthorizationTest {
   public static final String TEST_DECISION = "testDecision";
   public static final String SIMPLE_PROCESS = "process";
   public static final String USER_TASK_PROCESS = "userTaskProcess";
+  private static final String FAILING_PROCESS = "oneFailingServiceTaskProcess";
   private OptimizeService optimizeService;
 
   protected static final String TENANT_ONE = "tenant1";
@@ -95,72 +97,37 @@ public class OptimizeServiceAuthorizationTest {
   @Parameterized.Parameters
   public static Collection<Object[]> data() {
     return Arrays.asList(new Object[][]{
-      {new Function<OptimizeService, List<?>>() {
-        @Override
-        public List<?> apply(final OptimizeService optimizeService) {
-          return optimizeService.getCompletedHistoricActivityInstances(new Date(0L), null, 10);
-        }
-      }},
-      {new Function<OptimizeService, List<?>>() {
-        @Override
-        public List<?> apply(final OptimizeService optimizeService) {
-          return optimizeService.getRunningHistoricActivityInstances(new Date(0L), null, 10);
-        }
-      }},
+      {(Function<OptimizeService, List<?>>) optimizeService ->
+        optimizeService.getCompletedHistoricActivityInstances(new Date(0L), null, 10)},
+      {(Function<OptimizeService, List<?>>) optimizeService ->
+        optimizeService.getRunningHistoricActivityInstances(new Date(0L), null, 10)},
 
-      {new Function<OptimizeService, List<?>>() {
-        @Override
-        public List<?> apply(final OptimizeService optimizeService) {
-          return optimizeService.getCompletedHistoricProcessInstances(new Date(0L), null, 10);
-        }
-      }},
-      {new Function<OptimizeService, List<?>>() {
-        @Override
-        public List<?> apply(final OptimizeService optimizeService) {
-          return optimizeService.getRunningHistoricProcessInstances(new Date(0L), null, 10);
-        }
-      }},
+      {(Function<OptimizeService, List<?>>) optimizeService ->
+        optimizeService.getCompletedHistoricProcessInstances(new Date(0L), null, 10)},
+      {(Function<OptimizeService, List<?>>) optimizeService ->
+        optimizeService.getRunningHistoricProcessInstances(new Date(0L), null, 10)},
 
-      {new Function<OptimizeService, List<?>>() {
-        @Override
-        public List<?> apply(final OptimizeService optimizeService) {
-          return optimizeService.getCompletedHistoricTaskInstances(new Date(0L), null, 10);
-        }
-      }},
-      {new Function<OptimizeService, List<?>>() {
-        @Override
-        public List<?> apply(final OptimizeService optimizeService) {
-          return optimizeService.getRunningHistoricTaskInstances(new Date(0L), null, 10);
-        }
-      }},
+      {(Function<OptimizeService, List<?>>) optimizeService ->
+        optimizeService.getCompletedHistoricTaskInstances(new Date(0L), null, 10)},
+      {(Function<OptimizeService, List<?>>) optimizeService ->
+        optimizeService.getRunningHistoricTaskInstances(new Date(0L), null, 10)},
 
-      {new Function<OptimizeService, List<?>>() {
-        @Override
-        public List<?> apply(final OptimizeService optimizeService) {
-          return optimizeService.getHistoricIdentityLinkLogs(new Date(0L), null, 10);
-        }
-      }},
+      {(Function<OptimizeService, List<?>>) optimizeService ->
+        optimizeService.getHistoricIdentityLinkLogs(new Date(0L), null, 10)},
 
-      {new Function<OptimizeService, List<?>>() {
-        @Override
-        public List<?> apply(final OptimizeService optimizeService) {
-          return optimizeService.getHistoricUserOperationLogs(new Date(0L), null, 10);
-        }
-      }},
+      {(Function<OptimizeService, List<?>>) optimizeService ->
+        optimizeService.getHistoricUserOperationLogs(new Date(0L), null, 10)},
 
-      {new Function<OptimizeService, List<?>>() {
-        @Override
-        public List<?> apply(final OptimizeService optimizeService) {
-          return optimizeService.getHistoricVariableUpdates(new Date(0L), null, 10);
-        }
-      }},
+      {(Function<OptimizeService, List<?>>) optimizeService ->
+        optimizeService.getHistoricVariableUpdates(new Date(0L), null, false, 10)},
 
-      {new Function<OptimizeService, List<?>>() {
-        @Override
-        public List<?> apply(final OptimizeService optimizeService) {
-          return optimizeService.getHistoricDecisionInstances(new Date(0L), null, 10);
-        }
-      }},
+      {(Function<OptimizeService, List<?>>) optimizeService ->
+        optimizeService.getHistoricDecisionInstances(new Date(0L), null, 10)},
+
+      {(Function<OptimizeService, List<?>>) optimizeService ->
+        optimizeService.getCompletedHistoricIncidents(new Date(0L), null, 10)},
+      {(Function<OptimizeService, List<?>>) optimizeService ->
+        optimizeService.getOpenHistoricIncidents(new Date(0L), null, 10)},
     });
   }
 
@@ -173,6 +140,7 @@ public class OptimizeServiceAuthorizationTest {
   protected RuntimeService runtimeService;
   protected DecisionService decisionService;
   protected TaskService taskService;
+  protected ManagementService managementService;
 
   @Before
   public void setUp() throws Exception {
@@ -183,6 +151,7 @@ public class OptimizeServiceAuthorizationTest {
     runtimeService = engineRule.getRuntimeService();
     decisionService = engineRule.getDecisionService();
     taskService = engineRule.getTaskService();
+    managementService = engineRule.getManagementService();
     ProcessEngineConfigurationImpl config = engineRule.getProcessEngineConfiguration();
     optimizeService = config.getOptimizeService();
 
@@ -330,7 +299,7 @@ public class OptimizeServiceAuthorizationTest {
     List<?> instance = methodToTest.apply(optimizeService);
 
     // then
-    assertThat(instance.size(), greaterThan(0));
+    assertThat(instance.size()).isGreaterThan(0);
   }
 
   private void generateTestData() {
@@ -356,6 +325,13 @@ public class OptimizeServiceAuthorizationTest {
     final DecisionDefinition decision = selectDecisionDefinitionByKey();
     decisionService.evaluateDecisionById(decision.getId())
       .variables(Variables.createVariables().putValue("input1", "a")).evaluate();
+
+    // create completed incident data
+    runtimeService.startProcessInstanceByKey(FAILING_PROCESS);
+    String jobId = managementService.createJobQuery().singleResult().getId();
+    managementService.setJobRetries(jobId, 0); // creates incident
+    managementService.setJobRetries(jobId, 1); // resolves incident
+    managementService.setJobRetries(jobId, 0); // creates second incident
 
     engineRule.getProcessEngineConfiguration().setAuthorizationEnabled(true);
   }
@@ -396,6 +372,14 @@ public class OptimizeServiceAuthorizationTest {
       .endEvent()
       .done();
     deploymentBuilder.addModelInstance("userTaskProcess1-" + ".bpmn", bpmnModelInstance);
+    bpmnModelInstance = Bpmn.createExecutableProcess(FAILING_PROCESS)
+      .startEvent("start")
+      .serviceTask("task")
+        .camundaAsyncBefore()
+        .camundaClass(FailingDelegate.class.getName())
+      .endEvent("end")
+      .done();
+    deploymentBuilder.addModelInstance("failingProcess1-" + ".bpmn", bpmnModelInstance);
     deploymentBuilder.addClasspathResource(DECISION_INPUT_EQUALS_OUTPUT);
     testRule.deploy(deploymentBuilder);
 

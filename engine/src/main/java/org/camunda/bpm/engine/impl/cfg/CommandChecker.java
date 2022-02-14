@@ -367,4 +367,113 @@ public interface CommandChecker {
    */
   void checkDeleteHistoricVariableInstancesByProcessInstance(HistoricProcessInstanceEntity instance);
 
+  /**
+   * Checks if it is allowed to read collected telemetry data.
+   */
+  void checkReadTelemetryData();
+
+  /**
+   * Checks if it is allowed to toggle telemetry collection.
+   */
+  void checkConfigureTelemetry();
+
+  /**
+   * Checks if it is allowed to read the status (ON/OFF) of the telemetry collection.
+   */
+  void checkReadTelemetryCollectionStatusData();
+
+  /*
+   * Checks if it is allowed to read the history level.
+   */
+  void checkReadHistoryLevel();
+
+  /*
+   * Checks if it is allowed to read the database table count.
+   */
+  void checkReadTableCount();
+
+  /*
+   * Checks if it is allowed to read the database table name for an entity class.
+   */
+  void checkReadTableName();
+
+  /*
+   * Checks if it is allowed to read the table meta data for a table with a given name.
+   */
+  void checkReadTableMetaData();
+  /*
+   * Checks if it is allowed to read system properties.
+   */
+  void checkReadProperties();
+
+  /*
+   * Checks if it is allowed to set a system property.
+   */
+  void checkSetProperty();
+
+  /*
+   * Checks if it is allowed to delete a system property
+   */
+  void checkDeleteProperty();
+
+  /*
+   * Checks if it is allowed to delete the license key.
+   */
+  void checkDeleteLicenseKey();
+
+  /*
+   * Checks if it is allowed to set the license key.
+   */
+  void checkSetLicenseKey();
+
+  /*
+   * Checks if it is allowed to read the license key.
+   */
+  void checkReadLicenseKey();
+
+  /*
+   * Checks if it is allowed to register a process application.
+   */
+  void checkRegisterProcessApplication();
+
+  /*
+   * Checks if it is allowed to unregister a process application.
+   */
+  void checkUnregisterProcessApplication();
+
+  /*
+   * Checks if it is allowed to read the registered deployments.
+   */
+  void checkReadRegisteredDeployments();
+
+  /*
+   * Checks if it is allowed to read the process application for a deployment.
+   */
+  void checkReadProcessApplicationForDeployment();
+
+  /*
+   * Checks if it is allowed to register a deployment.
+   */
+  void checkRegisterDeployment();
+
+  /*
+   * Checks if it is allowed to unregister a deployment.
+   */
+  void checkUnregisterDeployment();
+
+  /*
+   * Checks if it is allowed to delete metrics.
+   */
+  void checkDeleteMetrics();
+
+  /*
+   * Checks if it is allowed to delete task metrics.
+   */
+  void checkDeleteTaskMetrics();
+
+  /*
+   * Checks if it is allowed to read schema log data.
+   */
+  void checkReadSchemaLog();
+
 }

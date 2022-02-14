@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <description>
-    Assembles the camunda BPM platform and makes it ready for qa. 
+    Assembles the Camunda Platform and makes it ready for qa. 
     The assembly is installed to maven later in the reactor, if the integration tests pass sucessfully
   </description>
 
@@ -12,14 +12,14 @@
   <parent>
     <groupId>org.camunda.bpm.tomcat</groupId>
     <artifactId>camunda-tomcat</artifactId>
-    <version>7.14.0-SNAPSHOT</version>
+    <version>7.17.0-SNAPSHOT</version>
   </parent>
   
   <properties>
     <skip-third-party-bom>false</skip-third-party-bom>
   </properties>
 
-  <name>camunda BPM - tomcat Assembly</name>
+  <name>Camunda Platform - tomcat Assembly</name>
 
   <dependencies>
     <dependency>
@@ -47,6 +47,15 @@
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
       <artifactId>groovy-all</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.graalvm.js</groupId>
+      <artifactId>js</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.graalvm.js</groupId>
+      <artifactId>js-scriptengine</artifactId>
     </dependency>
 
     <dependency>

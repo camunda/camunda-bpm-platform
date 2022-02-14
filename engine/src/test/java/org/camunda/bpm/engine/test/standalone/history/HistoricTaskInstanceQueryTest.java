@@ -17,11 +17,13 @@
 package org.camunda.bpm.engine.test.standalone.history;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -127,6 +129,27 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTest {
       historyService.createHistoricTaskInstanceQuery().processVariableValueLike("requester", null).count();
       fail("expected exception");
     } catch (final ProcessEngineException e) {/*OK*/}
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  @Test
+  public void testProcessVariableValueNotLike() throws Exception {
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+            Collections.<String, Object>singletonMap("requester", "vahid alizadeh"));
+
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery().processVariableValueNotLike("requester", "vahid%").count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery().processVariableValueNotLike("requester", "%alizadeh").count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery().processVariableValueNotLike("requester", "%ali%").count());
+
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().processVariableValueNotLike("requester", "requester%").count());
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().processVariableValueNotLike("requester", "%ali").count());
+
+    assertEquals(1, historyService.createHistoricTaskInstanceQuery().processVariableValueNotLike("requester", "vahid").count());
+    assertEquals(0, historyService.createHistoricTaskInstanceQuery().processVariableValueNotLike("nonExistingVar", "string%").count());
+
+    // test with null value
+    assertThatThrownBy(() -> historyService.createHistoricTaskInstanceQuery().processVariableValueNotLike("requester", null).count())
+      .isInstanceOf(ProcessEngineException.class);
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
@@ -252,6 +275,24 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTest {
     // then
     assertThatListContainsOnlyExpectedElement(like, instance);
     assertThatListContainsOnlyExpectedElement(likeValueLC, instance);
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testProcessVariableValueNotLikeIgnoreCase() {
+    // given
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess", VARIABLES);
+    // when
+    List<HistoricTaskInstance> notLike = queryValueIgnoreCase().processVariableValueNotLike(VARIABLE_NAME, VARIABLE_VALUE).list();
+    List<HistoricTaskInstance> notLikeValueNE = queryValueIgnoreCase().processVariableValueNotLike(VARIABLE_NAME, VARIABLE_VALUE_NE).list();
+    List<HistoricTaskInstance> notLikeNameLC = queryValueIgnoreCase().processVariableValueNotLike(VARIABLE_NAME_LC, VARIABLE_VALUE).list();
+    List<HistoricTaskInstance> notLikeNameLCValueNE = queryValueIgnoreCase().processVariableValueNotLike(VARIABLE_NAME_LC, VARIABLE_VALUE_NE).list();
+
+    // then
+    assertThat(notLike).isEmpty();
+    assertThatListContainsOnlyExpectedElement(notLikeValueNE, instance);
+    assertThat(notLikeNameLC).isEmpty();
+    assertThat(notLikeNameLCValueNE).isEmpty();
   }
 
   @Test
@@ -417,6 +458,25 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTest {
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskInvolvedUser("bUserId").count());
     assertEquals(0, historyService.createHistoricTaskInstanceQuery().taskInvolvedUser("invalidUserId").count());
     taskService.deleteTask("newTask",true);
+  }
+
+
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+  public void testTaskInvolvedUserAsOwner() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    taskService.setOwner(taskId, "user");
+
+    // when
+    List<HistoricTaskInstance> historicTasks =
+        historyService.createHistoricTaskInstanceQuery().taskInvolvedUser("user").list();
+
+    // query test
+    assertThat(historicTasks).hasSize(1);
   }
 
   @Test
@@ -680,6 +740,29 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTest {
     ClockUtil.reset();
   }
 
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void shouldQueryForTasksWithoutDueDate() {
+    // given
+    Task taskOne = taskService.newTask("taskOne");
+    taskOne.setDueDate(new Date());
+    taskService.saveTask(taskOne);
+    Task taskTwo = taskService.newTask("taskTwo");
+    taskService.saveTask(taskTwo);
+
+    // when
+    taskService.complete(taskOne.getId());
+    taskService.complete(taskTwo.getId());
+
+    // then
+    assertThat(historyService.createHistoricTaskInstanceQuery().withoutTaskDueDate().count())
+      .isEqualTo(1L);
+
+    // cleanup
+    taskService.deleteTask("taskOne", true);
+    taskService.deleteTask("taskTwo", true);
+  }
+
   private void assertThatListContainsOnlyExpectedElement(List<HistoricTaskInstance> instances, ProcessInstance instance) {
     assertThat(instances.size()).isEqualTo(1);
     assertThat(instances.get(0).getProcessInstanceId()).isEqualTo(instance.getId());
@@ -692,7 +775,7 @@ public class HistoricTaskInstanceQueryTest extends PluggableProcessEngineTest {
   private HistoricTaskInstanceQuery queryValueIgnoreCase() {
     return historyService.createHistoricTaskInstanceQuery().matchVariableValuesIgnoreCase();
   }
-  
+
   private HistoricTaskInstanceQuery queryNameValueIgnoreCase() {
     return historyService.createHistoricTaskInstanceQuery().matchVariableNamesIgnoreCase().matchVariableValuesIgnoreCase();
   }

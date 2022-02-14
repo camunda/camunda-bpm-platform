@@ -1,9 +1,11 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto
     required = [ "type" ] >
 
     <@lib.property
         name = "type"
         type = "string"
+        nullable = false
         enumValues = ['"startBeforeActivity"', '"startAfterActivity"', '"startTransition"']
         desc = "**Mandatory**. One of the following values: `startBeforeActivity`, `startAfterActivity`, `startTransition`.
 
@@ -25,3 +27,4 @@
                 Specifies the sequence flow to start." />
 
 </@lib.dto>
+</#macro>

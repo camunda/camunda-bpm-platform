@@ -1,0 +1,161 @@
+@import "./_app-variables";
+@import "./../../../common/styles/cam-webapps-common.less";
+
+/* ---------------------------------------------------------------- */
+
+.page-header {
+  margin: 0 (@grid-gutter-width * 0.5);
+  border: none;
+}
+
+aside {
+  border-right: 1px solid @gray-lighter;
+  background-color: @custom-gray-lighter;
+
+  ul {
+    .menu-ul(16px, 24px);
+
+    margin-top: 8px;
+  }
+
+  li {
+    > a {
+      margin-left: 2px;
+      border-left: 3px solid transparent;
+      color: @text-color;
+    }
+
+    &:hover > a {
+      border-left-color: @link-color;
+      color: @gray-base;
+    }
+
+    &.active-trail > a {
+      color: @gray-dark;
+    }
+
+    &.active > a {
+      border-left-color: @brand-primary;
+    }
+  }
+}
+
+[ng-view] > section {
+  &,
+  > aside,
+  > .section-content {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    overflow: auto;
+  }
+
+  padding: 0 (@grid-gutter-width * 0.5);
+  width: 100%;
+
+  > .section-content {
+    padding: (@grid-gutter-width * 0.5);
+    right: 0;
+    width: 100%;
+
+    > header > .text-right {
+      padding-top: 7px;
+    }
+  }
+
+  > aside {
+    left: 0;
+    width: 20%;
+    padding: (@grid-gutter-width * 0.5) 0;
+  }
+
+  > aside + .section-content {
+    width: 80%;
+  }
+}
+
+td.authorization-type {
+  width: 120px;
+}
+
+td.resource-id {
+  width: 160px;
+}
+
+td.action {
+  width: 90px;
+}
+
+table.cam-table > tbody > tr > td.action {
+  vertical-align: middle;
+}
+
+/* ---------------------------------------------------------------- */
+
+@import "pages/authorizations.less";
+@import "pages/analytics.less";
+@import "pages/metrics.less";
+@import "pages/dashboard";
+@import "directives/cam-breadcrumbs-panel.less";
+
+.dashboard section .stats {
+  padding-bottom: @grid-gutter-width * 0.5;
+}
+
+.ctn-main {
+  position: absolute;
+  width: 100%;
+  top: @header-height;
+  bottom: @footer-height;
+}
+
+.ctn-wrapper {
+  height: 100%;
+  width: 100%;
+
+  > [ng-view] {
+    position: absolute;
+    width: 100%;
+    top: @breadcrumb-height;
+    bottom: 0;
+    overflow: auto;
+  }
+
+  .no-breadcrumbs & {
+    > [ng-view] {
+      top: 0;
+    }
+  }
+}
+
+.container-fluid {
+  padding-top: @grid-gutter-width * 0.5;
+  padding-bottom: @grid-gutter-width * 0.5;
+
+  footer & {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+
+@media (min-width: 1200px) {
+  .dashboard section > .inner {
+    min-height: 250px;
+  }
+}
+
+table.group,
+table.tenant {
+  table-layout: fixed;
+
+  td {
+    &.group-id,
+    &.group-name,
+    &.group-type,
+    &.tenant-name,
+    &.tenant-id {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" id="Definitions_1ov1jf9" name="DRD" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="4.0.0-alpha.3">
+  <decision id="drg-with-bean-expression" name="Decision 1">
+    <decisionTable id="DecisionTable_1ju7hid">
+      <input id="Input_1">
+        <inputExpression expressionLanguage="juel" id="InputExpression_1" typeRef="string">
+          <text>${testbean.getBar()}</text>
+        </inputExpression>
+      </input>
+      <output id="Output_1" typeRef="string" />
+      <rule id="DecisionRule_0dorm6y">
+        <inputEntry id="UnaryTests_16ybhz3">
+          <text>"baz"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0r5kzib">
+          <text>"bar"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1s7tmvg">
+        <inputEntry id="UnaryTests_0gxmhtw">
+          <text>"bar"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1o9o0r1">
+          <text>"foo"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram>
+      <dmndi:DMNShape dmnElementRef="Decision_00khy2n">
+        <dc:Bounds height="80" width="180" x="100" y="100" />
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>

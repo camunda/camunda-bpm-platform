@@ -25,9 +25,9 @@
     <dependencySet>
       <unpack>true</unpack>
       <unpackOptions>
-        <includes>
-          <include>**/*.sql</include>
-        </includes>
+        <excludes>
+          <exclude>**/META-INF/**</exclude>
+        </excludes>
       </unpackOptions>
       <includes>
         <include>org.camunda.bpm.distro:camunda-sql-scripts:jar:*</include>

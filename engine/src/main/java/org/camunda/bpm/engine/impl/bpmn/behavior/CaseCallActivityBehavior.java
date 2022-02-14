@@ -40,7 +40,11 @@ import org.camunda.bpm.engine.variable.VariableMap;
 public class CaseCallActivityBehavior extends CallableElementActivityBehavior implements MigrationObserverBehavior {
 
   protected void startInstance(ActivityExecution execution, VariableMap variables, String businessKey) {
-    CmmnCaseDefinition definition = getCaseDefinitionToCall(execution, getCallableElement());
+    ExecutionEntity executionEntity = (ExecutionEntity) execution;
+
+    CmmnCaseDefinition definition = getCaseDefinitionToCall(executionEntity,
+        executionEntity.getProcessDefinitionTenantId(),
+        getCallableElement());
     CmmnCaseInstance caseInstance = execution.createSubCaseInstance(definition, businessKey);
     caseInstance.create(variables);
   }

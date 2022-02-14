@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.LATEST_DMN_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_ALLOWED_VALUE;
 
 import org.camunda.bpm.model.dmn.instance.AllowedValues;
@@ -34,7 +34,7 @@ public class AllowedValuesImpl extends UnaryTestsImpl implements AllowedValues {
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(AllowedValues.class, DMN_ELEMENT_ALLOWED_VALUE)
-      .namespaceUri(DMN11_NS)
+      .namespaceUri(LATEST_DMN_NS)
       .extendsType(LiteralExpression.class)
       .instanceProvider(new ModelTypeInstanceProvider<AllowedValues>() {
         public AllowedValues newInstance(ModelTypeInstanceContext instanceContext) {

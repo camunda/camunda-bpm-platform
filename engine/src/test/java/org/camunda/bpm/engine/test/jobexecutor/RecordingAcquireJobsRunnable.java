@@ -55,6 +55,17 @@ public class RecordingAcquireJobsRunnable extends SequentialJobAcquisitionRunnab
     return super.acquireJobs(context, configuration, currentProcessEngine);
   }
 
+  @Override
+  protected void configureNextAcquisitionCycle(JobAcquisitionContext acquisitionContext, JobAcquisitionStrategy acquisitionStrategy) {
+    super.configureNextAcquisitionCycle(acquisitionContext, acquisitionStrategy);
+
+    long timeBetweenCurrentAndNextAcquisition = acquisitionStrategy.getWaitTime();
+    waitEvents.add(new RecordedWaitEvent(
+        System.currentTimeMillis(),
+        timeBetweenCurrentAndNextAcquisition,
+        acquisitionContext.getAcquisitionException()));
+  }
+
   public List<RecordedWaitEvent> getWaitEvents() {
     return waitEvents;
   }
@@ -63,21 +74,16 @@ public class RecordingAcquireJobsRunnable extends SequentialJobAcquisitionRunnab
     return acquisitionEvents;
   }
 
-  protected void configureNextAcquisitionCycle(JobAcquisitionContext acquisitionContext, JobAcquisitionStrategy acquisitionStrategy) {
-    super.configureNextAcquisitionCycle(acquisitionContext, acquisitionStrategy);
-
-    long timeBetweenCurrentAndNextAcquisition = acquisitionStrategy.getWaitTime();
-    waitEvents.add(new RecordedWaitEvent(System.currentTimeMillis(), timeBetweenCurrentAndNextAcquisition));
-  }
-
   public static class RecordedWaitEvent {
 
     protected long timestamp;
     protected long timeBetweenAcquisitions;
+    protected Exception acquisitionException;
 
-    public RecordedWaitEvent(long timestamp, long timeBetweenAcquisitions) {
+    public RecordedWaitEvent(long timestamp, long timeBetweenAcquisitions, Exception acquisitionException) {
       this.timestamp = timestamp;
       this.timeBetweenAcquisitions = timeBetweenAcquisitions;
+      this.acquisitionException = acquisitionException;
     }
 
     public long getTimestamp() {
@@ -85,6 +91,9 @@ public class RecordingAcquireJobsRunnable extends SequentialJobAcquisitionRunnab
     }
     public long getTimeBetweenAcquisitions() {
       return timeBetweenAcquisitions;
+    }
+    public Exception getAcquisitionException() {
+      return acquisitionException;
     }
   }
 

@@ -1,0 +1,193 @@
+<html>
+  <head>
+    <title>Camunda commons UI library</title>
+    <base href="/" />
+    <!--[if IE]><script type="text/javascript">
+        // Fix for IE ignoring relative base tags.
+        // See http://stackoverflow.com/questions/3926197/html-base-tag-and-local-folder-path-with-internet-explorer
+        (function() {
+            var baseTag = document.getElementsByTagName('base');
+            if (baseTag[0]) { baseTag[0].href = baseTag[0].href; }
+        })();
+    </script><![endif]-->
+    <link rel="icon" href="resources/img/favicon.ico" />
+    <link href="styles.css" rel="stylesheet" />
+    <link href="test-styles.css" rel="stylesheet" />
+  </head>
+  <body>
+    <!-- gh-pages-menu -->
+
+    <header>
+      <div>
+        <h1>Bpmn-Viewer</h1>
+      </div>
+    </header>
+
+    <section class='widget-description'>
+      <header>
+        <h2>Description</h2>
+      </header>
+      <p>This widget displays a BPMN diagram and lets the user interact with it using the mouse (zoom and move). It also provides an API to highlight elements and create badge annotations.</p>
+    </section>
+
+    <section class='widget-reference'>
+      <header>
+        <h2>Usage</h2>
+      </header>
+
+      <h3>Options</h3>
+      <dl>
+        <dt><span class="badge">=</span> diagram-data</dt>
+        <dd>A string containing the XML content or an object containing the bpmn.io conforming process definition model of the rendered BPM model.</dd>
+        <dt><span class="badge">=</span> control</dt>
+        <dd>An object containing the control API of the widget. After initialization of the widget, the object provided in by this variable contains the following methods:
+          <ul>
+            <li>
+              <b>highlight(id)</b>: Highlights an element by ID.
+            </li>
+            <li>
+              <b>clearHighlight(id)</b>: Removes the highlight from the element by ID.
+            </li>
+            <li>
+              <b>isHighlighted(id)</b>: Returns whether an element is highlighted (boolean).
+            </li>
+            <li>
+              <b>createBadge(id, config)</b>: Creates a badge annotation for an element. Config is an object containing the following properties:
+              <ul>
+                <li><b>color</b>: background color of the badge (HTML color string: #FFFFFF)</li>
+                <li><b>tooltip</b>: Tooltip text</li>
+                <li><b>text</b>: Text content of the badge</li>
+                <li><b>html</b>: An HTML element which is used as badge. Replaces color, tooltip and text when provided.
+                <li><b>position</b>: Object describing the position of the badge (see <a href="https://github.com/bpmn-io/diagram-js/blob/01f9f5d7bc9930b5bd0715bbdf9468547e0e18d6/lib/features/overlays/Overlays.js#L185">diagram.js documentation</a>)</li>
+              </ul>
+            </li>
+            <li>
+              <b>removeBadges(id)</b>: Removes all badges from an element by ID.
+            </li>
+            <li>
+              <b>getViewer()</b>: Returns the bpmn.io viewer instance of the diagram
+            </li>
+            <li>
+              <b>scrollToElement(id)</b>: Will bring an element with a given ID into the viewport and zoom out if necessary. Will not zoom in.
+            </li>
+            <li>
+              <b>getElement(id)</b>: Returns the bpmn.io object representing an element with a given ID.
+            </li>
+            <li>
+              <b>isLoaded()</b>: Returns whether the diagram is loaded and displayed.
+            </li>
+            <li>
+              <b>addAction(config)</b>: Creates an action on the diagram. Config is an object containing the following properties:
+              <ul>
+                <li><b>html</b>: An HTML element which is used as badge. Replaces color, tooltip and text when provided.</li>
+              </ul>
+            </li>
+          </ul>
+        </dd>
+        <dt><span class="badge">&amp;</span> on-load</dt>
+        <dd>Method that is called after the diagram is loaded correctly. Diagram will already be correctly zoomed and event listeners are setup. Will also be called whenever the diagram-data value changes and the diagram successfully reloads.</dd>
+        <dt><span class="badge">&amp;</span> on-click</dt>
+        <dd>Method that is called when the user clicks on an element in the diagram. Via the named parameter element, the target of the click can be accessed. <i>Hint: Using element.businessObject.$instanceOf('bpmn:FlowNode') you can retrieve the type of the clicked element.</i></dd>
+        <dt><span class="badge">&amp;</span> on-mouse-enter</dt>
+        <dd>Method that is called when the user hovers over an element in the diagram. Via the named parameter element, the element can be accessed.</dd>
+        <dt><span class="badge">&amp;</span> on-mouse-leave</dt>
+        <dd>Method that is called when the user stops hovering over an element in the diagram. Via the named parameter element, the element can be accessed.</dd>
+        <dt><span class="badge">&amp;</span> disable-navigation</dt>
+        <dd>Boolean indicating whether the diagram should be navigatable. If set to false, move and zoom functionality is disabled. This does not affect the callbacks, you can still have onclick listeners on an diagram with disabled navigation. This setting can not be changed at runtime.</dd>
+      </dl>
+    </section>
+
+    <section class='widget-examples'>
+      <header>
+        <h2>Example</h2>
+      </header>
+
+      <div class='widget-example'
+           id='example'>
+        <h3>Navigated Viewer</h3>
+        <div ng-controller='testController'>
+          <div cam-widget-bpmn-viewer
+            diagram-data='diagramXML'
+            id='viewer1'
+            control='control'
+            on-click='handleClick(element)'
+            on-mouse-enter='mouseEnter(element)'
+            on-mouse-leave='mouseLeave(element)'
+            style="height: 400px;"></div>
+            Selected elements: {{selectedNodes}}<br />
+            Hovering over: <span id="hoveredElementsList">{{hovering}}</span>
+        </div>
+
+          <pre ng-non-bindable>
+$scope.diagramXML = /* bpmn xml string */;
+$scope.control = {};
+$scope.selectedNodes = [];
+
+$scope.handleClick = function(element) {
+  if(element.businessObject.$instanceOf('bpmn:FlowNode')) {
+    if($scope.control.isHighlighted(element.id)) {
+      $scope.control.clearHighlight(element.id);
+      $scope.control.removeBadges(element.id);
+      $scope.selectedNodes.splice($scope.selectedNodes.indexOf(element.id),1);
+      $scope.$apply();
+    } else {
+      $scope.control.highlight(element.id);
+      $scope.control.createBadge(element.id, {text: 'Test', tooltip: 'This is a tooltip'});
+      $scope.selectedNodes.push(element.id);
+      $scope.$apply();
+    }
+  }
+};
+
+$scope.hovering = [];
+$scope.mouseEnter = function(element) {
+  $scope.hovering.push(element.id);
+  $scope.$apply();
+};
+$scope.mouseLeave = function(element) {
+  $scope.hovering.splice($scope.hovering.indexOf(element.id), 1);
+  $scope.$apply();
+};
+
+&lt;div cam-widget-bpmn-viewer
+            diagram-data='diagramXML'
+            control='control'
+            on-click='handleClick(element)'
+            on-mouse-enter='mouseEnter(element)'
+            on-mouse-leave='mouseLeave(element)'
+            style="height: 400px;"&gt;&lt;/div&gt;
+Selected elements: {{selectedNodes}}&lt;br /&gt;
+Hovering over: {{hovering}}</pre>
+      </div><!-- /.widget-example -->
+
+      <div class='widget-example'
+           id='example'>
+        <h3>Navigation Disabled</h3>
+        <div ng-controller='testController'>
+          <div cam-widget-bpmn-viewer
+            id='viewer2'
+            diagram-data='diagramXML'
+            disable-navigation='true'
+            style="height: 400px;"></div>
+        </div>
+
+          <pre ng-non-bindable>
+$scope.diagramXML = /* bpmn xml string */;
+
+&lt;div cam-widget-bpmn-viewer
+            diagram-data='diagramXML'
+            disable-navigation='true'
+            style="height: 400px;"&gt;&lt;/div&gt;</pre>
+      </div><!-- /.widget-example -->
+    </section>
+
+
+
+    </div>
+    <footer>
+      <!-- gh-pages-footer -->
+    </footer>
+
+    <script src="lib/widgets/bpmn-viewer/test/cam-widget-bpmn-viewer.build.js"></script>
+  </body>
+</html>

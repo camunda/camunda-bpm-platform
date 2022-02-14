@@ -26,40 +26,46 @@
   <!-- This snippet is used by all queries that allow filtering by variable values -->
   <sql id="variableValueConditions">
 
-    <if test="queryVariableValue.operatorName.equals('NOT_EQUALS')">NOT</if><!-- NOT_EQUALS uses the same conditions as EQUALS -->
+    <if test="queryVariableValue.operatorName.equals('NOT_EQUALS') || queryVariableValue.operatorName.equals('NOT_LIKE')">NOT</if><!-- NOT_EQUALS and NOT_LIKE use the same conditions as EQUALS and LIKE -->
     (
     <foreach collection="queryVariableValue.valueConditions" item="valueCondition" separator="or">
       <trim prefix="(" prefixOverrides="and" suffix=")">
         <if test="!valueCondition.type.equals('null')">
-        <!-- When type of value is null, type doesn't matter! -->
-        and ${varPrefix}${varTypeField} is not null and ${varPrefix}${varTypeField} = #{valueCondition.type}
+          <!-- When type of value is null, type doesn't matter! -->
+          and ${varPrefix}${varTypeField} is not null and ${varPrefix}${varTypeField} = #{valueCondition.type}
         </if>
-         
         <if test="valueCondition.textValue != null &amp;&amp; valueCondition.longValue == null &amp;&amp; valueCondition.doubleValue == null">
-          and ${varPrefix}TEXT_ is not null and 
-		  <choose>
-		  	<when test="queryVariableValue.variableValueIgnoreCase">UPPER(${varPrefix}TEXT_)</when>
-		  	<otherwise>${varPrefix}TEXT_</otherwise>
-		  </choose>
-		  <choose>
-		    <when test="queryVariableValue.operatorName.contains('LIKE')">LIKE</when>
-		    <otherwise><include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.executionVariableOperator" /></otherwise>
-		  </choose>
-		  <choose>
-		  	<when test="queryVariableValue.variableValueIgnoreCase">UPPER(#{valueCondition.textValue})</when>
-		  	<otherwise>#{valueCondition.textValue}</otherwise>
-		  </choose>
-		  ${collationForCaseSensitivity}
-          <if test="queryVariableValue.operatorName.equals('LIKE')">ESCAPE ${escapeChar}</if>
+          <choose>
+            <when test="valueCondition.findNulledEmptyStrings">
+              and ${varPrefix}TEXT_ is null and ${varPrefix}TEXT2_ = '${@org.camunda.bpm.engine.impl.variable.serializer.StringValueSerializer@EMPTY_STRING}'
+            </when>
+            <otherwise>
+              and ${varPrefix}TEXT_ is not null and
+              <choose>
+                <when test="queryVariableValue.variableValueIgnoreCase">UPPER(${varPrefix}TEXT_)</when>
+                <otherwise>${varPrefix}TEXT_</otherwise>
+              </choose>
+              <choose>
+                <when test="queryVariableValue.operatorName.contains('LIKE')">LIKE</when>
+                <otherwise><include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.executionVariableOperator" /></otherwise>
+              </choose>
+              <choose>
+                <when test="queryVariableValue.variableValueIgnoreCase">UPPER(#{valueCondition.textValue})</when>
+                <otherwise>#{valueCondition.textValue}</otherwise>
+              </choose>
+              ${collationForCaseSensitivity}
+              <if test="queryVariableValue.operatorName.contains('LIKE')">ESCAPE ${escapeChar}</if>
+            </otherwise>
+          </choose>
         </if>
-        <if test="valueCondition.textValue2 != null">
+        <if test="valueCondition.textValue2 != null &amp;&amp; !valueCondition.type.equals('string')">
           and ${varPrefix}TEXT2_ is not null and ${varPrefix}TEXT2_
           <choose>
-            <when test="queryVariableValue.operatorName.equals('LIKE')">LIKE</when>
+            <when test="queryVariableValue.operatorName.contains('LIKE')">LIKE</when>
             <otherwise><include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.executionVariableOperator" /></otherwise>
           </choose>
           #{valueCondition.textValue2}
-          <if test="queryVariableValue.operatorName.equals('LIKE')">ESCAPE ${escapeChar}</if>
+          <if test="queryVariableValue.operatorName.contains('LIKE')">ESCAPE ${escapeChar}</if>
         </if>
     
         <if test="valueCondition.longValue != null">

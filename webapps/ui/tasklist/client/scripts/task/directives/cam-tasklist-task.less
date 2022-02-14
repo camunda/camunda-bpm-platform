@@ -1,0 +1,79 @@
+[cam-tasklist-task] {
+  header {
+    position: relative;
+    z-index: 15;
+  }
+
+  h2 {
+    margin-top: 0;
+  }
+
+  .definition-name {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 10px;
+
+    .glyphicon {
+      margin-left: 5px;
+    }
+  }
+
+  .tenant-id {
+    float: right;
+    text-align: right;
+    max-width: 25%;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  .nav-tabs .glyphicon {
+    margin-left: 5px;
+  }
+
+  .tab-content {
+    padding-top: @grid-gutter-width;
+  }
+
+  .form-container {
+    // aimed to correct the with of forms for which the nesting of elements
+    // was not done correctly (form > .row > .form-group)
+    form.form > .form-group {
+      margin-left: 0;
+      margin-right: 0;
+    }
+  }
+
+  .task-removed-alert {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.218s ease;
+    padding: 0 (@grid-gutter-width * 0.5);
+
+    > .alert {
+      padding: (@grid-gutter-width * 0.5) 0;
+    }
+  }
+
+  .task-removed {
+    h2 {
+      text-decoration: line-through;
+    }
+
+    .task-removed-alert {
+      max-height: 120px;
+    }
+
+    [cam-tasklist-task-meta] *,
+    .tabbed-content * {
+      cursor: not-allowed;
+    }
+  }
+}
+
+[cam-tasklist-form] {
+  .form-actions {
+    margin-top: (@grid-gutter-width / 2);
+  }
+}

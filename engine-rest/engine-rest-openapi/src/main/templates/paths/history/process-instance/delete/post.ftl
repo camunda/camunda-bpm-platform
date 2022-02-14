@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 {
   <@lib.endpointInfo
       id = "deleteHistoricProcessInstancesAsync"
@@ -58,3 +59,4 @@
 
   }
 }
+</#macro>

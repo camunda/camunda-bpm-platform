@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -8,3 +9,4 @@
         desc = "The links associated to this resource, with `method`, `href` and `rel`." />
 
 </@lib.dto>
+</#macro>

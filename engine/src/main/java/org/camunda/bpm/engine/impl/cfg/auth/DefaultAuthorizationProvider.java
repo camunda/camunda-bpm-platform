@@ -62,7 +62,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 
 /**
- * <p>Provides the default authorizations for camunda BPM.</p>
+ * <p>Provides the default authorizations for Camunda Platform.</p>
  *
  * @author Daniel Meyer
  *

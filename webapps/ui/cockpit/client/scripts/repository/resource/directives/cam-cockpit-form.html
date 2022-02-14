@@ -1,0 +1,14 @@
+<!-- # cockpit client/scripts/repository/resource/directives/cam-cockpit-form.html -->
+<h4>{{'REPOSITORY_RESOURCES_FORM_PREVIEW' | translate}}</h4>
+<div ng-show="!error" class="camundaForm"></div>
+<div ng-show="error" uib-alert class="alert alert-danger" role="alert">
+  <span class="glyphicon glyphicon-exclamation-sign"></span>
+  <strong class="status">{{ 'FORM_FAILURE' | translate }}</strong>
+  <span class="message">{{ error.message | translate }}</span>
+</div>
+
+<h4>{{'REPOSITORY_RESOURCES_RAW_DATA' | translate}}</h4>
+<div cam-source
+      name="name"
+      source="source"></div>
+<!-- / cockpit client/scripts/repository/resource/directives/cam-cockpit-form.html -->

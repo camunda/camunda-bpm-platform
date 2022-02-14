@@ -25,6 +25,7 @@ import javax.script.ScriptEngineManager;
 
 import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
+import org.camunda.bpm.engine.impl.scripting.engine.DefaultScriptEngineResolver;
 import org.camunda.bpm.engine.impl.scripting.engine.ScriptEngineResolver;
 
 /**
@@ -36,7 +37,7 @@ public class ProcessApplicationScriptEnvironment {
   protected ProcessApplicationInterface processApplication;
 
   protected ScriptEngineResolver processApplicationScriptEngineResolver;
-  protected Map<String, List<ExecutableScript>> environmentScripts = new HashMap<String, List<ExecutableScript>>();
+  protected Map<String, List<ExecutableScript>> environmentScripts = new HashMap<>();
 
   public ProcessApplicationScriptEnvironment(ProcessApplicationInterface processApplication) {
     this.processApplication = processApplication;
@@ -58,7 +59,7 @@ public class ProcessApplicationScriptEnvironment {
     if(processApplicationScriptEngineResolver == null) {
       synchronized (this) {
         if(processApplicationScriptEngineResolver == null) {
-          processApplicationScriptEngineResolver = new ScriptEngineResolver(new ScriptEngineManager(getProcessApplicationClassloader()));
+          processApplicationScriptEngineResolver = new DefaultScriptEngineResolver(new ScriptEngineManager(getProcessApplicationClassloader()));
         }
       }
     }

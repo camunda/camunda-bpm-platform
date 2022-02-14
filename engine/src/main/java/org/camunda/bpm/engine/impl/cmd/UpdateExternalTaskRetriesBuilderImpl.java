@@ -44,6 +44,11 @@ public class UpdateExternalTaskRetriesBuilderImpl implements UpdateExternalTaskR
 
   protected int retries;
 
+  public UpdateExternalTaskRetriesBuilderImpl(List<String> externalTaskIds, int retries) {
+    this.externalTaskIds = externalTaskIds;
+    this.retries = retries;
+  }
+
   public UpdateExternalTaskRetriesBuilderImpl(CommandExecutor commandExecutor) {
     this.commandExecutor = commandExecutor;
   }

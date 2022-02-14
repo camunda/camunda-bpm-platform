@@ -16,11 +16,9 @@
  */
 package org.camunda.bpm.engine.test.cmmn.activation;
 
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
@@ -92,9 +90,9 @@ public class ManualActivationRuleTest extends PluggableProcessEngineTest {
     caseService.createCaseInstanceByKey("case");
 
     CaseExecution taskExecution = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1").singleResult();
-    assertThat(taskExecution,is(notNullValue()));
-    assertThat(taskExecution.isEnabled(),is(false));
-    assertThat("Human Task is active, when ManualActivation is omitted",taskExecution.isActive(),is(true));
+    assertThat(taskExecution).isNotNull();
+    assertThat(taskExecution.isEnabled()).isFalse();
+    assertThat(taskExecution.isActive()).describedAs("Human Task is active, when ManualActivation is omitted").isTrue();
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/activation/ManualActivationRuleTest.testActivationWithoutManualActivationExpressionDefined.cmmn")
@@ -103,9 +101,9 @@ public class ManualActivationRuleTest extends PluggableProcessEngineTest {
     caseService.createCaseInstanceByKey("case");
 
     CaseExecution taskExecution = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1").singleResult();
-    assertThat(taskExecution,is(notNullValue()));
-    assertThat(taskExecution.isEnabled(),is(true));
-    assertThat("Human Task is not active, when ManualActivation's condition is empty",taskExecution.isActive(),is(false));
+    assertThat(taskExecution).isNotNull();
+    assertThat(taskExecution.isEnabled()).isTrue();
+    assertThat(taskExecution.isActive()).describedAs("Human Task is not active, when ManualActivation's condition is empty").isFalse();
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/activation/ManualActivationRuleTest.testActivationWithoutManualActivationConditionDefined.cmmn")
@@ -114,9 +112,9 @@ public class ManualActivationRuleTest extends PluggableProcessEngineTest {
     caseService.createCaseInstanceByKey("case");
 
     CaseExecution taskExecution = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1").singleResult();
-    assertThat(taskExecution,is(notNullValue()));
-    assertThat(taskExecution.isEnabled(),is(true));
-    assertThat("Human Task is not active, when ManualActivation's condition is empty",taskExecution.isActive(),is(false));
+    assertThat(taskExecution).isNotNull();
+    assertThat(taskExecution.isEnabled()).isTrue();
+    assertThat(taskExecution.isActive()).describedAs("Human Task is not active, when ManualActivation's condition is empty").isFalse();
   }
 
 }

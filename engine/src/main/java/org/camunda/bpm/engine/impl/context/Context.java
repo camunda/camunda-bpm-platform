@@ -87,7 +87,7 @@ public class Context {
       }
     } else {
       // reset the MDC to the logging context of the outer command invocation
-      stack.peek().getProcessDataContext().updateMdc();
+      stack.peek().getProcessDataContext().updateMdcFromCurrentValues();
     }
   }
 

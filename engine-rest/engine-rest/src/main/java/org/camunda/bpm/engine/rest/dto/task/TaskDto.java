@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.rest.dto.task;
 
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.form.CamundaFormRef;
 import org.camunda.bpm.engine.rest.dto.converter.DelegationStateConverter;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
@@ -45,6 +46,7 @@ public class TaskDto {
   private String caseDefinitionId;
   private boolean suspended;
   private String formKey;
+  private CamundaFormRef camundaFormRef;
   private String tenantId;
 
   public String getId() {
@@ -171,6 +173,10 @@ public class TaskDto {
     return formKey;
   }
 
+  public CamundaFormRef getCamundaFormRef() {
+    return camundaFormRef;
+  }
+
   public String getTenantId() {
     return tenantId;
   }
@@ -208,6 +214,7 @@ public class TaskDto {
 
     try {
       dto.formKey = task.getFormKey();
+      dto.camundaFormRef = task.getCamundaFormRef();
     }
     catch (BadUserRequestException e) {
       // ignore (initializeFormKeys was not called)

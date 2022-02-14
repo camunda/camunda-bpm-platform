@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.TaskListener;
+import org.camunda.bpm.engine.impl.form.FormDefinition;
 import org.camunda.bpm.engine.impl.form.handler.TaskFormHandler;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 
@@ -41,15 +42,15 @@ public class TaskDefinition {
   protected Expression nameExpression;
   protected Expression descriptionExpression;
   protected Expression assigneeExpression;
-  protected Set<Expression> candidateUserIdExpressions = new HashSet<Expression>();
-  protected Set<Expression> candidateGroupIdExpressions = new HashSet<Expression>();
+  protected Set<Expression> candidateUserIdExpressions = new HashSet<>();
+  protected Set<Expression> candidateGroupIdExpressions = new HashSet<>();
   protected Expression dueDateExpression;
   protected Expression followUpDateExpression;
   protected Expression priorityExpression;
 
   // form fields
   protected TaskFormHandler taskFormHandler;
-  protected Expression formKey;
+  protected FormDefinition formDefinition = new FormDefinition();
 
   // task listeners
   protected Map<String, List<TaskListener>> taskListeners = new HashMap<>();
@@ -173,7 +174,7 @@ public class TaskDefinition {
   public void addBuiltInTaskListener(String eventName, TaskListener taskListener) {
     List<TaskListener> listeners = taskListeners.get(eventName);
     if (listeners == null) {
-      listeners = new ArrayList<TaskListener>();
+      listeners = new ArrayList<>();
       taskListeners.put(eventName, listeners);
     }
 
@@ -186,12 +187,32 @@ public class TaskDefinition {
     timeoutTaskListeners.put(timeoutId, taskListener);
   }
 
+  public FormDefinition getFormDefinition() {
+    return formDefinition;
+  }
+
+  public void setFormDefinition(FormDefinition formDefinition) {
+    this.formDefinition = formDefinition;
+  }
+
   public Expression getFormKey() {
-    return formKey;
+    return formDefinition.getFormKey();
   }
 
   public void setFormKey(Expression formKey) {
-    this.formKey = formKey;
+    this.formDefinition.setFormKey(formKey);
+  }
+
+  public Expression getCamundaFormDefinitionKey() {
+    return formDefinition.getCamundaFormDefinitionKey();
+  }
+
+  public String getCamundaFormDefinitionBinding() {
+    return formDefinition.getCamundaFormDefinitionBinding();
+  }
+
+  public Expression getCamundaFormDefinitionVersion() {
+    return formDefinition.getCamundaFormDefinitionVersion();
   }
 
 }

@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 {
   <@lib.endpointInfo
       id = "getHistoricProcessInstances"
@@ -19,7 +20,7 @@
 
     <@lib.parameters
         object = params
-        skip = ["orQueries"] <#-- OR Queries not avaialble in GET -->
+        skip = ["orQueries"] <#-- OR Queries not available in GET -->
         last = true />
 
   ],
@@ -66,3 +67,4 @@
                 See the [Introduction](${docsUrl}/reference/rest/overview/#error-handling) for the error response format."/>
   }
 }
+</#macro>

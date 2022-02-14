@@ -588,6 +588,7 @@ public class MigratingActivityInstance extends MigratingScopeInstance implements
 
       parentExecution.setActivity(representativeExecution.getActivity());
       parentExecution.setActivityInstanceId(representativeExecution.getActivityInstanceId());
+      parentExecution.setActive(representativeExecution.isActive());
 
       representativeExecution.remove();
       representativeExecution = parentExecution;

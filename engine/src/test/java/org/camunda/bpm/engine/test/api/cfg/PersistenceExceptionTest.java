@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.cfg;
 
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -67,7 +67,8 @@ public class PersistenceExceptionTest {
       runtimeService.startProcessInstanceByKey("process1").getId();
       fail("persistence exception is expected");
     } catch (ProcessEngineException ex) {
-      assertTrue(ex.getMessage().contains("insertHistoricTaskInstanceEvent"));
+      Throwable cause = ex.getCause();
+      assertThat(cause.getMessage()).contains("insertHistoricTaskInstanceEvent");
     }
   }
 

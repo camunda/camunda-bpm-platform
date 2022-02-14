@@ -4,37 +4,37 @@
   <parent>
     <groupId>org.camunda</groupId>
     <artifactId>camunda-bpm-release-parent</artifactId>
-    <version>2.1.0</version>
+    <version>2.2.4</version>
     <!-- do not remove empty tag - http://jira.codehaus.org/browse/MNG-4687 -->
     <relativePath />
   </parent>
 
   <groupId>org.camunda.bpm</groupId>
   <artifactId>camunda-root</artifactId>
-  <version>7.14.0-SNAPSHOT</version>
+  <version>7.17.0-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <name>camunda BPM - Root Pom</name>
+  <name>Camunda Platform - Root Pom</name>
   <inceptionYear>2013</inceptionYear>
 
   <description>
     This pom defines the modules that make up the build.
-    The parent pom for all camunda BPM projects can be found in the parent directory relative to this file.
+    The parent pom for all Camunda Platform projects can be found in the parent directory relative to this file.
   </description>
 
   <properties>
     <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
 
     <!-- These properties are used in both the BOM as well as camunda-parent and subprojects -->
-    <version.mybatis>3.5.3</version.mybatis>
+    <version.mybatis>3.5.6</version.mybatis>
     <version.joda-time>2.1</version.joda-time>
     <version.uuid-generator>3.2.0</version.uuid-generator>
-    <version.camunda.commons>1.9.0</version.camunda.commons>
-    <version.camunda.connect>1.4.0</version.camunda.connect>
-    <version.camunda.spin>1.9.0</version.camunda.spin>
-    <version.camunda.template-engines>2.0.0</version.camunda.template-engines>
+    <version.camunda.commons>1.10.0</version.camunda.commons>
+    <version.camunda.connect>1.5.2</version.camunda.connect>
+    <version.camunda.spin>1.13.0</version.camunda.spin>
+    <version.camunda.template-engines>2.1.0</version.camunda.template-engines>
     <version.camunda.ee.xslt-plugin>1.1.0</version.camunda.ee.xslt-plugin>
-    <version.spring-boot>2.3.1.RELEASE</version.spring-boot>
-    <version.feel-scala>1.11.2</version.feel-scala>
+    <version.feel-scala>1.13.3</version.feel-scala>
+    <plugin.version.javadoc>3.0.1</plugin.version.javadoc>
   </properties>
 
   <build>
@@ -61,13 +61,15 @@
       </activation>
       <modules>
         <!-- This profile is run in the CI as the first step (platform-ASSEMBLY); It must not activate
-          any modules that have a dependency to the webapps. See also the referenced POMs, 
+          any modules that have a dependency to the webapps. See also the referenced POMs,
           they usually define which modules are covered by the distro profile -->
         <module>spring-boot-starter</module>
 
+        <module>quarkus-extension</module>
+
         <module>qa</module>
 
-        <module>webapps/h2-webapp</module>
+        <module>distro/h2-webapp</module>
 
         <module>javaee/ejb-service</module>
         <module>javaee/ejb-client</module>
@@ -77,22 +79,28 @@
         <module>model-api</module>
         <module>typed-values</module>
         <module>engine-dmn</module>
+        <module>test-utils/testcontainers</module>
 
         <module>engine</module>
         <module>engine-cdi</module>
         <module>engine-spring</module>
         <module>engine-rest</module>
 
+        <module>webapps</module>
+
         <module>examples/invoice</module>
 
         <module>engine-plugins</module>
 
         <module>distro/license-book</module>
-        <module>distro/jbossas7</module>
+        <module>distro/jboss</module>
         <module>distro/tomcat</module>
         <module>distro/sql-script</module>
         <module>distro/run</module>
 
+        <module>clients/java</module>
+
+        <module>internal-dependencies</module>
         <module>database</module>
         <module>parent</module>
         <module>bom</module>
@@ -105,15 +113,36 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
-        <!-- This profile is run in the CI after the webapps were built (platform-DISTRO); 
+        <!-- This profile is run in the CI after the webapps were built (platform-ASSEMBLY);
           It should activate any module that has a dependency to the webapps -->
         <module>spring-boot-starter</module>
-        
+
         <module>distro/license-book</module>
-        <module>distro/jbossas7</module>
+        <module>distro/jboss</module>
         <module>distro/tomcat</module>
         <module>distro/run</module>
       </modules>
+    </profile>
+
+    <profile>
+      <id>javadocs</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <configuration>
+              <failOnError>false</failOnError>
+              <additionalJOptions>
+                <additionalJOption>-Xdoclint:none</additionalJOption>
+                <additionalJOption>--ignore-source-errors</additionalJOption>
+              </additionalJOptions>
+              <doctitle>Camunda Platform Javadocs ${project.version}</doctitle>
+              <windowtitle>Camunda Platform Javadocs ${project.version}</windowtitle>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
 
     <profile>
@@ -121,12 +150,14 @@
       <modules>
         <module>qa</module>
 
-        <module>webapps/h2-webapp</module>
+        <module>distro/h2-webapp</module>
 
         <module>engine</module>
         <module>engine-cdi</module>
         <module>engine-spring</module>
         <module>engine-rest</module>
+
+        <module>webapps</module>
 
         <module>examples/invoice</module>
 
@@ -134,21 +165,10 @@
 
         <module>distro/sql-script</module>
 
+        <module>internal-dependencies</module>
         <module>database</module>
         <module>parent</module>
         <module>bom</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>distro-jbossas7</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <modules>
-        <module>javaee/ejb-client</module>
-        <module>distro/license-book</module>
-        <module>distro/jbossas7</module>
       </modules>
     </profile>
 
@@ -198,7 +218,7 @@
     <profile>
       <id>distro-starter</id>
       <!-- This profile is run in the release CI for building the enterprise artifacts
-          It can be removed if the webapp repo is merged to the platform and
+          It can be removed if the distro job is merged with the assembly job and
           distro-ce is not used for building the spring boot starter -->
       <modules>
         <module>spring-boot-starter</module>
@@ -214,6 +234,7 @@
         <module>engine-spring</module>
         <module>engine-rest</module>
 
+        <module>internal-dependencies</module>
         <module>database</module>
         <module>parent</module>
         <module>bom</module>
@@ -224,6 +245,7 @@
       <!-- profile for running webapp unit tests in QA -->
       <id>check-webapps</id>
       <modules>
+        <module>internal-dependencies</module>
         <module>parent</module>
         <module>bom</module>
       </modules>
@@ -233,6 +255,7 @@
       <id>sonatype-oss-release</id>
       <modules>
         <module>spring-boot-starter</module>
+        <module>quarkus-extension</module>
         <module>model-api</module>
 
         <module>engine</module>
@@ -245,10 +268,15 @@
 
         <module>javaee/ejb-client</module>
 
+        <module>webapps</module>
+
         <module>engine-plugins</module>
 
         <module>distro/webjar</module>
 
+        <module>clients/java</module>
+
+        <module>internal-dependencies</module>
         <module>database</module>
         <module>parent</module>
         <module>bom</module>
@@ -286,7 +314,7 @@
   <developers>
     <developer>
       <id>camunda.org</id>
-      <name>camunda BPM Community</name>
+      <name>Camunda Platform Community</name>
       <organization>camunda.org</organization>
       <organizationUrl>http://camunda.org</organizationUrl>
     </developer>

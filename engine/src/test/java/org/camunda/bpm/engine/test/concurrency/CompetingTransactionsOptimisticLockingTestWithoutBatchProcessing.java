@@ -22,6 +22,7 @@ import static org.junit.Assert.assertNull;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.CrdbTransactionRetryException;
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
@@ -34,11 +35,13 @@ import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.RuleChain;
 import org.slf4j.Logger;
 
 /**
@@ -52,8 +55,11 @@ public class CompetingTransactionsOptimisticLockingTestWithoutBatchProcessing {
   @ClassRule
   public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(
       "org/camunda/bpm/engine/test/concurrency/custombatchprocessing.camunda.cfg.xml");
+  protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+
   @Rule
-  public ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
   protected RuntimeService runtimeService;
@@ -117,6 +123,13 @@ public class CompetingTransactionsOptimisticLockingTestWithoutBatchProcessing {
 
     thread1.proceedAndWaitTillDone();
     assertNotNull(thread1.exception);
-    assertEquals(OptimisticLockingException.class, thread1.exception.getClass());
+
+    if (testRule.isOptimisticLockingExceptionSuppressible()) {
+      assertEquals(OptimisticLockingException.class, thread1.exception.getClass());
+    } else {
+      // on CRDB, the transaction needs to be rolled back and retried,
+      // so a CrdbTransactionRetryException is thrown.
+      assertEquals(CrdbTransactionRetryException.class, thread1.exception.getClass());
+    }
   }
 }

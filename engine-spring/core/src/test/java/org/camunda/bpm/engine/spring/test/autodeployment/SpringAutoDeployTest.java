@@ -64,7 +64,7 @@ public class SpringAutoDeployTest extends PvmTestCase {
       = "org/camunda/bpm/engine/spring/test/autodeployment/SpringAutoDeployCustomNameTest-context.xml";
 
 
-  protected ApplicationContext applicationContext;
+  protected ClassPathXmlApplicationContext applicationContext;
   protected RepositoryService repositoryService;
 
   protected void createAppContext(String path) {
@@ -75,6 +75,7 @@ public class SpringAutoDeployTest extends PvmTestCase {
   protected void tearDown() throws Exception {
     DynamicResourceProducer.clearResources();
     removeAllDeployments();
+    this.applicationContext.close();
     this.applicationContext = null;
     this.repositoryService = null;
     super.tearDown();

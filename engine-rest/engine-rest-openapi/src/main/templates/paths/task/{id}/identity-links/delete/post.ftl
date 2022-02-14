@@ -1,8 +1,10 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
       id = "deleteIdentityLink"
       tag = "Task Identity Link"
+      summary = "Delete"
       desc = "Removes an identity link from a task by id" />
 
   "parameters" : [
@@ -44,3 +46,5 @@
 
   }
 }
+
+</#macro>

@@ -30,6 +30,7 @@ import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSession;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionManager;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionManager;
+import org.camunda.bpm.engine.impl.form.entity.CamundaFormDefinitionManager;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInstanceManager;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -122,6 +123,10 @@ public abstract class AbstractManager implements Session {
     return getSession(DecisionRequirementsDefinitionManager.class);
   }
 
+  protected CamundaFormDefinitionManager getCamundaFormDefinitionManager() {
+    return getSession(CamundaFormDefinitionManager.class);
+  }
+
   protected HistoricDecisionInstanceManager getHistoricDecisionInstanceManager() {
     return getSession(HistoricDecisionInstanceManager.class);
   }
@@ -189,7 +194,7 @@ public abstract class AbstractManager implements Session {
   protected HistoricIdentityLinkLogManager getHistoricIdentityLinkManager() {
     return getSession(HistoricIdentityLinkLogManager.class);
   }
-  
+
   protected HistoricJobLogManager getHistoricJobLogManager() {
     return getSession(HistoricJobLogManager.class);
   }

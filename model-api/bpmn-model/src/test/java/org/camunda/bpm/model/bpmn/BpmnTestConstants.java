@@ -47,6 +47,7 @@ public final class BpmnTestConstants {
   public static final String CONDITION_ID = "condition";
   public static final String BOUNDARY_ID = "boundary";
   public static final String CATCH_ID = "catch";
+  public static final String FORM_ID = "form";
 
   public static final String TEST_STRING_XML = "test";
   public static final String TEST_STRING_API = "api";
@@ -88,5 +89,8 @@ public final class BpmnTestConstants {
   public static final String TEST_CONDITIONAL_VARIABLE_NAME = "variable";
   public static final String TEST_CONDITIONAL_VARIABLE_EVENTS = "create, update";
   public static final List<String> TEST_CONDITIONAL_VARIABLE_EVENTS_LIST = Arrays.asList("create", "update");
+
+  public static final String TEST_STRING_FORM_REF_BINDING = "version";
+  public static final String TEST_STRING_FORM_REF_VERSION = "2";
 
 }

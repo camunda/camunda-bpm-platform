@@ -10,7 +10,7 @@ else
 	BROWSERS="xdg-open gnome-www-browser x-www-browser firefox chromium chromium-browser google-chrome"
 fi
 
-echo "starting camunda BPM platform on Tomcat Application Server";
+echo "starting Camunda Platform on Tomcat Application Server";
 
 if [ -z "$BROWSER" ]; then
   for executable in $BROWSERS; do

@@ -21,9 +21,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
 
 
@@ -36,14 +36,13 @@ public class GetPropertiesCmd implements Command<Map<String, String>>, Serializa
 
   @SuppressWarnings("unchecked")
   public Map<String, String> execute(CommandContext commandContext) {
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkCamundaAdmin();
+    commandContext.getAuthorizationManager().checkCamundaAdminOrPermission(CommandChecker::checkReadProperties);
 
     List<PropertyEntity> propertyEntities = commandContext
       .getDbEntityManager()
       .selectList("selectProperties");
-    
-    Map<String, String> properties = new HashMap<String, String>();
+
+    Map<String, String> properties = new HashMap<>();
     for (PropertyEntity propertyEntity: propertyEntities) {
       properties.put(propertyEntity.getName(), propertyEntity.getValue());
     }

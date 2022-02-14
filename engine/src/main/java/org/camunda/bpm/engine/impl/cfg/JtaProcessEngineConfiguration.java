@@ -16,20 +16,21 @@
  */
 package org.camunda.bpm.engine.impl.cfg;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.transaction.TransactionManager;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.jta.JtaTransactionContextFactory;
 import org.camunda.bpm.engine.impl.cfg.standalone.StandaloneTransactionContextFactory;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextInterceptor;
+import org.camunda.bpm.engine.impl.interceptor.CommandCounterInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.JtaTransactionInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.LogInterceptor;
@@ -64,9 +65,15 @@ public class JtaProcessEngineConfiguration extends ProcessEngineConfigurationImp
   @Override
   protected Collection< ? extends CommandInterceptor> getDefaultCommandInterceptorsTxRequired() {
     List<CommandInterceptor> defaultCommandInterceptorsTxRequired = new ArrayList<CommandInterceptor>();
+    // CRDB interceptor is added before the JtaTransactionInterceptor,
+    // so that a Java EE managed TX may be rolled back before retrying.
+    if (DbSqlSessionFactory.CRDB.equals(databaseType)) {
+      defaultCommandInterceptorsTxRequired.add(getCrdbRetryInterceptor());
+    }
     defaultCommandInterceptorsTxRequired.add(new LogInterceptor());
+    defaultCommandInterceptorsTxRequired.add(new CommandCounterInterceptor(this));
     defaultCommandInterceptorsTxRequired.add(new ProcessApplicationContextInterceptor(this));
-    defaultCommandInterceptorsTxRequired.add(new JtaTransactionInterceptor(transactionManager, false));
+    defaultCommandInterceptorsTxRequired.add(new JtaTransactionInterceptor(transactionManager, false, this));
     defaultCommandInterceptorsTxRequired.add(new CommandContextInterceptor(commandContextFactory, this));
     return defaultCommandInterceptorsTxRequired;
   }
@@ -74,9 +81,15 @@ public class JtaProcessEngineConfiguration extends ProcessEngineConfigurationImp
   @Override
   protected Collection< ? extends CommandInterceptor> getDefaultCommandInterceptorsTxRequiresNew() {
     List<CommandInterceptor> defaultCommandInterceptorsTxRequiresNew = new ArrayList<CommandInterceptor>();
+    // CRDB interceptor is added before the JtaTransactionInterceptor,
+    // so that a Java EE managed TX may be rolled back before retrying.
+    if (DbSqlSessionFactory.CRDB.equals(databaseType)) {
+      defaultCommandInterceptorsTxRequiresNew.add(getCrdbRetryInterceptor());
+    }
     defaultCommandInterceptorsTxRequiresNew.add(new LogInterceptor());
+    defaultCommandInterceptorsTxRequiresNew.add(new CommandCounterInterceptor(this));
     defaultCommandInterceptorsTxRequiresNew.add(new ProcessApplicationContextInterceptor(this));
-    defaultCommandInterceptorsTxRequiresNew.add(new JtaTransactionInterceptor(transactionManager, true));
+    defaultCommandInterceptorsTxRequiresNew.add(new JtaTransactionInterceptor(transactionManager, true, this));
     defaultCommandInterceptorsTxRequiresNew.add(new CommandContextInterceptor(commandContextFactory, this, true));
     return defaultCommandInterceptorsTxRequiresNew;
   }
@@ -89,6 +102,7 @@ public class JtaProcessEngineConfiguration extends ProcessEngineConfigurationImp
     if(commandExecutorSchemaOperations == null) {
       List<CommandInterceptor> commandInterceptorsDbSchemaOperations = new ArrayList<CommandInterceptor>();
       commandInterceptorsDbSchemaOperations.add(new LogInterceptor());
+      commandInterceptorsDbSchemaOperations.add(new CommandCounterInterceptor(this));
       commandInterceptorsDbSchemaOperations.add(new CommandContextInterceptor(dbSchemaOperationsCommandContextFactory, this));
       commandInterceptorsDbSchemaOperations.add(actualCommandExecutor);
       commandExecutorSchemaOperations = initInterceptorChain(commandInterceptorsDbSchemaOperations);

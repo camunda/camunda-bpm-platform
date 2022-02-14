@@ -20,12 +20,14 @@ import org.assertj.core.util.DateUtil;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.delegate.TaskListener;
+import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.history.event.HistoricIdentityLinkLogEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricTaskInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.spring.boot.starter.event.TaskEvent;
+import org.camunda.bpm.spring.boot.starter.test.nonpa.BoundaryEventServiceTask;
 import org.camunda.bpm.spring.boot.starter.test.nonpa.TestApplication;
 import org.camunda.bpm.spring.boot.starter.test.nonpa.TestEventCaptor;
 import org.junit.After;
@@ -38,6 +40,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.Collections;
 import java.util.Date;
 
 import static junit.framework.TestCase.fail;
@@ -75,6 +78,9 @@ public class CamundaEventingIT extends AbstractCamundaAutoConfigurationIT {
       if (instance != null) {
         runtime.deleteProcessInstance(instance.getProcessInstanceId(), "eventing shutdown");
       }
+    }
+    for (HistoricVariableInstance historicVariableInstance : historyService.createHistoricVariableInstanceQuery().list()) {
+      historyService.deleteHistoricVariableInstance(historicVariableInstance.getId());
     }
   }
 
@@ -172,6 +178,64 @@ public class CamundaEventingIT extends AbstractCamundaAutoConfigurationIT {
     // 2 for end event (start, end)
     // 1 for process (end)
     int expectedCount = 2 + 3 + 2 + 1;
+    assertThat(eventCaptor.executionEvents).hasSize(expectedCount);
+    assertThat(eventCaptor.immutableExecutionEvents).hasSize(expectedCount);
+    assertThat(eventCaptor.transactionExecutionEvents).hasSize(expectedCount);
+    assertThat(eventCaptor.transactionImmutableExecutionEvents).hasSize(expectedCount);
+  }
+
+  @Test
+  public final void shouldEventExecutionWhenIntermediateCatchExists() {
+    // given
+    eventCaptor.clear();
+    instance = runtime.startProcessInstanceByKey("eventingWithIntermediateCatch");
+    // then 13
+    // 1 for process (start)
+    // 3 for start event (start, take, end)
+    // 1 for timer event (start)
+    int expectedCount = 1 + 3 +  1;
+    assertThat(eventCaptor.executionEvents).hasSize(expectedCount);
+    assertThat(eventCaptor.immutableExecutionEvents).hasSize(expectedCount);
+    assertThat(eventCaptor.transactionExecutionEvents).hasSize(expectedCount);
+    assertThat(eventCaptor.transactionImmutableExecutionEvents).hasSize(expectedCount);
+  }
+
+  @Test
+  public final void shouldEventExecutionWhenBoundaryEventExists() {
+    // given
+    eventCaptor.clear();
+    instance = runtime.startProcessInstanceByKey("eventingWithBoundaryEvent");
+    runtime.signalEventReceived("countSignal");
+    // then 13
+    // 1 for process (start)
+    // 3 for start event (start, take, end)
+    // 3 for signal event (start, take, end)
+    // 3 for service task (start, take, end)
+    // 2 for end event (start, end)
+    // 1 for process (end)
+    int expectedCount = 1 + 3 + 3 + 3 + 2 + 1;
+    assertThat(eventCaptor.executionEvents).hasSize(expectedCount);
+    assertThat(eventCaptor.immutableExecutionEvents).hasSize(expectedCount);
+    assertThat(eventCaptor.transactionExecutionEvents).hasSize(expectedCount);
+    assertThat(eventCaptor.transactionImmutableExecutionEvents).hasSize(expectedCount);
+  }
+
+  @Test
+  public final void shouldEventExecutionWhenBoundaryEventWithErrorExists() {
+    // given
+    eventCaptor.clear();
+    instance = runtime.startProcessInstanceByKey("eventingWithBoundaryEvent",
+            Collections.singletonMap(BoundaryEventServiceTask.ERROR_NAME, "testError"));
+    runtime.signalEventReceived("countSignal");
+    // then 15
+    // 1 for process (start)
+    // 3 for start event (start, take, end)
+    // 3 for signal event (start, take, end)
+    // 2 for service task (start, end)
+    // 3 for boundary error event (start, take, end)
+    // 2 for end event (start, end)
+    // 1 for process (end)
+    int expectedCount = 1 + 3 + 3 + 2 + 3 + 2 + 1;
     assertThat(eventCaptor.executionEvents).hasSize(expectedCount);
     assertThat(eventCaptor.immutableExecutionEvents).hasSize(expectedCount);
     assertThat(eventCaptor.transactionExecutionEvents).hasSize(expectedCount);

@@ -55,8 +55,7 @@ public class ThrowOleWhenDeletingExceptionStacktraceTest extends ConcurrencyTest
   public void testThrowOleWhenDeletingExceptionStacktraceTest() {
     // given
     processEngineConfiguration.getCommandExecutorTxRequired()
-      .execute(new Command<Void>() {
-      public Void execute(CommandContext commandContext) {
+      .execute((Command<Void>) commandContext -> {
         JobEntity jobEntity = new MessageEntity();
 
         jobEntity.setExceptionStacktrace("foo");
@@ -66,8 +65,7 @@ public class ThrowOleWhenDeletingExceptionStacktraceTest extends ConcurrencyTest
         job.set(jobEntity);
 
         return null;
-      }
-    });
+      });
 
     ThreadControl threadOne = executeControllableCommand(new ThreadOne());
 
@@ -87,7 +85,7 @@ public class ThrowOleWhenDeletingExceptionStacktraceTest extends ConcurrencyTest
     threadTwo.join();
 
     // then
-    assertThat(threadTwo.getException().getMessage()).contains("Entity was updated by another transaction concurrently.");
+    assertThat(threadTwo.getException().getMessage()).contains("Entity was updated by another transaction concurrently");
   }
 
   public class ThreadOne extends ControllableCommand<Void> {

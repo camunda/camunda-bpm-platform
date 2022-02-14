@@ -32,13 +32,13 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest(classes = { CamundaBpmRun.class })
 @ActiveProfiles(profiles = { "test-auth-disabled" , "test-ldap-enabled" })
 public class LdapConfigurationTest {
-  
+
   @Autowired
   CamundaBpmRunLdapProperties props;
 
   @Autowired
   LdapIdentityProviderPlugin plugin;
-  
+
   @Test
   public void shouldPickUpConfiguration() {
     assertThat(props.isEnabled()).isEqualTo(true);
@@ -66,5 +66,13 @@ public class LdapConfigurationTest {
     assertThat(props.isAcceptUntrustedCertificates()).isEqualTo(plugin.isAcceptUntrustedCertificates());
     assertThat(props.getInitialContextFactory()).isEqualTo(plugin.getInitialContextFactory());
     assertThat(props.getSecurityAuthentication()).isEqualTo(plugin.getSecurityAuthentication());
+  }
+
+  @Test
+  public void shouldNotIncludeSensitiveConnectionPropertiesInToString() {
+    assertThat(props.toString()).doesNotContain(
+        "http://foo.bar",
+        "managerdn",
+        "managerpw");
   }
 }

@@ -16,12 +16,9 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.util.Arrays;
@@ -74,7 +71,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
       .processDefinitionTenantId(TENANT_ONE)
       .execute();
 
-    assertThat(runtimeService.createProcessInstanceQuery().tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(runtimeService.createProcessInstanceQuery().tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
   }
 
   @Test
@@ -84,7 +81,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
     runtimeService.createProcessInstanceByKey("testProcess")
       .execute();
 
-    assertThat(runtimeService.createProcessInstanceQuery().tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(runtimeService.createProcessInstanceQuery().tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
   }
 
   @Test
@@ -97,8 +94,8 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
       .execute();
 
     ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
-    assertThat(query.count(), is(1L));
-    assertThat(query.singleResult().getTenantId(), is(nullValue()));
+    assertThat(query.count()).isEqualTo(1L);
+    assertThat(query.singleResult().getTenantId()).isNull();
   }
 
   @Test
@@ -112,7 +109,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("no processes deployed"));
+      assertThat(e.getMessage()).contains("no processes deployed");
     }
   }
 
@@ -127,7 +124,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("multiple tenants"));
+      assertThat(e.getMessage()).contains("multiple tenants");
     }
   }
 
@@ -144,7 +141,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
 
       fail("expected exception");
     } catch (BadUserRequestException e) {
-      assertThat(e.getMessage(), containsString("Cannot specify a tenant-id"));
+      assertThat(e.getMessage()).contains("Cannot specify a tenant-id");
     }
   }
 
@@ -161,7 +158,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
 
       fail("expected exception");
     } catch (BadUserRequestException e) {
-      assertThat(e.getMessage(), containsString("Cannot specify a tenant-id"));
+      assertThat(e.getMessage()).contains("Cannot specify a tenant-id");
     }
   }
 
@@ -175,7 +172,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
       .startBeforeActivity("userTask")
       .execute();
 
-    assertThat(runtimeService.createProcessInstanceQuery().tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(runtimeService.createProcessInstanceQuery().tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
   }
 
   @Test
@@ -186,7 +183,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
       .startBeforeActivity("userTask")
       .execute();
 
-    assertThat(runtimeService.createProcessInstanceQuery().tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(runtimeService.createProcessInstanceQuery().tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
   }
 
   @Test
@@ -200,8 +197,8 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
       .execute();
 
     ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
-    assertThat(query.count(), is(1L));
-    assertThat(query.singleResult().getTenantId(), is(nullValue()));
+    assertThat(query.count()).isEqualTo(1L);
+    assertThat(query.singleResult().getTenantId()).isNull();
   }
 
   @Test
@@ -216,7 +213,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("no processes deployed"));
+      assertThat(e.getMessage()).contains("no processes deployed");
     }
   }
 
@@ -232,7 +229,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("multiple tenants"));
+      assertThat(e.getMessage()).contains("multiple tenants");
     }
   }
 
@@ -250,7 +247,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
 
       fail("expected exception");
     } catch (BadUserRequestException e) {
-      assertThat(e.getMessage(), containsString("Cannot specify a tenant-id"));
+      assertThat(e.getMessage()).contains("Cannot specify a tenant-id");
     }
   }
 
@@ -268,7 +265,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
 
       fail("expected exception");
     } catch (BadUserRequestException e) {
-      assertThat(e.getMessage(), containsString("Cannot specify a tenant-id"));
+      assertThat(e.getMessage()).contains("Cannot specify a tenant-id");
     }
   }
 
@@ -283,7 +280,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
       .execute();
 
     ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
-    assertThat(query.count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
   }
 
   @Test
@@ -298,7 +295,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("no processes deployed with key 'testProcess'"));
+      assertThat(e.getMessage()).contains("no processes deployed with key 'testProcess'");
     }
   }
 
@@ -315,7 +312,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("Cannot create an instance of the process definition"));
+      assertThat(e.getMessage()).contains("Cannot create an instance of the process definition");
     }
   }
 
@@ -335,7 +332,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("Cannot create an instance of the process definition"));
+      assertThat(e.getMessage()).contains("Cannot create an instance of the process definition");
     }
   }
 
@@ -351,8 +348,8 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
       .execute();
 
     ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
-    assertThat(query.count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
   }
 
   @Test
@@ -369,8 +366,8 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
       .execute();
 
     ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
-    assertThat(query.count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
   }
 
   @Test
@@ -383,8 +380,8 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
     runtimeService.createProcessInstanceByKey("testProcess").execute();
 
     ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
-    assertThat(query.count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
   }
 
   @Test
@@ -399,8 +396,8 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
       .execute();
 
     ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
-    assertThat(query.count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
@@ -467,7 +464,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
       fail("expected exception");
     } catch (BadUserRequestException e) {
       // then
-      assertThat(e.getMessage(), containsString("Historic process instance cannot be found: historicProcessInstanceId is null"));
+      assertThat(e.getMessage()).contains("Historic process instance cannot be found: historicProcessInstanceId is null");
     }
   }
 
@@ -487,7 +484,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
         .executeAsync();
     }
     catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("Cannot restart process instances of process definition '" + processInstance.getProcessDefinitionId() + "' because it belongs to no authenticated tenant."));
+      assertThat(e.getMessage()).contains("Cannot restart process instances of process definition '" + processInstance.getProcessDefinitionId() + "' because it belongs to no authenticated tenant.");
     }
 
   }
@@ -559,7 +556,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
       fail("expected exception");
     } catch (BadUserRequestException e) {
       // then
-      assertThat(e.getMessage(), containsString("processInstanceIds is empty"));
+      assertThat(e.getMessage()).contains("processInstanceIds is empty");
     }
   }
 
@@ -580,7 +577,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
         .executeAsync();
     }
     catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("processInstanceIds is empty"));
+      assertThat(e.getMessage()).contains("processInstanceIds is empty");
     }
 
   }

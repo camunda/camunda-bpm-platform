@@ -1,0 +1,13 @@
+// get the admin app variables (based on bootstrap)
+@import "_app-variables";
+
+// use `reference` to avoid duplicate bootstrap styles
+// as they are already available in other compiled CSS
+@import (reference) "shared/bootstrap";
+
+/* add plugin styles here */
+
+@import "base/app/views/common/diagramPlugins/styles";
+@import "base/app/views/processesDashboard/styles";
+@import "base/app/views/processInstance/styles";
+@import "base/app/views/processDefinition/called-process-definition-table";

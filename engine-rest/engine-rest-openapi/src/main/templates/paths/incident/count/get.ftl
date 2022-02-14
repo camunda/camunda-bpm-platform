@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
@@ -16,14 +17,13 @@
     <@lib.response
         code = "200"
         dto = "CountResultDto"
-        array = true
         desc = "Request successful."
         examples = ['"example-1": {
                        "summary": "GET `/incident/count?processInstanceId=aProcInstId`",
-                       "value": [
+                       "value":
                            {
                              "count": 2
-                           }]}'] />
+                           }}'] />
 
     <@lib.response
         code = "400"
@@ -33,3 +33,5 @@
                 response format." />
     }
 }
+
+</#macro>

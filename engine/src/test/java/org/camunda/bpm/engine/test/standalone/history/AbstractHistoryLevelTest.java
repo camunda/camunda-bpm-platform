@@ -16,10 +16,10 @@
  */
 package org.camunda.bpm.engine.test.standalone.history;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.camunda.bpm.engine.impl.history.AbstractHistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventType;
-import org.hamcrest.CoreMatchers;
-import org.junit.Assert;
 import org.junit.Test;
 
 public class AbstractHistoryLevelTest {
@@ -45,6 +45,6 @@ public class AbstractHistoryLevelTest {
 
   @Test
   public void ensureCorrectToString() {
-    Assert.assertThat(new MyHistoryLevel().toString(), CoreMatchers.is("MyHistoryLevel(name=myName, id=4711)"));
+    assertThat(new MyHistoryLevel().toString()).isEqualTo("MyHistoryLevel(name=myName, id=4711)");
   }
 }

@@ -1,8 +1,10 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
       id = "getTaskLocalVariables"
       tag = "Task Local Variable"
+      summary = "Get Local Task Variables"
       desc = "Retrieves all variables of a given task by id." />
 
   "parameters": [
@@ -84,3 +86,5 @@
                 for the error response format." />
   }
 }
+
+</#macro>

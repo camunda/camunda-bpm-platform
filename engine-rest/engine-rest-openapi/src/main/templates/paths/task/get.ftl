@@ -1,8 +1,10 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
       id = "getTasks"
       tag = "Task"
+      summary = "Get List"
       desc = "Queries for tasks that fulfill a given filter. The size of the result set can be
               retrieved by using the Get Task Count method.
 
@@ -60,6 +62,11 @@
                            "taskDefinitionKey":"aTaskDefinitionKey",
                            "suspended": false,
                            "formKey":"aFormKey",
+                           "camundaFormRef":{
+                             "key": "aCamundaFormKey",
+                             "binding": "version",
+                             "version": 2
+                           },
                            "tenantId": "aTenantId"
                          }
                        ]
@@ -77,3 +84,4 @@
 
   }
 }
+</#macro>

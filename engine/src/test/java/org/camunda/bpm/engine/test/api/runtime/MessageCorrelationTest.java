@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -35,6 +36,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
@@ -55,6 +57,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.variables.FailingJavaSerializable;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
@@ -63,6 +66,7 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.Variables.SerializationDataFormats;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
+import org.camunda.bpm.engine.variable.value.StringValue;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Assert;
@@ -71,7 +75,6 @@ import org.junit.ClassRule;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -87,9 +90,6 @@ public class MessageCorrelationTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   private RuntimeService runtimeService;
   private TaskService taskService;
@@ -1695,6 +1695,43 @@ public class MessageCorrelationTest {
     assertNull(variableNonExisting);
   }
 
+
+
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void testCorrelationWithTransientLocalVariables() {
+    // given
+    BpmnModelInstance model = Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .intermediateCatchEvent("message_1").message("message")
+        .userTask("UserTask_1")
+        .endEvent()
+        .done();
+
+    testRule.deploy(model);
+
+    runtimeService.startProcessInstanceByKey("process");
+
+    StringValue transientValue = Variables.stringValue("value", true);
+
+    Map<String, Object> messageLocalPayload = new HashMap<>();
+    messageLocalPayload.put("var", transientValue);
+
+    // when
+    runtimeService
+        .createMessageCorrelation("message")
+        .setVariablesLocal(messageLocalPayload)
+        .correlate();
+
+    // then
+    long numHistoricVariables =
+        engineRule.getHistoryService()
+          .createHistoricVariableInstanceQuery()
+          .count();
+
+    assertThat(numHistoricVariables).isEqualTo(0);
+  }
+
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.waitForMessageProcess.bpmn20.xml",
   "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.sendMessageProcess.bpmn20.xml" })
   @Test
@@ -1707,16 +1744,16 @@ public class MessageCorrelationTest {
     Execution waitingProcess = runtimeService.createExecutionQuery().executionId(messageWaitProcess.getProcessInstanceId()).singleResult();
     Assert.assertNotNull(waitingProcess);
 
-    thrown.expect(MismatchingMessageCorrelationException.class);
-    thrown.expectMessage("Cannot correlate message 'waitForCorrelationKeyMessage'");
-
-    // start process that sends two messages with the same correlationKey
     VariableMap switchScenarioFlag = Variables.createVariables().putValue("allFlag", false);
-    runtimeService.startProcessInstanceByKey("sendMessageProcess", switchScenarioFlag);
 
-    // waiting process must be finished
+    // when/then
+    assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("sendMessageProcess", switchScenarioFlag))
+      .isInstanceOf(MismatchingMessageCorrelationException.class)
+      .hasMessageContaining("Cannot correlate message 'waitForCorrelationKeyMessage'");
+
+    // waiting process has not finished
     waitingProcess = runtimeService.createExecutionQuery().executionId(messageWaitProcess.getProcessInstanceId()).singleResult();
-    Assert.assertNull(waitingProcess);
+    Assert.assertNotNull(waitingProcess);
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.waitForMessageProcess.bpmn20.xml",

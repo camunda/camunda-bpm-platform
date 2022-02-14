@@ -1,7 +1,9 @@
+<#macro endpoint_macro docsUrl="">
 {
   <@lib.endpointInfo
       id = "deleteProcessInstance"
       tag = "Process Instance"
+      summary = "Delete"
       desc = "Deletes a running process instance by id." />
 
   "parameters": [
@@ -58,3 +60,4 @@
 
   }
 }
+</#macro>

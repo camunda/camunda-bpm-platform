@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.dmn.deployment;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -54,7 +55,6 @@ import org.camunda.bpm.model.dmn.instance.Text;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 public class DecisionDefinitionDeployerTest {
@@ -74,9 +74,6 @@ public class DecisionDefinitionDeployerTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   protected RepositoryService repositoryService;
 
@@ -173,14 +170,14 @@ public class DecisionDefinitionDeployerTest {
     String resourceName1 = "org/camunda/bpm/engine/test/dmn/deployment/DecisionDefinitionDeployerTest.testDuplicateIdInDeployment.dmn11.xml";
     String resourceName2 = "org/camunda/bpm/engine/test/dmn/deployment/DecisionDefinitionDeployerTest.testDuplicateIdInDeployment2.dmn11.xml";
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("duplicateDecision");
-
-    repositoryService.createDeployment()
-            .addClasspathResource(resourceName1)
-            .addClasspathResource(resourceName2)
-            .name("duplicateIds")
-            .deploy();
+    // when/then
+    assertThatThrownBy(() -> repositoryService.createDeployment()
+        .addClasspathResource(resourceName1)
+        .addClasspathResource(resourceName2)
+        .name("duplicateIds")
+        .deploy())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("duplicateDecision");
   }
 
   @Deployment(resources = {
@@ -297,14 +294,14 @@ public class DecisionDefinitionDeployerTest {
   @Test
   public void duplicateDrdIdInDeployment() {
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("definitions");
-
-    repositoryService.createDeployment()
-            .addClasspathResource(DRD_SCORE_RESOURCE)
-            .addClasspathResource(DRD_SCORE_V2_RESOURCE)
-            .name("duplicateIds")
-            .deploy();
+    // when/then
+    assertThatThrownBy(() -> repositoryService.createDeployment()
+        .addClasspathResource(DRD_SCORE_RESOURCE)
+        .addClasspathResource(DRD_SCORE_V2_RESOURCE)
+        .name("duplicateIds")
+        .deploy())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("definitions");
   }
 
   @Test

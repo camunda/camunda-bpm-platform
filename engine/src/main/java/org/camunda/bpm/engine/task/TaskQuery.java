@@ -40,6 +40,9 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    */
   TaskQuery taskId(String taskId);
 
+  /** Only select tasks with the given task ids. */
+  TaskQuery taskIdIn(String... taskIds);
+
   /**
    * Only select tasks with the given name.
    * The query will match the names of tasks in a case-insensitive way.
@@ -537,6 +540,12 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
 
   /**
    * Only select tasks which are part of a process that have a variable
+   * with the given name and not matching the given value.
+   * The syntax is that of SQL: for example usage: valueNotLike(%value%)*/
+  TaskQuery processVariableValueNotLike(String variableName, String variableValue);
+
+  /**
+   * Only select tasks which are part of a process that have a variable
    * with the given name and a value greater than the given one.
    */
   TaskQuery processVariableValueGreaterThan(String variableName, Object variableValue);
@@ -597,6 +606,20 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    * starts with (string%), ends with (%string) or contains (%string%).
    */
   TaskQuery caseInstanceVariableValueLike(String variableName, String variableValue);
+
+  /**
+   * Only select tasks which are part of a case instance that have a variable value
+   * not like the given value.
+   *
+   * This be used on string variables only.
+   *
+   * @param name variable name, cannot be null.
+   *
+   * @param value variable value. The string can include the
+   * wildcard character '%' to express like-strategy:
+   * starts with (string%), ends with (%string) or contains (%string%).
+   */
+  TaskQuery caseInstanceVariableValueNotLike(String variableName, String variableValue);
 
   /**
    * Only select tasks which are part of a case instance that have a variable
@@ -811,8 +834,9 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   TaskQuery active();
 
   /**
-   * If called, the form keys of the fetched tasks are initialized and
-   * {@link Task#getFormKey()} will return a value (in case the task has a form key).
+   * If called, the form keys and form references of the fetched tasks are initialized and
+   * {@link Task#getFormKey()} and {@link Task#getCamundaFormRef()} will return a value (in
+   * case the task has is linked to a form).
    *
    * @throws ProcessEngineException
    *   When method has been executed within "or query". Method must be executed on the base query.
@@ -821,11 +845,33 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    */
   TaskQuery initializeFormKeys();
 
-  /** Only select tasks with one of the given tenant ids. */
+  /**
+   * Only select tasks with one of the given tenant ids.
+   *
+   * @throws ProcessEngineException
+   *   <ul>
+   *     <li>When a query is executed and {@link #withoutTenantId()} has been executed on
+   *         the "and query" instance. No exception is thrown when a query is executed
+   *         and {@link #withoutTenantId()} has been executed on the "or query" instance.
+   *     </li>
+   *     <li>When a <code>null</code> tenant id is passed.</li>
+   *   </ul>
+   */
   TaskQuery tenantIdIn(String... tenantIds);
 
-  /** Only select tasks which have no tenant id. */
+  /**
+   * Only select tasks which have no tenant id.
+   *
+   * @throws ProcessEngineException When query is executed and {@link #tenantIdIn(String...)}
+   *     has been executed on the "and query" instance. No exception is thrown when query is
+   *     executed and {@link #tenantIdIn(String...)} has been executed on the "or query" instance.
+   */
   TaskQuery withoutTenantId();
+
+  /**
+   * Only select tasks which have no due date.
+   */
+  TaskQuery withoutDueDate();
 
   // ordering ////////////////////////////////////////////////////////////
 

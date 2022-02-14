@@ -17,8 +17,8 @@
 package org.camunda.bpm.engine.impl.persistence.deploy.cache;
 
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
-import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionQueryImpl;
-import org.camunda.bpm.engine.repository.DecisionDefinition;
+import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionQueryImpl;
+import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.model.cmmn.Cmmn;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 
@@ -50,8 +50,8 @@ public class CmmnModelInstanceCache extends ModelInstanceCache<CmmnModelInstance
   }
 
   @Override
-  protected List<DecisionDefinition> getAllDefinitionsForDeployment(String deploymentId) {
-    return new DecisionDefinitionQueryImpl()
+  protected List<CaseDefinition> getAllDefinitionsForDeployment(String deploymentId) {
+    return new CaseDefinitionQueryImpl()
         .deploymentId(deploymentId)
         .list();
   }

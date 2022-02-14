@@ -16,12 +16,10 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.timer;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.text.SimpleDateFormat;
@@ -718,9 +716,9 @@ public class BoundaryTimerNonInterruptingEventTest {
     Task userTask = taskService.createTaskQuery().singleResult();
 
     // assert that the timer job is not acquirable
-    assertThat(userTask, is(notNullValue()));
-    assertThat(timerJob, is(notNullValue()));
-    assertThat(timerJob.getDuedate(), is(timerDueDate));
+    assertThat(userTask).isNotNull();
+    assertThat(timerJob).isNotNull();
+    assertThat(timerJob.getDuedate()).isEqualTo(timerDueDate);
   }
 
   @Test(timeout = 10000L)
@@ -752,9 +750,9 @@ public class BoundaryTimerNonInterruptingEventTest {
     Task userTask = taskService.createTaskQuery().singleResult();
 
     // assert that the timer job is not acquirable
-    assertThat(userTask, is(notNullValue()));
-    assertThat(timerJob, is(notNullValue()));
-    assertThat(timerJob.getDuedate(), is(timerDueDate));
+    assertThat(userTask).isNotNull();
+    assertThat(timerJob).isNotNull();
+    assertThat(timerJob.getDuedate()).isEqualTo(timerDueDate);
   }
 
   //we cannot use waitForExecutor... method since there will always be one job left

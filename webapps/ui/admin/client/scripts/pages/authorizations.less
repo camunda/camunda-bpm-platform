@@ -1,0 +1,91 @@
+form[name="createAuthForm"] > .cam-table {
+  .dropdown-menu {
+    top: auto;
+  }
+
+  td {
+    padding: 5px;
+    vertical-align: top;
+
+    &.identity-id,
+    &.resource-id {
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    &.user.group {
+      min-width: 140px;
+    }
+
+    &.authorization-type {
+      min-width: 80px;
+      max-width: 160px;
+      width: 120px;
+
+      select {
+        padding-left: 3px;
+      }
+    }
+
+    &.identity-id {
+      min-width: 170px;
+    }
+
+    &.user {
+      width: 180px;
+    }
+
+    &.resource-id {
+      width: 160px;
+      min-width: 320px;
+      max-width: 350px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    &.permissions {
+      .form-control-static {
+        padding: 0;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .input-group-btn {
+        vertical-align: top;
+      }
+
+      .dropdown-menu {
+        >div.selection {
+          margin-bottom: 15px;
+          font-weight: 700;
+
+          >button .glyphicon {
+            margin-right: 10px;
+          }
+        }
+
+        >li {
+          >label {
+            cursor: pointer;
+            font-weight: normal;
+
+            >input {
+              margin-right: 5px;
+            }
+          }
+
+          margin: 5px;
+        }
+
+        padding: 12px;
+      }
+    }
+
+    &.action {
+      width: 120px;
+      text-align: center;
+      vertical-align: top;
+    }
+  }
+}

@@ -16,8 +16,8 @@
  */
 package org.camunda.bpm.engine.test.api.authorization;
 
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.argThat;
@@ -27,7 +27,9 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -43,6 +45,8 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.Session;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -217,7 +221,7 @@ public class GroupAuthorizationTest extends AuthorizationTest {
         verify(dbEntityManager).selectBoolean(eq("isUserAuthorizedForResource"), authorizationCheckArgument.capture());
 
         AuthorizationCheck authorizationCheck = authorizationCheckArgument.getValue();
-        assertThat(authorizationCheck.getAuthGroupIds(), containsInAnyOrder(testGroupIds.toArray()));
+        assertThat(authorizationCheck.getAuthGroupIds()).containsExactlyInAnyOrderElementsOf(testGroupIds);
 
         return null;
       }
@@ -244,6 +248,53 @@ public class GroupAuthorizationTest extends AuthorizationTest {
         return null;
       }
     });
+  }
+
+  @Test
+  public void testCheckAuthorizationForNullHostileListOfGroups() {
+    // given
+    identityService.clearAuthentication();
+
+    BpmnModelInstance process = Bpmn.createExecutableProcess("process").startEvent()
+      .userTask("foo")
+      .endEvent()
+      .done();
+
+    testRule.deploy(process);
+
+    runtimeService.startProcessInstanceByKey("process");
+
+    // a group authorization
+    createGroupGrantAuthorization(Resources.TASK, Authorization.ANY, testGroupIds.get(0));
+
+    // a user authorization (i.e. no group id set)
+    // this authorization is important to reproduce the bug in CAM-14306
+    createGrantAuthorization(Resources.TASK, Authorization.ANY, testUserId, Permissions.READ);
+
+    List<String> groupIds = new NullHostileList<>(testGroupIds);
+
+    // when
+    boolean isAuthorized = authorizationService.isUserAuthorized(testUserId, groupIds, Permissions.READ, Resources.TASK);
+
+    // then
+    assertThat(isAuthorized).isTrue();
+  }
+
+  protected class NullHostileList<E> extends ArrayList<E> {
+
+    public NullHostileList(Collection<E> other) {
+      super(other);
+    }
+
+    @Override
+    public boolean contains(Object o) {
+      // lists that behave similar:
+      // List.of (Java 9+) and List.copyOf (Java 10+)
+      if (o == null) {
+        throw new NullPointerException();
+      }
+      return super.contains(o);
+    }
   }
 
   protected void createGroupGrantAuthorization(Resource resource, String resourceId, String groupId, Permission... permissions) {

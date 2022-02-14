@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
   <@lib.property
@@ -8,3 +9,5 @@
       desc = "The priority of the resource." />
 
 </@lib.dto>
+
+</#macro>

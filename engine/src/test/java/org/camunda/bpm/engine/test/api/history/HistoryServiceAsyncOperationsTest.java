@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.history;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -52,7 +53,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -65,9 +65,6 @@ public class HistoryServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
 
   protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
@@ -200,11 +197,9 @@ public class HistoryServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
 
   @Test
   public void testDeleteHistoryProcessInstancesAsyncWithEmptyList() throws Exception {
-    //expect
-    thrown.expect(ProcessEngineException.class);
-
-    //when
-    historyService.deleteHistoricProcessInstancesAsync(new ArrayList<String>(), TEST_REASON);
+    // when/then
+    assertThatThrownBy(() -> historyService.deleteHistoricProcessInstancesAsync(new ArrayList<String>(), TEST_REASON))
+      .isInstanceOf(ProcessEngineException.class);
   }
 
   @Test
@@ -263,12 +258,12 @@ public class HistoryServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
 
   @Test
   public void testDeleteHistoryProcessInstancesAsyncWithEmptyQuery() throws Exception {
-    //expect
-    thrown.expect(ProcessEngineException.class);
     //given
     HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery().unfinished();
-    //when
-    historyService.deleteHistoricProcessInstancesAsync(query, TEST_REASON);
+
+    // when/then
+    assertThatThrownBy(() -> historyService.deleteHistoricProcessInstancesAsync(query, TEST_REASON))
+      .isInstanceOf(ProcessEngineException.class);
   }
 
   @Test
@@ -305,14 +300,16 @@ public class HistoryServiceAsyncOperationsTest extends AbstractAsyncOperationsTe
 
   @Test
   public void testDeleteHistoryProcessInstancesAsyncWithNullList() throws Exception {
-    thrown.expect(ProcessEngineException.class);
-    historyService.deleteHistoricProcessInstancesAsync((List<String>) null, TEST_REASON);
+    // when/then
+    assertThatThrownBy(() -> historyService.deleteHistoricProcessInstancesAsync((List<String>) null, TEST_REASON))
+      .isInstanceOf(ProcessEngineException.class);
   }
 
   @Test
   public void testDeleteHistoryProcessInstancesAsyncWithNullQuery() throws Exception {
-    thrown.expect(ProcessEngineException.class);
-    historyService.deleteHistoricProcessInstancesAsync((HistoricProcessInstanceQuery) null, TEST_REASON);
+    // when/then
+    assertThatThrownBy(() -> historyService.deleteHistoricProcessInstancesAsync((HistoricProcessInstanceQuery) null, TEST_REASON))
+      .isInstanceOf(ProcessEngineException.class);
   }
 
   @Test

@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.impl;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
 import org.camunda.bpm.engine.variable.Variables;
@@ -37,7 +38,7 @@ public class QueryVariableValue implements Serializable {
   protected boolean local;
 
   protected AbstractQueryVariableValueCondition valueCondition;
-  
+
   protected boolean variableNameIgnoreCase;
   protected boolean variableValueIgnoreCase;
 
@@ -54,14 +55,14 @@ public class QueryVariableValue implements Serializable {
     this.variableValueIgnoreCase = variableValueIgnoreCase;
   }
 
-  public void initialize(VariableSerializers serializers) {
+  public void initialize(VariableSerializers serializers, String dbType) {
     if (value.getType() != null && value.getType().isAbstract()) {
       valueCondition = new CompositeQueryVariableValueCondition(this);
     } else {
       valueCondition = new SingleQueryVariableValueCondition(this);
     }
 
-    valueCondition.initializeValue(serializers);
+    valueCondition.initializeValue(serializers, dbType);
   }
 
   public List<SingleQueryVariableValueCondition> getValueConditions() {
@@ -94,7 +95,7 @@ public class QueryVariableValue implements Serializable {
   public boolean isLocal() {
     return local;
   }
-  
+
 
   public boolean isVariableNameIgnoreCase() {
     return variableNameIgnoreCase;
@@ -111,4 +112,22 @@ public class QueryVariableValue implements Serializable {
   public void setVariableValueIgnoreCase(boolean variableValueIgnoreCase) {
     this.variableValueIgnoreCase = variableValueIgnoreCase;
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
+    QueryVariableValue that = (QueryVariableValue) o;
+    return local == that.local && variableNameIgnoreCase == that.variableNameIgnoreCase
+        && variableValueIgnoreCase == that.variableValueIgnoreCase && name.equals(that.name) && value.equals(that.value)
+        && operator == that.operator && Objects.equals(valueCondition, that.valueCondition);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(name, value, operator, local, valueCondition, variableNameIgnoreCase, variableValueIgnoreCase);
+  }
+
 }

@@ -32,14 +32,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.executor.BatchResult;
+import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
+import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.AbstractPersistenceSession;
 import org.camunda.bpm.engine.impl.db.DbEntity;
@@ -51,6 +56,7 @@ import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbEntityOperation;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation.State;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperationType;
+import org.camunda.bpm.engine.impl.util.DatabaseUtil;
 import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
@@ -67,6 +73,8 @@ import org.camunda.bpm.engine.impl.util.ReflectUtil;
 public abstract class DbSqlSession extends AbstractPersistenceSession {
 
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
+  public static final String[] JDBC_METADATA_TABLE_TYPES = { "TABLE" };
+  public static final String[] PG_JDBC_METADATA_TABLE_TYPES = { "TABLE", "PARTITIONED TABLE" };
 
   protected SqlSession sqlSession;
   protected DbSqlSessionFactory dbSqlSessionFactory;
@@ -76,45 +84,47 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
 
   public DbSqlSession(DbSqlSessionFactory dbSqlSessionFactory) {
     this.dbSqlSessionFactory = dbSqlSessionFactory;
-    this.sqlSession = dbSqlSessionFactory
-      .getSqlSessionFactory()
-      .openSession();
+    SqlSessionFactory sqlSessionFactory = dbSqlSessionFactory.getSqlSessionFactory();
+    this.sqlSession = ExceptionUtil.doWithExceptionWrapper(sqlSessionFactory::openSession);
   }
 
   public DbSqlSession(DbSqlSessionFactory dbSqlSessionFactory, Connection connection, String catalog, String schema) {
     this.dbSqlSessionFactory = dbSqlSessionFactory;
-    this.sqlSession = dbSqlSessionFactory
-      .getSqlSessionFactory()
-      .openSession(connection);
+    SqlSessionFactory sqlSessionFactory = dbSqlSessionFactory.getSqlSessionFactory();
+    this.sqlSession = ExceptionUtil.doWithExceptionWrapper(() -> sqlSessionFactory.openSession(connection));
     this.connectionMetadataDefaultCatalog = catalog;
     this.connectionMetadataDefaultSchema = schema;
   }
 
   // select ////////////////////////////////////////////
 
-  public List<?> selectList(String statement, Object parameter){
+  public List<?> selectList(String statement, Object parameter) {
     statement = dbSqlSessionFactory.mapStatement(statement);
-    List<Object> resultList = sqlSession.selectList(statement, parameter);
+    List<Object> resultList = executeSelectList(statement, parameter);
     for (Object object : resultList) {
       fireEntityLoaded(object);
     }
     return resultList;
   }
 
+  public List<Object> executeSelectList(String statement, Object parameter) {
+    return ExceptionUtil.doWithExceptionWrapper(() -> sqlSession.selectList(statement, parameter));
+  }
+
   @SuppressWarnings("unchecked")
   public <T extends DbEntity> T selectById(Class<T> type, String id) {
     String selectStatement = dbSqlSessionFactory.getSelectStatement(type);
-    selectStatement = dbSqlSessionFactory.mapStatement(selectStatement);
+    String mappedSelectStatement = dbSqlSessionFactory.mapStatement(selectStatement);
     ensureNotNull("no select statement for " + type + " in the ibatis mapping files", "selectStatement", selectStatement);
 
-    Object result = sqlSession.selectOne(selectStatement, id);
+    Object result = ExceptionUtil.doWithExceptionWrapper(() -> sqlSession.selectOne(mappedSelectStatement, id));
     fireEntityLoaded(result);
     return (T) result;
   }
 
   public Object selectOne(String statement, Object parameter) {
-    statement = dbSqlSessionFactory.mapStatement(statement);
-    Object result = sqlSession.selectOne(statement, parameter);
+    String mappedStatement = dbSqlSessionFactory.mapStatement(statement);
+    Object result = ExceptionUtil.doWithExceptionWrapper(() -> sqlSession.selectOne(mappedStatement, parameter));
     fireEntityLoaded(result);
     return result;
   }
@@ -125,24 +135,26 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
     // do not perform locking if H2 database is used. H2 uses table level locks
     // by default which may cause deadlocks if the deploy command needs to get a new
     // Id using the DbIdGenerator while performing a deployment.
-    if (!DbSqlSessionFactory.H2.equals(dbSqlSessionFactory.getDatabaseType())) {
+    //
+    // On CockroachDB, pessimistic locks are disabled since this database uses
+    // a stricter, SERIALIZABLE transaction isolation which ensures a serialized
+    // manner of transaction execution, making our use-case of pessimistic locks
+    // redundant.
+    if (!DatabaseUtil.checkDatabaseType(DbSqlSessionFactory.CRDB, DbSqlSessionFactory.H2)) {
       String mappedStatement = dbSqlSessionFactory.mapStatement(statement);
       executeSelectForUpdate(mappedStatement, parameter);
+    } else {
+      LOG.debugDisabledPessimisticLocks();
     }
   }
 
   protected abstract void executeSelectForUpdate(String statement, Object parameter);
 
-  protected void entityUpdatePerformed(DbEntityOperation operation, int rowsAffected, Exception failure) {
+  protected void entityUpdatePerformed(DbEntityOperation operation,
+                                       int rowsAffected,
+                                       Exception failure) {
     if (failure != null) {
-      operation.setRowsAffected(0);
-      operation.setFailure(failure);
-
-      if (isConcurrentModificationException(operation, failure)) {
-        operation.setState(State.FAILED_CONCURRENT_MODIFICATION);
-      } else {
-        operation.setState(State.FAILED_ERROR);
-      }
+      configureFailedDbEntityOperation(operation, failure);
     } else {
       DbEntity dbEntity = operation.getEntity();
 
@@ -162,44 +174,44 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
     }
   }
 
-  protected void bulkUpdatePerformed(DbBulkOperation operation, int rowsAffected, Exception failure) {
+  protected void bulkUpdatePerformed(DbBulkOperation operation,
+                                     int rowsAffected,
+                                     Exception failure) {
 
     bulkOperationPerformed(operation, rowsAffected, failure);
   }
 
-  protected void bulkDeletePerformed(DbBulkOperation operation, int rowsAffected, Exception failure) {
+  protected void bulkDeletePerformed(DbBulkOperation operation,
+                                     int rowsAffected,
+                                     Exception failure) {
 
     bulkOperationPerformed(operation, rowsAffected, failure);
   }
 
-  protected void bulkOperationPerformed(DbBulkOperation operation, int rowsAffected, Exception failure) {
+  protected void bulkOperationPerformed(DbBulkOperation operation,
+                                        int rowsAffected,
+                                        Exception failure) {
 
     if (failure != null) {
       operation.setFailure(failure);
-      operation.setState(State.FAILED_ERROR);
+
+      State failedState = State.FAILED_ERROR;
+      if (isCrdbConcurrencyConflict(failure)) {
+        failedState = State.FAILED_CONCURRENT_MODIFICATION_CRDB;
+      }
+      operation.setState(failedState);
     } else {
       operation.setRowsAffected(rowsAffected);
       operation.setState(State.APPLIED);
     }
   }
 
-  protected void entityDeletePerformed(DbEntityOperation operation, int rowsAffected, Exception failure) {
+  protected void entityDeletePerformed(DbEntityOperation operation,
+                                       int rowsAffected,
+                                       Exception failure) {
     
     if (failure != null) {
-      operation.setRowsAffected(0);
-      operation.setFailure(failure);
-
-      DbOperation dependencyOperation = operation.getDependentOperation();
-
-      if (isConcurrentModificationException(operation, failure)) {
-        operation.setState(State.FAILED_CONCURRENT_MODIFICATION);
-      } else if (dependencyOperation != null && dependencyOperation.getState() != null && dependencyOperation.getState() != State.APPLIED) {
-        // the owning operation was not successful, so the prerequisite for this operation was not given
-        LOG.ignoreFailureDuePreconditionNotMet(operation, "Parent database operation failed", dependencyOperation);
-        operation.setState(State.NOT_APPLIED);
-      } else {
-        operation.setState(State.FAILED_ERROR);
-      }
+      configureFailedDbEntityOperation(operation, failure);
     } else {
       operation.setRowsAffected(rowsAffected);
 
@@ -214,7 +226,37 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
     }
   }
 
-  protected boolean isConcurrentModificationException(DbOperation failedOperation, Throwable cause) {
+  protected void configureFailedDbEntityOperation(DbEntityOperation operation, Exception failure) {
+    operation.setRowsAffected(0);
+    operation.setFailure(failure);
+
+    DbOperationType operationType = operation.getOperationType();
+    DbOperation dependencyOperation = operation.getDependentOperation();
+
+    State failedState;
+    if (isCrdbConcurrencyConflict(failure)) {
+      failedState = State.FAILED_CONCURRENT_MODIFICATION_CRDB;
+      
+    } else if (isConcurrentModificationException(operation, failure)) {
+
+      failedState = State.FAILED_CONCURRENT_MODIFICATION;
+    } else if (DbOperationType.DELETE.equals(operationType)
+              && dependencyOperation != null
+              && dependencyOperation.getState() != null
+              && dependencyOperation.getState() != State.APPLIED) {
+
+      // the owning operation was not successful, so the prerequisite for this operation was not given
+      LOG.ignoreFailureDuePreconditionNotMet(operation, "Parent database operation failed", dependencyOperation);
+      failedState = State.NOT_APPLIED;
+    } else {
+
+      failedState = State.FAILED_ERROR;
+    }
+    operation.setState(failedState);
+  }
+
+  protected boolean isConcurrentModificationException(DbOperation failedOperation,
+                                                      Exception cause) {
 
     boolean isConstraintViolation = ExceptionUtil.checkForeignKeyConstraintViolation(cause);
     boolean isVariableIntegrityViolation = ExceptionUtil.checkVariableIntegrityViolation(cause);
@@ -243,6 +285,58 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
     return false;
   }
 
+  /**
+   * In cases where CockroachDB is used, and a failed operation is detected,
+   * the method checks if the exception was caused by a CockroachDB
+   * <code>TransactionRetryException</code>.
+   *
+   * @param cause for which an operation failed
+   * @return true if the failure was due to a CRDB <code>TransactionRetryException</code>.
+   *          Otherwise, it's false.
+   */
+  public static boolean isCrdbConcurrencyConflict(Throwable cause) {
+    // only check when CRDB is used
+    if (DatabaseUtil.checkDatabaseType(DbSqlSessionFactory.CRDB)) {
+      boolean isCrdbTxRetryException = ExceptionUtil.checkCrdbTransactionRetryException(cause);
+      if (isCrdbTxRetryException) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * In cases where CockroachDB is used, and a failed operation is detected,
+   * the method checks if the exception was caused by a CockroachDB
+   * <code>TransactionRetryException</code>. This method may be used when a
+   * CRDB Error occurs on commit, and a Command Context is not available, as
+   * it has already been closed. This is the case with Spring/JTA transaction
+   * interceptors.
+   *
+   * @param cause for which an operation failed
+   * @param configuration of the Process Engine
+   * @return true if the failure was due to a CRDB <code>TransactionRetryException</code>.
+   *          Otherwise, it's false.
+   */
+  public static boolean isCrdbConcurrencyConflictOnCommit(Throwable cause, ProcessEngineConfigurationImpl configuration) {
+    // only check when CRDB is used
+    if (DatabaseUtil.checkDatabaseType(configuration, DbSqlSessionFactory.CRDB)) {
+      // with Java EE (JTA) transactions, the real cause is suppressed,
+      // and replaced with a RollbackException. We need to look into the
+      // suppressed exceptions to find the CRDB TransactionRetryError.
+      List<Throwable> causes = new ArrayList<>(Arrays.asList(cause.getSuppressed()));
+      causes.add(cause);
+      for (Throwable throwable : causes) {
+        if (ExceptionUtil.checkCrdbTransactionRetryException(throwable)) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
   // insert //////////////////////////////////////////
 
   @Override
@@ -261,21 +355,21 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
 
   protected void executeInsertEntity(String insertStatement, Object parameter) {
     LOG.executeDatabaseOperation("INSERT", parameter);
-    sqlSession.insert(insertStatement, parameter);
+    try {
+      sqlSession.insert(insertStatement, parameter);
+    } catch (Exception e) {
+      // exception is wrapped later
+      throw e;
+    }
   }
 
-  protected void entityInsertPerformed(DbEntityOperation operation, int rowsAffected, Exception failure) {
+  protected void entityInsertPerformed(DbEntityOperation operation,
+                                       int rowsAffected,
+                                       Exception failure) {
     DbEntity entity = operation.getEntity();
 
     if (failure != null) {
-      operation.setRowsAffected(0);
-      operation.setFailure(failure);
-
-      if (isConcurrentModificationException(operation, failure)) {
-        operation.setState(State.FAILED_CONCURRENT_MODIFICATION);
-      } else {
-        operation.setState(State.FAILED_ERROR);
-      }
+      configureFailedDbEntityOperation(operation, failure);
     } else {
       // set revision of our copy to 1
       if (entity instanceof HasDbRevision) {
@@ -291,27 +385,49 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
 
   protected int executeDelete(String deleteStatement, Object parameter) {
     // map the statement
-    deleteStatement = dbSqlSessionFactory.mapStatement(deleteStatement);
-    return sqlSession.delete(deleteStatement, parameter);
+    String mappedDeleteStatement = dbSqlSessionFactory.mapStatement(deleteStatement);
+    try {
+      return sqlSession.delete(mappedDeleteStatement, parameter);
+    } catch (Exception e) {
+      // Exception is wrapped later
+      throw e;
+    }
   }
 
   // update ////////////////////////////////////////
 
   public int executeUpdate(String updateStatement, Object parameter) {
-    updateStatement = dbSqlSessionFactory.mapStatement(updateStatement);
-    return sqlSession.update(updateStatement, parameter);
+    String mappedUpdateStatement = dbSqlSessionFactory.mapStatement(updateStatement);
+    try {
+      return sqlSession.update(mappedUpdateStatement, parameter);
+    } catch (Exception e) {
+      // Exception is wrapped later
+      throw e;
+    }
+  }
+
+  public int update(String updateStatement, Object parameter) {
+    return ExceptionUtil.doWithExceptionWrapper(() -> sqlSession.update(updateStatement, parameter));
   }
 
   @Override
   public int executeNonEmptyUpdateStmt(String updateStmt, Object parameter) {
-    updateStmt = dbSqlSessionFactory.mapStatement(updateStmt);
+    String mappedUpdateStmt = dbSqlSessionFactory.mapStatement(updateStmt);
 
     //if mapped statement is empty, which can happens for some databases, we have no need to execute it
-    MappedStatement mappedStatement = sqlSession.getConfiguration().getMappedStatement(updateStmt);
-    if (mappedStatement.getBoundSql(parameter).getSql().isEmpty())
-      return 0;
+    boolean isMappedStmtEmpty = ExceptionUtil.doWithExceptionWrapper(() -> {
+      Configuration configuration = sqlSession.getConfiguration();
+      MappedStatement mappedStatement = configuration.getMappedStatement(mappedUpdateStmt);
+      BoundSql boundSql = mappedStatement.getBoundSql(parameter);
+      String sql = boundSql.getSql();
+      return sql.isEmpty();
+    });
 
-    return sqlSession.update(updateStmt, parameter);
+    if (isMappedStmtEmpty) {
+      return 0;
+    }
+
+    return update(mappedUpdateStmt, parameter);
   }
 
   // flush ////////////////////////////////////////////////////////////////////
@@ -320,23 +436,39 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
   }
 
   public void flushOperations() {
-    flushBatchOperations();
+    ExceptionUtil.doWithExceptionWrapper(this::flushBatchOperations);
   }
 
   public List<BatchResult> flushBatchOperations() {
-    return sqlSession.flushStatements();
+    try {
+      return sqlSession.flushStatements();
+
+    } catch (RuntimeException ex) {
+      // exception is wrapped later
+      throw ex;
+
+    }
   }
 
   public void close() {
-    sqlSession.close();
+    ExceptionUtil.doWithExceptionWrapper(() -> {
+      sqlSession.close();
+      return null;
+    });
   }
 
   public void commit() {
-    sqlSession.commit();
+    ExceptionUtil.doWithExceptionWrapper(() -> {
+      sqlSession.commit();
+      return null;
+    });
   }
 
   public void rollback() {
-    sqlSession.rollback();
+    ExceptionUtil.doWithExceptionWrapper(() -> {
+      sqlSession.rollback();
+      return null;
+    });
   }
 
   // schema operations ////////////////////////////////////////////////////////
@@ -385,7 +517,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
   @Override
   protected String getDbVersion() {
     String selectSchemaVersionStatement = dbSqlSessionFactory.mapStatement("selectDbSchemaVersion");
-    return (String) sqlSession.selectOne(selectSchemaVersionStatement);
+    return ExceptionUtil.doWithExceptionWrapper(() -> sqlSession.selectOne(selectSchemaVersionStatement));
   }
 
   @Override
@@ -463,8 +595,6 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
     executeSchemaResource(operation, component, getResourceForDbOperation(operation, operation, component), false);
   }
 
-  public static String[] JDBC_METADATA_TABLE_TYPES = {"TABLE"};
-
   @Override
   public boolean isEngineTablePresent(){
     return isTablePresent("ACT_RU_EXECUTION");
@@ -502,7 +632,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
     tableName = prependDatabaseTablePrefix(tableName);
     Connection connection = null;
     try {
-      connection = sqlSession.getConnection();
+      connection = ExceptionUtil.doWithExceptionWrapper(() -> sqlSession.getConnection());
       DatabaseMetaData databaseMetaData = connection.getMetaData();
       ResultSet tables = null;
 
@@ -511,14 +641,12 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
         schema = dbSqlSessionFactory.getDatabaseSchema();
       }
 
-      String databaseType = dbSqlSessionFactory.getDatabaseType();
-
-      if (DbSqlSessionFactory.POSTGRES.equals(databaseType)) {
+      if (DatabaseUtil.checkDatabaseType(DbSqlSessionFactory.POSTGRES, DbSqlSessionFactory.CRDB)) {
         tableName = tableName.toLowerCase();
       }
 
       try {
-        tables = databaseMetaData.getTables(this.connectionMetadataDefaultCatalog, schema, tableName, JDBC_METADATA_TABLE_TYPES);
+        tables = databaseMetaData.getTables(this.connectionMetadataDefaultCatalog, schema, tableName, getTableTypes());
         return tables.next();
       } finally {
         if (tables != null) {
@@ -548,14 +676,14 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
           String schema = getDbSqlSessionFactory().getDatabaseSchema();
           String tableNameFilter = prependDatabaseTablePrefix("ACT_%");
 
-          // for postgres we have to use lower case
-          if (DbSqlSessionFactory.POSTGRES.equals(getDbSqlSessionFactory().getDatabaseType())) {
+          // for postgres or cockroachdb, we have to use lower case
+          if (DatabaseUtil.checkDatabaseType(DbSqlSessionFactory.POSTGRES, DbSqlSessionFactory.CRDB)) {
             schema = schema == null ? schema : schema.toLowerCase();
             tableNameFilter = tableNameFilter.toLowerCase();
           }
 
           DatabaseMetaData databaseMetaData = connection.getMetaData();
-          tablesRs = databaseMetaData.getTables(null, schema, tableNameFilter, DbSqlSession.JDBC_METADATA_TABLE_TYPES);
+          tablesRs = databaseMetaData.getTables(null, schema, tableNameFilter, getTableTypes());
           while (tablesRs.next()) {
             String tableName = tablesRs.getString("TABLE_NAME");
             if (!databaseTablePrefix.isEmpty()) {
@@ -674,7 +802,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
     String sqlStatement = null;
     String exceptionSqlStatement = null;
     try {
-      Connection connection = sqlSession.getConnection();
+      Connection connection = ExceptionUtil.doWithExceptionWrapper(() -> sqlSession.getConnection());
       Exception exception = null;
       byte[] bytes = IoUtil.readInputStream(inputStream, resourceName);
       String ddlStatements = new String(bytes);
@@ -692,8 +820,8 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
 
           if (line.endsWith(";")) {
             sqlStatement = addSqlStatementPiece(sqlStatement, line.substring(0, line.length()-1));
-            Statement jdbcStatement = connection.createStatement();
             try {
+              Statement jdbcStatement = connection.createStatement();
               // no logging needed as the connection will log it
               logLines.add(sqlStatement);
               jdbcStatement.execute(sqlStatement);
@@ -743,24 +871,35 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
   }
 
   protected boolean isMissingTablesException(Exception e) {
-    String exceptionMessage = e.getMessage();
-    if(e.getMessage() != null) {
-      // Matches message returned from H2
-      if ((exceptionMessage.indexOf("Table") != -1) && (exceptionMessage.indexOf("not found") != -1)) {
-        return true;
-      }
+    Throwable cause = e.getCause();
+    if (cause != null) {
+      String exceptionMessage = cause.getMessage();
+      if(cause.getMessage() != null) {
+        // Matches message returned from H2
+        if ((exceptionMessage.contains("Table")) && (exceptionMessage.contains("not found"))) {
+          return true;
+        }
 
-      // Message returned from MySQL and Oracle
-      if ((exceptionMessage.indexOf("Table") != -1 || exceptionMessage.indexOf("table") != -1) && (exceptionMessage.indexOf("doesn't exist") != -1)) {
-        return true;
-      }
+        // Message returned from MySQL and Oracle
+        if ((exceptionMessage.contains("Table") || exceptionMessage.contains("table")) && (exceptionMessage.contains("doesn't exist"))) {
+          return true;
+        }
 
-      // Message returned from Postgres
-      if ((exceptionMessage.indexOf("relation") != -1 || exceptionMessage.indexOf("table") != -1) && (exceptionMessage.indexOf("does not exist") != -1)) {
-        return true;
+        // Message returned from Postgres
+        return (exceptionMessage.contains("relation") || exceptionMessage.contains("table")) && (exceptionMessage.contains("does not exist"));
       }
     }
     return false;
+  }
+
+  protected String[] getTableTypes() {
+    // the PostgreSQL JDBC API changed in 42.2.11 and partitioned tables
+    // are not detected unless the corresponding table type flag is added.
+    if (DatabaseUtil.checkDatabaseType(DbSqlSessionFactory.POSTGRES)) {
+      return PG_JDBC_METADATA_TABLE_TYPES;
+    }
+
+    return JDBC_METADATA_TABLE_TYPES;
   }
 
   // getters and setters //////////////////////////////////////////////////////

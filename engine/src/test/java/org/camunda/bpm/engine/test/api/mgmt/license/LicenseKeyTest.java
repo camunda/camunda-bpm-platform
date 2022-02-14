@@ -17,9 +17,11 @@
 package org.camunda.bpm.engine.test.api.mgmt.license;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Map;
 
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -33,17 +35,15 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 public class LicenseKeyTest {
 
   public ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
-  public ExpectedException exceptionRule = ExpectedException.none();
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(testRule).around(engineRule).around(exceptionRule);
+  public RuleChain ruleChain = RuleChain.outerRule(testRule).around(engineRule);
 
   ProcessEngine processEngine;
   ProcessEngineConfigurationImpl processEngineConfiguration;
@@ -238,17 +238,14 @@ public class LicenseKeyTest {
   public void shouldThrowExceptionWhenSetNullLicenseKey() {
     // given
     String licenseKey = null;
-    exceptionRule.expect(NullValueException.class);
-    exceptionRule.expectMessage("licenseKey is null");
 
-    // when
-    String storedLicenseKey = null;
-    try {
-      managementService.setLicenseKey(licenseKey);
-      storedLicenseKey = managementService.getLicenseKey();
-    } finally {
-      // then
-      assertThat(storedLicenseKey).isNull();
-    }
+    // when/then
+    assertThatThrownBy(() -> managementService.setLicenseKey(licenseKey))
+      .isInstanceOf(NullValueException.class)
+      .hasMessageContaining("licenseKey is null");
+
+    // and
+    String storedLicenseKey = managementService.getLicenseKey();
+    assertThat(storedLicenseKey).isNull();
   }
 }

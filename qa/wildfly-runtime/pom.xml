@@ -4,12 +4,12 @@
   <artifactId>camunda-qa-wildfly-runtime</artifactId>
   <packaging>jar</packaging>
 
-  <name>camunda BPM - QA Wildfly Test Runtime</name>
+  <name>Camunda Platform - QA Wildfly Test Runtime</name>
 
   <parent>
     <groupId>org.camunda.bpm.qa</groupId>
     <artifactId>camunda-qa</artifactId>
-    <version>7.14.0-SNAPSHOT</version>
+    <version>7.17.0-SNAPSHOT</version>
   </parent>
 
   <dependencies>
@@ -160,7 +160,7 @@
                       <message>
                         *****************************************************************************************************
                         *                                                                                                   *
-                        *               You must use at least JDK 1.8 to start Camunda Bpm Wildfly!!!                       *
+                        *               You must use at least JDK 1.8 to start Camunda Platform Wildfly!!!                  *
                         *                                                                                                   *
                         *****************************************************************************************************
                       </message>

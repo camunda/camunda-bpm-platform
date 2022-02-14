@@ -17,12 +17,10 @@
 package org.camunda.bpm.engine.test.api.mgmt;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -61,6 +59,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -72,6 +71,15 @@ import org.junit.Test;
  * @author Joram Barrez
  */
 public class ManagementServiceTest extends PluggableProcessEngineTest {
+
+  protected boolean tearDownTelemetry;
+
+  @After
+  public void tearDown() {
+    if (tearDownTelemetry) {
+      managementService.toggleTelemetry(false);
+    }
+  }
 
   @Test
   public void testGetMetaDataForUnexistingTable() {
@@ -249,7 +257,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTest {
 
   protected void assertRetries(List<String> allJobIds, int i) {
     for (String id : allJobIds) {
-      assertThat(managementService.createJobQuery().jobId(id).singleResult().getRetries(), is(i));
+      assertThat(managementService.createJobQuery().jobId(id).singleResult().getRetries()).isEqualTo(i);
     }
   }
 
@@ -876,20 +884,20 @@ public class ManagementServiceTest extends PluggableProcessEngineTest {
   @Test
   public void testTelemetryEnabled() {
     // given default configuration
+    tearDownTelemetry = true;
 
     // when
     managementService.toggleTelemetry(true);
 
     // then
     assertThat(managementService.isTelemetryEnabled()).isTrue();
-
-    // cleanup
-    managementService.toggleTelemetry(false);
   }
 
   @Test
   public void testTelemetryDisabled() {
     // given
+    tearDownTelemetry = true;
+
     managementService.toggleTelemetry(true);
 
     // when

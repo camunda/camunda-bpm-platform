@@ -1,0 +1,25 @@
+.pagination {
+  text-align: center;
+  display: block;
+  clear: both;
+  overflow: visible;
+  margin: (@grid-gutter-width / 2) auto;
+
+  > li {
+    overflow: visible;
+    display: inline-block;
+
+    a {
+      float: none;
+      border: none;
+    }
+
+    &.active {
+      a {
+        background-color: @gray-light;
+        background-color: @gray-lighter;
+        color: @gray;
+      }
+    }
+  }
+}

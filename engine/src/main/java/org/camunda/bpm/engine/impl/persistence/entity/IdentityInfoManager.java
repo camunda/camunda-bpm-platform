@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 
 
@@ -72,11 +71,7 @@ public class IdentityInfoManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
   protected List<IdentityInfoEntity> findIdentityInfoDetails(String identityInfoId) {
-    return Context
-      .getCommandContext()
-      .getDbSqlSession()
-      .getSqlSession()
-      .selectList("selectIdentityInfoDetails", identityInfoId);
+    return getDbEntityManager().selectList("selectIdentityInfoDetails", identityInfoId);
   }
 
   public void setUserInfo(String userId, String userPassword, String type, String key, String value, String accountPassword, Map<String, String> accountDetails) {
@@ -159,7 +154,7 @@ public class IdentityInfoManager extends AbstractManager {
     Map<String, String> parameters = new HashMap<String, String>();
     parameters.put("userId", userId);
     parameters.put("type", type);
-    return (List) getDbSqlSession().getSqlSession().selectList("selectIdentityInfoKeysByUserIdAndType", parameters);
+    return (List) getDbEntityManager().selectList("selectIdentityInfoKeysByUserIdAndType", parameters);
   }
 
   public void deleteUserInfoByUserId(String userId) {

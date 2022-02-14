@@ -1,7 +1,9 @@
+<#macro endpoint_macro docsUrl="">
 {
   <@lib.endpointInfo
       id = "getProcessInstances"
       tag = "Process Instance"
+      summary = "Get List"
       desc = "Queries for process instances that fulfill given parameters.
               Parameters may be static as well as dynamic runtime properties of process instances.
               The size of the result set can be retrieved by using the Get Instance Count method." />
@@ -50,3 +52,5 @@
                 for example if a sortOrder parameter is supplied, but no sortBy, or if an invalid operator for variable comparison is used."/>
   }
 }
+
+</#macro>

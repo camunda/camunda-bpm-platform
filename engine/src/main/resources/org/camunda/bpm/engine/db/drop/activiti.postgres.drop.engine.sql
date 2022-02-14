@@ -38,9 +38,11 @@ drop index ACT_IDX_AUTH_GROUP_ID;
 drop index ACT_IDX_EXEC_BUSKEY;
 drop index ACT_IDX_TASK_CREATE;
 drop index ACT_IDX_TASK_ASSIGNEE;
+drop index ACT_IDX_TASK_OWNER;
 drop index ACT_IDX_IDENT_LNK_USER;
 drop index ACT_IDX_IDENT_LNK_GROUP;
 drop index ACT_IDX_VARIABLE_TASK_ID;
+drop index ACT_IDX_VARIABLE_TASK_NAME_TYPE;
 
 -- new metric milliseconds column
 DROP INDEX ACT_IDX_METER_LOG_MS;
@@ -50,6 +52,9 @@ DROP INDEX ACT_IDX_METER_LOG_REPORT;
 -- old metric timestamp column
 DROP INDEX ACT_IDX_METER_LOG_TIME;
 DROP INDEX ACT_IDX_METER_LOG;
+
+-- task metric timestamp column
+drop index ACT_IDX_TASK_METER_LOG_TIME;
 
 drop index ACT_IDX_EXT_TASK_TOPIC;
 
@@ -143,6 +148,9 @@ alter table ACT_RU_BATCH
 alter table ACT_RU_EXT_TASK
     drop CONSTRAINT ACT_FK_EXT_TASK_ERROR_DETAILS;
 
+alter table ACT_RU_VARIABLE
+    drop CONSTRAINT ACT_FK_VAR_BATCH;
+
 drop index ACT_IDX_EVENT_SUBSCR_CONFIG_;
 drop index ACT_IDX_EVENT_SUBSCR;
 drop index ACT_IDX_ATHRZ_PROCEDEF;
@@ -187,10 +195,13 @@ drop index ACT_IDX_PROCDEF_VER_TAG;
 drop index ACT_IDX_AUTH_ROOT_PI;
 drop index ACT_IDX_AUTH_RM_TIME;
 
+drop index ACT_IDX_BATCH_ID;
+
 drop table ACT_GE_PROPERTY;
 drop table ACT_GE_BYTEARRAY;
 drop table ACT_RE_DEPLOYMENT;
 drop table ACT_RE_PROCDEF;
+drop table ACT_RE_CAMFORMDEF;
 drop table ACT_RU_EXECUTION;
 drop table ACT_RU_JOB;
 drop table ACT_RU_JOBDEF;
@@ -202,6 +213,7 @@ drop table ACT_RU_INCIDENT;
 drop table ACT_RU_AUTHORIZATION;
 drop table ACT_RU_FILTER;
 drop table ACT_RU_METER_LOG;
+drop table ACT_RU_TASK_METER_LOG;
 drop table ACT_RU_EXT_TASK;
 drop table ACT_RU_BATCH;
 drop table ACT_GE_SCHEMA_LOG;

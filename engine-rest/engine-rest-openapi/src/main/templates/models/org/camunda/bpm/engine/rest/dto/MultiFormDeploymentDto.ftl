@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -33,6 +34,15 @@
         desc = "The name for the deployment to be created."/>
 
     <@lib.property
+        name = "deployment-activation-time"
+        type = "string"
+        format = "date-time"
+        desc = "Sets the date on which the process definitions contained in this deployment will be activated. This means that all process
+                definitions will be deployed as usual, but they will be suspended from the start until the given activation date.
+                By [default](${docsUrl}/reference/rest/overview/date-format/),
+                the date must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.000+0200`."/>
+
+    <@lib.property
         name = "data"
         type = "string"
         format = "binary"
@@ -41,3 +51,5 @@
                 It is possible to have more than one form part with different form part names for the binary data to create a deployment."/>
 
 </@lib.dto>
+
+</#macro>

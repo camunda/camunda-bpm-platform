@@ -1,0 +1,154 @@
+[cam-widget-variable] {
+  // styles to display
+  &[display] {
+    .make-row();
+
+    > .type,
+    > .name,
+    > .value {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    > .type {
+      .make-xs-column(2);
+    }
+
+    > .name,
+    > .value {
+      .make-xs-column(5);
+    }
+
+    > .type,
+    > .value {
+      font-family: monospace;
+    }
+
+    .null-symbol {
+      color: @gray-light;
+    }
+  }
+
+  // styles to edit
+  .input-group {
+    .name {
+      width: 33%;
+    }
+
+    .value {
+      width: 67%;
+
+      &.null-value {
+        border-left: none;
+        margin-left: -1px;
+      }
+    }
+
+    .checkbox {
+      margin: 0;
+      position: relative;
+
+      input[type="checkbox"] {
+        width: auto;
+        position: absolute;
+        top: 50%;
+        margin: -7px 0 0 7px;
+      }
+    }
+  }
+
+  .set-null {
+    border-right-width: 0;
+  }
+
+  &.var-type-boolean,
+  &.var-type-bytes,
+  &.var-type-object {
+    .set-null {
+      border-right-width: 1px;
+    }
+  }
+
+  .value-wrapper {
+    width: 67%;
+
+    .value {
+      width: 100%;
+    }
+
+    .btn {
+      margin-left: -1px;
+      margin-right: -1px;
+      height: 34px;
+      line-height: 34px;
+
+      .glyphicon {
+        margin-top: 2px;
+      }
+    }
+  }
+
+  .type > select {
+    min-width: 120px;
+    text-align: right;
+    margin-right: -1px;
+  }
+
+  &.table-row {
+    margin-top: -1px;
+
+    &:first-of-type {
+      margin-top: 0;
+    }
+  }
+
+  .form-control-static {
+    display: table-cell;
+    position: relative;
+
+    > a {
+      position: absolute;
+      top: @padding-base-vertical;
+      bottom: @padding-base-vertical;
+      left: @padding-base-horizontal;
+      right: @padding-base-horizontal;
+      overflow: hidden;
+      display: block;
+      text-overflow: ellipsis;
+      font-family: monospace;
+      white-space: nowrap;
+    }
+  }
+
+  .no-click {
+    cursor: default;
+    cursor: not-allowed;
+
+    &.btn:hover {
+      box-shadow: none;
+    }
+  }
+}
+
+[cam-widget-variable] + [cam-widget-variable] {
+  margin-top: 1px;
+  padding-top: 1px;
+}
+
+.cam-widget-variable-dialog {
+  form {
+    padding-left: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+
+  .tab-content {
+    padding-top: @grid-gutter-width / 2;
+  }
+}
+
+[disabled].cam-string-variable {
+  cursor: default;
+  background-color: white;
+}

@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -44,3 +45,4 @@
         desc = "The id of the tenant this event subscription belongs to.
                 Can be `null` if the subscription belongs to no single tenant." />
 </@lib.dto>
+</#macro>

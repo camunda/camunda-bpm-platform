@@ -133,7 +133,7 @@ public abstract class ProcessEngines {
 
   protected static void initProcessEngineFromSpringResource(URL resource) {
     try {
-      Class< ? > springConfigurationHelperClass = ReflectUtil.loadClass("org.camunda.bpm.engine.test.spring.SpringConfigurationHelper");
+      Class< ? > springConfigurationHelperClass = ReflectUtil.loadClass("org.camunda.bpm.engine.spring.SpringConfigurationHelper");
       Method method = springConfigurationHelperClass.getMethod("buildProcessEngine", new Class<?>[]{URL.class});
       ProcessEngine processEngine = (ProcessEngine) method.invoke(null, new Object[]{resource});
 

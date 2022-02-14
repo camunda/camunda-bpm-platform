@@ -1,8 +1,10 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
       id = "getDeployedForm"
       tag = "Task"
+      summary = "Get Deployed Form"
       desc = "Retrieves the deployed form that is referenced from a given task. For further
             information please refer to the
             [User Guide](${docsUrl}/user-guide/task-forms/#embedded-task-forms)." />
@@ -21,34 +23,40 @@
 
   "responses" : {
 
-    <@lib.response
+    <@lib.multiTypeResponse
         code = "200"
-        mediaType = "application/xhtml+xml"
         desc = "Request successful."
-        examples = ['"example-1": {
-                       "summary": "Status 200 Response",
-                       "description": "Resonse for GET `/task/taskId/deployed-form`",
-                       "value": "<form role=\\"form\\" name=\\"invoiceForm\\"
-                                      class=\\"form-horizontal\\">
-
-                                  <div class=\\"form-group\\">
-                                    <label class=\\"control-label col-md-4\\"
-                                           for=\\"creditor\\">Creditor</label>
-                                    <div class=\\"col-md-8\\">
-                                      <input cam-variable-name=\\"creditor\\"
-                                             cam-variable-type=\\"String\\"
-                                             id=\\"creditor\\"
-                                             class=\\"form-control\\"
-                                             type=\\"text\\"
-                                             required />
-                                      <div class=\\"help\\">
-                                        (e.g. &quot;Great Pizza for Everyone Inc.&quot;)
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                </form>"
-                     }'] />
+        types = [
+          {
+            "mediaType": "application/xhtml+xml",
+            "examples": ['"example-1": {
+                            "summary": "Status 200 Response",
+                            "description": "Resonse for GET `/task/taskId/deployed-form`",
+                            "value": "<form role=\\"form\\" name=\\"invoiceForm\\"
+                                            class=\\"form-horizontal\\">
+                                        <div class=\\"form-group\\">
+                                          <label class=\\"control-label col-md-4\\"
+                                                 for=\\"creditor\\">Creditor</label>
+                                          <div class=\\"col-md-8\\">
+                                            <input cam-variable-name=\\"creditor\\"
+                                                   cam-variable-type=\\"String\\"
+                                                   id=\\"creditor\\"
+                                                   class=\\"form-control\\"
+                                                   type=\\"text\\"
+                                                   required />
+                                            <div class=\\"help\\">
+                                            (e.g. &quot;Great Pizza for Everyone Inc.&quot;)
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </form>"
+                          }']
+          },
+          {
+            "mediaType": "application/json",
+            "flatType": "string"
+          }
+        ] />
 
     <@lib.response
         code = "400"
@@ -74,3 +82,5 @@
 
   }
 }
+
+</#macro>

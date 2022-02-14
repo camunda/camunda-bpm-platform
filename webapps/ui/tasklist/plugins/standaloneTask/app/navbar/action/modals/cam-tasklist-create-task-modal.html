@@ -1,0 +1,92 @@
+<!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/standaloneTask/app/navbar/action/modals/cam-tasklist-create-task-modal.html -->
+<div class="modal-header">
+  <h3 class="cam-tasklist-create-task modal-title">{{ 'CREATE_TASK' | translate }}</h3>
+</div>
+
+<div class="modal-body">
+
+  <div notifications-panel></div>
+
+  <form class="form-horizontal"
+        name="newTaskForm"
+        role="form">
+    <div ng-init="setNewTaskForm(this.newTaskForm)"></div>
+
+    <div class="form-group">
+      <label for="filter-form-color"
+             class="col-xs-2 control-label">{{ 'NEW_TASK_NAME' | translate }}</label>
+      <div class="col-xs-10">
+        <input class="form-control"
+               name="taskName"
+               ng-model="task.name"
+               required
+               type="text" />
+        <span ng-if="this.newTaskForm.taskName.$invalid && this.newTaskForm.taskName.$dirty"
+              class="has-error">
+          <span ng-show="this.newTaskForm.taskName.$error.required"
+                class="help-block">
+            {{ 'REQUIRED_FIELD' | translate }}
+          </span>
+        </span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="filter-form-color"
+             class="col-xs-2 control-label">{{ 'NEW_TASK_ASSIGNEE' | translate }}</label>
+      <div class="col-xs-10">
+        <input class="form-control"
+               name="taskAssignee"
+               ng-model="task.assignee"
+               type="text" />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="filter-form-color"
+             class="col-xs-2 control-label">{{ 'NEW_TASK_TENANT_ID' | translate }}</label>
+      <div class="col-xs-10">
+        <input class="form-control"
+          name="taskTenantId"
+          ng-model="task.tenantId"
+          type="text" />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="filter-form-color"
+             class="col-xs-2 control-label">{{ 'NEW_TASK_DESCRIPTION' | translate }}</label>
+      <div class="col-xs-10">
+        <textarea class="form-control"
+                  name="taskDescription"
+                  ng-model="task.description"
+                  rows="4">
+        </textarea>
+      </div>
+    </div>
+
+  </form>
+
+</div>
+
+<div class="modal-footer">
+  <div class="row row-action">
+
+    <div class="col-xs-12">
+      <button class="btn btn-xs btn-link"
+              type="button"
+              ng-click="$dismiss()">
+        {{ 'CLOSE' | translate }}
+      </button>
+
+      <button class="btn btn-primary"
+              type="submit"
+              ng-click="save()"
+              ng-disabled="!isValid() || submitInProgress">
+        {{ 'SAVE' | translate }}
+      </button>
+    </div>
+
+  </div>
+</div>
+<!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/standaloneTask/app/navbar/action/modals/cam-tasklist-create-task-modal.html -->

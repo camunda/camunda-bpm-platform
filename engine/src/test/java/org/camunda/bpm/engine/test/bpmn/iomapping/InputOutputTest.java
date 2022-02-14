@@ -17,12 +17,9 @@
 package org.camunda.bpm.engine.test.bpmn.iomapping;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -1041,7 +1038,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
     runtimeService.startProcessInstanceByKey("testProcess", variables);
     //we will only reach the user task if the BPMNError from the script was handled by the boundary event
     Task task = taskService.createTaskQuery().singleResult();
-    assertThat(task.getName(), is("User Task"));
+    assertThat(task.getName()).isEqualTo("User Task");
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testThrowErrorInScriptInputOutputMapping.bpmn")
@@ -1054,7 +1051,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
     try {
       runtimeService.startProcessInstanceByKey("testProcess", variables);
     } catch(RuntimeException re){
-      assertThat(re.getMessage(), containsString(exceptionMessage));
+      assertThat(re.getMessage()).contains(exceptionMessage);
     }
   }
 
@@ -1068,7 +1065,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
     runtimeService.startProcessInstanceByKey("testProcess", variables);
     //we will only reach the user task if the BPMNError from the script was handled by the boundary event
     Task task = taskService.createTaskQuery().singleResult();
-    assertThat(task.getName(), is("User Task"));
+    assertThat(task.getName()).isEqualTo("User Task");
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testThrowErrorInScriptInputOutputMapping.bpmn")
@@ -1081,7 +1078,7 @@ public class InputOutputTest extends PluggableProcessEngineTest {
     try {
       runtimeService.startProcessInstanceByKey("testProcess", variables);
     } catch(RuntimeException re){
-      assertThat(re.getMessage(), containsString(exceptionMessage));
+      assertThat(re.getMessage()).contains(exceptionMessage);
     }
   }
 

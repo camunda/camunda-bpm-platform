@@ -19,9 +19,9 @@ package org.camunda.bpm.engine.impl.cmd;
 import java.util.Collections;
 
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyManager;
@@ -42,8 +42,7 @@ public class DeletePropertyCmd implements Command<Object> {
   }
 
   public Object execute(CommandContext commandContext) {
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkCamundaAdmin();
+    commandContext.getAuthorizationManager().checkCamundaAdminOrPermission(CommandChecker::checkDeleteProperty);
 
     final PropertyManager propertyManager = commandContext.getPropertyManager();
 
@@ -51,8 +50,8 @@ public class DeletePropertyCmd implements Command<Object> {
 
     if(propertyEntity != null) {
       propertyManager.delete(propertyEntity);
-      
-      commandContext.getOperationLogManager().logPropertyOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE, 
+
+      commandContext.getOperationLogManager().logPropertyOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE,
           Collections.singletonList(new PropertyChange("name", null, name)));
     }
 

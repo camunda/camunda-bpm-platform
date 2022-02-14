@@ -32,7 +32,9 @@ public class ExampleConfiguration {
 
   @Bean
   public ProcessEngineConfiguration processEngineConfiguration() {
-    return new StandaloneInMemProcessEngineConfiguration().setJobExecutorDeploymentAware(true);
+    return new StandaloneInMemProcessEngineConfiguration()
+        .setJobExecutorDeploymentAware(true)
+        .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
   }
 
   @Bean

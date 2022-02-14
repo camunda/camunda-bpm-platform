@@ -1,0 +1,205 @@
+<html>
+  <head>
+    <title>Camunda commons UI library</title>
+    <base href="/" />
+    <!--[if IE]><script type="text/javascript">
+        // Fix for IE ignoring relative base tags.
+        // See http://stackoverflow.com/questions/3926197/html-base-tag-and-local-folder-path-with-internet-explorer
+        (function() {
+            var baseTag = document.getElementsByTagName('base');
+            if (baseTag[0]) { baseTag[0].href = baseTag[0].href; }
+        })();
+    </script><![endif]-->
+    <link rel="icon" href="resources/img/favicon.ico" />
+    <link href="styles.css" rel="stylesheet" />
+    <link href="test-styles.css" rel="stylesheet" />
+  </head>
+  <body class="cam-widget-variable-test-page">
+    <!-- gh-pages-menu -->
+
+    <header>
+      <div>
+        <h1>Variable</h1>
+      </div>
+    </header>
+
+    <section class="widget-description">
+      <header>
+        <h2>Description</h2>
+      </header>
+      <p>A widget to display and manipulate variables used by the Camunda Platform suite.</p>
+    </section>
+
+    <section class="widget-reference">
+      <header>
+        <h2>Usage</h2>
+      </header>
+
+      <h3>Options</h3>
+      <dl>
+        <dt><span class="badge">=</span> cam-variable</dt>
+        <dd>The variable to be edited / displayed</dd>
+
+        <dt><span class="badge">@?</span> display</dt>
+        <dd>
+          Takes a boolean determining if the widget is only aimed to display the variable.
+          <a href="#example-3">Example</a>
+        </dd>
+
+        <dt><span class="badge">=?</span> shown</dt>
+        <dd>
+          Takes an array of strings to determine which parts of the variable is shown.<br/>
+          Valid strings:
+          <ul>
+            <li><code>type</code></li>
+            <li><code>name</code></li>
+            <li><code>value</code></li>
+          </ul>
+          <a href="#example-3">Example</a>
+        </dd>
+
+        <dt><span class="badge">=?</span> disabled</dt>
+        <dd>
+          Takes an array of strings to determine what parts of the variable can not be edited.<br/>
+          Valid strings:
+          <ul>
+            <li><code>type</code></li>
+            <li><code>name</code></li>
+            <li><code>value</code></li>
+          </ul>
+        </dd>
+      </dl>
+    </section>
+
+    <section class="widget-examples">
+      <header>
+        <h2>Examples</h2>
+      </header>
+
+
+      <div class="widget-example"
+           id="example-1"
+           ng-controller="example1Controller">
+        <h3>Editable variables</h3>
+        <pre ng-non-bindable>&lt;div ng-repeat="variable in vars"
+     class="table-row"
+     cam-widget-variable
+     cam-variable="variable"&gt;
+&lt;/div&gt;</pre>
+        <div class="test-container">
+          <div ng-repeat="variable in vars"
+               class="table-row"
+               cam-widget-variable
+               cam-variable="variable">
+          </div>
+        </div><!-- /.test-container -->
+      </div><!-- /.widget-example -->
+
+      <div class="widget-example"
+           id="example-2"
+           ng-controller="example2Controller">
+        <h3>Displayed variables</h3>
+        <pre ng-non-bindable>&lt;div ng-repeat="variable in vars"
+     cam-widget-variable
+     cam-variable="variable"
+     display="true"&gt;
+&lt;/div&gt;</pre>
+        <div class="test-container">
+          <div ng-repeat="variable in vars"
+               cam-widget-variable
+               cam-variable="variable"
+               display="true">
+          </div>
+        </div><!-- /.test-container -->
+      </div><!-- /.widget-example -->
+
+      <div class="widget-example"
+           id="example-3"
+           ng-controller="example3Controller">
+        <h3>Shown variable parts</h3>
+        <pre ng-non-bindable>&lt;div cam-widget-variable
+     cam-variable="vars[9]"
+     shown="nameValue"&gt;&lt;/div&gt;
+&lt;div cam-widget-variable
+     cam-variable="vars[9]"
+     shown="typeValue"&gt;&lt;/div&gt;
+&lt;div cam-widget-variable
+     cam-variable="vars[9]"
+     shown="typeName"&gt;&lt;/div&gt;</pre>
+        <div class="test-container">
+          <div cam-widget-variable
+               cam-variable="vars[9]"
+               shown="nameValue"></div>
+          <div cam-widget-variable
+               cam-variable="vars[9]"
+               shown="typeValue"></div>
+          <div cam-widget-variable
+               cam-variable="vars[9]"
+               shown="typeName"></div>
+        </div><!-- /.test-container -->
+      </div><!-- /.widget-example -->
+
+     <div class="widget-example"
+           id="example-4"
+           ng-controller="example3Controller">
+        <h3>Use within form</h3>
+        <pre ng-non-bindable>&lt;form name="testForm"&gt;
+            &lt;div cam-widget-variable
+                 cam-variable="vars[4]"&gt;&lt;/div&gt;
+            &lt;div cam-widget-variable
+                 cam-variable="vars[5]"&gt;&lt;/div&gt;
+            &lt;div cam-widget-variable
+                 cam-variable="vars[6]"&gt;&lt;/div&gt;
+            &lt;button class="btn btn-primary"
+                   ng-disabled="testForm.$invalid"&gt;
+              Submit changes
+            &lt;/button&gt;
+          &lt;/form&gt;</pre>
+        <div class="test-container">
+          <form name="testForm">
+            <div cam-widget-variable
+                 cam-variable="vars[4]"></div>
+            <div cam-widget-variable
+                 cam-variable="vars[5]"></div>
+            <div cam-widget-variable
+                 cam-variable="vars[6]"></div>
+            <button class="btn btn-primary"
+                   ng-disabled="testForm.$invalid">
+              Submit changes
+            </button>
+          </form>
+        </div><!-- /.test-container -->
+      </div><!-- /.widget-example -->
+
+     <div class="widget-example"
+           id="example-5"
+           ng-controller="example3Controller">
+        <h3>Disable input fields</h3>
+        <pre ng-non-bindable>&lt;div cam-widget-variable
+     cam-variable="vars[9]"
+     disabled="nameValue"&gt;&lt;/div&gt;
+&lt;div cam-widget-variable
+     cam-variable="vars[9]"
+     disabled="typeValue"&gt;&lt;/div&gt;
+&lt;div cam-widget-variable
+     cam-variable="vars[9]"
+     disabled="typeName"&gt;&lt;/div&gt;</pre>
+        <div class="test-container">
+          <div cam-widget-variable
+               cam-variable="vars[9]"
+               disabled="nameValue"></div>
+          <div cam-widget-variable
+               cam-variable="vars[9]"
+               disabled="typeValue"></div>
+          <div cam-widget-variable
+               cam-variable="vars[9]"
+               disabled="typeName"></div>
+        </div><!-- /.test-container -->
+      </div><!-- /.widget-example -->
+    </section>
+
+    <!-- gh-pages-footer -->
+
+    <script src="lib/widgets/variable/test/cam-widget-variable.build.js"></script>
+  </body>
+</html>

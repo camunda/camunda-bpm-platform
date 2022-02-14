@@ -52,7 +52,7 @@ import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
 public class ScriptingEnvironment {
 
   /** the cached environment scripts per script language */
-  protected Map<String, List<ExecutableScript>> env = new HashMap<String, List<ExecutableScript>>();
+  protected Map<String, List<ExecutableScript>> env = new HashMap<>();
 
   /** the resolvers */
   protected List<ScriptEnvResolver> envResolvers;
@@ -89,10 +89,8 @@ public class ScriptingEnvironment {
 
   public Object execute(ExecutableScript script, VariableScope scope, Bindings bindings, ScriptEngine scriptEngine) {
 
-    final String scriptLanguage = script.getLanguage();
-
     // first, evaluate the env scripts (if any)
-    List<ExecutableScript> envScripts = getEnvScripts(scriptLanguage);
+    List<ExecutableScript> envScripts = getEnvScripts(script, scriptEngine);
     for (ExecutableScript envScript : envScripts) {
       envScript.execute(scriptEngine, scope, bindings);
     }
@@ -131,6 +129,14 @@ public class ScriptingEnvironment {
     }
   }
 
+  protected List<ExecutableScript> getEnvScripts(ExecutableScript script, ScriptEngine scriptEngine) {
+    List<ExecutableScript> envScripts = getEnvScripts(script.getLanguage().toLowerCase());
+    if (envScripts.isEmpty()) {
+      envScripts = getEnvScripts(scriptEngine.getFactory().getLanguageName().toLowerCase());
+    }
+    return envScripts;
+  }
+
   /**
    * Returns the env scripts for the given language. Performs lazy initialization of the env scripts.
    *
@@ -160,7 +166,7 @@ public class ScriptingEnvironment {
    */
   protected List<ExecutableScript> initEnvForLanguage(String language) {
 
-    List<ExecutableScript> scripts = new ArrayList<ExecutableScript>();
+    List<ExecutableScript> scripts = new ArrayList<>();
     for (ScriptEnvResolver resolver : envResolvers) {
       String[] resolvedScripts = resolver.resolve(language);
       if(resolvedScripts != null) {

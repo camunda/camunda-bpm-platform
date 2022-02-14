@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.history;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicExternalTaskByTimestamp;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicExternalTaskLogByActivityId;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicExternalTaskLogByActivityInstanceId;
@@ -31,8 +32,6 @@ import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicE
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
 import static org.camunda.bpm.engine.test.api.runtime.migration.models.builder.DefaultExternalTaskModelBuilder.DEFAULT_TOPIC;
 import static org.camunda.bpm.engine.test.api.runtime.migration.models.builder.DefaultExternalTaskModelBuilder.createDefaultExternalTaskModel;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
 import java.util.Date;
 import java.util.LinkedList;
@@ -60,7 +59,6 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
@@ -75,9 +73,6 @@ public class HistoricExternalTaskLogQuerySortingTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(authRule).around(testHelper);
-
-  @Rule
-  public final ExpectedException thrown = ExpectedException.none();
 
   protected ProcessInstance processInstance;
   protected RuntimeService runtimeService;
@@ -616,8 +611,8 @@ public class HistoricExternalTaskLogQuerySortingTest {
   }
 
   protected void verifyQueryWithOrdering(HistoricExternalTaskLogQuery query, int countExpected, NullTolerantComparator<HistoricExternalTaskLog> expectedOrdering) {
-    assertThat(countExpected, is(query.list().size()));
-    assertThat((long) countExpected, is(query.count()));
+    assertThat(query.list()).hasSize(countExpected);
+    assertThat(query.count()).isEqualTo(countExpected);
     TestOrderingUtil.verifySorting(query.list(), expectedOrdering);
   }
 

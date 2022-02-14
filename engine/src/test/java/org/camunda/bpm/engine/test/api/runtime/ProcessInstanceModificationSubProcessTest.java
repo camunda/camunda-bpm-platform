@@ -16,14 +16,6 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
-import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
-import static org.camunda.bpm.engine.test.util.ExecutionAssert.assertThat;
-import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,6 +40,14 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
+
+import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
+import static org.camunda.bpm.engine.test.util.ExecutionAssert.assertThat;
+import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
 /**
  * @author Svetlana Dorokhova.
@@ -707,6 +707,100 @@ public class ProcessInstanceModificationSubProcessTest {
         .matches(
           describeExecutionTree("parentUserTask").scope()
         .done());
+  }
+
+  @Test
+  public void shouldContinueParentWithEscalationEndEvent() {
+    BpmnModelInstance parentProcess = Bpmn.createExecutableProcess("parentProcess")
+                                          .startEvent()
+                                          .callActivity("callActivity")
+                                            .calledElement("subprocess")
+                                          .boundaryEvent("escalationEvent")
+                                            .escalation("escalation")
+                                            .userTask("escalationTask")
+                                            .endEvent()
+                                          .moveToActivity("callActivity")
+                                            .userTask("normalTask")
+                                            .endEvent()
+                                          .done();
+
+    BpmnModelInstance subProcess = Bpmn.createExecutableProcess("subprocess")
+                                       .startEvent()
+                                       .userTask("userTask")
+                                       .endEvent("subEnd")
+                                       .escalation("escalation")
+                                       .done();
+
+    testHelper.deploy(parentProcess, subProcess);
+
+    // given I start the process, which wait as user task in subprocess
+    ProcessInstance parentPI = runtimeService.startProcessInstanceByKey("parentProcess");
+
+    assertNotNull(taskService.createTaskQuery().taskName("userTask").singleResult());
+
+    final ProcessInstance subprocess = runtimeService.createProcessInstanceQuery().processDefinitionKey("subprocess").singleResult();
+    assertNotNull(subprocess);
+
+    // when I do process instance modification
+    runtimeService.createProcessInstanceModification(
+            subprocess.getProcessInstanceId())
+                  .cancelAllForActivity("userTask")
+                  .startAfterActivity("userTask")
+                  .execute();
+
+    // then the parent process instance is still active
+    assertThat(runtimeService.createProcessInstanceQuery().count(), is(1L));
+    assertNotNull(taskService.createTaskQuery().taskName("escalationTask").singleResult());
+
+    Task task = taskService.createTaskQuery().singleResult();
+    assertThat(task.getProcessInstanceId(), is(parentPI.getId()));
+  }
+
+  @Test
+  public void shouldContinueParentWithErrorEndEvent() {
+    BpmnModelInstance parentProcess = Bpmn.createExecutableProcess("parentProcess")
+                                          .startEvent()
+                                          .callActivity("callActivity")
+                                            .calledElement("subprocess")
+                                          .boundaryEvent("errorEvent")
+                                            .error("error")
+                                            .userTask("errorTask")
+                                            .endEvent()
+                                          .moveToActivity("callActivity")
+                                            .userTask("normalTask")
+                                            .endEvent()
+                                          .done();
+
+    BpmnModelInstance subProcess = Bpmn.createExecutableProcess("subprocess")
+                                       .startEvent()
+                                       .userTask("userTask")
+                                       .endEvent("subEnd")
+                                       .error("error")
+                                       .done();
+
+    testHelper.deploy(parentProcess, subProcess);
+
+    // given I start the process, which wait as user task in subprocess
+    ProcessInstance parentPI = runtimeService.startProcessInstanceByKey("parentProcess");
+
+    assertNotNull(taskService.createTaskQuery().taskName("userTask").singleResult());
+
+    final ProcessInstance subprocess = runtimeService.createProcessInstanceQuery().processDefinitionKey("subprocess").singleResult();
+    assertNotNull(subprocess);
+
+    // when I do process instance modification
+    runtimeService.createProcessInstanceModification(
+            subprocess.getProcessInstanceId())
+                  .cancelAllForActivity("userTask")
+                  .startAfterActivity("userTask")
+                  .execute();
+
+    // then the parent process instance is still active
+    assertThat(runtimeService.createProcessInstanceQuery().count(), is(1L));
+    assertNotNull(taskService.createTaskQuery().taskName("errorTask").singleResult());
+
+    Task task = taskService.createTaskQuery().singleResult();
+    assertThat(task.getProcessInstanceId(), is(parentPI.getId()));
   }
 
 

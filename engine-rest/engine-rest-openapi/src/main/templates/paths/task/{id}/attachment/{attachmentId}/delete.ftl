@@ -1,8 +1,10 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
       id = "deleteAttachment"
       tag = "Task Attachment"
+      summary = "Delete"
       desc = "Removes an attachment from a task by id." />
 
   "parameters" : [
@@ -46,3 +48,5 @@
 
   }
 }
+
+</#macro>

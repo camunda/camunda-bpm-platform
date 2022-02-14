@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -33,3 +34,4 @@
         dto = "HistoricProcessInstanceQueryDto" />
 
 </@lib.dto>
+</#macro>

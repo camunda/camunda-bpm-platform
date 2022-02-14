@@ -16,10 +16,16 @@
  */
 package org.camunda.bpm.engine.spring;
 
+import java.util.logging.Logger;
+
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSession;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.TransactionSystemException;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -28,24 +34,55 @@ import org.springframework.transaction.support.TransactionTemplate;
  * @author Tom Baeyens
  */
 public class SpringTransactionInterceptor extends CommandInterceptor {
-  
+
   protected PlatformTransactionManager transactionManager;
   protected int transactionPropagation;
-  
+  protected ProcessEngineConfigurationImpl processEngineConfiguration;
+
+  /**
+   * This constructor doesn't pass an instance of the {@link ProcessEngineConfigurationImpl} class.
+   * As a result, if it is used with CockroachDB, concurrency conflicts that occur on transaction
+   * commit will not be handled by the process engine.
+   *
+   * @deprecated use the {@link #SpringTransactionInterceptor(PlatformTransactionManager, int, ProcessEngineConfigurationImpl)}
+   *    constructor to ensure that when used with CockroachDB, concurrency conflicts that occur
+   *    on transaction commit are detected and handled.
+   */
+  @Deprecated
   public SpringTransactionInterceptor(PlatformTransactionManager transactionManager, int transactionPropagation) {
+    this(transactionManager, transactionPropagation, null);
+  }
+
+  public SpringTransactionInterceptor(PlatformTransactionManager transactionManager,
+                                      int transactionPropagation,
+                                      ProcessEngineConfigurationImpl processEngineConfiguration) {
     this.transactionManager = transactionManager;
     this.transactionPropagation = transactionPropagation;
+    this.processEngineConfiguration = processEngineConfiguration;
   }
-  
+
   @SuppressWarnings("unchecked")
   public <T> T execute(final Command<T> command) {
     TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
     transactionTemplate.setPropagationBehavior(transactionPropagation);
-    T result = (T) transactionTemplate.execute(new TransactionCallback() {
-      public Object doInTransaction(TransactionStatus status) {
-        return next.execute(command);
+    try {
+      // don't use lambdas here => CAM-12810
+      T result = (T) transactionTemplate.execute(new TransactionCallback() {
+        public Object doInTransaction(TransactionStatus status) {
+          return next.execute(command);
+        }
+      });
+      return result;
+    } catch (TransactionSystemException ex) {
+      // When CockroachDB is used, a CRDB concurrency error may occur on transaction commit.
+      // To ensure that these errors are still detected as OLEs, we must catch them and wrap
+      // them in a CrdbTransactionRetryException
+      if (processEngineConfiguration != null
+          && DbSqlSession.isCrdbConcurrencyConflictOnCommit(ex, processEngineConfiguration)) {
+        throw ProcessEngineLogger.PERSISTENCE_LOGGER.crdbTransactionRetryExceptionOnCommit(ex);
+      } else {
+        throw ex;
       }
-    });
-    return result;
+    }
   }
 }

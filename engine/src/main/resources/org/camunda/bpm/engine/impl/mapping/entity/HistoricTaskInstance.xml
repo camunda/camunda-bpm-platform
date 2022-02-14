@@ -116,11 +116,27 @@
     where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
   </update>
 
+  <update id="updateHistoricTaskInstancesByRootProcessInstanceId_mssql"
+          parameterType="java.util.Map">
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_HI_TASKINST RES WITH (FORCESEEK)
+    where RES.ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+  </update>
+
   <update id="updateHistoricTaskInstancesByProcessInstanceId"
           parameterType="java.util.Map">
     update ${prefix}ACT_HI_TASKINST
       set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
       where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+  </update>
+
+  <update id="updateHistoricTaskInstancesByProcessInstanceId_mssql"
+          parameterType="java.util.Map">
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_HI_TASKINST RES WITH (FORCESEEK)
+      where RES.PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
   </update>
 
   <!-- HISTORIC TASK INSTANCE SELECT -->
@@ -259,12 +275,14 @@
 
     <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
-      AUTH ON (AUTH.RESOURCE_ID_ in (
+      AUTH ON (AUTH.RESOURCE_ID_ ${authJoinStart}
+        RES.PROC_DEF_KEY_ ${authJoinSeparator} '*'
         <if test="authCheck.isHistoricInstancePermissionsEnabled">
-          RES.PROC_INST_ID_,
-          RES.ID_,
+          ${authJoinSeparator} RES.PROC_INST_ID_
+          ${authJoinSeparator} RES.ID_
         </if>
-        RES.PROC_DEF_KEY_, '*'))
+        ${authJoinEnd}
+      )
     </if>
 
     <bind name="HPI_JOIN" value="false" />
@@ -315,33 +333,33 @@
               ${queryType} RES.ID_ in (select TASK_ID_ from ${prefix}ACT_HI_IDENTITYLINK HIL
               <where>
                 <if test= "query.taskInvolvedUser != null">
-                  HIL.USER_ID_ = #{query.taskInvolvedUser}
+                  ${queryType} HIL.USER_ID_ = #{query.taskInvolvedUser}
                 </if>
                 <if test ="query.taskInvolvedGroup != null">
-                  and HIL.GROUP_ID_ = #{query.taskInvolvedGroup}
+                  ${queryType} HIL.GROUP_ID_ = #{query.taskInvolvedGroup}
                 </if>
                 <if test="query.taskHadCandidateUser != null">
-                  and HIL.TYPE_ = 'candidate' and HIL.USER_ID_ = #{query.taskHadCandidateUser}
+                  ${queryType} HIL.TYPE_ = 'candidate' and HIL.USER_ID_ = #{query.taskHadCandidateUser}
                 </if>
                 <if test="query.taskHadCandidateGroup != null">
-                  and HIL.TYPE_ = 'candidate' and HIL.GROUP_ID_ = #{query.taskHadCandidateGroup}
+                  ${queryType} HIL.TYPE_ = 'candidate' and HIL.GROUP_ID_ = #{query.taskHadCandidateGroup}
                 </if>
                 <if test="query.withCandidateGroups">
-                  and HIL.TYPE_ = 'candidate' and HIL.GROUP_ID_ is not null
+                  ${queryType} HIL.TYPE_ = 'candidate' and HIL.GROUP_ID_ is not null
                 </if>
               </where>
               )
             </if>
 
             <if test="query.withoutCandidateGroups">
-              ${queryType} RES.ID_ not in (
-              select
-              TASK_ID_
+              ${queryType} not exists (
+              select 1
               from
               ${prefix}ACT_HI_IDENTITYLINK HIL
               <where>
                 HIL.TYPE_ = 'candidate' and HIL.GROUP_ID_ is not null
               </where>
+              AND HIL.TASK_ID_ = RES.ID_
               )
             </if>
 
@@ -487,6 +505,9 @@
 
                 and RES.DUE_DATE_ is not null
               </trim>
+            </if>
+            <if test="query.withoutTaskDueDate">
+              ${queryType} RES.DUE_DATE_ is null
             </if>
             <if test="query.followUpDate != null || query.followUpBefore != null || query.followUpAfter != null">
               ${queryType}
@@ -635,4 +656,5 @@
     ORDER BY RES.START_TIME_ ASC
     ${optimizeLimitAfterWithoutOffset}
   </select>
+
 </mapper>

@@ -31,7 +31,9 @@ import org.camunda.bpm.engine.impl.dmn.result.SingleEntryDecisionResultMapper;
 import org.camunda.bpm.engine.impl.dmn.result.SingleResultDecisionResultMapper;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.context.VariableContext;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * @author Roman Smirnov
@@ -63,17 +65,21 @@ public class DecisionEvaluationUtil {
     }
   }
 
-  public static void evaluateDecision(AbstractVariableScope execution, BaseCallableElement callableElement,
-      String resultVariable, DecisionResultMapper decisionResultMapper) throws Exception {
+  public static void evaluateDecision(AbstractVariableScope execution,
+      String defaultTenantId,
+      BaseCallableElement callableElement,
+      String resultVariable,
+      DecisionResultMapper decisionResultMapper) throws Exception {
 
-    DecisionDefinition decisionDefinition = resolveDecisionDefinition(callableElement, execution);
+    DecisionDefinition decisionDefinition = resolveDecisionDefinition(callableElement, execution, defaultTenantId);
     DecisionInvocation invocation = createInvocation(decisionDefinition, execution);
 
     invoke(invocation);
 
     DmnDecisionResult result = invocation.getInvocationResult();
     if (result != null) {
-      execution.setVariableLocalTransient(DECISION_RESULT_VARIABLE, result);
+      TypedValue typedValue = Variables.untypedValue(result, true);
+      execution.setVariableLocal(DECISION_RESULT_VARIABLE, typedValue);
 
       if (resultVariable != null && decisionResultMapper != null) {
         Object mappedDecisionResult = decisionResultMapper.mapDecisionResult(result);
@@ -112,8 +118,8 @@ public class DecisionEvaluationUtil {
     return new DecisionInvocation(decisionDefinition, variableContext);
   }
 
-  protected static DecisionDefinition resolveDecisionDefinition(BaseCallableElement callableElement, AbstractVariableScope execution) {
-    return CallableElementUtil.getDecisionDefinitionToCall(execution, callableElement);
+  protected static DecisionDefinition resolveDecisionDefinition(BaseCallableElement callableElement, AbstractVariableScope execution, String defaultTenantId) {
+    return CallableElementUtil.getDecisionDefinitionToCall(execution, defaultTenantId, callableElement);
   }
 
 }

@@ -44,14 +44,19 @@ import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -260,8 +265,14 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTest {
     assertEquals(processInstances.get(0).getId(), task.getProcessInstanceId());
   }
 
+  /**
+   * Excluded on CRDB since the problem does not occur on it. The test execution also times out
+   * during test cleanup, on DELETE-ing the deployments, due the the slowness of the SQL statements on CRDB.
+   * See CAM-12239 for the performance issue.
+   */
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
   @Test
+  @RequiredDatabase(excludes = DbSqlSessionFactory.CRDB)
   public void testQueryByLargeListOfProcessInstanceIdIn() {
     // given
     List<String> processInstances = new ArrayList<>();
@@ -665,6 +676,24 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTest {
     }
   }
 
+  @Test
+  public void shouldCheckPresenceOfVersionTag() {
+    BpmnModelInstance process = Bpmn.createExecutableProcess("process")
+        .camundaVersionTag("1.2.3.4")
+        .startEvent()
+        .serviceTask()
+          .camundaExternalTask("my-topic")
+        .endEvent()
+        .done();
+
+    testRule.deploy(process);
+
+    startInstancesByKey("process", 1);
+
+    ExternalTask task = externalTaskService.createExternalTaskQuery().singleResult();
+
+    assertThat(task.getProcessDefinitionVersionTag()).isEqualTo("1.2.3.4");
+  }
 
   protected List<ProcessInstance> startInstancesByKey(String processDefinitionKey, int number) {
     List<ProcessInstance> processInstances = new ArrayList<>();

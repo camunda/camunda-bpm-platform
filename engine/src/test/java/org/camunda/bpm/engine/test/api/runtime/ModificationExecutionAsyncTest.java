@@ -16,15 +16,13 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.text.ParseException;
@@ -62,7 +60,6 @@ import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -176,7 +173,7 @@ public class ModificationExecutionAsyncTest {
       runtimeService.createModification("processDefinitionId").startAfterActivity("user1").processInstanceIds((List<String>) null).executeAsync();
       fail("Should not succeed");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("Process instance ids is empty"));
+      assertThat(e.getMessage()).contains("Process instance ids is empty");
     }
   }
 
@@ -186,7 +183,7 @@ public class ModificationExecutionAsyncTest {
       runtimeService.createModification(null).cancelAllForActivity("activityId").processInstanceIds(Arrays.asList("20", "1--0")).executeAsync();
       fail("Should not succed");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("processDefinitionId is null"));
+      assertThat(e.getMessage()).contains("processDefinitionId is null");
     }
   }
 
@@ -198,7 +195,7 @@ public class ModificationExecutionAsyncTest {
       runtimeService.createModification("processDefinitionId").startAfterActivity("user1").processInstanceIds(Arrays.asList("foo", null, "bar")).executeAsync();
       fail("Should not succeed");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("Process instance ids contains null value"));
+      assertThat(e.getMessage()).contains("Process instance ids contains null value");
     }
   }
 
@@ -208,7 +205,7 @@ public class ModificationExecutionAsyncTest {
       runtimeService.createModification("processDefinitionId").startAfterActivity("user1").processInstanceIds(Collections.<String> emptyList()).executeAsync();
       fail("Should not succeed");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("Process instance ids is empty"));
+      assertThat(e.getMessage()).contains("Process instance ids is empty");
     }
   }
 
@@ -219,7 +216,7 @@ public class ModificationExecutionAsyncTest {
       runtimeService.createModification("processDefinitionId").startAfterActivity("user1").processInstanceIds((String[]) null).executeAsync();
       fail("Should not be able to modify");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), CoreMatchers.containsString("Process instance ids is empty"));
+      assertThat(e.getMessage()).contains("Process instance ids is empty");
     }
   }
 
@@ -230,7 +227,7 @@ public class ModificationExecutionAsyncTest {
       runtimeService.createModification("processDefinitionId").cancelAllForActivity("user1").processInstanceIds("foo", null, "bar").executeAsync();
       fail("Should not be able to modify");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("Process instance ids contains null value"));
+      assertThat(e.getMessage()).contains("Process instance ids contains null value");
     }
   }
 
@@ -241,7 +238,7 @@ public class ModificationExecutionAsyncTest {
       runtimeService.createModification("processDefinitionId").startAfterActivity("user1").processInstanceQuery(null).executeAsync();
       fail("Should not succeed");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("Process instance ids is empty"));
+      assertThat(e.getMessage()).contains("Process instance ids is empty");
     }
   }
 
@@ -255,7 +252,7 @@ public class ModificationExecutionAsyncTest {
       runtimeService.createModification("foo").cancelAllForActivity("activityId").processInstanceIds(processInstanceIds).executeAsync();
       fail("Should not succed");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("processDefinition is null"));
+      assertThat(e.getMessage()).contains("processDefinition is null");
     }
   }
 
@@ -837,8 +834,8 @@ public class ModificationExecutionAsyncTest {
 
     Job failedJob = modificationJobs.get(0);
     assertEquals(2, failedJob.getRetries());
-    assertThat(failedJob.getExceptionMessage(), startsWith("ENGINE-13036"));
-    assertThat(failedJob.getExceptionMessage(), containsString("Process instance '" + deletedProcessInstanceId + "' cannot be modified"));
+    assertThat(failedJob.getExceptionMessage()).startsWith("ENGINE-13036");
+    assertThat(failedJob.getExceptionMessage()).contains("Process instance '" + deletedProcessInstanceId + "' cannot be modified");
   }
 
   @Test
@@ -1139,7 +1136,7 @@ public class ModificationExecutionAsyncTest {
         .executeAsync();
 
     // then
-    Assertions.assertThat(batch.getInvocationsPerBatchJob()).isEqualTo(42);
+    assertThat(batch.getInvocationsPerBatchJob()).isEqualTo(42);
 
     // clear
     configuration.setInvocationsPerBatchJobByBatchType(new HashMap<>());

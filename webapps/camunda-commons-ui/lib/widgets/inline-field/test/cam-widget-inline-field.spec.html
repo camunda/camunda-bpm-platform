@@ -1,0 +1,245 @@
+<html>
+  <head>
+    <title>Camunda commons UI library</title>
+    <base href="/" />
+    <!--[if IE]><script type="text/javascript">
+        // Fix for IE ignoring relative base tags.
+        // See http://stackoverflow.com/questions/3926197/html-base-tag-and-local-folder-path-with-internet-explorer
+        (function() {
+            var baseTag = document.getElementsByTagName('base');
+            if (baseTag[0]) { baseTag[0].href = baseTag[0].href; }
+        })();
+    </script><![endif]-->
+    <link rel="icon" href="resources/img/favicon.ico" />
+    <link href="styles.css" rel="stylesheet" />
+    <link href="test-styles.css" rel="stylesheet" />
+  </head>
+  <body>
+    <!-- gh-pages-menu -->
+
+    <header>
+      <div>
+        <h1>Inline Field</h1>
+      </div>
+    </header>
+
+        <section class="widget-description">
+      <header>
+        <h2>Description</h2>
+      </header>
+      <p>The inline edit field provides the possibility to edit values directly where they are displayed. The user can click on the value, change it and directly apply the change to the
+      scope variable. The inline edit field can be used for text input, date inputs and selections with multiple options.</p>
+    </section>
+
+    <section class="widget-reference">
+      <header>
+        <h2>Usage</h2>
+      </header>
+
+      <h3>Options</h3>
+      <dl>
+        <dt><span class="badge">@</span> type</dt>
+        <dd>One of <i>text</i>, <i>option</i>, <i>date</i>, <i>time</i> or <i>datetime</i></dd>
+        <dt><span class="badge">=</span> value</dt>
+        <dd>The name of the scope variable you are editing with this inline edit field</dd>
+        <dt><span class="badge">&amp;</span> validate</dt>
+        <dd>An optional validator function which is used to set the field valid and invalid</dd>
+        <dt><span class="badge">&amp;</span> change</dt>
+        <dd>An optional function which is called whenever the scope value is changed (the user applies the change)</dd>
+        <dt><span class="badge">&amp;</span> onStartEditing</dt>
+        <dd>An optional function which is called whenever the user starts editing the value (clicks on the field)</dd>
+        <dt><span class="badge">&amp;</span> onCancelEditing</dt>
+        <dd>An optional function which is called whenever the user cancels the edit operation.</dd>
+        <dt><span class="badge">@</span> placeholder</dt>
+        <dd>A text which is displayed in the empty text edit field.</dd>
+        <dt><span class="badge">=</span> options</dt>
+        <dd>An array of either Strings or key-value objects which is used for the option input type.</dd>
+        <dt><span class="badge">@</span> allow-non-options</dt>
+        <dd>Only relevant in combination with options. Allows the user to enter values which are not part of the options array. In this case, the returned value will be the entered string. Defaults to false.</dd>
+        <dt><span class="badge">@</span> flexible</dt>
+        <dd>If set to true, the user can switch between a datetime and a text input field.</dd>
+      </dl>
+    </section>
+
+    <section class="widget-examples">
+      <header>
+        <h2>Examples</h2>
+      </header>
+
+      <div class="widget-example"
+           id="text-edit">
+        <h3>Text Edit</h3>
+        <div ng-controller="testController">
+          <pre ng-non-bindable>
+&lt;span cam-widget-inline-field
+      class="set-value"
+      type="text"
+      value="name"
+      placeholder="Please enter a name here"&gt;
+  {{name}}
+&lt;/span&gt;</pre>
+          <div class="test-container">
+            <span cam-widget-inline-field
+                  class="set-value"
+                  type="text"
+                  value="name"
+                  placeholder="Please enter a name here"
+                  id="field1">
+              {{name}}
+            </span>
+          </div>
+        </div>
+      </div><!-- /.widget-example -->
+
+
+      <div class="widget-example"
+           id="datepicker">
+        <h3>Datepicker</h3>
+        <div ng-controller="testController">
+          <pre ng-non-bindable>
+&lt;span cam-widget-inline-field
+      class="set-value"
+      type="datetime"
+      value="date"&gt;
+  {{ date | camDate }}
+&lt;/span&gt;</pre>
+          <div class="test-container">
+              <span cam-widget-inline-field
+                  class="set-value"
+                  type="datetime"
+                  value="date"
+                  id="field2">
+              {{ date | camDate }}
+            </span>
+          </div>
+        </div>
+      </div><!-- /.widget-example -->
+
+
+      <div class="widget-example"
+           id="options">
+        <h3>Options</h3>
+        <div ng-controller="testController">
+          <pre ng-non-bindable>
+&lt;span cam-widget-inline-field
+      class="set-value"
+      type="option"
+      options="options"
+      value="selectedOption"&gt;
+  {{ selectedOption }}
+&lt;/span&gt;</pre>
+          <div class="test-container">
+            <span cam-widget-inline-field
+                class="set-value"
+                type="option"
+                options="options"
+                value="selectedOption"
+                id="field3">
+              {{ selectedOption }}
+            </span>
+          </div>
+        </div>
+      </div><!-- /.widget-example -->
+
+
+      <div class="widget-example"
+           id="options-key-value">
+        <h3>Options - Key-Value</h3>
+        <div ng-controller="testController">
+          <pre ng-non-bindable>
+&lt;span cam-widget-inline-field
+      class="set-value"
+      type="option"
+      options="keyOptions"
+      value="selectedKeyOption"&gt;
+  {{ selectedKeyOption.key }} : {{ selectedKeyOption.value }}
+&lt;/span&gt;</pre>
+          <div class="test-container">
+            <span cam-widget-inline-field
+                  class="set-value"
+                  type="option"
+                  options="keyOptions"
+                  value="selectedKeyOption"
+                  id="field4">
+                  {{ selectedKeyOption.key }} : {{ selectedKeyOption.value }}
+            </span>
+          </div>
+        </div>
+      </div><!-- /.widget-example -->
+
+
+      <div class="widget-example"
+           id="options-allow">
+        <h3>Options with allow Non Options</h3>
+        <div ng-controller="testController">
+          <pre ng-non-bindable>
+&lt;span cam-widget-inline-field
+      class="set-value"
+      type="option"
+      options="options"
+      allow-non-options="true"
+      value="selectedOption2"&gt;
+  {{ selectedOption2 }}
+&lt;/span&gt;</pre>
+          <div class="test-container">
+            <span cam-widget-inline-field
+                  class="set-value"
+                  type="option"
+                  options="options"
+                  value="selectedOption2"
+                  allow-non-options="true"
+                  id="field6">
+                    {{ selectedOption2 }}
+            </span>
+          </div>
+        </div>
+      </div><!-- /.widget-example -->
+
+
+      <div class="widget-example"
+           id="flexible-combo">
+        <h3>Flexible: Text/Date-Combo</h3>
+        <div ng-controller="testController">
+          <pre ng-non-bindable>
+&lt;span cam-widget-inline-field
+      class="set-value"
+      type="text"
+      value="dateText"
+      flexible="true"&gt;
+  {{ dateText }}
+&lt;/span&gt;</pre>
+          <div class="test-container">
+            <span cam-widget-inline-field
+                  class="set-value"
+                  type="text"
+                  value="dateText"
+                  flexible="true"
+                  id="field5">
+              {{ dateText }}
+            </span>
+          </div>
+        </div>
+      </div><!-- /.widget-example -->
+
+
+      <div class="widget-example">
+        <h3>Scope Variables</h3>
+        Here are the variable settings which are used for the examples above:
+        <pre ng-non-bindable>
+testModule.controller('testController', ['$scope', function($scope) {
+  $scope.name = 'Mr. Prosciutto';
+  $scope.date = '2015-01-22T15:11:59';
+  $scope.options = ['foobar', '1', '2', '3'];
+  $scope.selectedOption = 'foobar';
+  $scope.keyOptions = [{key: 'foobar', value: 'Barfoo'}, {key: '1', value: 'One'}, {key: '2', value: 'Two'}, {key: '3', value: 'Three'}];
+  $scope.selectedKeyOption = {key: 'foobar', value: 'Barfoo'};
+  $scope.dateText = "Foobar";
+}]);</pre>
+      </div><!-- /.widget-example -->
+    </section><!-- /.widget-examples -->
+
+    <!-- gh-pages-footer -->
+
+    <script src="lib/widgets/inline-field/test/cam-widget-inline-field.build.js"></script>
+  </body>
+</html>

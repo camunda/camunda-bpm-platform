@@ -1,0 +1,266 @@
+<html>
+  <head>
+    <title>Camunda commons UI library</title>
+    <base href="/" />
+    <!--[if IE]><script type="text/javascript">
+        // Fix for IE ignoring relative base tags.
+        // See http://stackoverflow.com/questions/3926197/html-base-tag-and-local-folder-path-with-internet-explorer
+        (function() {
+            var baseTag = document.getElementsByTagName('base');
+            if (baseTag[0]) { baseTag[0].href = baseTag[0].href; }
+        })();
+    </script><![endif]-->
+    <link rel="icon" href="resources/img/favicon.ico" />
+    <link href="styles.css" rel="stylesheet" />
+    <link href="test-styles.css" rel="stylesheet" />
+  </head>
+  <body class="cam-widget-variables-table-test-page">
+    <!-- gh-pages-menu -->
+
+    <header>
+      <div>
+        <h1>Variables Table</h1>
+      </div>
+    </header>
+
+    <section class="widget-description">
+      <header>
+        <h2>Description</h2>
+      </header>
+      <p>A widget to display and manipulate variables used by the Camunda Platform suite.</p>
+    </section>
+
+    <section class="widget-reference">
+      <header>
+        <h2>Usage</h2>
+      </header>
+
+      <h3>Options</h3>
+      <dl>
+        <dt><span class="badge">=</span> cam-variables</dt>
+        <dd>
+          The variable to be edited / displayed contained in an array as following
+          <pre>[
+  {
+    variable: {
+      name: 'variableName',
+      type: 'String',
+      value: 'Some string value'
+    },
+
+    // is aimed to hold additional column information
+    additions: {
+      additionalColumn1: 'cell content',
+      additionalColumn2: 'other cell content'
+    }
+  },
+  {
+    // ...
+  }
+]</pre>
+          <strong>Note:</strong> if the cell content of an additional column is an HTML string, you need to use something like <code><a href="https://code.angularjs.org/1.2.16/docs/api/ng/service/$sce#trustAsHtml">$sce.trustAsHtml('Some &lt;i&gt;HTML&lt;/i&gt; string')</a></code>.
+        </dd>
+
+        <dt><span class="badge">=?</span> cam-headers</dt>
+        <dd>
+          Takes an object to determine which columns should be shown, their positions and which text should be used in their headers.<br/>
+          By default, the following columns are shown (with their respective header):
+          <ol>
+            <li><code>name</code>: Name</li>
+            <li><code>type</code>: Type</li>
+            <li><code>value</code>: Value</li>
+          </ol>
+          <a href="#example-2">Example</a>
+        </dd>
+
+        <dt><span class="badge">=?</span> cam-editable</dt>
+        <dd>
+          Takes an array of strings to determine which columns are editable.<br/>
+          Valid strings:
+          <ul>
+            <li><code>name</code></li>
+            <li><code>type</code></li>
+            <li><code>value</code></li>
+          </ul>
+          By default, all the above are editable.<br/>
+          <a href="#example-2">Example</a>
+        </dd>
+
+        <dt><span class="badge">=?</span> on-save<span class="function-definition">(<span class="params">info, delta</span>): <span class="returns">promise</span></span>
+        </dt>
+        <dd>
+          Can be used to pass a function triggered when saving.<br/>
+          The <code>info</code> argument is an object with information about the variable similar to:
+          <pre>{
+  "variable": {
+    "type": "...",
+    "name": "...",
+    "value": "...",
+    "valueInfo": "..."
+  },
+  // ...
+}</pre>
+          <a href="#example-1">Example</a>
+        </dd>
+
+        <dt><span class="badge">=?</span> on-delete<span class="function-definition">(<span class="params">info, delta</span>): <span class="returns">promise</span></span>
+        </dt>
+        <dd>
+          The <code>info</code> argument is similar to the one above.
+        </dd>
+
+        <dt><span class="badge">=?</span> on-edit<span class="function-definition">(<span class="params">info, delta</span>): <span class="returns">promise</span></span>
+        </dt>
+        <dd>
+          Can be used to customize the modal dialog shown when editing a complex variable.<br/>
+          The <code>info</code> argument is similar to the one above.<br />
+          If not used, a generic modal dialog will open.<br />
+          <a href="#example-1">Example</a>
+        </dd>
+
+        <dt><span class="badge">=?</span> on-upload<span class="function-definition">(<span class="params">info, delta</span>): <span class="returns">promise</span></span>
+        </dt>
+        <dd>
+          Can be used to customize the modal dialog shown when editing a complex variable.<br/>
+          The <code>info</code> argument is similar to the one above.
+        </dd>
+
+        <dt><span class="badge">=?</span> on-download<span class="function-definition">(<span class="params">info, delta</span>): <span class="returns">string URL</span></span></dt>
+        <dd>
+          Can be used to customize create a download link for the variable.<br/>
+          The <code>info</code> argument is similar to the one above.
+        </dd>
+
+        <dt><span class="badge">=?</span> is-variable-editable<span class="function-definition">(<span class="params">info, delta</span>): <span class="returns">boolean</span></span></dt>
+        <dd>
+          Can be used to pass a function to check whether a variable is editable or not.
+          When the variable is not editable then the edit buttons are disabled.<br/>
+          The <code>info</code> argument is similar to the one above.
+        </dd>
+      </dl>
+    </section>
+
+    <section class="widget-examples">
+      <header>
+        <h2>Examples</h2>
+      </header>
+
+
+      <div class="widget-example"
+           id="example-1"
+           ng-controller="example1Controller">
+        <h3>Editable variables</h3>
+        <pre ng-non-bindable>&lt;div cam-widget-variables-table
+     cam-variables="vars"
+     on-edit="editFunction"
+     on-save="saveFunction"
+     cam-headers="[
+    { class: 'name',      request: 'variableName', sortable: true,  content: 'Name'},
+    { class: 'value',     request: '',             sortable: false, content: 'Value'},
+    { class: 'type',      request: '',             sortable: false, content: 'Type'},
+    ]"
+         default-sort= "{ sortBy: 'variableName', sortOrder: 'asc' }"
+     is-variable-editable="isVariableEditable"&gt;&lt;/div&gt;
+
+&lt;ol&gt;
+  &lt;li ng-repeat="change in changes"&gt;{{ change.name }} | {{ change.type }} | {{ change.value }} | {{ change.saved }}&lt;/li&gt;
+&lt;/ol&gt;</pre>
+
+        <div class="test-container">
+          <div cam-widget-variables-table
+               cam-variables="vars"
+               on-edit="editFunction"
+               on-save="saveFunction"
+               cam-editable="['name','type', 'value']"
+               cam-headers="[
+          { class: 'name',      request: 'variableName', sortable: true,  content: 'Name'},
+          { class: 'value',     request: '',             sortable: false, content: 'Value'},
+          { class: 'type',      request: '',             sortable: false, content: 'Type'},
+          ]"
+               default-sort= "{ sortBy: 'variableName', sortOrder: 'asc' }"
+               is-variable-editable="isVariableEditable"></div>
+
+          <div>{{changes}}</div>
+          <ol>
+            <li ng-repeat="change in changes">{{ change.name }} | {{ change.type }} | {{ change.value }} | {{ change.saved }}</li>
+          </ol>
+        </div><!-- /.test-container -->
+      </div><!-- /.widget-example -->
+
+
+      <div class="widget-example"
+           id="example-2"
+           ng-controller="example2Controller">
+        <h3>Custom columns</h3>
+        <pre ng-non-bindable>&lt;h4&gt;Editable and additions&lt;/h4&gt;
+&lt;div cam-widget-variables-table
+     class="first"
+     on-download="formatDownloadLink"
+     cam-editable="['value']"
+     cam-headers="[
+          { class: 'plain',     request: '',             sortable: false, content: 'Plain'},
+          { class: 'name',      request: 'variableName', sortable: true,  content: 'Name'},
+          { class: 'value',     request: '',             sortable: false, content: 'Value'},
+          { class: 'type',      request: '',             sortable: false, content: 'Type'},
+          { class: 'formatted', request: '',             sortable: false, content: 'Formatted'}
+        ]"
+     default-sort= "{ sortBy: 'variableName', sortOrder: 'asc' }"
+
+     cam-variables="vars"&gt;&lt;/div&gt;
+
+&lt;h4&gt;Read only&lt;/h4&gt;
+&lt;div cam-widget-variables-table
+     class="second"
+     default-sort= "{ sortBy: 'variableName', sortOrder: 'asc' }"
+     cam-editable="[]"
+     cam-headers="[
+          { class: 'name',      request: 'variableName', sortable: true, content: 'Variable name'},
+          { class: 'plain',     request: '',             sortable: false, content: 'Plain text'},
+          { class: 'value',     request: '',             sortable: false, content: 'Value'}
+          ]"
+
+     cam-variables="vars"&gt;&lt;/div&gt;</pre>
+        <div class="test-container">
+          <h4>Editable and additions</h4>
+          <div cam-widget-variables-table
+               class="first"
+               on-download="formatDownloadLink"
+               cam-editable="['value']"
+               cam-headers="[
+          { class: 'plain',     request: '',             sortable: false, content: 'Plain'},
+          { class: 'name',      request: 'variableName', sortable: true,  content: 'Name'},
+          { class: 'value',     request: '',             sortable: false, content: 'Value'},
+          { class: 'type',      request: '',             sortable: false, content: 'Type'},
+          { class: 'formatted', request: '',             sortable: false, content: 'Formatted'}
+        ]"
+               default-sort = "{ sortBy: 'variableName', sortOrder: 'asc' }"
+               cam-variables="vars"></div>
+
+          <h4>Read only</h4>
+          <div cam-widget-variables-table
+               class="second"
+               cam-editable="[]"
+               default-sort= "{ sortBy: 'variableName', sortOrder: 'asc' }"
+               cam-headers="[
+          { class: 'plain',     request: '',             sortable: false, content: 'Plain text'},
+          { class: 'value',     request: '',             sortable: false, content: 'Value'},
+          { class: 'name',      request: 'variableName', sortable: true, content: 'Variable name'}
+          ]"
+
+
+
+
+
+
+
+
+               cam-variables="vars"></div>
+        </div><!-- /.test-container -->
+      </div><!-- /.widget-example -->
+    </section>
+
+    <!-- gh-pages-footer -->
+
+    <script src="lib/widgets/variables-table/test/cam-widget-variables-table.build.js"></script>
+  </body>
+</html>

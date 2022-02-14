@@ -1,8 +1,10 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
       id = "getRenderedForm"
       tag = "Task"
+      summary = "Get Rendered Form"
       desc = "Retrieves the rendered form for a task. This method can be used to get the HTML
               rendering of a
               [Generated Task Form](${docsUrl}/user-guide/task-forms/#generated-task-forms)." />
@@ -55,3 +57,5 @@
 
   }
 }
+
+</#macro>

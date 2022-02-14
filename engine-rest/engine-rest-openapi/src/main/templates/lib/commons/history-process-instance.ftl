@@ -86,6 +86,11 @@
     "type": "string",
     "desc": "Filter by process instance business key."
   },
+  "processInstanceBusinessKeyIn": {
+    "type": "array",
+    "itemType": "string",
+    "desc": "Filter by a list of business keys. A process instance must have one of the given business keys. ${listTypeDescription}"
+  },
 
   "processInstanceBusinessKeyLike": {
     "type": "string",
@@ -99,7 +104,8 @@
 
   "finished": {
     "type": "boolean",
-    "desc": "Only include finished process instances. Value may only be `true`, as `false` is the default behavior."
+    "desc": "Only include finished process instances. This flag includes all process instances
+             that are completed or terminated. Value may only be `true`, as `false` is the default behavior."
   },
 
   "unfinished": {

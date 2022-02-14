@@ -1,7 +1,9 @@
+<#macro endpoint_macro docsUrl="">
 {
   <@lib.endpointInfo
       id = "getRestAPIVersion"
       tag = "Version"
+      summary = "Get Rest API version"
       desc = "Retrieves the version of the Rest API." />
 
   "responses" : {
@@ -19,3 +21,4 @@
                      }'] />
   }
 }
+</#macro>

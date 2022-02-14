@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
@@ -13,7 +14,7 @@
     <#assign last = false >
     <#include "/lib/commons/user-query-params.ftl" >
 
-    <#assign sortBy = [ '"userId"', '"firstName"', '"lastName"', '"email"' ] >
+    <#assign sortByValues = [ '"userId"', '"firstName"', '"lastName"', '"email"' ] >
     <#include "/lib/commons/sort-params.ftl" >
 
     <#assign last = true >
@@ -56,3 +57,5 @@
                 for the error response format." />
   }
 }
+
+</#macro>

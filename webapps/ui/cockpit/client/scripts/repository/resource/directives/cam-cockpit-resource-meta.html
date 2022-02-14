@@ -1,0 +1,7 @@
+<!-- # cockpit client/scripts/repository/resource/directives/cam-cockpit-resource-meta.html -->
+<div class="filepath">{{ resource._filepath }}</div>
+<div class="table-row">
+  <h2 class="name">{{ resource._filename }}</h2>
+  <h3 class="version" ng-show="!isDmnResource(resource) && definitions.length > 0">{{ 'REPOSITORY_DEPLOYMENT_RESOURCE_DIRECTIVES_VERSION' | translate }} {{ definitions[0].version }}</h3>
+</div>
+<!-- / cockpit client/scripts/repository/resource/directives/cam-cockpit-resource-meta.html -->

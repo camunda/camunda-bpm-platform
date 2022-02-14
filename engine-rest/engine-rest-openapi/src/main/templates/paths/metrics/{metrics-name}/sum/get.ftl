@@ -1,7 +1,9 @@
+<#macro endpoint_macro docsUrl="">
 {
   <@lib.endpointInfo
       id = "getMetrics"
       tag = "Metrics"
+      summary = "Get Sum"
       desc = "Retrieves the `sum` (count) for a given metric." />
 
   "parameters" : [
@@ -13,6 +15,9 @@
         type = "string"
         enumValues = ["activity-instance-start",
                 "activity-instance-end",
+                "decision-instances",
+                "flow-node-instances-start",
+                "flow-node-instances-end",
                 "job-acquisition-attempt",
                 "job-acquired-success",
                 "job-acquired-failure",
@@ -24,7 +29,11 @@
                 "history-cleanup-removed-process-instances",
                 "history-cleanup-removed-case-instances",
                 "history-cleanup-removed-decision-instances",
-                "history-cleanup-removed-batch-operations"]
+                "history-cleanup-removed-batch-operations",
+                "history-cleanup-removed-task-metrics",
+                "unique-task-workers",
+                "process-instances",
+                "task-users"]
         desc = "The name of the metric." />
 
     <@lib.parameter
@@ -57,3 +66,5 @@
                      }']/>
   }
 }
+
+</#macro>

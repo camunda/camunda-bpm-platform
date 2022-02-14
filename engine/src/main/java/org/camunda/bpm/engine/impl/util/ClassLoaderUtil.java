@@ -21,6 +21,8 @@ import java.security.PrivilegedAction;
 
 import javax.servlet.ServletContextEvent;
 
+import org.camunda.bpm.engine.ProcessEngine;
+
 /**
  * @author Daniel Meyer
  *
@@ -74,6 +76,18 @@ public class ClassLoaderUtil {
     } else {
       return sce.getServletContext().getClassLoader();
     }
+  }
+
+  /**
+   * Switch the current Thread ClassLoader to the ProcessEngine's
+   * to assure the loading of the engine classes during job execution.
+   *
+   * @return the current Thread ClassLoader
+   */
+  public static ClassLoader switchToProcessEngineClassloader() {
+    ClassLoader currentClassloader = Thread.currentThread().getContextClassLoader();
+    Thread.currentThread().setContextClassLoader(ProcessEngine.class.getClassLoader());
+    return currentClassloader;
   }
 
 }

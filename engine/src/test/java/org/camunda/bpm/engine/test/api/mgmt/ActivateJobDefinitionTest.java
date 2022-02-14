@@ -16,11 +16,10 @@
  */
 package org.camunda.bpm.engine.test.api.mgmt;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -367,7 +366,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTest {
     assertNotNull(delayedActivationJob);
     String deploymentId = repositoryService.createProcessDefinitionQuery()
         .processDefinitionId(jobDefinition.getProcessDefinitionId()).singleResult().getDeploymentId();
-    assertThat(delayedActivationJob.getDeploymentId(), is(deploymentId));
+    assertThat(delayedActivationJob.getDeploymentId()).isEqualTo(deploymentId);
 
     // execute job
     managementService.executeJob(delayedActivationJob.getId());
@@ -427,7 +426,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTest {
     assertNotNull(delayedActivationJob);
     String deploymentId = repositoryService.createProcessDefinitionQuery()
         .processDefinitionId(jobDefinition.getProcessDefinitionId()).singleResult().getDeploymentId();
-    assertThat(delayedActivationJob.getDeploymentId(), is(deploymentId));
+    assertThat(delayedActivationJob.getDeploymentId()).isEqualTo(deploymentId);
 
     // execute job
     managementService.executeJob(delayedActivationJob.getId());
@@ -765,7 +764,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTest {
 
     Job delayedActivationJob = jobQuery.timers().active().singleResult();
     assertNotNull(delayedActivationJob);
-    assertThat(delayedActivationJob.getDeploymentId(), is(processDefinition.getDeploymentId()));
+    assertThat(delayedActivationJob.getDeploymentId()).isEqualTo(processDefinition.getDeploymentId());
 
     // execute job
     managementService.executeJob(delayedActivationJob.getId());
@@ -823,7 +822,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTest {
 
     Job delayedActivationJob = jobQuery.timers().active().singleResult();
     assertNotNull(delayedActivationJob);
-    assertThat(delayedActivationJob.getDeploymentId(), is(processDefinition.getDeploymentId()));
+    assertThat(delayedActivationJob.getDeploymentId()).isEqualTo(processDefinition.getDeploymentId());
 
     // execute job
     managementService.executeJob(delayedActivationJob.getId());
@@ -1161,7 +1160,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTest {
 
     Job delayedActivationJob = jobQuery.timers().active().singleResult();
     assertNotNull(delayedActivationJob);
-    assertThat(delayedActivationJob.getDeploymentId(), is(processDefinition.getDeploymentId()));
+    assertThat(delayedActivationJob.getDeploymentId()).isEqualTo(processDefinition.getDeploymentId());
 
     // execute job
     managementService.executeJob(delayedActivationJob.getId());
@@ -1220,7 +1219,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTest {
 
     Job delayedActivationJob = jobQuery.timers().active().singleResult();
     assertNotNull(delayedActivationJob);
-    assertThat(delayedActivationJob.getDeploymentId(), is(processDefinition.getDeploymentId()));
+    assertThat(delayedActivationJob.getDeploymentId()).isEqualTo(processDefinition.getDeploymentId());
 
     // execute job
     managementService.executeJob(delayedActivationJob.getId());
@@ -1495,7 +1494,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTest {
     assertNotNull(delayedActivationJob);
     String expectedDeploymentId = repositoryService.createProcessDefinitionQuery()
         .orderByProcessDefinitionVersion().desc().list().get(0).getDeploymentId();
-    assertThat(delayedActivationJob.getDeploymentId(), is(expectedDeploymentId));
+    assertThat(delayedActivationJob.getDeploymentId()).isEqualTo(expectedDeploymentId);
 
     // execute job
     managementService.executeJob(delayedActivationJob.getId());
@@ -1553,7 +1552,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTest {
     assertNotNull(delayedActivationJob);
     String expectedDeploymentId = repositoryService.createProcessDefinitionQuery()
         .orderByProcessDefinitionVersion().desc().list().get(0).getDeploymentId();
-    assertThat(delayedActivationJob.getDeploymentId(), is(expectedDeploymentId));
+    assertThat(delayedActivationJob.getDeploymentId()).isEqualTo(expectedDeploymentId);
 
     // execute job
     managementService.executeJob(delayedActivationJob.getId());
@@ -1741,7 +1740,7 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTest {
     assertNotNull(delayedActivationJob);
     String expectedDeploymentId = repositoryService.createProcessDefinitionQuery()
         .processDefinitionId(jobDefinition.getProcessDefinitionId()).singleResult().getDeploymentId();
-    assertThat(delayedActivationJob.getDeploymentId(), is(expectedDeploymentId));
+    assertThat(delayedActivationJob.getDeploymentId()).isEqualTo(expectedDeploymentId);
 
     // execute job
     managementService.executeJob(delayedActivationJob.getId());

@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.test.api.task;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
@@ -28,7 +30,6 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 public class TaskServiceWithJdbcSimpleProcessingTest {
@@ -41,9 +42,6 @@ public class TaskServiceWithJdbcSimpleProcessingTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   protected RuntimeService runtimeService;
   protected TaskService taskService;
@@ -59,8 +57,6 @@ public class TaskServiceWithJdbcSimpleProcessingTest {
   public void testUserTaskOptimisticLocking() {
     runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-    thrown.expect(OptimisticLockingException.class);
-
     Task task1 = taskService.createTaskQuery().singleResult();
     Task task2 = taskService.createTaskQuery().singleResult();
 
@@ -68,7 +64,10 @@ public class TaskServiceWithJdbcSimpleProcessingTest {
     taskService.saveTask(task1);
 
     task2.setDescription("test description two");
-    taskService.saveTask(task2);
+
+    // when/then
+    assertThatThrownBy(() -> taskService.saveTask(task2))
+      .isInstanceOf(OptimisticLockingException.class);
   }
 
 }

@@ -11,3 +11,9 @@ How this test suite works (`$CURRENT` refers to current minor version, `$PREVIOU
 ## Executing Tests
 
 Run `mvn clean install -Prolling-update,${DATABASE}`.
+
+### Running tests with the Maven Wrapper
+
+With `mvnw`, from the root of the project,
+run: `./mvnw clean install -f qa/test-db-rolling-update/pom.xml -Prolling-update,${database-id}`
+where `${database-id}` is for example `h2`.

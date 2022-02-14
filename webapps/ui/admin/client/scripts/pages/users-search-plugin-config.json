@@ -1,0 +1,98 @@
+{
+  "types": [
+    {
+      "id": {
+        "key": "id",
+        "value": "PLUGIN_SEARCH_USER_ID"
+      },
+      "default": true,
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "firstName",
+        "value": "PLUGIN_SEARCH_USER_FIRSTNAME"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        },
+        {
+          "key": "Like",
+          "value": "PLUGIN_SEARCH_USER_LIKE"
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "lastName",
+        "value": "PLUGIN_SEARCH_USER_LASTNAME"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        },
+        {
+          "key": "Like",
+          "value": "PLUGIN_SEARCH_USER_LIKE"
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "email",
+        "value": "PLUGIN_SEARCH_USER_EMAIL"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        },
+        {
+          "key": "Like",
+          "value": "PLUGIN_SEARCH_USER_LIKE"
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "memberOfGroup",
+        "value": "PLUGIN_SEARCH_USER_GROUP_ID"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "memberOfTenant",
+        "value": "PLUGIN_SEARCH_USER_TENANT_ID"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    }
+  ],
+  "tooltips": {
+    "inputPlaceholder": "SEARCH_PLACEHOLDER",
+    "invalid": "INVALID_SEARCH",
+    "deleteSearch": "DELETE_SEARCH",
+    "type": "TYPE",
+    "name": "PROPERTY",
+    "operator": "OPERATOR",
+    "value": "VALUE"
+  }
+}

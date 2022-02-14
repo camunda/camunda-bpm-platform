@@ -16,6 +16,17 @@
  */
 package org.camunda.bpm.engine.impl.pvm.runtime;
 
+import static org.camunda.bpm.engine.impl.bpmn.helper.CompensationUtil.SIGNAL_COMPENSATION_DONE;
+import static org.camunda.bpm.engine.impl.pvm.runtime.ActivityInstanceState.ENDING;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
@@ -25,38 +36,53 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
+import org.camunda.bpm.engine.impl.form.FormPropertyHelper;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
-import org.camunda.bpm.engine.impl.incident.DefaultIncidentHandler;
 import org.camunda.bpm.engine.impl.incident.IncidentContext;
 import org.camunda.bpm.engine.impl.incident.IncidentHandler;
+import org.camunda.bpm.engine.impl.incident.IncidentHandling;
 import org.camunda.bpm.engine.impl.persistence.entity.DelayedVariableEvent;
 import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
-import org.camunda.bpm.engine.impl.pvm.*;
+import org.camunda.bpm.engine.impl.pvm.PvmActivity;
+import org.camunda.bpm.engine.impl.pvm.PvmException;
+import org.camunda.bpm.engine.impl.pvm.PvmExecution;
+import org.camunda.bpm.engine.impl.pvm.PvmLogger;
+import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
+import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
+import org.camunda.bpm.engine.impl.pvm.PvmScope;
+import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ModificationObserverBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.SignallableActivityBehavior;
-import org.camunda.bpm.engine.impl.pvm.process.*;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityStartBehavior;
+import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
+import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
+import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
-import org.camunda.bpm.engine.impl.tree.*;
+import org.camunda.bpm.engine.impl.tree.ExecutionWalker;
+import org.camunda.bpm.engine.impl.tree.FlowScopeWalker;
+import org.camunda.bpm.engine.impl.tree.LeafActivityInstanceExecutionCollector;
+import org.camunda.bpm.engine.impl.tree.ReferenceWalker;
+import org.camunda.bpm.engine.impl.tree.ScopeCollector;
+import org.camunda.bpm.engine.impl.tree.ScopeExecutionCollector;
+import org.camunda.bpm.engine.impl.tree.TreeVisitor;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.runtime.Incident;
-
-import java.util.*;
-
-import static org.camunda.bpm.engine.impl.bpmn.helper.CompensationUtil.SIGNAL_COMPENSATION_DONE;
-import static org.camunda.bpm.engine.impl.pvm.runtime.ActivityInstanceState.ENDING;
+import org.camunda.bpm.engine.variable.VariableMap;
 
 /**
  * @author Daniel Meyer
  * @author Roman Smirnov
  * @author Sebastian Menski
  */
-public abstract class PvmExecutionImpl extends CoreExecution implements ActivityExecution, PvmProcessInstance {
+public abstract class PvmExecutionImpl extends CoreExecution implements
+  ActivityExecution, PvmProcessInstance {
 
   private static final long serialVersionUID = 1L;
 
@@ -64,7 +90,16 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   protected transient ProcessDefinitionImpl processDefinition;
 
-  protected transient ExecutionStartContext startContext;
+  protected transient ScopeInstantiationContext scopeInstantiationContext;
+
+  protected transient boolean ignoreAsync = false;
+
+  /**
+   * true for process instances in the initial phase. Currently
+   * this controls that historic variable updates created during this phase receive
+   * the <code>initial</code> flag (see {@link HistoricVariableUpdateEventEntity#isInitial}).
+   */
+  protected transient boolean isStarting = false;
 
   // current position /////////////////////////////////////////////////////////
 
@@ -150,12 +185,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
    * creates a new execution. properties processDefinition, processInstance and activity will be initialized.
    */
   @Override
-  public PvmExecutionImpl createExecution() {
-    return createExecution(false);
-  }
-
-  @Override
-  public abstract PvmExecutionImpl createExecution(boolean initStartContext);
+  public abstract PvmExecutionImpl createExecution();
 
   // sub process instance
 
@@ -232,9 +262,17 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     start(null);
   }
 
+
   @Override
   public void start(Map<String, Object> variables) {
-    startContext = new ProcessInstanceStartContext(getActivity());
+    start(variables, null);
+  }
+
+  public void startWithFormProperties(VariableMap formProperties) {
+    start(null, formProperties);
+  }
+
+  protected void start(Map<String, Object> variables, VariableMap formProperties) {
 
     initialize();
 
@@ -242,6 +280,10 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
     if (variables != null) {
       setVariables(variables);
+    }
+
+    if (formProperties != null) {
+      FormPropertyHelper.initFormPropertiesOnScope(formProperties, this);
     }
 
     initializeTimerDeclarations();
@@ -256,15 +298,17 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
    */
   public void startWithoutExecuting(Map<String, Object> variables) {
     initialize();
-    initializeTimerDeclarations();
+
     fireHistoricProcessStartEvent();
+
+    setActivityInstanceId(getId());
+    setVariables(variables);
+
+    initializeTimerDeclarations();
+
     performOperation(PvmAtomicOperation.FIRE_PROCESS_START);
 
     setActivity(null);
-    setActivityInstanceId(getId());
-
-    // set variables
-    setVariables(variables);
   }
 
   public abstract void fireHistoricProcessStartEvent();
@@ -850,7 +894,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     this.skipCustomListeners = skipCustomListeners;
     this.skipIoMapping = skipIoMappings;
 
-    ExecutionStartContext executionStartContext = new ExecutionStartContext();
+    ScopeInstantiationContext executionStartContext = new ScopeInstantiationContext();
 
     InstantiationStack instantiationStack = new InstantiationStack(new LinkedList<>(activityStack));
     executionStartContext.setInstantiationStack(instantiationStack);
@@ -894,7 +938,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     this.isEnded = false;
 
     if (!activityStack.isEmpty()) {
-      ExecutionStartContext executionStartContext = new ExecutionStartContext();
+      ScopeInstantiationContext executionStartContext = new ScopeInstantiationContext();
 
       InstantiationStack instantiationStack = new InstantiationStack(activityStack, targetActivity, targetTransition);
       executionStartContext.setInstantiationStack(instantiationStack);
@@ -1801,16 +1845,17 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     this.isEventScope = isEventScope;
   }
 
-  public ExecutionStartContext getExecutionStartContext() {
-    return startContext;
+  public ScopeInstantiationContext getScopeInstantiationContext() {
+    return scopeInstantiationContext;
   }
 
-  public void disposeProcessInstanceStartContext() {
-    startContext = null;
-  }
+  public void disposeScopeInstantiationContext() {
+    scopeInstantiationContext = null;
 
-  public void disposeExecutionStartContext() {
-    startContext = null;
+    PvmExecutionImpl parent = this;
+    while ((parent = parent.getParent()) != null && parent.scopeInstantiationContext != null) {
+      parent.scopeInstantiationContext = null;
+    }
   }
 
   @Override
@@ -1823,19 +1868,32 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     return getParent() == null;
   }
 
-  public ProcessInstanceStartContext getProcessInstanceStartContext() {
-    if (startContext != null && startContext instanceof ProcessInstanceStartContext) {
-      return (ProcessInstanceStartContext) startContext;
-    }
-    return null;
+  public void setStartContext(ScopeInstantiationContext startContext) {
+    this.scopeInstantiationContext = startContext;
   }
 
-  public boolean hasProcessInstanceStartContext() {
-    return startContext != null && startContext instanceof ProcessInstanceStartContext;
+  public void setIgnoreAsync(boolean ignoreAsync) {
+    this.ignoreAsync = ignoreAsync;
   }
 
-  public void setStartContext(ExecutionStartContext startContext) {
-    this.startContext = startContext;
+  public boolean isIgnoreAsync() {
+    return ignoreAsync;
+  }
+
+  public void setStarting(boolean isStarting) {
+    this.isStarting = isStarting;
+  }
+
+  public boolean isStarting() {
+    return isStarting;
+  }
+
+  public boolean isProcessInstanceStarting() {
+    return getProcessInstance().isStarting();
+  }
+
+  public void setProcessInstanceStarting(boolean starting) {
+    getProcessInstance().setStarting(starting);
   }
 
   public void setNextActivity(PvmActivity nextActivity) {
@@ -2167,6 +2225,12 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   }
 
   public Incident createIncident(String incidentType, String configuration, String message) {
+    IncidentContext incidentContext = createIncidentContext(configuration);
+
+    return IncidentHandling.createIncident(incidentType, incidentContext, message);
+  }
+
+  protected IncidentContext createIncidentContext(String configuration) {
     IncidentContext incidentContext = new IncidentContext();
 
     incidentContext.setTenantId(this.getTenantId());
@@ -2175,12 +2239,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     incidentContext.setActivityId(this.getActivityId());
     incidentContext.setConfiguration(configuration);
 
-    IncidentHandler incidentHandler = findIncidentHandler(incidentType);
-
-    if (incidentHandler == null) {
-      incidentHandler = new DefaultIncidentHandler(incidentType);
-    }
-    return incidentHandler.handleIncident(incidentContext, message);
+    return incidentContext;
   }
 
 
@@ -2196,13 +2255,8 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
         .getIncidentManager()
         .findIncidentById(incidentId);
 
-    IncidentHandler incidentHandler = findIncidentHandler(incident.getIncidentType());
-
-    if (incidentHandler == null) {
-      incidentHandler = new DefaultIncidentHandler(incident.getIncidentType());
-    }
     IncidentContext incidentContext = new IncidentContext(incident);
-    incidentHandler.resolveIncident(incidentContext);
+    IncidentHandling.removeIncidents(incident.getIncidentType(), incidentContext, true);
   }
 
   public IncidentHandler findIncidentHandler(String incidentType) {

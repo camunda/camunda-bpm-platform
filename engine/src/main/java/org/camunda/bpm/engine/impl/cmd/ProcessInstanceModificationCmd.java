@@ -22,13 +22,10 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.Callable;
-
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.impl.ModificationBuilderImpl;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.ProcessInstanceModificationBuilderImpl;
-import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -124,8 +121,7 @@ public class ProcessInstanceModificationCmd extends AbstractModificationCmd<Void
       else {
 
         if (activityInstanceTree == null) {
-          activityInstanceTree = commandContext.runWithoutAuthorization(() ->
-              new GetActivityInstanceCmd(processInstanceId).execute(commandContext));
+          activityInstanceTree = commandContext.runWithoutAuthorization(new GetActivityInstanceCmd(processInstanceId));
         }
 
         ActivityCancellationCmd cancellationInstruction = (ActivityCancellationCmd) instruction;

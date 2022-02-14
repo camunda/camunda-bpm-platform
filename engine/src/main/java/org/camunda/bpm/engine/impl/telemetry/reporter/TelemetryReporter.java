@@ -18,79 +18,128 @@ package org.camunda.bpm.engine.impl.telemetry.reporter;
 
 import java.util.Timer;
 
-import org.apache.http.client.HttpClient;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cmd.IsTelemetryEnabledCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
-import org.camunda.bpm.engine.impl.telemetry.dto.Data;
+import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
+import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
+import org.camunda.connect.spi.Connector;
+import org.camunda.connect.spi.ConnectorRequest;
 
 public class TelemetryReporter {
 
   protected static final TelemetryLogger LOG = ProcessEngineLogger.TELEMETRY_LOGGER;
 
-  // send report every 24 hours
-  protected long reportingIntervalInSeconds = 24 * 60 * 60;
+  protected long reportingIntervalInSeconds;
+  /**
+   * Report after 5 minutes the first time so that we get an initial ping
+   * quickly. 5 minutes delay so that other modules (e.g. those collecting the app
+   * server name) can contribute their data.
+   */
+  public static long DEFAULT_INIT_REPORT_DELAY_SECONDS = 5 * 60;
+  /**
+   * Report after 3 hours for the first time so that other modules (e.g. those
+   * collecting the app server name) can contribute their data and test cases
+   * which accidentally enable reporting are very unlikely to send data.
+   */
+  public static long EXTENDED_INIT_REPORT_DELAY_SECONDS = 3 * 60 * 60;
 
   protected TelemetrySendingTask telemetrySendingTask;
   protected Timer timer;
 
   protected CommandExecutor commandExecutor;
   protected String telemetryEndpoint;
-  protected Data data;
-  protected HttpClient httpClient;
-
-  protected boolean stopped;
+  protected int telemetryRequestRetries;
+  protected TelemetryDataImpl data;
+  protected Connector<? extends ConnectorRequest<?>> httpConnector;
+  protected TelemetryRegistry telemetryRegistry;
+  protected MetricsRegistry metricsRegistry;
+  protected int telemetryRequestTimeout;
 
   public TelemetryReporter(CommandExecutor commandExecutor,
                            String telemetryEndpoint,
-                           Data data,
-                           HttpClient httpClient) {
+                           int telemetryRequestRetries,
+                           long telemetryReportingPeriod,
+                           TelemetryDataImpl data,
+                           Connector<? extends ConnectorRequest<?>> httpConnector,
+                           TelemetryRegistry telemetryRegistry,
+                           MetricsRegistry metricsRegistry,
+                           int telemetryRequestTimeout) {
     this.commandExecutor = commandExecutor;
     this.telemetryEndpoint = telemetryEndpoint;
+    this.telemetryRequestRetries = telemetryRequestRetries;
+    this.reportingIntervalInSeconds = telemetryReportingPeriod;
     this.data = data;
-    this.httpClient = httpClient;
-    initTelemetrySendingTask();
+    this.httpConnector = httpConnector;
+    this.telemetryRegistry = telemetryRegistry;
+    this.metricsRegistry = metricsRegistry;
+    this.telemetryRequestTimeout = telemetryRequestTimeout;
+    initTelemetrySendingTask(false);
   }
 
-  protected void initTelemetrySendingTask() {
+  protected void initTelemetrySendingTask(boolean sendInitialMessage) {
     telemetrySendingTask = new TelemetrySendingTask(commandExecutor,
                                                     telemetryEndpoint,
+                                                    telemetryRequestRetries,
                                                     data,
-                                                    httpClient);
+                                                    httpConnector,
+                                                    telemetryRegistry,
+                                                    metricsRegistry,
+                                                    telemetryRequestTimeout,
+                                                    sendInitialMessage);
   }
 
-  public synchronized void start() {
-    if (stopped) {
-      // if the reporter was already stopped another task should be scheduled
-      initTelemetrySendingTask();
-    }
-    if (timer == null) { // initialize timer if only the the timer is not scheduled yet
+  public synchronized void start(boolean sendInitialMessage) {
+    if (!isScheduled()) { // initialize timer only if not scheduled yet
+      initTelemetrySendingTask(sendInitialMessage);
+
       timer = new Timer("Camunda BPM Runtime Telemetry Reporter", true);
       long reportingIntervalInMillis =  reportingIntervalInSeconds * 1000;
+      long initialReportingDelay = getInitialReportingDelaySeconds() * 1000;
 
       try {
-        timer.scheduleAtFixedRate(telemetrySendingTask, reportingIntervalInMillis, reportingIntervalInMillis);
+        timer.scheduleAtFixedRate(telemetrySendingTask, initialReportingDelay, reportingIntervalInMillis);
       } catch (Exception e) {
-        LOG.schedulingTaskFails(e.getMessage());
+        timer = null;
+        throw LOG.schedulingTaskFails(e);
       }
     }
   }
 
+  public synchronized void reschedule(boolean sendInitialMessage) {
+    stop(false);
+    start(sendInitialMessage);
+  }
+
   public synchronized void stop() {
-    if (timer != null) {
+    stop(true);
+  }
+
+  public synchronized void stop(boolean report) {
+    if (isScheduled()) {
       // cancel the timer
       timer.cancel();
       timer = null;
-      // collect and send manually for the last time
-      reportNow();
+
+      // sending initial message only upon start
+      telemetrySendingTask.sendInitialMessage = false;
+      if (report) {
+        // collect and send manually for the last time
+        reportNow();
+      }
     }
-    stopped = true;
   }
 
   public void reportNow() {
     if (telemetrySendingTask != null) {
       telemetrySendingTask.run();
     }
+  }
+
+  public boolean isScheduled() {
+    return timer != null;
   }
 
   public long getReportingIntervalInSeconds() {
@@ -107,6 +156,15 @@ public class TelemetryReporter {
 
   public String getTelemetryEndpoint() {
     return telemetryEndpoint;
+  }
+
+  public Connector<? extends ConnectorRequest<?>> getHttpConnector() {
+    return httpConnector;
+  }
+
+  public long getInitialReportingDelaySeconds() {
+    Boolean enabled = commandExecutor.execute(new IsTelemetryEnabledCmd());
+    return enabled == null ? EXTENDED_INIT_REPORT_DELAY_SECONDS : DEFAULT_INIT_REPORT_DELAY_SECONDS;
   }
 
 }

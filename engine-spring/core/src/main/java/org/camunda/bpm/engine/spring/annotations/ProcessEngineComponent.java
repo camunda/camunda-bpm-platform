@@ -19,23 +19,23 @@ package org.camunda.bpm.engine.spring.annotations;
 import java.lang.annotation.*;
 
 /**
- * Indicates that the given bean is an Activiti handler. An activiti handler is a bean
- * that is so annotated to respond to events ("states") in an Activiti BPM process.
- * Generically, it is a class that has been adapted to be usable in an Activiti process
+ * Indicates that the given bean is an process engine handler. A process engine handler is a bean
+ * that is so annotated to respond to events ("states") in a Camunda Platform process.
+ * Generically, it is a class that has been adapted to be usable in a Camunda Platform process.
  *
  * <p/>
  * For example, suppose we have registered a BPMN process that has
  * the following declaration:
  * <p/>
  * <code>
- * &lt;service-task activiti:expression = "myBean" id = "confirm-receipt" /&gt;
+ * &lt;service-task camunda:expression = "myBean" id = "confirm-receipt" /&gt;
  * </code>
  * <p/>
- * This is a state that will be entered from Activiti and execution will flow through to the bean
+ * This is a state that will be entered from Camunda Platform and execution will flow through to the bean
  * registered in the context as "myBean." To subscribe to that, a POJO need only implement
  * (optionally) {@link ProcessEngineComponent} and, on a method, add
  * {@link State} to indicate that the method in particular is
- * tasked with responding to a state. If applied to a bean and there are no {@link org.camunda.bpm.engine.ProcessEngineComponent.ActivitiComponent}
+ * tasked with responding to a state. If applied to a bean and there are no {@link org.camunda.bpm.engine.annotations.ProcessEngineComponent}
  * annotations present, then one option might be to automatically enlist all public methods
  * as handlers for states whose IDs or names are inferred from the method name:
  * <p/>

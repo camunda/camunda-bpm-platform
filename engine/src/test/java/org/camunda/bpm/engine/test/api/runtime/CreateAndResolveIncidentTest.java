@@ -16,20 +16,21 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
-import static org.hamcrest.CoreMatchers.containsString;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.ExternalTaskService;
+import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.incident.IncidentContext;
 import org.camunda.bpm.engine.impl.incident.IncidentHandler;
@@ -42,34 +43,66 @@ import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 public class CreateAndResolveIncidentTest {
 
+  public static final BpmnModelInstance ASYNC_TASK_PROCESS = Bpmn.createExecutableProcess("process")
+      .startEvent("start")
+      .serviceTask("task")
+        .camundaAsyncBefore()
+        .camundaExpression("${true}")
+      .endEvent("end")
+      .done();
+
+  public static final BpmnModelInstance EXTERNAL_TASK_PROCESS = Bpmn.createExecutableProcess("process")
+      .startEvent("start")
+      .serviceTask("task")
+        .camundaExternalTask("topic")
+      .endEvent("end")
+      .done();
+
+  private static final CustomIncidentHandler CUSTOM_HANDLER = new CustomIncidentHandler("custom");
+  private static final CustomIncidentHandler JOB_HANDLER = new CustomIncidentHandler(Incident.FAILED_JOB_HANDLER_TYPE);
+  private static final CustomIncidentHandler EXTERNAL_TASK_HANDLER = new CustomIncidentHandler(Incident.EXTERNAL_TASK_HANDLER_TYPE);
+
+  private static final List<IncidentHandler> HANDLERS = new ArrayList<IncidentHandler>();
+  static {
+    HANDLERS.add(CUSTOM_HANDLER);
+    HANDLERS.add(JOB_HANDLER);
+    HANDLERS.add(EXTERNAL_TASK_HANDLER);
+  }
+
   @ClassRule
   public static ProcessEngineBootstrapRule processEngineBootstrapRule = new ProcessEngineBootstrapRule(configuration ->
-      configuration.setCustomIncidentHandlers(Arrays.asList((IncidentHandler) new CustomIncidentHandler())));
+      configuration.setCustomIncidentHandlers(HANDLERS));
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule(processEngineBootstrapRule);
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public ExpectedException thrown = ExpectedException.none();
-
-  @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
-  protected RuntimeService runtimeService;
-  protected HistoryService historyService;
+  private RuntimeService runtimeService;
+  private ManagementService managementService;
+  private ExternalTaskService externalTaskService;
 
   @Before
   public void init() {
     runtimeService = engineRule.getRuntimeService();
-    historyService = engineRule.getHistoryService();
+    externalTaskService = engineRule.getExternalTaskService();
+    managementService = engineRule.getManagementService();
+  }
+
+  @After
+  public void resetHandlers() {
+    HANDLERS.forEach(h -> ((CustomIncidentHandler) h).reset());
   }
 
   @Test
@@ -97,7 +130,7 @@ public class CreateAndResolveIncidentTest {
       runtimeService.createIncident("foo", null, "userTask1", "bar");
       fail("exception expected");
     } catch (BadUserRequestException e) {
-      assertThat(e.getMessage(), containsString("Execution id cannot be null"));
+      assertThat(e.getMessage()).contains("Execution id cannot be null");
     }
   }
 
@@ -107,7 +140,7 @@ public class CreateAndResolveIncidentTest {
       runtimeService.createIncident(null, "processInstanceId", "foo", "bar");
       fail("Exception expected");
     } catch (BadUserRequestException e) {
-      assertThat(e.getMessage(), containsString("incidentType is null"));
+      assertThat(e.getMessage()).contains("incidentType is null");
     }
   }
 
@@ -118,7 +151,7 @@ public class CreateAndResolveIncidentTest {
       runtimeService.createIncident("foo", "aaa", "bbb", "bar");
       fail("exception expected");
     } catch (BadUserRequestException e) {
-      assertThat(e.getMessage(), containsString("Cannot find an execution with executionId 'aaa'"));
+      assertThat(e.getMessage()).contains("Cannot find an execution with executionId 'aaa'");
     }
   }
 
@@ -143,7 +176,7 @@ public class CreateAndResolveIncidentTest {
       runtimeService.resolveIncident("foo");
       fail("Exception expected");
     } catch (NotFoundException e) {
-      assertThat(e.getMessage(), containsString("Cannot find an incident with id 'foo'"));
+      assertThat(e.getMessage()).contains("Cannot find an incident with id 'foo'");
     }
   }
 
@@ -153,7 +186,7 @@ public class CreateAndResolveIncidentTest {
       runtimeService.resolveIncident(null);
       fail("Exception expected");
     } catch (BadUserRequestException e) {
-      assertThat(e.getMessage(), containsString("incidentId is null"));
+      assertThat(e.getMessage()).contains("incidentId is null");
     }
   }
 
@@ -179,7 +212,7 @@ public class CreateAndResolveIncidentTest {
       runtimeService.resolveIncident(incident.getId());
       fail("Exception expected");
     } catch (BadUserRequestException e) {
-      assertThat(e.getMessage(), containsString("Cannot resolve an incident of type failedJob"));
+      assertThat(e.getMessage()).contains("Cannot resolve an incident of type failedJob");
     }
   }
 
@@ -200,6 +233,10 @@ public class CreateAndResolveIncidentTest {
     assertEquals(incident, incident2);
     assertEquals("custom", incident.getIncidentType());
     assertEquals("configuration", incident.getConfiguration());
+
+    assertThat(CUSTOM_HANDLER.getCreateEvents()).hasSize(1);
+    assertThat(CUSTOM_HANDLER.getResolveEvents()).isEmpty();
+    assertThat(CUSTOM_HANDLER.getDeleteEvents()).isEmpty();
   }
 
   @Test
@@ -216,11 +253,153 @@ public class CreateAndResolveIncidentTest {
     // then
     incident = runtimeService.createIncidentQuery().singleResult();
     assertNull(incident);
+
+    assertThat(CUSTOM_HANDLER.getCreateEvents()).hasSize(1);
+    assertThat(CUSTOM_HANDLER.getResolveEvents()).hasSize(1);
+    assertThat(CUSTOM_HANDLER.getDeleteEvents()).isEmpty();
+  }
+
+  @Test
+  public void shouldCallDeleteForCustomHandlerOnProcessInstanceCancellation() {
+    // given
+    testRule.deploy(ProcessModels.TWO_TASKS_PROCESS);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process");
+    runtimeService.createIncident("custom", processInstance.getId(), "configuration");
+
+    CUSTOM_HANDLER.reset();
+
+    // when
+    runtimeService.deleteProcessInstance(processInstance.getId(), null);
+
+    // then
+    assertThat(CUSTOM_HANDLER.getCreateEvents()).isEmpty();
+    assertThat(CUSTOM_HANDLER.getResolveEvents()).isEmpty();
+    assertThat(CUSTOM_HANDLER.getDeleteEvents()).hasSize(1);
+
+    IncidentContext deleteContext = CUSTOM_HANDLER.getDeleteEvents().get(0);
+    assertThat(deleteContext.getConfiguration()).isEqualTo("configuration");
+
+    long numIncidents = runtimeService.createIncidentQuery().count();
+    assertThat(numIncidents).isEqualTo(0);
+  }
+
+  @Test
+  public void shouldCallDeleteForJobHandlerOnProcessInstanceCancellation() {
+
+    // given
+    testRule.deploy(ASYNC_TASK_PROCESS);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+    Job job = managementService.createJobQuery().singleResult();
+    managementService.setJobRetries(job.getId(), 0);
+
+    JOB_HANDLER.reset();
+
+    // when
+    runtimeService.deleteProcessInstance(processInstance.getId(), null);
+
+    // then
+    assertThat(JOB_HANDLER.getCreateEvents()).isEmpty();
+    assertThat(JOB_HANDLER.getResolveEvents()).isEmpty();
+    assertThat(JOB_HANDLER.getDeleteEvents()).hasSize(1);
+
+    IncidentContext deleteContext = JOB_HANDLER.getDeleteEvents().get(0);
+    assertThat(deleteContext.getConfiguration()).isEqualTo(job.getId());
+
+    long numIncidents = runtimeService.createIncidentQuery().count();
+    assertThat(numIncidents).isEqualTo(0);
+  }
+
+  @Test
+  public void shouldCallDeleteForExternalTasksHandlerOnProcessInstanceCancellation() {
+
+    // given
+    testRule.deploy(EXTERNAL_TASK_PROCESS);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+    List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(1, "foo").topic("topic", 1000L).execute();
+    LockedExternalTask task = tasks.get(0);
+
+    externalTaskService.setRetries(task.getId(), 0);
+
+    EXTERNAL_TASK_HANDLER.reset();
+
+    // when
+    runtimeService.deleteProcessInstance(processInstance.getId(), null);
+
+    // then
+    assertThat(EXTERNAL_TASK_HANDLER.getCreateEvents()).isEmpty();
+    assertThat(EXTERNAL_TASK_HANDLER.getResolveEvents()).isEmpty();
+    assertThat(EXTERNAL_TASK_HANDLER.getDeleteEvents()).hasSize(1);
+
+    IncidentContext deleteContext = EXTERNAL_TASK_HANDLER.getDeleteEvents().get(0);
+    assertThat(deleteContext.getConfiguration()).isEqualTo(task.getId());
+
+    long numIncidents = runtimeService.createIncidentQuery().count();
+    assertThat(numIncidents).isEqualTo(0);
+  }
+
+  @Test
+  public void shouldCallResolveForJobHandler() {
+    // given
+    testRule.deploy(ASYNC_TASK_PROCESS);
+    runtimeService.startProcessInstanceByKey("process");
+    Job job = managementService.createJobQuery().singleResult();
+    managementService.setJobRetries(job.getId(), 0);
+
+    JOB_HANDLER.reset();
+
+    // when
+    managementService.setJobRetries(job.getId(), 1);
+
+    // then
+    assertThat(JOB_HANDLER.getCreateEvents()).isEmpty();
+    assertThat(JOB_HANDLER.getResolveEvents()).hasSize(1);
+    assertThat(JOB_HANDLER.getDeleteEvents()).isEmpty();
+
+    IncidentContext deleteContext = JOB_HANDLER.getResolveEvents().get(0);
+    assertThat(deleteContext.getConfiguration()).isEqualTo(job.getId());
+
+    long numIncidents = runtimeService.createIncidentQuery().count();
+    assertThat(numIncidents).isEqualTo(0);
+  }
+
+  @Test
+  public void shouldCallResolveForExternalTaskHandler() {
+    // given
+    testRule.deploy(EXTERNAL_TASK_PROCESS);
+    runtimeService.startProcessInstanceByKey("process");
+    List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(1, "foo").topic("topic", 1000L).execute();
+    LockedExternalTask task = tasks.get(0);
+
+    externalTaskService.setRetries(task.getId(), 0);
+
+    EXTERNAL_TASK_HANDLER.reset();
+
+    // when
+    externalTaskService.setRetries(task.getId(), 1);
+
+    // then
+    assertThat(EXTERNAL_TASK_HANDLER.getCreateEvents()).isEmpty();
+    assertThat(EXTERNAL_TASK_HANDLER.getResolveEvents()).hasSize(1);
+    assertThat(EXTERNAL_TASK_HANDLER.getDeleteEvents()).isEmpty();
+
+    IncidentContext resolveContext = EXTERNAL_TASK_HANDLER.getResolveEvents().get(0);
+    assertThat(resolveContext.getConfiguration()).isEqualTo(task.getId());
+
+    long numIncidents = runtimeService.createIncidentQuery().count();
+    assertThat(numIncidents).isEqualTo(0);
   }
 
   public static class CustomIncidentHandler implements IncidentHandler {
 
-    String incidentType = "custom";
+    private String incidentType;
+
+    private List<IncidentContext> createEvents = new ArrayList<>();
+    private List<IncidentContext> resolveEvents = new ArrayList<>();
+    private List<IncidentContext> deleteEvents = new ArrayList<>();
+
+    public CustomIncidentHandler(String type) {
+      this.incidentType = type;
+    }
 
     @Override
     public String getIncidentHandlerType() {
@@ -229,19 +408,45 @@ public class CreateAndResolveIncidentTest {
 
     @Override
     public Incident handleIncident(IncidentContext context, String message) {
+      createEvents.add(context);
       return IncidentEntity.createAndInsertIncident(incidentType, context, message);
     }
 
     @Override
     public void resolveIncident(IncidentContext context) {
-      deleteIncident(context);
+      resolveEvents.add(context);
+      deleteIncidentEntity(context);
     }
 
     @Override
     public void deleteIncident(IncidentContext context) {
+      deleteEvents.add(context);
+      deleteIncidentEntity(context);
+    }
+
+    private void deleteIncidentEntity(IncidentContext context) {
       List<Incident> incidents = Context.getCommandContext().getIncidentManager()
           .findIncidentByConfigurationAndIncidentType(context.getConfiguration(), incidentType);
-      ((IncidentEntity) incidents.get(0)).delete();
+
+      incidents.forEach(i -> ((IncidentEntity) i).delete());
+    }
+
+    public List<IncidentContext> getCreateEvents() {
+      return createEvents;
+    }
+
+    public List<IncidentContext> getResolveEvents() {
+      return resolveEvents;
+    }
+
+    public List<IncidentContext> getDeleteEvents() {
+      return deleteEvents;
+    }
+
+    public void reset() {
+      createEvents.clear();
+      resolveEvents.clear();
+      deleteEvents.clear();
     }
 
   }

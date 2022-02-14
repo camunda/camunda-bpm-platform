@@ -10,7 +10,7 @@
     <startEvent id="theStart" />
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="miScriptTask" />
     
-    <serviceTask id="miScriptTask" camunda:expression="${MultiInstanceTestLocalVariableBean.test()}">
+    <serviceTask id="miScriptTask" camunda:delegateExpression="${multiInstanceDelegate}">
       <multiInstanceLoopCharacteristics isSequential="false" camunda:collection="${list}" camunda:elementVariable="localVar" />      
     </serviceTask>
     

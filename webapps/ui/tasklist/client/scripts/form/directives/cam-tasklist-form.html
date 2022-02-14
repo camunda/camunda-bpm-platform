@@ -1,0 +1,59 @@
+<div ng-show="tasklistForm && !$loaded"
+     class="loader">
+  <span class="animate-spin glyphicon glyphicon-refresh"></span>
+  {{ 'LOADING' | translate }}
+</div>
+
+<div ng-if="tasklistForm.type"
+     ng-show="tasklistForm && $loaded"
+     ng-class="{ 'disabled-form': options.disableForm, 'task-removed': taskRemoved}">
+
+  <div ng-show="tasklistForm.$error" uib-alert class="alert alert-danger" role="alert">
+    <span class="glyphicon glyphicon-exclamation-sign"></span>
+    <strong class="status">{{ 'FORM_FAILURE' | translate }}</strong>
+    <span class="message">{{ tasklistForm.$error.message | translate }}</span>
+  </div>
+
+  <div ng-switch="tasklistForm.type"
+       ng-show="!tasklistForm.$error">
+
+    <div ng-switch-when="embedded">
+      <div cam-tasklist-form-embedded>
+      </div>
+    </div>
+
+    <div ng-switch-when="camunda-forms">
+      <div cam-tasklist-form-camunda></div>
+    </div>
+
+    <div ng-switch-when="external">
+      <div cam-tasklist-form-external>
+      </div>
+    </div>
+
+    <div ng-switch-default>
+      <div cam-tasklist-form-generic>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="form-actions" ng-show="showCompleteButton()">
+    <button class="btn btn-default"
+            type="submit"
+            ng-click="save($event)"
+            ng-hide="tasklistForm.type === 'generic'"
+            tooltip-placement="top"
+            uib-tooltip="{{ 'SAVE_HINT' | translate }}"
+            ng-disabled="!$dirty">
+      {{ 'SAVE' | translate }}
+    </button>
+    <button class="btn btn-primary"
+            type="submit"
+            ng-click="complete()"
+            ng-disabled="disableCompleteButton()">
+      {{ 'COMPLETE' | translate }}
+    </button>
+  </div>
+
+</div>

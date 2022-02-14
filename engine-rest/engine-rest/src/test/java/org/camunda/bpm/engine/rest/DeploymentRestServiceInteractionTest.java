@@ -81,7 +81,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
   protected Resource mockDeploymentResource;
   protected DeploymentQuery mockDeploymentQuery;
   protected DeploymentBuilder mockDeploymentBuilder;
-  protected Collection<String> resourceNames = new ArrayList<String>();
+  protected Collection<String> resourceNames = new ArrayList<>();
 
   @Before
   public void setUpRuntimeData() {
@@ -273,7 +273,9 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
         .expect()
           .statusCode(Status.OK.getStatusCode())
           .contentType("application/octet-stream")
-          .header("Content-Disposition", "attachment; filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_RESOURCE_NAME + "\"")
+          .header("Content-Disposition", "attachment; " +
+                  "filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_RESOURCE_NAME + "\"; " +
+                  "filename*=UTF-8''" + MockProvider.EXAMPLE_DEPLOYMENT_RESOURCE_NAME)
       .when().get(SINGLE_RESOURCE_DATA_URL);
 
     String responseContent = response.asString();
@@ -285,7 +287,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
   public void testGetDeploymentSvgResourceData() {
     Resource resource = MockProvider.createMockDeploymentSvgResource();
 
-    List<Resource> resources = new ArrayList<Resource>();
+    List<Resource> resources = new ArrayList<>();
     resources.add(resource);
 
     when(mockRepositoryService.getDeploymentResources(eq(EXAMPLE_DEPLOYMENT_ID))).thenReturn(resources);
@@ -298,7 +300,9 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
         .expect()
           .statusCode(Status.OK.getStatusCode())
           .contentType("image/svg+xml")
-          .header("Content-Disposition", "attachment; filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_SVG_RESOURCE_NAME + "\"")
+          .header("Content-Disposition", "attachment; " +
+                  "filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_SVG_RESOURCE_NAME + "\"; " +
+                  "filename*=UTF-8''" + MockProvider.EXAMPLE_DEPLOYMENT_SVG_RESOURCE_NAME)
       .when().get(SINGLE_RESOURCE_DATA_URL);
 
     String responseContent = response.asString();
@@ -309,7 +313,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
   public void testGetDeploymentPngResourceData() {
     Resource resource = MockProvider.createMockDeploymentPngResource();
 
-    List<Resource> resources = new ArrayList<Resource>();
+    List<Resource> resources = new ArrayList<>();
     resources.add(resource);
 
     InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
@@ -324,7 +328,9 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
         .expect()
           .statusCode(Status.OK.getStatusCode())
           .contentType("image/png")
-          .header("Content-Disposition", "attachment; filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_PNG_RESOURCE_NAME + "\"")
+          .header("Content-Disposition", "attachment; " +
+                  "filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_PNG_RESOURCE_NAME + "\"; " +
+                  "filename*=UTF-8''" + MockProvider.EXAMPLE_DEPLOYMENT_PNG_RESOURCE_NAME)
       .when().get(SINGLE_RESOURCE_DATA_URL);
 
     String responseContent = response.asString();
@@ -335,7 +341,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
   public void testGetDeploymentGifResourceData() {
     Resource resource = MockProvider.createMockDeploymentGifResource();
 
-    List<Resource> resources = new ArrayList<Resource>();
+    List<Resource> resources = new ArrayList<>();
     resources.add(resource);
 
     InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
@@ -350,7 +356,9 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
         .expect()
           .statusCode(Status.OK.getStatusCode())
           .contentType("image/gif")
-          .header("Content-Disposition", "attachment; filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_GIF_RESOURCE_NAME + "\"")
+          .header("Content-Disposition", "attachment; " +
+                  "filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_GIF_RESOURCE_NAME + "\"; " +
+                  "filename*=UTF-8''" + MockProvider.EXAMPLE_DEPLOYMENT_GIF_RESOURCE_NAME)
       .when().get(SINGLE_RESOURCE_DATA_URL);
 
     String responseContent = response.asString();
@@ -361,7 +369,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
   public void testGetDeploymentJpgResourceData() {
     Resource resource = MockProvider.createMockDeploymentJpgResource();
 
-    List<Resource> resources = new ArrayList<Resource>();
+    List<Resource> resources = new ArrayList<>();
     resources.add(resource);
 
     InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
@@ -376,7 +384,9 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
         .expect()
           .statusCode(Status.OK.getStatusCode())
           .contentType("image/jpeg")
-          .header("Content-Disposition", "attachment; filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_JPG_RESOURCE_NAME + "\"")
+          .header("Content-Disposition", "attachment; " +
+                  "filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_JPG_RESOURCE_NAME + "\"; " +
+                  "filename*=UTF-8''" + MockProvider.EXAMPLE_DEPLOYMENT_JPG_RESOURCE_NAME)
       .when().get(SINGLE_RESOURCE_DATA_URL);
 
     String responseContent = response.asString();
@@ -387,7 +397,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
   public void testGetDeploymentJpegResourceData() {
     Resource resource = MockProvider.createMockDeploymentJpegResource();
 
-    List<Resource> resources = new ArrayList<Resource>();
+    List<Resource> resources = new ArrayList<>();
     resources.add(resource);
 
     InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
@@ -402,7 +412,9 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
         .expect()
           .statusCode(Status.OK.getStatusCode())
           .contentType("image/jpeg")
-          .header("Content-Disposition", "attachment; filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_JPEG_RESOURCE_NAME + "\"")
+          .header("Content-Disposition", "attachment; " +
+                  "filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_JPEG_RESOURCE_NAME + "\"; " +
+                  "filename*=UTF-8''" + MockProvider.EXAMPLE_DEPLOYMENT_JPEG_RESOURCE_NAME)
       .when().get(SINGLE_RESOURCE_DATA_URL);
 
     String responseContent = response.asString();
@@ -413,7 +425,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
   public void testGetDeploymentJpeResourceData() {
     Resource resource = MockProvider.createMockDeploymentJpeResource();
 
-    List<Resource> resources = new ArrayList<Resource>();
+    List<Resource> resources = new ArrayList<>();
     resources.add(resource);
 
     InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
@@ -428,7 +440,9 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
         .expect()
           .statusCode(Status.OK.getStatusCode())
           .contentType("image/jpeg")
-          .header("Content-Disposition", "attachment; filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_JPE_RESOURCE_NAME + "\"")
+          .header("Content-Disposition", "attachment; " +
+                  "filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_JPE_RESOURCE_NAME + "\"; " +
+                  "filename*=UTF-8''" + MockProvider.EXAMPLE_DEPLOYMENT_JPE_RESOURCE_NAME)
       .when().get(SINGLE_RESOURCE_DATA_URL);
 
     String responseContent = response.asString();
@@ -439,7 +453,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
   public void testGetDeploymentTifResourceData() {
     Resource resource = MockProvider.createMockDeploymentTifResource();
 
-    List<Resource> resources = new ArrayList<Resource>();
+    List<Resource> resources = new ArrayList<>();
     resources.add(resource);
 
     InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
@@ -454,7 +468,9 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
         .expect()
           .statusCode(Status.OK.getStatusCode())
           .contentType("image/tiff")
-          .header("Content-Disposition", "attachment; filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_TIF_RESOURCE_NAME + "\"")
+          .header("Content-Disposition", "attachment; " +
+                  "filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_TIF_RESOURCE_NAME + "\"; " +
+                  "filename*=UTF-8''" + MockProvider.EXAMPLE_DEPLOYMENT_TIF_RESOURCE_NAME)
       .when().get(SINGLE_RESOURCE_DATA_URL);
 
     String responseContent = response.asString();
@@ -465,7 +481,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
   public void testGetDeploymentTiffResourceData() {
     Resource resource = MockProvider.createMockDeploymentTiffResource();
 
-    List<Resource> resources = new ArrayList<Resource>();
+    List<Resource> resources = new ArrayList<>();
     resources.add(resource);
 
     InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
@@ -480,7 +496,9 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
         .expect()
           .statusCode(Status.OK.getStatusCode())
           .contentType("image/tiff")
-          .header("Content-Disposition", "attachment; filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_TIFF_RESOURCE_NAME + "\"")
+          .header("Content-Disposition", "attachment; " +
+                  "filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_TIFF_RESOURCE_NAME + "\"; " +
+                  "filename*=UTF-8''" + MockProvider.EXAMPLE_DEPLOYMENT_TIFF_RESOURCE_NAME)
       .when().get(SINGLE_RESOURCE_DATA_URL);
 
     String responseContent = response.asString();
@@ -491,7 +509,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
   public void testGetDeploymentBpmnResourceData() {
     Resource resource = MockProvider.createMockDeploymentBpmnResource();
 
-    List<Resource> resources = new ArrayList<Resource>();
+    List<Resource> resources = new ArrayList<>();
     resources.add(resource);
 
     when(mockRepositoryService.getDeploymentResources(eq(EXAMPLE_DEPLOYMENT_ID))).thenReturn(resources);
@@ -504,7 +522,9 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
         .expect()
           .statusCode(Status.OK.getStatusCode())
           .contentType(ContentType.XML)
-          .header("Content-Disposition", "attachment; filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_BPMN_RESOURCE_NAME + "\"")
+          .header("Content-Disposition", "attachment; " +
+                  "filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_BPMN_RESOURCE_NAME + "\"; " +
+                  "filename*=UTF-8''" + MockProvider.EXAMPLE_DEPLOYMENT_BPMN_RESOURCE_NAME)
       .when().get(SINGLE_RESOURCE_DATA_URL);
 
     String responseContent = response.asString();
@@ -515,7 +535,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
   public void testGetDeploymentBpmnXmlResourceData() {
     Resource resource = MockProvider.createMockDeploymentBpmnXmlResource();
 
-    List<Resource> resources = new ArrayList<Resource>();
+    List<Resource> resources = new ArrayList<>();
     resources.add(resource);
 
     when(mockRepositoryService.getDeploymentResources(eq(EXAMPLE_DEPLOYMENT_ID))).thenReturn(resources);
@@ -528,7 +548,9 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
         .expect()
           .statusCode(Status.OK.getStatusCode())
           .contentType(ContentType.XML)
-          .header("Content-Disposition", "attachment; filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_BPMN_XML_RESOURCE_NAME + "\"")
+          .header("Content-Disposition", "attachment; " +
+                  "filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_BPMN_XML_RESOURCE_NAME + "\"; " +
+                  "filename*=UTF-8''" + MockProvider.EXAMPLE_DEPLOYMENT_BPMN_XML_RESOURCE_NAME)
       .when().get(SINGLE_RESOURCE_DATA_URL);
 
     String responseContent = response.asString();
@@ -539,7 +561,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
   public void testGetDeploymentCmmnResourceData() {
     Resource resource = MockProvider.createMockDeploymentCmmnResource();
 
-    List<Resource> resources = new ArrayList<Resource>();
+    List<Resource> resources = new ArrayList<>();
     resources.add(resource);
 
     InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
@@ -554,7 +576,9 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
         .expect()
           .statusCode(Status.OK.getStatusCode())
           .contentType(ContentType.XML)
-          .header("Content-Disposition", "attachment; filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_CMMN_RESOURCE_NAME + "\"")
+          .header("Content-Disposition", "attachment; " +
+                  "filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_CMMN_RESOURCE_NAME + "\"; " +
+                  "filename*=UTF-8''" + MockProvider.EXAMPLE_DEPLOYMENT_CMMN_RESOURCE_NAME)
       .when().get(SINGLE_RESOURCE_DATA_URL);
 
     String responseContent = response.asString();
@@ -565,7 +589,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
   public void testGetDeploymentCmmnXmlResourceData() {
     Resource resource = MockProvider.createMockDeploymentCmmnXmlResource();
 
-    List<Resource> resources = new ArrayList<Resource>();
+    List<Resource> resources = new ArrayList<>();
     resources.add(resource);
 
     InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
@@ -580,7 +604,9 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
         .expect()
           .statusCode(Status.OK.getStatusCode())
           .contentType(ContentType.XML)
-          .header("Content-Disposition", "attachment; filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_CMMN_XML_RESOURCE_NAME + "\"")
+          .header("Content-Disposition", "attachment; " +
+                  "filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_CMMN_XML_RESOURCE_NAME + "\"; " +
+                  "filename*=UTF-8''" + MockProvider.EXAMPLE_DEPLOYMENT_CMMN_XML_RESOURCE_NAME)
       .when().get(SINGLE_RESOURCE_DATA_URL);
 
     String responseContent = response.asString();
@@ -591,7 +617,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
   public void testGetDeploymentDmnResourceData() {
     Resource resource = MockProvider.createMockDeploymentDmnResource();
 
-    List<Resource> resources = new ArrayList<Resource>();
+    List<Resource> resources = new ArrayList<>();
     resources.add(resource);
 
     InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
@@ -606,7 +632,9 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
         .expect()
           .statusCode(Status.OK.getStatusCode())
           .contentType(ContentType.XML)
-          .header("Content-Disposition", "attachment; filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_DMN_RESOURCE_NAME + "\"")
+          .header("Content-Disposition", "attachment; " +
+                  "filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_DMN_RESOURCE_NAME + "\"; " +
+                  "filename*=UTF-8''" + MockProvider.EXAMPLE_DEPLOYMENT_DMN_RESOURCE_NAME)
       .when().get(SINGLE_RESOURCE_DATA_URL);
 
     String responseContent = response.asString();
@@ -617,7 +645,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
   public void testGetDeploymentDmnXmlResourceData() {
     Resource resource = MockProvider.createMockDeploymentDmnXmlResource();
 
-    List<Resource> resources = new ArrayList<Resource>();
+    List<Resource> resources = new ArrayList<>();
     resources.add(resource);
 
     InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
@@ -632,7 +660,9 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
         .expect()
           .statusCode(Status.OK.getStatusCode())
           .contentType(ContentType.XML)
-          .header("Content-Disposition", "attachment; filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_DMN_XML_RESOURCE_NAME + "\"")
+          .header("Content-Disposition", "attachment; " +
+                  "filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_DMN_XML_RESOURCE_NAME + "\"; " +
+                  "filename*=UTF-8''" + MockProvider.EXAMPLE_DEPLOYMENT_DMN_XML_RESOURCE_NAME)
       .when().get(SINGLE_RESOURCE_DATA_URL);
 
     String responseContent = response.asString();
@@ -643,7 +673,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
   public void testGetDeploymentXmlResourceData() {
     Resource resource = MockProvider.createMockDeploymentXmlResource();
 
-    List<Resource> resources = new ArrayList<Resource>();
+    List<Resource> resources = new ArrayList<>();
     resources.add(resource);
 
     InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
@@ -658,7 +688,9 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
         .expect()
           .statusCode(Status.OK.getStatusCode())
           .contentType(ContentType.XML)
-          .header("Content-Disposition", "attachment; filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_XML_RESOURCE_NAME + "\"")
+          .header("Content-Disposition", "attachment; " +
+                  "filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_XML_RESOURCE_NAME + "\"; " +
+                  "filename*=UTF-8''" + MockProvider.EXAMPLE_DEPLOYMENT_XML_RESOURCE_NAME)
       .when().get(SINGLE_RESOURCE_DATA_URL);
 
     String responseContent = response.asString();
@@ -669,7 +701,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
   public void testGetDeploymentJsonResourceData() {
     Resource resource = MockProvider.createMockDeploymentJsonResource();
 
-    List<Resource> resources = new ArrayList<Resource>();
+    List<Resource> resources = new ArrayList<>();
     resources.add(resource);
 
     InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
@@ -684,7 +716,9 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
         .expect()
           .statusCode(Status.OK.getStatusCode())
           .contentType(ContentType.JSON)
-          .header("Content-Disposition", "attachment; filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_JSON_RESOURCE_NAME + "\"")
+          .header("Content-Disposition", "attachment; " +
+                  "filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_JSON_RESOURCE_NAME + "\"; " +
+                  "filename*=UTF-8''" + MockProvider.EXAMPLE_DEPLOYMENT_JSON_RESOURCE_NAME)
       .when().get(SINGLE_RESOURCE_DATA_URL);
 
     String responseContent = response.asString();
@@ -695,7 +729,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
   public void testGetDeploymentGroovyResourceData() {
     Resource resource = MockProvider.createMockDeploymentGroovyResource();
 
-    List<Resource> resources = new ArrayList<Resource>();
+    List<Resource> resources = new ArrayList<>();
     resources.add(resource);
 
     InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
@@ -710,7 +744,9 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
         .expect()
           .statusCode(Status.OK.getStatusCode())
           .contentType(ContentType.TEXT)
-          .header("Content-Disposition", "attachment; filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_GROOVY_RESOURCE_NAME + "\"")
+          .header("Content-Disposition", "attachment; " +
+                  "filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_GROOVY_RESOURCE_NAME + "\"; " +
+                  "filename*=UTF-8''" + MockProvider.EXAMPLE_DEPLOYMENT_GROOVY_RESOURCE_NAME)
       .when().get(SINGLE_RESOURCE_DATA_URL);
 
     String responseContent = response.asString();
@@ -721,7 +757,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
   public void testGetDeploymentJavaResourceData() {
     Resource resource = MockProvider.createMockDeploymentJavaResource();
 
-    List<Resource> resources = new ArrayList<Resource>();
+    List<Resource> resources = new ArrayList<>();
     resources.add(resource);
 
     InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
@@ -736,7 +772,9 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
         .expect()
           .statusCode(Status.OK.getStatusCode())
           .contentType(ContentType.TEXT)
-          .header("Content-Disposition", "attachment; filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_JAVA_RESOURCE_NAME + "\"")
+          .header("Content-Disposition", "attachment; " +
+                  "filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_JAVA_RESOURCE_NAME + "\"; " +
+                  "filename*=UTF-8''" + MockProvider.EXAMPLE_DEPLOYMENT_JAVA_RESOURCE_NAME)
       .when().get(SINGLE_RESOURCE_DATA_URL);
 
     String responseContent = response.asString();
@@ -747,7 +785,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
   public void testGetDeploymentJsResourceData() {
     Resource resource = MockProvider.createMockDeploymentJsResource();
 
-    List<Resource> resources = new ArrayList<Resource>();
+    List<Resource> resources = new ArrayList<>();
     resources.add(resource);
 
     InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
@@ -762,7 +800,9 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
         .expect()
           .statusCode(Status.OK.getStatusCode())
           .contentType(ContentType.TEXT)
-          .header("Content-Disposition", "attachment; filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_JS_RESOURCE_NAME + "\"")
+          .header("Content-Disposition", "attachment; " +
+                  "filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_JS_RESOURCE_NAME + "\"; " +
+                  "filename*=UTF-8''" + MockProvider.EXAMPLE_DEPLOYMENT_JS_RESOURCE_NAME)
       .when().get(SINGLE_RESOURCE_DATA_URL);
 
     String responseContent = response.asString();
@@ -773,7 +813,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
   public void testGetDeploymentPythonResourceData() {
     Resource resource = MockProvider.createMockDeploymentPythonResource();
 
-    List<Resource> resources = new ArrayList<Resource>();
+    List<Resource> resources = new ArrayList<>();
     resources.add(resource);
 
     InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
@@ -788,7 +828,9 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
         .expect()
           .statusCode(Status.OK.getStatusCode())
           .contentType(ContentType.TEXT)
-          .header("Content-Disposition", "attachment; filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_PYTHON_RESOURCE_NAME + "\"")
+          .header("Content-Disposition", "attachment; " +
+                  "filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_PYTHON_RESOURCE_NAME + "\"; " +
+                  "filename*=UTF-8''" + MockProvider.EXAMPLE_DEPLOYMENT_PYTHON_RESOURCE_NAME)
       .when().get(SINGLE_RESOURCE_DATA_URL);
 
     String responseContent = response.asString();
@@ -799,7 +841,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
   public void testGetDeploymentRubyResourceData() {
     Resource resource = MockProvider.createMockDeploymentRubyResource();
 
-    List<Resource> resources = new ArrayList<Resource>();
+    List<Resource> resources = new ArrayList<>();
     resources.add(resource);
 
     InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
@@ -814,7 +856,9 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
         .expect()
           .statusCode(Status.OK.getStatusCode())
           .contentType(ContentType.TEXT)
-          .header("Content-Disposition", "attachment; filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_RUBY_RESOURCE_NAME + "\"")
+          .header("Content-Disposition", "attachment; " +
+                  "filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_RUBY_RESOURCE_NAME + "\"; " +
+                  "filename*=UTF-8''" + MockProvider.EXAMPLE_DEPLOYMENT_RUBY_RESOURCE_NAME)
       .when().get(SINGLE_RESOURCE_DATA_URL);
 
     String responseContent = response.asString();
@@ -825,7 +869,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
   public void testGetDeploymentPhpResourceData() {
     Resource resource = MockProvider.createMockDeploymentPhpResource();
 
-    List<Resource> resources = new ArrayList<Resource>();
+    List<Resource> resources = new ArrayList<>();
     resources.add(resource);
 
     InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
@@ -840,7 +884,9 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
         .expect()
           .statusCode(Status.OK.getStatusCode())
           .contentType(ContentType.TEXT)
-          .header("Content-Disposition", "attachment; filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_PHP_RESOURCE_NAME + "\"")
+          .header("Content-Disposition", "attachment; " +
+                  "filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_PHP_RESOURCE_NAME + "\"; " +
+                  "filename*=UTF-8''" + MockProvider.EXAMPLE_DEPLOYMENT_PHP_RESOURCE_NAME)
       .when().get(SINGLE_RESOURCE_DATA_URL);
 
     String responseContent = response.asString();
@@ -851,7 +897,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
   public void testGetDeploymentHtmlpResourceData() {
     Resource resource = MockProvider.createMockDeploymentHtmlResource();
 
-    List<Resource> resources = new ArrayList<Resource>();
+    List<Resource> resources = new ArrayList<>();
     resources.add(resource);
 
     InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
@@ -866,7 +912,9 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
         .expect()
           .statusCode(Status.OK.getStatusCode())
           .contentType(ContentType.HTML)
-          .header("Content-Disposition", "attachment; filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_HTML_RESOURCE_NAME + "\"")
+          .header("Content-Disposition", "attachment; " +
+                  "filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_HTML_RESOURCE_NAME + "\"; " +
+                  "filename*=UTF-8''" + MockProvider.EXAMPLE_DEPLOYMENT_HTML_RESOURCE_NAME)
       .when().get(SINGLE_RESOURCE_DATA_URL);
 
     String responseContent = response.asString();
@@ -877,7 +925,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
   public void testGetDeploymentTxtResourceData() {
     Resource resource = MockProvider.createMockDeploymentTxtResource();
 
-    List<Resource> resources = new ArrayList<Resource>();
+    List<Resource> resources = new ArrayList<>();
     resources.add(resource);
 
     InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
@@ -892,8 +940,38 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
         .expect()
           .statusCode(Status.OK.getStatusCode())
           .contentType(ContentType.TEXT)
-          .header("Content-Disposition", "attachment; filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_TXT_RESOURCE_NAME + "\"")
+          .header("Content-Disposition", "attachment; " +
+                  "filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_TXT_RESOURCE_NAME + "\"; " +
+                  "filename*=UTF-8''" + MockProvider.EXAMPLE_DEPLOYMENT_TXT_RESOURCE_NAME)
       .when().get(SINGLE_RESOURCE_DATA_URL);
+
+    String responseContent = response.asString();
+    assertNotNull(responseContent);
+  }
+
+  @Test
+  public void testGetDeploymentCamundaFormResourceData() {
+    Resource resource = MockProvider.createMockDeploymentCamundaFormResource();
+
+    List<Resource> resources = new ArrayList<>();
+    resources.add(resource);
+
+    InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
+
+    when(mockRepositoryService.getDeploymentResources(eq(EXAMPLE_DEPLOYMENT_ID))).thenReturn(resources);
+    when(mockRepositoryService.getResourceAsStreamById(eq(EXAMPLE_DEPLOYMENT_ID), eq(EXAMPLE_DEPLOYMENT_CAMFORM_RESOURCE_ID))).thenReturn(input);
+
+    Response response = given()
+          .pathParam("id", EXAMPLE_DEPLOYMENT_ID)
+          .pathParam("resourceId", EXAMPLE_DEPLOYMENT_CAMFORM_RESOURCE_ID)
+        .then()
+          .expect()
+            .statusCode(Status.OK.getStatusCode())
+            .contentType("application/octet-stream")
+            .header("Content-Disposition", "attachment; " +
+                    "filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_CAMFORM_RESOURCE_NAME + "\"; " +
+                    "filename*=UTF-8''" + MockProvider.EXAMPLE_DEPLOYMENT_CAMFORM_RESOURCE_NAME)
+        .when().get(SINGLE_RESOURCE_DATA_URL);
 
     String responseContent = response.asString();
     assertNotNull(responseContent);
@@ -903,7 +981,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
   public void testGetDeploymentResourceDataFilename() {
     Resource resource = MockProvider.createMockDeploymentResourceFilename();
 
-    List<Resource> resources = new ArrayList<Resource>();
+    List<Resource> resources = new ArrayList<>();
     resources.add(resource);
 
     InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
@@ -918,7 +996,9 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
         .expect()
           .statusCode(Status.OK.getStatusCode())
           .contentType(ContentType.XML)
-          .header("Content-Disposition", "attachment; filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_RESOURCE_FILENAME_NAME + "\"")
+          .header("Content-Disposition", "attachment; " +
+                  "filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_RESOURCE_FILENAME_NAME + "\"; " +
+                  "filename*=UTF-8''" + MockProvider.EXAMPLE_DEPLOYMENT_RESOURCE_FILENAME_NAME)
       .when().get(SINGLE_RESOURCE_DATA_URL);
 
     String responseContent = response.asString();
@@ -929,7 +1009,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
   public void testGetDeploymentResourceDataFilenameBackslash() {
     Resource resource = MockProvider.createMockDeploymentResourceFilenameBackslash();
 
-    List<Resource> resources = new ArrayList<Resource>();
+    List<Resource> resources = new ArrayList<>();
     resources.add(resource);
 
     InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
@@ -944,7 +1024,9 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
         .expect()
           .statusCode(Status.OK.getStatusCode())
           .contentType(ContentType.XML)
-          .header("Content-Disposition", "attachment; filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_RESOURCE_FILENAME_NAME + "\"")
+          .header("Content-Disposition", "attachment; " +
+                  "filename=\"" + MockProvider.EXAMPLE_DEPLOYMENT_RESOURCE_FILENAME_NAME + "\"; " +
+                  "filename*=UTF-8''" + MockProvider.EXAMPLE_DEPLOYMENT_RESOURCE_FILENAME_NAME)
       .when().get(SINGLE_RESOURCE_DATA_URL);
 
     String responseContent = response.asString();
@@ -1232,6 +1314,23 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
   }
 
   @Test
+  public void testCreateDeploymentWithActivationTime() throws Exception {
+
+    resourceNames.addAll( Arrays.asList("data", "more-data") );
+
+    given()
+        .multiPart("data", "unspecified", createMockDeploymentResourceByteData())
+        .multiPart("deployment-activation-time", "2030-11-11T11:11:11Z")
+        .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .post(CREATE_DEPLOYMENT_URL);
+
+    verify(mockDeploymentBuilder).activateProcessDefinitionsOn(DateTimeUtil.parseDate("2030-11-11T11:11:11Z"));
+
+  }
+
+  @Test
   public void testCreateDeploymentWithTenantId() throws Exception {
 
     resourceNames.addAll( Arrays.asList("data", "more-data") );
@@ -1275,17 +1374,17 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
       .post(CREATE_DEPLOYMENT_URL);
 
   }
-  
+
   @Test
   public void testCreateDeploymentWithNonExistentPart() throws Exception {
-    
+
     given()
     .multiPart("non-existent-body-part", MockProvider.EXAMPLE_DEPLOYMENT_ID)
     .expect()
     .statusCode(Status.BAD_REQUEST.getStatusCode())
     .when()
     .post(CREATE_DEPLOYMENT_URL);
-    
+
   }
 
   @Test
@@ -1327,7 +1426,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
       .body("message", is(message))
     .when()
       .post(CREATE_DEPLOYMENT_URL);
-    
+
     String content = response.asString();
 
     Map<String, ResourceReport> details = from(content).getMap("details");
@@ -1461,7 +1560,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
 
     verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, true, true, false);
   }
-  
+
   @Test
   public void testDeleteDeploymentSkipIoMappings() {
 
@@ -1476,7 +1575,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
 
     verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, true, false, true);
   }
-  
+
   @Test
   public void testDeleteDeploymentSkipIoMappingsFalse() {
 
@@ -1524,14 +1623,14 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
 
   @Test
   public void testRedeployDeployment() {
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
 
-    List<String> resourceIds = new ArrayList<String>();
+    List<String> resourceIds = new ArrayList<>();
     resourceIds.add("first-resource-id");
     resourceIds.add("second-resource-id");
     json.put("resourceIds", resourceIds);
 
-    List<String> resourceNames = new ArrayList<String>();
+    List<String> resourceNames = new ArrayList<>();
     resourceNames.add("first-resource-name");
     resourceNames.add("second-resource-name");
     json.put("resourceNames", resourceNames);
@@ -1609,9 +1708,9 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
 
   @Test
   public void testRedeployDeploymentResourceIds() {
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
 
-    List<String> resourceIds = new ArrayList<String>();
+    List<String> resourceIds = new ArrayList<>();
     resourceIds.add("first-resource-id");
     resourceIds.add("second-resource-id");
     json.put("resourceIds", resourceIds);
@@ -1640,9 +1739,9 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
 
   @Test
   public void testRedeployDeploymentResourceNames() {
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
 
-    List<String> resourceNames = new ArrayList<String>();
+    List<String> resourceNames = new ArrayList<>();
     resourceNames.add("first-resource-name");
     resourceNames.add("second-resource-name");
     json.put("resourceNames", resourceNames);
@@ -1671,7 +1770,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
 
   @Test
   public void testRedeployDeploymentSource() {
-    Map<String, String> json = new HashMap<String, String>();
+    Map<String, String> json = new HashMap<>();
     json.put("source", MockProvider.EXAMPLE_DEPLOYMENT_SOURCE);
 
     Response response = given()

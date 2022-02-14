@@ -1,0 +1,221 @@
+.cam-widget-search-multiline-pill() {
+  [cam-widget-search-pill] {
+    width: 100%;
+  }
+
+  .search-label,
+  .type-field,
+  .name-field,
+  .operator-field,
+  .value-field {
+    display: inline-block;
+    margin-top: 0;
+    margin-bottom: 0;
+    float: left;
+  }
+
+  .type-field,
+  .name-field,
+  .operator-field {
+    clear: both;
+  }
+
+  .operator-field {
+    clear: left;
+  }
+
+  .name-field {
+    width: 100%;
+    display: inline-block;
+  }
+
+  .search-label {
+    width: 100%;
+    position: relative;
+    padding-left: 1.4em;
+  }
+
+  .remove-search {
+    position: absolute;
+    top: 2px;
+    left: 0;
+  }
+}
+
+[cam-widget-search] {
+  @icon-size: 33px;
+
+  .main-field {
+    width: auto;
+    height: auto;
+    display: inline-block;
+    padding: 0;
+    border: none;
+    vertical-align: top;
+    margin: (@padding-base-vertical + 1) 0 (@padding-base-vertical - 2) 0;
+    margin-top: @padding-base-vertical - 1px;
+  }
+
+  .search-container {
+    position: relative;
+    display: block;
+    min-height: @icon-size;
+    padding: (@padding-base-vertical - 4px) @padding-base-horizontal (@padding-base-vertical - 4px) @padding-base-horizontal;
+    box-shadow: @input-box-shadow;
+    border-radius: @input-border-radius;
+
+    &.has-icon {
+      padding-left: @padding-base-horizontal + @icon-size;
+    }
+  }
+
+  .search-type {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: @icon-size;
+    height: @icon-size;
+    line-height: @icon-size;
+    text-align: center;
+    display: inline-block;
+    color: @input-color-placeholder;
+    background-color: @gray-lighter;
+  }
+
+  .main-field,
+  [cam-widget-search-pill] {
+    margin-top: @padding-base-vertical - 2px;
+    margin-right: @padding-base-horizontal;
+  }
+
+  form {
+    display: block;
+    height: auto;
+    overflow: visible;
+    position: relative;
+    background-color: @input-bg;
+    border: 1px solid @input-border;
+    border-radius: @input-border-radius;
+
+    .search-type {
+      border-radius: @input-border-radius;
+    }
+
+    .main-field {
+      background-color: transparent;
+      background-image: none;
+      box-shadow: none;
+      border-radius: @input-border-radius;
+    }
+
+    &.focused,
+    &:focus {
+      border-color: @input-border-focus;
+    }
+  }
+
+  &:hover .search-type {
+    color: @input-color;
+  }
+
+  &.multiline-pills {
+    .cam-widget-search-multiline-pill();
+  }
+
+  .search-field {
+    position: relative;
+  }
+
+  .stored-criteria {
+    .dropdown-toggle {
+      border: 1px solid transparent;
+      background: none;
+    }
+
+    .dropdown-menu {
+      min-width: 200px;
+      overflow-y: auto;
+    }
+
+    .input-group {
+      margin-left: 9px;
+      margin-right: 9px;
+    }
+  }
+
+  .stored-criteria-set {
+    > div {
+      display: table;
+      padding: 2px 9px 2px 4px;
+      margin-left: 2px;
+      border-left: 3px solid transparent;
+      word-wrap: break-word; // IE
+      word-break: break-all; // IE
+      word-break: break-word;
+      white-space: normal;
+
+      &:hover {
+        border-left-color: @link-hover-color;
+      }
+    }
+
+    a {
+      display: table-cell;
+
+      &.glyphicon-remove-sign {
+        padding-right: 9px;
+      }
+    }
+  }
+
+  .match-any {
+    padding: 4px 0;
+
+    button {
+      width: 36px;
+      margin-right: 3px;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+
+    [disabled="disabled"] {
+      opacity: 0.65;
+    }
+  }
+
+  [cam-share-link] {
+    padding-left: 7px;
+
+    .glyphicon {
+      color: #333;
+    }
+
+    [cam-widget-clipboard] {
+      vertical-align: text-bottom;
+      margin-bottom: -2px;
+    }
+  }
+
+  .total-results {
+    text-align: right;
+    color: #333;
+  }
+
+  .controls {
+    position: absolute;
+    bottom: -2px;
+    right: 0;
+  }
+}
+
+.ignore-case {
+  margin-top: 8px;
+
+  label {
+    font-weight: normal;
+  }
+}
+
+.tasks-list .ignore-case {
+  padding-bottom: 20px;
+}

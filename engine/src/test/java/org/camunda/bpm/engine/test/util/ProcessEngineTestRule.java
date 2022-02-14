@@ -16,11 +16,8 @@
  */
 package org.camunda.bpm.engine.test.util;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.Matchers.lessThanOrEqualTo;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
@@ -29,14 +26,17 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import junit.framework.AssertionFailedError;
-
+import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.authorization.Permission;
+import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CaseControlRuleImpl;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.el.FixedValue;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -57,6 +57,8 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
+
+import junit.framework.AssertionFailedError;
 
 public class ProcessEngineTestRule extends TestWatcher {
 
@@ -86,8 +88,7 @@ public class ProcessEngineTestRule extends TestWatcher {
       .processInstanceId(processInstanceId)
       .singleResult();
 
-    assertThat("Process instance with id " + processInstanceId + " is not finished",
-        processInstance, is(nullValue()));
+    assertThat(processInstance).describedAs("Process instance with id " + processInstanceId + " is not finished").isNull();
   }
 
   public void assertProcessNotEnded(final String processInstanceId) {
@@ -110,8 +111,7 @@ public class ProcessEngineTestRule extends TestWatcher {
       .caseInstanceId(caseInstanceId)
       .singleResult();
 
-    assertThat("Case instance with id " + caseInstanceId + " is not finished",
-        caseInstance, is(nullValue()));
+    assertThat(caseInstance).describedAs("Case instance with id " + caseInstanceId + " is not finished").isNull();
   }
 
   public DeploymentWithDefinitions deploy(BpmnModelInstance... bpmnModelInstances) {
@@ -276,7 +276,7 @@ public class ProcessEngineTestRule extends TestWatcher {
 
     if (jobs.isEmpty()) {
       if (expectedExecutions != Integer.MAX_VALUE) {
-        assertThat("executed less jobs than expected.", jobsExecuted, is(expectedExecutions));
+        assertThat(jobsExecuted).describedAs("executed less jobs than expected.").isEqualTo(expectedExecutions);
       }
       return;
     }
@@ -288,8 +288,7 @@ public class ProcessEngineTestRule extends TestWatcher {
       } catch (Exception e) {}
     }
 
-    assertThat("executed more jobs than expected.",
-        jobsExecuted, lessThanOrEqualTo(expectedExecutions));
+    assertThat(jobsExecuted).describedAs("executed more jobs than expected.").isLessThanOrEqualTo(expectedExecutions);
 
     if (recursive) {
       executeAvailableJobs(jobsExecuted, expectedExecutions, recursive);
@@ -369,29 +368,29 @@ public class ProcessEngineTestRule extends TestWatcher {
     CaseControlRuleImpl caseControlRule = new CaseControlRuleImpl(expression);
     return caseControlRule;
   }
-  
+
 
   public void deleteHistoryCleanupJobs() {
     HistoryService historyService = processEngine.getHistoryService();
     final List<Job> jobs = historyService.findHistoryCleanupJobs();
     for (final Job job : jobs) {
       final String jobId = job.getId();
-      
+
       processEngineRule
         .getProcessEngineConfiguration()
         .getCommandExecutorTxRequired()
         .execute((Command<Void>) commandContext -> {
           JobManager jobManager = commandContext.getJobManager();
-          
+
           JobEntity jobEntity = jobManager.findJobById(jobId);
-          
+
           jobEntity.delete();
           commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(job.getId());
           return null;
         });
     }
   }
-  
+
   public CaseInstance createCaseInstanceByKey(String caseDefinitionKey) {
     return createCaseInstanceByKey(caseDefinitionKey, null, null);
   }
@@ -410,6 +409,56 @@ public class ProcessEngineTestRule extends TestWatcher {
         .businessKey(businessKey)
         .setVariables(variables)
         .create();
+  }
+
+  public String getDatabaseType() {
+    return processEngineRule.getProcessEngineConfiguration()
+        .getDbSqlSessionFactory()
+        .getDatabaseType();
+  }
+
+  /**
+   * This methods is used to determine if the currently used database
+   * allows for OptimisticLockingExceptions to be ignored, or handled,
+   * without a transaction rollback and retry. Otherwise, it is false.
+   *
+   * Currently, the method only returns false when CockroachDB is used
+   * since this database implements its own OLE mechanism.
+   */
+  public boolean isOptimisticLockingExceptionSuppressible() {
+    return !DbSqlSessionFactory.CRDB.equals(getDatabaseType());
+  }
+
+  public void deleteAllAuthorizations() {
+    AuthorizationService authorizationService = processEngine.getAuthorizationService();
+
+    authorizationService.createAuthorizationQuery()
+      .list()
+      .stream()
+      .map(Authorization::getId)
+      .forEach(authorizationService::deleteAuthorization);
+  }
+
+
+  public void deleteAllStandaloneTasks() {
+    TaskService taskService = processEngine.getTaskService();
+
+    taskService.createTaskQuery()
+      .list()
+      .stream()
+      .filter(t -> t.getProcessInstanceId() == null && t.getCaseInstanceId() == null)
+      .forEach(t -> taskService.deleteTask(t.getId(), true));
+  }
+
+  public void createGrantAuthorization(String userId, Resource resource, String resourceId, Permission... permissions) {
+    AuthorizationService authorizationService = processEngine.getAuthorizationService();
+
+    Authorization processInstanceAuthorization = authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
+    processInstanceAuthorization.setResource(resource);
+    processInstanceAuthorization.setResourceId(resourceId);
+    processInstanceAuthorization.setPermissions(permissions);
+    processInstanceAuthorization.setUserId(userId);
+    authorizationService.saveAuthorization(processInstanceAuthorization);
   }
 
   protected static class InterruptTask extends TimerTask {

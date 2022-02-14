@@ -20,6 +20,7 @@ import java.util.Date;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.form.CamundaFormRef;
 
 
 
@@ -141,7 +142,7 @@ public interface Task {
   /**
    * Provides the form key for the task.
    *
-   * <p><strong>NOTE:</strong> If the task instance us obtained through a query, this property is only populated in case the
+   * <p><strong>NOTE:</strong> If the task instance is obtained through a query, this property is only populated in case the
    * {@link TaskQuery#initializeFormKeys()} method is called. If this method is called without a prior call to
    * {@link TaskQuery#initializeFormKeys()}, it will throw a {@link BadUserRequestException}.</p>
    *
@@ -149,6 +150,18 @@ public interface Task {
    * @throws BadUserRequestException in case the form key is not initialized.
    */
   String getFormKey();
+
+  /**
+   * Provides the form binding reference to the Camunda Form for the task.
+   *
+   * <p><strong>NOTE:</strong> If the task instance is obtained through a query, this property is only populated in case the
+   * {@link TaskQuery#initializeFormKeys()} method is called. If this method is called without a prior call to
+   * {@link TaskQuery#initializeFormKeys()}, it will throw a {@link BadUserRequestException}.</p>
+   *
+   * @return the reference key, binding type and version (if type is {@code version})
+   * @throws BadUserRequestException in case the form key is not initialized.
+   */
+  CamundaFormRef getCamundaFormRef();
 
   /**
    * Returns the task's tenant id or null in case this task does not belong to a tenant.

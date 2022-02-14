@@ -97,7 +97,7 @@ public class RestartProcessIntanceWithInitialVariablesTest {
         .processInstanceId(restartedProcessInstance.getId())
         .singleResult();
     assertNotNull(detail);
-    assertFalse(detail.isInitial());
+    assertTrue(detail.isInitial());
     assertEquals("initial1", detail.getVariableName());
     assertEquals("value1", detail.getTextValue());
   }
@@ -162,7 +162,7 @@ public class RestartProcessIntanceWithInitialVariablesTest {
 
     for (HistoricDetail historicDetail : details) {
       HistoricVariableUpdateEventEntity detail = (HistoricVariableUpdateEventEntity) historicDetail;
-      assertFalse(detail.isInitial());
+      assertTrue(detail.isInitial());
     }
   }
 
@@ -228,6 +228,6 @@ public class RestartProcessIntanceWithInitialVariablesTest {
         .processInstanceId(restartedProcessInstance.getId())
         .singleResult();
 
-    assertFalse(detail.isInitial());
+    assertTrue(detail.isInitial());
   }
 }

@@ -1,0 +1,217 @@
+<form name="genericForm"
+      class="form-horizontal">
+
+  <div class="form-group"
+       ng-if="showBusinessKey">
+    <label for="business-key-field"
+           translate="BUSINESS_KEY"
+           class="control-label col-xs-2">Business key</label>
+    <div class="col-xs-10">
+      <input type="text"
+            ng-readonly="readonly"
+            ng-model="businessKey"
+             id="business-key-field"
+             cam-business-key
+             class="form-control" />
+    </div>
+  </div>
+
+  <div class="form-group labels-left">
+    <div class="col-xs-2 row-action">
+      <a href
+         ng-click="addVariable()"
+         ng-disabled="options.disableAddVariableButton">
+        <span class="hidden-xs hidden-sm"
+              translate="ADD_VARIABLE">Add variable</span>
+        <span class="glyphicon glyphicon-plus-sign"></span>
+      </a>
+    </div>
+
+
+
+    <div class="col-xs-10"
+         ng-if="variables.length">
+      <div class="row">
+        <label class="control-label col-xs-4"
+               translate="NAME">Name</label>
+
+
+
+        <label class="control-label col-xs-4"
+               translate="TYPE">Type</label>
+
+
+
+        <label class="control-label col-xs-4"
+               translate="VALUE">Value</label>
+      </div>
+    </div>
+  </div>
+
+
+
+  <div ng-if="variables.length"
+       ng-repeat="(delta, variable) in variables"
+       class="form-group"
+       ng-form="repeatForm">
+
+    <div class="col-xs-2 row-action">
+      <a href
+         ng-click="removeVariable(delta)"
+         ng-if="!variable.fixedName">
+        <span class="hidden-sm hidden-xs"
+              translate="REMOVE">Remove</span>
+        <span class="glyphicon glyphicon-remove-sign"></span>
+      </a>
+    </div>
+
+
+
+    <div class="col-xs-10">
+      <div class="row">
+        <div class="col-xs-4">
+          <input required
+                 type="text"
+                 class="form-control"
+                 placeholder="{{ 'VARIABLE_NAME' | translate }}"
+                 ng-model="variable.name"
+                 name="name"
+                 cam-unique-value="{{ getVariableNames() }}"
+                 ng-readonly="variable.fixedName || variable.readonly" />
+          <span ng-if="repeatForm.name.$invalid && repeatForm.name.$dirty" class="has-error">
+            <span ng-if="repeatForm.name.$error.required"
+                  class="help-block">
+              {{ 'REQUIRED_FIELD' | translate }}
+            </span>
+            <span ng-if="repeatForm.name.$error.camUniqueValue"
+                  class="help-block">
+              {{ 'REQUIRE_UNIQUE_NAME' | translate }}
+            </span>
+          </span>
+        </div>
+
+
+
+        <div class="col-xs-4">
+          <select ng-disabled="!variable.name || variable.readonly"
+                  class="form-control"
+                  ng-model="variable.type">
+
+            <option disabled
+                    value=""
+                    translate="VARIABLE_TYPE">Type</option>
+
+            <option value="Boolean">Boolean</option>
+            <option value="Short">Short</option>
+            <option value="Integer">Integer</option>
+            <option value="Long">Long</option>
+            <option value="Double">Double</option>
+            <option value="String">String</option>
+            <option value="Date">Date</option>
+            <option value="Object">Object</option>
+            <option value="File">File</option>
+          </select>
+        </div>
+
+
+
+        <div class="col-xs-4"
+             ng-switch="variable.type">
+
+          <div ng-switch-when="Object">
+            <label class="control-label object-type">{{ "CAM_WIDGET_VARIABLE_DIALOG_LABEL_OBJECT_TYPE" | translate }}</label>
+            <input class="form-control"
+                   required
+                   ng-model="variable.valueInfo.objectTypeName"
+                   name="objectTypeName" />
+
+            <span ng-if="repeatForm.objectTypeName.$invalid && repeatForm.objectTypeName.$dirty" class="has-error">
+              <span ng-if="repeatForm.objectTypeName.$error.required"
+                    class="help-block">
+                {{ 'REQUIRED_FIELD' | translate }}
+              </span>
+            </span>
+
+            <label class="control-label">{{ "CAM_WIDGET_VARIABLE_DIALOG_LABEL_SERIALIZATION" | translate }}</label>
+            <input class="form-control"
+                   required
+                   ng-model="variable.valueInfo.serializationDataFormat"
+                   name="serializationDataFormat" />
+
+            <span ng-if="repeatForm.serializationDataFormat.$invalid && repeatForm.serializationDataFormat.$dirty" class="has-error">
+              <span ng-if="repeatForm.serializationDataFormat.$error.required"
+                    class="help-block">
+                {{ 'REQUIRED_FIELD' | translate }}
+              </span>
+            </span>
+
+            <label class="control-label">{{ "CAM_WIDGET_VARIABLE_DIALOG_LABEL_SERIALIZED_VALUE" | translate }}</label>
+            <textarea class="form-control"
+                   required
+                   ng-model="variable.value"
+                   name="value">
+            </textarea>
+          </div>
+
+          <input ng-switch-when="Boolean"
+                 class="form-control"
+                 type="checkbox"
+                 ng-model="variable.value"
+                 ng-checked="variable.value"
+                 cam-variable-name="{{ variable.name }}"
+                 cam-variable-type="{{ variable.type }}" />
+
+          <input ng-switch-when="File"
+                 ng-if="!variable.readonly"
+                 class="form-control"
+                 type="file"                 
+                 cam-variable-name="{{ variable.name }}"
+                 cam-variable-type="File"
+                 ng-model="variable.file" />
+
+          <a ng-switch-when="File"
+             ng-if="variable.readonly"
+             href="{{variable.downloadUrl}}"
+             class="form-control-static">
+                {{ 'DOWNLOAD' | translate }}
+          </a>
+
+          <input ng-switch-default
+                 class="form-control"
+                 type="{{ variableTypes[variable.type] }}"
+                 required
+                 ng-model="variable.value"
+                 ng-readonly="!variable.type"
+                 name="value"
+                 cam-variable-name="{{ variable.name }}"
+                 cam-variable-type="{{ variable.type }}"
+                 placeholder="{{ 'VARIABLE_VALUE' | translate }}" />
+
+          <span ng-if="repeatForm.value.$invalid && repeatForm.value.$dirty" class="has-error">
+            <span ng-if="repeatForm.value.$error.required"
+                  class="help-block">
+              {{ 'REQUIRED_FIELD' | translate }}
+            </span>
+            <span ng-if="repeatForm.value.$error.camVariableType"
+                  class="help-block">
+              Only a {{ variable.type }} value is allowed
+            </span>
+          </span>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="form-group"
+       ng-if="!options.hideLoadVariablesButton && !variablesLoaded">
+    <div class="col-xs-2 row-action">
+      <a href
+         ng-click="loadVariables()">
+        <span class="hidden-sm hidden-xs"
+              translate="LOAD_VARIABLES">Load Variables</span>
+        <span class="glyphicon glyphicon-download"></span>
+      </a>
+    </div>
+  </div>
+
+</form>

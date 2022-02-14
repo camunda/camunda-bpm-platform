@@ -16,10 +16,12 @@
  */
 package org.camunda.bpm.engine.experimental;
 
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
 import org.camunda.bpm.engine.cdi.annotation.ProcessVariable;
 
+@Dependent
 public class InjectProcessVariable {
 
   @Inject @ProcessVariable public Object testKeyString;

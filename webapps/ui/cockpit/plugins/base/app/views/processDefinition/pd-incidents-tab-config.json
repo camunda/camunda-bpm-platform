@@ -1,0 +1,26 @@
+{
+  "types": [
+    {
+      "id": {
+        "key": "id",
+        "value": "ID"
+      },
+      "default": true,
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    }
+  ],
+  "tooltips": {
+    "inputPlaceholder": "Add criteria",
+    "invalid": "This search query is not valid",
+    "deleteSearch": "Remove search",
+    "type": "Type",
+    "name": "Property",
+    "operator": "Operator",
+    "value": "Value"
+  }
+}

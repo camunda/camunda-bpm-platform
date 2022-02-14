@@ -1,0 +1,11 @@
+<ul>
+  <li ng-if="access.create">
+    <a href="#/user-create">{{ 'USERS_CREATE_NEW' | translate }}</a>
+  </li>
+  <li ng-if="access.list">
+    <a href="#/users">{{ 'USERS_LIST_USERS' | translate }}</a>
+  </li>
+  <li>
+    <a ng-href="#/users/{{ $root.authentication.name }}?tab=profile">{{ 'USERS_MY_PROFILE' | translate }}</a>
+  </li>
+</ul>

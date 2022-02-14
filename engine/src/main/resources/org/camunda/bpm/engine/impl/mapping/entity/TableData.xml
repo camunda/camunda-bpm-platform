@@ -27,10 +27,13 @@
   </select>
 
   <select id="selectTableData" parameterType="org.camunda.bpm.engine.impl.TablePageQueryImpl" resultType="map">
-    select * from ${tableName}
-    <if test="order != null">
-      order by ${order}
-    </if>
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    ${limitBefore}
+    select RES.*
+    ${limitBetween}
+    from ${tableName} RES
+    ${orderBy}
+    ${limitAfter}
   </select>
 
   <delete id="deleteTableData" parameterType="map" >

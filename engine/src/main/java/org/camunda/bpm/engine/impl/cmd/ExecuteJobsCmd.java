@@ -110,7 +110,11 @@ public class ExecuteJobsCmd implements Command<Void>, Serializable {
       job.execute(commandContext);
 
     } catch (Throwable t) {
-      jobFailureCollector.setFailedActivityId(Context.getCommandInvocationContext().getProcessDataContext().getLatestPropertyValue(ProcessDataContext.PROPERTY_ACTIVITY_ID));
+      String failedActivityId = Context.getCommandInvocationContext()
+          .getProcessDataContext()
+          .getLatestActivityId();
+
+      jobFailureCollector.setFailedActivityId(failedActivityId);
       throw t;
     } finally {
       if (jobExecutorContext != null) {

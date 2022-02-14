@@ -16,10 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 import java.util.Map;
@@ -52,7 +49,7 @@ public class ProcessInstantiationAtStartEventTest extends PluggableProcessEngine
 
     runtimeService.createProcessInstanceById(processDefinition.getId()).execute();
 
-    assertThat(runtimeService.createProcessInstanceQuery().count(), is(1L));
+    assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(1L);
   }
 
   @Test
@@ -60,7 +57,7 @@ public class ProcessInstantiationAtStartEventTest extends PluggableProcessEngine
 
     runtimeService.createProcessInstanceByKey(PROCESS_DEFINITION_KEY).execute();
 
-    assertThat(runtimeService.createProcessInstanceQuery().count(), is(1L));
+    assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(1L);
   }
 
   @Test
@@ -69,8 +66,8 @@ public class ProcessInstantiationAtStartEventTest extends PluggableProcessEngine
     runtimeService.createProcessInstanceByKey(PROCESS_DEFINITION_KEY).businessKey("businessKey").execute();
 
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
-    assertThat(processInstance, is(notNullValue()));
-    assertThat(processInstance.getBusinessKey(), is("businessKey"));
+    assertThat(processInstance).isNotNull();
+    assertThat(processInstance.getBusinessKey()).isEqualTo("businessKey");
   }
 
   @Test
@@ -79,8 +76,8 @@ public class ProcessInstantiationAtStartEventTest extends PluggableProcessEngine
     runtimeService.createProcessInstanceByKey(PROCESS_DEFINITION_KEY).caseInstanceId("caseInstanceId").execute();
 
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
-    assertThat(processInstance, is(notNullValue()));
-    assertThat(processInstance.getCaseInstanceId(), is("caseInstanceId"));
+    assertThat(processInstance).isNotNull();
+    assertThat(processInstance.getCaseInstanceId()).isEqualTo("caseInstanceId");
   }
 
   @Test
@@ -89,8 +86,8 @@ public class ProcessInstantiationAtStartEventTest extends PluggableProcessEngine
     ProcessInstance processInstance = runtimeService.createProcessInstanceByKey(PROCESS_DEFINITION_KEY).setVariable("var", "value").execute();
 
     Object variable = runtimeService.getVariable(processInstance.getId(), "var");
-    assertThat(variable, is(notNullValue()));
-    assertThat(variable, is((Object) "value"));
+    assertThat(variable).isNotNull();
+    assertThat(variable).isEqualTo("value");
   }
 
   @Test
@@ -99,7 +96,7 @@ public class ProcessInstantiationAtStartEventTest extends PluggableProcessEngine
 
     ProcessInstance processInstance = runtimeService.createProcessInstanceByKey(PROCESS_DEFINITION_KEY).setVariables(variables).execute();
 
-    assertThat(runtimeService.getVariables(processInstance.getId()), is(variables));
+    assertThat(runtimeService.getVariables(processInstance.getId())).isEqualTo(variables);
   }
 
   @Test
@@ -107,7 +104,7 @@ public class ProcessInstantiationAtStartEventTest extends PluggableProcessEngine
 
     runtimeService.createProcessInstanceByKey(PROCESS_DEFINITION_KEY).execute(false, false);
 
-    assertThat(runtimeService.createProcessInstanceQuery().count(), is(1L));
+    assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(1L);
   }
 
   @Test
@@ -117,7 +114,7 @@ public class ProcessInstantiationAtStartEventTest extends PluggableProcessEngine
 
       fail("expected exception");
     } catch (BadUserRequestException e) {
-      assertThat(e.getMessage(), containsString("Cannot skip"));
+      assertThat(e.getMessage()).contains("Cannot skip");
     }
   }
 
@@ -128,7 +125,7 @@ public class ProcessInstantiationAtStartEventTest extends PluggableProcessEngine
 
       fail("expected exception");
     } catch (BadUserRequestException e) {
-      assertThat(e.getMessage(), containsString("Cannot skip"));
+      assertThat(e.getMessage()).contains("Cannot skip");
     }
   }
 

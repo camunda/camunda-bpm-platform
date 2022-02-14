@@ -16,10 +16,8 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy.tenantcheck;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.InputStream;
 import java.util.Arrays;
@@ -36,7 +34,6 @@ import org.camunda.bpm.model.dmn.DmnModelInstance;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -54,9 +51,6 @@ public class MultiTenancyDecisionDefinitionCmdsTenantCheckTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown= ExpectedException.none();
 
   protected RepositoryService repositoryService;
   protected IdentityService identityService;
@@ -80,11 +74,10 @@ public class MultiTenancyDecisionDefinitionCmdsTenantCheckTest {
   public void failToGetDecisionModelNoAuthenticatedTenants() {
     identityService.setAuthentication("user", null, null);
 
-    // declare expected exception
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot get the decision definition");
-
-    repositoryService.getDecisionModel(decisionDefinitionId);
+    // when/then
+    assertThatThrownBy(() -> repositoryService.getDecisionModel(decisionDefinitionId))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot get the decision definition");
   }
 
   @Test
@@ -93,7 +86,7 @@ public class MultiTenancyDecisionDefinitionCmdsTenantCheckTest {
 
     InputStream inputStream = repositoryService.getDecisionModel(decisionDefinitionId);
 
-    assertThat(inputStream, notNullValue());
+    assertThat(inputStream).isNotNull();
   }
 
   @Test
@@ -103,18 +96,18 @@ public class MultiTenancyDecisionDefinitionCmdsTenantCheckTest {
 
     InputStream inputStream = repositoryService.getDecisionModel(decisionDefinitionId);
 
-    assertThat(inputStream, notNullValue());
+    assertThat(inputStream).isNotNull();
   }
 
   @Test
   public void failToGetDecisionDiagramNoAuthenticatedTenants() {
     identityService.setAuthentication("user", null, null);
 
-    // declare expected exception
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot get the decision definition");
+    // when/then
+    assertThatThrownBy(() -> repositoryService.getDecisionDiagram(decisionDefinitionId))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot get the decision definition");
 
-    repositoryService.getDecisionDiagram(decisionDefinitionId);
   }
 
   @Test
@@ -124,8 +117,8 @@ public class MultiTenancyDecisionDefinitionCmdsTenantCheckTest {
     InputStream inputStream = repositoryService.getDecisionDiagram(decisionDefinitionId);
 
     // inputStream is always null because there is no decision diagram at the moment
-    // what should be deployed as a diagram resource for DMN? 
-    assertThat(inputStream, nullValue());
+    // what should be deployed as a diagram resource for DMN?
+    assertThat(inputStream).isNull();
   }
 
   @Test
@@ -136,19 +129,18 @@ public class MultiTenancyDecisionDefinitionCmdsTenantCheckTest {
     InputStream inputStream = repositoryService.getDecisionDiagram(decisionDefinitionId);
 
     // inputStream is always null because there is no decision diagram at the moment
-    // what should be deployed as a diagram resource for DMN? 
-    assertThat(inputStream, nullValue());
+    // what should be deployed as a diagram resource for DMN?
+    assertThat(inputStream).isNull();
   }
 
   @Test
   public void failToGetDecisionDefinitionNoAuthenticatedTenants() {
     identityService.setAuthentication("user", null, null);
 
-    // declare expected exception
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot get the decision definition");
-
-    repositoryService.getDecisionDefinition(decisionDefinitionId);
+    // when/then
+    assertThatThrownBy(() -> repositoryService.getDecisionDefinition(decisionDefinitionId))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot get the decision definition");
   }
 
   @Test
@@ -157,7 +149,7 @@ public class MultiTenancyDecisionDefinitionCmdsTenantCheckTest {
 
     DecisionDefinition definition = repositoryService.getDecisionDefinition(decisionDefinitionId);
 
-    assertThat(definition.getTenantId(), is(TENANT_ONE));
+    assertThat(definition.getTenantId()).isEqualTo(TENANT_ONE);
   }
 
   @Test
@@ -167,18 +159,17 @@ public class MultiTenancyDecisionDefinitionCmdsTenantCheckTest {
 
     DecisionDefinition definition = repositoryService.getDecisionDefinition(decisionDefinitionId);
 
-    assertThat(definition.getTenantId(), is(TENANT_ONE));
+    assertThat(definition.getTenantId()).isEqualTo(TENANT_ONE);
   }
 
   @Test
   public void failToGetDmnModelInstanceNoAuthenticatedTenants() {
     identityService.setAuthentication("user", null, null);
 
-    // declare expected exception
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot get the decision definition");
-
-    repositoryService.getDmnModelInstance(decisionDefinitionId);
+    // when/then
+    assertThatThrownBy(() -> repositoryService.getDmnModelInstance(decisionDefinitionId))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot get the decision definition");
   }
 
   @Test
@@ -189,8 +180,8 @@ public class MultiTenancyDecisionDefinitionCmdsTenantCheckTest {
 
     DecisionDefinition definition = repositoryService.getDecisionDefinition(decisionDefinitionId);
 
-    assertThat(definition.getTenantId(), is(TENANT_ONE));
-    assertThat(definition.getHistoryTimeToLive(), is(6));
+    assertThat(definition.getTenantId()).isEqualTo(TENANT_ONE);
+    assertThat(definition.getHistoryTimeToLive()).isEqualTo(6);
   }
 
   @Test
@@ -202,19 +193,18 @@ public class MultiTenancyDecisionDefinitionCmdsTenantCheckTest {
 
     DecisionDefinition definition = repositoryService.getDecisionDefinition(decisionDefinitionId);
 
-    assertThat(definition.getTenantId(), is(TENANT_ONE));
-    assertThat(definition.getHistoryTimeToLive(), is(6));
+    assertThat(definition.getTenantId()).isEqualTo(TENANT_ONE);
+    assertThat(definition.getHistoryTimeToLive()).isEqualTo(6);
   }
 
   @Test
   public void updateHistoryTimeToLiveNoAuthenticatedTenants() {
     identityService.setAuthentication("user", null, null);
 
-    // declare expected exception
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the decision definition");
-
-    repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinitionId, 6);
+    // when/then
+    assertThatThrownBy(() -> repositoryService.updateDecisionDefinitionHistoryTimeToLive(decisionDefinitionId, 6))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot update the decision definition");
   }
 
   @Test
@@ -223,7 +213,7 @@ public class MultiTenancyDecisionDefinitionCmdsTenantCheckTest {
 
     DmnModelInstance modelInstance = repositoryService.getDmnModelInstance(decisionDefinitionId);
 
-    assertThat(modelInstance, notNullValue());
+    assertThat(modelInstance).isNotNull();
   }
 
   @Test
@@ -233,7 +223,7 @@ public class MultiTenancyDecisionDefinitionCmdsTenantCheckTest {
 
     DmnModelInstance modelInstance = repositoryService.getDmnModelInstance(decisionDefinitionId);
 
-    assertThat(modelInstance, notNullValue());
+    assertThat(modelInstance).isNotNull();
   }
 
 }

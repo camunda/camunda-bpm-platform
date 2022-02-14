@@ -16,13 +16,19 @@
  */
 package org.camunda.bpm.engine.impl.util;
 
+import static org.camunda.bpm.engine.impl.ProcessEngineLogger.UTIL_LOGGER;
+
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.model.BaseCallableElement;
+import org.camunda.bpm.engine.impl.el.StartProcessVariableScope;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 
 /**
  * @author Roman Smirnov
@@ -36,13 +42,45 @@ public class CallableElementUtil {
         .getDeploymentCache();
   }
 
-  public static ProcessDefinitionImpl getProcessDefinitionToCall(VariableScope execution, BaseCallableElement callableElement) {
+  public static ProcessDefinitionImpl getProcessDefinitionToCall(VariableScope execution,
+      String defaultTenantId, BaseCallableElement callableElement) {
     String processDefinitionKey = callableElement.getDefinitionKey(execution);
-    String tenantId = callableElement.getDefinitionTenantId(execution);
+    String tenantId = callableElement.getDefinitionTenantId(execution, defaultTenantId);
+
+    return getCalledProcessDefinition(execution, callableElement, processDefinitionKey, tenantId);
+  }
+
+  public static ProcessDefinition getStaticallyBoundProcessDefinition(
+      String callingProcessDefinitionId,
+      String activityId,
+      BaseCallableElement callableElement,
+      String tenantId) {
+    if(callableElement.hasDynamicReferences()){
+      return null;
+    }
+
+    VariableScope emptyVariableScope = StartProcessVariableScope.getSharedInstance();
+
+    String targetTenantId = callableElement.getDefinitionTenantId(emptyVariableScope, tenantId);
+
+    try {
+      String processDefinitionKey = callableElement.getDefinitionKey(emptyVariableScope);
+      return getCalledProcessDefinition(emptyVariableScope, callableElement, processDefinitionKey, targetTenantId);
+    } catch (ProcessEngineException e) {
+      UTIL_LOGGER.debugCouldNotResolveCallableElement(callingProcessDefinitionId, activityId, e);
+      return null;
+    }
+  }
+
+  private static ProcessDefinitionEntity getCalledProcessDefinition(
+    VariableScope execution,
+    BaseCallableElement callableElement,
+    String processDefinitionKey,
+    String tenantId) {
 
     DeploymentCache deploymentCache = getDeploymentCache();
 
-    ProcessDefinitionImpl processDefinition = null;
+    ProcessDefinitionEntity processDefinition = null;
 
     if (callableElement.isLatestBinding()) {
       processDefinition = deploymentCache.findDeployedLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
@@ -64,9 +102,9 @@ public class CallableElementUtil {
     return processDefinition;
   }
 
-  public static CmmnCaseDefinition getCaseDefinitionToCall(VariableScope execution, BaseCallableElement callableElement) {
+  public static CmmnCaseDefinition getCaseDefinitionToCall(VariableScope execution, String defaultTenantId, BaseCallableElement callableElement) {
     String caseDefinitionKey = callableElement.getDefinitionKey(execution);
-    String tenantId = callableElement.getDefinitionTenantId(execution);
+    String tenantId = callableElement.getDefinitionTenantId(execution, defaultTenantId);
 
     DeploymentCache deploymentCache = getDeploymentCache();
 
@@ -86,9 +124,9 @@ public class CallableElementUtil {
     return caseDefinition;
   }
 
-  public static DecisionDefinition getDecisionDefinitionToCall(VariableScope execution, BaseCallableElement callableElement) {
+  public static DecisionDefinition getDecisionDefinitionToCall(VariableScope execution, String defaultTenantId, BaseCallableElement callableElement) {
     String decisionDefinitionKey = callableElement.getDefinitionKey(execution);
-    String tenantId = callableElement.getDefinitionTenantId(execution);
+    String tenantId = callableElement.getDefinitionTenantId(execution, defaultTenantId);
 
     DeploymentCache deploymentCache = getDeploymentCache();
 

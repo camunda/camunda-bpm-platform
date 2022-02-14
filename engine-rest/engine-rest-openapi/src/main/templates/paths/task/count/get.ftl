@@ -1,8 +1,10 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
       id = "getTasksCount"
       tag = "Task"
+      summary = "Get List Count"
       desc = "Retrieves the number of tasks that fulfill a provided filter. Corresponds to the size
               of the result set when using the [Get Tasks](${docsUrl}/reference/rest/task/) method.
 
@@ -42,3 +44,4 @@
 
   }
 }
+</#macro>

@@ -12,6 +12,12 @@ To run the tests just execute the following command:
 mvn clean test -Plarge-data-tests
 ```
 
+## Running tests with the Maven Wrapper
+
+With `mvnw`, from the root of the project,
+run: `./mvnw clean test -f qa/large-data-tests/pom.xml -Plarge-data-tests,${database-id}`
+where `${database-id}` is for example `h2`.
+
 ## Parameters to adjust
 
 You can select which database to test against by combining the respective database profile

@@ -1,7 +1,9 @@
+<#macro endpoint_macro docsUrl="">
 {
   <@lib.endpointInfo
       id = "deleteProcessInstancesAsyncOperation"
       tag = "Process Instance"
+      summary = "Delete Async (POST)"
       desc = "Deletes multiple process instances asynchronously (batch)." />
 
   <@lib.requestBody
@@ -53,3 +55,4 @@
 
   }
 }
+</#macro>

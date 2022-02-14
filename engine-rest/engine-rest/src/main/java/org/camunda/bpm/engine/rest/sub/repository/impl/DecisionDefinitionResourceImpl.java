@@ -46,6 +46,7 @@ import org.camunda.bpm.engine.rest.dto.repository.DecisionDefinitionDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.repository.DecisionDefinitionResource;
+import org.camunda.bpm.engine.rest.util.URLEncodingUtil;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.TypedValue;
@@ -123,7 +124,7 @@ public class DecisionDefinitionResourceImpl implements DecisionDefinitionResourc
       return Response.noContent().build();
     } else {
       String fileName = definition.getDiagramResourceName();
-      return Response.ok(decisionDiagram).header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+      return Response.ok(decisionDiagram).header("Content-Disposition",URLEncodingUtil.buildAttachmentValue(fileName))
           .type(ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix(fileName)).build();
     }
   }

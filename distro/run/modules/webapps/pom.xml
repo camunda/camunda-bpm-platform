@@ -5,12 +5,12 @@
   <parent>
     <groupId>org.camunda.bpm.run</groupId>
     <artifactId>camunda-bpm-run-modules</artifactId>
-    <version>7.14.0-SNAPSHOT</version>
+    <version>7.17.0-SNAPSHOT</version>
     <relativePath>..</relativePath>
   </parent>
 
   <artifactId>camunda-bpm-run-modules-webapps</artifactId>
-  <name>camunda BPM - Run - Module Webapps</name>
+  <name>Camunda Platform - Run - Module Webapps</name>
   <packaging>pom</packaging>
   
   <properties>
@@ -25,6 +25,12 @@
     <dependency>
       <groupId>org.camunda.bpm.springboot</groupId>
       <artifactId>camunda-bpm-spring-boot-starter-webapp</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-webmvc</artifactId>
+      <scope>provided</scope>
     </dependency>
 
   </dependencies>

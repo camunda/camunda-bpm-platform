@@ -16,10 +16,9 @@
  */
 package org.camunda.bpm.engine.test.cmmn.stage;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
@@ -360,7 +359,7 @@ public class AutoCompleteTest extends CmmnTest {
       .singleResult();
 
     manualStart(humanTask2.getId());
- 
+
     // when
     complete(humanTask1Id);
 
@@ -417,7 +416,7 @@ public class AutoCompleteTest extends CmmnTest {
       .list();
 
     // then
-    assertThat(historicCaseActivityInstances.size(), is(2));
+    assertThat(historicCaseActivityInstances).hasSize(2);
   }
 
 }

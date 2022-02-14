@@ -43,7 +43,11 @@ import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.operation.CoreAtomicOperation;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
 import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
-import org.camunda.bpm.engine.impl.core.variable.scope.*;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableCollectionProvider;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceFactory;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceLifecycleListener;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableListenerInvocationListener;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore;
 import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore.VariablesProvider;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
@@ -51,14 +55,16 @@ import org.camunda.bpm.engine.impl.db.HasDbReferences;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
+import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
+import org.camunda.bpm.engine.impl.incident.IncidentContext;
+import org.camunda.bpm.engine.impl.incident.IncidentHandling;
 import org.camunda.bpm.engine.impl.interceptor.AtomicOperationInvocation;
 import org.camunda.bpm.engine.impl.jobexecutor.MessageJobDeclaration;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
-import org.camunda.bpm.engine.impl.persistence.entity.util.FormPropertyStartContext;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
@@ -67,8 +73,6 @@ import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.ActivityInstanceState;
 import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperation;
-import org.camunda.bpm.engine.impl.pvm.runtime.ExecutionStartContext;
-import org.camunda.bpm.engine.impl.pvm.runtime.ProcessInstanceStartContext;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
 import org.camunda.bpm.engine.impl.tree.ExecutionTopDownWalker;
@@ -242,17 +246,12 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   public ExecutionEntity() {
   }
 
-  @Override
-  public ExecutionEntity createExecution() {
-    return createExecution(false);
-  }
-
   /**
    * creates a new execution. properties processDefinition, processInstance and
    * activity will be initialized.
    */
   @Override
-  public ExecutionEntity createExecution(boolean initializeExecutionStartContext) {
+  public ExecutionEntity createExecution() {
     // create the new child execution
     ExecutionEntity createdExecution = createNewExecution();
 
@@ -277,11 +276,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     }
 
     // with the fix of CAM-9249 we presume that the parent and the child have the same startContext
-    if (initializeExecutionStartContext) {
-      createdExecution.setStartContext(new ExecutionStartContext());
-    } else if (startContext != null) {
-      createdExecution.setStartContext(startContext);
-    }
+    createdExecution.setStartContext(scopeInstantiationContext);
 
     createdExecution.skipCustomListeners = this.skipCustomListeners;
     createdExecution.skipIoMapping = this.skipIoMapping;
@@ -441,7 +436,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   }
 
   @Override
-  public void start(Map<String, Object> variables) {
+  public void start(Map<String, Object> variables, VariableMap formProperties) {
     if (getSuperExecution() == null) {
       setRootProcessInstanceId(processInstanceId);
     } else {
@@ -450,23 +445,27 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     }
 
     // determine tenant Id if null
-    provideTenantId(variables);
-    super.start(variables);
+    provideTenantId(variables, formProperties);
+    super.start(variables, formProperties);
   }
 
   @Override
   public void startWithoutExecuting(Map<String, Object> variables) {
     setRootProcessInstanceId(getProcessInstanceId());
-    provideTenantId(variables);
+    provideTenantId(variables, null);
     super.startWithoutExecuting(variables);
   }
 
-  protected void provideTenantId(Map<String, Object> variables) {
+  protected void provideTenantId(Map<String, Object> variables, VariableMap properties) {
     if (tenantId == null) {
       TenantIdProvider tenantIdProvider = Context.getProcessEngineConfiguration().getTenantIdProvider();
 
       if (tenantIdProvider != null) {
         VariableMap variableMap = Variables.fromMap(variables);
+        if(properties != null && !properties.isEmpty()) {
+          variableMap.putAll(properties);
+        }
+
         ProcessDefinition processDefinition = getProcessDefinition();
 
         TenantIdProviderProcessInstanceContext ctx;
@@ -481,27 +480,6 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
         tenantId = tenantIdProvider.provideTenantIdForProcessInstance(ctx);
       }
     }
-  }
-
-  public void startWithFormProperties(VariableMap properties) {
-    setRootProcessInstanceId(getProcessInstanceId());
-    provideTenantId(properties);
-    if (isProcessInstanceExecution()) {
-      ActivityImpl initial = processDefinition.getInitial();
-      ProcessInstanceStartContext processInstanceStartContext = getProcessInstanceStartContext();
-      if (processInstanceStartContext != null) {
-        initial = processInstanceStartContext.getInitial();
-      }
-      FormPropertyStartContext formPropertyStartContext = new FormPropertyStartContext(initial);
-      formPropertyStartContext.setFormProperties(properties);
-      startContext = formPropertyStartContext;
-
-      initialize();
-      initializeTimerDeclarations();
-      fireHistoricProcessStartEvent();
-    }
-
-    performOperation(PvmAtomicOperation.PROCESS_START);
   }
 
   @Override
@@ -634,7 +612,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   @SuppressWarnings("deprecation")
   public void performOperation(AtomicOperation executionOperation) {
-    boolean async = executionOperation.isAsync(this);
+    boolean async = !isIgnoreAsync() && executionOperation.isAsync(this);
 
     if (!async && requiresUnsuspendedExecution(executionOperation)) {
       ensureNotSuspended();
@@ -811,30 +789,17 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   protected void ensureProcessInstanceInitialized() {
     if ((processInstance == null) && (processInstanceId != null)) {
 
-      if (isExecutionTreePrefetchEnabled()) {
-        ensureExecutionTreeInitialized();
-
+      if (id.equals(processInstanceId)) {
+        processInstance = this;
       } else {
-        processInstance = Context.getCommandContext().getExecutionManager().findExecutionById(processInstanceId);
+        if (isExecutionTreePrefetchEnabled()) {
+          ensureExecutionTreeInitialized();
+
+        } else {
+          processInstance = Context.getCommandContext().getExecutionManager().findExecutionById(processInstanceId);
+        }
       }
-
     }
-  }
-
-  /**
-   * returns true if a process instance is in the starting phase. During that phase,
-   * all variables that are set are considered as initial variables
-   * (see {@link HistoricVariableUpdateEventEntity#isInitial}).
-   */
-  public boolean isProcessInstanceStarting() {
-    // the process instance can only be starting if it is currently in main-memory already
-    // we never have to access the database
-
-    return
-        // case 1: processInstance reference is set
-        (processInstance != null && processInstance.getExecutionStartContext() != null) ||
-        // case 2: processInstance reference is not set, but "this" execution is the process instance
-        (id.equals(processInstanceId) && getExecutionStartContext() != null);
   }
 
   @Override
@@ -848,6 +813,12 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   @Override
   public boolean isProcessInstanceExecution() {
     return parentId == null;
+  }
+
+  public boolean isProcessInstanceStarting() {
+    // the process instance can only be starting if it is currently in main-memory already
+    // we never have to access the database
+    return processInstance != null && processInstance.isStarting;
   }
 
   // activity /////////////////////////////////////////////////////////////////
@@ -1099,8 +1070,15 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
       if (isReplacedByParent()) {
         incident.setExecution(getReplacedBy());
       } else {
-        incident.delete();
+        IncidentContext incidentContext = createIncidentContext(incident.getConfiguration());
+        IncidentHandling.removeIncidents(incident.getIncidentType(), incidentContext, false);
       }
+    }
+
+    for (IncidentEntity incident : getIncidents()) {
+      // if the handler doesn't take care of it,
+      // make sure the incident is deleted nevertheless
+      incident.delete();
     }
   }
 
@@ -1821,6 +1799,10 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   public void setProcessInstanceId(String processInstanceId) {
     this.processInstanceId = processInstanceId;
+
+    if (id.equals(processInstanceId)) {
+      this.processInstance = this;
+    }
   }
 
   @Override
@@ -1895,19 +1877,6 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   }
 
   @Override
-  public ProcessInstanceStartContext getProcessInstanceStartContext() {
-    if (isProcessInstanceExecution()) {
-      if (startContext == null) {
-
-        ActivityImpl activity = getActivity();
-        startContext = new ProcessInstanceStartContext(activity);
-
-      }
-    }
-    return super.getProcessInstanceStartContext();
-  }
-
-  @Override
   public String getCurrentActivityId() {
     return activityId;
   }
@@ -1959,5 +1928,9 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   @Override
   public ProcessEngine getProcessEngine() {
     return Context.getProcessEngineConfiguration().getProcessEngine();
+  }
+
+  public String getProcessDefinitionTenantId() {
+    return getProcessDefinition().getTenantId();
   }
 }

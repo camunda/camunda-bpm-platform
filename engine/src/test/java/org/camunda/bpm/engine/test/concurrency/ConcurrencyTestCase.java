@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.concurrency;
 
+import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -46,6 +47,7 @@ public abstract class ConcurrencyTestCase extends ConcurrencyTestHelper {
   protected TaskService taskService;
   protected HistoryService historyService;
   protected ManagementService managementService;
+  protected ExternalTaskService externalTaskService;
 
   @Before
   public void init() {
@@ -57,6 +59,7 @@ public abstract class ConcurrencyTestCase extends ConcurrencyTestHelper {
     historyService = engineRule.getHistoryService();
     historyService = engineRule.getHistoryService();
     managementService = engineRule.getManagementService();
+    externalTaskService = engineRule.getExternalTaskService();
     super.init();
   }
 

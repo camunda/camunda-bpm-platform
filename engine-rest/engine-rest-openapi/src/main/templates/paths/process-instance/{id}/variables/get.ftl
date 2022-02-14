@@ -1,7 +1,9 @@
+<#macro endpoint_macro docsUrl="">
 {
   <@lib.endpointInfo
       id = "getProcessInstanceVariables"
       tag = "Process Instance"
+      summary = "Get Process Variables"
       desc = "Retrieves all variables of a given process instance by id." />
 
   "parameters": [
@@ -14,7 +16,7 @@
         desc = "The id of the process instance to retrieve the variables from."/>
 
     <@lib.parameter
-        name = "deserializeValue"
+        name = "deserializeValues"
         location = "query"
         type = "boolean"
         defaultValue = "true"
@@ -79,3 +81,4 @@
         desc = "Process instance with given id does not exist."/>
   }
 }
+</#macro>

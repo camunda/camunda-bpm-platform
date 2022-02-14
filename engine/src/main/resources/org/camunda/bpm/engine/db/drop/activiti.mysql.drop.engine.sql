@@ -21,9 +21,11 @@ drop index ACT_IDX_EXEC_ROOT_PI on ACT_RU_EXECUTION;
 drop index ACT_IDX_EXEC_BUSKEY on ACT_RU_EXECUTION;
 drop index ACT_IDX_TASK_CREATE on ACT_RU_TASK;
 drop index ACT_IDX_TASK_ASSIGNEE on ACT_RU_TASK;
+drop index ACT_IDX_TASK_OWNER on ACT_RU_TASK;
 drop index ACT_IDX_IDENT_LNK_USER on ACT_RU_IDENTITYLINK;
 drop index ACT_IDX_IDENT_LNK_GROUP on ACT_RU_IDENTITYLINK;
 drop index ACT_IDX_VARIABLE_TASK_ID on ACT_RU_VARIABLE;
+drop index ACT_IDX_VARIABLE_TASK_NAME_TYPE on ACT_RU_VARIABLE;
 drop index ACT_IDX_INC_CONFIGURATION on ACT_RU_INCIDENT;
 drop index ACT_IDX_JOB_PROCINST on ACT_RU_JOB;
 drop index ACT_IDX_AUTH_GROUP_ID on ACT_RU_AUTHORIZATION;
@@ -36,6 +38,9 @@ DROP INDEX ACT_IDX_METER_LOG_REPORT ON ACT_RU_METER_LOG;
 -- old metric timestamp column
 DROP INDEX ACT_IDX_METER_LOG_TIME ON ACT_RU_METER_LOG;
 DROP INDEX ACT_IDX_METER_LOG ON ACT_RU_METER_LOG;
+
+-- task metric timestamp column
+drop index ACT_IDX_TASK_METER_LOG_TIME on ACT_RU_TASK_METER_LOG;
 
 drop index ACT_IDX_EXT_TASK_TOPIC on ACT_RU_EXT_TASK;
 
@@ -119,6 +124,9 @@ alter table ACT_RU_BATCH
 alter table ACT_RU_EXT_TASK
     drop FOREIGN KEY ACT_FK_EXT_TASK_ERROR_DETAILS;
 
+alter table ACT_RU_VARIABLE
+    drop FOREIGN KEY ACT_FK_VAR_BATCH;
+
 drop index ACT_IDX_ATHRZ_PROCEDEF on ACT_RU_IDENTITYLINK;
 drop index ACT_IDX_EVENT_SUBSCR_CONFIG_ on ACT_RU_EVENT_SUBSCR;
 
@@ -163,6 +171,8 @@ drop index ACT_IDX_JOB_HANDLER on ACT_RU_JOB;
 drop index ACT_IDX_AUTH_ROOT_PI on ACT_RU_AUTHORIZATION;
 drop index ACT_IDX_AUTH_RM_TIME on ACT_RU_AUTHORIZATION;
 
+drop index ACT_IDX_BATCH_ID on ACT_RU_VARIABLE;
+
 drop table if exists ACT_GE_PROPERTY;
 drop table if exists ACT_RU_VARIABLE;
 drop table if exists ACT_GE_BYTEARRAY;
@@ -170,6 +180,7 @@ drop table if exists ACT_RE_DEPLOYMENT;
 drop table if exists ACT_RU_IDENTITYLINK;
 drop table if exists ACT_RU_TASK;
 drop table if exists ACT_RE_PROCDEF;
+drop table if exists ACT_RE_CAMFORMDEF;
 drop table if exists ACT_RU_EXECUTION;
 drop table if exists ACT_RU_JOB;
 drop table if exists ACT_RU_JOBDEF;
@@ -178,6 +189,7 @@ drop table if exists ACT_RU_INCIDENT;
 drop table if exists ACT_RU_AUTHORIZATION;
 drop table if exists ACT_RU_FILTER;
 drop table if exists ACT_RU_METER_LOG;
+drop table if exists ACT_RU_TASK_METER_LOG;
 drop table if exists ACT_RU_EXT_TASK;
 drop table if exists ACT_RU_BATCH;
 drop table if exists ACT_GE_SCHEMA_LOG;

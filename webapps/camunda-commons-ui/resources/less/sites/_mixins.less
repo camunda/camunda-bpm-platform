@@ -1,0 +1,37 @@
+@import "./../shared/_mixins.less";
+
+.link(@color, @hover-color) {
+  a {
+    color: @color;
+
+    &:hover,
+    &:focus {
+      text-decoration: @link-hover-decoration;
+      outline: none;
+      color: @hover-color;
+    }
+  }
+}
+
+.content-link(@bg: @body-bg) {
+  text-decoration: none;
+  box-shadow:
+    0 -2px 0 0 @bg inset,
+    0 -3px 0 0 currentColor inset;
+  text-shadow:
+    -3px 1px 0 @bg,
+    3px 1px 0 @bg,
+    -2px 1px 0 @bg,
+    2px 1px 0 @bg,
+    -1px 1px 0 @bg,
+    1px 1px 0 @bg;
+}
+
+.link-no-decoration() {
+  a {
+    &:hover,
+    &:focus {
+      text-decoration: none;
+    }
+  }
+}

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0823et8" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.0.0-alpha.3">
+  <bpmn:process id="externalTaskProcess" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_03j7lb4</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_03j7lb4" sourceRef="StartEvent_1" targetRef="externalTask" />
+    <bpmn:serviceTask id="externalTask" name="externalTask" camunda:type="external" camunda:topic="externalTaskTopic">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:outputParameter name="foo">${bar}</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_03j7lb4</bpmn:incoming>
+      <bpmn:outgoing>Flow_17qoz5a</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="Event_0uf0trb">
+      <bpmn:incoming>Flow_17qoz5a</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_17qoz5a" sourceRef="externalTask" targetRef="Event_0uf0trb" />
+    <bpmn:boundaryEvent id="Event_0yajabf" attachedToRef="externalTask">
+      <bpmn:outgoing>Flow_0ovailf</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_0ko9aa8" errorRef="Error_0ck3ony" />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_0ovailf" sourceRef="Event_0yajabf" targetRef="Activity_11zrcsp" />
+    <bpmn:userTask id="Activity_11zrcsp" name="userTask">
+      <bpmn:incoming>Flow_0ovailf</bpmn:incoming>
+      <bpmn:outgoing>Flow_00qz07p</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="Event_1bh2lkg">
+      <bpmn:incoming>Flow_00qz07p</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_00qz07p" sourceRef="Activity_11zrcsp" targetRef="Event_1bh2lkg" />
+  </bpmn:process>
+  <bpmn:error id="Error_0ck3ony" name="Error_0jv7trd" errorCode="errorCode" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="externalTaskProcess">
+      <bpmndi:BPMNEdge id="Flow_00qz07p_di" bpmnElement="Flow_00qz07p">
+        <di:waypoint x="500" y="230" />
+        <di:waypoint x="552" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ovailf_di" bpmnElement="Flow_0ovailf">
+        <di:waypoint x="270" y="175" />
+        <di:waypoint x="270" y="230" />
+        <di:waypoint x="400" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_17qoz5a_di" bpmnElement="Flow_17qoz5a">
+        <di:waypoint x="370" y="117" />
+        <di:waypoint x="432" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_03j7lb4_di" bpmnElement="Flow_03j7lb4">
+        <di:waypoint x="215" y="117" />
+        <di:waypoint x="270" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1oijian_di" bpmnElement="externalTask">
+        <dc:Bounds x="270" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0uf0trb_di" bpmnElement="Event_0uf0trb">
+        <dc:Bounds x="432" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_01b61jf_di" bpmnElement="Activity_11zrcsp">
+        <dc:Bounds x="400" y="190" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1bh2lkg_di" bpmnElement="Event_1bh2lkg">
+        <dc:Bounds x="552" y="212" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_17t5yxw_di" bpmnElement="Event_0yajabf">
+        <dc:Bounds x="252" y="139" width="36" height="36" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

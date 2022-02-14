@@ -1,0 +1,56 @@
+<!-- # CE - camunda-bpm-webapp/camunda-commons-ui/lib/analytics/modal.html -->
+
+<div class="modal-header">
+  <h3 class="modal-title">{{ 'TELEMETRY_SETTINGS' | translate }}</h3>
+</div>
+
+<div class="modal-body analytics-body" ng-show="loadingState !== 'DONE'">
+  <div notifications-panel></div>
+
+  {{ 'TELEMETRY_INTRODUCTION' | translate }}
+
+  <form class="form-hotrizontal">
+    <div class="form-group">
+      <div class="col-xs-1">
+        <input type="checkbox" id="enable-telemetry" ng-model="enableUsage" class="form-control">
+      </div>
+      <div class="col-xs-11">
+        <label class="control-label" for="enable-telemetry">{{'TELEMETRY_ENABLE' | translate}}</label>
+        <div>{{'TELEMETRY_DETAILS' | translate}}
+        </div>
+      </div>
+    </div>
+  </form>  
+
+  <b>{{'TELEMETRY_PRIVACY' | translate}}</b>
+  {{'TELEMETRY_DATA' | translate}}
+  <a href={{"https://docs.camunda.org/manual/"+camundaVersion+"/introduction/telemetry/"}} 
+     target="_blank">
+     {{'TELEMETRY_DOCUMENTATION' | translate}}
+  </a>
+  {{'TELEMETRY_OR_VIEW' | translate}} 
+  <a href="https://camunda.com/legal/privacy/" target="_blank">
+    {{'TELEMETRY_PRIVACY_POLICY' | translate}}
+  </a>.
+</div>
+  
+<div class="modal-body analytics-body" ng-show="loadingState === 'DONE'">
+  {{'TELEMETRY_SUCCESS' | translate}} 
+</div>
+
+
+<div class="modal-footer">
+  <div class="col-xs-12 text-right">
+    <button class="btn btn-link modal-close" ng-click="close()" ng-show="loadingState !== 'DONE'">
+      {{ 'TELEMETRY_CANCEL' | translate }}
+    </button>
+
+    <button class="btn btn-primary" ng-click="save()" ng-show="loadingState !== 'DONE'" ng-disabled="loadingState === 'LOADING'">
+      {{ 'TELEMETRY_SAVE' | translate }}
+    </button>
+    <button class="btn btn-primary" ng-click="close()" ng-show="loadingState === 'DONE'">
+      {{ 'CLOSE' | translate }}
+    </button>
+  </div>
+</div>
+<!-- / CE - camunda-bpm-webapp/camunda-commons-ui/lib/analytics/modal.html -->

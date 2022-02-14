@@ -16,10 +16,9 @@
  */
 package org.camunda.bpm.engine.test.concurrency.partitioning;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import org.camunda.bpm.engine.CrdbTransactionRetryException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
@@ -32,41 +31,44 @@ import org.junit.Test;
 
 public class CompetingHistoricVariableInstancePartitioningTest extends AbstractPartitioningTest {
 
-  final protected String VARIABLE_NAME = "aVariableName";
+  protected final String VARIABLE_NAME = "aVariableName";
   final protected String VARIABLE_VALUE = "aVariableValue";
   final protected String ANOTHER_VARIABLE_VALUE = "anotherVariableValue";
 
   @Test
-  public void testConcurrentFetchAndDelete() {
+  public void shouldSuppressOleOnConcurrentFetchAndDelete() {
     // given
     String processInstanceId = deployAndStartProcess(PROCESS_WITH_USERTASK,
       Variables.createVariables().putValue(VARIABLE_NAME, VARIABLE_VALUE)).getId();
 
     ThreadControl asyncThread = executeControllableCommand(new AsyncThread(processInstanceId));
-
+    asyncThread.reportInterrupts();
     asyncThread.waitForSync();
 
-    commandExecutor.execute(new Command<Void>() {
-      public Void execute(CommandContext commandContext) {
-        HistoricVariableInstanceEntity historicVariableInstanceEntity =
-          (HistoricVariableInstanceEntity) historyService.createHistoricVariableInstanceQuery().singleResult();
+    commandExecutor.execute((Command<Void>) commandContext -> {
+      HistoricVariableInstanceEntity historicVariableInstanceEntity =
+        (HistoricVariableInstanceEntity) historyService.createHistoricVariableInstanceQuery().singleResult();
 
-        commandContext.getDbEntityManager().delete(historicVariableInstanceEntity);
+      commandContext.getDbEntityManager().delete(historicVariableInstanceEntity);
 
-        return null;
-      }
+      return null;
     });
 
     // assume
-    assertThat(historyService.createHistoricVariableInstanceQuery().singleResult(), nullValue());
+    assertThat(historyService.createHistoricVariableInstanceQuery().singleResult()).isNull();
 
     // when
     asyncThread.makeContinue();
     asyncThread.waitUntilDone();
 
     // then
-    assertThat(runtimeService.createVariableInstanceQuery().singleResult().getName(), is(VARIABLE_NAME));
-    assertThat((String) runtimeService.createVariableInstanceQuery().singleResult().getValue(), is(ANOTHER_VARIABLE_VALUE));
+    if (testRule.isOptimisticLockingExceptionSuppressible()) {
+      assertThat(runtimeService.createVariableInstanceQuery().singleResult().getName()).isEqualTo(VARIABLE_NAME);
+      assertThat(runtimeService.createVariableInstanceQuery().singleResult().getValue()).isEqualTo(ANOTHER_VARIABLE_VALUE);
+    } else {
+      // with CockroachDB, the OLE can't be ignored, the TX will fail and be rolled-back
+      assertThat(asyncThread.getException()).isInstanceOf(CrdbTransactionRetryException.class);
+    }
   }
 
   public class AsyncThread extends ControllableCommand<Void> {

@@ -3,7 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
 
-  <display-name>camunda bpm rest api</display-name>
+  <display-name>Camunda Platform rest api</display-name>
 
   <!-- Fetch And Lock Handler (long polling): Unique Worker Request (default value: false) -->
   <!--
@@ -12,6 +12,11 @@
     <param-value>true</param-value>
   </context-param>
   -->
+
+  <!-- rest bootstrap listener -->
+  <listener>
+    <listener-class>org.camunda.bpm.engine.rest.impl.web.bootstrap.RestContainerBootstrap</listener-class>
+  </listener>
 
   <listener>
     <listener-class>org.camunda.bpm.engine.rest.impl.FetchAndLockContextListener</listener-class>

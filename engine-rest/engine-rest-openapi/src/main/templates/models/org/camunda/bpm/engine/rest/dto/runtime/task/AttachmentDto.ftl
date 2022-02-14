@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto extends = "LinkableDto" >
 
     <@lib.property
@@ -35,7 +36,6 @@
         name = "createTime"
         type = "string"
         format = "date-time"
-        nullable = false
         desc = "The time the variable was inserted.
                 [Default format](${docsUrl}/reference/rest/overview/date-format/)
                 `yyyy-MM-dd'T'HH:mm:ss.SSSZ`." />
@@ -55,3 +55,4 @@
         desc = "The process instance id of the root process instance that initiated the process containing the task." />
 
 </@lib.dto>
+</#macro>

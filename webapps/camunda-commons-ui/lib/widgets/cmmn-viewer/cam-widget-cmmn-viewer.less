@@ -1,0 +1,148 @@
+@bpmn-nav-radius: 3px;
+
+[cam-widget-cmmn-viewer] {
+  border: 1px solid @gray-lighter;
+  position: relative;
+  min-height: 150px;
+
+  .placeholder-container {
+    display: table;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+  }
+
+  .placeholder-content {
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+  }
+
+  .loading-text {
+    font-size: 20px;
+  }
+
+  .diagram-holder .cjs-container > a {
+    display: none;
+  }
+
+  .diagram-holder .djs-container {
+    overflow: hidden;
+  }
+
+  .diagram-holder {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+  }
+
+  .diagram-holder .highlight .djs-outline {
+    stroke-width: 2px !important;
+    stroke: @bpmn-highlight-border-color !important;
+    fill: fade(@bpmn-highlight-bg, 40%) !important;
+  }
+
+  .diagram-holder .highlight .djs-visual > :nth-child(1) {
+    fill: @bpmn-highlight-bg !important;
+  }
+
+  .grab-cursor {
+    cursor: move;
+    cursor: -webkit-grab;
+    cursor: grab;
+  }
+
+  .navigation {
+    position: absolute;
+    right: (@grid-gutter-width / 2);
+    width: @grid-gutter-width;
+    min-height: @grid-gutter-width;
+
+    button {
+      font-size: 20px;
+      text-align: center;
+      position: absolute;
+      width: @grid-gutter-width;
+      height: @grid-gutter-width;
+      color: @gray;
+      padding: 0;
+      bottom: 0;
+
+      > span {
+        text-align: center;
+      }
+    }
+
+    &.reset {
+      bottom: @grid-gutter-width * 3;
+
+      span {
+        top: 3px;
+      }
+    }
+
+    &.zoom {
+      bottom: (@grid-gutter-width / 2);
+      height: (@grid-gutter-width * 2);
+
+      button.in {
+        bottom: (@grid-gutter-width * 1);
+        border-bottom: 0;
+
+        > span {
+          top: 2px;
+          left: 1px;
+        }
+      }
+
+      button.out {
+        bottom: 0;
+
+        > span {
+          top: 3px;
+        }
+      }
+    }
+  }
+
+  .actions {
+    float: right;
+    position: relative;
+    right: 15px;
+    top: 15px;
+    z-index: 999;
+
+    ul {
+      display: inline-block;
+      list-style: none;
+
+      li {
+        background: #fff;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+        border-color: #adadad;
+        border-radius: 2px;
+        padding: 5px;
+
+        a { /* stylelint-disable-line no-descending-specificity */
+          border: none;
+          color: @gray;
+          padding: 0;
+
+          &:hover {
+            background-color: white;
+          }
+
+          &:visited {
+            background-color: white;
+          }
+        }
+      }
+    }
+  }
+}
+
+.djs-cursor-move {
+  cursor: move;
+  cursor: -webkit-grabbing;
+  cursor: grabbing;
+}

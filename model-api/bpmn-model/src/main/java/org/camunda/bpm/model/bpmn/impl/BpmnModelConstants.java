@@ -41,7 +41,7 @@ public final class BpmnModelConstants {
   public static final String DI_NS = "http://www.omg.org/spec/DD/20100524/DI";
 
   /** The location of the BPMN 2.0 XML schema. */
-  public static final String BPMN_20_SCHEMA_LOCATION = "BPMN20.xsd";
+  public static final String BPMN_20_SCHEMA_LOCATION = "org/camunda/bpm/model/bpmn/schema/BPMN20.xsd";
 
   /** Xml Schema is the default type language */
   public static final String XML_SCHEMA_NS = "http://www.w3.org/2001/XMLSchema";
@@ -270,6 +270,7 @@ public final class BpmnModelConstants {
   public static final String CAMUNDA_ELEMENT_CONNECTOR_ID = "connectorId";
   public static final String CAMUNDA_ELEMENT_CONSTRAINT = "constraint";
   public static final String CAMUNDA_ELEMENT_ENTRY = "entry";
+  public static final String CAMUNDA_ELEMENT_ERROR_EVENT_DEFINITION = "errorEventDefinition";
   public static final String CAMUNDA_ELEMENT_EXECUTION_LISTENER = "executionListener";
   public static final String CAMUNDA_ELEMENT_EXPRESSION = "expression";
   public static final String CAMUNDA_ELEMENT_FAILED_JOB_RETRY_TIME_CYCLE = "failedJobRetryTimeCycle";
@@ -450,6 +451,9 @@ public final class BpmnModelConstants {
   public static final String CAMUNDA_ATTRIBUTE_EXPRESSION = "expression";
   public static final String CAMUNDA_ATTRIBUTE_FORM_HANDLER_CLASS = "formHandlerClass";
   public static final String CAMUNDA_ATTRIBUTE_FORM_KEY = "formKey";
+  public static final String CAMUNDA_ATTRIBUTE_FORM_REF = "formRef";
+  public static final String CAMUNDA_ATTRIBUTE_FORM_REF_BINDING = "formRefBinding";
+  public static final String CAMUNDA_ATTRIBUTE_FORM_REF_VERSION = "formRefVersion";
   public static final String CAMUNDA_ATTRIBUTE_ID = "id";
   public static final String CAMUNDA_ATTRIBUTE_INITIATOR = "initiator";
   public static final String CAMUNDA_ATTRIBUTE_JOB_PRIORITY = "jobPriority";

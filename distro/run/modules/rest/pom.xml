@@ -5,12 +5,12 @@
   <parent>
     <groupId>org.camunda.bpm.run</groupId>
     <artifactId>camunda-bpm-run-modules</artifactId>
-    <version>7.14.0-SNAPSHOT</version>
+    <version>7.17.0-SNAPSHOT</version>
     <relativePath>..</relativePath>
   </parent>
 
   <artifactId>camunda-bpm-run-modules-rest</artifactId>
-  <name>Camunda BPM - Run - Module REST</name>
+  <name>Camunda Platform - Run - Module REST</name>
   <packaging>pom</packaging>
   
   <properties>

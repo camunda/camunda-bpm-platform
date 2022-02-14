@@ -130,6 +130,7 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
   protected Date taskDueDate;
   protected Date taskDueDateBefore;
   protected Date taskDueDateAfter;
+  protected Boolean withoutTaskDueDate;
   protected Date taskFollowUpDate;
   protected Date taskFollowUpDateBefore;
   protected Date taskFollowUpDateAfter;
@@ -154,7 +155,7 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
   protected Boolean withoutCandidateGroups;
   protected List<VariableQueryParameterDto> taskVariables;
   protected List<VariableQueryParameterDto> processVariables;
-  
+
   protected Boolean variableValuesIgnoreCase;
   protected Boolean variableNamesIgnoreCase;
 
@@ -334,6 +335,11 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
   @CamundaQueryParam(value="taskDueDateAfter", converter=DateConverter.class)
   public void setTaskDueDateAfter(Date taskDueDateAfter) {
     this.taskDueDateAfter = taskDueDateAfter;
+  }
+
+  @CamundaQueryParam(value = "withoutTaskDueDate", converter = BooleanConverter.class)
+  public void setWithoutTaskDueDate(Boolean withoutTaskDueDate) {
+    this.withoutTaskDueDate = withoutTaskDueDate;
   }
 
   @CamundaQueryParam(value="taskFollowUpDate", converter=DateConverter.class)
@@ -579,6 +585,9 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
     if (taskDueDateAfter != null) {
       query.taskDueAfter(taskDueDateAfter);
     }
+    if (TRUE.equals(withoutTaskDueDate)) {
+      query.withoutTaskDueDate();
+    }
     if (taskFollowUpDate != null) {
       query.taskFollowUpDate(taskFollowUpDate);
     }
@@ -686,6 +695,8 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
           query.processVariableValueLessThanOrEquals(variableName, variableValue);
         } else if (op.equals(VariableQueryParameterDto.LIKE_OPERATOR_NAME)) {
           query.processVariableValueLike(variableName, String.valueOf(variableValue));
+        } else if (op.equals(VariableQueryParameterDto.NOT_LIKE_OPERATOR_NAME)) {
+          query.processVariableValueNotLike(variableName, String.valueOf(variableValue));
         } else {
           throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid process variable comparator specified: " + op);
         }

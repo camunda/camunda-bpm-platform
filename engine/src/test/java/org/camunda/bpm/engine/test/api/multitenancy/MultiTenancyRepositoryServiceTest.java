@@ -16,11 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy;
 
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -47,7 +43,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 public class MultiTenancyRepositoryServiceTest {
@@ -55,7 +50,7 @@ public class MultiTenancyRepositoryServiceTest {
   protected static final String TENANT_TWO = "tenant2";
   protected static final String TENANT_ONE = "tenant1";
 
-  protected static final BpmnModelInstance emptyProcess = Bpmn.createExecutableProcess().done();
+  protected static final BpmnModelInstance emptyProcess = Bpmn.createExecutableProcess().startEvent().done();
   protected static final String CMMN = "org/camunda/bpm/engine/test/cmmn/deployment/CmmnDeploymentTest.testSimpleDeployment.cmmn";
   protected static final String DMN = "org/camunda/bpm/engine/test/api/multitenancy/simpleDecisionTable.dmn";
 
@@ -65,9 +60,6 @@ public class MultiTenancyRepositoryServiceTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown= ExpectedException.none();
 
   protected RepositoryService repositoryService;
   protected ProcessEngineConfiguration processEngineConfiguration;
@@ -87,8 +79,8 @@ public class MultiTenancyRepositoryServiceTest {
         .createDeploymentQuery()
         .singleResult();
 
-    assertThat(deployment, is(notNullValue()));
-    assertThat(deployment.getTenantId(), is(nullValue()));
+    assertThat(deployment).isNotNull();
+    assertThat(deployment.getTenantId()).isNull();
   }
 
   @Test
@@ -101,8 +93,8 @@ public class MultiTenancyRepositoryServiceTest {
         .createDeploymentQuery()
         .singleResult();
 
-    assertThat(deployment, is(notNullValue()));
-    assertThat(deployment.getTenantId(), is(TENANT_ONE));
+    assertThat(deployment).isNotNull();
+    assertThat(deployment.getTenantId()).isEqualTo(TENANT_ONE);
   }
 
   @Test
@@ -127,12 +119,12 @@ public class MultiTenancyRepositoryServiceTest {
         .asc()
         .list();
 
-    assertThat(processDefinitions.size(), is(3));
+    assertThat(processDefinitions.size()).isEqualTo(3);
     // process definition was deployed twice for tenant one
-    assertThat(processDefinitions.get(0).getVersion(), is(1));
-    assertThat(processDefinitions.get(1).getVersion(), is(2));
+    assertThat(processDefinitions.get(0).getVersion()).isEqualTo(1);
+    assertThat(processDefinitions.get(1).getVersion()).isEqualTo(2);
     // process definition version of tenant two have to be independent from tenant one
-    assertThat(processDefinitions.get(2).getVersion(), is(1));
+    assertThat(processDefinitions.get(2).getVersion()).isEqualTo(1);
   }
 
   @Test
@@ -152,7 +144,7 @@ public class MultiTenancyRepositoryServiceTest {
       .deploy();
 
     // then it does not create a new deployment
-    assertThat(repositoryService.createDeploymentQuery().count(), is(1L));
+    assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(1L);
   }
 
   @Test
@@ -172,7 +164,7 @@ public class MultiTenancyRepositoryServiceTest {
       .deploy();
 
     // then a new deployment is created
-    assertThat(repositoryService.createDeploymentQuery().count(), is(2L));
+    assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(2L);
   }
 
   @Test
@@ -191,7 +183,7 @@ public class MultiTenancyRepositoryServiceTest {
       .deploy();
 
     // then a new deployment is created
-    assertThat(repositoryService.createDeploymentQuery().count(), is(2L));
+    assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(2L);
   }
 
   @Test
@@ -210,7 +202,7 @@ public class MultiTenancyRepositoryServiceTest {
       .deploy();
 
     // then a new deployment is created
-    assertThat(repositoryService.createDeploymentQuery().count(), is(2L));
+    assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(2L);
   }
 
   @Test
@@ -231,11 +223,11 @@ public class MultiTenancyRepositoryServiceTest {
     ProcessDefinitionEntity previousDefinitionTenantOne = getPreviousDefinition((ProcessDefinitionEntity) latestProcessDefinitions.get(0));
     ProcessDefinitionEntity previousDefinitionTenantTwo = getPreviousDefinition((ProcessDefinitionEntity) latestProcessDefinitions.get(1));
 
-    assertThat(previousDefinitionTenantOne.getVersion(), is(2));
-    assertThat(previousDefinitionTenantOne.getTenantId(), is(TENANT_ONE));
+    assertThat(previousDefinitionTenantOne.getVersion()).isEqualTo(2);
+    assertThat(previousDefinitionTenantOne.getTenantId()).isEqualTo(TENANT_ONE);
 
-    assertThat(previousDefinitionTenantTwo.getVersion(), is(1));
-    assertThat(previousDefinitionTenantTwo.getTenantId(), is(TENANT_TWO));
+    assertThat(previousDefinitionTenantTwo.getVersion()).isEqualTo(1);
+    assertThat(previousDefinitionTenantTwo.getTenantId()).isEqualTo(TENANT_TWO);
   }
 
   @Test
@@ -256,11 +248,11 @@ public class MultiTenancyRepositoryServiceTest {
     CaseDefinitionEntity previousDefinitionTenantOne = getPreviousDefinition((CaseDefinitionEntity) latestCaseDefinitions.get(0));
     CaseDefinitionEntity previousDefinitionTenantTwo = getPreviousDefinition((CaseDefinitionEntity) latestCaseDefinitions.get(1));
 
-    assertThat(previousDefinitionTenantOne.getVersion(), is(2));
-    assertThat(previousDefinitionTenantOne.getTenantId(), is(TENANT_ONE));
+    assertThat(previousDefinitionTenantOne.getVersion()).isEqualTo(2);
+    assertThat(previousDefinitionTenantOne.getTenantId()).isEqualTo(TENANT_ONE);
 
-    assertThat(previousDefinitionTenantTwo.getVersion(), is(1));
-    assertThat(previousDefinitionTenantTwo.getTenantId(), is(TENANT_TWO));
+    assertThat(previousDefinitionTenantTwo.getVersion()).isEqualTo(1);
+    assertThat(previousDefinitionTenantTwo.getTenantId()).isEqualTo(TENANT_TWO);
   }
 
   @Test
@@ -281,11 +273,11 @@ public class MultiTenancyRepositoryServiceTest {
     DecisionDefinitionEntity previousDefinitionTenantOne = getPreviousDefinition((DecisionDefinitionEntity) latestDefinitions.get(0));
     DecisionDefinitionEntity previousDefinitionTenantTwo = getPreviousDefinition((DecisionDefinitionEntity) latestDefinitions.get(1));
 
-    assertThat(previousDefinitionTenantOne.getVersion(), is(2));
-    assertThat(previousDefinitionTenantOne.getTenantId(), is(TENANT_ONE));
+    assertThat(previousDefinitionTenantOne.getVersion()).isEqualTo(2);
+    assertThat(previousDefinitionTenantOne.getTenantId()).isEqualTo(TENANT_ONE);
 
-    assertThat(previousDefinitionTenantTwo.getVersion(), is(1));
-    assertThat(previousDefinitionTenantTwo.getTenantId(), is(TENANT_TWO));
+    assertThat(previousDefinitionTenantTwo.getVersion()).isEqualTo(1);
+    assertThat(previousDefinitionTenantTwo.getTenantId()).isEqualTo(TENANT_TWO);
   }
 
   protected <T extends ResourceDefinitionEntity> T getPreviousDefinition(final T definitionEntity) {

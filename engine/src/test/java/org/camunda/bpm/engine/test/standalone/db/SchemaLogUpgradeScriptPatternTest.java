@@ -16,9 +16,7 @@
  */
 package org.camunda.bpm.engine.test.standalone.db;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.isOneOf;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -37,7 +35,7 @@ public class SchemaLogUpgradeScriptPatternTest extends SchemaLogTestCase {
   @Test
   public void testOnlyValidUpgradeFilePatterns() {
     /**
-     * valid patterns: 
+     * valid patterns:
      * h2_engine_7.2_to_7.3.sql,
      * oracle_engine_7.3_patch_7.3.0_to_7.3.1.sql,
      * postgres_engine_7.3_patch_7.3.2_to_7.3.3_1.sql,
@@ -48,28 +46,28 @@ public class SchemaLogUpgradeScriptPatternTest extends SchemaLogTestCase {
       file = file.substring(0, file.length() - 4);
 
       String[] nameParts = file.split("_");
-      assertThat(nameParts[0], isOneOf(DATABASES));
-      assertThat(nameParts[1], is("engine"));
+      assertThat(nameParts[0]).isIn((Object[]) DATABASES);
+      assertThat(nameParts[1]).isEqualTo("engine");
       String minorVersion = nameParts[2];
       assertTrue(isMinorLevel(minorVersion));
       if (nameParts[3].equals("to")) {
         // minor update
-        assertThat(nameParts[4], isOneOf(getPossibleNextVersions(minorVersion)));
+        assertThat(nameParts[4]).isIn(getPossibleNextVersions(minorVersion));
 
-        assertThat(nameParts.length, is(5));
+        assertThat(nameParts.length).isEqualTo(5);
       } else if (nameParts[3].equals("patch")) {
         // patch update
         String basePatchVersion = nameParts[4];
         assertTrue("unexpected patch version pattern for file: " + file, isPatchLevel(basePatchVersion));
-        assertThat(minorVersion, is(getMinorLevelFromPatchVersion(basePatchVersion)));
-        assertThat(nameParts[5], is("to"));
-        assertThat(nameParts[6], isOneOf(getPossibleNextVersions(basePatchVersion)));
+        assertThat(minorVersion).isEqualTo(getMinorLevelFromPatchVersion(basePatchVersion));
+        assertThat(nameParts[5]).isEqualTo("to");
+        assertThat(nameParts[6]).isIn(getPossibleNextVersions(basePatchVersion));
 
         if (nameParts.length == 8) {
           // check that script version is integer only
           Integer.parseInt(nameParts[7]);
         } else {
-          assertThat(nameParts.length, is(7));
+          assertThat(nameParts.length).isEqualTo(7);
         }
       } else {
         fail("unexpected pattern for file: " + file);
@@ -82,7 +80,7 @@ public class SchemaLogUpgradeScriptPatternTest extends SchemaLogTestCase {
     return StringUtils.join(versionParts, ".", 0, 2);
   }
 
-  private String[] getPossibleNextVersions(String version) {
+  private Object[] getPossibleNextVersions(String version) {
     List<String> versions = new ArrayList<String>();
     String[] versionParts = version.split("\\.");
     if (isPatchLevel(version)) {

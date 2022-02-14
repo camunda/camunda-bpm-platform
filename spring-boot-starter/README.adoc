@@ -12,7 +12,7 @@ image::https://maven-badges.herokuapp.com/maven-central/org.camunda.bpm.springbo
 image::https://www.openhub.net/p/camunda-bpm-spring-boot-starter/widgets/project_thin_badge.gif[link="https://www.openhub.net/p/camunda-bpm-spring-boot-starter"]
 ,====
 
-This project provides Spring Boot starters that allow you to integrate the Camunda BPM Platform into your Spring Boot applications.
+This project provides Spring Boot starters that allow you to integrate the Camunda Platform into your Spring Boot applications.
 
 Please check out the https://docs.camunda.org/manual/develop/user-guide/spring-boot-integration/[Documentation],
 the https://docs.camunda.org/get-started/spring-boot/[Getting Started Guide] and
@@ -77,7 +77,7 @@ The Camunda Spring Boot Starter project used to be the community extension, crea
 *  _https://github.com/jangalinski[Jan Galinski]_
 *  _https://github.com/hawky-4s-[Christian Lipphardt]_
 
-Starting from version 2.3.0 it was adopted as part of the Camunda BPM Platform.
+Starting from version 2.3.0 it was adopted as part of the Camunda Platform.
 
 ## License
 

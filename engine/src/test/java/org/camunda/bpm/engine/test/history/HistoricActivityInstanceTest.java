@@ -16,11 +16,10 @@
  */
 package org.camunda.bpm.engine.test.history;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -1082,8 +1081,8 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTest {
       .activityId("parallelJoinEnd")
       .list();
 
-    assertThat(activityInstance.size(), is(2));
-    assertThat(pi.isEnded(), is(true));
+    assertThat(activityInstance.size()).isEqualTo(2);
+    assertThat(pi.isEnded()).isTrue();
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricActivityInstanceTest.testHistoricActivityInstanceProperties.bpmn20.xml"})

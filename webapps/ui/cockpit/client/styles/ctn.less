@@ -1,0 +1,332 @@
+@ctn-sidebar-width: 280px;
+@ctn-toolbar-width: 56px;
+@ctn-content-bottom-height: 350px;
+@ctn-resize-handle-width: 5px;
+
+.ctn-main {
+  position: absolute;
+  top: @header-height;
+  bottom: @footer-height;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+  background-color: @custom-gray-lighter;
+}
+
+.ctn-view {
+  overflow: auto;
+  max-height: ~"calc(100vh - (@{header-height} + @{footer-height}))";
+}
+
+.ctn-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  background-color: @body-bg;
+}
+
+.ctn-fixed-view {
+  position: absolute;
+  top: @breadcrumb-height;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  overflow: visible;
+}
+
+.ctn-header {
+  background: @custom-gray-lighter;
+  height: 35px;
+  display: table;
+  width: 100%;
+
+  > h1,
+  > .view-pills-wrapper {
+    display: table-cell;
+    vertical-align: middle;
+  }
+
+  > h1 {
+    font-size: 20px;
+    line-height: 30px;
+    font-weight: normal;
+    position: relative;
+    margin: 0;
+    padding: 0;
+
+    > .inner {
+      position: relative;
+      padding-left: 65px;
+      padding-right: 45px;
+      height: 35px;
+      margin: 0 10px;
+      overflow: hidden;
+      width: 100%;
+      display: block;
+    }
+  }
+
+  .process-name-prefix {
+    position: absolute;
+    bottom: 7px;
+    left: 0;
+    margin: 0;
+    padding: 0;
+    display: block;
+    text-transform: uppercase;
+    white-space: normal;
+    font-size: 10px;
+    width: 65px;
+    line-height: 12px;
+    color: @gray-light;
+    text-shadow: 0 1px 0 @body-bg;
+
+    &::after {
+      position: absolute;
+      top: 0;
+      right: 3px;
+      display: block;
+      content: ':';
+      font-size: 20px;
+      line-height: 20px;
+      color: darken(@gray-light, 10%);
+      text-shadow: 0 1px 0 @body-bg;
+    }
+  }
+
+  .process-name {
+    position: absolute;
+    left: 65px;
+    right: 45px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .badge-suspended {
+    position: absolute;
+    right: 10px;
+    top: 9px;
+  }
+
+  .view-pills-wrapper {
+    padding-left: 10px;
+    width: 1%;
+  }
+
+  .view-pills {
+    display: table;
+
+    > li {
+      float: none;
+      display: table-cell;
+      padding-right: 10px;
+    }
+  }
+}
+
+.ctn-content-container,
+.ctn-column,
+.ctn-toolbar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.ctn-sidebar,
+.ctn-content {
+  overflow: auto;
+}
+
+.ctn-content-container {
+  background-color: @custom-gray-lighter;
+}
+
+.ctn-sidebar {
+  width: @ctn-sidebar-width;
+  right: auto;
+  overflow: hidden;
+  overflow-y: auto;
+
+  .nav-tabs {
+    margin-top: 6px;
+    border-top: none;
+  }
+
+  .tab-content {
+    overflow: auto;
+    position: absolute;
+    top: 43px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: block;
+    padding: 0;
+  }
+}
+
+.ctn-scroll .tab-content {
+  overflow: auto;
+}
+
+.ctn-content {
+  left: @ctn-sidebar-width;
+  right: @ctn-toolbar-width;
+  overflow: visible;
+  z-index: 11;
+  background-color: @body-bg;
+  border-left: 1px solid @gray-lighter;
+  border-right: 1px solid @gray-lighter;
+
+  > div {
+    position: absolute;
+    left: 0;
+    right: 0;
+  }
+}
+
+.ctn-content-top {
+  top: 0;
+  bottom: @ctn-content-bottom-height;
+  z-index: 10;
+
+  [cam-widget-bpmn-viewer],
+  [cam-widget-cmmn-viewer] {
+    border: none;
+  }
+}
+
+.ctn-content-bottom {
+  top: auto;
+  bottom: 0;
+  border-top: 1px solid @gray-lighter;
+  background: @custom-gray-lighter;
+  overflow: hidden;
+  z-index: 12;
+}
+
+// because `.ctn-content > div`
+// overrides `.ctn-content-bottom`
+div.ctn-content-bottom {
+  right: 1px;
+}
+
+.ctn-toolbar {
+  left: auto;
+  width: @ctn-toolbar-width;
+  background-color: @custom-gray-lighter;
+  text-align: center;
+
+  .btn-toolbar {
+    margin: 5px 0;
+  }
+}
+
+a.expand-collapse {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  text-decoration: none;
+  cursor: pointer;
+  opacity: 0.6;
+  padding: 0;
+  z-index: 12;
+  background-color: fade(@body-bg, 90%);
+  border: 1px solid @gray-lighter;
+  border-width: 0 1px 1px 0;
+  border-radius: 0 0 4px 0;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
+
+  &.pull-right {
+    top: 0;
+    left: auto;
+    right: 0;
+    border-width: 0 0 1px 1px;
+    border-radius: 0 0 0 4px;
+  }
+
+  &.vertical-collapse {
+    border-width: 1px 1px 0 1px;
+    border-radius: 4px 4px 0 0;
+    top: auto;
+    bottom: 0;
+    left: 25px;
+
+    &.show-collapsable {
+      border-width: 0 1px 1px 1px;
+      border-radius: 0 0 4px 4px;
+      top: 0;
+      bottom: auto;
+    }
+
+    &.maximize-collapsable,
+    &.restore-collapsable {
+      left: 50px;
+    }
+  }
+}
+
+.ctn-tabbed .ctn-tabbed-content {
+  margin: 0;
+  overflow: auto;
+  position: absolute;
+  top: 57px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0 (@grid-gutter-width * 0.5) (@grid-gutter-width * 0.5) (@grid-gutter-width * 0.5);
+}
+
+.ctn-tabbed.ctn-content-bottom > h4 {
+  margin: 2px 0 0 0;
+  padding: (@grid-gutter-width * 0.5) (@grid-gutter-width * 0.5) 5px (@grid-gutter-width * 0.5);
+  border-bottom: 1px solid @custom-gray-light;
+}
+
+// makes the tabs scroll horizontally when too wide
+.ctn-content-bottom ul.nav-tabs {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-height: 37px + 16px;
+  white-space: nowrap;
+
+  > li {
+    display: inline-block;
+    float: none;
+  }
+}
+
+.resize-handle {
+  position: absolute;
+  background: transparent;
+  transition: background-color 0.218s ease;
+  z-index: 15;
+
+  &.horizontal {
+    height: @ctn-resize-handle-width;
+    left: 0;
+    right: 0;
+    cursor: n-resize;
+    z-index: 20;
+  }
+
+  &.vertical {
+    width: @ctn-resize-handle-width;
+    bottom: 0;
+    top: 0;
+    cursor: e-resize;
+  }
+
+  &:hover {
+    background-color: fade(@gray, 50);
+  }
+}

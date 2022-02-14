@@ -16,10 +16,8 @@
  */
 package org.camunda.bpm.engine.test.bpmn.parse;
 
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RuntimeService;
@@ -33,7 +31,6 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 public class GlobalRetryConfigurationTest {
@@ -48,9 +45,6 @@ public class GlobalRetryConfigurationTest {
       configuration.setFailedJobRetryTimeCycle(SCHEDULE));
   protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
@@ -182,7 +176,7 @@ public class GlobalRetryConfigurationTest {
   }
 
   private void assertJobRetries(ProcessInstance pi, int expectedJobRetries) {
-    assertThat(pi, is(notNullValue()));
+    assertThat(pi).isNotNull();
 
     Job job = fetchJob(pi.getProcessInstanceId());
 

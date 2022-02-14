@@ -25,7 +25,6 @@ import static org.camunda.bpm.engine.authorization.Permissions.READ_TASK;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions.READ_INSTANCE_VARIABLE;
-import static org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions.READ_HISTORY_VARIABLE;
 import static org.camunda.bpm.engine.authorization.Resources.HISTORIC_PROCESS_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Resources.HISTORIC_TASK;
 import static org.camunda.bpm.engine.authorization.TaskPermissions.READ_VARIABLE;
@@ -44,7 +43,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -87,6 +88,7 @@ import org.camunda.bpm.engine.impl.VariableInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.batch.BatchQueryImpl;
 import org.camunda.bpm.engine.impl.batch.BatchStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.batch.history.HistoricBatchQueryImpl;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.AuthorizationCheck;
 import org.camunda.bpm.engine.impl.db.CompositePermissionCheck;
@@ -104,7 +106,6 @@ import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.persistence.entity.util.AuthManagerUtil;
 import org.camunda.bpm.engine.impl.persistence.entity.util.AuthManagerUtil.VariablePermissions;
 import org.camunda.bpm.engine.impl.util.ResourceTypeUtil;
-import org.camunda.bpm.engine.query.Query;
 
 /**
  * @author Daniel Meyer
@@ -117,7 +118,7 @@ public class AuthorizationManager extends AbstractManager {
 
   // Used instead of Collections.emptyList() as mybatis uses reflection to call methods
   // like size() which can lead to problems as Collections.EmptyList is a private implementation
-  protected static final List<String> EMPTY_LIST = new ArrayList<String>();
+  protected static final List<String> EMPTY_LIST = new ArrayList<>();
 
   /**
    * Group ids for which authorizations exist in the database.
@@ -164,7 +165,7 @@ public class AuthorizationManager extends AbstractManager {
   }
 
   public AuthorizationEntity findAuthorization(int type, String userId, String groupId, Resource resource, String resourceId) {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
 
     params.put("type", type);
     params.put("userId", userId);
@@ -201,7 +202,7 @@ public class AuthorizationManager extends AbstractManager {
       boolean isAuthorized = isAuthorized(compositePermissionCheck);
       if (!isAuthorized) {
 
-        List<MissingAuthorization> missingAuthorizations = new ArrayList<MissingAuthorization>();
+        List<MissingAuthorization> missingAuthorizations = new ArrayList<>();
 
         for (PermissionCheck check: compositePermissionCheck.getAllPermissionChecks()) {
           missingAuthorizations.add(new MissingAuthorization(
@@ -295,7 +296,7 @@ public class AuthorizationManager extends AbstractManager {
         isRevokeAuthCheckEnabled = false;
       }
       else {
-        final Map<String, Object> params = new HashMap<String, Object>();
+        final Map<String, Object> params = new HashMap<>();
         params.put("userId", userId);
         params.put("authGroupIds", filterAuthenticatedGroupIds(groupIds));
         isRevokeAuthCheckEnabled = getDbEntityManager().selectBoolean("selectRevokeAuthorization", params);
@@ -452,7 +453,7 @@ public class AuthorizationManager extends AbstractManager {
     }
 
     if(isAuthorizationEnabled()) {
-      Map<String, Object> deleteParams = new HashMap<String, Object>();
+      Map<String, Object> deleteParams = new HashMap<>();
       deleteParams.put("resourceType", resource.resourceType());
       deleteParams.put("resourceId", resourceId);
       getDbEntityManager().delete(AuthorizationEntity.class, "deleteAuthorizationsForResourceId", deleteParams);
@@ -467,7 +468,7 @@ public class AuthorizationManager extends AbstractManager {
     }
 
     if(isAuthorizationEnabled()) {
-      Map<String, Object> deleteParams = new HashMap<String, Object>();
+      Map<String, Object> deleteParams = new HashMap<>();
       deleteParams.put("resourceType", resource.resourceType());
       deleteParams.put("resourceId", resourceId);
       deleteParams.put("userId", userId);
@@ -483,7 +484,7 @@ public class AuthorizationManager extends AbstractManager {
     }
 
     if(isAuthorizationEnabled()) {
-      Map<String, Object> deleteParams = new HashMap<String, Object>();
+      Map<String, Object> deleteParams = new HashMap<>();
       deleteParams.put("resourceType", resource.resourceType());
       deleteParams.put("resourceId", resourceId);
       deleteParams.put("groupId", groupId);
@@ -505,12 +506,39 @@ public class AuthorizationManager extends AbstractManager {
    */
   public void checkCamundaAdmin() {
     final Authentication currentAuthentication = getCurrentAuthentication();
-    CommandContext commandContext = Context.getCommandContext();
 
-    if (isAuthorizationEnabled() && commandContext.isAuthorizationCheckEnabled()
-        && currentAuthentication != null  && !isCamundaAdmin(currentAuthentication)) {
+    if (isAuthorizationEnabled() && getCommandContext().isAuthorizationCheckEnabled()
+        && currentAuthentication != null && !isCamundaAdmin(currentAuthentication)) {
 
-      throw LOG.requiredCamundaAdminException();
+      throw LOG.requiredCamundaAdmin();
+    }
+  }
+
+  public void checkCamundaAdminOrPermission(Consumer<CommandChecker> permissionCheck) {
+    if (isAuthorizationEnabled() && getCommandContext().isAuthorizationCheckEnabled()) {
+
+      AuthorizationException authorizationException = null;
+      AuthorizationException adminException = null;
+
+      try {
+        for (CommandChecker checker : getCommandContext().getProcessEngineConfiguration().getCommandCheckers()) {
+          permissionCheck.accept(checker);
+        }
+      } catch (AuthorizationException e) {
+        authorizationException = e;
+      }
+
+      try {
+        checkCamundaAdmin();
+      } catch (AuthorizationException e) {
+        adminException = e;
+      }
+
+      if (authorizationException != null && adminException != null) {
+        // throw combined exception
+        List<MissingAuthorization> info = authorizationException.getMissingAuthorizations();
+        throw LOG.requiredCamundaAdminOrPermissionException(info);
+      }
     }
   }
 
@@ -603,7 +631,7 @@ public class AuthorizationManager extends AbstractManager {
       CompositePermissionCheck permissionCheck = new PermissionCheckBuilder()
               .disjunctive()
               .atomicCheck(TASK, "RES.ID_", READ)
-              .atomicCheck(PROCESS_DEFINITION, "PROCDEF.KEY_", READ_TASK)
+              .atomicCheck(PROCESS_DEFINITION, "D.KEY_", READ_TASK)
               .build();
         addPermissionCheck(query.getAuthCheck(), permissionCheck);
     }
@@ -1100,13 +1128,23 @@ public class AuthorizationManager extends AbstractManager {
       return EMPTY_LIST;
     }
     else {
-      if(availableAuthorizedGroupIds == null) {
-        availableAuthorizedGroupIds = new HashSet<String>(getDbEntityManager().selectList("selectAuthorizedGroupIds"));
-      }
-      Set<String> copy = new HashSet<String>(availableAuthorizedGroupIds);
-      copy.retainAll(authenticatedGroupIds);
-      return new ArrayList<String>(copy);
+      Set<String> groupIntersection = new HashSet<>(getAllGroups());
+      groupIntersection.retainAll(authenticatedGroupIds);
+      return new ArrayList<>(groupIntersection);
     }
+  }
+
+  protected Set<String> getAllGroups() {
+    if(availableAuthorizedGroupIds == null) {
+      availableAuthorizedGroupIds = new HashSet<String>();
+      List<String> groupsFromDatabase = getDbEntityManager().selectList("selectAuthorizedGroupIds");
+
+      groupsFromDatabase.stream()
+        .filter(Objects::nonNull)
+        .forEach(availableAuthorizedGroupIds::add);
+    }
+
+    return availableAuthorizedGroupIds;
   }
 
   protected boolean isAuthCheckExecuted() {
@@ -1153,7 +1191,7 @@ public class AuthorizationManager extends AbstractManager {
 
   public DbOperation deleteAuthorizationsByRemovalTime(Date removalTime, int minuteFrom,
                                                       int minuteTo, int batchSize) {
-    Map<String, Object> parameters = new HashMap<String, Object>();
+    Map<String, Object> parameters = new HashMap<>();
     parameters.put("removalTime", removalTime);
     if (minuteTo - minuteFrom + 1 < 60) {
       parameters.put("minuteFrom", minuteFrom);

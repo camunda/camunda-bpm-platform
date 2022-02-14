@@ -1,8 +1,10 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
       id = "getAttachments"
       tag = "Task Attachment"
+      summary = "Get List"
       desc = "Gets the attachments for a task." />
 
   "parameters" : [
@@ -72,3 +74,5 @@
 
   }
 }
+
+</#macro>

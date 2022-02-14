@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
@@ -35,12 +36,15 @@ import org.camunda.bpm.engine.history.ExternalTaskState;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.IncidentState;
 import org.camunda.bpm.engine.history.JobState;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity;
+import org.camunda.bpm.engine.impl.cfg.ConfigurationLogger;
 import org.camunda.bpm.engine.impl.cfg.IdGenerator;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.history.DefaultHistoryRemovalTimeProvider;
 import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricExternalTaskLogEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricFormPropertyEventEntity;
@@ -53,6 +57,7 @@ import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventType;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntity;
+import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupJobHandler;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
 import org.camunda.bpm.engine.impl.oplog.UserOperationLogContext;
 import org.camunda.bpm.engine.impl.oplog.UserOperationLogContextEntry;
@@ -69,6 +74,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.pvm.runtime.CompensationBehavior;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.impl.util.ParseUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ResourceTypes;
@@ -82,6 +88,8 @@ import org.camunda.bpm.engine.task.IdentityLink;
  *
  */
 public class DefaultHistoryEventProducer implements HistoryEventProducer {
+
+  protected final static ConfigurationLogger LOG = ProcessEngineLogger.CONFIG_LOGGER;
 
   protected void initActivityInstanceEvent(HistoricActivityInstanceEventEntity evt, ExecutionEntity execution, HistoryEventType eventType) {
     PvmScope eventSource = execution.getActivity();
@@ -367,6 +375,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setJobDefinitionId(incident.getJobDefinitionId());
     evt.setHistoryConfiguration(incident.getHistoryConfiguration());
     evt.setFailedActivityId(incident.getFailedActivityId());
+    evt.setAnnotation(incident.getAnnotation());
 
     String jobId = incident.getConfiguration();
     if (jobId != null && isHistoryRemovalTimeStrategyStart()) {
@@ -854,7 +863,6 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     historicFormPropertyEntity.setId(idGenerator.getNextId());
     historicFormPropertyEntity.setEventType(HistoryEventTypes.FORM_PROPERTY_UPDATE.getEventName());
     historicFormPropertyEntity.setTimestamp(ClockUtil.getCurrentTime());
-    historicFormPropertyEntity.setActivityInstanceId(execution.getActivityInstanceId());
     historicFormPropertyEntity.setExecutionId(execution.getId());
     historicFormPropertyEntity.setProcessDefinitionId(execution.getProcessDefinitionId());
     historicFormPropertyEntity.setProcessInstanceId(execution.getProcessInstanceId());
@@ -877,6 +885,14 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     // initialize sequence counter
     initSequenceCounter(execution, historicFormPropertyEntity);
 
+    if (execution.isProcessInstanceStarting()) {
+      // instantiate activity instance id as process instance id when starting a process instance
+      // via a form
+      historicFormPropertyEntity.setActivityInstanceId(execution.getProcessInstanceId());
+    } else {
+      historicFormPropertyEntity.setActivityInstanceId(execution.getActivityInstanceId());
+    }
+
     return historicFormPropertyEntity;
   }
 
@@ -884,6 +900,10 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
   public HistoryEvent createHistoricIncidentCreateEvt(Incident incident) {
     return createHistoricIncidentEvt(incident, HistoryEventTypes.INCIDENT_CREATE);
+  }
+
+  public HistoryEvent createHistoricIncidentUpdateEvt(Incident incident) {
+    return createHistoricIncidentEvt(incident, HistoryEventTypes.INCIDENT_UPDATE);
   }
 
   public HistoryEvent createHistoricIncidentResolveEvt(Incident incident) {
@@ -1087,7 +1107,8 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
   }
 
   protected void initHistoricJobLogEvent(HistoricJobLogEventEntity evt, Job job, HistoryEventType eventType) {
-    evt.setTimestamp(ClockUtil.getCurrentTime());
+    Date currentTime = ClockUtil.getCurrentTime();
+    evt.setTimestamp(currentTime);
 
     JobEntity jobEntity = (JobEntity) job;
     evt.setJobId(jobEntity.getId());
@@ -1097,6 +1118,20 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
     String hostName = Context.getCommandContext().getProcessEngineConfiguration().getHostname();
     evt.setHostname(hostName);
+
+    if (HistoryCleanupJobHandler.TYPE.equals(jobEntity.getJobHandlerType())) {
+      String timeToLive = Context.getProcessEngineConfiguration().getHistoryCleanupJobLogTimeToLive();
+      if(timeToLive != null) {
+        try {
+          Integer timeToLiveDays = ParseUtil.parseHistoryTimeToLive(timeToLive);
+          Date removalTime = DefaultHistoryRemovalTimeProvider.determineRemovalTime(currentTime, timeToLiveDays);
+          evt.setRemovalTime(removalTime);
+        } catch (ProcessEngineException e) {
+          ProcessEngineException wrappedException = LOG.invalidPropertyValue("historyCleanupJobLogTimeToLive", timeToLive, e);
+          LOG.invalidPropertyValue(wrappedException);
+        }
+      }
+    }
 
     JobDefinition jobDefinition = jobEntity.getJobDefinition();
     if (jobDefinition != null) {
@@ -1111,7 +1146,6 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
           evt.setRemovalTime(historicBatch.getRemovalTime());
         }
       }
-
     }
     else {
       // in case of async signal there does not exist a job definition
@@ -1326,7 +1360,4 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
   protected void initSequenceCounter(long sequenceCounter, HistoryEvent event) {
     event.setSequenceCounter(sequenceCounter);
   }
-
-
-
 }

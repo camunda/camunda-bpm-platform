@@ -17,7 +17,7 @@
 package org.camunda.bpm.engine.authorization;
 
 /**
- * Holds the set of built-in user identities for camunda BPM.
+ * Holds the set of built-in user identities for Camunda Platform.
  *
  * @author Nico Rehwaldt
  */

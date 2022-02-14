@@ -53,11 +53,12 @@ public class DefaultDeploymentConfigurationTest {
     defaultDeploymentConfiguration.preInit(configuration);
 
     final Resource[] resources = configuration.getDeploymentResources();
-    assertThat(resources).hasSize(9);
+    assertThat(resources).hasSize(11);
 
     assertThat(filenames(resources)).containsOnly("async-service-task.bpmn", "test.cmmn10.xml",
       "test.bpmn", "test.cmmn", "test.bpmn20.xml", "check-order.dmn", "eventing.bpmn",
-      "spin-java8-model.bpmn", "eventingWithTaskAssignee.bpmn");
+      "spin-java8-model.bpmn", "eventingWithTaskAssignee.bpmn","eventingWithBoundary.bpmn",
+      "eventingWithIntermediateCatch.bpmn");
   }
 
   private Set<String> filenames(Resource[] resources) {

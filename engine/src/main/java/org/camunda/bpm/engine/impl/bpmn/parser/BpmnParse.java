@@ -24,31 +24,103 @@ import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.delegate.VariableListener;
 import org.camunda.bpm.engine.impl.Condition;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.bpmn.behavior.*;
+import org.camunda.bpm.engine.impl.bpmn.behavior.BoundaryConditionalEventActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.BoundaryEventActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.CallActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.CallableElementActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.CancelBoundaryEventActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.CancelEndEventActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.CaseCallActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.ClassDelegateActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.CompensationEventActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.DmnBusinessRuleTaskActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.ErrorEndEventActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.EventBasedGatewayActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessStartConditionalEventActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessStartEventActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.ExclusiveGatewayActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.ExternalTaskActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.InclusiveGatewayActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateCatchEventActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateCatchLinkEventActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateConditionalEventBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateThrowNoneEventActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.MailActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.ManualTaskActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.MultiInstanceActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.NoneEndEventActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.NoneStartEventActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.ParallelGatewayActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.ParallelMultiInstanceActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.ReceiveTaskActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.ScriptTaskActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.SequentialMultiInstanceActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.ServiceTaskDelegateExpressionActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.ServiceTaskExpressionActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.ShellActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.SubProcessActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.TaskActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.TerminateEndEventActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.ThrowEscalationEventActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.ThrowSignalEventActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.impl.bpmn.listener.ClassDelegateExecutionListener;
 import org.camunda.bpm.engine.impl.bpmn.listener.DelegateExpressionExecutionListener;
 import org.camunda.bpm.engine.impl.bpmn.listener.ExpressionExecutionListener;
 import org.camunda.bpm.engine.impl.bpmn.listener.ScriptExecutionListener;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.core.model.*;
+import org.camunda.bpm.engine.impl.core.model.BaseCallableElement;
 import org.camunda.bpm.engine.impl.core.model.BaseCallableElement.CallableElementBinding;
+import org.camunda.bpm.engine.impl.core.model.CallableElement;
+import org.camunda.bpm.engine.impl.core.model.CallableElementParameter;
 import org.camunda.bpm.engine.impl.core.model.Properties;
 import org.camunda.bpm.engine.impl.core.variable.mapping.IoMapping;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ConstantValueProvider;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.NullValueProvider;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
 import org.camunda.bpm.engine.impl.dmn.result.DecisionResultMapper;
-import org.camunda.bpm.engine.impl.el.*;
+import org.camunda.bpm.engine.impl.el.ElValueProvider;
+import org.camunda.bpm.engine.impl.el.Expression;
+import org.camunda.bpm.engine.impl.el.ExpressionManager;
+import org.camunda.bpm.engine.impl.el.FixedValue;
+import org.camunda.bpm.engine.impl.el.UelExpressionCondition;
 import org.camunda.bpm.engine.impl.event.EventType;
-import org.camunda.bpm.engine.impl.form.handler.*;
-import org.camunda.bpm.engine.impl.jobexecutor.*;
+import org.camunda.bpm.engine.impl.form.FormDefinition;
+import org.camunda.bpm.engine.impl.form.handler.DefaultStartFormHandler;
+import org.camunda.bpm.engine.impl.form.handler.DefaultTaskFormHandler;
+import org.camunda.bpm.engine.impl.form.handler.DelegateStartFormHandler;
+import org.camunda.bpm.engine.impl.form.handler.DelegateTaskFormHandler;
+import org.camunda.bpm.engine.impl.form.handler.StartFormHandler;
+import org.camunda.bpm.engine.impl.form.handler.TaskFormHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.AsyncAfterMessageJobDeclaration;
+import org.camunda.bpm.engine.impl.jobexecutor.AsyncBeforeMessageJobDeclaration;
+import org.camunda.bpm.engine.impl.jobexecutor.EventSubscriptionJobDeclaration;
+import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
+import org.camunda.bpm.engine.impl.jobexecutor.MessageJobDeclaration;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerCatchIntermediateEventJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationType;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerExecuteNestedActivityJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerTaskListenerJobHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
-import org.camunda.bpm.engine.impl.pvm.process.*;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityStartBehavior;
+import org.camunda.bpm.engine.impl.pvm.process.HasDIBounds;
+import org.camunda.bpm.engine.impl.pvm.process.Lane;
+import org.camunda.bpm.engine.impl.pvm.process.LaneSet;
+import org.camunda.bpm.engine.impl.pvm.process.ParticipantProcess;
+import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
+import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
+import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
 import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
 import org.camunda.bpm.engine.impl.scripting.ScriptCondition;
@@ -73,9 +145,20 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import java.io.InputStream;
 import java.net.URL;
 import java.text.StringCharacterIterator;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
-import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.*;
+import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.findCamundaExtensionElement;
+import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.parseCamundaExtensionProperties;
+import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.parseCamundaScript;
+import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.parseInputOutput;
 import static org.camunda.bpm.engine.impl.util.ClassDelegateUtil.instantiateDelegate;
 
 /**
@@ -184,19 +267,19 @@ public class BpmnParse extends Parse {
   protected DeploymentEntity deployment;
 
   /** The end result of the parsing: a list of process definition. */
-  protected List<ProcessDefinitionEntity> processDefinitions = new ArrayList<ProcessDefinitionEntity>();
+  protected List<ProcessDefinitionEntity> processDefinitions = new ArrayList<>();
 
   /** Mapping of found errors in BPMN 2.0 file */
-  protected Map<String, Error> errors = new HashMap<String, Error>();
+  protected Map<String, Error> errors = new HashMap<>();
 
   /** Mapping of found escalation elements */
-  protected Map<String, Escalation> escalations = new HashMap<String, Escalation>();
+  protected Map<String, Escalation> escalations = new HashMap<>();
 
   /**
    * Mapping from a process definition key to his containing list of job
    * declarations
    **/
-  protected Map<String, List<JobDeclaration<?, ?>>> jobDeclarations = new HashMap<String, List<JobDeclaration<?, ?>>>();
+  protected Map<String, List<JobDeclaration<?, ?>>> jobDeclarations = new HashMap<>();
 
   /** A map for storing sequence flow based on their id during parsing. */
   protected Map<String, TransitionImpl> sequenceFlows;
@@ -205,10 +288,10 @@ public class BpmnParse extends Parse {
    * A list of all element IDs. This allows us to parse only what we actually
    * support but still validate the references among elements we do not support.
    */
-  protected List<String> elementIds = new ArrayList<String>();
+  protected List<String> elementIds = new ArrayList<>();
 
   /** A map for storing the process references of participants */
-  protected Map<String, String> participantProcesses = new HashMap<String, String>();
+  protected Map<String, String> participantProcesses = new HashMap<>();
 
   /**
    * Mapping containing values stored during the first phase of parsing since
@@ -218,28 +301,28 @@ public class BpmnParse extends Parse {
    * means that this map doesn't need to be re-initialized for each new process
    * definition.
    */
-  protected Map<String, MessageDefinition> messages = new HashMap<String, MessageDefinition>();
-  protected Map<String, SignalDefinition> signals = new HashMap<String, SignalDefinition>();
+  protected Map<String, MessageDefinition> messages = new HashMap<>();
+  protected Map<String, SignalDefinition> signals = new HashMap<>();
 
   // Members
   protected ExpressionManager expressionManager;
   protected List<BpmnParseListener> parseListeners;
-  protected Map<String, XMLImporter> importers = new HashMap<String, XMLImporter>();
-  protected Map<String, String> prefixs = new HashMap<String, String>();
+  protected Map<String, XMLImporter> importers = new HashMap<>();
+  protected Map<String, String> prefixs = new HashMap<>();
   protected String targetNamespace;
 
-  private Map<String, String> eventLinkTargets = new HashMap<String, String>();
-  private Map<String, String> eventLinkSources = new HashMap<String, String>();
+  private Map<String, String> eventLinkTargets = new HashMap<>();
+  private Map<String, String> eventLinkSources = new HashMap<>();
 
   /**
    * Constructor to be called by the {@link BpmnParser}.
    */
   public BpmnParse(BpmnParser parser) {
     super(parser);
-    this.expressionManager = parser.getExpressionManager();
-    this.parseListeners = parser.getParseListeners();
+    expressionManager = parser.getExpressionManager();
+    parseListeners = parser.getParseListeners();
+
     setSchemaResource(ReflectUtil.getResourceUrlAsString(BpmnParser.BPMN_20_SCHEMA_LOCATION));
-    setEnableXxeProcessing(Context.getProcessEngineConfiguration().isEnableXxeProcessing());
   }
 
   public BpmnParse deployment(DeploymentEntity deployment) {
@@ -530,7 +613,7 @@ public class BpmnParse extends Parse {
    */
   public ProcessDefinitionEntity parseProcess(Element processElement) {
     // reset all mappings that are related to one process definition
-    sequenceFlows = new HashMap<String, TransitionImpl>();
+    sequenceFlows = new HashMap<>();
 
     ProcessDefinitionEntity processDefinition = new ProcessDefinitionEntity();
 
@@ -638,7 +721,7 @@ public class BpmnParse extends Parse {
     // parseProperties(processElement);
 
     // filter activities that must be parsed separately
-    List<Element> activityElements = new ArrayList<Element>(scopeElement.elements());
+    List<Element> activityElements = new ArrayList<>(scopeElement.elements());
     Map<String, Element> intermediateCatchEvents = filterIntermediateCatchEvents(activityElements);
     activityElements.removeAll(intermediateCatchEvents.values());
     Map<String, Element> compensationHandlers = filterCompensationHandlers(activityElements);
@@ -664,7 +747,7 @@ public class BpmnParse extends Parse {
   }
 
   protected HashMap<String, Element> filterIntermediateCatchEvents(List<Element> activityElements) {
-    HashMap<String, Element> intermediateCatchEvents = new HashMap<String, Element>();
+    HashMap<String, Element> intermediateCatchEvents = new HashMap<>();
     for(Element activityElement : activityElements) {
       if (activityElement.getTagName().equals(ActivityTypes.INTERMEDIATE_EVENT_CATCH)) {
         intermediateCatchEvents.put(activityElement.attribute("id"), activityElement);
@@ -674,7 +757,7 @@ public class BpmnParse extends Parse {
   }
 
   protected HashMap<String, Element> filterCompensationHandlers(List<Element> activityElements) {
-    HashMap<String, Element> compensationHandlers = new HashMap<String, Element>();
+    HashMap<String, Element> compensationHandlers = new HashMap<>();
     for(Element activityElement : activityElements) {
       if (isCompensationHandler(activityElement)) {
         compensationHandlers.put(activityElement.attribute("id"), activityElement);
@@ -839,7 +922,7 @@ public class BpmnParse extends Parse {
 
   protected void parseCompensationHandlers(ScopeImpl parentScope, Map<String, Element> compensationHandlers) {
     // compensation handlers attached to compensation boundary events should be already parsed
-    for (Element compensationHandler : new HashSet<Element>(compensationHandlers.values())) {
+    for (Element compensationHandler : new HashSet<>(compensationHandlers.values())) {
       parseActivity(compensationHandler, null, parentScope);
     }
     compensationHandlers.clear();
@@ -857,7 +940,7 @@ public class BpmnParse extends Parse {
    */
   public void parseStartEvents(Element parentElement, ScopeImpl scope) {
     List<Element> startEventElements = parentElement.elements("startEvent");
-    List<ActivityImpl> startEventActivities = new ArrayList<ActivityImpl>();
+    List<ActivityImpl> startEventActivities = new ArrayList<>();
     if (startEventElements.size() > 0) {
       for (Element startEventElement : startEventElements) {
 
@@ -876,8 +959,8 @@ public class BpmnParse extends Parse {
         parseExecutionListenersOnScope(startEventElement, startEventActivity);
       }
     } else {
-      if (parentElement.getTagName().equals("subProcess") ) {
-        addError("subProcess must define a startEvent element", parentElement);
+      if (Arrays.asList("process", "subProcess").contains(parentElement.getTagName())) {
+        addError(parentElement.getTagName() + " must define a startEvent element", parentElement);
       }
     }
     if (scope instanceof ProcessDefinitionEntity) {
@@ -972,9 +1055,15 @@ public class BpmnParse extends Parse {
           } else {
             startFormHandler = new DefaultStartFormHandler();
           }
+
           startFormHandler.parseConfiguration(startEventElement, deployment, processDefinition, this);
 
           processDefinition.setStartFormHandler(new DelegateStartFormHandler(startFormHandler, deployment));
+
+          FormDefinition formDefinition = parseFormDefinition(startEventElement);
+          processDefinition.setStartFormDefinition(formDefinition);
+
+          processDefinition.setHasStartFormKey(formDefinition.getFormKey() != null);
         }
 
       }
@@ -1236,7 +1325,7 @@ public class BpmnParse extends Parse {
     List<EventSubscriptionJobDeclaration> jobDeclarationsForActivity = (List<EventSubscriptionJobDeclaration>) activity.getProperty(PROPERTYNAME_EVENT_SUBSCRIPTION_JOB_DECLARATION);
 
     if (jobDeclarationsForActivity == null) {
-      jobDeclarationsForActivity = new ArrayList<EventSubscriptionJobDeclaration>();
+      jobDeclarationsForActivity = new ArrayList<>();
       activity.setProperty(PROPERTYNAME_EVENT_SUBSCRIPTION_JOB_DECLARATION, jobDeclarationsForActivity);
     }
 
@@ -1379,7 +1468,7 @@ public class BpmnParse extends Parse {
       String defaultSequenceFlow = (String) activity.getProperty("default");
       boolean hasDefaultFlow = defaultSequenceFlow != null && defaultSequenceFlow.length() > 0;
 
-      ArrayList<PvmTransition> flowsWithoutCondition = new ArrayList<PvmTransition>();
+      ArrayList<PvmTransition> flowsWithoutCondition = new ArrayList<>();
       for (PvmTransition flow : activity.getOutgoingTransitions()) {
         Condition condition = (Condition) flow.getProperty(BpmnParse.PROPERTYNAME_CONDITION);
         boolean isDefaultFlow = flow.getId() != null && flow.getId().equals(defaultSequenceFlow);
@@ -1918,7 +2007,7 @@ public class BpmnParse extends Parse {
 
   public String parseDocumentation(Element element) {
     List<Element> docElements = element.elements("documentation");
-    List<String> docStrings = new ArrayList<String>();
+    List<String> docStrings = new ArrayList<>();
     for (Element e : docElements) {
       docStrings.add(e.getText());
     }
@@ -2003,7 +2092,7 @@ public class BpmnParse extends Parse {
     List<Element> sequenceFlows = parentElement.elements("sequenceFlow");
 
     // collect all siblings in a map
-    Map<String, Element> siblingsMap = new HashMap<String, Element>();
+    Map<String, Element> siblingsMap = new HashMap<>();
     List<Element> siblings = parentElement.elements();
     for (Element sibling : siblings) {
       siblingsMap.put(sibling.attribute("id"), sibling);
@@ -2321,7 +2410,7 @@ public class BpmnParse extends Parse {
   protected void addMessageJobDeclarationToActivity(MessageJobDeclaration messageJobDeclaration, ActivityImpl activity) {
     List<MessageJobDeclaration> messageJobDeclarations = (List<MessageJobDeclaration>) activity.getProperty(PROPERTYNAME_MESSAGE_JOB_DECLARATION);
     if (messageJobDeclarations == null) {
-      messageJobDeclarations = new ArrayList<MessageJobDeclaration>();
+      messageJobDeclarations = new ArrayList<>();
       activity.setProperty(PROPERTYNAME_MESSAGE_JOB_DECLARATION, messageJobDeclarations);
     }
     messageJobDeclarations.add(messageJobDeclaration);
@@ -2332,7 +2421,7 @@ public class BpmnParse extends Parse {
 
     List<JobDeclaration<?, ?>> containingJobDeclarations = jobDeclarations.get(key);
     if (containingJobDeclarations == null) {
-      containingJobDeclarations = new ArrayList<JobDeclaration<?, ?>>();
+      containingJobDeclarations = new ArrayList<>();
       jobDeclarations.put(key, containingJobDeclarations);
     }
 
@@ -2383,7 +2472,8 @@ public class BpmnParse extends Parse {
     ParameterValueProvider priorityProvider = parsePriority(serviceTaskElement, PROPERTYNAME_TASK_PRIORITY);
     Map<String, String> properties = parseCamundaExtensionProperties(serviceTaskElement);
     activity.getProperties().set(BpmnProperties.EXTENSION_PROPERTIES, properties);
-
+    List<CamundaErrorEventDefinition> camundaErrorEventDefinitions = parseCamundaErrorEventDefinitions(activity, serviceTaskElement);
+    activity.getProperties().set(BpmnProperties.CAMUNDA_ERROR_EVENT_DEFINITION, camundaErrorEventDefinitions);
     activity.setActivityBehavior(new ExternalTaskActivityBehavior(topicNameProvider, priorityProvider));
   }
 
@@ -2433,7 +2523,7 @@ public class BpmnParse extends Parse {
   }
 
   public List<FieldDeclaration> parseFieldDeclarations(Element element) {
-    List<FieldDeclaration> fieldDeclarations = new ArrayList<FieldDeclaration>();
+    List<FieldDeclaration> fieldDeclarations = new ArrayList<>();
 
     Element elementWithFieldInjections = element.element("extensionElements");
     if (elementWithFieldInjections == null) { // Custom extensions will just
@@ -2542,7 +2632,6 @@ public class BpmnParse extends Parse {
     for (BpmnParseListener parseListener : parseListeners) {
       parseListener.parseTask(taskElement, scope, activity);
     }
-//    createMessageJobDeclForAsyncActivity(activity, true);
     return activity;
   }
 
@@ -2646,11 +2735,8 @@ public class BpmnParse extends Parse {
     taskDefinition.setKey(taskDefinitionKey);
     processDefinition.getTaskDefinitions().put(taskDefinitionKey, taskDefinition);
 
-    String formKeyAttribute = taskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "formKey");
-
-    if (formKeyAttribute != null) {
-      taskDefinition.setFormKey(expressionManager.createExpression(formKeyAttribute));
-    }
+    FormDefinition formDefinition = parseFormDefinition(taskElement);
+    taskDefinition.setFormDefinition(formDefinition);
 
     String name = taskElement.attribute("name");
     if (name != null) {
@@ -2669,6 +2755,49 @@ public class BpmnParse extends Parse {
     parseUserTaskCustomExtensions(taskElement, activity, taskDefinition);
 
     return taskDefinition;
+  }
+
+  protected FormDefinition parseFormDefinition(Element flowNodeElement) {
+    FormDefinition formDefinition = new FormDefinition();
+
+    String formKeyAttribute = flowNodeElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "formKey");
+    String formRefAttribute = flowNodeElement.attributeNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "formRef");
+
+    if(formKeyAttribute != null && formRefAttribute != null) {
+      addError("Invalid element definition: only one of the attributes formKey and formRef is allowed.", flowNodeElement);
+    }
+
+    if (formKeyAttribute != null) {
+      formDefinition.setFormKey(expressionManager.createExpression(formKeyAttribute));
+    }
+
+    if(formRefAttribute != null) {
+      formDefinition.setCamundaFormDefinitionKey(expressionManager.createExpression(formRefAttribute));
+
+      String formRefBindingAttribute = flowNodeElement.attributeNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "formRefBinding");
+
+      if (formRefBindingAttribute == null || !DefaultTaskFormHandler.ALLOWED_FORM_REF_BINDINGS.contains(formRefBindingAttribute)) {
+        addError("Invalid element definition: value for formRefBinding attribute has to be one of "
+            + DefaultTaskFormHandler.ALLOWED_FORM_REF_BINDINGS + " but was " + formRefBindingAttribute, flowNodeElement);
+      }
+
+
+      if(formRefBindingAttribute != null) {
+        formDefinition.setCamundaFormDefinitionBinding(formRefBindingAttribute);
+      }
+
+      if(DefaultTaskFormHandler.FORM_REF_BINDING_VERSION.equals(formRefBindingAttribute)) {
+        String formRefVersionAttribute = flowNodeElement.attributeNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "formRefVersion");
+
+        Expression camundaFormDefinitionVersion = expressionManager.createExpression(formRefVersionAttribute);
+
+        if(formRefVersionAttribute != null) {
+          formDefinition.setCamundaFormDefinitionVersion(camundaFormDefinitionVersion);
+        }
+      }
+    }
+
+    return formDefinition;
   }
 
   protected void parseHumanPerformer(Element taskElement, TaskDefinition taskDefinition) {
@@ -2788,7 +2917,7 @@ public class BpmnParse extends Parse {
    * @return the entries of the comma separated list, trimmed.
    */
   protected List<String> parseCommaSeparatedList(String s) {
-    List<String> result = new ArrayList<String>();
+    List<String> result = new ArrayList<>();
     if (s != null && !"".equals(s)) {
 
       StringCharacterIterator iterator = new StringCharacterIterator(s);
@@ -3134,6 +3263,29 @@ public class BpmnParse extends Parse {
 
   }
 
+  public List<CamundaErrorEventDefinition> parseCamundaErrorEventDefinitions(ActivityImpl activity, Element scopeElement) {
+    List<CamundaErrorEventDefinition> errorEventDefinitions = new ArrayList<>();
+    Element extensionElements = scopeElement.element("extensionElements");
+    if (extensionElements != null) {
+      List<Element> errorEventDefinitionElements = extensionElements.elements("errorEventDefinition");
+      for (Element errorEventDefinitionElement : errorEventDefinitionElements) {
+        String errorRef = errorEventDefinitionElement.attribute("errorRef");
+        Error error = null;
+        if (errorRef != null) {
+          String camundaExpression = errorEventDefinitionElement.attribute("expression");
+          error = errors.get(errorRef);
+          CamundaErrorEventDefinition definition = new CamundaErrorEventDefinition(activity.getId(), expressionManager.createExpression(camundaExpression));
+          definition.setErrorCode(error == null ? errorRef : error.getErrorCode());
+          setErrorCodeVariableOnErrorEventDefinition(errorEventDefinitionElement, definition);
+          setErrorMessageVariableOnErrorEventDefinition(errorEventDefinitionElement, definition);
+
+          errorEventDefinitions.add(definition);
+        }
+      }
+    }
+    return errorEventDefinitions;
+  }
+
   protected ActivityImpl getMultiInstanceScope(ActivityImpl activity) {
     if (activity.isMultiInstance()) {
       return activity.getParentFlowScopeActivity();
@@ -3217,7 +3369,7 @@ public class BpmnParse extends Parse {
 
     List<TimerDeclarationImpl> timerDeclarations = (List<TimerDeclarationImpl>) processDefinition.getProperty(PROPERTYNAME_START_TIMER);
     if (timerDeclarations == null) {
-      timerDeclarations = new ArrayList<TimerDeclarationImpl>();
+      timerDeclarations = new ArrayList<>();
       processDefinition.setProperty(PROPERTYNAME_START_TIMER, timerDeclarations);
     }
     timerDeclarations.add(timerDeclaration);
@@ -3502,7 +3654,7 @@ public class BpmnParse extends Parse {
   protected void addVariableDeclaration(ScopeImpl scope, VariableDeclaration variableDeclaration) {
     List<VariableDeclaration> variableDeclarations = (List<VariableDeclaration>) scope.getProperty(PROPERTYNAME_VARIABLE_DECLARATIONS);
     if (variableDeclarations == null) {
-      variableDeclarations = new ArrayList<VariableDeclaration>();
+      variableDeclarations = new ArrayList<>();
       scope.setProperty(PROPERTYNAME_VARIABLE_DECLARATIONS, variableDeclarations);
     }
     variableDeclarations.add(variableDeclaration);
@@ -3598,7 +3750,7 @@ public class BpmnParse extends Parse {
 
       final String variableEvents = element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "variableEvents");
       final List<String> variableEventsList = parseCommaSeparatedList(variableEvents);
-      conditionalEventDefinition.setVariableEvents(new HashSet<String>(variableEventsList));
+      conditionalEventDefinition.setVariableEvents(new HashSet<>(variableEventsList));
 
       for (String variableEvent : variableEventsList) {
         if (!VARIABLE_EVENTS.contains(variableEvent)) {
@@ -3777,13 +3929,11 @@ public class BpmnParse extends Parse {
   }
 
   protected void parseTenantId(Element callingActivityElement, ActivityImpl activity, BaseCallableElement callableElement, String attrName) {
-    ParameterValueProvider tenantIdValueProvider;
+    ParameterValueProvider tenantIdValueProvider = null;
 
     String tenantId = callingActivityElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, attrName);
     if (tenantId != null && tenantId.length() > 0) {
       tenantIdValueProvider = createParameterValueProvider(tenantId, expressionManager);
-    } else {
-      tenantIdValueProvider = new DefaultCallableElementTenantIdProvider();
     }
 
     callableElement.setTenantIdProvider(tenantIdValueProvider);
@@ -4383,7 +4533,7 @@ public class BpmnParse extends Parse {
         TransitionImpl sequenceFlow = sequenceFlows.get(sequenceFlowId);
         List<Element> waypointElements = bpmnEdgeElement.elementsNS(OMG_DI_NS, "waypoint");
         if (waypointElements.size() >= 2) {
-          List<Integer> waypoints = new ArrayList<Integer>();
+          List<Integer> waypoints = new ArrayList<>();
           for (Element waypointElement : waypointElements) {
             waypoints.add(parseDoubleAttribute(waypointElement, "x", waypointElement.attribute("x"), true).intValue());
             waypoints.add(parseDoubleAttribute(waypointElement, "y", waypointElement.attribute("y"), true).intValue());

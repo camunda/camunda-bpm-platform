@@ -38,15 +38,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class AuthorizationQueryAuthorizationsTest {
 
   @Rule
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   protected AuthorizationService authorizationService;
   protected ProcessEngineConfigurationImpl processEngineConfiguration;

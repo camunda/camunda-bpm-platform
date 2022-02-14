@@ -1,8 +1,10 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
       id = "getTaskLocalVariableBinary"
       tag = "Task Local Variable"
+      summary = "Get Local Task Variable (Binary)"
       desc = "Retrieves a binary variable from the context of a given task by id. Applicable for byte array and file
               variables." />
 
@@ -79,3 +81,4 @@
 
   }
 }
+</#macro>

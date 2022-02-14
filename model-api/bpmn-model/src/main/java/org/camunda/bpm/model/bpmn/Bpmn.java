@@ -41,6 +41,7 @@ import org.camunda.bpm.model.bpmn.impl.instance.camunda.CamundaConnectorIdImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.camunda.CamundaConnectorImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.camunda.CamundaConstraintImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.camunda.CamundaEntryImpl;
+import org.camunda.bpm.model.bpmn.impl.instance.camunda.CamundaErrorEventDefinitionImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.camunda.CamundaExecutionListenerImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.camunda.CamundaExpressionImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.camunda.CamundaFailedJobRetryTimeCycleImpl;
@@ -489,6 +490,7 @@ public class Bpmn {
     CamundaConnectorIdImpl.registerType(bpmnModelBuilder);
     CamundaConstraintImpl.registerType(bpmnModelBuilder);
     CamundaEntryImpl.registerType(bpmnModelBuilder);
+    CamundaErrorEventDefinitionImpl.registerType(bpmnModelBuilder);
     CamundaExecutionListenerImpl.registerType(bpmnModelBuilder);
     CamundaExpressionImpl.registerType(bpmnModelBuilder);
     CamundaFailedJobRetryTimeCycleImpl.registerType(bpmnModelBuilder);

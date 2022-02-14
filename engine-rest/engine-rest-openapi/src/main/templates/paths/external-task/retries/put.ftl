@@ -1,8 +1,10 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
       id = "setExternalTaskRetries"
       tag = "External Task"
+      summary = "Set Retries Sync"
       desc = "Sets the number of retries left to execute external tasks by id synchronously. If retries are set to 0, 
               an incident is created." />
 
@@ -44,3 +46,5 @@
 
   }
 }
+
+</#macro>

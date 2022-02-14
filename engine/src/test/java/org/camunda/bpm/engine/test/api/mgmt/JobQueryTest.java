@@ -16,12 +16,12 @@
  */
 package org.camunda.bpm.engine.test.api.mgmt;
 
-import static org.hamcrest.CoreMatchers.containsString;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.io.PrintWriter;
@@ -68,7 +68,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -85,9 +84,6 @@ public class JobQueryTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(rule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
   protected RuntimeService runtimeService;
@@ -396,7 +392,7 @@ public class JobQueryTest {
       managementService.createJobQuery().timers().messages().list();
       fail();
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("Cannot combine onlyTimers() with onlyMessages() in the same query"));
+      assertThat(e.getMessage()).contains("Cannot combine onlyTimers() with onlyMessages() in the same query");
     }
   }
 
@@ -533,6 +529,30 @@ public class JobQueryTest {
             .processInstanceId(processInstanceIdOne)
             .createdBefore(new Date(jobCreateTime.getTime() - 1));
     verifyQueryResults(query, 0);
+  }
+
+  @Test
+  public void shouldReturnNoJobDueToExcludingCriteria() {
+    JobQuery query = managementService.createJobQuery().processInstanceId(processInstanceIdOne);
+
+    List<Job> jobs = query.list();
+    assertEquals(1, jobs.size());
+
+    query = query.createdBefore(new Date(0)).createdAfter(new Date());
+
+    verifyQueryResults(query, 0);
+  }
+
+  @Test
+  public void shouldReturnJobDueToIncludingCriteria() {
+    JobQuery query = managementService.createJobQuery().processInstanceId(processInstanceIdOne);
+
+    List<Job> jobs = query.list();
+    assertEquals(1, jobs.size());
+
+    query = query.createdBefore(new Date()).createdAfter(new Date(0));
+
+    verifyQueryResults(query, 1);
   }
 
   @Test
@@ -696,22 +716,22 @@ public class JobQueryTest {
   public void testQueryByJobIdsWithEmptyList() {
     // given
     Set<String> ids = Collections.emptySet();
-    // then
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Set of job ids is empty");
-    // when
-    managementService.createJobQuery().jobIds(ids);
+
+    // when/then
+    assertThatThrownBy(() -> managementService.createJobQuery().jobIds(ids))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Set of job ids is empty");
   }
 
   @Test
   public void testQueryByJobIdsWithNull() {
     // given
     Set<String> ids = null;
-    // then
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Set of job ids is null");
-    // when
-    managementService.createJobQuery().jobIds(ids);
+
+    // when/then
+    assertThatThrownBy(() -> managementService.createJobQuery().jobIds(ids))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Set of job ids is null");
   }
 
   @Test
@@ -759,22 +779,22 @@ public class JobQueryTest {
   public void testQueryByProcessInstanceIdsWithEmptyList() {
     // given
     Set<String> ids = Collections.emptySet();
-    // then
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Set of process instance ids is empty");
-    // when
-    managementService.createJobQuery().processInstanceIds(ids);
+
+    // when/then
+    assertThatThrownBy(() -> managementService.createJobQuery().processInstanceIds(ids))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Set of process instance ids is empty");
   }
 
   @Test
   public void testQueryByProcessInstanceIdsWithNull() {
     // given
     Set<String> ids = null;
-    // then
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Set of process instance ids is null");
-    // when
-    managementService.createJobQuery().processInstanceIds(ids);
+
+    // when/then
+    assertThatThrownBy(() -> managementService.createJobQuery().processInstanceIds(ids))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Set of process instance ids is null");
   }
 
   @Test
@@ -840,14 +860,14 @@ public class JobQueryTest {
       managementService.createJobQuery().orderByJobId().list();
       fail();
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("call asc() or desc() after using orderByXX()"));
+      assertThat(e.getMessage()).contains("call asc() or desc() after using orderByXX()");
     }
 
     try {
       managementService.createJobQuery().asc();
       fail();
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("You should call any of the orderBy methods first before specifying a direction"));
+      assertThat(e.getMessage()).contains("You should call any of the orderBy methods first before specifying a direction");
     }
   }
 
@@ -882,7 +902,7 @@ public class JobQueryTest {
       managementService.executeJob(timerJob.getId());
       fail("RuntimeException from within the script task expected");
     } catch(RuntimeException re) {
-      assertThat(re.getMessage(), containsString(EXCEPTION_MESSAGE));
+      assertThat(re.getMessage()).contains(EXCEPTION_MESSAGE);
     }
     return processInstance;
   }
@@ -894,7 +914,7 @@ public class JobQueryTest {
     assertNotNull(failedJob);
     assertEquals(processInstance.getId(), failedJob.getProcessInstanceId());
     assertNotNull(failedJob.getExceptionMessage());
-    assertThat(failedJob.getExceptionMessage(), containsString(EXCEPTION_MESSAGE));
+    assertThat(failedJob.getExceptionMessage()).contains(EXCEPTION_MESSAGE);
   }
 
   private void verifyQueryResults(JobQuery query, int countExpected) {

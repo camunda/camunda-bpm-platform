@@ -1,14 +1,18 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto
     required = [ "type" ] >
 
     <#-- NOTE: Please consider adjusting the RestartProcessInstanceModificationInstructionDto
          if the properties are valid there as well.
          The DTO was created separately as it does not contain
-         all of these properties and the description differs too much. -->
+         all of these properties and the description differs too much.
+         Also check the MultipleProcessInstanceModifcationInstructionDto if you need changes for the Modification endpoints.
+         -->
 
     <@lib.property
         name = "type"
         type = "string"
+        nullable = false
         enumValues = ['"cancel"', '"startBeforeActivity"', '"startAfterActivity"', '"startTransition"']
         desc = "**Mandatory**. One of the following values: `cancel`, `startBeforeActivity`, `startAfterActivity`, `startTransition`.
 
@@ -64,3 +68,5 @@
         desc = "Can be used with instructions of type cancel. Prevents the deletion of new created activity instances." />
 
 </@lib.dto>
+
+</#macro>

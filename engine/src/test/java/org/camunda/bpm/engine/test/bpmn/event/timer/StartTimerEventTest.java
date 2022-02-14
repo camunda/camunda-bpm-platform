@@ -42,6 +42,7 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
+import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
@@ -412,6 +413,23 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
 
     ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId());
     assertEquals(0, processInstanceQuery.count());
+  }
+
+  @Test
+  @Deployment
+  public void shouldEvaluateExpressionStartTimerEventInEventSubprocess() {
+    // given
+    ProcessInstantiationBuilder builder = runtimeService.createProcessInstanceByKey("shouldEvaluateExpressionStartTimerEventInEventSubprocess")
+        .setVariable("duration", "PT5M");
+
+    // when
+    ProcessInstance processInstance = builder.startBeforeActivity("processUserTask").execute();
+
+    // then
+    ProcessInstance startedProcessInstance = runtimeService.createProcessInstanceQuery().singleResult();
+    // make sure process instance was started
+    assertThat(processInstance.getId()).isEqualTo(startedProcessInstance.getId());
+    
   }
 
   @Deployment

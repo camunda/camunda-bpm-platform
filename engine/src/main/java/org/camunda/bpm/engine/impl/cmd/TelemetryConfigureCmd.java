@@ -17,12 +17,14 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
-import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
+import org.camunda.bpm.engine.impl.util.TelemetryUtil;
 
 public class TelemetryConfigureCmd implements Command<Void> {
 
@@ -39,25 +41,42 @@ public class TelemetryConfigureCmd implements Command<Void> {
   public Void execute(CommandContext commandContext) {
 
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkCamundaAdmin();
+    authorizationManager.checkCamundaAdminOrPermission(CommandChecker::checkConfigureTelemetry);
 
-    PropertyEntity telemetryProperty = commandContext.getPropertyManager().findPropertyById(TELEMETRY_PROPERTY);
-    if (telemetryProperty != null) {
-      telemetryProperty.setValue(Boolean.toString(telemetryEnabled));
-    } else {
-      LOG.databaseTelemetryPropertyMissingInfo(telemetryEnabled);
-      telemetryProperty = new PropertyEntity(TELEMETRY_PROPERTY, Boolean.toString(telemetryEnabled));
-      commandContext.getPropertyManager().insert(telemetryProperty);
-    }
 
-    TelemetryReporter telemetryReporter = commandContext.getProcessEngineConfiguration().getTelemetryReporter();
-    if (telemetryEnabled) {
-      telemetryReporter.start();
-    } else {
-      telemetryReporter.stop();
-    }
+    commandContext.runWithoutAuthorization(() -> {
+      toggleTelemetry(commandContext);
+      return null;
+    });
+
 
     return null;
+  }
+
+  protected void toggleTelemetry(CommandContext commandContext) {
+
+    Boolean currentValue = new IsTelemetryEnabledCmd().execute(commandContext);
+
+    new SetPropertyCmd(TELEMETRY_PROPERTY, Boolean.toString(telemetryEnabled)).execute(commandContext);
+
+    ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
+
+    boolean isReportedActivated = processEngineConfiguration.isTelemetryReporterActivate();
+    TelemetryReporter telemetryReporter = processEngineConfiguration.getTelemetryReporter();
+
+    // telemetry enabled or set for the first time
+    if (currentValue == null || (!currentValue.booleanValue() && telemetryEnabled)) {
+      if (isReportedActivated) {
+        telemetryReporter.reschedule(currentValue == null);
+      }
+    }
+
+    // reset collected data when telemetry is enabled
+    // we don't want to send data that has been collected before consent was given
+    TelemetryUtil.toggleLocalTelemetry(
+        telemetryEnabled,
+        processEngineConfiguration.getTelemetryRegistry(),
+        processEngineConfiguration.getMetricsRegistry());
   }
 
 }

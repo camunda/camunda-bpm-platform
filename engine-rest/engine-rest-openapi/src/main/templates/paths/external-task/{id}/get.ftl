@@ -1,8 +1,10 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
       id = "getExternalTask"
       tag = "External Task"
+      summary = "Get"
       desc = "Retrieves an external task by id, corresponding to the `ExternalTask` interface in the engine." />
 
   "parameters" : [
@@ -55,3 +57,5 @@
 
   }
 }
+
+</#macro>

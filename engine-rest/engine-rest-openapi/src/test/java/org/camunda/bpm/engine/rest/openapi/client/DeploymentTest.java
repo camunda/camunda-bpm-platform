@@ -88,7 +88,7 @@ public class DeploymentTest {
         );
 
     // when
-    DeploymentWithDefinitionsDto deployment = api.createDeployment(null, deploymentSource, false, false, deploymentName, new File("src/test/resources/one.bpmn"));
+    DeploymentWithDefinitionsDto deployment = api.createDeployment(null, deploymentSource, false, false, deploymentName, null, new File("src/test/resources/one.bpmn"));
 
     // then
     assertThat(deployment.getId()).isEqualTo("aDeploymentId");

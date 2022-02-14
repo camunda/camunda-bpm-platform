@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.LATEST_DMN_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_TARGET_REF;
 
 import org.camunda.bpm.model.dmn.instance.DmnElementReference;
@@ -34,7 +34,7 @@ public class TargetRefImpl extends DmnElementReferenceImpl implements TargetRef 
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(TargetRef.class, DMN_ELEMENT_TARGET_REF)
-      .namespaceUri(DMN11_NS)
+      .namespaceUri(LATEST_DMN_NS)
       .extendsType(DmnElementReference.class)
       .instanceProvider(new ModelTypeInstanceProvider<TargetRef>() {
         public TargetRef newInstance(ModelTypeInstanceContext instanceContext) {

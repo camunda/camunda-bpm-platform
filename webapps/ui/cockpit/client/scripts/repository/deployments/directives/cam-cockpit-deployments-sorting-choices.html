@@ -1,0 +1,34 @@
+<!-- # cockpit client/scripts/repository/deployments/directives/cam-cockpit-deployments-sorting-choices.html -->
+<div uib-dropdown class="dropdown">
+
+  <a href
+     uib-dropdown-toggle
+     tabindex="-1"
+     role="button"
+     class="dropdown-toggle">
+    <span class="hidden-xs hidden-sm hidden-md"></span>
+    <span class="sort-by">{{ byLabel(sorting.sortBy) }}</span>
+  </a>
+
+  <a href
+     tabindex="-1"
+     uib-tooltip="{{ (sorting.sortOrder === 'desc' ? 'REPOSITORY_DEPLOYMENTS_TOOLTIP_SORT_DESC' : 'REPOSITORY_DEPLOYMENTS_TOOLTIP_SORT_ASC' | translate) }}"
+     class="glyphicon sort-direction"
+     ng-class="sorting.sortOrder === 'asc' ? 'glyphicon-menu-up' : 'glyphicon-menu-down'"
+     ng-click="changeOrder()"></a>
+
+  <ul uib-dropdown-menu class="dropdown-menu"
+      role="menu">
+
+    <li ng-show="sorting.sortBy !== id"
+        ng-repeat="(id, name) in uniqueProps">
+      <a href
+         tabindex="-1"
+         class="sort-by-choice"
+         ng-click="changeBy(id)">{{ name }}</a>
+    </li>
+
+  </ul>
+
+</div>
+<!-- / cockpit client/scripts/repository/deployments/directives/cam-cockpit-deployments-sorting-choices.html -->

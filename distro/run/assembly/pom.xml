@@ -5,12 +5,12 @@
   <parent>
     <groupId>org.camunda.bpm.run</groupId>
     <artifactId>camunda-bpm-run-root</artifactId>
-    <version>7.14.0-SNAPSHOT</version>
+    <version>7.17.0-SNAPSHOT</version>
     <relativePath>..</relativePath>
   </parent>
 
   <artifactId>camunda-bpm-run-assembly</artifactId>
-  <name>Camunda BPM - Run - Assembly</name>
+  <name>Camunda Platform - Run - Assembly</name>
   <packaging>pom</packaging>
   
   <properties>
@@ -27,6 +27,34 @@
       <artifactId>camunda-bpm-run-modules-rest</artifactId>
       <version>${project.version}</version>
       <type>pom</type>
+      <exclusions>
+        <!-- do not add transitive dependencies to generated dependency list -->
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm.run</groupId>
+      <artifactId>camunda-bpm-run-modules-swaggerui</artifactId>
+      <version>${project.version}</version>
+      <type>jar</type>
+      <exclusions>
+        <!-- do not add transitive dependencies to generated dependency list -->
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm.run</groupId>
+      <artifactId>camunda-bpm-run-modules-example-invoice</artifactId>
+      <version>${project.version}</version>
+      <type>jar</type>
       <exclusions>
         <!-- do not add transitive dependencies to generated dependency list -->
         <exclusion>
@@ -59,6 +87,12 @@
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-all</artifactId>
+      <version>${version.groovy}</version>
     </dependency>
 
   </dependencies>

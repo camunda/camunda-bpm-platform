@@ -16,8 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy.query.history;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 
@@ -101,7 +100,7 @@ public class MultiTenancySharedDecisionInstanceStatisticsQueryTest {
     HistoricDecisionInstanceStatisticsQuery query = historyService.
         createHistoricDecisionInstanceStatisticsQuery(decisionRequirementsDefinition.getId());
 
-    assertThat(query.count(), is(0L));
+    assertThat(query.count()).isEqualTo(0L);
   }
 
   @Test
@@ -115,7 +114,7 @@ public class MultiTenancySharedDecisionInstanceStatisticsQueryTest {
     HistoricDecisionInstanceStatisticsQuery query = historyService.
         createHistoricDecisionInstanceStatisticsQuery(decisionRequirementsDefinition.getId());
 
-    assertThat(query.count(), is(3L));
+    assertThat(query.count()).isEqualTo(3L);
   }
 
   @Test
@@ -130,6 +129,6 @@ public class MultiTenancySharedDecisionInstanceStatisticsQueryTest {
     HistoricDecisionInstanceStatisticsQuery query = historyService.
         createHistoricDecisionInstanceStatisticsQuery(decisionRequirementsDefinition.getId());
 
-    assertThat(query.count(), is(3L));
+    assertThat(query.count()).isEqualTo(3L);
   }
 }

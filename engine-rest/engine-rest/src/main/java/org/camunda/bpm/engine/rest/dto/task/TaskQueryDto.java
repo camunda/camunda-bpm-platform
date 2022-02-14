@@ -135,6 +135,8 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   private String taskDefinitionKey;
   private String[] taskDefinitionKeyIn;
   private String taskDefinitionKeyLike;
+  private String taskId;
+  private String[] taskIdIn;
   private String description;
   private String descriptionLike;
   private String involvedUser;
@@ -169,6 +171,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   private String dueBeforeExpression;
   private Date dueDate;
   private String dueDateExpression;
+  private Boolean withoutDueDate;
   private Date followUpAfter;
   private String followUpAfterExpression;
   private Date followUpBefore;
@@ -195,7 +198,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   protected Boolean withoutCandidateGroups;
   protected Boolean withCandidateUsers;
   protected Boolean withoutCandidateUsers;
-  
+
   protected Boolean variableNamesIgnoreCase;
   protected Boolean variableValuesIgnoreCase;
 
@@ -373,6 +376,16 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     this.includeAssignedTasks = includeAssignedTasks;
   }
 
+  @CamundaQueryParam("taskId")
+  public void setTaskId(String taskId) {
+    this.taskId = taskId;
+  }
+
+  @CamundaQueryParam(value = "taskIdIn", converter= StringArrayConverter.class)
+  public void setTaskIdIn(String[] taskIdIn) {
+    this.taskIdIn = taskIdIn;
+  }
+
   @CamundaQueryParam("taskDefinitionKey")
   public void setTaskDefinitionKey(String taskDefinitionKey) {
     this.taskDefinitionKey = taskDefinitionKey;
@@ -512,6 +525,11 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   @CamundaQueryParam(value = "dueDateExpression")
   public void setDueDateExpression(String dueDateExpression) {
     this.dueDateExpression = dueDateExpression;
+  }
+
+  @CamundaQueryParam(value = "withoutDueDate", converter = BooleanConverter.class)
+  public void setWithoutDueDate(Boolean withoutDueDate) {
+    this.withoutDueDate = withoutDueDate;
   }
 
   @CamundaQueryParam(value = "followUpAfter", converter = DateConverter.class)
@@ -665,7 +683,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   public void setCaseInstanceVariables(List<VariableQueryParameterDto> caseInstanceVariables) {
     this.caseInstanceVariables = caseInstanceVariables;
   }
-  
+
   @CamundaQueryParam(value = "variableNamesIgnoreCase", converter = BooleanConverter.class)
   public void setVariableNamesIgnoreCase(Boolean variableNamesCaseInsensitive) {
     this.variableNamesIgnoreCase = variableNamesCaseInsensitive;
@@ -794,6 +812,14 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     return includeAssignedTasks;
   }
 
+  public String[] getTaskIdIn() {
+    return taskIdIn;
+  }
+
+  public String getTaskId() {
+    return taskId;
+  }
+
   public String[] getTaskDefinitionKeyIn() {
     return taskDefinitionKeyIn;
   }
@@ -862,6 +888,10 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     return parentTaskId;
   }
 
+  public Boolean getAssigned() {
+    return assigned;
+  }
+
   public Boolean getUnassigned() {
     return unassigned;
   }
@@ -928,6 +958,10 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
 
   public String getDueDateExpression() {
     return dueDateExpression;
+  }
+
+  public Boolean getWithoutDueDate() {
+    return withoutDueDate;
   }
 
   public Date getFollowUpAfter() {
@@ -1013,7 +1047,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   public List<TaskQueryDto> getOrQueries() {
     return orQueries;
   }
-  
+
   public Boolean isVariableNamesIgnoreCase() {
     return variableNamesIgnoreCase;
   }
@@ -1122,6 +1156,12 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     if (candidateUserExpression != null) {
       query.taskCandidateUserExpression(candidateUserExpression);
     }
+    if (taskIdIn != null && taskIdIn.length > 0) {
+      query.taskIdIn(taskIdIn);
+    }
+    if (taskId != null) {
+      query.taskId(taskId);
+    }
     if (taskDefinitionKeyIn != null && taskDefinitionKeyIn.length > 0) {
       query.taskDefinitionKeyIn(taskDefinitionKeyIn);
     }
@@ -1196,6 +1236,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     }
     if (dueDateExpression != null) {
       query.dueDateExpression(dueDateExpression);
+    }
+    if (TRUE.equals(withoutDueDate)) {
+      query.withoutDueDate();
     }
     if (followUpAfter != null) {
       query.followUpAfter(followUpAfter);
@@ -1337,6 +1380,8 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
           query.processVariableValueLessThanOrEquals(variableName, variableValue);
         } else if (op.equals(VariableQueryParameterDto.LIKE_OPERATOR_NAME)) {
           query.processVariableValueLike(variableName, String.valueOf(variableValue));
+        } else if (op.equals(VariableQueryParameterDto.NOT_LIKE_OPERATOR_NAME)) {
+          query.processVariableValueNotLike(variableName, String.valueOf(variableValue));
         } else {
           throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid process variable comparator specified: " + op);
         }
@@ -1533,8 +1578,12 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     dto.dueAfter = taskQuery.getDueAfter();
     dto.dueBefore = taskQuery.getDueBefore();
     dto.dueDate = taskQuery.getDueDate();
+    if (taskQuery.isWithoutDueDate()) {
+      dto.withoutDueDate = taskQuery.isWithoutDueDate();
+    }
+
     dto.followUpAfter = taskQuery.getFollowUpAfter();
-    
+
     dto.variableNamesIgnoreCase = taskQuery.isVariableNamesIgnoreCase();
     dto.variableValuesIgnoreCase = taskQuery.isVariableValuesIgnoreCase();
 
@@ -1552,7 +1601,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
       dto.delegationState = taskQuery.getDelegationState().toString();
     }
 
-    if (taskQuery.isTenantIdSet()) {
+    if (taskQuery.isWithoutTenantId()) {
       if (taskQuery.getTenantIds() != null) {
         dto.tenantIdIn = taskQuery.getTenantIds();
       } else {

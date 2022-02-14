@@ -74,6 +74,14 @@
     where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
   </update>
 
+  <update id="updateAuthorizationsByRootProcessInstanceId_mssql"
+          parameterType="java.util.Map">
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_RU_AUTHORIZATION RES WITH (FORCESEEK)
+    where RES.ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+  </update>
+
   <update id="updateAuthorizationsByProcessInstanceId"
           parameterType="java.util.Map">
     update ${prefix}ACT_RU_AUTHORIZATION set
@@ -88,6 +96,22 @@
       )
       <!-- process instances -->
       or RESOURCE_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+  </update>
+
+  <update id="updateAuthorizationsByProcessInstanceId_mssql"
+          parameterType="java.util.Map">
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_RU_AUTHORIZATION RES WITH (FORCESEEK)
+    where
+      <!-- task instances -->
+      RES.RESOURCE_ID_ IN (
+        SELECT ID_
+        FROM ${prefix}ACT_HI_TASKINST
+        WHERE PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+      )
+      <!-- process instances -->
+      or RES.RESOURCE_ID_ = #{processInstanceId, jdbcType=VARCHAR}
   </update>
 
   <!-- AUTHORIZATION DELETE -->
@@ -675,8 +699,8 @@
   
   <sql id="authCheckJoin">
     <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">      
-      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />      
-      AUTH ON (AUTH.RESOURCE_ID_ in (RES.ID_, '*'))      
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
+      AUTH ON (AUTH.RESOURCE_ID_ ${authJoinStart} RES.ID_ ${authJoinSeparator} '*' ${authJoinEnd})
     </if>    
   </sql>
   
@@ -685,11 +709,16 @@
     <bind name="authGroupIds" value="authCheck.authGroupIds" />
     <bind name="atomicChecks" value="authCheck.permissionChecks.atomicChecks" />
     <bind name="disjunctive" value="authCheck.permissionChecks.disjunctive" />
+    <bind name="useLeftJoin" value="authCheck.useLeftJoin" />
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClauseWithBinding" />
   </sql>
 
   <sql id="authCheckJoinWithoutOnClauseWithBinding">
-    left JOIN (
+    <choose>
+      <when test="useLeftJoin != null &amp;&amp; useLeftJoin == true">left join</when>
+      <otherwise>inner join</otherwise>
+    </choose>
+    (
     SELECT A.*
     FROM ${prefix}ACT_RU_AUTHORIZATION A
     WHERE A.TYPE_ &lt; 2     
@@ -851,9 +880,13 @@
         </when>
         <otherwise>
           and (
-          (RES.CASE_EXECUTION_ID_ IS NOT NULL)
-          OR
-          (AUTH.RESOURCE_ID_ IS NOT NULL)
+          <!-- Task query does not use left join if cmmn is disabled, 
+            so we don't need to account for case tasks in this case. -->
+          <if test="applyAuthorizationCheckForCaseInstances" >
+            (RES.CASE_EXECUTION_ID_ IS NOT NULL)
+            OR
+          </if>
+            (AUTH.RESOURCE_ID_ IS NOT NULL)
             <if test="authCheck.permissionChecks.compositeChecks != null &amp;&amp; authCheck.permissionChecks.compositeChecks.size > 0"> 
               AND
               <foreach item="permCheck" index="index" collection="authCheck.permissionChecks.compositeChecks" separator="AND">

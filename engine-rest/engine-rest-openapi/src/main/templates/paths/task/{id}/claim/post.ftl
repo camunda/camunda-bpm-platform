@@ -1,8 +1,10 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
       id = "claim"
       tag = "Task"
+      summary = "Claim"
       desc = "Claims a task for a specific user.
 
               **Note:** The difference with the
@@ -50,3 +52,5 @@
 
   }
 }
+
+</#macro>

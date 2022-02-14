@@ -34,6 +34,7 @@ import org.camunda.bpm.qa.rolling.update.scenarios.task.ProcessWithUserTaskAndTi
 import org.camunda.bpm.qa.rolling.update.scenarios.task.ProcessWithUserTaskScenario;
 import org.camunda.bpm.qa.rolling.update.scenarios.timestamp.IncidentTimestampUpdateScenario;
 import org.camunda.bpm.qa.rolling.update.scenarios.timestamp.JobTimestampsUpdateScenario;
+import org.camunda.bpm.qa.rolling.update.scenarios.variable.EmptyStringVariableScenario;
 import org.camunda.bpm.qa.upgrade.ScenarioRunner;
 
 /**
@@ -80,6 +81,7 @@ public class TestFixture {
 
     if (RollingUpdateConstants.NEW_ENGINE_TAG.equals(currentFixtureTag)) { // create data with new engine
       runner.setupScenarios(HistoryCleanupScenario.class);
+      runner.setupScenarios(EmptyStringVariableScenario.class);
     }
 
     processEngine.close();

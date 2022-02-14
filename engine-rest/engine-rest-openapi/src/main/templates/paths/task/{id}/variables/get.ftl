@@ -1,8 +1,10 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
       id = "getTaskVariables"
       tag = "Task Variable"
+      summary = "Get Task Variables"
       desc = "Retrieves all variables visible from the task. A variable is visible from the task if it is a local task
               variable or declared in a parent scope of the task. See documentation on
               [visiblity of variables](${docsUrl}/user-guide/process-engine/variables/)." />
@@ -17,7 +19,7 @@
         desc = "The id of the task to retrieve the variables from."/>
 
     <@lib.parameter
-        name = "deserializeValue"
+        name = "deserializeValues"
         location = "query"
         type = "boolean"
         defaultValue = "true"
@@ -85,3 +87,4 @@
                 for the error response format." />
   }
 }
+</#macro>

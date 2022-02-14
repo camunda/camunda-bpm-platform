@@ -31,7 +31,7 @@ public class MaxLengthValidator extends AbstractTextValueValidator {
       throw new FormFieldConfigurationException(configuration, "Cannot validate \"maxlength\": configuration "+configuration+" cannot be interpreted as Integer");
     }
 
-    return submittedValue.length() < maxLength;
+    return submittedValue.length() <= maxLength;
   }
 
 }

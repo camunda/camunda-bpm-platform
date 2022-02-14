@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
@@ -20,11 +21,13 @@
 
   "responses" : {
 
-    <@lib.response
+    <@lib.multiTypeResponse
         code = "200"
-        mediaType = "application/xhtml+xml"
         desc = "Request successful."
-        examples = ['"example-1": {
+        types = [
+          {
+            "mediaType": "application/xhtml+xml",
+            "examples": ['"example-1": {
                        "summary": "Status 200 Response",
                        "description": "Resonse for GET `/process-definition/processDefinitionId/deployed-start-form`",
                        "value": "<form role=\\"form\\" name=\\"invoiceForm\\"
@@ -47,7 +50,13 @@
                                   </div>
 
                                 </form>"
-                     }'] />
+                     }']
+          },
+          {
+            "mediaType": "application/json",
+            "flatType": "string"
+          }
+        ] />
 
     <@lib.response
         code = "400"
@@ -73,3 +82,5 @@
 
   }
 }
+
+</#macro>

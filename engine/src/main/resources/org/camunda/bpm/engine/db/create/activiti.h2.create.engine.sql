@@ -69,7 +69,7 @@ create table ACT_GE_SCHEMA_LOG (
 );
 
 insert into ACT_GE_SCHEMA_LOG
-values ('0', CURRENT_TIMESTAMP, '7.14.0');
+values ('0', CURRENT_TIMESTAMP, '7.17.0');
 
 create table ACT_RE_DEPLOYMENT (
     ID_ varchar(64),
@@ -131,6 +131,7 @@ create table ACT_RU_JOB (
     SEQUENCE_COUNTER_ integer,
     TENANT_ID_ varchar(64),
     CREATE_TIME_ timestamp,
+    LAST_FAILURE_LOG_ID_ varchar(64),
     primary key (ID_)
 );
 
@@ -165,6 +166,17 @@ create table ACT_RE_PROCDEF (
     VERSION_TAG_ varchar(64),
     HISTORY_TTL_ integer,
     STARTABLE_ boolean NOT NULL default TRUE,
+    primary key (ID_)
+);
+
+create table ACT_RE_CAMFORMDEF (
+    ID_ varchar(64) NOT NULL,
+    REV_ integer,
+    KEY_ varchar(255) NOT NULL,
+    VERSION_ integer NOT NULL,
+    DEPLOYMENT_ID_ varchar(64),
+    RESOURCE_NAME_ varchar(4000),
+    TENANT_ID_ varchar(64),
     primary key (ID_)
 );
 
@@ -216,6 +228,7 @@ create table ACT_RU_VARIABLE (
     CASE_EXECUTION_ID_ varchar(64),
     CASE_INST_ID_ varchar(64),
     TASK_ID_ varchar(64),
+    BATCH_ID_ varchar(64),
     BYTEARRAY_ID_ varchar(64),
     DOUBLE_ double,
     LONG_ bigint,
@@ -258,6 +271,7 @@ create table ACT_RU_INCIDENT (
   CONFIGURATION_ varchar(255),
   TENANT_ID_ varchar(64),
   JOB_DEF_ID_ varchar(64),
+  ANNOTATION_ varchar(4000),
   primary key (ID_)
 );
 
@@ -296,6 +310,13 @@ create table ACT_RU_METER_LOG (
   primary key (ID_)
 );
 
+create table ACT_RU_TASK_METER_LOG (
+  ID_ varchar(64) not null,
+  ASSIGNEE_HASH_ long,
+  TIMESTAMP_ timestamp,
+  primary key (ID_)
+);
+
 create table ACT_RU_EXT_TASK (
   ID_ varchar(64) not null,
   REV_ integer not null,
@@ -314,6 +335,7 @@ create table ACT_RU_EXT_TASK (
   ACT_INST_ID_ varchar(64),
   TENANT_ID_ varchar(64),
   PRIORITY_ bigint NOT NULL DEFAULT 0,
+  LAST_FAILURE_LOG_ID_ varchar(64),
   primary key (ID_)
 );
 
@@ -340,13 +362,17 @@ create index ACT_IDX_EXEC_BUSKEY on ACT_RU_EXECUTION(BUSINESS_KEY_);
 create index ACT_IDX_EXEC_TENANT_ID on ACT_RU_EXECUTION(TENANT_ID_);
 create index ACT_IDX_TASK_CREATE on ACT_RU_TASK(CREATE_TIME_);
 create index ACT_IDX_TASK_ASSIGNEE on ACT_RU_TASK(ASSIGNEE_);
+create index ACT_IDX_TASK_OWNER on ACT_RU_TASK(OWNER_);
 create index ACT_IDX_TASK_TENANT_ID on ACT_RU_TASK(TENANT_ID_);
 create index ACT_IDX_IDENT_LNK_USER on ACT_RU_IDENTITYLINK(USER_ID_);
 create index ACT_IDX_IDENT_LNK_GROUP on ACT_RU_IDENTITYLINK(GROUP_ID_);
 create index ACT_IDX_EVENT_SUBSCR_CONFIG_ on ACT_RU_EVENT_SUBSCR(CONFIGURATION_);
 create index ACT_IDX_EVENT_SUBSCR_TENANT_ID on ACT_RU_EVENT_SUBSCR(TENANT_ID_);
+
 create index ACT_IDX_VARIABLE_TASK_ID on ACT_RU_VARIABLE(TASK_ID_);
 create index ACT_IDX_VARIABLE_TENANT_ID on ACT_RU_VARIABLE(TENANT_ID_);
+create index ACT_IDX_VARIABLE_TASK_NAME_TYPE on ACT_RU_VARIABLE(TASK_ID_, NAME_, TYPE_);
+
 create index ACT_IDX_ATHRZ_PROCEDEF on ACT_RU_IDENTITYLINK(PROC_DEF_ID_);
 create index ACT_IDX_INC_CONFIGURATION on ACT_RU_INCIDENT(CONFIGURATION_);
 create index ACT_IDX_INC_TENANT_ID on ACT_RU_INCIDENT(TENANT_ID_);
@@ -365,6 +391,9 @@ CREATE INDEX ACT_IDX_METER_LOG_REPORT ON ACT_RU_METER_LOG(NAME_, REPORTER_, MILL
 -- old metric timestamp column
 CREATE INDEX ACT_IDX_METER_LOG_TIME ON ACT_RU_METER_LOG(TIMESTAMP_);
 CREATE INDEX ACT_IDX_METER_LOG ON ACT_RU_METER_LOG(NAME_, TIMESTAMP_);
+
+-- task metric timestamp column
+CREATE INDEX ACT_IDX_TASK_METER_LOG_TIME ON ACT_RU_TASK_METER_LOG(TIMESTAMP_);
 
 create index ACT_IDX_EXT_TASK_TOPIC ON ACT_RU_EXT_TASK(TOPIC_NAME_);
 create index ACT_IDX_EXT_TASK_TENANT_ID ON ACT_RU_EXT_TASK(TENANT_ID_);
@@ -542,6 +571,12 @@ alter table ACT_RU_BATCH
     add constraint ACT_FK_BATCH_JOB_DEF
     foreign key (BATCH_JOB_DEF_ID_)
     references ACT_RU_JOBDEF (ID_);
+
+create index ACT_IDX_BATCH_ID ON ACT_RU_VARIABLE(BATCH_ID_);
+alter table ACT_RU_VARIABLE
+    add constraint ACT_FK_VAR_BATCH
+    foreign key (BATCH_ID_)
+    references ACT_RU_BATCH (ID_);
 
 -- indices for history cleanup: https://jira.camunda.com/browse/CAM-11616
 create index ACT_IDX_AUTH_ROOT_PI on ACT_RU_AUTHORIZATION(ROOT_PROC_INST_ID_);

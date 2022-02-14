@@ -5,18 +5,30 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-database-settings</artifactId>
     <relativePath>../database</relativePath>
-    <version>7.14.0-SNAPSHOT</version>
+    <version>7.17.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-engine-rest-root</artifactId>
 
   <packaging>pom</packaging>
-  <name>camunda BPM - engine - REST - Root</name>
+  <name>Camunda Platform - engine - REST - Root</name>
 
   <properties>
-    <jackson.version>2.10.0</jackson.version>
+    <jackson.version>2.12.1</jackson.version>
     <jackson.databind.version>${jackson.version}</jackson.databind.version>
   </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-core-internal-dependencies</artifactId>
+        <version>${project.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <modules>
     <module>engine-rest</module>

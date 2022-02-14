@@ -41,6 +41,7 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
 
   public static final String ID = "id";
   public static final String TASK_ID = "taskId";
+  public static final String TASK_ID_IN = "taskIdIn";
   public static final String NAME = "name";
   public static final String NAME_NOT_EQUAL = "nameNotEqual";
   public static final String NAME_LIKE = "nameLike";
@@ -91,6 +92,7 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
   public static final String DUE_DATE = "dueDate";
   public static final String DUE_BEFORE = "dueBefore";
   public static final String DUE_AFTER = "dueAfter";
+  public static final String WITHOUT_DUE_DATE = "withoutDueDate";
   public static final String FOLLOW_UP = "followUp";
   public static final String FOLLOW_UP_DATE = "followUpDate";
   public static final String FOLLOW_UP_BEFORE = "followUpBefore";
@@ -133,6 +135,7 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     TaskQueryImpl query = (TaskQueryImpl) taskQuery;
 
     JsonUtil.addField(json, TASK_ID, query.getTaskId());
+    JsonUtil.addArrayField(json, TASK_ID_IN, query.getTaskIdIn());
     JsonUtil.addField(json, NAME, query.getName());
     JsonUtil.addField(json, NAME_NOT_EQUAL, query.getNameNotEqual());
     JsonUtil.addField(json, NAME_LIKE, query.getNameLike());
@@ -193,6 +196,7 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     JsonUtil.addDateField(json, DUE, query.getDueDate());
     JsonUtil.addDateField(json, DUE_BEFORE, query.getDueBefore());
     JsonUtil.addDateField(json, DUE_AFTER, query.getDueAfter());
+    JsonUtil.addDefaultField(json, WITHOUT_DUE_DATE, false, query.isWithoutDueDate());
     JsonUtil.addDateField(json, FOLLOW_UP, query.getFollowUpDate());
     JsonUtil.addDateField(json, FOLLOW_UP_BEFORE, query.getFollowUpBefore());
     JsonUtil.addDefaultField(json, FOLLOW_UP_NULL_ACCEPTED, false, query.isFollowUpNullAccepted());
@@ -247,12 +251,11 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
   }
 
   protected void addTenantIdFields(JsonObject jsonObject, TaskQueryImpl query) {
-    if (query.isTenantIdSet()) {
-      if (query.getTenantIds() != null) {
-        JsonUtil.addArrayField(jsonObject, TENANT_IDS, query.getTenantIds());
-      } else {
-        JsonUtil.addField(jsonObject, WITHOUT_TENANT_ID, true);
-      }
+    if (query.getTenantIds() != null) {
+      JsonUtil.addArrayField(jsonObject, TENANT_IDS, query.getTenantIds());
+    }
+    if (query.isWithoutTenantId()) {
+      JsonUtil.addField(jsonObject, WITHOUT_TENANT_ID, true);
     }
   }
 
@@ -279,15 +282,24 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
 
   @Override
   public TaskQuery toObject(JsonObject json) {
-    TaskQueryImpl query = new TaskQueryImpl();
+    return toObject(json, false);
+  }
 
+  protected TaskQuery toObject(JsonObject json, boolean isOrQuery) {
+    TaskQueryImpl query = new TaskQueryImpl();
+    if (isOrQuery) {
+      query.setOrQueryActive();
+    }
     if (json.has(OR_QUERIES)) {
       for (JsonElement jsonElement : JsonUtil.getArray(json, OR_QUERIES)) {
-        query.addOrQuery((TaskQueryImpl) toObject(JsonUtil.getObject(jsonElement)));
+        query.addOrQuery((TaskQueryImpl) toObject(JsonUtil.getObject(jsonElement), true));
       }
     }
     if (json.has(TASK_ID)) {
       query.taskId(JsonUtil.getString(json,TASK_ID));
+    }
+    if (json.has(TASK_ID_IN)) {
+      query.taskIdIn(getArray(JsonUtil.getArray(json, TASK_ID_IN)));
     }
     if (json.has(NAME)) {
       query.taskName(JsonUtil.getString(json, NAME));
@@ -441,6 +453,9 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     }
     if (json.has(DUE_AFTER)) {
       query.dueAfter(new Date(JsonUtil.getLong(json, DUE_AFTER)));
+    }
+    if (json.has(WITHOUT_DUE_DATE)) {
+      query.withoutDueDate();
     }
     if (json.has(FOLLOW_UP)) {
       query.followUpDate(new Date(JsonUtil.getLong(json, FOLLOW_UP)));

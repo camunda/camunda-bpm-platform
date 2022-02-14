@@ -16,8 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.cfg;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -37,9 +36,9 @@ public class HistoryLevelTest {
 
     ProcessEngineConfigurationImpl processEngineConfiguration = buildProcessEngine(config);
 
-    assertThat(processEngineConfiguration.getHistoryLevels().size(), is(4));
-    assertThat(processEngineConfiguration.getHistoryLevel(), is(HistoryLevel.HISTORY_LEVEL_FULL));
-    assertThat(processEngineConfiguration.getHistory(), is(HistoryLevel.HISTORY_LEVEL_FULL.getName()));
+    assertThat(processEngineConfiguration.getHistoryLevels()).hasSize(4);
+    assertThat(processEngineConfiguration.getHistoryLevel()).isSameAs(HistoryLevel.HISTORY_LEVEL_FULL);
+    assertThat(processEngineConfiguration.getHistory()).isEqualTo(HistoryLevel.HISTORY_LEVEL_FULL.getName());
   }
 
   @Test
@@ -49,9 +48,9 @@ public class HistoryLevelTest {
 
     ProcessEngineConfigurationImpl processEngineConfiguration = buildProcessEngine(config);
 
-    assertThat(processEngineConfiguration.getHistoryLevels().size(), is(4));
-    assertThat(processEngineConfiguration.getHistoryLevel(), is(HistoryLevel.HISTORY_LEVEL_FULL));
-    assertThat(processEngineConfiguration.getHistory(), is(HistoryLevel.HISTORY_LEVEL_FULL.getName()));
+    assertThat(processEngineConfiguration.getHistoryLevels()).hasSize(4);
+    assertThat(processEngineConfiguration.getHistoryLevel()).isSameAs(HistoryLevel.HISTORY_LEVEL_FULL);
+    assertThat(processEngineConfiguration.getHistory()).isEqualTo(HistoryLevel.HISTORY_LEVEL_FULL.getName());
   }
 
   protected ProcessEngineConfigurationImpl createConfig() {

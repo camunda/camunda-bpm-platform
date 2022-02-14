@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.history;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
@@ -37,22 +38,19 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
 public class HistoricProcessInstanceQueryOrTest {
 
   @Rule
   public ProcessEngineRule processEngineRule = new ProvidedProcessEngineRule();
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   protected HistoryService historyService;
   protected RuntimeService runtimeService;
@@ -78,177 +76,137 @@ public class HistoricProcessInstanceQueryOrTest {
 
   @Test
   public void shouldThrowExceptionByMissingStartOr() {
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set endOr() before or()");
-
-    historyService.createHistoricProcessInstanceQuery()
-      .or()
-      .endOr()
-      .endOr();
+    // when/then
+    assertThatThrownBy(() -> historyService.createHistoricProcessInstanceQuery()
+        .or()
+        .endOr()
+        .endOr())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Invalid query usage: cannot set endOr() before or()");
   }
 
   @Test
   public void shouldThrowExceptionByNesting() {
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set or() within 'or' query");
-
-    historyService.createHistoricProcessInstanceQuery()
+    // when/then
+    assertThatThrownBy(() -> historyService.createHistoricProcessInstanceQuery()
       .or()
         .or()
         .endOr()
       .endOr()
       .or()
-      .endOr();
+      .endOr())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Invalid query usage: cannot set or() within 'or' query");
   }
 
   @Test
   public void shouldThrowExceptionOnOrderByProcessInstanceId() {
-    // given
-
-    // then
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set orderByProcessInstanceId() within 'or' query");
-
-    // when
-    historyService.createHistoricProcessInstanceQuery()
+    // when/then
+    assertThatThrownBy(() -> historyService.createHistoricProcessInstanceQuery()
         .or()
-          .orderByProcessInstanceId()
-        .endOr();
+        .orderByProcessInstanceId()
+      .endOr())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Invalid query usage: cannot set orderByProcessInstanceId() within 'or' query");
   }
 
   @Test
   public void shouldThrowExceptionOnOrderByProcessDefinitionId() {
-    // given
-
-    // then
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set orderByProcessDefinitionId() within 'or' query");
-
-    // when
-    historyService.createHistoricProcessInstanceQuery()
+    // when/then
+    assertThatThrownBy(() -> historyService.createHistoricProcessInstanceQuery()
         .or()
-          .orderByProcessDefinitionId()
-        .endOr();
+        .orderByProcessDefinitionId()
+      .endOr())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Invalid query usage: cannot set orderByProcessDefinitionId() within 'or' query");
   }
 
   @Test
   public void shouldThrowExceptionOnOrderByProcessDefinitionKey() {
-    // given
-
-    // then
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set orderByProcessDefinitionKey() within 'or' query");
-
-    // when
-    historyService.createHistoricProcessInstanceQuery()
+    // when/then
+    assertThatThrownBy(() -> historyService.createHistoricProcessInstanceQuery()
         .or()
-          .orderByProcessDefinitionKey()
-        .endOr();
+        .orderByProcessDefinitionKey()
+      .endOr())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Invalid query usage: cannot set orderByProcessDefinitionKey() within 'or' query");
   }
 
   @Test
   public void shouldThrowExceptionOnOrderByTenantId() {
-    // given
-
-    // then
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set orderByTenantId() within 'or' query");
-
-    // when
-    historyService.createHistoricProcessInstanceQuery()
+    // when/then
+    assertThatThrownBy(() -> historyService.createHistoricProcessInstanceQuery()
         .or()
-          .orderByTenantId()
-        .endOr();
+        .orderByTenantId()
+      .endOr())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Invalid query usage: cannot set orderByTenantId() within 'or' query");
   }
 
   @Test
   public void shouldThrowExceptionOnOrderByProcessInstanceDuration() {
-    // given
-
-    // then
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set orderByProcessInstanceDuration() within 'or' query");
-
-    // when
-    historyService.createHistoricProcessInstanceQuery()
+    // when/then
+    assertThatThrownBy(() -> historyService.createHistoricProcessInstanceQuery()
         .or()
-          .orderByProcessInstanceDuration()
-        .endOr();
+        .orderByProcessInstanceDuration()
+      .endOr())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Invalid query usage: cannot set orderByProcessInstanceDuration() within 'or' query");
   }
 
   @Test
   public void shouldThrowExceptionOnOrderByProcessInstanceStartTime() {
-    // given
-
-    // then
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set orderByProcessInstanceStartTime() within 'or' query");
-
-    // when
-    historyService.createHistoricProcessInstanceQuery()
+    // when/then
+    assertThatThrownBy(() -> historyService.createHistoricProcessInstanceQuery()
         .or()
           .orderByProcessInstanceStartTime()
-        .endOr();
+        .endOr())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Invalid query usage: cannot set orderByProcessInstanceStartTime() within 'or' query");
   }
 
   @Test
   public void shouldThrowExceptionOnOrderByProcessInstanceEndTime() {
-    // given
-
-    // then
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set orderByProcessInstanceEndTime() within 'or' query");
-
-    // then
-    historyService.createHistoricProcessInstanceQuery()
+    // when/then
+    assertThatThrownBy(() -> historyService.createHistoricProcessInstanceQuery()
         .or()
           .orderByProcessInstanceEndTime()
-        .endOr();
+        .endOr())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Invalid query usage: cannot set orderByProcessInstanceEndTime() within 'or' query");
   }
 
   @Test
   public void shouldThrowExceptionOnOrderByProcessInstanceBusinessKey() {
-    // given
-
-    // then
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set orderByProcessInstanceBusinessKey() within 'or' query");
-
-    // then
-    historyService.createHistoricProcessInstanceQuery()
+    // when/then
+    assertThatThrownBy(() -> historyService.createHistoricProcessInstanceQuery()
         .or()
           .orderByProcessInstanceBusinessKey()
-        .endOr();
+        .endOr())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Invalid query usage: cannot set orderByProcessInstanceBusinessKey() within 'or' query");
   }
 
   @Test
   public void shouldThrowExceptionOnOrderByProcessDefinitionName() {
-    // given
-
-    // then
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set orderByProcessDefinitionName() within 'or' query");
-
-    // then
-    historyService.createHistoricProcessInstanceQuery()
+    // when/then
+    assertThatThrownBy(() -> historyService.createHistoricProcessInstanceQuery()
         .or()
           .orderByProcessDefinitionName()
-        .endOr();
+        .endOr())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Invalid query usage: cannot set orderByProcessDefinitionName() within 'or' query");
   }
 
   @Test
   public void shouldThrowExceptionOnOrderByProcessDefinitionVersion() {
-    // given
-
-    // then
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Invalid query usage: cannot set orderByProcessDefinitionVersion() within 'or' query");
-
-    // then
-    historyService.createHistoricProcessInstanceQuery()
+    // when/then
+    assertThatThrownBy(() -> historyService.createHistoricProcessInstanceQuery()
         .or()
           .orderByProcessDefinitionVersion()
-        .endOr();
+        .endOr())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Invalid query usage: cannot set orderByProcessDefinitionVersion() within 'or' query");
   }
 
   @Test
@@ -293,6 +251,144 @@ public class HistoricProcessInstanceQueryOrTest {
 
     // then
     assertEquals(2, processInstances.size());
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void shouldQueryByVariableValue_1() {
+    // GIVEN
+    String processInstanceIdOne = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.putValue("foo", "bar")).getProcessInstanceId();
+
+    String processInstanceIdTwo = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.putValue("bar", "foo")).getProcessInstanceId();
+
+    // WHEN
+    List<HistoricProcessInstance> processInstances = historyService.createHistoricProcessInstanceQuery()
+        .or()
+          .variableValueEquals("foo", "bar")
+          .variableValueEquals("bar", "foo")
+        .endOr()
+        .list();
+
+    // THEN
+    assertThat(processInstances)
+        .extracting("processInstanceId")
+        .containsExactlyInAnyOrder(processInstanceIdOne, processInstanceIdTwo);
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void shouldQueryByVariableValue_2() {
+    // GIVEN
+    String processInstanceIdOne = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.putValue("foo", "bar").putValue("bar", "foo")).getProcessInstanceId();
+    String processInstanceIdTwo = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.putValue("foo", "bar").putValue("bar", "foo")).getProcessInstanceId();
+
+    // WHEN
+    List<HistoricProcessInstance> processInstances = historyService.createHistoricProcessInstanceQuery()
+        .or()
+          .variableValueEquals("foo", "bar")
+          .variableValueEquals("bar", "foo")
+        .endOr()
+        .list();
+
+    // THEN
+    assertThat(processInstances)
+        .extracting("processInstanceId")
+        .containsExactlyInAnyOrder(processInstanceIdOne, processInstanceIdTwo);
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void shouldQueryByVariableValue_3() {
+    // GIVEN
+    String processInstanceIdOne = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.putValue("foo", "bar")).getProcessInstanceId();
+    String processInstanceIdTwo = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.putValue("foo", "bar")).getProcessInstanceId();
+
+    // WHEN
+    List<HistoricProcessInstance> processInstances = historyService.createHistoricProcessInstanceQuery()
+        .or()
+          .variableValueEquals("foo", "bar")
+        .endOr()
+        .list();
+
+    // THEN
+    assertThat(processInstances)
+        .extracting("processInstanceId")
+        .containsExactlyInAnyOrder(processInstanceIdOne, processInstanceIdTwo);
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void shouldQueryByVariableValue_4() {
+    // GIVEN
+    String processInstanceIdOne = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.putValue("foo", "bar")).getProcessInstanceId();
+    String processInstanceIdTwo = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.putValue("foo", "bar")).getProcessInstanceId();
+
+    // WHEN
+    List<HistoricProcessInstance> processInstances = historyService.createHistoricProcessInstanceQuery()
+        .or()
+          .variableValueEquals("foo", "bar")
+          .variableValueEquals("foo", "bar")
+        .endOr()
+        .list();
+
+    // THEN
+    assertThat(processInstances)
+        .extracting("processInstanceId")
+        .containsExactlyInAnyOrder(processInstanceIdOne, processInstanceIdTwo);
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void shouldQueryByVariableValue_5() {
+    // GIVEN
+    String processInstanceIdOne = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.putValue("foo", "bar")).getProcessInstanceId();
+    String processInstanceIdTwo = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.putValue("foo", "bar").putValue("bar", 5)).getProcessInstanceId();
+
+    // WHEN
+    List<HistoricProcessInstance> processInstances = historyService.createHistoricProcessInstanceQuery()
+        .or()
+          .variableValueEquals("foo", "bar")
+          .variableValueEquals("foo", "baz")
+          .variableValueEquals("bar", 5)
+        .endOr()
+        .list();
+
+    // THEN
+    assertThat(processInstances)
+        .extracting("processInstanceId")
+        .containsExactlyInAnyOrder(processInstanceIdOne, processInstanceIdTwo);
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void shouldQueryByVariableValue_6() {
+    // GIVEN
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", Variables.putValue("foo", "bar"));
+    String processInstanceIdTwo = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.putValue("foo", "bar").putValue("bar", 5)).getProcessInstanceId();
+
+    // WHEN
+    List<HistoricProcessInstance> processInstances = historyService.createHistoricProcessInstanceQuery()
+        .or()
+          .variableValueEquals("foo", "baz")
+          .variableValueEquals("bar", 5)
+        .endOr()
+        .list();
+
+    // THEN
+    assertThat(processInstances)
+        .extracting("processInstanceId")
+        .containsExactlyInAnyOrder(processInstanceIdTwo);
   }
 
   @Test

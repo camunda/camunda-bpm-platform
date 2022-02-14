@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.LATEST_DMN_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_INPUT_ENTRY;
 
 import org.camunda.bpm.model.dmn.instance.InputEntry;
@@ -34,7 +34,7 @@ public class InputEntryImpl extends UnaryTestsImpl implements InputEntry {
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(InputEntry.class, DMN_ELEMENT_INPUT_ENTRY)
-      .namespaceUri(DMN11_NS)
+      .namespaceUri(LATEST_DMN_NS)
       .extendsType(UnaryTests.class)
       .instanceProvider(new ModelTypeInstanceProvider<InputEntry>() {
         public InputEntry newInstance(ModelTypeInstanceContext instanceContext) {

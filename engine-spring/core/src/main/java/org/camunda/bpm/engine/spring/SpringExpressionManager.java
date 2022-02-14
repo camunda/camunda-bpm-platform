@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.impl.javax.el.CompositeELResolver;
 import org.camunda.bpm.engine.impl.javax.el.ELResolver;
 import org.camunda.bpm.engine.impl.javax.el.ListELResolver;
 import org.camunda.bpm.engine.impl.javax.el.MapELResolver;
+import org.camunda.bpm.engine.test.mock.MockElResolver;
 import org.springframework.context.ApplicationContext;
 
 import java.util.Map;
@@ -53,12 +54,22 @@ public class SpringExpressionManager extends ExpressionManager {
     super(beans);
     this.applicationContext = applicationContext;
   }
+  
+  /**
+   * @param applicationContext
+   *          the applicationContext to use.
+   * @see #SpringExpressionManager(ApplicationContext, Map)
+   */
+  public SpringExpressionManager(ApplicationContext applicationContext) {
+    this(applicationContext, null);
+  }
 
   @Override
   protected ELResolver createElResolver() {
     CompositeELResolver compositeElResolver = new CompositeELResolver();
     compositeElResolver.add(new VariableScopeElResolver());
     compositeElResolver.add(new VariableContextElResolver());
+    compositeElResolver.add(new MockElResolver());
 
     if(beans != null) {
       // Only expose limited set of beans in expressions

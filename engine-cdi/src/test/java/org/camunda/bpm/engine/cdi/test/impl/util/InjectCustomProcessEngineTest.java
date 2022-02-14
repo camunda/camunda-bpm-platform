@@ -18,8 +18,11 @@ package org.camunda.bpm.engine.cdi.test.impl.util;
 
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.cdi.impl.util.ProgrammaticBeanLookup;
+import org.camunda.bpm.engine.cdi.test.CdiProcessEngineTestCase;
 import org.camunda.bpm.engine.cdi.test.impl.beans.InjectedProcessEngineBean;
+import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -32,29 +35,30 @@ import org.junit.runner.RunWith;
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
 @RunWith(Arquillian.class)
-public class InjectCustomProcessEngineTest {
+public class InjectCustomProcessEngineTest extends CdiProcessEngineTestCase {
 
-  @Deployment
-  public static JavaArchive createDeployment() {
-
-    return ShrinkWrap.create(JavaArchive.class)
-      .addPackages(true, "org.camunda.bpm.engine.cdi")
-      .addAsManifestResource("org/camunda/bpm/engine/cdi/test/impl/util/beans.xml", "beans.xml");
-  }
-
-  @Rule
-  public ProcessEngineRule processEngineRule = new ProcessEngineRule("org/camunda/bpm/engine/cdi/test/impl/util/camunda.cfg.xml", true);
+  protected ProcessEngine defaultProcessEngine = null;
+  protected ProcessEngine processEngine = null;
 
   @Before
   public void init() {
-    if(BpmPlatform.getProcessEngineService().getDefaultProcessEngine() == null) {
-      RuntimeContainerDelegate.INSTANCE.get().registerProcessEngine(processEngineRule.getProcessEngine());
+    processEngine = TestHelper.getProcessEngine("org/camunda/bpm/engine/cdi/test/impl/util/camunda.cfg.xml");
+    defaultProcessEngine = BpmPlatform.getProcessEngineService().getDefaultProcessEngine();
+
+    if (defaultProcessEngine != null) {
+      RuntimeContainerDelegate.INSTANCE.get().unregisterProcessEngine(defaultProcessEngine);
     }
+
+    RuntimeContainerDelegate.INSTANCE.get().registerProcessEngine(processEngine);
   }
 
   @After
-  public void tearDownCdiProcessEngineTestCase() throws Exception {
-    RuntimeContainerDelegate.INSTANCE.get().unregisterProcessEngine(processEngineRule.getProcessEngine());
+  public void tearDownCdiProcessEngineTestCase() {
+    RuntimeContainerDelegate.INSTANCE.get().unregisterProcessEngine(processEngine);
+
+    if (defaultProcessEngine != null) {
+      RuntimeContainerDelegate.INSTANCE.get().registerProcessEngine(defaultProcessEngine);
+    }
   }
 
   @Test

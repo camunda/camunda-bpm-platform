@@ -1,0 +1,51 @@
+[cam-widget-search-pill] {
+  display: inline-block;
+
+  > .search-label {
+    display: block;
+    border: 1px solid transparent;
+    background-color: @custom-gray-lighter;
+    color: @text-color;
+    border-radius: 3px;
+    border-color: @custom-gray-light;
+
+    > * {
+      vertical-align: middle;
+      margin-top: -1px;
+      margin-bottom: -1px;
+
+      &:empty {
+        display: none;
+      }
+    }
+
+    &.invalid {
+      background-color: @state-danger-bg;
+      border-color: @state-danger-border;
+      color: @state-danger-text;
+    }
+
+    > .glyphicon {
+      padding-left: 3px;
+      padding-right: 3px;
+
+      &::before {
+        position: relative;
+        top: -1px;
+      }
+    }
+  }
+
+  &.inline-editing > .search-label {
+    overflow: visible;
+  }
+
+  .search-dropdown {
+    left: -1px;
+    margin-top: 0;
+
+    & > li > a {
+      padding: (@grid-gutter-width / 10) (@grid-gutter-width / 2);
+    }
+  }
+}

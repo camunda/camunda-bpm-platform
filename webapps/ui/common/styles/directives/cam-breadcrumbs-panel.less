@@ -1,0 +1,64 @@
+[cam-breadcrumbs-panel] {
+  position: absolute;
+  height: @breadcrumb-height;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: @custom-gray-lighter;
+  box-shadow: @box-shadow-lower;
+  z-index: 15;
+}
+
+.cam-breadcrumb {
+  background-color: transparent;
+  margin: 0;
+  padding: 9px 10px 0 10px;
+  height: @breadcrumb-height;
+  overflow: visible;
+  white-space: nowrap;
+
+  > li {
+    list-style: none;
+    overflow: visible;
+    display: inline-block;
+    padding: 0;
+
+    &:first-of-type {
+      padding-left: 0;
+    }
+
+    > a,
+    > span {
+      vertical-align: text-bottom;
+      display: inline-block;
+    }
+
+    > .divider {
+      margin-left: 4px;
+      margin-right: 4px;
+      cursor: pointer;
+    }
+
+    > .text,
+    > .dropdown-toggle > .text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 300px;
+
+      @media screen and (max-width: (@grid-float-breakpoint - 1)) {
+        max-width: 150px;
+      }
+    }
+
+    &.active {
+      > .text {
+        color: @gray-darker;
+        max-width: 500px;
+
+        @media screen and (max-width: (@grid-float-breakpoint - 1)) {
+          max-width: 250px;
+        }
+      }
+    }
+  }
+}

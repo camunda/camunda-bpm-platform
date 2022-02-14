@@ -16,13 +16,23 @@
  */
 package org.camunda.bpm.engine.rest;
 
+import static io.restassured.RestAssured.given;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_USER_OPERATION_ANNOTATION;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.Status;
+
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.RepositoryService;
-import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.exception.NotFoundException;
-import org.camunda.bpm.engine.impl.IncidentQueryImpl;
-import org.camunda.bpm.engine.impl.ManagementServiceImpl;
-import org.camunda.bpm.engine.impl.RepositoryServiceImpl;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
@@ -32,15 +42,6 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-import io.restassured.http.ContentType;
-
-import static io.restassured.RestAssured.given;
-import static org.mockito.Mockito.*;
-
-import java.util.List;
-
-import javax.ws.rs.core.Response.Status;
-
 
 public class IncidentRestServiceInteractionTest extends AbstractRestServiceTest {
 
@@ -49,6 +50,7 @@ public class IncidentRestServiceInteractionTest extends AbstractRestServiceTest 
 
   protected static final String INCIDENT_URL = TEST_RESOURCE_ROOT_PATH + "/incident";
   protected static final String SINGLE_INCIDENT_URL = INCIDENT_URL + "/{id}";
+  protected static final String INCIDENT_ANNOTATION_URL = SINGLE_INCIDENT_URL + "/annotation";
 
   private RuntimeServiceImpl mockRuntimeService;
   private IncidentQuery mockedQuery;
@@ -77,14 +79,14 @@ public class IncidentRestServiceInteractionTest extends AbstractRestServiceTest 
   public void testGetIncident() {
 
     given()
-      .pathParam("id", MockProvider.EXAMPLE_INCIDENT_ID)
+      .pathParam("id", EXAMPLE_INCIDENT_ID)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
     .when()
       .get(SINGLE_INCIDENT_URL);
 
     verify(mockRuntimeService).createIncidentQuery();
-    verify(mockedQuery).incidentId(MockProvider.EXAMPLE_INCIDENT_ID);
+    verify(mockedQuery).incidentId(EXAMPLE_INCIDENT_ID);
     verify(mockedQuery).singleResult();
   }
 
@@ -93,14 +95,14 @@ public class IncidentRestServiceInteractionTest extends AbstractRestServiceTest 
     when(mockedQuery.singleResult()).thenReturn(null);
 
     given()
-      .pathParam("id", MockProvider.EXAMPLE_INCIDENT_ID)
+      .pathParam("id", EXAMPLE_INCIDENT_ID)
     .then().expect()
       .statusCode(Status.NOT_FOUND.getStatusCode())
     .when()
       .get(SINGLE_INCIDENT_URL);
 
     verify(mockRuntimeService).createIncidentQuery();
-    verify(mockedQuery).incidentId(MockProvider.EXAMPLE_INCIDENT_ID);
+    verify(mockedQuery).incidentId(EXAMPLE_INCIDENT_ID);
     verify(mockedQuery).singleResult();
   }
 
@@ -108,13 +110,13 @@ public class IncidentRestServiceInteractionTest extends AbstractRestServiceTest 
   public void testResolveIncident() {
 
     given()
-      .pathParam("id", MockProvider.EXAMPLE_INCIDENT_ID)
+      .pathParam("id", EXAMPLE_INCIDENT_ID)
     .then().expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
       .delete(SINGLE_INCIDENT_URL);
 
-    verify(mockRuntimeService).resolveIncident(MockProvider.EXAMPLE_INCIDENT_ID);
+    verify(mockRuntimeService).resolveIncident(EXAMPLE_INCIDENT_ID);
   }
 
   @Test
@@ -122,12 +124,129 @@ public class IncidentRestServiceInteractionTest extends AbstractRestServiceTest 
     doThrow(new NotFoundException()).when(mockRuntimeService).resolveIncident(anyString());
 
     given()
-      .pathParam("id", MockProvider.EXAMPLE_INCIDENT_ID)
+      .pathParam("id", EXAMPLE_INCIDENT_ID)
     .then().expect()
       .statusCode(Status.NOT_FOUND.getStatusCode())
     .when()
       .delete(SINGLE_INCIDENT_URL);
 
-    verify(mockRuntimeService).resolveIncident(MockProvider.EXAMPLE_INCIDENT_ID);
+    verify(mockRuntimeService).resolveIncident(EXAMPLE_INCIDENT_ID);
+  }
+
+  @Test
+  public void shouldSetAnnotation() {
+    given()
+      .pathParam("id", EXAMPLE_INCIDENT_ID)
+      .contentType(MediaType.APPLICATION_JSON)
+      .body("{ \"annotation\": \"" + EXAMPLE_USER_OPERATION_ANNOTATION + "\" }")
+    .then().expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .put(INCIDENT_ANNOTATION_URL);
+
+    verify(mockRuntimeService)
+      .setAnnotationForIncidentById(EXAMPLE_INCIDENT_ID, EXAMPLE_USER_OPERATION_ANNOTATION);
+  }
+
+  @Test
+  public void shouldThrowNotValidExceptionWhenSetAnnotation() {
+    doThrow(new NotValidException("expected"))
+      .when(mockRuntimeService)
+      .setAnnotationForIncidentById(anyString(), anyString());
+
+    given()
+      .pathParam("id", EXAMPLE_INCIDENT_ID)
+      .contentType(MediaType.APPLICATION_JSON)
+      .body("{ \"annotation\": \"" + EXAMPLE_USER_OPERATION_ANNOTATION + "\" }")
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when()
+      .put(INCIDENT_ANNOTATION_URL);
+  }
+
+  @Test
+  public void shouldThrowAuthorizationExceptionWhenSetAnnotation() {
+    doThrow(new AuthorizationException("expected"))
+      .when(mockRuntimeService)
+      .setAnnotationForIncidentById(anyString(), anyString());
+
+    given()
+      .pathParam("id", EXAMPLE_INCIDENT_ID)
+      .contentType(MediaType.APPLICATION_JSON)
+      .body("{ \"annotation\": \"" + EXAMPLE_USER_OPERATION_ANNOTATION + "\" }")
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+    .when()
+      .put(INCIDENT_ANNOTATION_URL);
+  }
+
+  @Test
+  public void shouldThrowBadRequestExceptionWhenSetAnnotation() {
+    doThrow(new BadUserRequestException("expected"))
+      .when(mockRuntimeService)
+      .setAnnotationForIncidentById(anyString(), anyString());
+
+    given()
+      .pathParam("id", EXAMPLE_INCIDENT_ID)
+      .contentType(MediaType.APPLICATION_JSON)
+      .body("{ \"annotation\": \"" + EXAMPLE_USER_OPERATION_ANNOTATION + "\" }")
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when()
+      .put(INCIDENT_ANNOTATION_URL);
+  }
+
+  @Test
+  public void shouldClearAnnotation() {
+    given()
+      .pathParam("id", EXAMPLE_INCIDENT_ID)
+    .then().expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .delete(INCIDENT_ANNOTATION_URL);
+
+    verify(mockRuntimeService).clearAnnotationForIncidentById(EXAMPLE_INCIDENT_ID);
+  }
+
+  @Test
+  public void shouldThrowNotValidExceptionWhenClearAnnotation() {
+    doThrow(new NotValidException("expected"))
+      .when(mockRuntimeService)
+      .clearAnnotationForIncidentById(anyString());
+
+    given()
+      .pathParam("id", EXAMPLE_INCIDENT_ID)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when()
+      .delete(INCIDENT_ANNOTATION_URL);
+  }
+
+  @Test
+  public void shouldThrowAuthorizationExceptionWhenClearAnnotation() {
+    doThrow(new AuthorizationException("expected"))
+      .when(mockRuntimeService)
+      .clearAnnotationForIncidentById(anyString());
+
+    given()
+      .pathParam("id", EXAMPLE_INCIDENT_ID)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+    .when()
+      .delete(INCIDENT_ANNOTATION_URL);
+  }
+
+  @Test
+  public void shouldThrowBadRequestExceptionWhenClearAnnotation() {
+    doThrow(new BadUserRequestException("expected"))
+      .when(mockRuntimeService)
+      .clearAnnotationForIncidentById(anyString());
+
+    given()
+      .pathParam("id", EXAMPLE_INCIDENT_ID)
+    .expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when()
+      .delete(INCIDENT_ANNOTATION_URL);
   }
 }

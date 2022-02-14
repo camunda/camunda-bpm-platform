@@ -1,8 +1,10 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
       id = "deleteTaskVariable"
       tag = "Task Variable"
+      summary = "Delete Task Variable"
       desc = "Removes a variable that is visible to a task. A variable is visible to a task if it is a local task
               variable or declared in a parent scope of the task. See documentation on
               [visiblity of variables](${docsUrl}/user-guide/process-engine/variables/)." />
@@ -42,3 +44,5 @@
 
   }
 }
+
+</#macro>

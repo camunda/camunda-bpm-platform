@@ -4,20 +4,20 @@
   <parent>
     <groupId>org.camunda.bpm.qa.upgrade</groupId>
     <artifactId>camunda-qa-db-rolling-update</artifactId>
-    <version>7.14.0-SNAPSHOT</version>
+    <version>7.17.0-SNAPSHOT</version>
   </parent>
 
 
   <artifactId>camunda-qa-db-test-old-engine</artifactId>
   <packaging>jar</packaging>
-  <name>camunda BPM - QA - upgrade - rolling update - test old engine</name>
+  <name>Camunda Platform - QA - upgrade - rolling update - test old engine</name>
 
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>org.camunda.bpm</groupId>
         <artifactId>camunda-bom</artifactId>
-        <version>7.13.0</version>
+        <version>7.16.0</version>
         <scope>import</scope>
         <type>pom</type>
       </dependency>

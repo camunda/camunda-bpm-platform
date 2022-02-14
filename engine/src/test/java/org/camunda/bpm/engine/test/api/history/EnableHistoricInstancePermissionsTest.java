@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.history;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.BadUserRequestException;
@@ -28,16 +29,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.rules.RuleChain;
 
 public class EnableHistoricInstancePermissionsTest {
 
-  protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule();
-  protected ExpectedException thrown = ExpectedException.none();
-
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(thrown);
+  public ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule();
 
   protected ProcessEngineConfigurationImpl config;
   protected AuthorizationService authorizationService;
@@ -94,14 +90,12 @@ public class EnableHistoricInstancePermissionsTest {
     // given
     config.setEnableHistoricInstancePermissions(false);
 
-    // then
-    thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("ENGINE-03090 Historic instance permissions are disabled, " +
-        "please check your process engine configuration.");
-
-    // when
-    authorizationService.isUserAuthorized("myUserId", null,
-        HistoricTaskPermissions.ALL, Resources.HISTORIC_TASK);
+    // when/then
+    assertThatThrownBy(() -> authorizationService.isUserAuthorized("myUserId", null,
+        HistoricTaskPermissions.ALL, Resources.HISTORIC_TASK))
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("ENGINE-03090 Historic instance permissions are disabled, " +
+          "please check your process engine configuration.");
   }
 
   @Test
@@ -109,14 +103,12 @@ public class EnableHistoricInstancePermissionsTest {
     // given
     config.setEnableHistoricInstancePermissions(false);
 
-    // then
-    thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("ENGINE-03090 Historic instance permissions are disabled, " +
-        "please check your process engine configuration.");
-
-    // when
-    authorizationService.isUserAuthorized("myUserId", null,
-        HistoricTaskPermissions.ALL, Resources.HISTORIC_PROCESS_INSTANCE);
+    // when/then
+    assertThatThrownBy(() -> authorizationService.isUserAuthorized("myUserId", null,
+        HistoricTaskPermissions.ALL, Resources.HISTORIC_PROCESS_INSTANCE))
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("ENGINE-03090 Historic instance permissions are disabled, " +
+          "please check your process engine configuration.");
   }
 
 }

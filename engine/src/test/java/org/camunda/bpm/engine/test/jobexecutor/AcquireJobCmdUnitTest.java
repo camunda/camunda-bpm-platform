@@ -16,9 +16,7 @@
  */
 package org.camunda.bpm.engine.test.jobexecutor;
 
-import static org.hamcrest.CoreMatchers.hasItems;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -106,9 +104,9 @@ public class AcquireJobCmdUnitTest {
     AcquiredJobs acquiredJobs = acquireJobsCmd.execute(commandContext);
 
     List<List<String>> jobIdBatches = acquiredJobs.getJobIdBatches();
-    assertThat(jobIdBatches.size(), is(1));
-    assertThat(jobIdBatches.get(0).size(), is(2));
-    assertThat(jobIdBatches.get(0), hasItems(JOB_ID_1, JOB_ID_2));
+    assertThat(jobIdBatches.size()).isEqualTo(1);
+    assertThat(jobIdBatches.get(0).size()).isEqualTo(2);
+    assertThat(jobIdBatches.get(0)).containsExactlyInAnyOrder(JOB_ID_1, JOB_ID_2);
   }
 
   @Test
@@ -141,9 +139,9 @@ public class AcquireJobCmdUnitTest {
     AcquiredJobs acquiredJobs = acquireJobsCmd.execute(commandContext);
 
     List<List<String>> jobIdBatches = acquiredJobs.getJobIdBatches();
-    assertThat(jobIdBatches.size(), is(2));
-    assertThat(jobIdBatches.get(0).size(), is(1));
-    assertThat(jobIdBatches.get(1).size(), is(1));
+    assertThat(jobIdBatches.size()).isEqualTo(2);
+    assertThat(jobIdBatches.get(0).size()).isEqualTo(1);
+    assertThat(jobIdBatches.get(1).size()).isEqualTo(1);
   }
 
 }

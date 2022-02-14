@@ -23,12 +23,12 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.ibatis.session.ExecutorType;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.FlushResult;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbBulkOperation;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbEntityOperation;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
-import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation.State;
 
 /**
  * For mybatis {@link ExecutorType#SIMPLE}
@@ -47,7 +47,7 @@ public class SimpleDbSqlSession extends DbSqlSession {
 
   @Override
   protected void executeSelectForUpdate(String statement, Object parameter) {
-    sqlSession.update(statement, parameter);
+    update(statement, parameter);
   }
 
   @Override

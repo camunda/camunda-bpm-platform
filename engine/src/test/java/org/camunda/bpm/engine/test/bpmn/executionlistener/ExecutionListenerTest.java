@@ -16,13 +16,12 @@
  */
 package org.camunda.bpm.engine.test.bpmn.executionlistener;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT;
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -30,7 +29,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.AssertionFailedError;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RepositoryService;
@@ -63,8 +61,9 @@ import org.camunda.bpm.model.bpmn.instance.camunda.CamundaExecutionListener;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
+
+import junit.framework.AssertionFailedError;
 
 /**
  * @author Frederik Heremans
@@ -75,9 +74,6 @@ public class ExecutionListenerTest {
   protected static final String PROCESS_KEY = "Process";
   public ProcessEngineRule processEngineRule = new ProvidedProcessEngineRule();
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(processEngineRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(processEngineRule).around(testRule);
@@ -178,25 +174,25 @@ public class ExecutionListenerTest {
     assertEquals("Start Event", recordedEvents.get(0).getActivityName());
     assertEquals("Start Event Listener", recordedEvents.get(0).getParameter());
     assertEquals("end", recordedEvents.get(0).getEventName());
-    assertThat(recordedEvents.get(0).isCanceled(), is(false));
+    assertThat(recordedEvents.get(0).isCanceled()).isFalse();
 
     assertEquals("noneEvent", recordedEvents.get(1).getActivityId());
     assertEquals("None Event", recordedEvents.get(1).getActivityName());
     assertEquals("Intermediate Catch Event Listener", recordedEvents.get(1).getParameter());
     assertEquals("end", recordedEvents.get(1).getEventName());
-    assertThat(recordedEvents.get(1).isCanceled(), is(false));
+    assertThat(recordedEvents.get(1).isCanceled()).isFalse();
 
     assertEquals("signalEvent", recordedEvents.get(2).getActivityId());
     assertEquals("Signal Event", recordedEvents.get(2).getActivityName());
     assertEquals("Intermediate Throw Event Listener", recordedEvents.get(2).getParameter());
     assertEquals("start", recordedEvents.get(2).getEventName());
-    assertThat(recordedEvents.get(2).isCanceled(), is(false));
+    assertThat(recordedEvents.get(2).isCanceled()).isFalse();
 
     assertEquals("theEnd", recordedEvents.get(3).getActivityId());
     assertEquals("End Event", recordedEvents.get(3).getActivityName());
     assertEquals("End Event Listener", recordedEvents.get(3).getParameter());
     assertEquals("start", recordedEvents.get(3).getEventName());
-    assertThat(recordedEvents.get(3).isCanceled(), is(false));
+    assertThat(recordedEvents.get(3).isCanceled()).isFalse();
 
   }
 
@@ -261,12 +257,12 @@ public class ExecutionListenerTest {
     assertEquals("timer1", recordedEvents.get(0).getActivityId());
     assertEquals("start boundary listener", recordedEvents.get(0).getParameter());
     assertEquals("start", recordedEvents.get(0).getEventName());
-    assertThat(recordedEvents.get(0).isCanceled(), is(false));
+    assertThat(recordedEvents.get(0).isCanceled()).isFalse();
 
     assertEquals("timer2", recordedEvents.get(1).getActivityId());
     assertEquals("end boundary listener", recordedEvents.get(1).getParameter());
     assertEquals("end", recordedEvents.get(1).getEventName());
-    assertThat(recordedEvents.get(1).isCanceled(), is(false));
+    assertThat(recordedEvents.get(1).isCanceled()).isFalse();
   }
 
   @Test
@@ -348,11 +344,11 @@ public class ExecutionListenerTest {
     testRule.assertProcessEnded(processInstance.getId());
 
     List<RecordedEvent> recordedEvents = RecorderExecutionListener.getRecordedEvents();
-    assertThat(recordedEvents, hasSize(1));
+    assertThat(recordedEvents).hasSize(1);
 
     assertEquals("UserTask_1", recordedEvents.get(0).getActivityId());
     assertEquals("end", recordedEvents.get(0).getEventName());
-    assertThat(recordedEvents.get(0).isCanceled(), is(true));
+    assertThat(recordedEvents.get(0).isCanceled()).isTrue();
   }
 
   private static final String MESSAGE = "cancelMessage";
@@ -1114,10 +1110,6 @@ public class ExecutionListenerTest {
 
   @Test
   public void testThrowBpmnErrorInStartListenerOnModificationShouldNotTriggerPropagation() {
-    // expect
-    thrown.expect(BpmnError.class);
-    thrown.expectMessage("business error");
-
     // given
     BpmnModelInstance model = Bpmn.createExecutableProcess(PROCESS_KEY)
         .startEvent()
@@ -1144,8 +1136,10 @@ public class ExecutionListenerTest {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY);
 
-    // when the listeners are invoked
-    runtimeService.createModification(definition.getId()).startBeforeActivity("throw").processInstanceIds(processInstance.getId()).execute();
+    // when/then
+    assertThatThrownBy(() -> runtimeService.createModification(definition.getId()).startBeforeActivity("throw").processInstanceIds(processInstance.getId()).execute())
+      .isInstanceOf(BpmnError.class)
+      .hasMessageContaining("business error");
   }
 
   @Test

@@ -1,0 +1,230 @@
+<!-- # CE - camunda-bpm-webapp/ui/admin/client/scripts/pages/groupEdit.html -->
+<section ng-cloak>
+  <aside>
+    <ul>
+      <li ng-class="activeClass('tab=group')">
+        <a href="#/groups/{{group.id | escape}}?tab=group">{{ 'GROUP_EDIT_INFORMATION' | translate }}</a>
+      </li>
+      <li ng-class="activeClass('tab=tenants')">
+        <a href="#/groups/{{ group.id | escape }}?tab=tenants">{{ 'GROUP_EDIT_TENANTS_LINK' | translate }}</a>
+      </li>
+      <li ng-class="activeClass('tab=users')">
+        <a href="#/groups/{{group.id | escape}}?tab=users">{{ 'GROUP_EDIT_USERS' | translate }}</a>
+      </li>
+    </ul>
+  </aside>
+
+  <div class="section-content">
+    <header class="row">
+      <div class="col-xs-8">
+        <h3 translate="GROUP_EDIT_EDIT_GROUP"
+            translate-values="{ group: group.name }"></h3>
+      </div>
+      <div class="col-xs-4 text-right">
+        <a class="btn btn-default"
+           ng-if="show('tenants')"
+           ng-click="openCreateTenantMembershipDialog()">
+           {{ 'GROUP_EDIT_ADD_TO_TENANT' | translate }}
+          <span class="glyphicon glyphicon-plus-sign"></span>
+        </a>
+      </div>
+    </header>
+
+    <form ng-show="show('group')"
+          class="form-horizontal"
+          name="editGroupForm"
+          cam-widget-loader
+          loading-state="{{ groupLoadingState }}">
+      <div class="h4">{{ 'GROUP_EDIT_GROUP_DETAILS' | translate }}</div>
+
+      <div class="form-group">
+        <label class="control-label col-sm-4 col-md-2"
+               for="inputName">{{ 'GROUP_EDIT_GROUP_NAME' | translate }}</label>
+
+        <div class="col-sm-8 col-md-10">
+          <input id="inputName"
+                 name="groupName"
+                 class="form-control"
+                 type="text"
+                 ng-model="group.name"
+                 novalidate
+                 required
+                 ng-disabled="!availableOperations.update" />
+
+          <p class="text-danger"
+             ng-show="createGroupForm.groupName.$error.required">
+            {{ 'GROUP_EDIT_NAME_REQUIRED' | translate }}.
+          </p>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="control-label col-sm-4 col-md-2"
+               for="inputType">{{ 'GROUP_EDIT_GROUP_TYPE' | translate }}</label>
+
+        <div class="col-sm-8 col-md-10">
+          <input id="inputType"
+                 name="groupType"
+                 class="form-control"
+                 type="text"
+                 ng-model="group.type"
+                 ng-disabled="!availableOperations.update" />
+        </div>
+      </div>
+
+      <div class="form-group"
+           ng-show="availableOperations.update">
+        <div class="col-sm-8 col-sm-offset-4 col-md-10 col-md-offset-2 text-right">
+          <button type="submit"
+                  class="btn btn-primary"
+                  ng-disabled="!canSubmit(editGroupForm, 'group')"
+                  ng-click="updateGroup()">{{ 'GROUP_EDIT_UPDATE_GROUP' | translate }}</button>
+        </div>
+      </div>
+    </form>
+
+    <form class="form-horizontal"
+          ng-show="show('group') && availableOperations.delete">
+      <div class="h4">{{ 'GROUP_EDIT_DELETE_GROUP' | translate }}</div>
+
+      <div uib-alert class="alert alert-danger">
+        <strong>{{ 'GROUP_EDIT_WARNING' | translate }}:</strong> {{ 'GROUP_EDIT_WARNING_DELETE' | translate }}
+      </div>
+
+      <div class="text-right">
+        <button type="submit"
+                class="btn btn-danger"
+                ng-click="deleteGroup()">
+          {{ 'GROUP_EDIT_DELETE_GROUP' | translate }}
+        </button>
+      </div>
+    </form>
+
+    <div ng-if="show('tenants')">
+      <form class="form-horizontal"
+            name="updateTenantMemberships">
+
+        <div class="h4"
+             translate="GROUP_EDIT_TENANTS"
+             translate-values="{ group: group.name }">
+        </div>
+
+        <div cam-widget-loader
+             loading-state="{{ tenantLoadingState }}"
+             text-empty="{{ translate('GROUP_EDIT_MESSAGE_GROUP', { group: group.name }) }}">
+          <table class="cam-table"
+                 ng-hide="tenantList.length == 0">
+            <thead cam-sortable-table-header
+                   default-sort-by="id"
+                   default-sort-order="asc"
+                   sorting-id="admin-sorting-groups-tenants"
+                   on-sort-change="onTenantsSortingChanged(sorting)"
+                   on-sort-initialized="onTenantsSortingChanged(sorting)">
+            <tr>
+              <th class="tenant-id"
+                  cam-sortable-table-column
+                  sort-by-property="id">{{ 'GROUP_EDIT_TENANT_ID' | translate }}</th>
+              <th class="tenant-name"
+                  cam-sortable-table-column
+                  sort-by-property="name">{{ 'GROUP_EDIT_TENANT_NAME' | translate }}</th>
+              <th class="action"
+                  ng-show="availableOperations.removeTenant">
+                {{ 'GROUP_EDIT_ACTION' | translate }}
+              </th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr ng-repeat="tenant in tenantList">
+              <td class="tenant-id">
+                <a href="#/tenants/{{ tenant.id | escape }}?tab=tenant">{{ tenant.id }}</a>
+              </td>
+
+              <td class="tenant-name">
+                {{ tenant.name }}
+              </td>
+
+              <td class="action"
+                  ng-show="availableOperations.removeTenant">
+                <a ng-click="removeTenant(tenant.id)">{{ 'GROUP_EDIT_REMOVE' | translate }}</a>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+
+          <ul uib-pagination ng-if="groupTenantPages.total > groupTenantPages.size"
+            class="pagination-sm"
+
+            ng-model="groupTenantPages.current"
+            ng-change="updateGroupTenantView()"
+
+            total-items="groupTenantPages.total"
+            items-per-page="groupTenantPages.size"
+            max-size="7"
+
+            boundary-links="true"></ul>
+
+        </div>
+
+      </form>
+    </div>
+
+    <div ng-show="show('users')">
+      <div class="h3">{{ 'GROUP_EDIT_GROUP_USERS' | translate }}</div>
+
+      <div cam-widget-loader
+           loading-state="{{ userLoadingState }}"
+           text-empty="{{ translate('GROUP_EDIT_MESSAGE_USERS', {group: group.name}) }}">
+        <table class="cam-table">
+          <thead cam-sortable-table-header
+                 default-sort-by="userId"
+                 default-sort-order="asc"
+                 sorting-id="admin-sorting-groups-users"
+                 on-sort-change="onUsersSortingChanged(sorting)"
+                 on-sort-initialized="onUsersSortingInitialized(sorting)">
+            <tr ng-if="canSortUserEntries">
+              <th cam-sortable-table-column
+                  sort-by-property="userId">{{ 'USERS_ID' | translate }}</th>
+              <th cam-sortable-table-column
+                  sort-by-property="firstName">{{ 'USERS_FIRSTNAME' | translate }}</th>
+              <th cam-sortable-table-column
+                  sort-by-property="lastName">{{ 'USERS_LASTNAME' | translate }}</th>
+            </tr>
+            <tr ng-if="!canSortUserEntries">
+              <th>{{ 'USERS_ID' | translate }}</th>
+              <th>{{ 'USERS_FIRSTNAME' | translate }}</th>
+              <th>{{ 'USERS_LASTNAME' | translate }}</th>
+            </tr>
+
+          </thead>
+          <tbody>
+            <tr ng-repeat="user in groupUserList">
+              <td><a ng-href="#/users/{{user.id | escape}}">{{ user.id }}</a></td>
+              <td>{{ user.firstName }}</td>
+              <td>{{ user.lastName }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div><!-- /cam-widget-loader -->
+
+      <ul uib-pagination ng-if="groupUserPages.total > groupUserPages.size"
+                  class="pagination-sm"
+
+                  ng-model="groupUserPages.current"
+                  ng-change="pageChange(groupUserPages.current)"
+
+                  total-items="groupUserPages.total"
+                  items-per-page="groupUserPages.size"
+                  max-size="7"
+
+                  boundary-links="true"
+
+                  next-text="&rsaquo;"
+                  last-text="&raquo;"
+                  previous-text="&lsaquo;"
+                  first-text="&laquo;"></ul>
+
+    </div>
+  </div>
+</section>
+<!-- / CE - camunda-bpm-webapp/ui/admin/client/scripts/pages/groupEdit.html -->

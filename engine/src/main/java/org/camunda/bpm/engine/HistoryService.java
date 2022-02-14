@@ -349,14 +349,14 @@ public interface HistoryService {
   /**
    * Finds history cleanup job, if present.
    * @deprecated As of v. 7.9.0, because there can be more than one history cleanup job at once, use {@link #findHistoryCleanupJobs} instead.
-   * @return job entity
+   * @return history cleanup job entity
    */
   @Deprecated
   Job findHistoryCleanupJob();
 
   /**
-   * Finds history cleanup job if present.
-   * @return job entity
+   * Finds history cleanup jobs if present.
+   * @return history cleanup job entities
    */
   List<Job> findHistoryCleanupJobs();
 

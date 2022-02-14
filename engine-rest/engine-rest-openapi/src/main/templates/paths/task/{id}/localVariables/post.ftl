@@ -1,8 +1,10 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
       id = "modifyTaskLocalVariables"
       tag = "Task Local Variable"
+      summary = "Update/Delete Local Task Variables"
       desc = "Updates or deletes the variables in the context of a task. Updates precede deletions. So, if a variable is
               updated AND deleted, the deletion overrides the update." />
 
@@ -66,3 +68,5 @@
                 for the error response format." />
   }
 }
+
+</#macro>

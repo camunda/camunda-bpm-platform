@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.authorization.TaskPermissions;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
@@ -1070,12 +1071,12 @@ public interface TaskService {
   /**
    * <p>The all events related to the given task.</p>
    *
-   * <p>As of Camunda BPM 7.4 task events are only written in context of a logged in
+   * <p>As of Camunda Platform 7.4 task events are only written in context of a logged in
    * user. This behavior can be toggled in the process engine configuration using the
    * property <code>legacyUserOperationLog</code> (default false). To restore the engine's
    * previous behavior, set the flag to <code>true</code>.</p>
    *
-   * @deprecated This method has been deprecated as of camunda BPM 7.1. It has been replaced with
+   * @deprecated This method has been deprecated as of Camunda Platform 7.1. It has been replaced with
    * the operation log. See {@link UserOperationLogEntry} and {@link UserOperationLogQuery}.
    *
    * @see HistoryService#createUserOperationLogQuery()
@@ -1157,7 +1158,8 @@ public interface TaskService {
    * @param taskId the id of an existing active task
    * @param errorCode the error code of the corresponding bmpn error
    *
-   * @throws NullValueException if no task with the given id exists
+   * @throws NotFoundException if no task with the given id exists
+   * @throws BadUserRequestException if task id or error code were null or empty
    * @throws SuspendedEntityInteractionException if the task is suspended
    * @throws AuthorizationException if the user has none of the following permissions:
    * <li>{@link Permissions#TASK_WORK} permission on {@link Resources#TASK} or
@@ -1193,7 +1195,8 @@ public interface TaskService {
    * @param escalationCode the escalation code of the corresponding escalation
    * @param variables the variables to pass to the execution
    *
-   * @throws NullValueException if no task with the given id exists
+   * @throws NotFoundException if no task with the given id exists
+   * @throws BadUserRequestException if task id or escalation code were null or empty
    * @throws SuspendedEntityInteractionException if the task is suspended
    * @throws AuthorizationException if the user has none of the following permissions:
    * <li>{@link Permissions#TASK_WORK} permission on {@link Resources#TASK} or
@@ -1210,7 +1213,8 @@ public interface TaskService {
    * @param escalationCode the escalation code of the corresponding escalation
    * @param variables the variables to pass to the execution
    *
-   * @throws NullValueException if no task with the given id exists
+   * @throws NotFoundException if no task with the given id exists
+   * @throws BadUserRequestException if task id or escalation code were null or empty
    * @throws SuspendedEntityInteractionException if the task is suspended
    * @throws AuthorizationException if the user has none of the following permissions:
    * <li>{@link Permissions#TASK_WORK} permission on {@link Resources#TASK} or

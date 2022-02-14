@@ -120,11 +120,14 @@ public abstract class AbstractBatchJobHandler<T extends BatchConfiguration> impl
       List<String> idsForJob = processIds.subList(0, lastIdIndex);
 
       T jobConfiguration = createJobConfiguration(configuration, idsForJob);
+
+      jobConfiguration.setBatchId(batch.getId());
+
       ByteArrayEntity configurationEntity = saveConfiguration(byteArrayManager, jobConfiguration);
 
       JobEntity job = createBatchJob(batch, configurationEntity);
       job.setDeploymentId(deploymentId);
-      postProcessJob(configuration, job);
+      postProcessJob(configuration, job, jobConfiguration);
       jobManager.insertAndHintJobExecutor(job);
 
       idsForJob.clear();
@@ -137,7 +140,7 @@ public abstract class AbstractBatchJobHandler<T extends BatchConfiguration> impl
 
   protected abstract T createJobConfiguration(T configuration, List<String> processIdsForJob);
 
-  protected void postProcessJob(T configuration, JobEntity job) {
+  protected void postProcessJob(T configuration, JobEntity job, T jobConfiguration) {
     // do nothing as default
   }
 

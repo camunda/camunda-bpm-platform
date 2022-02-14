@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto
     extends = "ProcessInstanceDto" >
 
@@ -10,3 +11,4 @@
         desc = "The id of the process instance." />
 
 </@lib.dto>
+</#macro>

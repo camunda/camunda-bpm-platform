@@ -285,6 +285,13 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
 
   /**
    * Only select historic task instances which are part of a process that have a variable
+   * with the given name and not matching the given value.
+   * The syntax is that of SQL: for example usage: valueNotLike(%value%)
+   * */
+  HistoricTaskInstanceQuery processVariableValueNotLike(String variableName, Object variableValue);
+
+  /**
+   * Only select historic task instances which are part of a process that have a variable
    * with the given name and a value greater than the given one.
    */
   HistoricTaskInstanceQuery processVariableValueGreaterThan(String variableName, Object variableValue);
@@ -321,6 +328,11 @@ public interface HistoricTaskInstanceQuery  extends Query<HistoricTaskInstanceQu
    * Only select select historic task instances which have a due date after the given date.
    */
   HistoricTaskInstanceQuery taskDueAfter(Date dueDate);
+
+  /**
+   * Only select select historic task instances that have no due date.
+   */
+  HistoricTaskInstanceQuery withoutTaskDueDate();
 
   /**
    * Only select select historic task instances with the given follow-up date.

@@ -21,12 +21,15 @@ import java.util.Arrays;
 import org.camunda.bpm.engine.cdi.BusinessProcess;
 import org.camunda.bpm.engine.cdi.test.CdiProcessEngineTestCase;
 import org.camunda.bpm.engine.test.Deployment;
+import org.jboss.arquillian.junit.Arquillian;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * @author Daniel Meyer
  *
  */
+@RunWith(Arquillian.class)
 public class MultiInstanceTest extends CdiProcessEngineTestCase {
 
   @Test
@@ -34,7 +37,7 @@ public class MultiInstanceTest extends CdiProcessEngineTestCase {
   public void testParallelMultiInstanceServiceTasks() {
 
     BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
-    businessProcess.setVariable("list", Arrays.asList(new String[]{"1","2"}));
+    businessProcess.setVariable("list", Arrays.asList("1","2"));
     businessProcess.startProcessByKey("miParallelScriptTask");
 
   }

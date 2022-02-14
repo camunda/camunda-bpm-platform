@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.mgmt.metrics;
 
 import static junit.framework.TestCase.assertEquals;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.camunda.bpm.engine.management.Metrics.ACTIVTY_INSTANCE_START;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
@@ -72,10 +73,11 @@ public class MetricsIntervalTest extends AbstractMetricsIntervalTest {
   public void testMeterQueryIncreaseLimit() {
     //given metric data
 
-      //when query metric interval data with max results set to 1000
-    exception.expect(ProcessEngineException.class);
-    exception.expectMessage("Metrics interval query row limit can't be set larger than 200.");
-    managementService.createMetricsQuery().limit(1000).interval();
+    // when/then
+    // when query metric interval data with max results set to 1000
+    assertThatThrownBy(() -> managementService.createMetricsQuery().limit(1000).interval())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Metrics interval query row limit can't be set larger than 200.");
   }
 
   // OFFSET //////////////////////////////////////////////////////////////////////
@@ -230,6 +232,7 @@ public class MetricsIntervalTest extends AbstractMetricsIntervalTest {
     metrics.remove(0);
     for (MetricIntervalValue metric : metrics) {
       assertEquals(name, metric.getName());
+      assertEquals(Metrics.FLOW_NODE_INSTANCES_START, metric.getName());
       long nextTimestamp = metric.getTimestamp().getTime();
       if (lastTimestamp != nextTimestamp) {
         assertEquals(lastTimestamp, nextTimestamp + DEFAULT_INTERVAL_MILLIS);
@@ -265,6 +268,7 @@ public class MetricsIntervalTest extends AbstractMetricsIntervalTest {
     metrics.remove(0);
     for (MetricIntervalValue metric : metrics) {
       assertEquals(name, metric.getName());
+      assertEquals(Metrics.FLOW_NODE_INSTANCES_START, metric.getName());
       long nextTimestamp = metric.getTimestamp().getTime();
       if (lastTimestamp != nextTimestamp) {
         assertEquals(lastTimestamp, nextTimestamp + interval);

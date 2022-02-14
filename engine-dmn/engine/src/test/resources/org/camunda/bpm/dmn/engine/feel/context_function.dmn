@@ -13,7 +13,7 @@
       <output id="output_1" typeRef="string" />
       <rule id="DecisionRule_1rmq2b6">
         <inputEntry id="UnaryTests_1qviji0" expressionLanguage="feel">
-          <text>not(now())</text>
+          <text>not(dateTime())</text>
         </inputEntry>
         <outputEntry id="LiteralExpression_1q3jh5z" expressionLanguage="juel">
           <text>"foo"</text>
@@ -21,7 +21,7 @@
       </rule>
       <rule id="DecisionRule_1jrp8o4">
         <inputEntry id="UnaryTests_0g8ovnf" expressionLanguage="feel">
-          <text>now()</text>
+          <text>dateTime()</text>
         </inputEntry>
         <outputEntry id="LiteralExpression_19hblon" expressionLanguage="juel">
           <text>"bar"</text>

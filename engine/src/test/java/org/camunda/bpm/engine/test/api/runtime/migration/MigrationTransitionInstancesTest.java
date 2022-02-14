@@ -42,6 +42,7 @@ import org.camunda.bpm.engine.test.api.runtime.migration.models.EventSubProcessM
 import org.camunda.bpm.engine.test.api.runtime.migration.models.MultiInstanceProcessModels;
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
 import org.junit.Assert;
@@ -245,9 +246,15 @@ public class MigrationTransitionInstancesTest {
   @Test
   public void testMigrateAsyncBeforeTransitionInstanceRemoveIncomingFlow() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS)
-        .removeFlowNode("startEvent"));
+    BpmnModelInstance model = Bpmn.createExecutableProcess("Process")
+        .startEvent()
+        .serviceTask("serviceTask").camundaExpression("${true}")
+        .userTask("userTask").camundaAsyncBefore()
+        .endEvent()
+        .done();
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(model);
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(modify(model)
+        .removeFlowNode("serviceTask"));
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
@@ -272,9 +279,14 @@ public class MigrationTransitionInstancesTest {
   @Test
   public void testMigrateAsyncBeforeTransitionInstanceAddIncomingFlow() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(modify(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS)
-        .removeFlowNode("startEvent"));
-    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(AsyncProcessModels.ASYNC_BEFORE_USER_TASK_PROCESS);
+    BpmnModelInstance model = Bpmn.createExecutableProcess("Process")
+        .startEvent()
+        .serviceTask("serviceTask").camundaExpression("${true}")
+        .userTask("userTask").camundaAsyncBefore()
+        .endEvent()
+        .done();
+    ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(modify(model).removeFlowNode("serviceTask"));
+    ProcessDefinition targetProcessDefinition = testHelper.deployAndGetDefinition(model);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())

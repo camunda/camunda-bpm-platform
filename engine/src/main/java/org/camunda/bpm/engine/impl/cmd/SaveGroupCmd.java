@@ -21,10 +21,10 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureWhitelistedResou
 
 import java.io.Serializable;
 
+import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.impl.identity.IdentityOperationResult;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
 
 
 /**
@@ -33,9 +33,9 @@ import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
 public class SaveGroupCmd extends AbstractWritableIdentityServiceCmd<Void> implements Command<Void>, Serializable {
   
   private static final long serialVersionUID = 1L;
-  protected GroupEntity group;
+  protected Group group;
   
-  public SaveGroupCmd(GroupEntity group) {
+  public SaveGroupCmd(Group group) {
     this.group = group;
   }
   

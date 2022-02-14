@@ -1,0 +1,130 @@
+<div ng-form class="form-horizontal" role="form" name="filterGeneralForm">
+
+  <div class="row">
+    <div class="col-xs-8">
+      <div class="form-group">
+
+        <label for="filterName"
+               class="col-xs-3 control-label"
+               translate="FILTER_NAME_LABEL">Name</label>
+
+        <div class="col-xs-9">
+          <input class="form-control"
+                 name="filterName"
+                 ng-model="filter.name"
+                 type="text"
+                 required
+                 placeholder="{{ 'FILTER_NAME_PLACEHOLDER' | translate }}"
+                 ng-readonly="filter.id && !accesses.update"
+                 ng-disabled="filter.id && !accesses.update" />
+
+          <span ng-if="this.filterGeneralForm.filterName.$invalid && this.filterGeneralForm.filterName.$dirty"
+                class="has-error">
+            <span ng-show="this.filterGeneralForm.filterName.$error.required" class="help-block">
+              {{ 'REQUIRED_FIELD' | translate }}
+            </span>
+          </span>
+
+        </div>
+
+      </div>
+    </div>
+
+    <div class="col-xs-4">
+
+      <div class="form-group">
+
+        <label for="filter-form-color"
+               class="col-xs-6 control-label"
+               translate="FILTER_COLOR_LABEL">Color</label>
+
+        <div class="col-xs-6">
+
+          <input class="form-control"
+                 name="filterColor"
+                 ng-model="filter.properties.color"
+                 ng-pattern="/^#([0-9a-f]{6}|[0-9a-f]{3})$/i"
+                 type="color"
+                 ng-readonly="filter.id && !accesses.update"
+                 ng-disabled="filter.id && !accesses.update" />
+
+          <span ng-if="this.filterGeneralForm.filterColor.$invalid && this.filterGeneralForm.filterColor.$dirty"
+                class="has-error">
+            <span ng-show="this.filterGeneralForm.filterColor.$error.pattern" class="help-block">
+              {{ 'REQUIRED_HEX_COLOR_FIELD' | translate }}
+            </span>
+          </span>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-xs-8">
+      <div class="form-group">
+
+        <label for="filter-form-description"
+               class="col-xs-3 control-label"
+               translate="FILTER_DESCRIPTION_LABEL">Description</label>
+
+        <div class="col-xs-9">
+          <input class="col-xs-9 form-control"
+                 name="filterDescription"
+                 ng-model="filter.properties.description"
+                 type="text"
+                 placeholder="{{ 'FILTER_DESCRIPTION_PLACEHOLDER' | translate }}"
+                 ng-readonly="filter.id && !accesses.update"
+                 ng-disabled="filter.id && !accesses.update" />
+        </div>
+
+      </div>
+    </div>
+
+    <div class="col-xs-4">
+      <div class="form-group">
+
+        <label for="filter-form-priority"
+               class="col-xs-6 control-label"
+               translate="FILTER_PRIORITY_LABEL">Priority</label>
+
+        <div class="col-xs-6">
+          <input class="form-control"
+                 name="filterPriority"
+                 ng-model="filter.properties.priority"
+                 ng-pattern="/^-?[\d]+$/"
+                 type="text"
+                 ng-readonly="filter.id && !accesses.update"
+                 ng-disabled="filter.id && !accesses.update" />
+
+
+          <span ng-if="this.filterGeneralForm.filterPriority.$invalid && this.filterGeneralForm.filterPriority.$dirty"
+                class="has-error">
+            <span ng-show="this.filterGeneralForm.filterPriority.$error.pattern" class="help-block">
+              {{ 'REQUIRED_INTEGER_FIELD' | translate }}
+            </span>
+          </span>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-xs-offset-2 col-md-offset-10 col-xs-4 col-md-2 checkbox">
+      <label>
+        <input class="form-control"
+               name="filterRefresh"
+               ng-model="filter.properties.refresh"
+               type="checkbox"
+               tooltip-append-to-body="false"
+               uib-tooltip="{{ 'FILTER_REFRESH_TOOLTIP' | translate }}"
+               ng-disabled="filter.id && !accesses.update" />
+        {{ 'FILTER_REFRESH_LABEL' | translate }}
+      </label>
+    </div>
+  </div>
+
+</div>

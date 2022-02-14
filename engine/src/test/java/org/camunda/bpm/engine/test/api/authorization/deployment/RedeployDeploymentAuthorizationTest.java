@@ -96,8 +96,8 @@ public class RedeployDeploymentAuthorizationTest {
     // given
     RepositoryService repositoryService = engineRule.getRepositoryService();
 
-    BpmnModelInstance model1 = Bpmn.createExecutableProcess("process1").done();
-    BpmnModelInstance model2 = Bpmn.createExecutableProcess("process2").done();
+    BpmnModelInstance model1 = Bpmn.createExecutableProcess("process1").startEvent().done();
+    BpmnModelInstance model2 = Bpmn.createExecutableProcess("process2").startEvent().done();
 
     // first deployment
     Deployment deployment1 = repositoryService

@@ -1,0 +1,288 @@
+<html>
+  <head>
+    <title>Camunda commons UI library</title>
+    <base href="/" />
+    <!--[if IE]><script type="text/javascript">
+        // Fix for IE ignoring relative base tags.
+        // See http://stackoverflow.com/questions/3926197/html-base-tag-and-local-folder-path-with-internet-explorer
+        (function() {
+            var baseTag = document.getElementsByTagName('base');
+            if (baseTag[0]) { baseTag[0].href = baseTag[0].href; }
+        })();
+    </script><![endif]-->
+    <link rel="icon" href="resources/img/favicon.ico" />
+    <link href="styles.css" rel="stylesheet" />
+    <link href="test-styles.css" rel="stylesheet" />
+  </head>
+  <body class="cam-widget-header-test-page">
+    <!-- gh-pages-menu -->
+
+    <header>
+      <div>
+        <h1>Header</h1>
+      </div>
+    </header>
+
+        <section class="widget-description">
+      <header>
+        <h2>Description</h2>
+      </header>
+      <p>A header navigation bar with a branding on the left and the common menus on the right.
+      You can customize what comes in the center with <a href="//docs.angularjs.org/api/ng/directive/ngTransclude">ng-transclude</a>.</p>
+    </section>
+
+    <section class="widget-reference">
+      <header>
+        <h2>Usage</h2>
+        This widget depends an authentication service (provided in camunda-commons-ui - lib/auth).
+      </header>
+
+      <h3>Options</h3>
+      <dl>
+        <dt><span class="badge">@</span> brand-name</dt>
+        <dd>The brand name for the application</dd>
+        <dt><span class="badge">@</span> app-name</dt>
+        <dd>The application name</dd>
+        <dt><span class="badge">@</span> current-app</dt>
+        <dd>Indicate on which app the user currently is (used to limit the choices in the app switch dropdown).</dd>
+        <dt><span class="badge">=</span> authentication</dt>
+        <dd>can be passed to customize the dropdown menus (showing or not the account and limit the choices of apps the user can switch to according to its authorizations).</dd>
+        <dt><span class="badge">=</span> user-name</dt>
+        <dd>can be passed to load user full name.</dd>
+
+        <dt><span class="badge">@?</span> sign-out</dt>
+        <dd>a string to be place in the Log out link, by default: <span class="default">Log out</span>.</dd>
+
+        <dt><span class="badge">@?</span> toggle-navigation</dt>
+        <dd>a string to be place in the navigation toggle link, by default: <span class="default">Toggle navigation</span>.</dd>
+
+        <dt><span class="badge">@?</span> myProfile</dt>
+        <dd>a string to be place in the link to the user profile, by default: <span class="default">My profile</span>.</dd>
+      </dl>
+    </section>
+
+    <section class="widget-examples">
+      <header>
+        <h2>Examples</h2>
+      </header>
+
+      <div class="widget-example"
+           id="empty">
+        <h3>Without content</h3>
+        <pre ng-non-bindable>&lt;div cam-widget-header
+     brand-name="Cammunda Commons UI"&gt;&lt;/div&gt;</pre>
+        <div class="test-container">
+          <div cam-widget-header
+               brand-name="Cammunda Commons UI"></div>
+        </div><!-- /.test-container -->
+      </div><!-- /.widget-example -->
+
+
+      <div class="widget-example"
+           id="with-content">
+        <h3>With content</h3>
+        <pre ng-non-bindable>&lt;div cam-widget-header
+     brand-name="Cammunda Commons UI"&gt;
+  &lt;ul&gt;
+    &lt;li&gt;
+      &lt;a href&gt;Awesome&lt;/a&gt;
+    &lt;/li&gt;
+    &lt;li class="active"&gt;
+      &lt;a href&gt;Sweet&lt;/a&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;a href&gt;Marvellous&lt;/a&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;</pre>
+        <div class="test-container">
+          <div cam-widget-header
+               brand-name="Cammunda Commons UI">
+            <ul>
+              <li>
+                <a href>Awesome</a>
+              </li>
+              <li class="active">
+                <a href>Sweet</a>
+              </li>
+              <li>
+                <a href>Marvellous</a>
+              </li>
+            </ul>
+          </div>
+        </div><!-- /.test-container -->
+      </div><!-- /.widget-example -->
+
+
+      <div class="widget-example"
+           id="anonymous"
+           ng-controller="testAnonymousController">
+        <h3>Anonymous</h3>
+        <div class="description">Should show the app switch dropdown with all the links except Admin.</div>
+        <pre ng-non-bindable>&lt;div cam-widget-header
+     authentication="auth"
+     brand-name="Cammunda Commons UI"
+     current-app="{{ ctrlCurrentApp }}"&gt;
+  You are on `{{ ctrlCurrentApp }}` app.
+&lt;/div&gt;</pre>
+        <div class="test-container">
+          <div cam-widget-header
+               authentication="auth"
+               brand-name="Cammunda Commons UI"
+               current-app="{{ ctrlCurrentApp }}">
+            You are on `{{ ctrlCurrentApp }}` app.
+          </div>
+        </div><!-- /.test-container -->
+      </div><!-- /.widget-example -->
+
+
+      <div class="widget-example"
+           id="authenticated"
+           ng-controller="testAuthenticatedController">
+        <h3>Authenticated</h3>
+        <div class="description">Should show the app switch dropdown with a link to Admin.</div>
+        <pre ng-non-bindable>&lt;div cam-widget-header
+     authentication="auth"
+     my-profile="Your profile"
+     sign-out="Log out"
+     user-name="fullName"
+     brand-name="Camunda Commons UI"
+     current-app="{{ ctrlCurrentApp }}"&gt;
+  &lt;ul&gt;
+    &lt;li&gt;
+      &lt;a href&gt;Awesome&lt;/a&gt;
+    &lt;/li&gt;
+    &lt;li class="active"&gt;
+      &lt;a href&gt;Sweet&lt;/a&gt;
+    &lt;/li&gt;
+    &lt;li&gt;&lt;!-- as in cockpit --&gt;
+      &lt;view&gt;
+        &lt;a href&gt;Marvellous&lt;/a&gt;
+      &lt;/view&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="row"&gt;
+  &lt;div class="col-xs-12"&gt;
+    testAuthenticatedController scope.ctrlCurrentApp: `{{ ctrlCurrentApp }}`&lt;br /&gt;
+    testAuthenticatedController scope.auth.authorizedApps: `{{ auth.authorizedApps }}`
+  &lt;/div&gt;
+&lt;/div&gt;</pre>
+        <div class="test-container">
+          <div cam-widget-header
+               authentication="auth"
+               my-profile="Your profile"
+               sign-out="Log out"
+               user-name="fullName"
+               brand-name="Camunda Commons UI"
+               current-app="{{ ctrlCurrentApp }}">
+            <ul>
+              <li>
+                <a href>Awesome</a>
+              </li>
+              <li class="active">
+                <a href>Sweet</a>
+              </li>
+              <li>
+                <button>Button!</button>
+              </li>
+              <li><!-- as in cockpit -->
+                <view>
+                  <a href>Marvellous</a>
+                </view>
+              </li>
+            </ul>
+          </div>
+          <div class="row">
+            <div class="col-xs-12">
+              testAuthenticatedController scope.ctrlCurrentApp: `{{ ctrlCurrentApp }}`<br/>
+              testAuthenticatedController scope.auth.authorizedApps: `{{ auth.authorizedApps }}`
+            </div>
+          </div>
+        </div><!-- /.test-container -->
+      </div><!-- /.widget-example -->
+
+
+      <div class="widget-example"
+           id="welcome-page-usage"
+           ng-controller="testAuthenticatedController">
+        <h3>Authenticated on Welcome app</h3>
+        <div class="description">Should not show the app switch dropdown.</div>
+        <pre ng-non-bindable>&lt;div cam-widget-header
+     authentication="auth"
+     my-profile="Your profile"
+     sign-out="Log out"
+     user-name="fullName"
+     brand-name="Cammunda Commons UI"
+     current-app="welcome"&gt;
+&lt;/div&gt;</pre>
+        <div class="test-container">
+          <div cam-widget-header
+               authentication="auth"
+               my-profile="Your profile"
+               sign-out="Log out"
+               user-name="fullName"
+               brand-name="Cammunda Commons UI"
+               current-app="welcome">
+          </div>
+        </div><!-- /.test-container -->
+      </div><!-- /.widget-example -->
+
+
+      <div class="widget-example"
+           id="authenticated-single"
+           ng-controller="testAuthenticatedSingleController">
+        <h3>Authenticated, 1 app access</h3>
+        <div class="description">Should not show the app switch dropdown.</div>
+        <pre ng-non-bindable>&lt;div cam-widget-header
+     authentication="auth"
+     my-profile="Your profile"
+     sign-out="Log out"
+     user-name="fullName"
+     brand-name="Cammunda Commons UI"
+     current-app="tasklist"&gt;
+&lt;/div&gt;</pre>
+        <div class="test-container">
+          <div cam-widget-header
+               authentication="auth"
+               my-profile="Your profile"
+               sign-out="Log out"
+               user-name="fullName"
+               brand-name="Cammunda Commons UI"
+               current-app="tasklist">
+          </div>
+        </div><!-- /.test-container -->
+      </div><!-- /.widget-example -->
+
+
+      <div class="widget-example"
+           id="authenticated-single-unauthorized"
+           ng-controller="testAuthenticatedSingleController">
+        <h3>Authenticated, 1 app access</h3>
+        <div class="description">Should only show the authorized (Tasklist) app link.</div>
+        <pre ng-non-bindable>&lt;div cam-widget-header
+     authentication="auth"
+     my-profile="Your profile"
+     sign-out="Log out"
+     user-name="fullName"
+     brand-name="Cammunda Commons UI"
+     current-app="admin"&gt;
+&lt;/div&gt;</pre>
+        <div class="test-container">
+          <div cam-widget-header
+               authentication="auth"
+               my-profile="Your profile"
+               sign-out="Log out"
+               user-name="fullName"
+               brand-name="Cammunda Commons UI"
+               current-app="admin">
+          </div>
+        </div><!-- /.test-container -->
+      </div><!-- /.widget-example -->
+    </section>
+
+    <!-- gh-pages-footer -->
+
+    <script src="lib/widgets/header/test/cam-widget-header.build.js"></script>
+  </body>
+</html>

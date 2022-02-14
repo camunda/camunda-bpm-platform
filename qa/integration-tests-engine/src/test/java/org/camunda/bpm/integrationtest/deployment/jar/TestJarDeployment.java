@@ -29,7 +29,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * This test only runs on JBoss AS, as for all other servers, Arquillian wraps the jar in a war file
+ * This test only runs on WildFly, as for all other servers, Arquillian wraps the jar in a war file
  * to pack the test runtime. However, we want to deploy a plain jar. This is supported by JBoss-exclusive
  * protocol 'jmx-as7'.
  * 

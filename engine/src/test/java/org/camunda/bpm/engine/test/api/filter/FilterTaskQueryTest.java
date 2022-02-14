@@ -16,14 +16,13 @@
  */
 package org.camunda.bpm.engine.test.api.filter;
 
-import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -80,14 +79,24 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
   protected Date testDate = new Date(0);
   protected String[] testActivityInstances = new String[] {"a", "b", "c"};
   protected String[] testKeys = new String[] {"d", "e"};
-  protected List<String> testCandidateGroups = new ArrayList<String>();
+  protected List<String> testCandidateGroups = new ArrayList<>();
   protected String[] testInstances = new String[] {"x", "y", "z"};
 
-  protected String[] variableNames = new String[] {"a", "b", "c", "d", "e", "f"};
-  protected Object[] variableValues = new Object[] {1, 2, "3", "4", 5, 6};
-  protected QueryOperator[] variableOperators = new QueryOperator[] {QueryOperator.EQUALS, QueryOperator.GREATER_THAN_OR_EQUAL, QueryOperator.LESS_THAN, QueryOperator.LIKE, QueryOperator.NOT_EQUALS, QueryOperator.LESS_THAN_OR_EQUAL};
-  protected boolean[] isTaskVariable = new boolean[] {true, true, false, false, false, false};
-  protected boolean[] isProcessVariable = new boolean[] {false, false, true, true, false, false};
+  protected String[] variableNames = new String[] {"a", "b", "c", "d", "e", "f", "g", "h", "i"};
+  protected Object[] variableValues = new Object[] {1, 2, "3", "4", "5", 6, 7, "8", "9"};
+  protected QueryOperator[] variableOperators = new QueryOperator[] {
+      QueryOperator.EQUALS,
+      QueryOperator.GREATER_THAN_OR_EQUAL,
+      QueryOperator.LESS_THAN,
+      QueryOperator.LIKE,
+      QueryOperator.NOT_LIKE,
+      QueryOperator.NOT_EQUALS,
+      QueryOperator.LESS_THAN_OR_EQUAL,
+      QueryOperator.LIKE,
+      QueryOperator.NOT_LIKE
+  };
+  protected boolean[] isTaskVariable = new boolean[] {true, true, false, false, false, false, false, false, false};
+  protected boolean[] isProcessVariable = new boolean[] {false, false, true, true, true, false, false, false, false};
   protected User testUser;
   protected Group testGroup;
 
@@ -95,7 +104,10 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
 
   @Before
   public void setUp() {
-    filter = filterService.newTaskFilter("name").setOwner("owner").setQuery(taskService.createTaskQuery()).setProperties(new HashMap<String, Object>());
+    filter = filterService.newTaskFilter("name")
+        .setOwner("owner")
+        .setQuery(taskService.createTaskQuery())
+        .setProperties(new HashMap<>());
     testUser = identityService.newUser("user");
     testGroup = identityService.newGroup("group");
     identityService.saveUser(testUser);
@@ -207,8 +219,11 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     query.taskVariableValueGreaterThanOrEquals(variableNames[1], variableValues[1]);
     query.processVariableValueLessThan(variableNames[2], variableValues[2]);
     query.processVariableValueLike(variableNames[3], (String) variableValues[3]);
-    query.caseInstanceVariableValueNotEquals(variableNames[4], variableValues[4]);
-    query.caseInstanceVariableValueLessThanOrEquals(variableNames[5], variableValues[5]);
+    query.processVariableValueNotLike(variableNames[4], (String) variableValues[4]);
+    query.caseInstanceVariableValueNotEquals(variableNames[5], variableValues[5]);
+    query.caseInstanceVariableValueLessThanOrEquals(variableNames[6], variableValues[6]);
+    query.caseInstanceVariableValueLike(variableNames[7], (String) variableValues[7]);
+    query.caseInstanceVariableValueNotLike(variableNames[8], (String) variableValues[8]);
 
     query.dueDate(testDate);
     query.dueDateExpression(testString);
@@ -806,7 +821,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
   public void testExtendingTaskQueryListWithCandidateGroups() {
     TaskQuery query = taskService.createTaskQuery();
 
-    List<String> candidateGroups = new ArrayList<String>();
+    List<String> candidateGroups = new ArrayList<>();
     candidateGroups.add("accounting");
     query.taskCandidateGroupIn(candidateGroups);
 
@@ -1072,7 +1087,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
 
     List<Task> tasks = filterService.list(filter.getId());
     assertNotNull(tasks);
-    assertThat(tasks.size(),is(1));
+    assertThat(tasks).hasSize(1);
 
     query = taskService.createTaskQuery();
     query.taskName("tASk 2");
@@ -1080,7 +1095,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
 
     tasks = filterService.list(filter.getId());
     assertNotNull(tasks);
-    assertThat(tasks.size(),is(1));
+    assertThat(tasks).hasSize(1);
   }
 
   /**
@@ -1096,7 +1111,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
 
     List<Task> tasks = filterService.list(filter.getId());
     assertNotNull(tasks);
-    assertThat(tasks.size(),is(1));
+    assertThat(tasks).hasSize(1);
 
     query = taskService.createTaskQuery();
     query.taskDescription("dEscription 2");
@@ -1104,7 +1119,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
 
     tasks = filterService.list(filter.getId());
     assertNotNull(tasks);
-    assertThat(tasks.size(),is(1));
+    assertThat(tasks).hasSize(1);
   }
 
   /**
@@ -1120,7 +1135,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
 
     List<Task> tasks = filterService.list(filter.getId());
     assertNotNull(tasks);
-    assertThat(tasks.size(),is(3));
+    assertThat(tasks).hasSize(3);
 
     query = taskService.createTaskQuery();
     query.taskNameLike("%Task%");
@@ -1128,7 +1143,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
 
     tasks = filterService.list(filter.getId());
     assertNotNull(tasks);
-    assertThat(tasks.size(),is(3));
+    assertThat(tasks).hasSize(3);
   }
 
   @Test
@@ -1197,7 +1212,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     query = extendedFilter.getQuery();
 
     List<QueryOrderingProperty> expectedOrderingProperties =
-        new ArrayList<QueryOrderingProperty>(sortQuery.getOrderingProperties());
+        new ArrayList<>(sortQuery.getOrderingProperties());
 
     verifyOrderingProperties(expectedOrderingProperties, query.getOrderingProperties());
 
@@ -1317,7 +1332,6 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     assertEquals(TaskQueryProperty.NAME_CASE_INSENSITIVE.getFunction(),
       orderingProperty.getQueryProperty().getFunction());
   }
-
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/task/oneTaskWithFormKeyProcess.bpmn20.xml"})
   @Test
@@ -1588,7 +1602,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     String variableName = "variableName";
     String variableValueCamelCase = "someVariableValue";
     String variableValueLowerCase = variableValueCamelCase.toLowerCase();
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
 
     String caseDefinitionId = repositoryService.createCaseDefinitionQuery().singleResult().getId();
 
@@ -1653,6 +1667,20 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     assertTrue(tasks.contains(taskLowerCase));
     assertFalse(tasks.contains(taskWithNoVariable));
 
+    // not like case-sensitive for comparison
+    extendingQuery = taskService.createTaskQuery().caseInstanceVariableValueNotLike(variableName, "somevariable%");
+    tasks = filterService.list(filter.getId(), extendingQuery);
+    assertTrue(tasks.contains(taskCamelCase));
+    assertFalse(tasks.contains(taskLowerCase));
+    assertFalse(tasks.contains(taskWithNoVariable));
+
+    // not like case-insensitive
+    extendingQuery = taskService.createTaskQuery().matchVariableValuesIgnoreCase().caseInstanceVariableValueNotLike(variableName, "somevariable%");
+    tasks = filterService.list(filter.getId(), extendingQuery);
+    assertFalse(tasks.contains(taskCamelCase));
+    assertFalse(tasks.contains(taskLowerCase));
+    assertFalse(tasks.contains(taskWithNoVariable));
+
     // variable name case-insensitive
     extendingQuery = taskService.createTaskQuery().matchVariableNamesIgnoreCase().caseInstanceVariableValueEquals(variableName.toLowerCase(), variableValueCamelCase);
     tasks = filterService.list(filter.getId(), extendingQuery);
@@ -1679,7 +1707,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     String variableName = "variableName";
     String variableValueCamelCase = "someVariableValue";
     String variableValueLowerCase = variableValueCamelCase.toLowerCase();
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
 
     variables.put(variableName, variableValueCamelCase);
     ProcessInstance instanceCamelCase = runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
@@ -1740,6 +1768,20 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     tasks = filterService.list(filter.getId(), extendingQuery);
     assertTrue(tasks.contains(taskCamelCase));
     assertTrue(tasks.contains(taskLowerCase));
+    assertFalse(tasks.contains(taskWithNoVariable));
+
+    // not like case-sensitive for comparison
+    extendingQuery = taskService.createTaskQuery().processVariableValueNotLike(variableName, "somevariable%");
+    tasks = filterService.list(filter.getId(), extendingQuery);
+    assertTrue(tasks.contains(taskCamelCase));
+    assertFalse(tasks.contains(taskLowerCase));
+    assertFalse(tasks.contains(taskWithNoVariable));
+
+    // not like case-insensitive
+    extendingQuery = taskService.createTaskQuery().matchVariableValuesIgnoreCase().processVariableValueNotLike(variableName, "somevariable%");
+    tasks = filterService.list(filter.getId(), extendingQuery);
+    assertFalse(tasks.contains(taskCamelCase));
+    assertFalse(tasks.contains(taskLowerCase));
     assertFalse(tasks.contains(taskWithNoVariable));
 
     // variable name case-insensitive
@@ -1870,7 +1912,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
 
     // then
     List<QueryOrderingProperty> expectedOrderingProperties =
-        new ArrayList<QueryOrderingProperty>(query.getOrderingProperties());
+        new ArrayList<>(query.getOrderingProperties());
 
     verifyOrderingProperties(expectedOrderingProperties, ((TaskQueryImpl) filter.getQuery()).getOrderingProperties());
 
@@ -1896,7 +1938,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     filterService.saveFilter(filter);
 
     // then
-    assertThat(filterService.count(filter.getId()), is(1L));
+    assertThat(filterService.count(filter.getId())).isEqualTo(1L);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
@@ -1916,7 +1958,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     filterService.saveFilter(filter);
 
     // then
-    assertThat(filterService.count(filter.getId()), is(1L));
+    assertThat(filterService.count(filter.getId())).isEqualTo(1L);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
@@ -1936,7 +1978,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     filterService.saveFilter(filter);
 
     // then
-    assertThat(filterService.count(filter.getId()), is(1L));
+    assertThat(filterService.count(filter.getId())).isEqualTo(1L);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
@@ -1956,7 +1998,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     filterService.saveFilter(filter);
 
     // then
-    assertThat(filterService.count(filter.getId()), is(1L));
+    assertThat(filterService.count(filter.getId())).isEqualTo(1L);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
@@ -1976,7 +2018,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     filterService.saveFilter(filter);
 
     // then
-    assertThat(filterService.count(filter.getId()), is(1L));
+    assertThat(filterService.count(filter.getId())).isEqualTo(1L);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
@@ -1996,7 +2038,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     filterService.saveFilter(filter);
 
     // then
-    assertThat(filterService.count(filter.getId()), is(1L));
+    assertThat(filterService.count(filter.getId())).isEqualTo(1L);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
@@ -2024,7 +2066,68 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     filterService.saveFilter(filter);
 
     // then
-    assertThat(filterService.count(filter.getId()), is(1L));
+    assertThat(filterService.count(filter.getId())).isEqualTo(1L);
+  }
+
+  @Test
+  public void testWithoutDueDate() {
+    // given
+    Task task = taskService.newTask();
+    task.setDueDate(new Date());
+    taskService.saveTask(task);
+
+    TaskQuery query = taskService.createTaskQuery()
+      .withoutDueDate();
+
+    filter.setQuery(query);
+
+    // when
+    filterService.saveFilter(filter);
+
+    // then
+    assertThat(filterService.count(filter.getId())).isEqualTo(3L);
+  }
+
+  @Test
+  public void testExtendQueryByWithoutDueDate() {
+    // given
+    Task task = taskService.newTask();
+    task.setDueDate(new Date());
+    taskService.saveTask(task);
+
+    TaskQuery query = taskService.createTaskQuery();
+    saveQuery(query);
+
+    // assume
+    assertThat(filterService.count(filter.getId())).isEqualTo(4L);
+
+    // when
+    TaskQuery extendingQuery = taskService.createTaskQuery().withoutDueDate();
+
+    // then
+    assertThat(filterService.count(filter.getId(), extendingQuery)).isEqualTo(3L);
+  }
+
+  @Test
+  public void testTaskIdInPositive() {
+    // given
+    List<Task> existingTasks = taskService.createTaskQuery().list();
+    String task1 = existingTasks.get(0).getId();
+    String task2 = existingTasks.get(1).getId();
+    TaskQueryImpl query = (TaskQueryImpl) taskService.createTaskQuery().taskIdIn(task1, task2);
+    Filter filter = filterService.newTaskFilter("taskIDfilter");
+    filter.setQuery(query);
+
+    // when
+    // save filter
+    filterService.saveFilter(filter);
+
+    // then
+    filter = filterService.createTaskFilterQuery().singleResult();
+    query = filter.getQuery();
+
+    // then
+    assertThat(query.getTaskIdIn()).containsOnly(task1, task2);
   }
 
   @Test
@@ -2124,7 +2227,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     filterService.saveFilter(filter);
 
     // then
-    assertThat(filterService.count(filter.getId()), is(1L));
+    assertThat(filterService.count(filter.getId())).isEqualTo(1L);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
@@ -2145,7 +2248,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     filterService.saveFilter(filter);
 
     // then
-    assertThat(filterService.count(filter.getId()), is(1L));
+    assertThat(filterService.count(filter.getId())).isEqualTo(1L);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
@@ -2166,7 +2269,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     filterService.saveFilter(filter);
 
     // then
-    assertThat(filterService.count(filter.getId()), is(1L));
+    assertThat(filterService.count(filter.getId())).isEqualTo(1L);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
@@ -2187,7 +2290,7 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     filterService.saveFilter(filter);
 
     // then
-    assertThat(filterService.count(filter.getId()), is(1L));
+    assertThat(filterService.count(filter.getId())).isEqualTo(1L);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
@@ -2213,8 +2316,22 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     assertEquals(2, extendingQueryTasks.size());
   }
 
+  @Test
+  public void shouldDeserializeOrQueryWithCandidateGroupAndUser() {
+    // given
+    TaskQuery query = taskService.createTaskQuery()
+        .or()
+          .taskCandidateGroup("foo")
+          .taskCandidateUser("bar")
+        .endOr();
+    JsonObject jsonObject = queryConverter.toJsonObject(query);
 
-  protected void saveQuery(Query query) {
+    // when deserializing the query
+    // then there is no exception
+    queryConverter.toObject(jsonObject);
+  }
+
+  protected void saveQuery(TaskQuery query) {
     filter.setQuery(query);
     filterService.saveFilter(filter);
     filter = filterService.getFilter(filter.getId());

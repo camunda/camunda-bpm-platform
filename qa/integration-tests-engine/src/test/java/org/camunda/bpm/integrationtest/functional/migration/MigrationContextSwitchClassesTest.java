@@ -106,14 +106,6 @@ public class MigrationContextSwitchClassesTest extends AbstractFoxPlatformIntegr
 
   }
 
-  protected static Asset modelAsAsset(BpmnModelInstance modelInstance) {
-    ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-    Bpmn.writeModelToStream(byteStream, modelInstance);
-
-    byte[] bytes = byteStream.toByteArray();
-    return new ByteArrayAsset(bytes);
-  }
-
   @Test
   @OperateOnDeployment("clientDeployment")
   public void testCallStartListenerInTargetContext() {
@@ -176,4 +168,13 @@ public class MigrationContextSwitchClassesTest extends AbstractFoxPlatformIntegr
     // then
     Assert.assertTrue((Boolean)runtimeService.getVariable(pi, RemovalListener.VARIABLE_NAME));
   }
+
+  protected static Asset modelAsAsset(BpmnModelInstance modelInstance) {
+    ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+    Bpmn.writeModelToStream(byteStream, modelInstance);
+
+    byte[] bytes = byteStream.toByteArray();
+    return new ByteArrayAsset(bytes);
+  }
+
 }

@@ -16,16 +16,14 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -170,8 +168,8 @@ public class SingleProcessInstanceModificationAsyncTest extends PluggableProcess
       testRule.assertProcessEnded(processInstance.getId());
 
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), startsWith("ENGINE-13036"));
-      assertThat(e.getMessage(), containsString("Process instance '" + "foo" + "' cannot be modified"));
+      assertThat(e.getMessage()).startsWith("ENGINE-13036");
+      assertThat(e.getMessage()).contains("Process instance '" + "foo" + "' cannot be modified");
     }
   }
 

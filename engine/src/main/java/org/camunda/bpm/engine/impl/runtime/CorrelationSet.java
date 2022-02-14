@@ -29,6 +29,7 @@ public class CorrelationSet {
   protected final String processDefinitionId;
   protected final String tenantId;
   protected final boolean isTenantIdSet;
+  protected final boolean isExecutionsOnly;
 
   public CorrelationSet(MessageCorrelationBuilderImpl builder) {
     this.businessKey = builder.getBusinessKey();
@@ -38,6 +39,7 @@ public class CorrelationSet {
     this.processDefinitionId = builder.getProcessDefinitionId();
     this.tenantId = builder.getTenantId();
     this.isTenantIdSet = builder.isTenantIdSet();
+    this.isExecutionsOnly = builder.isExecutionsOnly();
   }
 
   public String getBusinessKey() {
@@ -68,10 +70,15 @@ public class CorrelationSet {
     return isTenantIdSet;
   }
 
+  public boolean isExecutionsOnly() {
+    return isExecutionsOnly;
+  }
+
   @Override
   public String toString() {
     return "CorrelationSet [businessKey=" + businessKey + ", processInstanceId=" + processInstanceId + ", processDefinitionId=" + processDefinitionId
-        + ", correlationKeys=" + correlationKeys + ", localCorrelationKeys=" + localCorrelationKeys + ", tenantId=" + tenantId + ", isTenantIdSet=" + isTenantIdSet + "]";
+        + ", correlationKeys=" + correlationKeys + ", localCorrelationKeys=" + localCorrelationKeys + ", tenantId=" + tenantId +
+        ", isTenantIdSet=" + isTenantIdSet + ", isExecutionsOnly=" + isExecutionsOnly + "]";
   }
 
 }

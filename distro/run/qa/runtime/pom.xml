@@ -5,12 +5,12 @@
   <parent>
     <groupId>org.camunda.bpm.run</groupId>
     <artifactId>camunda-bpm-run-qa</artifactId>
-    <version>7.14.0-SNAPSHOT</version>
+    <version>7.17.0-SNAPSHOT</version>
     <relativePath>..</relativePath>
   </parent>
 
   <artifactId>camunda-bpm-run-qa-runtime</artifactId>
-  <name>Camunda BPM - Run - QA - Runtime</name>
+  <name>Camunda Platform - Run - QA - Runtime</name>
   <packaging>jar</packaging>
   
   <properties>
@@ -25,6 +25,14 @@
       <version>${project.version}</version>
       <type>zip</type>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <!-- exclude Groovy 2.4.13 so that it doesn't conflict with the REST Assured version.
+               The groovy-all JAR will still be present in the ZIP archive. -->
+          <groupId>org.codehaus.groovy</groupId>
+          <artifactId>groovy-all</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -141,6 +149,7 @@
               </dependenciesToScan>
               <systemPropertyVariables>
                 <camunda.run.home>${run-home}</camunda.run.home>
+                <selenium.screenshot.directory>${project.build.directory}/selenium-screenshots</selenium.screenshot.directory>
               </systemPropertyVariables>
             </configuration>
             <executions>

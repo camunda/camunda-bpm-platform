@@ -24,7 +24,7 @@ import org.camunda.bpm.model.xml.impl.type.ModelElementTypeImpl;
 public class DoubleAttributeBuilder extends AttributeBuilderImpl<Double> {
 
   public DoubleAttributeBuilder(String attributeName, ModelElementTypeImpl modelType) {
-    super(attributeName, modelType, new DoubleAttribute((modelType)));
+    super(attributeName, modelType, new DoubleAttribute(modelType));
   }
 
   @Override

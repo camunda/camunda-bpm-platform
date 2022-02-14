@@ -16,8 +16,8 @@
  */
 package org.camunda.bpm.engine.test.api.identity;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -31,7 +31,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * @author Miklas Boskamp
@@ -40,8 +39,6 @@ public class CustomPasswordPolicyTest {
 
   @Rule
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   private ProcessEngineConfigurationImpl processEngineConfiguration;
   private IdentityService identityService;
@@ -66,8 +63,8 @@ public class CustomPasswordPolicyTest {
   @Test
   public void testPasswordPolicyConfiguration() {
     PasswordPolicy policy = processEngineConfiguration.getPasswordPolicy();
-    assertThat(policy.getClass().isAssignableFrom(DefaultPasswordPolicyImpl.class), is(true));
-    assertThat(policy.getRules().size(), is(6));
+    assertThat(policy.getClass().isAssignableFrom(DefaultPasswordPolicyImpl.class)).isTrue();
+    assertThat(policy.getRules()).hasSize(6);
   }
 
   @Test
@@ -75,16 +72,21 @@ public class CustomPasswordPolicyTest {
     User user = identityService.newUser("user");
     user.setPassword("this-is-1-STRONG-password");
     identityService.saveUser(user);
-    assertThat(identityService.createUserQuery().userId(user.getId()).count(), is(1L));
+    assertThat(identityService.createUserQuery().userId(user.getId()).count()).isEqualTo(1L);
   }
 
   @Test
   public void testCustomPasswordPolicyWithNonCompliantPassword() {
-    thrown.expect(ProcessEngineException.class);
+    // given
     User user = identityService.newUser("user");
     user.setPassword("weakpassword");
-    identityService.saveUser(user);
-    thrown.expectMessage("Password does not match policy");
-    assertThat(identityService.createUserQuery().userId(user.getId()).count(), is(0L));
+
+    // when/then
+    assertThatThrownBy(() -> identityService.saveUser(user))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Password does not match policy");
+
+    // and
+    assertThat(identityService.createUserQuery().userId(user.getId()).count()).isEqualTo(0L);
   }
 }

@@ -85,6 +85,11 @@ public interface VariableInstance {
   String getTaskId();
 
   /**
+   * Returns the corresponding batch id.
+   */
+  String getBatchId();
+
+  /**
    * Returns the corresponding activity instance id.
    */
   String getActivityInstanceId();

@@ -16,9 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.mgmt;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.HistoryService;
@@ -44,7 +42,7 @@ public class PropertyUserOperationLogTest {
 
   private static final String USER_ID = "testUserId";
   private static final String PROPERTY_NAME = "TEST_PROPERTY";
-  
+
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
 
   protected HistoryService historyService;
@@ -60,88 +58,88 @@ public class PropertyUserOperationLogTest {
     identityService = engineRule.getIdentityService();
     managementService = engineRule.getManagementService();
   }
-  
+
   @After
   public void tearDown() {
     managementService.deleteProperty(PROPERTY_NAME);
   }
-  
+
   @Test
   public void testCreateProperty() {
     // given
-    assertThat(historyService.createUserOperationLogQuery().count(), is(0L));
-    
+    assertThat(historyService.createUserOperationLogQuery().count()).isEqualTo(0L);
+
     // when
     identityService.setAuthenticatedUserId(USER_ID);
     managementService.setProperty(PROPERTY_NAME, "testValue");
     identityService.clearAuthentication();
-    
+
     // then
-    assertThat(historyService.createUserOperationLogQuery().count(), is(1L));
+    assertThat(historyService.createUserOperationLogQuery().count()).isEqualTo(1L);
     UserOperationLogEntry entry = historyService.createUserOperationLogQuery().singleResult();
-    assertThat(entry.getEntityType(), is(EntityTypes.PROPERTY));
-    assertThat(entry.getCategory(), is(UserOperationLogEntry.CATEGORY_ADMIN));
-    assertThat(entry.getOperationType(), is(UserOperationLogEntry.OPERATION_TYPE_CREATE));
-    assertThat(entry.getProperty(), is("name"));
-    assertThat(entry.getOrgValue(), nullValue());
-    assertThat(entry.getNewValue(), is(PROPERTY_NAME));
+    assertThat(entry.getEntityType()).isEqualTo(EntityTypes.PROPERTY);
+    assertThat(entry.getCategory()).isEqualTo(UserOperationLogEntry.CATEGORY_ADMIN);
+    assertThat(entry.getOperationType()).isEqualTo(UserOperationLogEntry.OPERATION_TYPE_CREATE);
+    assertThat(entry.getProperty()).isEqualTo("name");
+    assertThat(entry.getOrgValue()).isNull();
+    assertThat(entry.getNewValue()).isEqualTo(PROPERTY_NAME);
   }
-  
+
   @Test
   public void testUpdateProperty() {
     // given
     managementService.setProperty(PROPERTY_NAME, "testValue");
-    assertThat(historyService.createUserOperationLogQuery().count(), is(0L));
-    
+    assertThat(historyService.createUserOperationLogQuery().count()).isEqualTo(0L);
+
     // when
     identityService.setAuthenticatedUserId(USER_ID);
     managementService.setProperty(PROPERTY_NAME, "testValue2");
     identityService.clearAuthentication();
-    
+
     // then
-    assertThat(historyService.createUserOperationLogQuery().count(), is(1L));
+    assertThat(historyService.createUserOperationLogQuery().count()).isEqualTo(1L);
     UserOperationLogEntry entry = historyService.createUserOperationLogQuery().singleResult();
-    assertThat(entry.getEntityType(), is(EntityTypes.PROPERTY));
-    assertThat(entry.getCategory(), is(UserOperationLogEntry.CATEGORY_ADMIN));
-    assertThat(entry.getOperationType(), is(UserOperationLogEntry.OPERATION_TYPE_UPDATE));
-    assertThat(entry.getProperty(), is("name"));
-    assertThat(entry.getOrgValue(), nullValue());
-    assertThat(entry.getNewValue(), is(PROPERTY_NAME));
+    assertThat(entry.getEntityType()).isEqualTo(EntityTypes.PROPERTY);
+    assertThat(entry.getCategory()).isEqualTo(UserOperationLogEntry.CATEGORY_ADMIN);
+    assertThat(entry.getOperationType()).isEqualTo(UserOperationLogEntry.OPERATION_TYPE_UPDATE);
+    assertThat(entry.getProperty()).isEqualTo("name");
+    assertThat(entry.getOrgValue()).isNull();
+    assertThat(entry.getNewValue()).isEqualTo(PROPERTY_NAME);
   }
-  
+
   @Test
   public void testDeleteProperty() {
     // given
     managementService.setProperty(PROPERTY_NAME, "testValue");
-    assertThat(historyService.createUserOperationLogQuery().count(), is(0L));
-    
+    assertThat(historyService.createUserOperationLogQuery().count()).isEqualTo(0L);
+
     // when
     identityService.setAuthenticatedUserId(USER_ID);
     managementService.deleteProperty(PROPERTY_NAME);
     identityService.clearAuthentication();
-    
+
     // then
-    assertThat(historyService.createUserOperationLogQuery().count(), is(1L));
+    assertThat(historyService.createUserOperationLogQuery().count()).isEqualTo(1L);
     UserOperationLogEntry entry = historyService.createUserOperationLogQuery().singleResult();
-    assertThat(entry.getEntityType(), is(EntityTypes.PROPERTY));
-    assertThat(entry.getCategory(), is(UserOperationLogEntry.CATEGORY_ADMIN));
-    assertThat(entry.getOperationType(), is(UserOperationLogEntry.OPERATION_TYPE_DELETE));
-    assertThat(entry.getProperty(), is("name"));
-    assertThat(entry.getOrgValue(), nullValue());
-    assertThat(entry.getNewValue(), is(PROPERTY_NAME));    
+    assertThat(entry.getEntityType()).isEqualTo(EntityTypes.PROPERTY);
+    assertThat(entry.getCategory()).isEqualTo(UserOperationLogEntry.CATEGORY_ADMIN);
+    assertThat(entry.getOperationType()).isEqualTo(UserOperationLogEntry.OPERATION_TYPE_DELETE);
+    assertThat(entry.getProperty()).isEqualTo("name");
+    assertThat(entry.getOrgValue()).isNull();
+    assertThat(entry.getNewValue()).isEqualTo(PROPERTY_NAME);
   }
-  
+
   @Test
   public void testDeletePropertyNonExisting() {
     // given
-    assertThat(historyService.createUserOperationLogQuery().count(), is(0L));
-    
+    assertThat(historyService.createUserOperationLogQuery().count()).isEqualTo(0L);
+
     // when
     identityService.setAuthenticatedUserId(USER_ID);
     managementService.deleteProperty(PROPERTY_NAME);
     identityService.clearAuthentication();
-    
+
     // then
-    assertThat(historyService.createUserOperationLogQuery().count(), is(0L));
+    assertThat(historyService.createUserOperationLogQuery().count()).isEqualTo(0L);
   }
 }

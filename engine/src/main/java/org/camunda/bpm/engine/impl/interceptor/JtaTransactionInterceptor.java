@@ -28,21 +28,27 @@ import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSession;
 
 /**
  * @author Guillaume Nodet
  */
 public class JtaTransactionInterceptor extends CommandInterceptor {
 
-  private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
+  protected final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
-  private final TransactionManager transactionManager;
-  private final boolean requiresNew;
+  protected final TransactionManager transactionManager;
+  protected final boolean requiresNew;
+  protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
-  public JtaTransactionInterceptor(TransactionManager transactionManager, boolean requiresNew) {
+  public JtaTransactionInterceptor(TransactionManager transactionManager,
+                                   boolean requiresNew,
+                                   ProcessEngineConfigurationImpl processEngineConfiguration) {
     this.transactionManager = transactionManager;
     this.requiresNew = requiresNew;
+    this.processEngineConfiguration = processEngineConfiguration;
   }
 
   public <T> T execute(Command<T> command) {
@@ -124,7 +130,14 @@ public class JtaTransactionInterceptor extends CommandInterceptor {
     } catch (HeuristicRollbackException e) {
       throw new TransactionException("Unable to commit transaction", e);
     } catch (RollbackException e) {
-      throw new TransactionException("Unable to commit transaction", e);
+      // When CockroachDB is used, a CRDB concurrency error may occur on transaction commit.
+      // To ensure that these errors are still detected as OLEs, we must catch them and wrap
+      // them in a CrdbTransactionRetryException
+      if (DbSqlSession.isCrdbConcurrencyConflictOnCommit(e, processEngineConfiguration)) {
+        throw ProcessEngineLogger.PERSISTENCE_LOGGER.crdbTransactionRetryExceptionOnCommit(e);
+      } else {
+        throw new TransactionException("Unable to commit transaction", e);
+      }
     } catch (SystemException e) {
       throw new TransactionException("Unable to commit transaction", e);
     } catch (RuntimeException e) {
@@ -148,7 +161,7 @@ public class JtaTransactionInterceptor extends CommandInterceptor {
     }
   }
 
-  private static class TransactionException extends RuntimeException {
+  public static class TransactionException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
     private TransactionException() {

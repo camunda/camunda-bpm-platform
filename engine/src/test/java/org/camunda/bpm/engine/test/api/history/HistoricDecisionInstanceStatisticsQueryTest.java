@@ -16,9 +16,8 @@
  */
 package org.camunda.bpm.engine.test.api.history;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.HistoryService;
@@ -35,7 +34,6 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 
@@ -64,9 +62,6 @@ public class HistoricDecisionInstanceStatisticsQueryTest {
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
-  @Rule
-  public final ExpectedException thrown = ExpectedException.none();
-
   @Before
   public void setUp() {
     decisionService = engineRule.getDecisionService();
@@ -93,10 +88,10 @@ public class HistoricDecisionInstanceStatisticsQueryTest {
             decisionRequirementsDefinition.getId());
 
     //then
-    assertThat(statisticsQuery.count(), is(3L));
-    assertThat(statisticsQuery.list().size(), is(3));
-    assertThat(statisticsQuery.list().get(0).getEvaluations(), is(2));
-    assertThat(statisticsQuery.list().get(0).getDecisionDefinitionKey(), is(notNullValue()));
+    assertThat(statisticsQuery.count()).isEqualTo(3L);
+    assertThat(statisticsQuery.list()).hasSize(3);
+    assertThat(statisticsQuery.list().get(0).getEvaluations()).isEqualTo(2);
+    assertThat(statisticsQuery.list().get(0).getDecisionDefinitionKey()).isNotNull();
   }
 
   @Test
@@ -127,10 +122,10 @@ public class HistoricDecisionInstanceStatisticsQueryTest {
         .decisionInstanceId(decisionInstanceId);
 
     //then
-    assertThat(query.count(), is(3L));
-    assertThat(query.list().size(), is(3));
-    assertThat(query.list().get(0).getEvaluations(), is(1));
-    assertThat(query.list().get(0).getDecisionDefinitionKey(), is(notNullValue()));
+    assertThat(query.count()).isEqualTo(3L);
+    assertThat(query.list()).hasSize(3);
+    assertThat(query.list().get(0).getEvaluations()).isEqualTo(1);
+    assertThat(query.list().get(0).getDecisionDefinitionKey()).isNotNull();
   }
 
   @Test
@@ -148,8 +143,8 @@ public class HistoricDecisionInstanceStatisticsQueryTest {
         .decisionInstanceId(NON_EXISTING);
 
     //then
-    assertThat(query.count(), is(0L));
-    assertThat(query.list().size(), is(0));
+    assertThat(query.count()).isEqualTo(0L);
+    assertThat(query.list()).hasSize(0);
 
 
   }
@@ -196,10 +191,10 @@ public class HistoricDecisionInstanceStatisticsQueryTest {
             decisionRequirementsDefinition.getId());
 
     //then
-    assertThat(statisticsQuery.count(), is(1L));
-    assertThat(statisticsQuery.list().size(), is(1));
-    assertThat(statisticsQuery.list().get(0).getEvaluations(), is(1));
-    assertThat(statisticsQuery.list().get(0).getDecisionDefinitionKey(), is(notNullValue()));
+    assertThat(statisticsQuery.count()).isEqualTo(1L);
+    assertThat(statisticsQuery.list()).hasSize(1);
+    assertThat(statisticsQuery.list().get(0).getEvaluations()).isEqualTo(1);
+    assertThat(statisticsQuery.list().get(0).getDecisionDefinitionKey()).isNotNull();
   }
 
   @Test
@@ -226,38 +221,36 @@ public class HistoricDecisionInstanceStatisticsQueryTest {
             decisionRequirementsDefinition.getId());
 
     //then
-    assertThat(statisticsQuery.count(), is(1L));
-    assertThat(statisticsQuery.list().size(), is(1));
-    assertThat(statisticsQuery.list().get(0).getEvaluations(), is(1));
-    assertThat(statisticsQuery.list().get(0).getDecisionDefinitionKey(), is(notNullValue()));
+    assertThat(statisticsQuery.count()).isEqualTo(1L);
+    assertThat(statisticsQuery.list()).hasSize(1);
+    assertThat(statisticsQuery.list().get(0).getEvaluations()).isEqualTo(1);
+    assertThat(statisticsQuery.list().get(0).getDecisionDefinitionKey()).isNotNull();
   }
 
   @Test
   public void testStatisticDoesNotExistForFakeId() throws Exception {
     assertThat(
-        "available statistics count of fake",
         historyService.createHistoricDecisionInstanceStatisticsQuery(
-            NON_EXISTING).count(), is(0L));
+            NON_EXISTING).count()).isEqualTo(0L);
 
     assertThat(
-        "available statistics elements of fake",
         historyService.createHistoricDecisionInstanceStatisticsQuery(
-            NON_EXISTING).list().size(), is(0));
+            NON_EXISTING).list().size()).isEqualTo(0);
 
   }
 
   @Test
   public void testStatisticThrowsExceptionOnNullConstraintsCount() throws Exception {
-    //expect
-    thrown.expect(NullValueException.class);
-    historyService.createHistoricDecisionInstanceStatisticsQuery(null).count();
+    // when/then
+    assertThatThrownBy(() -> historyService.createHistoricDecisionInstanceStatisticsQuery(null).count())
+      .isInstanceOf(NullValueException.class);
   }
 
   @Test
   public void testStatisticThrowsExceptionOnNullConstraintsList() throws Exception {
-    //expect
-    thrown.expect(NullValueException.class);
-    historyService.createHistoricDecisionInstanceStatisticsQuery(null).list();
+    // when/then
+    assertThatThrownBy(() -> historyService.createHistoricDecisionInstanceStatisticsQuery(null).list())
+      .isInstanceOf(NullValueException.class);
   }
 
   @Test
@@ -270,7 +263,7 @@ public class HistoricDecisionInstanceStatisticsQueryTest {
         decisionRequirementsDefinition.getId());
 
     //then
-    assertThat("available statistics count", statisticsQuery.count(), is(0L));
-    assertThat("available statistics elements", statisticsQuery.list().size(), is(0));
+    assertThat(statisticsQuery.count()).isEqualTo(0L);
+    assertThat(statisticsQuery.list()).hasSize(0);
   }
 }

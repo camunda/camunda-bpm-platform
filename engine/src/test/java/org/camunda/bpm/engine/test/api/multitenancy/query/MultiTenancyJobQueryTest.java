@@ -16,8 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy.query;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 import java.util.Arrays;
@@ -60,7 +59,7 @@ public class MultiTenancyJobQueryTest extends PluggableProcessEngineTest {
     JobQuery query = managementService
         .createJobQuery();
 
-    assertThat(query.count(), is(3L));
+    assertThat(query.count()).isEqualTo(3L);
   }
 
   @Test
@@ -69,13 +68,13 @@ public class MultiTenancyJobQueryTest extends PluggableProcessEngineTest {
         .createJobQuery()
         .tenantIdIn(TENANT_ONE);
 
-    assertThat(query.count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
 
     query = managementService
         .createJobQuery()
         .tenantIdIn(TENANT_TWO);
 
-    assertThat(query.count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
   }
 
   @Test
@@ -84,7 +83,7 @@ public class MultiTenancyJobQueryTest extends PluggableProcessEngineTest {
         .createJobQuery()
         .tenantIdIn(TENANT_ONE, TENANT_TWO);
 
-    assertThat(query.count(), is(2L));
+    assertThat(query.count()).isEqualTo(2L);
   }
 
   @Test
@@ -93,7 +92,7 @@ public class MultiTenancyJobQueryTest extends PluggableProcessEngineTest {
         .createJobQuery()
         .withoutTenantId();
 
-    assertThat(query.count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
   }
 
   @Test
@@ -103,21 +102,21 @@ public class MultiTenancyJobQueryTest extends PluggableProcessEngineTest {
         .tenantIdIn(TENANT_ONE)
         .includeJobsWithoutTenantId();
 
-    assertThat(query.count(), is(2L));
+    assertThat(query.count()).isEqualTo(2L);
 
     query = managementService
         .createJobQuery()
         .tenantIdIn(TENANT_TWO)
         .includeJobsWithoutTenantId();
 
-    assertThat(query.count(), is(2L));
+    assertThat(query.count()).isEqualTo(2L);
 
     query = managementService
         .createJobQuery()
         .tenantIdIn(TENANT_ONE, TENANT_TWO)
         .includeJobsWithoutTenantId();
 
-    assertThat(query.count(), is(3L));
+    assertThat(query.count()).isEqualTo(3L);
   }
 
   @Test
@@ -126,7 +125,7 @@ public class MultiTenancyJobQueryTest extends PluggableProcessEngineTest {
         .createJobQuery()
         .tenantIdIn("nonExisting");
 
-    assertThat(query.count(), is(0L));
+    assertThat(query.count()).isEqualTo(0L);
   }
 
   @Test
@@ -149,9 +148,9 @@ public class MultiTenancyJobQueryTest extends PluggableProcessEngineTest {
         .asc()
         .list();
 
-    assertThat(jobs.size(), is(2));
-    assertThat(jobs.get(0).getTenantId(), is(TENANT_ONE));
-    assertThat(jobs.get(1).getTenantId(), is(TENANT_TWO));
+    assertThat(jobs).hasSize(2);
+    assertThat(jobs.get(0).getTenantId()).isEqualTo(TENANT_ONE);
+    assertThat(jobs.get(1).getTenantId()).isEqualTo(TENANT_TWO);
   }
 
   @Test
@@ -163,9 +162,9 @@ public class MultiTenancyJobQueryTest extends PluggableProcessEngineTest {
         .desc()
         .list();
 
-    assertThat(jobs.size(), is(2));
-    assertThat(jobs.get(0).getTenantId(), is(TENANT_TWO));
-    assertThat(jobs.get(1).getTenantId(), is(TENANT_ONE));
+    assertThat(jobs).hasSize(2);
+    assertThat(jobs.get(0).getTenantId()).isEqualTo(TENANT_TWO);
+    assertThat(jobs.get(1).getTenantId()).isEqualTo(TENANT_ONE);
   }
 
   @Test
@@ -173,7 +172,7 @@ public class MultiTenancyJobQueryTest extends PluggableProcessEngineTest {
     identityService.setAuthentication("user", null, null);
 
     JobQuery query = managementService.createJobQuery();
-    assertThat(query.count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
   }
 
   @Test
@@ -182,10 +181,10 @@ public class MultiTenancyJobQueryTest extends PluggableProcessEngineTest {
 
     JobQuery query = managementService.createJobQuery();
 
-    assertThat(query.count(), is(2L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
-    assertThat(query.tenantIdIn(TENANT_ONE, TENANT_TWO).includeJobsWithoutTenantId().count(), is(2L));
+    assertThat(query.count()).isEqualTo(2L);
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(0L);
+    assertThat(query.tenantIdIn(TENANT_ONE, TENANT_TWO).includeJobsWithoutTenantId().count()).isEqualTo(2L);
   }
 
   @Test
@@ -194,10 +193,10 @@ public class MultiTenancyJobQueryTest extends PluggableProcessEngineTest {
 
     JobQuery query = managementService.createJobQuery();
 
-    assertThat(query.count(), is(3L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
-    assertThat(query.withoutTenantId().count(), is(1L));
+    assertThat(query.count()).isEqualTo(3L);
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(1L);
+    assertThat(query.withoutTenantId().count()).isEqualTo(1L);
   }
 
   @Test
@@ -206,7 +205,7 @@ public class MultiTenancyJobQueryTest extends PluggableProcessEngineTest {
     identityService.setAuthentication("user", null, null);
 
     JobQuery query = managementService.createJobQuery();
-    assertThat(query.count(), is(3L));
+    assertThat(query.count()).isEqualTo(3L);
   }
 
 }

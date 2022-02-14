@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -23,3 +24,4 @@
 
                 **Note:** Cannot be set in conjunction with `absoluteRemovalTime` or `clearedRemovalTime`."/>
 </@lib.dto>
+</#macro>

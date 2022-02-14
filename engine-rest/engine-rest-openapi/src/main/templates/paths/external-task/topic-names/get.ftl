@@ -1,13 +1,15 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
       id = "getTopicNames"
       tag = "External Task"
+      summary = "Get External Task Topic Names"
       desc = "Queries for distinct topic names of external tasks that fulfill given parameters.
-      Query can be restricted to only tasks with retries left, tasks that are locked, or tasks
-      that are unlocked. The parameters withLockedTasks and withUnlockedTasks are
-      exclusive. Setting them both to true will return an empty list.
-      Providing no parameters will return a list of all distinct topic names with external tasks."
+              Query can be restricted to only tasks with retries left, tasks that are locked, or tasks
+              that are unlocked. The parameters withLockedTasks and withUnlockedTasks are
+              exclusive. Setting them both to true will return an empty list.
+              Providing no parameters will return a list of all distinct topic names with external tasks."
       />
 
   "parameters" : [
@@ -59,3 +61,4 @@
         desc = "Returned if some of the query parameters are invalid." />
   }
 }
+</#macro>

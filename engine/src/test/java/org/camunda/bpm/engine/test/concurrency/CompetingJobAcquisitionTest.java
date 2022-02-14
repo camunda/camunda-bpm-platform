@@ -16,9 +16,11 @@
  */
 package org.camunda.bpm.engine.test.concurrency;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import org.camunda.bpm.engine.CrdbTransactionRetryException;
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -37,6 +39,19 @@ import org.slf4j.Logger;
 
 
 /**
+ * This test covers the behavior of two competing JobAcquisition threads.
+ *
+ * In the test:
+ * 1. The first JobAcquisition thread is started.
+ * 1.1. The first JobAcquisition thread attempts to acquire the job, and blocks.
+ * 2. The second JobAcquisition thread is started.
+ * 2.1. The second JobAcquisition thread attempts to acquire the job, and blocks.
+ * 3. The first JobAcquisition thread unblocks, and successfully locks the acquired job in the DB.
+ * 5. The second JobAcquisition thread unblocks, attempts to lock the acquired job in the DBm and receives an OptimisticLockingException.
+ * 5.1. The OptimisticLockingListener on the second JobAcquisition thread handles
+ *      the OptimisticLockingException by excluding the failed jobs.
+ * 6. The second JobAcquisition thread acquires no jobs, but finishes without failing.
+ *
  * @author Tom Baeyens
  */
 public class CompetingJobAcquisitionTest {
@@ -53,40 +68,19 @@ public class CompetingJobAcquisitionTest {
   protected RuntimeService runtimeService;
 
   protected static ControllableThread activeThread;
+  protected String databaseType;
 
 
   @Before
   public void initializeServices() {
     processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+    databaseType = processEngineConfiguration.getDatabaseType();
     runtimeService = engineRule.getRuntimeService();
-  }
-
-  public class JobAcquisitionThread extends ControllableThread {
-    OptimisticLockingException exception;
-    AcquiredJobs jobs;
-
-    @Override
-    public synchronized void startAndWaitUntilControlIsReturned() {
-      activeThread = this;
-      super.startAndWaitUntilControlIsReturned();
-    }
-    public void run() {
-      try {
-        JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
-        jobs = (AcquiredJobs) processEngineConfiguration
-          .getCommandExecutorTxRequired()
-          .execute(new ControlledCommand(activeThread, new AcquireJobsCmd(jobExecutor)));
-
-      } catch (OptimisticLockingException e) {
-        this.exception = e;
-      }
-      LOG.debug(getName()+" ends");
-    }
   }
 
   @Deployment
   @Test
-  public void testCompetingJobAcquisitions() throws Exception {
+  public void testCompetingJobAcquisitions() {
     runtimeService.startProcessInstanceByKey("CompetingJobAcquisitionProcess");
 
     LOG.debug("test thread starts thread one");
@@ -105,11 +99,43 @@ public class CompetingJobAcquisitionTest {
 
     LOG.debug("test thread notifies thread 2");
     threadTwo.proceedAndWaitTillDone();
-    // the acquisition did NOT fail
-    assertNull(threadTwo.exception);
-    // but the job was not acquired
-    assertEquals(0, threadTwo.jobs.size());
 
+    if (testRule.isOptimisticLockingExceptionSuppressible()) {
+      // the acquisition did NOT fail
+      assertNull(threadTwo.exception);
+      // but the job was not acquired
+      assertEquals(0, threadTwo.jobs.size());
+    } else {
+      // on CockroachDb, the `commandRetries` property is 0 by default. So any retryable commands,
+      // like the `FetchExternalTasksCmd` will not be retried, but report
+      // a `CrdbTransactionRetryException` to the caller.
+      assertThat(threadTwo.exception).isInstanceOf(CrdbTransactionRetryException.class);
+    }
+  }
+
+  public class JobAcquisitionThread extends ControllableThread {
+    OptimisticLockingException exception;
+    AcquiredJobs jobs;
+
+    @Override
+    public synchronized void startAndWaitUntilControlIsReturned() {
+      activeThread = this;
+      super.startAndWaitUntilControlIsReturned();
+    }
+
+    @Override
+    public void run() {
+      try {
+        JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
+        jobs = (AcquiredJobs) processEngineConfiguration
+          .getCommandExecutorTxRequired()
+          .execute(new ControlledCommand(activeThread, new AcquireJobsCmd(jobExecutor)));
+
+      } catch (OptimisticLockingException e) {
+        this.exception = e;
+      }
+      LOG.debug(getName()+" ends");
+    }
   }
 
 }

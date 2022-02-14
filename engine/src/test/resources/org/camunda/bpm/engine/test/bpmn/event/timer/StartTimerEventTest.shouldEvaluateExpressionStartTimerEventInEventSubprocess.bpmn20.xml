@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn" targetNamespace="Examples">
+
+  <process id="shouldEvaluateExpressionStartTimerEventInEventSubprocess" isExecutable="true">
+
+    <startEvent id="startEvent" />
+
+    <sequenceFlow id="sequenceFlow_1" sourceRef="startEvent" targetRef="processUserTask" />
+
+    <userTask id="processUserTask" name="process user task" />
+
+    <sequenceFlow id="sequenceFlow_5" sourceRef="processUserTask" targetRef="endEvent" />
+
+    <endEvent id="endEvent" />
+
+    <subProcess id="subProcess" name="Subprocess" triggeredByEvent="true">
+
+      <startEvent id="subprocessStartEvent" isInterrupting="false">
+        <timerEventDefinition>
+          <timeDuration>${duration}</timeDuration>
+        </timerEventDefinition>
+      </startEvent>
+
+      <sequenceFlow id="sequenceFlow_2" sourceRef="subprocessStartEvent" targetRef="subprocessUserTask" />
+
+      <userTask id="subprocessUserTask" name="subprocess user task" />
+
+      <sequenceFlow id="sequenceFlow_3" sourceRef="subprocessUserTask" targetRef="subprocessEndEvent" />
+
+      <endEvent id="subprocessEndEvent" />
+
+    </subProcess>
+
+  </process>
+
+</definitions>

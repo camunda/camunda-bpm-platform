@@ -16,11 +16,9 @@
  */
 package org.camunda.bpm.engine.test.api.variables.scope;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
-import static org.hamcrest.CoreMatchers.startsWith;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertThat;
 
 import java.util.Arrays;
 
@@ -43,7 +41,6 @@ import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaExecutionListener;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * @author Askar Akhmerov
@@ -54,8 +51,6 @@ public class TargetVariableScopeTest {
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   @Rule
   public ProcessEngineTestRule testHelper = new ProcessEngineTestRule(engineRule);
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/variables/scope/TargetVariableScopeTest.testExecutionWithDelegateProcess.bpmn","org/camunda/bpm/engine/test/api/variables/scope/doer.bpmn"})
@@ -65,8 +60,8 @@ public class TargetVariableScopeTest {
     ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("Process_MultiInstanceCallAcitivity",variables);
 
     // it runs without any problems
-    assertThat(processInstance.isEnded(),is(true));
-    assertThat(((ProcessInstanceWithVariablesImpl) processInstance).getVariables().containsKey("targetOrderId"),is(false));
+    assertThat(processInstance.isEnded()).isTrue();
+    assertThat(((ProcessInstanceWithVariablesImpl) processInstance).getVariables().containsKey("targetOrderId")).isFalse();
   }
 
   @Test
@@ -76,19 +71,23 @@ public class TargetVariableScopeTest {
     ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("Process_MultiInstanceCallAcitivity",variables);
 
     // it runs without any problems
-    assertThat(processInstance.isEnded(),is(true));
-    assertThat(((ProcessInstanceWithVariablesImpl) processInstance).getVariables().containsKey("targetOrderId"),is(false));
+    assertThat(processInstance.isEnded()).isTrue();
+    assertThat(((ProcessInstanceWithVariablesImpl) processInstance).getVariables().containsKey("targetOrderId")).isFalse();
   }
 
   @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/variables/scope/TargetVariableScopeTest.testExecutionWithoutProperTargetScope.bpmn","org/camunda/bpm/engine/test/api/variables/scope/doer.bpmn"})
   public void testExecutionWithoutProperTargetScope () {
     VariableMap variables = Variables.createVariables().putValue("orderIds", Arrays.asList(new int[]{1, 2, 3}));
-    //fails due to inappropriate variable scope target
-    thrown.expect(ScriptEvaluationException.class);
     ProcessDefinition processDefinition = engineRule.getRepositoryService().createProcessDefinitionQuery().processDefinitionKey("Process_MultiInstanceCallAcitivity").singleResult();
-    thrown.expectMessage(startsWith("Unable to evaluate script while executing activity 'CallActivity_1' in the process definition with id '" + processDefinition.getId() + "': org.camunda.bpm.engine.ProcessEngineException: ENGINE-20011 Scope with specified activity Id NOT_EXISTING and execution"));
-    engineRule.getRuntimeService().startProcessInstanceByKey("Process_MultiInstanceCallAcitivity",variables);
+
+    // when/then
+    //fails due to inappropriate variable scope target
+    assertThatThrownBy(() -> engineRule.getRuntimeService().startProcessInstanceByKey("Process_MultiInstanceCallAcitivity",variables))
+      .isInstanceOf(ScriptEvaluationException.class)
+      .hasMessageContaining("Unable to evaluate script while executing activity 'CallActivity_1' in the process definition with id '"
+          + processDefinition.getId() + "': org.camunda.bpm.engine.ProcessEngineException: ENGINE-20011 "
+              + "Scope with specified activity Id NOT_EXISTING and execution");
   }
 
   @Test
@@ -155,10 +154,15 @@ public class TargetVariableScopeTest {
         .done();
 
     ProcessDefinition processDefinition = testHelper.deployAndGetDefinition(instance);
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage(startsWith("org.camunda.bpm.engine.ProcessEngineException: ENGINE-20011 Scope with specified activity Id SubProcess_2 and execution"));
+
     VariableMap variables = Variables.createVariables().putValue("orderIds", Arrays.asList(new int[]{1, 2, 3}));
-    engineRule.getRuntimeService().startProcessInstanceById(processDefinition.getId(),variables);
+
+    // when/then
+    //fails due to inappropriate variable scope target
+    assertThatThrownBy(() -> engineRule.getRuntimeService().startProcessInstanceById(processDefinition.getId(),variables))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("org.camunda.bpm.engine.ProcessEngineException: ENGINE-20011 Scope with specified activity Id SubProcess_2 and execution");
+
   }
 
   public static class JavaDelegate implements org.camunda.bpm.engine.delegate.JavaDelegate {
@@ -166,7 +170,7 @@ public class TargetVariableScopeTest {
     @Override
     public void execute(DelegateExecution execution) {
       execution.setVariable("varName", "varValue", "activityId");
-      assertThat(execution.getVariableLocal("varName"), is(notNullValue()));
+      assertThat(execution.getVariableLocal("varName")).isNotNull();
     }
 
   }
@@ -176,7 +180,7 @@ public class TargetVariableScopeTest {
     @Override
     public void notify(DelegateExecution execution) {
       execution.setVariable("varName", "varValue", "activityId");
-      assertThat(execution.getVariableLocal("varName"), is(notNullValue()));
+      assertThat(execution.getVariableLocal("varName")).isNotNull();
     }
 
   }
@@ -187,7 +191,7 @@ public class TargetVariableScopeTest {
     public void notify(DelegateTask delegateTask) {
       DelegateExecution execution = delegateTask.getExecution();
       execution.setVariable("varName", "varValue", "activityId");
-      assertThat(execution.getVariableLocal("varName"), is(notNullValue()));
+      assertThat(execution.getVariableLocal("varName")).isNotNull();
     }
   }
 

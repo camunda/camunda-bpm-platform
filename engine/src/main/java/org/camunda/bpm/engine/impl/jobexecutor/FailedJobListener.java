@@ -31,11 +31,12 @@ import org.camunda.bpm.engine.management.Metrics;
  */
 public class FailedJobListener implements Command<Void> {
 
+  private final static JobExecutorLogger LOG = ProcessEngineLogger.JOB_EXECUTOR_LOGGER;
+
   protected CommandExecutor commandExecutor;
   protected JobFailureCollector jobFailureCollector;
-  private final static JobExecutorLogger LOG = ProcessEngineLogger.JOB_EXECUTOR_LOGGER;
-  private int countRetries = 0;
-  private int totalRetries = ProcessEngineConfigurationImpl.DEFAULT_FAILED_JOB_LISTENER_MAX_RETRIES;
+  protected int countRetries = 0;
+  protected int totalRetries = ProcessEngineConfigurationImpl.DEFAULT_FAILED_JOB_LISTENER_MAX_RETRIES;
 
   public FailedJobListener(CommandExecutor commandExecutor, JobFailureCollector jobFailureCollector) {
     this.commandExecutor = commandExecutor;
@@ -49,25 +50,8 @@ public class FailedJobListener implements Command<Void> {
 
     FailedJobCommandFactory failedJobCommandFactory = commandContext.getFailedJobCommandFactory();
     String jobId = jobFailureCollector.getJobId();
-    final Command<Object> cmd = failedJobCommandFactory.getCommand(jobId, jobFailureCollector.getFailure());
-
-    commandExecutor.execute(new Command<Void>() {
-
-      public Void execute(CommandContext commandContext) {
-        JobEntity job = commandContext
-                .getJobManager()
-                .findJobById(jobId);
-
-        if (job != null) {
-          job.setFailedActivityId(jobFailureCollector.getFailedActivityId());
-          fireHistoricJobFailedEvt(job);
-          cmd.execute(commandContext);
-        } else {
-          LOG.debugFailedJobNotFound(jobId);
-        }
-        return null;
-      }
-    });
+    Command<Object> cmd = failedJobCommandFactory.getCommand(jobId, jobFailureCollector.getFailure());
+    commandExecutor.execute(new FailedJobListenerCmd(jobId, cmd));
 
     return null;
   }
@@ -104,4 +88,32 @@ public class FailedJobListener implements Command<Void> {
   public int getRetriesLeft() {
     return Math.max(0, totalRetries - countRetries);
   }
+
+  protected class FailedJobListenerCmd implements Command<Void> {
+
+    protected String jobId;
+    protected Command<Object> cmd;
+
+    public FailedJobListenerCmd(String jobId, Command<Object> cmd) {
+      this.jobId = jobId;
+      this.cmd = cmd;
+    }
+
+    @Override
+    public Void execute(CommandContext commandContext) {
+      JobEntity job = commandContext
+          .getJobManager()
+          .findJobById(jobId);
+
+      if (job != null) {
+        job.setFailedActivityId(jobFailureCollector.getFailedActivityId());
+        fireHistoricJobFailedEvt(job);
+        cmd.execute(commandContext);
+      } else {
+        LOG.debugFailedJobNotFound(jobId);
+      }
+      return null;
+    }
+  }
+
 }

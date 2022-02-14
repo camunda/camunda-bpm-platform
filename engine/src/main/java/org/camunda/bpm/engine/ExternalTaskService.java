@@ -57,7 +57,7 @@ public interface ExternalTaskService {
    * whether priority should be regarded or not.
    * The builder allows to specify multiple topics to fetch tasks for and
    * individual lock durations. For every topic, variables can be fetched
-   * in addition.Is the priority enabled the tasks with the highest priority are fetched.</p>
+   * in addition. If priority is enabled, the tasks with the highest priority are fetched.</p>
    *
    * <p>Returned tasks are locked for the given worker until
    * <code>now + lockDuration</code> expires.
@@ -94,10 +94,29 @@ public interface ExternalTaskService {
   public ExternalTaskQueryBuilder fetchAndLock(int maxTasks, String workerId, boolean usePriority);
 
   /**
+   * <p>Lock an external task on behalf of a worker.
+   *    Note: Attempting to lock an already locked external task with the same <code>workerId</code>
+   *    will succeed and a new lock duration will be set, starting from the current moment.
+   * </p>
+   *
+   * @param externalTaskId the id of the external task to lock
+   * @param workerId  the id of the worker to lock the task for
+   * @param lockDuration the duration in milliseconds for which task should be locked
+   * @throws NotFoundException if no external task with the given id exists
+   * @throws BadUserRequestException if the task was already locked by a different worker
+   * @throws AuthorizationException thrown if the current user does not possess any of the following permissions:
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_INSTANCE}</li>
+   *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
+   */
+  public void lock(String externalTaskId, String workerId, long lockDuration);
+
+  /**
    * <p>Completes an external task on behalf of a worker. The given task must be
    * assigned to the worker.</p>
    *
-   * @param externalTaskId the id of the external to complete
+   * @param externalTaskId the id of the external task to complete
    * @param workerId the id of the worker that completes the task
    * @throws NotFoundException if no external task with the given id exists
    * @throws BadUserRequestException if the task is assigned to a different worker
@@ -114,7 +133,7 @@ public interface ExternalTaskService {
    * to the process instance before continuing execution. The given task must be
    * assigned to the worker.</p>
    *
-   * @param externalTaskId the id of the external to complete
+   * @param externalTaskId the id of the external task to complete
    * @param workerId the id of the worker that completes the task
    * @param variables a map of variables to set on the execution (non-local)
    *   the external task is assigned to
@@ -134,7 +153,7 @@ public interface ExternalTaskService {
    * to the process instance before continuing execution. The given task must be
    * assigned to the worker.</p>
    *
-   * @param externalTaskId the id of the external to complete
+   * @param externalTaskId the id of the external task to complete
    * @param workerId the id of the worker that completes the task
    * @param variables a map of variables to set on the execution
    *   the external task is assigned to
@@ -175,6 +194,9 @@ public interface ExternalTaskService {
    * <p>If <code>retries</code> is 0, an incident with the given error message is created. The incident gets resolved,
    * once the number of retries is increased again.</p>
    *
+   * <p>Exceptions raised in evaluating expressions of error event definitions attached to the task will be ignored by this method
+   * and the event definitions considered as not-matching.</p>
+   *
    * @param externalTaskId the id of the external task to report a failure for
    * @param workerId the id of the worker that reports the failure
    * @param errorMessage short error message related to this failure. This message can be retrieved via
@@ -202,6 +224,9 @@ public interface ExternalTaskService {
    * <p>If <code>retries</code> is 0, an incident with the given error message is created. The incident gets resolved,
    * once the number of retries is increased again.</p>
    *
+   * <p>Exceptions raised in evaluating expressions of error event definitions attached to the task will be ignored by this method
+   * and the event definitions considered as not-matching.</p>
+   *
    * @param externalTaskId the id of the external task to report a failure for
    * @param workerId the id of the worker that reports the failure
    * @param errorMessage short error message related to this failure. This message can be retrieved via
@@ -222,6 +247,44 @@ public interface ExternalTaskService {
    *   </ul>
    */
   public void handleFailure(String externalTaskId, String workerId, String errorMessage, String errorDetails, int retries, long retryTimeout);
+
+  /**
+   * <p>Signals that an external task could not be successfully executed.
+   * The task must be assigned to the given worker. The number of retries left can be specified. In addition, a timeout can be
+   * provided, such that the task cannot be fetched before <code>now + retryTimeout</code> again.</p>
+   *
+   * <p>If <code>retries</code> is 0, an incident with the given error message is created. The incident gets resolved,
+   * once the number of retries is increased again.</p>
+   *
+   * <p>Exceptions raised in evaluating expressions of error event definitions attached to the task will be ignored by this method
+   * and the event definitions considered as not-matching.</p>
+   *
+   * Variables passed with the <code>variables</code> or <code>localVariables</code> parameter will be set before any
+   * output mapping is performed.
+   *
+   * @param externalTaskId the id of the external task to report a failure for
+   * @param workerId the id of the worker that reports the failure
+   * @param errorMessage short error message related to this failure. This message can be retrieved via
+   *   {@link ExternalTask#getErrorMessage()} and is used as the incident message in case <code>retries</code> is <code>null</code>.
+   *   May be <code>null</code>.
+   * @param errorDetails full error message related to this failure. This message can be retrieved via
+   *   {@link ExternalTaskService#getExternalTaskErrorDetails(String)} ()}
+   * @param retries the number of retries left. External tasks with 0 retries cannot be fetched anymore unless
+   *   the number of retries is increased via API. Must be >= 0.
+   * @param retryTimeout the timeout before the task can be fetched again. Must be >= 0.
+   * @param variables a map of variables to set on the execution
+   *   the external task is assigned to
+   * @param localVariables a map of variables to set on the execution locally
+   *
+   * @throws NotFoundException if no external task with the given id exists
+   * @throws BadUserRequestException if the task is assigned to a different worker
+   * @throws AuthorizationException thrown if the current user does not possess any of the following permissions:
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_INSTANCE}</li>
+   *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
+   */
+  public void handleFailure(String externalTaskId, String workerId, String errorMessage, String errorDetails, int retries, long retryDuration, Map<String, Object> variables, Map<String, Object> localVariables);
 
   /**
    * <p>Signals that an business error appears, which should be handled by the process engine.

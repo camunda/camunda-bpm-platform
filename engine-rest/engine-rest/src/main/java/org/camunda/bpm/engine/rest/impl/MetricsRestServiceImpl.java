@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.management.MetricsQuery;
 import org.camunda.bpm.engine.rest.dto.metrics.MetricsIntervalResultDto;
@@ -46,10 +47,15 @@ public class MetricsRestServiceImpl extends AbstractRestProcessEngineAware imple
   public static final String QUERY_PARAM_FIRST_RESULT = "firstResult";
   public static final String QUERY_PARAM_MAX_RESULTS = "maxResults";
   public static final String QUERY_PARAM_INTERVAL = "interval";
+  public static final String QUERY_PARAM_DATE = "date";
   public static final String QUERY_PARAM_AGG_BY_REPORTER = "aggregateByReporter";
+
+  protected final DateConverter dateConverter;
 
   public MetricsRestServiceImpl(String engineName, ObjectMapper objectMapper) {
     super(engineName, objectMapper);
+    dateConverter = new DateConverter();
+    dateConverter.setObjectMapper(objectMapper);
   }
 
   @Override
@@ -60,9 +66,10 @@ public class MetricsRestServiceImpl extends AbstractRestProcessEngineAware imple
   @Override
   public List<MetricsIntervalResultDto> interval(UriInfo uriInfo) {
     MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
+    final String name = queryParameters.getFirst(QUERY_PARAM_NAME);
     MetricsQuery query = processEngine.getManagementService()
       .createMetricsQuery()
-      .name(queryParameters.getFirst(QUERY_PARAM_NAME))
+      .name(name)
       .reporter(queryParameters.getFirst(QUERY_PARAM_REPORTER));
 
     applyQueryParams(query, queryParameters);
@@ -77,14 +84,23 @@ public class MetricsRestServiceImpl extends AbstractRestProcessEngineAware imple
       metrics = query.interval();
     }
 
-    return convertToDtos(metrics);
+    final List<MetricsIntervalResultDto> dtoList = convertToDtos(metrics);
+    if (name != null) {
+      dtoList.forEach(dto -> dto.setName(name));
+    }
+    return dtoList;
+  }
+
+  @Override
+  public Response deleteTaskMetrics(String dateString) {
+    Date date = dateConverter.convertQueryParameterToType(dateString);
+    processEngine.getManagementService().deleteTaskMetrics(date);
+
+    // return no content (204) since resource is deleted
+    return Response.noContent().build();
   }
 
   protected void applyQueryParams(MetricsQuery query, MultivaluedMap<String, String> queryParameters) {
-
-    DateConverter dateConverter = new DateConverter();
-    dateConverter.setObjectMapper(objectMapper);
-
     if(queryParameters.getFirst(QUERY_PARAM_START_DATE) != null) {
       Date startDate = dateConverter.convertQueryParameterToType(queryParameters.getFirst(QUERY_PARAM_START_DATE));
       query.startDate(startDate);

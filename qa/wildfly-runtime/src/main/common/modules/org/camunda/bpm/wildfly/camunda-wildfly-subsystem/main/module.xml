@@ -40,6 +40,10 @@
     <module name="org.camunda.bpm.camunda-engine-plugin-connect" />
     <module name="org.camunda.bpm.qa.camunda-qa-ensure-clean-db" services="import" />
 
+    <module name="org.camunda.connect.camunda-connect-core" />
+    <module name="org.camunda.connect.camunda-connect-http-client" services="import" />
+    <module name="org.camunda.connect.camunda-connect-soap-http-client" services="import" />
+
     <!-- for LDAP plugin only -->
     <module name="sun.jdk" />
 

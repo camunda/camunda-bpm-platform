@@ -155,4 +155,9 @@ public interface HistoricIncident {
    * Returns the id of the activity on which the last exception occurred.
    */
   String getFailedActivityId();
+
+  /**
+   * Returns the annotation of this incident
+   */
+  String getAnnotation();
 }

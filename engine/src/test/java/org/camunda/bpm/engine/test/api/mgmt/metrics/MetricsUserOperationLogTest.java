@@ -16,9 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.mgmt.metrics;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Date;
 
@@ -39,7 +37,7 @@ import org.junit.Test;
 import org.junit.rules.RuleChain;
 
 /**
- * 
+ *
  * @author Tobias Metzke
  *
  */
@@ -67,19 +65,19 @@ public class MetricsUserOperationLogTest {
   public void testDeleteMetrics() {
     // given
     identityService.setAuthenticatedUserId("userId");
-    
+
     // when
     managementService.deleteMetrics(null);
     identityService.clearAuthentication();
 
     // then
-    assertThat(historyService.createUserOperationLogQuery().count(), is(1L));
+    assertThat(historyService.createUserOperationLogQuery().count()).isEqualTo(1L);
     UserOperationLogEntry logEntry = historyService.createUserOperationLogQuery().singleResult();
-    assertThat(logEntry.getEntityType(), is(EntityTypes.METRICS));
-    assertThat(logEntry.getOperationType(), is(UserOperationLogEntry.OPERATION_TYPE_DELETE));
-    assertThat(logEntry.getProperty(), nullValue());
-    assertThat(logEntry.getOrgValue(), nullValue());
-    assertThat(logEntry.getNewValue(), nullValue());
+    assertThat(logEntry.getEntityType()).isEqualTo(EntityTypes.METRICS);
+    assertThat(logEntry.getOperationType()).isEqualTo(UserOperationLogEntry.OPERATION_TYPE_DELETE);
+    assertThat(logEntry.getProperty()).isNull();
+    assertThat(logEntry.getOrgValue()).isNull();
+    assertThat(logEntry.getNewValue()).isNull();
   }
 
   @Test
@@ -87,64 +85,103 @@ public class MetricsUserOperationLogTest {
     // given
     Date timestamp = ClockUtil.getCurrentTime();
     identityService.setAuthenticatedUserId("userId");
-    
+
     // when
     managementService.deleteMetrics(timestamp);
     identityService.clearAuthentication();
 
     // then
-    assertThat(historyService.createUserOperationLogQuery().count(), is(1L));
+    assertThat(historyService.createUserOperationLogQuery().count()).isEqualTo(1L);
     UserOperationLogEntry logEntry = historyService.createUserOperationLogQuery().singleResult();
-    assertThat(logEntry.getEntityType(), is(EntityTypes.METRICS));
-    assertThat(logEntry.getOperationType(), is(UserOperationLogEntry.OPERATION_TYPE_DELETE));
-    assertThat(logEntry.getProperty(), is("timestamp"));
-    assertThat(logEntry.getOrgValue(), nullValue());
-    assertThat(logEntry.getNewValue(), is(String.valueOf(timestamp.getTime())));
+    assertThat(logEntry.getEntityType()).isEqualTo(EntityTypes.METRICS);
+    assertThat(logEntry.getOperationType()).isEqualTo(UserOperationLogEntry.OPERATION_TYPE_DELETE);
+    assertThat(logEntry.getProperty()).isEqualTo("timestamp");
+    assertThat(logEntry.getOrgValue()).isNull();
+    assertThat(logEntry.getNewValue()).isEqualTo(String.valueOf(timestamp.getTime()));
   }
 
   @Test
   public void testDeleteMetricsWithReporterId() {
     // given
     identityService.setAuthenticatedUserId("userId");
-    
+
     // when
     managementService.deleteMetrics(null, "reporter1");
     identityService.clearAuthentication();
 
     // then
-    assertThat(historyService.createUserOperationLogQuery().count(), is(1L));
+    assertThat(historyService.createUserOperationLogQuery().count()).isEqualTo(1L);
     UserOperationLogEntry logEntry = historyService.createUserOperationLogQuery().singleResult();
-    assertThat(logEntry.getEntityType(), is(EntityTypes.METRICS));
-    assertThat(logEntry.getOperationType(), is(UserOperationLogEntry.OPERATION_TYPE_DELETE));
-    assertThat(logEntry.getProperty(), is("reporter"));
-    assertThat(logEntry.getOrgValue(), nullValue());
-    assertThat(logEntry.getNewValue(), is("reporter1"));
+    assertThat(logEntry.getEntityType()).isEqualTo(EntityTypes.METRICS);
+    assertThat(logEntry.getOperationType()).isEqualTo(UserOperationLogEntry.OPERATION_TYPE_DELETE);
+    assertThat(logEntry.getProperty()).isEqualTo("reporter");
+    assertThat(logEntry.getOrgValue()).isNull();
+    assertThat(logEntry.getNewValue()).isEqualTo("reporter1");
   }
-  
+
   @Test
   public void testDeleteMetricsWithTimestampAndReporterId() {
     // given
     Date timestamp = ClockUtil.getCurrentTime();
     identityService.setAuthenticatedUserId("userId");
-    
+
     // when
     managementService.deleteMetrics(timestamp, "reporter1");
     identityService.clearAuthentication();
 
     // then
-    assertThat(historyService.createUserOperationLogQuery().count(), is(2L));
+    assertThat(historyService.createUserOperationLogQuery().count()).isEqualTo(2L);
     UserOperationLogEntry logEntry = historyService.createUserOperationLogQuery().property("reporter").singleResult();
-    assertThat(logEntry.getEntityType(), is(EntityTypes.METRICS));
-    assertThat(logEntry.getOperationType(), is(UserOperationLogEntry.OPERATION_TYPE_DELETE));
-    assertThat(logEntry.getProperty(), is("reporter"));
-    assertThat(logEntry.getOrgValue(), nullValue());
-    assertThat(logEntry.getNewValue(), is("reporter1"));
-    
+    assertThat(logEntry.getEntityType()).isEqualTo(EntityTypes.METRICS);
+    assertThat(logEntry.getOperationType()).isEqualTo(UserOperationLogEntry.OPERATION_TYPE_DELETE);
+    assertThat(logEntry.getProperty()).isEqualTo("reporter");
+    assertThat(logEntry.getOrgValue()).isNull();
+    assertThat(logEntry.getNewValue()).isEqualTo("reporter1");
+
     logEntry = historyService.createUserOperationLogQuery().property("timestamp").singleResult();
-    assertThat(logEntry.getEntityType(), is(EntityTypes.METRICS));
-    assertThat(logEntry.getOperationType(), is(UserOperationLogEntry.OPERATION_TYPE_DELETE));
-    assertThat(logEntry.getProperty(), is("timestamp"));
-    assertThat(logEntry.getOrgValue(), nullValue());
-    assertThat(logEntry.getNewValue(), is(String.valueOf(timestamp.getTime())));
+    assertThat(logEntry.getEntityType()).isEqualTo(EntityTypes.METRICS);
+    assertThat(logEntry.getOperationType()).isEqualTo(UserOperationLogEntry.OPERATION_TYPE_DELETE);
+    assertThat(logEntry.getProperty()).isEqualTo("timestamp");
+    assertThat(logEntry.getOrgValue()).isNull();
+    assertThat(logEntry.getNewValue()).isEqualTo(String.valueOf(timestamp.getTime()));
+  }
+
+  @Test
+  public void shouldLogDeletionOfTaskMetricsWithTimestamp() {
+    // given
+    Date timestamp = ClockUtil.getCurrentTime();
+    identityService.setAuthenticatedUserId("userId");
+
+    // when
+    managementService.deleteTaskMetrics(timestamp);
+    identityService.clearAuthentication();
+
+    // then
+    assertThat(historyService.createUserOperationLogQuery().count()).isEqualTo(1L);
+    UserOperationLogEntry logEntry = historyService.createUserOperationLogQuery().property("timestamp").singleResult();
+    assertThat(logEntry.getEntityType()).isEqualTo(EntityTypes.TASK_METRICS);
+    assertThat(logEntry.getOperationType()).isEqualTo(UserOperationLogEntry.OPERATION_TYPE_DELETE);
+    assertThat(logEntry.getProperty()).isEqualTo("timestamp");
+    assertThat(logEntry.getOrgValue()).isNull();
+    assertThat(logEntry.getNewValue()).isEqualTo(String.valueOf(timestamp.getTime()));
+  }
+
+  @Test
+  public void shouldLogDeletionOfTaskMetricsWithoutTimestamp() {
+    // given
+    identityService.setAuthenticatedUserId("userId");
+
+    // when
+    managementService.deleteTaskMetrics(null);
+    identityService.clearAuthentication();
+
+    // then
+    assertThat(historyService.createUserOperationLogQuery().count()).isEqualTo(1L);
+    UserOperationLogEntry logEntry = historyService.createUserOperationLogQuery().singleResult();
+    assertThat(logEntry.getEntityType()).isEqualTo(EntityTypes.TASK_METRICS);
+    assertThat(logEntry.getOperationType()).isEqualTo(UserOperationLogEntry.OPERATION_TYPE_DELETE);
+    assertThat(logEntry.getProperty()).isNull();
+    assertThat(logEntry.getOrgValue()).isNull();
+    assertThat(logEntry.getNewValue()).isNull();
   }
 }

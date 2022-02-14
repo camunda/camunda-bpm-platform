@@ -12,7 +12,7 @@
     <property name="jdbcPassword" value="${database.password}" />
 
     <!-- Database configurations -->
-    <property name="databaseSchemaUpdate" value="false" />
+    <property name="databaseSchemaUpdate" value="${databaseSchemaUpdate}" />
     
     <!-- job executor configurations -->
     <property name="jobExecutorActivate" value="false" />
@@ -23,6 +23,7 @@
 
     <!-- turn off metrics reporter -->
     <property name="dbMetricsReporterActivate" value="false" />
+    <property name="telemetryReporterActivate" value="false" />
 
     <property name="defaultSerializationFormat" value="application/json"/>
 

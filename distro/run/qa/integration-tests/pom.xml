@@ -5,12 +5,12 @@
   <parent>
     <groupId>org.camunda.bpm.run</groupId>
     <artifactId>camunda-bpm-run-qa</artifactId>
-    <version>7.14.0-SNAPSHOT</version>
+    <version>7.17.0-SNAPSHOT</version>
     <relativePath>..</relativePath>
   </parent>
 
   <artifactId>camunda-bpm-run-qa-integration-tests</artifactId>
-  <name>Camunda BPM - Run - QA - Integration Tests</name>
+  <name>Camunda Platform - Run - QA - Integration Tests</name>
   <packaging>jar</packaging>
 
   <dependencies>

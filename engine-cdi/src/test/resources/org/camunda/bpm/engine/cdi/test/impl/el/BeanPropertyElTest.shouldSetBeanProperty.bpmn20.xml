@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="taskAssigneeExample"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+             targetNamespace="Examples">
+
+  <process id="setBeanProperty" isExecutable="true">
+
+    <startEvent id="startEvent" />
+
+    <serviceTask id="service" camunda:expression="#{messageBean.setMessage('Greetings from Berlin')}" />
+
+    <endEvent id="endEvent" />
+
+    <sequenceFlow targetRef="service" sourceRef="startEvent" />
+    <sequenceFlow targetRef="endEvent" sourceRef="service" />
+
+  </process>
+</definitions>

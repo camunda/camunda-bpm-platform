@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
     <@lib.property
         name = "id"
@@ -51,7 +52,6 @@
     <@lib.property
         name = "rootCauseIncidentId"
         type = "string"
-        format = "date-time"
         desc = "The id of the associated root cause incident which has been triggered." />
 
     <@lib.property
@@ -72,6 +72,13 @@
     <@lib.property
         name = "jobDefinitionId"
         type = "string"
-        last = true
         desc = "The job definition id the incident is associated with." />
+        
+    <@lib.property
+        name = "annotation"
+        type = "string"
+        last = true
+        desc = "The annotation set to the incident." />
 </@lib.dto>
+
+</#macro>

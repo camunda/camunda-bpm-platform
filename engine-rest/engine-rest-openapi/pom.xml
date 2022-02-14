@@ -1,14 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>camunda-engine-rest-openapi</artifactId>
-  <name>camunda BPM - engine - REST - OpenAPI</name>
+  <name>Camunda Platform - engine - REST - OpenAPI</name>
   <packaging>jar</packaging>
 
   <parent>
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-engine-rest-root</artifactId>
     <relativePath>../</relativePath>
-    <version>7.14.0-SNAPSHOT</version>
+    <version>7.17.0-SNAPSHOT</version>
   </parent>
 
   <properties>
@@ -21,11 +21,11 @@
     <gson-fire-version>1.8.3</gson-fire-version>
     <swagger-core-version>1.5.22</swagger-core-version>
     <okhttp-version>3.14.2</okhttp-version>
-    <gson-version>2.8.5</gson-version>
+    <gson-version>2.8.9</gson-version>
     <commons-lang3-version>3.9</commons-lang3-version>
     <maven-plugin-version>1.0.0</maven-plugin-version>
     <javax-annotation-version>1.0</javax-annotation-version>
-    <junit-version>4.13</junit-version>
+    <junit-version>4.13.1</junit-version>
   </properties>
 
   <dependencies>
@@ -218,5 +218,36 @@
 
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>javadocs</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.openapitools</groupId>
+            <artifactId>openapi-generator-maven-plugin</artifactId>
+            <version>${openapi.generator.version}</version>
+            <configuration>
+              <skip>true</skip>
+            </configuration>
+          </plugin>
+          
+          <plugin>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>default-testCompile</id>
+                <goals>
+                  <goal>testCompile</goal>
+                </goals>
+                <phase>not-existing</phase>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
 </project>

@@ -169,9 +169,9 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTest {
     // given
     processEngineConfiguration.setDeploymentHandlerFactory(customDeploymentHandlerFactory);
     BpmnModelInstance oldModel = Bpmn.createExecutableProcess("versionedProcess")
-      .camundaVersionTag("1").done();
+      .camundaVersionTag("1").startEvent().done();
     BpmnModelInstance newModel = Bpmn.createExecutableProcess("versionedProcess")
-      .camundaVersionTag("2").done();
+      .camundaVersionTag("2").startEvent().done();
 
     org.camunda.bpm.engine.repository.Deployment deployment1 = testRule
         .deploy(repositoryService.createDeployment()
@@ -199,8 +199,8 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTest {
 
   @Test
   public void testPartialChangesDeployAll() {
-    BpmnModelInstance model1 = Bpmn.createExecutableProcess("process1").done();
-    BpmnModelInstance model2 = Bpmn.createExecutableProcess("process2").done();
+    BpmnModelInstance model1 = Bpmn.createExecutableProcess("process1").startEvent().done();
+    BpmnModelInstance model2 = Bpmn.createExecutableProcess("process2").startEvent().done();
     org.camunda.bpm.engine.repository.Deployment deployment1 = repositoryService.createDeployment()
       .enableDuplicateFiltering()
       .addModelInstance("process1.bpmn20.xml", model1)
@@ -211,7 +211,7 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTest {
     List<String> deploymentResources = repositoryService.getDeploymentResourceNames(deployment1.getId());
     assertEquals(2, deploymentResources.size());
 
-    BpmnModelInstance changedModel2 = Bpmn.createExecutableProcess("process2").startEvent().done();
+    BpmnModelInstance changedModel2 = Bpmn.createExecutableProcess("process2").startEvent().endEvent().done();
 
     org.camunda.bpm.engine.repository.Deployment deployment2 = repositoryService.createDeployment()
       .enableDuplicateFiltering()
@@ -232,8 +232,8 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTest {
 
   @Test
   public void testPartialChangesDeployChangedOnly() {
-    BpmnModelInstance model1 = Bpmn.createExecutableProcess("process1").done();
-    BpmnModelInstance model2 = Bpmn.createExecutableProcess("process2").done();
+    BpmnModelInstance model1 = Bpmn.createExecutableProcess("process1").startEvent().done();
+    BpmnModelInstance model2 = Bpmn.createExecutableProcess("process2").startEvent().done();
     org.camunda.bpm.engine.repository.Deployment deployment1 = repositoryService.createDeployment()
       .addModelInstance("process1.bpmn20.xml", model1)
       .addModelInstance("process2.bpmn20.xml", model2)
@@ -243,7 +243,7 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTest {
     List<String> deploymentResources = repositoryService.getDeploymentResourceNames(deployment1.getId());
     assertEquals(2, deploymentResources.size());
 
-    BpmnModelInstance changedModel2 = Bpmn.createExecutableProcess("process2").startEvent().done();
+    BpmnModelInstance changedModel2 = Bpmn.createExecutableProcess("process2").startEvent().endEvent().done();
 
     org.camunda.bpm.engine.repository.Deployment deployment2 = repositoryService.createDeployment()
       .enableDuplicateFiltering(true)
@@ -264,7 +264,7 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTest {
     // there should be two versions of process 2
     assertEquals(2, repositoryService.createProcessDefinitionQuery().processDefinitionKey("process2").count());
 
-    BpmnModelInstance anotherChangedModel2 = Bpmn.createExecutableProcess("process2").startEvent().endEvent().done();
+    BpmnModelInstance anotherChangedModel2 = Bpmn.createExecutableProcess("process2").startEvent().sequenceFlowId("flow").endEvent().done();
 
     // testing with a third deployment to ensure the change check is not only performed against
     // the last version of the deployment
@@ -289,14 +289,14 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTest {
   @Test
   public void testPartialChangesRedeployOldVersion() {
     // deployment 1 deploys process version 1
-    BpmnModelInstance model1 = Bpmn.createExecutableProcess("process1").done();
+    BpmnModelInstance model1 = Bpmn.createExecutableProcess("process1").startEvent().done();
     org.camunda.bpm.engine.repository.Deployment deployment1 = repositoryService.createDeployment()
       .addModelInstance("process1.bpmn20.xml", model1)
       .name("deployment")
       .deploy();
 
     // deployment 2 deploys process version 2
-    BpmnModelInstance changedModel1 = Bpmn.createExecutableProcess("process1").startEvent().done();
+    BpmnModelInstance changedModel1 = Bpmn.createExecutableProcess("process1").startEvent().endEvent().done();
     org.camunda.bpm.engine.repository.Deployment deployment2 = repositoryService.createDeployment()
       .enableDuplicateFiltering(true)
       .addModelInstance("process1.bpmn20.xml", changedModel1)

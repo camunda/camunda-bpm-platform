@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.impl.db.CompositePermissionCheck;
 import org.camunda.bpm.engine.impl.db.PermissionCheckBuilder;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.optimize.OptimizeHistoricIdentityLinkLogEntity;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 
@@ -190,6 +191,34 @@ public class OptimizeManager extends AbstractManager {
     params.put("maxResults", maxResults);
 
     return getDbEntityManager().selectList("selectHistoricVariableUpdatePage", params);
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<HistoricIncidentEntity> getCompletedHistoricIncidents(Date finishedAfter,
+                                                                    Date finishedAt,
+                                                                    int maxResults) {
+    checkIsAuthorizedToReadHistoryAndTenants();
+
+    Map<String, Object> params = new HashMap<>();
+    params.put("finishedAfter", finishedAfter);
+    params.put("finishedAt", finishedAt);
+    params.put("maxResults", maxResults);
+
+    return getDbEntityManager().selectList("selectCompletedHistoricIncidentsPage", params);
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<HistoricIncidentEntity> getOpenHistoricIncidents(Date createdAfter,
+                                                               Date createdAt,
+                                                               int maxResults) {
+    checkIsAuthorizedToReadHistoryAndTenants();
+
+    Map<String, Object> params = new HashMap<>();
+    params.put("createdAfter", createdAfter);
+    params.put("createdAt", createdAt);
+    params.put("maxResults", maxResults);
+
+    return getDbEntityManager().selectList("selectOpenHistoricIncidentsPage", params);
   }
 
   @SuppressWarnings("unchecked")

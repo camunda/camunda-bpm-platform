@@ -21,6 +21,7 @@ import java.util.Collection;
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -59,8 +60,8 @@ public class JobExecutorLogger extends ProcessEngineLogger {
   public void exceptionWhileExecutingJob(String nextJobId, Throwable t) {
     if(t instanceof OptimisticLockingException && !isDebugEnabled()) {
       logWarn(
-          "006", 
-          "Exception while executing job {}: {}. To see the full stacktrace set logging level to DEBUG.", 
+          "006",
+          "Exception while executing job {}: {}. To see the full stacktrace set logging level to DEBUG.",
           nextJobId, t.getClass().getSimpleName());
     } else {
       logWarn(
@@ -190,6 +191,30 @@ public class JobExecutorLogger extends ProcessEngineLogger {
     logWarn(
       "028",
       "Batch window for history cleanup was not calculated. History cleanup job(s) will be suspended.");
+  }
+
+  public void infoJobExecutorDoesNotHandleHistoryCleanupJobs(ProcessEngineConfigurationImpl config) {
+    Long jobExecutorPriorityRangeMin = config.getJobExecutorPriorityRangeMin();
+    Long jobExecutorPriorityRangeMax = config.getJobExecutorPriorityRangeMax();
+    logInfo("029",
+        "JobExecutor is configured for priority range {}-{}. History cleanup jobs will not be handled, because they are outside the priority range ({}).",
+        jobExecutorPriorityRangeMin == null ? 0 : jobExecutorPriorityRangeMin,
+        jobExecutorPriorityRangeMax == null ? Long.MAX_VALUE : jobExecutorPriorityRangeMax,
+        config.getHistoryCleanupJobPriority());
+  }
+
+  public void infoJobExecutorDoesNotHandleBatchJobs(ProcessEngineConfigurationImpl config) {
+    Long jobExecutorPriorityRangeMin = config.getJobExecutorPriorityRangeMin();
+    Long jobExecutorPriorityRangeMax = config.getJobExecutorPriorityRangeMax();
+    logInfo("030",
+        "JobExecutor is configured for priority range {}-{}. Batch jobs will not be handled, because they are outside the priority range ({}).",
+        jobExecutorPriorityRangeMin == null ? 0 : jobExecutorPriorityRangeMin,
+        jobExecutorPriorityRangeMax == null ? Long.MAX_VALUE : jobExecutorPriorityRangeMax,
+        config.getBatchJobPriority());
+  }
+
+  public ProcessEngineException jobExecutorPriorityRangeException(String reason) {
+    return new ProcessEngineException(exceptionMessage("031", "Invalid configuration for job executor priority range. Reason: {}", reason));
   }
 
 }

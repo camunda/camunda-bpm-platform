@@ -133,7 +133,7 @@ public class HistoryCleanupAuthorizationTest extends AuthorizationTest {
     ClockUtil.setCurrentTime(DateUtils.addDays(oldCurrentTime, -6));
 
     // create 3 process instances
-    List<String> processInstanceIds = new ArrayList<String>();
+    List<String> processInstanceIds = new ArrayList<>();
     Map<String, Object> variables = Variables.createVariables().putValue("pojo", new TestPojo("okay", 13.37));
     for (int i = 0; i < 3; i++) {
       ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess", variables);
@@ -214,7 +214,7 @@ public class HistoryCleanupAuthorizationTest extends AuthorizationTest {
   }
 
   protected void clearMetrics() {
-    Collection<Meter> meters = processEngineConfiguration.getMetricsRegistry().getMeters().values();
+    Collection<Meter> meters = processEngineConfiguration.getMetricsRegistry().getDbMeters().values();
     for (Meter meter : meters) {
       meter.getAndClear();
     }

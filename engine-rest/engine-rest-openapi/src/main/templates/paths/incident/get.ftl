@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
@@ -14,8 +15,9 @@
     <#assign sortByValues = [ '"incidentId"', '"incidentMessage"', '"incidentTimestamp"', '"incidentType"',
                               '"executionId"', '"activityId"', '"processInstanceId"', '"processDefinitionId"',
                               '"causeIncidentId"', '"rootCauseIncidentId"', '"configuration"', '"tenantId"' ] >
-    <#assign last = true >
     <#include "/lib/commons/sort-params.ftl" >
+    <#assign last = true >
+    <#include "/lib/commons/pagination-params.ftl">
   ],
   "responses" : {
 
@@ -41,7 +43,8 @@
                              "configuration": "aConfiguration",
                              "tenantId": null,
                              "incidentMessage": "anIncidentMessage",
-                             "jobDefinitionId": "aJobDefinitionId"
+                             "jobDefinitionId": "aJobDefinitionId",
+                             "annotation": "an annotation"
                            },
                            {
                              "id": "anIncidentId",
@@ -57,7 +60,8 @@
                              "configuration": "anotherConfiguration",
                              "tenantId": null,
                              "incidentMessage": "anotherIncidentMessage",
-                             "jobDefinitionId": null
+                             "jobDefinitionId": null,
+                             "annotation": "another annotation"
                            }
                          ]
                      }'] />
@@ -71,3 +75,5 @@
                 response format." />
     }
 }
+
+</#macro>

@@ -22,9 +22,9 @@ import java.io.IOException;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.run.qa.util.SpringBootManagedContainer;
-import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Test;
-import org.junit.Before;
+import org.junit.BeforeClass;
 
 import io.restassured.response.Response;
 
@@ -32,8 +32,8 @@ public class ProductionConfigurationIT {
 
   static SpringBootManagedContainer container;
 
-  @After
-  public void stopApp() {
+  @AfterClass
+  public static void stopApp() {
     try {
       if (container != null) {
         container.stop();
@@ -45,8 +45,8 @@ public class ProductionConfigurationIT {
     }
   }
 
-  @Before
-  public void runStartScript() throws IOException {
+  @BeforeClass
+  public static void runStartScript() throws IOException {
     container = new SpringBootManagedContainer("--production");
 
     container.createConfigurationYml("configuration/production.yml",
@@ -69,5 +69,25 @@ public class ProductionConfigurationIT {
       .statusCode(Status.OK.getStatusCode())
       .body("size()", is(1))
       .body("[0].name", is("production"));
+  }
+
+  @Test
+  public void shouldNotProvideSwaggerUIInProductionConfiguration() {
+    // when
+    Response engineResponse = when().get(container.getBaseUrl() + "/swaggerui");
+
+    // then
+    engineResponse.then()
+      .statusCode(Status.NOT_FOUND.getStatusCode());
+  }
+
+  @Test
+  public void shouldNotProvideExampleInProductionConfiguration() {
+    // when
+    Response response = when().get(container.getBaseUrl() + "/engine-rest/engine/production/process-definition");
+
+    // then
+    response.then()
+      .body("size()", is(0));
   }
 }

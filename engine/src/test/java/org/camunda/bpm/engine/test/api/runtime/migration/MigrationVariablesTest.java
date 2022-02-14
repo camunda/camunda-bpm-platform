@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 
 import java.util.ArrayList;
@@ -582,8 +583,8 @@ public class MigrationVariablesTest {
       Assert.fail("expected exception");
     }
     catch (ProcessEngineException e) {
-      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("The variable 'foo' exists in both, this scope"
-          + " and concurrent local in the parent scope. Migrating to a non-scope activity would overwrite one of them."));
+      assertThat(e.getMessage()).contains("The variable 'foo' exists in both, this scope"
+          + " and concurrent local in the parent scope. Migrating to a non-scope activity would overwrite one of them.");
     }
   }
 

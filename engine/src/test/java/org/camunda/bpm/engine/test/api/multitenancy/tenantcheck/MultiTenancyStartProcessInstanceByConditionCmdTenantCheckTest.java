@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy.tenantcheck;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
@@ -43,7 +44,6 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 public class MultiTenancyStartProcessInstanceByConditionCmdTenantCheckTest {
@@ -65,9 +65,6 @@ public class MultiTenancyStartProcessInstanceByConditionCmdTenantCheckTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown= ExpectedException.none();
 
   public IdentityService identityService;
   public RepositoryService repositoryService;
@@ -205,18 +202,16 @@ public class MultiTenancyStartProcessInstanceByConditionCmdTenantCheckTest {
 
     ProcessDefinition processDefinition = engineRule.getRepositoryService().createProcessDefinitionQuery().processDefinitionKey("conditionStart").singleResult();
 
-    // expected
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot create an instance of the process definition");
-
     identityService.setAuthentication("user", null, null);
 
-    // when
-    engineRule.getRuntimeService()
-      .createConditionEvaluation()
-      .setVariable("foo", "bar")
-      .processDefinitionId(processDefinition.getId())
-      .evaluateStartConditions();
+    // when/then
+    assertThatThrownBy(() -> engineRule.getRuntimeService()
+        .createConditionEvaluation()
+        .setVariable("foo", "bar")
+        .processDefinitionId(processDefinition.getId())
+        .evaluateStartConditions())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot create an instance of the process definition");
   }
 
   @Test

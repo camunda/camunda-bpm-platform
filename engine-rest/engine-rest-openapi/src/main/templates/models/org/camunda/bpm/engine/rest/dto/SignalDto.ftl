@@ -1,8 +1,10 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
         name = "name"
         type = "string"
+        nullable = false
         desc = "The name of the signal to deliver.
 
                 **Note**: This property is mandatory." />
@@ -41,3 +43,5 @@
                 **Note**: Cannot be used in combination with `executionId`."/>
 
 </@lib.dto>
+
+</#macro>

@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Arrays;
 
 import org.camunda.bpm.engine.batch.Batch;
@@ -106,9 +108,9 @@ public class MultiTenancyMigrationAsyncTest {
 
     // then
     Job migrationJob = batchHelper.getExecutionJobs(batch).get(0);
-    Assert.assertThat(migrationJob.getExceptionMessage(),
-        CoreMatchers.containsString("Cannot migrate process instance '" + processInstance.getId()
-            + "' without tenant to a process definition with a tenant ('tenant1')"));
+    assertThat(migrationJob.getExceptionMessage()).contains
+      ("Cannot migrate process instance '" + processInstance.getId()
+            + "' without tenant to a process definition with a tenant ('tenant1')");
   }
 
   protected void assertMigratedTo(ProcessInstance processInstance, ProcessDefinition targetDefinition) {

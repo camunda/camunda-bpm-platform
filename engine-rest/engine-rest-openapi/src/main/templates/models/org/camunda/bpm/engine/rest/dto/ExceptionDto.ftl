@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto
     title="ExceptionDto">
 
@@ -13,3 +14,4 @@
         desc = "A detailed message of the error." />
 
 </@lib.dto>
+</#macro>

@@ -1,7 +1,9 @@
+<#macro endpoint_macro docsUrl="">
 {
   <@lib.endpointInfo
       id = "updateSuspensionState"
       tag = "Process Instance"
+      summary = "Activate/Suspend In Group"
       desc = "Activates or suspends process instances by providing certain criteria:
 
               # Activate/Suspend Process Instance By Process Definition Id
@@ -40,7 +42,7 @@
                        "processDefinitionKey" : "aProcDefKey",
                        "suspended" : true
                      }
-                   }'
+                   }',
                  '"example-3": {
                      "summary": "PUT `/process-instance/suspended`",
                      "description": "Suspend Process Instance In Group",
@@ -69,3 +71,4 @@
                 for example if the provided processDefinitionId or processDefinitionKey parameter is null."/>
   }
 }
+</#macro>

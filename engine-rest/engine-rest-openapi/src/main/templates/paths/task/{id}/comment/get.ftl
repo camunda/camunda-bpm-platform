@@ -1,8 +1,10 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
       id = "getComments"
       tag = "Task Comment"
+      summary = "Get List"
       desc = "Gets the comments for a task by id." />
 
   "parameters" : [
@@ -31,6 +33,7 @@
                            "id": "commentId",
                            "userId": "userId",
                            "taskId": "aTaskId",
+                           "processInstanceId": "96dc383f-23eb-11e6-8e4a-f6aefe19b687",
                            "time": "2013-01-02T21:37:03.764+0200",
                            "message": "message",
                            "removalTime": "2018-02-10T14:33:19.000+0200",
@@ -40,6 +43,7 @@
                            "id": "anotherCommentId",
                            "userId": "anotherUserId",
                            "taskId": "aTaskId",
+                           "processInstanceId": "96dc383f-23eb-11e6-8e4a-f6aefe19b687",
                            "time": "2013-02-23T20:37:43.975+0200",
                            "message": "anotherMessage",
                            "removalTime": "2018-02-10T14:33:19.000+0200",
@@ -49,6 +53,7 @@
                            "id": "yetAnotherCommentId",
                            "userId": "yetAnotherUserId",
                            "taskId": "aTaskId",
+                           "processInstanceId": "96dc383f-23eb-11e6-8e4a-f6aefe19b687",
                            "time": "2013-04-21T10:15:23.764+0200",
                            "message": "yetAnotherMessage",
                            "removalTime": "2018-02-10T14:33:19.000+0200",
@@ -68,3 +73,5 @@
 
   }
 }
+
+</#macro>

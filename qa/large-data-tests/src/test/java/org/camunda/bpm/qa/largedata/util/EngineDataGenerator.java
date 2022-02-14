@@ -48,14 +48,15 @@ import java.util.stream.IntStream;
 
 public class EngineDataGenerator {
 
-  private Logger logger = LoggerFactory.getLogger(this.getClass());
+  protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
-  public static final String userId = "testUser";
-  public static final String groupId = "testGroup";
-  public static final String USER_TASK_PROCESS_KEY = "userTaskProcess";
-  public static final String AUTO_COMPLETE_PROCESS_KEY = "autoCompleteProcess";
-  public static final String DECISION_KEY = "simpleDecisionKey";
-  public static final String DEPLOYMENT_NAME = "testDeployment";
+  protected static final String USER_ID = "testUser";
+  protected static final String GROUP_ID = "testGroup";
+  protected static final String USER_TASK_PROCESS_KEY = "userTaskProcess";
+  protected static final String AUTO_COMPLETE_PROCESS_KEY = "autoCompleteProcess";
+  protected static final String ASYNC_TASK_PROCESS_KEY = "asyncProcess";
+  protected static final String DECISION_KEY = "simpleDecisionKey";
+  protected static final String DEPLOYMENT_NAME = "testDeployment";
 
   protected final IdentityService identityService;
   protected final DecisionService decisionService;
@@ -65,11 +66,12 @@ public class EngineDataGenerator {
   protected final ProcessEngine processEngine;
 
   public final int numberOfInstancesToGenerate;
+  public final String keyPrefix;
 
   // allows to configure how many commands are executed in one transaction if jdbc transaction is enabled
   public static final int BATCH_SIZE = 100;
 
-  public EngineDataGenerator(final ProcessEngine processEngine, final int numberOfInstancesToGenerate) {
+  public EngineDataGenerator(final ProcessEngine processEngine, final int numberOfInstancesToGenerate, final String keyPrefix) {
     this.processEngine = processEngine;
     this.identityService = processEngine.getIdentityService();
     this.decisionService = processEngine.getDecisionService();
@@ -78,6 +80,7 @@ public class EngineDataGenerator {
     this.taskService = processEngine.getTaskService();
 
     this.numberOfInstancesToGenerate = numberOfInstancesToGenerate;
+    this.keyPrefix = keyPrefix;
   }
 
   public void generateData() {
@@ -101,9 +104,9 @@ public class EngineDataGenerator {
     logger.info("Successfully generated decision instance data.");
   }
 
-  private void evaluateDecision() {
+  protected void evaluateDecision() {
     decisionService
-      .evaluateDecisionByKey(DECISION_KEY)
+      .evaluateDecisionByKey(getDecisionKey())
       .variables(createSimpleVariables())
       .evaluate();
   }
@@ -118,8 +121,22 @@ public class EngineDataGenerator {
     logger.info("Successfully generated completed process instance data...");
   }
 
-  private void startAutoCompleteProcess() {
-    runtimeService.startProcessInstanceByKey(AUTO_COMPLETE_PROCESS_KEY, createSimpleVariables());
+  protected void startAutoCompleteProcess() {
+    runtimeService.startProcessInstanceByKey(getAutoCompleteProcessKey(), createSimpleVariables());
+  }
+
+  public void generateAsyncTaskProcessInstanceData() {
+    logger.info("Generating async task process instance data...");
+    final List<Integer> sequenceNumberList = createSequenceNumberList();
+    generateInBatches(
+        sequenceNumberList,
+        (ignored) -> startAsyncTaskProcess()
+    );
+    logger.info("Successfully generated async task process instance data...");
+  }
+
+  public void startAsyncTaskProcess() {
+    runtimeService.startProcessInstanceByKey(getAsyncTaskProcessKey());
   }
 
   public void generateUserTaskData() {
@@ -140,8 +157,8 @@ public class EngineDataGenerator {
   public void generateOpLogData() {
 
     for (int i = 0; i < numberOfInstancesToGenerate; i++) {
-      repositoryService.suspendProcessDefinitionByKey(USER_TASK_PROCESS_KEY);
-      repositoryService.activateProcessDefinitionByKey(USER_TASK_PROCESS_KEY);
+      repositoryService.suspendProcessDefinitionByKey(getUserTaskProcessKey());
+      repositoryService.activateProcessDefinitionByKey(getUserTaskProcessKey());
     }
   }
 
@@ -149,60 +166,62 @@ public class EngineDataGenerator {
     logger.info("Deploying process & decision definitions...");
     BpmnModelInstance userTaskProcessModelInstance = createUserTaskProcess();
     BpmnModelInstance autoCompleteProcessModelInstance = createSimpleServiceTaskProcess();
-    final DmnModelInstance decisionModelInstance = createSimpleDmnModel(DECISION_KEY);
+    BpmnModelInstance asyncTaskProcessModelInstance = createAsyncServiceTaskProcess();
+    final DmnModelInstance decisionModelInstance = createSimpleDmnModel(getDecisionKey());
     DeploymentBuilder deploymentbuilder = repositoryService.createDeployment();
-    deploymentbuilder.name(DEPLOYMENT_NAME);
+    deploymentbuilder.name(getDeploymentName());
     deploymentbuilder.addModelInstance("userTaskProcess.bpmn", userTaskProcessModelInstance);
     deploymentbuilder.addModelInstance("autoCompleteProcess.bpmn", autoCompleteProcessModelInstance);
+    deploymentbuilder.addModelInstance("asyncTaskProcess.bpmn", asyncTaskProcessModelInstance);
     deploymentbuilder.addModelInstance("simpleDecision.dmn", decisionModelInstance);
     deploymentbuilder.deploy();
     logger.info("Definitions successfully deployed.");
   }
 
   public void createUser() {
-    User user = identityService.newUser(EngineDataGenerator.userId);
+    User user = identityService.newUser(getUserId());
     identityService.saveUser(user);
   }
 
   public void createGroup() {
-    Group group = identityService.newGroup(groupId);
+    Group group = identityService.newGroup(getGroupId());
     identityService.saveGroup(group);
   }
 
-  private void setCandidateUserAndGroupForAllUserTask() {
+  protected void setCandidateUserAndGroupForAllUserTask() {
     List<Task> list = taskService.createTaskQuery().list();
-    identityService.setAuthenticatedUserId(userId);
+    identityService.setAuthenticatedUserId(getUserId());
     generateInBatches(
       list,
       (task) -> {
-        taskService.addCandidateUser(task.getId(), userId);
-        taskService.addCandidateGroup(task.getId(), groupId);
+        taskService.addCandidateUser(task.getId(), getUserId());
+        taskService.addCandidateGroup(task.getId(), getGroupId());
       }
     );
   }
 
-  public void completeAllUserTasks() {
+  protected void completeAllUserTasks() {
     List<Task> list = taskService.createTaskQuery().list();
     generateInBatches(
       list,
       (task) -> {
-        taskService.claim(task.getId(), userId);
+        taskService.claim(task.getId(), getUserId());
         taskService.complete(task.getId());
       }
     );
   }
 
-  private void startUserTaskProcess() {
-    runtimeService.startProcessInstanceByKey(USER_TASK_PROCESS_KEY, createSimpleVariables());
+  protected void startUserTaskProcess() {
+    runtimeService.startProcessInstanceByKey(getUserTaskProcessKey(), createSimpleVariables());
   }
 
-  private List<Integer> createSequenceNumberList() {
+  protected List<Integer> createSequenceNumberList() {
     return IntStream.range(0, numberOfInstancesToGenerate)
       .boxed().collect(Collectors.toList());
   }
 
 
-  private <T> void generateInBatches(List<T> allEntries, Consumer<T> generateData) {
+  protected <T> void generateInBatches(List<T> allEntries, Consumer<T> generateData) {
     final List<List<T>> partition = Lists.partition(allEntries, BATCH_SIZE);
     partition.forEach(batch -> {
       ProcessEngineConfigurationImpl configuration =
@@ -216,7 +235,7 @@ public class EngineDataGenerator {
     });
   }
 
-  private Map<String, Object> createSimpleVariables() {
+  protected Map<String, Object> createSimpleVariables() {
     Random random = new Random();
     Map<String, Object> variables = new HashMap<>();
     int integer = random.nextInt();
@@ -230,8 +249,12 @@ public class EngineDataGenerator {
     return variables;
   }
 
-  private BpmnModelInstance createSimpleServiceTaskProcess() {
-    return Bpmn.createExecutableProcess(AUTO_COMPLETE_PROCESS_KEY)
+  protected String testSpecificKey(String key) {
+    return keyPrefix + key;
+  }
+
+  protected BpmnModelInstance createSimpleServiceTaskProcess() {
+    return Bpmn.createExecutableProcess(getAutoCompleteProcessKey())
       .startEvent()
       .serviceTask()
         .camundaExpression("${true}")
@@ -239,12 +262,50 @@ public class EngineDataGenerator {
       .done();
   }
 
-  private static BpmnModelInstance createUserTaskProcess() {
-    return Bpmn.createExecutableProcess(USER_TASK_PROCESS_KEY)
+  protected BpmnModelInstance createAsyncServiceTaskProcess() {
+    return Bpmn.createExecutableProcess(getAsyncTaskProcessKey())
+        .startEvent()
+        .serviceTask()
+          .camundaAsyncBefore()
+          .camundaExpression("${true}")
+        .endEvent()
+        .done();
+  }
+
+  protected BpmnModelInstance createUserTaskProcess() {
+    return Bpmn.createExecutableProcess(getUserTaskProcessKey())
       .startEvent()
       .userTask("userTaskToComplete")
       .userTask("pendingUserTask")
       .endEvent()
       .done();
+  }
+
+  public String getUserId() {
+    return testSpecificKey(USER_ID);
+  }
+
+  public String getGroupId() {
+    return testSpecificKey(GROUP_ID);
+  }
+
+  public String getUserTaskProcessKey() {
+    return testSpecificKey(USER_TASK_PROCESS_KEY);
+  }
+
+  public String getAutoCompleteProcessKey() {
+    return testSpecificKey(AUTO_COMPLETE_PROCESS_KEY);
+  }
+
+  public String getAsyncTaskProcessKey() {
+    return testSpecificKey(ASYNC_TASK_PROCESS_KEY);
+  }
+
+  public String getDecisionKey() {
+    return testSpecificKey(DECISION_KEY);
+  }
+
+  public String getDeploymentName() {
+    return testSpecificKey(DEPLOYMENT_NAME);
   }
 }

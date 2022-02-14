@@ -1,7 +1,9 @@
+<#macro endpoint_macro docsUrl="">
 {
   <@lib.endpointInfo
       id = "setProcessInstanceVariable"
       tag = "Process Instance"
+      summary = "Update Process Variable"
       desc = "Sets a variable of a given process instance by id." />
 
   "parameters": [
@@ -63,3 +65,4 @@
                 the passed variable type is not supported."/>
   }
 }
+</#macro>

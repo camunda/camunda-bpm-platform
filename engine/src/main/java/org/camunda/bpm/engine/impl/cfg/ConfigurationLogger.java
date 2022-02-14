@@ -110,4 +110,8 @@ public class ConfigurationLogger extends ProcessEngineLogger {
             "batch type", batchType);
   }
 
+  public void invalidPropertyValue(Exception e) {
+    logError("015", "Exception while reading configuration property: {}", e.getMessage());
+  }
+
 }

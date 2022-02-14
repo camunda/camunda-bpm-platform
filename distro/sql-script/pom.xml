@@ -5,22 +5,59 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-database-settings</artifactId>
     <relativePath>../../database</relativePath>
-    <version>7.14.0-SNAPSHOT</version>
+    <version>7.17.0-SNAPSHOT</version>
   </parent>
 
   <groupId>org.camunda.bpm.distro</groupId>
   <artifactId>camunda-sql-scripts</artifactId>
   <packaging>jar</packaging>
 
-  <name>camunda BPM - SQL scripts</name>
+  <name>Camunda Platform - SQL scripts</name>
+  
+  <properties>
+    <!-- exclude tests by default, only run in check-sql profile -->
+    <skipTests>true</skipTests>
+
+    <version.liquibase>4.4.2</version.liquibase>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-core-internal-dependencies</artifactId>
+        <version>${project.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
-      <dependency>
-         <groupId>org.camunda.bpm</groupId>
-         <artifactId>camunda-engine</artifactId>
-         <version>${project.version}</version>
-         <scope>provided</scope>
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine</artifactId>
+      <scope>provided</scope>
     </dependency>
+
+    <!-- test dependencies -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.liquibase</groupId>
+      <artifactId>liquibase-core</artifactId>
+      <version>${version.liquibase}</version>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -46,6 +83,10 @@
           <include>*.sql</include>
         </includes>
       </resource>
+      <resource>
+        <targetPath>sql/liquibase</targetPath>
+        <directory>target/sql/liquibase</directory>
+      </resource>
     </resources>
 
     <testResources>
@@ -54,6 +95,13 @@
         <directory>target/upgrade-test/sql/upgrade</directory>
         <includes>
           <include>*.sql</include>
+        </includes>
+      </testResource>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/properties-from-pom.properties</include>
         </includes>
       </testResource>
     </testResources>
@@ -107,7 +155,7 @@
                   <outputDirectory>target/camunda-engine-${project.version}</outputDirectory>
                 </artifactItem>
               </artifactItems>
-              <includes>**/create/*.sql, **/drop/*.sql, **/upgrade/*.sql</includes>
+              <includes>**/create/*.sql, **/drop/*.sql, **/upgrade/*.sql, **/liquibase/**/*</includes>
             </configuration>
           </execution>
         </executions>
@@ -158,6 +206,10 @@
                   <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.postgres.create.engine.sql activiti.postgres.create.case.engine.sql activiti.postgres.create.decision.engine.sql activiti.postgres.create.history.sql activiti.postgres.create.case.history.sql activiti.postgres.create.decision.history.sql" />
                 </concat>
 
+                <concat destfile="target/sql/create/cockroachdb_engine_${project.version}.sql" fixlastline="yes">
+                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.cockroachdb.create.engine.sql activiti.cockroachdb.create.case.engine.sql activiti.cockroachdb.create.decision.engine.sql activiti.cockroachdb.create.history.sql activiti.cockroachdb.create.case.history.sql activiti.cockroachdb.create.decision.history.sql" />
+                </concat>
+
                 <!-- add identity create files -->
                 <copy todir="target/sql/create" flatten="false">
                   <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" />
@@ -200,6 +252,10 @@
                   <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.postgres.drop.decision.engine.sql activiti.postgres.drop.case.engine.sql activiti.postgres.drop.engine.sql activiti.postgres.drop.decision.history.sql activiti.postgres.drop.case.history.sql activiti.postgres.drop.history.sql" />
                 </concat>
 
+                <concat destfile="target/sql/drop/cockroachdb_engine_${project.version}.sql" fixlastline="yes">
+                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.cockroachdb.drop.decision.engine.sql activiti.cockroachdb.drop.case.engine.sql activiti.cockroachdb.drop.engine.sql activiti.cockroachdb.drop.decision.history.sql activiti.cockroachdb.drop.case.history.sql activiti.cockroachdb.drop.history.sql" />
+                </concat>
+
                 <!-- add identity drop files -->
                 <copy todir="target/sql/drop" flatten="false">
                   <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" />
@@ -217,6 +273,12 @@
                   <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade">
                     <include name="*.sql" />
                   </fileset>
+                </copy>
+                
+                <!-- liquibase -->
+
+                <copy todir="target/sql/liquibase">
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/liquibase" includes="**/*" />
                 </copy>
 
               </target>
@@ -351,6 +413,23 @@
                   <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade" includes="postgres_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch*.sql" />
                 </concat>
 
+                <!-- cockroachdb patches -->
+                <concat destfile="target/upgrade-test/sql/upgrade/cockroachdb_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql" fixlastline="yes">
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade" includes="cockroachdb_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch*.sql" />
+                </concat>
+
+                <concat destfile="target/upgrade-test/sql/upgrade/cockroachdb_identity_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql" fixlastline="yes">
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade" includes="cockroachdb_identity_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch*.sql" />
+                </concat>
+
+                <concat destfile="target/upgrade-test/sql/upgrade/cockroachdb_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql" fixlastline="yes">
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade" includes="cockroachdb_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch*.sql" />
+                </concat>
+
+                <concat destfile="target/upgrade-test/sql/upgrade/cockroachdb_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql" fixlastline="yes">
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade" includes="cockroachdb_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch*.sql" />
+                </concat>
+
                 <copy todir="target/upgrade-test/sql/upgrade">
                   <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/upgrade">
                     <include name="*.sql" />
@@ -366,6 +445,9 @@
                   <fileset dir="target/sql/drop">
                     <include name="*.sql" />
                   </fileset>
+                </copy>
+                <copy todir="target/upgrade-test/sql/liquibase">
+                  <fileset dir="target/sql/liquibase" includes="**/*" />
                 </copy>
 
               </target>
@@ -418,7 +500,9 @@
   <profiles>
     <profile>
       <id>check-sql</id>
-
+      <properties>
+        <skipTests>false</skipTests>
+      </properties>
       <build>
         <plugins>
           <plugin>
@@ -476,6 +560,30 @@
                   </srcFiles>
                   <autocommit>true</autocommit>
                 </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-maven-plugin</artifactId>
+            <executions> 
+              <execution>
+                <id>create-engine-liquibase</id>
+                <phase>generate-test-sources</phase>
+                <goals>
+                  <goal>update</goal>
+                </goals>
+                <configuration>
+                  <changeLogFile>camunda-changelog.xml</changeLogFile>
+                  <changeLogDirectory>${project.build.directory}/sql/liquibase/</changeLogDirectory>
+                </configuration>
+              </execution>
+              <execution>
+                <id>drop-engine-liquibase</id>
+                <phase>generate-test-sources</phase>
+                <goals>
+                  <goal>dropAll</goal>
+                </goals>
               </execution>
             </executions>
           </plugin>

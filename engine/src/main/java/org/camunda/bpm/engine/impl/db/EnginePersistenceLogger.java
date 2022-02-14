@@ -16,19 +16,19 @@
  */
 package org.camunda.bpm.engine.impl.db;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.ibatis.executor.BatchResult;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.CrdbTransactionRetryException;
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.SuspendedEntityInteractionException;
 import org.camunda.bpm.engine.WrongDbException;
+import org.camunda.bpm.engine.authorization.MissingAuthorization;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.db.entitymanager.cache.CachedDbEntity;
@@ -115,19 +115,22 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
     ));
   }
 
-  public ProcessEngineException flushDbOperationException(List<DbOperation> operationsToFlush, DbOperation operation,
-      Throwable cause) {
+  public ProcessEngineException flushDbOperationException(List<DbOperation> operationsToFlush,
+                                                          DbOperation failedOperation,
+                                                          Throwable e) {
 
-    String message = ExceptionUtil.collectExceptionMessages(cause);
+    String message = ExceptionUtil.collectExceptionMessages(e);
+
     String exceptionMessage = exceptionMessage(
-      "004",
-      "Exception while executing Database Operation '{}' with message '{}'. Flush summary: \n {}",
-      operation.toString(),
-      message,
-      buildStringFromList(operationsToFlush)
+        "004",
+        "Exception while executing Database Operation '{}' with message '{}'. Flush summary: \n {}",
+        failedOperation,
+        message,
+        buildStringFromList(operationsToFlush)
     );
 
-    return new ProcessEngineException(exceptionMessage, cause);
+    ProcessEngineException subException = new ProcessEngineException(exceptionMessage, e);
+    return ExceptionUtil.wrapPersistenceException(subException);
   }
 
   public OptimisticLockingException concurrentUpdateDbEntityException(DbOperation operation) {
@@ -312,9 +315,21 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
       exceptionMessage("028", "Illegal value '{}' for userId for GLOBAL authorization. Must be '{}'", id, expected));
   }
 
-  public AuthorizationException requiredCamundaAdminException() {
-    return new AuthorizationException(
-      exceptionMessage("029", "Required admin authenticated group or user."));
+  public AuthorizationException requiredCamundaAdmin() {
+    return requiredCamundaAdminOrPermissionException(null);
+  }
+
+  public AuthorizationException requiredCamundaAdminOrPermissionException(List<MissingAuthorization> missingAuthorizations) {
+    String exceptionCode = "029";
+    StringBuilder sb = new StringBuilder();
+    sb.append("Required admin authenticated group or user");
+    if(missingAuthorizations != null && !missingAuthorizations.isEmpty()) {
+      sb.append(" or any of the following permissions: ");
+      sb.append(AuthorizationException.generateMissingAuthorizationsList(missingAuthorizations));
+      exceptionCode = "110";
+    }
+    sb.append(".");
+    return new AuthorizationException(exceptionMessage(exceptionCode, sb.toString()));
   }
 
   public void createChildExecution(ExecutionEntity child, ExecutionEntity parent) {
@@ -440,8 +455,9 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
   }
 
   public ProcessEngineException retrieveMetadataException(Throwable cause) {
-    return new ProcessEngineException(
-      exceptionMessage("050", "Could not retrieve database metadata. Reason: '{}'", cause.getMessage()), cause);
+    String exceptionMessage = exceptionMessage("050", "Could not retrieve database metadata. Reason: '{}'", cause.getMessage());
+    ProcessEngineException exception = new ProcessEngineException(exceptionMessage, cause);
+    return ExceptionUtil.wrapPersistenceException(exception);
   }
 
   public ProcessEngineException invokeTaskListenerException(Throwable cause) {
@@ -455,8 +471,8 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
   public BadUserRequestException uninitializedFormKeyException() {
     return new BadUserRequestException(exceptionMessage(
       "052",
-      "The form key is not initialized. You must call initializeFormKeys() on the task query before you can " +
-      "retrieve the form key."
+      "The form key / form reference is not initialized. You must call initializeFormKeys() on the task query before you can " +
+      "retrieve the form key or the form reference."
     ));
   }
 
@@ -651,31 +667,17 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
         "081", "No startup lock property found in database");
   }
 
-  public void printBatchResults(List<BatchResult> results) {
-    if (results.size() > 0) {
-      StringBuilder sb = new StringBuilder();
-      sb.append("Batch summary:\n");
-      for (int i = 0; i < results.size(); i++) {
-        BatchResult result = results.get(i);
-        sb.append("Result ").append(i).append(":\t");
-        sb.append(result.getSql().replaceAll("\n", "").replaceAll("\\s+", " ")).append("\t");
-        sb.append("Update counts: ").append(Arrays.toString(result.getUpdateCounts())).append("\n");
-      }
-      logDebug("082", sb.toString());
-    }
-  }
-
-  public ProcessEngineException flushDbOperationsException(List<DbOperation> operationsToFlush,
-    Throwable cause) {
-
-    String message = ExceptionUtil.collectExceptionMessages(cause);
+  public ProcessEngineException flushDbOperationUnexpectedException(List<DbOperation> operationsToFlush,
+                                                                    Throwable cause) {
     String exceptionMessage = exceptionMessage(
       "083",
-      "Unexpected exception while executing database operations with message '{}'. Flush summary: \n {}", message,
-      buildStringFromList(operationsToFlush)
+      "Unexpected exception while executing database operations with message '{}'. Flush summary: \n {}",
+        ExceptionUtil.collectExceptionMessages(cause),
+        buildStringFromList(operationsToFlush)
     );
 
-    return new ProcessEngineException(exceptionMessage, cause);
+    ProcessEngineException subException = new ProcessEngineException(exceptionMessage, cause);
+    return ExceptionUtil.wrapPersistenceException(subException);
   }
 
   public ProcessEngineException wrongBatchResultsSizeException(List<DbOperation> operationsToFlush) {
@@ -801,4 +803,68 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
         failedOperation.toString());
   }
 
+  public CrdbTransactionRetryException crdbTransactionRetryException(DbOperation operation) {
+    return new CrdbTransactionRetryException(exceptionMessage(
+        "102",
+        "Execution of '{}' failed. Entity was updated by another transaction concurrently, " +
+            "and the transaction needs to be retried",
+        operation),
+        operation.getFailure());
+  }
+
+  public CrdbTransactionRetryException crdbTransactionRetryExceptionOnSelect(Throwable cause) {
+    return new CrdbTransactionRetryException(exceptionMessage(
+      "103",
+      "Execution of SELECT statement failed. The transaction needs to be retried."),
+      cause
+    );
+  }
+
+  public CrdbTransactionRetryException crdbTransactionRetryExceptionOnCommit(Throwable cause) {
+    return new CrdbTransactionRetryException(exceptionMessage(
+        "104",
+        "Could not commit transaction. The transaction needs to be retried."),
+        cause
+    );
+  }
+
+  public void crdbFailureIgnored(DbOperation operation) {
+    logDebug(
+      "105",
+      "An OptimisticLockingListener attempted to ignore a failure of: {}. "
+      + "Since CockroachDB aborted the transaction, ignoring the failure "
+      + "is not possible and an exception is thrown instead.",
+      operation
+    );
+  }
+
+  public void debugDisabledPessimisticLocks() {
+    logDebug(
+      "106", "No exclusive lock is acquired on CockroachDB or H2, " +
+            "as pessimistic locks are disabled on these databases.");
+  }
+
+  public void errorFetchingTelemetryInitialMessagePropertyInDatabase(Exception exception) {
+    logDebug(
+        "107",
+        "Error while fetching the telemetry initial message status property from the database: {}", exception.getMessage());
+  }
+
+
+  public void logTaskWithoutExecution(String taskId) {
+    logDebug("108",
+      "Execution of external task {} is null. This indicates that the task was concurrently completed or deleted. "
+      + "It is not returned by the current fetch and lock command.",
+      taskId);
+  }
+
+  public ProcessEngineException multipleTenantsForCamundaFormDefinitionKeyException(String camundaFormDefinitionKey) {
+    return new ProcessEngineException(exceptionMessage(
+        "109",
+        "Cannot resolve a unique Camunda Form definition for key '{}' because it exists for multiple tenants.",
+        camundaFormDefinitionKey
+        ));
+  }
+
+  // exception code 110 is already taken. See requiredCamundaAdminOrPermissionException() for details.
 }

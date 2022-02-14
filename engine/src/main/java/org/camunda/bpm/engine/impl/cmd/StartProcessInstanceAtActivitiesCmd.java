@@ -86,11 +86,18 @@ public class StartProcessInstanceAtActivitiesCmd implements Command<ProcessInsta
 
     processInstance.startWithoutExecuting(variables);
 
+
     // prevent ending of the process instance between instructions
     processInstance.setPreserveScope(true);
 
     // apply modifications
     List<AbstractProcessInstanceModificationCommand> instructions = modificationBuilder.getModificationOperations();
+
+    // The "starting" flag controls if historic details are marked as initial.
+    // The documented behavior of this feature is that initial variables
+    // are only set if there is a single start activity. Accordingly,
+    // we reset the flag in case we have more than one start instruction.
+    processInstance.setStarting(instructions.size() == 1);
 
     for (int i = 0; i < instructions.size(); i++) {
       AbstractProcessInstanceModificationCommand instruction = instructions.get(i);

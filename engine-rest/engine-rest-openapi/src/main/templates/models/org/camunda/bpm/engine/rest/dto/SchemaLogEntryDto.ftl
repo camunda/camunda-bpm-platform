@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -9,7 +10,6 @@
         name = "timestamp"
         type = "string"
         format = "date-time"
-        nullable = false
         desc = "The date and time of the schema update." />
 
     <@lib.property
@@ -19,3 +19,5 @@
         desc = "The version of the schema." />
 
 </@lib.dto>
+
+</#macro>

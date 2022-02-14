@@ -363,6 +363,10 @@ public final class EnsureUtil {
     }
   }
 
+  public static void ensureFalse(String message, boolean value) {
+    ensureTrue(message, !value);
+  }
+
   protected static String determineResourceWhitelistPattern(ProcessEngineConfiguration processEngineConfiguration, String resourceType) {
     String resourcePattern = null;
 

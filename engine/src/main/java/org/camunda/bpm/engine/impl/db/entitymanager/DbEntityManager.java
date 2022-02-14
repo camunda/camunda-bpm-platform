@@ -71,6 +71,7 @@ import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation.State;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperationManager;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperationType;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSession;
 import org.camunda.bpm.engine.impl.identity.db.DbGroupQueryImpl;
 import org.camunda.bpm.engine.impl.identity.db.DbUserQueryImpl;
 import org.camunda.bpm.engine.impl.interceptor.Session;
@@ -330,7 +331,8 @@ public class DbEntityManager implements Session, EntityLoadListener {
     }
   }
 
-  protected void flushDbOperations(List<DbOperation> operationsToFlush, List<DbOperation> allOperations) {
+  protected void flushDbOperations(List<DbOperation> operationsToFlush,
+                                   List<DbOperation> allOperations) {
 
     // execute the flush
     while (!operationsToFlush.isEmpty()) {
@@ -338,7 +340,9 @@ public class DbEntityManager implements Session, EntityLoadListener {
       try {
         flushResult = persistenceSession.executeDbOperations(operationsToFlush);
       } catch (Exception e) {
-        throw LOG.flushDbOperationsException(allOperations, e);
+        // Top level persistence exception
+        throw LOG.flushDbOperationUnexpectedException(allOperations, e);
+
       }
 
       List<DbOperation> failedOperations = flushResult.getFailedOperations();
@@ -351,8 +355,14 @@ public class DbEntityManager implements Session, EntityLoadListener {
           // accordingly, this method will be left as well in this case
           handleConcurrentModification(failedOperation);
         }
+        else if (failureState == State.FAILED_CONCURRENT_MODIFICATION_CRDB) {
+          handleConcurrentModificationCrdb(failedOperation);
+        }
         else if (failureState == State.FAILED_ERROR) {
-          throw LOG.flushDbOperationException(allOperations, failedOperation, failedOperation.getFailure());
+          // Top level persistence exception
+          Exception failure = failedOperation.getFailure();
+          throw LOG.flushDbOperationException(allOperations, failedOperation, failure);
+
         } else {
           // This branch should never be reached and the exception thus indicates a bug
           throw new ProcessEngineException("Entity session returned a failed operation not "
@@ -388,28 +398,61 @@ public class DbEntityManager implements Session, EntityLoadListener {
    * @throws OptimisticLockingException if there is no handler for the failure
    */
   protected void handleConcurrentModification(DbOperation dbOperation) {
-    boolean isHandled = false;
+    OptimisticLockingResult handlingResult = invokeOptimisticLockingListeners(dbOperation);
+
+    if (OptimisticLockingResult.THROW.equals(handlingResult)
+        && canIgnoreHistoryModificationFailure(dbOperation)) {
+        handlingResult = OptimisticLockingResult.IGNORE;
+    }
+
+    switch (handlingResult) {
+      case IGNORE:
+        break;
+      case THROW:
+      default:
+        throw LOG.concurrentUpdateDbEntityException(dbOperation);
+    }
+  }
+  
+  protected void handleConcurrentModificationCrdb(DbOperation dbOperation) {
+    OptimisticLockingResult handlingResult = invokeOptimisticLockingListeners(dbOperation);
+    
+    if (OptimisticLockingResult.IGNORE.equals(handlingResult)) {
+      LOG.crdbFailureIgnored(dbOperation);
+    }
+    
+    // CRDB concurrent modification exceptions always lead to the transaction
+    // being aborted, so we must always throw an exception.
+    throw LOG.crdbTransactionRetryException(dbOperation);
+  }
+
+  private OptimisticLockingResult invokeOptimisticLockingListeners(DbOperation dbOperation) {
+    OptimisticLockingResult handlingResult = OptimisticLockingResult.THROW;
 
     if(optimisticLockingListeners != null) {
       for (OptimisticLockingListener optimisticLockingListener : optimisticLockingListeners) {
         if(optimisticLockingListener.getEntityType() == null
             || optimisticLockingListener.getEntityType().isAssignableFrom(dbOperation.getEntityType())) {
-          optimisticLockingListener.failedOperation(dbOperation);
-          isHandled = true;
+          handlingResult = optimisticLockingListener.failedOperation(dbOperation);
         }
       }
     }
+    return handlingResult;
+  }
+  
 
-    if (!isHandled && Context.getProcessEngineConfiguration().isSkipHistoryOptimisticLockingExceptions()) {
-      DbEntity dbEntity = ((DbEntityOperation) dbOperation).getEntity();
-      if (dbEntity instanceof HistoricEntity || isHistoricByteArray(dbEntity)) {
-        isHandled = true;
-      }
-    }
-
-    if(!isHandled) {
-      throw LOG.concurrentUpdateDbEntityException(dbOperation);
-    }
+  /**
+   * Determines if a failed database operation (OptimisticLockingException)
+   * on a Historic entity can be ignored.
+   *
+   * @param dbOperation that failed
+   * @return true if the failure can be ignored
+   */
+  protected boolean canIgnoreHistoryModificationFailure(DbOperation dbOperation) {
+    DbEntity dbEntity = ((DbEntityOperation) dbOperation).getEntity();
+    return 
+        Context.getProcessEngineConfiguration().isSkipHistoryOptimisticLockingExceptions()
+        && (dbEntity instanceof HistoricEntity || isHistoricByteArray(dbEntity));
   }
 
   protected boolean isHistoricByteArray(DbEntity dbEntity) {

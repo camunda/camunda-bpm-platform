@@ -16,6 +16,11 @@
  */
 package org.camunda.bpm;
 
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Locale;
+
 import org.camunda.bpm.util.SeleniumScreenshotRule;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -25,12 +30,8 @@ import org.junit.Rule;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
-
-import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Locale;
 
 public class AbstractWebappUiIntegrationTest extends AbstractWebIntegrationTest {
 
@@ -57,7 +58,11 @@ public class AbstractWebappUiIntegrationTest extends AbstractWebIntegrationTest 
         .usingDriverExecutable(chromeDriver)
         .build();
 
-    driver = new ChromeDriver(chromeDriverService);
+    ChromeOptions chromeOptions = new ChromeOptions()
+        .setHeadless(true)
+        .addArguments("--window-size=1920,1200");
+
+    driver = new ChromeDriver(chromeDriverService, chromeOptions);
   }
 
   public static ExpectedCondition<Boolean> currentURIIs(final URI pageURI) {

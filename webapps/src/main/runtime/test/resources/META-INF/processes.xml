@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<process-application
+  xmlns="http://www.camunda.org/schema/1.0/ProcessApplication"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.camunda.org/schema/1.0/ProcessApplication http://www.camunda.org/schema/1.0/ProcessApplication ">
+
+  <process-engine name="default">
+    <configuration>org.camunda.bpm.pa.TestProcessEngineConfiguration</configuration>
+    <properties>
+      <property name="authorizationEnabled">true</property>
+      <property name="history">full</property>
+    </properties>
+
+  </process-engine>
+
+  <process-engine name="engine2">
+    <configuration>org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration</configuration>
+    <properties>
+      <property name="jdbcUrl">jdbc:h2:mem:activiti2;MVCC=TRUE;TRACE_LEVEL_FILE=0;DB_CLOSE_ON_EXIT=FALSE</property>
+      <property name="authorizationEnabled">true</property>
+    </properties>
+
+  </process-engine>
+
+  <process-engine name="engine3">
+    <configuration>org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration</configuration>
+    <properties>
+      <property name="jdbcUrl">jdbc:h2:mem:activiti3;MVCC=TRUE;TRACE_LEVEL_FILE=0;DB_CLOSE_ON_EXIT=FALSE</property>
+      <property name="authorizationEnabled">true</property>
+    </properties>
+
+  </process-engine>
+
+</process-application>

@@ -19,7 +19,7 @@ package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
-import org.camunda.bpm.engine.impl.pvm.runtime.ExecutionStartContext;
+import org.camunda.bpm.engine.impl.pvm.runtime.ScopeInstantiationContext;
 import org.camunda.bpm.engine.impl.pvm.runtime.InstantiationStack;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
@@ -54,12 +54,13 @@ public class PvmAtomicOperationActivityInitStackNotifyListenerReturn extends Pvm
   protected void eventNotificationsCompleted(PvmExecutionImpl execution) {
     super.eventNotificationsCompleted(execution);
 
-    ExecutionStartContext startContext = execution.getExecutionStartContext();
+    ScopeInstantiationContext startContext = execution.getScopeInstantiationContext();
     InstantiationStack instantiationStack = startContext.getInstantiationStack();
 
     // if the stack has been instantiated
     if (instantiationStack.getActivities().isEmpty()) {
       // done
+      execution.disposeScopeInstantiationContext();
       return;
     }
     else {

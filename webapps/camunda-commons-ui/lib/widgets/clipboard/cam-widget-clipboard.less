@@ -1,0 +1,77 @@
+[cam-widget-clipboard] {
+  overflow: hidden;
+  display: inline-block;
+
+  > [ng-transclude],
+  > .glyphicon {
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  > [ng-transclude]:empty {
+    display: none;
+  }
+
+  > .glyphicon {
+    cursor: pointer;
+    top: 0;
+    opacity: 0;
+    line-height: inherit;
+    transition:
+      opacity 0.218s linear,
+      color 0.218s linear;
+
+    &.copy-ok::before {
+      content: "\e013";
+      color: @brand-success;
+    }
+
+    &.copy-error::before {
+      content: "\e107";
+      color: @brand-warning;
+    }
+  }
+
+  &:hover,
+  &.hovered,
+  &.no-transclusion {
+    > .glyphicon {
+      opacity: 1;
+    }
+  }
+
+  &.form-control-static {
+    display: inline;
+
+    > [ng-transclude],
+    > .glyphicon {
+      display: inline;
+    }
+  }
+
+  .cam-table & {
+    white-space: nowrap;
+    max-width: 100%;
+
+    > [ng-transclude] {
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: max-width 0.218s linear;
+    }
+
+    &:hover > [ng-transclude].resize {
+      max-width: ~"calc(100% - 2em)";
+    }
+  }
+
+  .cam-table td& {
+    display: table-cell;
+    max-width: none;
+    width: auto;
+
+    > [ng-transclude] {
+      white-space: nowrap;
+    }
+  }
+}

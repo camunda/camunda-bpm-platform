@@ -1,8 +1,10 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
       id = "getDeploymentResourceData"
       tag = "Deployment"
+      summary = "Get Resource (Binary)"
       desc = "Retrieves the binary content of a deployment resource for the given deployment by id." />
 
   "parameters" : [
@@ -57,3 +59,5 @@
 
   }
 }
+
+</#macro>

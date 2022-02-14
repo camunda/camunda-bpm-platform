@@ -1,0 +1,214 @@
+{
+  "types": [
+    {
+      "id": {
+        "key": "businessKey",
+        "value": "PROCESS_INSTANCE_ID_BUSINESS_KEY"
+      },
+      "default": true,
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "activityIdIn",
+        "value": "PROCESS_INSTANCE_ID_ACTIVITY_ID"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "startedDate",
+        "value": "PROCESS_INSTANCE_ID_START_DATE"
+      },
+      "operators": [
+        {
+          "key": "Before",
+          "value": "PROCESS_INSTANCE_OPERATOR_BEFORE"
+        },
+        {
+          "key": "After",
+          "value": "PROCESS_INSTANCE_OPERATOR_AFTER"
+        }
+      ],
+      "allowDates": true,
+      "enforceDates": true
+    },
+    {
+      "id": {
+        "key": "variables",
+        "value": "PROCESS_INSTANCE_ID_VARIABLE"
+      },
+      "extended": true,
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        },
+        {
+          "key": "neq",
+          "value": "!="
+        },
+        {
+          "key": "gt",
+          "value": ">"
+        },
+        {
+          "key": "gteq",
+          "value": ">="
+        },
+        {
+          "key": "lt",
+          "value": "<"
+        },
+        {
+          "key": "lteq",
+          "value": "<="
+        },
+        {
+          "key": "like",
+          "value": "PROCESS_INSTANCE_OPERATOR_LIKE"
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "withIncident",
+        "value": "PLUGIN_PROCESS_INSTANCE_WITH_INCIDENTS"
+      },
+      "basic": true
+    }
+  ],
+  "operators": {
+    "undefined":  [
+      {
+        "key": "eq",
+        "value": "="
+      },
+      {
+        "key": "neq",
+        "value": "!="
+      },
+      {
+        "key": "gt",
+        "value": ">"
+      },
+      {
+        "key": "gteq",
+        "value": ">="
+      },
+      {
+        "key": "lt",
+        "value": "<"
+      },
+      {
+        "key": "lteq",
+        "value": "<="
+      },
+      {
+        "key": "like",
+        "value": "PROCESS_INSTANCE_OPERATOR_LIKE"
+      }
+    ],
+    "string":     [
+      {
+        "key": "eq",
+        "value": "="
+      },
+      {
+        "key": "neq",
+        "value": "!="
+      },
+      {
+        "key": "gt",
+        "value": ">"
+      },
+      {
+        "key": "gteq",
+        "value": ">="
+      },
+      {
+        "key": "lt",
+        "value": "<"
+      },
+      {
+        "key": "lteq",
+        "value": "<="
+      },
+      {
+        "key": "like",
+        "value": "PROCESS_INSTANCE_OPERATOR_LIKE"
+      }
+    ],
+    "number":     [
+      {
+        "key": "eq",
+        "value": "="
+      },
+      {
+        "key": "neq",
+        "value": "!="
+      },
+      {
+        "key": "gt",
+        "value": ">"
+      },
+      {
+        "key": "gteq",
+        "value": ">="
+      },
+      {
+        "key": "lt",
+        "value": "<"
+      },
+      {
+        "key": "lteq",
+        "value": "<="
+      }
+    ],
+    "boolean":    [
+      {
+        "key": "eq",
+        "value": "="
+      },
+      {
+        "key": "neq",
+        "value": "!="
+      }
+    ],
+    "object":     [{
+      "key": "eq",
+      "value": "="
+    },
+      {
+        "key": "neq",
+        "value": "!="
+      }],
+    "date":     [{
+      "key": "lteq",
+      "value": "PROCESS_INSTANCE_OPERATOR_BEFORE"
+    },
+      {
+        "key": "gteq",
+        "value": "PROCESS_INSTANCE_OPERATOR_AFTER"
+      }]
+  },
+  "tooltips": {
+    "inputPlaceholder": "PROCESS_INSTANCE_ADD_CRITERIA",
+    "invalid": "PROCESS_INSTANCE_INVALID",
+    "deleteSearch": "PROCESS_INSTANCE_DELETE_SEARCH",
+    "type": "PROCESS_INSTANCE_TYPE",
+    "name": "PROCESS_INSTANCE_NAME",
+    "operator": "PROCESS_INSTANCE_OPERATOR",
+    "value": "PROCESS_INSTANCE_VALUE"
+  }
+}

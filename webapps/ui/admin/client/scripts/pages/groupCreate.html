@@ -1,0 +1,77 @@
+<!-- # CE - camunda-bpm-webapp/ui/admin/client/scripts/pages/groupCreate.html -->
+<section>
+  <div class="section-content">
+    <header class="row">
+      <div class="col-xs-8">
+        <h3>{{ 'GROUP_CREATE_NEW_GROUP' | translate }}</h3>
+      </div>
+    </header>
+
+    <form class="form-horizontal"
+          name="createGroupForm">
+      <div class="col-xs-12">
+        <div class="form-group">
+          <label class="control-label col-sm-4 col-md-2"
+                 for="inputGroupId">{{ 'GROUP_CREATE_GROUP_ID' | translate }}</label>
+
+          <div class="col-sm-8 col-md-10">
+            <input id="inputGroupId"
+                   name="groupId"
+                   class="form-control"
+                   type="text"
+                   ng-model="group.id"
+                   novalidate required />
+            <span class="help-inline"
+                ng-show="createGroupForm.groupId.$error.required">{{ 'GROUP_CREATE_ID_REQUIRED' | translate }}</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="control-label col-sm-4 col-md-2"
+                 for="inputName">{{ 'GROUP_CREATE_GROUP_NAME' | translate }}</label>
+
+          <div class="col-sm-8 col-md-10">
+            <input id="inputName"
+                   name="groupName"
+                   type="text"
+                   class="form-control"
+                   ng-model="group.name"
+                   novalidate required />
+            <span class="help-inline"
+                  ng-show="createGroupForm.groupName.$error.required">{{ 'GROUP_CREATE_NAME_REQUIRED' | translate }}</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="control-label col-sm-4 col-md-2"
+                 for="inputType">{{ 'GROUP_GROUP_TYPE' | translate }}</label>
+          <div class="col-sm-8 col-md-10">
+            <input id="inputType"
+                   name="groupType"
+                   class="form-control"
+                   type="text"
+                   ng-model="group.type" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="col-sm-8 col-sm-offset-4 col-md-10 col-md-offset-2 text-right">
+            <a class="btn btn-link"
+               href="#/groups">
+              {{ 'GROUP_CREATE_CANCEL' | translate }}
+            </a>
+
+            <button type="submit"
+                    class="btn btn-primary"
+                    ng-disabled="!createGroupForm.$valid"
+                    ng-click="createGroup()">
+              {{ 'GROUP_CREATE_NEW_GROUP' | translate }}
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </form>
+  </div>
+</section>
+<!-- / CE - camunda-bpm-webapp/ui/admin/client/scripts/pages/groupCreate.html -->

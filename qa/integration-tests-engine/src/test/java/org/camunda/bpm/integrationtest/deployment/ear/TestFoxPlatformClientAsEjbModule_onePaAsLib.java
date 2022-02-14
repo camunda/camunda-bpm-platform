@@ -35,54 +35,54 @@ import org.junit.runner.RunWith;
 
 
 /**
- * This test verifies that a process archive packaging the camunda BPM platform client
+ * This test verifies that a process archive packaging the Camunda Platform client
  * can be packaged inside an EAR application.
- * 
+ *
  * @author Daniel Meyer
- * 
+ *
  */
 @RunWith(Arquillian.class)
 public class TestFoxPlatformClientAsEjbModule_onePaAsLib extends AbstractFoxPlatformIntegrationTest {
 
   /**
    * Deployment layout
-   * 
-   * test-application.ear    
+   *
+   * test-application.ear
    *    |-- lib /
    *        |-- processes.jar
    *          |-- META-INF/processes.xml
    *          |-- org/camunda/bpm/integrationtest/testDeployProcessArchive.bpmn20.xml
-   *          
-   *    |-- fox-platform-client.jar  <<===============================||      
+   *
+   *    |-- fox-platform-client.jar  <<===============================||
    *                                                                  ||  Class-Path reference
    *    |-- test.war (contains the test-class but also processes)     ||
    *        |-- META-INF/MANIFEST.MF =================================||
    *        |-- WEB-INF/beans.xml
    *        |-- + test classes
-   *        
-   */   
+   *
+   */
   @Deployment
-  public static EnterpriseArchive onePaAsLib() {    
-    
+  public static EnterpriseArchive onePaAsLib() {
+
     JavaArchive processArchiveJar = ShrinkWrap.create(JavaArchive.class, "processes.jar")
       .addAsResource("org/camunda/bpm/integrationtest/testDeployProcessArchive.bpmn20.xml")
       .addAsResource("META-INF/processes.xml", "META-INF/processes.xml");
-    
+
     JavaArchive foxPlatformClientJar = DeploymentHelper.getEjbClient();
-    
+
     WebArchive testJar = ShrinkWrap.create(WebArchive.class, "test.war")
       .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
       .setManifest(new ByteArrayAsset(("Class-Path: " + foxPlatformClientJar.getName()+"\n").getBytes()))
       .addClass(AbstractFoxPlatformIntegrationTest.class)
       .addClass(TestFoxPlatformClientAsEjbModule_onePaAsLib.class);
 
-    return ShrinkWrap.create(EnterpriseArchive.class, "onePaAsLib.ear")            
+    return ShrinkWrap.create(EnterpriseArchive.class, "onePaAsLib.ear")
       .addAsLibrary(processArchiveJar)
       .addAsModule(foxPlatformClientJar)
       .addAsModule(testJar)
       .addAsLibrary(DeploymentHelper.getEngineCdi());
   }
-      
+
   @Test
   public void testOnePaAsLib() {
     ProcessEngine processEngine = ProgrammaticBeanLookup.lookup(ProcessEngine.class);
@@ -91,8 +91,8 @@ public class TestFoxPlatformClientAsEjbModule_onePaAsLib extends AbstractFoxPlat
     long count = repositoryService.createProcessDefinitionQuery()
       .processDefinitionKey("testDeployProcessArchive")
       .count();
-    
+
     Assert.assertEquals(1, count);
   }
-  
+
 }

@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
@@ -28,7 +29,6 @@ import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 public abstract class AbstractDefinitionQueryTest {
@@ -38,9 +38,8 @@ public abstract class AbstractDefinitionQueryTest {
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
-  protected ExpectedException exceptionRule = ExpectedException.none();
   @Rule
-  public RuleChain chain = RuleChain.outerRule(engineRule).around(testRule).around(exceptionRule);
+  public RuleChain chain = RuleChain.outerRule(engineRule).around(testRule);
 
   protected RepositoryService repositoryService;
   protected RuntimeService runtimeService;
@@ -93,7 +92,9 @@ public abstract class AbstractDefinitionQueryTest {
   }
 
   private void verifySingleResultFails(Query query) {
-    exceptionRule.expect(ProcessEngineException.class);
-    query.singleResult();
+
+    // when/then
+    assertThatThrownBy(() -> query.singleResult())
+      .isInstanceOf(ProcessEngineException.class);
   }
 }

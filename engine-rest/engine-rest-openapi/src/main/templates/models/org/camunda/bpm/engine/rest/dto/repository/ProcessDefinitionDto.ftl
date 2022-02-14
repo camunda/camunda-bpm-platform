@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -29,7 +30,6 @@
         name = "version"
         type = "integer"
         format = "int32"
-        nullable = false
         desc = "The version of the process definition that the engine assigned to it." />
 
     <@lib.property
@@ -50,7 +50,6 @@
     <@lib.property
         name = "suspended"
         type = "boolean"
-        nullable = false
         desc = "A flag indicating whether the definition is suspended or not." />
 
     <@lib.property
@@ -74,8 +73,8 @@
     <@lib.property
         name = "startableInTasklist"
         type = "boolean"
-        nullable = false
         last = true
         desc = "A flag indicating whether the process definition is startable in Tasklist or not." />
 
 </@lib.dto>
+</#macro>

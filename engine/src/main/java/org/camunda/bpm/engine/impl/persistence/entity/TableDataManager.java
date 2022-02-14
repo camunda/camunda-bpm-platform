@@ -19,9 +19,13 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import org.apache.ibatis.session.RowBounds;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricCaseActivityInstance;
@@ -45,8 +49,15 @@ import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionEntity;
-import org.camunda.bpm.engine.impl.history.event.*;
+import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInputInstanceEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInstanceEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricDecisionOutputInstanceEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricDetailEventEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricExternalTaskLogEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricIncidentEventEntity;
+import org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntity;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
+import org.camunda.bpm.engine.impl.util.DatabaseUtil;
 import org.camunda.bpm.engine.management.TableMetaData;
 import org.camunda.bpm.engine.management.TablePage;
 import org.camunda.bpm.engine.repository.Deployment;
@@ -65,8 +76,8 @@ public class TableDataManager extends AbstractManager {
 
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
-  public static Map<Class<?>, String> apiTypeToTableNameMap = new HashMap<Class<?>, String>();
-  public static Map<Class<? extends DbEntity>, String> persistentObjectToTableNameMap = new HashMap<Class<? extends DbEntity>, String>();
+  public static Map<Class<?>, String> apiTypeToTableNameMap = new HashMap<>();
+  public static Map<Class<? extends DbEntity>, String> persistentObjectToTableNameMap = new HashMap<>();
 
   static {
     // runtime
@@ -86,9 +97,11 @@ public class TableDataManager extends AbstractManager {
 
     persistentObjectToTableNameMap.put(EventSubscriptionEntity.class, "ACT_RU_EVENT_SUBSCR");
 
-    persistentObjectToTableNameMap.put(FilterEntity.class, "ACT_RU_FILTER");
 
     persistentObjectToTableNameMap.put(MeterLogEntity.class, "ACT_RU_METER_LOG");
+    persistentObjectToTableNameMap.put(TaskMeterLogEntity.class, "ACT_RU_TASK_METER_LOG");
+
+    persistentObjectToTableNameMap.put(CamundaFormDefinitionEntity.class, "ACT_RE_CAMFORMDEF");
     // repository
     persistentObjectToTableNameMap.put(DeploymentEntity.class, "ACT_RE_DEPLOYMENT");
     persistentObjectToTableNameMap.put(ProcessDefinitionEntity.class, "ACT_RE_PROCDEF");
@@ -121,7 +134,6 @@ public class TableDataManager extends AbstractManager {
     persistentObjectToTableNameMap.put(HistoricIdentityLinkLogEntity.class, "ACT_HI_IDENTITYLINK");
     // a couple of stuff goes to the same table
     persistentObjectToTableNameMap.put(HistoricFormPropertyEntity.class, "ACT_HI_DETAIL");
-    persistentObjectToTableNameMap.put(HistoricVariableInstanceEntity.class, "ACT_HI_DETAIL");
     persistentObjectToTableNameMap.put(HistoricVariableInstanceEntity.class, "ACT_HI_VARINST");
     persistentObjectToTableNameMap.put(HistoricDetailEventEntity.class, "ACT_HI_DETAIL");
 
@@ -176,7 +188,7 @@ public class TableDataManager extends AbstractManager {
   }
 
   public Map<String, Long> getTableCount() {
-    Map<String, Long> tableCount = new HashMap<String, Long>();
+    Map<String, Long> tableCount = new HashMap<>();
     try {
       for (String tableName: getDbEntityManager().getTableNamesPresentInDatabase()) {
         tableCount.put(tableName, getTableCount(tableName));
@@ -196,25 +208,24 @@ public class TableDataManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
-  public TablePage getTablePage(TablePageQueryImpl tablePageQuery, int firstResult, int maxResults) {
+  public TablePage getTablePage(TablePageQueryImpl tablePageQuery) {
 
     TablePage tablePage = new TablePage();
 
     @SuppressWarnings("rawtypes")
-    List tableData = getDbSqlSession().getSqlSession()
-      .selectList("selectTableData", tablePageQuery, new RowBounds(firstResult, maxResults));
+    List tableData = getDbEntityManager().selectList("selectTableData", tablePageQuery);
 
     tablePage.setTableName(tablePageQuery.getTableName());
     tablePage.setTotal(getTableCount(tablePageQuery.getTableName()));
     tablePage.setRows(tableData);
-    tablePage.setFirstResult(firstResult);
+    tablePage.setFirstResult(tablePageQuery.getFirstResult());
 
     return tablePage;
   }
 
   public List<Class<? extends DbEntity>> getEntities(String tableName) {
     String databaseTablePrefix = getDbSqlSession().getDbSqlSessionFactory().getDatabaseTablePrefix();
-    List<Class<? extends DbEntity>> entities = new ArrayList<Class<? extends DbEntity>>();
+    List<Class<? extends DbEntity>> entities = new ArrayList<>();
 
     Set<Class<? extends DbEntity>> entityClasses = persistentObjectToTableNameMap.keySet();
     for (Class<? extends DbEntity> entityClass : entityClasses) {
@@ -256,7 +267,7 @@ public class TableDataManager extends AbstractManager {
             .getConnection()
             .getMetaData();
 
-        if (DbSqlSessionFactory.POSTGRES.equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
+        if (DatabaseUtil.checkDatabaseType(DbSqlSessionFactory.POSTGRES, DbSqlSessionFactory.CRDB)) {
           tableName = tableName.toLowerCase();
         }
 

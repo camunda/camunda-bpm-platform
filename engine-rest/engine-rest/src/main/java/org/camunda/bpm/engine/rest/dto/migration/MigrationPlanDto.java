@@ -18,18 +18,23 @@ package org.camunda.bpm.engine.rest.dto.migration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.migration.MigrationPlanBuilder;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
 import org.camunda.bpm.engine.migration.MigrationInstructionBuilder;
 import org.camunda.bpm.engine.migration.MigrationPlan;
+import org.camunda.bpm.engine.rest.dto.VariableValueDto;
+import org.camunda.bpm.engine.variable.VariableMap;
 
 public class MigrationPlanDto {
 
   protected String sourceProcessDefinitionId;
   protected String targetProcessDefinitionId;
   protected List<MigrationInstructionDto> instructions;
+  protected Map<String, VariableValueDto> variables;
 
   public String getSourceProcessDefinitionId() {
     return sourceProcessDefinitionId;
@@ -55,8 +60,21 @@ public class MigrationPlanDto {
     this.instructions = instructions;
   }
 
+  public Map<String, VariableValueDto> getVariables() {
+    return variables;
+  }
+
+  public void setVariables(Map<String, VariableValueDto> variables) {
+    this.variables = variables;
+  }
+
   public static MigrationPlanDto from(MigrationPlan migrationPlan) {
     MigrationPlanDto dto = new MigrationPlanDto();
+
+    VariableMap variables = migrationPlan.getVariables();
+    if (variables != null) {
+      dto.setVariables(VariableValueDto.fromMap(variables));
+    }
 
     dto.setSourceProcessDefinitionId(migrationPlan.getSourceProcessDefinitionId());
     dto.setTargetProcessDefinitionId(migrationPlan.getTargetProcessDefinitionId());
@@ -73,8 +91,17 @@ public class MigrationPlanDto {
     return dto;
   }
 
-  public static MigrationPlan toMigrationPlan(ProcessEngine processEngine, MigrationPlanDto migrationPlanDto) {
+  public static MigrationPlan toMigrationPlan(ProcessEngine processEngine,
+                                              ObjectMapper objectMapper,
+                                              MigrationPlanDto migrationPlanDto) {
     MigrationPlanBuilder migrationPlanBuilder = processEngine.getRuntimeService().createMigrationPlan(migrationPlanDto.getSourceProcessDefinitionId(), migrationPlanDto.getTargetProcessDefinitionId());
+
+    Map<String, VariableValueDto> variableDtos = migrationPlanDto.getVariables();
+    if (variableDtos != null) {
+      Map<String, Object> variables =
+          VariableValueDto.toMap(variableDtos, processEngine, objectMapper);
+      migrationPlanBuilder.setVariables(variables);
+    }
 
     if (migrationPlanDto.getInstructions() != null) {
       for (MigrationInstructionDto migrationInstructionDto : migrationPlanDto.getInstructions()) {

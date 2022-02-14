@@ -16,10 +16,12 @@
  */
 package org.camunda.bpm.engine.test.api.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -34,7 +36,9 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import org.assertj.core.groups.Tuple;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -45,12 +49,15 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.impl.RepositoryServiceImpl;
+import org.camunda.bpm.engine.impl.bpmn.behavior.CallActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.core.model.CallableElement;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -61,8 +68,11 @@ import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.ReadOnlyProcessDefinition;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.IoUtil;
+import org.camunda.bpm.engine.repository.CalledProcessDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
@@ -83,6 +93,7 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 /**
  * @author Frederik Heremans
@@ -821,10 +832,10 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
 
     String deploymentId = deployment.getId();
     List<String> resourceNames = repositoryService.getDeploymentResourceNames(deploymentId);
-    Set<String> expectedResourceNames = new HashSet<String>();
+    Set<String> expectedResourceNames = new HashSet<>();
     expectedResourceNames.add("org/camunda/bpm/engine/test/test/HelloWorld.string");
     expectedResourceNames.add("org/camunda/bpm/engine/test/test/TheAnswer.string");
-    assertEquals(expectedResourceNames, new HashSet<String>(resourceNames));
+    assertEquals(expectedResourceNames, new HashSet<>(resourceNames));
 
     InputStream resourceStream = repositoryService.getResourceAsStream(deploymentId, "org/camunda/bpm/engine/test/test/HelloWorld.string");
     assertTrue(Arrays.equals("hello world".getBytes(), IoUtil.readInputStream(resourceStream, "test")));
@@ -1176,12 +1187,12 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
 
   @Test
   public void testGetProcessDefinitions() {
-    List<String> deploymentIds = new ArrayList<String>();
-    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + ">" + "  <process id='IDR' name='Insurance Damage Report 1' isExecutable='true' />" + "</definitions>")));
-    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + ">" + "  <process id='IDR' name='Insurance Damage Report 2' isExecutable='true' />" + "</definitions>")));
-    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + ">" + "  <process id='IDR' name='Insurance Damage Report 3' isExecutable='true' />" + "</definitions>")));
-    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + ">" + "  <process id='EN' name='Expense Note 1' isExecutable='true' />" + "</definitions>")));
-    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + ">" + "  <process id='EN' name='Expense Note 2' isExecutable='true' />" + "</definitions>")));
+    List<String> deploymentIds = new ArrayList<>();
+    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + ">" + "  <process id='IDR' name='Insurance Damage Report 1' isExecutable='true'><startEvent id='start'/></process></definitions>")));
+    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + ">" + "  <process id='IDR' name='Insurance Damage Report 2' isExecutable='true'><startEvent id='start'/></process></definitions>")));
+    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + ">" + "  <process id='IDR' name='Insurance Damage Report 3' isExecutable='true'><startEvent id='start'/></process></definitions>")));
+    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + ">" + "  <process id='EN' name='Expense Note 1' isExecutable='true'><startEvent id='start'/></process></definitions>")));
+    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + ">" + "  <process id='EN' name='Expense Note 2' isExecutable='true'><startEvent id='start'/></process></definitions>")));
 
     List<ProcessDefinition> processDefinitions = repositoryService
       .createProcessDefinitionQuery()
@@ -1228,9 +1239,9 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
 
   @Test
   public void testDeployIdenticalProcessDefinitions() {
-    List<String> deploymentIds = new ArrayList<String>();
-    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + ">" + "  <process id='IDR' name='Insurance Damage Report' isExecutable='true' />" + "</definitions>")));
-    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + ">" + "  <process id='IDR' name='Insurance Damage Report' isExecutable='true' />" + "</definitions>")));
+    List<String> deploymentIds = new ArrayList<>();
+    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + "><process id='IDR' name='Insurance Damage Report' isExecutable='true'><startEvent id='start'/></process></definitions>")));
+    deploymentIds.add(deployProcessString(("<definitions " + NAMESPACE + " " + TARGET_NAMESPACE + "><process id='IDR' name='Insurance Damage Report' isExecutable='true'><startEvent id='start'/></process></definitions>")));
 
     List<ProcessDefinition> processDefinitions = repositoryService
       .createProcessDefinitionQuery()
@@ -1254,6 +1265,163 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
     assertEquals(1, processDefinition.getVersion());
 
     deleteDeployments(deploymentIds);
+  }
+
+  @Test
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/api/repository/call-activities-with-references.bpmn",
+    "org/camunda/bpm/engine/test/api/repository/failingProcessCreateOneIncident.bpmn20.xml",
+    "org/camunda/bpm/engine/test/api/repository/first-process.bpmn20.xml",
+    "org/camunda/bpm/engine/test/api/repository/three_.cmmn"
+  })
+  public void shouldReturnStaticCalledProcessDefinitions() {
+    //given
+    testRule.deploy("org/camunda/bpm/engine/test/api/repository/second-process.bpmn20.xml");
+    testRule.deployForTenant("someTenant", "org/camunda/bpm/engine/test/api/repository/processOne.bpmn20.xml");
+
+    ProcessDefinition processDefinition = repositoryService
+      .createProcessDefinitionQuery()
+      .processDefinitionKey("TestCallActivitiesWithReferences")
+      .singleResult();
+
+    String callingProcessId = processDefinition.getId();
+
+    //when
+    Collection<CalledProcessDefinition> mappings = repositoryService.getStaticCalledProcessDefinitions(callingProcessId);
+
+    //then
+    //cmmn tasks are not resolved
+    assertThat(mappings).hasSize(4);
+
+    assertThat(mappings.stream()
+      .filter(def -> def.getId().startsWith("process:1:"))
+      .flatMap(def -> def.getCalledFromActivityIds().stream())
+      .collect(Collectors.toList()))
+      .containsExactlyInAnyOrder("deployment_1", "version_1");
+
+    assertThat(mappings).extracting("name", "version", "key","calledFromActivityIds", "versionTag", "callingProcessDefinitionId")
+      .contains(
+        Tuple.tuple("Process One", 1, "processOne", Arrays.asList("tenant_reference_1"), null, callingProcessId),
+        Tuple.tuple("Second Test Process", 2, "process", Arrays.asList("latest_reference_1"), null, callingProcessId),
+        Tuple.tuple("Failing Process", 1, "failingProcess", Arrays.asList("version_tag_reference_1"), "ver_tag_2", callingProcessId));
+
+    for (CalledProcessDefinition called : mappings) {
+      assertThat(called).isEqualToIgnoringGivenFields(repositoryService.getProcessDefinition(called.getId()), "calledFromActivityIds", "callingProcessDefinitionId");
+    }
+  }
+
+  @Test
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/repository/dynamic-call-activities.bpmn" })
+  public void shouldNotTryToResolveDynamicCalledElementBinding() {
+    //given
+    ProcessDefinition processDefinition = repositoryService
+      .createProcessDefinitionQuery()
+      .processDefinitionKey("DynamicCallActivities")
+      .singleResult();
+
+    List<ActivityImpl> callActivities = ((ProcessDefinitionImpl) repositoryService
+      .getProcessDefinition(processDefinition.getId())).getActivities().stream()
+      .filter(act -> act.getActivityBehavior() instanceof CallActivityBehavior)
+      .map(activity -> {
+        CallableElement callableElement = ((CallActivityBehavior) activity.getActivityBehavior()).getCallableElement();
+        CallableElement spy = Mockito.spy(callableElement);
+        ((CallActivityBehavior) activity.getActivityBehavior()).setCallableElement(spy);
+        return activity;
+      }).collect(Collectors.toList());
+
+    //when
+    Collection<CalledProcessDefinition> mappings = repositoryService.getStaticCalledProcessDefinitions(processDefinition.getId());
+
+    //then
+    //check that we never try to resolve any of the dynamic bindings
+    for (ActivityImpl activity : callActivities) {
+      CallableElement callableElement = ((CallActivityBehavior) activity.getActivityBehavior()).getCallableElement();
+      Mockito.verify(callableElement, Mockito.never()).getDefinitionKey(Mockito.anyObject());
+      Mockito.verify(callableElement, Mockito.never()).getVersion(Mockito.anyObject());
+      Mockito.verify(callableElement, Mockito.never()).getVersionTag(Mockito.anyObject());
+      Mockito.verify(callableElement, Mockito.never()).getDefinitionTenantId(Mockito.anyObject(), Mockito.anyString());
+      Mockito.verify(callableElement, Mockito.times(1)).hasDynamicReferences();
+    }
+
+    assertThat(mappings).isEmpty();
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/repository/first-process.bpmn20.xml" )
+  public void shouldReturnEmptyListIfNoCallActivityExists(){
+    //given
+    ProcessDefinition processDefinition = repositoryService
+      .createProcessDefinitionQuery()
+      .processDefinitionKey("process")
+      .singleResult();
+
+    //when
+    Collection<CalledProcessDefinition> maps = repositoryService.getStaticCalledProcessDefinitions(processDefinition.getId());
+
+    //then
+    assertThat(maps).isEmpty();
+  }
+
+  @Test
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/repository/nested-call-activities.bpmn",
+      "org/camunda/bpm/engine/test/api/repository/failingProcessCreateOneIncident.bpmn20.xml" })
+  public void shouldReturnCalledProcessDefinitionsForNestedCallActivities() {
+    //given
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("nested-call-activities")
+        .singleResult();
+
+    //when
+    Collection<CalledProcessDefinition> calledProcessDefinitions = repositoryService
+        .getStaticCalledProcessDefinitions(processDefinition.getId());
+
+    //then
+    assertThat(calledProcessDefinitions).hasSize(1);
+    CalledProcessDefinition calledProcessDefinition = new ArrayList<>(calledProcessDefinitions).get(0);
+    assertThat(calledProcessDefinition.getKey()).isEqualTo("failingProcess");
+    assertThat(
+        calledProcessDefinition.getCalledFromActivityIds().stream().distinct().collect(Collectors.toList())).hasSize(8);
+  }
+
+  @Test
+  public void testGetStaticCallActivityMappingShouldThrowIfProcessDoesNotExist(){
+    //given //when //then
+    assertThrows(NullValueException.class, () -> repositoryService.getStaticCalledProcessDefinitions("notExistingId"));
+  }
+
+  @Test
+  public void shouldReturnCorrectProcessesForCallActivityWithTenantId(){
+    //given
+    final String processOne = "org/camunda/bpm/engine/test/api/repository/processOne.bpmn20.xml";
+    final String processTwo = "org/camunda/bpm/engine/test/api/repository/processTwo.bpmn20.xml";
+
+    final String aTenant = "aTenant";
+    final String anotherTenant = "anotherTenant";
+
+    String id = testRule.deployForTenantAndGetDefinition(aTenant,
+      "org/camunda/bpm/engine/test/api/repository/call_activities_with_tenants.bpmn").getId();
+    testRule.deployForTenant(anotherTenant, processTwo);
+    String sameTenantProcessOne = testRule.deployForTenantAndGetDefinition(aTenant, processOne).getId();
+    String otherTenantProcessOne = testRule.deployForTenantAndGetDefinition(anotherTenant, processOne).getId();
+    // these two processes should not be picked up even though they are newer because they are not deployed for a tenant.
+    testRule.deploy(processOne);
+    testRule.deploy(processTwo);
+
+    //when
+    Collection<CalledProcessDefinition> mappings = repositoryService.getStaticCalledProcessDefinitions(id);
+
+    //then
+    assertThat(mappings).hasSize(2);
+
+    assertThat(mappings.stream()
+      .filter(def -> def.getId().equals(sameTenantProcessOne))
+      .flatMap(def -> def.getCalledFromActivityIds().stream())
+      .collect(Collectors.toList()))
+      .containsExactlyInAnyOrder("null_tenant_reference_same_tenant", "explicit_same_tenant_reference");
+
+    assertThat(mappings).extracting("id","calledFromActivityIds", "callingProcessDefinitionId")
+      .contains(
+        Tuple.tuple(otherTenantProcessOne, Arrays.asList("explicit_other_tenant_reference"), id));
   }
 
   private String deployProcessString(String processString) {

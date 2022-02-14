@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.task;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -145,11 +146,11 @@ public class TaskQueryExpressionTest {
 
   @Test
   public void testQueryByInvolvedUserExpression() {
-    assertCount(taskQuery().taskInvolvedUserExpression("${'" + user.getId() + "'}"), 2);
+    assertCount(taskQuery().taskInvolvedUserExpression("${'" + user.getId() + "'}"), 3);
     assertCount(taskQuery().taskInvolvedUserExpression("${'" + anotherUser.getId() + "'}"), 0);
 
     setCurrentUser(user);
-    assertCount(taskQuery().taskInvolvedUserExpression("${currentUser()}"), 2);
+    assertCount(taskQuery().taskInvolvedUserExpression("${currentUser()}"), 3);
 
     setCurrentUser(anotherUser);
     assertCount(taskQuery().taskInvolvedUserExpression("${currentUser()}"), 0);
@@ -601,6 +602,48 @@ public class TaskQueryExpressionTest {
 
     // then
     assertEquals(2, tasks.size());
+  }
+
+  @Test
+  public void shouldRejectDueDateExpressionAndWithoutDueDateCombination() {
+    assertThatThrownBy(() -> taskService.createTaskQuery().dueDateExpression("").withoutDueDate())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Invalid query usage");
+  }
+
+  @Test
+  public void shouldRejectWithoutDueDateAndDueDateExpressionCombination() {
+    assertThatThrownBy(() -> taskService.createTaskQuery().withoutDueDate().dueDateExpression(""))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Invalid query usage");
+  }
+
+  @Test
+  public void shouldRejectDueAfterExpressionAndWithoutDueDateCombination() {
+    assertThatThrownBy(() -> taskService.createTaskQuery().dueAfterExpression("").withoutDueDate())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Invalid query usage");
+  }
+
+  @Test
+  public void shouldRejectWithoutDueDateAndDueAfterExpressionCombination() {
+    assertThatThrownBy(() -> taskService.createTaskQuery().withoutDueDate().dueAfterExpression(""))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Invalid query usage");
+  }
+
+  @Test
+  public void shouldRejectDueBeforeExpressionAndWithoutDueDateCombination() {
+    assertThatThrownBy(() -> taskService.createTaskQuery().dueBeforeExpression("").withoutDueDate())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Invalid query usage");
+  }
+
+  @Test
+  public void shouldRejectWithoutDueDateAndDueBeforeExpressionCombination() {
+    assertThatThrownBy(() -> taskService.createTaskQuery().withoutDueDate().dueBeforeExpression(""))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Invalid query usage");
   }
 
   @After

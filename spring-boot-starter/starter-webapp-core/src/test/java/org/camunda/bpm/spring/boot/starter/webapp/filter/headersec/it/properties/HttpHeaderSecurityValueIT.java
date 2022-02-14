@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -38,6 +39,7 @@ import static org.assertj.core.api.Assertions.assertThat;
   "camunda.bpm.webapp.headerSecurity.hstsDisabled=false",
   "camunda.bpm.webapp.headerSecurity.hstsValue=aValue"
 })
+@DirtiesContext
 public class HttpHeaderSecurityValueIT {
 
   @Rule

@@ -27,8 +27,7 @@ public class PvmAtomicOperationActivityStartCreateScope extends PvmAtomicOperati
 
   public boolean isAsync(PvmExecutionImpl execution) {
     PvmActivity activity = execution.getActivity();
-    return activity.isAsyncBefore()
-        && !execution.hasProcessInstanceStartContext();
+    return activity.isAsyncBefore();
   }
 
   public boolean isAsyncCapable() {
@@ -40,6 +39,7 @@ public class PvmAtomicOperationActivityStartCreateScope extends PvmAtomicOperati
   }
 
   protected void scopeCreated(PvmExecutionImpl execution) {
+    execution.setIgnoreAsync(false);
     execution.performOperation(ACTIVITY_START);
   }
 }

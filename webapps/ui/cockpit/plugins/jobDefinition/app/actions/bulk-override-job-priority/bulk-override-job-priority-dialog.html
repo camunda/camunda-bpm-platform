@@ -1,0 +1,183 @@
+<!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/jobDefinition/app/actions/bulk-override-job-priority/bulk-override-job-priority-dialog.html -->
+<div class="modal-header">
+  <h3>{{ 'BULK_OVERRIDE_CHANGE_JOB_TEXT' | translate }}</h3>
+</div>
+
+<div class="job-definition-override-job-priority modal-body">
+  <div notifications-panel></div>
+
+  <div ng-hide="status === 'FINISHED' || hasNoJobDefinitions">
+
+    <p>{{ 'BULK_OVERRIDE_CHANGE_JOB_LEGEND' | translate }}</p>
+
+    <form class="form-horizontal"
+          name="overrideJobPriorityForm"
+          novalidate
+          request-aware
+          ng-submit="isValid() && submit()">
+
+      <fieldset>
+
+        <div class="form-group">
+          <label class="col-xs-4 control-label"
+                 for="execute">
+            {{ 'BULK_OVERRIDE_EXECUTE' | translate }}
+            <span class="glyphicon glyphicon-question-sign"
+                  uib-tooltip="{{ 'BULK_OVERRIDE_EXECUTE_TOOLTIP' | translate }}"
+                  tooltip-placement="right">
+            </span>
+          </label>
+
+          <div class="col-xs-8">
+            <div class="radio">
+              <label>
+                <input ng-model="setJobPriority"
+                       ng-value="false"
+                       type="radio"
+                       name="execute" />
+                {{ 'BULK_OVERRIDE_CLEAR_OVRR' | translate }}
+              </label>
+            </div>
+
+            <div class="radio">
+              <label>
+                <input ng-model="setJobPriority"
+                       ng-value="true"
+                       type="radio"
+                       name="execute" />
+                {{ 'BULK_OVERRIDE_SET_OVRR' | translate }}
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group" ng-show="setJobPriority">
+          <label class="col-xs-4 control-label"
+                 for="priority">
+            {{ 'BULK_OVERRIDE_PRIORITY' | translate }}
+            <span class="glyphicon glyphicon-question-sign"
+                  uib-tooltip="{{ 'BULK_OVERRIDE_PRIORITY_TOOLTIP' | translate }}"
+                  tooltip-placement="right">
+            </span>
+          </label>
+
+          <div class="col-xs-8">
+            <input name="priority"
+                   ng-model="data.priority"
+                   class="form-control"
+                   numeric integer="true"
+                   required />
+            <p class="invalid"
+               ng-show="this.overrideJobPriorityForm.priority.$error.numeric">
+              {{ 'BULK_OVERRIDE_INVALID_VALUE' | translate }}
+            </p>
+          </div>
+        </div>
+
+        <div class="form-group" ng-show="setJobPriority">
+          <label class="col-xs-4 control-label"
+                 for="includeJobsPriority">
+            {{ 'BULK_OVERRIDE_INCLUDE_EXISTING_JOB' | translate }}
+            <span class="glyphicon glyphicon-question-sign"
+                  uib-tooltip="{{ 'BULK_OVERRIDE_INCLUDE_EXISTING_JOB_TOOLTIP' | translate }}"
+                  tooltip-placement="right">
+            </span>
+          </label>
+
+          <div class="col-xs-8 checkbox">
+            <label>
+              <input name="includeJobsPriority"
+                     type="checkbox"
+                     ng-model="data.includeJobs" />
+            </label>
+          </div>
+        </div>
+
+      </fieldset>
+    </form>
+
+    <p>
+      {{ 'BULK_OVERRIDE_DO_YOU_REALLY' | translate }}
+    </p>
+
+  </div>
+
+  <div ng-show="status === 'FINISHED' || status === 'PERFORMING'">
+
+    <table class="cam-table">
+      <thead>
+        <tr>
+          <th class="job-id uuid">{{ 'BULK_OVERRIDE_ACTIVITY' | translate }}</th>
+          <th class="scope">{{ 'BULK_OVERRIDE_TYPE' | translate }}</th>
+          <th class="status">{{ 'BULK_OVERRIDE_STATUS' | translate }}</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr ng-repeat="jobDefinition in showJobDefinitions">
+          <td class="activity">
+            {{ jobDefinition.activityName || jobDefinition.activityId }}
+          </td>
+          <td class="type">
+            {{ jobDefinition.jobType }}
+          </td>
+          <td class="status">
+            <span ng-show="jobDefinition.status && jobDefinition.status === 'PERFORMING'">
+              <span class="glyphicon glyphicon-loading"></span>
+            </span>
+            <span ng-show="jobDefinition.status && jobDefinition.status === 'SUCCESS'">
+              <span class="glyphicon glyphicon-ok"></span>&nbsp;{{ 'BULK_OVERRIDE_SUCCESSFUL' | translate }}
+            </span>
+            <span ng-show="jobDefinition.status && jobDefinition.status === 'FAILED'">
+              <span class="glyphicon glyphicon-remove"></span>&nbsp;{{ 'BULK_OVERRIDE_FAILED' | translate }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ul uib-pagination ng-if="summarizePages.total > summarizePages.size"
+                class="pagination-sm"
+
+                page="summarizePages.current"
+                ng-model="summarizePages.current"
+
+                total-items="summarizePages.total"
+                items-per-page="summarizePages.size"
+
+                max-size="7"
+                boundary-links="true"></ul>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-link"
+          ng-click="close(status)"
+          ng-disabled="status === 'PERFORMING'"
+          ng-hide="status === 'FINISHED' || hasNoJobDefinitions">
+    {{ 'BULK_OVERRIDE_CLOSE' | translate }}
+  </button>
+
+  <button type="submit"
+          class="btn btn-primary"
+          ng-click="submit()"
+          ng-hide="setJobPriority || status === 'FINISHED'"
+          ng-disabled="!isValid() || status === 'PEFORMING'">
+    {{ 'BULK_OVERRIDE_CLEAR' | translate }}
+  </button>
+
+  <button type="submit"
+          class="btn btn-primary"
+          ng-click="submit()"
+          ng-hide="!setJobPriority || status === 'FINISHED' || hasNoJobDefinitions"
+          ng-disabled="!isValid() || status === 'PERFORMING'">
+    {{ 'BULK_OVERRIDE_OVERRIDE' | translate }}
+  </button>
+
+  <button class="btn btn-primary"
+          ng-click="close(status)"
+          ng-show="status === 'FINISHED' || hasNoJobDefinitions">
+    {{ 'BULK_OVERRIDE_OK' | translate }}
+  </button>
+</div>
+<!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/jobDefinition/app/actions/bulk-override-job-priority/bulk-override-job-priority-dialog.html -->

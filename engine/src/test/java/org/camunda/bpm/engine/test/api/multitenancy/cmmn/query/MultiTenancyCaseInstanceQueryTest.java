@@ -16,8 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy.cmmn.query;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 import java.util.Arrays;
@@ -54,7 +53,7 @@ public class MultiTenancyCaseInstanceQueryTest extends PluggableProcessEngineTes
     CaseInstanceQuery query = caseService
         .createCaseInstanceQuery();
 
-    assertThat(query.count(), is(3L));
+    assertThat(query.count()).isEqualTo(3L);
   }
 
   @Test
@@ -63,13 +62,13 @@ public class MultiTenancyCaseInstanceQueryTest extends PluggableProcessEngineTes
         .createCaseInstanceQuery()
         .tenantIdIn(TENANT_ONE);
 
-    assertThat(query.count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
 
     query = caseService
         .createCaseInstanceQuery()
         .tenantIdIn(TENANT_TWO);
 
-    assertThat(query.count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
   }
 
   @Test
@@ -78,7 +77,7 @@ public class MultiTenancyCaseInstanceQueryTest extends PluggableProcessEngineTes
         .createCaseInstanceQuery()
         .tenantIdIn(TENANT_ONE, TENANT_TWO);
 
-    assertThat(query.count(), is(2L));
+    assertThat(query.count()).isEqualTo(2L);
   }
 
   @Test
@@ -87,7 +86,7 @@ public class MultiTenancyCaseInstanceQueryTest extends PluggableProcessEngineTes
         .createCaseInstanceQuery()
         .withoutTenantId();
 
-    assertThat(query.count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
   }
 
   @Test
@@ -96,7 +95,7 @@ public class MultiTenancyCaseInstanceQueryTest extends PluggableProcessEngineTes
         .createCaseInstanceQuery()
         .tenantIdIn("nonExisting");
 
-    assertThat(query.count(), is(0L));
+    assertThat(query.count()).isEqualTo(0L);
   }
 
   @Test
@@ -119,9 +118,9 @@ public class MultiTenancyCaseInstanceQueryTest extends PluggableProcessEngineTes
         .asc()
         .list();
 
-    assertThat(caseInstances.size(), is(2));
-    assertThat(caseInstances.get(0).getTenantId(), is(TENANT_ONE));
-    assertThat(caseInstances.get(1).getTenantId(), is(TENANT_TWO));
+    assertThat(caseInstances).hasSize(2);
+    assertThat(caseInstances.get(0).getTenantId()).isEqualTo(TENANT_ONE);
+    assertThat(caseInstances.get(1).getTenantId()).isEqualTo(TENANT_TWO);
   }
 
   @Test
@@ -133,9 +132,9 @@ public class MultiTenancyCaseInstanceQueryTest extends PluggableProcessEngineTes
         .desc()
         .list();
 
-    assertThat(caseInstances.size(), is(2));
-    assertThat(caseInstances.get(0).getTenantId(), is(TENANT_TWO));
-    assertThat(caseInstances.get(1).getTenantId(), is(TENANT_ONE));
+    assertThat(caseInstances).hasSize(2);
+    assertThat(caseInstances.get(0).getTenantId()).isEqualTo(TENANT_TWO);
+    assertThat(caseInstances.get(1).getTenantId()).isEqualTo(TENANT_ONE);
   }
 
   @Test
@@ -143,7 +142,7 @@ public class MultiTenancyCaseInstanceQueryTest extends PluggableProcessEngineTes
     identityService.setAuthentication("user", null, null);
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
-    assertThat(query.count(), is(1L));
+    assertThat(query.count()).isEqualTo(1L);
   }
 
   @Test
@@ -152,10 +151,10 @@ public class MultiTenancyCaseInstanceQueryTest extends PluggableProcessEngineTes
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
-    assertThat(query.count(), is(2L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
-    assertThat(query.tenantIdIn(TENANT_ONE, TENANT_TWO).count(), is(1L));
+    assertThat(query.count()).isEqualTo(2L);
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(0L);
+    assertThat(query.tenantIdIn(TENANT_ONE, TENANT_TWO).count()).isEqualTo(1L);
   }
 
   @Test
@@ -164,10 +163,10 @@ public class MultiTenancyCaseInstanceQueryTest extends PluggableProcessEngineTes
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
 
-    assertThat(query.count(), is(3L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
-    assertThat(query.withoutTenantId().count(), is(1L));
+    assertThat(query.count()).isEqualTo(3L);
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(1L);
+    assertThat(query.withoutTenantId().count()).isEqualTo(1L);
   }
 
   @Test
@@ -176,7 +175,7 @@ public class MultiTenancyCaseInstanceQueryTest extends PluggableProcessEngineTes
     identityService.setAuthentication("user", null, null);
 
     CaseInstanceQuery query = caseService.createCaseInstanceQuery();
-    assertThat(query.count(), is(3L));
+    assertThat(query.count()).isEqualTo(3L);
   }
 
   protected CaseInstance createCaseInstance(String tenantId) {

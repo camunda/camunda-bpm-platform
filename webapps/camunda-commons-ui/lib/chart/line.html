@@ -1,0 +1,143 @@
+<html>
+<head>
+  <title>Line Chart dev page</title>
+  <script>R=function(e,n,v1){function t(e,o,u,a){if(e.g)return o(e.e,e);var c=e.g=e.l,f=new XMLHttpRequest;f.onload=function(i,l){function s(){l--||o(n,e)}200==f.status||e.t?(i=[],(e.t=e.t||f.response).replace(/(?:^|[^\w\$_.])require\s*\(\s*["']([^"']*)["']\s*\)/g,function(e,n){i.push(n)}),l=i.length,i.map(function(o){t(r(e.l,o),s,"."!=o[0]?c+"/../":n,o)}),s()):u?t(e.n=r(u+="../",a),o,u,a):(e.e=f,o(f,e))},e.t?f.onload():(f.open("GET",c,!0),f.send())}function r(e,n,t){if(e.e)throw e.e;return n?(f.href=e,i.href="."!=n[0]?"./node_modules/"+n:n,t=i.href+".js",f.href="",u[t]=u[t]||{l:t}):e.n?r(e.n):(e[c]||(e.f||a("(function(require,"+c+",module){"+e.t+"\n})//# sourceURL="+e.l))(function(n){return r(r(e.l,n))},e[c]={},e),e[c])}function o(e,n){t(e.call?{l:"",t:""+e,f:e}:r("",e),function(t,o){try{e=r(o)}catch(u){t=u}n&&n(t,e)})}var u={},a=eval,c="createElement",f=e[c]("base"),i=e[c]("a");return e.head.appendChild(f),c=e.querySelector("script[data-main]"),c&&o(c.dataset.main),c="exports",o}(document);</script>
+</head>
+<body>
+  <section>
+    <header>
+      <h1>Line Chart</h1>
+    </header>
+    <div class="graph" style="width:400px;height:300px;border:1px solid #efefef"></div>
+
+    <div class="controls">
+      <select id="timespan">
+        <option value="day">day</option>
+        <option value="week" selected>week</option>
+        <option value="month">month</option>
+      </select>
+    </div>
+
+    <div class="info">
+      <div>
+        <strong>Selection</strong>
+        <div id="selection-start"><strong>Begin:</strong> <span></span></div>
+        <div id="selection-end"><strong>End:</strong> <span></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <header>
+      <h1>Info</h1>
+    </header>
+
+    <div class="help">
+      <p>This file is aimed for demo and development.</p>
+      <p>To develop, serve the project root (of camunda-commons-ui) statically with some tool like <a href="https://www.npmjs.com/package/http-server">http-server</a> and <a href="https://www.npmjs.com/package/livereload">livereload</a>.</p>
+    </div>
+
+    <pre id="output"></pre>
+  </section>
+
+  <script type="text/javascript" id="script">
+(function() {
+  'use strict';
+  var graph;
+  var graphEl = document.querySelector('.graph');
+  var timespanSelectEl = document.getElementById('timespan');
+  var startValueEl = document.querySelector('#selection-start span');
+  var endValueEl = document.querySelector('#selection-end span');
+  var moment, abbreviateNumber;
+
+  function init(err, LineChart) {
+    if (err) throw err;
+    // moment = LineChart.moment;
+
+    graph = new LineChart({
+      moment: moment,
+      abbreviateNumber: abbreviateNumber,
+
+      lineColors: ['green', 'blue'],
+      width: graphEl.clientWidth,
+      height: graphEl.clientHeight,
+      onselection: function(info) {
+        if (!info.start || !info.end) {
+          startValueEl.textContent = '';
+          endValueEl.textContent = '';
+          return;
+        }
+        startValueEl.textContent = info.start.toString();
+        endValueEl.textContent = info.end.toString();
+      }
+    });
+
+    graphEl.appendChild(graph.canvas);
+
+    loadData();
+  }
+
+  function getInterval(ts) {
+    if (ts === 'day') return 900;
+    if (ts === 'week') return 2700;
+    return 12600;
+  }
+
+  function fetchJson(timespan, what) {
+    return fetch('./../widgets/graph-line/test/data/' + timespan + '-instance-' + what + '.json')
+      .then(function (res) {
+        return res.json();
+      })
+      .then(function(json) {
+        // shift the timestamps
+        var diff = moment().valueOf() - moment(json[0].timestamp).valueOf();
+        return json.map(function(item) {
+          item.timestamp = moment(item.timestamp).add(diff).format('YYYY-MM-DDTHH:mm:00');
+          return item;
+        });
+      });
+  }
+
+  function loadData() {
+    var timespan = timespanSelectEl.value;
+
+    fetchJson(timespan, 'start').then(function (jsonStart) {
+      fetchJson(timespan, 'end').then(function (jsonEnd) {
+        var data = [
+          jsonStart.reverse(),
+          jsonEnd.reverse()
+        ];
+
+        var interval = getInterval(timespan);
+
+        graph.setData(data, timespan, interval);
+      });
+    });
+  }
+
+  timespanSelectEl.addEventListener('change', loadData);
+
+  // The following bits are only aimed to load the script and its dependencies
+  // Due to the simplistic mechanism of require1k, some 404 errors might appear in the console
+  window.R('./../filter/abbreviateNumber', function(err, filter) {
+    abbreviateNumber = filter();
+
+    window.R('./../../node_modules/moment/moment', function(err, mom) {
+      moment = mom;
+
+      window.R('./line', init);
+    });
+  });
+})();
+  </script>
+
+  <script type="text/javascript">
+(function() {
+  'use strict';
+  var script = document.getElementById('script');
+  var output = document.getElementById('output');
+  output.textContent = script.textContent;
+})();
+  </script>
+</body>
+</html>

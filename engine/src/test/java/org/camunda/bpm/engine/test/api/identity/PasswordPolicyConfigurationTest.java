@@ -30,7 +30,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 public class PasswordPolicyConfigurationTest {
@@ -40,9 +39,6 @@ public class PasswordPolicyConfigurationTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
@@ -72,7 +68,7 @@ public class PasswordPolicyConfigurationTest {
   @Test
   public void testAutoConfigurationDefaultPasswordPolicy() {
     // given
-    
+
     processEngineConfiguration.setEnablePasswordPolicy(true);
 
     // when

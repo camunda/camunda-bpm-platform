@@ -1,0 +1,91 @@
+<div class="navbar-header">
+  <button type="button"
+          class="navbar-toggle"
+          ng-class="{open: !!navbarOpen}"
+          ng-click="navbarOpen = !navbarOpen">
+    <em class="sr-only">{{ toggleNavigation }}</em>
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  <a class="navbar-brand app-banner"
+     ng-if="authentication.name"
+     href="#/"
+     title="{{ brandName }} {{ appName }}">
+     <span ng-bind-html="logo" class="brand-logo"></span>
+     <span class="brand-name" ng-cloak>{{ brandName }}</span>
+  </a>
+
+  <div class="small-screen-warning">
+    <span class="glyphicon glyphicon-exclamation-sign"
+          uib-tooltip="{{ smallScreenWarning | translate }}"
+          tooltip-placement="bottom"></span>
+  </div>
+</div>
+
+<nav class="cam-nav app-menu">
+  <ul ng-class="{collapse: !navbarOpen}">
+
+    <li engine-select></li>
+
+    <li class="account dropdown"
+        ng-if="authentication.name"
+        ng-cloak
+        uib-dropdown>
+      <a href
+         class="dropdown-toggle"
+         uib-dropdown-toggle>
+        <span class="glyphicon glyphicon-user "></span>
+        {{ (userName || authentication.name) }}
+      </a>
+
+      <ul class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
+        <li class="profile"
+            ng-if="currentApp !== 'welcome'">
+          <a ng-href="{{ '../../welcome/:engine/' | uri }}">
+            {{ myProfile | translate }}
+          </a>
+        </li>
+
+        <li class="divider"
+            ng-if="currentApp !== 'welcome'"></li>
+
+        <li class="logout">
+          <a href
+             ng-click="logout()">
+            {{ signOut | translate }}
+          </a>
+        </li>
+      </ul>
+    </li>
+
+    <li class="divider-vertical"
+        ng-if="authentication.name"
+        ng-cloak></li>
+
+    <li class="app-switch dropdown"
+        ng-if="showAppDropDown"
+        uib-dropdown>
+      <a href
+         class="dropdown-toggle"
+         uib-dropdown-toggle>
+        <span class="glyphicon glyphicon-home"></span>
+        <span class="caret"></span>
+      </a>
+
+      <ul class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
+        <li ng-repeat="(appName, app) in apps"
+            ng-class="appName">
+          <a ng-href="{{ ('../../' + appName + '/:engine/' | uri) + getTargetRoute() }}">
+            {{ app.label }}
+          </a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+<div ng-transclude
+     class="sections-menu"
+     ng-class="{collapse: !navbarOpen}"></div>

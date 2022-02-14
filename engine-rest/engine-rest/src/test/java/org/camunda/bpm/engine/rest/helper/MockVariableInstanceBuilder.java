@@ -43,6 +43,7 @@ public class MockVariableInstanceBuilder {
   protected String caseInstanceId;
   protected String caseExecutionId;
   protected String taskId;
+  protected String batchId;
   protected String activityInstanceId;
   protected String tenantId;
   protected String errorMessage;
@@ -89,6 +90,11 @@ public class MockVariableInstanceBuilder {
 
   public MockVariableInstanceBuilder taskId(String taskId) {
     this.taskId = taskId;
+    return this;
+  }
+
+  public MockVariableInstanceBuilder batchId(String batchId) {
+    this.batchId = batchId;
     return this;
   }
 
@@ -145,6 +151,10 @@ public class MockVariableInstanceBuilder {
 
   public String getTaskId() {
     return taskId;
+  }
+
+  public String getBatchId() {
+    return batchId;
   }
 
   public String getActivityInstanceId() {
@@ -205,6 +215,7 @@ public class MockVariableInstanceBuilder {
     when(mockVariable.getCaseInstanceId()).thenReturn(caseInstanceId);
     when(mockVariable.getCaseExecutionId()).thenReturn(caseExecutionId);
     when(mockVariable.getTaskId()).thenReturn(taskId);
+    when(mockVariable.getBatchId()).thenReturn(batchId);
     when(mockVariable.getActivityInstanceId()).thenReturn(activityInstanceId);
     when(mockVariable.getTenantId()).thenReturn(tenantId);
     when(mockVariable.getErrorMessage()).thenReturn(errorMessage);

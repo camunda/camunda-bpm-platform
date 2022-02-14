@@ -16,10 +16,7 @@
  */
 package org.camunda.bpm.engine.test.standalone.variables;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -56,7 +53,7 @@ public class FileValueSerializerTest {
 
   @Test
   public void testTypeIsFileValueType() {
-    assertThat(serializer.getType(), is(instanceOf(FileValueTypeImpl.class)));
+    assertThat(serializer.getType()).isInstanceOf(FileValueTypeImpl.class);
   }
 
   @Test
@@ -67,9 +64,9 @@ public class FileValueSerializerTest {
 
     serializer.writeValue(fileValue, valueFields);
 
-    assertThat(valueFields.getByteArrayValue(), is(nullValue()));
-    assertThat(valueFields.getTextValue(), is(filename));
-    assertThat(valueFields.getTextValue2(), is(nullValue()));
+    assertThat(valueFields.getByteArrayValue()).isNull();
+    assertThat(valueFields.getTextValue()).isEqualTo(filename);
+    assertThat(valueFields.getTextValue2()).isNull();
   }
 
   @Test
@@ -80,9 +77,9 @@ public class FileValueSerializerTest {
 
     serializer.writeValue(fileValue, valueFields);
 
-    assertThat(valueFields.getByteArrayValue(), is(nullValue()));
-    assertThat(valueFields.getTextValue(), is(filename));
-    assertThat(valueFields.getTextValue2(), is(nullValue()));
+    assertThat(valueFields.getByteArrayValue()).isNull();
+    assertThat(valueFields.getTextValue()).isEqualTo(filename);
+    assertThat(valueFields.getTextValue2()).isNull();
   }
 
   @Test
@@ -94,9 +91,9 @@ public class FileValueSerializerTest {
 
     serializer.writeValue(fileValue, valueFields);
 
-    assertThat(valueFields.getByteArrayValue(), is(nullValue()));
-    assertThat(valueFields.getTextValue(), is(filename));
-    assertThat(valueFields.getTextValue2(), is(mimeType + SEPARATOR));
+    assertThat(valueFields.getByteArrayValue()).isNull();
+    assertThat(valueFields.getTextValue()).isEqualTo(filename);
+    assertThat(valueFields.getTextValue2()).isEqualTo(mimeType + SEPARATOR);
   }
 
   @Test
@@ -109,9 +106,9 @@ public class FileValueSerializerTest {
 
     serializer.writeValue(fileValue, valueFields);
 
-    assertThat(new String(valueFields.getByteArrayValue(), "UTF-8"), is("text"));
-    assertThat(valueFields.getTextValue(), is(filename));
-    assertThat(valueFields.getTextValue2(), is(mimeType + SEPARATOR));
+    assertThat(new String(valueFields.getByteArrayValue(), "UTF-8")).isEqualTo("text");
+    assertThat(valueFields.getTextValue()).isEqualTo(filename);
+    assertThat(valueFields.getTextValue2()).isEqualTo(mimeType + SEPARATOR);
   }
 
   @Test
@@ -125,9 +122,9 @@ public class FileValueSerializerTest {
 
     serializer.writeValue(fileValue, valueFields);
 
-    assertThat(new String(valueFields.getByteArrayValue(), "UTF-8"), is("text"));
-    assertThat(valueFields.getTextValue(), is(filename));
-    assertThat(valueFields.getTextValue2(), is(mimeType + SEPARATOR + encoding.name()));
+    assertThat(new String(valueFields.getByteArrayValue(), "UTF-8")).isEqualTo("text");
+    assertThat(valueFields.getTextValue()).isEqualTo(filename);
+    assertThat(valueFields.getTextValue2()).isEqualTo(mimeType + SEPARATOR + encoding.name());
   }
 
   @Test
@@ -138,9 +135,9 @@ public class FileValueSerializerTest {
 
     serializer.writeValue(fileValue, valueFields);
 
-    assertThat(new String(valueFields.getByteArrayValue(), "UTF-8"), is("text"));
-    assertThat(valueFields.getTextValue(), is("simpleFile.txt"));
-    assertThat(valueFields.getTextValue2(), is("text/plain" + SEPARATOR));
+    assertThat(new String(valueFields.getByteArrayValue(), "UTF-8")).isEqualTo("text");
+    assertThat(valueFields.getTextValue()).isEqualTo("simpleFile.txt");
+    assertThat(valueFields.getTextValue2()).isEqualTo("text/plain" + SEPARATOR);
   }
 
   @Test(expected = UnsupportedOperationException.class)
@@ -164,8 +161,8 @@ public class FileValueSerializerTest {
 
     FileValue fileValue = serializer.readValue(valueFields, true, false);
 
-    assertThat(fileValue.getFilename(), is(filename));
-    assertThat(fileValue.getMimeType(), is(mimeType));
+    assertThat(fileValue.getFilename()).isEqualTo(filename);
+    assertThat(fileValue.getMimeType()).isEqualTo(mimeType);
     checkStreamFromValue(fileValue, "text");
   }
 
@@ -185,9 +182,9 @@ public class FileValueSerializerTest {
 
     FileValue fileValue = serializer.readValue(valueFields, true, false);
 
-    assertThat(fileValue.getFilename(), is(filename));
-    assertThat(fileValue.getEncoding(), is("UTF-8"));
-    assertThat(fileValue.getEncodingAsCharset(), is(Charset.forName("UTF-8")));
+    assertThat(fileValue.getFilename()).isEqualTo(filename);
+    assertThat(fileValue.getEncoding()).isEqualTo("UTF-8");
+    assertThat(fileValue.getEncodingAsCharset()).isEqualTo(Charset.forName("UTF-8"));
     checkStreamFromValue(fileValue, "text");
   }
 
@@ -208,10 +205,10 @@ public class FileValueSerializerTest {
 
     FileValue fileValue = serializer.readValue(valueFields, true, false);
 
-    assertThat(fileValue.getFilename(), is(filename));
-    assertThat(fileValue.getMimeType(), is(mimeType));
-    assertThat(fileValue.getEncoding(), is("UTF-16"));
-    assertThat(fileValue.getEncodingAsCharset(), is(Charset.forName("UTF-16")));
+    assertThat(fileValue.getFilename()).isEqualTo(filename);
+    assertThat(fileValue.getMimeType()).isEqualTo(mimeType);
+    assertThat(fileValue.getEncoding()).isEqualTo("UTF-16");
+    assertThat(fileValue.getEncodingAsCharset()).isEqualTo(Charset.forName("UTF-16"));
     checkStreamFromValue(fileValue, "text");
   }
 
@@ -229,8 +226,8 @@ public class FileValueSerializerTest {
 
     FileValue fileValue = serializer.readValue(valueFields, true, false);
 
-    assertThat(fileValue.getFilename(), is(filename));
-    assertThat(fileValue.getMimeType(), is(nullValue()));
+    assertThat(fileValue.getFilename()).isEqualTo(filename);
+    assertThat(fileValue.getMimeType()).isNull();
     checkStreamFromValue(fileValue, "text");
   }
 
@@ -242,9 +239,9 @@ public class FileValueSerializerTest {
 
     FileValue fileValue = serializer.readValue(valueFields, true, false);
 
-    assertThat(fileValue.getFilename(), is(filename));
-    assertThat(fileValue.getMimeType(), is(nullValue()));
-    assertThat(fileValue.getValue(), is(nullValue()));
+    assertThat(fileValue.getFilename()).isEqualTo(filename);
+    assertThat(fileValue.getMimeType()).isNull();
+    assertThat(fileValue.getValue()).isNull();
   }
 
   @Test
@@ -255,9 +252,9 @@ public class FileValueSerializerTest {
 
     FileValue fileValue = serializer.readValue(valueFields, true, false);
 
-    assertThat(fileValue.getFilename(), is(""));
-    assertThat(fileValue.getMimeType(), is(nullValue()));
-    assertThat(fileValue.getValue(), is(nullValue()));
+    assertThat(fileValue.getFilename()).isEqualTo("");
+    assertThat(fileValue.getMimeType()).isNull();
+    assertThat(fileValue.getValue()).isNull();
   }
 
   @Test
@@ -268,14 +265,14 @@ public class FileValueSerializerTest {
 
     FileValue fileValue = serializer.readValue(valueFields, true, false);
 
-    assertThat(fileValue.getFilename(), is(""));
-    assertThat(fileValue.getMimeType(), is(nullValue()));
-    assertThat(fileValue.getValue(), is(nullValue()));
+    assertThat(fileValue.getFilename()).isEqualTo("");
+    assertThat(fileValue.getMimeType()).isNull();
+    assertThat(fileValue.getValue()).isNull();
   }
 
   @Test
   public void testNameIsFile() {
-    assertThat(serializer.getName(), is("file"));
+    assertThat(serializer.getName()).isEqualTo("file");
   }
 
   @Test
@@ -287,9 +284,9 @@ public class FileValueSerializerTest {
 
     serializer.writeValue(fileValue, valueFields);
 
-    assertThat(valueFields.getByteArrayValue(), is(nullValue()));
-    assertThat(valueFields.getTextValue(), is(filename));
-    assertThat(valueFields.getTextValue2(), is(SEPARATOR + encoding));
+    assertThat(valueFields.getByteArrayValue()).isNull();
+    assertThat(valueFields.getTextValue()).isEqualTo(filename);
+    assertThat(valueFields.getTextValue2()).isEqualTo(SEPARATOR + encoding);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -300,7 +297,7 @@ public class FileValueSerializerTest {
   private void checkStreamFromValue(TypedValue value, String expected) {
     InputStream stream = (InputStream) value.getValue();
     try (Scanner scanner = new Scanner(stream)) {
-      assertThat(scanner.nextLine(), is(expected));
+      assertThat(scanner.nextLine()).isEqualTo(expected);
     }
   }
 

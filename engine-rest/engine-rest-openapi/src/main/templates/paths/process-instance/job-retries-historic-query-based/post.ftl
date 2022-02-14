@@ -1,7 +1,9 @@
+<#macro endpoint_macro docsUrl="">
 {
   <@lib.endpointInfo
       id = "setRetriesByProcessHistoricQueryBased"
       tag = "Process Instance"
+      summary = "Set Job Retries Async Historic Query Based (POST)"
       desc = "Create a batch to set retries of jobs asynchronously based on a historic process instance query." />
 
   <@lib.requestBody
@@ -55,3 +57,4 @@
 
   }
 }
+</#macro>

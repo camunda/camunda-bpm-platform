@@ -30,7 +30,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 public class OptimizeAuthorizationTest {
@@ -39,9 +38,6 @@ public class OptimizeAuthorizationTest {
 
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   public AuthorizationTestBaseRule authRule = new AuthorizationTestBaseRule(engineRule);
-
-  @Rule
-  public ExpectedException exceptionRule = ExpectedException.none();
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(authRule);

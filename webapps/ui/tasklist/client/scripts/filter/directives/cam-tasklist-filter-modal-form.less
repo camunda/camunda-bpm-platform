@@ -1,0 +1,47 @@
+[cam-tasklist-filter-modal-form] {
+  .panel-title {
+    .glyphicon {
+      font-size: @font-size-base;
+      color: @brand-danger;
+    }
+  }
+
+  .undefined-variable,
+  .global-access {
+    margin: 0 0 (@grid-gutter-width * 0.5) (@grid-gutter-width * 0.5);
+  }
+
+  .user-read-permissions .btn-link {
+    max-width: 100%;
+    overflow: hidden;
+
+    > span {
+      display: inline-block;
+      max-width: ~"calc(100% - 1.3em)";
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      &.glyphicon {
+        top: -2px;
+      }
+    }
+  }
+
+  .match-type {
+    button {
+      width: 36px;
+      margin-right: 3px;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+
+    >div {
+      text-align: left;
+    }
+
+    [disabled="disabled"] {
+      opacity: 0.65;
+    }
+  }
+}

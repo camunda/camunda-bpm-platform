@@ -1,8 +1,10 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
       id = "redeploy"
       tag = "Deployment"
+      summary = "Redeploy"
       desc = "Re-deploys an existing deployment.
 
               The deployment resources to re-deploy can be restricted by using the properties `resourceIds` or
@@ -91,3 +93,5 @@
 
   }
 }
+
+</#macro>

@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.integrationtest.functional.cdi;
 
+import org.camunda.bpm.engine.cdi.CdiStandaloneProcessEngineConfiguration;
 import org.camunda.bpm.engine.cdi.impl.util.ProgrammaticBeanLookup;
 import org.camunda.bpm.integrationtest.functional.cdi.beans.ExampleBean;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
@@ -89,6 +90,14 @@ public class CdiBeanResolutionTest extends AbstractFoxPlatformIntegrationTest {
     waitForJobExecutorToProcessAllJobs();
 
     Assert.assertEquals(0,runtimeService.createProcessInstanceQuery().processDefinitionKey("testResolveBeanFromJobExecutor").count());
+
+  }
+
+  @Test
+  @OperateOnDeployment("clientDeployment")
+  public void testResolveCdiStandaloneProcessEngineConfigBean() {
+
+    Assert.assertNotNull(ProgrammaticBeanLookup.lookup(CdiStandaloneProcessEngineConfiguration.class));
 
   }
 

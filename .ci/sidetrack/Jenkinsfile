@@ -1,0 +1,75 @@
+// https://github.com/camunda/jenkins-global-shared-library
+// https://github.com/camunda/cambpm-jenkins-shared-library
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
+
+pipeline {
+  agent {
+    node {
+      label 'jenkins-job-runner'
+    }
+  }
+  environment {
+    LOGGER_LOG_LEVEL = 'DEBUG'
+  }
+  parameters {
+    booleanParam name: 'TRIGGERED_BY_UPSTREAM', defaultValue: false, description: 'Is the current build triggered in the scope of an upstream pipeline (pull request or default branch)'
+    string name: 'UPSTREAM_PROJECT_NAME', defaultValue: '7.XX/cambpm-ce/cambpm-main/master', description: 'Not used on standalone runs. This property is passed by the upstream build that triggers this one.'
+    string name: 'UPSTREAM_BUILD_NUMBER', defaultValue: '', description: 'Not used on standalone runs. This property is passed by the upstream build that triggers this one.'
+    string name: 'PR_LABELS', defaultValue: '', description: 'The labels assigned to the CE pull request'
+  }
+  options {
+    buildDiscarder(logRotator(numToKeepStr: '5'))
+    throttleJobProperty(
+      throttleEnabled: true,
+      throttleOption: 'project',
+      maxConcurrentTotal: 2
+    )
+  }
+  triggers {
+    pollSCM('H H(22-23) * * *') // Sidetrack daily runs before CE daily
+  }
+  stages {
+    stage('Prepare') {
+      when {
+        expression {
+          cambpmWithLabels('upstream')
+        }
+      }
+      steps {
+        cambpmConditionalRetry([
+          agentLabel: 'centos-stable',
+          suppressErrors: false,
+          runSteps: {
+            cambpmCopyArtifacts(params.UPSTREAM_PROJECT_NAME, params.UPSTREAM_BUILD_NUMBER)
+            cambpmStash("platform-stash-runtime",
+                        ".m2/org/camunda/**/*-SNAPSHOT/**",
+                        "**/qa/**,**/*qa*/**,**/*.zip,**/*.tar.gz")
+            cambpmStash("platform-stash-qa",
+                        ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**",
+                        "**/*.zip,**/*.tar.gz")
+          }
+        ])
+      }
+    }
+    stage('UNIT DB tests') {
+      steps {
+        script {
+          // see the .ci/config/matrices.yaml for the stage generation values
+          // see .ci/config/stage-types.yaml for the stage configurations
+          parallel(cambpmGetMatrixStages('sidetrack-stages', [], { stageInfo ->
+            return cambpmWithLabels(cambpmGetLabels(stageInfo.stageType), cambpmGetDbType(stageInfo.nodeType))
+          }))
+        }
+      }
+    }
+  }
+  post {
+    changed {
+      script {
+        if (!agentDisconnected()){
+          cambpmSendEmailNotification()
+        }
+      }
+    }
+  }
+}

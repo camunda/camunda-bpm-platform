@@ -16,13 +16,12 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
@@ -105,7 +104,7 @@ public class ModificationExecutionSyncTest {
      runtimeService.createModification("processDefinitionId").startAfterActivity("user1") .processInstanceIds((List<String>) null).execute();
       fail("Should not succeed");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("Process instance ids is empty"));
+      assertThat(e.getMessage()).contains("Process instance ids is empty");
     }
   }
 
@@ -116,7 +115,7 @@ public class ModificationExecutionSyncTest {
       runtimeService.createModification("processDefinitionId").startAfterActivity("user1").processInstanceIds(Arrays.asList("foo", null, "bar")).execute();
       fail("Should not succeed");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("Process instance ids contains null value"));
+      assertThat(e.getMessage()).contains("Process instance ids contains null value");
     }
   }
 
@@ -127,7 +126,7 @@ public class ModificationExecutionSyncTest {
       runtimeService.createModification("processDefinitionId").startAfterActivity("user1").processInstanceIds(Collections.<String> emptyList()).execute();
       fail("Should not succeed");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("Process instance ids is empty"));
+      assertThat(e.getMessage()).contains("Process instance ids is empty");
     }
   }
 
@@ -137,7 +136,7 @@ public class ModificationExecutionSyncTest {
       runtimeService.createModification(null).cancelAllForActivity("activityId").processInstanceIds(Arrays.asList("20", "1--0")).execute();
       fail("Should not succed");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("processDefinitionId is null"));
+      assertThat(e.getMessage()).contains("processDefinitionId is null");
     }
   }
 
@@ -150,7 +149,7 @@ public class ModificationExecutionSyncTest {
       .processInstanceIds((String[]) null).execute();
       fail("Should not be able to modify");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), CoreMatchers.containsString("Process instance ids is empty"));
+      assertThat(e.getMessage()).contains("Process instance ids is empty");
     }
   }
 
@@ -161,7 +160,7 @@ public class ModificationExecutionSyncTest {
       runtimeService.createModification("processDefinitionId").cancelAllForActivity("user1").processInstanceIds("foo", null, "bar").execute();
       fail("Should not be able to modify");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("Process instance ids contains null value"));
+      assertThat(e.getMessage()).contains("Process instance ids contains null value");
     }
   }
 
@@ -171,10 +170,10 @@ public class ModificationExecutionSyncTest {
       runtimeService.createModification("processDefinitionId").startAfterActivity("user1").processInstanceQuery(null).execute();
       fail("Should not succeed");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("Process instance ids is empty"));
+      assertThat(e.getMessage()).contains("Process instance ids is empty");
     }
   }
-  
+
   @Test
   public void createModificationWithNotMatchingProcessDefinitionId() {
     DeploymentWithDefinitions deployment = testRule.deploy(instance);
@@ -185,10 +184,10 @@ public class ModificationExecutionSyncTest {
       runtimeService.createModification("foo").cancelAllForActivity("activityId").processInstanceIds(processInstanceIds).execute();
       fail("Should not succed");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("processDefinition is null"));
+      assertThat(e.getMessage()).contains("processDefinition is null");
     }
   }
-  
+
   @Test
   public void testStartBefore() {
     DeploymentWithDefinitions deployment = testRule.deploy(instance);

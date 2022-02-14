@@ -35,17 +35,21 @@ import static org.junit.Assert.assertNotNull;
 public abstract class AbstractScriptEngineSupportTest extends AbstractFoxPlatformIntegrationTest {
 
   public static final String PROCESS_ID = "testProcess";
-  public static final String EXAMPLE_SCRIPT = "execution.setVariable('foo', S('<bar/>').name())";
+  public static final String EXAMPLE_SCRIPT = "execution.setVariable('foo', 'bar')";
+  public static final String EXAMPLE_SPIN_SCRIPT = "execution.setVariable('bar', S('<baz/>').name())";
 
   public String processInstanceId;
 
-  protected static StringAsset createScriptTaskProcess(String scriptFormat, String scriptText) {
+  protected static StringAsset createScriptTaskProcess(String scriptFormat, String scriptTextPlain, String scriptTextSpin) {
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(PROCESS_ID)
       .startEvent()
       .scriptTask()
         .scriptFormat(scriptFormat)
-        .scriptText(scriptText)
-        .userTask()
+        .scriptText(scriptTextPlain)
+      .scriptTask()
+        .scriptFormat(scriptFormat)
+        .scriptText(scriptTextSpin)
+      .userTask()
       .endEvent()
       .done();
     return new StringAsset(Bpmn.convertToString(modelInstance));
@@ -59,8 +63,11 @@ public abstract class AbstractScriptEngineSupportTest extends AbstractFoxPlatfor
   @After
   public void variableFooShouldBeBar() {
     Object foo = runtimeService.getVariable(processInstanceId, "foo");
+    Object bar = runtimeService.getVariable(processInstanceId, "bar");
     assertNotNull(foo);
+    assertNotNull(bar);
     assertEquals("bar", foo);
+    assertEquals("baz", bar);
   }
 
 }

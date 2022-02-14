@@ -1,0 +1,204 @@
+<!-- # CE - camunda-cockpit-ui/client/scripts/pages/process-definition.html -->
+<div class="ctn-fixed-view">
+  <div class="ctn-content-container"
+       ctn-collapsable-parent="sidebar"
+       ctn-min-width=".nav-tabs li">
+
+    <!-- tool bar -->
+    <div class="ctn-toolbar">
+
+      <!-- Toolbar actions are provided by plugins -->
+      <span ng-repeat="actionProvider in processDefinitionActions">
+        <view provider="actionProvider"
+              vars="processDefinitionVars" />
+      </span>
+    </div>
+
+    <!-- sidebar -->
+    <div class="ctn-column ctn-sidebar ctn-scroll"
+         cam-hover-area
+         ctn-collapsable="left">
+
+      <dl class="process-information">
+        <dt>{{ 'PROCESS_DEFINITION_DEFINITION_VERSION' | translate }}</dt>
+        <dd class="definition-version">
+          <span ng-if="!instanceStatistics.$loaded"
+                class="glyphicon glyphicon-refresh animate-spin"></span>
+
+          <div class="dropdown"
+               ng-if="instanceStatistics.$loaded && allDefinitions.length > 1"
+               uib-dropdown>
+            <span>
+              <span change-version="processDefinition"
+                    type="process"></span>
+
+              <a href
+                 uib-dropdown-toggle
+                 class="dropdown-toggle btn btn-xs btn-default">
+                <span class="caret"></span>
+              </a>
+            </span>
+
+            <ul uib-dropdown-menu class="dropdown-menu">
+              <li ng-repeat="definition in allDefinitions">
+                <a ng-href="#/process-definition/{{ definition.id }}">
+                  {{ definition.version }}
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <span ng-if="instanceStatistics.$loaded && allDefinitions.length < 2">
+            {{ processDefinition.version }}
+          </span>
+        </dd>
+
+        <dt>{{ 'PROCESS_DEFINITION_VERSION_TAG' | translate }}</dt>
+        <dd class="version-tag"
+            ng-if="processDefinition.versionTag">{{ processDefinition.versionTag }}</dd>
+        <dd class="version-tag"
+            ng-if="!processDefinition.versionTag"><span class="null-value">{{ 'PROCESS_DEFINITION_NULL' | translate }}</span></dd>
+
+        <dt cam-widget-clipboard="processDefinition.id"
+            cam-hoverable-title="definition-id">{{ 'PROCESS_DEFINITION_DEFINITION_ID' | translate }}</dt>
+        <dd class="definition-id" cam-hover-trigger="definition-id">{{ processDefinition.id }}</dd>
+
+        <dt cam-widget-clipboard="processDefinition.key"
+            cam-hoverable-title="definition-key">{{ 'PROCESS_DEFINITION_DEFINITION_KEY' | translate }}</dt>
+        <dd class="definition-key" cam-hover-trigger="definition-key">{{ processDefinition.key }}</dd>
+
+        <dt>{{ 'PROCESS_DEFINITION_DEFINITION_NAME' | translate }}</dt>
+        <dd class="definition-name"
+            ng-if="processDefinition.name">{{ processDefinition.name }}</dd>
+        <dd class="definition-name"
+            ng-if="!processDefinition.name"><span class="null-value">{{ 'PROCESS_DEFINITION_NULL' | translate }}</span></dd>
+
+        <dt cam-widget-clipboard="processDefinition.historyTimeToLive"
+            cam-hoverable-title="history-time-to-live">
+            {{ 'PROCESS_DEFINITION_HISTORY_TIME_TO_LIVE' | translate }}
+        </dt>
+        <dd class="history-time-to-live" cam-hover-trigger="history-time-to-live">
+          <span time-to-live="processDefinition" resource="process-definition"></span>
+        </dd>
+
+        <dt ng-if="processDefinition.tenantId"
+            cam-widget-clipboard="processDefinition.tenantId"
+            cam-hoverable-title="tenant-id">{{ 'PROCESS_DEFINITION_TENANT_ID' | translate }}</dt>
+        <dd class="tenant-id"
+            ng-if="processDefinition.tenantId" cam-hover-trigger="tenant-id">
+            {{ processDefinition.tenantId }}
+        </dd>
+        <dt ng-if="!processDefinition.tenantId">{{ 'PROCESS_DEFINITION_TENANT_ID' | translate }}</dt>
+        <dd class="tenant-id"
+            ng-if="!processDefinition.tenantId"><span class="null-value">{{ 'PROCESS_DEFINITION_NULL' | translate }}</span></dd>
+
+        <dt cam-widget-clipboard="processDefinition.deploymentId"
+            cam-hoverable-title="deployment-id">{{ 'PROCESS_DEFINITION_DEPLOYMENT_ID' | translate }}</dt>
+        <dd class="deployment-id" cam-hover-trigger="deployment-id">
+          <a ng-href="{{ getDeploymentUrl() }}">{{ processDefinition.deploymentId }}</a>
+        </dd>
+
+        <dt>{{ 'PROCESS_DEFINITION_INSTANCES_RUNNING' | translate }}</dt>
+        <dd class="running-instances">
+          <span ng-if="!instanceStatistics.$loaded"
+                class="glyphicon glyphicon-refresh animate-spin"></span>
+          <ul ng-if="instanceStatistics.$loaded">
+            <li>
+              {{ 'PROCESS_DEFINITION_CURRENT_VERSION' | translate }}
+              <strong class="current-version">{{ instanceStatistics.current.count }}</strong>
+              <a ng-href="{{ getMigrationUrl() }}"
+                 class="instance-upgrade-link"
+                 ng-if="hasMigrationPlugin && !isLatestVersion() && instanceStatistics.current.count > 0">
+                <span class="glyphicon glyphicon-arrow-up"
+                      uib-tooltip="{{ 'PROCESS_DEFINITION_TOOLTIP_MIGRATE_PROCESS' | translate }}"></span>
+              </a>
+            </li>
+            <li>
+              {{ 'PROCESS_DEFINITION_ALL_VERSIONS' | translate }}
+              <strong class="all-versions">{{ instanceStatistics.all.count }}</strong>
+              <a ng-href="{{ getMigrationUrl() }}"
+                 class="instance-upgrade-link"
+                 ng-if="hasMigrationPlugin && isLatestVersion() && instanceStatistics.all.count !== instanceStatistics.current.count">
+                <span class="glyphicon glyphicon-arrow-up"
+                      uib-tooltip="{{ 'PROCESS_DEFINITION_TOOLTIP_MIGRATE_PROCESS' | translate }}"></span>
+              </a>
+            </li>
+          </ul>
+        </dd>
+
+        <dt ng-if="hasMigrationPlugin || hasReportPlugin">{{ 'PROCESS_DEFINITION_RELATED' | translate }}</dt>
+        <dd ng-if="hasMigrationPlugin || hasReportPlugin">
+          <ul>
+            <li ng-if="hasReportPlugin">
+              <a class="report-link"
+                 ng-href="#/reports/reporting-duration-report?processDefinitionKey={{ processDefinition.key }}&processDefinitionVersion={{ processDefinition.version }}">
+                {{ 'PROCESS_DEFINITION_REPORTS' | translate }}
+              </a>
+            </li>
+            <li ng-if="hasMigrationPlugin">
+              <a ng-href="#/migration?searchQuery=%5B%5D&sourceKey={{ processDefinition.key }}">{{ 'PROCESS_DEFINITION_MIGRATION' | translate }}</a>
+            </li>
+          </ul>
+        </dd>
+      </dl>
+
+      <a class="hide-collapsable pull-right"></a>
+    </div>
+
+    <div class="ctn-column ctn-content"
+         ctn-collapsable-parent="tabs">
+      <a class="show-collapsable"></a>
+
+      <!-- content top pane -->
+      <div class="ctn-row ctn-content-top"
+           is-sidebar-collapsed="onDiagramCollapseChange(collapsed)"
+           ctn-collapsable="top">
+        <div process-diagram="processDiagram"
+             key="{{processDefinition.id}}"
+             on-element-click="handleBpmnElementSelection(id, $event)"
+             selection="filter"
+             callbacks="callbacks"
+             process-data="processData"
+             page-data="pageData"
+             collapsed="diagramCollapsed"
+             overlay-provider-component="cockpit.processDefinition.diagram.overlay"
+             diagram-provider-component="cockpit.processDefinition.diagram.plugin"
+             action-provider-component="cockpit.processDefinition.diagram.action"
+             viewer="diagramViewer"></div>
+
+        <a class="hide-collapsable vertical-collapse"
+           title="{{ 'PROCESS_DEFINITION_SHOW_TABS' | translate }}"></a>
+
+        <a class="maximize-collapsable vertical-collapse"
+           maximize-parent-direction="left"
+           title="{{ 'PROCESS_DEFINITION_MAXIMIZE_DIAGRAM' | translate }}"></a>
+
+        <a class="restore-collapsable vertical-collapse"
+          maximize-parent-direction="left"
+          title="{{ 'PROCESS_DEFINITION_RESTORE_DEFAULT_SIZE' | translate }}"></a>
+      </div>
+
+      <!-- content bottom pane -->
+      <div class="ctn-row ctn-content-bottom ctn-tabbed">
+        <a class="show-collapsable vertical-collapse"
+           title="{{ 'PROCESS_DEFINITION_HIDE_TABS' | translate }}"></a>
+
+        <div ng-show="processDefinitionTabs.length">
+          <ul class="nav nav-tabs">
+            <li ng-class="{ active: selectedTab == tabProvider }"
+                ng-repeat="tabProvider in processDefinitionTabs">
+              <a href ng-click="selectTab(tabProvider)">{{ tabProvider.label | translate }}</a>
+            </li>
+          </ul>
+
+          <div class="ctn-tabbed-content ctn-scroll">
+            <view provider="selectedTab"
+                  vars="processDefinitionVars" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end .ctn-fixed-view -->
+<!-- / CE - camunda-cockpit-ui/client/scripts/pages/process-definition.html -->

@@ -1,8 +1,10 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
       id = "getTask"
       tag = "Task"
+      summary = "Get"
       desc = "Retrieves a task by id." />
 
   "parameters" : [
@@ -46,6 +48,11 @@
                          "taskDefinitionKey":"aTaskDefinitionKey",
                          "suspended": false,
                          "formKey":"aFormKey",
+                         "camundaFormRef":{
+                           "key": "aCamundaFormKey",
+                           "binding": "version",
+                           "version": 2
+                         },
                          "tenantId":"aTenantId"
                        }
                      }'] />
@@ -60,3 +67,5 @@
 
   }
 }
+
+</#macro>

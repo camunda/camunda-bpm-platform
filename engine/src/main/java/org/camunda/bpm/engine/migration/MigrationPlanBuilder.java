@@ -20,6 +20,8 @@ import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 
+import java.util.Map;
+
 /**
  * @author Thorben Lindhauer
  *
@@ -32,6 +34,11 @@ public interface MigrationPlanBuilder {
    * level of sub process, and have the same id.
    */
   MigrationInstructionsBuilder mapEqualActivities();
+
+  /**
+   * @param variables which will be set into the process instance scope after the migration
+   */
+  MigrationPlanBuilder setVariables(Map<String, ?> variables);
 
   /**
    * Adds a migration instruction that maps activity instances of the source activity (of the source process definition)

@@ -20,6 +20,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 
+import org.camunda.bpm.engine.exception.NotAllowedException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
@@ -46,6 +47,7 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
 
 	public Void execute(CommandContext commandContext) {
     ensureNotNull("task", task);
+    validateStandaloneTask(task, commandContext);
 
     String operation;
     if (task.getRevision() == 0) {
@@ -56,14 +58,13 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
         task.propagateParentTaskTenantId();
         task.insert();
         operation = UserOperationLogEntry.OPERATION_TYPE_CREATE;
-        task.executeMetrics(Metrics.ACTIVTY_INSTANCE_START);
+        task.executeMetrics(Metrics.ACTIVTY_INSTANCE_START, commandContext);
       } catch (NullValueException e) {
         throw new NotValidException(e.getMessage(), e);
       }
 
       task.fireAuthorizationProvider();
       task.transitionTo(TaskState.STATE_CREATED);
-
     } else {
       checkTaskAssign(task, commandContext);
       task.update();
@@ -73,10 +74,18 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
       task.triggerUpdateEvent();
     }
 
+    task.executeMetrics(Metrics.UNIQUE_TASK_WORKERS, commandContext);
     task.logUserOperation(operation);
 
     return null;
   }
+
+	protected void validateStandaloneTask(TaskEntity task, CommandContext commandContext) {
+	  boolean standaloneTasksEnabled = commandContext.getProcessEngineConfiguration().isStandaloneTasksEnabled();
+	  if (!standaloneTasksEnabled && task.isStandaloneTask()) {
+      throw new NotAllowedException("Cannot save standalone task. They are disabled in the process engine configuration.");
+	  }
+	}
 
   protected void checkTaskAssign(TaskEntity task, CommandContext commandContext) {
     for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {

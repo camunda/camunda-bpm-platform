@@ -28,6 +28,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -69,6 +70,7 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTest {
 
   protected static final String VARIABLE_NAME = "aVariableName";
   protected static final String VARIABLE_VALUE = "aVariableValue";
+  protected List<String> deploymentIds = new ArrayList<>();
 
   @Before
   public void setUp() throws Exception {
@@ -93,6 +95,9 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTest {
     for (Authorization authorization : authorizationService.createAuthorizationQuery().list()) {
       authorizationService.deleteAuthorization(authorization.getId());
     }
+    for (String deploymentId : deploymentIds) {
+      deleteDeployment(deploymentId);
+    }
   }
 
   protected <T> T runWithoutAuthorization(Callable<T> runnable) {
@@ -109,6 +114,11 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTest {
         enableAuthorization();
       }
     }
+  }
+
+  protected String permissionException(Resource resource, Permission permission) {
+    return "ENGINE-03110 Required admin authenticated group or user or any of the following permissions: '"
+        + permission.getName() + "' permission on resource '" + resource.resourceName() + "'";
   }
 
   // user ////////////////////////////////////////////////////////////////
@@ -489,7 +499,9 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTest {
       for (String resource : resources) {
         builder.addClasspathResource(resource);
       }
-      return builder.deploy();
+      Deployment deployment = builder.deploy();
+      deploymentIds.add(deployment.getId());
+      return deployment;
     });
   }
 
@@ -585,5 +597,9 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTest {
 
   protected VariableMap getVariables() {
     return Variables.createVariables().putValue(VARIABLE_NAME, VARIABLE_VALUE);
+  }
+
+  protected String getMissingPermissionMessageRegex(Permission permission, Resource resource) {
+    return ".*'"+ permission.getName() + "' permission .* type '" + resource.resourceName() + "'.*";
   }
 }

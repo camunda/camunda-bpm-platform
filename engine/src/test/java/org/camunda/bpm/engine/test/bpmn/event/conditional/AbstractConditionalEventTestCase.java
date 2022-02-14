@@ -41,7 +41,6 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
-import org.junit.rules.ExpectedException;
 
 /**
  *
@@ -92,9 +91,6 @@ public abstract class AbstractConditionalEventTestCase {
 
   @Rule
   public final ProcessEngineRule engine = new ProvidedProcessEngineRule();
-
-  @Rule
-  public ExpectedException expectException = ExpectedException.none();
 
   protected RuntimeService runtimeService;
   protected TaskService taskService;

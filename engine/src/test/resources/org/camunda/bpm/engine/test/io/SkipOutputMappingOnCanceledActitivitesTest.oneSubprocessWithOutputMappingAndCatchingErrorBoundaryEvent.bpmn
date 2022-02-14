@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_0823et8" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.0.0-alpha.3">
+  <bpmn:process id="subProcess" isExecutable="true">
+    <bpmn:startEvent id="Event_0y4v54s">
+      <bpmn:outgoing>Flow_13onyx9</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:subProcess id="Activity_0s2tra0">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:outputParameter name="foo">${bar}</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_13onyx9</bpmn:incoming>
+      <bpmn:outgoing>Flow_0v0q3bp</bpmn:outgoing>
+      <bpmn:startEvent id="Event_0552ild">
+        <bpmn:outgoing>Flow_0u3gt0u</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:sequenceFlow id="Flow_0u3gt0u" sourceRef="Event_0552ild" targetRef="userTaskSubprocess" />
+      <bpmn:endEvent id="Event_0fn9t70">
+        <bpmn:incoming>Flow_1hmamke</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="Flow_1hmamke" sourceRef="userTaskSubprocess" targetRef="Event_0fn9t70" />
+      <bpmn:userTask id="userTaskSubprocess" name="userTask in Subprocess">
+        <bpmn:incoming>Flow_0u3gt0u</bpmn:incoming>
+        <bpmn:outgoing>Flow_1hmamke</bpmn:outgoing>
+      </bpmn:userTask>
+    </bpmn:subProcess>
+    <bpmn:sequenceFlow id="Flow_13onyx9" sourceRef="Event_0y4v54s" targetRef="Activity_0s2tra0" />
+    <bpmn:sequenceFlow id="Flow_04qa0hs" sourceRef="Event_10ht1iv" targetRef="userTask" />
+    <bpmn:endEvent id="Event_022qzym">
+      <bpmn:incoming>Flow_0jaitk6</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0jaitk6" sourceRef="userTask" targetRef="Event_022qzym" />
+    <bpmn:userTask id="userTask" name="userTask">
+      <bpmn:incoming>Flow_04qa0hs</bpmn:incoming>
+      <bpmn:outgoing>Flow_0jaitk6</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="Event_09qu2sh">
+      <bpmn:incoming>Flow_0v0q3bp</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0v0q3bp" sourceRef="Activity_0s2tra0" targetRef="Event_09qu2sh" />
+    <bpmn:boundaryEvent id="Event_10ht1iv" attachedToRef="Activity_0s2tra0">
+      <bpmn:outgoing>Flow_04qa0hs</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_0swck7h" errorRef="Error_03wqvyo" />
+    </bpmn:boundaryEvent>
+  </bpmn:process>
+  <bpmn:error id="Error_0ck3ony" name="Error_0jv7trd" errorCode="errorCode" />
+  <bpmn:error id="Error_03wqvyo" name="Error_36cu86n" errorCode="errorCode" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="subProcess">
+      <bpmndi:BPMNEdge id="Flow_0v0q3bp_di" bpmnElement="Flow_0v0q3bp">
+        <di:waypoint x="625" y="180" />
+        <di:waypoint x="692" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0jaitk6_di" bpmnElement="Flow_0jaitk6">
+        <di:waypoint x="480" y="360" />
+        <di:waypoint x="532" y="360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_04qa0hs_di" bpmnElement="Flow_04qa0hs">
+        <di:waypoint x="310" y="298" />
+        <di:waypoint x="310" y="360" />
+        <di:waypoint x="380" y="360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_13onyx9_di" bpmnElement="Flow_13onyx9">
+        <di:waypoint x="215" y="180" />
+        <di:waypoint x="275" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_0y4v54s_di" bpmnElement="Event_0y4v54s">
+        <dc:Bounds x="179" y="162" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0s2tra0_di" bpmnElement="Activity_0s2tra0" isExpanded="true">
+        <dc:Bounds x="275" y="80" width="350" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1hmamke_di" bpmnElement="Flow_1hmamke">
+        <di:waypoint x="510" y="180" />
+        <di:waypoint x="572" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0u3gt0u_di" bpmnElement="Flow_0u3gt0u">
+        <di:waypoint x="351" y="180" />
+        <di:waypoint x="410" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_0552ild_di" bpmnElement="Event_0552ild">
+        <dc:Bounds x="315" y="162" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0fn9t70_di" bpmnElement="Event_0fn9t70">
+        <dc:Bounds x="572" y="162" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1cx9z6z_di" bpmnElement="userTaskSubprocess">
+        <dc:Bounds x="410" y="140" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_022qzym_di" bpmnElement="Event_022qzym">
+        <dc:Bounds x="532" y="342" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1l6aaja_di" bpmnElement="userTask">
+        <dc:Bounds x="380" y="320" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_09qu2sh_di" bpmnElement="Event_09qu2sh">
+        <dc:Bounds x="692" y="162" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0nwstho_di" bpmnElement="Event_10ht1iv">
+        <dc:Bounds x="292" y="262" width="36" height="36" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

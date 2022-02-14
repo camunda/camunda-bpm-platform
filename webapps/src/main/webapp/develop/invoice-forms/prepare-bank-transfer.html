@@ -1,0 +1,62 @@
+<form class="form-horizontal"
+      role="form">
+
+  <div class="well">Please prepare the bank transfer for the following invoice</div>
+
+
+  <div class="form-group">
+    <label class="control-label col-md-4">Invoice Document</label>
+    <div class="col-md-8">
+      <a cam-file-download="invoiceDocument"></a>
+    </div>
+  </div>
+
+
+  <div class="form-group">
+    <label class="control-label col-md-4">Creditor</label>
+    <div class="col-md-8">
+      <input cam-variable-name="creditor"
+             type="text"
+             name="creditor"
+             readonly="true"
+             class="form-control" />
+    </div>
+  </div>
+
+
+  <div class="form-group">
+    <label class="control-label col-md-4">Amount</label>
+    <div class="col-md-8">
+      <input cam-variable-name="amount"
+             type="text"
+             name="amount"
+             readonly="true"
+             class="form-control" />
+    </div>
+  </div>
+
+
+  <div class="form-group">
+    <label class="control-label col-md-4">Invoice Number</label>
+    <div class="col-md-8">
+      <input cam-variable-name="invoiceNumber"
+             type="text"
+             name="invoiceNumber"
+             readonly="true"
+             class="form-control" />
+    </div>
+  </div>
+
+
+  <div class="form-group">
+    <label class="control-label col-md-4">Approved by </label>
+    <div class="col-md-8">
+      <input cam-variable-name="approver"
+             type="text"
+             name="approved"
+             readonly="true"
+             class="form-control"></input>
+    </div>
+  </div>
+</form>
+

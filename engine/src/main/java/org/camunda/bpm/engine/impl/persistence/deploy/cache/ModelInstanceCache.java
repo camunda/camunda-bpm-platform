@@ -28,7 +28,6 @@ import org.camunda.commons.utils.cache.Cache;
 
 import java.io.InputStream;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 /**
  * @author: Johannes Heinemann
@@ -64,11 +63,8 @@ public abstract class ModelInstanceCache<InstanceType extends ModelInstance, Def
 
   protected InstanceType loadAndCacheBpmnModelInstance(final DefinitionType definitionEntity) {
     final CommandContext commandContext = Context.getCommandContext();
-    InputStream bpmnResourceInputStream = commandContext.runWithoutAuthorization(new Callable<InputStream>() {
-      public InputStream call() throws Exception {
-        return new GetDeploymentResourceCmd(definitionEntity.getDeploymentId(), definitionEntity.getResourceName()).execute(commandContext);
-      }
-    });
+    InputStream bpmnResourceInputStream = commandContext.runWithoutAuthorization(
+        new GetDeploymentResourceCmd(definitionEntity.getDeploymentId(), definitionEntity.getResourceName()));
 
     try {
       InstanceType bpmnModelInstance = readModelFromStream(bpmnResourceInputStream);

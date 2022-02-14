@@ -16,11 +16,9 @@
  */
 package org.camunda.bpm.engine.test.api.task;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.text.ParseException;
@@ -122,8 +120,8 @@ public class DelegateTaskTest {
     String processInstanceId = processInstance.getId();
     Date followUpDate = (Date) runtimeService.getVariable(processInstanceId, "followUp");
 
-    assertThat(followUpDate, notNullValue());
-    assertThat(followUpDate, is(FOLLOW_UP_DATE));
+    assertThat(followUpDate).isNotNull();
+    assertThat(followUpDate).isEqualTo(FOLLOW_UP_DATE);
   }
 
   @Test
@@ -145,8 +143,8 @@ public class DelegateTaskTest {
     Task task = taskService.createTaskQuery().singleResult();
     Date followUpDate = task.getFollowUpDate();
 
-    assertThat(followUpDate, notNullValue());
-    assertThat(followUpDate, is(FOLLOW_UP_DATE));
+    assertThat(followUpDate).isNotNull();
+    assertThat(followUpDate).isEqualTo(FOLLOW_UP_DATE);
   }
 
   public static class GetFollowUpDateListener implements TaskListener {
@@ -154,7 +152,7 @@ public class DelegateTaskTest {
     @Override
     public void notify(DelegateTask delegateTask) {
       Date followUpDate = delegateTask.getFollowUpDate();
-      assertThat(followUpDate, notNullValue());
+      assertThat(followUpDate).isNotNull();
 
       delegateTask.setVariable("followUp", followUpDate);
     }

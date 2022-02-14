@@ -16,8 +16,7 @@
  */
 package org.camunda.bpm.container.impl.deployment.jobexecutor;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.management.ObjectName;
 
@@ -45,22 +44,22 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * 
+ *
  * @author Ronny Bräunlich
  *
  */
 public class StartManagedThreadPoolStepTest {
-  
+
   private MBeanServiceContainer container = new MBeanServiceContainer();
-  
+
   private DeploymentOperation deploymentOperation;
-  
+
   private JobExecutorXmlImpl jobExecutorXml;
-  
+
   private BpmPlatformXml bpmPlatformXml;
-  
+
   private StartManagedThreadPoolStep step;
-  
+
   @Before
   public void setUp(){
     step = new StartManagedThreadPoolStep();
@@ -69,7 +68,7 @@ public class StartManagedThreadPoolStepTest {
     bpmPlatformXml = new BpmPlatformXmlImpl(jobExecutorXml, Collections.<ProcessEngineXml>emptyList());
     deploymentOperation.addAttachment(Attachments.BPM_PLATFORM_XML, bpmPlatformXml);
   }
-  
+
   @After
   public void tearDown(){
     container.stopService(ServiceTypes.BPM_PLATFORM, RuntimeContainerDelegateImpl.SERVICE_NAME_EXECUTOR);
@@ -85,10 +84,10 @@ public class StartManagedThreadPoolStepTest {
     ThreadPoolExecutor executor = service.getValue().getThreadPoolExecutor();
 
     //since no jobs will start, remaining capacity is sufficent to check the size
-    assertThat(executor.getQueue().remainingCapacity(), is(3));
-    assertThat(executor.getCorePoolSize(), is(3));
-    assertThat(executor.getMaximumPoolSize(), is(10));
-    assertThat(executor.getKeepAliveTime(TimeUnit.MILLISECONDS), is(0L));
+    assertThat(executor.getQueue().remainingCapacity()).isEqualTo(3);
+    assertThat(executor.getCorePoolSize()).isEqualTo(3);
+    assertThat(executor.getMaximumPoolSize()).isEqualTo(10);
+    assertThat(executor.getKeepAliveTime(TimeUnit.MILLISECONDS)).isEqualTo(0L);
   }
 
   @Test
@@ -109,12 +108,12 @@ public class StartManagedThreadPoolStepTest {
     ThreadPoolExecutor executor = service.getValue().getThreadPoolExecutor();
 
     //since no jobs will start, remaining capacity is sufficent to check the size
-    assertThat(executor.getQueue().remainingCapacity(), is(Integer.parseInt(queueSize)));
-    assertThat(executor.getCorePoolSize(), is(Integer.parseInt(corePoolSize)));
-    assertThat(executor.getMaximumPoolSize(), is(Integer.parseInt(maxPoolSize)));
-    assertThat(executor.getKeepAliveTime(TimeUnit.MILLISECONDS), is(Long.parseLong(keepAliveTime)));
+    assertThat(executor.getQueue().remainingCapacity()).isEqualTo(Integer.parseInt(queueSize));
+    assertThat(executor.getCorePoolSize()).isEqualTo(Integer.parseInt(corePoolSize));
+    assertThat(executor.getMaximumPoolSize()).isEqualTo(Integer.parseInt(maxPoolSize));
+    assertThat(executor.getKeepAliveTime(TimeUnit.MILLISECONDS)).isEqualTo(Long.parseLong(keepAliveTime));
   }
-  
+
   private ObjectName getObjectNameForExecutor(){
     String localName = MBeanServiceContainer.composeLocalName(ServiceTypes.BPM_PLATFORM, RuntimeContainerDelegateImpl.SERVICE_NAME_EXECUTOR);
     return MBeanServiceContainer.getObjectName(localName);

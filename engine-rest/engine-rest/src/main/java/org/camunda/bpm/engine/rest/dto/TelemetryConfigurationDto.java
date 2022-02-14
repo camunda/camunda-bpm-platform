@@ -18,14 +18,21 @@ package org.camunda.bpm.engine.rest.dto;
 
 public class TelemetryConfigurationDto {
 
-  protected  boolean enableTelemetry;
+  protected Boolean enableTelemetry;
 
-  public boolean isEnableTelemetry() {
+  public TelemetryConfigurationDto() {
+  }
+
+  public TelemetryConfigurationDto(Boolean enableTelemetry) {
+    this.enableTelemetry = enableTelemetry;
+  }
+
+  public Boolean isEnableTelemetry() {
     return enableTelemetry;
   }
 
-  public void setEnableTelemetry(boolean enableTelemetry) {
+  public void setEnableTelemetry(Boolean enableTelemetry) {
     this.enableTelemetry = enableTelemetry;
   }
- 
+
 }

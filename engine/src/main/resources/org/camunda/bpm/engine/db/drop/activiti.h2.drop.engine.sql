@@ -21,9 +21,11 @@ drop index ACT_IDX_EXEC_ROOT_PI;
 drop index ACT_IDX_EXEC_BUSKEY;
 drop index ACT_IDX_TASK_CREATE;
 drop index ACT_IDX_TASK_ASSIGNEE;
+drop index ACT_IDX_TASK_OWNER;
 drop index ACT_IDX_IDENT_LNK_USER;
 drop index ACT_IDX_IDENT_LNK_GROUP;
 drop index ACT_IDX_VARIABLE_TASK_ID;
+drop index ACT_IDX_VARIABLE_TASK_NAME_TYPE;
 drop index ACT_IDX_INC_CONFIGURATION;
 drop index ACT_IDX_JOB_PROCINST;
 drop index ACT_IDX_AUTH_GROUP_ID;
@@ -115,6 +117,9 @@ alter table ACT_RU_BATCH
 alter table ACT_RU_EXT_TASK
     drop CONSTRAINT ACT_FK_EXT_TASK_ERROR_DETAILS;
 
+alter table ACT_RU_VARIABLE
+    drop CONSTRAINT ACT_FK_VAR_BATCH;
+
 drop index ACT_IDX_EVENT_SUBSCR_CONFIG_;
 drop index ACT_IDX_ATHRZ_PROCEDEF;
 
@@ -134,6 +139,9 @@ DROP INDEX ACT_IDX_METER_LOG_REPORT;
 -- old metric timestamp column
 DROP INDEX ACT_IDX_METER_LOG_TIME;
 DROP INDEX ACT_IDX_METER_LOG;
+
+-- task metric timestamp column
+drop index ACT_IDX_TASK_METER_LOG_TIME;
 
 drop index ACT_IDX_AUTH_RESOURCE_ID;
 drop index ACT_IDX_EXT_TASK_TOPIC;
@@ -172,6 +180,8 @@ drop index ACT_IDX_JOB_HANDLER;
 drop index ACT_IDX_AUTH_ROOT_PI;
 drop index ACT_IDX_AUTH_RM_TIME;
 
+drop index ACT_IDX_BATCH_ID;
+
 drop table ACT_GE_PROPERTY if exists;
 drop table ACT_GE_BYTEARRAY if exists;
 drop table ACT_RE_DEPLOYMENT if exists;
@@ -179,6 +189,7 @@ drop table ACT_RU_EXECUTION if exists;
 drop table ACT_RU_JOB if exists;
 drop table ACT_RU_JOBDEF if exists;
 drop table ACT_RE_PROCDEF if exists;
+drop table ACT_RE_CAMFORMDEF if exists;
 drop table ACT_RU_TASK if exists;
 drop table ACT_RU_IDENTITYLINK if exists;
 drop table ACT_RU_VARIABLE if exists;
@@ -187,6 +198,7 @@ drop table ACT_RU_INCIDENT if exists;
 drop table ACT_RU_AUTHORIZATION if exists;
 drop table ACT_RU_FILTER if exists;
 drop table ACT_RU_METER_LOG if exists;
+drop table ACT_RU_TASK_METER_LOG if exists;
 drop table ACT_RU_EXT_TASK if exists;
 drop table ACT_RU_BATCH if exists;
 drop table ACT_GE_SCHEMA_LOG if exists;

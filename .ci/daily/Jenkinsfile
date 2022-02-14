@@ -1,0 +1,258 @@
+// https://github.com/camunda/jenkins-global-shared-library
+// https://github.com/camunda/cambpm-jenkins-shared-library
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
+
+def failedStageTypes = []
+
+pipeline {
+  agent {
+    node {
+      label 'jenkins-job-runner'
+    }
+  }
+  environment {
+    LOGGER_LOG_LEVEL = 'DEBUG'
+  }
+  parameters {
+    booleanParam name: 'TRIGGERED_BY_UPSTREAM', defaultValue: false, description: 'Is the current build triggered in the scope of an upstream pipeline (pull request or default branch)'
+    string name: 'UPSTREAM_PROJECT_NAME', defaultValue: '7.XX/cambpm-ce/cambpm-main/master', description: 'Not used on standalone runs. This property is passed by the upstream build that triggers this one.'
+    string name: 'UPSTREAM_BUILD_NUMBER', defaultValue: '', description: 'Not used on standalone runs. This property is passed by the upstream build that triggers this one.'
+    string name: 'PR_LABELS', defaultValue: '', description: 'The labels assigned to the CE pull request'
+  }
+  options {
+    buildDiscarder(logRotator(numToKeepStr: '5'))
+    throttleJobProperty(
+      throttleEnabled: true,
+      throttleOption: 'project',
+      maxConcurrentTotal: 2
+    )
+  }
+  triggers {
+    pollSCM('H H(0-3) * * *') // CE daily runs after EE daily and Sidetrack daily
+  }
+  stages {
+    stage('Prepare') {
+      when {
+        expression {
+          cambpmWithLabels('upstream')
+        }
+      }
+      steps {
+        cambpmConditionalRetry([
+          agentLabel: 'centos-stable',
+          suppressErrors: false,
+          runSteps: {
+            cambpmCopyArtifacts(params.UPSTREAM_PROJECT_NAME, params.UPSTREAM_BUILD_NUMBER)
+            cambpmStash("platform-stash-runtime",
+                        ".m2/org/camunda/**/*-SNAPSHOT/**",
+                        "**/qa/**,**/*qa*/**,**/*.zip,**/*.tar.gz")
+            cambpmStash("platform-stash-qa",
+                        ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**",
+                        "**/*.zip,**/*.tar.gz")
+          }
+        ])
+      }
+    }
+    stage('Misc') {
+      parallel {
+        stage('check-sql-scripts') {
+          steps {
+            cambpmConditionalRetry([
+              agentLabel: 'centos-stable',
+              runSteps: {
+                sh '.ci/scripts/check-sql-scripts.sh'
+              }
+            ])
+          }
+        }
+        stage('stage-javadocs') {
+          when {
+            branch cambpmDefaultBranch();
+          }
+          steps {
+            cambpmConditionalRetry([
+              agentLabel : 'centos-stable',
+              runSteps   : {
+                sh 'mkdir -p ./webapps/target/webapp'
+                cambpmRunMaven('.',
+                  'package javadoc:javadoc javadoc:aggregate -Pdistro,distro-wildfly,distro-webjar,javadocs -DskipTests=true -Dskip.frontend.build=true',
+                  withNpm: true,
+                  jdkVersion: 'jdk-11-latest')
+              },
+              postSuccess: {
+                def projectVersion = cambpmUtils.getMavenProjectVersion()
+                cambpmPublishJavadocs("\"target/site/apidocs/\"", projectVersion)
+              }
+            ])
+          }
+        }
+      }
+    }
+    stage('Standalone QA tests') {
+      parallel {
+        stage('sql-scripts-h2') {
+          when {
+            expression {
+              cambpmWithLabels('h2', 'all-db')
+            }
+          }
+          steps {
+            cambpmConditionalRetry([
+              agentLabel: 'h2',
+              runSteps: {
+                cambpmRunMavenByStageType('sql-scripts', 'h2')
+              },
+              postFailure: {
+                cambpmAddFailedStageType(failedStageTypes, 'sql-scripts')
+              }
+            ])
+          }
+        }
+        stage('wildfly-subsystem-UNIT-wildfly') {
+          when {
+            expression {
+              cambpmWithLabels('wildfly')
+            }
+          }
+          steps {
+            cambpmConditionalRetry([
+              agentLabel: 'h2',
+              runSteps: {
+                cambpmRunMaven('distro/wildfly/subsystem', 'test', runtimeStash: true)
+              },
+              postFailure: {
+                cambpmPublishTestResult()
+              }
+            ])
+          }
+        }
+        stage('UPGRADE-databases-from-714-h2') {
+          when {
+            expression {
+              cambpmWithLabels('h2', 'all-db')
+            }
+          }
+          steps {
+            cambpmConditionalRetry([
+              agentLabel: 'h2',
+              runSteps: {
+                cambpmRunMavenByStageType('upgrade-database', 'h2')
+              },
+              postFailure: {
+                cambpmPublishTestResult()
+                cambpmAddFailedStageType(failedStageTypes, 'upgrade-database')
+              }
+            ])
+          }
+        }
+        stage('UPGRADE-instance-migration-h2') {
+          when {
+            expression {
+              cambpmWithLabels('default-build', 'migration')
+            }
+          }
+          steps {
+            cambpmConditionalRetry([
+              agentLabel: 'h2',
+              runSteps: {
+                cambpmRunMavenByStageType('instance-migration', 'h2')
+              },
+              postFailure: {
+                cambpmPublishTestResult()
+                cambpmAddFailedStageType(failedStageTypes, 'instance-migration')
+              }
+            ])
+          }
+        }
+        stage('UPGRADE-old-engine-from-714-h2') {
+          when {
+            expression {
+              cambpmWithLabels('h2', 'all-db')
+            }
+          }
+          steps {
+            cambpmConditionalRetry([
+              agentLabel: 'h2',
+              runSteps: {
+                cambpmRunMavenByStageType('old-engine', 'h2')
+              },
+              postFailure: {
+                cambpmPublishTestResult()
+                cambpmAddFailedStageType(failedStageTypes, 'old-engine')
+              }
+            ])
+          }
+        }
+        stage('UPGRADE-rolling-update-h2') {
+          when {
+            expression {
+              cambpmWithLabels('rolling-update', 'default-build')
+            }
+          }
+          steps {
+            cambpmConditionalRetry([
+              agentLabel: 'h2',
+              runSteps: {
+                cambpmRunMavenByStageType('rolling-update', 'h2')
+              },
+              postFailure: {
+                cambpmPublishTestResult()
+                cambpmAddFailedStageType(failedStageTypes, 'rolling-update')
+              }
+            ])
+          }
+        }
+        stage('PERFORMANCE-large-data-h2') {
+          when {
+            branch cambpmDefaultBranch();
+          }
+          steps {
+            cambpmConditionalRetry([
+              agentLabel: 'h2',
+              runSteps: {
+                cambpmRunMavenByStageType('large-data-tests', 'h2')
+              },
+              postFailure: {
+                cambpmPublishTestResult()
+                cambpmAddFailedStageType(failedStageTypes, 'large-data-tests')
+              }
+            ])
+          }
+        }
+      }
+    }
+    stage('QA DB tests') {
+      steps {
+        script {
+          // see the .ci/config/matrices.yaml for the stage generation values
+          // see .ci/config/stage-types.yaml for the stage configurations
+          parallel(cambpmGetMatrixStages('daily-stages', failedStageTypes, { stageInfo ->
+            List allowedStageLabels = stageInfo.allowedLabels
+            String dbLabel = stageInfo.nodeType
+            return cambpmWithLabels(allowedStageLabels.minus('cockroachdb'), cambpmGetDbType(dbLabel))
+          }))
+        }
+      }
+    }
+    stage('JDKs') {
+      steps {
+        script {
+          // see the .ci/config/matrices.yaml for the stage generation values
+          // see .ci/config/stage-types.yaml for the stage configurations
+          parallel(cambpmGetMatrixStages('jdk-ce-stages', failedStageTypes, { stageInfo ->
+            return cambpmWithLabels('default-build')
+          }))
+        }
+      }
+    }
+  }
+  post {
+    changed {
+      script {
+        if (!agentDisconnected()){
+          cambpmSendEmailNotification()
+        }
+      }
+    }
+  }
+}

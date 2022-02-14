@@ -1,0 +1,66 @@
+{
+  "types": [
+    {
+      "id": {
+        "key": "id",
+        "value": "PLUGIN_SEARCH_TENANTS_ID"
+      },
+      "default": true,
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "name",
+        "value": "PLUGIN_SEARCH_TENANTS_NAME"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        },
+        {
+          "key": "Like",
+          "value": "PLUGIN_SEARCH_TENANTS_LIKE"
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "userMember",
+        "value": "PLUGIN_SEARCH_TENANTS_USER_ID"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "groupMember",
+        "value": "PLUGIN_SEARCH_TENANTS_GROUP_ID"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    }
+  ],
+  "tooltips": {
+    "inputPlaceholder": "SEARCH_PLACEHOLDER",
+    "invalid": "INVALID_SEARCH",
+    "deleteSearch": "DELETE_SEARCH",
+    "type": "TYPE",
+    "name": "PROPERTY",
+    "operator": "OPERATOR",
+    "value": "VALUE"
+  }
+}

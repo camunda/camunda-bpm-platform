@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.task;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -37,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
@@ -47,6 +49,7 @@ import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskAlreadyClaimedException;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricDetail;
@@ -89,7 +92,6 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -111,16 +113,13 @@ public class TaskServiceTest {
   protected static final String USER_TASK_THROW_ESCALATION = "throw-escalation";
 
   @ClassRule
-  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration -> 
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration ->
       configuration.setJavaSerializationFormatEnabled(true));
   protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   private RuntimeService runtimeService;
   private TaskService taskService;
@@ -2470,12 +2469,10 @@ public class TaskServiceTest {
     // given
     // non-existing task
 
-    // then
-    thrown.expect(NullValueException.class);
-    thrown.expectMessage("Cannot find task with id non-existing: task is null");
-
-    // when
-    taskService.handleBpmnError("non-existing", ERROR_CODE);
+    // when/then
+    assertThatThrownBy(() -> taskService.handleBpmnError("non-existing", ERROR_CODE))
+      .isInstanceOf(NotFoundException.class)
+      .hasMessageContaining("Cannot find task with id non-existing: task is null");
   }
 
   @Test
@@ -2517,6 +2514,32 @@ public class TaskServiceTest {
     assertEquals(USER_TASK_AFTER_CATCH, taskAfterThrow.getTaskDefinitionKey());
     VariableInstance errorCodeVariable = runtimeService.createVariableInstanceQuery().variableName("errorCodeVar").singleResult();
     assertEquals(ERROR_CODE, errorCodeVariable.getValue());
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testHandleBpmnErrorWithEmptyErrorCode() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+
+    // when/then
+    assertThatThrownBy(() -> taskService.handleBpmnError(task.getId(), ""))
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("errorCode is empty");
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testHandleBpmnErrorWithNullErrorCode() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+
+    // when/then
+    assertThatThrownBy(() -> taskService.handleBpmnError(task.getId(), null))
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("errorCode is null");
   }
 
   @Test
@@ -2593,12 +2616,32 @@ public class TaskServiceTest {
     // given
     // non-existing task
 
-    // then
-    thrown.expect(NullValueException.class);
-    thrown.expectMessage("Cannot find task with id non-existing: task is null");
+    // when/then
+    assertThatThrownBy(() -> taskService.handleEscalation("non-existing", ESCALATION_CODE))
+      .isInstanceOf(NotFoundException.class)
+      .hasMessageContaining("Cannot find task with id non-existing: task is null");
+  }
 
-    // when
-    taskService.handleEscalation("non-existing", ESCALATION_CODE);
+  @Test
+  public void testHandleEscalationWithoutEscalationCode() {
+    // given
+    BpmnModelInstance model = Bpmn.createExecutableProcess(PROCESS_KEY).startEvent()
+      .userTask(USER_TASK_THROW_ESCALATION).boundaryEvent("catch-escalation").escalation(ESCALATION_CODE)
+      .userTask(USER_TASK_AFTER_CATCH).endEvent().moveToActivity(USER_TASK_THROW_ESCALATION)
+      .userTask(USER_TASK_AFTER_THROW).endEvent().done();
+    testRule.deploy(model);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals(USER_TASK_THROW_ESCALATION, task.getTaskDefinitionKey());
+
+    // when/then
+    assertThatThrownBy(() -> taskService.handleEscalation(task.getId(), ""))
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("escalationCode is empty");
+
+    assertThatThrownBy(() -> taskService.handleEscalation(task.getId(), null))
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("escalationCode is null");
   }
 
   @Test
@@ -2615,14 +2658,12 @@ public class TaskServiceTest {
     Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
     assertEquals(USER_TASK_THROW_ESCALATION, task.getTaskDefinitionKey());
 
-    // then
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Execution with id '" + task.getTaskDefinitionKey()
-        + "' throws an escalation event with escalationCode '" + ESCALATION_CODE
-        + "', but no escalation handler was defined.");
-
-    // when
-    taskService.handleEscalation(task.getId(), ESCALATION_CODE);
+    // when/then
+    assertThatThrownBy(() -> taskService.handleEscalation(task.getId(), ESCALATION_CODE))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Execution with id '" + task.getTaskDefinitionKey()
+      + "' throws an escalation event with escalationCode '" + ESCALATION_CODE
+      + "', but no escalation handler was defined.");
   }
 
   @Test

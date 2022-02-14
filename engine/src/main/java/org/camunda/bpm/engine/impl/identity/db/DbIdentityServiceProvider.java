@@ -275,7 +275,9 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
   public IdentityOperationResult createMembership(String userId, String groupId) {
     checkAuthorization(Permissions.CREATE, Resources.GROUP_MEMBERSHIP, groupId);
     UserEntity user = findUserById(userId);
+    ensureNotNull("No user found with id '" + userId + "'.", "user", user);
     GroupEntity group = findGroupById(groupId);
+    ensureNotNull("No group found with id '" + groupId + "'.", "group", group);
     MembershipEntity membership = new MembershipEntity();
     membership.setUser(user);
     membership.setGroup(group);

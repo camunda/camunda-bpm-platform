@@ -36,7 +36,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class PasswordPolicyUserDataTest {
 
@@ -44,9 +43,6 @@ public class PasswordPolicyUserDataTest {
 
   @Rule
   public ProcessEngineRule engineRule = new ProcessEngineRule(true);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   protected IdentityService identityService;
 

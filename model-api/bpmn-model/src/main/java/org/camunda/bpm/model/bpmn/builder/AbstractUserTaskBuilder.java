@@ -159,6 +159,39 @@ public abstract class AbstractUserTaskBuilder<B extends AbstractUserTaskBuilder<
   }
 
   /**
+   * Sets the camunda form ref attribute.
+   *
+   * @param camundaFormRef the form ref to set
+   * @return the builder object
+   */
+  public B camundaFormRef(String camundaFormRef) {
+    element.setCamundaFormRef(camundaFormRef);
+    return myself;
+  }
+
+  /**
+   * Sets the camunda form ref binding attribute.
+   *
+   * @param camundaFormRef the form ref binding to set
+   * @return the builder object
+   */
+  public B camundaFormRefBinding(String camundaFormRefBinding) {
+    element.setCamundaFormRefBinding(camundaFormRefBinding);
+    return myself;
+  }
+
+  /**
+   * Sets the camunda form ref version attribute.
+   *
+   * @param camundaFormRef the form ref version to set
+   * @return the builder object
+   */
+  public B camundaFormRefVersion(String camundaFormRefVersion) {
+    element.setCamundaFormRefVersion(camundaFormRefVersion);
+    return myself;
+  }
+
+  /**
    * Sets the camunda priority attribute.
    *
    * @param camundaPriority  the priority of the user task

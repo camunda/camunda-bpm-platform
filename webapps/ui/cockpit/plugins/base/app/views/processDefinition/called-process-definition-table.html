@@ -1,0 +1,45 @@
+<!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processDefinition/called-process-definition-table.html -->
+<div cam-widget-loader
+     loading-state="{{ loadingState }}"
+     text-empty="{{'PLUGIN_CALLED_PROCESS_EMPTY' | translate}}">
+  <table class="called-process-definition cam-table">
+    <thead sortable-table-head
+           head-columns="headColumns"
+           on-sort-change="onSortChange(sortObj)"
+           default-sort="sortObj">
+    </thead>
+    <tbody>
+      <tr ng-repeat="calledProcessDefinition in calledProcessDefinitions | orderBy:sortObj.sortBy:sortObj.sortReverse">
+        <td class="process-definition"
+            cam-widget-clipboard="calledProcessDefinition.id">
+          <a ng-href="#/process-definition/{{ calledProcessDefinition.id }}/runtime?parentProcessDefinitionId={{ processDefinition.id }}">
+            {{ calledProcessDefinition.label }}
+          </a>
+        </td>
+
+        <td class="called-process-state" >
+          <span>{{ calledProcessDefinition.state | translate }}</span>
+        </td>
+
+        <td class="activity">
+          <span ng-show="calledProcessDefinition.calledFromActivities.length === 1"
+                cam-widget-clipboard="calledProcessDefinition.calledFromActivities[0].id">
+            <a ng-href="#/process-definition/{{ processDefinition.id }}/runtime?{{ getSearchQueryForSearchType(calledProcessDefinition.calledFromActivities[0].id) }}&amp;detailsTab=call-process-definitions-table">
+              {{ calledProcessDefinition.calledFromActivities[0].name }}
+            </a>
+          </span>
+
+          <ul class="call-activity-list" ng-show="calledProcessDefinition.calledFromActivities.length > 1">
+            <li ng-repeat="activity in calledProcessDefinition.calledFromActivities"
+                cam-widget-clipboard="activity.id">
+              <a ng-href="#/process-definition/{{ processDefinition.id }}/runtime?{{ getSearchQueryForSearchType(activity.id) }}&amp;detailsTab=call-process-definitions-table">
+                {{ activity.name }}
+              </a>
+            </li>
+          </ul>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processDefinition/called-process-definition-table.html -->

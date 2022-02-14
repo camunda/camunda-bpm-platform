@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.test.api.history.removaltime.cleanup;
 
 import static org.apache.commons.lang3.time.DateUtils.addDays;
 import static org.apache.commons.lang3.time.DateUtils.addMinutes;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_FULL;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_END;
@@ -35,6 +36,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.DecisionService;
@@ -164,8 +166,11 @@ public class HistoryCleanupRemovalTimeTest {
 
     engineConfiguration.setBatchOperationHistoryTimeToLive(null);
     engineConfiguration.setBatchOperationsForHistoryCleanup(null);
-    
+
     engineConfiguration.setHistoryTimeToLive(null);
+
+    engineConfiguration.setTaskMetricsEnabled(false);
+    engineConfiguration.setTaskMetricsTimeToLive(null);
 
     engineConfiguration.initHistoryCleanup();
 
@@ -199,10 +204,15 @@ public class HistoryCleanupRemovalTimeTest {
       engineConfiguration.setBatchOperationHistoryTimeToLive(null);
       engineConfiguration.setBatchOperationsForHistoryCleanup(null);
 
+      engineConfiguration.setHistoryCleanupJobLogTimeToLive(null);
+
+      engineConfiguration.setTaskMetricsTimeToLive(null);
+
       engineConfiguration.initHistoryCleanup();
 
       engineConfiguration.setAuthorizationEnabled(false);
       engineConfiguration.setEnableHistoricInstancePermissions(false);
+      engineConfiguration.setTaskMetricsEnabled(false);
     }
 
     ClockUtil.reset();
@@ -232,7 +242,7 @@ public class HistoryCleanupRemovalTimeTest {
       .callActivity()
         .calledElement(PROCESS_KEY)
     .endEvent().done();
-  
+
   protected final BpmnModelInstance CALLING_PROCESS_WO_TTL = Bpmn.createExecutableProcess(CALLING_PROCESS_KEY)
       .startEvent()
         .callActivity()
@@ -472,7 +482,7 @@ public class HistoryCleanupRemovalTimeTest {
     // then
     assertThat(historicProcessInstances.size(), is(0));
   }
-  
+
   @Test
   public void shouldNotCleanupProcessInstanceWithoutTTL() {
     // given
@@ -508,12 +518,12 @@ public class HistoryCleanupRemovalTimeTest {
     // then
     assertThat(historicProcessInstances.size(), is(1));
   }
-  
+
   @Test
   public void shouldCleanupProcessInstanceWithoutTTLWithConfigDefault() {
     // given
     engineConfiguration.setHistoryTimeToLive("5");
-    
+
     testRule.deploy(CALLING_PROCESS_WO_TTL);
 
     testRule.deploy(PROCESS);
@@ -879,6 +889,43 @@ public class HistoryCleanupRemovalTimeTest {
   }
 
   @Test
+  public void shouldCleanupHistoryCleanupJobsFromHistoricJobLog() {
+    // given
+    engineConfiguration.setHistoryCleanupJobLogTimeToLive("P5D");
+
+    ClockUtil.setCurrentTime(END_DATE);
+
+    // when
+    runHistoryCleanup();
+    List<String> initialHistoryCleanupJobLog = historyService.createHistoricJobLogQuery().list().stream().map(HistoricJobLog::getId).collect(Collectors.toList());
+    ClockUtil.setCurrentTime(addDays(END_DATE, 5));
+    runHistoryCleanup();
+
+    // then
+    List<HistoricJobLog> finalJobLog = historyService.createHistoricJobLogQuery().list();
+    assertThat(finalJobLog).hasSize(1);
+    assertThat(finalJobLog).extracting("id").doesNotContainAnyElementsOf(initialHistoryCleanupJobLog);
+  }
+
+  @Test
+  public void shouldNotCleanupHistoryCleanupJobsFromHistoricJobLog() {
+    // given
+    engineConfiguration.setHistoryCleanupJobLogTimeToLive(null);
+    ClockUtil.setCurrentTime(END_DATE);
+
+    // when
+    runHistoryCleanup();
+    List<String> initialHistoryCleanupJobLog = historyService.createHistoricJobLogQuery().list().stream().map(HistoricJobLog::getId).collect(Collectors.toList());
+    ClockUtil.setCurrentTime(addDays(END_DATE, 5));
+    runHistoryCleanup();
+
+    // then
+    List<HistoricJobLog> finalJobLog = historyService.createHistoricJobLogQuery().list();
+    assertThat(finalJobLog).hasSize(3);
+    assertThat(finalJobLog).extracting("id").containsAll(initialHistoryCleanupJobLog);
+  }
+
+  @Test
   public void shouldCleanupUserOperationLog() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -1172,6 +1219,69 @@ public class HistoryCleanupRemovalTimeTest {
 
     // then
     assertThat(removedBatchesSum, is(1L));
+  }
+
+  @Test
+  public void shouldCleanupTaskMetrics() {
+    // given
+    engineConfiguration.setTaskMetricsEnabled(true);
+    engineConfiguration.setTaskMetricsTimeToLive("P5D");
+    engineConfiguration.initHistoryCleanup();
+
+    testRule.deploy(PROCESS);
+
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY).getId();
+
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    ClockUtil.setCurrentTime(END_DATE);
+
+    taskService.setAssignee(taskId, "kermit");
+
+    ClockUtil.setCurrentTime(addDays(END_DATE, 5));
+
+    // assume
+    assertThat(managementService.getUniqueTaskWorkerCount(null, null)).isEqualTo(1L);
+
+    // when
+    runHistoryCleanup();
+
+    // then
+    assertThat(managementService.getUniqueTaskWorkerCount(null, null)).isEqualTo(0L);
+  }
+
+  @Test
+  public void shouldReportMetricsForTaskMetricsCleanup() {
+    // given
+    engineConfiguration.setTaskMetricsEnabled(true);
+    engineConfiguration.setTaskMetricsTimeToLive("P5D");
+    engineConfiguration.initHistoryCleanup();
+
+    testRule.deploy(PROCESS);
+
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY).getId();
+
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    ClockUtil.setCurrentTime(END_DATE);
+
+    taskService.setAssignee(taskId, "kermit");
+
+    ClockUtil.setCurrentTime(addDays(END_DATE, 5));
+
+    // assume
+    assertThat(managementService.getUniqueTaskWorkerCount(null, null)).isEqualTo(1L);
+
+    // when
+    runHistoryCleanup();
+
+    // then
+    long removedMetricsSum = managementService.createMetricsQuery()
+      .name(Metrics.HISTORY_CLEANUP_REMOVED_TASK_METRICS)
+      .sum();
+
+    // then
+    assertThat(removedMetricsSum, is(1L));
   }
 
   // parallelism test cases ////////////////////////////////////////////////////////////////////////////////////////////
@@ -1812,6 +1922,37 @@ public class HistoryCleanupRemovalTimeTest {
 
     // assume, when & then
     assumeWhenThenParallelizedCleanup(jobs, historicBatchQuery::count, 15);
+  }
+
+  @Test
+  public void shouldDistributeWorkForTaskMetrics() {
+    // given
+    engineConfiguration.setTaskMetricsEnabled(true);
+    engineConfiguration.setTaskMetricsTimeToLive("P5D");
+    engineConfiguration.initHistoryCleanup();
+
+    testRule.deploy(PROCESS);
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY).getId();
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    for (int i = 0; i < 60; i++) {
+      if (i%4 == 0) {
+        ClockUtil.setCurrentTime(addMinutes(END_DATE, i));
+        taskService.setAssignee(taskId, "kermit" + i);
+      }
+    }
+
+    ClockUtil.setCurrentTime(addDays(END_DATE, 6));
+
+    engineConfiguration.setHistoryCleanupDegreeOfParallelism(3);
+    engineConfiguration.initHistoryCleanup();
+
+    historyService.cleanUpHistoryAsync(true);
+
+    List<Job> jobs = historyService.findHistoryCleanupJobs();
+
+    // assume, when & then
+    assumeWhenThenParallelizedCleanup(jobs, () -> managementService.getUniqueTaskWorkerCount(null, null), 15);
   }
 
   // report tests //////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -21,8 +21,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.CompositePermissionCheck;
@@ -70,6 +72,7 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   protected boolean latest = false;
   protected SuspensionState suspensionState;
   protected String authorizationUserId;
+  protected List<String> cachedCandidateGroups;
   protected String procDefId;
   protected String incidentType;
   protected String incidentId;
@@ -356,6 +359,8 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
+    // fetch candidate groups
+    getCandidateGroups();
     return commandContext
       .getProcessDefinitionManager()
       .findProcessDefinitionCountByQueryCriteria(this);
@@ -364,6 +369,8 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   @Override
   public List<ProcessDefinition> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
+    // fetch candidate groups
+    getCandidateGroups();
     List<ProcessDefinition> list = commandContext
       .getProcessDefinitionManager()
       .findProcessDefinitionsByQueryCriteria(this, page);
@@ -526,9 +533,27 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
     processDefinitionCreatePermissionChecks.addAll(processDefinitionCreatePermissionCheck.getAllPermissionChecks());
   }
 
+  public List<String> getCandidateGroups() {
+    if (cachedCandidateGroups != null) {
+      return cachedCandidateGroups;
+    }
+
+    if(authorizationUserId != null) {
+      List<Group> groups = Context.getCommandContext()
+          .getReadOnlyIdentityProvider()
+          .createGroupQuery()
+          .groupMember(authorizationUserId)
+          .list();
+      cachedCandidateGroups = groups.stream().map(Group::getId).collect(Collectors.toList());
+    }
+
+    return cachedCandidateGroups;
+  }
+
   public ProcessDefinitionQueryImpl startableByUser(String userId) {
     ensureNotNull("userId", userId);
     this.authorizationUserId = userId;
+
     return this;
   }
 }

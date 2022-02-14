@@ -17,11 +17,9 @@
 package org.camunda.bpm.engine.test.bpmn.async;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -97,7 +95,7 @@ public class AsyncAfterTest extends PluggableProcessEngineTest {
 
     List<Task> list = taskService.createTaskQuery().list();
     // multiinstance says three in the bpmn
-    assertThat(list, hasSize(3));
+    assertThat(list).hasSize(3);
 
     for (Task task : list) {
       taskService.complete(task.getId());

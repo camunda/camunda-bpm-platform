@@ -1,0 +1,24 @@
+<!-- # CE - camunda-cockpit-ui/client/scripts/reports/directives/reports-type.html -->
+<section class="col-xs-12">
+  <div class="inner">
+    <header>
+      <h1 class="section-title">{{ 'REPORTS_TYPE_AVAILABLE_REPORTS' | translate }}</h1>
+    </header>
+
+    <div class="reports-type-selection">
+      <div ng-if="!plugins || !(plugins.length > 0)"
+           class="well no-reports-available">
+        <span class="glyphicon glyphicon-info-sign"></span>
+        {{ 'REPORTS_TYPE_NO_AVAILABLE_REPORTS' | translate }}
+      </div>
+
+      <ul ng-if="plugins">
+        <li ng-repeat="provider in plugins">
+          <a ng-class="{active: selection.type === provider.id}"
+             ng-href="#/reports/{{ provider.id }}">{{ provider.label | translate }}</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+<!-- / CE - camunda-cockpit-ui/client/scripts/reports/directives/reports-type.html -->

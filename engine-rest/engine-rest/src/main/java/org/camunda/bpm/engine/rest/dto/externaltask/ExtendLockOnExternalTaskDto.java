@@ -16,18 +16,9 @@
  */
 package org.camunda.bpm.engine.rest.dto.externaltask;
 
-public class ExtendLockOnExternalTaskDto {
+public class ExtendLockOnExternalTaskDto extends HandleExternalTaskDto {
 
-  private String workerId;
-  private long newDuration;
-
-  public String getWorkerId() {
-    return workerId;
-  }
-
-  public void setWorkerId(String workerId) {
-    this.workerId = workerId;
-  }
+  protected long newDuration;
 
   public long getNewDuration() {
     return newDuration;

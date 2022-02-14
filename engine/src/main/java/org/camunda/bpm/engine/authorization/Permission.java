@@ -21,7 +21,7 @@ package org.camunda.bpm.engine.authorization;
  * resource in a specific way. See {@link Permissions} for a set of built-in 
  * permissions and {@link Authorization} for general overview on authorizations.</p>
  *  
- * <p>In camunda BPM, multiple permissions are grouped into an {@link Authorization}.
+ * <p>In Camunda Platform, multiple permissions are grouped into an {@link Authorization}.
  * For efficient storage and checking of authorizations, the permissons that make
  * up an authorization are coded into a single integer.
  * The implication of this design is that a permission must have a unique integer value 

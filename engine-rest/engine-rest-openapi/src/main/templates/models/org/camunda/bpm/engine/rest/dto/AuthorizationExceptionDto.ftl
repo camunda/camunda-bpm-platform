@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto
     extends = "ExceptionDto" >
 
@@ -13,3 +14,4 @@
         last = true />
 
 </@lib.dto>
+</#macro>

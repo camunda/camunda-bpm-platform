@@ -34,7 +34,6 @@ import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -56,9 +55,6 @@ public abstract class AbstractMetricsIntervalTest {
   @Rule
   public RuleChain RULE_CHAIN = RuleChain.outerRule(ENGINE_RULE).around(TEST_RULE);
 
-  @Rule
-  public final ExpectedException exception = ExpectedException.none();
-
   protected RuntimeService runtimeService;
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
   protected ManagementService managementService;
@@ -70,7 +66,7 @@ public abstract class AbstractMetricsIntervalTest {
 
   protected void generateMeterData(long dataCount, long interval) {
     //set up for randomnes
-    Set<String> metricNames = metricsRegistry.getMeters().keySet();
+    Set<String> metricNames = metricsRegistry.getDbMeters().keySet();
     metricsCount = metricNames.size();
 
     //start date is the default interval since mariadb can't set 0 as timestamp
@@ -94,7 +90,7 @@ public abstract class AbstractMetricsIntervalTest {
   }
 
   protected void reportMetrics() {
-    for (String metricName : metricsRegistry.getMeters().keySet()) {
+    for (String metricName : metricsRegistry.getDbMeters().keySet()) {
       //mark random occurence
       long occurence = (long) (rand.nextInt((MAX_OCCURENCE - MIN_OCCURENCE) + 1) + MIN_OCCURENCE);
       metricsRegistry.markOccurrence(metricName, occurence);
@@ -109,7 +105,7 @@ public abstract class AbstractMetricsIntervalTest {
   }
 
   protected void clearLocalMetrics() {
-    Collection<Meter> meters = processEngineConfiguration.getMetricsRegistry().getMeters().values();
+    Collection<Meter> meters = processEngineConfiguration.getMetricsRegistry().getDbMeters().values();
     for (Meter meter : meters) {
       meter.getAndClear();
     }

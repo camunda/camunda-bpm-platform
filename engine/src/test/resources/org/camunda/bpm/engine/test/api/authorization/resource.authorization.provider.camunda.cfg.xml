@@ -27,6 +27,7 @@
 
     <!-- turn off metrics reporter -->
     <property name="dbMetricsReporterActivate" value="false" />
+    <property name="taskMetricsEnabled" value="false" />
 
     <!-- resource authorization provider -->
     <property name="resourceAuthorizationProvider" ref="myResourceAuthorizationProvider" />

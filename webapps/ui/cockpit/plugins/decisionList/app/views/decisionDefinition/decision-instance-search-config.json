@@ -1,0 +1,266 @@
+{
+  "types": [
+    {
+      "id": {
+        "key": "decisionInstanceId",
+        "value": "PLUGIN_DECISION_DEFINITION_VALUE_TYPE_ID"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ],
+      "default": true
+    },
+    {
+      "id": {
+        "key": "processDefinitionId",
+        "value": "PLUGIN_DECISION_DEFINITION_VALUE_PROCESS_DEFINITION_ID"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "processDefinitionKey",
+        "value": "PLUGIN_DECISION_DEFINITION_VALUE_PROCESS_DEFINITION_KEY"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "processInstanceId",
+        "value": "PLUGIN_DECISION_DEFINITION_VALUE_PROCESS_INSTANCE_ID"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "caseDefinitionId",
+        "value": "PLUGIN_DECISION_DEFINITION_VALUE_CASE_DEFINITION_ID"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "caseDefinitionKey",
+        "value": "PLUGIN_DECISION_DEFINITION_VALUE_CASE_DEFINITION_KEY"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "caseInstanceId",
+        "value": "PLUGIN_DECISION_DEFINITION_VALUE_CASE_INSTANCE_ID"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "activityIdIn",
+        "value": "PLUGIN_DECISION_DEFINITION_VALUE_ACTIVITY_ID"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "activityInstanceIdIn",
+        "value": "PLUGIN_DECISION_DEFINITION_VALUE_ACTIVITY_INSTANCE_ID"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "evaluatedDate",
+        "value": "PLUGIN_DECISION_DEFINITION_VALUE_EVALUATED_DATE"
+      },
+      "operators": [
+        {
+          "key": "Before",
+          "value": "PLUGIN_DECISION_DEFINITION_VALUE_OPERATOR_BEFORE"
+        },
+        {
+          "key": "After",
+          "value": "PLUGIN_DECISION_DEFINITION_VALUE_OPERATOR_AFTER"
+        }
+      ],
+      "allowDates": true,
+      "enforceDates": true
+    },
+    {
+      "id": {
+        "key": "userId",
+        "value": "PLUGIN_DECISION_DEFINITION_VALUE_USER_ID"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    }
+  ],
+  "operators": {
+    "undefined":  [
+      {
+        "key": "eq",
+        "value": "="
+      },
+      {
+        "key": "neq",
+        "value": "!="
+      },
+      {
+        "key": "gt",
+        "value": ">"
+      },
+      {
+        "key": "gteq",
+        "value": ">="
+      },
+      {
+        "key": "lt",
+        "value": "<"
+      },
+      {
+        "key": "lteq",
+        "value": "<="
+      },
+      {
+        "key": "like",
+        "value": "PLUGIN_DECISION_DEFINITION_OPERATOR_LIKE"
+      }
+    ],
+    "string":     [
+      {
+        "key": "eq",
+        "value": "="
+      },
+      {
+        "key": "neq",
+        "value": "!="
+      },
+      {
+        "key": "gt",
+        "value": ">"
+      },
+      {
+        "key": "gteq",
+        "value": ">="
+      },
+      {
+        "key": "lt",
+        "value": "<"
+      },
+      {
+        "key": "lteq",
+        "value": "<="
+      },
+      {
+        "key": "like",
+        "value": "PLUGIN_DECISION_DEFINITION_OPERATOR_LIKE"
+      }
+    ],
+    "number":     [
+      {
+        "key": "eq",
+        "value": "="
+      },
+      {
+        "key": "neq",
+        "value": "!="
+      },
+      {
+        "key": "gt",
+        "value": ">"
+      },
+      {
+        "key": "gteq",
+        "value": ">="
+      },
+      {
+        "key": "lt",
+        "value": "<"
+      },
+      {
+        "key": "lteq",
+        "value": "<="
+      }
+    ],
+    "boolean":    [
+      {
+        "key": "eq",
+        "value": "="
+      },
+      {
+        "key": "neq",
+        "value": "!="
+      }
+    ],
+    "object":     [{
+      "key": "eq",
+      "value": "="
+    },
+      {
+        "key": "neq",
+        "value": "!="
+      }],
+    "date":     [{
+      "key": "lteq",
+      "value": "PLUGIN_DECISION_DEFINITION_VALUE_OPERATOR_BEFORE"
+    },
+      {
+        "key": "gteq",
+        "value": "PLUGIN_DECISION_DEFINITION_VALUE_OPERATOR_AFTER"
+      }]
+  },
+  "tooltips": {
+    "inputPlaceholder": "PLUGIN_DECISION_DEFINITION_ADD_CRITERIA",
+    "invalid": "PLUGIN_DECISION_DEFINITION_INVALID",
+    "deleteSearch": "PLUGIN_DECISION_DEFINITION_DELETE_SEARCH",
+    "type": "PLUGIN_DECISION_DEFINITION_TYPE",
+    "name": "PLUGIN_DECISION_DEFINITION_NAME",
+    "operator": "PLUGIN_DECISION_DEFINITION_OPERATOR",
+    "value": "PLUGIN_DECISION_DEFINITION_VALUE"
+  }
+}

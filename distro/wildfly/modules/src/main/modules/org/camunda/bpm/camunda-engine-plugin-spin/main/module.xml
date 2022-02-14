@@ -17,5 +17,6 @@
     <module name="org.camunda.spin.camunda-spin-dataformat-xml-dom" services="import" />
 
     <module name="org.camunda.bpm.dmn.camunda-engine-feel-scala" />
+    <module name="org.camunda.feel.feel-engine" />
   </dependencies>
 </module>

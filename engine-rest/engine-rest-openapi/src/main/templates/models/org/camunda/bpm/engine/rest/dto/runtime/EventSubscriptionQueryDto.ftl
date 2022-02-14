@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto desc = "A event subscription query which retrieves a list of event subscriptions">
 
     <@lib.property
@@ -54,6 +55,7 @@
 
     "sorting": {
       "type": "array",
+      "nullable": true,
       "description": "Apply sorting of the result",
       "items":
 
@@ -64,3 +66,4 @@
        }
 
 </@lib.dto>
+</#macro>

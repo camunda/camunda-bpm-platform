@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.impl;
 
+import static java.lang.Boolean.TRUE;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -78,12 +80,14 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   protected List<TaskQueryVariableValue> variables = new ArrayList<>();
   protected Boolean variableNamesIgnoreCase;
   protected Boolean variableValuesIgnoreCase;
+
   protected Date dueDate;
   protected Date dueAfter;
   protected Date dueBefore;
+  protected boolean isWithoutTaskDueDate;
+
   protected Date followUpDate;
   protected Date followUpBefore;
-
   protected Date followUpAfter;
 
   protected String[] tenantIds;
@@ -281,7 +285,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
     this.unfinished = true;
     return this;
   }
-  
+
   @Override
   public HistoricTaskInstanceQuery matchVariableNamesIgnoreCase() {
     this.variableNamesIgnoreCase = true;
@@ -318,6 +322,11 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
 
   public HistoricTaskInstanceQuery processVariableValueLike(String variableName, Object variableValue) {
     addVariable(variableName, variableValue, QueryOperator.LIKE, false, true);
+    return this;
+  }
+
+  public HistoricTaskInstanceQuery processVariableValueNotLike(String variableName, Object variableValue) {
+    addVariable(variableName, variableValue, QueryOperator.NOT_LIKE, false, true);
     return this;
   }
 
@@ -409,15 +418,17 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   }
 
   protected void ensureVariablesInitialized() {
-    VariableSerializers types = Context.getProcessEngineConfiguration().getVariableSerializers();
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    VariableSerializers variableSerializers = processEngineConfiguration.getVariableSerializers();
+    String dbType = processEngineConfiguration.getDatabaseType();
     for(QueryVariableValue var : variables) {
-      var.initialize(types);
+      var.initialize(variableSerializers, dbType);
     }
 
     if (!queries.isEmpty()) {
       for (HistoricTaskInstanceQueryImpl orQuery: queries) {
         for (QueryVariableValue var : orQuery.variables) {
-          var.initialize(types);
+          var.initialize(variableSerializers, dbType);
         }
       }
     }
@@ -438,6 +449,8 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
           throw new ProcessEngineException("Booleans and null cannot be used in 'less than or equal' condition");
         case LIKE:
           throw new ProcessEngineException("Booleans and null cannot be used in 'like' condition");
+        case NOT_LIKE:
+          throw new ProcessEngineException("Booleans and null cannot be used in 'not like' condition");
         default:
           break;
       }
@@ -459,17 +472,55 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   }
 
   public HistoricTaskInstanceQuery taskDueDate(Date dueDate) {
+    // The taskDueDate filter can't be used in an AND query with
+    // the withoutTaskDueDate filter. They can be combined in an OR query
+    if (!isOrQueryActive) {
+      if (TRUE.equals(isWithoutTaskDueDate)) {
+        throw new ProcessEngineException("Invalid query usage: cannot set both taskDueDate and withoutTaskDueDate filters.");
+      }
+    }
+
     this.dueDate = dueDate;
     return this;
   }
 
   public HistoricTaskInstanceQuery taskDueAfter(Date dueAfter) {
+    // The taskDueAfter filter can't be used in an AND query with
+    // the withoutTaskDueDate filter. They can be combined in an OR query
+    if (!isOrQueryActive) {
+      if (TRUE.equals(isWithoutTaskDueDate)) {
+        throw new ProcessEngineException("Invalid query usage: cannot set both taskDueAfter and withoutTaskDueDate filters.");
+      }
+    }
+
     this.dueAfter = dueAfter;
     return this;
   }
 
   public HistoricTaskInstanceQuery taskDueBefore(Date dueBefore) {
+    // The taskDueBefore filter can't be used in an AND query with
+    // the withoutTaskDueDate filter. They can be combined in an OR query
+    if (!isOrQueryActive) {
+      if (TRUE.equals(isWithoutTaskDueDate)) {
+        throw new ProcessEngineException("Invalid query usage: cannot set both taskDueBefore and withoutTaskDueDate filters.");
+      }
+    }
+
     this.dueBefore = dueBefore;
+    return this;
+  }
+
+  @Override
+  public HistoricTaskInstanceQuery withoutTaskDueDate() {
+    // The due date filters can't be used in an AND query with
+    // the withoutTaskDueDate filter. They can be combined in an OR query
+    if (!isOrQueryActive) {
+      if (dueAfter != null || dueBefore != null || dueDate != null) {
+        throw new ProcessEngineException("Invalid query usage: cannot set both task due date (equal to, before, or after) and withoutTaskDueDate filters.");
+      }
+    }
+
+    this.isWithoutTaskDueDate = true;
     return this;
   }
 
@@ -808,6 +859,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
 
   public Date getDueAfter() {
     return dueAfter;
+  }
+
+  public boolean isWithoutTaskDueDate() {
+    return isWithoutTaskDueDate;
   }
 
   public Date getFollowUpDate() {

@@ -7,7 +7,7 @@
   version="1.6" metadata-complete="false">
 
   <module-name>camunda-jobexecutor-rar</module-name>
-  <display-name>camunda BPM platform jobexecutor resource adapter</display-name>
+  <display-name>Camunda Platform jobexecutor resource adapter</display-name>
   <vendor-name>camunda services GmbH</vendor-name>
   
   <resourceadapter>

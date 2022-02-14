@@ -35,8 +35,12 @@ import static org.camunda.bpm.engine.rest.helper.MockProvider.NON_EXISTING_PROCE
 import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockBatch;
 import static org.camunda.bpm.engine.rest.helper.NoIntermediaryInvocation.immediatelyAfter;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.engine.variable.impl.value.PrimitiveTypeValueImpl.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.emptyArray;
+import static org.hamcrest.Matchers.emptyCollectionOf;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Matchers.any;
@@ -73,6 +77,8 @@ import org.camunda.bpm.engine.migration.MigrationPlanBuilder;
 import org.camunda.bpm.engine.migration.MigrationPlanExecutionBuilder;
 import org.camunda.bpm.engine.migration.MigrationPlanValidationException;
 import org.camunda.bpm.engine.migration.MigrationPlanValidationReport;
+import org.camunda.bpm.engine.migration.MigrationVariableValidationReport;
+import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.migration.MigrationInstructionDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.helper.FluentAnswer;
@@ -82,6 +88,9 @@ import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.camunda.bpm.engine.rest.util.migration.MigrationExecutionDtoBuilder;
 import org.camunda.bpm.engine.rest.util.migration.MigrationPlanDtoBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -332,28 +341,123 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
   @Test
   public void generatePlanUpdateEventTriggerResponse() {
     migrationPlanBuilderMock = new MockMigrationPlanBuilder()
+        .sourceProcessDefinitionId(EXAMPLE_PROCESS_DEFINITION_ID)
+        .targetProcessDefinitionId(ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
+        .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID, true)
+        .builder();
+    when(runtimeServiceMock.createMigrationPlan(anyString(), anyString()))
+        .thenReturn(migrationPlanBuilderMock);
+
+    Map<String, Object> generationRequest = new HashMap<String, Object>();
+    generationRequest.put("sourceProcessDefinitionId", EXAMPLE_PROCESS_DEFINITION_ID);
+    generationRequest.put("targetProcessDefinitionId", ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID);
+
+    given()
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(generationRequest)
+        .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("instructions[0].sourceActivityIds[0]", equalTo(EXAMPLE_ACTIVITY_ID))
+        .body("instructions[0].targetActivityIds[0]", equalTo(ANOTHER_EXAMPLE_ACTIVITY_ID))
+        .body("instructions[0].updateEventTrigger", equalTo(true))
+        .when()
+        .post(GENERATE_MIGRATION_URL);
+
+  }
+
+  @Test
+  public void generatePlanVariables() {
+    migrationPlanBuilderMock = new MockMigrationPlanBuilder()
       .sourceProcessDefinitionId(EXAMPLE_PROCESS_DEFINITION_ID)
       .targetProcessDefinitionId(ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
       .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID, true)
       .builder();
+
+    Map<String, Object> generationRequest = new HashMap<>();
+    generationRequest.put("sourceProcessDefinitionId", EXAMPLE_PROCESS_DEFINITION_ID);
+    generationRequest.put("targetProcessDefinitionId", ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID);
+
+    Map<String, VariableValueDto> variableDtos = new HashMap<>();
+
+    VariableValueDto valueDtoFoo = new VariableValueDto();
+    valueDtoFoo.setValue("foo");
+    valueDtoFoo.setType("String");
+    valueDtoFoo.setValueInfo(Collections.singletonMap("transient", true));
+    variableDtos.put("foo", valueDtoFoo);
+
+    VariableValueDto valueDtoBar = new VariableValueDto();
+    valueDtoBar.setValue(5);
+    valueDtoBar.setType("short");
+    valueDtoBar.setValueInfo(Collections.singletonMap("transient", false));
+    variableDtos.put("bar", valueDtoBar);
+
+    generationRequest.put("variables", variableDtos);
+
     when(runtimeServiceMock.createMigrationPlan(anyString(), anyString()))
       .thenReturn(migrationPlanBuilderMock);
-
-    Map<String, Object> generationRequest = new HashMap<String, Object>();
-      generationRequest.put("sourceProcessDefinitionId", EXAMPLE_PROCESS_DEFINITION_ID);
-      generationRequest.put("targetProcessDefinitionId", ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID);
 
     given()
       .contentType(POST_JSON_CONTENT_TYPE)
       .body(generationRequest)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
-      .body("instructions[0].sourceActivityIds[0]", equalTo(EXAMPLE_ACTIVITY_ID))
-      .body("instructions[0].targetActivityIds[0]", equalTo(ANOTHER_EXAMPLE_ACTIVITY_ID))
-      .body("instructions[0].updateEventTrigger", equalTo(true))
     .when()
       .post(GENERATE_MIGRATION_URL);
 
+    verify(runtimeServiceMock).createMigrationPlan(eq(EXAMPLE_PROCESS_DEFINITION_ID), eq(ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID));
+
+    InOrder inOrder = Mockito.inOrder(migrationPlanBuilderMock);
+
+    // the map equal activities method should be called
+    inOrder.verify(migrationPlanBuilderMock).mapEqualActivities();
+    ArgumentCaptor<Map> variablesCaptor = ArgumentCaptor.forClass(Map.class);
+
+    inOrder.verify(migrationPlanBuilderMock).setVariables(variablesCaptor.capture());
+    TypedValue foo = ((VariableMap) variablesCaptor.getValue()).getValueTyped("foo");
+    assertThat(foo.getValue()).isEqualTo("foo");
+    assertThat(foo.isTransient()).isTrue();
+    assertThat(foo.getType().getName()).isEqualTo("string");
+
+    TypedValue bar = ((VariableMap) variablesCaptor.getValue()).getValueTyped("bar");
+    assertThat(bar.getValue()).isEqualTo((short)5);
+    assertThat(bar.isTransient()).isFalse();
+    assertThat(bar.getType().getName()).isEqualTo("short");
+
+    verify(migrationPlanBuilderMock, never()).mapActivities(anyString(), anyString());
+  }
+
+  @Test
+  public void generatePlanVariablesResponse() {
+    migrationPlanBuilderMock = new MockMigrationPlanBuilder()
+        .sourceProcessDefinitionId(EXAMPLE_PROCESS_DEFINITION_ID)
+        .targetProcessDefinitionId(ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
+        .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID, true)
+        .variables(Variables.putValue("foo", Variables.stringValue("bar", true))
+            .putValue("bar", Variables.shortValue((short)5)))
+        .builder();
+    when(runtimeServiceMock.createMigrationPlan(anyString(), anyString()))
+        .thenReturn(migrationPlanBuilderMock);
+
+    Map<String, Object> generationRequest = new HashMap<>();
+    generationRequest.put("sourceProcessDefinitionId", EXAMPLE_PROCESS_DEFINITION_ID);
+    generationRequest.put("targetProcessDefinitionId", ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID);
+    generationRequest.put("variables", new HashMap<>());
+
+    given()
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(generationRequest)
+        .then().expect()
+          .statusCode(Status.OK.getStatusCode())
+          .body("instructions[0].sourceActivityIds[0]", equalTo(EXAMPLE_ACTIVITY_ID))
+          .body("instructions[0].targetActivityIds[0]", equalTo(ANOTHER_EXAMPLE_ACTIVITY_ID))
+          .body("instructions[0].updateEventTrigger", equalTo(true))
+          .body("variables.foo.value", is("bar"))
+          .body("variables.foo.type", is("String"))
+          .body("variables.foo.valueInfo.transient", is(true))
+          .body("variables.bar.value", is(5))
+          .body("variables.bar.type", is("Short"))
+        .when()
+          .post(GENERATE_MIGRATION_URL);
   }
 
   @Test
@@ -1304,6 +1408,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
       .body("instructionReports", hasSize(0))
+      .body("variableReports.isEmpty()", is(true))
     .when()
       .post(VALIDATE_MIGRATION_URL);
 
@@ -1311,7 +1416,7 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
   }
 
   @Test
-  public void validateMigrationPlanValidationException() {
+  public void validateMigrationPlanInstructionsValidationException() {
     MigrationInstruction migrationInstruction = mock(MigrationInstruction.class);
     when(migrationInstruction.getSourceActivityId()).thenReturn(EXAMPLE_ACTIVITY_ID);
     when(migrationInstruction.getTargetActivityId()).thenReturn(ANOTHER_EXAMPLE_ACTIVITY_ID);
@@ -1346,6 +1451,51 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
       .body("instructionReports[0].failures", hasSize(2))
       .body("instructionReports[0].failures[0]", is("failure1"))
       .body("instructionReports[0].failures[1]", is("failure2"))
+    .when()
+      .post(VALIDATE_MIGRATION_URL);
+  }
+
+  @Test
+  public void validateMigrationPlanVariablesValidationException() {
+    MigrationInstruction migrationInstruction = mock(MigrationInstruction.class);
+    when(migrationInstruction.getSourceActivityId()).thenReturn(EXAMPLE_ACTIVITY_ID);
+    when(migrationInstruction.getTargetActivityId()).thenReturn(ANOTHER_EXAMPLE_ACTIVITY_ID);
+
+    MigrationVariableValidationReport variableReport1 = mock(MigrationVariableValidationReport.class);
+    when(variableReport1.getTypedValue()).thenReturn(new StringValueImpl("bar"));
+    when(variableReport1.getFailures()).thenReturn(Arrays.asList("failure1", "failure2"));
+
+    MigrationVariableValidationReport variableReport2 = mock(MigrationVariableValidationReport.class);
+    when(variableReport2.getTypedValue()).thenReturn(new LongValueImpl(8L));
+    when(variableReport2.getFailures()).thenReturn(Arrays.asList("failure1", "failure2"));
+
+    MigrationPlanValidationReport validationReport = mock(MigrationPlanValidationReport.class);
+    Map<String, MigrationVariableValidationReport> reports = new HashMap<>();
+    reports.put("foo", variableReport1);
+    reports.put("bar", variableReport2);
+    when(validationReport.getVariableReports()).thenReturn(reports);
+
+    when(migrationPlanBuilderMock.build()).thenThrow(new MigrationPlanValidationException("fooo", validationReport));
+
+    Map<String, Object> migrationPlan = new MigrationPlanDtoBuilder(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
+      .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
+      .build();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(migrationPlan)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body("variableReports.foo.type", is("String"))
+      .body("variableReports.foo.value", is("bar"))
+      .body("variableReports.foo.failures", hasSize(2))
+      .body("variableReports.foo.failures[0]", is("failure1"))
+      .body("variableReports.foo.failures[1]", is("failure2"))
+      .body("variableReports.bar.type", is("Long"))
+      .body("variableReports.bar.value", is(8))
+      .body("variableReports.bar.failures", hasSize(2))
+      .body("variableReports.bar.failures[0]", is("failure1"))
+      .body("variableReports.bar.failures[1]", is("failure2"))
     .when()
       .post(VALIDATE_MIGRATION_URL);
   }

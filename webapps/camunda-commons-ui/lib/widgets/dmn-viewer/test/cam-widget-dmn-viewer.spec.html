@@ -1,0 +1,266 @@
+<html>
+  <head>
+    <title>Camunda commons UI library</title>
+    <base href="/" />
+    <!--[if IE]><script type="text/javascript">
+        // Fix for IE ignoring relative base tags.
+        // See http://stackoverflow.com/questions/3926197/html-base-tag-and-local-folder-path-with-internet-explorer
+        (function() {
+            var baseTag = document.getElementsByTagName("base");
+            if (baseTag[0]) { baseTag[0].href = baseTag[0].href; }
+        })();
+    </script><![endif]-->
+    <link rel="icon" href="resources/img/favicon.ico" />
+    <link href="styles.css" rel="stylesheet" />
+    <link href="test-styles.css" rel="stylesheet" />
+  </head>
+  <body>
+    <!-- gh-pages-menu -->
+
+    <header>
+      <div>
+        <h1>Dmn-Viewer</h1>
+      </div>
+    </header>
+
+    <section class="widget-description">
+      <header>
+        <h2>Description</h2>
+      </header>
+      <p>This widget displays a DMN table.</p>
+    </section>
+
+    <section class="widget-reference">
+      <header>
+        <h2>Usage</h2>
+      </header>
+
+      <h3>Options</h3>
+      <dl>
+        <dt><span class="badge">=</span> xml</dt>
+        <dd>A string containing the XML content of the DMN model to render.</dd>
+
+        <dt><span class="badge">=</span> control</dt>
+        <dd>An object containing the control API of the widget. After initialization of the widget, the object provided in by this variable contains the following methods:
+          <ul>
+            <li>
+              <b>getViewer()</b>: Returns the dmn.io viewer instance of the table
+            </li>
+            <li>
+              <b>getElement(id)</b>: Returns the dmn.io object representing an element with a given ID.
+            </li>
+            <li>
+              <b>isLoaded()</b>: Returns whether the table is loaded and displayed.
+            </li>
+          </ul>
+        </dd>
+
+        <dt><span class="badge">&amp;</span> edit-mode</dt>
+        <dd>Takes <code>true</code> or <code>false</code> to indicate if the table can be edited.</dd>
+
+        <dt><span class="badge">&amp;</span> show-details</dt>
+        <dd>Takes <code>true</code> or <code>false</code> to indicate if the table technical details are shown by default.</dd>
+
+        <dt><span class="badge">&amp;</span> on-load</dt>
+        <dd>Allows to pass a function which will be called when the table is loaded.</dd>
+
+        <dt><span class="badge">=</span> width</dt>
+        <dd>
+          A value to set the width of the <strong>table element</strong> (not the widget).<br/>
+          <strong>Note:</strong> unless otherwise specified in the value,
+          the unit will be pixel.<br/>
+          See the <a href="#example-3">sizing example</a>.
+        </dd>
+
+        <dt><span class="badge">=</span> height</dt>
+        <dd>
+          A value to set the height of the <strong>table element</strong> (not the widget).<br/>
+          <strong>Note:</strong> unless otherwise specified in the value,
+          the unit will be pixel.<br/>
+          See the <a href="#example-3">sizing example</a>.
+        </dd>
+
+        <dt><span class="badge">@</span> table</dt>
+        <dd>
+          Name or index of dmn table that should be displayed. Applies only to decision requirements definitions.
+        </dd>
+
+        <dt><span class="badge">&</span> on-click</dt>
+        <dd>
+          Allows to pass function that will be called when decision requirements definition element is clicked.
+        </dd>
+
+        <dt><span class="badge">&</span> on-dbl-click</dt>
+        <dd>
+          Allows to pass function that will be called when decision requirements definition element is double clicked.
+        </dd>
+
+        <dt><span class="badge">=</span> enable-drd-navigation</dt>
+        <dd>
+          Enables decision requirements definition navigation between decisions diagram and decision requirements definition diagram.
+        </dd>
+
+        <dt><span class="badge">=</span> disable-loader</dt>
+        <dd>
+          Disables diagram loading indicator
+        </dd>
+      </dl>
+    </section>
+
+    <section class="widget-examples">
+      <header>
+        <h2>Examples</h2>
+      </header>
+
+      <div class="widget-example"
+           id="example-1"
+           ng-controller="testController">
+        <h3>Viewer</h3>
+        <pre ng-non-bindable>
+&lt;!--
+$scope.tableXML = /* dmn xml string */;
+$scope.control = {};
+--&gt;
+&lt;div cam-widget-dmn-viewer
+     xml="decisionTable"
+     control="control"&gt;&lt;/div&gt;</pre>
+        <div class="test-container"
+             style="max-height: 450px;">
+          <div cam-widget-dmn-viewer
+               xml="decisionTable"
+               control="control">
+          </div>
+        </div>
+
+      </div><!-- /.widget-example -->
+
+      <div class="widget-example"
+           id="example-2"
+           ng-controller="testController">
+        <h3>Editor</h3>
+        <pre ng-non-bindable>
+&lt;div cam-widget-dmn-viewer
+     xml="decisionTable"
+     control="control"
+     edit-mode="true"&gt;&lt;/div&gt;</pre>
+        <div class="test-container">
+          <div cam-widget-dmn-viewer
+               xml="decisionTable"
+               control="control"
+               edit-mode="true">
+          </div>
+        </div>
+
+      </div><!-- /.widget-example -->
+
+      <div class="widget-example"
+           id="example-3"
+           ng-controller="testController">
+        <h3>Sizing</h3>
+        <div></div>
+        <pre ng-non-bindable>
+&lt;div style="border: 1px dashed #a33; max-height: 250px; max-width: 500px; margin: auto; overflow: auto; padding: 5px;"
+  &lt;div cam-widget-dmn-viewer
+       xml="decisionTable"
+       control="control"
+       width="800"
+       height="500"
+       edit-mode="true"
+       show-details="true"&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre>
+        <div class="test-container">
+          <div style="border: 1px dashed #a33; max-height: 250px; max-width: 500px; margin: auto; overflow: auto; padding: 5px;">
+            <div cam-widget-dmn-viewer
+                 xml="decisionTable"
+                 control="control"
+                 height="500"
+                 show-details="true">
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /.widget-example -->
+
+      <div class="widget-example"
+           id="example-4"
+           ng-controller="testController">
+        <h3>DRD Viewer Example</h3>
+        <pre ng-non-bindable>
+&lt;!--
+$scope.drdXML = /* dmn xml string */;
+$scope.control = {};
+--&gt;
+&lt;div cam-widget-dmn-viewer
+     xml="drdXML"
+     control="control"&gt;&lt;/div&gt;</pre>
+        <div class="test-container"
+             style="max-height: 450px;">
+          <div cam-widget-dmn-viewer
+               xml="drdXML"
+               control="control">
+          </div>
+        </div>
+
+      </div><!-- /.widget-example -->
+
+      <div class="widget-example"
+           id="example-5"
+           ng-controller="testController">
+        <h3>DRD Viewer Single Table Example</h3>
+        <pre ng-non-bindable>
+&lt;!--
+$scope.drdXML = /* dmn xml string */;
+$scope.control = {};
+--&gt;
+&lt;div cam-widget-dmn-viewer
+     xml="drdXML"
+     table="season"
+     control="control"&gt;&lt;/div&gt;</pre>
+        <div class="test-container"
+             style="max-height: 450px;">
+          <div cam-widget-dmn-viewer
+               xml="drdXML"
+               table="season"
+               control="control">
+          </div>
+        </div>
+
+      </div><!-- /.widget-example -->
+
+      <div class="widget-example"
+           id="example-6"
+           ng-controller="testController">
+        <h3>DRD Viewer With Navigation</h3>
+        <pre ng-non-bindable>
+&lt;!--
+$scope.drdXML = /* dmn xml string */;
+$scope.control = {};
+--&gt;
+&lt;div cam-widget-dmn-viewer
+     xml="drdXML"
+     enableDrdNavigation="true"
+     control="control"&gt;&lt;/div&gt;</pre>
+        <div class="test-container"
+             style="max-height: 450px;">
+          <div cam-widget-dmn-viewer
+               xml="drdXML"
+               enable-drd-navigation="true"
+               control="control">
+          </div>
+        </div>
+
+      </div><!-- /.widget-example -->
+
+    </section>
+
+
+
+    </div>
+    <footer>
+      <!-- gh-pages-footer -->
+    </footer>
+
+    <script src="lib/widgets/dmn-viewer/test/cam-widget-dmn-viewer.build.js"></script>
+  </body>
+</html>

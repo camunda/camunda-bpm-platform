@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -82,8 +83,7 @@
     <@lib.property
         name = "durationInMillis"
         type = "integer"
-        format = "int32"
-        nullable = false
+        format = "int64"
         desc = "The time the instance took to finish (in milliseconds)."/>
 
     <@lib.property
@@ -115,3 +115,4 @@
         desc = "The process instance id of the root process instance that initiated the process containing this activity instance."/>
 
 </@lib.dto>
+</#macro>

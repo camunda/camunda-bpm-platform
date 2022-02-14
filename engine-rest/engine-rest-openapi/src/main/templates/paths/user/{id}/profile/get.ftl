@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
@@ -22,18 +23,16 @@
     <@lib.response
         code = "200"
         dto = "UserProfileDto"
-        array = true
         desc = "Request successful."
         examples = ['"example-1": {
                        "summary": "GET `/user/jonny1/profile",
-                       "value": [
+                       "value":
                          {
                            "id": "jonny1",
                            "firstName": "John",
                            "lastName": "Doe",
                            "email": "anEmailAddress"
                          }
-                       ]
                      }'] />
 
     <@lib.response
@@ -45,3 +44,5 @@
                 for the error response format." />
   }
 }
+
+</#macro>

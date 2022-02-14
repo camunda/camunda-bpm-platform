@@ -16,10 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 import java.util.Arrays;
@@ -59,7 +56,7 @@ public class MultiTenancyDecisionEvaluationTest extends PluggableProcessEngineTe
           .evaluate();
       fail("BadUserRequestException exception");
     } catch(BadUserRequestException e) {
-      assertThat(e.getMessage(), containsString("Cannot specify a tenant-id"));
+      assertThat(e.getMessage()).contains("Cannot specify a tenant-id");
     }
   }
 
@@ -76,7 +73,7 @@ public class MultiTenancyDecisionEvaluationTest extends PluggableProcessEngineTe
           .evaluate();
       fail("BadUserRequestException exception");
     } catch(BadUserRequestException e) {
-      assertThat(e.getMessage(), containsString("Cannot specify a tenant-id"));
+      assertThat(e.getMessage()).contains("Cannot specify a tenant-id");
     }
   }
 
@@ -92,7 +89,7 @@ public class MultiTenancyDecisionEvaluationTest extends PluggableProcessEngineTe
           .evaluate();
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("no decision definition deployed with key 'decision' and tenant-id 'nonExistingTenantId'"));
+      assertThat(e.getMessage()).contains("no decision definition deployed with key 'decision' and tenant-id 'nonExistingTenantId'");
     }
   }
 
@@ -107,7 +104,7 @@ public class MultiTenancyDecisionEvaluationTest extends PluggableProcessEngineTe
           .evaluate();
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("multiple tenants."));
+      assertThat(e.getMessage()).contains("multiple tenants.");
     }
   }
 
@@ -204,7 +201,7 @@ public class MultiTenancyDecisionEvaluationTest extends PluggableProcessEngineTe
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("no decision definition deployed with key 'decision'"));
+      assertThat(e.getMessage()).contains("no decision definition deployed with key 'decision'");
     }
   }
 
@@ -222,7 +219,7 @@ public class MultiTenancyDecisionEvaluationTest extends PluggableProcessEngineTe
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("Cannot evaluate the decision"));
+      assertThat(e.getMessage()).contains("Cannot evaluate the decision");
     }
   }
 
@@ -243,7 +240,7 @@ public class MultiTenancyDecisionEvaluationTest extends PluggableProcessEngineTe
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("Cannot evaluate the decision"));
+      assertThat(e.getMessage()).contains("Cannot evaluate the decision");
     }
   }
 
@@ -313,10 +310,10 @@ public class MultiTenancyDecisionEvaluationTest extends PluggableProcessEngineTe
   }
 
   protected void assertThatDecisionHasResult(DmnDecisionResult decisionResult, Object expectedValue) {
-    assertThat(decisionResult, is(notNullValue()));
-    assertThat(decisionResult.size(), is(1));
+    assertThat(decisionResult).isNotNull();
+    assertThat(decisionResult.size()).isEqualTo(1);
     String value = decisionResult.getSingleResult().getFirstEntry();
-    assertThat(value, is(expectedValue));
+    assertThat(value).isEqualTo(expectedValue);
   }
 
 }

@@ -16,10 +16,8 @@
  */
 package org.camunda.bpm.engine.test.bpmn.tasklistener;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.concurrent.TimeUnit;
 
@@ -42,7 +40,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -57,9 +54,6 @@ public class TaskListenerDelegateCompletionTest {
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected AuthorizationTestRule authRule = new AuthorizationTestRule(engineRule);
   protected ProcessEngineTestRule testHelper = new ProcessEngineTestRule(engineRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(authRule).around(testHelper);
@@ -100,7 +94,7 @@ public class TaskListenerDelegateCompletionTest {
 
     //then
     Task task = taskService.createTaskQuery().singleResult();
-    assertThat(task, is(nullValue()));
+    assertThat(task).isNull();
   }
 
   @Test
@@ -115,7 +109,7 @@ public class TaskListenerDelegateCompletionTest {
 
     //then
     task = taskService.createTaskQuery().singleResult();
-    assertThat(task, is(nullValue()));
+    assertThat(task).isNull();
   }
 
   @Test
@@ -130,7 +124,7 @@ public class TaskListenerDelegateCompletionTest {
 
     //then
     task = taskService.createTaskQuery().singleResult();
-    assertThat(task, is(nullValue()));
+    assertThat(task).isNull();
   }
 
   @Test
@@ -145,7 +139,7 @@ public class TaskListenerDelegateCompletionTest {
 
     //then
     task = taskService.createTaskQuery().singleResult();
-    assertThat(task, is(nullValue()));
+    assertThat(task).isNull();
   }
 
   @Test
@@ -157,43 +151,41 @@ public class TaskListenerDelegateCompletionTest {
     runtimeService.startProcessInstanceByKey("process");
 
     // assume
-    assertThat(taskQuery.count(), is(1L));
+    assertThat(taskQuery.count()).isEqualTo(1L);
 
     // when
     ClockUtil.offset(TimeUnit.MINUTES.toMillis(70L));
     testHelper.waitForJobExecutorToProcessAllJobs(5000L);
 
     // then
-    assertThat(taskQuery.count(), is(0L));
+    assertThat(taskQuery.count()).isEqualTo(0L);
   }
 
   @Test
   public void testCompletionIsNotPossibleOnComplete () {
-    // expect
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage(containsString("invalid task state"));
     //given
     createProcessWithListener(TaskListener.EVENTNAME_COMPLETE);
 
-    //when
     runtimeService.startProcessInstanceByKey(TASK_LISTENER_PROCESS);
     Task task = taskService.createTaskQuery().singleResult();
 
-    taskService.complete(task.getId());
+    // when/then
+    assertThatThrownBy(() -> taskService.complete(task.getId()))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("invalid task state");
   }
 
   @Test
   public void testCompletionIsNotPossibleOnDelete () {
-    // expect
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage(containsString("invalid task state"));
 
     //given
     createProcessWithListener(TaskListener.EVENTNAME_DELETE);
-
-    //when
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(TASK_LISTENER_PROCESS);
-    runtimeService.deleteProcessInstance(processInstance.getId(),"test reason");
+
+    // when/then
+    assertThatThrownBy(() -> runtimeService.deleteProcessInstance(processInstance.getId(),"test reason"))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("invalid task state");
   }
 
   protected void createProcessWithListener(String eventName) {

@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -39,7 +38,7 @@ import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.HasDbReferences;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.incident.IncidentContext;
-import org.camunda.bpm.engine.impl.incident.IncidentHandler;
+import org.camunda.bpm.engine.impl.incident.IncidentHandling;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobPriorityProvider;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
@@ -62,7 +61,8 @@ import org.camunda.bpm.engine.runtime.Job;
  * @author Frederik Heremans
  */
 public abstract class JobEntity extends AcquirableJobEntity
-    implements Serializable, Job, DbEntity, HasDbRevision, HasDbReferences, DbEntityLifecycleAware {
+    implements Serializable, Job, DbEntity,
+    HasDbRevision, HasDbReferences, DbEntityLifecycleAware {
 
   private final static EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
@@ -341,30 +341,20 @@ public abstract class JobEntity extends AcquirableJobEntity
 
       }
 
+
       IncidentContext incidentContext = createIncidentContext();
       incidentContext.setActivityId(getActivityId());
       incidentContext.setHistoryConfiguration(getLastFailureLogId());
       incidentContext.setFailedActivityId(getFailedActivityId());
 
-      processEngineConfiguration
-        .getIncidentHandler(incidentHandlerType)
-        .handleIncident(incidentContext, exceptionMessage);
+      IncidentHandling.createIncident(incidentHandlerType, incidentContext, exceptionMessage);
 
     }
   }
 
   protected void removeFailedJobIncident(boolean incidentResolved) {
-    IncidentHandler handler = Context
-        .getProcessEngineConfiguration()
-        .getIncidentHandler(Incident.FAILED_JOB_HANDLER_TYPE);
-
     IncidentContext incidentContext = createIncidentContext();
-
-    if (incidentResolved) {
-      handler.resolveIncident(incidentContext);
-    } else {
-      handler.deleteIncident(incidentContext);
-    }
+    IncidentHandling.removeIncidents(Incident.FAILED_JOB_HANDLER_TYPE, incidentContext, incidentResolved);
   }
 
   protected IncidentContext createIncidentContext() {
@@ -524,7 +514,7 @@ public abstract class JobEntity extends AcquirableJobEntity
     // Avoid NPE when the job was reconfigured by another
     // node in the meantime
     if (byteArray != null) {
-      
+
       Context.getCommandContext()
           .getDbEntityManager()
           .delete(byteArray);
@@ -668,23 +658,6 @@ public abstract class JobEntity extends AcquirableJobEntity
   }
 
   public String getLastFailureLogId() {
-    if (lastFailureLogId == null) {
-      // try to find the last failure log in the database,
-      // can occur if setRetries is called manually since
-      // otherwise the failure handling ensures that a log
-      // entry is written before the incident is created
-      List<HistoricJobLog> logEntries = Context.getCommandContext()
-        .getProcessEngineConfiguration()
-        .getHistoryService()
-        .createHistoricJobLogQuery()
-        .failureLog()
-        .jobId(id)
-        .orderPartiallyByOccurrence().desc()
-        .list();
-      if (!logEntries.isEmpty()) {
-        lastFailureLogId = logEntries.get(0).getId();
-      }
-    }
     return lastFailureLogId;
   }
 

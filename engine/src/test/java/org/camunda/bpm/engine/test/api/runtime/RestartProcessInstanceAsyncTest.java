@@ -16,10 +16,10 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -31,7 +31,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
@@ -149,7 +148,7 @@ public class RestartProcessInstanceAsyncTest {
       .executeAsync();
       fail("exception expected");
     } catch (BadUserRequestException e) {
-      Assert.assertThat(e.getMessage(), containsString("processDefinitionId is null"));
+      assertThat(e.getMessage()).contains("processDefinitionId is null");
     }
   }
 
@@ -163,7 +162,7 @@ public class RestartProcessInstanceAsyncTest {
       helper.completeBatch(batch);
       fail("exception expected");
     } catch (BadUserRequestException e) {
-      Assert.assertThat(e.getMessage(), containsString("instructions is empty"));
+      assertThat(e.getMessage()).contains("instructions is empty");
     }
   }
 
@@ -173,7 +172,7 @@ public class RestartProcessInstanceAsyncTest {
       runtimeService.restartProcessInstances("foo").startAfterActivity("bar").executeAsync();
       fail("exception expected");
     } catch (BadUserRequestException e) {
-      Assert.assertThat(e.getMessage(), containsString("processInstanceIds is empty"));
+      assertThat(e.getMessage()).contains("processInstanceIds is empty");
     }
   }
 
@@ -186,7 +185,7 @@ public class RestartProcessInstanceAsyncTest {
       .executeAsync();
       fail("exception expected");
     } catch (BadUserRequestException e) {
-      Assert.assertThat(e.getMessage(), containsString("processInstanceIds contains null value"));
+      assertThat(e.getMessage()).contains("processInstanceIds contains null value");
     }
   }
 
@@ -202,7 +201,7 @@ public class RestartProcessInstanceAsyncTest {
       helper.executeJobs(batch);
       fail("exception expected");
     } catch (BadUserRequestException e) {
-      Assert.assertThat(e.getMessage(), containsString("Historic process instance cannot be found"));
+      assertThat(e.getMessage()).contains("Historic process instance cannot be found");
     }
   }
 
@@ -825,7 +824,7 @@ public class RestartProcessInstanceAsyncTest {
     ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("Process");
     runtimeService.deleteProcessInstance(processInstance.getId(), null);
-    BpmnModelInstance instance2 = Bpmn.createExecutableProcess().done();
+    BpmnModelInstance instance2 = Bpmn.createExecutableProcess().startEvent().done();
     ProcessDefinition processDefinition2 = testRule.deployAndGetDefinition(instance2);
 
     // when
@@ -839,7 +838,7 @@ public class RestartProcessInstanceAsyncTest {
       fail("exception expected");
     } catch (ProcessEngineException e) {
       // then
-      Assert.assertThat(e.getMessage(), containsString("Its process definition '" + processDefinition.getId() + "' does not match given process definition '" + processDefinition2.getId() +"'" ));
+      assertThat(e.getMessage()).contains("Its process definition '" + processDefinition.getId() + "' does not match given process definition '" + processDefinition2.getId() +"'" );
     }
   }
 
@@ -1114,7 +1113,7 @@ public class RestartProcessInstanceAsyncTest {
         .executeAsync();
 
     // then
-    Assertions.assertThat(batch.getInvocationsPerBatchJob()).isEqualTo(42);
+    assertThat(batch.getInvocationsPerBatchJob()).isEqualTo(42);
 
     // clear
     engineRule.getProcessEngineConfiguration()

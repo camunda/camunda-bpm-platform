@@ -95,14 +95,7 @@ public class HistoricProcessInstanceReportImpl implements HistoricProcessInstanc
     CommandContext commandContext = Context.getCommandContext();
 
     if(commandContext == null) {
-      return commandExecutor.execute(new Command<List<DurationReportResult>>() {
-
-        @Override
-        public List<DurationReportResult> execute(CommandContext commandContext) {
-          return executeDurationReport(commandContext);
-        }
-
-      });
+      return commandExecutor.execute(new ExecuteDurationReportCmd());
     }
     else {
       return executeDurationReport(commandContext);
@@ -182,4 +175,11 @@ public class HistoricProcessInstanceReportImpl implements HistoricProcessInstanc
     return durationPeriodUnit.name();
   }
 
+  protected class ExecuteDurationReportCmd implements Command<List<DurationReportResult>> {
+
+    @Override
+    public List<DurationReportResult> execute(CommandContext commandContext) {
+      return executeDurationReport(commandContext);
+    }
+  }
 }

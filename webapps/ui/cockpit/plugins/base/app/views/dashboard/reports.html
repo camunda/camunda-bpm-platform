@@ -1,0 +1,10 @@
+<ul ng-show="plugins.length">
+  <li ng-repeat="plugin in plugins">
+    <a ng-href="#/reports/{{ plugin.id }}">{{plugin.label  | translate}}</a>
+  </li>
+</ul>
+<div class="well"
+     ng-hide="plugins.length">
+  <span class="glyphicon glyphicon-info-sign"></span>
+  {{ 'DASHBOARD_REPORTS_AVAILABLE' | translate}}
+</div>

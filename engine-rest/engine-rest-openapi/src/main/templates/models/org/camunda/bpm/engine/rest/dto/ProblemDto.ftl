@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -32,3 +33,4 @@
         desc = "A list of element id affected by the problem."/>
 
 </@lib.dto>
+</#macro>

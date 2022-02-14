@@ -1,0 +1,236 @@
+@import '_three-cols-layout';
+
+.three-cols-layout-base();
+.three-cols-layout-handheld();
+.three-cols-layout-colors(@column-left-bg, @column-center-bg, @column-right-bg);
+.three-cols-layout-header();
+
+// S
+@media (min-width: @screen-sm-min) and (max-width: @screen-sm-max) {
+  .three-cols-layout(200px, 200px * 1.618);
+}
+
+// M
+@media (min-width: @screen-md-min) and (max-width: @screen-md-max) {
+  // On medium proportion between first and second column is bit different
+  // So that there is space for header buttons.
+  .three-cols-layout(240px, 240px * 1.418);
+}
+
+// L
+@media (min-width: @screen-lg-min) {
+  .three-cols-layout(250px, 250px * 1.618);
+}
+
+[cam-resource-wrapper] {
+  max-height: 100%;
+
+  header {
+    position: relative;
+    z-index: 15;
+  }
+
+  .table-row {
+    display: table;
+    margin-bottom: @grid-gutter-width / 2;
+  }
+
+  h2.name,
+  h3.version {
+    margin-top: 0;
+    display: table-cell;
+  }
+
+  h3.version {
+    width: 1%;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  h4.subheading {
+    margin-top: 30px;
+    margin-bottom: 0;
+  }
+
+  h2.name {
+    padding-right: @grid-gutter-width / 2;
+    overflow: hidden;
+    word-break: break-all;
+    display: block;
+  }
+
+  h4.form-preview {
+    padding-top: 30px;
+  }
+
+  .cmmn-resource,
+  .unkown-resource,
+  .image-resource {
+    max-height: 400px;
+    overflow: auto;
+  }
+
+  [cam-widget-bpmn-viewer],
+  [cam-widget-cmmn-viewer],
+  [cam-widget-dmn-viewer] {
+    height: 400px;
+    overflow: auto;
+  }
+
+  .cmmn-resource {
+    > [cam-source] {
+      overflow: auto;
+    }
+
+    pre {
+      max-height: 400px;
+      margin: 0;
+    }
+  }
+
+  .image-resource {
+    > img {
+      max-width: 100%;
+    }
+  }
+
+  .nav-tabs {
+    margin-top: @grid-gutter-width;
+    margin-bottom: (@grid-gutter-width * 0.5);
+
+    .glyphicon {
+      margin-left: 5px;
+    }
+  }
+
+  .ctn-tabbed-content h4 {
+    margin-top: @grid-gutter-width;
+    margin-bottom: (@grid-gutter-width * 0.5);
+  }
+}
+
+.three-cols-layout {
+  position: relative;
+
+  .deployments {
+    .first-column-list();
+
+    .actions {
+      float: right;
+      font-size: smaller;
+      visibility: hidden;
+
+      a {
+        margin-left: 0.5em;
+      }
+    }
+
+    > li {
+      .first-column-list-item();
+
+      padding-top: 10px;
+      padding-bottom: 10px;
+
+      &:hover .actions {
+        display: block;
+        visibility: visible;
+      }
+    }
+
+    dl {
+      overflow: hidden;
+      font-size: small;
+      margin-bottom: 0;
+    }
+
+    dt {
+      float: left;
+      clear: left;
+    }
+
+    dd {
+      float: right;
+      clear: right;
+      text-align: right;
+
+      .undefined {
+        color: @gray-light;
+      }
+    }
+
+    dt,
+    dd {
+      margin-bottom: @padding-base-vertical;
+
+      &:last-of-type {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  .column-left,
+  .column-center,
+  .column-right {
+    .three-cols-layout-cell.content {
+      position: absolute;
+    }
+
+    .alert,
+    .well {
+      margin: 0 (@grid-gutter-width * 0.5) (@grid-gutter-width * 0.5)
+        (@grid-gutter-width * 0.5);
+    }
+  }
+
+  .column-left .deployments > li,
+  .column-center .list-unstyled > li {
+    .column-list-item();
+  }
+
+  .column-left {
+    .three-cols-layout-cell.top [cam-deployments-sorting-choices] {
+      float: left;
+    }
+
+    [cam-widget-search] {
+      margin: 0 (@grid-gutter-width * 0.5) (@grid-gutter-width * 0.5)
+        (@grid-gutter-width * 0.5);
+    }
+  }
+
+  .column-center {
+    .list-unstyled {
+      .second-column-list();
+
+      > li {
+        .second-column-list-item();
+
+        > h4 {
+          margin: 0;
+        }
+      }
+    }
+  }
+
+  .filepath {
+    max-width: 100%;
+    font-style: italic;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &::after {
+      content: '/';
+      display: inline-block;
+    }
+
+    &:empty {
+      display: none;
+    }
+  }
+
+  .three-cols-layout-cell.top .resource-actions {
+    float: right;
+    margin-left: 1em;
+  }
+}

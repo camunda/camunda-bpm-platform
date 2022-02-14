@@ -1,0 +1,24 @@
+<form name="changeVersionForm" ng-if="isActive" class="change-version" ng-class="{'has-error': !isValid}">
+  <input type="text"
+         class="form-control"
+         name="defVersion"
+         ng-keydown="enableValidating()"
+         ng-model="model.newVersion"
+         ng-change="change(changeVersionForm)"
+         ng-model-options="{debounce: 300}"
+         required>
+         <button ng-click="changeLocation()"
+          ng-disabled="!isValid || isValidating || storedVersion == model.newVersion"
+          class="btn btn-xs btn-default">
+    <span class="glyphicon glyphicon-ok"></span>
+  </button>
+  <button ng-click="close(changeVersionForm)"
+          class="btn btn-xs btn-default">
+    <span class="glyphicon glyphicon-remove"></span>
+  </button>
+</form>
+<button ng-if="!isActive"
+        ng-click="open()"
+        class="btn btn-xs btn-default">
+  <span>{{ definition.version }}</span>
+</button>

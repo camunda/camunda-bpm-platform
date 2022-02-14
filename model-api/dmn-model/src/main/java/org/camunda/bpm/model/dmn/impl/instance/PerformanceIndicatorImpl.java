@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.LATEST_DMN_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_PERFORMANCE_INDICATOR;
 
 import java.util.Collection;
@@ -46,7 +46,7 @@ public class PerformanceIndicatorImpl extends BusinessContextElementImpl impleme
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(PerformanceIndicator.class, DMN_ELEMENT_PERFORMANCE_INDICATOR)
-      .namespaceUri(DMN11_NS)
+      .namespaceUri(LATEST_DMN_NS)
       .extendsType(BusinessContextElement.class)
       .instanceProvider(new ModelTypeInstanceProvider<PerformanceIndicator>() {
         public PerformanceIndicator newInstance(ModelTypeInstanceContext instanceContext) {

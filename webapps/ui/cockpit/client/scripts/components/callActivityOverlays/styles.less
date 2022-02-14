@@ -1,0 +1,21 @@
+.call-activity-overlay {
+  margin-left: -20px;
+  margin-top: 5px;
+  width: 20px;
+  height: 20px;
+
+  button.bjs-drilldown {
+    margin-left: 0;
+    margin-top: 0;
+
+    &::before {
+      display: block;
+      background-color: white;
+      content: ' ';
+      width: 20px;
+      height: 20px;
+      -webkit-mask: url(../assets/images/svg/link.svg) no-repeat center;
+      mask: url(../assets/images/svg/link.svg) no-repeat center;
+    }
+  }
+}

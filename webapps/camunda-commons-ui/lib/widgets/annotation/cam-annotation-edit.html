@@ -1,0 +1,9 @@
+<span ng-if="annotation" cam-widget-clipboard="annotation">
+  <span ng-click="openModal()" uib-tooltip="{{ readonly ? 'PLGN_AUDIT_SHOW_ANNOTATION' : 'PLGN_AUDIT_EDIT_ANNOTATION' | translate}}" tooltip-placement="top-left">
+    {{annotation}}
+  </span>
+</span>
+
+<a class="edit" ng-click="openModal()" ng-if="!annotation && !readonly" uib-tooltip="{{'PLGN_AUDIT_ADD_ANNOTATION' | translate}}">
+  <span class="glyphicon glyphicon-pencil"></span>
+</a>

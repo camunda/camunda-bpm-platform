@@ -5,19 +5,31 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-database-settings</artifactId>
     <relativePath>../database</relativePath>
-    <version>7.14.0-SNAPSHOT</version>
+    <version>7.17.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-engine-plugins</artifactId>
   <packaging>pom</packaging>
 
-  <name>camunda BPM - engine plugins</name>
+  <name>Camunda Platform - engine plugins</name>
 
   <modules>
     <module>identity-ldap</module>
     <module>connect-plugin</module>
     <module>spin-plugin</module>
   </modules>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-core-internal-dependencies</artifactId>
+        <version>${project.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
     <dependency>

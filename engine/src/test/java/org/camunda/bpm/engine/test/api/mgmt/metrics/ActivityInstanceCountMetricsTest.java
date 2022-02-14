@@ -65,6 +65,11 @@ public class ActivityInstanceCountMetricsTest extends AbstractMetricsTest {
     assertEquals(3l, managementService.createMetricsQuery()
         .name(Metrics.ACTIVTY_INSTANCE_START)
         .sum());
+
+    // still 3 with the new metric name
+    assertEquals(3l, managementService.createMetricsQuery()
+        .name(Metrics.FLOW_NODE_INSTANCES_START)
+        .sum());
   }
 
   @Test

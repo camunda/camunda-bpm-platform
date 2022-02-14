@@ -16,9 +16,8 @@
  */
 package org.camunda.bpm.engine.test.api.cfg;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,16 +33,11 @@ import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.junit.After;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class DatabaseHistoryPropertyAutoTest {
 
   protected List<ProcessEngineImpl> processEngines = new ArrayList<ProcessEngineImpl>();
-
-  @Rule
-  public final ExpectedException thrown = ExpectedException.none();
 
   private static ProcessEngineConfigurationImpl config(final String historyLevel) {
 
@@ -66,10 +60,9 @@ public class DatabaseHistoryPropertyAutoTest {
   public void failWhenSecondEngineDoesNotHaveTheSameHistoryLevel() {
     buildEngine(config("true", ProcessEngineConfiguration.HISTORY_FULL));
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("historyLevel mismatch: configuration says HistoryLevelAudit(name=audit, id=2) and database says HistoryLevelFull(name=full, id=3)");
-
-    buildEngine(config(ProcessEngineConfiguration.HISTORY_AUDIT));
+    assertThatThrownBy(() -> buildEngine(config(ProcessEngineConfiguration.HISTORY_AUDIT)))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("historyLevel mismatch: configuration says HistoryLevelAudit(name=audit, id=2) and database says HistoryLevelFull(name=full, id=3)");
   }
 
   @Test
@@ -81,8 +74,8 @@ public class DatabaseHistoryPropertyAutoTest {
     ProcessEngineImpl processEngineTwo = buildEngine(config("true", ProcessEngineConfiguration.HISTORY_AUTO));
 
     // then
-    assertThat(processEngineTwo.getProcessEngineConfiguration().getHistory(), is(ProcessEngineConfiguration.HISTORY_AUTO));
-    assertThat(processEngineTwo.getProcessEngineConfiguration().getHistoryLevel(), is(HistoryLevel.HISTORY_LEVEL_FULL));
+    assertThat(processEngineTwo.getProcessEngineConfiguration().getHistory()).isSameAs(ProcessEngineConfiguration.HISTORY_AUTO);
+    assertThat(processEngineTwo.getProcessEngineConfiguration().getHistoryLevel()).isSameAs(HistoryLevel.HISTORY_LEVEL_FULL);
 
   }
 
@@ -98,9 +91,9 @@ public class DatabaseHistoryPropertyAutoTest {
       }
     });
 
-    assertThat(level, equalTo(HistoryLevel.HISTORY_LEVEL_AUDIT.getId()));
+    assertThat(level).isEqualTo(HistoryLevel.HISTORY_LEVEL_AUDIT.getId());
 
-    assertThat(processEngine.getProcessEngineConfiguration().getHistoryLevel(), equalTo(HistoryLevel.HISTORY_LEVEL_AUDIT));
+    assertThat(processEngine.getProcessEngineConfiguration().getHistoryLevel()).isEqualTo(HistoryLevel.HISTORY_LEVEL_AUDIT);
   }
 
   @After

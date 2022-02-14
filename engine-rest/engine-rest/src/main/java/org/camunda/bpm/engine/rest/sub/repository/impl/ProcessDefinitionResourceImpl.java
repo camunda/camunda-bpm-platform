@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.form.CamundaFormRef;
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.impl.form.validator.FormFieldValidationException;
 import org.camunda.bpm.engine.impl.util.IoUtil;
@@ -42,6 +43,7 @@ import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 import org.camunda.bpm.engine.rest.dto.repository.ActivityStatisticsResultDto;
+import org.camunda.bpm.engine.rest.dto.repository.CalledProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDiagramDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionSuspensionStateDto;
@@ -55,7 +57,9 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.repository.ProcessDefinitionResource;
 import org.camunda.bpm.engine.rest.util.ApplicationContextPathUtil;
+import org.camunda.bpm.engine.rest.util.ContentTypeUtil;
 import org.camunda.bpm.engine.rest.util.EncodingUtil;
+import org.camunda.bpm.engine.rest.util.URLEncodingUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
 import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
@@ -74,6 +78,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource {
 
@@ -276,7 +281,7 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
     } else {
       String fileName = definition.getDiagramResourceName();
       return Response.ok(processDiagram)
-          .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+          .header("Content-Disposition", URLEncodingUtil.buildAttachmentValue(fileName))
           .type(getMediaTypeForFileSuffix(fileName)).build();
     }
   }
@@ -320,7 +325,7 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
       throw new InvalidRequestException(Status.BAD_REQUEST, e, "Cannot get start form data for process definition " + processDefinitionId);
     }
     FormDto dto = FormDto.fromFormData(formData);
-    if(dto.getKey() == null || dto.getKey().isEmpty()) {
+    if((dto.getKey() == null || dto.getKey().isEmpty()) && dto.getCamundaFormRef() == null) {
       if(formData != null && formData.getFormFields() != null && !formData.getFormFields().isEmpty()) {
         dto.setKey("embedded:engine://engine/:engine/process-definition/"+processDefinitionId+"/rendered-form");
       }
@@ -378,6 +383,17 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
   }
 
   @Override
+  public List<CalledProcessDefinitionDto> getStaticCalledProcessDefinitions() {
+    try {
+      return engine.getRepositoryService().getStaticCalledProcessDefinitions(processDefinitionId).stream()
+        .map(CalledProcessDefinitionDto::from)
+        .collect(Collectors.toList());
+    } catch (NullValueException e) {
+      throw new InvalidRequestException(Status.NOT_FOUND, e.getMessage());
+    }
+  }
+
+  @Override
   public void restartProcessInstance(RestartProcessInstanceDto restartProcessInstanceDto) {
     try {
       createRestartProcessInstanceBuilder(restartProcessInstanceDto).execute();
@@ -430,9 +446,9 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
   }
 
   public Response getDeployedStartForm() {
-    InputStream deployedStartForm = null;
     try {
-      deployedStartForm = engine.getFormService().getDeployedStartForm(processDefinitionId);
+      InputStream deployedStartForm = engine.getFormService().getDeployedStartForm(processDefinitionId);
+      return Response.ok(deployedStartForm, getStartFormMediaType(processDefinitionId)).build();
     } catch (NotFoundException e) {
       throw new InvalidRequestException(Status.NOT_FOUND, e.getMessage());
     } catch (NullValueException e) {
@@ -442,6 +458,16 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
     } catch (BadUserRequestException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
     }
-    return Response.ok(deployedStartForm, MediaType.APPLICATION_XHTML_XML).build();
+  }
+
+  protected String getStartFormMediaType(String processDefinitionId) {
+    String formKey = engine.getFormService().getStartFormKey(processDefinitionId);
+    CamundaFormRef camundaFormRef = engine.getFormService().getStartFormData(processDefinitionId).getCamundaFormRef();
+    if(formKey != null) {
+      return ContentTypeUtil.getFormContentType(formKey);
+    } else if(camundaFormRef != null) {
+      return ContentTypeUtil.getFormContentType(camundaFormRef);
+    }
+    return MediaType.APPLICATION_XHTML_XML;
   }
 }

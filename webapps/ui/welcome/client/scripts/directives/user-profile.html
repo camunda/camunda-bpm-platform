@@ -1,0 +1,156 @@
+<div class="user-profile">
+  <div class="user-profile-display"
+       ng-if="!visibleForm">
+    <h3 class="section-title">
+      {{'PROFILE' | translate}}
+    </h3>
+
+    <div class="user-profile-info">
+      <h4 class="user-profile-name"
+          ng-if="user.firstName || user.lastName"
+          uib-tooltip="{{ translate('USERNAME_FOR_AUTHENTICATION', { username: user.id }) }}">{{ user.firstName }} {{ user.lastName }}</h4>
+      <h4 class="user-profile-name"
+          ng-if="!user.firstName && !user.lastName">{{ user.id }}</h4>
+      <div class="user-profile-email">{{ user.email }}</div>
+    </div>
+
+    <ul class="action-links list-inline">
+      <li><a ng-click="showForm('profile')">{{'EDIT_PROFILE' | translate}}</a></li>
+      <li><a ng-click="showForm('password')">{{'CHANGE_PASSWORD' | translate}}</a></li>
+    </ul>
+
+    <hr class="narrow"
+        ng-if="user.groups.length">
+
+    <div ng-if="user.groups.length">
+      <h4>{{'GROUPS' | translate}}</h4>
+      <ul class="user-profile-groups">
+        <li ng-repeat="group in user.groups"
+            ng-class="'group-' + group.id + ' type-' + group.type.toLowerCase()">{{ group.name }}</li>
+      </ul>
+
+      <ul uib-pagination
+        class="pagination-sm"
+
+        page="groupPages.current"
+        ng-model="groupPages.current"
+        ng-change="loadGroups()"
+        ng-if="groupPages.total > groupPages.size"
+
+        total-items="groupPages.total"
+        items-per-page="groupPages.size"
+
+        max-size="7"
+        boundary-links="false"></ul>
+    </div>
+  </div>
+
+  <form name="userProfile"
+        class="user-profile"
+        ng-submit="submitProfile()"
+        ng-show="visibleForm === 'profile'">
+    <h3 class="section-title">{{'EDIT_YOUR_PROFILE' | translate}}</h3>
+
+    <div class="form-group">
+      <label>{{'USERNAME' | translate}}</label>
+      <div class="form-control-static">{{ user.id }}</div>
+    </div>
+
+    <div class="form-group">
+      <label for="user-profile-firstname">{{'FIRST_NAME' | translate}}</label>
+      <input class="form-control"
+             id="user-profile-firstname"
+             type="text"
+             name="firstName"
+             required
+             ng-model="user.firstName"
+             placeholder="Jonny" />
+    </div>
+
+    <div class="form-group">
+      <label for="user-profile-lastname">{{'LAST_NAME' | translate}}</label>
+      <input class="form-control"
+             id="user-profile-lastname"
+             type="text"
+             name="lastName"
+             required
+             ng-model="user.lastName"
+             placeholder="Prosciutto" />
+    </div>
+
+    <div class="form-group">
+      <label for="user-profile-email">{{'EMAIL' | translate}}</label>
+      <input class="form-control"
+             id="user-profile-email"
+             type="text"
+             name="email"
+             ng-model="user.email"
+             placeholder="j.prosciutto@acme.org" />
+    </div>
+
+    <div class="form-group actions row">
+      <div class="col-xs-6">
+        <button type="button"
+                class="btn btn-link"
+                ng-click="showForm()">{{'CANCEL' | translate}}</button>
+      </div>
+      <div class="col-xs-6 text-right">
+        <button type="submit"
+                ng-disabled="userProfile.$invalid || userProfile.$pristine || processing"
+                class="btn btn-primary">{{'UPDATE' | translate}}</button>
+      </div>
+    </div>
+  </form>
+
+
+
+  <form name="changePassword"
+        class="change-password"
+        ng-submit="submitPassword()"
+        ng-show="visibleForm === 'password'">
+    <h3 class="section-title">{{'CHANGE_YOUR_PASSWORD' | translate}}</h3>
+
+    <div class="form-group">
+      <label for="user-password-current">{{'CURRENT_PASSWORD' | translate}}</label>
+      <input class="form-control"
+             id="user-password-current"
+             type="password"
+             name="current"
+             required
+             ng-model="password.current" />
+    </div>
+
+    <div class="form-group">
+      <label for="user-password-new">{{'NEW_PASSWORD' | translate}}</label>
+      <div cam-widget-password
+           cam-widget-password-profile="persistedProfile"
+           cam-widget-password-password="password.new"
+           cam-widget-password-valid="password.valid"></div>
+    </div>
+
+    <div class="form-group">
+      <label for="user-password-confirmation">{{'CONFIRM_NEW_PASSWORD' | translate}}</label>
+      <input class="form-control"
+             id="user-password-confirmation"
+             type="password"
+             name="confirmation"
+             required
+             ng-model="password.confirmation" />
+      <div ng-if="passwordsMismatch"
+           class="help-block error">{{'PASSWORD_NOT_MATCHING' | translate}}</div>
+    </div>
+
+    <div class="form-group actions row">
+      <div class="col-xs-6">
+        <button type="button"
+                class="btn btn-link"
+                ng-click="showForm()">{{'CANCEL' | translate}}</button>
+      </div>
+      <div class="col-xs-6 text-right">
+        <button type="submit"
+                ng-disabled="changePassword.$invalid || changePassword.$pristine || processing || passwordsMismatch || !password.valid"
+                class="btn btn-primary">{{'CHANGE_PASSWORD' | translate}}</button>
+      </div>
+    </div>
+  </form>
+</div>

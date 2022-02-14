@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
@@ -37,7 +38,8 @@
                            "configuration": "aConfiguration",
                            "tenantId": null,
                            "incidentMessage": "anIncidentMessage",
-                           "jobDefinitionId": "aJobDefinitionId"
+                           "jobDefinitionId": "aJobDefinitionId",
+                            "annotation": "an annotation"
                          }
                      }'] />
 
@@ -48,3 +50,5 @@
         desc = "Returned if an incident with given id does not exist." />
     }
 }
+
+</#macro>

@@ -1,8 +1,10 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
       id = "getFormVariables"
       tag = "Task"
+      summary = "Get Task Form Variables"
       desc = "Retrieves the form variables for a task. The form variables take form data specified
               on the task into account. If form fields are defined, the variable types and default
               values of the form fields are taken into account." />
@@ -86,3 +88,5 @@
 
   }
 }
+
+</#macro>

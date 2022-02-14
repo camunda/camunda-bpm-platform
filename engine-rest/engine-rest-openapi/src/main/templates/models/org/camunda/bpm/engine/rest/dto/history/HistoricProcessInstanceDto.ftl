@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
   <#assign dateFormatDescription = "Default [format](${docsUrl}/reference/rest/overview/date-format/) `yyyy-MM-dd'T'HH:mm:ss.SSSZ`."/>
 
@@ -40,7 +41,6 @@
       name = "processDefinitionVersion"
       type = "integer"
       format = "int32"
-      nullable = false
       desc = "The version of the process definition that this process instance belongs to."/>
 
   <@lib.property
@@ -74,8 +74,7 @@
   <@lib.property
       name = "durationInMillis"
       type = "integer"
-      format = "int32"
-      nullable = true
+      format = "int64"
       desc = "The time the instance took to finish (in milliseconds)."/>
 
   <@lib.property
@@ -116,3 +115,4 @@
               `INTERNALLY_TERMINATED` - terminated internally, for instance by terminating boundary event"/>
 
 </@lib.dto>
+</#macro>

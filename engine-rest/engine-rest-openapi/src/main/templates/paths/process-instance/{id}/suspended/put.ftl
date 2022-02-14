@@ -1,8 +1,10 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
       id = "updateSuspensionStateById"
       tag = "Process Instance"
+      summary = "Activate/Suspend Process Instance By Id"
       desc = "Activates or suspends a given process instance by id." />
 
   "parameters" : [ 
@@ -35,3 +37,4 @@
 
       }
 }
+</#macro>

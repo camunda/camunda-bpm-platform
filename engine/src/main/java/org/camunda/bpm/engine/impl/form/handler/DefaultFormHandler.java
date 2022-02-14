@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.impl.form.handler;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.form.FormDataImpl;
+import org.camunda.bpm.engine.impl.form.FormDefinition;
 import org.camunda.bpm.engine.impl.form.type.AbstractFormFieldType;
 import org.camunda.bpm.engine.impl.form.type.FormTypes;
 import org.camunda.bpm.engine.impl.form.validator.FormFieldValidator;
@@ -59,12 +61,17 @@ public class DefaultFormHandler implements FormHandler {
   public static final String FORM_PROPERTY_ELEMENT = "formProperty";
   private static final String BUSINESS_KEY_ATTRIBUTE = "businessKey";
 
+  public static final String FORM_REF_BINDING_DEPLOYMENT = "deployment";
+  public static final String FORM_REF_BINDING_LATEST = "latest";
+  public static final String FORM_REF_BINDING_VERSION = "version";
+  public static final List<String> ALLOWED_FORM_REF_BINDINGS = Arrays.asList(FORM_REF_BINDING_DEPLOYMENT, FORM_REF_BINDING_LATEST, FORM_REF_BINDING_VERSION);
+
   protected String deploymentId;
   protected String businessKeyFieldId;
 
-  protected List<FormPropertyHandler> formPropertyHandlers = new ArrayList<FormPropertyHandler>();
+  protected List<FormPropertyHandler> formPropertyHandlers = new ArrayList<>();
 
-  protected List<FormFieldHandler> formFieldHandlers = new ArrayList<FormFieldHandler>();
+  protected List<FormFieldHandler> formFieldHandlers = new ArrayList<>();
 
   public void parseConfiguration(Element activityElement, DeploymentEntity deployment, ProcessDefinitionEntity processDefinition, BpmnParse bpmnParse) {
     this.deploymentId = deployment.getId();
@@ -153,7 +160,7 @@ public class DefaultFormHandler implements FormHandler {
       List<Element> propertyElements = propertiesElement.elementsNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "property");
 
       // use linked hash map to preserve item ordering as provided in XML
-      Map<String, String> propertyMap = new LinkedHashMap<String, String>();
+      Map<String, String> propertyMap = new LinkedHashMap<>();
       for (Element property : propertyElements) {
         String id = property.attribute("id");
         String value = property.attribute("value");
@@ -262,7 +269,7 @@ public class DefaultFormHandler implements FormHandler {
   }
 
   protected void initializeFormProperties(FormDataImpl formData, ExecutionEntity execution) {
-    List<FormProperty> formProperties = new ArrayList<FormProperty>();
+    List<FormProperty> formProperties = new ArrayList<>();
     for (FormPropertyHandler formPropertyHandler: formPropertyHandlers) {
       if (formPropertyHandler.isReadable()) {
         FormProperty formProperty = formPropertyHandler.createFormProperty(execution);
@@ -340,7 +347,7 @@ public class DefaultFormHandler implements FormHandler {
           if (!(value instanceof SerializableValue)
               && value.getValue() != null && value.getValue() instanceof String) {
             final String stringValue = (String) value.getValue();
-            
+
             HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
               @Override
               public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
@@ -379,4 +386,5 @@ public class DefaultFormHandler implements FormHandler {
   public void setBusinessKeyFieldId(String businessKeyFieldId) {
     this.businessKeyFieldId = businessKeyFieldId;
   }
+
 }

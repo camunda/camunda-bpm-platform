@@ -91,8 +91,18 @@ public class CamundaBpmRunRestConfiguration {
     String restApiPathPattern = applicationPath.getUrlMapping();
     registration.addUrlPatterns(restApiPathPattern);
 
-    registration.addInitParameter(CorsFilter.PARAM_CORS_ALLOWED_ORIGINS, camundaBpmRunProperties.getCors().getAllowedOrigins());
-    registration.addInitParameter(CorsFilter.PARAM_CORS_ALLOWED_METHODS, CamundaBpmRunCorsProperty.DEFAULT_HTTP_METHODS);
+    registration.addInitParameter(CorsFilter.PARAM_CORS_ALLOWED_ORIGINS,
+                                  camundaBpmRunProperties.getCors().getAllowedOrigins());
+    registration.addInitParameter(CorsFilter.PARAM_CORS_ALLOWED_METHODS,
+                                  CamundaBpmRunCorsProperty.DEFAULT_HTTP_METHODS);
+    registration.addInitParameter(CorsFilter.PARAM_CORS_ALLOWED_HEADERS,
+                                  camundaBpmRunProperties.getCors().getAllowedHeaders());
+    registration.addInitParameter(CorsFilter.PARAM_CORS_EXPOSED_HEADERS,
+                                  camundaBpmRunProperties.getCors().getExposedHeaders());
+    registration.addInitParameter(CorsFilter.PARAM_CORS_SUPPORT_CREDENTIALS,
+                                  String.valueOf(camundaBpmRunProperties.getCors().getAllowCredentials()));
+    registration.addInitParameter(CorsFilter.PARAM_CORS_PREFLIGHT_MAXAGE,
+                                  camundaBpmRunProperties.getCors().getPreflightMaxAge());
 
     return registration;
   }

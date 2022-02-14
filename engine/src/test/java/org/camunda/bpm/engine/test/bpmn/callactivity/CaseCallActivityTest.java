@@ -16,12 +16,11 @@
  */
 package org.camunda.bpm.engine.test.bpmn.callactivity;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -1205,9 +1204,9 @@ public class CaseCallActivityTest extends CmmnTest {
 
     Task task = taskService.createTaskQuery().singleResult();
     TypedValue value = runtimeService.getVariableTyped(task.getProcessInstanceId(), variableName);
-    assertThat(value, is(variableValue));
+    assertThat(value).isEqualTo(variableValue);
     value = runtimeService.getVariableTyped(task.getProcessInstanceId(), variableName2);
-    assertThat(value, is(variableValue2));
+    assertThat(value).isEqualTo(variableValue2);
   }
 
   @Deployment(resources = {

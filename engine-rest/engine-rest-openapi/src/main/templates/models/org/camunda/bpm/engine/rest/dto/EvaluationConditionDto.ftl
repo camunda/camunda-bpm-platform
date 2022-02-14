@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -32,3 +33,5 @@
         desc = "Used to evaluate conditions of the process definition with the given id."/>
 
 </@lib.dto>
+
+</#macro>

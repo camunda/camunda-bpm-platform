@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -13,7 +14,6 @@
     <@lib.property
         name = "ended"
         type = "boolean"
-        nullable = false
         desc = "Indicates if the execution is ended."/>
 
     <@lib.property
@@ -24,3 +24,4 @@
                 if the execution belongs to no single tenant."/>
 
 </@lib.dto>
+</#macro>

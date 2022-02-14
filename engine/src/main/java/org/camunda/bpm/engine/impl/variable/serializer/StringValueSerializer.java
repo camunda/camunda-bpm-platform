@@ -28,6 +28,8 @@ import org.camunda.bpm.engine.variable.value.StringValue;
  */
 public class StringValueSerializer extends PrimitiveValueSerializer<StringValue> {
 
+  public static final String EMPTY_STRING = "!emptyString!";
+
   public StringValueSerializer() {
     super(ValueType.STRING);
   }
@@ -37,11 +39,19 @@ public class StringValueSerializer extends PrimitiveValueSerializer<StringValue>
   }
 
   public StringValue readValue(ValueFields valueFields, boolean asTransientValue) {
-    return Variables.stringValue(valueFields.getTextValue(), asTransientValue);
+    String textValue = valueFields.getTextValue();
+    if (textValue == null && EMPTY_STRING.equals(valueFields.getTextValue2())) {
+      textValue = "";
+    }
+    return Variables.stringValue(textValue, asTransientValue);
   }
 
   public void writeValue(StringValue variableValue, ValueFields valueFields) {
-    valueFields.setTextValue(variableValue.getValue());
+    String value = variableValue.getValue();
+    valueFields.setTextValue(value);
+    if ("".equals(value)) {
+      valueFields.setTextValue2(EMPTY_STRING);
+    }
   }
 
 }

@@ -11,6 +11,18 @@ camunda.bpm:
       same-site-cookie-option: STRICT
     header-security:
       hsts-disabled: false
+      content-security-policy-value: base-uri 'self';
+        default-src 'self' 'unsafe-inline' 'unsafe-eval';
+        img-src 'self' data:;
+        block-all-mixed-content;
+        form-action 'self';
+        frame-ancestors 'none';
+        object-src 'none';
+        sandbox
+          allow-forms
+          allow-scripts
+          allow-same-origin
+          allow-popups
 
 # https://docs.camunda.org/manual/latest/user-guide/security/#authorization
 # https://docs.camunda.org/manual/latest/user-guide/process-engine/authorization-service/
@@ -29,6 +41,37 @@ camunda.bpm:
 # https://docs.camunda.org/manual/latest/user-guide/security/#authentication
 # https://docs.camunda.org/manual/latest/user-guide/camunda-bpm-run/#authentication
     auth.enabled: true
+# https://docs.camunda.org/manual/latest/user-guide/process-engine/identity-service/#configuration-properties-of-the-ldap-plugin
+# https://docs.camunda.org/manual/latest/user-guide/camunda-bpm-run/#ldap-identity-service
+# Uncomment this section to enable LDAP support for Camunda Run
+#    ldap:
+#      enabled: true
+#      server-url: ldaps://localhost:4334
+#      administrator-group-name: camunda-admin
+#      accept-untrusted-certificates: false
+#      manager-dn: uid=jonny,ou=office-berlin,o=camunda,c=org
+#      manager-password: s3cr3t
+#      base-dn: o=camunda,c=org
+#      user-search-base: ''
+#      user-search-filter: (objectclass=person)
+#      user-id-attribute: uid
+#      user-firstname-attribute: cn
+#      user-lastname-attribute: sn
+#      user-email-ttribute: mail
+#      user-password-attribute: userpassword
+#      group-search-base: ''
+#      group-search-filter: (objectclass=groupOfNames)
+#      group-id-attribute: cn
+#      group-name-attribute: cn
+#      group-member-attribute: member
+#      sort-control-supported: false
+# https://docs.camunda.org/manual/latest/user-guide/process-engine/authorization-service/#the-administrator-authorization-plugin
+# https://docs.camunda.org/manual/latest/user-guide/camunda-bpm-run/#ldap-administrator-authorization
+# Uncomment this section to grant administrator authorizations to an existing LDAP user or group
+#    admin-auth:
+#      enabled: true
+#      administrator-user-name: admin
+#      administrator-group-name: admins
 
 server:
 # https://docs.camunda.org/manual/latest/user-guide/camunda-bpm-run/#https
@@ -51,7 +94,7 @@ server:
 # https://docs.camunda.org/manual/latest/user-guide/logging/#process-engine
 logging:
    level.root: INFO
-   file: logs/camunda-bpm-run.log
+   file.name: logs/camunda-bpm-run.log
 
 # datasource configuration is required
 # do not use the H2 databse in production
@@ -62,3 +105,9 @@ spring.datasource:
   driver-class-name: org.h2.Driver
   username: sa
   password: sa
+
+# By default, Spring Boot serves static content from any directories called /static or /public or /resources or
+# /META-INF/resources in the classpath. To prevent users from accidentally sharing files, this is disabled here by setting static locations to NULL.
+# https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#boot-features-spring-mvc-static-content
+spring.web.resources:
+  static-locations: NULL

@@ -1,0 +1,204 @@
+@import "shared/_variables.less";
+
+@brand-logo:      'resources/img/camunda-logo.png';
+// @header-height:   41px;
+
+@font-path:       "./vendor/fonts/";
+@bpmn-font-path:  @font-path;//"./node_modules/bpmn-font/dist/font/";
+@icon-font-path:  @font-path;//"./node_modules/bootstrap/fonts/";
+
+@import "shared/bootstrap.less";
+@import "shared/base.less";
+@import "inline-field/cam-widget-inline-field";
+@import "bpmn-viewer/cam-widget-bpmn-viewer";
+@import "cmmn-viewer/cam-widget-cmmn-viewer";
+@import "dmn-viewer/cam-widget-dmn-viewer";
+@dmn-font-path:   @font-path;//"../../node_modules/dmn-js/fonts/";
+
+@import "footer/cam-widget-footer";
+@import "header/cam-widget-header";
+@import "loader/cam-widget-loader";
+@import "search/cam-widget-search";
+@import "cam-share-link/cam-share-link";
+@import "search-pill/cam-widget-search-pill";
+@import "variable/cam-widget-variable";
+@import "variables-table/cam-widget-variables-table";
+@import "clipboard/cam-widget-clipboard";
+@import "password/cam-widget-password";
+
+// custom styles for the testing suite -----------------------------------------
+
+.cam-brand-header {
+  .cam-corporate-header-base();
+
+  a {
+    .cam-corporate-header-link();
+  }
+
+  .navbar-brand {
+    .cam-corporate-header-branding();
+  }
+
+  .container .navbar-brand {
+    padding-left: 0;
+  }
+
+  .brand-logo::before {
+    color: @brand-primary;
+    display: inline-block;
+    /* stylelint-disable-next-line font-family-no-missing-generic-family-keyword -- Icon Font */
+    font-family: "bpmn";
+    font-style: normal;
+    font-weight: normal;
+    content: '\e831';
+  }
+}
+
+.cam-brand-footer {
+  .cam-corporate-footer-base();
+}
+
+dd {
+  padding-left: @grid-gutter-width;
+  max-width: 550px;
+}
+
+dt + dd {
+  margin-bottom: (@grid-gutter-width / 2);
+}
+
+dd li {
+  margin-top: (@grid-gutter-width / 2);
+}
+
+body {
+  padding-top: @header-height;
+
+  > .page-wrapper {
+    .container-fluid();
+
+    @media (min-width: @screen-sm-min) {
+      width: @container-sm;
+    }
+
+    @media (min-width: @screen-md-min) {
+      width: @container-md;
+    }
+
+    @media (min-width: @screen-lg-min) {
+      width: @container-lg;
+    }
+  }
+
+  &.gh-pages {
+    h1,
+    h2,
+    h3,
+    h4 {
+      font-weight: 100;
+    }
+
+    h1 {
+      text-transform: uppercase;
+    }
+
+    &.readme .content {
+      margin-top: 10px;
+    }
+
+    > footer,
+    > footer > nav {
+      text-align: right;
+      overflow: hidden;
+    }
+
+    > .page-wrapper {
+      padding-left: 160px;
+
+      > nav {
+        width: (160px - @grid-gutter-width);
+        position: fixed;
+        margin: 0;
+        overflow: auto;
+        left: (@grid-gutter-width / 2);
+        top: 60px;
+        bottom: @grid-gutter-width * 1.5;
+
+        li {
+          display: block;
+        }
+
+        a {
+          display: inline-block;
+          font-size: 1.2em;
+        }
+
+        .active a {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+}
+
+.widget-description,
+.widget-reference {
+  font-size: 16px;
+  line-height: 22px;
+}
+
+.widget-reference {
+  dt {
+    font-family: monospace;
+
+    > .function-definition {
+      color: @gray-light;
+      font-weight: lighter;
+
+      > .params {
+        font-style: italic;
+      }
+
+      > .returns {
+        font-weight: bolder;
+      }
+    }
+  }
+}
+
+.widget-example {
+  margin: (@grid-gutter-width / 2) 0;
+  padding: (@grid-gutter-width / 2) 0;
+
+  [ng-non-bindable] {
+    margin-bottom: @grid-gutter-width;
+  }
+}
+
+.test-container {
+  .container;
+
+  max-width: 100% !important;
+  position: relative;
+  padding: @grid-gutter-width;
+  border: 1px solid @gray-lighter;
+  background: url(resources/img/check-pattern.png);
+  background-color: @gray-lighter;
+}
+
+// overrides for tests
+
+// header
+.cam-widget-header-test-page .test-container {
+  padding-top: @header-height;
+
+  .test-container {
+    overflow: hidden;
+    min-height: 200px;
+  }
+}
+
+.test-container > [cam-widget-header],
+.test-container > [cam-widget-footer] {
+  position: absolute;
+}

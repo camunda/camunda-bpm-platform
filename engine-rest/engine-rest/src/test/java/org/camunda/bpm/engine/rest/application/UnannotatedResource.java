@@ -68,7 +68,7 @@ public class UnannotatedResource {
   @GET
   @Path("/authorizationExceptionMultiple")
   public String throwAuthorizationExceptionMultiple() throws Exception {
-    List<MissingAuthorization> missingAuthorizations = new ArrayList<MissingAuthorization>();
+    List<MissingAuthorization> missingAuthorizations = new ArrayList<>();
 
     missingAuthorizations.add(
         new MissingAuthorization("somePermission1", "someResourceName1", "someResourceId1"));

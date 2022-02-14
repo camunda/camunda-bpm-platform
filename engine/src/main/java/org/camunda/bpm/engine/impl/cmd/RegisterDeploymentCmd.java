@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -39,7 +40,7 @@ public class RegisterDeploymentCmd implements Command<Void> {
 
     ensureNotNull("Deployment " + deploymentId + " does not exist", "deployment", deployment);
 
-    commandContext.getAuthorizationManager().checkCamundaAdmin();
+    commandContext.getAuthorizationManager().checkCamundaAdminOrPermission(CommandChecker::checkRegisterDeployment);
 
     Context.getProcessEngineConfiguration().getRegisteredDeployments().add(deploymentId);
     return null;

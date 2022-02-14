@@ -16,9 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -70,8 +68,8 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
       .setVariable("status", "gold")
       .processDefinitionTenantId(TENANT_TWO).execute();
 
-    assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
-    assertThat((String)runtimeService.getVariable(processInstanceTwo.getId(), "decisionVar"), is(RESULT_OF_VERSION_TWO));
+    assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar")).isEqualTo(RESULT_OF_VERSION_ONE);
+    assertThat((String)runtimeService.getVariable(processInstanceTwo.getId(), "decisionVar")).isEqualTo(RESULT_OF_VERSION_TWO);
   }
 
   @Test
@@ -99,8 +97,8 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
       .setVariable("status", "gold")
       .processDefinitionTenantId(TENANT_TWO).execute();
 
-    assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
-    assertThat((String)runtimeService.getVariable(processInstanceTwo.getId(), "decisionVar"), is(RESULT_OF_VERSION_TWO));
+    assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar")).isEqualTo(RESULT_OF_VERSION_ONE);
+    assertThat((String)runtimeService.getVariable(processInstanceTwo.getId(), "decisionVar")).isEqualTo(RESULT_OF_VERSION_TWO);
   }
 
   @Test
@@ -130,8 +128,8 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
       .setVariable("status", "gold")
       .processDefinitionTenantId(TENANT_TWO).execute();
 
-    assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
-    assertThat((String)runtimeService.getVariable(processInstanceTwo.getId(), "decisionVar"), is(RESULT_OF_VERSION_TWO));
+    assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar")).isEqualTo(RESULT_OF_VERSION_ONE);
+    assertThat((String)runtimeService.getVariable(processInstanceTwo.getId(), "decisionVar")).isEqualTo(RESULT_OF_VERSION_TWO);
   }
 
   @Test
@@ -163,8 +161,8 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
       .setVariable("status", "gold")
       .processDefinitionTenantId(TENANT_TWO).execute();
 
-    assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
-    assertThat((String)runtimeService.getVariable(processInstanceTwo.getId(), "decisionVar"), is(RESULT_OF_VERSION_TWO));
+    assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar")).isEqualTo(RESULT_OF_VERSION_ONE);
+    assertThat((String)runtimeService.getVariable(processInstanceTwo.getId(), "decisionVar")).isEqualTo(RESULT_OF_VERSION_TWO);
   }
 
   @Test
@@ -190,7 +188,7 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
         .execute();
 
     // then
-    assertThat((String)runtimeService.getVariable(processInstance.getId(), "decisionVar"), is(RESULT_OF_VERSION_TAG_ONE));
+    assertThat((String)runtimeService.getVariable(processInstance.getId(), "decisionVar")).isEqualTo(RESULT_OF_VERSION_TAG_ONE);
   }
 
   @Test
@@ -219,8 +217,8 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
       .setVariable("status", "gold")
       .processDefinitionTenantId(TENANT_TWO).execute();
 
-    assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar"), is(RESULT_OF_VERSION_TAG_ONE));
-    assertThat((String)runtimeService.getVariable(processInstanceTwo.getId(), "decisionVar"), is(RESULT_OF_VERSION_TAG_TWO));
+    assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar")).isEqualTo(RESULT_OF_VERSION_TAG_ONE);
+    assertThat((String)runtimeService.getVariable(processInstanceTwo.getId(), "decisionVar")).isEqualTo(RESULT_OF_VERSION_TAG_TWO);
   }
 
   @Test
@@ -245,7 +243,7 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("no decision definition deployed with key = 'decision'"));
+      assertThat(e.getMessage()).contains("no decision definition deployed with key = 'decision'");
     }
   }
 
@@ -271,7 +269,7 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("no decision definition deployed with key 'decision'"));
+      assertThat(e.getMessage()).contains("no decision definition deployed with key 'decision'");
     }
   }
 
@@ -300,7 +298,7 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
 
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertThat(e.getMessage(), containsString("no decision definition deployed with key = 'decision', version = '2' and tenant-id 'tenant1'"));
+      assertThat(e.getMessage()).contains("no decision definition deployed with key = 'decision', version = '2' and tenant-id 'tenant1'");
     }
   }
 
@@ -332,7 +330,7 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
       fail("expected exception");
     } catch (ProcessEngineException e) {
       // then
-      assertThat(e.getMessage(), containsString("no decision definition deployed with key = 'decision', versionTag = '0.0.2' and tenant-id 'tenant1': decisionDefinition is null"));
+      assertThat(e.getMessage()).contains("no decision definition deployed with key = 'decision', versionTag = '0.0.2' and tenant-id 'tenant1': decisionDefinition is null");
     }
   }
 
@@ -358,7 +356,7 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
     ProcessInstance processInstanceOne = runtimeService.createProcessInstanceByKey("process")
       .setVariable("status", "gold").execute();
 
-    assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
+    assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar")).isEqualTo(RESULT_OF_VERSION_ONE);
   }
 
   @Test
@@ -383,7 +381,7 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
     ProcessInstance processInstanceOne = runtimeService.createProcessInstanceByKey("process")
       .setVariable("status", "gold").execute();
 
-    assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
+    assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar")).isEqualTo(RESULT_OF_VERSION_ONE);
   }
 
   @Test
@@ -408,7 +406,7 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
     ProcessInstance processInstanceOne = runtimeService.createProcessInstanceByKey("process")
       .setVariable("status", "gold").execute();
 
-    assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
+    assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar")).isEqualTo(RESULT_OF_VERSION_ONE);
   }
 
   @Test
@@ -434,7 +432,7 @@ public class MultiTenancyBusinessRuleTaskTest extends PluggableProcessEngineTest
       .setVariable("status", "gold").execute();
 
     // then
-    assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar"), is(RESULT_OF_VERSION_ONE));
+    assertThat((String)runtimeService.getVariable(processInstanceOne.getId(), "decisionVar")).isEqualTo(RESULT_OF_VERSION_ONE);
   }
 
 }

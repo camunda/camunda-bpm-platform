@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto
     extends = "LinkableDto" >
 
@@ -15,7 +16,6 @@
         name = "deploymentTime"
         type = "string"
         format = "date-time"
-        nullable = false
         desc = "The time when the deployment was created." />
 
     <@lib.property
@@ -30,3 +30,4 @@
         desc = "The name of the deployment." />
 
 </@lib.dto>
+</#macro>

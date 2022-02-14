@@ -1,8 +1,10 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
       id = "unclaim"
       tag = "Task"
+      summary = "Unclaim"
       desc = "Resets a task's assignee. If successful, the task is not assigned to a user." />
 
   "parameters" : [
@@ -36,3 +38,5 @@
 
   }
 }
+
+</#macro>

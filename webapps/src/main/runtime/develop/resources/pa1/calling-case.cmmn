@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cmmn:definitions xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:cmmn="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/cmmn" id="Test" targetNamespace="http://bpmn.io/schema/cmmn" exporter="Camunda Modeler" exporterVersion="1.2.2">
+  <cmmn:case id="CallingCase" name="Calling Case">
+    <cmmn:casePlanModel id="CasePlanModel_1" name="A CasePlanModel">
+      <cmmn:planItem id="PlanItem_1" name="Business Rule Task 1" definitionRef="DecisionTask_197ci0t" />
+      <cmmn:planItem id="PlanItem_15gxxwo" name="Business Rule Task 2" definitionRef="DecisionTask_0ctchbo" />
+      <cmmn:planItem id="PlanItem_1sycsk7" name="Business Rule Task 3" definitionRef="DecisionTask_120r7zs" />
+      <cmmn:planItem id="PlanItem_1e7839i" name="Business Rule Task 4" definitionRef="DecisionTask_10uq333" />
+      <cmmn:planItem id="PlanItem_1vr42hw" name="Business Rule Task 5" definitionRef="DecisionTask_1oqoh04" />
+      <cmmn:planItem id="PlanItem_0l9npet" name="Business Rule Task 6" definitionRef="DecisionTask_1byjni6" />
+      <cmmn:planItem id="PlanItem_1k69f6a" name="Business Rule Task 7" definitionRef="DecisionTask_0ev6dd4" />
+      <cmmn:decisionTask id="DecisionTask_197ci0t" decisionRef="invoice-assign-approver">
+        <cmmn:extensionElements>
+          <camunda:caseExecutionListener event="create" class="org.camunda.bpm.pa.service.SetDecisionVariableListener" />
+        </cmmn:extensionElements>
+      </cmmn:decisionTask>
+      <cmmn:decisionTask id="DecisionTask_0ctchbo" name="Business Rule Task 2" decisionRef="invoice-assign-approver">
+        <cmmn:extensionElements>
+          <camunda:caseExecutionListener event="create" class="org.camunda.bpm.pa.service.SetDecisionVariableListener" />
+        </cmmn:extensionElements>
+      </cmmn:decisionTask>
+      <cmmn:decisionTask id="DecisionTask_120r7zs" decisionRef="invoice-assign-approver">
+        <cmmn:extensionElements>
+          <camunda:caseExecutionListener event="create" class="org.camunda.bpm.pa.service.SetDecisionVariableListener" />
+        </cmmn:extensionElements>
+      </cmmn:decisionTask>
+      <cmmn:decisionTask id="DecisionTask_10uq333" decisionRef="invoice-assign-approver">
+        <cmmn:extensionElements>
+          <camunda:caseExecutionListener event="create" class="org.camunda.bpm.pa.service.SetDecisionVariableListener" />
+        </cmmn:extensionElements>
+      </cmmn:decisionTask>
+      <cmmn:decisionTask id="DecisionTask_1oqoh04" decisionRef="invoice-assign-approver">
+        <cmmn:extensionElements>
+          <camunda:caseExecutionListener event="create" class="org.camunda.bpm.pa.service.SetDecisionVariableListener" />
+        </cmmn:extensionElements>
+      </cmmn:decisionTask>
+      <cmmn:decisionTask id="DecisionTask_1byjni6" decisionRef="invoice-assign-approver">
+        <cmmn:extensionElements>
+          <camunda:caseExecutionListener event="create" class="org.camunda.bpm.pa.service.SetDecisionVariableListener" />
+        </cmmn:extensionElements>
+      </cmmn:decisionTask>
+      <cmmn:decisionTask id="DecisionTask_0ev6dd4" decisionRef="invoice-assign-approver">
+        <cmmn:extensionElements>
+          <camunda:caseExecutionListener event="create" class="org.camunda.bpm.pa.service.SetDecisionVariableListener" />
+        </cmmn:extensionElements>
+      </cmmn:decisionTask>
+    </cmmn:casePlanModel>
+  </cmmn:case>
+  <cmmndi:CMMNDI>
+    <cmmndi:CMMNDiagram id="_5a66685b-5f57-4e2f-b1d1-acca4fae04b2">
+      <cmmndi:Size xsi:type="dc:Dimension" width="500" height="500" />
+      <cmmndi:CMMNShape id="DI_CasePlanModel_1" cmmnElementRef="CasePlanModel_1">
+        <dc:Bounds x="93" y="50" width="413" height="341" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="PlanItem_0kcs5uo_di" cmmnElementRef="PlanItem_1">
+        <dc:Bounds x="115" y="73" width="100" height="80" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="PlanItem_0l6fkfu_di" cmmnElementRef="PlanItem_15gxxwo">
+        <dc:Bounds x="245" y="73" width="100" height="80" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="PlanItem_1gio601_di" cmmnElementRef="PlanItem_1sycsk7">
+        <dc:Bounds x="115" y="172" width="100" height="80" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="PlanItem_0997pml_di" cmmnElementRef="PlanItem_1e7839i">
+        <dc:Bounds x="245" y="172" width="100" height="80" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="PlanItem_1lxccth_di" cmmnElementRef="PlanItem_1vr42hw">
+        <dc:Bounds x="115" y="270" width="100" height="80" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="PlanItem_0gv18za_di" cmmnElementRef="PlanItem_0l9npet">
+        <dc:Bounds x="245" y="270" width="100" height="80" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="PlanItem_1msdljw_di" cmmnElementRef="PlanItem_1k69f6a">
+        <dc:Bounds x="386" y="172" width="100" height="80" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+    </cmmndi:CMMNDiagram>
+  </cmmndi:CMMNDI>
+</cmmn:definitions>

@@ -1,9 +1,11 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto
     required = [ "topicName", "lockDuration" ] >
 
     <@lib.property
         name = "topicName"
         type = "string"
+        nullable = false
         desc = "**Mandatory.** The topic's name." />
 
     <@lib.property
@@ -102,3 +104,5 @@
 
 
 </@lib.dto>
+
+</#macro>

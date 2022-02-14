@@ -1,3 +1,4 @@
+<#macro endpoint_macro docsUrl="">
 {
   <@lib.endpointInfo
       id = "deleteProcessDefinitionsByKeyAndTenantId"
@@ -70,3 +71,4 @@
 
   }
 }
+</#macro>

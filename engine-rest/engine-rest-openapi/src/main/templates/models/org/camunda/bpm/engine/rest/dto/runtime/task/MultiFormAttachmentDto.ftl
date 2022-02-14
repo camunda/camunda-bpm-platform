@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -28,3 +29,4 @@
         desc = "The content of the attachment." />
 
 </@lib.dto>
+</#macro>

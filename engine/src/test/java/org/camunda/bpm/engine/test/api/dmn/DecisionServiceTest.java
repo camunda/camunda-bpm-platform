@@ -16,9 +16,8 @@
  */
 package org.camunda.bpm.engine.test.api.dmn;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
@@ -39,7 +38,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -65,9 +63,6 @@ public class DecisionServiceTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   protected DecisionService decisionService;
   protected RepositoryService repositoryService;
@@ -151,34 +146,30 @@ public class DecisionServiceTest {
 
   @Test
 	public void evaluateDecisionTableByNullId() {
-    thrown.expect(NotValidException.class);
-    thrown.expectMessage("either decision definition id or key must be set");
-
-    decisionService.evaluateDecisionTableById(null, null);
+    assertThatThrownBy(() -> decisionService.evaluateDecisionTableById(null, null))
+      .isInstanceOf(NotValidException.class)
+      .hasMessageContaining("either decision definition id or key must be set");
   }
 
   @Test
 	public void evaluateDecisionTableByNonExistingId() {
-    thrown.expect(NotFoundException.class);
-    thrown.expectMessage("no deployed decision definition found with id 'unknown'");
-
-    decisionService.evaluateDecisionTableById("unknown", null);
+    assertThatThrownBy(() -> decisionService.evaluateDecisionTableById("unknown", null))
+      .isInstanceOf(NotFoundException.class)
+      .hasMessageContaining("no deployed decision definition found with id 'unknown'");
   }
 
   @Test
 	public void evaluateDecisionTableByNullKey() {
-    thrown.expect(NotValidException.class);
-    thrown.expectMessage("either decision definition id or key must be set");
-
-    decisionService.evaluateDecisionTableByKey(null, null);
+    assertThatThrownBy(() -> decisionService.evaluateDecisionTableByKey(null, null))
+      .isInstanceOf(NotValidException.class)
+      .hasMessageContaining("either decision definition id or key must be set");
   }
 
   @Test
 	public void evaluateDecisionTableByNonExistingKey() {
-    thrown.expect(NotFoundException.class);
-    thrown.expectMessage("no decision definition deployed with key 'unknown'");
-
-    decisionService.evaluateDecisionTableByKey("unknown", null);
+    assertThatThrownBy(() -> decisionService.evaluateDecisionTableByKey("unknown", null))
+      .isInstanceOf(NotFoundException.class)
+      .hasMessageContaining("no decision definition deployed with key 'unknown'");
   }
 
   @Deployment(resources = DMN_DECISION_TABLE)
@@ -186,10 +177,9 @@ public class DecisionServiceTest {
 	public void evaluateDecisionTableByKeyWithNonExistingVersion() {
     DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().singleResult();
 
-    thrown.expect(NotFoundException.class);
-    thrown.expectMessage("no decision definition deployed with key = 'decision' and version = '42'");
-
-    decisionService.evaluateDecisionTableByKeyAndVersion(decisionDefinition.getKey(), 42, null);
+    assertThatThrownBy(() -> decisionService.evaluateDecisionTableByKeyAndVersion(decisionDefinition.getKey(), 42, null))
+      .isInstanceOf(NotFoundException.class)
+      .hasMessageContaining("no decision definition deployed with key = 'decision' and version = '42'");
   }
 
   @Deployment(resources = DMN_DECISION_LITERAL_EXPRESSION)
@@ -259,34 +249,30 @@ public class DecisionServiceTest {
 
   @Test
   public void evaluateDecisionByNullId() {
-    thrown.expect(NotValidException.class);
-    thrown.expectMessage("either decision definition id or key must be set");
-
-    decisionService.evaluateDecisionById(null).evaluate();
+    assertThatThrownBy(() -> decisionService.evaluateDecisionById(null).evaluate())
+      .isInstanceOf(NotValidException.class)
+      .hasMessageContaining("either decision definition id or key must be set");
   }
 
   @Test
   public void evaluateDecisionByNonExistingId() {
-    thrown.expect(NotFoundException.class);
-    thrown.expectMessage("no deployed decision definition found with id 'unknown'");
-
-    decisionService.evaluateDecisionById("unknown").evaluate();
+    assertThatThrownBy(() -> decisionService.evaluateDecisionById("unknown").evaluate())
+      .isInstanceOf(NotFoundException.class)
+      .hasMessageContaining("no deployed decision definition found with id 'unknown'");
   }
 
   @Test
   public void evaluateDecisionByNullKey() {
-    thrown.expect(NotValidException.class);
-    thrown.expectMessage("either decision definition id or key must be set");
-
-    decisionService.evaluateDecisionByKey(null).evaluate();
+    assertThatThrownBy(() -> decisionService.evaluateDecisionByKey(null).evaluate())
+      .isInstanceOf(NotValidException.class)
+      .hasMessageContaining("either decision definition id or key must be set");
   }
 
   @Test
   public void evaluateDecisionByNonExistingKey() {
-    thrown.expect(NotFoundException.class);
-    thrown.expectMessage("no decision definition deployed with key 'unknown'");
-
-    decisionService.evaluateDecisionByKey("unknown").evaluate();
+    assertThatThrownBy(() -> decisionService.evaluateDecisionByKey("unknown").evaluate())
+      .isInstanceOf(NotFoundException.class)
+      .hasMessageContaining("no decision definition deployed with key 'unknown'");
   }
 
   @Deployment(resources = DMN_DECISION_LITERAL_EXPRESSION)
@@ -294,13 +280,12 @@ public class DecisionServiceTest {
   public void evaluateDecisionByKeyWithNonExistingVersion() {
     DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().singleResult();
 
-    thrown.expect(NotFoundException.class);
-    thrown.expectMessage("no decision definition deployed with key = 'decision' and version = '42'");
-
-    decisionService
-      .evaluateDecisionByKey(decisionDefinition.getKey())
-      .version(42)
-      .evaluate();
+    assertThatThrownBy(() -> decisionService
+        .evaluateDecisionByKey(decisionDefinition.getKey())
+        .version(42)
+        .evaluate())
+      .isInstanceOf(NotFoundException.class)
+      .hasMessageContaining("no decision definition deployed with key = 'decision' and version = '42'");
   }
 
   @Deployment( resources = DRD_DISH_DECISION_TABLE )
@@ -319,17 +304,17 @@ public class DecisionServiceTest {
   }
 
   protected void assertThatDecisionHasResult(DmnDecisionTableResult decisionResult, Object expectedValue) {
-    assertThat(decisionResult, is(notNullValue()));
-    assertThat(decisionResult.size(), is(1));
+    assertThat(decisionResult).isNotNull();
+    assertThat(decisionResult).hasSize(1);
     String value = decisionResult.getSingleResult().getFirstEntry();
-    assertThat(value, is(expectedValue));
+    assertThat(value).isEqualTo(expectedValue);
   }
 
   protected void assertThatDecisionHasResult(DmnDecisionResult decisionResult, Object expectedValue) {
-    assertThat(decisionResult, is(notNullValue()));
-    assertThat(decisionResult.size(), is(1));
+    assertThat(decisionResult).isNotNull();
+    assertThat(decisionResult).hasSize(1);
     String value = decisionResult.getSingleResult().getFirstEntry();
-    assertThat(value, is(expectedValue));
+    assertThat(value).isEqualTo(expectedValue);
   }
 
 }

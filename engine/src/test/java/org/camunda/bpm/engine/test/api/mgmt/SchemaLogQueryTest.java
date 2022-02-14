@@ -16,15 +16,10 @@
  */
 package org.camunda.bpm.engine.test.api.mgmt;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.schemaLogEntryByTimestamp;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySorting;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.junit.Assert.assertThat;
 
 import java.util.Date;
 import java.util.List;
@@ -76,13 +71,13 @@ public class SchemaLogQueryTest {
     List<SchemaLogEntry> schemaLogEntries = managementService.createSchemaLogQuery().list();
 
     // then expect (at least) one entry
-    assertThat(managementService.createSchemaLogQuery().count(), is(greaterThan(0L)));
+    assertThat(managementService.createSchemaLogQuery().count()).isGreaterThan(0L);
 
     // in case of tests that upgrade the schema there are more than one entry
     for (SchemaLogEntry schemaLogEntry : schemaLogEntries) {
-      assertThat(Integer.parseInt(schemaLogEntry.getId()), greaterThanOrEqualTo(0));
-      assertThat(schemaLogEntry.getTimestamp(), notNullValue());
-      assertThat(schemaLogEntry.getVersion(), notNullValue());
+      assertThat(Integer.parseInt(schemaLogEntry.getId())).isGreaterThanOrEqualTo(0);
+      assertThat(schemaLogEntry.getTimestamp()).isNotNull();
+      assertThat(schemaLogEntry.getVersion()).isNotNull();
     }
 
     cleanupTable();
@@ -109,9 +104,9 @@ public class SchemaLogQueryTest {
     SchemaLogEntry schemaLogEntry = managementService.createSchemaLogQuery().version("dummyVersion").singleResult();
 
     // then
-    assertThat(schemaLogEntry.getId(), is(dummySchemaLogEntry.getId()));
-    assertThat(schemaLogEntry.getTimestamp(), notNullValue());
-    assertThat(schemaLogEntry.getVersion(), is(dummySchemaLogEntry.getVersion()));
+    assertThat(schemaLogEntry.getId()).isEqualTo(dummySchemaLogEntry.getId());
+    assertThat(schemaLogEntry.getTimestamp()).isNotNull();
+    assertThat(schemaLogEntry.getVersion()).isEqualTo(dummySchemaLogEntry.getVersion());
 
     cleanupTable();
   }
@@ -131,21 +126,21 @@ public class SchemaLogQueryTest {
     // then paging works
     // ascending order
     List<SchemaLogEntry> schemaLogEntry = managementService.createSchemaLogQuery().orderByTimestamp().asc().listPage(0, 1);
-    assertThat(schemaLogEntry.size(), is(1));
-    assertThat(schemaLogEntry.get(0).getId(), is("0"));
+    assertThat(schemaLogEntry).hasSize(1);
+    assertThat(schemaLogEntry.get(0).getId()).isEqualTo("0");
 
     schemaLogEntry = managementService.createSchemaLogQuery().orderByTimestamp().asc().listPage(count - 1, 1);
-    assertThat(schemaLogEntry.size(), is(1));
-    assertThat(schemaLogEntry.get(0).getId(), is(not("0")));
+    assertThat(schemaLogEntry).hasSize(1);
+    assertThat(schemaLogEntry.get(0).getId()).isNotEqualTo("0");
 
     // descending order
     schemaLogEntry = managementService.createSchemaLogQuery().orderByTimestamp().desc().listPage(0, 1);
-    assertThat(schemaLogEntry.size(), is(1));
-    assertThat(schemaLogEntry.get(0).getId(), is(not("0")));
+    assertThat(schemaLogEntry).hasSize(1);
+    assertThat(schemaLogEntry.get(0).getId()).isNotEqualTo("0");
 
     schemaLogEntry = managementService.createSchemaLogQuery().orderByTimestamp().desc().listPage(count - 1, 1);
-    assertThat(schemaLogEntry.size(), is(1));
-    assertThat(schemaLogEntry.get(0).getId(), is("0"));
+    assertThat(schemaLogEntry).hasSize(1);
+    assertThat(schemaLogEntry.get(0).getId()).isEqualTo("0");
 
     cleanupTable();
   }
@@ -162,7 +157,7 @@ public class SchemaLogQueryTest {
         return null;
       }
     });
-    assertThat(managementService.createSchemaLogQuery().count(), is(initialEntryCount + 1));
+    assertThat(managementService.createSchemaLogQuery().count()).isEqualTo(initialEntryCount + 1);
   }
 
   private void cleanupTable() {
@@ -175,7 +170,7 @@ public class SchemaLogQueryTest {
         return null;
       }
     });
-    assertThat(managementService.createSchemaLogQuery().count(), is(initialEntryCount));
+    assertThat(managementService.createSchemaLogQuery().count()).isEqualTo(initialEntryCount);
   }
 
   private SchemaLogEntryEntity createDummySchemaLogEntry() {

@@ -108,11 +108,27 @@
     where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
   </update>
 
+  <update id="updateHistoricActivityInstancesByRootProcessInstanceId_mssql"
+          parameterType="java.util.Map">
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_HI_ACTINST RES WITH (FORCESEEK)
+    where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+  </update>
+
   <update id="updateHistoricActivityInstancesByProcessInstanceId"
           parameterType="java.util.Map">
     update ${prefix}ACT_HI_ACTINST
       set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
       where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+  </update>
+
+  <update id="updateHistoricActivityInstancesByProcessInstanceId_mssql"
+          parameterType="java.util.Map">
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_HI_ACTINST RES WITH (FORCESEEK)
+    where RES.PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
   </update>
 
   <!-- HISTORIC ACTIVITY INSTANCE SELECT -->
@@ -244,11 +260,13 @@
 
     <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause"/>
-      AUTH ON (AUTH.RESOURCE_ID_ in (
-      <if test="authCheck.isHistoricInstancePermissionsEnabled">
-        RES.PROC_INST_ID_,
-      </if>
-      RES.PROC_DEF_KEY_, '*'))
+      AUTH ON (AUTH.RESOURCE_ID_ ${authJoinStart}
+        RES.PROC_DEF_KEY_ ${authJoinSeparator} '*'
+        <if test="authCheck.isHistoricInstancePermissionsEnabled">
+          ${authJoinSeparator} RES.PROC_INST_ID_
+        </if>
+        ${authJoinEnd}
+      )
     </if>
 
     <where>

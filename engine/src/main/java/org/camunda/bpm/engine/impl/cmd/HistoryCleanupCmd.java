@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
@@ -34,6 +35,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyManager;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
+import org.camunda.bpm.engine.impl.util.DatabaseUtil;
 import org.camunda.bpm.engine.runtime.Job;
 
 import java.util.Date;
@@ -122,11 +124,9 @@ public class HistoryCleanupCmd implements Command<Job> {
   protected List<Job> createJobs(int degreeOfParallelism, int[][] minuteChunks) {
     CommandContext commandContext = Context.getCommandContext();
 
-    PropertyManager propertyManager = commandContext.getPropertyManager();
     JobManager jobManager = commandContext.getJobManager();
 
-    //exclusive lock
-    propertyManager.acquireExclusiveLockForHistoryCleanupJob();
+    acquireExclusiveLock(commandContext);
 
     //check again after lock
     List<Job> historyCleanupJobs = getHistoryCleanupJobs();
@@ -222,4 +222,28 @@ public class HistoryCleanupCmd implements Command<Job> {
         .isHistoryCleanupEnabled();
   }
 
+  protected void acquireExclusiveLock(CommandContext commandContext) {
+    PropertyManager propertyManager = commandContext.getPropertyManager();
+    //exclusive lock
+    propertyManager.acquireExclusiveLockForHistoryCleanupJob();
+  }
+
+  /**
+   * When CockroachDB is used, this command may be retried multiple times until
+   * it is successful, or the retries are exhausted. CockroachDB uses a stricter,
+   * SERIALIZABLE transaction isolation which ensures a serialized manner
+   * of transaction execution. A concurrent transaction that attempts to modify
+   * the same data as another transaction is required to abort, rollback and retry.
+   * This also makes our use-case of pessimistic locks redundant since we only use
+   * them as synchronization barriers, and not to lock actual data which would
+   * protect it from concurrent modifications.
+   *
+   * The History Cleanup command only executes internal code, so we are certain that
+   * a retry of a failed reconfiguraton will not impact user data, and may be performed
+   * multiple times.
+   */
+  @Override
+  public boolean isRetryable() {
+    return true;
+  }
 }

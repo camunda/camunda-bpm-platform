@@ -69,7 +69,6 @@ public abstract class TomcatServerBootstrap extends EmbeddedServerBootstrap {
       .useLegacyLocalRepo(true).configureViaPlugin();
 
     WebArchive wa = ShrinkWrap.create(WebArchive.class, "rest-test.war").setWebXML(webXmlPath)
-        .addAsLibraries(resolver.resolve("org.codehaus.jackson:jackson-jaxrs:1.6.5").withTransitivity().asFile())
         .addAsLibraries(resolver.addDependencies(
             MavenDependencies.createDependency("org.mockito:mockito-core", ScopeType.TEST, false,
             MavenDependencies.createExclusion("org.hamcrest:hamcrest-core"))).resolve()

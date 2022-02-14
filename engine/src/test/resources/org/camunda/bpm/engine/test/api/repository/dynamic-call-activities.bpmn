@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="_0yVNEMLBEeKbkYsGzbdBqg" targetNamespace="http://camunda.org/schema/1.0/bpmn" exporter="Camunda Modeler" exporterVersion="4.11.0-nightly.20210926" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+  <bpmn2:process id="DynamicCallActivities" name="DynamicCallActivities" isExecutable="true">
+    <bpmn2:startEvent id="StartEvent_1" name="Start Event">
+      <bpmn2:outgoing>SequenceFlow_1</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:callActivity id="dynamicCalledElement" name="dynamic called element" calledElement="${someDynamicReference}">
+      <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0dvvghu</bpmn2:outgoing>
+    </bpmn2:callActivity>
+    <bpmn2:sequenceFlow id="SequenceFlow_1" sourceRef="StartEvent_1" targetRef="dynamicCalledElement" />
+    <bpmn2:sequenceFlow id="Flow_0dvvghu" sourceRef="dynamicCalledElement" targetRef="dynamicVersion" />
+    <bpmn2:callActivity id="dynamicVersion" name="dynamic called version" calledElement="aNonExistingProcess" camunda:calledElementBinding="version" camunda:calledElementVersion="${someVersion}">
+      <bpmn2:incoming>Flow_0dvvghu</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1anu28t</bpmn2:outgoing>
+    </bpmn2:callActivity>
+    <bpmn2:sequenceFlow id="Flow_1anu28t" sourceRef="dynamicVersion" targetRef="dynamicVersionTag" />
+    <bpmn2:callActivity id="dynamicVersionTag" name="dynamic version tag" calledElement="aNonExistingProcess" camunda:calledElementBinding="versionTag" camunda:calledElementVersionTag="#{someVersionTag}">
+      <bpmn2:incoming>Flow_1anu28t</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0g9d9qm</bpmn2:outgoing>
+    </bpmn2:callActivity>
+    <bpmn2:callActivity id="dynamicCaseRef" name="dynamic cmmn" camunda:calledElementVersionTag="#{someVersionTag}" camunda:caseRef="#{SomeCaseRef}">
+      <bpmn2:incoming>Flow_0g9d9qm</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0spmyft</bpmn2:outgoing>
+    </bpmn2:callActivity>
+    <bpmn2:sequenceFlow id="Flow_0g9d9qm" sourceRef="dynamicVersionTag" targetRef="dynamicCaseRef" />
+    <bpmn2:sequenceFlow id="Flow_0spmyft" sourceRef="dynamicCaseRef" targetRef="dynamicTenantRef" />
+    <bpmn2:callActivity id="dynamicTenantRef" name="dynamic tenant" calledElement="aNonExistingProcess" camunda:calledElementTenantId="${someDynamicTenantId}">
+      <bpmn2:incoming>Flow_0spmyft</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1u4jh9v</bpmn2:outgoing>
+    </bpmn2:callActivity>
+    <bpmn2:sequenceFlow id="Flow_1u4jh9v" sourceRef="dynamicTenantRef" targetRef="Activity_1exefja" />
+    <bpmn2:callActivity id="Activity_1exefja" name="bean var" calledElement="${bean.variable}">
+      <bpmn2:incoming>Flow_1u4jh9v</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_11q3xz6</bpmn2:outgoing>
+    </bpmn2:callActivity>
+    <bpmn2:callActivity id="Activity_04tk5zl" name="bean method" calledElement="${bean.method()}">
+      <bpmn2:incoming>Flow_11q3xz6</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_126tmt0</bpmn2:outgoing>
+    </bpmn2:callActivity>
+    <bpmn2:sequenceFlow id="Flow_11q3xz6" sourceRef="Activity_1exefja" targetRef="Activity_04tk5zl" />
+    <bpmn2:endEvent id="Event_1u6zlb3">
+      <bpmn2:incoming>Flow_126tmt0</bpmn2:incoming>
+    </bpmn2:endEvent>
+    <bpmn2:sequenceFlow id="Flow_126tmt0" sourceRef="Activity_04tk5zl" targetRef="Event_1u6zlb3" />
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1" name="CallActivity">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="DynamicCallActivities">
+      <bpmndi:BPMNEdge id="Flow_0spmyft_di" bpmnElement="Flow_0spmyft">
+        <di:waypoint x="850" y="125" />
+        <di:waypoint x="930" y="125" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0g9d9qm_di" bpmnElement="Flow_0g9d9qm">
+        <di:waypoint x="670" y="125" />
+        <di:waypoint x="710" y="125" />
+        <di:waypoint x="710" y="130" />
+        <di:waypoint x="750" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1anu28t_di" bpmnElement="Flow_1anu28t">
+        <di:waypoint x="510" y="125" />
+        <di:waypoint x="570" y="125" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0dvvghu_di" bpmnElement="Flow_0dvvghu">
+        <di:waypoint x="353" y="125" />
+        <di:waypoint x="410" y="125" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1" bpmnElement="SequenceFlow_1" sourceElement="_BPMNShape_StartEvent_17" targetElement="_BPMNShape_CallActivity_2">
+        <di:waypoint x="203" y="125" />
+        <di:waypoint x="253" y="125" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1u4jh9v_di" bpmnElement="Flow_1u4jh9v">
+        <di:waypoint x="1030" y="125" />
+        <di:waypoint x="1110" y="125" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_11q3xz6_di" bpmnElement="Flow_11q3xz6">
+        <di:waypoint x="1210" y="125" />
+        <di:waypoint x="1235" y="125" />
+        <di:waypoint x="1235" y="120" />
+        <di:waypoint x="1260" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_126tmt0_di" bpmnElement="Flow_126tmt0">
+        <di:waypoint x="1360" y="125" />
+        <di:waypoint x="1412" y="125" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_17" bpmnElement="StartEvent_1">
+        <dc:Bounds x="167" y="107" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="158" y="143" width="55" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_CallActivity_2" bpmnElement="dynamicCalledElement" isExpanded="true">
+        <dc:Bounds x="253" y="85" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_16nunas_di" bpmnElement="dynamicVersion">
+        <dc:Bounds x="410" y="85" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0a2bofq_di" bpmnElement="dynamicVersionTag">
+        <dc:Bounds x="570" y="85" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_04r120s_di" bpmnElement="dynamicCaseRef">
+        <dc:Bounds x="750" y="85" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0t6t6cu_di" bpmnElement="dynamicTenantRef">
+        <dc:Bounds x="930" y="85" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0q89r76_di" bpmnElement="Activity_1exefja">
+        <dc:Bounds x="1110" y="85" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_04tk5zl_di" bpmnElement="Activity_04tk5zl">
+        <dc:Bounds x="1260" y="85" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1u6zlb3_di" bpmnElement="Event_1u6zlb3">
+        <dc:Bounds x="1412" y="107" width="36" height="36" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

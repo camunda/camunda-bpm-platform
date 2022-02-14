@@ -22,7 +22,9 @@ import org.camunda.commons.logging.BaseLogger;
 import org.springframework.core.io.Resource;
 
 import java.net.URL;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class SpringBootProcessEngineLogger extends BaseLogger {
   public static final String PROJECT_CODE = "STARTER";
@@ -54,11 +56,20 @@ public class SpringBootProcessEngineLogger extends BaseLogger {
   }
 
   public void autoDeployResources(Set<Resource> resources) {
-    logInfo("021", "Auto-Deploying resources: {}", resources);
+    // Only log the description of `Resource` objects since log libraries that serialize them and
+    // therefore consume the input stream make the deployment fail since the input stream has
+    // already been consumed.
+    Set<String> resourceDescriptions = resources.stream()
+        .filter(Objects::nonNull)
+        .map(Resource::getDescription)
+        .filter(Objects::nonNull)
+        .collect(Collectors.toSet());
+
+    logInfo("021", "Auto-Deploying resources: {}", resourceDescriptions);
   }
 
-  public void enterLicenseKey(URL licenseKeyFile) {
-    logInfo("030", "Setting up license key: {}", licenseKeyFile);
+  public void enterLicenseKey(String licenseKeySource) {
+    logInfo("030", "Setting up license key: {}", licenseKeySource);
   }
 
   public void enterLicenseKeyFailed(URL licenseKeyFile, Exception e) {

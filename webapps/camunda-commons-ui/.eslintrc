@@ -1,0 +1,31 @@
+{
+  "rules": {
+    "space-before-blocks": [ 2, "always"],
+    "space-before-function-paren": [ 2, "never" ],
+    "semi": [ 2, "always" ],
+    "no-console": 1,
+    "no-useless-escape": "off"
+  },
+  "env": {
+    "node": true,
+    "browser": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:camunda-licensed/apache",
+    "plugin:prettier/recommended"
+  ],
+  "parserOptions": {
+    "sourceType": "module"
+  },
+  "globals": {
+    "requirejs": false,
+    "expect": false,
+    "it": false,
+    "describe": false,
+    "beforeEach": true,
+    "afterEach": true,
+    "before": true,
+    "after": true
+  }
+}

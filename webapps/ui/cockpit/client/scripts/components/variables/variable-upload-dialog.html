@@ -1,0 +1,63 @@
+<!-- # CE - camunda-bpm-webapp/ui/cockpit/scripts/components/variables/variable-upload-modal.html -->
+<div class="modal-header">
+  <h3>{{ 'VARIABLE_UPLOAD_MODAL_TITLE' | translate }}</h3>
+</div>
+
+<!--[if lt IE 10]>
+
+This feature is unsupported in your Browser.
+
+<![endif]-->
+
+<![if gt IE 9]>
+
+<div class="modal-body variable-upload">
+
+  <div notifications-panel></div>
+
+  <div ng-show="status === 'beforeUpload'">
+
+    <p>{{ 'VARIABLE_UPLOAD_SELECT_FILE' | translate }}:</p>
+
+    <p>
+      <input name="data"
+             type="file"
+             size="50"
+             maxlength="100000"
+             accept="*/*"
+             onchange="angular.element(this).scope().setFile(this)" />
+    </p>
+
+  </div>
+
+  <div ng-show="status === 'performUpload'"
+       translate="VARIABLE_UPLOAD_PROGRESS"
+       translate-values="{progress: progress}">
+  </div>
+
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-default"
+          ng-click="$dismiss()"
+          ng-hide="status === 'uploadSuccess' || status === 'uploadFailed'">
+    {{ 'VARIABLE_UPLOAD_CLOSE' | translate }}
+  </button>
+
+  <button class="btn btn-primary"
+          ng-click="$close()"
+          ng-show="status === 'uploadSuccess' || status === 'uploadFailed'">
+    {{ 'VARIABLE_UPLOAD_OK' | translate }}
+  </button>
+
+  <button class="btn btn-primary"
+          ng-click="upload()"
+          ng-disabled="status !== 'beforeUpload'"
+          ng-hide="status === 'uploadSuccess' || status === 'uploadFailed'">
+    {{ 'VARIABLE_UPLOAD_UPLOAD' | translate }}
+  </button>
+</div>
+
+<![endif]>
+
+<!-- / CE - camunda-bpm-webapp/ui/cockpit/scripts/components/variables/variable-upload-modal.html -->

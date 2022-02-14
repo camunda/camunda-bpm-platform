@@ -34,7 +34,11 @@ import org.camunda.bpm.engine.impl.util.ReflectUtil;
  */
 public class PropertyHelper {
 
-  private final static ContainerIntegrationLogger LOG = ProcessEngineLogger.CONTAINER_INTEGRATION_LOGGER;
+  protected final static ContainerIntegrationLogger LOG = ProcessEngineLogger.CONTAINER_INTEGRATION_LOGGER;
+
+  public static final String KEBAB_CASE = "-";
+  public static final String SNAKE_CASE = "_";
+  public static final String CAMEL_CASE = "";
 
   /**
    * Regex for Ant-style property placeholders
@@ -99,6 +103,28 @@ public class PropertyHelper {
   /**
    * Sets an objects fields via reflection from String values.
    * Depending on the field's type the respective values are converted to int or boolean.
+   * This method allows to specify a property naming strategy, i.e., if a property is written in
+   * <code>camelCase</code>, <code>kebab-case</code>, or <code>snake_case</code>.
+   *
+   * @param configuration
+   * @param properties
+   * @param namingStrategy can be either {@link PropertyHelper#KEBAB_CASE}, {@link PropertyHelper#SNAKE_CASE}, or {@link PropertyHelper#CAMEL_CASE}.
+   * @throws ProcessEngineException if a property is supplied that matches no field or
+   * if the field's type is not String, nor int, nor boolean.
+   */
+  public static void applyProperties(Object configuration, Map<String, String> properties, String namingStrategy) {
+    for (Map.Entry<String, String> property : properties.entrySet()) {
+      String key = property.getKey();
+      if (!CAMEL_CASE.equals(namingStrategy)) {
+        key = convertToCamelCase(key, namingStrategy);
+      }
+      applyProperty(configuration, key, property.getValue());
+    }
+  }
+
+  /**
+   * Sets an objects fields via reflection from String values.
+   * Depending on the field's type the respective values are converted to int or boolean.
    *
    * @param configuration
    * @param properties
@@ -106,9 +132,7 @@ public class PropertyHelper {
    * if the field's type is not String, nor int, nor boolean.
    */
   public static void applyProperties(Object configuration, Map<String, String> properties) {
-    for (Map.Entry<String, String> property : properties.entrySet()) {
-      applyProperty(configuration, property.getKey(), property.getValue());
-    }
+    applyProperties(configuration, properties, CAMEL_CASE);
   }
 
 
@@ -131,6 +155,15 @@ public class PropertyHelper {
         .append(matcher.group(3));
     }
     return found ? buffer.toString() : original;
+  }
+
+  protected static String convertToCamelCase(String value, String token) {
+    while(value.contains(token)) {
+      value = value
+          .replaceFirst(token + "[a-z]",
+                        String.valueOf(Character.toUpperCase(value.charAt(value.indexOf(token) + 1))));
+    }
+    return value;
   }
 
 }

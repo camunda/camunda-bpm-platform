@@ -1,0 +1,282 @@
+# Data structure:
+#
+# $stageName:
+#   directory: [LIST; REQUIRED; Doc: defines the stage types to be used in the matrix generation. ]
+#   command: [LIST; REQUIRED; Doc: defines the databases to be used in the stage generation. ]
+#   stash: [MAP; REQUIRED; Doc: a map of Boolean values indicating if an artifact stash needs to be used. ]
+#     runtimeStash: [BOOLEAN; OPTIONAL;]
+#     qaStash: [BOOLEAN; OPTIONAL;]
+#     archiveStash: [BOOLEAN; OPTIONAL;]
+#   nodeLabel: [STRING; OPTIONAL; Doc: specifies the node/agent label for this stage, if this type of stage is not combined with a database label ]
+#   jdkVersion: [STRING; OPTIONAL; Doc: specifies the label for the JDK version to be used in this stage. Default is `jdk-8-latest`. ]
+#   withNpm: [BOOLEAN; OPTIONAL; Doc: defines if the stage should set up NodeJS or not. Default is `false`.]
+#   labels: [LIST; OPTIONAL; Doc: defines the PR labels for which this stage type should run. ]
+#   timeout: [MAP; OPTIONAL - default timeout is 3600 seconds; Doc: defines a map containing Job timeouts (in seconds) for each DB type.]
+#     postgresql: [INT; OPTIONAL;]
+#     cockroachdb: [INT; OPTIONAL;]
+#     mysql: [INT; OPTIONAL;]
+#     mariadb: [INT; OPTIONAL;]
+#     oracle: [INT; OPTIONAL;]
+#     h2: [INT; OPTIONAL;]
+#     db2: [INT; OPTIONAL;]
+#     sqlserver: [INT; OPTIONAL;]
+db-unit:
+  directory: '.'
+  command: 'clean test -pl "engine,webapps" -Dskip.frontend.build=true -P'
+  stash:
+    runtimeStash: true
+  labels:
+  - 'all-db'
+  - 'db2'
+  - 'mysql'
+  - 'oracle'
+  - 'mariadb'
+  - 'sqlserver'
+  - 'postgresql'
+  - 'cockroachdb'
+  - 'authorizations'
+db-unit-authorizations:
+  directory: '.'
+  command: 'clean test -pl "engine,webapps" -Dskip.frontend.build=true -PcfgAuthorizationCheckRevokesAlways,'
+  stash:
+    runtimeStash: true
+  labels:
+  - 'authorizations'
+sql-scripts:
+  directory: 'distro/sql-script'
+  command: 'install -Pcheck-sql,'
+  stash:
+    runtimeStash: true
+  labels:
+  - 'all-db'
+  - 'db2'
+  - 'mysql'
+  - 'oracle'
+  - 'mariadb'
+  - 'sqlserver'
+  - 'postgresql'
+  - 'cockroachdb'
+upgrade-database:
+  directory: 'qa/test-db-upgrade'
+  command: 'verify -Pupgrade-db,'
+  stash:
+    runtimeStash: true
+  labels:
+  - 'all-db'
+  - 'db2'
+  - 'mysql'
+  - 'oracle'
+  - 'mariadb'
+  - 'sqlserver'
+  - 'postgresql'
+  - 'cockroachdb'
+instance-migration:
+  directory: 'qa/test-db-instance-migration'
+  command: 'verify -Pinstance-migration,'
+  stash:
+    runtimeStash: true
+    qaStash: true
+old-engine:
+  directory: 'qa'
+  command: 'verify -Pold-engine,'
+  stash:
+    runtimeStash: true
+  labels:
+  - 'all-db'
+  - 'db2'
+  - 'mysql'
+  - 'oracle'
+  - 'mariadb'
+  - 'sqlserver'
+  - 'postgresql'
+  - 'cockroachdb'
+rolling-update:
+  directory: 'qa/test-db-rolling-update'
+  command: 'verify -Prolling-update,'
+  stash:
+    runtimeStash: true
+    qaStash: true
+large-data-tests:
+  directory: 'qa/large-data-tests'
+  command: 'verify -Plarge-data-tests,'
+  stash:
+    runtimeStash: true
+  timeout:
+    cockroachdb: 14400
+engine-rest-unit-jersey-2:
+  directory: 'engine-rest/engine-rest'
+  command: 'clean install -Pjersey2'
+  stash:
+    runtimeStash: true
+  labels:
+  - 'rest-api'
+  nodeLabel: 'h2'
+engine-rest-unit-resteasy:
+  directory: 'engine-rest/engine-rest'
+  command: 'clean install -Presteasy'
+  stash:
+    runtimeStash: true
+  labels:
+  - 'rest-api'
+  nodeLabel: 'h2'
+engine-rest-unit-resteasy3:
+  directory: 'engine-rest/engine-rest'
+  command: 'clean install -Presteasy3'
+  stash:
+    runtimeStash: true
+  labels:
+  - 'rest-api'
+  nodeLabel: 'h2'
+engine-rest-unit-cxf:
+  directory: 'engine-rest/engine-rest'
+  command: 'clean install -Pcxf'
+  stash:
+    runtimeStash: true
+  labels:
+  - 'rest-api'
+  nodeLabel: 'h2'
+engine-rest-unit-wink:
+  directory: 'engine-rest/engine-rest'
+  command: 'clean install -Pwink'
+  stash:
+    runtimeStash: true
+  labels:
+  - 'rest-api'
+  nodeLabel: 'h2'
+engine-rest-unit-jaxrs2-jersey-2:
+  directory: 'engine-rest/engine-rest-jaxrs2'
+  command: 'clean install -Pjersey2'
+  stash:
+    runtimeStash: true
+  labels:
+  - 'rest-api'
+  nodeLabel: 'h2'
+engine-rest-unit-jaxrs2-resteasy3:
+  directory: 'engine-rest/engine-rest-jaxrs2'
+  command: 'clean install -Presteasy3'
+  stash:
+    runtimeStash: true
+  labels:
+  - 'rest-api'
+  nodeLabel: 'h2'
+engine-rest-unit-compatibility-wildfly:
+  directory: 'engine-rest/engine-rest'
+  command: 'clean install -Pwildfly-compatibility,resteasy'
+  stash:
+    runtimeStash: true
+  labels:
+  - 'rest-api'
+  nodeLabel: 'h2'
+engine-rest-IT-embedded-wildfly:
+  directory: 'qa'
+  command: 'clean install -Pwildfly,h2,webapps-integration,embedded-engine-rest'
+  stash:
+    runtimeStash: true
+    archiveStash: true
+  labels:
+  - 'rest-api'
+  nodeLabel: 'h2'
+platform-jdk-openjdk-jdk-15-latest:
+  directory: '.'
+  command: 'install source:jar source:test-jar -pl ''!webapps'' -Pdistro,distro-ce,distro-wildfly'
+  stash:
+    runtimeStash: true
+  nodeLabel: 'h2'
+  jdkVersion: 'openjdk-jdk-15-latest'
+  withNpm: true
+platform-jdk-openjdk-jdk-14-latest:
+  directory: '.'
+  command: 'install source:jar source:test-jar -pl ''!webapps'' -Pdistro,distro-ce,distro-wildfly'
+  stash:
+    runtimeStash: true
+  nodeLabel: 'h2'
+  jdkVersion: 'openjdk-jdk-14-latest'
+  withNpm: true
+platform-jdk-openjdk-jdk-13-latest:
+  directory: '.'
+  command: 'install source:jar source:test-jar -pl ''!webapps'' -Pdistro,distro-ce,distro-wildfly'
+  stash:
+    runtimeStash: true
+  nodeLabel: 'h2'
+  jdkVersion: 'openjdk-jdk-13-latest'
+  withNpm: true
+platform-jdk-openjdk-jdk-12-latest:
+  directory: '.'
+  command: 'install source:jar source:test-jar -pl ''!webapps'' -Pdistro,distro-ce,distro-wildfly'
+  stash:
+    runtimeStash: true
+  nodeLabel: 'h2'
+  jdkVersion: 'openjdk-jdk-12-latest'
+  withNpm: true
+platform-jdk-openjdk-jdk-11-latest:
+  directory: '.'
+  command: 'install source:jar source:test-jar -pl ''!webapps'' -Pdistro,distro-ce,distro-wildfly'
+  stash:
+    runtimeStash: true
+  nodeLabel: 'h2'
+  jdkVersion: 'openjdk-jdk-11-latest'
+  withNpm: true
+platform-jdk-openjdk-jdk-8-latest:
+  directory: '.'
+  command: 'install source:jar source:test-jar -pl ''!webapps'',''!quarkus-extension/engine/deployment'',''!quarkus-extension/engine/runtime'',''!quarkus-extension/engine/qa'' -Pdistro,distro-ce,distro-wildfly'
+  stash:
+    runtimeStash: true
+  nodeLabel: 'h2'
+  jdkVersion: 'openjdk-jdk-8-latest'
+  withNpm: true
+platform-jdk-jdk-15-latest:
+  directory: '.'
+  command: 'install source:jar source:test-jar -pl ''!webapps'' -Pdistro,distro-ce,distro-wildfly'
+  stash:
+    runtimeStash: true
+  nodeLabel: 'h2'
+  jdkVersion: 'jdk-15-latest'
+  withNpm: true
+platform-jdk-jdk-14-latest:
+  directory: '.'
+  command: 'install source:jar source:test-jar -pl ''!webapps'' -Pdistro,distro-ce,distro-wildfly'
+  stash:
+    runtimeStash: true
+  nodeLabel: 'h2'
+  jdkVersion: 'jdk-14-latest'
+  withNpm: true
+platform-jdk-jdk-13-latest:
+  directory: '.'
+  command: 'install source:jar source:test-jar -pl ''!webapps'' -Pdistro,distro-ce,distro-wildfly'
+  stash:
+    runtimeStash: true
+  nodeLabel: 'h2'
+  jdkVersion: 'jdk-13-latest'
+  withNpm: true
+platform-jdk-jdk-12-latest:
+  directory: '.'
+  command: 'install source:jar source:test-jar -pl ''!webapps'' -Pdistro,distro-ce,distro-wildfly'
+  stash:
+    runtimeStash: true
+  nodeLabel: 'h2'
+  jdkVersion: 'jdk-12-latest'
+  withNpm: true
+platform-jdk-jdk-11-latest:
+  directory: '.'
+  command: 'install source:jar source:test-jar -pl ''!webapps'' -Pdistro,distro-ce,distro-wildfly'
+  stash:
+    runtimeStash: true
+  nodeLabel: 'h2'
+  jdkVersion: 'jdk-11-latest'
+  withNpm: true
+platform-jdk-jdk-8-latest:
+  directory: '.'
+  command: 'install source:jar source:test-jar -pl ''!webapps'',''!quarkus-extension/engine/deployment'',''!quarkus-extension/engine/runtime'',''!quarkus-extension/engine/qa'' -Pdistro,distro-ce,distro-wildfly'
+  stash:
+    runtimeStash: true
+  nodeLabel: 'h2'
+  jdkVersion: 'jdk-8-latest'
+  withNpm: true
+platform-jdk-ibm-jdk-8-latest:
+  directory: '.'
+  command: 'install source:jar source:test-jar -pl ''!webapps'',''!quarkus-extension/engine/deployment'',''!quarkus-extension/engine/runtime'',''!quarkus-extension/engine/qa'' -Pdistro,distro-ce,distro-wildfly'
+  stash:
+    runtimeStash: true
+  nodeLabel: 'h2'
+  jdkVersion: 'ibm-jdk-8-latest'
+  withNpm: true

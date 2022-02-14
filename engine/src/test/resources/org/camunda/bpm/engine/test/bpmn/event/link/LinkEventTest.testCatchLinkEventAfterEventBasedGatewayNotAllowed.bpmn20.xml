@@ -4,6 +4,8 @@
   id="_ZeSZENg2EeKYYcWBkDaPIQ" targetNamespace="http://camunda.org/schema/1.0/bpmn">
   <process id="linkEventInvalid" isExecutable="true">
     
+    <startEvent id="start" />
+    
     <eventBasedGateway id="gw1" />
     
     <sequenceFlow sourceRef="gw1" targetRef="IntermediateCatchEvent_2"/>

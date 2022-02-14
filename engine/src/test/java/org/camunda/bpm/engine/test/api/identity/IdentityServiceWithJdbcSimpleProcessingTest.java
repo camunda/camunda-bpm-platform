@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.test.api.identity;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.identity.Group;
@@ -28,7 +30,6 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -44,9 +45,6 @@ public class IdentityServiceWithJdbcSimpleProcessingTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   protected IdentityService identityService;
 
@@ -76,10 +74,12 @@ public class IdentityServiceWithJdbcSimpleProcessingTest {
     user1.setFirstName("name one");
     identityService.saveUser(user1);
 
-    thrown.expect(OptimisticLockingException.class);
-
     user2.setFirstName("name two");
-    identityService.saveUser(user2);
+
+    // when/then
+    assertThatThrownBy(() -> identityService.saveUser(user2))
+      .isInstanceOf(OptimisticLockingException.class);
+
   }
 
   @Test
@@ -93,10 +93,11 @@ public class IdentityServiceWithJdbcSimpleProcessingTest {
     group1.setName("name one");
     identityService.saveGroup(group1);
 
-    thrown.expect(OptimisticLockingException.class);
-
     group2.setName("name two");
-    identityService.saveGroup(group2);
+
+    // when/then
+    assertThatThrownBy(() -> identityService.saveGroup(group2))
+      .isInstanceOf(OptimisticLockingException.class);
   }
 
 }

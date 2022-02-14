@@ -39,18 +39,7 @@ public abstract class HistoryCleanupHandler implements TransactionListener {
 
   public void execute(CommandContext commandContext) {
     // passed commandContext may be in an inconsistent state
-    commandExecutor.execute(new Command<Void>() {
-      @Override
-      public Void execute(CommandContext commandContext) {
-
-        Map<String, Long> report = reportMetrics();
-        boolean isRescheduleNow = shouldRescheduleNow();
-
-        new HistoryCleanupSchedulerCmd(isRescheduleNow, report, configuration, jobId).execute(commandContext);
-
-        return null;
-      }
-    });
+    commandExecutor.execute(new HistoryCleanupHandlerCmd());
   }
 
   abstract void performCleanup();
@@ -76,6 +65,19 @@ public abstract class HistoryCleanupHandler implements TransactionListener {
   public HistoryCleanupHandler setCommandExecutor(CommandExecutor commandExecutor) {
     this.commandExecutor = commandExecutor;
     return this;
+  }
+
+  protected class HistoryCleanupHandlerCmd implements Command<Void> {
+    @Override
+    public Void execute(CommandContext commandContext) {
+
+      Map<String, Long> report = reportMetrics();
+      boolean isRescheduleNow = shouldRescheduleNow();
+
+      new HistoryCleanupSchedulerCmd(isRescheduleNow, report, configuration, jobId).execute(commandContext);
+
+      return null;
+    }
   }
 
 }

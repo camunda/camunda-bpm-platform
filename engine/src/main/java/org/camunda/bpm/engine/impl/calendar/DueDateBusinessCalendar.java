@@ -20,6 +20,7 @@ import java.util.Date;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.util.EngineUtilLogger;
+import org.camunda.bpm.engine.task.Task;
 import org.joda.time.DateTime;
 import org.joda.time.format.ISOPeriodFormat;
 
@@ -30,10 +31,14 @@ public class DueDateBusinessCalendar implements BusinessCalendar {
 
   public static final String NAME = "dueDate";
 
-  public Date resolveDuedate(String duedate) {
-    return resolveDuedate(duedate, null);
+  public Date resolveDuedate(String duedate, Task task) {
+    return resolveDuedate(duedate);
   }
-  
+
+  public Date resolveDuedate(String duedate) {
+    return resolveDuedate(duedate, (Date)null);
+  }
+
   public Date resolveDuedate(String duedate, Date startDate) {
     try {
       if (duedate.startsWith("P")){
@@ -41,7 +46,7 @@ public class DueDateBusinessCalendar implements BusinessCalendar {
         if (startDate == null) {
           start = DateTimeUtil.now();
         } else {
-          start = new DateTime(startDate); 
+          start = new DateTime(startDate);
         }
         return start.plus(ISOPeriodFormat.standard().parsePeriod(duedate)).toDate();
       }

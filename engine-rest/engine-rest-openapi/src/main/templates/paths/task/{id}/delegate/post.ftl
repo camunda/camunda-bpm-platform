@@ -1,8 +1,10 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
       id = "delegateTask"
       tag = "Task"
+      summary = "Delegate"
       desc = "Delegates a task to another user." />
 
   "parameters" : [
@@ -45,3 +47,5 @@
 
   }
 }
+
+</#macro>

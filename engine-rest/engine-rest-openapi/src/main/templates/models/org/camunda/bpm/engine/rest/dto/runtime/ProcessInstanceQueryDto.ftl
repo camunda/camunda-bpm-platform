@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto
     desc = "A process instance query which defines a group of process instances" >
 
@@ -183,6 +184,7 @@
 
     "sorting": {
       "type": "array",
+      "nullable": true,
       "description": "Apply sorting of the result",
       "items":
 
@@ -193,3 +195,5 @@
     }
 
 </@lib.dto>
+
+</#macro>

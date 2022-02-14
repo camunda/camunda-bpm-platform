@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -14,3 +15,4 @@
                 The business key uniquely identifies the process instance in the context of the given process definition." />
 
 </@lib.dto>
+</#macro>

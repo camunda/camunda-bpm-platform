@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.history.removaltime.cleanup;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_CLEANUP_STRATEGY_END_TIME_BASED;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_END;
@@ -33,7 +34,6 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -46,9 +46,6 @@ public class HistoryCleanupStrategyConfigurationTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   protected static ProcessEngineConfigurationImpl engineConfiguration;
 
@@ -154,12 +151,10 @@ public class HistoryCleanupStrategyConfigurationTest {
     engineConfiguration
       .setHistoryCleanupStrategy("nonExistentStrategy");
 
-    // then
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("history cleanup strategy must be either set to 'removalTimeBased' or 'endTimeBased'.");
-
-    // when
-    engineConfiguration.initHistoryCleanup();
+    // when/then
+    assertThatThrownBy(() -> engineConfiguration.initHistoryCleanup())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("history cleanup strategy must be either set to 'removalTimeBased' or 'endTimeBased'.");
   }
 
   @Test
@@ -170,12 +165,10 @@ public class HistoryCleanupStrategyConfigurationTest {
       .setHistoryCleanupStrategy(HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED)
       .setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_NONE);
 
-    // then
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("history removal time strategy cannot be set to 'none' in conjunction with 'removalTimeBased' history cleanup strategy.");
-
-    // when
-    engineConfiguration.initHistoryCleanup();
+    // when/then
+    assertThatThrownBy(() -> engineConfiguration.initHistoryCleanup())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("history removal time strategy cannot be set to 'none' in conjunction with 'removalTimeBased' history cleanup strategy.");
   }
 
 }

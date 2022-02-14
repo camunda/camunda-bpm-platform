@@ -44,6 +44,7 @@
         INCIDENT_STATE_,
         TENANT_ID_,
         JOB_DEF_ID_,
+        ANNOTATION_,
         REMOVAL_TIME_
       ) values (
         #{id ,jdbcType=VARCHAR},
@@ -65,6 +66,7 @@
         #{incidentState, jdbcType=INTEGER},
         #{tenantId, jdbcType=VARCHAR},
         #{jobDefinitionId, jdbcType=VARCHAR},
+        #{annotation, jdbcType=VARCHAR},
         #{removalTime, jdbcType=TIMESTAMP}
       )
   </insert>
@@ -85,7 +87,8 @@
       EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
       ACTIVITY_ID_ = #{activityId, jdbcType=VARCHAR},
       FAILED_ACTIVITY_ID_ = #{failedActivityId, jdbcType=VARCHAR},
-      JOB_DEF_ID_ = #{jobDefinitionId, jdbcType=VARCHAR}
+      JOB_DEF_ID_ = #{jobDefinitionId, jdbcType=VARCHAR},
+      ANNOTATION_ = #{annotation, jdbcType=VARCHAR}
     where
       ID_ = #{id, jdbcType=VARCHAR}
   </update>
@@ -110,6 +113,14 @@
     where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
   </update>
 
+  <update id="updateHistoricIncidentsByRootProcessInstanceId_mssql"
+          parameterType="java.util.Map">
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_HI_INCIDENT RES WITH (FORCESEEK)
+    where RES.ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+  </update>
+
   <update id="updateHistoricIncidentsByRootProcessInstanceId_mysql"
           parameterType="java.util.Map">
     update ${prefix}ACT_HI_INCIDENT set
@@ -126,6 +137,14 @@
       where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
   </update>
 
+  <update id="updateHistoricIncidentsByProcessInstanceId_mssql"
+          parameterType="java.util.Map">
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_HI_INCIDENT RES WITH (FORCESEEK)
+    where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+  </update>
+
   <update id="updateHistoricIncidentsByProcessInstanceId_mysql"
           parameterType="java.util.Map">
     update ${prefix}ACT_HI_INCIDENT
@@ -140,6 +159,20 @@
     REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
 
     where ID_ in (SELECT HI.ID_ from ${prefix}ACT_HI_INCIDENT HI
+      inner join ${prefix}ACT_HI_BATCH HB
+      on HI.JOB_DEF_ID_ in
+        (HB.SEED_JOB_DEF_ID_,
+         HB.MONITOR_JOB_DEF_ID_,
+         HB.BATCH_JOB_DEF_ID_)
+      where HB.ID_ = #{batchId})
+  </update>
+
+  <update id="updateHistoricIncidentsByBatchId_mssql"
+          parameterType="java.util.Map">
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_HI_INCIDENT RES WITH (FORCESEEK)
+    where RES.ID_ in (SELECT HI.ID_ from ${prefix}ACT_HI_INCIDENT HI
       inner join ${prefix}ACT_HI_BATCH HB
       on HI.JOB_DEF_ID_ in
         (HB.SEED_JOB_DEF_ID_,
@@ -264,6 +297,7 @@
     <result property="incidentState" column="INCIDENT_STATE_" jdbcType="INTEGER" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="jobDefinitionId" column="JOB_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="annotation" column="ANNOTATION_" jdbcType="VARCHAR" />
     <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP"/>
   </resultMap>
 
@@ -299,11 +333,13 @@
         See camunda-bpm-platform-ee/webapps/camunda-webapp/plugins/src/main/resources/org/camunda/bpm/cockpit/impl/plugin/history/historicIncident.xml
       -->
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause"/>
-      AUTH ON (AUTH.RESOURCE_ID_ in (
-      <if test="authCheck.isHistoricInstancePermissionsEnabled">
-      RES.PROC_INST_ID_,
-      </if>
-      RES.PROC_DEF_KEY_, '*'))
+      AUTH ON (AUTH.RESOURCE_ID_ ${authJoinStart}
+        RES.PROC_DEF_KEY_ ${authJoinSeparator} '*'
+        <if test="authCheck.isHistoricInstancePermissionsEnabled">
+          ${authJoinSeparator} RES.PROC_INST_ID_
+        </if>
+        ${authJoinEnd}
+      )
     </if>
 
     <where>
@@ -425,5 +461,46 @@
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.applyInForPaginatedCollection"/>
       and HI.JOB_DEF_ID_ is not null
   </sql>
+
+  <select id="selectCompletedHistoricIncidentsPage" resultMap="historicIncidentResultMap" parameterType="java.util.Map" >
+    <bind name="maxResults" value="parameter.maxResults" />
+
+    ${optimizeLimitBeforeWithoutOffset}
+    select ${limitBeforeWithoutOffset} * from ${prefix}ACT_HI_INCIDENT RES
+
+    <where>
+      <if test="parameter.finishedAfter != null">
+        and RES.END_TIME_ &gt; #{parameter.finishedAfter}
+      </if>
+      <if test="parameter.finishedAt != null">
+        and RES.END_TIME_ = #{parameter.finishedAt}
+      </if>
+      <if test="parameter.finishedAfter == null and parameter.finishedAt == null">
+        and RES.END_TIME_ is not null
+      </if>
+    </where>
+
+    ORDER BY RES.END_TIME_ ASC
+    ${optimizeLimitAfterWithoutOffset}
+  </select>
+
+  <select id="selectOpenHistoricIncidentsPage" resultMap="historicIncidentResultMap" parameterType="java.util.Map">
+    <bind name="maxResults" value="parameter.maxResults"/>
+    ${optimizeLimitBeforeWithoutOffset}
+      select ${limitBeforeWithoutOffset} * from ${prefix}ACT_HI_INCIDENT RES
+
+    <where>
+      <if test="parameter.createdAfter != null">
+        and RES.CREATE_TIME_ &gt; #{parameter.createdAfter}
+      </if>
+      <if test="parameter.createdAt != null">
+        and RES.CREATE_TIME_ = #{parameter.createdAt}
+      </if>
+      and RES.END_TIME_ is null
+    </where>
+
+    ORDER BY RES.CREATE_TIME_ ASC
+    ${optimizeLimitAfterWithoutOffset}
+  </select>
 
 </mapper>

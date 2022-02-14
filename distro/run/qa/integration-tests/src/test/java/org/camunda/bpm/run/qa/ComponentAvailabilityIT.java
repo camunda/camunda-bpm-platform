@@ -16,13 +16,7 @@
  */
 package org.camunda.bpm.run.qa;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static io.restassured.RestAssured.*;
-
-import java.util.Arrays;
-import java.util.Collection;
-
+import io.restassured.response.Response;
 import org.camunda.bpm.run.qa.util.SpringBootManagedContainer;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,7 +26,12 @@ import org.junit.runners.Parameterized.BeforeParam;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
-import io.restassured.response.Response;
+import java.util.Arrays;
+import java.util.Collection;
+
+import static io.restassured.RestAssured.when;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 
 /**
  * Test cases for ensuring connectivity to REST API based on startup parameters
@@ -46,21 +45,29 @@ public class ComponentAvailabilityIT {
   public boolean restAvailable;
   @Parameter(2)
   public boolean webappsAvailable;
+  @Parameter(3)
+  public boolean swaggerUIAvailable;
+  @Parameter(4)
+  public boolean exampleAvailable;
 
-  @Parameters
+  @Parameters(name = "Test instance: {index}. Rest: {1}, Webapps: {2}, SwaggerUI: {3}, Example: {4}")
   public static Collection<Object[]> commands() {
     return Arrays.asList(new Object[][] {
-      { new String[0], true, true },
-      { new String[]{"--rest"}, true, false },
-      { new String[]{"--rest", "--webapps"}, true, true },
-      { new String[]{"--webapps"}, false, true }
+      { new String[0], true, true, true, true },
+      { new String[]{"--rest"}, true, false, false, false },
+      { new String[]{"--rest", "--webapps"}, true, true, false, false },
+      { new String[]{"--rest", "--example"}, true, false, false, true },
+      { new String[]{"--webapps"}, false, true, false, false },
+      { new String[]{"--swaggerui"}, false, false, true, false },
+      { new String[]{"--rest", "--webapps", "--swaggerui"}, true, true, true, false },
+      { new String[]{"--rest", "--webapps", "--swaggerui", "--example"}, true, true, true, true }
     });
   }
 
   private static SpringBootManagedContainer container;
 
   @BeforeParam
-  public static void runStartScript(String[] commands, boolean restAvailable, boolean webappsAvailable) {
+  public static void runStartScript(String[] commands, boolean restAvailable, boolean webappsAvailable, boolean swaggerUIAvailable, boolean exampleAvailable) {
     container = new SpringBootManagedContainer(commands);
     try {
       container.start();
@@ -108,4 +115,32 @@ public class ComponentAvailabilityIT {
     }
   }
 
+  @Test
+  public void shouldFindSwaggerUI() {
+    Response response = when().get(container.getBaseUrl() + "/swaggerui");
+    if (swaggerUIAvailable) {
+      response.then()
+        .statusCode(200)
+        .body("html.head.title", equalTo("Camunda Platform REST API"));
+    } else {
+      response.then()
+        .statusCode(404);
+    }
+  }
+
+  @Test
+  public void shouldFindExample() {
+    Response response = when().get(container.getBaseUrl() + "/engine-rest/process-definition");
+    if (exampleAvailable && restAvailable) {
+      response.then()
+        .body("size()", is(3))
+        .body("key[0]", is("ReviewInvoice"));
+    } else if (restAvailable) {
+      response.then()
+        .body("size()", is(0));
+    } else {
+      response.then()
+        .statusCode(404);
+    }
+  }
 }

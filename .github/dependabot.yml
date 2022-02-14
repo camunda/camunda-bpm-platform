@@ -1,0 +1,22 @@
+version: 2
+updates:
+- package-ecosystem: maven
+  directory: "/"
+  schedule:
+    interval: daily
+    timezone: Europe/Berlin
+- package-ecosystem: maven
+  directory: "/webapps"
+  schedule:
+    interval: daily
+    timezone: Europe/Berlin
+- package-ecosystem: npm
+  directory: "/webapps"
+  schedule:
+    interval: daily
+    timezone: Europe/Berlin
+- package-ecosystem: npm
+  directory: "/webapps/ui/cockpit"
+  schedule:
+    interval: daily
+    timezone: Europe/Berlin

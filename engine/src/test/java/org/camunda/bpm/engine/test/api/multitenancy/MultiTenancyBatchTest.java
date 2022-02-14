@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.multitenancy;
 
 import static java.util.Collections.singletonList;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -35,7 +36,6 @@ import org.camunda.bpm.engine.test.api.runtime.migration.batch.BatchMigrationHel
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
-import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -198,8 +198,8 @@ public class MultiTenancyBatchTest {
     }
     catch (ProcessEngineException e) {
       // then
-      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("Cannot delete batch '"
-        + batch.getId() + "' because it belongs to no authenticated tenant"));
+      assertThat(e.getMessage()).contains("Cannot delete batch '"
+        + batch.getId() + "' because it belongs to no authenticated tenant");
     }
     finally {
       identityService.clearAuthentication();
@@ -234,8 +234,8 @@ public class MultiTenancyBatchTest {
     }
     catch (ProcessEngineException e) {
       // then
-      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("Cannot suspend batch '"
-      + batch.getId() +"' because it belongs to no authenticated tenant"));
+      assertThat(e.getMessage()).contains("Cannot suspend batch '"
+      + batch.getId() +"' because it belongs to no authenticated tenant");
     }
     finally {
       identityService.clearAuthentication();
@@ -272,8 +272,8 @@ public class MultiTenancyBatchTest {
     }
     catch (ProcessEngineException e) {
       // then
-      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("Cannot activate batch '"
-      + batch.getId() + "' because it belongs to no authenticated tenant"));
+      assertThat(e.getMessage()).contains("Cannot activate batch '"
+      + batch.getId() + "' because it belongs to no authenticated tenant");
     }
     finally {
       identityService.clearAuthentication();

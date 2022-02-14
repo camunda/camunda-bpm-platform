@@ -1,17 +1,18 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
-    <#-- NOTE: Please adding any changes, if necessary, to:
-         * ProcessDefinitionSuspensionStateDto
-         * ProcessInstanceSuspensionStateAsyncDto
-         * ProcessInstanceSuspensionStateDto
+    <#-- NOTE: When adding any changes, if necessary, to:
+         * ProcessDefinitionSuspensionStateDto or JobSuspensionStateDto or create a new file
          * ... -->
     <@lib.property
         name = "suspended"
         type = "boolean"
-        nullable = false
-        desc = "A Boolean value which indicates whether to activate or suspend a given process instance.
-                When the value is set to true, the given process instance will be suspended and when the value is set to false,
-                the given process instance will be activated."
+        desc = "A Boolean value which indicates whether to activate or suspend a given instance 
+                (e.g. process instance, job, job definition, or batch). When the value is set to true, 
+                the given instance will be suspended and when the value is set to false, 
+                the given instance will be activated."
         last = true />
 
 </@lib.dto>
+
+</#macro>

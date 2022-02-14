@@ -1,7 +1,9 @@
+<#macro endpoint_macro docsUrl="">
 {
   <@lib.endpointInfo
       id = "setRetriesByProcess"
       tag = "Process Instance"
+      summary = "Set Job Retries Async (POST)"
       desc = "Create a batch to set retries of jobs associated with given processes asynchronously." />
 
   <@lib.requestBody
@@ -54,3 +56,4 @@
 
   }
 }
+</#macro>

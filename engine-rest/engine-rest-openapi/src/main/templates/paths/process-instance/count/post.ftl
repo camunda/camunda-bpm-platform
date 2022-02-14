@@ -1,7 +1,9 @@
+<#macro endpoint_macro docsUrl="">
 {
   <@lib.endpointInfo
       id = "queryProcessInstancesCount"
       tag = "Process Instance"
+      summary = "Get List Count (POST)"
       desc = "Queries for the number of process instances that fulfill the given parameters.
               This method takes the same message body as the Get Instances (POST) method and
               therefore it is slightly more powerful than the Get Instance Count method." />
@@ -51,3 +53,4 @@
 
   }
 }
+</#macro>

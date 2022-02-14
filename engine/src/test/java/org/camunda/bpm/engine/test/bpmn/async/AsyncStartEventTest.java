@@ -16,8 +16,11 @@
  */
 package org.camunda.bpm.engine.test.bpmn.async;
 
+import static org.assertj.core.api.Assertions.fail;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
+import static org.camunda.bpm.engine.test.util.ExecutionAssert.assertThat;
+import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -28,9 +31,11 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.ExecutionTree;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.junit.Assert;
 import org.junit.Test;
@@ -148,5 +153,50 @@ public class AsyncStartEventTest extends PluggableProcessEngineTest {
           .beginScope("SubProcess_1")
             .transition("StartEvent_2")
         .done());
+  }
+
+  @Deployment
+  @Test
+  public void shouldRunAfterMessageStartInEventSubprocess() {
+    // given
+    // instance is waiting in async before on start event
+    String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
+    Job job = managementService.createJobQuery().singleResult();
+
+    // an event sub process is triggered before the job is executed
+    runtimeService.createMessageCorrelation("start_sub")
+      .processInstanceId(processInstanceId)
+      .correlate();
+
+    // when the job is executed
+    managementService.executeJob(job.getId());
+
+    // then
+    // the user task after the async continuation is reached successfully
+    Task task = taskService.createTaskQuery().singleResult();
+
+    assertEquals(0, runtimeService.createExecutionQuery().activityId("StartEvent_1").count());
+    assertNotNull("The user task should have been reached", task);
+
+    // and the event sub process is still active
+    String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
+
+    ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
+    assertThat(executionTree)
+      .matches(
+        describeExecutionTree(null).scope()
+        .child("user-task").concurrent().noScope().up()
+        .child(null).concurrent().noScope()
+          .child(null).scope()
+            .child("external-task").scope()
+      .done());
+
+    ActivityInstance activityInstanceTree = runtimeService.getActivityInstance(processInstanceId);
+    assertThat(activityInstanceTree).hasStructure(
+        describeActivityInstanceTree(processDefinitionId)
+          .activity("user-task")
+          .beginScope("sub-process")
+            .activity("external-task")
+          .done());
   }
 }

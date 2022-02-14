@@ -24,10 +24,12 @@
     
     <!-- turn off metrics reporter -->
     <property name="dbMetricsReporterActivate" value="false" />
+    <property name="telemetryReporterActivate" value="false" />
+    <property name="taskMetricsEnabled" value="false" />
     
     <property name="customPreBPMNParseListeners">
       <list>
-        <bean class="org.camunda.bpm.engine.test.standalone.deploy.TestBPMNParseListener" />
+        <bean class="org.camunda.bpm.engine.test.standalone.deploy.DelegatingBpmnParseListener" />
       </list>
     </property>
     

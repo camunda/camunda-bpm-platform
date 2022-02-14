@@ -16,12 +16,10 @@
  */
 package org.camunda.bpm.application.impl.deployment;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 
 import java.util.Map;
 
@@ -74,10 +72,10 @@ public class EmptyProcessesXmlTest {
     String isDeployChangedOnly = properties.get(ProcessArchiveXml.PROP_IS_DEPLOY_CHANGED_ONLY);
     assertNotNull(isDeployChangedOnly);
     assertEquals(Boolean.FALSE.toString(), isDeployChangedOnly);
-    
+
     String resumePreviousBy = properties.get(ProcessArchiveXml.PROP_RESUME_PREVIOUS_BY);
-    assertThat(resumePreviousBy, is(notNullValue()));
-    assertThat(resumePreviousBy, is(ResumePreviousBy.RESUME_BY_PROCESS_DEFINITION_KEY));
+    assertThat(resumePreviousBy).isNotNull();
+    assertThat(resumePreviousBy).isSameAs(ResumePreviousBy.RESUME_BY_PROCESS_DEFINITION_KEY);
   }
 
 }

@@ -27,7 +27,6 @@ import java.util.ServiceLoader;
 
 import javax.ws.rs.core.MediaType;
 
-import io.restassured.http.Header;
 import org.apache.http.entity.ContentType;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -44,9 +43,10 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.BytesValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
-import org.junit.BeforeClass;
+import org.junit.Before;
 
 import io.restassured.RestAssured;
+import io.restassured.http.Header;
 
 public abstract class AbstractRestServiceTest {
 
@@ -150,27 +150,30 @@ public abstract class AbstractRestServiceTest {
 
 
   private static Properties connectionProperties = null;
+  private static MockedProcessEngineProvider processEngineProvider = null;
 
-  @BeforeClass
-  public static void setUp() throws IOException {
+  @Before
+  public void setUp() throws IOException {
     setupTestScenario();
   }
 
   protected static void setupTestScenario() throws IOException {
     setupRestAssured();
 
-    ServiceLoader<ProcessEngineProvider> serviceLoader = ServiceLoader
-        .load(ProcessEngineProvider.class);
-    Iterator<ProcessEngineProvider> iterator = serviceLoader.iterator();
+    if (processEngineProvider == null) {
+      ServiceLoader<ProcessEngineProvider> serviceLoader = ServiceLoader
+          .load(ProcessEngineProvider.class);
+      Iterator<ProcessEngineProvider> iterator = serviceLoader.iterator();
 
-    if (iterator.hasNext()) {
-      MockedProcessEngineProvider provider = (MockedProcessEngineProvider) iterator.next();
-
-      // reset engine mocks before every test
-      provider.resetEngines();
-
-      processEngine = provider.getDefaultProcessEngine();
+      if (iterator.hasNext()) {
+        processEngineProvider = (MockedProcessEngineProvider) iterator.next();
+      }
     }
+
+    // reset engine mocks before every test
+    processEngineProvider.resetEngines();
+
+    processEngine = processEngineProvider.getDefaultProcessEngine();
   }
 
   protected ProcessEngine getProcessEngine(String name) {

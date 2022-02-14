@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.history.removaltime.batch;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_FULL;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_END;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_NONE;
@@ -64,7 +65,6 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -80,9 +80,6 @@ public class BatchSetRemovalTimeTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(engineTestRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   protected final Date CURRENT_DATE = testRule.CURRENT_DATE;
   protected final Date REMOVAL_TIME = testRule.REMOVAL_TIME;
@@ -2010,15 +2007,13 @@ public class BatchSetRemovalTimeTest {
   public void shouldThrowBadUserRequestException_NotExistingIds() {
     // given
 
-    // then
-    thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("historicProcessInstances is empty");
-
-    // when
-    historyService.setRemovalTimeToHistoricProcessInstances()
-      .absoluteRemovalTime(REMOVAL_TIME)
-      .byIds("aNotExistingId", "anotherNotExistingId")
-      .executeAsync();
+    // when/then
+    assertThatThrownBy(() -> historyService.setRemovalTimeToHistoricProcessInstances()
+        .absoluteRemovalTime(REMOVAL_TIME)
+        .byIds("aNotExistingId", "anotherNotExistingId")
+        .executeAsync())
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("historicProcessInstances is empty");
   }
 
   @Test
@@ -2068,15 +2063,13 @@ public class BatchSetRemovalTimeTest {
   public void shouldThrowBadUserRequestExceptionForStandaloneDecision_NotExistingIds() {
     // given
 
-    // then
-    thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("historicDecisionInstances is empty");
-
-    // when
-    historyService.setRemovalTimeToHistoricDecisionInstances()
-      .absoluteRemovalTime(REMOVAL_TIME)
-      .byIds("aNotExistingId", "anotherNotExistingId")
-      .executeAsync();
+    // when/then
+    assertThatThrownBy(() -> historyService.setRemovalTimeToHistoricDecisionInstances()
+        .absoluteRemovalTime(REMOVAL_TIME)
+        .byIds("aNotExistingId", "anotherNotExistingId")
+        .executeAsync())
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("historicDecisionInstances is empty");
   }
 
   @Test
@@ -2125,66 +2118,55 @@ public class BatchSetRemovalTimeTest {
   public void shouldThrowBadUserRequestExceptionForBatch_NotExistingIds() {
     // given
 
-    // then
-    thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("historicBatches is empty");
-
-    // when
-    historyService.setRemovalTimeToHistoricBatches()
-      .absoluteRemovalTime(REMOVAL_TIME)
-      .byIds("aNotExistingId", "anotherNotExistingId")
-      .executeAsync();
+    // when/then
+    assertThatThrownBy(() -> historyService.setRemovalTimeToHistoricBatches()
+        .absoluteRemovalTime(REMOVAL_TIME)
+        .byIds("aNotExistingId", "anotherNotExistingId")
+        .executeAsync())
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("historicBatches is empty");
   }
 
   @Test
   public void shouldThrowBadUserRequestException() {
     // given
-
-    // then
-    thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("historicProcessInstances is empty");
-
     HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
 
-    // when
-    historyService.setRemovalTimeToHistoricProcessInstances()
-      .absoluteRemovalTime(REMOVAL_TIME)
-      .byQuery(query)
-      .executeAsync();
+    // when/then
+    assertThatThrownBy(() -> historyService.setRemovalTimeToHistoricProcessInstances()
+        .absoluteRemovalTime(REMOVAL_TIME)
+        .byQuery(query)
+        .executeAsync())
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("historicProcessInstances is empty");
   }
 
   @Test
   public void shouldThrowBadUserRequestExceptionForStandaloneDecision() {
     // given
-
-    // then
-    thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("historicDecisionInstances is empty");
-
     HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
 
-    // when
-    historyService.setRemovalTimeToHistoricDecisionInstances()
-      .absoluteRemovalTime(REMOVAL_TIME)
-      .byQuery(query)
-      .executeAsync();
+    // when/then
+    assertThatThrownBy(() -> historyService.setRemovalTimeToHistoricDecisionInstances()
+        .absoluteRemovalTime(REMOVAL_TIME)
+        .byQuery(query)
+        .executeAsync())
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("historicDecisionInstances is empty");
   }
 
   @Test
   public void shouldThrowBadUserRequestExceptionForBatch() {
     // given
-
-    // then
-    thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("historicBatches is empty");
-
     HistoricBatchQuery query = historyService.createHistoricBatchQuery();
 
-    // when
-    historyService.setRemovalTimeToHistoricBatches()
-      .absoluteRemovalTime(REMOVAL_TIME)
-      .byQuery(query)
-      .executeAsync();
+    // when/then
+    assertThatThrownBy(() -> historyService.setRemovalTimeToHistoricBatches()
+        .absoluteRemovalTime(REMOVAL_TIME)
+        .byQuery(query)
+        .executeAsync())
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("historicBatches is empty");
   }
 
   @Test
@@ -2277,12 +2259,10 @@ public class BatchSetRemovalTimeTest {
     SetRemovalTimeToHistoricProcessInstancesBuilder batchBuilder = historyService.setRemovalTimeToHistoricProcessInstances()
       .byQuery(query);
 
-    // then
-    thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("removalTime is null");
-
-    // when
-    batchBuilder.executeAsync();
+    // when/then
+    assertThatThrownBy(() -> batchBuilder.executeAsync())
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("removalTime is null");
   }
 
   @Test
@@ -2293,12 +2273,10 @@ public class BatchSetRemovalTimeTest {
     SetRemovalTimeToHistoricDecisionInstancesBuilder batchBuilder = historyService.setRemovalTimeToHistoricDecisionInstances()
       .byQuery(query);
 
-    // then
-    thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("removalTime is null");
-
-    // when
-    batchBuilder.executeAsync();
+    // when/then
+    assertThatThrownBy(() -> batchBuilder.executeAsync())
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("removalTime is null");
   }
 
   @Test
@@ -2309,12 +2287,10 @@ public class BatchSetRemovalTimeTest {
     SetRemovalTimeToHistoricBatchesBuilder batchBuilder = historyService.setRemovalTimeToHistoricBatches()
       .byQuery(query);
 
-    // then
-    thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("removalTime is null");
-
-    // when
-    batchBuilder.executeAsync();
+    // when/then
+    assertThatThrownBy(() -> batchBuilder.executeAsync())
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("removalTime is null");
   }
 
   @Test
@@ -2324,12 +2300,10 @@ public class BatchSetRemovalTimeTest {
     SetRemovalTimeToHistoricProcessInstancesBuilder batchBuilder = historyService.setRemovalTimeToHistoricProcessInstances()
       .absoluteRemovalTime(new Date());
 
-    // then
-    thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("Neither query nor ids provided.");
-
-    // when
-    batchBuilder.executeAsync();
+    // when/then
+    assertThatThrownBy(() -> batchBuilder.executeAsync())
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("Neither query nor ids provided.");
   }
 
   @Test
@@ -2339,12 +2313,10 @@ public class BatchSetRemovalTimeTest {
     SetRemovalTimeToHistoricDecisionInstancesBuilder batchBuilder = historyService.setRemovalTimeToHistoricDecisionInstances()
       .absoluteRemovalTime(new Date());
 
-    // then
-    thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("Neither query nor ids provided.");
-
-    // when
-    batchBuilder.executeAsync();
+    // when/then
+    assertThatThrownBy(() -> batchBuilder.executeAsync())
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("Neither query nor ids provided.");
   }
 
   @Test
@@ -2354,12 +2326,10 @@ public class BatchSetRemovalTimeTest {
     SetRemovalTimeToHistoricBatchesBuilder batchBuilder = historyService.setRemovalTimeToHistoricBatches()
       .absoluteRemovalTime(new Date());
 
-    // then
-    thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("Neither query nor ids provided.");
-
-    // when
-    batchBuilder.executeAsync();
+    // when/then
+    assertThatThrownBy(() -> batchBuilder.executeAsync())
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("Neither query nor ids provided.");
   }
 
   @Test
@@ -2598,12 +2568,10 @@ public class BatchSetRemovalTimeTest {
     SetRemovalTimeSelectModeForHistoricProcessInstancesBuilder builder = historyService.setRemovalTimeToHistoricProcessInstances();
     builder.calculatedRemovalTime();
 
-    // then
-    thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("The removal time modes are mutually exclusive: mode is not null");
-
-    // when
-    builder.clearedRemovalTime();
+    // when/then
+    assertThatThrownBy(() -> builder.clearedRemovalTime())
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("The removal time modes are mutually exclusive: mode is not null");
   }
 
   @Test
@@ -2612,12 +2580,10 @@ public class BatchSetRemovalTimeTest {
     SetRemovalTimeSelectModeForHistoricProcessInstancesBuilder builder = historyService.setRemovalTimeToHistoricProcessInstances();
     builder.calculatedRemovalTime();
 
-    // then
-    thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("The removal time modes are mutually exclusive: mode is not null");
-
-    // when
-    builder.absoluteRemovalTime(new Date());
+    // when/then
+    assertThatThrownBy(() -> builder.absoluteRemovalTime(new Date()))
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("The removal time modes are mutually exclusive: mode is not null");
   }
 
   @Test
@@ -2626,12 +2592,10 @@ public class BatchSetRemovalTimeTest {
     SetRemovalTimeSelectModeForHistoricDecisionInstancesBuilder builder = historyService.setRemovalTimeToHistoricDecisionInstances();
     builder.calculatedRemovalTime();
 
-    // then
-    thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("The removal time modes are mutually exclusive: mode is not null");
-
-    // when
-    builder.clearedRemovalTime();
+    // when/then
+    assertThatThrownBy(() -> builder.clearedRemovalTime())
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("The removal time modes are mutually exclusive: mode is not null");
   }
 
   @Test
@@ -2640,12 +2604,10 @@ public class BatchSetRemovalTimeTest {
     SetRemovalTimeSelectModeForHistoricDecisionInstancesBuilder builder = historyService.setRemovalTimeToHistoricDecisionInstances();
     builder.calculatedRemovalTime();
 
-    // then
-    thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("The removal time modes are mutually exclusive: mode is not null");
-
-    // when
-    builder.absoluteRemovalTime(new Date());
+    // when/then
+    assertThatThrownBy(() -> builder.absoluteRemovalTime(new Date()))
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("The removal time modes are mutually exclusive: mode is not null");
   }
 
   @Test
@@ -2654,12 +2616,10 @@ public class BatchSetRemovalTimeTest {
     SetRemovalTimeSelectModeForHistoricBatchesBuilder builder = historyService.setRemovalTimeToHistoricBatches();
     builder.calculatedRemovalTime();
 
-    // then
-    thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("The removal time modes are mutually exclusive: mode is not null");
-
-    // when
-    builder.clearedRemovalTime();
+    // when/then
+    assertThatThrownBy(() -> builder.clearedRemovalTime())
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("The removal time modes are mutually exclusive: mode is not null");
   }
 
   @Test
@@ -2668,12 +2628,10 @@ public class BatchSetRemovalTimeTest {
     SetRemovalTimeSelectModeForHistoricBatchesBuilder builder = historyService.setRemovalTimeToHistoricBatches();
     builder.calculatedRemovalTime();
 
-    // then
-    thrown.expect(BadUserRequestException.class);
-    thrown.expectMessage("The removal time modes are mutually exclusive: mode is not null");
-
-    // when
-    builder.absoluteRemovalTime(new Date());
+    // when/then
+    assertThatThrownBy(() -> builder.absoluteRemovalTime(new Date()))
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessageContaining("The removal time modes are mutually exclusive: mode is not null");
   }
 
   @Test

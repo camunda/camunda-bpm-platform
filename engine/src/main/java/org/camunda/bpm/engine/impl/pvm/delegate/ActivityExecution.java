@@ -69,12 +69,6 @@ public interface ActivityExecution extends DelegateExecution {
   ActivityExecution createExecution();
 
   /**
-   * creates a new execution. This execution will be the parent of the newly created execution.
-   * properties processDefinition, processInstance and activity will be initialized.
-   */
-  ActivityExecution createExecution(boolean initializeExecutionStartContext);
-
-  /**
    * creates a new sub process instance.
    * The current execution will be the super execution of the created execution.
    *

@@ -32,4 +32,7 @@ public class OptimisticLockingException extends ProcessEngineException {
     super(message);
   }
 
+  public OptimisticLockingException(String message, Throwable throwable) {
+    super(message, throwable);
+  }
 }

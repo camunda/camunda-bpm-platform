@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
-<domain xmlns="urn:jboss:domain:12.0">
+<domain xmlns="urn:jboss:domain:16.0">
     <extensions>
         <extension module="org.jboss.as.clustering.infinispan"/>
         <extension module="org.jboss.as.clustering.jgroups"/>
@@ -106,7 +106,7 @@
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:bean-validation:1.0"/>
             <subsystem xmlns="urn:jboss:domain:core-management:1.0"/>
-            <subsystem xmlns="urn:jboss:domain:datasources:5.0">
+            <subsystem xmlns="urn:jboss:domain:datasources:6.0">
                 <datasources>
                     <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true" statistics-enabled="${wildfly.datasources.statistics-enabled:${wildfly.statistics-enabled:false}}">
                         <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</connection-url>
@@ -134,12 +134,12 @@
             <subsystem xmlns="urn:jboss:domain:discovery:1.0"/>
             <subsystem xmlns="urn:jboss:domain:distributable-web:2.0" default-session-management="default" default-single-sign-on-management="default">
                 <infinispan-session-management name="default" cache-container="web" granularity="SESSION">
-                    <primary-owner-affinity/>
+                    <local-affinity/>
                 </infinispan-session-management>
                 <infinispan-single-sign-on-management name="default" cache-container="web" cache="sso"/>
-                <infinispan-routing cache-container="web" cache="routing"/>
+                <local-routing/>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:ee:5.0">
+            <subsystem xmlns="urn:jboss:domain:ee:6.0">
                 <spec-descriptor-property-replacement>false</spec-descriptor-property-replacement>
                 <concurrent>
                     <context-services>
@@ -149,16 +149,16 @@
                         <managed-thread-factory name="default" jndi-name="java:jboss/ee/concurrency/factory/default" context-service="default"/>
                     </managed-thread-factories>
                     <managed-executor-services>
-                        <managed-executor-service name="default" jndi-name="java:jboss/ee/concurrency/executor/default" context-service="default" hung-task-threshold="60000" keepalive-time="5000"/>
+                        <managed-executor-service name="default" jndi-name="java:jboss/ee/concurrency/executor/default" context-service="default" hung-task-termination-period="0" hung-task-threshold="60000" keepalive-time="5000"/>
                     </managed-executor-services>
                     <managed-scheduled-executor-services>
-                        <managed-scheduled-executor-service name="default" jndi-name="java:jboss/ee/concurrency/scheduler/default" context-service="default" hung-task-threshold="60000" keepalive-time="3000"/>
+                        <managed-scheduled-executor-service name="default" jndi-name="java:jboss/ee/concurrency/scheduler/default" context-service="default" hung-task-termination-period="0" hung-task-threshold="60000" keepalive-time="3000"/>
                     </managed-scheduled-executor-services>
                 </concurrent>
                 <default-bindings context-service="java:jboss/ee/concurrency/context/default" datasource="java:jboss/datasources/ExampleDS" managed-executor-service="java:jboss/ee/concurrency/executor/default" managed-scheduled-executor-service="java:jboss/ee/concurrency/scheduler/default" managed-thread-factory="java:jboss/ee/concurrency/factory/default"/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:ee-security:1.0"/>
-            <subsystem xmlns="urn:jboss:domain:ejb3:6.0">
+            <subsystem xmlns="urn:jboss:domain:ejb3:9.0">
                 <session-bean>
                     <stateless>
                         <bean-instance-pool-ref pool-name="slsb-strict-max-pool"/>
@@ -185,7 +185,7 @@
                         <file-data-store name="default-file-store" path="timer-service-data" relative-to="jboss.server.data.dir"/>
                     </data-stores>
                 </timer-service>
-                <remote connector-ref="http-remoting-connector" thread-pool-name="default">
+                <remote cluster="ejb" connectors="http-remoting-connector" thread-pool-name="default">
                     <channel-creation-options>
                         <option name="MAX_OUTBOUND_MESSAGES" value="1234" type="remoting"/>
                     </channel-creation-options>
@@ -201,7 +201,7 @@
                 <statistics enabled="${wildfly.ejb3.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
                 <log-system-exceptions value="true"/>
             </subsystem>
-            <subsystem xmlns="urn:wildfly:elytron:9.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
+            <subsystem xmlns="urn:wildfly:elytron:13.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
                 <providers>
                     <aggregate-providers name="combined-providers">
                         <providers name="elytron"/>
@@ -284,43 +284,52 @@
                     </mechanism-provider-filtering-sasl-server-factory>
                     <provider-sasl-server-factory name="global"/>
                 </sasl>
+                <tls>
+                    <key-stores>
+                        <key-store name="applicationKS">
+                            <credential-reference clear-text="password"/>
+                            <implementation type="JKS"/>
+                            <file path="application.keystore" relative-to="jboss.domain.config.dir"/>
+                        </key-store>
+                    </key-stores>
+                    <key-managers>
+                        <key-manager name="applicationKM" key-store="applicationKS" generate-self-signed-certificate-host="localhost">
+                            <credential-reference clear-text="password"/>
+                        </key-manager>
+                    </key-managers>
+                    <server-ssl-contexts>
+                        <server-ssl-context name="applicationSSC" key-manager="applicationKM"/>
+                    </server-ssl-contexts>
+                </tls>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:infinispan:9.0">
-                <cache-container name="web" default-cache="passivation" module="org.wildfly.clustering.web.infinispan">
+            <subsystem xmlns="urn:jboss:domain:infinispan:12.0">
+                <cache-container name="ejb" default-cache="passivation" aliases="sfsb" modules="org.wildfly.clustering.ejb.infinispan">
                     <local-cache name="passivation">
-                        <locking isolation="REPEATABLE_READ"/>
-                        <transaction mode="BATCH"/>
-                        <file-store passivation="true" purge="false"/>
-                    </local-cache>
-                    <local-cache name="sso">
-                        <locking isolation="REPEATABLE_READ"/>
-                        <transaction mode="BATCH"/>
-                    </local-cache>
-                    <local-cache name="routing"/>
-                </cache-container>
-                <cache-container name="server" default-cache="default" module="org.wildfly.clustering.server">
-                    <local-cache name="default">
-                        <transaction mode="BATCH"/>
-                    </local-cache>
-                </cache-container>
-                <cache-container name="ejb" aliases="sfsb" default-cache="passivation" module="org.wildfly.clustering.ejb.infinispan">
-                    <local-cache name="passivation">
-                        <locking isolation="REPEATABLE_READ"/>
-                        <transaction mode="BATCH"/>
                         <file-store passivation="true" purge="false"/>
                     </local-cache>
                 </cache-container>
-                <cache-container name="hibernate" module="org.infinispan.hibernate-cache">
+                <cache-container name="web" default-cache="passivation" modules="org.wildfly.clustering.web.infinispan">
+                    <local-cache name="passivation">
+                        <file-store passivation="true" purge="false"/>
+                    </local-cache>
+                    <local-cache name="sso"/>
+                </cache-container>
+                <cache-container name="server" default-cache="default" modules="org.wildfly.clustering.server">
+                    <local-cache name="default"/>
+                </cache-container>
+                <cache-container name="hibernate" modules="org.infinispan.hibernate-cache">
                     <local-cache name="entity">
-                        <transaction mode="NON_XA"/>
-                        <object-memory size="10000"/>
+                        <heap-memory size="10000"/>
                         <expiration max-idle="100000"/>
                     </local-cache>
                     <local-cache name="local-query">
-                        <object-memory size="10000"/>
+                        <heap-memory size="10000"/>
                         <expiration max-idle="100000"/>
                     </local-cache>
                     <local-cache name="timestamps"/>
+                    <local-cache name="pending-puts">
+                        <expiration max-idle="60000"/>
+                    </local-cache>
                 </cache-container>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:io:3.0">
@@ -353,17 +362,17 @@
                 <expose-expression-model/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:jpa:1.1">
-                <jpa default-datasource="" default-extended-persistence-inheritance="DEEP"/>
+                <jpa default-extended-persistence-inheritance="DEEP"/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:jsf:1.1"/>
-            <subsystem xmlns="urn:jboss:domain:mail:3.0">
+            <subsystem xmlns="urn:jboss:domain:mail:4.0">
                 <mail-session name="default" jndi-name="java:jboss/mail/Default">
                     <smtp-server outbound-socket-binding-ref="mail-smtp"/>
                 </mail-session>
             </subsystem>
             <subsystem xmlns="urn:wildfly:microprofile-config-smallrye:1.0"/>
             <subsystem xmlns="urn:wildfly:microprofile-jwt-smallrye:1.0"/>
-            <subsystem xmlns="urn:wildfly:microprofile-opentracing-smallrye:2.0" default-tracer="jaeger">
+            <subsystem xmlns="urn:wildfly:microprofile-opentracing-smallrye:3.0" default-tracer="jaeger">
                 <jaeger-tracer name="jaeger">
                     <sampler-configuration sampler-type="const" sampler-param="1.0"/>
                 </jaeger-tracer>
@@ -376,7 +385,7 @@
                 <http-connector name="http-remoting-connector" connector-ref="default" security-realm="ApplicationRealm"/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:request-controller:1.0"/>
-            <subsystem xmlns="urn:jboss:domain:resource-adapters:5.0"/>
+            <subsystem xmlns="urn:jboss:domain:resource-adapters:6.0"/>
             <subsystem xmlns="urn:jboss:domain:sar:1.0"/>
             <subsystem xmlns="urn:jboss:domain:security:2.0">
                 <security-domains>
@@ -417,7 +426,7 @@
                     </maximum-set>
                 </deployment-permissions>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:transactions:5.0">
+            <subsystem xmlns="urn:jboss:domain:transactions:6.0">
                 <core-environment node-identifier="${jboss.tx.node.id:1}">
                     <process-id>
                         <uuid/>
@@ -427,7 +436,7 @@
                 <coordinator-environment statistics-enabled="${wildfly.transactions.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
                 <object-store path="tx-object-store" relative-to="jboss.server.data.dir"/>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:undertow:10.0" default-server="default-server" default-virtual-host="default-host" default-servlet-container="default" default-security-domain="other" statistics-enabled="${wildfly.undertow.statistics-enabled:${wildfly.statistics-enabled:false}}">
+            <subsystem xmlns="urn:jboss:domain:undertow:12.0" default-server="default-server" default-virtual-host="default-host" default-servlet-container="default" default-security-domain="other" statistics-enabled="${wildfly.undertow.statistics-enabled:${wildfly.statistics-enabled:false}}">
                 <buffer-cache name="default"/>
                 <server name="default-server">
                     <http-listener name="default" socket-binding="http" redirect-socket="https" enable-http2="true"/>
@@ -544,7 +553,7 @@
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:bean-validation:1.0"/>
             <subsystem xmlns="urn:jboss:domain:core-management:1.0"/>
-            <subsystem xmlns="urn:jboss:domain:datasources:5.0">
+            <subsystem xmlns="urn:jboss:domain:datasources:6.0">
                 <datasources>
                     <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true" statistics-enabled="${wildfly.datasources.statistics-enabled:${wildfly.statistics-enabled:false}}">
                         <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</connection-url>
@@ -569,7 +578,7 @@
                 <infinispan-single-sign-on-management name="default" cache-container="web" cache="sso"/>
                 <infinispan-routing cache-container="web" cache="routing"/>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:ee:5.0">
+            <subsystem xmlns="urn:jboss:domain:ee:6.0">
                 <spec-descriptor-property-replacement>false</spec-descriptor-property-replacement>
                 <concurrent>
                     <context-services>
@@ -579,16 +588,16 @@
                         <managed-thread-factory name="default" jndi-name="java:jboss/ee/concurrency/factory/default" context-service="default"/>
                     </managed-thread-factories>
                     <managed-executor-services>
-                        <managed-executor-service name="default" jndi-name="java:jboss/ee/concurrency/executor/default" context-service="default" hung-task-threshold="60000" keepalive-time="5000"/>
+                        <managed-executor-service name="default" jndi-name="java:jboss/ee/concurrency/executor/default" context-service="default" hung-task-termination-period="0" hung-task-threshold="60000" keepalive-time="5000"/>
                     </managed-executor-services>
                     <managed-scheduled-executor-services>
-                        <managed-scheduled-executor-service name="default" jndi-name="java:jboss/ee/concurrency/scheduler/default" context-service="default" hung-task-threshold="60000" keepalive-time="3000"/>
+                        <managed-scheduled-executor-service name="default" jndi-name="java:jboss/ee/concurrency/scheduler/default" context-service="default" hung-task-termination-period="0" hung-task-threshold="60000" keepalive-time="3000"/>
                     </managed-scheduled-executor-services>
                 </concurrent>
                 <default-bindings context-service="java:jboss/ee/concurrency/context/default" datasource="java:jboss/datasources/ExampleDS" managed-executor-service="java:jboss/ee/concurrency/executor/default" managed-scheduled-executor-service="java:jboss/ee/concurrency/scheduler/default" managed-thread-factory="java:jboss/ee/concurrency/factory/default"/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:ee-security:1.0"/>
-            <subsystem xmlns="urn:jboss:domain:ejb3:6.0">
+            <subsystem xmlns="urn:jboss:domain:ejb3:9.0">
                 <session-bean>
                     <stateless>
                         <bean-instance-pool-ref pool-name="slsb-strict-max-pool"/>
@@ -615,7 +624,7 @@
                         <file-data-store name="default-file-store" path="timer-service-data" relative-to="jboss.server.data.dir"/>
                     </data-stores>
                 </timer-service>
-                <remote connector-ref="http-remoting-connector" thread-pool-name="default">
+                <remote cluster="ejb" connectors="http-remoting-connector" thread-pool-name="default">
                     <channel-creation-options>
                         <option name="MAX_OUTBOUND_MESSAGES" value="1234" type="remoting"/>
                     </channel-creation-options>
@@ -631,7 +640,7 @@
                 <statistics enabled="${wildfly.ejb3.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
                 <log-system-exceptions value="true"/>
             </subsystem>
-            <subsystem xmlns="urn:wildfly:elytron:9.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
+            <subsystem xmlns="urn:wildfly:elytron:13.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
                 <providers>
                     <aggregate-providers name="combined-providers">
                         <providers name="elytron"/>
@@ -714,9 +723,40 @@
                     </mechanism-provider-filtering-sasl-server-factory>
                     <provider-sasl-server-factory name="global"/>
                 </sasl>
+                <tls>
+                    <key-stores>
+                        <key-store name="applicationKS">
+                            <credential-reference clear-text="password"/>
+                            <implementation type="JKS"/>
+                            <file path="application.keystore" relative-to="jboss.domain.config.dir"/>
+                        </key-store>
+                    </key-stores>
+                    <key-managers>
+                        <key-manager name="applicationKM" key-store="applicationKS" generate-self-signed-certificate-host="localhost">
+                            <credential-reference clear-text="password"/>
+                        </key-manager>
+                    </key-managers>
+                    <server-ssl-contexts>
+                        <server-ssl-context name="applicationSSC" key-manager="applicationKM"/>
+                    </server-ssl-contexts>
+                </tls>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:infinispan:9.0">
-                <cache-container name="web" default-cache="dist" module="org.wildfly.clustering.web.infinispan">
+            <subsystem xmlns="urn:jboss:domain:infinispan:12.0">
+                <cache-container name="ejb" default-cache="dist" aliases="sfsb" modules="org.wildfly.clustering.ejb.infinispan">
+                    <transport lock-timeout="60000"/>
+                    <distributed-cache name="dist">
+                        <locking isolation="REPEATABLE_READ"/>
+                        <transaction mode="BATCH"/>
+                        <file-store/>
+                    </distributed-cache>
+                </cache-container>
+                <cache-container name="server" default-cache="default" aliases="singleton cluster" modules="org.wildfly.clustering.server">
+                    <transport lock-timeout="60000"/>
+                    <replicated-cache name="default">
+                        <transaction mode="BATCH"/>
+                    </replicated-cache>
+                </cache-container>
+                <cache-container name="web" default-cache="dist" modules="org.wildfly.clustering.web.infinispan">
                     <transport lock-timeout="60000"/>
                     <replicated-cache name="sso">
                         <locking isolation="REPEATABLE_READ"/>
@@ -729,29 +769,17 @@
                         <file-store/>
                     </distributed-cache>
                 </cache-container>
-                <cache-container name="server" aliases="singleton cluster" default-cache="default" module="org.wildfly.clustering.server">
-                    <transport lock-timeout="60000"/>
-                    <replicated-cache name="default">
-                        <transaction mode="BATCH"/>
-                    </replicated-cache>
-                </cache-container>
-                <cache-container name="ejb" aliases="sfsb" default-cache="dist" module="org.wildfly.clustering.ejb.infinispan">
-                    <transport lock-timeout="60000"/>
-                    <distributed-cache name="dist">
-                        <locking isolation="REPEATABLE_READ"/>
-                        <transaction mode="BATCH"/>
-                        <file-store/>
-                    </distributed-cache>
-                </cache-container>
-                <cache-container name="hibernate" module="org.infinispan.hibernate-cache">
+                <cache-container name="hibernate" modules="org.infinispan.hibernate-cache">
                     <transport lock-timeout="60000"/>
                     <local-cache name="local-query">
-                        <object-memory size="10000"/>
+                        <heap-memory size="10000"/>
                         <expiration max-idle="100000"/>
                     </local-cache>
+                    <local-cache name="pending-puts">
+                        <expiration max-idle="60000"/>
+                    </local-cache>
                     <invalidation-cache name="entity">
-                        <transaction mode="NON_XA"/>
-                        <object-memory size="10000"/>
+                        <heap-memory size="10000"/>
                         <expiration max-idle="100000"/>
                     </invalidation-cache>
                     <replicated-cache name="timestamps"/>
@@ -782,7 +810,7 @@
                 <cached-connection-manager/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:jdr:1.0"/>
-            <subsystem xmlns="urn:jboss:domain:jgroups:7.0">
+            <subsystem xmlns="urn:jboss:domain:jgroups:8.0">
                 <channels default="ee">
                     <channel name="ee" stack="udp" cluster="ejb"/>
                 </channels>
@@ -823,17 +851,17 @@
                 <expose-expression-model/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:jpa:1.1">
-                <jpa default-datasource="" default-extended-persistence-inheritance="DEEP"/>
+                <jpa default-extended-persistence-inheritance="DEEP"/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:jsf:1.1"/>
-            <subsystem xmlns="urn:jboss:domain:mail:3.0">
+            <subsystem xmlns="urn:jboss:domain:mail:4.0">
                 <mail-session name="default" jndi-name="java:jboss/mail/Default">
                     <smtp-server outbound-socket-binding-ref="mail-smtp"/>
                 </mail-session>
             </subsystem>
             <subsystem xmlns="urn:wildfly:microprofile-config-smallrye:1.0"/>
             <subsystem xmlns="urn:wildfly:microprofile-jwt-smallrye:1.0"/>
-            <subsystem xmlns="urn:wildfly:microprofile-opentracing-smallrye:2.0" default-tracer="jaeger">
+            <subsystem xmlns="urn:wildfly:microprofile-opentracing-smallrye:3.0" default-tracer="jaeger">
                 <jaeger-tracer name="jaeger">
                     <sampler-configuration sampler-type="const" sampler-param="1.0"/>
                 </jaeger-tracer>
@@ -853,7 +881,7 @@
                 <http-connector name="http-remoting-connector" connector-ref="default" security-realm="ApplicationRealm"/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:request-controller:1.0"/>
-            <subsystem xmlns="urn:jboss:domain:resource-adapters:5.0"/>
+            <subsystem xmlns="urn:jboss:domain:resource-adapters:6.0"/>
             <subsystem xmlns="urn:jboss:domain:sar:1.0"/>
             <subsystem xmlns="urn:jboss:domain:security:2.0">
                 <security-domains>
@@ -901,7 +929,7 @@
                     </singleton-policy>
                 </singleton-policies>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:transactions:5.0">
+            <subsystem xmlns="urn:jboss:domain:transactions:6.0">
                 <core-environment node-identifier="${jboss.tx.node.id:1}">
                     <process-id>
                         <uuid/>
@@ -911,7 +939,7 @@
                 <coordinator-environment statistics-enabled="${wildfly.transactions.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
                 <object-store path="tx-object-store" relative-to="jboss.server.data.dir"/>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:undertow:10.0" default-server="default-server" default-virtual-host="default-host" default-servlet-container="default" default-security-domain="other" statistics-enabled="${wildfly.undertow.statistics-enabled:${wildfly.statistics-enabled:false}}">
+            <subsystem xmlns="urn:jboss:domain:undertow:12.0" default-server="default-server" default-virtual-host="default-host" default-servlet-container="default" default-security-domain="other" statistics-enabled="${wildfly.undertow.statistics-enabled:${wildfly.statistics-enabled:false}}">
                 <buffer-cache name="default"/>
                 <server name="default-server">
                     <ajp-listener name="ajp" socket-binding="ajp"/>
@@ -990,7 +1018,7 @@
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:bean-validation:1.0"/>
             <subsystem xmlns="urn:jboss:domain:core-management:1.0"/>
-            <subsystem xmlns="urn:jboss:domain:datasources:5.0">
+            <subsystem xmlns="urn:jboss:domain:datasources:6.0">
                 <datasources>
                     <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true" statistics-enabled="${wildfly.datasources.statistics-enabled:${wildfly.statistics-enabled:false}}">
                         <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</connection-url>
@@ -1010,12 +1038,12 @@
             <subsystem xmlns="urn:jboss:domain:discovery:1.0"/>
             <subsystem xmlns="urn:jboss:domain:distributable-web:2.0" default-session-management="default" default-single-sign-on-management="default">
                 <infinispan-session-management name="default" cache-container="web" granularity="SESSION">
-                    <primary-owner-affinity/>
+                    <local-affinity/>
                 </infinispan-session-management>
                 <infinispan-single-sign-on-management name="default" cache-container="web" cache="sso"/>
-                <infinispan-routing cache-container="web" cache="routing"/>
+                <local-routing/>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:ee:5.0">
+            <subsystem xmlns="urn:jboss:domain:ee:6.0">
                 <spec-descriptor-property-replacement>false</spec-descriptor-property-replacement>
                 <concurrent>
                     <context-services>
@@ -1025,16 +1053,16 @@
                         <managed-thread-factory name="default" jndi-name="java:jboss/ee/concurrency/factory/default" context-service="default"/>
                     </managed-thread-factories>
                     <managed-executor-services>
-                        <managed-executor-service name="default" jndi-name="java:jboss/ee/concurrency/executor/default" context-service="default" hung-task-threshold="60000" keepalive-time="5000"/>
+                        <managed-executor-service name="default" jndi-name="java:jboss/ee/concurrency/executor/default" context-service="default" hung-task-termination-period="0" hung-task-threshold="60000" keepalive-time="5000"/>
                     </managed-executor-services>
                     <managed-scheduled-executor-services>
-                        <managed-scheduled-executor-service name="default" jndi-name="java:jboss/ee/concurrency/scheduler/default" context-service="default" hung-task-threshold="60000" keepalive-time="3000"/>
+                        <managed-scheduled-executor-service name="default" jndi-name="java:jboss/ee/concurrency/scheduler/default" context-service="default" hung-task-termination-period="0" hung-task-threshold="60000" keepalive-time="3000"/>
                     </managed-scheduled-executor-services>
                 </concurrent>
                 <default-bindings context-service="java:jboss/ee/concurrency/context/default" datasource="java:jboss/datasources/ExampleDS" jms-connection-factory="java:jboss/DefaultJMSConnectionFactory" managed-executor-service="java:jboss/ee/concurrency/executor/default" managed-scheduled-executor-service="java:jboss/ee/concurrency/scheduler/default" managed-thread-factory="java:jboss/ee/concurrency/factory/default"/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:ee-security:1.0"/>
-            <subsystem xmlns="urn:jboss:domain:ejb3:6.0">
+            <subsystem xmlns="urn:jboss:domain:ejb3:9.0">
                 <session-bean>
                     <stateless>
                         <bean-instance-pool-ref pool-name="slsb-strict-max-pool"/>
@@ -1065,7 +1093,7 @@
                         <file-data-store name="default-file-store" path="timer-service-data" relative-to="jboss.server.data.dir"/>
                     </data-stores>
                 </timer-service>
-                <remote connector-ref="http-remoting-connector" thread-pool-name="default">
+                <remote cluster="ejb" connectors="http-remoting-connector" thread-pool-name="default">
                     <channel-creation-options>
                         <option name="MAX_OUTBOUND_MESSAGES" value="1234" type="remoting"/>
                     </channel-creation-options>
@@ -1082,7 +1110,7 @@
                 <statistics enabled="${wildfly.ejb3.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
                 <log-system-exceptions value="true"/>
             </subsystem>
-            <subsystem xmlns="urn:wildfly:elytron:9.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
+            <subsystem xmlns="urn:wildfly:elytron:13.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
                 <providers>
                     <aggregate-providers name="combined-providers">
                         <providers name="elytron"/>
@@ -1165,48 +1193,57 @@
                     </mechanism-provider-filtering-sasl-server-factory>
                     <provider-sasl-server-factory name="global"/>
                 </sasl>
+                <tls>
+                    <key-stores>
+                        <key-store name="applicationKS">
+                            <credential-reference clear-text="password"/>
+                            <implementation type="JKS"/>
+                            <file path="application.keystore" relative-to="jboss.domain.config.dir"/>
+                        </key-store>
+                    </key-stores>
+                    <key-managers>
+                        <key-manager name="applicationKM" key-store="applicationKS" generate-self-signed-certificate-host="localhost">
+                            <credential-reference clear-text="password"/>
+                        </key-manager>
+                    </key-managers>
+                    <server-ssl-contexts>
+                        <server-ssl-context name="applicationSSC" key-manager="applicationKM"/>
+                    </server-ssl-contexts>
+                </tls>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:iiop-openjdk:2.1">
                 <orb socket-binding="iiop"/>
                 <initializers security="identity" transactions="spec"/>
                 <security server-requires-ssl="false" client-requires-ssl="false"/>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:infinispan:9.0">
-                <cache-container name="web" default-cache="passivation" module="org.wildfly.clustering.web.infinispan">
+            <subsystem xmlns="urn:jboss:domain:infinispan:12.0">
+                <cache-container name="ejb" default-cache="passivation" aliases="sfsb" modules="org.wildfly.clustering.ejb.infinispan">
                     <local-cache name="passivation">
-                        <locking isolation="REPEATABLE_READ"/>
-                        <transaction mode="BATCH"/>
-                        <file-store passivation="true" purge="false"/>
-                    </local-cache>
-                    <local-cache name="sso">
-                        <locking isolation="REPEATABLE_READ"/>
-                        <transaction mode="BATCH"/>
-                    </local-cache>
-                    <local-cache name="routing"/>
-                </cache-container>
-                <cache-container name="server" default-cache="default" module="org.wildfly.clustering.server">
-                    <local-cache name="default">
-                        <transaction mode="BATCH"/>
-                    </local-cache>
-                </cache-container>
-                <cache-container name="ejb" aliases="sfsb" default-cache="passivation" module="org.wildfly.clustering.ejb.infinispan">
-                    <local-cache name="passivation">
-                        <locking isolation="REPEATABLE_READ"/>
-                        <transaction mode="BATCH"/>
                         <file-store passivation="true" purge="false"/>
                     </local-cache>
                 </cache-container>
-                <cache-container name="hibernate" module="org.infinispan.hibernate-cache">
+                <cache-container name="web" default-cache="passivation" modules="org.wildfly.clustering.web.infinispan">
+                    <local-cache name="passivation">
+                        <file-store passivation="true" purge="false"/>
+                    </local-cache>
+                    <local-cache name="sso"/>
+                </cache-container>
+                <cache-container name="server" default-cache="default" modules="org.wildfly.clustering.server">
+                    <local-cache name="default"/>
+                </cache-container>
+                <cache-container name="hibernate" modules="org.infinispan.hibernate-cache">
                     <local-cache name="entity">
-                        <transaction mode="NON_XA"/>
-                        <object-memory size="10000"/>
+                        <heap-memory size="10000"/>
                         <expiration max-idle="100000"/>
                     </local-cache>
                     <local-cache name="local-query">
-                        <object-memory size="10000"/>
+                        <heap-memory size="10000"/>
                         <expiration max-idle="100000"/>
                     </local-cache>
                     <local-cache name="timestamps"/>
+                    <local-cache name="pending-puts">
+                        <expiration max-idle="60000"/>
+                    </local-cache>
                 </cache-container>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:io:3.0">
@@ -1239,16 +1276,16 @@
                 <expose-expression-model/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:jpa:1.1">
-                <jpa default-datasource="" default-extended-persistence-inheritance="DEEP"/>
+                <jpa default-extended-persistence-inheritance="DEEP"/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:jsf:1.1"/>
             <subsystem xmlns="urn:jboss:domain:jsr77:1.0"/>
-            <subsystem xmlns="urn:jboss:domain:mail:3.0">
+            <subsystem xmlns="urn:jboss:domain:mail:4.0">
                 <mail-session name="default" jndi-name="java:jboss/mail/Default">
                     <smtp-server outbound-socket-binding-ref="mail-smtp"/>
                 </mail-session>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:messaging-activemq:9.0">
+            <subsystem xmlns="urn:jboss:domain:messaging-activemq:13.0">
                 <server name="default">
                     <statistics enabled="${wildfly.messaging-activemq.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
                     <security-setting name="#">
@@ -1279,7 +1316,7 @@
             </subsystem>
             <subsystem xmlns="urn:wildfly:microprofile-config-smallrye:1.0"/>
             <subsystem xmlns="urn:wildfly:microprofile-jwt-smallrye:1.0"/>
-            <subsystem xmlns="urn:wildfly:microprofile-opentracing-smallrye:2.0" default-tracer="jaeger">
+            <subsystem xmlns="urn:wildfly:microprofile-opentracing-smallrye:3.0" default-tracer="jaeger">
                 <jaeger-tracer name="jaeger">
                     <sampler-configuration sampler-type="const" sampler-param="1.0"/>
                 </jaeger-tracer>
@@ -1292,7 +1329,7 @@
                 <http-connector name="http-remoting-connector" connector-ref="default" security-realm="ApplicationRealm"/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:request-controller:1.0"/>
-            <subsystem xmlns="urn:jboss:domain:resource-adapters:5.0"/>
+            <subsystem xmlns="urn:jboss:domain:resource-adapters:6.0"/>
             <subsystem xmlns="urn:jboss:domain:sar:1.0"/>
             <subsystem xmlns="urn:jboss:domain:security:2.0">
                 <security-domains>
@@ -1333,7 +1370,7 @@
                     </maximum-set>
                 </deployment-permissions>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:transactions:5.0">
+            <subsystem xmlns="urn:jboss:domain:transactions:6.0">
                 <core-environment node-identifier="${jboss.tx.node.id:1}">
                     <process-id>
                         <uuid/>
@@ -1343,7 +1380,7 @@
                 <coordinator-environment statistics-enabled="${wildfly.transactions.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
                 <object-store path="tx-object-store" relative-to="jboss.server.data.dir"/>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:undertow:10.0" default-server="default-server" default-virtual-host="default-host" default-servlet-container="default" default-security-domain="other" statistics-enabled="${wildfly.undertow.statistics-enabled:${wildfly.statistics-enabled:false}}">
+            <subsystem xmlns="urn:jboss:domain:undertow:12.0" default-server="default-server" default-virtual-host="default-host" default-servlet-container="default" default-security-domain="other" statistics-enabled="${wildfly.undertow.statistics-enabled:${wildfly.statistics-enabled:false}}">
                 <buffer-cache name="default"/>
                 <server name="default-server">
                     <http-listener name="default" socket-binding="http" redirect-socket="https" enable-http2="true"/>
@@ -1421,7 +1458,7 @@
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:bean-validation:1.0"/>
             <subsystem xmlns="urn:jboss:domain:core-management:1.0"/>
-            <subsystem xmlns="urn:jboss:domain:datasources:5.0">
+            <subsystem xmlns="urn:jboss:domain:datasources:6.0">
                 <datasources>
                     <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true" statistics-enabled="${wildfly.datasources.statistics-enabled:${wildfly.statistics-enabled:false}}">
                         <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</connection-url>
@@ -1446,7 +1483,7 @@
                 <infinispan-single-sign-on-management name="default" cache-container="web" cache="sso"/>
                 <infinispan-routing cache-container="web" cache="routing"/>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:ee:5.0">
+            <subsystem xmlns="urn:jboss:domain:ee:6.0">
                 <spec-descriptor-property-replacement>false</spec-descriptor-property-replacement>
                 <concurrent>
                     <context-services>
@@ -1456,16 +1493,16 @@
                         <managed-thread-factory name="default" jndi-name="java:jboss/ee/concurrency/factory/default" context-service="default"/>
                     </managed-thread-factories>
                     <managed-executor-services>
-                        <managed-executor-service name="default" jndi-name="java:jboss/ee/concurrency/executor/default" context-service="default" hung-task-threshold="60000" keepalive-time="5000"/>
+                        <managed-executor-service name="default" jndi-name="java:jboss/ee/concurrency/executor/default" context-service="default" hung-task-termination-period="0" hung-task-threshold="60000" keepalive-time="5000"/>
                     </managed-executor-services>
                     <managed-scheduled-executor-services>
-                        <managed-scheduled-executor-service name="default" jndi-name="java:jboss/ee/concurrency/scheduler/default" context-service="default" hung-task-threshold="60000" keepalive-time="3000"/>
+                        <managed-scheduled-executor-service name="default" jndi-name="java:jboss/ee/concurrency/scheduler/default" context-service="default" hung-task-termination-period="0" hung-task-threshold="60000" keepalive-time="3000"/>
                     </managed-scheduled-executor-services>
                 </concurrent>
                 <default-bindings context-service="java:jboss/ee/concurrency/context/default" datasource="java:jboss/datasources/ExampleDS" jms-connection-factory="java:jboss/DefaultJMSConnectionFactory" managed-executor-service="java:jboss/ee/concurrency/executor/default" managed-scheduled-executor-service="java:jboss/ee/concurrency/scheduler/default" managed-thread-factory="java:jboss/ee/concurrency/factory/default"/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:ee-security:1.0"/>
-            <subsystem xmlns="urn:jboss:domain:ejb3:6.0">
+            <subsystem xmlns="urn:jboss:domain:ejb3:9.0">
                 <session-bean>
                     <stateless>
                         <bean-instance-pool-ref pool-name="slsb-strict-max-pool"/>
@@ -1496,7 +1533,7 @@
                         <file-data-store name="default-file-store" path="timer-service-data" relative-to="jboss.server.data.dir"/>
                     </data-stores>
                 </timer-service>
-                <remote connector-ref="http-remoting-connector" thread-pool-name="default">
+                <remote cluster="ejb" connectors="http-remoting-connector" thread-pool-name="default">
                     <channel-creation-options>
                         <option name="MAX_OUTBOUND_MESSAGES" value="1234" type="remoting"/>
                     </channel-creation-options>
@@ -1513,7 +1550,7 @@
                 <statistics enabled="${wildfly.ejb3.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
                 <log-system-exceptions value="true"/>
             </subsystem>
-            <subsystem xmlns="urn:wildfly:elytron:9.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
+            <subsystem xmlns="urn:wildfly:elytron:13.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
                 <providers>
                     <aggregate-providers name="combined-providers">
                         <providers name="elytron"/>
@@ -1596,14 +1633,45 @@
                     </mechanism-provider-filtering-sasl-server-factory>
                     <provider-sasl-server-factory name="global"/>
                 </sasl>
+                <tls>
+                    <key-stores>
+                        <key-store name="applicationKS">
+                            <credential-reference clear-text="password"/>
+                            <implementation type="JKS"/>
+                            <file path="application.keystore" relative-to="jboss.domain.config.dir"/>
+                        </key-store>
+                    </key-stores>
+                    <key-managers>
+                        <key-manager name="applicationKM" key-store="applicationKS" generate-self-signed-certificate-host="localhost">
+                            <credential-reference clear-text="password"/>
+                        </key-manager>
+                    </key-managers>
+                    <server-ssl-contexts>
+                        <server-ssl-context name="applicationSSC" key-manager="applicationKM"/>
+                    </server-ssl-contexts>
+                </tls>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:iiop-openjdk:2.1">
                 <orb socket-binding="iiop"/>
                 <initializers security="identity" transactions="spec"/>
                 <security server-requires-ssl="false" client-requires-ssl="false"/>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:infinispan:9.0">
-                <cache-container name="web" default-cache="dist" module="org.wildfly.clustering.web.infinispan">
+            <subsystem xmlns="urn:jboss:domain:infinispan:12.0">
+                <cache-container name="ejb" default-cache="dist" aliases="sfsb" modules="org.wildfly.clustering.ejb.infinispan">
+                    <transport lock-timeout="60000"/>
+                    <distributed-cache name="dist">
+                        <locking isolation="REPEATABLE_READ"/>
+                        <transaction mode="BATCH"/>
+                        <file-store/>
+                    </distributed-cache>
+                </cache-container>
+                <cache-container name="server" default-cache="default" aliases="singleton cluster" modules="org.wildfly.clustering.server">
+                    <transport lock-timeout="60000"/>
+                    <replicated-cache name="default">
+                        <transaction mode="BATCH"/>
+                    </replicated-cache>
+                </cache-container>
+                <cache-container name="web" default-cache="dist" modules="org.wildfly.clustering.web.infinispan">
                     <transport lock-timeout="60000"/>
                     <replicated-cache name="sso">
                         <locking isolation="REPEATABLE_READ"/>
@@ -1616,29 +1684,17 @@
                         <file-store/>
                     </distributed-cache>
                 </cache-container>
-                <cache-container name="server" aliases="singleton cluster" default-cache="default" module="org.wildfly.clustering.server">
-                    <transport lock-timeout="60000"/>
-                    <replicated-cache name="default">
-                        <transaction mode="BATCH"/>
-                    </replicated-cache>
-                </cache-container>
-                <cache-container name="ejb" aliases="sfsb" default-cache="dist" module="org.wildfly.clustering.ejb.infinispan">
-                    <transport lock-timeout="60000"/>
-                    <distributed-cache name="dist">
-                        <locking isolation="REPEATABLE_READ"/>
-                        <transaction mode="BATCH"/>
-                        <file-store/>
-                    </distributed-cache>
-                </cache-container>
-                <cache-container name="hibernate" module="org.infinispan.hibernate-cache">
+                <cache-container name="hibernate" modules="org.infinispan.hibernate-cache">
                     <transport lock-timeout="60000"/>
                     <local-cache name="local-query">
-                        <object-memory size="10000"/>
+                        <heap-memory size="10000"/>
                         <expiration max-idle="100000"/>
                     </local-cache>
+                    <local-cache name="pending-puts">
+                        <expiration max-idle="60000"/>
+                    </local-cache>
                     <invalidation-cache name="entity">
-                        <transaction mode="NON_XA"/>
-                        <object-memory size="10000"/>
+                        <heap-memory size="10000"/>
                         <expiration max-idle="100000"/>
                     </invalidation-cache>
                     <replicated-cache name="timestamps"/>
@@ -1669,7 +1725,7 @@
                 <cached-connection-manager/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:jdr:1.0"/>
-            <subsystem xmlns="urn:jboss:domain:jgroups:7.0">
+            <subsystem xmlns="urn:jboss:domain:jgroups:8.0">
                 <channels default="ee">
                     <channel name="ee" stack="udp" cluster="ejb"/>
                 </channels>
@@ -1710,16 +1766,16 @@
                 <expose-expression-model/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:jpa:1.1">
-                <jpa default-datasource="" default-extended-persistence-inheritance="DEEP"/>
+                <jpa default-extended-persistence-inheritance="DEEP"/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:jsf:1.1"/>
             <subsystem xmlns="urn:jboss:domain:jsr77:1.0"/>
-            <subsystem xmlns="urn:jboss:domain:mail:3.0">
+            <subsystem xmlns="urn:jboss:domain:mail:4.0">
                 <mail-session name="default" jndi-name="java:jboss/mail/Default">
                     <smtp-server outbound-socket-binding-ref="mail-smtp"/>
                 </mail-session>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:messaging-activemq:9.0">
+            <subsystem xmlns="urn:jboss:domain:messaging-activemq:13.0">
                 <server name="default">
                     <cluster password="${jboss.messaging.cluster.password:CHANGE ME!!}"/>
                     <statistics enabled="${wildfly.messaging-activemq.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
@@ -1754,7 +1810,7 @@
             </subsystem>
             <subsystem xmlns="urn:wildfly:microprofile-config-smallrye:1.0"/>
             <subsystem xmlns="urn:wildfly:microprofile-jwt-smallrye:1.0"/>
-            <subsystem xmlns="urn:wildfly:microprofile-opentracing-smallrye:2.0" default-tracer="jaeger">
+            <subsystem xmlns="urn:wildfly:microprofile-opentracing-smallrye:3.0" default-tracer="jaeger">
                 <jaeger-tracer name="jaeger">
                     <sampler-configuration sampler-type="const" sampler-param="1.0"/>
                 </jaeger-tracer>
@@ -1774,7 +1830,7 @@
                 <http-connector name="http-remoting-connector" connector-ref="default" security-realm="ApplicationRealm"/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:request-controller:1.0"/>
-            <subsystem xmlns="urn:jboss:domain:resource-adapters:5.0"/>
+            <subsystem xmlns="urn:jboss:domain:resource-adapters:6.0"/>
             <subsystem xmlns="urn:jboss:domain:sar:1.0"/>
             <subsystem xmlns="urn:jboss:domain:security:2.0">
                 <security-domains>
@@ -1822,7 +1878,7 @@
                     </singleton-policy>
                 </singleton-policies>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:transactions:5.0">
+            <subsystem xmlns="urn:jboss:domain:transactions:6.0">
                 <core-environment node-identifier="${jboss.tx.node.id:1}">
                     <process-id>
                         <uuid/>
@@ -1832,7 +1888,7 @@
                 <coordinator-environment statistics-enabled="${wildfly.transactions.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
                 <object-store path="tx-object-store" relative-to="jboss.server.data.dir"/>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:undertow:10.0" default-server="default-server" default-virtual-host="default-host" default-servlet-container="default" default-security-domain="other" statistics-enabled="${wildfly.undertow.statistics-enabled:${wildfly.statistics-enabled:false}}">
+            <subsystem xmlns="urn:jboss:domain:undertow:12.0" default-server="default-server" default-virtual-host="default-host" default-servlet-container="default" default-security-domain="other" statistics-enabled="${wildfly.undertow.statistics-enabled:${wildfly.statistics-enabled:false}}">
                 <buffer-cache name="default"/>
                 <server name="default-server">
                     <ajp-listener name="ajp" socket-binding="ajp"/>
@@ -1902,7 +1958,7 @@
                 <worker name="default"/>
                 <buffer-pool name="default"/>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:undertow:10.0" default-server="default-server" default-virtual-host="default-host" default-servlet-container="default" statistics-enabled="${wildfly.undertow.statistics-enabled:${wildfly.statistics-enabled:false}}">
+            <subsystem xmlns="urn:jboss:domain:undertow:12.0" default-server="default-server" default-virtual-host="default-host" default-servlet-container="default" statistics-enabled="${wildfly.undertow.statistics-enabled:${wildfly.statistics-enabled:false}}">
                 <buffer-cache name="default"/>
                 <server name="default-server">
                     <http-listener name="default" socket-binding="http" redirect-socket="https" enable-http2="true"/>
@@ -2019,6 +2075,8 @@
                 <extension module="org.wildfly.extension.discovery"/>
                 <extension module="org.wildfly.extension.ee-security"/>
                 <extension module="org.wildfly.extension.elytron"/>
+                <extension module="org.wildfly.extension.health"/>
+                <extension module="org.wildfly.extension.metrics"/>
                 <extension module="org.wildfly.extension.microprofile.config-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.health-smallrye"/>
@@ -2026,6 +2084,8 @@
                 <extension module="org.wildfly.extension.microprofile.metrics-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.openapi-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.opentracing-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.reactive-messaging-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.reactive-streams-operators-smallrye"/>
             </excluded-extensions>
         </host-exclude>
         <host-exclude name="WildFly10.1">
@@ -2037,6 +2097,8 @@
                 <extension module="org.wildfly.extension.discovery"/>
                 <extension module="org.wildfly.extension.ee-security"/>
                 <extension module="org.wildfly.extension.elytron"/>
+                <extension module="org.wildfly.extension.health"/>
+                <extension module="org.wildfly.extension.metrics"/>
                 <extension module="org.wildfly.extension.microprofile.config-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.health-smallrye"/>
@@ -2044,6 +2106,8 @@
                 <extension module="org.wildfly.extension.microprofile.metrics-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.openapi-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.opentracing-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.reactive-messaging-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.reactive-streams-operators-smallrye"/>
             </excluded-extensions>
         </host-exclude>
         <host-exclude name="WildFly11.0">
@@ -2052,6 +2116,8 @@
                 <extension module="org.wildfly.extension.clustering.web"/>
                 <extension module="org.wildfly.extension.datasources-agroal"/>
                 <extension module="org.wildfly.extension.ee-security"/>
+                <extension module="org.wildfly.extension.health"/>
+                <extension module="org.wildfly.extension.metrics"/>
                 <extension module="org.wildfly.extension.microprofile.config-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.health-smallrye"/>
@@ -2059,6 +2125,8 @@
                 <extension module="org.wildfly.extension.microprofile.metrics-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.openapi-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.opentracing-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.reactive-messaging-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.reactive-streams-operators-smallrye"/>
             </excluded-extensions>
         </host-exclude>
         <host-exclude name="WildFly12.0">
@@ -2067,6 +2135,8 @@
                 <extension module="org.wildfly.extension.clustering.web"/>
                 <extension module="org.wildfly.extension.datasources-agroal"/>
                 <extension module="org.wildfly.extension.ee-security"/>
+                <extension module="org.wildfly.extension.health"/>
+                <extension module="org.wildfly.extension.metrics"/>
                 <extension module="org.wildfly.extension.microprofile.config-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.health-smallrye"/>
@@ -2074,6 +2144,8 @@
                 <extension module="org.wildfly.extension.microprofile.metrics-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.openapi-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.opentracing-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.reactive-messaging-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.reactive-streams-operators-smallrye"/>
             </excluded-extensions>
         </host-exclude>
         <host-exclude name="WildFly13.0">
@@ -2081,6 +2153,8 @@
             <excluded-extensions>
                 <extension module="org.wildfly.extension.clustering.web"/>
                 <extension module="org.wildfly.extension.datasources-agroal"/>
+                <extension module="org.wildfly.extension.health"/>
+                <extension module="org.wildfly.extension.metrics"/>
                 <extension module="org.wildfly.extension.microprofile.config-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.health-smallrye"/>
@@ -2088,49 +2162,98 @@
                 <extension module="org.wildfly.extension.microprofile.metrics-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.openapi-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.opentracing-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.reactive-messaging-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.reactive-streams-operators-smallrye"/>
             </excluded-extensions>
         </host-exclude>
         <host-exclude name="WildFly14.0">
             <host-release id="WildFly14.0"/>
             <excluded-extensions>
                 <extension module="org.wildfly.extension.clustering.web"/>
+                <extension module="org.wildfly.extension.health"/>
+                <extension module="org.wildfly.extension.metrics"/>
                 <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.jwt-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.metrics-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.openapi-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.reactive-messaging-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.reactive-streams-operators-smallrye"/>
             </excluded-extensions>
         </host-exclude>
         <host-exclude name="WildFly15.0">
             <host-release id="WildFly15.0"/>
             <excluded-extensions>
                 <extension module="org.wildfly.extension.clustering.web"/>
+                <extension module="org.wildfly.extension.health"/>
+                <extension module="org.wildfly.extension.metrics"/>
                 <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.jwt-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.openapi-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.reactive-messaging-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.reactive-streams-operators-smallrye"/>
             </excluded-extensions>
         </host-exclude>
         <host-exclude name="WildFly16.0">
             <host-release id="WildFly16.0"/>
             <excluded-extensions>
+                <extension module="org.wildfly.extension.health"/>
+                <extension module="org.wildfly.extension.metrics"/>
                 <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.jwt-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.openapi-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.reactive-messaging-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.reactive-streams-operators-smallrye"/>
             </excluded-extensions>
         </host-exclude>
         <host-exclude name="WildFly17.0">
             <host-release id="WildFly17.0"/>
             <excluded-extensions>
+                <extension module="org.wildfly.extension.health"/>
+                <extension module="org.wildfly.extension.metrics"/>
                 <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.jwt-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.openapi-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.reactive-messaging-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.reactive-streams-operators-smallrye"/>
             </excluded-extensions>
         </host-exclude>
         <host-exclude name="WildFly18.0">
             <host-release id="WildFly18.0"/>
             <excluded-extensions>
+                <extension module="org.wildfly.extension.health"/>
+                <extension module="org.wildfly.extension.metrics"/>
                 <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.jwt-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.openapi-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.reactive-messaging-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.reactive-streams-operators-smallrye"/>
+            </excluded-extensions>
+        </host-exclude>
+        <host-exclude name="WildFly19.0">
+            <host-release id="WildFly19.0"/>
+            <excluded-extensions>
+                <extension module="org.wildfly.extension.health"/>
+                <extension module="org.wildfly.extension.metrics"/>
+                <extension module="org.wildfly.extension.microprofile.reactive-messaging-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.reactive-streams-operators-smallrye"/>
+            </excluded-extensions>
+        </host-exclude>
+        <host-exclude name="WildFly20.0">
+            <host-release id="WildFly20.0"/>
+            <excluded-extensions>
+                <extension module="org.wildfly.extension.health"/>
+                <extension module="org.wildfly.extension.metrics"/>
+                <extension module="org.wildfly.extension.microprofile.reactive-messaging-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.reactive-streams-operators-smallrye"/>
+            </excluded-extensions>
+        </host-exclude>
+        <host-exclude name="WildFly21.0">
+            <host-release id="WildFly21.0"/>
+            <excluded-extensions>
+                <extension module="org.wildfly.extension.health"/>
+                <extension module="org.wildfly.extension.metrics"/>
+                <extension module="org.wildfly.extension.microprofile.reactive-messaging-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.reactive-streams-operators-smallrye"/>
             </excluded-extensions>
         </host-exclude>
     </host-excludes>

@@ -28,7 +28,6 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Logger;
@@ -37,6 +36,8 @@ import java.util.logging.Logger;
  * Allows to take screenshots in case of an selenium test error.
  */
 public class SeleniumScreenshotRule implements TestRule {
+
+  private static final String OUTPUT_DIR_PROPERTY_NAME = "selenium.screenshot.directory";
 
   private static Logger log = Logger.getAnonymousLogger();
 
@@ -59,31 +60,34 @@ public class SeleniumScreenshotRule implements TestRule {
         try {
           base.evaluate();
         } catch (Throwable t) {
+          log.info("Test failed. Attempting to create a screenshot.");
           captureScreenShot(description);
           throw t;
         }
       }
 
       public void captureScreenShot(Description describe) {
+        String screenshotDirectory = System.getProperty(OUTPUT_DIR_PROPERTY_NAME);
+
+        if (screenshotDirectory == null) {
+          log.info("No screenshot created, because no output directory is specified. "
+              + "Set the system property " + OUTPUT_DIR_PROPERTY_NAME + " to resolve this.");
+          return;
+        }
+
         File scrFile = ((TakesScreenshot) webDriver).getScreenshotAs(OutputType.FILE);
         String now = new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date());
         String scrFilename = describe.getClassName() + "-" + describe.getMethodName() + "-" + now + ".png";
-        File outputFile = new File(computeScreenshotsRoot(describe.getTestClass()), scrFilename);
-        log.info(scrFilename + " screenshot created.");
+        File outputFile = new File(screenshotDirectory, scrFilename);
+
         try {
           FileUtils.copyFile(scrFile, outputFile);
         } catch (IOException ioe) {
-          log.severe("Error copying screenshot after exception.");
+          log.severe("No screenshot created due to an error on copying: " + ioe.getMessage());
+          return;
         }
-      }
 
-      public File computeScreenshotsRoot(Class anyTestClass) {
-        final String clsUri = anyTestClass.getName().replace('.','/') + ".class";
-        final URL url = anyTestClass.getClassLoader().getResource(clsUri);
-        final String clsPath = url.getPath();
-        final File root = new File(clsPath.substring(0, clsPath.length() - clsUri.length()));
-        final File clsFile = new File(root, clsUri);
-        return new File(root.getParentFile(), "screenshots");
+        log.info("Screenshot created at: " + outputFile.getPath());
       }
 
     };

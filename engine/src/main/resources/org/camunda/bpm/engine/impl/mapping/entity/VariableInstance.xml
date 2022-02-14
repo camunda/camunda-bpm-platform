@@ -35,6 +35,7 @@
       CASE_INST_ID_,
       CASE_EXECUTION_ID_,
       TASK_ID_,
+      BATCH_ID_,
       BYTEARRAY_ID_,
       DOUBLE_,
       LONG_,
@@ -56,6 +57,7 @@
       #{caseInstanceId, jdbcType=VARCHAR},
       #{caseExecutionId, jdbcType=VARCHAR},
       #{taskId, jdbcType=VARCHAR},
+      #{batchId, jdbcType=VARCHAR},
       #{byteArrayValueId, jdbcType=VARCHAR},
       #{doubleValue, jdbcType=DOUBLE},
       #{longValue, jdbcType=BIGINT},
@@ -107,6 +109,7 @@
       <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
       <result property="caseExecutionId" column="CASE_EXECUTION_ID_" jdbcType="VARCHAR" />
       <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
+      <result property="batchId" column="BATCH_ID_" jdbcType="VARCHAR" />
       <result property="activityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR" />
       <result property="activityId" column="ACTIVITY_ID_" jdbcType="VARCHAR" />
       <result property="isActive" column="IS_ACTIVE_" jdbcType="BOOLEAN" />
@@ -122,6 +125,10 @@
 	</resultMap>
 
   <!-- VARIABLE INSTANCE SELECT -->
+
+  <select id="selectVariableInstancesByBatchId" parameterType="string" resultMap="variableInstanceResultMap">
+    SELECT * FROM ${prefix}ACT_RU_VARIABLE RES WHERE VAR_SCOPE_ = #{parameter.batchId}
+  </select>
 
 	<select id="selectVariableInstance" parameterType="string" resultMap="variableInstanceResultMap">
 		SELECT
@@ -320,13 +327,13 @@
             on PROCDEF.ID_ = PROC_EXECUTION.PROC_DEF_ID_   
             <if test="!authCheck.revokeAuthorizationCheckEnabled">      
               <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" /> 
-              AUTH ON (
-              AUTH.RESOURCE_ID_ in (
-                                    RES.PROC_INST_ID_,
-                                    PROC_EXECUTION.ID_,
-                                    PROCDEF.KEY_,
-                                    RES.TASK_ID_,
-                                    '*')
+              AUTH ON (AUTH.RESOURCE_ID_ ${authJoinStart}
+                RES.PROC_INST_ID_ 
+                ${authJoinSeparator} PROC_EXECUTION.ID_
+                ${authJoinSeparator} PROCDEF.KEY_
+                ${authJoinSeparator} RES.TASK_ID_
+                ${authJoinSeparator} '*'
+                ${authJoinEnd}
               )
             </if>
           </if>
@@ -400,6 +407,15 @@
               </foreach>
             </if>
 
+            <!-- batchIds -->
+            <if test="batchIds != null &amp;&amp; batchIds.length > 0">
+              and RES.BATCH_ID_ in
+              <foreach item="item" index="index" collection="batchIds"
+                       open="(" separator="," close=")">
+                #{item}
+              </foreach>
+            </if>
+
             <!-- variableScopeIds -->
             <if test="variableScopeIds != null &amp;&amp; variableScopeIds.length > 0">
               and RES.VAR_SCOPE_ in
@@ -446,6 +462,7 @@
               </if>
             </foreach>
 
+            <bind name="applyAuthorizationCheckForCaseInstances" value="true" />
             <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.contextualAuthorizationCheck" />
             <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
 
@@ -490,6 +507,14 @@
       where ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
   </update>
 
+  <update id="updateByteArraysByRootProcessInstanceId_mssql"
+          parameterType="java.util.Map">
+      update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_GE_BYTEARRAY RES WITH (FORCESEEK)
+      where RES.ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR}
+  </update>
+
   <update id="updateVariableByteArraysByProcessInstanceId"
           parameterType="java.util.Map">
     update ${prefix}ACT_GE_BYTEARRAY
@@ -502,11 +527,39 @@
       )
   </update>
 
+  <update id="updateVariableByteArraysByProcessInstanceId_mssql"
+          parameterType="java.util.Map">
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_GE_BYTEARRAY RES WITH (FORCESEEK)
+      where RES.ID_ IN (
+        <!-- variables -->
+        SELECT BYTEARRAY_ID_
+        FROM ${prefix}ACT_HI_VARINST
+        WHERE PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+      )
+  </update>
+
   <update id="updateDecisionInputsByteArraysByProcessInstanceId"
           parameterType="java.util.Map">
     update ${prefix}ACT_GE_BYTEARRAY
       set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
       where ID_ IN (
+        <!-- decision inputs -->
+        SELECT BYTEARRAY_ID_
+        FROM ${prefix}ACT_HI_DEC_IN I
+        INNER JOIN ${prefix}ACT_HI_DECINST D
+        ON I.DEC_INST_ID_ = D.ID_
+        WHERE D.PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+      )
+  </update>
+
+  <update id="updateDecisionInputsByteArraysByProcessInstanceId_mssql"
+          parameterType="java.util.Map">
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_GE_BYTEARRAY RES WITH (FORCESEEK)
+      where RES.ID_ IN (
         <!-- decision inputs -->
         SELECT BYTEARRAY_ID_
         FROM ${prefix}ACT_HI_DEC_IN I
@@ -530,6 +583,21 @@
       )
   </update>
 
+  <update id="updateDecisionOutputsByteArraysByProcessInstanceId_mssql"
+          parameterType="java.util.Map">
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_GE_BYTEARRAY RES WITH (FORCESEEK)
+      where RES.ID_ IN (
+        <!-- decision outputs -->
+        SELECT BYTEARRAY_ID_
+        FROM ${prefix}ACT_HI_DEC_OUT O
+        INNER JOIN ${prefix}ACT_HI_DECINST D
+        ON O.DEC_INST_ID_ = D.ID_
+        WHERE D.PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+      )
+  </update>
+
   <update id="updateJobLogByteArraysByProcessInstanceId"
           parameterType="java.util.Map">
     update ${prefix}ACT_GE_BYTEARRAY
@@ -542,11 +610,37 @@
       )
   </update>
 
+  <update id="updateJobLogByteArraysByProcessInstanceId_mssql"
+          parameterType="java.util.Map">
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_GE_BYTEARRAY RES WITH (FORCESEEK)
+      where RES.ID_ IN (
+        <!-- job log -->
+        SELECT JOB_EXCEPTION_STACK_ID_
+        FROM ${prefix}ACT_HI_JOB_LOG
+        WHERE PROCESS_INSTANCE_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+      )
+  </update>
+
   <update id="updateExternalTaskLogByteArraysByProcessInstanceId"
           parameterType="java.util.Map">
     update ${prefix}ACT_GE_BYTEARRAY
       set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
       where ID_ IN (
+        <!-- external task log -->
+        SELECT ERROR_DETAILS_ID_
+        FROM ${prefix}ACT_HI_EXT_TASK_LOG
+        WHERE PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+      )
+  </update>
+
+  <update id="updateExternalTaskLogByteArraysByProcessInstanceId_mssql"
+          parameterType="java.util.Map">
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_GE_BYTEARRAY RES WITH (FORCESEEK)
+      where RES.ID_ IN (
         <!-- external task log -->
         SELECT ERROR_DETAILS_ID_
         FROM ${prefix}ACT_HI_EXT_TASK_LOG
@@ -568,7 +662,22 @@
       )
   </update>
 
-  <update id="updateByteArraysByRootDecisionInstanceId"
+  <update id="updateAttachmentByteArraysByProcessInstanceId_mssql"
+          parameterType="java.util.Map">
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_GE_BYTEARRAY RES WITH (FORCESEEK)
+      where RES.ID_ IN (
+        <!-- attachment -->
+        SELECT CONTENT_ID_
+        FROM ${prefix}ACT_HI_ATTACHMENT A
+        LEFT JOIN ${prefix}ACT_HI_TASKINST T ON A.TASK_ID_ = T.ID_
+        WHERE A.PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+          OR T.PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+      )
+  </update>
+
+  <update id="updateDecisionInputByteArraysByRootDecisionInstanceId"
           parameterType="java.util.Map">
     update ${prefix}ACT_GE_BYTEARRAY
       set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
@@ -580,7 +689,30 @@
         ON I.DEC_INST_ID_ = D.ID_
         WHERE D.ROOT_DEC_INST_ID_ = #{rootDecisionInstanceId, jdbcType=VARCHAR} <!-- null for root dec instances -->
            OR D.ID_ = #{rootDecisionInstanceId, jdbcType=VARCHAR}
-      ) or ID_ IN (
+      )
+  </update>
+
+  <update id="updateDecisionInputByteArraysByRootDecisionInstanceId_mssql"
+          parameterType="java.util.Map">
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_GE_BYTEARRAY RES WITH (FORCESEEK)
+      where RES.ID_ IN (
+        <!-- decision inputs -->
+        SELECT BYTEARRAY_ID_
+        FROM ${prefix}ACT_HI_DEC_IN I
+        INNER JOIN ${prefix}ACT_HI_DECINST D
+        ON I.DEC_INST_ID_ = D.ID_
+        WHERE D.ROOT_DEC_INST_ID_ = #{rootDecisionInstanceId, jdbcType=VARCHAR} <!-- null for root dec instances -->
+           OR D.ID_ = #{rootDecisionInstanceId, jdbcType=VARCHAR}
+      )
+  </update>
+
+  <update id="updateDecisionOutputByteArraysByRootDecisionInstanceId"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_GE_BYTEARRAY
+      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      where ID_ IN (
         <!-- decision outputs -->
         SELECT BYTEARRAY_ID_
         FROM ${prefix}ACT_HI_DEC_OUT O
@@ -591,7 +723,23 @@
       )
   </update>
 
-  <update id="updateByteArraysByDecisionInstanceId"
+  <update id="updateDecisionOutputByteArraysByRootDecisionInstanceId_mssql"
+          parameterType="java.util.Map">
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_GE_BYTEARRAY RES WITH (FORCESEEK)
+      where RES.ID_ IN (
+        <!-- decision outputs -->
+        SELECT BYTEARRAY_ID_
+        FROM ${prefix}ACT_HI_DEC_OUT O
+        INNER JOIN ${prefix}ACT_HI_DECINST D
+        ON O.DEC_INST_ID_ = D.ID_
+        WHERE D.ROOT_DEC_INST_ID_ = #{rootDecisionInstanceId, jdbcType=VARCHAR} <!-- null for root dec instances -->
+           OR D.ID_ = #{rootDecisionInstanceId, jdbcType=VARCHAR}
+      )
+  </update>
+
+  <update id="updateDecisionInputByteArraysByDecisionInstanceId"
           parameterType="java.util.Map">
     update ${prefix}ACT_GE_BYTEARRAY
       set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
@@ -602,7 +750,44 @@
         INNER JOIN ${prefix}ACT_HI_DECINST D
         ON I.DEC_INST_ID_ = D.ID_
         WHERE D.ID_ = #{decisionInstanceId, jdbcType=VARCHAR}
-      ) or ID_ IN (
+      )
+  </update>
+
+  <update id="updateDecisionInputByteArraysByDecisionInstanceId_mssql"
+          parameterType="java.util.Map">
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_GE_BYTEARRAY RES WITH (FORCESEEK)
+      where RES.ID_ IN (
+        <!-- decision inputs -->
+        SELECT BYTEARRAY_ID_
+        FROM ${prefix}ACT_HI_DEC_IN I
+        INNER JOIN ${prefix}ACT_HI_DECINST D
+        ON I.DEC_INST_ID_ = D.ID_
+        WHERE D.ID_ = #{decisionInstanceId, jdbcType=VARCHAR}
+      )
+  </update>
+
+  <update id="updateDecisionOutputByteArraysByDecisionInstanceId"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_GE_BYTEARRAY
+      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      where ID_ IN (
+        <!-- decision outputs -->
+        SELECT BYTEARRAY_ID_
+        FROM ${prefix}ACT_HI_DEC_OUT O
+        INNER JOIN ${prefix}ACT_HI_DECINST D
+        ON O.DEC_INST_ID_ = D.ID_
+        WHERE D.ID_ = #{decisionInstanceId, jdbcType=VARCHAR}
+      )
+  </update>
+
+  <update id="updateDecisionOutputByteArraysByDecisionInstanceId_mssql"
+          parameterType="java.util.Map">
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_GE_BYTEARRAY RES WITH (FORCESEEK)
+      where RES.ID_ IN (
         <!-- decision outputs -->
         SELECT BYTEARRAY_ID_
         FROM ${prefix}ACT_HI_DEC_OUT O
@@ -617,6 +802,18 @@
     update ${prefix}ACT_GE_BYTEARRAY
       set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
       where ID_ IN (
+        SELECT JOB_EXCEPTION_STACK_ID_
+        FROM ${prefix}ACT_HI_JOB_LOG
+        WHERE JOB_DEF_CONFIGURATION_ = #{batchId, jdbcType=VARCHAR}
+      )
+  </update>
+
+  <update id="updateByteArraysByBatchId_mssql"
+          parameterType="java.util.Map">
+    update RES set
+    RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+    FROM ${prefix}ACT_GE_BYTEARRAY RES WITH (FORCESEEK)
+      where RES.ID_ IN (
         SELECT JOB_EXCEPTION_STACK_ID_
         FROM ${prefix}ACT_HI_JOB_LOG
         WHERE JOB_DEF_CONFIGURATION_ = #{batchId, jdbcType=VARCHAR}
@@ -685,6 +882,17 @@
        FROM ${prefix}ACT_GE_BYTEARRAY
        WHERE REMOVAL_TIME_ &lt;= #{parameter.removalTime} <include refid="andWhereMinuteInDateBetweenSql"/>
        ${limitAfterWithoutOffset})
+  </delete>
+
+  <delete id="deleteByteArraysByRemovalTime_mssql"
+          parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    <bind name="date" value="'REMOVAL_TIME_'"/>
+    <bind name="reportPeriodUnitName" value="'MINUTE'"/>
+    delete ${limitBeforeWithoutOffset} from ${prefix}ACT_GE_BYTEARRAY
+    where REMOVAL_TIME_ &lt;= #{parameter.removalTime}
+    <include refid="andWhereMinuteInDateBetweenSql"/>
+    ${limitAfterWithoutOffset}
+    OPTION (LOOP JOIN)
   </delete>
 
   <!-- BYTE ARRAY RESULTMAP -->
@@ -768,13 +976,10 @@
 <!--  MySQL specific configuration -->
   <update id="updateByteArraysByBatchId_mysql"
           parameterType="java.util.Map">
-    update ${prefix}ACT_GE_BYTEARRAY
-      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
-      where ID_ IN (
-        SELECT JOB_EXCEPTION_STACK_ID_
-        FROM ${prefix}ACT_HI_JOB_LOG
-        WHERE JOB_DEF_CONFIGURATION_ = #{batchId, jdbcType=VARCHAR}
-          AND JOB_EXCEPTION_STACK_ID_ IS NOT NULL
-      )
+    update ${prefix}ACT_GE_BYTEARRAY BA
+      INNER JOIN ${prefix}ACT_HI_JOB_LOG JL
+        ON BA.ID_ = JL.JOB_EXCEPTION_STACK_ID_
+        AND JL.JOB_DEF_CONFIGURATION_ = #{batchId, jdbcType=VARCHAR}
+      SET BA.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
   </update>
 </mapper>

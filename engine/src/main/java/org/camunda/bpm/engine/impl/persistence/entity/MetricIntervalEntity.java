@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 import java.io.Serializable;
 import java.util.Date;
 import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.metrics.util.MetricsUtil;
 import org.camunda.bpm.engine.management.MetricIntervalValue;
 
 /**
@@ -69,7 +70,7 @@ public class MetricIntervalEntity implements MetricIntervalValue, DbEntity, Seri
   }
 
   public String getName() {
-    return name;
+    return MetricsUtil.resolvePublicName(name);
   }
 
   public void setName(String name) {

@@ -53,6 +53,11 @@ public class ScriptValueProvider implements ParameterValueProvider {
     return invocation.getInvocationResult();
   }
 
+  @Override
+  public boolean isDynamic() {
+    return true;
+  }
+
   public ExecutableScript getScript() {
     return script;
   }

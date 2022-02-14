@@ -21,6 +21,7 @@ import static org.camunda.bpm.engine.impl.util.CallableElementUtil.getCaseDefini
 import java.util.Map;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnCaseInstance;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
@@ -34,7 +35,9 @@ public class CaseTaskActivityBehavior extends ProcessOrCaseTaskActivityBehavior 
   protected static final CmmnBehaviorLogger LOG = ProcessEngineLogger.CMNN_BEHAVIOR_LOGGER;
 
   protected void triggerCallableElement(CmmnActivityExecution execution, Map<String, Object> variables, String businessKey) {
-    CmmnCaseDefinition definition = getCaseDefinitionToCall(execution, getCallableElement());
+    CaseExecutionEntity executionEntity = (CaseExecutionEntity) execution;
+
+    CmmnCaseDefinition definition = getCaseDefinitionToCall(executionEntity, executionEntity.getCaseDefinitionTenantId(), getCallableElement());
     CmmnCaseInstance caseInstance = execution.createSubCaseInstance(definition, businessKey);
     caseInstance.create(variables);
   }

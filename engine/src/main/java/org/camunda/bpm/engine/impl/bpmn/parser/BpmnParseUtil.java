@@ -17,11 +17,10 @@
 package org.camunda.bpm.engine.impl.bpmn.parser;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
-
 import org.camunda.bpm.engine.BpmnParseException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -170,7 +169,7 @@ public final class BpmnParseUtil {
 
     // LIST
     if("list".equals(parameterElement.getTagName())) {
-      List<ParameterValueProvider> providerList = new ArrayList<ParameterValueProvider>();
+      List<ParameterValueProvider> providerList = new ArrayList<>();
       for (Element element : parameterElement.elements()) {
         // parse nested provider
         providerList.add(parseParamValueProvider(element));
@@ -180,7 +179,7 @@ public final class BpmnParseUtil {
 
     // MAP
     if("map".equals(parameterElement.getTagName())) {
-      TreeMap<ParameterValueProvider, ParameterValueProvider> providerMap = new TreeMap<ParameterValueProvider, ParameterValueProvider>();
+      TreeMap<ParameterValueProvider, ParameterValueProvider> providerMap = new TreeMap<>();
       for (Element entryElement : parameterElement.elements("entry")) {
         // entry must provide key
         String keyAttribute = entryElement.attribute("key");
@@ -238,13 +237,17 @@ public final class BpmnParseUtil {
       }
     }
   }
-  
-  
+
+
   public static Map<String, String> parseCamundaExtensionProperties(Element element){
     Element propertiesElement = findCamundaExtensionElement(element, "properties");
     if(propertiesElement != null) {
       List<Element> properties = propertiesElement.elementsNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "property");
-      return properties.stream().collect(Collectors.toMap(e -> e.attribute("name"), e -> e.attribute("value")));
+      Map<String, String> propertiesMap = new HashMap<>();
+      for (Element property : properties) {
+        propertiesMap.put(property.attribute("name"), property.attribute("value"));
+      }
+      return propertiesMap;
     }
     return null;
   }

@@ -1,0 +1,30 @@
+<!-- # CE - camunda-bpm-webapp/ui/admin/client/scripts/pages/analytics.html -->
+<form class="statisticsTab">
+  <h3>{{ 'TELEMETRY_SETTINGS' | translate }}</h3>
+
+  <div uib-alert class="alert alert-info">
+    {{ 'TELEMETRY_INTRODUCTION' | translate}}
+  </div>
+
+
+  <form class="form-inline">
+    <div class="row">
+      <div class="col-xs-1 col-sm-1 text-right form-control-static">
+        <input type="checkbox" ng-model="enableUsage" class="form-control usage-statistics" id="usage-statistics">
+      </div>
+      <div class="col-xs-10 col-sm-10 form-control-static ">
+        <label for="usage-statistics">{{ 'TELEMETRY_ENABLE' | translate}}</label>
+        <p class="details">
+          {{ 'TELEMETRY_DETAILS' | translate}}
+        </p>
+
+      </div>
+    </div>
+    <div class="text-right">
+      <button ng-click="submit()" class="btn btn-default">
+        {{ 'TELEMETRY_SAVE' | translate}}
+      </button>
+    </div>
+  </form>
+</form>
+<!-- / CE - camunda-bpm-webapp/ui/admin/client/scripts/pages/analytics.html -->

@@ -76,6 +76,8 @@ public enum HistoryEventTypes implements HistoryEventType {
   INCIDENT_DELETE("incident", "delete"),
   /** fired when an incident is resolved. */
   INCIDENT_RESOLVE("incident", "resolve"),
+  /** fired when an incident is updated. */
+  INCIDENT_UPDATE("incident", "update"),
 
   /** fired when a case instance is created. */
   CASE_INSTANCE_CREATE("case-instance", "create"),

@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -15,3 +16,4 @@
         desc = "An array of String keys of variables to be deleted."/>
 
 </@lib.dto>
+</#macro>

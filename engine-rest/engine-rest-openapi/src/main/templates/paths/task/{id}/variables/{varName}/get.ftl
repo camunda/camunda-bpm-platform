@@ -1,8 +1,10 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
       id = "getTaskVariable"
       tag = "Task Variable"
+      summary = "Get Task Variable"
       desc = "Retrieves a variable from the context of a given task.
               The variable must be visible from the task. It is visible from the task if it is a local task variable or
               declared in a parent scope of the task. See documentation on
@@ -95,3 +97,5 @@
                 for the error response format." />
   }
 }
+
+</#macro>

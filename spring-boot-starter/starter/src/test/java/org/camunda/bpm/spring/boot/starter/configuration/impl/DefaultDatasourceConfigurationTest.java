@@ -28,7 +28,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -57,6 +57,15 @@ public class DefaultDatasourceConfigurationTest {
     defaultDatasourceConfiguration.dataSource = mock(DataSource.class);
     defaultDatasourceConfiguration.preInit(configuration);
     assertSame(platformTransactionManager, configuration.getTransactionManager());
+  }
+
+  @Test
+  public void camundaTransactionManagerTest() {
+    defaultDatasourceConfiguration.dataSource = mock(DataSource.class);
+    PlatformTransactionManager camundaTransactionManager = mock(PlatformTransactionManager.class);
+    defaultDatasourceConfiguration.camundaTransactionManager = camundaTransactionManager;
+    defaultDatasourceConfiguration.preInit(configuration);
+    assertSame(camundaTransactionManager, configuration.getTransactionManager());
   }
 
   @Test

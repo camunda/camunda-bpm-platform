@@ -16,9 +16,8 @@
  */
 package org.camunda.bpm.engine.test.api.mgmt;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,7 +43,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -56,9 +54,6 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
 
   protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
@@ -94,7 +89,7 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     List<Exception> exceptions = executeBatchJobs(batch);
 
     // then
-    assertThat(exceptions.size(), is(0));
+    assertThat(exceptions).isEmpty();
     assertRetries(ids, RETRIES);
     assertHistoricBatchExists(testRule);
   }
@@ -125,7 +120,7 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     List<Exception> exceptions = executeBatchJobs(batch);
 
     // then
-    assertThat(exceptions.size(), is(0));
+    assertThat(exceptions).isEmpty();
     assertRetries(ids, RETRIES);
     assertHistoricBatchExists(testRule);
   }
@@ -145,16 +140,16 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     executeSeedJobs(batch, 2);
     // then batch jobs with different deployment ids exist
     List<Job> batchJobs = managementService.createJobQuery().jobDefinitionId(batch.getBatchJobDefinitionId()).list();
-    assertThat(batchJobs.size(), is(2));
-    assertThat(batchJobs.get(0).getDeploymentId(), IsIn.isOneOf(firstDeploymentId, secondDeploymentId));
-    assertThat(batchJobs.get(1).getDeploymentId(), IsIn.isOneOf(firstDeploymentId, secondDeploymentId));
-    assertThat(batchJobs.get(0).getDeploymentId(), is(not(batchJobs.get(1).getDeploymentId())));
+    assertThat(batchJobs).hasSize(2);
+    Assert.assertThat(batchJobs.get(0).getDeploymentId(), IsIn.isOneOf(firstDeploymentId, secondDeploymentId));
+    Assert.assertThat(batchJobs.get(1).getDeploymentId(), IsIn.isOneOf(firstDeploymentId, secondDeploymentId));
+    assertThat(batchJobs.get(0).getDeploymentId()).isNotEqualTo(batchJobs.get(1).getDeploymentId());
 
     // when the batch jobs for the first deployment are executed
-    assertThat(getJobCountWithUnchangedRetries(), is(4L));
+    assertThat(getJobCountWithUnchangedRetries()).isEqualTo(4L);
     getJobIdsByDeployment(batchJobs, firstDeploymentId).forEach(managementService::executeJob);
     // then the retries for jobs from process instances related to the first deployment should be changed
-    assertThat(getJobCountWithUnchangedRetries(), is(2L));
+    assertThat(getJobCountWithUnchangedRetries()).isEqualTo(2L);
 
     // when the remaining batch jobs are executed
     getJobIdsByDeployment(batchJobs, secondDeploymentId).forEach(managementService::executeJob);
@@ -165,20 +160,16 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
 
   @Test
   public void testSetJobsRetryAsyncWithEmptyJobList() throws Exception {
-    //expect
-    thrown.expect(ProcessEngineException.class);
-
-    //when
-    managementService.setJobRetriesAsync(new ArrayList<String>(), RETRIES);
+    // when/then
+    assertThatThrownBy(() -> managementService.setJobRetriesAsync(new ArrayList<String>(), RETRIES))
+      .isInstanceOf(ProcessEngineException.class);
   }
 
   @Test
   public void testSetJobsRetryAsyncWithEmptyProcessList() throws Exception {
-    //expect
-    thrown.expect(ProcessEngineException.class);
-
-    //when
-    managementService.setJobRetriesAsync(new ArrayList<String>(), (ProcessInstanceQuery) null, RETRIES);
+    // when/then
+    assertThatThrownBy(() -> managementService.setJobRetriesAsync(new ArrayList<String>(), (ProcessInstanceQuery) null, RETRIES))
+      .isInstanceOf(ProcessEngineException.class);
   }
 
   @Test
@@ -192,7 +183,7 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     List<Exception> exceptions = executeBatchJobs(batch);
 
     //then
-    assertThat(exceptions.size(), is(1));
+    assertThat(exceptions).hasSize(1);
     assertRetries(getAllJobIds(), RETRIES);
     assertHistoricBatchExists(testRule);
   }
@@ -208,7 +199,7 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     List<Exception> exceptions = executeBatchJobs(batch);
 
     //then
-    assertThat(exceptions.size(), is(0));
+    assertThat(exceptions).hasSize(0);
     assertRetries(getAllJobIds(), RETRIES);
     assertHistoricBatchExists(testRule);
   }
@@ -225,7 +216,7 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     List<Exception> exceptions = executeBatchJobs(batch);
 
     // then
-    assertThat(exceptions.size(), is(0));
+    assertThat(exceptions).hasSize(0);
     assertRetries(getAllJobIds(), RETRIES);
     assertHistoricBatchExists(testRule);
   }
@@ -242,7 +233,7 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     List<Exception> exceptions = executeBatchJobs(batch);
 
     // then
-    assertThat(exceptions.size(), is(0));
+    assertThat(exceptions).hasSize(0);
     assertRetries(getAllJobIds(), RETRIES);
     assertHistoricBatchExists(testRule);
   }
@@ -258,7 +249,7 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     List<Exception> exceptions = executeBatchJobs(batch);
 
     // then
-    assertThat(exceptions.size(), is(0));
+    assertThat(exceptions).hasSize(0);
     assertRetries(ids, RETRIES);
     assertHistoricBatchExists(testRule);
   }
@@ -274,7 +265,7 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     List<Exception> exceptions = executeBatchJobs(batch);
 
     // then
-    assertThat(exceptions.size(), is(0));
+    assertThat(exceptions).hasSize(0);
     assertRetries(ids, RETRIES);
     assertHistoricBatchExists(testRule);
   }
@@ -293,7 +284,7 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     List<Exception> exceptions = executeBatchJobs(batch);
 
     // then
-    assertThat(exceptions.size(), is(0));
+    assertThat(exceptions).hasSize(0);
     assertRetries(ids, RETRIES);
     assertHistoricBatchExists(testRule);
   }
@@ -316,84 +307,71 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     List<Exception> exceptions = executeBatchJobs(batch);
 
     // then
-    assertThat(exceptions.size(), is(0));
+    assertThat(exceptions).hasSize(0);
     assertRetries(ids, RETRIES);
     assertHistoricBatchExists(testRule);
   }
 
   @Test
   public void testSetJobsRetryAsyncWithEmptyJobQuery() throws Exception {
-    //expect
-    thrown.expect(ProcessEngineException.class);
-
     //given
     JobQuery query = managementService.createJobQuery().suspended();
 
-    //when
-    managementService.setJobRetriesAsync(query, RETRIES);
+    // when/then
+    assertThatThrownBy(() -> managementService.setJobRetriesAsync(query, RETRIES))
+      .isInstanceOf(ProcessEngineException.class);
   }
 
   @Test
   public void testSetJobsRetryAsyncWithEmptyProcessQuery() throws Exception {
-    //expect
-    thrown.expect(ProcessEngineException.class);
-
     //given
     ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().suspended();
 
-    //when
-    managementService.setJobRetriesAsync(null, query, RETRIES);
+    // when/then
+    assertThatThrownBy(() -> managementService.setJobRetriesAsync(null, query, RETRIES))
+      .isInstanceOf(ProcessEngineException.class);
   }
 
   @Test
   public void testSetJobsRetryAsyncWithNonExistingIDAsJobQuery() throws Exception {
-    //expect
-    thrown.expect(ProcessEngineException.class);
-
     //given
     JobQuery query = managementService.createJobQuery().jobId("aFake");
 
-    //when
-    managementService.setJobRetriesAsync(query, RETRIES);
+    // when/then
+    assertThatThrownBy(() -> managementService.setJobRetriesAsync(query, RETRIES))
+      .isInstanceOf(ProcessEngineException.class);
   }
 
   @Test
   public void testSetJobsRetryAsyncWithNonExistingIDAsProcessQuery() throws Exception {
-    //expect
-    thrown.expect(ProcessEngineException.class);
-
     //given
     ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().processInstanceId("aFake");
 
-    //when
-    managementService.setJobRetriesAsync(null, query, RETRIES);
+    // when/then
+    assertThatThrownBy(() -> managementService.setJobRetriesAsync(null, query, RETRIES))
+      .isInstanceOf(ProcessEngineException.class);
   }
 
   @Test
   public void testSetJobsRetryAsyncWithNullJobList() throws Exception {
-    //expect
-    thrown.expect(ProcessEngineException.class);
 
-    //when
-    managementService.setJobRetriesAsync((List<String>) null, RETRIES);
+    // when/then
+    assertThatThrownBy(() -> managementService.setJobRetriesAsync((List<String>) null, RETRIES))
+      .isInstanceOf(ProcessEngineException.class);
   }
 
   @Test
   public void testSetJobsRetryAsyncWithNullJobQuery() throws Exception {
-    //expect
-    thrown.expect(ProcessEngineException.class);
-
-    //when
-    managementService.setJobRetriesAsync((JobQuery) null, RETRIES);
+    // when/then
+    assertThatThrownBy(() -> managementService.setJobRetriesAsync((JobQuery) null, RETRIES))
+      .isInstanceOf(ProcessEngineException.class);
   }
 
   @Test
   public void testSetJobsRetryAsyncWithNullProcessQuery() throws Exception {
-    //expect
-    thrown.expect(ProcessEngineException.class);
-
-    //when
-    managementService.setJobRetriesAsync(null, (ProcessInstanceQuery) null, RETRIES);
+    // when/then
+    assertThatThrownBy(() -> managementService.setJobRetriesAsync(null, (ProcessInstanceQuery) null, RETRIES))
+      .isInstanceOf(ProcessEngineException.class);
   }
 
   @Test
@@ -401,9 +379,9 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     //given
     JobQuery query = managementService.createJobQuery();
 
-    //when
-    thrown.expect(ProcessEngineException.class);
-    managementService.setJobRetriesAsync(query, -1);
+    // when/then
+    assertThatThrownBy(() -> managementService.setJobRetriesAsync(query, -1))
+      .isInstanceOf(ProcessEngineException.class);
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
@@ -451,7 +429,7 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
 
   protected void assertRetries(List<String> allJobIds, int i) {
     for (String id : allJobIds) {
-      Assert.assertThat(managementService.createJobQuery().jobId(id).singleResult().getRetries(), is(i));
+      assertThat(managementService.createJobQuery().jobId(id).singleResult().getRetries()).isEqualTo(i);
     }
   }
 

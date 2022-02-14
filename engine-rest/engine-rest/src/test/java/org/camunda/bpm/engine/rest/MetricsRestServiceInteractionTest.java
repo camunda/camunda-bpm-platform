@@ -20,7 +20,8 @@ import static org.camunda.bpm.engine.rest.util.DateTimeUtils.DATE_FORMAT_WITH_TI
 import static org.camunda.bpm.engine.rest.util.DateTimeUtils.withTimezone;
 import static org.hamcrest.Matchers.*;
 import static io.restassured.RestAssured.given;
-import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -30,7 +31,7 @@ import static org.mockito.Mockito.when;
 import java.util.Date;
 import javax.ws.rs.core.Response.Status;
 
-
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.management.MetricsQuery;
@@ -49,6 +50,7 @@ public class MetricsRestServiceInteractionTest extends AbstractRestServiceTest {
   public static TestContainerRule rule = new TestContainerRule();
 
   public static final String METRICS_URL = TEST_RESOURCE_ROOT_PATH + MetricsRestService.PATH;
+  public static final String DELETE_UTW_URL = METRICS_URL + "/task-worker";
   public static final String SINGLE_METER_URL = METRICS_URL + "/{name}";
   public static final String SUM_URL = SINGLE_METER_URL + "/sum";
 
@@ -64,6 +66,7 @@ public class MetricsRestServiceInteractionTest extends AbstractRestServiceTest {
     meterQueryMock = MockProvider.createMockMeterQuery();
     when(managementServiceMock.createMetricsQuery()).thenReturn(meterQueryMock);
 
+    when(managementServiceMock.getUniqueTaskWorkerCount(any(), any())).thenReturn(10L);
   }
 
   @Test
@@ -318,5 +321,106 @@ public class MetricsRestServiceInteractionTest extends AbstractRestServiceTest {
 
   }
 
+  @Test
+  public void testGetUtw() {
+
+    given()
+      .pathParam("name", Metrics.UNIQUE_TASK_WORKERS)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body("result", equalTo(10))
+     .when()
+      .get(SUM_URL);
+
+    verify(managementServiceMock, times (1)).getUniqueTaskWorkerCount(null, null);
+    verifyNoMoreInteractions(managementServiceMock);
+  }
+
+  @Test
+  public void testGetTaskUsers() {
+
+    given()
+      .pathParam("name", Metrics.TASK_USERS)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body("result", equalTo(10))
+     .when()
+      .get(SUM_URL);
+
+    verify(managementServiceMock, times (1)).getUniqueTaskWorkerCount(null, null);
+    verifyNoMoreInteractions(managementServiceMock);
+  }
+
+  @Test
+  public void testGetUtwWithTimestamps() {
+
+    given()
+      .pathParam("name", Metrics.UNIQUE_TASK_WORKERS)
+      .queryParam("startDate", MockProvider.EXAMPLE_METRICS_START_DATE)
+      .queryParam("endDate", MockProvider.EXAMPLE_METRICS_END_DATE)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body("result", equalTo(10))
+     .when()
+      .get(SUM_URL);
+
+    verify(managementServiceMock, times(1)).getUniqueTaskWorkerCount(any(Date.class), any(Date.class));
+    verifyNoMoreInteractions(managementServiceMock);
+  }
+
+  @Test
+  public void testGetUtwWithInvalidTimestamp() {
+
+    given()
+      .pathParam("name", Metrics.UNIQUE_TASK_WORKERS)
+      .queryParam("startDate", "INVALID-TIME-STAMP")
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+     .when()
+      .get(SUM_URL);
+
+    verifyNoMoreInteractions(managementServiceMock);
+  }
+
+  @Test
+  public void testDeleteUtwWithTimestamp() {
+    Date date = MockProvider.createMockDuedate();
+
+    given()
+      .queryParam("date", DATE_FORMAT_WITH_TIMEZONE.format(date))
+    .then().expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+     .when()
+      .delete(DELETE_UTW_URL);
+
+    verify(managementServiceMock, times(1)).deleteTaskMetrics(date);
+    verifyNoMoreInteractions(managementServiceMock);
+  }
+
+  @Test
+  public void testDeleteUtwWithoutTimestamp() {
+    given()
+    .then().expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .delete(DELETE_UTW_URL);
+
+    verify(managementServiceMock, times(1)).deleteTaskMetrics(null);
+    verifyNoMoreInteractions(managementServiceMock);
+  }
+
+  @Test
+  public void testDeleteUtwThrowsAuthorizationException() {
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(managementServiceMock).deleteTaskMetrics(any(Date.class));
+
+    given()
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .delete(DELETE_UTW_URL);
+  }
 
 }

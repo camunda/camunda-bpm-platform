@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
     <@lib.property
@@ -24,7 +25,6 @@
         name = "version"
         type = "integer"
         format = "int32"
-        nullable = false
         desc = "The version of the decision definition that the engine assigned to it." />
 
     <@lib.property
@@ -67,3 +67,4 @@
         desc = "The version tag of the decision definition." />
 
 </@lib.dto>
+</#macro>

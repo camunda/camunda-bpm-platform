@@ -22,6 +22,7 @@ import java.util.List;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.SchemaLogQueryImpl;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.management.SchemaLogEntry;
 import org.camunda.bpm.engine.management.SchemaLogQuery;
@@ -51,7 +52,7 @@ public class SchemaLogManager extends AbstractManager {
 
   private boolean isAuthorized() {
     try {
-      getAuthorizationManager().checkCamundaAdmin();
+      getAuthorizationManager().checkCamundaAdminOrPermission(CommandChecker::checkReadSchemaLog);
       return true;
     } catch (AuthorizationException e) {
       return false;

@@ -20,12 +20,18 @@ package org.camunda.bpm.engine.impl.cfg;
 import static org.camunda.bpm.engine.impl.cmd.HistoryCleanupCmd.MAX_THREADS_NUMBER;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
+import javax.naming.InitialContext;
+import javax.script.ScriptEngineManager;
+import javax.sql.DataSource;
+
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -41,11 +47,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import javax.naming.InitialContext;
-import javax.sql.DataSource;
-
-import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.ibatis.builder.xml.XMLConfigBuilder;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.apache.ibatis.mapping.Environment;
@@ -92,6 +93,7 @@ import org.camunda.bpm.engine.impl.ModificationBatchJobHandler;
 import org.camunda.bpm.engine.impl.OptimizeService;
 import org.camunda.bpm.engine.impl.PriorityProvider;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.RepositoryServiceImpl;
 import org.camunda.bpm.engine.impl.RestartProcessInstancesJobHandler;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
@@ -105,10 +107,12 @@ import org.camunda.bpm.engine.impl.batch.deletion.DeleteHistoricProcessInstances
 import org.camunda.bpm.engine.impl.batch.deletion.DeleteProcessInstancesJobHandler;
 import org.camunda.bpm.engine.impl.batch.externaltask.SetExternalTaskRetriesJobHandler;
 import org.camunda.bpm.engine.impl.batch.job.SetJobRetriesJobHandler;
+import org.camunda.bpm.engine.impl.batch.message.MessageCorrelationBatchJobHandler;
 import org.camunda.bpm.engine.impl.batch.removaltime.BatchSetRemovalTimeJobHandler;
 import org.camunda.bpm.engine.impl.batch.removaltime.DecisionSetRemovalTimeJobHandler;
 import org.camunda.bpm.engine.impl.batch.removaltime.ProcessSetRemovalTimeJobHandler;
 import org.camunda.bpm.engine.impl.batch.update.UpdateProcessInstancesSuspendStateJobHandler;
+import org.camunda.bpm.engine.impl.batch.variables.BatchSetVariablesHandler;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ExternalTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
@@ -165,9 +169,11 @@ import org.camunda.bpm.engine.impl.event.EventHandlerImpl;
 import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.event.SignalEventHandler;
 import org.camunda.bpm.engine.impl.externaltask.DefaultExternalTaskPriorityProvider;
+import org.camunda.bpm.engine.impl.form.deployer.CamundaFormDefinitionDeployer;
 import org.camunda.bpm.engine.impl.form.engine.FormEngine;
 import org.camunda.bpm.engine.impl.form.engine.HtmlFormEngine;
 import org.camunda.bpm.engine.impl.form.engine.JuelFormEngine;
+import org.camunda.bpm.engine.impl.form.entity.CamundaFormDefinitionManager;
 import org.camunda.bpm.engine.impl.form.type.AbstractFormFieldType;
 import org.camunda.bpm.engine.impl.form.type.BooleanFormType;
 import org.camunda.bpm.engine.impl.form.type.DateFormType;
@@ -204,12 +210,14 @@ import org.camunda.bpm.engine.impl.identity.DefaultPasswordPolicyImpl;
 import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
 import org.camunda.bpm.engine.impl.identity.WritableIdentityProvider;
 import org.camunda.bpm.engine.impl.identity.db.DbIdentityServiceProvider;
+import org.camunda.bpm.engine.impl.incident.CompositeIncidentHandler;
 import org.camunda.bpm.engine.impl.incident.DefaultIncidentHandler;
 import org.camunda.bpm.engine.impl.incident.IncidentHandler;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutorImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
+import org.camunda.bpm.engine.impl.interceptor.CrdbTransactionRetryInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.DelegateInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
 import org.camunda.bpm.engine.impl.jobexecutor.AsyncContinuationJobHandler;
@@ -329,19 +337,24 @@ import org.camunda.bpm.engine.impl.runtime.DefaultCorrelationHandler;
 import org.camunda.bpm.engine.impl.runtime.DefaultDeserializationTypeValidator;
 import org.camunda.bpm.engine.impl.scripting.ScriptFactory;
 import org.camunda.bpm.engine.impl.scripting.engine.BeansResolverFactory;
+import org.camunda.bpm.engine.impl.scripting.engine.DefaultScriptEngineResolver;
 import org.camunda.bpm.engine.impl.scripting.engine.ResolverFactory;
 import org.camunda.bpm.engine.impl.scripting.engine.ScriptBindingsFactory;
+import org.camunda.bpm.engine.impl.scripting.engine.ScriptEngineResolver;
 import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
 import org.camunda.bpm.engine.impl.scripting.engine.VariableScopeResolverFactory;
 import org.camunda.bpm.engine.impl.scripting.env.ScriptEnvResolver;
 import org.camunda.bpm.engine.impl.scripting.env.ScriptingEnvironment;
-import org.camunda.bpm.engine.impl.telemetry.dto.Data;
-import org.camunda.bpm.engine.impl.telemetry.dto.Database;
-import org.camunda.bpm.engine.impl.telemetry.dto.Internals;
-import org.camunda.bpm.engine.impl.telemetry.dto.Product;
+import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
+import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.DatabaseImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.InternalsImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.JdkImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.ProductImpl;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ParseUtil;
+import org.camunda.bpm.engine.impl.util.ProcessEngineDetails;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.impl.variable.ValueTypeResolverImpl;
 import org.camunda.bpm.engine.impl.variable.serializer.BooleanValueSerializer;
@@ -363,13 +376,20 @@ import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSession;
 import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSessionFactory;
 import org.camunda.bpm.engine.impl.variable.serializer.jpa.JPAVariableSerializer;
 import org.camunda.bpm.engine.management.Metrics;
+import org.camunda.bpm.engine.repository.CaseDefinition;
+import org.camunda.bpm.engine.repository.DecisionDefinition;
+import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.DeploymentHandlerFactory;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.WhitelistingDeserializationTypeValidator;
+import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.mock.MocksResolverFactory;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.connect.Connectors;
+import org.camunda.connect.spi.Connector;
+import org.camunda.connect.spi.ConnectorRequest;
 
 
 /**
@@ -395,8 +415,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public static final int DEFAULT_INVOCATIONS_PER_BATCH_JOB = 1;
 
-  protected static final String EDITION_ENTERPRISE = "enterprise";
-  protected static final String EDITION_COMMUNITY = "community";
+  protected static final Map<Object, Object> DEFAULT_BEANS_MAP = new HashMap<>();
+
   protected static final String PRODUCT_NAME = "Camunda BPM Runtime";
 
   public static SqlSessionFactory cachedSqlSessionFactory;
@@ -451,6 +471,22 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    */
   protected CommandExecutor commandExecutorSchemaOperations;
 
+  /**
+   * Allows for specific commands to be retried when using CockroachDB. This is due to the fact that
+   * OptimisticLockingExceptions can't be handled on CockroachDB and transactions must be rolled back.
+   * The commands where CockroachDB retries are possible are:
+   *
+   * <ul>
+   *   <li>BootstrapEngineCommand</li>
+   *   <li>AcquireJobsCmd</li>
+   *   <li>DeployCmd</li>
+   *   <li>FetchExternalTasksCmd</li>
+   *   <li>HistoryCleanupCmd</li>
+   *   <li>HistoryLevelSetupCommand</li>
+   * </ul>
+   */
+  protected int commandRetries = 0;
+
   // SESSION FACTORIES ////////////////////////////////////////////////////////
 
   protected List<SessionFactory> customSessionFactories;
@@ -477,6 +513,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected JobExecutor jobExecutor;
 
   protected PriorityProvider<JobDeclaration<?, ?>> jobPriorityProvider;
+
+  protected Long jobExecutorPriorityRangeMin = null;
+  protected Long jobExecutorPriorityRangeMax = null;
 
   // EXTERNAL TASK /////////////////////////////////////////////////////////////
   protected PriorityProvider<ExternalTaskActivityBehavior> externalTaskPriorityProvider;
@@ -536,6 +575,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected FormValidators formValidators;
   protected Map<String, Class<? extends FormFieldValidator>> customFormFieldValidators;
 
+  /** don't throw parsing exceptions for Camunda Forms if set to true*/
+  protected boolean disableStrictCamundaFormParsing = false;
+
   protected List<TypedValueSerializer> customPreVariableSerializers;
   protected List<TypedValueSerializer> customPostVariableSerializers;
   protected VariableSerializers variableSerializers;
@@ -552,13 +594,45 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected ScriptingEnvironment scriptingEnvironment;
   protected List<ScriptEnvResolver> scriptEnvResolvers;
   protected ScriptFactory scriptFactory;
+  protected ScriptEngineResolver scriptEngineResolver;
+  protected String scriptEngineNameJavaScript;
   protected boolean autoStoreScriptVariables = false;
   protected boolean enableScriptCompilation = true;
   protected boolean enableScriptEngineCaching = true;
   protected boolean enableFetchScriptEngineFromProcessApplication = true;
+  protected boolean enableScriptEngineLoadExternalResources = false;
+  protected boolean enableScriptEngineNashornCompatibility = false;
+  protected boolean configureScriptEngineHostAccess = true;
 
+  /**
+   * When set to false, the following behavior changes:
+   * <ul>
+   * <li>The automated schema maintenance (creating and dropping tables, see property <code>databaseSchemaUpdate</code>)
+   *   does not cover the tables required for CMMN execution.</li>
+   * <li>CMMN resources are not deployed as {@link CaseDefinition} to the engine.</li>
+   * <li>Tasks from CMMN cases are not returned by the {@link TaskQuery}.</li>
+   * </ul>
+   */
   protected boolean cmmnEnabled = true;
+
+    /**
+   * When set to false, the following behavior changes:
+   * <ul>
+   * <li>The automated schema maintenance (creating and dropping tables, see property <code>databaseSchemaUpdate</code>)
+   *   does not cover the tables required for DMN execution.</li>
+   * <li>DMN resources are not deployed as {@link DecisionDefinition} or
+   *   {@link DecisionRequirementsDefinition} to the engine.</li>
+   * </ul>
+   */
   protected boolean dmnEnabled = true;
+  /**
+   * When set to <code>false</code>, the following behavior changes:
+   * <ul>
+   *   <li>Standalone tasks can no longer be created via API.</li>
+   *   <li>Standalone tasks are not returned by the TaskQuery.</li>
+   * </ul>
+   */
+  protected boolean standaloneTasksEnabled = true;
 
   protected boolean enableGracefulDegradationOnContextSwitchFailure = true;
 
@@ -689,13 +763,29 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected boolean isExecutionTreePrefetchEnabled = true;
 
   /**
+   * If true, the incident handlers init as {@link CompositeIncidentHandler} and
+   * multiple incident handlers can be added for the same Incident type.
+   * However, only the result from the "main" incident handler will be returned.
+   * <p>
+   * All {@link customIncidentHandlers} will be added as sub handlers to {@link CompositeIncidentHandler} for same handler type.
+   * <p>
+   * By default, main handler is {@link DefaultIncidentHandler}.
+   * To override the main handler you need create {@link CompositeIncidentHandler} with your main IncidentHandler and
+   * init {@link incidentHandlers} before setting up the engine.
+   *
+   * @see CompositeIncidentHandler
+   * @see #initIncidentHandlers
+   */
+  protected boolean isCompositeIncidentHandlersEnabled = false;
+
+  /**
    * If true the process engine will attempt to acquire an exclusive lock before
    * creating a deployment.
    */
   protected boolean isDeploymentLockUsed = true;
 
   /**
-   * If true then several deployments will be processed strictly sequentally. When false they may be processed in parallel.
+   * If true then several deployments will be processed strictly sequentially. When false they may be processed in parallel.
    */
   protected boolean isDeploymentSynchronized = true;
 
@@ -730,6 +820,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected boolean isDbMetricsReporterActivate = true;
 
   protected MetricsReporterIdProvider metricsReporterIdProvider;
+
+  protected boolean isTaskMetricsEnabled = true;
 
   /**
    * the historic job log host name
@@ -821,7 +913,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected String sundayHistoryCleanupBatchWindowStartTime;
   protected String sundayHistoryCleanupBatchWindowEndTime;
 
-
   protected int historyCleanupDegreeOfParallelism = 1;
 
   protected String historyTimeToLive;
@@ -829,6 +920,20 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected String batchOperationHistoryTimeToLive;
   protected Map<String, String> batchOperationsForHistoryCleanup;
   protected Map<String, Integer> parsedBatchOperationsForHistoryCleanup;
+
+  /**
+   * Default priority for history cleanup jobs. */
+  protected long historyCleanupJobPriority = DefaultJobPriorityProvider.DEFAULT_PRIORITY;
+
+  /**
+   * Time to live for historic job log entries written by history cleanup jobs.
+   * Must be an ISO-8601 conform String specifying only a number of days. Only
+   * works in conjunction with removal-time-based cleanup strategy.
+   */
+  protected String historyCleanupJobLogTimeToLive;
+
+  protected String taskMetricsTimeToLive;
+  protected Integer parsedTaskMetricsTimeToLive;
 
   protected BatchWindowManager batchWindowManager = new DefaultBatchWindowManager();
 
@@ -883,13 +988,25 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    * Subsequent changes can be done only via the
    * {@link ManagementService#toggleTelemetry(boolean) Telemetry} API in {@link ManagementService}
    */
-  protected boolean initializeTelemetry = false;
+  protected Boolean initializeTelemetry = null;
   /** The endpoint which telemetry is sent to */
   protected String telemetryEndpoint = "https://api.telemetry.camunda.cloud/pings";
+  /** The number of times the telemetry request is retried in case it fails **/
+  protected int telemetryRequestRetries = 2;
   protected TelemetryReporter telemetryReporter;
+  /** Determines if the telemetry reporter thread runs. For telemetry to be sent,
+   * this flag must be set to <code>true</code> and telemetry must be enabled via API
+   * (see {@link ManagementService#toggleTelemetry(boolean)}. */
+  protected boolean isTelemetryReporterActivate = true;
   /** http client used for sending telemetry */
-  protected HttpClient telemetryHttpClient;
-  protected Data telemetryData;
+  protected Connector<? extends ConnectorRequest<?>> telemetryHttpConnector;
+  /** default: once every 24 hours */
+  protected long telemetryReportingPeriod = 24 * 60 * 60;
+  protected TelemetryDataImpl telemetryData;
+  /** the connection and socket timeout configuration of the telemetry request
+   * in milliseconds
+   *  default: 15 seconds */
+  protected int telemetryRequestTimeout = 15 * 1000;
 
 
   // buildProcessEngine ///////////////////////////////////////////////////////
@@ -923,6 +1040,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initBusinessCalendarManager();
     initCommandContextFactory();
     initTransactionContextFactory();
+
+    // Database type needs to be detected before CommandExecutors are initialized
+    initDataSource();
+
     initCommandExecutors();
     initServices();
     initIdGenerator();
@@ -932,7 +1053,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initExternalTaskPriorityProvider();
     initBatchHandlers();
     initJobExecutor();
-    initDataSource();
     initTransactionFactory();
     initSqlSessionFactory();
     initIdentityProviderSessionFactory();
@@ -1034,6 +1154,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initHistoryTimeToLive();
 
     initBatchOperationsHistoryTimeToLive();
+
+    initHistoryCleanupJobLogTimeToLive();
+
+    initTaskMetricsTimeToLive();
   }
 
   protected void initHistoryCleanupStrategy() {
@@ -1163,6 +1287,22 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
   }
 
+  protected void initHistoryCleanupJobLogTimeToLive() {
+    try {
+      ParseUtil.parseHistoryTimeToLive(historyCleanupJobLogTimeToLive);
+    } catch (Exception e) {
+      throw LOG.invalidPropertyValue("historyCleanupJobLogTimeToLive", historyCleanupJobLogTimeToLive, e);
+    }
+  }
+
+  protected void initTaskMetricsTimeToLive() {
+    try {
+      parsedTaskMetricsTimeToLive = ParseUtil.parseHistoryTimeToLive(taskMetricsTimeToLive);
+    } catch (Exception e) {
+      throw LOG.invalidPropertyValue("taskMetricsTimeToLive", taskMetricsTimeToLive, e);
+    }
+  }
+
   protected void invokePreInit() {
     for (ProcessEnginePlugin plugin : processEnginePlugins) {
       LOG.pluginActivated(plugin.toString(), getProcessEngineName());
@@ -1202,14 +1342,21 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       incidentHandlers = new HashMap<>();
 
       DefaultIncidentHandler failedJobIncidentHandler = new DefaultIncidentHandler(Incident.FAILED_JOB_HANDLER_TYPE);
-      incidentHandlers.put(failedJobIncidentHandler.getIncidentHandlerType(), failedJobIncidentHandler);
+      DefaultIncidentHandler failedExternalTaskIncidentHandler = new DefaultIncidentHandler(
+          Incident.EXTERNAL_TASK_HANDLER_TYPE);
 
-      DefaultIncidentHandler failedExternalTaskIncidentHandler = new DefaultIncidentHandler(Incident.EXTERNAL_TASK_HANDLER_TYPE);
-      incidentHandlers.put(failedExternalTaskIncidentHandler.getIncidentHandlerType(), failedExternalTaskIncidentHandler);
+      if (isCompositeIncidentHandlersEnabled) {
+        addIncidentHandler(new CompositeIncidentHandler(failedJobIncidentHandler));
+        addIncidentHandler(new CompositeIncidentHandler(failedExternalTaskIncidentHandler));
+      } else {
+        addIncidentHandler(failedJobIncidentHandler);
+        addIncidentHandler(failedExternalTaskIncidentHandler);
+      }
+
     }
     if (customIncidentHandlers != null) {
       for (IncidentHandler incidentHandler : customIncidentHandlers) {
-        incidentHandlers.put(incidentHandler.getIncidentHandlerType(), incidentHandler);
+        addIncidentHandler(incidentHandler);
       }
     }
   }
@@ -1255,6 +1402,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
       BatchSetRemovalTimeJobHandler batchSetRemovalTimeJobHandler = new BatchSetRemovalTimeJobHandler();
       batchHandlers.put(batchSetRemovalTimeJobHandler.getType(), batchSetRemovalTimeJobHandler);
+
+      BatchSetVariablesHandler batchSetVariablesHandler = new BatchSetVariablesHandler();
+      batchHandlers.put(batchSetVariablesHandler.getType(), batchSetVariablesHandler);
+
+      MessageCorrelationBatchJobHandler messageCorrelationJobHandler = new MessageCorrelationBatchJobHandler();
+      batchHandlers.put(messageCorrelationJobHandler.getType(), messageCorrelationJobHandler);
     }
 
     if (customBatchJobHandlers != null) {
@@ -1426,6 +1579,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected static Properties databaseTypeMappings = getDefaultDatabaseTypeMappings();
   protected static final String MY_SQL_PRODUCT_NAME = "MySQL";
   protected static final String MARIA_DB_PRODUCT_NAME = "MariaDB";
+  protected static final String POSTGRES_DB_PRODUCT_NAME = "PostgreSQL";
+  protected static final String CRDB_DB_PRODUCT_NAME = "CockroachDB";
 
   protected static Properties getDefaultDatabaseTypeMappings() {
     Properties databaseTypeMappings = new Properties();
@@ -1433,7 +1588,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     databaseTypeMappings.setProperty(MY_SQL_PRODUCT_NAME, "mysql");
     databaseTypeMappings.setProperty(MARIA_DB_PRODUCT_NAME, "mariadb");
     databaseTypeMappings.setProperty("Oracle", "oracle");
-    databaseTypeMappings.setProperty("PostgreSQL", "postgres");
+    databaseTypeMappings.setProperty(POSTGRES_DB_PRODUCT_NAME, "postgres");
+    databaseTypeMappings.setProperty(CRDB_DB_PRODUCT_NAME, "cockroachdb");
     databaseTypeMappings.setProperty("Microsoft SQL Server", "mssql");
     databaseTypeMappings.setProperty("DB2", "db2");
     databaseTypeMappings.setProperty("DB2", "db2");
@@ -1465,6 +1621,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       String databaseProductName = databaseMetaData.getDatabaseProductName();
       if (MY_SQL_PRODUCT_NAME.equals(databaseProductName)) {
         databaseProductName = checkForMariaDb(databaseMetaData, databaseProductName);
+      }
+      if (POSTGRES_DB_PRODUCT_NAME.equals(databaseProductName)) {
+        databaseProductName = checkForCrdb(connection);
       }
       LOG.debugDatabaseproductName(databaseProductName);
       databaseType = databaseTypeMappings.getProperty(databaseProductName);
@@ -1514,6 +1673,23 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     return databaseName;
+  }
+
+  protected String checkForCrdb(Connection connection) {
+    try {
+      try (PreparedStatement preparedStatement = connection.prepareStatement("select version() as version;")) {
+        ResultSet result = preparedStatement.executeQuery();
+        if (result.next()) {
+          String versionData = result.getString(1);
+          if (versionData != null && versionData.toLowerCase().contains("cockroachdb")) {
+            return CRDB_DB_PRODUCT_NAME;
+          }
+        }
+      }
+    } catch (SQLException ignore) {
+    }
+
+    return POSTGRES_DB_PRODUCT_NAME;
   }
 
   protected void initDatabaseVendorAndVersion(DatabaseMetaData databaseMetaData) throws SQLException {
@@ -1605,6 +1781,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       properties.put("orderBy", DbSqlSessionFactory.databaseSpecificOrderByStatements.get(databaseType));
       properties.put("limitBeforeNativeQuery", DbSqlSessionFactory.databaseSpecificLimitBeforeNativeQueryStatements.get(databaseType));
       properties.put("distinct", DbSqlSessionFactory.databaseSpecificDistinct.get(databaseType));
+      properties.put("numericCast", DbSqlSessionFactory.databaseSpecificNumericCast.get(databaseType));
 
       properties.put("countDistinctBeforeStart", DbSqlSessionFactory.databaseSpecificCountDistinctBeforeStart.get(databaseType));
       properties.put("countDistinctBeforeEnd", DbSqlSessionFactory.databaseSpecificCountDistinctBeforeEnd.get(databaseType));
@@ -1629,6 +1806,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       properties.put("dayComparator", DbSqlSessionFactory.databaseSpecificDaysComparator.get(databaseType));
 
       properties.put("collationForCaseSensitivity", DbSqlSessionFactory.databaseSpecificCollationForCaseSensitivity.get(databaseType));
+      
+      properties.put("authJoinStart", DbSqlSessionFactory.databaseSpecificAuthJoinStart.get(databaseType));
+      properties.put("authJoinEnd", DbSqlSessionFactory.databaseSpecificAuthJoinEnd.get(databaseType));
+      properties.put("authJoinSeparator", DbSqlSessionFactory.databaseSpecificAuthJoinSeparator.get(databaseType));
+      
+      properties.put("authJoin1Start", DbSqlSessionFactory.databaseSpecificAuth1JoinStart.get(databaseType));
+      properties.put("authJoin1End", DbSqlSessionFactory.databaseSpecificAuth1JoinEnd.get(databaseType));
+      properties.put("authJoin1Separator", DbSqlSessionFactory.databaseSpecificAuth1JoinSeparator.get(databaseType));
 
       Map<String, String> constants = DbSqlSessionFactory.dbSpecificConstants.get(databaseType);
       for (Entry<String, String> entry : constants.entrySet()) {
@@ -1706,6 +1891,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       addSessionFactory(new GenericManagerFactory(DecisionDefinitionManager.class));
       addSessionFactory(new GenericManagerFactory(DecisionRequirementsDefinitionManager.class));
       addSessionFactory(new GenericManagerFactory(HistoricDecisionInstanceManager.class));
+
+      addSessionFactory(new GenericManagerFactory(CamundaFormDefinitionManager.class));
 
       addSessionFactory(new GenericManagerFactory(OptimizeManager.class));
 
@@ -1873,6 +2060,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     BpmnDeployer bpmnDeployer = getBpmnDeployer();
     defaultDeployers.add(bpmnDeployer);
 
+    defaultDeployers.add(getCamundaFormDeployer());
+
     if (isCmmnEnabled()) {
       CmmnDeployer cmmnDeployer = getCmmnDeployer();
       defaultDeployers.add(cmmnDeployer);
@@ -1922,6 +2111,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       defaultListeners.add(new MetricsBpmnParseListener());
     }
     return defaultListeners;
+  }
+
+  protected CamundaFormDefinitionDeployer getCamundaFormDeployer() {
+    CamundaFormDefinitionDeployer deployer = new CamundaFormDefinitionDeployer();
+    deployer.setIdGenerator(idGenerator);
+    return deployer;
   }
 
   protected CmmnDeployer getCmmnDeployer() {
@@ -2064,6 +2259,25 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       }
     }
 
+    long effectiveJobExecutorPriorityRangeMin = jobExecutorPriorityRangeMin == null ? 0 : jobExecutorPriorityRangeMin;
+    long effectiveJobExecutorPriorityRangeMax = jobExecutorPriorityRangeMax == null ? Long.MAX_VALUE : jobExecutorPriorityRangeMax;
+
+    // verify job executor priority range is configured correctly
+    if (effectiveJobExecutorPriorityRangeMin > effectiveJobExecutorPriorityRangeMax) {
+      throw ProcessEngineLogger.JOB_EXECUTOR_LOGGER.jobExecutorPriorityRangeException(
+          "jobExecutorPriorityRangeMin can not be greater than jobExecutorPriorityRangeMax");
+    }
+    if (effectiveJobExecutorPriorityRangeMin < 0) {
+      throw ProcessEngineLogger.JOB_EXECUTOR_LOGGER
+          .jobExecutorPriorityRangeException("job executor priority range can not be negative");
+    }
+
+    if (effectiveJobExecutorPriorityRangeMin > historyCleanupJobPriority || effectiveJobExecutorPriorityRangeMax < historyCleanupJobPriority) {
+      ProcessEngineLogger.JOB_EXECUTOR_LOGGER.infoJobExecutorDoesNotHandleHistoryCleanupJobs(this);
+    }
+    if (effectiveJobExecutorPriorityRangeMin > batchJobPriority || effectiveJobExecutorPriorityRangeMax < batchJobPriority) {
+      ProcessEngineLogger.JOB_EXECUTOR_LOGGER.infoJobExecutorDoesNotHandleBatchJobs(this);
+    }
   }
 
   protected void initJobProvider() {
@@ -2200,15 +2414,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected void initDefaultMetrics(MetricsRegistry metricsRegistry) {
     metricsRegistry.createMeter(Metrics.ACTIVTY_INSTANCE_START);
-    metricsRegistry.createMeter(Metrics.ACTIVTY_INSTANCE_END);
+    metricsRegistry.createDbMeter(Metrics.ACTIVTY_INSTANCE_END);
 
-    metricsRegistry.createMeter(Metrics.JOB_ACQUISITION_ATTEMPT);
-    metricsRegistry.createMeter(Metrics.JOB_ACQUIRED_SUCCESS);
-    metricsRegistry.createMeter(Metrics.JOB_ACQUIRED_FAILURE);
-    metricsRegistry.createMeter(Metrics.JOB_SUCCESSFUL);
-    metricsRegistry.createMeter(Metrics.JOB_FAILED);
-    metricsRegistry.createMeter(Metrics.JOB_LOCKED_EXCLUSIVE);
-    metricsRegistry.createMeter(Metrics.JOB_EXECUTION_REJECTED);
+    metricsRegistry.createDbMeter(Metrics.JOB_ACQUISITION_ATTEMPT);
+    metricsRegistry.createDbMeter(Metrics.JOB_ACQUIRED_SUCCESS);
+    metricsRegistry.createDbMeter(Metrics.JOB_ACQUIRED_FAILURE);
+    metricsRegistry.createDbMeter(Metrics.JOB_SUCCESSFUL);
+    metricsRegistry.createDbMeter(Metrics.JOB_FAILED);
+    metricsRegistry.createDbMeter(Metrics.JOB_LOCKED_EXCLUSIVE);
+    metricsRegistry.createDbMeter(Metrics.JOB_EXECUTION_REJECTED);
 
     metricsRegistry.createMeter(Metrics.ROOT_PROCESS_INSTANCE_START);
 
@@ -2306,8 +2520,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       resolverFactories.add(new VariableScopeResolverFactory());
       resolverFactories.add(new BeansResolverFactory());
     }
+    if (scriptEngineResolver == null) {
+      scriptEngineResolver = new DefaultScriptEngineResolver(new ScriptEngineManager());
+    }
     if (scriptingEngines == null) {
-      scriptingEngines = new ScriptingEngines(new ScriptBindingsFactory(resolverFactories));
+      scriptingEngines = new ScriptingEngines(new ScriptBindingsFactory(resolverFactories), scriptEngineResolver);
       scriptingEngines.setEnableScriptEngineCaching(enableScriptEngineCaching);
     }
     if (scriptFactory == null) {
@@ -2429,7 +2646,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected void initBeans() {
     if (beans == null) {
-      beans = new HashMap<>();
+      beans = DEFAULT_BEANS_MAP;
     }
   }
 
@@ -2576,36 +2793,55 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   }
 
   protected void initTelemetry() {
+    if (telemetryRegistry == null) {
+      telemetryRegistry = new TelemetryRegistry();
+    }
     if (telemetryData == null) {
       initTelemetryData();
     }
-    if (telemetryHttpClient == null) {
-      telemetryHttpClient = HttpClientBuilder.create().useSystemProperties().build();
+    try {
+      if (telemetryHttpConnector == null) {
+        telemetryHttpConnector = Connectors.getConnector(Connectors.HTTP_CONNECTOR_ID);
+      }
+    } catch (Exception e) {
+      ProcessEngineLogger.TELEMETRY_LOGGER.unexpectedExceptionDuringHttpConnectorConfiguration(e);
     }
-    if (telemetryReporter == null) {
-      telemetryReporter = new TelemetryReporter(commandExecutorTxRequired,
-          telemetryEndpoint,
-          telemetryData,
-          telemetryHttpClient);
+    if (telemetryHttpConnector == null) {
+      ProcessEngineLogger.TELEMETRY_LOGGER.unableToConfigureHttpConnectorWarning();
+    } else {
+      if (telemetryReporter == null) {
+        telemetryReporter = new TelemetryReporter(commandExecutorTxRequired,
+                                                  telemetryEndpoint,
+                                                  telemetryRequestRetries,
+                                                  telemetryReportingPeriod,
+                                                  telemetryData,
+                                                  telemetryHttpConnector,
+                                                  telemetryRegistry,
+                                                  metricsRegistry,
+                                                  telemetryRequestTimeout);
+      }
     }
   }
 
   protected void initTelemetryData() {
-      Database database = new Database(databaseVendor, databaseVersion);
-      Internals internals = new Internals(database);
+    DatabaseImpl database = new DatabaseImpl(databaseVendor, databaseVersion);
 
-      String edition = EDITION_COMMUNITY;
-      String version = ProcessEngineConfigurationImpl.class.getPackage().getImplementationVersion();
+    JdkImpl jdk = ParseUtil.parseJdkDetails();
 
-      if (version != null && version.contains("-ee")) {
-        version = version.split("-")[0]; // trim `-ee` suffix
-        edition = EDITION_ENTERPRISE;
-      }
+    InternalsImpl internals = new InternalsImpl(database, telemetryRegistry.getApplicationServer(), telemetryRegistry.getLicenseKey(), jdk);
 
-      Product product = new Product(PRODUCT_NAME, version, edition, internals);
+    String camundaIntegration = telemetryRegistry.getCamundaIntegration();
+    if (camundaIntegration != null && !camundaIntegration.isEmpty()) {
+      internals.getCamundaIntegration().add(camundaIntegration);
+    }
 
-      // installationId=null, the id will be fetched later from database
-      telemetryData = new Data(null, product);
+    ProcessEngineDetails engineInfo = ParseUtil
+        .parseProcessEngineVersion(true);
+
+    ProductImpl product = new ProductImpl(PRODUCT_NAME, engineInfo.getVersion(), engineInfo.getEdition(), internals);
+
+    // installationId=null, the id will be fetched later from database
+    telemetryData = new TelemetryDataImpl(null, product);
   }
 
   // getters and setters //////////////////////////////////////////////////////
@@ -2775,6 +3011,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return authorizationService;
   }
 
+  public void setAuthorizationService(AuthorizationService authorizationService) {
+    this.authorizationService = authorizationService;
+  }
+
   public ProcessEngineConfigurationImpl setManagementService(ManagementService managementService) {
     this.managementService = managementService;
     return this;
@@ -2808,12 +3048,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return decisionService;
   }
 
-  public OptimizeService getOptimizeService() {
-    return optimizeService;
-  }
-
   public void setDecisionService(DecisionService decisionService) {
     this.decisionService = decisionService;
+  }
+
+  public OptimizeService getOptimizeService() {
+    return optimizeService;
   }
 
   public Map<Class<?>, SessionFactory> getSessionFactories() {
@@ -2849,6 +3089,24 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setJobPriorityProvider(PriorityProvider<JobDeclaration<?, ?>> jobPriorityProvider) {
     this.jobPriorityProvider = jobPriorityProvider;
+  }
+
+  public Long getJobExecutorPriorityRangeMin() {
+    return jobExecutorPriorityRangeMin;
+  }
+
+  public ProcessEngineConfigurationImpl setJobExecutorPriorityRangeMin(Long jobExecutorPriorityRangeMin) {
+    this.jobExecutorPriorityRangeMin = jobExecutorPriorityRangeMin;
+    return this;
+  }
+
+  public Long getJobExecutorPriorityRangeMax() {
+    return jobExecutorPriorityRangeMax;
+  }
+
+  public ProcessEngineConfigurationImpl setJobExecutorPriorityRangeMax(Long jobExecutorPriorityRangeMax) {
+    this.jobExecutorPriorityRangeMax = jobExecutorPriorityRangeMax;
+    return this;
   }
 
   public PriorityProvider<ExternalTaskActivityBehavior> getExternalTaskPriorityProvider() {
@@ -2954,6 +3212,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfigurationImpl setTransactionContextFactory(TransactionContextFactory transactionContextFactory) {
     this.transactionContextFactory = transactionContextFactory;
+    return this;
+  }
+
+  public BpmnParseFactory getBpmnParseFactory() {
+    return bpmnParseFactory;
+  }
+
+  public ProcessEngineConfigurationImpl setBpmnParseFactory(BpmnParseFactory bpmnParseFactory) {
+    this.bpmnParseFactory = bpmnParseFactory;
     return this;
   }
 
@@ -3556,6 +3823,16 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return incidentHandlers.get(incidentType);
   }
 
+  public void addIncidentHandler(IncidentHandler incidentHandler) {
+    IncidentHandler existsHandler = incidentHandlers.get(incidentHandler.getIncidentHandlerType());
+
+    if (existsHandler instanceof CompositeIncidentHandler) {
+      ((CompositeIncidentHandler) existsHandler).add(incidentHandler);
+    } else {
+      incidentHandlers.put(incidentHandler.getIncidentHandlerType(), incidentHandler);
+    }
+  }
+
   public Map<String, IncidentHandler> getIncidentHandlers() {
     return incidentHandlers;
   }
@@ -3627,6 +3904,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setBatchJobPriority(long batchJobPriority) {
     this.batchJobPriority = batchJobPriority;
+  }
+
+  public long getHistoryCleanupJobPriority() {
+    return historyCleanupJobPriority;
+  }
+
+  public ProcessEngineConfigurationImpl setHistoryCleanupJobPriority(long historyCleanupJobPriority) {
+    this.historyCleanupJobPriority = historyCleanupJobPriority;
+    return this;
   }
 
   public SessionFactory getIdentityProviderSessionFactory() {
@@ -3744,6 +4030,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return formValidators;
   }
 
+  public ProcessEngineConfigurationImpl setDisableStrictCamundaFormParsing(boolean disableStrictCamundaFormParsing) {
+    this.disableStrictCamundaFormParsing = disableStrictCamundaFormParsing;
+    return this;
+  }
+
+  public boolean isDisableStrictCamundaFormParsing() {
+    return disableStrictCamundaFormParsing;
+  }
+
   public boolean isExecutionTreePrefetchEnabled() {
     return isExecutionTreePrefetchEnabled;
   }
@@ -3852,6 +4147,24 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.dmnEnabled = dmnEnabled;
   }
 
+  public boolean isStandaloneTasksEnabled() {
+    return standaloneTasksEnabled;
+  }
+
+  public ProcessEngineConfigurationImpl setStandaloneTasksEnabled(boolean standaloneTasksEnabled) {
+    this.standaloneTasksEnabled = standaloneTasksEnabled;
+    return this;
+  }
+
+  public boolean isCompositeIncidentHandlersEnabled() {
+    return isCompositeIncidentHandlersEnabled;
+  }
+
+  public ProcessEngineConfigurationImpl setCompositeIncidentHandlersEnabled(boolean compositeIncidentHandlersEnabled) {
+    this.isCompositeIncidentHandlersEnabled = compositeIncidentHandlersEnabled;
+    return this;
+  }
+
   public ScriptFactory getScriptFactory() {
     return scriptFactory;
   }
@@ -3864,6 +4177,18 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.scriptFactory = scriptFactory;
   }
 
+  public ScriptEngineResolver getScriptEngineResolver() {
+    return scriptEngineResolver;
+  }
+
+  public ProcessEngineConfigurationImpl setScriptEngineResolver(ScriptEngineResolver scriptEngineResolver) {
+    this.scriptEngineResolver = scriptEngineResolver;
+    if (scriptingEngines != null) {
+      scriptingEngines.setScriptEngineResolver(scriptEngineResolver);
+    }
+    return this;
+  }
+
   public void setScriptingEnvironment(ScriptingEnvironment scriptingEnvironment) {
     this.scriptingEnvironment = scriptingEnvironment;
   }
@@ -3874,6 +4199,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setEnvScriptResolvers(List<ScriptEnvResolver> scriptEnvResolvers) {
     this.scriptEnvResolvers = scriptEnvResolvers;
+  }
+
+  public String getScriptEngineNameJavaScript() {
+    return scriptEngineNameJavaScript;
+  }
+
+  public ProcessEngineConfigurationImpl setScriptEngineNameJavaScript(String scriptEngineNameJavaScript) {
+    this.scriptEngineNameJavaScript = scriptEngineNameJavaScript;
+    return this;
   }
 
   public ProcessEngineConfiguration setArtifactFactory(ArtifactFactory artifactFactory) {
@@ -4036,6 +4370,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
+  public boolean isTaskMetricsEnabled() {
+    return isTaskMetricsEnabled;
+  }
+
+  public ProcessEngineConfigurationImpl setTaskMetricsEnabled(boolean isTaskMetricsEnabled) {
+    this.isTaskMetricsEnabled = isTaskMetricsEnabled;
+    return this;
+  }
+
   public boolean isEnableScriptEngineCaching() {
     return enableScriptEngineCaching;
   }
@@ -4051,6 +4394,33 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfigurationImpl setEnableFetchScriptEngineFromProcessApplication(boolean enable) {
     this.enableFetchScriptEngineFromProcessApplication = enable;
+    return this;
+  }
+
+  public boolean isEnableScriptEngineLoadExternalResources() {
+    return enableScriptEngineLoadExternalResources;
+  }
+
+  public ProcessEngineConfigurationImpl setEnableScriptEngineLoadExternalResources(boolean enableScriptEngineLoadExternalResources) {
+    this.enableScriptEngineLoadExternalResources = enableScriptEngineLoadExternalResources;
+    return this;
+  }
+
+  public boolean isEnableScriptEngineNashornCompatibility() {
+    return enableScriptEngineNashornCompatibility;
+  }
+
+  public ProcessEngineConfigurationImpl setEnableScriptEngineNashornCompatibility(boolean enableScriptEngineNashornCompatibility) {
+    this.enableScriptEngineNashornCompatibility = enableScriptEngineNashornCompatibility;
+    return this;
+  }
+
+  public boolean isConfigureScriptEngineHostAccess() {
+    return configureScriptEngineHostAccess;
+  }
+
+  public ProcessEngineConfigurationImpl setConfigureScriptEngineHostAccess(boolean configureScriptEngineHostAccess) {
+    this.configureScriptEngineHostAccess = configureScriptEngineHostAccess;
     return this;
   }
 
@@ -4499,6 +4869,33 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.parsedBatchOperationsForHistoryCleanup = parsedBatchOperationsForHistoryCleanup;
   }
 
+  public String getHistoryCleanupJobLogTimeToLive() {
+    return historyCleanupJobLogTimeToLive;
+  }
+
+  public ProcessEngineConfigurationImpl setHistoryCleanupJobLogTimeToLive(String historyCleanupJobLogTimeToLive) {
+    this.historyCleanupJobLogTimeToLive = historyCleanupJobLogTimeToLive;
+    return this;
+  }
+
+  public String getTaskMetricsTimeToLive() {
+    return taskMetricsTimeToLive;
+  }
+
+  public ProcessEngineConfigurationImpl setTaskMetricsTimeToLive(String taskMetricsTimeToLive) {
+    this.taskMetricsTimeToLive = taskMetricsTimeToLive;
+    return this;
+  }
+
+  public Integer getParsedTaskMetricsTimeToLive() {
+    return parsedTaskMetricsTimeToLive;
+  }
+
+  public ProcessEngineConfigurationImpl setParsedTaskMetricsTimeToLive(Integer parsedTaskMetricsTimeToLive) {
+    this.parsedTaskMetricsTimeToLive = parsedTaskMetricsTimeToLive;
+    return this;
+  }
+
   public BatchWindowManager getBatchWindowManager() {
     return batchWindowManager;
   }
@@ -4679,7 +5076,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
-  public boolean isInitializeTelemetry() {
+  public Boolean isInitializeTelemetry() {
     return initializeTelemetry;
   }
 
@@ -4697,6 +5094,24 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
+  public int getTelemetryRequestRetries() {
+    return telemetryRequestRetries;
+  }
+
+  public ProcessEngineConfigurationImpl setTelemetryRequestRetries(int telemetryRequestRetries) {
+    this.telemetryRequestRetries = telemetryRequestRetries;
+    return this;
+  }
+
+  public long getTelemetryReportingPeriod() {
+    return telemetryReportingPeriod;
+  }
+
+  public ProcessEngineConfigurationImpl setTelemetryReportingPeriod(long telemetryReportingPeriod) {
+    this.telemetryReportingPeriod = telemetryReportingPeriod;
+    return this;
+  }
+
   public TelemetryReporter getTelemetryReporter() {
     return telemetryReporter;
   }
@@ -4706,22 +5121,53 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
-  public HttpClient getTelemetryHttpClient() {
-    return telemetryHttpClient;
+  public boolean isTelemetryReporterActivate() {
+    return isTelemetryReporterActivate;
   }
- 
-  public ProcessEngineConfigurationImpl setTelemetryHttpClient(HttpClient telemetryHttpClient) {
-    this.telemetryHttpClient = telemetryHttpClient;
+
+  public ProcessEngineConfigurationImpl setTelemetryReporterActivate(boolean isTelemetryReporterActivate) {
+    this.isTelemetryReporterActivate = isTelemetryReporterActivate;
     return this;
   }
 
-  public Data getTelemetryData() {
+  public Connector<? extends ConnectorRequest<?>> getTelemetryHttpConnector() {
+    return telemetryHttpConnector;
+  }
+
+  public ProcessEngineConfigurationImpl setTelemetryHttpConnector(Connector<? extends ConnectorRequest<?>> telemetryHttp) {
+    this.telemetryHttpConnector = telemetryHttp;
+    return this;
+  }
+
+  public TelemetryDataImpl getTelemetryData() {
     return telemetryData;
   }
 
-  public ProcessEngineConfigurationImpl setTelemetryData(Data telemetryData) {
+  public ProcessEngineConfigurationImpl setTelemetryData(TelemetryDataImpl telemetryData) {
     this.telemetryData = telemetryData;
     return this;
+  }
+
+  public int getTelemetryRequestTimeout() {
+    return telemetryRequestTimeout;
+  }
+
+  public ProcessEngineConfigurationImpl setTelemetryRequestTimeout(int telemetryRequestTimeout) {
+    this.telemetryRequestTimeout = telemetryRequestTimeout;
+    return this;
+  }
+
+  public ProcessEngineConfigurationImpl setCommandRetries(int commandRetries) {
+    this.commandRetries = commandRetries;
+    return this;
+  }
+
+  public int getCommandRetries() {
+    return commandRetries;
+  }
+
+  protected CrdbTransactionRetryInterceptor getCrdbRetryInterceptor() {
+    return new CrdbTransactionRetryInterceptor(commandRetries);
   }
 
 }

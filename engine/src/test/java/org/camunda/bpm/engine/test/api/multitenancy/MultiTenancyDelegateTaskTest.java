@@ -16,8 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -50,7 +49,7 @@ public class MultiTenancyDelegateTaskTest extends PluggableProcessEngineTest {
 
       @Override
       public void doAssert(DelegateTask task) {
-        assertThat(task.getTenantId(), is(expectedTenantId));
+        assertThat(task.getTenantId()).isEqualTo(expectedTenantId);
       }
     };
   }

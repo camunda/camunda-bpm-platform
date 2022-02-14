@@ -16,12 +16,15 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy.tenantcheck;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Arrays;
 
+import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -29,9 +32,9 @@ import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 public class MultiTenancyMessageEventReceivedCmdTenantCheckTest {
@@ -48,58 +51,65 @@ public class MultiTenancyMessageEventReceivedCmdTenantCheckTest {
       .done();
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
-
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
-  @Rule
-  public ExpectedException thrown= ExpectedException.none();
+  protected RuntimeService runtimeService;
+  protected TaskService taskService;
+  protected IdentityService identityService;
+
+  @Before
+  public void setUp() {
+    runtimeService = engineRule.getRuntimeService();
+    taskService = engineRule.getTaskService();
+    identityService = engineRule.getIdentityService();
+  }
 
   @Test
   public void correlateReceivedMessageToIntermediateCatchEventNoAuthenticatedTenants() {
     testRule.deploy(MESSAGE_CATCH_PROCESS);
 
-    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch").execute();
+    runtimeService.createProcessInstanceByKey("messageCatch").execute();
 
-    Execution execution = engineRule.getRuntimeService().createExecutionQuery()
+    Execution execution = runtimeService.createExecutionQuery()
       .processDefinitionKey("messageCatch")
       .messageEventSubscriptionName("message")
       .singleResult();
 
-    engineRule.getIdentityService().setAuthentication("user", null, null);
+    identityService.setAuthentication("user", null, null);
 
-    engineRule.getRuntimeService().messageEventReceived("message", execution.getId());
+    runtimeService.messageEventReceived("message", execution.getId());
 
-    engineRule.getIdentityService().clearAuthentication();
+    identityService.clearAuthentication();
 
-    TaskQuery query = engineRule.getTaskService().createTaskQuery();
-    assertThat(query.count(), is(1L));
-    assertThat(query.withoutTenantId().count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(0L));
+    TaskQuery query = taskService.createTaskQuery();
+    assertThat(query.count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(0L);
+    assertThat(taskService.createTaskQuery().withoutTenantId().count()).isEqualTo(1L);
   }
 
   @Test
   public void correlateReceivedMessageToIntermediateCatchEventWithAuthenticatedTenant() {
     testRule.deployForTenant(TENANT_ONE, MESSAGE_CATCH_PROCESS);
 
-    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch").execute();
+    runtimeService.createProcessInstanceByKey("messageCatch").execute();
 
-    Execution execution = engineRule.getRuntimeService().createExecutionQuery()
+    Execution execution = runtimeService.createExecutionQuery()
       .processDefinitionKey("messageCatch")
       .messageEventSubscriptionName("message")
       .singleResult();
 
-    engineRule.getIdentityService().setAuthentication("user", null, Arrays.asList(TENANT_ONE));
+    identityService.setAuthentication("user", null, Arrays.asList(TENANT_ONE));
 
-    engineRule.getRuntimeService().messageEventReceived("message", execution.getId());
+    runtimeService.messageEventReceived("message", execution.getId());
 
-    engineRule.getIdentityService().clearAuthentication();
+    identityService.clearAuthentication();
 
-    TaskQuery query = engineRule.getTaskService().createTaskQuery();
-    assertThat(query.count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
+    TaskQuery query = taskService.createTaskQuery();
+    assertThat(query.count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
   }
 
   @Test
@@ -108,44 +118,44 @@ public class MultiTenancyMessageEventReceivedCmdTenantCheckTest {
     testRule.deployForTenant(TENANT_TWO, MESSAGE_CATCH_PROCESS);
 
     engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
-    engineRule.getIdentityService().setAuthentication("user", null, null);
+    identityService.setAuthentication("user", null, null);
 
-    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch").processDefinitionTenantId(TENANT_ONE).execute();
-    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch").processDefinitionTenantId(TENANT_TWO).execute();
+    runtimeService.createProcessInstanceByKey("messageCatch").processDefinitionTenantId(TENANT_ONE).execute();
+    runtimeService.createProcessInstanceByKey("messageCatch").processDefinitionTenantId(TENANT_TWO).execute();
 
-    Execution execution = engineRule.getRuntimeService().createExecutionQuery()
+    Execution execution = runtimeService.createExecutionQuery()
       .processDefinitionKey("messageCatch")
       .messageEventSubscriptionName("message")
       .tenantIdIn(TENANT_ONE)
       .singleResult();
 
-    engineRule.getRuntimeService().messageEventReceived("message", execution.getId());
+    runtimeService.messageEventReceived("message", execution.getId());
 
-    TaskQuery query = engineRule.getTaskService().createTaskQuery();
-    assertThat(query.count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
-    assertThat(query.tenantIdIn(TENANT_TWO).count(), is(0L));
+    TaskQuery query = taskService.createTaskQuery();
+    assertThat(query.count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_ONE).count()).isEqualTo(1L);
+    assertThat(query.tenantIdIn(TENANT_TWO).count()).isEqualTo(0L);
   }
 
   @Test
   public void failToCorrelateReceivedMessageToIntermediateCatchEventNoAuthenticatedTenants() {
     testRule.deployForTenant(TENANT_ONE, MESSAGE_CATCH_PROCESS);
 
-    engineRule.getRuntimeService().createProcessInstanceByKey("messageCatch").processDefinitionTenantId(TENANT_ONE).execute();
+    runtimeService.createProcessInstanceByKey("messageCatch").processDefinitionTenantId(TENANT_ONE).execute();
 
-    Execution execution = engineRule.getRuntimeService().createExecutionQuery()
+    Execution execution = runtimeService.createExecutionQuery()
       .processDefinitionKey("messageCatch")
       .messageEventSubscriptionName("message")
       .tenantIdIn(TENANT_ONE)
       .singleResult();
 
-    // declare expected exception
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("Cannot update the process instance");
+    identityService.setAuthentication("user", null, null);
 
-    engineRule.getIdentityService().setAuthentication("user", null, null);
+    // when/then
+    assertThatThrownBy(() -> runtimeService.messageEventReceived("message", execution.getId()))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot update the process instance");
 
-    engineRule.getRuntimeService().messageEventReceived("message", execution.getId());
   }
 
 }

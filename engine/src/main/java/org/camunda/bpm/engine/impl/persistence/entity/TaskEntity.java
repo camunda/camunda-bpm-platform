@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import static org.camunda.bpm.engine.delegate.TaskListener.EVENTNAME_DELETE;
+import static org.camunda.bpm.engine.impl.form.handler.DefaultFormHandler.FORM_REF_BINDING_VERSION;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
@@ -40,6 +41,7 @@ import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.form.CamundaFormRef;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnExceptionHandler;
@@ -63,6 +65,7 @@ import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.HasDbReferences;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
+import org.camunda.bpm.engine.impl.form.CamundaFormRefImpl;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextListener;
@@ -153,6 +156,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   protected String eventName;
   protected boolean isFormKeyInitialized = false;
   protected String formKey;
+  protected CamundaFormRef camundaFormRef;
 
   @SuppressWarnings({ "unchecked" })
   protected transient VariableStore<VariableInstanceEntity> variableStore
@@ -877,6 +881,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
   @Override
   public void setAssignee(String assignee) {
+    Date timestamp = ClockUtil.getCurrentTime();
     ensureTaskActive();
     registerCommandContextCloseListener();
 
@@ -896,6 +901,10 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
       if (commandContext.getDbEntityManager().contains(this)) {
         fireAssigneeAuthorizationProvider(oldAssignee, assignee);
         fireHistoricIdentityLinks();
+      }
+      if (commandContext.getProcessEngineConfiguration().isTaskMetricsEnabled() && assignee != null && !assignee.equals(oldAssignee)) {
+        // assignee has changed and is not null, so mark a new task worker
+        commandContext.getMeterLogManager().insert(new TaskMeterLogEntity(assignee, timestamp));
       }
     }
   }
@@ -1380,6 +1389,10 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     return processInstanceId;
   }
 
+  public boolean isStandaloneTask() {
+    return executionId == null && caseExecutionId == null;
+  }
+
   public ProcessDefinitionEntity getProcessDefinition() {
     if (processDefinitionId != null) {
       return Context
@@ -1400,9 +1413,26 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     if(taskDefinitionKey != null) {
       TaskDefinition taskDefinition = getTaskDefinition();
       if(taskDefinition != null) {
+        // initialize formKey
         Expression formKey = taskDefinition.getFormKey();
         if(formKey != null) {
           this.formKey = (String) formKey.getValue(this);
+        } else {
+          // initialize form reference
+          Expression formRef = taskDefinition.getCamundaFormDefinitionKey();
+          String formRefBinding = taskDefinition.getCamundaFormDefinitionBinding();
+          Expression formRefVersion = taskDefinition.getCamundaFormDefinitionVersion();
+          if (formRef != null && formRefBinding != null) {
+            String formRefValue = (String) formRef.getValue(this);
+            if (formRefValue != null) {
+              CamundaFormRefImpl camFormRef = new CamundaFormRefImpl(formRefValue, formRefBinding);
+              if (formRefBinding.equals(FORM_REF_BINDING_VERSION) && formRefVersion != null) {
+                String formRefVersionValue = (String) formRefVersion.getValue(this);
+                camFormRef.setVersion(Integer.parseInt(formRefVersionValue));
+              }
+              this.camundaFormRef = camFormRef;
+            }
+          }
         }
       }
     }
@@ -1414,6 +1444,13 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
       throw LOG.uninitializedFormKeyException();
     }
     return formKey;
+  }
+
+  public CamundaFormRef getCamundaFormRef() {
+    if(!isFormKeyInitialized) {
+      throw LOG.uninitializedFormKeyException();
+    }
+    return camundaFormRef;
   }
 
   public void setProcessDefinitionId(String processDefinitionId) {
@@ -1632,10 +1669,15 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     return true;
   }
 
-  public void executeMetrics(String metricsName) {
+  public void executeMetrics(String metricsName, CommandContext commandContext) {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
-    if(processEngineConfiguration.isMetricsEnabled()) {
+    if (Metrics.ACTIVTY_INSTANCE_START.equals(metricsName) && processEngineConfiguration.isMetricsEnabled()) {
       processEngineConfiguration.getMetricsRegistry().markOccurrence(Metrics.ACTIVTY_INSTANCE_START);
+    }
+    if (Metrics.UNIQUE_TASK_WORKERS.equals(metricsName) && processEngineConfiguration.isTaskMetricsEnabled() &&
+        assignee != null && propertyChanges.containsKey(ASSIGNEE)) {
+      // assignee has changed and is not null, so mark a new task worker
+      commandContext.getMeterLogManager().insert(new TaskMeterLogEntity(assignee, ClockUtil.getCurrentTime()));
     }
   }
 
@@ -1644,8 +1686,8 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   }
 
   @Override
-  public void setVariablesLocal(Map<String, ?> variables) {
-    super.setVariablesLocal(variables);
+  public void setVariablesLocal(Map<String, ?> variables, boolean skipJavaSerializationFormatCheck) {
+    super.setVariablesLocal(variables, skipJavaSerializationFormatCheck);
     Context.getCommandContext().getDbEntityManager().forceUpdate(this);
   }
 

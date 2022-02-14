@@ -1,0 +1,188 @@
+[cam-widget-variables-table] {
+  table {
+    width: 100%;
+    table-layout: fixed;
+    border-bottom: 1px solid #ddd;
+  }
+
+  td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    .form-control {
+      border: none;
+    }
+  }
+
+  thead {
+    font-weight: bolder;
+    border-bottom: 2px solid #ddd;
+
+    td {
+      vertical-align: bottom;
+    }
+  }
+
+  tbody {
+    td {
+      vertical-align: middle;
+    }
+
+    tr.ng-invalid > td {
+      background-color: fade(@brand-danger, 20);
+      color: @brand-danger;
+    }
+  }
+
+  .col-type,
+  .col-name,
+  .col-value,
+  .col-scope {
+    a,
+    span,
+    div {
+      width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.2;
+      vertical-align: middle;
+      display: inline-block;
+    }
+  }
+
+  table.cam-table {
+    > thead,
+    > tbody {
+      > tr > td {
+        vertical-align: middle;
+        white-space: nowrap;
+        padding: @padding-base-vertical @padding-base-horizontal;
+      }
+    }
+
+    > tbody {
+      > tr.editing > td.editable {
+        padding: 0;
+      }
+    }
+  }
+
+  td.col-type,
+  td.actions,
+  td.col-action {
+    width: 76px;
+  }
+
+  td.actions {
+    text-align: right;
+  }
+
+  &[data-fluid-layout] {
+    table {
+      table-layout: auto;
+    }
+
+    td.actions {
+      max-width: 120px;
+      min-width: 80px;
+    }
+  }
+
+  .type-object .read-only[ng-click] {
+    cursor: pointer;
+    color: @link-color;
+  }
+
+  .ng-invalid {
+    input,
+    .form-control,
+    .value-wrapper {
+      color: @brand-danger;
+    }
+  }
+
+  td.editable > .value-wrapper {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+
+    > a,
+    > input {
+      display: table-cell;
+    }
+
+    > input[type='checkbox'] {
+      margin: 12px auto 0 @padding-base-horizontal;
+    }
+
+    > a {
+      width: auto;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      vertical-align: middle;
+      padding: @padding-base-vertical @padding-base-horizontal;
+    }
+
+    > .set-null,
+    .null-value {
+      .btn;
+      .btn-default;
+
+      display: table-cell;
+      text-align: center;
+      height: 34px;
+      border: none;
+      color: @gray-light;
+
+      span {
+        width: auto;
+      }
+    }
+
+    > .set-null {
+      width: 38px;
+    }
+
+    .null-value {
+      width: auto;
+    }
+  }
+
+  [cam-widget-clipboard] {
+    > [ng-transclude] {
+      width: auto;
+      max-width: ~'calc(100% - 2em)';
+    }
+
+    > .glyphicon-copy {
+      top: 0;
+      width: auto;
+      margin-left: 0.25em;
+    }
+  }
+
+  .valid {
+    button {
+      padding: 0;
+    }
+    // Remove/fix .error-sign class when CAM-13580 is fixed
+    .error-sign {
+      display: block;
+      width: 15px;
+      height: 15px;
+      background-color: #d9534f;
+      -webkit-mask: url(../assets/images/error-sign.svg) no-repeat center;
+      mask: url(../assets/images/error-sign.svg) no-repeat center;
+    }
+
+    .glyphicon-ok {
+      color: #5cb85c;
+    }
+  }
+}
+
+.cam-widget-variables-popover {
+  word-break: break-all;
+  z-index: 1039;
+}

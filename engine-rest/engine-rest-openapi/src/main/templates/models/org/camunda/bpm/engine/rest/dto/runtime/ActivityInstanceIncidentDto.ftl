@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto
     desc = "An activity instance, incident pair." >
 
@@ -7,9 +8,11 @@
         desc = "The id of the incident."/>
 
     <@lib.property
-        name="parentActivityInstanceId"
+        name="activityId"
         type = "string"
         last = true
         desc = "The activity id in which the incident happened."/>
 
 </@lib.dto>
+
+</#macro>

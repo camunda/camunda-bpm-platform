@@ -60,7 +60,6 @@ import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.junit.Assert;
-import org.junit.runner.Description;
 import org.slf4j.Logger;
 
 
@@ -97,7 +96,6 @@ public abstract class TestHelper {
   }
 
   public static String annotationDeploymentSetUp(ProcessEngine processEngine, Class<?> testClass, String methodName, Deployment deploymentAnnotation) {
-    String deploymentId = null;
     Method method = null;
     boolean onMethod = true;
 
@@ -128,10 +126,24 @@ public abstract class TestHelper {
     }
 
     if (deploymentAnnotation != null) {
-      LOG.debug("annotation @Deployment creates deployment for {}.{}", ClassNameUtil.getClassNameWithoutPackage(testClass), methodName);
       String[] resources = deploymentAnnotation.resources();
-      if (resources.length == 0 && method != null) {
-        String name = onMethod ? method.getName() : null;
+      LOG.debug("annotation @Deployment creates deployment for {}.{}", ClassNameUtil.getClassNameWithoutPackage(testClass), methodName);
+      return annotationDeploymentSetUp(processEngine, resources, testClass, onMethod, methodName);
+
+    } else {
+      return null;
+
+    }
+  }
+
+  public static String annotationDeploymentSetUp(ProcessEngine processEngine, String[] resources, Class<?> testClass, String methodName) {
+    return annotationDeploymentSetUp(processEngine, resources, testClass, true, methodName);
+  }
+
+  public static String annotationDeploymentSetUp(ProcessEngine processEngine, String[] resources, Class<?> testClass, boolean onMethod, String methodName) {
+    if (resources != null) {
+      if (resources.length == 0 && methodName != null) {
+        String name = onMethod ? methodName : null;
         String resource = getBpmnProcessDefinitionResource(testClass, name);
         resources = new String[]{resource};
       }
@@ -144,14 +156,14 @@ public abstract class TestHelper {
         deploymentBuilder.addClasspathResource(resource);
       }
 
-      deploymentId = deploymentBuilder.deploy().getId();
+      return deploymentBuilder.deploy().getId();
     }
 
-    return deploymentId;
+    return null;
   }
 
   public static String annotationDeploymentSetUp(ProcessEngine processEngine, Class<?> testClass, String methodName) {
-    return annotationDeploymentSetUp(processEngine, testClass, methodName, null);
+    return annotationDeploymentSetUp(processEngine, testClass, methodName, (Deployment) null);
   }
 
   public static void annotationDeploymentTearDown(ProcessEngine processEngine, String deploymentId, Class<?> testClass, String methodName) {
@@ -193,14 +205,13 @@ public abstract class TestHelper {
     return r.append("." + suffix).toString();
   }
 
-  public static boolean annotationRequiredHistoryLevelCheck(ProcessEngine processEngine, Description description) {
-    RequiredHistoryLevel annotation = description.getAnnotation(RequiredHistoryLevel.class);
+  public static boolean annotationRequiredHistoryLevelCheck(ProcessEngine processEngine, RequiredHistoryLevel annotation, Class<?> testClass, String methodName) {
 
     if (annotation != null) {
       return historyLevelCheck(processEngine, annotation);
 
     } else {
-      return annotationRequiredHistoryLevelCheck(processEngine, description.getTestClass(), description.getMethodName());
+      return annotationRequiredHistoryLevelCheck(processEngine, testClass, methodName);
     }
   }
 
@@ -233,14 +244,13 @@ public abstract class TestHelper {
     }
   }
 
-  public static boolean annotationRequiredDatabaseCheck(ProcessEngine processEngine, Description description) {
-    RequiredDatabase annotation = description.getAnnotation(RequiredDatabase.class);
+  public static boolean annotationRequiredDatabaseCheck(ProcessEngine processEngine, RequiredDatabase annotation, Class<?> testClass, String methodName) {
 
     if (annotation != null) {
       return databaseCheck(processEngine, annotation);
 
     } else {
-      return annotationRequiredDatabaseCheck(processEngine, description.getTestClass(), description.getMethodName());
+      return annotationRequiredDatabaseCheck(processEngine, testClass, methodName);
     }
   }
 
@@ -268,8 +278,21 @@ public abstract class TestHelper {
         }
       }
     }
+    
+    String[] includes = annotation.includes();
+    
+    if (includes != null && includes.length > 0) {
+      for (String include : includes) {
+        if (include.equals(actualDbType)) {
+          return true;
+        }
+      }
+      
+      return false;
+    } else {
+      return true;
+    }
 
-    return true;
   }
 
 

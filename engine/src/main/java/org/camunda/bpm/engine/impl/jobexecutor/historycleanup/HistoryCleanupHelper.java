@@ -115,6 +115,16 @@ public abstract class HistoryCleanupHelper {
         historyCleanupBatch.setHistoricBatchIds(historicBatchIds);
       }
     }
+
+    //if batch is not full, add task metric ids
+    Integer parsedTaskMetricsTimeToLive = processEngineConfiguration.getParsedTaskMetricsTimeToLive();
+    if (parsedTaskMetricsTimeToLive != null && historyCleanupBatch.size() < batchSize) {
+      final List<String> taskMetricIds = commandContext.getMeterLogManager()
+          .findTaskMetricsForCleanup(batchSize - historyCleanupBatch.size(), parsedTaskMetricsTimeToLive, configuration.getMinuteFrom(), configuration.getMinuteTo());
+      if (taskMetricIds.size() > 0) {
+        historyCleanupBatch.setTaskMetricIds(taskMetricIds);
+      }
+    }
   }
 
   public static int[][] listMinuteChunks(int numberOfChunks) {

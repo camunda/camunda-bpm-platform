@@ -16,8 +16,7 @@
  */
 package org.camunda.bpm.engine.test.history.dmn;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -117,12 +116,12 @@ public class HistoricDecisionInstanceInputOutputValueTest {
 
     HistoricDecisionInstance historicDecisionInstance = engineRule.getHistoryService().createHistoricDecisionInstanceQuery().includeInputs().singleResult();
     List<HistoricDecisionInputInstance> inputInstances = historicDecisionInstance.getInputs();
-    assertThat(inputInstances.size(), is(1));
+    assertThat(inputInstances).hasSize(1);
 
     HistoricDecisionInputInstance inputInstance = inputInstances.get(0);
-    assertThat(inputInstance.getTypeName(), is(valueType));
-    assertThat(inputInstance.getValue(), is(inputValue));
-    assertThat(inputInstance.getCreateTime(), is(fixedDate));
+    assertThat(inputInstance.getTypeName()).isEqualTo(valueType);
+    assertThat(inputInstance.getValue()).isEqualTo(inputValue);
+    assertThat(inputInstance.getCreateTime()).isEqualTo(fixedDate);
   }
 
   @Test
@@ -136,12 +135,12 @@ public class HistoricDecisionInstanceInputOutputValueTest {
 
     HistoricDecisionInstance historicDecisionInstance = engineRule.getHistoryService().createHistoricDecisionInstanceQuery().includeOutputs().singleResult();
     List<HistoricDecisionOutputInstance> outputInstances = historicDecisionInstance.getOutputs();
-    assertThat(outputInstances.size(), is(1));
+    assertThat(outputInstances).hasSize(1);
 
     HistoricDecisionOutputInstance outputInstance = outputInstances.get(0);
-    assertThat(outputInstance.getTypeName(), is(valueType));
-    assertThat(outputInstance.getValue(), is(inputValue));
-    assertThat(outputInstance.getCreateTime(), is(fixedDate));
+    assertThat(outputInstance.getTypeName()).isEqualTo(valueType);
+    assertThat(outputInstance.getValue()).isEqualTo(inputValue);
+    assertThat(outputInstance.getCreateTime()).isEqualTo(fixedDate);
   }
 
   protected ProcessInstance startProcessInstanceAndEvaluateDecision(Object input) {

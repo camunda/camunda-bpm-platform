@@ -16,15 +16,13 @@
  */
 package org.camunda.bpm.engine.test.standalone.testing;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineTestCase;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
-import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 
 
@@ -50,26 +48,23 @@ public class ProcessEngineTestCaseTest extends ProcessEngineTestCase {
   @Test
   public void testRequiredHistoryLevelAudit() {
 
-    assertThat(currentHistoryLevel(),
-        CoreMatchers.<String>either(is(ProcessEngineConfiguration.HISTORY_AUDIT))
-        .or(is(ProcessEngineConfiguration.HISTORY_FULL)));
+    assertThat(currentHistoryLevel()).isIn(ProcessEngineConfiguration.HISTORY_AUDIT, ProcessEngineConfiguration.HISTORY_FULL);
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
   @Test
   public void testRequiredHistoryLevelActivity() {
 
-    assertThat(currentHistoryLevel(),
-        CoreMatchers.<String>either(is(ProcessEngineConfiguration.HISTORY_ACTIVITY))
-        .or(is(ProcessEngineConfiguration.HISTORY_AUDIT))
-        .or(is(ProcessEngineConfiguration.HISTORY_FULL)));
+    assertThat(currentHistoryLevel()).isIn(ProcessEngineConfiguration.HISTORY_ACTIVITY,
+        ProcessEngineConfiguration.HISTORY_AUDIT,
+        ProcessEngineConfiguration.HISTORY_FULL);
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Test
   public void testRequiredHistoryLevelFull() {
 
-    assertThat(currentHistoryLevel(), is(ProcessEngineConfiguration.HISTORY_FULL));
+    assertThat(currentHistoryLevel()).isEqualTo(ProcessEngineConfiguration.HISTORY_FULL);
   }
 
   protected String currentHistoryLevel() {

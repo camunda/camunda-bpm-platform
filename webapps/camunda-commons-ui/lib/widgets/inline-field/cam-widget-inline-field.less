@@ -1,0 +1,143 @@
+/* stylelint-disable no-descending-specificity -- This file also overwrites datepicker-controls unscoped. */
+[cam-widget-inline-field] {
+  display: inline-block;
+  max-width: 100%;
+  position: relative;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+
+  > .view-value,
+  > .preview {
+    .form-control-static;
+
+    display: block;
+    float: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-height: auto;
+    max-width: 100%;
+    color: @link-color;
+
+    &:hover {
+      color: @link-hover-color;
+    }
+  }
+
+  > .view-value,
+  > .preview,
+  .form-control {
+    padding-left: 3px;
+    padding-right: 3px;
+    padding-top: 0;
+    padding-bottom: 0;
+    border-radius: @input-border-radius-small 0 @input-border-radius-small @input-border-radius-small;
+  }
+
+  .form-control {
+    width: auto;
+    min-width: 40px;
+    max-width: 100%;
+    margin-bottom: -1px;
+    height: auto;
+  }
+
+  .dropdown-menu {
+    min-width: 0;
+  }
+
+  &[type="date"],
+  &[type="time"],
+  &[type="datetime"] {
+    > .edit {
+      position: relative;
+      z-index: 99;
+      min-width: 90px;
+    }
+
+    .field {
+      position: absolute;
+      top: 30px;
+      left: 0;
+      background-color: @body-bg;
+    }
+  }
+
+  .visible-whitespace {
+    white-space: nowrap;
+    width: auto;
+    max-width: none;
+  }
+}
+
+.list-inline > [cam-widget-inline-field] {
+  padding-right: 0;
+}
+
+.cam-widget-inline-field {
+  &.btn-group,
+  &.field-control {
+    display: none;
+    position: absolute;
+    z-index: 1039; // move behind modal dialog backdrop
+  }
+}
+
+.cam-widget-inline-field.datepicker,
+.datepicker-control {
+  &.btn-group,
+  &.field-control {
+    position: absolute;
+    display: block;
+    background-color: @body-bg;
+  }
+
+  &.btn-group {
+    border-radius: @border-radius-small @border-radius-small 0 0;
+    background-color: transparent;
+
+    &.datepicker-control {
+      margin-top: -4px;
+    }
+
+    > button.btn {
+      &:first-child {
+        border-radius: @border-radius-small 0 0 0;
+      }
+
+      &:last-child {
+        border-radius: 0 @border-radius-small 0 0;
+      }
+    }
+  }
+
+  &.field-control {
+    .box-shadow(0 3px 9px rgba(0,0,0,0.5));
+
+    margin-top: -2px;
+
+    table button {
+      border: none;
+      width: 100%;
+    }
+
+    thead button {
+      height: 28px;
+    }
+
+    .uib-timepicker {
+      margin: auto;
+
+      input {
+        max-width: 50px;
+      }
+    }
+
+    > .dropdown-menu {
+      display: block;
+      min-width: initial;
+      text-align: left;
+    }
+  }
+}

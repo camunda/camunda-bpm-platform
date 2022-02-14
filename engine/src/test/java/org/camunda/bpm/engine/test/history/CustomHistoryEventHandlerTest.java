@@ -18,19 +18,26 @@ package org.camunda.bpm.engine.test.history;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.migration.MigrationPlan;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -70,6 +77,8 @@ public class CustomHistoryEventHandlerTest {
 
   @Before
   public void initServices() {
+    recorderHandler.clear();
+
     runtimeService = engineRule.getRuntimeService();
     taskService = engineRule.getTaskService();
   }
@@ -137,13 +146,45 @@ public class CustomHistoryEventHandlerTest {
     assertThat(incidentEvents.get(0).getEventType()).isEqualTo(HistoryEventTypes.INCIDENT_MIGRATE.getEventName());
   }
 
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void shouldReceiveHistoricProcessInstanceEventFirstOnFormSubmit() {
+    // given
+    FormService formService = engineRule.getFormService();
+    RepositoryService repositoryService = engineRule.getRepositoryService();
+    ProcessDefinition procDef = repositoryService.createProcessDefinitionQuery().singleResult();
+
+    VariableMap formData = Variables.createVariables().putValue("foo", "bar");
+
+    // when
+    formService.submitStartForm(procDef.getId(), formData);
+
+    // then
+    List<HistoryEvent> historyEvents = recorderHandler.getEvents().stream()
+        .filter(h -> h instanceof HistoricVariableUpdateEventEntity ||
+            h instanceof HistoricProcessInstanceEventEntity)
+        .collect(Collectors.toList());
+
+    assertThat(historyEvents).hasSize(2);
+    HistoryEvent processInstanceEvent = historyEvents.get(0);
+    HistoryEvent variableInstanceEvent = historyEvents.get(1);
+
+    assertThat(processInstanceEvent).isInstanceOf(HistoricProcessInstanceEventEntity.class);
+    assertThat(processInstanceEvent.getEventType()).isEqualTo("start");
+
+    assertThat(variableInstanceEvent).isInstanceOf(HistoricVariableUpdateEventEntity.class);
+    assertThat(variableInstanceEvent.getEventType()).isEqualTo("create");
+  }
+
   public static class RecorderHistoryEventHandler implements HistoryEventHandler {
 
     private Map<String, List<HistoryEvent>> historyEventsByEntity = new HashMap<>();
+    private List<HistoryEvent> historyEvents = new ArrayList<>();
 
     @Override
     public void handleEvent(HistoryEvent historyEvent) {
       CollectionUtil.addToMapOfLists(historyEventsByEntity, historyEvent.getId(), historyEvent);
+      historyEvents.add(historyEvent);
     }
 
     @Override
@@ -153,18 +194,19 @@ public class CustomHistoryEventHandlerTest {
 
     public void clear() {
       historyEventsByEntity.clear();
+      historyEvents.clear();
     }
 
     public List<HistoryEvent> getEventsForEntity(String id) {
       return historyEventsByEntity.getOrDefault(id, Collections.emptyList());
     }
 
+    public List<HistoryEvent> getEvents() {
+      return historyEvents;
+    }
+
     public int size() {
-      return historyEventsByEntity
-          .values()
-          .stream()
-          .mapToInt(List::size)
-          .sum();
+      return historyEvents.size();
     }
   }
 }

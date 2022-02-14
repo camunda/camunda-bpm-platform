@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cockpit.base">
+
+  <resultMap id="processInstanceMap" type="org.camunda.bpm.cockpit.impl.plugin.base.dto.ProcessInstanceDto">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="businessKey" column="BUSINESS_KEY_" jdbcType="VARCHAR" />
+    <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP"/>
+    <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER"/>
+    <collection property="incidents" javaType="java.util.ArrayList" ofType="org.camunda.bpm.cockpit.impl.plugin.base.dto.IncidentStatisticsDto">
+      <result property="incidentType" column="INCIDENT_TYPE_" jdbcType="VARCHAR" />
+      <result property="incidentCount" column="INCIDENT_COUNT_" jdbcType="INTEGER"/>
+    </collection>
+  </resultMap>
+
+  <resultMap id="calledProcessInstanceMap" type="org.camunda.bpm.cockpit.impl.plugin.base.dto.CalledProcessInstanceDto">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="processDefinitionId" column="SUPER_PROC_DEF_ID_" jdbcType="VARCHAR"/>
+    <result property="processDefinitionKey" column="KEY_" jdbcType="VARCHAR"/>
+    <result property="processDefinitionName" column="NAME_" jdbcType="VARCHAR"/>
+    <result property="callActivityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR"/>
+    <result property="callActivityId" column="ACT_ID_" jdbcType="VARCHAR"/>
+    <collection property="incidents" javaType="java.util.ArrayList" ofType="org.camunda.bpm.cockpit.impl.plugin.base.dto.IncidentStatisticsDto">
+      <result property="incidentType" column="INCIDENT_TYPE_" jdbcType="VARCHAR" />
+      <result property="incidentCount" column="INCIDENT_COUNT_" jdbcType="INTEGER"/>
+    </collection>
+  </resultMap>
+
+  <select id="selectRunningProcessInstancesCount" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessInstanceQueryDto"
+          resultType="long">
+    <bind name="joinHistory" value="false"/>
+    ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
+    <include refid="selectProcessInstances" />
+    ${countDistinctAfterEnd}
+
+  </select>
+
+  <select id="selectRunningProcessInstancesIncludingIncidents" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessInstanceQueryDto"
+          resultMap="processInstanceMap">
+    <bind name="joinHistory" value="false"/>
+    select distinct
+      INSTANCE.ID_,
+      INSTANCE.BUSINESS_KEY_,
+      INSTANCE.START_TIME_,
+      INSTANCE.SUSPENSION_STATE_,
+      INCIDENT.INCIDENT_TYPE_,
+      INCIDENT.INCIDENT_COUNT_
+    from
+      (
+        <!-- This statement selects all process instances to an assigned process definition id (by using pagination!).-->
+        ${limitBefore}
+        select ${distinct} RES.* ${limitBetween},
+        <if test="historyEnabled">
+        HISTORY.START_TIME_
+        <bind name="joinHistory" value="true"/>
+        </if>
+        <if test="!historyEnabled">
+        ${constant.null.startTime}
+        </if>
+        <include refid="selectProcessInstances"/>
+        ${orderBy}
+        ${innerLimitAfter}
+      ) INSTANCE
+    <!-- The set of process instances will be (left) joined with a set of incidents. -->
+    <choose>
+      <when test="withIncident != null &amp;&amp; withIncident">
+        join
+      </when>
+      <otherwise>
+        left join
+      </otherwise>
+    </choose>
+      (
+        <!-- to avoid to have a list of incidents with only one item which type is null and count is zero an extra subselect is needed -->
+        <!-- this subselect selects all incidents to the assigned process definition id -->
+        select
+          INCIDENT.PROC_INST_ID_, INCIDENT.INCIDENT_TYPE_, count(INCIDENT.ID_) INCIDENT_COUNT_
+        from
+          ${prefix}ACT_RU_INCIDENT INCIDENT
+        <if test="processDefinitionId != null">
+        where
+          INCIDENT.PROC_DEF_ID_ = #{processDefinitionId}
+        </if>
+        group by
+          INCIDENT.PROC_INST_ID_, INCIDENT.INCIDENT_TYPE_
+      ) INCIDENT
+    on
+      INSTANCE.ID_ = INCIDENT.PROC_INST_ID_
+    order by
+      ${outerOrderBy}
+  </select>
+
+  <sql id="selectProcessInstances">
+    from
+      ${prefix}ACT_RU_EXECUTION RES
+
+    <if test="joinHistory || (historyEnabled &amp;&amp; (startedBefore != null || startedAfter != null))">
+    left join
+      ${prefix}ACT_HI_PROCINST HISTORY
+    ON
+      RES.ID_ = HISTORY.PROC_INST_ID_
+    </if>
+    
+    <if test="withIncident != null &amp;&amp; withIncident">
+    join
+      ${prefix}ACT_RU_INCIDENT INCIDENT
+    ON
+      RES.ID_ = INCIDENT.PROC_INST_ID_
+    </if>
+
+    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
+    inner join
+      ${prefix}ACT_RE_PROCDEF P
+    on
+      RES.PROC_DEF_ID_ = P.ID_
+
+      <if test="!authCheck.revokeAuthorizationCheckEnabled">
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
+        AUTH ON (AUTH.RESOURCE_ID_ ${authJoinStart} RES.PROC_INST_ID_ 
+          ${authJoinSeparator} P.KEY_ 
+          ${authJoinSeparator} '*' 
+        ${authJoinEnd})
+      </if>
+
+    </if>
+
+    <where>
+      RES.ID_ = RES.PROC_INST_ID_
+
+      <!-- processDefinitionId -->
+      <if test="processDefinitionId != null">
+      and RES.PROC_DEF_ID_ = #{processDefinitionId}
+      </if>
+
+      <!-- businessKey -->
+      <if test="businessKey != null">
+      and RES.BUSINESS_KEY_ = #{businessKey}
+      </if>
+
+      <!-- startedBefore -->
+      <if test="historyEnabled &amp;&amp; startedBefore != null">
+        and HISTORY.START_TIME_ &lt;= #{startedBefore}
+      </if>
+
+      <!-- startedAfter -->
+      <if test="historyEnabled &amp;&amp; startedAfter != null">
+        and HISTORY.START_TIME_ &gt;= #{startedAfter}
+      </if>
+
+      <!-- activityIds -->
+      <if test="activityIdIn != null &amp;&amp; activityIdIn.length > 0">
+      and EXISTS (
+        select
+          PROC_INST_ID_
+        from
+          ${prefix}ACT_RU_EXECUTION
+        where
+          RES.ID_ = PROC_INST_ID_
+          and
+          <foreach item="item" index="index" collection="activityIdIn"
+                   open="(" separator="OR" close=")">
+            ACT_ID_ = #{item}
+          </foreach>
+          <if test="processDefinitionId != null">
+          and PROC_DEF_ID_ = #{processDefinitionId}
+          </if>
+      )
+      </if>
+
+      <!-- parentProcessDefinitionId -->
+      <if test="parentProcessDefinitionId != null">
+      and EXISTS (
+        select
+          ID_
+        from
+          ${prefix}ACT_RU_EXECUTION
+        where
+          PROC_DEF_ID_ = #{parentProcessDefinitionId}
+          and RES.SUPER_EXEC_ = ID_
+      )
+      </if>
+
+      <!-- queryVariables -->
+      <!-- PLEASE NOTE: If you change anything have a look into the HistoricVariableInstance & HistoricProcessInstance, the same query object is used there! -->
+      <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
+      and EXISTS (
+        select
+          ID_
+        from
+          ${prefix}ACT_RU_VARIABLE
+        where
+          RES.PROC_INST_ID_ = PROC_INST_ID_
+
+          and NAME_= #{queryVariableValue.name}
+
+        <if test="queryVariableValue.valueConditions != null">
+          and
+          <if test="queryVariableValue.operatorName.equals('NOT_EQUALS')">NOT</if><!-- NOT_EQUALS uses the same conditions as EQUALS -->
+          (
+          <foreach collection="queryVariableValue.valueConditions" item="valueCondition" separator="or">
+            <trim prefix="(" prefixOverrides="and" suffix=")">
+              <if test="!valueCondition.type.equals('null')">
+              <!-- When operator is not-equals or type of value is null, type doesn't matter! -->
+              and TYPE_ = #{valueCondition.type}
+              </if>
+
+              <if test="valueCondition.textValue != null &amp;&amp; valueCondition.longValue == null &amp;&amp; valueCondition.doubleValue == null">
+                and TEXT_
+              <choose>
+                <when test="queryVariableValue.operatorName.equals('LIKE')">LIKE</when>
+                <otherwise><include refid="executionVariableOperator" /></otherwise>
+              </choose>
+                #{valueCondition.textValue}
+                <if test="queryVariableValue.operatorName.equals('LIKE')">ESCAPE ${escapeChar}</if>
+              </if>
+              <if test="valueCondition.textValue2 != null">
+                and TEXT2_
+              <choose>
+                <when test="queryVariableValue.operatorName.equals('LIKE')">LIKE</when>
+                <otherwise><include refid="executionVariableOperator" /></otherwise>
+              </choose>
+                #{valueCondition.textValue2}
+                <if test="queryVariableValue.operatorName.equals('LIKE')">ESCAPE ${escapeChar}</if>
+              </if>
+
+              <if test="valueCondition.longValue != null">
+                and LONG_
+                <include refid="executionVariableOperator" />
+                #{valueCondition.longValue}
+              </if>
+
+              <if test="valueCondition.doubleValue != null">
+                and DOUBLE_
+                <include refid="executionVariableOperator" />
+                #{valueCondition.doubleValue}
+              </if>
+
+              <!-- Null variable type -->
+              <if test="valueCondition.textValue == null &amp;&amp; valueCondition.textValue2 == null &amp;&amp; valueCondition.longValue == null &amp;&amp; valueCondition.doubleValue == null">
+                and TEXT_ is null and TEXT2_ is null and LONG_ is null and DOUBLE_ is null and BYTEARRAY_ID_ is null
+              </if>
+            </trim>
+          </foreach>
+          )
+        </if>
+      )
+      </foreach>
+
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+
+    </where>
+  </sql>
+
+  <select id="selectCalledProcessInstances" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessInstanceQueryDto"
+          resultMap="calledProcessInstanceMap">
+    select distinct RES.ID_, EXEC1.ACT_INST_ID_, EXEC1.ACT_ID_, PROC_.ID_ AS SUPER_PROC_DEF_ID_, PROC_.KEY_, PROC_.NAME_, INCIDENT.INCIDENT_TYPE_, INCIDENT.INCIDENT_COUNT_
+    <include refid="selectCalledProcessInstancesByCriteria" />
+    ${orderBy}
+  </select>
+
+  <sql id="selectCalledProcessInstancesByCriteria">
+    from
+      ${prefix}ACT_RU_EXECUTION RES
+    inner join
+      ${prefix}ACT_RU_EXECUTION EXEC1
+    on
+      RES.SUPER_EXEC_ = EXEC1.ID_
+    inner join
+      ${prefix}ACT_RE_PROCDEF PROC_
+    on
+      RES.PROC_DEF_ID_ = PROC_.ID_
+    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
+    inner join
+        ${prefix}ACT_RE_PROCDEF PROCDEF
+    on
+        EXEC1.PROC_DEF_ID_ = PROCDEF.ID_
+    </if>
+    <!-- The set of process instances will be (left) joined with a set of incidents. -->
+    left join
+    (
+    <!-- to avoid to have a list of incidents with only one item which type is null and count is zero an extra subselect is needed -->
+    <!-- this subselect selects all incidents to the assigned process definition id -->
+      select
+        INCIDENT.PROC_INST_ID_, INCIDENT.INCIDENT_TYPE_, count(INCIDENT.ID_) INCIDENT_COUNT_
+      from
+        ${prefix}ACT_RU_INCIDENT INCIDENT
+      group by
+        INCIDENT.PROC_INST_ID_, INCIDENT.INCIDENT_TYPE_
+    ) INCIDENT
+    on
+      RES.PROC_INST_ID_ = INCIDENT.PROC_INST_ID_
+
+    <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
+      AUTH ON (AUTH.RESOURCE_ID_ ${authJoinStart} RES.PROC_INST_ID_
+        ${authJoinSeparator} EXEC1.PROC_INST_ID_ 
+        ${authJoinSeparator} PROCDEF.KEY_ 
+        ${authJoinSeparator} '*' 
+      ${authJoinEnd})
+    </if>
+
+    <where>
+      <!-- parentProcessInstanceId -->
+      <if test="parentProcessInstanceId != null">
+      EXEC1.PROC_INST_ID_ = #{parentProcessInstanceId}
+      </if>
+
+      <!-- activityInstanceIds -->
+      <if test="activityInstanceIdIn != null &amp;&amp; activityInstanceIdIn.length > 0">
+      and
+      <foreach item="item" index="index" collection="activityInstanceIdIn"
+               open="(" separator="or" close=")">
+        EXEC1.ACT_INST_ID_ = #{item}
+      </foreach>
+      </if>
+
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
+
+    </where>
+  </sql>
+
+  <sql id="executionVariableOperator">
+    <choose>
+   	  <when test="queryVariableValue.operatorName.equals('EQUALS')">=</when>
+   	  <when test="queryVariableValue.operatorName.equals('NOT_EQUALS')">=</when><!-- Note: NOT_EQUALS is handled by negating the condition -->
+   	  <when test="queryVariableValue.operatorName.equals('GREATER_THAN')">&gt;</when>
+   	  <when test="queryVariableValue.operatorName.equals('GREATER_THAN_OR_EQUAL')">&gt;=</when>
+   	  <when test="queryVariableValue.operatorName.equals('LESS_THAN')">&lt;</when>
+   	  <when test="queryVariableValue.operatorName.equals('LESS_THAN_OR_EQUAL')">&lt;=</when>
+   </choose>
+  </sql>
+</mapper>

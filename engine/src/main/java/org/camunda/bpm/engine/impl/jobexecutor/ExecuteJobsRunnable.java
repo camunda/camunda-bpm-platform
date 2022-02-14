@@ -127,9 +127,7 @@ public class ExecuteJobsRunnable implements Runnable {
    * @return the classloader before the switch to return it back after the job execution
    */
   protected ClassLoader switchClassLoader() {
-    ClassLoader classLoaderBeforeExecution = Thread.currentThread().getContextClassLoader();
-    Thread.currentThread().setContextClassLoader(ProcessEngine.class.getClassLoader());
-    return classLoaderBeforeExecution;
+    return ClassLoaderUtil.switchToProcessEngineClassloader();
   }
 
 }

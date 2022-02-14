@@ -1,0 +1,147 @@
+<!-- # CE - camunda-bpm-webapp/ui/admin/client/scripts/pages/userCreate.html -->
+<section ng-cloak>
+  <!-- <aside></aside> -->
+  <div class="section-content">
+    <form class="form-horizontal"
+          name="createUserForm">
+      <div class="col-xs-12">
+        <div class="h3">{{ 'USERS_USER_ACCOUNT' | translate }}</div>
+
+        <div class="form-group">
+          <label class="control-label col-sm-4 col-md-2"
+                 for="inputUserId">{{ 'USERS_USER_ID' | translate }}</label>
+
+          <div class="col-sm-8 col-md-10">
+            <input id="inputUserId"
+                   name="userId"
+                   class="form-control"
+                   type="text"
+                   ng-model="profile.id"
+                   novalidate
+                   required />
+
+            <span class="help-inline"
+                  ng-show="createUserForm.userId.$error.required">
+              {{ 'USERS_USER_ID_REQUIRED' | translate }}
+            </span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="control-label col-sm-4 col-md-2"
+                 for="inputPassword">{{ 'USERS_PASSWORD' | translate }}</label>
+
+          <div class="col-sm-8 col-md-10">
+              <div cam-widget-password
+                   cam-widget-password-profile="profile"
+                   cam-widget-password-password="credentials.password"
+                   cam-widget-password-valid="credentials.valid"></div>
+
+            <span class="help-inline"
+                  ng-show="createUserForm.inputPassword.$error.password">
+              {{ 'USERS_PASSWORD_INVALID' | translate }}
+            </span>
+
+            <span class="help-inline"
+                  ng-show="createUserForm.inputPassword.$error.required">
+              {{ 'USERS_PASSWORD_REQUIRED' | translate }}
+            </span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="control-label col-sm-4 col-md-2"
+                 for="inputPasswordRepeat">{{ 'USERS_PASSWORD_REPEAT' | translate }}</label>
+
+          <div class="col-sm-8 col-md-10">
+            <input id="inputPasswordRepeat"
+                   name="inputPasswordRepeat"
+                   class="form-control"
+                   type="password"
+                   ng-model="credentials.password2"
+                   data-password-repeat="credentials.password" />
+
+            <span class="help-inline"
+                  ng-show="createUserForm.inputPasswordRepeat.$error.passwordRepeat">
+              {{ 'USERS_PASSWORDS_NOT_EQUAL' | translate }}
+            </span>
+          </div>
+        </div>
+
+        <div class="h3">{{ 'USERS_USER_PROFILE' | translate }}</div>
+
+        <div class="form-group">
+          <label class="control-label col-sm-4 col-md-2"
+                 for="inputFirstname">{{ 'USERS_FIRSTNAME' | translate }}</label>
+
+          <div class="col-sm-8 col-md-10">
+            <input id="inputFirstname"
+                   name="firstname"
+                   class="form-control"
+                   type="text"
+                   ng-model="profile.firstName"
+                   novalidate
+                   required />
+
+            <span class="help-inline"
+                  ng-show="createUserForm.firstname.$error.required">
+              {{ 'USERS_FIRSTNAME_REQUIRED' | translate }}
+            </span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="control-label col-sm-4 col-md-2"
+                 for="inputLastname">{{ 'USERS_LASTNAME' | translate }}</label>
+
+          <div class="col-sm-8 col-md-10">
+            <input id="inputLastname"
+                   class="form-control"
+                   type="text"
+                   ng-model="profile.lastName"
+                   novalidate
+                   required />
+
+            <span class="help-inline"
+                  ng-show="createUserForm.firstname.$error.required">
+              {{ 'USERS_LASTNAME_REQUIRED' | translate }}
+            </span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="control-label col-sm-4 col-md-2"
+              for="inputEmail">{{ 'USERS_EMAIL' | translate }}</label>
+
+          <div class="col-sm-8 col-md-10">
+            <input id="inputEmail"
+                   name="email"
+                   class="form-control"
+                   type="text"
+                   ng-model="profile.email"
+                   data-email />
+
+            <span class="help-inline"
+                  ng-show="createUserForm.email.$error.email">
+              {{ 'USERS_EMAIL_INVALID' | translate }}
+            </span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="col-sm-8 col-sm-offset-4 col-md-10 col-md-offset-2 text-right">
+            <a class="btn btn-link"
+               href="#/users">{{ 'USERS_CANCEL' | translate }}</a>
+
+            <button type="submit"
+                    class="btn btn-primary"
+                    ng-disabled="!createUserForm.$valid || !credentials.valid"
+                    ng-click="createUser()">{{ 'USERS_CREATE_NEW_USER' | translate }}</button>
+          </div>
+        </div>
+
+      </div>
+    </form>
+  </div>
+</section>
+<!-- / CE - camunda-bpm-webapp/ui/admin/client/scripts/pages/userCreate.html -->

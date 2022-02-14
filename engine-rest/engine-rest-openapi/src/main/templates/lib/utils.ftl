@@ -90,12 +90,9 @@
 
         <#if format?has_content>
           "format": "${format}",
-          <#if nullable>
-            "nullable": true,
-          </#if>
         </#if>
 
-        <#if type == "boolean">
+        <#if type == "boolean" | type == "string" | type == "array" | format?has_content | dto?has_content >
           <#if nullable>
             "nullable": true,
           </#if>
@@ -220,7 +217,9 @@
 </#macro>
 
 <#-- Generates a Request Body JSON object -->
-<#macro requestBody mediaType dto
+<#macro requestBody mediaType 
+        dto=""
+        flatType=""
         requestDesc=""
         examples=[] >
   "requestBody" : {
@@ -233,7 +232,11 @@
       "${mediaType}" : {
 
         "schema" : {
-          "$ref" : "#/components/schemas/${dto}"
+          <#if dto?has_content >
+            "$ref" : "#/components/schemas/${dto}"
+          <#elseif flatType?has_content >
+            "type": "${flatType}"
+          </#if>
         }
 
         <#if examples?size != 0>,
@@ -255,18 +258,70 @@
         array=false
         additionalProperties=false
         mediaType="application/json"
+        binary = false
         examples=[]
         last=false >
     "${code}": {
+        <#if code != "204">
+          "content": {
+            <@lib.responseContentMediaType
+                flatType = flatType
+                dto = dto
+                array = array
+                additionalProperties = additionalProperties
+                mediaType = mediaType
+                binary = binary
+                examples = examples />
+          },
+        </#if>
+          "description": "${removeIndentation(desc)}"
+    }
 
-       <#if code != "204">
-         "content": {
-           <#if mediaType == "application/xhtml+xml">
+    <#if !last> , </#if> <#-- if not a last response, add a comma-->
+</#macro>
+
+<#-- Generates an HTTP multi type Response JSON object -->
+<#macro multiTypeResponse 
+        code 
+        desc
+        types=[]
+        last=false >
+    "${code}": {
+        <#if code != "204">
+          "content": {
+            <#list types as type >
+              <@lib.responseContentMediaType
+                  flatType = type["flatType"]
+                  dto = type["dto"]
+                  array = type["array"]
+                  additionalProperties = type["additionalProperties"]
+                  mediaType = type["mediaType"]
+                  binary = type["binary"]
+                  examples = type["examples"] /><#sep>,
+            </#list>
+          },
+        </#if>
+        "description": "${removeIndentation(desc)}"
+    }
+
+    <#if !last> , </#if> <#-- if not a last response, add a comma-->
+</#macro>
+
+<#-- Generates a content media type JSON object for HTTP response -->
+<#macro responseContentMediaType
+        flatType=""
+        dto=""
+        array=false
+        additionalProperties=false
+        mediaType="application/json"
+        binary = false
+        examples=[] >
+           <#if mediaType == "application/xhtml+xml" | (mediaType == "application/json" & !array & flatType == "string") | binary>
              "${mediaType}": {
                "schema": {
                  "type": "string",
                  "format": "binary",
-                 "description": "For `application/xhtml+xml` Responses, a byte stream is returned."
+                 "description": "For `${mediaType}` Responses, a byte stream is returned."
                }
            <#else>
              "${mediaType}": {
@@ -278,7 +333,9 @@
                  </#if>
 
                  <#if additionalProperties>
-                   "type" : "object",
+                   <#if !array>
+                     "type" : "object",
+                   </#if>
                    "additionalProperties": {
                  </#if>
 
@@ -290,28 +347,26 @@
                   "type": "${flatType}"
                  </#if>
 
-                 <#if array || additionalProperties >
+                 <#if additionalProperties>
+                   }
+                 </#if>
+
+                 <#if array>
                    }
                  </#if>
                }
            </#if>
 
            <#if examples?size != 0>,
-             "examples": {
-               ${examples?join(", ")}
-             }
+               "examples": {
+                 ${examples?join(", ")}
+               }
            </#if>
 
-           }
-         },
-       </#if>
-
-       "description": "${removeIndentation(desc)}"
-     }
-
-    <#if !last> , </#if> <#-- if not a last response, add a comma-->
+             }
 </#macro>
 
+<#-- Generates a Server JSON object -->
 <#macro server
         url
         variables
@@ -336,11 +391,18 @@
         id
         tag
         desc
+        deprecated = false
         summary = "" >
+
+    <#if deprecated>
+      "deprecated": true,
+    </#if>
+
     "operationId": "${id}",
     "tags": [
       "${tag}"
     ],
+
 
     <#if summary?has_content>
       "summary": "${summary}",

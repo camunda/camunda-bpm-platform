@@ -1,8 +1,10 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
       id = "handleFailure"
       tag = "External Task"
+      summary = "Handle Failure"
       desc = "Reports a failure to execute an external task by id. A number of retries and a timeout until the task can
               be retried can be specified. If retries are set to 0, an incident for this task is created." />
 
@@ -61,3 +63,5 @@
                 for the error response format." />
   }
 }
+
+</#macro>

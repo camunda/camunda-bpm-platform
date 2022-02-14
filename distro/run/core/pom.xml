@@ -5,12 +5,12 @@
   <parent>
     <groupId>org.camunda.bpm.run</groupId>
     <artifactId>camunda-bpm-run-root</artifactId>
-    <version>7.14.0-SNAPSHOT</version>
+    <version>7.17.0-SNAPSHOT</version>
     <relativePath>..</relativePath>
   </parent>
 
   <artifactId>camunda-bpm-run-core</artifactId>
-  <name>Camunda BPM - Run - Core</name>
+  <name>Camunda Platform - Run - Core</name>
   <packaging>jar</packaging>
 
   <properties>
@@ -32,6 +32,11 @@
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-plugin-spin</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine-plugin-connect</artifactId>
     </dependency>
 
     <dependency>
@@ -70,6 +75,31 @@
     <dependency>
       <groupId>org.apache.tomcat.embed</groupId>
       <artifactId>tomcat-embed-core</artifactId>
+      <exclusions>
+        <!-- This artifact is also excluded by the Spring Boot starter for Tomcat -->
+        <exclusion>
+          <artifactId>tomcat-annotations-api</artifactId>
+          <groupId>org.apache.tomcat</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <!-- spring-webmvc is not a direct requirement of run-core, but is required by modules/swaggerui and modules/webapps.
+      To avoid having it on the classpath twice, it is included here and becomes part of the uberjar.-->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-webmvc</artifactId>
+    </dependency>
+    
+    <!-- Graal.js -->
+    
+    <dependency>
+      <groupId>org.graalvm.js</groupId>
+      <artifactId>js</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.graalvm.js</groupId>
+      <artifactId>js-scriptengine</artifactId>
     </dependency>
 
     <!-- Testing -->
@@ -95,6 +125,13 @@
           <artifactId>asm</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    
+    <!-- Required to Run JUnit4 tests -->
+    <dependency>
+      <groupId>org.junit.vintage</groupId>
+      <artifactId>junit-vintage-engine</artifactId>
+      <scope>test</scope>
     </dependency>
 
   </dependencies>

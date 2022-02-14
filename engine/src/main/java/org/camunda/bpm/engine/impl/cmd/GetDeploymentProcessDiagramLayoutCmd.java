@@ -18,8 +18,6 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.InputStream;
 import java.io.Serializable;
-import java.util.concurrent.Callable;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.bpmn.diagram.ProcessDiagramLayoutFactory;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
@@ -59,17 +57,11 @@ public class GetDeploymentProcessDiagramLayoutCmd implements Command<DiagramLayo
       checker.checkReadProcessDefinition(processDefinition);
     }
 
-    InputStream processModelStream = commandContext.runWithoutAuthorization(new Callable<InputStream>() {
-      public InputStream call() throws Exception {
-        return new GetDeploymentProcessModelCmd(processDefinitionId).execute(commandContext);
-      }
-    });
+    InputStream processModelStream = commandContext.runWithoutAuthorization(
+        new GetDeploymentProcessModelCmd(processDefinitionId));
 
-    InputStream processDiagramStream = commandContext.runWithoutAuthorization(new Callable<InputStream>() {
-      public InputStream call() throws Exception {
-        return new GetDeploymentProcessDiagramCmd(processDefinitionId).execute(commandContext);
-      }
-    });
+    InputStream processDiagramStream = commandContext.runWithoutAuthorization(
+        new GetDeploymentProcessDiagramCmd(processDefinitionId));
 
     return new ProcessDiagramLayoutFactory().getProcessDiagramLayout(processModelStream, processDiagramStream);
   }

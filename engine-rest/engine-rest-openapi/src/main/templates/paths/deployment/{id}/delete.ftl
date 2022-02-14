@@ -1,8 +1,10 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
       id = "deleteDeployment"
       tag = "Deployment"
+      summary = "Delete"
       desc = "Deletes a deployment by id." />
 
   "parameters" : [
@@ -55,3 +57,5 @@
 
   }
 }
+
+</#macro>

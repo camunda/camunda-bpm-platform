@@ -30,13 +30,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-
 
 /**
  * @author Tom Baeyens
@@ -45,7 +45,7 @@ public abstract class ReflectUtil {
 
   private static final EngineUtilLogger LOG = ProcessEngineLogger.UTIL_LOGGER;
 
-  private static final Map<String, String> charEncodings = new HashMap<String, String>();
+  private static final Map<String, String> charEncodings = new HashMap<>();
 
   static {
     charEncodings.put("ä", "%C3%A4");
@@ -200,7 +200,7 @@ public abstract class ReflectUtil {
   public static Object invoke(Object target, String methodName, Object[] args) {
     try {
       Class<? extends Object> clazz = target.getClass();
-      Method method = findMethod(clazz, methodName, args);
+      Method method = findMethod(clazz, methodName, Arrays.stream(args).map(Object::getClass).toArray(Class<?>[]::new));
       method.setAccessible(true);
       return method.invoke(target, args);
     }
@@ -283,8 +283,8 @@ public abstract class ReflectUtil {
       // Using getMathods(), getMathod(...) expects exact parameter type
       // matching and ignores inheritance-tree.
       Method[] methods = clazz.getMethods();
-      List<Method> candidates = new ArrayList<Method>();
-      Set<Class<?>> parameterTypes = new HashSet<Class<?>>();
+      List<Method> candidates = new ArrayList<>();
+      Set<Class<?>> parameterTypes = new HashSet<>();
       for(Method method : methods) {
         if(method.getName().equals(setterName)) {
           Class<?>[] paramTypes = method.getParameterTypes();
@@ -315,7 +315,7 @@ public abstract class ReflectUtil {
         fieldName.substring(1, fieldName.length());
   }
 
-  private static Method findMethod(Class< ? extends Object> clazz, String methodName, Object[] args) {
+  private static Method findMethod(Class< ? extends Object> clazz, String methodName, Class< ? >[] args) {
     for (Method method : clazz.getDeclaredMethods()) {
       // TODO add parameter matching
       if ( method.getName().equals(methodName)
@@ -337,8 +337,7 @@ public abstract class ReflectUtil {
     ensureNotNull("couldn't find constructor for " + className + " with args " + Arrays.asList(args), "constructor", constructor);
     try {
       return constructor.newInstance(args);
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw LOG.exceptionWhileInstantiatingClass(className, e);
     }
   }
@@ -346,29 +345,28 @@ public abstract class ReflectUtil {
   @SuppressWarnings({ "unchecked", "rawtypes" })
   private static <T> Constructor<T> findMatchingConstructor(Class<T> clazz, Object[] args) {
     for (Constructor constructor: clazz.getDeclaredConstructors()) { // cannot use <?> or <T> due to JDK 5/6 incompatibility
-      if (matches(constructor.getParameterTypes(), args)) {
+      if (matches(constructor.getParameterTypes(), Arrays.stream(args).map(Object::getClass).toArray(Class<?>[]::new))){
         return constructor;
       }
     }
     return null;
   }
 
-  private static boolean matches(Class< ? >[] parameterTypes, Object[] args) {
-    if ( (parameterTypes==null)
-         || (parameterTypes.length==0)
+  private static boolean matches(Class< ? >[] parameterTypes, Class< ? >[] args) {
+    if ( parameterTypes==null
+         || parameterTypes.length==0
        ) {
-      return ( (args==null)
-               || (args.length==0)
-             );
+      return args==null
+               || args.length==0;
     }
-    if ( (args==null)
-         || (parameterTypes.length!=args.length)
+    if ( args==null
+         || parameterTypes.length!=args.length
        ) {
       return false;
     }
     for (int i=0; i<parameterTypes.length; i++) {
-      if ( (args[i]!=null)
-           && (! parameterTypes[i].isAssignableFrom(args[i].getClass()))
+      if ( args[i]!=null
+           && ! parameterTypes[i].isAssignableFrom(args[i])
          ) {
         return false;
       }

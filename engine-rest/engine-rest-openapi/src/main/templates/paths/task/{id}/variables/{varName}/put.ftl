@@ -1,8 +1,10 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
       id = "putTaskVariable"
       tag = "Task Variable"
+      summary = "Update Task Variable"
       desc = "Updates a process variable that is visible from the Task scope. A variable is visible from the task if it
               is a local task variable, or declared in a parent scope of the task. See the documentation on
               [variable scopes and visibility](${docsUrl}/user-guide/process-engine/variables#variable-scopes-and-variable-visibility).
@@ -78,3 +80,5 @@
 
   }
 }
+
+</#macro>

@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.variables;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.camunda.bpm.engine.test.util.TypedValueAssert.assertObjectValueDeserialized;
 import static org.camunda.bpm.engine.test.util.TypedValueAssert.assertObjectValueDeserializedNull;
 import static org.camunda.bpm.engine.test.util.TypedValueAssert.assertObjectValueSerializedJava;
@@ -57,7 +58,6 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 public class JavaSerializationTest {
@@ -74,9 +74,6 @@ public class JavaSerializationTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   private RuntimeService runtimeService;
   private TaskService taskService;
@@ -172,12 +169,11 @@ public class JavaSerializationTest {
     byte[] serializedObjectBytes = baos.toByteArray();
     String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(serializedObjectBytes), engineRule.getProcessEngine());
 
-    thrown.expect(RuntimeException.class);
-    thrown.expectMessage("Exception while deserializing object");
-
     // which cannot be deserialized
     ObjectInputStream objectInputStream = new ObjectInputStream(new ByteArrayInputStream(serializedObjectBytes));
-    objectInputStream.readObject();
+    assertThatThrownBy(() -> objectInputStream.readObject())
+      .isInstanceOf(RuntimeException.class)
+      .hasMessageContaining("Exception while deserializing object");
 
     // if
     // I start a process instance in which a Java Delegate reads the value in its serialized form

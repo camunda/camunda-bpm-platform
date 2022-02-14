@@ -255,7 +255,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
     return super.hasExcludingConditions()
       || CompareUtil.areNotInAscendingOrder(priorityHigherThanOrEqual, priorityLowerThanOrEqual)
       || hasExcludingDueDateParameters()
-      || CompareUtil.areNotInAscendingOrder(createdBefore, createdAfter);
+      || CompareUtil.areNotInAscendingOrder(createdAfter, createdBefore);
   }
 
   private boolean hasExcludingDueDateParameters() {

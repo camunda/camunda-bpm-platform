@@ -1,3 +1,4 @@
+<#macro dto_macro docsUrl="">
 <@lib.dto>
 
   <@lib.property
@@ -25,3 +26,4 @@
       desc = "If set to `false`, the request will still be successful if one ore more of the process ids are not found."/>
 
 </@lib.dto>
+</#macro>

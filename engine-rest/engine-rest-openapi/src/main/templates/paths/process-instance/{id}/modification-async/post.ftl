@@ -1,8 +1,10 @@
+<#macro endpoint_macro docsUrl="">
 {
 
   <@lib.endpointInfo
       id = "modifyProcessInstanceAsyncOperation"
       tag = "Process Instance"
+      summary = "Modify Process Instance Execution State Async"
       desc = "Submits a list of modification instructions to change a process instance's execution state async.
               A modification instruction is one of the following:
       
@@ -92,3 +94,4 @@
 
    }
 }
+</#macro>

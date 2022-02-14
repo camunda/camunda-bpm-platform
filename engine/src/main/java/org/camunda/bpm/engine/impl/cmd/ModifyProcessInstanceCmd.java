@@ -19,8 +19,6 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Callable;
-
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.ProcessInstanceModificationBuilderImpl;
@@ -83,7 +81,7 @@ public class ModifyProcessInstanceCmd implements Command<Void> {
 
     processInstance = executionManager.findExecutionById(processInstanceId);
 
-    if (!processInstance.hasChildren()) {
+    if (!processInstance.hasChildren() && !processInstance.isCanceled() && !processInstance.isRemoved()) {
       if (processInstance.getActivity() == null) {
         // process instance was cancelled
         checkDeleteProcessInstance(processInstance, commandContext);
@@ -112,12 +110,8 @@ public class ModifyProcessInstanceCmd implements Command<Void> {
     for (final AbstractProcessInstanceModificationCommand instruction : builder.getModificationOperations()) {
       if (instruction instanceof ActivityCancellationCmd
           && ((ActivityCancellationCmd) instruction).cancelCurrentActiveActivityInstances) {
-        ActivityInstance activityInstanceTree = commandContext.runWithoutAuthorization(new Callable<ActivityInstance>() {
-          @Override
-          public ActivityInstance call() throws Exception {
-            return new GetActivityInstanceCmd(((ActivityCancellationCmd) instruction).processInstanceId).execute(commandContext);
-          }
-        });
+        ActivityInstance activityInstanceTree = commandContext.runWithoutAuthorization(
+            new GetActivityInstanceCmd(((ActivityCancellationCmd) instruction).processInstanceId));
         ((ActivityCancellationCmd) instruction).setActivityInstanceTreeToCancel(activityInstanceTree);
       }
     }
