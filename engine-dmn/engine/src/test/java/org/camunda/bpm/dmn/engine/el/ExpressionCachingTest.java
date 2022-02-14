@@ -19,11 +19,10 @@ package org.camunda.bpm.dmn.engine.el;
 import static org.camunda.bpm.engine.variable.Variables.emptyVariableContext;
 import static org.mockito.Mockito.*;
 
-import javax.script.Compilable;
 import javax.script.CompiledScript;
-import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+import javax.script.SimpleBindings;
 
 import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.impl.DmnExpressionImpl;
@@ -31,11 +30,10 @@ import org.camunda.bpm.dmn.engine.impl.el.DefaultScriptEngineResolver;
 import org.camunda.bpm.dmn.engine.impl.evaluation.ExpressionEvaluationHandler;
 import org.camunda.bpm.dmn.engine.impl.spi.el.ElExpression;
 import org.camunda.bpm.dmn.engine.impl.spi.el.ElProvider;
+import org.codehaus.groovy.jsr223.GroovyScriptEngineImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 /**
  * @author Daniel Meyer
@@ -45,19 +43,16 @@ public class ExpressionCachingTest {
 
   protected ExpressionEvaluationHandler expressionEvaluationHandler;
   protected ElProvider elProviderSpy;
-  protected ScriptEngine scriptEngineSpy;
-  protected Compilable compilableSpy;
+  private GroovyScriptEngineImpl scriptEngineSpy;
 
   @Before
-  public void setup() {
-    ScriptEngineManager scriptEngineManager = spy(new ScriptEngineManager());
-    when(scriptEngineManager.getEngineByName(anyString())).then(new Answer<ScriptEngine>() {
-      public ScriptEngine answer(InvocationOnMock invocation) throws Throwable {
-        scriptEngineSpy = spy((ScriptEngine) invocation.callRealMethod());
-        compilableSpy = (Compilable) scriptEngineSpy;
-        return scriptEngineSpy;
-      }
-    });
+  public void setup() throws ScriptException {
+    ScriptEngineManager scriptEngineManager = mock(ScriptEngineManager.class);
+
+    scriptEngineSpy = mock(GroovyScriptEngineImpl.class);
+    when(scriptEngineSpy.createBindings()).thenReturn(new SimpleBindings());
+    when(scriptEngineSpy.compile(anyString())).thenReturn(mock(CompiledScript.class));
+    when(scriptEngineManager.getEngineByName(anyString())).thenReturn(scriptEngineSpy);
 
     DefaultDmnEngineConfiguration configuration = new DefaultDmnEngineConfiguration();
 
@@ -83,7 +78,7 @@ public class ExpressionCachingTest {
     // then
     InOrder inOrder = inOrder(expression, scriptEngineSpy);
     inOrder.verify(expression, atLeastOnce()).getCachedCompiledScript();
-    inOrder.verify(compilableSpy, times(1)).compile(anyString());
+    inOrder.verify(scriptEngineSpy, times(1)).compile(anyString());
     inOrder.verify(expression, times(1)).cacheCompiledScript(any(CompiledScript.class));
 
     // when (2)
@@ -91,7 +86,7 @@ public class ExpressionCachingTest {
 
     // then (2)
     inOrder.verify(expression, atLeastOnce()).getCachedCompiledScript();
-    inOrder.verify(compilableSpy, times(0)).compile(anyString());
+    inOrder.verify(scriptEngineSpy, times(0)).compile(anyString());
   }
 
   @Test
