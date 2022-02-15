@@ -26,7 +26,7 @@ import java.util.Set;
 
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.IncidentDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.query.IncidentQueryDto;
-import org.camunda.bpm.cockpit.impl.plugin.resources.IncidentRestService;
+import org.camunda.bpm.cockpit.impl.plugin.resource.IncidentRestService;
 import org.camunda.bpm.cockpit.plugin.test.AbstractCockpitPluginTest;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;

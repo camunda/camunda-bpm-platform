@@ -21,8 +21,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.camunda.bpm.cockpit.impl.plugin.resources.CockpitPluginsRootResource;
-import org.camunda.bpm.cockpit.impl.plugin.resources.BaseRootResource;
+import org.camunda.bpm.cockpit.impl.plugin.resource.CockpitPluginsRootResource;
+import org.camunda.bpm.cockpit.impl.plugin.resource.BaseRootResource;
 import org.camunda.bpm.cockpit.plugin.spi.impl.AbstractCockpitPlugin;
 
 /**

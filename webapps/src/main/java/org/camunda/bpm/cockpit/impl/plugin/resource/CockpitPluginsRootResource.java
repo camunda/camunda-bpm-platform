@@ -14,10 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.cockpit.impl.plugin.resources;
+package org.camunda.bpm.cockpit.impl.plugin.resource;
 
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 
 import org.camunda.bpm.cockpit.impl.plugin.CockpitPlugins;
 import org.camunda.bpm.cockpit.plugin.resource.AbstractCockpitPluginRootResource;
