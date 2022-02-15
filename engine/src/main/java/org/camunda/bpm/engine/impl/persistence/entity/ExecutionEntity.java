@@ -1244,11 +1244,6 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     registeredVariableListeners.remove(listener);
   }
 
-  public boolean isExecutingScopeLeafActivity() {
-    return isActive && getActivity() != null && getActivity().isScope() && activityInstanceId != null
-        && !(getActivity().getActivityBehavior() instanceof CompositeActivityBehavior);
-  }
-
   @Override
   public Collection<VariableInstanceEntity> provideVariables() {
     return Context.getCommandContext().getVariableInstanceManager().findVariableInstancesByExecutionId(id);
