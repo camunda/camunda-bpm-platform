@@ -126,33 +126,25 @@ public class SpringBootManagedContainer {
   }
 
   public void stop() {
-//    if (commands.size() == 1) {
-//      // run shutdown script
-//      try {
-//        final ProcessBuilder shutdownProcessBuilder = new ProcessBuilder(getStopScriptPath());
-//        shutdownProcessBuilder.start();
-//      }  catch (final Exception ex) {
-//        throw new RuntimeException("Could not stop managed Spring Boot application!", ex);
-//      }
-//    } else {
-      if (shutdownThread != null) {
+
+    if (shutdownThread != null) {
       Runtime.getRuntime().removeShutdownHook(shutdownThread);
       shutdownThread = null;
-      }
-      try {
-        if (startupProcess != null) {
-          if (isRunning()) {
-            killProcess(startupProcess, false);
-            if (!isShutDown(RAMP_DOWN_SECONDS * 1000)) {
-              throw new RuntimeException("Could not kill the application.");
-            }
+    }
+    try {
+      if (startupProcess != null) {
+        if (isRunning()) {
+          killProcess(startupProcess, false);
+          if (!isShutDown(RAMP_DOWN_SECONDS * 1000)) {
+            throw new RuntimeException("Could not kill the application.");
           }
-          startupProcess = null;
         }
-      } catch (final Exception e) {
-        throw new RuntimeException("Could not stop managed Spring Boot application", e);
+        startupProcess = null;
       }
-//    }
+    } catch (final Exception e) {
+      throw new RuntimeException("Could not stop managed Spring Boot application", e);
+    }
+
     cleanup();
   }
 
@@ -162,10 +154,6 @@ public class SpringBootManagedContainer {
 
   protected String getStartScriptPath() {
     return baseDirectory + "/internal/run." + (isUnixLike() ? "sh" : "bat");
-  }
-
-  protected String getStopScriptPath() {
-    return baseDirectory + "/shutdown." + (isUnixLike() ? "sh" : "bat");
   }
 
   // ---------------------------
