@@ -18,9 +18,8 @@ package org.camunda.bpm.engine.rest.util;
 
 import static org.camunda.bpm.engine.rest.util.EngineUtil.getProcessEngineProvider;
 
-import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.impl.ManagementServiceImpl;
 import org.camunda.bpm.engine.impl.telemetry.PlatformTelemetryRegistry;
-import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
 import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyDataImpl;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 
@@ -38,11 +37,10 @@ public class WebApplicationUtil {
   public static void setLicenseKey(LicenseKeyDataImpl licenseKeyData) {
     if (licenseKeyData != null) {
       ProcessEngineProvider processEngineProvider = getProcessEngineProvider();
-      for (String engineName : processEngineProvider.getProcessEngineNames()) {
-        TelemetryRegistry telemetryRegistry = getTelemetryRegistry(processEngineProvider, engineName);
-        if (telemetryRegistry != null) {
-          telemetryRegistry.setLicenseKey(licenseKeyData);;
-        }
+      String engineName = processEngineProvider.getProcessEngineNames().stream().filter(e -> e != null).findFirst().orElse(null);
+      if (engineName != null) {
+        ((ManagementServiceImpl) processEngineProvider.getProcessEngine(engineName).getManagementService())
+            .addLicenseKeyToTelemetry(licenseKeyData);
       }
     }
   }
@@ -58,19 +56,6 @@ public class WebApplicationUtil {
    */
   public static boolean setWebapp(String engineName, String webapp) {
     ProcessEngineProvider processEngineProvider = getProcessEngineProvider();
-    TelemetryRegistry telemetryRegistry = getTelemetryRegistry(processEngineProvider, engineName);
-    if (telemetryRegistry != null) {
-      telemetryRegistry.addWebapp(webapp);
-      return true;
-    }
-    return false;
-  }
-
-  protected static TelemetryRegistry getTelemetryRegistry(ProcessEngineProvider processEngineProvider, String engineName) {
-    ProcessEngine processEngine = processEngineProvider.getProcessEngine(engineName);
-    if (processEngine != null) {
-      return processEngine.getProcessEngineConfiguration().getTelemetryRegistry();
-    }
-    return null;
+    return ((ManagementServiceImpl) processEngineProvider.getProcessEngine(engineName).getManagementService()).addWebappToTelemetry(webapp);
   }
 }

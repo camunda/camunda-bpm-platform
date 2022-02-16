@@ -19,7 +19,7 @@ package org.camunda.bpm.spring.boot.starter.telemetry;
 import javax.servlet.ServletContext;
 
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
+import org.camunda.bpm.engine.impl.ManagementServiceImpl;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -41,12 +41,10 @@ public class CamundaApplicationServerConfigurator implements InitializingBean {
     } catch (Exception e) {
     }
 
-    TelemetryRegistry telemetryRegistry = processEngine.getProcessEngineConfiguration().getTelemetryRegistry();
-
-    if (servletContext != null && telemetryRegistry != null) {
+    if (servletContext != null) {
       String serverInfo = servletContext.getServerInfo();
       if (serverInfo != null) {
-        telemetryRegistry.setApplicationServer(serverInfo);
+        ((ManagementServiceImpl) processEngine.getManagementService()).addApplicationServerInfoToTelemetry(serverInfo);
       }
     }
   }

@@ -16,10 +16,9 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import static org.camunda.bpm.engine.impl.util.LicenseKeyUtil.addToTelemetry;
-
 import java.nio.charset.StandardCharsets;
 
+import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -59,7 +58,14 @@ public class SetLicenseKeyCmd extends LicenseCmd implements Command<Object> {
     commandContext.runWithoutAuthorization(new DeletePropertyCmd(LICENSE_KEY_PROPERTY_NAME));
 
     // add raw license to telemetry data if not there already
-    addToTelemetry(licenseKey, commandContext.getProcessEngineConfiguration().getTelemetryRegistry());
+    ManagementService managementService = commandContext.getProcessEngineConfiguration().getManagementService();
+    String currentLicenseData = managementService.getLicenseKey();
+    // only report license body without signature, if present
+    String newLicenseString = licenseKey.contains(";") ? licenseKey.split(";", 2)[1] : licenseKey;
+
+    if (currentLicenseData == null || !newLicenseString.equals(currentLicenseData)) {
+      managementService.setLicenseKey(newLicenseString);
+    }
 
     return null;
   }
