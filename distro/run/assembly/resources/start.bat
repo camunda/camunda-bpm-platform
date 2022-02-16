@@ -16,6 +16,9 @@ GOTO setArgs
 
 :StartDetached
 call "%EXECUTABLE%" start --detached
+REM open a browser
+timeout /t 10 /nobreak > NUL
+start http://localhost:8080/
 GOTO Done
 
 :StartWithArguments

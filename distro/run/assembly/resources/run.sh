@@ -1,22 +1,31 @@
 #!/bin/bash
 
+# set constants
 BASEDIR=$(dirname "$0")
 PARENTDIR=$(builtin cd $BASEDIR/..; pwd)
-deploymentDir=$PARENTDIR/configuration/resources
+DEPLOYMENT_DIR=$PARENTDIR/configuration/resources
+WEBAPPS_PATH=$BASEDIR/webapps/
+REST_PATH=$BASEDIR/rest/
+SWAGGER_PATH=$BASEDIR/swaggerui
+EXAMPLE_PATH=$BASEDIR/example
+PID_PATH=$BASEDIR/run.pid
+OPTIONS_HELP="Options:
+  --webapps    - Enables the Camunda Platform Webapps
+  --rest       - Enables the REST API
+  --swaggerui  - Enables the Swagger UI
+  --example    - Enables the example application
+  --production - Applies the production.yaml configuration file
+  --detached   - Starts Camunda Run as a detached process
+"
 
 # set environment parameters
-webappsPath=$BASEDIR/webapps/
-restPath=$BASEDIR/rest/
-swaggerPath=$BASEDIR/swaggerui
-examplePath=$BASEDIR/example
-classPath=$PARENTDIR/configuration/userlib/,$PARENTDIR/configuration/keystore/
 optionalComponentChosen=false
 restChosen=false
 swaggeruiChosen=false
 productionChosen=false
 detachProcess=false
+classPath=$PARENTDIR/configuration/userlib/,$PARENTDIR/configuration/keystore/
 configuration=$PARENTDIR/configuration/default.yml
-pidPath=$BASEDIR/run.pid
 
 if [ "$1" = "start" ] ; then
   shift
@@ -40,21 +49,21 @@ if [ "$1" = "start" ] ; then
   while [ "$1" != "" ]; do
     case $1 in
       --webapps )    optionalComponentChosen=true
-                     classPath=$webappsPath,$classPath
+                     classPath=$WEBAPPS_PATH,$classPath
                      echo WebApps enabled
                      ;;
       --rest )       optionalComponentChosen=true
                      restChosen=true
-                     classPath=$restPath,$classPath
+                     classPath=$REST_PATH,$classPath
                      echo REST API enabled
                      ;;
       --swaggerui )  optionalComponentChosen=true
                      swaggeruiChosen=true
-                     classPath=$swaggerPath,$classPath
+                     classPath=$SWAGGER_PATH,$classPath
                      echo Swagger UI enabled
                      ;;
       --example )    optionalComponentChosen=true
-                     classPath=$examplePath,$classPath
+                     classPath=$EXAMPLE_PATH,$classPath
                      echo Invoice Example included - needs to be enabled in application configuration as well
                      ;;
       --production ) configuration=$PARENTDIR/configuration/production.yml
@@ -63,6 +72,9 @@ if [ "$1" = "start" ] ; then
       # the background flag shouldn't influence the optional component flags
       --detached )   detachProcess=true
                      echo Camunda Run will start in the background. Use the shutdown.sh script to stop it
+                     ;;
+      --help )       printf "%s" "$OPTIONS_HELP"
+                     exit 0
                      ;;
       * )            exit 1
     esac
@@ -79,9 +91,9 @@ if [ "$1" = "start" ] ; then
       swaggeruiChosen=true
       echo Swagger UI enabled
       echo Invoice Example included - needs to be enabled in application configuration as well
-      classPath=$swaggerPath,$examplePath,$classPath
+      classPath=$SWAGGER_PATH,$EXAMPLE_PATH,$classPath
     fi
-    classPath=$webappsPath,$restPath,$classPath
+    classPath=$WEBAPPS_PATH,$REST_PATH,$classPath
   fi
 
   # if Swagger UI is enabled but REST is not, warn the user
@@ -95,55 +107,31 @@ if [ "$1" = "start" ] ; then
   if [ "$detachProcess" = "true" ]; then
 
     # check if a Camunda Run instance is already in operation
-    if [ -s "$pidPath" ]; then
+    if [ -s "$PID_PATH" ]; then
       echo "
-A Camunda Run instance is already in operation (process id $(cat $pidPath)).
+A Camunda Run instance is already in operation (process id $(cat $PID_PATH)).
 
-Please stop it or remove the file $pidPath."
+Please stop it or remove the file $PID_PATH."
       exit 1
     fi
 
     # start Camunda Run detached
-    "$JAVA" -Dloader.path="$classPath" -Dcamunda.deploymentDir="$deploymentDir" $JAVA_OPTS -jar "$BASEDIR/camunda-bpm-run-core.jar" --spring.config.location=file:"$configuration" &
+    "$JAVA" -Dloader.path="$classPath" -Dcamunda.deploymentDir="$DEPLOYMENT_DIR" $JAVA_OPTS -jar "$BASEDIR/camunda-bpm-run-core.jar" --spring.config.location=file:"$configuration" &
     # store the process id
-    echo $! > $pidPath
-
-    # open a browser
-    UNAME=`which uname`
-    if [ -n "$UNAME" -a "`$UNAME`" = "Darwin" ]
-    then
-      BROWSERS="open"
-    else
-      BROWSERS="xdg-open gnome-www-browser x-www-browser firefox chromium chromium-browser google-chrome"
-    fi
-
-    if [ -z "$BROWSER" ]; then
-      for executable in $BROWSERS; do
-        BROWSER=`which $executable 2> /dev/null`
-        if [ -n "$BROWSER" ]; then
-          break;
-        fi
-      done
-    fi
-
-    if [ -z "$BROWSER" ]; then
-      (sleep 15; echo -e "We are sorry... We tried all we could do but we couldn't locate your default browser... \nIf you want to see our default website please open your browser and insert this URL:\nhttp://localhost:8080/camunda-welcome/index.html";) &
-    else
-      (sleep 15; $BROWSER "http://localhost:8080/";) &
-    fi
+    echo $! > $PID_PATH
 
   else
-    "$JAVA" -Dloader.path="$classPath" -Dcamunda.deploymentDir="$deploymentDir" $JAVA_OPTS -jar "$BASEDIR/camunda-bpm-run-core.jar" --spring.config.location=file:"$configuration"
+    "$JAVA" -Dloader.path="$classPath" -Dcamunda.deploymentDir="$DEPLOYMENT_DIR" $JAVA_OPTS -jar "$BASEDIR/camunda-bpm-run-core.jar" --spring.config.location=file:"$configuration"
   fi
 
 elif [ "$1" = "stop" ] ; then
 
-  if [ -s "$pidPath" ]; then
+  if [ -s "$PID_PATH" ]; then
     # stop Camunda Run if the process is still running
-    kill $(cat $pidPath)
+    kill $(cat $PID_PATH)
 
     # remove process ID file
-    rm $pidPath
+    rm $PID_PATH
 
     echo "Camunda Run is shutting down."
   else
@@ -153,14 +141,5 @@ elif [ "$1" = "stop" ] ; then
 
 elif [ "$1" = "" ] || [ "$1" = "help" ] ; then
 
-  echo "
-Usage: run.sh [start|stop] (options...)
-Options:
-  --webapps    - Enables the Camunda Platform Webapps
-  --rest       - Enables the REST API
-  --swaggerui  - Enables the Swagger UI
-  --example    - Enables the example application
-  --production - Applies the production.yaml configuration file
-  --detached   - Starts Camunda Run as a detached process
-  "
+  printf "Usage: run.sh [start|stop] (options...) \n%s" "$OPTIONS_HELP"
 fi

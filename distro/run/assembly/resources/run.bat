@@ -1,8 +1,13 @@
 @echo off
 
+REM set constants
 SET BASEDIR=%~dp0
 SET PARENTDIR=%BASEDIR%..\
 SET DEPLOYMENTDIR=%PARENTDIR%configuration/resources
+SET WEBAPPS_PATH=%BASEDIR%webapps
+SET REST_PATH=%BASEDIR%rest
+SET SWAGGER_PATH=%BASEDIR%swaggerui
+SET EXAMPLE_PATH=%BASEDIR%example
 SET APPNAME=Camunda Run
 
 IF [%~1]==[start] GOTO Startup
@@ -38,16 +43,12 @@ IF NOT "x%JAVA_OPTS%" == "x" (
 )
 
 REM set environment parameters
-SET webappsPath=%BASEDIR%webapps
-SET restPath=%BASEDIR%rest
-SET swaggerPath=%BASEDIR%swaggerui
-SET examplePath=%BASEDIR%example
-SET classPath=%PARENTDIR%configuration\userlib,%PARENTDIR%configuration\keystore
 SET optionalComponentChosen=false
 SET restChosen=false
 SET swaggeruiChosen=false
 SET productionChosen=false
 SET detachProcess=false
+SET classPath=%PARENTDIR%configuration\userlib,%PARENTDIR%configuration\keystore
 SET configuration=%PARENTDIR%configuration\default.yml
 
 
@@ -57,27 +58,27 @@ IF [%~1]==[] GOTO Continue
 
 IF [%~1]==[--webapps] (
   SET optionalComponentChosen=true
-  SET classPath=%webappsPath%,%classPath%
+  SET classPath=%WEBAPPS_PATH%,%classPath%
   ECHO WebApps enabled
 )
 
 IF [%~1]==[--rest] (
   SET optionalComponentChosen=true
   SET restChosen=true
-  SET classPath=%restPath%,%classPath%
+  SET classPath=%REST_PATH%,%classPath%
   ECHO REST API enabled
 )
 
 IF [%~1]==[--swaggerui] (
   SET optionalComponentChosen=true
   SET swaggeruiChosen=true
-  SET classPath=%swaggerPath%,%classPath%
+  SET classPath=%SWAGGER_PATH%,%classPath%
   ECHO Swagger UI enabled
 )
 
 IF [%~1]==[--example] (
   SET optionalComponentChosen=true
-  SET classPath=%examplePath%,%classPath%
+  SET classPath=%EXAMPLE_PATH%,%classPath%
   ECHO Invoice Example included - needs to be enabled in application configuration as well
 )
 
@@ -88,6 +89,10 @@ IF [%~1]==[--production] (
 
 IF [%~1]==[--detached] (
   SET detachProcess=true
+)
+
+IF [%~1]==[--help] (
+  GOTO ArgsHelp
 )
 
 SHIFT
@@ -105,9 +110,9 @@ IF [%optionalComponentChosen%]==[false] (
     SET swaggeruiChosen=true
     ECHO Swagger UI enabled
     ECHO Invoice Example included - needs to be enabled in application configuration as well
-    SET classPath=%swaggerPath%,%examplePath%,%classPath%
+    SET classPath=%SWAGGER_PATH%,%EXAMPLE_PATH%,%classPath%
   )
-  SET classPath=%webappsPath%,%restPath%,!classPath!
+  SET classPath=%WEBAPPS_PATH%,%REST_PATH%,!classPath!
 )
 setlocal disabledelayedexpansion
 
@@ -123,13 +128,10 @@ ECHO classpath: %classPath%
 REM start the application
 IF [%detachProcess%]==[true] (
   REM in the background
-  start "%APPNAME%" %JAVA% -Dloader.path="%classPath%" -Dcamunda.DEPLOYMENTDIR=%DEPLOYMENTDIR% %JAVA_OPTS% -jar "%BASEDIR%camunda-bpm-run-core.jar" --spring.config.location=file:"%configuration%"
+  start "%APPNAME%" %JAVA% -Dloader.path="%classPath%" -Dcamunda.deploymentDir=%DEPLOYMENTDIR% %JAVA_OPTS% -jar "%BASEDIR%camunda-bpm-run-core.jar" --spring.config.location=file:"%configuration%"
 
-  REM open a browser
-  ping -n 5 localhost > NULL
-  start http://localhost:8080/
 ) ELSE (
-  call %JAVA% -Dloader.path="%classPath%" -Dcamunda.DEPLOYMENTDIR=%DEPLOYMENTDIR% %JAVA_OPTS% -jar "%BASEDIR%camunda-bpm-run-core.jar" --spring.config.location=file:"%configuration%"
+  call %JAVA% -Dloader.path="%classPath%" -Dcamunda.deploymentDir=%DEPLOYMENTDIR% %JAVA_OPTS% -jar "%BASEDIR%camunda-bpm-run-core.jar" --spring.config.location=file:"%configuration%"
 )
 
 GOTO End
@@ -146,6 +148,7 @@ GOTO End
 
 :Help
 ECHO Usage: run.bat [start^|stop] (options...)
+:ArgsHelp
 ECHO Options:
 ECHO   --webapps    - Enables the Camunda Platform Webapps
 ECHO   --rest       - Enables the REST API
