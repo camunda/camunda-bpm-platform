@@ -254,7 +254,7 @@ public class ConnectProcessEnginePluginTest extends PluggableProcessEngineTestCa
       assertThat(re.getMessage(), containsString("Invalid format"));
     }
   }
-  
+
   @Deployment
   public void testSendTaskWithConnector() {
     String outputParamValue = "someSendTaskOutputValue";
@@ -276,7 +276,7 @@ public class ConnectProcessEnginePluginTest extends PluggableProcessEngineTestCa
     assertNotNull(variable);
     assertEquals(outputParamValue, variable.getValue());
   }
-  
+
   @Deployment
   public void testIntermediateMessageThrowEventWithConnector() {
     String outputParamValue = "someMessageThrowOutputValue";
@@ -297,7 +297,7 @@ public class ConnectProcessEnginePluginTest extends PluggableProcessEngineTestCa
     VariableInstance variable = runtimeService.createVariableInstanceQuery().variableName("out1").singleResult();
     assertNotNull(variable);
     assertEquals(outputParamValue, variable.getValue());
-}
+  }
 
   @Deployment
   public void testMessageEndEventWithConnector() {

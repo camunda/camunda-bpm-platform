@@ -16,9 +16,13 @@
  */
 package org.camunda.bpm.engine.test.api.externaltask;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -98,5 +102,27 @@ public class ExternalTaskSupportTest {
     rule.getExternalTaskService().complete(externalTasks.get(0).getId(), "aWorker");
 
     Assert.assertEquals(0L, rule.getRuntimeService().createProcessInstanceQuery().count());
+  }
+
+  @Test
+  public void testExternalTaskProperties() {
+    // given
+    ProcessDefinition processDefinition = rule.getRepositoryService().createProcessDefinitionQuery().singleResult();
+    rule.getRuntimeService().startProcessInstanceById(processDefinition.getId());
+
+    // when
+    List<LockedExternalTask> externalTasks = rule
+        .getExternalTaskService()
+        .fetchAndLock(1, "aWorker")
+        .topic("externalTaskTopic", 5000L)
+        .includeExtensionProperties()
+        .execute();
+
+    // then
+    LockedExternalTask task = externalTasks.get(0);
+    Map<String, String> properties = task.getExtensionProperties();
+    assertThat(properties).containsOnly(
+        entry("key1", "val1"),
+        entry("key2", "val2"));
   }
 }
