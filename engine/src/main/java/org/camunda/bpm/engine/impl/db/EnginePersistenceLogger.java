@@ -764,7 +764,7 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
   public void errorConfiguringTelemetryProperty(Exception exception) {
     logDebug(
         "095",
-        "Error while configurting the telemetry property: {}", exception.getMessage());
+        "Error while configuring the telemetry property: {}", exception.getMessage());
   }
 
   public void noInstallationIdPropertyFound() {
