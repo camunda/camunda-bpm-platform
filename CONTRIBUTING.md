@@ -156,7 +156,11 @@ A list of bullet points giving a high-level overview of the contribution, e.g. w
 
 ## \<footer\>
 
-Must be `related to <ticket>` where ticket is the ticket number, e.g. CAM-1234. If the change is related to multiple tickets, list them in a comma-separated list such as `related to CAM-1234, CAM-4321`.
+Must be `related to <ticket>` where ticket is the ticket number, e.g. CAM-1234. If the change is related to multiple 
+tickets, list them in a comma-separated list such as `related to CAM-1234, CAM-4321`.
+
+Optionally, you can reference the number of the GitHub PR from which the commit is merged. The message footer can then 
+look like `related to <ticket>, closes #<pr_number>` such as `related to CAM-1234, closes #567`.
 
 # License Headers
 
