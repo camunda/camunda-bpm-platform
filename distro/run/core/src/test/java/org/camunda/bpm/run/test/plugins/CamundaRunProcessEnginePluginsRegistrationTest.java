@@ -17,6 +17,7 @@
 package org.camunda.bpm.run.test.plugins;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.util.List;
 import java.util.Map;
@@ -74,16 +75,16 @@ public class CamundaRunProcessEnginePluginsRegistrationTest {
 
     CamundaBpmRunProcessEnginePluginProperty firstPlugin = pluginConfigs.get(0);
     Map<String, Object> firstPluginParameters = firstPlugin.getPluginParameters();
-    assertThat(firstPluginParameters).hasSize(2);
-    assertThat(firstPluginParameters.keySet()).contains("parameterOne", "parameterTwo");
-    assertThat(firstPluginParameters.values()).contains("valueOne", true);
+    assertThat(firstPluginParameters).containsOnly(
+        entry("parameterOne", "valueOne"),
+        entry("parameterTwo", true));
 
     CamundaBpmRunProcessEnginePluginProperty secondPlugin = properties.getProcessEnginePlugins().get(1);
     Map<String, Object> secondPluginParameters = secondPlugin.getPluginParameters();
-    assertThat(secondPluginParameters).hasSize(3);
-    assertThat(secondPluginParameters.keySet())
-        .contains("parameterOne", "parameterTwo", "parameterThree");
-    assertThat(secondPluginParameters.values()).contains(1.222, false, 123);
+    assertThat(secondPluginParameters).containsOnly(
+        entry("parameterOne", 1.222),
+        entry("parameterTwo", false),
+        entry("parameterThree", 123));
   }
 
   @Test
