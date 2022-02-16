@@ -1534,7 +1534,11 @@ public abstract class PvmExecutionImpl extends CoreExecution implements
   }
 
   protected PvmExecutionImpl getFlowScopeExecution() {
-    if (!isScope || CompensationBehavior.executesNonScopeCompensationHandler(this)) {
+
+    if (!isScope
+        || CompensationBehavior.executesNonScopeCompensationHandler(this)
+        || isAsyncAfterScopeWithoutTransition())
+    {
       // LEGACY: a correct implementation should also skip a compensation-throwing parent scope execution
       // (since compensation throwing activities are scopes), but this cannot be done for backwards compatibility
       // where a compensation throwing activity was no scope (and we would wrongly skip an execution in that case)
@@ -2262,5 +2266,27 @@ public abstract class PvmExecutionImpl extends CoreExecution implements
   public IncidentHandler findIncidentHandler(String incidentType) {
     Map<String, IncidentHandler> incidentHandlers = Context.getProcessEngineConfiguration().getIncidentHandlers();
     return incidentHandlers.get(incidentType);
+  }
+
+  public boolean isExecutingScopeLeafActivity() {
+    return isActive && getActivity() != null && getActivity().isScope() && activityInstanceId != null
+        && !(getActivity().getActivityBehavior() instanceof CompositeActivityBehavior);
+  }
+
+  /**
+   * This case is special, because the execution tree is different if an async after
+   * activity is left via transition (case 1) or not (case 2). In case 1, when the
+   * execution becomes async, the scope execution is already removed. In case 2 it is not.
+   *
+   * @return true if
+   * <ul>
+   *   <li>the execution is in asyncAfter state and completes
+   *   <li>leaves a scope activity
+   *   <li>completes the parent scope (i.e. does not leave via a transition
+   *   but propagates control to the parent)
+   * </ul>
+   */
+  public boolean isAsyncAfterScopeWithoutTransition() {
+    return activityInstanceId == null && activity.isScope() && !isActive;
   }
 }
