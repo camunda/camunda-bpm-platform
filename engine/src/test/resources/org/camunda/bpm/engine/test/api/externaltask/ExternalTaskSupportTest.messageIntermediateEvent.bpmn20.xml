@@ -8,6 +8,12 @@
     <startEvent id="start" />
     <sequenceFlow id="flow1" sourceRef="start" targetRef="externalTask" />
     <intermediateThrowEvent id="externalTask">
+      <extensionElements>
+        <camunda:properties>
+          <camunda:property name="key1" value="val1" />
+          <camunda:property name="key2" value="val2" />
+        </camunda:properties>
+      </extensionElements>
       <messageEventDefinition camunda:type="external" camunda:topic="externalTaskTopic" />
     </intermediateThrowEvent>
     <sequenceFlow id="flow2" sourceRef="externalTask" targetRef="end" />

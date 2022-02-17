@@ -7,7 +7,14 @@
   <process id="oneExternalTaskProcess" isExecutable="true">
     <startEvent id="start" />
     <sequenceFlow id="flow1" sourceRef="start" targetRef="externalTask" />
-    <businessRuleTask id="externalTask" camunda:type="external" camunda:topic="externalTaskTopic" />
+    <businessRuleTask id="externalTask" camunda:type="external" camunda:topic="externalTaskTopic">
+      <extensionElements>
+        <camunda:properties>
+          <camunda:property name="key1" value="val1" />
+          <camunda:property name="key2" value="val2" />
+        </camunda:properties>
+      </extensionElements>
+    </businessRuleTask>
     <sequenceFlow id="flow2" sourceRef="externalTask" targetRef="end" />
     <endEvent id="end" />
   </process>

@@ -1622,6 +1622,8 @@ public class BpmnParse extends Parse {
 
     parseAsynchronousContinuationForActivity(intermediateEventElement, nestedActivityImpl);
 
+    boolean isServiceTaskLike = isServiceTaskLike(messageEventDefinitionElement);
+
     if (signalEventDefinitionElement != null) {
       nestedActivityImpl.getProperties().set(BpmnProperties.TYPE, ActivityTypes.INTERMEDIATE_EVENT_SIGNAL_THROW);
 
@@ -1634,11 +1636,16 @@ public class BpmnParse extends Parse {
       nestedActivityImpl.setProperty(PROPERTYNAME_THROWS_COMPENSATION, true);
       nestedActivityImpl.setScope(true);
     } else if (messageEventDefinitionElement != null) {
-      if (isServiceTaskLike(messageEventDefinitionElement)) {
+      if (isServiceTaskLike) {
 
         // CAM-436 same behavior as service task
         nestedActivityImpl.getProperties().set(BpmnProperties.TYPE, ActivityTypes.INTERMEDIATE_EVENT_MESSAGE_THROW);
-        activityBehavior = parseServiceTaskLike(ActivityTypes.INTERMEDIATE_EVENT_MESSAGE_THROW, messageEventDefinitionElement, scopeElement).getActivityBehavior();
+        parseServiceTaskLike(
+            nestedActivityImpl,
+            ActivityTypes.INTERMEDIATE_EVENT_MESSAGE_THROW,
+            messageEventDefinitionElement,
+            intermediateEventElement,
+            scopeElement);
       } else {
         // default to non behavior if no service task
         // properties have been specified
@@ -1660,12 +1667,22 @@ public class BpmnParse extends Parse {
       activityBehavior = new IntermediateThrowNoneEventActivityBehavior();
     }
 
-    nestedActivityImpl.setActivityBehavior(activityBehavior);
+    if (activityBehavior != null) {
+      nestedActivityImpl.setActivityBehavior(activityBehavior);
+    }
 
     parseExecutionListenersOnScope(intermediateEventElement, nestedActivityImpl);
 
     for (BpmnParseListener parseListener : parseListeners) {
       parseListener.parseIntermediateThrowEvent(intermediateEventElement, scopeElement, nestedActivityImpl);
+    }
+
+    if (isServiceTaskLike) {
+      // activity behavior could be set by a listener (e.g. connector); thus,
+      // check is after listener invocation
+      validateServiceTaskLike(nestedActivityImpl,
+          ActivityTypes.INTERMEDIATE_EVENT_MESSAGE_THROW,
+          messageEventDefinitionElement);
     }
 
     return nestedActivityImpl;
@@ -2210,11 +2227,41 @@ public class BpmnParse extends Parse {
    * Parses a serviceTask declaration.
    */
   public ActivityImpl parseServiceTask(Element serviceTaskElement, ScopeImpl scope) {
-    return parseServiceTaskLike("serviceTask", serviceTaskElement, scope);
+    ActivityImpl activity = createActivityOnScope(serviceTaskElement, scope);
+
+    parseAsynchronousContinuationForActivity(serviceTaskElement, activity);
+
+    String elementName = "serviceTask";
+    parseServiceTaskLike(activity, elementName, serviceTaskElement, serviceTaskElement, scope);
+
+    parseExecutionListenersOnScope(serviceTaskElement, activity);
+
+    for (BpmnParseListener parseListener : parseListeners) {
+      parseListener.parseServiceTask(serviceTaskElement, scope, activity);
+    }
+
+    // activity behavior could be set by a listener (e.g. connector); thus,
+    // check is after listener invocation
+    validateServiceTaskLike(activity, elementName, serviceTaskElement);
+
+    return activity;
   }
 
-  public ActivityImpl parseServiceTaskLike(String elementName, Element serviceTaskElement, ScopeImpl scope) {
-    ActivityImpl activity = createActivityOnScope(serviceTaskElement, scope);
+  /**
+   * @param elementName
+   * @param serviceTaskElement the element that contains the camunda service task definition
+   *   (e.g. camunda:class attributes)
+   * @param camundaPropertiesElement the element that contains the camunda:properties extension elements
+   *   that apply to this service task. Usually, but not always, this is the same as serviceTaskElement
+   * @param scope
+   * @return
+   */
+  public void parseServiceTaskLike(
+      ActivityImpl activity,
+      String elementName,
+      Element serviceTaskElement,
+      Element camundaPropertiesElement,
+      ScopeImpl scope) {
 
     String type = serviceTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, TYPE);
     String className = serviceTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, PROPERTYNAME_CLASS);
@@ -2222,15 +2269,13 @@ public class BpmnParse extends Parse {
     String delegateExpression = serviceTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, PROPERTYNAME_DELEGATE_EXPRESSION);
     String resultVariableName = parseResultVariable(serviceTaskElement);
 
-    parseAsynchronousContinuationForActivity(serviceTaskElement, activity);
-
     if (type != null) {
       if (type.equalsIgnoreCase("mail")) {
         parseEmailServiceTask(activity, serviceTaskElement, parseFieldDeclarations(serviceTaskElement));
       } else if (type.equalsIgnoreCase("shell")) {
         parseShellServiceTask(activity, serviceTaskElement, parseFieldDeclarations(serviceTaskElement));
       } else if (type.equalsIgnoreCase("external")) {
-        parseExternalServiceTask(activity, serviceTaskElement);
+        parseExternalServiceTask(activity, serviceTaskElement, camundaPropertiesElement);
       } else {
         addError("Invalid usage of type attribute on " + elementName + ": '" + type + "'", serviceTaskElement);
       }
@@ -2251,20 +2296,18 @@ public class BpmnParse extends Parse {
       activity.setActivityBehavior(new ServiceTaskExpressionActivityBehavior(expressionManager.createExpression(expression), resultVariableName));
 
     }
+  }
 
-    parseExecutionListenersOnScope(serviceTaskElement, activity);
-
-    for (BpmnParseListener parseListener : parseListeners) {
-      parseListener.parseServiceTask(serviceTaskElement, scope, activity);
-    }
-
-    // activity behavior could be set by a listener (e.g. connector); thus,
-    // check is after listener invocation
+  protected void validateServiceTaskLike(
+      ActivityImpl activity,
+      String elementName,
+      Element serviceTaskElement
+      ) {
     if (activity.getActivityBehavior() == null) {
-      addError("One of the attributes 'class', 'delegateExpression', 'type', or 'expression' is mandatory on " + elementName + ".", serviceTaskElement);
+      addError("One of the attributes 'class', 'delegateExpression', 'type', "
+          + "or 'expression' is mandatory on " + elementName + ". If you are using a connector, make sure the"
+          + "connect process engine plugin is registered with the process engine.", serviceTaskElement);
     }
-
-    return activity;
   }
 
   /**
@@ -2276,7 +2319,30 @@ public class BpmnParse extends Parse {
       return parseDmnBusinessRuleTask(businessRuleTaskElement, scope);
     }
     else {
-      return parseServiceTaskLike("businessRuleTask", businessRuleTaskElement, scope);
+      ActivityImpl activity = createActivityOnScope(businessRuleTaskElement, scope);
+      parseAsynchronousContinuationForActivity(businessRuleTaskElement, activity);
+
+      String elementName = "businessRuleTask";
+      parseServiceTaskLike(
+          activity,
+          elementName,
+          businessRuleTaskElement,
+          businessRuleTaskElement,
+          scope);
+
+      parseExecutionListenersOnScope(businessRuleTaskElement, activity);
+
+      for (BpmnParseListener parseListener : parseListeners) {
+        parseListener.parseBusinessRuleTask(businessRuleTaskElement, scope, activity);
+      }
+
+      // activity behavior could be set by a listener (e.g. connector); thus,
+      // check is after listener invocation
+      validateServiceTaskLike(activity,
+          elementName,
+          businessRuleTaskElement);
+
+      return activity;
     }
   }
 
@@ -2432,13 +2498,27 @@ public class BpmnParse extends Parse {
    * Parses a sendTask declaration.
    */
   public ActivityImpl parseSendTask(Element sendTaskElement, ScopeImpl scope) {
+    ActivityImpl activity = createActivityOnScope(sendTaskElement, scope);
+
     if (isServiceTaskLike(sendTaskElement)) {
       // CAM-942: If expression or class is set on a SendTask it behaves like a service task
       // to allow implementing the send handling yourself
-      return parseServiceTaskLike("sendTask", sendTaskElement, scope);
-    } else {
-      ActivityImpl activity = createActivityOnScope(sendTaskElement, scope);
+      String elementName = "sendTask";
+      parseAsynchronousContinuationForActivity(sendTaskElement, activity);
 
+      parseServiceTaskLike(activity, elementName, sendTaskElement, sendTaskElement, scope);
+
+      parseExecutionListenersOnScope(sendTaskElement, activity);
+
+      for (BpmnParseListener parseListener : parseListeners) {
+        parseListener.parseSendTask(sendTaskElement, scope, activity);
+      }
+
+      // activity behavior could be set by a listener (e.g. connector); thus,
+      // check is after listener invocation
+      validateServiceTaskLike(activity, elementName, sendTaskElement);
+
+    } else {
       parseAsynchronousContinuationForActivity(sendTaskElement, activity);
       parseExecutionListenersOnScope(sendTaskElement, activity);
 
@@ -2450,9 +2530,9 @@ public class BpmnParse extends Parse {
       if (activity.getActivityBehavior() == null) {
         addError("One of the attributes 'class', 'delegateExpression', 'type', or 'expression' is mandatory on sendTask.", sendTaskElement);
       }
-
-      return activity;
     }
+
+    return activity;
   }
 
   protected void parseEmailServiceTask(ActivityImpl activity, Element serviceTaskElement, List<FieldDeclaration> fieldDeclarations) {
@@ -2465,12 +2545,14 @@ public class BpmnParse extends Parse {
     activity.setActivityBehavior((ActivityBehavior) instantiateDelegate(ShellActivityBehavior.class, fieldDeclarations));
   }
 
-  protected void parseExternalServiceTask(ActivityImpl activity, Element serviceTaskElement) {
+  protected void parseExternalServiceTask(ActivityImpl activity,
+      Element serviceTaskElement,
+      Element camundaPropertiesElement) {
     activity.setScope(true);
 
     ParameterValueProvider topicNameProvider = parseTopic(serviceTaskElement, PROPERTYNAME_EXTERNAL_TASK_TOPIC);
     ParameterValueProvider priorityProvider = parsePriority(serviceTaskElement, PROPERTYNAME_TASK_PRIORITY);
-    Map<String, String> properties = parseCamundaExtensionProperties(serviceTaskElement);
+    Map<String, String> properties = parseCamundaExtensionProperties(camundaPropertiesElement);
     activity.getProperties().set(BpmnProperties.EXTENSION_PROPERTIES, properties);
     List<CamundaErrorEventDefinition> camundaErrorEventDefinitions = parseCamundaErrorEventDefinitions(activity, serviceTaskElement);
     activity.getProperties().set(BpmnProperties.CAMUNDA_ERROR_EVENT_DEFINITION, camundaErrorEventDefinitions);
@@ -3047,6 +3129,8 @@ public class BpmnParse extends Parse {
       Element compensateEventDefinitionElement = endEventElement.element(COMPENSATE_EVENT_DEFINITION);
       Element escalationEventDefinition = endEventElement.element(ESCALATION_EVENT_DEFINITION);
 
+      boolean isServiceTaskLike = isServiceTaskLike(messageEventDefinitionElement);
+
       String activityId = activity.getId();
       if (errorEventDefinition != null) { // error end event
         String errorRef = errorEventDefinition.attribute("errorRef");
@@ -3083,13 +3167,16 @@ public class BpmnParse extends Parse {
         activity.setActivityBehavior(new TerminateEndEventActivityBehavior());
         activity.setActivityStartBehavior(ActivityStartBehavior.INTERRUPT_FLOW_SCOPE);
       } else if (messageEventDefinitionElement != null) {
-        if (isServiceTaskLike(messageEventDefinitionElement)) {
+        if (isServiceTaskLike) {
 
           // CAM-436 same behaviour as service task
-          ActivityImpl act = parseServiceTaskLike(ActivityTypes.END_EVENT_MESSAGE, messageEventDefinitionElement, scope);
+          parseServiceTaskLike(
+              activity,
+              ActivityTypes.END_EVENT_MESSAGE,
+              messageEventDefinitionElement,
+              endEventElement,
+              scope);
           activity.getProperties().set(BpmnProperties.TYPE, ActivityTypes.END_EVENT_MESSAGE);
-          activity.setActivityBehavior(act.getActivityBehavior());
-          scope.getActivities().remove(act);
         } else {
           // default to non behavior if no service task
           // properties have been specified
@@ -3133,6 +3220,13 @@ public class BpmnParse extends Parse {
         parseListener.parseEndEvent(endEventElement, scope, activity);
       }
 
+      if (isServiceTaskLike) {
+        // activity behavior could be set by a listener (e.g. connector); thus,
+        // check is after listener invocation
+        validateServiceTaskLike(activity,
+            ActivityTypes.END_EVENT_MESSAGE,
+            messageEventDefinitionElement);
+      }
     }
   }
 
@@ -4663,11 +4757,12 @@ public class BpmnParse extends Parse {
 
   protected boolean isServiceTaskLike(Element element) {
 
-    return element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, PROPERTYNAME_CLASS) != null
+    return element != null && (
+          element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, PROPERTYNAME_CLASS) != null
         || element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, PROPERTYNAME_EXPRESSION) != null
         || element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, PROPERTYNAME_DELEGATE_EXPRESSION) != null
         || element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, TYPE) != null
-        || hasConnector(element);
+        || hasConnector(element));
   }
 
   protected boolean hasConnector(Element element) {

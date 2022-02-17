@@ -21,6 +21,7 @@ import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.parseInputOu
 
 import org.camunda.bpm.engine.BpmnParseException;
 import org.camunda.bpm.engine.impl.bpmn.parser.AbstractBpmnParseListener;
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.core.variable.mapping.IoMapping;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
@@ -30,6 +31,38 @@ public class ConnectorParseListener extends AbstractBpmnParseListener {
 
   @Override
   public void parseServiceTask(Element serviceTaskElement, ScopeImpl scope, ActivityImpl activity) {
+    parseConnectorElement(serviceTaskElement, scope, activity);
+  }
+
+  @Override
+  public void parseEndEvent(Element endEventElement, ScopeImpl scope, ActivityImpl activity) {
+    Element messageEventDefinitionElement = endEventElement.element(BpmnParse.MESSAGE_EVENT_DEFINITION);
+
+    if (messageEventDefinitionElement != null) {
+      parseConnectorElement(messageEventDefinitionElement, scope, activity);
+    }
+  }
+
+  @Override
+  public void parseIntermediateThrowEvent(Element intermediateEventElement, ScopeImpl scope, ActivityImpl activity) {
+    Element messageEventDefinitionElement = intermediateEventElement.element(BpmnParse.MESSAGE_EVENT_DEFINITION);
+
+    if (messageEventDefinitionElement != null) {
+      parseConnectorElement(messageEventDefinitionElement, scope, activity);
+    }
+  }
+
+  @Override
+  public void parseBusinessRuleTask(Element businessRuleTaskElement, ScopeImpl scope, ActivityImpl activity) {
+    parseConnectorElement(businessRuleTaskElement, scope, activity);
+  }
+
+  @Override
+  public void parseSendTask(Element sendTaskElement, ScopeImpl scope, ActivityImpl activity) {
+    parseConnectorElement(sendTaskElement, scope, activity);
+  }
+
+  protected void parseConnectorElement(Element serviceTaskElement, ScopeImpl scope, ActivityImpl activity) {
     Element connectorDefinition = findCamundaExtensionElement(serviceTaskElement, "connector");
     if (connectorDefinition != null) {
       Element connectorIdElement = connectorDefinition.element("connectorId");
