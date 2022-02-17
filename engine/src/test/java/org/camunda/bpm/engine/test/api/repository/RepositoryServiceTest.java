@@ -1336,10 +1336,10 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
     //check that we never try to resolve any of the dynamic bindings
     for (ActivityImpl activity : callActivities) {
       CallableElement callableElement = ((CallActivityBehavior) activity.getActivityBehavior()).getCallableElement();
-      Mockito.verify(callableElement, Mockito.never()).getDefinitionKey(Mockito.anyObject());
-      Mockito.verify(callableElement, Mockito.never()).getVersion(Mockito.anyObject());
-      Mockito.verify(callableElement, Mockito.never()).getVersionTag(Mockito.anyObject());
-      Mockito.verify(callableElement, Mockito.never()).getDefinitionTenantId(Mockito.anyObject(), Mockito.anyString());
+      Mockito.verify(callableElement, Mockito.never()).getDefinitionKey(Mockito.any());
+      Mockito.verify(callableElement, Mockito.never()).getVersion(Mockito.any());
+      Mockito.verify(callableElement, Mockito.never()).getVersionTag(Mockito.any());
+      Mockito.verify(callableElement, Mockito.never()).getDefinitionTenantId(Mockito.any(), Mockito.anyString());
       Mockito.verify(callableElement, Mockito.times(1)).hasDynamicReferences();
     }
 
