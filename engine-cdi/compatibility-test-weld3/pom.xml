@@ -12,6 +12,11 @@
     <relativePath>../../database</relativePath>
     <version>7.17.0-SNAPSHOT</version>
   </parent>
+
+  <properties>
+    <arquillian.container.version>2.1.0.Final</arquillian.container.version>
+    <arquillian.junit.version>1.6.0.Final</arquillian.junit.version>
+  </properties>
   
   <dependencyManagement>
     <dependencies>
@@ -64,19 +69,12 @@
       <version>1.0.4.Final</version>
       <type>pom</type>
       <scope>test</scope>
-      <exclusions>
-      <!--TODO: Check if exclusion is still relevant -->
-        <exclusion>
-          <artifactId>xalan</artifactId>
-          <groupId>org.apache.xalan</groupId>
-        </exclusion>
-      </exclusions>
     </dependency>
     
     <dependency>
       <groupId>org.jboss.arquillian.container</groupId>
       <artifactId>arquillian-weld-embedded</artifactId>
-      <version>2.1.0.Final</version>
+      <version>${arquillian.container.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -97,8 +95,7 @@
     <dependency>
       <groupId>org.jboss.arquillian.junit</groupId>
       <artifactId>arquillian-junit-container</artifactId>
-      <!-- TODO: manage version as property -->
-      <version>1.6.0.Final</version>
+      <version>${arquillian.junit.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -133,7 +130,6 @@
     </dependency>
   </dependencies>
 
-
   <build>
     <resources>
       <resource>
@@ -151,6 +147,7 @@
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
           <trimStackTrace>false</trimStackTrace>
           <failIfNoTests>false</failIfNoTests>
+          <argLine>-Denvironment=EE</argLine>
         </configuration>
       </plugin>
     </plugins>
