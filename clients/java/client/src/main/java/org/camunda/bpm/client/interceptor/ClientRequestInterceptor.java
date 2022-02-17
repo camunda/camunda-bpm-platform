@@ -25,7 +25,7 @@ package org.camunda.bpm.client.interceptor;
 public interface ClientRequestInterceptor {
 
   /**
-   * Has been invoked before a request is sent to the http server
+   * Gets invoked before a request is sent to the http server
    *
    * @param requestContext provides the data of the request and offers methods to change it
    */
