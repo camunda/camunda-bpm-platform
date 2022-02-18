@@ -143,7 +143,6 @@ public abstract class MockProvider {
   public static Tenant createMockTenant() {
     Tenant mockTenant = mock(Tenant.class);
     when(mockTenant.getId()).thenReturn(EXAMPLE_TENANT_ID);
-    when(mockTenant.getName()).thenReturn(EXAMPLE_TENANT_NAME);
     return mockTenant;
   }
 

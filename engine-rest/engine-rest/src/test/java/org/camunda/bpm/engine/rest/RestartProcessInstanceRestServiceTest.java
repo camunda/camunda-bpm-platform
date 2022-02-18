@@ -19,8 +19,8 @@ package org.camunda.bpm.engine.rest;
 import static io.restassured.RestAssured.given;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockBatch;
 import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.anyList;
+import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.*;
 
 import io.restassured.http.ContentType;
@@ -72,7 +72,7 @@ public class RestartProcessInstanceRestServiceTest extends AbstractRestServiceTe
     when(builderMock.startAfterActivity(anyString())).thenReturn(builderMock);
     when(builderMock.startBeforeActivity(anyString())).thenReturn(builderMock);
     when(builderMock.startTransition(anyString())).thenReturn(builderMock);
-    when(builderMock.processInstanceIds(anyListOf(String.class))).thenReturn(builderMock);
+    when(builderMock.processInstanceIds(anyList())).thenReturn(builderMock);
     when(builderMock.historicProcessInstanceQuery(any(HistoricProcessInstanceQuery.class))).thenReturn(builderMock);
     when(builderMock.skipCustomListeners()).thenReturn(builderMock);
     when(builderMock.skipIoMappings()).thenReturn(builderMock);

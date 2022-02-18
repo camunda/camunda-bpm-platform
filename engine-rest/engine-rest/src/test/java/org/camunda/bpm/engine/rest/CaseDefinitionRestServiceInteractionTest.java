@@ -21,9 +21,10 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.hamcrest.MockitoHamcrest.argThat;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -65,7 +66,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.mockito.Matchers;
+import org.mockito.Mockito;
 
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
@@ -114,8 +115,8 @@ public class CaseDefinitionRestServiceInteractionTest extends AbstractRestServic
     CaseInstance mockCaseInstance = MockProvider.createMockCaseInstance();
 
     when(caseServiceMock.withCaseDefinition(MockProvider.EXAMPLE_CASE_DEFINITION_ID)).thenReturn(caseInstanceBuilder);
-    when(caseInstanceBuilder.businessKey(anyString())).thenReturn(caseInstanceBuilder);
-    when(caseInstanceBuilder.setVariables(Matchers.<Map<String, Object>>any())).thenReturn(caseInstanceBuilder);
+    when(caseInstanceBuilder.businessKey(any())).thenReturn(caseInstanceBuilder);
+    when(caseInstanceBuilder.setVariables(any())).thenReturn(caseInstanceBuilder);
     when(caseInstanceBuilder.create()).thenReturn(mockCaseInstance);
   }
 
@@ -128,7 +129,7 @@ public class CaseDefinitionRestServiceInteractionTest extends AbstractRestServic
 
     caseDefinitionQueryMock = mock(CaseDefinitionQuery.class);
     when(caseDefinitionQueryMock.caseDefinitionKey(MockProvider.EXAMPLE_CASE_DEFINITION_KEY)).thenReturn(caseDefinitionQueryMock);
-    when(caseDefinitionQueryMock.tenantIdIn(anyString())).thenReturn(caseDefinitionQueryMock);
+    when(caseDefinitionQueryMock.tenantIdIn(any())).thenReturn(caseDefinitionQueryMock);
     when(caseDefinitionQueryMock.withoutTenantId()).thenReturn(caseDefinitionQueryMock);
     when(caseDefinitionQueryMock.latestVersion()).thenReturn(caseDefinitionQueryMock);
     when(caseDefinitionQueryMock.singleResult()).thenReturn(mockCaseDefinition);
@@ -636,7 +637,7 @@ public class CaseDefinitionRestServiceInteractionTest extends AbstractRestServic
   public void testUpdateHistoryTimeToLive() {
     given()
       .pathParam("id", MockProvider.EXAMPLE_CASE_DEFINITION_ID)
-      .content(new HistoryTimeToLiveDto(5))
+      .body(new HistoryTimeToLiveDto(5))
       .contentType(ContentType.JSON)
     .then()
       .expect()
@@ -651,7 +652,7 @@ public class CaseDefinitionRestServiceInteractionTest extends AbstractRestServic
   public void testUpdateHistoryTimeToLiveNullValue() {
     given()
       .pathParam("id", MockProvider.EXAMPLE_CASE_DEFINITION_ID)
-      .content(new HistoryTimeToLiveDto())
+      .body(new HistoryTimeToLiveDto())
       .contentType(ContentType.JSON)
     .then()
       .expect()
@@ -672,7 +673,7 @@ public class CaseDefinitionRestServiceInteractionTest extends AbstractRestServic
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_CASE_DEFINITION_ID)
-      .content(new HistoryTimeToLiveDto(-1))
+      .body(new HistoryTimeToLiveDto(-1))
       .contentType(ContentType.JSON)
     .then()
       .expect()
@@ -695,7 +696,7 @@ public class CaseDefinitionRestServiceInteractionTest extends AbstractRestServic
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_CASE_DEFINITION_ID)
-      .content(new HistoryTimeToLiveDto(5))
+      .body(new HistoryTimeToLiveDto(5))
       .contentType(ContentType.JSON)
     .then()
       .expect()

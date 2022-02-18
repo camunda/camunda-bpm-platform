@@ -41,7 +41,6 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 
 import javax.ws.rs.core.Response.Status;
 import java.util.Arrays;
@@ -54,15 +53,15 @@ import java.util.Map;
 import static io.restassured.RestAssured.given;
 import static io.restassured.path.json.JsonPath.from;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DECISION_INSTANCE_ID;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyList;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -208,11 +207,7 @@ public class HistoricProcessInstanceRestServiceInteractionTest extends AbstractR
   public void testDeleteAsync() {
     List<String> ids = Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
     Batch batchEntity = MockProvider.createMockBatch();
-    when(historyServiceMock.deleteHistoricProcessInstancesAsync(
-        anyListOf(String.class),
-        any(HistoricProcessInstanceQuery.class),
-        anyString())
-    ).thenReturn(batchEntity);
+    when(historyServiceMock.deleteHistoricProcessInstancesAsync(anyList(), any(), anyString())).thenReturn(batchEntity);
 
     Map<String, Object> messageBodyJson = new HashMap<String, Object>();
     messageBodyJson.put("historicProcessInstanceIds", ids);
@@ -233,10 +228,7 @@ public class HistoricProcessInstanceRestServiceInteractionTest extends AbstractR
   @Test
   public void testDeleteAsyncWithQuery() {
     Batch batchEntity = MockProvider.createMockBatch();
-    when(historyServiceMock.deleteHistoricProcessInstancesAsync(
-        anyListOf(String.class),
-        any(HistoricProcessInstanceQuery.class),
-        anyString())
+    when(historyServiceMock.deleteHistoricProcessInstancesAsync(any(), any(), any())
     ).thenReturn(batchEntity);
 
     Map<String, Object> messageBodyJson = new HashMap<String, Object>();
@@ -253,7 +245,7 @@ public class HistoricProcessInstanceRestServiceInteractionTest extends AbstractR
     verifyBatchJson(response.asString());
 
     verify(historyServiceMock, times(1)).deleteHistoricProcessInstancesAsync(
-        eq((List<String>) null), any(HistoricProcessInstanceQuery.class), Mockito.eq(TEST_DELETE_REASON));
+        isNull(), isNull(), eq(TEST_DELETE_REASON));
   }
 
 

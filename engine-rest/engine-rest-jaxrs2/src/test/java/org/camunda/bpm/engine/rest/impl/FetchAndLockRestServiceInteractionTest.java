@@ -23,9 +23,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryTopicBuilder;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.identity.Group;
-import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.Tenant;
-import org.camunda.bpm.engine.identity.TenantQuery;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksDto.FetchExternalTaskTopicDto;
@@ -41,26 +39,26 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import javax.servlet.ServletContextEvent;
 import javax.ws.rs.core.Response.Status;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.anyList;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.inOrder;
@@ -108,7 +106,7 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
     when(fetchTopicBuilder.topic(any(String.class), anyLong()))
       .thenReturn(fetchTopicBuilder);
 
-    when(fetchTopicBuilder.variables(anyListOf(String.class)))
+    when(fetchTopicBuilder.variables(anyList()))
       .thenReturn(fetchTopicBuilder);
 
     when(fetchTopicBuilder.enableCustomObjectDeserialization())
@@ -122,10 +120,10 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
       .thenReturn(identityServiceMock);
 
     List<Group> groupMocks = MockProvider.createMockGroups();
-    groupIds = setupGroupQueryMock(groupMocks);
+    groupIds = groupMocks.stream().map(Group::getId).collect(Collectors.toList());
 
     List<Tenant> tenantMocks = Collections.singletonList(MockProvider.createMockTenant());
-    tenantIds = setupTenantQueryMock(tenantMocks);
+    tenantIds = tenantMocks.stream().map(Tenant::getId).collect(Collectors.toList());
 
     new FetchAndLockContextListener().contextInitialized(mock(ServletContextEvent.class, RETURNS_DEEP_STUBS));
   }
@@ -393,35 +391,6 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
     topicDto.setDeserializeValues(withDeserialization);
     fetchExternalTasksDto.setTopics(Collections.singletonList(topicDto));
     return fetchExternalTasksDto;
-  }
-
-  private List<String> setupGroupQueryMock(List<Group> groups) {
-    GroupQuery mockGroupQuery = mock(GroupQuery.class);
-
-    when(identityServiceMock.createGroupQuery()).thenReturn(mockGroupQuery);
-    when(mockGroupQuery.groupMember(anyString())).thenReturn(mockGroupQuery);
-    when(mockGroupQuery.list()).thenReturn(groups);
-
-    List<String> groupIds = new ArrayList<String>();
-    for (Group groupMock : groups) {
-      groupIds.add(groupMock.getId());
-    }
-    return groupIds;
-  }
-
-  private List<String> setupTenantQueryMock(List<Tenant> tenants) {
-    TenantQuery mockTenantQuery = mock(TenantQuery.class);
-
-    when(identityServiceMock.createTenantQuery()).thenReturn(mockTenantQuery);
-    when(mockTenantQuery.userMember(anyString())).thenReturn(mockTenantQuery);
-    when(mockTenantQuery.includingGroupsOfUser(anyBoolean())).thenReturn(mockTenantQuery);
-    when(mockTenantQuery.list()).thenReturn(tenants);
-
-    List<String> tenantIds = new ArrayList<String>();
-    for(Tenant tenant: tenants) {
-      tenantIds.add(tenant.getId());
-    }
-    return tenantIds;
   }
 
 }

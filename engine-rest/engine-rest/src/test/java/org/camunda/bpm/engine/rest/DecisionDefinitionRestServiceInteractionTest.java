@@ -22,9 +22,9 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.mockito.Matchers.anyMapOf;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.anyMap;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -131,7 +131,7 @@ public class DecisionDefinitionRestServiceInteractionTest extends AbstractRestSe
 
   private void setUpDecisionService() {
     decisionEvaluationBuilderMock = mock(DecisionsEvaluationBuilder.class);
-    when(decisionEvaluationBuilderMock.variables(anyMapOf(String.class, Object.class))).thenReturn(decisionEvaluationBuilderMock);
+    when(decisionEvaluationBuilderMock.variables(anyMap())).thenReturn(decisionEvaluationBuilderMock);
 
     decisionServiceMock = mock(DecisionService.class);
     when(decisionServiceMock.evaluateDecisionById(MockProvider.EXAMPLE_DECISION_DEFINITION_ID)).thenReturn(decisionEvaluationBuilderMock);
@@ -701,7 +701,7 @@ public class DecisionDefinitionRestServiceInteractionTest extends AbstractRestSe
   public void testUpdateHistoryTimeToLive() {
     given()
         .pathParam("id", MockProvider.EXAMPLE_DECISION_DEFINITION_ID)
-        .content(new HistoryTimeToLiveDto(5))
+        .body(new HistoryTimeToLiveDto(5))
         .contentType(ContentType.JSON)
         .then().expect()
         .statusCode(Status.NO_CONTENT.getStatusCode())
@@ -715,7 +715,7 @@ public class DecisionDefinitionRestServiceInteractionTest extends AbstractRestSe
   public void testUpdateHistoryTimeToLiveNullValue() {
     given()
         .pathParam("id", MockProvider.EXAMPLE_DECISION_DEFINITION_ID)
-        .content(new HistoryTimeToLiveDto())
+        .body(new HistoryTimeToLiveDto())
         .contentType(ContentType.JSON)
         .then().expect()
         .statusCode(Status.NO_CONTENT.getStatusCode())
@@ -735,7 +735,7 @@ public class DecisionDefinitionRestServiceInteractionTest extends AbstractRestSe
 
     given()
         .pathParam("id", MockProvider.EXAMPLE_DECISION_DEFINITION_ID)
-        .content(new HistoryTimeToLiveDto(-1))
+        .body(new HistoryTimeToLiveDto(-1))
         .contentType(ContentType.JSON)
         .then().expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode())
@@ -757,7 +757,7 @@ public class DecisionDefinitionRestServiceInteractionTest extends AbstractRestSe
 
     given()
         .pathParam("id", MockProvider.EXAMPLE_DECISION_DEFINITION_ID)
-        .content(new HistoryTimeToLiveDto(5))
+        .body(new HistoryTimeToLiveDto(5))
         .contentType(ContentType.JSON)
         .then().expect()
         .statusCode(Status.FORBIDDEN.getStatusCode())

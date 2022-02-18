@@ -20,11 +20,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.variable.VariableMap;
+import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
-import org.mockito.ArgumentMatcher;
 
-public class EqualsVariableMap extends ArgumentMatcher<Map<String, Object>> {
+public class EqualsVariableMap extends BaseMatcher<Map<String, Object>> {
 
   protected Map<String, Matcher<?>> matchers;
 

@@ -21,15 +21,13 @@ import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockBatch;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyMap;
-import static org.mockito.Matchers.anyMapOf;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.hamcrest.MockitoHamcrest.argThat;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -80,6 +78,7 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
+import org.mockito.Mockito;
 
 import io.restassured.http.ContentType;
 
@@ -136,40 +135,40 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
 
     // fetching
     fetchTopicBuilder = mock(ExternalTaskQueryTopicBuilder.class);
-    when(externalTaskService.fetchAndLock(anyInt(), any(String.class))).thenReturn(fetchTopicBuilder);
-    when(externalTaskService.fetchAndLock(anyInt(), any(String.class), any(Boolean.class))).thenReturn(fetchTopicBuilder);
+    when(externalTaskService.fetchAndLock(anyInt(), any())).thenReturn(fetchTopicBuilder);
+    when(externalTaskService.fetchAndLock(anyInt(), any(), anyBoolean())).thenReturn(fetchTopicBuilder);
 
-    when(fetchTopicBuilder.topic(any(String.class), anyLong())).thenReturn(fetchTopicBuilder);
-    when(fetchTopicBuilder.variables(anyListOf(String.class))).thenReturn(fetchTopicBuilder);
-    when(fetchTopicBuilder.variables(any(String[].class))).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.topic(any(), anyLong())).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.variables(Mockito.<List<String>>any())).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.variables(Mockito.<String[]>any())).thenReturn(fetchTopicBuilder);
     when(fetchTopicBuilder.enableCustomObjectDeserialization()).thenReturn(fetchTopicBuilder);
     when(fetchTopicBuilder.localVariables()).thenReturn(fetchTopicBuilder);
-    when(fetchTopicBuilder.topic(any(String.class), anyLong())).thenReturn(fetchTopicBuilder);
-    when(fetchTopicBuilder.businessKey(any(String.class))).thenReturn(fetchTopicBuilder);
-    when(fetchTopicBuilder.processDefinitionId(any(String.class))).thenReturn(fetchTopicBuilder);
-    when(fetchTopicBuilder.processDefinitionIdIn(any(String.class))).thenReturn(fetchTopicBuilder);
-    when(fetchTopicBuilder.processDefinitionKey(any(String.class))).thenReturn(fetchTopicBuilder);
-    when(fetchTopicBuilder.processDefinitionKeyIn(any(String.class))).thenReturn(fetchTopicBuilder);
-    when(fetchTopicBuilder.processInstanceVariableEquals(anyMapOf(String.class, Object.class))).thenReturn(fetchTopicBuilder);
-    when(fetchTopicBuilder.processDefinitionVersionTag(anyString())).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.topic(any(), anyLong())).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.businessKey(any())).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.processDefinitionId(any())).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.processDefinitionIdIn(Mockito.<String>any())).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.processDefinitionKey(any())).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.processDefinitionKeyIn(Mockito.<String>any())).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.processInstanceVariableEquals(any())).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.processDefinitionVersionTag(any())).thenReturn(fetchTopicBuilder);
     when(fetchTopicBuilder.withoutTenantId()).thenReturn(fetchTopicBuilder);
-    when(fetchTopicBuilder.tenantIdIn(any(String.class))).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.tenantIdIn(Mockito.<String>any())).thenReturn(fetchTopicBuilder);
     when(fetchTopicBuilder.includeExtensionProperties()).thenReturn(fetchTopicBuilder);
 
     Batch batch = createMockBatch();
     updateRetriesBuilder = mock(UpdateExternalTaskRetriesBuilder.class);
     when(externalTaskService.updateRetries()).thenReturn(updateRetriesBuilder);
 
-    when(updateRetriesBuilder.externalTaskIds(anyListOf(String.class))).thenReturn(updateRetriesBuilder);
-    when(updateRetriesBuilder.processInstanceIds(anyListOf(String.class))).thenReturn(updateRetriesBuilder);
-    when(updateRetriesBuilder.externalTaskQuery(any(ExternalTaskQuery.class))).thenReturn(updateRetriesBuilder);
-    when(updateRetriesBuilder.processInstanceQuery(any(ProcessInstanceQuery.class))).thenReturn(updateRetriesBuilder);
-    when(updateRetriesBuilder.historicProcessInstanceQuery(any(HistoricProcessInstanceQuery.class))).thenReturn(updateRetriesBuilder);
+    when(updateRetriesBuilder.externalTaskIds(Mockito.<List<String>>any())).thenReturn(updateRetriesBuilder);
+    when(updateRetriesBuilder.processInstanceIds(Mockito.<List<String>>any())).thenReturn(updateRetriesBuilder);
+    when(updateRetriesBuilder.externalTaskQuery(any())).thenReturn(updateRetriesBuilder);
+    when(updateRetriesBuilder.processInstanceQuery(any())).thenReturn(updateRetriesBuilder);
+    when(updateRetriesBuilder.historicProcessInstanceQuery(any())).thenReturn(updateRetriesBuilder);
     when(updateRetriesBuilder.setAsync(anyInt())).thenReturn(batch);
 
     // querying
     externalTaskQueryMock = mock(ExternalTaskQuery.class);
-    when(externalTaskQueryMock.externalTaskId(any(String.class))).thenReturn(externalTaskQueryMock);
+    when(externalTaskQueryMock.externalTaskId(any())).thenReturn(externalTaskQueryMock);
     when(externalTaskService.createExternalTaskQuery()).thenReturn(externalTaskQueryMock);
 
     // external task
@@ -592,7 +591,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
   public void testCompleteNonExistingTask() {
     doThrow(new NotFoundException())
       .when(externalTaskService)
-      .complete(any(String.class), any(String.class), anyMapOf(String.class, Object.class), anyMapOf(String.class, Object.class));
+      .complete(any(), any(), any(), any());
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put("workerId", "aWorkerId");
@@ -614,7 +613,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
   public void testCompleteThrowsAuthorizationException() {
     doThrow(new AuthorizationException("aMessage"))
       .when(externalTaskService)
-      .complete(any(String.class), any(String.class), anyMapOf(String.class, Object.class), anyMapOf(String.class, Object.class));
+      .complete(any(), any(), any(), any());
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put("workerId", "aWorkerId");
@@ -636,7 +635,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
   public void testCompleteThrowsBadUserRequestException() {
     doThrow(new BadUserRequestException("aMessage"))
       .when(externalTaskService)
-      .complete(any(String.class), any(String.class), anyMapOf(String.class, Object.class), anyMapOf(String.class, Object.class));
+      .complete(any(), any(), any(), any());
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put("workerId", "aWorkerId");
@@ -803,7 +802,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
   public void testHandleFailureNonExistingTask() {
     doThrow(new NotFoundException())
       .when(externalTaskService)
-      .handleFailure(any(String.class), any(String.class), any(String.class),any(String.class), anyInt(), anyLong(), anyMap(), anyMap());
+      .handleFailure(any(), any(), any(), any(), anyInt(), anyLong(), any(), any());
 
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("workerId", "aWorkerId");
@@ -828,7 +827,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
   public void testHandleFailureThrowsAuthorizationException() {
     doThrow(new AuthorizationException("aMessage"))
       .when(externalTaskService)
-      .handleFailure(any(String.class), any(String.class), any(String.class),any(String.class), anyInt(), anyLong(), anyMap(), anyMap());
+      .handleFailure(any(), any(), any(),any(), anyInt(), anyLong(), any(), any());
 
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("workerId", "aWorkerId");
@@ -853,7 +852,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
   public void testHandleFailureThrowsBadUserRequestException() {
     doThrow(new BadUserRequestException("aMessage"))
       .when(externalTaskService)
-      .handleFailure(any(String.class), any(String.class), any(String.class),any(String.class), anyInt(), anyLong(), anyMap(), anyMap());
+      .handleFailure(any(), any(), any(),any(), anyInt(), anyLong(), any(), any());
 
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("workerId", "aWorkerId");
@@ -1005,7 +1004,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
   public void testHandleBpmnErrorNonExistingTask() {
     doThrow(new NotFoundException())
       .when(externalTaskService)
-      .handleBpmnError(any(String.class), any(String.class), any(String.class), any(String.class), anyMapOf(String.class, Object.class));
+      .handleBpmnError(any(), any(), any(), any(), any());
 
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("workerId", "aWorkerId");
@@ -1028,7 +1027,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
   public void testHandleBpmnErrorThrowsAuthorizationException() {
     doThrow(new AuthorizationException("aMessage"))
       .when(externalTaskService)
-      .handleBpmnError(any(String.class), any(String.class), any(String.class), any(String.class), anyMapOf(String.class, Object.class));
+      .handleBpmnError(any(), any(), any(), any(), any());
 
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("workerId", "aWorkerId");
@@ -1051,7 +1050,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
   public void testHandleBpmnErrorThrowsBadUserRequestException() {
     doThrow(new BadUserRequestException("aMessage"))
       .when(externalTaskService)
-      .handleBpmnError(any(String.class), any(String.class), any(String.class), any(String.class), anyMapOf(String.class, Object.class));
+      .handleBpmnError(any(), any(), any(), any(), any());
 
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("workerId", "aWorkerId");
@@ -1153,7 +1152,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
 
   @Test
   public void testSetPriorityNonExistingTask() {
-    doThrow(new NotFoundException()).when(externalTaskService).setPriority(any(String.class), anyInt());
+    doThrow(new NotFoundException()).when(externalTaskService).setPriority(any(), anyLong());
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put("priority", "5");
@@ -1173,7 +1172,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
 
   @Test
   public void testSetPriorityThrowsAuthorizationException() {
-    doThrow(new AuthorizationException("aMessage")).when(externalTaskService).setPriority(any(String.class), anyInt());
+    doThrow(new AuthorizationException("aMessage")).when(externalTaskService).setPriority(any(), anyLong());
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put("priority", "5");

@@ -100,6 +100,12 @@
       <scope>provided</scope>
     </dependency>
 
+    <dependency>
+      <groupId>com.sun.xml.bind</groupId>
+      <artifactId>jaxb-impl</artifactId>
+      <scope>test</scope>
+    </dependency>
+
     <!--
       needed for offline shrinkwrap (in particular CustomJacksonDateFormatTest), 
       BOMs must be installed before this module is built
@@ -159,27 +165,13 @@
     <dependency>
       <groupId>io.rest-assured</groupId>
       <artifactId>rest-assured</artifactId>
-      <version>3.1.1</version>
       <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.codehaus.groovy</groupId>
-          <artifactId>groovy</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpcore</artifactId>
       <version>4.4.5</version>
-      <scope>test</scope>
-    </dependency>
-
-    <!-- version must be the same as used by restassured -->
-    <dependency>
-      <groupId>org.codehaus.groovy</groupId>
-      <artifactId>groovy-all</artifactId>
       <scope>test</scope>
     </dependency>
 

@@ -20,14 +20,12 @@ import static io.restassured.RestAssured.expect;
 import static io.restassured.RestAssured.given;
 import static io.restassured.path.json.JsonPath.from;
 import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +38,6 @@ import org.assertj.core.util.Arrays;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.rest.helper.EqualsList;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.junit.Assert;
@@ -146,7 +143,7 @@ public class GroupRestServiceQueryTest extends AbstractRestServiceTest {
 
     RequestSpecification requestSpecification = given().contentType(POST_JSON_CONTENT_TYPE);
     for (Entry<String, Object> paramEntry : queryParameters.entrySet()) {
-      requestSpecification.parameter(paramEntry.getKey(), paramEntry.getValue());
+      requestSpecification.param(paramEntry.getKey(), paramEntry.getValue());
     }
 
     requestSpecification.expect().statusCode(Status.OK.getStatusCode())

@@ -22,12 +22,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
@@ -113,7 +113,7 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.Matchers;
+import org.mockito.Mockito;
 
 import io.restassured.http.ContentType;
 import org.camunda.bpm.engine.runtime.MessageCorrelationResult;
@@ -353,7 +353,7 @@ public class ProcessEngineRestServiceTest extends
     when(mockMessageCorrelationBuilder.processInstanceId(anyString())).thenReturn(mockMessageCorrelationBuilder);
     when(mockMessageCorrelationBuilder.processInstanceBusinessKey(anyString())).thenReturn(mockMessageCorrelationBuilder);
     when(mockMessageCorrelationBuilder.processInstanceVariableEquals(anyString(), any())).thenReturn(mockMessageCorrelationBuilder);
-    when(mockMessageCorrelationBuilder.setVariables(Matchers.<Map<String,Object>>any())).thenReturn(mockMessageCorrelationBuilder);
+    when(mockMessageCorrelationBuilder.setVariables(Mockito.any())).thenReturn(mockMessageCorrelationBuilder);
     when(mockMessageCorrelationBuilder.setVariable(anyString(), any())).thenReturn(mockMessageCorrelationBuilder);
 
   }
@@ -489,7 +489,7 @@ public class ProcessEngineRestServiceTest extends
     .when().get(PROCESS_DEFINITION_URL);
 
     verify(mockRepoService).getProcessDefinition(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID));
-    verifyZeroInteractions(processEngine);
+    verifyNoInteractions(processEngine);
   }
 
   @Test
@@ -501,7 +501,7 @@ public class ProcessEngineRestServiceTest extends
     .when().get(PROCESS_INSTANCE_URL);
 
     verify(mockRuntimeService).createProcessInstanceQuery();
-    verifyZeroInteractions(processEngine);
+    verifyNoInteractions(processEngine);
   }
 
   @Test
@@ -514,7 +514,7 @@ public class ProcessEngineRestServiceTest extends
     .when().get(TASK_URL);
 
     verify(mockTaskService).createTaskQuery();
-    verifyZeroInteractions(processEngine);
+    verifyNoInteractions(processEngine);
   }
 
   @Test
@@ -526,7 +526,7 @@ public class ProcessEngineRestServiceTest extends
     .when().get(IDENTITY_GROUPS_URL);
 
     verify(mockIdentityService).createUserQuery();
-    verifyZeroInteractions(processEngine);
+    verifyNoInteractions(processEngine);
   }
 
   @Test
@@ -542,7 +542,7 @@ public class ProcessEngineRestServiceTest extends
     verify(mockRuntimeService).createMessageCorrelation(eq(messageName));
     verify(mockMessageCorrelationBuilder).correlateWithResult();
     verifyNoMoreInteractions(mockMessageCorrelationBuilder);
-    verifyZeroInteractions(processEngine);
+    verifyNoInteractions(processEngine);
   }
 
   @Test
@@ -559,7 +559,7 @@ public class ProcessEngineRestServiceTest extends
     verify(mockRuntimeService).createMessageCorrelation(eq(messageName));
     verify(mockMessageCorrelationBuilder).correlateWithResult();
     verifyNoMoreInteractions(mockMessageCorrelationBuilder);
-    verifyZeroInteractions(processEngine);
+    verifyNoInteractions(processEngine);
   }
 
 
@@ -571,7 +571,7 @@ public class ProcessEngineRestServiceTest extends
     .when().get(EXECUTION_URL);
 
     verify(mockRuntimeService).createExecutionQuery();
-    verifyZeroInteractions(processEngine);
+    verifyNoInteractions(processEngine);
   }
 
   @Test
@@ -582,7 +582,7 @@ public class ProcessEngineRestServiceTest extends
     .when().get(VARIABLE_INSTANCE_URL);
 
     verify(mockRuntimeService).createVariableInstanceQuery();
-    verifyZeroInteractions(processEngine);
+    verifyNoInteractions(processEngine);
   }
 
   @Test
@@ -593,7 +593,7 @@ public class ProcessEngineRestServiceTest extends
     .when().get(USER_URL);
 
     verify(mockIdentityService).createUserQuery();
-    verifyZeroInteractions(processEngine);
+    verifyNoInteractions(processEngine);
   }
 
   @Test
@@ -604,7 +604,7 @@ public class ProcessEngineRestServiceTest extends
     .when().get(GROUP_URL);
 
     verify(mockIdentityService).createGroupQuery();
-    verifyZeroInteractions(processEngine);
+    verifyNoInteractions(processEngine);
   }
 
   @Test
@@ -626,7 +626,7 @@ public class ProcessEngineRestServiceTest extends
         .get(HISTORY_ACTIVITY_INSTANCE_URL);
 
     verify(mockHistoryService).createHistoricActivityInstanceQuery();
-    verifyZeroInteractions(processEngine);
+    verifyNoInteractions(processEngine);
   }
 
   @Test
@@ -640,7 +640,7 @@ public class ProcessEngineRestServiceTest extends
         .get(HISTORY_PROCESS_INSTANCE_URL);
 
     verify(mockHistoryService).createHistoricProcessInstanceQuery();
-    verifyZeroInteractions(processEngine);
+    verifyNoInteractions(processEngine);
   }
 
   @Test
@@ -654,7 +654,7 @@ public class ProcessEngineRestServiceTest extends
         .get(HISTORY_VARIABLE_INSTANCE_URL);
 
     verify(mockHistoryService).createHistoricVariableInstanceQuery();
-    verifyZeroInteractions(processEngine);
+    verifyNoInteractions(processEngine);
   }
 
   @Ignore
@@ -686,7 +686,7 @@ public class ProcessEngineRestServiceTest extends
         .get(HISTORY_BINARY_VARIABLE_INSTANCE_URL);
 
     verify(mockHistoryService).createHistoricVariableInstanceQuery();
-    verifyZeroInteractions(processEngine);
+    verifyNoInteractions(processEngine);
   }
 
   @Test
@@ -701,7 +701,7 @@ public class ProcessEngineRestServiceTest extends
         .get(HISTORY_ACTIVITY_STATISTICS_URL);
 
     verify(mockHistoryService).createHistoricActivityStatisticsQuery(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
-    verifyZeroInteractions(processEngine);
+    verifyNoInteractions(processEngine);
   }
 
   @Test
@@ -715,7 +715,7 @@ public class ProcessEngineRestServiceTest extends
         .get(JOB_DEFINITION_URL);
 
     verify(mockManagementService).createJobDefinitionQuery();
-    verifyZeroInteractions(processEngine);
+    verifyNoInteractions(processEngine);
   }
 
   @Test
@@ -729,7 +729,7 @@ public class ProcessEngineRestServiceTest extends
         .get(HISTORY_DETAIL_URL);
 
     verify(mockHistoryService).createHistoricDetailQuery();
-    verifyZeroInteractions(processEngine);
+    verifyNoInteractions(processEngine);
   }
 
   @Ignore
@@ -759,7 +759,7 @@ public class ProcessEngineRestServiceTest extends
         .get(HISTORY_BINARY_DETAIL_URL);
 
     verify(mockHistoryService).createHistoricDetailQuery();
-    verifyZeroInteractions(processEngine);
+    verifyNoInteractions(processEngine);
   }
 
   @Test
@@ -773,7 +773,7 @@ public class ProcessEngineRestServiceTest extends
         .get(HISTORY_TASK_INSTANCE_URL);
 
     verify(mockHistoryService).createHistoricTaskInstanceQuery();
-    verifyZeroInteractions(processEngine);
+    verifyNoInteractions(processEngine);
   }
 
   @Test
@@ -787,7 +787,7 @@ public class ProcessEngineRestServiceTest extends
         .get(INCIDENT_URL);
 
     verify(mockRuntimeService).createIncidentQuery();
-    verifyZeroInteractions(processEngine);
+    verifyNoInteractions(processEngine);
   }
 
   @Test
@@ -801,7 +801,7 @@ public class ProcessEngineRestServiceTest extends
         .get(HISTORY_INCIDENT_URL);
 
     verify(mockHistoryService).createHistoricIncidentQuery();
-    verifyZeroInteractions(processEngine);
+    verifyNoInteractions(processEngine);
   }
 
   @Test
@@ -813,7 +813,7 @@ public class ProcessEngineRestServiceTest extends
     .when().get(DEPLOYMENT_URL);
 
     verify(mockRepoService).createDeploymentQuery();
-    verifyZeroInteractions(processEngine);
+    verifyNoInteractions(processEngine);
   }
 
   @Test
@@ -828,7 +828,7 @@ public class ProcessEngineRestServiceTest extends
     .when().get(DEPLOYMENT_REST_SERVICE_URL + "/registered");
 
     verify(mockManagementService).getRegisteredDeployments();
-    verifyZeroInteractions(processEngine);
+    verifyNoInteractions(processEngine);
 
     assertThat(response.getBody().as(Set.class)).isEqualTo(registeredDeployments);
   }
@@ -844,7 +844,7 @@ public class ProcessEngineRestServiceTest extends
         .get(CASE_DEFINITION_URL);
 
     verify(mockRepoService).createCaseDefinitionQuery();
-    verifyZeroInteractions(processEngine);
+    verifyNoInteractions(processEngine);
   }
 
   @Test
@@ -858,7 +858,7 @@ public class ProcessEngineRestServiceTest extends
         .get(CASE_INSTANCE_URL);
 
     verify(mockCaseService).createCaseInstanceQuery();
-    verifyZeroInteractions(processEngine);
+    verifyNoInteractions(processEngine);
   }
 
   @Test
@@ -872,7 +872,7 @@ public class ProcessEngineRestServiceTest extends
         .get(CASE_EXECUTION_URL);
 
     verify(mockCaseService).createCaseExecutionQuery();
-    verifyZeroInteractions(processEngine);
+    verifyNoInteractions(processEngine);
   }
 
   @Test
@@ -886,7 +886,7 @@ public class ProcessEngineRestServiceTest extends
         .get(FILTER_URL);
 
     verify(mockFilterService).createFilterQuery();
-    verifyZeroInteractions(processEngine);
+    verifyNoInteractions(processEngine);
   }
 
   @Test
@@ -900,7 +900,7 @@ public class ProcessEngineRestServiceTest extends
         .get(HISTORY_JOB_LOG_URL);
 
     verify(mockHistoryService).createHistoricJobLogQuery();
-    verifyZeroInteractions(processEngine);
+    verifyNoInteractions(processEngine);
   }
 
   @Test
@@ -914,7 +914,7 @@ public class ProcessEngineRestServiceTest extends
         .get(EXTERNAL_TASKS_URL);
 
     verify(mockExternalTaskService).createExternalTaskQuery();
-    verifyZeroInteractions(processEngine);
+    verifyNoInteractions(processEngine);
   }
 
   @Test
@@ -928,6 +928,6 @@ public class ProcessEngineRestServiceTest extends
       .get(HISTORY_EXTERNAL_TASK_LOG_URL);
 
     verify(mockHistoryService).createHistoricExternalTaskLogQuery();
-    verifyZeroInteractions(processEngine);
+    verifyNoInteractions(processEngine);
   }
 }

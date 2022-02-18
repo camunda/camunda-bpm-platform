@@ -17,8 +17,8 @@
 package org.camunda.bpm.engine.rest.helper;
 
 import static org.camunda.bpm.engine.rest.util.DateTimeUtils.withTimezone;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -2802,7 +2802,7 @@ public abstract class MockProvider {
 
     when(query.list()).thenReturn(mockFilters);
     when(query.count()).thenReturn((long) mockFilters.size());
-    when(query.filterId(anyString())).thenReturn(query);
+    when(query.filterId(any())).thenReturn(query);
     when(query.singleResult()).thenReturn(mockFilters.get(0));
 
     FilterQuery nonExistingQuery = mock(FilterQuery.class);
@@ -2817,12 +2817,12 @@ public abstract class MockProvider {
 
     MetricsQuery query = mock(MetricsQuery.class);
 
-    when(query.name(anyString())).thenReturn(query);
-    when(query.reporter(any(String.class))).thenReturn(query);
-    when(query.limit(any(Integer.class))).thenReturn(query);
-    when(query.offset(any(Integer.class))).thenReturn(query);
-    when(query.startDate(any(Date.class))).thenReturn(query);
-    when(query.endDate(any(Date.class))).thenReturn(query);
+    when(query.name(any())).thenReturn(query);
+    when(query.reporter(any())).thenReturn(query);
+    when(query.limit(anyInt())).thenReturn(query);
+    when(query.offset(anyInt())).thenReturn(query);
+    when(query.startDate(any())).thenReturn(query);
+    when(query.endDate(any())).thenReturn(query);
 
     return query;
 

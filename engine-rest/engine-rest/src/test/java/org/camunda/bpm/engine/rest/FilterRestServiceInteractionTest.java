@@ -52,19 +52,16 @@ import static org.camunda.bpm.engine.variable.Variables.stringValue;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.Matchers.emptyOrNullString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.anyVararg;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isNull;
+import static org.mockito.hamcrest.MockitoHamcrest.argThat;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.isNull;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -88,8 +85,6 @@ import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.TaskService;
-import org.camunda.bpm.engine.authorization.Permission;
-import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.filter.FilterQuery;
@@ -114,6 +109,7 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import io.restassured.response.Response;
 import org.mockito.ArgumentCaptor;
@@ -178,37 +174,37 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
 
     when(filterServiceMock.singleResult(eq(EXAMPLE_FILTER_ID)))
       .thenReturn(mockTasks.get(0));
-    when(filterServiceMock.singleResult(eq(EXAMPLE_FILTER_ID), any(Query.class)))
+    when(filterServiceMock.singleResult(eq(EXAMPLE_FILTER_ID), any()))
       .thenReturn(mockTasks.get(0));
     when(filterServiceMock.list(eq(EXAMPLE_FILTER_ID)))
       .thenReturn(mockTasks);
-    when(filterServiceMock.list(eq(EXAMPLE_FILTER_ID), any(Query.class)))
+    when(filterServiceMock.list(eq(EXAMPLE_FILTER_ID), any()))
       .thenReturn(mockTasks);
     when(filterServiceMock.listPage(eq(EXAMPLE_FILTER_ID), anyInt(), anyInt()))
       .thenReturn(mockTasks);
-    when(filterServiceMock.listPage(eq(EXAMPLE_FILTER_ID), any(Query.class), anyInt(), anyInt()))
+    when(filterServiceMock.listPage(eq(EXAMPLE_FILTER_ID), any(), anyInt(), anyInt()))
       .thenReturn(mockTasks);
     when(filterServiceMock.count(eq(EXAMPLE_FILTER_ID)))
       .thenReturn((long) 1);
-    when(filterServiceMock.count(eq(EXAMPLE_FILTER_ID), any(Query.class)))
+    when(filterServiceMock.count(eq(EXAMPLE_FILTER_ID), any()))
       .thenReturn((long) 1);
 
     doThrow(new NullValueException("No filter found with given id"))
       .when(filterServiceMock).singleResult(eq(MockProvider.NON_EXISTING_ID));
     doThrow(new NullValueException("No filter found with given id"))
-      .when(filterServiceMock).singleResult(eq(MockProvider.NON_EXISTING_ID), any(Query.class));
+      .when(filterServiceMock).singleResult(eq(MockProvider.NON_EXISTING_ID), any());
     doThrow(new NullValueException("No filter found with given id"))
       .when(filterServiceMock).list(eq(MockProvider.NON_EXISTING_ID));
     doThrow(new NullValueException("No filter found with given id"))
-      .when(filterServiceMock).list(eq(MockProvider.NON_EXISTING_ID), any(Query.class));
+      .when(filterServiceMock).list(eq(MockProvider.NON_EXISTING_ID), any());
     doThrow(new NullValueException("No filter found with given id"))
       .when(filterServiceMock).listPage(eq(MockProvider.NON_EXISTING_ID), anyInt(), anyInt());
     doThrow(new NullValueException("No filter found with given id"))
-      .when(filterServiceMock).listPage(eq(MockProvider.NON_EXISTING_ID), any(Query.class), anyInt(), anyInt());
+      .when(filterServiceMock).listPage(eq(MockProvider.NON_EXISTING_ID), any(), anyInt(), anyInt());
     doThrow(new NullValueException("No filter found with given id"))
       .when(filterServiceMock).count(eq(MockProvider.NON_EXISTING_ID));
     doThrow(new NullValueException("No filter found with given id"))
-      .when(filterServiceMock).count(eq(MockProvider.NON_EXISTING_ID), any(Query.class));
+      .when(filterServiceMock).count(eq(MockProvider.NON_EXISTING_ID), any());
     doThrow(new NullValueException("No filter found with given id"))
       .when(filterServiceMock).deleteFilter(eq(MockProvider.NON_EXISTING_ID));
 
@@ -226,9 +222,9 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
     variableInstanceQueryMock = mock(VariableInstanceQueryImpl.class);
     when(processEngine.getRuntimeService().createVariableInstanceQuery())
       .thenReturn(variableInstanceQueryMock);
-    when(variableInstanceQueryMock.variableScopeIdIn((String) anyVararg()))
+    when(variableInstanceQueryMock.variableScopeIdIn(any()))
       .thenReturn(variableInstanceQueryMock);
-    when(variableInstanceQueryMock.variableNameIn((String) anyVararg()))
+    when(variableInstanceQueryMock.variableNameIn(any()))
       .thenReturn(variableInstanceQueryMock);
     when(variableInstanceQueryMock.disableBinaryFetching()).thenReturn(variableInstanceQueryMock);
     when(variableInstanceQueryMock.disableCustomObjectDeserialization()).thenReturn(variableInstanceQueryMock);
@@ -450,7 +446,7 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
       .pathParam("id", EXAMPLE_FILTER_ID)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
-      .body("query.sorting", isEmptyOrNullString())
+      .body("query.sorting", emptyOrNullString())
     .when()
       .get(SINGLE_FILTER_URL);
   }
@@ -802,12 +798,12 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
     .when()
       .get(EXECUTE_SINGLE_RESULT_FILTER_URL);
 
-    verify(filterServiceMock).singleResult(eq(EXAMPLE_FILTER_ID), isNull(Query.class));
+    verify(filterServiceMock).singleResult(eq(EXAMPLE_FILTER_ID), isNull());
   }
 
   @Test
   public void testEmptySingleResult() {
-    when(filterServiceMock.singleResult(anyString(), any(Query.class))).thenReturn(null);
+    when(filterServiceMock.singleResult(any(), any())).thenReturn(null);
 
     given()
       .header(ACCEPT_JSON_HEADER)
@@ -817,13 +813,13 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
     .when()
       .get(EXECUTE_SINGLE_RESULT_FILTER_URL);
 
-    verify(filterServiceMock).singleResult(eq(EXAMPLE_FILTER_ID), isNull(Query.class));
+    verify(filterServiceMock).singleResult(eq(EXAMPLE_FILTER_ID), isNull());
   }
 
   @Test
   public void testInvalidSingleResult() {
     doThrow(new ProcessEngineException("More than one result found"))
-      .when(filterServiceMock).singleResult(anyString(), any(Query.class));
+      .when(filterServiceMock).singleResult(any(), any());
 
     given()
       .header(ACCEPT_JSON_HEADER)
@@ -833,7 +829,7 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
     .when()
       .get(EXECUTE_SINGLE_RESULT_FILTER_URL);
 
-    verify(filterServiceMock).singleResult(eq(EXAMPLE_FILTER_ID), isNull(Query.class));
+    verify(filterServiceMock).singleResult(eq(EXAMPLE_FILTER_ID), isNull());
   }
 
   @Test
@@ -846,12 +842,12 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
       .when()
       .get(EXECUTE_SINGLE_RESULT_FILTER_URL);
 
-    verify(filterServiceMock).singleResult(eq(EXAMPLE_FILTER_ID),isNull(Query.class));
+    verify(filterServiceMock).singleResult(eq(EXAMPLE_FILTER_ID),isNull());
   }
 
   @Test
   public void testEmptyHalSingleResult() {
-    when(filterServiceMock.singleResult(anyString(), any(Query.class))).thenReturn(null);
+    when(filterServiceMock.singleResult(any(), any())).thenReturn(null);
 
     given()
       .header(ACCEPT_HAL_HEADER)
@@ -863,13 +859,13 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
     .when()
       .get(EXECUTE_SINGLE_RESULT_FILTER_URL);
 
-    verify(filterServiceMock).singleResult(eq(EXAMPLE_FILTER_ID), isNull(Query.class));
+    verify(filterServiceMock).singleResult(eq(EXAMPLE_FILTER_ID), isNull());
   }
 
   @Test
   public void testInvalidHalSingleResult() {
     doThrow(new ProcessEngineException("More than one result found"))
-      .when(filterServiceMock).singleResult(anyString(), any(Query.class));
+      .when(filterServiceMock).singleResult(any(), any());
 
     given()
       .header(ACCEPT_HAL_HEADER)
@@ -879,7 +875,7 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
     .when()
       .get(EXECUTE_SINGLE_RESULT_FILTER_URL);
 
-    verify(filterServiceMock).singleResult(eq(EXAMPLE_FILTER_ID), isNull(Query.class));
+    verify(filterServiceMock).singleResult(eq(EXAMPLE_FILTER_ID), isNull());
   }
 
   @Test
@@ -892,7 +888,7 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
     .when()
       .get(EXECUTE_SINGLE_RESULT_FILTER_URL);
 
-    verify(filterServiceMock).singleResult(eq(MockProvider.NON_EXISTING_ID), isNull(Query.class));
+    verify(filterServiceMock).singleResult(eq(MockProvider.NON_EXISTING_ID), isNull());
   }
 
   @Test
@@ -907,7 +903,7 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
     .when()
       .post(EXECUTE_SINGLE_RESULT_FILTER_URL);
 
-    verify(filterServiceMock).singleResult(eq(EXAMPLE_FILTER_ID), any(Query.class));
+    verify(filterServiceMock).singleResult(eq(EXAMPLE_FILTER_ID), any());
   }
 
   @Test
@@ -922,7 +918,7 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
     .when()
       .post(EXECUTE_SINGLE_RESULT_FILTER_URL);
 
-    verify(filterServiceMock).singleResult(eq(EXAMPLE_FILTER_ID), any(Query.class));
+    verify(filterServiceMock).singleResult(eq(EXAMPLE_FILTER_ID), any());
   }
 
   @Test
@@ -983,12 +979,12 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
     .when()
       .get(EXECUTE_LIST_FILTER_URL);
 
-    verify(filterServiceMock).list(eq(EXAMPLE_FILTER_ID), isNull(Query.class));
+    verify(filterServiceMock).list(eq(EXAMPLE_FILTER_ID), isNull());
   }
 
   @Test
   public void testEmptyList() {
-    when(filterServiceMock.list(anyString(), any(Query.class))).thenReturn(Collections.emptyList());
+    when(filterServiceMock.list(any(), any())).thenReturn(Collections.emptyList());
 
     given()
       .header(ACCEPT_JSON_HEADER)
@@ -999,7 +995,7 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
     .when()
       .get(EXECUTE_LIST_FILTER_URL);
 
-    verify(filterServiceMock).list(eq(EXAMPLE_FILTER_ID), isNull(Query.class));
+    verify(filterServiceMock).list(eq(EXAMPLE_FILTER_ID), isNull());
   }
 
   @Test
@@ -1013,13 +1009,13 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
     .when()
       .get(EXECUTE_LIST_FILTER_URL);
 
-    verify(filterServiceMock).list(eq(EXAMPLE_FILTER_ID), isNull(Query.class));
+    verify(filterServiceMock).list(eq(EXAMPLE_FILTER_ID), isNull());
   }
 
   @Test
   public void testEmptyHalList() {
-    when(filterServiceMock.list(anyString(), any(Query.class))).thenReturn(Collections.emptyList());
-    when(filterServiceMock.count(anyString(), any(Query.class))).thenReturn(0l);
+    when(filterServiceMock.list(any(), any())).thenReturn(Collections.emptyList());
+    when(filterServiceMock.count(any(), any())).thenReturn(0l);
 
     given()
       .header(ACCEPT_HAL_HEADER)
@@ -1032,7 +1028,7 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
     .when()
       .get(EXECUTE_LIST_FILTER_URL);
 
-    verify(filterServiceMock).list(eq(EXAMPLE_FILTER_ID), isNull(Query.class));
+    verify(filterServiceMock).list(eq(EXAMPLE_FILTER_ID), isNull());
   }
 
   @Test
@@ -1045,7 +1041,7 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
     .when()
       .get(EXECUTE_LIST_FILTER_URL);
 
-    verify(filterServiceMock).list(eq(MockProvider.NON_EXISTING_ID), isNull(Query.class));
+    verify(filterServiceMock).list(eq(MockProvider.NON_EXISTING_ID), isNull());
   }
 
   @Test
@@ -1061,7 +1057,7 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
     .when()
       .get(EXECUTE_LIST_FILTER_URL);
 
-    verify(filterServiceMock).listPage(eq(EXAMPLE_FILTER_ID), isNull(Query.class), eq(1), eq(2));
+    verify(filterServiceMock).listPage(eq(EXAMPLE_FILTER_ID), isNull(), eq(1), eq(2));
   }
 
   @Test
@@ -1077,7 +1073,7 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
     .when()
       .post(EXECUTE_LIST_FILTER_URL);
 
-    verify(filterServiceMock).list(eq(EXAMPLE_FILTER_ID), any(Query.class));
+    verify(filterServiceMock).list(eq(EXAMPLE_FILTER_ID), any());
   }
 
   @Test
@@ -1093,7 +1089,7 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
     .when()
       .post(EXECUTE_LIST_FILTER_URL);
 
-    verify(filterServiceMock).list(eq(EXAMPLE_FILTER_ID), any(Query.class));
+    verify(filterServiceMock).list(eq(EXAMPLE_FILTER_ID), any());
   }
 
   @Test
@@ -1111,7 +1107,7 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
     .when()
       .post(EXECUTE_LIST_FILTER_URL);
 
-    verify(filterServiceMock).listPage(eq(EXAMPLE_FILTER_ID), isNull(Query.class), eq(1), eq(2));
+    verify(filterServiceMock).listPage(eq(EXAMPLE_FILTER_ID), isNull(), eq(1), eq(2));
   }
 
   @Test
@@ -1172,7 +1168,7 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
     .when()
       .get(EXECUTE_COUNT_FILTER_URL);
 
-    verify(filterServiceMock).count(eq(EXAMPLE_FILTER_ID), isNull(Query.class));
+    verify(filterServiceMock).count(eq(EXAMPLE_FILTER_ID), isNull());
   }
 
   @Test
@@ -1201,7 +1197,7 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
     .when()
       .post(EXECUTE_COUNT_FILTER_URL);
 
-    verify(filterServiceMock).count(eq(EXAMPLE_FILTER_ID), any(Query.class));
+    verify(filterServiceMock).count(eq(EXAMPLE_FILTER_ID), any());
   }
 
   @Test
@@ -1548,8 +1544,8 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
       .get(EXECUTE_SINGLE_RESULT_FILTER_URL);
 
     verify(filterServiceMock, times(1)).getFilter(eq(EXAMPLE_FILTER_ID));
-    verify(variableInstanceQueryMock, never()).variableScopeIdIn((String) anyVararg());
-    verify(variableInstanceQueryMock, never()).variableNameIn((String) anyVararg());
+    verify(variableInstanceQueryMock, never()).variableScopeIdIn(any());
+    verify(variableInstanceQueryMock, never()).variableNameIn(any());
     verify(variableInstanceQueryMock, never()).list();
 
   }
@@ -1572,8 +1568,8 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
       .get(EXECUTE_SINGLE_RESULT_FILTER_URL);
 
     verify(filterServiceMock, times(1)).getFilter(eq(EXAMPLE_FILTER_ID));
-    verify(variableInstanceQueryMock, never()).variableScopeIdIn((String) anyVararg());
-    verify(variableInstanceQueryMock, never()).variableNameIn((String) anyVararg());
+    verify(variableInstanceQueryMock, never()).variableScopeIdIn(any());
+    verify(variableInstanceQueryMock, never()).variableNameIn(any());
     verify(variableInstanceQueryMock, never()).list();
   }
 
@@ -1584,7 +1580,7 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
 
     // mock resulting task
     Task task = createTaskMock(TASK_A_ID, PROCESS_INSTANCE_A_ID, EXECUTION_A_ID, null, null);
-    when(filterServiceMock.singleResult(eq(EXAMPLE_FILTER_ID), any(Query.class))).thenReturn(task);
+    when(filterServiceMock.singleResult(eq(EXAMPLE_FILTER_ID), any())).thenReturn(task);
 
     // mock variable instances
     List<VariableInstance> variableInstances = Arrays.asList(
@@ -1601,14 +1597,14 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
     .expect()
       .statusCode(Status.OK.getStatusCode())
       .body("_embedded.containsKey('variable')", is(true))
-      .body("_embedded.variable.size", equalTo(0))
+      .body("_embedded.variable.size()", equalTo(0))
     .when()
       .get(EXECUTE_SINGLE_RESULT_FILTER_URL);
 
     verify(filterServiceMock, times(1)).getFilter(eq(EXAMPLE_FILTER_ID));
-    verify(variableInstanceQueryMock, times(1)).variableScopeIdIn((String) anyVararg());
+    verify(variableInstanceQueryMock, times(1)).variableScopeIdIn(any());
     verify(variableInstanceQueryMock).variableScopeIdIn(TASK_A_ID, EXECUTION_A_ID, PROCESS_INSTANCE_A_ID);
-    verify(variableInstanceQueryMock, times(1)).variableNameIn((String) anyVararg());
+    verify(variableInstanceQueryMock, times(1)).variableNameIn(any());
     verify(variableInstanceQueryMock).variableNameIn("foo", "bar");
     verify(variableInstanceQueryMock, times(1)).unlimitedList();
   }
@@ -1620,7 +1616,7 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
 
     // mock resulting task
     Task task = createTaskMock(TASK_A_ID, PROCESS_INSTANCE_A_ID, EXECUTION_A_ID, CASE_INSTANCE_A_ID, CASE_EXECUTION_A_ID);
-    when(filterServiceMock.singleResult(eq(EXAMPLE_FILTER_ID), any(Query.class))).thenReturn(task);
+    when(filterServiceMock.singleResult(eq(EXAMPLE_FILTER_ID), any())).thenReturn(task);
 
     // mock variable instances
     List<VariableInstance> variableInstances = Arrays.asList(
@@ -1643,14 +1639,14 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
     .expect()
       .statusCode(Status.OK.getStatusCode())
       .body("_embedded.containsKey('variable')", is(true))
-      .body("_embedded.variable.size", equalTo(6))
+      .body("_embedded.variable.size()", equalTo(6))
     .when()
       .get(EXECUTE_SINGLE_RESULT_FILTER_URL);
 
     verify(filterServiceMock, times(1)).getFilter(eq(EXAMPLE_FILTER_ID));
-    verify(variableInstanceQueryMock, times(1)).variableScopeIdIn((String) anyVararg());
+    verify(variableInstanceQueryMock, times(1)).variableScopeIdIn(any());
     verify(variableInstanceQueryMock).variableScopeIdIn(TASK_A_ID, EXECUTION_A_ID, PROCESS_INSTANCE_A_ID, CASE_EXECUTION_A_ID, CASE_INSTANCE_A_ID);
-    verify(variableInstanceQueryMock, times(1)).variableNameIn((String) anyVararg());
+    verify(variableInstanceQueryMock, times(1)).variableNameIn(any());
     verify(variableInstanceQueryMock).variableNameIn("foo", "bar");
     verify(variableInstanceQueryMock, times(1)).unlimitedList();
     verify(variableInstanceQueryMock, times(1)).disableBinaryFetching();
@@ -1684,7 +1680,7 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
       createTaskMock(TASK_B_ID, PROCESS_INSTANCE_A_ID, EXECUTION_B_ID, null, null),
       createTaskMock(TASK_C_ID, null, null, CASE_INSTANCE_A_ID, CASE_EXECUTION_A_ID)
     );
-    when(filterServiceMock.list(eq(EXAMPLE_FILTER_ID), any(Query.class))).thenReturn(tasks);
+    when(filterServiceMock.list(eq(EXAMPLE_FILTER_ID), Mockito.<Query>any())).thenReturn(tasks);
 
     // mock variable instances
     List<VariableInstance> variableInstances = Arrays.asList(
@@ -1712,15 +1708,15 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
       .header(ACCEPT_HAL_HEADER)
     .expect()
       .statusCode(Status.OK.getStatusCode())
-      .body("_embedded.task.size", equalTo(3))
+      .body("_embedded.task.size()", equalTo(3))
       .body("_embedded.task.any { it._embedded.containsKey('variable') }", is(true))
     .when()
       .get(EXECUTE_LIST_FILTER_URL);
 
     verify(filterServiceMock, times(1)).getFilter(eq(EXAMPLE_FILTER_ID));
-    verify(variableInstanceQueryMock, times(1)).variableScopeIdIn((String) anyVararg());
+    verify(variableInstanceQueryMock, times(1)).variableScopeIdIn(any());
     verify(variableInstanceQueryMock).variableScopeIdIn(TASK_A_ID, EXECUTION_A_ID, PROCESS_INSTANCE_A_ID, TASK_B_ID, EXECUTION_B_ID, TASK_C_ID, CASE_EXECUTION_A_ID, CASE_INSTANCE_A_ID);
-    verify(variableInstanceQueryMock, times(1)).variableNameIn((String) anyVararg());
+    verify(variableInstanceQueryMock, times(1)).variableNameIn(any());
     verify(variableInstanceQueryMock).variableNameIn("foo", "bar");
     verify(variableInstanceQueryMock, times(1)).unlimitedList();
 
@@ -1776,16 +1772,16 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
       createTaskMock(TASK_B_ID, PROCESS_INSTANCE_A_ID, EXECUTION_A_ID, null, null),
       createTaskMock(TASK_C_ID, PROCESS_INSTANCE_A_ID, EXECUTION_B_ID, null, null)
     );
-    when(filterServiceMock.list(eq(EXAMPLE_FILTER_ID), any(Query.class))).thenReturn(tasks);
-    when(filterServiceMock.listPage(eq(EXAMPLE_FILTER_ID), any(Query.class), eq(0), eq(2))).thenReturn(tasks.subList(0, 2));
-    when(filterServiceMock.listPage(eq(EXAMPLE_FILTER_ID), any(Query.class), eq(5), eq(2))).thenReturn(Collections.emptyList());
-    when(filterServiceMock.count(eq(EXAMPLE_FILTER_ID), any(Query.class))).thenReturn((long) tasks.size());
+    when(filterServiceMock.list(eq(EXAMPLE_FILTER_ID), Mockito.<Query>any())).thenReturn(tasks);
+    when(filterServiceMock.listPage(eq(EXAMPLE_FILTER_ID), Mockito.<Query>any(), eq(0), eq(2))).thenReturn(tasks.subList(0, 2));
+    when(filterServiceMock.listPage(eq(EXAMPLE_FILTER_ID), any(), eq(5), eq(2))).thenReturn(Collections.emptyList());
+    when(filterServiceMock.count(eq(EXAMPLE_FILTER_ID), any())).thenReturn((long) tasks.size());
 
     given()
       .pathParam("id", EXAMPLE_FILTER_ID)
       .header(ACCEPT_HAL_HEADER)
     .then().expect()
-      .body("_embedded.task.size", equalTo(3))
+      .body("_embedded.task.size()", equalTo(3))
       .body("count", equalTo(3))
     .when()
       .get(EXECUTE_LIST_FILTER_URL);
@@ -1796,7 +1792,7 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
       .queryParam("maxResults", 2)
       .header(ACCEPT_HAL_HEADER)
     .then().expect()
-      .body("_embedded.task.size", equalTo(2))
+      .body("_embedded.task.size()", equalTo(2))
       .body("count", equalTo(3))
     .when()
       .get(EXECUTE_LIST_FILTER_URL);
@@ -1912,7 +1908,7 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
 
   protected void verifyNoAuthorizationCheckPerformed() {
     verify(identityServiceMock, times(0)).getCurrentAuthentication();
-    verify(authorizationServiceMock, times(0)).isUserAuthorized(anyString(), anyListOf(String.class), any(Permission.class), any(Resource.class));
+    verify(authorizationServiceMock, times(0)).isUserAuthorized(any(), any(), any(), any());
   }
 
 }

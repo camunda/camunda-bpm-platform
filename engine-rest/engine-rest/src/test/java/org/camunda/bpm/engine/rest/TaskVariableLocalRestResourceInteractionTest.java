@@ -22,15 +22,15 @@ import static org.camunda.bpm.engine.rest.helper.MockProvider.NON_EXISTING_ID;
 import static org.camunda.bpm.engine.rest.util.DateTimeUtils.DATE_FORMAT_WITH_TIMEZONE;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.hamcrest.MockitoHamcrest.argThat;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -253,7 +253,7 @@ public class TaskVariableLocalRestResourceInteractionTest extends
   @Test
   public void testLocalVariableModificationForNonExistingTaskId() {
     TaskServiceImpl taskServiceMock = mockTaskServiceImpl();
-    doThrow(new ProcessEngineException("Cannot find task with id " + NON_EXISTING_ID)).when(taskServiceMock).updateVariablesLocal(anyString(), any(Map.class), any(List.class));
+    doThrow(new ProcessEngineException("Cannot find task with id " + NON_EXISTING_ID)).when(taskServiceMock).updateVariablesLocal(any(), any(), any());
 
     Map<String, Object> messageBodyJson = new HashMap<String, Object>();
 
@@ -290,7 +290,7 @@ public class TaskVariableLocalRestResourceInteractionTest extends
 
     TaskServiceImpl taskServiceMock = mockTaskServiceImpl();
     String message = "excpected exception";
-    doThrow(new AuthorizationException(message)).when(taskServiceMock).updateVariablesLocal(anyString(), any(Map.class), any(List.class));
+    doThrow(new AuthorizationException(message)).when(taskServiceMock).updateVariablesLocal(any(), any(), any());
 
     given()
       .pathParam("id", EXAMPLE_TASK_ID)

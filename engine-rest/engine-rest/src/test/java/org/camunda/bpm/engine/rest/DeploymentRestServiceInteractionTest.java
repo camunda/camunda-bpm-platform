@@ -51,10 +51,10 @@ import static org.camunda.bpm.engine.rest.helper.MockProvider.*;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyList;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.*;
 
 public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTest {
@@ -105,8 +105,8 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
     mockDeploymentBuilder = mock(DeploymentBuilder.class);
     when(mockRepositoryService.createDeployment()).thenReturn(mockDeploymentBuilder);
     when(mockDeploymentBuilder.addInputStream(anyString(), any(InputStream.class))).thenReturn(mockDeploymentBuilder);
-    when(mockDeploymentBuilder.addDeploymentResourcesById(anyString(), anyListOf(String.class))).thenReturn(mockDeploymentBuilder);
-    when(mockDeploymentBuilder.addDeploymentResourcesByName(anyString(), anyListOf(String.class))).thenReturn(mockDeploymentBuilder);
+    when(mockDeploymentBuilder.addDeploymentResourcesById(anyString(), anyList())).thenReturn(mockDeploymentBuilder);
+    when(mockDeploymentBuilder.addDeploymentResourcesByName(anyString(), anyList())).thenReturn(mockDeploymentBuilder);
     when(mockDeploymentBuilder.source(anyString())).thenReturn(mockDeploymentBuilder);
     when(mockDeploymentBuilder.tenantId(anyString())).thenReturn(mockDeploymentBuilder);
     when(mockDeploymentBuilder.getResourceNames()).thenReturn(resourceNames);
@@ -1673,9 +1673,9 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
     verify(mockDeploymentBuilder).addDeploymentResources(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID));
     verify(mockDeploymentBuilder).nameFromDeployment(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID));
     verify(mockDeploymentBuilder, never()).addDeploymentResourceById(anyString(), anyString());
-    verify(mockDeploymentBuilder, never()).addDeploymentResourcesById(anyString(), anyListOf(String.class));
+    verify(mockDeploymentBuilder, never()).addDeploymentResourcesById(anyString(), anyList());
     verify(mockDeploymentBuilder, never()).addDeploymentResourceByName(anyString(), anyString());
-    verify(mockDeploymentBuilder, never()).addDeploymentResourcesByName(anyString(), anyListOf(String.class));
+    verify(mockDeploymentBuilder, never()).addDeploymentResourcesByName(anyString(), anyList());
     verify(mockDeploymentBuilder, never()).source(anyString());
     verify(mockDeploymentBuilder).deployWithResult();
 
@@ -1697,9 +1697,9 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
     verify(mockDeploymentBuilder).addDeploymentResources(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID));
     verify(mockDeploymentBuilder).nameFromDeployment(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID));
     verify(mockDeploymentBuilder, never()).addDeploymentResourceById(anyString(), anyString());
-    verify(mockDeploymentBuilder, never()).addDeploymentResourcesById(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID), anyListOf(String.class));
+    verify(mockDeploymentBuilder, never()).addDeploymentResourcesById(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID), anyList());
     verify(mockDeploymentBuilder, never()).addDeploymentResourceByName(anyString(), anyString());
-    verify(mockDeploymentBuilder, never()).addDeploymentResourcesByName(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID), anyListOf(String.class));
+    verify(mockDeploymentBuilder, never()).addDeploymentResourcesByName(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID), anyList());
     verify(mockDeploymentBuilder).source(null);
     verify(mockDeploymentBuilder).deployWithResult();
 
@@ -1730,7 +1730,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
     verify(mockDeploymentBuilder, never()).addDeploymentResourceById(anyString(), anyString());
     verify(mockDeploymentBuilder).addDeploymentResourcesById(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID), eq(resourceIds));
     verify(mockDeploymentBuilder, never()).addDeploymentResourceByName(anyString(), anyString());
-    verify(mockDeploymentBuilder, never()).addDeploymentResourcesByName(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID), anyListOf(String.class));
+    verify(mockDeploymentBuilder, never()).addDeploymentResourcesByName(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID), anyList());
     verify(mockDeploymentBuilder).source(null);
     verify(mockDeploymentBuilder).deployWithResult();
 
@@ -1759,7 +1759,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
     verify(mockDeploymentBuilder, never()).addDeploymentResources(anyString());
     verify(mockDeploymentBuilder).nameFromDeployment(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID));
     verify(mockDeploymentBuilder, never()).addDeploymentResourceById(anyString(), anyString());
-    verify(mockDeploymentBuilder, never()).addDeploymentResourcesById(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID), anyListOf(String.class));
+    verify(mockDeploymentBuilder, never()).addDeploymentResourcesById(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID), anyList());
     verify(mockDeploymentBuilder, never()).addDeploymentResourceByName(anyString(), anyString());
     verify(mockDeploymentBuilder).addDeploymentResourcesByName(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID), eq(resourceNames));
     verify(mockDeploymentBuilder).source(null);
@@ -1786,9 +1786,9 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
     verify(mockDeploymentBuilder).addDeploymentResources(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID));
     verify(mockDeploymentBuilder).nameFromDeployment(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID));
     verify(mockDeploymentBuilder, never()).addDeploymentResourceById(anyString(), anyString());
-    verify(mockDeploymentBuilder, never()).addDeploymentResourcesById(anyString(), anyListOf(String.class));
+    verify(mockDeploymentBuilder, never()).addDeploymentResourcesById(anyString(), anyList());
     verify(mockDeploymentBuilder, never()).addDeploymentResourceByName(anyString(), anyString());
-    verify(mockDeploymentBuilder, never()).addDeploymentResourcesByName(anyString(), anyListOf(String.class));
+    verify(mockDeploymentBuilder, never()).addDeploymentResourcesByName(anyString(), anyList());
     verify(mockDeploymentBuilder).source(eq(MockProvider.EXAMPLE_DEPLOYMENT_SOURCE));
     verify(mockDeploymentBuilder).deployWithResult();
 

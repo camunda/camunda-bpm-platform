@@ -20,8 +20,6 @@ import static io.restassured.RestAssured.given;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockBatch;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
@@ -45,6 +43,7 @@ import org.camunda.bpm.engine.runtime.ModificationBuilder;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import io.restassured.http.ContentType;
 
@@ -66,16 +65,16 @@ public class ModificationRestServiceInteractionTest extends AbstractRestServiceT
     when(processEngine.getRuntimeService()).thenReturn(runtimeServiceMock);
 
     modificationBuilderMock = mock(ModificationBuilder.class);
-    when(modificationBuilderMock.cancelAllForActivity(anyString())).thenReturn(modificationBuilderMock);
-    when(modificationBuilderMock.startAfterActivity(anyString())).thenReturn(modificationBuilderMock);
-    when(modificationBuilderMock.startBeforeActivity(anyString())).thenReturn(modificationBuilderMock);
-    when(modificationBuilderMock.startTransition(anyString())).thenReturn(modificationBuilderMock);
-    when(modificationBuilderMock.processInstanceIds(anyListOf(String.class))).thenReturn(modificationBuilderMock);
+    when(modificationBuilderMock.cancelAllForActivity(any())).thenReturn(modificationBuilderMock);
+    when(modificationBuilderMock.startAfterActivity(any())).thenReturn(modificationBuilderMock);
+    when(modificationBuilderMock.startBeforeActivity(any())).thenReturn(modificationBuilderMock);
+    when(modificationBuilderMock.startTransition(any())).thenReturn(modificationBuilderMock);
+    when(modificationBuilderMock.processInstanceIds(Mockito.<List<String>>any())).thenReturn(modificationBuilderMock);
 
     Batch batchMock = createMockBatch();
     when(modificationBuilderMock.executeAsync()).thenReturn(batchMock);
 
-    when(runtimeServiceMock.createModification(anyString())).thenReturn(modificationBuilderMock);
+    when(runtimeServiceMock.createModification(any())).thenReturn(modificationBuilderMock);
   }
 
   @Test

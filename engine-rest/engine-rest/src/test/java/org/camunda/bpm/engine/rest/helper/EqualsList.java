@@ -20,9 +20,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.mockito.ArgumentMatcher;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
 
-public class EqualsList extends ArgumentMatcher<List<String>> {
+public class EqualsList extends BaseMatcher<List<String>> {
 
   private List<String> listToCompare;
 
@@ -49,4 +50,14 @@ public class EqualsList extends ArgumentMatcher<List<String>> {
     return setToCompare.equals(argumentSet);
   }
 
+  @Override
+  public void describeTo(final Description description) {
+    StringBuilder sb = new StringBuilder();
+    sb.append(this.getClass().getSimpleName());
+    sb.append(": ");
+    sb.append("listToCompare=");
+    sb.append(listToCompare);
+
+    description.appendText(sb.toString());
+  }
 }

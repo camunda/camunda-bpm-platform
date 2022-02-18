@@ -21,15 +21,15 @@ import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ID;
 import static org.camunda.bpm.engine.rest.util.DateTimeUtils.DATE_FORMAT_WITH_TIMEZONE;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.hamcrest.MockitoHamcrest.argThat;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -79,7 +79,7 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Matchers;
+import org.mockito.Mockito;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
@@ -140,17 +140,17 @@ public class CaseInstanceRestServiceInteractionTest extends AbstractRestServiceT
     when(caseServiceMock.getVariableTyped(anyString(), eq(EXAMPLE_BYTES_VARIABLE_KEY), eq(false))).thenReturn(EXAMPLE_VARIABLE_VALUE_BYTES);
 
     when(caseServiceMock.getVariablesTyped(anyString(), eq(true))).thenReturn(EXAMPLE_VARIABLES);
-    when(caseServiceMock.getVariablesTyped(anyString(), Matchers.<Collection<String>>any(), eq(true))).thenReturn(EXAMPLE_VARIABLES);
+    when(caseServiceMock.getVariablesTyped(anyString(), Mockito.any(), eq(true))).thenReturn(EXAMPLE_VARIABLES);
 
     caseExecutionCommandBuilderMock = mock(CaseExecutionCommandBuilder.class);
 
     when(caseServiceMock.withCaseExecution(MockProvider.EXAMPLE_CASE_INSTANCE_ID)).thenReturn(caseExecutionCommandBuilderMock);
 
     when(caseExecutionCommandBuilderMock.setVariable(anyString(), any())).thenReturn(caseExecutionCommandBuilderMock);
-    when(caseExecutionCommandBuilderMock.setVariables(Matchers.<Map<String, Object>>any())).thenReturn(caseExecutionCommandBuilderMock);
+    when(caseExecutionCommandBuilderMock.setVariables(Mockito.any())).thenReturn(caseExecutionCommandBuilderMock);
 
     when(caseExecutionCommandBuilderMock.removeVariable(anyString())).thenReturn(caseExecutionCommandBuilderMock);
-    when(caseExecutionCommandBuilderMock.removeVariables(Matchers.<Collection<String>>any())).thenReturn(caseExecutionCommandBuilderMock);
+    when(caseExecutionCommandBuilderMock.removeVariables(Mockito.any())).thenReturn(caseExecutionCommandBuilderMock);
   }
 
   @Test

@@ -21,12 +21,13 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.anyList;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -1308,7 +1309,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
   public void testSetJobPriorityThrowsAuthorizationException() {
     String message = "expected exception";
     doThrow(new AuthorizationException(message))
-      .when(mockManagementService).setJobPriority(anyString(), anyInt());
+      .when(mockManagementService).setJobPriority(any(), anyLong());
 
     Map<String, Object> priorityJson = new HashMap<String, Object>();
     priorityJson.put("priority", MockProvider.EXAMPLE_JOB_PRIORITY);
@@ -1409,8 +1410,8 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
     List<String> ids = Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
     Batch batchEntity = MockProvider.createMockBatch();
     when(mockManagementService.setJobRetriesAsync(
-        anyListOf(String.class),
-        any(JobQuery.class),
+        anyList(),
+        Mockito.<JobQuery>any(),
         anyInt())
     ).thenReturn(batchEntity);
 
@@ -1434,7 +1435,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
   public void testSetRetriesAsyncWithQuery() {
     Batch batchEntity = MockProvider.createMockBatch();
     when(mockManagementService.setJobRetriesAsync(
-        anyListOf(String.class),
+        any(),
         any(JobQuery.class),
         anyInt())
     ).thenReturn(batchEntity);
@@ -1485,8 +1486,8 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
   public void testSetRetriesWithNegativeRetries() {
     doThrow(new BadUserRequestException("retries are negative"))
         .when(mockManagementService).setJobRetriesAsync(
-        anyListOf(String.class),
-        any(JobQuery.class),
+        any(),
+        Mockito.<JobQuery>any(),
         eq(-1));
 
     Map<String, Object> messageBodyJson = new HashMap<String, Object>();

@@ -21,9 +21,9 @@ import static io.restassured.path.json.JsonPath.from;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -49,7 +49,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.mockito.Matchers;
+import org.mockito.Mockito;
 
 import io.restassured.response.Response;
 
@@ -74,7 +74,7 @@ public class ConditionRestServiceTest extends AbstractRestServiceTest {
     when(runtimeServiceMock.createConditionEvaluation()).thenReturn(conditionEvaluationBuilderMock);
     when(conditionEvaluationBuilderMock.processDefinitionId(anyString())).thenReturn(conditionEvaluationBuilderMock);
     when(conditionEvaluationBuilderMock.processInstanceBusinessKey(anyString())).thenReturn(conditionEvaluationBuilderMock);
-    when(conditionEvaluationBuilderMock.setVariables(Matchers.<Map<String,Object>>any())).thenReturn(conditionEvaluationBuilderMock);
+    when(conditionEvaluationBuilderMock.setVariables(Mockito.any())).thenReturn(conditionEvaluationBuilderMock);
     when(conditionEvaluationBuilderMock.setVariable(anyString(), any())).thenReturn(conditionEvaluationBuilderMock);
 
     processInstancesMock = MockProvider.createAnotherMockProcessInstanceList();

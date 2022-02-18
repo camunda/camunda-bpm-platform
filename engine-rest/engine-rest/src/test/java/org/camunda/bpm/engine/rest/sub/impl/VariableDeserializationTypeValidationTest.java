@@ -65,7 +65,7 @@ public class VariableDeserializationTypeValidationTest {
     variablesResourceSpy.validateType(type);
 
     // then
-    Mockito.verifyZeroInteractions(validator);
+    Mockito.verifyNoInteractions(validator);
   }
 
   @Test

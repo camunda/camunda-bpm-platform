@@ -181,7 +181,7 @@ public class AuthorizationRestServiceQueryTest extends AbstractRestServiceTest {
 
     RequestSpecification requestSpecification = given().contentType(POST_JSON_CONTENT_TYPE);
     for (Entry<String, String> paramEntry : queryParameters.entrySet()) {
-      requestSpecification.parameter(paramEntry.getKey(), paramEntry.getValue());
+      requestSpecification.param(paramEntry.getKey(), paramEntry.getValue());
     }
 
     requestSpecification.expect().statusCode(Status.OK.getStatusCode())

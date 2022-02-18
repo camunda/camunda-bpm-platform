@@ -16,10 +16,10 @@
  */
 package org.camunda.bpm.engine.rest.standalone;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.anyList;
+import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -211,7 +211,7 @@ public class AuthenticationFilterPathMatchingTest extends AbstractRestServiceTes
       verify(identityServiceMock).clearAuthentication();
 
     } else {
-      verify(identityServiceMock, never()).setAuthentication(any(String.class), anyListOf(String.class), anyListOf(String.class));
+      verify(identityServiceMock, never()).setAuthentication(any(String.class), anyList(), anyList());
       verify(identityServiceMock, never()).clearAuthentication();
     }
   }
