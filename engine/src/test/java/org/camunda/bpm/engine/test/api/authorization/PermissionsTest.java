@@ -19,11 +19,14 @@ package org.camunda.bpm.engine.test.api.authorization;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resource;
+import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.impl.util.ResourceTypeUtil;
 import org.junit.Test;
 
@@ -46,7 +49,7 @@ public class PermissionsTest {
           assertThat(resolvedPermission)
             .overridingErrorMessage("Permission %s for resource %s not found in new enum %s", permission, resource, clazz.getSimpleName())
             .isNotNull();
-            
+
           assertThat(resolvedPermission.getValue()).isEqualTo(permission.getValue());
         }
       }
@@ -65,6 +68,16 @@ public class PermissionsTest {
         verifyValuesAreUniqueAndPowerOfTwo((Permission[])permissionsClass.getEnumConstants(), permissionsClass.getSimpleName());
       }
     }
+  }
+
+  @Test
+  public void testThatPermissionsEnumContainsAllPermissions() {
+    // when
+    Map<Integer, Class<? extends Enum<? extends Permission>>> permissionEnums = ResourceTypeUtil.getPermissionEnums();
+
+    // then
+    Integer[] allResourceTypes = Stream.of(Resources.values()).map(r -> r.resourceType()).toArray(Integer[]::new);
+    assertThat(permissionEnums).containsKeys(allResourceTypes);
   }
 
   private void verifyValuesAreUniqueAndPowerOfTwo(Permission[] permissions, String className) {

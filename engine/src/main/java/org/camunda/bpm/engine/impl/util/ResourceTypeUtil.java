@@ -16,6 +16,16 @@
  */
 package org.camunda.bpm.engine.impl.util;
 
+import static org.camunda.bpm.engine.authorization.Resources.BATCH;
+import static org.camunda.bpm.engine.authorization.Resources.HISTORIC_PROCESS_INSTANCE;
+import static org.camunda.bpm.engine.authorization.Resources.HISTORIC_TASK;
+import static org.camunda.bpm.engine.authorization.Resources.OPERATION_LOG_CATEGORY;
+import static org.camunda.bpm.engine.authorization.Resources.OPTIMIZE;
+import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
+import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
+import static org.camunda.bpm.engine.authorization.Resources.TASK;
+import static org.camunda.bpm.engine.authorization.Resources.SYSTEM;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,17 +40,9 @@ import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
 import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.authorization.SystemPermissions;
 import org.camunda.bpm.engine.authorization.TaskPermissions;
 import org.camunda.bpm.engine.authorization.UserOperationLogCategoryPermissions;
-
-import static org.camunda.bpm.engine.authorization.Resources.BATCH;
-import static org.camunda.bpm.engine.authorization.Resources.HISTORIC_PROCESS_INSTANCE;
-import static org.camunda.bpm.engine.authorization.Resources.HISTORIC_TASK;
-import static org.camunda.bpm.engine.authorization.Resources.OPERATION_LOG_CATEGORY;
-import static org.camunda.bpm.engine.authorization.Resources.OPTIMIZE;
-import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
-import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
-import static org.camunda.bpm.engine.authorization.Resources.TASK;
 
 public class ResourceTypeUtil {
 
@@ -61,13 +63,19 @@ public class ResourceTypeUtil {
       put(HISTORIC_PROCESS_INSTANCE.resourceType(), HistoricProcessInstancePermissions.class);
       put(OPERATION_LOG_CATEGORY.resourceType(), UserOperationLogCategoryPermissions.class);
       put(OPTIMIZE.resourceType(), OptimizePermissions.class);
+      put(SYSTEM.resourceType(), SystemPermissions.class);
     }};
 
     // the rest
-    for (Resource resource : Resources.values()) {
-      int resourceType = resource.resourceType();
-      if (!PERMISSION_ENUMS.containsKey(resourceType)) {
-        PERMISSION_ENUMS.put(resourceType, Permissions.class);
+    for (Permission permission : Permissions.values()) {
+      if(permission.equals(Permissions.ALL) || permission.equals(Permissions.NONE)) {
+        continue;
+      }
+      for (Resource resource : permission.getTypes()) {
+        int resourceType = resource.resourceType();
+        if(!PERMISSION_ENUMS.containsKey(resourceType)) {
+          PERMISSION_ENUMS.put(resourceType, Permissions.class);
+        }
       }
     }
   }
@@ -84,7 +92,7 @@ public class ResourceTypeUtil {
     return false;
   }
 
-  
+
   /**
    * @return See {@link ResourceTypeUtil#PERMISSION_ENUMS}
    */
@@ -120,7 +128,7 @@ public class ResourceTypeUtil {
   }
 
   /**
-   * Iterates over the {@link Resources} and 
+   * Iterates over the {@link Resources} and
    * returns either the resource with specified <code>resourceType</code> or <code>null</code>.
    */
   public static Resource getResourceByType(int resourceType) {

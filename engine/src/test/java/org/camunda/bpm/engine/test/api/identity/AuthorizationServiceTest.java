@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.identity;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GLOBAL;
 import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
@@ -42,6 +43,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.BatchPermissions;
@@ -652,7 +654,7 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTest {
     ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
 
     try {
-      ArrayList<Callable<Exception>> callables = new ArrayList<Callable<Exception>>();
+      ArrayList<Callable<Exception>> callables = new ArrayList<>();
 
       for (int i = 0; i < invocationCount; i++) {
         callables.add(new Callable<Exception>() {
@@ -874,6 +876,21 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTest {
     assertFalse(authorizationResult.isPermissionRevoked(BatchPermissions.CREATE_BATCH_MODIFY_PROCESS_INSTANCES));
     assertFalse(authorizationResult.isPermissionRevoked(Permissions.ACCESS));
     assertFalse(authorizationResult.isPermissionRevoked(Permissions.CREATE));
+  }
+
+  @Test
+  public void shouldFailSaveAuthorizationWithIncompatibleResourceAndPermission() {
+    // given
+    Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+    authorization.setUserId("testUser");
+    authorization.addPermission(TestPermissions.RANDOM);
+    authorization.setResource(Resources.TASK);
+    authorization.setResourceId(ANY);
+
+    // when attempt to save, expect BadUserRequest
+    assertThatThrownBy(() -> authorizationService.saveAuthorization(authorization))
+      .isInstanceOf(BadUserRequestException.class)
+      .hasMessage("ENGINE-03087 The resource type with id:'" + Resources.TASK.resourceType() + "' is not valid for '" + TestPermissions.RANDOM.getName() + "' permission." );
   }
 
   protected void cleanupAfterTest() {
