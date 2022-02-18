@@ -48,7 +48,9 @@ module.exports = [
 
     var finishedWithFailures = false;
 
-    $scope.allJobsSelected = false;
+    $scope.form = {
+      allJobsSelected: false
+    };
 
     var FINISHED = 'finished',
       PERFORM = 'performing',
@@ -82,7 +84,7 @@ module.exports = [
 
     function updateJobTable(page) {
       $scope.failedJobs = null;
-      $scope.allJobsSelected = false;
+      $scope.form.allJobsSelected = false;
       $scope.loadingState = 'LOADING';
 
       var count = jobPages.size;
@@ -124,7 +126,7 @@ module.exports = [
               $scope.loadingState = 'LOADED';
 
               if (jobPages.total <= count) {
-                $scope.allJobsSelected = true;
+                $scope.form.allJobsSelected = true;
                 $scope.selectAllJobs(true);
               }
             })
@@ -175,8 +177,8 @@ module.exports = [
 
       if (failedJob.selected === false) {
         selectedFailedJobIds.splice(index, 1);
-        if ($scope.allJobsSelected === true) {
-          $scope.allJobsSelected = false;
+        if ($scope.form.allJobsSelected === true) {
+          $scope.form.allJobsSelected = false;
         }
         return;
       }

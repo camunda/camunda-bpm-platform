@@ -19,8 +19,8 @@
               <th class="row-select">
                 <input type="checkbox"
                        title="Select all"
-                       ng-model="allJobsSelected"
-                       ng-change="selectAllJobs(allJobsSelected)">
+                       ng-model="form.allJobsSelected"
+                       ng-change="selectAllJobs(form.allJobsSelected)">
               </th>
               <th class="job-id uuid">{{ 'PLUGIN_JOB_RETRY_BULK_ID' | translate }}</th>
               <th class="scope">{{ 'PLUGIN_JOB_RETRY_BULK_SCOPE' | translate }}</th>
