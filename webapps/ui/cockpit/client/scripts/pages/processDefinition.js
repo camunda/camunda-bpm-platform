@@ -87,10 +87,10 @@ var Controller = [
     };
 
     $scope.callbacks = {
-      handlePlaneChange: function(selectionOnPlane) {
+      handleRootChange: function(selection) {
         var newFilter = angular.copy($scope.filter);
 
-        newFilter.activityIds = selectionOnPlane || [];
+        newFilter.activityIds = selection || [];
 
         processData.set('filter', newFilter);
       }

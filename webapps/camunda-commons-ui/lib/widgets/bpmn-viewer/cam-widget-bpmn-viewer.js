@@ -43,7 +43,7 @@ module.exports = [
         disableNavigation: '&',
         onLoad: '&',
         onClick: '&',
-        onPlaneSet: '&',
+        onRootChange: '&',
         onMouseEnter: '&',
         onMouseLeave: '&',
         bpmnJsConf: '=?'
@@ -54,7 +54,7 @@ module.exports = [
       link: function($scope, $element) {
         var viewer = null;
         var canvas = null;
-        var visitedPlanes = [];
+        var visitedRoots = [];
         var definitions;
         var diagramContainer = $element[0].querySelector('.diagram-holder');
 
@@ -379,10 +379,11 @@ module.exports = [
               ($location.search() || {}).viewbox || '{}'
             )[definitions.id];
 
-            var plane = ($location.search() || {}).plane;
+            var rootId = ($location.search() || {}).rootElement;
 
-            if (plane) {
-              canvas.setActivePlane(plane);
+            if (rootId) {
+              var rootElement = canvas.findRoot(rootId);
+              canvas.setRootElement(rootElement);
             }
 
             if (viewbox) {
@@ -443,22 +444,22 @@ module.exports = [
           }
         }, 500);
 
-        var onPlaneSet = function(e, context) {
-          var newPlane = context.plane;
+        var onRootChange = function(e, context) {
+          var rootElement = context.element;
 
-          $scope.onPlaneSet();
-          if (!newPlane) {
+          $scope.onRootChange();
+          if (!rootElement) {
             return;
           }
 
           search.updateSilently({
-            plane: newPlane.name
+            rootElement: rootElement.id
           });
 
-          // viewport for visited planes is handled correctly by bpmn-js
-          if (!visitedPlanes.includes(newPlane)) {
+          // viewport for visited roots is handled correctly by bpmn-js
+          if (!visitedRoots.includes(rootElement)) {
             canvas.zoom('fit-viewport', 'auto');
-            visitedPlanes.push(newPlane);
+            visitedRoots.push(rootElement);
           }
         };
 
@@ -469,7 +470,7 @@ module.exports = [
           eventBus.on('element.out', onOut);
           eventBus.on('element.mousedown', onMousedown);
           eventBus.on('canvas.viewbox.changed', onViewboxChange);
-          eventBus.on('plane.set', onPlaneSet);
+          eventBus.on('root.set', onRootChange);
         }
 
         function clearEventListeners() {
@@ -479,10 +480,10 @@ module.exports = [
           eventBus.off('element.out', onOut);
           eventBus.off('element.mousedown', onMousedown);
           eventBus.off('canvas.viewbox.changed', onViewboxChange);
-          eventBus.off('plane.set', onPlaneSet);
+          eventBus.off('root.set', onRootChange);
 
           search.updateSilently({
-            plane: null
+            rootElement: null
           });
         }
 
