@@ -64,6 +64,11 @@ module.exports = [
           ));
 
           function setLink(task) {
+            if (!task) {
+              $scope.instanceLink = undefined;
+              return;
+            }
+
             var resource = '';
             var resourceId = '';
             var rootElement = $location.search()?.rootElement;
