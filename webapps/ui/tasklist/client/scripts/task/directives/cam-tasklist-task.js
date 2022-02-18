@@ -66,7 +66,7 @@ module.exports = [
           function setLink(task) {
             var resource = '';
             var resourceId = '';
-            var plane = $location.search()?.plane;
+            var rootElement = $location.search()?.rootElement;
 
             if (task.processInstanceId) {
               resource = 'process-instance';
@@ -84,8 +84,8 @@ module.exports = [
               'cockpitbase://:engine/#/' + resource + '/' + resourceId
             );
 
-            if (plane) {
-              link += '/runtime?plane=' + plane;
+            if (rootElement) {
+              link += '/runtime?rootElement=' + rootElement;
             }
 
             $scope.instanceLink = link;

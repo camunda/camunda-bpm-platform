@@ -676,16 +676,16 @@ var Controller = [
     });
 
     $scope.callbacks = {
-      handlePlaneChange: function(selectionOnPlane, canvas) {
+      handleRootChange: function(selection, canvas) {
         var newFilter = angular.copy($scope.filter);
 
-        newFilter.activityIds = selectionOnPlane || [];
+        newFilter.activityIds = selection || [];
 
         newFilter.activityInstanceIds = $scope.filter.activityInstanceIds.filter(
           instanceId => {
             var instance = $scope.instanceIdToInstanceMap[instanceId];
             return (
-              canvas.getActivePlane() === canvas.findPlane(instance.activityId)
+              canvas.getRootElement() === canvas.findRoot(instance.activityId)
             );
           }
         );

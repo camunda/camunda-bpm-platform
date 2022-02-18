@@ -273,13 +273,13 @@ var DirectiveController = [
       selection = newSelection;
     }
 
-    $scope.onPlaneSet = function() {
+    $scope.onRootChange = function() {
       var canvas = $scope.control.getViewer().get('canvas');
-      var activePlane = canvas.getActivePlane();
-      var elementsOnPlane =
-        selection?.filter(el => canvas.findPlane(el) === activePlane) || [];
+      var rootElement = canvas.getRootElement();
+      var elementsOnRoot =
+        selection?.filter(el => canvas.findRoot(el) === rootElement) || [];
 
-      $scope.callbacks?.handlePlaneChange?.(elementsOnPlane, canvas);
+      $scope.callbacks?.handleRootChange?.(elementsOnRoot, canvas);
     };
 
     /*------------------- Handle scroll to bpmn element ---------------------*/
