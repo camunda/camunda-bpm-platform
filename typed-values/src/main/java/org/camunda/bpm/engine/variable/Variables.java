@@ -360,10 +360,14 @@ public class Variables {
    * for the returned instance.
    */
   public static TypedValue untypedValue(Object value) {
-    if (value instanceof TypedValue) {
-      return untypedValue(value, ((TypedValue) value).isTransient());
+    Object untypedValue = value;
+    if (untypedValue instanceof TypedValueBuilder) {
+      untypedValue = ((TypedValueBuilder<?>) untypedValue).create();
     }
-    else return untypedValue(value, false);
+    if (untypedValue instanceof TypedValue) {
+      return untypedValue(untypedValue, ((TypedValue) untypedValue).isTransient());
+    }
+    else return untypedValue(untypedValue, false);
   }
 
   /**

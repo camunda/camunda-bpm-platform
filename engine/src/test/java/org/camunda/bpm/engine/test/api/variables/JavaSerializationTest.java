@@ -331,11 +331,10 @@ public class JavaSerializationTest {
       String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()), engineRule.getProcessEngine());
 
       taskService.setVariable(taskId, "instrument",
-        Variables.serializedObjectValue(serializedObject)
+        serializedObjectValue(serializedObject)
           .objectTypeName(String.class.getName())
           .serializationDataFormat(Variables.SerializationDataFormats.JAVA)
-          .setTransient(true)
-          );
+          .create());
       assertEquals("trumpet", taskService.getVariable(taskId, "instrument"));
     } finally {
       taskService.deleteTask(taskId, true);
