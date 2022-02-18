@@ -16,7 +16,7 @@
  */
 package org.camunda.spin.plugin.variables;
 
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
