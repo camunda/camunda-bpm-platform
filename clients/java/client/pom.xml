@@ -323,6 +323,21 @@
         </dependency>
       </dependencies>
     </profile>
+    <profile>
+      <id>jdk16-and-onwards</id>
+      <activation>
+        <jdk>[16,)</jdk>
+      </activation>
+
+      <dependencies>
+        <dependency>
+          <groupId>com.sun.xml.bind</groupId>
+          <artifactId>jaxb-impl</artifactId>
+          <version>2.3.6</version>
+          <scope>provided</scope>
+        </dependency>
+      </dependencies>
+    </profile>
   </profiles>
 
   <!-- DO NOT REMOVE IF YOU DON'T KNOW WHAT YOU DO -->
