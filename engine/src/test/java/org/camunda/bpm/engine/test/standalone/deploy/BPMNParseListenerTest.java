@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.form.CamundaFormRef;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.parser.AbstractBpmnParseListener;
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
 import org.camunda.bpm.engine.impl.el.Expression;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.form.FormDefinition;
@@ -130,7 +131,7 @@ public class BPMNParseListenerTest {
 
     BpmnModelInstance model = Bpmn.createExecutableProcess("process")
       .startEvent()
-      .userTask("task").camundaFormKey(originalFormKey)
+        .userTask("task").camundaFormKey(originalFormKey)
       .endEvent()
       .done();
 
@@ -163,7 +164,6 @@ public class BPMNParseListenerTest {
     assertThat(formData.getFormKey()).isEqualTo(modifiedFormKey);
   }
 
-
   @Test
   public void shouldModifyFormRefViaTaskDefinition() {
     // given
@@ -175,12 +175,12 @@ public class BPMNParseListenerTest {
     Integer modifiedFormRefVersion = 20;
 
     BpmnModelInstance model = Bpmn.createExecutableProcess("process")
-      .startEvent()
-      .userTask("task")
-        .camundaFormRef(originalFormRef)
-        .camundaFormRefBinding(originalFormRefBinding)
-      .endEvent()
-      .done();
+        .startEvent()
+          .userTask("task")
+            .camundaFormRef(originalFormRef)
+            .camundaFormRefBinding(originalFormRefBinding)
+          .endEvent()
+        .done();
 
     DelegatingBpmnParseListener.DELEGATE = new AbstractBpmnParseListener() {
       @Override
@@ -216,53 +216,75 @@ public class BPMNParseListenerTest {
     assertThat(formRef.getVersion()).isEqualTo(modifiedFormRefVersion);
   }
 
+  @Test
+  public void shouldCheckWithoutTenant() {
+    // given
+    BpmnModelInstance model = Bpmn.createExecutableProcess("process-tenantId")
+        .startEvent()
+          .subProcess()
+          .embeddedSubProcess()
+            .startEvent()
+            .endEvent()
+          .subProcessDone()
+        .endEvent()
+        .done();
+
+    DelegatingBpmnParseListener.DELEGATE = createBpmnParseListenerAndAssertTenantId(null);
+
+    // when
+    engineTestRule.deploy(model);
+  }
 
   @Test
-  public void testTenantIdDuringDeployment() {
-      // given
-      BpmnModelInstance model = Bpmn.createExecutableProcess("process-tenantId")
-              .startEvent()
-              .subProcess()
-              .embeddedSubProcess()
-              .startEvent()
-              .endEvent()
-              .subProcessDone()
-              .endEvent()
-              .done();
+  public void shouldCheckWithTenant() {
+    // given
+    BpmnModelInstance model = Bpmn.createExecutableProcess("process-tenantId")
+        .startEvent()
+          .subProcess()
+          .embeddedSubProcess()
+            .startEvent()
+            .endEvent()
+          .subProcessDone()
+        .endEvent()
+        .done();
 
-      final String tenantId[] = new String[] { null };
+    DelegatingBpmnParseListener.DELEGATE = createBpmnParseListenerAndAssertTenantId("parseListenerTenantId");
 
-      DelegatingBpmnParseListener.DELEGATE = new AbstractBpmnParseListener() {
-          private void checkTenantId(ProcessDefinitionImpl processDefinitionImpl) {
-              // then
-              assert processDefinitionImpl instanceof ProcessDefinitionEntity;
-              ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) processDefinitionImpl;
-              assertEquals(tenantId[0], processDefinition.getTenantId());
-          }
-          @Override
-          public void parseProcess(Element processElement, ProcessDefinitionEntity processDefinition) {
-              checkTenantId(processDefinition);
-          }
-          @Override
-          public void parseStartEvent(Element startEventElement, ScopeImpl scope, ActivityImpl startEventActivity) {
-              checkTenantId(startEventActivity.getProcessDefinition());
-          }
-          @Override
-          public void parseEndEvent(Element endEventElement, ScopeImpl scope, ActivityImpl activity) {
-              checkTenantId(activity.getProcessDefinition());
-          }
-          @Override
-          public void parseSubProcess(Element subProcessElement, ScopeImpl scope, ActivityImpl activity) {
-              checkTenantId(activity.getProcessDefinition());
-          }
-      };
-
-      // when
-      engineTestRule.deploy(model);
-
-      // when
-      tenantId[0] = "parseListenerTenantId";
-      engineTestRule.deployForTenant("parseListenerTenantId", model);
+    // when
+    engineTestRule.deployForTenant("parseListenerTenantId", model);
   }
+
+  // helper ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  protected BpmnParseListener createBpmnParseListenerAndAssertTenantId(String tenantId) {
+    return new AbstractBpmnParseListener() {
+      protected void checkTenantId(ProcessDefinitionImpl processDefinitionImpl) {
+        // then
+        ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) processDefinitionImpl;
+        assertThat(processDefinition.getTenantId()).isEqualTo(tenantId);
+      }
+
+      @Override
+      public void parseProcess(Element processElement, ProcessDefinitionEntity processDefinition) {
+        checkTenantId(processDefinition);
+      }
+
+      @Override
+      public void parseStartEvent(Element startEventElement, ScopeImpl scope, ActivityImpl startEventActivity) {
+        checkTenantId(startEventActivity.getProcessDefinition());
+      }
+
+      @Override
+      public void parseEndEvent(Element endEventElement, ScopeImpl scope, ActivityImpl activity) {
+        checkTenantId(activity.getProcessDefinition());
+      }
+
+      @Override
+      public void parseSubProcess(Element subProcessElement, ScopeImpl scope, ActivityImpl activity) {
+        checkTenantId(activity.getProcessDefinition());
+      }
+    };
+  }
+
 
 }
