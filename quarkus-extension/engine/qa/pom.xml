@@ -73,7 +73,7 @@
       <artifactId>camunda-engine-cdi</artifactId>
       <version>${project.version}</version>
       <type>test-jar</type>
-      <classifier>tests</classifier>
+      <classifier>tests-quarkus</classifier>
     </dependency>
 
     <!-- Quarkus dependencies -->
