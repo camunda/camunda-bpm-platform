@@ -52,7 +52,7 @@ public class BpmnActivityBehavior {
    * parallel paths of executions are created.
    */
   public void performDefaultOutgoingBehavior(ActivityExecution activityExecution) {
-    performOutgoingBehavior(activityExecution, true, null);
+    performOutgoingBehavior(activityExecution, true);
   }
 
   /**
@@ -66,7 +66,7 @@ public class BpmnActivityBehavior {
    * be created.
    */
   public void performIgnoreConditionsOutgoingBehavior(ActivityExecution activityExecution) {
-    performOutgoingBehavior(activityExecution, false, null);
+    performOutgoingBehavior(activityExecution, false);
   }
 
   /**
@@ -79,7 +79,7 @@ public class BpmnActivityBehavior {
    *          not to take a transition.
    */
   protected void performOutgoingBehavior(ActivityExecution execution,
-          boolean checkConditions, List<ActivityExecution> reusableExecutions) {
+          boolean checkConditions) {
 
     LOG.leavingActivity(execution.getActivity().getId());
 
@@ -101,13 +101,7 @@ public class BpmnActivityBehavior {
       execution.leaveActivityViaTransition(transitionsToTake.get(0));
 
     } else if (transitionsToTake.size() >= 1) {
-
-      if (reusableExecutions == null || reusableExecutions.isEmpty()) {
-        execution.leaveActivityViaTransitions(transitionsToTake, Arrays.asList(execution));
-      } else {
-        execution.leaveActivityViaTransitions(transitionsToTake, reusableExecutions);
-      }
-
+      execution.leaveActivityViaTransitions(transitionsToTake, Arrays.asList(execution));
     } else {
 
       if (defaultSequenceFlow != null) {

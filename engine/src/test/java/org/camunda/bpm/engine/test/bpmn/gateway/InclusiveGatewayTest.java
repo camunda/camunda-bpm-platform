@@ -28,12 +28,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -44,7 +42,6 @@ import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.model.bpmn.Bpmn;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -73,7 +70,7 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTest {
     for (int i = 1; i <= 3; i++) {
       ProcessInstance pi = runtimeService.startProcessInstanceByKey("inclusiveGwDiverging", CollectionUtil.singletonMap("input", i));
       List<Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
-      List<String> expectedNames = new ArrayList<String>();
+      List<String> expectedNames = new ArrayList<>();
       if (i == 1) {
         expectedNames.add(TASK1_NAME);
       }
@@ -218,7 +215,7 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTest {
     runtimeService.startProcessInstanceByKey("inclusiveDecisionBasedOnBeanProperty", CollectionUtil.singletonMap("order", new InclusiveGatewayTestOrder(150)));
     List<Task> tasks = taskService.createTaskQuery().list();
     assertEquals(2, tasks.size());
-    Map<String, String> expectedNames = new HashMap<String, String>();
+    Map<String, String> expectedNames = new HashMap<>();
     expectedNames.put(BEAN_TASK2_NAME, BEAN_TASK2_NAME);
     expectedNames.put(BEAN_TASK3_NAME, BEAN_TASK3_NAME);
     for (Task task : tasks) {
@@ -230,7 +227,7 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTest {
   @Deployment
   @Test
   public void testDecideBasedOnListOrArrayOfBeans() {
-    List<InclusiveGatewayTestOrder> orders = new ArrayList<InclusiveGatewayTestOrder>();
+    List<InclusiveGatewayTestOrder> orders = new ArrayList<>();
     orders.add(new InclusiveGatewayTestOrder(50));
     orders.add(new InclusiveGatewayTestOrder(300));
     orders.add(new InclusiveGatewayTestOrder(175));
@@ -254,7 +251,7 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTest {
     List<Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
     assertNotNull(tasks);
     assertEquals(2, tasks.size());
-    List<String> expectedNames = new ArrayList<String>();
+    List<String> expectedNames = new ArrayList<>();
     expectedNames.add(BEAN_TASK2_NAME);
     expectedNames.add(BEAN_TASK3_NAME);
     for (Task t : tasks) {
@@ -292,7 +289,7 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTest {
             CollectionUtil.singletonMap("order", new InclusiveGatewayTestOrder(125)));
     List<Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
     assertEquals(2, tasks.size());
-    List<String> expectedNames = new ArrayList<String>();
+    List<String> expectedNames = new ArrayList<>();
     expectedNames.add(BEAN_TASK2_NAME);
     expectedNames.add(BEAN_TASK3_NAME);
     for (Task t : tasks) {
@@ -327,7 +324,7 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTest {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("inclusiveGwDefaultSequenceFlow", CollectionUtil.singletonMap("input", 1));
     List<Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
     assertEquals(2, tasks.size());
-    Map<String, String> expectedNames = new HashMap<String, String>();
+    Map<String, String> expectedNames = new HashMap<>();
     expectedNames.put("Input is one", "Input is one");
     expectedNames.put("Input is three or one", "Input is three or one");
     for (Task t : tasks) {
@@ -397,7 +394,7 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTest {
     pi = runtimeService.startProcessInstanceByKey("inclusiveNoIdOnSequenceFlow", CollectionUtil.singletonMap("input", 1));
     List<Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
     assertEquals(2, tasks.size());
-    Map<String, String> expectedNames = new HashMap<String, String>();
+    Map<String, String> expectedNames = new HashMap<>();
     expectedNames.put("Input is one", "Input is one");
     expectedNames.put("Input is more than one", "Input is more than one");
     for (Task t : tasks) {
@@ -437,7 +434,7 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTest {
   @Test
   public void testJoinAfterSubprocesses() {
     // Test case to test act-1204
-    Map<String, Object> variableMap = new HashMap<String, Object>();
+    Map<String, Object> variableMap = new HashMap<>();
     variableMap.put("a", 1);
     variableMap.put("b", 1);
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("InclusiveGateway", variableMap);
@@ -458,7 +455,7 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTest {
     processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
     assertNull(processInstance);
 
-    variableMap = new HashMap<String, Object>();
+    variableMap = new HashMap<>();
     variableMap.put("a", 1);
     variableMap.put("b", 2);
     processInstance = runtimeService.startProcessInstanceByKey("InclusiveGateway", variableMap);
@@ -478,7 +475,7 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTest {
     processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
     assertNull(processInstance);
 
-    variableMap = new HashMap<String, Object>();
+    variableMap = new HashMap<>();
     variableMap.put("a", 2);
     variableMap.put("b", 2);
     try {
@@ -536,14 +533,14 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTest {
   @Test
   public void testDecisionFunctionality() {
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
 
     // Test with input == 1
     variables.put("input", 1);
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("inclusiveGateway", variables);
     List<Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
     assertEquals(3, tasks.size());
-    Map<String, String> expectedMessages = new HashMap<String, String>();
+    Map<String, String> expectedMessages = new HashMap<>();
     expectedMessages.put(TASK1_NAME, TASK1_NAME);
     expectedMessages.put(TASK2_NAME, TASK2_NAME);
     expectedMessages.put(TASK3_NAME, TASK3_NAME);
@@ -557,7 +554,7 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTest {
     pi = runtimeService.startProcessInstanceByKey("inclusiveGateway", variables);
     tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
     assertEquals(2, tasks.size());
-    expectedMessages = new HashMap<String, String>();
+    expectedMessages = new HashMap<>();
     expectedMessages.put(TASK2_NAME, TASK2_NAME);
     expectedMessages.put(TASK3_NAME, TASK3_NAME);
     for (Task task : tasks) {
@@ -570,7 +567,7 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTest {
     pi = runtimeService.startProcessInstanceByKey("inclusiveGateway", variables);
     tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
     assertEquals(1, tasks.size());
-    expectedMessages = new HashMap<String, String>();
+    expectedMessages = new HashMap<>();
     expectedMessages.put(TASK3_NAME, TASK3_NAME);
     for (Task task : tasks) {
       expectedMessages.remove(task.getName());
@@ -787,77 +784,16 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTest {
     assertEquals("taskAfterJoin", task.getTaskDefinitionKey());
   }
 
-  @Ignore("https://jira.camunda.com/browse/CAM-14116")
   @Deployment(resources = ASYNC_CONCURRENT_PARALLEL_GATEWAY)
   @Test
-  public void shouldCompleteWithConcurrentExecution_ParallelGateway_1() {
-    runtimeService.startProcessInstanceByKey("Process_Model11842");
+  public void shouldCompleteWithConcurrentExecution_ParallelGateway() {
+    // given
+    runtimeService.startProcessInstanceByKey("process");
 
-    AtomicReference<String> jobIdNotifyListener = new AtomicReference<>();
-    AtomicReference<String> jobIdActivityEnd = new AtomicReference<>();
-    managementService.createJobQuery().list().forEach(job -> {
-      if ("transition-notify-listener-take$Flow_0wno03o".equals(((JobEntity)job).getJobHandlerConfigurationRaw())) {
-        jobIdNotifyListener.set(job.getId());
+    // when
+    testRule.executeAvailableJobs(1);
 
-      } else if ("activity-end".equals(((JobEntity)job).getJobHandlerConfigurationRaw())) {
-        jobIdActivityEnd.set(job.getId());
-
-      }
-    });
-
-    managementService.executeJob(jobIdNotifyListener.get());
-    managementService.executeJob(jobIdActivityEnd.get());
-
-    Assertions.assertThat(managementService.createJobQuery().count()).isEqualTo(0);
-    Assertions.assertThat(historyService.createHistoricProcessInstanceQuery().singleResult().getState())
-        .isEqualTo("COMPLETED");
-  }
-
-  @Deployment(resources = ASYNC_CONCURRENT_PARALLEL_GATEWAY)
-  @Test
-  public void shouldCompleteWithConcurrentExecution_ParallelGateway_2() {
-    runtimeService.startProcessInstanceByKey("Process_Model11842");
-
-    AtomicReference<String> jobIdNotifyListener = new AtomicReference<>();
-    AtomicReference<String> jobIdActivityEnd = new AtomicReference<>();
-    managementService.createJobQuery().list().forEach(job -> {
-      if ("transition-notify-listener-take$Flow_0wno03o".equals(((JobEntity)job).getJobHandlerConfigurationRaw())) {
-        jobIdNotifyListener.set(job.getId());
-      } else if ("activity-end".equals(((JobEntity)job).getJobHandlerConfigurationRaw())) {
-        jobIdActivityEnd.set(job.getId());
-      }
-    });
-
-    managementService.executeJob(jobIdActivityEnd.get());
-    managementService.executeJob(jobIdNotifyListener.get());
-
-    Assertions.assertThat(managementService.createJobQuery().count()).isEqualTo(0);
-    Assertions.assertThat(historyService.createHistoricProcessInstanceQuery().singleResult().getState())
-        .isEqualTo("COMPLETED");
-  }
-
-
-  @Ignore("https://jira.camunda.com/browse/CAM-14116")
-  @Deployment(resources = ASYNC_CONCURRENT_PARALLEL_INCLUSIVE_GATEWAY)
-  @Test
-  public void shouldCompleteWithConcurrentExecution_InclusiveGateway_1() {
-    runtimeService.startProcessInstanceByKey("Process_Model11842");
-
-    AtomicReference<String> jobIdNotifyListener = new AtomicReference<>();
-    AtomicReference<String> jobIdActivityEnd = new AtomicReference<>();
-    managementService.createJobQuery().list().forEach(job -> {
-      if ("transition-notify-listener-take$Flow_0wno03o".equals(((JobEntity)job).getJobHandlerConfigurationRaw())) {
-        jobIdNotifyListener.set(job.getId());
-
-      } else if ("activity-end".equals(((JobEntity)job).getJobHandlerConfigurationRaw())) {
-        jobIdActivityEnd.set(job.getId());
-
-      }
-    });
-
-    managementService.executeJob(jobIdNotifyListener.get());
-    managementService.executeJob(jobIdActivityEnd.get());
-
+    // then
     Assertions.assertThat(managementService.createJobQuery().count()).isEqualTo(0);
     Assertions.assertThat(historyService.createHistoricProcessInstanceQuery().singleResult().getState())
         .isEqualTo("COMPLETED");
@@ -865,25 +801,17 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTest {
 
   @Deployment(resources = ASYNC_CONCURRENT_PARALLEL_INCLUSIVE_GATEWAY)
   @Test
-  public void shouldCompleteWithConcurrentExecution_InclusiveGateway_2() {
-    runtimeService.startProcessInstanceByKey("Process_Model11842");
+  public void shouldCompleteWithConcurrentExecution_InclusiveGateway() {
+    // given
+    runtimeService.startProcessInstanceByKey("process");
 
-    AtomicReference<String> jobIdNotifyListener = new AtomicReference<>();
-    AtomicReference<String> jobIdActivityEnd = new AtomicReference<>();
-    managementService.createJobQuery().list().forEach(job -> {
-      if ("transition-notify-listener-take$Flow_0wno03o".equals(((JobEntity)job).getJobHandlerConfigurationRaw())) {
-        jobIdNotifyListener.set(job.getId());
-      } else if ("activity-end".equals(((JobEntity)job).getJobHandlerConfigurationRaw())) {
-        jobIdActivityEnd.set(job.getId());
-      }
-    });
+    // when
+    testRule.executeAvailableJobs(1);
 
-    managementService.executeJob(jobIdActivityEnd.get());
-    managementService.executeJob(jobIdNotifyListener.get());
-
+    // then
     Assertions.assertThat(managementService.createJobQuery().count()).isEqualTo(0);
     Assertions.assertThat(historyService.createHistoricProcessInstanceQuery().singleResult().getState())
         .isEqualTo("COMPLETED");
   }
-
+  
 }

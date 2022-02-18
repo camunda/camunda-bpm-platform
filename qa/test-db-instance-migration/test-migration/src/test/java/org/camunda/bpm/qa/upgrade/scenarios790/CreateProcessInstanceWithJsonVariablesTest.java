@@ -18,7 +18,6 @@ package org.camunda.bpm.qa.upgrade.scenarios790;
 
 import java.util.HashMap;
 import java.util.List;
-import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -26,19 +25,14 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.camunda.bpm.qa.upgrade.Origin;
 
 import org.camunda.bpm.qa.upgrade.ScenarioUnderTest;
-import org.camunda.bpm.qa.upgrade.json.beans.Customer;
 import org.camunda.bpm.qa.upgrade.json.beans.ObjectList;
 import org.camunda.bpm.qa.upgrade.json.beans.Order;
 
-import org.camunda.bpm.qa.upgrade.json.beans.OrderDetails;
 import org.camunda.bpm.qa.upgrade.json.beans.RegularCustomer;
-import org.camunda.bpm.qa.upgrade.json.beans.SpecialCustomer;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 @ScenarioUnderTest("CreateProcessInstanceWithJsonVariablesScenario")
@@ -99,7 +93,7 @@ public class CreateProcessInstanceWithJsonVariablesTest {
   }
 
   public void assertSerializedMap(TypedValue typedValue) {
-    HashMap<String, String> expected = new HashMap<String, String>();
+    HashMap<String, String> expected = new HashMap<>();
     expected.put("foo", "bar");
     Assert.assertEquals(expected, typedValue.getValue());
   }

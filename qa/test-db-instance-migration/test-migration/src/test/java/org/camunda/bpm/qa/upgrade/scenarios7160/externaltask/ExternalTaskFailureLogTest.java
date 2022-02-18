@@ -19,11 +19,9 @@ package org.camunda.bpm.qa.upgrade.scenarios7160.externaltask;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.camunda.bpm.engine.ExternalTaskService;
-import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.runtime.Incident;
-import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.qa.upgrade.Origin;
 import org.camunda.bpm.qa.upgrade.ScenarioUnderTest;
