@@ -65,7 +65,7 @@ public class DeleteLicenseKeyCmd extends LicenseCmd implements Command<Object> {
     }
 
     if (updateTelemetry) {
-      ((ManagementServiceImpl) commandContext.getProcessEngineConfiguration().getManagementService()).addLicenseKeyToTelemetry(null);
+      ((ManagementServiceImpl) commandContext.getProcessEngineConfiguration().getManagementService()).setLicenseKeyForTelemetry(null);
     }
 
     return null;

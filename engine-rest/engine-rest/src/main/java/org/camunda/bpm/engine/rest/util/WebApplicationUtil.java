@@ -37,10 +37,11 @@ public class WebApplicationUtil {
   public static void setLicenseKey(LicenseKeyDataImpl licenseKeyData) {
     if (licenseKeyData != null) {
       ProcessEngineProvider processEngineProvider = getProcessEngineProvider();
-      String engineName = processEngineProvider.getProcessEngineNames().stream().filter(e -> e != null).findFirst().orElse(null);
-      if (engineName != null) {
-        ((ManagementServiceImpl) processEngineProvider.getProcessEngine(engineName).getManagementService())
-            .addLicenseKeyToTelemetry(licenseKeyData);
+      for (String engineName : processEngineProvider.getProcessEngineNames()) {
+        if (engineName != null) {
+          ManagementServiceImpl managementService = (ManagementServiceImpl) processEngineProvider.getProcessEngine(engineName).getManagementService();
+          managementService.setLicenseKeyForTelemetry(licenseKeyData);
+        }
       }
     }
   }
@@ -56,6 +57,7 @@ public class WebApplicationUtil {
    */
   public static boolean setWebapp(String engineName, String webapp) {
     ProcessEngineProvider processEngineProvider = getProcessEngineProvider();
-    return ((ManagementServiceImpl) processEngineProvider.getProcessEngine(engineName).getManagementService()).addWebappToTelemetry(webapp);
+    ManagementServiceImpl managementService = (ManagementServiceImpl) processEngineProvider.getProcessEngine(engineName).getManagementService();
+    return managementService.addWebappToTelemetry(webapp);
   }
 }

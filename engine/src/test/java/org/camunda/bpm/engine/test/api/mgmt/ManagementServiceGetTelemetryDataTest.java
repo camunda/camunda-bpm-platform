@@ -126,7 +126,7 @@ public class ManagementServiceGetTelemetryDataTest {
   @Test
   public void shouldReturnLicenseKey() {
     // given
-    managementService.addLicenseKeyToTelemetry(new LicenseKeyDataImpl(null, null, null, null, null, "test license"));
+    managementService.setLicenseKeyForTelemetry(new LicenseKeyDataImpl(null, null, null, null, null, "test license"));
 
     // when
     TelemetryData telemetryData = managementService.getTelemetryData();

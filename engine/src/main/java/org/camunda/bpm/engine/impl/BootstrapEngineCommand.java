@@ -236,11 +236,11 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
     telemetryData.setInstallation(installationId);
 
     // set the persisted license key in the telemetry data and registry
-    String licenseKey = processEngineConfiguration.getManagementService().getLicenseKey();
+    ManagementServiceImpl managementService = (ManagementServiceImpl) processEngineConfiguration.getManagementService();
+    String licenseKey = managementService.getLicenseKey();
     if (licenseKey != null) {
-      String licenseKeyRawString = licenseKey.contains(";") ? licenseKey.split(";", 2)[1] : licenseKey;
-      LicenseKeyDataImpl licenseKeyData = new LicenseKeyDataImpl(null, null, null, null, null, licenseKeyRawString);
-      ((ManagementServiceImpl) processEngineConfiguration.getManagementService()).addLicenseKeyToTelemetry(licenseKeyData);
+      LicenseKeyDataImpl licenseKeyData = LicenseKeyDataImpl.fromRawString(licenseKey);
+      managementService.setLicenseKeyForTelemetry(licenseKeyData);
       telemetryData.getProduct().getInternals().setLicenseKey(licenseKeyData);
     }
   }

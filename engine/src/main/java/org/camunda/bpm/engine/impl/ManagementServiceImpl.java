@@ -35,6 +35,7 @@ import org.camunda.bpm.engine.impl.batch.BatchQueryImpl;
 import org.camunda.bpm.engine.impl.batch.BatchStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.batch.DeleteBatchCmd;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.ActivateBatchCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteJobCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteLicenseKeyCmd;
@@ -79,6 +80,7 @@ import org.camunda.bpm.engine.impl.management.PurgeReport;
 import org.camunda.bpm.engine.impl.management.UpdateJobDefinitionSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.management.UpdateJobSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.metrics.MetricsQueryImpl;
+import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
 import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyDataImpl;
 import org.camunda.bpm.engine.management.ActivityStatisticsQuery;
@@ -585,17 +587,37 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
   }
 
   /**
-   * Adds license key information to the telemetry data of the engine.
+   * Sets license key information to the telemetry data of the engine.
    *
    * @param licenseKeyData
    *          a data object containing various pieces of information
    *          about the installed license
    */
-  public void addLicenseKeyToTelemetry(LicenseKeyDataImpl licenseKeyData) {
+  public void setLicenseKeyForTelemetry(LicenseKeyDataImpl licenseKeyData) {
     TelemetryRegistry telemetryRegistry = processEngineConfiguration.getTelemetryRegistry();
     if (telemetryRegistry != null) {
       telemetryRegistry.setLicenseKey(licenseKeyData);
     }
+  }
+
+  public LicenseKeyDataImpl getLicenseKeyFromTelemetry() {
+    TelemetryRegistry telemetryRegistry = processEngineConfiguration.getTelemetryRegistry();
+    if (telemetryRegistry != null) {
+      return telemetryRegistry.getLicenseKey();
+    }
+    return null;
+  }
+
+  public void clearTelemetryData() {
+    TelemetryRegistry telemetryRegistry = processEngineConfiguration.getTelemetryRegistry();
+    if (telemetryRegistry != null) {
+      telemetryRegistry.clear();
+    }
+    MetricsRegistry metricsRegistry = ((ProcessEngineConfigurationImpl) processEngineConfiguration).getMetricsRegistry();
+    if(metricsRegistry != null) {
+      metricsRegistry.clearTelemetryMetrics();
+    }
+    deleteMetrics(null);
   }
 
   protected class DbSchemaUpgradeCmd implements Command<String> {
