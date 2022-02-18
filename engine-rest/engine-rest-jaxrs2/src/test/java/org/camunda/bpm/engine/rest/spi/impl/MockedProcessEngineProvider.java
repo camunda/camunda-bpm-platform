@@ -55,43 +55,15 @@ public class MockedProcessEngineProvider implements ProcessEngineProvider {
     ProcessEngine engine = mock(ProcessEngine.class);
     when(engine.getName()).thenReturn(engineName);
     mockServices(engine);
-    mockProcessEngineConfiguration(engine);
     return engine;
   }
 
   private void mockServices(ProcessEngine engine) {
-    RepositoryService repoService = mock(RepositoryService.class);
     IdentityService identityService = mock(IdentityService.class);
-    TaskService taskService = mock(TaskService.class);
-    RuntimeService runtimeService = mock(RuntimeService.class);
-    FormService formService = mock(FormService.class);
-    HistoryService historyService = mock(HistoryService.class);
-    ManagementService managementService = mock(ManagementService.class);
-    CaseService caseService = mock(CaseService.class);
-    FilterService filterService = mock(FilterService.class);
     ExternalTaskService externalTaskService = mock(ExternalTaskService.class);
 
-    when(engine.getRepositoryService()).thenReturn(repoService);
     when(engine.getIdentityService()).thenReturn(identityService);
-    when(engine.getTaskService()).thenReturn(taskService);
-    when(engine.getRuntimeService()).thenReturn(runtimeService);
-    when(engine.getFormService()).thenReturn(formService);
-    when(engine.getHistoryService()).thenReturn(historyService);
-    when(engine.getManagementService()).thenReturn(managementService);
-    when(engine.getCaseService()).thenReturn(caseService);
-    when(engine.getFilterService()).thenReturn(filterService);
     when(engine.getExternalTaskService()).thenReturn(externalTaskService);
-  }
-
-  protected void mockProcessEngineConfiguration(ProcessEngine engine) {
-    ProcessEngineConfiguration configuration = mock(ProcessEngineConfiguration.class);
-    when(configuration.getValueTypeResolver()).thenReturn(mockValueTypeResolver());
-    when(engine.getProcessEngineConfiguration()).thenReturn(configuration);
-  }
-
-  protected ValueTypeResolver mockValueTypeResolver() {
-    // no true mock here, but the impl class is a simple container and should be safe to use
-    return new ValueTypeResolverImpl();
   }
 
   @Override

@@ -46,7 +46,7 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.InOrder;
-import org.mockito.Matchers;
+import org.mockito.Mockito;
 
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
@@ -398,7 +398,7 @@ public class DecisionDefinitionRestServiceQueryTest extends AbstractRestServiceT
 
     // assert query invocation
     InOrder inOrder = inOrder(mockedQuery);
-    inOrder.verify(mockedQuery, never()).decisionDefinitionIdIn(Matchers.<String[]>anyVararg());
+    inOrder.verify(mockedQuery, never()).decisionDefinitionIdIn(Mockito.any());
     inOrder.verify(mockedQuery).list();
   }
 

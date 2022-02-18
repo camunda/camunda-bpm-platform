@@ -20,8 +20,8 @@ import static io.restassured.RestAssured.expect;
 import static io.restassured.RestAssured.given;
 import static io.restassured.path.json.JsonPath.from;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -123,7 +123,7 @@ public class TenantRestServiceQueryTest extends AbstractRestServiceTest {
 
     RequestSpecification requestSpecification = given().contentType(POST_JSON_CONTENT_TYPE);
     for (Entry<String, String> paramEntry : queryParameters.entrySet()) {
-      requestSpecification.parameter(paramEntry.getKey(), paramEntry.getValue());
+      requestSpecification.param(paramEntry.getKey(), paramEntry.getValue());
     }
 
     requestSpecification

@@ -42,7 +42,6 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.InOrder;
-import org.mockito.Matchers;
 import org.mockito.Mockito;
 
 import io.restassured.http.ContentType;
@@ -392,7 +391,7 @@ public class CaseDefinitionRestServiceQueryTest extends AbstractRestServiceTest 
 
     // assert query invocation
     InOrder inOrder = Mockito.inOrder(mockedQuery);
-    inOrder.verify(mockedQuery, never()).caseDefinitionIdIn(Matchers.<String[]>anyVararg());
+    inOrder.verify(mockedQuery, never()).caseDefinitionIdIn(Mockito.any());
     inOrder.verify(mockedQuery).list();
   }
 

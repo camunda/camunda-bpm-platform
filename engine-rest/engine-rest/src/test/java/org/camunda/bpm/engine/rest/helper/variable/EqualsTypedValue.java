@@ -18,13 +18,14 @@ package org.camunda.bpm.engine.rest.helper.variable;
 
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.TypedValue;
-import org.mockito.ArgumentMatcher;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class EqualsTypedValue<S extends EqualsTypedValue<S>> extends ArgumentMatcher<TypedValue> {
+public class EqualsTypedValue<S extends EqualsTypedValue<S>> extends BaseMatcher<TypedValue> {
 
   protected ValueType type;
 
@@ -47,6 +48,16 @@ public class EqualsTypedValue<S extends EqualsTypedValue<S>> extends ArgumentMat
     }
 
     return true;
+  }
+
+  public void describeTo(Description description) {
+    StringBuilder sb = new StringBuilder();
+    sb.append(this.getClass().getSimpleName());
+    sb.append(": ");
+    sb.append("type=");
+    sb.append(type);
+
+    description.appendText(sb.toString());
   }
 
 }

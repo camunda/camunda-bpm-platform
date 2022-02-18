@@ -23,9 +23,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.rest.util.DateTimeUtils.withTimezone;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Matchers.anySetOf;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.anySet;
+import static org.mockito.hamcrest.MockitoHamcrest.argThat;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -1327,7 +1327,7 @@ public class ProcessInstanceRestServiceQueryTest extends
 
     when(instanceQuery.list()).thenReturn(null);
     String expectedExceptionMessage = "Set of process instance ids is empty";
-    doThrow(new ProcessEngineException(expectedExceptionMessage)).when(instanceQuery).processInstanceIds(anySetOf(String.class));
+    doThrow(new ProcessEngineException(expectedExceptionMessage)).when(instanceQuery).processInstanceIds(anySet());
     when(processEngine.getRuntimeService().createProcessInstanceQuery()).thenReturn(instanceQuery);
 
     String emptyList = "";
@@ -1348,7 +1348,7 @@ public class ProcessInstanceRestServiceQueryTest extends
 
     when(instanceQuery.list()).thenReturn(null);
     String expectedExceptionMessage = "Set of process instance ids is empty";
-    doThrow(new ProcessEngineException(expectedExceptionMessage)).when(instanceQuery).processInstanceIds(anySetOf(String.class));
+    doThrow(new ProcessEngineException(expectedExceptionMessage)).when(instanceQuery).processInstanceIds(anySet());
     when(processEngine.getRuntimeService().createProcessInstanceQuery()).thenReturn(instanceQuery);
 
     Map<String, Set<String>> params = new HashMap<String, Set<String>>();

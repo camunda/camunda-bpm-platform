@@ -21,15 +21,15 @@ import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ID;
 import static org.camunda.bpm.engine.rest.util.DateTimeUtils.DATE_FORMAT_WITH_TIMEZONE;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.hamcrest.MockitoHamcrest.argThat;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -287,7 +287,7 @@ public class ExecutionRestServiceInteractionTest extends AbstractRestServiceTest
 
   @Test
   public void testSignalNonExistingExecution() {
-    doThrow(new ProcessEngineException("expected exception")).when(runtimeServiceMock).signal(anyString(), any(Map.class));
+    doThrow(new ProcessEngineException("expected exception")).when(runtimeServiceMock).signal(any(), any());
 
     given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).contentType(ContentType.JSON).body(EMPTY_JSON_OBJECT)
       .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
@@ -299,7 +299,7 @@ public class ExecutionRestServiceInteractionTest extends AbstractRestServiceTest
   @Test
   public void testSignalThrowsAuthorizationException() {
     String message = "expected exception";
-    doThrow(new AuthorizationException(message)).when(runtimeServiceMock).signal(anyString(), any(Map.class));
+    doThrow(new AuthorizationException(message)).when(runtimeServiceMock).signal(any(), any());
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID)
@@ -440,7 +440,7 @@ public class ExecutionRestServiceInteractionTest extends AbstractRestServiceTest
 
   @Test
   public void testLocalVariableModificationForNonExistingExecution() {
-    doThrow(new ProcessEngineException("expected exception")).when(runtimeServiceMock).updateVariablesLocal(anyString(), any(Map.class), any(List.class));
+    doThrow(new ProcessEngineException("expected exception")).when(runtimeServiceMock).updateVariablesLocal(any(), any(), any());
 
     Map<String, Object> messageBodyJson = new HashMap<>();
 
@@ -466,7 +466,7 @@ public class ExecutionRestServiceInteractionTest extends AbstractRestServiceTest
   @Test
   public void testLocalVariableModificationThrowsAuthorizationException() {
     String message = "expected exception";
-    doThrow(new AuthorizationException(message)).when(runtimeServiceMock).updateVariablesLocal(anyString(), any(Map.class), any(List.class));
+    doThrow(new AuthorizationException(message)).when(runtimeServiceMock).updateVariablesLocal(any(), any(), any());
 
     Map<String, Object> messageBodyJson = new HashMap<>();
 
@@ -1599,7 +1599,7 @@ public class ExecutionRestServiceInteractionTest extends AbstractRestServiceTest
   public void testFailingMessageEventTriggering() {
     String messageName = "someMessage";
     doThrow(new ProcessEngineException("expected exception"))
-      .when(runtimeServiceMock).messageEventReceived(anyString(), anyString(), any(Map.class));
+      .when(runtimeServiceMock).messageEventReceived(any(), any(), any());
 
     given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("messageName", messageName)
       .contentType(ContentType.JSON).body(EMPTY_JSON_OBJECT)
@@ -1613,7 +1613,7 @@ public class ExecutionRestServiceInteractionTest extends AbstractRestServiceTest
   public void testMessageEventTriggeringThrowsAuthorizationException() {
     String message = "expected exception";
     doThrow(new AuthorizationException(message))
-      .when(runtimeServiceMock).messageEventReceived(anyString(), anyString(), any(Map.class));
+      .when(runtimeServiceMock).messageEventReceived(any(), any(), any());
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID)
@@ -1644,7 +1644,7 @@ public class ExecutionRestServiceInteractionTest extends AbstractRestServiceTest
 
   @Test
   public void testCreateIncidentWithNullIncidentType() {
-    doThrow(new BadUserRequestException()).when(runtimeServiceMock).createIncident(anyString(), anyString(), anyString(), anyString());
+    doThrow(new BadUserRequestException()).when(runtimeServiceMock).createIncident(any(), any(), any(), any());
     Map<String, Object> json = new HashMap<>();
     json.put("configuration", "configuration");
     json.put("message", "message");

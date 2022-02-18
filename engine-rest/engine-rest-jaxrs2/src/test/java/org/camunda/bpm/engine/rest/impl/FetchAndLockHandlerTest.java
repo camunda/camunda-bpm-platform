@@ -35,7 +35,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response.Status;
@@ -46,12 +46,11 @@ import java.util.Date;
 import java.util.List;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.argThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -95,10 +94,6 @@ public class FetchAndLockHandlerTest {
     when(externalTaskService.fetchAndLock(anyInt(), any(String.class), any(Boolean.class)))
       .thenReturn(fetchTopicBuilder);
     when(fetchTopicBuilder.topic(any(String.class), anyLong()))
-      .thenReturn(fetchTopicBuilder);
-    when(fetchTopicBuilder.variables(anyListOf(String.class)))
-      .thenReturn(fetchTopicBuilder);
-    when(fetchTopicBuilder.enableCustomObjectDeserialization())
       .thenReturn(fetchTopicBuilder);
 
     doNothing().when(handler).suspend(anyLong());
@@ -314,9 +309,6 @@ public class FetchAndLockHandlerTest {
 
   @Test
   public void shouldNotPollPeriodicallyWhenNotRequestsPending() {
-    // given
-    doReturn(Collections.emptyList()).when(fetchTopicBuilder).execute();
-
     // when
     handler.acquire();
 

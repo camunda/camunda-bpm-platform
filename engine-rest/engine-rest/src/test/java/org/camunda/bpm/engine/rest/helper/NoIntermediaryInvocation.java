@@ -16,8 +16,8 @@
  */
 package org.camunda.bpm.engine.rest.helper;
 
-import org.mockito.exceptions.Reporter;
 import org.mockito.exceptions.base.MockitoAssertionError;
+import org.mockito.internal.exceptions.Reporter;
 import org.mockito.internal.invocation.InvocationsFinder;
 import org.mockito.internal.verification.api.VerificationData;
 import org.mockito.internal.verification.api.VerificationDataInOrder;
@@ -34,16 +34,14 @@ import org.mockito.verification.VerificationMode;
  */
 public class NoIntermediaryInvocation implements VerificationInOrderMode, VerificationMode {
 
-  protected InvocationsFinder finder = new InvocationsFinder();
-
   @Override
   public void verifyInOrder(VerificationDataInOrder data) {
 
-    Invocation firstUnverifiedInvocation = finder.findFirstUnverifiedInOrder(data.getOrderingContext(), data.getAllInvocations());
+    Invocation firstUnverifiedInvocation = InvocationsFinder.findFirstUnverifiedInOrder(data.getOrderingContext(), data.getAllInvocations());
 
     if (firstUnverifiedInvocation == null) {
-      Invocation previouslyVerified = finder.findPreviousVerifiedInOrder(data.getAllInvocations(), data.getOrderingContext());
-      new Reporter().wantedButNotInvokedInOrder(data.getWanted(), previouslyVerified);
+      Invocation previouslyVerified = InvocationsFinder.findPreviousVerifiedInOrder(data.getAllInvocations(), data.getOrderingContext());
+      throw Reporter.wantedButNotInvokedInOrder(data.getWanted(), previouslyVerified);
     }
 
     if (!data.getWanted().matches(firstUnverifiedInvocation)) {

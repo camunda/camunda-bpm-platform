@@ -17,14 +17,14 @@
 package org.camunda.bpm.engine.rest.helper.variable;
 
 import org.camunda.bpm.engine.variable.value.TypedValue;
+import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
-import org.mockito.ArgumentMatcher;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class EqualsUntypedValue extends ArgumentMatcher<TypedValue> {
+public class EqualsUntypedValue extends BaseMatcher<TypedValue> {
 
   protected Object value;
 

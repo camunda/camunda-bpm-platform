@@ -20,15 +20,15 @@ import static io.restassured.RestAssured.given;
 import static org.camunda.bpm.engine.rest.util.DateTimeUtils.DATE_FORMAT_WITH_TIMEZONE;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.hamcrest.MockitoHamcrest.argThat;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -37,7 +37,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -72,7 +71,7 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Matchers;
+import org.mockito.Mockito;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
@@ -133,8 +132,8 @@ public class CaseExecutionRestServiceInteractionTest extends AbstractRestService
     when(caseServiceMock.getVariableLocalTyped(anyString(), eq(EXAMPLE_BYTES_VARIABLE_KEY), eq(false))).thenReturn(EXAMPLE_VARIABLE_VALUE_BYTES);
     when(caseServiceMock.getVariablesLocalTyped(anyString(), eq(true))).thenReturn(EXAMPLE_VARIABLES);
 
-    when(caseServiceMock.getVariablesTyped(anyString(), Matchers.<Collection<String>>any(), eq(true))).thenReturn(EXAMPLE_VARIABLES);
-    when(caseServiceMock.getVariablesLocalTyped(anyString(), Matchers.<Collection<String>>any(), eq(true))).thenReturn(EXAMPLE_VARIABLES);
+    when(caseServiceMock.getVariablesTyped(anyString(), Mockito.any(), eq(true))).thenReturn(EXAMPLE_VARIABLES);
+    when(caseServiceMock.getVariablesLocalTyped(anyString(), Mockito.any(), eq(true))).thenReturn(EXAMPLE_VARIABLES);
 
     caseExecutionCommandBuilderMock = mock(CaseExecutionCommandBuilder.class);
 
@@ -142,13 +141,13 @@ public class CaseExecutionRestServiceInteractionTest extends AbstractRestService
 
     when(caseExecutionCommandBuilderMock.setVariable(anyString(), any())).thenReturn(caseExecutionCommandBuilderMock);
     when(caseExecutionCommandBuilderMock.setVariableLocal(anyString(), any())).thenReturn(caseExecutionCommandBuilderMock);
-    when(caseExecutionCommandBuilderMock.setVariables(Matchers.<Map<String, Object>>any())).thenReturn(caseExecutionCommandBuilderMock);
-    when(caseExecutionCommandBuilderMock.setVariablesLocal(Matchers.<Map<String, Object>>any())).thenReturn(caseExecutionCommandBuilderMock);
+    when(caseExecutionCommandBuilderMock.setVariables(Mockito.any())).thenReturn(caseExecutionCommandBuilderMock);
+    when(caseExecutionCommandBuilderMock.setVariablesLocal(Mockito.any())).thenReturn(caseExecutionCommandBuilderMock);
 
     when(caseExecutionCommandBuilderMock.removeVariable(anyString())).thenReturn(caseExecutionCommandBuilderMock);
     when(caseExecutionCommandBuilderMock.removeVariableLocal(anyString())).thenReturn(caseExecutionCommandBuilderMock);
-    when(caseExecutionCommandBuilderMock.removeVariables(Matchers.<Collection<String>>any())).thenReturn(caseExecutionCommandBuilderMock);
-    when(caseExecutionCommandBuilderMock.removeVariablesLocal(Matchers.<Collection<String>>any())).thenReturn(caseExecutionCommandBuilderMock);
+    when(caseExecutionCommandBuilderMock.removeVariables(Mockito.any())).thenReturn(caseExecutionCommandBuilderMock);
+    when(caseExecutionCommandBuilderMock.removeVariablesLocal(Mockito.any())).thenReturn(caseExecutionCommandBuilderMock);
 
   }
 

@@ -59,7 +59,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.anyString;
 
 public class HistoricVariableInstanceRestServiceQueryTest extends AbstractRestServiceTest {
 
@@ -936,7 +936,7 @@ public class HistoricVariableInstanceRestServiceQueryTest extends AbstractRestSe
     when(mockedQuery.processDefinitionId(anyString())).thenReturn(mockedQuery);
 
     given()
-      .queryParameter("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .queryParam("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
     .when()
@@ -967,7 +967,7 @@ public class HistoricVariableInstanceRestServiceQueryTest extends AbstractRestSe
     when(mockedQuery.processDefinitionKey(anyString())).thenReturn(mockedQuery);
 
     given()
-      .queryParameter("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+      .queryParam("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
     .when()

@@ -20,6 +20,7 @@ import static io.restassured.RestAssured.given;
 import static io.restassured.path.json.JsonPath.from;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DECISION_DEFINITION_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DECISION_INSTANCE_ID;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -27,11 +28,10 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyList;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
@@ -307,11 +307,7 @@ public class HistoricDecisionInstanceRestServiceInteractionTest extends Abstract
 
     Batch batchEntity = MockProvider.createMockBatch();
 
-    when(historyServiceMock.deleteHistoricDecisionInstancesAsync(
-        anyListOf(String.class),
-        any(HistoricDecisionInstanceQuery.class),
-        anyString()
-    )).thenReturn(batchEntity);
+    when(historyServiceMock.deleteHistoricDecisionInstancesAsync(any(), any(), any())).thenReturn(batchEntity);
 
     Map<String, Object> messageBodyJson = new HashMap<String, Object>();
     messageBodyJson.put("historicDecisionInstanceIds", ids);
@@ -332,11 +328,7 @@ public class HistoricDecisionInstanceRestServiceInteractionTest extends Abstract
   public void testDeleteAsyncWithQuery() {
     Batch batchEntity = MockProvider.createMockBatch();
 
-    when(historyServiceMock.deleteHistoricDecisionInstancesAsync(
-        anyListOf(String.class),
-        any(HistoricDecisionInstanceQuery.class),
-        anyString()
-    )).thenReturn(batchEntity);
+    when(historyServiceMock.deleteHistoricDecisionInstancesAsync(any(), any(), any())).thenReturn(batchEntity);
 
     Map<String, Object> messageBodyJson = new HashMap<String, Object>();
     HistoricDecisionInstanceQueryDto query = new HistoricDecisionInstanceQueryDto();
@@ -360,7 +352,7 @@ public class HistoricDecisionInstanceRestServiceInteractionTest extends Abstract
     Batch batchEntity = MockProvider.createMockBatch();
 
     when(historyServiceMock.deleteHistoricDecisionInstancesAsync(
-        anyListOf(String.class),
+        anyList(),
         any(HistoricDecisionInstanceQuery.class),
         anyString()
     )).thenReturn(batchEntity);
@@ -388,7 +380,7 @@ public class HistoricDecisionInstanceRestServiceInteractionTest extends Abstract
   @Test
   public void testDeleteAsyncWithBadRequestQuery() {
     doThrow(new BadUserRequestException("process instance ids are empty"))
-        .when(historyServiceMock).deleteHistoricDecisionInstancesAsync(eq((List<String>) null), eq((HistoricDecisionInstanceQuery) null), anyString());
+        .when(historyServiceMock).deleteHistoricDecisionInstancesAsync(eq((List<String>) null), eq((HistoricDecisionInstanceQuery) null), any());
 
     given()
         .contentType(ContentType.JSON).body(EMPTY_JSON_OBJECT)

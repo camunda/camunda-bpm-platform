@@ -412,7 +412,7 @@ public class MetricsRestServiceInteractionTest extends AbstractRestServiceTest {
   @Test
   public void testDeleteUtwThrowsAuthorizationException() {
     String message = "expected exception";
-    doThrow(new AuthorizationException(message)).when(managementServiceMock).deleteTaskMetrics(any(Date.class));
+    doThrow(new AuthorizationException(message)).when(managementServiceMock).deleteTaskMetrics(any());
 
     given()
     .then().expect()

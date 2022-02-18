@@ -46,8 +46,6 @@ public class MockGroupBuilder {
   public Group build() {
     Group group = mock(Group.class);
     when(group.getId()).thenReturn(id);
-    when(group.getName()).thenReturn(name);
-    when(group.getType()).thenReturn(type);
     return group;
   }
 

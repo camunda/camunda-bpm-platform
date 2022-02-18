@@ -42,14 +42,12 @@ import org.junit.Test;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
-import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -84,10 +82,10 @@ public abstract class AbstractEmptyBodyFilterTest extends AbstractRestServiceTes
     when(processEngine.getRuntimeService()).thenReturn(runtimeServiceMock);
 
     mockInstantiationBuilder = mock(ProcessInstantiationBuilder.class);
-    when(mockInstantiationBuilder.setVariables(any(Map.class))).thenReturn(mockInstantiationBuilder);
-    when(mockInstantiationBuilder.businessKey(anyString())).thenReturn(mockInstantiationBuilder);
-    when(mockInstantiationBuilder.caseInstanceId(anyString())).thenReturn(mockInstantiationBuilder);
-    when(runtimeServiceMock.createProcessInstanceById(anyString())).thenReturn(mockInstantiationBuilder);
+    when(mockInstantiationBuilder.setVariables(any())).thenReturn(mockInstantiationBuilder);
+    when(mockInstantiationBuilder.businessKey(any())).thenReturn(mockInstantiationBuilder);
+    when(mockInstantiationBuilder.caseInstanceId(any())).thenReturn(mockInstantiationBuilder);
+    when(runtimeServiceMock.createProcessInstanceById(any())).thenReturn(mockInstantiationBuilder);
 
     ProcessInstanceWithVariables resultInstanceWithVariables = MockProvider.createMockInstanceWithVariables();
     when(mockInstantiationBuilder.executeWithVariablesInReturn(anyBoolean(), anyBoolean())).thenReturn(resultInstanceWithVariables);

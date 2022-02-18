@@ -22,10 +22,11 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.camunda.bpm.engine.variable.VariableMap;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
 import org.hamcrest.Matcher;
-import org.mockito.ArgumentMatcher;
 
-public class EqualsMap extends ArgumentMatcher<Map<String, Object>> {
+public class EqualsMap extends BaseMatcher<Map<String, Object>> {
 
   protected Map<String, Object> mapToCompare;
   protected Map<String, Matcher<?>> matchers;
@@ -112,6 +113,19 @@ public class EqualsMap extends ArgumentMatcher<Map<String, Object>> {
 
     matchers.put(key, matcher);
     return this;
+  }
+
+  public void describeTo(Description description) {
+    StringBuilder sb = new StringBuilder();
+    sb.append(this.getClass().getSimpleName());
+    sb.append(": ");
+    sb.append("mapToCompare=");
+    sb.append(mapToCompare);
+    sb.append(" ");
+    sb.append("matchers=");
+    sb.append(matchers);
+
+    description.appendText(sb.toString());
   }
 
 }

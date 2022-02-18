@@ -28,7 +28,7 @@ import org.camunda.bpm.engine.runtime.SignalEventReceivedBuilder;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.mockito.Matchers;
+import org.mockito.Mockito;
 
 import javax.ws.rs.core.Response.Status;
 import java.util.HashMap;
@@ -36,7 +36,7 @@ import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -63,7 +63,7 @@ public class SignalRestServiceTest extends AbstractRestServiceTest {
 
     signalBuilderMock = mock(SignalEventReceivedBuilderImpl.class);
     when(runtimeServiceMock.createSignalEvent(anyString())).thenReturn(signalBuilderMock);
-    when(signalBuilderMock.setVariables(Matchers.<Map<String,Object>>any())).thenReturn(signalBuilderMock);
+    when(signalBuilderMock.setVariables(Mockito.any())).thenReturn(signalBuilderMock);
     when(signalBuilderMock.executionId(anyString())).thenReturn(signalBuilderMock);
     when(signalBuilderMock.tenantId(anyString())).thenReturn(signalBuilderMock);
     when(signalBuilderMock.withoutTenantId()).thenReturn(signalBuilderMock);

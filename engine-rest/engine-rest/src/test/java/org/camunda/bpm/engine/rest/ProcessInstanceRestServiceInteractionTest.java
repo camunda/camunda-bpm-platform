@@ -20,13 +20,11 @@ import static io.restassured.RestAssured.given;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockBatch;
 import static org.camunda.bpm.engine.rest.util.DateTimeUtils.DATE_FORMAT_WITH_TIMEZONE;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.*;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
+import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -95,6 +93,7 @@ import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.FileValue;
 import org.camunda.bpm.engine.variable.value.LongValue;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -185,14 +184,14 @@ public class ProcessInstanceRestServiceInteractionTest extends
     when(runtimeServiceMock.updateProcessInstanceSuspensionState()).thenReturn(mockUpdateSuspensionStateSelectBuilder);
 
     mockUpdateSuspensionStateBuilder = mock(UpdateProcessInstanceSuspensionStateTenantBuilder.class);
-    when(mockUpdateSuspensionStateSelectBuilder.byProcessInstanceId(anyString())).thenReturn(mockUpdateSuspensionStateBuilder);
-    when(mockUpdateSuspensionStateSelectBuilder.byProcessDefinitionId(anyString())).thenReturn(mockUpdateSuspensionStateBuilder);
-    when(mockUpdateSuspensionStateSelectBuilder.byProcessDefinitionKey(anyString())).thenReturn(mockUpdateSuspensionStateBuilder);
+    when(mockUpdateSuspensionStateSelectBuilder.byProcessInstanceId(any())).thenReturn(mockUpdateSuspensionStateBuilder);
+    when(mockUpdateSuspensionStateSelectBuilder.byProcessDefinitionId(any())).thenReturn(mockUpdateSuspensionStateBuilder);
+    when(mockUpdateSuspensionStateSelectBuilder.byProcessDefinitionKey(any())).thenReturn(mockUpdateSuspensionStateBuilder);
 
     mockUpdateProcessInstancesSuspensionStateBuilder = mock(UpdateProcessInstancesSuspensionStateBuilder.class);
-    when(mockUpdateSuspensionStateSelectBuilder.byProcessInstanceIds(anyListOf(String.class))).thenReturn(mockUpdateProcessInstancesSuspensionStateBuilder);
-    when(mockUpdateSuspensionStateSelectBuilder.byProcessInstanceQuery(any(ProcessInstanceQuery.class))).thenReturn(mockUpdateProcessInstancesSuspensionStateBuilder);
-    when(mockUpdateSuspensionStateSelectBuilder.byHistoricProcessInstanceQuery(any(HistoricProcessInstanceQuery.class))).thenReturn(mockUpdateProcessInstancesSuspensionStateBuilder);
+    when(mockUpdateSuspensionStateSelectBuilder.byProcessInstanceIds(Mockito.<List<String>>any())).thenReturn(mockUpdateProcessInstancesSuspensionStateBuilder);
+    when(mockUpdateSuspensionStateSelectBuilder.byProcessInstanceQuery(any())).thenReturn(mockUpdateProcessInstancesSuspensionStateBuilder);
+    when(mockUpdateSuspensionStateSelectBuilder.byHistoricProcessInstanceQuery(any())).thenReturn(mockUpdateProcessInstancesSuspensionStateBuilder);
 
     // runtime service
     when(processEngine.getRuntimeService()).thenReturn(runtimeServiceMock);
@@ -205,50 +204,50 @@ public class ProcessInstanceRestServiceInteractionTest extends
   public void testGetActivityInstanceTree() {
     Response response = given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
         .then().expect().statusCode(Status.OK.getStatusCode())
-        .body("id", equalTo(EXAMPLE_ACTIVITY_INSTANCE_ID))
-        .body("parentActivityInstanceId", equalTo(EXAMPLE_PARENT_ACTIVITY_INSTANCE_ID))
-        .body("activityId", equalTo(EXAMPLE_ACTIVITY_ID))
-        .body("processInstanceId", equalTo(EXAMPLE_PROCESS_INSTANCE_ID))
-        .body("processDefinitionId", equalTo(EXAMPLE_PROCESS_DEFINITION_ID))
-        .body("executionIds", not(empty()))
-        .body("executionIds[0]", equalTo(EXAMPLE_EXECUTION_ID))
-        .body("activityName", equalTo(EXAMPLE_ACTIVITY_NAME))
+        .body("id", Matchers.equalTo(EXAMPLE_ACTIVITY_INSTANCE_ID))
+        .body("parentActivityInstanceId", Matchers.equalTo(EXAMPLE_PARENT_ACTIVITY_INSTANCE_ID))
+        .body("activityId", Matchers.equalTo(EXAMPLE_ACTIVITY_ID))
+        .body("processInstanceId", Matchers.equalTo(EXAMPLE_PROCESS_INSTANCE_ID))
+        .body("processDefinitionId", Matchers.equalTo(EXAMPLE_PROCESS_DEFINITION_ID))
+        .body("executionIds", Matchers.not(Matchers.empty()))
+        .body("executionIds[0]", Matchers.equalTo(EXAMPLE_EXECUTION_ID))
+        .body("activityName", Matchers.equalTo(EXAMPLE_ACTIVITY_NAME))
         // "name" is deprecated and there for legacy reasons
-        .body("name", equalTo(EXAMPLE_ACTIVITY_NAME))
-        .body("incidentIds", empty())
-        .body("incidents", not(empty()))
-        .body("incidents[0].id", equalTo("anIncidentId"))
-        .body("incidents[0].activityId", equalTo("anActivityId"))
-        .body("childActivityInstances", not(empty()))
-        .body("childActivityInstances[0].id", equalTo(CHILD_EXAMPLE_ACTIVITY_INSTANCE_ID))
-        .body("childActivityInstances[0].parentActivityInstanceId", equalTo(CHILD_EXAMPLE_PARENT_ACTIVITY_INSTANCE_ID))
-        .body("childActivityInstances[0].activityId", equalTo(CHILD_EXAMPLE_ACTIVITY_ID))
-        .body("childActivityInstances[0].activityType", equalTo(CHILD_EXAMPLE_ACTIVITY_TYPE))
-        .body("childActivityInstances[0].activityName", equalTo(CHILD_EXAMPLE_ACTIVITY_NAME))
-        .body("childActivityInstances[0].name", equalTo(CHILD_EXAMPLE_ACTIVITY_NAME))
-        .body("childActivityInstances[0].processInstanceId", equalTo(CHILD_EXAMPLE_PROCESS_INSTANCE_ID))
-        .body("childActivityInstances[0].processDefinitionId", equalTo(CHILD_EXAMPLE_PROCESS_DEFINITION_ID))
-        .body("childActivityInstances[0].executionIds", not(empty()))
-        .body("childActivityInstances[0].childActivityInstances", empty())
-        .body("childActivityInstances[0].childTransitionInstances", empty())
-        .body("childActivityInstances[0].incidentIds", not(empty()))
-        .body("childActivityInstances[0].incidentIds[0]", equalTo(EXAMPLE_INCIDENT_ID))
-        .body("childActivityInstances[0].incidents[0].id", equalTo("anIncidentId"))
-        .body("childActivityInstances[0].incidents[0].activityId", equalTo("anActivityId"))
-        .body("childTransitionInstances", not(empty()))
-        .body("childTransitionInstances[0].id", equalTo(CHILD_EXAMPLE_ACTIVITY_INSTANCE_ID))
-        .body("childTransitionInstances[0].parentActivityInstanceId", equalTo(CHILD_EXAMPLE_PARENT_ACTIVITY_INSTANCE_ID))
-        .body("childTransitionInstances[0].activityId", equalTo(CHILD_EXAMPLE_ACTIVITY_ID))
-        .body("childTransitionInstances[0].activityName", equalTo(CHILD_EXAMPLE_ACTIVITY_NAME))
-        .body("childTransitionInstances[0].activityType", equalTo(CHILD_EXAMPLE_ACTIVITY_TYPE))
-        .body("childTransitionInstances[0].targetActivityId", equalTo(CHILD_EXAMPLE_ACTIVITY_ID))
-        .body("childTransitionInstances[0].processInstanceId", equalTo(CHILD_EXAMPLE_PROCESS_INSTANCE_ID))
-        .body("childTransitionInstances[0].processDefinitionId", equalTo(CHILD_EXAMPLE_PROCESS_DEFINITION_ID))
-        .body("childTransitionInstances[0].executionId", equalTo(EXAMPLE_EXECUTION_ID))
-        .body("childTransitionInstances[0].incidentIds", not(empty()))
-        .body("childTransitionInstances[0].incidentIds[0]", equalTo(EXAMPLE_ANOTHER_INCIDENT_ID))
-        .body("childTransitionInstances[0].incidents[0].id", equalTo("anIncidentId"))
-        .body("childTransitionInstances[0].incidents[0].activityId", equalTo("anActivityId"))
+        .body("name", Matchers.equalTo(EXAMPLE_ACTIVITY_NAME))
+        .body("incidentIds", Matchers.empty())
+        .body("incidents", Matchers.not(Matchers.empty()))
+        .body("incidents[0].id", Matchers.equalTo("anIncidentId"))
+        .body("incidents[0].activityId", Matchers.equalTo("anActivityId"))
+        .body("childActivityInstances", Matchers.not(Matchers.empty()))
+        .body("childActivityInstances[0].id", Matchers.equalTo(CHILD_EXAMPLE_ACTIVITY_INSTANCE_ID))
+        .body("childActivityInstances[0].parentActivityInstanceId", Matchers.equalTo(CHILD_EXAMPLE_PARENT_ACTIVITY_INSTANCE_ID))
+        .body("childActivityInstances[0].activityId", Matchers.equalTo(CHILD_EXAMPLE_ACTIVITY_ID))
+        .body("childActivityInstances[0].activityType", Matchers.equalTo(CHILD_EXAMPLE_ACTIVITY_TYPE))
+        .body("childActivityInstances[0].activityName", Matchers.equalTo(CHILD_EXAMPLE_ACTIVITY_NAME))
+        .body("childActivityInstances[0].name", Matchers.equalTo(CHILD_EXAMPLE_ACTIVITY_NAME))
+        .body("childActivityInstances[0].processInstanceId", Matchers.equalTo(CHILD_EXAMPLE_PROCESS_INSTANCE_ID))
+        .body("childActivityInstances[0].processDefinitionId", Matchers.equalTo(CHILD_EXAMPLE_PROCESS_DEFINITION_ID))
+        .body("childActivityInstances[0].executionIds", Matchers.not(Matchers.empty()))
+        .body("childActivityInstances[0].childActivityInstances", Matchers.empty())
+        .body("childActivityInstances[0].childTransitionInstances", Matchers.empty())
+        .body("childActivityInstances[0].incidentIds", Matchers.not(Matchers.empty()))
+        .body("childActivityInstances[0].incidentIds[0]", Matchers.equalTo(EXAMPLE_INCIDENT_ID))
+        .body("childActivityInstances[0].incidents[0].id", Matchers.equalTo("anIncidentId"))
+        .body("childActivityInstances[0].incidents[0].activityId", Matchers.equalTo("anActivityId"))
+        .body("childTransitionInstances", Matchers.not(Matchers.empty()))
+        .body("childTransitionInstances[0].id", Matchers.equalTo(CHILD_EXAMPLE_ACTIVITY_INSTANCE_ID))
+        .body("childTransitionInstances[0].parentActivityInstanceId", Matchers.equalTo(CHILD_EXAMPLE_PARENT_ACTIVITY_INSTANCE_ID))
+        .body("childTransitionInstances[0].activityId", Matchers.equalTo(CHILD_EXAMPLE_ACTIVITY_ID))
+        .body("childTransitionInstances[0].activityName", Matchers.equalTo(CHILD_EXAMPLE_ACTIVITY_NAME))
+        .body("childTransitionInstances[0].activityType", Matchers.equalTo(CHILD_EXAMPLE_ACTIVITY_TYPE))
+        .body("childTransitionInstances[0].targetActivityId", Matchers.equalTo(CHILD_EXAMPLE_ACTIVITY_ID))
+        .body("childTransitionInstances[0].processInstanceId", Matchers.equalTo(CHILD_EXAMPLE_PROCESS_INSTANCE_ID))
+        .body("childTransitionInstances[0].processDefinitionId", Matchers.equalTo(CHILD_EXAMPLE_PROCESS_DEFINITION_ID))
+        .body("childTransitionInstances[0].executionId", Matchers.equalTo(EXAMPLE_EXECUTION_ID))
+        .body("childTransitionInstances[0].incidentIds", Matchers.not(Matchers.empty()))
+        .body("childTransitionInstances[0].incidentIds[0]", Matchers.equalTo(EXAMPLE_ANOTHER_INCIDENT_ID))
+        .body("childTransitionInstances[0].incidents[0].id", Matchers.equalTo("anIncidentId"))
+        .body("childTransitionInstances[0].incidents[0].activityId", Matchers.equalTo("anActivityId"))
         .when().get(PROCESS_INSTANCE_ACTIVIY_INSTANCES_URL);
 
     Assert.assertEquals("Should return right number of properties", 13,
@@ -261,8 +260,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
     given().pathParam("id", "aNonExistingProcessInstanceId")
       .then().expect().statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("Process instance with id aNonExistingProcessInstanceId does not exist"))
+      .body("type", Matchers.equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", Matchers.equalTo("Process instance with id aNonExistingProcessInstanceId does not exist"))
       .when().get(PROCESS_INSTANCE_ACTIVIY_INSTANCES_URL);
   }
 
@@ -272,8 +271,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
     given().pathParam("id", "aNonExistingProcessInstanceId")
       .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("expected exception"))
+      .body("type", Matchers.equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", Matchers.equalTo("expected exception"))
       .when().get(PROCESS_INSTANCE_ACTIVIY_INSTANCES_URL);
   }
 
@@ -287,8 +286,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     .then().expect()
       .statusCode(Status.FORBIDDEN.getStatusCode())
       .contentType(ContentType.JSON)
-      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
-      .body("message", equalTo(message))
+      .body("type", Matchers.equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", Matchers.equalTo(message))
     .when()
       .get(PROCESS_INSTANCE_ACTIVIY_INSTANCES_URL);
   }
@@ -297,9 +296,9 @@ public class ProcessInstanceRestServiceInteractionTest extends
   public void testGetVariables() {
     Response response = given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
       .then().expect().statusCode(Status.OK.getStatusCode())
-      .body(EXAMPLE_VARIABLE_KEY, notNullValue())
-      .body(EXAMPLE_VARIABLE_KEY + ".value", equalTo(EXAMPLE_VARIABLE_VALUE.getValue()))
-      .body(EXAMPLE_VARIABLE_KEY + ".type", equalTo(String.class.getSimpleName()))
+      .body(EXAMPLE_VARIABLE_KEY, Matchers.notNullValue())
+      .body(EXAMPLE_VARIABLE_KEY + ".value", Matchers.equalTo(EXAMPLE_VARIABLE_VALUE.getValue()))
+      .body(EXAMPLE_VARIABLE_KEY + ".type", Matchers.equalTo(String.class.getSimpleName()))
       .when().get(PROCESS_INSTANCE_VARIABLES_URL);
 
     Assert.assertEquals("Should return exactly one variable", 1, response.jsonPath().getMap("").size());
@@ -308,7 +307,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
   @Test
   public void testDeleteAsync() {
     List<String> ids = Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
-    when(runtimeServiceMock.deleteProcessInstancesAsync(anyListOf(String.class), any(ProcessInstanceQuery.class), anyString(), anyBoolean(), anyBoolean())).thenReturn(new BatchEntity());
+    when(runtimeServiceMock.deleteProcessInstancesAsync(any(), any(), any(), anyBoolean(), anyBoolean())).thenReturn(new BatchEntity());
 
     Map<String, Object> messageBodyJson = new HashMap<String, Object>();
     messageBodyJson.put("processInstanceIds", ids);
@@ -329,7 +328,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
     messageBodyJson.put(DELETE_REASON, TEST_DELETE_REASON);
     ProcessInstanceQueryDto query = new ProcessInstanceQueryDto();
     messageBodyJson.put("processInstanceQuery", query);
-    when(runtimeServiceMock.deleteProcessInstancesAsync(anyListOf(String.class), any(ProcessInstanceQuery.class), anyString(), anyBoolean(), anyBoolean())).thenReturn(new BatchEntity());
+    when(runtimeServiceMock.deleteProcessInstancesAsync(any(), any(), any(), anyBoolean(), anyBoolean())).thenReturn(new BatchEntity());
 
     given()
         .contentType(ContentType.JSON).body(messageBodyJson)
@@ -338,7 +337,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
         .when().post(DELETE_PROCESS_INSTANCES_ASYNC_URL);
 
     verify(runtimeServiceMock, times(1)).deleteProcessInstancesAsync(
-        anyListOf(String.class), Mockito.any(ProcessInstanceQuery.class), Mockito.eq(TEST_DELETE_REASON), Mockito.eq(false), Mockito.eq(false));
+        any(), Mockito.any(), Mockito.eq(TEST_DELETE_REASON), Mockito.eq(false), Mockito.eq(false));
   }
 
   @Test
@@ -358,7 +357,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
   @Test
   public void testDeleteAsyncWithSkipCustomListeners() {
-    when(runtimeServiceMock.deleteProcessInstancesAsync(anyListOf(String.class), any(ProcessInstanceQuery.class), anyString(), anyBoolean(), anyBoolean())).thenReturn(new BatchEntity());
+    when(runtimeServiceMock.deleteProcessInstancesAsync(any(), any(), any(), anyBoolean(), anyBoolean())).thenReturn(new BatchEntity());
     Map<String, Object> messageBodyJson = new HashMap<String, Object>();
     messageBodyJson.put(DELETE_REASON, TEST_DELETE_REASON);
     messageBodyJson.put("processInstanceIds", Arrays.asList("processInstanceId1", "processInstanceId2"));
@@ -370,12 +369,12 @@ public class ProcessInstanceRestServiceInteractionTest extends
         .statusCode(Status.OK.getStatusCode())
         .when().post(DELETE_PROCESS_INSTANCES_ASYNC_URL);
 
-    verify(runtimeServiceMock).deleteProcessInstancesAsync(anyListOf(String.class), Mockito.any(ProcessInstanceQuery.class), Mockito.eq(TEST_DELETE_REASON), Mockito.eq(true), Mockito.eq(false));
+    verify(runtimeServiceMock).deleteProcessInstancesAsync(anyList(), any(), Mockito.eq(TEST_DELETE_REASON), Mockito.eq(true), Mockito.eq(false));
   }
 
   @Test
   public void testDeleteAsyncWithSkipSubprocesses() {
-    when(runtimeServiceMock.deleteProcessInstancesAsync(anyListOf(String.class), any(ProcessInstanceQuery.class), anyString(), anyBoolean(), anyBoolean())).thenReturn(new BatchEntity());
+    when(runtimeServiceMock.deleteProcessInstancesAsync(any(), any(), any(), anyBoolean(), anyBoolean())).thenReturn(new BatchEntity());
     Map<String, Object> messageBodyJson = new HashMap<String, Object>();
     messageBodyJson.put(DELETE_REASON, TEST_DELETE_REASON);
     messageBodyJson.put("processInstanceIds", Arrays.asList("processInstanceId1", "processInstanceId2"));
@@ -388,20 +387,20 @@ public class ProcessInstanceRestServiceInteractionTest extends
         .when().post(DELETE_PROCESS_INSTANCES_ASYNC_URL);
 
     verify(runtimeServiceMock).deleteProcessInstancesAsync(
-        anyListOf(String.class),
-        Mockito.any(ProcessInstanceQuery.class),
-        Mockito.eq(TEST_DELETE_REASON),
-        Mockito.eq(false),
-        Mockito.eq(true));
+        anyList(),
+        any(),
+        eq(TEST_DELETE_REASON),
+        eq(false),
+        eq(true));
   }
 
   @Test
   public void testDeleteAsyncHistoricQueryBasedWithQuery() {
     when(runtimeServiceMock.deleteProcessInstancesAsync(
-      anyListOf(String.class),
+      any(),
       eq((ProcessInstanceQuery)null),
-      any(HistoricProcessInstanceQuery.class),
-      anyString(),
+      any(),
+      any(),
       anyBoolean(),
       anyBoolean()))
     .thenReturn(new BatchEntity());
@@ -431,10 +430,10 @@ public class ProcessInstanceRestServiceInteractionTest extends
   @Test
   public void testDeleteAsyncHistoricQueryBasedWithProcessInstanceIds() {
     when(runtimeServiceMock.deleteProcessInstancesAsync(
-      anyListOf(String.class),
+      any(),
       eq((ProcessInstanceQuery)null),
       eq((HistoricProcessInstanceQuery)null),
-      anyString(),
+      any(),
       anyBoolean(),
       anyBoolean()))
     .thenReturn(new BatchEntity());
@@ -461,10 +460,10 @@ public class ProcessInstanceRestServiceInteractionTest extends
   @Test
   public void testDeleteAsyncHistoricQueryBasedWithQueryAndProcessInstanceIds() {
     when(runtimeServiceMock.deleteProcessInstancesAsync(
-      anyListOf(String.class),
+      any(),
       eq((ProcessInstanceQuery)null),
-      any(HistoricProcessInstanceQuery.class),
-      anyString(),
+      any(),
+      any(),
       anyBoolean(),
       anyBoolean()))
     .thenReturn(new BatchEntity());
@@ -499,7 +498,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
         eq((List<String>)null),
         eq((ProcessInstanceQuery)null),
         eq((HistoricProcessInstanceQuery)null),
-        anyString(),
+        any(),
         anyBoolean(),
         anyBoolean());
 
@@ -522,10 +521,10 @@ public class ProcessInstanceRestServiceInteractionTest extends
   @Test
   public void testDeleteAsyncHistoricQueryBasedWithDeleteReason() {
     when(runtimeServiceMock.deleteProcessInstancesAsync(
-      anyListOf(String.class),
-      any(ProcessInstanceQuery.class),
-      any(HistoricProcessInstanceQuery.class),
-      anyString(),
+      any(),
+      any(),
+      any(),
+      any(),
       anyBoolean(),
       anyBoolean()))
     .thenReturn(new BatchEntity());
@@ -554,8 +553,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     when(runtimeServiceMock.deleteProcessInstancesAsync(
       eq((List<String>)null),
       eq((ProcessInstanceQuery)null),
-      any(HistoricProcessInstanceQuery.class),
-      anyString(),
+      any(),
+      any(),
       anyBoolean(),
       anyBoolean()))
     .thenReturn(new BatchEntity());
@@ -585,7 +584,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       eq((List<String>)null),
       eq((ProcessInstanceQuery)null),
       eq((HistoricProcessInstanceQuery)null),
-      anyString(),
+      any(),
       anyBoolean(),
       anyBoolean()))
     .thenReturn(new BatchEntity());
@@ -613,9 +612,9 @@ public class ProcessInstanceRestServiceInteractionTest extends
   public void testGetVariablesWithNullValue() {
     Response response = given().pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID_WITH_NULL_VALUE_AS_VARIABLE)
       .then().expect().statusCode(Status.OK.getStatusCode())
-      .body(EXAMPLE_ANOTHER_VARIABLE_KEY, notNullValue())
-      .body(EXAMPLE_ANOTHER_VARIABLE_KEY + ".value", nullValue())
-      .body(EXAMPLE_ANOTHER_VARIABLE_KEY + ".type", equalTo("Null"))
+      .body(EXAMPLE_ANOTHER_VARIABLE_KEY, Matchers.notNullValue())
+      .body(EXAMPLE_ANOTHER_VARIABLE_KEY + ".value", Matchers.nullValue())
+      .body(EXAMPLE_ANOTHER_VARIABLE_KEY + ".type", Matchers.equalTo("Null"))
       .when().get(PROCESS_INSTANCE_VARIABLES_URL);
 
     Assert.assertEquals("Should return exactly one variable", 1, response.jsonPath().getMap("").size());
@@ -639,9 +638,9 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .statusCode(Status.OK.getStatusCode())
       .contentType(ContentType.JSON.toString())
     .and()
-      .body("valueInfo.mimeType", equalTo(mimeType))
-      .body("valueInfo.filename", equalTo(filename))
-      .body("value", nullValue())
+      .body("valueInfo.mimeType", Matchers.equalTo(mimeType))
+      .body("valueInfo.filename", Matchers.equalTo(filename))
+      .body("value", Matchers.nullValue())
     .when().get(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
   }
 
@@ -662,7 +661,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .statusCode(Status.OK.getStatusCode())
       .contentType(ContentType.TEXT.toString())
     .and()
-      .body(is(equalTo("")))
+      .body(Matchers.is(Matchers.equalTo("")))
     .when().get(SINGLE_PROCESS_INSTANCE_BINARY_VARIABLE_URL);
   }
 
@@ -683,7 +682,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .statusCode(Status.OK.getStatusCode())
       .contentType(ContentType.TEXT.toString())
     .and()
-      .body(is(equalTo(new String(byteContent))))
+      .body(Matchers.is(Matchers.equalTo(new String(byteContent))))
     .when().get(SINGLE_PROCESS_INSTANCE_BINARY_VARIABLE_URL);
   }
 
@@ -703,11 +702,11 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .pathParam("varId", variableKey)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
-      .body(is(equalTo(new String(byteContent))))
+      .body(Matchers.is(Matchers.equalTo(new String(byteContent))))
     .when().get(SINGLE_PROCESS_INSTANCE_BINARY_VARIABLE_URL);
 
     String contentType = response.contentType().replaceAll(" ", "");
-    assertThat(contentType, is(ContentType.TEXT + ";charset=" + encoding));
+    assertThat(contentType, Matchers.is(ContentType.TEXT + ";charset=" + encoding));
   }
 
   @Test
@@ -727,8 +726,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .statusCode(Status.OK.getStatusCode())
       .contentType(MediaType.APPLICATION_OCTET_STREAM)
     .and()
-      .body(is(equalTo(new String(byteContent))))
-      .header("Content-Disposition", containsString(filename))
+      .body(Matchers.is(Matchers.equalTo(new String(byteContent))))
+      .header("Content-Disposition", Matchers.containsString(filename))
     .when().get(SINGLE_PROCESS_INSTANCE_BINARY_VARIABLE_URL);
   }
 
@@ -754,12 +753,12 @@ public class ProcessInstanceRestServiceInteractionTest extends
   public void testJavaObjectVariableSerialization() {
     Response response = given().pathParam("id", MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID)
       .then().expect().statusCode(Status.OK.getStatusCode())
-      .body(EXAMPLE_VARIABLE_KEY, notNullValue())
-      .body(EXAMPLE_VARIABLE_KEY + ".value.property1", equalTo("aPropertyValue"))
-      .body(EXAMPLE_VARIABLE_KEY + ".value.property2", equalTo(true))
-      .body(EXAMPLE_VARIABLE_KEY + ".type", equalTo(VariableTypeHelper.toExpectedValueTypeName(ValueType.OBJECT)))
-      .body(EXAMPLE_VARIABLE_KEY + ".valueInfo." + SerializableValueType.VALUE_INFO_OBJECT_TYPE_NAME, equalTo(ExampleVariableObject.class.getName()))
-      .body(EXAMPLE_VARIABLE_KEY + ".valueInfo." + SerializableValueType.VALUE_INFO_SERIALIZATION_DATA_FORMAT, equalTo("application/json"))
+      .body(EXAMPLE_VARIABLE_KEY, Matchers.notNullValue())
+      .body(EXAMPLE_VARIABLE_KEY + ".value.property1", Matchers.equalTo("aPropertyValue"))
+      .body(EXAMPLE_VARIABLE_KEY + ".value.property2", Matchers.equalTo(true))
+      .body(EXAMPLE_VARIABLE_KEY + ".type", Matchers.equalTo(VariableTypeHelper.toExpectedValueTypeName(ValueType.OBJECT)))
+      .body(EXAMPLE_VARIABLE_KEY + ".valueInfo." + SerializableValueType.VALUE_INFO_OBJECT_TYPE_NAME, Matchers.equalTo(ExampleVariableObject.class.getName()))
+      .body(EXAMPLE_VARIABLE_KEY + ".valueInfo." + SerializableValueType.VALUE_INFO_SERIALIZATION_DATA_FORMAT, Matchers.equalTo("application/json"))
       .when().get(PROCESS_INSTANCE_VARIABLES_URL);
 
     Assert.assertEquals("Should return exactly one variable", 1, response.jsonPath().getMap("").size());
@@ -786,10 +785,10 @@ public class ProcessInstanceRestServiceInteractionTest extends
     // when
     given().pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
       .then().expect().statusCode(Status.OK.getStatusCode())
-      .body(variableKey + ".value", equalTo(payload))
-      .body(variableKey + ".type", equalTo("Object"))
-      .body(variableKey + ".valueInfo." + SerializableValueType.VALUE_INFO_SERIALIZATION_DATA_FORMAT, equalTo("application/json"))
-      .body(variableKey + ".valueInfo." + SerializableValueType.VALUE_INFO_OBJECT_TYPE_NAME, equalTo(ArrayList.class.getName()))
+      .body(variableKey + ".value", Matchers.equalTo(payload))
+      .body(variableKey + ".type", Matchers.equalTo("Object"))
+      .body(variableKey + ".valueInfo." + SerializableValueType.VALUE_INFO_SERIALIZATION_DATA_FORMAT, Matchers.equalTo("application/json"))
+      .body(variableKey + ".valueInfo." + SerializableValueType.VALUE_INFO_OBJECT_TYPE_NAME, Matchers.equalTo(ArrayList.class.getName()))
       .when().get(PROCESS_INSTANCE_VARIABLES_URL);
 
     // then
@@ -816,10 +815,10 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
       .queryParam("deserializeValues", false)
     .then().expect().statusCode(Status.OK.getStatusCode())
-      .body(variableKey + ".value", equalTo("a serialized value"))
-      .body(variableKey + ".type", equalTo("Object"))
-      .body(variableKey + ".valueInfo." + SerializableValueType.VALUE_INFO_SERIALIZATION_DATA_FORMAT, equalTo("application/json"))
-      .body(variableKey + ".valueInfo." + SerializableValueType.VALUE_INFO_OBJECT_TYPE_NAME, equalTo(ArrayList.class.getName()))
+      .body(variableKey + ".value", Matchers.equalTo("a serialized value"))
+      .body(variableKey + ".type", Matchers.equalTo("Object"))
+      .body(variableKey + ".valueInfo." + SerializableValueType.VALUE_INFO_SERIALIZATION_DATA_FORMAT, Matchers.equalTo("application/json"))
+      .body(variableKey + ".valueInfo." + SerializableValueType.VALUE_INFO_OBJECT_TYPE_NAME, Matchers.equalTo(ArrayList.class.getName()))
       .when().get(PROCESS_INSTANCE_VARIABLES_URL);
 
     // then
@@ -832,8 +831,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
     given().pathParam("id", "aNonExistingProcessInstanceId")
       .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
-      .body("message", equalTo("expected exception"))
+      .body("type", Matchers.equalTo(ProcessEngineException.class.getSimpleName()))
+      .body("message", Matchers.equalTo("expected exception"))
       .when().get(PROCESS_INSTANCE_VARIABLES_URL);
   }
 
@@ -847,8 +846,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     .then().expect()
       .statusCode(Status.FORBIDDEN.getStatusCode())
       .contentType(ContentType.JSON)
-      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
-      .body("message", equalTo(message))
+      .body("type", Matchers.equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", Matchers.equalTo(message))
     .when()
       .get(PROCESS_INSTANCE_VARIABLES_URL);
   }
@@ -863,12 +862,12 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
       .then().expect().statusCode(Status.OK.getStatusCode())
-      .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
-      .body("ended", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_ENDED))
-      .body("definitionId", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
-      .body("businessKey", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY))
-      .body("suspended", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED))
-      .body("tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
+      .body("id", Matchers.equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
+      .body("ended", Matchers.equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_ENDED))
+      .body("definitionId", Matchers.equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
+      .body("businessKey", Matchers.equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY))
+      .body("suspended", Matchers.equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED))
+      .body("tenantId", Matchers.equalTo(MockProvider.EXAMPLE_TENANT_ID))
       .when().get(SINGLE_PROCESS_INSTANCE_URL);
   }
 
@@ -881,8 +880,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
     given().pathParam("id", "aNonExistingInstanceId")
       .then().expect().statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("Process instance with id aNonExistingInstanceId does not exist"))
+      .body("type", Matchers.equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", Matchers.equalTo("Process instance with id aNonExistingInstanceId does not exist"))
       .when().get(SINGLE_PROCESS_INSTANCE_URL);
   }
 
@@ -897,11 +896,11 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
   @Test
   public void testDeleteNonExistingProcessInstance() {
-    doThrow(new NotFoundException()).when(runtimeServiceMock).deleteProcessInstance(anyString(), anyString(), anyBoolean(), anyBoolean(), anyBoolean() ,anyBoolean());
+    doThrow(new NotFoundException()).when(runtimeServiceMock).deleteProcessInstance(any(), any(), anyBoolean(), anyBoolean(), anyBoolean() ,anyBoolean());
 
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
       .then().expect().statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("type", Matchers.equalTo(InvalidRequestException.class.getSimpleName()))
       .when().delete(SINGLE_PROCESS_INSTANCE_URL);
   }
 
@@ -917,15 +916,15 @@ public class ProcessInstanceRestServiceInteractionTest extends
   @Test
   public void testDeleteProcessInstanceThrowsAuthorizationException() {
     String message = "expected exception";
-    doThrow(new AuthorizationException(message)).when(runtimeServiceMock).deleteProcessInstance(anyString(), anyString(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean());
+    doThrow(new AuthorizationException(message)).when(runtimeServiceMock).deleteProcessInstance(any(), any(), anyBoolean(), anyBoolean(), anyBoolean(), anyBoolean());
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
     .then().expect()
       .statusCode(Status.FORBIDDEN.getStatusCode())
       .contentType(ContentType.JSON)
-      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
-      .body("message", equalTo(message))
+      .body("type", Matchers.equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", Matchers.equalTo(message))
     .when()
       .delete(SINGLE_PROCESS_INSTANCE_URL);
   }
@@ -1024,8 +1023,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).contentType(ContentType.JSON).body(messageBodyJson)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("Cannot modify variables for process instance: "
+      .body("type", Matchers.equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", Matchers.equalTo("Cannot modify variables for process instance: "
           + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Integer.class)))
       .when().post(PROCESS_INSTANCE_VARIABLES_URL);
   }
@@ -1043,8 +1042,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).contentType(ContentType.JSON).body(messageBodyJson)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("Cannot modify variables for process instance: "
+      .body("type", Matchers.equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", Matchers.equalTo("Cannot modify variables for process instance: "
       + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Short.class)))
       .when().post(PROCESS_INSTANCE_VARIABLES_URL);
   }
@@ -1062,8 +1061,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).contentType(ContentType.JSON).body(messageBodyJson)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("Cannot modify variables for process instance: "
+      .body("type", Matchers.equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", Matchers.equalTo("Cannot modify variables for process instance: "
           + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Long.class)))
       .when().post(PROCESS_INSTANCE_VARIABLES_URL);
   }
@@ -1081,8 +1080,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).contentType(ContentType.JSON).body(messageBodyJson)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("Cannot modify variables for process instance: "
+      .body("type", Matchers.equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", Matchers.equalTo("Cannot modify variables for process instance: "
           + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Double.class)))
       .when().post(PROCESS_INSTANCE_VARIABLES_URL);
   }
@@ -1100,8 +1099,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).contentType(ContentType.JSON).body(messageBodyJson)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("Cannot modify variables for process instance: "
+      .body("type", Matchers.equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", Matchers.equalTo("Cannot modify variables for process instance: "
           + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, variableType, Date.class)))
       .when().post(PROCESS_INSTANCE_VARIABLES_URL);
   }
@@ -1119,14 +1118,14 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).contentType(ContentType.JSON).body(messageBodyJson)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("Cannot modify variables for process instance: Unsupported value type 'X'"))
+      .body("type", Matchers.equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", Matchers.equalTo("Cannot modify variables for process instance: Unsupported value type 'X'"))
       .when().post(PROCESS_INSTANCE_VARIABLES_URL);
   }
 
   @Test
   public void testVariableModificationForNonExistingProcessInstance() {
-    doThrow(new ProcessEngineException("expected exception")).when(runtimeServiceMock).updateVariables(anyString(), anyMapOf(String.class, Object.class), anyCollectionOf(String.class));
+    doThrow(new ProcessEngineException("expected exception")).when(runtimeServiceMock).updateVariables(any(), any(), any());
 
     String variableKey = "aKey";
     int variableValue = 123;
@@ -1139,8 +1138,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).contentType(ContentType.JSON).body(messageBodyJson)
       .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", equalTo("Cannot modify variables for process instance " + MockProvider.EXAMPLE_PROCESS_INSTANCE_ID + ": expected exception"))
+      .body("type", Matchers.equalTo(RestException.class.getSimpleName()))
+      .body("message", Matchers.equalTo("Cannot modify variables for process instance " + MockProvider.EXAMPLE_PROCESS_INSTANCE_ID + ": expected exception"))
       .when().post(PROCESS_INSTANCE_VARIABLES_URL);
   }
 
@@ -1160,7 +1159,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
     messageBodyJson.put("modifications", modifications);
 
     String message = "excpected exception";
-    doThrow(new AuthorizationException(message)).when(runtimeServiceMock).updateVariables(anyString(), anyMapOf(String.class, Object.class), anyCollectionOf(String.class));
+    doThrow(new AuthorizationException(message)).when(runtimeServiceMock).updateVariables(any(), any(), any());
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
@@ -1168,8 +1167,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .body(messageBodyJson)
     .then().expect()
       .statusCode(Status.FORBIDDEN.getStatusCode())
-      .body("type", is(AuthorizationException.class.getSimpleName()))
-      .body("message", is(message))
+      .body("type", Matchers.is(AuthorizationException.class.getSimpleName()))
+      .body("message", Matchers.is(message))
     .when()
       .post(PROCESS_INSTANCE_VARIABLES_URL);
   }
@@ -1184,8 +1183,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
       .then().expect().statusCode(Status.OK.getStatusCode())
-      .body("value", is(123))
-      .body("type", is("Integer"))
+      .body("value", Matchers.is(123))
+      .body("type", Matchers.is("Integer"))
       .when().get(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
   }
 
@@ -1197,8 +1196,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
       .then().expect().statusCode(Status.NOT_FOUND.getStatusCode())
-      .body("type", is(InvalidRequestException.class.getSimpleName()))
-      .body("message", is("process instance variable with name " + variableKey + " does not exist"))
+      .body("type", Matchers.is(InvalidRequestException.class.getSimpleName()))
+      .body("message", Matchers.is("process instance variable with name " + variableKey + " does not exist"))
       .when().get(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
   }
 
@@ -1214,8 +1213,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .pathParam("varId", variableKey)
     .then().expect()
       .statusCode(Status.FORBIDDEN.getStatusCode())
-      .body("type", is(AuthorizationException.class.getSimpleName()))
-      .body("message", is(message))
+      .body("type", Matchers.is(AuthorizationException.class.getSimpleName()))
+      .body("message", Matchers.is(message))
     .when()
       .get(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
   }
@@ -1249,8 +1248,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     .then()
       .expect()
         .statusCode(Status.NOT_FOUND.getStatusCode())
-        .body("type", is(InvalidRequestException.class.getSimpleName()))
-        .body("message", is("process instance variable with name " + "nonExisting" + " does not exist"))
+        .body("type", Matchers.is(InvalidRequestException.class.getSimpleName()))
+        .body("message", Matchers.is("process instance variable with name " + "nonExisting" + " does not exist"))
     .when()
       .get(SINGLE_PROCESS_INSTANCE_BINARY_VARIABLE_URL);
 
@@ -1294,10 +1293,10 @@ public class ProcessInstanceRestServiceInteractionTest extends
     // when
     given().pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
       .then().expect().statusCode(Status.OK.getStatusCode())
-      .body("value", equalTo(payload))
-      .body("type", equalTo("Object"))
-      .body("valueInfo." + SerializableValueType.VALUE_INFO_SERIALIZATION_DATA_FORMAT, equalTo("application/json"))
-      .body("valueInfo." + SerializableValueType.VALUE_INFO_OBJECT_TYPE_NAME, equalTo(ArrayList.class.getName()))
+      .body("value", Matchers.equalTo(payload))
+      .body("type", Matchers.equalTo("Object"))
+      .body("valueInfo." + SerializableValueType.VALUE_INFO_SERIALIZATION_DATA_FORMAT, Matchers.equalTo("application/json"))
+      .body("valueInfo." + SerializableValueType.VALUE_INFO_OBJECT_TYPE_NAME, Matchers.equalTo(ArrayList.class.getName()))
       .when().get(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
 
     // then
@@ -1324,10 +1323,10 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .pathParam("varId", variableKey)
       .queryParam("deserializeValue", false)
     .then().expect().statusCode(Status.OK.getStatusCode())
-      .body("value", equalTo("a serialized value"))
-      .body("type", equalTo("Object"))
-      .body("valueInfo." + SerializableValueType.VALUE_INFO_SERIALIZATION_DATA_FORMAT, equalTo("application/json"))
-      .body("valueInfo." + SerializableValueType.VALUE_INFO_OBJECT_TYPE_NAME, equalTo(ArrayList.class.getName()))
+      .body("value", Matchers.equalTo("a serialized value"))
+      .body("type", Matchers.equalTo("Object"))
+      .body("valueInfo." + SerializableValueType.VALUE_INFO_SERIALIZATION_DATA_FORMAT, Matchers.equalTo("application/json"))
+      .body("valueInfo." + SerializableValueType.VALUE_INFO_OBJECT_TYPE_NAME, Matchers.equalTo(ArrayList.class.getName()))
       .when().get(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
 
     // then
@@ -1343,8 +1342,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
       .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
-      .body("type", is(RestException.class.getSimpleName()))
-      .body("message", is("Cannot get process instance variable " + variableKey + ": expected exception"))
+      .body("type", Matchers.is(RestException.class.getSimpleName()))
+      .body("message", Matchers.is("Cannot get process instance variable " + variableKey + ": expected exception"))
       .when().get(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
   }
 
@@ -1409,8 +1408,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
       .contentType(ContentType.JSON).body(variableJson)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("Cannot put process instance variable aVariableKey: "
+      .body("type", Matchers.equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", Matchers.equalTo("Cannot put process instance variable aVariableKey: "
           + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, type, Integer.class)))
       .when().put(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
   }
@@ -1443,8 +1442,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
       .contentType(ContentType.JSON).body(variableJson)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("Cannot put process instance variable aVariableKey: "
+      .body("type", Matchers.equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", Matchers.equalTo("Cannot put process instance variable aVariableKey: "
           + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, type, Short.class)))
       .when().put(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
   }
@@ -1477,8 +1476,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
       .contentType(ContentType.JSON).body(variableJson)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("Cannot put process instance variable aVariableKey: "
+      .body("type", Matchers.equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", Matchers.equalTo("Cannot put process instance variable aVariableKey: "
           + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, type, Long.class)))
       .when().put(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
   }
@@ -1511,8 +1510,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
       .contentType(ContentType.JSON).body(variableJson)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("Cannot put process instance variable aVariableKey: "
+      .body("type", Matchers.equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", Matchers.equalTo("Cannot put process instance variable aVariableKey: "
           + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, type, Double.class)))
       .when().put(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
   }
@@ -1566,8 +1565,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
       .contentType(ContentType.JSON).body(variableJson)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("Cannot put process instance variable aVariableKey: "
+      .body("type", Matchers.equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", Matchers.equalTo("Cannot put process instance variable aVariableKey: "
           + ErrorMessageHelper.getExpectedFailingConversionMessage(variableValue, type, Date.class)))
       .when().put(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
   }
@@ -1583,8 +1582,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
       .contentType(ContentType.JSON).body(variableJson)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("Cannot put process instance variable aVariableKey: Unsupported value type 'X'"))
+      .body("type", Matchers.equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", Matchers.equalTo("Cannot put process instance variable aVariableKey: Unsupported value type 'X'"))
       .when().put(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
   }
 
@@ -1605,8 +1604,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .body(variableJson)
     .then().expect()
       .statusCode(Status.FORBIDDEN.getStatusCode())
-      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
-      .body("message", equalTo(message))
+      .body("type", Matchers.equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", Matchers.equalTo(message))
     .when()
       .put(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
   }
@@ -1681,8 +1680,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     .expect()
       .statusCode(Status.FORBIDDEN.getStatusCode())
       .contentType(ContentType.JSON)
-      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
-      .body("message", equalTo(message))
+      .body("type", Matchers.equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", Matchers.equalTo(message))
     .when()
       .post(SINGLE_PROCESS_INSTANCE_BINARY_VARIABLE_URL);
   }
@@ -1730,7 +1729,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .multiPart("type", typeName, MediaType.TEXT_PLAIN)
     .expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body(containsString("Unrecognized content type for serialized java type: unsupported"))
+      .body(Matchers.containsString("Unrecognized content type for serialized java type: unsupported"))
     .when()
       .post(SINGLE_PROCESS_INSTANCE_BINARY_VARIABLE_URL);
 
@@ -1778,8 +1777,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .body(requestJson)
     .expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("Cannot put process instance variable aVariableKey: Unsupported value type 'aNonExistingType'"))
+      .body("type", Matchers.equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", Matchers.equalTo("Cannot put process instance variable aVariableKey: Unsupported value type 'aNonExistingType'"))
     .when()
       .put(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
   }
@@ -1827,8 +1826,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
       .contentType(ContentType.JSON).body(variableJson)
       .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
-      .body("type", is(RestException.class.getSimpleName()))
-      .body("message", is("Cannot put process instance variable " + variableKey + ": expected exception"))
+      .body("type", Matchers.is(RestException.class.getSimpleName()))
+      .body("message", Matchers.is("Cannot put process instance variable " + variableKey + ": expected exception"))
       .when().put(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
   }
 
@@ -1855,10 +1854,10 @@ public class ProcessInstanceRestServiceInteractionTest extends
     verify(runtimeServiceMock).setVariable(eq(MockProvider.EXAMPLE_TASK_ID), eq(variableKey),
         captor.capture());
     FileValue captured = captor.getValue();
-    assertThat(captured.getEncoding(), is(encoding));
-    assertThat(captured.getFilename(), is(filename));
-    assertThat(captured.getMimeType(), is(mimetype));
-    assertThat(IoUtil.readInputStream(captured.getValue(), null), is(value));
+    assertThat(captured.getEncoding(), Matchers.is(encoding));
+    assertThat(captured.getFilename(), Matchers.is(filename));
+    assertThat(captured.getMimeType(), Matchers.is(mimetype));
+    assertThat(IoUtil.readInputStream(captured.getValue(), null), Matchers.is(value));
   }
 
   @Test
@@ -1883,10 +1882,10 @@ public class ProcessInstanceRestServiceInteractionTest extends
     verify(runtimeServiceMock).setVariable(eq(MockProvider.EXAMPLE_TASK_ID), eq(variableKey),
         captor.capture());
     FileValue captured = captor.getValue();
-    assertThat(captured.getEncoding(), is(nullValue()));
-    assertThat(captured.getFilename(), is(filename));
-    assertThat(captured.getMimeType(), is(mimetype));
-    assertThat(IoUtil.readInputStream(captured.getValue(), null), is(value));
+    assertThat(captured.getEncoding(), Matchers.is(Matchers.nullValue()));
+    assertThat(captured.getFilename(), Matchers.is(filename));
+    assertThat(captured.getMimeType(), Matchers.is(mimetype));
+    assertThat(IoUtil.readInputStream(captured.getValue(), null), Matchers.is(value));
   }
 
   @Test
@@ -1929,10 +1928,10 @@ public class ProcessInstanceRestServiceInteractionTest extends
     verify(runtimeServiceMock).setVariable(eq(MockProvider.EXAMPLE_TASK_ID), eq(variableKey),
         captor.capture());
     FileValue captured = captor.getValue();
-    assertThat(captured.getEncoding(), is(nullValue()));
-    assertThat(captured.getFilename(), is(filename));
-    assertThat(captured.getMimeType(), is(MediaType.APPLICATION_OCTET_STREAM));
-    assertThat(captured.getValue().available(), is(0));
+    assertThat(captured.getEncoding(), Matchers.is(Matchers.nullValue()));
+    assertThat(captured.getFilename(), Matchers.is(filename));
+    assertThat(captured.getMimeType(), Matchers.is(MediaType.APPLICATION_OCTET_STREAM));
+    assertThat(captured.getValue().available(), Matchers.is(0));
   }
 
   @Test
@@ -1955,8 +1954,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
       .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
-      .body("type", is(RestException.class.getSimpleName()))
-      .body("message", is("Cannot delete process instance variable " + variableKey + ": expected exception"))
+      .body("type", Matchers.is(RestException.class.getSimpleName()))
+      .body("message", Matchers.is("Cannot delete process instance variable " + variableKey + ": expected exception"))
       .when().delete(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
   }
 
@@ -1973,8 +1972,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     .then().expect()
       .statusCode(Status.FORBIDDEN.getStatusCode())
       .contentType(ContentType.JSON)
-      .body("type", is(AuthorizationException.class.getSimpleName()))
-      .body("message", is(message))
+      .body("type", Matchers.is(AuthorizationException.class.getSimpleName()))
+      .body("message", Matchers.is(message))
     .when()
       .delete(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
   }
@@ -2016,8 +2015,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     .then()
       .expect()
         .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
-        .body("type", is(ProcessEngineException.class.getSimpleName()))
-        .body("message", is(expectedMessage))
+        .body("type", Matchers.is(ProcessEngineException.class.getSimpleName()))
+        .body("message", Matchers.is(expectedMessage))
       .when()
         .put(SINGLE_PROCESS_INSTANCE_SUSPENDED_URL);
   }
@@ -2040,8 +2039,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     .then().expect()
       .statusCode(Status.FORBIDDEN.getStatusCode())
       .contentType(ContentType.JSON)
-      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
-      .body("message", equalTo(message))
+      .body("type", Matchers.equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", Matchers.equalTo(message))
     .when()
     .put(SINGLE_PROCESS_INSTANCE_SUSPENDED_URL);
   }
@@ -2083,8 +2082,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     .then()
       .expect()
         .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
-        .body("type", is(ProcessEngineException.class.getSimpleName()))
-        .body("message", is(expectedMessage))
+        .body("type", Matchers.is(ProcessEngineException.class.getSimpleName()))
+        .body("message", Matchers.is(expectedMessage))
       .when()
         .put(SINGLE_PROCESS_INSTANCE_SUSPENDED_URL);
   }
@@ -2107,8 +2106,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     .then().expect()
       .statusCode(Status.FORBIDDEN.getStatusCode())
       .contentType(ContentType.JSON)
-      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
-      .body("message", equalTo(message))
+      .body("type", Matchers.equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", Matchers.equalTo(message))
     .when()
     .put(SINGLE_PROCESS_INSTANCE_SUSPENDED_URL);
   }
@@ -2149,8 +2148,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     .then()
       .expect()
         .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
-        .body("type", is(ProcessEngineException.class.getSimpleName()))
-        .body("message", is(expectedException))
+        .body("type", Matchers.is(ProcessEngineException.class.getSimpleName()))
+        .body("message", Matchers.is(expectedException))
       .when()
         .put(PROCESS_INSTANCE_SUSPENDED_URL);
   }
@@ -2173,8 +2172,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     .then().expect()
       .statusCode(Status.FORBIDDEN.getStatusCode())
       .contentType(ContentType.JSON)
-      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
-      .body("message", equalTo(message))
+      .body("type", Matchers.equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", Matchers.equalTo(message))
     .when()
     .put(PROCESS_INSTANCE_SUSPENDED_URL);
   }
@@ -2215,8 +2214,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     .then()
       .expect()
         .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
-        .body("type", is(ProcessEngineException.class.getSimpleName()))
-        .body("message", is(expectedException))
+        .body("type", Matchers.is(ProcessEngineException.class.getSimpleName()))
+        .body("message", Matchers.is(expectedException))
       .when()
         .put(PROCESS_INSTANCE_SUSPENDED_URL);
   }
@@ -2239,8 +2238,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     .then().expect()
       .statusCode(Status.FORBIDDEN.getStatusCode())
       .contentType(ContentType.JSON)
-      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
-      .body("message", equalTo(message))
+      .body("type", Matchers.equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", Matchers.equalTo(message))
     .when()
     .put(PROCESS_INSTANCE_SUSPENDED_URL);
   }
@@ -2365,8 +2364,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     .then()
       .expect()
         .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
-        .body("type", is(ProcessEngineException.class.getSimpleName()))
-        .body("message", is(expectedException))
+        .body("type", Matchers.is(ProcessEngineException.class.getSimpleName()))
+        .body("message", Matchers.is(expectedException))
       .when()
         .put(PROCESS_INSTANCE_SUSPENDED_URL);
   }
@@ -2389,8 +2388,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     .then().expect()
       .statusCode(Status.FORBIDDEN.getStatusCode())
       .contentType(ContentType.JSON)
-      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
-      .body("message", equalTo(message))
+      .body("type", Matchers.equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", Matchers.equalTo(message))
     .when()
       .put(PROCESS_INSTANCE_SUSPENDED_URL);
   }
@@ -2431,8 +2430,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     .then()
       .expect()
         .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
-        .body("type", is(ProcessEngineException.class.getSimpleName()))
-        .body("message", is(expectedException))
+        .body("type", Matchers.is(ProcessEngineException.class.getSimpleName()))
+        .body("message", Matchers.is(expectedException))
       .when()
         .put(PROCESS_INSTANCE_SUSPENDED_URL);
   }
@@ -2455,8 +2454,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     .then().expect()
       .statusCode(Status.FORBIDDEN.getStatusCode())
       .contentType(ContentType.JSON)
-      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
-      .body("message", equalTo(message))
+      .body("type", Matchers.equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", Matchers.equalTo(message))
     .when()
       .put(PROCESS_INSTANCE_SUSPENDED_URL);
   }
@@ -2475,8 +2474,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     .then()
       .expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode())
-        .body("type", is(InvalidRequestException.class.getSimpleName()))
-        .body("message", is(message))
+        .body("type", Matchers.is(InvalidRequestException.class.getSimpleName()))
+        .body("message", Matchers.is(message))
       .when()
         .put(PROCESS_INSTANCE_SUSPENDED_URL);
   }
@@ -2495,8 +2494,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     .then()
       .expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode())
-        .body("type", is(InvalidRequestException.class.getSimpleName()))
-        .body("message", is(message))
+        .body("type", Matchers.is(InvalidRequestException.class.getSimpleName()))
+        .body("message", Matchers.is(message))
       .when()
         .put(PROCESS_INSTANCE_SUSPENDED_URL);
   }
@@ -2516,8 +2515,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     .then()
       .expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode())
-        .body("type", is(InvalidRequestException.class.getSimpleName()))
-        .body("message", is(message))
+        .body("type", Matchers.is(InvalidRequestException.class.getSimpleName()))
+        .body("message", Matchers.is(message))
       .when()
         .put(PROCESS_INSTANCE_SUSPENDED_URL);
   }
@@ -2535,8 +2534,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     .then()
       .expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode())
-        .body("type", is(InvalidRequestException.class.getSimpleName()))
-        .body("message", is(message))
+        .body("type", Matchers.is(InvalidRequestException.class.getSimpleName()))
+        .body("message", Matchers.is(message))
       .when()
         .put(PROCESS_INSTANCE_SUSPENDED_URL);
   }
@@ -2663,7 +2662,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .when()
         .put(PROCESS_INSTANCE_SUSPENDED_URL);
 
-    verify(mockUpdateSuspensionStateSelectBuilder).byHistoricProcessInstanceQuery(any(HistoricProcessInstanceQuery.class));
+    verify(mockUpdateSuspensionStateSelectBuilder).byHistoricProcessInstanceQuery(any());
     verify(mockUpdateProcessInstancesSuspensionStateBuilder).suspend();
   }
 
@@ -2684,7 +2683,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .when()
         .put(PROCESS_INSTANCE_SUSPENDED_URL);
 
-    verify(mockUpdateSuspensionStateSelectBuilder).byHistoricProcessInstanceQuery(any(HistoricProcessInstanceQuery.class));
+    verify(mockUpdateSuspensionStateSelectBuilder).byHistoricProcessInstanceQuery(any());
     verify(mockUpdateProcessInstancesSuspensionStateBuilder).activate();
   }
 
@@ -2853,8 +2852,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .then()
       .expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", is(InvalidRequestException.class.getSimpleName()))
-      .body("message", is(message))
+      .body("type", Matchers.is(InvalidRequestException.class.getSimpleName()))
+      .body("message", Matchers.is(message))
       .when()
       .post(PROCESS_INSTANCE_SUSPENDED_ASYNC_URL);
 
@@ -2986,8 +2985,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     .then()
     .expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", is(InvalidRequestException.class.getSimpleName()))
-      .body("message", containsString("'activityId' must be set"))
+      .body("type", Matchers.is(InvalidRequestException.class.getSimpleName()))
+      .body("message", Matchers.containsString("'activityId' must be set"))
     .when()
       .post(PROCESS_INSTANCE_MODIFICATION_URL);
 
@@ -3003,8 +3002,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     .then()
     .expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", is(InvalidRequestException.class.getSimpleName()))
-      .body("message", containsString("'activityId' must be set"))
+      .body("type", Matchers.is(InvalidRequestException.class.getSimpleName()))
+      .body("message", Matchers.containsString("'activityId' must be set"))
     .when()
       .post(PROCESS_INSTANCE_MODIFICATION_URL);
 
@@ -3020,8 +3019,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     .then()
     .expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", is(InvalidRequestException.class.getSimpleName()))
-      .body("message", containsString("'transitionId' must be set"))
+      .body("type", Matchers.is(InvalidRequestException.class.getSimpleName()))
+      .body("message", Matchers.containsString("'transitionId' must be set"))
     .when()
       .post(PROCESS_INSTANCE_MODIFICATION_URL);
 
@@ -3037,8 +3036,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     .then()
     .expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", is(InvalidRequestException.class.getSimpleName()))
-      .body("message", containsString("For instruction type 'cancel': exactly one, "
+      .body("type", Matchers.is(InvalidRequestException.class.getSimpleName()))
+      .body("message", Matchers.containsString("For instruction type 'cancel': exactly one, "
           + "'activityId', 'activityInstanceId', or 'transitionInstanceId', is required"))
     .when()
       .post(PROCESS_INSTANCE_MODIFICATION_URL);
@@ -3056,8 +3055,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     .then()
     .expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", is(InvalidRequestException.class.getSimpleName()))
-      .body("message", containsString("For instruction type 'cancel': exactly one, "
+      .body("type", Matchers.is(InvalidRequestException.class.getSimpleName()))
+      .body("message", Matchers.containsString("For instruction type 'cancel': exactly one, "
           + "'activityId', 'activityInstanceId', or 'transitionInstanceId', is required"))
     .when()
       .post(PROCESS_INSTANCE_MODIFICATION_URL);
@@ -3102,8 +3101,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     .then().expect()
       .statusCode(Status.FORBIDDEN.getStatusCode())
       .contentType(ContentType.JSON)
-      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
-      .body("message", equalTo(message))
+      .body("type", Matchers.equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", Matchers.equalTo(message))
     .when()
       .post(PROCESS_INSTANCE_MODIFICATION_URL);
   }
@@ -3150,8 +3149,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     List<String> ids = Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
     Batch batchEntity = MockProvider.createMockBatch();
     when(mockManagementService.setJobRetriesAsync(
-        anyListOf(String.class),
-        any(ProcessInstanceQuery.class),
+        any(),
+        Mockito.<ProcessInstanceQuery>any(),
         anyInt())
     ).thenReturn(batchEntity);
 
@@ -3175,8 +3174,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
   public void testSetRetriesByProcessAsyncWithQuery() {
     Batch batchEntity = MockProvider.createMockBatch();
     when(mockManagementService.setJobRetriesAsync(
-        anyListOf(String.class),
-        any(ProcessInstanceQuery.class),
+        any(),
+        Mockito.<ProcessInstanceQuery>any(),
         anyInt())
     ).thenReturn(batchEntity);
 
@@ -3194,7 +3193,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
     verifyBatchJson(response.asString());
 
     verify(mockManagementService, times(1)).setJobRetriesAsync(
-        eq((List<String>) null), any(ProcessInstanceQuery.class), Mockito.eq(5));
+        eq((List<String>) null), Mockito.<ProcessInstanceQuery>any(), Mockito.eq(5));
   }
 
   @Test
@@ -3229,8 +3228,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
   public void testSetRetriesByProcessWithNegativeRetries() {
     doThrow(new BadUserRequestException("retries are negative"))
         .when(mockManagementService).setJobRetriesAsync(
-        anyListOf(String.class),
-        any(ProcessInstanceQuery.class),
+        any(),
+        Mockito.<ProcessInstanceQuery>any(),
         eq(-1));
 
     Map<String, Object> messageBodyJson = new HashMap<String, Object>();
@@ -3283,7 +3282,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
   public void testSetRetriesByProcessAsyncHistoricQueryBasedWithProcessInstanceIds() {
     Batch batchEntity = MockProvider.createMockBatch();
     when(mockManagementService.setJobRetriesAsync(
-      anyListOf(String.class),
+      anyList(),
       eq((ProcessInstanceQuery) null),
       eq((HistoricProcessInstanceQuery) null),
       anyInt())
@@ -3310,7 +3309,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
   public void testSetRetriesByProcessAsyncHistoricQueryBasedWithQueryAndProcessInstanceIds() {
     Batch batchEntity = MockProvider.createMockBatch();
     when(mockManagementService.setJobRetriesAsync(
-      anyListOf(String.class),
+      anyList(),
       eq((ProcessInstanceQuery) null),
       any(HistoricProcessInstanceQuery.class),
       anyInt())
@@ -3359,9 +3358,9 @@ public class ProcessInstanceRestServiceInteractionTest extends
   public void testSetRetriesByProcessAsyncHistoricQueryBasedWithNegativeRetries() {
     doThrow(new BadUserRequestException("retries are negative"))
       .when(mockManagementService).setJobRetriesAsync(
-        anyListOf(String.class),
+        any(),
         eq((ProcessInstanceQuery) null),
-        any(HistoricProcessInstanceQuery.class),
+        any(),
         eq(MockProvider.EXAMPLE_NEGATIVE_JOB_RETRIES));
 
     HistoricProcessInstanceQuery mockedHistoricProcessInstanceQuery = mock(HistoricProcessInstanceQuery.class);
@@ -3452,8 +3451,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     .then()
     .expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", is(InvalidRequestException.class.getSimpleName()))
-      .body("message", containsString("'activityId' must be set"))
+      .body("type", Matchers.is(InvalidRequestException.class.getSimpleName()))
+      .body("message", Matchers.containsString("'activityId' must be set"))
     .when()
       .post(PROCESS_INSTANCE_MODIFICATION_ASYNC_URL);
 
@@ -3469,8 +3468,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     .then()
     .expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", is(InvalidRequestException.class.getSimpleName()))
-      .body("message", containsString("'activityId' must be set"))
+      .body("type", Matchers.is(InvalidRequestException.class.getSimpleName()))
+      .body("message", Matchers.containsString("'activityId' must be set"))
     .when()
       .post(PROCESS_INSTANCE_MODIFICATION_ASYNC_URL);
 
@@ -3486,8 +3485,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     .then()
     .expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", is(InvalidRequestException.class.getSimpleName()))
-      .body("message", containsString("'transitionId' must be set"))
+      .body("type", Matchers.is(InvalidRequestException.class.getSimpleName()))
+      .body("message", Matchers.containsString("'transitionId' must be set"))
     .when()
       .post(PROCESS_INSTANCE_MODIFICATION_ASYNC_URL);
 
@@ -3503,8 +3502,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     .then()
     .expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", is(InvalidRequestException.class.getSimpleName()))
-      .body("message", containsString("For instruction type 'cancel': exactly one, "
+      .body("type", Matchers.is(InvalidRequestException.class.getSimpleName()))
+      .body("message", Matchers.containsString("For instruction type 'cancel': exactly one, "
           + "'activityId', 'activityInstanceId', or 'transitionInstanceId', is required"))
     .when()
       .post(PROCESS_INSTANCE_MODIFICATION_ASYNC_URL);
@@ -3522,8 +3521,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     .then()
     .expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", is(InvalidRequestException.class.getSimpleName()))
-      .body("message", containsString("For instruction type 'cancel': exactly one, "
+      .body("type", Matchers.is(InvalidRequestException.class.getSimpleName()))
+      .body("message", Matchers.containsString("For instruction type 'cancel': exactly one, "
           + "'activityId', 'activityInstanceId', or 'transitionInstanceId', is required"))
     .when()
       .post(PROCESS_INSTANCE_MODIFICATION_ASYNC_URL);
@@ -3560,8 +3559,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     .then().expect()
       .statusCode(Status.FORBIDDEN.getStatusCode())
       .contentType(ContentType.JSON)
-      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
-      .body("message", equalTo(message))
+      .body("type", Matchers.equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", Matchers.equalTo(message))
     .when()
       .post(PROCESS_INSTANCE_MODIFICATION_ASYNC_URL);
   }
@@ -3709,7 +3708,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
           .body(body)
         .then().expect()
           .statusCode(Status.BAD_REQUEST.getStatusCode())
-          .body(containsString("{\"type\":\"InvalidRequestException\"," +
+          .body(Matchers.containsString("{\"type\":\"InvalidRequestException\"," +
               "\"message\":\"Cannot set variables: Unsupported value type 'unknown'\"}"))
         .when()
           .post(PROCESS_INSTANCE_SET_VARIABLES_ASYNC_URL);
@@ -3731,7 +3730,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
           .body("{}")
         .then().expect()
           .statusCode(Status.BAD_REQUEST.getStatusCode())
-          .body(containsString("{\"type\":\"InvalidRequestException\"," +
+          .body(Matchers.containsString("{\"type\":\"InvalidRequestException\"," +
               "\"message\":\"message\"}"))
         .when()
           .post(PROCESS_INSTANCE_SET_VARIABLES_ASYNC_URL);
@@ -3749,7 +3748,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
           .body("{}")
         .then().expect()
           .statusCode(Status.FORBIDDEN.getStatusCode())
-          .body(containsString("{\"type\":\"AuthorizationException\""))
+          .body(Matchers.containsString("{\"type\":\"AuthorizationException\""))
         .when()
           .post(PROCESS_INSTANCE_SET_VARIABLES_ASYNC_URL);
   }
@@ -3766,7 +3765,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
           .body("{}")
         .then().expect()
           .statusCode(Status.BAD_REQUEST.getStatusCode())
-          .body(containsString("{\"type\":\"InvalidRequestException\",\"message\":\"message\"}"))
+          .body(Matchers.containsString("{\"type\":\"InvalidRequestException\",\"message\":\"message\"}"))
         .when()
           .post(PROCESS_INSTANCE_SET_VARIABLES_ASYNC_URL);
   }
@@ -3783,7 +3782,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
           .body("{}")
         .then().expect()
           .statusCode(Status.BAD_REQUEST.getStatusCode())
-          .body(containsString("{\"type\":\"BadUserRequestException\",\"message\":\"message\"}"))
+          .body(Matchers.containsString("{\"type\":\"BadUserRequestException\",\"message\":\"message\"}"))
         .when()
           .post(PROCESS_INSTANCE_SET_VARIABLES_ASYNC_URL);
   }
@@ -3940,7 +3939,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .body("{}")
     .then().expect()
       .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
-      .body(containsString("{\"type\":\"ProcessEngineException\"," +
+      .body(Matchers.containsString("{\"type\":\"ProcessEngineException\"," +
           "\"message\":\"message\"}"))
     .when()
       .post(PROCESS_INSTANCE_CORRELATE_MESSAGE_ASYNC_URL);
@@ -3957,7 +3956,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .body("{}")
     .then().expect()
       .statusCode(Status.FORBIDDEN.getStatusCode())
-      .body(containsString("{\"type\":\"AuthorizationException\""))
+      .body(Matchers.containsString("{\"type\":\"AuthorizationException\""))
     .when()
       .post(PROCESS_INSTANCE_CORRELATE_MESSAGE_ASYNC_URL);
   }
@@ -3973,7 +3972,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .body("{}")
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body(containsString("{\"type\":\"InvalidRequestException\",\"message\":\"message\"}"))
+      .body(Matchers.containsString("{\"type\":\"InvalidRequestException\",\"message\":\"message\"}"))
     .when()
       .post(PROCESS_INSTANCE_CORRELATE_MESSAGE_ASYNC_URL);
   }
@@ -3989,7 +3988,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .body("{}")
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body(containsString("{\"type\":\"BadUserRequestException\",\"message\":\"message\"}"))
+      .body(Matchers.containsString("{\"type\":\"BadUserRequestException\",\"message\":\"message\"}"))
     .when()
       .post(PROCESS_INSTANCE_CORRELATE_MESSAGE_ASYNC_URL);
   }

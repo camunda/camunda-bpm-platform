@@ -34,7 +34,7 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import io.restassured.http.ContentType;
 import static io.restassured.RestAssured.given;
-import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Mockito.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;

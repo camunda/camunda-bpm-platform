@@ -17,13 +17,15 @@
 package org.camunda.bpm.engine.rest.helper;
 
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
 import org.mockito.ArgumentMatcher;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class TaskQueryMatcher extends ArgumentMatcher<TaskQueryImpl> {
+public class TaskQueryMatcher extends BaseMatcher<TaskQueryImpl> {
 
   protected String taskName;
 
@@ -48,6 +50,16 @@ public class TaskQueryMatcher extends ArgumentMatcher<TaskQueryImpl> {
     TaskQueryMatcher matcher = new TaskQueryMatcher();
     matcher.taskName = taskName;
     return matcher;
+  }
+
+  public void describeTo(Description description) {
+    StringBuilder sb = new StringBuilder();
+    sb.append(this.getClass().getSimpleName());
+    sb.append(": ");
+    sb.append("taskName=");
+    sb.append(taskName);
+
+    description.appendText(sb.toString());
   }
 
 }

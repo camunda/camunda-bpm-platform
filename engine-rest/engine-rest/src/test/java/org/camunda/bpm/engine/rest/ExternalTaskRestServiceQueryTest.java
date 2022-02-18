@@ -552,7 +552,7 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
     queryParameters.put("priorityLowerThanOrEquals", "4");
 
     Response response = given()
-        .queryParameters(queryParameters)
+        .queryParams(queryParameters)
     .expect()
       .statusCode(Status.OK.getStatusCode())
     .when()

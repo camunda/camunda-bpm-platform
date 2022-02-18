@@ -23,8 +23,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -56,7 +56,7 @@ import org.camunda.bpm.engine.task.IdentityLink;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Matchers;
+import org.mockito.Mockito;
 
 public class HalResourceCacheTest extends AbstractRestServiceTest {
 
@@ -193,7 +193,7 @@ public class HalResourceCacheTest extends AbstractRestServiceTest {
     when(user.getId()).thenReturn(userIds[0]);
     when(user.getFirstName()).thenReturn("kermit");
     UserQuery userQuery = mock(UserQuery.class);
-    when(userQuery.userIdIn(Matchers.<String[]>anyVararg())).thenReturn(userQuery);
+    when(userQuery.userIdIn(Mockito.any())).thenReturn(userQuery);
     when(userQuery.listPage(anyInt(), anyInt())).thenReturn(Arrays.asList(user));
     when(processEngine.getIdentityService().createUserQuery()).thenReturn(userQuery);
 
