@@ -16,9 +16,17 @@
  */
 package org.camunda.bpm.engine.impl;
 
+import java.sql.Connection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.BatchQuery;
 import org.camunda.bpm.engine.batch.BatchStatisticsQuery;
@@ -27,7 +35,41 @@ import org.camunda.bpm.engine.impl.batch.BatchQueryImpl;
 import org.camunda.bpm.engine.impl.batch.BatchStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.batch.DeleteBatchCmd;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
-import org.camunda.bpm.engine.impl.cmd.*;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cmd.ActivateBatchCmd;
+import org.camunda.bpm.engine.impl.cmd.DeleteJobCmd;
+import org.camunda.bpm.engine.impl.cmd.DeleteLicenseKeyCmd;
+import org.camunda.bpm.engine.impl.cmd.DeleteMetricsCmd;
+import org.camunda.bpm.engine.impl.cmd.DeletePropertyCmd;
+import org.camunda.bpm.engine.impl.cmd.DeleteTaskMetricsCmd;
+import org.camunda.bpm.engine.impl.cmd.GetHistoryLevelCmd;
+import org.camunda.bpm.engine.impl.cmd.GetJobExceptionStacktraceCmd;
+import org.camunda.bpm.engine.impl.cmd.GetLicenseKeyCmd;
+import org.camunda.bpm.engine.impl.cmd.GetProcessApplicationForDeploymentCmd;
+import org.camunda.bpm.engine.impl.cmd.GetPropertiesCmd;
+import org.camunda.bpm.engine.impl.cmd.GetTableCountCmd;
+import org.camunda.bpm.engine.impl.cmd.GetTableMetaDataCmd;
+import org.camunda.bpm.engine.impl.cmd.GetTableNameCmd;
+import org.camunda.bpm.engine.impl.cmd.GetTelemetryDataCmd;
+import org.camunda.bpm.engine.impl.cmd.GetUniqueTaskWorkerCountCmd;
+import org.camunda.bpm.engine.impl.cmd.IsTelemetryEnabledCmd;
+import org.camunda.bpm.engine.impl.cmd.PurgeDatabaseAndCacheCmd;
+import org.camunda.bpm.engine.impl.cmd.RecalculateJobDuedateCmd;
+import org.camunda.bpm.engine.impl.cmd.RegisterDeploymentCmd;
+import org.camunda.bpm.engine.impl.cmd.RegisterProcessApplicationCmd;
+import org.camunda.bpm.engine.impl.cmd.ReportDbMetricsCmd;
+import org.camunda.bpm.engine.impl.cmd.SetJobDefinitionPriorityCmd;
+import org.camunda.bpm.engine.impl.cmd.SetJobDuedateCmd;
+import org.camunda.bpm.engine.impl.cmd.SetJobPriorityCmd;
+import org.camunda.bpm.engine.impl.cmd.SetJobRetriesCmd;
+import org.camunda.bpm.engine.impl.cmd.SetJobsRetriesBatchCmd;
+import org.camunda.bpm.engine.impl.cmd.SetJobsRetriesCmd;
+import org.camunda.bpm.engine.impl.cmd.SetLicenseKeyCmd;
+import org.camunda.bpm.engine.impl.cmd.SetPropertyCmd;
+import org.camunda.bpm.engine.impl.cmd.SuspendBatchCmd;
+import org.camunda.bpm.engine.impl.cmd.TelemetryConfigureCmd;
+import org.camunda.bpm.engine.impl.cmd.UnregisterDeploymentCmd;
+import org.camunda.bpm.engine.impl.cmd.UnregisterProcessApplicationCmd;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSession;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
@@ -38,6 +80,9 @@ import org.camunda.bpm.engine.impl.management.PurgeReport;
 import org.camunda.bpm.engine.impl.management.UpdateJobDefinitionSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.management.UpdateJobSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.metrics.MetricsQueryImpl;
+import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
+import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
+import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyDataImpl;
 import org.camunda.bpm.engine.management.ActivityStatisticsQuery;
 import org.camunda.bpm.engine.management.DeploymentStatisticsQuery;
 import org.camunda.bpm.engine.management.JobDefinitionQuery;
@@ -52,13 +97,6 @@ import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.telemetry.TelemetryData;
 
-import java.sql.Connection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 
 /**
  * @author Tom Baeyens
@@ -68,6 +106,12 @@ import java.util.Set;
  * @author Askar AKhmerov
  */
 public class ManagementServiceImpl extends ServiceImpl implements ManagementService {
+
+  protected ProcessEngineConfiguration processEngineConfiguration;
+
+  public ManagementServiceImpl(ProcessEngineConfiguration processEngineConfiguration) {
+    this.processEngineConfiguration = processEngineConfiguration;
+  }
 
   public ProcessApplicationRegistration registerProcessApplication(String deploymentId, ProcessApplicationReference reference) {
     return commandExecutor.execute(new RegisterProcessApplicationCmd(deploymentId, reference));
@@ -511,6 +555,69 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
   @Override
   public TelemetryData getTelemetryData() {
     return commandExecutor.execute(new GetTelemetryDataCmd());
+  }
+
+  /**
+   * Adds the web application name to the telemetry data of the engine.
+   *
+   * @param webapp
+   *          the web application that is used with the engine
+   * @return whether the web application was successfully added or not
+   */
+  public boolean addWebappToTelemetry(String webapp) {
+    TelemetryRegistry telemetryRegistry = processEngineConfiguration.getTelemetryRegistry();
+    if (telemetryRegistry != null) {
+      telemetryRegistry.addWebapp(webapp);
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Adds the application server information to the telemetry data of the engine.
+   *
+   * @param appServerInfo
+   *          a String containing information about the application server
+   */
+  public void addApplicationServerInfoToTelemetry(String appServerInfo) {
+    TelemetryRegistry telemetryRegistry = processEngineConfiguration.getTelemetryRegistry();
+    if (telemetryRegistry != null) {
+      telemetryRegistry.setApplicationServer(appServerInfo);
+    }
+  }
+
+  /**
+   * Sets license key information to the telemetry data of the engine.
+   *
+   * @param licenseKeyData
+   *          a data object containing various pieces of information
+   *          about the installed license
+   */
+  public void setLicenseKeyForTelemetry(LicenseKeyDataImpl licenseKeyData) {
+    TelemetryRegistry telemetryRegistry = processEngineConfiguration.getTelemetryRegistry();
+    if (telemetryRegistry != null) {
+      telemetryRegistry.setLicenseKey(licenseKeyData);
+    }
+  }
+
+  public LicenseKeyDataImpl getLicenseKeyFromTelemetry() {
+    TelemetryRegistry telemetryRegistry = processEngineConfiguration.getTelemetryRegistry();
+    if (telemetryRegistry != null) {
+      return telemetryRegistry.getLicenseKey();
+    }
+    return null;
+  }
+
+  public void clearTelemetryData() {
+    TelemetryRegistry telemetryRegistry = processEngineConfiguration.getTelemetryRegistry();
+    if (telemetryRegistry != null) {
+      telemetryRegistry.clear();
+    }
+    MetricsRegistry metricsRegistry = ((ProcessEngineConfigurationImpl) processEngineConfiguration).getMetricsRegistry();
+    if(metricsRegistry != null) {
+      metricsRegistry.clearTelemetryMetrics();
+    }
+    deleteMetrics(null);
   }
 
   protected class DbSchemaUpgradeCmd implements Command<String> {

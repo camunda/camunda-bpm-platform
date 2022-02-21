@@ -45,10 +45,6 @@ public class TelemetryRegistry {
     return applicationServer;
   }
 
-  public synchronized void setApplicationServer(ApplicationServerImpl applicationServer) {
-    this.applicationServer = applicationServer;
-  }
-
   public synchronized void setApplicationServer(String applicationServerVersion) {
     this.applicationServer = new ApplicationServerImpl(applicationServerVersion);
   }

@@ -33,7 +33,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.PropertyManager;
 import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyDataImpl;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
-import org.camunda.bpm.engine.impl.util.LicenseKeyUtil;
 import org.camunda.bpm.engine.impl.util.TelemetryUtil;
 
 /**
@@ -237,10 +236,11 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
     telemetryData.setInstallation(installationId);
 
     // set the persisted license key in the telemetry data and registry
-    String licenseKey = processEngineConfiguration.getManagementService().getLicenseKey();
+    ManagementServiceImpl managementService = (ManagementServiceImpl) processEngineConfiguration.getManagementService();
+    String licenseKey = managementService.getLicenseKey();
     if (licenseKey != null) {
-      LicenseKeyDataImpl licenseKeyData = LicenseKeyUtil.getLicenseKeyData(licenseKey);
-      processEngineConfiguration.getTelemetryRegistry().setLicenseKey(licenseKeyData);
+      LicenseKeyDataImpl licenseKeyData = LicenseKeyDataImpl.fromRawString(licenseKey);
+      managementService.setLicenseKeyForTelemetry(licenseKeyData);
       telemetryData.getProduct().getInternals().setLicenseKey(licenseKeyData);
     }
   }

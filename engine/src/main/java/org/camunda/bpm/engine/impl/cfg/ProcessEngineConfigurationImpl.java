@@ -429,7 +429,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected IdentityService identityService = new IdentityServiceImpl();
   protected TaskService taskService = new TaskServiceImpl();
   protected FormService formService = new FormServiceImpl();
-  protected ManagementService managementService = new ManagementServiceImpl();
+  protected ManagementService managementService = new ManagementServiceImpl(this);
   protected AuthorizationService authorizationService = new AuthorizationServiceImpl();
   protected CaseService caseService = new CaseServiceImpl();
   protected FilterService filterService = new FilterServiceImpl();
@@ -1806,11 +1806,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       properties.put("dayComparator", DbSqlSessionFactory.databaseSpecificDaysComparator.get(databaseType));
 
       properties.put("collationForCaseSensitivity", DbSqlSessionFactory.databaseSpecificCollationForCaseSensitivity.get(databaseType));
-      
+
       properties.put("authJoinStart", DbSqlSessionFactory.databaseSpecificAuthJoinStart.get(databaseType));
       properties.put("authJoinEnd", DbSqlSessionFactory.databaseSpecificAuthJoinEnd.get(databaseType));
       properties.put("authJoinSeparator", DbSqlSessionFactory.databaseSpecificAuthJoinSeparator.get(databaseType));
-      
+
       properties.put("authJoin1Start", DbSqlSessionFactory.databaseSpecificAuth1JoinStart.get(databaseType));
       properties.put("authJoin1End", DbSqlSessionFactory.databaseSpecificAuth1JoinEnd.get(databaseType));
       properties.put("authJoin1Separator", DbSqlSessionFactory.databaseSpecificAuth1JoinSeparator.get(databaseType));

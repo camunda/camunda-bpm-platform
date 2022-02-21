@@ -45,6 +45,11 @@ public class LicenseKeyDataImpl implements LicenseKeyData {
     this.raw = raw;
   }
 
+  public static LicenseKeyDataImpl fromRawString(String rawLicense) {
+    String licenseKeyRawString = rawLicense.contains(";") ? rawLicense.split(";", 2)[1] : rawLicense;
+    return new LicenseKeyDataImpl(null, null, null, null, null, licenseKeyRawString);
+  }
+
   public String getCustomer() {
     return customer;
   }

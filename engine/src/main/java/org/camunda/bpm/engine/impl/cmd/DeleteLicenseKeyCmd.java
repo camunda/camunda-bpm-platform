@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import org.camunda.bpm.engine.impl.ManagementServiceImpl;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -64,7 +65,7 @@ public class DeleteLicenseKeyCmd extends LicenseCmd implements Command<Object> {
     }
 
     if (updateTelemetry) {
-      commandContext.getProcessEngineConfiguration().getTelemetryRegistry().setLicenseKey(null);
+      ((ManagementServiceImpl) commandContext.getProcessEngineConfiguration().getManagementService()).setLicenseKeyForTelemetry(null);
     }
 
     return null;
