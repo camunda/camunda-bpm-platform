@@ -19,7 +19,7 @@
 
   <properties>
     <version.quarkus>2.1.2.Final</version.quarkus>
-    <version.spring.framework>5.3.15</version.spring.framework>
+    <version.spring.framework>5.2.19.RELEASE</version.spring.framework>
     <version.spring-boot>2.6.3</version.spring-boot>
     <version.cxf>3.0.3</version.cxf>
     <version.resteasy>2.3.5.Final</version.resteasy>
