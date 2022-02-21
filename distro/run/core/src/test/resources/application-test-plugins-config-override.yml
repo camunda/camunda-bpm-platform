@@ -1,0 +1,5 @@
+camunda.bpm.run.process-engine-plugins:
+  - plugin-class: org.camunda.spin.plugin.impl.SpinProcessEnginePlugin
+    plugin-parameters:
+      enableXxeProcessing: true
+      enableSecureXmlProcessing: false

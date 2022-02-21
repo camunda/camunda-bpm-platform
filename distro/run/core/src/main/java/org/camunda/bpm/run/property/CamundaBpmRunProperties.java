@@ -16,6 +16,11 @@
  */
 package org.camunda.bpm.run.property;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
@@ -26,13 +31,16 @@ public class CamundaBpmRunProperties {
   public static final String PREFIX = CamundaBpmProperties.PREFIX + ".run";
 
   @NestedConfigurationProperty
-  private CamundaBpmRunAuthenticationProperties auth = new CamundaBpmRunAuthenticationProperties();
+  protected CamundaBpmRunAuthenticationProperties auth = new CamundaBpmRunAuthenticationProperties();
 
   @NestedConfigurationProperty
-  private CamundaBpmRunCorsProperty cors = new CamundaBpmRunCorsProperty();
+  protected CamundaBpmRunCorsProperty cors = new CamundaBpmRunCorsProperty();
 
   @NestedConfigurationProperty
-  private CamundaBpmRunLdapProperties ldap = new CamundaBpmRunLdapProperties();
+  protected CamundaBpmRunLdapProperties ldap = new CamundaBpmRunLdapProperties();
+
+  @NestedConfigurationProperty
+  protected List<CamundaBpmRunProcessEnginePluginProperty> processEnginePlugins = new ArrayList<>();
 
   protected CamundaBpmRunAdministratorAuthorizationProperties adminAuth
       = new CamundaBpmRunAdministratorAuthorizationProperties();
@@ -69,6 +77,14 @@ public class CamundaBpmRunProperties {
     this.adminAuth = adminAuth;
   }
 
+  public List<CamundaBpmRunProcessEnginePluginProperty> getProcessEnginePlugins() {
+    return processEnginePlugins;
+  }
+
+  public void setProcessEnginePlugins(List<CamundaBpmRunProcessEnginePluginProperty> processEnginePlugins) {
+    this.processEnginePlugins = processEnginePlugins;
+  }
+
   @Override
   public String toString() {
     return "CamundaBpmRunProperties [" +
@@ -76,6 +92,7 @@ public class CamundaBpmRunProperties {
         ", cors=" + cors +
         ", ldap=" + ldap +
         ", adminAuth=" + adminAuth +
+        ", plugins=" + processEnginePlugins +
         "]";
   }
 }

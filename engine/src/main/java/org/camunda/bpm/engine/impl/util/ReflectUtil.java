@@ -113,6 +113,14 @@ public abstract class ReflectUtil {
    return clazz;
   }
 
+  public static <T> Class<? extends T> loadClass(String className, ClassLoader customClassloader, Class<T> clazz) throws ClassNotFoundException, ClassCastException {
+    if(customClassloader != null) {
+      return (Class<? extends T>) customClassloader.loadClass(className);
+    } else {
+      return (Class<? extends T>) loadClass(className);
+    }
+  }
+
   public static InputStream getResourceAsStream(String name) {
     InputStream resourceStream = null;
     ClassLoader classLoader = getCustomClassLoader();
@@ -195,6 +203,10 @@ public abstract class ReflectUtil {
     catch (Exception e) {
       throw LOG.exceptionWhileInstantiatingClass(type.getName(), e);
     }
+  }
+
+  public static <T> T createInstance(Class<? extends T> clazz) {
+    return instantiate(clazz);
   }
 
   public static Object invoke(Object target, String methodName, Object[] args) {

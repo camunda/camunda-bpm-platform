@@ -14,14 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.spring.boot.starter.configuration.impl;
+package org.camunda.bpm.spring.boot.starter.util;
 
 import java.util.Map;
-import org.camunda.bpm.engine.spring.SpringProcessEngineConfiguration;
-import org.camunda.bpm.spring.boot.starter.configuration.Ordering;
-import org.camunda.bpm.spring.boot.starter.property.GenericProperties;
-import org.camunda.bpm.spring.boot.starter.util.SpringBootProcessEngineLogger;
-import org.camunda.bpm.spring.boot.starter.util.SpringBootStarterPropertyHelper;
+
 import org.springframework.boot.context.properties.bind.BindHandler;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
@@ -29,23 +25,22 @@ import org.springframework.boot.context.properties.bind.handler.NoUnboundElement
 import org.springframework.boot.context.properties.source.ConfigurationPropertyName;
 import org.springframework.boot.context.properties.source.ConfigurationPropertySource;
 import org.springframework.boot.context.properties.source.MapConfigurationPropertySource;
-import org.springframework.core.annotation.Order;
-import org.springframework.util.CollectionUtils;
 
-@Order(Ordering.DEFAULT_ORDER - 1)
-public class GenericPropertiesConfiguration extends AbstractCamundaConfiguration {
+public class SpringBootStarterPropertyHelper {
 
   protected static final SpringBootProcessEngineLogger LOG = SpringBootProcessEngineLogger.LOG;
 
-  @Override
-  public void preInit(SpringProcessEngineConfiguration springProcessEngineConfiguration) {
-    GenericProperties genericProperties = camundaBpmProperties.getGenericProperties();
-    final Map<String, Object> properties = genericProperties.getProperties();
-
-    if (!CollectionUtils.isEmpty(properties)) {
-      SpringBootStarterPropertyHelper
-          .applyProperties(springProcessEngineConfiguration, properties, genericProperties.isIgnoreUnknownFields());
-      LOG.propertiesApplied(genericProperties);
+  public static <T> void applyProperties(T target, Map<String, Object> sourceMap, boolean ignoreUnknownFields) {
+    ConfigurationPropertySource source = new MapConfigurationPropertySource(sourceMap);
+    Binder binder = new Binder(source);
+    try {
+      if (ignoreUnknownFields) {
+        binder.bind(ConfigurationPropertyName.EMPTY, Bindable.ofInstance(target));
+      } else {
+        binder.bind(ConfigurationPropertyName.EMPTY, Bindable.ofInstance(target), new NoUnboundElementsBindHandler(BindHandler.DEFAULT));
+      }
+    } catch (Exception e) {
+      throw LOG.exceptionDuringBinding(e.getMessage());
     }
   }
 
