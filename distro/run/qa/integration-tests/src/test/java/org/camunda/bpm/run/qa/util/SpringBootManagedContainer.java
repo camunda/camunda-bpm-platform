@@ -70,6 +70,7 @@ public class SpringBootManagedContainer {
     this.baseDirectory = getRunHome();
     this.baseUrl = "http://localhost:8080";
     this.commands.add(getScriptPath());
+    this.commands.add("start");
     if (commands != null && commands.length > 0) {
       Arrays.stream(commands).forEach(e -> this.commands.add(e));
     }
@@ -152,7 +153,7 @@ public class SpringBootManagedContainer {
   }
 
   protected String getScriptPath() {
-    return baseDirectory + "/start." + (isUnixLike() ? "sh" : "bat");
+    return baseDirectory + "/internal/run." + (isUnixLike() ? "sh" : "bat");
   }
 
   // ---------------------------
