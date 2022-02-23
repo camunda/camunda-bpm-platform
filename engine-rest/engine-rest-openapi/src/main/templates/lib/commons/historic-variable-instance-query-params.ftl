@@ -106,5 +106,10 @@
     "type": "boolean",
     "desc": "Only include historic variable instances that belong to no tenant. Value may only be
              `true`, as `false` is the default behavior."
+  },
+  "variableNameIn": {
+    "type": "array",
+    "itemType": "string",
+    "desc": "Only include historic variable instances which belong to one of the passed ${paramListType} variable names."
   }
 }>
