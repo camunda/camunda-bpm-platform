@@ -77,6 +77,7 @@ module.exports = function(pluginDependencies) {
     '$locationProvider',
     '$animateProvider',
     '$qProvider',
+    '$compileProvider',
     function(
       $routeProvider,
       UriProvider,
@@ -84,8 +85,12 @@ module.exports = function(pluginDependencies) {
       $tooltipProvider,
       $locationProvider,
       $animateProvider,
-      $qProvider
+      $qProvider,
+      $compileProvider
     ) {
+      $compileProvider.aHrefSanitizationWhitelist(
+        /^\s*(https?|s?ftp|mailto|tel|file|blob):/
+      );
       $routeProvider.otherwise({redirectTo: '/dashboard'});
 
       UriProvider.replace(':appName', 'cockpit');
