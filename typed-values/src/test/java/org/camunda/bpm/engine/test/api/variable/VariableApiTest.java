@@ -23,6 +23,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Date;
@@ -101,7 +102,7 @@ public class VariableApiTest {
         .putValueTyped("foo", integerValue(10))
         .putValueTyped("bar", integerValue(20));
 
-    Map<String, Object> map3 = new HashMap<String, Object>();
+    Map<String, Object> map3 = new HashMap<>();
     map3.put("foo", 10);
     map3.put("bar", 20);
 
@@ -180,7 +181,7 @@ public class VariableApiTest {
                      .putValueTyped("test", byteArrayValue("test".getBytes(), true))
                      .putValueTyped("blob", fileValue(new File(this.getClass().getClassLoader().getResource("org/camunda/bpm/engine/test/variables/simpleFile.txt").toURI()), true))
                      .putValueTyped("val", dateValue(new Date(), true))
-                     .putValueTyped("var", objectValue(new Integer(10), true).create())
+                     .putValueTyped("var", objectValue(BigDecimal.valueOf(10), true).create())
                      .putValueTyped("short", shortValue((short)12, true))
                      .putValueTyped("long", longValue((long)10, true))
                      .putValueTyped("file", fileValue("org/camunda/bpm/engine/test/variables/simpleFile.txt").setTransient(true).create())
@@ -190,7 +191,32 @@ public class VariableApiTest {
 
     for (Entry<String, Object> e : variableMap.entrySet()) {
       TypedValue value = (TypedValue) variableMap.getValueTyped(e.getKey());
-      assertTrue(value.isTransient());
+      assertTrue("Variable '" + e.getKey() + "' is not transient: " + value, value.isTransient());
+    }
+  }
+  
+  @Test
+  public void testTransientVariablesRaw() throws URISyntaxException {
+    VariableMap variableMap = createVariables().putValueTyped("foo", doubleValue(10.0, true))
+                     .putValue("bar", integerValue(10, true))
+                     .putValue("aa", booleanValue(true, true))
+                     .putValue("bb", stringValue("bb", true))
+                     .putValue("test", byteArrayValue("test".getBytes(), true))
+                     .putValue("blob", fileValue(new File(this.getClass().getClassLoader().getResource("org/camunda/bpm/engine/test/variables/simpleFile.txt").toURI()), true))
+                     .putValue("val", dateValue(new Date(), true))
+                     .putValue("var", objectValue(BigDecimal.valueOf(10), true).create())
+                     .putValue("varBuilder", objectValue(BigDecimal.valueOf(10), true))
+                     .putValue("short", shortValue((short)12, true))
+                     .putValue("long", longValue((long)10, true))
+                     .putValue("file", fileValue("org/camunda/bpm/engine/test/variables/simpleFile.txt").setTransient(true).create())
+                     .putValue("hi", untypedValue("stringUntyped", true))
+                     .putValue("null", untypedValue(null, true))
+                     .putValue("ser", serializedObjectValue("{\"name\" : \"foo\"}", true).create())
+                     .putValue("serBuilder", serializedObjectValue("{\"name\" : \"foo\"}", true));
+
+    for (Entry<String, Object> e : variableMap.entrySet()) {
+      TypedValue value = (TypedValue) variableMap.getValueTyped(e.getKey());
+      assertTrue("Variable '" + e.getKey() + "' is not transient: " + value, value.isTransient());
     }
   }
 }
