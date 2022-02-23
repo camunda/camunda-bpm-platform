@@ -95,7 +95,7 @@ public class TestServlet extends HttpServlet {
 
     ManagementService managementService = processEngine.getManagementService();
 
-    Collection<Meter> meters = processEngineConfiguration.getMetricsRegistry().getMeters().values();
+    Collection<Meter> meters = processEngineConfiguration.getMetricsRegistry().getDbMeters().values();
     for (Meter meter : meters) {
       meter.getAndClear();
     }
@@ -153,7 +153,13 @@ public class TestServlet extends HttpServlet {
     userProfileDto.setLastName("Hentschi");
     user.setProfile(userProfileDto);
 
-    new SetupResource().createInitialUser(processEngine.getName(), user);
+    try {
+      new SetupResource().createInitialUser(processEngine.getName(), user);
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (ServletException e) {
+      e.printStackTrace();
+    }
   }
 
   protected void deleteAdminUser(ProcessEngine processEngine) {

@@ -23,7 +23,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Providers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.camunda.bpm.cockpit.impl.plugin.CockpitPlugins;
 import org.camunda.bpm.cockpit.plugin.resource.AbstractCockpitPluginRootResource;
 import org.camunda.bpm.engine.rest.util.ProvidersUtil;
 

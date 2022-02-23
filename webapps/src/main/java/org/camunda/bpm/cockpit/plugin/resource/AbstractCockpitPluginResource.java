@@ -103,7 +103,7 @@ public class AbstractCockpitPluginResource extends AbstractAppPluginResource<Coc
   /**
    * Configure the authorization check for the given {@link QueryParameters}.
    */
-  protected void configureAuthorizationCheck(QueryParameters<?> query) {
+  protected void configureAuthorizationCheck(QueryParameters query) {
     Authentication currentAuthentication = getCurrentAuthentication();
 
     AuthorizationCheck authCheck = query.getAuthCheck();
@@ -122,7 +122,7 @@ public class AbstractCockpitPluginResource extends AbstractAppPluginResource<Coc
   /**
    * Configure the tenant check for the given {@link QueryParameters}.
    */
-  protected void configureTenantCheck(QueryParameters<?> query) {
+  protected void configureTenantCheck(QueryParameters query) {
     TenantCheck tenantCheck = query.getTenantCheck();
 
     if (isTenantCheckEnabled()) {
@@ -139,7 +139,7 @@ public class AbstractCockpitPluginResource extends AbstractAppPluginResource<Coc
   /**
    * Add a new {@link PermissionCheck} with the given values.
    */
-  protected void addPermissionCheck(QueryParameters<?>  query, Resource resource, String queryParam, Permission permission) {
+  protected void addPermissionCheck(QueryParameters query, Resource resource, String queryParam, Permission permission) {
     if(!isPermissionDisabled(permission)){
       PermissionCheck permCheck = new PermissionCheck();
       permCheck.setResource(resource);
