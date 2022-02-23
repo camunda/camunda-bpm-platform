@@ -577,7 +577,7 @@
         <dependency>
           <artifactId>jackson-annotations</artifactId>
           <groupId>com.fasterxml.jackson.core</groupId>
-          <version>2.12.1</version>
+          <version>${version.jackson}</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
