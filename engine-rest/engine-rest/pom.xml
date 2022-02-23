@@ -752,7 +752,7 @@
       <properties>
         <!-- Test with Resteasy version used by the oldest
              Camunda-supported Wildfly/JBoss EAP version -->
-        <version.resteasy>3.5.1.Final</version.resteasy>
+        <version.resteasy>3.0.16.Final</version.resteasy>
       </properties>
     </profile>
 
