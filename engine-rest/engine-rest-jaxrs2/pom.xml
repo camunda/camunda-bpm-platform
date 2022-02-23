@@ -132,14 +132,14 @@
         <dependency>
           <groupId>org.jboss.resteasy</groupId>
           <artifactId>resteasy-netty4</artifactId>
-          <version>${version.resteasy3}</version>
+          <version>${version.resteasy}</version>
           <scope>test</scope>
         </dependency>
 
         <dependency>
           <groupId>org.jboss.resteasy</groupId>
           <artifactId>resteasy-jaxrs</artifactId>
-          <version>${version.resteasy3}</version>
+          <version>${version.resteasy}</version>
           <scope>test</scope>
           <exclusions>
             <exclusion>
@@ -152,7 +152,7 @@
         <dependency>
           <groupId>org.jboss.resteasy</groupId>
           <artifactId>resteasy-client</artifactId>
-          <version>${version.resteasy3}</version>
+          <version>${version.resteasy}</version>
           <scope>test</scope>
         </dependency>
       </dependencies>

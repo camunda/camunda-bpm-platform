@@ -22,8 +22,7 @@
     <version.spring.framework>5.2.19.RELEASE</version.spring.framework>
     <version.spring-boot>2.6.3</version.spring-boot>
     <version.cxf>3.0.3</version.cxf>
-    <version.resteasy>2.3.5.Final</version.resteasy>
-    <version.resteasy3>3.14.0.Final</version.resteasy3>
+    <version.resteasy>3.14.0.Final</version.resteasy>
     <version.jersey2>2.34</version.jersey2>
     <version.groovy>2.4.13</version.groovy>
     <version.graal.js>21.1.0</version.graal.js>
