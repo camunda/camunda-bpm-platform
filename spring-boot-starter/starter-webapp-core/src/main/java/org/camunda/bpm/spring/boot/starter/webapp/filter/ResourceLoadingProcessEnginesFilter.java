@@ -16,6 +16,10 @@
  */
 package org.camunda.bpm.spring.boot.starter.webapp.filter;
 
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,11 +30,30 @@ import org.camunda.bpm.spring.boot.starter.property.WebappProperty;
 import org.camunda.bpm.webapp.impl.engine.ProcessEnginesFilter;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.util.StringUtils;
 
 public class ResourceLoadingProcessEnginesFilter extends ProcessEnginesFilter implements ResourceLoaderDependingFilter {
 
-  private ResourceLoader resourceLoader;
-  private WebappProperty webappProperty;
+  protected static final String DEFAULT_REDIRECT_APP = "tasklist";
+
+  protected ResourceLoader resourceLoader;
+  protected WebappProperty webappProperty;
+
+  @Override
+  protected void applyFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
+    String contextPath = request.getContextPath();
+    String requestUri = request.getRequestURI().substring(contextPath.length());
+    String applicationPath = webappProperty.getApplicationPath();
+
+    requestUri = trimChar(requestUri, '/');
+    String appPath = trimChar(applicationPath, '/');
+    if (requestUri.equals(appPath)) {
+      response.sendRedirect(String.format("%s%s/app/%s/", contextPath, applicationPath, DEFAULT_REDIRECT_APP));
+      return;
+    }
+
+    super.applyFilter(request, response, chain);
+  }
 
   @Override
   protected String getWebResourceContents(String name) throws IOException {
@@ -79,16 +102,27 @@ public class ResourceLoadingProcessEnginesFilter extends ProcessEnginesFilter im
   /**
    * @return the webappProperty
    */
-    public WebappProperty getWebappProperty() {
+  public WebappProperty getWebappProperty() {
         return webappProperty;
     }
 
-    /**
-     * @param webappProperty 
-     *          webappProperty to set
-     */
-    public void setWebappProperty(WebappProperty webappProperty) {
-        this.webappProperty = webappProperty;
-    }
+  /**
+   * @param webappProperty
+   *          webappProperty to set
+   */
+  public void setWebappProperty(WebappProperty webappProperty) {
+    this.webappProperty = webappProperty;
+  }
 
+  /**
+   * @param input - String to trim
+   * @param charachter - Char to trim
+   * @return the trimmed String
+   */
+  protected String trimChar(String input, char charachter) {
+    input = StringUtils.trimLeadingCharacter(input, charachter);
+    input = StringUtils.trimTrailingCharacter(input, charachter);
+
+    return input;
+  }
 }

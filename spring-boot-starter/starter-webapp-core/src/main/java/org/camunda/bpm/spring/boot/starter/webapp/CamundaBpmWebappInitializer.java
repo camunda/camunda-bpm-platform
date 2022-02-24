@@ -112,7 +112,10 @@ public class CamundaBpmWebappInitializer implements ServletContextInitializer {
         applicationPath + "/api/*", applicationPath + "/app/*");
 
     registerFilter("Engines Filter", LazyProcessEnginesFilter.class,
-        applicationPath + "/api/*", applicationPath + "/app/*");
+        applicationPath + "/api/*",
+                   applicationPath + "/app/*",
+                   applicationPath + "/",
+                   applicationPath);
 
     registerFilter("EmptyBodyFilter", EmptyBodyFilter.class,
         applicationPath + "/api/*", applicationPath + "/app/*");
