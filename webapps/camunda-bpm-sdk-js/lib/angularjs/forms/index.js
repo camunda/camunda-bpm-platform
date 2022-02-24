@@ -62,13 +62,6 @@ ngModule.directive('camVariableType', [
           ctrl.$setValidity('camVariableType', true);
 
           if (viewValue || viewValue === false || type === 'Bytes') {
-            if (ctrl.$pristine) {
-              ctrl.$pristine = false;
-              ctrl.$dirty = true;
-              $element.addClass('ng-dirty');
-              $element.removeClass('ng-pristine');
-            }
-
             if (
               ['Boolean', 'String', 'Bytes'].indexOf(type) === -1 &&
               !isType(viewValue, type)
