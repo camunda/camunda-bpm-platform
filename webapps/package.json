@@ -48,7 +48,7 @@
     "dmn-js": "10.0.0",
     "dmn-js-decision-table": "10.0.0",
     "dmn-js-drd": "10.0.0",
-    "dmn-js-literal-expression": "10.0.0",
+    "dmn-js-literal-expression": "12.0.0",
     "dmn-js-shared": "10.0.0",
     "dom4": "2.1.6",
     "events": "3.0.0",
