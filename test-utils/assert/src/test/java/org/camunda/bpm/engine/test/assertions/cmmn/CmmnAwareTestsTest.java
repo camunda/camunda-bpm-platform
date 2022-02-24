@@ -17,14 +17,9 @@
 package org.camunda.bpm.engine.test.assertions.cmmn;
 
 import static org.camunda.bpm.engine.test.assertions.cmmn.CmmnAwareTests.withVariables;
-import static org.camunda.bpm.engine.test.assertions.helpers.CamundaMatchers.*;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.*;
-import static org.powermock.api.mockito.PowerMockito.verifyNoMoreInteractions;
 
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.CaseService;
@@ -35,17 +30,17 @@ import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
 import org.camunda.bpm.engine.runtime.*;
 import org.camunda.bpm.engine.test.assertions.bpmn.AbstractAssertions;
 import org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests;
-import org.camunda.bpm.engine.test.assertions.helpers.CamundaMatchers;
 import org.camunda.bpm.engine.test.assertions.helpers.CaseExecutionQueryFluentAnswer;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 
 /**
  * You will notice that this test class does not cover all methods.
@@ -54,12 +49,10 @@ import org.powermock.modules.junit4.PowerMockRunner;
  *
  * @author Malte Sörensen (malte.soerensen@holisticon.de)
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({BpmnAwareTests.class, CmmnAwareTests.class, AbstractAssertions.class})
+@RunWith(MockitoJUnitRunner.class)
 public class CmmnAwareTestsTest {
 
   public static final String ACTIVITY_ID = "FOO";
-  public static final String CASE_INSTANCE_ID = "BAR";
 
   @Rule
   public ExpectedException thrown = ExpectedException.none();
@@ -73,26 +66,52 @@ public class CmmnAwareTestsTest {
   @Mock
   private CaseDefinition caseDefinition;
 
+  @Mock
+  private ProcessEngine processEngine;
+
+  @Mock
+  private CaseService caseService;
+
   //mocked below
   private CaseExecutionQuery caseExecutionQuery;
+  private MockedStatic<CmmnAwareTests> cmmnAwareTestsMockedStatic;
+  private MockedStatic<AbstractAssertions> abstractAssertionsMockedStatic;
+
+  @Before
+  public void setUp() {
+    cmmnAwareTestsMockedStatic = mockStatic(CmmnAwareTests.class, CALLS_REAL_METHODS);
+    abstractAssertionsMockedStatic = mockStatic(AbstractAssertions.class);
+    abstractAssertionsMockedStatic.when(AbstractAssertions::processEngine).thenReturn(processEngine);
+    when(processEngine.getCaseService()).thenReturn(caseService);
+
+    caseExecutionQuery = mock(CaseExecutionQuery.class, new CaseExecutionQueryFluentAnswer());
+    when(caseService.createCaseExecutionQuery()).thenReturn(caseExecutionQuery);
+  }
+
+  @After
+  public void tearDown() {
+    cmmnAwareTestsMockedStatic.close();
+    abstractAssertionsMockedStatic.close();
+  }
 
   @Test
   public void assertThatCaseDefinition_should_delegate_to_CmmnAwareAssertions() {
 
     //prepare and mock static methods
     //because we need control over the CaseDefinitionAssert created
-    mockStatic(CmmnAwareTests.class);
+    final MockedStatic<CaseDefinitionAssert> caseDefinitionAssertMockedStatic = mockStatic(CaseDefinitionAssert.class);
     CaseDefinitionAssert caseDefinitionAssert = mock(CaseDefinitionAssert.class);
-    when(CmmnAwareTests.assertThat(any(CaseDefinition.class))).thenReturn(caseDefinitionAssert);
+    caseDefinitionAssertMockedStatic.when(() -> CaseDefinitionAssert.assertThat(Mockito.any(), any())).thenReturn(caseDefinitionAssert);
 
     //when calling the method under test with a non-null CaseDefinition object
     CaseDefinitionAssert actualCaseDefinitionAssert = CmmnAwareTests.assertThat(caseDefinition);
 
     //then the delegate is called with that CaseDefinition object
-    verifyStatic(CmmnAwareTests.class);
-    CmmnAwareTests.assertThat(caseDefinition);
+    caseDefinitionAssertMockedStatic.verify(() -> CaseDefinitionAssert.assertThat(Mockito.any(), any()));
     //and whatever the delegate returns, is returned by the tested method, too
     Assertions.assertThat(actualCaseDefinitionAssert).isSameAs(caseDefinitionAssert);
+
+    caseDefinitionAssertMockedStatic.close();
   }
 
   @Test
@@ -100,18 +119,19 @@ public class CmmnAwareTestsTest {
 
     //prepare and mock static methods
     //because we need control over the CaseExecutionAssert created
-    mockStatic(CmmnAwareTests.class);
+    final MockedStatic<CaseExecutionAssert> caseExecutionAssertMockedStatic = mockStatic(CaseExecutionAssert.class);
     CaseExecutionAssert caseExecutionAssert = mock(CaseExecutionAssert.class);
-    when(CmmnAwareTests.assertThat(anyCaseExecution())).thenReturn(caseExecutionAssert);
+    caseExecutionAssertMockedStatic.when(() -> CaseExecutionAssert.assertThat(Mockito.any(), any())).thenReturn(caseExecutionAssert);
 
     //when calling the method under test with a non-null CaseExecution object
     CaseExecutionAssert actualCaseExecutionAssert = CmmnAwareTests.assertThat(caseExecution);
 
     //then the delegate is called with that CaseExecution object
-    verifyStatic(CmmnAwareTests.class);
-    CmmnAwareTests.assertThat(caseExecution);
+    caseExecutionAssertMockedStatic.verify(() -> CaseExecutionAssert.assertThat(Mockito.any(), any()));
     //and whatever the delegate returns, is returned by the tested method, too
     Assertions.assertThat(actualCaseExecutionAssert).isSameAs(caseExecutionAssert);
+
+    caseExecutionAssertMockedStatic.close();
   }
 
   @Test
@@ -119,18 +139,19 @@ public class CmmnAwareTestsTest {
 
     //prepare and mock static methods
     //because we need control over the CaseInstanceAssert created
-    mockStatic(CmmnAwareTests.class);
+    final MockedStatic<CaseInstanceAssert> caseInstanceAssertMockedStatic = mockStatic(CaseInstanceAssert.class);
     CaseInstanceAssert caseInstanceAssert = mock(CaseInstanceAssert.class);
-    when(CmmnAwareTests.assertThat(anyCaseInstance())).thenReturn(caseInstanceAssert);
+    caseInstanceAssertMockedStatic.when(() -> CaseInstanceAssert.assertThat(any(), any())).thenReturn(caseInstanceAssert);
 
     //when calling the method under test with a non-null CaseInstance object
     CaseInstanceAssert actualCaseInstanceAssert = CmmnAwareTests.assertThat(caseInstance);
 
     //then the delegate is called with that CaseInstance object
-    verifyStatic(CmmnAwareTests.class);
-    CmmnAwareTests.assertThat(caseInstance);
+    caseInstanceAssertMockedStatic.verify(() -> CaseInstanceAssert.assertThat(any(), any()));
     //and whatever the delegate returns, is returned by the tested method, too
     Assertions.assertThat(actualCaseInstanceAssert).isSameAs(caseInstanceAssert);
+
+    caseInstanceAssertMockedStatic.close();
   }
 
   @Test
@@ -138,9 +159,9 @@ public class CmmnAwareTestsTest {
 
     //prepare and mock static methods
     //because we need control over the CaseDefinitionQuery created
-    mockStatic(BpmnAwareTests.class);
+    final MockedStatic<BpmnAwareTests> bpmnAwareTestsMockedStatic = mockStatic(BpmnAwareTests.class);
     RepositoryService repositoryService = mock(RepositoryService.class);
-    when(BpmnAwareTests.repositoryService()).thenReturn(repositoryService);
+    bpmnAwareTestsMockedStatic.when(BpmnAwareTests::repositoryService).thenReturn(repositoryService);
 
     CaseDefinitionQuery caseDefinitionQuery = mock(CaseDefinitionQuery.class);
     when(repositoryService.createCaseDefinitionQuery()).thenReturn(caseDefinitionQuery);
@@ -154,41 +175,37 @@ public class CmmnAwareTestsTest {
     Assertions.assertThat(actualCaseDefinitionQuery).isSameAs(caseDefinitionQuery);
     //and the returned CaseDefinitionQuery is a vanilla one
     verifyNoMoreInteractions(caseDefinitionQuery);
+
+    bpmnAwareTestsMockedStatic.close();
   }
 
   @Test
   public void caseExecutionCaseExecutionQueryCaseInstance_should_delegate_to_assertThatCaseInstance() {
+    final MockedStatic<CaseInstanceAssert> caseInstanceAssertMockedStatic = mockStatic(CaseInstanceAssert.class);
     CaseInstanceAssert caseInstanceAssert = mock(CaseInstanceAssert.class);
     when(caseInstanceAssert.isNotNull()).thenReturn(caseInstanceAssert);
     when(caseInstanceAssert.descendantCaseExecution(caseExecutionQuery)).thenReturn(mock(CaseExecutionAssert.class));
 
     //prepare and mock static methods
     //because we need control over the context of tested method
-    mockStatic(CmmnAwareTests.class);
-    when(CmmnAwareTests.assertThat(anyCaseInstance())).thenReturn(caseInstanceAssert);
-    when(CmmnAwareTests.caseExecution(anyCaseExecutionQuery(), anyCaseInstance())).thenCallRealMethod();
+    caseInstanceAssertMockedStatic.when(() -> CaseInstanceAssert.assertThat(any(), any())).thenReturn(caseInstanceAssert);
 
     //when getting the CaseExecution for a CaseInstance and a given CaseExecutionQuery
     CmmnAwareTests.caseExecution(caseExecutionQuery, caseInstance);
 
     //then the call is delegated via assertThat to a CaseInstanceAssert
-    verifyStatic(CmmnAwareTests.class);
-    CmmnAwareTests.assertThat(caseInstance);
+    cmmnAwareTestsMockedStatic.verify(() -> CmmnAwareTests.assertThat(caseInstance));
+    caseInstanceAssertMockedStatic.verify(() -> CaseInstanceAssert.assertThat(any(), any()));
 
     //and the CaseExecutionQuery is used for narrowing down the result
     verify(caseInstanceAssert).descendantCaseExecution(caseExecutionQuery);
     verifyNoMoreInteractions(caseExecutionQuery);
+
+    caseInstanceAssertMockedStatic.close();
   }
 
   @Test
   public void caseExecutionQuery_should_create_vanilla_query() {
-
-    //prepare and mock static methods
-    //because we need control over the CaseExecutionQuery created
-    mockStatic(CmmnAwareTests.class);
-    when(CmmnAwareTests.caseExecutionQuery()).thenCallRealMethod();
-    CaseService caseService = mock(CaseService.class);
-    when(CmmnAwareTests.caseService()).thenReturn(caseService);
     when(caseService.createCaseExecutionQuery()).thenReturn(caseExecutionQuery);
 
     //when getting a CaseExecutionQuery
@@ -204,34 +221,29 @@ public class CmmnAwareTestsTest {
 
   @Test
   public void caseExecutionStringCaseInstance_should_delegate_to_its_query_variant() {
-    //prepare and mock static methods
-    //because we need control over the context of tested method
-    mockStatic(CmmnAwareTests.class);
-    when(CmmnAwareTests.caseExecution(anyString(), anyCaseInstance())).thenCallRealMethod();
-    when(CmmnAwareTests.caseExecution(anyCaseExecutionQuery(), anyCaseInstance())).thenReturn(caseExecution);
-    when(CmmnAwareTests.caseExecutionQuery()).thenReturn(caseExecutionQuery);
+    final MockedStatic<CaseInstanceAssert> caseInstanceAssertMockedStatic = mockStatic(CaseInstanceAssert.class);
+    final CaseInstanceAssert caseInstanceAssert = mock(CaseInstanceAssert.class);
+    caseInstanceAssertMockedStatic.when(() -> CaseInstanceAssert.assertThat(any(), eq(caseInstance))).thenReturn(caseInstanceAssert);
+    when(caseInstanceAssert.isNotNull()).thenReturn(caseInstanceAssert);
+    final CaseExecutionAssert caseExecutionAssert = mock(CaseExecutionAssert.class);
+    when(caseInstanceAssert.descendantCaseExecution(any())).thenReturn(caseExecutionAssert);
+    when(caseExecutionAssert.getActual()).thenReturn(caseExecution);
 
     //when getting the CaseExecution for activity FOO in a given case instance
     CmmnAwareTests.caseExecution(ACTIVITY_ID, caseInstance);
 
     //then the caseExecutionQuery is enhanced with the activityId only
     verify(caseExecutionQuery).activityId(ACTIVITY_ID);
+    caseInstanceAssertMockedStatic.verify(() -> CaseInstanceAssert.assertThat(any(), eq(caseInstance)));
     verifyNoMoreInteractions(caseExecutionQuery);
     //and the call is delegated properly
-    verifyStatic(CmmnAwareTests.class);
-    CmmnAwareTests.caseExecution(caseExecutionQuery, caseInstance);
+    cmmnAwareTestsMockedStatic.verify(() -> CmmnAwareTests.caseExecution(caseExecutionQuery, caseInstance));
+
+    caseInstanceAssertMockedStatic.close();
   }
 
   @Test
   public void caseInstanceQuery_should_create_vanilla_query() {
-
-    //prepare and mock static methods
-    //because we need control over the CaseInstanceQuery created
-    mockStatic(CmmnAwareTests.class);
-    when(CmmnAwareTests.caseInstanceQuery()).thenCallRealMethod();
-    CaseService caseService = mock(CaseService.class);
-    when(CmmnAwareTests.caseService()).thenReturn(caseService);
-
     CaseInstanceQuery caseInstanceQuery = mock(CaseInstanceQuery.class);
     when(caseService.createCaseInstanceQuery()).thenReturn(caseInstanceQuery);
 
@@ -248,15 +260,6 @@ public class CmmnAwareTestsTest {
 
   @Test
   public void caseService_should_return_the_processEngines_caseService() {
-
-    //prepare and mock static methods
-    //because we need control over the CaseService created
-    mockStatic(AbstractAssertions.class);
-    ProcessEngine processEngine = mock(ProcessEngine.class);
-    when(AbstractAssertions.processEngine()).thenReturn(processEngine);
-    CaseService caseService = mock(CaseService.class);
-    when(processEngine.getCaseService()).thenReturn(caseService);
-
     //when getting a CaseInstanceQuery
     CaseService actualCaseService = CmmnAwareTests.caseService();
 
@@ -266,14 +269,6 @@ public class CmmnAwareTestsTest {
 
   @Test
   public void completeCaseExecution_should_delegate_to_caseService() {
-    //prepare and mock static methods
-    //because we need control over the CaseService created
-    mockStatic(AbstractAssertions.class);
-    ProcessEngine processEngine = mock(ProcessEngine.class);
-    when(AbstractAssertions.processEngine()).thenReturn(processEngine);
-    CaseService caseService = mock(CaseService.class);
-    when(processEngine.getCaseService()).thenReturn(caseService);
-
     when(caseExecution.getId()).thenReturn("baz");
 
     CmmnAwareTests.complete(caseExecution);
@@ -290,14 +285,6 @@ public class CmmnAwareTestsTest {
 
   @Test
   public void disableCaseExecution_should_delegate_to_caseService() {
-    //prepare and mock static methods
-    //because we need control over the CaseService created
-    mockStatic(AbstractAssertions.class);
-    ProcessEngine processEngine = mock(ProcessEngine.class);
-    when(AbstractAssertions.processEngine()).thenReturn(processEngine);
-    CaseService caseService = mock(CaseService.class);
-    when(processEngine.getCaseService()).thenReturn(caseService);
-
     when(caseExecution.getId()).thenReturn("baz");
 
     CmmnAwareTests.disable(caseExecution);
@@ -314,14 +301,6 @@ public class CmmnAwareTestsTest {
 
   @Test
   public void manuallyStartCaseExecution_should_delegate_to_caseService() {
-    //prepare and mock static methods
-    //because we need control over the CaseService created
-    mockStatic(AbstractAssertions.class);
-    ProcessEngine processEngine = mock(ProcessEngine.class);
-    when(AbstractAssertions.processEngine()).thenReturn(processEngine);
-    CaseService caseService = mock(CaseService.class);
-    when(processEngine.getCaseService()).thenReturn(caseService);
-
     when(caseExecution.getId()).thenReturn("baz");
 
     CmmnAwareTests.manuallyStart(caseExecution);
@@ -338,16 +317,6 @@ public class CmmnAwareTestsTest {
 
   @Test
   public void completeCaseExecutionWithVariables_should_delegate_to_caseService() {
-    //prepare and mock static methods
-    //because we need control over the CaseService created
-    mockStatic(AbstractAssertions.class);
-    ProcessEngine processEngine = mock(ProcessEngine.class);
-    when(AbstractAssertions.processEngine()).thenReturn(processEngine);
-    CaseService caseService = mock(CaseService.class);
-    when(processEngine.getCaseService()).thenReturn(caseService);
-    CaseExecutionCommandBuilder caseExecutionCommandBuilder = mock(CaseExecutionCommandBuilder.class);
-    when(caseService.withCaseExecution("baz")).thenReturn(caseExecutionCommandBuilder);
-    when(caseExecutionCommandBuilder.setVariables(CamundaMatchers.<String, Object>anyMap())).thenReturn(caseExecutionCommandBuilder);
     when(caseExecution.getId()).thenReturn("baz");
 
     CmmnAwareTests.complete(caseExecution, withVariables("aVariable", "aValue"));
@@ -369,14 +338,4 @@ public class CmmnAwareTestsTest {
     CmmnAwareTests.complete(caseExecution, null);
   }
 
-  @Before
-  public void prepareCaseExecutionQuery() {
-    caseExecutionQuery = mock(CaseExecutionQuery.class, new CaseExecutionQueryFluentAnswer());
-    when(caseExecutionQuery.toString()).thenCallRealMethod();
-  }
-
-  @Before
-  public void prepareCaseInstance() {
-    when(caseInstance.getId()).thenReturn(CASE_INSTANCE_ID);
-  }
 }

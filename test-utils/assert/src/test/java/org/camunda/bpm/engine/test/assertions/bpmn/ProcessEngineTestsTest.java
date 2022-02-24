@@ -30,10 +30,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -48,21 +47,23 @@ import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
 /**
  * @author Martin Schimak (martin.schimak@plexiti.com)
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(ProcessEngines.class)
+@RunWith(MockitoJUnitRunner.class)
 public class ProcessEngineTestsTest {
 
   ProcessEngine processEngine;
+  MockedStatic<ProcessEngines> processEnginesMockedStatic;
 
   @Before
   public void setUp() {
     processEngine = mock(ProcessEngine.class);
+    processEnginesMockedStatic = mockStatic(ProcessEngines.class, CALLS_REAL_METHODS);
     init(processEngine);
   }
 
   @After
   public void tearDown() {
     reset();
+    processEnginesMockedStatic.close();
   }
 
   @Test
@@ -72,12 +73,11 @@ public class ProcessEngineTestsTest {
     // Then
     assertThat(returnedEngine).isNotNull().isSameAs(processEngine);
   }
-  
+
   @Test
   public void testNoProcessEngine_Failure() throws Exception {
     // Given
-    PowerMockito.spy(ProcessEngines.class);
-    Mockito.when(ProcessEngines.getProcessEngines()).thenReturn(new HashMap<String,ProcessEngine>());
+    processEnginesMockedStatic.when(ProcessEngines::getProcessEngines).thenReturn(new HashMap<String,ProcessEngine>());
     reset();
     try {
       // When
@@ -88,15 +88,14 @@ public class ProcessEngineTestsTest {
       assertThat(e).hasMessage("No ProcessEngine found to be registered with ProcessEngines!");
     }
   }
-  
+
   @Test
   public void testMultipleProcessEngine_Failure() throws Exception {
     // Given
     Map<String,ProcessEngine> multipleEnginesMap = new HashMap<>();
     multipleEnginesMap.put("test1", mock(ProcessEngine.class));
     multipleEnginesMap.put("test2", mock(ProcessEngine.class));
-    PowerMockito.spy(ProcessEngines.class);
-    Mockito.when(ProcessEngines.getProcessEngines()).thenReturn(multipleEnginesMap);
+    processEnginesMockedStatic.when(ProcessEngines::getProcessEngines).thenReturn(multipleEnginesMap);
     reset();
     try {
       // When
@@ -173,7 +172,7 @@ public class ProcessEngineTestsTest {
     JobAssert jobAssert = assertThat(job);
     assertThat(jobAssert.getActual()).isSameAs(job);
   }
-  
+
   @Test
   public void testAssertThat_CaseInstance() throws Exception {
     //Given
@@ -367,7 +366,7 @@ public class ProcessEngineTestsTest {
     verify(repositoryService, times(1)).createProcessDefinitionQuery();
     verifyNoMoreInteractions(repositoryService);
   }
-  
+
   @Test
   public void testExecutionQuery() {
     // Given
