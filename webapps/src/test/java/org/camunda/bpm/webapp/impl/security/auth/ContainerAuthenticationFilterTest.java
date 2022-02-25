@@ -16,28 +16,24 @@
  */
 package org.camunda.bpm.webapp.impl.security.auth;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.when;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.ServiceLoader;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.AuthorizationService;
@@ -58,20 +54,14 @@ import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 import org.camunda.bpm.engine.rest.spi.impl.MockedProcessEngineProvider;
 import org.camunda.bpm.webapp.impl.util.ProcessEngineUtil;
 import org.camunda.bpm.webapp.impl.util.ServletContextUtil;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.rule.PowerMockRule;
+import org.mockito.MockedStatic;
 import org.springframework.mock.web.MockFilterChain;
 import org.springframework.mock.web.MockFilterConfig;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -79,17 +69,9 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockServletContext;
 
 @RunWith(Parameterized.class)
-@PrepareForTest({ ProcessEngineUtil.class, ServiceLoader.class, Authentications.class })
-@PowerMockIgnore("javax.security.*")
 public class ContainerAuthenticationFilterTest {
 
   protected static final String SERVICE_PATH = "/camunda";
-
-  @Rule
-  public PowerMockRule rule = new PowerMockRule();
-
-  @Mock
-  private ServiceLoader<ProcessEngineProvider> serviceLoader;
 
   private Authentications authentications;
 
@@ -104,6 +86,9 @@ public class ContainerAuthenticationFilterTest {
   protected boolean authenticationExpected;
 
   protected ProcessEngine currentEngine;
+
+  private MockedStatic<Authentications> authenticationsMockedStatic;
+  private MockedStatic<ProcessEngineUtil> processEngineUtilMockedStatic;
 
   public ContainerAuthenticationFilterTest(String requestUrl, String engineName, boolean alreadyAuthenticated, boolean authenticationExpected) {
     this.requestUrl = requestUrl;
@@ -185,42 +170,34 @@ public class ContainerAuthenticationFilterTest {
 
     when(currentEngine.getAuthorizationService()).thenReturn(authorizationService);
     when(currentEngine.getIdentityService()).thenReturn(identityService);
+    processEngineUtilMockedStatic = mockStatic(ProcessEngineUtil.class);
+    processEngineUtilMockedStatic.when(() -> ProcessEngineUtil.lookupProcessEngine(any())).thenReturn(currentEngine);
 
     User mockedUser = mock(User.class);
     when(mockedUser.getId()).thenReturn(MockProvider.EXAMPLE_USER_ID);
 
     UserQuery mockUserQuery = mock(UserQuery.class);
     when(identityService.createUserQuery()).thenReturn(mockUserQuery);
-    when(mockUserQuery.userId(anyString())).thenReturn(mockUserQuery);
+    when(mockUserQuery.userId(any())).thenReturn(mockUserQuery);
     when(mockUserQuery.singleResult()).thenReturn(mockedUser);
 
     GroupQuery mockGroupQuery = mock(GroupQuery.class);
     when(identityService.createGroupQuery()).thenReturn(mockGroupQuery);
-    when(mockGroupQuery.groupMember(anyString())).thenReturn(mockGroupQuery);
+    when(mockGroupQuery.groupMember(any())).thenReturn(mockGroupQuery);
     when(mockGroupQuery.list()).thenReturn(new ArrayList<Group>());
 
     TenantQuery mockTenantQuery = mock(TenantQuery.class);
     when(identityService.createTenantQuery()).thenReturn(mockTenantQuery);
-    when(mockTenantQuery.userMember(anyString())).thenReturn(mockTenantQuery);
+    when(mockTenantQuery.userMember(any())).thenReturn(mockTenantQuery);
     when(mockTenantQuery.includingGroupsOfUser(anyBoolean())).thenReturn(mockTenantQuery);
     when(mockTenantQuery.list()).thenReturn(new ArrayList<Tenant>());
-
-    mockStatic(ServiceLoader.class);
-    when(ServiceLoader.load(ArgumentMatchers.eq(ProcessEngineProvider.class)))
-      .thenAnswer((Answer<ServiceLoader>) invocation -> serviceLoader);
-
-    when(serviceLoader.iterator())
-      .thenAnswer((Answer<Iterator<ProcessEngineProvider>>) invocation ->
-        Collections.singletonList(provider).iterator());
   }
 
   protected void setupAuthentications() {
     Authentications.clearCurrent();
-    mockStatic(Authentications.class);
+    authenticationsMockedStatic = mockStatic(Authentications.class);
     authentications = mock(Authentications.class);
-
-    when(Authentications.getFromSession(any(HttpSession.class)))
-      .thenAnswer((Answer<Authentications>) invocation -> authentications);
+    authenticationsMockedStatic.when(() -> Authentications.getFromSession(any())).thenReturn(authentications);
   }
 
   protected void setupFilter() throws ServletException {
@@ -237,6 +214,12 @@ public class ContainerAuthenticationFilterTest {
     request.setMethod("GET");
     FilterChain filterChain = new MockFilterChain();
     authenticationFilter.doFilter(request, response, filterChain);
+  }
+
+  @After
+  public void teardown() {
+    authenticationsMockedStatic.close();
+    processEngineUtilMockedStatic.close();
   }
 
   @Test
