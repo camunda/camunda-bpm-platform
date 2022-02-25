@@ -42,6 +42,27 @@
 
   </dependencies>
   <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.owasp</groupId>
+          <artifactId>dependency-check-maven</artifactId>
+          <!-- This is necessary when pom.xml and package-lock.json
+            are not co-located. We use this configuration via 
+            https://github.com/camunda/automation-platform-vulnerability-scan -->
+          <configuration>
+            <scanSet>
+              <fileSet>
+              <directory>ui</directory>
+                 <includes>
+                   <include>package-lock.json</include>
+                 </includes>
+              </fileSet>
+            </scanSet>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
     <plugins>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
