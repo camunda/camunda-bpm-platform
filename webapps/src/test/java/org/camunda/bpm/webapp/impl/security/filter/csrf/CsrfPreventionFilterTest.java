@@ -19,12 +19,9 @@ package org.camunda.bpm.webapp.impl.security.filter.csrf;
 import org.camunda.bpm.webapp.impl.security.filter.CsrfPreventionFilter;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.modules.junit4.rule.PowerMockRule;
 import org.springframework.mock.web.MockFilterChain;
 import org.springframework.mock.web.MockFilterConfig;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -44,20 +41,17 @@ import java.util.Collection;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.webapp.impl.security.filter.util.CsrfConstants.CSRF_PATH_FIELD_NAME;
 import static org.camunda.bpm.webapp.impl.security.filter.util.CookieConstants.SET_COOKIE_HEADER_NAME;
+
 /**
  * @author Nikola Koevski
  */
 @RunWith(Parameterized.class)
-@PowerMockIgnore("javax.security.*")
 public class CsrfPreventionFilterTest {
 
   protected static final String SERVICE_PATH = "/camunda";
   protected static final String CSRF_COOKIE_NAME = "XSRF-TOKEN";
   protected static final String CSRF_HEADER_NAME = "X-XSRF-TOKEN";
   protected static final String CSRF_HEADER_REQUIRED = "Required";
-
-  @Rule
-  public PowerMockRule rule = new PowerMockRule();
 
   protected Filter csrfPreventionFilter;
 
