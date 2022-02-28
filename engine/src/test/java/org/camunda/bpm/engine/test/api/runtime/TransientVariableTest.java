@@ -658,6 +658,29 @@ public class TransientVariableTest {
 
     assertThat(numHistoricVariables).isEqualTo(0);
   }
+  
+  @Test
+  public void shouldAcceptNonserializableTransientValue() {
+    // given
+    BpmnModelInstance model = Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .serviceTask().camundaClass(SetNonserializableTransientVariableDelegate.class)
+        .endEvent()
+        .done();
+    
+    testRule.deploy(model);
+    
+    // when
+    runtimeService.startProcessInstanceByKey("process");
+    
+    // then
+    long numHistoricVariables =
+        engineRule.getHistoryService()
+          .createHistoricVariableInstanceQuery()
+          .count();
+
+    assertThat(numHistoricVariables).isEqualTo(0);
+  }
 
   public static class ReadTypedTransientVariableDelegate implements JavaDelegate {
 
@@ -677,6 +700,13 @@ public class TransientVariableTest {
     @Override
     public void execute(DelegateExecution execution) throws Exception {
       execution.setVariable(VARIABLE_NAME, Variables.integerValue(1, true));
+    }
+  }
+
+  public static class SetNonserializableTransientVariableDelegate implements JavaDelegate {
+    @Override
+    public void execute(DelegateExecution execution) throws Exception {
+      execution.setVariable(VARIABLE_NAME, Variables.objectValue(new Object()).setTransient(true).create());
     }
   }
 

@@ -118,25 +118,27 @@ public class TypedValueField implements DbEntityLifecycleAware, CommandContextLi
   }
 
   public TypedValue setValue(TypedValue value) {
-    // determine serializer to use
-    serializer = getSerializers().findSerializerForValue(value,
-        Context.getProcessEngineConfiguration().getFallbackSerializerFactory());
-    serializerName = serializer.getName();
-
-    if(value instanceof UntypedValueImpl) {
-      // type has been detected
-      value = serializer.convertToTypedValue((UntypedValueImpl) value);
+    if (!value.isTransient()) {
+      // determine serializer to use
+      serializer = getSerializers().findSerializerForValue(value,
+          Context.getProcessEngineConfiguration().getFallbackSerializerFactory());
+      serializerName = serializer.getName();
+  
+      if(value instanceof UntypedValueImpl) {
+        // type has been detected
+        value = serializer.convertToTypedValue((UntypedValueImpl) value);
+      }
+  
+      // set new value
+      writeValue(value, valueFields);
     }
-
-    // set new value
-    writeValue(value, valueFields);
 
     // cache the value
     cachedValue = value;
 
     // ensure that we serialize the object on command context flush
     // if it can be implicitly changed
-    if (notifyOnImplicitUpdates && isMutableValue(cachedValue)) {
+    if (!value.isTransient() && notifyOnImplicitUpdates && isMutableValue(cachedValue)) {
       Context.getCommandContext().registerCommandContextListener(this);
     }
 
