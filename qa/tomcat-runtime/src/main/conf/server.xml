@@ -64,7 +64,7 @@
               username="${database.username}"
               password="${database.password}"
               defaultTransactionIsolation="READ_COMMITTED"
-              maxTotal="20"
+              maxActive="20"
               minIdle="5"
               maxIdle="20" />
               
