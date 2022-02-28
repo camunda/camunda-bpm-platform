@@ -18,7 +18,7 @@ GOTO setArgs
 call "%EXECUTABLE%" start --detached
 REM open a browser
 timeout /t 10 /nobreak > NUL
-start http://localhost:8080/
+start http://localhost:8080/camunda-welcome/index.html
 GOTO Done
 
 :StartWithArguments

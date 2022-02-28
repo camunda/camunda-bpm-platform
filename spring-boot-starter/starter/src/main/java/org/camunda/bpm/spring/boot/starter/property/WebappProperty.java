@@ -26,11 +26,11 @@ public class WebappProperty {
 
   public static final String PREFIX = CamundaBpmProperties.PREFIX + ".webapp";
 
-  private boolean indexRedirectEnabled = true;
+  protected boolean indexRedirectEnabled = true;
 
-  private String webjarClasspath = "/META-INF/resources/webjars/camunda";
+  protected String webjarClasspath = "/META-INF/resources/webjars/camunda";
 
-  private String securityConfigFile = "/securityFilterRules.json";
+  protected String securityConfigFile = "/securityFilterRules.json";
 
   protected String applicationPath = DEFAULT_APP_PATH;
 

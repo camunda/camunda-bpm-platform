@@ -26,7 +26,7 @@ if [ $# -eq 0 ]; then
   if [ -z "$BROWSER" ]; then
     (sleep 5; echo -e "We are sorry... We tried all we could do but we couldn't locate your default browser... \nIf you want to see our default website please open your browser and insert this URL:\nhttp://localhost:8080/camunda-welcome/index.html";) &
   else
-    (sleep 10; $BROWSER "http://localhost:8080/";) &
+    (sleep 10; $BROWSER "http://localhost:8080/camunda-welcome/index.html";) &
   fi
 
   # start Camunda Run in the background
