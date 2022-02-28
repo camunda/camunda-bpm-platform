@@ -15,7 +15,6 @@
 
   <properties>
     <version.httpclient>4.5.9</version.httpclient>
-    <version.jackson>2.12.1</version.jackson>
 
     <engine.runtime>${project.build.directory}/camunda-tomcat</engine.runtime>
     <tomcat.runtime>${engine.runtime}/server/apache-tomcat-${version.tomcat}</tomcat.runtime>

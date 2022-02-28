@@ -15,11 +15,7 @@
     <!-- pin tomcat version for engine-rest -->
     <version.tomcat>7.0.50</version.tomcat>
     <rest.http.port>38080</rest.http.port>
-    <!-- use inherited version as default -->
-    <resteasy.version>${version.resteasy}</resteasy.version>
-    <resteasy.netty.version>2.3.6.Final</resteasy.netty.version>
     <!-- other JAX-RS implementations -->
-    <wink.version>1.1.1-incubating</wink.version>
     <jersey.version>1.17.1</jersey.version>
     <javax.activation.version>1.1.1</javax.activation.version>
   </properties>
@@ -39,7 +35,7 @@
     <dependency>
       <groupId>com.fasterxml.jackson.jaxrs</groupId>
       <artifactId>jackson-jaxrs-json-provider</artifactId>
-      <version>${jackson.version}</version>
+      <version>${version.jackson}</version>
       <!--
       * Since version 2.10.0 this dependency comes with transitive Jakarta dependencies
       * These trans-deps are directly included in JDKs <= Java 8 * For Java >= 9 compatible containers, we make sure to include these dependencies
@@ -59,13 +55,13 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>${jackson.databind.version}</version>
+      <version>${version.jackson}</version>
     </dependency>
 
     <dependency>
       <groupId>com.fasterxml.jackson.datatype</groupId>
       <artifactId>jackson-datatype-jsr310</artifactId>
-      <version>${jackson.version}</version>
+      <version>${version.jackson}</version>
     </dependency>
 
     <!-- provided deps -->
@@ -309,7 +305,7 @@
             <classpathDependencyExclude>org.jboss.spec.javax.ws.rs:jboss-jaxrs-api_1.1_spec</classpathDependencyExclude>
           </classpathDependencyExcludes>
           <systemPropertyVariables>
-            <restEasyVersion>${resteasy.version}</restEasyVersion>
+            <restEasyVersion>${version.resteasy}</restEasyVersion>
           </systemPropertyVariables>
         </configuration>
       </plugin>
@@ -449,106 +445,6 @@
       <dependencies>
         <dependency>
           <groupId>org.jboss.spec.javax.ws.rs</groupId>
-          <artifactId>jboss-jaxrs-api_1.1_spec</artifactId>
-          <scope>provided</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.jboss.resteasy</groupId>
-          <artifactId>resteasy-jaxrs</artifactId>
-          <version>${resteasy.version}</version>
-          <scope>test</scope>
-          <exclusions>
-            <exclusion>
-              <artifactId>httpclient</artifactId>
-              <groupId>org.apache.httpcomponents</groupId>
-            </exclusion>
-          </exclusions>
-        </dependency>
-
-        <dependency>
-          <groupId>org.jboss.resteasy</groupId>
-          <artifactId>resteasy-netty</artifactId>
-          <version>${resteasy.netty.version}</version>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <excludes>
-                <exclude>**/TaskRestServiceInteractionTest.java</exclude>
-                <exclude>**/NoServletEmptyBodyFilterTest.java</exclude>
-                <exclude>**/ServletEmptyBodyFilterTest.java</exclude>
-              </excludes>
-              <redirectTestOutputToFile>true</redirectTestOutputToFile>
-            </configuration>
-            <executions>
-              <execution>
-                <id>encoding-test</id>
-                <phase>test</phase>
-                <goals>
-                  <goal>test</goal>
-                </goals>
-                <configuration>
-                  <argLine>-Dfile.encoding=ISO-8859-1</argLine>
-                  <includes>
-                    <include>**/ProcessDefinitionRestServiceInteractionTest.java</include>
-                    <include>**/ResteasyTaskRestServiceInteractionTest.java</include>
-                  </includes>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>build-helper-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>add-test-source</id>
-                <phase>generate-test-sources</phase>
-                <goals>
-                  <goal>add-test-source</goal>
-                </goals>
-                <configuration>
-                  <sources>
-                    <source>src/test/java-resteasy</source>
-                  </sources>
-                </configuration>
-              </execution>
-              <execution>
-                <id>add-test-resource</id>
-                <phase>generate-test-resources</phase>
-                <goals>
-                  <goal>add-test-resource</goal>
-                </goals>
-                <configuration>
-                  <resources>
-                    <resource>
-                      <directory>
-                        src/test/resources-resteasy
-                      </directory>
-                    </resource>
-                  </resources>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    
-    
-    <profile>
-      <id>resteasy3</id>
-      <properties>
-        <version.resteasy>${version.resteasy3}</version.resteasy>
-      </properties>
-      <dependencies>
-        <dependency>
-          <groupId>org.jboss.spec.javax.ws.rs</groupId>
           <artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
           <version>2.0.1.Final</version>
           <scope>provided</scope>
@@ -556,7 +452,7 @@
         <dependency>
           <groupId>org.jboss.resteasy</groupId>
           <artifactId>resteasy-jaxrs</artifactId>
-          <version>${version.resteasy3}</version>
+          <version>${version.resteasy}</version>
           <scope>test</scope>
           <exclusions>
             <exclusion>
@@ -576,7 +472,7 @@
         <dependency>
           <groupId>org.jboss.resteasy</groupId>
           <artifactId>resteasy-netty4</artifactId>
-          <version>${version.resteasy3}</version>
+          <version>${version.resteasy}</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
@@ -637,109 +533,6 @@
                     <resource>
                       <directory>
                         src/test/resources-resteasy
-                      </directory>
-                    </resource>
-                  </resources>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>wink</id>
-      <properties>
-        <version.slf4j>1.5.11</version.slf4j>
-        <version.logback>0.9.20</version.logback>
-      </properties>
-      <dependencies>
-        <dependency>
-          <groupId>org.jboss.spec.javax.ws.rs</groupId>
-          <artifactId>jboss-jaxrs-api_1.1_spec</artifactId>
-          <scope>provided</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.apache.wink</groupId>
-          <artifactId>wink-server</artifactId>
-          <version>${wink.version}</version>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-api</artifactId>
-          <version>${version.slf4j}</version>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.slf4j</groupId>
-          <artifactId>jcl-over-slf4j</artifactId>
-          <version>${version.slf4j}</version>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>ch.qos.logback</groupId>
-          <artifactId>logback-classic</artifactId>
-          <version>${version.logback}</version>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <excludes>
-                <exclude>**/rest/standalone/**</exclude>
-              </excludes>
-              <redirectTestOutputToFile>true</redirectTestOutputToFile>
-            </configuration>
-            <executions>
-              <execution>
-                <id>encoding-test</id>
-                <phase>test</phase>
-                <goals>
-                  <goal>test</goal>
-                </goals>
-                <configuration>
-                  <argLine>-Dfile.encoding=ISO-8859-1</argLine>
-                  <includes>
-                    <include>**/ProcessDefinitionRestServiceInteractionTest.java</include>
-                    <include>**/TaskRestServiceInteractionTest.java</include>
-                  </includes>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>build-helper-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>add-test-source</id>
-                <phase>generate-test-sources</phase>
-                <goals>
-                  <goal>add-test-source</goal>
-                </goals>
-                <configuration>
-                  <sources>
-                    <source>src/test/java-wink</source>
-                  </sources>
-                </configuration>
-              </execution>
-              <execution>
-                <id>add-test-resource</id>
-                <phase>generate-test-resources</phase>
-                <goals>
-                  <goal>add-test-resource</goal>
-                </goals>
-                <configuration>
-                  <resources>
-                    <resource>
-                      <directory>
-                        src/test/resources-wink
                       </directory>
                     </resource>
                   </resources>
@@ -957,8 +750,9 @@
     <profile>
       <id>wildfly-compatibility</id>
       <properties>
-        <resteasy.version>3.0.14.Final</resteasy.version>
-        <resteasy.netty.version>${resteasy.version}</resteasy.netty.version>
+        <!-- Test with Resteasy version used by the oldest
+             Camunda-supported Wildfly/JBoss EAP version -->
+        <version.resteasy>3.0.16.Final</version.resteasy>
       </properties>
     </profile>
 

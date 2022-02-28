@@ -13,11 +13,6 @@
   <packaging>pom</packaging>
   <name>Camunda Platform - engine - REST - Root</name>
 
-  <properties>
-    <jackson.version>2.12.1</jackson.version>
-    <jackson.databind.version>${jackson.version}</jackson.databind.version>
-  </properties>
-
   <dependencyManagement>
     <dependencies>
       <dependency>

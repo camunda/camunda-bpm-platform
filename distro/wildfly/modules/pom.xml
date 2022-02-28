@@ -13,9 +13,6 @@
 
   <properties>
     <org.jboss.shrinkwrap.resolver.version>1.0.0-beta-5</org.jboss.shrinkwrap.resolver.version>
-    <version.jackson>2.12.1</version.jackson>
-    <version.jackson.databind>${version.jackson}</version.jackson.databind>
-    <version.jackson.annotations>${version.jackson}</version.jackson.annotations>
     <version.json-path>2.6.0</version.json-path>
     <version.json-smart>2.4.7</version.json-smart>
     <!-- generate a bom of compile time dependencies for the license book.
@@ -221,28 +218,6 @@
                   </mapper>
                 </copy>
 
-                <delete dir="target/modules/com/fasterxml/jackson/core/jackson-databind" />
-                <copy todir="target/modules" flatten="false">
-                  <fileset refid="maven.project.dependencies" />
-                  <mapper>
-                    <chainedmapper>
-                      <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/${version.jackson.databind}/\3" handledirsep="yes" />
-                      <regexpmapper from="^(com.fasterxml.jackson.core.jackson-databind/.*.jar)$$" to="\1" handledirsep="yes" />
-                    </chainedmapper>
-                  </mapper>
-                </copy>
-
-                <delete dir="target/modules/com/fasterxml/jackson/core/jackson-annotations" />
-                <copy todir="target/modules" flatten="false">
-                  <fileset refid="maven.project.dependencies" />
-                  <mapper>
-                    <chainedmapper>
-                      <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/${version.jackson.annotations}/\3" handledirsep="yes" />
-                      <regexpmapper from="^(com.fasterxml.jackson.core.jackson-annotations/.*.jar)$$" to="\1" handledirsep="yes" />
-                    </chainedmapper>
-                  </mapper>
-                </copy>
-
                 <copy todir="target/modules" flatten="false">
                   <fileset dir="src/main/modules" />
                 </copy>
@@ -272,14 +247,6 @@
                 </replace>
 
                 <replace dir="target/modules" token="@version.jackson@" value="${version.jackson}">
-                  <include name="**/module.xml" />
-                </replace>
-
-                <replace dir="target/modules" token="@version.jackson.databind@" value="${version.jackson.databind}">
-                  <include name="**/module.xml" />
-                </replace>
-
-                <replace dir="target/modules" token="@version.jackson.annotations@" value="${version.jackson.annotations}">
                   <include name="**/module.xml" />
                 </replace>
 
