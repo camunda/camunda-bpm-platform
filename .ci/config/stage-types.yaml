@@ -145,7 +145,7 @@ engine-rest-unit-jaxrs2-resteasy:
   nodeLabel: 'h2'
 engine-rest-unit-compatibility-wildfly:
   directory: 'engine-rest/engine-rest'
-  command: 'clean install -Pwildfly-compatibility,resteasy'
+  command: 'clean install -Pwildfly-compatibility'
   stash:
     runtimeStash: true
   labels:

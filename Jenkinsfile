@@ -486,7 +486,7 @@ pipeline {
           when {
             allOf {
               expression {
-                cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit')
+                cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit', 'rest-api')
               }
               branch cambpmDefaultBranch();
             }
@@ -495,7 +495,7 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel: 'h2',
               runSteps: {
-                cambpmRunMaven('.', 'clean verify -Pcheck-engine,wls-compatibility,jersey', runtimeStash: true)
+                cambpmRunMaven('.', 'clean verify -Pcheck-engine,wls-compatibility,jersey2', runtimeStash: true)
               },
               postFailure: {
                 cambpmPublishTestResult()
