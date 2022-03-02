@@ -88,7 +88,7 @@ module.exports = function(pluginDependencies) {
       $qProvider,
       $compileProvider
     ) {
-      $compileProvider.aHrefSanitizationWhitelist(
+      $compileProvider.aHrefSanitizationTrustedUrlList(
         /^\s*(https?|s?ftp|mailto|tel|file|blob):/
       );
       $routeProvider.otherwise({redirectTo: '/dashboard'});
