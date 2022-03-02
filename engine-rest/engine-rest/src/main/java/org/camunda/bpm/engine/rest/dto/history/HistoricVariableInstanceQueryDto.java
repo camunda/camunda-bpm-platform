@@ -69,6 +69,7 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
   protected List<String> tenantIds;
   protected Boolean withoutTenantId;
   protected boolean includeDeleted;
+  protected String[] variableNameIn;
 
   public HistoricVariableInstanceQueryDto() {
   }
@@ -176,6 +177,11 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
     this.includeDeleted = includeDeleted;
   }
 
+  @CamundaQueryParam(value = "variableNameIn", converter = StringArrayConverter.class)
+  public void setVariableNameIn(String[] variableNameIn) {
+    this.variableNameIn = variableNameIn;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -249,6 +255,9 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
     }
     if (includeDeleted) {
       query.includeDeleted();
+    }
+    if (variableNameIn != null && variableNameIn.length > 0) {
+      query.variableNameIn(variableNameIn);
     }
   }
 

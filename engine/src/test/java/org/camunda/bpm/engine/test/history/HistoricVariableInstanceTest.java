@@ -17,6 +17,8 @@
 package org.camunda.bpm.engine.test.history;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -34,6 +36,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
@@ -2555,4 +2558,79 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTest {
     assertThat(instanceIgnoreCase).isNull();
     assertThat(instanceIgnoreCaseMatchNameIgnoreCase).isNotNull();
   }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  @Test
+  public void shouldQueryByVariableNamesWithOneVariableName() {
+    // given
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("my-variable-name-one", "my-variable-value-one");
+    variables.put("my-variable-name-two", "my-variable-value-two");
+    variables.put("my-variable-name-three", "my-variable-value-three");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
+
+    // when
+    List<HistoricVariableInstance> instances = historyService.createHistoricVariableInstanceQuery()
+        .variableNameIn("my-variable-name-one")
+        .list();
+
+    // then
+    assertThat(instances).extracting("name", "value")
+        .containsExactly(tuple("my-variable-name-one", "my-variable-value-one"));
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  @Test
+  public void shouldQueryByVariableNamesWithTwoVariableNames() {
+    // given
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("my-variable-name-one", "my-variable-value-one");
+    variables.put("my-variable-name-two", "my-variable-value-two");
+    variables.put("my-variable-name-three", "my-variable-value-three");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
+
+    // when
+    List<HistoricVariableInstance> instances = historyService.createHistoricVariableInstanceQuery()
+        .variableNameIn("my-variable-name-one", "my-variable-name-two")
+        .list();
+
+    // then
+    assertThat(instances).extracting("name", "value")
+        .containsExactlyInAnyOrder(
+            tuple("my-variable-name-one", "my-variable-value-one"),
+            tuple("my-variable-name-two", "my-variable-value-two"));
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  @Test
+  public void shouldThrowExceptionWhenQueryByVariableNamesWithNullString() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // when
+    ThrowingCallable throwingCallable =
+        () -> historyService.createHistoricVariableInstanceQuery().variableNameIn((String) null);
+
+    // then
+    assertThatThrownBy(throwingCallable)
+        .isInstanceOf(NullValueException.class)
+        .hasMessage("Variable names contains null value");
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  @Test
+  public void shouldThrowExceptionWhenQueryByVariableNamesWithNullArrayString() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // when
+    ThrowingCallable throwingCallable =
+        () -> historyService.createHistoricVariableInstanceQuery().variableNameIn((String[]) null);
+
+    // then
+    assertThatThrownBy(throwingCallable)
+        .isInstanceOf(NullValueException.class)
+        .hasMessage("Variable names is null");
+  }
+
 }

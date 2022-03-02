@@ -26,7 +26,7 @@ import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
  */
 public interface QueryService {
 
-  public <T> List<T> executeQuery(final String statement, final QueryParameters<T> parameter);
+  public <T> List<T> executeQuery(final String statement, final QueryParameters parameter);
 
   @Deprecated
   public <T> T executeQuery(final String statement, final Object parameter, final Class<T> clazz);

@@ -1023,4 +1023,37 @@ public class HistoricVariableInstanceRestServiceQueryTest extends AbstractRestSe
     verify(mockedQuery).matchVariableNamesIgnoreCase();
     verify(mockedQuery).variableNameLike("aVariableName");
   }
+
+  @Test
+  public void shouldQueryByVariableNameInAsGet() {
+      String aVariableName = "aVariableName";
+      String anotherVariableName = "anotherVariableName";
+
+      given()
+        .queryParam("variableNameIn", aVariableName + "," + anotherVariableName)
+        .then().expect().statusCode(Status.OK.getStatusCode())
+        .when().get(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
+
+      verify(mockedQuery).variableNameIn(aVariableName, anotherVariableName);
+  }
+
+  @Test
+  public void shouldQueryByVariableNameInAsPost() {
+    String aVariableName = "aVariableName";
+    String anotherVariableName = "anotherVariableName";
+
+    List<String> variableNameIn = new ArrayList<>();
+    variableNameIn.add(aVariableName);
+    variableNameIn.add(anotherVariableName);
+
+    Map<String, Object> json = new HashMap<>();
+    json.put("variableNameIn", variableNameIn);
+
+    given().contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().post(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
+
+    verify(mockedQuery).variableNameIn(aVariableName, anotherVariableName);
+  }
+
 }

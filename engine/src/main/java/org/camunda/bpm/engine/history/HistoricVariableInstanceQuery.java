@@ -117,4 +117,7 @@ public interface HistoricVariableInstanceQuery extends Query<HistoricVariableIns
    */
   HistoricVariableInstanceQuery includeDeleted();
 
+  /** Only select historic process variables with the given variable names. */
+  HistoricVariableInstanceQuery variableNameIn(String... names);
+
 }

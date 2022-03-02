@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.impl;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
@@ -41,6 +42,7 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
 
   private static final long serialVersionUID = 1L;
 
+  protected List<String> variableNameIn;
   protected String variableId;
   protected String processInstanceId;
   protected String processDefinitionId;
@@ -72,6 +74,12 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
 
   public HistoricVariableInstanceQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
+  }
+
+  public HistoricVariableInstanceQuery variableNameIn(String... names) {
+    ensureNotNull("Variable names", (Object[]) names);
+    variableNameIn = Arrays.asList(names);
+    return this;
   }
 
   public HistoricVariableInstanceQuery variableId(String id) {
@@ -351,4 +359,9 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
   public String getProcessDefinitionKey() {
     return processDefinitionKey;
   }
+
+  public List<String> getVariableNameIn() {
+    return variableNameIn;
+  }
+
 }
