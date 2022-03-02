@@ -155,10 +155,10 @@ public class TestServlet extends HttpServlet {
 
     try {
       new SetupResource().createInitialUser(processEngine.getName(), user);
-    } catch (IOException e) {
-      e.printStackTrace();
-    } catch (ServletException e) {
-      e.printStackTrace();
+
+    } catch (IOException | ServletException e) {
+     throw new RuntimeException(e);
+
     }
   }
 
