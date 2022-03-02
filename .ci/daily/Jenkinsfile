@@ -240,7 +240,7 @@ pipeline {
           // see the .ci/config/matrices.yaml for the stage generation values
           // see .ci/config/stage-types.yaml for the stage configurations
           parallel(cambpmGetMatrixStages('jdk-ce-stages', failedStageTypes, { stageInfo ->
-            return cambpmWithLabels('default-build')
+            return cambpmWithLabels('default-build', 'jdk')
           }))
         }
       }
