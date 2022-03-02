@@ -484,11 +484,8 @@ pipeline {
         }
         stage('engine-UNIT-wls-compatibility') {
           when {
-            allOf {
-              expression {
-                cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit', 'rest-api')
-              }
-              branch cambpmDefaultBranch();
+            expression {
+              cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit') && cambpmWithLabels('rest-api')
             }
           }
           steps {
