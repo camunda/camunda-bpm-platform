@@ -34,6 +34,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
 /**
@@ -43,6 +44,7 @@ import org.springframework.test.context.ActiveProfiles;
  * 
  * @see https://jira.camunda.com/browse/CAM-11290
  */
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @ActiveProfiles(profiles = { "test-cors-enabled", "test-auth-enabled", "test-demo-user" }, inheritProfiles = false)
 public class CorsAuthenticationTest extends AbstractRestTest {
 

@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.run.test.config.identity;
 
-import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.camunda.bpm.engine.impl.plugin.AdministratorAuthorizationPlugin;
@@ -27,9 +26,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { CamundaBpmRun.class })
 @ActiveProfiles(profiles = { "test-auth-enabled" , "test-admin-auth-enabled" })
