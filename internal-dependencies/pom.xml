@@ -309,12 +309,6 @@
       </dependency>
 
       <dependency>
-        <groupId>org.jboss.resteasy</groupId>
-        <artifactId>resteasy-netty</artifactId>
-        <version>2.3.6.Final</version>
-      </dependency>
-
-      <dependency>
         <groupId>org.apache.directory.server</groupId>
         <artifactId>apacheds-all</artifactId>
         <version>2.0.0-M23</version>

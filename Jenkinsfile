@@ -484,18 +484,15 @@ pipeline {
         }
         stage('engine-UNIT-wls-compatibility') {
           when {
-            allOf {
-              expression {
-                cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit')
-              }
-              branch cambpmDefaultBranch();
+            expression {
+              cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit') && cambpmWithLabels('rest-api')
             }
           }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'h2',
               runSteps: {
-                cambpmRunMaven('.', 'clean verify -Pcheck-engine,wls-compatibility,jersey', runtimeStash: true)
+                cambpmRunMaven('.', 'clean verify -Pcheck-engine,wls-compatibility,jersey2', runtimeStash: true)
               },
               postFailure: {
                 cambpmPublishTestResult()

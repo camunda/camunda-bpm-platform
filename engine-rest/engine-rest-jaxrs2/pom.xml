@@ -115,7 +115,7 @@
     </profile>
 
     <profile>
-      <id>resteasy3</id>
+      <id>resteasy</id>
       
 		  <properties>
 		    <version.jaxrs>2.1</version.jaxrs>
