@@ -10,7 +10,7 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-database-settings</artifactId>
     <relativePath>../../database</relativePath>
-    <version>7.17.0-SNAPSHOT</version>
+    <version>7.17.0-alpha5</version>
   </parent>
 
   <dependencyManagement>
@@ -215,7 +215,7 @@
         <artifactId>maven-jar-plugin</artifactId>
         <version>3.2.2</version>
         <configuration>
-          <useDefaultManifestFile combine.self="override"/>
+          <useDefaultManifestFile combine.self="override" />
         </configuration>
         <executions>
           <!-- create test jar that is consumed by the quarkus qa -->
