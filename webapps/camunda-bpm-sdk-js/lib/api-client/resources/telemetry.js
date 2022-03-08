@@ -62,4 +62,17 @@ Telemetry.configure = function(payload, done) {
   });
 };
 
+/**
+ * Fetches telemetry data for diagnostics.
+ *
+ * @param  {Object}   payload
+ * @param  {Function} done
+ */
+ Telemetry.fetchData = function(payload, done) {
+  return this.http.get(this.path + '/data', {
+    data: payload,
+    done: done
+  });
+};
+
 module.exports = Telemetry;
