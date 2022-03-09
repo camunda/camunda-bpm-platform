@@ -2,6 +2,8 @@
 <jboss-deployment-structure>
   <deployment>
     <exclusions>
+      <module name="com.fasterxml.jackson.datatype.jackson-datatype-jsr310" />
+      <module name="org.jboss.resteasy.resteasy-jackson2-provider" />
       <module name="org.jboss.resteasy.resteasy-jackson-provider" />
       <module name="org.jboss.resteasy.resteasy-jettison-provider" />
     </exclusions>
