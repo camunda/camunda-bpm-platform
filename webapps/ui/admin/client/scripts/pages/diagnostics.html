@@ -1,14 +1,18 @@
 <!-- # CE - camunda-bpm-webapp/ui/admin/client/scripts/pages/diagnostics.html -->
 <form class="statisticsTab">
-    <h3>{{ 'DIAGNOSTICS' | translate }}</h3>
-  
-    <div uib-alert class="alert alert-info">
-      {{ 'DIAGNOSTICS_INTRODUCTION' | translate}}
-    </div>
+  <h3>{{ 'DIAGNOSTICS' | translate }}</h3>
 
-    <div cam-widget-debug
-         display-name="{{ 'PLGN_MOD_REQUEST_PAYLOAD' | translate }}"
-         debugged="data"
-         cam-widget-debug-tooltip="{{ 'PLGN_MOD_SHOW_REQUEST_PAYLOAD' | translate }}"></div>
-  </form>
-  <!-- / CE - camunda-bpm-webapp/ui/admin/client/scripts/pages/diagnostics.html -->
+  <div uib-alert class="alert alert-info">
+    {{ 'DIAGNOSTICS_INTRODUCTION' | translate}}
+  </div>
+
+  <div notifications-panel></div>
+  
+  <div cam-widget-debug
+       display-name="{{ 'PLGN_MOD_REQUEST_PAYLOAD' | translate }}"
+       debugged="data"
+       show-button
+       ng-if="data"
+       cam-widget-debug-tooltip="{{ 'PLGN_MOD_SHOW_REQUEST_PAYLOAD' | translate }}"></div>
+</form>
+<!-- / CE - camunda-bpm-webapp/ui/admin/client/scripts/pages/diagnostics.html -->

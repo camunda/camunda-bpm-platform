@@ -69,6 +69,14 @@ Telemetry.configure = function(payload, done) {
  * @param  {Function} done
  */
  Telemetry.fetchData = function(payload, done) {
+  if (typeof payload === 'function') {
+    done = payload;
+    payload = {};
+  }
+  
+  payload = payload || {};
+  done = done || noop;
+
   return this.http.get(this.path + '/data', {
     data: payload,
     done: done

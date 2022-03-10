@@ -23,14 +23,18 @@ var template = fs.readFileSync(__dirname + '/diagnostics.html', 'utf8');
 
 var Controller = [
   '$scope',
-  '$translate',
   'camAPI',
   'Notifications',
-  function($scope, camAPI) {
+  '$translate',
+  function($scope, camAPI, Notifications, $translate) {
     var telemetryResource = camAPI.resource('telemetry');
 
-    telemetryResource.fetchData({}, function(err, res) {
-      $scope.data = res;
+    telemetryResource.fetchData(function(err, res) {
+      if (err) {
+        Notifications.addError({ status: $translate.instant('ERROR'), message: `Telemetry data fetching failed: ${err.message}` });
+      } else {
+        $scope.data = res;
+      }
     });
   }
 ];
@@ -44,22 +48,6 @@ module.exports = [
       template: template,
       controller: Controller,
       priority: 950,
-      access: [
-        'AuthorizationResource',
-        function(AuthorizationResource) {
-          return function(cb) {
-            AuthorizationResource.check({
-              permissionName: 'ALL',
-              resourceName: 'authorization',
-              resourceType: 4
-            })
-              .$promise.then(function(response) {
-                cb(null, response.authorized);
-              })
-              .catch(cb);
-          };
-        }
-      ]
     });
   }
 ];
