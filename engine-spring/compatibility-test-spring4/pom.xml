@@ -151,8 +151,8 @@
       <dependencies>
         <!-- Hibernate requires JAXB which is not present in Java 11+ -->
         <dependency>
-          <groupId>javax.xml.bind</groupId>
-          <artifactId>jaxb-api</artifactId>
+          <groupId>jakarta.xml.bind</groupId>
+          <artifactId>jakarta.xml.bind-api</artifactId>
           <scope>test</scope>
         </dependency>
       </dependencies>
@@ -173,6 +173,24 @@
                 <excludes>
                   <exclude>**/*NashornTest.java</exclude>
                 </excludes>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <profile>
+      <id>java16</id>
+      <activation>
+        <jdk>[16,)</jdk>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <artifactId>maven-surefire-plugin</artifactId>
+              <configuration>
+                <skipTests>true</skipTests>
               </configuration>
             </plugin>
           </plugins>
