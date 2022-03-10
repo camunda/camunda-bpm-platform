@@ -260,6 +260,12 @@
         <version>1.0.1.Final</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.jboss.spec.javax.ws.rs</groupId>
+        <artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
+        <version>${version.jaxrs.api}</version>
+      </dependency>
+
       <!-- licensing dependencies -->
       <dependency>
         <groupId>org.bouncycastle</groupId>
