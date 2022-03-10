@@ -16,11 +16,11 @@
  */
 package org.camunda.bpm;
 
+import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.client.apache4.ApacheHttpClient4;
 import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
-import org.apache.commons.io.IOUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
@@ -30,7 +30,6 @@ import org.junit.Before;
 import org.openqa.selenium.chrome.ChromeDriverService;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
@@ -38,6 +37,8 @@ import java.net.URLConnection;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import javax.ws.rs.core.MediaType;
 
 /**
  *
@@ -48,8 +49,15 @@ import java.util.logging.Logger;
 public abstract class AbstractWebIntegrationTest {
 
   private final static Logger LOGGER = Logger.getLogger(AbstractWebIntegrationTest.class.getName());
+  
+  protected static final String COOKIE_HEADER = "Cookie";
+  protected static final String X_XSRF_TOKEN_HEADER = "X-XSRF-TOKEN";
+  
+  protected static final String TASKLIST_PATH = "app/tasklist/default/";
 
-  protected String TASKLIST_PATH = "app/tasklist/default/";
+  private static final String JSESSIONID_IDENTIFIER = "JSESSIONID=";
+  private static final String XSRF_TOKEN_IDENTIFIER = "XSRF-TOKEN=";
+  
   public static final String HOST_NAME = "localhost";
   public String APP_BASE_PATH;
 
@@ -63,6 +71,9 @@ public abstract class AbstractWebIntegrationTest {
   public DefaultHttpClient defaultHttpClient;
   public String httpPort;
   protected HttpURLConnection connection;
+  
+  protected String csrfToken;
+  protected String sessionId;
 
   @Before
   public void before() throws Exception {
@@ -120,6 +131,63 @@ public abstract class AbstractWebIntegrationTest {
     }
 
     return connection;
+  }
+  
+  protected void getTokens() {
+    // first request, first set of cookies
+    ClientResponse clientResponse = client.resource(APP_BASE_PATH + TASKLIST_PATH).get(ClientResponse.class);
+    List<String> cookieValues = clientResponse.getHeaders().get("Set-Cookie");
+    clientResponse.close();
+
+    String startCsrfCookie = getCookie(cookieValues, XSRF_TOKEN_IDENTIFIER);
+    String startSessionCookie = getCookie(cookieValues, JSESSIONID_IDENTIFIER);
+    
+    // login with user, update session cookie
+    clientResponse = client.resource(APP_BASE_PATH + "api/admin/auth/user/default/login/cockpit")
+        .entity("username=demo&password=demo", MediaType.APPLICATION_FORM_URLENCODED_TYPE)
+        .header(COOKIE_HEADER, createCookieHeader(startCsrfCookie, startSessionCookie))
+        .header(X_XSRF_TOKEN_HEADER, startCsrfCookie)
+        .accept(MediaType.APPLICATION_JSON)
+        .post(ClientResponse.class);
+    cookieValues = clientResponse.getHeaders().get("Set-Cookie");
+    clientResponse.close();
+    
+    sessionId = getCookie(cookieValues, JSESSIONID_IDENTIFIER);
+    
+    // update CSRF cookie
+    clientResponse = client.resource(APP_BASE_PATH + "api/engine/engine")
+        .header(COOKIE_HEADER, createCookieHeader(startCsrfCookie, sessionId))
+        .header(X_XSRF_TOKEN_HEADER, startCsrfCookie)
+        .get(ClientResponse.class);
+    
+    cookieValues = clientResponse.getHeaders().get("Set-Cookie");
+    clientResponse.close();
+    
+    csrfToken = getCookie(cookieValues, XSRF_TOKEN_IDENTIFIER);
+  }
+
+  protected String getCookie(List<String> cookieValues, String cookieName) {
+    String cookieValue = null;
+    for (String cookie : cookieValues) {
+      if (cookie.startsWith(cookieName)) {
+        cookieValue = cookie;
+        break;
+      }
+    }
+
+    if (cookieValue == null) {
+      throw new RuntimeException("Cookie \"" + cookieName + "\" does not exists!");
+    }
+    int valueEnd = cookieValue.contains(";") ? cookieValue.indexOf(';') : cookieValue.length() - 1;
+    return cookieValue.substring(cookieName.length(), valueEnd);
+  }
+  
+  protected String createCookieHeader() {
+    return createCookieHeader(csrfToken, sessionId);
+  }
+  
+  protected String createCookieHeader(String csrf, String session) {
+    return XSRF_TOKEN_IDENTIFIER + csrf + "; " + JSESSIONID_IDENTIFIER + session;
   }
 
   public String getXsrfTokenHeader() {

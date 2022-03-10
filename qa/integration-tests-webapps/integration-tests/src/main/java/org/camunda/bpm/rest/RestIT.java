@@ -21,6 +21,7 @@ import com.sun.jersey.api.client.WebResource;
 
 import org.camunda.bpm.AbstractWebIntegrationTest;
 import org.camunda.bpm.engine.rest.hal.Hal;
+import org.camunda.bpm.engine.rest.mapper.JacksonConfigurator;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -29,6 +30,8 @@ import org.junit.Test;
 
 import javax.ws.rs.core.MediaType;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,6 +54,8 @@ public class RestIT extends AbstractWebIntegrationTest {
   private static final String HISTORIC_DETAIL_PATH = ENGINE_DEFAULT_PATH + "/history/detail";
 
   private static final String PROCESS_INSTANCE_PATH = ENGINE_DEFAULT_PATH + "/process-instance";
+  
+  private static final String SCHEMA_LOG_PATH = ENGINE_DEFAULT_PATH + "/schema/log";
 
 
   private final static Logger log = Logger.getLogger(RestIT.class.getName());
@@ -117,7 +122,7 @@ public class RestIT extends AbstractWebIntegrationTest {
 
     WebResource resource = client.resource(APP_BASE_PATH + JOB_DEFINITION_PATH + "/suspended");
 
-    Map<String, Object> requestBody = new HashMap<String, Object>();
+    Map<String, Object> requestBody = new HashMap<>();
     requestBody.put("processDefinitionKey", "jobExampleProcess");
     requestBody.put("suspended", true);
     requestBody.put("includeJobs", true);
@@ -149,10 +154,10 @@ public class RestIT extends AbstractWebIntegrationTest {
   public void testTaskFilterResultContentType() throws JSONException {
     // create filter for first task, so single result will not throw an exception
     JSONObject firstTask = getFirstTask();
-    Map<String, Object> query = new HashMap<String, Object>();
+    Map<String, Object> query = new HashMap<>();
     query.put("taskDefinitionKey", firstTask.getString("taskDefinitionKey"));
     query.put("processInstanceId", firstTask.getString("processInstanceId"));
-    Map<String, Object> filter = new HashMap<String, Object>();
+    Map<String, Object> filter = new HashMap<>();
     filter.put("resourceType", "Task");
     filter.put("name", "IT Test Filter");
     filter.put("query", query);
@@ -176,6 +181,22 @@ public class RestIT extends AbstractWebIntegrationTest {
     response = client.resource(APP_BASE_PATH + FILTER_PATH + "/" + filterId ).delete(ClientResponse.class);
     assertEquals(204, response.getStatus());
     response.close();
+  }
+
+  @Test
+  public void shouldSerializeDateWithDefinedFormat() throws JSONException {
+    // when
+    ClientResponse response = client.resource(APP_BASE_PATH + SCHEMA_LOG_PATH).accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+    // then
+    assertEquals(200, response.getStatus());
+    JSONObject logElement = response.getEntity(JSONArray.class).getJSONObject(0);
+    response.close();
+    String timestamp = logElement.getString("timestamp");
+    try {
+      new SimpleDateFormat(JacksonConfigurator.DEFAULT_DATE_FORMAT).parse(timestamp);
+    } catch (ParseException pex) {
+      fail("Couldn't parse timestamp from schema log: " + timestamp);
+    }
   }
 
   /**
