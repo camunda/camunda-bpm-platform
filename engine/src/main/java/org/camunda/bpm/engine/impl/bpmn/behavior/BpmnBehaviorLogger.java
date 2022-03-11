@@ -229,7 +229,7 @@ public class BpmnBehaviorLogger extends ProcessEngineLogger {
   }
 
   public void errorPropagationException(String activityId, Throwable cause) {
-    logError("035", "caught an exception while propagate error in activity with id '{}'", activityId, cause);
+    logError("035", "Caught an exception while propagate error in activity with id '{}'", activityId, cause);
   }
 
   public void debugConcurrentScopeIsPruned(PvmExecutionImpl execution) {

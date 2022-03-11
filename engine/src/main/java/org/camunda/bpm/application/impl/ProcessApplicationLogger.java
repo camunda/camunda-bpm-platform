@@ -204,7 +204,7 @@ public class ProcessApplicationLogger extends ProcessEngineLogger {
 
   public void debugNoTargetProcessApplicationFound(ExecutionEntity execution, ProcessApplicationManager processApplicationManager) {
     logDebug("023",
-        "no target process application found for Execution[{}], ProcessDefinition[{}], Deployment[{}] Registrations[{}]",
+        "No target process application found for Execution[{}], ProcessDefinition[{}], Deployment[{}] Registrations[{}]",
             execution.getId(),
             execution.getProcessDefinitionId(),
             execution.getProcessDefinition().getDeploymentId(),
@@ -213,7 +213,7 @@ public class ProcessApplicationLogger extends ProcessEngineLogger {
 
   public void debugNoTargetProcessApplicationFoundForCaseExecution(CaseExecutionEntity execution, ProcessApplicationManager processApplicationManager) {
     logDebug("024",
-        "no target process application found for CaseExecution[{}], CaseDefinition[{}], Deployment[{}] Registrations[{}]",
+        "No target process application found for CaseExecution[{}], CaseDefinition[{}], Deployment[{}] Registrations[{}]",
             execution.getId(),
             execution.getCaseDefinitionId(),
             ((CaseDefinitionEntity)execution.getCaseDefinition()).getDeploymentId(),
