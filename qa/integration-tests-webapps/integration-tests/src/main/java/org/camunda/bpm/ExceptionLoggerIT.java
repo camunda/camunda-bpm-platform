@@ -34,7 +34,7 @@ public class ExceptionLoggerIT extends AbstractWebIntegrationTest {
   @Test
   public void shouldNotFailForUndefinedUser() {
     // when
-    ClientResponse response = client.resource(APP_BASE_PATH + "app/admin/default/#/users/undefined?tab=profile")
+    ClientResponse response = client.resource(appBasePath + "app/admin/default/#/users/undefined?tab=profile")
                                     .get(ClientResponse.class);
 
     // then

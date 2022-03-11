@@ -48,7 +48,7 @@ public class DateSerializationIT extends AbstractWebIntegrationTest {
   public void shouldSerializeDateWithDefinedFormat() throws JSONException {
     // when
     ClientResponse response = client
-      .resource(APP_BASE_PATH + SCHEMA_LOG_PATH)
+      .resource(appBasePath + SCHEMA_LOG_PATH)
       .accept(MediaType.APPLICATION_JSON)
       .header(X_XSRF_TOKEN_HEADER, csrfToken)
       .header(COOKIE_HEADER, createCookieHeader())

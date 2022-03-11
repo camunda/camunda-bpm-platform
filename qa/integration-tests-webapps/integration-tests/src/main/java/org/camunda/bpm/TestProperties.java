@@ -73,7 +73,6 @@ public class TestProperties {
     try {
       propertiesStream = TestProperties.class.getResourceAsStream(TESTCONFIG_PROPERTIES_FILE);
       properties.load(propertiesStream);
-      String httpPort = (String) properties.get("http.port");
     } finally {
       try {
         if (propertiesStream != null) {

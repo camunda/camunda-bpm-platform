@@ -16,7 +16,24 @@
  */
 package org.camunda.bpm.rest;
 
-import com.sun.jersey.api.client.ClientResponse;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -30,25 +47,9 @@ import org.camunda.bpm.AbstractWebIntegrationTest;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import com.sun.jersey.api.client.ClientResponse;
 
 public class RestJaxRs2IT extends AbstractWebIntegrationTest {
 
@@ -63,11 +64,11 @@ public class RestJaxRs2IT extends AbstractWebIntegrationTest {
 
   @Test(timeout=10000)
   public void shouldUseJaxRs2Artifact() throws JSONException {
-    Map<String, Object> payload = new HashMap<String, Object>();
+    Map<String, Object> payload = new HashMap<>();
     payload.put("workerId", "aWorkerId");
     payload.put("asyncResponseTimeout", 1000 * 60 * 30 + 1);
 
-    ClientResponse response = client.resource(APP_BASE_PATH + FETCH_AND_LOCK_PATH).accept(MediaType.APPLICATION_JSON)
+    ClientResponse response = client.resource(appBasePath + FETCH_AND_LOCK_PATH).accept(MediaType.APPLICATION_JSON)
       .entity(payload, MediaType.APPLICATION_JSON_TYPE)
       .post(ClientResponse.class);
 
@@ -88,7 +89,7 @@ public class RestJaxRs2IT extends AbstractWebIntegrationTest {
 
       @Override
       public String call() throws IOException {
-        HttpPost request = new HttpPost(APP_BASE_PATH + FETCH_AND_LOCK_PATH);
+        HttpPost request = new HttpPost(appBasePath + FETCH_AND_LOCK_PATH);
         request.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
         StringEntity stringEntity = new StringEntity("{ \"workerId\": \"aWorkerId\", \"asyncResponseTimeout\": 1000 }");
         request.setEntity(stringEntity);
@@ -111,7 +112,7 @@ public class RestJaxRs2IT extends AbstractWebIntegrationTest {
     int requestsCount = 500;
     ExecutorService service = Executors.newFixedThreadPool(requestsCount);
 
-    List<Callable<String>> requests = new ArrayList<Callable<String>>();
+    List<Callable<String>> requests = new ArrayList<>();
     for (int i = 0; i < requestsCount; i++) {
       requests.add(performRequest);
     }

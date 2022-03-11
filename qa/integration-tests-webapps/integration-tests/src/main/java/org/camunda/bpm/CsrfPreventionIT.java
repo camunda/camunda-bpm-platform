@@ -17,17 +17,15 @@
 package org.camunda.bpm;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
-import javax.ws.rs.core.MultivaluedMap;
-import java.io.IOException;
-import java.net.URLConnection;
-import java.util.List;
+import javax.ws.rs.core.MediaType;
 
-import com.sun.jersey.api.client.ClientResponse;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.sun.jersey.api.client.ClientResponse;
 
 public class CsrfPreventionIT extends AbstractWebIntegrationTest {
 
@@ -42,42 +40,19 @@ public class CsrfPreventionIT extends AbstractWebIntegrationTest {
     // given
 
     // when
-    ClientResponse response = client.resource(APP_BASE_PATH + TASKLIST_PATH)
+    ClientResponse response = client.resource(appBasePath + TASKLIST_PATH)
         .get(ClientResponse.class);
 
     // then
     assertEquals(200, response.getStatus());
-    assertTrue(checkCookieSet(response));
-    assertTrue(checkXsrfTokenHeaderPresent(response));
-
-    // cleanup
+    String xsrfTokenHeader = getXsrfTokenHeader(response);
+    String xsrfCookieValue = getXsrfCookieValue(response);
     response.close();
-  }
-
-  protected boolean checkCookieSet(ClientResponse response) {
-    MultivaluedMap<String, String> headers = response.getHeaders();
-
-    List<String> values = headers.get("Set-Cookie");
-    for (String value : values) {
-      if (value.startsWith("XSRF-TOKEN=")) {
-        return value.contains(";SameSite=Lax");
-      }
-    }
-
-    return false;
-  }
-
-  protected boolean checkXsrfTokenHeaderPresent(ClientResponse response) {
-    MultivaluedMap<String, String> headers = response.getHeaders();
-
-    List<String> values = headers.get("X-XSRF-TOKEN");
-    for (String value : values) {
-      if (value.length() == 32) {
-        return true;
-      }
-    }
-
-    return false;
+    
+    assertNotNull(xsrfTokenHeader);
+    assertEquals(32, xsrfTokenHeader.length());
+    assertNotNull(xsrfCookieValue);
+    assertTrue(xsrfCookieValue.contains(";SameSite=Lax"));
   }
 
   @Test(timeout=10000)
@@ -87,20 +62,13 @@ public class CsrfPreventionIT extends AbstractWebIntegrationTest {
     String modifyingRequestPath = "api/admin/auth/user/default/login/welcome";
 
     // when
-    URLConnection urlConnection = performRequest(baseUrl + modifyingRequestPath,
-                                                 "POST",
-                                                 "Content-Type",
-                                                 "application/x-www-form-urlencoded");
+    ClientResponse response = client.resource(baseUrl + modifyingRequestPath)
+        .header("Content-Type", MediaType.APPLICATION_FORM_URLENCODED_TYPE)
+        .post(ClientResponse.class);
 
-    try {
-      urlConnection.getContent();
-      fail("Exception expected!");
-    } catch (IOException e) {
-      // then
-      assertTrue(getXsrfTokenHeader().equals("Required"));
-      assertTrue(e.getMessage().contains("Server returned HTTP response code: 403 for URL"));
-    }
-
+    // then
+    assertEquals(403, response.getStatus());
+    assertTrue(getXsrfTokenHeader(response).equals("Required"));
   }
 
 }

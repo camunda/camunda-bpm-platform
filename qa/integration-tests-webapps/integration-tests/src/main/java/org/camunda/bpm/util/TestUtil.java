@@ -20,7 +20,6 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.camunda.bpm.TestProperties;
 import org.camunda.bpm.engine.rest.dto.identity.UserCredentialsDto;
 import org.camunda.bpm.engine.rest.dto.identity.UserDto;
@@ -40,7 +39,6 @@ import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
 public class TestUtil {
 
   private final ApacheHttpClient4 client;
-  private final DefaultHttpClient defaultHttpClient;
 
   private final TestProperties testProperties;
 
@@ -53,7 +51,6 @@ public class TestUtil {
     clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
     client = ApacheHttpClient4.create(clientConfig);
 
-    defaultHttpClient = (DefaultHttpClient) client.getClientHandler().getHttpClient();
   }
 
   public void destroy() {
@@ -75,8 +72,8 @@ public class TestUtil {
     WebResource webResource = client.resource(testProperties.getApplicationPath("/camunda/api/admin/setup/default/user/create"));
     ClientResponse clientResponse = webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).post(ClientResponse.class, user);
     try {
-      if (clientResponse.getResponseStatus() != Response.Status.NO_CONTENT) {
-        throw new WebApplicationException(clientResponse.getResponseStatus());
+      if (clientResponse.getStatus() != Response.Status.NO_CONTENT.getStatusCode()) {
+        throw new WebApplicationException(clientResponse.getStatus());
       }
     } finally {
       clientResponse.close();
