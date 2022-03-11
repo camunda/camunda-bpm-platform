@@ -51,7 +51,7 @@ public class DatabaseTableSchemaTest {
   @Before
   public void setUp() {
     pooledDataSource = new PooledDataSource(ReflectUtil.getClassLoader(), "org.h2.Driver",
-        "jdbc:h2:mem:DatabaseTablePrefixTest;DB_CLOSE_DELAY=1000", "sa", "");
+        "jdbc:h2:mem:DatabaseTableSchemaTest;DB_CLOSE_DELAY=1000", "sa", "");
   }
 
   @After
