@@ -26,3 +26,7 @@ ALTER TABLE ACT_RU_EXT_TASK
   ADD COLUMN LAST_FAILURE_LOG_ID_ varchar(64);
 
 create index ACT_IDX_HI_VARINST_NAME on ACT_HI_VARINST(NAME_);
+
+-- https://jira.camunda.com/browse/CAM-14205 --
+-- ensures liquibase creates the same schema as the normal create scripts --
+ALTER TABLE ACT_GE_BYTEARRAY ALTER COLUMN BYTES_ SET DATA TYPE blob;
