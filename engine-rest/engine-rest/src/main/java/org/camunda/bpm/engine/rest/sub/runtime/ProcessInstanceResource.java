@@ -69,4 +69,7 @@ public interface ProcessInstanceResource {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   BatchDto modifyProcessInstanceAsync(ProcessInstanceModificationDto dto);
+  
+  @Path("/comment")
+  ProcessInstanceCommentResource getProcessInstanceCommentResource();
 }
