@@ -33,8 +33,8 @@ public enum HistoricTaskPermissions implements Permission {
    * is revoked. This does not implicate that all individual
    * permissions are revoked.
    *
-   * Example: If the UPDATE permission is revoked also the ALL
-   * permission is revoked, because the user is not authorized
+   * Example: If the READ permission is revoked then the ALL
+   * permission is revoked as well, because the user is not authorized
    * to execute all actions anymore.
    */
   ALL("ALL", Integer.MAX_VALUE),
