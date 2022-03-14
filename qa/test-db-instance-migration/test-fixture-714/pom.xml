@@ -16,7 +16,7 @@
     <!-- this property is different for CockroachDB since support begins from version 7.14.0 -->
     <databaseSchemaUpdate>false</databaseSchemaUpdate>
     
-    <version.h2>1.4.190</version.h2>
+    <version.h2>${version.h2-v1}</version.h2>
   </properties>
 
    <dependencyManagement>

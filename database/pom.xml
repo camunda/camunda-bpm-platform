@@ -18,6 +18,7 @@
 
     <!-- database driver versions -->
     <version.h2>2.0.206</version.h2>
+    <version.h2-v1>1.4.190</version.h2-v1><!-- used for instance migration qa -->
     <version.oracle-12>12.1.0.2</version.oracle-12>
     <version.oracle-18>18.3.0.0</version.oracle-18>
     <version.oracle-19>19.3.0.0</version.oracle-19>
