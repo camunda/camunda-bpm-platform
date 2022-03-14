@@ -17,7 +17,6 @@
 package org.camunda.bpm.engine.test.api.mgmt.telemetry;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
 
 import java.util.Map;
 
@@ -27,16 +26,15 @@ import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.metrics.Meter;
 import org.camunda.bpm.engine.impl.telemetry.CommandCounter;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
-import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
-import org.camunda.bpm.engine.test.util.NoInitMessageInMemProcessEngineConfiguration;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.After;
 import org.junit.Before;
@@ -97,7 +95,7 @@ public class TelemetryDynamicDataTest {
   @Test
   public void shouldCountCommandsFromEngineStartAfterTelemetryActivation() {
     // when
-    processEngineInMem =  new NoInitMessageInMemProcessEngineConfiguration()
+    processEngineInMem =  new StandaloneInMemProcessEngineConfiguration()
         .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName())
         .setInitializeTelemetry(true)
         .buildProcessEngine();
@@ -110,7 +108,7 @@ public class TelemetryDynamicDataTest {
     // during engine startup
     assertThat(entries.keySet()).containsExactlyInAnyOrder(
         "IsTelemetryEnabledCmd",
-        "NoInitMessageBootstrapEngineCommand",
+        "BootstrapEngineCommand",
         "GetLicenseKeyCmd");
     for (String commandName : entries.keySet()) {
       assertThat(entries.get(commandName).get()).isEqualTo(1);

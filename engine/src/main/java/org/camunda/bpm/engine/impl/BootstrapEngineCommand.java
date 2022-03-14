@@ -43,10 +43,7 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
   private final static EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
   protected static final String TELEMETRY_PROPERTY_NAME = "camunda.telemetry.enabled";
-  protected static final String TELEMETRY_INIT_MESSAGE_SENT_NAME = "camunda.telemetry.initial.message.sent";
   protected static final String INSTALLATION_PROPERTY_NAME = "camunda.installation.id";
-
-  protected boolean sendInitialTelemetryMessage = false;
 
   @Override
   public Void execute(CommandContext commandContext) {
@@ -115,15 +112,11 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
 
       acquireExclusiveTelemetryLock(commandContext);
       PropertyEntity databaseTelemetryProperty = databaseTelemetryConfiguration(commandContext);
-      PropertyEntity databaseTelemetryInitMessageProperty = databaseTelemetryInitialMessageSent(commandContext);
 
       ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
       if (databaseTelemetryProperty == null) {
         LOG.noTelemetryPropertyFound();
         createTelemetryProperty(commandContext);
-      } else if (databaseTelemetryInitMessageProperty == null) {
-        // we need to still send an initial message because it didn't happen yet
-        initializeInitialTelemetryMessage();
       }
 
       // reset collected dynamic data
@@ -155,15 +148,6 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
     }
   }
 
-  protected PropertyEntity databaseTelemetryInitialMessageSent(CommandContext commandContext) {
-    try {
-      return commandContext.getPropertyManager().findPropertyById(TELEMETRY_INIT_MESSAGE_SENT_NAME);
-    } catch (Exception e) {
-      LOG.errorFetchingTelemetryInitialMessagePropertyInDatabase(e);
-      return null;
-    }
-  }
-
   protected void createTelemetryProperty(CommandContext commandContext) {
     Boolean telemetryEnabled = commandContext.getProcessEngineConfiguration().isInitializeTelemetry();
     PropertyEntity property = null;
@@ -174,11 +158,6 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
     }
     commandContext.getPropertyManager().insert(property);
     LOG.creatingTelemetryPropertyInDatabase(telemetryEnabled);
-    initializeInitialTelemetryMessage();
-  }
-
-  protected void initializeInitialTelemetryMessage() {
-    sendInitialTelemetryMessage = true;
   }
 
   public void initializeInstallationId(CommandContext commandContext) {
@@ -258,7 +237,7 @@ public class BootstrapEngineCommand implements ProcessEngineBootstrapCommand {
     // was enabled by another engine in the cluster.
     if (telemetryReporter != null && telemetryReporterActivate) {
       try {
-        telemetryReporter.start(sendInitialTelemetryMessage);
+        telemetryReporter.start();
       } catch (Exception e) {
         ProcessEngineLogger.TELEMETRY_LOGGER.schedulingTaskFailsOnEngineStart(e);
       }
