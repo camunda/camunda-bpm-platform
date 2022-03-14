@@ -33,7 +33,9 @@ var Controller = [
       if (err) {
         Notifications.addError({
           status: $translate.instant('ERROR'),
-          message: `Telemetry data fetching failed: ${err.message}`
+          message: `${$translate.instant(
+            'TELEMETRY_FETCH_DATA_ERROR_MESSAGE'
+          )} ${err.message}`
         });
       } else {
         $scope.data = res;
