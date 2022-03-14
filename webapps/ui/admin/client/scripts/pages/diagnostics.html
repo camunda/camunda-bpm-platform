@@ -9,10 +9,9 @@
   <div notifications-panel></div>
   
   <div cam-widget-debug
-       display-name="{{ 'PLGN_MOD_REQUEST_PAYLOAD' | translate }}"
+       display-name="{{ 'DIAGNOSTICS_DATA' | translate }}"
        debugged="data"
-       show-button
-       ng-if="data"
-       cam-widget-debug-tooltip="{{ 'PLGN_MOD_SHOW_REQUEST_PAYLOAD' | translate }}"></div>
+       disable-toggle-button="true"
+       ng-if="data"></div>
 </form>
 <!-- / CE - camunda-bpm-webapp/ui/admin/client/scripts/pages/diagnostics.html -->

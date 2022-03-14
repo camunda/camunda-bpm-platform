@@ -31,7 +31,10 @@ var Controller = [
 
     telemetryResource.fetchData(function(err, res) {
       if (err) {
-        Notifications.addError({ status: $translate.instant('ERROR'), message: `Telemetry data fetching failed: ${err.message}` });
+        Notifications.addError({
+          status: $translate.instant('ERROR'),
+          message: `Telemetry data fetching failed: ${err.message}`
+        });
       } else {
         $scope.data = res;
       }
@@ -47,7 +50,7 @@ module.exports = [
       label: 'DIAGNOSTICS',
       template: template,
       controller: Controller,
-      priority: 950,
+      priority: 950
     });
   }
 ];
