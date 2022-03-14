@@ -36,9 +36,10 @@ public enum OptimizePermissions implements Permission {
    * that the user is not permitted to do everything, which means that at least
    * one permission is revoked. This does not implicate that all individual
    * permissions are revoked.
-   *
-   * Example: If the EDIT permission is revoke also the ALL permission is
-   * revoked, because the user is not authorized to execute all actions anymore.
+   * 
+   * Example: If the EDIT permission is revoked then the ALL
+   * permission is revoked as well, because the user is not authorized
+   * to execute all actions anymore.
    */
   ALL("ALL", Integer.MAX_VALUE),
 
