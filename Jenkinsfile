@@ -44,11 +44,11 @@ pipeline {
             withVault(
               [vaultSecrets:
                  [
-                   [path        : 'common/ci-automationplatform/xlts.dev',
+                   [path        : 'common/ci-cambpm/xlts.dev',
                     secretValues:
                       [
-                        [envVar: 'XLTS_REGISTRY', vaultKey: 'authToken'],
-                        [envVar: 'XLTS_AUTH_TOKEN', vaultKey: 'registry'],
+                        [envVar: 'XLTS_REGISTRY', vaultKey: 'registry'],
+                        [envVar: 'XLTS_AUTH_TOKEN', vaultKey: 'authToken'],
                       ]
                    ],
                  ]
