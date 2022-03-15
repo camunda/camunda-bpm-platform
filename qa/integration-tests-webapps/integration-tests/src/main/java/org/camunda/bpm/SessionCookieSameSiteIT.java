@@ -25,7 +25,6 @@ import javax.ws.rs.core.MultivaluedMap;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class SessionCookieSameSiteIT extends AbstractWebIntegrationTest {
@@ -41,7 +40,7 @@ public class SessionCookieSameSiteIT extends AbstractWebIntegrationTest {
     // given
 
     // when
-    ClientResponse response = client.resource(APP_BASE_PATH + TASKLIST_PATH)
+    ClientResponse response = client.resource(appBasePath + TASKLIST_PATH)
         .get(ClientResponse.class);
 
     // then

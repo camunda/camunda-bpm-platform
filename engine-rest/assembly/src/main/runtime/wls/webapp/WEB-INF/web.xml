@@ -66,6 +66,13 @@
       <param-name>jersey.config.server.disableMoxyJson</param-name>
       <param-value>true</param-value>
     </init-param>
+    <!-- enable Jackson explicitly so no default JSON serializer like JSON-B is enabled -->
+    <init-param>
+      <param-name>jersey.config.server.provider.classnames</param-name>
+      <param-value>
+        org.glassfish.jersey.jackson.JacksonFeature
+      </param-value>
+    </init-param>
     <!-- Enable to debug Jersey requests -->
     <!--
     <init-param>

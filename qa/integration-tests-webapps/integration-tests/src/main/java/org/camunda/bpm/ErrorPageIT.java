@@ -37,7 +37,7 @@ public class ErrorPageIT extends AbstractWebIntegrationTest {
   @Test
   public void shouldCheckNonFoundResponse() {
     // when
-    ClientResponse response = client.resource(APP_BASE_PATH + "nonexisting")
+    ClientResponse response = client.resource(appBasePath + "nonexisting")
         .get(ClientResponse.class);
 
     // then

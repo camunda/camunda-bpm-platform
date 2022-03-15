@@ -41,7 +41,7 @@ public class SessionCookieSecurityIT extends AbstractWebIntegrationTest {
     // given
 
     // when
-    ClientResponse response = client.resource(APP_BASE_PATH + TASKLIST_PATH)
+    ClientResponse response = client.resource(appBasePath + TASKLIST_PATH)
         .get(ClientResponse.class);
 
     // then

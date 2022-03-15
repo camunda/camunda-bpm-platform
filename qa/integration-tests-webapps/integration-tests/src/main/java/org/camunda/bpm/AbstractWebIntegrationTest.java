@@ -16,28 +16,21 @@
  */
 package org.camunda.bpm;
 
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.json.JSONConfiguration;
-import com.sun.jersey.client.apache4.ApacheHttpClient4;
-import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
-import org.apache.commons.io.IOUtils;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
+import java.util.List;
+import java.util.logging.Logger;
+
+import javax.ws.rs.core.MediaType;
+
 import org.camunda.bpm.util.TestUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.openqa.selenium.chrome.ChromeDriverService;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.net.HttpURLConnection;
-import java.net.ProtocolException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.json.JSONConfiguration;
+import com.sun.jersey.client.apache4.ApacheHttpClient4;
+import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
 
 /**
  *
@@ -48,21 +41,29 @@ import java.util.logging.Logger;
 public abstract class AbstractWebIntegrationTest {
 
   private final static Logger LOGGER = Logger.getLogger(AbstractWebIntegrationTest.class.getName());
+  
+  protected static final String TASKLIST_PATH = "app/tasklist/default/";
+  
+  protected static final String COOKIE_HEADER = "Cookie";
+  protected static final String X_XSRF_TOKEN_HEADER = "X-XSRF-TOKEN";
 
-  protected String TASKLIST_PATH = "app/tasklist/default/";
-  public static final String HOST_NAME = "localhost";
-  public String APP_BASE_PATH;
+  protected static final String JSESSIONID_IDENTIFIER = "JSESSIONID=";
+  protected static final String XSRF_TOKEN_IDENTIFIER = "XSRF-TOKEN=";
+  
+  protected static final String HOST_NAME = "localhost";
 
+  protected String appBasePath;
   protected String appUrl;
   protected TestUtil testUtil;
   protected TestProperties testProperties;
 
   protected static ChromeDriverService service;
 
-  public ApacheHttpClient4 client;
-  public DefaultHttpClient defaultHttpClient;
-  public String httpPort;
-  protected HttpURLConnection connection;
+  protected ApacheHttpClient4 client;
+  protected String httpPort;
+  
+  protected String csrfToken;
+  protected String sessionId;
 
   @Before
   public void before() throws Exception {
@@ -73,68 +74,85 @@ public abstract class AbstractWebIntegrationTest {
   @After
   public void destroyClient() {
     client.destroy();
-    connection = null;
   }
 
   public void createClient(String ctxPath) throws Exception {
     testProperties = new TestProperties();
 
-    APP_BASE_PATH = testProperties.getApplicationPath("/" + ctxPath);
-    LOGGER.info("Connecting to application "+APP_BASE_PATH);
+    appBasePath = testProperties.getApplicationPath("/" + ctxPath);
+    LOGGER.info("Connecting to application " + appBasePath);
 
     ClientConfig clientConfig = new DefaultApacheHttpClient4Config();
     clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
     client = ApacheHttpClient4.create(clientConfig);
-
-    defaultHttpClient = (DefaultHttpClient) client.getClientHandler().getHttpClient();
-    HttpParams params = defaultHttpClient.getParams();
-    HttpConnectionParams.setConnectionTimeout(params, 3 * 60 * 1000);
-    HttpConnectionParams.setSoTimeout(params, 10 * 60 * 1000);
   }
 
-  public URLConnection performRequest(String url, String method, String headerName, String headerValue) {
-    try {
-      connection =
-          (HttpURLConnection) new URL(url)
-              .openConnection();
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+  protected void getTokens() {
+    // first request, first set of cookies
+    ClientResponse clientResponse = client.resource(appBasePath + TASKLIST_PATH).get(ClientResponse.class);
+    List<String> cookieValues = getCookieHeaders(clientResponse);
+    clientResponse.close();
 
-    if ("POST".equals(method)) {
-      try {
-        connection.setRequestMethod("POST");
-      } catch (ProtocolException e) {
-        throw new RuntimeException(e);
-      }
-    }
-
-    if (headerName != null && headerValue != null) {
-      connection.setRequestProperty(headerName, headerValue);
-    }
-
-    try {
-      connection.connect();
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-
-    return connection;
+    String startCsrfCookie = getCookie(cookieValues, XSRF_TOKEN_IDENTIFIER);
+    String startSessionCookie = getCookie(cookieValues, JSESSIONID_IDENTIFIER);
+    
+    // login with user, update session cookie
+    clientResponse = client.resource(appBasePath + "api/admin/auth/user/default/login/cockpit")
+        .entity("username=demo&password=demo", MediaType.APPLICATION_FORM_URLENCODED_TYPE)
+        .header(COOKIE_HEADER, createCookieHeader(startCsrfCookie, startSessionCookie))
+        .header(X_XSRF_TOKEN_HEADER, startCsrfCookie)
+        .accept(MediaType.APPLICATION_JSON)
+        .post(ClientResponse.class);
+    cookieValues = clientResponse.getHeaders().get("Set-Cookie");
+    clientResponse.close();
+    
+    sessionId = getCookie(cookieValues, JSESSIONID_IDENTIFIER);
+    
+    // update CSRF cookie
+    clientResponse = client.resource(appBasePath + "api/engine/engine")
+        .header(COOKIE_HEADER, createCookieHeader(startCsrfCookie, sessionId))
+        .header(X_XSRF_TOKEN_HEADER, startCsrfCookie)
+        .get(ClientResponse.class);
+    
+    cookieValues = getCookieHeaders(clientResponse);
+    clientResponse.close();
+    
+    csrfToken = getCookie(cookieValues, XSRF_TOKEN_IDENTIFIER);
   }
 
-  public String getXsrfTokenHeader() {
-    return connection.getHeaderField("X-XSRF-TOKEN");
+  protected List<String> getCookieHeaders(ClientResponse response) {
+    return response.getHeaders().get("Set-Cookie");
+  }
+  
+  protected String getCookie(List<String> cookieValues, String cookieName) {
+    String cookieValue = getCookieValue(cookieValues, cookieName);
+    int valueEnd = cookieValue.contains(";") ? cookieValue.indexOf(';') : cookieValue.length() - 1;
+    return cookieValue.substring(cookieName.length(), valueEnd);
+  }
+  
+  protected String createCookieHeader() {
+    return createCookieHeader(csrfToken, sessionId);
+  }
+  
+  protected String createCookieHeader(String csrf, String session) {
+    return XSRF_TOKEN_IDENTIFIER + csrf + "; " + JSESSIONID_IDENTIFIER + session;
   }
 
-  public String getXsrfCookieValue() {
-    return getCookieValue("XSRF-TOKEN");
+  protected String getXsrfTokenHeader(ClientResponse response) {
+    return response.getHeaders().getFirst(X_XSRF_TOKEN_HEADER);
   }
 
-  public String getCookieValue(String cookieName) {
-    List<String> cookies = getCookieHeaders();
+  protected String getXsrfCookieValue(ClientResponse response) {
+    return getCookieValue(response, XSRF_TOKEN_IDENTIFIER);
+  }
+  
+  protected String getCookieValue(ClientResponse response, String cookieName) {
+    return getCookieValue(getCookieHeaders(response), cookieName);
+  }
 
+  protected String getCookieValue(List<String> cookies, String cookieName) {
     for (String cookie : cookies) {
-      if (cookie.startsWith(cookieName + "=")) {
+      if (cookie.startsWith(cookieName)) {
         return cookie;
       }
     }
@@ -142,16 +160,7 @@ public abstract class AbstractWebIntegrationTest {
     return "";
   }
 
-  public List<String> getCookieHeaders() {
-    return getHeaders("Set-Cookie");
-  }
-
-  public List<String> getHeaders(String name) {
-    Map<String, List<String>> headerFields = connection.getHeaderFields();
-    return headerFields.get(name);
-  }
-
-  public void preventRaceConditions() throws InterruptedException {
+  protected void preventRaceConditions() throws InterruptedException {
     // just wait some seconds before starting because of Wildfly / Cargo race conditions
     Thread.sleep(5 * 1000);
   }
