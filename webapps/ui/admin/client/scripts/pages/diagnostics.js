@@ -31,11 +31,12 @@ var Controller = [
 
     telemetryResource.fetchData(function(err, res) {
       if (err) {
+        const msg = err.message;
         Notifications.addError({
           status: $translate.instant('ERROR'),
-          message: `${$translate.instant(
-            'TELEMETRY_FETCH_DATA_ERROR_MESSAGE'
-          )} ${err.message}`
+          message: $translate.instant('DIAGNOSTICS_FETCH_DATA_ERROR_MESSAGE', {
+            msg
+          })
         });
       } else {
         $scope.data = res;
