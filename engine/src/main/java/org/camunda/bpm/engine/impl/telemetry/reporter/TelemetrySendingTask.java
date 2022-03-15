@@ -35,15 +35,12 @@ import java.util.TimerTask;
 
 import javax.ws.rs.core.MediaType;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmd.IsTelemetryEnabledCmd;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.metrics.Meter;
 import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
 import org.camunda.bpm.engine.impl.metrics.util.MetricsUtil;
-import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
 import org.camunda.bpm.engine.impl.telemetry.CommandCounter;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
@@ -53,7 +50,6 @@ import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.InternalsImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.MetricImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.ProductImpl;
-import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
 import org.camunda.bpm.engine.impl.util.TelemetryUtil;
 import org.camunda.bpm.engine.telemetry.Command;
@@ -66,7 +62,6 @@ public class TelemetrySendingTask extends TimerTask {
 
   protected static final Set<String> METRICS_TO_REPORT = new HashSet<>();
   protected static final TelemetryLogger LOG = ProcessEngineLogger.TELEMETRY_LOGGER;
-  protected static final String TELEMETRY_INIT_MESSAGE_SENT_NAME = "camunda.telemetry.initial.message.sent";
   protected static final String UUID4_PATTERN = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}";
 
   static {
@@ -84,7 +79,6 @@ public class TelemetrySendingTask extends TimerTask {
   protected TelemetryRegistry telemetryRegistry;
   protected MetricsRegistry metricsRegistry;
   protected int telemetryRequestTimeout;
-  protected boolean sendInitialMessage;
 
   public TelemetrySendingTask(CommandExecutor commandExecutor,
                               String telemetryEndpoint,
@@ -93,8 +87,7 @@ public class TelemetrySendingTask extends TimerTask {
                               Connector<? extends ConnectorRequest<?>> httpConnector,
                               TelemetryRegistry telemetryRegistry,
                               MetricsRegistry metricsRegistry,
-                              int telemetryRequestTimeout,
-                              boolean sendInitialMessage) {
+                              int telemetryRequestTimeout) {
     this.commandExecutor = commandExecutor;
     this.telemetryEndpoint = telemetryEndpoint;
     this.telemetryRequestRetries = telemetryRequestRetries;
@@ -103,16 +96,11 @@ public class TelemetrySendingTask extends TimerTask {
     this.telemetryRegistry = telemetryRegistry;
     this.metricsRegistry = metricsRegistry;
     this.telemetryRequestTimeout = telemetryRequestTimeout;
-    this.sendInitialMessage = sendInitialMessage;
   }
 
   @Override
   public void run() {
     LOG.startTelemetrySendingTask();
-
-    if (sendInitialMessage) {
-      sendInitialMessage();
-    }
 
     if (!isTelemetryEnabled()) {
       LOG.telemetryDisabled();
@@ -121,7 +109,7 @@ public class TelemetrySendingTask extends TimerTask {
 
     TelemetryUtil.toggleLocalTelemetry(true, telemetryRegistry, metricsRegistry);
 
-    performDataSend(false, () -> updateAndSendData(true, true));
+    performDataSend(() -> updateAndSendData(true, true));
   }
 
   public TelemetryDataImpl updateAndSendData(boolean sendData, boolean addLegacyNames) {
@@ -132,7 +120,7 @@ public class TelemetrySendingTask extends TimerTask {
 
     if(sendData) {
       try {
-        sendData(mergedData, false);
+        sendData(mergedData);
       } catch (Exception e) {
         // so that we send it again the next time
         restoreDynamicData(dynamicData);
@@ -140,44 +128,6 @@ public class TelemetrySendingTask extends TimerTask {
       }
     }
     return mergedData;
-  }
-
-  protected void sendInitialMessage() {
-    try {
-      commandExecutor.execute(new SendInitialMsgCmd());
-    } catch (ProcessEngineException pex) {
-      // the property might have been inserted already by another cluster node after we checked it, ignore that
-      if (!ExceptionUtil.checkConstraintViolationException(pex)) {
-        LOG.exceptionWhileSendingTelemetryData(pex, true);
-      }
-    } catch (Exception e) {
-      LOG.exceptionWhileSendingTelemetryData(e, true);
-    }
-  }
-
-  protected void sendInitialMessage(CommandContext commandContext) {
-    /*
-     * check on init message property to minimize the risk of sending the
-     * message twice in case another node in the cluster toggled the value
-     * and successfully sent the message already - it is not 100% safe but
-     * good enough as sending the message twice is still OK
-     */
-    if (null == commandContext.getPropertyManager().findPropertyById(TELEMETRY_INIT_MESSAGE_SENT_NAME)) {
-      // message has not been sent yet
-      performDataSend(true, () -> {
-        TelemetryDataImpl initData = new TelemetryDataImpl(staticData.getInstallation(), new ProductImpl(staticData.getProduct()));
-        InternalsImpl internals = new InternalsImpl();
-        internals.setTelemetryEnabled(new IsTelemetryEnabledCmd().execute(commandContext));
-        initData.getProduct().setInternals(internals);
-
-        sendData(initData, true);
-        sendInitialMessage = false;
-        commandContext.getPropertyManager().insert(new PropertyEntity(TELEMETRY_INIT_MESSAGE_SENT_NAME, "true"));
-      });
-    } else {
-      // message has already been sent by another node
-      sendInitialMessage = false;
-    }
   }
 
   protected void updateStaticData() {
@@ -202,7 +152,7 @@ public class TelemetrySendingTask extends TimerTask {
     return telemetryEnabled != null && telemetryEnabled.booleanValue();
   }
 
-  protected void sendData(TelemetryDataImpl dataToSend, boolean isInitialMessage) {
+  protected void sendData(TelemetryDataImpl dataToSend) {
 
       String telemetryData = JsonUtil.asString(dataToSend);
       Map<String, Object> requestParams = assembleRequestParameters(METHOD_NAME_POST,
@@ -214,23 +164,23 @@ public class TelemetrySendingTask extends TimerTask {
       ConnectorRequest<?> request = httpConnector.createRequest();
       request.setRequestParameters(requestParams);
 
-      LOG.sendingTelemetryData(telemetryData, isInitialMessage);
+      LOG.sendingTelemetryData(telemetryData);
       CloseableConnectorResponse response = (CloseableConnectorResponse) request.execute();
 
       if (response == null) {
-        LOG.unexpectedResponseWhileSendingTelemetryData(isInitialMessage);
+        LOG.unexpectedResponseWhileSendingTelemetryData();
       } else {
         int responseCode = (int) response.getResponseParameter(PARAM_NAME_RESPONSE_STATUS_CODE);
 
         if (isSuccessStatusCode(responseCode)) {
           if (responseCode != HttpURLConnection.HTTP_ACCEPTED) {
-            LOG.unexpectedResponseSuccessCode(responseCode, isInitialMessage);
+            LOG.unexpectedResponseSuccessCode(responseCode);
           }
 
-          LOG.telemetrySentSuccessfully(isInitialMessage);
+          LOG.telemetrySentSuccessfully();
 
         } else {
-          throw LOG.unexpectedResponseWhileSendingTelemetryData(responseCode, isInitialMessage);
+          throw LOG.unexpectedResponseWhileSendingTelemetryData(responseCode);
         }
       }
   }
@@ -311,15 +261,7 @@ public class TelemetrySendingTask extends TimerTask {
     return metrics;
   }
 
-  protected class SendInitialMsgCmd implements org.camunda.bpm.engine.impl.interceptor.Command<Void> {
-    @Override
-    public Void execute(CommandContext commandContext) {
-      sendInitialMessage(commandContext);
-      return null;
-    }
-  }
-
-  protected void performDataSend(Boolean isInitialMessage, Runnable runnable) {
+  protected void performDataSend(Runnable runnable) {
     if (validateData(staticData)) {
       int triesLeft = telemetryRequestRetries + 1;
       boolean requestSuccessful = false;
@@ -331,7 +273,7 @@ public class TelemetrySendingTask extends TimerTask {
 
           requestSuccessful = true;
         } catch (Exception e) {
-          LOG.exceptionWhileSendingTelemetryData(e, isInitialMessage);
+          LOG.exceptionWhileSendingTelemetryData(e);
         }
       } while (!requestSuccessful && triesLeft > 0);
     } else {

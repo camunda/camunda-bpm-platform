@@ -28,10 +28,9 @@ public class TelemetryLogger extends ProcessEngineLogger {
         "001", "Start telemetry sending task.");
   }
 
-  public void exceptionWhileSendingTelemetryData(Exception e, boolean isInitialMessage) {
+  public void exceptionWhileSendingTelemetryData(Exception e) {
     logWarn("002",
-        "Could not send {}telemetry data. Reason: {} with message '{}'. Set this logger to DEBUG/FINE for the full stacktrace.",
-        getInitialMessageText(isInitialMessage),
+        "Could not send telemetry data. Reason: {} with message '{}'. Set this logger to DEBUG/FINE for the full stacktrace.",
         e.getClass().getSimpleName(),
         e.getMessage());
     logDebug(
@@ -40,19 +39,17 @@ public class TelemetryLogger extends ProcessEngineLogger {
         e);
   }
 
-  public ProcessEngineException unexpectedResponseWhileSendingTelemetryData(int responseCode, boolean isInitialMessage) {
+  public ProcessEngineException unexpectedResponseWhileSendingTelemetryData(int responseCode) {
     return new ProcessEngineException(
-      exceptionMessage("004", "Unexpected response code {} when sending {}telemetry data", responseCode, getInitialMessageText(isInitialMessage)));
+      exceptionMessage("004", "Unexpected response code {} when sending telemetry data", responseCode));
   }
 
-  public void unexpectedResponseWhileSendingTelemetryData(boolean isInitialMessage) {
-    logDebug(
-        "005", "Unexpected 'null' response while sending {}telemetry data.", getInitialMessageText(isInitialMessage));
+  public void unexpectedResponseWhileSendingTelemetryData() {
+    logDebug("005", "Unexpected 'null' response while sending telemetry data.");
   }
 
-  public void sendingTelemetryData(String data, boolean isInitialMessage) {
-    logDebug(
-        "006", "Sending {}telemetry data: {}", getInitialMessageText(isInitialMessage), data);
+  public void sendingTelemetryData(String data) {
+    logDebug("006", "Sending telemetry data: {}", data);
   }
 
   public void databaseTelemetryPropertyMissingInfo(boolean telemetryEnabled) {
@@ -101,15 +98,14 @@ public class TelemetryLogger extends ProcessEngineLogger {
         e.getMessage());
   }
 
-  public void unexpectedResponseSuccessCode(int statusCode, boolean isInitialMessage) {
+  public void unexpectedResponseSuccessCode(int statusCode) {
     logDebug(
-        "015", "{} request was sent, but received an unexpected response success code: {}", getInitialMessageTextCapitalized(isInitialMessage), statusCode);
+        "015", "Telemetry request was sent, but received an unexpected response success code: {}", statusCode);
   }
 
 
-  public void telemetrySentSuccessfully(boolean isInitialMessage) {
-    logDebug(
-        "016", "{} request was successful.", getInitialMessageTextCapitalized(isInitialMessage));
+  public void telemetrySentSuccessfully() {
+    logDebug("016", "Telemetry request was successful.");
   }
 
   public void sendingTelemetryDataFails(TelemetryData productData) {
@@ -130,11 +126,4 @@ public class TelemetryLogger extends ProcessEngineLogger {
         exceptionMessage("019", "Error while retrieving telemetry data. Telemetry registry was not initialized."));
   }
 
-  protected String getInitialMessageText(boolean isInitialMessage) {
-    return isInitialMessage ? "initial " : "";
-  }
-
-  protected String getInitialMessageTextCapitalized(boolean isInitialMessage) {
-    return isInitialMessage ? "Initial telemetry" : "Telemetry";
-  }
 }

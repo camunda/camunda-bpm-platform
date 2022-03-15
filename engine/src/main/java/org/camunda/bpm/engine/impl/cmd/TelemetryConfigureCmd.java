@@ -67,7 +67,7 @@ public class TelemetryConfigureCmd implements Command<Void> {
     // telemetry enabled or set for the first time
     if (currentValue == null || (!currentValue.booleanValue() && telemetryEnabled)) {
       if (isReportedActivated) {
-        telemetryReporter.reschedule(currentValue == null);
+        telemetryReporter.reschedule();
       }
     }
 

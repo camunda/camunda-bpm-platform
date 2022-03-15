@@ -16,13 +16,20 @@
  */
 package org.camunda.bpm.engine.test.api.mgmt.telemetry;
 
-import static org.assertj.core.api.Assertions.*;
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.HttpURLConnection;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -30,13 +37,12 @@ import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration
 import org.camunda.bpm.engine.impl.metrics.Meter;
 import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
 import org.camunda.bpm.engine.impl.metrics.reporter.DbMetricsReporter;
-import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.InternalsImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 import org.camunda.bpm.engine.impl.util.JsonTestUtil;
 import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.telemetry.Metric;
-import org.camunda.bpm.engine.test.util.NoInitMessageBootstrapEngineCommand;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.junit.After;
 import org.junit.Before;
@@ -63,13 +69,11 @@ public class TelemetryMultipleEnginesTest {
 
   @ClassRule
   public static ProcessEngineBootstrapRule secondEngineRule = new ProcessEngineBootstrapRule(config ->
-      config.setTelemetryEndpoint(TELEMETRY_ENDPOINT)
-            .setProcessEngineBootstrapCommand(new NoInitMessageBootstrapEngineCommand()));
+      config.setTelemetryEndpoint(TELEMETRY_ENDPOINT));
 
   @ClassRule
   public static ProcessEngineBootstrapRule defaultEngineRule = new ProcessEngineBootstrapRule(config ->
-      config.setTelemetryEndpoint(TELEMETRY_ENDPOINT)
-            .setProcessEngineBootstrapCommand(new NoInitMessageBootstrapEngineCommand()));
+      config.setTelemetryEndpoint(TELEMETRY_ENDPOINT));
 
   protected ProcessEngine defaultEngine;
   protected ProcessEngine secondEngine;
@@ -170,35 +174,6 @@ public class TelemetryMultipleEnginesTest {
     LoggedRequest defaultRequest = requests.get(0);
     TelemetryDataImpl defaultRequestBody = gson.fromJson(defaultRequest.getBodyAsString(), TelemetryDataImpl.class);
     assertReportedMetrics(defaultRequestBody, 0, 0, 0);
-  }
-
-  @Test
-  public void shouldReportInitialTelemetryOnce() {
-    // given one engine does send the initial message
-    ProcessEngineConfigurationImpl defaultEngineConfiguration = new StandaloneInMemProcessEngineConfiguration()
-        .setTelemetryEndpoint(TELEMETRY_ENDPOINT)
-        .setTelemetryReporterActivate(true)
-        .setJdbcUrl("jdbc:h2:mem:camunda-test" + getClass().getSimpleName());
-    ProcessEngineConfigurationImpl secondEngineConfiguration = new StandaloneInMemProcessEngineConfiguration()
-        .setTelemetryEndpoint(TELEMETRY_ENDPOINT)
-        .setTelemetryReporterActivate(true)
-        .setJdbcUrl("jdbc:h2:mem:camunda-test" + getClass().getSimpleName())
-        .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE);
-    ProcessEngine defaultEngineIM = defaultEngineConfiguration.buildProcessEngine();
-    ProcessEngine secondEngineIM = secondEngineConfiguration.buildProcessEngine();
-
-    secondEngineConfiguration.getTelemetryReporter().reportNow();
-
-    // when
-    defaultEngineConfiguration.getTelemetryReporter().reportNow();
-
-    // then only one engine sent one
-    verify(1, postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
-        .withHeader("Content-Type",  equalTo("application/json")));
-
-    // clean up
-    secondEngineIM.close();
-    defaultEngineIM.close();
   }
 
   private TelemetryReporter getTelemetryReporter(ProcessEngine engine) {

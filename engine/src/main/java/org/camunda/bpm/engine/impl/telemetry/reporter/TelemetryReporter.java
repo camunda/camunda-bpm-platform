@@ -76,10 +76,10 @@ public class TelemetryReporter {
     this.telemetryRegistry = telemetryRegistry;
     this.metricsRegistry = metricsRegistry;
     this.telemetryRequestTimeout = telemetryRequestTimeout;
-    initTelemetrySendingTask(false);
+    initTelemetrySendingTask();
   }
 
-  protected void initTelemetrySendingTask(boolean sendInitialMessage) {
+  protected void initTelemetrySendingTask() {
     telemetrySendingTask = new TelemetrySendingTask(commandExecutor,
                                                     telemetryEndpoint,
                                                     telemetryRequestRetries,
@@ -87,13 +87,12 @@ public class TelemetryReporter {
                                                     httpConnector,
                                                     telemetryRegistry,
                                                     metricsRegistry,
-                                                    telemetryRequestTimeout,
-                                                    sendInitialMessage);
+                                                    telemetryRequestTimeout);
   }
 
-  public synchronized void start(boolean sendInitialMessage) {
+  public synchronized void start() {
     if (!isScheduled()) { // initialize timer only if not scheduled yet
-      initTelemetrySendingTask(sendInitialMessage);
+      initTelemetrySendingTask();
 
       timer = new Timer("Camunda BPM Runtime Telemetry Reporter", true);
       long reportingIntervalInMillis =  reportingIntervalInSeconds * 1000;
@@ -108,9 +107,9 @@ public class TelemetryReporter {
     }
   }
 
-  public synchronized void reschedule(boolean sendInitialMessage) {
+  public synchronized void reschedule() {
     stop(false);
-    start(sendInitialMessage);
+    start();
   }
 
   public synchronized void stop() {
@@ -123,8 +122,6 @@ public class TelemetryReporter {
       timer.cancel();
       timer = null;
 
-      // sending initial message only upon start
-      telemetrySendingTask.sendInitialMessage = false;
       if (report) {
         // collect and send manually for the last time
         reportNow();
