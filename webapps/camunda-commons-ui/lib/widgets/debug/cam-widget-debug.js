@@ -32,13 +32,13 @@ module.exports = [
         open: '@',
         extendedInfo: '=',
         tooltip: '@camWidgetDebugTooltip',
-        tooltipPlacement: '@camWidgetDebugTooltipPlacement'
+        tooltipPlacement: '@camWidgetDebugTooltipPlacement',
+        disableToggleButton: '='
       },
 
       link: function(scope, element, attrs) {
         scope.varName = attrs.displayName || attrs.debugged;
         scope.extended = attrs.extended !== undefined;
-
         scope.toggleOpen = function() {
           scope.open = !scope.open;
         };

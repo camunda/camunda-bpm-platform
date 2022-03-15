@@ -1,0 +1,17 @@
+<!-- # CE - camunda-bpm-webapp/ui/admin/client/scripts/pages/diagnostics.html -->
+<form class="statisticsTab">
+  <h3>{{ 'DIAGNOSTICS' | translate }}</h3>
+
+  <div uib-alert class="alert alert-info">
+    {{ 'DIAGNOSTICS_INTRODUCTION' | translate}}
+  </div>
+
+  <div notifications-panel></div>
+  
+  <div cam-widget-debug
+       display-name="{{ 'DIAGNOSTICS_DATA' | translate }}"
+       debugged="data"
+       disable-toggle-button="true"
+       ng-if="data"></div>
+</form>
+<!-- / CE - camunda-bpm-webapp/ui/admin/client/scripts/pages/diagnostics.html -->
