@@ -48,8 +48,7 @@ var ChoicesFieldHandler = AbstractFormField.extend(
       // crate variable
       this.variableManager.createVariable({
         name: variableName,
-        type: variableType,
-        value: this.element.val() || null
+        type: variableType
       });
 
       // fetch choices variable
@@ -57,10 +56,7 @@ var ChoicesFieldHandler = AbstractFormField.extend(
         this.variableManager.fetchVariable(choicesVariableName);
       }
 
-      // remember the original value found in the element for later checks
-      this.originalValue = this.element.val() || null;
-
-      this.previousValue = this.originalValue;
+      this.previousValue = this.originalValue = '';
 
       // remember variable name
       this.variableName = variableName;
