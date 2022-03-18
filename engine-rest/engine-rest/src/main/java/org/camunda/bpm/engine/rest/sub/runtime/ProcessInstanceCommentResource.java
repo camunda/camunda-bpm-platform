@@ -26,8 +26,8 @@ import org.camunda.bpm.engine.rest.dto.task.CommentDto;
 
 public interface ProcessInstanceCommentResource {
 
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	List<CommentDto> getComments();
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  List<CommentDto> getComments();
 
 }
