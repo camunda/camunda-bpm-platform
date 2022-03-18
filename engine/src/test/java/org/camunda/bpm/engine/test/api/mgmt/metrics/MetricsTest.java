@@ -102,7 +102,7 @@ public class MetricsTest {
                                   .name(Metrics.ACTIVTY_INSTANCE_END)
                                   .sum();
     assertEquals(end, start);
-    assertEquals(end, managementService.createMetricsQuery().name(Metrics.FLOW_NODE_INSTANCES_END).sum());
+    assertEquals(start, managementService.createMetricsQuery().name(Metrics.FLOW_NODE_INSTANCES).sum());
   }
 
   @Test
@@ -126,7 +126,7 @@ public class MetricsTest {
                                   .name(Metrics.ACTIVTY_INSTANCE_END)
                                   .sum();
     assertNotEquals(end, start);
-    assertEquals(end, managementService.createMetricsQuery().name(Metrics.FLOW_NODE_INSTANCES_END).sum());
+    assertEquals(start, managementService.createMetricsQuery().name(Metrics.FLOW_NODE_INSTANCES).sum());
     assertEquals(2, start);
     assertEquals(1, end);
 
@@ -142,7 +142,7 @@ public class MetricsTest {
                                   .name(Metrics.ACTIVTY_INSTANCE_END)
                                   .sum();
     assertEquals(end, start);
-    assertEquals(end, managementService.createMetricsQuery().name(Metrics.FLOW_NODE_INSTANCES_END).sum());
+    assertEquals(start, managementService.createMetricsQuery().name(Metrics.FLOW_NODE_INSTANCES).sum());
   }
 
   @Test

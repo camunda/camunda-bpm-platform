@@ -205,7 +205,7 @@ public class TelemetryRestServiceTest extends AbstractRestServiceTest {
         .body("product.internals.commands.FetchExternalTasksCmd.count", equalTo(100))
         .body("product.internals.commands.StartProcessInstanceCmd.count", equalTo(40))
         .body("product.internals.metrics.process-instances.count", equalTo(936))
-        .body("product.internals.metrics.flow-node-instances-start.count", equalTo(6125))
+        .body("product.internals.metrics.flow-node-instances.count", equalTo(6125))
         .body("product.internals.metrics.executed-decision-elements.count", equalTo(732))
         .body("product.internals.metrics.decision-instances.count", equalTo(140))
         .body("product.internals.webapps[0]", equalTo("cockpit"))

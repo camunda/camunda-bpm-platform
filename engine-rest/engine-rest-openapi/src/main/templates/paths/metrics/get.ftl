@@ -15,8 +15,7 @@
         enumValues = ["activity-instance-start",
                 "activity-instance-end",
                 "decision-instances",
-                "flow-node-instances-start",
-                "flow-node-instances-end",
+                "flow-node-instances",
                 "job-acquisition-attempt",
                 "job-acquired-success",
                 "job-acquired-failure",
@@ -83,11 +82,11 @@
         array = true
         desc = "Request successful."
         examples = ['"example-1": {
-                       "summary": "GET /metrics?name=flow-node-instances-end&startDate=1970-01-01T01:45:00.000%2b0200&endDate=1970-01-01T02:00:00.000%2b0200",
+                       "summary": "GET /metrics?name=flow-node-instances&startDate=1970-01-01T01:45:00.000%2b0200&endDate=1970-01-01T02:00:00.000%2b0200",
                        "value": [
                                   {
                                     "timestamp":"1970-01-01T01:45:00.000+0200",
-                                    "name":"flow-node-instances-end",
+                                    "name":"flow-node-instances",
                                     "reporter":"REPORTER",
                                     "value":23
                                   }

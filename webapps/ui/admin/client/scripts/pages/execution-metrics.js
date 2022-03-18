@@ -134,7 +134,7 @@ var Controller = [
         flowNodes: function(cb) {
           MetricsResource.sum(
             {
-              name: 'flow-node-instances-start',
+              name: 'flow-node-instances',
               startDate: fixDate($scope.startDate),
               endDate: fixDate($scope.endDate)
             },
