@@ -24,8 +24,7 @@ public class Metrics {
 
   public static final String ACTIVTY_INSTANCE_START = "activity-instance-start";
   public static final String ACTIVTY_INSTANCE_END = "activity-instance-end";
-  public static final String FLOW_NODE_INSTANCES_START = "flow-node-instances-start";
-  public static final String FLOW_NODE_INSTANCES_END = "flow-node-instances-end";
+  public static final String FLOW_NODE_INSTANCES = "flow-node-instances";
 
   /**
    * Number of times job acquisition is performed

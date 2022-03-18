@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.camunda.bpm.engine.management.Metrics.DECISION_INSTANCES;
 import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_ELEMENTS;
-import static org.camunda.bpm.engine.management.Metrics.FLOW_NODE_INSTANCES_START;
+import static org.camunda.bpm.engine.management.Metrics.FLOW_NODE_INSTANCES;
 import static org.camunda.bpm.engine.management.Metrics.PROCESS_INSTANCES;
 import java.util.Map;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -196,8 +196,8 @@ public class ManagementServiceGetTelemetryDataTest {
 
     // then
     Map<String, Metric> metrics = telemetryData.getProduct().getInternals().getMetrics();
-    assertThat(metrics).containsOnlyKeys(FLOW_NODE_INSTANCES_START, PROCESS_INSTANCES, EXECUTED_DECISION_ELEMENTS, DECISION_INSTANCES);
-    assertThat(metrics.get(FLOW_NODE_INSTANCES_START).getCount()).isZero();
+    assertThat(metrics).containsOnlyKeys(FLOW_NODE_INSTANCES, PROCESS_INSTANCES, EXECUTED_DECISION_ELEMENTS, DECISION_INSTANCES);
+    assertThat(metrics.get(FLOW_NODE_INSTANCES).getCount()).isZero();
     assertThat(metrics.get(PROCESS_INSTANCES).getCount()).isZero();
     assertThat(metrics.get(EXECUTED_DECISION_ELEMENTS).getCount()).isZero();
     assertThat(metrics.get(DECISION_INSTANCES).getCount()).isZero();
@@ -215,7 +215,7 @@ public class ManagementServiceGetTelemetryDataTest {
     TelemetryData telemetryData = managementService.getTelemetryData();
 
     // then count should not reset
-    assertThat(telemetryData.getProduct().getInternals().getMetrics().get(FLOW_NODE_INSTANCES_START).getCount()).isEqualTo(2);
+    assertThat(telemetryData.getProduct().getInternals().getMetrics().get(FLOW_NODE_INSTANCES).getCount()).isEqualTo(2);
     assertThat(telemetryData.getProduct().getInternals().getMetrics().get(PROCESS_INSTANCES).getCount()).isEqualTo(1);
   }
 
@@ -339,7 +339,7 @@ public class ManagementServiceGetTelemetryDataTest {
     // then metrics produced before telemetry was enabled should be deleted
     Map<String, Metric> metrics = telemetryData.getProduct().getInternals().getMetrics();
     assertThat(metrics.size()).isEqualTo(4);
-    assertThat(metrics.get(FLOW_NODE_INSTANCES_START).getCount()).isEqualTo(2);
+    assertThat(metrics.get(FLOW_NODE_INSTANCES).getCount()).isEqualTo(2);
     assertThat(metrics.get(PROCESS_INSTANCES).getCount()).isEqualTo(1);
     assertThat(metrics.get(DECISION_INSTANCES).getCount()).isEqualTo(0);
     assertThat(metrics.get(EXECUTED_DECISION_ELEMENTS).getCount()).isEqualTo(0);

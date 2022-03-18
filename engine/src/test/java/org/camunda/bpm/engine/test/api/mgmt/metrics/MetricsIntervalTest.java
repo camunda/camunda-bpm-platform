@@ -232,7 +232,7 @@ public class MetricsIntervalTest extends AbstractMetricsIntervalTest {
     metrics.remove(0);
     for (MetricIntervalValue metric : metrics) {
       assertEquals(name, metric.getName());
-      assertEquals(Metrics.FLOW_NODE_INSTANCES_START, metric.getName());
+      assertEquals(Metrics.FLOW_NODE_INSTANCES, metric.getName());
       long nextTimestamp = metric.getTimestamp().getTime();
       if (lastTimestamp != nextTimestamp) {
         assertEquals(lastTimestamp, nextTimestamp + DEFAULT_INTERVAL_MILLIS);
@@ -268,7 +268,7 @@ public class MetricsIntervalTest extends AbstractMetricsIntervalTest {
     metrics.remove(0);
     for (MetricIntervalValue metric : metrics) {
       assertEquals(name, metric.getName());
-      assertEquals(Metrics.FLOW_NODE_INSTANCES_START, metric.getName());
+      assertEquals(Metrics.FLOW_NODE_INSTANCES, metric.getName());
       long nextTimestamp = metric.getTimestamp().getTime();
       if (lastTimestamp != nextTimestamp) {
         assertEquals(lastTimestamp, nextTimestamp + interval);
