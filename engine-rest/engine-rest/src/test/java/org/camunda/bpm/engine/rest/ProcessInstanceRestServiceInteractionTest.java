@@ -231,7 +231,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
   }
 
   public void mockHistoryFull() {
-	when(mockManagementService.getHistoryLevel()).thenReturn(ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL);
+    when(mockManagementService.getHistoryLevel()).thenReturn(ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL);
   }
   
   public void mockHistoryDisabled() {
@@ -661,7 +661,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
   @Test
   public void testGetProcessInstanceComments() {
     mockHistoryFull();
-	  
+  
     Response response = given()
       .pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
       .header("accept", MediaType.APPLICATION_JSON)
