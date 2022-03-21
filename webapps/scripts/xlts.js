@@ -15,19 +15,12 @@
  * limitations under the License.
  */
 
-const {XLTS_REGISTRY, XLTS_AUTH_TOKEN} = process.env;
-
-if (!XLTS_REGISTRY || !XLTS_AUTH_TOKEN) {
-  console.log('XLTS installation skipped.');
-  return;
-}
-
 const scope = 'xlts.dev';
 
 const {execSync} = require('child_process');
 
 const exec = (cmd, successMsg) => {
-  execSync(cmd, (error, stdout, stderr) => {
+  return execSync(cmd, (error, stdout, stderr) => {
     if (error) {
       console.err(`error: ${error.message}`);
       return;
@@ -37,18 +30,29 @@ const exec = (cmd, successMsg) => {
       return;
     }
     console.log(successMsg ? successMsg : `stdout: ${stdout}`);
-  });
+  }).toString();
 };
 
-exec(
-  `npm set @${scope}:registry https://${XLTS_REGISTRY}/`,
-  'XLTS.dev registry configured.'
-);
+const registryConfigured = exec(`npm get @${scope}:registry`) !== 'undefined\n';
 
-exec(
-  `npm set //${XLTS_REGISTRY}/:_authToken ${XLTS_AUTH_TOKEN}`,
-  'XLTS.dev auth token configured.'
-);
+const {XLTS_REGISTRY, XLTS_AUTH_TOKEN} = process.env;
+
+if (!registryConfigured && (!XLTS_REGISTRY || !XLTS_AUTH_TOKEN)) {
+  console.log('XLTS installation skipped.');
+  return;
+}
+
+if (!registryConfigured) {
+  exec(
+    `npm set @${scope}:registry https://${XLTS_REGISTRY}/`,
+    'XLTS.dev registry configured.'
+  );
+
+  exec(
+    `npm set //${XLTS_REGISTRY}/:_authToken ${XLTS_AUTH_TOKEN}`,
+    'XLTS.dev auth token configured.'
+  );
+}
 
 if (process.argv[2] === 'install') {
   const {version, dependencies} = require('../package.json').xlts;
