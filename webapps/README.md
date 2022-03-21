@@ -109,7 +109,16 @@ Since December 31, 2021, AngularJS is no longer officially supported by the orig
 
 **Heads-up:** If you build the Webapps from our source code, the build includes the no longer maintained AngularJS libraries unless you have access to the XLTS.dev registry and configure it with the help of environment variables.
 
-To enable pulling the XLTS.dev AngularJS libraries while building the Webapps, please set the following environment variables:
+To enable pulling the XLTS.dev AngularJS libraries while building the Webapps, please configure the npm registry. Add the XLTS.dev npm registry by replacing the variables `${XLTS_REGISTRY}` and `${XLTS_AUTH_TOKEN}` in the following commands and execute the commands in your terminal.
+
+Commands to configure the XLTS.dev npm registry:
+
+```
+npm set @xlts.dev:registry https://${XLTS_REGISTRY}/
+npm set //${XLTS_REGISTRY}/:_authToken ${XLTS_AUTH_TOKEN}
+```
+
+Alternatively, you can set the following environment variables:
 
 ```sh
 export XLTS_REGISTRY = "example.com" # Hostname without protocol (e.g., "https://"), leading or trailing slashes 
