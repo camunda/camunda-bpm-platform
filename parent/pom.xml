@@ -47,8 +47,8 @@
     <version.bouncycastle>1.47</version.bouncycastle>
 
     <!-- application servers -->
-    <version.wildfly>23.0.2.Final</version.wildfly>
-    <version.wildfly.core>15.0.1.Final</version.wildfly.core>
+    <version.wildfly>26.0.1.Final</version.wildfly>
+    <version.wildfly.core>18.0.4.Final</version.wildfly.core>
 
     <version.tomcat>9.0.58</version.tomcat>
 
@@ -228,8 +228,8 @@
         </plugin>
         <plugin>
           <groupId>org.codehaus.cargo</groupId>
-          <artifactId>cargo-maven2-plugin</artifactId>
-          <version>1.7.2</version>
+          <artifactId>cargo-maven3-plugin</artifactId>
+          <version>1.9.9</version>
         </plugin>
         <plugin>
           <groupId>net.kennychua</groupId>

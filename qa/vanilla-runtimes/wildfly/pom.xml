@@ -22,7 +22,7 @@
           <groupId>org.wildfly</groupId>
           <artifactId>wildfly-dist</artifactId>
           <version>${version.wildfly}</version>
-          <type>tar.gz</type>
+          <type>zip</type>
           <scope>runtime</scope>
         </dependency>
       </dependencies>
@@ -46,7 +46,7 @@
                       <groupId>org.wildfly</groupId>
                       <artifactId>wildfly-dist</artifactId>
                       <version>${version.wildfly}</version>
-                      <type>tar.gz</type>
+                      <type>zip</type>
                       <overWrite>true</overWrite>
                       <outputDirectory>target/server/</outputDirectory>
                     </artifactItem>

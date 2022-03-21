@@ -23,6 +23,7 @@ import org.jboss.as.controller.ObjectTypeAttributeDefinition;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.as.controller.descriptions.ResourceDescriptionResolver;
 import org.jboss.as.controller.operations.validation.ObjectTypeValidator;
+import org.jboss.as.controller.operations.validation.ParameterValidator;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
 
@@ -43,42 +44,47 @@ public class FixedObjectTypeAttributeDefinition extends ObjectTypeAttributeDefin
 
   private static final Logger LOG = Logger.getLogger(FixedObjectTypeAttributeDefinition.class.getName());
 
-  public FixedObjectTypeAttributeDefinition(AbstractAttributeDefinitionBuilder<?, ? extends ObjectTypeAttributeDefinition> builder, String suffix, AttributeDefinition[] valueTypes) {
+  public FixedObjectTypeAttributeDefinition(AbstractAttributeDefinitionBuilder<?, ? extends ObjectTypeAttributeDefinition> builder,
+                                            String suffix,
+                                            AttributeDefinition[] valueTypes) {
     super(builder, suffix, valueTypes);
   }
 
   @Override
-  protected void addValueTypeDescription(ModelNode node, String prefix, ResourceBundle bundle, ResourceDescriptionResolver resolver, Locale locale) {
+  protected void addValueTypeDescription(ModelNode node,
+                                         String prefix,
+                                         ResourceBundle bundle,
+                                         ResourceDescriptionResolver resolver,
+                                         Locale locale) {
     super.addValueTypeDescription(node, prefix, bundle, false, resolver, locale);
 
     try {
       Field valueTypesField = ObjectTypeAttributeDefinition.class.getDeclaredField("valueTypes");
       valueTypesField.setAccessible(true);
       Object value = valueTypesField.get(this);
-      if (value == null) {
-        return;
-      } else if (AttributeDefinition[].class.isAssignableFrom(value.getClass())){
-        for (AttributeDefinition valueType : (AttributeDefinition[])value) {
-          final ModelNode childType = node.get(ModelDescriptionConstants.VALUE_TYPE, valueType.getName());
+      if (value != null) {
+        if (AttributeDefinition[].class.isAssignableFrom(value.getClass())) {
+          for (AttributeDefinition valueType : (AttributeDefinition[]) value) {
+            final ModelNode childType = node.get(ModelDescriptionConstants.VALUE_TYPE, valueType.getName());
 
-          if (valueType instanceof MapAttributeDefinition) {
-            if (!childType.hasDefined(ModelDescriptionConstants.VALUE_TYPE)) {
-              childType.get(ModelDescriptionConstants.VALUE_TYPE).set(ModelType.STRING);
-            }
-            if (!childType.hasDefined(ModelDescriptionConstants.EXPRESSIONS_ALLOWED)) {
-              childType.get(ModelDescriptionConstants.EXPRESSIONS_ALLOWED).set(new ModelNode(false));
+            if (valueType instanceof MapAttributeDefinition) {
+              if (!childType.hasDefined(ModelDescriptionConstants.VALUE_TYPE)) {
+                childType.get(ModelDescriptionConstants.VALUE_TYPE).set(ModelType.STRING);
+              }
+              if (!childType.hasDefined(ModelDescriptionConstants.EXPRESSIONS_ALLOWED)) {
+                childType.get(ModelDescriptionConstants.EXPRESSIONS_ALLOWED).set(new ModelNode(false));
+              }
             }
           }
         }
       }
-    } catch (NoSuchFieldException e) {
-      LOG.warning("Could not access 'valueTypes', the attribute is added nonetheless");
-    } catch (IllegalAccessException e) {
+    } catch (NoSuchFieldException | IllegalAccessException e) {
       LOG.warning("Could not access 'valueTypes', the attribute is added nonetheless");
     }
   }
 
-  public static final class Builder extends AbstractAttributeDefinitionBuilder<Builder, FixedObjectTypeAttributeDefinition> {
+  public static final class Builder
+      extends AbstractAttributeDefinitionBuilder<Builder, FixedObjectTypeAttributeDefinition> {
     private String suffix;
     private final AttributeDefinition[] valueTypes;
 
@@ -92,8 +98,10 @@ public class FixedObjectTypeAttributeDefinition extends ObjectTypeAttributeDefin
       return new Builder(name, valueTypes);
     }
 
-    public static Builder of(final String name, final AttributeDefinition[] valueTypes, final AttributeDefinition[] moreValueTypes) {
-      ArrayList<AttributeDefinition> list = new ArrayList<AttributeDefinition>(Arrays.asList(valueTypes));
+    public static Builder of(final String name,
+                             final AttributeDefinition[] valueTypes,
+                             final AttributeDefinition[] moreValueTypes) {
+      ArrayList<AttributeDefinition> list = new ArrayList<>(Arrays.asList(valueTypes));
       list.addAll(Arrays.asList(moreValueTypes));
       AttributeDefinition[] allValueTypes = new AttributeDefinition[list.size()];
       list.toArray(allValueTypes);
@@ -102,14 +110,12 @@ public class FixedObjectTypeAttributeDefinition extends ObjectTypeAttributeDefin
     }
 
     public FixedObjectTypeAttributeDefinition build() {
-      if (validator == null) { validator = new ObjectTypeValidator(allowNull, valueTypes); }
-//      attributeMarshaller = new Object
+      ParameterValidator validator = getValidator();
+      if (validator == null) {
+        ObjectTypeValidator objectTypeValidator = new ObjectTypeValidator(isAllowNull(), valueTypes);
+        setValidator(objectTypeValidator);
+      }
       return new FixedObjectTypeAttributeDefinition(this, suffix, valueTypes);
-    }
-
-    public Builder setSuffix(final String suffix) {
-      this.suffix = suffix;
-      return this;
     }
 
     /*
