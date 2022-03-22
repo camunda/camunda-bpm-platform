@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://activiti.org/bpmn" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="test-process" targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL">
+  <process id="ProcessEngineTests-job" name="Test Process" isExecutable="true">
+    <parallelGateway id="ParallelGateway_1">
+      <incoming>SequenceFlow_6</incoming>
+      <outgoing>SequenceFlow_7</outgoing>
+      <outgoing>SequenceFlow_12</outgoing>
+    </parallelGateway>
+    <serviceTask id="ServiceTask_1" camunda:expression="#{serviceTask_1}" camunda:async="true">
+      <incoming>SequenceFlow_5</incoming>
+      <outgoing>SequenceFlow_6</outgoing>
+    </serviceTask>
+    <sequenceFlow id="SequenceFlow_6" name="" sourceRef="ServiceTask_1" targetRef="ParallelGateway_1"/>
+    <startEvent id="StartEvent_1">
+      <outgoing>SequenceFlow_5</outgoing>
+    </startEvent>
+    <sequenceFlow id="SequenceFlow_5" name="" sourceRef="StartEvent_1" targetRef="ServiceTask_1"/>
+    <serviceTask id="ServiceTask_2" camunda:expression="#{serviceTask_2}" camunda:async="true">
+      <incoming>SequenceFlow_7</incoming>
+      <outgoing>SequenceFlow_16</outgoing>
+    </serviceTask>
+    <sequenceFlow id="SequenceFlow_7" name="" sourceRef="ParallelGateway_1" targetRef="ServiceTask_2"/>
+    <serviceTask id="ServiceTask_3" camunda:expression="#{serviceTask_3}" camunda:async="true">
+      <incoming>SequenceFlow_12</incoming>
+      <outgoing>SequenceFlow_17</outgoing>
+    </serviceTask>
+    <sequenceFlow id="SequenceFlow_12" name="" sourceRef="ParallelGateway_1" targetRef="ServiceTask_3"/>
+    <endEvent id="EndEvent_1">
+      <incoming>SequenceFlow_18</incoming>
+    </endEvent>
+    <parallelGateway id="ParallelGateway_2">
+      <incoming>SequenceFlow_16</incoming>
+      <incoming>SequenceFlow_17</incoming>
+      <outgoing>SequenceFlow_18</outgoing>
+    </parallelGateway>
+    <sequenceFlow id="SequenceFlow_16" name="" sourceRef="ServiceTask_2" targetRef="ParallelGateway_2"/>
+    <sequenceFlow id="SequenceFlow_17" name="" sourceRef="ServiceTask_3" targetRef="ParallelGateway_2"/>
+    <sequenceFlow id="SequenceFlow_18" name="" sourceRef="ParallelGateway_2" targetRef="EndEvent_1"/>
+  </process>
+  <bpmndi:BPMNDiagram id="sid-830c5f5e-90b8-4b10-84fa-0fe5d466f2d0">
+    <bpmndi:BPMNPlane id="sid-c40130ce-08e6-4f67-ae3d-774a7f6a3ead" bpmnElement="ProcessEngineTests-job">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <omgdc:Bounds height="28.0" width="28.0" x="111.0" y="112.0"/>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="0.0" width="0.0" x="125.0" y="145.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_ParallelGateway_2" bpmnElement="ParallelGateway_1">
+        <omgdc:Bounds height="40.0" width="40.0" x="334.0" y="105.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_EndEvent_2" bpmnElement="EndEvent_1">
+        <omgdc:Bounds height="28.0" width="28.0" x="648.0" y="112.0"/>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="0.0" width="0.0" x="662.0" y="145.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_ServiceTask_2" bpmnElement="ServiceTask_1">
+        <omgdc:Bounds height="80.0" width="100.0" x="180.0" y="86.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_5" bpmnElement="SequenceFlow_5" sourceElement="_BPMNShape_StartEvent_2" targetElement="_BPMNShape_ServiceTask_2">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="139.0" y="126.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="180.0" y="126.0"/>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="6.0" width="6.0" x="160.0" y="126.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_6" bpmnElement="SequenceFlow_6" sourceElement="_BPMNShape_ServiceTask_2" targetElement="_BPMNShape_ParallelGateway_2">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="280.0" y="126.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="334.0" y="125.0"/>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="6.0" width="6.0" x="304.0" y="126.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_ServiceTask_3" bpmnElement="ServiceTask_2">
+        <omgdc:Bounds height="80.0" width="100.0" x="420.0" y="26.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_7" bpmnElement="SequenceFlow_7" sourceElement="_BPMNShape_ParallelGateway_2" targetElement="_BPMNShape_ServiceTask_3">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="354.0" y="105.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="354.0" y="66.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="397.0" y="66.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="420.0" y="66.0"/>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="6.0" width="6.0" x="364.0" y="66.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_ServiceTask_4" bpmnElement="ServiceTask_3">
+        <omgdc:Bounds height="80.0" width="100.0" x="420.0" y="144.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_12" bpmnElement="SequenceFlow_12" sourceElement="_BPMNShape_ParallelGateway_2" targetElement="_BPMNShape_ServiceTask_4">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="354.0" y="145.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="354.0" y="184.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="397.0" y="184.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="420.0" y="184.0"/>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="6.0" width="6.0" x="365.0" y="184.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_ParallelGateway_3" bpmnElement="ParallelGateway_2">
+        <omgdc:Bounds height="40.0" width="40.0" x="566.0" y="105.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_16" bpmnElement="SequenceFlow_16" sourceElement="_BPMNShape_ServiceTask_3" targetElement="_BPMNShape_ParallelGateway_3">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="520.0" y="66.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="543.0" y="66.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="586.0" y="66.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="586.0" y="105.0"/>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="6.0" width="6.0" x="570.0" y="66.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_17" bpmnElement="SequenceFlow_17" sourceElement="_BPMNShape_ServiceTask_4" targetElement="_BPMNShape_ParallelGateway_3">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="520.0" y="184.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="543.0" y="184.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="586.0" y="184.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="586.0" y="145.0"/>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="6.0" width="6.0" x="569.0" y="184.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_18" bpmnElement="SequenceFlow_18" sourceElement="_BPMNShape_ParallelGateway_3" targetElement="_BPMNShape_EndEvent_2">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="606.0" y="125.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="627.0" y="125.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="627.0" y="126.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="648.0" y="126.0"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
