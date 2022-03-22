@@ -29,7 +29,7 @@
         <management-interfaces>
             <http-interface http-authentication-factory="management-http-authentication">
                 <http-upgrade enabled="true" sasl-authentication-factory="management-sasl-authentication"/>
-                <socket interface="management" port="${jboss.management.http.port:9990}"/>
+                <socket interface="management" port="${jboss.management-http.port}"/>
             </http-interface>
         </management-interfaces>
     </management>
