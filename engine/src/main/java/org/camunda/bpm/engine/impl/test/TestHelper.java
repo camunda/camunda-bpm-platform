@@ -95,12 +95,13 @@ public abstract class TestHelper {
     ProcessEngineAssert.assertProcessEnded(processEngine, processInstanceId);
   }
 
-  public static String annotationDeploymentSetUp(ProcessEngine processEngine, Class<?> testClass, String methodName, Deployment deploymentAnnotation) {
+  public static String annotationDeploymentSetUp(ProcessEngine processEngine, Class<?> testClass, String methodName,
+      Deployment deploymentAnnotation, Class<?>... parameterTypes) {
     Method method = null;
     boolean onMethod = true;
 
     try {
-      method = getMethod(testClass, methodName);
+      method = getMethod(testClass, methodName, parameterTypes);
     } catch (Exception e) {
       if (deploymentAnnotation == null) {
         // we have neither the annotation, nor can look it up from the method
@@ -140,7 +141,8 @@ public abstract class TestHelper {
     return annotationDeploymentSetUp(processEngine, resources, testClass, true, methodName);
   }
 
-  public static String annotationDeploymentSetUp(ProcessEngine processEngine, String[] resources, Class<?> testClass, boolean onMethod, String methodName) {
+  public static String annotationDeploymentSetUp(ProcessEngine processEngine, String[] resources, Class<?> testClass,
+      boolean onMethod, String methodName) {
     if (resources != null) {
       if (resources.length == 0 && methodName != null) {
         String name = onMethod ? methodName : null;
@@ -162,8 +164,8 @@ public abstract class TestHelper {
     return null;
   }
 
-  public static String annotationDeploymentSetUp(ProcessEngine processEngine, Class<?> testClass, String methodName) {
-    return annotationDeploymentSetUp(processEngine, testClass, methodName, (Deployment) null);
+  public static String annotationDeploymentSetUp(ProcessEngine processEngine, Class<?> testClass, String methodName, Class<?>... parameterTypes) {
+    return annotationDeploymentSetUp(processEngine, testClass, methodName, (Deployment) null, parameterTypes);
   }
 
   public static void annotationDeploymentTearDown(ProcessEngine processEngine, String deploymentId, Class<?> testClass, String methodName) {
@@ -234,8 +236,8 @@ public abstract class TestHelper {
     throw new IllegalArgumentException("Unknown history level: " + name);
   }
 
-  public static boolean annotationRequiredHistoryLevelCheck(ProcessEngine processEngine, Class<?> testClass, String methodName) {
-    RequiredHistoryLevel annotation = getAnnotation(processEngine, testClass, methodName, RequiredHistoryLevel.class);
+  public static boolean annotationRequiredHistoryLevelCheck(ProcessEngine processEngine, Class<?> testClass, String methodName, Class<?>... parameterTypes) {
+    RequiredHistoryLevel annotation = getAnnotation(processEngine, testClass, methodName, RequiredHistoryLevel.class, parameterTypes);
 
     if (annotation != null) {
       return historyLevelCheck(processEngine, annotation);
@@ -244,18 +246,18 @@ public abstract class TestHelper {
     }
   }
 
-  public static boolean annotationRequiredDatabaseCheck(ProcessEngine processEngine, RequiredDatabase annotation, Class<?> testClass, String methodName) {
+  public static boolean annotationRequiredDatabaseCheck(ProcessEngine processEngine, RequiredDatabase annotation, Class<?> testClass, String methodName, Class<?>... parameterTypes) {
 
     if (annotation != null) {
       return databaseCheck(processEngine, annotation);
 
     } else {
-      return annotationRequiredDatabaseCheck(processEngine, testClass, methodName);
+      return annotationRequiredDatabaseCheck(processEngine, testClass, methodName, parameterTypes);
     }
   }
 
-  public static boolean annotationRequiredDatabaseCheck(ProcessEngine processEngine, Class<?> testClass, String methodName) {
-    RequiredDatabase annotation = getAnnotation(processEngine, testClass, methodName, RequiredDatabase.class);
+  public static boolean annotationRequiredDatabaseCheck(ProcessEngine processEngine, Class<?> testClass, String methodName, Class<?>... parameterTypes) {
+    RequiredDatabase annotation = getAnnotation(processEngine, testClass, methodName, RequiredDatabase.class, parameterTypes);
 
     if (annotation != null) {
       return databaseCheck(processEngine, annotation);
@@ -278,16 +280,16 @@ public abstract class TestHelper {
         }
       }
     }
-    
+
     String[] includes = annotation.includes();
-    
+
     if (includes != null && includes.length > 0) {
       for (String include : includes) {
         if (include.equals(actualDbType)) {
           return true;
         }
       }
-      
+
       return false;
     } else {
       return true;
@@ -296,12 +298,13 @@ public abstract class TestHelper {
   }
 
 
-  private static <T extends Annotation> T getAnnotation(ProcessEngine processEngine, Class<?> testClass, String methodName, Class<T> annotationClass) {
+  private static <T extends Annotation> T getAnnotation(ProcessEngine processEngine, Class<?> testClass,
+      String methodName, Class<T> annotationClass, Class<?>... parameterTypes) {
     Method method = null;
     T annotation = null;
 
     try {
-      method = getMethod(testClass, methodName);
+      method = getMethod(testClass, methodName, parameterTypes);
       annotation = method.getAnnotation(annotationClass);
     } catch (Exception e) {
       // - ignore if we cannot access the method
@@ -318,8 +321,8 @@ public abstract class TestHelper {
     return annotation;
   }
 
-  protected static Method getMethod(Class<?> clazz, String methodName) throws SecurityException, NoSuchMethodException {
-    return clazz.getMethod(methodName, (Class<?>[]) null);
+  protected static Method getMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) throws SecurityException, NoSuchMethodException {
+    return clazz.getMethod(methodName, parameterTypes);
   }
 
   /**
