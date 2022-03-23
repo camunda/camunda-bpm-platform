@@ -34,7 +34,7 @@ public class CaseInstanceAssertIsClosedTest extends ProcessAssertTestCase {
 
   @Rule
   public ProcessEngineRule processEngineRule = new ProcessEngineRule();
-  
+
   @Test
   @Deployment(resources = { "cmmn/CaseTaskAssertIsTerminatedTest.cmmn" })
   public void testIsClosed_Success() {

@@ -16,26 +16,38 @@
  */
 package org.camunda.bpm.engine.test.assertions.bpmn;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.assertj.core.api.*;
+import org.assertj.core.api.Assertions;
+import org.assertj.core.api.ListAssert;
+import org.assertj.core.api.MapAssert;
 import org.assertj.core.util.Lists;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
-import org.camunda.bpm.engine.history.*;
+import org.camunda.bpm.engine.history.HistoricActivityInstance;
+import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
+import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
+import org.camunda.bpm.engine.history.HistoricVariableInstance;
+import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
-import org.camunda.bpm.engine.runtime.*;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.ExecutionQuery;
+import org.camunda.bpm.engine.runtime.JobQuery;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.assertions.AssertionsLogger;
 
 /**
- * Assertions for a {@link ProcessInstance}
- * @author Martin Schimak (martin.schimak@plexiti.com)
- * @author Rafael Cordones (rafael@cordones.me)
- * @author Ingo Richtsmeier
+ * Assertions for a {@link ProcessInstance}.
  */
 public class ProcessInstanceAssert extends AbstractProcessAssert<ProcessInstanceAssert, ProcessInstance> {
 
@@ -130,7 +142,7 @@ public class ProcessInstanceAssert extends AbstractProcessAssert<ProcessInstance
     final String message = "Expecting %s " +
       (isWaitingAt ? "to be waiting at " + (exactly ? "exactly " : "") + "%s, ": "NOT to be waiting at %s, ") +
       "but it is actually waiting at %s.";
-    ListAssert<String> assertion = (ListAssert<String>) Assertions.assertThat(decendentActivityIds)
+    ListAssert<String> assertion = Assertions.assertThat(decendentActivityIds)
       .overridingErrorMessage(message,
         toString(current),
         Lists.newArrayList(activityIds),
@@ -204,7 +216,7 @@ public class ProcessInstanceAssert extends AbstractProcessAssert<ProcessInstance
       .isNotNull().isNotEmpty().doesNotContainNull();
     for (String messageName: messageNames) {
       List<Execution> executions = executionQuery().messageEventSubscriptionName(messageName).list();
-      ListAssert<Execution> assertion = (ListAssert<Execution>) Assertions.assertThat(executions).overridingErrorMessage("Expecting %s " +
+      ListAssert<Execution> assertion = Assertions.assertThat(executions).overridingErrorMessage("Expecting %s " +
         (isWaitingFor ? "to be waiting for %s, ": "NOT to be waiting for %s, ") +
         "but actually did " + (isWaitingFor ? "not ": "") + "find it to be waiting for message [%s].",
         actual, Arrays.asList(messageNames), messageName);
@@ -264,7 +276,7 @@ public class ProcessInstanceAssert extends AbstractProcessAssert<ProcessInstance
         .orderByHistoricActivityInstanceEndTime().asc()
         .orderPartiallyByOccurrence().asc()
         .list();
-    List<String> finished = new ArrayList<String>(finishedInstances.size());
+    List<String> finished = new ArrayList<>(finishedInstances.size());
     for (HistoricActivityInstance instance: finishedInstances) {
       finished.add(instance.getActivityId());
     }
@@ -274,7 +286,7 @@ public class ProcessInstanceAssert extends AbstractProcessAssert<ProcessInstance
         : "NOT to have passed activities %s, ") +
       "but actually we found that it passed %s. (Please make sure you have set the history " +
       "service of the engine to at least 'activity' or a higher level before making use of this assertion!)";
-    ListAssert<String> assertion = (ListAssert<String>) Assertions.assertThat(finished)
+    ListAssert<String> assertion = Assertions.assertThat(finished)
       .overridingErrorMessage(message,
         actual,
         Lists.newArrayList(activityIds),
@@ -284,15 +296,15 @@ public class ProcessInstanceAssert extends AbstractProcessAssert<ProcessInstance
       assertion.contains(activityIds);
       if (inOrder) {
         List<String> remainingFinished = finished;
-        for (int i = 0; i< activityIds.length; i++) {
+        for (String activityId : activityIds) {
           Assertions.assertThat(remainingFinished)
             .overridingErrorMessage(message,
               actual,
               Lists.newArrayList(activityIds),
               Lists.newArrayList(finished)
             )
-            .contains(activityIds[i]);
-          remainingFinished = remainingFinished.subList(remainingFinished.indexOf(activityIds[i]) + 1, remainingFinished.size());
+            .contains(activityId);
+          remainingFinished = remainingFinished.subList(remainingFinished.indexOf(activityId) + 1, remainingFinished.size());
         }
       }
     }
@@ -719,7 +731,7 @@ public class ProcessInstanceAssert extends AbstractProcessAssert<ProcessInstance
    *          Inspecting an empty map in case no such variables are available.
    */
   public MapAssert<String, Object> variables() {
-    return (MapAssert<String, Object>) Assertions.assertThat(vars());
+    return Assertions.assertThat(vars());
   }
 
   /* Return variables map - independent of running/historic instance status */
@@ -729,7 +741,7 @@ public class ProcessInstanceAssert extends AbstractProcessAssert<ProcessInstance
       return runtimeService().getVariables(current.getProcessInstanceId());
     } else {
       List<HistoricVariableInstance> instances = historicVariableInstanceQuery().list();
-      Map<String, Object> map = new HashMap<String, Object>();
+      Map<String, Object> map = new HashMap<>();
       for (HistoricVariableInstance instance : instances) {
         map.put(instance.getName(), instance.getValue());
       }

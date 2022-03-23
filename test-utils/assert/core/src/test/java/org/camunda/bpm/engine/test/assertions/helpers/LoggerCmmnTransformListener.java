@@ -20,13 +20,20 @@ import org.camunda.bpm.engine.delegate.CaseExecutionListener;
 import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.transformer.AbstractCmmnTransformListener;
-import org.camunda.bpm.model.cmmn.instance.*;
+import org.camunda.bpm.model.cmmn.instance.CaseTask;
+import org.camunda.bpm.model.cmmn.instance.HumanTask;
+import org.camunda.bpm.model.cmmn.instance.Milestone;
+import org.camunda.bpm.model.cmmn.instance.PlanItem;
+import org.camunda.bpm.model.cmmn.instance.ProcessTask;
+import org.camunda.bpm.model.cmmn.instance.Stage;
+import org.camunda.bpm.model.cmmn.instance.Task;
 
 /**
  * Created by Malte on 08.09.2015.
  */
 public class LoggerCmmnTransformListener extends AbstractCmmnTransformListener {
   public static CaseExecutionListener listener = new CaseExecutionListener() {
+    @Override
     public void notify(DelegateCaseExecution var1) throws Exception {
       System.out.printf("Execution Event: %s %s\n", var1.getEventName(), var1.getActivityId());
     }
@@ -46,26 +53,32 @@ public class LoggerCmmnTransformListener extends AbstractCmmnTransformListener {
     }
   }
 
+  @Override
   public void transformHumanTask(PlanItem planItem, HumanTask humanTask, CmmnActivity activity) {
     addListeners(activity);
   }
 
+  @Override
   public void transformProcessTask(PlanItem planItem, ProcessTask processTask, CmmnActivity activity) {
     addListeners(activity);
   }
 
+  @Override
   public void transformCaseTask(PlanItem planItem, CaseTask caseTask, CmmnActivity activity) {
     addListeners(activity);
   }
 
+  @Override
   public void transformTask(PlanItem planItem, Task task, CmmnActivity activity) {
     addListeners(activity);
   }
 
+  @Override
   public void transformStage(PlanItem planItem, Stage stage, CmmnActivity activity) {
     addListeners(activity);
   }
 
+  @Override
   public void transformMilestone(PlanItem planItem, Milestone milestone, CmmnActivity activity) {
     addListeners(activity);
   }

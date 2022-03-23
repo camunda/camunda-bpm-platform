@@ -16,6 +16,14 @@
  */
 package org.camunda.bpm.engine.test.assertions.bpmn;
 
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.calledProcessInstance;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.complete;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.processInstanceQuery;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.runtimeService;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.task;
+import static org.junit.Assert.fail;
+
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -24,12 +32,6 @@ import org.camunda.bpm.engine.test.assertions.helpers.ProcessAssertTestCase;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
-import static org.junit.Assert.fail;
-
-/**
- * @author Martin Schimak (martin.schimak@plexiti.com)
- */
 public class ProcessEngineTestsCalledProcessInstanceTest extends ProcessAssertTestCase {
 
   @Rule
@@ -50,7 +52,7 @@ public class ProcessEngineTestsCalledProcessInstanceTest extends ProcessAssertTe
       }
     });
   }
-  
+
   @Test
   @Deployment(resources = {"bpmn/ProcessEngineTests-calledProcessInstance-superProcess1.bpmn", "bpmn/ProcessEngineTests-calledProcessInstance-subProcess1.bpmn", "bpmn/ProcessEngineTests-calledProcessInstance-subProcess2.bpmn"
   })
@@ -61,7 +63,7 @@ public class ProcessEngineTestsCalledProcessInstanceTest extends ProcessAssertTe
     // Then
     assertThat(calledProcessInstance(processInstance)).isNotNull();
   }
-  
+
   @Test
   @Deployment(resources = {"bpmn/ProcessEngineTests-calledProcessInstance-superProcess1.bpmn", "bpmn/ProcessEngineTests-calledProcessInstance-subProcess1.bpmn", "bpmn/ProcessEngineTests-calledProcessInstance-subProcess2.bpmn"
   })
@@ -77,7 +79,7 @@ public class ProcessEngineTestsCalledProcessInstanceTest extends ProcessAssertTe
       }
     });
   }
-  
+
   @Test
   @Deployment(resources = {"bpmn/ProcessEngineTests-calledProcessInstance-superProcess1.bpmn", "bpmn/ProcessEngineTests-calledProcessInstance-subProcess1.bpmn", "bpmn/ProcessEngineTests-calledProcessInstance-subProcess2.bpmn"
   })
@@ -93,7 +95,7 @@ public class ProcessEngineTestsCalledProcessInstanceTest extends ProcessAssertTe
       }
     });
   }
-  
+
   @Test
   @Deployment(resources = {"bpmn/ProcessEngineTests-calledProcessInstance-superProcess1.bpmn", "bpmn/ProcessEngineTests-calledProcessInstance-subProcess1.bpmn", "bpmn/ProcessEngineTests-calledProcessInstance-subProcess2.bpmn"
   })
@@ -105,7 +107,7 @@ public class ProcessEngineTestsCalledProcessInstanceTest extends ProcessAssertTe
     // Then
     assertThat(calledProcessInstance(subProcessDefinitionKey, processInstance)).isNotNull();
   }
-  
+
   @Test
   @Deployment(resources = {"bpmn/ProcessEngineTests-calledProcessInstance-superProcess1.bpmn", "bpmn/ProcessEngineTests-calledProcessInstance-subProcess1.bpmn", "bpmn/ProcessEngineTests-calledProcessInstance-subProcess2.bpmn"
   })
@@ -127,7 +129,7 @@ public class ProcessEngineTestsCalledProcessInstanceTest extends ProcessAssertTe
       // expected
     }
   }
-  
+
   @Test
   @Deployment(resources = {"bpmn/ProcessEngineTests-calledProcessInstance-superProcess1.bpmn", "bpmn/ProcessEngineTests-calledProcessInstance-subProcess1.bpmn", "bpmn/ProcessEngineTests-calledProcessInstance-subProcess2.bpmn"
   })

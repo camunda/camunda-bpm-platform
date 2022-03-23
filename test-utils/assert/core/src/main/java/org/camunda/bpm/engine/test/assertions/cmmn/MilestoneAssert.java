@@ -19,10 +19,6 @@ package org.camunda.bpm.engine.test.assertions.cmmn;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 
-/**
- * @author Martin Schimak (martin.schimak@plexiti.com)
- * @author Malte Sörense (malte.soerensen@holisticon.de)
- */
 public class MilestoneAssert extends AbstractCaseAssert<MilestoneAssert, CaseExecution> {
 
 	protected MilestoneAssert(final ProcessEngine engine, final CaseExecution actual) {

@@ -16,17 +16,14 @@
  */
 package org.camunda.bpm.engine.test.assertions.bpmn;
 
+import java.util.Map;
+
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngines;
 
-import java.util.Map;
-
-/**
- * @author Martin Schimak (martin.schimak@plexiti.com)
- */
 public abstract class AbstractAssertions {
 
-  static ThreadLocal<ProcessEngine> processEngine = new ThreadLocal<ProcessEngine>();
+  static ThreadLocal<ProcessEngine> processEngine = new ThreadLocal<>();
 
   /**
    * Retrieve the processEngine bound to the current testing thread
@@ -36,7 +33,7 @@ public abstract class AbstractAssertions {
    *
    * @return  processEngine bound to the current testing thread
    * @throws  IllegalStateException in case a processEngine has not
-   *          been initialised yet and cannot be initialised with a 
+   *          been initialised yet and cannot be initialised with a
    *          default engine.
    */
   public static ProcessEngine processEngine() {

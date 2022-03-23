@@ -17,26 +17,23 @@
 package org.camunda.bpm.engine.test.assertions.helpers;
 
 
-import org.assertj.core.util.Lists;
-import org.junit.After;
-
 import static org.assertj.core.api.Assertions.fail;
 import static org.camunda.bpm.engine.test.assertions.bpmn.AbstractAssertions.reset;
 
-/**
- * @author Martin Schimak (martin.schimak@plexiti.com)
- */
+import org.assertj.core.util.Lists;
+import org.junit.After;
+
 public abstract class ProcessAssertTestCase {
 
   @After
   public void tearDown() {
     reset();
   }
-  
+
   protected void expect(Failure fail) {
     expect(fail, AssertionError.class);
   }
-  
+
   protected void expect(Failure fail, String messageContent) {
     try {
       fail.when();
@@ -55,8 +52,7 @@ public abstract class ProcessAssertTestCase {
     try {
       fail.when();
     } catch (Throwable e) {
-      for (int i = 0; i< exception.length; i++) {
-        Class<? extends Throwable> t = exception[i];
+      for (Class<? extends Throwable> t : exception) {
         if (t.isAssignableFrom(e.getClass())) {
           System.out.println(String.format("caught " + e.getClass().getSimpleName() + " of expected type " + t.getSimpleName() + " with message '%s'", e.getMessage()));
           return;

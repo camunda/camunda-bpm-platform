@@ -20,25 +20,21 @@ import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.TransitionInstance;
 import org.camunda.commons.logging.BaseLogger;
 
-/**
- * @author Ingo Richtsmeier
- *
- */
 public class AssertionsLogger extends BaseLogger {
-  
+
   public static final AssertionsLogger INSTANCE = BaseLogger.createLogger(
       AssertionsLogger.class, "BPM_ASSERT", "org.camunda.bpm.engine.test.assertions", "00");
-  
+
   public void collectTransitionInstances(ActivityInstance activityInstance) {
-    logDebug("001", "Collecting transition instances for activity instance '{}' at activity with ID '{}' and name '{}'", 
+    logDebug("001", "Collecting transition instances for activity instance '{}' at activity with ID '{}' and name '{}'",
         activityInstance.getId(),
         activityInstance.getActivityId(),
         activityInstance.getActivityName());
   }
-  
+
   public void foundTransitionInstances(TransitionInstance transitionInstance) {
-    logDebug("002", "found transition instance '{}' at activity with ID '{}'", 
-        transitionInstance.getId(), 
+    logDebug("002", "found transition instance '{}' at activity with ID '{}'",
+        transitionInstance.getId(),
         transitionInstance.getActivityId());
   }
 

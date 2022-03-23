@@ -16,6 +16,11 @@
  */
 package org.camunda.bpm.engine.test.assertions.bpmn;
 
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.runtimeService;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.task;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.unclaim;
+
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -24,11 +29,6 @@ import org.camunda.bpm.engine.test.assertions.helpers.ProcessAssertTestCase;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
-
-/**
- * @author Jens Kanschik
- */
 public class ProcessEngineTestsUnclaimTest extends ProcessAssertTestCase {
 
   @Rule

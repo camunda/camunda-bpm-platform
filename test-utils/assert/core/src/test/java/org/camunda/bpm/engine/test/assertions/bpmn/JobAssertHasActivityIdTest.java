@@ -16,20 +16,18 @@
  */
 package org.camunda.bpm.engine.test.assertions.bpmn;
 
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.job;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.runtimeService;
+
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
-import org.camunda.bpm.engine.test.assertions.ProcessEngineTests;
 import org.camunda.bpm.engine.test.assertions.helpers.Failure;
 import org.camunda.bpm.engine.test.assertions.helpers.ProcessAssertTestCase;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
-
-/**
- * @author Martin Schimak (martin.schimak@plexiti.com)
- */
 public class JobAssertHasActivityIdTest extends ProcessAssertTestCase {
 
   @Rule
@@ -44,7 +42,7 @@ public class JobAssertHasActivityIdTest extends ProcessAssertTestCase {
       "JobAssert-hasActivityId"
     );
     // And
-    assertThat(processInstance).isNotNull();    
+    assertThat(processInstance).isNotNull();
     // Then
     assertThat(job()).isNotNull();
     // And
@@ -88,7 +86,7 @@ public class JobAssertHasActivityIdTest extends ProcessAssertTestCase {
     expect(new Failure() {
       @Override
       public void when() {
-        ProcessEngineTests.assertThat(job()).hasActivityId(null);
+        BpmnAwareTests.assertThat(job()).hasActivityId(null);
       }
     });
   }

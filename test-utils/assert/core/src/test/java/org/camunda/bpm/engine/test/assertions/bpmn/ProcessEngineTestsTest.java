@@ -16,11 +16,57 @@
  */
 package org.camunda.bpm.engine.test.assertions.bpmn;
 
-import org.camunda.bpm.engine.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.engine.test.assertions.bpmn.AbstractAssertions.init;
+import static org.camunda.bpm.engine.test.assertions.bpmn.AbstractAssertions.processEngine;
+import static org.camunda.bpm.engine.test.assertions.bpmn.AbstractAssertions.reset;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.authorizationService;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.executionQuery;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.formService;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.historyService;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.identityService;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.jobQuery;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.managementService;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.processDefinitionQuery;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.processInstanceQuery;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.repositoryService;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.runtimeService;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.taskQuery;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.taskService;
+import static org.camunda.bpm.engine.test.assertions.cmmn.CmmnAwareTests.assertThat;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.camunda.bpm.engine.AuthorizationService;
+import org.camunda.bpm.engine.FormService;
+import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngines;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
-import org.camunda.bpm.engine.runtime.*;
+import org.camunda.bpm.engine.runtime.CaseExecution;
+import org.camunda.bpm.engine.runtime.CaseInstance;
+import org.camunda.bpm.engine.runtime.ExecutionQuery;
+import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.runtime.JobQuery;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.assertions.cmmn.CaseDefinitionAssert;
@@ -34,19 +80,6 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.assertThat;
-import static org.junit.Assert.fail;
-import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
-
-/**
- * @author Martin Schimak (martin.schimak@plexiti.com)
- */
 @RunWith(MockitoJUnitRunner.class)
 public class ProcessEngineTestsTest {
 

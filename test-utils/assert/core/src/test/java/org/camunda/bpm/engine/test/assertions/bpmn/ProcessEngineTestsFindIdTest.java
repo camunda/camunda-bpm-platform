@@ -16,15 +16,15 @@
  */
 package org.camunda.bpm.engine.test.assertions.bpmn;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.findId;
+
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.assertions.helpers.Failure;
 import org.camunda.bpm.engine.test.assertions.helpers.ProcessAssertTestCase;
 import org.junit.Rule;
 import org.junit.Test;
-
-import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
-import static org.assertj.core.api.Assertions.*;
 
 public class ProcessEngineTestsFindIdTest extends ProcessAssertTestCase {
 

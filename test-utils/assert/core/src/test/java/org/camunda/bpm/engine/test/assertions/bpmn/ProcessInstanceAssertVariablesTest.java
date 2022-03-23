@@ -16,6 +16,12 @@
  */
 package org.camunda.bpm.engine.test.assertions.bpmn;
 
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.complete;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.runtimeService;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.task;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.withVariables;
+
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -24,11 +30,6 @@ import org.camunda.bpm.engine.test.assertions.helpers.ProcessAssertTestCase;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
-
-/**
- * @author Martin Schimak (martin.schimak@plexiti.com)
- */
 public class ProcessInstanceAssertVariablesTest extends ProcessAssertTestCase {
 
   @Rule
@@ -58,7 +59,7 @@ public class ProcessInstanceAssertVariablesTest extends ProcessAssertTestCase {
     final ProcessInstance processInstance = runtimeService().startProcessInstanceByKey(
       "ProcessInstanceAssert-variables", withVariables("aVariable", "aValue")
     );
-    // Then 
+    // Then
     assertThat(processInstance).variables().containsEntry("aVariable", "aValue");
     // When
     complete(task(processInstance), withVariables("aVariable", "anotherValue"));

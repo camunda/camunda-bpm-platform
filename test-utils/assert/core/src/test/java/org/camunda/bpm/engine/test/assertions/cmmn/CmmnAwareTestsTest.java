@@ -16,9 +16,14 @@
  */
 package org.camunda.bpm.engine.test.assertions.cmmn;
 
-import static org.camunda.bpm.engine.test.assertions.cmmn.CmmnAwareTests.withVariables;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.withVariables;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import org.assertj.core.api.Assertions;
@@ -27,7 +32,10 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
-import org.camunda.bpm.engine.runtime.*;
+import org.camunda.bpm.engine.runtime.CaseExecution;
+import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
+import org.camunda.bpm.engine.runtime.CaseInstance;
+import org.camunda.bpm.engine.runtime.CaseInstanceQuery;
 import org.camunda.bpm.engine.test.assertions.bpmn.AbstractAssertions;
 import org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests;
 import org.camunda.bpm.engine.test.assertions.helpers.CaseExecutionQueryFluentAnswer;
@@ -47,7 +55,6 @@ import org.mockito.junit.MockitoJUnitRunner;
  * That's because simple, one-liner boilerplate code is not regarded as test-worthy.
  * That code is so simplistic, it is not expected to break easily.
  *
- * @author Malte Sörensen (malte.soerensen@holisticon.de)
  */
 @RunWith(MockitoJUnitRunner.class)
 public class CmmnAwareTestsTest {

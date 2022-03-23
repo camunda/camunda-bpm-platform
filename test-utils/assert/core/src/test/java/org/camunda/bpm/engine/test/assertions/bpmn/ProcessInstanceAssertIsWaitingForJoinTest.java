@@ -16,7 +16,10 @@
  */
 package org.camunda.bpm.engine.test.assertions.bpmn;
 
-import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.*;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.complete;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.runtimeService;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.task;
 
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
@@ -26,10 +29,6 @@ import org.camunda.bpm.engine.test.assertions.helpers.ProcessAssertTestCase;
 import org.junit.Rule;
 import org.junit.Test;
 
-/**
- * @author Ingo Richtsmeier
- *
- */
 public class ProcessInstanceAssertIsWaitingForJoinTest extends ProcessAssertTestCase {
 
   @Rule
@@ -46,11 +45,11 @@ public class ProcessInstanceAssertIsWaitingForJoinTest extends ProcessAssertTest
 
     // when
     complete(task("UserTask1"));
-    
+
     // Then
     assertThat(processInstance).isWaitingAt("UserTask2", "JoinGateway");
   }
-  
+
   @Test
   @Deployment(resources = "bpmn/ProcessInstanceAssert-isWaitingForJoinAt.bpmn")
   public void testIsNotWaitingForJoin() {
@@ -58,7 +57,7 @@ public class ProcessInstanceAssertIsWaitingForJoinTest extends ProcessAssertTest
     final ProcessInstance processInstance = runtimeService().startProcessInstanceByKey(
       "ProcessInstanceAssert-isWaitingForJoinAt"
     );
-    
+
     // then
     assertThat(processInstance).isNotWaitingAt("JoinGateway");
   }
@@ -72,22 +71,22 @@ public class ProcessInstanceAssertIsWaitingForJoinTest extends ProcessAssertTest
     );
     assertThat(processInstance).isWaitingAt("Task1", "Task2", "Task3", "Task4");
     complete(task("Task1"));
-    
+
     // when
     complete(task("Task3"));
 
     // then
     assertThat(processInstance).isWaitingAt("JoinGateway1");
     assertThat(processInstance).isWaitingAt("JoinGateway2");
-    
+
     // and when
     complete(task("Task2"));
-    
+
     // then
     assertThat(processInstance).isWaitingAt("JoinGateway2");
     assertThat(processInstance).isWaitingAt("JoinGateway3");
   }
-  
+
   @Test
   @Deployment(resources = "bpmn/ProcessInstanceAssert-isWaitingForJoinAt3.bpmn")
   public void testNestedInclusiveGatewaysAll() {
@@ -96,20 +95,20 @@ public class ProcessInstanceAssertIsWaitingForJoinTest extends ProcessAssertTest
       "ProcessInstanceAssert-isWaitingForJoinAt3"
     );
     assertThat(processInstance).isWaitingAt("Task1", "Task2", "Task3");
-    
+
     // when
-    complete(task("Task1"));  
-    
+    complete(task("Task1"));
+
     // then
     assertThat(processInstance).isWaitingAt("JoinInclusiveGateway1");
-    
+
     // and when
     complete(task("Task3"));
 
     // then
     assertThat(processInstance).isWaitingAt("JoinInclusiveGateway2");
   }
-  
+
   @Test
   @Deployment(resources = "bpmn/ProcessInstanceAssert-isWaitingForJoinAt.bpmn")
   public void testIsNotWaitingForJoinFails() {
@@ -119,7 +118,7 @@ public class ProcessInstanceAssertIsWaitingForJoinTest extends ProcessAssertTest
     );
     assertThat(processInstance).isWaitingAt("UserTask1", "UserTask2");
     complete(task("UserTask1"));
-    
+
     // then
     expect(new Failure() {
       @Override
@@ -128,19 +127,19 @@ public class ProcessInstanceAssertIsWaitingForJoinTest extends ProcessAssertTest
       }
     }, "NOT to be waiting at [");
   }
-  
+
   @Test
   @Deployment(resources = "bpmn/ProcessInstanceAssert-isWaitingForJoinAt.bpmn")
   public void testIsWaitingForJoinAtNull() {
     // given
     final ProcessInstance processInstance = runtimeService().startProcessInstanceByKey(
       "ProcessInstanceAssert-isWaitingForJoinAt");
-    
+
     // then
     expect(new Failure() {
       @Override
       public void when() {
-        assertThat(processInstance).isWaitingAt(null);        
+        assertThat(processInstance).isWaitingAt(null);
       }
     }, "Expecting list of activityIds not to be null, not to be empty");
   }
@@ -154,7 +153,7 @@ public class ProcessInstanceAssertIsWaitingForJoinTest extends ProcessAssertTest
     );
     assertThat(processInstance).isWaitingAt("UserTask1", "UserTask2");
     complete(task("UserTask1"));
-    
+
     // Then
     expect(new Failure() {
       @Override
@@ -162,7 +161,7 @@ public class ProcessInstanceAssertIsWaitingForJoinTest extends ProcessAssertTest
         assertThat(processInstance).isWaitingAt("WrongGateway");
       }
     }, "is actually waiting at [");
-    
+
   }
 
   @Test
@@ -175,7 +174,7 @@ public class ProcessInstanceAssertIsWaitingForJoinTest extends ProcessAssertTest
     assertThat(processInstance).isWaitingAt("UserTask1", "UserTask2");
     complete(task("UserTask1"));
     complete(task("UserTask2"));
-    
+
     // Then
     expect(new Failure() {
       @Override

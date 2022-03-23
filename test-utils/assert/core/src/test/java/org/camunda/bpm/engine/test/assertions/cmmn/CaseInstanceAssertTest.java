@@ -16,6 +16,11 @@
  */
 package org.camunda.bpm.engine.test.assertions.cmmn;
 
+import static org.camunda.bpm.engine.test.assertions.cmmn.CmmnAwareTests.assertThat;
+import static org.camunda.bpm.engine.test.assertions.cmmn.CmmnAwareTests.caseExecution;
+import static org.camunda.bpm.engine.test.assertions.cmmn.CmmnAwareTests.caseExecutionQuery;
+import static org.camunda.bpm.engine.test.assertions.cmmn.CmmnAwareTests.caseService;
+
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
@@ -25,13 +30,6 @@ import org.camunda.bpm.engine.test.assertions.helpers.ProcessAssertTestCase;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
-import static org.camunda.bpm.engine.test.assertions.cmmn.CmmnAwareTests.assertThat;
-
-/**
- * @author Malte Sörensen (malte.soerensen@holisticon.de)
- * @author Martin Günther (martin.guenther@holisticon.de)
- */
 public class CaseInstanceAssertTest extends ProcessAssertTestCase {
 
 	public static final String TASK_A = "PI_TaskA";
@@ -74,7 +72,7 @@ public class CaseInstanceAssertTest extends ProcessAssertTestCase {
 								+ " to be equal to " + toString(pi_taskA))
 				.isEqualToComparingOnlyGivenFields(pi_taskA, "id");
 	}
-	
+
 	@Test
   @Deployment(resources = { "cmmn/TaskTest.cmmn" })
   public void testIsCaseInstance() {
@@ -83,7 +81,7 @@ public class CaseInstanceAssertTest extends ProcessAssertTestCase {
     // Then
     assertThat((CaseExecution) caseInstance).isCaseInstance();
   }
-	
+
 	private CaseInstance aStartedCase() {
 		return caseService().createCaseInstanceByKey("Case_TaskTests");
 	}

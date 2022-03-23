@@ -16,6 +16,17 @@
  */
 package org.camunda.bpm.engine.test.assertions.cmmn;
 
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.complete;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.processInstanceQuery;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.task;
+import static org.camunda.bpm.engine.test.assertions.cmmn.CmmnAwareTests.assertThat;
+import static org.camunda.bpm.engine.test.assertions.cmmn.CmmnAwareTests.caseExecution;
+import static org.camunda.bpm.engine.test.assertions.cmmn.CmmnAwareTests.caseInstanceQuery;
+import static org.camunda.bpm.engine.test.assertions.cmmn.CmmnAwareTests.caseService;
+import static org.camunda.bpm.engine.test.assertions.cmmn.CmmnAwareTests.complete;
+import static org.camunda.bpm.engine.test.assertions.cmmn.CmmnAwareTests.disable;
+import static org.camunda.bpm.engine.test.assertions.cmmn.CmmnAwareTests.manuallyStart;
+
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -25,15 +36,6 @@ import org.camunda.bpm.engine.test.assertions.helpers.ProcessAssertTestCase;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
-import static org.camunda.bpm.engine.test.assertions.cmmn.CmmnAwareTests.caseExecution;
-import static org.camunda.bpm.engine.test.assertions.cmmn.CmmnAwareTests.caseService;
-
-/**
- * @author Malte Sörensen (malte.soerensen@holisticon.de)
- * @author Martin Günther (martin.guenther@holisticon.de)
- * @author Tobias Metzke (tobias.metzke@camunda.com)
- */
 public class StageTest extends ProcessAssertTestCase {
 
   public static final String TASK_A    = "PI_HT_A";
@@ -119,7 +121,7 @@ public class StageTest extends ProcessAssertTestCase {
     assertThat(stageExecution).isDisabled();
     stage.isDisabled();
   }
-  
+
   @Test
   @Deployment(resources = { "cmmn/StageTest.cmmn" })
   public void testStageIsTerminated() {
@@ -150,7 +152,7 @@ public class StageTest extends ProcessAssertTestCase {
     manuallyStart(caseExecution(TASK_A, caseInstance));
     return caseInstance;
   }
-  
+
   private ProcessInstance calledProcessInstance(CaseInstance caseInstance) {
     return processInstanceQuery().superCaseInstanceId(caseInstance.getId()).singleResult();
   }
