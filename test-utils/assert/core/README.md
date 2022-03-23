@@ -16,7 +16,7 @@ complete(task(instance), withVariables("approved", true));
 ## Compatibility
 
 Camunda Platform Assert works with the corresponding version of Camunda Platform (i.e., Camunda Platform Assert 7.17.0 is compatible to Camunda Platform 7.17.0). The compatibility between earlier versions are as shown [in the documentation](https://docs.camunda.org/manual/latest/user-guide/testing/#assertions-version-compatibility).
-Camunda Platform Assert is works with multiple Java versions (1.8+). All of this is continuously verified by executing around 500 test cases. 
+Camunda Platform Assert works with multiple Java versions (1.8+). All of this is continuously verified by executing around 500 test cases. 
 
 ## Get started
 
@@ -26,7 +26,7 @@ Camunda Platform Assert is works with multiple Java versions (1.8+). All of this
 <dependency>
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-bpm-assert</artifactId>
-    <version>7.17.0</version>
+    <version>${camunda.platform.version}</version>
     <scope>test</scope>
 </dependency>
 ```
