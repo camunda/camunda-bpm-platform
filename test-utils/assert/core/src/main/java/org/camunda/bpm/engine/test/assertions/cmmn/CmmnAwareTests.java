@@ -17,6 +17,10 @@
 package org.camunda.bpm.engine.test.assertions.cmmn;
 
 
+import static java.lang.String.format;
+
+import java.util.Map;
+
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.repository.CaseDefinition;
@@ -27,19 +31,12 @@ import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.CaseInstanceQuery;
 import org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests;
 
-import java.util.Map;
-
-import static java.lang.String.format;
-
 /**
- * Convenience class to access camunda *BPMN* and *CMMN* 
+ * Convenience class to access camunda *BPMN* and *CMMN*
  * related Assertions PLUS helper methods. Use it with a static import:
  *
  * import static org.camunda.bpm.engine.test.assertions.cmmn.CmmnAwareTests.*;
  *
- * @author Martin Schimak (martin.schimak@plexiti.com)
- * @author Martin Günther (martin.guenter@holisticon.de)
- * @author Malte Sörensen (malte.soerensen@holisticon.de)
  */
 public class CmmnAwareTests extends BpmnAwareTests {
 

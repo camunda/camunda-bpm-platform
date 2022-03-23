@@ -21,7 +21,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 
 /**
- * Assertions for an {@link ExternalTask}
+ * Assertions for an {@link ExternalTask}.
  */
 public class ExternalTaskAssert extends AbstractProcessAssert<ExternalTaskAssert, ExternalTask> {
 

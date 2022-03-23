@@ -16,6 +16,12 @@
  */
 package org.camunda.bpm.engine.test.assertions.bpmn;
 
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.complete;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.processDefinitionQuery;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.runtimeService;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.task;
+
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
@@ -25,11 +31,6 @@ import org.camunda.bpm.engine.test.assertions.helpers.ProcessAssertTestCase;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
-
-/**
- * @author Martin Schimak (martin.schimak@plexiti.com)
- */
 public class ProcessDefinitionAssertHasActiveInstancesTest extends ProcessAssertTestCase {
 
   @Rule
@@ -40,7 +41,7 @@ public class ProcessDefinitionAssertHasActiveInstancesTest extends ProcessAssert
   })
   public void testHasActiveInstances_One_Started_Success() {
     // Given
-    final ProcessDefinition processDefinition = 
+    final ProcessDefinition processDefinition =
       processDefinitionQuery().processDefinitionKey("ProcessDefinitionAssert-hasActiveInstances").singleResult();
     // When
     runtimeService().startProcessInstanceByKey(

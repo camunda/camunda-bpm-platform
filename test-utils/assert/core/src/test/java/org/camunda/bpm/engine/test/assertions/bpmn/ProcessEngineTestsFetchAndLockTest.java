@@ -17,7 +17,9 @@
 package org.camunda.bpm.engine.test.assertions.bpmn;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.DEFAULT_WORKER_EXTERNAL_TASK;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.fetchAndLock;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.runtimeService;
 
 import java.util.List;
 
@@ -47,7 +49,7 @@ public class ProcessEngineTestsFetchAndLockTest extends ProcessAssertTestCase {
     // And
     assertThat(lockedTasks.get(0).getWorkerId()).isEqualTo(DEFAULT_WORKER_EXTERNAL_TASK);
   }
-  
+
   @Test
   @Deployment(resources = { "bpmn/ProcessEngineTests-fetchAndLock.bpmn" })
   public void testFetchAndLock_Failure() {
@@ -63,7 +65,7 @@ public class ProcessEngineTestsFetchAndLockTest extends ProcessAssertTestCase {
       }
     });
   }
-  
+
   @Test
   @Deployment(resources = { "bpmn/ProcessEngineTests-fetchAndLock.bpmn" })
   public void testFetchAndLock_NullTopic_Failure() {
@@ -77,7 +79,7 @@ public class ProcessEngineTestsFetchAndLockTest extends ProcessAssertTestCase {
       }
     }, IllegalArgumentException.class);
   }
-  
+
   @Test
   @Deployment(resources = { "bpmn/ProcessEngineTests-fetchAndLock.bpmn" })
   public void testFetchAndLock_NullWorker_Failure() {

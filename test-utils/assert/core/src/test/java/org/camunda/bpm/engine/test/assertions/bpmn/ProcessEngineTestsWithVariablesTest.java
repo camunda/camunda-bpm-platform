@@ -16,19 +16,21 @@
  */
 package org.camunda.bpm.engine.test.assertions.bpmn;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.withVariables;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.util.*;
-
-import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
-
-/**
- * @author Martin Schimak (martin.schimak@plexiti.com)
- */
 @RunWith(value = Parameterized.class)
 public class ProcessEngineTestsWithVariablesTest {
 
@@ -38,7 +40,7 @@ public class ProcessEngineTestsWithVariablesTest {
 
   public ProcessEngineTestsWithVariablesTest(String key1, Object value1, String key2, Object value2, String key3, Object value3) {
 
-    expectedMap = new HashMap<String, Object>();
+    expectedMap = new HashMap<>();
     if (key1 != null)
       expectedMap.put(key1, value1);
     if (key2 != null)
@@ -46,7 +48,7 @@ public class ProcessEngineTestsWithVariablesTest {
     if (key3 != null)
       expectedMap.put(key3, value3);
 
-    keys = new ArrayList<Object>();
+    keys = new ArrayList<>();
     if (key1 != null)
     keys.add(key1);
     if (key2 != null)
@@ -54,7 +56,7 @@ public class ProcessEngineTestsWithVariablesTest {
     if (key3 != null)
     keys.add(key3);
 
-    values = new ArrayList<Object>();
+    values = new ArrayList<>();
     if (key1 != null)
     values.add(value1);
     if (key2 != null)
@@ -66,11 +68,11 @@ public class ProcessEngineTestsWithVariablesTest {
 
   @Parameterized.Parameters
   public static Collection<Object[]> data() {
-    Object[][] data = new Object[][] { 
-      { "key1", 1   , null  , null, null  , null }, 
+    Object[][] data = new Object[][] {
+      { "key1", 1   , null  , null, null  , null },
       { "key1", 1   , "key2", 2   , null  , null },
       { null  , null, "key2", 2   , null  , null },
-      { "key1", 1   , "key2", 2   , "key3", 3    } 
+      { "key1", 1   , "key2", 2   , "key3", 3    }
     };
     return Arrays.asList(data);
   }
@@ -116,7 +118,7 @@ public class ProcessEngineTestsWithVariablesTest {
   @Test
   public void testWithVariables_NullValues() {
     // Given we replace all values with a null pointer
-    int idx = values.size(); 
+    int idx = values.size();
     while (idx > 0)
       values.set(--idx, null);
     // When we construct the variables map
@@ -126,7 +128,7 @@ public class ProcessEngineTestsWithVariablesTest {
     // And we expect all the values to be null
     assertThat(returnedMap.values()).containsOnly((Object) null);
   }
-  
+
   private static Map<String, Object> returnedMap(List<Object> keys, List<Object> values) {
     Map<String, Object> returnedMap;
     if (keys.size() > 2)

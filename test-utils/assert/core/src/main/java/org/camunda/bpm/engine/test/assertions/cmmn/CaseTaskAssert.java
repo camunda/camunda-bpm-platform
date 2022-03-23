@@ -20,12 +20,8 @@ import org.assertj.core.api.MapAssert;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState;
 import org.camunda.bpm.engine.runtime.CaseExecution;
-
 import org.camunda.bpm.model.cmmn.instance.CaseTask;
 
-/**
- * @author Martin Schimak (martin.schimak@plexiti.com)
- */
 public class CaseTaskAssert extends AbstractCaseAssert<CaseTaskAssert, CaseExecution> {
 
   protected CaseTaskAssert(final ProcessEngine engine, final CaseExecution actual) {
@@ -38,7 +34,7 @@ public class CaseTaskAssert extends AbstractCaseAssert<CaseTaskAssert, CaseExecu
 
   /**
    * Verifies the expectation that the {@link CaseTask} is in {@link CaseExecutionState} 'available'.
-   * 
+   *
    * @return this {@link CaseTaskAssert}
    */
   @Override
@@ -48,7 +44,7 @@ public class CaseTaskAssert extends AbstractCaseAssert<CaseTaskAssert, CaseExecu
 
   /**
    * Verifies the expectation that the {@link CaseTask} is in {@link CaseExecutionState} 'enabled'.
-   * 
+   *
    * @return this {@link CaseTaskAssert}
    */
   @Override
@@ -58,7 +54,7 @@ public class CaseTaskAssert extends AbstractCaseAssert<CaseTaskAssert, CaseExecu
 
   /**
    * Verifies the expectation that the {@link CaseTask} is in {@link CaseExecutionState} 'disabled'.
-   * 
+   *
    * @return this {@link CaseTaskAssert}
    */
   @Override
@@ -68,7 +64,7 @@ public class CaseTaskAssert extends AbstractCaseAssert<CaseTaskAssert, CaseExecu
 
   /**
    * Verifies the expectation that the {@link CaseTask} is in {@link CaseExecutionState} 'active'.
-   * 
+   *
    * @return this {@link CaseTaskAssert}
    */
   @Override
@@ -78,7 +74,7 @@ public class CaseTaskAssert extends AbstractCaseAssert<CaseTaskAssert, CaseExecu
 
   /**
    * Verifies the expectation that the {@link CaseTask} is in {@link CaseExecutionState} 'completed'.
-   * 
+   *
    * @return this {@link CaseTaskAssert}
    */
   @Override
@@ -88,7 +84,7 @@ public class CaseTaskAssert extends AbstractCaseAssert<CaseTaskAssert, CaseExecu
 
   /**
    * Verifies the expectation that the {@link CaseTask} is in {@link CaseExecutionState} 'terminated'.
-   * 
+   *
    * @return this {@link CaseTaskAssert}
    */
   @Override
@@ -103,7 +99,7 @@ public class CaseTaskAssert extends AbstractCaseAssert<CaseTaskAssert, CaseExecu
    * @return  this {@link CaseTaskAssert}
    */
   public CaseTaskAssert hasNoVariables() {
-    return (CaseTaskAssert) hasVars(null);
+    return hasVars(null);
   }
 
   /**
@@ -116,7 +112,7 @@ public class CaseTaskAssert extends AbstractCaseAssert<CaseTaskAssert, CaseExecu
    * @return  this {@link CaseTaskAssert}
    */
   public CaseTaskAssert hasVariables(final String... names) {
-    return (CaseTaskAssert) hasVars(names);
+    return hasVars(names);
   }
 
   /**
@@ -126,6 +122,7 @@ public class CaseTaskAssert extends AbstractCaseAssert<CaseTaskAssert, CaseExecu
    * @return MapAssert(String, Object) inspecting the case task instance variables. Inspecting an empty map in case no such variables
    *         are available.
    */
+  @Override
   public MapAssert<String, Object> variables() {
     return super.variables();
   }

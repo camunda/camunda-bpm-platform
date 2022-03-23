@@ -17,8 +17,14 @@
 package org.camunda.bpm.engine.test.assertions.bpmn;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.assertThat;
-import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.DEFAULT_WORKER_EXTERNAL_TASK;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.complete;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.externalTask;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.fetchAndLock;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.historyService;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.runtimeService;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.withVariables;
 
 import java.util.List;
 import java.util.Map;
@@ -72,7 +78,7 @@ public class ProcessEngineTestsCompleteExternalTaskTest extends ProcessAssertTes
       }
     }, NotFoundException.class);
   }
-  
+
   @Test
   @Deployment(resources = { "bpmn/ProcessEngineTests-completeExternalTask.bpmn" })
   public void testComplete_NullTaskOnly_Failure() {
@@ -86,7 +92,7 @@ public class ProcessEngineTestsCompleteExternalTaskTest extends ProcessAssertTes
       }
     }, IllegalArgumentException.class);
   }
-  
+
   @Test
   @Deployment(resources = { "bpmn/ProcessEngineTests-completeExternalTask.bpmn" })
   public void testComplete_TaskOnlyMultiplePerTopic_Failure() {
@@ -136,7 +142,7 @@ public class ProcessEngineTestsCompleteExternalTaskTest extends ProcessAssertTes
       }
     }, NotFoundException.class);
   }
-  
+
   @Test
   @Deployment(resources = { "bpmn/ProcessEngineTests-completeExternalTask.bpmn" })
   public void testComplete_WithVariablesNullTask_Failure() {
@@ -150,7 +156,7 @@ public class ProcessEngineTestsCompleteExternalTaskTest extends ProcessAssertTes
       }
     }, IllegalArgumentException.class);
   }
-  
+
   @Test
   @Deployment(resources = { "bpmn/ProcessEngineTests-completeExternalTask.bpmn" })
   public void testComplete_WithNullVariables_Failure() {
@@ -166,7 +172,7 @@ public class ProcessEngineTestsCompleteExternalTaskTest extends ProcessAssertTes
       }
     }, IllegalArgumentException.class);
   }
-  
+
   @Test
   @Deployment(resources = { "bpmn/ProcessEngineTests-completeExternalTask.bpmn" })
   public void testComplete_LockedTask_Success() {
@@ -184,7 +190,7 @@ public class ProcessEngineTestsCompleteExternalTaskTest extends ProcessAssertTes
     // And
     assertThat(getExternalTaskLogEntry().getWorkerId()).isEqualTo(DEFAULT_WORKER_EXTERNAL_TASK);
   }
-  
+
   @Test
   @Deployment(resources = { "bpmn/ProcessEngineTests-completeExternalTask.bpmn" })
   public void testComplete_LockedTask_Failure() {
@@ -204,7 +210,7 @@ public class ProcessEngineTestsCompleteExternalTaskTest extends ProcessAssertTes
       }
     }, NotFoundException.class);
   }
-  
+
   @Test
   @Deployment(resources = { "bpmn/ProcessEngineTests-completeExternalTask.bpmn" })
   public void testComplete_NullLockedTask_Failure() {
@@ -218,7 +224,7 @@ public class ProcessEngineTestsCompleteExternalTaskTest extends ProcessAssertTes
       }
     }, IllegalArgumentException.class);
   }
-  
+
   @Test
   @Deployment(resources = { "bpmn/ProcessEngineTests-completeExternalTask.bpmn" })
   public void testComplete_LockedTaskWithVariables_Success() {
@@ -236,7 +242,7 @@ public class ProcessEngineTestsCompleteExternalTaskTest extends ProcessAssertTes
     // And
     assertThat(getExternalTaskLogEntry().getWorkerId()).isEqualTo(DEFAULT_WORKER_EXTERNAL_TASK);
   }
-  
+
   @Test
   @Deployment(resources = { "bpmn/ProcessEngineTests-completeExternalTask.bpmn" })
   public void testComplete_LockedTaskWithVariables_Failure() {
@@ -256,7 +262,7 @@ public class ProcessEngineTestsCompleteExternalTaskTest extends ProcessAssertTes
       }
     }, NotFoundException.class);
   }
-  
+
   @Test
   @Deployment(resources = { "bpmn/ProcessEngineTests-completeExternalTask.bpmn" })
   public void testComplete_NullLockedTaskWithVariables_Failure() {
@@ -270,7 +276,7 @@ public class ProcessEngineTestsCompleteExternalTaskTest extends ProcessAssertTes
       }
     }, IllegalArgumentException.class);
   }
-  
+
   @Test
   @Deployment(resources = { "bpmn/ProcessEngineTests-completeExternalTask.bpmn" })
   public void testComplete_LockedTaskWithNullVariables_Failure() {
@@ -289,11 +295,11 @@ public class ProcessEngineTestsCompleteExternalTaskTest extends ProcessAssertTes
       }
     }, IllegalArgumentException.class);
   }
-  
+
   private ProcessInstance getProcessInstanceStarted() {
     return runtimeService().startProcessInstanceByKey("ProcessEngineTests-completeExternalTask");
   }
-  
+
   private HistoricExternalTaskLog getExternalTaskLogEntry() {
     return historyService().createHistoricExternalTaskLogQuery().successLog().singleResult();
   }

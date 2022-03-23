@@ -16,6 +16,13 @@
  */
 package org.camunda.bpm.engine.test.assertions.bpmn;
 
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.complete;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.externalTask;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.externalTaskQuery;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.runtimeService;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.task;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
@@ -24,8 +31,6 @@ import org.camunda.bpm.engine.test.assertions.helpers.Failure;
 import org.camunda.bpm.engine.test.assertions.helpers.ProcessAssertTestCase;
 import org.junit.Rule;
 import org.junit.Test;
-
-import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
 
 public class ProcessEngineTestsExternalTaskTest extends ProcessAssertTestCase {
 
@@ -61,7 +66,7 @@ public class ProcessEngineTestsExternalTaskTest extends ProcessAssertTestCase {
       }
     }, IllegalStateException.class);
   }
-  
+
   @Test
   @Deployment(resources = { "bpmn/ProcessEngineTests-externalTask.bpmn" })
   public void testTask_TwoActivities_Success() {
@@ -107,7 +112,7 @@ public class ProcessEngineTestsExternalTaskTest extends ProcessAssertTestCase {
     // Then
     assertThat(externalTask(EXTERNAL_TASK_1)).isNotNull().hasActivityId(EXTERNAL_TASK_1);
   }
-  
+
   @Test
   @Deployment(resources = { "bpmn/ProcessEngineTests-externalTask.bpmn" })
   public void testTask_ActivityId_OnlyActivity_Failure() {
@@ -211,7 +216,7 @@ public class ProcessEngineTestsExternalTaskTest extends ProcessAssertTestCase {
     // Then
     assertThat(externalTask(processInstance)).isNotNull().hasActivityId(EXTERNAL_TASK_1);
   }
-  
+
   @Test
   @Deployment(resources = { "bpmn/ProcessEngineTests-externalTask.bpmn" })
   public void testTask_processInstance_TwoActivities_Failure() {
@@ -229,7 +234,7 @@ public class ProcessEngineTestsExternalTaskTest extends ProcessAssertTestCase {
       }
     }, ProcessEngineException.class);
   }
-  
+
   @Test
   @Deployment(resources = { "bpmn/ProcessEngineTests-externalTask.bpmn" })
   public void testTask_ActivityId_processInstance_OnlyActivity_Success() {

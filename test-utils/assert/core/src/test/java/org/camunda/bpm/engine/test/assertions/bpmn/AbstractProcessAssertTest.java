@@ -16,12 +16,8 @@
  */
 package org.camunda.bpm.engine.test.assertions.bpmn;
 
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.test.assertions.ProcessEngineTests;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mockito;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -29,14 +25,15 @@ import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;
 import java.util.Iterator;
 
-import static org.assertj.core.api.Assertions.*;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mockito;
 
-/**
- * @author Martin Schimak (martin.schimak@plexiti.com)
- */
 @SuppressWarnings("unchecked")
 public class AbstractProcessAssertTest {
-  
+
   ProcessEngine processEngine;
   Class<AbstractProcessAssert<?, ?>> anAssertClass;
   Class<?> anActualClass;
@@ -47,18 +44,18 @@ public class AbstractProcessAssertTest {
   @Before
   public void setUp() {
     processEngine = Mockito.mock(ProcessEngine.class);
-    ProcessEngineTests.init(processEngine);
+    AbstractAssertions.init(processEngine);
     allAsserts = Arrays.asList((Class<AbstractProcessAssert<?, ?>>[]) new Class[] {
-      JobAssert.class, 
-      ProcessDefinitionAssert.class, 
-      ProcessInstanceAssert.class, 
+      JobAssert.class,
+      ProcessDefinitionAssert.class,
+      ProcessInstanceAssert.class,
       TaskAssert.class
     }).iterator();
   }
 
   @After
   public void tearDown() {
-    ProcessEngineTests.reset();
+    AbstractAssertions.reset();
   }
 
   @Test
@@ -78,7 +75,7 @@ public class AbstractProcessAssertTest {
       assertThat(newInstanceFromExpectedFactoryMethod).isNotNull();
     }
   }
-  
+
   @Test
   public void testLastAssert_BeforeFirstAssert() {
     while(allAsserts.hasNext()) {
@@ -111,7 +108,7 @@ public class AbstractProcessAssertTest {
   }
 
   private <A extends AbstractProcessAssert<?, ?>> A newInstanceFromExpectedConstructor() {
-    Constructor<?> constructor = null; 
+    Constructor<?> constructor = null;
     try {
       constructor = anAssertClass.getDeclaredConstructor(ProcessEngine.class, anActualClass);
     } catch (NoSuchMethodException e) {

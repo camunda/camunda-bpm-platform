@@ -18,13 +18,15 @@ package org.camunda.bpm.engine.test.assertions.bpmn;
 
 import java.util.Date;
 
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.runtime.*;
 import org.assertj.core.api.Assertions;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.ExecutionQuery;
+import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.runtime.JobQuery;
 
 /**
- * Assertions for a {@link Job}
- * @author Martin Schimak (martin.schimak@plexiti.com)
+ * Assertions for a {@link Job}.
  */
 public class JobAssert extends AbstractProcessAssert<JobAssert, Job> {
 
@@ -43,8 +45,8 @@ public class JobAssert extends AbstractProcessAssert<JobAssert, Job> {
 
   /**
    * Verifies the expectation of a specific id for the {@link Job}.
-   * 
-   * @param   expectedId the expected job id     
+   *
+   * @param   expectedId the expected job id
    * @return  this {@link JobAssert}
    * @see     org.camunda.bpm.engine.runtime.Job#getId()
    */
@@ -54,7 +56,7 @@ public class JobAssert extends AbstractProcessAssert<JobAssert, Job> {
     final String actualId = actual.getId();
     Assertions.assertThat(actualId)
       .overridingErrorMessage(
-        "Expecting %s to have id '%s', but found it to be '%s'", 
+        "Expecting %s to have id '%s', but found it to be '%s'",
         toString(current), expectedId, actualId
       )
       .isEqualTo(expectedId);
@@ -63,10 +65,10 @@ public class JobAssert extends AbstractProcessAssert<JobAssert, Job> {
 
   /**
    * Verifies the expectation of a specific due date for the {@link Job}.
-   * 
+   *
    * @param   expectedDueDate the expected due date
-   * @return  this {@link JobAssert}  
-   * @see     org.camunda.bpm.engine.runtime.Job#getDuedate() 
+   * @return  this {@link JobAssert}
+   * @see     org.camunda.bpm.engine.runtime.Job#getDuedate()
    */
   public JobAssert hasDueDate(final Date expectedDueDate) {
     Job current = getExistingCurrent();
@@ -74,7 +76,7 @@ public class JobAssert extends AbstractProcessAssert<JobAssert, Job> {
     final Date actualDuedate = current.getDuedate();
     Assertions.assertThat(actualDuedate)
       .overridingErrorMessage(
-        "Expecting %s to be due at '%s', but found it to be due at '%s'", 
+        "Expecting %s to be due at '%s', but found it to be due at '%s'",
         toString(current), expectedDueDate, actualDuedate
       )
       .isEqualTo(expectedDueDate);
@@ -83,8 +85,8 @@ public class JobAssert extends AbstractProcessAssert<JobAssert, Job> {
 
   /**
    * Verifies the expectation of a specific process instance id for the {@link Job}.
-   * 
-   * @param   expectedProcessInstanceId the expected process instance id     
+   *
+   * @param   expectedProcessInstanceId the expected process instance id
    * @return  this {@link JobAssert}
    * @see     org.camunda.bpm.engine.runtime.Job#getProcessInstanceId()
    */
@@ -94,7 +96,7 @@ public class JobAssert extends AbstractProcessAssert<JobAssert, Job> {
     final String actualProcessInstanceId = current.getProcessInstanceId();
     Assertions.assertThat(actualProcessInstanceId)
       .overridingErrorMessage(
-        "Expecting %s to have process instance id '%s', but found it to be '%s'", 
+        "Expecting %s to have process instance id '%s', but found it to be '%s'",
         toString(current), expectedProcessInstanceId, actualProcessInstanceId
       )
       .isEqualTo(expectedProcessInstanceId);
@@ -103,8 +105,8 @@ public class JobAssert extends AbstractProcessAssert<JobAssert, Job> {
 
   /**
    * Verifies the expectation of a specific execution id for the {@link Job}.
-   * 
-   * @param   expectedExecutionId the expected execution id     
+   *
+   * @param   expectedExecutionId the expected execution id
    * @return  this {@link JobAssert}
    * @see     org.camunda.bpm.engine.runtime.Job#getExecutionId()
    */
@@ -123,7 +125,7 @@ public class JobAssert extends AbstractProcessAssert<JobAssert, Job> {
 
   /**
    * Verifies the expectation of a specific number of retries left for the {@link Job}.
-   * @param   expectedRetries the expected number of retries     
+   * @param   expectedRetries the expected number of retries
    * @return  this {@link JobAssert}
    * @see     org.camunda.bpm.engine.runtime.Job#getExecutionId()
    */
@@ -140,11 +142,11 @@ public class JobAssert extends AbstractProcessAssert<JobAssert, Job> {
   }
 
   /**
-   * Verifies the expectation of the existence of an exception message 
+   * Verifies the expectation of the existence of an exception message
    * for the {@link Job}.
-   * 
+   *
    * @return  this {@link JobAssert}
-   * @see     org.camunda.bpm.engine.runtime.Job#getExceptionMessage() 
+   * @see     org.camunda.bpm.engine.runtime.Job#getExceptionMessage()
    */
   public JobAssert hasExceptionMessage() {
     Job current = getExistingCurrent();
@@ -160,8 +162,8 @@ public class JobAssert extends AbstractProcessAssert<JobAssert, Job> {
 
   /**
    * Verifies the expectation of a specific deployment id for the {@link Job}.
-   * 
-   * @param   expectedDeploymentId the expected deployment id     
+   *
+   * @param   expectedDeploymentId the expected deployment id
    * @return  this {@link JobAssert}
    * @see     org.camunda.bpm.engine.runtime.Job#getDeploymentId()
    */
@@ -194,32 +196,32 @@ public class JobAssert extends AbstractProcessAssert<JobAssert, Job> {
 
   @Override
   protected String toString(Job job) {
-     return job != null ? 
+     return job != null ?
        String.format("%s {" +
          "id='%s', " +
          "processInstanceId='%s', " +
-         "executionId='%s'}", 
-         Job.class.getSimpleName(), 
-         job.getId(), 
-         job.getProcessInstanceId(), 
-         job.getExecutionId()) 
-       : null; 
+         "executionId='%s'}",
+         Job.class.getSimpleName(),
+         job.getId(),
+         job.getProcessInstanceId(),
+         job.getExecutionId())
+       : null;
   }
 
-  /* 
-   * JobQuery, automatically narrowed to {@link ProcessInstance} of actual {@link job} 
+  /*
+   * JobQuery, automatically narrowed to {@link ProcessInstance} of actual {@link job}
    */
   @Override
   protected JobQuery jobQuery() {
     return super.jobQuery().processInstanceId(actual.getProcessInstanceId());
   }
 
-  /* ExecutionQuery, automatically narrowed to {@link ProcessInstance} of actual 
-   * {@link job} 
+  /* ExecutionQuery, automatically narrowed to {@link ProcessInstance} of actual
+   * {@link job}
    */
   @Override
   protected ExecutionQuery executionQuery() {
     return super.executionQuery().processInstanceId(actual.getProcessInstanceId());
   }
-  
+
 }

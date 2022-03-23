@@ -20,9 +20,6 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
 
-/**
- * @author Martin Schimak (martin.schimak@plexiti.com)
- */
 public class StageAssert extends AbstractCaseAssert<StageAssert, CaseExecution> {
 
 	protected StageAssert(final ProcessEngine engine, final CaseExecution actual) {

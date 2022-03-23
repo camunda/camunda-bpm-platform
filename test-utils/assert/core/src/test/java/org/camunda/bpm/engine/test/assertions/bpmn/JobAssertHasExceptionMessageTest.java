@@ -16,6 +16,12 @@
  */
 package org.camunda.bpm.engine.test.assertions.bpmn;
 
+import static org.assertj.core.api.Assertions.fail;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.jobQuery;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.managementService;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.runtimeService;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -24,14 +30,6 @@ import org.camunda.bpm.engine.test.assertions.helpers.ProcessAssertTestCase;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
-import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.assertThat;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
-
-/**
- * @author Martin Schimak (martin.schimak@plexiti.com)
- */
 public class JobAssertHasExceptionMessageTest extends ProcessAssertTestCase {
 
   @Rule

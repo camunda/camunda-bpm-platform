@@ -16,19 +16,19 @@
  */
 package org.camunda.bpm.engine.test.assertions.bpmn;
 
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.jobQuery;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.processDefinitionQuery;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.processInstanceQuery;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.runtimeService;
+
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
-import org.camunda.bpm.engine.test.assertions.ProcessEngineTests;
 import org.camunda.bpm.engine.test.assertions.helpers.Failure;
 import org.camunda.bpm.engine.test.assertions.helpers.ProcessAssertTestCase;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
-
-/**
- * @author Martin Schimak (martin.schimak@plexiti.com)
- */
 public class JobAssertHasDeploymentIdTest extends ProcessAssertTestCase {
 
   @Rule
@@ -62,7 +62,7 @@ public class JobAssertHasDeploymentIdTest extends ProcessAssertTestCase {
     expect(new Failure() {
       @Override
       public void when() {
-        ProcessEngineTests.assertThat(jobQuery().singleResult()).hasDeploymentId("otherDeploymentId");
+        BpmnAwareTests.assertThat(jobQuery().singleResult()).hasDeploymentId("otherDeploymentId");
       }
     });
   }
@@ -81,7 +81,7 @@ public class JobAssertHasDeploymentIdTest extends ProcessAssertTestCase {
     expect(new Failure() {
       @Override
       public void when() {
-        ProcessEngineTests.assertThat(jobQuery().singleResult()).hasDeploymentId(null);
+        BpmnAwareTests.assertThat(jobQuery().singleResult()).hasDeploymentId(null);
       }
     });
   }

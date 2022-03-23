@@ -79,8 +79,10 @@
         <module>model-api</module>
         <module>typed-values</module>
         <module>engine-dmn</module>
+
         <module>test-utils/testcontainers</module>
         <module>test-utils/junit5-extension</module>
+        <module>test-utils/assert</module>
 
         <module>engine</module>
         <module>engine-cdi</module>
@@ -278,6 +280,7 @@
         <module>clients/java</module>
 
         <module>test-utils/junit5-extension</module>
+        <module>test-utils/assert</module>
 
         <module>internal-dependencies</module>
         <module>database</module>

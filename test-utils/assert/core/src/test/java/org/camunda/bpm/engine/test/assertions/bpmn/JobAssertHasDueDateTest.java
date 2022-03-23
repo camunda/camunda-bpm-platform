@@ -16,20 +16,18 @@
  */
 package org.camunda.bpm.engine.test.assertions.bpmn;
 
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.jobQuery;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.runtimeService;
+
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
-import org.camunda.bpm.engine.test.assertions.ProcessEngineTests;
 import org.camunda.bpm.engine.test.assertions.helpers.Failure;
 import org.camunda.bpm.engine.test.assertions.helpers.ProcessAssertTestCase;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
-
-/**
- * @author Martin Schimak (martin.schimak@plexiti.com)
- */
 public class JobAssertHasDueDateTest extends ProcessAssertTestCase {
 
   @Rule
@@ -82,7 +80,7 @@ public class JobAssertHasDueDateTest extends ProcessAssertTestCase {
     expect(new Failure() {
       @Override
       public void when() {
-        ProcessEngineTests.assertThat(jobQuery().singleResult()).hasDueDate(null);
+        BpmnAwareTests.assertThat(jobQuery().singleResult()).hasDueDate(null);
       }
     });
   }

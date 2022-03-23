@@ -16,6 +16,12 @@
  */
 package org.camunda.bpm.engine.test.assertions.cmmn;
 
+import static org.camunda.bpm.engine.test.assertions.cmmn.CmmnAwareTests.assertThat;
+import static org.camunda.bpm.engine.test.assertions.cmmn.CmmnAwareTests.caseExecution;
+import static org.camunda.bpm.engine.test.assertions.cmmn.CmmnAwareTests.caseService;
+import static org.camunda.bpm.engine.test.assertions.cmmn.CmmnAwareTests.complete;
+import static org.camunda.bpm.engine.test.assertions.cmmn.CmmnAwareTests.manuallyStart;
+
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.test.Deployment;
@@ -24,12 +30,6 @@ import org.camunda.bpm.engine.test.assertions.helpers.ProcessAssertTestCase;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
-
-/**
- * @author Malte Sörensen (malte.soerensen@holisticon.de)
- * @author Martin Günther (martin.guenther@holisticon.de)
- */
 public class StageWithSentryTest extends ProcessAssertTestCase {
 
   public static final String TASK_A = "PI_HT_A";
