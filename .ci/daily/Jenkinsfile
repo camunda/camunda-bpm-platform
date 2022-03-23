@@ -1,8 +1,6 @@
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
-@Library(['camunda-ci@CAMTEAM-231', 'cambpm-jenkins-shared-library']) _
-
-import org.camunda.helper.Podspec
+@Library(['camunda-ci@CAMTEAM-231', 'cambpm-jenkins-shared-library@CAMTEAM-231']) _
 
 def failedStageTypes = []
 
@@ -90,19 +88,14 @@ pipeline {
         }
         stage('Trigger Docker CE GHA') {
           when {
-            // for testing - start
-            expression {
-              cambpmWithLabels('docker')
-            }
-            // for testing - end
-//            branch cambpmDefaultBranch();
+            branch cambpmDefaultBranch();
           }
           agent {
             kubernetes {
               cloud "kubernetes"
               label "${utils.envPrefix()}ci-infra-camunda-cloud-build_${env.JOB_BASE_NAME.take(15)}-${env.BUILD_ID}"
               defaultContainer 'alpine'
-              yaml Podspec.getAgentPodspec(this, 'alpine-small', [
+              yaml org.camunda.helper.Podspec.getAgentPodspec(this, 'alpine-small', [
                   useStableNodePool: false
               ])
             }
@@ -112,8 +105,7 @@ pipeline {
             INPUT_OWNER = 'camunda'
             INPUT_REPO = 'docker-camunda-bpm-platform'
             // ensure that the GHA trigger works for maintenance branches as well
-//            INPUT_REF = cambpmGetDockerRepoBranch()
-            INPUT_REF = 'next'
+            INPUT_REF = cambpmGetDockerRepoBranch()
             INPUT_WORKFLOW_FILE_NAME = 'build-test-and-publish-ce.yml'
             INPUT_WAIT_INPUT_WAIT_WORKFLOW = 'true'
           }
