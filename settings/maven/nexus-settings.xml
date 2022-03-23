@@ -7,7 +7,7 @@
       <id>camunda-nexus</id>
       <mirrorOf>*</mirrorOf>
       <name>Camunda Nexus</name>
-      <url>https://app.camunda.com/nexus/content/groups/public</url>
+      <url>https://artifacts.camunda.com/artifactory/public/</url>
     </mirror>
   </mirrors>
 
