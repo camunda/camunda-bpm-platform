@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
-<domain xmlns="urn:jboss:domain:16.0">
+<domain xmlns="urn:jboss:domain:19.0">
     <extensions>
         <extension module="org.jboss.as.clustering.infinispan"/>
         <extension module="org.jboss.as.clustering.jgroups"/>
@@ -20,7 +20,6 @@
         <extension module="org.jboss.as.pojo"/>
         <extension module="org.jboss.as.remoting"/>
         <extension module="org.jboss.as.sar"/>
-        <extension module="org.jboss.as.security"/>
         <extension module="org.jboss.as.transactions"/>
         <extension module="org.jboss.as.webservices"/>
         <extension module="org.jboss.as.weld"/>
@@ -197,11 +196,14 @@
                     </thread-pool>
                 </thread-pools>
                 <default-security-domain value="other"/>
+                <application-security-domains>
+                    <application-security-domain name="other" security-domain="ApplicationDomain"/>
+                </application-security-domains>
                 <default-missing-method-permissions-deny-access value="true"/>
                 <statistics enabled="${wildfly.ejb3.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
                 <log-system-exceptions value="true"/>
             </subsystem>
-            <subsystem xmlns="urn:wildfly:elytron:13.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
+            <subsystem xmlns="urn:wildfly:elytron:15.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
                 <providers>
                     <aggregate-providers name="combined-providers">
                         <providers name="elytron"/>
@@ -256,9 +258,8 @@
                     <http-authentication-factory name="application-http-authentication" security-domain="ApplicationDomain" http-server-mechanism-factory="global">
                         <mechanism-configuration>
                             <mechanism mechanism-name="BASIC">
-                                <mechanism-realm realm-name="Application Realm"/>
+                                <mechanism-realm realm-name="ApplicationRealm"/>
                             </mechanism>
-                            <mechanism mechanism-name="FORM"/>
                         </mechanism-configuration>
                     </http-authentication-factory>
                     <provider-http-server-mechanism-factory name="global"/>
@@ -275,6 +276,7 @@
                     <configurable-sasl-server-factory name="configured" sasl-server-factory="elytron">
                         <properties>
                             <property name="wildfly.sasl.local-user.default-user" value="$local"/>
+                            <property name="wildfly.sasl.local-user.challenge-path" value="${jboss.server.temp.dir}/auth"/>
                         </properties>
                     </configurable-sasl-server-factory>
                     <mechanism-provider-filtering-sasl-server-factory name="elytron" sasl-server-factory="global">
@@ -302,22 +304,28 @@
                     </server-ssl-contexts>
                 </tls>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:infinispan:12.0">
-                <cache-container name="ejb" default-cache="passivation" aliases="sfsb" modules="org.wildfly.clustering.ejb.infinispan">
+            <subsystem xmlns="urn:jboss:domain:infinispan:13.0">
+                <cache-container name="ejb" default-cache="passivation" marshaller="PROTOSTREAM" aliases="sfsb" modules="org.wildfly.clustering.ejb.infinispan">
                     <local-cache name="passivation">
+                        <expiration interval="0"/>
                         <file-store passivation="true" purge="false"/>
                     </local-cache>
                 </cache-container>
-                <cache-container name="web" default-cache="passivation" modules="org.wildfly.clustering.web.infinispan">
+                <cache-container name="web" default-cache="passivation" marshaller="PROTOSTREAM" modules="org.wildfly.clustering.web.infinispan">
                     <local-cache name="passivation">
+                        <expiration interval="0"/>
                         <file-store passivation="true" purge="false"/>
                     </local-cache>
-                    <local-cache name="sso"/>
+                    <local-cache name="sso">
+                        <expiration interval="0"/>
+                    </local-cache>
                 </cache-container>
-                <cache-container name="server" default-cache="default" modules="org.wildfly.clustering.server">
-                    <local-cache name="default"/>
+                <cache-container name="server" default-cache="default" marshaller="PROTOSTREAM" modules="org.wildfly.clustering.server">
+                    <local-cache name="default">
+                        <expiration interval="0"/>
+                    </local-cache>
                 </cache-container>
-                <cache-container name="hibernate" modules="org.infinispan.hibernate-cache">
+                <cache-container name="hibernate" marshaller="JBOSS" modules="org.infinispan.hibernate-cache">
                     <local-cache name="entity">
                         <heap-memory size="10000"/>
                         <expiration max-idle="100000"/>
@@ -326,7 +334,9 @@
                         <heap-memory size="10000"/>
                         <expiration max-idle="100000"/>
                     </local-cache>
-                    <local-cache name="timestamps"/>
+                    <local-cache name="timestamps">
+                        <expiration interval="0"/>
+                    </local-cache>
                     <local-cache name="pending-puts">
                         <expiration max-idle="60000"/>
                     </local-cache>
@@ -382,43 +392,11 @@
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:pojo:1.0"/>
             <subsystem xmlns="urn:jboss:domain:remoting:4.0">
-                <http-connector name="http-remoting-connector" connector-ref="default" security-realm="ApplicationRealm"/>
+                <http-connector name="http-remoting-connector" connector-ref="default" sasl-authentication-factory="application-sasl-authentication"/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:request-controller:1.0"/>
             <subsystem xmlns="urn:jboss:domain:resource-adapters:6.0"/>
             <subsystem xmlns="urn:jboss:domain:sar:1.0"/>
-            <subsystem xmlns="urn:jboss:domain:security:2.0">
-                <security-domains>
-                    <security-domain name="other" cache-type="default">
-                        <authentication>
-                            <login-module code="Remoting" flag="optional">
-                                <module-option name="password-stacking" value="useFirstPass"/>
-                            </login-module>
-                            <login-module code="RealmDirect" flag="required">
-                                <module-option name="password-stacking" value="useFirstPass"/>
-                            </login-module>
-                        </authentication>
-                    </security-domain>
-                    <security-domain name="jboss-web-policy" cache-type="default">
-                        <authorization>
-                            <policy-module code="Delegating" flag="required"/>
-                        </authorization>
-                    </security-domain>
-                    <security-domain name="jaspitest" cache-type="default">
-                        <authentication-jaspi>
-                            <login-module-stack name="dummy">
-                                <login-module code="Dummy" flag="optional"/>
-                            </login-module-stack>
-                            <auth-module code="Dummy"/>
-                        </authentication-jaspi>
-                    </security-domain>
-                    <security-domain name="jboss-ejb-policy" cache-type="default">
-                        <authorization>
-                            <policy-module code="Delegating" flag="required"/>
-                        </authorization>
-                    </security-domain>
-                </security-domains>
-            </subsystem>
             <subsystem xmlns="urn:jboss:domain:security-manager:1.0">
                 <deployment-permissions>
                     <maximum-set>
@@ -440,10 +418,10 @@
                 <buffer-cache name="default"/>
                 <server name="default-server">
                     <http-listener name="default" socket-binding="http" redirect-socket="https" enable-http2="true"/>
-                    <https-listener name="https" socket-binding="https" security-realm="ApplicationRealm" enable-http2="true"/>
+                    <https-listener name="https" socket-binding="https" ssl-context="applicationSSC" enable-http2="true"/>
                     <host name="default-host" alias="localhost">
                         <location name="/" handler="welcome-content"/>
-                        <http-invoker security-realm="ApplicationRealm"/>
+                        <http-invoker http-authentication-factory="application-http-authentication"/>
                     </host>
                 </server>
                 <servlet-container name="default">
@@ -453,6 +431,9 @@
                 <handlers>
                     <file name="welcome-content" path="${jboss.home.dir}/welcome-content"/>
                 </handlers>
+                <application-security-domains>
+                    <application-security-domain name="other" security-domain="ApplicationDomain"/>
+                </application-security-domains>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:webservices:2.0" statistics-enabled="${wildfly.webservices.statistics-enabled:${wildfly.statistics-enabled:false}}">
                 <wsdl-host>${jboss.bind.address:127.0.0.1}</wsdl-host>
@@ -636,11 +617,14 @@
                     </thread-pool>
                 </thread-pools>
                 <default-security-domain value="other"/>
+                <application-security-domains>
+                    <application-security-domain name="other" security-domain="ApplicationDomain"/>
+                </application-security-domains>
                 <default-missing-method-permissions-deny-access value="true"/>
                 <statistics enabled="${wildfly.ejb3.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
                 <log-system-exceptions value="true"/>
             </subsystem>
-            <subsystem xmlns="urn:wildfly:elytron:13.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
+            <subsystem xmlns="urn:wildfly:elytron:15.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
                 <providers>
                     <aggregate-providers name="combined-providers">
                         <providers name="elytron"/>
@@ -695,9 +679,8 @@
                     <http-authentication-factory name="application-http-authentication" security-domain="ApplicationDomain" http-server-mechanism-factory="global">
                         <mechanism-configuration>
                             <mechanism mechanism-name="BASIC">
-                                <mechanism-realm realm-name="Application Realm"/>
+                                <mechanism-realm realm-name="ApplicationRealm"/>
                             </mechanism>
-                            <mechanism mechanism-name="FORM"/>
                         </mechanism-configuration>
                     </http-authentication-factory>
                     <provider-http-server-mechanism-factory name="global"/>
@@ -714,6 +697,7 @@
                     <configurable-sasl-server-factory name="configured" sasl-server-factory="elytron">
                         <properties>
                             <property name="wildfly.sasl.local-user.default-user" value="$local"/>
+                            <property name="wildfly.sasl.local-user.challenge-path" value="${jboss.server.temp.dir}/auth"/>
                         </properties>
                     </configurable-sasl-server-factory>
                     <mechanism-provider-filtering-sasl-server-factory name="elytron" sasl-server-factory="global">
@@ -741,35 +725,41 @@
                     </server-ssl-contexts>
                 </tls>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:infinispan:12.0">
-                <cache-container name="ejb" default-cache="dist" aliases="sfsb" modules="org.wildfly.clustering.ejb.infinispan">
+            <subsystem xmlns="urn:jboss:domain:infinispan:13.0">
+                <cache-container name="ejb" default-cache="dist" marshaller="PROTOSTREAM" aliases="sfsb" modules="org.wildfly.clustering.ejb.infinispan">
                     <transport lock-timeout="60000"/>
                     <distributed-cache name="dist">
                         <locking isolation="REPEATABLE_READ"/>
                         <transaction mode="BATCH"/>
+                        <expiration interval="0"/>
                         <file-store/>
                     </distributed-cache>
                 </cache-container>
-                <cache-container name="server" default-cache="default" aliases="singleton cluster" modules="org.wildfly.clustering.server">
+                <cache-container name="server" default-cache="default" marshaller="PROTOSTREAM" aliases="singleton cluster" modules="org.wildfly.clustering.server">
                     <transport lock-timeout="60000"/>
                     <replicated-cache name="default">
                         <transaction mode="BATCH"/>
+                        <expiration interval="0"/>
                     </replicated-cache>
                 </cache-container>
-                <cache-container name="web" default-cache="dist" modules="org.wildfly.clustering.web.infinispan">
+                <cache-container name="web" default-cache="dist" marshaller="PROTOSTREAM" modules="org.wildfly.clustering.web.infinispan">
                     <transport lock-timeout="60000"/>
                     <replicated-cache name="sso">
                         <locking isolation="REPEATABLE_READ"/>
                         <transaction mode="BATCH"/>
+                        <expiration interval="0"/>
                     </replicated-cache>
-                    <replicated-cache name="routing"/>
+                    <replicated-cache name="routing">
+                        <expiration interval="0"/>
+                    </replicated-cache>
                     <distributed-cache name="dist">
                         <locking isolation="REPEATABLE_READ"/>
                         <transaction mode="BATCH"/>
+                        <expiration interval="0"/>
                         <file-store/>
                     </distributed-cache>
                 </cache-container>
-                <cache-container name="hibernate" modules="org.infinispan.hibernate-cache">
+                <cache-container name="hibernate" marshaller="JBOSS" modules="org.infinispan.hibernate-cache">
                     <transport lock-timeout="60000"/>
                     <local-cache name="local-query">
                         <heap-memory size="10000"/>
@@ -782,7 +772,9 @@
                         <heap-memory size="10000"/>
                         <expiration max-idle="100000"/>
                     </invalidation-cache>
-                    <replicated-cache name="timestamps"/>
+                    <replicated-cache name="timestamps">
+                        <expiration interval="0"/>
+                    </replicated-cache>
                 </cache-container>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:io:3.0">
@@ -878,43 +870,11 @@
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:pojo:1.0"/>
             <subsystem xmlns="urn:jboss:domain:remoting:4.0">
-                <http-connector name="http-remoting-connector" connector-ref="default" security-realm="ApplicationRealm"/>
+                <http-connector name="http-remoting-connector" connector-ref="default" sasl-authentication-factory="application-sasl-authentication"/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:request-controller:1.0"/>
             <subsystem xmlns="urn:jboss:domain:resource-adapters:6.0"/>
             <subsystem xmlns="urn:jboss:domain:sar:1.0"/>
-            <subsystem xmlns="urn:jboss:domain:security:2.0">
-                <security-domains>
-                    <security-domain name="other" cache-type="default">
-                        <authentication>
-                            <login-module code="Remoting" flag="optional">
-                                <module-option name="password-stacking" value="useFirstPass"/>
-                            </login-module>
-                            <login-module code="RealmDirect" flag="required">
-                                <module-option name="password-stacking" value="useFirstPass"/>
-                            </login-module>
-                        </authentication>
-                    </security-domain>
-                    <security-domain name="jboss-web-policy" cache-type="default">
-                        <authorization>
-                            <policy-module code="Delegating" flag="required"/>
-                        </authorization>
-                    </security-domain>
-                    <security-domain name="jaspitest" cache-type="default">
-                        <authentication-jaspi>
-                            <login-module-stack name="dummy">
-                                <login-module code="Dummy" flag="optional"/>
-                            </login-module-stack>
-                            <auth-module code="Dummy"/>
-                        </authentication-jaspi>
-                    </security-domain>
-                    <security-domain name="jboss-ejb-policy" cache-type="default">
-                        <authorization>
-                            <policy-module code="Delegating" flag="required"/>
-                        </authorization>
-                    </security-domain>
-                </security-domains>
-            </subsystem>
             <subsystem xmlns="urn:jboss:domain:security-manager:1.0">
                 <deployment-permissions>
                     <maximum-set>
@@ -944,10 +904,10 @@
                 <server name="default-server">
                     <ajp-listener name="ajp" socket-binding="ajp"/>
                     <http-listener name="default" socket-binding="http" redirect-socket="https" enable-http2="true"/>
-                    <https-listener name="https" socket-binding="https" security-realm="ApplicationRealm" enable-http2="true"/>
+                    <https-listener name="https" socket-binding="https" ssl-context="applicationSSC" enable-http2="true"/>
                     <host name="default-host" alias="localhost">
                         <location name="/" handler="welcome-content"/>
-                        <http-invoker security-realm="ApplicationRealm"/>
+                        <http-invoker http-authentication-factory="application-http-authentication"/>
                     </host>
                 </server>
                 <servlet-container name="default">
@@ -957,6 +917,9 @@
                 <handlers>
                     <file name="welcome-content" path="${jboss.home.dir}/welcome-content"/>
                 </handlers>
+                <application-security-domains>
+                    <application-security-domain name="other" security-domain="ApplicationDomain"/>
+                </application-security-domains>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:webservices:2.0" statistics-enabled="${wildfly.webservices.statistics-enabled:${wildfly.statistics-enabled:false}}">
                 <wsdl-host>${jboss.bind.address:127.0.0.1}</wsdl-host>
@@ -1106,11 +1069,14 @@
                 </thread-pools>
                 <iiop enable-by-default="false" use-qualified-name="false"/>
                 <default-security-domain value="other"/>
+                <application-security-domains>
+                    <application-security-domain name="other" security-domain="ApplicationDomain"/>
+                </application-security-domains>
                 <default-missing-method-permissions-deny-access value="true"/>
                 <statistics enabled="${wildfly.ejb3.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
                 <log-system-exceptions value="true"/>
             </subsystem>
-            <subsystem xmlns="urn:wildfly:elytron:13.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
+            <subsystem xmlns="urn:wildfly:elytron:15.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
                 <providers>
                     <aggregate-providers name="combined-providers">
                         <providers name="elytron"/>
@@ -1165,9 +1131,8 @@
                     <http-authentication-factory name="application-http-authentication" security-domain="ApplicationDomain" http-server-mechanism-factory="global">
                         <mechanism-configuration>
                             <mechanism mechanism-name="BASIC">
-                                <mechanism-realm realm-name="Application Realm"/>
+                                <mechanism-realm realm-name="ApplicationRealm"/>
                             </mechanism>
-                            <mechanism mechanism-name="FORM"/>
                         </mechanism-configuration>
                     </http-authentication-factory>
                     <provider-http-server-mechanism-factory name="global"/>
@@ -1184,6 +1149,7 @@
                     <configurable-sasl-server-factory name="configured" sasl-server-factory="elytron">
                         <properties>
                             <property name="wildfly.sasl.local-user.default-user" value="$local"/>
+                            <property name="wildfly.sasl.local-user.challenge-path" value="${jboss.server.temp.dir}/auth"/>
                         </properties>
                     </configurable-sasl-server-factory>
                     <mechanism-provider-filtering-sasl-server-factory name="elytron" sasl-server-factory="global">
@@ -1213,25 +1179,31 @@
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:iiop-openjdk:2.1">
                 <orb socket-binding="iiop"/>
-                <initializers security="identity" transactions="spec"/>
+                <initializers security="elytron" transactions="spec"/>
                 <security server-requires-ssl="false" client-requires-ssl="false"/>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:infinispan:12.0">
-                <cache-container name="ejb" default-cache="passivation" aliases="sfsb" modules="org.wildfly.clustering.ejb.infinispan">
+            <subsystem xmlns="urn:jboss:domain:infinispan:13.0">
+                <cache-container name="ejb" default-cache="passivation" marshaller="PROTOSTREAM" aliases="sfsb" modules="org.wildfly.clustering.ejb.infinispan">
                     <local-cache name="passivation">
+                        <expiration interval="0"/>
                         <file-store passivation="true" purge="false"/>
                     </local-cache>
                 </cache-container>
-                <cache-container name="web" default-cache="passivation" modules="org.wildfly.clustering.web.infinispan">
+                <cache-container name="web" default-cache="passivation" marshaller="PROTOSTREAM" modules="org.wildfly.clustering.web.infinispan">
                     <local-cache name="passivation">
+                        <expiration interval="0"/>
                         <file-store passivation="true" purge="false"/>
                     </local-cache>
-                    <local-cache name="sso"/>
+                    <local-cache name="sso">
+                        <expiration interval="0"/>
+                    </local-cache>
                 </cache-container>
-                <cache-container name="server" default-cache="default" modules="org.wildfly.clustering.server">
-                    <local-cache name="default"/>
+                <cache-container name="server" default-cache="default" marshaller="PROTOSTREAM" modules="org.wildfly.clustering.server">
+                    <local-cache name="default">
+                        <expiration interval="0"/>
+                    </local-cache>
                 </cache-container>
-                <cache-container name="hibernate" modules="org.infinispan.hibernate-cache">
+                <cache-container name="hibernate" marshaller="JBOSS" modules="org.infinispan.hibernate-cache">
                     <local-cache name="entity">
                         <heap-memory size="10000"/>
                         <expiration max-idle="100000"/>
@@ -1240,7 +1212,9 @@
                         <heap-memory size="10000"/>
                         <expiration max-idle="100000"/>
                     </local-cache>
-                    <local-cache name="timestamps"/>
+                    <local-cache name="timestamps">
+                        <expiration interval="0"/>
+                    </local-cache>
                     <local-cache name="pending-puts">
                         <expiration max-idle="60000"/>
                     </local-cache>
@@ -1287,6 +1261,7 @@
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:messaging-activemq:13.0">
                 <server name="default">
+                    <security elytron-domain="ApplicationDomain"/>
                     <statistics enabled="${wildfly.messaging-activemq.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
                     <security-setting name="#">
                         <role name="guest" send="true" consume="true" create-non-durable-queue="true" delete-non-durable-queue="true"/>
@@ -1326,43 +1301,11 @@
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:pojo:1.0"/>
             <subsystem xmlns="urn:jboss:domain:remoting:4.0">
-                <http-connector name="http-remoting-connector" connector-ref="default" security-realm="ApplicationRealm"/>
+                <http-connector name="http-remoting-connector" connector-ref="default" sasl-authentication-factory="application-sasl-authentication"/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:request-controller:1.0"/>
             <subsystem xmlns="urn:jboss:domain:resource-adapters:6.0"/>
             <subsystem xmlns="urn:jboss:domain:sar:1.0"/>
-            <subsystem xmlns="urn:jboss:domain:security:2.0">
-                <security-domains>
-                    <security-domain name="other" cache-type="default">
-                        <authentication>
-                            <login-module code="Remoting" flag="optional">
-                                <module-option name="password-stacking" value="useFirstPass"/>
-                            </login-module>
-                            <login-module code="RealmDirect" flag="required">
-                                <module-option name="password-stacking" value="useFirstPass"/>
-                            </login-module>
-                        </authentication>
-                    </security-domain>
-                    <security-domain name="jboss-web-policy" cache-type="default">
-                        <authorization>
-                            <policy-module code="Delegating" flag="required"/>
-                        </authorization>
-                    </security-domain>
-                    <security-domain name="jaspitest" cache-type="default">
-                        <authentication-jaspi>
-                            <login-module-stack name="dummy">
-                                <login-module code="Dummy" flag="optional"/>
-                            </login-module-stack>
-                            <auth-module code="Dummy"/>
-                        </authentication-jaspi>
-                    </security-domain>
-                    <security-domain name="jboss-ejb-policy" cache-type="default">
-                        <authorization>
-                            <policy-module code="Delegating" flag="required"/>
-                        </authorization>
-                    </security-domain>
-                </security-domains>
-            </subsystem>
             <subsystem xmlns="urn:jboss:domain:security-manager:1.0">
                 <deployment-permissions>
                     <maximum-set>
@@ -1384,10 +1327,10 @@
                 <buffer-cache name="default"/>
                 <server name="default-server">
                     <http-listener name="default" socket-binding="http" redirect-socket="https" enable-http2="true"/>
-                    <https-listener name="https" socket-binding="https" security-realm="ApplicationRealm" enable-http2="true"/>
+                    <https-listener name="https" socket-binding="https" ssl-context="applicationSSC" enable-http2="true"/>
                     <host name="default-host" alias="localhost">
                         <location name="/" handler="welcome-content"/>
-                        <http-invoker security-realm="ApplicationRealm"/>
+                        <http-invoker http-authentication-factory="application-http-authentication"/>
                     </host>
                 </server>
                 <servlet-container name="default">
@@ -1397,6 +1340,9 @@
                 <handlers>
                     <file name="welcome-content" path="${jboss.home.dir}/welcome-content"/>
                 </handlers>
+                <application-security-domains>
+                    <application-security-domain name="other" security-domain="ApplicationDomain"/>
+                </application-security-domains>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:webservices:2.0" statistics-enabled="${wildfly.webservices.statistics-enabled:${wildfly.statistics-enabled:false}}">
                 <wsdl-host>${jboss.bind.address:127.0.0.1}</wsdl-host>
@@ -1546,11 +1492,14 @@
                 </thread-pools>
                 <iiop enable-by-default="false" use-qualified-name="false"/>
                 <default-security-domain value="other"/>
+                <application-security-domains>
+                    <application-security-domain name="other" security-domain="ApplicationDomain"/>
+                </application-security-domains>
                 <default-missing-method-permissions-deny-access value="true"/>
                 <statistics enabled="${wildfly.ejb3.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
                 <log-system-exceptions value="true"/>
             </subsystem>
-            <subsystem xmlns="urn:wildfly:elytron:13.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
+            <subsystem xmlns="urn:wildfly:elytron:15.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
                 <providers>
                     <aggregate-providers name="combined-providers">
                         <providers name="elytron"/>
@@ -1605,9 +1554,8 @@
                     <http-authentication-factory name="application-http-authentication" security-domain="ApplicationDomain" http-server-mechanism-factory="global">
                         <mechanism-configuration>
                             <mechanism mechanism-name="BASIC">
-                                <mechanism-realm realm-name="Application Realm"/>
+                                <mechanism-realm realm-name="ApplicationRealm"/>
                             </mechanism>
-                            <mechanism mechanism-name="FORM"/>
                         </mechanism-configuration>
                     </http-authentication-factory>
                     <provider-http-server-mechanism-factory name="global"/>
@@ -1624,6 +1572,7 @@
                     <configurable-sasl-server-factory name="configured" sasl-server-factory="elytron">
                         <properties>
                             <property name="wildfly.sasl.local-user.default-user" value="$local"/>
+                            <property name="wildfly.sasl.local-user.challenge-path" value="${jboss.server.temp.dir}/auth"/>
                         </properties>
                     </configurable-sasl-server-factory>
                     <mechanism-provider-filtering-sasl-server-factory name="elytron" sasl-server-factory="global">
@@ -1653,38 +1602,44 @@
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:iiop-openjdk:2.1">
                 <orb socket-binding="iiop"/>
-                <initializers security="identity" transactions="spec"/>
+                <initializers security="elytron" transactions="spec"/>
                 <security server-requires-ssl="false" client-requires-ssl="false"/>
             </subsystem>
-            <subsystem xmlns="urn:jboss:domain:infinispan:12.0">
-                <cache-container name="ejb" default-cache="dist" aliases="sfsb" modules="org.wildfly.clustering.ejb.infinispan">
+            <subsystem xmlns="urn:jboss:domain:infinispan:13.0">
+                <cache-container name="ejb" default-cache="dist" marshaller="PROTOSTREAM" aliases="sfsb" modules="org.wildfly.clustering.ejb.infinispan">
                     <transport lock-timeout="60000"/>
                     <distributed-cache name="dist">
                         <locking isolation="REPEATABLE_READ"/>
                         <transaction mode="BATCH"/>
+                        <expiration interval="0"/>
                         <file-store/>
                     </distributed-cache>
                 </cache-container>
-                <cache-container name="server" default-cache="default" aliases="singleton cluster" modules="org.wildfly.clustering.server">
+                <cache-container name="server" default-cache="default" marshaller="PROTOSTREAM" aliases="singleton cluster" modules="org.wildfly.clustering.server">
                     <transport lock-timeout="60000"/>
                     <replicated-cache name="default">
                         <transaction mode="BATCH"/>
+                        <expiration interval="0"/>
                     </replicated-cache>
                 </cache-container>
-                <cache-container name="web" default-cache="dist" modules="org.wildfly.clustering.web.infinispan">
+                <cache-container name="web" default-cache="dist" marshaller="PROTOSTREAM" modules="org.wildfly.clustering.web.infinispan">
                     <transport lock-timeout="60000"/>
                     <replicated-cache name="sso">
                         <locking isolation="REPEATABLE_READ"/>
                         <transaction mode="BATCH"/>
+                        <expiration interval="0"/>
                     </replicated-cache>
-                    <replicated-cache name="routing"/>
+                    <replicated-cache name="routing">
+                        <expiration interval="0"/>
+                    </replicated-cache>
                     <distributed-cache name="dist">
                         <locking isolation="REPEATABLE_READ"/>
                         <transaction mode="BATCH"/>
+                        <expiration interval="0"/>
                         <file-store/>
                     </distributed-cache>
                 </cache-container>
-                <cache-container name="hibernate" modules="org.infinispan.hibernate-cache">
+                <cache-container name="hibernate" marshaller="JBOSS" modules="org.infinispan.hibernate-cache">
                     <transport lock-timeout="60000"/>
                     <local-cache name="local-query">
                         <heap-memory size="10000"/>
@@ -1697,7 +1652,9 @@
                         <heap-memory size="10000"/>
                         <expiration max-idle="100000"/>
                     </invalidation-cache>
-                    <replicated-cache name="timestamps"/>
+                    <replicated-cache name="timestamps">
+                        <expiration interval="0"/>
+                    </replicated-cache>
                 </cache-container>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:io:3.0">
@@ -1777,6 +1734,7 @@
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:messaging-activemq:13.0">
                 <server name="default">
+                    <security elytron-domain="ApplicationDomain"/>
                     <cluster password="${jboss.messaging.cluster.password:CHANGE ME!!}"/>
                     <statistics enabled="${wildfly.messaging-activemq.statistics-enabled:${wildfly.statistics-enabled:false}}"/>
                     <security-setting name="#">
@@ -1827,43 +1785,11 @@
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:pojo:1.0"/>
             <subsystem xmlns="urn:jboss:domain:remoting:4.0">
-                <http-connector name="http-remoting-connector" connector-ref="default" security-realm="ApplicationRealm"/>
+                <http-connector name="http-remoting-connector" connector-ref="default" sasl-authentication-factory="application-sasl-authentication"/>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:request-controller:1.0"/>
             <subsystem xmlns="urn:jboss:domain:resource-adapters:6.0"/>
             <subsystem xmlns="urn:jboss:domain:sar:1.0"/>
-            <subsystem xmlns="urn:jboss:domain:security:2.0">
-                <security-domains>
-                    <security-domain name="other" cache-type="default">
-                        <authentication>
-                            <login-module code="Remoting" flag="optional">
-                                <module-option name="password-stacking" value="useFirstPass"/>
-                            </login-module>
-                            <login-module code="RealmDirect" flag="required">
-                                <module-option name="password-stacking" value="useFirstPass"/>
-                            </login-module>
-                        </authentication>
-                    </security-domain>
-                    <security-domain name="jboss-web-policy" cache-type="default">
-                        <authorization>
-                            <policy-module code="Delegating" flag="required"/>
-                        </authorization>
-                    </security-domain>
-                    <security-domain name="jaspitest" cache-type="default">
-                        <authentication-jaspi>
-                            <login-module-stack name="dummy">
-                                <login-module code="Dummy" flag="optional"/>
-                            </login-module-stack>
-                            <auth-module code="Dummy"/>
-                        </authentication-jaspi>
-                    </security-domain>
-                    <security-domain name="jboss-ejb-policy" cache-type="default">
-                        <authorization>
-                            <policy-module code="Delegating" flag="required"/>
-                        </authorization>
-                    </security-domain>
-                </security-domains>
-            </subsystem>
             <subsystem xmlns="urn:jboss:domain:security-manager:1.0">
                 <deployment-permissions>
                     <maximum-set>
@@ -1893,10 +1819,10 @@
                 <server name="default-server">
                     <ajp-listener name="ajp" socket-binding="ajp"/>
                     <http-listener name="default" socket-binding="http" redirect-socket="https" enable-http2="true"/>
-                    <https-listener name="https" socket-binding="https" security-realm="ApplicationRealm" enable-http2="true"/>
+                    <https-listener name="https" socket-binding="https" ssl-context="applicationSSC" enable-http2="true"/>
                     <host name="default-host" alias="localhost">
                         <location name="/" handler="welcome-content"/>
-                        <http-invoker security-realm="ApplicationRealm"/>
+                        <http-invoker http-authentication-factory="application-http-authentication"/>
                     </host>
                 </server>
                 <servlet-container name="default">
@@ -1906,6 +1832,9 @@
                 <handlers>
                     <file name="welcome-content" path="${jboss.home.dir}/welcome-content"/>
                 </handlers>
+                <application-security-domains>
+                    <application-security-domain name="other" security-domain="ApplicationDomain"/>
+                </application-security-domains>
             </subsystem>
             <subsystem xmlns="urn:jboss:domain:webservices:2.0" statistics-enabled="${wildfly.webservices.statistics-enabled:${wildfly.statistics-enabled:false}}">
                 <wsdl-host>${jboss.bind.address:127.0.0.1}</wsdl-host>
@@ -2075,6 +2004,7 @@
                 <extension module="org.wildfly.extension.discovery"/>
                 <extension module="org.wildfly.extension.ee-security"/>
                 <extension module="org.wildfly.extension.elytron"/>
+                <extension module="org.wildfly.extension.elytron-oidc-client"/>
                 <extension module="org.wildfly.extension.health"/>
                 <extension module="org.wildfly.extension.metrics"/>
                 <extension module="org.wildfly.extension.microprofile.config-smallrye"/>
@@ -2086,6 +2016,7 @@
                 <extension module="org.wildfly.extension.microprofile.opentracing-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.reactive-messaging-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.reactive-streams-operators-smallrye"/>
+                <extension module="org.wildfly.extension.opentelemetry"/>
             </excluded-extensions>
         </host-exclude>
         <host-exclude name="WildFly10.1">
@@ -2097,6 +2028,7 @@
                 <extension module="org.wildfly.extension.discovery"/>
                 <extension module="org.wildfly.extension.ee-security"/>
                 <extension module="org.wildfly.extension.elytron"/>
+                <extension module="org.wildfly.extension.elytron-oidc-client"/>
                 <extension module="org.wildfly.extension.health"/>
                 <extension module="org.wildfly.extension.metrics"/>
                 <extension module="org.wildfly.extension.microprofile.config-smallrye"/>
@@ -2108,6 +2040,7 @@
                 <extension module="org.wildfly.extension.microprofile.opentracing-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.reactive-messaging-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.reactive-streams-operators-smallrye"/>
+                <extension module="org.wildfly.extension.opentelemetry"/>
             </excluded-extensions>
         </host-exclude>
         <host-exclude name="WildFly11.0">
@@ -2116,6 +2049,7 @@
                 <extension module="org.wildfly.extension.clustering.web"/>
                 <extension module="org.wildfly.extension.datasources-agroal"/>
                 <extension module="org.wildfly.extension.ee-security"/>
+                <extension module="org.wildfly.extension.elytron-oidc-client"/>
                 <extension module="org.wildfly.extension.health"/>
                 <extension module="org.wildfly.extension.metrics"/>
                 <extension module="org.wildfly.extension.microprofile.config-smallrye"/>
@@ -2127,6 +2061,7 @@
                 <extension module="org.wildfly.extension.microprofile.opentracing-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.reactive-messaging-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.reactive-streams-operators-smallrye"/>
+                <extension module="org.wildfly.extension.opentelemetry"/>
             </excluded-extensions>
         </host-exclude>
         <host-exclude name="WildFly12.0">
@@ -2135,6 +2070,7 @@
                 <extension module="org.wildfly.extension.clustering.web"/>
                 <extension module="org.wildfly.extension.datasources-agroal"/>
                 <extension module="org.wildfly.extension.ee-security"/>
+                <extension module="org.wildfly.extension.elytron-oidc-client"/>
                 <extension module="org.wildfly.extension.health"/>
                 <extension module="org.wildfly.extension.metrics"/>
                 <extension module="org.wildfly.extension.microprofile.config-smallrye"/>
@@ -2146,6 +2082,7 @@
                 <extension module="org.wildfly.extension.microprofile.opentracing-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.reactive-messaging-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.reactive-streams-operators-smallrye"/>
+                <extension module="org.wildfly.extension.opentelemetry"/>
             </excluded-extensions>
         </host-exclude>
         <host-exclude name="WildFly13.0">
@@ -2153,6 +2090,7 @@
             <excluded-extensions>
                 <extension module="org.wildfly.extension.clustering.web"/>
                 <extension module="org.wildfly.extension.datasources-agroal"/>
+                <extension module="org.wildfly.extension.elytron-oidc-client"/>
                 <extension module="org.wildfly.extension.health"/>
                 <extension module="org.wildfly.extension.metrics"/>
                 <extension module="org.wildfly.extension.microprofile.config-smallrye"/>
@@ -2164,12 +2102,14 @@
                 <extension module="org.wildfly.extension.microprofile.opentracing-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.reactive-messaging-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.reactive-streams-operators-smallrye"/>
+                <extension module="org.wildfly.extension.opentelemetry"/>
             </excluded-extensions>
         </host-exclude>
         <host-exclude name="WildFly14.0">
             <host-release id="WildFly14.0"/>
             <excluded-extensions>
                 <extension module="org.wildfly.extension.clustering.web"/>
+                <extension module="org.wildfly.extension.elytron-oidc-client"/>
                 <extension module="org.wildfly.extension.health"/>
                 <extension module="org.wildfly.extension.metrics"/>
                 <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
@@ -2178,12 +2118,14 @@
                 <extension module="org.wildfly.extension.microprofile.openapi-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.reactive-messaging-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.reactive-streams-operators-smallrye"/>
+                <extension module="org.wildfly.extension.opentelemetry"/>
             </excluded-extensions>
         </host-exclude>
         <host-exclude name="WildFly15.0">
             <host-release id="WildFly15.0"/>
             <excluded-extensions>
                 <extension module="org.wildfly.extension.clustering.web"/>
+                <extension module="org.wildfly.extension.elytron-oidc-client"/>
                 <extension module="org.wildfly.extension.health"/>
                 <extension module="org.wildfly.extension.metrics"/>
                 <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
@@ -2191,11 +2133,13 @@
                 <extension module="org.wildfly.extension.microprofile.openapi-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.reactive-messaging-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.reactive-streams-operators-smallrye"/>
+                <extension module="org.wildfly.extension.opentelemetry"/>
             </excluded-extensions>
         </host-exclude>
         <host-exclude name="WildFly16.0">
             <host-release id="WildFly16.0"/>
             <excluded-extensions>
+                <extension module="org.wildfly.extension.elytron-oidc-client"/>
                 <extension module="org.wildfly.extension.health"/>
                 <extension module="org.wildfly.extension.metrics"/>
                 <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
@@ -2203,11 +2147,13 @@
                 <extension module="org.wildfly.extension.microprofile.openapi-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.reactive-messaging-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.reactive-streams-operators-smallrye"/>
+                <extension module="org.wildfly.extension.opentelemetry"/>
             </excluded-extensions>
         </host-exclude>
         <host-exclude name="WildFly17.0">
             <host-release id="WildFly17.0"/>
             <excluded-extensions>
+                <extension module="org.wildfly.extension.elytron-oidc-client"/>
                 <extension module="org.wildfly.extension.health"/>
                 <extension module="org.wildfly.extension.metrics"/>
                 <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
@@ -2215,11 +2161,13 @@
                 <extension module="org.wildfly.extension.microprofile.openapi-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.reactive-messaging-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.reactive-streams-operators-smallrye"/>
+                <extension module="org.wildfly.extension.opentelemetry"/>
             </excluded-extensions>
         </host-exclude>
         <host-exclude name="WildFly18.0">
             <host-release id="WildFly18.0"/>
             <excluded-extensions>
+                <extension module="org.wildfly.extension.elytron-oidc-client"/>
                 <extension module="org.wildfly.extension.health"/>
                 <extension module="org.wildfly.extension.metrics"/>
                 <extension module="org.wildfly.extension.microprofile.fault-tolerance-smallrye"/>
@@ -2227,33 +2175,63 @@
                 <extension module="org.wildfly.extension.microprofile.openapi-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.reactive-messaging-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.reactive-streams-operators-smallrye"/>
+                <extension module="org.wildfly.extension.opentelemetry"/>
             </excluded-extensions>
         </host-exclude>
         <host-exclude name="WildFly19.0">
             <host-release id="WildFly19.0"/>
             <excluded-extensions>
+                <extension module="org.wildfly.extension.elytron-oidc-client"/>
                 <extension module="org.wildfly.extension.health"/>
                 <extension module="org.wildfly.extension.metrics"/>
                 <extension module="org.wildfly.extension.microprofile.reactive-messaging-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.reactive-streams-operators-smallrye"/>
+                <extension module="org.wildfly.extension.opentelemetry"/>
             </excluded-extensions>
         </host-exclude>
         <host-exclude name="WildFly20.0">
             <host-release id="WildFly20.0"/>
             <excluded-extensions>
+                <extension module="org.wildfly.extension.elytron-oidc-client"/>
                 <extension module="org.wildfly.extension.health"/>
                 <extension module="org.wildfly.extension.metrics"/>
                 <extension module="org.wildfly.extension.microprofile.reactive-messaging-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.reactive-streams-operators-smallrye"/>
+                <extension module="org.wildfly.extension.opentelemetry"/>
             </excluded-extensions>
         </host-exclude>
         <host-exclude name="WildFly21.0">
             <host-release id="WildFly21.0"/>
             <excluded-extensions>
+                <extension module="org.wildfly.extension.elytron-oidc-client"/>
                 <extension module="org.wildfly.extension.health"/>
                 <extension module="org.wildfly.extension.metrics"/>
                 <extension module="org.wildfly.extension.microprofile.reactive-messaging-smallrye"/>
                 <extension module="org.wildfly.extension.microprofile.reactive-streams-operators-smallrye"/>
+                <extension module="org.wildfly.extension.opentelemetry"/>
+            </excluded-extensions>
+        </host-exclude>
+        <host-exclude name="WildFly22.0">
+            <host-release id="WildFly22.0"/>
+            <excluded-extensions>
+                <extension module="org.wildfly.extension.elytron-oidc-client"/>
+                <extension module="org.wildfly.extension.microprofile.reactive-messaging-smallrye"/>
+                <extension module="org.wildfly.extension.microprofile.reactive-streams-operators-smallrye"/>
+                <extension module="org.wildfly.extension.opentelemetry"/>
+            </excluded-extensions>
+        </host-exclude>
+        <host-exclude name="WildFly23.0">
+            <host-release id="WildFly23.0"/>
+            <excluded-extensions>
+                <extension module="org.wildfly.extension.elytron-oidc-client"/>
+                <extension module="org.wildfly.extension.opentelemetry"/>
+            </excluded-extensions>
+        </host-exclude>
+        <host-exclude name="WildFly24.0">
+            <host-release id="WildFly24.0"/>
+            <excluded-extensions>
+                <extension module="org.wildfly.extension.elytron-oidc-client"/>
+                <extension module="org.wildfly.extension.opentelemetry"/>
             </excluded-extensions>
         </host-exclude>
     </host-excludes>

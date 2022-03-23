@@ -17,7 +17,7 @@
     <cargo.deploy.timeout>60000</cargo.deploy.timeout>
 
     <!-- Needs to be updated after a new WildFly release (check support on Codehaus Cargo first) -->
-    <cargo.wildfly.container.id>wildfly15x</cargo.wildfly.container.id>
+    <cargo.wildfly.container.id>wildfly26x</cargo.wildfly.container.id>
 
     <redirect.test.output>true</redirect.test.output>
 
