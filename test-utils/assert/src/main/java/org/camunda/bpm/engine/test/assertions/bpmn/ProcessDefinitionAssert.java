@@ -20,12 +20,10 @@ import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
-import org.camunda.bpm.engine.runtime.*;
+import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
 /**
- * Assertions for a {@link ProcessDefinition}
- * @author Martin Schimak (martin.schimak@plexiti.com)
- * @author Rafael Cordones (rafael@cordones.me)
+ * Assertions for a {@link ProcessDefinition}.
  */
 public class ProcessDefinitionAssert extends AbstractProcessAssert<ProcessDefinitionAssert, ProcessDefinition> {
 
@@ -59,23 +57,23 @@ public class ProcessDefinitionAssert extends AbstractProcessAssert<ProcessDefini
   }
 
   /**
-   * Verifies the expectation that the {@link ProcessDefinition} currently has the 
+   * Verifies the expectation that the {@link ProcessDefinition} currently has the
    * specified number of active instances, iow neither suspended nor ended instances.
    *
-   * @param   number the number of expected active instances 
+   * @param   number the number of expected active instances
    * @return  this {@link ProcessDefinitionAssert}
    */
   public ProcessDefinitionAssert hasActiveInstances(final long number) {
     long instances = processInstanceQuery().active().count();
-    Assertions      
+    Assertions
       .assertThat(instances)
       .overridingErrorMessage("Expecting %s to have %s active instances, but found it to have %s.",
-        getCurrent(), number, instances 
+        getCurrent(), number, instances
       )
       .isEqualTo(number);
     return this;
   }
-  
+
   /* ProcessInstanceQuery, automatically narrowed to actual {@link ProcessDefinition} */
   @Override
   protected ProcessInstanceQuery processInstanceQuery() {
@@ -87,5 +85,5 @@ public class ProcessDefinitionAssert extends AbstractProcessAssert<ProcessDefini
   protected ProcessDefinitionQuery processDefinitionQuery() {
     return super.processDefinitionQuery().processDefinitionId(actual.getId());
   }
-  
+
 }

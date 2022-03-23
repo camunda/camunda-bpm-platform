@@ -29,9 +29,6 @@ import org.camunda.bpm.engine.test.assertions.helpers.ProcessAssertTestCase;
 import org.junit.Rule;
 import org.junit.Test;
 
-/**
- * @author Malte Soerensen (malte.soerensen@holisticon.de)
- */
 @Deployment(resources = "cmmn/MilestoneAssertIsCompletedTest.cmmn")
 public class MilestoneAssertIsCompletedTest extends ProcessAssertTestCase {
 

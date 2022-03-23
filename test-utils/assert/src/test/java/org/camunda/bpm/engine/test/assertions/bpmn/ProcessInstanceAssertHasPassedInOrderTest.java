@@ -16,6 +16,11 @@
  */
 package org.camunda.bpm.engine.test.assertions.bpmn;
 
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.complete;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.runtimeService;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.taskQuery;
+
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -24,11 +29,6 @@ import org.camunda.bpm.engine.test.assertions.helpers.ProcessAssertTestCase;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
-
-/**
- * @author Martin Schimak (martin.schimak@plexiti.com)
- */
 public class ProcessInstanceAssertHasPassedInOrderTest extends ProcessAssertTestCase {
 
   @Rule
@@ -156,7 +156,7 @@ public class ProcessInstanceAssertHasPassedInOrderTest extends ProcessAssertTest
     // And
     assertThat(processInstance).hasPassedInOrder("UserTask_1", "UserTask_3");
     /*
-     * Hint: passedInOrder can not be guaranteed for [UserTask_2, UserTask_4, UserTask_3] due to 
+     * Hint: passedInOrder can not be guaranteed for [UserTask_2, UserTask_4, UserTask_3] due to
      * parallel execution paths when endTime can't be determined with enough precision
      */
   }
@@ -197,7 +197,7 @@ public class ProcessInstanceAssertHasPassedInOrderTest extends ProcessAssertTest
       }
     });
   }
-  
+
   @Test
   @Deployment(resources = {"bpmn/ProcessInstanceAssert-hasPassedInOrder.bpmn"
   })

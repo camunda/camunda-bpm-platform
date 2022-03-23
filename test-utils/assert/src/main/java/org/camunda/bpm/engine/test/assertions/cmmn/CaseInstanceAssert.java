@@ -23,11 +23,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseInstanceEntity
 import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 
-/**
- * @author Martin Schimak (martin.schimak@plexiti.com)
- * @author Malte Sörensen (malte.soerensen@holisticon.de)
- * @author Martin Günther (martin.guenther@holisticon.de)
- */
 public class CaseInstanceAssert extends AbstractCaseAssert<CaseInstanceAssert, CaseInstance> {
 
   protected CaseInstanceAssert(final ProcessEngine engine, final CaseInstance actual) {
@@ -107,7 +102,7 @@ public class CaseInstanceAssert extends AbstractCaseAssert<CaseInstanceAssert, C
   public MilestoneAssert milestone(String activityId) {
     return super.milestone(activityId);
   }
-  
+
   @Override
   protected int getHistoricState() {
     isNotNull();

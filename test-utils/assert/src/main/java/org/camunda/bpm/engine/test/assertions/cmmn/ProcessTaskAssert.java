@@ -22,9 +22,6 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.model.cmmn.instance.ProcessTask;
 
-/**
- * @author Martin Schimak (martin.schimak@plexiti.com)
- */
 public class ProcessTaskAssert extends AbstractCaseAssert<ProcessTaskAssert, CaseExecution> {
 
   protected ProcessTaskAssert(final ProcessEngine engine, final CaseExecution actual) {
@@ -102,7 +99,7 @@ public class ProcessTaskAssert extends AbstractCaseAssert<ProcessTaskAssert, Cas
    * @return  this {@link AbstractCaseAssert}
    */
   public ProcessTaskAssert hasNoVariables() {
-    return (ProcessTaskAssert) hasVars(null);
+    return hasVars(null);
   }
 
   /**
@@ -115,7 +112,7 @@ public class ProcessTaskAssert extends AbstractCaseAssert<ProcessTaskAssert, Cas
    * @return  this {@link ProcessTaskAssert}
    */
   public ProcessTaskAssert hasVariables(final String... names) {
-    return (ProcessTaskAssert) hasVars(names);
+    return hasVars(names);
   }
 
   /**

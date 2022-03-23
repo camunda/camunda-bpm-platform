@@ -17,21 +17,7 @@
 package org.camunda.bpm.engine.test.assertions.bpmn;
 
 
-import org.assertj.core.api.Assertions;
-import org.camunda.bpm.engine.*;
-import org.camunda.bpm.engine.exception.NotFoundException;
-import org.camunda.bpm.engine.externaltask.ExternalTask;
-import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
-import org.camunda.bpm.engine.externaltask.LockedExternalTask;
-import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
-import org.camunda.bpm.engine.runtime.*;
-import org.camunda.bpm.engine.task.Task;
-import org.camunda.bpm.engine.task.TaskQuery;
-import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.camunda.bpm.model.bpmn.instance.Activity;
-import org.camunda.bpm.model.bpmn.instance.Event;
-import org.camunda.bpm.model.bpmn.instance.Gateway;
+import static java.lang.String.format;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -39,13 +25,40 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static java.lang.String.format;
+import org.assertj.core.api.Assertions;
+import org.camunda.bpm.engine.AuthorizationService;
+import org.camunda.bpm.engine.DecisionService;
+import org.camunda.bpm.engine.ExternalTaskService;
+import org.camunda.bpm.engine.FormService;
+import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.externaltask.ExternalTask;
+import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
+import org.camunda.bpm.engine.externaltask.LockedExternalTask;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
+import org.camunda.bpm.engine.runtime.ExecutionQuery;
+import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.runtime.JobQuery;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
+import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.task.TaskQuery;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.instance.Activity;
+import org.camunda.bpm.model.bpmn.instance.Event;
+import org.camunda.bpm.model.bpmn.instance.Gateway;
 
 /**
- * Convenience class to access only camunda *BPMN* related Assertions 
- * PLUS helper methods. Usage is possible, if you only need BPMN Tests and 
- * mandatory if you still use Camunda Platform lower than 7.2 version. 
- * 
+ * Convenience class to access only camunda *BPMN* related Assertions
+ * PLUS helper methods. Usage is possible, if you only need BPMN Tests and
+ * mandatory if you still use Camunda Platform lower than 7.2 version.
+ *
  * Use it with a static import:
  *
  * import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.*;
@@ -53,8 +66,6 @@ import static java.lang.String.format;
  * @see org.camunda.bpm.engine.test.assertions.ProcessEngineTests
  *      for full Camunda Platform Assertions functionality
  *
- * @author Martin Schimak (martin.schimak@plexiti.com)
- * @author Ingo Richtsmeier (ingo.richtsmeier@camunda.com)
  */
 public class BpmnAwareTests extends AbstractAssertions {
 
@@ -284,13 +295,13 @@ public class BpmnAwareTests extends AbstractAssertions {
    * @param   value (obligatory) value of first process variable
    * @param   furtherKeyValuePairs (optional) key/value pairs for further
    *          process variables
-   * @return  a map of process variables by passing a list of String, 
+   * @return  a map of process variables by passing a list of String,
    *          Object key value pairs.
    */
   public static Map<String, Object> withVariables(final String key, final Object value, final Object... furtherKeyValuePairs) {
     if (key == null)
       throw new IllegalArgumentException(format("Illegal call of withVariables(key = '%s', value = '%s', ...) - key must not be null!", key, value));
-    final Map<String, Object> map = new HashMap<String, Object>();
+    final Map<String, Object> map = new HashMap<>();
     map.put(key, value);
     if (furtherKeyValuePairs != null) {
       if (furtherKeyValuePairs.length % 2 != 0) {
