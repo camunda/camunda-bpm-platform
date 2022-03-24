@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0ozqxbc" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.0.0">
+  <bpmn:process id="ProcessInstanceAssert-jobEventSubprocess" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_158hwqi</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_158hwqi" sourceRef="StartEvent_1" targetRef="ServiceTask_1" />
+    <bpmn:sequenceFlow id="Flow_1ycpdtq" sourceRef="ServiceTask_1" targetRef="EndEvent_1" />
+    <bpmn:endEvent id="EndEvent_1">
+      <bpmn:incoming>Flow_1ycpdtq</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:subProcess id="EventSubprocess_1" triggeredByEvent="true">
+      <bpmn:startEvent id="StartEvent_2">
+        <bpmn:outgoing>Flow_0ubhuzp</bpmn:outgoing>
+        <bpmn:timerEventDefinition id="TimerEventDefinition_0gsdz1v">
+          <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT3M</bpmn:timeDuration>
+        </bpmn:timerEventDefinition>
+      </bpmn:startEvent>
+      <bpmn:endEvent id="EndEvent_2">
+        <bpmn:incoming>Flow_0ubhuzp</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="Flow_0ubhuzp" sourceRef="StartEvent_2" targetRef="EndEvent_2" />
+    </bpmn:subProcess>
+    <bpmn:serviceTask id="ServiceTask_1" camunda:asyncBefore="true" camunda:expression="${true}">
+      <bpmn:incoming>Flow_158hwqi</bpmn:incoming>
+      <bpmn:outgoing>Flow_1ycpdtq</bpmn:outgoing>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="ProcessInstanceAssert-jobEventSubprocess">
+      <bpmndi:BPMNEdge id="Flow_1ycpdtq_di" bpmnElement="Flow_1ycpdtq">
+        <di:waypoint x="365" y="120" />
+        <di:waypoint x="404" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_158hwqi_di" bpmnElement="Flow_158hwqi">
+        <di:waypoint x="228" y="120" />
+        <di:waypoint x="265" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="192" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0ft9nw7_di" bpmnElement="ServiceTask_1">
+        <dc:Bounds x="265" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_02mc3qr_di" bpmnElement="EndEvent_1">
+        <dc:Bounds x="404" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0ohogvz_di" bpmnElement="EventSubprocess_1" isExpanded="true">
+        <dc:Bounds x="190" y="190" width="250" height="120" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0ubhuzp_di" bpmnElement="Flow_0ubhuzp">
+        <di:waypoint x="248" y="250" />
+        <di:waypoint x="332" y="250" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_1auenfx_di" bpmnElement="StartEvent_2">
+        <dc:Bounds x="212" y="232" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0grg7an_di" bpmnElement="EndEvent_2">
+        <dc:Bounds x="332" y="232" width="36" height="36" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

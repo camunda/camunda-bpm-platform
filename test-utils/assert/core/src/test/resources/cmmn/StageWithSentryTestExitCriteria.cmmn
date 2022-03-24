@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cmmn:definitions xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:cmmn="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns="http://www.trisotech.com/cmmn/definitions/_StageWithSentryExitCriteriaTest" xmlns:trisob="http://www.trisotech.com/2014/triso/bpmn" xmlns:rss="http://purl.org/rss/2.0/" xmlns:trisofeed="http://trisotech.com/feed" xmlns:trisocmmn="http://www.trisotech.com/2014/triso/cmmn" xmlns:triso="http://www.trisotech.com/2015/triso/modeling" id="Def_StageWithSentryExitCriteriaTest" name="Stage with Sentry Tests and Exit Criteria" targetNamespace="http://www.trisotech.com/cmmn/definitions/_StageWithSentryExitCriteriaTest" exporter="Camunda Modeler" exporterVersion="1.4.0" author="">
+  <cmmn:case id="Case_StageWithSentryExitCriteriaTest" name="Stage with Sentry Tests and Exit Criteria">
+    <cmmn:casePlanModel id="CPM_StageWithSentryExitCriteriaTest" name="Stage with Sentry Tests and Exit Criteria" autoComplete="false">
+      <cmmn:planItem id="PI_StageS" definitionRef="PID_PI_StageS">
+        <cmmn:itemControl id="PlanItemControl_10d87hs">
+          <cmmn:manualActivationRule id="ManualActivationRule_1j6k683">
+            <cmmn:condition id="Expression_1o03cs5">${true}</cmmn:condition>
+          </cmmn:manualActivationRule>
+        </cmmn:itemControl>
+        <cmmn:exitCriterion id="N65556_exit1" sentryRef="On_PI_HT_B_ManualStart" />
+      </cmmn:planItem>
+      <cmmn:planItem id="PI_HT_B" definitionRef="PID_PI_HT_B">
+        <cmmn:itemControl id="PlanItemControl_01rxe5o">
+          <cmmn:manualActivationRule id="ManualActivationRule_0sx6dma">
+            <cmmn:condition id="Expression_0ewq9lc">${true}</cmmn:condition>
+          </cmmn:manualActivationRule>
+        </cmmn:itemControl>
+      </cmmn:planItem>
+      <cmmn:sentry id="On_PI_HT_B_ManualStart">
+        <cmmn:planItemOnPart id="b254176d-d8e3-4542-bdb0-8108bf73188a" sourceRef="PI_HT_B">        <cmmn:standardEvent>manualStart</cmmn:standardEvent>
+</cmmn:planItemOnPart>
+      </cmmn:sentry>
+      <cmmn:stage id="PID_PI_StageS" name="S" autoComplete="false">
+        <cmmn:planItem id="PI_HT_A" definitionRef="PID_PI_HT_A">
+          <cmmn:itemControl id="PlanItemControl_0sywbtr">
+            <cmmn:manualActivationRule id="ManualActivationRule_0krdhkm">
+              <cmmn:condition id="Expression_0zzaes5">${true}</cmmn:condition>
+            </cmmn:manualActivationRule>
+          </cmmn:itemControl>
+        </cmmn:planItem>
+        <cmmn:humanTask id="PID_PI_HT_A" name="A" />
+      </cmmn:stage>
+      <cmmn:humanTask id="PID_PI_HT_B" name="B" />
+    </cmmn:casePlanModel>
+  </cmmn:case>
+  <cmmndi:CMMNDI>
+    <cmmndi:CMMNDiagram sharedStyle="afb871cd-d2ae-4dd7-8398-d3114fa72884" id="PCPM_StageWithSentryExitCriteriaTest" name="Stage with Sentry Tests and Exit Criteria">
+      <cmmndi:Size xsi:type="dc:Dimension" width="762" height="576" />
+      <cmmndi:CMMNShape id="_ce0acc5f-f743-4d3e-9a4e-8086dc832903" cmmnElementRef="CPM_StageWithSentryExitCriteriaTest">
+        <dc:Bounds x="150" y="150" width="462" height="276" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="_d90d0986-d2cd-405f-bc45-810d531b59f2" cmmnElementRef="PI_StageS" isCollapsed="false">
+        <dc:Bounds x="190" y="190" width="216" height="196" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="_86c6994f-a4ef-4dc3-9779-a69e6bc64c8d" cmmnElementRef="PI_HT_A">
+        <dc:Bounds x="250" y="250" width="96" height="76" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="_3cbf7d9a-7413-4bfa-ba03-60bade1c4149" cmmnElementRef="PI_HT_B">
+        <dc:Bounds x="476" y="250" width="96" height="76" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="_7385d524-6a2a-46ce-a964-50166972972b" cmmnElementRef="N65556_exit1">
+        <dc:Bounds x="396" y="274" width="20" height="28" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNEdge id="_e1fcba51-47ac-4c06-9eec-bf7888c524bc" cmmnElementRef="b254176d-d8e3-4542-bdb0-8108bf73188a" targetCMMNElementRef="N65556_exit1" isStandardEventVisible="true">
+        <di:waypoint xsi:type="dc:Point" x="416" y="288" />
+        <di:waypoint xsi:type="dc:Point" x="476" y="288" />
+        <cmmndi:CMMNLabel />
+      </cmmndi:CMMNEdge>
+    </cmmndi:CMMNDiagram>
+    <cmmndi:CMMNStyle id="afb871cd-d2ae-4dd7-8398-d3114fa72884" fontFamily="Arial,Helvetica,sans-serif" />
+  </cmmndi:CMMNDI>
+</cmmn:definitions>

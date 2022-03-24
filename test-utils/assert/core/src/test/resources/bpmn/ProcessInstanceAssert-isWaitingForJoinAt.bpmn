@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1ya9uho" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.7.1">
+  <bpmn:process id="ProcessInstanceAssert-isWaitingForJoinAt" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_06p8cnv</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_06p8cnv" sourceRef="StartEvent_1" targetRef="SplitGateway" />
+    <bpmn:parallelGateway id="SplitGateway" name="split">
+      <bpmn:incoming>Flow_06p8cnv</bpmn:incoming>
+      <bpmn:outgoing>Flow_1ktsvy5</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1fz2577</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:sequenceFlow id="Flow_1ktsvy5" sourceRef="SplitGateway" targetRef="UserTask1" />
+    <bpmn:sequenceFlow id="Flow_1fz2577" sourceRef="SplitGateway" targetRef="UserTask2" />
+    <bpmn:userTask id="UserTask2" name="User task 2">
+      <bpmn:incoming>Flow_1fz2577</bpmn:incoming>
+      <bpmn:outgoing>Flow_0v2s5za</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="UserTask1" name="User task 1">
+      <bpmn:incoming>Flow_1ktsvy5</bpmn:incoming>
+      <bpmn:outgoing>Flow_0tpcche</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_0tpcche" sourceRef="UserTask1" targetRef="JoinGateway" />
+    <bpmn:parallelGateway id="JoinGateway" name="join&#10;&#10;">
+      <bpmn:incoming>Flow_0tpcche</bpmn:incoming>
+      <bpmn:incoming>Flow_0v2s5za</bpmn:incoming>
+      <bpmn:outgoing>Flow_17q4d3l</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:sequenceFlow id="Flow_0v2s5za" sourceRef="UserTask2" targetRef="JoinGateway" />
+    <bpmn:endEvent id="Event_0rn7wiu">
+      <bpmn:incoming>Flow_17q4d3l</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_17q4d3l" sourceRef="JoinGateway" targetRef="Event_0rn7wiu" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="ProcessInstanceAssert-isWaitingForJoinAt">
+      <bpmndi:BPMNEdge id="Flow_0v2s5za_di" bpmnElement="Flow_0v2s5za">
+        <di:waypoint x="480" y="260" />
+        <di:waypoint x="570" y="260" />
+        <di:waypoint x="570" y="202" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0tpcche_di" bpmnElement="Flow_0tpcche">
+        <di:waypoint x="480" y="100" />
+        <di:waypoint x="570" y="100" />
+        <di:waypoint x="570" y="152" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1fz2577_di" bpmnElement="Flow_1fz2577">
+        <di:waypoint x="290" y="202" />
+        <di:waypoint x="290" y="260" />
+        <di:waypoint x="380" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ktsvy5_di" bpmnElement="Flow_1ktsvy5">
+        <di:waypoint x="290" y="152" />
+        <di:waypoint x="290" y="100" />
+        <di:waypoint x="380" y="100" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_06p8cnv_di" bpmnElement="Flow_06p8cnv">
+        <di:waypoint x="215" y="177" />
+        <di:waypoint x="265" y="177" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_17q4d3l_di" bpmnElement="Flow_17q4d3l">
+        <di:waypoint x="595" y="177" />
+        <di:waypoint x="652" y="177" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="159" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0535xwc_di" bpmnElement="SplitGateway">
+        <dc:Bounds x="265" y="152" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="329" y="170" width="21" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1urtda3_di" bpmnElement="UserTask1">
+        <dc:Bounds x="380" y="60" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1c6tntc_di" bpmnElement="JoinGateway">
+        <dc:Bounds x="545" y="152" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="521" y="167" width="17" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0n20flt_di" bpmnElement="UserTask2">
+        <dc:Bounds x="380" y="220" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0rn7wiu_di" bpmnElement="Event_0rn7wiu">
+        <dc:Bounds x="652" y="159" width="36" height="36" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
