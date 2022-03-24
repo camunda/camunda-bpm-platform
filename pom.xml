@@ -83,6 +83,7 @@
         <module>test-utils/testcontainers</module>
         <module>test-utils/junit5-extension</module>
         <module>test-utils/assert/core</module>
+        <module>test-utils/assert/qa</module>
 
         <module>engine</module>
         <module>engine-cdi</module>
