@@ -215,6 +215,7 @@ public class ProcessEngineExtension implements TestWatcher,
    for (String additionalDeployment : additionalDeployments) {
      TestHelper.deleteDeployment(processEngine, additionalDeployment);
    }
+   additionalDeployments.clear();
 
    TestHelper.resetIdGenerator(processEngineConfiguration);
    ClockUtil.reset();
