@@ -16,8 +16,7 @@
  */
 package org.camunda.bpm.engine.test.junit5.registerExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
+import static org.assertj.core.api.Assertions.assertThat;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
@@ -51,10 +50,22 @@ public class RegisterNewProcessEngineTest {
   @Test
   @Deployment(resources = "processes/subProcess.bpmn")
   public void testUseProcessEngine() {
+    // given
     RuntimeService runtimeService = testEngine.getRuntimeService();
     runtimeService.startProcessInstanceByKey("subProcess");
     TaskService taskService = testEngine.getTaskService();
-    assertEquals(1, taskService.createTaskQuery().list().size());
+
+    // when
+    int numberOfTasks = taskService.createTaskQuery().list().size();
+
+    // then
+    assertThat(numberOfTasks).isOne();
+  }
+
+  @Test
+  public void shouldUpdateServiceReferences() {
+
+    assertThat(extension.getRuntimeService()).isEqualTo(testEngine.getRuntimeService());
   }
 
 }

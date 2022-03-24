@@ -36,6 +36,13 @@
       <version>5.8.2</version>
       <scope>provided</scope>
     </dependency>
+    <!-- Necessary for using TestHelper which is based on JUnit 4 -->
+    <dependency>
+        <groupId>org.junit.vintage</groupId>
+        <artifactId>junit-vintage-engine</artifactId>
+        <version>5.8.2</version>
+        <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
