@@ -61,7 +61,7 @@ In order to build our codebase from source, add the following to your Maven `set
         <snapshots>
           <enabled>true</enabled>
         </snapshots>
-        <url>https://app.camunda.com/nexus/content/groups/public</url>
+        <url>https://artifacts.camunda.com/artifactory/public/</url>
       </repository>
     </repositories>
   </profile>
