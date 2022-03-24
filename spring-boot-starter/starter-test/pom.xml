@@ -12,11 +12,6 @@
   <artifactId>camunda-bpm-spring-boot-starter-test</artifactId>
   <name>Camunda Platform - Spring Boot Starter - Test</name>
 
-  <properties>
-    <camunda-assert.artifact>camunda-bpm-assert-assertj3-11-1</camunda-assert.artifact>
-    <camunda-assert.version>4.0.0</camunda-assert.version>
-  </properties>
-
   <dependencies>
 
     <dependency>
@@ -45,9 +40,9 @@
     </dependency>
 
     <dependency>
-      <groupId>org.camunda.bpm.assert</groupId>
-      <artifactId>${camunda-assert.artifact}</artifactId>
-      <version>${camunda-assert.version}</version>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-bpm-assert</artifactId>
+      <version>${project.version}</version>
       <scope>compile</scope>
     </dependency>
 
