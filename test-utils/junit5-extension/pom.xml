@@ -40,6 +40,13 @@
       <version>${version.junit5}</version>
       <scope>provided</scope>
     </dependency>
+    <!-- Necessary for using the engine's 'TestHelper class which is based on JUnit 4 -->
+    <dependency>
+        <groupId>org.junit.vintage</groupId>
+        <artifactId>junit-vintage-engine</artifactId>
+        <version>${version.junit5}</version>
+        <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>

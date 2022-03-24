@@ -24,8 +24,8 @@ import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-public class ProcessEngineExtensionRequiredHistoryLevelTest {
-  
+public class ProcessEngineExtensionRequiredHistoryLevelAuditTest {
+
   @RegisterExtension
   ProcessEngineExtension extension = ProcessEngineExtension.builder()
       .configurationResource("audithistory.camunda.cfg.xml")
@@ -36,11 +36,11 @@ public class ProcessEngineExtensionRequiredHistoryLevelTest {
   public void testRequiredHistoryIgnored() {
     fail("the configured history level is too high");
   }
-  
+
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
   public void testRequiredHistoryLevelMatch() {
-    assertEquals(extension.getProcessEngineConfiguration().getHistoryLevel().getName(), 
+    assertEquals(extension.getProcessEngineConfiguration().getHistoryLevel().getName(),
         ProcessEngineConfiguration.HISTORY_AUDIT);
   }
 }
