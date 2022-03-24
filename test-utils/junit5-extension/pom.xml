@@ -11,6 +11,10 @@
     <relativePath>../../database</relativePath>
     <version>7.17.0-SNAPSHOT</version>
   </parent>
+
+  <properties>
+    <version.junit>5.8.2</version.junit>
+  </properties>
   
   <dependencyManagement>
     <dependencies>
@@ -33,14 +37,14 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
-      <version>5.8.2</version>
+      <version>${version.junit}</version>
       <scope>provided</scope>
     </dependency>
-    <!-- Necessary for using TestHelper which is based on JUnit 4 -->
+    <!-- Necessary for using the engine's 'TestHelper class which is based on JUnit 4 -->
     <dependency>
         <groupId>org.junit.vintage</groupId>
         <artifactId>junit-vintage-engine</artifactId>
-        <version>5.8.2</version>
+        <version>${version.junit}</version>
         <scope>test</scope>
     </dependency>
     <dependency>
