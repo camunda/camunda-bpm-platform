@@ -60,8 +60,6 @@ import static org.assertj.core.api.Assertions.*;
 import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
 ```
 
-Find a more detailed description of the assertions and helper methods available in the Camunda Platform Assert [user guide](https://github.com/camunda/camunda-bpm-assert/blob/master/docs/README.md).
-
 ## Credits
 
 The Camunda Platform Assert project used to be the community extension, created and supported by
