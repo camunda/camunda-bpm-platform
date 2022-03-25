@@ -25,7 +25,7 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.junit5.ProcessEngineExtension;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
@@ -36,7 +36,7 @@ public class ProcessEngineExtensionCompatibilityTest {
 
   RuntimeService runtimeService;
 
-  @BeforeAll
+  @BeforeEach
   public void setup() {
     runtimeService = extension.getRuntimeService();
   }

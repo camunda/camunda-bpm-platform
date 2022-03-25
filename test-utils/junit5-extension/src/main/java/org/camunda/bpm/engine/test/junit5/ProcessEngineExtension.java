@@ -192,8 +192,6 @@ public class ProcessEngineExtension implements TestWatcher,
   public void beforeTestExecution(ExtensionContext context) {
     LOG.debug("beforeTestExecution: {}", context.getDisplayName());
 
-    initializeServices();
-
     final Method testMethod = context.getTestMethod().orElseThrow(illegalStateException("testMethod not set"));
     final Class<?> testClass = context.getTestClass().orElseThrow(illegalStateException("testClass not set"));
 
@@ -268,6 +266,7 @@ public class ProcessEngineExtension implements TestWatcher,
     if (processEngine == null) {
       initializeProcessEngine();
     }
+    initializeServices();
     return this;
   }
 
