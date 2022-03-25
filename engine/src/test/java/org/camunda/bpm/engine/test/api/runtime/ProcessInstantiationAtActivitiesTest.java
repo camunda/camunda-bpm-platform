@@ -556,6 +556,36 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
     identityService.clearAuthentication();
   }
 
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/conditionalbug.bpmn"})
+  public void startBeforeFirstTask() {
+    // Start process instance before the FirstTask (UserTask)
+    ProcessInstance processInstance = runtimeService.createProcessInstanceByKey("conditionalBug")
+        .startBeforeActivity("FirstTask")
+        .execute();
+
+    // There should be one execution in the event sub process since the condition is met
+    List<Execution> executions = runtimeService.createExecutionQuery()
+        .processInstanceId(processInstance.getId())
+        .activityId("Event_0s2zckl")
+        .list();
+
+    assertEquals(1, executions.size());
+
+    String id = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId();
+    taskService.complete(id);
+    id = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId();
+    taskService.complete(id);
+
+    // Sub process should finish since the second condition should true as well
+    executions = runtimeService.createExecutionQuery()
+        .processInstanceId(processInstance.getId())
+        .activityId("Event_0s2zckl")
+        .list();
+
+    assertEquals(0, executions.size());
+  }
+
   protected void completeTasksInOrder(String... taskNames) {
     for (String taskName : taskNames) {
       // complete any task with that name
