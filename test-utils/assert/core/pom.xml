@@ -7,39 +7,12 @@
 
   <parent>
     <groupId>org.camunda.bpm</groupId>
-    <artifactId>camunda-database-settings</artifactId>
-    <relativePath>../../database</relativePath>
+    <artifactId>camunda-bpm-assert-root</artifactId>
+    <relativePath>../</relativePath>
     <version>7.17.0-SNAPSHOT</version>
   </parent>
   
-  <dependencyManagement>
-    <dependencies>
-      <!-- spring-boot-dependencies as first element in the list
-           ensures to be chosen over internal-dependencies for assertj -->
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-dependencies</artifactId>
-        <version>${version.spring-boot}</version>
-        <scope>import</scope>
-        <type>pom</type>
-      </dependency>
-      <dependency>
-        <groupId>org.camunda.bpm</groupId>
-        <artifactId>camunda-core-internal-dependencies</artifactId>
-        <version>${project.version}</version>
-        <scope>import</scope>
-        <type>pom</type>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
-    <dependency>
-      <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
     <!-- managed by spring-boot-dependencies -->
     <dependency>
       <groupId>org.assertj</groupId>
@@ -47,6 +20,12 @@
       <scope>provided</scope>
     </dependency>
 
+    <!-- managed by camunda internal dependencies -->
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine</artifactId>
+      <scope>provided</scope>
+    </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>

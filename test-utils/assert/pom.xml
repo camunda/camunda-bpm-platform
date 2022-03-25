@@ -1,0 +1,41 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>camunda-bpm-assert-root</artifactId>
+  <packaging>pom</packaging>
+  
+  <name>Camunda Platform - Assert - Root</name>
+  
+  <parent>
+    <groupId>org.camunda.bpm</groupId>
+    <artifactId>camunda-database-settings</artifactId>
+    <relativePath>../../database</relativePath>
+    <version>7.17.0-SNAPSHOT</version>
+  </parent>
+
+  <dependencyManagement>
+    <dependencies>
+      <!-- spring-boot-dependencies as first element in the list
+           ensures to be chosen over internal-dependencies for assertj -->
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>${version.spring-boot}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-core-internal-dependencies</artifactId>
+        <version>${project.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <modules>
+    <module>core</module>
+    <module>qa</module>
+  </modules>
+
+</project>
