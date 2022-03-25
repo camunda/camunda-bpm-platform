@@ -33,9 +33,24 @@
     </dependencies>
   </dependencyManagement>
 
-  <modules>
-    <module>core</module>
-    <module>qa</module>
-  </modules>
+  <profiles>
+    <profile>
+      <id>distro</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>core</module>
+        <module>qa</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>sonatype-oss-release</id>
+      <modules>
+        <module>core</module>
+      </modules>
+    </profile>
+  </profiles>
 
 </project>
