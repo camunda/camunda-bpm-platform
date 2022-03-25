@@ -47,6 +47,7 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -106,7 +107,7 @@ import org.slf4j.Logger;
  */
 public class ProcessEngineExtension implements TestWatcher,
     TestInstancePostProcessor, BeforeTestExecutionCallback, AfterTestExecutionCallback,
-    ParameterResolver, ProcessEngineServices {
+    AfterAllCallback, ParameterResolver, ProcessEngineServices {
 
   protected static final Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
@@ -192,8 +193,6 @@ public class ProcessEngineExtension implements TestWatcher,
   public void beforeTestExecution(ExtensionContext context) {
     LOG.debug("beforeTestExecution: {}", context.getDisplayName());
 
-    initializeServices();
-
     final Method testMethod = context.getTestMethod().orElseThrow(illegalStateException("testMethod not set"));
     final Class<?> testClass = context.getTestClass().orElseThrow(illegalStateException("testClass not set"));
 
@@ -219,13 +218,17 @@ public class ProcessEngineExtension implements TestWatcher,
 
    TestHelper.resetIdGenerator(processEngineConfiguration);
    ClockUtil.reset();
-   clearServiceReferences();
    PlatformTelemetryRegistry.clear();
 
    // finally clear database and fail test if database is dirty
    if (ensureCleanAfterTest) {
      TestHelper.assertAndEnsureCleanDbAndCache(processEngine);
    }
+  }
+
+  @Override
+  public void afterAll(ExtensionContext context) throws Exception {
+    clearServiceReferences();
   }
 
   @Override
@@ -268,6 +271,7 @@ public class ProcessEngineExtension implements TestWatcher,
     if (processEngine == null) {
       initializeProcessEngine();
     }
+    initializeServices();
     return this;
   }
 

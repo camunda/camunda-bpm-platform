@@ -173,6 +173,16 @@
         <artifactId>camunda-bpm-quarkus-engine</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-bpm-junit5</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-bpm-assert</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
       <!-- dmn engine dependencies
        -->
