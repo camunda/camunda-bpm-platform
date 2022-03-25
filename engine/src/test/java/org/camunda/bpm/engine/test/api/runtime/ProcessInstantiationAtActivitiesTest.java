@@ -556,6 +556,37 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
     identityService.clearAuthentication();
   }
 
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/concurrentExecutionVariableWithSubprocess.bpmn20.xml"})
+  public void shouldFinishProcessWithIoMappingAndEventSubprocess() {
+    // given
+    // Start process instance before the FirstTask (UserTask) with I/O mapping
+    ProcessInstance processInstance = runtimeService.createProcessInstanceByKey("process")
+        .startBeforeActivity("FirstTask")
+        .execute();
+
+    // There should be one execution in the event sub process since the condition is met
+    List<Execution> executions = runtimeService.createExecutionQuery()
+        .processInstanceId(processInstance.getId())
+        .activityId("Event_0s2zckl")
+        .list();
+    assertEquals(1, executions.size());
+
+    // when the user tasks are completed
+    String id = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId();
+    taskService.complete(id);
+    id = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId();
+    taskService.complete(id);
+
+    // then
+    // Sub process should finish since the second condition should be true as well
+    executions = runtimeService.createExecutionQuery()
+        .processInstanceId(processInstance.getId())
+        .activityId("Event_0s2zckl")
+        .list();
+    assertEquals(0, executions.size());
+  }
+
   protected void completeTasksInOrder(String... taskNames) {
     for (String taskName : taskNames) {
       // complete any task with that name
