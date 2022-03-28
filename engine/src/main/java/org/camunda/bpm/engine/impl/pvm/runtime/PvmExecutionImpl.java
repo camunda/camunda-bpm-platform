@@ -301,13 +301,14 @@ public abstract class PvmExecutionImpl extends CoreExecution implements
 
     fireHistoricProcessStartEvent();
 
-    setActivity(null);
     setActivityInstanceId(getId());
     setVariables(variables);
 
     initializeTimerDeclarations();
 
     performOperation(PvmAtomicOperation.FIRE_PROCESS_START);
+
+    setActivity(null);
   }
 
   public abstract void fireHistoricProcessStartEvent();
