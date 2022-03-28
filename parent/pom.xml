@@ -36,7 +36,7 @@
     <version.jackson>2.13.1</version.jackson>
 
     <version.slf4j>1.7.26</version.slf4j>
-    <version.logback>1.2.10</version.logback>
+    <version.logback>1.2.11</version.logback>
     <version.junit>4.13.1</version.junit>
     <version.assertj>2.9.1</version.assertj>
     <version.mockito>4.3.1</version.mockito>
