@@ -5,17 +5,14 @@
 #   databases: [LIST; OPTIONAL; Doc: defines the databases to be used in the stage generation ]
 engine-webapp-unit:
   databases:
-  - 'postgresql_96'
   - 'postgresql_1013'
   - 'postgresql_112'
   - 'postgresql_122'
   - 'postgresql_132'
   - 'aws_aurora_postgresql_1013'
   - 'aws_aurora_postgresql_124'
-  - 'mariadb_102'
   - 'mariadb_103'
   - 'mariadb_106'
-  - 'mariadb_galera'
   - 'mysql_57'
   - 'mysql_80'
   - 'oracle_12'
@@ -39,17 +36,14 @@ engine-rest:
   - 'engine-rest-IT-embedded-wildfly'
 daily-stages:
   databases: 
-  - 'postgresql_96'
   - 'postgresql_1013'
   - 'postgresql_112'
   - 'postgresql_122'
   - 'postgresql_132'
   - 'aws_aurora_postgresql_1013'
   - 'aws_aurora_postgresql_124'
-  - 'mariadb_102'
   - 'mariadb_103'
   - 'mariadb_106'
-  - 'mariadb_galera'
   - 'mysql_57'
   - 'mysql_80'
   - 'oracle_12'
@@ -82,17 +76,9 @@ sidetrack-stages:
 jdk-ce-stages:
   stages:
   - 'platform-jdk-openjdk-jdk-17-latest'
-  - 'platform-jdk-openjdk-jdk-15-latest'
-  - 'platform-jdk-openjdk-jdk-14-latest'
-  - 'platform-jdk-openjdk-jdk-13-latest'
-  - 'platform-jdk-openjdk-jdk-12-latest'
   - 'platform-jdk-openjdk-jdk-11-latest'
   - 'platform-jdk-openjdk-jdk-8-latest'
   - 'platform-jdk-jdk-17-latest'
-  - 'platform-jdk-jdk-15-latest'
-  - 'platform-jdk-jdk-14-latest'
-  - 'platform-jdk-jdk-13-latest'
-  - 'platform-jdk-jdk-12-latest'
   - 'platform-jdk-jdk-11-latest'
   - 'platform-jdk-jdk-8-latest'
   - 'platform-jdk-ibm-jdk-8-latest'

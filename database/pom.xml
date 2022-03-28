@@ -24,7 +24,6 @@
     <version.oracle-19>19.3.0.0</version.oracle-19>
     <version.oracle>${version.oracle-12}</version.oracle>
     <version.mariadb>1.1.8</version.mariadb>
-    <version.mariadb.galera>1.6.3</version.mariadb.galera>
     <version.mysql>8.0.28</version.mysql>
     <version.sqlserver>8.2.2.jre8</version.sqlserver>
     <version.db2-11.5>11.5.0.0</version.db2-11.5>
@@ -347,18 +346,6 @@
           </plugins>
         </pluginManagement>
       </build>
-    </profile>
-    <profile>
-      <id>mariadb-galera</id>
-      <properties>
-        <version.mariadb>${version.mariadb.galera}</version.mariadb>
-      </properties>
-    </profile>
-    <profile>
-      <id>mariadb-10.2</id>
-      <properties>
-        <database.tc.url>cammariadb:10.2</database.tc.url>
-      </properties>
     </profile>
 
     <profile>

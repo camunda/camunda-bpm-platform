@@ -141,14 +141,6 @@ public class DeploymentHelper {
           .using(new RejectDependenciesStrategy(false,
               "joda-time:joda-time"))
           .as(JavaArchive.class);
-    } else if (server.equals("websphere")) {
-      return Maven.configureResolver()
-        .workOffline()
-        .loadPomFromFile("pom.xml", "was85")
-        .resolve("com.fasterxml.jackson.datatype:jackson-datatype-joda")
-        .using(new RejectDependenciesStrategy(false,
-          "joda-time:joda-time"))
-        .as(JavaArchive.class);
     } else if (server.equals("jboss")) {
       return Maven.configureResolver()
           .workOffline()
@@ -178,16 +170,6 @@ public class DeploymentHelper {
               "org.camunda.commons:camunda-commons-logging",
               "org.camunda.commons:camunda-commons-utils"))
           .as(JavaArchive.class);
-    } else if (server.equals("websphere")) {
-      return Maven.configureResolver()
-        .workOffline()
-        .loadPomFromFile("pom.xml", "was85")
-        .resolve("org.camunda.spin:camunda-spin-dataformat-json-jackson")
-        .using(new RejectDependenciesStrategy(false,
-          "org.camunda.spin:camunda-spin-core",
-          "org.camunda.commons:camunda-commons-logging",
-          "org.camunda.commons:camunda-commons-utils"))
-        .as(JavaArchive.class);
     } else {
       throw new RuntimeException("Unable to determine dependencies for spinJacksonJsonDataFormat: " + server);
     }

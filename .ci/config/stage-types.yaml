@@ -168,38 +168,6 @@ platform-jdk-openjdk-jdk-17-latest:
   nodeLabel: 'h2'
   jdkVersion: 'openjdk-jdk-17-latest'
   withNpm: true
-platform-jdk-openjdk-jdk-15-latest:
-  directory: '.'
-  command: 'install source:jar source:test-jar -pl ''!webapps'' -Pdistro,distro-ce,distro-wildfly'
-  stash:
-    runtimeStash: true
-  nodeLabel: 'h2'
-  jdkVersion: 'openjdk-jdk-15-latest'
-  withNpm: true
-platform-jdk-openjdk-jdk-14-latest:
-  directory: '.'
-  command: 'install source:jar source:test-jar -pl ''!webapps'' -Pdistro,distro-ce,distro-wildfly'
-  stash:
-    runtimeStash: true
-  nodeLabel: 'h2'
-  jdkVersion: 'openjdk-jdk-14-latest'
-  withNpm: true
-platform-jdk-openjdk-jdk-13-latest:
-  directory: '.'
-  command: 'install source:jar source:test-jar -pl ''!webapps'' -Pdistro,distro-ce,distro-wildfly'
-  stash:
-    runtimeStash: true
-  nodeLabel: 'h2'
-  jdkVersion: 'openjdk-jdk-13-latest'
-  withNpm: true
-platform-jdk-openjdk-jdk-12-latest:
-  directory: '.'
-  command: 'install source:jar source:test-jar -pl ''!webapps'' -Pdistro,distro-ce,distro-wildfly'
-  stash:
-    runtimeStash: true
-  nodeLabel: 'h2'
-  jdkVersion: 'openjdk-jdk-12-latest'
-  withNpm: true
 platform-jdk-openjdk-jdk-11-latest:
   directory: '.'
   command: 'install source:jar source:test-jar -pl ''!webapps'' -Pdistro,distro-ce,distro-wildfly'
@@ -223,38 +191,6 @@ platform-jdk-jdk-17-latest:
     runtimeStash: true
   nodeLabel: 'h2'
   jdkVersion: 'jdk-17-latest'
-  withNpm: true
-platform-jdk-jdk-15-latest:
-  directory: '.'
-  command: 'install source:jar source:test-jar -pl ''!webapps'' -Pdistro,distro-ce,distro-wildfly'
-  stash:
-    runtimeStash: true
-  nodeLabel: 'h2'
-  jdkVersion: 'jdk-15-latest'
-  withNpm: true
-platform-jdk-jdk-14-latest:
-  directory: '.'
-  command: 'install source:jar source:test-jar -pl ''!webapps'' -Pdistro,distro-ce,distro-wildfly'
-  stash:
-    runtimeStash: true
-  nodeLabel: 'h2'
-  jdkVersion: 'jdk-14-latest'
-  withNpm: true
-platform-jdk-jdk-13-latest:
-  directory: '.'
-  command: 'install source:jar source:test-jar -pl ''!webapps'' -Pdistro,distro-ce,distro-wildfly'
-  stash:
-    runtimeStash: true
-  nodeLabel: 'h2'
-  jdkVersion: 'jdk-13-latest'
-  withNpm: true
-platform-jdk-jdk-12-latest:
-  directory: '.'
-  command: 'install source:jar source:test-jar -pl ''!webapps'' -Pdistro,distro-ce,distro-wildfly'
-  stash:
-    runtimeStash: true
-  nodeLabel: 'h2'
-  jdkVersion: 'jdk-12-latest'
   withNpm: true
 platform-jdk-jdk-11-latest:
   directory: '.'
