@@ -2,8 +2,8 @@
 <definitions xmlns="http://www.omg.org/spec/DMN/20151101/dmn.xsd" xmlns:camunda="http://camunda.org/schema/1.0/dmn" id="definitions_0afw8ry" name="definitions" namespace="http://camunda.org/schema/1.0/dmn">
   <decision id="decision" name="Decision">
     <decisionTable id="decisionTable" hitPolicy="FIRST">
-      <input id="input1" label="in" camunda:inputVariable="inputVariableName">
-        <inputExpression id="inputExpression1" typeRef="integer">        <text>in</text>
+      <input id="input1" label="inVar" camunda:inputVariable="inputVariableName">
+        <inputExpression id="inputExpression1" typeRef="integer">        <text>inVar</text>
 </inputExpression>
       </input>
       <output id="output1" label="out" name="out" typeRef="boolean" />

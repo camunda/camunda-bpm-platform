@@ -110,7 +110,7 @@ public class BreakingScalaFeelBehaviorTest extends DmnEngineTest {
     // then
     thrown.expect(FeelException.class);
     thrown.expectMessage("FEEL/SCALA-01008 Error while evaluating expression: failed to parse expression ''Hello World'': "
-        + "Expected (acceptAnyInputValue | \"not\" | positiveUnaryTests):1:1, found \"'Hello Wor\"");
+      + "Expected (negation | positiveUnaryTests | anyInput):1:1, found \"'Hello Wor\"");
 
     // when
     engine.evaluateDecision(decision, Variables.createVariables().putValue("input", "Hello World"));
