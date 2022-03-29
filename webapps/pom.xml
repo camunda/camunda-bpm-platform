@@ -918,6 +918,17 @@
     <!-- profile for running cockpit testsuite with database table prefix -->
     <profile>
       <id>db-table-prefix</id>
+      <!-- imports the DbSchemaPrefixTestHelper class -->
+      <dependencies>
+        <dependency>
+          <groupId>org.camunda.bpm</groupId>
+          <artifactId>camunda-engine</artifactId>
+          <version>${project.version}</version>
+          <scope>test</scope>
+          <classifier>tests</classifier>
+        </dependency>
+      </dependencies>
+
       <build>
         <plugins>
           <plugin>
