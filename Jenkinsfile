@@ -136,9 +136,8 @@ pipeline {
           when {
             allOf {
               expression {
-                cambpmIsNotFailedStageType(failedStageTypes, 'webapp-unit', 'default-build')
+                cambpmIsNotFailedStageType(failedStageTypes, 'webapp-unit')
               }
-              branch cambpmDefaultBranch();
             }
           }
           steps {
