@@ -4,7 +4,7 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-  <bean id="dbSchemaPrefixTestHelper" class="org.camunda.bpm.webapp.impl.test.util.DbSchemaPrefixTestHelper" />
+  <bean id="dbSchemaPrefixTestHelper" class="org.camunda.bpm.engine.test.util.DbSchemaPrefixTestHelper" />
 
   <bean id="idGenerator" class="org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator" />
 
@@ -15,7 +15,7 @@
     <property name="jdbcUsername" value="sa" />
     <property name="jdbcPassword" value="" />
 
-    <!-- Note: The database is created within dbSchemaPrefixTestHelper (org.camunda.bpm.webapp.impl.test.util.DbSchemaPrefixTestHelper)-->
+    <!-- Note: The database is created within dbSchemaPrefixTestHelper -->
     <!-- If some database changes are required during the database setup, they should be performed in the DbSchemaPrefixTestHelper -->
 
     <!-- Database configurations -->
