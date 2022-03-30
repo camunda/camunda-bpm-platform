@@ -40,7 +40,7 @@ You can contribute code that fixes bugs and/or implements features. Here is how 
 1. Select a ticket that you would like to implement. Tickets labelled [EasyPick](https://jira.camunda.com/issues/?jql=project%20%3D%20CAM%20AND%20status%20in%20(Open%2C%20Reopened%2C%20Ready)%20AND%20labels%20in%20(easy-pick%2C%20EasyPick)) are tickets that require little effort and can be good candidates to start. Be aware though that some of them need good knowledge of the surrounding code.
 1. Tell us in the ticket comments or in the [forum](https://forum.camunda.org/c/contributions/14) (select the *Contributions* category) that you want to work on your ticket. This is also the place where you can ask questions.
 1. Check your code changes against our [contribution checklist](#contribution-checklist)
-1. [Create a pull request on Github](). Note that you can already do this earlier if you would like feedback on your work in progress.
+1. [Create a pull request on Github](https://github.com/camunda/camunda-bpm-platform/pulls). Note that you can already do this earlier if you would like feedback on your work in progress.
 
 
 # Build from Source
