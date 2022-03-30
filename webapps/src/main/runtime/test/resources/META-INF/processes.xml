@@ -5,7 +5,7 @@
   xsi:schemaLocation="http://www.camunda.org/schema/1.0/ProcessApplication http://www.camunda.org/schema/1.0/ProcessApplication ">
 
   <process-engine name="default">
-    <configuration>org.camunda.bpm.pa.TestProcessEngineConfiguration</configuration>
+    <configuration>org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration</configuration>
     <properties>
       <property name="authorizationEnabled">true</property>
       <property name="history">full</property>
