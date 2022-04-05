@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.cdi.impl.el;
 import java.beans.FeatureDescriptor;
 import java.util.Iterator;
 
+import javax.el.BeanELResolver;
 import javax.enterprise.inject.spi.BeanManager;
 
 import org.camunda.bpm.engine.cdi.impl.util.BeanManagerLookup;
@@ -41,7 +42,18 @@ public class CdiResolver extends ELResolver {
 
   protected javax.el.ELResolver getWrappedResolver() {
     BeanManager beanManager = getBeanManager();
-    javax.el.ELResolver resolver = beanManager.getELResolver();
+    
+    /* CAM-13637: 
+     * the quarkus bean manager does and will not support getELResolver() 
+     * and throws an UnsupportedOperationException
+     * catching that exception and returning a new BeanELResolver() fixes that issue
+     */
+    javax.el.ELResolver resolver = null;
+    try {
+      resolver = beanManager.getELResolver();
+    } catch (UnsupportedOperationException ex) {
+      resolver = new BeanELResolver();
+    }
     return resolver;
   }
 
