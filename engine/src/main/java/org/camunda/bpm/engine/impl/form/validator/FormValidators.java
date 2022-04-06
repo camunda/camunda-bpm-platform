@@ -49,45 +49,39 @@ public class FormValidators {
     String name = constraint.attribute("name");
     String config = constraint.attribute("config");
 
-    if("validator".equals(name)) {
-
-      // custom validators
-
-      if(config == null || config.isEmpty()) {
-        bpmnParse.addError("validator configuration needs to provide either a fully " +
-        		"qualified classname or an expression resolving to a custom FormFieldValidator implementation.",
-        		constraint);
-
-      } else {
-        if(StringUtil.isExpression(config)) {
-          // expression
-          Expression validatorExpression = expressionManager.createExpression(config);
-          return new DelegateFormFieldValidator(validatorExpression);
-        } else {
-          // classname
-          return new DelegateFormFieldValidator(config);
-        }
-      }
-
-    } else {
-
-      // built-in validators
-
-      Class<? extends FormFieldValidator> validator = validators.get(name);
-      if(validator != null) {
-        FormFieldValidator validatorInstance = createValidatorInstance(validator);
-        return validatorInstance;
-
-      } else {
-        bpmnParse.addError("Cannot find validator implementation for name '"+name+"'.", constraint);
-
-      }
-
+    Class<? extends FormFieldValidator> validator = validators.get(name);
+    // built-in validators
+    if(validator != null)
+    {
+      FormFieldValidator validatorInstance = createValidatorInstance(validator);
+      return validatorInstance;
     }
+    // custom validators
+    else
+    {
+      String validatorImplementation = name;
 
-    return null;
+      // compatiblity with original version
+      if("validator".equals(name)) {
 
+        validatorImplementation = config;
+      }
 
+      if(validatorImplementation == null || validatorImplementation.isEmpty()) {
+        bpmnParse.addError("validator configuration needs to provide either a fully " +
+                        "qualified classname or an expression resolving to a custom FormFieldValidator implementation.",
+                constraint);
+        return null;
+      }
+
+      if(StringUtil.isExpression(validatorImplementation)) {
+        // expression
+        Expression validatorExpression = expressionManager.createExpression(validatorImplementation);
+        return new DelegateFormFieldValidator(validatorExpression);
+      } else {
+        // classname
+        return new DelegateFormFieldValidator(validatorImplementation);
+      }
   }
 
   protected FormFieldValidator createValidatorInstance(Class<? extends FormFieldValidator> validator) {
