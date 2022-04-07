@@ -26,13 +26,25 @@
   <!-- This snippet is used by all queries that allow filtering by variable values -->
   <sql id="variableValueConditions">
 
-    <if test="queryVariableValue.operatorName.equals('NOT_EQUALS') || queryVariableValue.operatorName.equals('NOT_LIKE')">NOT</if><!-- NOT_EQUALS and NOT_LIKE use the same conditions as EQUALS and LIKE -->
+    <bind name="notOperator"
+          value="queryVariableValue.operatorName.equals('NOT_EQUALS') || queryVariableValue.operatorName.equals('NOT_LIKE')"/>
+
+    <if test="notOperator">NOT</if><!-- NOT_EQUALS and NOT_LIKE use the same conditions as EQUALS and LIKE -->
     (
     <foreach collection="queryVariableValue.valueConditions" item="valueCondition" separator="or">
       <trim prefix="(" prefixOverrides="and" suffix=")">
         <if test="!valueCondition.type.equals('null')">
           <!-- When type of value is null, type doesn't matter! -->
-          and ${varPrefix}${varTypeField} is not null and ${varPrefix}${varTypeField} = #{valueCondition.type}
+          <choose>
+            <when test="varTypeField == 'TYPE_'">
+              <!-- it's the ACT_RU_VARIABLE.TYPE_ column which cannot be null -->
+              and ${varPrefix}${varTypeField} = #{valueCondition.type}
+            </when>
+            <otherwise>
+              <!-- it's the ACT_HI_VARINST.VAR_TYPE_ column which can be null -->
+              and ${varPrefix}${varTypeField} is not null and ${varPrefix}${varTypeField} = #{valueCondition.type}
+            </otherwise>
+          </choose>
         </if>
         <if test="valueCondition.textValue != null &amp;&amp; valueCondition.longValue == null &amp;&amp; valueCondition.doubleValue == null">
           <choose>
@@ -59,7 +71,8 @@
           </choose>
         </if>
         <if test="valueCondition.textValue2 != null &amp;&amp; !valueCondition.type.equals('string')">
-          and ${varPrefix}TEXT2_ is not null and ${varPrefix}TEXT2_
+          <if test="notOperator">and ${varPrefix}TEXT2_ is not null</if>
+          and ${varPrefix}TEXT2_
           <choose>
             <when test="queryVariableValue.operatorName.contains('LIKE')">LIKE</when>
             <otherwise><include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.executionVariableOperator" /></otherwise>
@@ -67,19 +80,21 @@
           #{valueCondition.textValue2}
           <if test="queryVariableValue.operatorName.contains('LIKE')">ESCAPE ${escapeChar}</if>
         </if>
-    
+
         <if test="valueCondition.longValue != null">
-          and ${varPrefix}LONG_ is not null and ${varPrefix}LONG_
+          <if test="notOperator">and ${varPrefix}LONG_ is not null</if>
+          and ${varPrefix}LONG_
           <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.executionVariableOperator" />
           #{valueCondition.longValue}
         </if>
-    
+
         <if test="valueCondition.doubleValue != null">
-          and ${varPrefix}DOUBLE_ is not null and ${varPrefix}DOUBLE_
+          <if test="notOperator">and ${varPrefix}DOUBLE_ is not null</if>
+          and ${varPrefix}DOUBLE_
           <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.executionVariableOperator" />
           #{valueCondition.doubleValue}
         </if>
-  
+
         <!-- Null variable type -->
         <if test="valueCondition.textValue == null &amp;&amp; valueCondition.textValue2 == null &amp;&amp; valueCondition.longValue == null &amp;&amp; valueCondition.doubleValue == null">
           and ${varPrefix}TEXT_ is null and ${varPrefix}TEXT2_ is null and ${varPrefix}LONG_ is null and ${varPrefix}DOUBLE_ is null and ${varPrefix}BYTEARRAY_ID_ is null
