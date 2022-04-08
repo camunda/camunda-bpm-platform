@@ -85,4 +85,16 @@
     <tagDatabase tag="7.17.0"/>
   </changeSet>
 
+  <changeSet author="Camunda" id="7.17-to-7.18">
+    <sqlFile path="../upgrade/${db.name}_engine_7.17_to_7.18.sql"
+             encoding="UTF-8"
+             relativeToChangelogFile="true"
+             splitStatements="true"
+             stripComments="true"/>
+  </changeSet>
+
+  <changeSet author="Camunda" id="7.18.0-tag">
+    <tagDatabase tag="7.18.0"/>
+  </changeSet>
+
 </databaseChangeLog>
