@@ -1,7 +1,18 @@
 <#macro dto_macro docsUrl="">
 <@lib.dto
     desc = "A Task query which defines a group of Tasks." >
-  
+
+    <@lib.property
+        name = "taskId"
+        type = "string"
+        desc = "Restrict to task with the given id." />
+
+    <@lib.property
+        name = "taskIdIn"
+        type = "array"
+        itemType = "string"
+        desc = "Restrict to tasks with any of the given ids." />
+
     <@lib.property
         name = "processInstanceId"
         type = "string"
