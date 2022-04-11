@@ -221,31 +221,5 @@
         </plugins>
       </build>
     </profile>
-    <profile>
-      <!-- For 7.16 to 7.17, we are not executing these tests against h2, because
-        the 7.16 engine works with H2 1.4 and the 7.17 engine works with H2 2.0. It
-        is therefore not possible to perform a rolling update when using H2. 
-        This profile should be removed with 7.18 development via https://jira.camunda.com/browse/CAM-14434.
-        -->
-      <id>h2</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>sql-maven-plugin</artifactId>
-            <configuration>
-              <skip>true</skip>
-            </configuration>
-          </plugin>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <configuration>
-              <skip>true</skip>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
   </profiles>
 </project>
