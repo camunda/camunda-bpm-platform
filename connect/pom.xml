@@ -14,7 +14,16 @@
   <packaging>pom</packaging>
 
   <properties>
+    <assertj.version>2.9.1</assertj.version>
+    <commons.version>1.10.0</commons.version>
+    <commons-codec.version>1.15</commons-codec.version>
     <connect.version.old>1.5.0</connect.version.old>
+    <httpclient.version>4.5.13</httpclient.version>
+    <junit.version>4.13.1</junit.version>
+    <logback.version>1.2.10</logback.version>
+    <mockito.version>1.9.5</mockito.version>
+    <wiremock.version>1.58</wiremock.version>
+
     <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
     <additionalparam>-Xdoclint:none</additionalparam>
   </properties>
@@ -33,7 +42,7 @@
       <dependency>
         <groupId>org.camunda.commons</groupId>
         <artifactId>camunda-commons-bom</artifactId>
-        <version>1.9.0</version>
+        <version>${commons.version}</version>
         <scope>import</scope>
         <type>pom</type>
       </dependency>
@@ -41,31 +50,43 @@
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpclient</artifactId>
-        <version>4.5.13</version>
+        <version>${httpclient.version}</version>
       </dependency>
       
       <dependency>
         <groupId>commons-codec</groupId>
         <artifactId>commons-codec</artifactId>
-        <version>1.15</version>
+        <version>${commons-codec.version}</version>
       </dependency>
 
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>4.13.1</version>
+        <version>${junit.version}</version>
       </dependency>
 
       <dependency>
         <groupId>org.assertj</groupId>
         <artifactId>assertj-core</artifactId>
-        <version>2.9.1</version>
+        <version>${assertj.version}</version>
       </dependency>
 
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
-        <version>1.1.2</version>
+        <version>${logback.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.github.tomakehurst</groupId>
+        <artifactId>wiremock</artifactId>
+        <version>${wiremock.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>${mockito.version}</version>
       </dependency>
 
     </dependencies>
