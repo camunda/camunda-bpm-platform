@@ -88,7 +88,9 @@ pipeline {
         }
         stage('Trigger Docker CE GHA') {
           when {
-            branch cambpmDefaultBranch();
+            // temporarily disable stage due to GitHub API issues
+            expression { false }
+//            branch cambpmDefaultBranch();
           }
           agent {
             kubernetes {
@@ -99,6 +101,9 @@ pipeline {
                   useStableNodePool: false
               ])
             }
+          }
+          options {
+            timeout(time: 15, unit: 'MINUTES')
           }
           environment {
             // define helper script input arguments
