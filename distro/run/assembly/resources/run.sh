@@ -2,7 +2,7 @@
 
 # set constants
 BASEDIR=$(dirname "$0")
-PARENTDIR=$(builtin cd $BASEDIR/..; pwd)
+PARENTDIR=$(builtin cd "$BASEDIR/.."; pwd)
 DEPLOYMENT_DIR=$PARENTDIR/configuration/resources
 WEBAPPS_PATH=$BASEDIR/webapps/
 REST_PATH=$BASEDIR/rest/
@@ -118,7 +118,7 @@ Please stop it or remove the file $PID_PATH."
     # start Camunda Run detached
     "$JAVA" -Dloader.path="$classPath" -Dcamunda.deploymentDir="$DEPLOYMENT_DIR" $JAVA_OPTS -jar "$BASEDIR/camunda-bpm-run-core.jar" --spring.config.location=file:"$configuration" &
     # store the process id
-    echo $! > $PID_PATH
+    echo $! > "$PID_PATH"
 
   else
     "$JAVA" -Dloader.path="$classPath" -Dcamunda.deploymentDir="$DEPLOYMENT_DIR" $JAVA_OPTS -jar "$BASEDIR/camunda-bpm-run-core.jar" --spring.config.location=file:"$configuration"
@@ -128,10 +128,10 @@ elif [ "$1" = "stop" ] ; then
 
   if [ -s "$PID_PATH" ]; then
     # stop Camunda Run if the process is still running
-    kill $(cat $PID_PATH)
+    kill $(cat "$PID_PATH")
 
     # remove process ID file
-    rm $PID_PATH
+    rm "$PID_PATH"
 
     echo "Camunda Run is shutting down."
   else
