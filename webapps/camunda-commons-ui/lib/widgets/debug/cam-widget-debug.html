@@ -10,16 +10,18 @@
     </button>
   </div>
   <div class="col-xs-10"
-       ng-show="open || disableToggleButton">
+       ng-show="open || disableToggleButton"
+       cam-hover-area>
     <span ng-show="extended" cam-widget-clipboard="extendedInfo"
           no-tooltip>
       <code>{{ extensionName }}</code>
     </span>
     <pre ng-show="extended">{{ extendedInfo }}</pre>
     <span cam-widget-clipboard="debugged | json "
-          no-tooltip>
+          no-tooltip
+          cam-hoverable-title="data-id">
       <code>{{ varName }}</code>
     </span>
-    <pre>{{ debugged | json }}</pre>
+    <pre cam-hover-trigger="data-id">{{ debugged | json }}</pre>
   </div>
 </div>
