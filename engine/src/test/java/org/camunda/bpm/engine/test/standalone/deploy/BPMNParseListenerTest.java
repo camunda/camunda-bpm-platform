@@ -30,6 +30,7 @@ import org.camunda.bpm.engine.impl.bpmn.parser.AbstractBpmnParseListener;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
 import org.camunda.bpm.engine.impl.el.Expression;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
+import org.camunda.bpm.engine.impl.el.JuelExpressionManager;
 import org.camunda.bpm.engine.impl.form.FormDefinition;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessInstanceWithVariablesImpl;
@@ -141,7 +142,7 @@ public class BPMNParseListenerTest {
         UserTaskActivityBehavior activityBehavior = (UserTaskActivityBehavior) activity.getActivityBehavior();
         TaskDefinition taskDefinition = activityBehavior.getTaskDefinition();
 
-        ExpressionManager expressionManager = new ExpressionManager();
+        ExpressionManager expressionManager = new JuelExpressionManager();
         Expression formKeyExpression = expressionManager.createExpression(modifiedFormKey);
 
         taskDefinition.setFormKey(formKeyExpression);
@@ -189,7 +190,7 @@ public class BPMNParseListenerTest {
         TaskDefinition taskDefinition = activityBehavior.getTaskDefinition();
         FormDefinition formDefinition = taskDefinition.getFormDefinition();
 
-        ExpressionManager expressionManager = new ExpressionManager();
+        ExpressionManager expressionManager = new JuelExpressionManager();
 
         Expression formRefExpression = expressionManager.createExpression(modifiedFormRef);
         formDefinition.setCamundaFormDefinitionKey(formRefExpression);

@@ -39,9 +39,9 @@ public class JuelExpression implements Expression {
 
   protected String expressionText;
   protected ValueExpression valueExpression;
-  protected ExpressionManager expressionManager;
+  protected JuelExpressionManager expressionManager;
 
-  public JuelExpression(ValueExpression valueExpression, ExpressionManager expressionManager, String expressionText) {
+  public JuelExpression(ValueExpression valueExpression, JuelExpressionManager expressionManager, String expressionText) {
     this.valueExpression = valueExpression;
     this.expressionManager = expressionManager;
     this.expressionText = expressionText;

@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.impl.dmn.el;
 import org.camunda.bpm.dmn.engine.impl.spi.el.ElExpression;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.el.JuelExpressionManager;
 import org.camunda.bpm.engine.impl.javax.el.ELContext;
 import org.camunda.bpm.engine.impl.javax.el.ValueExpression;
 import org.camunda.bpm.engine.variable.context.VariableContext;
@@ -29,9 +30,11 @@ import org.camunda.bpm.engine.variable.context.VariableContext;
  */
 public class ProcessEngineElExpression implements ElExpression {
 
+  protected final JuelExpressionManager expressionManager;
   protected final ValueExpression valueExpression;
 
-  public ProcessEngineElExpression(ValueExpression expression) {
+  public ProcessEngineElExpression(JuelExpressionManager expressionManager, ValueExpression expression) {
+    this.expressionManager = expressionManager;
     this.valueExpression = expression;
   }
 
@@ -40,9 +43,7 @@ public class ProcessEngineElExpression implements ElExpression {
       throw new ProcessEngineException("Expression can only be evaluated inside the context of the process engine");
     }
 
-    ELContext context = Context.getProcessEngineConfiguration()
-      .getExpressionManager()
-      .createElContext(variableContext);
+    ELContext context = expressionManager.createElContext(variableContext);
 
     return valueExpression.getValue(context);
 

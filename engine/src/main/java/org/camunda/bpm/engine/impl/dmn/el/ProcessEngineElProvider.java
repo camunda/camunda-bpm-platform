@@ -19,7 +19,7 @@ package org.camunda.bpm.engine.impl.dmn.el;
 
 import org.camunda.bpm.dmn.engine.impl.spi.el.ElExpression;
 import org.camunda.bpm.dmn.engine.impl.spi.el.ElProvider;
-import org.camunda.bpm.engine.impl.el.ExpressionManager;
+import org.camunda.bpm.engine.impl.el.JuelExpressionManager;
 
 /**
  * @author Daniel Meyer
@@ -27,14 +27,14 @@ import org.camunda.bpm.engine.impl.el.ExpressionManager;
  */
 public class ProcessEngineElProvider implements ElProvider {
 
-  protected final ExpressionManager expressionManager;
+  protected final JuelExpressionManager expressionManager;
 
-  public ProcessEngineElProvider(ExpressionManager expressionManager) {
+  public ProcessEngineElProvider(JuelExpressionManager expressionManager) {
     this.expressionManager = expressionManager;
   }
 
   public ElExpression createExpression(String expression) {
-    return new ProcessEngineElExpression(expressionManager.createValueExpression(expression));
+    return new ProcessEngineElExpression(expressionManager, expressionManager.createValueExpression(expression));
   }
 
 }

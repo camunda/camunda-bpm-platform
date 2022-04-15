@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.test.mock;
 
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
+import org.camunda.bpm.engine.impl.el.JuelExpressionManager;
 import org.camunda.bpm.engine.impl.el.VariableContextElResolver;
 import org.camunda.bpm.engine.impl.el.VariableScopeElResolver;
 import org.camunda.bpm.engine.impl.javax.el.ArrayELResolver;
@@ -27,7 +28,7 @@ import org.camunda.bpm.engine.impl.javax.el.ELResolver;
 import org.camunda.bpm.engine.impl.javax.el.ListELResolver;
 import org.camunda.bpm.engine.impl.javax.el.MapELResolver;
 
-public class MockExpressionManager extends ExpressionManager {
+public class MockExpressionManager extends JuelExpressionManager {
 
   protected ELResolver createElResolver(VariableScope scope) {
     return createElResolver();

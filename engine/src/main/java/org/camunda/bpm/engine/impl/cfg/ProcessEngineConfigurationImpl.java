@@ -161,7 +161,9 @@ import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionManag
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionManager;
 import org.camunda.bpm.engine.impl.el.CommandContextFunctionMapper;
 import org.camunda.bpm.engine.impl.el.DateTimeFunctionMapper;
+import org.camunda.bpm.engine.impl.el.ElProviderCompatible;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
+import org.camunda.bpm.engine.impl.el.JuelExpressionManager;
 import org.camunda.bpm.engine.impl.event.CompensationEventHandler;
 import org.camunda.bpm.engine.impl.event.ConditionalEventHandler;
 import org.camunda.bpm.engine.impl.event.EventHandler;
@@ -2545,13 +2547,17 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         dmnEngineConfiguration = (DefaultDmnEngineConfiguration) DmnEngineConfiguration.createDefaultDmnEngineConfiguration();
       }
 
-      dmnEngineConfiguration = new DmnEngineConfigurationBuilder(dmnEngineConfiguration)
+      DmnEngineConfigurationBuilder dmnEngineConfigurationBuilder = new DmnEngineConfigurationBuilder(dmnEngineConfiguration)
           .dmnHistoryEventProducer(dmnHistoryEventProducer)
           .scriptEngineResolver(scriptingEngines)
-          .expressionManager(expressionManager)
           .feelCustomFunctionProviders(dmnFeelCustomFunctionProviders)
-          .enableFeelLegacyBehavior(dmnFeelEnableLegacyBehavior)
-          .build();
+          .enableFeelLegacyBehavior(dmnFeelEnableLegacyBehavior);
+
+      if (expressionManager instanceof ElProviderCompatible) {
+        dmnEngineConfigurationBuilder.elProvider(((ElProviderCompatible)expressionManager).toElProvider());
+      }
+
+      dmnEngineConfiguration = dmnEngineConfigurationBuilder.build();
 
       dmnEngine = dmnEngineConfiguration.buildEngine();
 
@@ -2562,13 +2568,18 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected void initExpressionManager() {
     if (expressionManager == null) {
-      expressionManager = new ExpressionManager(beans);
+      expressionManager = new JuelExpressionManager(beans);
     }
 
-    // add function mapper for command context (eg currentUser(), currentUserGroups())
-    expressionManager.addFunctionMapper(new CommandContextFunctionMapper());
-    // add function mapper for date time (eg now(), dateTime())
-    expressionManager.addFunctionMapper(new DateTimeFunctionMapper());
+    // it's better to add FunctionMapper when create default JuelExpressionManager above,
+    // but we leave it here for backward compatibility
+    if (expressionManager instanceof JuelExpressionManager) {
+      // add function mapper for command context (eg currentUser(), currentUserGroups())
+      ((JuelExpressionManager)expressionManager).addFunctionMapper(new CommandContextFunctionMapper());
+      // add function mapper for date time (eg now(), dateTime())
+      ((JuelExpressionManager)expressionManager).addFunctionMapper(new DateTimeFunctionMapper());
+
+    }
   }
 
   protected void initBusinessCalendarManager() {
