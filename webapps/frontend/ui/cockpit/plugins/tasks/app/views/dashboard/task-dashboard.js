@@ -17,9 +17,7 @@
 
 'use strict';
 
-var fs = require('fs');
-
-var template = fs.readFileSync(__dirname + '/task-dashboard.html', 'utf8');
+var template = require('./task-dashboard.html')();
 
 module.exports = [
   'ViewsProvider',

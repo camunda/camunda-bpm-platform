@@ -17,12 +17,7 @@
 
 'use strict';
 
-var fs = require('fs');
-
-var template = fs.readFileSync(
-  __dirname + '/processDiagramPreview.html',
-  'utf8'
-);
+var template = require('./processDiagramPreview.html')();
 
 var angular = require('../../../../../camunda-commons-ui/vendor/angular');
 

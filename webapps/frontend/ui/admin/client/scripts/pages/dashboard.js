@@ -17,9 +17,7 @@
 
 'use strict';
 
-var fs = require('fs');
-
-var template = fs.readFileSync(__dirname + '/dashboard.html', 'utf8');
+var template = require('./dashboard.html')();
 
 var angular = require('../../../../../camunda-commons-ui/vendor/angular');
 var isArray = angular.isArray;

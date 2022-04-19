@@ -15,18 +15,18 @@
  * limitations under the License.
  */
 
-"use strict";
+'use strict';
 
 module.exports = [
-  "Uri",
+  'Uri',
   function(Uri) {
-    return (headers) => {
+    return headers => {
       if (headers) {
-        const apps = headers["x-authorized-apps"]?.split(",");
+        const apps = headers['x-authorized-apps']?.split(',');
         if (apps) {
-          const currentApp = Uri.appUri(":appName");
-          if (currentApp !== "welcome" && !apps.includes(currentApp)) {
-            window.location.href = Uri.appUri("app://../../welcome/:engine/");
+          const currentApp = Uri.appUri(':appName');
+          if (currentApp !== 'welcome' && !apps.includes(currentApp)) {
+            window.location.href = Uri.appUri('app://../../welcome/:engine/');
           }
         }
       }

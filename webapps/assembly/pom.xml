@@ -161,6 +161,28 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-resources-assembly</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}/target/webapp</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${basedir}/../frontend/target/webapp</directory>
+                  <filtering>false</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 
@@ -457,202 +479,6 @@
       </properties>
     </profile>
 
-    <profile>
-      <id>test-e2e</id>
-      <dependencies>
-        <dependency>
-          <groupId>org.jboss.resteasy</groupId>
-          <artifactId>resteasy-jaxrs</artifactId>
-          <scope>runtime</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.camunda.bpm.identity</groupId>
-          <artifactId>camunda-identity-ldap</artifactId>
-          <version>${project.version}</version>
-          <scope>test</scope>
-        </dependency>
-        <!-- We need to override the "provided" scope
-          from the main dependency declaration here or
-          else the dependency will not be available in Jetty
-          (see also Jetty plugin config option useProvidedScope) -->
-        <dependency>
-          <groupId>org.jboss.spec.javax.ws.rs</groupId>
-          <artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
-        </dependency>
-      </dependencies>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <skipTests>true</skipTests>
-            </configuration>
-          </plugin>
-          <plugin>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-maven-plugin</artifactId>
-            <version>${version.jetty}</version>
-            <configuration>
-              <webAppConfig>
-                <contextPath>/camunda</contextPath>
-                <defaultsDescriptor>${project.basedir}/src/main/runtime/test/jetty/webdefault.xml</defaultsDescriptor>
-              </webAppConfig>
-              <contextHandlers>
-                <contextHandler implementation="org.eclipse.jetty.maven.plugin.JettyWebAppContext">
-                  <war>${basedir}/target/engine-rest.war</war>
-                  <contextPath>/engine-rest</contextPath>
-                </contextHandler>
-              </contextHandlers>
-              <stopKey>STOP</stopKey>
-              <stopPort>9999</stopPort>
-              <stopWait>10</stopWait>
-            </configuration>
-            <executions>
-              <execution>
-                <id>start-jetty</id>
-                <phase>pre-integration-test</phase>
-                <goals>
-                  <goal>deploy-war</goal>
-                </goals>
-                <configuration>
-                  <scanIntervalSeconds>0</scanIntervalSeconds>
-                  <daemon>true</daemon>
-                </configuration>
-              </execution>
-              <execution>
-                <id>stop-jetty</id>
-                <phase>post-integration-test</phase>
-                <goals>
-                  <goal>stop</goal>
-                </goals>
-              </execution>
-            </executions>
-            <dependencies>
-              <dependency>
-                <groupId>org.camunda.bpm</groupId>
-                <artifactId>camunda-engine</artifactId>
-                <version>${project.version}</version>
-              </dependency>
-              <dependency>
-                <groupId>org.camunda.bpm.identity</groupId>
-                <artifactId>camunda-identity-ldap</artifactId>
-                <version>${project.version}</version>
-              </dependency>
-              <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-jdk14</artifactId>
-                <version>${version.slf4j}</version>
-              </dependency>
-              <dependency>
-                <groupId>com.h2database</groupId>
-                <artifactId>h2</artifactId>
-                <version>${version.h2}</version>
-              </dependency>
-              <dependency>
-                <groupId>com.fasterxml.uuid</groupId>
-                <artifactId>java-uuid-generator</artifactId>
-                <version>${version.uuid-generator}</version>
-              </dependency>
-            </dependencies>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>grunt-test</id>
-                <phase>integration-test</phase>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-                <inherited>false</inherited>
-                <configuration>
-                  <target>
-                    <!-- grunt test-e2e -->
-                    <exec executable="./node_modules/grunt-cli/bin/grunt" failonerror="true" osfamily="unix" dir="../frontend">
-                      <env key="XUNIT_FILE" value="target/xunit.xml" />
-                      <env key="LOG_XUNIT" value="true" />
-                      <arg value="test-e2e" />
-                      <arg value="--color=false" />
-                    </exec>
-                    <exec executable="cmd" failonerror="true" osfamily="windows" dir="../frontend">
-                      <env key="XUNIT_FILE" value="target/xunit.xml" />
-                      <env key="LOG_XUNIT" value="true" />
-                      <arg value="/c" />
-                      <arg value="node_modules\.bin\grunt.cmd" />
-                      <arg value="test-e2e" />
-                      <arg value="--color=false" />
-                    </exec>
-                  </target>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>build-helper-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>add-sources</id>
-                <goals>
-                  <goal>add-source</goal>
-                </goals>
-                <configuration>
-                  <sources>
-                    <source>src/main/runtime/test/java</source>
-                  </sources>
-                </configuration>
-              </execution>
-              <execution>
-                <id>add-resources</id>
-                <goals>
-                  <goal>add-resource</goal>
-                </goals>
-                <configuration>
-                  <resources>
-                    <resource>
-                      <directory>src/main/runtime/test/resources</directory>
-                    </resource>
-                  </resources>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-dependency-plugin</artifactId>
-            <version>2.10</version>
-            <executions>
-              <execution>
-                <id>copy</id>
-                <phase>generate-resources</phase>
-                <goals>
-                  <goal>copy</goal>
-                </goals>
-                <configuration>
-                  <artifactItems>
-                    <artifactItem>
-                      <groupId>org.camunda.bpm</groupId>
-                      <artifactId>camunda-engine-rest</artifactId>
-                      <version>${project.version}</version>
-                      <type>war</type>
-                      <classifier>tomcat</classifier>
-                      <overWrite>true</overWrite>
-                      <outputDirectory>${project.build.directory}/</outputDirectory>
-                      <destFileName>engine-rest.war</destFileName>
-                    </artifactItem>
-                  </artifactItems>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-      <properties>
-        <java.resources.override>src/main/runtime/test/resources</java.resources.override>
-      </properties>
-    </profile>
-
     <!-- database QA profiles -->
     <profile>
       <id>database</id>
@@ -721,114 +547,6 @@
           </plugin>
         </plugins>
       </build>
-    </profile>
-
-    <profile>
-      <id>node-build-windows</id>
-      <activation>
-        <os>
-          <family>windows</family>
-        </os>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>build-frontend</id>
-                <phase>generate-resources</phase>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-                <inherited>false</inherited>
-                <configuration>
-                  <skip>${skip.frontend.build}</skip>
-                  <target>
-                    <!-- run node build -->
-                    <exec executable="cmd" failonerror="true" dir="../frontend">
-                      <arg value="/c" />
-                      <arg value="npm" />
-                      <arg value="ci" />
-                    </exec>
-                    <exec executable="cmd" failonerror="true" dir="../frontend">
-                      <arg value="/c" />
-                      <arg value="node" />
-                      <arg value="scripts/xlts" />
-                      <arg value="install" />
-                    </exec>
-                    <exec executable="cmd" failonerror="true" dir="../frontend">
-                      <arg value="/c" />
-                      <arg value="node_modules\.bin\grunt.cmd" />
-                      <arg value="build" />
-                      <arg value="--color=false" />
-                    </exec>
-                  </target>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>node-build-unix</id>
-      <activation>
-        <os>
-          <family>!windows</family>
-        </os>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>build-frontend</id>
-                <phase>generate-resources</phase>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-                <inherited>false</inherited>
-                <configuration>
-                  <skip>${skip.frontend.build}</skip>
-                  <target>
-                    <!-- run node build -->
-                    <exec executable="npm" failonerror="true" dir="../frontend">
-                      <arg value="ci" />
-                    </exec>
-                    <exec executable="node" failonerror="true" dir="../frontend">
-                      <arg value="scripts/xlts" />
-                      <arg value="install" />
-                    </exec>
-                    <exec executable="./node_modules/grunt-cli/bin/grunt" failonerror="true" dir="../frontend">
-                      <arg value="build" />
-                      <arg value="--color=false" />
-                    </exec>
-                  </target>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>doFrontendBuild</id>
-      <properties>
-        <skip.frontend.build>false</skip.frontend.build>
-      </properties>
-    </profile>
-
-    <profile>
-      <id>skipFrontendBuild</id>
-      <properties>
-        <skip.frontend.build>true</skip.frontend.build>
-      </properties>
     </profile>
 
     <profile>

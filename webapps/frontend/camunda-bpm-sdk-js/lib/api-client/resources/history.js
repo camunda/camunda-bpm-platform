@@ -1276,8 +1276,6 @@ History.jobLogList = function(params, done) {
     data: params,
     done: done
   });
-
-
 };
 
 History.jobLogCount = function(params, done) {
@@ -1292,7 +1290,7 @@ History.jobLogCount = function(params, done) {
     data: params,
     done: done
   });
-}
+};
 
 History.externalTaskLogList = helpers.createSimpleGetQueryFunction(
   '/external-task-log'

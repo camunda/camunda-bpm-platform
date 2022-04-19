@@ -16,13 +16,10 @@
  */
 
 'use strict';
-var fs = require('fs');
+
 var Clipboard = require('clipboard');
 
-var template = fs.readFileSync(
-  __dirname + '/cam-widget-clipboard.html',
-  'utf8'
-);
+var template = require('./cam-widget-clipboard.html')();
 
 module.exports = [
   '$timeout',

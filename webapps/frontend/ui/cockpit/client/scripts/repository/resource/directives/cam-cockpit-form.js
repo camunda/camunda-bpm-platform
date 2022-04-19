@@ -17,9 +17,7 @@
 
 'use strict';
 
-var fs = require('fs');
-
-var template = fs.readFileSync(__dirname + '/cam-cockpit-form.html', 'utf8');
+var template = require('./cam-cockpit-form.html')();
 
 const Form = require('@bpmn-io/form-js').Form;
 

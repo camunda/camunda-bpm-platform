@@ -77,7 +77,7 @@
       <ul class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
         <li ng-repeat="(appName, app) in apps"
             ng-class="appName">
-          <a ng-href="{{ ('../../' + appName + '/:engine/' | uri) + getTargetRoute() }}">
+          <a ng-href="{{ (':appRoot/app/' + appName + '/:engine/' | uri) + getTargetRoute() }}">
             {{ app.label }}
           </a>
         </li>

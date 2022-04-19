@@ -36,9 +36,7 @@
 
 'use strict';
 
-var fs = require('fs');
-
-var template = fs.readFileSync(__dirname + '/quick-filter.html', 'utf8');
+var template = require('./quick-filter.html')();
 
 var $ = require('jquery');
 

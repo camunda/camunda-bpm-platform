@@ -16,7 +16,6 @@
  */
 
 'use strict';
-var fs = require('fs');
 
 var migrateDiagram = require('@bpmn-io/dmn-migrate').migrateDiagram;
 
@@ -25,10 +24,7 @@ var Viewer = require('./lib/navigatedViewer').default;
 var Modeler = require('camunda-dmn-js').CamundaPlatformModeler;
 var changeDmnNamespace = require('../../util/change-dmn-namespace');
 
-var template = fs.readFileSync(
-  __dirname + '/cam-widget-dmn-viewer.html',
-  'utf8'
-);
+var template = require('./cam-widget-dmn-viewer.html')();
 
 // This is only relevant when editMode===true,
 // but we only want to rewrite the function once

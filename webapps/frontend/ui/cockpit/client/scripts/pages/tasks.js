@@ -17,9 +17,7 @@
 
 'use strict';
 
-var fs = require('fs');
-
-var template = fs.readFileSync(__dirname + '/tasks.html', 'utf8');
+var template = require('./tasks.html')();
 
 var Controller = [
   '$scope',

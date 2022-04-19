@@ -17,12 +17,7 @@
 
 'use strict';
 
-var fs = require('fs');
-
-var template = fs.readFileSync(
-  __dirname + '/cam-cockpit-definitions-plugin.html',
-  'utf8'
-);
+var template = require('./cam-cockpit-definitions-plugin.html')();
 
 var Controller = [
   '$scope',

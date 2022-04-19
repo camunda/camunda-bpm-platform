@@ -15,10 +15,10 @@
                ng-class="'col-xs-' + cols"
                class="cockpit-app">
             <a class="app-label-wrapper"
-               ng-href="./../../cockpit/{{currentEngine}}/">
+               ng-href="{{ (':appRoot/app/cockpit/:engine/') | uri }}">
             </a>
             <h3 class="app-name">
-              <a ng-href="./../../cockpit/{{currentEngine}}/">{{'COCKPIT' | translate}}</a>
+              <a ng-href="{{ (':appRoot/app/cockpit/:engine/') | uri }}">{{'COCKPIT' | translate}}</a>
             </h3>
           </div>
 
@@ -27,10 +27,10 @@
                ng-class="'col-xs-' + cols"
                class="tasklist-app">
             <a class="app-label-wrapper"
-               ng-href="./../../tasklist/{{currentEngine}}/">
+               ng-href="{{ (':appRoot/app/tasklist/:engine/') | uri }}">
             </a>
             <h3 class="app-name">
-              <a ng-href="./../../tasklist/{{currentEngine}}/">{{'TASKLIST' | translate}}</a>
+              <a ng-href="{{ (':appRoot/app/tasklist/:engine/') | uri }}">{{'TASKLIST' | translate}}</a>
             </h3>
           </div>
 
@@ -39,10 +39,10 @@
                ng-class="'col-xs-' + cols"
                class="admin-app">
             <a class="app-label-wrapper"
-               ng-href="./../../admin/{{currentEngine}}/">
+               ng-href="{{ (':appRoot/app/admin/:engine/') | uri }}">
             </a>
             <h3 class="app-name">
-              <a ng-href="./../../admin/{{currentEngine}}/">{{'ADMIN' | translate}}</a>
+              <a ng-href="{{ (':appRoot/app/admin/:engine/') | uri }}">{{'ADMIN' | translate}}</a>
             </h3>
           </div>
         </div>

@@ -17,12 +17,7 @@
 
 'use strict';
 
-var fs = require('fs');
-
-var template = fs.readFileSync(
-  __dirname + '/input-variable-table.html',
-  'utf8'
-);
+var template = require('./input-variable-table.html')();
 
 module.exports = [
   'ViewsProvider',

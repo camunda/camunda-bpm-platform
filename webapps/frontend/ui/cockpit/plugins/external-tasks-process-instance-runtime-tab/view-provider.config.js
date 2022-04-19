@@ -17,12 +17,7 @@
 
 'use strict';
 
-var fs = require('fs');
-
-var template = fs.readFileSync(
-  __dirname + '/process-instance-runtime-external-tasks.html',
-  'utf8'
-);
+var template = require('./process-instance-runtime-external-tasks.html')();
 
 module.exports = [
   'ViewsProvider',

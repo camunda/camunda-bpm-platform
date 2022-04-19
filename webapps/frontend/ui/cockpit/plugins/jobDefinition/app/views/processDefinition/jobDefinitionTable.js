@@ -17,14 +17,10 @@
 
 'use strict';
 
-var fs = require('fs');
 var angular = require('angular');
 var searchWidgetUtils = require('../../../../../../common/scripts/util/search-widget-utils');
 
-var template = fs.readFileSync(
-  __dirname + '/job-definition-table.html',
-  'utf8'
-);
+var template = require('./job-definition-table.html')();
 
 var Controller = [
   '$scope',

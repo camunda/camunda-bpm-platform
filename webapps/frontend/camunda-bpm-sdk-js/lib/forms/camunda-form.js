@@ -16,7 +16,7 @@
  */
 
 'use strict';
-/* global CamSDK, require, localStorage: false */
+/* global CamSDK */
 
 /**
  * For all API client related
@@ -349,7 +349,9 @@ CamundaForm.prototype.store = function(callback) {
     // build the local storage object
     var store = {date: Date.now(), vars: {}};
     for (var name in this.variableManager.variables) {
-      if (!['Bytes', 'File'].includes(this.variableManager.variables[name].type)) {
+      if (
+        !['Bytes', 'File'].includes(this.variableManager.variables[name].type)
+      ) {
         store.vars[name] = this.variableManager.variables[name].value;
       }
     }

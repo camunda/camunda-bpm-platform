@@ -17,12 +17,7 @@
 
 'use strict';
 
-var fs = require('fs');
-
-var template = fs.readFileSync(
-  __dirname + '/diagram-statistics-loader.html',
-  'utf8'
-);
+var template = require('./diagram-statistics-loader.html')();
 
 module.exports = [
   'Loaders',

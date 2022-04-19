@@ -17,9 +17,7 @@
 
 'use strict';
 
-var fs = require('fs');
-
-var template = fs.readFileSync(__dirname + '/cam-pagination.html', 'utf8');
+var template = require('./cam-pagination.html')();
 
 module.exports = function() {
   return {
