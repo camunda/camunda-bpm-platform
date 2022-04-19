@@ -19,10 +19,7 @@
 
 var fs = require('fs');
 
-var template = fs.readFileSync(
-  __dirname + '/cam-sortable-table-column.html',
-  'utf8'
-);
+var template = require('./cam-sortable-table-column.html')();
 
 var Directive = function() {
   return {

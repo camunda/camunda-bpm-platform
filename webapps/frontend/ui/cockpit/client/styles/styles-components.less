@@ -1,8 +1,8 @@
 // use `reference` to avoid duplicate bootstrap styles
 // as they are already available in other compiled CSS
-@import (reference) 'shared/bootstrap';
+@import (reference) '/camunda-commons-ui/resources/less/shared/bootstrap.less';
 @import './_app-variables.less';
-@import 'shared/_mixins';
+@import '/camunda-commons-ui/resources/less/shared/_mixins';
 
 /* ---------------------------------------------------------------- */
 
@@ -11,13 +11,13 @@
 }
 
 @import 'pages/repository';
-@import 'pages/dashboard';
+@import '/ui/common/styles/pages/dashboard.less';
 @import './../scripts/pages/dashboard';
 @import './../scripts/components/callActivityOverlays/styles';
-@import 'pages/processes';
+@import '/ui/cockpit/client/scripts/pages/processes';
 @import 'pages/process-instance';
 @import 'pages/batch';
-@import 'pages/tasks';
+@import '/ui/cockpit/client/scripts/pages/tasks';
 @import 'directives/process-diagram';
 @import 'directives/process-diagram-preview';
 @import 'directives/activity-instance-tree';
@@ -28,4 +28,4 @@
 @import '../scripts/directives/variables';
 @import '../scripts/directives/processDiagram';
 @import '../scripts/directives/time-to-live/time-to-live';
-@import 'reports/reports';
+@import '/ui/cockpit/client/scripts/reports/reports';

@@ -22,7 +22,8 @@
           tasklist-api="$APP_ROOT/api/tasklist/"
           welcome-api="$APP_ROOT/api/welcome/"
           engine-api="$APP_ROOT/api/engine/"
-          app-root="$APP_ROOT" />
+          app-root="$APP_ROOT"
+          app-name="welcome" />
 
     <!-- an example of plugin/feature exclusion -->
     <!--
@@ -38,16 +39,16 @@
 
 
     <!-- styles -->
-    <link href="$APP_ROOT/app/welcome/styles/styles.css?bust=$GRUNT_CACHE_BUST"
+    <!--<link href="$APP_ROOT/app/welcome/styles/styles.css?bust=$GRUNT_CACHE_BUST"
           rel="stylesheet" />
     <link rel="stylesheet"
           type="text/css"
-          href="$APP_ROOT/app/welcome/styles/user-styles.css?bust=$GRUNT_CACHE_BUST">
+          href="$APP_ROOT/app/welcome/styles/user-styles.css?bust=$GRUNT_CACHE_BUST">-->
 
     <!-- favicon -->
-    <link rel="shortcut icon"
+    <!--<link rel="shortcut icon"
           href="$APP_ROOT/app/welcome/assets/images/favicon.ico"
-          type="image/x-icon" />
+          type="image/x-icon" />-->
   </head>
   <body ng-controller="WelcomePage as welcomePage">
     <!-- navigation -->
@@ -76,7 +77,7 @@
 
     <!-- footer -->
     <footer cam-widget-footer
-            version="v${project.version}"></footer>
+            version="v$VERSION"></footer>
 
     <script type="application/javascript" $CSP_NONCE>
       window.PLUGIN_DEPENDENCIES = $PLUGIN_DEPENDENCIES || [];
@@ -85,11 +86,6 @@
       window.require = {
           waitSeconds: 0
       };
-    </script>
-
-    <script type="application/javascript"
-            src="$APP_ROOT/lib/require.js" $CSP_NONCE></script>
-    <script type="text/javascript" $CSP_NONCE>
 
 window.__define = window.define;
 window.__require = window.require;

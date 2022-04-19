@@ -20,14 +20,8 @@
 var fs = require('fs');
 
 var angular = require('angular');
-var actionTemplate = fs.readFileSync(
-  __dirname + '/incident-external-task-action.html',
-  'utf8'
-);
-var dialogTemplate = fs.readFileSync(
-  __dirname + '/job-retry-dialog.html',
-  'utf8'
-);
+var actionTemplate = require('./incident-external-task-action.html')();
+var dialogTemplate = require('./job-retry-dialog.html')();
 
 var Configuration = function PluginConfiguration(ViewsProvider) {
   ViewsProvider.registerDefaultView('cockpit.incident.action', {

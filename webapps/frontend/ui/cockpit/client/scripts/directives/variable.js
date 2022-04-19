@@ -25,7 +25,7 @@
 var angular = require('angular');
 var fs = require('fs');
 
-var template = fs.readFileSync(__dirname + '/variable.html', 'utf8');
+var template = require('./variable.html')();
 
 module.exports = [
   'typeUtils',

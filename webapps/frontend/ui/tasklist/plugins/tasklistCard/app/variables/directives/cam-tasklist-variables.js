@@ -18,14 +18,8 @@
 'use strict';
 var fs = require('fs');
 
-var template = fs.readFileSync(
-  __dirname + '/cam-tasklist-variables.html',
-  'utf8'
-);
-var modalTemplate = fs.readFileSync(
-  __dirname + '/../modals/cam-tasklist-variables-detail-modal.html',
-  'utf8'
-);
+var template = require('./cam-tasklist-variables.html')();
+var modalTemplate = require('./../modals/cam-tasklist-variables-detail-modal.html')();
 
 var angular = require('../../../../../../../camunda-commons-ui/vendor/angular');
 

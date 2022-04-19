@@ -2,18 +2,18 @@
 <html lang="en">
 <head>
   <meta http-equiv="X-UA-Compatible"
-        content="IE=edge" />
+        content="IE=edge"/>
 
   <title>Camunda Tasklist</title>
 
-  <meta charset="utf-8" />
+  <meta charset="utf-8"/>
   <meta name="viewport"
-        content="width=device-width, initial-scale=1.0" />
+        content="width=device-width, initial-scale=1.0"/>
 
   <meta name="description"
-        content="Camunda Tasklist" />
+        content="Camunda Tasklist"/>
   <meta name="author"
-        content="Camunda services GmbH" />
+        content="Camunda services GmbH"/>
 
   <!--< base href="/" /> -->
   <base href="$BASE"
@@ -23,97 +23,80 @@
         welcome-api="$APP_ROOT/api/welcome/"
         engine-api="$APP_ROOT/api/engine/"
         app-root="$APP_ROOT"
-        app-name="tasklist" />
+        app-name="tasklist"/>
 
-  <link rel="stylesheet"
+  <!--<link rel="stylesheet"
         type="text/css"
         href="$APP_ROOT/app/tasklist/styles/styles.css?bust=$GRUNT_CACHE_BUST">
   <link rel="stylesheet"
         type="text/css"
-        href="$APP_ROOT/app/tasklist/styles/user-styles.css?bust=$GRUNT_CACHE_BUST">
+        href="$APP_ROOT/app/tasklist/styles/user-styles.css?bust=$GRUNT_CACHE_BUST">-->
 
   <!-- favicon -->
-  <link rel="shortcut icon"
+  <!--<link rel="shortcut icon"
         href="$APP_ROOT/app/tasklist/assets/images/favicon.ico"
-        type="image/x-icon" />
+        type="image/x-icon" />-->
 </head>
 
 <body ng-controller="camTasklistAppCtrl">
-  <div cam-widget-header
-       authentication="authentication"
-       user-name="userFullName"
-       current-app="tasklist"
-       toggle-navigation="{{ 'TOGGLE_NAVIGATION' | translate }}"
-       sign-out="{{ 'SIGN_OUT_ACTION' | translate }}"
-       my-profile="{{ 'MY_PROFILE' | translate }}"
-       ng-cloak>
-   <ul cam-if-logged-in
-       ng-controller="camHeaderViewsCtrl">
-      <li ng-repeat="actionProvider in navbarActions"
-          ng-class="actionProvider.id">
-        <view ng-cloak
-              provider="actionProvider"
-              vars="navbarVars">
-        </view>
-      </li>
-    </ul>
-  </div>
+<div cam-widget-header
+     authentication="authentication"
+     user-name="userFullName"
+     current-app="tasklist"
+     toggle-navigation="{{ 'TOGGLE_NAVIGATION' | translate }}"
+     sign-out="{{ 'SIGN_OUT_ACTION' | translate }}"
+     my-profile="{{ 'MY_PROFILE' | translate }}"
+     ng-cloak>
+  <ul cam-if-logged-in
+      ng-controller="camHeaderViewsCtrl">
+    <li ng-repeat="actionProvider in navbarActions"
+        ng-class="actionProvider.id">
+      <view ng-cloak
+            provider="actionProvider"
+            vars="navbarVars">
+      </view>
+    </li>
+  </ul>
+</div>
 
-  <div class="site-wrap">
+<div class="site-wrap">
 
     <!-- # page-content -->
     <div class="page-wrap three-cols-layout" ng-view>
       <div class="app-splash"><div>
         <div class="spinner spinner-big"></div>
-      </div></div><!-- / .app-splash -->
-</div>
-    <!-- / page-content -->
-
+      </div>
+    </div><!-- / .app-splash -->
   </div>
+  <!-- / page-content -->
+
+</div>
 
 
-
-  <div notifications-panel
-       class="page-notifications"></div>
-
+<div notifications-panel
+     class="page-notifications"></div>
 
 
-  <!-- # page-footer -->
-  <footer cam-widget-footer
-          version="v${project.version}"></footer>
+<!-- # page-footer -->
+<footer cam-widget-footer
+        version="v$VERSION"></footer>
 
 
-  <script type="text/javascript" $CSP_NONCE>
-    // override the following line to include configuration
-    var tasklistConf = {};
-  </script>
+<script type="text/javascript" $CSP_NONCE>
+  window.tasklistConf = {
+    apiUri: '$APP_ROOT/api/engine',
+    mock: false,
 
-  <script type="text/javascript" $CSP_NONCE>
-    window.PLUGIN_DEPENDENCIES = $PLUGIN_DEPENDENCIES || [];
-    window.PLUGIN_PACKAGES = $PLUGIN_PACKAGES || [];
+    // overrides the settings above
+    resources: {}
+  };
 
-    window.require = {
-        waitSeconds: 0
-    };
-  </script>
+  window.PLUGIN_DEPENDENCIES = $PLUGIN_DEPENDENCIES || [];
+  window.PLUGIN_PACKAGES = $PLUGIN_PACKAGES || [];
 
-  <script type="application/javascript"
-          src="$APP_ROOT/lib/require.js" $CSP_NONCE></script>
-    <script type="text/javascript" $CSP_NONCE>
-
-window.__define = window.define;
-window.__require = window.require;
-window.define = undefined;
-window.require = undefined;
-window.bust = '$GRUNT_CACHE_BUST';
-
-requirejs.config({
-  baseUrl: '$APP_ROOT/app/tasklist',
-  urlArgs: 'bust=$GRUNT_CACHE_BUST'
-});
-requirejs(['$APP_ROOT/lib/deps.js'], function () {
-  requirejs(['$APP_ROOT/app/tasklist/camunda-tasklist-bootstrap.js'], function () {});
-});
-    </script>
+  window.require = {
+    waitSeconds: 0
+  };
+</script>
 </body>
 </html>

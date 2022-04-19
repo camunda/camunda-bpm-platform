@@ -19,7 +19,7 @@
 
 var fs = require('fs');
 
-var template = fs.readFileSync(__dirname + '/decisions-table.html', 'utf8');
+var template = require('./decisions-table.html')();
 
 module.exports = function() {
   return {

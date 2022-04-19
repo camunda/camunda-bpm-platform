@@ -20,14 +20,8 @@
 var fs = require('fs');
 
 var angular = require('angular');
-var actionTemplate = fs.readFileSync(
-  __dirname + '/bulk-override-job-priority-action.html',
-  'utf8'
-);
-var dialogTemplate = fs.readFileSync(
-  __dirname + '/bulk-override-job-priority-dialog.html',
-  'utf8'
-);
+var actionTemplate = require('./bulk-override-job-priority-action.html')();
+var dialogTemplate = require('./bulk-override-job-priority-dialog.html')();
 
 var Configuration = function PluginConfiguration(ViewsProvider) {
   ViewsProvider.registerDefaultView(

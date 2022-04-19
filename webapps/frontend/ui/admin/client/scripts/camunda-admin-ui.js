@@ -17,6 +17,9 @@
 
 'use strict';
 
+import '../styles/styles.less';
+import '/ui/admin/plugins/styles.less';
+
 // DOM Polyfills
 require('dom4');
 
@@ -99,6 +102,9 @@ module.exports = function(pluginDependencies) {
       UriProvider.replace(':engine', [
         '$window',
         function($window) {
+          if (DEV_MODE) {
+            return 'default';
+          }
           var uri = $window.location.href;
 
           var match = uri.match(/\/app\/admin\/([\w-]+)(|\/)/);

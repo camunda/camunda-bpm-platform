@@ -19,14 +19,8 @@
 
 var fs = require('fs');
 
-var createTaskActionTemplate = fs.readFileSync(
-  __dirname + '/cam-tasklist-navbar-action-create-task-plugin.html',
-  'utf8'
-);
-var createTaskModalTemplate = fs.readFileSync(
-  __dirname + '/modals/cam-tasklist-create-task-modal.html',
-  'utf8'
-);
+var createTaskActionTemplate = require('./cam-tasklist-navbar-action-create-task-plugin.html')();
+var createTaskModalTemplate = require('./modals/cam-tasklist-create-task-modal.html')();
 
 var Controller = [
   '$scope',

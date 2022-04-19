@@ -21,7 +21,7 @@ var fs = require('fs');
 
 var angular = require('../../../../../camunda-bpm-sdk-js/vendor/angular');
 var camCommonsUi = require('../../index');
-var testXML = fs.readFileSync(__dirname + '/test.xml', 'utf8');
+var testXML = require('./test.xml');
 
 var testModule = angular.module('myModule', [camCommonsUi.name]);
 testModule.factory('debounce', require('../../../services/debounce'));

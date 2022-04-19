@@ -19,14 +19,8 @@
 
 var fs = require('fs');
 
-var dialogTemplate = fs.readFileSync(
-  __dirname + '/job-retry-bulk-dialog.html',
-  'utf8'
-);
-var actionTemplate = fs.readFileSync(
-  __dirname + '/job-retry-bulk-action.html',
-  'utf8'
-);
+var dialogTemplate = require('./job-retry-bulk-dialog.html')();
+var actionTemplate = require('./job-retry-bulk-action.html')();
 
 module.exports = function(ngModule, pluginPoint) {
   ngModule.controller('JobRetryActionController', [

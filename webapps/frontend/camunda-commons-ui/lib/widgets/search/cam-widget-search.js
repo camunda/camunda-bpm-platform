@@ -21,7 +21,7 @@ var fs = require('fs');
 var angular = require('../../../../camunda-bpm-sdk-js/vendor/angular'),
   copy = angular.copy,
   $ = require('jquery'),
-  template = fs.readFileSync(__dirname + '/cam-widget-search.html', 'utf8');
+  template = require('./cam-widget-search.html')();
 
 var dateRegex = /(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)(?:.(\d\d\d)| )?$/;
 

@@ -18,14 +18,8 @@
 'use strict';
 var fs = require('fs');
 
-var addCommentTemplate = fs.readFileSync(
-  __dirname + '/cam-tasklist-task-action-comment-plugin.html',
-  'utf8'
-);
-var addCommentFormTemplate = fs.readFileSync(
-  __dirname + '/modals/cam-tasklist-comment-form.html',
-  'utf8'
-);
+var addCommentTemplate = require('./cam-tasklist-task-action-comment-plugin.html')();
+var addCommentFormTemplate = require('./modals/cam-tasklist-comment-form.html')();
 
 var Controller = [
   '$scope',

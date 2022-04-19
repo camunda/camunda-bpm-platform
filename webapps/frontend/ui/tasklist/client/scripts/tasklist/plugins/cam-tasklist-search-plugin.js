@@ -18,14 +18,8 @@
 'use strict';
 var fs = require('fs');
 
-var template = fs.readFileSync(
-  __dirname + '/cam-tasklist-search-plugin.html',
-  'utf8'
-);
-var searchConfigJSON = fs.readFileSync(
-  __dirname + '/cam-tasklist-search-plugin-config.json',
-  'utf8'
-);
+var template = require('./cam-tasklist-search-plugin.html')();
+var searchConfigJSON = require('./cam-tasklist-search-plugin-config.json');
 
 var angular = require('../../../../../../camunda-commons-ui/vendor/angular');
 var moment = require('../../../../../../camunda-commons-ui/vendor/moment');
@@ -33,7 +27,7 @@ var moment = require('../../../../../../camunda-commons-ui/vendor/moment');
 var expressionsRegex = /^[\s]*([#$]){/;
 var simpleDateExp = /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(|\.[0-9]{0,4})$/;
 
-var searchConfig = JSON.parse(searchConfigJSON);
+var searchConfig = searchConfigJSON;
 
 var parseValue = function(value, enforceString) {
   if (enforceString) {

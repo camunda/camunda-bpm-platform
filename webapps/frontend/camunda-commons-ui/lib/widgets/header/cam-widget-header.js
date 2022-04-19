@@ -20,8 +20,8 @@ var fs = require('fs');
 var $ = require('jquery');
 
 var angular = require('../../../../camunda-bpm-sdk-js/vendor/angular'),
-  template = fs.readFileSync(__dirname + '/cam-widget-header.html', 'utf8'),
-  logo = fs.readFileSync(__dirname + '/logo-2020-round.svg', 'utf8');
+  template = require('./cam-widget-header.html'),
+  logo = require('raw-loader!./logo-2020-round.svg').default;
 
 var apps = {
   welcome: {

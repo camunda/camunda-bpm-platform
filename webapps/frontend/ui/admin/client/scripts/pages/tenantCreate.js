@@ -19,7 +19,7 @@
 
 var fs = require('fs');
 
-var template = fs.readFileSync(__dirname + '/tenantCreate.html', 'utf8');
+var template = require('./tenantCreate.html')();
 
 var Controller = [
   '$scope',

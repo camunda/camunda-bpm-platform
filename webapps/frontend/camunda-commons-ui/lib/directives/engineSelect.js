@@ -20,7 +20,7 @@
 var fs = require('fs');
 
 var angular = require('../../../camunda-bpm-sdk-js/vendor/angular');
-var template = fs.readFileSync(__dirname + '/engineSelect.html', 'utf8');
+var template = require('./engineSelect.html')();
 
 var $ = require('jquery');
 

@@ -21,17 +21,9 @@ var angular = require('angular');
 var fs = require('fs');
 
 var searchWidgetUtils = require('../../../../../../common/scripts/util/search-widget-utils');
-var variableInstancesTabSearchConfig = JSON.parse(
-  fs.readFileSync(
-    __dirname + '/variable-instances-tab-search-config.json',
-    'utf8'
-  )
-);
+var variableInstancesTabSearchConfig = require('./variable-instances-tab-search-config.json');
 
-var instancesTemplate = fs.readFileSync(
-  __dirname + '/variable-instances-tab.html',
-  'utf8'
-);
+var instancesTemplate = require('./variable-instances-tab.html')();
 var inspectTemplate = require('../../../../../client/scripts/components/variables/variable-inspect-dialog');
 var uploadTemplate = require('../../../../../client/scripts/components/variables/variable-upload-dialog');
 

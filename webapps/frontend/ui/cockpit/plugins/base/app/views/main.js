@@ -21,7 +21,7 @@
 'use strict';
 
 var angular = require('angular'),
-  camCommon = require('cam-common'),
+  camCommon = require('/ui/common/scripts/module/index'),
   diagramInstancePlugins = require('./processInstance/diagramPlugins'),
   diagramDefinitionPlugins = require('./processDefinition/diagramPlugins'),
   // dashboard

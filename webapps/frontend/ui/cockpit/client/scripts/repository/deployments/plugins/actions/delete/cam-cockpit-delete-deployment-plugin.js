@@ -19,14 +19,8 @@
 
 var fs = require('fs');
 
-var template = fs.readFileSync(
-  __dirname + '/cam-cockpit-delete-deployment-plugin.html',
-  'utf8'
-);
-var modalTemplate = fs.readFileSync(
-  __dirname + '/modals/cam-cockpit-delete-deployment-modal.html',
-  'utf8'
-);
+var template = require('./cam-cockpit-delete-deployment-plugin.html')();
+var modalTemplate = require('./modals/cam-cockpit-delete-deployment-modal.html')();
 
 var Controller = [
   '$scope',

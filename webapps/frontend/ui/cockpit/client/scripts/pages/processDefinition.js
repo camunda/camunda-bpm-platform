@@ -19,7 +19,7 @@
 
 var fs = require('fs');
 
-var template = fs.readFileSync(__dirname + '/process-definition.html', 'utf8');
+var template = require('./process-definition.html')();
 
 var angular = require('../../../../../camunda-commons-ui/vendor/angular');
 var routeUtil = require('../../../../common/scripts/util/routeUtil');

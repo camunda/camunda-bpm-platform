@@ -18,7 +18,7 @@
 'use strict';
 
 var angular = require('angular');
-var camCommon = require('cam-common');
+var camCommon = require('/ui/common/scripts/module/index');
 var decisionList = require('./views/decision-list');
 var DecisionListController = require('./controllers/decision-list');
 var decisionListService = require('./services/decision-list');

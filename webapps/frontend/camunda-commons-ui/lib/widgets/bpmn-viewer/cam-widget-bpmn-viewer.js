@@ -21,10 +21,7 @@ var ModuleLoader = require('../../util/moduleLoader');
 
 var angular = require('../../../../camunda-bpm-sdk-js/vendor/angular'),
   Viewer = require('../../util/viewer'),
-  template = fs.readFileSync(
-    __dirname + '/cam-widget-bpmn-viewer.html',
-    'utf8'
-  );
+  template = require('./cam-widget-bpmn-viewer.html')();
 
 module.exports = [
   '$q',

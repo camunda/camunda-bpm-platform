@@ -19,10 +19,7 @@
 
 var fs = require('fs');
 
-var template = fs.readFileSync(
-  __dirname + '/external-task-activity-link.html',
-  'utf8'
-);
+var template = require('./external-task-activity-link.html')();
 
 module.exports = function() {
   return {

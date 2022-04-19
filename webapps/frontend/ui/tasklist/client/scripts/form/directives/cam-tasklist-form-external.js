@@ -18,10 +18,7 @@
 'use strict';
 var fs = require('fs');
 
-var template = fs.readFileSync(
-  __dirname + '/cam-tasklist-form-external.html',
-  'utf8'
-);
+var template = require('./cam-tasklist-form-external.html')();
 
 module.exports = [
   '$location',

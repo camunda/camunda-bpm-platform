@@ -20,7 +20,7 @@
 var fs = require('fs');
 var angular = require('angular');
 
-var template = fs.readFileSync(__dirname + '/instanceCount.html', 'utf8');
+var template = require('./instanceCount.html')();
 
 module.exports = function(
   $scope,

@@ -20,16 +20,10 @@ var fs = require('fs');
 
 var angular = require('../../../../camunda-bpm-sdk-js/vendor/angular'),
   $ = require('jquery'),
-  template = fs.readFileSync(
-    __dirname + '/cam-widget-inline-field.html',
-    'utf8'
-  );
+  template = require('./cam-widget-inline-field.html')();
 
 const dialogController = require('./dialog/controller');
-const dialogTemplate = fs.readFileSync(
-  __dirname + '/dialog/template.html',
-  'utf8'
-);
+const dialogTemplate = require('./dialog/template.html')();
 
 function getScrollParent(element) {
   var style = getComputedStyle(element);

@@ -21,7 +21,6 @@
 require('dom4');
 
 /* jshint browserify: true */
-var $ = (window.jQuery = window.$ = require('jquery'));
 
 var commons = require('../../../../camunda-commons-ui/lib');
 var sdk = require('camunda-bpm-sdk-js/lib/angularjs/index');
@@ -91,6 +90,9 @@ module.exports = function(pluginDependencies) {
       UriProvider.replace(':engine', [
         '$window',
         function($window) {
+          if (DEV_MODE) {
+            return 'default';
+          }
           var uri = $window.location.href;
 
           var match = uri.match(/\/app\/welcome\/([\w-]+)(|\/)/);

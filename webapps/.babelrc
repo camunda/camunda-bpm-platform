@@ -1,0 +1,27 @@
+{
+  "presets": [
+    // "env",
+    [
+      "@babel/preset-env",
+      {
+        "corejs": 3,
+        "modules": "commonjs", // resolves https://github.com/noppa/ng-hot-reload/issues/31
+        "shippedProposals": true,
+        "useBuiltIns": "usage"
+      }
+    ]
+  ],
+  "plugins": [
+    "@babel/plugin-proposal-object-rest-spread",
+    "@babel/plugin-transform-object-assign",
+    [
+      // By default, this plugin will attempt to add annotations to common AngularJS code patterns.
+      // This behavior can be disabled (requiring you to mark up functions with /* @ngInject */ or 'ngInject')
+      // https://www.npmjs.com/package/babel-plugin-angularjs-annotate
+      "angularjs-annotate",
+      {
+        "explicitOnly": false
+      }
+    ]
+  ]
+}

@@ -20,7 +20,7 @@
 var angular = require('angular');
 var fs = require('fs');
 
-var template = fs.readFileSync(__dirname + '/variable-add-dialog.html', 'utf8');
+var template = require('./variable-add-dialog.html')();
 
 var Controller = [
   '$uibModalInstance',

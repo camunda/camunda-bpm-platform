@@ -18,7 +18,7 @@
 'use strict';
 /* jshint browserify: true */
 var fs = require('fs');
-var template = fs.readFileSync(__dirname + '/user-profile.html', 'utf8');
+var template = require('./user-profile.html')();
 var angular = require('../../../../../camunda-commons-ui/vendor/angular');
 
 module.exports = [

@@ -21,14 +21,8 @@ var fs = require('fs');
 var searchWidgetUtils = require('../../../../../../common/scripts/util/search-widget-utils');
 var angular = require('angular');
 
-var identityLinksTemplate = fs.readFileSync(
-  __dirname + '/identity-links-modal.html',
-  'utf8'
-);
-var userTasksTemplate = fs.readFileSync(
-  __dirname + '/user-tasks-table.html',
-  'utf8'
-);
+var identityLinksTemplate = require('./identity-links-modal.html')();
+var userTasksTemplate = require('./user-tasks-table.html')();
 
 module.exports = function(ngModule) {
   /**

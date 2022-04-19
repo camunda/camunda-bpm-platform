@@ -21,11 +21,8 @@ var fs = require('fs');
 var angular = require('angular');
 var moment = require('../../../../../../../camunda-commons-ui/vendor/moment');
 
-var jobsTemplate = fs.readFileSync(__dirname + '/jobs-tab.html', 'utf8');
-var jobRescheduleTemplate = fs.readFileSync(
-  __dirname + '/jobs-reschedule-modal.html',
-  'utf8'
-);
+var jobsTemplate = require('./jobs-tab.html')();
+var jobRescheduleTemplate = require('./jobs-reschedule-modal.html')();
 
 var Configuration = function PluginConfiguration(ViewsProvider) {
   ViewsProvider.registerDefaultView('cockpit.processInstance.runtime.tab', {

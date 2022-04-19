@@ -20,14 +20,8 @@
 var fs = require('fs');
 var lodash = require('../../../../../../../camunda-commons-ui/vendor/lodash');
 
-var template = fs.readFileSync(
-  __dirname + '/cam-cockpit-deployments.html',
-  'utf8'
-);
-var searchConfigJSON = fs.readFileSync(
-  __dirname + '/cam-cockpit-deployments-search-plugin-config.json',
-  'utf8'
-);
+var template = require('./cam-cockpit-deployments.html')();
+var searchConfigJSON = require('./cam-cockpit-deployments-search-plugin-config.json');
 
 var debouncePromiseFactory = require('camunda-bpm-sdk-js').utils
   .debouncePromiseFactory;
@@ -55,7 +49,7 @@ module.exports = [
           var deploymentsListData = ($scope.deploymentsListData = $scope.deploymentsData.newChild(
             $scope
           ));
-          $scope.searchConfig = JSON.parse(searchConfigJSON);
+          $scope.searchConfig = searchConfigJSON;
 
           $scope.loadingState = 'INITIAL';
 

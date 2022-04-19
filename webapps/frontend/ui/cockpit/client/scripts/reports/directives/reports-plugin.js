@@ -18,7 +18,7 @@
 'use strict';
 
 var fs = require('fs');
-var template = fs.readFileSync(__dirname + '/reports-plugin.html', 'utf8');
+var template = require('./reports-plugin.html')();
 
 module.exports = [
   function() {

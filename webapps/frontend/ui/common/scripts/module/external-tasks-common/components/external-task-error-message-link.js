@@ -19,10 +19,7 @@
 
 var fs = require('fs');
 
-var template = fs.readFileSync(
-  __dirname + '/external-task-error-message-link.html',
-  'utf8'
-);
+var template = require('./external-task-error-message-link.html')();
 
 module.exports = function() {
   return {

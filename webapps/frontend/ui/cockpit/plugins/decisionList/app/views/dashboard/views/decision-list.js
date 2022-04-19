@@ -19,7 +19,7 @@
 
 var fs = require('fs');
 
-var template = fs.readFileSync(__dirname + '/decision-list.html', 'utf8');
+var template = require('./decision-list.html')();
 
 module.exports = [
   'ViewsProvider',

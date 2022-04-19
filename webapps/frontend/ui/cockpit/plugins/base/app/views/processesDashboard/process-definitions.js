@@ -19,7 +19,7 @@
 
 var fs = require('fs');
 
-var template = fs.readFileSync(__dirname + '/process-definitions.html', 'utf8');
+var template = require('./process-definitions.html')();
 
 module.exports = [
   'ViewsProvider',

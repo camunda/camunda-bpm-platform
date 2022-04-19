@@ -19,10 +19,8 @@
 
 var fs = require('fs');
 
-var template = fs.readFileSync(__dirname + '/tenants.html', 'utf8');
-var searchConfig = JSON.parse(
-  fs.readFileSync(__dirname + '/tenants-search-plugin-config.json', 'utf8')
-);
+var template = require('./tenants.html')();
+var searchConfig = require('./tenants-search-plugin-config.json');
 
 var debouncePromiseFactory = require('camunda-bpm-sdk-js').utils
   .debouncePromiseFactory;

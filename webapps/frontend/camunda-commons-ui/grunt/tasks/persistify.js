@@ -28,7 +28,7 @@ module.exports = function(grunt, dirname, licensebookConfig) {
     var done = this.async();
 
     var externalModules = JSON.parse(
-      fs.readFileSync(__dirname + '/../../cache/deps.json', 'utf8')
+      require('./../../cache/deps.json');
     );
 
     var firstRun = true;

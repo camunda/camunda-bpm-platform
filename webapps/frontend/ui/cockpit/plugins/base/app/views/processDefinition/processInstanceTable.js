@@ -20,13 +20,8 @@
 var fs = require('fs');
 var angular = require('angular');
 
-var template = fs.readFileSync(
-  __dirname + '/process-instance-table.html',
-  'utf8'
-);
-var searchConfig = JSON.parse(
-  fs.readFileSync(__dirname + '/process-instance-search-config.json', 'utf8')
-);
+var template = require('./process-instance-table.html')();
+var searchConfig = require('./process-instance-search-config.json');
 
 var debouncePromiseFactory = require('camunda-bpm-sdk-js').utils
   .debouncePromiseFactory;

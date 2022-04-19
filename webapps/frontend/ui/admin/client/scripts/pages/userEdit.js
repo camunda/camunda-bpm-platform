@@ -19,19 +19,10 @@
 
 var fs = require('fs');
 
-var template = fs.readFileSync(__dirname + '/userEdit.html', 'utf8');
-var groupTemplate = fs.readFileSync(
-  __dirname + '/create-group-membership.html',
-  'utf8'
-);
-var tenantTemplate = fs.readFileSync(
-  __dirname + '/create-tenant-user-membership.html',
-  'utf8'
-);
-var confirmationTemplate = fs.readFileSync(
-  __dirname + '/generic-confirmation.html',
-  'utf8'
-);
+var template = require('./userEdit.html')();
+var groupTemplate = require('./create-group-membership.html')();
+var tenantTemplate = require('./create-tenant-user-membership.html')();
+var confirmationTemplate = require('./generic-confirmation.html')();
 
 var angular = require('../../../../../camunda-commons-ui/vendor/angular');
 

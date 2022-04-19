@@ -19,11 +19,8 @@
 
 var fs = require('fs');
 
-var template = fs.readFileSync(__dirname + '/tenantEdit.html', 'utf8');
-var confirmationTemplate = fs.readFileSync(
-  __dirname + '/generic-confirmation.html',
-  'utf8'
-);
+var template = require('./tenantEdit.html')();
+var confirmationTemplate = require('./generic-confirmation.html')();
 
 var angular = require('../../../../../camunda-commons-ui/vendor/angular');
 

@@ -18,7 +18,7 @@
 'use strict';
 const fs = require('fs');
 const angular = require('angular');
-const template = fs.readFileSync(__dirname + '/template.html', 'utf8');
+const template = require('./template.html')();
 
 module.exports = {
   getCallActivityFlowNodes: getCallActivityFlowNodes,

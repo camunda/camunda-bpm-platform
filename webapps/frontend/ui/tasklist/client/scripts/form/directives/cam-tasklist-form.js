@@ -18,7 +18,7 @@
 'use strict';
 var fs = require('fs');
 
-var template = fs.readFileSync(__dirname + '/cam-tasklist-form.html', 'utf8');
+var template = require('./cam-tasklist-form.html')();
 
 var EMBEDDED_KEY = 'embedded:',
   APP_KEY = 'app:',

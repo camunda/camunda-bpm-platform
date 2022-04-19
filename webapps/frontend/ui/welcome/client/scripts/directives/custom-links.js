@@ -18,7 +18,7 @@
 'use strict';
 /* jshint browserify: true */
 var fs = require('fs');
-var template = fs.readFileSync(__dirname + '/custom-links.html', 'utf8');
+var template = require('./custom-links.html')();
 
 module.exports = [
   'customLinks',

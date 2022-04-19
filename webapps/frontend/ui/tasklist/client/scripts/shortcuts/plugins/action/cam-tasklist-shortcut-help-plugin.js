@@ -20,14 +20,8 @@ require('mousetrap');
 
 var fs = require('fs');
 
-var helpLinkTemplate = fs.readFileSync(
-  __dirname + '/cam-tasklist-shortcut-help-plugin.html',
-  'utf8'
-);
-var showHelpTemplate = fs.readFileSync(
-  __dirname + '/modals/cam-tasklist-shortcut-help.html',
-  'utf8'
-);
+var helpLinkTemplate = require('./cam-tasklist-shortcut-help-plugin.html')();
+var showHelpTemplate = require('./modals/cam-tasklist-shortcut-help.html')();
 
 var Controller = [
   '$scope',

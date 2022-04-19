@@ -18,10 +18,7 @@
 'use strict';
 var fs = require('fs');
 
-var template = fs.readFileSync(
-  __dirname + '/cam-tasklist-sorting-dropdown.html',
-  'utf8'
-);
+var template = require('./cam-tasklist-sorting-dropdown.html')();
 
 module.exports = [
   '$translate',

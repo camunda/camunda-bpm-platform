@@ -18,7 +18,7 @@
 'use strict';
 
 var fs = require('fs');
-var template = fs.readFileSync(__dirname + '/reports-view.html', 'utf8');
+var template = require('./reports-view.html')();
 var angular = require('../../../../../../camunda-commons-ui/vendor/angular');
 var extend = angular.extend;
 

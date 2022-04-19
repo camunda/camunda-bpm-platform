@@ -19,7 +19,7 @@
 
 var fs = require('fs');
 
-var template = fs.readFileSync(__dirname + '/cam-share-link.html', 'utf8');
+var template = require('./cam-share-link.html')();
 
 module.exports = [
   '$location',

@@ -18,7 +18,7 @@
 'use strict';
 var fs = require('fs');
 
-var template = fs.readFileSync(__dirname + '/cam-widget-debug.html', 'utf8');
+var template = require('./cam-widget-debug.html')();
 
 module.exports = [
   function() {

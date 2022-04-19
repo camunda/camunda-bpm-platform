@@ -18,10 +18,7 @@
 'use strict';
 var fs = require('fs');
 
-var template = fs.readFileSync(
-  __dirname + '/cam-tasklist-filter-modal-form-general.html',
-  'utf8'
-);
+var template = require('./cam-tasklist-filter-modal-form-general.html')();
 
 module.exports = [
   function() {

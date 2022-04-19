@@ -18,8 +18,8 @@
 var fs = require('fs');
 var angular = require('angular');
 
-var modalTemplate = fs.readFileSync(__dirname + '/modal.html', 'utf8');
-var camundaLogo = fs.readFileSync(__dirname + '/../auth/page/logo.svg', 'utf8');
+var modalTemplate = require('./modal.html')();
+var camundaLogo = require('svg-inline-loader?classPrefix!./../auth/page/logo.svg');
 
 // CAMUNDA_VERSION has a structure of 'major.minor.patch[-SNAPSHOT]', but we only need 'major.minor' for doc links
 var camundaVersion = (process.env.CAMUNDA_VERSION || '').match(

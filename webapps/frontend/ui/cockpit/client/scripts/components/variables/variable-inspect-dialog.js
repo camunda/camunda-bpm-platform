@@ -20,10 +20,7 @@
 var angular = require('angular');
 var fs = require('fs');
 
-var template = fs.readFileSync(
-  __dirname + '/variable-inspect-dialog.html',
-  'utf8'
-);
+var template = require('./variable-inspect-dialog.html')();
 
 var Controller = [
   '$http',

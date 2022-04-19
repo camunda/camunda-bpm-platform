@@ -21,8 +21,8 @@ var fs = require('fs');
 
 var angular = require('../../../../../camunda-bpm-sdk-js/vendor/angular'),
     camCommonsUi = require('../../index'),
-    testXML = fs.readFileSync(__dirname + '/test.xml', 'utf8'),
-    drdXML = fs.readFileSync(__dirname + '/drd.dmn11.xml', 'utf8');
+    testXML = require('./test.xml'),
+    drdXML = require('./drd.dmn11.xml');
 
 var testModule = angular.module('myModule', [camCommonsUi.name]);
 

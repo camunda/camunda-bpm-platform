@@ -18,7 +18,7 @@
 'use strict';
 var fs = require('fs');
 
-var tasklistTemplate = fs.readFileSync(__dirname + '/../index.html', 'utf8');
+var tasklistTemplate = require('./../index.html')();
 
 module.exports = [
   '$routeProvider',

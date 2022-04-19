@@ -19,10 +19,7 @@
 
 var fs = require('fs');
 
-var template = fs.readFileSync(
-  __dirname + '/cam-cockpit-resources.html',
-  'utf8'
-);
+var template = require('./cam-cockpit-resources.html')();
 
 var angular = require('../../../../../../../camunda-commons-ui/vendor/angular');
 

@@ -19,10 +19,7 @@
 var fs = require('fs');
 var $ = require('jquery');
 
-var template = fs.readFileSync(
-  __dirname + '/../modals/cam-tasklist-filter-modal.html',
-  'utf8'
-);
+var template = require('./../modals/cam-tasklist-filter-modal.html')();
 
 module.exports = [
   '$scope',

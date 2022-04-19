@@ -18,10 +18,7 @@
 'use strict';
 var fs = require('fs');
 
-var template = fs.readFileSync(
-  __dirname + '/cam-tasklist-filter-modal-form-variable.html',
-  'utf8'
-);
+var template = require('./cam-tasklist-filter-modal-form-variable.html')();
 
 var angular = require('../../../../../../camunda-commons-ui/vendor/angular');
 

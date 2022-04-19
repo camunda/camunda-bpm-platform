@@ -22,7 +22,8 @@
           tasklist-api="$APP_ROOT/api/tasklist/"
           welcome-api="$APP_ROOT/api/welcome/"
           engine-api="$APP_ROOT/api/engine/"
-          app-root="$APP_ROOT" />
+          app-root="$APP_ROOT"
+          app-name="cockpit" />
 
     <!-- an example of plugin/feature exclusion -->
     <!--
@@ -37,19 +38,19 @@
     -->
 
 
-    <!-- styles -->
+    <!-- styles
     <link href="$APP_ROOT/app/cockpit/styles/styles.css?bust=$GRUNT_CACHE_BUST"
           rel="stylesheet" />
     <link href="$APP_ROOT/app/cockpit/styles/styles-components.css?bust=$GRUNT_CACHE_BUST"
           rel="stylesheet" />
     <link rel="stylesheet"
           type="text/css"
-          href="$APP_ROOT/app/cockpit/styles/user-styles.css?bust=$GRUNT_CACHE_BUST">
+          href="$APP_ROOT/app/cockpit/styles/user-styles.css?bust=$GRUNT_CACHE_BUST">-->
 
-    <!-- favicon -->
+    <!-- favicon
     <link rel="shortcut icon"
           href="$APP_ROOT/app/cockpit/assets/images/favicon.ico"
-          type="image/x-icon" />
+          type="image/x-icon" />-->
   </head>
   <body>
     <!-- navigation -->
@@ -108,36 +109,17 @@
 
     <!-- footer -->
     <footer cam-widget-footer
-            version="v${project.version}"></footer>
+            version="v$VERSION"></footer>
 
     <script type="application/javascript" $CSP_NONCE>
-      var cockpitConf = window.camCockpitConf = {};
+        window.camCockpitConf = {};
 
-      window.PLUGIN_DEPENDENCIES = $PLUGIN_DEPENDENCIES || [];
-      window.PLUGIN_PACKAGES = $PLUGIN_PACKAGES || [];
+        window.PLUGIN_DEPENDENCIES = $PLUGIN_DEPENDENCIES || [];
+        window.PLUGIN_PACKAGES = $PLUGIN_PACKAGES || [];
 
-      window.require = {
+        window.require = {
           waitSeconds: 0
-      };
-    </script>
-
-    <script type="application/javascript"
-            src="$APP_ROOT/lib/require.js" $CSP_NONCE></script>
-    <script type="text/javascript" $CSP_NONCE>
-
-window.__define = window.define;
-window.__require = window.require;
-window.define = undefined;
-window.require = undefined;
-window.bust = '$GRUNT_CACHE_BUST';
-
-requirejs.config({
-  baseUrl: '$APP_ROOT/app/cockpit',
-  urlArgs: 'bust=$GRUNT_CACHE_BUST'
-});
-requirejs(['$APP_ROOT/lib/deps.js'], function () {
-  requirejs(['$APP_ROOT/app/cockpit/camunda-cockpit-bootstrap.js'], function(){});
-});
+        };
     </script>
   </body>
 </html>

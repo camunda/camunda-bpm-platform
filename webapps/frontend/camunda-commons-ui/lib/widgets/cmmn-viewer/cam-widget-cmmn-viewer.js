@@ -19,10 +19,7 @@
 var fs = require('fs');
 var Viewer = require('cmmn-js/lib/NavigatedViewer');
 
-var template = fs.readFileSync(
-  __dirname + '/cam-widget-cmmn-viewer.html',
-  'utf8'
-);
+var template = require('./cam-widget-cmmn-viewer.html')();
 
 module.exports = [
   '$compile',

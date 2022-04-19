@@ -21,10 +21,7 @@
 
 var fs = require('fs');
 
-var template = fs.readFileSync(
-  __dirname + '/cam-cockpit-html-source.html',
-  'utf8'
-);
+var template = require('./cam-cockpit-html-source.html')();
 
 module.exports = [
   '$sce',

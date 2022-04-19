@@ -19,7 +19,7 @@
 
 var fs = require('fs');
 
-var template = fs.readFileSync(__dirname + '/decisionTable.html', 'utf8');
+var template = require('./decisionTable.html')();
 
 var DirectiveController = [
   '$scope',

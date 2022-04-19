@@ -18,10 +18,7 @@
 'use strict';
 var fs = require('fs');
 
-var template = fs.readFileSync(
-  __dirname + '/cam-tasklist-task-detail-description-plugin.html',
-  'utf8'
-);
+var template = require('./cam-tasklist-task-detail-description-plugin.html')();
 
 var Controller = ['$scope', function() {}];
 

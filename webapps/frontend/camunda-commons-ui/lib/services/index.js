@@ -30,7 +30,6 @@ var angular = require('../../../camunda-bpm-sdk-js/vendor/angular'),
   HttpClient = require('./HttpClient'),
   unescape = require('./unescape'),
   fixDate = require('./fixDate'),
-  ifUnauthorizedForwardToWelcomeApp = require('./ifUnauthorizedForwardToWelcomeApp'),
   unfixDate = require('./unfixDate'),
   shouldDisplayAuthenticationError = require('./shouldDisplayAuthenticationError');
 
@@ -47,7 +46,6 @@ ngModule.factory('ResourceResolver', ResourceResolver);
 ngModule.factory('camAPIHttpClient', HttpClient);
 ngModule.factory('unescape', unescape);
 ngModule.factory('fixDate', fixDate);
-ngModule.factory('ifUnauthorizedForwardToWelcomeApp', ifUnauthorizedForwardToWelcomeApp);
 ngModule.factory('unfixDate', unfixDate);
 ngModule.factory(
   'shouldDisplayAuthenticationError',
@@ -59,23 +57,21 @@ ngModule.factory(
  */
 ngModule.config([
   '$httpProvider',
-  function($httpProvider) {
+  function ($httpProvider) {
     $httpProvider.interceptors.push([
       '$rootScope',
       '$q',
       'RequestLogger',
-      'ifUnauthorizedForwardToWelcomeApp',
-      function($rootScope, $q, RequestLogger, ifUnauthorizedForwardToWelcomeApp) {
+      function ($rootScope, $q, RequestLogger) {
         RequestLogger.logStarted();
 
         return {
-          response: function(response) {
+          response: function (response) {
             RequestLogger.logFinished();
-            ifUnauthorizedForwardToWelcomeApp(response.headers());
 
             return response;
           },
-          responseError: function(response) {
+          responseError: function (response) {
             RequestLogger.logFinished();
 
             var httpError = {
@@ -97,15 +93,21 @@ ngModule.config([
 ngModule.config([
   '$httpProvider',
   '$windowProvider',
-  function($httpProvider, $windowProvider) {
-    var window = $windowProvider.$get();
-    var uri = window.location.href;
+  function ($httpProvider, $windowProvider) {
+    if (!DEV_MODE) {
+      var window = $windowProvider.$get();
+      var uri = window.location.href;
 
-    var match = uri.match(/\/(?:app)(?!.*\/app\/)\/([\w-]+)\/([\w-]+)/);
-    if (match) {
-      $httpProvider.defaults.headers.get = {'X-Authorized-Engine': match[2]};
+      var match = uri.match(/\/(?:app)(?!.*\/app\/)\/([\w-]+)\/([\w-]+)/);
+      if (match) {
+        $httpProvider.defaults.headers.get = {'X-Authorized-Engine': match[2]};
+      } else {
+        throw new Error('no process engine selected');
+      }
+
     } else {
-      throw new Error('no process engine selected');
+      $httpProvider.defaults.headers.get = {'X-Authorized-Engine': 'default'};
+
     }
   }
 ]);

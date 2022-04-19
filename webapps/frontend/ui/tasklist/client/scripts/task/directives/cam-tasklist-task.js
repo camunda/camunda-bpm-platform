@@ -18,7 +18,7 @@
 'use strict';
 var fs = require('fs');
 
-var template = fs.readFileSync(__dirname + '/cam-tasklist-task.html', 'utf8');
+var template = require('./cam-tasklist-task.html')();
 
 var angular = require('../../../../../../camunda-commons-ui/vendor/angular');
 

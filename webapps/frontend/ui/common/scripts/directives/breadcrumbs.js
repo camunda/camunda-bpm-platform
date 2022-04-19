@@ -19,7 +19,7 @@
 
 var fs = require('fs');
 
-var template = fs.readFileSync(__dirname + '/breadcrumbs.html', 'utf8');
+var template = require('./breadcrumbs.html')();
 
 module.exports = [
   '$location',

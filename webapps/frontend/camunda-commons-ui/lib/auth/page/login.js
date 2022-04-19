@@ -19,8 +19,8 @@
 
 var fs = require('fs');
 
-var template = fs.readFileSync(__dirname + '/login.html', 'utf8');
-var logo = fs.readFileSync(__dirname + '/logo.svg', 'utf8');
+var template = require('./login.html')();
+var logo = require('svg-inline-loader?classPrefix!./logo.svg');
 
 var $ = require('jquery');
 

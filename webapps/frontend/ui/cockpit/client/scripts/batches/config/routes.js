@@ -19,10 +19,7 @@
 
 var fs = require('fs');
 
-var template = fs.readFileSync(
-  __dirname + '/../templates/cam-cockpit-batch-view.html',
-  'utf8'
-);
+var template = require('./../templates/cam-cockpit-batch-view.html')();
 var ctrl = require('../controllers/view-ctrl');
 
 module.exports = [

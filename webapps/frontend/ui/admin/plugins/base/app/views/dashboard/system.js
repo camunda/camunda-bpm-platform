@@ -19,7 +19,7 @@
 
 var fs = require('fs');
 
-var template = fs.readFileSync(__dirname + '/system.html', 'utf8');
+var template = require('./system.html')();
 
 var angular = require('angular');
 

@@ -18,10 +18,7 @@
 'use strict';
 
 const fs = require('fs');
-const template = fs.readFileSync(
-  __dirname + '/time-to-live-dialog.html',
-  'utf8'
-);
+const template = require('./time-to-live-dialog.html')();
 
 const Controller = [
   'camAPI',

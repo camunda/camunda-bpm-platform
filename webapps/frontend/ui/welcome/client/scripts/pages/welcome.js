@@ -18,7 +18,7 @@
 'use strict';
 
 var fs = require('fs');
-var template = fs.readFileSync(__dirname + '/welcome.html', 'utf8');
+var template = require('./welcome.html')();
 
 var RouteConfig = [
   '$routeProvider',

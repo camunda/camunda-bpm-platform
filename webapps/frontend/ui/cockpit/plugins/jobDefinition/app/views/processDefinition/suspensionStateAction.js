@@ -20,14 +20,8 @@
 var fs = require('fs');
 
 var angular = require('angular');
-var actionTemplate = fs.readFileSync(
-  __dirname + '/suspension-state-action.html',
-  'utf8'
-);
-var dialogTemplate = fs.readFileSync(
-  __dirname + '/job-definition-suspension-state-dialog.html',
-  'utf8'
-);
+var actionTemplate = require('./suspension-state-action.html')();
+var dialogTemplate = require('./job-definition-suspension-state-dialog.html')();
 
 var Configuration = function PluginConfiguration(ViewsProvider) {
   ViewsProvider.registerDefaultView('cockpit.jobDefinition.action', {

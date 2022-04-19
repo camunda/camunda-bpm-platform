@@ -20,10 +20,7 @@
 const angular = require('angular');
 const fs = require('fs');
 
-const template = fs.readFileSync(
-  __dirname + '/cam-annotation-edit.html',
-  'utf8'
-);
+const template = require('./cam-annotation-edit.html')();
 const annotationModal = require('./cam-annotation-modal');
 
 module.exports = [

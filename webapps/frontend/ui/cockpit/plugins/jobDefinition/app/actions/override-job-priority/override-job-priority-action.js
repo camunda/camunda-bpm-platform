@@ -20,14 +20,8 @@
 var fs = require('fs');
 
 var angular = require('angular');
-var actionTemplate = fs.readFileSync(
-  __dirname + '/override-job-priority-action.html',
-  'utf8'
-);
-var dialogTemplate = fs.readFileSync(
-  __dirname + '/override-job-priority-dialog.html',
-  'utf8'
-);
+var actionTemplate = require('./override-job-priority-action.html')();
+var dialogTemplate = require('./override-job-priority-dialog.html')();
 
 var Configuration = function PluginConfiguration(ViewsProvider) {
   ViewsProvider.registerDefaultView('cockpit.jobDefinition.action', {

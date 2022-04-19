@@ -20,14 +20,8 @@ var fs = require('fs');
 
 var angular = require('../../../../camunda-bpm-sdk-js/vendor/angular'),
   typeUtils = require('../../../../camunda-bpm-sdk-js/lib/forms/type-util'),
-  templateDialog = fs.readFileSync(
-    __dirname + '/cam-widget-variable-dialog.html',
-    'utf8'
-  ),
-  templateStringDialog = fs.readFileSync(
-    __dirname + '/cam-widget-string-dialog.html',
-    'utf8'
-  );
+  templateDialog = require('./cam-widget-variable-dialog.html')(),
+  templateStringDialog = require('./cam-widget-string-dialog.html')();
 
 var varUtils = {};
 

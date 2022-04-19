@@ -19,10 +19,7 @@
 
 var fs = require('fs');
 
-var template = fs.readFileSync(
-  __dirname + '/cam-cockpit-resource-content.html',
-  'utf8'
-);
+var template = require('./cam-cockpit-resource-content.html')();
 
 module.exports = [
   function() {

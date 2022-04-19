@@ -21,14 +21,8 @@ var angular = require('../../../../../../../camunda-commons-ui/vendor/angular');
 
 var fs = require('fs');
 
-var startProcessActionTemplate = fs.readFileSync(
-  __dirname + '/cam-tasklist-navbar-action-start-process-plugin.html',
-  'utf8'
-);
-var template = fs.readFileSync(
-  __dirname + '/modals/cam-tasklist-process-start-modal.html',
-  'utf8'
-);
+var startProcessActionTemplate = require('./cam-tasklist-navbar-action-start-process-plugin.html')();
+var template = require('./modals/cam-tasklist-process-start-modal.html')();
 
 var Controller = [
   '$scope',

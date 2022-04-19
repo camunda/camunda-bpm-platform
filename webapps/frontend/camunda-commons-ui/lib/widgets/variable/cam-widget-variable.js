@@ -20,7 +20,7 @@ var fs = require('fs');
 
 var angular = require('../../../../camunda-bpm-sdk-js/vendor/angular'),
   varUtils = require('./cam-variable-utils'),
-  template = fs.readFileSync(__dirname + '/cam-widget-variable.html', 'utf8');
+  template = require('./cam-widget-variable.html')();
 
 var variableTypes = varUtils.types;
 
