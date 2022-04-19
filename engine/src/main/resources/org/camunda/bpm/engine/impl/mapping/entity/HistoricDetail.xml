@@ -423,7 +423,7 @@
       </if>
 
       <if test="userOperationId != null">
-        RES.OPERATION_ID_ = #{userOperationId}
+        and RES.OPERATION_ID_ = #{userOperationId}
       </if>
 
       <if test="sequenceCounter != null">
