@@ -19,10 +19,13 @@ package org.camunda.bpm.engine.rest;
 import static io.restassured.RestAssured.given;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockBatch;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockHistoricProcessInstance;
 import static org.camunda.bpm.engine.rest.util.DateTimeUtils.DATE_FORMAT_WITH_TIMEZONE;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 
@@ -31,6 +34,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,17 +44,24 @@ import javax.ws.rs.core.Response.Status;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
+import org.camunda.bpm.engine.history.HistoricTaskInstance;
+import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.HistoryServiceImpl;
 import org.camunda.bpm.engine.impl.ManagementServiceImpl;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
+import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
@@ -86,6 +97,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateSelectBuilder;
 import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateTenantBuilder;
 import org.camunda.bpm.engine.runtime.UpdateProcessInstancesSuspensionStateBuilder;
+import org.camunda.bpm.engine.task.Comment;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.SerializableValueType;
@@ -122,6 +134,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
   protected static final String PROCESS_INSTANCE_URL = TEST_RESOURCE_ROOT_PATH + "/process-instance";
   protected static final String SINGLE_PROCESS_INSTANCE_URL = PROCESS_INSTANCE_URL + "/{id}";
   protected static final String PROCESS_INSTANCE_VARIABLES_URL = SINGLE_PROCESS_INSTANCE_URL + "/variables";
+  protected static final String PROCESS_INSTANCE_COMMENTS_URL = SINGLE_PROCESS_INSTANCE_URL + "/comment";  
   protected static final String DELETE_PROCESS_INSTANCES_ASYNC_URL = PROCESS_INSTANCE_URL + "/delete";
   protected static final String DELETE_PROCESS_INSTANCES_ASYNC_HIST_QUERY_URL = PROCESS_INSTANCE_URL + "/delete-historic-query-based";
   protected static final String SET_JOB_RETRIES_ASYNC_URL = PROCESS_INSTANCE_URL + "/job-retries";
@@ -158,9 +171,13 @@ public class ProcessInstanceRestServiceInteractionTest extends
           .objectTypeName(ExampleVariableObject.class.getName()));
   }
 
+  private List<Comment> mockTaskComments;
+  private HistoricProcessInstanceQuery historicProcessInstanceQueryMock;
+  
   private RuntimeServiceImpl runtimeServiceMock;
   private ManagementServiceImpl mockManagementService;
   private HistoryServiceImpl historyServiceMock;
+  private TaskService taskServiceMock;
 
   private UpdateProcessInstanceSuspensionStateTenantBuilder mockUpdateSuspensionStateBuilder;
   private UpdateProcessInstanceSuspensionStateSelectBuilder mockUpdateSuspensionStateSelectBuilder;
@@ -193,13 +210,34 @@ public class ProcessInstanceRestServiceInteractionTest extends
     when(mockUpdateSuspensionStateSelectBuilder.byProcessInstanceQuery(any())).thenReturn(mockUpdateProcessInstancesSuspensionStateBuilder);
     when(mockUpdateSuspensionStateSelectBuilder.byHistoricProcessInstanceQuery(any())).thenReturn(mockUpdateProcessInstancesSuspensionStateBuilder);
 
+    // tasks and task service
+    taskServiceMock = mock(TaskService.class);
+    when(processEngine.getTaskService()).thenReturn(taskServiceMock);
+    
+    mockTaskComments = MockProvider.createMockTaskComments();
+    when(taskServiceMock.getProcessInstanceComments(EXAMPLE_PROCESS_INSTANCE_ID)).thenReturn(mockTaskComments);
+    
+    historicProcessInstanceQueryMock = mock(HistoricProcessInstanceQuery.class);
+    when(historyServiceMock.createHistoricProcessInstanceQuery()).thenReturn(historicProcessInstanceQueryMock);
+    when(historicProcessInstanceQueryMock.processInstanceId(eq(EXAMPLE_PROCESS_INSTANCE_ID))).thenReturn(historicProcessInstanceQueryMock);
+    HistoricProcessInstance historicProcessInstanceMock = createMockHistoricProcessInstance();
+    when(historicProcessInstanceQueryMock.singleResult()).thenReturn(historicProcessInstanceMock);    
+    
     // runtime service
     when(processEngine.getRuntimeService()).thenReturn(runtimeServiceMock);
     when(processEngine.getManagementService()).thenReturn(mockManagementService);
     when(processEngine.getHistoryService()).thenReturn(historyServiceMock);
-
+    
   }
 
+  public void mockHistoryFull() {
+    when(mockManagementService.getHistoryLevel()).thenReturn(ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL);
+  }
+  
+  public void mockHistoryDisabled() {
+    when(mockManagementService.getHistoryLevel()).thenReturn(ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE);
+  }
+  
   @Test
   public void testGetActivityInstanceTree() {
     Response response = given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
@@ -620,6 +658,39 @@ public class ProcessInstanceRestServiceInteractionTest extends
     Assert.assertEquals("Should return exactly one variable", 1, response.jsonPath().getMap("").size());
   }
 
+  @Test
+  public void testGetProcessInstanceComments() {
+    mockHistoryFull();
+  
+    Response response = given()
+      .pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("$.size()", equalTo(1))
+    .when()
+      .get(PROCESS_INSTANCE_COMMENTS_URL);
+
+    verifyTaskComments(mockTaskComments, response);
+    verify(taskServiceMock).getProcessInstanceComments(EXAMPLE_PROCESS_INSTANCE_ID);
+  }
+  
+  @Test
+  public void testGetProcessInstanceCommentsWithHistoryDisabled() {
+    mockHistoryDisabled();
+
+    given()
+      .pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("$.size()", equalTo(0))
+    .when()
+      .get(PROCESS_INSTANCE_COMMENTS_URL);
+  }  
+  
   @Test
   public void testGetFileVariable() {
     String variableKey = "aVariableKey";
@@ -4134,5 +4205,27 @@ public class ProcessInstanceRestServiceInteractionTest extends
     assertEquals(MockProvider.EXAMPLE_MONITOR_JOB_DEFINITION_ID, batch.getMonitorJobDefinitionId());
     assertEquals(MockProvider.EXAMPLE_BATCH_JOB_DEFINITION_ID, batch.getBatchJobDefinitionId());
     assertEquals(MockProvider.EXAMPLE_TENANT_ID, batch.getTenantId());
+  }
+  
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  private void verifyTaskComments(List<Comment> mockTaskComments, Response response) {
+    List list = response.as(List.class);
+    assertEquals(1, list.size());
+
+    LinkedHashMap<String, String> resourceHashMap = (LinkedHashMap<String, String>) list.get(0);
+
+    String returnedId = resourceHashMap.get("id");
+    String returnedUserId = resourceHashMap.get("userId");
+    String returnedTaskId = resourceHashMap.get("taskId");
+    Date returnedTime = DateTimeUtil.parseDate(resourceHashMap.get("time"));
+    String returnedFullMessage = resourceHashMap.get("message");
+
+    Comment mockComment = mockTaskComments.get(0);
+
+    assertEquals(mockComment.getId(), returnedId);
+    assertEquals(mockComment.getTaskId(), returnedTaskId);
+    assertEquals(mockComment.getUserId(), returnedUserId);
+    assertEquals(mockComment.getTime(), returnedTime);
+    assertEquals(mockComment.getFullMessage(), returnedFullMessage);
   }
 }

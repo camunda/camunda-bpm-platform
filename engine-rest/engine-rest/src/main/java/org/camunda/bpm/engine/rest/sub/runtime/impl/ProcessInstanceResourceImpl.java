@@ -32,6 +32,7 @@ import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.modification.ProcessInstanceModificationDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.VariableResource;
+import org.camunda.bpm.engine.rest.sub.runtime.ProcessInstanceCommentResource;
 import org.camunda.bpm.engine.rest.sub.runtime.ProcessInstanceResource;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -154,4 +155,10 @@ public class ProcessInstanceResourceImpl implements ProcessInstanceResource {
 
     throw new InvalidRequestException(Status.BAD_REQUEST, "The provided instuctions are invalid.");
   }
+
+  @Override
+  public ProcessInstanceCommentResource getProcessInstanceCommentResource() {
+    return new ProcessInstanceCommentResourceImpl(engine, processInstanceId);
+  }
+  
 }
