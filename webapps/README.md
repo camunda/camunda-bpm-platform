@@ -105,7 +105,7 @@ describe.only('Cockpit Dashboard Spec', function() {
 
 #### AngularJS libraries from XLTS.dev
 
-Since December 31, 2021, AngularJS is no longer officially supported by the original maintainers (Google). We replaced the official AngularJS libraries with the ones from [XLTS.dev](https://XLTS.dev) to ensure that our used libraries stay secure and supported. We include the AngularJS libraries from XLTS.dev in our Community Edition releases from 7.17.0 on.
+Since December 31, 2021, AngularJS is no longer officially supported by the original maintainers (Google). We replaced the official AngularJS libraries with the ones from [XLTS.dev](https://XLTS.dev) to ensure that our used libraries stay secure and supported. We include the AngularJS libraries from XLTS.dev in our Community Edition releases from 7.18.0-alpha1 on.
 
 **Heads-up:** If you build the Webapps from our source code, the build includes the no longer maintained AngularJS libraries unless you have access to the XLTS.dev registry and configure it with the help of environment variables.
 
