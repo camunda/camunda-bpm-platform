@@ -35,15 +35,15 @@ public class SpringBootProcessEngineLogger extends BaseLogger {
   public static final SpringBootProcessEngineLogger LOG = createLogger(SpringBootProcessEngineLogger.class, PROJECT_CODE, PACKAGE, PROJECT_ID);
 
   public void creatingInitialAdminUser(User adminUser) {
-    logInfo("010", "creating initial Admin User: {}", adminUser);
+    logInfo("010", "Creating initial Admin User: {}", adminUser);
   }
 
   public void skipAdminUserCreation(User existingUser) {
-    logInfo("011", "skip creating initial Admin User, user does exist: {}", existingUser);
+    logInfo("011", "Skip creating initial Admin User, user does exist: {}", existingUser);
   }
 
   public void createInitialFilter(Filter filter) {
-    logInfo("015", "create initial filter: id={} name={}", filter.getId(), filter.getName());
+    logInfo("015", "Create initial filter: id={} name={}", filter.getId(), filter.getName());
   }
 
   public void skipCreateInitialFilter(String filterName) {
@@ -87,7 +87,7 @@ public class SpringBootProcessEngineLogger extends BaseLogger {
   }
 
   public void propertiesApplied(GenericProperties genericProperties) {
-    logDebug("051", "properties bound to configuration: {}", genericProperties);
+    logDebug("051", "Properties bound to configuration: {}", genericProperties);
   }
 
 }
