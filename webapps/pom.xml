@@ -981,7 +981,9 @@
                       <arg value="npm"/>
                       <arg value="ci"/>
                     </exec>
-                    <exec executable="node" failonerror="true">
+                    <exec executable="cmd" failonerror="true">
+                      <arg value="/c"/>
+                      <arg value="node"/>
                       <arg value="scripts/xlts"/>
                       <arg value="install"/>
                     </exec>
