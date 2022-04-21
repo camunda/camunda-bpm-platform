@@ -114,7 +114,7 @@
     "xunit-file": "1.0.0"
   },
   "xlts": {
-    "version": "1.8.8",
+    "xltsVersion": "1.8.8",
     "dependencies": [
       "angular",
       "angular-animate",
