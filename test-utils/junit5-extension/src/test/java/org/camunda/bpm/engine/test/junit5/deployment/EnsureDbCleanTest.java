@@ -48,7 +48,7 @@ public class EnsureDbCleanTest {
   }
 
   @Test
-  public void shouldFoo() {
+  public void shouldFailTestsThatExpectCleanDbWhenDbIsDirty() {
     EngineExecutionResults results = EngineTestKit
       .engine("junit-jupiter")
       .selectors(
