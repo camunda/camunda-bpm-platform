@@ -80,7 +80,31 @@
     <!-- script engine dependencies -->
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
-      <artifactId>groovy-all</artifactId>
+      <artifactId>groovy</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-jsr223</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-json</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-xml</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-datetime</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-dateutil</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-templates</artifactId>
     </dependency>
     
     <dependency>
@@ -218,6 +242,18 @@
                   </mapper>
                 </copy>
 
+                <!-- copy groovy dependencies to single dir -->
+                <delete dir="target/modules/org/codehaus/groovy" />
+                <copy todir="target/modules" flatten="false">
+                  <fileset refid="maven.project.dependencies" />
+                  <mapper>
+                    <chainedmapper>
+                      <regexpmapper from="^(.*)/([^/]+)/([^/]+)/([^/]*)$$" to="\1/groovy-all/main/\4" handledirsep="yes" />
+                      <regexpmapper from="^(org.codehaus.groovy.*/.*.jar)$$" to="\1" handledirsep="yes" />
+                    </chainedmapper>
+                  </mapper>
+                </copy>
+
                 <copy todir="target/modules" flatten="false">
                   <fileset dir="src/main/modules" />
                 </copy>
@@ -243,6 +279,10 @@
                 </replace>
 
                 <replace dir="target/modules" token="@version.freemarker@" value="${version.freemarker}">
+                  <include name="**/module.xml" />
+                </replace>
+
+                <replace dir="target/modules" token="@version.groovy@" value="${version.groovy}">
                   <include name="**/module.xml" />
                 </replace>
 
