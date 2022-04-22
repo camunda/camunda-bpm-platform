@@ -169,10 +169,6 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTest {
     
     // then
     assertEquals(1, loggingRule.getFilteredLog(CMD_LOGGER, "Deployment name set to null. Filtering duplicates will not work properly.").size());
-
-    // cleanup
-    String deploymentId = repositoryService.createDeploymentQuery().singleResult().getId();
-    repositoryService.deleteDeployment(deploymentId);
   }
   
   @Test
