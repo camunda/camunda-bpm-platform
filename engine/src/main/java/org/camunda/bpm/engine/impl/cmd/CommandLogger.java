@@ -317,4 +317,8 @@ public class CommandLogger extends ProcessEngineLogger {
       cause.getMessage());
   }
 
+  public void warnFilteringDuplicatesEnabledWithNullDeploymentName() {
+    logWarn("047", "Deployment name set to null. Filtering duplicates will not work properly.");
+  }
+
 }

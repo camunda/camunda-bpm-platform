@@ -210,6 +210,10 @@ public class DeployCmd implements Command<DeploymentWithDefinitions>, Serializab
 
     if (deploymentBuilder.isDuplicateFilterEnabled()) {
 
+      if (candidateDeployment.getName() == null) {
+        LOG.warnFilteringDuplicatesEnabledWithNullDeploymentName();
+      }
+
       String source = candidateDeployment.getSource();
       if (source == null || source.isEmpty()) {
         source = ProcessApplicationDeployment.PROCESS_APPLICATION_DEPLOYMENT_SOURCE;
