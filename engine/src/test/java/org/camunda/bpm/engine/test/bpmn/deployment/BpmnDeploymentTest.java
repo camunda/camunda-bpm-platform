@@ -36,6 +36,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.ReadOnlyProcessDefinition;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
+import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.DeploymentHandlerFactory;
 import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -44,8 +45,11 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.commons.testing.ProcessEngineLoggingRule;
+import org.camunda.commons.testing.WatchLogger;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 
@@ -55,21 +59,23 @@ import org.junit.Test;
  */
 public class BpmnDeploymentTest extends PluggableProcessEngineTest {
 
-  DeploymentHandlerFactory defaultDeploymentHandlerFactory;
-  DeploymentHandlerFactory customDeploymentHandlerFactory;
+  protected static final String CMD_LOGGER = "org.camunda.bpm.engine.cmd";
+  
+  @Rule
+  public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule();
 
+  protected DeploymentHandlerFactory defaultDeploymentHandlerFactory;
+  protected DeploymentHandlerFactory customDeploymentHandlerFactory;
+  
   @Before
   public void setUp() throws Exception {
     defaultDeploymentHandlerFactory = processEngineConfiguration.getDeploymentHandlerFactory();
     customDeploymentHandlerFactory = new VersionedDeploymentHandlerFactory();
-
-
   }
 
   @After
   public void tearDown() throws Exception {
     processEngineConfiguration.setDeploymentHandlerFactory(defaultDeploymentHandlerFactory);
-
   }
 
   @Deployment
@@ -124,7 +130,7 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTest {
   @Test
   public void testDeploySameFileTwice() {
     String bpmnResourceName = "org/camunda/bpm/engine/test/bpmn/deployment/BpmnDeploymentTest.testGetBpmnXmlFileThroughService.bpmn20.xml";
-    repositoryService.createDeployment().enableDuplicateFiltering().addClasspathResource(bpmnResourceName).name("twice").deploy();
+    repositoryService.createDeployment().enableDuplicateFiltering(true).addClasspathResource(bpmnResourceName).name("twice").deploy();
 
     String deploymentId = repositoryService.createDeploymentQuery().singleResult().getId();
     List<String> deploymentResources = repositoryService.getDeploymentResourceNames(deploymentId);
@@ -133,13 +139,50 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTest {
     assertEquals(1, deploymentResources.size());
     assertEquals(bpmnResourceName, deploymentResources.get(0));
 
-    repositoryService.createDeployment().enableDuplicateFiltering().addClasspathResource(bpmnResourceName).name("twice").deploy();
+    repositoryService.createDeployment().enableDuplicateFiltering(true).addClasspathResource(bpmnResourceName).name("twice").deploy();
     List<org.camunda.bpm.engine.repository.Deployment> deploymentList = repositoryService.createDeploymentQuery().list();
     assertEquals(1, deploymentList.size());
 
     repositoryService.deleteDeployment(deploymentId);
   }
 
+  @Test
+  @WatchLogger(loggerNames = CMD_LOGGER, level = "WARN")
+  public void shouldLogWarningForDuplicateFilteringWithoutName() {
+    // given
+    BpmnModelInstance model = Bpmn.createExecutableProcess("process").startEvent().endEvent().done();
+
+    DeploymentBuilder deploymentBuilder = repositoryService.createDeployment()
+      .enableDuplicateFiltering(true)
+      .addModelInstance("model.bpmn", model);
+
+    // when
+    testRule.deploy(deploymentBuilder);
+    
+    // then
+    assertEquals(1, loggingRule.getFilteredLog(CMD_LOGGER, "Deployment name set to null. Filtering duplicates will not work properly.").size());
+  }
+  
+  @Test
+  @WatchLogger(loggerNames = CMD_LOGGER, level = "WARN")
+  public void shouldLogWarningForDuplicateFilteringWithoutPreviousDeploymentName() {
+    // given
+    BpmnModelInstance model = Bpmn.createExecutableProcess("process").startEvent().endEvent().done();
+
+    DeploymentWithDefinitions deployment = testRule.deploy(repositoryService.createDeployment()
+      .addModelInstance("model.bpmn", model));
+    
+    DeploymentBuilder deploymentBuilder = repositoryService.createDeployment()
+        .enableDuplicateFiltering(true)
+        .addDeploymentResources(deployment.getId());
+
+    // when
+    testRule.deploy(deploymentBuilder);
+    
+    // then
+    assertEquals(1, loggingRule.getFilteredLog(CMD_LOGGER, "Deployment name set to null. Filtering duplicates will not work properly.").size());
+  }
+  
   @Test
   public void testDuplicateFilteringDefaultBehavior() {
     // given
@@ -202,7 +245,7 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTest {
     BpmnModelInstance model1 = Bpmn.createExecutableProcess("process1").startEvent().done();
     BpmnModelInstance model2 = Bpmn.createExecutableProcess("process2").startEvent().done();
     org.camunda.bpm.engine.repository.Deployment deployment1 = repositoryService.createDeployment()
-      .enableDuplicateFiltering()
+      .enableDuplicateFiltering(true)
       .addModelInstance("process1.bpmn20.xml", model1)
       .addModelInstance("process2.bpmn20.xml", model2)
       .name("twice")
@@ -214,7 +257,7 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTest {
     BpmnModelInstance changedModel2 = Bpmn.createExecutableProcess("process2").startEvent().endEvent().done();
 
     org.camunda.bpm.engine.repository.Deployment deployment2 = repositoryService.createDeployment()
-      .enableDuplicateFiltering()
+      .enableDuplicateFiltering(true)
       .addModelInstance("process1.bpmn20.xml", model1)
       .addModelInstance("process2.bpmn20.xml", changedModel2)
       .name("twice")
@@ -323,7 +366,7 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTest {
     try {
       String bpmnResourceName = "org/camunda/bpm/engine/test/bpmn/deployment/BpmnDeploymentTest.testGetBpmnXmlFileThroughService.bpmn20.xml";
       String bpmnResourceName2 = "org/camunda/bpm/engine/test/bpmn/deployment/BpmnDeploymentTest.testGetBpmnXmlFileThroughService2.bpmn20.xml";
-      repositoryService.createDeployment().enableDuplicateFiltering()
+      repositoryService.createDeployment().enableDuplicateFiltering(true)
               .addClasspathResource(bpmnResourceName)
               .addClasspathResource(bpmnResourceName2)
               .name("duplicateAtTheSameTime").deploy();
@@ -347,7 +390,7 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTest {
     assertEquals(bpmnResourceName, deploymentResources.get(0));
 
     bpmnResourceName = "org/camunda/bpm/engine/test/bpmn/deployment/BpmnDeploymentTest.testProcessDiagramResource.bpmn20.xml";
-    repositoryService.createDeployment().enableDuplicateFiltering().addClasspathResource(bpmnResourceName).name("twice").deploy();
+    repositoryService.createDeployment().enableDuplicateFiltering(true).addClasspathResource(bpmnResourceName).name("twice").deploy();
     List<org.camunda.bpm.engine.repository.Deployment> deploymentList = repositoryService.createDeploymentQuery().list();
     assertEquals(2, deploymentList.size());
 
