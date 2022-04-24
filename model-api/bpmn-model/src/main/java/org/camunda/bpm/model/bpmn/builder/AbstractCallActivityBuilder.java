@@ -157,6 +157,18 @@ public class AbstractCallActivityBuilder<B extends AbstractCallActivityBuilder<B
   }
 
   /**
+   * Sets the businessKey
+   * @param businessKey the business key to set
+   * @return the builder object
+   */
+  public B camundaBusinessKey(String businessKey) {
+    CamundaIn param = modelInstance.newInstance(CamundaIn.class);
+    param.setCamundaBusinessKey(businessKey);
+    addExtensionElement(param);
+    return myself;
+  }
+
+  /**
    * Sets a "camunda in" parameter to pass a variable from the super process instance to the sub process instance
    *
    * @param source the name of variable in the super process instance
