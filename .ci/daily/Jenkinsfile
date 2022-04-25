@@ -88,11 +88,7 @@ pipeline {
         }
         stage('Trigger Docker CE GHA') {
           when {
-            allOf {
-              // only build snapshot docker images on master CE branch
-              expression { cambpmIsDevelopmentVersion }
-              branch cambpmDefaultBranch();
-            }
+            branch cambpmDefaultBranch();
           }
           agent {
             kubernetes {
