@@ -30,7 +30,18 @@ var Controller = [
     var telemetryResource = camAPI.resource('telemetry');
 
     telemetryResource.get(function(err, res) {
-      $scope.enableUsage = res.enableTelemetry;
+      if (err) {
+        const msg = err.message;
+        Notifications.addError({
+          status: $translate.instant('ERROR'),
+          message: $translate.instant('TELEMETRY_FETCH_CONFIGURATION_ERROR_MESSAGE', {
+            msg
+          })
+        });
+      } else {
+        $scope.authorized = true;
+        $scope.enableUsage = res.enableTelemetry;
+      }
     });
 
     $scope.submit = function() {
@@ -54,23 +65,7 @@ module.exports = [
       label: 'TELEMETRY_SETTINGS',
       template: template,
       controller: Controller,
-      priority: 950,
-      access: [
-        'AuthorizationResource',
-        function(AuthorizationResource) {
-          return function(cb) {
-            AuthorizationResource.check({
-              permissionName: 'ALL',
-              resourceName: 'authorization',
-              resourceType: 4
-            })
-              .$promise.then(function(response) {
-                cb(null, response.authorized);
-              })
-              .catch(cb);
-          };
-        }
-      ]
+      priority: 950
     });
   }
 ];
