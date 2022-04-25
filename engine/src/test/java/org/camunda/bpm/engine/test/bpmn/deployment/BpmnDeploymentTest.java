@@ -185,7 +185,7 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTest {
         .addDeploymentResources(deployment.getId());
 
     // when
-    DeploymentWithDefinitions deployment2 = testRule.deploy(deploymentBuilder);
+    testRule.deploy(deploymentBuilder);
     
     // then
     assertEquals(1, loggingRule.getFilteredLog(CMD_LOGGER, "Deployment name set to null. Filtering duplicates will not work properly.").size());
