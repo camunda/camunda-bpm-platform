@@ -88,9 +88,7 @@ pipeline {
         }
         stage('Trigger Docker CE GHA') {
           when {
-            // temporarily disable stage due to GitHub API issues
-            expression { false }
-//            branch cambpmDefaultBranch();
+            branch cambpmDefaultBranch();
           }
           agent {
             kubernetes {
