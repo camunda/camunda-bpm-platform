@@ -33,6 +33,7 @@ var included = [
   'angular-resource',
   'angular-route',
   'angular-sanitize',
+  'angular-scenario',
   'angular-touch',
   'angular-translate',
   'bootstrap',
