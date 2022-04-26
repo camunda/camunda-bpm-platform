@@ -1,0 +1,143 @@
+body.dashboard {
+  background-color: #e5e5e5;
+  padding-top: 70px;
+}
+
+[cam-widget-header] .btn-primary,
+[cam-widget-header] .btn-primary:hover {
+  font-size: 14px;
+  color: #fff;
+}
+[cam-widget-header] .row {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-brand .logo {
+  margin-right: 5px;
+  fill: #666;
+}
+
+section .inner {
+  background-color: #fff;
+  padding: 15px;
+  margin-bottom: 30px;
+}
+
+section header {
+  overflow: hidden;
+  border-bottom: 1px solid #e5e5e5;
+  margin-bottom: 15px;
+}
+
+.section-title {
+  font-size: 28px;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  font-weight: 100;
+}
+
+.subsection-title {
+  font-size: 20px;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  font-weight: 100;
+}
+
+.section-actions {
+  margin-top: 15px;
+}
+
+section.webapps .section-body,
+section.invoice .section-body {
+  position: relative;
+}
+
+.screenshot {
+  display: block;
+  text-align: center;
+  position: relative;
+}
+
+.screenshot:before,
+.screenshot:after {
+  content: "";
+  display: block;
+  position: absolute;
+}
+
+.screenshot:before {
+  bottom: -15px;
+  height: 30px;
+  background-color: #fff;
+  border-top: 1px solid #e5e5e5;
+  z-index: 3;
+  left: -5px;
+  right: -5px;
+}
+
+.page-body a.screenshot:hover {
+  text-shadow: none;
+  box-shadow: none;
+}
+
+.screenshot img {
+  display: inline-block;
+  max-width: calc(100% - 40px);
+  margin: 5px auto;
+  box-shadow: 0 0 40px -10px rgba(0, 0, 0, 0.8);
+  transition: box-shadow 0.218s ease-in-out, transform 0.218s ease-in-out;
+}
+.screenshot:hover img {
+  box-shadow: 0 0 40px -5px rgba(21, 92, 181, 0.8);
+  transform: translateY(-5px);
+}
+
+.screenshot .hover-text {
+  text-align: center;
+  display: block;
+  position: absolute;
+  top: 50%;
+  line-height: 30px;
+  font-size: 27px;
+  margin-top: -15px;
+  left: 15px;
+  right: 15px;
+  opacity: 0;
+  transition: opacity 0.218s ease-in-out;
+}
+.screenshot:hover {
+  z-index: 10;
+}
+.screenshot:hover .hover-text {
+  opacity: 1;
+}
+.hover-text > span {
+  display: inline-block;
+  background-color: rgba(255, 255, 255, 0.75);
+  padding-left: 0.25em;
+  padding-right: 0.25em;
+}
+
+section.invoice .section-body {
+  min-height: 200px;
+}
+
+section.webapps .section-body {
+  margin-bottom: 30px;
+}
+.webapp-screenshot img {
+  max-width: 500px;
+}
+
+@media screen and (max-width: 992px) {
+  .webapp-screenshot img {
+    max-width: 380px;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .webapp-screenshot img {
+    max-width: 320px;
+  }
+}
