@@ -338,7 +338,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
 
       try {
         // bind authenticate for user + supplied password
-        openContext(user.getDn(), password);
+        initialContext = openContext(user.getDn(), password);
         return true;
 
       } catch(LdapAuthenticationException e) {
