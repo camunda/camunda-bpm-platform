@@ -34,7 +34,7 @@
     <json-path.version>2.6.0</json-path.version>
     <junit.version>4.13.1</junit.version>
     <jython.version>2.5.3</jython.version>
-    <logback.version>1.2.10</logback.version>
+    <logback.version>1.2.11</logback.version>
     <powermock.version>2.0.9</powermock.version>
     <spin.version.old>1.12.0</spin.version.old>
     <xml.bind-api.version>2.3.3</xml.bind-api.version>
