@@ -213,7 +213,7 @@
                   <mapper>
                     <chainedmapper>
                       <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/${version.jackson}/\3" handledirsep="yes" />
-                      <regexpmapper from="^(com.fasterxml.jackson.*/.*.jar)$$" to="\1" handledirsep="yes" />
+                      <regexpmapper from="^(com.fasterxml.jackson.*)\/((jackson.*-)[0-9\.]*).*.jar$$" to="\1/\3${version.jackson}.jar" handledirsep="yes" />
                     </chainedmapper>
                   </mapper>
                 </copy>

@@ -46,6 +46,14 @@
         <scope>import</scope>
       </dependency>
 
+      <dependency>
+        <groupId>com.fasterxml.jackson</groupId>
+        <artifactId>jackson-bom</artifactId>
+        <version>${version.jackson}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 
@@ -171,7 +179,6 @@
     <dependency>
       <groupId>com.fasterxml.jackson.datatype</groupId>
       <artifactId>jackson-datatype-joda</artifactId>
-      <version>${version.jackson}</version>
       <!--
       Excluding jackson-databind for the following reason:
 

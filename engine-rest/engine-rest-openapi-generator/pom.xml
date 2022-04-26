@@ -10,6 +10,13 @@
     <relativePath>../</relativePath>
     <version>7.18.0-SNAPSHOT</version>
   </parent>
+  
+  <properties>
+    <!-- The JSON schema validator works with Jackson 2.12 currently, but not with the latest patch level.
+         This can potentially be removed if the validator uses a proper patch level version of Jackson as well -->
+    <version.jackson>2.12.6.20220326</version.jackson>
+    <version.json-schema-validator>1.0.69</version.json-schema-validator>
+  </properties>
 
   <dependencies>
 
@@ -34,7 +41,7 @@
     <dependency>
       <groupId>com.networknt</groupId>
       <artifactId>json-schema-validator</artifactId>
-      <version>1.0.29</version>
+      <version>${version.json-schema-validator}</version>
     </dependency>
 
   </dependencies>

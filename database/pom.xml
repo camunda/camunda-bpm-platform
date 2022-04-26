@@ -616,12 +616,22 @@
 
     <profile>
       <id>testcontainers</id>
+      <dependencyManagement>
+        <dependencies>
+          <dependency>
+            <groupId>com.fasterxml.jackson</groupId>
+            <artifactId>jackson-bom</artifactId>
+            <version>${version.jackson}</version>
+            <scope>import</scope>
+            <type>pom</type>
+          </dependency>
+        </dependencies>
+      </dependencyManagement>
       <dependencies>
         <!-- Testcontainers depends on docker-java which depends on jackson-annotations -->
         <dependency>
           <artifactId>jackson-annotations</artifactId>
           <groupId>com.fasterxml.jackson.core</groupId>
-          <version>${version.jackson}</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
