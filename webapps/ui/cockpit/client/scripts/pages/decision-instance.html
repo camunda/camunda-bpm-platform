@@ -115,6 +115,15 @@
         <dd class="super-case-instance-id"
             ng-if="!decisionInstance.decisionRequirementsDefinitionId"><span class="null-value">{{ 'DECISION_INSTANCE_NULL' |  translate }}</span></dd>
 
+        <dt ng-if="decisionInstance.removalTime"
+            cam-widget-clipboard="decisionInstance.removalTime | camDate"
+            cam-hoverable-title="removal-time">{{ 'DECISION_INSTANCE_REMOVAL_TIME' |  translate }}</dt>
+        <dd class="removal-time"
+            ng-if="decisionInstance.removalTime"
+            cam-hover-trigger="removal-time">{{ decisionInstance.removalTime | camDate }}</dd>
+        <dt ng-if="!decisionInstance.removalTime">{{ 'DECISION_INSTANCE_REMOVAL_TIME' |  translate }}</dt>
+        <dd class="removal-time"
+            ng-if="!decisionInstance.removalTime"><span class="null-value">{{ 'DECISION_INSTANCE_NULL' |  translate }}</span></dd>
       </dl>
 
       <a class="hide-collapsable pull-right"></a>
