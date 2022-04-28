@@ -56,7 +56,7 @@
     "jquery": "3.5.1",
     "jquery-ui": "1.13.1",
     "lodash": "4.17.21",
-    "moment": "2.24.0",
+    "moment": "2.29.3",
     "mousetrap": "1.6.5",
     "q": "1.5.1",
     "regenerator-runtime": "0.13.9",
