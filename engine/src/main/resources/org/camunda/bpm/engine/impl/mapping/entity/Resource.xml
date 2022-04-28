@@ -168,7 +168,7 @@
       from ${prefix}ACT_GE_BYTEARRAY B
         inner join ${prefix}ACT_RE_DEPLOYMENT D
         on B.DEPLOYMENT_ID_ = D.ID_
-      where D.NAME_ = #{parameter.deploymentName}
+      where D.NAME_ = #{parameter.deploymentName, jdbcType=VARCHAR}
         and
         <if test="processApplicationSource.equals(parameter.source)">
           (D.SOURCE_ is null or
@@ -190,7 +190,7 @@
     inner join ${prefix}ACT_RE_DEPLOYMENT D
     on B.DEPLOYMENT_ID_ = D.ID_
     and D.DEPLOY_TIME_ = LAST_RESOURCE.DEPLOY_TIME_ 
-    and D.NAME_ = #{parameter.deploymentName}
+    and D.NAME_ = #{parameter.deploymentName, jdbcType=VARCHAR}
     and
     <if test="processApplicationSource.equals(parameter.source)">
       (D.SOURCE_ is null or
