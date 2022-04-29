@@ -32,7 +32,6 @@
     <dependency>
       <groupId>com.fasterxml.jackson.jaxrs</groupId>
       <artifactId>jackson-jaxrs-json-provider</artifactId>
-      <version>${version.jackson}</version>
       <!--
       * Since version 2.10.0 this dependency comes with transitive Jakarta dependencies
       * These trans-deps are directly included in JDKs <= Java 8 * For Java >= 9 compatible containers, we make sure to include these dependencies
@@ -52,13 +51,11 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>${version.jackson}</version>
     </dependency>
 
     <dependency>
       <groupId>com.fasterxml.jackson.datatype</groupId>
       <artifactId>jackson-datatype-jsr310</artifactId>
-      <version>${version.jackson}</version>
     </dependency>
 
     <!-- provided deps -->
