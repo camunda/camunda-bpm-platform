@@ -106,7 +106,7 @@
       <groupId>org.codehaus.groovy</groupId>
       <artifactId>groovy-templates</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.graalvm.js</groupId>
       <artifactId>js</artifactId>

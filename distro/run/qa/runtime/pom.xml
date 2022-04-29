@@ -27,16 +27,10 @@
       <scope>test</scope>
       <exclusions>
         <exclusion>
-          <!-- exclude groovy so that it doesn't conflict with the REST Assured Groovy version.
-               The groovy JAR will still be present in the ZIP archive. -->
-          <groupId>org.codehaus.groovy</groupId>
-          <artifactId>groovy</artifactId>
-        </exclusion>
-        <exclusion>
-          <!-- exclude groovy-jsr223 so that it doesn't conflict with the REST Assured Groovy version.
-               The groovy-jsr223 JAR will still be present in the ZIP archive. -->
-          <groupId>org.codehaus.groovy</groupId>
-          <artifactId>groovy-jsr223</artifactId>
+          <!-- exclude transitive artifacts so that they don't
+              conflict with the qa runtime versions. -->
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
