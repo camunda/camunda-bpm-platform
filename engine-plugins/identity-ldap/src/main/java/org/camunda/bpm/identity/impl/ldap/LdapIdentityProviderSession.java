@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.naming.AuthenticationException;
@@ -85,9 +84,13 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
   }
 
   public void close() {
-    if (initialContext != null) {
+    closeLdapCtx(initialContext);
+  }
+
+  protected void closeLdapCtx(LdapContext context) {
+    if (context != null) {
       try {
-        initialContext.close();
+        context.close();
       } catch (Exception e) {
         // ignore
         LdapPluginLogger.INSTANCE.exceptionWhenClosingLdapCOntext(e);
@@ -336,13 +339,18 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
       return false;
     } else {
 
+      LdapContext context = null;
+
       try {
         // bind authenticate for user + supplied password
-        openContext(user.getDn(), password);
+        context = openContext(user.getDn(), password);
         return true;
 
       } catch(LdapAuthenticationException e) {
         return false;
+
+      } finally {
+        closeLdapCtx(context);
 
       }
 
