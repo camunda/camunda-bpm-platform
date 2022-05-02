@@ -138,11 +138,16 @@
         <artifactId>openjpa</artifactId>
         <version>${version.openjpa}</version>
       </dependency>
+
+      <!-- groovy script engine dependencies -->
       <dependency>
         <groupId>org.codehaus.groovy</groupId>
-        <artifactId>groovy-all</artifactId>
+        <artifactId>groovy-bom</artifactId>
         <version>${version.groovy}</version>
+        <scope>import</scope>
+        <type>pom</type>
       </dependency>
+
       <dependency>
         <groupId>org.graalvm.js</groupId>
         <artifactId>js</artifactId>

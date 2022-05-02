@@ -13,8 +13,23 @@
   <packaging>pom</packaging>
   <name>Camunda Platform - engine - REST - Root</name>
 
+  <properties>
+    <version.rest-assured>4.5.0</version.rest-assured>
+    <!-- override groovy version with the one used by rest-assured -->
+    <version.groovy>3.0.9</version.groovy>
+  </properties>
+
   <dependencyManagement>
     <dependencies>
+      <!-- explicitly declare groovy dependencies, so it prevents our groovy version
+            from overriding the groovy version from rest-assured -->
+      <dependency>
+        <groupId>org.codehaus.groovy</groupId>
+        <artifactId>groovy-bom</artifactId>
+        <version>${version.groovy}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
       <dependency>
         <groupId>org.camunda.bpm</groupId>
         <artifactId>camunda-core-internal-dependencies</artifactId>
@@ -30,8 +45,7 @@
       <dependency>
         <groupId>io.rest-assured</groupId>
         <artifactId>rest-assured</artifactId>
-        <version>4.5.0</version>
-        <scope>test</scope>
+        <version>${version.rest-assured}</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson</groupId>
