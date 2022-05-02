@@ -48,10 +48,16 @@ public class FailedJobListener implements Command<Void> {
 
     logJobFailure(commandContext);
 
-    FailedJobCommandFactory failedJobCommandFactory = commandContext.getFailedJobCommandFactory();
-    String jobId = jobFailureCollector.getJobId();
-    Command<Object> cmd = failedJobCommandFactory.getCommand(jobId, jobFailureCollector.getFailure());
-    commandExecutor.execute(new FailedJobListenerCmd(jobId, cmd));
+    // take action if no other job execution thread took over already
+    JobEntity currentJob = commandContext.getJobManager().findJobById(jobFailureCollector.getJobId());
+    if (jobFailureCollector.getJob().getLockExpirationTime() != currentJob.getLockExpirationTime()) {
+      // do nothing, we expired and someone else already took over
+    } else {
+      FailedJobCommandFactory failedJobCommandFactory = commandContext.getFailedJobCommandFactory();
+      String jobId = jobFailureCollector.getJobId();
+      Command<Object> cmd = failedJobCommandFactory.getCommand(jobId, jobFailureCollector.getFailure());
+      commandExecutor.execute(new FailedJobListenerCmd(jobId, cmd));
+    }
 
     return null;
   }
