@@ -34,9 +34,12 @@ var Controller = [
         const msg = err.message;
         Notifications.addError({
           status: $translate.instant('ERROR'),
-          message: $translate.instant('TELEMETRY_FETCH_CONFIGURATION_ERROR_MESSAGE', {
-            msg
-          })
+          message: $translate.instant(
+            'TELEMETRY_FETCH_CONFIGURATION_ERROR_MESSAGE',
+            {
+              msg
+            }
+          )
         });
       } else {
         $scope.authorized = true;
