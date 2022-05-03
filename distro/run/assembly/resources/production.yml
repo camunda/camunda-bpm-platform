@@ -12,7 +12,9 @@ camunda.bpm:
     header-security:
       hsts-disabled: false
       content-security-policy-value: base-uri 'self';
-        default-src 'self' 'unsafe-inline' 'unsafe-eval';
+        script-src $NONCE 'strict-dynamic' 'unsafe-eval' https: 'self' 'unsafe-inline';
+        style-src 'unsafe-inline' 'self';
+        default-src 'self';
         img-src 'self' data:;
         block-all-mixed-content;
         form-action 'self';

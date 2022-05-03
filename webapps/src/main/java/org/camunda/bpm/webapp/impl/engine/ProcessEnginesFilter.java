@@ -39,6 +39,7 @@ import org.camunda.bpm.engine.authorization.Groups;
 import org.camunda.bpm.engine.rest.util.WebApplicationUtil;
 import org.camunda.bpm.tasklist.Tasklist;
 import org.camunda.bpm.tasklist.TasklistRuntimeDelegate;
+import org.camunda.bpm.webapp.impl.security.filter.headersec.provider.impl.ContentSecurityPolicyProvider;
 import org.camunda.bpm.webapp.impl.util.ServletContextUtil;
 import org.camunda.bpm.webapp.impl.IllegalWebAppConfigurationException;
 import org.camunda.bpm.webapp.impl.filter.AbstractTemplateFilter;
@@ -73,6 +74,7 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
 
   public static final String PLUGIN_DEPENDENCIES_PLACEHOLDER = "$PLUGIN_DEPENDENCIES";
   public static final String PLUGIN_PACKAGES_PLACEHOLDER = "$PLUGIN_PACKAGES";
+  public static final String CSP_NONCE_PLACEHOLDER = "$CSP_NONCE";
 
   public static Pattern APP_PREFIX_PATTERN = Pattern.compile("/app/(?:([\\w-]+?)/(?:(index\\.html|[\\w-]+)?/?([^?]*)?)?)?");
 
@@ -269,8 +271,9 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
                                 ServletContext servletContext) throws IOException {
     setWebappInTelemetry(engineName, appName, servletContext);
     String data = getWebResourceContents("/app/" + appName + "/index.html");
+    final String cspNonce = (String) servletContext.getAttribute(ContentSecurityPolicyProvider.ATTR_CSP_FILTER_NONCE);
 
-    data = replacePlaceholder(data, appName, engineName, applicationPath, contextPath);
+    data = replacePlaceholder(data, appName, engineName, applicationPath, contextPath, cspNonce);
 
     response.setContentLength(data.getBytes(StandardCharsets.UTF_8).length);
     response.setContentType("text/html");
@@ -289,13 +292,15 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
                                       String appName,
                                       String engineName,
                                       String applicationPath,
-                                      String contextPath) {
+                                      String contextPath,
+                                      String cspNonce) {
     return data.replace(APP_ROOT_PLACEHOLDER, contextPath + applicationPath)
                .replace(BASE_PLACEHOLDER, String.format("%s%s/app/%s/%s/", contextPath,
                  applicationPath, appName, engineName))
                .replace(PLUGIN_PACKAGES_PLACEHOLDER, createPluginPackagesStr(appName,
                  applicationPath, contextPath))
-               .replace(PLUGIN_DEPENDENCIES_PLACEHOLDER, createPluginDependenciesStr(appName));
+               .replace(PLUGIN_DEPENDENCIES_PLACEHOLDER, createPluginDependenciesStr(appName))
+               .replace(CSP_NONCE_PLACEHOLDER, cspNonce);
   }
 
   protected <T extends AppPlugin> CharSequence createPluginPackagesStr(String appName,

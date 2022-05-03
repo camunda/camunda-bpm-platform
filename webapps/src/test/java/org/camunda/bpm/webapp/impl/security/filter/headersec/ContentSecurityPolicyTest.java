@@ -20,12 +20,17 @@ import org.camunda.bpm.webapp.impl.util.HeaderRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.webapp.impl.security.filter.headersec.provider.impl.ContentSecurityPolicyProvider.HEADER_DEFAULT_VALUE;
+import static org.camunda.bpm.webapp.impl.security.filter.headersec.provider.impl.ContentSecurityPolicyProvider.HEADER_NAME;
+import static org.camunda.bpm.webapp.impl.security.filter.headersec.provider.impl.ContentSecurityPolicyProvider.HEADER_NONCE_PLACEHOLDER;
 
 public class ContentSecurityPolicyTest {
 
-  public static final String HEADER_NAME = "Content-Security-Policy";
-  public static final String HEADER_DEFAULT_VALUE = "base-uri 'self'";
+  public static final Pattern NONCE_PATTERN = Pattern.compile("'nonce-([a-zA-Z\\d]*)'");
 
   @Rule
   public HeaderRule headerRule = new HeaderRule();
@@ -39,7 +44,21 @@ public class ContentSecurityPolicyTest {
     headerRule.performRequest();
 
     // then
-    assertThat(headerRule.getHeader(HEADER_NAME)).isEqualTo(HEADER_DEFAULT_VALUE);
+    final String[] actualCSPHeader = headerRule.getHeader(HEADER_NAME).split("[ ;]");
+    final String[] expectedCSPHeader = HEADER_DEFAULT_VALUE.split("[ ;]");
+    assertThat(actualCSPHeader.length).isEqualTo(expectedCSPHeader.length);
+    for (int i = 0; i < actualCSPHeader.length; i++) {
+      final String expected = expectedCSPHeader[i];
+      final String actual = actualCSPHeader[i];
+
+      if (expected.equals(HEADER_NONCE_PLACEHOLDER)) {
+        final Matcher matcher = NONCE_PATTERN.matcher(actual);
+        assertThat(matcher.matches()).isTrue();
+        assertThat(matcher.group(1).length()).isGreaterThanOrEqualTo(8);
+      } else {
+        assertThat(actual).isEqualTo(expected);
+      }
+    }
   }
 
   @Test
