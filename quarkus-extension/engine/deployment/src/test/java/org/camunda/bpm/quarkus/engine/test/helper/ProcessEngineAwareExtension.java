@@ -21,13 +21,10 @@ import io.quarkus.test.QuarkusUnitTest;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.quarkus.engine.extension.QuarkusProcessEngineConfiguration;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Produces;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.function.Supplier;
@@ -37,13 +34,6 @@ public class ProcessEngineAwareExtension extends QuarkusUnitTest {
   protected String deploymentId;
   protected Supplier<JavaArchive> archiveProducer;
   protected String withConfigurationResource;
-
-  protected static Supplier<QuarkusProcessEngineConfiguration> engineConfig = () -> {
-    QuarkusProcessEngineConfiguration engineConfig = new QuarkusProcessEngineConfiguration();
-    engineConfig.setJobExecutorActivate(false); // Disable Job Executor in tests
-
-    return engineConfig;
-  };
 
   @Override
   public void beforeEach(ExtensionContext context) throws Exception {
@@ -127,16 +117,6 @@ public class ProcessEngineAwareExtension extends QuarkusUnitTest {
     return this;
   }
 
-  @ApplicationScoped
-  static class EngineConfigurer {
-
-    @Produces
-    public QuarkusProcessEngineConfiguration engineConfiguration() {
-      return engineConfig.get();
-    }
-
-  }
-
   protected Class<?> loadClass(Class<?> clazz) throws ClassNotFoundException {
     return Thread.currentThread().getContextClassLoader().loadClass(clazz.getName());
   }
@@ -155,11 +135,6 @@ public class ProcessEngineAwareExtension extends QuarkusUnitTest {
     Object bean = getMethod.invoke(instanceHandle);
 
     return bean;
-  }
-
-  public ProcessEngineAwareExtension engineConfig(Supplier<QuarkusProcessEngineConfiguration> engineConfig) {
-    ProcessEngineAwareExtension.engineConfig = engineConfig;
-    return this;
   }
 
 }

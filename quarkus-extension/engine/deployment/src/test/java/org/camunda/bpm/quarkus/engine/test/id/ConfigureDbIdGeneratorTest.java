@@ -29,6 +29,8 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,8 +39,6 @@ public class ConfigureDbIdGeneratorTest {
 
   @RegisterExtension
   static final QuarkusUnitTest unitTest = new ProcessEngineAwareExtension()
-      .engineConfig(() -> (QuarkusProcessEngineConfiguration) new QuarkusProcessEngineConfiguration()
-          .setIdGenerator(null))
       .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class));
 
   @Inject
@@ -46,6 +46,17 @@ public class ConfigureDbIdGeneratorTest {
 
   @Inject
   protected ProcessEngine processEngine;
+
+  @ApplicationScoped
+  static class EngineConfigurer {
+
+    @Produces
+    public QuarkusProcessEngineConfiguration engineConfiguration() {
+      return (QuarkusProcessEngineConfiguration) new QuarkusProcessEngineConfiguration()
+          .setIdGenerator(null);
+    }
+
+  }
 
   @Test
   public void shouldConfigureDbIdGenerator() {
