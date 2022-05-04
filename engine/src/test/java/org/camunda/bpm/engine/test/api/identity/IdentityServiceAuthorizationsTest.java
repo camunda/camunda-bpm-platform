@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.identity;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GLOBAL;
 import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
@@ -1162,6 +1163,90 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
 
     // now the base permission applies and grants us read access
     assertEquals(1, identityService.createTenantQuery().count());
+  }
+
+  @Test
+  public void shouldDeleteTenantUserMembership() {
+    // given
+    User userOne = identityService.newUser("userOne");
+    identityService.saveUser(userOne);
+
+    User userTwo = identityService.newUser("userTwo");
+    identityService.saveUser(userTwo);
+
+    Tenant tenantOne = identityService.newTenant("tenantOne");
+    identityService.saveTenant(tenantOne);
+
+    engineRule.getProcessEngineConfiguration().setAuthorizationEnabled(true);
+
+    identityService.createTenantUserMembership("tenantOne", "userOne");
+    identityService.createTenantUserMembership("tenantOne", "userTwo");
+
+    // assume
+    List<Authorization> authorizations = engineRule.getAuthorizationService()
+        .createAuthorizationQuery()
+        .list();
+
+    assertThat(authorizations).extracting("resourceId", "userId")
+        .containsExactlyInAnyOrder(
+            tuple("tenantOne", "userOne"),
+            tuple("tenantOne", "userTwo")
+        );
+
+    // when
+    identityService.deleteTenantUserMembership("tenantOne", "userOne");
+
+    // then
+    authorizations = engineRule.getAuthorizationService()
+        .createAuthorizationQuery()
+        .list();
+
+    assertThat(authorizations).extracting("resourceId", "userId")
+        .containsExactly(
+            tuple("tenantOne", "userTwo")
+        );
+  }
+
+  @Test
+  public void shouldDeleteTenantGroupMembership() {
+    // given
+    Group groupOne = identityService.newGroup("groupOne");
+    identityService.saveGroup(groupOne);
+
+    Group groupTwo = identityService.newGroup("groupTwo");
+    identityService.saveGroup(groupTwo);
+
+    Tenant tenantOne = identityService.newTenant("tenantOne");
+    identityService.saveTenant(tenantOne);
+
+    engineRule.getProcessEngineConfiguration().setAuthorizationEnabled(true);
+
+    identityService.createTenantGroupMembership("tenantOne", "groupOne");
+    identityService.createTenantGroupMembership("tenantOne", "groupTwo");
+
+    // assume
+    List<Authorization> authorizations = engineRule.getAuthorizationService()
+        .createAuthorizationQuery()
+        .list();
+
+    assertThat(authorizations).extracting("resourceId", "groupId")
+        .containsExactlyInAnyOrder(
+            tuple("tenantOne", "groupOne"),
+            tuple("tenantOne", "groupTwo")
+        );
+
+    // when
+    identityService.deleteTenantGroupMembership("tenantOne", "groupOne");
+
+    // then
+    authorizations = engineRule.getAuthorizationService()
+        .createAuthorizationQuery()
+        .list();
+
+    assertThat(authorizations).extracting("resourceId", "groupId")
+        .containsExactly(
+            tuple("tenantOne", "groupTwo")
+        );
   }
 
   protected void lockUser(String userId, String invalidPassword) throws ParseException {

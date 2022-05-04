@@ -131,6 +131,22 @@
         AND RESOURCE_ID_ = #{resourceId}
   </delete>
 
+  <delete id="deleteAuthorizationsForResourceIdAndUserId" parameterType="map">
+    delete from ${prefix}ACT_RU_AUTHORIZATION
+    where
+      RESOURCE_TYPE_ = #{resourceType}
+      AND RESOURCE_ID_ = #{resourceId}
+      AND USER_ID_ = #{userId}
+  </delete>
+
+  <delete id="deleteAuthorizationsForResourceIdAndGroupId" parameterType="map">
+    delete from ${prefix}ACT_RU_AUTHORIZATION
+    where
+      RESOURCE_TYPE_ = #{resourceType}
+      AND RESOURCE_ID_ = #{resourceId}
+      AND GROUP_ID_ = #{groupId}
+  </delete>
+
   <delete id="deleteAuthorizationsByRemovalTime"
           parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
     <bind name="date" value="'REMOVAL_TIME_'"/>
