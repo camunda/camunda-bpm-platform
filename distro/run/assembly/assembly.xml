@@ -48,8 +48,6 @@
         <include>org.codehaus.groovy:groovy-jsr223:jar:*</include>
         <include>org.codehaus.groovy:groovy-json:jar:*</include>
         <include>org.codehaus.groovy:groovy-xml:jar:*</include>
-        <include>org.codehaus.groovy:groovy-datetime:jar:*</include>
-        <include>org.codehaus.groovy:groovy-dateutil:jar:*</include>
         <include>org.codehaus.groovy:groovy-templates:jar:*</include>
       </includes>
     </dependencySet>
