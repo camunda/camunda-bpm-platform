@@ -37,19 +37,8 @@ import org.camunda.bpm.engine.impl.juel.ExpressionFactoryImpl;
 import org.camunda.bpm.engine.test.mock.MockElResolver;
 import org.camunda.bpm.engine.variable.context.VariableContext;
 
-
 /**
- * <p>
- * Central manager for all expressions.
- * </p>
- * <p>
- * Process parsers will use this to build expression objects that are stored in
- * the process definitions.
- * </p>
- * <p>
- * Then also this class is used as an entry point for runtime evaluation of the
- * expressions.
- * </p>
+ * JUEL-specific implementation of an {@link ExpressionManager}.
  *
  * @author Tom Baeyens
  * @author Dave Syer
@@ -57,13 +46,13 @@ import org.camunda.bpm.engine.variable.context.VariableContext;
  */
 public class JuelExpressionManager implements ExpressionManager, ElProviderCompatible {
 
-
   protected List<FunctionMapper> functionMappers = new ArrayList<FunctionMapper>();
   protected ExpressionFactory expressionFactory;
   // Default implementation (does nothing)
   protected ELContext parsingElContext = new ProcessEngineElContext(functionMappers);
   protected Map<Object, Object> beans;
-  protected volatile ELResolver elResolver; // why volatile? => https://jira.camunda.com/browse/CAM-12106
+  protected volatile ELResolver elResolver; // why volatile? =>
+                                            // https://jira.camunda.com/browse/CAM-12106
   protected volatile ElProvider elProvider;
 
   public JuelExpressionManager() {
@@ -71,7 +60,8 @@ public class JuelExpressionManager implements ExpressionManager, ElProviderCompa
   }
 
   public JuelExpressionManager(Map<Object, Object> beans) {
-    // Use the ExpressionFactoryImpl built-in version of juel, with parametrised method expressions enabled
+    // Use the ExpressionFactoryImpl built-in version of juel, with parametrised
+    // method expressions enabled
     expressionFactory = new ExpressionFactoryImpl();
     this.beans = beans;
   }
@@ -97,10 +87,10 @@ public class JuelExpressionManager implements ExpressionManager, ElProviderCompa
       elContext = variableScopeImpl.getCachedElContext();
     }
 
-    if (elContext==null) {
+    if (elContext == null) {
       elContext = createElContext(variableScope);
       if (variableScope instanceof AbstractVariableScope) {
-        ((AbstractVariableScope)variableScope).setCachedElContext(elContext);
+        ((AbstractVariableScope) variableScope).setCachedElContext(elContext);
       }
     }
 
@@ -125,7 +115,7 @@ public class JuelExpressionManager implements ExpressionManager, ElProviderCompa
 
   protected ELResolver getCachedElResolver() {
     if (elResolver == null) {
-      synchronized(this) {
+      synchronized (this) {
         if (elResolver == null) {
           elResolver = createElResolver();
         }
@@ -141,8 +131,9 @@ public class JuelExpressionManager implements ExpressionManager, ElProviderCompa
     elResolver.add(new VariableContextElResolver());
     elResolver.add(new MockElResolver());
 
-    if(beans != null) {
-      // ACT-1102: Also expose all beans in configuration when using standalone engine, not
+    if (beans != null) {
+      // ACT-1102: Also expose all beans in configuration when using standalone
+      // engine, not
       // in spring-context
       elResolver.add(new ReadOnlyMapELResolver(beans));
     }
@@ -167,7 +158,7 @@ public class JuelExpressionManager implements ExpressionManager, ElProviderCompa
   @Override
   public ElProvider toElProvider() {
     if (elProvider == null) {
-      synchronized(this) {
+      synchronized (this) {
         if (elProvider == null) {
           elProvider = createElProvider();
         }

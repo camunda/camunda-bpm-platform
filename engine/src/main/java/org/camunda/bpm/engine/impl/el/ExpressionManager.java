@@ -19,8 +19,6 @@ package org.camunda.bpm.engine.impl.el;
 /**
  * Original ExpressionManager class is renamed to {@link JuelExpressionManager}
  * to make el pluggable.
- *
- * @author Jan Cheng
  */
 public interface ExpressionManager {
   Expression createExpression(String expression);

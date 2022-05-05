@@ -19,12 +19,9 @@ package org.camunda.bpm.engine.impl.el;
 import org.camunda.bpm.dmn.engine.impl.spi.el.ElProvider;
 
 /**
- * A class implements {@link ExpressionManager} may also implements
- * {@link ElProviderCompatible} to indicate it is compatible with
- * {@link ElProvider}.
- *
- * @author Jan Cheng
- *
+ * Implementations indicate that they are compatible with {@link ElProvider} and
+ * can provide one. A class that implements {@link ExpressionManager} may
+ * implement this interface to be used as an {@link ElProvider} as well.
  */
 public interface ElProviderCompatible {
 
