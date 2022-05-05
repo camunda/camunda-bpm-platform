@@ -60,6 +60,7 @@ import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 import org.camunda.bpm.dmn.engine.DmnEngine;
 import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
+import org.camunda.bpm.dmn.engine.impl.spi.el.ElProvider;
 import org.camunda.bpm.dmn.feel.impl.scala.function.FeelCustomFunctionProvider;
 import org.camunda.bpm.engine.ArtifactFactory;
 import org.camunda.bpm.engine.AuthorizationService;
@@ -591,6 +592,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected Charset defaultCharset = null;
 
   protected ExpressionManager expressionManager;
+  protected ElProvider elProvider;
   protected ScriptingEngines scriptingEngines;
   protected List<ResolverFactory> resolverFactories;
   protected ScriptingEnvironment scriptingEnvironment;
@@ -2553,7 +2555,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
           .feelCustomFunctionProviders(dmnFeelCustomFunctionProviders)
           .enableFeelLegacyBehavior(dmnFeelEnableLegacyBehavior);
 
-      if (expressionManager instanceof ElProviderCompatible) {
+      if (elProvider != null) {
+        dmnEngineConfigurationBuilder.elProvider(elProvider);
+      } else if (expressionManager instanceof ElProviderCompatible) {
         dmnEngineConfigurationBuilder.elProvider(((ElProviderCompatible)expressionManager).toElProvider());
       }
 
@@ -3197,6 +3201,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfigurationImpl setExpressionManager(ExpressionManager expressionManager) {
     this.expressionManager = expressionManager;
+    return this;
+  }
+
+  public ElProvider getElProvider() {
+    return elProvider;
+  }
+
+  public ProcessEngineConfigurationImpl setElProvider(ElProvider elProvider) {
+    this.elProvider = elProvider;
     return this;
   }
 
