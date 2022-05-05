@@ -4810,6 +4810,10 @@ public class BpmnParse extends Parse {
             activity.setScope(true);
           }
         }
+
+        for (BpmnParseListener parseListener : parseListeners) {
+          parseListener.parseIoMapping(extensionElements, activity, inputOutput);
+        }
       }
     }
   }
