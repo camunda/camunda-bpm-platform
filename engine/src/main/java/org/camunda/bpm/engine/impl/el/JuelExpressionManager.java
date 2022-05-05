@@ -23,7 +23,7 @@ import java.util.Map;
 import org.camunda.bpm.dmn.engine.impl.spi.el.ElProvider;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
-import org.camunda.bpm.engine.impl.dmn.el.ProcessEngineElProvider;
+import org.camunda.bpm.engine.impl.dmn.el.ProcessEngineJuelElProvider;
 import org.camunda.bpm.engine.impl.javax.el.ArrayELResolver;
 import org.camunda.bpm.engine.impl.javax.el.CompositeELResolver;
 import org.camunda.bpm.engine.impl.javax.el.ELContext;
@@ -177,6 +177,6 @@ public class JuelExpressionManager implements ExpressionManager, ElProviderCompa
   }
 
   protected ElProvider createElProvider() {
-    return new ProcessEngineElProvider(this);
+    return new ProcessEngineJuelElProvider(this);
   }
 }

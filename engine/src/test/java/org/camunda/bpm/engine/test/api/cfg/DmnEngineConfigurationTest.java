@@ -33,7 +33,7 @@ import org.camunda.bpm.dmn.feel.impl.FeelEngineFactory;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.dmn.el.ProcessEngineElProvider;
+import org.camunda.bpm.engine.impl.dmn.el.ProcessEngineJuelElProvider;
 import org.junit.After;
 import org.junit.Test;
 
@@ -149,7 +149,7 @@ public class DmnEngineConfigurationTest {
     engine = processEngineConfiguration.buildProcessEngine();
 
     // then the DMN engine should use the process engine el provider
-    assertEquals(ProcessEngineElProvider.class, getConfigurationOfDmnEngine().getElProvider().getClass());
+    assertEquals(ProcessEngineJuelElProvider.class, getConfigurationOfDmnEngine().getElProvider().getClass());
   }
 
   @Test

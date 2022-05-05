@@ -16,37 +16,25 @@
  */
 package org.camunda.bpm.engine.impl.dmn.el;
 
+
 import org.camunda.bpm.dmn.engine.impl.spi.el.ElExpression;
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.dmn.engine.impl.spi.el.ElProvider;
 import org.camunda.bpm.engine.impl.el.JuelExpressionManager;
-import org.camunda.bpm.engine.impl.javax.el.ELContext;
-import org.camunda.bpm.engine.impl.javax.el.ValueExpression;
-import org.camunda.bpm.engine.variable.context.VariableContext;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class ProcessEngineElExpression implements ElExpression {
+public class ProcessEngineJuelElProvider implements ElProvider {
 
   protected final JuelExpressionManager expressionManager;
-  protected final ValueExpression valueExpression;
 
-  public ProcessEngineElExpression(JuelExpressionManager expressionManager, ValueExpression expression) {
+  public ProcessEngineJuelElProvider(JuelExpressionManager expressionManager) {
     this.expressionManager = expressionManager;
-    this.valueExpression = expression;
   }
 
-  public Object getValue(VariableContext variableContext) {
-    if(Context.getCommandContext() == null) {
-      throw new ProcessEngineException("Expression can only be evaluated inside the context of the process engine");
-    }
-
-    ELContext context = expressionManager.createElContext(variableContext);
-
-    return valueExpression.getValue(context);
-
+  public ElExpression createExpression(String expression) {
+    return new ProcessEngineJuleElExpression(expressionManager, expressionManager.createValueExpression(expression));
   }
 
 }
