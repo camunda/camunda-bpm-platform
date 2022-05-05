@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.core.variable.mapping.IoMapping;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
@@ -232,6 +233,10 @@ public class HistoryParseListener implements BpmnParseListener {
   public void parseConditionalStartEventForEventSubprocess(Element element, ActivityImpl conditionalActivity, boolean interrupting) {
   }
 
+  @Override
+  public void parseIoMapping(Element extensionElements, ActivityImpl activity, IoMapping inputOutput) {
+  }
+
   // helper methods ///////////////////////////////////////////////////////////
 
   protected void addActivityHandlers(ActivityImpl activity) {
@@ -243,7 +248,7 @@ public class HistoryParseListener implements BpmnParseListener {
       activity.addBuiltInListener(PvmEvent.EVENTNAME_END, ACTIVITY_INSTANCE_END_LISTENER);
     }
   }
-  
+
   protected void ensureHistoryLevelInitialized() {
     if (historyLevel == null) {
       historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();

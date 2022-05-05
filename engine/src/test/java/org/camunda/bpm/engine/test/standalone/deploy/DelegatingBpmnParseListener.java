@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.test.standalone.deploy;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
+import org.camunda.bpm.engine.impl.core.variable.mapping.IoMapping;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
@@ -239,5 +240,10 @@ public class DelegatingBpmnParseListener implements BpmnParseListener {
   public void parseConditionalStartEventForEventSubprocess(Element element,
       ActivityImpl conditionalActivity, boolean interrupting) {
     DELEGATE.parseConditionalStartEventForEventSubprocess(element, conditionalActivity, interrupting);
+  }
+
+  @Override
+  public void parseIoMapping(Element extensionElements, ActivityImpl activity, IoMapping inputOutput) {
+    DELEGATE.parseIoMapping(extensionElements, activity, inputOutput);
   }
 }

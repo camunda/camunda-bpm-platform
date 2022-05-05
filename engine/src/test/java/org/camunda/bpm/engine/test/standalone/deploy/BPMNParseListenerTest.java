@@ -20,6 +20,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
@@ -28,6 +30,7 @@ import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.parser.AbstractBpmnParseListener;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
+import org.camunda.bpm.engine.impl.core.variable.mapping.IoMapping;
 import org.camunda.bpm.engine.impl.el.Expression;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.form.FormDefinition;
@@ -286,5 +289,24 @@ public class BPMNParseListenerTest {
     };
   }
 
+  @Test
+  public void shouldInvokeParseIoMapping() {
+    // given
+    AtomicInteger invokeTimes = new AtomicInteger();
+    DelegatingBpmnParseListener.DELEGATE = new AbstractBpmnParseListener() {
+      @Override
+      public void parseIoMapping(Element extensionElements, ActivityImpl activity, IoMapping inputOutput) {
+        invokeTimes.incrementAndGet();
+      }
+
+    };
+
+    // when
+    engineTestRule.deploy("org/camunda/bpm/engine/test/standalone/deploy/"
+        + "BPMNParseListenerTest.shouldInvokeParseIoMapping.bpmn20.xml");
+
+    // then
+    assertEquals(1, invokeTimes.get());
+  }
 
 }
