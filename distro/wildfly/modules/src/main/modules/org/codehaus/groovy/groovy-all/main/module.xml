@@ -4,8 +4,6 @@
     <resource-root path="groovy-jsr223-@version.groovy@.jar" />
     <resource-root path="groovy-json-@version.groovy@.jar" />
     <resource-root path="groovy-xml-@version.groovy@.jar" />
-    <resource-root path="groovy-datetime-@version.groovy@.jar" />
-    <resource-root path="groovy-dateutil-@version.groovy@.jar" />
     <resource-root path="groovy-templates-@version.groovy@.jar" />
   </resources>
 
