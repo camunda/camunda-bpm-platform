@@ -70,8 +70,11 @@ import junit.framework.AssertionFailedError;
  */
 public class ExecutionListenerTest {
 
-  protected static final String ERROR_CODE = "208";
   protected static final String PROCESS_KEY = "Process";
+
+  protected static final String ERROR_CODE = "208";
+  protected static final RuntimeException RUNTIME_EXCEPTION = new RuntimeException("Intended exception from delegate");
+
   public ProcessEngineRule processEngineRule = new ProvidedProcessEngineRule();
   public ProcessEngineTestRule testRule = new ProcessEngineTestRule(processEngineRule);
 
@@ -101,6 +104,7 @@ public class ExecutionListenerTest {
   @Before
   public void resetListener() {
     ThrowBPMNErrorDelegate.reset();
+    ThrowRuntimeExceptionDelegate.reset();
   }
 
   public void assertProcessEnded(final String processInstanceId) {
@@ -537,6 +541,86 @@ public class ExecutionListenerTest {
   }
 
   @Test
+  public void testThrowExceptionInStartListenerServiceTaskWithCatch() {
+    // given
+    BpmnModelInstance model = createModelWithCatchInServiceTaskAndListener(ExecutionListener.EVENTNAME_START, true);
+    testRule.deploy(model);
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+    Task task = taskService.createTaskQuery().taskDefinitionKey("userTask1").singleResult();
+
+    // when listeners are invoked
+    assertThatThrownBy(() -> taskService.complete(task.getId()))
+    // then
+      .isInstanceOf(RuntimeException.class)
+      .hasMessage("Intended exception from delegate");
+    assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(1L);
+  }
+
+  @Test
+  public void testThrowExceptionInEndListenerAndServiceTaskWithCatch() {
+    // given
+    BpmnModelInstance model = createModelWithCatchInServiceTaskAndListener(ExecutionListener.EVENTNAME_END, true);
+    testRule.deploy(model);
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+    Task task = taskService.createTaskQuery().taskDefinitionKey("userTask1").singleResult();
+
+    // when listeners are invoked
+    assertThatThrownBy(() -> taskService.complete(task.getId()))
+    // then
+      .isInstanceOf(RuntimeException.class)
+      .hasMessage("Intended exception from delegate");
+    assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(1L);
+  }
+
+  @Test
+  public void testThrowExceptionInEndListenerAndServiceTaskWithCatchException() {
+    // given
+    BpmnModelInstance model = createModelWithCatchInServiceTaskAndListener(ExecutionListener.EVENTNAME_END, true, true);
+    testRule.deploy(model);
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+    Task task = taskService.createTaskQuery().taskDefinitionKey("userTask1").singleResult();
+
+    // when listeners are invoked
+    taskService.complete(task.getId());
+
+    // then
+    verifyErrorGotCaught(true);
+    verifyActivityCanceled("throw");
+  }
+
+  @Test
+  public void testThrowExceptionInEndListenerAndSubprocessWithCatchException() {
+    // given
+    BpmnModelInstance model = createModelWithCatchInSubprocessAndListener(ExecutionListener.EVENTNAME_END, true, true);
+    testRule.deploy(model);
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+    Task task = taskService.createTaskQuery().taskDefinitionKey("userTask1").singleResult();
+
+    // when listeners are invoked
+    taskService.complete(task.getId());
+
+    // then
+    verifyErrorGotCaught(true);
+    verifyActivityCanceled("throw");
+  }
+
+  @Test
+  public void testThrowExceptionInEndListenerAndEventSubprocessWithCatchException() {
+    // given
+    BpmnModelInstance model = createModelWithCatchInEventSubprocessAndListener(ExecutionListener.EVENTNAME_END, true, true);
+    testRule.deploy(model);
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY);
+    Task task = taskService.createTaskQuery().taskDefinitionKey("userTask1").singleResult();
+
+    // when the listeners are invoked
+    taskService.complete(task.getId());
+
+    // then
+    verifyErrorGotCaught(true);
+    verifyActivityCanceled("throw");
+  }
+
+  @Test
   public void testThrowBpmnErrorInStartListenerServiceTaskWithCatch() {
     // given
     BpmnModelInstance model = createModelWithCatchInServiceTaskAndListener(ExecutionListener.EVENTNAME_START);
@@ -549,6 +633,7 @@ public class ExecutionListenerTest {
 
     // then
     verifyErrorGotCaught();
+    verifyActivityCanceled("throw");
   }
 
   @Test
@@ -564,6 +649,7 @@ public class ExecutionListenerTest {
 
     // then
     verifyErrorGotCaught();
+    verifyActivityCanceled("throw");
   }
 
   @Test
@@ -579,6 +665,7 @@ public class ExecutionListenerTest {
 
     // then
     verifyErrorGotCaught();
+    verifyActivityCanceled("throw");
   }
 
   @Test
@@ -594,6 +681,7 @@ public class ExecutionListenerTest {
 
     // then
     verifyErrorGotCaught();
+    verifyActivityCanceled("throw");
   }
 
   @Test
@@ -609,6 +697,7 @@ public class ExecutionListenerTest {
 
     // then
     verifyErrorGotCaught();
+    verifyActivityCanceled("throw");
   }
 
   @Test
@@ -624,6 +713,7 @@ public class ExecutionListenerTest {
 
     // then
     verifyErrorGotCaught();
+    verifyActivityCanceled("throw");
   }
 
   @Test
@@ -748,6 +838,7 @@ public class ExecutionListenerTest {
     taskService.complete(afterCatch.getId());
 
     assertEquals(0, runtimeService.createExecutionQuery().count());
+    verifyActivityCanceled("throw");
   }
 
   @Test
@@ -773,6 +864,7 @@ public class ExecutionListenerTest {
 
     // then
     verifyErrorGotCaught();
+    verifyActivityCanceled("throw");
   }
 
   @Test
@@ -798,6 +890,7 @@ public class ExecutionListenerTest {
 
     // then
     verifyErrorGotCaught();
+    verifyActivityCanceled("throw");
   }
 
   @Test
@@ -829,6 +922,7 @@ public class ExecutionListenerTest {
 
     // then
     verifyErrorGotCaught();
+    verifyActivityCanceled("throw");
   }
 
   @Test
@@ -860,6 +954,7 @@ public class ExecutionListenerTest {
 
     // then
     verifyErrorGotCaught();
+    verifyActivityCanceled("throw");
   }
 
   @Test
@@ -892,6 +987,7 @@ public class ExecutionListenerTest {
     verifyErrorGotCaught();
     // end listener is called
     assertEquals("bar", runtimeService.createVariableInstanceQuery().variableName("foo").singleResult().getValue());
+    verifyActivityCanceled("throw");
   }
 
   @Test
@@ -927,6 +1023,7 @@ public class ExecutionListenerTest {
 
     // then
     verifyErrorGotCaught();
+    verifyActivityCanceled("throw");
   }
 
   @Test
@@ -958,6 +1055,7 @@ public class ExecutionListenerTest {
 
     // then
     verifyErrorGotCaught();
+    verifyActivityCanceled("throw");
   }
 
   @Test
@@ -989,6 +1087,7 @@ public class ExecutionListenerTest {
 
     // then
     verifyErrorGotCaught();
+    verifyActivityCanceled("throw");
   }
 
   @Test
@@ -1000,6 +1099,7 @@ public class ExecutionListenerTest {
     // then
     assertEquals(1, taskService.createTaskQuery().list().size());
     assertEquals("afterCatch", taskService.createTaskQuery().singleResult().getName());
+    verifyActivityCanceled("task1");
   }
 
   @Test
@@ -1030,6 +1130,7 @@ public class ExecutionListenerTest {
 
     // the listener was only called once
     assertEquals(1, ThrowBPMNErrorDelegate.INVOCATIONS);
+    verifyActivityEnded("throw");
   }
 
   @Test
@@ -1060,6 +1161,7 @@ public class ExecutionListenerTest {
 
     // the listener was only called once
     assertEquals(1, ThrowBPMNErrorDelegate.INVOCATIONS);
+    verifyActivityEnded("throw");
   }
 
   @Test
@@ -1086,7 +1188,7 @@ public class ExecutionListenerTest {
         .endEvent()
         .done();
 
-    DeploymentWithDefinitions deployment = testRule.deploy(model);
+    testRule.deploy(model);
     runtimeService.startProcessInstanceByKey(PROCESS_KEY);
     Task task = taskService.createTaskQuery().taskDefinitionKey("userTask1").singleResult();
     taskService.complete(task.getId());
@@ -1103,9 +1205,6 @@ public class ExecutionListenerTest {
       assertTrue(e.getMessage().contains("business error"));
       assertEquals(1, ThrowBPMNErrorDelegate.INVOCATIONS);
     }
-
-    // cleanup
-    repositoryService.deleteDeployment(deployment.getId(), true, true);
   }
 
   @Test
@@ -1162,7 +1261,7 @@ public class ExecutionListenerTest {
     listener.setCamundaClass(ThrowBPMNErrorDelegate.class.getName());
     model.<org.camunda.bpm.model.bpmn.instance.Process>getModelElementById(PROCESS_KEY).builder().addExtensionElement(listener);
 
-    DeploymentWithDefinitions deployment = testRule.deploy(model);
+    testRule.deploy(model);
 
     try {
       // when listeners are invoked
@@ -1173,9 +1272,6 @@ public class ExecutionListenerTest {
       assertTrue(e.getMessage().contains("business error"));
       assertEquals(1, ThrowBPMNErrorDelegate.INVOCATIONS);
     }
-
-    // cleanup
-    repositoryService.deleteDeployment(deployment.getId(), true, true);
   }
 
   @Test
@@ -1197,7 +1293,7 @@ public class ExecutionListenerTest {
     listener.setCamundaClass(ThrowBPMNErrorDelegate.class.getName());
     model.<org.camunda.bpm.model.bpmn.instance.Process>getModelElementById(PROCESS_KEY).builder().addExtensionElement(listener);
 
-    DeploymentWithDefinitions deployment = testRule.deploy(model);
+    testRule.deploy(model);
 
     try {
       // when listeners are invoked
@@ -1207,20 +1303,25 @@ public class ExecutionListenerTest {
       assertTrue(e.getMessage().contains("business error"));
       assertEquals(1, ThrowBPMNErrorDelegate.INVOCATIONS);
     }
-
-    // cleanup
-    repositoryService.deleteDeployment(deployment.getId(), true, true);
   }
 
   protected BpmnModelInstance createModelWithCatchInServiceTaskAndListener(String eventName) {
+    return createModelWithCatchInServiceTaskAndListener(eventName, false);
+  }
+
+  protected BpmnModelInstance createModelWithCatchInServiceTaskAndListener(String eventName, boolean throwException) {
+    return createModelWithCatchInServiceTaskAndListener(eventName, throwException, false);
+  }
+
+  protected BpmnModelInstance createModelWithCatchInServiceTaskAndListener(String eventName, boolean throwException, boolean catchException) {
     return Bpmn.createExecutableProcess(PROCESS_KEY)
           .startEvent()
           .userTask("userTask1")
           .serviceTask("throw")
-            .camundaExecutionListenerClass(eventName, ThrowBPMNErrorDelegate.class.getName())
+            .camundaExecutionListenerClass(eventName, throwException ? ThrowRuntimeExceptionDelegate.class : ThrowBPMNErrorDelegate.class)
             .camundaExpression("${true}")
           .boundaryEvent("errorEvent")
-          .error(ERROR_CODE)
+          .error(catchException ? RUNTIME_EXCEPTION.getClass().getName() : ERROR_CODE)
           .userTask("afterCatch")
           .endEvent("endEvent")
           .moveToActivity("throw")
@@ -1230,6 +1331,10 @@ public class ExecutionListenerTest {
   }
 
   protected BpmnModelInstance createModelWithCatchInSubprocessAndListener(String eventName) {
+    return createModelWithCatchInSubprocessAndListener(eventName, false, false);
+  }
+
+  protected BpmnModelInstance createModelWithCatchInSubprocessAndListener(String eventName, boolean throwException, boolean catchException) {
     return Bpmn.createExecutableProcess(PROCESS_KEY)
           .startEvent()
           .userTask("userTask1")
@@ -1237,13 +1342,13 @@ public class ExecutionListenerTest {
             .embeddedSubProcess()
             .startEvent("inSub")
             .serviceTask("throw")
-              .camundaExecutionListenerClass(eventName, ThrowBPMNErrorDelegate.class.getName())
+              .camundaExecutionListenerClass(eventName, throwException ? ThrowRuntimeExceptionDelegate.class : ThrowBPMNErrorDelegate.class)
               .camundaExpression("${true}")
               .userTask("afterService")
               .endEvent()
             .subProcessDone()
           .boundaryEvent("errorEvent")
-          .error(ERROR_CODE)
+          .error(catchException ? RUNTIME_EXCEPTION.getClass().getName() : ERROR_CODE)
           .userTask("afterCatch")
           .endEvent("endEvent")
           .moveToActivity("sub")
@@ -1253,27 +1358,53 @@ public class ExecutionListenerTest {
   }
 
   protected BpmnModelInstance createModelWithCatchInEventSubprocessAndListener(String eventName) {
+    return createModelWithCatchInEventSubprocessAndListener(eventName, false, false);
+  }
+
+  protected BpmnModelInstance createModelWithCatchInEventSubprocessAndListener(String eventName, boolean throwException, boolean catchException) {
     ProcessBuilder processBuilder = Bpmn.createExecutableProcess(PROCESS_KEY);
     BpmnModelInstance model = processBuilder
         .startEvent()
         .userTask("userTask1")
         .serviceTask("throw")
-          .camundaExecutionListenerClass(eventName, ThrowBPMNErrorDelegate.class.getName())
+          .camundaExecutionListenerClass(eventName, throwException ? ThrowRuntimeExceptionDelegate.class : ThrowBPMNErrorDelegate.class)
           .camundaExpression("${true}")
         .userTask("afterService")
         .endEvent()
         .done();
     processBuilder.eventSubProcess()
-       .startEvent("errorEvent").error(ERROR_CODE)
+       .startEvent("errorEvent").error(catchException ? RUNTIME_EXCEPTION.getClass().getName() : ERROR_CODE)
          .userTask("afterCatch")
        .endEvent();
     return model;
   }
 
   protected void verifyErrorGotCaught() {
+    verifyErrorGotCaught(false);
+  }
+
+  protected void verifyErrorGotCaught(boolean useExceptionDelegate) {
     assertEquals(1, taskService.createTaskQuery().list().size());
     assertEquals("afterCatch", taskService.createTaskQuery().singleResult().getName());
-    assertEquals(1, ThrowBPMNErrorDelegate.INVOCATIONS);
+    assertEquals(1, useExceptionDelegate ? ThrowRuntimeExceptionDelegate.INVOCATIONS : ThrowBPMNErrorDelegate.INVOCATIONS);
+  }
+
+  protected void verifyActivityCanceled(String activityName) {
+    if (processEngineRule.getProcessEngineConfiguration().getHistoryLevel().getId() >= HISTORYLEVEL_AUDIT) {
+      assertThat(historyService.createHistoricActivityInstanceQuery()
+          .activityName(activityName)
+          .canceled()
+          .count()).isEqualTo(1);
+    }
+  }
+
+  protected void verifyActivityEnded(String activityName) {
+    if (processEngineRule.getProcessEngineConfiguration().getHistoryLevel().getId() >= HISTORYLEVEL_AUDIT) {
+      assertThat(historyService.createHistoricActivityInstanceQuery()
+          .activityName(activityName)
+          .completeScope()
+          .count()).isEqualTo(1);
+    }
   }
 
   public static class ThrowBPMNErrorDelegate implements ExecutionListener {
@@ -1284,6 +1415,21 @@ public class ExecutionListenerTest {
     public void notify(DelegateExecution execution) throws Exception {
       INVOCATIONS++;
       throw new BpmnError(ERROR_CODE, "business error");
+    }
+
+    public static void reset() {
+      INVOCATIONS = 0;
+    }
+  }
+
+  public static class ThrowRuntimeExceptionDelegate implements ExecutionListener {
+
+    public static int INVOCATIONS = 0;
+
+    @Override
+    public void notify(DelegateExecution execution) throws Exception {
+      INVOCATIONS++;
+      throw RUNTIME_EXCEPTION;
     }
 
     public static void reset() {

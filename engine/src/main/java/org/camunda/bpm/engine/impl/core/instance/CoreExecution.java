@@ -101,6 +101,10 @@ public abstract class CoreExecution extends AbstractVariableScope implements Bas
     listener.notify(this);
   }
 
+  public boolean hasFailedOnEndListeners() {
+    return false;
+  }
+
   // getters / setters /////////////////////////////////////////////////
 
   public String getId() {
