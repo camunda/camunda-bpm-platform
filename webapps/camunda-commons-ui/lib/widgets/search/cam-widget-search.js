@@ -142,7 +142,7 @@ module.exports = [
           $scope.translations[key] = $translate.instant(value);
         });
 
-        if ($scope.types)
+        const initTypes = () => {
           $scope.types.map(function(el) {
             el.id.value = $translate.instant(el.id.value);
             if (el.operators) {
@@ -164,6 +164,9 @@ module.exports = [
             }
             return el;
           });
+        }
+
+        if ($scope.types) initTypes();
 
         angular.forEach($scope.operators, function(operatorGroupedByType) {
           angular.forEach(operatorGroupedByType, function(operator) {
@@ -827,6 +830,7 @@ module.exports = [
         $scope.$watch(
           'types',
           function() {
+            initTypes();
             //in case if array of types changed - update dropdown values
             $scope.searchTypes = $scope.types.map(function(el) {
               return el.id;
