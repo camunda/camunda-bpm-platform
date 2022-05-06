@@ -257,6 +257,26 @@ public class BPMNParseListenerTest {
     engineTestRule.deployForTenant("parseListenerTenantId", model);
   }
 
+  @Test
+  public void shouldInvokeParseIoMapping() {
+    // given
+    AtomicInteger invokeTimes = new AtomicInteger();
+    DelegatingBpmnParseListener.DELEGATE = new AbstractBpmnParseListener() {
+      @Override
+      public void parseIoMapping(Element extensionElements, ActivityImpl activity, IoMapping inputOutput) {
+        invokeTimes.incrementAndGet();
+      }
+
+    };
+
+    // when
+    engineTestRule.deploy("org/camunda/bpm/engine/test/standalone/deploy/"
+        + "BPMNParseListenerTest.shouldInvokeParseIoMapping.bpmn20.xml");
+
+    // then
+    assertEquals(1, invokeTimes.get());
+  }
+
   // helper ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   protected BpmnParseListener createBpmnParseListenerAndAssertTenantId(String tenantId) {
@@ -287,26 +307,6 @@ public class BPMNParseListenerTest {
         checkTenantId(activity.getProcessDefinition());
       }
     };
-  }
-
-  @Test
-  public void shouldInvokeParseIoMapping() {
-    // given
-    AtomicInteger invokeTimes = new AtomicInteger();
-    DelegatingBpmnParseListener.DELEGATE = new AbstractBpmnParseListener() {
-      @Override
-      public void parseIoMapping(Element extensionElements, ActivityImpl activity, IoMapping inputOutput) {
-        invokeTimes.incrementAndGet();
-      }
-
-    };
-
-    // when
-    engineTestRule.deploy("org/camunda/bpm/engine/test/standalone/deploy/"
-        + "BPMNParseListenerTest.shouldInvokeParseIoMapping.bpmn20.xml");
-
-    // then
-    assertEquals(1, invokeTimes.get());
   }
 
 }
