@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.cdi;
 
 import org.camunda.bpm.engine.cdi.impl.el.CdiResolver;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
+import org.camunda.bpm.engine.impl.el.JuelExpressionManager;
 import org.camunda.bpm.engine.impl.el.VariableContextElResolver;
 import org.camunda.bpm.engine.impl.el.VariableScopeElResolver;
 import org.camunda.bpm.engine.impl.javax.el.ArrayELResolver;
@@ -42,7 +43,7 @@ import org.camunda.bpm.engine.impl.javax.el.MapELResolver;
  *
  * @author Daniel Meyer
  */
-public class CdiExpressionManager extends ExpressionManager {
+public class CdiExpressionManager extends JuelExpressionManager {
 
   @Override
   protected ELResolver createElResolver() {
