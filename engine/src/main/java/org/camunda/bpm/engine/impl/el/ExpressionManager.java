@@ -17,8 +17,21 @@
 package org.camunda.bpm.engine.impl.el;
 
 /**
+ * <p>
  * Original ExpressionManager class is renamed to {@link JuelExpressionManager}
  * to make el pluggable.
+ * </p>
+ * <p>
+ * Central manager for all expressions.
+ * </p>
+ * <p>
+ * Process parsers will use this to build expression objects that are stored in
+ * the process definitions.
+ * </p>
+ * <p>
+ * Then also this class is used as an entry point for runtime evaluation of the
+ * expressions.
+ * </p>
  */
 public interface ExpressionManager {
   Expression createExpression(String expression);

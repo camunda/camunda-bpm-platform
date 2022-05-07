@@ -34,7 +34,7 @@ public class ProcessEngineJuelElProvider implements ElProvider {
   }
 
   public ElExpression createExpression(String expression) {
-    return new ProcessEngineJuleElExpression(expressionManager, expressionManager.createValueExpression(expression));
+    return new ProcessEngineJuelElExpression(expressionManager, expressionManager.createValueExpression(expression));
   }
 
 }

@@ -28,12 +28,12 @@ import org.camunda.bpm.engine.variable.context.VariableContext;
  * @author Daniel Meyer
  *
  */
-public class ProcessEngineJuleElExpression implements ElExpression {
+public class ProcessEngineJuelElExpression implements ElExpression {
 
   protected final JuelExpressionManager expressionManager;
   protected final ValueExpression valueExpression;
 
-  public ProcessEngineJuleElExpression(JuelExpressionManager expressionManager, ValueExpression expression) {
+  public ProcessEngineJuelElExpression(JuelExpressionManager expressionManager, ValueExpression expression) {
     this.expressionManager = expressionManager;
     this.valueExpression = expression;
   }

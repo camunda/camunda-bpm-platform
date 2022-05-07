@@ -2575,8 +2575,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       expressionManager = new JuelExpressionManager(beans);
     }
 
-    // it's better to add FunctionMapper when create default JuelExpressionManager above,
-    // but we leave it here for backward compatibility
     // for JuelExpressionManagers, we provide default function mappers
     if (expressionManager instanceof JuelExpressionManager) {
       // add function mapper for command context (eg currentUser(), currentUserGroups())

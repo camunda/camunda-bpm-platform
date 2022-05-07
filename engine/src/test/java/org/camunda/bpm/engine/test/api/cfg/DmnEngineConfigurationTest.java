@@ -153,6 +153,20 @@ public class DmnEngineConfigurationTest {
   }
 
   @Test
+  public void setProvidedElProvider() {
+    // given provided a el provider in process engine configuration
+    ProcessEngineConfigurationImpl processEngineConfiguration = createProcessEngineConfiguration();
+    ElProvider elProvider = mock(ElProvider.class);
+    processEngineConfiguration.setElProvider(elProvider);
+
+    // when the engine is initialized
+    engine = processEngineConfiguration.buildProcessEngine();
+
+    // then the DMN engine should use the provided el provider
+    assertEquals(elProvider, getConfigurationOfDmnEngine().getElProvider());
+  }
+
+  @Test
   public void setProcessEngineScriptEnginesByDefault() {
     // given a default DMN engine configuration without script engine resolver
     ProcessEngineConfigurationImpl processEngineConfiguration = createProcessEngineConfiguration();
