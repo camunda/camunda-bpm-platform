@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.el.ExpressionManager;
+import org.camunda.bpm.engine.impl.el.JuelExpressionManager;
 import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
 import org.camunda.bpm.engine.impl.variable.serializer.JavaObjectSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.TypedValueSerializer;
@@ -91,7 +93,10 @@ public class SpinProcessEnginePlugin extends SpinConfiguration {
   }
 
   protected void registerFunctionMapper(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    processEngineConfiguration.getExpressionManager().addFunctionMapper(new SpinFunctionMapper());
+    ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
+    if (expressionManager instanceof JuelExpressionManager) {
+      ((JuelExpressionManager)expressionManager).addFunctionMapper(new SpinFunctionMapper());
+    }
   }
 
   protected void registerValueTypes(ProcessEngineConfigurationImpl processEngineConfiguration){
