@@ -165,4 +165,61 @@ public class JsonJacksonTreeTypeDetectionTest {
     assertThat(canonicalTypeString).isEqualTo("java.util.Map<java.lang.String,java.util.Map<java.lang.Integer,org.camunda.spin.json.mapping.RegularCustomer>>");
   }
 
+  @Test
+  public void shouldHandleMapWithNullAndStringValue() {
+    Map<String, Object> map = new HashMap<>();
+    map.put("bar", null);
+    map.put("foo", "baz");
+
+    String canonicalTypeString = dataFormatWithMapTypeDetector.getCanonicalTypeName(map);
+    assertThat(canonicalTypeString).isEqualTo("java.util.Map<java.lang.String,java.lang.String>");
+  }
+
+  @Test
+  public void shouldHandleMapWithNullAndNullValue() {
+    Map<String, Object> map = new HashMap<>();
+    map.put("foo", null);
+    map.put("bar", null);
+
+    String canonicalTypeString = dataFormatWithMapTypeDetector.getCanonicalTypeName(map);
+    assertThat(canonicalTypeString).isEqualTo("java.util.Map<java.lang.String,java.lang.Object>");
+  }
+
+  @Test
+  public void shouldHandleMapWithSingleNullValue() {
+    Map<String, Object> map = new HashMap<>();
+    map.put("bar", null);
+
+    String canonicalTypeString = dataFormatWithMapTypeDetector.getCanonicalTypeName(map);
+    assertThat(canonicalTypeString).isEqualTo("java.util.Map<java.lang.String,java.lang.Object>");
+  }
+
+  @Test
+  public void shouldHandleSetWithSingleStringValue() {
+    Set<String> set = new HashSet<>();
+    set.add("foo");
+
+    String canonicalTypeString = dataFormatWithSetTypeDetector.getCanonicalTypeName(set);
+    assertThat(canonicalTypeString).isEqualTo("java.util.HashSet<java.lang.String>");
+  }
+
+  @Test
+  public void shouldHandleSetWithNullAndStringValue() {
+    Set<Object> set = new HashSet<>();
+    set.add(null);
+    set.add("foo");
+
+    String canonicalTypeString = dataFormatWithSetTypeDetector.getCanonicalTypeName(set);
+    assertThat(canonicalTypeString).isEqualTo("java.util.HashSet<java.lang.String>");
+  }
+
+  @Test
+  public void shouldHandleSetWithNullValue() {
+    Set<String> set = new HashSet<>();
+    set.add(null);
+
+    String canonicalTypeString = dataFormatWithSetTypeDetector.getCanonicalTypeName(set);
+    assertThat(canonicalTypeString).isEqualTo("java.util.HashSet<java.lang.Object>");
+  }
+
 }
