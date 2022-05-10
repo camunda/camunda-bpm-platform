@@ -352,7 +352,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements
     PvmActivity activity = getActivity();
     if (isActive && activity != null) {
       // set activity instance state to cancel
-      if (activityInstanceState != ENDING.getStateCode()) {
+      if (activityInstanceState != ENDING.getStateCode() || activityInstanceEndListenersFailed) {
         setCanceled(true);
         performOperation(PvmAtomicOperation.FIRE_ACTIVITY_END);
       }
@@ -1848,6 +1848,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements
     return activityInstanceState == state.getStateCode();
   }
 
+  @Override
   public boolean hasFailedOnEndListeners() {
     return activityInstanceEndListenersFailed;
   }
