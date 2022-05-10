@@ -472,7 +472,7 @@ public class AuthorizationManager extends AbstractManager {
       deleteParams.put("resourceType", resource.resourceType());
       deleteParams.put("resourceId", resourceId);
       deleteParams.put("userId", userId);
-      getDbEntityManager().delete(AuthorizationEntity.class, "deleteAuthorizationsForResourceId", deleteParams);
+      getDbEntityManager().delete(AuthorizationEntity.class, "deleteAuthorizationsForResourceIdAndUserId", deleteParams);
     }
 
   }
@@ -488,7 +488,7 @@ public class AuthorizationManager extends AbstractManager {
       deleteParams.put("resourceType", resource.resourceType());
       deleteParams.put("resourceId", resourceId);
       deleteParams.put("groupId", groupId);
-      getDbEntityManager().delete(AuthorizationEntity.class, "deleteAuthorizationsForResourceId", deleteParams);
+      getDbEntityManager().delete(AuthorizationEntity.class, "deleteAuthorizationsForResourceIdAndGroupId", deleteParams);
     }
 
   }
