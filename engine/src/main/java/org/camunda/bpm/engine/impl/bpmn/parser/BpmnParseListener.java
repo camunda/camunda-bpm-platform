@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.impl.bpmn.parser;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.core.variable.mapping.IoMapping;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
@@ -74,4 +75,5 @@ public interface BpmnParseListener {
   void parseBoundaryConditionalEventDefinition(Element element, boolean interrupting, ActivityImpl conditionalActivity);
   void parseIntermediateConditionalEventDefinition(Element conditionalEventDefinition, ActivityImpl conditionalActivity);
   void parseConditionalStartEventForEventSubprocess(Element element, ActivityImpl conditionalActivity, boolean interrupting);
+  void parseIoMapping(Element extensionElements, ActivityImpl activity, IoMapping inputOutput);
 }
