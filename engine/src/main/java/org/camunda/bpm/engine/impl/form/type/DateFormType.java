@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.impl.form.type;
 
+import static com.ifsworld.fnd.bpa.Constants.ATTR_DATE_MASK;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -36,10 +38,12 @@ public class DateFormType extends AbstractFormFieldType {
 
   protected String datePattern;
   protected DateFormat dateFormat;
+  protected DateFormat odataDateFormat;
 
   public DateFormType(String datePattern) {
     this.datePattern = datePattern;
     this.dateFormat = new SimpleDateFormat(datePattern);
+    this.odataDateFormat = new SimpleDateFormat(ATTR_DATE_MASK);
   }
 
   public String getName() {
@@ -69,6 +73,11 @@ public class DateFormType extends AbstractFormFieldType {
       try {
         return Variables.dateValue((Date) dateFormat.parseObject(strValue), propertyValue.isTransient());
       } catch (ParseException e) {
+         try {
+            return Variables.dateValue((Date) odataDateFormat.parseObject(strValue), propertyValue.isTransient());
+         } catch (ParseException ex) {
+            // Throw original error if this fails
+         }
         throw new ProcessEngineException("Could not parse value '"+value+"' as date using date format '"+datePattern+"'.");
       }
     }
@@ -79,9 +88,21 @@ public class DateFormType extends AbstractFormFieldType {
 
   public TypedValue convertToFormValue(TypedValue modelValue) {
     if(modelValue.getValue() == null) {
-      return Variables.stringValue("", modelValue.isTransient());
+      return Variables.stringValue(null, modelValue.isTransient());
     } else if(modelValue.getType() == ValueType.DATE) {
-      return Variables.stringValue(dateFormat.format(modelValue.getValue()), modelValue.isTransient());
+       return Variables.stringValue(dateFormat.format(modelValue.getValue()), modelValue.isTransient());
+     } else if(modelValue.getType() == ValueType.STRING) {
+        // added this option for untyped Date data
+        String value = modelValue.getValue().toString();
+        
+        try {
+           // validate parsing .. if it fails send a consistent message as the previous implementation
+           dateFormat.parse(value);
+        } catch (ParseException e) {
+           throw new ProcessEngineException("Expected value to be of type '"+ValueType.DATE+"' but got '"+modelValue.getType()+"'.");
+        }
+        
+      return Variables.stringValue(value, modelValue.isTransient());
     }
     else {
       throw new ProcessEngineException("Expected value to be of type '"+ValueType.DATE+"' but got '"+modelValue.getType()+"'.");
@@ -94,9 +115,20 @@ public class DateFormType extends AbstractFormFieldType {
     if (propertyValue==null || "".equals(propertyValue)) {
       return null;
     }
+    
+    // added this check to handle both typed and untyped data
+    if(propertyValue instanceof Date) {
+       return propertyValue;
+    }
+    
     try {
       return dateFormat.parseObject(propertyValue.toString());
     } catch (ParseException e) {
+      try {
+        return odataDateFormat.parseObject(propertyValue.toString());
+      } catch (ParseException ex) {
+        // Throw original error if this fails
+      }
       throw new ProcessEngineException("invalid date value "+propertyValue);
     }
   }

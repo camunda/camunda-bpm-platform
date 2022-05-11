@@ -16,15 +16,19 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity.util;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
-import org.camunda.bpm.engine.ProcessEngineException;
+
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntityLifecycleAware;
@@ -36,10 +40,13 @@ import org.camunda.bpm.engine.impl.variable.serializer.ValueFields;
 import org.camunda.bpm.engine.impl.variable.serializer.ValueFieldsImpl;
 import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializerFactory;
 import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
+import org.camunda.bpm.engine.variable.impl.value.PrimitiveTypeValueImpl.DateValueImpl;
 import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.SerializableValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
+
+import com.ifsworld.fnd.common.logging.Marker;
 
 /**
  * A field what provide a typed version of a value. It can
@@ -62,6 +69,10 @@ public class TypedValueField implements DbEntityLifecycleAware, CommandContextLi
 
   protected boolean notifyOnImplicitUpdates = false;
   protected List<TypedValueUpdateListener> updateListeners;
+  
+  public static final String DATE_VALUE_PREFIX = "[Date";
+  private static final String DATE_FILTER_REGEX = "(\\[|Date |\\])";
+  private static final Logger LOGGER = LogManager.getLogger(TypedValueField.class.getName());
 
   public TypedValueField(ValueFields valueFields, boolean notifyOnImplicitUpdates) {
     this.valueFields = valueFields;
@@ -79,10 +90,18 @@ public class TypedValueField implements DbEntityLifecycleAware, CommandContextLi
   }
 
   public TypedValue getTypedValue(boolean asTransientValue) {
-    return getTypedValue(true, asTransientValue);
+    return getTypedValue(true, asTransientValue, false);
   }
 
+  public TypedValue getTypedValueWithImplicitUpdatesSkipped(boolean asTransientValue) {
+     return getTypedValue(true, asTransientValue, true);
+  }
+  
   public TypedValue getTypedValue(boolean deserializeValue, boolean asTransientValue) {
+     return getTypedValue(deserializeValue, asTransientValue, false);
+  }
+   
+  public TypedValue getTypedValue(boolean deserializeValue, boolean asTransientValue, boolean skipImplicitUpdates) {
     if (Context.getCommandContext() != null) {
       // in some circumstances we must invalidate the cached value instead of returning it
 
@@ -104,7 +123,7 @@ public class TypedValueField implements DbEntityLifecycleAware, CommandContextLi
       try {
         cachedValue = getSerializer().readValue(valueFields, deserializeValue, asTransientValue);
 
-        if (notifyOnImplicitUpdates && isMutableValue(cachedValue)) {
+        if (!skipImplicitUpdates && notifyOnImplicitUpdates && isMutableValue(cachedValue)) {
           Context.getCommandContext().registerCommandContextListener(this);
         }
 
@@ -116,8 +135,32 @@ public class TypedValueField implements DbEntityLifecycleAware, CommandContextLi
     }
     return cachedValue;
   }
+  
+  /**
+    * If type value is date convert it to DateValueImpl
+    * 
+    * @param TypedValue
+    * @return
+  */
+  public TypedValue getDateValue(TypedValue value) {
+    if (value != null && value.getValue() != null
+            && value.getValue().toString().startsWith(DATE_VALUE_PREFIX)) {
+
+        String dateTimeString = value.getValue().toString().replaceAll(DATE_FILTER_REGEX, "");
+
+        LOGGER.info(Marker.BPA, "Date defined in script task: {}", dateTimeString);
+
+        Instant instant = Instant.parse(dateTimeString);
+        return new DateValueImpl(Date.from(instant), value.isTransient());
+
+    }
+    return value;
+  }
 
   public TypedValue setValue(TypedValue value) {
+    // get DateValueImpl, if Date value is exist in value
+    value = getDateValue(value);
+    
     // determine serializer to use
     serializer = getSerializers().findSerializerForValue(value,
         Context.getProcessEngineConfiguration().getFallbackSerializerFactory());

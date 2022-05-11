@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.impl.form.type;
 
 import java.util.Map;
+import java.util.Optional;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.variable.Variables;
@@ -51,7 +52,16 @@ public class EnumFormType extends SimpleFormFieldType {
   public TypedValue convertValue(TypedValue propertyValue) {
     Object value = propertyValue.getValue();
     if(value == null || String.class.isInstance(value)) {
-      validateValue(value);
+      try {
+      	validateValue(value);
+      } catch (ProcessEngineException e) {
+            try {
+               String key = validateMapAndReturnKeyIfValueProvided(String.valueOf(value));
+               return Variables.stringValue(key, propertyValue.isTransient());
+            } catch (Exception ex) {
+               throw e;
+            }
+         }	
       return Variables.stringValue((String) value, propertyValue.isTransient());
     }
     else {
@@ -70,12 +80,34 @@ public class EnumFormType extends SimpleFormFieldType {
   public Map<String, String> getValues() {
     return values;
   }
+  
+  protected String validateMapAndReturnKeyIfValueProvided(String propertyValue) {
+     // default value is a value of the enumeration
+     // try to retrieve the key
+     if (propertyValue != null && values.containsValue(propertyValue)) {
+        Optional<String> firstOccuranceForValue = values.entrySet().stream()
+                 .filter(entry -> propertyValue.equals(entry.getValue()))
+                 .map(mapper -> mapper.getKey()).findFirst();
+        if (firstOccuranceForValue.isPresent()) {
+           return String.valueOf(firstOccuranceForValue.get());
+        }
+     }
+     throw new ProcessEngineException("Invalid value for enum form property: " + propertyValue);
+  }
 
   //////////////////// deprecated ////////////////////////////////////////
 
   @Override
   public Object convertFormValueToModelValue(Object propertyValue) {
-    validateValue(propertyValue);
+    try {
+      validateValue(propertyValue);
+   } catch (ProcessEngineException e) {
+      try {
+         return validateMapAndReturnKeyIfValueProvided(String.valueOf(propertyValue));
+      } catch (Exception ex) {
+         throw e;
+      }
+   }
     return propertyValue;
   }
 
