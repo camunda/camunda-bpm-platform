@@ -25,7 +25,6 @@ import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +36,7 @@ public class HeaderRule extends ExternalResource {
 
   protected Integer port = null;
   protected HttpURLConnection connection = null;
+  protected boolean followRedirects;
 
   public HeaderRule() {
   }
@@ -51,19 +51,19 @@ public class HeaderRule extends ExternalResource {
     connection = null;
   }
 
-  public URLConnection performRequest() {
+  public HttpURLConnection performRequest() {
     return performRequest(WEBAPP_URL.replace(PORT_PLACEHOLDER_WEBAPP_URL, String.valueOf(port)), null, null, null);
   }
 
-  public URLConnection performRequest(String url) {
+  public HttpURLConnection performRequest(String url) {
     return performRequest(url, null, null, null);
   }
 
-  public URLConnection performPostRequest(String url, String headerName, String headerValue) {
+  public HttpURLConnection performPostRequest(String url, String headerName, String headerValue) {
     return performRequest(url, "POST", headerName, headerValue);
   }
 
-  public URLConnection performRequest(String url, String method, String headerName, String headerValue) {
+  public HttpURLConnection performRequest(String url, String method, String headerName, String headerValue) {
     try {
       connection =
         (HttpURLConnection) new URL(url)
@@ -72,7 +72,7 @@ public class HeaderRule extends ExternalResource {
       throw new RuntimeException(e);
     }
 
-    connection.setInstanceFollowRedirects(false);
+    connection.setInstanceFollowRedirects(followRedirects);
 
     if ("POST".equals(method)) {
       try {
@@ -92,6 +92,10 @@ public class HeaderRule extends ExternalResource {
       throw new RuntimeException(e);
     }
 
+    if(followRedirects) {
+      // trigger resolving the redirects
+      connection.getHeaderField("Location");
+    }
     return connection;
   }
 
@@ -122,7 +126,7 @@ public class HeaderRule extends ExternalResource {
   public String getXsrfCookieValue() {
     return getCookieValue("XSRF-TOKEN");
   }
-  
+
   public String getSessionCookieValue() {
     return getCookieValue("JSESSIONID");
   }
@@ -154,15 +158,15 @@ public class HeaderRule extends ExternalResource {
   public String getSessionCookieRegex(String sameSite) {
     return getSessionCookieRegex(null, null, sameSite, false);
   }
-  
+
   public String getSessionCookieRegex(String cookieName, String sameSite) {
     return getSessionCookieRegex(null, cookieName, sameSite, false);
   }
-  
+
   public String getSessionCookieRegex(String sameSite, boolean secure) {
     return getSessionCookieRegex(null, null, sameSite, secure);
   }
-  
+
   public String getSessionCookieRegex(String path, String cookieNameInput, String sameSite, boolean secure) {
     String cookieName = StringUtils.isBlank(cookieNameInput) ? "JSESSIONID" : cookieNameInput;
     StringBuilder regex = new StringBuilder(cookieName + "=.*;\\W*Path=/");
@@ -177,5 +181,10 @@ public class HeaderRule extends ExternalResource {
       regex.append(";\\W*Secure");
     }
     return regex.toString();
+  }
+
+  public HeaderRule followRedirects(boolean followRedirects) {
+    this.followRedirects = followRedirects;
+    return this;
   }
 }
