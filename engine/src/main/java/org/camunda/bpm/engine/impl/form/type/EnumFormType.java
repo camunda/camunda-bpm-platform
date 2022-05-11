@@ -1,22 +1,20 @@
 /*
- * Copyright Camunda Services GmbH and/or licensed to Camunda Services GmbH
- * under one or more contributor license agreements. See the NOTICE file
- * distributed with this work for additional information regarding copyright
- * ownership. Camunda licenses this file to you under the Apache License,
- * Version 2.0; you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *                 IFS Research & Development
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *  This program is protected by copyright law and by international
+ *  conventions. All licensing, renting, lending or copying (including
+ *  for private use), and all other use of the program, which is not
+ *  expressively permitted by IFS Research & Development (IFS), is a
+ *  violation of the rights of IFS. Such violations will be reported to the
+ *  appropriate authorities.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  VIOLATIONS OF ANY COPYRIGHT IS PUNISHABLE BY LAW AND CAN LEAD
+ *  TO UP TO TWO YEARS OF IMPRISONMENT AND LIABILITY TO PAY DAMAGES.
  */
 package org.camunda.bpm.engine.impl.form.type;
 
 import java.util.Map;
+import java.util.Optional;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.variable.Variables;
@@ -24,7 +22,7 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
 
 
 /**
- * @author Tom Baeyens
+ * @author IFS RnD
  */
 public class EnumFormType extends SimpleFormFieldType {
 
@@ -48,16 +46,24 @@ public class EnumFormType extends SimpleFormFieldType {
     return null;
   }
 
-  public TypedValue convertValue(TypedValue propertyValue) {
-    Object value = propertyValue.getValue();
-    if(value == null || String.class.isInstance(value)) {
-      validateValue(value);
-      return Variables.stringValue((String) value, propertyValue.isTransient());
-    }
-    else {
-      throw new ProcessEngineException("Value '"+value+"' is not of type String.");
-    }
-  }
+   public TypedValue convertValue(TypedValue propertyValue) {
+      Object value = propertyValue.getValue();
+      if (value == null || String.class.isInstance(value)) {
+         try {
+            validateValue(value);
+         } catch (ProcessEngineException e) {
+            try {
+               String key = validateMapAndReturnKeyIfValueProvided(String.valueOf(value));
+               return Variables.stringValue(key, propertyValue.isTransient());
+            } catch (Exception ex) {
+               throw e;
+            }
+         }
+         return Variables.stringValue((String) value, propertyValue.isTransient());
+      } else {
+         throw new ProcessEngineException("Value '" + value + "' is not of type String.");
+      }
+   }
 
   protected void validateValue(Object value) {
     if(value != null) {
@@ -70,12 +76,34 @@ public class EnumFormType extends SimpleFormFieldType {
   public Map<String, String> getValues() {
     return values;
   }
+  
+  protected String validateMapAndReturnKeyIfValueProvided(String propertyValue) {
+     // default value is a value of the enumeration
+     // try to retrieve the key
+     if (propertyValue != null && values.containsValue(propertyValue)) {
+        Optional<String> firstOccuranceForValue = values.entrySet().stream()
+                 .filter(entry -> propertyValue.equals(entry.getValue()))
+                 .map(mapper -> mapper.getKey()).findFirst();
+        if (firstOccuranceForValue.isPresent()) {
+           return String.valueOf(firstOccuranceForValue.get());
+        }
+     }
+     throw new ProcessEngineException("Invalid value for enum form property: " + propertyValue);
+  }
 
   //////////////////// deprecated ////////////////////////////////////////
 
   @Override
   public Object convertFormValueToModelValue(Object propertyValue) {
-    validateValue(propertyValue);
+    try {
+      validateValue(propertyValue);
+   } catch (ProcessEngineException e) {
+      try {
+         return validateMapAndReturnKeyIfValueProvided(String.valueOf(propertyValue));
+      } catch (Exception ex) {
+         throw e;
+      }
+   }
     return propertyValue;
   }
 
