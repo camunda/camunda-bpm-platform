@@ -19,8 +19,9 @@ package org.camunda.bpm.webapp.impl.security.filter.headersec.provider.impl;
 import org.camunda.bpm.webapp.impl.security.filter.headersec.provider.HeaderSecurityProvider;
 
 import javax.servlet.ServletContext;
+import java.util.Base64;
 import java.util.Map;
-import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class ContentSecurityPolicyProvider extends HeaderSecurityProvider {
 
@@ -41,6 +42,7 @@ public class ContentSecurityPolicyProvider extends HeaderSecurityProvider {
   public static final String DISABLED_PARAM = "contentSecurityPolicyDisabled";
   public static final String VALUE_PARAM = "contentSecurityPolicyValue";
   public static final String ATTR_CSP_FILTER_NONCE = "org.camunda.bpm.csp.nonce";
+  public static final Base64.Encoder ENCODER = Base64.getUrlEncoder().withoutPadding();
 
   @Override
   public Map<String, String> initParams() {
@@ -86,8 +88,14 @@ public class ContentSecurityPolicyProvider extends HeaderSecurityProvider {
 
   @Override
   public String getHeaderValue(final ServletContext servletContext) {
-    final String nonce = UUID.randomUUID().toString().replaceAll("-", "");
+    final String nonce = generateNonce();
     servletContext.setAttribute(ATTR_CSP_FILTER_NONCE, nonce);
     return value.replaceAll("\\" + HEADER_NONCE_PLACEHOLDER, String.format("'nonce-%s'", nonce));
+  }
+
+  protected String generateNonce() {
+    final byte[] bytes = new byte[20];
+    ThreadLocalRandom.current().nextBytes(bytes);
+    return ENCODER.encodeToString(bytes);
   }
 }

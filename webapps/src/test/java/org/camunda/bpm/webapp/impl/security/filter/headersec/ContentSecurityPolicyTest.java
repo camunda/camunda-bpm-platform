@@ -39,7 +39,7 @@ public class ContentSecurityPolicyTest {
     headerRule.performRequest();
 
     // then
-    String expectedHeaderPattern = HEADER_DEFAULT_VALUE.replace(HEADER_NONCE_PLACEHOLDER, "'nonce-([a-zA-Z\\d]*)'");
+    String expectedHeaderPattern = HEADER_DEFAULT_VALUE.replace(HEADER_NONCE_PLACEHOLDER, "'nonce-([-_a-zA-Z\\d]*)'");
     assertThat(headerRule.getHeader(HEADER_NAME)).matches(expectedHeaderPattern);
   }
 
