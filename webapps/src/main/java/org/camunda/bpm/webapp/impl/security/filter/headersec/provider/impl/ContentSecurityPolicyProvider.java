@@ -36,7 +36,7 @@ public class ContentSecurityPolicyProvider extends HeaderSecurityProvider {
     + "form-action 'self';"
     + "frame-ancestors 'none';"
     + "object-src 'none';"
-    + "sandbox allow-forms allow-scripts allow-same-origin allow-popups";
+    + "sandbox allow-forms allow-scripts allow-same-origin allow-popups allow-downloads";
 
   public static final String DISABLED_PARAM = "contentSecurityPolicyDisabled";
   public static final String VALUE_PARAM = "contentSecurityPolicyValue";
