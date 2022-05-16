@@ -44,21 +44,8 @@ public class ContentSecurityPolicyTest {
     headerRule.performRequest();
 
     // then
-    final String[] actualCSPHeader = headerRule.getHeader(HEADER_NAME).split("[ ;]");
-    final String[] expectedCSPHeader = HEADER_DEFAULT_VALUE.split("[ ;]");
-    assertThat(actualCSPHeader.length).isEqualTo(expectedCSPHeader.length);
-    for (int i = 0; i < actualCSPHeader.length; i++) {
-      final String expected = expectedCSPHeader[i];
-      final String actual = actualCSPHeader[i];
-
-      if (expected.equals(HEADER_NONCE_PLACEHOLDER)) {
-        final Matcher matcher = NONCE_PATTERN.matcher(actual);
-        assertThat(matcher.matches()).isTrue();
-        assertThat(matcher.group(1).length()).isGreaterThanOrEqualTo(8);
-      } else {
-        assertThat(actual).isEqualTo(expected);
-      }
-    }
+    String expectedHeaderPattern = HEADER_DEFAULT_VALUE.replace("$NONCE", "'nonce-([a-zA-Z\\d]*) '");
+    assertThat(headerRule.getHeader(HEADER_NAME)).matches(expectedHeaderPattern);
   }
 
   @Test
