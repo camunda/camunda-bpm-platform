@@ -20,17 +20,12 @@ import org.camunda.bpm.webapp.impl.util.HeaderRule;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.webapp.impl.security.filter.headersec.provider.impl.ContentSecurityPolicyProvider.HEADER_DEFAULT_VALUE;
 import static org.camunda.bpm.webapp.impl.security.filter.headersec.provider.impl.ContentSecurityPolicyProvider.HEADER_NAME;
 import static org.camunda.bpm.webapp.impl.security.filter.headersec.provider.impl.ContentSecurityPolicyProvider.HEADER_NONCE_PLACEHOLDER;
 
 public class ContentSecurityPolicyTest {
-
-  public static final Pattern NONCE_PATTERN = Pattern.compile("'nonce-([a-zA-Z\\d]*)'");
 
   @Rule
   public HeaderRule headerRule = new HeaderRule();
@@ -44,7 +39,7 @@ public class ContentSecurityPolicyTest {
     headerRule.performRequest();
 
     // then
-    String expectedHeaderPattern = HEADER_DEFAULT_VALUE.replace("$NONCE", "'nonce-([a-zA-Z\\d]*) '");
+    String expectedHeaderPattern = HEADER_DEFAULT_VALUE.replace(HEADER_NONCE_PLACEHOLDER, "'nonce-([a-zA-Z\\d]*)'");
     assertThat(headerRule.getHeader(HEADER_NAME)).matches(expectedHeaderPattern);
   }
 

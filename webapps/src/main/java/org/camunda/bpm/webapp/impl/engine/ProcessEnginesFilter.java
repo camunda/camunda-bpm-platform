@@ -300,7 +300,7 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
                .replace(PLUGIN_PACKAGES_PLACEHOLDER, createPluginPackagesStr(appName,
                  applicationPath, contextPath))
                .replace(PLUGIN_DEPENDENCIES_PLACEHOLDER, createPluginDependenciesStr(appName))
-               .replace(CSP_NONCE_PLACEHOLDER, cspNonce);
+               .replace(CSP_NONCE_PLACEHOLDER, cspNonce == null ? "" : String.format("nonce=\"%s\"", cspNonce));
   }
 
   protected <T extends AppPlugin> CharSequence createPluginPackagesStr(String appName,
