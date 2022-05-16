@@ -11,20 +11,6 @@ camunda.bpm:
       same-site-cookie-option: STRICT
     header-security:
       hsts-disabled: false
-      content-security-policy-value: base-uri 'self';
-        script-src $NONCE 'strict-dynamic' 'unsafe-eval' https: 'self' 'unsafe-inline';
-        style-src 'unsafe-inline' 'self';
-        default-src 'self';
-        img-src 'self' data:;
-        block-all-mixed-content;
-        form-action 'self';
-        frame-ancestors 'none';
-        object-src 'none';
-        sandbox
-          allow-forms
-          allow-scripts
-          allow-same-origin
-          allow-popups
 
 # https://docs.camunda.org/manual/latest/user-guide/security/#authorization
 # https://docs.camunda.org/manual/latest/user-guide/process-engine/authorization-service/
