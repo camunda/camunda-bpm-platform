@@ -18,10 +18,6 @@ package org.camunda.bpm.engine.impl.el;
 
 /**
  * <p>
- * Original ExpressionManager class is renamed to {@link JuelExpressionManager}
- * to make el pluggable.
- * </p>
- * <p>
  * Central manager for all expressions.
  * </p>
  * <p>
