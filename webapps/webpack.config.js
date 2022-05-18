@@ -220,8 +220,21 @@ module.exports = (_env, argv = {}) => {
           multiple: [
             {search: /\$APP_ROOT/g, replace: '/camunda'},
             {search: /\$BASE/g, replace: '/camunda/app/tasklist/'},
-            {search: /\$PLUGIN_DEPENDENCIES/g, replace: '[]'},
-            {search: /\$PLUGIN_PACKAGES/g, replace: '[]'}
+            {
+              search: /\$PLUGIN_DEPENDENCIES/g, replace: `
+                [{
+                  ngModuleName: 'tasklist.plugin.tasklistPlugins',
+                  requirePackageName: 'tasklist-plugin-tasklistPlugins'
+                }]`
+            },
+            {
+              search: /\$PLUGIN_PACKAGES/g, replace: `
+                [{
+                  name: 'tasklist-plugin-tasklistPlugins',
+                  location: '/camunda/app/tasklist/',
+                  main: 'tasklistPlugins.js'
+                }]`
+            }
           ]
         }
       },

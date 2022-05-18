@@ -79,27 +79,13 @@
     <footer cam-widget-footer
             version="v$VERSION"></footer>
 
-    <script type="application/javascript" $CSP_NONCE>
+    <script type="text/javascript" $CSP_NONCE>
       window.PLUGIN_DEPENDENCIES = $PLUGIN_DEPENDENCIES || [];
       window.PLUGIN_PACKAGES = $PLUGIN_PACKAGES || [];
 
       window.require = {
-          waitSeconds: 0
+        waitSeconds: 0
       };
-
-window.__define = window.define;
-window.__require = window.require;
-window.define = undefined;
-window.require = undefined;
-window.bust = '$GRUNT_CACHE_BUST';
-
-requirejs.config({
-  baseUrl: '$APP_ROOT/app/welcome',
-  urlArgs: 'bust=$GRUNT_CACHE_BUST'
-});
-requirejs(['$APP_ROOT/lib/deps.js'], function () {
-  requirejs(['$APP_ROOT/app/welcome/camunda-welcome-bootstrap.js'], function(){});
-});
     </script>
   </body>
 </html>

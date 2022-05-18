@@ -17,6 +17,8 @@
 
 'use strict';
 
+import '../styles/styles.less';
+
 // DOM Polyfills
 require('dom4');
 
