@@ -108,7 +108,9 @@ let entry = {
   ]
 };
 
-let optimization = {};
+let optimization = {
+  runtimeChunk: 'single',
+};
 
 let rules = [
   {
@@ -266,9 +268,15 @@ module.exports = (_env, argv = {}) => {
       minimize: true,
       minimizer: [
         new TerserPlugin({
-          extractComments: /license/i,
+          terserOptions: {
+            format: {
+              comments: /license/i,
+            },
+          },
+          extractComments: false,
         }),
       ],
+      ...optimization
     };
   }
 
