@@ -19,38 +19,45 @@ package org.camunda.bpm.container.impl.threading.ra.outbound;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
+import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor.JobExecutorThreadMetrics;
 
 
 /**
- * 
+ *
  * @author Daniel Meyer
- * 
+ *
  */
 public class JcaExecutorServiceConnectionImpl implements JcaExecutorServiceConnection {
 
   protected JcaExecutorServiceManagedConnection mc;
   protected JcaExecutorServiceManagedConnectionFactory mcf;
-  
+
   public JcaExecutorServiceConnectionImpl() {
   }
-  
+
   public JcaExecutorServiceConnectionImpl(JcaExecutorServiceManagedConnection mc, JcaExecutorServiceManagedConnectionFactory mcf) {
     this.mc = mc;
     this.mcf = mcf;
   }
 
+  @Override
   public void closeConnection() {
     mc.closeHandle(this);
   }
 
+  @Override
   public boolean schedule(Runnable runnable, boolean isLongRunning) {
     return mc.schedule(runnable, isLongRunning);
   }
 
+  @Override
   public Runnable getExecuteJobsRunnable(List<String> jobIds, ProcessEngineImpl processEngine) {
     return mc.getExecuteJobsRunnable(jobIds, processEngine);
   }
- 
 
+  @Override
+  public JobExecutorThreadMetrics getThreadMetrics() {
+    return mc.getThreadMetrics();
+  }
 
 }

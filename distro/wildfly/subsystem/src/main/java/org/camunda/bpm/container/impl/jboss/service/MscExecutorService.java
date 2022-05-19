@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import org.camunda.bpm.container.ExecutorService;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.ExecuteJobsRunnable;
+import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor.JobExecutorThreadMetrics;
 import org.jboss.as.threads.ManagedQueueExecutorService;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
@@ -37,35 +38,40 @@ import org.jboss.threads.ExecutionTimedOutException;
 public class MscExecutorService implements Service<MscExecutorService>, ExecutorService {
 
   private static Logger log = Logger.getLogger(MscExecutorService.class.getName());
-  
+
   private final InjectedValue<ManagedQueueExecutorService> managedQueueInjector = new InjectedValue<ManagedQueueExecutorService>();
-  
+
   private long lastWarningLogged = System.currentTimeMillis();
 
+  @Override
   public MscExecutorService getValue() throws IllegalStateException, IllegalArgumentException {
     return this;
   }
 
+  @Override
   public void start(StartContext context) throws StartException {
     // nothing to do
   }
 
+  @Override
   public void stop(StopContext context) {
-    // nothing to do    
+    // nothing to do
   }
-  
+
+  @Override
   public Runnable getExecuteJobsRunnable(List<String> jobIds, ProcessEngineImpl processEngine) {
     return new ExecuteJobsRunnable(jobIds, processEngine);
   }
-  
+
+  @Override
   public boolean schedule(Runnable runnable, boolean isLongRunning) {
-    
+
     if(isLongRunning) {
       return scheduleLongRunningWork(runnable);
-      
-    } else {      
+
+    } else {
       return scheduleShortRunningWork(runnable);
-      
+
     }
 
   }
@@ -73,34 +79,34 @@ public class MscExecutorService implements Service<MscExecutorService>, Executor
   protected boolean scheduleShortRunningWork(Runnable runnable) {
 
     ManagedQueueExecutorService managedQueueExecutorService = managedQueueInjector.getValue();
-    
+
     try {
-      
+
       managedQueueExecutorService.executeBlocking(runnable);
       return true;
-      
+
     } catch (InterruptedException e) {
-      // the the acquisition thread is interrupted, this probably means the app server is turning the lights off -> ignore          
-    } catch (Exception e) {      
+      // the the acquisition thread is interrupted, this probably means the app server is turning the lights off -> ignore
+    } catch (Exception e) {
       // we must be able to schedule this
       log.log(Level.WARNING,  "Cannot schedule long running work.", e);
     }
-    
+
     return false;
   }
 
   protected boolean scheduleLongRunningWork(Runnable runnable) {
-    
+
     final ManagedQueueExecutorService managedQueueExecutorService = managedQueueInjector.getValue();
 
     boolean rejected = false;
     try {
-      
+
       // wait for 2 seconds for the job to be accepted by the pool.
       managedQueueExecutorService.executeBlocking(runnable, 2, TimeUnit.SECONDS);
-      
+
     } catch (InterruptedException e) {
-      // the acquisition thread is interrupted, this probably means the app server is turning the lights off -> ignore          
+      // the acquisition thread is interrupted, this probably means the app server is turning the lights off -> ignore
     } catch (ExecutionTimedOutException e) {
       rejected = true;
     } catch (RejectedExecutionException e) {
@@ -115,13 +121,25 @@ public class MscExecutorService implements Service<MscExecutorService>, Executor
         log.log(Level.FINE, "Unexpected Exception while submitting job to executor pool.", e);
       }
     }
-    
+
     return !rejected;
-    
+
   }
 
   public InjectedValue<ManagedQueueExecutorService> getManagedQueueInjector() {
     return managedQueueInjector;
   }
-    
+
+  @Override
+  public JobExecutorThreadMetrics getThreadMetrics() {
+    JobExecutorThreadMetrics metrics = new JobExecutorThreadMetrics();
+    ManagedQueueExecutorService executor = managedQueueInjector.getOptionalValue();
+    if (executor != null) {
+      metrics.setQueueSize(executor.getQueueSize());
+      metrics.setThreadsActive(executor.getCurrentThreadCount());
+      metrics.setThreadsIdle(executor.getMaxThreads() - executor.getCurrentThreadCount());
+    }
+    return metrics;
+  }
+
 }

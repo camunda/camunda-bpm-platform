@@ -28,11 +28,18 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
+
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.impl.metrics.CounterMetricSampleFamily;
+import org.camunda.bpm.engine.impl.metrics.GaugeMetricSampleFamily;
+import org.camunda.bpm.engine.impl.metrics.MetricSampleFamily;
 import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.management.MetricsQuery;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
@@ -50,6 +57,7 @@ public class MetricsRestServiceInteractionTest extends AbstractRestServiceTest {
   public static TestContainerRule rule = new TestContainerRule();
 
   public static final String METRICS_URL = TEST_RESOURCE_ROOT_PATH + MetricsRestService.PATH;
+  public static final String PROMETHEUS_URL = METRICS_URL + "/prometheus";
   public static final String DELETE_UTW_URL = METRICS_URL + "/task-worker";
   public static final String SINGLE_METER_URL = METRICS_URL + "/{name}";
   public static final String SUM_URL = SINGLE_METER_URL + "/sum";
@@ -421,6 +429,37 @@ public class MetricsRestServiceInteractionTest extends AbstractRestServiceTest {
       .body("message", equalTo(message))
     .when()
       .delete(DELETE_UTW_URL);
+  }
+
+  @Test
+  public void shouldReturnPrometheusCounter() {
+    // given
+    List<MetricSampleFamily> testMetrics = new ArrayList<>();
+
+    CounterMetricSampleFamily testCounterSamples = new CounterMetricSampleFamily("testCounter", null);
+    testCounterSamples.addValue(null, 10);
+
+    GaugeMetricSampleFamily testGaugeSamples = new GaugeMetricSampleFamily("testGauge", Collections.singletonList("key"));
+    testGaugeSamples.addValue(Collections.singletonList("ABC"), 55);
+    testGaugeSamples.addValue(Collections.singletonList("DEF"), 22);
+
+    testMetrics.add(testCounterSamples);
+    testMetrics.add(testGaugeSamples);
+
+    when(managementServiceMock.getMetrics()).thenReturn(testMetrics);
+
+    given()
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body(containsString("# HELP testCounter_total"))
+      .body(containsString("# TYPE testCounter_total counter"))
+      .body(containsString("testCounter_total 10.0"))
+      .body(containsString("# HELP testGauge"))
+      .body(containsString("# TYPE testGauge gauge"))
+      .body(containsString("testGauge{key=\"ABC\",} 55.0"))
+      .body(containsString("testGauge{key=\"DEF\",} 22.0"))
+     .when()
+      .get(PROMETHEUS_URL);
   }
 
 }

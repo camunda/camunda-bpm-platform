@@ -16,6 +16,9 @@
  */
 package org.camunda.bpm.engine.management;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * @author Daniel Meyer
  *
@@ -55,6 +58,16 @@ public class Metrics {
    * and created in the context of job execution
    */
   public static final String JOB_LOCKED_EXCLUSIVE = "job-locked-exclusive";
+
+  public static final String JOB_EXECUTOR_THREADS_ACTIVE = "jobExecutorThreadsActive";
+  public static final String JOB_EXECUTOR_THREADS_BLOCKED = "jobExecutorThreadsBlocked";
+  public static final String JOB_EXECUTOR_THREADS_IDLE = "jobExecutorThreadsIdle";
+  public static final String JOB_EXECUTOR_THREADS_QUEUE = "jobExecutorThreadsQueueSize";
+  public static final List<String> JOB_EXECUTOR_THREADS_METRICS = Arrays.asList(
+      JOB_EXECUTOR_THREADS_ACTIVE,
+      JOB_EXECUTOR_THREADS_BLOCKED,
+      JOB_EXECUTOR_THREADS_IDLE,
+      JOB_EXECUTOR_THREADS_QUEUE);
 
   /**
    * Number of executed Root Process Instance executions.

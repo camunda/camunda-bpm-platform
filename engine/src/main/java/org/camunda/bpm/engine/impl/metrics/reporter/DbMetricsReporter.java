@@ -112,6 +112,10 @@ public class DbMetricsReporter {
     }
   }
 
+  public String getReporterId() {
+    return reporterId;
+  }
+
   protected class ReportDbMetricsValueCmd implements Command<Void> {
 
     protected String name;

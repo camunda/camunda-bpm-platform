@@ -21,14 +21,23 @@ import org.camunda.bpm.engine.rest.sub.metrics.MetricsResource;
 import org.camunda.bpm.engine.rest.sub.metrics.MetricsResourceImpl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.prometheus.client.Collector;
+import io.prometheus.client.CollectorRegistry;
+import io.prometheus.client.exporter.common.TextFormat;
+
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.management.MetricsQuery;
 import org.camunda.bpm.engine.rest.dto.metrics.MetricsIntervalResultDto;
+import org.camunda.bpm.engine.rest.impl.metrics.DefaultPrometheusMetricsCollector;
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.management.MetricIntervalValue;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.converter.IntegerConverter;
@@ -51,11 +60,16 @@ public class MetricsRestServiceImpl extends AbstractRestProcessEngineAware imple
   public static final String QUERY_PARAM_AGG_BY_REPORTER = "aggregateByReporter";
 
   protected final DateConverter dateConverter;
+  protected final Collector prometheusCollector;
+  protected final CollectorRegistry prometheusCollectorRegistry;
 
   public MetricsRestServiceImpl(String engineName, ObjectMapper objectMapper) {
     super(engineName, objectMapper);
     dateConverter = new DateConverter();
     dateConverter.setObjectMapper(objectMapper);
+    prometheusCollector = new DefaultPrometheusMetricsCollector(getProcessEngine());
+    prometheusCollectorRegistry = new CollectorRegistry();
+    prometheusCollectorRegistry.register(prometheusCollector);
   }
 
   @Override
@@ -98,6 +112,18 @@ public class MetricsRestServiceImpl extends AbstractRestProcessEngineAware imple
 
     // return no content (204) since resource is deleted
     return Response.noContent().build();
+  }
+
+  @Override
+  public Response getPrometheusMetrics() {
+    StringWriter writer = new StringWriter();
+    try {
+      // TODO we could use the generic #writeFormat method that inspects the content type first
+      TextFormat.write004(writer, prometheusCollectorRegistry.metricFamilySamples());
+      return Response.ok(writer.toString()).build();
+    } catch (Exception e) {
+      throw new BadUserRequestException("Meh", e);
+    }
   }
 
   protected void applyQueryParams(MetricsQuery query, MultivaluedMap<String, String> queryParameters) {

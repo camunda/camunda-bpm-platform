@@ -30,36 +30,38 @@ import javax.resource.spi.work.WorkRejectedException;
 import org.camunda.bpm.container.ExecutorService;
 import org.camunda.bpm.container.impl.threading.ra.inflow.JcaInflowExecuteJobsRunnable;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
+import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor.JobExecutorThreadMetrics;
 
 
 
 /**
  * {@link AbstractPlatformJobExecutor} implementation delegating to a JCA {@link WorkManager}.
- * 
+ *
  * @author Daniel Meyer
- * 
+ *
  */
 public class JcaWorkManagerExecutorService implements Referenceable, ExecutorService {
-  
+
   public static int START_WORK_TIMEOUT = 1500;
 
   private static Logger logger = Logger.getLogger(JcaWorkManagerExecutorService.class.getName());
-  
+
   protected final JcaExecutorServiceConnector ra;
   protected WorkManager workManager;
-  
+
   public JcaWorkManagerExecutorService(JcaExecutorServiceConnector connector, WorkManager workManager) {
     this.workManager = workManager;
     this.ra = connector;
   }
-  
+
+  @Override
   public boolean schedule(Runnable runnable, boolean isLongRunning) {
     if(isLongRunning) {
       return scheduleLongRunning(runnable);
-      
+
     } else {
       return executeShortRunning(runnable);
-      
+
     }
   }
 
@@ -67,48 +69,56 @@ public class JcaWorkManagerExecutorService implements Referenceable, ExecutorSer
     try {
       workManager.scheduleWork(new JcaWorkRunnableAdapter(runnable));
       return true;
-      
+
     } catch (WorkException e) {
       logger.log(Level.WARNING, "Could not schedule : "+e.getMessage(), e);
       return false;
-      
+
     }
   }
-  
+
   protected boolean executeShortRunning(Runnable runnable) {
-   
-    try {      
+
+    try {
       workManager.startWork(new JcaWorkRunnableAdapter(runnable), START_WORK_TIMEOUT, null, null);
       return true;
-      
+
     } catch (WorkRejectedException e) {
-      logger.log(Level.FINE, "WorkRejectedException while scheduling jobs for execution", e);      
-      
+      logger.log(Level.FINE, "WorkRejectedException while scheduling jobs for execution", e);
+
     } catch (WorkException e) {
       logger.log(Level.WARNING, "WorkException while scheduling jobs for execution", e);
     }
-    
+
     return false;
   }
-  
+
+  @Override
   public Runnable getExecuteJobsRunnable(List<String> jobIds, ProcessEngineImpl processEngine) {
     return new JcaInflowExecuteJobsRunnable(jobIds, processEngine, ra);
   }
-    
+
+  @Override
+  public JobExecutorThreadMetrics getThreadMetrics() {
+    return JobExecutorThreadMetrics.EMPTY;
+  }
+
   // javax.resource.Referenceable /////////////////////////
 
   protected Reference reference;
-  
-  public Reference getReference() throws NamingException {    
+
+  @Override
+  public Reference getReference() throws NamingException {
     return reference;
   }
 
+  @Override
   public void setReference(Reference reference) {
-    this.reference = reference;        
+    this.reference = reference;
   }
-  
+
   // getters / setters ////////////////////////////////////
-  
+
   public WorkManager getWorkManager() {
     return workManager;
   }

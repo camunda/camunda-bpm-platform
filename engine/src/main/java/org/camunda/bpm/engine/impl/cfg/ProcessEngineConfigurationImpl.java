@@ -35,6 +35,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -71,6 +72,7 @@ import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.MetricsCollector;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -246,6 +248,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupBatc
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHelper;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupJobHandler;
+import org.camunda.bpm.engine.impl.metrics.DefaultMetricsCollector;
 import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
 import org.camunda.bpm.engine.impl.metrics.MetricsReporterIdProvider;
 import org.camunda.bpm.engine.impl.metrics.parser.MetricsBpmnParseListener;
@@ -822,6 +825,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected MetricsReporterIdProvider metricsReporterIdProvider;
 
   protected boolean isTaskMetricsEnabled = true;
+
+  protected MetricsCollector metricsCollector;
+  protected List<String> exportedMetrics;
 
   /**
    * the historic job log host name
@@ -2400,6 +2406,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       if (dbMetricsReporter == null) {
         dbMetricsReporter = new DbMetricsReporter(metricsRegistry, commandExecutorTxRequired);
       }
+
+      if (metricsCollector == null) {
+        metricsCollector = new DefaultMetricsCollector(this);
+      }
     }
   }
 
@@ -2428,6 +2438,25 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     metricsRegistry.createMeter(Metrics.EXECUTED_DECISION_INSTANCES);
     metricsRegistry.createMeter(Metrics.EXECUTED_DECISION_ELEMENTS);
+
+    if (exportedMetrics == null) {
+      exportedMetrics = Arrays.asList(Metrics.ACTIVTY_INSTANCE_START,
+          Metrics.ACTIVTY_INSTANCE_END,
+          Metrics.JOB_ACQUISITION_ATTEMPT,
+          Metrics.JOB_ACQUIRED_SUCCESS,
+          Metrics.JOB_ACQUIRED_FAILURE,
+          Metrics.JOB_SUCCESSFUL,
+          Metrics.JOB_FAILED,
+          Metrics.JOB_LOCKED_EXCLUSIVE,
+          Metrics.JOB_EXECUTION_REJECTED,
+          Metrics.ROOT_PROCESS_INSTANCE_START,
+          Metrics.EXECUTED_DECISION_INSTANCES,
+          Metrics.EXECUTED_DECISION_ELEMENTS,
+          Metrics.JOB_EXECUTOR_THREADS_ACTIVE,
+          Metrics.JOB_EXECUTOR_THREADS_BLOCKED,
+          Metrics.JOB_EXECUTOR_THREADS_IDLE,
+          Metrics.JOB_EXECUTOR_THREADS_QUEUE);
+    }
   }
 
   protected void initSerialization() {
@@ -4332,6 +4361,24 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfigurationImpl setDbMetricsReporterActivate(boolean isDbMetricsReporterEnabled) {
     this.isDbMetricsReporterActivate = isDbMetricsReporterEnabled;
+    return this;
+  }
+
+  public MetricsCollector getMetricsCollector() {
+    return metricsCollector;
+  }
+
+  public ProcessEngineConfigurationImpl setMetricsCollector(MetricsCollector metricsCollector) {
+    this.metricsCollector = metricsCollector;
+    return this;
+  }
+
+  public List<String> getExportedMetrics() {
+    return exportedMetrics;
+  }
+
+  public ProcessEngineConfigurationImpl setExportedMetrics(List<String> exportedMetrics) {
+    this.exportedMetrics = exportedMetrics;
     return this;
   }
 

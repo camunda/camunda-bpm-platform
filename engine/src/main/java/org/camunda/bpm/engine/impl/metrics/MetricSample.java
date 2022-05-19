@@ -14,25 +14,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.container.impl.threading.ra.outbound;
+package org.camunda.bpm.engine.impl.metrics;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.ProcessEngineImpl;
-import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor.JobExecutorThreadMetrics;
-
 /**
- *
- * @author Daniel Meyer
- *
+ * Sample of metric values
  */
-public interface JcaExecutorServiceConnection {
+public class MetricSample {
 
-  boolean schedule(Runnable runnable, boolean isLongRunning);
+  public final String name;
+  public final List<String> labelNames;
+  public final List<String> labelValues;  // Must have same length as labelNames.
+  public double value;
 
-  Runnable getExecuteJobsRunnable(List<String> jobIds, ProcessEngineImpl processEngine);
+  public MetricSample(String name, List<String> labelNames, List<String> labelValues, double value) {
+    this.name = name;
+    this.labelNames = labelNames;
+    this.labelValues = labelValues;
+    this.value = value;
+  }
 
-  void closeConnection();
+  public String getName() {
+    return name;
+  }
 
-  JobExecutorThreadMetrics getThreadMetrics();
+  public List<String> getLabelNames() {
+    return labelNames;
+  }
+
+  public List<String> getLabelValues() {
+    return labelValues;
+  }
+
+  public double getValue() {
+    return value;
+  }
+
+  public void setValue(double value) {
+    this.value = value;
+  }
 }

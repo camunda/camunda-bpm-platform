@@ -22,7 +22,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.engine.ManagementService;
@@ -79,6 +78,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.ExecuteJobHelper;
 import org.camunda.bpm.engine.impl.management.PurgeReport;
 import org.camunda.bpm.engine.impl.management.UpdateJobDefinitionSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.management.UpdateJobSuspensionStateBuilderImpl;
+import org.camunda.bpm.engine.impl.metrics.MetricSampleFamily;
 import org.camunda.bpm.engine.impl.metrics.MetricsQueryImpl;
 import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
@@ -113,46 +113,57 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
     this.processEngineConfiguration = processEngineConfiguration;
   }
 
+  @Override
   public ProcessApplicationRegistration registerProcessApplication(String deploymentId, ProcessApplicationReference reference) {
     return commandExecutor.execute(new RegisterProcessApplicationCmd(deploymentId, reference));
   }
 
+  @Override
   public void unregisterProcessApplication(String deploymentId, boolean removeProcessesFromCache) {
     commandExecutor.execute(new UnregisterProcessApplicationCmd(deploymentId, removeProcessesFromCache));
   }
 
+  @Override
   public void unregisterProcessApplication(Set<String> deploymentIds, boolean removeProcessesFromCache) {
     commandExecutor.execute(new UnregisterProcessApplicationCmd(deploymentIds, removeProcessesFromCache));
   }
 
+  @Override
   public String getProcessApplicationForDeployment(String deploymentId) {
     return commandExecutor.execute(new GetProcessApplicationForDeploymentCmd(deploymentId));
   }
 
+  @Override
   public Map<String, Long> getTableCount() {
     return commandExecutor.execute(new GetTableCountCmd());
   }
 
+  @Override
   public String getTableName(Class<?> activitiEntityClass) {
     return commandExecutor.execute(new GetTableNameCmd(activitiEntityClass));
   }
 
+  @Override
   public TableMetaData getTableMetaData(String tableName) {
     return commandExecutor.execute(new GetTableMetaDataCmd(tableName));
   }
 
+  @Override
   public void executeJob(String jobId) {
     ExecuteJobHelper.executeJob(jobId, commandExecutor);
   }
 
+  @Override
   public void deleteJob(String jobId) {
     commandExecutor.execute(new DeleteJobCmd(jobId));
   }
 
+  @Override
   public void setJobRetries(String jobId, int retries) {
     commandExecutor.execute(new SetJobRetriesCmd(jobId, null, retries));
   }
 
+  @Override
   public void setJobRetries(List<String> jobIds, int retries) {
     commandExecutor.execute(new SetJobsRetriesCmd(jobIds, retries));
   }
@@ -186,66 +197,82 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
         historicProcessInstanceQuery, retries));
   }
 
+  @Override
   public void setJobRetriesByJobDefinitionId(String jobDefinitionId, int retries) {
     commandExecutor.execute(new SetJobRetriesCmd(null, jobDefinitionId, retries));
   }
 
+  @Override
   public void setJobDuedate(String jobId, Date newDuedate) {
     setJobDuedate(jobId, newDuedate, false);
   }
 
+  @Override
   public void setJobDuedate(String jobId, Date newDuedate, boolean cascade) {
     commandExecutor.execute(new SetJobDuedateCmd(jobId, newDuedate, cascade));
   }
 
+  @Override
   public void recalculateJobDuedate(String jobId, boolean creationDateBased) {
     commandExecutor.execute(new RecalculateJobDuedateCmd(jobId, creationDateBased));
   }
 
+  @Override
   public void setJobPriority(String jobId, long priority) {
     commandExecutor.execute(new SetJobPriorityCmd(jobId, priority));
   }
 
+  @Override
   public TablePageQuery createTablePageQuery() {
     return new TablePageQueryImpl(commandExecutor);
   }
 
+  @Override
   public JobQuery createJobQuery() {
     return new JobQueryImpl(commandExecutor);
   }
 
+  @Override
   public JobDefinitionQuery createJobDefinitionQuery() {
     return new JobDefinitionQueryImpl(commandExecutor);
   }
 
+  @Override
   public String getJobExceptionStacktrace(String jobId) {
     return commandExecutor.execute(new GetJobExceptionStacktraceCmd(jobId));
   }
 
+  @Override
   public Map<String, String> getProperties() {
     return commandExecutor.execute(new GetPropertiesCmd());
   }
 
+  @Override
   public void setProperty(String name, String value) {
     commandExecutor.execute(new SetPropertyCmd(name, value));
   }
 
+  @Override
   public void deleteProperty(String name) {
     commandExecutor.execute(new DeletePropertyCmd(name));
   }
 
+  @Override
   public void setLicenseKey(String licenseKey) {
     commandExecutor.execute(new SetLicenseKeyCmd(licenseKey));
   }
 
+  @Override
   public String getLicenseKey() {
     return commandExecutor.execute(new GetLicenseKeyCmd());
   }
 
+  @Override
   public void deleteLicenseKey() {
     commandExecutor.execute(new DeleteLicenseKeyCmd(true));
   }
 
+  @Override
   public String databaseSchemaUpgrade(Connection connection, String catalog, String schema) {
     return commandExecutor.execute(new DbSchemaUpgradeCmd(connection, catalog, schema));
   }
@@ -258,37 +285,45 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
   }
 
 
+  @Override
   public ProcessDefinitionStatisticsQuery createProcessDefinitionStatisticsQuery() {
     return new ProcessDefinitionStatisticsQueryImpl(commandExecutor);
   }
 
+  @Override
   public ActivityStatisticsQuery createActivityStatisticsQuery(String processDefinitionId) {
     return new ActivityStatisticsQueryImpl(processDefinitionId, commandExecutor);
   }
 
+  @Override
   public DeploymentStatisticsQuery createDeploymentStatisticsQuery() {
     return new DeploymentStatisticsQueryImpl(commandExecutor);
   }
 
+  @Override
   public Set<String> getRegisteredDeployments() {
     return commandExecutor.execute(new GetRegisteredDeploymentsCmd());
   }
 
+  @Override
   public void registerDeploymentForJobExecutor(final String deploymentId) {
     commandExecutor.execute(new RegisterDeploymentCmd(deploymentId));
   }
 
+  @Override
   public void unregisterDeploymentForJobExecutor(final String deploymentId) {
     commandExecutor.execute(new UnregisterDeploymentCmd(deploymentId));
   }
 
 
+  @Override
   public void activateJobDefinitionById(String jobDefinitionId) {
     updateJobDefinitionSuspensionState()
         .byJobDefinitionId(jobDefinitionId)
         .activate();
   }
 
+  @Override
   public void activateJobDefinitionById(String jobDefinitionId, boolean activateJobs) {
     updateJobDefinitionSuspensionState()
         .byJobDefinitionId(jobDefinitionId)
@@ -296,6 +331,7 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
         .activate();
   }
 
+  @Override
   public void activateJobDefinitionById(String jobDefinitionId, boolean activateJobs, Date activationDate) {
     updateJobDefinitionSuspensionState()
         .byJobDefinitionId(jobDefinitionId)
@@ -304,12 +340,14 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
         .activate();
   }
 
+  @Override
   public void suspendJobDefinitionById(String jobDefinitionId) {
     updateJobDefinitionSuspensionState()
         .byJobDefinitionId(jobDefinitionId)
         .suspend();
   }
 
+  @Override
   public void suspendJobDefinitionById(String jobDefinitionId, boolean suspendJobs) {
     updateJobDefinitionSuspensionState()
         .byJobDefinitionId(jobDefinitionId)
@@ -317,6 +355,7 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
         .suspend();
   }
 
+  @Override
   public void suspendJobDefinitionById(String jobDefinitionId, boolean suspendJobs, Date suspensionDate) {
     updateJobDefinitionSuspensionState()
         .byJobDefinitionId(jobDefinitionId)
@@ -325,12 +364,14 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
         .suspend();
   }
 
+  @Override
   public void activateJobDefinitionByProcessDefinitionId(String processDefinitionId) {
     updateJobDefinitionSuspensionState()
         .byProcessDefinitionId(processDefinitionId)
         .activate();
   }
 
+  @Override
   public void activateJobDefinitionByProcessDefinitionId(String processDefinitionId, boolean activateJobs) {
     updateJobDefinitionSuspensionState()
         .byProcessDefinitionId(processDefinitionId)
@@ -338,6 +379,7 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
         .activate();
   }
 
+  @Override
   public void activateJobDefinitionByProcessDefinitionId(String processDefinitionId, boolean activateJobs, Date activationDate) {
     updateJobDefinitionSuspensionState()
         .byProcessDefinitionId(processDefinitionId)
@@ -346,12 +388,14 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
         .activate();
   }
 
+  @Override
   public void suspendJobDefinitionByProcessDefinitionId(String processDefinitionId) {
     updateJobDefinitionSuspensionState()
         .byProcessDefinitionId(processDefinitionId)
         .suspend();
   }
 
+  @Override
   public void suspendJobDefinitionByProcessDefinitionId(String processDefinitionId, boolean suspendJobs) {
     updateJobDefinitionSuspensionState()
         .byProcessDefinitionId(processDefinitionId)
@@ -359,6 +403,7 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
         .suspend();
   }
 
+  @Override
   public void suspendJobDefinitionByProcessDefinitionId(String processDefinitionId, boolean suspendJobs, Date suspensionDate) {
     updateJobDefinitionSuspensionState()
         .byProcessDefinitionId(processDefinitionId)
@@ -367,12 +412,14 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
         .suspend();
   }
 
+  @Override
   public void activateJobDefinitionByProcessDefinitionKey(String processDefinitionKey) {
     updateJobDefinitionSuspensionState()
         .byProcessDefinitionKey(processDefinitionKey)
         .activate();
   }
 
+  @Override
   public void activateJobDefinitionByProcessDefinitionKey(String processDefinitionKey, boolean activateJobs) {
     updateJobDefinitionSuspensionState()
         .byProcessDefinitionKey(processDefinitionKey)
@@ -380,6 +427,7 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
         .activate();
   }
 
+  @Override
   public void activateJobDefinitionByProcessDefinitionKey(String processDefinitionKey, boolean activateJobs, Date activationDate) {
     updateJobDefinitionSuspensionState()
         .byProcessDefinitionKey(processDefinitionKey)
@@ -388,12 +436,14 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
         .activate();
   }
 
+  @Override
   public void suspendJobDefinitionByProcessDefinitionKey(String processDefinitionKey) {
     updateJobDefinitionSuspensionState()
         .byProcessDefinitionKey(processDefinitionKey)
         .suspend();
   }
 
+  @Override
   public void suspendJobDefinitionByProcessDefinitionKey(String processDefinitionKey, boolean suspendJobs) {
     updateJobDefinitionSuspensionState()
         .byProcessDefinitionKey(processDefinitionKey)
@@ -401,6 +451,7 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
         .suspend();
   }
 
+  @Override
   public void suspendJobDefinitionByProcessDefinitionKey(String processDefinitionKey, boolean suspendJobs, Date suspensionDate) {
     updateJobDefinitionSuspensionState()
         .byProcessDefinitionKey(processDefinitionKey)
@@ -409,91 +460,108 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
         .suspend();
   }
 
+  @Override
   public UpdateJobDefinitionSuspensionStateSelectBuilder updateJobDefinitionSuspensionState() {
     return new UpdateJobDefinitionSuspensionStateBuilderImpl(commandExecutor);
   }
 
+  @Override
   public void activateJobById(String jobId) {
     updateJobSuspensionState()
         .byJobId(jobId)
         .activate();
   }
 
+  @Override
   public void activateJobByProcessInstanceId(String processInstanceId) {
     updateJobSuspensionState()
         .byProcessInstanceId(processInstanceId)
         .activate();
   }
 
+  @Override
   public void activateJobByJobDefinitionId(String jobDefinitionId) {
     updateJobSuspensionState()
         .byJobDefinitionId(jobDefinitionId)
         .activate();
   }
 
+  @Override
   public void activateJobByProcessDefinitionId(String processDefinitionId) {
     updateJobSuspensionState()
         .byProcessDefinitionId(processDefinitionId)
         .activate();
   }
 
+  @Override
   public void activateJobByProcessDefinitionKey(String processDefinitionKey) {
     updateJobSuspensionState()
         .byProcessDefinitionKey(processDefinitionKey)
         .activate();
   }
 
+  @Override
   public void suspendJobById(String jobId) {
     updateJobSuspensionState()
         .byJobId(jobId)
         .suspend();
   }
 
+  @Override
   public void suspendJobByJobDefinitionId(String jobDefinitionId) {
     updateJobSuspensionState()
         .byJobDefinitionId(jobDefinitionId)
         .suspend();
   }
 
+  @Override
   public void suspendJobByProcessInstanceId(String processInstanceId) {
     updateJobSuspensionState()
         .byProcessInstanceId(processInstanceId)
         .suspend();
   }
 
+  @Override
   public void suspendJobByProcessDefinitionId(String processDefinitionId) {
     updateJobSuspensionState()
         .byProcessDefinitionId(processDefinitionId)
         .suspend();
   }
 
+  @Override
   public void suspendJobByProcessDefinitionKey(String processDefinitionKey) {
     updateJobSuspensionState()
         .byProcessDefinitionKey(processDefinitionKey)
         .suspend();
   }
 
+  @Override
   public UpdateJobSuspensionStateSelectBuilder updateJobSuspensionState() {
     return new UpdateJobSuspensionStateBuilderImpl(commandExecutor);
   }
 
+  @Override
   public int getHistoryLevel() {
     return commandExecutor.execute(new GetHistoryLevelCmd());
   }
 
+  @Override
   public MetricsQuery createMetricsQuery() {
     return new MetricsQueryImpl(commandExecutor);
   }
 
+  @Override
   public void deleteMetrics(Date timestamp) {
     commandExecutor.execute(new DeleteMetricsCmd(timestamp, null));
   }
 
+  @Override
   public void deleteMetrics(Date timestamp, String reporter) {
     commandExecutor.execute(new DeleteMetricsCmd(timestamp, reporter));
 
   }
 
+  @Override
   public void reportDbMetricsNow() {
     commandExecutor.execute(new ReportDbMetricsCmd());
   }
@@ -508,46 +576,62 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
     commandExecutor.execute(new DeleteTaskMetricsCmd(timestamp));
   }
 
+  @Override
+  public List<MetricSampleFamily> getMetrics() {
+    return commandExecutor.execute(context -> context.getProcessEngineConfiguration().getMetricsCollector().collect());
+  }
+
+  @Override
   public void setOverridingJobPriorityForJobDefinition(String jobDefinitionId, long priority) {
     commandExecutor.execute(new SetJobDefinitionPriorityCmd(jobDefinitionId, priority, false));
   }
 
+  @Override
   public void setOverridingJobPriorityForJobDefinition(String jobDefinitionId, long priority, boolean cascade) {
     commandExecutor.execute(new SetJobDefinitionPriorityCmd(jobDefinitionId, priority, true));
   }
 
+  @Override
   public void clearOverridingJobPriorityForJobDefinition(String jobDefinitionId) {
     commandExecutor.execute(new SetJobDefinitionPriorityCmd(jobDefinitionId, null, false));
   }
 
+  @Override
   public BatchQuery createBatchQuery() {
     return new BatchQueryImpl(commandExecutor);
   }
 
+  @Override
   public void deleteBatch(String batchId, boolean cascade) {
     commandExecutor.execute(new DeleteBatchCmd(batchId, cascade));
   }
 
+  @Override
   public void suspendBatchById(String batchId) {
     commandExecutor.execute(new SuspendBatchCmd(batchId));
   }
 
+  @Override
   public void activateBatchById(String batchId) {
     commandExecutor.execute(new ActivateBatchCmd(batchId));
   }
 
+  @Override
   public BatchStatisticsQuery createBatchStatisticsQuery() {
     return new BatchStatisticsQueryImpl(commandExecutor);
   }
 
+  @Override
   public SchemaLogQuery createSchemaLogQuery() {
     return new SchemaLogQueryImpl(commandExecutor);
   }
 
+  @Override
   public void toggleTelemetry(boolean enabled) {
     commandExecutor.execute(new TelemetryConfigureCmd(enabled));
   }
 
+  @Override
   public Boolean isTelemetryEnabled() {
     return commandExecutor.execute(new IsTelemetryEnabledCmd());
   }

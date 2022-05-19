@@ -35,12 +35,13 @@ import javax.transaction.xa.XAResource;
 import org.camunda.bpm.container.ExecutorService;
 import org.camunda.bpm.container.impl.threading.ra.JcaExecutorServiceConnector;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
+import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor.JobExecutorThreadMetrics;
 
 
 /**
- * 
+ *
  * @author Daniel Meyer
- * 
+ *
  */
 public class JcaExecutorServiceManagedConnection implements ManagedConnection {
 
@@ -49,9 +50,9 @@ public class JcaExecutorServiceManagedConnection implements ManagedConnection {
   protected JcaExecutorServiceManagedConnectionFactory mcf;
   protected List<ConnectionEventListener> listeners;
   protected JcaExecutorServiceConnectionImpl connection;
-  
+
   protected ExecutorService delegate;
-  
+
   public JcaExecutorServiceManagedConnection() {
   }
 
@@ -64,11 +65,13 @@ public class JcaExecutorServiceManagedConnection implements ManagedConnection {
     delegate = (ExecutorService) ra.getExecutorServiceWrapper().getExecutorService();
   }
 
+  @Override
   public Object getConnection(Subject subject, ConnectionRequestInfo cxRequestInfo) throws ResourceException {
     connection = new JcaExecutorServiceConnectionImpl(this, mcf);
     return connection;
   }
 
+  @Override
   public void associateConnection(Object connection) throws ResourceException {
     if (connection == null) {
       throw new ResourceException("Null connection handle");
@@ -79,14 +82,17 @@ public class JcaExecutorServiceManagedConnection implements ManagedConnection {
     this.connection = (JcaExecutorServiceConnectionImpl) connection;
   }
 
+  @Override
   public void cleanup() throws ResourceException {
     // no-op
   }
 
+  @Override
   public void destroy() throws ResourceException {
     // no-op
   }
 
+  @Override
   public void addConnectionEventListener(ConnectionEventListener listener) {
     if (listener == null) {
       throw new IllegalArgumentException("Listener is null");
@@ -94,6 +100,7 @@ public class JcaExecutorServiceManagedConnection implements ManagedConnection {
     listeners.add(listener);
   }
 
+  @Override
   public void removeConnectionEventListener(ConnectionEventListener listener) {
     if (listener == null) {
       throw new IllegalArgumentException("Listener is null");
@@ -109,22 +116,27 @@ public class JcaExecutorServiceManagedConnection implements ManagedConnection {
     }
 
   }
+  @Override
   public PrintWriter getLogWriter() throws ResourceException {
     return logwriter;
   }
 
+  @Override
   public void setLogWriter(PrintWriter out) throws ResourceException {
     logwriter = out;
   }
 
+  @Override
   public LocalTransaction getLocalTransaction() throws ResourceException {
     throw new NotSupportedException("LocalTransaction not supported");
   }
 
+  @Override
   public XAResource getXAResource() throws ResourceException {
     throw new NotSupportedException("GetXAResource not supported not supported");
   }
 
+  @Override
   public ManagedConnectionMetaData getMetaData() throws ResourceException {
     return null;
   }
@@ -137,6 +149,10 @@ public class JcaExecutorServiceManagedConnection implements ManagedConnection {
 
   public Runnable getExecuteJobsRunnable(List<String> jobIds, ProcessEngineImpl processEngine) {
     return delegate.getExecuteJobsRunnable(jobIds, processEngine);
+  }
+
+  public JobExecutorThreadMetrics getThreadMetrics() {
+    return delegate.getThreadMetrics();
   }
 
 }

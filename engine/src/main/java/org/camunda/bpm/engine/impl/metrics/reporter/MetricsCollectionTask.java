@@ -48,6 +48,7 @@ public class MetricsCollectionTask extends TimerTask {
     this.commandExecutor = commandExecutor;
   }
 
+  @Override
   public void run() {
     try {
       collectMetrics();
@@ -66,10 +67,13 @@ public class MetricsCollectionTask extends TimerTask {
 
     List<MeterLogEntity> logs = new ArrayList<>();
     for (Meter meter : metricsRegistry.getDbMeters().values()) {
-      logs.add(new MeterLogEntity(meter.getName(),
-          reporterId,
-          meter.getAndClear(),
-          ClockUtil.getCurrentTime()));
+      long value = meter.getAndClear();
+      if (value > 0L) {
+        logs.add(new MeterLogEntity(meter.getName(),
+            reporterId,
+            value,
+            ClockUtil.getCurrentTime()));
+      }
 
     }
 

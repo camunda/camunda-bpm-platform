@@ -32,10 +32,11 @@ import org.camunda.bpm.container.impl.threading.ra.outbound.JcaExecutorServiceCo
 import org.camunda.bpm.container.impl.threading.ra.outbound.JcaExecutorServiceConnectionFactory;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
+import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor.JobExecutorThreadMetrics;
 
 /**
  * Bean exposing the JCA implementation of the {@link ExecutorService} as Stateless Bean.
- * 
+ *
  * @author Daniel Meyer
  *
  */
@@ -43,10 +44,10 @@ import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 @Local(ExecutorService.class)
 @TransactionAttribute(TransactionAttributeType.SUPPORTS)
 public class ExecutorServiceBean implements ExecutorService {
-  
+
   @Resource(mappedName="eis/JcaExecutorServiceConnectionFactory")
   protected JcaExecutorServiceConnectionFactory executorConnectionFactory;
-  
+
   protected JcaExecutorServiceConnection executorConnection;
 
   @PostConstruct
@@ -55,9 +56,9 @@ public class ExecutorServiceBean implements ExecutorService {
       executorConnection = executorConnectionFactory.getConnection();
     } catch (ResourceException e) {
       throw new ProcessEngineException("Could not open connection to executor service connection factory ", e);
-    } 
+    }
   }
-  
+
   @PreDestroy
   protected void closeConnection() {
     if(executorConnection != null) {
@@ -65,12 +66,19 @@ public class ExecutorServiceBean implements ExecutorService {
     }
   }
 
+  @Override
   public boolean schedule(Runnable runnable, boolean isLongRunning) {
     return executorConnection.schedule(runnable, isLongRunning);
   }
-  
+
+  @Override
   public Runnable getExecuteJobsRunnable(List<String> jobIds, ProcessEngineImpl processEngine) {
     return executorConnection.getExecuteJobsRunnable(jobIds, processEngine);
   }
-  
+
+  @Override
+  public JobExecutorThreadMetrics getThreadMetrics() {
+    return executorConnection.getThreadMetrics();
+  }
+
 }

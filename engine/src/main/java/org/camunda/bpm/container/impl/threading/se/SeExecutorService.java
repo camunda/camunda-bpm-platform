@@ -24,6 +24,7 @@ import org.camunda.bpm.container.impl.ContainerIntegrationLogger;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.jobexecutor.ExecuteJobsRunnable;
+import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor.JobExecutorThreadMetrics;
 
 /**
  * @author Daniel Meyer
@@ -39,6 +40,7 @@ public class SeExecutorService implements ExecutorService {
     this.threadPoolExecutor = threadPoolExecutor;
   }
 
+  @Override
   public boolean schedule(Runnable runnable, boolean isLongRunning) {
 
     if(isLongRunning) {
@@ -68,8 +70,16 @@ public class SeExecutorService implements ExecutorService {
 
   }
 
+  @Override
   public Runnable getExecuteJobsRunnable(List<String> jobIds, ProcessEngineImpl processEngine) {
     return new ExecuteJobsRunnable(jobIds, processEngine);
   }
 
+  @Override
+  public JobExecutorThreadMetrics getThreadMetrics() {
+    JobExecutorThreadMetrics metrics = new JobExecutorThreadMetrics();
+    metrics.setThreadsActive(threadPoolExecutor.getActiveCount());
+    metrics.setThreadsIdle(threadPoolExecutor.getPoolSize() - threadPoolExecutor.getActiveCount());
+    return metrics;
+  }
 }

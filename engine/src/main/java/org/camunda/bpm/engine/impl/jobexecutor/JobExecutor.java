@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.impl.jobexecutor;
 
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -355,6 +356,54 @@ public abstract class JobExecutor {
 
   public Runnable getExecuteJobsRunnable(List<String> jobIds, ProcessEngineImpl processEngine) {
     return new ExecuteJobsRunnable(jobIds, processEngine);
+  }
+
+  public JobExecutorThreadMetrics getThreadMetrics() {
+    return JobExecutorThreadMetrics.EMPTY;
+  }
+
+  public static class JobExecutorThreadMetrics implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    public static final JobExecutorThreadMetrics EMPTY = new JobExecutorThreadMetrics();
+
+    private int threadsActive;
+    private int threadsIdle;
+    private int threadsBlocked;
+    private int queueSize;
+
+    public int getThreadsActive() {
+      return threadsActive;
+    }
+
+    public void setThreadsActive(int threadsActive) {
+      this.threadsActive = threadsActive;
+    }
+
+    public int getThreadsIdle() {
+      return threadsIdle;
+    }
+
+    public void setThreadsIdle(int threadsIdle) {
+      this.threadsIdle = threadsIdle;
+    }
+
+    public int getThreadsBlocked() {
+      return threadsBlocked;
+    }
+
+    public void setThreadsBlocked(int threadsBlocked) {
+      this.threadsBlocked = threadsBlocked;
+    }
+
+    public int getQueueSize() {
+      return queueSize;
+    }
+
+    public void setQueueSize(int queueSize) {
+      this.queueSize = queueSize;
+    }
   }
 
 }

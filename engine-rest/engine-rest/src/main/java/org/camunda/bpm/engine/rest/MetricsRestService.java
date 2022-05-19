@@ -52,4 +52,9 @@ public interface MetricsRestService {
   @DELETE
   @Path("/task-worker")
   Response deleteTaskMetrics(@QueryParam("date") String dateString);
+
+  @GET
+  @Path("/prometheus")
+  @Produces(MediaType.TEXT_PLAIN)
+  Response getPrometheusMetrics();
 }

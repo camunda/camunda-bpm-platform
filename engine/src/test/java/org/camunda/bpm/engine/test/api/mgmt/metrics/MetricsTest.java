@@ -18,17 +18,21 @@ package org.camunda.bpm.engine.test.api.mgmt.metrics;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.fail;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-
 import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.MetricsCollector;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.metrics.CounterMetricSampleFamily;
 import org.camunda.bpm.engine.impl.metrics.Meter;
+import org.camunda.bpm.engine.impl.metrics.MetricSampleFamily;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -56,6 +60,7 @@ public class MetricsTest {
   protected static RuntimeService runtimeService;
   protected static ProcessEngineConfigurationImpl processEngineConfiguration;
   protected static ManagementService managementService;
+  protected static MetricsCollector metricsCollector;
 
   protected static void clearMetrics() {
     Collection<Meter> meters = processEngineConfiguration.getMetricsRegistry().getDbMeters().values();
@@ -64,6 +69,7 @@ public class MetricsTest {
     }
     managementService.deleteMetrics(null);
     processEngineConfiguration.setDbMetricsReporterActivate(false);
+    processEngineConfiguration.setMetricsCollector(metricsCollector);
   }
 
   @BeforeClass
@@ -71,6 +77,7 @@ public class MetricsTest {
     runtimeService = ENGINE_RULE.getRuntimeService();
     processEngineConfiguration = ENGINE_RULE.getProcessEngineConfiguration();
     managementService = ENGINE_RULE.getManagementService();
+    metricsCollector = processEngineConfiguration.getMetricsCollector();
 
     //clean up before start
     clearMetrics();
@@ -390,6 +397,43 @@ public class MetricsTest {
     // cleanup
     processEngineConfiguration.setDbMetricsReporterActivate(false);
     processEngineConfiguration.getDbMetricsReporter().setReporterId(null);
+  }
+
+  @Test
+  public void shouldReportMetricsInDefaultMetricsCollector() {
+    // indicate that db metrics reporter is active (although it is not)
+    processEngineConfiguration.setDbMetricsReporterActivate(true);
+
+    // given
+    runtimeService.startProcessInstanceByKey("testProcess");
+
+    // assume
+    assertThat(managementService.createMetricsQuery().interval()).isEmpty();
+
+    // when
+    Collection<MetricSampleFamily> metrics = managementService.getMetrics();
+
+    // then
+    assertThat(metrics).isNotEmpty();
+    assertThat(managementService.createMetricsQuery().interval()).isNotEmpty();
+  }
+
+  @Test
+  public void shouldUseCustomMetricsCollector() {
+    // given
+    CounterMetricSampleFamily testMetric = new CounterMetricSampleFamily("test", Arrays.asList("testLabel"))
+        .addValue(Arrays.asList("testLabelValue"), 999);
+    processEngineConfiguration.setMetricsCollector(() -> Arrays.asList(testMetric));
+    runtimeService.startProcessInstanceByKey("testProcess");
+
+    // when
+    Collection<MetricSampleFamily> metrics = managementService.getMetrics();
+
+    // then
+    assertThat(metrics)
+      .isNotEmpty()
+      .containsExactly(testMetric);
+    assertThat(managementService.createMetricsQuery().interval()).isEmpty();
   }
 
 }

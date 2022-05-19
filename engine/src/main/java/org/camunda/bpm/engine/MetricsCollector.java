@@ -14,25 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.container.impl.threading.ra.outbound;
+package org.camunda.bpm.engine;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.ProcessEngineImpl;
-import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor.JobExecutorThreadMetrics;
+import org.camunda.bpm.engine.impl.metrics.MetricSampleFamily;
 
-/**
- *
- * @author Daniel Meyer
- *
- */
-public interface JcaExecutorServiceConnection {
+public interface MetricsCollector {
 
-  boolean schedule(Runnable runnable, boolean isLongRunning);
-
-  Runnable getExecuteJobsRunnable(List<String> jobIds, ProcessEngineImpl processEngine);
-
-  void closeConnection();
-
-  JobExecutorThreadMetrics getThreadMetrics();
+  List<MetricSampleFamily> collect();
 }
