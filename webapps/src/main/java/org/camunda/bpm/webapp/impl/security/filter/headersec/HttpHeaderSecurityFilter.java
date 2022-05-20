@@ -79,7 +79,7 @@ public class HttpHeaderSecurityFilter implements Filter {
         if (!provider.isDisabled()) {
 
           String headerName = provider.getHeaderName();
-          String headerValue = provider.getHeaderValue();
+          String headerValue = provider.getHeaderValue(request.getServletContext());
 
           httpResponse.setHeader(headerName, headerValue);
         }

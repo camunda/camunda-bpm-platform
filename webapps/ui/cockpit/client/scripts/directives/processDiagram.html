@@ -1,4 +1,4 @@
-<div ng-if="diagramEnabled" style="position: relative; height: 100%">
+<div class="process-diagram-wrapper" ng-if="diagramEnabled">
   <div diagram-statistics-loader></div>
   <div
     cam-widget-bpmn-viewer
@@ -11,7 +11,6 @@
     on-mouse-enter="onMouseEnter(element, $event)"
     on-mouse-leave="onMouseLeave(element, $event)"
     bpmn-js-conf="bpmnJsConf"
-    style="height: 100%"
   ></div>
 </div>
 <div ng-if="!diagramEnabled" class="placeholder-container">

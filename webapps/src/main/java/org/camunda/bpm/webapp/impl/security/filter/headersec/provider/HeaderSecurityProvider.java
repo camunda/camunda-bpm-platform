@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.webapp.impl.security.filter.headersec.provider;
 
+import javax.servlet.ServletContext;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,7 +35,7 @@ public abstract class HeaderSecurityProvider {
 
   abstract public String getHeaderName();
 
-  public String getHeaderValue() {
+  public String getHeaderValue(final ServletContext servletContext) {
     return value;
   }
 

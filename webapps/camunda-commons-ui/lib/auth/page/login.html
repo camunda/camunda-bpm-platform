@@ -38,12 +38,11 @@
             ng-disabled="status === 'LOADING'">{{ 'PAGE_LOGIN_SIGN_IN_ACTION' | translate }}</button>
 
     <div ng-if="showFirstLogin"
-         class="alert-info alert"
-         style="margin-top: 75px; margin-bottom: 0px">
+         class="alert-info alert">
       <div>
         <button type="button" class="close" ng-click="dismissInfoBox()">×</button>
         <strong class="status">{{ 'FIRST_LOGIN_HEADING' | translate }}</strong>
-        <span class="message" ng-bind-html="FirstLoginMessage" style="display: block"></span>
+        <span class="message" ng-bind-html="FirstLoginMessage"></span>
       </div>
     </div>
   </form>
