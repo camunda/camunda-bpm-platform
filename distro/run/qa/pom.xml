@@ -17,7 +17,6 @@
     <!-- default os -->
     <os.type>linux64</os.type>
 
-    <version.selenium>3.141.59</version.selenium>
     <version.jersey-json>1.15</version.jersey-json>
     <version.jersey-apache-client>1.15</version.jersey-apache-client>
     <version.httpcomponents>4.5.10</version.httpcomponents>

@@ -87,12 +87,6 @@
 
         <dependency>
           <groupId>org.seleniumhq.selenium</groupId>
-          <artifactId>selenium-server</artifactId>
-          <version>${version.selenium}</version>
-        </dependency>
-
-        <dependency>
-          <groupId>org.seleniumhq.selenium</groupId>
           <artifactId>selenium-remote-driver</artifactId>
           <version>${version.selenium}</version>
         </dependency>

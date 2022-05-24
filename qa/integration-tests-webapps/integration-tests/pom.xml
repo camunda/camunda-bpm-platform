@@ -24,6 +24,13 @@
     <dependency>
       <groupId>org.jboss.shrinkwrap.resolver</groupId>
       <artifactId>shrinkwrap-resolver-depchain</artifactId>
+      <exclusions>
+        <exclusion>
+          <!-- conflicts with the version pulled in transitively via selenium-java  -->
+          <groupId>com.google.guava</groupId>
+          <artifactId>guava</artifactId>
+        </exclusion>
+      </exclusions>
       <scope>provided</scope>
       <type>pom</type>
     </dependency>

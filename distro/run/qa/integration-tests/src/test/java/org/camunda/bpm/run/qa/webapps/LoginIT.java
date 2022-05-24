@@ -33,6 +33,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -96,7 +97,7 @@ public class LoginIT extends AbstractWebappUiIT {
 
     driver.get(appUrl + "app/" + appName + "/default/");
 
-    wait = new WebDriverWait(driver, 10);
+    wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
     WebElement userNameInput = wait.until(visibilityOfElementLocated(By.cssSelector("input[type=\"text\"]")));
     sendKeys(userNameInput, "demo");

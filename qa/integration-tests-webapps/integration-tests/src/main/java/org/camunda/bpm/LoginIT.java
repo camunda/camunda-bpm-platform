@@ -21,6 +21,7 @@ import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElem
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Duration;
 import java.util.Arrays;
 
 import org.junit.Test;
@@ -38,7 +39,7 @@ public class LoginIT extends AbstractWebappUiIntegrationTest {
 
     driver.get(appUrl + "app/" + appName + "/default/");
 
-    wait = new WebDriverWait(driver, 10);
+    wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
     WebElement userNameInput = wait.until(visibilityOfElementLocated(By.cssSelector("input[type=\"text\"]")));
     sendKeys(userNameInput, "demo");

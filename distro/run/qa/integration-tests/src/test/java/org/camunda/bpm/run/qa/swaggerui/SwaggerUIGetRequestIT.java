@@ -26,6 +26,9 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import static org.openqa.selenium.support.ui.ExpectedConditions.textToBePresentInElementLocated;
 import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated;
+
+import java.time.Duration;
+
 /**
  * NOTE:
  * This test is specific to RUN, as Swagger UI is exclusive to RUN.
@@ -63,7 +66,7 @@ public class SwaggerUIGetRequestIT extends AbstractWebappUiIT {
     String path = testProperties.getApplicationPath("/swaggerui");
     driver.get(path);
 
-    WebDriverWait wait = new WebDriverWait(driver, 10);
+    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
     // click on Batch resource
     wait.until(visibilityOfElementLocated(By.id("operations-tag-Batch"))).click();
     // click on get batches endpoint
