@@ -33,6 +33,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.webapp.impl.security.filter.headersec.provider.impl.ContentSecurityPolicyProvider.HEADER_DEFAULT_VALUE;
+import static org.camunda.bpm.webapp.impl.security.filter.headersec.provider.impl.ContentSecurityPolicyProvider.HEADER_NAME;
+import static org.camunda.bpm.webapp.impl.security.filter.headersec.provider.impl.ContentSecurityPolicyProvider.HEADER_NONCE_PLACEHOLDER;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(
@@ -95,9 +98,10 @@ public class ChangedAppPathIT {
 
     // then
     List<String> contentSecurityPolicyHeaders = response.getHeaders()
-        .get("Content-Security-Policy");
+        .get(HEADER_NAME);
 
-    assertThat(contentSecurityPolicyHeaders).containsExactly("base-uri 'self'");
+    String expectedHeaderPattern = HEADER_DEFAULT_VALUE.replace(HEADER_NONCE_PLACEHOLDER, "'nonce-([-_a-zA-Z\\d]*)'");
+    assertThat(contentSecurityPolicyHeaders).anyMatch(val -> val.matches(expectedHeaderPattern));
   }
 
   @Test
