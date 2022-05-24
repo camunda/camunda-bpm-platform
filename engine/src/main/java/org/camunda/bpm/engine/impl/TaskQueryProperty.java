@@ -35,6 +35,7 @@ public interface TaskQueryProperty {
   public static final QueryProperty PRIORITY = new QueryPropertyImpl("PRIORITY_");
   public static final QueryProperty ASSIGNEE = new QueryPropertyImpl("ASSIGNEE_");
   public static final QueryProperty CREATE_TIME = new QueryPropertyImpl("CREATE_TIME_");
+  public static final QueryProperty UPDATED_AFTER = new QueryPropertyImpl("LAST_UPDATED_");
   public static final QueryProperty PROCESS_INSTANCE_ID = new QueryPropertyImpl("PROC_INST_ID_");
   public static final QueryProperty CASE_INSTANCE_ID = new QueryPropertyImpl("CASE_INST_ID_");
   public static final QueryProperty EXECUTION_ID = new QueryPropertyImpl("EXECUTION_ID_");

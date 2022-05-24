@@ -5416,6 +5416,201 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
     assertThat(camundaFormRefWithFormKey.getVersion()).isEqualTo(3);
   }
 
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void shouldFindTaskLastUpdatedNullUseCreateDate() {
+    // given
+    Date beforeStart = getBeforeCurrentTime();
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // when
+    // no update to task, lastUpdated = null
+
+    // then
+    Task taskResult = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskUpdatedAfter(beforeStart).singleResult();
+    assertThat(taskResult).isNotNull();
+    assertThat(taskResult.getLastUpdated()).isNull();
+    assertThat(taskResult.getCreateTime()).isAfter(beforeStart);
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void shouldNotFindTaskLastUpdatedNullCreateDateBeforeQueryDate() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Date afterStart = getAfterCurrentTime();
+
+    // when
+    // no update to task, lastUpdated = null
+
+    // then
+    Task taskResult = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskUpdatedAfter(afterStart).singleResult();
+    assertThat(taskResult).isNull();
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void shouldNotFindTaskLastUpdatedBeforeQueryDate() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    Date lastUpdatedBeforeUpdate = task.getLastUpdated();
+    task.setAssignee("myself");
+
+    // assume
+    assertThat(lastUpdatedBeforeUpdate).isNull();
+
+    // when
+    taskService.saveTask(task);
+
+    // then
+    Date afterUpdate = getAfterCurrentTime();
+    Task taskResult = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskUpdatedAfter(afterUpdate).singleResult();
+    assertThat(taskResult).isNull();
+    taskResult = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertThat(taskResult).isNotNull();
+    assertThat(taskResult.getLastUpdated()).isBefore(afterUpdate);
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void shouldNotFindTaskLastUpdatedEqualsQueryDate() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    task.setAssignee("myself");
+
+    // when
+    taskService.saveTask(task);
+
+    // then
+    Task taskResult = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertThat(taskResult).isNotNull();
+    assertThat(taskResult.getLastUpdated()).isNotNull();
+    taskResult = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskUpdatedAfter(taskResult.getLastUpdated()).singleResult();
+    assertThat(taskResult).isNull();
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void shouldReturnResultsOrderedByLastUpdatedAsc() {
+    // given
+    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    ProcessInstance processInstance3 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    Date beforeUpdates = getBeforeCurrentTime();
+
+    Task task2 = taskService.createTaskQuery().processInstanceId(processInstance2.getId()).singleResult();
+    taskService.setOwner(task2.getId(), "myself");
+
+    ClockUtil.offset(1000L);
+
+    Task task1 = taskService.createTaskQuery().processInstanceId(processInstance1.getId()).singleResult();
+    taskService.setVariableLocal(task1.getId(), "myVar", "varVal");
+
+    ClockUtil.offset(2000L);
+
+    Task task3 = taskService.createTaskQuery().processInstanceId(processInstance3.getId()).singleResult();
+    taskService.setPriority(task3.getId(), 3);
+
+    // when
+    List<Task> tasks = taskService.createTaskQuery()
+        .processInstanceIdIn(processInstance1.getId(), processInstance2.getId(), processInstance3.getId())
+        .taskUpdatedAfter(beforeUpdates).orderByTaskUpdatedAfter().asc().list();
+
+    // then
+    assertThat(tasks).hasSize(3);
+    assertThat(tasks).extracting("id").containsExactly(task2.getId(), task1.getId(), task3.getId());
+    assertThat(tasks).extracting("lastUpdated").isSorted();
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void shouldReturnResultsOrderedByLastUpdatedDesc() {
+    // given
+    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    ProcessInstance processInstance3 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    Date beforeUpdates = getBeforeCurrentTime();
+
+    Task task2 = taskService.createTaskQuery().processInstanceId(processInstance2.getId()).singleResult();
+    taskService.setOwner(task2.getId(), "myself");
+
+    ClockUtil.offset(1000L);
+
+    Task task1 = taskService.createTaskQuery().processInstanceId(processInstance1.getId()).singleResult();
+    taskService.setVariableLocal(task1.getId(), "myVar", "varVal");
+
+    ClockUtil.offset(2000L);
+
+    Task task3 = taskService.createTaskQuery().processInstanceId(processInstance3.getId()).singleResult();
+    taskService.setPriority(task3.getId(), 3);
+
+    // when
+    List<Task> tasks = taskService.createTaskQuery()
+        .processInstanceIdIn(processInstance1.getId(), processInstance2.getId(), processInstance3.getId())
+        .taskUpdatedAfter(beforeUpdates).orderByTaskUpdatedAfter().desc().list();
+
+    // then
+    assertThat(tasks).hasSize(3);
+    assertThat(tasks).extracting("id").containsExactly(task3.getId(), task1.getId(), task2.getId());
+    assertThat(tasks).extracting("lastUpdated").isSortedAccordingTo(Collections.reverseOrder());
+  }
+
+  @Test
+  public void shouldFindStandaloneTaskWithoutUpdateByLastUpdated() {
+    // given
+    Date beforeCreateTask = getBeforeCurrentTime();
+    Task task = taskService.newTask("myTask");
+    taskIds.add(task.getId());
+    task.setAssignee("myself");
+    Date beforeSave = getAfterCurrentTime();
+
+    // when
+    taskService.saveTask(task);
+
+    // then
+    Task taskResult = taskService.createTaskQuery().taskId("myTask").taskUpdatedAfter(beforeCreateTask).singleResult();
+    assertThat(taskResult).isNotNull();
+    assertThat(taskResult.getLastUpdated()).isNull();
+    assertThat(taskResult.getCreateTime()).isBefore(beforeSave);
+  }
+
+  @Test
+  public void shouldFindStandaloneTaskWithUpdateByLastUpdated() {
+    // given
+    Task task = taskService.newTask("myTask");
+    taskIds.add(task.getId());
+    task.setAssignee("myself");
+    Date beforeSave = getBeforeCurrentTime();
+    taskService.saveTask(task);
+    // make sure time passes between create and update
+    ClockUtil.offset(1000L);
+
+    // when
+    taskService.setPriority(task.getId(), 2);
+
+    // then
+    Task taskResult = taskService.createTaskQuery().taskId("myTask").taskUpdatedAfter(beforeSave).singleResult();
+    assertThat(taskResult).isNotNull();
+    assertThat(taskResult.getLastUpdated()).isAfter(beforeSave);
+    assertThat(taskResult.getLastUpdated()).isAfter(taskResult.getCreateTime());
+  }
+
+  // ---------------------- HELPER ------------------------------
+
+  // make sure that time passes between two fast operations
+  private Date getAfterCurrentTime() {
+    return new Date(ClockUtil.getCurrentTime().getTime() + 1000L);
+  }
+
+  //make sure that time passes between two fast operations
+  private Date getBeforeCurrentTime() {
+    return new Date(ClockUtil.getCurrentTime().getTime() - 1000L);
+  }
+
   /**
    * Generates some test tasks.
    * - 6 tasks where kermit is a candidate
@@ -5484,6 +5679,8 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
     taskService.addCandidateGroup(task.getId(), "management");
     taskService.addCandidateGroup(task.getId(), "accountancy");
     ids.add(task.getId());
+
+    ClockUtil.reset();
 
     return ids;
   }

@@ -385,20 +385,26 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
   /** Only select tasks that are created on the given date. **/
   TaskQuery taskCreatedOn(Date createTime);
 
-  /** Only select tasks that are created on the described date by the given expression. **/
+  /** Only select tasks that are created on the date resolved from the given expression. **/
   TaskQuery taskCreatedOnExpression(String createTimeExpression);
 
   /** Only select tasks that are created before the given date. **/
   TaskQuery taskCreatedBefore(Date before);
 
-  /** Only select tasks that are created before the described date by the given expression. **/
+  /** Only select tasks that are created before the date resolved from the given expression. **/
   TaskQuery taskCreatedBeforeExpression(String beforeExpression);
 
   /** Only select tasks that are created after the given date. **/
   TaskQuery taskCreatedAfter(Date after);
 
-  /** Only select tasks that are created after the described date by the given expression. **/
+  /** Only select tasks that are created after the date resolved from the given expression. **/
   TaskQuery taskCreatedAfterExpression(String afterExpression);
+
+  /** Only select tasks that were updated after the given date. **/
+  TaskQuery taskUpdatedAfter(Date after);
+
+  /** Only select tasks that were updated after the date resolved from the given expression. **/
+  TaskQuery taskUpdatedAfterExpression(String afterExpression);
 
   /** Only select tasks that have no parent (i.e. do not select subtasks). **/
   TaskQuery excludeSubtasks();
@@ -923,6 +929,13 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    * @throws ProcessEngineException When method has been executed within "or query".
    * */
   TaskQuery orderByTaskCreateTime();
+
+  /**
+   * Order by the time the task was updated last (needs to be followed by {@link #asc()} or {@link #desc()}).
+   *
+   * @throws ProcessEngineException When method has been executed within "or query".
+   */
+  TaskQuery orderByTaskUpdatedAfter();
 
   /**
    * Order by process instance id (needs to be followed by {@link #asc()} or {@link #desc()}).

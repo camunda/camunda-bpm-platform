@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.task;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -26,6 +27,7 @@ import java.util.List;
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.junit.After;
@@ -48,7 +50,10 @@ public class StandaloneTaskTest extends PluggableProcessEngineTest {
   public void tearDown() throws Exception {
     identityService.deleteUser("kermit");
     identityService.deleteUser("gonzo");
-
+    List<Task> tasks = taskService.createTaskQuery().list();
+    for (Task task : tasks) {
+      taskService.deleteTask(task.getId(), true);
+    }
   }
 
   @Test
@@ -110,8 +115,6 @@ public class StandaloneTaskTest extends PluggableProcessEngineTest {
     } catch (OptimisticLockingException expected) {
       //  exception was thrown as expected
     }
-
-    taskService.deleteTask(taskId, true);
   }
 
   // See http://jira.codehaus.org/browse/ACT-1290
@@ -128,8 +131,6 @@ public class StandaloneTaskTest extends PluggableProcessEngineTest {
     task.setDescription("second modification");
     taskService.saveTask(task);
     assertEquals(3, ((TaskEntity) task).getRevision());
-
-    taskService.deleteTask(task.getId(), true);
   }
 
   @Test
@@ -143,5 +144,37 @@ public class StandaloneTaskTest extends PluggableProcessEngineTest {
     }
   }
 
+  @Test
+  public void shouldSetLastUpdatedOnUpdate() {
+    // given
+    Task task = taskService.newTask("shouldSetLastUpdatedOnUpdate");
+    task.setAssignee("myself");
+    taskService.saveTask(task);
+
+    // make sure time passes between save and update
+    ClockUtil.offset(1000L);
+
+    // when
+    taskService.setVariable(task.getId(), "myVar", "varVal");
+
+    // then
+    Task taskResult = taskService.createTaskQuery().taskId("shouldSetLastUpdatedOnUpdate").singleResult();
+    assertThat(taskResult.getLastUpdated()).isNotNull();
+    assertThat(taskResult.getCreateTime()).isBefore(taskResult.getLastUpdated());
+  }
+
+  @Test
+  public void shouldNotSetLastUpdatedOnCreate() {
+    // given
+    Task task = taskService.newTask("shouldNotSetLastUpdatedOnCreate");
+    task.setAssignee("myself");
+
+    // when
+    taskService.saveTask(task);
+
+    // then
+    Task taskResult = taskService.createTaskQuery().taskId("shouldNotSetLastUpdatedOnCreate").singleResult();
+    assertThat(taskResult.getLastUpdated()).isNull();
+  }
 
 }
