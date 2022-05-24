@@ -126,6 +126,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected Date createTime;
   protected Date createTimeBefore;
   protected Date createTimeAfter;
+  protected Date updatedAfter;
   protected String key;
   protected String keyLike;
   protected String[] taskDefinitionKeys;
@@ -393,40 +394,28 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery withCandidateGroups() {
-    if (isOrQueryActive) {
-      throw new ProcessEngineException("Invalid query usage: cannot set withCandidateGroups() within 'or' query");
-    }
-
+    ensureNotInOrQuery("withCandidateGroups()");
     this.withCandidateGroups = true;
     return this;
   }
 
   @Override
   public TaskQuery withoutCandidateGroups() {
-    if (isOrQueryActive) {
-      throw new ProcessEngineException("Invalid query usage: cannot set withoutCandidateGroups() within 'or' query");
-    }
-
+    ensureNotInOrQuery("withoutCandidateGroups()");
     this.withoutCandidateGroups = true;
     return this;
   }
 
   @Override
   public TaskQuery withCandidateUsers() {
-    if (isOrQueryActive) {
-      throw new ProcessEngineException("Invalid query usage: cannot set withCandidateUsers() within 'or' query");
-    }
-
+    ensureNotInOrQuery("withCandidateUsers()");
     this.withCandidateUsers = true;
     return this;
   }
 
   @Override
   public TaskQuery withoutCandidateUsers() {
-    if (isOrQueryActive) {
-      throw new ProcessEngineException("Invalid query usage: cannot set withoutCandidateUsers() within 'or' query");
-    }
-
+    ensureNotInOrQuery("withoutCandidateUsers()");
     this.withoutCandidateUsers = true;
     return this;
   }
@@ -631,6 +620,19 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   @Override
   public TaskQuery taskCreatedAfterExpression(String afterExpression) {
     expressions.put("taskCreatedAfter", afterExpression);
+    return this;
+  }
+
+  @Override
+  public TaskQuery taskUpdatedAfter(Date after) {
+    this.updatedAfter = after;
+    expressions.remove("taskUpdatedAfter");
+    return this;
+  }
+
+  @Override
+  public TaskQuery taskUpdatedAfterExpression(String afterExpression) {
+    expressions.put("taskUpdatedAfter", afterExpression);
     return this;
   }
 
@@ -1064,10 +1066,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery initializeFormKeys() {
-    if (isOrQueryActive) {
-      throw new ProcessEngineException("Invalid query usage: cannot set initializeFormKeys() within 'or' query");
-    }
-
+    ensureNotInOrQuery("initializeFormKeys()");
     this.initializeFormKeys = true;
     return this;
   }
@@ -1227,6 +1226,12 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     }
   }
 
+  protected void ensureNotInOrQuery(String methodName) {
+    if (isOrQueryActive) {
+      throw new ProcessEngineException(String.format("Invalid query usage: cannot set %s within 'or' query", methodName));
+    }
+  }
+
   public void addVariable(String name, Object value, QueryOperator operator, boolean isTaskVariable, boolean isProcessInstanceVariable) {
     ensureNotNull("name", name);
 
@@ -1269,137 +1274,98 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery orderByTaskId() {
-    if (isOrQueryActive) {
-      throw new ProcessEngineException("Invalid query usage: cannot set orderByTaskId() within 'or' query");
-    }
-
+    ensureNotInOrQuery("orderByTaskId()");
     return orderBy(TaskQueryProperty.TASK_ID);
   }
 
   @Override
   public TaskQuery orderByTaskName() {
-    if (isOrQueryActive) {
-      throw new ProcessEngineException("Invalid query usage: cannot set orderByTaskName() within 'or' query");
-    }
-
+    ensureNotInOrQuery("orderByTaskName()");
     return orderBy(TaskQueryProperty.NAME);
   }
 
   @Override
   public TaskQuery orderByTaskNameCaseInsensitive() {
-    if (isOrQueryActive) {
-      throw new ProcessEngineException("Invalid query usage: cannot set orderByTaskNameCaseInsensitive() within 'or' query");
-    }
-
+    ensureNotInOrQuery("orderByTaskNameCaseInsensitive()");
     taskNameCaseInsensitive();
     return orderBy(TaskQueryProperty.NAME_CASE_INSENSITIVE);
   }
 
   @Override
   public TaskQuery orderByTaskDescription() {
-    if (isOrQueryActive) {
-      throw new ProcessEngineException("Invalid query usage: cannot set orderByTaskDescription() within 'or' query");
-    }
-
+    ensureNotInOrQuery("orderByTaskDescription()");
     return orderBy(TaskQueryProperty.DESCRIPTION);
   }
 
   @Override
   public TaskQuery orderByTaskPriority() {
-    if (isOrQueryActive) {
-      throw new ProcessEngineException("Invalid query usage: cannot set orderByTaskPriority() within 'or' query");
-    }
-
+    ensureNotInOrQuery("orderByTaskPriority()");
     return orderBy(TaskQueryProperty.PRIORITY);
   }
 
   @Override
   public TaskQuery orderByProcessInstanceId() {
-    if (isOrQueryActive) {
-      throw new ProcessEngineException("Invalid query usage: cannot set orderByProcessInstanceId() within 'or' query");
-    }
-
+    ensureNotInOrQuery("orderByProcessInstanceId()");
     return orderBy(TaskQueryProperty.PROCESS_INSTANCE_ID);
   }
 
   @Override
   public TaskQuery orderByCaseInstanceId() {
-    if (isOrQueryActive) {
-      throw new ProcessEngineException("Invalid query usage: cannot set orderByCaseInstanceId() within 'or' query");
-    }
-
+    ensureNotInOrQuery("orderByCaseInstanceId()");
     return orderBy(TaskQueryProperty.CASE_INSTANCE_ID);
   }
 
   @Override
   public TaskQuery orderByExecutionId() {
-    if (isOrQueryActive) {
-      throw new ProcessEngineException("Invalid query usage: cannot set orderByExecutionId() within 'or' query");
-    }
-
+    ensureNotInOrQuery("orderByExecutionId()");
     return orderBy(TaskQueryProperty.EXECUTION_ID);
   }
 
   @Override
   public TaskQuery orderByTenantId() {
-    if (isOrQueryActive) {
-      throw new ProcessEngineException("Invalid query usage: cannot set orderByTenantId() within 'or' query");
-    }
-
+    ensureNotInOrQuery("orderByTenantId()");
     return orderBy(TaskQueryProperty.TENANT_ID);
   }
 
   @Override
   public TaskQuery orderByCaseExecutionId() {
-    if (isOrQueryActive) {
-      throw new ProcessEngineException("Invalid query usage: cannot set orderByCaseExecutionId() within 'or' query");
-    }
-
+    ensureNotInOrQuery("orderByCaseExecutionId()");
     return orderBy(TaskQueryProperty.CASE_EXECUTION_ID);
   }
 
   @Override
   public TaskQuery orderByTaskAssignee() {
-    if (isOrQueryActive) {
-      throw new ProcessEngineException("Invalid query usage: cannot set orderByTaskAssignee() within 'or' query");
-    }
-
+    ensureNotInOrQuery("orderByTaskAssignee()");
     return orderBy(TaskQueryProperty.ASSIGNEE);
   }
 
   @Override
   public TaskQuery orderByTaskCreateTime() {
-    if (isOrQueryActive) {
-      throw new ProcessEngineException("Invalid query usage: cannot set orderByTaskCreateTime() within 'or' query");
-    }
-
+    ensureNotInOrQuery("orderByTaskCreateTime()");
     return orderBy(TaskQueryProperty.CREATE_TIME);
   }
 
   @Override
-  public TaskQuery orderByDueDate() {
-    if (isOrQueryActive) {
-      throw new ProcessEngineException("Invalid query usage: cannot set orderByDueDate() within 'or' query");
-    }
+  public TaskQuery orderByTaskUpdatedAfter() {
+    ensureNotInOrQuery("orderByTaskUpdatedAfter()");
+    return orderBy(TaskQueryProperty.UPDATED_AFTER);
+  }
 
+  @Override
+  public TaskQuery orderByDueDate() {
+    ensureNotInOrQuery("orderByDueDate()");
     return orderBy(TaskQueryProperty.DUE_DATE);
   }
 
   @Override
   public TaskQuery orderByFollowUpDate() {
-    if (isOrQueryActive) {
-      throw new ProcessEngineException("Invalid query usage: cannot set orderByFollowUpDate() within 'or' query");
-    }
-
+    ensureNotInOrQuery("orderByFollowUpDate()");
     return orderBy(TaskQueryProperty.FOLLOW_UP_DATE);
   }
 
   @Override
   public TaskQuery orderByProcessVariable(String variableName, ValueType valueType) {
-    if (isOrQueryActive) {
-      throw new ProcessEngineException("Invalid query usage: cannot set orderByProcessVariable() within 'or' query");
-    }
-
+    ensureNotInOrQuery("orderByProcessVariable()");
     ensureNotNull("variableName", variableName);
     ensureNotNull("valueType", valueType);
 
@@ -1409,10 +1375,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery orderByExecutionVariable(String variableName, ValueType valueType) {
-    if (isOrQueryActive) {
-      throw new ProcessEngineException("Invalid query usage: cannot set orderByExecutionVariable() within 'or' query");
-    }
-
+    ensureNotInOrQuery("orderByExecutionVariable()");
     ensureNotNull("variableName", variableName);
     ensureNotNull("valueType", valueType);
 
@@ -1422,10 +1385,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery orderByTaskVariable(String variableName, ValueType valueType) {
-    if (isOrQueryActive) {
-      throw new ProcessEngineException("Invalid query usage: cannot set orderByTaskVariable() within 'or' query");
-    }
-
+    ensureNotInOrQuery("orderByTaskVariable()");
     ensureNotNull("variableName", variableName);
     ensureNotNull("valueType", valueType);
 
@@ -1435,10 +1395,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery orderByCaseExecutionVariable(String variableName, ValueType valueType) {
-    if (isOrQueryActive) {
-      throw new ProcessEngineException("Invalid query usage: cannot set orderByCaseExecutionVariable() within 'or' query");
-    }
-
+    ensureNotInOrQuery("orderByCaseExecutionVariable()");
     ensureNotNull("variableName", variableName);
     ensureNotNull("valueType", valueType);
 
@@ -1448,10 +1405,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   @Override
   public TaskQuery orderByCaseInstanceVariable(String variableName, ValueType valueType) {
-    if (isOrQueryActive) {
-      throw new ProcessEngineException("Invalid query usage: cannot set orderByCaseInstanceVariable() within 'or' query");
-    }
-
+    ensureNotInOrQuery("orderByCaseInstanceVariable()");
     ensureNotNull("variableName", variableName);
     ensureNotNull("valueType", valueType);
 
@@ -1675,6 +1629,10 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   public Date getCreateTimeAfter() {
     return createTimeAfter;
+  }
+
+  public Date getUpdatedAfter() {
+    return updatedAfter;
   }
 
   public String getKey() {
@@ -2073,6 +2031,13 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     }
     else if (this.getCreateTimeAfter() != null) {
       extendedQuery.taskCreatedAfter(this.getCreateTimeAfter());
+    }
+
+    if(extendingQuery.getUpdatedAfter() != null) {
+      extendedQuery.taskUpdatedAfter(extendingQuery.getUpdatedAfter());
+    }
+    else if(this.getUpdatedAfter() != null) {
+      extendedQuery.taskUpdatedAfter(this.getUpdatedAfter());
     }
 
     if (extendingQuery.getKey() != null) {

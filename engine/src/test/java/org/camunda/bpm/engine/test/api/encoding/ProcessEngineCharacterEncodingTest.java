@@ -87,7 +87,6 @@ public class ProcessEngineCharacterEncodingTest {
   protected Task newTaskWithComment(String message) {
     Task task = newTask();
     taskService.createComment(task.getId(), null, message);
-    taskService.saveTask(task);
     return task;
   }
 

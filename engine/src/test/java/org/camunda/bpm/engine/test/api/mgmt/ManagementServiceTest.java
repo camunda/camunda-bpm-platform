@@ -262,7 +262,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTest {
   }
 
   protected List<String> getAllJobIds() {
-    ArrayList<String> result = new ArrayList<String>();
+    ArrayList<String> result = new ArrayList<>();
     for (Job job : managementService.createJobQuery().list()) {
       result.add(job.getId());
     }
@@ -797,17 +797,20 @@ public class ManagementServiceTest extends PluggableProcessEngineTest {
   public void testGetTableMetaData() {
 
     TableMetaData tableMetaData = managementService.getTableMetaData("ACT_RU_TASK");
-    assertEquals(tableMetaData.getColumnNames().size(), tableMetaData.getColumnTypes().size());
-    assertEquals(21, tableMetaData.getColumnNames().size());
+    assertThat(tableMetaData.getColumnNames().size()).isEqualTo(tableMetaData.getColumnTypes().size());
+    assertThat(tableMetaData.getColumnNames()).contains("ID_", "REV_","NAME_", "PARENT_TASK_ID_",
+        "PRIORITY_", "CREATE_TIME_", "OWNER_", "ASSIGNEE_", "DELEGATION_", "EXECUTION_ID_", "PROC_DEF_ID_",
+        "PROC_INST_ID_", "CASE_EXECUTION_ID_","CASE_INST_ID_", "CASE_DEF_ID_", "TASK_DEF_KEY_", "DESCRIPTION_",
+        "DUE_DATE_", "FOLLOW_UP_DATE_", "SUSPENSION_STATE_", "TENANT_ID_");
 
     int assigneeIndex = tableMetaData.getColumnNames().indexOf("ASSIGNEE_");
     int createTimeIndex = tableMetaData.getColumnNames().indexOf("CREATE_TIME_");
 
-    assertTrue(assigneeIndex >= 0);
-    assertTrue(createTimeIndex >= 0);
+    assertThat(assigneeIndex >= 0).isTrue();
+    assertThat(createTimeIndex >= 0).isTrue();
 
-    assertOneOf(new String[]{"CHARACTER VARYING", "VARCHAR", "NVARCHAR2", "nvarchar", "NVARCHAR"}, tableMetaData.getColumnTypes().get(assigneeIndex));
-    assertOneOf(new String[]{"TIMESTAMP", "TIMESTAMP(6)", "datetime", "DATETIME", "DATETIME2"}, tableMetaData.getColumnTypes().get(createTimeIndex));
+    assertThat(tableMetaData.getColumnTypes().get(assigneeIndex)).isIn("CHARACTER VARYING", "VARCHAR", "NVARCHAR2", "nvarchar", "NVARCHAR");
+    assertThat(tableMetaData.getColumnTypes().get(createTimeIndex)).isIn("TIMESTAMP", "TIMESTAMP(6)", "datetime", "DATETIME", "DATETIME2");
   }
 
   private void assertOneOf(String[] possibleValues, String currentValue) {
@@ -921,7 +924,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTest {
   }
 
   private List<String> generateDummyTasks(int nrOfTasks) {
-    ArrayList<String> taskIds = new ArrayList<String>();
+    ArrayList<String> taskIds = new ArrayList<>();
     for (int i = 0; i < nrOfTasks; i++) {
       Task task = taskService.newTask();
       task.setName(((char) ('A' + i)) + "");

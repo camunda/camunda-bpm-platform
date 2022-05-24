@@ -16,13 +16,13 @@
  */
 package org.camunda.bpm.engine.test.api.filter;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,7 +31,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gson.JsonObject;
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.filter.Filter;
@@ -65,6 +64,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import com.google.gson.JsonObject;
 
 /**
  * @author Sebastian Menski
@@ -200,6 +201,8 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     query.taskCreatedBeforeExpression(testString);
     query.taskCreatedAfter(testDate);
     query.taskCreatedAfterExpression(testString);
+    query.taskUpdatedAfter(testDate);
+    query.taskUpdatedAfterExpression(testString);
     query.taskDefinitionKey(testString);
     query.taskDefinitionKeyIn(testKeys);
     query.taskDefinitionKeyLike(testString);
@@ -309,6 +312,8 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTest {
     assertEquals(testString, query.getExpressions().get("taskCreatedBefore"));
     assertEquals(testDate, query.getCreateTimeAfter());
     assertEquals(testString, query.getExpressions().get("taskCreatedAfter"));
+    assertEquals(testDate, query.getUpdatedAfter());
+    assertEquals(testString, query.getExpressions().get("taskUpdatedAfter"));
     assertEquals(testString, query.getKey());
     assertEquals(testKeys.length, query.getKeys().length);
     for (int i = 0; i < query.getKeys().length; i++) {
