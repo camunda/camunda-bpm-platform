@@ -22,6 +22,7 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -58,6 +59,7 @@ public class ProcessDataContext {
   protected String mdcPropertyApplicationName;
   protected String mdcPropertyBusinessKey;
   protected String mdcPropertyDefinitionId;
+  protected String mdcPropertyDefinitionKey;
   protected String mdcPropertyInstanceId;
   protected String mdcPropertyTenantId;
 
@@ -84,26 +86,13 @@ public class ProcessDataContext {
     if (isNotBlank(mdcPropertyActivityId)) {
       mdcDataStacks.put(mdcPropertyActivityId, activityIdStack);
     }
-    mdcPropertyApplicationName = configuration.getLoggingContextApplicationName();
-    if (isNotBlank(mdcPropertyApplicationName)) {
-      mdcDataStacks.put(mdcPropertyApplicationName, new ProcessDataStack(mdcPropertyApplicationName));
-    }
-    mdcPropertyBusinessKey = configuration.getLoggingContextBusinessKey();
-    if (isNotBlank(mdcPropertyBusinessKey)) {
-      mdcDataStacks.put(mdcPropertyBusinessKey, new ProcessDataStack(mdcPropertyBusinessKey));
-    }
-    mdcPropertyDefinitionId = configuration.getLoggingContextProcessDefinitionId();
-    if (isNotBlank(mdcPropertyDefinitionId)) {
-      mdcDataStacks.put(mdcPropertyDefinitionId, new ProcessDataStack(mdcPropertyDefinitionId));
-    }
-    mdcPropertyInstanceId = configuration.getLoggingContextProcessInstanceId();
-    if (isNotBlank(mdcPropertyInstanceId)) {
-      mdcDataStacks.put(mdcPropertyInstanceId, new ProcessDataStack(mdcPropertyInstanceId));
-    }
-    mdcPropertyTenantId = configuration.getLoggingContextTenantId();
-    if (isNotBlank(mdcPropertyTenantId)) {
-      mdcDataStacks.put(mdcPropertyTenantId, new ProcessDataStack(mdcPropertyTenantId));
-    }
+    mdcPropertyApplicationName = initProperty(configuration::getLoggingContextApplicationName);
+    mdcPropertyBusinessKey = initProperty(configuration::getLoggingContextBusinessKey);
+    mdcPropertyDefinitionId = initProperty(configuration::getLoggingContextProcessDefinitionId);
+    mdcPropertyDefinitionKey = initProperty(configuration::getLoggingContextProcessDefinitionKey);
+    mdcPropertyInstanceId = initProperty(configuration::getLoggingContextProcessInstanceId);
+    mdcPropertyTenantId = initProperty(configuration::getLoggingContextTenantId);
+
     handleMdc = !mdcDataStacks.isEmpty();
 
     if (initFromCurrentMdc) {
@@ -116,6 +105,14 @@ public class ProcessDataContext {
 
       sections.sealCurrentSection();
     }
+  }
+
+  protected String initProperty(final Supplier<String> configSupplier) {
+    final String configValue = configSupplier.get();
+    if (isNotBlank(configValue)) {
+      mdcDataStacks.put(configValue, new ProcessDataStack(configValue));
+    }
+    return configValue;
   }
 
   /**
@@ -156,6 +153,10 @@ public class ProcessDataContext {
 
     if (isNotBlank(mdcPropertyBusinessKey)) {
       addToStack(execution.getBusinessKey(), mdcPropertyBusinessKey);
+    }
+
+    if (isNotBlank(mdcPropertyDefinitionKey)) {
+      addToStack(execution.getProcessDefinition().getKey(), mdcPropertyDefinitionKey);
     }
 
     sections.sealCurrentSection();
