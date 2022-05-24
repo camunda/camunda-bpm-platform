@@ -981,6 +981,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected String loggingContextApplicationName = "applicationName";
   protected String loggingContextBusinessKey;// default == null => disabled by default
   protected String loggingContextProcessDefinitionId = "processDefinitionId";
+  protected String loggingContextProcessDefinitionKey;// default == null => disabled by default
   protected String loggingContextProcessInstanceId = "processInstanceId";
   protected String loggingContextTenantId = "tenantId";
 
@@ -5064,6 +5065,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfigurationImpl setLoggingContextProcessDefinitionId(String loggingContextProcessDefinitionId) {
     this.loggingContextProcessDefinitionId = loggingContextProcessDefinitionId;
+    return this;
+  }
+
+  public String getLoggingContextProcessDefinitionKey() {
+    return loggingContextProcessDefinitionKey;
+  }
+
+  public ProcessEngineConfigurationImpl setLoggingContextProcessDefinitionKey(String loggingContextProcessDefinitionKey) {
+    this.loggingContextProcessDefinitionKey = loggingContextProcessDefinitionKey;
     return this;
   }
 
