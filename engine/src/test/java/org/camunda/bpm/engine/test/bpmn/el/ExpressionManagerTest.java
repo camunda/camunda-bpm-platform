@@ -16,19 +16,24 @@
  */
 package org.camunda.bpm.engine.test.bpmn.el;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Test;
 
 /**
@@ -107,5 +112,33 @@ public class ExpressionManagerTest extends PluggableProcessEngineTest {
     taskService.complete(taskService.createTaskQuery().singleResult().getId());
     // then
     assertEquals(1L, historyService.createHistoricVariableInstanceQuery().variableValueEquals("myCounter", 6).count());
+  }
+
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void testJuelExpressionWithNonPublicClass() {
+    final BpmnModelInstance process = Bpmn.createExecutableProcess("testProcess")
+        .startEvent()
+          .exclusiveGateway()
+            .condition("true", "${list.contains('foo')}")
+            .userTask("userTask")
+          .moveToLastGateway()
+            .condition("false", "${!list.contains('foo')}")
+            .endEvent()
+        .done();
+
+    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService.createDeployment()
+        .addModelInstance("testProcess.bpmn", process)
+        .deploy();
+
+    runtimeService.startProcessInstanceByKey("testProcess",
+        Variables.createVariables().putValue("list", Arrays.asList("foo", "bar")));
+
+    HistoricActivityInstance userTask = historyService.createHistoricActivityInstanceQuery()
+        .activityId("userTask")
+        .singleResult();
+    assertThat(userTask).isNotNull();
+
+    repositoryService.deleteDeployment(deployment.getId(), true);
   }
 }
