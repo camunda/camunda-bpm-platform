@@ -21,7 +21,7 @@ import java.util.Map;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.TypedValue;
-
+import java.util.Optional;
 
 /**
  * @author Tom Baeyens
@@ -62,7 +62,11 @@ public class EnumFormType extends SimpleFormFieldType {
   protected void validateValue(Object value) {
     if(value != null) {
       if(values != null && !values.containsKey(value)) {
-        throw new ProcessEngineException("Invalid value for enum form property: " + value);
+        try {
+          value = validateMapAndReturnKeyIfValueProvided(String.valueOf(value));
+        } catch (Exception ex) {
+          throw new ProcessEngineException("Invalid value for enum form property: " + value);
+        }        
       }
     }
   }
@@ -71,6 +75,19 @@ public class EnumFormType extends SimpleFormFieldType {
     return values;
   }
 
+  protected String validateMapAndReturnKeyIfValueProvided(String propertyValue) {
+    // default value is a value of the enumeration
+    // try to retrieve the key
+    if (propertyValue != null && values.containsValue(propertyValue)) {
+      Optional<String> firstOccuranceForValue = values.entrySet().stream()
+              .filter(entry -> propertyValue.equals(entry.getValue()))
+              .map(mapper -> mapper.getKey()).findFirst();
+      if (firstOccuranceForValue.isPresent()) {
+        return String.valueOf(firstOccuranceForValue.get());
+      }
+    }
+    throw new ProcessEngineException("Invalid value for enum form property: " + propertyValue);
+  }
   //////////////////// deprecated ////////////////////////////////////////
 
   @Override
