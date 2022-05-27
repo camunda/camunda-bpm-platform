@@ -16,8 +16,10 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity.util;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.application.AbstractProcessApplication;
@@ -40,6 +42,7 @@ import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.SerializableValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
+import org.camunda.bpm.engine.variable.impl.value.PrimitiveTypeValueImpl.DateValueImpl;
 
 /**
  * A field what provide a typed version of a value. It can
@@ -62,6 +65,9 @@ public class TypedValueField implements DbEntityLifecycleAware, CommandContextLi
 
   protected boolean notifyOnImplicitUpdates = false;
   protected List<TypedValueUpdateListener> updateListeners;
+
+  private static final String DATE_VALUE_PREFIX = "[Date";
+  private static final String DATE_FILTER_REGEX = "(\\[|Date |\\])";
 
   public TypedValueField(ValueFields valueFields, boolean notifyOnImplicitUpdates) {
     this.valueFields = valueFields;
@@ -117,7 +123,27 @@ public class TypedValueField implements DbEntityLifecycleAware, CommandContextLi
     return cachedValue;
   }
 
+  /**
+   * If type value is date convert it to DateValueImpl
+   *
+   * @param TypedValue
+   * @return
+   */
+  public TypedValue getDateValue(TypedValue value) {
+    if (value != null && value.getValue() != null
+            && value.getValue().toString().startsWith(DATE_VALUE_PREFIX)) {
+
+      String dateTimeString = value.getValue().toString().replaceAll(DATE_FILTER_REGEX, "");
+      Instant instant = Instant.parse(dateTimeString);
+      return new DateValueImpl(Date.from(instant), value.isTransient());
+    }
+    return value;
+  }
+
   public TypedValue setValue(TypedValue value) {
+    // get DateValueImpl, if Date value is exist in value
+    value = getDateValue(value);
+
     // determine serializer to use
     serializer = getSerializers().findSerializerForValue(value,
         Context.getProcessEngineConfiguration().getFallbackSerializerFactory());
