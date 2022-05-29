@@ -850,7 +850,7 @@ public class ProcessBuilderTest {
     modelInstance = Bpmn.createProcess()
       .startEvent()
       .callActivity(CALL_ACTIVITY_ID)
-        .camundaBusinessKey("business-key")
+        .camundaInBusinessKey("business-key")
       .endEvent()
       .done();
 

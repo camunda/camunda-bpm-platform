@@ -161,7 +161,7 @@ public class AbstractCallActivityBuilder<B extends AbstractCallActivityBuilder<B
    * @param businessKey the business key to set
    * @return the builder object
    */
-  public B camundaBusinessKey(String businessKey) {
+  public B camundaInBusinessKey(String businessKey) {
     CamundaIn param = modelInstance.newInstance(CamundaIn.class);
     param.setCamundaBusinessKey(businessKey);
     addExtensionElement(param);
