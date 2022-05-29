@@ -157,7 +157,7 @@ public class AbstractCallActivityBuilder<B extends AbstractCallActivityBuilder<B
   }
 
   /**
-   * Sets the businessKey
+   * Sets a "camunda in" parameter to pass a business key from the super process instance to the sub process instance
    * @param businessKey the business key to set
    * @return the builder object
    */
