@@ -59,10 +59,10 @@ public class Metrics {
    */
   public static final String JOB_LOCKED_EXCLUSIVE = "job-locked-exclusive";
 
-  public static final String JOB_EXECUTOR_THREADS_ACTIVE = "jobExecutorThreadsActive";
-  public static final String JOB_EXECUTOR_THREADS_BLOCKED = "jobExecutorThreadsBlocked";
-  public static final String JOB_EXECUTOR_THREADS_IDLE = "jobExecutorThreadsIdle";
-  public static final String JOB_EXECUTOR_THREADS_QUEUE = "jobExecutorThreadsQueueSize";
+  public static final String JOB_EXECUTOR_THREADS_ACTIVE = "job-executor-threads-active";
+  public static final String JOB_EXECUTOR_THREADS_BLOCKED = "job-executor-threads-blocked";
+  public static final String JOB_EXECUTOR_THREADS_IDLE = "job-executor-threads-idle";
+  public static final String JOB_EXECUTOR_THREADS_QUEUE = "job-executor-threads-queue-size";
   public static final List<String> JOB_EXECUTOR_THREADS_METRICS = Arrays.asList(
       JOB_EXECUTOR_THREADS_ACTIVE,
       JOB_EXECUTOR_THREADS_BLOCKED,

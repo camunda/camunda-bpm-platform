@@ -47,11 +47,11 @@ public class DefaultPrometheusMetricsCollector extends Collector {
   private MetricFamilySamples buildSamples(MetricSampleFamily sampleFamily) {
     switch (sampleFamily.type) {
       case COUNTER:
-        CounterMetricFamily counterMetricFamily = new CounterMetricFamily(sampleFamily.getName(), sampleFamily.getHelp(), sampleFamily.getLabelNames());
+        CounterMetricFamily counterMetricFamily = new CounterMetricFamily(sampleFamily.getName().replaceAll("-", "_"), sampleFamily.getHelp(), sampleFamily.getLabelNames());
         sampleFamily.getSamples().values().forEach(s -> counterMetricFamily.addMetric(s.getLabelValues(), s.getValue()));
         return counterMetricFamily;
       case GAUGE:
-        GaugeMetricFamily gaugeMetricFamily = new GaugeMetricFamily(sampleFamily.getName(), sampleFamily.getHelp(), sampleFamily.getLabelNames());
+        GaugeMetricFamily gaugeMetricFamily = new GaugeMetricFamily(sampleFamily.getName().replaceAll("-", "_"), sampleFamily.getHelp(), sampleFamily.getLabelNames());
         sampleFamily.getSamples().values().forEach(s -> gaugeMetricFamily.addMetric(s.getLabelValues(), s.getValue()));
         return gaugeMetricFamily;
     }

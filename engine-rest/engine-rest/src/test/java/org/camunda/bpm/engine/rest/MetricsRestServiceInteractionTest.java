@@ -436,10 +436,10 @@ public class MetricsRestServiceInteractionTest extends AbstractRestServiceTest {
     // given
     List<MetricSampleFamily> testMetrics = new ArrayList<>();
 
-    CounterMetricSampleFamily testCounterSamples = new CounterMetricSampleFamily("testCounter", null);
+    CounterMetricSampleFamily testCounterSamples = new CounterMetricSampleFamily("test-counter", null);
     testCounterSamples.addValue(null, 10);
 
-    GaugeMetricSampleFamily testGaugeSamples = new GaugeMetricSampleFamily("testGauge", Collections.singletonList("key"));
+    GaugeMetricSampleFamily testGaugeSamples = new GaugeMetricSampleFamily("test-gauge", Collections.singletonList("key"));
     testGaugeSamples.addValue(Collections.singletonList("ABC"), 55);
     testGaugeSamples.addValue(Collections.singletonList("DEF"), 22);
 
@@ -451,13 +451,13 @@ public class MetricsRestServiceInteractionTest extends AbstractRestServiceTest {
     given()
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
-      .body(containsString("# HELP testCounter_total"))
-      .body(containsString("# TYPE testCounter_total counter"))
-      .body(containsString("testCounter_total 10.0"))
-      .body(containsString("# HELP testGauge"))
-      .body(containsString("# TYPE testGauge gauge"))
-      .body(containsString("testGauge{key=\"ABC\",} 55.0"))
-      .body(containsString("testGauge{key=\"DEF\",} 22.0"))
+      .body(containsString("# HELP test_counter_total"))
+      .body(containsString("# TYPE test_counter_total counter"))
+      .body(containsString("test_counter_total 10.0"))
+      .body(containsString("# HELP test_gauge"))
+      .body(containsString("# TYPE test_gauge gauge"))
+      .body(containsString("test_gauge{key=\"ABC\",} 55.0"))
+      .body(containsString("test_gauge{key=\"DEF\",} 22.0"))
      .when()
       .get(PROMETHEUS_URL);
   }
