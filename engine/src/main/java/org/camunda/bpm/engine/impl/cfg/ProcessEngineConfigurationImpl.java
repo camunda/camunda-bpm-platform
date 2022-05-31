@@ -160,8 +160,8 @@ import org.camunda.bpm.engine.impl.dmn.deployer.DecisionDefinitionDeployer;
 import org.camunda.bpm.engine.impl.dmn.deployer.DecisionRequirementsDefinitionDeployer;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionManager;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionManager;
-import org.camunda.bpm.engine.impl.el.CommandContextFunctionMapper;
-import org.camunda.bpm.engine.impl.el.DateTimeFunctionMapper;
+import org.camunda.bpm.engine.impl.el.CommandContextFunctions;
+import org.camunda.bpm.engine.impl.el.DateTimeFunctions;
 import org.camunda.bpm.engine.impl.el.ElProviderCompatible;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.el.JuelExpressionManager;
@@ -2575,14 +2575,16 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       expressionManager = new JuelExpressionManager(beans);
     }
 
-    // for JuelExpressionManagers, we provide default function mappers
-    if (expressionManager instanceof JuelExpressionManager) {
-      // add function mapper for command context (eg currentUser(), currentUserGroups())
-      ((JuelExpressionManager)expressionManager).addFunctionMapper(new CommandContextFunctionMapper());
-      // add function mapper for date time (eg now(), dateTime())
-      ((JuelExpressionManager)expressionManager).addFunctionMapper(new DateTimeFunctionMapper());
-
-    }
+    
+    expressionManager.addFunction(CommandContextFunctions.CURRENT_USER,
+        ReflectUtil.getMethod(CommandContextFunctions.class, CommandContextFunctions.CURRENT_USER));
+    expressionManager.addFunction(CommandContextFunctions.CURRENT_USER_GROUPS,
+        ReflectUtil.getMethod(CommandContextFunctions.class, CommandContextFunctions.CURRENT_USER_GROUPS));
+    
+    expressionManager.addFunction(DateTimeFunctions.NOW,
+        ReflectUtil.getMethod(DateTimeFunctions.class, DateTimeFunctions.NOW));
+    expressionManager.addFunction(DateTimeFunctions.DATE_TIME,
+        ReflectUtil.getMethod(DateTimeFunctions.class, DateTimeFunctions.DATE_TIME));
   }
 
   protected void initBusinessCalendarManager() {

@@ -25,13 +25,14 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
-import org.camunda.bpm.engine.impl.el.JuelExpressionManager;
 import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
+import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.impl.variable.serializer.JavaObjectSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.TypedValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
 import org.camunda.bpm.engine.variable.type.ValueTypeResolver;
 import org.camunda.spin.DataFormats;
+import org.camunda.spin.Spin;
 
 /**
  * @author Thorben Lindhauer
@@ -94,9 +95,12 @@ public class SpinProcessEnginePlugin extends SpinConfiguration {
 
   protected void registerFunctionMapper(ProcessEngineConfigurationImpl processEngineConfiguration) {
     ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
-    if (expressionManager instanceof JuelExpressionManager) {
-      ((JuelExpressionManager)expressionManager).addFunctionMapper(new SpinFunctionMapper());
-    }
+    expressionManager.addFunction(SpinFunctions.S, 
+        ReflectUtil.getMethod(Spin.class, SpinFunctions.S, Object.class));
+    expressionManager.addFunction(SpinFunctions.XML,
+        ReflectUtil.getMethod(Spin.class, SpinFunctions.XML, Object.class));
+    expressionManager.addFunction(SpinFunctions.JSON,
+        ReflectUtil.getMethod(Spin.class, SpinFunctions.JSON, Object.class));
   }
 
   protected void registerValueTypes(ProcessEngineConfigurationImpl processEngineConfiguration){

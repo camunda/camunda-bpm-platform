@@ -35,7 +35,7 @@ import org.camunda.spin.xml.SpinXmlElement;
  * @author Daniel Meyer
  *
  */
-public class SpinFunctionMapperTest extends PluggableProcessEngineTestCase {
+public class SpinFunctionsTest extends PluggableProcessEngineTestCase {
 
   String xmlString = "<elementName attrName=\"attrValue\" />";
   String jsonString = "{\"foo\": \"bar\"}";

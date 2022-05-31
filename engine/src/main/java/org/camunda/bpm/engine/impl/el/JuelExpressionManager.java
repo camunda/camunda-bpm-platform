@@ -16,8 +16,8 @@
  */
 package org.camunda.bpm.engine.impl.el;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.dmn.engine.impl.spi.el.ElProvider;
@@ -34,6 +34,7 @@ import org.camunda.bpm.engine.impl.javax.el.ListELResolver;
 import org.camunda.bpm.engine.impl.javax.el.MapELResolver;
 import org.camunda.bpm.engine.impl.javax.el.ValueExpression;
 import org.camunda.bpm.engine.impl.juel.ExpressionFactoryImpl;
+import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.test.mock.MockElResolver;
 import org.camunda.bpm.engine.variable.context.VariableContext;
 
@@ -46,13 +47,14 @@ import org.camunda.bpm.engine.variable.context.VariableContext;
  */
 public class JuelExpressionManager implements ExpressionManager, ElProviderCompatible {
 
-  protected List<FunctionMapper> functionMappers = new ArrayList<FunctionMapper>();
+  protected Map<String, Method> functions = new HashMap<String, Method>();
   protected ExpressionFactory expressionFactory;
-  // Default implementation (does nothing)
-  protected ELContext parsingElContext = new ProcessEngineElContext(functionMappers);
   protected Map<Object, Object> beans;
-  protected volatile ELResolver elResolver; // why volatile? =>
-                                            // https://jira.camunda.com/browse/CAM-12106
+  protected volatile boolean initialized = false;
+  protected ELResolver elResolver;
+  protected FunctionMapper functionMapper;
+  // Default implementation (does nothing)
+  protected ELContext parsingElContext;
   protected volatile ElProvider elProvider;
 
   public JuelExpressionManager() {
@@ -68,11 +70,20 @@ public class JuelExpressionManager implements ExpressionManager, ElProviderCompa
 
   @Override
   public Expression createExpression(String expression) {
+    ensureInitialized();
     ValueExpression valueExpression = createValueExpression(expression);
     return new JuelExpression(valueExpression, this, expression);
   }
 
+  @Override
+  public void addFunction(String name, Method function) {
+    EnsureUtil.ensureNotEmpty("name", name);
+    EnsureUtil.ensureNotNull("function", function);
+    functions.put(name, function);
+  }
+
   public ValueExpression createValueExpression(String expression) {
+    ensureInitialized();
     return expressionFactory.createValueExpression(parsingElContext, expression, Object.class);
   }
 
@@ -81,6 +92,7 @@ public class JuelExpressionManager implements ExpressionManager, ElProviderCompa
   }
 
   public ELContext getElContext(VariableScope variableScope) {
+    ensureInitialized();
     ELContext elContext = null;
     if (variableScope instanceof AbstractVariableScope) {
       AbstractVariableScope variableScopeImpl = (AbstractVariableScope) variableScope;
@@ -98,31 +110,32 @@ public class JuelExpressionManager implements ExpressionManager, ElProviderCompa
   }
 
   public ELContext createElContext(VariableContext variableContext) {
-    ELResolver elResolver = getCachedElResolver();
-    ProcessEngineElContext elContext = new ProcessEngineElContext(functionMappers, elResolver);
+    ensureInitialized();
+    ProcessEngineElContext elContext = new ProcessEngineElContext(functionMapper, elResolver);
     elContext.putContext(ExpressionFactory.class, expressionFactory);
     elContext.putContext(VariableContext.class, variableContext);
     return elContext;
   }
 
   protected ProcessEngineElContext createElContext(VariableScope variableScope) {
-    ELResolver elResolver = getCachedElResolver();
-    ProcessEngineElContext elContext = new ProcessEngineElContext(functionMappers, elResolver);
+    ensureInitialized();
+    ProcessEngineElContext elContext = new ProcessEngineElContext(functionMapper, elResolver);
     elContext.putContext(ExpressionFactory.class, expressionFactory);
     elContext.putContext(VariableScope.class, variableScope);
     return elContext;
   }
-
-  protected ELResolver getCachedElResolver() {
-    if (elResolver == null) {
+ 
+  protected void ensureInitialized() {
+    if (!initialized) {
       synchronized (this) {
-        if (elResolver == null) {
+        if (!initialized) {
           elResolver = createElResolver();
+          functionMapper = createFunctionMapper();
+          parsingElContext = new ProcessEngineElContext(functionMapper);
+          initialized = true;
         }
       }
     }
-
-    return elResolver;
   }
 
   protected ELResolver createElResolver() {
@@ -147,12 +160,16 @@ public class JuelExpressionManager implements ExpressionManager, ElProviderCompa
 
     return elResolver;
   }
-
-  /**
-   * @param elFunctionMapper
-   */
-  public void addFunctionMapper(FunctionMapper elFunctionMapper) {
-    this.functionMappers.add(elFunctionMapper);
+  
+  protected FunctionMapper createFunctionMapper() {
+    FunctionMapper functionMapper = new FunctionMapper() {
+      @Override
+      public Method resolveFunction(String prefix, String localName) {
+        return functions.get(localName);
+      }
+      
+    };
+    return functionMapper;
   }
 
   @Override

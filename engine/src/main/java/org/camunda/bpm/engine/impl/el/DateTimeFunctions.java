@@ -16,35 +16,24 @@
  */
 package org.camunda.bpm.engine.impl.el;
 
-import java.lang.reflect.Method;
-import java.util.List;
+import java.util.Date;
 
-import org.camunda.bpm.engine.impl.javax.el.FunctionMapper;
-
+import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.joda.time.DateTime;
 
 /**
- * A {@link FunctionMapper} implemenation which delegates to a list of
- * mappers. When a function is resolved, the list of mappers is iterated
- * and the first one to return a method is used.
- *
- * @author Daniel Meyer
+ * @author Sebastian Menski
  */
-public class CompositeFunctionMapper extends FunctionMapper {
+public final class DateTimeFunctions {
+  public final static String NOW = "now";
+  public final static String DATE_TIME = "dateTime";
 
-  protected List<FunctionMapper> delegateMappers;
-
-  public CompositeFunctionMapper(List<FunctionMapper> delegateMappers) {
-    this.delegateMappers = delegateMappers;
+  public static Date now() {
+    return ClockUtil.getCurrentTime();
   }
 
-  public Method resolveFunction(String prefix, String localName) {
-    for (FunctionMapper mapper : delegateMappers) {
-      Method resolvedFunction = mapper.resolveFunction(prefix, localName);
-      if(resolvedFunction != null) {
-        return resolvedFunction;
-      }
-    }
-    return null;
+  public static DateTime dateTime() {
+    return new DateTime(now());
   }
 
 }
