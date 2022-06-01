@@ -30,7 +30,7 @@ public class CounterMetricSampleFamily extends MetricSampleFamily {
   }
 
   @Override
-  public CounterMetricSampleFamily addValue(List<String> labelsIn, double value) {
+  public CounterMetricSampleFamily addValue(List<String> labelsIn, long value) {
     List<String> labels = labelsIn == null ? Collections.emptyList() : labelsIn;
     if (labels.size() != labelNames.size()) {
       throw new IllegalArgumentException("Incorrect number of labels.");

@@ -50,7 +50,7 @@ public abstract class MetricSampleFamily {
     GAUGE
   }
 
-  public abstract MetricSampleFamily addValue(List<String> labels, double value);
+  public abstract MetricSampleFamily addValue(List<String> labels, long value);
 
   public String getName() {
     return name;

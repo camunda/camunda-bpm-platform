@@ -18,6 +18,7 @@ package org.camunda.bpm.spring.boot.starter;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
+import org.camunda.bpm.spring.boot.starter.actuator.CamundaMonitoringMetrics;
 import org.camunda.bpm.spring.boot.starter.actuator.JobExecutorHealthIndicator;
 import org.camunda.bpm.spring.boot.starter.actuator.ProcessEngineHealthIndicator;
 import org.springframework.boot.actuate.health.HealthIndicator;
@@ -28,11 +29,15 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.scheduling.annotation.EnableScheduling;
+
+import io.micrometer.core.instrument.MeterRegistry;
 
 @Configuration
 @ConditionalOnProperty(prefix = "management.health.camunda", name = "enabled", matchIfMissing = true)
 @ConditionalOnClass(HealthIndicator.class)
 @DependsOn("runtimeService")
+@EnableScheduling
 public class CamundaBpmActuatorConfiguration {
 
   @Bean
@@ -46,5 +51,11 @@ public class CamundaBpmActuatorConfiguration {
   @ConditionalOnMissingBean(name = "processEngineHealthIndicator")
   public HealthIndicator processEngineHealthIndicator(ProcessEngine processEngine) {
     return new ProcessEngineHealthIndicator(processEngine);
+  }
+
+  @Bean
+  @ConditionalOnMissingBean(name = "camundaMonitoringMetrics")
+  public CamundaMonitoringMetrics camundaMetrics(MeterRegistry registry, ProcessEngine engine) {
+    return new CamundaMonitoringMetrics(registry, engine);
   }
 }

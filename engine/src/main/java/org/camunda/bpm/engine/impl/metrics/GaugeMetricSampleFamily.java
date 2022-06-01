@@ -30,7 +30,7 @@ public class GaugeMetricSampleFamily extends MetricSampleFamily {
   }
 
   @Override
-  public GaugeMetricSampleFamily addValue(List<String> labelsIn, double value) {
+  public GaugeMetricSampleFamily addValue(List<String> labelsIn, long value) {
     List<String> labels = labelsIn == null ? Collections.emptyList() : labelsIn;
     if (labels.size() != labelNames.size()) {
       throw new IllegalArgumentException("Incorrect number of labels.");

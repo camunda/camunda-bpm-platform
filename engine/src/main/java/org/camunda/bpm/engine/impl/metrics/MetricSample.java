@@ -26,9 +26,9 @@ public class MetricSample {
   public final String name;
   public final List<String> labelNames;
   public final List<String> labelValues;  // Must have same length as labelNames.
-  public double value;
+  public long value;
 
-  public MetricSample(String name, List<String> labelNames, List<String> labelValues, double value) {
+  public MetricSample(String name, List<String> labelNames, List<String> labelValues, long value) {
     this.name = name;
     this.labelNames = labelNames;
     this.labelValues = labelValues;
@@ -47,11 +47,11 @@ public class MetricSample {
     return labelValues;
   }
 
-  public double getValue() {
+  public long getValue() {
     return value;
   }
 
-  public void setValue(double value) {
+  public void setValue(long value) {
     this.value = value;
   }
 }

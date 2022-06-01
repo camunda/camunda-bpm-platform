@@ -68,7 +68,7 @@ public class DefaultMetricsCollector implements MetricsCollector {
     return Collections.emptyList();
   }
 
-  private double getJobExecutorMetric(String metricName, JobExecutorThreadMetrics jobExecutorThreadMetrics) {
+  private long getJobExecutorMetric(String metricName, JobExecutorThreadMetrics jobExecutorThreadMetrics) {
     switch (metricName) {
     case Metrics.JOB_EXECUTOR_THREADS_ACTIVE:
       return jobExecutorThreadMetrics.getThreadsActive();
