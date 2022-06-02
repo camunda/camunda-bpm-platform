@@ -18,6 +18,7 @@ package org.camunda.commons.logging;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 import org.slf4j.helpers.MessageFormatter;
 
 /**
@@ -102,6 +103,48 @@ public abstract class BaseLogger {
     } catch (IllegalAccessException e) {
       throw new RuntimeException("Unable to instantiate logger '"+loggerClass.getName()+"'", e);
 
+    }
+  }
+
+  /**
+   * Logs a message with the specified log level
+   *
+   * @param level           the log level
+   * @param id              the unique id of this log message
+   * @param messageTemplate the message template to use
+   * @param parameters      a list of optional parameters
+   */
+  protected void log(Level level, String id, String messageTemplate, Object... parameters) {
+    switch (level) {
+    case ERROR:
+      logError(id, messageTemplate, parameters);
+      break;
+    case WARN:
+      logWarn(id, messageTemplate, parameters);
+      break;
+    case INFO:
+      logInfo(id, messageTemplate, parameters);
+      break;
+    case DEBUG:
+      logDebug(id, messageTemplate, parameters);
+      break;
+    case TRACE:
+      logTrace(id, messageTemplate, parameters);
+      break;
+    }
+  }
+
+  /**
+   * Logs a 'TRACE' message
+   *
+   * @param id              the unique id of this log message
+   * @param messageTemplate the message template to use
+   * @param parameters      a list of optional parameters
+   */
+  protected void logTrace(String id, String messageTemplate, Object... parameters) {
+    if (delegateLogger.isTraceEnabled()) {
+      String msg = formatMessageTemplate(id, messageTemplate);
+      delegateLogger.trace(msg, parameters);
     }
   }
 
