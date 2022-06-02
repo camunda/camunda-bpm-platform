@@ -19,16 +19,22 @@ package org.camunda.bpm.engine.impl.util;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.SQLException;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.apache.ibatis.executor.BatchExecutorException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.repository.ResourceType;
+
+import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.CRDB;
+import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.DB2;
+import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.H2;
+import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.MARIADB_MYSQL;
+import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.ORACLE;
+import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.POSTGRES;
+import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.MSSQL;
 
 /**
  * @author Roman Smirnov
@@ -170,24 +176,24 @@ public class ExceptionUtil {
         message.contains("SQLCODE=-803, SQLSTATE=23505");
   }
 
-  public static boolean checkForeignKeyConstraintViolation(PersistenceException persistenceException) {
+  public static boolean checkForeignKeyConstraintViolation(PersistenceException persistenceException, boolean skipPostgres) {
     SQLException sqlException = unwrapException(persistenceException);
 
     if (sqlException == null) {
       return false;
     }
 
-    return checkForeignKeyConstraintViolation(sqlException);
+    return checkForeignKeyConstraintViolation(sqlException, skipPostgres);
   }
 
-  public static boolean checkForeignKeyConstraintViolation(SQLException sqlException) {
+  public static boolean checkForeignKeyConstraintViolation(SQLException sqlException, boolean skipPostgres) {
     String message = sqlException.getMessage().toLowerCase();
     String sqlState = sqlException.getSQLState();
     int errorCode = sqlException.getErrorCode();
 
     // PostgreSQL doesn't allow for a proper check
     if ("23503".equals(sqlState) && errorCode == 0) {
-      return false;
+      return !skipPostgres;
     } else {
       // SqlServer
       return message.contains("foreign key constraint") ||
@@ -263,6 +269,51 @@ public class ExceptionUtil {
           && !errorMessage.contains("retry_commit_deadline_exceeded");
     }
     return false;
+  }
+
+  public enum DEADLOCK_CODES {
+
+    MARIADB_MYSQL(1213, "40001"),
+    MSSQL(1205, "40001"),
+    DB2(-911, "40001"),
+    ORACLE(60, "61000"),
+    POSTGRES(0, "40P01"),
+    CRDB(0, "40001"),
+    H2(40001, "40001");
+
+    protected final int errorCode;
+    protected final String sqlState;
+
+    DEADLOCK_CODES(int errorCode, String sqlState) {
+      this.errorCode = errorCode;
+      this.sqlState = sqlState;
+    }
+
+    public int getErrorCode() {
+      return errorCode;
+    }
+
+    public String getSqlState() {
+      return sqlState;
+    }
+
+    protected boolean equals(int errorCode, String sqlState) {
+      return this.getErrorCode() == errorCode && this.getSqlState().equals(sqlState);
+    }
+
+  }
+
+  public static boolean checkDeadlockException(SQLException sqlException) {
+    String sqlState = sqlException.getSQLState().toUpperCase();
+    int errorCode = sqlException.getErrorCode();
+
+    return MARIADB_MYSQL.equals(errorCode, sqlState) ||
+        MSSQL.equals(errorCode, sqlState) ||
+        DB2.equals(errorCode, sqlState) ||
+        ORACLE.equals(errorCode, sqlState) ||
+        POSTGRES.equals(errorCode, sqlState) ||
+        CRDB.equals(errorCode, sqlState) ||
+        H2.equals(errorCode, sqlState);
   }
 
   public static BatchExecutorException findBatchExecutorException(PersistenceException exception) {

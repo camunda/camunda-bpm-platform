@@ -145,10 +145,10 @@ public class DeleteProcessDefinitionTest {
     try {
       repositoryService.deleteProcessDefinition(processDefinition.getId());
       fail("Should fail, since there exists a process instance");
-    } catch (ProcessEngineException pee) {
+    } catch (ProcessEngineException pex) {
       // then Exception is expected, the deletion should fail since there exist a process instance
       // and the cascade flag is per default false
-      assertTrue(pee.getMessage().contains("Deletion of process definition without cascading failed."));
+      assertTrue(pex.getMessage().contains("Deletion of process definition without cascading failed."));
     }
     assertEquals(1, repositoryService.createProcessDefinitionQuery().count());
   }

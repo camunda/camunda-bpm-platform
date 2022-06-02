@@ -70,6 +70,9 @@ public class JtaProcessEngineConfiguration extends ProcessEngineConfigurationImp
     if (DbSqlSessionFactory.CRDB.equals(databaseType)) {
       defaultCommandInterceptorsTxRequired.add(getCrdbRetryInterceptor());
     }
+    if (!isDisableExceptionCode()) {
+      defaultCommandInterceptorsTxRequired.add(getExceptionCodeInterceptor());
+    }
     defaultCommandInterceptorsTxRequired.add(new LogInterceptor());
     defaultCommandInterceptorsTxRequired.add(new CommandCounterInterceptor(this));
     defaultCommandInterceptorsTxRequired.add(new ProcessApplicationContextInterceptor(this));
@@ -85,6 +88,9 @@ public class JtaProcessEngineConfiguration extends ProcessEngineConfigurationImp
     // so that a Java EE managed TX may be rolled back before retrying.
     if (DbSqlSessionFactory.CRDB.equals(databaseType)) {
       defaultCommandInterceptorsTxRequiresNew.add(getCrdbRetryInterceptor());
+    }
+    if (!isDisableExceptionCode()) {
+      defaultCommandInterceptorsTxRequiresNew.add(getExceptionCodeInterceptor());
     }
     defaultCommandInterceptorsTxRequiresNew.add(new LogInterceptor());
     defaultCommandInterceptorsTxRequiresNew.add(new CommandCounterInterceptor(this));
