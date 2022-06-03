@@ -5064,8 +5064,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return bpmnStackTraceLogLevel;
   }
 
-  public void setBpmnStackTraceLogLevel(final Level bpmnStackTraceLogLevel) {
+  public ProcessEngineConfigurationImpl setBpmnStackTraceLogLevel(final Level bpmnStackTraceLogLevel) {
     this.bpmnStackTraceLogLevel = bpmnStackTraceLogLevel;
+    return this;
   }
 
   public List<FeelCustomFunctionProvider> getDmnFeelCustomFunctionProviders() {
