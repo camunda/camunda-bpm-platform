@@ -408,6 +408,7 @@ pipeline {
             return cambpmWithLabels(allowedStageLabels.minus('cockroachdb'), cambpmGetDbType(dbLabel))
           }))
         }
+        cambpmArchiveArtifacts('engine/target/surefire-reports/org.camunda.bpm.engine.test.DeadlockTest-output.txt')
       }
     }
     stage('MISC tests') {
