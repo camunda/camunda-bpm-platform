@@ -24,9 +24,9 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 /**
  * @author Sebastian Menski
  */
-public final class CommandContextFunctions {
-  public final static String CURRENT_USER = "currentUser";
-  public final static String CURRENT_USER_GROUPS = "currentUserGroups";
+public class CommandContextFunctions {
+  public static final String CURRENT_USER = "currentUser";
+  public static final String CURRENT_USER_GROUPS = "currentUserGroups";
 
   public static String currentUser() {
     CommandContext commandContext = Context.getCommandContext();

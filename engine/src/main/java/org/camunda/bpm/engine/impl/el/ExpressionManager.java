@@ -32,21 +32,19 @@ import java.lang.reflect.Method;
  * </p>
  */
 public interface ExpressionManager {
+  
+  /**
+   * @param expression
+   * @return a parsed expression
+   */
   Expression createExpression(String expression);
 
   /**
    * <p>
-   * This method is supposed to be invoked before first invocation of
+   * Adds a custom function to the expression manager that can be used in
+   * expression evaluation later on. Ideally, use this in the setup phase of the
+   * expression manager, i.e. before the first invocation of
    * {@link #createExpression(String) createExpression}.
-   * </p>
-   * 
-   * <p>
-   * This method is not supposed to be synchronized. It is suggested that this
-   * method is only invoked in
-   * {@link org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin
-   * ProcessEnginePlugin} or subclass of
-   * {@link org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl
-   * ProcessEngineConfigurationImpl}.
    * </p>
    * 
    * @param name

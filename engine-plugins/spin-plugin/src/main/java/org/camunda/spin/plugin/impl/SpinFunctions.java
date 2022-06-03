@@ -28,8 +28,8 @@ package org.camunda.spin.plugin.impl;
  * @author Daniel Meyer
  *
  */
-public final class SpinFunctions {
-  public final static String S = "S";
-  public final static String XML = "XML";
-  public final static String JSON = "JSON";
+public class SpinFunctions {
+  public static final String S = "S";
+  public static final String XML = "XML";
+  public static final String JSON = "JSON";
 }

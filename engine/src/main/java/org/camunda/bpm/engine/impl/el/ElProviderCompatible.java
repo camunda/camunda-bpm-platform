@@ -25,6 +25,9 @@ import org.camunda.bpm.dmn.engine.impl.spi.el.ElProvider;
  */
 public interface ElProviderCompatible {
 
+  /**
+   * @return an {@link ElProvider}
+   */
   ElProvider toElProvider();
 
 }

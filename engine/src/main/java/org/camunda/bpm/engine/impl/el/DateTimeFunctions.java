@@ -24,9 +24,9 @@ import org.joda.time.DateTime;
 /**
  * @author Sebastian Menski
  */
-public final class DateTimeFunctions {
-  public final static String NOW = "now";
-  public final static String DATE_TIME = "dateTime";
+public class DateTimeFunctions {
+  public static final String NOW = "now";
+  public static final String DATE_TIME = "dateTime";
 
   public static Date now() {
     return ClockUtil.getCurrentTime();

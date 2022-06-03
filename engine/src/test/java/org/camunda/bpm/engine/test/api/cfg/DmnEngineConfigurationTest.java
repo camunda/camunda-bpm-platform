@@ -157,7 +157,7 @@ public class DmnEngineConfigurationTest {
     // given provided a el provider in process engine configuration
     ProcessEngineConfigurationImpl processEngineConfiguration = createProcessEngineConfiguration();
     ElProvider elProvider = mock(ElProvider.class);
-    processEngineConfiguration.setElProvider(elProvider);
+    processEngineConfiguration.setDmnElProvider(elProvider);
 
     // when the engine is initialized
     engine = processEngineConfiguration.buildProcessEngine();

@@ -592,7 +592,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected Charset defaultCharset = null;
 
   protected ExpressionManager expressionManager;
-  protected ElProvider elProvider;
+  protected ElProvider dmnElProvider;
   protected ScriptingEngines scriptingEngines;
   protected List<ResolverFactory> resolverFactories;
   protected ScriptingEnvironment scriptingEnvironment;
@@ -2555,8 +2555,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
           .feelCustomFunctionProviders(dmnFeelCustomFunctionProviders)
           .enableFeelLegacyBehavior(dmnFeelEnableLegacyBehavior);
 
-      if (elProvider != null) {
-        dmnEngineConfigurationBuilder.elProvider(elProvider);
+      if (dmnElProvider != null) {
+        dmnEngineConfigurationBuilder.elProvider(dmnElProvider);
       } else if (expressionManager instanceof ElProviderCompatible) {
         dmnEngineConfigurationBuilder.elProvider(((ElProviderCompatible)expressionManager).toElProvider());
       }
@@ -3204,12 +3204,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
-  public ElProvider getElProvider() {
-    return elProvider;
+  public ElProvider getDmnElProvider() {
+    return dmnElProvider;
   }
 
-  public ProcessEngineConfigurationImpl setElProvider(ElProvider elProvider) {
-    this.elProvider = elProvider;
+  public ProcessEngineConfigurationImpl setDmnElProvider(ElProvider elProvider) {
+    this.dmnElProvider = elProvider;
     return this;
   }
 
