@@ -981,7 +981,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected String loggingContextTenantId = "tenantId";
 
   // logging levels (with default values)
-  protected Level bpmnStackTraceLogLevel = Level.DEBUG;
+  protected Level logLevelBpmnStackTrace = Level.DEBUG;
 
   // telemetry ///////////////////////////////////////////////////////
   /**
@@ -5060,12 +5060,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
-  public Level getBpmnStackTraceLogLevel() {
-    return bpmnStackTraceLogLevel;
+  public Level getLogLevelBpmnStackTrace() {
+    return logLevelBpmnStackTrace;
   }
 
-  public ProcessEngineConfigurationImpl setBpmnStackTraceLogLevel(final Level bpmnStackTraceLogLevel) {
-    this.bpmnStackTraceLogLevel = bpmnStackTraceLogLevel;
+  public ProcessEngineConfigurationImpl setLogLevelBpmnStackTrace(final Level logLevelBpmnStackTrace) {
+    this.logLevelBpmnStackTrace = logLevelBpmnStackTrace;
     return this;
   }
 

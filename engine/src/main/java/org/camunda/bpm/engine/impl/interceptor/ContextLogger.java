@@ -58,7 +58,7 @@ public class ContextLogger extends ProcessEngineLogger {
   }
 
   public void bpmnStackTrace(String string) {
-    log(Context.getProcessEngineConfiguration().getBpmnStackTraceLogLevel(),
+    log(Context.getProcessEngineConfiguration().getLogLevelBpmnStackTrace(),
         "006",
         string);
   }
