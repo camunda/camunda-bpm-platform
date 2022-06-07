@@ -16,12 +16,14 @@
  */
 package org.camunda.bpm.engine.test.api.cfg;
 
+import java.lang.reflect.Method;
+import java.util.Map;
+
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.el.CommandContextFunctionMapper;
-import org.camunda.bpm.engine.impl.el.DateTimeFunctionMapper;
-import org.camunda.bpm.engine.impl.javax.el.FunctionMapper;
+import org.camunda.bpm.engine.impl.el.CommandContextFunctions;
+import org.camunda.bpm.engine.impl.el.DateTimeFunctions;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
@@ -40,30 +42,22 @@ public class CustomExpressionManagerTest {
         .setJdbcUrl("jdbc:h2:mem:camunda" + getClass().getSimpleName());
 
     CustomExpressionManager customExpressionManager = new CustomExpressionManager();
-    Assert.assertTrue(customExpressionManager.getFunctionMappers().isEmpty());
+    Assert.assertTrue(customExpressionManager.getFunctions().isEmpty());
     config.setExpressionManager(customExpressionManager);
 
     // when the engine is initialized
     engine = config.buildProcessEngine();
 
-    // then two default function mappers should be registered
+    // then 4 default functions should be registered
     Assert.assertSame(customExpressionManager, config.getExpressionManager());
-    Assert.assertEquals(2, customExpressionManager.getFunctionMappers().size());
+    Assert.assertEquals(4, customExpressionManager.getFunctions().size());
 
-    boolean commandContextMapperFound = false;
-    boolean dateTimeMapperFound = false;
+    Map<String, Method> functions = customExpressionManager.getFunctions();
 
-    for (FunctionMapper functionMapper : customExpressionManager.getFunctionMappers()) {
-      if (functionMapper instanceof CommandContextFunctionMapper) {
-        commandContextMapperFound = true;
-      }
-
-      if (functionMapper instanceof DateTimeFunctionMapper) {
-        dateTimeMapperFound = true;
-      }
-    }
-
-    Assert.assertTrue(commandContextMapperFound && dateTimeMapperFound);
+    Assert.assertTrue(functions.containsKey(CommandContextFunctions.CURRENT_USER));
+    Assert.assertTrue(functions.containsKey(CommandContextFunctions.CURRENT_USER_GROUPS));
+    Assert.assertTrue(functions.containsKey(DateTimeFunctions.NOW));
+    Assert.assertTrue(functions.containsKey(DateTimeFunctions.DATE_TIME));
   }
 
   @After

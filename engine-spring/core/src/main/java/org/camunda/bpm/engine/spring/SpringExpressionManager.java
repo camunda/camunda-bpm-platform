@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.spring;
 
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
+import org.camunda.bpm.engine.impl.el.JuelExpressionManager;
 import org.camunda.bpm.engine.impl.el.ReadOnlyMapELResolver;
 import org.camunda.bpm.engine.impl.el.VariableContextElResolver;
 import org.camunda.bpm.engine.impl.el.VariableScopeElResolver;
@@ -38,7 +39,7 @@ import java.util.Map;
  *
  * @author Tom Baeyens
  */
-public class SpringExpressionManager extends ExpressionManager {
+public class SpringExpressionManager extends JuelExpressionManager {
 
   protected ApplicationContext applicationContext;
 

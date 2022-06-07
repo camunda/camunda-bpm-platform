@@ -16,8 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.el;
 
-import java.util.List;
-
 import org.camunda.bpm.engine.impl.javax.el.ELContext;
 import org.camunda.bpm.engine.impl.javax.el.ELResolver;
 import org.camunda.bpm.engine.impl.javax.el.FunctionMapper;
@@ -36,14 +34,14 @@ public class ProcessEngineElContext extends ELContext {
 
   protected FunctionMapper functionMapper;
 
-  public ProcessEngineElContext(List<FunctionMapper> functionMappers, ELResolver elResolver) {
-    this(functionMappers);
+  public ProcessEngineElContext(FunctionMapper functionMapper, ELResolver elResolver) {
+    this(functionMapper);
     this.elResolver = elResolver;
   }
 
 
-  public ProcessEngineElContext(List<FunctionMapper> functionMappers) {
-    this.functionMapper = new CompositeFunctionMapper(functionMappers);
+  public ProcessEngineElContext(FunctionMapper functionMapper) {
+    this.functionMapper = functionMapper;
   }
 
   public ELResolver getELResolver() {
