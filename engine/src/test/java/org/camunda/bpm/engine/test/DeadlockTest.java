@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test;
 
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.After;
@@ -28,6 +29,9 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.concurrent.CountDownLatch;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 public class DeadlockTest {
 
@@ -57,10 +61,38 @@ public class DeadlockTest {
 
   @Test
   public void should() throws InterruptedException {
-    deadlock();
+    String databaseType = engineRule.getProcessEngineConfiguration().getDatabaseType();
+    switch (databaseType) {
+    case DbSqlSessionFactory.MYSQL:
+      deadlock("40001", 1213);
+      break;
+    case DbSqlSessionFactory.MARIADB:
+      deadlock("40001", 1213);
+      break;
+    case DbSqlSessionFactory.MSSQL:
+      deadlock("40001", 1205);
+      break;
+    case DbSqlSessionFactory.DB2:
+      deadlock("40001", 0);
+      break;
+    case DbSqlSessionFactory.ORACLE:
+      deadlock("61000", 60);
+      break;
+    case DbSqlSessionFactory.POSTGRES:
+      deadlock("40P01", 0);
+      break;
+    case DbSqlSessionFactory.CRDB:
+      deadlock("40P01", 0);
+      break;
+    case DbSqlSessionFactory.H2:
+      deadlock("40001", 40001);
+      break;
+    default:
+      fail("database unknown");
+    }
   }
 
-  public void deadlock() throws InterruptedException {
+  public void deadlock(String expectedSqlState, int expectedErrorCode) throws InterruptedException {
     CountDownLatch latch = new CountDownLatch(2);
 
     Thread t1 = new Thread(() -> {
@@ -91,8 +123,8 @@ public class DeadlockTest {
         } catch (SQLException ex) {
           ex.printStackTrace();
         }
-        //assertThat(e.getSQLState()).isEqualTo(sqlState);
-        //assertThat(e.getErrorCode()).isEqualTo(errorCode);
+        assertThat(e.getSQLState()).isEqualTo(expectedSqlState);
+        assertThat(e.getErrorCode()).isEqualTo(expectedErrorCode);
       }
     });
 
@@ -124,8 +156,8 @@ public class DeadlockTest {
         } catch (SQLException ex) {
           ex.printStackTrace();
         }
-        //assertThat(e.getSQLState()).isEqualTo(sqlState);
-        //assertThat(e.getErrorCode()).isEqualTo(errorCode);
+        assertThat(e.getSQLState()).isEqualTo(expectedSqlState);
+        assertThat(e.getErrorCode()).isEqualTo(expectedErrorCode);
       }
     });
     t1.start();
