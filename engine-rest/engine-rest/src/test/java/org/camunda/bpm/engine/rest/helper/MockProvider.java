@@ -17,8 +17,8 @@
 package org.camunda.bpm.engine.rest.helper;
 
 import static org.camunda.bpm.engine.rest.util.DateTimeUtils.withTimezone;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyInt;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -180,6 +180,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_TASK_NAME = "aName";
   public static final String EXAMPLE_TASK_ASSIGNEE_NAME = "anAssignee";
   public static final String EXAMPLE_TASK_CREATE_TIME = withTimezone("2013-01-23T13:42:42");
+  public static final String EXAMPLE_TASK_LAST_UPDATED = withTimezone("2013-01-23T13:42:45");
   public static final String EXAMPLE_TASK_DUE_DATE = withTimezone("2013-01-23T13:42:43");
   public static final String EXAMPLE_FOLLOW_UP_DATE = withTimezone("2013-01-23T13:42:44");
   public static final DelegationState EXAMPLE_TASK_DELEGATION_STATE = DelegationState.RESOLVED;
@@ -1034,6 +1035,7 @@ public abstract class MockProvider {
       .id(EXAMPLE_TASK_ID).name(EXAMPLE_TASK_NAME)
       .assignee(EXAMPLE_TASK_ASSIGNEE_NAME)
       .createTime(DateTimeUtil.parseDate(EXAMPLE_TASK_CREATE_TIME))
+      .lastUpdated(DateTimeUtil.parseDate(EXAMPLE_TASK_LAST_UPDATED))
       .dueDate(DateTimeUtil.parseDate(EXAMPLE_TASK_DUE_DATE))
       .followUpDate(DateTimeUtil.parseDate(EXAMPLE_FOLLOW_UP_DATE))
       .delegationState(EXAMPLE_TASK_DELEGATION_STATE).description(EXAMPLE_TASK_DESCRIPTION)

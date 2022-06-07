@@ -72,6 +72,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   public static final String SORT_BY_CASE_EXECUTION_ID_VALUE = "caseExecutionId";
   public static final String SORT_BY_ASSIGNEE_VALUE = "assignee";
   public static final String SORT_BY_CREATE_TIME_VALUE = "created";
+  public static final String SORT_BY_UPDATED_AFTER_VALUE = "updatedAfter";
   public static final String SORT_BY_DESCRIPTION_VALUE = "description";
   public static final String SORT_BY_ID_VALUE = "id";
   public static final String SORT_BY_NAME_VALUE = "name";
@@ -96,6 +97,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     VALID_SORT_BY_VALUES.add(SORT_BY_CASE_EXECUTION_ID_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_ASSIGNEE_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_CREATE_TIME_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_UPDATED_AFTER_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_DESCRIPTION_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_ID_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_NAME_VALUE);
@@ -186,6 +188,8 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   private String createdBeforeExpression;
   private Date createdOn;
   private String createdOnExpression;
+  private Date updatedAfter;
+  private String updatedAfterExpression;
 
   private String delegationState;
 
@@ -614,6 +618,16 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     this.createdOnExpression = createdOnExpression;
   }
 
+  @CamundaQueryParam(value = "updatedAfter", converter = DateConverter.class)
+  public void setUpdatedAfter(Date updatedAfter) {
+    this.updatedAfter = updatedAfter;
+  }
+
+  @CamundaQueryParam(value = "updatedAfterExpression")
+  public void setUpdatedAfterExpression(String updatedAfterExpression) {
+    this.updatedAfterExpression = updatedAfterExpression;
+  }
+
   @CamundaQueryParam(value = "delegationState")
   public void setDelegationState(String taskDelegationState) {
     this.delegationState = taskDelegationState;
@@ -1020,6 +1034,14 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     return createdOnExpression;
   }
 
+  public Date getUpdatedAfter() {
+    return updatedAfter;
+  }
+
+  public String getUpdatedAfterExpression() {
+    return updatedAfterExpression;
+  }
+
   public String getDelegationState() {
     return delegationState;
   }
@@ -1282,6 +1304,12 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     if (createdOnExpression != null) {
       query.taskCreatedOnExpression(createdOnExpression);
     }
+    if (updatedAfter != null) {
+      query.taskUpdatedAfter(updatedAfter);
+    }
+    if (updatedAfterExpression != null) {
+      query.taskUpdatedAfterExpression(updatedAfterExpression);
+    }
     if (delegationState != null) {
       DelegationStateConverter converter = new DelegationStateConverter();
       DelegationState state = converter.convertQueryParameterToType(delegationState);
@@ -1434,6 +1462,8 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
       query.orderByTaskAssignee();
     } else if (sortBy.equals(SORT_BY_CREATE_TIME_VALUE)) {
       query.orderByTaskCreateTime();
+    } else if (sortBy.equals(SORT_BY_UPDATED_AFTER_VALUE)) {
+      query.orderByTaskUpdatedAfter();
     } else if (sortBy.equals(SORT_BY_DESCRIPTION_VALUE)) {
       query.orderByTaskDescription();
     } else if (sortBy.equals(SORT_BY_ID_VALUE)) {
@@ -1597,6 +1627,8 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     dto.createdBefore = taskQuery.getCreateTimeBefore();
     dto.createdOn = taskQuery.getCreateTime();
 
+    dto.updatedAfter = taskQuery.getUpdatedAfter();
+
     if (taskQuery.getDelegationState() != null) {
       dto.delegationState = taskQuery.getDelegationState().toString();
     }
@@ -1660,14 +1692,17 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     if (expressions.containsKey("taskCandidateGroupIn")) {
       dto.setCandidateGroupsExpression(expressions.get("taskCandidateGroupIn"));
     }
-    if (expressions.containsKey("taskCreatedOne")) {
-      dto.setCreatedOnExpression(expressions.get("taskCreatedOne"));
+    if (expressions.containsKey("taskCreatedOn")) {
+      dto.setCreatedOnExpression(expressions.get("taskCreatedOn"));
     }
     if (expressions.containsKey("taskCreatedBefore")) {
       dto.setCreatedBeforeExpression(expressions.get("taskCreatedBefore"));
     }
     if (expressions.containsKey("taskCreatedAfter")) {
       dto.setCreatedAfterExpression(expressions.get("taskCreatedAfter"));
+    }
+    if (expressions.containsKey("taskUpdatedAfter")) {
+      dto.setUpdatedAfterExpression(expressions.get("taskUpdatedAfter"));
     }
     if (expressions.containsKey("dueDate")) {
       dto.setDueDateExpression(expressions.get("dueDate"));
@@ -1742,6 +1777,9 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     }
     else if (TaskQueryProperty.CREATE_TIME.equals(queryProperty)) {
       return SORT_BY_CREATE_TIME_VALUE;
+    }
+    else if (TaskQueryProperty.UPDATED_AFTER.equals(queryProperty)) {
+      return SORT_BY_UPDATED_AFTER_VALUE;
     }
     else if (TaskQueryProperty.DESCRIPTION.equals(queryProperty)) {
       return SORT_BY_DESCRIPTION_VALUE;

@@ -16,13 +16,13 @@
  */
 package org.camunda.bpm.engine.rest.dto.task;
 
+import java.util.Date;
+
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.form.CamundaFormRef;
 import org.camunda.bpm.engine.rest.dto.converter.DelegationStateConverter;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
-
-import java.util.Date;
 
 public class TaskDto {
 
@@ -32,6 +32,7 @@ public class TaskDto {
   private Date created;
   private Date due;
   private Date followUp;
+  private Date lastUpdated;
   private String delegationState;
   private String description;
   private String executionId;
@@ -149,6 +150,14 @@ public class TaskDto {
     this.followUp = followUp;
   }
 
+  public Date getLastUpdated() {
+    return lastUpdated;
+  }
+
+  public void setLastUpdated(Date lastUpdated) {
+    this.lastUpdated = lastUpdated;
+  }
+
   public String getCaseDefinitionId() {
     return caseDefinitionId;
   }
@@ -191,6 +200,7 @@ public class TaskDto {
     dto.name = task.getName();
     dto.assignee = task.getAssignee();
     dto.created = task.getCreateTime();
+    dto.lastUpdated = task.getLastUpdated();
     dto.due = task.getDueDate();
     dto.followUp = task.getFollowUpDate();
 
