@@ -846,6 +846,20 @@ public class ProcessBuilderTest {
   }
 
   @Test
+  public void testCallActivityCamundaBusinessKey() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .callActivity(CALL_ACTIVITY_ID)
+        .camundaInBusinessKey("business-key")
+      .endEvent()
+      .done();
+
+    CallActivity callActivity = modelInstance.getModelElementById(CALL_ACTIVITY_ID);
+    CamundaIn camundaIn = (CamundaIn) callActivity.getExtensionElements().getUniqueChildElementByType(CamundaIn.class);
+    assertThat(camundaIn.getCamundaBusinessKey()).isEqualTo("business-key");
+  }
+
+  @Test
   public void testCallActivityCamundaVariableMappingClass() {
     modelInstance = Bpmn.createProcess()
       .startEvent()
