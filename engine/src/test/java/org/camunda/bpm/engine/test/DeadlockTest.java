@@ -41,6 +41,8 @@ public class DeadlockTest {
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
+  protected SQLException sqlException;
+
   @Before
   public void createTestTables() throws SQLException {
     Connection conn = engineRule.getProcessEngineConfiguration().getDataSource().getConnection();
@@ -49,6 +51,8 @@ public class DeadlockTest {
     statement.execute("CREATE TABLE deadlock_test2 (FOO INTEGER)");
     statement.executeUpdate("INSERT INTO deadlock_test1 VALUES (0)");
     statement.executeUpdate("INSERT INTO deadlock_test2 VALUES (0)");
+
+    sqlException = null;
   }
 
   @After
@@ -64,35 +68,51 @@ public class DeadlockTest {
     String databaseType = engineRule.getProcessEngineConfiguration().getDatabaseType();
     switch (databaseType) {
     case DbSqlSessionFactory.MYSQL:
-      deadlock("40001", 1213);
+      deadlock();
+      assertThat(sqlException.getSQLState()).isEqualTo("40001");
+      assertThat(sqlException.getErrorCode()).isEqualTo(1213);
       break;
     case DbSqlSessionFactory.MARIADB:
-      deadlock("40001", 1213);
+      deadlock();
+      assertThat(sqlException.getSQLState()).isEqualTo("40001");
+      assertThat(sqlException.getErrorCode()).isEqualTo(1213);
       break;
     case DbSqlSessionFactory.MSSQL:
-      deadlock("40001", 1205);
+      deadlock();
+      assertThat(sqlException.getSQLState()).isEqualTo("40001");
+      assertThat(sqlException.getErrorCode()).isEqualTo(1205);
       break;
     case DbSqlSessionFactory.DB2:
-      deadlock("40001", 0);
+      deadlock();
+      assertThat(sqlException.getSQLState()).isEqualTo("40001");
+      assertThat(sqlException.getErrorCode()).isEqualTo(-911);
       break;
     case DbSqlSessionFactory.ORACLE:
-      deadlock("61000", 60);
+      deadlock();
+      assertThat(sqlException.getSQLState()).isEqualTo("61000");
+      assertThat(sqlException.getErrorCode()).isEqualTo(60);
       break;
     case DbSqlSessionFactory.POSTGRES:
-      deadlock("40P01", 0);
+      deadlock();
+      assertThat(sqlException.getSQLState()).isEqualTo("40P01");
+      assertThat(sqlException.getErrorCode()).isEqualTo(0);
       break;
     case DbSqlSessionFactory.CRDB:
-      deadlock("40P01", 0);
+      deadlock();
+      assertThat(sqlException.getSQLState()).isEqualTo("40P01");
+      assertThat(sqlException.getErrorCode()).isEqualTo(0);
       break;
     case DbSqlSessionFactory.H2:
-      deadlock("40001", 40001);
+      deadlock();
+      assertThat(sqlException.getSQLState()).isEqualTo("40001");
+      assertThat(sqlException.getErrorCode()).isEqualTo(40001);
       break;
     default:
       fail("database unknown");
     }
   }
 
-  public void deadlock(String expectedSqlState, int expectedErrorCode) throws InterruptedException {
+  public void deadlock() throws InterruptedException {
     CountDownLatch latch = new CountDownLatch(2);
 
     Thread t1 = new Thread(() -> {
@@ -115,6 +135,7 @@ public class DeadlockTest {
         statement.executeUpdate("UPDATE deadlock_test2 SET FOO=1");
         conn.commit();
       } catch (SQLException e) {
+        sqlException = e;
         System.out.println(e);
         System.out.println("STATE: " + e.getSQLState());
         System.out.println("CODE: " + e.getErrorCode());
@@ -123,8 +144,6 @@ public class DeadlockTest {
         } catch (SQLException ex) {
           ex.printStackTrace();
         }
-        assertThat(e.getSQLState()).isEqualTo(expectedSqlState);
-        assertThat(e.getErrorCode()).isEqualTo(expectedErrorCode);
       }
     });
 
@@ -148,6 +167,7 @@ public class DeadlockTest {
         statement.executeUpdate("UPDATE deadlock_test1 SET FOO=1");
         conn.commit();
       } catch (SQLException e) {
+        sqlException = e;
         System.out.println(e);
         System.out.println("STATE: " + e.getSQLState());
         System.out.println("CODE: " + e.getErrorCode());
@@ -156,8 +176,6 @@ public class DeadlockTest {
         } catch (SQLException ex) {
           ex.printStackTrace();
         }
-        assertThat(e.getSQLState()).isEqualTo(expectedSqlState);
-        assertThat(e.getErrorCode()).isEqualTo(expectedErrorCode);
       }
     });
     t1.start();
