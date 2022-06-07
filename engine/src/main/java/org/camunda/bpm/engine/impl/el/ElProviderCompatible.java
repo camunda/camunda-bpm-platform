@@ -14,20 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.test.api.cfg;
+package org.camunda.bpm.engine.impl.el;
 
-import java.lang.reflect.Method;
-import java.util.Map;
-
-import org.camunda.bpm.engine.impl.el.JuelExpressionManager;
+import org.camunda.bpm.dmn.engine.impl.spi.el.ElProvider;
 
 /**
- * @author Thorben Lindhauer
- *
+ * Implementations indicate that they are compatible with {@link ElProvider} and
+ * can provide one. A class that implements {@link ExpressionManager} may
+ * implement this interface to be used as an {@link ElProvider} as well.
  */
-public class CustomExpressionManager extends JuelExpressionManager {
+public interface ElProviderCompatible {
 
-  public Map<String, Method> getFunctions() {
-    return functions;
-  }
+  /**
+   * @return an {@link ElProvider}
+   */
+  ElProvider toElProvider();
+
 }

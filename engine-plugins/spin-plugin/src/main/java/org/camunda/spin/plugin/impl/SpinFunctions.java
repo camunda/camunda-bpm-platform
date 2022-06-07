@@ -14,27 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.dmn.el;
-
-
-import org.camunda.bpm.dmn.engine.impl.spi.el.ElExpression;
-import org.camunda.bpm.dmn.engine.impl.spi.el.ElProvider;
-import org.camunda.bpm.engine.impl.el.ExpressionManager;
+package org.camunda.spin.plugin.impl;
 
 /**
+ * A FunctionMapper which resolves the Spin functions for Expression Language.
+ *
+ * <p>Lazy loading: This implementation supports lazy loading: the Java Methods
+ * are loaded upon the first request.</p>
+ *
+ * <p>Caching: once the methods are loaded, they are cached in a Map for efficient
+ * retrieval.</p>
+ *
  * @author Daniel Meyer
  *
  */
-public class ProcessEngineElProvider implements ElProvider {
-
-  protected final ExpressionManager expressionManager;
-
-  public ProcessEngineElProvider(ExpressionManager expressionManager) {
-    this.expressionManager = expressionManager;
-  }
-
-  public ElExpression createExpression(String expression) {
-    return new ProcessEngineElExpression(expressionManager.createValueExpression(expression));
-  }
-
+public class SpinFunctions {
+  public static final String S = "S";
+  public static final String XML = "XML";
+  public static final String JSON = "JSON";
 }

@@ -14,20 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.test.api.cfg;
+package org.camunda.bpm.engine.impl.dmn.el;
 
-import java.lang.reflect.Method;
-import java.util.Map;
 
+import org.camunda.bpm.dmn.engine.impl.spi.el.ElExpression;
+import org.camunda.bpm.dmn.engine.impl.spi.el.ElProvider;
 import org.camunda.bpm.engine.impl.el.JuelExpressionManager;
 
 /**
- * @author Thorben Lindhauer
+ * @author Daniel Meyer
  *
  */
-public class CustomExpressionManager extends JuelExpressionManager {
+public class ProcessEngineJuelElProvider implements ElProvider {
 
-  public Map<String, Method> getFunctions() {
-    return functions;
+  protected final JuelExpressionManager expressionManager;
+
+  public ProcessEngineJuelElProvider(JuelExpressionManager expressionManager) {
+    this.expressionManager = expressionManager;
   }
+
+  public ElExpression createExpression(String expression) {
+    return new ProcessEngineJuelElExpression(expressionManager, expressionManager.createValueExpression(expression));
+  }
+
 }

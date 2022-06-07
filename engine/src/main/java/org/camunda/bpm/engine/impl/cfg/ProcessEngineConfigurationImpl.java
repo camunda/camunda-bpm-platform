@@ -60,6 +60,7 @@ import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 import org.camunda.bpm.dmn.engine.DmnEngine;
 import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
+import org.camunda.bpm.dmn.engine.impl.spi.el.ElProvider;
 import org.camunda.bpm.dmn.feel.impl.scala.function.FeelCustomFunctionProvider;
 import org.camunda.bpm.engine.ArtifactFactory;
 import org.camunda.bpm.engine.AuthorizationService;
@@ -159,9 +160,11 @@ import org.camunda.bpm.engine.impl.dmn.deployer.DecisionDefinitionDeployer;
 import org.camunda.bpm.engine.impl.dmn.deployer.DecisionRequirementsDefinitionDeployer;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionManager;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionManager;
-import org.camunda.bpm.engine.impl.el.CommandContextFunctionMapper;
-import org.camunda.bpm.engine.impl.el.DateTimeFunctionMapper;
+import org.camunda.bpm.engine.impl.el.CommandContextFunctions;
+import org.camunda.bpm.engine.impl.el.DateTimeFunctions;
+import org.camunda.bpm.engine.impl.el.ElProviderCompatible;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
+import org.camunda.bpm.engine.impl.el.JuelExpressionManager;
 import org.camunda.bpm.engine.impl.event.CompensationEventHandler;
 import org.camunda.bpm.engine.impl.event.ConditionalEventHandler;
 import org.camunda.bpm.engine.impl.event.EventHandler;
@@ -589,6 +592,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected Charset defaultCharset = null;
 
   protected ExpressionManager expressionManager;
+  protected ElProvider dmnElProvider;
   protected ScriptingEngines scriptingEngines;
   protected List<ResolverFactory> resolverFactories;
   protected ScriptingEnvironment scriptingEnvironment;
@@ -2545,13 +2549,19 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         dmnEngineConfiguration = (DefaultDmnEngineConfiguration) DmnEngineConfiguration.createDefaultDmnEngineConfiguration();
       }
 
-      dmnEngineConfiguration = new DmnEngineConfigurationBuilder(dmnEngineConfiguration)
+      DmnEngineConfigurationBuilder dmnEngineConfigurationBuilder = new DmnEngineConfigurationBuilder(dmnEngineConfiguration)
           .dmnHistoryEventProducer(dmnHistoryEventProducer)
           .scriptEngineResolver(scriptingEngines)
-          .expressionManager(expressionManager)
           .feelCustomFunctionProviders(dmnFeelCustomFunctionProviders)
-          .enableFeelLegacyBehavior(dmnFeelEnableLegacyBehavior)
-          .build();
+          .enableFeelLegacyBehavior(dmnFeelEnableLegacyBehavior);
+
+      if (dmnElProvider != null) {
+        dmnEngineConfigurationBuilder.elProvider(dmnElProvider);
+      } else if (expressionManager instanceof ElProviderCompatible) {
+        dmnEngineConfigurationBuilder.elProvider(((ElProviderCompatible)expressionManager).toElProvider());
+      }
+
+      dmnEngineConfiguration = dmnEngineConfigurationBuilder.build();
 
       dmnEngine = dmnEngineConfiguration.buildEngine();
 
@@ -2562,13 +2572,19 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected void initExpressionManager() {
     if (expressionManager == null) {
-      expressionManager = new ExpressionManager(beans);
+      expressionManager = new JuelExpressionManager(beans);
     }
 
-    // add function mapper for command context (eg currentUser(), currentUserGroups())
-    expressionManager.addFunctionMapper(new CommandContextFunctionMapper());
-    // add function mapper for date time (eg now(), dateTime())
-    expressionManager.addFunctionMapper(new DateTimeFunctionMapper());
+    
+    expressionManager.addFunction(CommandContextFunctions.CURRENT_USER,
+        ReflectUtil.getMethod(CommandContextFunctions.class, CommandContextFunctions.CURRENT_USER));
+    expressionManager.addFunction(CommandContextFunctions.CURRENT_USER_GROUPS,
+        ReflectUtil.getMethod(CommandContextFunctions.class, CommandContextFunctions.CURRENT_USER_GROUPS));
+    
+    expressionManager.addFunction(DateTimeFunctions.NOW,
+        ReflectUtil.getMethod(DateTimeFunctions.class, DateTimeFunctions.NOW));
+    expressionManager.addFunction(DateTimeFunctions.DATE_TIME,
+        ReflectUtil.getMethod(DateTimeFunctions.class, DateTimeFunctions.DATE_TIME));
   }
 
   protected void initBusinessCalendarManager() {
@@ -3185,6 +3201,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfigurationImpl setExpressionManager(ExpressionManager expressionManager) {
     this.expressionManager = expressionManager;
+    return this;
+  }
+
+  public ElProvider getDmnElProvider() {
+    return dmnElProvider;
+  }
+
+  public ProcessEngineConfigurationImpl setDmnElProvider(ElProvider elProvider) {
+    this.dmnElProvider = elProvider;
     return this;
   }
 
