@@ -298,7 +298,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
   public static boolean isCrdbConcurrencyConflict(Throwable cause) {
     // only check when CRDB is used
     if (DatabaseUtil.checkDatabaseType(DbSqlSessionFactory.CRDB)) {
-      return ExceptionUtil.checkCrdbTransactionRetryException((PersistenceException) cause);
+      return ExceptionUtil.checkCrdbTransactionRetryException(cause);
     }
 
     return false;

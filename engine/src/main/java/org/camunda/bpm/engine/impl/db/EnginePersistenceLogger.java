@@ -815,14 +815,6 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
         operation.getFailure());
   }
 
-  public CrdbTransactionRetryException crdbTransactionRetryExceptionOnSelect(Throwable cause) {
-    return new CrdbTransactionRetryException(exceptionMessage(
-      "103",
-      "Execution of SELECT statement failed. The transaction needs to be retried."),
-      cause
-    );
-  }
-
   public CrdbTransactionRetryException crdbTransactionRetryExceptionOnCommit(Throwable cause) {
     return new CrdbTransactionRetryException(exceptionMessage(
         "104",
