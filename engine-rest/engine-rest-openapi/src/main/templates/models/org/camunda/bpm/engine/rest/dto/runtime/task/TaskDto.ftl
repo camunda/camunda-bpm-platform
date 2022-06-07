@@ -30,6 +30,14 @@
                 `yyyy-MM-dd'T'HH:mm:ss.SSSZ`." />
 
     <@lib.property
+        name = "lastUpdated"
+        type = "string"
+        format = "date-time"
+        desc = "The date the task was last updated. Every action that fires a [task update event](${docsUrl}/user-guide/process-engine/delegation-code/#task-listener-event-lifecycle) will update this property.
+                [Default format](${docsUrl}/reference/rest/overview/date-format/)
+                `yyyy-MM-dd'T'HH:mm:ss.SSSZ`." />
+
+    <@lib.property
         name = "due"
         type = "string"
         format = "date-time"

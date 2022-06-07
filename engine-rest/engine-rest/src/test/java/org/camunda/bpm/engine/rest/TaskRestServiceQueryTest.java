@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.rest;
 import static io.restassured.RestAssured.given;
 import static io.restassured.path.json.JsonPath.from;
 import static junit.framework.TestCase.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.rest.util.DateTimeUtils.withTimezone;
 import static org.camunda.bpm.engine.rest.util.QueryParamUtils.arrayAsCommaSeperatedList;
 import static org.hamcrest.Matchers.equalTo;
@@ -37,6 +38,7 @@ import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -159,14 +161,15 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     inOrder.verify(mockQuery).list();
 
     String content = response.asString();
-    List<String> instances = from(content).getList("");
-    Assert.assertEquals("There should be one task returned.", 1, instances.size());
-    Assert.assertNotNull("The returned task should not be null.", instances.get(0));
+    List<LinkedHashMap<String, String>> instances = from(content).getList("");
+    assertThat(instances).hasSize(1).as("There should be one task returned.");
+    assertThat(instances.get(0)).isNotNull().as("The returned task should not be null.");
 
     String returnedTaskName = from(content).getString("[0].name");
     String returnedId = from(content).getString("[0].id");
     String returendAssignee = from(content).getString("[0].assignee");
     String returnedCreateTime = from(content).getString("[0].created");
+    String returnedLastUpdated = from(content).getString("[0].lastUpdated");
     String returnedDueDate = from(content).getString("[0].due");
     String returnedFollowUpDate = from(content).getString("[0].followUp");
     String returnedDelegationState = from(content).getString("[0].delegationState");
@@ -185,27 +188,28 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     String returnedFormKey = from(content).getString("[0].formKey");
     String returnedTenantId = from(content).getString("[0].tenantId");
 
-    Assert.assertEquals(MockProvider.EXAMPLE_TASK_NAME, returnedTaskName);
-    Assert.assertEquals(MockProvider.EXAMPLE_TASK_ID, returnedId);
-    Assert.assertEquals(MockProvider.EXAMPLE_TASK_ASSIGNEE_NAME, returendAssignee);
-    Assert.assertEquals(MockProvider.EXAMPLE_TASK_CREATE_TIME, returnedCreateTime);
-    Assert.assertEquals(MockProvider.EXAMPLE_TASK_DUE_DATE, returnedDueDate);
-    Assert.assertEquals(MockProvider.EXAMPLE_FOLLOW_UP_DATE, returnedFollowUpDate);
-    Assert.assertEquals(MockProvider.EXAMPLE_TASK_DELEGATION_STATE.toString(), returnedDelegationState);
-    Assert.assertEquals(MockProvider.EXAMPLE_TASK_DESCRIPTION, returnedDescription);
-    Assert.assertEquals(MockProvider.EXAMPLE_TASK_EXECUTION_ID, returnedExecutionId);
-    Assert.assertEquals(MockProvider.EXAMPLE_TASK_OWNER, returnedOwner);
-    Assert.assertEquals(MockProvider.EXAMPLE_TASK_PARENT_TASK_ID, returnedParentTaskId);
-    Assert.assertEquals(MockProvider.EXAMPLE_TASK_PRIORITY, returnedPriority);
-    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, returnedProcessDefinitionId);
-    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, returnedProcessInstanceId);
-    Assert.assertEquals(MockProvider.EXAMPLE_TASK_DEFINITION_KEY, returnedTaskDefinitionKey);
-    Assert.assertEquals(MockProvider.EXAMPLE_CASE_DEFINITION_ID, returnedCaseDefinitionId);
-    Assert.assertEquals(MockProvider.EXAMPLE_CASE_INSTANCE_ID, returnedCaseInstanceId);
-    Assert.assertEquals(MockProvider.EXAMPLE_CASE_EXECUTION_ID, returnedCaseExecutionId);
-    Assert.assertEquals(MockProvider.EXAMPLE_TASK_SUSPENSION_STATE, returnedSuspensionState);
-    Assert.assertEquals(MockProvider.EXAMPLE_FORM_KEY, returnedFormKey);
-    Assert.assertEquals(MockProvider.EXAMPLE_TENANT_ID, returnedTenantId);
+    assertThat(MockProvider.EXAMPLE_TASK_NAME).isEqualTo(returnedTaskName);
+    assertThat(MockProvider.EXAMPLE_TASK_ID).isEqualTo(returnedId);
+    assertThat(MockProvider.EXAMPLE_TASK_ASSIGNEE_NAME).isEqualTo(returendAssignee);
+    assertThat(MockProvider.EXAMPLE_TASK_CREATE_TIME).isEqualTo(returnedCreateTime);
+    assertThat(MockProvider.EXAMPLE_TASK_LAST_UPDATED).isEqualTo(returnedLastUpdated);
+    assertThat(MockProvider.EXAMPLE_TASK_DUE_DATE).isEqualTo(returnedDueDate);
+    assertThat(MockProvider.EXAMPLE_FOLLOW_UP_DATE).isEqualTo(returnedFollowUpDate);
+    assertThat(MockProvider.EXAMPLE_TASK_DELEGATION_STATE.toString()).isEqualTo(returnedDelegationState);
+    assertThat(MockProvider.EXAMPLE_TASK_DESCRIPTION).isEqualTo(returnedDescription);
+    assertThat(MockProvider.EXAMPLE_TASK_EXECUTION_ID).isEqualTo(returnedExecutionId);
+    assertThat(MockProvider.EXAMPLE_TASK_OWNER).isEqualTo(returnedOwner);
+    assertThat(MockProvider.EXAMPLE_TASK_PARENT_TASK_ID).isEqualTo(returnedParentTaskId);
+    assertThat(MockProvider.EXAMPLE_TASK_PRIORITY).isEqualTo(returnedPriority);
+    assertThat(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID).isEqualTo(returnedProcessDefinitionId);
+    assertThat(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).isEqualTo(returnedProcessInstanceId);
+    assertThat(MockProvider.EXAMPLE_TASK_DEFINITION_KEY).isEqualTo(returnedTaskDefinitionKey);
+    assertThat(MockProvider.EXAMPLE_CASE_DEFINITION_ID).isEqualTo(returnedCaseDefinitionId);
+    assertThat(MockProvider.EXAMPLE_CASE_INSTANCE_ID).isEqualTo(returnedCaseInstanceId);
+    assertThat(MockProvider.EXAMPLE_CASE_EXECUTION_ID).isEqualTo(returnedCaseExecutionId);
+    assertThat(MockProvider.EXAMPLE_TASK_SUSPENSION_STATE).isEqualTo(returnedSuspensionState);
+    assertThat(MockProvider.EXAMPLE_FORM_KEY).isEqualTo(returnedFormKey);
+    assertThat(MockProvider.EXAMPLE_TENANT_ID).isEqualTo(returnedTenantId);
 
   }
 
@@ -603,6 +607,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     verify(mockQuery).taskCreatedAfter(any(Date.class));
     verify(mockQuery).taskCreatedBefore(any(Date.class));
     verify(mockQuery).taskCreatedOn(any(Date.class));
+    verify(mockQuery).taskUpdatedAfter(any(Date.class));
   }
 
   @Test
@@ -628,6 +633,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     verify(mockQuery).taskCreatedAfter(any(Date.class));
     verify(mockQuery).taskCreatedBefore(any(Date.class));
     verify(mockQuery).taskCreatedOn(any(Date.class));
+    verify(mockQuery).taskUpdatedAfter(any(Date.class));
   }
 
   @Test
@@ -662,6 +668,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     parameters.put("followUpBefore", withTimezone("2013-01-23T14:42:49"));
     parameters.put("followUpBeforeOrNotExistent", withTimezone("2013-01-23T14:42:49"));
     parameters.put("followUpDate", withTimezone("2013-01-23T14:42:50"));
+    parameters.put("updatedAfter", withTimezone("2013-01-23T14:42:50"));
     return parameters;
   }
 
@@ -837,6 +844,11 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     inOrder = Mockito.inOrder(mockQuery);
     executeAndVerifySorting("tenantId", "asc", Status.OK);
     inOrder.verify(mockQuery).orderByTenantId();
+    inOrder.verify(mockQuery).asc();
+
+    inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySorting("updatedAfter", "asc", Status.OK);
+    inOrder.verify(mockQuery).orderByTaskUpdatedAfter();
     inOrder.verify(mockQuery).asc();
 
   }
@@ -2123,6 +2135,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     params.put("followUpAfterExpression", generator.getValue("followUpAfterExpression"));
     params.put("processInstanceBusinessKeyExpression", generator.getValue("processInstanceBusinessKeyExpression"));
     params.put("processInstanceBusinessKeyLikeExpression", generator.getValue("processInstanceBusinessKeyLikeExpression"));
+    params.put("lastUpdatedExpression", generator.getValue("lastUpdatedExpressionExpression"));
 
     // get
     given()

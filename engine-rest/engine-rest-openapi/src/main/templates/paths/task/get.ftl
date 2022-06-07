@@ -20,7 +20,7 @@
     <#include "/lib/commons/task-query-params.ftl" >
 
     <#assign sortByValues = [ '"instanceId"', '"caseInstanceId"', '"dueDate"', '"executionId"', '"caseExecutionId"',
-                              '"assignee"', '"created"', '"description"', '"id"', '"name"', '"nameCaseInsensitive"',
+                              '"assignee"', '"created"', '"lastUpdated"', '"description"', '"id"', '"name"', '"nameCaseInsensitive"',
                               '"priority"', '"processVariable"', '"executionVariable"', '"taskVariable"',
                               '"caseExecutionVariable"', '"caseInstanceVariable"' ] >
     <#include "/lib/commons/sort-params.ftl" >
@@ -48,6 +48,7 @@
                            "created":"2013-01-23T13:42:42.657+0200",
                            "due":"2013-01-23T13:49:42.323+0200",
                            "followUp:":"2013-01-23T13:44:42.987+0200",
+                           "lastUpdated:":"2013-01-23T13:44:42.987+0200",
                            "delegationState":"RESOLVED",
                            "description":"aDescription",
                            "executionId":"anExecution",

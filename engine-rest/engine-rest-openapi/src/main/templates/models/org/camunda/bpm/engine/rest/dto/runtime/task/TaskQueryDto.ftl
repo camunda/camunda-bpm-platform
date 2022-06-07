@@ -508,6 +508,25 @@
                 `java.util.Date` or `org.joda.time.DateTime` object." />
   
     <@lib.property
+        name = "updatedAfter"
+        type = "string"
+        format = "date-time"
+        desc = "Restrict to tasks that were updated after the given date. Every action that fires 
+                a [task update event](${docsUrl}/user-guide/process-engine/delegation-code/#task-listener-event-lifecycle) is considered as updating the task.
+                By [default](${docsUrl}/reference/rest/overview/date-format/), the date must
+                have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.332+0200`." />
+  
+    <@lib.property
+        name = "updatedAfterExpression"
+        type = "string"
+        desc = "Restrict to tasks that were updated after the date described by the given expression. Every action that fires 
+                a [task update event](${docsUrl}/user-guide/process-engine/delegation-code/#task-listener-event-lifecycle) is considered as updating the task.
+                See the
+                [user guide](${docsUrl}/user-guide/process-engine/expression-language/#internal-context-functions)
+                for more information on available functions. The expression must evaluate to a
+                `java.util.Date` or `org.joda.time.DateTime` object." />
+  
+    <@lib.property
         name = "delegationState"
         type = "string"
         enumValues = ['"PENDING"', '"RESOLVED"']
