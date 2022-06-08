@@ -17,7 +17,6 @@
 package org.camunda.bpm.engine.impl.interceptor;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.operation.CoreAtomicOperation;
 
@@ -58,7 +57,7 @@ public class ContextLogger extends ProcessEngineLogger {
   }
 
   public void bpmnStackTrace(String string) {
-    log(Context.getProcessEngineConfiguration().getLogLevelBpmnStackTrace(),
+    logDebug(
         "006",
         string);
   }
