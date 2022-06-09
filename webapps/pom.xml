@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-database-settings</artifactId>
-    <version>7.18.0-SNAPSHOT</version>
+    <version>7.18.0-alpha2</version>
     <relativePath>../database</relativePath>
   </parent>
 
@@ -977,21 +977,21 @@
                   <target>
                     <!-- run node build -->
                     <exec executable="cmd" failonerror="true">
-                      <arg value="/c"/>
-                      <arg value="npm"/>
-                      <arg value="ci"/>
+                      <arg value="/c" />
+                      <arg value="npm" />
+                      <arg value="ci" />
                     </exec>
                     <exec executable="cmd" failonerror="true">
-                      <arg value="/c"/>
-                      <arg value="node"/>
-                      <arg value="scripts/xlts"/>
-                      <arg value="install"/>
+                      <arg value="/c" />
+                      <arg value="node" />
+                      <arg value="scripts/xlts" />
+                      <arg value="install" />
                     </exec>
                     <exec executable="cmd" failonerror="true">
-                      <arg value="/c"/>
-                      <arg value="node_modules\.bin\grunt.cmd"/>
-                      <arg value="build"/>
-                      <arg value="--color=false"/>
+                      <arg value="/c" />
+                      <arg value="node_modules\.bin\grunt.cmd" />
+                      <arg value="build" />
+                      <arg value="--color=false" />
                     </exec>
                   </target>
                 </configuration>
@@ -1027,15 +1027,15 @@
                   <target>
                     <!-- run node build -->
                     <exec executable="npm" failonerror="true">
-                      <arg value="ci"/>
+                      <arg value="ci" />
                     </exec>
                     <exec executable="node" failonerror="true">
-                      <arg value="scripts/xlts"/>
-                      <arg value="install"/>
+                      <arg value="scripts/xlts" />
+                      <arg value="install" />
                     </exec>
                     <exec executable="./node_modules/grunt-cli/bin/grunt" failonerror="true">
-                      <arg value="build"/>
-                      <arg value="--color=false"/>
+                      <arg value="build" />
+                      <arg value="--color=false" />
                     </exec>
                   </target>
                 </configuration>
