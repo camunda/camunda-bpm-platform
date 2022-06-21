@@ -393,7 +393,6 @@ import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.connect.Connectors;
 import org.camunda.connect.spi.Connector;
 import org.camunda.connect.spi.ConnectorRequest;
-import org.slf4j.event.Level;
 
 /**
  * @author Tom Baeyens
@@ -987,7 +986,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected String loggingContextTenantId = "tenantId";
 
   // logging levels (with default values)
-  protected Level logLevelBpmnStackTrace = Level.DEBUG;
+  protected String logLevelBpmnStackTrace = "DEBUG";
 
   // telemetry ///////////////////////////////////////////////////////
   /**
@@ -5105,11 +5104,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
-  public Level getLogLevelBpmnStackTrace() {
+  public String getLogLevelBpmnStackTrace() {
     return logLevelBpmnStackTrace;
   }
 
-  public ProcessEngineConfigurationImpl setLogLevelBpmnStackTrace(final Level logLevelBpmnStackTrace) {
+  public ProcessEngineConfigurationImpl setLogLevelBpmnStackTrace(final String logLevelBpmnStackTrace) {
     this.logLevelBpmnStackTrace = logLevelBpmnStackTrace;
     return this;
   }
