@@ -56,6 +56,7 @@ public class ProcessDataContext {
   protected static final String NULL_VALUE = "~NULL_VALUE~";
 
   protected String mdcPropertyActivityId;
+  protected String mdcPropertyActivityName;
   protected String mdcPropertyApplicationName;
   protected String mdcPropertyBusinessKey;
   protected String mdcPropertyDefinitionId;
@@ -86,6 +87,7 @@ public class ProcessDataContext {
     if (isNotBlank(mdcPropertyActivityId)) {
       mdcDataStacks.put(mdcPropertyActivityId, activityIdStack);
     }
+    mdcPropertyActivityName = initProperty(configuration::getLoggingContextActivityName);
     mdcPropertyApplicationName = initProperty(configuration::getLoggingContextApplicationName);
     mdcPropertyBusinessKey = initProperty(configuration::getLoggingContextBusinessKey);
     mdcPropertyDefinitionId = initProperty(configuration::getLoggingContextProcessDefinitionId);
@@ -140,6 +142,7 @@ public class ProcessDataContext {
     int numSections = sections.size();
 
     addToStack(activityIdStack, execution.getActivityId());
+    addToStack(execution.getCurrentActivityName(), mdcPropertyActivityName);
     addToStack(execution.getProcessDefinitionId(), mdcPropertyDefinitionId);
     addToStack(execution.getProcessInstanceId(), mdcPropertyInstanceId);
     addToStack(execution.getTenantId(), mdcPropertyTenantId);

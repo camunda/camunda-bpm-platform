@@ -978,6 +978,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   // logging context property names (with default values)
   protected String loggingContextActivityId = "activityId";
+  protected String loggingContextActivityName = "activityName";
   protected String loggingContextApplicationName = "applicationName";
   protected String loggingContextBusinessKey;// default == null => disabled by default
   protected String loggingContextProcessDefinitionId = "processDefinitionId";
@@ -2578,12 +2579,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       expressionManager = new JuelExpressionManager(beans);
     }
 
-    
+
     expressionManager.addFunction(CommandContextFunctions.CURRENT_USER,
         ReflectUtil.getMethod(CommandContextFunctions.class, CommandContextFunctions.CURRENT_USER));
     expressionManager.addFunction(CommandContextFunctions.CURRENT_USER_GROUPS,
         ReflectUtil.getMethod(CommandContextFunctions.class, CommandContextFunctions.CURRENT_USER_GROUPS));
-    
+
     expressionManager.addFunction(DateTimeFunctions.NOW,
         ReflectUtil.getMethod(DateTimeFunctions.class, DateTimeFunctions.NOW));
     expressionManager.addFunction(DateTimeFunctions.DATE_TIME,
@@ -5038,6 +5039,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfigurationImpl setLoggingContextActivityId(String loggingContextActivityId) {
     this.loggingContextActivityId = loggingContextActivityId;
+    return this;
+  }
+
+  public String getLoggingContextActivityName() {
+    return loggingContextActivityName;
+  }
+
+  public ProcessEngineConfigurationImpl setLoggingContextActivityName(final String loggingContextActivityName) {
+    this.loggingContextActivityName = loggingContextActivityName;
     return this;
   }
 
