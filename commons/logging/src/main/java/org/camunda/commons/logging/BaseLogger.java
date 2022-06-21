@@ -107,15 +107,39 @@ public abstract class BaseLogger {
   }
 
   /**
-   * Logs a message with the specified log level
+   * Logs a message with the specified log level. If the log level cannot be matched, it defaults to DEBUG.
    *
    * @param level           the log level
    * @param id              the unique id of this log message
    * @param messageTemplate the message template to use
    * @param parameters      a list of optional parameters
    */
-  protected void log(Level level, String id, String messageTemplate, Object... parameters) {
-    switch (level) {
+  protected void log(String level, String id, String messageTemplate, Object... parameters) {
+    log(level, Level.DEBUG, id, messageTemplate, parameters);
+  }
+
+  /**
+   * Logs a message with the specified log level.
+   *
+   * @param level           the log level
+   * @param defaultLevel    the default log level to use when log level cannot be matched
+   * @param id              the unique id of this log message
+   * @param messageTemplate the message template to use
+   * @param parameters      a list of optional parameters
+   */
+  protected void log(String level, Level defaultLevel, String id, String messageTemplate, Object... parameters) {
+    Level logLevel;
+    if (level == null) {
+      logLevel = defaultLevel;
+    } else {
+      try {
+        logLevel = Level.valueOf(level.trim().toUpperCase());
+      } catch (IllegalArgumentException e) {
+        logLevel = defaultLevel;
+      }
+    }
+
+    switch (logLevel) {
     case ERROR:
       logError(id, messageTemplate, parameters);
       break;

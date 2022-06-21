@@ -84,35 +84,49 @@ public class BaseLoggerTest {
   @Test
   public void shouldCallLogTrace() {
     final ExampleLogger logger = Mockito.spy(LOG);
-    logger.log(Level.TRACE, ID, SOME_MESSAGE);
+    logger.log("TRACE", ID, SOME_MESSAGE);
     Mockito.verify(logger).logTrace(ID, SOME_MESSAGE);
   }
 
   @Test
   public void shouldCallLogInfo() {
     final ExampleLogger logger = Mockito.spy(LOG);
-    logger.log(Level.INFO, ID, SOME_MESSAGE);
+    logger.log("INFO", ID, SOME_MESSAGE);
     Mockito.verify(logger).logInfo(ID, SOME_MESSAGE);
   }
 
   @Test
   public void shouldCallLogDebug() {
     final ExampleLogger logger = Mockito.spy(LOG);
-    logger.log(Level.DEBUG, ID, SOME_MESSAGE);
+    logger.log("DEBUG", ID, SOME_MESSAGE);
     Mockito.verify(logger).logDebug(ID, SOME_MESSAGE);
   }
 
   @Test
   public void shouldCallLogError() {
     final ExampleLogger logger = Mockito.spy(LOG);
-    logger.log(Level.ERROR, ID, SOME_MESSAGE);
+    logger.log("ERROR", ID, SOME_MESSAGE);
     Mockito.verify(logger).logError(ID, SOME_MESSAGE);
   }
 
   @Test
   public void shouldCallLogWarn() {
     final ExampleLogger logger = Mockito.spy(LOG);
-    logger.log(Level.WARN, ID, SOME_MESSAGE);
+    logger.log(" warn ", ID, SOME_MESSAGE);
+    Mockito.verify(logger).logWarn(ID, SOME_MESSAGE);
+  }
+
+  @Test
+  public void shouldCallLogDebugWhenNotMatched() {
+    final ExampleLogger logger = Mockito.spy(LOG);
+    logger.log("FATAL", ID, SOME_MESSAGE);
+    Mockito.verify(logger).logDebug(ID, SOME_MESSAGE);
+  }
+
+  @Test
+  public void shouldCallLogWarnWhenNotMatched() {
+    final ExampleLogger logger = Mockito.spy(LOG);
+    logger.log("FATAL", Level.WARN, ID, SOME_MESSAGE);
     Mockito.verify(logger).logWarn(ID, SOME_MESSAGE);
   }
 
