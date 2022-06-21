@@ -32,6 +32,7 @@ import org.camunda.bpm.spring.boot.starter.test.nonpa.TestApplication;
 import org.camunda.bpm.spring.boot.starter.test.nonpa.TestEventCaptor;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -243,6 +244,7 @@ public class CamundaEventingIT extends AbstractCamundaAutoConfigurationIT {
   }
 
   @Test
+  @Ignore("CAM-14699")
   public final void shouldEventHistoryTaskAssignmentChanges() {
     // given
     startEventingInstance();
@@ -328,6 +330,7 @@ public class CamundaEventingIT extends AbstractCamundaAutoConfigurationIT {
   }
 
   @Test
+  @Ignore("CAM-14699")
   public void shouldEventHistoryTaskMultipleAssignmentChanges() {
     // given
     startEventingInstance();
