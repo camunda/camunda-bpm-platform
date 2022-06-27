@@ -46,6 +46,7 @@ import org.camunda.bpm.engine.impl.incident.IncidentContext;
 import org.camunda.bpm.engine.impl.incident.IncidentHandler;
 import org.camunda.bpm.engine.impl.incident.IncidentHandling;
 import org.camunda.bpm.engine.impl.persistence.entity.DelayedVariableEvent;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
@@ -315,6 +316,14 @@ public abstract class PvmExecutionImpl extends CoreExecution implements
 
   @Override
   public void destroy() {
+    destroy(false);
+  }
+
+  /**
+   * @param alwaysSkipIoMappings set to true to always skip IO mappings,
+   * regardless of internal state of execution (=> {@link CoreExecution#isSkipIoMappings()})
+   */
+  public void destroy(boolean alwaysSkipIoMappings) {
     LOG.destroying(this);
     setScope(false);
   }

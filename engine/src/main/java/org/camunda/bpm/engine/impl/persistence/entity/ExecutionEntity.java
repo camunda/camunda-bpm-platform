@@ -502,19 +502,18 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
    * removed afterwards.
    */
   @Override
-  public void destroy() {
-
+  public void destroy(boolean alwaysSkipIoMappings) {
     ensureParentInitialized();
 
     // execute Output Mappings (if they exist).
     ensureActivityInitialized();
-    if (activity != null && activity.getIoMapping() != null && !skipIoMapping) {
+    if (activity != null && activity.getIoMapping() != null && !skipIoMapping && !alwaysSkipIoMappings) {
       activity.getIoMapping().executeOutputParameters(this);
     }
 
     clearExecution();
 
-    super.destroy();
+    super.destroy(alwaysSkipIoMappings);
 
     removeEventSubscriptionsExceptCompensation();
   }
