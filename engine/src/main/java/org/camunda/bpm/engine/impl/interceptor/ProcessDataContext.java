@@ -18,11 +18,12 @@ package org.camunda.bpm.engine.impl.interceptor;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -56,13 +57,6 @@ public class ProcessDataContext {
   protected static final String NULL_VALUE = "~NULL_VALUE~";
 
   protected String mdcPropertyActivityId;
-  protected String mdcPropertyActivityName;
-  protected String mdcPropertyApplicationName;
-  protected String mdcPropertyBusinessKey;
-  protected String mdcPropertyDefinitionId;
-  protected String mdcPropertyDefinitionKey;
-  protected String mdcPropertyInstanceId;
-  protected String mdcPropertyTenantId;
 
   protected boolean handleMdc = false;
 
@@ -72,6 +66,19 @@ public class ProcessDataContext {
    */
   protected Map<String, ProcessDataStack> mdcDataStacks = new HashMap<>();
   protected ProcessDataSections sections = new ProcessDataSections();
+
+  protected List<MdcProperty> mdcProperties = Arrays.asList(
+      new MdcProperty(ProcessEngineConfigurationImpl::getLoggingContextActivityName, ExecutionEntity::getCurrentActivityName),
+      new MdcProperty(ProcessEngineConfigurationImpl::getLoggingContextApplicationName, (execution) -> {
+        ProcessApplicationReference currentPa = Context.getCurrentProcessApplication();
+        return currentPa != null ? currentPa.getName() : null;
+      }),
+      new MdcProperty(ProcessEngineConfigurationImpl::getLoggingContextBusinessKey, ExecutionEntity::getBusinessKey),
+      new MdcProperty(ProcessEngineConfigurationImpl::getLoggingContextProcessDefinitionId, ExecutionEntity::getProcessDefinitionId),
+      new MdcProperty(ProcessEngineConfigurationImpl::getLoggingContextProcessDefinitionKey, execution -> execution.getProcessDefinition().getKey()),
+      new MdcProperty(ProcessEngineConfigurationImpl::getLoggingContextProcessInstanceId, ExecutionEntity::getProcessInstanceId),
+      new MdcProperty(ProcessEngineConfigurationImpl::getLoggingContextTenantId, ExecutionEntity::getTenantId)
+  );
 
   public ProcessDataContext(ProcessEngineConfigurationImpl configuration) {
     this(configuration, false);
@@ -87,13 +94,7 @@ public class ProcessDataContext {
     if (isNotBlank(mdcPropertyActivityId)) {
       mdcDataStacks.put(mdcPropertyActivityId, activityIdStack);
     }
-    mdcPropertyActivityName = initProperty(configuration::getLoggingContextActivityName);
-    mdcPropertyApplicationName = initProperty(configuration::getLoggingContextApplicationName);
-    mdcPropertyBusinessKey = initProperty(configuration::getLoggingContextBusinessKey);
-    mdcPropertyDefinitionId = initProperty(configuration::getLoggingContextProcessDefinitionId);
-    mdcPropertyDefinitionKey = initProperty(configuration::getLoggingContextProcessDefinitionKey);
-    mdcPropertyInstanceId = initProperty(configuration::getLoggingContextProcessInstanceId);
-    mdcPropertyTenantId = initProperty(configuration::getLoggingContextTenantId);
+    mdcProperties.forEach(mdcProperty -> mdcProperty.initProperty(configuration, mdcDataStacks));
 
     handleMdc = !mdcDataStacks.isEmpty();
 
@@ -107,14 +108,6 @@ public class ProcessDataContext {
 
       sections.sealCurrentSection();
     }
-  }
-
-  protected String initProperty(final Supplier<String> configSupplier) {
-    final String configValue = configSupplier.get();
-    if (isNotBlank(configValue)) {
-      mdcDataStacks.put(configValue, new ProcessDataStack(configValue));
-    }
-    return configValue;
   }
 
   /**
@@ -142,25 +135,12 @@ public class ProcessDataContext {
     int numSections = sections.size();
 
     addToStack(activityIdStack, execution.getActivityId());
-    addToStack(execution.getCurrentActivityName(), mdcPropertyActivityName);
-    addToStack(execution.getProcessDefinitionId(), mdcPropertyDefinitionId);
-    addToStack(execution.getProcessInstanceId(), mdcPropertyInstanceId);
-    addToStack(execution.getTenantId(), mdcPropertyTenantId);
 
-    if (isNotBlank(mdcPropertyApplicationName)) {
-      ProcessApplicationReference currentPa = Context.getCurrentProcessApplication();
-      if (currentPa != null) {
-        addToStack(currentPa.getName(), mdcPropertyApplicationName);
+    mdcProperties.forEach(mdcProperty -> {
+      if (isNotBlank(mdcProperty.getConfigValue())) {
+        addToStack(mdcProperty.getValue(execution), mdcProperty.getConfigValue());
       }
-    }
-
-    if (isNotBlank(mdcPropertyBusinessKey)) {
-      addToStack(execution.getBusinessKey(), mdcPropertyBusinessKey);
-    }
-
-    if (isNotBlank(mdcPropertyDefinitionKey)) {
-      addToStack(execution.getProcessDefinition().getKey(), mdcPropertyDefinitionKey);
-    }
+    });
 
     sections.sealCurrentSection();
 
@@ -358,6 +338,35 @@ public class ProcessDataContext {
 
     public int size() {
       return sections.size();
+    }
+  }
+
+  protected static class MdcProperty {
+
+    private final Function<ProcessEngineConfigurationImpl, String> configFunction;
+    private final Function<ExecutionEntity, String> valueFunction;
+    private String configValue;
+
+    public MdcProperty(final Function<ProcessEngineConfigurationImpl, String> configFunction,
+                       final Function<ExecutionEntity, String> valueFunction) {
+      this.configFunction = configFunction;
+      this.valueFunction = valueFunction;
+    }
+
+    public void initProperty(final ProcessEngineConfigurationImpl configuration,
+                             final Map<String, ProcessDataStack> mdcDataStacks) {
+      configValue = configFunction.apply(configuration);
+      if (isNotBlank(configValue)) {
+        mdcDataStacks.put(configValue, new ProcessDataStack(configValue));
+      }
+    }
+
+    public String getConfigValue() {
+      return configValue;
+    }
+
+    public String getValue(final ExecutionEntity execution) {
+      return valueFunction.apply(execution);
     }
   }
 }
