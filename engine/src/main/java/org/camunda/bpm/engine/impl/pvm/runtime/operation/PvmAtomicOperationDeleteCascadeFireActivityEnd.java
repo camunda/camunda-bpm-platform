@@ -17,6 +17,9 @@
 package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.impl.bpmn.behavior.EventBasedGatewayActivityBehavior;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
@@ -37,6 +40,7 @@ public class PvmAtomicOperationDeleteCascadeFireActivityEnd extends PvmAtomicOpe
     return super.eventNotificationsStarted(execution);
   }
 
+  @Override
   protected ScopeImpl getScope(PvmExecutionImpl execution) {
     ActivityImpl activity = execution.getActivity();
 
@@ -52,6 +56,7 @@ public class PvmAtomicOperationDeleteCascadeFireActivityEnd extends PvmAtomicOpe
     }
   }
 
+  @Override
   protected String getEventName() {
     return ExecutionListener.EVENTNAME_END;
   }
@@ -72,11 +77,16 @@ public class PvmAtomicOperationDeleteCascadeFireActivityEnd extends PvmAtomicOpe
 
     } else {
       if (execution.isScope()) {
-        if(execution instanceof ExecutionEntity && !execution.isProcessInstanceExecution() && execution.isCanceled()) {
-          // execution was canceled and output mapping for activity is marked as skippable
-          execution.setSkipIoMappings(execution.isSkipIoMappings() || execution.getProcessEngine().getProcessEngineConfiguration().isSkipOutputMappingOnCanceledActivities());
-        }
-        execution.destroy();
+        ProcessEngineConfigurationImpl engineConfiguration = Context.getProcessEngineConfiguration();
+
+        // execution was canceled and output mapping for activity is marked as skippable
+        boolean alwaysSkipIoMappings =
+            execution instanceof ExecutionEntity &&
+            !execution.isProcessInstanceExecution() &&
+            execution.isCanceled() &&
+            engineConfiguration.isSkipOutputMappingOnCanceledActivities();
+
+        execution.destroy(alwaysSkipIoMappings);
       }
 
       // remove this execution and its concurrent parent (if exists)
@@ -123,6 +133,7 @@ public class PvmAtomicOperationDeleteCascadeFireActivityEnd extends PvmAtomicOpe
     return flowScopeActivity;
   }
 
+  @Override
   public String getCanonicalName() {
     return "delete-cascade-fire-activity-end";
   }
