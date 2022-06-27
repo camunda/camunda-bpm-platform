@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.impl.bpmn.behavior.EventBasedGatewayActivityBehavior;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
@@ -37,6 +38,7 @@ public class PvmAtomicOperationDeleteCascadeFireActivityEnd extends PvmAtomicOpe
     return super.eventNotificationsStarted(execution);
   }
 
+  @Override
   protected ScopeImpl getScope(PvmExecutionImpl execution) {
     ActivityImpl activity = execution.getActivity();
 
@@ -52,6 +54,7 @@ public class PvmAtomicOperationDeleteCascadeFireActivityEnd extends PvmAtomicOpe
     }
   }
 
+  @Override
   protected String getEventName() {
     return ExecutionListener.EVENTNAME_END;
   }
@@ -72,9 +75,9 @@ public class PvmAtomicOperationDeleteCascadeFireActivityEnd extends PvmAtomicOpe
 
     } else {
       if (execution.isScope()) {
-        if(execution instanceof ExecutionEntity && !execution.isProcessInstanceExecution() && execution.isCanceled()) {
+        if (execution instanceof ExecutionEntity && !execution.isProcessInstanceExecution() && execution.isCanceled()) {
           // execution was canceled and output mapping for activity is marked as skippable
-          execution.setSkipIoMappings(execution.isSkipIoMappings() || execution.getProcessEngine().getProcessEngineConfiguration().isSkipOutputMappingOnCanceledActivities());
+          execution.setSkipIoMappings(execution.isSkipIoMappings() || shouldSkipIoMappingsByDefault(execution, activity));
         }
         execution.destroy();
       }
@@ -105,6 +108,14 @@ public class PvmAtomicOperationDeleteCascadeFireActivityEnd extends PvmAtomicOpe
     }
   }
 
+  protected boolean shouldSkipIoMappingsByDefault(PvmExecutionImpl execution, PvmActivity activity) {
+    return execution.getProcessEngine().getProcessEngineConfiguration().isSkipOutputMappingOnCanceledActivities() &&
+        // Event based gateways are always canceled as event scopes when a condition is fulfilled.
+        // Skipping I/O here for them leads to skipping I/O for all follow-up activities, which we don't want.
+        // Since gateways cannot have I/O themselves, we can ignore skipping I/O here for the event based gateway.
+        !(activity != null && activity.getActivityBehavior() instanceof EventBasedGatewayActivityBehavior);
+  }
+
   protected boolean executesNonScopeActivity(PvmExecutionImpl execution) {
     ActivityImpl activity = execution.getActivity();
     return activity!=null && !activity.isScope();
@@ -123,6 +134,7 @@ public class PvmAtomicOperationDeleteCascadeFireActivityEnd extends PvmAtomicOpe
     return flowScopeActivity;
   }
 
+  @Override
   public String getCanonicalName() {
     return "delete-cascade-fire-activity-end";
   }
