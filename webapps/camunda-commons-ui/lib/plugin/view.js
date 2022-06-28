@@ -125,6 +125,10 @@ module.exports = function(module) {
               }
             );
           }
+
+          if (attrs.setFn) {
+            scope.$eval(attrs.setFn, {updateFn: update});
+          }
         }
       };
     }

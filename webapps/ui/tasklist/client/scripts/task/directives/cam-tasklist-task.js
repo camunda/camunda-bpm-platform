@@ -58,6 +58,7 @@ module.exports = [
           Uri
         ) {
           // setup /////////////////////////////////////////////////////////////////////
+          $scope.viewUpdateFn = null;
 
           var taskData = ($scope.taskData = $scope.tasklistData.newChild(
             $scope
@@ -343,6 +344,7 @@ module.exports = [
           $scope.taskExists = false;
           $scope.$watch('task.id', function(newVal) {
             $scope.taskExists = !!newVal;
+            if ($scope.viewUpdateFn) $scope.viewUpdateFn();
           });
 
           $scope.dismissTask = function() {
@@ -359,6 +361,8 @@ module.exports = [
               }
             });
           });
+
+          $scope.setViewFn = (viewUpdateFn) => $scope.viewUpdateFn = viewUpdateFn;
         }
       ]
     };
