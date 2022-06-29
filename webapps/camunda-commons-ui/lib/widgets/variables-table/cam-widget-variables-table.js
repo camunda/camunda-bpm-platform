@@ -350,7 +350,6 @@ module.exports = [
         $scope.rowClasses = function(info /*, v*/) {
           return [
             info.editMode ? 'editing' : null,
-            info.valid ? null : 'ng-invalid',
             info.valid ? null : 'ng-invalid-cam-variable-validator'
           ];
         };
