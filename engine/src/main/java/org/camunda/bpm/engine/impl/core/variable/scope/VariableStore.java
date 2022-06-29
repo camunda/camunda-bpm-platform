@@ -38,7 +38,7 @@ public class VariableStore<T extends CoreVariableInstance> {
   protected VariablesProvider<T> variablesProvider;
   protected Map<String, T> variables;
 
-  protected Map<String, T> removedVariables = new HashMap<String, T>();
+  protected Map<String, T> removedVariables = new HashMap<>();
 
   protected List<VariableStoreObserver<T>> observers;
 
@@ -48,7 +48,7 @@ public class VariableStore<T extends CoreVariableInstance> {
 
   public VariableStore(VariablesProvider<T> provider, VariableStoreObserver<T>... observers) {
     this.variablesProvider = provider;
-    this.observers = new ArrayList<VariableStoreObserver<T>>();
+    this.observers = new ArrayList<>();
     this.observers.addAll(Arrays.asList(observers));
   }
 
@@ -77,7 +77,7 @@ public class VariableStore<T extends CoreVariableInstance> {
       return getVariablesMap();
     }
 
-    Map<String, T> result = new HashMap<String, T>();
+    Map<String, T> result = new HashMap<>();
 
     if (isInitialized()) {
       for (String variableName : variableNames) {
@@ -108,11 +108,11 @@ public class VariableStore<T extends CoreVariableInstance> {
   }
 
   public List<T> getVariables() {
-    return new ArrayList<T>(getVariablesMap().values());
+    return new ArrayList<>(getVariablesMap().values());
   }
 
   public List<T> getVariables(Collection<String> variableNames) {
-    return new ArrayList<T>(getVariablesMap(variableNames).values());
+    return new ArrayList<>(getVariablesMap(variableNames).values());
   }
 
   public void addVariable(T value) {
@@ -153,7 +153,7 @@ public class VariableStore<T extends CoreVariableInstance> {
   }
 
   public Set<String> getKeys() {
-    return new HashSet<String>(getVariablesMap().keySet());
+    return new HashSet<>(getVariablesMap().keySet());
   }
 
   public boolean isInitialized() {
@@ -162,7 +162,7 @@ public class VariableStore<T extends CoreVariableInstance> {
 
   public void forceInitialization() {
     if (!isInitialized()) {
-      variables = new HashMap<String, T>();
+      variables = new HashMap<>();
 
       for (T variable : variablesProvider.provideVariables()) {
         variables.put(variable.getName(), variable);
