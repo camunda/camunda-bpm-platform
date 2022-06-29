@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.rest;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.nullValue;
 
 import javax.ws.rs.core.Response.Status;
 
@@ -53,6 +54,7 @@ public class ExceptionHandlerTest extends AbstractRestServiceTest {
       .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
       .body("type", equalTo(Exception.class.getSimpleName()))
       .body("message", equalTo("expected exception"))
+      .body("code", nullValue())
     .when().get(GENERAL_EXCEPTION_URL);
   }
 
@@ -63,6 +65,7 @@ public class ExceptionHandlerTest extends AbstractRestServiceTest {
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .body("type", equalTo(RestException.class.getSimpleName()))
       .body("message", equalTo("expected exception"))
+      .body("code", nullValue())
     .when().get(REST_EXCEPTION_URL);
   }
 
@@ -73,6 +76,7 @@ public class ExceptionHandlerTest extends AbstractRestServiceTest {
       .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
       .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
       .body("message", equalTo("expected exception"))
+      .body("code", equalTo(0))
     .when().get(PROCESS_ENGINE_EXCEPTION_URL);
   }
 
@@ -84,6 +88,7 @@ public class ExceptionHandlerTest extends AbstractRestServiceTest {
       .statusCode(Status.FORBIDDEN.getStatusCode())
       .body("type", equalTo(AuthorizationException.class.getSimpleName()))
       .body("message", equalTo("The user with id 'someUser' does not have 'somePermission' permission on resource 'someResourceId' of type 'someResourceName'."))
+      .body("code", equalTo(0))
       .body("userId", equalTo("someUser"))
       .body("resourceName", equalTo("someResourceName"))
       .body("resourceId", equalTo("someResourceId"))
@@ -101,6 +106,7 @@ public class ExceptionHandlerTest extends AbstractRestServiceTest {
     .expect().contentType(ContentType.JSON)
       .statusCode(Status.FORBIDDEN.getStatusCode())
       .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("code", equalTo(0))
       .body("message", equalTo("The user with id 'someUser' does not have one of the following permissions: 'somePermission1' permission on resource "
           + "'someResourceId1' of type 'someResourceName1' or 'somePermission2' permission on resource "
           + "'someResourceId2' of type 'someResourceName2'"))
@@ -121,6 +127,7 @@ public class ExceptionHandlerTest extends AbstractRestServiceTest {
       .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
         .body("type", equalTo(StackOverflowError.class.getSimpleName()))
         .body("message", equalTo("Stack overflow"))
+        .body("code", nullValue())
       .when().get(STACK_OVERFLOW_ERROR_URL);
   }
 

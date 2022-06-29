@@ -953,6 +953,22 @@ public class TaskRestServiceInteractionTest extends
   }
 
   @Test
+  public void shouldReturnErrorOnSubmitTaskForm() {
+    doThrow(new ProcessEngineException("foo", 123))
+        .when(formServiceMock).submitTaskForm(anyString(), Mockito.any());
+
+    given().pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE).body("{}")
+    .then().expect()
+      .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot submit task form anId: foo"))
+      .body("code", equalTo(123))
+    .when().post(SUBMIT_FORM_URL);
+  }
+
+  @Test
   public void testSubmitFormWithNotSupportedVariableType() {
     String variableKey = "aVariableKey";
     String variableValue = "1abc";
@@ -1793,6 +1809,22 @@ public class TaskRestServiceInteractionTest extends
         .body("type", equalTo(RestException.class.getSimpleName()))
         .body("message", equalTo("Cannot complete task " + EXAMPLE_TASK_ID + ": expected exception"))
       .when().post(COMPLETE_TASK_URL);
+  }
+
+  @Test
+  public void shouldReturnErrorOnCompletingTask() {
+    doThrow(new ProcessEngineException("foo", 123))
+        .when(taskServiceMock).complete(any(String.class), Mockito.any());
+
+    given().pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
+    .then().expect()
+      .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot complete task anId: foo"))
+      .body("code", equalTo(123))
+    .when().post(COMPLETE_TASK_URL);
   }
 
   @Test

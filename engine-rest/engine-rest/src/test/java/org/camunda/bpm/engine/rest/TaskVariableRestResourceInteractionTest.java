@@ -305,6 +305,31 @@ public class TaskVariableRestResourceInteractionTest extends
   }
 
   @Test
+  public void shouldReturnErrorOnModification() {
+    String variableKey = "aKey";
+    int variableValue = 123;
+    Map<String, Object> messageBodyJson = new HashMap<>();
+    Map<String, Object> modifications = VariablesBuilder.create().variable(variableKey, variableValue).getVariables();
+    messageBodyJson.put("modifications", modifications);
+
+    TaskServiceImpl taskServiceMock = mockTaskServiceImpl();
+    doThrow(new ProcessEngineException("foo", 123))
+        .when(taskServiceMock).updateVariables(any(), any(), any());
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .contentType(ContentType.JSON)
+      .body(messageBodyJson)
+    .then().expect()
+      .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+      .body("type", is(RestException.class.getSimpleName()))
+      .body("message", is("Cannot modify variables for task anId: foo"))
+      .body("code", is(123))
+    .when()
+      .post(SINGLE_TASK_MODIFY_VARIABLES_URL);
+  }
+
+  @Test
   public void testGetSingleVariable() {
     String variableKey = "aVariableKey";
     int variableValue = 123;

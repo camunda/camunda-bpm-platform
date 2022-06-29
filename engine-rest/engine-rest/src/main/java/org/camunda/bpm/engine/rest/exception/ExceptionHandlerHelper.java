@@ -52,11 +52,36 @@ public class ExceptionHandlerHelper {
     Response.Status responseStatus = getStatus(throwable);
     ExceptionDto exceptionDto = fromException(throwable);
 
+    provideExceptionCode(throwable, exceptionDto);
+
     return Response
         .status(responseStatus)
         .entity(exceptionDto)
         .type(MediaType.APPLICATION_JSON_TYPE)
         .build();
+  }
+
+  protected void provideExceptionCode(Throwable throwable, ExceptionDto exceptionDto) {
+    Integer code = null;
+    if (throwable instanceof ProcessEngineException) {
+      code = getCode(throwable);
+
+    } else if (throwable instanceof RestException) {
+      Throwable cause = throwable.getCause();
+      if (cause instanceof ProcessEngineException) {
+        code = getCode(cause);
+
+      }
+    }
+
+    if (code != null) {
+      exceptionDto.setCode(code);
+    }
+  }
+
+  protected Integer getCode(Throwable throwable) {
+    ProcessEngineException pex = (ProcessEngineException) throwable;
+    return pex.getCode();
   }
 
   public ExceptionDto fromException(Throwable e) {

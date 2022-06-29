@@ -25,6 +25,7 @@ public class ExceptionDto {
 
   protected String type;
   protected String message;
+  protected Integer code;
 
   public ExceptionDto() {
 
@@ -65,6 +66,13 @@ public class ExceptionDto {
   public void setMessage(String message) {
     this.message = message;
   }
-  
-  
+
+  public Integer getCode() {
+    return code;
+  }
+
+  public void setCode(Integer code) {
+    this.code = code;
+  }
+
 }
