@@ -35,6 +35,7 @@ module.exports = function(module) {
           var lastScope;
 
           scope.$watch(attrs.provider, update);
+          scope.$watch(attrs.task, update);
 
           function destroyLastScope() {
             if (lastScope) {
