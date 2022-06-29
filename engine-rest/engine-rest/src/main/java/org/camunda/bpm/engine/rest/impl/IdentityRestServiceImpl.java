@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.identity.PasswordPolicyResult;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
 import org.camunda.bpm.engine.rest.IdentityRestService;
 import org.camunda.bpm.engine.rest.dto.identity.BasicUserCredentialsDto;
 import org.camunda.bpm.engine.rest.dto.identity.CheckPasswordPolicyResultDto;
@@ -124,7 +125,7 @@ public class IdentityRestServiceImpl extends AbstractRestProcessEngineAware impl
       UserProfileDto profileDto = dto.getProfile();
       if (profileDto != null) {
         String id = sanitizeUserId(profileDto.getId());
-        user = identityService.newUser(id);
+        user = new UserEntity(id);
 
         user.setFirstName(profileDto.getFirstName());
         user.setLastName(profileDto.getLastName());
