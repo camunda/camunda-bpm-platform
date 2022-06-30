@@ -47,6 +47,7 @@ var Batch = function(camAPI, localConf, configuration) {
       currentPage: 1,
       count: 0,
       data: null,
+      users: {},
       sorting: runtimeSorting
     },
     history: {
@@ -238,6 +239,11 @@ Batch.prototype.getLoadingState = function(type) {
 
 Batch.prototype.getBatches = function(type) {
   return this._batches[type].data;
+};
+
+Batch.prototype.getFullName = function(createUserId) {
+  let user = this._batches.runtime.users[createUserId];
+  return user ? user.firstName + ' ' + user.lastName : createUserId;
 };
 
 Batch.prototype.getSelection = function() {
@@ -456,6 +462,22 @@ Batch.prototype._load = function(type) {
   };
   var cb = function(err, data) {
     obj.data = data.items || data;
+
+    if (type === 'runtime') {
+      // fetch unique usernames
+      let uniqueUserIds = new Set(data.map(item => item.createUserId));
+      this._sdk.resource('user').list(
+        {
+          idIn: Array.from(uniqueUserIds).toString(),
+          maxResults: uniqueUserIds.size
+        },
+        (err, data) => {
+          obj.users = {};
+          data.forEach(item => (obj.users[item.id] = item));
+        }
+      );
+    }
+
     if (typeof data.count !== 'undefined') {
       countCb(err, data);
     } else {
