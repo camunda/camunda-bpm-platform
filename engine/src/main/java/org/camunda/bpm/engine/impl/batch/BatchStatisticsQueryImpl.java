@@ -107,6 +107,11 @@ public class BatchStatisticsQueryImpl extends AbstractQuery<BatchStatisticsQuery
     return orderBy(BatchQueryProperty.TENANT_ID);
   }
 
+  @Override
+  public BatchStatisticsQuery orderByStartTime() {
+    return orderBy(BatchQueryProperty.START_TIME);
+  }
+
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     return commandContext

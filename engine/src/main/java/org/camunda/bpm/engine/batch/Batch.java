@@ -18,6 +18,8 @@ package org.camunda.bpm.engine.batch;
 
 import org.camunda.bpm.engine.ManagementService;
 
+import java.util.Date;
+
 /**
  * <p>A batch represents a number of jobs which
  * execute a number of commands asynchronously.
@@ -122,5 +124,10 @@ public interface Batch {
    * @see ManagementService#activateBatchById(String)
    */
   boolean isSuspended();
+
+  /**
+   * @return the date the batch was started
+   */
+  Date getStartTime();
 
 }

@@ -19,6 +19,10 @@ insert into ACT_GE_SCHEMA_LOG
 values ('700', CURRENT_TIMESTAMP, '7.18.0');
 
 -- https://jira.camunda.com/browse/CAM-14303 --
-ALTER TABLE ACT_RU_TASK 
+ALTER TABLE ACT_RU_TASK
   ADD LAST_UPDATED_ datetime2;
 create index ACT_IDX_TASK_LAST_UPDATED on ACT_RU_TASK(LAST_UPDATED_);
+
+-- https://jira.camunda.com/browse/CAM-14721
+ALTER TABLE ACT_RU_BATCH
+    ADD START_TIME_ datetime2;

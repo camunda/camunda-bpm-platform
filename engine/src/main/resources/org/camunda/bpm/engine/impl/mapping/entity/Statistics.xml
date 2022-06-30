@@ -85,6 +85,7 @@
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="createUserId" column="CREATE_USER_ID_" jdbcType="VARCHAR" />
     <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER" />
+    <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
   </resultMap>
 
   <resultMap id="decisionDefinitionStatisticsResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.DecisionInstanceStatisticsImpl">
@@ -92,8 +93,8 @@
     <result property="evaluations" column="EVALUATION_COUNT_" jdbcType="INTEGER" />
   </resultMap>
 
-  <!-- Process Definition Statistics -->  
-  <select id ="selectProcessDefinitionStatistics" resultMap="processDefinitionStatisticsResultMap" 
+  <!-- Process Definition Statistics -->
+  <select id ="selectProcessDefinitionStatistics" resultMap="processDefinitionStatisticsResultMap"
     parameterType="org.camunda.bpm.engine.impl.ProcessDefinitionStatisticsQueryImpl">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
@@ -104,11 +105,11 @@
     ${limitAfter}
   </select>
 
-  <select id ="selectProcessDefinitionStatisticsCount" resultType="long" 
+  <select id ="selectProcessDefinitionStatisticsCount" resultType="long"
     parameterType="org.camunda.bpm.engine.impl.ProcessDefinitionStatisticsQueryImpl">
     ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectProcessDefinitionStatisticsByQueryCriteriaSql"/>
-    ${countDistinctAfterEnd} 
+    ${countDistinctAfterEnd}
   </select>
 
   <sql id="selectProcessDefinitionStatisticsByQueryCriteriaSql">
@@ -199,13 +200,13 @@
               PROCDEF.ID_ = INC.PROC_DEF_ID_
           </if>
 
-    
+
 
         ) RES
 
       <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; !authCheck.revokeAuthorizationCheckEnabled &amp;&amp; authCheck.authUserId != null">
-        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" /> 
-        AUTH ON (AUTH.RESOURCE_ID_ ${authJoinStart} RES.ID_ ${authJoinSeparator} RES.KEY_ ${authJoinSeparator} '*' ${authJoinEnd})      
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" />
+        AUTH ON (AUTH.RESOURCE_ID_ ${authJoinStart} RES.ID_ ${authJoinSeparator} RES.KEY_ ${authJoinSeparator} '*' ${authJoinEnd})
       </if>
       <where>
         <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
@@ -229,14 +230,14 @@
     parameterType="org.camunda.bpm.engine.impl.DeploymentStatisticsQueryImpl">
     ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
     <include refid="selectDeploymentStatisticsByQueryCriteriaSql"/>
-    ${countDistinctAfterEnd} 
+    ${countDistinctAfterEnd}
   </select>
 
   <sql id="selectDeploymentStatisticsByQueryCriteriaSql">
     <bind name="authUserId" value="authCheck.authUserId" />
     <bind name="authGroupIds" value="authCheck.authGroupIds" />
     <bind name="revokeAuthorizationCheckEnabled" value="authCheck.revokeAuthorizationCheckEnabled" />
-  
+
     from (
             select
                 DEPLOYMENT.*
@@ -314,7 +315,7 @@
                         ) = 1
                     </if>
                     <bind name="columnPrefix" value="'JOB.'"/>
-                    <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />  
+                    <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
                   group by
                       DEPLOYMENT_ID_
                 ) JOB
@@ -354,7 +355,7 @@
                         ) = 1
                     </if>
                     <bind name="columnPrefix" value="'INC.'"/>
-                    <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />    
+                    <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
                   group by
                       PROCDEF.DEPLOYMENT_ID_, INC.INCIDENT_TYPE_
                 ) INC
@@ -362,12 +363,12 @@
                  DEPLOYMENT.ID_ = INC.DEPLOYMENT_ID_
             </if>
 
-    
+
 
           ) RES
 
-          <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoin" /> 
-    
+          <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoin" />
+
           <where>
             <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
             <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
@@ -376,7 +377,7 @@
 
   <!-- Activity statistics -->
 
-  <select id ="selectActivityStatistics" resultMap="activityStatisticsResultMap" 
+  <select id ="selectActivityStatistics" resultMap="activityStatisticsResultMap"
     parameterType="org.camunda.bpm.engine.impl.ActivityStatisticsQueryImpl">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
@@ -395,7 +396,7 @@
     ${limitAfter}
   </select>
 
-  <select id ="selectActivityStatisticsCount" resultType="long" 
+  <select id ="selectActivityStatisticsCount" resultType="long"
     parameterType="org.camunda.bpm.engine.impl.ActivityStatisticsQueryImpl">
     ${countDistinctBeforeStart} RES.ID_ ${countDistinctBeforeEnd}
 
@@ -406,7 +407,7 @@
     <if test="failedJobsToInclude || incidentsToInclude">
       <include refid="selectActivityStatisticsByQueryCriteriaSql"/>
     </if>
-    
+
     ${countDistinctAfterEnd}
 
   </select>
@@ -501,7 +502,7 @@
                   where
                       E.PROC_DEF_ID_ = #{processDefinitionId}
                       and E.IS_ACTIVE_ = ${trueConstant}
-                      <!-- CAM-5252: tolerate inconsistent execution trees where IS_ACTIVE_ is 
+                      <!-- CAM-5252: tolerate inconsistent execution trees where IS_ACTIVE_ is
                         true but no current activity is set -->
                       and E.ACT_ID_ is not null
 

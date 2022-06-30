@@ -68,8 +68,15 @@
     <@lib.property
         name = "createUserId"
         type = "string"
-        last = true
         desc = "The id of the user that created the batch." />
+
+    <@lib.property
+        name = "startTime"
+        type = "string"
+        format = "date-time"
+        last = true
+        desc = "The time the batch was started. Default format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`. For further information,
+         please see the [documentation] (${docsUrl}/reference/rest/overview/date-format/)" />
 
 </@lib.dto>
 </#macro>

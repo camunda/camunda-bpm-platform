@@ -21,6 +21,8 @@ import static org.mockito.Mockito.when;
 
 import org.camunda.bpm.engine.batch.BatchStatistics;
 
+import java.util.Date;
+
 public class MockBatchStatisticsBuilder {
 
   protected String id;
@@ -38,6 +40,7 @@ public class MockBatchStatisticsBuilder {
   protected int completedJobs;
   protected int failedJobs;
   protected boolean suspended;
+  protected Date startTime;
 
   public MockBatchStatisticsBuilder id(String id) {
     this.id = id;
@@ -114,6 +117,11 @@ public class MockBatchStatisticsBuilder {
     return this;
   }
 
+  public MockBatchStatisticsBuilder startTime(Date startTime) {
+    this.startTime = startTime;
+    return this;
+  }
+
   public BatchStatistics build() {
     BatchStatistics batchStatistics = mock(BatchStatistics.class);
     when(batchStatistics.getId()).thenReturn(id);
@@ -131,6 +139,7 @@ public class MockBatchStatisticsBuilder {
     when(batchStatistics.getCompletedJobs()).thenReturn(completedJobs);
     when(batchStatistics.getFailedJobs()).thenReturn(failedJobs);
     when(batchStatistics.isSuspended()).thenReturn(suspended);
+    when(batchStatistics.getStartTime()).thenReturn(startTime);
     return batchStatistics;
   }
 }

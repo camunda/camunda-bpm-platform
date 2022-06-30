@@ -38,6 +38,7 @@ public class BatchStatisticsQueryDto extends AbstractQueryDto<BatchStatisticsQue
 
   private static final String SORT_BY_BATCH_ID_VALUE = "batchId";
   private static final String SORT_BY_TENANT_ID_VALUE = "tenantId";
+  private static final String SORT_BY_START_TIME_VALUE = "startTime";
 
   protected String batchId;
   protected String type;
@@ -47,9 +48,10 @@ public class BatchStatisticsQueryDto extends AbstractQueryDto<BatchStatisticsQue
 
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
-    VALID_SORT_BY_VALUES = new ArrayList<String>();
+    VALID_SORT_BY_VALUES = new ArrayList<>();
     VALID_SORT_BY_VALUES.add(SORT_BY_BATCH_ID_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_TENANT_ID_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_START_TIME_VALUE);
   }
 
   public BatchStatisticsQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
@@ -116,6 +118,9 @@ public class BatchStatisticsQueryDto extends AbstractQueryDto<BatchStatisticsQue
     }
     else if (sortBy.equals(SORT_BY_TENANT_ID_VALUE)) {
       query.orderByTenantId();
+    }
+    else if (sortBy.equals(SORT_BY_START_TIME_VALUE)) {
+      query.orderByStartTime();
     }
   }
 

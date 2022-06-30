@@ -67,6 +67,8 @@ public class BatchEntity implements Batch, DbEntity, HasDbReferences, Nameable, 
 
   protected int suspensionState = SuspensionState.ACTIVE.getStateCode();
 
+  protected Date startTime;
+
   protected int revision;
 
   // transient
@@ -186,6 +188,14 @@ public class BatchEntity implements Batch, DbEntity, HasDbReferences, Nameable, 
 
   public boolean isSuspended() {
     return suspensionState == SuspensionState.SUSPENDED.getStateCode();
+  }
+
+  public Date getStartTime() {
+    return startTime;
+  }
+
+  public void setStartTime(final Date startTime) {
+    this.startTime = startTime;
   }
 
   public void setRevision(int revision) {
