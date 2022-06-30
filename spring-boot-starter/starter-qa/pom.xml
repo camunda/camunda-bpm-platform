@@ -23,6 +23,7 @@
       <modules>
         <module>integration-test-simple</module>
         <module>integration-test-plugins</module>
+        <module>integration-test-liquibase</module>
       </modules>
       <build>
         <pluginManagement>
@@ -69,6 +70,7 @@
         <module>integration-test-simple</module>
         <module>integration-test-plugins</module>
         <module>integration-test-webapp</module>
+        <module>integration-test-liquibase</module>
       </modules>
     </profile>
   </profiles>

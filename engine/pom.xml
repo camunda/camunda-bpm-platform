@@ -470,6 +470,32 @@
           <shadeTestJar>true</shadeTestJar>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-upgrade-scripts-liquibase</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+
+                <!-- copy all upgrade scripts after 7.15 -->
+                <mkdir dir="target/classes/org/camunda/bpm/engine/db/liquibase/upgrade" />
+                <copy todir="target/classes/org/camunda/bpm/engine/db/liquibase/upgrade">
+                  <fileset dir="target/classes/org/camunda/bpm/engine/db/upgrade" 
+                           excludes="*_6.*_*,*_7.0_*,*_7.1_*,*_7.2_*,*_7.3_*,*_7.4_*,*_7.5_*,*_7.6_*,*_7.7_*,
+                           *_7.8_*,*_7.9_*,*_7.10_*,*_7.11_*,*_7.12_*,*_7.13_*,*_7.14_*,*_7.15_*" />
+                </copy>
+
+              </target>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
     <pluginManagement>
       <plugins>
