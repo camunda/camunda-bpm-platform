@@ -16,6 +16,7 @@
             <tr ng-repeat="batch in ctrl.getBatches('runtime')" ng-class="{selected: ctrl.isSelected(batch)}">
               <td class="uuid"><a ng-href="#/batch?details={{batch.id}}&type=runtime">{{batch.id}}</a></td>
               <td class="type">{{batch.type}}</td>
+              <td class="user">{{ctrl.getFullName(batch.createUserId)}}</td>
               <td class="failed">{{ ctrl.getProgressAbsolute(batch, 'failed') }}</td>
               <td>
                 <uib-progress>

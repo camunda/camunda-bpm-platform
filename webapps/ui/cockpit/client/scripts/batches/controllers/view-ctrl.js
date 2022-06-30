@@ -69,6 +69,12 @@ module.exports = [
         content: $translate.instant('BATCHES_PROGRESS_TYPE')
       },
       {
+        class: 'user',
+        request: '',
+        sortable: false,
+        content: $translate.instant('BATCHES_PROGRESS_USER')
+      },
+      {
         class: 'failed',
         request: '',
         sortable: false,
