@@ -29,8 +29,7 @@
                 "history-cleanup-removed-decision-instances",
                 "history-cleanup-removed-batch-operations",
                 "history-cleanup-removed-task-metrics",
-                "process-instances",
-                "task-users"]
+                "process-instances"]
         desc = "The name of the metric." />
 
     <@lib.parameter
