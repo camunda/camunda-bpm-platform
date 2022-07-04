@@ -223,11 +223,14 @@ public class JobExecutorMetricsTest extends AbstractMetricsTest {
       assertEquals(3, jobCandidatesForAcquisition);
       assertEquals(3, exclusiveFollowupJobs);
     } else {
-      // on CRDB there are additional job failures due to a self-referencing foreign
+      // on CRDB there can be additional job failures due to a self-referencing foreign
       // key constraint on the ACT_RU_EXECUTION table which causes a TransactionRetryError
-      assertTrue(jobsFailed > 0);
-      // this leads to more job retries and acquisitions
-      assertTrue(jobCandidatesForAcquisition >= 3);
+      if (jobsFailed > 0) {
+        // this leads to more job retries and acquisitions
+        assertTrue(jobCandidatesForAcquisition >= 3);
+      } else {
+        assertEquals(3, jobCandidatesForAcquisition);
+      }
       assertEquals(3, exclusiveFollowupJobs);
     }
   }
@@ -257,7 +260,7 @@ public class JobExecutorMetricsTest extends AbstractMetricsTest {
   public static class RejectingJobExecutor extends DefaultJobExecutor {
 
     public RejectingJobExecutor() {
-      BlockingQueue<Runnable> threadPoolQueue = new ArrayBlockingQueue<Runnable>(queueSize);
+      BlockingQueue<Runnable> threadPoolQueue = new ArrayBlockingQueue<>(queueSize);
       threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maxPoolSize, 0L, TimeUnit.MILLISECONDS, threadPoolQueue) {
 
         @Override
