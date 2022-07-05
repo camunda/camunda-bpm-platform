@@ -95,10 +95,14 @@ public class SqlScriptTest {
     SnapshotParserFactory.getInstance().register(new DirectAccessSnapshotParser());
     database = getDatabase();
 
-    executeSqlScript("create", "engine");
-    executeSqlScript("create", "identity");
-
     try (Liquibase liquibase = getLiquibase()) {
+      //   database cleared and set up with Liquibase changelog
+      liquibase.dropAll();
+
+      // execute the SQL scripts
+      executeSqlScript("create", "engine");
+      executeSqlScript("create", "identity");
+
       //   snapshot created of the database for manual scripts
       DatabaseSnapshot snapshotManualScripts = createCurrentDatabaseSnapshot();
       //   database cleared and set up with Liquibase changelog
