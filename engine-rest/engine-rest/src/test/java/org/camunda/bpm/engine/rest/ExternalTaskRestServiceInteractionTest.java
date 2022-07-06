@@ -47,6 +47,7 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ExternalTaskService;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
@@ -1773,6 +1774,29 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     json.put("newDuration", 1000);
 
     validateExtendLockRequest(json, Status.NOT_FOUND.getStatusCode());
+  }
+
+  @Test
+  public void shouldReturnErrorCodeWhenCompleting() {
+    doThrow(new ProcessEngineException("foo", 123))
+      .when(externalTaskService)
+      .complete(any(), any(), any(), any());
+
+    Map<String, String> parameters = new HashMap<>();
+    parameters.put("workerId", "aWorkerId");
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+      .pathParam("id", "anExternalTaskId")
+    .then()
+      .expect()
+      .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+      .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
+      .body("message", equalTo("foo"))
+      .body("code", equalTo(123))
+    .when()
+      .post(COMPLETE_EXTERNAL_TASK_URL);
   }
 
   protected void validateExtendLockRequest(Map json, int statusCode) {

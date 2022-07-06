@@ -4079,4 +4079,40 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
       .get(PROCESS_DEFINITION_CALL_ACTIVITY_MAPPINGS);
   }
 
+  @Test
+  public void shouldReturnErrorCodeWhenStartingProcessInstance() {
+    when(mockInstantiationBuilder.executeWithVariablesInReturn(anyBoolean(), anyBoolean()))
+      .thenThrow(new ProcessEngineException("foo", 123));
+
+    given()
+      .pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(EMPTY_JSON_OBJECT)
+    .then().expect()
+      .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot instantiate process definition aProcDefId: foo"))
+      .body("code", equalTo(123))
+    .when()
+      .post(START_PROCESS_INSTANCE_BY_KEY_URL);
+  }
+
+  @Test
+  public void shouldReturnErrorCodeWhenSubmittingForm() {
+    doThrow(new ProcessEngineException("foo", 123))
+        .when(formServiceMock).submitStartForm(any(String.class), Mockito.any());
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(EMPTY_JSON_OBJECT)
+    .then().expect()
+      .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot instantiate process definition aProcDefId: foo"))
+      .body("code", equalTo(123))
+    .when()
+      .post(SUBMIT_FORM_URL);
+  }
+
 }

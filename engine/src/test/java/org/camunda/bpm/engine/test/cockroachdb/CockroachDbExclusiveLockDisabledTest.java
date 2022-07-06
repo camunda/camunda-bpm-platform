@@ -470,7 +470,7 @@ public class CockroachDbExclusiveLockDisabledTest extends ConcurrencyTestHelper 
 
     public Void execute(CommandContext commandContext) {
 
-      monitor.sync();  // thread will block here until makeContinue() is called form main thread
+      monitor.sync();  // thread will block here until makeContinue() is called from main thread
 
       tries++;
       historyLevelSetupCommand.execute(commandContext);
@@ -601,7 +601,7 @@ public class CockroachDbExclusiveLockDisabledTest extends ConcurrencyTestHelper 
     @Override
     public void initializeInstallationId(CommandContext commandContext) {
 
-      monitor.sync(); // thread will block here until makeContinue() is called form main thread
+      monitor.sync(); // thread will block here until makeContinue() is called from main thread
 
       tries++;
       super.initializeInstallationId(commandContext);
@@ -620,7 +620,7 @@ public class CockroachDbExclusiveLockDisabledTest extends ConcurrencyTestHelper 
     @Override
     public void initializeTelemetryProperty(CommandContext commandContext) {
 
-      monitor.sync(); // thread will block here until makeContinue() is called form main thread
+      monitor.sync(); // thread will block here until makeContinue() is called from main thread
 
       tries++;
       super.initializeTelemetryProperty(commandContext);
@@ -641,7 +641,7 @@ public class CockroachDbExclusiveLockDisabledTest extends ConcurrencyTestHelper 
     }
 
     public Void execute(CommandContext commandContext) {
-      monitor.sync();  // thread will block here until makeContinue() is called form main thread
+      monitor.sync();  // thread will block here until makeContinue() is called from main thread
 
       historyCleanupCmd.execute(commandContext);
 
@@ -676,7 +676,7 @@ public class CockroachDbExclusiveLockDisabledTest extends ConcurrencyTestHelper 
     }
 
     public Void execute(CommandContext commandContext) {
-      monitor.sync();  // thread will block here until makeContinue() is called form main thread
+      monitor.sync();  // thread will block here until makeContinue() is called from main thread
 
       tries++;
       deployCmd.execute(commandContext);

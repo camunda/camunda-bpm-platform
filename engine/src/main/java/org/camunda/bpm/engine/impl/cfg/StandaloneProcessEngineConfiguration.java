@@ -39,6 +39,9 @@ public class StandaloneProcessEngineConfiguration extends ProcessEngineConfigura
     if (DbSqlSessionFactory.CRDB.equals(databaseType)) {
       defaultCommandInterceptorsTxRequired.add(getCrdbRetryInterceptor());
     }
+    if (!isDisableExceptionCode()) {
+      defaultCommandInterceptorsTxRequired.add(getExceptionCodeInterceptor());
+    }
     defaultCommandInterceptorsTxRequired.add(new LogInterceptor());
     defaultCommandInterceptorsTxRequired.add(new CommandCounterInterceptor(this));
     defaultCommandInterceptorsTxRequired.add(new ProcessApplicationContextInterceptor(this));
@@ -50,6 +53,9 @@ public class StandaloneProcessEngineConfiguration extends ProcessEngineConfigura
     List<CommandInterceptor> defaultCommandInterceptorsTxRequired = new ArrayList<CommandInterceptor>();
     if (DbSqlSessionFactory.CRDB.equals(databaseType)) {
       defaultCommandInterceptorsTxRequired.add(getCrdbRetryInterceptor());
+    }
+    if (!isDisableExceptionCode()) {
+      defaultCommandInterceptorsTxRequired.add(getExceptionCodeInterceptor());
     }
     defaultCommandInterceptorsTxRequired.add(new LogInterceptor());
     defaultCommandInterceptorsTxRequired.add(new CommandCounterInterceptor(this));

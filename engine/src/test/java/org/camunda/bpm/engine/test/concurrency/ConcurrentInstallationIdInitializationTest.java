@@ -91,7 +91,7 @@ public class ConcurrentInstallationIdInitializationTest extends ConcurrencyTestC
 
     public Void execute(CommandContext commandContext) {
 
-      monitor.sync(); // thread will block here until makeContinue() is called form main thread
+      monitor.sync(); // thread will block here until makeContinue() is called from main thread
 
       new BootstrapEngineCommand().initializeInstallationId(commandContext);
 

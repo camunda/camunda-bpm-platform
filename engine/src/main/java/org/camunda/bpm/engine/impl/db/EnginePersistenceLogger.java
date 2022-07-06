@@ -16,10 +16,13 @@
  */
 package org.camunda.bpm.engine.impl.db;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.executor.BatchExecutorException;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.BadUserRequestException;
@@ -34,6 +37,7 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.db.entitymanager.cache.CachedDbEntity;
 import org.camunda.bpm.engine.impl.db.entitymanager.cache.DbEntityState;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
+import org.camunda.bpm.engine.impl.errorcode.BuiltinExceptionCode;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
@@ -119,7 +123,7 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
                                                           DbOperation failedOperation,
                                                           Throwable e) {
 
-    String message = ExceptionUtil.collectExceptionMessages(e);
+    String message = collectExceptionMessages(e);
 
     String exceptionMessage = exceptionMessage(
         "004",
@@ -672,7 +676,7 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
     String exceptionMessage = exceptionMessage(
       "083",
       "Unexpected exception while executing database operations with message '{}'. Flush summary: \n {}",
-        ExceptionUtil.collectExceptionMessages(cause),
+        collectExceptionMessages(cause),
         buildStringFromList(operationsToFlush)
     );
 
@@ -812,14 +816,6 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
         operation.getFailure());
   }
 
-  public CrdbTransactionRetryException crdbTransactionRetryExceptionOnSelect(Throwable cause) {
-    return new CrdbTransactionRetryException(exceptionMessage(
-      "103",
-      "Execution of SELECT statement failed. The transaction needs to be retried."),
-      cause
-    );
-  }
-
   public CrdbTransactionRetryException crdbTransactionRetryExceptionOnCommit(Throwable cause) {
     return new CrdbTransactionRetryException(exceptionMessage(
         "104",
@@ -867,4 +863,42 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
   }
 
   // exception code 110 is already taken. See requiredCamundaAdminOrPermissionException() for details.
+
+  public static List<SQLException> findRelatedSqlExceptions(Throwable exception) {
+    List<SQLException> sqlExceptionList = new ArrayList<>();
+    Throwable cause = exception;
+    do {
+      if (cause instanceof SQLException) {
+        SQLException sqlEx = (SQLException) cause;
+        sqlExceptionList.add(sqlEx);
+        while (sqlEx.getNextException() != null) {
+          sqlExceptionList.add(sqlEx.getNextException());
+          sqlEx = sqlEx.getNextException();
+        }
+      }
+      cause = cause.getCause();
+    } while (cause != null);
+    return sqlExceptionList;
+  }
+
+  public static String collectExceptionMessages(Throwable cause) {
+    StringBuilder message = new StringBuilder(cause.getMessage());
+
+    //collect real SQL exception messages in case of batch processing
+    Throwable exCause = cause;
+    do {
+      if (exCause instanceof BatchExecutorException) {
+        final List<SQLException> relatedSqlExceptions = findRelatedSqlExceptions(exCause);
+        StringBuilder sb = new StringBuilder();
+        for (SQLException sqlException : relatedSqlExceptions) {
+          sb.append(sqlException).append("\n");
+        }
+        message.append("\n").append(sb);
+      }
+      exCause = exCause.getCause();
+    } while (exCause != null);
+
+    return message.toString();
+  }
+
 }

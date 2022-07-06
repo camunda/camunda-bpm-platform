@@ -562,6 +562,24 @@ public class DecisionDefinitionRestServiceInteractionTest extends AbstractRestSe
   }
 
   @Test
+  public void shouldReturnErrorCode() {
+    when(decisionEvaluationBuilderMock.evaluate())
+        .thenThrow(new ProcessEngineException("foo", 123));
+
+    Map<String, Object> json = new HashMap<>();
+    json.put("variables", Collections.emptyMap());
+
+    given().pathParam("key", MockProvider.EXAMPLE_DECISION_DEFINITION_KEY)
+        .contentType(POST_JSON_CONTENT_TYPE).body(json)
+        .then().expect()
+          .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
+          .body("type", is(RestException.class.getSimpleName()))
+          .body("message", containsString("foo"))
+          .body("code", equalTo(123))
+    .when().post(EVALUATE_DECISION_BY_KEY_URL);
+  }
+
+  @Test
   public void testEvaluateDecision_NotValid() {
     String message = "expected message";
     when(decisionEvaluationBuilderMock.evaluate()).thenThrow(new NotValidException(message));

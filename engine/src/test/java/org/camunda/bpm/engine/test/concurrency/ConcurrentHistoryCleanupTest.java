@@ -105,7 +105,7 @@ public class ConcurrentHistoryCleanupTest extends ConcurrencyTestCase {
   protected static class ControllableHistoryCleanupCommand extends ControllableCommand<Void> {
 
     public Void execute(CommandContext commandContext) {
-      monitor.sync();  // thread will block here until makeContinue() is called form main thread
+      monitor.sync();  // thread will block here until makeContinue() is called from main thread
 
       new HistoryCleanupCmd(true).execute(commandContext);
 

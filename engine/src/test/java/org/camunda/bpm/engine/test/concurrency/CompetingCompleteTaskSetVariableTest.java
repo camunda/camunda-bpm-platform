@@ -45,7 +45,7 @@ public class CompetingCompleteTaskSetVariableTest extends ConcurrencyTestCase {
     }
 
     public Void execute(CommandContext commandContext) {
-      monitor.sync();  // thread will block here until makeContinue() is called form main thread
+      monitor.sync();  // thread will block here until makeContinue() is called from main thread
 
       new CompleteTaskCmd(taskId, null).execute(commandContext);
 
@@ -70,7 +70,7 @@ public class CompetingCompleteTaskSetVariableTest extends ConcurrencyTestCase {
     }
 
     public Void execute(CommandContext commandContext) {
-      monitor.sync();  // thread will block here until makeContinue() is called form main thread
+      monitor.sync();  // thread will block here until makeContinue() is called from main thread
 
       new SetTaskVariablesCmd(taskId, variables, true).execute(commandContext);
 

@@ -16,6 +16,9 @@
  */
 package org.camunda.bpm.engine;
 
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.errorcode.BuiltinExceptionCode;
+import org.camunda.bpm.engine.impl.errorcode.ExceptionCodeProvider;
 
 /**
  * Runtime exception that is the superclass of all exceptions in the process engine.
@@ -25,6 +28,8 @@ package org.camunda.bpm.engine;
 public class ProcessEngineException extends RuntimeException {
 
   private static final long serialVersionUID = 1L;
+
+  protected int code = BuiltinExceptionCode.FALLBACK.getCode();
 
   public ProcessEngineException() {
     super();
@@ -38,7 +43,41 @@ public class ProcessEngineException extends RuntimeException {
     super(message);
   }
 
+  public ProcessEngineException(String message, int code) {
+    super(message);
+    this.code = code;
+  }
+
   public ProcessEngineException(Throwable cause) {
     super(cause);
   }
+
+  /**
+   * <p>The exception code can be set via delegation code.
+   *
+   * <p>Setting an error code on the exception in delegation code always overrides
+   * the exception code from a custom {@link ExceptionCodeProvider}.
+   *
+   * <p>Your business logic can react to the exception code exposed
+   * via {@link #getCode} when calling Camunda Java API and is
+   * even exposed to the REST API when an error occurs.
+   */
+  public void setCode(int code) {
+    this.code = code;
+  }
+
+  /**
+   * <p>Accessor of the exception error code.
+   *
+   * <p>If not changed via {@link #setCode}, default code is {@link BuiltinExceptionCode#FALLBACK}
+   * which is always overridden by a custom or built-in error code provider.
+   *
+   * <p>You can implement a custom {@link ExceptionCodeProvider}
+   * and register it in the {@link ProcessEngineConfigurationImpl}
+   * via the {@code customExceptionCodeProvider} property.
+   */
+  public int getCode() {
+    return code;
+  }
+
 }

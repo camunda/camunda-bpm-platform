@@ -80,6 +80,9 @@ public class SpringTransactionsProcessEngineConfiguration extends ProcessEngineC
     if (DbSqlSessionFactory.CRDB.equals(databaseType)) {
       defaultCommandInterceptorsTxRequired.add(getCrdbRetryInterceptor());
     }
+    if (!isDisableExceptionCode()) {
+      defaultCommandInterceptorsTxRequired.add(getExceptionCodeInterceptor());
+    }
     defaultCommandInterceptorsTxRequired.add(new LogInterceptor());
     defaultCommandInterceptorsTxRequired.add(new CommandCounterInterceptor(this));
     defaultCommandInterceptorsTxRequired.add(new ProcessApplicationContextInterceptor(this));
@@ -95,6 +98,9 @@ public class SpringTransactionsProcessEngineConfiguration extends ProcessEngineC
     // so that a Spring TX may be rolled back before retrying.
     if (DbSqlSessionFactory.CRDB.equals(databaseType)) {
       defaultCommandInterceptorsTxRequiresNew.add(getCrdbRetryInterceptor());
+    }
+    if (!isDisableExceptionCode()) {
+      defaultCommandInterceptorsTxRequiresNew.add(getExceptionCodeInterceptor());
     }
     defaultCommandInterceptorsTxRequiresNew.add(new LogInterceptor());
     defaultCommandInterceptorsTxRequiresNew.add(new CommandCounterInterceptor(this));

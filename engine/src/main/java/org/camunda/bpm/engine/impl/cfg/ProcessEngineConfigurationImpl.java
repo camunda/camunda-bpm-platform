@@ -222,6 +222,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutorImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.CrdbTransactionRetryInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.DelegateInterceptor;
+import org.camunda.bpm.engine.impl.interceptor.ExceptionCodeInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
 import org.camunda.bpm.engine.impl.jobexecutor.AsyncContinuationJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.DefaultFailedJobCommandFactory;
@@ -393,6 +394,7 @@ import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.connect.Connectors;
 import org.camunda.connect.spi.Connector;
 import org.camunda.connect.spi.ConnectorRequest;
+import org.camunda.bpm.engine.impl.errorcode.ExceptionCodeProvider;
 
 /**
  * @author Tom Baeyens
@@ -1015,6 +1017,80 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    *  default: 15 seconds */
   protected int telemetryRequestTimeout = 15 * 1000;
 
+  // Exception Codes ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * Disables the {@link ExceptionCodeInterceptor} and therefore the whole exception code feature.
+   */
+  protected boolean disableExceptionCode;
+
+  /**
+   * Disables the default implementation of {@link ExceptionCodeProvider} which allows overriding the reserved
+   * exception codes > {@link ExceptionCodeInterceptor#MAX_CUSTOM_CODE} or < {@link ExceptionCodeInterceptor#MIN_CUSTOM_CODE}.
+   */
+  protected boolean disableBuiltinExceptionCodeProvider;
+
+  /**
+   * Allows registering a custom implementation of a {@link ExceptionCodeProvider}
+   * allowing to provide custom exception codes.
+   */
+  protected ExceptionCodeProvider customExceptionCodeProvider;
+
+  /**
+   * Holds the default implementation of {@link ExceptionCodeProvider}.
+   */
+  protected ExceptionCodeProvider builtinExceptionCodeProvider;
+
+  /**
+   * @return {@code true} if the exception code feature is disabled and vice-versa.
+   */
+  public boolean isDisableExceptionCode() {
+    return disableExceptionCode;
+  }
+
+  /**
+   * Setter to disables the {@link ExceptionCodeInterceptor} and therefore the whole exception code feature.
+   */
+  public void setDisableExceptionCode(boolean disableExceptionCode) {
+    this.disableExceptionCode = disableExceptionCode;
+  }
+
+  /**
+   * @return {@code true} if the built-in exception code provider is disabled and vice-versa.
+   */
+  public boolean isDisableBuiltinExceptionCodeProvider() {
+    return disableBuiltinExceptionCodeProvider;
+  }
+
+  /**
+   * Setter to disables the default implementation of {@link ExceptionCodeProvider} which allows overriding the reserved
+   * exception codes > {@link ExceptionCodeInterceptor#MAX_CUSTOM_CODE} or < {@link ExceptionCodeInterceptor#MIN_CUSTOM_CODE}.
+   */
+  public void setDisableBuiltinExceptionCodeProvider(boolean disableBuiltinExceptionCodeProvider) {
+    this.disableBuiltinExceptionCodeProvider = disableBuiltinExceptionCodeProvider;
+  }
+
+  /**
+   * @return a custom implementation of a {@link ExceptionCodeProvider} allowing to provide custom error codes.
+   */
+  public ExceptionCodeProvider getCustomExceptionCodeProvider() {
+    return customExceptionCodeProvider;
+  }
+
+  /**
+   * Setter to register a custom implementation of a {@link ExceptionCodeProvider} allowing to provide custom error codes.
+   */
+  public void setCustomExceptionCodeProvider(ExceptionCodeProvider customExceptionCodeProvider) {
+    this.customExceptionCodeProvider = customExceptionCodeProvider;
+  }
+
+  public ExceptionCodeProvider getBuiltinExceptionCodeProvider() {
+    return builtinExceptionCodeProvider;
+  }
+
+  public void setBuiltinExceptionCodeProvider(ExceptionCodeProvider builtinExceptionCodeProvider) {
+    this.builtinExceptionCodeProvider = builtinExceptionCodeProvider;
+  }
 
   // buildProcessEngine ///////////////////////////////////////////////////////
 
@@ -1051,6 +1127,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // Database type needs to be detected before CommandExecutors are initialized
     initDataSource();
 
+    initExceptionCodeProvider();
     initCommandExecutors();
     initServices();
     initIdGenerator();
@@ -1092,6 +1169,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initAdminGroups();
     initPasswordPolicy();
     invokePostInit();
+  }
+
+  public void initExceptionCodeProvider() {
+    if (!isDisableBuiltinExceptionCodeProvider()) {
+      builtinExceptionCodeProvider = new ExceptionCodeProvider() {};
+
+    }
   }
 
   protected void initTypeValidator() {
@@ -5223,6 +5307,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected CrdbTransactionRetryInterceptor getCrdbRetryInterceptor() {
     return new CrdbTransactionRetryInterceptor(commandRetries);
+  }
+
+  /**
+   * @return a exception code interceptor. The interceptor is not registered in case
+   * {@code disableExceptionCode} is configured to {@code true}.
+   */
+  protected ExceptionCodeInterceptor getExceptionCodeInterceptor() {
+    return new ExceptionCodeInterceptor(builtinExceptionCodeProvider, customExceptionCodeProvider);
   }
 
 }

@@ -37,9 +37,11 @@ import java.util.Map;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.ConditionEvaluationBuilderImpl;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.VariablesBuilder;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
@@ -243,6 +245,30 @@ public class ConditionRestServiceTest extends AbstractRestServiceTest {
       .statusCode(Status.FORBIDDEN.getStatusCode())
       .body("type", equalTo(AuthorizationException.class.getSimpleName()))
       .body("message", equalTo(message))
+    .when()
+      .post(CONDITION_URL);
+  }
+
+  @Test
+  public void shouldReturnErrorCode() {
+    Map<String, Object> parameters = new HashMap<>();
+    Map<String, Object> variables = VariablesBuilder
+        .create()
+        .variable("foo", "bar")
+        .getVariables();
+    parameters.put("variables", variables);
+
+    doThrow(new ProcessEngineException("foo", 123))
+        .when(conditionEvaluationBuilderMock).evaluateStartConditions();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+    .then().expect()
+      .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+      .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
+      .body("message", equalTo("foo"))
+      .body("code", equalTo(123))
     .when()
       .post(CONDITION_URL);
   }
