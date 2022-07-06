@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.errorcode;
 
+import ch.qos.logback.classic.Level;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.OptimisticLockingException;
@@ -37,6 +38,7 @@ import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.commons.testing.ProcessEngineLoggingRule;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -45,10 +47,16 @@ import org.junit.rules.RuleChain;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
 
 public class ExceptionBuiltinCodesTest {
+
+  @Rule
+  public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule()
+      .watch("org.camunda.bpm.engine.cmd")
+      .level(Level.WARN);
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule engineTestRule = new ProcessEngineTestRule(engineRule);
@@ -115,6 +123,7 @@ public class ExceptionBuiltinCodesTest {
     assertThatThrownBy(() -> authorizationService.saveAuthorization(authorizationTwo))
         .extracting("code")
         .contains(BuiltinExceptionCode.FALLBACK.getCode());
+    assertThat(loggingRule.getLog()).isEmpty();
   }
 
   @Test
