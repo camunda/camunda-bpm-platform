@@ -17,7 +17,6 @@
 package org.camunda.bpm.engine.test.errorcode.conf;
 
 import ch.qos.logback.classic.Level;
-import org.assertj.core.api.ThrowableAssert;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -46,7 +45,6 @@ import java.sql.SQLException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.junit.Assert.fail;
 
 public class CustomErrorCodeProviderTest {
 

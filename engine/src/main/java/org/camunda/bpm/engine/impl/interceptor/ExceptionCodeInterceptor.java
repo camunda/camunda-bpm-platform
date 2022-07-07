@@ -126,6 +126,7 @@ public class ExceptionCodeInterceptor extends CommandInterceptor {
   /**
    * Resets codes to the {@link BuiltinExceptionCode#FALLBACK}
    * in case they are < {@link #MIN_CUSTOM_CODE} or > {@link #MAX_CUSTOM_CODE}.
+   * No log is written when code is {@link BuiltinExceptionCode#FALLBACK}.
    */
   protected Integer tryResetReservedCode(Integer code) {
     if (codeReserved(code)) {
@@ -139,7 +140,8 @@ public class ExceptionCodeInterceptor extends CommandInterceptor {
   }
 
   protected boolean codeReserved(Integer code) {
-    return code != null && (code < MIN_CUSTOM_CODE || code > MAX_CUSTOM_CODE);
+    return code != null && code != BuiltinExceptionCode.FALLBACK.getCode() &&
+        (code < MIN_CUSTOM_CODE || code > MAX_CUSTOM_CODE);
   }
 
   protected void assignCodeToException(ProcessEngineException pex) {
