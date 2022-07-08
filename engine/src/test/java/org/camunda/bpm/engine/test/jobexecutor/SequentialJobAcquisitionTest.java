@@ -239,7 +239,7 @@ public class SequentialJobAcquisitionTest {
   protected void waitForJobExecutorToProcessAllJobs(long maxMillisToWait, long intervalMillis, JobExecutor jobExecutor,
       ManagementService managementService, boolean shutdown) {
     try {
-      waitForCondition(maxMillisToWait, intervalMillis, new AtomicBoolean(true), () -> areJobsAvailable(managementService));
+      waitForCondition(maxMillisToWait, intervalMillis, () -> areJobsAvailable(managementService));
     } finally {
       if (shutdown) {
         jobExecutor.shutdown();
@@ -248,11 +248,12 @@ public class SequentialJobAcquisitionTest {
   }
 
   protected void waitForJobExecutionRunnablesToFinish(long maxMillisToWait, long intervalMillis, JobExecutor jobExecutor) {
-    waitForCondition(maxMillisToWait, intervalMillis, new AtomicBoolean(true),
+    waitForCondition(maxMillisToWait, intervalMillis,
         () -> ((ThreadPoolJobExecutor) jobExecutor).getThreadPoolExecutor().getActiveCount() != 0);
   }
 
-  protected void waitForCondition(long maxMillisToWait, long intervalMillis, AtomicBoolean condition, Supplier<Boolean> conditionSupplier) {
+  protected void waitForCondition(long maxMillisToWait, long intervalMillis, Supplier<Boolean> conditionSupplier) {
+    AtomicBoolean condition = new AtomicBoolean(true);
     Timer timer = new Timer();
     InteruptTask task = new InteruptTask(Thread.currentThread());
     timer.schedule(task, maxMillisToWait);
