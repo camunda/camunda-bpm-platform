@@ -23,7 +23,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -239,7 +238,7 @@ public class SequentialJobAcquisitionTest {
   protected void waitForJobExecutorToProcessAllJobs(long maxMillisToWait, long intervalMillis, JobExecutor jobExecutor,
       ManagementService managementService, boolean shutdown) {
     try {
-      waitForCondition(maxMillisToWait, intervalMillis, () -> areJobsAvailable(managementService));
+      waitForCondition(maxMillisToWait, intervalMillis, () -> !areJobsAvailable(managementService));
     } finally {
       if (shutdown) {
         jobExecutor.shutdown();
@@ -249,24 +248,24 @@ public class SequentialJobAcquisitionTest {
 
   protected void waitForJobExecutionRunnablesToFinish(long maxMillisToWait, long intervalMillis, JobExecutor jobExecutor) {
     waitForCondition(maxMillisToWait, intervalMillis,
-        () -> ((ThreadPoolJobExecutor) jobExecutor).getThreadPoolExecutor().getActiveCount() != 0);
+        () -> ((ThreadPoolJobExecutor) jobExecutor).getThreadPoolExecutor().getActiveCount() == 0);
   }
 
   protected void waitForCondition(long maxMillisToWait, long intervalMillis, Supplier<Boolean> conditionSupplier) {
-    AtomicBoolean condition = new AtomicBoolean(true);
+    boolean conditionFulfilled = false;
     Timer timer = new Timer();
     InteruptTask task = new InteruptTask(Thread.currentThread());
     timer.schedule(task, maxMillisToWait);
     try {
-      while (condition.get() && !task.isTimeLimitExceeded()) {
+      while (!conditionFulfilled && !task.isTimeLimitExceeded()) {
         Thread.sleep(intervalMillis);
-        condition.set(conditionSupplier.get());
+        conditionFulfilled = conditionSupplier.get();
       }
     } catch (InterruptedException e) {
     } finally {
       timer.cancel();
     }
-    if (condition.get()) {
+    if (!conditionFulfilled) {
       throw new ProcessEngineException("time limit of " + maxMillisToWait + " was exceeded");
     }
   }
