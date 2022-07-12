@@ -16,10 +16,20 @@
  */
 package org.camunda.bpm.engine.test.persistence;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
+import static org.camunda.bpm.engine.impl.util.ExceptionUtil.PERSISTENCE_EXCEPTION_MESSAGE;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.assertj.core.api.ThrowableAssert;
 import org.camunda.bpm.engine.AuthorizationService;
-import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.FilterService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ManagementService;
@@ -34,7 +44,10 @@ import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
-import org.camunda.bpm.engine.impl.history.HistoryLevel;
+import org.camunda.bpm.engine.impl.history.event.HistoricDetailEventEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
@@ -48,17 +61,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
-import static org.camunda.bpm.engine.impl.util.ExceptionUtil.PERSISTENCE_EXCEPTION_MESSAGE;
 
 public class SuppressSqlExceptionsTest {
 
@@ -316,12 +318,11 @@ public class SuppressSqlExceptionsTest {
     engineRule.getIdentityService().deleteUser("foo");
   }
 
+
   @Test
   @RequiredDatabase(excludes = DbSqlSessionFactory.MARIADB)
   public void shouldThrowExceptionOnUpdate() {
     // given
-    HistoryLevel historyLevel = engineConfig.getHistoryLevel();
-    engineConfig.setHistoryLevel(HistoryLevel.HISTORY_LEVEL_NONE);
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("process")
         .startEvent()
         .userTask()
@@ -335,16 +336,23 @@ public class SuppressSqlExceptionsTest {
 
     String variableValue = generateString(10_000);
 
+    CommandExecutor commandExecutor = engineConfig.getCommandExecutorTxRequired();
+
     Iterator<Throwable> exceptionsByHierarchy = catchExceptionHierarchy(() -> {
       // when
-      runtimeService.setVariable(processInstanceId, "foo", variableValue);
+      commandExecutor.execute(c -> {
+        runtimeService.setVariable(processInstanceId, "foo", variableValue);
+
+        // otherwise the command fails on the INSERT of the historic detail,
+        // but we want to provoke an exception on an UPDATE statement
+        trimHistoricDetailValue(c);
+
+        return null;
+      });
+
     });
 
     // then
-    assertThat(exceptionsByHierarchy.next())
-        .isInstanceOf(BadUserRequestException.class)
-        .hasMessage("Variable value is too long");
-
     assertThat(exceptionsByHierarchy.next())
         .isInstanceOf(ProcessEngineException.class)
         .hasMessageContaining(PERSISTENCE_EXCEPTION_MESSAGE);
@@ -358,8 +366,17 @@ public class SuppressSqlExceptionsTest {
     assertThat(exceptionsByHierarchy.next())
         .isInstanceOf(PersistenceException.class);
 
-    // clear
-    engineConfig.setHistoryLevel(historyLevel);
+  }
+
+  private void trimHistoricDetailValue(CommandContext c) {
+    List<HistoricDetailEventEntity> historicDetails =
+        c.getDbEntityManager().getCachedEntitiesByType(HistoricDetailEventEntity.class);
+
+    // only if history produces the detail
+    if (!historicDetails.isEmpty()) {
+      HistoricVariableUpdateEventEntity detail = (HistoricVariableUpdateEventEntity) historicDetails.get(0);
+      detail.setTextValue("");
+    }
   }
 
   @Test
