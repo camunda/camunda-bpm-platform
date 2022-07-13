@@ -42,8 +42,11 @@ module.exports = [
           $scope.variables = $scope.decisionInstance.inputs.map(function(
             variable
           ) {
-            const variableValue = variable.type === 'Date' ? (new Date(variable.value)) : variable.value;
-            
+            const variableValue =
+              variable.type === 'Date'
+                ? new Date(variable.value)
+                : variable.value;
+
             return {
               variable: {
                 type: variable.type,

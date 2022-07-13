@@ -279,7 +279,7 @@ module.exports = [
 
             // check if the current tab is an external plugin and select a deep copy to re-render the plugin
             const taskDetailsTab = $scope.selectedTaskDetailTab;
-            
+
             if (taskDetailsTab.pluginPoint) {
               $scope.selectTaskDetailTab(angular.copy(taskDetailsTab));
             }
