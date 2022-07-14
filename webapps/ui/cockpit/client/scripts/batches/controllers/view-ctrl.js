@@ -152,6 +152,7 @@ module.exports = [
 
     events.on('deleteModal:open', function(deleteModal) {
       var modal = (deleteModal.instance = $modal.open({
+        scope: $scope,
         template: deleteModalTemplate,
         controller: deleteModalCtrl
       }));
