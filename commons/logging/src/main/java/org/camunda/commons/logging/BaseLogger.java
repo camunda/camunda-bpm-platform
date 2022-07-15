@@ -18,7 +18,6 @@ package org.camunda.commons.logging;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.event.Level;
 import org.slf4j.helpers.MessageFormatter;
 
 /**
@@ -128,18 +127,7 @@ public abstract class BaseLogger {
    * @param parameters      a list of optional parameters
    */
   protected void log(String level, Level defaultLevel, String id, String messageTemplate, Object... parameters) {
-    Level logLevel;
-    if (level == null) {
-      logLevel = defaultLevel;
-    } else {
-      try {
-        logLevel = Level.valueOf(level.trim().toUpperCase());
-      } catch (IllegalArgumentException e) {
-        logLevel = defaultLevel;
-      }
-    }
-
-    switch (logLevel) {
+    switch (Level.parse(level, defaultLevel)) {
     case ERROR:
       logError(id, messageTemplate, parameters);
       break;

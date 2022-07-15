@@ -18,7 +18,6 @@ package org.camunda.commons.logging;
 
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.slf4j.event.Level;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.camunda.commons.logging.ExampleLogger.*;
