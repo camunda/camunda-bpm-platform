@@ -303,6 +303,7 @@ create table ACT_HI_BATCH (
     START_TIME_ TIMESTAMP(6) NOT NULL,
     END_TIME_ TIMESTAMP(6),
     REMOVAL_TIME_ TIMESTAMP(6),
+    EXEC_START_TIME_ TIMESTAMP(6),
     primary key (ID_)
 );
 

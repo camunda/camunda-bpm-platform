@@ -86,6 +86,7 @@
     <result property="createUserId" column="CREATE_USER_ID_" jdbcType="VARCHAR" />
     <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER" />
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
+    <result property="executionStartTime" column="EXEC_START_TIME_" jdbcType="TIMESTAMP" />
   </resultMap>
 
   <resultMap id="decisionDefinitionStatisticsResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.DecisionInstanceStatisticsImpl">

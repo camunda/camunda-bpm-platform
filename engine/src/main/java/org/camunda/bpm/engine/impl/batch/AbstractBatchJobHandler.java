@@ -16,18 +16,27 @@
  */
 package org.camunda.bpm.engine.impl.batch;
 
+import org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.db.entitymanager.OptimisticLockingListener;
+import org.camunda.bpm.engine.impl.db.entitymanager.OptimisticLockingResult;
+import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbEntityOperation;
+import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.json.JsonObjectConverter;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayManager;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
 import com.google.gson.JsonElement;
 
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -79,6 +88,48 @@ public abstract class AbstractBatchJobHandler<T extends BatchConfiguration> impl
 
     return deploymentAware ? idMappings.isEmpty() : ids.isEmpty();
   }
+
+  @Override
+  public final void execute(final BatchJobConfiguration configuration,
+                            final ExecutionEntity execution,
+                            final CommandContext commandContext,
+                            final String tenantId) {
+
+    commandContext.getDbEntityManager().registerOptimisticLockingListener(new OptimisticLockingListener() {
+      @Override
+      public Class<? extends DbEntity> getEntityType() {
+        return BatchEntity.class;
+      }
+
+      @Override
+      public OptimisticLockingResult failedOperation(final DbOperation operation) {
+        if (operation instanceof DbEntityOperation) {
+          return OptimisticLockingResult.IGNORE;
+        }
+        return OptimisticLockingResult.THROW;
+      }
+    });
+
+    final String jobDefinitionId = commandContext.getCurrentJob().getJobDefinitionId();
+    final BatchEntity batch = commandContext.getBatchManager().findBatchByJobDefinitionId(jobDefinitionId);
+    if (batch != null && batch.getExecutionStartTime() == null) {
+      final HistoricBatchEntity historicBatch = commandContext.getHistoricBatchManager().findHistoricBatchById(batch.getId());
+
+      final Date executionStartTime = ClockUtil.now();
+      batch.setExecutionStartTime(executionStartTime);
+      historicBatch.setExecutionStartTime(executionStartTime);
+
+      commandContext.getDbEntityManager().merge(batch);
+      commandContext.getDbEntityManager().merge(historicBatch);
+    }
+
+    executeInternal(configuration, execution, commandContext, tenantId);
+  }
+
+  protected abstract void executeInternal(final BatchJobConfiguration configuration,
+                                          final ExecutionEntity execution,
+                                          final CommandContext commandContext,
+                                          final String tenantId);
 
   protected void sanitizeMappings(DeploymentMappings idMappings, List<String> ids) {
     // for mixed version SeedJob execution, there might be ids that have been processed

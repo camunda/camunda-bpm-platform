@@ -42,7 +42,7 @@ public class BatchSetRemovalTimeJobHandler extends AbstractBatchJobHandler<SetRe
 
   public static final BatchJobDeclaration JOB_DECLARATION = new BatchJobDeclaration(Batch.TYPE_BATCH_SET_REMOVAL_TIME);
 
-  public void execute(BatchJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
+  public void executeInternal(BatchJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
 
     String byteArrayId = configuration.getConfigurationByteArrayId();
     byte[] configurationByteArray = findByteArrayById(byteArrayId, commandContext).getBytes();

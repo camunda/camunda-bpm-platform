@@ -141,13 +141,13 @@
                   ng-if="selection[key] && key !== 'failedJobs'"
                   ng-class="key">
                 <td>{{key}}</td>
-                <td ng-if="key !== 'startTime' && key !== 'endTime'">{{selection[key]}}
+                <td ng-if="!key.endsWith('Time')">{{selection[key]}}
                   <span ng-if="key === 'remainingJobs' && selection.failedJobs"
                         class="failedJobs"
                         translate="BATCHES_PROGRESS_FAILED"
                         translate-values="{jobs: selection.failedJobs}"></span>
                 </td>
-                <td ng-if="key === 'startTime' || key == 'endTime'">{{selection[key] | camDate}}</td>
+                <td ng-if="key.endsWith('Time')">{{selection[key] | camDate}}</td>
               </tr>
             </tbody>
           </table>

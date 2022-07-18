@@ -35,14 +35,14 @@ import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 public class SetExternalTaskRetriesJobHandler extends AbstractBatchJobHandler<SetRetriesBatchConfiguration> {
 
   public static final BatchJobDeclaration JOB_DECLARATION = new BatchJobDeclaration(Batch.TYPE_SET_EXTERNAL_TASK_RETRIES);
-  
+
   @Override
   public String getType() {
     return Batch.TYPE_SET_EXTERNAL_TASK_RETRIES;
   }
 
   @Override
-  public void execute(BatchJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
+  public void executeInternal(BatchJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
     ByteArrayEntity configurationEntity = commandContext
         .getDbEntityManager()
         .selectById(ByteArrayEntity.class, configuration.getConfigurationByteArrayId());
@@ -56,7 +56,7 @@ public class SetExternalTaskRetriesJobHandler extends AbstractBatchJobHandler<Se
                 batchConfiguration.getRetries())));
 
     commandContext.getByteArrayManager().delete(configurationEntity);
-    
+
   }
 
   @Override

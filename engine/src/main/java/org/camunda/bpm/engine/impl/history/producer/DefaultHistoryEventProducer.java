@@ -1057,6 +1057,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
     if (HistoryEventTypes.BATCH_END.equals(eventType)) {
       event.setEndTime(ClockUtil.getCurrentTime());
+      event.setExecutionStartTime(batch.getExecutionStartTime());
     }
 
     return event;

@@ -31,4 +31,6 @@ public interface BatchQueryProperty {
 
   QueryProperty START_TIME = new QueryPropertyImpl("START_TIME_");
 
+  QueryProperty EXEC_START_TIME = new QueryPropertyImpl("EXEC_START_TIME");
+
 }

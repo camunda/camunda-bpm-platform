@@ -58,7 +58,7 @@ public class DeleteHistoricProcessInstancesJobHandler extends AbstractBatchJobHa
   }
 
   @Override
-  public void execute(BatchJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
+  public void executeInternal(BatchJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
     ByteArrayEntity configurationEntity = commandContext
         .getDbEntityManager()
         .selectById(ByteArrayEntity.class, configuration.getConfigurationByteArrayId());

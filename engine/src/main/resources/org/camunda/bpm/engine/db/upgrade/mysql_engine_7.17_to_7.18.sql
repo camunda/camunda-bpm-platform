@@ -26,3 +26,9 @@ create index ACT_IDX_TASK_LAST_UPDATED on ACT_RU_TASK(LAST_UPDATED_);
 -- https://jira.camunda.com/browse/CAM-14721
 ALTER TABLE ACT_RU_BATCH
     ADD COLUMN START_TIME_ datetime;
+
+-- https://jira.camunda.com/browse/CAM-14721
+ALTER TABLE ACT_RU_BATCH
+    ADD COLUMN EXEC_START_TIME_ datetime;
+ALTER TABLE ACT_HI_BATCH
+    ADD COLUMN EXEC_START_TIME_ datetime;

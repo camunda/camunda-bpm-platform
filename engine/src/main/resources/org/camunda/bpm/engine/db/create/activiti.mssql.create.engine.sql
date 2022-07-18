@@ -356,6 +356,7 @@ create table ACT_RU_BATCH (
   TENANT_ID_ nvarchar(64),
   CREATE_USER_ID_ nvarchar(255),
   START_TIME_ datetime2,
+  EXEC_START_TIME_ datetime2,
   primary key (ID_)
 );
 

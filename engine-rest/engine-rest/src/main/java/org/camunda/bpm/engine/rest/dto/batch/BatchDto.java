@@ -35,6 +35,7 @@ public class BatchDto {
   protected String tenantId;
   protected String createUserId;
   protected Date startTime;
+  protected Date executionStartTime;
 
   public String getId() {
     return id;
@@ -92,6 +93,14 @@ public class BatchDto {
     this.startTime = startTime;
   }
 
+  public Date getExecutionStartTime() {
+    return executionStartTime;
+  }
+
+  public void setExecutionStartTime(final Date executionStartTime) {
+    this.executionStartTime = executionStartTime;
+  }
+
   public static BatchDto fromBatch(Batch batch) {
     BatchDto dto = new BatchDto();
     dto.id = batch.getId();
@@ -107,6 +116,7 @@ public class BatchDto {
     dto.tenantId = batch.getTenantId();
     dto.createUserId = batch.getCreateUserId();
     dto.startTime = batch.getStartTime();
+    dto.executionStartTime = batch.getExecutionStartTime();
     return dto;
   }
 

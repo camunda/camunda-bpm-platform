@@ -43,7 +43,7 @@ public class DecisionSetRemovalTimeJobHandler extends AbstractBatchJobHandler<Se
 
   public static final BatchJobDeclaration JOB_DECLARATION = new BatchJobDeclaration(Batch.TYPE_DECISION_SET_REMOVAL_TIME);
 
-  public void execute(BatchJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
+  public void executeInternal(BatchJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
     if (isDmnEnabled(commandContext)) {
 
       String byteArrayId = configuration.getConfigurationByteArrayId();

@@ -368,6 +368,7 @@ public class HistoricBatchRestServiceInteractionTest extends AbstractRestService
     assertEquals(MockProvider.EXAMPLE_TENANT_ID, historicBatch.getTenantId());
     assertEquals(MockProvider.EXAMPLE_USER_ID, historicBatch.getCreateUserId());
     assertEquals(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_BATCH_START_TIME), historicBatch.getStartTime());
+    assertEquals(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_BATCH_START_TIME), historicBatch.getExecutionStartTime());
     assertEquals(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_BATCH_END_TIME), historicBatch.getEndTime());
     assertEquals(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_BATCH_REMOVAL_TIME), historicBatch.getRemovalTime());
   }

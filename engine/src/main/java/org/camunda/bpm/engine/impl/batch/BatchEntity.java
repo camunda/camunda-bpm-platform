@@ -68,6 +68,7 @@ public class BatchEntity implements Batch, DbEntity, HasDbReferences, Nameable, 
   protected int suspensionState = SuspensionState.ACTIVE.getStateCode();
 
   protected Date startTime;
+  protected Date executionStartTime;
 
   protected int revision;
 
@@ -196,6 +197,14 @@ public class BatchEntity implements Batch, DbEntity, HasDbReferences, Nameable, 
 
   public void setStartTime(final Date startTime) {
     this.startTime = startTime;
+  }
+
+  public Date getExecutionStartTime() {
+    return executionStartTime;
+  }
+
+  public void setExecutionStartTime(final Date executionStartTime) {
+    this.executionStartTime = executionStartTime;
   }
 
   public void setRevision(int revision) {

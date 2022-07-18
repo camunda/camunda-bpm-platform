@@ -41,10 +41,10 @@ public class BatchSetVariablesHandler extends AbstractBatchJobHandler<BatchConfi
       new BatchJobDeclaration(Batch.TYPE_SET_VARIABLES);
 
   @Override
-  public void execute(BatchJobConfiguration configuration,
-                      ExecutionEntity execution,
-                      CommandContext commandContext,
-                      String tenantId) {
+  public void executeInternal(BatchJobConfiguration configuration,
+                              ExecutionEntity execution,
+                              CommandContext commandContext,
+                              String tenantId) {
 
     String byteArrayId = configuration.getConfigurationByteArrayId();
     ByteArrayEntity byteArray = findByteArrayById(byteArrayId, commandContext);

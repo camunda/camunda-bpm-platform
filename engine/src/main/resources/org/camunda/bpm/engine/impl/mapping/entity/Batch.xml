@@ -40,6 +40,7 @@
       CREATE_USER_ID_,
       SUSPENSION_STATE_,
       START_TIME_,
+      EXEC_START_TIME_,
       REV_
     )
     values
@@ -58,6 +59,7 @@
       #{createUserId, jdbcType=VARCHAR},
       #{suspensionState, jdbcType=INTEGER},
       #{startTime, jdbcType=TIMESTAMP},
+      #{executionStartTime, jdbcType=TIMESTAMP},
       1
     )
   </insert>
@@ -80,14 +82,19 @@
     <result property="createUserId" column="CREATE_USER_ID_" jdbcType="VARCHAR" />
     <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER" />
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
+    <result property="executionStartTime" column="EXEC_START_TIME_" jdbcType="TIMESTAMP" />
   </resultMap>
 
   <!-- UPDATE -->
   <update id="updateBatch" parameterType="org.camunda.bpm.engine.impl.batch.BatchEntity">
     update ${prefix}ACT_RU_BATCH
-    set
+    <set>
       JOBS_CREATED_ = #{jobsCreated, jdbcType=INTEGER},
-      REV_ = #{revisionNext, jdbcType=INTEGER}
+      REV_ = #{revisionNext, jdbcType=INTEGER},
+      <if test="executionStartTime != null">
+        EXEC_START_TIME_ = #{executionStartTime, jdbcType=TIMESTAMP},
+      </if>
+    </set>
     where
       ID_ = #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
@@ -163,5 +170,10 @@
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
     </where>
   </sql>
+
+  <select id="selectBatchByJobDefinitionId" parameterType="string" resultMap="batchResultMap">
+    select * from ${prefix}ACT_RU_BATCH
+    where BATCH_JOB_DEF_ID_ = #{jobDefinitionId}
+  </select>
 
 </mapper>
