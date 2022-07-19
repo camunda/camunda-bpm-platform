@@ -24,7 +24,7 @@
 
   <properties>
     <assertj.version>2.9.1</assertj.version>
-    <commons.version>1.11.0</commons.version>
+    <commons.version>1.12.0</commons.version>
     <graal.js.version>21.1.0</graal.js.version>
     <groovy.version>2.4.13</groovy.version>
     <jackson.version>2.13.2.20220328</jackson.version>
