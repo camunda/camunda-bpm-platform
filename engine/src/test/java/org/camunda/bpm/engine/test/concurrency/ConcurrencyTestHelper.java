@@ -85,6 +85,9 @@ public abstract class ConcurrencyTestHelper {
       this.monitor = threadControl;
     }
 
+    public ThreadControl getMonitor() {
+      return monitor;
+    }
   }
 
   public static class ThreadControl {
