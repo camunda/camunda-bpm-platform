@@ -28,6 +28,7 @@ import java.util.Set;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
@@ -77,6 +78,7 @@ import org.camunda.bpm.engine.impl.tree.ExecutionTopDownWalker;
 import org.camunda.bpm.engine.impl.tree.TreeVisitor;
 import org.camunda.bpm.engine.impl.util.BitMaskUtil;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
+import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.impl.variable.VariableDeclaration;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -1308,6 +1310,10 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
       Collection<JobEntity> jobs,
       Collection<IncidentEntity> incidents,
       Collection<ExternalTaskEntity> externalTasks) {
+
+    EnsureUtil.ensureNotEmpty(NullValueException.class,
+        String.format("Cannot restore state of process instance %s", processInstanceId),
+        "list of executions", executions);
 
     if(!isProcessInstanceExecution()) {
       throw LOG.restoreProcessInstanceException(this);
