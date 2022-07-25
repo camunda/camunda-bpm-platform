@@ -33,6 +33,7 @@ public class DeploymentHelper {
   private static JavaArchive CACHED_ENGINE_CDI_ASSET;
   private static JavaArchive[] CACHED_WELD_ASSETS;
   private static JavaArchive[] CACHED_SPRING_ASSETS;
+  private static JavaArchive[] CACHED_WIREMOCK_ASSETS;
 
   public static JavaArchive getEjbClient() {
     if(CACHED_CLIENT_ASSET != null) {
@@ -97,6 +98,30 @@ public class DeploymentHelper {
       }
     }
 
+  }
+
+  public static JavaArchive[] getWiremock() {
+    if(CACHED_WIREMOCK_ASSETS != null) {
+      return CACHED_WIREMOCK_ASSETS;
+    } else {
+
+      JavaArchive[] resolvedArchives = Maven.configureResolver()
+          .workOffline()
+          .loadPomFromFile("pom.xml")
+          .addDependencies(
+              MavenDependencies.createDependency("com.github.tomakehurst:wiremock-jre8", ScopeType.COMPILE, false,
+                                                 MavenDependencies.createExclusion("org.slf4j:slf4j-api")))
+          .resolve()
+          .withTransitivity()
+          .as(JavaArchive.class);
+
+      if(resolvedArchives.length == 0) {
+        throw new RuntimeException("could not resolve com.github.tomakehurst:wiremock-jre8");
+      } else {
+        CACHED_WIREMOCK_ASSETS = resolvedArchives;
+        return CACHED_WIREMOCK_ASSETS;
+      }
+    }
   }
 
   public static JavaArchive[] getEngineSpring() {

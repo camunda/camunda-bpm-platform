@@ -47,6 +47,7 @@ import org.camunda.bpm.engine.impl.util.ParseUtil;
 import org.camunda.bpm.engine.telemetry.Command;
 import org.camunda.bpm.engine.telemetry.Metric;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
+import org.camunda.bpm.integrationtest.util.DeploymentHelper;
 import org.camunda.bpm.integrationtest.util.TestContainer;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
@@ -97,12 +98,7 @@ public class TelemetryConnectPluginTest extends AbstractFoxPlatformIntegrationTe
   public static WebArchive createDeployment() {
     final WebArchive webArchive =
         initWebArchiveDeployment("paConnectPlugin.war", "org/camunda/bpm/integrationtest/telemetry/processes-connectPlugin.xml")
-        .addAsLibraries(Maven.resolver()
-            .offline()
-            .loadPomFromFile("pom.xml")
-            .resolve("com.github.tomakehurst:wiremock-standalone")
-            .withTransitivity()
-            .as(JavaArchive.class));
+        .addAsLibraries(DeploymentHelper.getWiremock());
 
     TestContainer.addContainerSpecificProcessEngineConfigurationClass(webArchive);
     return webArchive;
