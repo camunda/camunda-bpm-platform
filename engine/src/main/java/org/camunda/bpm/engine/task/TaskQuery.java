@@ -935,7 +935,7 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    *
    * @throws ProcessEngineException When method has been executed within "or query".
    */
-  TaskQuery orderByTaskUpdatedAfter();
+  TaskQuery orderByLastUpdated();
 
   /**
    * Order by process instance id (needs to be followed by {@link #asc()} or {@link #desc()}).

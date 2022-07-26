@@ -72,7 +72,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   public static final String SORT_BY_CASE_EXECUTION_ID_VALUE = "caseExecutionId";
   public static final String SORT_BY_ASSIGNEE_VALUE = "assignee";
   public static final String SORT_BY_CREATE_TIME_VALUE = "created";
-  public static final String SORT_BY_UPDATED_AFTER_VALUE = "updatedAfter";
+  public static final String SORT_BY_LAST_UPDATED_VALUE = "lastUpdated";
   public static final String SORT_BY_DESCRIPTION_VALUE = "description";
   public static final String SORT_BY_ID_VALUE = "id";
   public static final String SORT_BY_NAME_VALUE = "name";
@@ -97,7 +97,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     VALID_SORT_BY_VALUES.add(SORT_BY_CASE_EXECUTION_ID_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_ASSIGNEE_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_CREATE_TIME_VALUE);
-    VALID_SORT_BY_VALUES.add(SORT_BY_UPDATED_AFTER_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_LAST_UPDATED_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_DESCRIPTION_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_ID_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_NAME_VALUE);
@@ -1462,8 +1462,8 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
       query.orderByTaskAssignee();
     } else if (sortBy.equals(SORT_BY_CREATE_TIME_VALUE)) {
       query.orderByTaskCreateTime();
-    } else if (sortBy.equals(SORT_BY_UPDATED_AFTER_VALUE)) {
-      query.orderByTaskUpdatedAfter();
+    } else if (sortBy.equals(SORT_BY_LAST_UPDATED_VALUE)) {
+      query.orderByLastUpdated();
     } else if (sortBy.equals(SORT_BY_DESCRIPTION_VALUE)) {
       query.orderByTaskDescription();
     } else if (sortBy.equals(SORT_BY_ID_VALUE)) {
@@ -1778,8 +1778,8 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     else if (TaskQueryProperty.CREATE_TIME.equals(queryProperty)) {
       return SORT_BY_CREATE_TIME_VALUE;
     }
-    else if (TaskQueryProperty.UPDATED_AFTER.equals(queryProperty)) {
-      return SORT_BY_UPDATED_AFTER_VALUE;
+    else if (TaskQueryProperty.LAST_UPDATED.equals(queryProperty)) {
+      return SORT_BY_LAST_UPDATED_VALUE;
     }
     else if (TaskQueryProperty.DESCRIPTION.equals(queryProperty)) {
       return SORT_BY_DESCRIPTION_VALUE;
