@@ -63,6 +63,7 @@
                            "executionId": "aExecutionId",
                            "followUp": null,
                            "formKey": null,
+                           "lastUpdated": "2014-09-15T15:45:48.000+0200",
                            "id": "aTaskId",
                            "name": "Task 2",
                            "owner": null,
