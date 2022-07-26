@@ -20,7 +20,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.bpmn.iomapping.VariableLogDelegate;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
@@ -30,6 +32,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+@RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
 public class EventBasedGatewayInputOutputTest extends PluggableProcessEngineTest {
 
   protected static final BpmnModelInstance EVENT_GATEWAY_PROCESS =
