@@ -1,0 +1,50 @@
+<div class="form-inline">
+  <div>
+    <label for="instance"></label>
+    <input type="radio"
+           id="instance"
+           name="selection_type"
+           value="INSTANCE"
+           ng-model="selectionType"
+           ng-change="updateSelectionType(selectionType)" />
+    {{ 'INSTANCE' | translate }}
+    <span class="glyphicon glyphicon-question-sign"
+          uib-tooltip="{{ 'CAM_WIDGET_SELECTION_TYPE_INSTANCE_TOOLTIP' | translate }}"
+          tooltip-placement="right"></span>
+  </div>
+  <div>
+    <label for="query"></label>
+    <input type="radio"
+           id="query"
+           name="selection_type"
+           value="QUERY"
+           ng-model="selectionType"
+           ng-change="updateSelectionType(selectionType)" />
+    {{ 'QUERY' | translate }}
+    <span class="glyphicon glyphicon-question-sign"
+          uib-tooltip="{{ 'CAM_WIDGET_SELECTION_TYPE_QUERY_TOOLTIP' | translate }}"
+          tooltip-placement="right"></span>
+  </div>   
+</div>
+
+<div class="instance"
+     ng-if="selectionType === 'INSTANCE' && toggleState === 'on' && totalInstancesCount > 12">
+  <div class="alert alert-info">
+    <p>{{ 'CAM_WIDGET_SELECTION_TYPE_INSTANCE_NOTICE_PLACEHOLDER' | translate }} {{ selectedInstancesCount }} {{ 'INSTANCES' | translate }}. </p><br />
+    <p>
+      <a ng-click="updateSelectionType('QUERY')">{{ 'CAM_WIDGET_SELECTION_TYPE_INSTANCE_NOTICE_LINK' | translate }} {{ totalInstancesCount }} {{ 'INSTANCES' | translate }}.</a>
+      <strong>{{ 'WARNING' | translate }}:</strong> {{ 'CAM_WIDGET_SELECTION_TYPE_NOTICE_WARNING_PLACEHOLDER' | translate }}
+    </p>
+  </div>
+</div>
+
+<div class="query"
+     ng-if="selectionType === 'QUERY'">
+  <div class="alert alert-warning">
+    <p><strong>{{ totalInstancesCount }} {{ 'CAM_WIDGET_SELECTION_TYPE_QUERY_WARNING_PLACEHOLDER' | translate }}</strong></p><br />
+    <p>
+      {{ 'CAM_WIDGET_SELECTION_TYPE_NOTICE_WARNING_PLACEHOLDER' | translate }} <strong>{{ 'OPTIONAL' | translate }}:</strong>
+      <a ng-click="updateSelectionType('INSTANCE')">{{ 'CAM_WIDGET_SELECTION_TYPE_QUERY_WARNING_LINK' | translate }}</a>
+    </p>
+  </div>
+</div>

@@ -41,7 +41,8 @@ var angular = require('../../../camunda-bpm-sdk-js/vendor/angular'),
   variableValidator = require('./variable/cam-variable-validator'),
   localConf = require('./../services/cam-local-configuration'),
   camShareLink = require('./cam-share-link/cam-share-link'),
-  password = require('./password/cam-widget-password');
+  password = require('./password/cam-widget-password'),
+  selectionType = require('./selection-type/cam-widget-selection-type.directive');
 
 require('../../vendor/ui-bootstrap-tpls-2.5.0-camunda');
 
@@ -73,6 +74,8 @@ widgetModule.directive('camWidgetPassword', password);
 
 widgetModule.directive('camVariableValidator', variableValidator);
 widgetModule.directive('camAnnotationEdit', annotationEdit);
+
+widgetModule.directive('camWidgetSelectionType', selectionType);
 
 widgetModule.filter('camQueryComponent', camQueryComponent);
 
