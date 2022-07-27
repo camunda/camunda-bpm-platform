@@ -104,6 +104,31 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
 
   }
 
+  @Deployment
+  @Test
+  public void testFixedDateWithRepeatStartTimerEvent() throws Exception {
+    // given a process definition with a start timer event with the following expression: R2/2036-11-15T11:00/PT10S
+    ProcessInstanceQuery piQuery = runtimeService.createProcessInstanceQuery().processDefinitionKey("startTimerEventExample");
+
+    ClockUtil.setCurrentTime(new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse("15/11/2036 11:00:00"));
+    executeAllJobs();
+    List<ProcessInstance> at110000 = piQuery.list();
+
+    ClockUtil.setCurrentTime(new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse("15/11/2036 11:00:15"));
+    executeAllJobs();
+    List<ProcessInstance> at110015 = piQuery.list();
+
+    ClockUtil.setCurrentTime(new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse("15/11/2036 11:00:25"));
+    executeAllJobs();
+    List<ProcessInstance> at110025 = piQuery.list();
+
+    // then
+    assertThat(at110000).hasSize(1);
+    assertThat(at110015).hasSize(2);
+    // should only start 2 instances
+    assertThat(at110025).hasSize(2);
+  }
+
   // FIXME: This test likes to run in an endless loop when invoking the
   // waitForJobExecutorOnCondition method
   @Deployment
@@ -219,7 +244,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
 
     assertEquals(0, jobQuery.count());
   }
-  
+
   @Deployment
   @Test
   public void testRecalculateExpressionStartTimerEvent() throws Exception {
@@ -228,19 +253,19 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
     ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().processDefinitionKey("startTimerEventExample");
     assertEquals(1, jobQuery.count());
     assertEquals(0, processInstanceQuery.count());
-    
+
     Job job = jobQuery.singleResult();
     Date oldDate = job.getDuedate();
-    
+
     // when
     moveByMinutes(2);
     Date currentTime = ClockUtil.getCurrentTime();
     managementService.recalculateJobDuedate(job.getId(), false);
-    
+
     // then
     assertEquals(1, jobQuery.count());
     assertEquals(0, processInstanceQuery.count());
-    
+
     Date newDate = jobQuery.singleResult().getDuedate();
     assertNotEquals(oldDate, newDate);
     assertTrue(oldDate.before(newDate));
@@ -256,7 +281,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
 
     assertEquals(0, jobQuery.count());
   }
-  
+
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/timer/StartTimerEventTest.testRecalculateExpressionStartTimerEvent.bpmn20.xml")
   @Test
   public void testRecalculateUnchangedExpressionStartTimerEventCreationDateBased() throws Exception {
@@ -265,15 +290,15 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
     ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().processDefinitionKey("startTimerEventExample");
     assertEquals(1, jobQuery.count());
     assertEquals(0, processInstanceQuery.count());
-    
+
     // when
     moveByMinutes(1);
     managementService.recalculateJobDuedate(jobQuery.singleResult().getId(), true);
-    
+
     // then due date should be based on the creation time
     assertEquals(1, jobQuery.count());
     assertEquals(0, processInstanceQuery.count());
-    
+
     Job jobUpdated = jobQuery.singleResult();
     Date expectedDate = LocalDateTime.fromDateFields(jobUpdated.getCreateTime()).plusHours(2).toDate();
     assertEquals(expectedDate, jobUpdated.getDuedate());
@@ -429,7 +454,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
     ProcessInstance startedProcessInstance = runtimeService.createProcessInstanceQuery().singleResult();
     // make sure process instance was started
     assertThat(processInstance.getId()).isEqualTo(startedProcessInstance.getId());
-    
+
   }
 
   @Deployment
@@ -666,7 +691,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
       "org/camunda/bpm/engine/test/bpmn/event/timer/StartTimerEventTest.testStartTimerEventWithTwoEventSubProcesses.bpmn20.xml" })
   @Test
   public void testStartTimerEventSubProcessCalledFromCallActivity() {
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("calledProcess", "startTimerEventWithTwoEventSubProcesses");
     // start process instance
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleCallActivityProcess", variables);
@@ -1241,7 +1266,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
     String anotherJobId = jobQuery.singleResult().getId();
     assertFalse(jobId.equals(anotherJobId));
   }
-  
+
   @Test
   public void testRecalculateTimeCycleExpressionCurrentDateBased() throws Exception {
     // given
@@ -1257,7 +1282,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
 
     testRule.deploy(repositoryService.createDeployment()
       .addModelInstance("process.bpmn", modelInstance));
-    
+
     JobQuery jobQuery = managementService.createJobQuery();
     assertEquals(1, jobQuery.count());
 
@@ -1274,7 +1299,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
     assertEquals(jobId, jobUpdated.getId());
     assertNotEquals(oldDuedate, jobUpdated.getDuedate());
     assertTrue(oldDuedate.before(jobUpdated.getDuedate()));
-    
+
     // when
     Mocks.register("cycle", "R/PT10M");
     managementService.recalculateJobDuedate(jobId, false);
@@ -1284,10 +1309,10 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
     assertEquals(jobId, jobUpdated.getId());
     assertNotEquals(oldDuedate, jobUpdated.getDuedate());
     assertTrue(oldDuedate.after(jobUpdated.getDuedate()));
-    
+
     Mocks.reset();
   }
-  
+
   @Test
   public void testRecalculateTimeCycleExpressionCreationDateBased() throws Exception {
     // given
@@ -1303,7 +1328,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
 
     testRule.deploy(repositoryService.createDeployment()
       .addModelInstance("process.bpmn", modelInstance));
-    
+
     JobQuery jobQuery = managementService.createJobQuery();
     assertEquals(1, jobQuery.count());
 
@@ -1320,7 +1345,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
     assertEquals(jobId, jobUpdated.getId());
     Date expectedDate = LocalDateTime.fromDateFields(jobUpdated.getCreateTime()).plusMinutes(15).toDate();
     assertEquals(expectedDate, jobUpdated.getDuedate());
-    
+
     // when
     Mocks.register("cycle", "R/PT10M");
     managementService.recalculateJobDuedate(jobId, true);
@@ -1332,10 +1357,10 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
     assertTrue(oldDuedate.after(jobUpdated.getDuedate()));
     expectedDate = LocalDateTime.fromDateFields(jobUpdated.getCreateTime()).plusMinutes(10).toDate();
     assertEquals(expectedDate, jobUpdated.getDuedate());
-    
+
     Mocks.reset();
   }
-  
+
   @Deployment
   @Test
   public void testFailingTimeCycle() throws Exception {
@@ -1505,7 +1530,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
     // then
     assertEquals(1, taskService.createTaskQuery().taskName("taskInSubprocess").list().size());
   }
-  
+
   @Test
   public void testRecalculateNonInterruptingWithUnchangedDurationExpressionInEventSubprocessCurrentDateBased() throws Exception {
     // given
@@ -1524,14 +1549,14 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
     testRule.deploy(repositoryService.createDeployment()
       .addModelInstance("process.bpmn", modelInstance));
 
-    runtimeService.startProcessInstanceByKey("process", 
+    runtimeService.startProcessInstanceByKey("process",
         Variables.createVariables().putValue("duration", "PT70S"));
-    
+
     JobQuery jobQuery = managementService.createJobQuery();
     Job job = jobQuery.singleResult();
     String jobId = job.getId();
     Date oldDueDate = job.getDuedate();
-    
+
     // when
     moveByMinutes(2);
     Date currentTime = ClockUtil.getCurrentTime();
@@ -1544,11 +1569,11 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
     assertTrue(oldDueDate.before(newDuedate));
     Date expectedDate = LocalDateTime.fromDateFields(currentTime).plusSeconds(70).toDate();
     assertThat(newDuedate).isCloseTo(expectedDate, 1000l);
-    
+
     managementService.executeJob(jobId);
     assertEquals(1, taskService.createTaskQuery().taskName("taskInSubprocess").list().size());
   }
-  
+
   @Test
   public void testRecalculateNonInterruptingWithChangedDurationExpressionInEventSubprocessCreationDateBased() throws Exception {
     // given
@@ -1567,14 +1592,14 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
     testRule.deploy(repositoryService.createDeployment()
       .addModelInstance("process.bpmn", modelInstance));
 
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("process", 
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("process",
         Variables.createVariables().putValue("duration", "PT60S"));
-    
+
     JobQuery jobQuery = managementService.createJobQuery();
     Job job = jobQuery.singleResult();
     String jobId = job.getId();
     Date oldDueDate = job.getDuedate();
-    
+
     // when
     runtimeService.setVariable(pi.getId(), "duration", "PT2M");
     managementService.recalculateJobDuedate(jobId, true);
@@ -1585,7 +1610,7 @@ public class StartTimerEventTest extends PluggableProcessEngineTest {
     Date expectedDate = LocalDateTime.fromDateFields(jobQuery.singleResult().getCreateTime()).plusMinutes(2).toDate();
     assertTrue(oldDueDate.before(newDuedate));
     assertTrue(expectedDate.equals(newDuedate));
-    
+
     managementService.executeJob(jobId);
     assertEquals(1, taskService.createTaskQuery().taskName("taskInSubprocess").list().size());
   }
