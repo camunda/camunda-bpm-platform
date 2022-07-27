@@ -147,12 +147,7 @@ public class ExceptionBuiltinCodesTest {
         .contains(BuiltinExceptionCode.OPTIMISTIC_LOCKING.getCode());
   }
 
-  /**
-   * This test case doesn't lead to a foreign key constraint violation on DB2.
-   * Instead, the following error is thrown: https://www.sqlerror.de/db2_sql_error_-532_sqlstate_23504.html
-   */
   @Test
-  @RequiredDatabase(excludes = DbSqlSessionFactory.DB2)
   public void shouldHaveForeignKeyConstraintViolationCode() {
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("calling")
         .startEvent()
