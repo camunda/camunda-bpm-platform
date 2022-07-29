@@ -43,7 +43,7 @@ module.exports = [
           localStorage.getItem(`camunda-form:${taskId}`) || '{}'
         );
         let form;
-        let variables = [];
+        let variables = null;
         let triggerSubmit = true;
 
         formController.notifyFormValidated(false);
@@ -58,19 +58,7 @@ module.exports = [
             deserializeValues: false
           })
             .then(result => {
-              angular.forEach(result, function(value, name) {
-                var parsedValue = value.value;
-
-                if (value.type === 'Date') {
-                  parsedValue = unfixDate(parsedValue);
-                }
-                variables.push({
-                  name: name,
-                  value: parsedValue,
-                  type: value.type,
-                  fixedName: true
-                });
-              });
+              variables = result;
             })
             .catch(err => {
               return $translate('LOAD_VARIABLES_FAILURE')
@@ -85,9 +73,58 @@ module.exports = [
             });
         };
 
+        const checkVariableTypeJson = variable =>
+          variable.type === 'Json' ||
+          variable?.valueInfo?.serializationDataFormat === 'application/json';
+
+        const convertVariableValues = schema => {
+          const schemaValuesKeySet = new Set(
+            schema.components.map(({valuesKey}) => {
+              if (valuesKey) {
+                return valuesKey;
+              }
+            })
+          );
+
+          const fromShortcutFormat = (schemaValuesKeySet, variable, name) => {
+            if (Array.from(schemaValuesKeySet).includes(name)) {
+              const checkShortcutFormat = value =>
+                value.every(i => typeof i === 'string');
+              if (checkShortcutFormat(variable.value)) {
+                variable.value = variable.value.map(element => {
+                  return {label: element, value: element};
+                });
+              }
+            }
+          };
+
+          Object.entries(variables).forEach(entry => {
+            const [name, variable] = entry;
+
+            if (variable.type === 'Date') {
+              variable.value = unfixDate(variable.value);
+            } else if (checkVariableTypeJson(variable)) {
+              variable.value = JSON.parse(variable.value);
+
+              fromShortcutFormat(schemaValuesKeySet, variable, name);
+            }
+          });
+        };
+
+        let variableToValuesKeyMap = null;
+
         async function renderForm(schema) {
-          const data = variables.reduce((res, variable) => {
-            res[variable.name] = variable.value;
+          variableToValuesKeyMap = schema.components.reduce(
+            (acc, {key, valuesKey}) => {
+              acc[key] = valuesKey;
+              return acc;
+            },
+            {}
+          );
+
+          convertVariableValues(schema);
+          const data = Object.keys(variables).reduce((res, name) => {
+            res[name] = variables[name].value;
             return res;
           }, {});
 
@@ -141,7 +178,29 @@ module.exports = [
           }
           const variablePayload = Object.entries(data).reduce(
             (res, [key, value]) => {
-              res[key] = {value};
+              if (value !== null && typeof value === 'object') {
+                const variable = variables[key];
+                let type = null,
+                  valueInfo = null;
+                if (variable) {
+                  type = variable.type;
+                  valueInfo = variable.valueInfo;
+                } else {
+                  const valuesKey = variableToValuesKeyMap[key];
+                  const valuesKeyVariable = variables[valuesKey];
+
+                  type = valuesKeyVariable.type;
+                  valueInfo = valuesKeyVariable.valueInfo;
+                }
+
+                res[key] = {
+                  type,
+                  valueInfo,
+                  value: JSON.stringify(value)
+                };
+              } else {
+                res[key] = {value};
+              }
               return res;
             },
             {}
