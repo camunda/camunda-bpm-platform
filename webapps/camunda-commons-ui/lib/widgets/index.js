@@ -42,7 +42,7 @@ var angular = require('../../../camunda-bpm-sdk-js/vendor/angular'),
   localConf = require('./../services/cam-local-configuration'),
   camShareLink = require('./cam-share-link/cam-share-link'),
   password = require('./password/cam-widget-password'),
-  selectionType = require('./selection-type/cam-widget-selection-type.directive');
+  selectionType = require('./selection-type/cam-widget-selection-type');
 
 require('../../vendor/ui-bootstrap-tpls-2.5.0-camunda');
 

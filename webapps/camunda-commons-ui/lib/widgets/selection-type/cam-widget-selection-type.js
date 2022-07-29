@@ -20,7 +20,7 @@ var fs = require('fs');
 
 var angular = require('../../../../camunda-bpm-sdk-js/vendor/angular'),
   template = fs.readFileSync(
-    __dirname + '/cam-widget-selection-type.template.html',
+    __dirname + '/cam-widget-selection-type.html',
     'utf8'
   );
 
@@ -30,18 +30,24 @@ module.exports = function() {
     scope: {
       selectedInstancesCount: '@',
       totalInstancesCount: '@',
-      toggleState: '@'
+      toggleState: '@',
+      pageSize: '@'
     },
     link: function(scope) {
       scope.selectionType = 'INSTANCE';
 
-      scope.updateSelectionType = function(selectionType) {
-        if (scope.selectionType !== selectionType) {
+      const updateSelectionType = (scope.updateSelectionType = function(
+        selectionType = scope.selectionType
+      ) {
+        // This check succeeds when clicking on the links to switch between selection types. In this instance, scope.selectionType will be different from the selectionType argument passed from the UI.
+        if (selectionType !== scope.selectionType) {
           scope.selectionType = selectionType;
         }
 
         scope.$emit('selection.type.updated', selectionType);
-      };
+      });
+
+      scope.$watch('selectionType', updateSelectionType);
     }
   };
 };
