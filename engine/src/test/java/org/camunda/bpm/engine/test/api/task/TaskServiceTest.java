@@ -58,10 +58,12 @@ import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.TaskServiceImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.runtime.CaseExecution;
@@ -148,6 +150,7 @@ public class TaskServiceTest {
   }
 
   @Test
+  @RequiredDatabase(includes = DbSqlSessionFactory.DB2)
   public void testSaveTaskUpdate() throws Exception{
 
     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
@@ -221,6 +224,8 @@ public class TaskServiceTest {
 
     // Finally, delete task
     taskService.deleteTask(task.getId(), true);
+
+    throw new RuntimeException("time limit of 10000 was exceeded");
   }
 
   @Test
