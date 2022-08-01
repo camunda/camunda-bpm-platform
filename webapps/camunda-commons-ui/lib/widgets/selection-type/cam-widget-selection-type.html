@@ -41,7 +41,6 @@
     <p>{{ 'CAM_WIDGET_SELECTION_TYPE_INSTANCE_INTRO' | translate }} {{ selectedInstancesCount }} {{ 'CAM_WIDGET_SELECTION_TYPE_INSTANCES' | translate }}. </p><br />
     <p>
       <a ng-click="updateSelectionType('QUERY')">{{ 'CAM_WIDGET_SELECTION_TYPE_INSTANCE_LINK' | translate }}</a>
-      <strong>{{ 'CAM_WIDGET_SELECTION_TYPE_NOTE' | translate }}</strong> {{ 'CAM_WIDGET_SELECTION_TYPE_INSTANCE_NOTE' | translate }} <strong>{{ 'CAM_WIDGET_SELECTION_TYPE_QUERY' | translate }}</strong>
     </p>
   </div>
 </div>
@@ -52,6 +51,8 @@
     <p><strong>{{ 'CAM_WIDGET_SELECTION_TYPE_QUERY_INTRO' | translate }}</strong></p><br />
     <p>
       <strong>{{ 'CAM_WIDGET_SELECTION_TYPE_WARNING' | translate }}</strong> {{ 'CAM_WIDGET_SELECTION_TYPE_QUERY_WARNING' | translate }}
+    </p><br />
+    <p>
       <a ng-click="updateSelectionType('INSTANCE')">{{ 'CAM_WIDGET_SELECTION_TYPE_QUERY_LINK' | translate }} <strong>{{ 'CAM_WIDGET_SELECTION_TYPE_INSTANCE' | translate }}</strong></a>
     </p>
   </div>
