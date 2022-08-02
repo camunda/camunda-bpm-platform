@@ -16,9 +16,7 @@
  */
 package org.camunda.bpm.engine.test.standalone.calendar;
 
-import static junit.framework.TestCase.assertEquals;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNull;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -34,77 +32,118 @@ public class DurationHelperTest {
   public void tearDown() {
     ClockUtil.reset();
   }
-  
+
   @Test
   public void shouldNotExceedNumber() throws Exception {
+    // given
     ClockUtil.setCurrentTime(new Date(0));
+
+    // when
     DurationHelper dh = new DurationHelper("R2/PT10S");
 
+    // then
     ClockUtil.setCurrentTime(new Date(15000));
-    assertEquals(20000, dh.getDateAfter().getTime());
-
+    assertThat(dh.getDateAfter().getTime()).isEqualTo(20000);
 
     ClockUtil.setCurrentTime(new Date(30000));
-    assertNull(dh.getDateAfter());
+    assertThat(dh.getDateAfter()).isNull();
+  }
+
+  @Test
+  public void shouldNotExceedNumberWithStartDateExpression() throws Exception {
+    // given
+    ClockUtil.setCurrentTime(parse("19700101-00:00:00"));
+
+    // when
+    DurationHelper dh = new DurationHelper("R2/1970-01-01T00:01:00/PT10S");
+
+    // then should trigger twice
+    ClockUtil.setCurrentTime(parse("19700101-00:00:05"));
+    assertThat(dh.getDateAfter()).isEqualTo(parse("19700101-00:01:00"));
+
+    ClockUtil.setCurrentTime(parse("19700101-00:01:05"));
+    assertThat(dh.getDateAfter()).isEqualTo(parse("19700101-00:01:10"));
+
+    ClockUtil.setCurrentTime(parse("19700101-00:01:15"));
+    assertThat(dh.getDateAfter()).isNull();
   }
 
   @Test
   public void shouldNotExceedNumberPeriods() throws Exception {
+    // given
     ClockUtil.setCurrentTime(parse("19700101-00:00:00"));
+
+    // when
     DurationHelper dh = new DurationHelper("R2/1970-01-01T00:00:00/1970-01-01T00:00:10");
 
+    // then
     ClockUtil.setCurrentTime(parse("19700101-00:00:15"));
-    assertEquals(parse("19700101-00:00:20"), dh.getDateAfter());
-
+    assertThat(dh.getDateAfter()).isEqualTo(parse("19700101-00:00:20"));
 
     ClockUtil.setCurrentTime(parse("19700101-00:00:30"));
-    assertNull(dh.getDateAfter());
+    assertThat(dh.getDateAfter()).isNull();
   }
 
   @Test
   public void shouldNotExceedNumberNegative() throws Exception {
+    // given
     ClockUtil.setCurrentTime(parse("19700101-00:00:00"));
+
+    // when
     DurationHelper dh = new DurationHelper("R2/PT10S/1970-01-01T00:00:50");
 
+    // then
     ClockUtil.setCurrentTime(parse("19700101-00:00:20"));
-    assertEquals(parse("19700101-00:00:30"), dh.getDateAfter());
-
+    assertThat(dh.getDateAfter()).isEqualTo(parse("19700101-00:00:30"));
 
     ClockUtil.setCurrentTime(parse("19700101-00:00:35"));
-
-    assertEquals(parse("19700101-00:00:40"), dh.getDateAfter());
+    assertThat(dh.getDateAfter()).isEqualTo(parse("19700101-00:00:40"));
   }
-  
+
   @Test
   public void shouldNotExceedNumberWithStartDate() throws Exception {
+    // given
+
+    // when
     DurationHelper dh = new DurationHelper("R2/PT10S", new Date(0));
-    assertEquals(20000, dh.getDateAfter(new Date(15000)).getTime());
-    assertNull(dh.getDateAfter(new Date(30000)));
+
+    // then
+    assertThat(dh.getDateAfter(new Date(15000)).getTime()).isEqualTo(20000);
+    assertThat(dh.getDateAfter(new Date(30000))).isNull();
   }
 
   @Test
   public void shouldNotExceedNumberPeriodsWithStartDate() throws Exception {
+    // given
+
+    // when
     DurationHelper dh = new DurationHelper("R2/1970-01-01T00:00:00/1970-01-01T00:00:10", parse("19700101-00:00:00"));
 
-    assertEquals(parse("19700101-00:00:20"), dh.getDateAfter(parse("19700101-00:00:15")));
-    assertNull(dh.getDateAfter(parse("19700101-00:00:30")));
+    // then
+    assertThat(dh.getDateAfter(parse("19700101-00:00:15"))).isEqualTo(parse("19700101-00:00:20"));
+    assertThat(dh.getDateAfter(parse("19700101-00:00:30"))).isNull();
   }
 
   @Test
   public void shouldNotExceedNumberNegativeWithStartDate() throws Exception {
+    // given
+
+    // when
     DurationHelper dh = new DurationHelper("R2/PT10S/1970-01-01T00:00:50", parse("19700101-00:00:00"));
 
-    assertEquals(parse("19700101-00:00:30"), dh.getDateAfter(parse("19700101-00:00:20")));
-
-    assertEquals(parse("19700101-00:00:40"), dh.getDateAfter(parse("19700101-00:00:35")));
+    // then
+    assertThat(dh.getDateAfter(parse("19700101-00:00:20"))).isEqualTo(parse("19700101-00:00:30"));
+    assertThat(dh.getDateAfter(parse("19700101-00:00:35"))).isEqualTo(parse("19700101-00:00:40"));
   }
-  
+
   @Test
   public void shouldParseAllSupportedISO8601DurationPatterns() throws Exception {
     // given
+
     // when
     DurationHelper PnYnMnDTnHnMnS = new DurationHelper("P1Y5M21DT19H47M55S", parse("19700101-00:00:00"));
     DurationHelper PnW = new DurationHelper("P2W", parse("19700101-00:00:00"));
+
     // then
     assertThat(PnYnMnDTnHnMnS.getDateAfter()).isEqualTo(parse("19710622-19:47:55"));
     assertThat(PnW.getDateAfter()).isEqualTo(parse("19700115-00:00:00"));

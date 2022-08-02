@@ -31,7 +31,6 @@ import org.camunda.bpm.engine.impl.el.StartProcessVariableScope;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
-import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 /**
  * @author Tom Baeyens
@@ -77,6 +76,7 @@ public class TimerDeclarationImpl extends JobDeclaration<ExecutionEntity, TimerE
     return eventScopeActivityId;
   }
 
+  @Override
   protected TimerEntity newJobInstance(ExecutionEntity execution) {
 
     TimerEntity timer = new TimerEntity(this);
@@ -102,7 +102,7 @@ public class TimerDeclarationImpl extends JobDeclaration<ExecutionEntity, TimerE
 
       // See ACT-1427: A boundary timer with a cancelActivity='true', doesn't need to repeat itself
       if (!isInterruptingTimer) {
-        String prepared = prepareRepeat(dueDateString);
+        String prepared = prepareRepeat(dueDateString, job);
         job.setRepeat(prepared);
       }
     }
@@ -154,14 +154,15 @@ public class TimerDeclarationImpl extends JobDeclaration<ExecutionEntity, TimerE
     return dueDateString;
   }
 
+  @Override
   protected void postInitialize(ExecutionEntity execution, TimerEntity timer) {
     initializeConfiguration(execution, timer);
   }
 
-  protected String prepareRepeat(String dueDate) {
+  protected String prepareRepeat(String dueDate, TimerEntity job) {
     if (dueDate.startsWith("R") && dueDate.split("/").length==2) {
       SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-      return dueDate.replace("/","/"+sdf.format(ClockUtil.getCurrentTime())+"/");
+      return dueDate.replace("/","/"+sdf.format(job.getDuedate())+"/");
     }
     return dueDate;
   }
@@ -194,6 +195,7 @@ public class TimerDeclarationImpl extends JobDeclaration<ExecutionEntity, TimerE
       .schedule(timer);
   }
 
+  @Override
   protected ExecutionEntity resolveExecution(ExecutionEntity context) {
     return context;
   }
