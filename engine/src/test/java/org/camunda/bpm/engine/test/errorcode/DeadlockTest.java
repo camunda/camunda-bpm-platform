@@ -61,11 +61,16 @@ public class DeadlockTest {
   @Before
   public void createTestTables() throws SQLException {
     Connection conn = engineRule.getProcessEngineConfiguration().getDataSource().getConnection();
+
+    conn.setAutoCommit(false);
+
     Statement statement = conn.createStatement();
     statement.execute("CREATE TABLE deadlock_test1 (FOO INTEGER)");
     statement.execute("CREATE TABLE deadlock_test2 (FOO INTEGER)");
     statement.executeUpdate("INSERT INTO deadlock_test1 VALUES (0)");
     statement.executeUpdate("INSERT INTO deadlock_test2 VALUES (0)");
+
+    conn.commit();
 
     sqlException = null;
   }
@@ -73,9 +78,14 @@ public class DeadlockTest {
   @After
   public void cleanTables() throws SQLException {
     Connection conn = engineRule.getProcessEngineConfiguration().getDataSource().getConnection();
+
+    conn.setAutoCommit(false);
+
     Statement statement = conn.createStatement();
     statement.execute("DROP TABLE deadlock_test1");
     statement.execute("DROP TABLE deadlock_test2");
+
+    conn.commit();
   }
 
   @Test
