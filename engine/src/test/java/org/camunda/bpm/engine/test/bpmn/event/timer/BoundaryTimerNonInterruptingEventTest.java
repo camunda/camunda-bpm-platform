@@ -645,7 +645,7 @@ public class BoundaryTimerNonInterruptingEventTest {
     // there should be a single timer job (R5/PT1H)
     TimerEntity timerJob = (TimerEntity) managementService.createJobQuery().singleResult();
     assertNotNull(timerJob);
-    assertEquals("R5/" + sdf.format(ClockUtil.getCurrentTime()) + "/PT1H", timerJob.getRepeat());
+    assertEquals("R5/" + sdf.format(timerJob.getDuedate()) + "/PT1H", timerJob.getRepeat());
 
     // WHEN
     // we update the repeat property of the timer job
