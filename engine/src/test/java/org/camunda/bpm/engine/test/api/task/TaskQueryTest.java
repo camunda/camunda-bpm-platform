@@ -5517,7 +5517,7 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
     // when
     List<Task> tasks = taskService.createTaskQuery()
         .processInstanceIdIn(processInstance1.getId(), processInstance2.getId(), processInstance3.getId())
-        .taskUpdatedAfter(beforeUpdates).orderByTaskUpdatedAfter().asc().list();
+        .taskUpdatedAfter(beforeUpdates).orderByLastUpdated().asc().list();
 
     // then
     assertThat(tasks).hasSize(3);
@@ -5551,7 +5551,7 @@ public class TaskQueryTest extends PluggableProcessEngineTest {
     // when
     List<Task> tasks = taskService.createTaskQuery()
         .processInstanceIdIn(processInstance1.getId(), processInstance2.getId(), processInstance3.getId())
-        .taskUpdatedAfter(beforeUpdates).orderByTaskUpdatedAfter().desc().list();
+        .taskUpdatedAfter(beforeUpdates).orderByLastUpdated().desc().list();
 
     // then
     assertThat(tasks).hasSize(3);

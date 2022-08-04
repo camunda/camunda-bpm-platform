@@ -692,7 +692,7 @@
 
         <#assign last = true >
         <#assign sortByValues = [ '"instanceId"', '"caseInstanceId"', '"dueDate"', '"executionId"', '"caseExecutionId"',
-                                  '"assignee"', '"created"', '"description"', '"id"', '"name"', '"nameCaseInsensitive"',
+                                  '"assignee"', '"created"', '"lastUpdated"', '"followUpDate"', '"description"', '"id"', '"name"', '"nameCaseInsensitive"',
                                   '"priority"', '"processVariable"', '"executionVariable"', '"taskVariable"',
                                   '"caseExecutionVariable"', '"caseInstanceVariable"' ] >
         <#assign sortParamsDto = "SortTaskQueryParametersDto" >

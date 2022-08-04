@@ -847,8 +847,8 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     inOrder.verify(mockQuery).asc();
 
     inOrder = Mockito.inOrder(mockQuery);
-    executeAndVerifySorting("updatedAfter", "asc", Status.OK);
-    inOrder.verify(mockQuery).orderByTaskUpdatedAfter();
+    executeAndVerifySorting("lastUpdated", "asc", Status.OK);
+    inOrder.verify(mockQuery).orderByLastUpdated();
     inOrder.verify(mockQuery).asc();
 
   }

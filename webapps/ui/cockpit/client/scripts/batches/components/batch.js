@@ -119,7 +119,8 @@ Batch.prototype._remove = function(params) {
   var obj = this._batches.selection;
   params.id = obj.data.id;
   var self = this;
-  return this._sdk.resource('batch').delete(params, function(err) {
+
+  let cb = err => {
     self.deleteModal.instance && self.deleteModal.instance.close();
     self.deleteModal.instance = null;
 
@@ -132,7 +133,13 @@ Batch.prototype._remove = function(params) {
       obj.type = null;
       obj.data = {};
     }
-  });
+  };
+
+  if (obj.type === 'history') {
+    return this._sdk.resource('history').batchDelete(obj.data.id, cb);
+  } else {
+    return this._sdk.resource('batch').delete(params, cb);
+  }
 };
 
 var handleRetryResponse = function(context) {

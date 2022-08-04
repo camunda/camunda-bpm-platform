@@ -74,14 +74,11 @@ public class BuiltinExceptionCodeForeignKeyConstraintViolationTest extends Concu
   }
 
   /**
-   * This test case doesn't lead to a foreign key constraint violation on DB2.
-   * Instead, the following error is thrown: https://www.sqlerror.de/db2_sql_error_-532_sqlstate_23504.html
-   *
    * This test case doesn't lead to a foreign key constraint violation on CRDB.
    * Instead, a deadlock error is detected.
    */
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
-  @RequiredDatabase(excludes = {DbSqlSessionFactory.DB2, DbSqlSessionFactory.CRDB})
+  @RequiredDatabase(excludes = {DbSqlSessionFactory.CRDB})
   @Test
   public void shouldReturnForeignKeyConstraintErrorCode() {
     // given

@@ -207,9 +207,8 @@ public class ExceptionUtil {
           // H2
           "23506".equals(sqlState) && errorCode == 23506 ||
           // DB2
-          message.contains("sqlstate=23503") && message.toLowerCase().contains("sqlcode=-530") ||
-          // DB2 zOS
-          "23503".equals(sqlState) && errorCode == -530;
+          "23503".equals(sqlState) && errorCode == -530 ||
+          "23504".equals(sqlState) && errorCode == -532;
     }
   }
 
