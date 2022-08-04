@@ -19,8 +19,11 @@ package org.camunda.bpm.client.client;
 import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.ExternalTaskClientBuilder;
 import org.camunda.bpm.client.backoff.BackoffStrategy;
+import org.camunda.bpm.client.backoff.ErrorAwareBackoffStrategy;
 import org.camunda.bpm.client.dto.ProcessDefinitionDto;
+import org.camunda.bpm.client.exception.EngineException;
 import org.camunda.bpm.client.exception.ExternalTaskClientException;
+import org.camunda.bpm.client.exception.RestException;
 import org.camunda.bpm.client.rule.ClientRule;
 import org.camunda.bpm.client.rule.EngineRule;
 import org.camunda.bpm.client.task.ExternalTask;
@@ -46,6 +49,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.client.util.ProcessModels.BPMN_ERROR_EXTERNAL_TASK_PROCESS;
@@ -627,10 +631,61 @@ public class ClientIT {
         .open();
 
       // when
-      clientRule.waitForFetchAndLockUntil(() -> handler.isFailed());
+      clientRule.waitForFetchAndLockUntil(handler::isFailed);
 
       // then
-      assertThat(handler.getException().getMessage()).containsIgnoringCase("ScriptEvaluationException");
+      assertThat(handler.getException().getType()).isEqualTo("ScriptEvaluationException");
+    } finally {
+      if (client != null) {
+        client.stop();
+      }
+    }
+  }
+
+  @Test
+  public void shouldPassExceptionToErrorAwareBackoffStrategy() {
+    // given
+    ExternalTaskClient client = null;
+
+    AtomicReference<ExternalTaskClientException> ex = new AtomicReference<>();
+
+    try {
+      client = ExternalTaskClient.create()
+        .baseUrl(BASE_URL)
+        .backoffStrategy(new ErrorAwareBackoffStrategy() {
+
+          @Override
+          public void reconfigure(List<ExternalTask> externalTasks, ExternalTaskClientException e) {
+            ex.set(e);
+          }
+
+          @Override
+          public long calculateBackoffTime() {
+            return 0;
+          }
+        })
+        .build();
+
+      RecordingExternalTaskHandler handler = new RecordingExternalTaskHandler((t, s) -> s.complete(t));
+      client.subscribe("something")
+        .processVariableEquals("foo", new MyPojo())
+        .handler(handler)
+        .open();
+
+      // when
+      clientRule.waitForFetchAndLockUntil(() -> ex.get() != null);
+
+      // then
+      EngineException exception = (EngineException) ex.get();
+      assertThat(exception).isInstanceOf(EngineException.class);
+      assertThat(exception.getCode()).isEqualTo(0);
+      assertThat(exception.getType()).isEqualTo("ProcessEngineException");
+      assertThat(exception.getMessage()).isEqualTo("TASK/CLIENT-03009 Exception while fetching and locking task: Object values cannot be used to query");
+      assertThat(exception.getHttpStatusCode()).isEqualTo(500);
+      assertThat(exception.getCause())
+          .isInstanceOf(RestException.class)
+          .hasMessage("Object values cannot be used to query");
+
     } finally {
       if (client != null) {
         client.stop();
@@ -696,4 +751,19 @@ public class ClientIT {
       }
     }
   }
+
+  static class MyPojo {
+
+    protected String id;
+
+    public String getId() {
+      return id;
+    }
+
+    public void setId(String id) {
+      this.id = id;
+    }
+
+  }
+
 }

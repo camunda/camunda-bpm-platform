@@ -19,17 +19,9 @@ package org.camunda.bpm.client.impl;
 /**
  * @author Tassilo Weidner
  */
-public class EngineClientException extends Exception {
+public class EngineClientException extends RuntimeException {
 
   private static final long serialVersionUID = 1L;
-
-  public EngineClientException(String message) {
-    super(message);
-  }
-
-  public EngineClientException(Throwable throwable) {
-    super(throwable);
-  }
 
   protected EngineClientException(String message, Throwable e) {
     super(message, e);

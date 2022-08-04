@@ -17,6 +17,7 @@
 package org.camunda.bpm.client.backoff;
 
 import org.assertj.core.util.Lists;
+import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.impl.ExternalTaskImpl;
 import org.junit.Before;
@@ -44,7 +45,7 @@ public class ExponentialErrorBackoffStrategyTest {
     // when
     // in consecutive iterations, an error occurs
     List<ExternalTask> tasks = Lists.newArrayList(new ExternalTaskImpl());
-    Exception error = new Exception();
+    ExternalTaskClientException error = new ExternalTaskClientException();
     backoffStrategy.reconfigure(tasks, error);
     long waitingTime1 = backoffStrategy.calculateBackoffTime();
     backoffStrategy.reconfigure(tasks, error);
@@ -59,7 +60,7 @@ public class ExponentialErrorBackoffStrategyTest {
   public void shouldResetBackoffStrategy() {
     // given
     List<ExternalTask> tasks = Lists.newArrayList(new ExternalTaskImpl());
-    Exception error = new Exception();
+    ExternalTaskClientException error = new ExternalTaskClientException();
     backoffStrategy.reconfigure(tasks, error);
     long waitingTime1 = backoffStrategy.calculateBackoffTime();
     assertThat(waitingTime1).isEqualTo(500L);
@@ -82,7 +83,26 @@ public class ExponentialErrorBackoffStrategyTest {
     // when
     // reach maximum waiting time
     List<ExternalTask> tasks = Lists.newArrayList(new ExternalTaskImpl());
-    Exception error = new Exception();
+    ExternalTaskClientException error = new ExternalTaskClientException();
+    for (int i=0; i<8; i++) {
+      backoffStrategy.reconfigure(tasks, error);
+    }
+
+    // then
+    waitingTime = backoffStrategy.calculateBackoffTime();
+    assertThat(waitingTime).isEqualTo(60000L);
+  }
+
+  @Test
+  public void shouldCapWaitingTime2() {
+    // given
+    long waitingTime = backoffStrategy.calculateBackoffTime();
+    assertThat(waitingTime).isEqualTo(0L);
+
+    // when
+    // reach maximum waiting time
+    List<ExternalTask> tasks = Lists.newArrayList(new ExternalTaskImpl());
+    ExternalTaskClientException error = new ExternalTaskClientException();
     for (int i=0; i<8; i++) {
       backoffStrategy.reconfigure(tasks, error);
     }

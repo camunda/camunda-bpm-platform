@@ -17,26 +17,14 @@
 package org.camunda.bpm.client.exception;
 
 /**
- * <p>Exception is thrown if the corresponding process instance could not be resumed</p>
- *
- * @author Tassilo Weidner
+ * @deprecated since this exception has been replaced by {@link EngineException} and will be removed in version 7.19.
+ * Please review your code and replace {@link NotResumedException} with {@link EngineException}.
  */
-public class NotResumedException extends ExternalTaskClientException {
+@Deprecated
+public class NotResumedException extends RestException {
 
-  private static final long serialVersionUID = 1L;
-
-  private String processEngineError;
-
-  public NotResumedException(String message) {
-    super(message);
+  public NotResumedException(String message, RestException restException) {
+    super(message, restException);
   }
 
-  public NotResumedException(String message, String processEngineError) {
-    super(message);
-    this.processEngineError = processEngineError;
-  }
-
-  public String getProcessEngineError() {
-    return processEngineError;
-  }
 }

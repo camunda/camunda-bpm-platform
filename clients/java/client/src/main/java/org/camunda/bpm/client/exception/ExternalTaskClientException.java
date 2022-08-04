@@ -25,12 +25,16 @@ public class ExternalTaskClientException extends RuntimeException {
 
   private static final long serialVersionUID = 1L;
 
+  public ExternalTaskClientException() {
+    super();
+  }
+
   public ExternalTaskClientException(String message) {
     super(message);
   }
 
-  public ExternalTaskClientException(String message, Throwable e) {
-    super(message, e);
+  public ExternalTaskClientException(String message, Throwable throwable) {
+    super(message, throwable);
   }
 
 }

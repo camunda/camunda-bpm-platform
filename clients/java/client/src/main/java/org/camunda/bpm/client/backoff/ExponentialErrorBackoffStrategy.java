@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.client.backoff;
 
+import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.task.ExternalTask;
 
 import java.util.List;
@@ -51,7 +52,7 @@ public class ExponentialErrorBackoffStrategy implements ErrorAwareBackoffStrateg
   }
 
   @Override
-  public void reconfigure(List<ExternalTask> externalTasks, Exception error) {
+  public void reconfigure(List<ExternalTask> externalTasks, ExternalTaskClientException error) {
     if (error != null) {
       level++;
     } else {

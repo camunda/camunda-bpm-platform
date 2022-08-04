@@ -16,8 +16,7 @@
  */
 package org.camunda.bpm.client.topic.impl.dto;
 
-import org.camunda.bpm.client.exception.FetchAndLockException;
-import org.camunda.bpm.client.impl.EngineClientException;
+import org.camunda.bpm.client.exception.ExternalTaskClientException;
 import org.camunda.bpm.client.task.ExternalTask;
 
 import java.util.Collections;
@@ -26,13 +25,13 @@ import java.util.List;
 public class FetchAndLockResponseDto {
 
   protected List<ExternalTask> externalTasks;
-  protected FetchAndLockException error;
+  protected ExternalTaskClientException error;
 
   public FetchAndLockResponseDto(List<ExternalTask> externalTasks) {
     this.externalTasks = externalTasks;
   }
 
-  public FetchAndLockResponseDto(FetchAndLockException error) {
+  public FetchAndLockResponseDto(ExternalTaskClientException error) {
     this.externalTasks = Collections.emptyList();
     this.error = error;
   }
@@ -45,7 +44,7 @@ public class FetchAndLockResponseDto {
     return error != null;
   }
 
-  public FetchAndLockException getError() {
+  public ExternalTaskClientException getError() {
     return error;
   }
 }

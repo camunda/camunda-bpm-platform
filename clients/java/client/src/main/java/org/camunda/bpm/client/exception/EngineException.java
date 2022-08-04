@@ -16,19 +16,13 @@
  */
 package org.camunda.bpm.client.exception;
 
-import java.io.IOException;
-
 /**
- * <p>Exception is thrown if the connection could not be established</p>
- *
- * @author Tassilo Weidner
+ * Thrown if something went wrong during the engine execution (e.g., a persistence exception occurred).
  */
-public class ConnectionLostException extends ExternalTaskClientException {
+public class EngineException extends NotResumedException {
 
-  private static final long serialVersionUID = 1L;
-
-  public ConnectionLostException(String message, IOException e) {
-    super(message, e);
+  public EngineException(String message, RestException restException) {
+    super(message, restException);
   }
 
 }

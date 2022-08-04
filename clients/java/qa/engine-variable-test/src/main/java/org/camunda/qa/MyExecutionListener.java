@@ -14,18 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.client.exception;
+package org.camunda.qa;
 
-public class FetchAndLockException extends ExternalTaskClientException {
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.ExecutionListener;
 
-  private static final long serialVersionUID = 1L;
+public class MyExecutionListener implements ExecutionListener {
 
-  public FetchAndLockException(String message) {
-    super(message);
-  }
-
-  public FetchAndLockException(String message, Throwable e) {
-    super(message, e);
+  @Override
+  public void notify(DelegateExecution delegateExecution) {
+    throw new ProcessEngineException("my_error_message", 22_222);
   }
 
 }
