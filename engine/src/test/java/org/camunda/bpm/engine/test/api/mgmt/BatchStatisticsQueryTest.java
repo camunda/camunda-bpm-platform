@@ -265,7 +265,8 @@ public class BatchStatisticsQueryTest {
   public void testQueryOrderByStartTimeAsc() {
     // given
     helper.migrateProcessInstancesAsync(1);
-    ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() + 7200000L));
+    final long oneHour = 60 * 60 * 1000L;
+    ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() + oneHour));
     helper.migrateProcessInstancesAsync(1);
 
     // when
@@ -281,7 +282,8 @@ public class BatchStatisticsQueryTest {
   public void testQueryOrderByStartTimeDesc() {
     // given
     helper.migrateProcessInstancesAsync(1);
-    ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() + 7200000L));
+    final long oneHour = 60 * 60 * 1000L;
+    ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() + oneHour));
     helper.migrateProcessInstancesAsync(1);
 
     // when
