@@ -606,6 +606,10 @@ public class TestOrderingUtil {
     });
   }
 
+  public static NullTolerantComparator<BatchStatistics> batchStatisticsByStartTime() {
+    return propertyComparator(Batch::getStartTime);
+  }
+
   // HISTORIC EXTERNAL TASK LOG
 
   public static NullTolerantComparator<HistoricExternalTaskLog> historicExternalTaskByTimestamp() {

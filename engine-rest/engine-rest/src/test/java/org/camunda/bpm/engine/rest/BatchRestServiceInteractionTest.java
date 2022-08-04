@@ -317,6 +317,8 @@ public class BatchRestServiceInteractionTest extends AbstractRestServiceTest {
 
   protected void verifyBatchJson(String batchJson) {
     BatchDto batch = from(batchJson).getObject("", BatchDto.class);
+    String returnedStartTime = from(batchJson).getString("startTime");
+
     assertNotNull("The returned batch should not be null.", batch);
     assertEquals(MockProvider.EXAMPLE_BATCH_ID, batch.getId());
     assertEquals(MockProvider.EXAMPLE_BATCH_TYPE, batch.getType());
@@ -328,6 +330,7 @@ public class BatchRestServiceInteractionTest extends AbstractRestServiceTest {
     assertEquals(MockProvider.EXAMPLE_BATCH_JOB_DEFINITION_ID, batch.getBatchJobDefinitionId());
     assertEquals(MockProvider.EXAMPLE_TENANT_ID, batch.getTenantId());
     assertEquals(MockProvider.EXAMPLE_USER_ID, batch.getCreateUserId());
+    assertEquals(MockProvider.EXAMPLE_HISTORIC_BATCH_START_TIME, returnedStartTime);
   }
 
 }

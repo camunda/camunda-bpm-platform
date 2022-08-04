@@ -267,6 +267,8 @@ public class BatchRestServiceQueryTest extends AbstractRestServiceTest {
     assertEquals("There should be one batch returned.", 1, batches.size());
 
     BatchDto batch = from(batchListJson).getObject("[0]", BatchDto.class);
+    String returnedStartTime = from(batchListJson).getString("[0].startTime");
+
     assertNotNull("The returned batch should not be null.", batch);
     assertEquals(MockProvider.EXAMPLE_BATCH_ID, batch.getId());
     assertEquals(MockProvider.EXAMPLE_BATCH_TYPE, batch.getType());
@@ -279,6 +281,7 @@ public class BatchRestServiceQueryTest extends AbstractRestServiceTest {
     assertEquals(MockProvider.EXAMPLE_BATCH_JOB_DEFINITION_ID, batch.getBatchJobDefinitionId());
     assertEquals(MockProvider.EXAMPLE_TENANT_ID, batch.getTenantId());
     assertEquals(MockProvider.EXAMPLE_USER_ID, batch.getCreateUserId());
+    assertEquals(MockProvider.EXAMPLE_HISTORIC_BATCH_START_TIME, returnedStartTime);
     assertTrue(batch.isSuspended());
   }
 

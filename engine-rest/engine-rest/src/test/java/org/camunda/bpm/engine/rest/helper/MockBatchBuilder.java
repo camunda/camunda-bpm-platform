@@ -21,6 +21,8 @@ import static org.mockito.Mockito.when;
 
 import org.camunda.bpm.engine.batch.Batch;
 
+import java.util.Date;
+
 public class MockBatchBuilder {
 
   protected String id;
@@ -35,6 +37,7 @@ public class MockBatchBuilder {
   protected boolean suspended;
   protected String tenantId;
   protected String createUserId;
+  protected Date startTime;
 
   public MockBatchBuilder id(String id) {
     this.id = id;
@@ -96,6 +99,11 @@ public class MockBatchBuilder {
     return this;
   }
 
+  public MockBatchBuilder startTime(Date startTime) {
+    this.startTime = startTime;
+    return this;
+  }
+
   public Batch build() {
     Batch batch = mock(Batch.class);
     when(batch.getId()).thenReturn(id);
@@ -110,6 +118,7 @@ public class MockBatchBuilder {
     when(batch.isSuspended()).thenReturn(suspended);
     when(batch.getTenantId()).thenReturn(tenantId);
     when(batch.getCreateUserId()).thenReturn(createUserId);
+    when(batch.getStartTime()).thenReturn(startTime);
     return batch;
   }
 

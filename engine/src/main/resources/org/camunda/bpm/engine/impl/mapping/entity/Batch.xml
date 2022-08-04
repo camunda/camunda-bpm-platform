@@ -39,6 +39,7 @@
       TENANT_ID_,
       CREATE_USER_ID_,
       SUSPENSION_STATE_,
+      START_TIME_,
       REV_
     )
     values
@@ -56,6 +57,7 @@
       #{tenantId, jdbcType=VARCHAR},
       #{createUserId, jdbcType=VARCHAR},
       #{suspensionState, jdbcType=INTEGER},
+      #{startTime, jdbcType=TIMESTAMP},
       1
     )
   </insert>
@@ -77,6 +79,7 @@
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="createUserId" column="CREATE_USER_ID_" jdbcType="VARCHAR" />
     <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER" />
+    <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
   </resultMap>
 
   <!-- UPDATE -->

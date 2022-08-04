@@ -3164,6 +3164,7 @@ public abstract class MockProvider {
       .batchJobDefinitionId(EXAMPLE_BATCH_JOB_DEFINITION_ID)
       .suspended()
       .createUserId(EXAMPLE_USER_ID)
+      .startTime(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_BATCH_START_TIME))
       .tenantId(EXAMPLE_TENANT_ID);
   }
 
@@ -3218,6 +3219,7 @@ public abstract class MockProvider {
       .tenantId(EXAMPLE_TENANT_ID)
       .createUserId(EXAMPLE_USER_ID)
       .suspended()
+      .startTime(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_BATCH_START_TIME))
       .remainingJobs(EXAMPLE_BATCH_REMAINING_JOBS)
       .completedJobs(EXAMPLE_BATCH_COMPLETED_JOBS)
       .failedJobs(EXAMPLE_BATCH_FAILED_JOBS);

@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.test.api.mgmt;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.batchStatisticsById;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.batchStatisticsByStartTime;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySorting;
 import static org.junit.Assert.assertEquals;
@@ -25,6 +26,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.ManagementService;
@@ -34,6 +36,7 @@ import org.camunda.bpm.engine.batch.BatchStatisticsQuery;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.MigrationTestRule;
@@ -76,6 +79,7 @@ public class BatchStatisticsQueryTest {
   public void resetBatchJobsPerSeed() {
     engineRule.getProcessEngineConfiguration()
       .setBatchJobsPerSeed(defaultBatchJobsPerSeed);
+    ClockUtil.reset();
   }
 
   @After
@@ -255,6 +259,40 @@ public class BatchStatisticsQueryTest {
 
     // then
     verifySorting(statistics, inverted(batchStatisticsById()));
+  }
+
+  @Test
+  public void testQueryOrderByStartTimeAsc() {
+    // given
+    helper.migrateProcessInstancesAsync(1);
+    final long oneHour = 60 * 60 * 1000L;
+    ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() + oneHour));
+    helper.migrateProcessInstancesAsync(1);
+
+    // when
+    List<BatchStatistics> statistics = managementService.createBatchStatisticsQuery()
+      .orderByStartTime().asc()
+      .list();
+
+    // then
+    verifySorting(statistics, batchStatisticsByStartTime());
+  }
+
+  @Test
+  public void testQueryOrderByStartTimeDesc() {
+    // given
+    helper.migrateProcessInstancesAsync(1);
+    final long oneHour = 60 * 60 * 1000L;
+    ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() + oneHour));
+    helper.migrateProcessInstancesAsync(1);
+
+    // when
+    List<BatchStatistics> statistics = managementService.createBatchStatisticsQuery()
+      .orderByStartTime().desc()
+      .list();
+
+    // then
+    verifySorting(statistics, inverted(batchStatisticsByStartTime()));
   }
 
   @Test

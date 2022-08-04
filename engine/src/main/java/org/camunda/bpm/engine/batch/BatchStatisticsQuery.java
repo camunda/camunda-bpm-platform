@@ -52,4 +52,9 @@ public interface BatchStatisticsQuery extends Query<BatchStatisticsQuery, BatchS
    */
   BatchStatisticsQuery orderByTenantId();
 
+  /**
+   * Returns batch statistics sorted by start time; must be followed by an invocation of {@link #asc()} or {@link #desc()}.
+   */
+  BatchStatisticsQuery orderByStartTime();
+
 }

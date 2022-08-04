@@ -22,6 +22,7 @@ import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySorting;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.HistoryService;
@@ -31,6 +32,7 @@ import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.BatchQuery;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.MigrationTestRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.batch.BatchMigrationHelper;
@@ -69,6 +71,7 @@ public class BatchQueryTest {
   @After
   public void removeBatches() {
     helper.removeAllRunningAndHistoricBatches();
+    ClockUtil.reset();
   }
 
   @Test
@@ -95,6 +98,7 @@ public class BatchQueryTest {
   @Test
   public void testBatchQueryResult() {
     // given
+    ClockUtil.setCurrentTime(new Date());
     Batch batch = helper.migrateProcessInstancesAsync(1);
 
     // when
@@ -114,6 +118,8 @@ public class BatchQueryTest {
     Assert.assertEquals(batch.getTotalJobs(), resultBatch.getTotalJobs());
     Assert.assertEquals(batch.getJobsCreated(), resultBatch.getJobsCreated());
     Assert.assertEquals(batch.isSuspended(), resultBatch.isSuspended());
+    Assert.assertEquals(batch.getStartTime(), resultBatch.getStartTime());
+    Assert.assertEquals(batch.getStartTime(), ClockUtil.getCurrentTime());
   }
 
   @Test
