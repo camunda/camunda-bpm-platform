@@ -43,7 +43,7 @@ pipeline {
           runSteps: {
             withVault([vaultSecrets: [
                 [
-                    path        : 'secret/common/ci-cambpm/xlts.dev',
+                    path        : 'secret/products/cambpm/ci/xlts.dev',
                     secretValues: [
                         [envVar: 'XLTS_REGISTRY', vaultKey: 'registry'],
                         [envVar: 'XLTS_AUTH_TOKEN', vaultKey: 'authToken']]
