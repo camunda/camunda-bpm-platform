@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RuntimeService;
@@ -86,7 +87,7 @@ public class BatchQueryTest {
     // then
     Assert.assertEquals(2, list.size());
 
-    List<String> batchIds = new ArrayList<String>();
+    List<String> batchIds = new ArrayList<>();
     for (Batch resultBatch : list) {
       batchIds.add(resultBatch.getId());
     }
@@ -118,8 +119,8 @@ public class BatchQueryTest {
     Assert.assertEquals(batch.getTotalJobs(), resultBatch.getTotalJobs());
     Assert.assertEquals(batch.getJobsCreated(), resultBatch.getJobsCreated());
     Assert.assertEquals(batch.isSuspended(), resultBatch.isSuspended());
-    Assert.assertEquals(batch.getStartTime(), resultBatch.getStartTime());
-    Assert.assertEquals(batch.getStartTime(), ClockUtil.getCurrentTime());
+    Assertions.assertThat(batch.getStartTime()).isEqualToIgnoringMillis(resultBatch.getStartTime());
+    Assertions.assertThat(batch.getStartTime()).isEqualToIgnoringMillis(ClockUtil.getCurrentTime());
   }
 
   @Test
@@ -282,7 +283,7 @@ public class BatchQueryTest {
     Assert.assertEquals(2, query.count());
     Assert.assertEquals(2, query.list().size());
 
-    List<String> foundIds = new ArrayList<String>();
+    List<String> foundIds = new ArrayList<>();
     for (Batch batch : query.list()) {
       foundIds.add(batch.getId());
     }
