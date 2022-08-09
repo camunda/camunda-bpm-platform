@@ -48,9 +48,6 @@ import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.POST
  * HEADS-UP: If a test fails, please make sure to adjust the error code / sql state for the respective
  * database in {@link ExceptionUtil.DEADLOCK_CODES}.
  */
-@RequiredDatabase(
-    excludes = DbSqlSessionFactory.MSSQL
-) // This test is flaky on SQL Server. Flakyness will be investigated with CAM-14749.
 public class DeadlockTest {
 
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
@@ -64,11 +61,16 @@ public class DeadlockTest {
   @Before
   public void createTestTables() throws SQLException {
     Connection conn = engineRule.getProcessEngineConfiguration().getDataSource().getConnection();
+
+    conn.setAutoCommit(false);
+
     Statement statement = conn.createStatement();
     statement.execute("CREATE TABLE deadlock_test1 (FOO INTEGER)");
     statement.execute("CREATE TABLE deadlock_test2 (FOO INTEGER)");
     statement.executeUpdate("INSERT INTO deadlock_test1 VALUES (0)");
     statement.executeUpdate("INSERT INTO deadlock_test2 VALUES (0)");
+
+    conn.commit();
 
     sqlException = null;
   }
@@ -76,9 +78,14 @@ public class DeadlockTest {
   @After
   public void cleanTables() throws SQLException {
     Connection conn = engineRule.getProcessEngineConfiguration().getDataSource().getConnection();
+
+    conn.setAutoCommit(false);
+
     Statement statement = conn.createStatement();
     statement.execute("DROP TABLE deadlock_test1");
     statement.execute("DROP TABLE deadlock_test2");
+
+    conn.commit();
   }
 
   @Test
