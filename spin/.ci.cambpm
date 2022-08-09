@@ -7,6 +7,10 @@ buildMavenAndDeployToMavenCentral([
   publishZipArtifactToCamundaOrg:true,
   extraJdks: [
    'jdk-11-latest',
-   'jdk-17-latest'
+   'jdk-17-latest',
+   'openjdk-jdk-8-latest',
+   'openjdk-jdk-11-latest',
+   'openjdk-jdk-17-latest',
+   'ibm-jdk-8-latest'
   ]
 ])
