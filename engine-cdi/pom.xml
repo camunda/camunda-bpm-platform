@@ -15,13 +15,14 @@
 
   <!--
   Why this module structure?
-  Core is the user-facing camunda-engine-spring artifact and is compiled against Spring 5 and JPA 2.0.
-  The compatibility module runs the tests contained in core with Spring 4 respectively.
+  Core is the user-facing camunda-engine-cdi artifact and is compiled against Weld 1.1.11.Final.
+  The compatibility modules run the tests contained in core with Weld 2.4.x and Weld 3.x respectively.
   This is implemented as separate modules and not as profiles of the core module, in order
-  to test the artifact that was compiled against Spring 5 (i.e. to ensure binary compatibility).
+  to test the artifact that was compiled against Weld 1.1.11.Final (i.e. to ensure binary compatibility).
   -->
   <modules>
     <module>core</module>
+    <module>compatibility-test-weld2</module>
     <module>compatibility-test-weld3</module>
   </modules>
   

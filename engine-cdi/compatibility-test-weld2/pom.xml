@@ -2,8 +2,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <name>Camunda Platform - engine - Cdi - Compatbility Test Weld 3</name>
-  <artifactId>camunda-engine-cdi-compatibility-test-weld3</artifactId>
+  <name>Camunda Platform - engine - Cdi - Compatbility Test Weld 2</name>
+  <artifactId>camunda-engine-cdi-compatibility-test-weld2</artifactId>
   <packaging>jar</packaging>
 
   <parent>
@@ -16,9 +16,9 @@
   <properties>
     <arquillian.container.version>2.1.0.Final</arquillian.container.version>
     <arquillian.junit.version>1.6.0.Final</arquillian.junit.version>
-    <weld.version>3.1.9.Final</weld.version>
-    <javaee.spec>jboss-javaee-8.0</javaee.spec>
-    <javaee.spec.version>1.0.4.Final</javaee.spec.version>
+    <weld.version>2.4.8.Final</weld.version>
+    <javaee.spec>jboss-javaee-7.0</javaee.spec>
+    <javaee.spec.version>1.1.1.Final</javaee.spec.version>
   </properties>
   
   <dependencyManagement>
@@ -83,11 +83,6 @@
     <dependency>
       <groupId>org.jboss.weld</groupId>
       <artifactId>weld-core-impl</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.weld.module</groupId>
-      <artifactId>weld-web</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
