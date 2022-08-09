@@ -28,6 +28,7 @@ import java.io.UnsupportedEncodingException;
 import org.camunda.spin.DataFormats;
 import org.camunda.spin.SpinFactory;
 import org.camunda.spin.spi.DataFormat;
+import org.camunda.spin.xml.JdkUtil;
 import org.camunda.spin.xml.SpinXmlElement;
 import org.junit.Test;
 
@@ -39,10 +40,13 @@ public class DomXmlDataFormatWriterTest {
   private final String newLine = System.getProperty("line.separator");
   private final String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><order><product>Milk</product><product>Coffee</product></order>";
 
-  private final String formattedXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><order>" + newLine
+
+  private final String formattedXmlIbmJDK = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><order>" + newLine
       + "  <product>Milk</product>" + newLine
       + "  <product>Coffee</product>" + newLine
-      + "</order>" + newLine;
+      + "</order>";
+
+  private final String formattedXml = formattedXmlIbmJDK + newLine;
 
 
   // this is what execution.setVariable("test", spinXml); does
@@ -67,6 +71,18 @@ public class DomXmlDataFormatWriterTest {
   }
 
   /**
+   * IBM JDK does not generate a new line character at the end
+   * of an XSLT-transformed XML document. See CAM-14806.
+   */
+  private String getExpectedFormattedXML() {
+    if (JdkUtil.runsOnIbmJDK()) {
+      return formattedXmlIbmJDK;
+    } else {
+      return formattedXml;
+    }
+  }
+
+  /**
    * standard behaviour: an unformatted XML will be formatted stored into a SPIN variable and also returned formatted.
    */
   @Test
@@ -81,14 +97,14 @@ public class DomXmlDataFormatWriterTest {
 
     // then
     // assert that there are now new lines in the serialized value:
-    assertThat(new String(serializedValue, "UTF-8")).isEqualTo(formattedXml);
+    assertThat(new String(serializedValue, "UTF-8")).isEqualTo(getExpectedFormattedXML());
 
     // when
     // this is what execution.getVariable("test"); does
     SpinXmlElement spinXmlElement = deserializeValue(serializedValue, dataFormat);
 
     // then
-    assertThat(spinXmlElement.toString()).isEqualTo(formattedXml);
+    assertThat(spinXmlElement.toString()).isEqualTo(getExpectedFormattedXML());
   }
 
   /**
@@ -107,14 +123,14 @@ public class DomXmlDataFormatWriterTest {
 
     // then
     // assert that there are no new lines in the serialized value:
-    assertThat(new String(serializedValue, "UTF-8")).isEqualTo(formattedXml);
+    assertThat(new String(serializedValue, "UTF-8")).isEqualTo(getExpectedFormattedXML());
 
     // when
     // this is what execution.getVariable("test"); does
     SpinXmlElement spinXmlElement = deserializeValue(serializedValue, dataFormat);
 
     // then
-    assertThat(spinXmlElement.toString()).isEqualTo(formattedXml);
+    assertThat(spinXmlElement.toString()).isEqualTo(getExpectedFormattedXML());
   }
 
   /**

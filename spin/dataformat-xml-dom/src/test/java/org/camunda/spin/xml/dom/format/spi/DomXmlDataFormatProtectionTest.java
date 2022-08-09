@@ -23,7 +23,9 @@ import java.io.InputStreamReader;
 
 import org.camunda.spin.DataFormats;
 import org.camunda.spin.impl.xml.dom.format.DomXmlDataFormat;
+import org.camunda.spin.xml.JdkUtil;
 import org.camunda.spin.xml.SpinXmlDataFormatException;
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -38,6 +40,9 @@ public class DomXmlDataFormatProtectionTest {
 
   @Test
   public void shouldThrowExceptionForTooManyAttributes() {
+    // IBM JDKs do not check on attribute number limits, skip the test there
+    Assume.assumeFalse(JdkUtil.runsOnIbmJDK());
+
     // given
     String testXml = "org/camunda/spin/xml/dom/format/spi/FeatureSecureProcessing.xml";
     InputStream testXmlAsStream = this.getClass().getClassLoader().getResourceAsStream(testXml);
