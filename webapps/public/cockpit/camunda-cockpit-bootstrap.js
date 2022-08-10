@@ -55,7 +55,7 @@ window.__define(
     const bootstrap = function(config) {
       'use strict';
 
-      var camundaCockpitUi = window['camunda/app/cockpit/camunda-cockpit-ui'];
+      var camundaCockpitUi = window['app/cockpit/camunda-cockpit-ui'];
 
       window.__requirejs.config({
         baseUrl: '../../lib'
@@ -120,7 +120,7 @@ window.__define(
           packages: pluginPackages,
           baseUrl: './',
           paths: {
-            ngDefine: '../../lib/ngDefine'
+            ngDefine: `${appRoot}/lib/ngDefine`
           }
         });
 

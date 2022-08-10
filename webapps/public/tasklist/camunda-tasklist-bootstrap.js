@@ -44,7 +44,7 @@ window.__define(
     const bootstrap = function(config) {
       'use strict';
 
-      var camundaTasklistUi = window['camunda/app/tasklist/camunda-tasklist-ui'];
+      var camundaTasklistUi = window['app/tasklist/camunda-tasklist-ui'];
 
       window.__requirejs.config({
         baseUrl: '../../../lib'
@@ -105,7 +105,7 @@ window.__define(
           packages: pluginPackages,
           baseUrl: './',
           paths: {
-            ngDefine: '../../lib/ngDefine'
+            ngDefine: `${appRoot}/lib/ngDefine`
           }
         });
 

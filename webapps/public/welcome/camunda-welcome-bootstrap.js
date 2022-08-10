@@ -44,7 +44,7 @@ window.__define(
     'use strict';
 
     const bootstrap = config => {
-      var camundaWelcomeUi = window['camunda/app/welcome/camunda-welcome-ui'];
+      var camundaWelcomeUi = window['app/welcome/camunda-welcome-ui'];
 
       window.__requirejs.config({
         baseUrl: '../../../lib'
@@ -95,7 +95,7 @@ window.__define(
           packages: pluginPackages,
           baseUrl: './',
           paths: {
-            ngDefine: '../../lib/ngDefine'
+            ngDefine: `${appRoot}/lib/ngDefine`
           }
         });
 

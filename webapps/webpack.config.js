@@ -1,8 +1,8 @@
-const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const path = require('path');
 const webpack = require('webpack');
@@ -10,54 +10,54 @@ const webpack = require('webpack');
 let jsLoaders = ['babel-loader'];
 let entry = {
   /* Cockpit */
-  "camunda/app/cockpit/camunda-cockpit-ui": {
+  "app/cockpit/camunda-cockpit-ui": {
     import: './ui/cockpit/client/scripts/camunda-cockpit-ui.js',
-    dependOn: 'camunda/lib/deps'
+    dependOn: 'lib/deps'
   },
-  "camunda/app/cockpit/plugin": {
+  "plugin/cockpit/app/plugin": {
     import: './ui/cockpit/plugins/cockpitPlugins.js',
-    dependOn: 'camunda/lib/deps'
+    dependOn: 'lib/deps'
   },
 
   /* Tasklist */
-  "camunda/app/tasklist/camunda-tasklist-ui": {
+  "app/tasklist/camunda-tasklist-ui": {
     import: './ui/tasklist/client/scripts/camunda-tasklist-ui.js',
-    dependOn: 'camunda/lib/deps'
+    dependOn: 'lib/deps'
   },
-  "camunda/app/tasklist/tasklistPlugins": {
+  "plugin/tasklist/app/plugin": {
     import: './ui/tasklist/plugins/tasklistPlugins.js',
-    dependOn: 'camunda/lib/deps'
+    dependOn: 'lib/deps'
   },
 
   /* Admin */
-  "camunda/app/admin/camunda-admin-ui": {
+  "app/admin/camunda-admin-ui": {
     import: './ui/admin/client/scripts/camunda-admin-ui.js',
-    dependOn: 'camunda/lib/deps'
+    dependOn: 'lib/deps'
   },
-  "camunda/app/admin/adminPlugins": {
+  "plugin/admin/app/plugin": {
     import: './ui/admin/plugins/adminPlugins.js',
-    dependOn: 'camunda/lib/deps'
+    dependOn: 'lib/deps'
   },
 
   /* Welcome */
-  "camunda/app/welcome/camunda-welcome-ui": {
+  "app/welcome/camunda-welcome-ui": {
     import: './ui/welcome/client/scripts/camunda-welcome-ui.js',
-    dependOn: 'camunda/lib/deps'
+    dependOn: 'lib/deps'
   },
 
   /* Shared */
-  "camunda/lib/jquery": {
+  "lib/jquery": {
     import: './ui/common/lib/jquery.js'
   },
-  "camunda/lib/ngDefine": {
+  "lib/ngDefine": {
     import: './ui/common/lib/ngDefine.js',
-    dependOn: 'camunda/lib/deps'
+    dependOn: 'lib/deps'
   },
-  "camunda/lib/requirejs": {
+  "lib/requirejs": {
     import: './ui/common/lib/requirejs.js',
-    dependOn: 'camunda/lib/deps'
+    dependOn: 'lib/deps'
   },
-  "camunda/lib/deps": [
+  "lib/deps": [
     "angular",
     "moment",
     "camunda-bpm-sdk-js/lib/angularjs/index",
@@ -134,34 +134,6 @@ let rules = [
     ]
   },
   {
-    test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
-    include: [],
-    use: [
-      {
-        loader: 'file-loader',
-        options: {
-          name: '[name].[ext]',
-          outputPath: 'fonts/'
-        }
-      }
-    ]
-  },
-  {
-    test: /\.(png|jpe?g)/i,
-    use: [
-      {
-        loader: 'url-loader',
-        options: {
-          name: './assets/images/[name].[ext]',
-          limit: 10000
-        }
-      },
-      {
-        loader: 'img-loader'
-      }
-    ]
-  },
-  {
     test: /\.less$/i,
     use: [
       // compiles Less to CSS
@@ -180,6 +152,8 @@ let rules = [
 module.exports = (_env, argv = {}) => {
   const isDevMode = argv.mode === 'development';
   const isTestMode = argv.mode === 'test';
+  const output = {};
+  const htmlPluginOpts = {};
 
   if (isDevMode) {
     jsLoaders = ['ng-hot-reload-loader', ...jsLoaders];
@@ -195,8 +169,8 @@ module.exports = (_env, argv = {}) => {
         loader: 'string-replace-loader',
         options: {
           multiple: [
-            {search: /\$APP_ROOT/g, replace: '/camunda'},
-            {search: /\$BASE/g, replace: '/camunda/app/cockpit/'},
+            {search: /\$APP_ROOT/g, replace: ''},
+            {search: /\$BASE/g, replace: '/app/cockpit/'},
             {
               search: /\$PLUGIN_DEPENDENCIES/g, replace: `
                 [{
@@ -208,7 +182,7 @@ module.exports = (_env, argv = {}) => {
               search: /\$PLUGIN_PACKAGES/g, replace: `
                 [{
                   name: 'cockpit-plugin-cockpitPlugins',
-                  location: '/camunda/app/cockpit/',
+                  location: '/plugin/cockpit/app/',
                   main: 'plugin.js'
                 }]`
             }
@@ -220,8 +194,8 @@ module.exports = (_env, argv = {}) => {
         loader: 'string-replace-loader',
         options: {
           multiple: [
-            {search: /\$APP_ROOT/g, replace: '/camunda'},
-            {search: /\$BASE/g, replace: '/camunda/app/tasklist/'},
+            {search: /\$APP_ROOT/g, replace: ''},
+            {search: /\$BASE/g, replace: '/app/tasklist/'},
             {
               search: /\$PLUGIN_DEPENDENCIES/g, replace: `
                 [{
@@ -233,8 +207,8 @@ module.exports = (_env, argv = {}) => {
               search: /\$PLUGIN_PACKAGES/g, replace: `
                 [{
                   name: 'tasklist-plugin-tasklistPlugins',
-                  location: '/camunda/app/tasklist/',
-                  main: 'tasklistPlugins.js'
+                  location: '/plugin/tasklist/app/',
+                  main: 'plugin.js'
                 }]`
             }
           ]
@@ -245,8 +219,8 @@ module.exports = (_env, argv = {}) => {
         loader: 'string-replace-loader',
         options: {
           multiple: [
-            {search: /\$APP_ROOT/g, replace: '/camunda'},
-            {search: /\$BASE/g, replace: '/camunda/app/admin/'},
+            {search: /\$APP_ROOT/g, replace: ''},
+            {search: /\$BASE/g, replace: '/app/admin/'},
             {
               search: /\$PLUGIN_DEPENDENCIES/g, replace: `
                 [{
@@ -258,8 +232,8 @@ module.exports = (_env, argv = {}) => {
               search: /\$PLUGIN_PACKAGES/g, replace: `
                 [{
                   name: 'admin-plugin-adminPlugins',
-                  location: '/camunda/app/admin/',
-                  main: 'adminPlugins.js'
+                  location: '/plugin/admin/app/',
+                  main: 'plugin.js'
                 }]`
             }
           ]
@@ -270,8 +244,8 @@ module.exports = (_env, argv = {}) => {
         loader: 'string-replace-loader',
         options: {
           multiple: [
-            {search: /\$APP_ROOT/g, replace: '/camunda'},
-            {search: /\$BASE/g, replace: '/camunda/app/welcome/'},
+            {search: /\$APP_ROOT/g, replace: ''},
+            {search: /\$BASE/g, replace: '/app/welcome/'},
             {search: /\$PLUGIN_DEPENDENCIES/g, replace: '[]'},
             {search: /\$PLUGIN_PACKAGES/g, replace: '[]'}
           ]
@@ -279,6 +253,8 @@ module.exports = (_env, argv = {}) => {
       }
     ]
   } else {
+    htmlPluginOpts.publicPath = "$APP_ROOT";
+    output.clean = true;
     optimization = {
       minimize: true,
       minimizer: [
@@ -308,22 +284,28 @@ module.exports = (_env, argv = {}) => {
       library: '[name]',
       libraryTarget: 'umd',
       filename: '[name].js',
+      assetModuleFilename: "assets/[name]-[hash][ext]",
+      ...output
     },
     devServer: {
       static: {
         directory: path.resolve(__dirname, './public'),
-        publicPath: '/camunda/app',
+        publicPath: '/app',
       },
       hot: true,
       //hotOnly: true,
       https: false,
       proxy: {
-        '/camunda/api': {
-          target: 'http://localhost:8080',
-          logLevel: 'debug'
+        '/api': {
+          target: 'http://localhost:8080/camunda/api',
+          logLevel: 'debug',
+          pathRewrite: {
+            "^/api": ""
+          },
+          cookiePathRewrite: "/"
         }
       },
-      open: ['/camunda/app/cockpit/']
+      open: ['/app/cockpit/']
     },
     resolve: {
       fallback: {
@@ -340,31 +322,39 @@ module.exports = (_env, argv = {}) => {
       rules
     },
     plugins: [
-      // clean the "dist" folder before generating a build
-      new CleanWebpackPlugin(),
+      new CopyWebpackPlugin({
+        patterns: [{
+          from: 'public',
+          to: 'app'
+        }]
+      }),
       new HtmlWebPackPlugin({
         template: 'ui/cockpit/client/scripts/index.html',
-        filename: 'camunda/app/cockpit/index.html',
-        chunks: ['camunda/lib/jquery', 'camunda/lib/requirejs', 'camunda/lib/deps'],
-        favicon: "./ui/common/images/favicon.ico"
+        filename: 'app/cockpit/index.html',
+        chunks: ['lib/jquery', 'lib/requirejs', 'lib/deps'],
+        favicon: "./ui/common/images/favicon.ico",
+        ...htmlPluginOpts
       }),
       new HtmlWebPackPlugin({
         template: 'ui/tasklist/client/index.html',
-        filename: 'camunda/app/tasklist/index.html',
-        chunks: ['camunda/lib/jquery', 'camunda/lib/requirejs', 'camunda/lib/deps'],
-        favicon: "./ui/common/images/favicon.ico"
+        filename: 'app/tasklist/index.html',
+        chunks: ['lib/jquery', 'lib/requirejs', 'lib/deps'],
+        favicon: "./ui/common/images/favicon.ico",
+        ...htmlPluginOpts
       }),
       new HtmlWebPackPlugin({
         template: 'ui/admin/client/scripts/index.html',
-        filename: 'camunda/app/admin/index.html',
-        chunks: ['camunda/lib/jquery', 'camunda/lib/requirejs', 'camunda/lib/deps'],
-        favicon: "./ui/common/images/favicon.ico"
+        filename: 'app/admin/index.html',
+        chunks: ['lib/jquery', 'lib/requirejs', 'lib/deps'],
+        favicon: "./ui/common/images/favicon.ico",
+        ...htmlPluginOpts
       }),
       new HtmlWebPackPlugin({
         template: 'ui/welcome/client/scripts/index.html',
-        filename: 'camunda/app/welcome/index.html',
-        chunks: ['camunda/lib/jquery', 'camunda/lib/requirejs', 'camunda/lib/deps'],
-        favicon: "./ui/common/images/favicon.ico"
+        filename: 'app/welcome/index.html',
+        chunks: ['lib/jquery', 'lib/requirejs', 'lib/deps'],
+        favicon: "./ui/common/images/favicon.ico",
+        ...htmlPluginOpts
       }),
       new MiniCssExtractPlugin({
         // both options are optional, similar to the same options in webpackOptions.output
@@ -381,7 +371,7 @@ module.exports = (_env, argv = {}) => {
       new webpack.ProvidePlugin({
         DEV_MODE: isDevMode,
       }),
-      //new BundleAnalyzerPlugin()
+      //new BundleAnalyzerPlugin(),
     ],
     optimization
   }
