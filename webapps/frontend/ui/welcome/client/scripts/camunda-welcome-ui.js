@@ -19,6 +19,8 @@
 
 import '../styles/styles.less';
 
+const $ = window.jQuery;
+
 // DOM Polyfills
 require('dom4');
 

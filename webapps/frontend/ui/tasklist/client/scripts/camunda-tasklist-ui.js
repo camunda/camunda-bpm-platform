@@ -20,6 +20,8 @@
 import '../styles/styles.less';
 import '/ui/tasklist/plugins/styles.less';
 
+const $ = window.jQuery;
+
 // DOM Polyfills
 require('dom4');
 

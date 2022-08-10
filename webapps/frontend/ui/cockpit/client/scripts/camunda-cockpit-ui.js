@@ -21,6 +21,8 @@ import '../styles/styles.less';
 import '/ui/cockpit/client/styles/styles-components.less';
 import '/ui/cockpit/plugins/styles.less';
 
+const $ = window.jQuery;
+
 // DOM Polyfills
 require('dom4');
 

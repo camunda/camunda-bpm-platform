@@ -46,6 +46,9 @@ let entry = {
   },
 
   /* Shared */
+  "camunda/lib/jquery": {
+    import: './ui/common/lib/jquery.js'
+  },
   "camunda/lib/ngDefine": {
     import: './ui/common/lib/ngDefine.js',
     dependOn: 'camunda/lib/deps'
@@ -55,7 +58,6 @@ let entry = {
     dependOn: 'camunda/lib/deps'
   },
   "camunda/lib/deps": [
-    "jquery",
     "angular",
     "moment",
     "camunda-bpm-sdk-js/lib/angularjs/index",
@@ -343,22 +345,22 @@ module.exports = (_env, argv = {}) => {
       new HtmlWebPackPlugin({
         template: 'ui/cockpit/client/scripts/index.html',
         filename: 'camunda/app/cockpit/index.html',
-        chunks: ['camunda/lib/requirejs', 'camunda/lib/deps']
+        chunks: ['camunda/lib/jquery', 'camunda/lib/requirejs', 'camunda/lib/deps']
       }),
       new HtmlWebPackPlugin({
         template: 'ui/tasklist/client/index.html',
         filename: 'camunda/app/tasklist/index.html',
-        chunks: ['camunda/lib/requirejs', 'camunda/lib/deps']
+        chunks: ['camunda/lib/jquery', 'camunda/lib/requirejs', 'camunda/lib/deps']
       }),
       new HtmlWebPackPlugin({
         template: 'ui/admin/client/scripts/index.html',
         filename: 'camunda/app/admin/index.html',
-        chunks: ['camunda/lib/requirejs', 'camunda/lib/deps']
+        chunks: ['camunda/lib/jquery', 'camunda/lib/requirejs', 'camunda/lib/deps']
       }),
       new HtmlWebPackPlugin({
         template: 'ui/welcome/client/scripts/index.html',
         filename: 'camunda/app/welcome/index.html',
-        chunks: ['camunda/lib/requirejs', 'camunda/lib/deps']
+        chunks: ['camunda/lib/jquery', 'camunda/lib/requirejs', 'camunda/lib/deps']
       }),
       new MiniCssExtractPlugin({
         // both options are optional, similar to the same options in webpackOptions.output
@@ -373,8 +375,6 @@ module.exports = (_env, argv = {}) => {
         'process.env.CAMUNDA_VERSION': "'7.18.0-SNAPSHOT'",
       }),
       new webpack.ProvidePlugin({
-        $: 'jquery',
-        jQuery: 'jquery',
         DEV_MODE: isDevMode,
       }),
       //new BundleAnalyzerPlugin()

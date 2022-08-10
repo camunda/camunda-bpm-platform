@@ -17,6 +17,4 @@ requirejs.config({
   urlArgs: 'bust=$GRUNT_CACHE_BUST'
 });
 
-window.jQuery = window.$ = require('jquery');
-
 requirejs([`camunda-${appName}-bootstrap`], () => {});
