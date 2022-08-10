@@ -345,22 +345,26 @@ module.exports = (_env, argv = {}) => {
       new HtmlWebPackPlugin({
         template: 'ui/cockpit/client/scripts/index.html',
         filename: 'camunda/app/cockpit/index.html',
-        chunks: ['camunda/lib/jquery', 'camunda/lib/requirejs', 'camunda/lib/deps']
+        chunks: ['camunda/lib/jquery', 'camunda/lib/requirejs', 'camunda/lib/deps'],
+        favicon: "./ui/common/images/favicon.ico"
       }),
       new HtmlWebPackPlugin({
         template: 'ui/tasklist/client/index.html',
         filename: 'camunda/app/tasklist/index.html',
-        chunks: ['camunda/lib/jquery', 'camunda/lib/requirejs', 'camunda/lib/deps']
+        chunks: ['camunda/lib/jquery', 'camunda/lib/requirejs', 'camunda/lib/deps'],
+        favicon: "./ui/common/images/favicon.ico"
       }),
       new HtmlWebPackPlugin({
         template: 'ui/admin/client/scripts/index.html',
         filename: 'camunda/app/admin/index.html',
-        chunks: ['camunda/lib/jquery', 'camunda/lib/requirejs', 'camunda/lib/deps']
+        chunks: ['camunda/lib/jquery', 'camunda/lib/requirejs', 'camunda/lib/deps'],
+        favicon: "./ui/common/images/favicon.ico"
       }),
       new HtmlWebPackPlugin({
         template: 'ui/welcome/client/scripts/index.html',
         filename: 'camunda/app/welcome/index.html',
-        chunks: ['camunda/lib/jquery', 'camunda/lib/requirejs', 'camunda/lib/deps']
+        chunks: ['camunda/lib/jquery', 'camunda/lib/requirejs', 'camunda/lib/deps'],
+        favicon: "./ui/common/images/favicon.ico"
       }),
       new MiniCssExtractPlugin({
         // both options are optional, similar to the same options in webpackOptions.output

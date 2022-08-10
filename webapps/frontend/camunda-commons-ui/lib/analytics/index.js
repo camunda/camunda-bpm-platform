@@ -19,7 +19,6 @@ var fs = require('fs');
 var angular = require('angular');
 
 var modalTemplate = require('./modal.html')();
-var camundaLogo = require('svg-inline-loader?classPrefix!./../auth/page/logo.svg');
 
 // CAMUNDA_VERSION has a structure of 'major.minor.patch[-SNAPSHOT]', but we only need 'major.minor' for doc links
 var camundaVersion = (process.env.CAMUNDA_VERSION || '').match(
@@ -36,7 +35,7 @@ var modalController = [
   function(scope, $sce, Notifications, telemetryResource, $translate) {
     scope.camundaVersion = camundaVersion;
     scope.loadingState = 'INITIAL';
-    scope.logo = $sce.trustAsHtml(camundaLogo);
+    scope.enableUsage = false;
     scope.form = {enableUsage: false};
 
     scope.close = function() {
