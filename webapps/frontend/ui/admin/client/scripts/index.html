@@ -37,13 +37,9 @@
         cam-exclude-plugins="admin.dashboard:process-definition-tiles" />
   -->
 
-
-  <!-- styles -->
-  <!--<link href="$APP_ROOT/app/admin/styles/styles.css?bust=$GRUNT_CACHE_BUST"
-        rel="stylesheet" />
   <link rel="stylesheet"
         type="text/css"
-        href="$APP_ROOT/app/admin/styles/user-styles.css?bust=$GRUNT_CACHE_BUST">-->
+        href="${'$APP_ROOT/app/admin/styles/user-styles.css?bust=$GRUNT_CACHE_BUST'}">
 </head>
 <body ng-controller="camAdminAppCtrl" ng-class="{'no-breadcrumbs': !$root.showBreadcrumbs}">
 <!-- navigation -->

@@ -21,7 +21,7 @@ var angular = require('angular');
 var modalTemplate = require('./modal.html')();
 
 // CAMUNDA_VERSION has a structure of 'major.minor.patch[-SNAPSHOT]', but we only need 'major.minor' for doc links
-var camundaVersion = (process.env.CAMUNDA_VERSION || '').match(
+var camundaVersion = (CAMUNDA_VERSION || '').match(
   /([0-9]+.[0-9]+)/
 );
 camundaVersion = camundaVersion ? camundaVersion[0] : 'latest'; // if 'latest' is chosen, something went wrong

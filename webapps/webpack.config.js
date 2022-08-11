@@ -116,6 +116,13 @@ let optimization = {};
 let rules = [
   {
     test: /\.html$/,
+    loader: 'string-replace-loader',
+    options: {
+      multiple: [{search: /\$VERSION/g, replace: version}],
+    },
+  },
+  {
+    test: /\.html$/,
     use: [
       {
         loader: 'ejs-loader',
@@ -124,7 +131,7 @@ let rules = [
         },
       },
       {
-        loader: 'extract-loader',
+        loader: 'extract-loader'
       },
       {
         loader: 'html-loader',
@@ -154,7 +161,7 @@ module.exports = (_env, argv = {}) => {
   const isDevMode = argv.mode === 'development';
   const isTestMode = argv.mode === 'test';
   const output = {};
-  const htmlPluginOpts = {};
+  let htmlPluginOpts = {};
 
   if (isDevMode) {
     jsLoaders = ['ng-hot-reload-loader', ...jsLoaders];
@@ -188,7 +195,6 @@ module.exports = (_env, argv = {}) => {
           loader: 'string-replace-loader',
           options: {
             multiple: [
-              {search: /\$VERSION/g, replace: version},
               {search: /\$APP_ROOT/g, replace: ''},
               {search: /\$BASE/g, replace: `/app/${name}/`},
               {
@@ -220,7 +226,9 @@ module.exports = (_env, argv = {}) => {
       }),
     ];
   } else {
-    htmlPluginOpts.publicPath = '$APP_ROOT';
+    htmlPluginOpts = {
+      publicPath: '$APP_ROOT',
+    };
     output.clean = true;
     optimization = {
       minimize: true,
@@ -280,7 +288,6 @@ module.exports = (_env, argv = {}) => {
       },
       extensions: ['.js'],
       alias: {
-        '@': path.resolve('src'),
         'camunda-bpm-sdk-js': path.resolve('./camunda-bpm-sdk-js'),
         'cam-common': path.resolve('./ui/common/scripts/module'),
       },
@@ -322,17 +329,17 @@ module.exports = (_env, argv = {}) => {
         ...htmlPluginOpts,
       }),
       new HtmlNoncePlugin(),
-      new MiniCssExtractPlugin({
+      /*new MiniCssExtractPlugin({
         // both options are optional, similar to the same options in webpackOptions.output
         filename: isDevMode ? '[name].css' : '[name].[hash].css',
         chunkFilename: isDevMode ? '[id].css' : '[id].[hash].css',
-      }),
+      }),*/
       new webpack.HotModuleReplacementPlugin(),
       new webpack.DefinePlugin({
         // define custom global variables
         TEST_MODE: isTestMode,
         DEV_MODE: isDevMode,
-        'process.env.CAMUNDA_VERSION': "'7.18.0-SNAPSHOT'",
+        CAMUNDA_VERSION: `'${version}'`,
       }),
       new webpack.ProvidePlugin({
         DEV_MODE: isDevMode,
