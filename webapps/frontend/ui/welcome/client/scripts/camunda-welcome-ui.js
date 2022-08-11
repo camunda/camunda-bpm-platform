@@ -19,6 +19,10 @@
 
 import '../styles/styles.less';
 
+if (process.env.NODE_ENV === 'development') {
+  require("../../../common/scripts/util/dev-setup").setupDev();
+}
+
 const $ = window.jQuery;
 
 // DOM Polyfills
@@ -83,6 +87,7 @@ module.exports = function(pluginDependencies) {
       translatePaginationCtrls($provide);
       $routeProvider.otherwise({redirectTo: '/welcome'});
 
+      UriProvider.replace(':appRoot', getUri('app-root'));
       UriProvider.replace(':appName', 'welcome');
       UriProvider.replace('app://', getUri('href'));
       UriProvider.replace('adminbase://', getUri('app-root') + '/app/admin/');
@@ -94,9 +99,6 @@ module.exports = function(pluginDependencies) {
       UriProvider.replace(':engine', [
         '$window',
         function($window) {
-          if (DEV_MODE) {
-            return 'default';
-          }
           var uri = $window.location.href;
 
           var match = uri.match(/\/app\/welcome\/([\w-]+)(|\/)/);

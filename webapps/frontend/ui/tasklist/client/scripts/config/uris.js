@@ -21,6 +21,7 @@ module.exports = function(ngModule, config) {
   ngModule.config([
     'UriProvider',
     function(UriProvider) {
+      UriProvider.replace(':appRoot', config['app-root']);
       UriProvider.replace(':appName', 'tasklist');
       UriProvider.replace('app://', config.href);
       UriProvider.replace('adminbase://', config['app-root'] + '/app/admin/');
@@ -39,9 +40,6 @@ module.exports = function(ngModule, config) {
       UriProvider.replace(':engine', [
         '$window',
         function($window) {
-          if (DEV_MODE) {
-            return 'default';
-          }
           var uri = $window.location.href;
 
           var match = uri.match(/\/app\/tasklist\/([\w-]+)(|\/)/);

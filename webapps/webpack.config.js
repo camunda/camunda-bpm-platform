@@ -162,7 +162,9 @@ module.exports = (_env, argv = {}) => {
   const isTestMode = argv.mode === 'test';
   const eeBuild = !!argv.eeBuild;
   const output = {};
-  let htmlPluginOpts = {};
+  let htmlPluginOpts = {
+    publicPath: '/camunda',
+  };
 
   if (isDevMode) {
     jsLoaders = ['ng-hot-reload-loader', ...jsLoaders];
@@ -224,8 +226,8 @@ module.exports = (_env, argv = {}) => {
           loader: 'string-replace-loader',
           options: {
             multiple: [
-              {search: /\$APP_ROOT/g, replace: ''},
-              {search: /\$BASE/g, replace: `/app/${name}/`},
+              {search: /\$APP_ROOT/g, replace: '/camunda'},
+              {search: /\$BASE/g, replace: `/camunda/app/${name}/{ENGINE}/`},
               {search: /\$PLUGIN_DEPENDENCIES/g, replace: JSON.stringify(pluginDependencies)},
               {search: /\$PLUGIN_PACKAGES/g, replace: JSON.stringify(pluginPackages)},
             ],
@@ -255,6 +257,27 @@ module.exports = (_env, argv = {}) => {
 
   console.log('[Webpack Config] NODE_ENV:', process.env.NODE_ENV);
   console.log('[Webpack Config] argv.mode:', argv.mode);
+
+  const addEngines = (engines) => {
+    return engines.reduce((acc, engine) => {
+        acc[`/camunda/app/*/${engine}/`] = {
+          target: 'http://localhost:8081/',
+          pathRewrite: (path) => {
+            return path.replace(`/${engine}`, '').replace('/camunda', '');
+          },
+        };
+        acc[`/camunda/app/*/${engine}/setup/`] = {
+          target: 'http://localhost:8081/',
+          pathRewrite: (path) => {
+            return path
+              .replace(`/${engine}`, '')
+              .replace('/camunda', '')
+              .replace('/setup', '');
+          },
+        };
+        return acc;
+    }, {});
+  };
 
   return {
     entry,
@@ -286,10 +309,24 @@ module.exports = (_env, argv = {}) => {
           pathRewrite: {
             '^/api': '',
           },
-          cookiePathRewrite: '/',
+        },
+        ...addEngines(['default', 'engine2', 'engine3']),
+        '/camunda/*': {
+          target: 'http://localhost:8081/',
+          logLevel: 'debug',
+          pathRewrite: (path) => {
+            return path.replace('/camunda', '');
+          },
+        },
+        '/camunda/api/*': {
+          target: 'http://localhost:8081/',
+          logLevel: 'debug',
+          pathRewrite: (path) => {
+            return path.replace('/camunda', '');
+          },
         },
       },
-      open: ['/app/cockpit/'],
+      open: ['/camunda/app/cockpit/default/'],
     },
     resolve: {
       fallback: {

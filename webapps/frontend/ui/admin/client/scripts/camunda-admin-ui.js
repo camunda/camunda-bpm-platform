@@ -20,6 +20,10 @@
 import '../styles/styles.less';
 import 'ui/admin/plugins/styles.less';
 
+if (process.env.NODE_ENV === 'development') {
+  require("../../../common/scripts/util/dev-setup").setupDev();
+}
+
 // DOM Polyfills
 require('dom4');
 
@@ -89,6 +93,7 @@ module.exports = function(pluginDependencies) {
       translatePaginationCtrls($provide);
       $routeProvider.otherwise({redirectTo: '/'});
 
+      UriProvider.replace(':appRoot', getUri('app-root'));
       UriProvider.replace(':appName', 'admin');
       UriProvider.replace('app://', getUri('href'));
       UriProvider.replace(
@@ -102,9 +107,6 @@ module.exports = function(pluginDependencies) {
       UriProvider.replace(':engine', [
         '$window',
         function($window) {
-          if (DEV_MODE) {
-            return 'default';
-          }
           var uri = $window.location.href;
 
           var match = uri.match(/\/app\/admin\/([\w-]+)(|\/)/);
