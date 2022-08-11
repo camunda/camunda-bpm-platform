@@ -7,6 +7,8 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const path = require('path');
 const webpack = require('webpack');
 
+const {version} = require('./package.json')
+
 let jsLoaders = ['babel-loader'];
 let entry = {
   /* Cockpit */
@@ -169,6 +171,7 @@ module.exports = (_env, argv = {}) => {
         loader: 'string-replace-loader',
         options: {
           multiple: [
+            {search: /\$VERSION/g, replace: version},
             {search: /\$APP_ROOT/g, replace: ''},
             {search: /\$BASE/g, replace: '/app/cockpit/'},
             {
@@ -194,6 +197,7 @@ module.exports = (_env, argv = {}) => {
         loader: 'string-replace-loader',
         options: {
           multiple: [
+            {search: /\$VERSION/g, replace: version},
             {search: /\$APP_ROOT/g, replace: ''},
             {search: /\$BASE/g, replace: '/app/tasklist/'},
             {
@@ -219,6 +223,7 @@ module.exports = (_env, argv = {}) => {
         loader: 'string-replace-loader',
         options: {
           multiple: [
+            {search: /\$VERSION/g, replace: version},
             {search: /\$APP_ROOT/g, replace: ''},
             {search: /\$BASE/g, replace: '/app/admin/'},
             {
@@ -285,6 +290,7 @@ module.exports = (_env, argv = {}) => {
       libraryTarget: 'umd',
       filename: '[name].js',
       assetModuleFilename: "assets/[name]-[hash][ext]",
+      path: path.resolve(__dirname, 'target/webapp'),
       ...output
     },
     devServer: {
