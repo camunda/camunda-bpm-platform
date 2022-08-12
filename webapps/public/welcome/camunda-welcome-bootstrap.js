@@ -164,7 +164,7 @@ window.__define(
 
               // now that we loaded the plugins and the additional modules, we can finally
               // initialize Welcome
-              camundaWelcomeUi(pluginDependencies);
+              camundaWelcomeUi.init(pluginDependencies);
             });
           } else {
             // for consistency, also create a empty module
@@ -180,7 +180,7 @@ window.__define(
             require([], function() {
               window.define = undefined;
               window.require = undefined;
-              camundaWelcomeUi(pluginDependencies);
+              camundaWelcomeUi.init(pluginDependencies);
             });
           }
         });

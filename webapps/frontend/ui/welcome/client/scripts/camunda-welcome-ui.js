@@ -44,7 +44,7 @@ var servicesModule = require('./services/main');
 var pluginsModule = require('./plugins/main');
 const translatePaginationCtrls = require('../../../common/scripts/util/translate-pagination-ctrls');
 
-module.exports = function(pluginDependencies) {
+export function init(pluginDependencies) {
   var ngDependencies = [
     'ng',
     'ngResource',
@@ -149,7 +149,7 @@ module.exports = function(pluginDependencies) {
   });
 };
 
-module.exports.exposePackages = function(container) {
+export function exposePackages(container) {
   container.angular = angular;
   container.jquery = $;
   container['camunda-commons-ui'] = commons;

@@ -178,7 +178,7 @@ window.__define(
 
               // now that we loaded the plugins and the additional modules, we can finally
               // initialize the tasklist
-              camundaTasklistUi(pluginDependencies);
+              camundaTasklistUi.init(pluginDependencies);
             });
           } else {
             // for consistency, also create a empty module
@@ -194,7 +194,7 @@ window.__define(
             require([], function() {
               window.define = undefined;
               window.require = undefined;
-              camundaTasklistUi(pluginDependencies);
+              camundaTasklistUi.init(pluginDependencies);
             });
           }
         });

@@ -170,7 +170,7 @@ window.__define(
 
               // now that we loaded the plugins and the additional modules, we can finally
               // initialize Admin
-              camundaAdminUi(pluginDependencies);
+              camundaAdminUi.init(pluginDependencies);
             });
           } else {
             // for consistency, also create a empty module
@@ -186,7 +186,7 @@ window.__define(
             require([], function() {
               window.define = undefined;
               window.require = undefined;
-              camundaAdminUi(pluginDependencies);
+              camundaAdminUi.init(pluginDependencies);
             });
           }
         });

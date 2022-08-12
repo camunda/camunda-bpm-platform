@@ -189,6 +189,7 @@ module.exports = (_env, argv = {}) => {
       },
     ];
 
+    const eeApps = ['admin', 'cockpit'];
     rules = [
       ...rules,
       ...webapps.map(({name, indexFile}) => {
@@ -198,7 +199,7 @@ module.exports = (_env, argv = {}) => {
             ngModuleName: `${name}.plugin.${name}Plugins`,
             requirePackageName: `${name}-plugin-${name}Plugins`
           });
-          if (eeBuild) {
+          if (eeBuild && eeApps.includes(name)) {
             pluginDependencies.push({
               ngModuleName: `${name}.plugin.${name}EE`,
               requirePackageName: `${name}-plugin-${name}EE`
@@ -212,7 +213,7 @@ module.exports = (_env, argv = {}) => {
             location: `/plugin/${name}/app/`,
             main: 'plugin.js'
           });
-          if (eeBuild) {
+          if (eeBuild && eeApps.includes(name)) {
             pluginPackages.push({
               name: `${name}-plugin-${name}EE`,
               location: `/plugin/${name}EE/app/`,
