@@ -18,7 +18,7 @@
 'use strict';
 
 import '../styles/styles.less';
-import '/ui/admin/plugins/styles.less';
+import 'ui/admin/plugins/styles.less';
 
 // DOM Polyfills
 require('dom4');
@@ -29,12 +29,12 @@ var $ = (window.jQuery = window.$ = require('jquery')),
   filtersModule = require('./filters/main'),
   servicesModule = require('./services/main'),
   resourcesModule = require('./resources/main'),
-  camCommonsUi = require('../../../../camunda-commons-ui/lib'),
+  camCommonsUi = require('camunda-commons-ui/lib'),
   sdk = require('camunda-bpm-sdk-js/lib/angularjs/index'),
-  angular = require('../../../../camunda-commons-ui/vendor/angular'),
+  angular = require('camunda-commons-ui/vendor/angular'),
   camCommon = require('../../../common/scripts/module'),
-  lodash = require('../../../../camunda-commons-ui/vendor/lodash'),
-  moment = require('../../../../camunda-commons-ui/vendor/moment');
+  lodash = require('camunda-commons-ui/vendor/lodash'),
+  moment = require('camunda-commons-ui/vendor/moment');
 const translatePaginationCtrls = require('../../../common/scripts/util/translate-pagination-ctrls');
 
 var APP_NAME = 'cam.admin';

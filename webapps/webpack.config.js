@@ -6,56 +6,56 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const path = require('path');
 const webpack = require('webpack');
 
-const {version} = require('./package.json');
+const {version} = require(path.resolve(__dirname, './package.json'));
 
 let jsLoaders = ['babel-loader'];
 let entry = {
   /* Cockpit */
   'app/cockpit/camunda-cockpit-ui': {
-    import: './ui/cockpit/client/scripts/camunda-cockpit-ui.js',
+    import: path.resolve(__dirname, 'ui/cockpit/client/scripts/camunda-cockpit-ui.js'),
     dependOn: 'lib/deps',
   },
   'plugin/cockpit/app/plugin': {
-    import: './ui/cockpit/plugins/cockpitPlugins.js',
+    import: path.resolve(__dirname, 'ui/cockpit/plugins/cockpitPlugins.js'),
     dependOn: 'lib/deps',
   },
 
   /* Tasklist */
   'app/tasklist/camunda-tasklist-ui': {
-    import: './ui/tasklist/client/scripts/camunda-tasklist-ui.js',
+    import: path.resolve(__dirname, 'ui/tasklist/client/scripts/camunda-tasklist-ui.js'),
     dependOn: 'lib/deps',
   },
   'plugin/tasklist/app/plugin': {
-    import: './ui/tasklist/plugins/tasklistPlugins.js',
+    import: path.resolve(__dirname, 'ui/tasklist/plugins/tasklistPlugins.js'),
     dependOn: 'lib/deps',
   },
 
   /* Admin */
   'app/admin/camunda-admin-ui': {
-    import: './ui/admin/client/scripts/camunda-admin-ui.js',
+    import: path.resolve(__dirname, 'ui/admin/client/scripts/camunda-admin-ui.js'),
     dependOn: 'lib/deps',
   },
   'plugin/admin/app/plugin': {
-    import: './ui/admin/plugins/adminPlugins.js',
+    import: path.resolve(__dirname, 'ui/admin/plugins/adminPlugins.js'),
     dependOn: 'lib/deps',
   },
 
   /* Welcome */
   'app/welcome/camunda-welcome-ui': {
-    import: './ui/welcome/client/scripts/camunda-welcome-ui.js',
+    import: path.resolve(__dirname, 'ui/welcome/client/scripts/camunda-welcome-ui.js'),
     dependOn: 'lib/deps',
   },
 
   /* Shared */
   'lib/jquery': {
-    import: './ui/common/lib/jquery.js',
+    import: path.resolve(__dirname, 'ui/common/lib/jquery.js'),
   },
   'lib/ngDefine': {
-    import: './ui/common/lib/ngDefine.js',
+    import: path.resolve(__dirname, 'ui/common/lib/ngDefine.js'),
     dependOn: 'lib/deps',
   },
   'lib/requirejs': {
-    import: './ui/common/lib/requirejs.js',
+    import: path.resolve(__dirname, 'ui/common/lib/requirejs.js'),
     dependOn: 'lib/deps',
   },
   'lib/deps': [
@@ -160,6 +160,7 @@ let rules = [
 module.exports = (_env, argv = {}) => {
   const isDevMode = argv.mode === 'development';
   const isTestMode = argv.mode === 'test';
+  const eeBuild = !!argv.eeBuild;
   const output = {};
   let htmlPluginOpts = {};
 
@@ -189,7 +190,35 @@ module.exports = (_env, argv = {}) => {
     rules = [
       ...rules,
       ...webapps.map(({name, indexFile}) => {
-        const packageName = `${name}-plugin-${name}Plugins`;
+        const pluginDependencies = [];
+        if (name !== 'welcome') {
+          pluginDependencies.push({
+            ngModuleName: `${name}.plugin.${name}Plugins`,
+            requirePackageName: `${name}-plugin-${name}Plugins`
+          });
+          if (eeBuild) {
+            pluginDependencies.push({
+              ngModuleName: `${name}.plugin.${name}EE`,
+              requirePackageName: `${name}-plugin-${name}EE`
+            });
+          }
+        }
+        const pluginPackages = [];
+        if (name !== 'welcome') {
+          pluginPackages.push({
+            name: `${name}-plugin-${name}Plugins`,
+            location: `/plugin/${name}/app/`,
+            main: 'plugin.js'
+          });
+          if (eeBuild) {
+            pluginPackages.push({
+              name: `${name}-plugin-${name}EE`,
+              location: `/plugin/${name}EE/app/`,
+              main: 'plugin.js'
+            });
+          }
+        }
+
         return {
           test: indexFile,
           loader: 'string-replace-loader',
@@ -197,29 +226,8 @@ module.exports = (_env, argv = {}) => {
             multiple: [
               {search: /\$APP_ROOT/g, replace: ''},
               {search: /\$BASE/g, replace: `/app/${name}/`},
-              {
-                search: /\$PLUGIN_DEPENDENCIES/g,
-                replace:
-                  name === 'welcome'
-                    ? '[]'
-                    : `
-                [{
-                  ngModuleName: '${name}.plugin.${name}Plugins',
-                  requirePackageName: '${packageName}'
-                }]`,
-              },
-              {
-                search: /\$PLUGIN_PACKAGES/g,
-                replace:
-                  name === 'welcome'
-                    ? '[]'
-                    : `
-                [{
-                  name: '${packageName}',
-                  location: '/plugin/${name}/app/',
-                  main: 'plugin.js'
-                }]`,
-              },
+              {search: /\$PLUGIN_DEPENDENCIES/g, replace: JSON.stringify(pluginDependencies)},
+              {search: /\$PLUGIN_PACKAGES/g, replace: JSON.stringify(pluginPackages)},
             ],
           },
         };
@@ -263,6 +271,7 @@ module.exports = (_env, argv = {}) => {
       ...output,
     },
     devServer: {
+      port: 8081,
       static: {
         directory: path.resolve(__dirname, './public'),
         publicPath: '/app',
@@ -286,10 +295,12 @@ module.exports = (_env, argv = {}) => {
       fallback: {
         fs: false,
       },
-      extensions: ['.js'],
+      extensions: ['.js', '.less'],
       alias: {
-        'camunda-bpm-sdk-js': path.resolve('./camunda-bpm-sdk-js'),
-        'cam-common': path.resolve('./ui/common/scripts/module'),
+        'camunda-commons-ui': path.resolve(__dirname, 'camunda-commons-ui'),
+        'ui': path.resolve(__dirname, 'ui'),
+        'camunda-bpm-sdk-js': path.resolve(__dirname, 'camunda-bpm-sdk-js'),
+        'cam-common': path.resolve(__dirname, 'ui/common/scripts/module'),
       },
     },
     module: {
@@ -298,34 +309,34 @@ module.exports = (_env, argv = {}) => {
     plugins: [
       new HtmlWebPackPlugin({
         minify: false,
-        template: 'ui/cockpit/client/scripts/index.html',
+        template: path.resolve(__dirname, 'ui/cockpit/client/scripts/index.html'),
         filename: 'app/cockpit/index.html',
         chunks: ['lib/jquery', 'lib/requirejs', 'lib/deps'],
-        favicon: './ui/common/images/favicon.ico',
+        favicon: path.resolve(__dirname, 'ui/common/images/favicon.ico'),
         ...htmlPluginOpts,
       }),
       new HtmlWebPackPlugin({
         minify: false,
-        template: 'ui/tasklist/client/index.html',
+        template: path.resolve(__dirname, 'ui/tasklist/client/index.html'),
         filename: 'app/tasklist/index.html',
         chunks: ['lib/jquery', 'lib/requirejs', 'lib/deps'],
-        favicon: './ui/common/images/favicon.ico',
+        favicon: path.resolve(__dirname, 'ui/common/images/favicon.ico'),
         ...htmlPluginOpts,
       }),
       new HtmlWebPackPlugin({
         minify: false,
-        template: 'ui/admin/client/scripts/index.html',
+        template: path.resolve(__dirname, 'ui/admin/client/scripts/index.html'),
         filename: 'app/admin/index.html',
         chunks: ['lib/jquery', 'lib/requirejs', 'lib/deps'],
-        favicon: './ui/common/images/favicon.ico',
+        favicon: path.resolve(__dirname, 'ui/common/images/favicon.ico'),
         ...htmlPluginOpts,
       }),
       new HtmlWebPackPlugin({
         minify: false,
-        template: 'ui/welcome/client/scripts/index.html',
+        template: path.resolve(__dirname, 'ui/welcome/client/scripts/index.html'),
         filename: 'app/welcome/index.html',
         chunks: ['lib/jquery', 'lib/requirejs', 'lib/deps'],
-        favicon: './ui/common/images/favicon.ico',
+        favicon: path.resolve(__dirname, 'ui/common/images/favicon.ico'),
         ...htmlPluginOpts,
       }),
       new HtmlNoncePlugin(),
@@ -347,7 +358,7 @@ module.exports = (_env, argv = {}) => {
       new CopyWebpackPlugin({
         patterns: [
           {
-            from: 'public',
+            from: path.resolve(__dirname, 'public'),
             to: 'app',
           },
         ],

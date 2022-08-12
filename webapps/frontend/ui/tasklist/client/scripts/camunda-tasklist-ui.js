@@ -18,7 +18,7 @@
 'use strict';
 
 import '../styles/styles.less';
-import '/ui/tasklist/plugins/styles.less';
+import 'ui/tasklist/plugins/styles.less';
 
 const $ = window.jQuery;
 

@@ -18,7 +18,7 @@
 'use strict';
 
 var angular = require('angular');
-var camCommon = require('/ui/common/scripts/module/index');
+var camCommon = require('ui/common/scripts/module/index');
 
 var instanceCount = require('./instanceCount');
 var callActivity = require('./callActivity');

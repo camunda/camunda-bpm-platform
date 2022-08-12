@@ -291,7 +291,7 @@ window.__define(
 
             // now that we loaded the plugins and the additional modules, we can finally
             // initialize Cockpit
-            camundaCockpitUi(pluginDependencies);
+            camundaCockpitUi.init(pluginDependencies);
           }
         });
       });
