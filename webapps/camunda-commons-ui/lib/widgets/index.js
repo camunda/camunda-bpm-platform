@@ -44,7 +44,7 @@ var angular = require('../../../camunda-bpm-sdk-js/vendor/angular'),
   password = require('./password/cam-widget-password'),
   selectionType = require('./selection-type/cam-widget-selection-type');
 
-require('../../vendor/ui-bootstrap-tpls-2.5.0-camunda');
+require('angular-ui-bootstrap');
 
 var widgetModule = angular.module('camunda.common.widgets', [
   filtersModule.name,
