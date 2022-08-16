@@ -1,36 +1,42 @@
 <div class="form-inline operation-details">
   <div class="row">
-    <label class="col-xs-4 col-sm-3 form-control-static text-right"
-           for="instance">
+    <label class="col-xs-6 form-control-static text-right"
+           for="instance"
+           ng-class="{'col-xs-4 col-sm-3': isBatchOperationPage}">
       {{ 'CAM_WIDGET_SELECTION_TYPE_INSTANCE' | translate }}
       <span class="glyphicon glyphicon-question-sign"
             uib-tooltip="{{ 'CAM_WIDGET_SELECTION_TYPE_INSTANCE_TOOLTIP' | translate }}"
             tooltip-placement="right"></span>
     </label>
-    <div class="col-xs-6 col-sm-9">
+    <div class="col-xs-6"
+         ng-class="{'col-xs-6 col-sm-9': isBatchOperationPage}">
       <input type="radio"
              name="selection_type"
              id="instance"
              class="form-control operation-radio"
              ng-model="selectionType"
-             value="INSTANCE" />
+             value="INSTANCE"
+             style="width: auto;" />
     </div>
   </div>
   <div class="row">
-    <label class="col-xs-4 col-sm-3 form-control-static text-right"
-           for="query">
+    <label class="col-xs-6 form-control-static text-right"
+           for="query"
+           ng-class="{'col-xs-4 col-sm-3': isBatchOperationPage}">
            {{ 'CAM_WIDGET_SELECTION_TYPE_QUERY' | translate }}
       <span class="glyphicon glyphicon-question-sign"
             uib-tooltip="{{ 'CAM_WIDGET_SELECTION_TYPE_QUERY_TOOLTIP' | translate }}"
             tooltip-placement="right"></span>
     </label>
-    <div class="col-xs-6 col-sm-9">
+    <div class="col-xs-6"
+         ng-class="{'col-xs-6 col-sm-9': isBatchOperationPage}">
       <input type="radio"
              name="selection_type"
              id="query"
              class="form-control operation-radio"
              ng-model="selectionType"
-             value="QUERY" />
+             value="QUERY"
+             style="width: auto;" />
     </div>
   </div>   
 </div>
