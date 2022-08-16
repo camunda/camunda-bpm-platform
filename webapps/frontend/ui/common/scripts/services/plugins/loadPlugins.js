@@ -22,7 +22,7 @@ const camundaPlugins = [
   'admin-plugin-adminEE',
   'cockpit-plugin-cockpitPlugins',
   'cockpit-plugin-cockpitEE',
-  'tasklist-plugin-tasklistPlugins'
+  'tasklist-plugin-tasklistPlugins',
 ];
 
 function withSuffix(string, suffix) {
@@ -41,24 +41,24 @@ module.exports = async function loadPlugins(config, appName) {
   const customScripts = config.customScripts || [];
 
   const JARScripts = window.PLUGIN_PACKAGES.filter(
-    el =>
+    (el) =>
       !camundaPlugins.includes(el.name) &&
       !el.name.startsWith(`${appName}-plugin-legacy`)
-  ).map(el => {
-    addCssSource(`${el.location}/plugin.css`);
+  ).map((el) => {
+    addCssSource(`${el.location}/plugin.css?bust=$CACHE_BUST`);
     return `${el.location}/${el.main}`;
   });
 
   const baseImportPath = `${appRoot}/app/${appName}/`;
-  const fetchers = customScripts.map(url =>
-    window
-      ._import(baseImportPath + withSuffix(url, '.js'))
-      .catch(e => console.error(e))
+  const fetchers = customScripts.map((url) =>
+    eval(`import('${baseImportPath + withSuffix(url, '.js')}')`).catch((e) =>
+      console.error(e)
+    )
   );
 
   fetchers.push(
-    ...JARScripts.map(url => {
-      return window._import(url).catch(e => console.error(e));
+    ...JARScripts.map((url) => {
+      return `import('${url}')`.catch((e) => console.error(e));
     })
   );
 

@@ -11,8 +11,8 @@ const {version} = require(path.resolve(__dirname, './package.json'));
 let jsLoaders = ['babel-loader'];
 let entry = {
   /* Cockpit */
-  'app/cockpit/camunda-cockpit-ui': {
-    import: path.resolve(__dirname, 'ui/cockpit/client/scripts/camunda-cockpit-ui.js'),
+  'app/cockpit/camunda-cockpit-bootstrap': {
+    import: path.resolve(__dirname, 'ui/cockpit/client/scripts/camunda-cockpit-bootstrap.js'),
     dependOn: 'lib/deps',
   },
   'plugin/cockpit/app/plugin': {
@@ -21,8 +21,8 @@ let entry = {
   },
 
   /* Tasklist */
-  'app/tasklist/camunda-tasklist-ui': {
-    import: path.resolve(__dirname, 'ui/tasklist/client/scripts/camunda-tasklist-ui.js'),
+  'app/tasklist/camunda-tasklist-bootstrap': {
+    import: path.resolve(__dirname, 'ui/tasklist/client/scripts/camunda-tasklist-bootstrap.js'),
     dependOn: 'lib/deps',
   },
   'plugin/tasklist/app/plugin': {
@@ -31,8 +31,8 @@ let entry = {
   },
 
   /* Admin */
-  'app/admin/camunda-admin-ui': {
-    import: path.resolve(__dirname, 'ui/admin/client/scripts/camunda-admin-ui.js'),
+  'app/admin/camunda-admin-bootstrap': {
+    import: path.resolve(__dirname, 'ui/admin/client/scripts/camunda-admin-bootstrap.js'),
     dependOn: 'lib/deps',
   },
   'plugin/admin/app/plugin': {
@@ -41,8 +41,8 @@ let entry = {
   },
 
   /* Welcome */
-  'app/welcome/camunda-welcome-ui': {
-    import: path.resolve(__dirname, 'ui/welcome/client/scripts/camunda-welcome-ui.js'),
+  'app/welcome/camunda-welcome-bootstrap': {
+    import: path.resolve(__dirname, 'ui/welcome/client/scripts/camunda-welcome-bootstrap.js'),
     dependOn: 'lib/deps',
   },
 
@@ -52,10 +52,6 @@ let entry = {
   },
   'lib/ngDefine': {
     import: path.resolve(__dirname, 'ui/common/lib/ngDefine.js'),
-    dependOn: 'lib/deps',
-  },
-  'lib/requirejs': {
-    import: path.resolve(__dirname, 'ui/common/lib/requirejs.js'),
     dependOn: 'lib/deps',
   },
   'lib/deps': [
@@ -115,6 +111,16 @@ let optimization = {};
 
 let rules = [
   {
+    test: /(\.js)|(\.html)$/,
+    loader: 'string-replace-loader',
+    options: {
+      multiple: [{
+        search: /\$CACHE_BUST/g,
+        replace: new Date().getTime().toString()
+      }]
+    }
+  },
+  {
     test: /\.html$/,
     loader: 'string-replace-loader',
     options: {
@@ -144,8 +150,7 @@ let rules = [
   {
     test: /\.less$/i,
     use: [
-      // compiles Less to CSS
-      'style-loader',
+      MiniCssExtractPlugin.loader,
       'css-loader',
       'less-loader',
     ],
@@ -251,7 +256,6 @@ module.exports = (_env, argv = {}) => {
           exclude: /scripts\/config\.js/,
         }),
       ],
-      runtimeChunk: 'single',
       ...optimization,
     };
   }
@@ -289,8 +293,8 @@ module.exports = (_env, argv = {}) => {
     output: {
       library: '[name]',
       libraryTarget: 'umd',
-      filename: '[name].js',
-      assetModuleFilename: 'assets/[name]-[hash][ext]',
+      filename: '[name].js?bust=[hash]',
+      assetModuleFilename: 'assets/[name][ext]?bust=[hash]',
       path: path.resolve(__dirname, 'target/webapp'),
       ...output,
     },
@@ -349,7 +353,7 @@ module.exports = (_env, argv = {}) => {
         minify: false,
         template: path.resolve(__dirname, 'ui/cockpit/client/scripts/index.html'),
         filename: 'app/cockpit/index.html',
-        chunks: ['lib/jquery', 'lib/requirejs', 'lib/deps'],
+        chunks: ['lib/jquery', 'lib/deps', 'app/cockpit/camunda-cockpit-bootstrap'],
         favicon: path.resolve(__dirname, 'ui/common/images/favicon.ico'),
         ...htmlPluginOpts,
       }),
@@ -357,7 +361,7 @@ module.exports = (_env, argv = {}) => {
         minify: false,
         template: path.resolve(__dirname, 'ui/tasklist/client/index.html'),
         filename: 'app/tasklist/index.html',
-        chunks: ['lib/jquery', 'lib/requirejs', 'lib/deps'],
+        chunks: ['lib/jquery', 'lib/deps', 'app/tasklist/camunda-tasklist-bootstrap'],
         favicon: path.resolve(__dirname, 'ui/common/images/favicon.ico'),
         ...htmlPluginOpts,
       }),
@@ -365,7 +369,7 @@ module.exports = (_env, argv = {}) => {
         minify: false,
         template: path.resolve(__dirname, 'ui/admin/client/scripts/index.html'),
         filename: 'app/admin/index.html',
-        chunks: ['lib/jquery', 'lib/requirejs', 'lib/deps'],
+        chunks: ['lib/jquery', 'lib/deps', 'app/admin/camunda-admin-bootstrap'],
         favicon: path.resolve(__dirname, 'ui/common/images/favicon.ico'),
         ...htmlPluginOpts,
       }),
@@ -373,17 +377,16 @@ module.exports = (_env, argv = {}) => {
         minify: false,
         template: path.resolve(__dirname, 'ui/welcome/client/scripts/index.html'),
         filename: 'app/welcome/index.html',
-        chunks: ['lib/jquery', 'lib/requirejs', 'lib/deps'],
+        chunks: ['lib/jquery', 'lib/deps', 'app/welcome/camunda-welcome-bootstrap'],
         favicon: path.resolve(__dirname, 'ui/common/images/favicon.ico'),
         ...htmlPluginOpts,
       }),
       new HtmlNoncePlugin(),
-      /*new MiniCssExtractPlugin({
+      new MiniCssExtractPlugin({
         // both options are optional, similar to the same options in webpackOptions.output
-        filename: isDevMode ? '[name].css' : '[name].[hash].css',
-        chunkFilename: isDevMode ? '[id].css' : '[id].[hash].css',
-      }),*/
-      new webpack.HotModuleReplacementPlugin(),
+        filename: '[name].css?bust=[hash]',
+        chunkFilename: '[id].css?bust=[hash]',
+      }),
       new webpack.DefinePlugin({
         // define custom global variables
         TEST_MODE: isTestMode,

@@ -17,6 +17,8 @@
 
 'use strict';
 
+import 'ui/tasklist/plugins/styles.less';
+
 var angular = require('angular'),
   standaloneTask = require('./standaloneTask/app/plugin'),
   tasklistCard = require('./tasklistCard/app/plugin'),

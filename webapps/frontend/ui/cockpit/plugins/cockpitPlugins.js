@@ -17,6 +17,8 @@
 
 'use strict';
 
+import 'ui/cockpit/plugins/styles.less';
+
 var angular = require('angular'),
   base = require('./base/app/plugin'),
   decisionList = require('./decisionList/app/plugin'),

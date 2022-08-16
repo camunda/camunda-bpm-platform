@@ -17,9 +17,6 @@
 
 'use strict';
 
-import '../styles/styles.less';
-import 'ui/admin/plugins/styles.less';
-
 if (process.env.NODE_ENV === 'development') {
   require("../../../common/scripts/util/dev-setup").setupDev();
 }
