@@ -85,8 +85,14 @@
 
     <dependency>
       <groupId>com.github.tomakehurst</groupId>
-      <artifactId>wiremock-standalone</artifactId>
+      <artifactId>wiremock-jre8-standalone</artifactId>
       <scope>test</scope>
+    </dependency>
+
+    <!-- required for wiremock-jre8-standalone - see CAM-14755 -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-jdk14</artifactId>
     </dependency>
 
     <dependency>
