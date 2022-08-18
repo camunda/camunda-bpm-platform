@@ -18,6 +18,8 @@ package org.camunda.bpm.engine.batch;
 
 import org.camunda.bpm.engine.query.Query;
 
+import java.util.Date;
+
 public interface BatchStatisticsQuery extends Query<BatchStatisticsQuery, BatchStatistics> {
 
   /**
@@ -41,6 +43,18 @@ public interface BatchStatisticsQuery extends Query<BatchStatisticsQuery, BatchS
 
   /** Only selects batches which are suspended **/
   BatchStatisticsQuery suspended();
+
+  /** Only selects batches which have this createUserId **/
+  BatchStatisticsQuery createUserId(String createUserId);
+
+  /** Only select historic activity instances that were started before the given date. */
+  BatchStatisticsQuery startedBefore(Date date);
+
+  /** Only select historic activity instances that were started after the given date. */
+  BatchStatisticsQuery startedAfter(Date date);
+
+  /** Only selects batches that either do or don't have failed jobs **/
+  BatchStatisticsQuery hasFailure(boolean hasFailure);
 
   /**
    * Returns batch statistics sorted by batch id; must be followed by an invocation of {@link #asc()} or {@link #desc()}.

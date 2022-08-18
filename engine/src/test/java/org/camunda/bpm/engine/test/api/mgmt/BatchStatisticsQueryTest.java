@@ -639,6 +639,118 @@ public class BatchStatisticsQueryTest {
     );
   }
 
+  @Test
+  public void testStatisticsQueryByFailures() {
+    // given
+    Batch batch1 = helper.migrateProcessInstancesAsync(2);
+    Batch batch2 = helper.migrateProcessInstancesAsync(1);
+    helper.executeSeedJob(batch1);
+    helper.executeSeedJob(batch2);
+    helper.failExecutionJobs(batch1, 1);
+
+    // when
+    final long total = managementService.createBatchStatisticsQuery().count();
+    BatchStatisticsQuery queryWithFailures = managementService.createBatchStatisticsQuery().hasFailure(true);
+    BatchStatisticsQuery queryWithoutFailures = managementService.createBatchStatisticsQuery().hasFailure(false);
+
+    // then
+    assertThat(total).isEqualTo(2);
+
+    final List<BatchStatistics> batchWithFailures = queryWithFailures.list();
+    assertThat(batchWithFailures).hasSize(1);
+    assertThat(queryWithFailures.count()).isEqualTo(1);
+    final BatchStatistics batch1Statistics = batchWithFailures.get(0);
+    assertThat(batch1Statistics.getId()).isEqualTo(batch1.getId());
+    assertThat(batch1Statistics.getFailedJobs()).isEqualTo(1);
+    assertThat(batch1Statistics.getTotalJobs()).isEqualTo(2);
+
+    final List<BatchStatistics> batchWithoutFailures = queryWithoutFailures.list();
+    assertThat(batchWithoutFailures).hasSize(1);
+    assertThat(queryWithoutFailures.count()).isEqualTo(1);
+    final BatchStatistics batch2Statistics = batchWithoutFailures.get(0);
+    assertThat(batch2Statistics.getId()).isEqualTo(batch2.getId());
+    assertThat(batch2Statistics.getFailedJobs()).isZero();
+    assertThat(batch2Statistics.getTotalJobs()).isEqualTo(1);
+  }
+
+  @Test
+  public void testStatisticsQueryByStartedAfter() {
+    // given
+    final long oneMin = 60 * 1000L;
+    ClockUtil.setCurrentTime(ClockUtil.getCurrentTime());
+    final Date oneMinLater = new Date(ClockUtil.getCurrentTime().getTime() + oneMin);
+    final Date oneMinEarlier= new Date(ClockUtil.getCurrentTime().getTime() - oneMin);
+    final Batch batch = helper.migrateProcessInstancesAsync(1);
+
+    // when
+    BatchStatisticsQuery query1 = managementService.createBatchStatisticsQuery().startedAfter(oneMinEarlier);
+    BatchStatisticsQuery query2 = managementService.createBatchStatisticsQuery().startedAfter(oneMinLater);
+
+    // then
+    final List<BatchStatistics> batchStatistics = query1.list();
+    assertThat(batchStatistics.get(0).getId()).isEqualTo(batch.getId());
+    assertThat(batchStatistics.get(0).getStartTime()).isEqualToIgnoringMillis(ClockUtil.getCurrentTime());
+    assertThat(batchStatistics).hasSize(1);
+    assertThat(query1.count()).isEqualTo(1);
+
+    assertThat(query2.count()).isEqualTo(0);
+    assertThat(query2.list()).hasSize(0);
+  }
+
+  @Test
+  public void testStatisticsQueryByStartedBefore() {
+    // given
+    final long oneMin = 60 * 1000L;
+    ClockUtil.setCurrentTime(ClockUtil.getCurrentTime());
+    final Date oneMinLater = new Date(ClockUtil.getCurrentTime().getTime() + oneMin);
+    final Date oneMinEarlier= new Date(ClockUtil.getCurrentTime().getTime() - oneMin);
+    final Batch batch = helper.migrateProcessInstancesAsync(1);
+
+    // when
+    BatchStatisticsQuery query1 = managementService.createBatchStatisticsQuery().startedBefore(oneMinEarlier);
+    BatchStatisticsQuery query2 = managementService.createBatchStatisticsQuery().startedBefore(oneMinLater);
+
+    // then
+    assertThat(query1.count()).isEqualTo(0);
+    assertThat(query1.list()).hasSize(0);
+
+    final List<BatchStatistics> batchStatistics = query2.list();
+    assertThat(batchStatistics.get(0).getId()).isEqualTo(batch.getId());
+    assertThat(batchStatistics.get(0).getStartTime()).isEqualToIgnoringMillis(ClockUtil.getCurrentTime());
+    assertThat(batchStatistics).hasSize(1);
+    assertThat(query2.count()).isEqualTo(1);
+  }
+
+  @Test
+  public void testStatisticsQueryByCreateUserId() {
+    // given
+    engineRule.getIdentityService().setAuthenticatedUserId("user1");
+    final Batch batch1 = helper.migrateProcessInstancesAsync(1);
+    engineRule.getIdentityService().setAuthenticatedUserId("user2");
+    final Batch batch2 = helper.migrateProcessInstancesAsync(1);
+
+    // when
+    BatchStatisticsQuery query1 = managementService.createBatchStatisticsQuery().createUserId("user1");
+    BatchStatisticsQuery query2 = managementService.createBatchStatisticsQuery().createUserId("user2");
+    BatchStatisticsQuery query3 = managementService.createBatchStatisticsQuery().createUserId("user3");
+
+    // then
+    final BatchStatistics user1Batch = query1.list().get(0);
+    assertThat(user1Batch.getId()).isEqualTo(batch1.getId());
+    assertThat(user1Batch.getCreateUserId()).isEqualTo(batch1.getCreateUserId());
+    assertThat(query1.list()).hasSize(1);
+    assertThat(query1.count()).isEqualTo(1);
+
+    final BatchStatistics user2Batch = query2.list().get(0);
+    assertThat(user2Batch.getId()).isEqualTo(batch2.getId());
+    assertThat(user2Batch.getCreateUserId()).isEqualTo(batch2.getCreateUserId());
+    assertThat(query2.list()).hasSize(1);
+    assertThat(query2.count()).isEqualTo(1);
+
+    assertThat(query3.list()).hasSize(0);
+    assertThat(query3.count()).isEqualTo(0);
+  }
+
   protected void deleteMigrationJobs(Batch batch) {
     for (Job migrationJob: helper.getExecutionJobs(batch)) {
       managementService.deleteJob(migrationJob.getId());

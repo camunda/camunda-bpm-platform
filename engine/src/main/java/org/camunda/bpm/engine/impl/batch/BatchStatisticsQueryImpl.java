@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.impl.batch;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
+import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.batch.BatchStatistics;
@@ -38,6 +39,10 @@ public class BatchStatisticsQueryImpl extends AbstractQuery<BatchStatisticsQuery
   protected boolean isTenantIdSet = false;
   protected String[] tenantIds;
   protected SuspensionState suspensionState;
+  protected String createUserId;
+  protected Date startedBefore;
+  protected Date startedAfter;
+  protected Boolean hasFailure;
 
   public BatchStatisticsQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
@@ -91,6 +96,30 @@ public class BatchStatisticsQueryImpl extends AbstractQuery<BatchStatisticsQuery
 
   public BatchStatisticsQuery suspended() {
     this.suspensionState = SuspensionState.SUSPENDED;
+    return this;
+  }
+
+  @Override
+  public BatchStatisticsQuery createUserId(final String createUserId) {
+    this.createUserId = createUserId;
+    return this;
+  }
+
+  @Override
+  public BatchStatisticsQuery startedBefore(final Date date) {
+    this.startedBefore = date;
+    return this;
+  }
+
+  @Override
+  public BatchStatisticsQuery startedAfter(final Date date) {
+    this.startedAfter = date;
+    return this;
+  }
+
+  @Override
+  public BatchStatisticsQuery hasFailure(boolean hasFailure) {
+    this.hasFailure = hasFailure;
     return this;
   }
 

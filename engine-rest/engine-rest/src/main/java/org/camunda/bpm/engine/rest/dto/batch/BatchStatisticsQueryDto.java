@@ -20,6 +20,7 @@ import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +31,7 @@ import org.camunda.bpm.engine.batch.BatchStatisticsQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
+import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -45,6 +47,10 @@ public class BatchStatisticsQueryDto extends AbstractQueryDto<BatchStatisticsQue
   protected List<String> tenantIds;
   protected Boolean withoutTenantId;
   protected Boolean suspended;
+  protected String createUserId;
+  protected Date startedBefore;
+  protected Date startedAfter;
+  protected Boolean hasFailure;
 
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
@@ -83,6 +89,26 @@ public class BatchStatisticsQueryDto extends AbstractQueryDto<BatchStatisticsQue
     this.suspended = suspended;
   }
 
+  @CamundaQueryParam(value="createUserId")
+  public void setCreateUserId(String createUserId) {
+    this.createUserId = createUserId;
+  }
+
+  @CamundaQueryParam(value = "startedBefore", converter = DateConverter.class)
+  public void setStartedBefore(Date startedBefore) {
+    this.startedBefore = startedBefore;
+  }
+
+  @CamundaQueryParam(value = "startedAfter", converter = DateConverter.class)
+  public void setStartedAfter(Date startedAfter) {
+    this.startedAfter = startedAfter;
+  }
+
+  @CamundaQueryParam(value = "hasFailure", converter = BooleanConverter.class)
+  public void setHasFailure(final Boolean hasFailure) {
+    this.hasFailure = hasFailure;
+  }
+
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
   }
@@ -109,6 +135,21 @@ public class BatchStatisticsQueryDto extends AbstractQueryDto<BatchStatisticsQue
     }
     if (FALSE.equals(suspended)) {
       query.active();
+    }
+    if (createUserId != null) {
+      query.createUserId(createUserId);
+    }
+    if (startedBefore != null) {
+      query.startedBefore(startedBefore);
+    }
+    if (startedAfter != null) {
+      query.startedAfter(startedAfter);
+    }
+    if (TRUE.equals(hasFailure)) {
+      query.hasFailure(true);
+    }
+    if (FALSE.equals(hasFailure)) {
+      query.hasFailure(false);
     }
   }
 
