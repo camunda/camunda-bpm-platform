@@ -133,6 +133,8 @@ pipeline {
           },
           postFailure: {
             cambpmPublishTestResult()
+            // archive any heap dumps generated in the target folder
+            cambpmArchiveArtifacts(false, '**/target/*.hprof')
           }
         ])
 
