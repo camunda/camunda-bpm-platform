@@ -34,7 +34,7 @@ var angular = require('../../camunda-bpm-sdk-js/vendor/angular'),
   widgets = require('./widgets/index'),
   dateFilter = require('./filter/date/index');
 
-require('../vendor/ui-bootstrap-tpls-2.5.0-camunda');
+require('angular-ui-bootstrap');
 require('angular-translate');
 require('angular-cookies');
 require('angular-animate');

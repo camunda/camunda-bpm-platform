@@ -29,7 +29,7 @@ var angular = require('../../../camunda-bpm-sdk-js/vendor/angular'),
   instantTypeahead = require('./instantTypeahead'),
   util = require('../util/index');
 
-require('../../vendor/ui-bootstrap-tpls-2.5.0-camunda');
+require('angular-ui-bootstrap');
 
 var directivesModule = angular.module('camunda.common.directives', [
   'ui.bootstrap',

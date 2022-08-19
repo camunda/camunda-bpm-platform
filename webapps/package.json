@@ -57,10 +57,11 @@
     "moment": "2.29.3",
     "mousetrap": "1.6.5",
     "q": "1.5.1",
-    "regenerator-runtime": "0.13.9",
     "requirejs": "2.3.6",
     "requirejs-angular-define": "https://github.com/camunda/requirejs-angular-define.git#aaa450a66e4d1a0588819804e1098c541bed585d",
-    "superagent": "4.1.0"
+    "superagent": "4.1.0",
+    "core-js": "3.12.1",
+    "angular-ui-bootstrap": "2.5.6"
   },
   "devDependencies": {
     "@babel/core": "7.14.3",
@@ -71,7 +72,6 @@
     "browserify": "17.0.0",
     "chai": "4.3.4",
     "chai-as-promised": "7.1.1",
-    "core-js": "3.12.1",
     "envify": "4.1.0",
     "eslint": "7.26.0",
     "eslint-config-prettier": "8.3.0",
@@ -110,7 +110,7 @@
     "source-map": "0.7.3",
     "stylelint": "13.13.1",
     "stylelint-config-standard": "22.0.0",
-    "terser": "5.7.0",
+    "terser": "5.14.2",
     "watchify": "4.0.0",
     "xunit-file": "1.0.0"
   },

@@ -17,6 +17,7 @@
 
 const terser = require('terser');
 const abbreviateNumber = require('../../camunda-commons-ui/lib/filter/abbreviateNumber')();
+const path = require('path');
 
 function getBinarySize(string) {
   return Buffer.byteLength(string, 'utf8');
@@ -37,7 +38,23 @@ module.exports = function(grunt) {
           return src;
         }, {});
 
-        const minified = await terser.minify(original);
+        const licenses = new Set();
+        const minified = await terser.minify(original, {
+          format: {
+            comments: (astNode, comment) => {
+              const hasLicense =
+                /^\**!/i.test(comment.value) || // include license headers with a leading ! (e.g., moment.js)
+                (/@license|@preserve|@lic|@cc_on/i.test(comment.value) &&
+                  'comment2' === comment.type);
+
+              if (hasLicense) {
+                licenses.add(comment.value);
+              }
+              return false;
+            }
+          }
+        });
+
         if (minified.error) {
           grunt.log.error(minified.error);
           return false;
@@ -45,7 +62,24 @@ module.exports = function(grunt) {
         if (minified.warnings) {
           grunt.log.warn(minified.warnings.join('\n'));
         }
-        grunt.file.write(file.dest, minified.code);
+
+        if (licenses.size > 0) {
+          const filename = path.parse(file.dest).base;
+          grunt.file.write(
+            file.dest,
+            `/*! For license information, please see ${filename}.LICENSE.txt */\n${minified.code}`
+          );
+
+          grunt.file.write(
+            `${file.dest}.LICENSE.txt`,
+            Array.from(licenses)
+              .map(license => `/*${license}*/\n\n`)
+              .join('')
+          );
+        } else {
+          grunt.file.write(file.dest, minified.code);
+        }
+
         finalSize += getBinarySize(minified.code);
         fileCounter++;
       })
