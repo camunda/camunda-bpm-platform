@@ -58,6 +58,7 @@ var included = [
   'dmn-moddle',
   'dom4',
   'events',
+  'fast-xml-parser',
   'jquery',
   'jquery/external/sizzle/dist/sizzle',
   'jquery-ui/ui/data',

@@ -63,9 +63,12 @@ module.exports = function(grunt) {
           grunt.log.warn(minified.warnings.join('\n'));
         }
 
-        if (licenses.size > 0 ) {
+        if (licenses.size > 0) {
           const filename = path.parse(file.dest).base;
-          grunt.file.write(file.dest, `/*! For license information please see ${filename}.LICENSE.txt */\n${minified.code}`);
+          grunt.file.write(
+            file.dest,
+            `/*! For license information, please see ${filename}.LICENSE.txt */\n${minified.code}`
+          );
 
           grunt.file.write(
             `${file.dest}.LICENSE.txt`,
@@ -75,7 +78,6 @@ module.exports = function(grunt) {
           );
         } else {
           grunt.file.write(file.dest, minified.code);
-
         }
 
         finalSize += getBinarySize(minified.code);
