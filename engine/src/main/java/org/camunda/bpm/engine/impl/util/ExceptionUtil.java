@@ -303,7 +303,13 @@ public class ExceptionUtil {
   }
 
   public static boolean checkDeadlockException(SQLException sqlException) {
-    String sqlState = sqlException.getSQLState().toUpperCase();
+    String sqlState = sqlException.getSQLState();
+    if (sqlState != null) {
+      sqlState = sqlState.toUpperCase();
+    } else {
+      return false;
+    }
+    
     int errorCode = sqlException.getErrorCode();
 
     return MARIADB_MYSQL.equals(errorCode, sqlState) ||
