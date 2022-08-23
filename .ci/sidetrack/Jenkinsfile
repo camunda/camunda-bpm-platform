@@ -32,7 +32,7 @@ pipeline {
     stage('Prepare') {
       when {
         expression {
-          cambpmWithLabels('upstream')
+          return params.TRIGGERED_BY_UPSTREAM
         }
       }
       steps {
