@@ -63,6 +63,7 @@ public class ProcessDataContext {
   protected String mdcPropertyDefinitionKey;
   protected String mdcPropertyInstanceId;
   protected String mdcPropertyTenantId;
+  protected String mdcPropertyEngineName;
 
   protected boolean handleMdc = false;
 
@@ -94,6 +95,7 @@ public class ProcessDataContext {
     mdcPropertyDefinitionKey = initProperty(configuration::getLoggingContextProcessDefinitionKey);
     mdcPropertyInstanceId = initProperty(configuration::getLoggingContextProcessInstanceId);
     mdcPropertyTenantId = initProperty(configuration::getLoggingContextTenantId);
+    mdcPropertyEngineName = initProperty(configuration::getLoggingContextEngineName);
 
     handleMdc = !mdcDataStacks.isEmpty();
 
@@ -146,6 +148,7 @@ public class ProcessDataContext {
     addToStack(execution.getProcessDefinitionId(), mdcPropertyDefinitionId);
     addToStack(execution.getProcessInstanceId(), mdcPropertyInstanceId);
     addToStack(execution.getTenantId(), mdcPropertyTenantId);
+    addToStack(execution.getProcessEngine().getName(), mdcPropertyEngineName);
 
     if (isNotBlank(mdcPropertyApplicationName)) {
       ProcessApplicationReference currentPa = Context.getCurrentProcessApplication();
@@ -160,6 +163,10 @@ public class ProcessDataContext {
 
     if (isNotBlank(mdcPropertyDefinitionKey)) {
       addToStack(execution.getProcessDefinition().getKey(), mdcPropertyDefinitionKey);
+    }
+
+    if(isNotBlank(mdcPropertyEngineName)) {
+      addToStack(execution.getProcessEngine().getName(), mdcPropertyEngineName);
     }
 
     sections.sealCurrentSection();
