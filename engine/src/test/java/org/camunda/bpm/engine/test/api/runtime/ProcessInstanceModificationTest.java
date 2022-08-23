@@ -1511,6 +1511,41 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTest 
     }
   }
 
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/concurrentExecutionVariable.bpmn20.xml")
+  public void shouldNotDeleteVariablesWhenConcurrentExecution() {
+    // given process with user task
+    String processInstanceId = runtimeService.createProcessInstanceByKey("process")
+        .setVariable("featureIssueId", 178825)
+        .setVariable("implementationCategory", "category-value")
+        .startBeforeActivity("Implement_feature")
+        .execute()
+        .getId();
+
+    // process variables are there
+    assertThat(runtimeService.getVariable(processInstanceId, "featureIssueId"))
+        .isEqualTo(178825);
+    assertThat(runtimeService.getVariable(processInstanceId, "implementationCategory"))
+        .isEqualTo("category-value");
+    assertThat(runtimeService.getVariable(processInstanceId, "implementationIssue"))
+        .isNull();
+
+    // when: triggering script task that will set `issueId`
+    runtimeService.createProcessInstanceModification(processInstanceId)
+        .startBeforeActivity("Set_issue_id")
+        .execute();
+
+    // then
+    // `implementationIssue` is set by event `Implement_feature_issue_id_set` after `issueId` was set
+    // and the process variables are still available
+    assertThat(runtimeService.getVariable(processInstanceId, "implementationIssue"))
+        .isEqualTo(777);
+    assertThat(runtimeService.getVariable(processInstanceId, "featureIssueId"))
+        .isEqualTo(178825);
+    assertThat(runtimeService.getVariable(processInstanceId, "implementationCategory"))
+        .isEqualTo("category-value");
+  }
+
   // TODO: check if starting with a non-existing activity/transition id is
   // handled properly
 

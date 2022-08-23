@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0luai3l" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.12.0">
+  <bpmn:collaboration id="Collaboration_10hvrux">
+    <bpmn:participant id="DAV-2-POC-1" name="DAV-2 POC-1" processRef="process" />
+  </bpmn:collaboration>
+  <bpmn:process id="process" name="process" isExecutable="true">
+    <bpmn:endEvent id="End_setting_impl_issue" name="End setting implementationIssue">
+      <bpmn:incoming>Flow_14ux7cc</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:startEvent id="StartEvent_1" name="Start feature development process">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="featureIssueId" label="Issue Id" type="long" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_1f9as0w</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0ai3cua</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="Implement_feature" name="User task">
+      <bpmn:incoming>Flow_1f9as0w</bpmn:incoming>
+      <bpmn:outgoing>Flow_05os606</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="Event_01w4qys">
+      <bpmn:incoming>Flow_05os606</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:boundaryEvent id="Implement_feature_issue_id_set" name="`issue ID`&#10;is set" cancelActivity="false" attachedToRef="Implement_feature">
+      <bpmn:outgoing>Flow_14ux7cc</bpmn:outgoing>
+      <bpmn:conditionalEventDefinition id="ConditionalEventDefinition_0z87gtz" camunda:variableName="issueId">
+        <bpmn:condition xsi:type="bpmn:tFormalExpression" language="groovy">def issueId = execution.getVariable("issueId")
+def implIssueId = execution.getVariable("implementationIssue")
+
+if (issueId != null &amp;&amp; implIssueId == null) {
+   execution.setVariable("implementationIssue", issueId)
+}
+issueId != null &amp;&amp; implIssueId == null</bpmn:condition>
+      </bpmn:conditionalEventDefinition>
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_05os606" sourceRef="Implement_feature" targetRef="Event_01w4qys" />
+    <bpmn:sequenceFlow id="Flow_1f9as0w" sourceRef="StartEvent_1" targetRef="Implement_feature" />
+    <bpmn:sequenceFlow id="Flow_14ux7cc" sourceRef="Implement_feature_issue_id_set" targetRef="End_setting_impl_issue" />
+    <bpmn:sequenceFlow id="Flow_1kyfq17" sourceRef="Set_issue_id" targetRef="Event_1eny26q" />
+    <bpmn:sequenceFlow id="Flow_1jcqeoj" sourceRef="Event_0ihnopt" targetRef="Set_issue_id" />
+    <bpmn:endEvent id="Event_1eny26q">
+      <bpmn:incoming>Flow_1kyfq17</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:scriptTask id="Set_issue_id" name="Set `issue ID`" scriptFormat="groovy">
+      <bpmn:incoming>Flow_1jcqeoj</bpmn:incoming>
+      <bpmn:outgoing>Flow_1kyfq17</bpmn:outgoing>
+      <bpmn:script>execution.setVariable("issueId", 777)</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:intermediateCatchEvent id="Event_0ihnopt" name="Clock message">
+      <bpmn:incoming>Flow_0ai3cua</bpmn:incoming>
+      <bpmn:outgoing>Flow_1jcqeoj</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_01rnnkn">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT10S</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:sequenceFlow id="Flow_0ai3cua" sourceRef="StartEvent_1" targetRef="Event_0ihnopt" />
+  </bpmn:process>
+  <bpmn:message id="Message_0go5523" name="Message_0in1nes" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_10hvrux">
+      <bpmndi:BPMNShape id="Participant_1t2vhkx_di" bpmnElement="DAV-2-POC-1" isHorizontal="true">
+        <dc:Bounds x="190" y="110" width="470" height="430" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_05os606_di" bpmnElement="Flow_05os606">
+        <di:waypoint x="520" y="210" />
+        <di:waypoint x="602" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1f9as0w_di" bpmnElement="Flow_1f9as0w">
+        <di:waypoint x="278" y="210" />
+        <di:waypoint x="420" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_14ux7cc_di" bpmnElement="Flow_14ux7cc">
+        <di:waypoint x="420" y="268" />
+        <di:waypoint x="420" y="312" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1kyfq17_di" bpmnElement="Flow_1kyfq17">
+        <di:waypoint x="470" y="460" />
+        <di:waypoint x="602" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1jcqeoj_di" bpmnElement="Flow_1jcqeoj">
+        <di:waypoint x="278" y="460" />
+        <di:waypoint x="370" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ai3cua_di" bpmnElement="Flow_0ai3cua">
+        <di:waypoint x="260" y="228" />
+        <di:waypoint x="260" y="442" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_0dnfnr5_di" bpmnElement="End_setting_impl_issue">
+        <dc:Bounds x="402" y="312" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="378" y="355" width="84" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="242" y="192" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="228" y="142" width="64" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0l48mtv_di" bpmnElement="Implement_feature">
+        <dc:Bounds x="420" y="170" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_01w4qys_di" bpmnElement="Event_01w4qys">
+        <dc:Bounds x="602" y="192" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1eny26q_di" bpmnElement="Event_1eny26q">
+        <dc:Bounds x="602" y="442" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Send_clock_signal_di" bpmnElement="Set_issue_id">
+        <dc:Bounds x="370" y="420" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0ennj85_di" bpmnElement="Event_0ihnopt">
+        <dc:Bounds x="242" y="442" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="224" y="485" width="76" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_13x4yrh_di" bpmnElement="Implement_feature_issue_id_set">
+        <dc:Bounds x="402" y="232" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="357" y="266" width="48" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
