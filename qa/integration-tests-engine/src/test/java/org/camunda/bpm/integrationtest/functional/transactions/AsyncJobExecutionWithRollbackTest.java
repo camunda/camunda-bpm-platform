@@ -19,16 +19,12 @@ package org.camunda.bpm.integrationtest.functional.transactions;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.util.HashMap;
-
 import javax.inject.Inject;
 
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.integrationtest.functional.transactions.beans.FailingTransactionListenerDelegate;
-import org.camunda.bpm.integrationtest.functional.transactions.beans.GetVersionInfoDelegate;
-import org.camunda.bpm.integrationtest.functional.transactions.beans.UpdateRouterConfiguration;
+import org.camunda.bpm.integrationtest.functional.transactions.beans.TransactionRollbackDelegate;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -37,17 +33,20 @@ import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+/**
+ * This test class ensures that when a UserTransaction is explicitly marked as ROLLBACK_ONLY,
+ * and this code is executed within a Job, then the transaction is rolled back, and the job
+ * execution is marked as failed, reducing the job retries.
+ */
 @RunWith(Arquillian.class)
-public class AsyncJobExecutionTest extends AbstractFoxPlatformIntegrationTest {
+public class AsyncJobExecutionWithRollbackTest extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment
   public static WebArchive processArchive() {
     return initWebArchiveDeployment()
-            .addClass(GetVersionInfoDelegate.class)
-            .addClass(UpdateRouterConfiguration.class)
-            .addClass(FailingTransactionListenerDelegate.class)
-            .addAsResource("org/camunda/bpm/integrationtest/functional/transactions/AsyncJobExecutionTest.testAsyncServiceTasks.bpmn20.xml")
-            .addAsResource("org/camunda/bpm/integrationtest/functional/transactions/AsyncJobExecutionTest.failingTransactionListener.bpmn20.xml")
+            .addClass(TransactionRollbackDelegate.class)
+            .addAsResource("org/camunda/bpm/integrationtest/functional/transactions/AsyncJobExecutionWithRollbackTest.transactionRollbackInServiceTask.bpmn20.xml")
+            .addAsResource("org/camunda/bpm/integrationtest/functional/transactions/AsyncJobExecutionWithRollbackTest.transactionRollbackInServiceTaskWithCustomRetryCycle.bpmn20.xml")
             .addAsWebInfResource("persistence.xml", "classes/META-INF/persistence.xml");
   }
 
@@ -62,24 +61,28 @@ public class AsyncJobExecutionTest extends AbstractFoxPlatformIntegrationTest {
   }
 
   @Test
-  public void shouldExecuteAsyncServiceTasks() {
+  public void shouldRollbackTransactionInServiceTask() throws Exception {
     // given
-    HashMap<String, Object> variables = new HashMap<>();
-    variables.put("serialnumber", "23");
-    runtimeService.startProcessInstanceByKey("configure-router", variables);
+    runtimeService.startProcessInstanceByKey("txRollbackServiceTask");
 
     // when
-    // all jobs are executed
-    waitForJobExecutorToProcessAllJobs();
+    // the job is executed
+    waitForJobExecutorToProcessAllJobs(10000);
 
     // then
-    // there are no failures
+    // the job exists with no retries, and an incident is raised
+    Job job = managementService.createJobQuery().singleResult();
+
+    assertNotNull(job);
+    assertEquals(0, job.getRetries());
+    assertNotNull(job.getExceptionMessage());
+    assertNotNull(managementService.getJobExceptionStacktrace(job.getId()));
   }
 
   @Test
-  public void shouldFailJobWithFailingTransactionListener() throws Exception {
+  public void shouldRollbackTransactionInServiceTaskWithCustomRetryCycle() throws Exception {
     // given
-    runtimeService.startProcessInstanceByKey("failingTransactionListener");
+    runtimeService.startProcessInstanceByKey("txRollbackServiceTaskWithCustomRetryCycle");
 
     // when
     waitForJobExecutorToProcessAllJobs(10000);
