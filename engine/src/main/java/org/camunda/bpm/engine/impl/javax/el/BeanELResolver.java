@@ -22,10 +22,14 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -482,7 +486,7 @@ public class BeanELResolver extends ELResolver {
 				params = new Object[0];
 			}
 			String name = method.toString();
-			Method target = findMethod(base, name, paramTypes, params.length);
+			Method target = findMethod(base, name, paramTypes, params);
 			if (target == null) {
 				throw new MethodNotFoundException("Cannot find method " + name + " with " + params.length + " parameters in " + base.getClass());
 			}
@@ -498,18 +502,32 @@ public class BeanELResolver extends ELResolver {
 		return result;
 	}
 
-  private Method findMethod(Object base, String name, Class<?>[] types, int paramCount) {
+  private Method findMethod(Object base, String name, Class<?>[] types, Object[] params) {
+		boolean hasTypesInitially = types != null;
+		if (!hasTypesInitially) {
+			Set<Class<?>> detectedTypes = new HashSet<>();
+			Arrays.stream(params)
+					.filter(Objects::nonNull)
+					.forEach(param -> detectedTypes.add(param.getClass()));
+
+			if (!detectedTypes.isEmpty()) {
+				types = detectedTypes.toArray(new Class<?>[0]);
+			}
+		}
 		if (types != null) {
 			try {
 				return findAccessibleMethod(base.getClass().getMethod(name, types));
 			} catch (NoSuchMethodException e) {
-				return null;
+				if (hasTypesInitially) {
+					return null;
+				}
 			}
 		}
 		Method varArgsMethod = null;
 		for (Method method : base.getClass().getMethods()) {
 			if (method.getName().equals(name)) {
 				int formalParamCount = method.getParameterTypes().length;
+				int paramCount = params.length;
 				if (method.isVarArgs() && paramCount >= formalParamCount - 1) {
 					varArgsMethod = method;
 				} else if (paramCount == formalParamCount) {
