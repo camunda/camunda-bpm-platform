@@ -100,7 +100,8 @@ public class TelemetryConnectPluginTest extends AbstractFoxPlatformIntegrationTe
         .addAsLibraries(Maven.resolver()
             .offline()
             .loadPomFromFile("pom.xml")
-            .resolve("com.github.tomakehurst:wiremock-standalone")
+            .resolve("com.github.tomakehurst:wiremock-jre8-standalone",
+                     "org.slf4j:slf4j-jdk14") // required to resolve classloading issues in WAS Liberty
             .withTransitivity()
             .as(JavaArchive.class));
 

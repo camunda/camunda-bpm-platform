@@ -41,6 +41,7 @@
     <version.assertj>2.9.1</version.assertj>
     <version.mockito>4.3.1</version.mockito>
     <version.wiremock>1.58</version.wiremock>
+    <version.wiremock-jre8>2.27.2</version.wiremock-jre8>
     <version.testcontainers>1.16.0</version.testcontainers>
 
     <version.commonj>1.1.0</version.commonj>
