@@ -651,30 +651,14 @@
       <properties>
         <!-- Test with Resteasy version used by the oldest
              Camunda-supported Wildfly/JBoss EAP version.
-             Currently this is JBoss EAP 7.0 (3.0.16.Final) and 7.1 (3.0.24.Final). -->
-        <version.resteasy>3.0.16.Final</version.resteasy>
+             Currently, this is JBoss EAP 7.2. -->
+        <version.resteasy>3.6.1.SP2</version.resteasy>
       </properties>
-      <!-- Resteasy 3.0.X is more similar to Resteasy 2.x, so we need to define separate
-           dependencies for testing compatibility with older Wildfly/JBoss versions.
-           We can drop the 'dependencies' and 'build' sections below once we drop support for
-           Resteasy 3.0.X -->
       <dependencies>
         <dependency>
           <groupId>org.jboss.spec.javax.ws.rs</groupId>
-          <artifactId>jboss-jaxrs-api_1.1_spec</artifactId>
+          <artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
           <scope>provided</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.jboss.resteasy</groupId>
-          <artifactId>resteasy-jaxrs</artifactId>
-          <version>${version.resteasy}</version>
-          <scope>test</scope>
-          <exclusions>
-            <exclusion>
-              <artifactId>httpclient</artifactId>
-              <groupId>org.apache.httpcomponents</groupId>
-            </exclusion>
-          </exclusions>
         </dependency>
 
         <dependency>
@@ -686,34 +670,6 @@
       </dependencies>
       <build>
         <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <excludes>
-                <exclude>**/TaskRestServiceInteractionTest.java</exclude>
-                <exclude>**/NoServletEmptyBodyFilterTest.java</exclude>
-                <exclude>**/ServletEmptyBodyFilterTest.java</exclude>
-              </excludes>
-              <redirectTestOutputToFile>true</redirectTestOutputToFile>
-            </configuration>
-            <executions>
-              <execution>
-                <id>encoding-test</id>
-                <phase>test</phase>
-                <goals>
-                  <goal>test</goal>
-                </goals>
-                <configuration>
-                  <argLine>-Dfile.encoding=ISO-8859-1</argLine>
-                  <includes>
-                    <include>**/ProcessDefinitionRestServiceInteractionTest.java</include>
-                    <include>**/ResteasyTaskRestServiceInteractionTest.java</include>
-                  </includes>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>build-helper-maven-plugin</artifactId>
