@@ -9,7 +9,7 @@
     1. Set an environment variable `GITHUB_ACCESS_TOKEN` with your github token
     1. `github-label-sync --dry-run --labels ./.github/pr-labels.yml --allow-added-labels camunda/camunda-bpm-platform`
         * Only remove `--allow-added-labels` when you are really sure. When not set, other labels in the repository will be deleted. There is no way to restore the label assignment to issues once deleted.
-        * Never skip the dry run, it's easy to mess things up here.
+        * **Never** skip the dry run, it's easy to mess things up here.
     1. Review the dry-run output
     1. Run the command again without `--dry-run`
 1. Sync the labels by applying the same procedure with repositories:
