@@ -14,21 +14,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.client.exception;
+package org.camunda.bpm.client.impl;
 
-import java.io.IOException;
+import org.camunda.bpm.client.exception.RestException;
 
-/**
- * <p>Exception is thrown if the connection could not be established</p>
- *
- * @author Tassilo Weidner
- */
-public class ConnectionLostException extends ExternalTaskClientException {
+public class EngineRestExceptionDto {
 
-  private static final long serialVersionUID = 1L;
+  protected String message;
+  protected String type;
+  protected Integer code;
 
-  public ConnectionLostException(String message, IOException e) {
-    super(message, e);
+  public String getMessage() {
+    return message;
+  }
+
+  public void setMessage(String message) {
+    this.message = message;
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
+  }
+
+  public Integer getCode() {
+    return code;
+  }
+
+  public void setCode(Integer code) {
+    this.code = code;
+  }
+
+  public RestException toRestException() {
+    return new RestException(message, type, code);
   }
 
 }

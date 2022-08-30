@@ -17,15 +17,16 @@
 package org.camunda.bpm.client.exception;
 
 /**
- * <p>Exception is thrown in cases not related to the process engine operation.</p>
+ * <p>Exception is thrown in case the HTTP status code is not known by the client.</p>
  *
  * @author Nikola Koevski
  */
-public class UnknownHttpErrorException extends ExternalTaskClientException {
+public class UnknownHttpErrorException extends RestException {
 
   private static final long serialVersionUID = 1L;
 
-  public UnknownHttpErrorException(String message) {
-    super(message);
+  public UnknownHttpErrorException(String message, RestException restException) {
+    super(message, restException);
   }
+
 }

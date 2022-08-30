@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.camunda.bpm.client.exception.EngineException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskHandler;
 import org.camunda.bpm.client.task.ExternalTaskService;
@@ -27,7 +28,7 @@ import org.camunda.bpm.client.task.ExternalTaskService;
 public class RecordingExternalTaskHandler implements ExternalTaskHandler {
 
   protected boolean failed = false;
-  protected Exception exception;
+  protected EngineException exception;
   protected List<ExternalTask> handledTasks = Collections.synchronizedList(new ArrayList<>());
   protected int nextTaskHandler = 0;
   protected final ExternalTaskHandler[] taskHandlers;
@@ -49,7 +50,7 @@ public class RecordingExternalTaskHandler implements ExternalTaskHandler {
 
     try {
       handler.execute(task, externalTaskService);
-    } catch (Exception ex) {
+    } catch (EngineException ex) {
       failed = true;
       exception = ex;
     } finally {
@@ -69,7 +70,7 @@ public class RecordingExternalTaskHandler implements ExternalTaskHandler {
     return failed;
   }
 
-  public Exception getException() {
+  public EngineException getException() {
     return exception;
   }
 

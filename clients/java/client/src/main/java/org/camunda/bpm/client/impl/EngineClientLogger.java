@@ -16,20 +16,19 @@
  */
 package org.camunda.bpm.client.impl;
 
-import java.io.IOException;
-
 import org.apache.http.HttpRequest;
-import org.apache.http.client.HttpResponseException;
+import org.camunda.bpm.client.exception.RestException;
+
+import java.io.IOException;
 
 /**
  * @author Tassilo Weidner
  */
 public class EngineClientLogger extends ExternalTaskClientLogger {
 
-  protected EngineClientException exceptionWhileReceivingResponse(HttpRequest httpRequest, HttpResponseException e) {
+  protected EngineClientException exceptionWhileReceivingResponse(HttpRequest httpRequest, RestException e) {
     return new EngineClientException(exceptionMessage(
-      "001", "Request '{}' returned error: status code '{}' - message: {}",
-      httpRequest, e.getStatusCode(), e.getMessage()), e);
+      "001", "Request '{}' returned error: status code '{}' - message: {}", httpRequest, e.getHttpStatusCode(), e.getMessage()), e);
   }
 
   protected EngineClientException exceptionWhileEstablishingConnection(HttpRequest httpRequest, IOException e) {

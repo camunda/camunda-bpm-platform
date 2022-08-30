@@ -14,21 +14,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.client.exception;
+package org.camunda.bpm.client.task.impl.dto;
 
-import java.io.IOException;
+public class ExceptionResponseDto {
 
-/**
- * <p>Exception is thrown if the connection could not be established</p>
- *
- * @author Tassilo Weidner
- */
-public class ConnectionLostException extends ExternalTaskClientException {
+  protected String type;
+  protected String message;
+  protected Integer code;
 
-  private static final long serialVersionUID = 1L;
+  public String getType() {
+    return type;
+  }
 
-  public ConnectionLostException(String message, IOException e) {
-    super(message, e);
+  public String getMessage() {
+    return message;
+  }
+
+  public void setType(String type) {
+    this.type = type;
+  }
+
+  public void setMessage(String message) {
+    this.message = message;
+  }
+
+  public Integer getCode() {
+    return code;
+  }
+
+  public void setCode(Integer code) {
+    this.code = code;
   }
 
 }

@@ -16,19 +16,13 @@
  */
 package org.camunda.bpm.client.exception;
 
-import java.io.IOException;
-
 /**
- * <p>Exception is thrown if the connection could not be established</p>
- *
- * @author Tassilo Weidner
+ * Thrown when you perform an illegal operation or the given data is invalid.
  */
-public class ConnectionLostException extends ExternalTaskClientException {
+public class BadRequestException extends NotAcquiredException {
 
-  private static final long serialVersionUID = 1L;
-
-  public ConnectionLostException(String message, IOException e) {
-    super(message, e);
+  public BadRequestException(String message, RestException restException) {
+    super(message, restException);
   }
 
 }
