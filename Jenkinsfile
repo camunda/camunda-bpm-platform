@@ -66,7 +66,6 @@ pipeline {
                                   '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*.war',
                                   '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-engine-rest*.war',
                                   '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-example-invoice*.war',
-                                  '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-h2-webapp*.war',
                                   '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-bpm-run-modules-swaggerui-*-run-swaggerui-license-book-json.json')
 
             cambpmStash("platform-stash-runtime",

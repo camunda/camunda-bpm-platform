@@ -69,8 +69,6 @@
 
         <module>qa</module>
 
-        <module>distro/h2-webapp</module>
-
         <module>javaee/ejb-service</module>
         <module>javaee/ejb-client</module>
         <module>javaee/jobexecutor-ra</module>
@@ -152,8 +150,6 @@
       <id>distro-serverless</id>
       <modules>
         <module>qa</module>
-
-        <module>distro/h2-webapp</module>
 
         <module>engine</module>
         <module>engine-cdi</module>
