@@ -33,13 +33,6 @@
         <include>org.camunda.bpm.distro:camunda-sql-scripts:jar:*</include>
       </includes>
     </dependencySet>
-      
-  	<dependencySet>
-  		<includes>
-  			<include>org.camunda.bpm.distro:camunda-h2-webapp:war:*</include>
-  		</includes>
-  		<outputDirectory>server/wildfly-${version.wildfly}/standalone/deployments</outputDirectory>
-  	</dependencySet>
 
     <dependencySet>
         <outputFileNameMapping>${artifact.artifactId}-${artifact.version}.${artifact.extension}</outputFileNameMapping>
