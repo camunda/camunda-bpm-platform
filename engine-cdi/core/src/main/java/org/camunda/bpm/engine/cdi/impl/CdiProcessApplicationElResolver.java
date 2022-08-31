@@ -19,7 +19,7 @@ package org.camunda.bpm.engine.cdi.impl;
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationElResolver;
 import org.camunda.bpm.engine.cdi.impl.el.CdiResolver;
-import org.camunda.bpm.engine.impl.javax.el.ELResolver;
+import jakarta.el.ELResolver;
 
 /**
  * <p>Exposes the CdiResolver in a multiple-applications, shared process engine context.</p>

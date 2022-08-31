@@ -19,11 +19,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.PrintWriter;
 
-import javax.el.ELContext;
-import javax.el.ELException;
-import javax.el.FunctionMapper;
-import javax.el.ValueReference;
-import javax.el.VariableMapper;
+import jakarta.el.ELContext;
+import jakarta.el.ELException;
+import jakarta.el.FunctionMapper;
+import jakarta.el.ValueReference;
+import jakarta.el.VariableMapper;
 
 
 /**
@@ -35,7 +35,7 @@ import javax.el.VariableMapper;
  *
  * @author Christoph Beck
  */
-public final class TreeValueExpression extends javax.el.ValueExpression {
+public final class TreeValueExpression extends jakarta.el.ValueExpression {
 	private static final long serialVersionUID = 1L;
 
 	private final TreeBuilder builder;

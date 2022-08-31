@@ -25,8 +25,8 @@ import org.camunda.bpm.application.impl.EmbeddedProcessApplication;
 import org.camunda.bpm.application.impl.ServletProcessApplication;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.TaskListener;
-import javax.el.BeanELResolver;
-import javax.el.ELResolver;
+import jakarta.el.BeanELResolver;
+import jakarta.el.ELResolver;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 
 /**

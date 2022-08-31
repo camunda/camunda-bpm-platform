@@ -15,9 +15,9 @@
  */
 package org.camunda.bpm.engine.impl.juel;
 
-import javax.el.ELContext;
-import javax.el.MethodInfo;
-import javax.el.ValueReference;
+import jakarta.el.ELContext;
+import jakarta.el.MethodInfo;
+import jakarta.el.ValueReference;
 
 /**
  * Expression node interface. This interface provides all the methods needed for value expressions
@@ -78,7 +78,7 @@ public interface ExpressionNode extends Node {
 
 	/**
 	 * Determine whether {@link #setValue(Bindings, ELContext, Object)} will throw a
-	 * {@link javax.el.PropertyNotWritableException}.
+	 * {@link jakarta.el.PropertyNotWritableException}.
 	 * 
 	 * @param bindings
 	 *            bindings containing variables and functions

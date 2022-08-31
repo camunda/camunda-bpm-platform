@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.engine.impl.el;
 
-import javax.el.ExpressionFactory;
+import jakarta.el.ExpressionFactory;
 import org.camunda.bpm.engine.impl.juel.ExpressionFactoryImpl;
 
 

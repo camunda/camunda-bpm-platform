@@ -15,7 +15,7 @@
  */
 package org.camunda.bpm.engine.impl.juel;
 
-import javax.el.ELContext;
+import jakarta.el.ELContext;
 
 
 public final class AstNested extends AstRightValue {

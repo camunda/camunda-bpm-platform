@@ -15,10 +15,10 @@
  */ 
 package org.camunda.bpm.engine.impl.juel;
 
-import javax.el.ELContext;
-import javax.el.ELException;
-import javax.el.MethodInfo;
-import javax.el.ValueReference;
+import jakarta.el.ELContext;
+import jakarta.el.ELException;
+import jakarta.el.MethodInfo;
+import jakarta.el.ValueReference;
 
 
 /**

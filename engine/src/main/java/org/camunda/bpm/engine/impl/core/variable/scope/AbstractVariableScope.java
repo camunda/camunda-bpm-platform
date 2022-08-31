@@ -32,7 +32,7 @@ import org.camunda.bpm.engine.impl.core.variable.VariableUtil;
 import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
 import org.camunda.bpm.engine.impl.core.variable.event.VariableEventDispatcher;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
-import javax.el.ELContext;
+import jakarta.el.ELContext;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.impl.VariableMapImpl;

@@ -17,7 +17,7 @@ package org.camunda.bpm.engine.impl.juel;
 
 import java.util.List;
 
-import javax.el.ELContext;
+import jakarta.el.ELContext;
 
 
 public class AstComposite extends AstRightValue {

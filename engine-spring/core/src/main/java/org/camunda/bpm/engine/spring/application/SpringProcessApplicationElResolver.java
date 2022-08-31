@@ -25,7 +25,7 @@ import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationElResolver;
 import org.camunda.bpm.application.impl.EjbProcessApplication;
 import org.camunda.bpm.application.impl.ServletProcessApplication;
-import javax.el.ELResolver;
+import jakarta.el.ELResolver;
 import org.camunda.bpm.engine.spring.ApplicationContextElResolver;
 import org.springframework.util.ClassUtils;
 import org.springframework.web.context.WebApplicationContext;

@@ -20,7 +20,7 @@ import java.beans.PropertyEditorManager;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import javax.el.ELException;
+import jakarta.el.ELException;
 
 /**
  * Type Conversions as described in EL 2.1 specification (section 1.17).

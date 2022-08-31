@@ -15,8 +15,8 @@
  */
 package org.camunda.bpm.engine.impl.juel;
 
-import javax.el.ELContext;
-import javax.el.ELException;
+import jakarta.el.ELContext;
+import jakarta.el.ELException;
 
 
 public class AstDot extends AstProperty {

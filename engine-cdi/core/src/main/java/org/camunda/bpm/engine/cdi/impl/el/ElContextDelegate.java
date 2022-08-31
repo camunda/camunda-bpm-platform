@@ -18,10 +18,10 @@ package org.camunda.bpm.engine.cdi.impl.el;
 
 import java.util.Locale;
 
-import javax.el.ELContext;
-import javax.el.ELResolver;
-import javax.el.FunctionMapper;
-import javax.el.VariableMapper;
+import jakarta.el.ELContext;
+import jakarta.el.ELResolver;
+import jakarta.el.FunctionMapper;
+import jakarta.el.VariableMapper;
 
 /**
  * @author Daniel Meyer
@@ -29,11 +29,11 @@ import javax.el.VariableMapper;
  */
 public class ElContextDelegate extends ELContext {
 
-  protected final org.camunda.bpm.engine.impl.javax.el.ELContext delegateContext;
+  protected final jakarta.el.ELContext delegateContext;
 
   protected final ELResolver elResolver;
 
-  public ElContextDelegate(org.camunda.bpm.engine.impl.javax.el.ELContext delegateContext, ELResolver elResolver) {
+  public ElContextDelegate(jakarta.el.ELContext delegateContext, ELResolver elResolver) {
     this.delegateContext = delegateContext;
     this.elResolver = elResolver;
   }

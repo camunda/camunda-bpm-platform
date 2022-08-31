@@ -21,8 +21,8 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import javax.el.ELContext;
-import javax.el.ELResolver;
+import jakarta.el.ELContext;
+import jakarta.el.ELResolver;
 
 /**
  * An {@link ELResolver} that exposed object values in the map, under the name of the entry's key.

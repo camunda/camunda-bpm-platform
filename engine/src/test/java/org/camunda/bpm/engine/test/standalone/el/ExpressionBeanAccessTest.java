@@ -23,7 +23,7 @@ import static org.junit.Assert.fail;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
-import javax.el.PropertyNotFoundException;
+import jakarta.el.PropertyNotFoundException;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;

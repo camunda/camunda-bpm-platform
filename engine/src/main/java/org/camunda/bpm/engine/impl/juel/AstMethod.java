@@ -15,12 +15,12 @@
  */
 package org.camunda.bpm.engine.impl.juel;
 
-import javax.el.ELContext;
-import javax.el.ELException;
-import javax.el.MethodInfo;
-import javax.el.MethodNotFoundException;
-import javax.el.PropertyNotFoundException;
-import javax.el.ValueReference;
+import jakarta.el.ELContext;
+import jakarta.el.ELException;
+import jakarta.el.MethodInfo;
+import jakarta.el.MethodNotFoundException;
+import jakarta.el.PropertyNotFoundException;
+import jakarta.el.ValueReference;
 
 
 public class AstMethod extends AstNode {

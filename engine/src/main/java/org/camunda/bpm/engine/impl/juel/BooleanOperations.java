@@ -22,7 +22,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.el.ELException;
+import jakarta.el.ELException;
 
 public class BooleanOperations {
 	private final static Set<Class<? extends Number>> SIMPLE_INTEGER_TYPES = new HashSet<Class<? extends Number>>();

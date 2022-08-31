@@ -20,11 +20,11 @@ import java.io.ObjectInputStream;
 import java.io.PrintWriter;
 import java.util.Arrays;
 
-import javax.el.ELContext;
-import javax.el.ELException;
-import javax.el.FunctionMapper;
-import javax.el.MethodInfo;
-import javax.el.VariableMapper;
+import jakarta.el.ELContext;
+import jakarta.el.ELException;
+import jakarta.el.FunctionMapper;
+import jakarta.el.MethodInfo;
+import jakarta.el.VariableMapper;
 
 
 /**
@@ -35,7 +35,7 @@ import javax.el.VariableMapper;
  * 
  * @author Christoph Beck
  */
-public final class TreeMethodExpression extends javax.el.MethodExpression {
+public final class TreeMethodExpression extends jakarta.el.MethodExpression {
 	private static final long serialVersionUID = 1L;
 
 	private final TreeBuilder builder;
