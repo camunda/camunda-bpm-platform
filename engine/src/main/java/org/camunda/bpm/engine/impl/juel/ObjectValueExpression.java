@@ -15,8 +15,8 @@
  */ 
 package org.camunda.bpm.engine.impl.juel;
 
-import org.camunda.bpm.engine.impl.javax.el.ELContext;
-import org.camunda.bpm.engine.impl.javax.el.ELException;
+import javax.el.ELContext;
+import javax.el.ELException;
 
 
 /**
@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.impl.javax.el.ELException;
  *
  * @author Christoph Beck
  */
-public final class ObjectValueExpression extends org.camunda.bpm.engine.impl.javax.el.ValueExpression {
+public final class ObjectValueExpression extends javax.el.ValueExpression {
 	private static final long serialVersionUID = 1L;
 
 	private final TypeConverter converter;

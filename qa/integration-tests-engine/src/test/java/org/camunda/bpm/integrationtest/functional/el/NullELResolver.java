@@ -18,7 +18,7 @@ package org.camunda.bpm.integrationtest.functional.el;
 
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationElResolver;
-import org.camunda.bpm.engine.impl.javax.el.ELResolver;
+import javax.el.ELResolver;
 
 /**
  * @author Thorben Lindhauer

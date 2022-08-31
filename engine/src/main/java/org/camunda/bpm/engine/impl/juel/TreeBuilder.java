@@ -17,7 +17,7 @@ package org.camunda.bpm.engine.impl.juel;
 
 import java.io.Serializable;
 
-import org.camunda.bpm.engine.impl.javax.el.ELException;
+import javax.el.ELException;
 
 /**
  * Tree builder interface.

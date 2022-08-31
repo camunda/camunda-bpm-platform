@@ -15,7 +15,7 @@
  */
 package org.camunda.bpm.engine.impl.juel;
 
-import org.camunda.bpm.engine.impl.javax.el.ELContext;
+import javax.el.ELContext;
 
 
 public class AstBinary extends AstRightValue {

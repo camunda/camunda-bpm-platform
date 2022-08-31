@@ -18,11 +18,11 @@ package org.camunda.bpm.engine.impl.juel;
 import java.io.PrintWriter;
 import java.util.EnumSet;
 
-import org.camunda.bpm.engine.impl.javax.el.ELContext;
-import org.camunda.bpm.engine.impl.javax.el.ELException;
-import org.camunda.bpm.engine.impl.javax.el.ELResolver;
-import org.camunda.bpm.engine.impl.javax.el.FunctionMapper;
-import org.camunda.bpm.engine.impl.javax.el.VariableMapper;
+import javax.el.ELContext;
+import javax.el.ELException;
+import javax.el.ELResolver;
+import javax.el.FunctionMapper;
+import javax.el.VariableMapper;
 import org.camunda.bpm.engine.impl.juel.Parser.ParseException;
 import org.camunda.bpm.engine.impl.juel.Scanner.ScanException;
 

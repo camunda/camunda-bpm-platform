@@ -22,7 +22,7 @@ import java.util.Map;
 import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.application.impl.EmbeddedProcessApplication;
 import org.camunda.bpm.engine.impl.el.ReadOnlyMapELResolver;
-import org.camunda.bpm.engine.impl.javax.el.ELResolver;
+import javax.el.ELResolver;
 
 /**
  * @author Thorben Lindhauer

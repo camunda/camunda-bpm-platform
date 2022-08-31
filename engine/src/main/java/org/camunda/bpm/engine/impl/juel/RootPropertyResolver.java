@@ -21,10 +21,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.camunda.bpm.engine.impl.javax.el.ELContext;
-import org.camunda.bpm.engine.impl.javax.el.ELResolver;
-import org.camunda.bpm.engine.impl.javax.el.PropertyNotFoundException;
-import org.camunda.bpm.engine.impl.javax.el.PropertyNotWritableException;
+import javax.el.ELContext;
+import javax.el.ELResolver;
+import javax.el.PropertyNotFoundException;
+import javax.el.PropertyNotWritableException;
 
 /**
  * Simple root property resolver implementation. This resolver handles root properties (i.e.

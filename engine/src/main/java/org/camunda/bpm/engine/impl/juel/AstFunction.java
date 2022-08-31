@@ -19,8 +19,8 @@ import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import org.camunda.bpm.engine.impl.javax.el.ELContext;
-import org.camunda.bpm.engine.impl.javax.el.ELException;
+import javax.el.ELContext;
+import javax.el.ELException;
 
 
 public class AstFunction extends AstRightValue implements FunctionNode {

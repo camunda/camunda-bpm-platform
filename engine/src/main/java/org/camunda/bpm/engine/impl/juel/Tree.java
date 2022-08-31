@@ -18,10 +18,10 @@ package org.camunda.bpm.engine.impl.juel;
 import java.lang.reflect.Method;
 import java.util.Collection;
 
-import org.camunda.bpm.engine.impl.javax.el.ELException;
-import org.camunda.bpm.engine.impl.javax.el.FunctionMapper;
-import org.camunda.bpm.engine.impl.javax.el.ValueExpression;
-import org.camunda.bpm.engine.impl.javax.el.VariableMapper;
+import javax.el.ELException;
+import javax.el.FunctionMapper;
+import javax.el.ValueExpression;
+import javax.el.VariableMapper;
 
 
 /**

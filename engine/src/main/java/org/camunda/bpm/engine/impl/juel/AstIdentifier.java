@@ -19,13 +19,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
-import org.camunda.bpm.engine.impl.javax.el.ELContext;
-import org.camunda.bpm.engine.impl.javax.el.ELException;
-import org.camunda.bpm.engine.impl.javax.el.MethodInfo;
-import org.camunda.bpm.engine.impl.javax.el.MethodNotFoundException;
-import org.camunda.bpm.engine.impl.javax.el.PropertyNotFoundException;
-import org.camunda.bpm.engine.impl.javax.el.ValueExpression;
-import org.camunda.bpm.engine.impl.javax.el.ValueReference;
+import javax.el.ELContext;
+import javax.el.ELException;
+import javax.el.MethodInfo;
+import javax.el.MethodNotFoundException;
+import javax.el.PropertyNotFoundException;
+import javax.el.ValueExpression;
+import javax.el.ValueReference;
 
 
 public class AstIdentifier extends AstNode implements IdentifierNode {

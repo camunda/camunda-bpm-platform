@@ -17,7 +17,7 @@ package org.camunda.bpm.engine.impl.juel;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.javax.el.ELContext;
+import javax.el.ELContext;
 
 
 public class AstParameters extends AstRightValue {

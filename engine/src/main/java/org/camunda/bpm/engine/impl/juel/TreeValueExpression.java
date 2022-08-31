@@ -19,11 +19,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.PrintWriter;
 
-import org.camunda.bpm.engine.impl.javax.el.ELContext;
-import org.camunda.bpm.engine.impl.javax.el.ELException;
-import org.camunda.bpm.engine.impl.javax.el.FunctionMapper;
-import org.camunda.bpm.engine.impl.javax.el.ValueReference;
-import org.camunda.bpm.engine.impl.javax.el.VariableMapper;
+import javax.el.ELContext;
+import javax.el.ELException;
+import javax.el.FunctionMapper;
+import javax.el.ValueReference;
+import javax.el.VariableMapper;
 
 
 /**
@@ -35,7 +35,7 @@ import org.camunda.bpm.engine.impl.javax.el.VariableMapper;
  *
  * @author Christoph Beck
  */
-public final class TreeValueExpression extends org.camunda.bpm.engine.impl.javax.el.ValueExpression {
+public final class TreeValueExpression extends javax.el.ValueExpression {
 	private static final long serialVersionUID = 1L;
 
 	private final TreeBuilder builder;

@@ -20,11 +20,11 @@ import java.io.ObjectInputStream;
 import java.io.PrintWriter;
 import java.util.Arrays;
 
-import org.camunda.bpm.engine.impl.javax.el.ELContext;
-import org.camunda.bpm.engine.impl.javax.el.ELException;
-import org.camunda.bpm.engine.impl.javax.el.FunctionMapper;
-import org.camunda.bpm.engine.impl.javax.el.MethodInfo;
-import org.camunda.bpm.engine.impl.javax.el.VariableMapper;
+import javax.el.ELContext;
+import javax.el.ELException;
+import javax.el.FunctionMapper;
+import javax.el.MethodInfo;
+import javax.el.VariableMapper;
 
 
 /**
@@ -35,7 +35,7 @@ import org.camunda.bpm.engine.impl.javax.el.VariableMapper;
  * 
  * @author Christoph Beck
  */
-public final class TreeMethodExpression extends org.camunda.bpm.engine.impl.javax.el.MethodExpression {
+public final class TreeMethodExpression extends javax.el.MethodExpression {
 	private static final long serialVersionUID = 1L;
 
 	private final TreeBuilder builder;

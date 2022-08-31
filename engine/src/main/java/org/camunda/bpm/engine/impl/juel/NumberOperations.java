@@ -18,7 +18,7 @@ package org.camunda.bpm.engine.impl.juel;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import org.camunda.bpm.engine.impl.javax.el.ELException;
+import javax.el.ELException;
 
 /**
  * Arithmetic Operations as specified in chapter 1.7.

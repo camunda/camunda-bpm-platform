@@ -21,8 +21,8 @@ import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.javax.el.BeanELResolver;
-import org.camunda.bpm.engine.impl.javax.el.ELResolver;
+import javax.el.BeanELResolver;
+import javax.el.ELResolver;
 
 /**
  * <p>Resolves a {@link BeanELResolver} from the current process application.

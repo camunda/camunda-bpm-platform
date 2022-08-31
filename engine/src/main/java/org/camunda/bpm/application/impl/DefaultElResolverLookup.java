@@ -24,8 +24,8 @@ import java.util.ServiceLoader;
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationElResolver;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.javax.el.CompositeELResolver;
-import org.camunda.bpm.engine.impl.javax.el.ELResolver;
+import javax.el.CompositeELResolver;
+import javax.el.ELResolver;
 
 /**
  * @author Daniel Meyer

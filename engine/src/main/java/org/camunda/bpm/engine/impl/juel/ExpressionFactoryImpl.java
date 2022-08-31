@@ -23,9 +23,9 @@ import java.lang.reflect.Constructor;
 import java.util.EnumSet;
 import java.util.Properties;
 
-import org.camunda.bpm.engine.impl.javax.el.ELContext;
-import org.camunda.bpm.engine.impl.javax.el.ELException;
-import org.camunda.bpm.engine.impl.javax.el.ExpressionFactory;
+import javax.el.ELContext;
+import javax.el.ELException;
+import javax.el.ExpressionFactory;
 import org.camunda.bpm.engine.impl.juel.Builder.Feature;
 
 
@@ -70,7 +70,7 @@ import org.camunda.bpm.engine.impl.juel.Builder.Feature;
  * 
  * @author Christoph Beck
  */
-public class ExpressionFactoryImpl extends org.camunda.bpm.engine.impl.javax.el.ExpressionFactory {
+public class ExpressionFactoryImpl extends javax.el.ExpressionFactory {
 	/**
 	 * A profile provides a default set of language features that will define the builder's
 	 * behavior. A profile can be adjusted using the <code>javax.el.methodInvocations</code>,
@@ -96,7 +96,7 @@ public class ExpressionFactoryImpl extends org.camunda.bpm.engine.impl.javax.el.
 		}
 
 		Feature[] features() {
-			return features.toArray(new Feature[features.size()]);
+			return features.toArray(new Feature[0]);
 		}
 
 		boolean contains(Feature feature) {

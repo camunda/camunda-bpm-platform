@@ -15,9 +15,8 @@
  */
 package org.camunda.bpm.engine.impl.juel;
 
-import org.camunda.bpm.engine.impl.javax.el.ELContext;
-import org.camunda.bpm.engine.impl.javax.el.ELException;
-
+import javax.el.ELContext;
+import javax.el.ELException;
 
 public class AstChoice extends AstRightValue {
 	private final AstNode question, yes, no;
@@ -31,7 +30,7 @@ public class AstChoice extends AstRightValue {
 	@Override 
 	public Object eval(Bindings bindings, ELContext context) throws ELException {
 		Boolean value = bindings.convert(question.eval(bindings, context), Boolean.class);
-		return value.booleanValue() ? yes.eval(bindings, context) : no.eval(bindings, context);
+		return value ? yes.eval(bindings, context) : no.eval(bindings, context);
 	}
 
 	@Override

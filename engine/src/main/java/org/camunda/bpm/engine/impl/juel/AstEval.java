@@ -15,9 +15,9 @@
  */
 package org.camunda.bpm.engine.impl.juel;
 
-import org.camunda.bpm.engine.impl.javax.el.ELContext;
-import org.camunda.bpm.engine.impl.javax.el.MethodInfo;
-import org.camunda.bpm.engine.impl.javax.el.ValueReference;
+import javax.el.ELContext;
+import javax.el.MethodInfo;
+import javax.el.ValueReference;
 
 
 public final class AstEval extends AstNode {

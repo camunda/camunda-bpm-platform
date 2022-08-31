@@ -22,8 +22,8 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
-import org.camunda.bpm.engine.impl.javax.el.ELException;
-import org.camunda.bpm.engine.impl.javax.el.ValueExpression;
+import javax.el.ELException;
+import javax.el.ValueExpression;
 
 
 /**

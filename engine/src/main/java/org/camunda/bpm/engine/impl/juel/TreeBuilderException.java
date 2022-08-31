@@ -15,7 +15,7 @@
  */ 
 package org.camunda.bpm.engine.impl.juel;
 
-import org.camunda.bpm.engine.impl.javax.el.ELException;
+import javax.el.ELException;
 
 
 /**

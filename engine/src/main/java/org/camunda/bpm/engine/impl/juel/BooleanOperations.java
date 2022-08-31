@@ -22,7 +22,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.camunda.bpm.engine.impl.javax.el.ELException;
+import javax.el.ELException;
 
 public class BooleanOperations {
 	private final static Set<Class<? extends Number>> SIMPLE_INTEGER_TYPES = new HashSet<Class<? extends Number>>();
