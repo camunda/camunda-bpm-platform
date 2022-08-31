@@ -165,10 +165,6 @@ public class ProcessDataContext {
       addToStack(execution.getProcessDefinition().getKey(), mdcPropertyDefinitionKey);
     }
 
-    if(isNotBlank(mdcPropertyEngineName)) {
-      addToStack(execution.getProcessEngine().getName(), mdcPropertyEngineName);
-    }
-
     sections.sealCurrentSection();
 
     boolean newSectionCreated = numSections != sections.size();
