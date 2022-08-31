@@ -124,6 +124,21 @@ public class HistoricBatchManager extends AbstractManager {
     }
   }
 
+  public void updateHistoricBatch(final BatchEntity batch) {
+    ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
+
+    HistoryLevel historyLevel = configuration.getHistoryLevel();
+    if(historyLevel.isHistoryEventProduced(HistoryEventTypes.BATCH_UPDATE, batch)) {
+
+      HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
+        @Override
+        public HistoryEvent createHistoryEvent(HistoryEventProducer producer) {
+          return producer.createBatchUpdateEvent(batch);
+        }
+      });
+    }
+  }
+
   protected void configureQuery(HistoricBatchQueryImpl query) {
     getAuthorizationManager().configureHistoricBatchQuery(query);
     getTenantManager().configureQuery(query);

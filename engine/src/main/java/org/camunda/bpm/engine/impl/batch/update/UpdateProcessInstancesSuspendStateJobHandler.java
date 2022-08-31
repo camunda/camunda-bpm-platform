@@ -20,14 +20,12 @@ import java.util.List;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.UpdateProcessInstancesSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.batch.AbstractBatchJobHandler;
-import org.camunda.bpm.engine.impl.batch.BatchJobConfiguration;
 import org.camunda.bpm.engine.impl.batch.BatchJobContext;
 import org.camunda.bpm.engine.impl.batch.BatchJobDeclaration;
 import org.camunda.bpm.engine.impl.cmd.UpdateProcessInstancesSuspendStateCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
-import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 
@@ -55,12 +53,10 @@ public class UpdateProcessInstancesSuspendStateJobHandler extends AbstractBatchJ
   }
 
   @Override
-  public void executeInternal(BatchJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
-    ByteArrayEntity configurationEntity = commandContext
-      .getDbEntityManager()
-      .selectById(ByteArrayEntity.class, configuration.getConfigurationByteArrayId());
-
-    UpdateProcessInstancesSuspendStateBatchConfiguration batchConfiguration = readConfiguration(configurationEntity.getBytes());
+  public void executeHandler(UpdateProcessInstancesSuspendStateBatchConfiguration batchConfiguration,
+                             ExecutionEntity execution,
+                             CommandContext commandContext,
+                             String tenantId) {
 
     CommandExecutor commandExecutor = commandContext.getProcessEngineConfiguration()
         .getCommandExecutorTxRequired();

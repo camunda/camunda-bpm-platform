@@ -19,14 +19,12 @@ package org.camunda.bpm.engine.impl.batch.variables;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.batch.AbstractBatchJobHandler;
 import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
-import org.camunda.bpm.engine.impl.batch.BatchJobConfiguration;
 import org.camunda.bpm.engine.impl.batch.BatchJobContext;
 import org.camunda.bpm.engine.impl.batch.BatchJobDeclaration;
 import org.camunda.bpm.engine.impl.cmd.SetExecutionVariablesCmd;
 import org.camunda.bpm.engine.impl.core.variable.VariableUtil;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
-import org.camunda.bpm.engine.impl.json.JsonObjectConverter;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
@@ -41,16 +39,10 @@ public class BatchSetVariablesHandler extends AbstractBatchJobHandler<BatchConfi
       new BatchJobDeclaration(Batch.TYPE_SET_VARIABLES);
 
   @Override
-  public void executeInternal(BatchJobConfiguration configuration,
-                              ExecutionEntity execution,
-                              CommandContext commandContext,
-                              String tenantId) {
-
-    String byteArrayId = configuration.getConfigurationByteArrayId();
-    ByteArrayEntity byteArray = findByteArrayById(byteArrayId, commandContext);
-
-    byte[] configurationByteArray = byteArray.getBytes();
-    BatchConfiguration batchConfiguration = readConfiguration(configurationByteArray);
+  public void executeHandler(BatchConfiguration batchConfiguration,
+                             ExecutionEntity execution,
+                             CommandContext commandContext,
+                             String tenantId) {
 
     String batchId = batchConfiguration.getBatchId();
     Map<String, ?> variables = VariableUtil.findBatchVariablesSerialized(batchId, commandContext);
@@ -61,8 +53,6 @@ public class BatchSetVariablesHandler extends AbstractBatchJobHandler<BatchConfi
       commandContext.executeWithOperationLogPrevented(
           new SetExecutionVariablesCmd(processInstanceId, variables, false, true));
     }
-
-    commandContext.getByteArrayManager().delete(byteArray);
   }
 
   @Override
@@ -77,7 +67,7 @@ public class BatchSetVariablesHandler extends AbstractBatchJobHandler<BatchConfi
   }
 
   @Override
-  protected JsonObjectConverter<BatchConfiguration> getJsonConverterInstance() {
+  protected SetVariablesJsonConverter getJsonConverterInstance() {
     return SetVariablesJsonConverter.INSTANCE;
   }
 

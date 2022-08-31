@@ -60,10 +60,6 @@ public class BatchManager extends AbstractManager {
     getDbEntityManager().update(BatchEntity.class, "updateBatchSuspensionStateByParameters", queryParameter);
   }
 
-  public BatchEntity findBatchByJobDefinitionId(final String jobDefinitionId) {
-    return (BatchEntity) getDbEntityManager().selectOne("selectBatchByJobDefinitionId", jobDefinitionId);
-  }
-
   protected void configureQuery(BatchQueryImpl batchQuery) {
     getAuthorizationManager().configureBatchQuery(batchQuery);
     getTenantManager().configureQuery(batchQuery);

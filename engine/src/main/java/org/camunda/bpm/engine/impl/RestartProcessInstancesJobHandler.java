@@ -20,7 +20,6 @@ import java.util.List;
 
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.batch.AbstractBatchJobHandler;
-import org.camunda.bpm.engine.impl.batch.BatchJobConfiguration;
 import org.camunda.bpm.engine.impl.batch.BatchJobContext;
 import org.camunda.bpm.engine.impl.batch.BatchJobDeclaration;
 import org.camunda.bpm.engine.impl.cmd.RestartProcessInstancesCmd;
@@ -28,7 +27,6 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
-import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
@@ -59,12 +57,10 @@ public class RestartProcessInstancesJobHandler extends AbstractBatchJobHandler<R
   }
 
   @Override
-  public void executeInternal(BatchJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
-    ByteArrayEntity configurationEntity = commandContext
-        .getDbEntityManager()
-        .selectById(ByteArrayEntity.class, configuration.getConfigurationByteArrayId());
-
-    RestartProcessInstancesBatchConfiguration batchConfiguration = readConfiguration(configurationEntity.getBytes());
+  public void executeHandler(RestartProcessInstancesBatchConfiguration batchConfiguration,
+                             ExecutionEntity execution,
+                             CommandContext commandContext,
+                             String tenantId) {
 
     String processDefinitionId = batchConfiguration.getProcessDefinitionId();
     RestartProcessInstanceBuilderImpl builder =
@@ -94,8 +90,6 @@ public class RestartProcessInstancesJobHandler extends AbstractBatchJobHandler<R
         .getCommandExecutorTxRequired();
     commandContext.executeWithOperationLogPrevented(
         new RestartProcessInstancesCmd(commandExecutor, builder));
-
-    commandContext.getByteArrayManager().delete(configurationEntity);
 
   }
 

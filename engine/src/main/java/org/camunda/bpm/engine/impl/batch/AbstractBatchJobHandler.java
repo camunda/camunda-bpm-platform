@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.batch;
 
-import org.camunda.bpm.engine.impl.batch.history.HistoricBatchEntity;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.entitymanager.OptimisticLockingListener;
@@ -25,7 +24,6 @@ import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbEntityOperation;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
-import org.camunda.bpm.engine.impl.json.JsonObjectConverter;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -45,7 +43,7 @@ import java.util.List;
  *
  * @author Askar Akhmerov
  */
-public abstract class AbstractBatchJobHandler<T extends BatchConfiguration> implements BatchJobHandler<T> {
+public abstract class AbstractBatchJobHandler<T extends BatchConfiguration> implements BatchJobHandler<T>, OptimisticLockingListener {
 
   public abstract JobDeclaration<BatchJobContext, MessageEntity> getJobDeclaration();
 
@@ -95,41 +93,35 @@ public abstract class AbstractBatchJobHandler<T extends BatchConfiguration> impl
                             final CommandContext commandContext,
                             final String tenantId) {
 
-    commandContext.getDbEntityManager().registerOptimisticLockingListener(new OptimisticLockingListener() {
-      @Override
-      public Class<? extends DbEntity> getEntityType() {
-        return BatchEntity.class;
-      }
+    // load handler config
+    String byteArrayId = configuration.getConfigurationByteArrayId();
+    ByteArrayEntity byteArray = commandContext.getDbEntityManager().selectById(ByteArrayEntity.class, byteArrayId);
+    byte[] configurationByteArray = byteArray.getBytes();
+    T batchConfiguration = readConfiguration(configurationByteArray);
 
-      @Override
-      public OptimisticLockingResult failedOperation(final DbOperation operation) {
-        if (operation instanceof DbEntityOperation) {
-          return OptimisticLockingResult.IGNORE;
-        }
-        return OptimisticLockingResult.THROW;
-      }
-    });
+    // load batch
+    String batchId = batchConfiguration.getBatchId();
+    final BatchEntity batch = commandContext.getBatchManager().findBatchById(batchId);
 
-    final String jobDefinitionId = commandContext.getCurrentJob().getJobDefinitionId();
-    final BatchEntity batch = commandContext.getBatchManager().findBatchByJobDefinitionId(jobDefinitionId);
+    // set executionStartTime & fire historic update event
     if (batch != null && batch.getExecutionStartTime() == null) {
-      final HistoricBatchEntity historicBatch = commandContext.getHistoricBatchManager().findHistoricBatchById(batch.getId());
+      // batches with multiple jobs could trigger an OptimisticLockingException, register listener to ignore that
+      commandContext.getDbEntityManager().registerOptimisticLockingListener(this);
 
       final Date executionStartTime = ClockUtil.now();
       batch.setExecutionStartTime(executionStartTime);
-      historicBatch.setExecutionStartTime(executionStartTime);
-
-      commandContext.getDbEntityManager().merge(batch);
-      commandContext.getDbEntityManager().merge(historicBatch);
+      batch.fireHistoricUpdateEvent();
     }
 
-    executeInternal(configuration, execution, commandContext, tenantId);
+    executeHandler(batchConfiguration, execution, commandContext, tenantId);
+
+    commandContext.getByteArrayManager().delete(byteArray);
   }
 
-  protected abstract void executeInternal(final BatchJobConfiguration configuration,
-                                          final ExecutionEntity execution,
-                                          final CommandContext commandContext,
-                                          final String tenantId);
+  protected abstract void executeHandler(final T configuration,
+                                         final ExecutionEntity execution,
+                                         final CommandContext commandContext,
+                                         final String tenantId);
 
   protected void sanitizeMappings(DeploymentMappings idMappings, List<String> ids) {
     // for mixed version SeedJob execution, there might be ids that have been processed
@@ -244,5 +236,19 @@ public abstract class AbstractBatchJobHandler<T extends BatchConfiguration> impl
     return getJsonConverterInstance().toObject(JsonUtil.asObject(serializedConfiguration));
   }
 
-  protected abstract JsonObjectConverter<T> getJsonConverterInstance();
+  protected abstract AbstractBatchConfigurationObjectConverter<T> getJsonConverterInstance();
+
+  @Override
+  public Class<? extends DbEntity> getEntityType() {
+    return BatchEntity.class;
+  }
+
+  @Override
+  public OptimisticLockingResult failedOperation(final DbOperation operation) {
+    if (operation instanceof DbEntityOperation) {
+      return OptimisticLockingResult.IGNORE;
+    }
+    return OptimisticLockingResult.THROW;
+  }
+
 }

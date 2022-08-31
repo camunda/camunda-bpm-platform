@@ -630,20 +630,21 @@ public class BatchHistoricDecisionInstanceDeletionTest {
 
   @Test
   public void shouldSetExecutionStartTimeInBatchAndHistory() {
+    // given
     ClockUtil.setCurrentTime(TEST_DATE);
-
-    // when
     Batch batch = historyService.deleteHistoricDecisionInstancesAsync(decisionInstanceIds, null);
     helper.executeSeedJob(batch);
     List<Job> executionJobs = helper.getExecutionJobs(batch);
-    // finish one job so both batch & history are available
+
+    // when
     helper.executeJob(executionJobs.get(0));
 
     // then
     HistoricBatch historicBatch = historyService.createHistoricBatchQuery().singleResult();
     batch = rule.getManagementService().createBatchQuery().singleResult();
-    AssertUtil.assertEqualsSecondPrecision(batch.getExecutionStartTime(), TEST_DATE);
-    AssertUtil.assertEqualsSecondPrecision(historicBatch.getExecutionStartTime(), TEST_DATE);
+
+    Assertions.assertThat(batch.getExecutionStartTime()).isEqualToIgnoringMillis(TEST_DATE);
+    Assertions.assertThat(historicBatch.getExecutionStartTime()).isEqualToIgnoringMillis(TEST_DATE);
   }
 
   protected void assertBatchCreated(Batch batch, int decisionInstanceCount) {

@@ -91,8 +91,9 @@
     name = "executionStartTime"
     type = "string"
     format = "date-time"
-    desc = "The time the batch execution was started. Default format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`. For further
-        information, please see the [documentation](${docsUrl}/reference/rest/overview/date-format/)" />
+    desc = "The time the batch execution was started, i.e., at least one batch job has been executed. Default format
+    `yyyy-MM-dd'T'HH:mm:ss.SSSZ`. For further information, please see the [documentation]
+    (${docsUrl}/reference/rest/overview/date-format/)" />
 
     <@lib.property
         name = "endTime"
@@ -109,15 +110,8 @@
         desc = "The time after which the historic batch should be removed by the History Cleanup
                 job. Default format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`.
                 For further information, please see the [documentation](${docsUrl}/reference/rest/overview/date-format/)"
-    />
-
-    <@lib.property
-        name = "startTime"
-        type = "string"
-        format = "date-time"
         last = true
-        desc = "The time the batch execution was started. Default format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`. For further
-        information, please see the [documentation] (${docsUrl}/reference/rest/overview/date-format/)" />
+    />
 
 </@lib.dto>
 </#macro>

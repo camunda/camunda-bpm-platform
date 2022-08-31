@@ -138,7 +138,7 @@
             </thead>
             <tbody>
               <tr ng-repeat="key in ctrl.sortingKeys"
-                  ng-if="selection[key] && key !== 'failedJobs'"
+                  ng-if="selection[key] && key !== 'failedJobs' || key === 'executionStartTime'"
                   ng-class="key">
                 <td>{{key}}</td>
                 <td ng-if="!key.endsWith('Time')">{{selection[key]}}

@@ -266,6 +266,7 @@ public class BatchEntity implements Batch, DbEntity, HasDbReferences, Nameable, 
   public Object getPersistentState() {
     HashMap<String, Object> persistentState = new HashMap<>();
     persistentState.put("jobsCreated", jobsCreated);
+    persistentState.put("executionStartTime", executionStartTime);
     return persistentState;
   }
 
@@ -414,6 +415,12 @@ public class BatchEntity implements Batch, DbEntity, HasDbReferences, Nameable, 
     Context.getCommandContext()
       .getHistoricBatchManager()
       .completeHistoricBatch(this);
+  }
+
+  public void fireHistoricUpdateEvent() {
+    Context.getCommandContext()
+      .getHistoricBatchManager()
+      .updateHistoricBatch(this);
   }
 
   public boolean isCompleted() {

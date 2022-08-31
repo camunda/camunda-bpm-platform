@@ -31,7 +31,7 @@ values ('700', CURRENT_TIMESTAMP, '7.18.0');
 ALTER TABLE ACT_RU_BATCH
     ADD COLUMN START_TIME_ timestamp;
 
--- https://jira.camunda.com/browse/CAM-14721
+-- https://jira.camunda.com/browse/CAM-14722
 ALTER TABLE ACT_RU_BATCH
     ADD COLUMN EXEC_START_TIME_ timestamp;
 ALTER TABLE ACT_HI_BATCH

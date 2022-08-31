@@ -24,8 +24,10 @@ import static java.util.stream.Collectors.toSet;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
+import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
@@ -33,10 +35,13 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
 import org.camunda.bpm.engine.runtime.Job;
@@ -63,10 +68,12 @@ public class CorrelateAllMessageBatchTest {
   protected static final String PROCESS_THREE_KEY = "process-three";
   protected static final String MESSAGE_ONE_REF = "message";
   protected static final String MESSAGE_TWO_REF = "message-two";
+  protected static final Date TEST_DATE = new Date(1457326800000L);
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule engineTestRule = new ProcessEngineTestRule(engineRule);
   protected BatchRule rule = new BatchRule(engineRule, engineTestRule);
+  protected BatchHelper helper = new BatchHelper(engineRule);
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(engineTestRule).around(rule);
@@ -101,6 +108,7 @@ public class CorrelateAllMessageBatchTest {
 
   @After
   public void resetConfiguration() {
+    ClockUtil.reset();
     engineRule.getProcessEngineConfiguration()
       .setInvocationsPerBatchJob(ProcessEngineConfigurationImpl.DEFAULT_INVOCATIONS_PER_BATCH_JOB);
   }
@@ -603,6 +611,33 @@ public class CorrelateAllMessageBatchTest {
     assertThat(executionJobs)
       .extracting("processInstanceId")
       .containsOnlyNulls();
+
+    // clear
+    managementService.deleteBatch(batch.getId(), true);
+  }
+
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void shouldSetExecutionStartTimeInBatchAndHistory() {
+    // given
+    ClockUtil.setCurrentTime(TEST_DATE);
+
+    String processInstanceIdOne = runtimeService.startProcessInstanceByKey(PROCESS_ONE_KEY).getId();
+    Batch batch = runtimeService.createMessageCorrelationAsync(MESSAGE_ONE_REF)
+        .processInstanceIds(Collections.singletonList(processInstanceIdOne))
+        .correlateAllAsync();
+    helper.executeSeedJob(batch);
+    List<Job> executionJobs = helper.getExecutionJobs(batch, Batch.TYPE_CORRELATE_MESSAGE);
+
+    // when
+    helper.executeJob(executionJobs.get(0));
+
+    // then
+    HistoricBatch historicBatch = historyService.createHistoricBatchQuery().singleResult();
+    batch = managementService.createBatchQuery().singleResult();
+
+    Assertions.assertThat(batch.getExecutionStartTime()).isEqualToIgnoringMillis(TEST_DATE);
+    Assertions.assertThat(historicBatch.getExecutionStartTime()).isEqualToIgnoringMillis(TEST_DATE);
 
     // clear
     managementService.deleteBatch(batch.getId(), true);

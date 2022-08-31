@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.HistoryService;
@@ -54,14 +55,17 @@ import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricDecisionInstancesB
 import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricProcessInstancesBuilder;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.history.removaltime.batch.helper.BatchSetRemovalTimeRule;
+import org.camunda.bpm.engine.test.api.runtime.BatchHelper;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -77,6 +81,7 @@ public class BatchSetRemovalTimeTest {
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule engineTestRule = new ProcessEngineTestRule(engineRule);
   protected BatchSetRemovalTimeRule testRule = new BatchSetRemovalTimeRule(engineRule, engineTestRule);
+  protected BatchHelper helper = new BatchHelper(engineRule);
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(engineTestRule).around(testRule);
@@ -95,6 +100,11 @@ public class BatchSetRemovalTimeTest {
     decisionService = engineRule.getDecisionService();
     historyService = engineRule.getHistoryService();
     managementService = engineRule.getManagementService();
+  }
+
+  @After
+  public void tearDown() {
+    ClockUtil.reset();
   }
 
   @Test
@@ -2848,6 +2858,67 @@ public class BatchSetRemovalTimeTest {
         .setInvocationsPerBatchJobByBatchType(new HashMap<>());
     managementService.deleteBatch(batchTwo.getId(), true);
     historyService.deleteHistoricBatch(batchOne.getId());
+  }
+
+  @Test
+  public void shouldSetExecutionStartTimeInBatchAndHistoryForBatches() {
+    // given
+    ClockUtil.setCurrentTime(CURRENT_DATE);
+    String processInstanceId = testRule.process().serviceTask().deploy().start();
+    Batch batchDelete = historyService.deleteHistoricProcessInstancesAsync(Collections.singletonList(processInstanceId), "");
+    testRule.syncExec(batchDelete, false);
+    Batch batch = historyService.setRemovalTimeToHistoricBatches()
+        .absoluteRemovalTime(CURRENT_DATE)
+        .byQuery(historyService.createHistoricBatchQuery())
+        .executeAsync();
+    helper.executeSeedJob(batch);
+    List<Job> executionJobs = helper.getExecutionJobs(batch, Batch.TYPE_BATCH_SET_REMOVAL_TIME);
+    historyService.deleteHistoricBatch(batchDelete.getId());
+
+    // when
+    helper.executeJob(executionJobs.get(0));
+
+    // then
+    HistoricBatch historicBatch = historyService.createHistoricBatchQuery().singleResult();
+    batch = managementService.createBatchQuery().singleResult();
+
+    Assertions.assertThat(batch.getExecutionStartTime()).isEqualToIgnoringMillis(CURRENT_DATE);
+    Assertions.assertThat(historicBatch.getExecutionStartTime()).isEqualToIgnoringMillis(CURRENT_DATE);
+
+    // clear
+    managementService.deleteBatch(batch.getId(), true);
+  }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml")
+  public void shouldSetExecutionStartTimeInBatchAndHistoryForDecisions() {
+    // given
+    ClockUtil.setCurrentTime(CURRENT_DATE);
+    decisionService.evaluateDecisionByKey("dish-decision")
+        .variables(
+            Variables.createVariables()
+                .putValue("temperature", 32)
+                .putValue("dayType", "Weekend")
+        ).evaluate();
+    Batch batch = historyService.setRemovalTimeToHistoricDecisionInstances()
+        .absoluteRemovalTime(CURRENT_DATE)
+        .byQuery(historyService.createHistoricDecisionInstanceQuery())
+        .executeAsync();
+    helper.executeSeedJob(batch);
+    List<Job> executionJobs = helper.getExecutionJobs(batch, Batch.TYPE_DECISION_SET_REMOVAL_TIME);
+
+    // when
+    helper.executeJob(executionJobs.get(0));
+
+    // then
+    HistoricBatch historicBatch = historyService.createHistoricBatchQuery().singleResult();
+    batch = managementService.createBatchQuery().singleResult();
+
+    Assertions.assertThat(batch.getExecutionStartTime()).isEqualToIgnoringMillis(CURRENT_DATE);
+    Assertions.assertThat(historicBatch.getExecutionStartTime()).isEqualToIgnoringMillis(CURRENT_DATE);
+
+    // clear
+    managementService.deleteBatch(batch.getId(), true);
   }
 
 }

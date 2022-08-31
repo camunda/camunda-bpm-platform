@@ -38,8 +38,7 @@
       CREATE_USER_ID_,
       START_TIME_,
       END_TIME_,
-      REMOVAL_TIME_,
-      EXEC_START_TIME_
+      REMOVAL_TIME_
     )
     values
     (
@@ -55,8 +54,7 @@
       #{createUserId, jdbcType=VARCHAR},
       #{startTime, jdbcType=TIMESTAMP},
       #{endTime, jdbcType=TIMESTAMP},
-      #{removalTime, jdbcType=TIMESTAMP},
-      #{executionStartTime, jdbcType=TIMESTAMP}
+      #{removalTime, jdbcType=TIMESTAMP}
     )
   </insert>
 
@@ -148,7 +146,7 @@
         REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP},
       </if>
       <if test="executionStartTime != null">
-        EXEC_START_TIME_ = #{executionStartTime, jdbcType=TIMESTAMP},
+        EXEC_START_TIME_ = #{executionStartTime, jdbcType=TIMESTAMP}
       </if>
     </set>
     where ID_= #{id, jdbcType=VARCHAR}
@@ -161,7 +159,10 @@
         RES.END_TIME_ = #{endTime, jdbcType=TIMESTAMP},
       </if>
       <if test="removalTime != null">
-        RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+        RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP},
+      </if>
+      <if test="executionStartTime != null">
+        EXEC_START_TIME_ = #{executionStartTime, jdbcType=TIMESTAMP}
       </if>
     </set>
     FROM ${prefix}ACT_HI_BATCH RES WITH (FORCESEEK)

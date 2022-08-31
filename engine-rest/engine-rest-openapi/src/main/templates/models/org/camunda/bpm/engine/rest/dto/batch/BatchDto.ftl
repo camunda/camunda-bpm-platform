@@ -82,8 +82,9 @@
         type = "string"
         format = "date-time"
         last = true
-        desc = "The time the batch execution was started. Default format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`. For further
-        information, please see the [documentation] (${docsUrl}/reference/rest/overview/date-format/)" />
+        desc = "The time the batch execution was started, i.e., at least one batch job has been executed. Default
+        format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`. For further information, please see the [documentation]
+        (${docsUrl}/reference/rest/overview/date-format/)" />
 
 </@lib.dto>
 </#macro>

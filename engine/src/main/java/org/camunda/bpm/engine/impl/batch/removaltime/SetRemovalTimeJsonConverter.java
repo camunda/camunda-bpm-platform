@@ -18,9 +18,9 @@ package org.camunda.bpm.engine.impl.batch.removaltime;
 
 import com.google.gson.JsonObject;
 
+import org.camunda.bpm.engine.impl.batch.AbstractBatchConfigurationObjectConverter;
 import org.camunda.bpm.engine.impl.batch.DeploymentMappingJsonConverter;
 import org.camunda.bpm.engine.impl.batch.DeploymentMappings;
-import org.camunda.bpm.engine.impl.json.JsonObjectConverter;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
 
 import java.util.Date;
@@ -29,7 +29,8 @@ import java.util.List;
 /**
  * @author Tassilo Weidner
  */
-public class SetRemovalTimeJsonConverter extends JsonObjectConverter<SetRemovalTimeBatchConfiguration> {
+public class SetRemovalTimeJsonConverter
+    extends AbstractBatchConfigurationObjectConverter<SetRemovalTimeBatchConfiguration> {
 
   public static final SetRemovalTimeJsonConverter INSTANCE = new SetRemovalTimeJsonConverter();
 
@@ -39,7 +40,8 @@ public class SetRemovalTimeJsonConverter extends JsonObjectConverter<SetRemovalT
   protected static final String HAS_REMOVAL_TIME = "hasRemovalTime";
   protected static final String IS_HIERARCHICAL = "isHierarchical";
 
-  public JsonObject toJsonObject(SetRemovalTimeBatchConfiguration configuration) {
+  @Override
+  public JsonObject writeConfiguration(SetRemovalTimeBatchConfiguration configuration) {
     JsonObject json = JsonUtil.createObject();
 
     JsonUtil.addListField(json, IDS, configuration.getIds());
@@ -51,7 +53,8 @@ public class SetRemovalTimeJsonConverter extends JsonObjectConverter<SetRemovalT
     return json;
   }
 
-  public SetRemovalTimeBatchConfiguration toObject(JsonObject jsonObject) {
+  @Override
+  public SetRemovalTimeBatchConfiguration readConfiguration(JsonObject jsonObject) {
 
     long removalTimeMills = JsonUtil.getLong(jsonObject, REMOVAL_TIME);
     Date removalTime = removalTimeMills > 0 ? new Date(removalTimeMills) : null;

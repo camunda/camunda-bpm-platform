@@ -149,9 +149,8 @@ public class HistoricBatchEntity extends HistoryEvent implements HistoricBatch, 
   @Override
   public Object getPersistentState() {
     Map<String, Object> persistentState = new HashMap<String, Object>();
-
     persistentState.put("endTime", endTime);
-
+    persistentState.put("executionStartTime", executionStartTime);
     return persistentState;
   }
 
