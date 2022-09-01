@@ -16,10 +16,10 @@
  */
 package org.camunda.bpm.dmn.feel.impl.juel.el;
 
-import javax.el.ELContext;
-import javax.el.ELResolver;
-import javax.el.FunctionMapper;
-import javax.el.VariableMapper;
+import jakarta.el.ELContext;
+import jakarta.el.ELResolver;
+import jakarta.el.FunctionMapper;
+import jakarta.el.VariableMapper;
 
 public class FeelElContext extends ELContext {
 

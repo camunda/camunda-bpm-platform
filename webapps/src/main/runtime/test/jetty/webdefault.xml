@@ -31,7 +31,7 @@
   </description>
 
   <!-- ==================================================================== -->
-  <!-- Removes static references to beans from javax.el.BeanELResolver to   -->
+  <!-- Removes static references to beans from jakarta.el.BeanELResolver to   -->
   <!-- ensure webapp classloader can be released on undeploy                -->
   <!-- ==================================================================== -->
   <listener>

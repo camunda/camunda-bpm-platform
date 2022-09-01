@@ -19,7 +19,7 @@ package org.camunda.bpm.dmn.feel.impl.juel.el;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import javax.el.FunctionMapper;
+import jakarta.el.FunctionMapper;
 
 import org.camunda.bpm.dmn.feel.impl.juel.FeelEngineLogger;
 import org.camunda.bpm.dmn.feel.impl.juel.FeelLogger;

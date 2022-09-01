@@ -97,7 +97,7 @@
                 <transformer implementation="org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer">
                   <resources>
                     <resource>
-                      META-INF/services/javax.el.ExpressionFactory
+                      META-INF/services/jakarta.el.ExpressionFactory
                     </resource>
                   </resources>
                 </transformer>

@@ -20,8 +20,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
-import javax.el.ELException;
-import javax.el.ExpressionFactory;
+import jakarta.el.ELException;
+import jakarta.el.ExpressionFactory;
 
 import org.camunda.bpm.dmn.feel.impl.FeelEngine;
 import org.camunda.bpm.dmn.feel.impl.FeelEngineFactory;

@@ -18,8 +18,8 @@ package org.camunda.bpm.dmn.feel.impl.juel.el;
 
 import java.lang.reflect.Method;
 
-import javax.el.ELContext;
-import javax.el.ExpressionFactory;
+import jakarta.el.ELContext;
+import jakarta.el.ExpressionFactory;
 
 import org.camunda.bpm.engine.variable.context.VariableContext;
 
