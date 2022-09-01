@@ -64,7 +64,14 @@ public class JuelExpression implements Expression {
     } catch (MethodNotFoundException mnfe) {
       throw new ProcessEngineException("Unknown method used in expression: " + expressionText+". Cause: "+mnfe.getMessage(), mnfe);
     } catch(ELException ele) {
-      throw new ProcessEngineException("Error while evaluating expression: " + expressionText+". Cause: "+ele.getMessage(), ele);
+      Throwable cause = ele.getCause();
+      if (cause != null) {
+        throw new ProcessEngineException(cause);
+
+      } else {
+        throw new ProcessEngineException("Error while evaluating expression: " + expressionText + ". Cause: " + ele.getMessage(), ele);
+
+      }
     } catch (Exception e) {
       throw new ProcessEngineException("Error while evaluating expression: " + expressionText+". Cause: "+e.getMessage(), e);
     }

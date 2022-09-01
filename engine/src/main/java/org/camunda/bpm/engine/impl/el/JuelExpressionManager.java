@@ -121,7 +121,9 @@ public class JuelExpressionManager implements ExpressionManager, ElProviderCompa
     ensureInitialized();
     ProcessEngineElContext elContext = new ProcessEngineElContext(functionMapper, elResolver);
     elContext.putContext(ExpressionFactory.class, expressionFactory);
-    elContext.putContext(VariableScope.class, variableScope);
+    if (variableScope != null) {
+      elContext.putContext(VariableScope.class, variableScope);
+    }
     return elContext;
   }
  
