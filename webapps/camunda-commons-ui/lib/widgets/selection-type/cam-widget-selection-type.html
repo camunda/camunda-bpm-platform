@@ -1,43 +1,42 @@
-<div class="form-inline operation-details">
-  <div class="row">
-    <label class="col-xs-6 form-control-static text-right"
+<div class="form-inline operation-details"
+     ng-class="{'selection-wrap': !isBatchOperationPage}">
+  <div ng-class="{row: isBatchOperationPage, 'selection-type': !isBatchOperationPage}">
+    <label class="form-control-static"
            for="instance"
-           ng-class="{'col-xs-4 col-sm-3': isBatchOperationPage}">
+           ng-class="{'col-xs-4 col-sm-3 text-right': isBatchOperationPage, 'selection-label': !isBatchOperationPage}">
       {{ 'CAM_WIDGET_SELECTION_TYPE_INSTANCE' | translate }}
       <span class="glyphicon glyphicon-question-sign"
             uib-tooltip="{{ 'CAM_WIDGET_SELECTION_TYPE_INSTANCE_TOOLTIP' | translate }}"
             tooltip-placement="right"></span>
     </label>
-    <div class="col-xs-6"
-         ng-class="{'col-xs-6 col-sm-9': isBatchOperationPage}">
+    <span ng-class="{'col-xs-6 col-sm-9': isBatchOperationPage}">
       <input type="radio"
              name="selection_type"
              id="instance"
              class="form-control operation-radio"
+             ng-class="{'selection-input': !isBatchOperationPage}"
              ng-model="selectionType"
-             value="INSTANCE"
-             style="width: auto;" />
-    </div>
+             value="INSTANCE" />
+    </span>
   </div>
-  <div class="row">
-    <label class="col-xs-6 form-control-static text-right"
+  <div ng-class="{row: isBatchOperationPage, 'selection-type': !isBatchOperationPage}">
+    <label class="form-control-static"
            for="query"
-           ng-class="{'col-xs-4 col-sm-3': isBatchOperationPage}">
+           ng-class="{'col-xs-4 col-sm-3 text-right': isBatchOperationPage, 'selection-label': !isBatchOperationPage}">
            {{ 'CAM_WIDGET_SELECTION_TYPE_QUERY' | translate }}
       <span class="glyphicon glyphicon-question-sign"
             uib-tooltip="{{ 'CAM_WIDGET_SELECTION_TYPE_QUERY_TOOLTIP' | translate }}"
             tooltip-placement="right"></span>
     </label>
-    <div class="col-xs-6"
-         ng-class="{'col-xs-6 col-sm-9': isBatchOperationPage}">
+    <span ng-class="{'col-xs-6 col-sm-9': isBatchOperationPage}">
       <input type="radio"
              name="selection_type"
              id="query"
              class="form-control operation-radio"
+             ng-class="{'selection-input': !isBatchOperationPage}"
              ng-model="selectionType"
-             value="QUERY"
-             style="width: auto;" />
-    </div>
+             value="QUERY" />
+    </span>
   </div>   
 </div>
 
