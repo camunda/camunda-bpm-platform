@@ -17,13 +17,7 @@
 package org.camunda.bpm.engine.test.logging;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -32,7 +26,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import ch.qos.logback.classic.spi.ILoggingEvent;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
@@ -59,6 +52,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.spi.ILoggingEvent;
 
 public class ProcessDataLoggingContextTest {
 
@@ -121,7 +116,8 @@ public class ProcessDataLoggingContextTest {
       .setLoggingContextBusinessKey("businessKey")
       .setLoggingContextProcessDefinitionId("processDefinitionId")
       .setLoggingContextProcessInstanceId("processInstanceId")
-      .setLoggingContextTenantId("tenantId");
+      .setLoggingContextTenantId("tenantId")
+      .setLoggingContextEngineName("engineName");
   }
 
   @Test
@@ -134,7 +130,7 @@ public class ProcessDataLoggingContextTest {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey(PROCESS, B_KEY);
     taskService.complete(taskService.createTaskQuery().singleResult().getId());
     // then
-    assertActivityLogs(instance, "ENGINE-200", Arrays.asList("start", "waitState", "end"), true, false, true, true);
+    assertActivityLogs(instance, "ENGINE-200", Arrays.asList("start", "waitState", "end"), true, false, true, true, "default");
   }
 
   @Test
@@ -144,13 +140,14 @@ public class ProcessDataLoggingContextTest {
     engineRule.getProcessEngineConfiguration()
       .setLoggingContextActivityId(null)
       .setLoggingContextBusinessKey(null)
-      .setLoggingContextProcessDefinitionId("");
+      .setLoggingContextProcessDefinitionId("")
+      .setLoggingContextEngineName(null);
     manageDeployment(modelOneTaskProcess());
     // when
     ProcessInstance instance = runtimeService.startProcessInstanceByKey(PROCESS, B_KEY);
     taskService.complete(taskService.createTaskQuery().singleResult().getId());
     // then
-    assertActivityLogs(instance, "ENGINE-200", null, true, false, false, false);
+    assertActivityLogs(instance, "ENGINE-200", null, true, false, false, false, null);
   }
 
   @Test
@@ -177,13 +174,14 @@ public class ProcessDataLoggingContextTest {
       .setLoggingContextBusinessKey("busKey")
       .setLoggingContextProcessDefinitionId("defId")
       .setLoggingContextProcessInstanceId("instId")
-      .setLoggingContextTenantId("tenId");
+      .setLoggingContextTenantId("tenId")
+      .setLoggingContextEngineName("engName");
     manageDeployment(modelOneTaskProcess());
     // when
     ProcessInstance instance = runtimeService.startProcessInstanceByKey(PROCESS, B_KEY);
     taskService.complete(taskService.createTaskQuery().singleResult().getId());
     // then activity context logs are present
-    assertActivityLogsPresent(instance, Arrays.asList("start", "waitState", "end"), "actId", "appName", "busKey", "defId", "instId", "tenId");
+    assertActivityLogsPresent(instance, Arrays.asList("start", "waitState", "end"), "actId", "appName", "busKey", "defId", "instId", "tenId", "engName");
   }
 
   @Test
@@ -664,24 +662,24 @@ public class ProcessDataLoggingContextTest {
   }
 
   protected void assertActivityLogsPresent(ProcessInstance instance, List<String> expectedActivities) {
-    assertActivityLogs(instance, "ENGINE-200", expectedActivities, true, true, true, true);
+    assertActivityLogs(instance, "ENGINE-200", expectedActivities, true, true, true, true, "default");
   }
 
   protected void assertActivityLogsPresentWithoutMdc(String filter) {
-    assertActivityLogs(null, filter, null, false, false, false, false);
+    assertActivityLogs(null, filter, null, false, false, false, false, "default");
   }
 
   protected void assertActivityLogs(ProcessInstance instance, String filter, List<String> expectedActivities, boolean isMdcPresent,
-      boolean isBusinessKeyPresent, boolean isActivityIdPresent, boolean isDefinitionIdPresent) {
+      boolean isBusinessKeyPresent, boolean isActivityIdPresent, boolean isDefinitionIdPresent, String engineName) {
     assertActivityLogs(instance, filter, isActivityIdPresent ? expectedActivities : null, null,
-        isBusinessKeyPresent ? instance.getBusinessKey() : null, isDefinitionIdPresent ? instance.getProcessDefinitionId() : null,
+        isBusinessKeyPresent ? instance.getBusinessKey() : null, isDefinitionIdPresent ? instance.getProcessDefinitionId() : null, engineName,
         isMdcPresent, null);
   }
 
   protected void assertActivityLogsPresent(ProcessInstance instance, List<String> expectedActivities, String activityIdProperty,
-      String appNameProperty, String businessKeyProperty, String definitionIdProperty, String instanceIdProperty, String tenantIdProperty) {
-    assertLogs(instance, "ENGINE-200", expectedActivities, null, instance.getBusinessKey(), instance.getProcessDefinitionId(), true, null,
-        activityIdProperty, appNameProperty, businessKeyProperty, definitionIdProperty, instanceIdProperty, tenantIdProperty);
+      String appNameProperty, String businessKeyProperty, String definitionIdProperty, String instanceIdProperty, String tenantIdProperty, String engineNameProperty) {
+    assertLogs(instance, "ENGINE-200", expectedActivities, null, instance.getBusinessKey(), instance.getProcessDefinitionId(), "default", true, null,
+        activityIdProperty, appNameProperty, businessKeyProperty, definitionIdProperty, instanceIdProperty, tenantIdProperty, engineNameProperty);
   }
 
   protected void assertFailureLogPresent(ProcessInstance instance, String activityId) {
@@ -698,24 +696,24 @@ public class ProcessDataLoggingContextTest {
 
   protected void assertFailureLogPresent(ProcessInstance instance, String filter, String activityId, String appName,
       String businessKey, int numberOfFailureLogs) {
-    assertActivityLogs(instance, filter, Arrays.asList(activityId), appName, businessKey, instance.getProcessDefinitionId(), true,
+    assertActivityLogs(instance, filter, Arrays.asList(activityId), appName, businessKey, instance.getProcessDefinitionId(), "default", true,
         numberOfFailureLogs);
   }
 
   protected void assertActivityLogs(ProcessInstance instance, String filter, List<String> expectedActivities, String appName,
-      String businessKey, String definitionId, boolean isMdcPresent, Integer numberOfLogs) {
-    assertLogs(instance, filter, expectedActivities, appName, businessKey, definitionId, isMdcPresent, numberOfLogs,
-        "activityId", "applicationName", "businessKey", "processDefinitionId", "processInstanceId", "tenantId");
+      String businessKey, String definitionId, String engineName, boolean isMdcPresent, Integer numberOfLogs) {
+    assertLogs(instance, filter, expectedActivities, appName, businessKey, definitionId, engineName, isMdcPresent, numberOfLogs,
+        "activityId", "applicationName", "businessKey", "processDefinitionId", "processInstanceId", "tenantId", "engineName");
   }
 
   protected void assertLogs(ProcessInstance instance, String filter, List<String> expectedActivities, String appName,
-      String businessKey, String definitionId, boolean isMdcPresent, Integer numberOfLogs, String activityIdProperty, String appNameProperty,
-      String businessKeyProperty, String definitionIdProperty, String instanceIdProperty, String tenantIdProperty) {
+      String businessKey, String definitionId, String engineName, boolean isMdcPresent, Integer numberOfLogs, String activityIdProperty, String appNameProperty,
+      String businessKeyProperty, String definitionIdProperty, String instanceIdProperty, String tenantIdProperty, String engineNameProperty) {
     boolean foundLogEntries = false;
     Set<String> passedActivities = new HashSet<>();
     List<ILoggingEvent> filteredLog = loggingRule.getFilteredLog(filter);
     if (numberOfLogs != null) {
-      assertEquals(numberOfLogs.intValue(), filteredLog.size());
+      assertThat(numberOfLogs.intValue()).isEqualTo(filteredLog.size());
     }
     for (ILoggingEvent logEvent : filteredLog) {
       Map<String, String> mdcPropertyMap = logEvent.getMDCPropertyMap();
@@ -727,76 +725,84 @@ public class ProcessDataLoggingContextTest {
         String definitionIdMdc = mdcPropertyMap.get(definitionIdProperty);
         String instanceIdMdc = mdcPropertyMap.get(instanceIdProperty);
         String tenantIdMdc = mdcPropertyMap.get(tenantIdProperty);
+        String engineNameMdc = mdcPropertyMap.get(engineNameProperty);
 
         if (expectedActivities != null) {
-          assertNotNull(activityIdMdc);
-          assertTrue(expectedActivities.contains(activityIdMdc));
+          assertThat(activityIdMdc).isNotNull();
+          assertThat(expectedActivities.contains(activityIdMdc)).isTrue();
           passedActivities.add(activityIdMdc);
         } else {
-          assertNull(activityIdMdc);
+          assertThat(activityIdMdc).isNull();
         }
 
         if (appName != null) {
-          assertEquals(appName, appNameMdc);
+          assertThat(appName).isEqualTo(appNameMdc);
         } else {
-          assertNull(appNameMdc);
+          assertThat(appNameMdc).isNull();
         }
 
         if (businessKey != null) {
-          assertEquals(businessKey, businessKeyMdc);
+          assertThat(businessKey).isEqualTo( businessKeyMdc);
         } else {
-          assertNull(businessKeyMdc);
+          assertThat(businessKeyMdc).isNull();
         }
 
         if (definitionId != null) {
-          assertEquals(definitionId, definitionIdMdc);
+          assertThat(definitionId).isEqualTo( definitionIdMdc);
         } else {
-          assertNull(definitionIdMdc);
+          assertThat(definitionIdMdc).isNull();
         }
 
-        assertNotNull(instanceIdMdc);
-        assertEquals(instance.getId(), instanceIdMdc);
+        if(engineName != null) {
+          assertThat(engineName).isEqualTo( engineNameMdc);
+        } else {
+          assertThat(engineNameMdc).isNull();
+        }
 
-        assertNotNull(tenantIdMdc);
-        assertEquals(instance.getTenantId(), tenantIdMdc);
+        assertThat(instanceIdMdc).isNotNull();
+        assertThat(instance.getId()).isEqualTo( instanceIdMdc);
+
+        assertThat(tenantIdMdc).isNotNull();
+        assertThat(instance.getTenantId()).isEqualTo( tenantIdMdc);
+
 
       } else {
-        assertTrue(mdcPropertyMap.isEmpty());
+        assertThat(mdcPropertyMap.isEmpty()).isTrue();
       }
       foundLogEntries = true;
     }
-    assertTrue(foundLogEntries);
+    assertThat(foundLogEntries).isTrue();
     if (expectedActivities != null) {
-      assertTrue(passedActivities.equals(new HashSet<>(expectedActivities)));
+      assertThat(passedActivities).containsExactlyInAnyOrderElementsOf(expectedActivities);
     }
   }
 
   protected void assertBpmnStacktraceLogPresent(ProcessInstance instance) {
     List<ILoggingEvent> bpmnStacktraceLog = loggingRule.getFilteredLog("ENGINE-16006");
-    assertEquals(2, bpmnStacktraceLog.size());
+    assertThat(bpmnStacktraceLog.size()).isEqualTo(2);
     for (int i = 0; i < bpmnStacktraceLog.size(); i++) {
       ILoggingEvent logEvent = bpmnStacktraceLog.get(i);
       Map<String, String> mdcPropertyMap = logEvent.getMDCPropertyMap();
-      assertTrue(mdcPropertyMap.containsKey("activityId"));
-      assertFalse(mdcPropertyMap.containsKey("applicationName"));
-      assertTrue(mdcPropertyMap.containsKey("processDefinitionId"));
-      assertTrue(mdcPropertyMap.containsKey("processInstanceId"));
-      assertTrue(mdcPropertyMap.containsKey("tenantId"));
+      assertThat(mdcPropertyMap.containsKey("activityId")).isTrue();
+      assertThat(mdcPropertyMap.containsKey("applicationName")).isFalse();
+      assertThat(mdcPropertyMap.containsKey("processDefinitionId")).isTrue();
+      assertThat(mdcPropertyMap.containsKey("processInstanceId")).isTrue();
+      assertThat(mdcPropertyMap.containsKey("tenantId")).isTrue();
       if (i == 0) {
         // first BPMN stack trace log corresponds to nested service task
-        assertFalse(mdcPropertyMap.containsKey("businessKey"));
-        assertEquals("failing_task", mdcPropertyMap.get("activityId"));
-        assertNotEquals(instance.getProcessDefinitionId(), mdcPropertyMap.get("processDefinitionId"));
-        assertNotEquals(instance.getId(), mdcPropertyMap.get("processInstanceId"));
-        assertEquals(instance.getTenantId(), mdcPropertyMap.get("tenantId"));
+        assertThat(mdcPropertyMap.containsKey("businessKey")).isFalse();
+        assertThat(mdcPropertyMap.get("activityId")).isEqualTo("failing_task");
+        assertThat(mdcPropertyMap.get("processDefinitionId")).isNotEqualTo(instance.getProcessDefinitionId());
+        assertThat(mdcPropertyMap.get("processInstanceId")).isNotEqualTo(instance.getId());
+        assertThat(instance.getTenantId()).isEqualTo(mdcPropertyMap.get("tenantId"));
       } else {
         // second BPMN stack trace log corresponds to outer service task
-        assertTrue(mdcPropertyMap.containsKey("businessKey"));
-        assertEquals("startProcess", mdcPropertyMap.get("activityId"));
-        assertEquals(instance.getBusinessKey(), mdcPropertyMap.get("businessKey"));
-        assertEquals(instance.getProcessDefinitionId(), mdcPropertyMap.get("processDefinitionId"));
-        assertEquals(instance.getId(), mdcPropertyMap.get("processInstanceId"));
-        assertEquals(instance.getTenantId(), mdcPropertyMap.get("tenantId"));
+        assertThat(mdcPropertyMap.containsKey("businessKey")).isTrue();
+        assertThat("startProcess").isEqualTo(mdcPropertyMap.get("activityId"));
+        assertThat(instance.getBusinessKey()).isEqualTo(mdcPropertyMap.get("businessKey"));
+        assertThat(instance.getProcessDefinitionId()).isEqualTo(mdcPropertyMap.get("processDefinitionId"));
+        assertThat(instance.getId()).isEqualTo(mdcPropertyMap.get("processInstanceId"));
+        assertThat(instance.getTenantId()).isEqualTo(mdcPropertyMap.get("tenantId"));
       }
     }
   }
