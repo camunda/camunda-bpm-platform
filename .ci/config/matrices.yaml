@@ -38,13 +38,32 @@ engine-rest:
   - 'engine-rest-IT-embedded-wildfly'
 daily-stages:
   databases: 
+  - 'postgresql_1013'
+  - 'postgresql_112'
+  - 'postgresql_122'
+  - 'postgresql_132'
   - 'postgresql_142'
   - 'aws_aurora_postgresql_10'
   - 'aws_aurora_postgresql_11'
   - 'aws_aurora_postgresql_12'
+  - 'mariadb_103'
+  - 'mariadb_106'
   - 'mysql_57'
+  - 'mysql_80'
+  - 'oracle_12'
+  - 'oracle_19'
+  - 'db2_111'
+  - 'db2_115'
+  - 'sqlserver_2016'
+  - 'sqlserver_2017'
+  - 'sqlserver_2019'
   stages: 
   - 'sql-scripts'
+  - 'upgrade-database'
+  - 'instance-migration'
+  - 'old-engine'
+  - 'rolling-update'
+  - 'large-data-tests'
 sidetrack-stages:
   databases:
   - 'cockroachdb_201'
