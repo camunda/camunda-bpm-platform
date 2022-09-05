@@ -17,7 +17,7 @@
       <useTransitiveFiltering>true</useTransitiveFiltering>
       <scope>provided</scope>
       <includes>
-        <include>org.camunda.bpm:camunda-engine-rest-jaxrs2:jar:*</include>
+        <include>org.camunda.bpm:camunda-engine-rest-core:jar:*</include>
         <include>org.jboss.resteasy:resteasy-jaxrs:jar:*</include>
         <include>org.jboss.resteasy:async-http-servlet-3.0:jar:*</include>
         <include>org.jboss.spec.javax.ws.rs:jboss-jaxrs-api_2.1_spec:jar:*</include>
@@ -32,8 +32,7 @@
       <unpack>true</unpack>   
       <unpackOptions>
         <excludes>
-          <exclude>**/web.xml</exclude> 
-          <exclude>**/camunda-engine-rest-core-*</exclude>        
+          <exclude>**/web.xml</exclude>  
         </excludes>
       </unpackOptions>   
     </dependencySet>    

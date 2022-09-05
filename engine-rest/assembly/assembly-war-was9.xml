@@ -24,7 +24,7 @@
       <useTransitiveFiltering>true</useTransitiveFiltering>
       <scope>provided</scope>
       <includes>
-        <include>org.camunda.bpm:camunda-engine-rest-jaxrs2:jar:*</include>
+        <include>org.camunda.bpm:camunda-engine-rest-core:jar:*</include>
         <include>org.glassfish.jersey.containers:jersey-container-servlet:*</include>
         <include>org.glassfish.jersey.inject:jersey-hk2:*</include>
       </includes>
@@ -35,7 +35,6 @@
       <unpackOptions>
         <excludes>
           <exclude>**/web.xml</exclude>
-          <exclude>**/camunda-engine-rest-core-*</exclude>
         </excludes>
       </unpackOptions>
       <includes>
