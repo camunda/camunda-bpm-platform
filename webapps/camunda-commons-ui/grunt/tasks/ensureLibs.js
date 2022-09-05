@@ -55,7 +55,6 @@ var included = [
   'dmn-js-shared/lib/util/ModelUtil',
   'dmn-js',
   'dmn-js/lib/Modeler',
-  'dmn-moddle',
   'dom4',
   'events',
   'fast-xml-parser',
