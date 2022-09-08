@@ -26,6 +26,8 @@ import static org.camunda.bpm.identity.impl.ldap.LdapConfiguration.LDAP_QUERY_WI
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
