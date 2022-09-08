@@ -472,11 +472,13 @@ Batch.prototype._load = function(type) {
 
     if (type === 'runtime') {
       // fetch unique usernames
-      let uniqueUserIds = new Set(data.map(item => item.createUserId));
+      let uniqueUserIds = Array.from(
+        new Set(data.map(item => item.createUserId))
+      );
       this._sdk.resource('user').list(
         {
-          idIn: Array.from(uniqueUserIds).toString(),
-          maxResults: uniqueUserIds.size
+          idIn: uniqueUserIds,
+          maxResults: uniqueUserIds.length
         },
         (err, data) => {
           obj.users = {};

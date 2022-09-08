@@ -19,6 +19,7 @@
 
 var request = require('superagent');
 var Q = require('q');
+var qs = require('qs');
 var Events = require('./../events');
 var utils = require('./../utils');
 
@@ -166,12 +167,13 @@ HttpClient.prototype.load = function(url, options) {
 
   var headers = options.headers || this.config.headers;
   var accept = options.accept || headers.Accept || this.config.headers.Accept;
+  var data = options.data || {};
 
   var req = request
     .get(url)
     .set(headers)
     .set('Accept', accept)
-    .query(options.data || {});
+    .query(qs.stringify(data, {arrayFormat: 'comma'}));
 
   req.end(end(self, done, deferred));
   return deferred.promise;
