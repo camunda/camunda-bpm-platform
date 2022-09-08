@@ -31,7 +31,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.HistoryService;
@@ -55,7 +54,6 @@ import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricDecisionInstancesB
 import org.camunda.bpm.engine.history.SetRemovalTimeToHistoricProcessInstancesBuilder;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
-import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -105,6 +103,9 @@ public class BatchSetRemovalTimeTest {
   @After
   public void tearDown() {
     ClockUtil.reset();
+    managementService.createBatchQuery().list().forEach(b -> managementService.deleteBatch(b.getId(), true));
+    historyService.createHistoricBatchQuery().list().forEach(b -> historyService.deleteHistoricBatch(b.getId()));
+    engineRule.getProcessEngineConfiguration().setInvocationsPerBatchJobByBatchType(new HashMap<>());
   }
 
   @Test
@@ -261,9 +262,6 @@ public class BatchSetRemovalTimeTest {
     assertThat(executionJobs.get(0).getDeploymentId()).isIn(deploymentIds);
     assertThat(executionJobs.get(1).getDeploymentId()).isIn(deploymentIds);
     assertThat(executionJobs.get(0).getDeploymentId()).isNotEqualTo(executionJobs.get(1).getDeploymentId());
-
-    // cleanup
-    managementService.deleteBatch(batch.getId(), true);
   }
 
   @Test
@@ -309,9 +307,6 @@ public class BatchSetRemovalTimeTest {
     assertThat(executionJobs.get(0).getDeploymentId()).isIn(deploymentIds);
     assertThat(executionJobs.get(1).getDeploymentId()).isIn(deploymentIds);
     assertThat(executionJobs.get(0).getDeploymentId()).isNotEqualTo(executionJobs.get(1).getDeploymentId());
-
-    // cleanup
-    managementService.deleteBatch(batch.getId(), true);
   }
 
   @Test
@@ -424,10 +419,6 @@ public class BatchSetRemovalTimeTest {
     // then
     assertThat(historicBatches.get(0).getRemovalTime()).isEqualTo(REMOVAL_TIME);
     assertThat(historicBatches.get(1).getRemovalTime()).isEqualTo(REMOVAL_TIME);
-
-    // clear database
-    managementService.deleteBatch(batchOne.getId(), true);
-    managementService.deleteBatch(batchTwo.getId(), true);
   }
 
   @Test
@@ -540,10 +531,6 @@ public class BatchSetRemovalTimeTest {
     // then
     assertThat(historicBatches.get(0).getRemovalTime()).isEqualTo(REMOVAL_TIME);
     assertThat(historicBatches.get(1).getRemovalTime()).isEqualTo(REMOVAL_TIME);
-
-    // clear database
-    managementService.deleteBatch(batchOne.getId(), true);
-    managementService.deleteBatch(batchTwo.getId(), true);
   }
 
   @Test
@@ -1050,9 +1037,6 @@ public class BatchSetRemovalTimeTest {
 
     // then
     assertThat(historicBatch.getRemovalTime()).isEqualTo(addDays(CURRENT_DATE, 5));
-
-    // clear database
-    managementService.deleteBatch(batch.getId(), true);
   }
 
   @Test
@@ -1233,9 +1217,6 @@ public class BatchSetRemovalTimeTest {
 
     // then
     assertThat(historicBatch.getRemovalTime()).isNull();
-
-    // clear database
-    managementService.deleteBatch(batch.getId(), true);
   }
 
   @Test
@@ -1274,9 +1255,6 @@ public class BatchSetRemovalTimeTest {
 
     // then
     assertThat(historicBatch.getRemovalTime()).isNull();
-
-    // clear database
-    managementService.deleteBatch(batch.getId(), true);
   }
 
   @Test
@@ -1650,9 +1628,6 @@ public class BatchSetRemovalTimeTest {
 
     // then
     assertThat(historicBatch.getRemovalTime()).isNull();
-
-    // clear database
-    managementService.deleteBatch(batch.getId(), true);
   }
 
   @Test
@@ -1829,9 +1804,6 @@ public class BatchSetRemovalTimeTest {
 
     // then
     assertThat(historicBatch.getRemovalTime()).isEqualTo(REMOVAL_TIME);
-
-    // clear database
-    managementService.deleteBatch(batch.getId(), true);
   }
 
   @Test
@@ -2118,10 +2090,6 @@ public class BatchSetRemovalTimeTest {
     // then
     assertThat(historicBatches.get(0).getRemovalTime()).isEqualTo(REMOVAL_TIME);
     assertThat(historicBatches.get(1).getRemovalTime()).isEqualTo(REMOVAL_TIME);
-
-    // clear database
-    managementService.deleteBatch(batchOne.getId(), true);
-    managementService.deleteBatch(batchTwo.getId(), true);
   }
 
   @Test
@@ -2461,10 +2429,6 @@ public class BatchSetRemovalTimeTest {
     // then
     assertThat(historicBatches.get(0).getRemovalTime()).isEqualTo(addDays(CURRENT_DATE, 5));
     assertThat(historicBatches.get(1).getRemovalTime()).isEqualTo(addDays(CURRENT_DATE, 5));
-
-    // clear database
-    managementService.deleteBatch(batchOne.getId(), true);
-    managementService.deleteBatch(batchTwo.getId(), true);
   }
 
   @Test
@@ -2567,9 +2531,6 @@ public class BatchSetRemovalTimeTest {
 
     // then
     assertThat(historicBatch.getRemovalTime()).isEqualTo(addDays(CURRENT_DATE, 5));
-
-    // clear database
-    managementService.deleteBatch(batchOne.getId(), true);
   }
 
   @Test
@@ -2742,9 +2703,6 @@ public class BatchSetRemovalTimeTest {
     assertThat(report.getFinishedBatchesCount()).isEqualTo(0);
     assertThat(report.getCleanableBatchesCount()).isEqualTo(1);
     assertThat(report.getHistoryTimeToLive()).isNull();
-
-    // clear database
-    managementService.deleteBatch(batchOne.getId(), true);
   }
 
   @Test
@@ -2771,9 +2729,6 @@ public class BatchSetRemovalTimeTest {
     assertThat(report.getFinishedBatchesCount()).isEqualTo(1);
     assertThat(report.getCleanableBatchesCount()).isEqualTo(1);
     assertThat(report.getHistoryTimeToLive()).isNull();
-
-    // clear database
-    historyService.deleteHistoricBatch(batchOne.getId());
   }
 
   @Test
@@ -2793,11 +2748,6 @@ public class BatchSetRemovalTimeTest {
 
     // then
     assertThat(batch.getInvocationsPerBatchJob()).isEqualTo(42);
-
-    // clear
-    engineRule.getProcessEngineConfiguration()
-        .setInvocationsPerBatchJobByBatchType(new HashMap<>());
-    managementService.deleteBatch(batch.getId(), true);
   }
 
   @Test
@@ -2825,11 +2775,6 @@ public class BatchSetRemovalTimeTest {
 
     // then
     assertThat(batch.getInvocationsPerBatchJob()).isEqualTo(42);
-
-    // clear
-    engineRule.getProcessEngineConfiguration()
-        .setInvocationsPerBatchJobByBatchType(new HashMap<>());
-    managementService.deleteBatch(batch.getId(), true);
   }
 
   @Test
@@ -2852,12 +2797,6 @@ public class BatchSetRemovalTimeTest {
 
     // then
     assertThat(batchTwo.getInvocationsPerBatchJob()).isEqualTo(42);
-
-    // clear
-    engineRule.getProcessEngineConfiguration()
-        .setInvocationsPerBatchJobByBatchType(new HashMap<>());
-    managementService.deleteBatch(batchTwo.getId(), true);
-    historyService.deleteHistoricBatch(batchOne.getId());
   }
 
   @Test
@@ -2882,11 +2821,8 @@ public class BatchSetRemovalTimeTest {
     HistoricBatch historicBatch = historyService.createHistoricBatchQuery().singleResult();
     batch = managementService.createBatchQuery().singleResult();
 
-    Assertions.assertThat(batch.getExecutionStartTime()).isEqualToIgnoringMillis(CURRENT_DATE);
-    Assertions.assertThat(historicBatch.getExecutionStartTime()).isEqualToIgnoringMillis(CURRENT_DATE);
-
-    // clear
-    managementService.deleteBatch(batch.getId(), true);
+    assertThat(batch.getExecutionStartTime()).isEqualToIgnoringMillis(CURRENT_DATE);
+    assertThat(historicBatch.getExecutionStartTime()).isEqualToIgnoringMillis(CURRENT_DATE);
   }
 
   @Test
@@ -2914,11 +2850,8 @@ public class BatchSetRemovalTimeTest {
     HistoricBatch historicBatch = historyService.createHistoricBatchQuery().singleResult();
     batch = managementService.createBatchQuery().singleResult();
 
-    Assertions.assertThat(batch.getExecutionStartTime()).isEqualToIgnoringMillis(CURRENT_DATE);
-    Assertions.assertThat(historicBatch.getExecutionStartTime()).isEqualToIgnoringMillis(CURRENT_DATE);
-
-    // clear
-    managementService.deleteBatch(batch.getId(), true);
+    assertThat(batch.getExecutionStartTime()).isEqualToIgnoringMillis(CURRENT_DATE);
+    assertThat(historicBatch.getExecutionStartTime()).isEqualToIgnoringMillis(CURRENT_DATE);
   }
 
 }
