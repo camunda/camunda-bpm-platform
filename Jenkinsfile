@@ -83,7 +83,7 @@ pipeline {
                 // otherwise CE PR branch triggers EE PR branch
                 eeMainProjectBranch = "cambpm-ee-main/" + cambpmDefaultBranch()
               } else {
-                eeMainProjectBranch = params.EE_DOWNSTREAM
+                eeMainProjectBranch = "cambpm-ee-main/PR-727"
               }
 
               // JOB_NAME, e.g.: '7.15/cambpm-ce/cambpm-main/PR-1373'
