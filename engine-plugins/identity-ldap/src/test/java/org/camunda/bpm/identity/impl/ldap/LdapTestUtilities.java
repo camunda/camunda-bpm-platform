@@ -60,7 +60,7 @@ public final class LdapTestUtilities {
     assertEquals(0, groups.size());
   }
 
-  public static void testUserPaging(IdentityService identityService) {
+  public static void testUserPaging(IdentityService identityService, LdapTestEnvironment ldapTestEnvironment) {
     Set<String> userNames = new HashSet<String>();
     List<User> users = identityService.createUserQuery().listPage(0, 2);
     assertEquals(2, users.size());
@@ -78,7 +78,8 @@ public final class LdapTestUtilities {
     assertEquals(2, users.size());
     checkPagingResults(userNames, users.get(0).getId(), users.get(1).getId());
 
-    users = identityService.createUserQuery().listPage(12, 2);
+    // over the page.
+    users = identityService.createUserQuery().listPage(ldapTestEnvironment.getTotalNumberOfUsersCreated() + 1, 2);
     assertEquals(0, users.size());
   }
 

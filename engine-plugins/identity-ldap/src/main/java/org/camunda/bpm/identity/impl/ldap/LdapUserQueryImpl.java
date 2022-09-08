@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.impl.UserQueryImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
+
 /**
  * @author Daniel Meyer
  *
@@ -32,13 +33,16 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 public class LdapUserQueryImpl extends UserQueryImpl {
 
   private static final long serialVersionUID = 1L;
+  private final LdapConfiguration ldapConfiguration;
 
-  public LdapUserQueryImpl() {
+  public LdapUserQueryImpl(LdapConfiguration ldapConfiguration) {
     super();
+    this.ldapConfiguration = ldapConfiguration;
   }
 
-  public LdapUserQueryImpl(CommandExecutor commandExecutor) {
+  public LdapUserQueryImpl(CommandExecutor commandExecutor, LdapConfiguration ldapConfiguration) {
     super(commandExecutor);
+    this.ldapConfiguration = ldapConfiguration;
   }
 
   // execute queries /////////////////////////////////////////
@@ -57,6 +61,7 @@ public class LdapUserQueryImpl extends UserQueryImpl {
     return (LdapIdentityProviderSession) commandContext.getReadOnlyIdentityProvider();
   }
 
+  @Override
   public UserQuery desc() {
     throw new UnsupportedOperationException("The LDAP identity provider does not support descending search order.");
   }

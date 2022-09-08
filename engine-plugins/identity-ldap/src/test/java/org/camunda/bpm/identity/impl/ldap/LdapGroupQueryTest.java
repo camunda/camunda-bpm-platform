@@ -28,6 +28,9 @@ import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.identity.Group;
+import org.camunda.bpm.engine.identity.GroupQuery;
+import org.camunda.bpm.engine.identity.User;
+
 import static org.camunda.bpm.identity.impl.ldap.LdapTestUtilities.checkPagingResults;
 import static org.camunda.bpm.identity.impl.ldap.LdapTestUtilities.testGroupPaging;
 
@@ -37,6 +40,13 @@ import static org.camunda.bpm.identity.impl.ldap.LdapTestUtilities.testGroupPagi
  *
  */
 public class LdapGroupQueryTest extends LdapIdentityProviderTest {
+
+  public void testCountGroups() {
+    GroupQuery groupQuery = identityService.createGroupQuery();
+
+    assertEquals(6, groupQuery.listPage(0, Integer.MAX_VALUE).size());
+    assertEquals(6, groupQuery.count());
+  }
 
   public void testQueryNoFilter() {
     List<Group> groupList = identityService.createGroupQuery().list();
