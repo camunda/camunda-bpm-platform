@@ -640,7 +640,7 @@ public class BatchStatisticsQueryTest {
   }
 
   @Test
-  public void testStatisticsQueryByFailures() {
+  public void shouldQueryByFailures() {
     // given
     Batch batch1 = helper.migrateProcessInstancesAsync(2);
     Batch batch2 = helper.migrateProcessInstancesAsync(1);
@@ -650,8 +650,8 @@ public class BatchStatisticsQueryTest {
 
     // when
     final long total = managementService.createBatchStatisticsQuery().count();
-    BatchStatisticsQuery queryWithFailures = managementService.createBatchStatisticsQuery().hasFailure(true);
-    BatchStatisticsQuery queryWithoutFailures = managementService.createBatchStatisticsQuery().hasFailure(false);
+    BatchStatisticsQuery queryWithFailures = managementService.createBatchStatisticsQuery().withFailures();
+    BatchStatisticsQuery queryWithoutFailures = managementService.createBatchStatisticsQuery().withoutFailures();
 
     // then
     assertThat(total).isEqualTo(2);
@@ -674,7 +674,7 @@ public class BatchStatisticsQueryTest {
   }
 
   @Test
-  public void testStatisticsQueryByStartedAfter() {
+  public void shouldQueryByStartedAfter() {
     // given
     final long oneMin = 60 * 1000L;
     ClockUtil.setCurrentTime(ClockUtil.getCurrentTime());
@@ -698,7 +698,7 @@ public class BatchStatisticsQueryTest {
   }
 
   @Test
-  public void testStatisticsQueryByStartedBefore() {
+  public void shouldQueryByStartedBefore() {
     // given
     final long oneMin = 60 * 1000L;
     ClockUtil.setCurrentTime(ClockUtil.getCurrentTime());
@@ -722,7 +722,7 @@ public class BatchStatisticsQueryTest {
   }
 
   @Test
-  public void testStatisticsQueryByCreateUserId() {
+  public void shouldQueryByCreatedBy() {
     // given
     engineRule.getIdentityService().setAuthenticatedUserId("user1");
     final Batch batch1 = helper.migrateProcessInstancesAsync(1);
@@ -730,9 +730,9 @@ public class BatchStatisticsQueryTest {
     final Batch batch2 = helper.migrateProcessInstancesAsync(1);
 
     // when
-    BatchStatisticsQuery query1 = managementService.createBatchStatisticsQuery().createUserId("user1");
-    BatchStatisticsQuery query2 = managementService.createBatchStatisticsQuery().createUserId("user2");
-    BatchStatisticsQuery query3 = managementService.createBatchStatisticsQuery().createUserId("user3");
+    BatchStatisticsQuery query1 = managementService.createBatchStatisticsQuery().createdBy("user1");
+    BatchStatisticsQuery query2 = managementService.createBatchStatisticsQuery().createdBy("user2");
+    BatchStatisticsQuery query3 = managementService.createBatchStatisticsQuery().createdBy("user3");
 
     // then
     final BatchStatistics user1Batch = query1.list().get(0);

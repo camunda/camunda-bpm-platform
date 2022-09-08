@@ -154,10 +154,6 @@ module.exports = [
         $scope.search.arrayTypes,
         $scope.search.types
       );
-      if (params.hasNoFailure) {
-        params.hasFailure = false;
-        delete params.hasNoFailure;
-      }
 
       $scope.ctrl.onBatchQueryChange('runtime', params);
     });

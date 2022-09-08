@@ -44,8 +44,8 @@ public interface BatchStatisticsQuery extends Query<BatchStatisticsQuery, BatchS
   /** Only selects batches which are suspended **/
   BatchStatisticsQuery suspended();
 
-  /** Only selects batches which have this createUserId **/
-  BatchStatisticsQuery createUserId(String createUserId);
+  /** Only selects batches that are started by the given user id **/
+  BatchStatisticsQuery createdBy(String userId);
 
   /** Only select historic activity instances that were started before the given date. */
   BatchStatisticsQuery startedBefore(Date date);
@@ -53,8 +53,11 @@ public interface BatchStatisticsQuery extends Query<BatchStatisticsQuery, BatchS
   /** Only select historic activity instances that were started after the given date. */
   BatchStatisticsQuery startedAfter(Date date);
 
-  /** Only selects batches that either do or don't have failed jobs **/
-  BatchStatisticsQuery hasFailure(boolean hasFailure);
+  /** Only selects batches with failed jobs **/
+  BatchStatisticsQuery withFailures();
+
+  /** Only selects batches without failed jobs **/
+  BatchStatisticsQuery withoutFailures();
 
   /**
    * Returns batch statistics sorted by batch id; must be followed by an invocation of {@link #asc()} or {@link #desc()}.

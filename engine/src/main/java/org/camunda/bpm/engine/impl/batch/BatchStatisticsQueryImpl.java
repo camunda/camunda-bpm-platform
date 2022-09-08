@@ -39,7 +39,7 @@ public class BatchStatisticsQueryImpl extends AbstractQuery<BatchStatisticsQuery
   protected boolean isTenantIdSet = false;
   protected String[] tenantIds;
   protected SuspensionState suspensionState;
-  protected String createUserId;
+  protected String userId;
   protected Date startedBefore;
   protected Date startedAfter;
   protected Boolean hasFailure;
@@ -100,8 +100,8 @@ public class BatchStatisticsQueryImpl extends AbstractQuery<BatchStatisticsQuery
   }
 
   @Override
-  public BatchStatisticsQuery createUserId(final String createUserId) {
-    this.createUserId = createUserId;
+  public BatchStatisticsQuery createdBy(final String userId) {
+    this.userId = userId;
     return this;
   }
 
@@ -118,8 +118,14 @@ public class BatchStatisticsQueryImpl extends AbstractQuery<BatchStatisticsQuery
   }
 
   @Override
-  public BatchStatisticsQuery hasFailure(boolean hasFailure) {
-    this.hasFailure = hasFailure;
+  public BatchStatisticsQuery withFailures() {
+    this.hasFailure = true;
+    return this;
+  }
+
+  @Override
+  public BatchStatisticsQuery withoutFailures() {
+    this.hasFailure = false;
     return this;
   }
 

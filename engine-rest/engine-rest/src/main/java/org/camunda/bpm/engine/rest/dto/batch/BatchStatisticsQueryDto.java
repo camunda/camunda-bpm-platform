@@ -47,10 +47,11 @@ public class BatchStatisticsQueryDto extends AbstractQueryDto<BatchStatisticsQue
   protected List<String> tenantIds;
   protected Boolean withoutTenantId;
   protected Boolean suspended;
-  protected String createUserId;
+  protected String userId;
   protected Date startedBefore;
   protected Date startedAfter;
-  protected Boolean hasFailure;
+  protected Boolean withFailures;
+  protected Boolean withoutFailures;
 
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
@@ -89,9 +90,9 @@ public class BatchStatisticsQueryDto extends AbstractQueryDto<BatchStatisticsQue
     this.suspended = suspended;
   }
 
-  @CamundaQueryParam(value="createUserId")
-  public void setCreateUserId(String createUserId) {
-    this.createUserId = createUserId;
+  @CamundaQueryParam(value="createdBy")
+  public void setCreateUserId(String userId) {
+    this.userId = userId;
   }
 
   @CamundaQueryParam(value = "startedBefore", converter = DateConverter.class)
@@ -104,9 +105,14 @@ public class BatchStatisticsQueryDto extends AbstractQueryDto<BatchStatisticsQue
     this.startedAfter = startedAfter;
   }
 
-  @CamundaQueryParam(value = "hasFailure", converter = BooleanConverter.class)
-  public void setHasFailure(final Boolean hasFailure) {
-    this.hasFailure = hasFailure;
+  @CamundaQueryParam(value = "withFailures", converter = BooleanConverter.class)
+  public void setWithFailures(final Boolean withFailures) {
+    this.withFailures = withFailures;
+  }
+
+  @CamundaQueryParam(value = "withoutFailures", converter = BooleanConverter.class)
+  public void setWithoutFailures(final Boolean withoutFailures) {
+    this.withoutFailures = withoutFailures;
   }
 
   protected boolean isValidSortByValue(String value) {
@@ -136,8 +142,8 @@ public class BatchStatisticsQueryDto extends AbstractQueryDto<BatchStatisticsQue
     if (FALSE.equals(suspended)) {
       query.active();
     }
-    if (createUserId != null) {
-      query.createUserId(createUserId);
+    if (userId != null) {
+      query.createdBy(userId);
     }
     if (startedBefore != null) {
       query.startedBefore(startedBefore);
@@ -145,11 +151,11 @@ public class BatchStatisticsQueryDto extends AbstractQueryDto<BatchStatisticsQue
     if (startedAfter != null) {
       query.startedAfter(startedAfter);
     }
-    if (TRUE.equals(hasFailure)) {
-      query.hasFailure(true);
+    if (TRUE.equals(withFailures)) {
+      query.withFailures();
     }
-    if (FALSE.equals(hasFailure)) {
-      query.hasFailure(false);
+    if (TRUE.equals(withoutFailures)) {
+      query.withoutFailures();
     }
   }
 

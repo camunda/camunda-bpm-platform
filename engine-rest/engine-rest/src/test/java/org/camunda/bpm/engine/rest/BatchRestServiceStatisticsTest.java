@@ -276,10 +276,11 @@ public class BatchRestServiceStatisticsTest extends AbstractRestServiceTest {
     parameters.put("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID + "," + MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
     parameters.put("withoutTenantId", true);
     parameters.put("suspended", true);
-    parameters.put("createUserId", MockProvider.EXAMPLE_USER_ID);
+    parameters.put("createdBy", MockProvider.EXAMPLE_USER_ID);
     parameters.put("startedBefore", MockProvider.EXAMPLE_HISTORIC_BATCH_START_TIME);
     parameters.put("startedAfter", MockProvider.EXAMPLE_HISTORIC_BATCH_END_TIME);
-    parameters.put("hasFailure", true);
+    parameters.put("withFailures", true);
+    parameters.put("withoutFailures", true);
 
     return parameters;
   }
@@ -290,10 +291,11 @@ public class BatchRestServiceStatisticsTest extends AbstractRestServiceTest {
     verify(queryMock).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID, MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
     verify(queryMock).withoutTenantId();
     verify(queryMock).suspended();
-    verify(queryMock).createUserId(MockProvider.EXAMPLE_USER_ID);
+    verify(queryMock).createdBy(MockProvider.EXAMPLE_USER_ID);
     verify(queryMock).startedBefore(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_BATCH_START_TIME));
     verify(queryMock).startedAfter(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_BATCH_END_TIME));
-    verify(queryMock).hasFailure(true);
+    verify(queryMock).withFailures();
+    verify(queryMock).withoutFailures();
   }
 
   protected void executeAndVerifySorting(String sortBy, String sortOrder, Status expectedStatus) {

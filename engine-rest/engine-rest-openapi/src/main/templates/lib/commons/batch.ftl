@@ -41,7 +41,7 @@
              when the value is set to `false`, only active batches will be returned."
   },
 
-  "createUserId": {
+  "createdBy": {
     "type": "string",
     "desc": "Only include batches that were started by this user id."
   },
@@ -60,10 +60,15 @@
              the date must have the format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`, e.g., `2013-01-23T14:42:45.000+0200`."
   },
 
-  "hasFailure": {
+  "withFailures": {
     "type": "boolean",
-    "desc": "Only include batches that either do or don't have jobs with failures.
-             When the value is set to `true`, only bathes with failed jobs will be returned and
-             when the value is set to `false`, only bathes without failed jobs will be returned."
+    "desc": "Only include batches having jobs with failures.
+             Value can only be `true`."
+  },
+
+  "withoutFailures": {
+    "type": "boolean",
+    "desc": "Only include batches having jobs without failures.
+             Value can only be `true`."
   }
 }>

@@ -774,8 +774,8 @@
        <if test="suspensionState != null">
          and RES.SUSPENSION_STATE_ = #{suspensionState.stateCode}
        </if>
-       <if test="createUserId != null">
-         and RES.CREATE_USER_ID_ = #{createUserId}
+       <if test="userId != null">
+         and RES.CREATE_USER_ID_ = #{userId}
        </if>
        <if test="startedBefore != null">
          and RES.START_TIME_ &lt;= #{startedBefore}

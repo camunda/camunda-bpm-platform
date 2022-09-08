@@ -2,7 +2,7 @@
   "types": [
     {
       "id": {
-        "key": "createUserId",
+        "key": "createdBy",
         "value": "BATCHES_USER_ID"
       },
       "operators": [
@@ -32,7 +32,7 @@
     },
     {
       "id": {
-        "key": "hasFailure",
+        "key": "withFailures",
         "value": "BATCHES_HAS_FAILED_JOBS"
       },
       "basic": true,
@@ -40,7 +40,7 @@
     },
     {
       "id": {
-        "key": "hasNoFailure",
+        "key": "withoutFailures",
         "value": "BATCHES_HAS_NO_FAILED_JOBS"
       },
       "basic": true,
