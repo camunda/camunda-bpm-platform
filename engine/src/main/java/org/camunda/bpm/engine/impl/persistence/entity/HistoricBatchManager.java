@@ -128,7 +128,7 @@ public class HistoricBatchManager extends AbstractManager {
     ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
 
     HistoryLevel historyLevel = configuration.getHistoryLevel();
-    if(historyLevel.isHistoryEventProduced(HistoryEventTypes.BATCH_UPDATE, batch)) {
+    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.BATCH_UPDATE, batch)) {
 
       HistoryEventProcessor.processHistoryEvents(new HistoryEventProcessor.HistoryEventCreator() {
         @Override
