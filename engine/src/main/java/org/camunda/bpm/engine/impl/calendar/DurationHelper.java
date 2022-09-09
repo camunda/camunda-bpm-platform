@@ -56,9 +56,9 @@ public class DurationHelper {
   public DurationHelper(String expressions) throws Exception {
     this(expressions, null);
   }
-
+  
   public DurationHelper(String expressions, Date startDate) throws Exception {
-    List<String> expression = new ArrayList<>();
+    List<String> expression = new ArrayList<String>();
     if(expressions != null) {
       expression = Arrays.asList(expressions.split("/"));
     }
@@ -80,9 +80,6 @@ public class DurationHelper {
       start = DateTimeUtil.parseDate(expression.get(0));
       if (isDuration(expression.get(1))) {
         period = parsePeriod(expression.get(1));
-        // In cases like R2/1970-01-01T00:01:00/PT10S, the timer will trigger two times. At 1970-01-01T00:01:00 and 10 seconds after.
-        // Since we expect only one repetition after the first trigger, we need to reduce the repetition count in this case.
-        times = Math.max(0, times - 1);
       } else {
         end = DateTimeUtil.parseDate(expression.get(1));
         period = datatypeFactory.newDuration(end.getTime()-start.getTime());
@@ -96,7 +93,7 @@ public class DurationHelper {
   public Date getDateAfter() {
     return getDateAfter(null);
   }
-
+  
   public Date getDateAfter(Date date) {
     if (isRepeat) {
       return getDateAfterRepeat(date == null ? ClockUtil.getCurrentTime() : date);

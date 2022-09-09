@@ -6,6 +6,8 @@ camunda.bpm:
   admin-user:
     id: demo
     password: demo
+  filter:
+    create: All tasks
   run:
 # https://docs.camunda.org/manual/latest/user-guide/camunda-bpm-run/#cross-origin-resource-sharing
     cors:

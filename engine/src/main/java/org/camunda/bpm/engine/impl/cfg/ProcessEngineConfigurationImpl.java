@@ -20,10 +20,6 @@ package org.camunda.bpm.engine.impl.cfg;
 import static org.camunda.bpm.engine.impl.cmd.HistoryCleanupCmd.MAX_THREADS_NUMBER;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
-import javax.naming.InitialContext;
-import javax.script.ScriptEngineManager;
-import javax.sql.DataSource;
-
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -46,6 +42,10 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+
+import javax.naming.InitialContext;
+import javax.script.ScriptEngineManager;
+import javax.sql.DataSource;
 
 import org.apache.ibatis.builder.xml.XMLConfigBuilder;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
@@ -165,6 +165,7 @@ import org.camunda.bpm.engine.impl.el.DateTimeFunctions;
 import org.camunda.bpm.engine.impl.el.ElProviderCompatible;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.el.JuelExpressionManager;
+import org.camunda.bpm.engine.impl.errorcode.ExceptionCodeProvider;
 import org.camunda.bpm.engine.impl.event.CompensationEventHandler;
 import org.camunda.bpm.engine.impl.event.ConditionalEventHandler;
 import org.camunda.bpm.engine.impl.event.EventHandler;
@@ -350,11 +351,11 @@ import org.camunda.bpm.engine.impl.scripting.engine.VariableScopeResolverFactory
 import org.camunda.bpm.engine.impl.scripting.env.ScriptEnvResolver;
 import org.camunda.bpm.engine.impl.scripting.env.ScriptingEnvironment;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
-import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.DatabaseImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.InternalsImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.JdkImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.ProductImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ParseUtil;
@@ -394,7 +395,6 @@ import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.connect.Connectors;
 import org.camunda.connect.spi.Connector;
 import org.camunda.connect.spi.ConnectorRequest;
-import org.camunda.bpm.engine.impl.errorcode.ExceptionCodeProvider;
 
 /**
  * @author Tom Baeyens
@@ -986,6 +986,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected String loggingContextProcessDefinitionKey;// default == null => disabled by default
   protected String loggingContextProcessInstanceId = "processInstanceId";
   protected String loggingContextTenantId = "tenantId";
+  protected String loggingContextEngineName = "engineName";
 
   // logging levels (with default values)
   protected String logLevelBpmnStackTrace = "DEBUG";
@@ -5185,6 +5186,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfigurationImpl setLoggingContextTenantId(String loggingContextTenantId) {
     this.loggingContextTenantId = loggingContextTenantId;
+    return this;
+  }
+
+  public String getLoggingContextEngineName() {
+    return loggingContextEngineName;
+  }
+
+  public ProcessEngineConfigurationImpl setLoggingContextEngineName(String loggingContextEngineName) {
+    this.loggingContextEngineName = loggingContextEngineName;
     return this;
   }
 
