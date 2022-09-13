@@ -35,6 +35,7 @@ public class HistoricBatchDto {
   protected Date startTime;
   protected Date endTime;
   protected Date removalTime;
+  protected Date executionStartTime;
 
   public String getId() {
     return id;
@@ -88,6 +89,14 @@ public class HistoricBatchDto {
     return removalTime;
   }
 
+  public Date getExecutionStartTime() {
+    return executionStartTime;
+  }
+
+  public void setExecutionStartTime(final Date executionStartTime) {
+    this.executionStartTime = executionStartTime;
+  }
+
   public static HistoricBatchDto fromBatch(HistoricBatch historicBatch) {
     HistoricBatchDto dto = new HistoricBatchDto();
     dto.id = historicBatch.getId();
@@ -103,6 +112,7 @@ public class HistoricBatchDto {
     dto.startTime = historicBatch.getStartTime();
     dto.endTime = historicBatch.getEndTime();
     dto.removalTime = historicBatch.getRemovalTime();
+    dto.executionStartTime = historicBatch.getExecutionStartTime();
     return dto;
   }
 

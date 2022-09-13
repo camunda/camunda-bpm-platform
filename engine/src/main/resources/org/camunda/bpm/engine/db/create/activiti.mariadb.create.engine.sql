@@ -356,6 +356,7 @@ create table ACT_RU_BATCH (
   TENANT_ID_ varchar(64),
   CREATE_USER_ID_ varchar(255),
   START_TIME_ datetime(3),
+  EXEC_START_TIME_ datetime(3),
   primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 

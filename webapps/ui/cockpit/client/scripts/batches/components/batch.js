@@ -514,6 +514,7 @@ Batch.prototype._load = function(type) {
 Batch.prototype.sortingKeys = [
   'id',
   'startTime',
+  'executionStartTime',
   'endTime',
   'type',
   'user',

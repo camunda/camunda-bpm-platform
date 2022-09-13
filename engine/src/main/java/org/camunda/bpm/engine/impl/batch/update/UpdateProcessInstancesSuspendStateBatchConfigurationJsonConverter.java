@@ -18,13 +18,14 @@ package org.camunda.bpm.engine.impl.batch.update;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.batch.AbstractBatchConfigurationObjectConverter;
 import org.camunda.bpm.engine.impl.batch.DeploymentMappingJsonConverter;
 import org.camunda.bpm.engine.impl.batch.DeploymentMappings;
-import org.camunda.bpm.engine.impl.json.JsonObjectConverter;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
 import com.google.gson.JsonObject;
 
-public class UpdateProcessInstancesSuspendStateBatchConfigurationJsonConverter extends JsonObjectConverter<UpdateProcessInstancesSuspendStateBatchConfiguration> {
+public class UpdateProcessInstancesSuspendStateBatchConfigurationJsonConverter
+    extends AbstractBatchConfigurationObjectConverter<UpdateProcessInstancesSuspendStateBatchConfiguration> {
 
   public static final UpdateProcessInstancesSuspendStateBatchConfigurationJsonConverter INSTANCE = new UpdateProcessInstancesSuspendStateBatchConfigurationJsonConverter();
 
@@ -32,7 +33,8 @@ public class UpdateProcessInstancesSuspendStateBatchConfigurationJsonConverter e
   public static final String PROCESS_INSTANCE_ID_MAPPINGS = "processInstanceIdMappings";
   public static final String SUSPENDING = "suspended";
 
-  public JsonObject toJsonObject(UpdateProcessInstancesSuspendStateBatchConfiguration configuration) {
+  @Override
+  public JsonObject writeConfiguration(UpdateProcessInstancesSuspendStateBatchConfiguration configuration) {
     JsonObject json = JsonUtil.createObject();
 
     JsonUtil.addListField(json, PROCESS_INSTANCE_IDS, configuration.getIds());
@@ -41,7 +43,8 @@ public class UpdateProcessInstancesSuspendStateBatchConfigurationJsonConverter e
     return json;
   }
 
-  public UpdateProcessInstancesSuspendStateBatchConfiguration toObject(JsonObject json) {
+  @Override
+  public UpdateProcessInstancesSuspendStateBatchConfiguration readConfiguration(JsonObject json) {
     UpdateProcessInstancesSuspendStateBatchConfiguration configuration =
       new UpdateProcessInstancesSuspendStateBatchConfiguration(readProcessInstanceIds(json), readMappings(json),
           JsonUtil.getBoolean(json, SUSPENDING));
