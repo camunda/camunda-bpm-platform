@@ -48,7 +48,8 @@ var Batch = function(camAPI, localConf, configuration) {
       count: 0,
       data: null,
       users: {},
-      sorting: runtimeSorting
+      sorting: runtimeSorting,
+      query: {}
     },
     history: {
       state: 'INITIAL',
@@ -502,6 +503,10 @@ Batch.prototype._load = function(type) {
     params.sortOrder = obj.sorting.sortOrder;
   }
 
+  if (obj.query) {
+    params = {...params, ...obj.query};
+  }
+
   switch (type) {
     case 'runtime':
       return this._sdk.resource('batch').statistics(params, cb);
@@ -509,6 +514,14 @@ Batch.prototype._load = function(type) {
       params.completed = true;
       return this._sdk.resource('history').batch(params, cb);
   }
+};
+
+Batch.prototype.onBatchQueryChange = function(type, query) {
+  if (JSON.stringify(query) === JSON.stringify(this._batches[type].query)) {
+    return;
+  }
+  this._batches[type].query = query;
+  this._load(type);
 };
 
 Batch.prototype.sortingKeys = [

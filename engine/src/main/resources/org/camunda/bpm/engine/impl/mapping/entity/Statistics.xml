@@ -775,6 +775,21 @@
        <if test="suspensionState != null">
          and RES.SUSPENSION_STATE_ = #{suspensionState.stateCode}
        </if>
+       <if test="userId != null">
+         and RES.CREATE_USER_ID_ = #{userId}
+       </if>
+       <if test="startedBefore != null">
+         and RES.START_TIME_ &lt;= #{startedBefore}
+       </if>
+       <if test="startedAfter != null">
+         and RES.START_TIME_ &gt;= #{startedAfter}
+       </if>
+       <if test="hasFailure == true">
+         and JOB.FAILED_JOBS_COUNT_ != 0
+       </if>
+       <if test="hasFailure == false">
+         and (JOB.FAILED_JOBS_COUNT_ is null or JOB.FAILED_JOBS_COUNT_ = 0)
+       </if>
 
        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
        <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
