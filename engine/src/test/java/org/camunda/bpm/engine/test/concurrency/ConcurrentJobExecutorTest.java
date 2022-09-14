@@ -81,7 +81,7 @@ public class ConcurrentJobExecutorTest {
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
   protected static ControllableThread activeThread;
-  
+
   protected static final BpmnModelInstance SIMPLE_ASYNC_PROCESS = Bpmn.createExecutableProcess("simpleAsyncProcess")
       .startEvent()
       .serviceTask()
@@ -99,7 +99,8 @@ public class ConcurrentJobExecutorTest {
   }
 
   @After
-  public void deleteJobs() {
+  public void tearDown() {
+    ClockUtil.reset();
     for(final Job job : managementService.createJobQuery().list()) {
 
       processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
@@ -137,10 +138,10 @@ public class ConcurrentJobExecutorTest {
     threadOne.proceedAndWaitTillDone();
     assertTrue(threadOne.exception instanceof OptimisticLockingException);
   }
-  
+
   @Test
   public void shouldCompleteTimeoutRetryWhenTimeoutedJobCompletesInbetween() {
-    // given a simple process with a async service task
+    // given a simple process with an async service task
     testRule.deploy(Bpmn
         .createExecutableProcess("process")
           .startEvent()
@@ -155,19 +156,19 @@ public class ConcurrentJobExecutorTest {
     // and a job is executed until before the command context is closed
     JobExecutionThread threadOne = new JobExecutionThread(currentJob.getId());
     threadOne.startAndWaitUntilControlIsReturned();
-    
+
     // and lock is expiring in the meantime
-    ClockUtil.offset(Long.valueOf(engineRule.getProcessEngineConfiguration().getJobExecutor().getLockTimeInMillis()) + 10_000L);
+    ClockUtil.offset((long) engineRule.getProcessEngineConfiguration().getJobExecutor().getLockTimeInMillis() + 10_000L);
 
     // and job is acquired again
     JobAcquisitionThread acquisitionThread = new JobAcquisitionThread();
     acquisitionThread.startAndWaitUntilControlIsReturned();
     acquisitionThread.proceedAndWaitTillDone();
-    
+
     // and the job is executed again until before the command context is closed
     JobExecutionThread threadTwo = new JobExecutionThread(currentJob.getId());
     threadTwo.startAndWaitUntilControlIsReturned();
-    
+
     // and the first execution finishes
     threadOne.proceedAndWaitTillDone();
 
@@ -490,7 +491,7 @@ public class ConcurrentJobExecutorTest {
     public void run() {
       try {
         JobFailureCollector jobFailureCollector = new JobFailureCollector(jobId);
-        ExecuteJobHelper.executeJob(jobId, processEngineConfiguration.getCommandExecutorTxRequired(),jobFailureCollector, 
+        ExecuteJobHelper.executeJob(jobId, processEngineConfiguration.getCommandExecutorTxRequired(),jobFailureCollector,
             new ControlledCommand<>(activeThread, new ExecuteJobsCmd(jobId, jobFailureCollector)));
 
       }

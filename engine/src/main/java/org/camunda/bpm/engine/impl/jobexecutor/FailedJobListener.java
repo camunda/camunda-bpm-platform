@@ -48,18 +48,28 @@ public class FailedJobListener implements Command<Void> {
 
     logJobFailure(commandContext);
 
-    // take action if no other job execution thread took over already
-    JobEntity currentJob = commandContext.getJobManager().findJobById(jobFailureCollector.getJobId());
-    if (jobFailureCollector.getJob().getLockExpirationTime() != currentJob.getLockExpirationTime()) {
-      // do nothing, we expired and someone else already took over
-    } else {
-      FailedJobCommandFactory failedJobCommandFactory = commandContext.getFailedJobCommandFactory();
-      String jobId = jobFailureCollector.getJobId();
-      Command<Object> cmd = failedJobCommandFactory.getCommand(jobId, jobFailureCollector.getFailure());
-      commandExecutor.execute(new FailedJobListenerCmd(jobId, cmd));
+    if (isJobReacquired(commandContext)) {
+      // skip failed listener if job has been already re-acquired
+      return null;
     }
 
+    FailedJobCommandFactory failedJobCommandFactory = commandContext.getFailedJobCommandFactory();
+    String jobId = jobFailureCollector.getJobId();
+    Command<Object> cmd = failedJobCommandFactory.getCommand(jobId, jobFailureCollector.getFailure());
+    commandExecutor.execute(new FailedJobListenerCmd(jobId, cmd));
+
     return null;
+  }
+
+  private boolean isJobReacquired(CommandContext commandContext) {
+    // if persisted job's lockExpirationTime is different, then it's been already re-acquired
+    JobEntity persistedJob = commandContext.getJobManager().findJobById(jobFailureCollector.getJobId());
+    JobEntity job = jobFailureCollector.getJob();
+
+    if (persistedJob == null || persistedJob.getLockExpirationTime() == null) {
+      return false;
+    }
+    return !persistedJob.getLockExpirationTime().equals(job.getLockExpirationTime());
   }
 
   private void initTotalRetries(CommandContext commandContext) {
