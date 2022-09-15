@@ -388,7 +388,12 @@
                   <goal>test</goal>
                 </goals>
                 <configuration>
+                  <!-- Ensures that endpoints work with other encodings than UTF-8 (cf. CAM-6983) -->
                   <argLine>-Dfile.encoding=ISO-8859-1</argLine>
+                  <includes>
+                    <include>**/ProcessDefinitionRestServiceInteractionTest.java</include>
+                    <include>**/TaskRestServiceInteractionTest.java</include>
+                  </includes>
                 </configuration>
               </execution>
             </executions>
@@ -481,7 +486,12 @@
                   <goal>test</goal>
                 </goals>
                 <configuration>
+                  <!-- Ensures that endpoints work with other encodings than UTF-8 (cf. CAM-6983) -->
                   <argLine>-Dfile.encoding=ISO-8859-1</argLine>
+                  <includes>
+                    <include>**/ProcessDefinitionRestServiceInteractionTest.java</include>
+                    <include>**/TaskRestServiceInteractionTest.java</include>
+                  </includes>
                 </configuration>
               </execution>
             </executions>
@@ -574,7 +584,12 @@
                   <goal>test</goal>
                 </goals>
                 <configuration>
+                  <!-- Ensures that endpoints work with other encodings than UTF-8 (cf. CAM-6983) -->
                   <argLine>-Dfile.encoding=ISO-8859-1</argLine>
+                  <includes>
+                    <include>**/ProcessDefinitionRestServiceInteractionTest.java</include>
+                    <include>**/TaskRestServiceInteractionTest.java</include>
+                  </includes>
                 </configuration>
               </execution>
             </executions>
@@ -675,6 +690,27 @@
       </dependencies>
       <build>
         <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>encoding-test</id>
+                <phase>test</phase>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+                <configuration>
+                  <!-- Ensures that endpoints work with other encodings than UTF-8 (cf. CAM-6983) -->
+                  <argLine>-Dfile.encoding=ISO-8859-1</argLine>
+                  <includes>
+                    <include>**/ProcessDefinitionRestServiceInteractionTest.java</include>
+                    <include>**/TaskRestServiceInteractionTest.java</include>
+                  </includes>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>build-helper-maven-plugin</artifactId>
