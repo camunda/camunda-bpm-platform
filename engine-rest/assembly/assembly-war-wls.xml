@@ -24,10 +24,14 @@
       <useTransitiveFiltering>true</useTransitiveFiltering>
       <scope>provided</scope>
       <includes>
-        <include>org.camunda.bpm:camunda-engine-rest-core:jar:*</include>
+        <include>org.camunda.bpm:camunda-engine-rest-core:jar</include>
         <include>org.glassfish.jersey.containers:jersey-container-servlet:*</include>
         <include>org.glassfish.jersey.inject:jersey-hk2:*</include>
       </includes>
+      <excludes>
+        <exclude>org.camunda.bpm:camunda-engine-rest-core:jar:tests</exclude>
+        <exclude>org.camunda.bpm:camunda-engine-rest-core:jar:sources</exclude>
+      </excludes>
     </dependencySet>
 
     <dependencySet>
