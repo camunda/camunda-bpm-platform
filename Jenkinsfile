@@ -217,7 +217,7 @@ pipeline {
             ])
           }
         }
-        stage('engine-IT-tomcat-9-postgresql-1013') {
+        stage('engine-IT-tomcat-9-postgresql-142') {
           when {
             expression {
               cambpmWithLabels('all-as', 'tomcat')
@@ -225,7 +225,7 @@ pipeline {
           }
           steps {
             cambpmConditionalRetry([
-              agentLabel: 'postgresql_1013',
+              agentLabel: 'postgresql_142',
               runSteps: {
                 cambpmRunMaven('qa/', 'clean install -Ptomcat,postgresql,engine-integration', runtimeStash: true, archiveStash: true)
               },
@@ -235,7 +235,7 @@ pipeline {
             ])
           }
         }
-        stage('engine-IT-wildfly-postgresql-1013') {
+        stage('engine-IT-wildfly-postgresql-142') {
           when {
             expression {
               cambpmWithLabels('all-as', 'wildfly')
@@ -243,7 +243,7 @@ pipeline {
           }
           steps {
             cambpmConditionalRetry([
-              agentLabel: 'postgresql_1013',
+              agentLabel: 'postgresql_142',
               runSteps: {
                 cambpmRunMaven('qa/', 'clean install -Pwildfly,postgresql,engine-integration', runtimeStash: true, archiveStash: true)
               },
@@ -255,7 +255,7 @@ pipeline {
             ])
           }
         }
-        stage('engine-IT-XA-wildfly-postgresql-1013') {
+        stage('engine-IT-XA-wildfly-postgresql-142') {
           when {
             expression {
               cambpmWithLabels('wildfly')
@@ -263,7 +263,7 @@ pipeline {
           }
           steps {
             cambpmConditionalRetry([
-              agentLabel: 'postgresql_1013',
+              agentLabel: 'postgresql_142',
               runSteps: {
                 cambpmRunMaven('qa/', 'clean install -Pwildfly,postgresql,postgresql-xa,engine-integration', runtimeStash: true, archiveStash: true)
               },
