@@ -27,13 +27,6 @@
       <version>${project.version}</version>
     </dependency>
 
-    <dependency>
-      <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine-rest-jaxrs2</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
-    </dependency>
-
     <!-- dependencies only used for assemblies should be scope provided -->
     <dependency>
       <groupId>org.camunda.bpm</groupId>

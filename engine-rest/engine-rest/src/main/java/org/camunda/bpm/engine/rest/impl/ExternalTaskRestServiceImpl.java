@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.rest.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
 
@@ -29,8 +30,6 @@ import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
-import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
-import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.externaltask.UpdateExternalTaskRetriesBuilder;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.rest.ExternalTaskRestService;
@@ -38,12 +37,12 @@ import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskQueryDto;
-import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksDto;
+import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksExtendedDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.rest.dto.externaltask.LockedExternalTaskDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.SetRetriesForExternalTasksDto;
+import org.camunda.bpm.engine.rest.spi.FetchAndLockHandler;
 import org.camunda.bpm.engine.rest.sub.externaltask.ExternalTaskResource;
 import org.camunda.bpm.engine.rest.sub.externaltask.impl.ExternalTaskResourceImpl;
 
@@ -117,10 +116,9 @@ public class ExternalTaskRestServiceImpl extends AbstractRestProcessEngineAware 
   }
 
   @Override
-  public List<LockedExternalTaskDto> fetchAndLock(FetchExternalTasksDto fetchingDto) {
-    ExternalTaskQueryBuilder fetchBuilder = fetchingDto.buildQuery(processEngine);
-    List<LockedExternalTask> externalTasks = fetchBuilder.execute();
-    return LockedExternalTaskDto.fromLockedExternalTasks(externalTasks);
+  public void fetchAndLock(FetchExternalTasksExtendedDto dto, AsyncResponse asyncResponse) {
+    FetchAndLockHandler fetchAndLockHandler = FetchAndLockContextListener.getFetchAndLockHandler();
+    fetchAndLockHandler.addPendingRequest(dto, asyncResponse, processEngine);
   }
 
   @Override
