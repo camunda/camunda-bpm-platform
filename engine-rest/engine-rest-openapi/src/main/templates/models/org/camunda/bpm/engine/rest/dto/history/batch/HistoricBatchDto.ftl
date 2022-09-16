@@ -1,13 +1,13 @@
 <#-- Generated From File: camunda-docs-manual/public/reference/rest/history/batch/get-query/index.html -->
 <#macro dto_macro docsUrl="">
 <@lib.dto >
-    
+
     <@lib.property
         name = "id"
         type = "string"
         desc = "The id of the batch."
     />
-    
+
     <@lib.property
         name = "type"
         type = "string"
@@ -15,7 +15,7 @@
                 [User Guide](${docsUrl}/user-guide/process-engine/batch/#creating-a-batch)
                 for more information about batch types."
     />
-    
+
     <@lib.property
         name = "totalJobs"
         type = "integer"
@@ -25,7 +25,7 @@
                 jobs required to complete the batch.
                 "
     />
-    
+
     <@lib.property
         name = "batchJobsPerSeed"
         type = "integer"
@@ -36,7 +36,7 @@
                 execution jobs required by the batch (see `totalJobs` property).
                 "
     />
-    
+
     <@lib.property
         name = "invocationsPerBatchJob"
         type = "integer"
@@ -48,37 +48,37 @@
                 which are migrated per batch execution job.
                 "
     />
-    
+
     <@lib.property
         name = "seedJobDefinitionId"
         type = "string"
         desc = "The job definition id for the seed jobs of this batch."
     />
-    
+
     <@lib.property
         name = "monitorJobDefinitionId"
         type = "string"
         desc = "The job definition id for the monitor jobs of this batch."
     />
-    
+
     <@lib.property
         name = "batchJobDefinitionId"
         type = "string"
         desc = "The job definition id for the batch execution jobs of this batch."
     />
-    
+
     <@lib.property
         name = "tenantId"
         type = "string"
         desc = "The tenant id of the batch."
     />
-    
+
     <@lib.property
         name = "createUserId"
         type = "string"
         desc = "The batch creator's user id."
     />
-    
+
     <@lib.property
         name = "startTime"
         type = "string"
@@ -86,7 +86,15 @@
         desc = "The time the batch was started. Default format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`.
                 For further information, please see the [documentation](${docsUrl}/reference/rest/overview/date-format/)"
     />
-    
+
+    <@lib.property
+    name = "executionStartTime"
+    type = "string"
+    format = "date-time"
+    desc = "The time the batch execution was started, i.e., at least one batch job has been executed. Default format
+    `yyyy-MM-dd'T'HH:mm:ss.SSSZ`. For further information, please see the [documentation]
+    (${docsUrl}/reference/rest/overview/date-format/)" />
+
     <@lib.property
         name = "endTime"
         type = "string"
@@ -94,7 +102,7 @@
         desc = "The time the batch ended. Default format `yyyy-MM-dd'T'HH:mm:ss.SSSZ`.
                 For further information, please see the [documentation](${docsUrl}/reference/rest/overview/date-format/)"
     />
-    
+
     <@lib.property
         name = "removalTime"
         type = "string"

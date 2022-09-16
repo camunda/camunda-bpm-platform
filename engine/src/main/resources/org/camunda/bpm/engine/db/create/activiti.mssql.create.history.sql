@@ -302,6 +302,7 @@ create table ACT_HI_BATCH (
     START_TIME_ datetime2 not null,
     END_TIME_ datetime2,
     REMOVAL_TIME_ datetime2,
+    EXEC_START_TIME_ datetime2,
     primary key (ID_)
 );
 

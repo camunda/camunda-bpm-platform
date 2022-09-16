@@ -31,6 +31,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
@@ -39,6 +40,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -79,6 +81,8 @@ import org.junit.rules.RuleChain;
  */
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class RestartProcessInstanceAsyncTest {
+
+  protected static final Date TEST_DATE = new Date(1457326800000L);
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
@@ -552,8 +556,7 @@ public class RestartProcessInstanceAsyncTest {
 
   @Test
   public void testMonitorJobPollingForCompletionDueDateSet() {
-    Date testDate = new Date(1457326800000L);
-    ClockUtil.setCurrentTime(testDate);
+    ClockUtil.setCurrentTime(TEST_DATE);
     processEngineConfiguration.setEnsureJobDueDateNotNull(true);
 
     // given
@@ -572,20 +575,19 @@ public class RestartProcessInstanceAsyncTest {
       .executeAsync();
 
     // when the seed job creates the monitor job
-    Date createDate = testDate;
     helper.completeSeedJobs(batch);
 
     // then the monitor job has the create date as due date set
     Job monitorJob = helper.getMonitorJob(batch);
     assertNotNull(monitorJob);
-    assertEquals(testDate, monitorJob.getDuedate());
+    assertEquals(TEST_DATE, monitorJob.getDuedate());
 
     // when the monitor job is executed
     helper.executeMonitorJob(batch);
 
     // then the monitor job has a due date of the default batch poll time
     monitorJob = helper.getMonitorJob(batch);
-    Date dueDate = helper.addSeconds(createDate, 30);
+    Date dueDate = helper.addSeconds(TEST_DATE, 30);
     assertEquals(dueDate, monitorJob.getDuedate());
   }
 
@@ -1118,6 +1120,34 @@ public class RestartProcessInstanceAsyncTest {
     // clear
     engineRule.getProcessEngineConfiguration()
         .setInvocationsPerBatchJobByBatchType(new HashMap<>());
+  }
+
+  @Test
+  public void shouldSetExecutionStartTimeInBatchAndHistory() {
+    // given
+    ClockUtil.setCurrentTime(TEST_DATE);
+
+    ProcessDefinition processDefinition = testRule.deployAndGetDefinition(ProcessModels.TWO_TASKS_PROCESS);
+    ProcessInstance processInstance1 = runtimeService.createProcessInstanceById(processDefinition.getId())
+        .startBeforeActivity("userTask1")
+        .execute();
+    runtimeService.deleteProcessInstance(processInstance1.getId(), "test");
+    Batch batch = runtimeService.restartProcessInstances(processDefinition.getId())
+        .startAfterActivity("userTask2")
+        .processInstanceIds(processInstance1.getId())
+        .executeAsync();
+    helper.executeSeedJob(batch);
+    List<Job> executionJobs = helper.getExecutionJobs(batch);
+
+    // when
+    helper.executeJob(executionJobs.get(0));
+
+    // then
+    HistoricBatch historicBatch = historyService.createHistoricBatchQuery().singleResult();
+    batch = managementService.createBatchQuery().singleResult();
+
+    Assertions.assertThat(batch.getExecutionStartTime()).isEqualToIgnoringMillis(TEST_DATE);
+    Assertions.assertThat(historicBatch.getExecutionStartTime()).isEqualToIgnoringMillis(TEST_DATE);
   }
 
   protected void assertBatchCreated(Batch batch, int processInstanceCount) {

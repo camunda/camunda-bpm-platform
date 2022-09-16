@@ -54,12 +54,12 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.notNullValue;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -71,14 +71,13 @@ import static org.mockito.Mockito.when;
 /**
  * @author Tassilo Weidner
  */
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
 
-  private static final String FETCH_EXTERNAL_TASK_URL =  "/external-task/fetchAndLock";
-  private static final String FETCH_EXTERNAL_TASK_URL_NAMED_ENGINE =  NamedProcessEngineRestServiceImpl.PATH + "/{name}" + FETCH_EXTERNAL_TASK_URL;
+  private static final String FETCH_EXTERNAL_TASK_URL =  "/rest-test/external-task/fetchAndLock";
 
   @Mock
   private ExternalTaskService externalTaskService;
@@ -137,7 +136,6 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
     given()
       .contentType(ContentType.JSON)
       .body(fetchExternalTasksDto)
-      .pathParam("name", "default")
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
       .body("[0].id", equalTo(MockProvider.EXTERNAL_TASK_ID))
@@ -161,7 +159,7 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
         equalTo(MockProvider.EXAMPLE_PRIMITIVE_VARIABLE_VALUE.getValue()))
       .body("[0].variables." + MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME + ".type",
         equalTo("String"))
-    .when().post(FETCH_EXTERNAL_TASK_URL_NAMED_ENGINE);
+    .when().post(FETCH_EXTERNAL_TASK_URL);
 
     InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
     inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", true);
@@ -203,12 +201,11 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
     given()
       .contentType(ContentType.JSON)
       .body(fetchExternalTasksDto)
-      .pathParam("name", "default")
     .then()
       .expect()
       .statusCode(Status.OK.getStatusCode())
     .when()
-      .post(FETCH_EXTERNAL_TASK_URL_NAMED_ENGINE);
+      .post(FETCH_EXTERNAL_TASK_URL);
 
     InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
     inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId", false);
@@ -226,14 +223,13 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
     given()
       .contentType(ContentType.JSON)
       .body(fetchExternalTasksDto)
-      .pathParam("name", "default")
     .then()
       .expect()
         .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
         .body("message", containsString("The asynchronous response timeout cannot be set to a value greater than "))
         .statusCode(Status.BAD_REQUEST.getStatusCode())
     .when()
-      .post(FETCH_EXTERNAL_TASK_URL_NAMED_ENGINE);
+      .post(FETCH_EXTERNAL_TASK_URL);
   }
 
   @Test
@@ -248,14 +244,13 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
     given()
       .contentType(ContentType.JSON)
       .body(fetchExternalTasksDto)
-      .pathParam("name", "default")
     .then()
       .expect()
         .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
         .body("message", equalTo("anExceptionMessage"))
         .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
     .when()
-      .post(FETCH_EXTERNAL_TASK_URL_NAMED_ENGINE);
+      .post(FETCH_EXTERNAL_TASK_URL);
 
     verify(fetchTopicBuilder, atLeastOnce()).execute();
   }
@@ -270,14 +265,13 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
     given()
       .contentType(ContentType.JSON)
       .body(fetchExternalTasksDto)
-      .pathParam("name", "default")
     .then()
       .expect()
         .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
         .body("message", equalTo("anExceptionMessage"))
         .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
     .when()
-      .post(FETCH_EXTERNAL_TASK_URL_NAMED_ENGINE);
+      .post(FETCH_EXTERNAL_TASK_URL);
 
     verify(fetchTopicBuilder, times(1)).execute();
   }
@@ -311,9 +305,8 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
     given()
       .contentType(ContentType.JSON)
       .body(fetchExternalTasksDto)
-      .pathParam("name", "default")
     .when()
-      .post(FETCH_EXTERNAL_TASK_URL_NAMED_ENGINE);
+      .post(FETCH_EXTERNAL_TASK_URL);
 
     ArgumentCaptor<Authentication> argumentCaptor = ArgumentCaptor.forClass(Authentication.class);
     verify(identityServiceMock, atLeastOnce()).setAuthentication(argumentCaptor.capture());
@@ -333,14 +326,13 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
     given()
       .contentType(ContentType.JSON)
       .body(fetchExternalTasksDto)
-      .pathParam("name", "default")
     .then()
       .expect()
         .body("type", equalTo(IllegalArgumentException.class.getSimpleName()))
         .body("message", equalTo("anExceptionMessage"))
         .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
     .when()
-      .post(FETCH_EXTERNAL_TASK_URL_NAMED_ENGINE);
+      .post(FETCH_EXTERNAL_TASK_URL);
 
     verify(fetchTopicBuilder, times(1)).execute();
   }
@@ -355,7 +347,7 @@ public class FetchAndLockRestServiceInteractionTest extends AbstractRestServiceT
       topic.setProcessDefinitionVersionTag("version");
     }
 
-    given()
+  given()
     .contentType(ContentType.JSON)
     .body(fetchExternalTasksDto)
   .then()

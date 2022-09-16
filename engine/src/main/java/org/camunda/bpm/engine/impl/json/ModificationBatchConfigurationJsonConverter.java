@@ -19,13 +19,15 @@ package org.camunda.bpm.engine.impl.json;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.ModificationBatchConfiguration;
+import org.camunda.bpm.engine.impl.batch.AbstractBatchConfigurationObjectConverter;
 import org.camunda.bpm.engine.impl.batch.DeploymentMappingJsonConverter;
 import org.camunda.bpm.engine.impl.batch.DeploymentMappings;
 import org.camunda.bpm.engine.impl.cmd.AbstractProcessInstanceModificationCommand;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
 import com.google.gson.JsonObject;
 
-public class ModificationBatchConfigurationJsonConverter extends JsonObjectConverter<ModificationBatchConfiguration>{
+public class ModificationBatchConfigurationJsonConverter
+    extends AbstractBatchConfigurationObjectConverter<ModificationBatchConfiguration> {
 
   public static final ModificationBatchConfigurationJsonConverter INSTANCE = new ModificationBatchConfigurationJsonConverter();
   public static final String INSTRUCTIONS = "instructions";
@@ -36,7 +38,7 @@ public class ModificationBatchConfigurationJsonConverter extends JsonObjectConve
   public static final String PROCESS_DEFINITION_ID = "processDefinitionId";
 
   @Override
-  public JsonObject toJsonObject(ModificationBatchConfiguration configuration) {
+  public JsonObject writeConfiguration(ModificationBatchConfiguration configuration) {
     JsonObject json = JsonUtil.createObject();
 
     JsonUtil.addListField(json, INSTRUCTIONS, ModificationCmdJsonConverter.INSTANCE, configuration.getInstructions());
@@ -50,7 +52,7 @@ public class ModificationBatchConfigurationJsonConverter extends JsonObjectConve
   }
 
   @Override
-  public ModificationBatchConfiguration toObject(JsonObject json) {
+  public ModificationBatchConfiguration readConfiguration(JsonObject json) {
 
     List<String> processInstanceIds = readProcessInstanceIds(json);
     DeploymentMappings mappings = readIdMappings(json);

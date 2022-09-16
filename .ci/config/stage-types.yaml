@@ -127,22 +127,6 @@ engine-rest-unit-cxf:
   labels:
   - 'rest-api'
   nodeLabel: 'h2'
-engine-rest-unit-jaxrs2-jersey-2:
-  directory: 'engine-rest/engine-rest-jaxrs2'
-  command: 'clean install -Pjersey2'
-  stash:
-    runtimeStash: true
-  labels:
-  - 'rest-api'
-  nodeLabel: 'h2'
-engine-rest-unit-jaxrs2-resteasy:
-  directory: 'engine-rest/engine-rest-jaxrs2'
-  command: 'clean install -Presteasy'
-  stash:
-    runtimeStash: true
-  labels:
-  - 'rest-api'
-  nodeLabel: 'h2'
 engine-rest-unit-compatibility-wildfly:
   directory: 'engine-rest/engine-rest'
   command: 'clean install -Pwildfly-compatibility'

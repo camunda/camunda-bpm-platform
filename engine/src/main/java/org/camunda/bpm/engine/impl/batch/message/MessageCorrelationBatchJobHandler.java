@@ -23,7 +23,6 @@ import java.util.Map;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.MessageCorrelationBuilderImpl;
 import org.camunda.bpm.engine.impl.batch.AbstractBatchJobHandler;
-import org.camunda.bpm.engine.impl.batch.BatchJobConfiguration;
 import org.camunda.bpm.engine.impl.batch.BatchJobContext;
 import org.camunda.bpm.engine.impl.batch.BatchJobDeclaration;
 import org.camunda.bpm.engine.impl.cmd.CorrelateAllMessageCmd;
@@ -31,7 +30,6 @@ import org.camunda.bpm.engine.impl.core.variable.VariableUtil;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.json.MessageCorrelationBatchConfigurationJsonConverter;
-import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
@@ -75,12 +73,10 @@ public class MessageCorrelationBatchJobHandler extends AbstractBatchJobHandler<M
   }
 
   @Override
-  public void execute(BatchJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
-    ByteArrayEntity configurationEntity = commandContext
-        .getDbEntityManager()
-        .selectById(ByteArrayEntity.class, configuration.getConfigurationByteArrayId());
-
-    MessageCorrelationBatchConfiguration batchConfiguration = readConfiguration(configurationEntity.getBytes());
+  public void executeHandler(MessageCorrelationBatchConfiguration batchConfiguration,
+                             ExecutionEntity execution,
+                             CommandContext commandContext,
+                             String tenantId) {
     String batchId = batchConfiguration.getBatchId();
 
     MessageCorrelationBuilderImpl correlationBuilder = new MessageCorrelationBuilderImpl(commandContext, batchConfiguration.getMessageName());
@@ -90,8 +86,6 @@ public class MessageCorrelationBatchJobHandler extends AbstractBatchJobHandler<M
       correlationBuilder.processInstanceId(id);
       commandContext.executeWithOperationLogPrevented(new CorrelateAllMessageCmd(correlationBuilder, false, false));
     }
-
-    commandContext.getByteArrayManager().delete(configurationEntity);
   }
 
   protected void setVariables(String batchId,

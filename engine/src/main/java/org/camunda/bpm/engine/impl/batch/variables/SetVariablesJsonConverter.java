@@ -17,43 +17,40 @@
 package org.camunda.bpm.engine.impl.batch.variables;
 
 import com.google.gson.JsonObject;
+import org.camunda.bpm.engine.impl.batch.AbstractBatchConfigurationObjectConverter;
 import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
 import org.camunda.bpm.engine.impl.batch.DeploymentMappingJsonConverter;
 import org.camunda.bpm.engine.impl.batch.DeploymentMappings;
-import org.camunda.bpm.engine.impl.json.JsonObjectConverter;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
 
 import java.util.List;
 
-public class SetVariablesJsonConverter extends JsonObjectConverter<BatchConfiguration> {
+public class SetVariablesJsonConverter extends AbstractBatchConfigurationObjectConverter<BatchConfiguration> {
 
   public static final SetVariablesJsonConverter INSTANCE = new SetVariablesJsonConverter();
 
   protected static final String IDS = "ids";
   protected static final String ID_MAPPINGS = "idMappings";
-  protected static final String BATCH_ID = "batchId";
 
   @Override
-  public JsonObject toJsonObject(BatchConfiguration configuration) {
+  public JsonObject writeConfiguration(final BatchConfiguration configuration) {
     JsonObject json = JsonUtil.createObject();
 
     JsonUtil.addListField(json, IDS, configuration.getIds());
     JsonUtil.addListField(json, ID_MAPPINGS, DeploymentMappingJsonConverter.INSTANCE,
         configuration.getIdMappings());
-    JsonUtil.addField(json, BATCH_ID, configuration.getBatchId());
 
     return json;
   }
 
-  public BatchConfiguration toObject(JsonObject jsonObject) {
+  @Override
+  public BatchConfiguration readConfiguration(final JsonObject jsonObject) {
     List<String> instanceIds = JsonUtil.asStringList(JsonUtil.getArray(jsonObject, IDS));
 
     DeploymentMappings mappings = JsonUtil.asList(JsonUtil.getArray(jsonObject, ID_MAPPINGS),
         DeploymentMappingJsonConverter.INSTANCE, DeploymentMappings::new);
 
-    String batchId = JsonUtil.getString(jsonObject, BATCH_ID);
-
-    return new BatchConfiguration(instanceIds, mappings, batchId);
+    return new BatchConfiguration(instanceIds, mappings);
   }
 
 }

@@ -130,4 +130,9 @@ public interface Batch {
    */
   Date getStartTime();
 
+  /**
+   * @return the date the batch execution started
+   */
+  Date getExecutionStartTime();
+
 }

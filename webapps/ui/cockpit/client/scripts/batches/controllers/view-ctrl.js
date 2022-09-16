@@ -19,6 +19,8 @@
 
 var Ctrl = require('../components/batch');
 var events = require('../components/events');
+var angular = require('../../../../../../camunda-commons-ui/vendor/angular');
+var searchConfig = require('../config/batch-search-config.json');
 
 var fs = require('fs');
 
@@ -44,6 +46,7 @@ module.exports = [
   'Notifications',
   'localConf',
   'configuration',
+  'searchWidgetUtils',
   function(
     $scope,
     page,
@@ -53,7 +56,8 @@ module.exports = [
     $translate,
     Notifications,
     localConf,
-    configuration
+    configuration,
+    searchWidgetUtils
   ) {
     $scope.runtimeHeadColumns = [
       {
@@ -142,6 +146,18 @@ module.exports = [
       }
     ];
 
+    $scope.search = angular.copy(searchConfig);
+    $scope.search.searches = [];
+    $scope.$watch('search.searches', searches => {
+      const params = searchWidgetUtils.createSearchQueryForSearchWidget(
+        searches,
+        $scope.search.arrayTypes,
+        $scope.search.types
+      );
+
+      $scope.ctrl.onBatchQueryChange('runtime', params);
+    });
+
     $scope.$on('$destroy', function() {
       events.removeAllListeners();
       $scope.ctrl.stopLoadingPeriodically();
@@ -157,6 +173,12 @@ module.exports = [
         }
       }
     );
+
+    $scope.openDetails = function(id, type) {
+      $location.search('details', id);
+      $location.search('type', type);
+      $scope.ctrl.loadDetails(id, type);
+    };
 
     events.on('details:switchToHistory', function() {
       $location.search('type', 'history');

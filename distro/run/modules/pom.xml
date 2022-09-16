@@ -84,7 +84,7 @@
       </dependency>
       <dependency>
         <groupId>org.camunda.bpm</groupId>
-        <artifactId>camunda-engine-rest-jaxrs2</artifactId>
+        <artifactId>camunda-engine-rest-core</artifactId>
         <scope>provided</scope>
       </dependency>
     </dependencies>
