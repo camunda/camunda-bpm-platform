@@ -66,7 +66,7 @@ public class ProcessInstanceTest {
     assertThat(count.getCount()).isEqualTo(3);
     verify(postRequestedFor(urlEqualTo(ENGINE_REST_PROCESS_INSTANCE + "/count"))
         .withRequestBody(equalToJson("{ \"active\": true }"))
-        .withHeader("Content-Type",  equalTo("application/json; charset=utf-8"))
+        .withHeader("Content-Type",  equalTo("application/json; charset=UTF-8"))
         );
 
   }

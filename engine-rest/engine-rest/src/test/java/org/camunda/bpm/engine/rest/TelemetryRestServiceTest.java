@@ -16,9 +16,22 @@
  */
 package org.camunda.bpm.engine.rest;
 
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+
+import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ManagementService;
-import org.camunda.bpm.engine.rest.dto.telemetry.TelemetryDataDto;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.camunda.bpm.engine.telemetry.ApplicationServer;
@@ -32,20 +45,8 @@ import org.junit.ClassRule;
 import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.restassured.http.ContentType;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-
-import javax.ws.rs.core.Response.Status;
-
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class TelemetryRestServiceTest extends AbstractRestServiceTest {
 
@@ -220,6 +221,7 @@ public class TelemetryRestServiceTest extends AbstractRestServiceTest {
         .body("product.internals.license-key.unlimited", equalTo(MockProvider.EXAMPLE_TELEMETRY_LICENSE_UNLIMITED))
         .body("product.internals.license-key.valid-until", equalTo(MockProvider.EXAMPLE_TELEMETRY_LICENSE_VALID_UNTIL))
         .body("product.internals.camunda-integration[0]", equalTo("spring-boot"))
+        .body("product.internals.data-collection-start-date", equalTo(MockProvider.EXAMPLE_TELEMETRY_DATA_COLLECTION_START_DATE))
     .when()
       .get(TELEMETRY_DATA_URL);
 

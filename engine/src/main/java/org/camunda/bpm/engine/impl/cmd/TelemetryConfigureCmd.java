@@ -72,6 +72,10 @@ public class TelemetryConfigureCmd implements Command<Void> {
     }
 
     // reset collected data when telemetry is enabled
+    if(telemetryEnabled && !processEngineConfiguration.getTelemetryRegistry().isTelemetryLocallyActivated()) {
+      // reset data collection time frame only if telemetry was disabled and is now enabled
+      processEngineConfiguration.getTelemetryReporter().getTelemetrySendingTask().updateDataCollectionStartDate();
+    }
     // we don't want to send data that has been collected before consent was given
     TelemetryUtil.toggleLocalTelemetry(
         telemetryEnabled,

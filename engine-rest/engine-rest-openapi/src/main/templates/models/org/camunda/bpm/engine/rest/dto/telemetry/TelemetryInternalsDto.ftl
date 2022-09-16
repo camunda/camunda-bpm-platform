@@ -51,10 +51,17 @@
     <@lib.property
         name = "jdk"
         type = "object"
-        last = true
         additionalProperties = true
         dto = "AbstractVendorVersionInformationDto"
         desc = "Vendor and version of the installed JDK."/>
+
+    <@lib.property
+        name = "data-collection-start-date"
+        type = "string"
+        format = "date-time"
+        nullable = false
+        last = true
+        desc = "The date when the engine started to collect dynamic data, such as command executions and metrics. This property is initially set at engine startup and, if telemetry sending is enabled, resets to the current date on sending telemetry data to Camunda. At this point all dynamic data, such as command execution counts and metrics are reset as well."/>
 
 </@lib.dto>
 

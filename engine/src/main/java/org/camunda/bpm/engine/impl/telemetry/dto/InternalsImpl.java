@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.impl.telemetry.dto;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -33,16 +34,18 @@ public class InternalsImpl implements Internals {
   public static final String SERIALIZED_CAMUNDA_INTEGRATION = "camunda-integration";
   public static final String SERIALIZED_LICENSE_KEY = "license-key";
   public static final String SERIALIZED_TELEMETRY_ENABLED = "telemetry-enabled";
+  public static final String SERIALIZED_TELEMETRY_DATA_COLLECTION_START_DATE = "data-collection-start-date";
 
   protected DatabaseImpl database;
   @SerializedName(value = SERIALIZED_APPLICATION_SERVER)
   protected ApplicationServerImpl applicationServer;
   @SerializedName(value = SERIALIZED_LICENSE_KEY)
   protected LicenseKeyDataImpl licenseKey;
-  protected Map<String, Command> commands;
   @SerializedName(value = SERIALIZED_CAMUNDA_INTEGRATION)
   protected Set<String> camundaIntegration;
-
+  @SerializedName(value = SERIALIZED_TELEMETRY_DATA_COLLECTION_START_DATE)
+  protected Date dataCollectionStartDate;
+  protected Map<String, Command> commands;
   protected Map<String, Metric> metrics;
   protected Set<String> webapps;
 
@@ -71,6 +74,7 @@ public class InternalsImpl implements Internals {
     this.metrics = internals.metrics == null ? null : new HashMap<>(internals.getMetrics());
     this.telemetryEnabled = internals.telemetryEnabled;
     this.webapps = internals.webapps;
+    this.dataCollectionStartDate = internals.dataCollectionStartDate;
   }
 
   public DatabaseImpl getDatabase() {
@@ -87,6 +91,15 @@ public class InternalsImpl implements Internals {
 
   public void setApplicationServer(ApplicationServerImpl applicationServer) {
     this.applicationServer = applicationServer;
+  }
+
+  @Override
+  public Date getDataCollectionStartDate() {
+    return dataCollectionStartDate;
+  }
+
+  public void setDataCollectionStartDate(Date dataCollectionStartDate) {
+    this.dataCollectionStartDate = dataCollectionStartDate;
   }
 
   public Map<String, Command> getCommands() {
@@ -165,5 +178,4 @@ public class InternalsImpl implements Internals {
   public void setWebapps(Set<String> webapps) {
     this.webapps = webapps;
   }
-
 }
