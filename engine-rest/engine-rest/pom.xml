@@ -282,14 +282,10 @@
         </configuration>
       </plugin>
 
-      <!-- the test runtimes each bring the JAX-RS classes themselves -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <classpathDependencyExcludes>
-            <classpathDependencyExclude>org.jboss.spec.javax.ws.rs:jboss-jaxrs-api_1.1_spec</classpathDependencyExclude>
-          </classpathDependencyExcludes>
           <systemPropertyVariables>
             <restEasyVersion>${version.resteasy}</restEasyVersion>
           </systemPropertyVariables>
