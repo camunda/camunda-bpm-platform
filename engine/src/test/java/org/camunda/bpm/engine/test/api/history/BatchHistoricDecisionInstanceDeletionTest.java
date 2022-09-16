@@ -36,6 +36,7 @@ import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.impl.batch.BatchSeedJobHandler;
@@ -47,6 +48,7 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.runtime.BatchHelper;
+import org.camunda.bpm.engine.test.util.AssertUtil;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -624,6 +626,25 @@ public class BatchHistoricDecisionInstanceDeletionTest {
 
     // clear
     configuration.setInvocationsPerBatchJobByBatchType(new HashMap<>());
+  }
+
+  @Test
+  public void shouldSetExecutionStartTimeInBatchAndHistory() {
+    // given
+    ClockUtil.setCurrentTime(TEST_DATE);
+    Batch batch = historyService.deleteHistoricDecisionInstancesAsync(decisionInstanceIds, null);
+    helper.executeSeedJob(batch);
+    List<Job> executionJobs = helper.getExecutionJobs(batch);
+
+    // when
+    helper.executeJob(executionJobs.get(0));
+
+    // then
+    HistoricBatch historicBatch = historyService.createHistoricBatchQuery().singleResult();
+    batch = rule.getManagementService().createBatchQuery().singleResult();
+
+    Assertions.assertThat(batch.getExecutionStartTime()).isEqualToIgnoringMillis(TEST_DATE);
+    Assertions.assertThat(historicBatch.getExecutionStartTime()).isEqualToIgnoringMillis(TEST_DATE);
   }
 
   protected void assertBatchCreated(Batch batch, int decisionInstanceCount) {

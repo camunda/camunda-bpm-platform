@@ -3165,6 +3165,7 @@ public abstract class MockProvider {
       .suspended()
       .createUserId(EXAMPLE_USER_ID)
       .startTime(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_BATCH_START_TIME))
+      .executionStartTime(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_BATCH_START_TIME))
       .tenantId(EXAMPLE_TENANT_ID);
   }
 
@@ -3191,6 +3192,7 @@ public abstract class MockProvider {
       .tenantId(EXAMPLE_TENANT_ID)
       .createUserId(EXAMPLE_USER_ID)
       .startTime(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_BATCH_START_TIME))
+      .executionStartTime(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_BATCH_START_TIME))
       .endTime(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_BATCH_END_TIME))
       .removalTime(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_BATCH_REMOVAL_TIME));
   }

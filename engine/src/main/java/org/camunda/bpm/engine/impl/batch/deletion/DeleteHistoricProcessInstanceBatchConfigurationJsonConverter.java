@@ -18,10 +18,10 @@ package org.camunda.bpm.engine.impl.batch.deletion;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.batch.AbstractBatchConfigurationObjectConverter;
 import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
 import org.camunda.bpm.engine.impl.batch.DeploymentMappingJsonConverter;
 import org.camunda.bpm.engine.impl.batch.DeploymentMappings;
-import org.camunda.bpm.engine.impl.json.JsonObjectConverter;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
 
 import com.google.gson.JsonObject;
@@ -29,8 +29,8 @@ import com.google.gson.JsonObject;
 /**
  * @author Askar Akhmerov
  */
-public class DeleteHistoricProcessInstanceBatchConfigurationJsonConverter extends JsonObjectConverter<BatchConfiguration> {
-
+public class DeleteHistoricProcessInstanceBatchConfigurationJsonConverter
+    extends AbstractBatchConfigurationObjectConverter<BatchConfiguration> {
 
   public static final DeleteHistoricProcessInstanceBatchConfigurationJsonConverter INSTANCE = new DeleteHistoricProcessInstanceBatchConfigurationJsonConverter();
 
@@ -38,7 +38,8 @@ public class DeleteHistoricProcessInstanceBatchConfigurationJsonConverter extend
   public static final String HISTORIC_PROCESS_INSTANCE_ID_MAPPINGS = "historicProcessInstanceIdMappings";
   public static final String FAIL_IF_NOT_EXISTS = "failIfNotExists";
 
-  public JsonObject toJsonObject(BatchConfiguration configuration) {
+  @Override
+  public JsonObject writeConfiguration(BatchConfiguration configuration) {
     JsonObject json = JsonUtil.createObject();
     JsonUtil.addListField(json, HISTORIC_PROCESS_INSTANCE_ID_MAPPINGS, DeploymentMappingJsonConverter.INSTANCE, configuration.getIdMappings());
     JsonUtil.addListField(json, HISTORIC_PROCESS_INSTANCE_IDS, configuration.getIds());
@@ -46,7 +47,8 @@ public class DeleteHistoricProcessInstanceBatchConfigurationJsonConverter extend
     return json;
   }
 
-  public BatchConfiguration toObject(JsonObject json) {
+  @Override
+  public BatchConfiguration readConfiguration(JsonObject json) {
     BatchConfiguration configuration = new BatchConfiguration(readProcessInstanceIds(json), readIdMappings(json),
         JsonUtil.getBoolean(json, FAIL_IF_NOT_EXISTS));
     return configuration;

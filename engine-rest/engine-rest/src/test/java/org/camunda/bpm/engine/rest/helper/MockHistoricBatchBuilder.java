@@ -36,6 +36,7 @@ public class MockHistoricBatchBuilder {
   protected String tenantId;
   protected String createUserId;
   protected Date startTime;
+  protected Date executionStartTime;
   protected Date endTime;
   protected Date removalTime;
 
@@ -94,6 +95,11 @@ public class MockHistoricBatchBuilder {
     return this;
   }
 
+  public MockHistoricBatchBuilder executionStartTime(Date executionStartTime) {
+    this.executionStartTime = executionStartTime;
+    return this;
+  }
+
   public MockHistoricBatchBuilder endTime(Date endTime) {
     this.endTime = endTime;
     return this;
@@ -117,6 +123,7 @@ public class MockHistoricBatchBuilder {
     when(historicBatch.getTenantId()).thenReturn(tenantId);
     when(historicBatch.getCreateUserId()).thenReturn(createUserId);
     when(historicBatch.getStartTime()).thenReturn(startTime);
+    when(historicBatch.getExecutionStartTime()).thenReturn(executionStartTime);
     when(historicBatch.getEndTime()).thenReturn(endTime);
     when(historicBatch.getRemovalTime()).thenReturn(removalTime);
     return historicBatch;

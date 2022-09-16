@@ -22,10 +22,12 @@ import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
@@ -33,9 +35,12 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
+import org.camunda.bpm.engine.batch.history.HistoricBatch;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
@@ -59,12 +64,14 @@ import org.junit.rules.RuleChain;
 public class SetVariablesBatchTest {
 
   protected static final String PROCESS_KEY = "process";
+  protected static final Date TEST_DATE = new Date(1457326800000L);
 
   protected static final VariableMap SINGLE_VARIABLE = Variables.putValue("foo", "bar");
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule engineTestRule = new ProcessEngineTestRule(engineRule);
   protected BatchRule rule = new BatchRule(engineRule, engineTestRule);
+  protected BatchHelper helper = new BatchHelper(engineRule);
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(engineTestRule).around(rule);
@@ -92,6 +99,7 @@ public class SetVariablesBatchTest {
 
   @After
   public void clearAuthentication() {
+    ClockUtil.reset();
     engineRule.getIdentityService()
         .setAuthenticatedUserId(null);
   }
@@ -706,6 +714,30 @@ public class SetVariablesBatchTest {
     assertThat(executionJobs)
         .extracting("processInstanceId")
         .containsOnlyNulls();
+
+    // clear
+    managementService.deleteBatch(batch.getId(), true);
+  }
+
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void shouldSetExecutionStartTimeInBatchAndHistory() {
+    // given
+    ClockUtil.setCurrentTime(TEST_DATE);
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY).getId();
+    Batch batch = runtimeService.setVariablesAsync(runtimeService.createProcessInstanceQuery(), SINGLE_VARIABLE);
+    helper.executeSeedJob(batch);
+    List<Job> executionJobs = helper.getExecutionJobs(batch, Batch.TYPE_SET_VARIABLES);
+
+    // when
+    helper.executeJob(executionJobs.get(0));
+
+    // then
+    HistoricBatch historicBatch = historyService.createHistoricBatchQuery().singleResult();
+    batch = managementService.createBatchQuery().singleResult();
+
+    Assertions.assertThat(batch.getExecutionStartTime()).isEqualToIgnoringMillis(TEST_DATE);
+    Assertions.assertThat(historicBatch.getExecutionStartTime()).isEqualToIgnoringMillis(TEST_DATE);
 
     // clear
     managementService.deleteBatch(batch.getId(), true);

@@ -38,6 +38,7 @@ public class MockBatchBuilder {
   protected String tenantId;
   protected String createUserId;
   protected Date startTime;
+  protected Date executionStartTime;
 
   public MockBatchBuilder id(String id) {
     this.id = id;
@@ -104,6 +105,11 @@ public class MockBatchBuilder {
     return this;
   }
 
+  public MockBatchBuilder executionStartTime(Date executionStartTime) {
+    this.executionStartTime = executionStartTime;
+    return this;
+  }
+
   public Batch build() {
     Batch batch = mock(Batch.class);
     when(batch.getId()).thenReturn(id);
@@ -119,6 +125,7 @@ public class MockBatchBuilder {
     when(batch.getTenantId()).thenReturn(tenantId);
     when(batch.getCreateUserId()).thenReturn(createUserId);
     when(batch.getStartTime()).thenReturn(startTime);
+    when(batch.getExecutionStartTime()).thenReturn(executionStartTime);
     return batch;
   }
 

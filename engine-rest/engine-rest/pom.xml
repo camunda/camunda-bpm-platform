@@ -374,11 +374,6 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
-              <excludes>
-                <!-- This test is only needed for the Resteasy 2 profile; with
-                  Resteasy 3 we can run the regular test -->
-                <exclude>**/ResteasyTaskRestServiceInteractionTest.java</exclude>
-              </excludes>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
             <executions>
@@ -389,6 +384,7 @@
                   <goal>test</goal>
                 </goals>
                 <configuration>
+                  <!-- Ensures that endpoints work with other encodings than UTF-8 (cf. CAM-6983) -->
                   <argLine>-Dfile.encoding=ISO-8859-1</argLine>
                   <includes>
                     <include>**/ProcessDefinitionRestServiceInteractionTest.java</include>
@@ -486,6 +482,7 @@
                   <goal>test</goal>
                 </goals>
                 <configuration>
+                  <!-- Ensures that endpoints work with other encodings than UTF-8 (cf. CAM-6983) -->
                   <argLine>-Dfile.encoding=ISO-8859-1</argLine>
                   <includes>
                     <include>**/ProcessDefinitionRestServiceInteractionTest.java</include>
@@ -583,6 +580,7 @@
                   <goal>test</goal>
                 </goals>
                 <configuration>
+                  <!-- Ensures that endpoints work with other encodings than UTF-8 (cf. CAM-6983) -->
                   <argLine>-Dfile.encoding=ISO-8859-1</argLine>
                   <includes>
                     <include>**/ProcessDefinitionRestServiceInteractionTest.java</include>
@@ -649,7 +647,9 @@
              Camunda-supported Wildfly/JBoss EAP version.
              Currently, this is JBoss EAP 7.2. -->
         <version.resteasy>3.6.1.SP2</version.resteasy>
+        <version.netty>4.1.42.Final</version.netty>
       </properties>
+
       <dependencies>
         <dependency>
           <groupId>org.jboss.spec.javax.ws.rs</groupId>
@@ -659,7 +659,27 @@
 
         <dependency>
           <groupId>org.jboss.resteasy</groupId>
-          <artifactId>resteasy-netty</artifactId>
+          <artifactId>resteasy-jaxrs</artifactId>
+          <version>${version.resteasy}</version>
+          <scope>test</scope>
+          <exclusions>
+            <exclusion>
+              <artifactId>httpclient</artifactId>
+              <groupId>org.apache.httpcomponents</groupId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+
+        <dependency>
+          <groupId>io.netty</groupId>
+          <artifactId>netty-all</artifactId>
+          <version>${version.netty}</version>
+          <scope>test</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>resteasy-netty4</artifactId>
           <version>${version.resteasy}</version>
           <scope>test</scope>
         </dependency>

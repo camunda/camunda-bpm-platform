@@ -141,6 +141,7 @@ public class BatchMigrationHistoryTest {
     assertEquals(batch.getBatchJobDefinitionId(), historicBatch.getBatchJobDefinitionId());
     assertEquals(START_DATE, historicBatch.getStartTime());
     assertEquals(batch.getStartTime(), historicBatch.getStartTime());
+    assertEquals(batch.getExecutionStartTime(), historicBatch.getExecutionStartTime());
     assertNull(historicBatch.getEndTime());
   }
 
