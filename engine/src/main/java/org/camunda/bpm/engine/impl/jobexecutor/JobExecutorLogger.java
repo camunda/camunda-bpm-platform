@@ -213,6 +213,10 @@ public class JobExecutorLogger extends ProcessEngineLogger {
         config.getBatchJobPriority());
   }
 
+  public void debugFailedJobListenerSkipped(String jobId) {
+    logDebug("031", "Failed job listener skipped for job {} because it's been already re-acquired", jobId);
+  }
+
   public ProcessEngineException jobExecutorPriorityRangeException(String reason) {
     return new ProcessEngineException(exceptionMessage("031", "Invalid configuration for job executor priority range. Reason: {}", reason));
   }

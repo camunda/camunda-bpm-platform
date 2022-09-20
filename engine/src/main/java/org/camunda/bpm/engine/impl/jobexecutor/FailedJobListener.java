@@ -44,14 +44,15 @@ public class FailedJobListener implements Command<Void> {
   }
 
   public Void execute(CommandContext commandContext) {
+    if (isJobReacquired(commandContext)) {
+      // skip failed listener if job has been already re-acquired
+      LOG.debugFailedJobListenerSkipped(jobFailureCollector.getJobId());
+      return null;
+    }
+
     initTotalRetries(commandContext);
 
     logJobFailure(commandContext);
-
-    if (isJobReacquired(commandContext)) {
-      // skip failed listener if job has been already re-acquired
-      return null;
-    }
 
     FailedJobCommandFactory failedJobCommandFactory = commandContext.getFailedJobCommandFactory();
     String jobId = jobFailureCollector.getJobId();
