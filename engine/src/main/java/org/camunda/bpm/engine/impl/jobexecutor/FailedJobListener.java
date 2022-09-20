@@ -61,7 +61,7 @@ public class FailedJobListener implements Command<Void> {
     return null;
   }
 
-  private boolean isJobReacquired(CommandContext commandContext) {
+  protected boolean isJobReacquired(CommandContext commandContext) {
     // if persisted job's lockExpirationTime is different, then it's been already re-acquired
     JobEntity persistedJob = commandContext.getJobManager().findJobById(jobFailureCollector.getJobId());
     JobEntity job = jobFailureCollector.getJob();
