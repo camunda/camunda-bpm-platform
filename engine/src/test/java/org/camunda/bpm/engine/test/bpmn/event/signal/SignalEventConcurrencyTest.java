@@ -20,8 +20,10 @@ import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.event.EventHandler;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -76,7 +78,8 @@ public class SignalEventConcurrencyTest extends ConcurrencyTestHelper {
   @Test
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventConcurrencyTest.testSignalWithCompletedExecution.bpmn20.xml" })
-  public void testSignalWithCompletedExecution() {
+  @RequiredDatabase(excludes = DbSqlSessionFactory.CRDB)
+  public void shouldThrowExceptionWhenSignallingWithCompletedExecution() {
 
     runtimeService.startProcessInstanceByKey("mainProcess");
 
