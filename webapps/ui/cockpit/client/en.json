@@ -1357,6 +1357,7 @@
     "PLGN_MOD_REQUEST_PAYLOAD": "requestPayload",
     "PLGN_MOD_NOTIFICATION_ERROR": "Could not apply modification",
     "PLGN_MOD_DIALOG_TITLE": "Select Instances To Modify",
+    "PLGN_MOD_DIALOG_FILTER": "Filter for running process instances",
     "PLGN_MOD_DIALOG_LOADER_EMPTY": "There are no process instances in the current filter.",
     "PLGN_MOD_DIALOG_ID": "ID",
     "PLGN_MOD_DIALOG_BUSINESS_KEY": "Business Key",

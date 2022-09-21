@@ -24,30 +24,36 @@ var angular = require('../../../../camunda-bpm-sdk-js/vendor/angular'),
     'utf8'
   );
 
-module.exports = function() {
-  return {
-    template: template,
-    scope: {
-      selectedInstancesCount: '@',
-      totalInstancesCount: '@',
-      toggleState: '@',
-      pageSize: '@'
-    },
-    link: function(scope) {
-      scope.selectionType = 'INSTANCE';
+module.exports = [
+  '$location',
+  function($location) {
+    return {
+      template: template,
+      scope: {
+        selectedInstancesCount: '@',
+        totalInstancesCount: '@',
+        toggleState: '@',
+        pageSize: '@'
+      },
+      link: function(scope) {
+        scope.selectionType = 'INSTANCE';
+        scope.isBatchOperationPage = $location
+          .path()
+          .includes('batch/operation');
 
-      const updateSelectionType = (scope.updateSelectionType = function(
-        selectionType = scope.selectionType
-      ) {
-        // This check succeeds when clicking on the links to switch between selection types. In this instance, scope.selectionType will be different from the selectionType argument passed from the UI.
-        if (selectionType !== scope.selectionType) {
-          scope.selectionType = selectionType;
-        }
+        const updateSelectionType = (scope.updateSelectionType = function(
+          selectionType = scope.selectionType
+        ) {
+          // This check succeeds when clicking on the links to switch between selection types. In this instance, scope.selectionType will be different from the selectionType argument passed from the UI.
+          if (selectionType !== scope.selectionType) {
+            scope.selectionType = selectionType;
+          }
 
-        scope.$emit('selection.type.updated', selectionType);
-      });
+          scope.$emit('selection.type.updated', selectionType);
+        });
 
-      scope.$watch('selectionType', updateSelectionType);
-    }
-  };
-};
+        scope.$watch('selectionType', updateSelectionType);
+      }
+    };
+  }
+];
