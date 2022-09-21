@@ -27,6 +27,12 @@ pipeline {
     string name: 'MAVEN_VERSION', defaultValue: 'maven-3.8-latest', description: 'e.g. maven-3.2-latest'
   }
   stages {
+    stage('Maven'){
+      parallel {
+          
+
+
+
     stage('ASSEMBLY') {
       when {
         expression {
@@ -82,19 +88,32 @@ pipeline {
 
 
             script {
-              sh 'cd .m2/org/camunda'
-              sh 'find . -name "*-7.18.0-SNAPSHOT.jar" -print  -exec jar -tf {} /; > ./jar-list.txt'
-            //  sh 'find . -name "camunda-webapp*frontend-sources.zip" -print  -exec jar -tvf {} /; > ./frontend-sources-list.txt'
-              //sh 'find . -name "camunda-*-assembly*.tar.gz" -print  -exec jar -tvf {} /; > ./tar-list.txt'
-              //TODO
-              sh 'find . -name "camunda-webapp*.war" -print  -exec jar -tf {} /; > ./camunda-webapp-war-list.txt'
-              sh 'find . -name "camunda-engine-rest*.war" -print  -exec jar -tf {} /; > ./camunda-engine-rest-war-list.txt'
-              sh 'find . -name "camunda-engine-rest*.war" -print  -exec jar -tf {} /; > ./camunda-engine-rest-war-list.txt'
-              
-              
-              cambpmStash("platform-lists",
-                        ".m2/org/camunda/**/*-SNAPSHOT/**",
-                        "**-list.txt")
+              sh 'mkdir 3.8'
+              def JAR_OUTPUT = sh(returnStdout: true,
+                                  script: "find .m2/org -name '*-7.18.0-SNAPSHOT.jar' -print  -exec jar -tf {} \\;").trim()
+              echo "list: ${JAR_OUTPUT}"
+              writeFile(file: '3.8/jar-list.txt', text: JAR_OUTPUT)
+
+              JAR_OUTPUT = sh(returnStdout: true,
+                              script: "find .m2/org -name '*-7.18.0-SNAPSHOT.zip' -print  -exec jar -tf {} \\;").trim()
+              echo "list: ${JAR_OUTPUT}"
+              writeFile(file: '3.8/zip-list.txt', text: JAR_OUTPUT)
+
+              JAR_OUTPUT = sh(returnStdout: true,
+                              script: "find .m2/org -name '*-7.18.0-SNAPSHOT.war' -print  -exec jar -tf {} \\;").trim()
+              echo "list: ${JAR_OUTPUT}"
+              writeFile(file: '3.8/war-list.txt', text: JAR_OUTPUT)
+
+              JAR_OUTPUT = sh(returnStdout: true, 
+                              script: "find .m2/org -name '*-7.18.0-SNAPSHOT.tar.gz' -print  -exec jar -tf {} \\;").trim()
+              echo "jar-list: ${JAR_OUTPUT}"
+              writeFile(file: '3.8/tar-list.txt', text: JAR_OUTPUT)
+              sh "ls"
+              sh "ls 3.8"
+
+              cambpmArchiveArtifacts('3.8/**-list.txt')
+              cambpmStash("platform-lists-3.8",
+                          "**/**-list.txt")
                         
               // JOB_NAME, e.g.: '7.15/cambpm-ce/cambpm-main/PR-1373'
               // keep leading slash for the absolute project path
@@ -108,6 +127,7 @@ pipeline {
            //      [string(name: 'UPSTREAM_PROJECT_NAME', value: upstreamProjectName),
            //      string(name: 'UPSTREAM_BUILD_NUMBER', value: upstreamBuildNumber)],
            //      true, true, true
+           
            //    )
            //  }
 
@@ -117,6 +137,95 @@ pipeline {
         ])
 
       }
-    }
+          }
+      stage('ASSEMBLY-3.2') {
+      when {
+        expression {
+          env.BRANCH_NAME == cambpmDefaultBranch() || (changeRequest() && !pullRequest.labels.contains('ci:no-build'))
+        }
+      }
+      environment {
+        NEXUS_SNAPSHOT_REPOSITORY = cambpmConfig.nexusSnapshotRepository()
+        NEXUS_SNAPSHOT_REPOSITORY_ID = cambpmConfig.nexusSnapshotRepositoryId()
+      }
+      steps {
+        cambpmConditionalRetry([
+          agentLabel: 'h2_perf32',
+          suppressErrors: false,
+          runSteps: {
+            withVault([vaultSecrets: [
+                [
+                    path        : 'secret/products/cambpm/ci/xlts.dev',
+                    secretValues: [
+                        [envVar: 'XLTS_REGISTRY', vaultKey: 'registry'],
+                        [envVar: 'XLTS_AUTH_TOKEN', vaultKey: 'authToken']]
+                ]]]) {
+              cambpmRunMaven('.',
+                  'clean source:jar deploy source:test-jar com.mycila:license-maven-plugin:check -Pdistro,distro-ce,distro-wildfly,distro-webjar,h2-in-memory -DaltStagingDirectory=${WORKSPACE}/staging -DskipRemoteStaging=true -DskipTests',
+                  withCatch: false,
+                  withNpm: true,
+                  // we use JDK 11 to build the artifacts, as it is required by the Quarkus extension
+                  // the compiler source and target is set to JDK 8 in the release parents
+                  jdkVersion: 'jdk-11-latest',
+                  mvnVersion: 'maven-3.2-latest')
+            }
+
+            script {
+              sh 'mkdir 3.2'
+              def JAR_OUTPUT = sh(returnStdout: true,
+                                  script: "find .m2/org -name '*-7.18.0-SNAPSHOT.jar' -print  -exec jar -tf {} \\;").trim()
+              echo "list: ${JAR_OUTPUT}"
+              writeFile(file: '3.2/jar-list.txt', text: JAR_OUTPUT)
+
+              JAR_OUTPUT = sh(returnStdout: true,
+                              script: "find .m2/org -name '*-7.18.0-SNAPSHOT.zip' -print  -exec jar -tf {} \\;").trim()
+              echo "list: ${JAR_OUTPUT}"
+              writeFile(file: '3.2/zip-list.txt', text: JAR_OUTPUT)
+
+              JAR_OUTPUT = sh(returnStdout: true,
+                              script: "find .m2/org -name '*-7.18.0-SNAPSHOT.war' -print  -exec jar -tf {} \\;").trim()
+              echo "list: ${JAR_OUTPUT}"
+              writeFile(file: '3.2/war-list.txt', text: JAR_OUTPUT)
+
+              JAR_OUTPUT = sh(returnStdout: true, 
+                              script: "find .m2/org -name '*-7.18.0-SNAPSHOT.tar.gz' -print  -exec jar -tf {} \\;").trim()
+              echo "jar-list: ${JAR_OUTPUT}"
+              writeFile(file: '3.2/tar-list.txt', text: JAR_OUTPUT)
+              sh 'cd ..'
+              sh "ls 3.8"
+
+              cambpmArchiveArtifacts('3.2/**-list.txt')
+              cambpmStash("platform-lists-3.2",
+                          "**/**-list.txt")
+
+            }
+          }
+        ])
+
+      }
+          }}
+        }
+                  stage('diff') {
+          steps{
+             script{
+               //sh 'cd \${WORKSPACE}'
+               cambpmUnstash("platform-lists-3.2")
+               cambpmUnstash("platform-lists-3.8")
+               sh 'ls'
+               sh 'ls 3.2'
+               sh 'ls 3.8'
+               sh 'diff -r ./3.2 ./3.8 >> artifact-diff.patch'
+               //OUTPUT = sh(returnStdout: false,
+               //            script: "diff -r ./3.2 ./3.8 ").trim()
+               //writeFile(file: 'artifact-diff.patch', text: OUTPUT)
+               //echo "diff: ${OUTPUT}"
+               cambpmArchiveArtifacts('artifact-diff.patch')
+             }
+
+              
+              
+          }
+
+          }
   }
 }
