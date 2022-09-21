@@ -36,7 +36,7 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 
-public abstract class BatchHelper {
+public class BatchHelper {
 
   protected ProcessEngineRule engineRule;
   protected PluggableProcessEngineTest testCase;
@@ -118,10 +118,24 @@ public abstract class BatchHelper {
     }
   }
 
-  public abstract JobDefinition getExecutionJobDefinition(Batch batch);
+  public JobDefinition getExecutionJobDefinition(Batch batch) {
+    throw new AssertionError("This method is not implemented");
+  }
+
+  public JobDefinition getExecutionJobDefinition(Batch batch, String jobType) {
+    return engineRule.getManagementService()
+        .createJobDefinitionQuery()
+        .jobDefinitionId(batch.getBatchJobDefinitionId())
+        .jobType(jobType)
+        .singleResult();
+  }
 
   public List<Job> getExecutionJobs(Batch batch) {
     return getJobsForDefinition(getExecutionJobDefinition(batch));
+  }
+
+  public List<Job> getExecutionJobs(Batch batch, String jobType) {
+    return getJobsForDefinition(getExecutionJobDefinition(batch, jobType));
   }
 
   public void executeJobs(Batch batch) {

@@ -21,7 +21,8 @@ window._import = path => {
 };
 
 // camunda-welcome-bootstrap is copied as-is, so we have to inline everything
-const baseImportPath = document.querySelector('base').href + '../';
+const appRoot = document.querySelector('base').getAttribute('app-root');
+const baseImportPath = `${appRoot}/app/welcome/`;
 
 const loadConfig = (async function() {
   // eslint-disable-next-line

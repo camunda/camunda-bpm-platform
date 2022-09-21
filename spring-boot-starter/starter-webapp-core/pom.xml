@@ -22,17 +22,6 @@
       <artifactId>camunda-webapp</artifactId>
       <type>jar</type>
       <classifier>classes</classifier>
-      <exclusions>
-        <exclusion>
-          <groupId>org.camunda.bpm</groupId>
-          <artifactId>camunda-engine-rest-core</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine-rest-jaxrs2</artifactId>
     </dependency>
 
     <dependency>

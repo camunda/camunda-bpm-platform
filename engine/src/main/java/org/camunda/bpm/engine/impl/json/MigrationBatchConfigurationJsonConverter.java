@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.impl.json;
 
+import org.camunda.bpm.engine.impl.batch.AbstractBatchConfigurationObjectConverter;
 import org.camunda.bpm.engine.impl.batch.DeploymentMappingJsonConverter;
 import org.camunda.bpm.engine.impl.batch.DeploymentMappings;
 import org.camunda.bpm.engine.impl.migration.batch.MigrationBatchConfiguration;
@@ -24,7 +25,8 @@ import com.google.gson.JsonObject;
 
 import java.util.List;
 
-public class MigrationBatchConfigurationJsonConverter extends JsonObjectConverter<MigrationBatchConfiguration> {
+public class MigrationBatchConfigurationJsonConverter
+    extends AbstractBatchConfigurationObjectConverter<MigrationBatchConfiguration> {
 
   public static final MigrationBatchConfigurationJsonConverter INSTANCE = new MigrationBatchConfigurationJsonConverter();
 
@@ -33,9 +35,9 @@ public class MigrationBatchConfigurationJsonConverter extends JsonObjectConverte
   public static final String PROCESS_INSTANCE_ID_MAPPINGS = "processInstanceIdMappings";
   public static final String SKIP_LISTENERS = "skipListeners";
   public static final String SKIP_IO_MAPPINGS = "skipIoMappings";
-  public static final String BATCH_ID = "batchId";
 
-  public JsonObject toJsonObject(MigrationBatchConfiguration configuration) {
+  @Override
+  public JsonObject writeConfiguration(MigrationBatchConfiguration configuration) {
     JsonObject json = JsonUtil.createObject();
 
     JsonUtil.addField(json, MIGRATION_PLAN, MigrationPlanJsonConverter.INSTANCE, configuration.getMigrationPlan());
@@ -43,19 +45,18 @@ public class MigrationBatchConfigurationJsonConverter extends JsonObjectConverte
     JsonUtil.addListField(json, PROCESS_INSTANCE_ID_MAPPINGS, DeploymentMappingJsonConverter.INSTANCE, configuration.getIdMappings());
     JsonUtil.addField(json, SKIP_LISTENERS, configuration.isSkipCustomListeners());
     JsonUtil.addField(json, SKIP_IO_MAPPINGS, configuration.isSkipIoMappings());
-    JsonUtil.addField(json, BATCH_ID, configuration.getBatchId());
 
     return json;
   }
 
-  public MigrationBatchConfiguration toObject(JsonObject json) {
+  @Override
+  public MigrationBatchConfiguration readConfiguration(JsonObject json) {
     return new MigrationBatchConfiguration(
         readProcessInstanceIds(json),
         readIdMappings(json),
         JsonUtil.asJavaObject(JsonUtil.getObject(json, MIGRATION_PLAN), MigrationPlanJsonConverter.INSTANCE),
         JsonUtil.getBoolean(json, SKIP_LISTENERS),
-        JsonUtil.getBoolean(json, SKIP_IO_MAPPINGS),
-        JsonUtil.getString(json, BATCH_ID));
+        JsonUtil.getBoolean(json, SKIP_IO_MAPPINGS));
   }
 
   protected List<String> readProcessInstanceIds(JsonObject jsonObject) {

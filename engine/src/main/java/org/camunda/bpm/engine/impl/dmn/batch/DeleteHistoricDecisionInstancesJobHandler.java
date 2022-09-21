@@ -21,13 +21,11 @@ import java.util.List;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.batch.AbstractBatchJobHandler;
 import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
-import org.camunda.bpm.engine.impl.batch.BatchJobConfiguration;
 import org.camunda.bpm.engine.impl.batch.BatchJobContext;
 import org.camunda.bpm.engine.impl.batch.BatchJobDeclaration;
 import org.camunda.bpm.engine.impl.dmn.cmd.DeleteHistoricDecisionInstancesBulkCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
-import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 
@@ -55,17 +53,13 @@ public class DeleteHistoricDecisionInstancesJobHandler extends AbstractBatchJobH
   }
 
   @Override
-  public void execute(BatchJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
-    ByteArrayEntity configurationEntity = commandContext
-        .getDbEntityManager()
-        .selectById(ByteArrayEntity.class, configuration.getConfigurationByteArrayId());
-
-    BatchConfiguration batchConfiguration = readConfiguration(configurationEntity.getBytes());
+  public void executeHandler(BatchConfiguration batchConfiguration,
+                             ExecutionEntity execution,
+                             CommandContext commandContext,
+                             String tenantId) {
 
     commandContext.executeWithOperationLogPrevented(
         new DeleteHistoricDecisionInstancesBulkCmd(batchConfiguration.getIds()));
-
-    commandContext.getByteArrayManager().delete(configurationEntity);
   }
 
 }

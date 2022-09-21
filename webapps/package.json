@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@bpmn-io/dmn-migrate": "0.4.3",
-    "@bpmn-io/form-js": "0.7.0",
+    "@bpmn-io/form-js": "0.8.0",
     "angular": "1.8.2",
     "angular-animate": "1.8.2",
     "angular-cookies": "1.8.2",
@@ -113,7 +113,7 @@
     "xunit-file": "1.0.0"
   },
   "xlts": {
-    "xltsVersion": "1.8.8",
+    "xltsVersion": "1.9.0",
     "dependencies": [
       "angular",
       "angular-animate",

@@ -47,6 +47,7 @@ public class HistoricBatchEntity extends HistoryEvent implements HistoricBatch, 
 
   protected Date startTime;
   protected Date endTime;
+  protected Date executionStartTime;
 
   public String getType() {
     return type;
@@ -137,11 +138,19 @@ public class HistoricBatchEntity extends HistoryEvent implements HistoricBatch, 
   }
 
   @Override
+  public Date getExecutionStartTime() {
+    return executionStartTime;
+  }
+
+  public void setExecutionStartTime(final Date executionStartTime) {
+    this.executionStartTime = executionStartTime;
+  }
+
+  @Override
   public Object getPersistentState() {
     Map<String, Object> persistentState = new HashMap<String, Object>();
-
     persistentState.put("endTime", endTime);
-
+    persistentState.put("executionStartTime", executionStartTime);
     return persistentState;
   }
 

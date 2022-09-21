@@ -86,4 +86,9 @@ public interface HistoricBatch {
   /** The time the historic batch will be removed. */
   Date getRemovalTime();
 
+  /**
+   * @return the date the batch execution started
+   */
+  Date getExecutionStartTime();
+
 }

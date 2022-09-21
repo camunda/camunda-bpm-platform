@@ -33,14 +33,6 @@
     </dependencySet>
 
     <dependencySet>
-      <includes>
-        <include>org.camunda.bpm.distro:camunda-h2-webapp:war:*</include>
-      </includes>
-      <outputDirectory>server/apache-tomcat-${version.tomcat}/webapps/h2</outputDirectory>
-      <unpack>true</unpack>
-    </dependencySet>
-
-    <dependencySet>
         <includes>
             <include>org.camunda.bpm:camunda-engine-rest:war:*</include>
         </includes>

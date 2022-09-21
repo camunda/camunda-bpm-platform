@@ -20,6 +20,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -44,7 +45,6 @@ public class GetIdentityLinksForTaskCmd implements Command<List<IdentityLink>>, 
     this.taskId = taskId;
   }
 
-  @SuppressWarnings({"unchecked", "rawtypes" })
   public List<IdentityLink> execute(CommandContext commandContext) {
     ensureNotNull("taskId", taskId);
 
@@ -54,7 +54,7 @@ public class GetIdentityLinksForTaskCmd implements Command<List<IdentityLink>>, 
 
     checkGetIdentityLink(task, commandContext);
 
-    List<IdentityLink> identityLinks = (List) task.getIdentityLinks();
+    List<IdentityLink> identityLinks = task.getIdentityLinks().stream().collect(Collectors.toList());
 
     // assignee is not part of identity links in the db.
     // so if there is one, we add it here.
@@ -79,7 +79,7 @@ public class GetIdentityLinksForTaskCmd implements Command<List<IdentityLink>>, 
       identityLinks.add(identityLink);
     }
 
-    return (List) task.getIdentityLinks();
+    return identityLinks;
   }
 
   protected void checkGetIdentityLink(TaskEntity task, CommandContext commandContext) {

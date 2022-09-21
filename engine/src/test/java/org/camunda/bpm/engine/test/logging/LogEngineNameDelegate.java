@@ -14,39 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest.helper;
+package org.camunda.bpm.engine.test.logging;
 
-import org.camunda.bpm.engine.identity.Group;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+public class LogEngineNameDelegate implements JavaDelegate {
 
-public class MockGroupBuilder {
+  protected static final String LOG_MESSAGE = "this is a log message from engine";
 
-  protected String id;
-  protected String name;
-  protected String type;
-
-  public MockGroupBuilder id(String id) {
-    this.id = id;
-    return this;
-  }
-
-  public MockGroupBuilder name(String name) {
-    this.name = name;
-    return this;
-  }
-
-  public MockGroupBuilder type(String type) {
-    this.type = type;
-    return this;
-  }
-
-  @SuppressWarnings("unchecked")
-  public Group build() {
-    Group group = mock(Group.class);
-    when(group.getId()).thenReturn(id);
-    return group;
+  @Override
+  public void execute(DelegateExecution execution) throws Exception {
+    Logger logger = LoggerFactory.getLogger(this.getClass());
+    logger.debug(LOG_MESSAGE + " " + execution.getProcessEngine().getName());
   }
 
 }

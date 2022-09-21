@@ -18,13 +18,11 @@ package org.camunda.bpm.engine.impl.batch.removaltime;
 
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.batch.AbstractBatchJobHandler;
-import org.camunda.bpm.engine.impl.batch.BatchJobConfiguration;
 import org.camunda.bpm.engine.impl.batch.BatchJobContext;
 import org.camunda.bpm.engine.impl.batch.BatchJobDeclaration;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInstanceEntity;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
-import org.camunda.bpm.engine.impl.json.JsonObjectConverter;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
@@ -43,13 +41,12 @@ public class DecisionSetRemovalTimeJobHandler extends AbstractBatchJobHandler<Se
 
   public static final BatchJobDeclaration JOB_DECLARATION = new BatchJobDeclaration(Batch.TYPE_DECISION_SET_REMOVAL_TIME);
 
-  public void execute(BatchJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
+  public void executeHandler(SetRemovalTimeBatchConfiguration batchConfiguration,
+                             ExecutionEntity execution,
+                             CommandContext commandContext,
+                             String tenantId) {
+
     if (isDmnEnabled(commandContext)) {
-
-      String byteArrayId = configuration.getConfigurationByteArrayId();
-      byte[] configurationByteArray = findByteArrayById(byteArrayId, commandContext).getBytes();
-
-      SetRemovalTimeBatchConfiguration batchConfiguration = readConfiguration(configurationByteArray);
 
       for (String instanceId : batchConfiguration.getIds()) {
 
@@ -162,7 +159,7 @@ public class DecisionSetRemovalTimeJobHandler extends AbstractBatchJobHandler<Se
       .setHierarchical(configuration.isHierarchical());
   }
 
-  protected JsonObjectConverter getJsonConverterInstance() {
+  protected SetRemovalTimeJsonConverter getJsonConverterInstance() {
     return SetRemovalTimeJsonConverter.INSTANCE;
   }
 

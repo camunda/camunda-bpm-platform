@@ -24,8 +24,12 @@
       <useTransitiveFiltering>true</useTransitiveFiltering>
       <scope>provided</scope>
       <includes>
-        <include>org.camunda.bpm:camunda-engine-rest-jaxrs2:jar:*</include>
+        <include>org.camunda.bpm:camunda-engine-rest-core:jar</include>
       </includes>
+      <excludes>
+        <exclude>org.camunda.bpm:camunda-engine-rest-core:jar:tests</exclude>
+        <exclude>org.camunda.bpm:camunda-engine-rest-core:jar:sources</exclude>
+      </excludes>
     </dependencySet>
 
     <dependencySet>
@@ -38,7 +42,6 @@
         <excludes>
           <exclude>**/jboss-deployment-structure.xml</exclude>
           <exclude>**/web.xml</exclude>
-          <exclude>**/camunda-engine-rest-core-*</exclude>
         </excludes>
       </unpackOptions>   
     </dependencySet>    

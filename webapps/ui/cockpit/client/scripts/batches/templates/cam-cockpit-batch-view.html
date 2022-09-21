@@ -2,6 +2,16 @@
   <div class="row">
     <div class="col-md-6">
       <h3>{{ 'BATCHES_PROGRESS_IN' | translate }}</h3>
+
+      <div cam-widget-search
+           cam-widget-search-total="ctrl.getBatchCount('runtime')"
+           cam-widget-search-valid-searches="search.searches"
+           cam-widget-search-translations="search.translations"
+           cam-widget-search-types="search.types"
+           cam-widget-search-operators="search.operators"
+           cam-widget-search-storage-group="'BIP'"
+           cam-widget-search-mode="filter"></div>
+
       <div cam-widget-loader
            loading-state="{{ ctrl.getLoadingState('runtime') }}"
            text-empty="{{ 'BATCHES_PROGRESS_NO_RUNNING' | translate }}">
@@ -14,7 +24,7 @@
           </thead>
           <tbody>
             <tr ng-repeat="batch in ctrl.getBatches('runtime')" ng-class="{selected: ctrl.isSelected(batch)}">
-              <td class="uuid"><a ng-href="#/batch?details={{batch.id}}&type=runtime">{{batch.id}}</a></td>
+              <td class="uuid"><a ng-click="openDetails(batch.id, 'runtime')">{{batch.id}}</a></td>
               <td class="type">{{batch.type}}</td>
               <td class="user">{{ctrl.getFullName(batch.createUserId)}}</td>
               <td class="startTime">{{batch.startTime | camDate}}</td>
@@ -61,7 +71,7 @@
           </thead>
           <tbody>
             <tr ng-repeat="batch in ctrl.getBatches('history')" ng-class="{selected: ctrl.isSelected(batch)}">
-              <td class="uuid"><a ng-href="#/batch?details={{batch.id}}&type=history">{{batch.id}}</a></td>
+              <td class="uuid"><a ng-click="openDetails(batch.id, 'history')">{{batch.id}}</a></td>
               <td>{{batch.type}}</td>
               <td>{{batch.startTime | camDate}}</td>
               <td>{{batch.endTime | camDate}}</td>
@@ -138,16 +148,16 @@
             </thead>
             <tbody>
               <tr ng-repeat="key in ctrl.sortingKeys"
-                  ng-if="selection[key] && key !== 'failedJobs'"
+                  ng-if="selection[key] && key !== 'failedJobs' || key === 'executionStartTime'"
                   ng-class="key">
                 <td>{{key}}</td>
-                <td ng-if="key !== 'startTime' && key !== 'endTime'">{{selection[key]}}
+                <td ng-if="!key.endsWith('Time')">{{selection[key]}}
                   <span ng-if="key === 'remainingJobs' && selection.failedJobs"
                         class="failedJobs"
                         translate="BATCHES_PROGRESS_FAILED"
                         translate-values="{jobs: selection.failedJobs}"></span>
                 </td>
-                <td ng-if="key === 'startTime' || key == 'endTime'">{{selection[key] | camDate}}</td>
+                <td ng-if="key.endsWith('Time')">{{selection[key] | camDate}}</td>
               </tr>
             </tbody>
           </table>

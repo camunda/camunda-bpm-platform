@@ -55,7 +55,6 @@ var included = [
   'dmn-js-shared/lib/util/ModelUtil',
   'dmn-js',
   'dmn-js/lib/Modeler',
-  'dmn-moddle',
   'dom4',
   'events',
   'fast-xml-parser',
@@ -152,8 +151,10 @@ module.exports = function(grunt, dirname, licensebookConfig) {
         }
 
         if (pkg) {
-          const packageJsonPath = require.resolve(`${pkg}/package.json`);
-          const packagePath = path.dirname(packageJsonPath);
+          let packagePath = `${process.cwd()}/node_modules/${pkg}`;
+          if (!fs.existsSync(packagePath)) {
+            packagePath = `${process.cwd()}/node_modules/camunda-bpm-webapp/node_modules/${pkg}`;
+          }
 
           let licenseInfo = null;
           try {
@@ -183,6 +184,7 @@ module.exports = function(grunt, dirname, licensebookConfig) {
             }
           }
 
+          let packageJsonPath = require.resolve(`${packagePath}/package.json`);
           const {version, license} = require(packageJsonPath);
           if (licenseInfo) {
             row.source = `/*!\n@license ${pkg}@${version}\n${licenseInfo}*/\n${row.source}`;
