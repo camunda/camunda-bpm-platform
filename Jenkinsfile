@@ -192,7 +192,7 @@ pipeline {
               echo "jar-list: ${JAR_OUTPUT}"
               writeFile(file: '3.2/tar-list.txt', text: JAR_OUTPUT)
               sh 'cd ..'
-              sh "ls 3.8"
+              sh "ls 3.2"
 
               cambpmArchiveArtifacts('3.2/**-list.txt')
               cambpmStash("platform-lists-3.2",
