@@ -214,12 +214,12 @@ pipeline {
                sh 'ls'
                sh 'ls 3.2'
                sh 'ls 3.8'
-               sh 'diff -r ./3.2 ./3.8 >> artifact-diff.patch'
-               //OUTPUT = sh(returnStdout: false,
-               //            script: "diff -r ./3.2 ./3.8 ").trim()
-               //writeFile(file: 'artifact-diff.patch', text: OUTPUT)
-               //echo "diff: ${OUTPUT}"
-               cambpmArchiveArtifacts('artifact-diff.patch')
+               //sh 'diff -r ./3.2 ./3.8 >> artifact-diff.patch'
+               OUTPUT = sh(returnStdout: false,
+                           script: "diff -r ./3.2 ./3.8 ").trim()
+               writeFile(file: 'artifact-diff.patch', text: OUTPUT)
+               echo "diff: ${OUTPUT}"
+              cambpmArchiveArtifacts('artifact-diff.patch')
              }
 
               
