@@ -187,10 +187,16 @@ module.exports = [
                   valueInfo = variable.valueInfo;
                 } else {
                   const valuesKey = variableToValuesKeyMap[key];
-                  const valuesKeyVariable = variables[valuesKey];
+                  if (valuesKey) {
+                    const valuesKeyVariable = variables[valuesKey];
 
-                  type = valuesKeyVariable.type;
-                  valueInfo = valuesKeyVariable.valueInfo;
+                    if (valuesKeyVariable) {
+                      type = valuesKeyVariable.type;
+                      valueInfo = valuesKeyVariable.valueInfo;
+                    } else {
+                      type = 'Json';
+                    }
+                  }
                 }
 
                 res[key] = {
