@@ -43,7 +43,7 @@ module.exports = [
           localStorage.getItem(`camunda-form:${taskId}`) || '{}'
         );
         let form;
-        let variables = null;
+        let variables = []; // initialize it with empty array for start event forms without taskId
         let triggerSubmit = true;
 
         formController.notifyFormValidated(false);
