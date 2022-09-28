@@ -101,7 +101,14 @@
     </#list>
 
   },
+  "security": [ {"basicAuth": []} ],
   "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    },
     "schemas": {
 
     <#list models as name, package>
