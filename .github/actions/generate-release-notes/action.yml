@@ -1,0 +1,15 @@
+name: 'Generate github release notes'
+description: 'For a set of fix versions, produces slack blocks that link to the versions release notes'
+inputs:
+  versions:
+    description: 'Versions to include. Should be a comma-separated list of version identifiers, e.g. "7.18.0, 7.17.2, 7.16.6"'
+    required: true
+  version-prefix:
+    description: 'The prefix for the labels that identify versions'
+    required: true
+outputs:
+  release-notes-block:
+    description: 'Rendering of the release-notes links as Slack blocks (https://api.slack.com/reference/block-kit/blocks). Can be used to send as a message to slack.'
+runs:
+  using: 'node16'
+  main: 'index.js'
