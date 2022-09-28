@@ -1,0 +1,36 @@
+name: Add issue to project
+
+on:
+  issues:
+    types:
+      - opened
+      - transferred
+
+jobs:
+  Exec:
+    name: Add issue to project
+    runs-on: ubuntu-latest
+    steps:
+      - name: Import Secrets
+        id: secrets
+        uses: hashicorp/vault-action@v2.4.2
+        with:
+          url: ${{ secrets.VAULT_ADDR }}
+          method: approle
+          roleId: ${{ secrets.VAULT_ROLE_ID }}
+          secretId: ${{ secrets.VAULT_SECRET_ID }}
+          exportEnv: false
+          secrets: |
+            secret/data/products/cambpm/ci/github-workflow GITHUB_APP_ID;
+            secret/data/products/cambpm/ci/github-workflow GITHUB_APP_PRIVATE_KEY;
+      - name: Generate token for GitHub
+        id: generate-github-token
+        uses: tibdex/github-app-token@v1
+        with:
+          app_id: ${{ steps.secrets.outputs.GITHUB_APP_ID }}
+          private_key: ${{ steps.secrets.outputs.GITHUB_APP_PRIVATE_KEY }}
+      - name: Add to project
+        uses: actions/add-to-project@75ae529d219964f1ad5c0e8351e4e7c38ed501be
+        with:
+          project-url: https://github.com/orgs/${{ github.repository_owner }}/projects/40
+          github-token: ${{ steps.generate-github-token.outputs.token }}
