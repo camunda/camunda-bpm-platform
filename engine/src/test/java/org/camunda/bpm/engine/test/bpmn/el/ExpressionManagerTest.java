@@ -185,4 +185,20 @@ public class ExpressionManagerTest extends PluggableProcessEngineTest {
     assertThat(userTask).isNotNull();
   }
 
+  @Deployment
+  @Test
+  public void shouldResolveMethodExpressionTwoParametersSameType() {
+    // given process with two service tasks that resolve expression and store the result as variable
+    Map<String, Object> vars = new HashMap<>();
+    vars.put("myVar", new ExpressionTestParameter());
+
+    // when the process is started
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", vars);
+
+    // then no exceptions are thrown and two variables are saved
+    boolean task1Var = (boolean) runtimeService.getVariable(processInstance.getId(), "task1Var");
+    assertThat(task1Var).isTrue();
+    String task2Var = (String) runtimeService.getVariable(processInstance.getId(), "task2Var");
+    assertEquals("lastParam", task2Var);
+  }
 }
