@@ -189,7 +189,7 @@ public class ExpressionManagerTest extends PluggableProcessEngineTest {
   @Test
   public void shouldResolveMethodExpressionTwoParametersSameType() {
     // given process with two service tasks that resolve expression and store the result as variable
-    Map<String, Object> vars = new HashMap<String, Object>();
+    Map<String, Object> vars = new HashMap<>();
     vars.put("myVar", new ExpressionTestParameter());
 
     // when the process is started
@@ -199,6 +199,6 @@ public class ExpressionManagerTest extends PluggableProcessEngineTest {
     boolean task1Var = (boolean) runtimeService.getVariable(processInstance.getId(), "task1Var");
     assertThat(task1Var).isTrue();
     String task2Var = (String) runtimeService.getVariable(processInstance.getId(), "task2Var");
-    assertEquals("lastParam",task2Var);
+    assertEquals("lastParam", task2Var);
   }
 }
