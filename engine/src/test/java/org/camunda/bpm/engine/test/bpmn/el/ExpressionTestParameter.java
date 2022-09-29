@@ -29,8 +29,18 @@ public class ExpressionTestParameter implements Serializable {
     return false;
   }
 
+  public boolean testMethod(String param1, Object param2) {
+    return false;
+  }
+
+  // first service task
   public boolean testMethod(String param1, String param2) {
     return true;
+  }
+
+  // second service task
+  public String testMethod(String param1, String param2, String param3) {
+    return param3;
   }
 
 }
