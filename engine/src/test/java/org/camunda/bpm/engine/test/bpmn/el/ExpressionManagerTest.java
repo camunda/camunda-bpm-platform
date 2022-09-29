@@ -190,7 +190,7 @@ public class ExpressionManagerTest extends PluggableProcessEngineTest {
   public void shouldResolveMethodExpressionTwoParametersSameType() {
     Map<String, Object> vars = new HashMap<String, Object>();
 
-    vars.put("myVar", new ExecutionTestVariable());
+    vars.put("myVar", new ExpressionTestParameter());
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", vars);
 
     // Check of the testMethod has been called with the current execution
