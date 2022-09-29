@@ -34,4 +34,12 @@ public class ExecutionTestVariable implements Serializable{
     delegateExecution.setVariable("testVar", "myValue");
   }
 
+  public boolean testMethod(String param1) {
+    return false;
+  }
+
+  public boolean testMethod(String param1, String param2) {
+    return true;
+  }
+
 }

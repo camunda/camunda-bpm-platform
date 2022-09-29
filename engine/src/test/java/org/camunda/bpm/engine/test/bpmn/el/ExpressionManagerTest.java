@@ -185,4 +185,16 @@ public class ExpressionManagerTest extends PluggableProcessEngineTest {
     assertThat(userTask).isNotNull();
   }
 
+  @Deployment
+  @Test
+  public void shouldResolveMethodExpressionTwoParametersSameType() {
+    Map<String, Object> vars = new HashMap<String, Object>();
+
+    vars.put("myVar", new ExecutionTestVariable());
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", vars);
+
+    // Check of the testMethod has been called with the current execution
+    boolean value = (boolean) runtimeService.getVariable(processInstance.getId(), "resultVar");
+    assertThat(value).isTrue();
+  }
 }
