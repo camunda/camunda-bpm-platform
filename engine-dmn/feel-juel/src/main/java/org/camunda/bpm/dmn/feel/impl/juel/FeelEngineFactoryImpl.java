@@ -34,7 +34,7 @@ import org.camunda.bpm.dmn.feel.impl.juel.transform.FeelToJuelTransformImpl;
 import org.camunda.commons.utils.cache.Cache;
 import org.camunda.commons.utils.cache.ConcurrentLruCache;
 
-import de.odysseus.el.ExpressionFactoryImpl;
+import org.camunda.bpm.impl.juel.ExpressionFactoryImpl;
 
 public class FeelEngineFactoryImpl implements FeelEngineFactory {
 

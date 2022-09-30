@@ -54,21 +54,6 @@
     </dependency>
 
     <dependency>
-      <groupId>de.odysseus.juel</groupId>
-      <artifactId>juel-api</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>de.odysseus.juel</groupId>
-      <artifactId>juel-spi</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>de.odysseus.juel</groupId>
-      <artifactId>juel-impl</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>provided</scope>
@@ -114,6 +99,12 @@
       <groupId>joda-time</groupId>
       <artifactId>joda-time</artifactId>
       <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.glassfish</groupId>
+      <artifactId>jakarta.el</artifactId>
+      <version>4.0.2</version>
     </dependency>
 
   </dependencies>

@@ -33,7 +33,7 @@ import jakarta.el.FunctionMapper;
 import jakarta.el.ListELResolver;
 import jakarta.el.MapELResolver;
 import jakarta.el.ValueExpression;
-import org.camunda.bpm.engine.impl.juel.ExpressionFactoryImpl;
+import org.camunda.bpm.impl.juel.ExpressionFactoryImpl;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.test.mock.MockElResolver;
 import org.camunda.bpm.engine.variable.context.VariableContext;

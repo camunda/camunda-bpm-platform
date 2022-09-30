@@ -77,6 +77,7 @@
         <module>model-api</module>
         <module>typed-values</module>
         <module>engine-dmn</module>
+        <module>juel</module>
 
         <module>test-utils/testcontainers</module>
         <module>test-utils/junit5-extension</module>
@@ -264,6 +265,7 @@
 
         <module>typed-values</module>
         <module>engine-dmn</module>
+        <module>juel</module>
 
         <module>javaee/ejb-client</module>
 

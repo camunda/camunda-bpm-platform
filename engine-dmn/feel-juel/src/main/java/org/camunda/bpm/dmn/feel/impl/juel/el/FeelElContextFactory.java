@@ -28,7 +28,7 @@ import org.camunda.bpm.dmn.feel.impl.juel.FeelEngineLogger;
 import org.camunda.bpm.dmn.feel.impl.juel.FeelLogger;
 import org.camunda.bpm.engine.variable.context.VariableContext;
 
-import de.odysseus.el.util.SimpleResolver;
+import org.camunda.bpm.impl.juel.SimpleResolver;
 
 public class FeelElContextFactory implements ElContextFactory {
 

@@ -23,7 +23,7 @@ import jakarta.el.ELException;
 import org.camunda.bpm.dmn.feel.impl.juel.FeelEngineLogger;
 import org.camunda.bpm.dmn.feel.impl.juel.FeelLogger;
 
-import de.odysseus.el.misc.TypeConverterImpl;
+import org.camunda.bpm.impl.juel.TypeConverterImpl;
 
 public class FeelTypeConverter extends TypeConverterImpl {
 

@@ -53,16 +53,12 @@
       <artifactId>camunda-engine-dmn</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>de.odysseus.juel</groupId>
-          <artifactId>juel-api</artifactId>
+          <groupId>org.camunda.bpm</groupId>
+          <artifactId>juel</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>de.odysseus.juel</groupId>
-          <artifactId>juel-spi</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>de.odysseus.juel</groupId>
-          <artifactId>juel-impl</artifactId>
+          <groupId>org.glassfish</groupId>
+          <artifactId>jakarta.el</artifactId>
         </exclusion>
         <!-- these exclusions are needed when building with Maven >= 3.3
           see CAM-11822 for details -->
@@ -132,6 +128,12 @@
       <groupId>org.glassfish</groupId>
       <artifactId>jakarta.el</artifactId>
       <version>4.0.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>juel</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
@@ -474,6 +476,14 @@
             <relocation>
               <pattern>com.google.gson</pattern>
               <shadedPattern>camundajar.impl.com.google.gson</shadedPattern>
+            </relocation>
+            <relocation>
+              <pattern>jakarta.el</pattern>
+              <shadedPattern>camundajar.impl.jakarta.el</shadedPattern>
+            </relocation>
+            <relocation>
+              <pattern>jakarta.el-api</pattern>
+              <shadedPattern>camundajar.impl.jakarta.el-api</shadedPattern>
             </relocation>
           </relocations>
           <transformers>

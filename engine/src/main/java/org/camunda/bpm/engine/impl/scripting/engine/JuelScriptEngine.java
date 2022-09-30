@@ -45,7 +45,7 @@ import jakarta.el.MapELResolver;
 import jakarta.el.ResourceBundleELResolver;
 import jakarta.el.ValueExpression;
 import jakarta.el.VariableMapper;
-import org.camunda.bpm.engine.impl.juel.SimpleResolver;
+import org.camunda.bpm.impl.juel.SimpleResolver;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 
 

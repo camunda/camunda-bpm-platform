@@ -1,0 +1,46 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <name>Camunda Platform - juel</name>
+  <artifactId>juel</artifactId>
+
+  <parent>
+    <groupId>org.camunda.bpm</groupId>
+    <artifactId>camunda-database-settings</artifactId>
+    <relativePath>../database</relativePath>
+    <version>7.18.0-SNAPSHOT</version>
+  </parent>
+
+  <dependencyManagement>
+    <dependencies>
+
+      <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-core-internal-dependencies</artifactId>
+        <version>${project.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-framework-bom</artifactId>
+        <version>${version.spring.framework}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.glassfish</groupId>
+      <artifactId>jakarta.el</artifactId>
+      <version>4.0.2</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+
+</project>

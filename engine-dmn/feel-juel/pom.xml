@@ -12,7 +12,7 @@
   <name>camunda DMN - engine FEEL - JUEL</name>
 
   <properties>
-    <!-- We shade artifacts into the jar, so we need to generate 
+    <!-- We shade artifacts into the jar, so we need to generate
     a dependency BOM for the license book -->
     <skip-third-party-bom>false</skip-third-party-bom>
     <camunda.artifact>org.camunda.bpm.dmn.feel.impl.juel</camunda.artifact>
@@ -34,21 +34,6 @@
     </dependency>
 
     <dependency>
-      <groupId>de.odysseus.juel</groupId>
-      <artifactId>juel-api</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>de.odysseus.juel</groupId>
-      <artifactId>juel-spi</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>de.odysseus.juel</groupId>
-      <artifactId>juel-impl</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
@@ -58,6 +43,19 @@
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
       <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>juel</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.glassfish</groupId>
+      <artifactId>jakarta.el</artifactId>
+      <version>4.0.2</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 
@@ -83,25 +81,6 @@
                   <exclude>org.slf4j:*</exclude>
                 </excludes>
               </artifactSet>
-              <relocations>
-                <relocation>
-                  <pattern>de.odysseus.el</pattern>
-                  <shadedPattern>camundafeel.de.odysseus.el</shadedPattern>
-                </relocation>
-                <relocation>
-                  <pattern>javax.el</pattern>
-                  <shadedPattern>camundafeel.javax.el</shadedPattern>
-                </relocation>
-              </relocations>
-              <transformers>
-                <transformer implementation="org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer">
-                  <resources>
-                    <resource>
-                      META-INF/services/jakarta.el.ExpressionFactory
-                    </resource>
-                  </resources>
-                </transformer>
-              </transformers>
             </configuration>
           </execution>
         </executions>
@@ -113,14 +92,14 @@
           <unpackBundle>false</unpackBundle>
           <instructions>
             <Import-Package>
-              !de.odysseus.el*,
-              !javax.el,
+              !org.camunda.bpm.impl.juel*,
+              !jakarta.el,
               *
             </Import-Package>
             <Bundle-ClassPath>.</Bundle-ClassPath>
             <Embed-Dependency>
-              de.odysseus.el*;inline=true,
-              javax.el*;inline=true
+              org.camunda.bpm.impl.juel*;inline=true,
+              jakarta.el*;inline=true
             </Embed-Dependency>
           </instructions>
         </configuration>
