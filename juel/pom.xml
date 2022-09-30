@@ -12,6 +12,10 @@
     <version>7.18.0-SNAPSHOT</version>
   </parent>
 
+  <properties>
+    <license.skip>true</license.skip>
+  </properties>
+
   <dependencyManagement>
     <dependencies>
 
