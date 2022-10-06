@@ -56,7 +56,7 @@ pipeline {
                         [envVar: 'XLTS_AUTH_TOKEN', vaultKey: 'authToken']]
                 ]]]) {
               cambpmRunMaven('.',
-                  'clean source:jar deploy source:test-jar com.mycila:license-maven-plugin:check -Pdistro,distro-ce,distro-wildfly,distro-webjar,h2-in-memory -DaltStagingDirectory=${WORKSPACE}/staging -DskipRemoteStaging=true -DskipTests',
+                  'clean source:jar deploy source:test-jar com.mycila:license-maven-plugin:check -Pdistro,distro-ce,distro-wildfly,distro-webjar,h2-in-memory -DaltStagingDirectory=${WORKSPACE}/staging -Dmaven.repo.local=\${WORKSPACE}/3.8/.m2 -DskipRemoteStaging=true -DskipTests',
                   withCatch: false,
                   withNpm: true,
                   // we use JDK 11 to build the artifacts, as it is required by the Quarkus extension
@@ -67,15 +67,15 @@ pipeline {
 
             // archive all .jar, .pom, .xml, .txt runtime artifacts + required .war/.zip/.tar.gz for EE pipeline
             // add a new line for each group of artifacts
-           // cambpmArchiveArtifacts('.m2/org/camunda/**/*-SNAPSHOT/**/*.jar,.m2/org/camunda/**/*-SNAPSHOT/**/*.pom,.m2/org/camunda/**/*-SNAPSHOT/**/*.xml,.m2/org/camunda/**/*-SNAPSHOT/**/*.txt',
-           //                       '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*frontend-sources.zip',
-           //                       '.m2/org/camunda/**/*-SNAPSHOT/**/license-book*.zip',
-           //                       '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-*-assembly*.tar.gz',
-           //                       '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*.war',
-           //                       '.m2/org/camunda/**/*-SNAPSHOT/**/',
-           //                       '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-example-invoice*.war',
-           //                       '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-h2-webapp*.war',
-           //                       '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-bpm-run-modules-swaggerui-*-run-swaggerui-license-book-json.json')
+            cambpmArchiveArtifacts(//'.m2/org/camunda/**/*-SNAPSHOT/**/*.jar,.m2/org/camunda/**/*-SNAPSHOT/**/*.pom,.m2/org/camunda/**/*-SNAPSHOT/**/*.xml,.m2/org/camunda/**/*-SNAPSHOT/**/*.txt',
+                                  '3.8/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*frontend-sources.zip',
+                                  '3.8/.m2/org/camunda/**/*-SNAPSHOT/**/license-book*.zip',
+                                  '3.8/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-*-assembly*.tar.gz',
+                                  '3.8/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*.war',
+                                  '3.8/.m2/org/camunda/**/*-SNAPSHOT/**/',
+                                  '3.8/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-example-invoice*.war',
+                                  '3.8/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-h2-webapp*.war',
+                                  '3.8/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-bpm-run-modules-swaggerui-*-run-swaggerui-license-book-json.json')
 
             //cambpmStash("platform-stash-runtime",
             //            ".m2/org/camunda/**/*-SNAPSHOT/**",
@@ -88,24 +88,25 @@ pipeline {
 
 
             script {
-              sh 'mkdir 3.8'
+              
+              //sh 'mkdir 3.8'
               def JAR_OUTPUT = sh(returnStdout: true,
-                                  script: "find .m2/org -name '*-7.18.0-SNAPSHOT.jar' -print  -exec jar -tf {} \\;").trim()
+                                  script: "find 3.8/.m2/org -name '*-7.18.0-SNAPSHOT.jar' -print  -exec jar -tf {} \\;").trim()
               echo "list: ${JAR_OUTPUT}"
               writeFile(file: '3.8/jar-list.txt', text: JAR_OUTPUT)
 
               JAR_OUTPUT = sh(returnStdout: true,
-                              script: "find .m2/org -name '*-7.18.0-SNAPSHOT.zip' -print  -exec jar -tf {} \\;").trim()
+                              script: "find 3.8/.m2/org -name '*-7.18.0-SNAPSHOT.zip' -print  -exec jar -tf {} \\;").trim()
               echo "list: ${JAR_OUTPUT}"
               writeFile(file: '3.8/zip-list.txt', text: JAR_OUTPUT)
 
               JAR_OUTPUT = sh(returnStdout: true,
-                              script: "find .m2/org -name '*-7.18.0-SNAPSHOT.war' -print  -exec jar -tf {} \\;").trim()
+                              script: "find 3.8/.m2/org -name '*-7.18.0-SNAPSHOT.war' -print  -exec jar -tf {} \\;").trim()
               echo "list: ${JAR_OUTPUT}"
               writeFile(file: '3.8/war-list.txt', text: JAR_OUTPUT)
 
               JAR_OUTPUT = sh(returnStdout: true, 
-                              script: "find .m2/org -name '*-7.18.0-SNAPSHOT.tar.gz' -print  -exec jar -tf {} \\;").trim()
+                              script: "find 3.8/.m2/org -name '*-7.18.0-SNAPSHOT.tar.gz' -print  -exec jar -tf {} \\;").trim()
               echo "jar-list: ${JAR_OUTPUT}"
               writeFile(file: '3.8/tar-list.txt', text: JAR_OUTPUT)
               sh "ls"
@@ -161,7 +162,7 @@ pipeline {
                         [envVar: 'XLTS_AUTH_TOKEN', vaultKey: 'authToken']]
                 ]]]) {
               cambpmRunMaven('.',
-                  'clean source:jar deploy source:test-jar com.mycila:license-maven-plugin:check -Pdistro,distro-ce,distro-wildfly,distro-webjar,h2-in-memory -DaltStagingDirectory=${WORKSPACE}/staging -DskipRemoteStaging=true -DskipTests',
+                  'clean source:jar deploy source:test-jar com.mycila:license-maven-plugin:check -Pdistro,distro-ce,distro-wildfly,distro-webjar,h2-in-memory -Dmaven.repo.local=\${WORKSPACE}/3.2/.m2 -DaltStagingDirectory=${WORKSPACE}/staging -DskipRemoteStaging=true -DskipTests',
                   withCatch: false,
                   withNpm: true,
                   // we use JDK 11 to build the artifacts, as it is required by the Quarkus extension
@@ -169,26 +170,36 @@ pipeline {
                   jdkVersion: 'jdk-11-latest',
                   mvnVersion: 'maven-3.2-latest')
             }
+            
+            cambpmArchiveArtifacts(//'.m2/org/camunda/**/*-SNAPSHOT/**/*.jar,.m2/org/camunda/**/*-SNAPSHOT/**/*.pom,.m2/org/camunda/**/*-SNAPSHOT/**/*.xml,.m2/org/camunda/**/*-SNAPSHOT/**/*.txt',
+                      '3.2/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*frontend-sources.zip',
+                      '3.2/.m2/org/camunda/**/*-SNAPSHOT/**/license-book*.zip',
+                      '3.2/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-*-assembly*.tar.gz',
+                      '3.2/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*.war',
+                      '3.2/.m2/org/camunda/**/*-SNAPSHOT/**/',
+                      '3.2/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-example-invoice*.war',
+                      '3.2/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-h2-webapp*.war',
+                      '3.2/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-bpm-run-modules-swaggerui-*-run-swaggerui-license-book-json.json')
 
             script {
-              sh 'mkdir 3.2'
+              //sh 'mkdir 3.2'
               def JAR_OUTPUT = sh(returnStdout: true,
-                                  script: "find .m2/org -name '*-7.18.0-SNAPSHOT.jar' -print  -exec jar -tf {} \\;").trim()
+                                  script: "find 3.2/.m2/org -name '*-7.18.0-SNAPSHOT.jar' -print  -exec jar -tf {} \\;").trim()
               echo "list: ${JAR_OUTPUT}"
               writeFile(file: '3.2/jar-list.txt', text: JAR_OUTPUT)
 
               JAR_OUTPUT = sh(returnStdout: true,
-                              script: "find .m2/org -name '*-7.18.0-SNAPSHOT.zip' -print  -exec jar -tf {} \\;").trim()
+                              script: "find 3.2/.m2/org -name '*-7.18.0-SNAPSHOT.zip' -print  -exec jar -tf {} \\;").trim()
               echo "list: ${JAR_OUTPUT}"
               writeFile(file: '3.2/zip-list.txt', text: JAR_OUTPUT)
 
               JAR_OUTPUT = sh(returnStdout: true,
-                              script: "find .m2/org -name '*-7.18.0-SNAPSHOT.war' -print  -exec jar -tf {} \\;").trim()
+                              script: "find 3.2/.m2/org -name '*-7.18.0-SNAPSHOT.war' -print  -exec jar -tf {} \\;").trim()
               echo "list: ${JAR_OUTPUT}"
               writeFile(file: '3.2/war-list.txt', text: JAR_OUTPUT)
 
               JAR_OUTPUT = sh(returnStdout: true, 
-                              script: "find .m2/org -name '*-7.18.0-SNAPSHOT.tar.gz' -print  -exec jar -tf {} \\;").trim()
+                              script: "find 3.2/.m2/org -name '*-7.18.0-SNAPSHOT.tar.gz' -print  -exec jar -tf {} \\;").trim()
               echo "jar-list: ${JAR_OUTPUT}"
               writeFile(file: '3.2/tar-list.txt', text: JAR_OUTPUT)
               sh 'cd ..'
