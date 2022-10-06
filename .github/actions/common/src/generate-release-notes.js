@@ -6,7 +6,6 @@ module.exports = async function() {
   try {
     const versionsString = core.getInput('versions');
     const versionPrefix = core.getInput('version-prefix');
-    const repoToken = core.getInput('repo-token');
     
     var versions = versionsString.split(",");
     versions.forEach(function(part, index) {
@@ -14,7 +13,7 @@ module.exports = async function() {
       
     }, versions);
     
-    releaseNotes = new Map(); // releaseNotesUrl => link label
+    const releaseNotes = new Map(); // releaseNotesUrl => link label
     
     const repo = github.context.payload.repository;
     const repoUrl = `${github.context.serverUrl}/${repo.owner.login}/${repo.name}`;
