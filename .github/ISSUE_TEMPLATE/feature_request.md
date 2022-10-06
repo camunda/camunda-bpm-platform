@@ -7,23 +7,23 @@ assignees: ''
 
 ---
 
-**User Story (Required on creation):**
+### User Story (Required on creation)
     
-**Functional Requirements (Required before implementation):**
+### Functional Requirements (Required before implementation)
  
-**Technical Requirements (Required before implementation):** 
+### Technical Requirements (Required before implementation)
     
-**Limitations of Scope (Optional):**
+### Limitations of Scope
     
-**Hints (optional):**
+### Hints
 
-**Links:** 
+### Links
 
 <!--
 - https://jira.camunda.com/browse/CAM-12398
 -->
 
-**Breakdown:**
+### Breakdown
 
 <!--
 - [ ] #123

@@ -7,17 +7,17 @@ assignees: ''
 
 ---
 
-**Acceptance Criteria (Required on creation):**
+### Acceptance Criteria (Required on creation)
 
-**Hints (optional):**
+### Hints
 
-**Links:**
+### Links
 
 <!--
 - https://jira.camunda.com/browse/CAM-12398
 -->
 
-**Breakdown:**
+### Breakdown
 
 <!--
 - [ ] #123

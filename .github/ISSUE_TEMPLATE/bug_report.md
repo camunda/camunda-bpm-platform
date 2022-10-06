@@ -7,29 +7,29 @@ assignees:
 
 ---
 
-**Environment (Required on creation):**
+### Environment (Required on creation)
  
-**Description (Required on creation; please attach any relevant screenshots, stacktraces, log files, etc. to the ticket)**
+### Description (Required on creation; please attach any relevant screenshots, stacktraces, log files, etc. to the ticket)
  
-**Steps to reproduce (Required on creation)**
+### Steps to reproduce (Required on creation)
     
-**Observed Behavior (Required on creation)** 
+### Observed Behavior (Required on creation)
     
-**Expected behavior (Required on creation)**
+### Expected behavior (Required on creation)
     
-**Root Cause (Required on prioritization)**
+### Root Cause (Required on prioritization)
     
-**Solution Ideas (Optional)**
+### Solution Ideas
     
-**Hints (Optional)**
+### Hints
 
-**Links:** 
+### Links
 
 <!--
 - https://jira.camunda.com/browse/CAM-12398
 -->
 
-**Breakdown:**
+### Breakdown
 
 <!--
 - [ ] #123
