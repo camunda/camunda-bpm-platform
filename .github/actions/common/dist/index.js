@@ -8326,9 +8326,7 @@ module.exports = async function () {
     
     // regex is supposed to match JIRA-style links 
     // (i.e. ensures that there is a sequence LLLL-DDD where L is a letter and D is a digit
-    const linkRegex = new RegExp(
-      '\\bhttps?:\\/\\/\\S+[A-Za-z]+-[0-9]+',
-      'gi');
+    const linkRegex = /\bhttps?:\/\/\S+[A-Za-z]+-[0-9]+/gi;
     
     var links = new Map();    // issue id => [url, ..]
     const issues = new Map();   // issue id => {}
@@ -8356,10 +8354,7 @@ module.exports = async function () {
             const linkMatches = issue.body.matchAll(linkRegex);
             const linksForIssue = [];
             
-            for (const linkMatch of linkMatches) {
-              const url = linkMatch[0];
-              const title = linkMatch[1];
-              
+            for (const [url] of linkMatches) {
               linksForIssue.push(url);
             }
             
@@ -8470,7 +8465,6 @@ module.exports = async function() {
   try {
     const versionsString = core.getInput('versions');
     const versionPrefix = core.getInput('version-prefix');
-    const repoToken = core.getInput('repo-token');
     
     var versions = versionsString.split(",");
     versions.forEach(function(part, index) {
@@ -8478,7 +8472,7 @@ module.exports = async function() {
       
     }, versions);
     
-    releaseNotes = new Map(); // releaseNotesUrl => link label
+    const releaseNotes = new Map(); // releaseNotesUrl => link label
     
     const repo = github.context.payload.repository;
     const repoUrl = `${github.context.serverUrl}/${repo.owner.login}/${repo.name}`;
