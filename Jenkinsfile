@@ -91,22 +91,22 @@ pipeline {
               
               //sh 'mkdir 3.8'
               def JAR_OUTPUT = sh(returnStdout: true,
-                                  script: "find 3.8/.m2/org -name '*-7.18.0-SNAPSHOT.jar' -print  -exec jar -tf {} \\;").trim()
+                                  script: "find 3.8/.m2/org -name '*-7.19.0-*.jar' -print  -exec jar -tf {} \\;").trim()
               echo "list: ${JAR_OUTPUT}"
               writeFile(file: '3.8/jar-list.txt', text: JAR_OUTPUT)
 
               JAR_OUTPUT = sh(returnStdout: true,
-                              script: "find 3.8/.m2/org -name '*-7.18.0-SNAPSHOT.zip' -print  -exec jar -tf {} \\;").trim()
+                              script: "find 3.8/.m2/org -name '*-7.19.0-*.zip' -print  -exec jar -tf {} \\;").trim()
               echo "list: ${JAR_OUTPUT}"
               writeFile(file: '3.8/zip-list.txt', text: JAR_OUTPUT)
 
               JAR_OUTPUT = sh(returnStdout: true,
-                              script: "find 3.8/.m2/org -name '*-7.18.0-SNAPSHOT.war' -print  -exec jar -tf {} \\;").trim()
+                              script: "find 3.8/.m2/org -name '*-7.19.0-*.war' -print  -exec jar -tf {} \\;").trim()
               echo "list: ${JAR_OUTPUT}"
               writeFile(file: '3.8/war-list.txt', text: JAR_OUTPUT)
 
               JAR_OUTPUT = sh(returnStdout: true, 
-                              script: "find 3.8/.m2/org -name '*-7.18.0-SNAPSHOT.tar.gz' -print  -exec jar -tf {} \\;").trim()
+                              script: "find 3.8/.m2/org -name '*-7.19.0-*.tar.gz' -print  -exec jar -tf {} \\;").trim()
               echo "jar-list: ${JAR_OUTPUT}"
               writeFile(file: '3.8/tar-list.txt', text: JAR_OUTPUT)
               sh "ls"
@@ -184,22 +184,22 @@ pipeline {
             script {
               //sh 'mkdir 3.2'
               def JAR_OUTPUT = sh(returnStdout: true,
-                                  script: "find 3.2/.m2/org -name '*-7.18.0-SNAPSHOT.jar' -print  -exec jar -tf {} \\;").trim()
+                                  script: "find 3.2/.m2/org -name '*-7.19.0-*.jar' -print  -exec jar -tf {} \\;").trim()
               echo "list: ${JAR_OUTPUT}"
               writeFile(file: '3.2/jar-list.txt', text: JAR_OUTPUT)
 
               JAR_OUTPUT = sh(returnStdout: true,
-                              script: "find 3.2/.m2/org -name '*-7.18.0-SNAPSHOT.zip' -print  -exec jar -tf {} \\;").trim()
+                              script: "find 3.2/.m2/org -name '*-7.19.0-*.zip' -print  -exec jar -tf {} \\;").trim()
               echo "list: ${JAR_OUTPUT}"
               writeFile(file: '3.2/zip-list.txt', text: JAR_OUTPUT)
 
               JAR_OUTPUT = sh(returnStdout: true,
-                              script: "find 3.2/.m2/org -name '*-7.18.0-SNAPSHOT.war' -print  -exec jar -tf {} \\;").trim()
+                              script: "find 3.2/.m2/org -name '*-7.19.0-*.war' -print  -exec jar -tf {} \\;").trim()
               echo "list: ${JAR_OUTPUT}"
               writeFile(file: '3.2/war-list.txt', text: JAR_OUTPUT)
 
               JAR_OUTPUT = sh(returnStdout: true, 
-                              script: "find 3.2/.m2/org -name '*-7.18.0-SNAPSHOT.tar.gz' -print  -exec jar -tf {} \\;").trim()
+                              script: "find 3.2/.m2/org -name '*-7.19.0-*.tar.gz' -print  -exec jar -tf {} \\;").trim()
               echo "jar-list: ${JAR_OUTPUT}"
               writeFile(file: '3.2/tar-list.txt', text: JAR_OUTPUT)
               sh 'cd ..'
