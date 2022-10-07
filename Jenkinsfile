@@ -219,6 +219,15 @@ pipeline {
                   stage('diff') {
           steps{
              script{
+               platformVersionDir = "/" + env.JOB_NAME.split('/')[0]
+                 upstreamProjectName = "/" + env.JOB_NAME
+                 upstreamBuildNumber = env.BUILD_NUMBER
+               cambpmTriggerDownstream(
+                  platformVersionDir + "/cambpm-ee/" + "cambpm-ee-main/PR-727",
+                  [string(name: 'UPSTREAM_PROJECT_NAME', value: upstreamProjectName),
+                  string(name: 'UPSTREAM_BUILD_NUMBER', value: upstreamBuildNumber)],
+                  true, true, true
+                )
                //sh 'cd \${WORKSPACE}'
                cambpmUnstash("platform-lists-3.2")
                cambpmUnstash("platform-lists-3.8")
