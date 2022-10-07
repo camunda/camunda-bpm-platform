@@ -74,7 +74,6 @@ pipeline {
                                   '3.8/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*.war',
                                   '3.8/.m2/org/camunda/**/*-SNAPSHOT/**/',
                                   '3.8/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-example-invoice*.war',
-                                  '3.8/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-h2-webapp*.war',
                                   '3.8/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-bpm-run-modules-swaggerui-*-run-swaggerui-license-book-json.json')
 
             //cambpmStash("platform-stash-runtime",
@@ -178,7 +177,6 @@ pipeline {
                       '3.2/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*.war',
                       '3.2/.m2/org/camunda/**/*-SNAPSHOT/**/',
                       '3.2/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-example-invoice*.war',
-                      '3.2/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-h2-webapp*.war',
                       '3.2/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-bpm-run-modules-swaggerui-*-run-swaggerui-license-book-json.json')
 
             script {
