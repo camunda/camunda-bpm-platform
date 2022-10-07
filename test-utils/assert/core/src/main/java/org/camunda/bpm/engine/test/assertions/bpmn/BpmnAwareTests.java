@@ -962,6 +962,20 @@ public class BpmnAwareTests extends AbstractAssertions {
     complete(lockedTasks.get(0), variables);
   }
 
+  // same with localVariables
+  public static void complete(ExternalTask externalTask, Map<String, Object> variables, Map<String, Object> localVariables) {
+    if (externalTask == null || variables == null) {
+      throw new IllegalArgumentException(format("Illegal call of completeExternalTask(externalTask = '%s', variables = '%s') - both must not be null!", externalTask, variables));
+    }
+    List<LockedExternalTask> lockedTasks = fetchAndLock(externalTask.getTopicName(), DEFAULT_WORKER_EXTERNAL_TASK, 1);
+    if (lockedTasks.isEmpty()) {
+      throw new NotFoundException(format("No lockable external task found for externalTask = '%s', variables = '%s'", externalTask, variables));
+    }
+    if (!lockedTasks.get(0).getId().equals(externalTask.getId())) {
+      throw new IllegalStateException(format("Multiple external tasks found for externalTask = '%s', variables = '%s'", externalTask, variables));
+    }
+    complete(lockedTasks.get(0), variables, localVariables);
+  }
   /**
    * Helper method to easily fetch and lock external tasks from a given topic
    * using a given workerId. The tasks will be locked for
@@ -1014,6 +1028,14 @@ public class BpmnAwareTests extends AbstractAssertions {
       throw new IllegalArgumentException(format("Illegal call of completeExternalTask(lockedExternalTask = '%s', variables = '%s') - both must not be null!", lockedExternalTask, variables));
     }
     externalTaskService().complete(lockedExternalTask.getId(), lockedExternalTask.getWorkerId(), variables);
+  }
+
+  // same with localVariables
+  public static void complete(LockedExternalTask lockedExternalTask, Map<String, Object> variables, Map<String, Object> localVariables) {
+    if (lockedExternalTask == null || variables == null) {
+      throw new IllegalArgumentException(format("Illegal call of completeExternalTask(lockedExternalTask = '%s', variables = '%s') - both must not be null!", lockedExternalTask, variables));
+    }
+    externalTaskService().complete(lockedExternalTask.getId(), lockedExternalTask.getWorkerId(), variables, localVariables);
   }
 
   /**
