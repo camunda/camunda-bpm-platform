@@ -1,49 +1,84 @@
-# How to Contribute
+# How to contribute
 
-* [Ways to Contribute](#ways-to-contribute)
-* [Build from Source](#build-from-source)
-* [Create a Pull Request](#create-a-pull-request)
-* [Contribution Checklist](#contribution-checklist)
+* [Ways to contribute](#ways-to-contribute)
+* [Browse our issues](#browse-our-issues)
+* [Build from source](#build-from-source)
+* [Create a pull request](#create-a-pull-request)
+* [Contribution checklist](#contribution-checklist)
 * [Contributor License Agreement (CLA)](#contributor-license-agreement-cla)
-* [Commit Message Conventions](#commit-message-conventions)
-* [License Headers](#license-headers)
-* [Review Process](#review-process)
+* [Commit message conventions](#commit-message-conventions)
+* [License headers](#license-headers)
+* [Review process](#review-process)
 
-# Ways to Contribute
+# Ways to contribute
 
 We would love you to contribute to this project. You can do so in various ways.
 
 
-## Contribute your Knowledge
+## Contribute your knowledge
 
 Help others by participating in our [forum](https://forum.camunda.org/). Please read the [Forum FAQ](https://forum.camunda.org/faq) before you start.
 
 
-## File Bugs or Feature Requests
+## File bugs or feature requests
 
-File bugs you found in the code or features you would like to see in the future in our [JIRA project named CAM](https://jira.camunda.com/browse/CAM).
+Found a bug in the code or have a feature that you would like to see in the future? [Search our open issues](https://github.com/camunda/camunda-bpm-platform/issues) if we have it on the radar already or [create a new issue otherwise](https://github.com/camunda/camunda-bpm-platform/issues/new/choose).
 
-1. [Signup for our JIRA](https://jira.camunda.com/secure/Signup!default.jspa)
-1. [Search for similar issues](https://jira.camunda.com/issues/?jql=project%20%3D%20CAM), your bug or feature may have already been reported
-1. [Create a new ticket](https://jira.camunda.com/secure/CreateIssue!default.jspa)
-   1. Select the CAM project
-   1. Be concise
-   1. Describe the steps to reproduce the problem or the context of the feature request
-   1. Specify your environment (e.g. Camunda version, Camunda modules you use, ...)
-   1. Provide code. For a bug report, create a test that reproduces the problem. For feature requests, create mockup code that shows how the feature might look like. Fork our [unit test Github template](https://github.com/camunda/camunda-engine-unittest) to get started quickly.
+Try to apply our best practices for creating issues:
+
+* Only Raise an issue if your request requires a code change in Camunda Platform 7
+  * If you want to contact the Camunda customer support, please see our [Enterprise Support Guide](https://docs.camunda.org/enterprise/support/).
+  * If you have an understanding question or need help building your solution, check out our [user forum](https://forum.camunda.io/).
+* Create a high-quality issue:
+  * Give enough context so that a person who doesn't know your project can understand your request
+  * Be concise, only add what's needed to understand the core of the request
+  * If you raise a bug report, describe the steps to reproduce the problem
+  * Specify your environment (e.g. Camunda version, Camunda modules you use, ...)
+  * Provide code. For a bug report, create a test that reproduces the problem. For feature requests, create mockup code that shows how the feature might look like. Fork our [unit test Github template](https://github.com/camunda/camunda-engine-unittest) to get started quickly.
 
 
-## Write Code
+## Write code
 
 You can contribute code that fixes bugs and/or implements features. Here is how it works:
 
-1. Select a ticket that you would like to implement. Tickets labelled [EasyPick](https://jira.camunda.com/issues/?jql=project%20%3D%20CAM%20AND%20status%20in%20(Open%2C%20Reopened%2C%20Ready)%20AND%20labels%20in%20(easy-pick%2C%20EasyPick)) are tickets that require little effort and can be good candidates to start. Be aware though that some of them need good knowledge of the surrounding code.
+1. Select a ticket that you would like to implement. Have a look at [our backlog](https://github.com/camunda/camunda-bpm-platform/issues) if you need inspiration. Be aware that some of the issues need good knowledge of the surrounding code.
 1. Tell us in the ticket comments or in the [forum](https://forum.camunda.org/c/contributions/14) (select the *Contributions* category) that you want to work on your ticket. This is also the place where you can ask questions.
 1. Check your code changes against our [contribution checklist](#contribution-checklist)
-1. [Create a pull request on Github](https://github.com/camunda/camunda-bpm-platform/pulls). Note that you can already do this earlier if you would like feedback on your work in progress.
+1. [Create a pull request](https://github.com/camunda/camunda-bpm-platform/pulls). Note that you can already do this before you have finished your implementation if you would like feedback on your work in progress.
 
 
-# Build from Source
+# Browse our issues
+
+In this repository, we manage the [issues](https://github.com/camunda/camunda-bpm-platform/issues) for the following Camunda Platform 7 code repositories and projects:
+
+* https://github.com/camunda/camunda-bpm-platform
+* Camunda Platform 7 Enterprise Edition
+* Camunda Platform 7 RPA Bridge
+* https://github.com/camunda/camunda-spin
+* https://github.com/camunda/camunda-connect
+* https://github.com/camunda/docker-camunda-bpm-platform
+* https://github.com/camunda/camunda-template-engines-jsr223
+* Camunda Platform 7 XSLT Script engine Extension
+* https://github.com/camunda/camunda-commons
+* https://github.com/camunda/camunda-bpm-examples
+* https://github.com/camunda/camunda-docs-manual
+* https://github.com/camunda/camunda-archetypes
+* https://github.com/camunda/camunda-engine-dmn-unittest
+* https://github.com/camunda/camunda-engine-unittest
+
+We use [labels](https://github.com/camunda/camunda-bpm-platform/labels) to mark and group our issues for easier browsing. We define the following label prefixes:
+
+* `bot:` labels that control a github app, workflow, ...
+* `ci:` labels that control the CI for a pull request
+* `group:` Arbitrary labels that we can define to group tickets. If you create this, please add a DRI to the description to make sure someone has ownership, e.g. to decide if we still need the label
+* `potential:` Issues that we are potentially releasing with the given version. This is not a guarantee and does not express high confidence.
+* `hacktoberfest-` labels for hacktoberfest contributions. This prefix cannot be changed. It is a rule of Hacktoberfest to name it like that.
+* `scope`: The technical scope in which the ticket makes changes.
+* `type`: Issue type. Every issue should have exactly one of these labels. They are automatically added when you create a new issue from a template.
+* `version:` Issues that will be released (with high confidence) with the given version.
+
+
+# Build from source
 
 In order to build our codebase from source, add the following to your Maven `settings.xml`.
 
@@ -75,7 +110,7 @@ An entire repository can then be built by running `mvn clean install` in the roo
 
 Integration tests (e.g. tests that run in an actual application server) are usually not part of the default Maven profiles. If you think they are relevant to your contribution, please ask us in the ticket, on the forum or in your pull request for how to run them. Smaller contributions usually do not need this.
 
-# Create a Pull Request
+# Create a pull request
 
 In order to show us your code, you can create a pull request on Github. Do this when your contribution is ready for review, or if you have started with your implementation and want some feedback before you continue. It is always easier to help if we can see your work in progress.
 
@@ -84,8 +119,9 @@ A pull request can be submitted as follows:
 1. [Fork the Camunda repository](https://docs.github.com/en/github/getting-started-with-github/fork-a-repo) you are contributing to
 1. Commit and push your changes to a branch in your fork
 1. [Submit a Pull Request to the Camunda repository](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request-from-a-fork). As the *base* branch (the one that you contribute to), select `master`. This should also be the default in the Github UI.
+1. In the pull request description, reference the github issue that your pull request addresses.
 
-# Contribution Checklist
+# Contribution checklist
 
 Before submitting your pull request for code review, please go through the following checklist:
 
@@ -104,7 +140,7 @@ Before submitting your pull request for code review, please go through the follo
 
 Before we can merge your contribution you have to sign our [Contributor License Agreement](https://cla-assistant.io/camunda/) (CLA). The CLA contains the terms and conditions under which the contribution is submitted. You need to do this only once for your first pull request. Keep in mind that without a signed CLA we cannot merge your contribution.
 
-# Commit Message Conventions
+# Commit message conventions
 
 The messages of all commits must conform to the style:
 
@@ -124,7 +160,7 @@ feat(engine): Support BPEL
 - implements execution for a really old standard
 - BPEL models are mapped to internal ActivityBehavior classes
 
-related to CAM-1337
+related to #123
 ```
 
 Have a look at the [commit history](https://github.com/camunda/camunda-bpm-platform/commits/master) for real-life examples.
@@ -162,7 +198,7 @@ tickets, list them in a comma-separated list such as `related to CAM-1234, CAM-4
 Optionally, you can reference the number of the GitHub PR from which the commit is merged. The message footer can then 
 look like `related to <ticket>, closes #<pr_number>` such as `related to CAM-1234, closes #567`.
 
-# License Headers
+# License headers
 
 Every source file in an open-source repository needs to contain the following license header at  the top, formatted as a code comment:
 
@@ -187,7 +223,7 @@ The header can be added manually (check other files). If you use our [IDE settin
 
 Contributions that do not contain valid license headers cannot be merged.
 
-# Review Process
+# Review process
 
 We usually check for new community-submitted pull requests once a week. We will then assign a reviewer from our development team and that person will provide feedback as soon as possible. 
 
