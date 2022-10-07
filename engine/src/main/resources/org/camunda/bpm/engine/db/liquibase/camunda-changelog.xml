@@ -98,7 +98,7 @@
   </changeSet>
 
   <changeSet author="Camunda" id="7.18-to-7.19">
-    <sqlFile path="../upgrade/${db.name}_engine_7.18_to_7.19.sql"
+    <sqlFile path="upgrade/${db.name}_engine_7.18_to_7.19.sql"
              encoding="UTF-8"
              relativeToChangelogFile="true"
              splitStatements="true"
