@@ -74,7 +74,7 @@ We use [labels](https://github.com/camunda/camunda-bpm-platform/labels) to mark 
 * `potential:` Issues that we are potentially releasing with the given version. This is not a guarantee and does not express high confidence.
 * `hacktoberfest-` labels for hacktoberfest contributions. This prefix cannot be changed. It is a rule of Hacktoberfest to name it like that.
 * `scope:` The technical scope in which the ticket makes changes.
-* `type`: Issue type. Every issue should have exactly one of these labels. They are automatically added when you create a new issue from a template.
+* `type:` Issue type. Every issue should have exactly one of these labels. They are automatically added when you create a new issue from a template.
 * `version:` Issues that will be released (with high confidence) with the given version.
 
 
