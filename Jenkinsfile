@@ -67,7 +67,7 @@ pipeline {
 
             // archive all .jar, .pom, .xml, .txt runtime artifacts + required .war/.zip/.tar.gz for EE pipeline
             // add a new line for each group of artifacts
-            cambpmArchiveArtifacts(//'.m2/org/camunda/**/*-SNAPSHOT/**/*.jar,.m2/org/camunda/**/*-SNAPSHOT/**/*.pom,.m2/org/camunda/**/*-SNAPSHOT/**/*.xml,.m2/org/camunda/**/*-SNAPSHOT/**/*.txt',
+            cambpmArchiveArtifacts('3.8/.m2/org/camunda/**/*-SNAPSHOT/**/*.jar,.m2/org/camunda/**/*-SNAPSHOT/**/*.pom,.m2/org/camunda/**/*-SNAPSHOT/**/*.xml,.m2/org/camunda/**/*-SNAPSHOT/**/*.txt',
                                   '3.8/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*frontend-sources.zip',
                                   '3.8/.m2/org/camunda/**/*-SNAPSHOT/**/license-book*.zip',
                                   '3.8/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-*-assembly*.tar.gz',
@@ -176,7 +176,7 @@ pipeline {
                   mvnVersion: 'maven-3.2-latest')
             }
             
-            cambpmArchiveArtifacts(//'.m2/org/camunda/**/*-SNAPSHOT/**/*.jar,.m2/org/camunda/**/*-SNAPSHOT/**/*.pom,.m2/org/camunda/**/*-SNAPSHOT/**/*.xml,.m2/org/camunda/**/*-SNAPSHOT/**/*.txt',
+            cambpmArchiveArtifacts('3.2/.m2/org/camunda/**/*-SNAPSHOT/**/*.jar,.m2/org/camunda/**/*-SNAPSHOT/**/*.pom,.m2/org/camunda/**/*-SNAPSHOT/**/*.xml,.m2/org/camunda/**/*-SNAPSHOT/**/*.txt',
                       '3.2/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*frontend-sources.zip',
                       '3.2/.m2/org/camunda/**/*-SNAPSHOT/**/license-book*.zip',
                       '3.2/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-*-assembly*.tar.gz',
