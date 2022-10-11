@@ -65,6 +65,7 @@ In this repository, we manage the [issues](https://github.com/camunda/camunda-bp
 * https://github.com/camunda/camunda-archetypes
 * https://github.com/camunda/camunda-engine-dmn-unittest
 * https://github.com/camunda/camunda-engine-unittest
+* https://github.com/camunda/camunda-external-task-client-js
 
 We use [labels](https://github.com/camunda/camunda-bpm-platform/labels) to mark and group our issues for easier browsing. We define the following label prefixes:
 
