@@ -74,6 +74,7 @@ pipeline {
                                   '3.8/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*.war',
                                   '3.8/.m2/org/camunda/**/*-SNAPSHOT/**/',
                                   '3.8/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-example-invoice*.war',
+                                  '**/target/**/dependencies-generated.txt',
                                   '3.8/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-bpm-run-modules-swaggerui-*-run-swaggerui-license-book-json.json')
 
             //cambpmStash("platform-stash-runtime",
@@ -105,9 +106,14 @@ pipeline {
               writeFile(file: '3.8/war-list.txt', text: JAR_OUTPUT)
 
               JAR_OUTPUT = sh(returnStdout: true, 
-                              script: "find 3.8/.m2/org -name '*-7.19.0-*.tar.gz' -print  -exec jar -tf {} \\;").trim()
+                              script: "find 3.8/.m2/org -name '*-7.19.0-*.tar.gz' -print  -exec tar -tf {} \\;").trim()
               echo "jar-list: ${JAR_OUTPUT}"
               writeFile(file: '3.8/tar-list.txt', text: JAR_OUTPUT)
+
+              JAR_OUTPUT = sh(returnStdout: true,
+                    script: "find 3.8/.m2/org -name '*-7.19.0-*.war' -print  -exec jar -tf {} \\;").trim()
+                 echo "war-list: ${JAR_OUTPUT}"
+                 writeFile(file: '3.8/war-list.txt', text: JAR_OUTPUT)
               sh "ls"
               sh "ls 3.8"
 
@@ -197,9 +203,15 @@ pipeline {
               writeFile(file: '3.2/war-list.txt', text: JAR_OUTPUT)
 
               JAR_OUTPUT = sh(returnStdout: true, 
-                              script: "find 3.2/.m2/org -name '*-7.19.0-*.tar.gz' -print  -exec jar -tf {} \\;").trim()
+                              script: "find 3.2/.m2/org -name '*-7.19.0-*.tar.gz' -print  -exec tar -tf {} \\;").trim()
               echo "jar-list: ${JAR_OUTPUT}"
               writeFile(file: '3.2/tar-list.txt', text: JAR_OUTPUT)
+
+
+              JAR_OUTPUT = sh(returnStdout: true,
+                    script: "find 3.2/.m2/org -name '*-7.19.0-*.war' -print  -exec jar -tf {} \\;").trim()
+                 echo "war-list: ${JAR_OUTPUT}"
+                 writeFile(file: '3.2/war-list.txt', text: JAR_OUTPUT)
               sh 'cd ..'
               sh "ls 3.2"
 
