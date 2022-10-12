@@ -53,7 +53,7 @@ Most of the components that make up the platform can even be completely embedded
 
 ## Contributing
 
-Please see our [contribution guidelines](CONTRIBUTING.md).
+Please see our [contribution guidelines](CONTRIBUTING.md) for how to raise issues and how to contribute code to our project.
 
 ## Tests
 
