@@ -21,7 +21,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 
-import javax.activation.MimetypesFileTypeMap;
+import camundajar.javax.activation.MimetypesFileTypeMap;
 
 import org.camunda.bpm.engine.variable.context.VariableContext;
 import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
