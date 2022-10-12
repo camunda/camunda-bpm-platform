@@ -453,7 +453,7 @@
               <exclude>org.apache.commons:*</exclude>
               <exclude>com.sun.mail:*</exclude>
               <exclude>javax.activation:*</exclude>
-              <exclude>com.sun.activation:*</exclude>
+<!--               <exclude>com.sun.activation:*</exclude> -->
               <exclude>org.mybatis:mybatis:*</exclude>
               <exclude>commons-logging:*</exclude>
               <exclude>joda-time:*</exclude>
