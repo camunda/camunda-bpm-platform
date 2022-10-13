@@ -81,6 +81,7 @@ pipeline {
               },
               postSuccess: {
                 def projectVersion = cambpmUtils.getMavenProjectVersion()
+                projectVersion = projectVersion.substring(0, projectVersion.lastIndexOf('.')) + "-SNAPSHOT"
                 cambpmPublishJavadocs("\"target/site/apidocs/\"", projectVersion)
               }
             ])
