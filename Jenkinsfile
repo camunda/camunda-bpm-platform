@@ -67,7 +67,7 @@ pipeline {
 
             // archive all .jar, .pom, .xml, .txt runtime artifacts + required .war/.zip/.tar.gz for EE pipeline
             // add a new line for each group of artifacts
-            cambpmArchiveArtifacts('3.8/.m2/org/camunda/**/*-SNAPSHOT/**/*.jar,.m2/org/camunda/**/*-SNAPSHOT/**/*.pom,.m2/org/camunda/**/*-SNAPSHOT/**/*.xml,.m2/org/camunda/**/*-SNAPSHOT/**/*.txt',
+            cambpmArchiveArtifacts('3.8/.m2/org/camunda/**/*-SNAPSHOT/**/*.jar,3.8/.m2/org/camunda/**/*-SNAPSHOT/**/*.pom,3.8/.m2/org/camunda/**/*-SNAPSHOT/**/*.xml,3.8/.m2/org/camunda/**/*-SNAPSHOT/**/*.txt',
                                   '3.8/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*frontend-sources.zip',
                                   '3.8/.m2/org/camunda/**/*-SNAPSHOT/**/license-book*.zip',
                                   '3.8/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-*-assembly*.tar.gz',
@@ -120,6 +120,7 @@ pipeline {
               cambpmArchiveArtifacts('3.8/**-list.txt')
               cambpmStash("platform-lists-3.8",
                           "**/**-list.txt")
+              cambpmStash("pom-3.8","3.8/.m2/org/camunda/**/*-SNAPSHOT/**/*.pom")
                         
               // JOB_NAME, e.g.: '7.15/cambpm-ce/cambpm-main/PR-1373'
               // keep leading slash for the absolute project path
@@ -176,7 +177,7 @@ pipeline {
                   mvnVersion: 'maven-3.2-latest')
             }
             
-            cambpmArchiveArtifacts('3.2/.m2/org/camunda/**/*-SNAPSHOT/**/*.jar,.m2/org/camunda/**/*-SNAPSHOT/**/*.pom,.m2/org/camunda/**/*-SNAPSHOT/**/*.xml,.m2/org/camunda/**/*-SNAPSHOT/**/*.txt',
+            cambpmArchiveArtifacts('3.2/.m2/org/camunda/**/*-SNAPSHOT/**/*.jar,3.2/.m2/org/camunda/**/*-SNAPSHOT/**/*.pom,3.2/.m2/org/camunda/**/*-SNAPSHOT/**/*.xml,3.2/.m2/org/camunda/**/*-SNAPSHOT/**/*.txt',
                       '3.2/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*frontend-sources.zip',
                       '3.2/.m2/org/camunda/**/*-SNAPSHOT/**/license-book*.zip',
                       '3.2/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-*-assembly*.tar.gz',
@@ -218,6 +219,7 @@ pipeline {
               cambpmArchiveArtifacts('3.2/**-list.txt')
               cambpmStash("platform-lists-3.2",
                           "**/**-list.txt")
+              cambpmStash("pom-3.2","3.2/.m2/org/camunda/**/*-SNAPSHOT/**/*.pom")
 
             }
           }
@@ -239,8 +241,10 @@ pipeline {
                   true, true, true
                 )
                //sh 'cd \${WORKSPACE}'
-               cambpmUnstash("platform-lists-3.2")
-               cambpmUnstash("platform-lists-3.8")
+               //cambpmUnstash("platform-lists-3.2")
+               //cambpmUnstash("platform-lists-3.8")
+               cambpmUnstash("pom-3.2")
+               cambpmUnstash("pom-3.8")
                sh 'ls'
                sh 'ls 3.2'
                sh 'ls 3.8'
