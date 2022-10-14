@@ -67,15 +67,8 @@ pipeline {
 
             // archive all .jar, .pom, .xml, .txt runtime artifacts + required .war/.zip/.tar.gz for EE pipeline
             // add a new line for each group of artifacts
-            cambpmArchiveArtifacts('3.8/.m2/org/camunda/**/*-SNAPSHOT/**/*.jar,3.8/.m2/org/camunda/**/*-SNAPSHOT/**/*.pom,3.8/.m2/org/camunda/**/*-SNAPSHOT/**/*.xml,3.8/.m2/org/camunda/**/*-SNAPSHOT/**/*.txt',
-                                  '3.8/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*frontend-sources.zip',
-                                  '3.8/.m2/org/camunda/**/*-SNAPSHOT/**/license-book*.zip',
-                                  '3.8/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-*-assembly*.tar.gz',
-                                  '3.8/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*.war',
-                                  '3.8/.m2/org/camunda/**/*-SNAPSHOT/**/',
-                                  '3.8/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-example-invoice*.war',
-                                  '**/target/**/dependencies-generated.txt',
-                                  '3.8/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-bpm-run-modules-swaggerui-*-run-swaggerui-license-book-json.json')
+            cambpmArchiveArtifacts('3.8/.m2/org/camunda/**/*-SNAPSHOT/**/*.pom,3.8/.m2/org/camunda/**/*-SNAPSHOT/**/*.xml,3.8/.m2/org/camunda/**/*-SNAPSHOT/**/*.txt',
+                               )
 
             //cambpmStash("platform-stash-runtime",
             //            ".m2/org/camunda/**/*-SNAPSHOT/**",
@@ -87,59 +80,7 @@ pipeline {
             //          "**/*.zip,**/*.tar.gz")
 
 
-            script {
-              
-              //sh 'mkdir 3.8'
-              def JAR_OUTPUT = sh(returnStdout: true,
-                                  script: "find 3.8/.m2/org -name '*-7.19.0-*.jar' -print  -exec jar -tf {} \\;").trim()
-              echo "list: ${JAR_OUTPUT}"
-              writeFile(file: '3.8/jar-list.txt', text: JAR_OUTPUT)
 
-              JAR_OUTPUT = sh(returnStdout: true,
-                              script: "find 3.8/.m2/org -name '*-7.19.0-*.zip' -print  -exec jar -tf {} \\;").trim()
-              echo "list: ${JAR_OUTPUT}"
-              writeFile(file: '3.8/zip-list.txt', text: JAR_OUTPUT)
-
-              JAR_OUTPUT = sh(returnStdout: true,
-                              script: "find 3.8/.m2/org -name '*-7.19.0-*.war' -print  -exec jar -tf {} \\;").trim()
-              echo "list: ${JAR_OUTPUT}"
-              writeFile(file: '3.8/war-list.txt', text: JAR_OUTPUT)
-
-              JAR_OUTPUT = sh(returnStdout: true, 
-                              script: "find 3.8/.m2/org -name '*-7.19.0-*.tar.gz' -print  -exec tar -tf {} \\;").trim()
-              echo "jar-list: ${JAR_OUTPUT}"
-              writeFile(file: '3.8/tar-list.txt', text: JAR_OUTPUT)
-
-              JAR_OUTPUT = sh(returnStdout: true,
-                    script: "find 3.8/.m2/org -name '*-7.19.0-*.war' -print  -exec jar -tf {} \\;").trim()
-                 echo "war-list: ${JAR_OUTPUT}"
-                 writeFile(file: '3.8/war-list.txt', text: JAR_OUTPUT)
-              sh "ls"
-              sh "ls 3.8"
-
-              cambpmArchiveArtifacts('3.8/**-list.txt')
-              cambpmStash("platform-lists-3.8",
-                          "**/**-list.txt")
-              cambpmStash("pom-3.8","3.8/.m2/org/camunda/**/*-SNAPSHOT/**/*.pom")
-                        
-              // JOB_NAME, e.g.: '7.15/cambpm-ce/cambpm-main/PR-1373'
-              // keep leading slash for the absolute project path
-            //  platformVersionDir = "/" + env.JOB_NAME.split('/')[0]
-            //  upstreamProjectName = "/" + env.JOB_NAME
-            //  upstreamBuildNumber = env.BUILD_NUMBER
-
-           //  if (cambpmWithLabels('webapp-integration', 'all-as', 'h2', 'websphere', 'weblogic', 'jbosseap', 'run', 'spring-boot', 'authorizations', 'e2e')) {
-           //    cambpmTriggerDownstream(
-           //      platformVersionDir + "/cambpm-ee/" + eeMainProjectBranch,
-           //      [string(name: 'UPSTREAM_PROJECT_NAME', value: upstreamProjectName),
-           //      string(name: 'UPSTREAM_BUILD_NUMBER', value: upstreamBuildNumber)],
-           //      true, true, true
-           
-           //    )
-           //  }
-
-
-            }
           }
         ])
 
@@ -177,89 +118,16 @@ pipeline {
                   mvnVersion: 'maven-3.2-latest')
             }
             
-            cambpmArchiveArtifacts('3.2/.m2/org/camunda/**/*-SNAPSHOT/**/*.jar,3.2/.m2/org/camunda/**/*-SNAPSHOT/**/*.pom,3.2/.m2/org/camunda/**/*-SNAPSHOT/**/*.xml,3.2/.m2/org/camunda/**/*-SNAPSHOT/**/*.txt',
-                      '3.2/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*frontend-sources.zip',
-                      '3.2/.m2/org/camunda/**/*-SNAPSHOT/**/license-book*.zip',
-                      '3.2/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-*-assembly*.tar.gz',
-                      '3.2/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*.war',
-                      '3.2/.m2/org/camunda/**/*-SNAPSHOT/**/',
-                      '3.2/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-example-invoice*.war',
-                      '3.2/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-bpm-run-modules-swaggerui-*-run-swaggerui-license-book-json.json')
-
-            script {
-              //sh 'mkdir 3.2'
-              def JAR_OUTPUT = sh(returnStdout: true,
-                                  script: "find 3.2/.m2/org -name '*-7.19.0-*.jar' -print  -exec jar -tf {} \\;").trim()
-              echo "list: ${JAR_OUTPUT}"
-              writeFile(file: '3.2/jar-list.txt', text: JAR_OUTPUT)
-
-              JAR_OUTPUT = sh(returnStdout: true,
-                              script: "find 3.2/.m2/org -name '*-7.19.0-*.zip' -print  -exec jar -tf {} \\;").trim()
-              echo "list: ${JAR_OUTPUT}"
-              writeFile(file: '3.2/zip-list.txt', text: JAR_OUTPUT)
-
-              JAR_OUTPUT = sh(returnStdout: true,
-                              script: "find 3.2/.m2/org -name '*-7.19.0-*.war' -print  -exec jar -tf {} \\;").trim()
-              echo "list: ${JAR_OUTPUT}"
-              writeFile(file: '3.2/war-list.txt', text: JAR_OUTPUT)
-
-              JAR_OUTPUT = sh(returnStdout: true, 
-                              script: "find 3.2/.m2/org -name '*-7.19.0-*.tar.gz' -print  -exec tar -tf {} \\;").trim()
-              echo "jar-list: ${JAR_OUTPUT}"
-              writeFile(file: '3.2/tar-list.txt', text: JAR_OUTPUT)
+            cambpmArchiveArtifacts('3.2/.m2/org/camunda/**/*-SNAPSHOT/**/*.pom,3.2/.m2/org/camunda/**/*-SNAPSHOT/**/*.xml,3.2/.m2/org/camunda/**/*-SNAPSHOT/**/*.txt',
+                      )
 
 
-              JAR_OUTPUT = sh(returnStdout: true,
-                    script: "find 3.2/.m2/org -name '*-7.19.0-*.war' -print  -exec jar -tf {} \\;").trim()
-                 echo "war-list: ${JAR_OUTPUT}"
-                 writeFile(file: '3.2/war-list.txt', text: JAR_OUTPUT)
-              sh 'cd ..'
-              sh "ls 3.2"
-
-              cambpmArchiveArtifacts('3.2/**-list.txt')
-              cambpmStash("platform-lists-3.2",
-                          "**/**-list.txt")
-              cambpmStash("pom-3.2","3.2/.m2/org/camunda/**/*-SNAPSHOT/**/*.pom")
-
-            }
           }
         ])
 
       }
           }}
         }
-                  stage('diff') {
-          steps{
-             script{
-               platformVersionDir = "/" + env.JOB_NAME.split('/')[0]
-                 upstreamProjectName = "/" + env.JOB_NAME
-                 upstreamBuildNumber = env.BUILD_NUMBER
-               cambpmTriggerDownstream(
-                  platformVersionDir + "/cambpm-ee/" + "cambpm-ee-main/PR-727",
-                  [string(name: 'UPSTREAM_PROJECT_NAME', value: upstreamProjectName),
-                  string(name: 'UPSTREAM_BUILD_NUMBER', value: upstreamBuildNumber)],
-                  true, true, true
-                )
-               //sh 'cd \${WORKSPACE}'
-               //cambpmUnstash("platform-lists-3.2")
-               //cambpmUnstash("platform-lists-3.8")
-               cambpmUnstash("pom-3.2")
-               cambpmUnstash("pom-3.8")
-               sh 'ls'
-               sh 'ls 3.2'
-               sh 'ls 3.8'
-               //sh 'diff -r ./3.2 ./3.8 >> artifact-diff.patch'
-               OUTPUT = sh(returnStdout: false,
-                           script: "diff -r ./3.2 ./3.8 ").trim()
-               writeFile(file: 'artifact-diff.patch', text: OUTPUT)
-               echo "diff: ${OUTPUT}"
-              cambpmArchiveArtifacts('artifact-diff.patch')
-             }
 
-              
-              
-          }
-
-          }
   }
 }
