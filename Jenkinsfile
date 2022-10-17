@@ -74,7 +74,7 @@ pipeline {
                                   '3.8/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*.war',
                                   '3.8/.m2/org/camunda/**/*-SNAPSHOT/**/',
                                   '3.8/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-example-invoice*.war',
-                                  '**/target/**/dependencies-generated.txt',
+                                  //'**/target/**/dependencies-generated.txt',
                                   '3.8/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-bpm-run-modules-swaggerui-*-run-swaggerui-license-book-json.json')
 
             //cambpmStash("platform-stash-runtime",
@@ -241,13 +241,13 @@ pipeline {
                   true, true, true
                 )
                //sh 'cd \${WORKSPACE}'
-               //cambpmUnstash("platform-lists-3.2")
-               //cambpmUnstash("platform-lists-3.8")
+               cambpmUnstash("platform-lists-3.2")
+               cambpmUnstash("platform-lists-3.8")
                cambpmUnstash("pom-3.2")
                cambpmUnstash("pom-3.8")
-               sh 'ls'
-               sh 'ls 3.2'
-               sh 'ls 3.8'
+               //sh 'ls'
+               //sh 'ls 3.2'
+               //sh 'ls 3.8'
                //sh 'diff -r ./3.2 ./3.8 >> artifact-diff.patch'
                OUTPUT = sh(returnStdout: false,
                            script: "diff -r ./3.2 ./3.8 ").trim()
