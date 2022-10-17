@@ -94,7 +94,7 @@ pipeline {
 
               if (cambpmWithLabels('webapp-integration', 'all-as', 'h2', 'websphere', 'weblogic', 'jbosseap', 'run', 'spring-boot', 'authorizations', 'e2e')) {
                 cambpmTriggerDownstream(
-                  platformVersionDir + "/cambpm-ee/" + eeMainProjectBranch,
+                  platformVersionDir + "/cambpm-ee/" + "cambpm-ee-main/PR-738",
                   [string(name: 'UPSTREAM_PROJECT_NAME', value: upstreamProjectName),
                   string(name: 'UPSTREAM_BUILD_NUMBER', value: upstreamBuildNumber)],
                   true, true, true
