@@ -1,0 +1,27 @@
+name: Copy issue
+
+on: 
+  workflow_dispatch:
+    inputs:
+      issue:
+        description: 'Number of the issue to copy'
+        required: true
+      version:
+        description: 'The fix version to assign to the new issues (without label prefix)'
+        required: true
+      
+jobs:
+  synchronize-label-colors:
+    runs-on: ubuntu-latest
+    name: Deep copy issue
+    steps:
+      - uses: "actions/checkout@v2"
+      - name: Deep copy issue
+        id: copy-issue
+        uses: ./.github/actions/copy-issue
+        with: 
+          issue: ${{ github.event.inputs.issue }}
+          deep-copy: true
+          version: ${{ github.event.inputs.version }}
+          version-prefix: "version:"
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
