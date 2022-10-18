@@ -34,14 +34,14 @@ public class TelemetryRestServiceImpl extends AbstractRestProcessEngineAware imp
   public void configureTelemetry(TelemetryConfigurationDto dto) {
     boolean enableTelemetry = dto.isEnableTelemetry();
 
-    ManagementService managementService = processEngine.getManagementService();
+    ManagementService managementService = getProcessEngine().getManagementService();
 
     managementService.toggleTelemetry(enableTelemetry);
   }
 
   @Override
   public TelemetryConfigurationDto getTelemetryConfiguration() {
-    ManagementService managementService = processEngine.getManagementService();
+    ManagementService managementService = getProcessEngine().getManagementService();
 
     Boolean telemetryEnabled = managementService.isTelemetryEnabled();
     return new TelemetryConfigurationDto(telemetryEnabled);
@@ -49,7 +49,7 @@ public class TelemetryRestServiceImpl extends AbstractRestProcessEngineAware imp
 
   @Override
   public TelemetryDataDto getTelemetryData() {
-    ManagementService managementService = processEngine.getManagementService();
+    ManagementService managementService = getProcessEngine().getManagementService();
     TelemetryData data = managementService.getTelemetryData();
 
     return TelemetryDataDto.fromEngineDto(data);

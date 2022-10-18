@@ -242,11 +242,12 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
 
   @Override
   public BatchDto setVariablesAsync(SetVariablesAsyncDto setVariablesAsyncDto) {
+    ProcessEngine engine = getProcessEngine();
     Map<String, VariableValueDto> variables = setVariablesAsyncDto.getVariables();
 
     VariableMap variableMap = null;
     try {
-      variableMap = VariableValueDto.toMap(variables, processEngine, objectMapper);
+      variableMap = VariableValueDto.toMap(variables, engine, objectMapper);
 
     } catch (RestException e) {
       String errorMessage = String.format("Cannot set variables: %s", e.getMessage());
@@ -258,7 +259,7 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
     ProcessInstanceQuery runtimeQuery = toQuery(setVariablesAsyncDto.getProcessInstanceQuery());
     HistoricProcessInstanceQuery historyQuery = toQuery(setVariablesAsyncDto.getHistoricProcessInstanceQuery());
 
-    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
+    RuntimeService runtimeService = engine.getRuntimeService();
 
     Batch batch = null;
     try {

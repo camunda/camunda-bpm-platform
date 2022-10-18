@@ -118,7 +118,7 @@ public class ExternalTaskRestServiceImpl extends AbstractRestProcessEngineAware 
   @Override
   public void fetchAndLock(FetchExternalTasksExtendedDto dto, AsyncResponse asyncResponse) {
     FetchAndLockHandler fetchAndLockHandler = FetchAndLockContextListener.getFetchAndLockHandler();
-    fetchAndLockHandler.addPendingRequest(dto, asyncResponse, processEngine);
+    fetchAndLockHandler.addPendingRequest(dto, asyncResponse, getProcessEngine());
   }
 
   @Override
@@ -152,7 +152,7 @@ public class ExternalTaskRestServiceImpl extends AbstractRestProcessEngineAware 
   @Override
   public List<String> getTopicNames(boolean withLockedTasks, boolean withUnlockedTasks,
                                     boolean withRetriesLeft) {
-    return processEngine.getExternalTaskService()
+    return getProcessEngine().getExternalTaskService()
                         .getTopicNames(withLockedTasks, withUnlockedTasks, withRetriesLeft);
   }
 
@@ -179,7 +179,8 @@ public class ExternalTaskRestServiceImpl extends AbstractRestProcessEngineAware 
 
   protected UpdateExternalTaskRetriesBuilder updateRetries(SetRetriesForExternalTasksDto retriesDto) {
 
-    ExternalTaskService externalTaskService = getProcessEngine().getExternalTaskService();
+    ProcessEngine engine = getProcessEngine();
+    ExternalTaskService externalTaskService = engine.getExternalTaskService();
 
     List<String> externalTaskIds = retriesDto.getExternalTaskIds();
     List<String> processInstanceIds = retriesDto.getProcessInstanceIds();
@@ -190,17 +191,17 @@ public class ExternalTaskRestServiceImpl extends AbstractRestProcessEngineAware 
 
     ExternalTaskQueryDto externalTaskQueryDto = retriesDto.getExternalTaskQuery();
     if (externalTaskQueryDto != null) {
-      externalTaskQuery = externalTaskQueryDto.toQuery(getProcessEngine());
+      externalTaskQuery = externalTaskQueryDto.toQuery(engine);
     }
 
     ProcessInstanceQueryDto processInstanceQueryDto = retriesDto.getProcessInstanceQuery();
     if (processInstanceQueryDto != null) {
-      processInstanceQuery = processInstanceQueryDto.toQuery(getProcessEngine());
+      processInstanceQuery = processInstanceQueryDto.toQuery(engine);
     }
 
     HistoricProcessInstanceQueryDto historicProcessInstanceQueryDto = retriesDto.getHistoricProcessInstanceQuery();
     if (historicProcessInstanceQueryDto != null) {
-      historicProcessInstanceQuery = historicProcessInstanceQueryDto.toQuery(getProcessEngine());
+      historicProcessInstanceQuery = historicProcessInstanceQueryDto.toQuery(engine);
     }
 
     return externalTaskService.updateRetries()

@@ -22,6 +22,7 @@ import java.util.Map.Entry;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.rest.MessageRestService;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
@@ -115,13 +116,14 @@ public class MessageRestServiceImpl extends AbstractRestProcessEngineAware imple
   }
 
   protected MessageCorrelationBuilder createMessageCorrelationBuilder(CorrelationMessageDto messageDto) {
-    RuntimeService runtimeService = processEngine.getRuntimeService();
+    ProcessEngine engine = getProcessEngine();
+    RuntimeService runtimeService = engine.getRuntimeService();
 
     ObjectMapper objectMapper = getObjectMapper();
-    Map<String, Object> correlationKeys = VariableValueDto.toMap(messageDto.getCorrelationKeys(), processEngine, objectMapper);
-    Map<String, Object> localCorrelationKeys = VariableValueDto.toMap(messageDto.getLocalCorrelationKeys(), processEngine, objectMapper);
-    Map<String, Object> processVariables = VariableValueDto.toMap(messageDto.getProcessVariables(), processEngine, objectMapper);
-    Map<String, Object> processVariablesLocal = VariableValueDto.toMap(messageDto.getProcessVariablesLocal(), processEngine, objectMapper);
+    Map<String, Object> correlationKeys = VariableValueDto.toMap(messageDto.getCorrelationKeys(), engine, objectMapper);
+    Map<String, Object> localCorrelationKeys = VariableValueDto.toMap(messageDto.getLocalCorrelationKeys(), engine, objectMapper);
+    Map<String, Object> processVariables = VariableValueDto.toMap(messageDto.getProcessVariables(), engine, objectMapper);
+    Map<String, Object> processVariablesLocal = VariableValueDto.toMap(messageDto.getProcessVariablesLocal(), engine, objectMapper);
 
     MessageCorrelationBuilder builder = runtimeService
         .createMessageCorrelation(messageDto.getMessageName());

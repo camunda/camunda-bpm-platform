@@ -200,7 +200,7 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
 
   @Override
   public void deleteProcessDefinitionsByKey(String processDefinitionKey, boolean cascade, boolean skipCustomListeners, boolean skipIoMappings) {
-    RepositoryService repositoryService = processEngine.getRepositoryService();
+    RepositoryService repositoryService = getProcessEngine().getRepositoryService();
 
     DeleteProcessDefinitionsBuilder builder = repositoryService.deleteProcessDefinitions()
       .byKey(processDefinitionKey);
@@ -210,7 +210,7 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
 
   @Override
   public void deleteProcessDefinitionsByKeyAndTenantId(String processDefinitionKey, boolean cascade, boolean skipCustomListeners, boolean skipIoMappings, String tenantId) {
-    RepositoryService repositoryService = processEngine.getRepositoryService();
+    RepositoryService repositoryService = getProcessEngine().getRepositoryService();
 
     DeleteProcessDefinitionsBuilder builder = repositoryService.deleteProcessDefinitions()
       .byKey(processDefinitionKey)

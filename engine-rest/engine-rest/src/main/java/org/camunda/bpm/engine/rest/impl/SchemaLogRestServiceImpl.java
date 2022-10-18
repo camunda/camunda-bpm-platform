@@ -45,7 +45,7 @@ public class SchemaLogRestServiceImpl extends AbstractRestProcessEngineAware imp
 
   @Override
   public List<SchemaLogEntryDto> querySchemaLog(SchemaLogQueryDto dto, Integer firstResult, Integer maxResults) {
-    SchemaLogQuery query = dto.toQuery(processEngine);
+    SchemaLogQuery query = dto.toQuery(getProcessEngine());
     List<SchemaLogEntry> schemaLogEntries;
     if (firstResult != null || maxResults != null) {
       schemaLogEntries = executePaginatedQuery(query, firstResult, maxResults);

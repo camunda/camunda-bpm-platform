@@ -43,7 +43,7 @@ public class IncidentRestServiceImpl extends AbstractRestProcessEngineAware impl
   @Override
   public List<IncidentDto> getIncidents(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
     IncidentQueryDto queryDto = new IncidentQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
-    IncidentQuery query = queryDto.toQuery(processEngine);
+    IncidentQuery query = queryDto.toQuery(getProcessEngine());
 
     List<Incident> queryResult;
     if (firstResult != null || maxResults != null) {
@@ -64,7 +64,7 @@ public class IncidentRestServiceImpl extends AbstractRestProcessEngineAware impl
   @Override
   public CountResultDto getIncidentsCount(UriInfo uriInfo) {
     IncidentQueryDto queryDto = new IncidentQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
-    IncidentQuery query = queryDto.toQuery(processEngine);
+    IncidentQuery query = queryDto.toQuery(getProcessEngine());
 
     long count = query.count();
     CountResultDto result = new CountResultDto();

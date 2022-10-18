@@ -22,6 +22,7 @@ import java.util.Map;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.migration.MigrationInstructionsBuilder;
@@ -50,7 +51,8 @@ public class MigrationRestServiceImpl extends AbstractRestProcessEngineAware imp
   }
 
   public MigrationPlanDto generateMigrationPlan(MigrationPlanGenerationDto generationDto) {
-    RuntimeService runtimeService = processEngine.getRuntimeService();
+    ProcessEngine engine = getProcessEngine();
+    RuntimeService runtimeService = engine.getRuntimeService();
 
     String sourceProcessDefinitionId = generationDto.getSourceProcessDefinitionId();
     String targetProcessDefinitionId = generationDto.getTargetProcessDefinitionId();
@@ -65,7 +67,7 @@ public class MigrationRestServiceImpl extends AbstractRestProcessEngineAware imp
 
       Map<String, VariableValueDto> variableDtos = generationDto.getVariables();
       if (variableDtos != null) {
-        instructionsBuilder.setVariables(toMap(variableDtos, processEngine, objectMapper));
+        instructionsBuilder.setVariables(toMap(variableDtos, engine, objectMapper));
       }
 
       MigrationPlan migrationPlan = instructionsBuilder.build();
@@ -98,15 +100,16 @@ public class MigrationRestServiceImpl extends AbstractRestProcessEngineAware imp
   }
 
   protected MigrationPlanExecutionBuilder createMigrationPlanExecutionBuilder(MigrationExecutionDto migrationExecution) {
+    ProcessEngine engine = getProcessEngine();
     MigrationPlan migrationPlan = createMigrationPlan(migrationExecution.getMigrationPlan());
     List<String> processInstanceIds = migrationExecution.getProcessInstanceIds();
 
-    MigrationPlanExecutionBuilder executionBuilder = processEngine.getRuntimeService()
+    MigrationPlanExecutionBuilder executionBuilder = engine.getRuntimeService()
       .newMigration(migrationPlan).processInstanceIds(processInstanceIds);
 
     ProcessInstanceQueryDto processInstanceQueryDto = migrationExecution.getProcessInstanceQuery();
     if (processInstanceQueryDto != null) {
-      ProcessInstanceQuery processInstanceQuery = processInstanceQueryDto.toQuery(getProcessEngine());
+      ProcessInstanceQuery processInstanceQuery = processInstanceQueryDto.toQuery(engine);
       executionBuilder.processInstanceQuery(processInstanceQuery);
     }
 
@@ -123,7 +126,7 @@ public class MigrationRestServiceImpl extends AbstractRestProcessEngineAware imp
 
   protected MigrationPlan createMigrationPlan(MigrationPlanDto migrationPlanDto) {
     try {
-      return MigrationPlanDto.toMigrationPlan(processEngine, objectMapper, migrationPlanDto);
+      return MigrationPlanDto.toMigrationPlan(getProcessEngine(), objectMapper, migrationPlanDto);
     }
     catch (MigrationPlanValidationException e) {
       throw e;

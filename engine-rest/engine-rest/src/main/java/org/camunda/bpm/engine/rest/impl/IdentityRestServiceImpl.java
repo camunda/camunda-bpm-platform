@@ -25,6 +25,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.identity.PasswordPolicyResult;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
@@ -98,10 +99,11 @@ public class IdentityRestServiceImpl extends AbstractRestProcessEngineAware impl
 
   @Override
   public Response getPasswordPolicy() {
-    boolean isEnabled = processEngine.getProcessEngineConfiguration().isEnablePasswordPolicy();
+    ProcessEngine engine = getProcessEngine();
+    boolean isEnabled = engine.getProcessEngineConfiguration().isEnablePasswordPolicy();
 
     if (isEnabled) {
-      IdentityService identityService = processEngine.getIdentityService();
+      IdentityService identityService = engine.getIdentityService();
 
       return Response.status(Status.OK.getStatusCode())
         .entity(PasswordPolicyDto.fromPasswordPolicy(identityService.getPasswordPolicy()))
@@ -115,10 +117,11 @@ public class IdentityRestServiceImpl extends AbstractRestProcessEngineAware impl
 
   @Override
   public Response checkPassword(PasswordPolicyRequestDto dto) {
-    boolean isEnabled = processEngine.getProcessEngineConfiguration().isEnablePasswordPolicy();
+    ProcessEngine engine = getProcessEngine();
+    boolean isEnabled = engine.getProcessEngineConfiguration().isEnablePasswordPolicy();
 
     if (isEnabled) {
-      IdentityService identityService = processEngine.getIdentityService();
+      IdentityService identityService = engine.getIdentityService();
 
       User user = null;
       UserProfileDto profileDto = dto.getProfile();

@@ -39,7 +39,7 @@ public class VariableInstanceRestServiceImpl extends AbstractRestProcessEngineAw
 
   @Override
   public VariableInstanceResource getVariableInstance(String id) {
-    return new VariableInstanceResourceImpl(id, processEngine);
+    return new VariableInstanceResourceImpl(id, getProcessEngine());
   }
 
   @Override

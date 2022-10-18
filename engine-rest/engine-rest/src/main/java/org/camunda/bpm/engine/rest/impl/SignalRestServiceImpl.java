@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.rest.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.rest.SignalRestService;
 import org.camunda.bpm.engine.rest.dto.SignalDto;
@@ -48,7 +49,8 @@ public class SignalRestServiceImpl extends AbstractRestProcessEngineAware implem
   }
 
   protected SignalEventReceivedBuilder createSignalEventReceivedBuilder(SignalDto dto) {
-    RuntimeService runtimeService = processEngine.getRuntimeService();
+    ProcessEngine engine = getProcessEngine();
+    RuntimeService runtimeService = engine.getRuntimeService();
     String name = dto.getName();
     SignalEventReceivedBuilder signalEvent = runtimeService.createSignalEvent(name);
 
@@ -59,7 +61,7 @@ public class SignalRestServiceImpl extends AbstractRestProcessEngineAware implem
 
     Map<String, VariableValueDto> variablesDto = dto.getVariables();
     if (variablesDto != null) {
-      Map<String, Object> variables = VariableValueDto.toMap(variablesDto, processEngine, objectMapper);
+      Map<String, Object> variables = VariableValueDto.toMap(variablesDto, engine, objectMapper);
       signalEvent.setVariables(variables);
     }
 

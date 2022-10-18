@@ -21,6 +21,7 @@ import java.util.List;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.rest.ConditionRestService;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
@@ -55,11 +56,12 @@ public class ConditionRestServiceImpl extends AbstractRestProcessEngineAware imp
   }
 
   protected ConditionEvaluationBuilder createConditionEvaluationBuilder(EvaluationConditionDto conditionDto) {
-    RuntimeService runtimeService = processEngine.getRuntimeService();
+    ProcessEngine engine = getProcessEngine();
+    RuntimeService runtimeService = engine.getRuntimeService();
 
     ObjectMapper objectMapper = getObjectMapper();
 
-    VariableMap variables = VariableValueDto.toMap(conditionDto.getVariables(), processEngine, objectMapper);
+    VariableMap variables = VariableValueDto.toMap(conditionDto.getVariables(), engine, objectMapper);
 
     ConditionEvaluationBuilder builder = runtimeService.createConditionEvaluation();
 
