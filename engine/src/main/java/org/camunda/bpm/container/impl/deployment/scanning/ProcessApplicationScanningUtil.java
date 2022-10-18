@@ -24,6 +24,7 @@ import org.camunda.bpm.container.impl.deployment.scanning.spi.ProcessApplication
 import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.camunda.bpm.engine.impl.cmmn.deployer.CmmnDeployer;
 import org.camunda.bpm.engine.impl.dmn.deployer.DecisionDefinitionDeployer;
+import org.camunda.bpm.engine.impl.form.deployer.CamundaFormDefinitionDeployer;
 
 public class ProcessApplicationScanningUtil {
 
@@ -72,7 +73,8 @@ public class ProcessApplicationScanningUtil {
   public static boolean isDeployable(String filename) {
     return hasSuffix(filename, BpmnDeployer.BPMN_RESOURCE_SUFFIXES)
       || hasSuffix(filename, CmmnDeployer.CMMN_RESOURCE_SUFFIXES)
-      || hasSuffix(filename, DecisionDefinitionDeployer.DMN_RESOURCE_SUFFIXES);
+      || hasSuffix(filename, DecisionDefinitionDeployer.DMN_RESOURCE_SUFFIXES)
+      || hasSuffix(filename, CamundaFormDefinitionDeployer.FORM_RESOURCE_SUFFIXES);
   }
 
   public static boolean isDeployable(String filename, String[] additionalResourceSuffixes) {
