@@ -31,7 +31,8 @@
             "mediaType": "image/*",
             "examples": ['"example-1": {
                        "summary": "GET `/decision-requirements-definition/invoice:1:9f86d61f-9ee5-11e3-be3b-606720b6f99c/diagram`",
-                       "description": "GET `/decision-requirements-definition/invoice:1:9f86d61f-9ee5-11e3-be3b-606720b6f99c/diagram`"
+                       "description": "GET `/decision-requirements-definition/invoice:1:9f86d61f-9ee5-11e3-be3b-606720b6f99c/diagram`",
+                       "value": ""
                      }']
           },
           {
@@ -39,7 +40,8 @@
             "mediaType": "application/octet-stream",
             "examples": ['"example-1": {
                        "summary": "GET `/decision-requirements-definition/invoice:1:9f86d61f-9ee5-11e3-be3b-606720b6f99c/diagram`",
-                       "description": "GET `/decision-requirements-definition/invoice:1:9f86d61f-9ee5-11e3-be3b-606720b6f99c/diagram`"
+                       "description": "GET `/decision-requirements-definition/invoice:1:9f86d61f-9ee5-11e3-be3b-606720b6f99c/diagram`",
+                       "value": ""
                      }']
           }
         ]

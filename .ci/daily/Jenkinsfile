@@ -1,6 +1,6 @@
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
-@Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library@generate-rest-docs']) _
 
 def failedStageTypes = []
 
@@ -82,7 +82,28 @@ pipeline {
               postSuccess: {
                 def projectVersion = cambpmUtils.getMavenProjectVersion()
                 projectVersion = projectVersion.substring(0, projectVersion.lastIndexOf('.')) + "-SNAPSHOT"
-                cambpmPublishJavadocs("\"target/site/apidocs/\"", projectVersion)
+                cambpmPublishDocs("\"target/site/apidocs/\"", projectVersion, "javadoc")
+              }
+            ])
+          }
+        }
+        stage('stage-restapi-docs') {
+          /*when {
+            branch cambpmDefaultBranch();
+          }*/
+          steps {
+            cambpmConditionalRetry([
+              agentLabel : 'centos-stable',
+              runSteps   : {
+                cambpmRunMaven('./engine-rest',
+                  "package -Dmaven.test.skip -DskipTests -pl '!engine-rest,!assembly'",
+                  withNpm: true,
+                  jdkVersion: 'jdk-11-latest')
+              },
+              postSuccess: {
+                def projectVersion = cambpmUtils.getMavenProjectVersion()
+                projectVersion = projectVersion.substring(0, projectVersion.lastIndexOf('.')) + "-SNAPSHOT"
+                cambpmPublishDocs("\"engine-rest/docs/target/index.html\"", projectVersion, "rest")
               }
             ])
           }

@@ -62,6 +62,7 @@
     <module>engine-rest-openapi</module>
     <module>engine-rest-openapi-generator</module>
     <module>assembly</module>
+    <module>docs</module>
   </modules>
 
 </project>
