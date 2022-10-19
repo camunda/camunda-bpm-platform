@@ -24,7 +24,11 @@
 		<setting name="lazyLoadingEnabled" value="false" />
 	</settings>
 	<mappers>
+    <!-- Mappings are ordered so that cross-references can always be resolved by already loaded mappings -->
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Commons.xml" />
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Authorization.xml" />
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Report.xml" />
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Tenant.xml" />
     
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Attachment.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Comment.xml" />
@@ -62,14 +66,11 @@
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/VariableInstance.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/EventSubscription.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Statistics.xml" />
-    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Authorization.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Filter.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Metrics.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/ExternalTask.xml" />
-    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Report.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Batch.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/HistoricBatch.xml" />
-    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Tenant.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/TenantMembership.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/CamundaFormDefinition.xml" />
 
