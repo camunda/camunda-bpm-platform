@@ -42,7 +42,7 @@ public class SpringBeansResolverFactory implements ResolverFactory, Resolver {
 
   protected static Logger LOG = Logger.getLogger(SpringBeansResolverFactory.class.getName());
 
-  protected static String SCOPE_NOT_ACTIVE = "org.springframework.beans.factory.support.ScopeNotActiveException";
+  protected static String SCOPE_NOT_ACTIVE_EXCEPTION = "org.springframework.beans.factory.support.ScopeNotActiveException";
 
   private ApplicationContext applicationContext;
   private Set<String> keySet;
@@ -74,7 +74,10 @@ public class SpringBeansResolverFactory implements ResolverFactory, Resolver {
       try {
         return applicationContext.getBean((String) key);
       } catch (BeanCreationException ex) {
-        if (SCOPE_NOT_ACTIVE.equals(ex.getClass().getName())) {
+        // Only swallow exceptions for beans with inactive scope.
+        // Unfortunately, we cannot use ScopeNotActiveException directly as
+        // it is only available starting with Spring 5.3, but we still support Spring 4.
+        if (SCOPE_NOT_ACTIVE_EXCEPTION.equals(ex.getClass().getName())) {
           LOG.info("Bean '" + key + "' cannot be accessed since scope is not active. Instead, null is returned. "
               + "Full exception message: " + ex.getMessage());
           return null;
