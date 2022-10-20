@@ -49,12 +49,13 @@ pipeline {
                         [envVar: 'XLTS_AUTH_TOKEN', vaultKey: 'authToken']]
                 ]]]) {
               cambpmRunMaven('.',
-                  'clean source:jar deploy source:test-jar com.mycila:license-maven-plugin:check -Pdistro,distro-ce,distro-wildfly,distro-webjar,h2-in-memory -DaltStagingDirectory=${WORKSPACE}/staging -DskipRemoteStaging=true',
+                  'clean source:jar deploy source:test-jar com.mycila:license-maven-plugin:check -Pdistro,distro-ce,distro-wildfly,distro-webjar,h2-in-memory -DaltStagingDirectory=${WORKSPACE}/staging -DskipRemoteStaging=true -DskipTests',
                   withCatch: false,
                   withNpm: true,
                   // we use JDK 11 to build the artifacts, as it is required by the Quarkus extension
                   // the compiler source and target is set to JDK 8 in the release parents
-                  jdkVersion: 'jdk-11-latest')
+                  jdkVersion: 'jdk-11-latest',
+                  mvnVersion: 'maven-3.2-latest')
             }
 
             // archive all .jar, .pom, .xml, .txt runtime artifacts + required .war/.zip/.tar.gz for EE pipeline
