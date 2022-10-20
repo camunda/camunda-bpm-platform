@@ -28,17 +28,14 @@ module.exports = async function() {
         q: prefix
     })
     .then(labels => {
-      for (const label of labels) {
-        const labelName = label.name;
+      for (const {name, color} of labels) {
         
-        if ((label.name == newLabel) || (!label.name.startsWith(prefix))) {
+        if ((name === newLabel) || (!name.startsWith(prefix))) {
           // 1) ignore the new label
           // 2) github search may also return labels 
           // where the prefix is not at the start
           return;
         }
-        
-        const color = label.color;
         
         colorCounts.set(color, (colorCounts.get(color) ?? 0) + 1);
       }
