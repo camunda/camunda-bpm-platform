@@ -1,0 +1,15 @@
+name: 'Synchronize label colors'
+description: 'Synchronizes the color of a given labels with the other labels of the same prefix. Labels that do not have a prefix are not changed.'
+inputs:
+  label:
+    description: 'The label that colors should be synced for.'
+    required: true
+  prefix-delimiter:
+    description: 'Characters that delimit the prefix from the rest of the label.'
+    required: true
+  repo-token:
+    description: 'Github access token'
+    required: true
+runs:
+  using: 'node16'
+  main: 'index.js'

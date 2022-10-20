@@ -29,3 +29,8 @@ exports.revertMultiMap = function(map) {
   
   return result;
 }
+
+// returns an array [key, value] that represents the map entry with the highest value
+exports.getMaximumKeyValuePair = function(map) {
+  return [...map.entries()].reduce((entry1, entry2) => entry1[1] > entry2[1] ? entry1 : entry2);
+}
