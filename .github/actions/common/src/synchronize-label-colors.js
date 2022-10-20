@@ -21,7 +21,7 @@ module.exports = async function() {
     const prefix = newLabel.substring(0, delimiterIndex + prefixDelimiter.length);
     core.debug(`Label prefix: ${prefix}`);
     
-    var colorCounts = new Map(); // color => number of labels with that color
+    const colorCounts = new Map(); // color => number of labels with that color
    
     await octokit.paginate(octokit.rest.search.labels, {
         repository_id: repo.id,
