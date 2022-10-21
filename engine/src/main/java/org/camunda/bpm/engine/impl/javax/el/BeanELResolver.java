@@ -502,13 +502,15 @@ public class BeanELResolver extends ELResolver {
 		return result;
 	}
 
+	protected boolean checkIfAnyParamNull(Object[] params) {
+		return Arrays.stream(params).anyMatch(Objects::isNull);
+	}
+
   private Method findMethod(Object base, String name, Class<?>[] types, Object[] params) {
 		boolean hasTypesInitially = types != null;
-		if (!hasTypesInitially) {
+		if (!hasTypesInitially && !checkIfAnyParamNull(params)) {
 			List<Class<?>> detectedTypes = new ArrayList<>();
-			Arrays.stream(params)
-					.filter(Objects::nonNull)
-					.forEach(param -> detectedTypes.add(param.getClass()));
+			Arrays.stream(params).forEach(param -> detectedTypes.add(param.getClass()));
 
 			if (!detectedTypes.isEmpty()) {
 				types = detectedTypes.toArray(new Class<?>[0]);
