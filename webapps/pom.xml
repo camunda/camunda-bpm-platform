@@ -256,6 +256,12 @@
           <artifactId>build-helper-maven-plugin</artifactId>
           <version>1.9.1</version>
         </plugin>
+        
+        <plugin>
+          <groupId>org.eclipse.jetty</groupId>
+          <artifactId>jetty-maven-plugin</artifactId>
+          <version>${version.jetty}</version>
+        </plugin>
 
       </plugins>
     </pluginManagement>
@@ -378,6 +384,10 @@
           <scope>runtime</scope>
         </dependency>
         <dependency>
+          <groupId>org.jboss.spec.javax.ws.rs</groupId>
+          <artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
+        </dependency>
+        <dependency>
           <groupId>org.camunda.bpm</groupId>
           <artifactId>camunda-engine</artifactId>
         </dependency>
@@ -398,17 +408,8 @@
           <artifactId>camunda-engine-plugin-connect</artifactId>
         </dependency>
         <dependency>
-          <groupId>org.camunda.connect</groupId>
-          <artifactId>camunda-connect-http-client</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>org.camunda.connect</groupId>
-          <artifactId>camunda-connect-soap-http-client</artifactId>
-        </dependency>
-        <dependency>
           <groupId>org.camunda.bpm.identity</groupId>
           <artifactId>camunda-identity-ldap</artifactId>
-          <version>${project.version}</version>
         </dependency>
         <dependency>
           <groupId>com.h2database</groupId>
@@ -418,12 +419,10 @@
           <groupId>com.fasterxml.uuid</groupId>
           <artifactId>java-uuid-generator</artifactId>
         </dependency>
-
         <dependency>
           <groupId>ch.qos.logback</groupId>
           <artifactId>logback-classic</artifactId>
         </dependency>
-
       </dependencies>
       <build>
         <plugins>
@@ -447,7 +446,6 @@
           <plugin>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-maven-plugin</artifactId>
-            <version>${version.jetty}</version>
             <configuration>
               <webAppConfig>
                 <contextPath>/camunda</contextPath>
@@ -526,6 +524,14 @@
           <artifactId>resteasy-jaxrs</artifactId>
           <scope>runtime</scope>
         </dependency>
+        <!-- We need to override the "provided" scope
+          from the main dependency declaration here or
+          else the dependency will not be available in Jetty 
+          (see also Jetty plugin config option useProvidedScope) -->
+        <dependency>
+          <groupId>org.jboss.spec.javax.ws.rs</groupId>
+          <artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
+        </dependency>
       </dependencies>
       <build>
         <plugins>
@@ -580,17 +586,17 @@
               <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-jdk14</artifactId>
-                <version>1.7.26</version>
+                <version>${version.slf4j}</version>
               </dependency>
               <dependency>
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
-                <version>1.4.181</version>
+                <version>${version.h2}</version>
               </dependency>
               <dependency>
                 <groupId>com.fasterxml.uuid</groupId>
                 <artifactId>java-uuid-generator</artifactId>
-                <version>3.1.2</version>
+                <version>${version.uuid-generator}</version>
               </dependency>
             </dependencies>
           </plugin>
@@ -674,6 +680,14 @@
           <version>${project.version}</version>
           <scope>test</scope>
         </dependency>
+        <!-- We need to override the "provided" scope
+          from the main dependency declaration here or
+          else the dependency will not be available in Jetty 
+          (see also Jetty plugin config option useProvidedScope) -->
+        <dependency>
+          <groupId>org.jboss.spec.javax.ws.rs</groupId>
+          <artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
+        </dependency>
       </dependencies>
       <build>
         <plugins>
@@ -736,17 +750,17 @@
               <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-jdk14</artifactId>
-                <version>1.7.7</version>
+                <version>${version.slf4j}</version>
               </dependency>
               <dependency>
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
-                <version>1.4.181</version>
+                <version>${version.h2}</version>
               </dependency>
               <dependency>
                 <groupId>com.fasterxml.uuid</groupId>
                 <artifactId>java-uuid-generator</artifactId>
-                <version>3.1.2</version>
+                <version>${version.uuid-generator}</version>
               </dependency>
             </dependencies>
           </plugin>
