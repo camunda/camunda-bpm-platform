@@ -12,6 +12,7 @@ pipeline {
   }
   environment {
     LOGGER_LOG_LEVEL = 'DEBUG'
+    MAVEN_VERSION = 'maven-3.8-latest'
   }
   options {
     buildDiscarder(logRotator(numToKeepStr: '5'))
