@@ -52,7 +52,7 @@
     "jquery": "3.5.1",
     "jquery-ui": "1.13.2",
     "lodash": "4.17.21",
-    "moment": "2.29.3",
+    "moment": "2.29.4",
     "mousetrap": "1.6.5",
     "q": "1.5.1",
     "requirejs": "2.3.6",
