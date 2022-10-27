@@ -8627,12 +8627,17 @@ module.exports = async function() {
           // 1) ignore the new label
           // 2) github search may also return labels 
           // where the prefix is not at the start
-          return;
+          continue;
         }
         
         colorCounts.set(color, (colorCounts.get(color) ?? 0) + 1);
       }
     });
+    
+    if (colorCounts.size == 0) {
+      core.info(`No other labels with the same prefix found. Not changing color of label ${newLabel}`);
+      return;
+    }
     
     const majorityColor = collectionUtils.getMaximumKeyValuePair(colorCounts)[0];
     core.info(`Assigning color ${majorityColor} to label ${newLabel}`);
