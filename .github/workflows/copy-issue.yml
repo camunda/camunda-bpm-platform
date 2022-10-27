@@ -11,7 +11,7 @@ on:
         required: true
       
 jobs:
-  synchronize-label-colors:
+  copy-issue:
     runs-on: ubuntu-latest
     name: Deep copy issue
     steps:
