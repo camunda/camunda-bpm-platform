@@ -8525,28 +8525,30 @@ module.exports = async function() {
     const prefix = newLabel.substring(0, delimiterIndex + prefixDelimiter.length);
     core.debug(`Label prefix: ${prefix}`);
     
-    var colorCounts = new Map(); // color => number of labels with that color
+    const colorCounts = new Map(); // color => number of labels with that color
    
     await octokit.paginate(octokit.rest.search.labels, {
         repository_id: repo.id,
         q: prefix
     })
     .then(labels => {
-      for (const label of labels) {
-        const labelName = label.name;
+      for (const {name, color} of labels) {
         
-        if ((label.name == newLabel) || (!label.name.startsWith(prefix))) {
+        if ((name === newLabel) || (!name.startsWith(prefix))) {
           // 1) ignore the new label
           // 2) github search may also return labels 
           // where the prefix is not at the start
-          return;
+          continue;
         }
-        
-        const color = label.color;
         
         colorCounts.set(color, (colorCounts.get(color) ?? 0) + 1);
       }
     });
+    
+    if (colorCounts.size == 0) {
+      core.info(`No other labels with the same prefix found. Not changing color of label ${newLabel}`);
+      return;
+    }
     
     const majorityColor = collectionUtils.getMaximumKeyValuePair(colorCounts)[0];
     core.info(`Assigning color ${majorityColor} to label ${newLabel}`);
