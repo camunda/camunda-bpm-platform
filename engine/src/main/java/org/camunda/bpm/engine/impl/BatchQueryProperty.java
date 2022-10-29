@@ -29,4 +29,6 @@ public interface BatchQueryProperty {
 
   QueryProperty TENANT_ID = new QueryPropertyImpl("TENANT_ID_");
 
+  QueryProperty START_TIME = new QueryPropertyImpl("START_TIME_");
+
 }

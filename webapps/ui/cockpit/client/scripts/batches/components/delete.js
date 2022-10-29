@@ -19,9 +19,10 @@
 
 var events = require('./events');
 
-var Delete = function() {
+var Delete = function(type) {
   this.cascade = false;
   this.disable = false;
+  this.type = type;
 };
 
 Delete.prototype.cancel = function() {

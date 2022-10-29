@@ -22,8 +22,8 @@ import java.sql.Connection;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.ibatis.exceptions.PersistenceException;
 import org.apache.ibatis.session.ExecutorType;
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.FlushResult;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbBulkOperation;
@@ -84,7 +84,7 @@ public class SimpleDbSqlSession extends DbSqlSession {
     try {
       executeInsertEntity(insertStatement, dbEntity);
       entityInsertPerformed(operation, 1, null);
-    } catch (Exception e) {
+    } catch (PersistenceException e) {
       entityInsertPerformed(operation, 0, e);
     }
   }
@@ -105,7 +105,7 @@ public class SimpleDbSqlSession extends DbSqlSession {
     try {
       int nrOfRowsDeleted = executeDelete(deleteStatement, dbEntity);
       entityDeletePerformed(operation, nrOfRowsDeleted, null);
-    } catch (Exception e) {
+    } catch (PersistenceException e) {
       entityDeletePerformed(operation, 0, e);
     }
   }
@@ -120,7 +120,7 @@ public class SimpleDbSqlSession extends DbSqlSession {
     try {
       int rowsAffected = executeDelete(statement, parameter);
       bulkDeletePerformed(operation, rowsAffected, null);
-    } catch (Exception e) {
+    } catch (PersistenceException e) {
       bulkDeletePerformed(operation, 0, e);
     }
   }
@@ -140,7 +140,7 @@ public class SimpleDbSqlSession extends DbSqlSession {
     try {
       int rowsAffected = executeUpdate(updateStatement, dbEntity);
       entityUpdatePerformed(operation, rowsAffected, null);
-    } catch (Exception e) {
+    } catch (PersistenceException e) {
       entityUpdatePerformed(operation, 0, e);
     }
   }
@@ -155,7 +155,7 @@ public class SimpleDbSqlSession extends DbSqlSession {
     try {
       int rowsAffected = executeUpdate(statement, parameter);
       bulkUpdatePerformed(operation, rowsAffected, null);
-    } catch (Exception e) {
+    } catch (PersistenceException e) {
       bulkUpdatePerformed(operation, 0, e);
     }
   }

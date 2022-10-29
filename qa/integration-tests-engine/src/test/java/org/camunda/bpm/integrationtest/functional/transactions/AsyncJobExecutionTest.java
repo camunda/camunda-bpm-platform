@@ -28,7 +28,6 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.integrationtest.functional.transactions.beans.FailingTransactionListenerDelegate;
 import org.camunda.bpm.integrationtest.functional.transactions.beans.GetVersionInfoDelegate;
-import org.camunda.bpm.integrationtest.functional.transactions.beans.TransactionRollbackDelegate;
 import org.camunda.bpm.integrationtest.functional.transactions.beans.UpdateRouterConfiguration;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -46,11 +45,8 @@ public class AsyncJobExecutionTest extends AbstractFoxPlatformIntegrationTest {
     return initWebArchiveDeployment()
             .addClass(GetVersionInfoDelegate.class)
             .addClass(UpdateRouterConfiguration.class)
-            .addClass(TransactionRollbackDelegate.class)
             .addClass(FailingTransactionListenerDelegate.class)
             .addAsResource("org/camunda/bpm/integrationtest/functional/transactions/AsyncJobExecutionTest.testAsyncServiceTasks.bpmn20.xml")
-            .addAsResource("org/camunda/bpm/integrationtest/functional/transactions/AsyncJobExecutionTest.transactionRollbackInServiceTask.bpmn20.xml")
-            .addAsResource("org/camunda/bpm/integrationtest/functional/transactions/AsyncJobExecutionTest.transactionRollbackInServiceTaskWithCustomRetryCycle.bpmn20.xml")
             .addAsResource("org/camunda/bpm/integrationtest/functional/transactions/AsyncJobExecutionTest.failingTransactionListener.bpmn20.xml")
             .addAsWebInfResource("persistence.xml", "classes/META-INF/persistence.xml");
   }
@@ -66,51 +62,30 @@ public class AsyncJobExecutionTest extends AbstractFoxPlatformIntegrationTest {
   }
 
   @Test
-  public void testAsyncServiceTasks() {
-    HashMap<String, Object> variables = new HashMap<String, Object>();
+  public void shouldExecuteAsyncServiceTasks() {
+    // given
+    HashMap<String, Object> variables = new HashMap<>();
     variables.put("serialnumber", "23");
     runtimeService.startProcessInstanceByKey("configure-router", variables);
 
+    // when
+    // all jobs are executed
     waitForJobExecutorToProcessAllJobs();
+
+    // then
+    // there are no failures
   }
 
   @Test
-  public void testTransactionRollbackInServiceTask() throws Exception {
-
-    runtimeService.startProcessInstanceByKey("txRollbackServiceTask");
-
-    waitForJobExecutorToProcessAllJobs(10000);
-
-    Job job = managementService.createJobQuery().singleResult();
-
-    assertNotNull(job);
-    assertEquals(0, job.getRetries());
-    assertNotNull(job.getExceptionMessage());
-    assertNotNull(managementService.getJobExceptionStacktrace(job.getId()));
-  }
-
-  @Test
-  public void testTransactionRollbackInServiceTaskWithCustomRetryCycle() throws Exception {
-
-    runtimeService.startProcessInstanceByKey("txRollbackServiceTaskWithCustomRetryCycle");
-
-    waitForJobExecutorToProcessAllJobs(10000);
-
-    Job job = managementService.createJobQuery().singleResult();
-
-    assertNotNull(job);
-    assertEquals(0, job.getRetries());
-    assertNotNull(job.getExceptionMessage());
-    assertNotNull(managementService.getJobExceptionStacktrace(job.getId()));
-  }
-
-  @Test
-  public void testFailingTransactionListener() throws Exception {
-
+  public void shouldFailJobWithFailingTransactionListener() throws Exception {
+    // given
     runtimeService.startProcessInstanceByKey("failingTransactionListener");
 
+    // when
     waitForJobExecutorToProcessAllJobs(10000);
 
+    // then
+    // the job exists with no retries, and an incident is raised
     Job job = managementService.createJobQuery().singleResult();
 
     assertNotNull(job);

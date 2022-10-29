@@ -303,6 +303,7 @@ create table ACT_HI_BATCH (
     START_TIME_ datetime not null,
     END_TIME_ datetime,
     REMOVAL_TIME_ datetime,
+    EXEC_START_TIME_ datetime,
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 

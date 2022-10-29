@@ -1036,6 +1036,11 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     return historicBatch;
   }
 
+  @Override
+  public HistoryEvent createBatchUpdateEvent(Batch batch) {
+    return createBatchEvent((BatchEntity) batch, HistoryEventTypes.BATCH_UPDATE);
+  }
+
   protected HistoryEvent createBatchEvent(BatchEntity batch, HistoryEventTypes eventType) {
     HistoricBatchEntity event = loadBatchEntity(batch);
 
@@ -1051,12 +1056,16 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     event.setEventType(eventType.getEventName());
 
     if (HistoryEventTypes.BATCH_START.equals(eventType)) {
-      event.setStartTime(ClockUtil.getCurrentTime());
+      event.setStartTime(batch.getStartTime());
       event.setCreateUserId(Context.getCommandContext().getAuthenticatedUserId());
     }
 
     if (HistoryEventTypes.BATCH_END.equals(eventType)) {
       event.setEndTime(ClockUtil.getCurrentTime());
+    }
+
+    if (HistoryEventTypes.BATCH_UPDATE.equals(eventType)) {
+      event.setExecutionStartTime(batch.getExecutionStartTime());
     }
 
     return event;

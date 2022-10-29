@@ -58,9 +58,9 @@ public class UelExpressionCondition implements Condition {
     boolean result = false;
     try {
       result = evaluate(scope, execution);
-    } catch (ProcessEngineException pee) {
-      if (!(pee.getCause() instanceof PropertyNotFoundException)) {
-        throw pee;
+    } catch (ProcessEngineException pex) {
+      if (!(pex.getCause() instanceof PropertyNotFoundException)) {
+        throw pex;
       }
     }
     return result;

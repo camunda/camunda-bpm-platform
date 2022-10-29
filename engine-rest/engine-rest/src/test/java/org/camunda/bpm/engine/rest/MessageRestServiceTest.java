@@ -1246,6 +1246,27 @@ public class MessageRestServiceTest extends AbstractRestServiceTest {
     .when().post(MESSAGE_URL);
   }
 
+  @Test
+  public void shouldReturnErrorOnMessageCorrelation() {
+    // given
+    doThrow(new ProcessEngineException("foo", 123))
+        .when(messageCorrelationBuilderMock).correlateWithResult();
+
+    String messageName = "aMessageName";
+    Map<String, Object> messageParameters = new HashMap<>();
+    messageParameters.put("messageName", messageName);
+
+    // when/
+    given().contentType(POST_JSON_CONTENT_TYPE)
+           .body(messageParameters)
+    .then().expect()
+           .contentType(ContentType.JSON)
+           .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+           .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
+           .body("message", equalTo("foo"))
+           .body("code", equalTo(123))
+    .when().post(MESSAGE_URL);
+  }
 
   protected void checkVariablesInResult(String content, int idx) {
     List<String> variableNames = java.util.Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME, MockProvider.EXAMPLE_DESERIALIZED_VARIABLE_INSTANCE_NAME);

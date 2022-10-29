@@ -44,6 +44,12 @@ public class FailedJobListener implements Command<Void> {
   }
 
   public Void execute(CommandContext commandContext) {
+    if (isJobReacquired(commandContext)) {
+      // skip failed listener if job has been already re-acquired
+      LOG.debugFailedJobListenerSkipped(jobFailureCollector.getJobId());
+      return null;
+    }
+
     initTotalRetries(commandContext);
 
     logJobFailure(commandContext);
@@ -54,6 +60,17 @@ public class FailedJobListener implements Command<Void> {
     commandExecutor.execute(new FailedJobListenerCmd(jobId, cmd));
 
     return null;
+  }
+
+  protected boolean isJobReacquired(CommandContext commandContext) {
+    // if persisted job's lockExpirationTime is different, then it's been already re-acquired
+    JobEntity persistedJob = commandContext.getJobManager().findJobById(jobFailureCollector.getJobId());
+    JobEntity job = jobFailureCollector.getJob();
+
+    if (persistedJob == null || persistedJob.getLockExpirationTime() == null) {
+      return false;
+    }
+    return !persistedJob.getLockExpirationTime().equals(job.getLockExpirationTime());
   }
 
   private void initTotalRetries(CommandContext commandContext) {

@@ -80,7 +80,7 @@ public class EngineRule extends ExternalResource {
   protected static final String URI_GET_INCIDENTS = "%s/incident";
   protected static final String URI_GET_EXTERNAL_TASKS = "%s/external-task";
   protected static final String URI_GET_HISTORIC_PROCESS_INSTANCE = "%s/history/process-instance";
-  protected static final String URI_DELETE_PROCESS_INSTANCE = "%s/process-instance/%s";
+  protected static final String URI_DELETE_PROCESS_INSTANCE = "%s/process-instance/%s?skipCustomListeners=true";
   protected static final String URI_GET_VARIABLE_INSTANCE = "%s/variable-instance";
 
   protected Properties properties;
@@ -363,11 +363,15 @@ public class EngineRule extends ExternalResource {
   }
 
   public ExternalTask getExternalTaskByProcessInstanceId(String processInstanceId) {
+    List<ExternalTaskImpl> externalTasks = getExternalTasksByProcessInstanceId(processInstanceId);
+    assertThat(externalTasks).hasSize(1);
+    return externalTasks.get(0);
+  }
+
+  public List<ExternalTaskImpl> getExternalTasksByProcessInstanceId(String processInstanceId) {
     String uri = String.format(URI_GET_EXTERNAL_TASKS, getEngineUrl()) + "?processInstanceId=" + processInstanceId;
     HttpGet httpGet = new HttpGet(uri);
-    ExternalTaskImpl[] externalTasks = executeRequest(httpGet, ExternalTaskImpl[].class);
-    assertThat(externalTasks).hasSize(1);
-    return (ExternalTask) externalTasks[0];
+    return Arrays.asList(executeRequest(httpGet, ExternalTaskImpl[].class));
   }
 
   public HistoricProcessInstanceDto getHistoricProcessInstanceById(String processInstanceId) {

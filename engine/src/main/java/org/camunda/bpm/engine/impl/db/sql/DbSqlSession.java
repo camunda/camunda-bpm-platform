@@ -36,6 +36,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.exceptions.PersistenceException;
 import org.apache.ibatis.executor.BatchResult;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -152,7 +153,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
 
   protected void entityUpdatePerformed(DbEntityOperation operation,
                                        int rowsAffected,
-                                       Exception failure) {
+                                       PersistenceException failure) {
     if (failure != null) {
       configureFailedDbEntityOperation(operation, failure);
     } else {
@@ -176,21 +177,21 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
 
   protected void bulkUpdatePerformed(DbBulkOperation operation,
                                      int rowsAffected,
-                                     Exception failure) {
+                                     PersistenceException failure) {
 
     bulkOperationPerformed(operation, rowsAffected, failure);
   }
 
   protected void bulkDeletePerformed(DbBulkOperation operation,
                                      int rowsAffected,
-                                     Exception failure) {
+                                     PersistenceException failure) {
 
     bulkOperationPerformed(operation, rowsAffected, failure);
   }
 
   protected void bulkOperationPerformed(DbBulkOperation operation,
                                         int rowsAffected,
-                                        Exception failure) {
+                                        PersistenceException failure) {
 
     if (failure != null) {
       operation.setFailure(failure);
@@ -208,7 +209,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
 
   protected void entityDeletePerformed(DbEntityOperation operation,
                                        int rowsAffected,
-                                       Exception failure) {
+                                       PersistenceException failure) {
     
     if (failure != null) {
       configureFailedDbEntityOperation(operation, failure);
@@ -226,7 +227,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
     }
   }
 
-  protected void configureFailedDbEntityOperation(DbEntityOperation operation, Exception failure) {
+  protected void configureFailedDbEntityOperation(DbEntityOperation operation, PersistenceException failure) {
     operation.setRowsAffected(0);
     operation.setFailure(failure);
 
@@ -256,9 +257,9 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
   }
 
   protected boolean isConcurrentModificationException(DbOperation failedOperation,
-                                                      Exception cause) {
+                                                      PersistenceException cause) {
 
-    boolean isConstraintViolation = ExceptionUtil.checkForeignKeyConstraintViolation(cause);
+    boolean isConstraintViolation = ExceptionUtil.checkForeignKeyConstraintViolation(cause, true);
     boolean isVariableIntegrityViolation = ExceptionUtil.checkVariableIntegrityViolation(cause);
 
     if (isVariableIntegrityViolation) {
@@ -297,10 +298,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
   public static boolean isCrdbConcurrencyConflict(Throwable cause) {
     // only check when CRDB is used
     if (DatabaseUtil.checkDatabaseType(DbSqlSessionFactory.CRDB)) {
-      boolean isCrdbTxRetryException = ExceptionUtil.checkCrdbTransactionRetryException(cause);
-      if (isCrdbTxRetryException) {
-        return true;
-      }
+      return ExceptionUtil.checkCrdbTransactionRetryException(cause);
     }
 
     return false;
@@ -319,7 +317,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
    * @return true if the failure was due to a CRDB <code>TransactionRetryException</code>.
    *          Otherwise, it's false.
    */
-  public static boolean isCrdbConcurrencyConflictOnCommit(Throwable cause, ProcessEngineConfigurationImpl configuration) {
+  public static boolean isCrdbConcurrencyConflictOnCommit(Exception cause, ProcessEngineConfigurationImpl configuration) {
     // only check when CRDB is used
     if (DatabaseUtil.checkDatabaseType(configuration, DbSqlSessionFactory.CRDB)) {
       // with Java EE (JTA) transactions, the real cause is suppressed,
@@ -328,7 +326,8 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
       List<Throwable> causes = new ArrayList<>(Arrays.asList(cause.getSuppressed()));
       causes.add(cause);
       for (Throwable throwable : causes) {
-        if (ExceptionUtil.checkCrdbTransactionRetryException(throwable)) {
+        if (throwable instanceof SQLException &&
+            ExceptionUtil.checkCrdbTransactionRetryException((SQLException) throwable)) {
           return true;
         }
       }
@@ -365,7 +364,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
 
   protected void entityInsertPerformed(DbEntityOperation operation,
                                        int rowsAffected,
-                                       Exception failure) {
+                                       PersistenceException failure) {
     DbEntity entity = operation.getEntity();
 
     if (failure != null) {
@@ -443,7 +442,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
     try {
       return sqlSession.flushStatements();
 
-    } catch (RuntimeException ex) {
+    } catch (PersistenceException ex) {
       // exception is wrapped later
       throw ex;
 

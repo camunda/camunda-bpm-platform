@@ -133,10 +133,10 @@ public class CallActivityDelegateMappingTest {
     try {
       engineRule.getRuntimeService().startProcessInstanceByKey("callSimpleSubProcess");
       fail("Exception expected!");
-    } catch (ProcessEngineException pee) {
+    } catch (ProcessEngineException pex) {
       assertEquals(
               "Unknown property used in expression: ${notFound}. Cause: Cannot resolve identifier 'notFound'",
-              pee.getMessage());
+              pex.getMessage());
     }
   }
 
@@ -152,9 +152,9 @@ public class CallActivityDelegateMappingTest {
     try {
       engineRule.getTaskService().complete(taskBeforeSubProcess.getId());
       fail("Exeption expected!");
-    } catch (ProcessEngineException pee) { //then
-      Assert.assertTrue(pee.getMessage().equalsIgnoreCase("org.camunda.bpm.engine.ProcessEngineException: New process engine exception.")
-              || pee.getMessage().contains("1234"));
+    } catch (ProcessEngineException pex) { //then
+      Assert.assertTrue(pex.getMessage().equalsIgnoreCase("org.camunda.bpm.engine.ProcessEngineException: New process engine exception.")
+              || pex.getMessage().contains("1234"));
     }
 
     //then process rollback to user task which is before sub process
@@ -221,9 +221,9 @@ public class CallActivityDelegateMappingTest {
     try {
       engineRule.getTaskService().complete(taskInSubProcess.getId());
       fail("Exeption expected!");
-    } catch (ProcessEngineException pee) { //then
-      Assert.assertTrue(pee.getMessage().equalsIgnoreCase("org.camunda.bpm.engine.ProcessEngineException: New process engine exception.")
-              || pee.getMessage().contains("1234"));
+    } catch (ProcessEngineException pex) { //then
+      Assert.assertTrue(pex.getMessage().equalsIgnoreCase("org.camunda.bpm.engine.ProcessEngineException: New process engine exception.")
+              || pex.getMessage().contains("1234"));
     }
 
     //then process rollback to user task which is in sub process

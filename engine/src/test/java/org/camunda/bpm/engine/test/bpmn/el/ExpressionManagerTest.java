@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,12 +35,23 @@ import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.After;
 import org.junit.Test;
 
 /**
  * @author Frederik Heremans
  */
 public class ExpressionManagerTest extends PluggableProcessEngineTest {
+
+  protected String deploymentId;
+
+  @After
+  public void clear() {
+    if (deploymentId != null) {
+      repositoryService.deleteDeployment(deploymentId, true);
+      deploymentId = null;
+    }
+  }
 
   @Deployment
   @Test
@@ -127,9 +139,10 @@ public class ExpressionManagerTest extends PluggableProcessEngineTest {
             .endEvent()
         .done();
 
-    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService.createDeployment()
+    deploymentId = repositoryService.createDeployment()
         .addModelInstance("testProcess.bpmn", process)
-        .deploy();
+        .deploy()
+        .getId();
 
     runtimeService.startProcessInstanceByKey("testProcess",
         Variables.createVariables().putValue("list", Arrays.asList("foo", "bar")));
@@ -138,7 +151,54 @@ public class ExpressionManagerTest extends PluggableProcessEngineTest {
         .activityId("userTask")
         .singleResult();
     assertThat(userTask).isNotNull();
+  }
 
-    repositoryService.deleteDeployment(deployment.getId(), true);
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void shouldCompareWithBigDecimal() {
+    // given
+    BpmnModelInstance process = Bpmn.createExecutableProcess("testProcess")
+        .startEvent()
+          .exclusiveGateway()
+            .condition("true", "${total.compareTo(myValue) >= 0}")
+            .userTask("userTask")
+          .moveToLastGateway()
+            .condition("false", "${total.compareTo(myValue) < 0}")
+            .endEvent()
+        .done();
+
+    deploymentId = repositoryService.createDeployment()
+        .addModelInstance("testProcess.bpmn", process)
+        .deploy()
+        .getId();
+
+    // when
+    runtimeService.startProcessInstanceByKey("testProcess",
+        Variables.createVariables()
+            .putValue("total", new BigDecimal(123))
+            .putValue("myValue", new BigDecimal(0)));
+
+    // then
+    HistoricActivityInstance userTask = historyService.createHistoricActivityInstanceQuery()
+        .activityId("userTask")
+        .singleResult();
+    assertThat(userTask).isNotNull();
+  }
+
+  @Deployment
+  @Test
+  public void shouldResolveMethodExpressionTwoParametersSameType() {
+    // given process with two service tasks that resolve expression and store the result as variable
+    Map<String, Object> vars = new HashMap<>();
+    vars.put("myVar", new ExpressionTestParameter());
+
+    // when the process is started
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", vars);
+
+    // then no exceptions are thrown and two variables are saved
+    boolean task1Var = (boolean) runtimeService.getVariable(processInstance.getId(), "task1Var");
+    assertThat(task1Var).isTrue();
+    String task2Var = (String) runtimeService.getVariable(processInstance.getId(), "task2Var");
+    assertEquals("lastParam", task2Var);
   }
 }

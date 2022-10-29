@@ -17,16 +17,14 @@
 package org.camunda.bpm.client.exception;
 
 /**
- * <p>Exception is thrown if if the task's most recent lock could not be acquired</p>
- *
- * @author Tassilo Weidner
+ * @deprecated since this exception has been replaced by {@link BadRequestException} and will be removed in version 7.19.
+ * Please review your code and replace {@link NotAcquiredException} with {@link BadRequestException}.
  */
-public class NotAcquiredException extends ExternalTaskClientException {
+@Deprecated
+public class NotAcquiredException extends RestException {
 
-  private static final long serialVersionUID = 1L;
-
-  public NotAcquiredException(String message) {
-    super(message);
+  public NotAcquiredException(String message, RestException restException) {
+    super(message, restException);
   }
 
 }

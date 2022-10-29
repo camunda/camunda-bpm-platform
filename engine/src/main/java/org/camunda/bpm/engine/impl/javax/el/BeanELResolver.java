@@ -22,10 +22,14 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -40,7 +44,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * for details. Because this resolver handles base objects of any type, it should be placed near the
  * end of a composite resolver. Otherwise, it will claim to have resolved a property before any
  * resolvers that come after it get a chance to test if they can do so as well.
- * 
+ *
  * @see CompositeELResolver
  * @see ELResolver
  */
@@ -139,7 +143,7 @@ public class BeanELResolver extends ELResolver {
 
 	private final boolean readOnly;
 	private final ConcurrentHashMap<Class<?>, BeanProperties> cache;
-	
+
 	private ExpressionFactory defaultFactory;
 
 	/**
@@ -162,7 +166,7 @@ public class BeanELResolver extends ELResolver {
 	 * the property argument. Otherwise, returns null. Assuming the base is not null, this method
 	 * will always return Object.class. This is because any object is accepted as a key and is
 	 * coerced into a string.
-	 * 
+	 *
 	 * @param context
 	 *            The context of this evaluation.
 	 * @param base
@@ -187,7 +191,7 @@ public class BeanELResolver extends ELResolver {
 	 * PropertyDescriptor.getPropertyType().</li>
 	 * <li>{@link ELResolver#RESOLVABLE_AT_DESIGN_TIME} - true.</li>
 	 * </ul>
-	 * 
+	 *
 	 * @param context
 	 *            The context of this evaluation.
 	 * @param base
@@ -241,7 +245,7 @@ public class BeanELResolver extends ELResolver {
 	 * will first be coerced to a String. If there is a BeanInfoProperty for this property and there
 	 * were no errors retrieving it, the propertyType of the propertyDescriptor is returned.
 	 * Otherwise, a PropertyNotFoundException is thrown.
-	 * 
+	 *
 	 * @param context
 	 *            The context of this evaluation.
 	 * @param base
@@ -281,7 +285,7 @@ public class BeanELResolver extends ELResolver {
 	 * JavaBeans specification, then return the result of the getter call. If the getter throws an
 	 * exception, it is propagated to the caller. If the property is not found or is not readable, a
 	 * PropertyNotFoundException is thrown.
-	 * 
+	 *
 	 * @param context
 	 *            The context of this evaluation.
 	 * @param base
@@ -328,7 +332,7 @@ public class BeanELResolver extends ELResolver {
 	 * null, the propertyResolved property of the ELContext object must be set to true by this
 	 * resolver, before returning. If this property is not true after this method is called, the
 	 * caller can safely assume no value was set.
-	 * 
+	 *
 	 * @param context
 	 *            The context of this evaluation.
 	 * @param base
@@ -370,7 +374,7 @@ public class BeanELResolver extends ELResolver {
 	 * (as per the JavaBeans Specification), the setter method is called (passing value). If the
 	 * property exists but does not have a setter, then a PropertyNotFoundException is thrown. If
 	 * the property does not exist, a PropertyNotFoundException is thrown.
-	 * 
+	 *
 	 * @param context
 	 *            The context of this evaluation.
 	 * @param base
@@ -418,33 +422,33 @@ public class BeanELResolver extends ELResolver {
 	/**
 	 * If the base object is not <code>null</code>, invoke the method, with the given parameters on
 	 * this bean. The return value from the method is returned.
-	 * 
+	 *
 	 * <p>
 	 * If the base is not <code>null</code>, the <code>propertyResolved</code> property of the
 	 * <code>ELContext</code> object must be set to <code>true</code> by this resolver, before
 	 * returning. If this property is not <code>true</code> after this method is called, the caller
 	 * should ignore the return value.
 	 * </p>
-	 * 
+	 *
 	 * <p>
 	 * The provided method object will first be coerced to a <code>String</code>. The methods in the
 	 * bean is then examined and an attempt will be made to select one for invocation. If no
 	 * suitable can be found, a <code>MethodNotFoundException</code> is thrown.
-	 * 
+	 *
 	 * If the given paramTypes is not <code>null</code>, select the method with the given name and
 	 * parameter types.
-	 * 
+	 *
 	 * Else select the method with the given name that has the same number of parameters. If there
 	 * are more than one such method, the method selection process is undefined.
-	 * 
+	 *
 	 * Else select the method with the given name that takes a variable number of arguments.
-	 * 
+	 *
 	 * Note the resolution for overloaded methods will likely be clarified in a future version of
 	 * the spec.
-	 * 
+	 *
 	 * The provided parameters are coerced to the corresponding parameter types of the method, and
 	 * the method is then invoked.
-	 * 
+	 *
 	 * @param context
 	 *            The context of this evaluation.
 	 * @param base
@@ -482,7 +486,7 @@ public class BeanELResolver extends ELResolver {
 				params = new Object[0];
 			}
 			String name = method.toString();
-			Method target = findMethod(base, name, paramTypes, params.length);
+			Method target = findMethod(base, name, paramTypes, params);
 			if (target == null) {
 				throw new MethodNotFoundException("Cannot find method " + name + " with " + params.length + " parameters in " + base.getClass());
 			}
@@ -498,18 +502,32 @@ public class BeanELResolver extends ELResolver {
 		return result;
 	}
 
-  private Method findMethod(Object base, String name, Class<?>[] types, int paramCount) {
+  private Method findMethod(Object base, String name, Class<?>[] types, Object[] params) {
+		boolean hasTypesInitially = types != null;
+		if (!hasTypesInitially) {
+			List<Class<?>> detectedTypes = new ArrayList<>();
+			Arrays.stream(params)
+					.filter(Objects::nonNull)
+					.forEach(param -> detectedTypes.add(param.getClass()));
+
+			if (!detectedTypes.isEmpty()) {
+				types = detectedTypes.toArray(new Class<?>[0]);
+			}
+		}
 		if (types != null) {
 			try {
 				return findAccessibleMethod(base.getClass().getMethod(name, types));
 			} catch (NoSuchMethodException e) {
-				return null;
+				if (hasTypesInitially) {
+					return null;
+				}
 			}
 		}
 		Method varArgsMethod = null;
 		for (Method method : base.getClass().getMethods()) {
 			if (method.getName().equals(name)) {
 				int formalParamCount = method.getParameterTypes().length;
+				int paramCount = params.length;
 				if (method.isVarArgs() && paramCount >= formalParamCount - 1) {
 					varArgsMethod = method;
 				} else if (paramCount == formalParamCount) {
@@ -539,7 +557,7 @@ public class BeanELResolver extends ELResolver {
 		}
 		return defaultFactory;
 	}
-	
+
 	private Object[] coerceParams(ExpressionFactory factory, Method method, Object[] params) {
 		Class<?>[] types = method.getParameterTypes();
 		Object[] args = new Object[types.length];
@@ -593,10 +611,10 @@ public class BeanELResolver extends ELResolver {
 			Array.set(array, index, factory.coerceToType(value, type));
 		}
 	}
-	
+
 	/**
 	 * Test whether the given base should be resolved by this ELResolver.
-	 * 
+	 *
 	 * @param base
 	 *            The bean to analyze.
 	 * @param property
@@ -609,7 +627,7 @@ public class BeanELResolver extends ELResolver {
 
 	/**
 	 * Lookup BeanProperty for the given (base, property) pair.
-	 * 
+	 *
 	 * @param base
 	 *            The bean to analyze.
 	 * @param property
@@ -637,10 +655,10 @@ public class BeanELResolver extends ELResolver {
 	/**
 	 * This method is not part of the API, though it can be used (reflectively) by clients of this
 	 * class to remove entries from the cache when the beans are being unloaded.
-	 * 
+	 *
 	 * Note: this method is present in the reference implementation, so we're adding it here to ease
 	 * migration.
-	 * 
+	 *
 	 * @param classloader
 	 *            The classLoader used to load the beans.
 	 */

@@ -17,9 +17,10 @@
 package org.camunda.bpm.client.task;
 
 import org.camunda.bpm.client.exception.ConnectionLostException;
-import org.camunda.bpm.client.exception.NotAcquiredException;
+import org.camunda.bpm.client.exception.BadRequestException;
 import org.camunda.bpm.client.exception.NotFoundException;
-import org.camunda.bpm.client.exception.NotResumedException;
+import org.camunda.bpm.client.exception.EngineException;
+import org.camunda.bpm.client.exception.UnknownHttpErrorException;
 import org.camunda.bpm.client.exception.ValueMapperException;
 
 import java.util.Map;
@@ -40,9 +41,11 @@ public interface ExternalTaskService {
    * @param externalTaskId the id of the external task whose lock will be extended
    * @param lockDuration specifies the lock duration in milliseconds
    *
-   * @throws NotFoundException if the task has been canceled and therefore does not exist anymore
-   * @throws NotAcquiredException if the task's most recent lock could not be acquired
+   * @throws NotFoundException if the task doesn't exist or has already been canceled or completed
+   * @throws BadRequestException if an illegal operation was performed or the given data is invalid.
+   * @throws EngineException if something went wrong during the engine execution (e.g., a persistence exception occurred)
    * @throws ConnectionLostException if the connection could not be established
+   * @throws UnknownHttpErrorException if the HTTP status code is not known by the client
    */
   void lock(String externalTaskId, long lockDuration);
 
@@ -55,9 +58,11 @@ public interface ExternalTaskService {
    * @param externalTask which lock will be extended
    * @param lockDuration specifies the lock duration in milliseconds
    *
-   * @throws NotFoundException if the task has been canceled and therefore does not exist anymore
-   * @throws NotAcquiredException if the task's most recent lock could not be acquired
+   * @throws NotFoundException if the task doesn't exist or has already been canceled or completed
+   * @throws BadRequestException if an illegal operation was performed or the given data is invalid.
+   * @throws EngineException if something went wrong during the engine execution (e.g., a persistence exception occurred)
    * @throws ConnectionLostException if the connection could not be established
+   * @throws UnknownHttpErrorException if the HTTP status code is not known by the client.
    */
   void lock(ExternalTask externalTask, long lockDuration);
 
@@ -66,8 +71,11 @@ public interface ExternalTaskService {
    *
    * @param externalTask which will be unlocked
    *
-   * @throws NotFoundException if the task has been canceled and therefore does not exist anymore
+   * @throws NotFoundException if the task doesn't exist or has already been canceled or completed
+   * @throws BadRequestException if an illegal operation was performed or the given data is invalid.
+   * @throws EngineException if something went wrong during the engine execution (e.g., a persistence exception occurred)
    * @throws ConnectionLostException if the connection could not be established
+   * @throws UnknownHttpErrorException if the HTTP status code is not known by the client.
    */
   void unlock(ExternalTask externalTask);
 
@@ -76,11 +84,12 @@ public interface ExternalTaskService {
    *
    * @param externalTask which will be completed
    *
-   * @throws NotFoundException if the task has been canceled and therefore does not exist anymore
-   * @throws NotAcquiredException if the tasks most recent lock could not be acquired
-   * @throws NotResumedException if the corresponding process instance could not be resumed
+   * @throws NotFoundException if the task doesn't exist or has already been canceled or completed
+   * @throws BadRequestException if the tasks most recent lock could not be acquired
+   * @throws EngineException if something went wrong during the engine execution (e.g., a persistence exception occurred)
    * @throws ConnectionLostException if the connection could not be established
    * @throws ValueMapperException
+   * @throws UnknownHttpErrorException if the HTTP status code is not known by the client.
    * <ul>
    *   <li> if an object cannot be serialized
    *   <li> if no 'objectTypeName' is provided for non-null value
@@ -96,11 +105,12 @@ public interface ExternalTaskService {
    * @param variables     are set in the tasks ancestor execution hierarchy. The key and the value represent
    *                      the variable name and its value. Map can consist of both typed and untyped variables.
    *
-   * @throws NotFoundException if the task has been canceled and therefore does not exist anymore
-   * @throws NotAcquiredException if the task's most recent lock could not be acquired
-   * @throws NotResumedException if the corresponding process instance could not be resumed
+   * @throws NotFoundException if the task doesn't exist or has already been canceled or completed
+   * @throws BadRequestException if an illegal operation was performed or the given data is invalid.
+   * @throws EngineException if something went wrong during the engine execution (e.g., a persistence exception occurred)
    * @throws ConnectionLostException if the connection could not be established
    * @throws ValueMapperException
+   * @throws UnknownHttpErrorException if the HTTP status code is not known by the client.
    * <ul>
    *   <li> if an object cannot be serialized
    *   <li> if no 'objectTypeName' is provided for non-null value
@@ -117,11 +127,12 @@ public interface ExternalTaskService {
    * @param variables     are set in the tasks ancestor execution hierarchy. The key and the value represent
    *                      the variable name and its value. Map can consist of both typed and untyped variables.
    *
-   * @throws NotFoundException if the task has been canceled and therefore does not exist anymore
-   * @throws NotAcquiredException if the task's most recent lock could not be acquired
-   * @throws NotResumedException if the corresponding process instance could not be resumed
+   * @throws NotFoundException if the task doesn't exist or has already been canceled or completed
+   * @throws BadRequestException if an illegal operation was performed or the given data is invalid.
+   * @throws EngineException if something went wrong during the engine execution (e.g., a persistence exception occurred)
    * @throws ConnectionLostException if the connection could not be established
    * @throws ValueMapperException
+   * @throws UnknownHttpErrorException if the HTTP status code is not known by the client.
    * <ul>
    *   <li> if an object cannot be serialized
    *   <li> if no 'objectTypeName' is provided for non-null value
@@ -139,11 +150,12 @@ public interface ExternalTaskService {
    * @param variables     are set in the tasks ancestor execution hierarchy The key and the value represent
    *                      the variable name and its value. Map can consist of both typed and untyped variables.
    *
-   * @throws NotFoundException if the task has been canceled and therefore does not exist anymore
-   * @throws NotAcquiredException if the task's most recent lock could not be acquired
-   * @throws NotResumedException if the corresponding process instance could not be resumed
+   * @throws NotFoundException if the task doesn't exist or has already been canceled or completed
+   * @throws BadRequestException if an illegal operation was performed or the given data is invalid.
+   * @throws EngineException if something went wrong during the engine execution (e.g., a persistence exception occurred)
    * @throws ConnectionLostException if the connection could not be established
    * @throws ValueMapperException
+   * @throws UnknownHttpErrorException if the HTTP status code is not known by the client.
    * <ul>
    *   <li> if an object cannot be serialized
    *   <li> if no 'objectTypeName' is provided for non-null value
@@ -162,11 +174,12 @@ public interface ExternalTaskService {
    * @param localVariables  are set in the execution of the external task instance. The key and the value represent
    *                        the variable name and its value. Map can consist of both typed and untyped variables.
    *
-   * @throws NotFoundException if the task has been canceled and therefore does not exist anymore
-   * @throws NotAcquiredException if the task's most recent lock could not be acquired
-   * @throws NotResumedException if the corresponding process instance could not be resumed
+   * @throws NotFoundException if the task doesn't exist or has already been canceled or completed
+   * @throws BadRequestException if an illegal operation was performed or the given data is invalid.
+   * @throws EngineException if something went wrong during the engine execution (e.g., a persistence exception occurred)
    * @throws ConnectionLostException if the connection could not be established
    * @throws ValueMapperException
+   * @throws UnknownHttpErrorException if the HTTP status code is not known by the client.
    * <ul>
    *   <li> if an object cannot be serialized
    *   <li> if no 'objectTypeName' is provided for non-null value
@@ -184,6 +197,13 @@ public interface ExternalTaskService {
    *                        the variable name and its value. Map can consist of both typed and untyped variables.
    * @param localVariables  are set in the execution of the external task instance. The key and the value represent
    *                        the variable name and its value. Map can consist of both typed and untyped variables.
+   *
+   * @throws NotFoundException if the task doesn't exist or has already been canceled or completed
+   * @throws BadRequestException if an illegal operation was performed or the given data is invalid.
+   * @throws EngineException if something went wrong during the engine execution (e.g., a persistence exception occurred)
+   * @throws ConnectionLostException if the connection could not be established
+   * @throws ValueMapperException
+   * @throws UnknownHttpErrorException if the HTTP status code is not known by the client.
    */
   void complete(String externalTaskId, Map<String, Object> variables, Map<String, Object> localVariables);
 
@@ -202,10 +222,11 @@ public interface ExternalTaskService {
    * @param retryTimeout specifies a timeout in milliseconds before the external task
    *                     becomes available again for fetching. Must be &gt;= 0.
    *
-   * @throws NotFoundException if the task has been canceled and therefore does not exist anymore
-   * @throws NotAcquiredException if the task's most recent lock could not be acquired
-   * @throws NotResumedException if the corresponding process instance could not be resumed
+   * @throws NotFoundException if the task doesn't exist or has already been canceled or completed
+   * @throws BadRequestException if an illegal operation was performed or the given data is invalid.
+   * @throws EngineException if something went wrong during the engine execution (e.g., a persistence exception occurred)
    * @throws ConnectionLostException if the connection could not be established
+   * @throws UnknownHttpErrorException if the HTTP status code is not known by the client.
    */
   void handleFailure(ExternalTask externalTask, String errorMessage, String errorDetails, int retries, long retryTimeout);
 
@@ -224,10 +245,11 @@ public interface ExternalTaskService {
    * @param retryTimeout   specifies a timeout in milliseconds before the external task
    *                       becomes available again for fetching. Must be &gt;= 0.
    *
-   * @throws NotFoundException if the task has been canceled and therefore does not exist anymore
-   * @throws NotAcquiredException if the task's most recent lock could not be acquired
-   * @throws NotResumedException if the corresponding process instance could not be resumed
+   * @throws NotFoundException if the task doesn't exist or has already been canceled or completed
+   * @throws BadRequestException if an illegal operation was performed or the given data is invalid.
+   * @throws EngineException if something went wrong during the engine execution (e.g., a persistence exception occurred)
    * @throws ConnectionLostException if the connection could not be established
+   * @throws UnknownHttpErrorException if the HTTP status code is not known by the client.
    */
   void handleFailure(String externalTaskId, String errorMessage, String errorDetails, int retries, long retryTimeout);
 
@@ -248,10 +270,11 @@ public interface ExternalTaskService {
    * @param variables      a map of variables to set on the execution the external task is assigned to
    * @param localVariables a map of variables to set on the execution locally
    *
-   * @throws NotFoundException if the task has been canceled and therefore does not exist anymore
-   * @throws NotAcquiredException if the task's most recent lock could not be acquired
-   * @throws NotResumedException if the corresponding process instance could not be resumed
+   * @throws NotFoundException if the task doesn't exist or has already been canceled or completed
+   * @throws BadRequestException if an illegal operation was performed or the given data is invalid.
+   * @throws EngineException if something went wrong during the engine execution (e.g., a persistence exception occurred)
    * @throws ConnectionLostException if the connection could not be established
+   * @throws UnknownHttpErrorException if the HTTP status code is not known by the client.
    */
   void handleFailure(String externalTaskId, String errorMessage, String errorDetails, int retries, long retryTimeout, Map<String, Object> variables, Map<String, Object> localVariables);
 
@@ -263,10 +286,11 @@ public interface ExternalTaskService {
    * @param errorCode    that indicates the predefined error. The error code
    *                     is used to identify the BPMN error handler.
    *
-   * @throws NotFoundException if the task has been canceled and therefore does not exist anymore
-   * @throws NotAcquiredException if the task's most recent lock could not be acquired
-   * @throws NotResumedException if the corresponding process instance could not be resumed
+   * @throws NotFoundException if the task doesn't exist or has already been canceled or completed
+   * @throws BadRequestException if an illegal operation was performed or the given data is invalid.
+   * @throws EngineException if something went wrong during the engine execution (e.g., a persistence exception occurred)
    * @throws ConnectionLostException if the connection could not be established
+   * @throws UnknownHttpErrorException if the HTTP status code is not known by the client.
    */
   void handleBpmnError(ExternalTask externalTask, String errorCode);
 
@@ -279,10 +303,11 @@ public interface ExternalTaskService {
    *                     is used to identify the BPMN error handler.
    * @param errorMessage which will be passed when the BPMN error is caught
    *
-   * @throws NotFoundException if the task has been canceled and therefore does not exist anymore
-   * @throws NotAcquiredException if the task's most recent lock could not be acquired
-   * @throws NotResumedException if the corresponding process instance could not be resumed
+   * @throws NotFoundException if the task doesn't exist or has already been canceled or completed
+   * @throws BadRequestException if an illegal operation was performed or the given data is invalid.
+   * @throws EngineException if something went wrong during the engine execution (e.g., a persistence exception occurred)
    * @throws ConnectionLostException if the connection could not be established
+   * @throws UnknownHttpErrorException if the HTTP status code is not known by the client.
    */
   void handleBpmnError(ExternalTask externalTask, String errorCode, String errorMessage);
 
@@ -296,10 +321,11 @@ public interface ExternalTaskService {
    * @param errorMessage which will be passed when the BPMN error is caught
    * @param variables    which will be passed to the execution when the BPMN error is caught
    *
-   * @throws NotFoundException if the task has been canceled and therefore does not exist anymore
-   * @throws NotAcquiredException if the task's most recent lock could not be acquired
-   * @throws NotResumedException if the corresponding process instance could not be resumed
+   * @throws NotFoundException if the task doesn't exist or has already been canceled or completed
+   * @throws BadRequestException if an illegal operation was performed or the given data is invalid.
+   * @throws EngineException if something went wrong during the engine execution (e.g., a persistence exception occurred)
    * @throws ConnectionLostException if the connection could not be established
+   * @throws UnknownHttpErrorException if the HTTP status code is not known by the client.
    */
   void handleBpmnError(ExternalTask externalTask, String errorCode, String errorMessage, Map<String, Object> variables);
 
@@ -313,10 +339,11 @@ public interface ExternalTaskService {
    * @param errorMessage   which will be passed when the BPMN error is caught
    * @param variables      which will be passed to the execution when the BPMN error is caught
    *
-   * @throws NotFoundException if the task has been canceled and therefore does not exist anymore
-   * @throws NotAcquiredException if the task's most recent lock could not be acquired
-   * @throws NotResumedException if the corresponding process instance could not be resumed
+   * @throws NotFoundException if the task doesn't exist or has already been canceled or completed
+   * @throws BadRequestException if an illegal operation was performed or the given data is invalid.
+   * @throws EngineException if something went wrong during the engine execution (e.g., a persistence exception occurred)
    * @throws ConnectionLostException if the connection could not be established
+   * @throws UnknownHttpErrorException if the HTTP status code is not known by the client.
    */
   void handleBpmnError(String externalTaskId, String errorCode, String errorMessage, Map<String, Object> variables);
 
@@ -324,11 +351,13 @@ public interface ExternalTaskService {
    * Extends the timeout of the lock by a given amount of time.
    *
    * @param externalTask which lock will be extended
-   * @param newDuration  specifies the the new lock duration in milliseconds
+   * @param newDuration  specifies the new lock duration in milliseconds
    *
-   * @throws NotFoundException if the task has been canceled and therefore does not exist anymore
-   * @throws NotAcquiredException if the task's most recent lock could not be acquired
+   * @throws NotFoundException if the task doesn't exist or has already been canceled or completed
+   * @throws BadRequestException if an illegal operation was performed or the given data is invalid.
+   * @throws EngineException if something went wrong during the engine execution (e.g., a persistence exception occurred)
    * @throws ConnectionLostException if the connection could not be established
+   * @throws UnknownHttpErrorException if the HTTP status code is not known by the client.
    */
   void extendLock(ExternalTask externalTask, long newDuration);
 
@@ -336,11 +365,13 @@ public interface ExternalTaskService {
    * Extends the timeout of the lock by a given amount of time.
    *
    * @param externalTaskId the id of the external task which lock will be extended
-   * @param newDuration    specifies the the new lock duration in milliseconds
+   * @param newDuration    specifies the new lock duration in milliseconds
    *
-   * @throws NotFoundException if the task has been canceled and therefore does not exist anymore
-   * @throws NotAcquiredException if the task's most recent lock could not be acquired
+   * @throws NotFoundException if the task doesn't exist or has already been canceled or completed
+   * @throws BadRequestException if an illegal operation was performed or the given data is invalid.
+   * @throws EngineException if something went wrong during the engine execution (e.g., a persistence exception occurred)
    * @throws ConnectionLostException if the connection could not be established
+   * @throws UnknownHttpErrorException if the HTTP status code is not known by the client.
    */
   void extendLock(String externalTaskId, long newDuration);
 

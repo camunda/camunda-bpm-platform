@@ -7,7 +7,7 @@ Camunda Platform 7 is a flexible framework for workflow and process automation. 
 - Web Site: https://www.camunda.org/
 - Getting Started: https://docs.camunda.org/get-started/
 - User Forum: https://forum.camunda.org/
-- Issue Tracker: https://app.camunda.com/jira
+- Issue Tracker: https://github.com/camunda/camunda-bpm-platform/issues
 - Contribution Guidelines: https://camunda.org/contribute/
 
 ## Components
@@ -53,7 +53,7 @@ Most of the components that make up the platform can even be completely embedded
 
 ## Contributing
 
-Please see our [contribution guidelines](CONTRIBUTING.md).
+Please see our [contribution guidelines](CONTRIBUTING.md) for how to raise issues and how to contribute code to our project.
 
 ## Tests
 

@@ -1903,6 +1903,26 @@ public class ProcessInstanceRestServiceInteractionTest extends
   }
 
   @Test
+  public void shouldReturnErrorOnSettingVariable() {
+    String variableKey = "aVariableKey";
+    String variableValue = "aVariableValue";
+
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue);
+
+    doThrow(new ProcessEngineException("foo", 123))
+        .when(runtimeServiceMock)
+        .setVariable(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey), any());
+
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+    .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+      .body("type", Matchers.is(RestException.class.getSimpleName()))
+      .body("message", Matchers.is("Cannot put process instance variable aVariableKey: foo"))
+      .body("code", Matchers.is(123))
+    .when().put(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
+  }
+
+  @Test
   public void testPostSingleFileVariableWithEncodingAndMimeType() throws Exception {
 
     byte[] value = "some text".getBytes();
@@ -3779,8 +3799,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
           .body(body)
         .then().expect()
           .statusCode(Status.BAD_REQUEST.getStatusCode())
-          .body(Matchers.containsString("{\"type\":\"InvalidRequestException\"," +
-              "\"message\":\"Cannot set variables: Unsupported value type 'unknown'\"}"))
+          .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+          .body("message", equalTo("Cannot set variables: Unsupported value type 'unknown'"))
         .when()
           .post(PROCESS_INSTANCE_SET_VARIABLES_ASYNC_URL);
   }
@@ -3801,8 +3821,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
           .body("{}")
         .then().expect()
           .statusCode(Status.BAD_REQUEST.getStatusCode())
-          .body(Matchers.containsString("{\"type\":\"InvalidRequestException\"," +
-              "\"message\":\"message\"}"))
+          .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+          .body("message", equalTo("message"))
         .when()
           .post(PROCESS_INSTANCE_SET_VARIABLES_ASYNC_URL);
   }
@@ -3836,7 +3856,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
           .body("{}")
         .then().expect()
           .statusCode(Status.BAD_REQUEST.getStatusCode())
-          .body(Matchers.containsString("{\"type\":\"InvalidRequestException\",\"message\":\"message\"}"))
+          .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+          .body("message", equalTo("message"))
         .when()
           .post(PROCESS_INSTANCE_SET_VARIABLES_ASYNC_URL);
   }
@@ -3853,7 +3874,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
           .body("{}")
         .then().expect()
           .statusCode(Status.BAD_REQUEST.getStatusCode())
-          .body(Matchers.containsString("{\"type\":\"BadUserRequestException\",\"message\":\"message\"}"))
+          .body("type", equalTo(BadUserRequestException.class.getSimpleName()))
+          .body("message", equalTo("message"))
         .when()
           .post(PROCESS_INSTANCE_SET_VARIABLES_ASYNC_URL);
   }
@@ -4010,8 +4032,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .body("{}")
     .then().expect()
       .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
-      .body(Matchers.containsString("{\"type\":\"ProcessEngineException\"," +
-          "\"message\":\"message\"}"))
+      .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
+      .body("message", equalTo("message"))
     .when()
       .post(PROCESS_INSTANCE_CORRELATE_MESSAGE_ASYNC_URL);
   }
@@ -4043,7 +4065,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .body("{}")
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body(Matchers.containsString("{\"type\":\"InvalidRequestException\",\"message\":\"message\"}"))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("message"))
     .when()
       .post(PROCESS_INSTANCE_CORRELATE_MESSAGE_ASYNC_URL);
   }
@@ -4059,7 +4082,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .body("{}")
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body(Matchers.containsString("{\"type\":\"BadUserRequestException\",\"message\":\"message\"}"))
+      .body("type", equalTo(BadUserRequestException.class.getSimpleName()))
+      .body("message", equalTo("message"))
     .when()
       .post(PROCESS_INSTANCE_CORRELATE_MESSAGE_ASYNC_URL);
   }

@@ -21,16 +21,19 @@ window._import = path => {
 };
 
 //  Camunda-Cockpit-Bootstrap is copied as-is, so we have to inline everything
-const baseImportPath = document.querySelector('base').href + '../';
+const appRoot = document.querySelector('base').getAttribute('app-root');
+const baseImportPath = `${appRoot}/app/cockpit/`;
 
 function withSuffix(string, suffix) {
   return !string.endsWith(suffix) ? string + suffix : string;
 }
 
 const loadConfig = (async function() {
-  const config = (await import(
-    baseImportPath + 'scripts/config.js?bust=' + new Date().getTime()
-  )).default;
+  const config = (
+    await import(
+      baseImportPath + 'scripts/config.js?bust=' + new Date().getTime()
+    )
+  ).default;
 
   if (Array.isArray(config.bpmnJs && config.bpmnJs.additionalModules)) {
     const fetchers = config.bpmnJs.additionalModules.map(el =>

@@ -1,0 +1,64 @@
+<div class="form-inline operation-details"
+     ng-class="{'selection-wrap': !isBatchOperationPage}">
+  <div ng-class="{row: isBatchOperationPage, 'selection-type': !isBatchOperationPage}">
+    <label class="form-control-static"
+           for="instance"
+           ng-class="{'col-xs-4 col-sm-3 text-right': isBatchOperationPage, 'selection-label': !isBatchOperationPage}">
+      {{ 'CAM_WIDGET_SELECTION_TYPE_INSTANCE' | translate }}
+      <span class="glyphicon glyphicon-question-sign"
+            uib-tooltip="{{ 'CAM_WIDGET_SELECTION_TYPE_INSTANCE_TOOLTIP' | translate }}"
+            tooltip-placement="right"></span>
+    </label>
+    <span ng-class="{'col-xs-6 col-sm-9': isBatchOperationPage}">
+      <input type="radio"
+             name="selection_type"
+             id="instance"
+             class="form-control operation-radio"
+             ng-class="{'selection-input': !isBatchOperationPage}"
+             ng-model="selectionType"
+             value="INSTANCE" />
+    </span>
+  </div>
+  <div ng-class="{row: isBatchOperationPage, 'selection-type': !isBatchOperationPage}">
+    <label class="form-control-static"
+           for="query"
+           ng-class="{'col-xs-4 col-sm-3 text-right': isBatchOperationPage, 'selection-label': !isBatchOperationPage}">
+           {{ 'CAM_WIDGET_SELECTION_TYPE_QUERY' | translate }}
+      <span class="glyphicon glyphicon-question-sign"
+            uib-tooltip="{{ 'CAM_WIDGET_SELECTION_TYPE_QUERY_TOOLTIP' | translate }}"
+            tooltip-placement="right"></span>
+    </label>
+    <span ng-class="{'col-xs-6 col-sm-9': isBatchOperationPage}">
+      <input type="radio"
+             name="selection_type"
+             id="query"
+             class="form-control operation-radio"
+             ng-class="{'selection-input': !isBatchOperationPage}"
+             ng-model="selectionType"
+             value="QUERY" />
+    </span>
+  </div>   
+</div>
+
+<div class="instance"
+     ng-if="selectionType === 'INSTANCE' && toggleState === 'on' && totalInstancesCount > pageSize">
+  <div class="alert alert-info">
+    <p>{{ 'CAM_WIDGET_SELECTION_TYPE_INSTANCE_INTRO' | translate }} {{ selectedInstancesCount }} {{ 'CAM_WIDGET_SELECTION_TYPE_INSTANCES' | translate }}. </p><br />
+    <p>
+      <a ng-click="updateSelectionType('QUERY')">{{ 'CAM_WIDGET_SELECTION_TYPE_INSTANCE_LINK' | translate }}</a>
+    </p>
+  </div>
+</div>
+
+<div class="query"
+     ng-if="selectionType === 'QUERY'">
+  <div class="alert alert-warning">
+    <p><strong>{{ 'CAM_WIDGET_SELECTION_TYPE_QUERY_INTRO' | translate }}</strong></p><br />
+    <p>
+      <strong>{{ 'CAM_WIDGET_SELECTION_TYPE_WARNING' | translate }}</strong> {{ 'CAM_WIDGET_SELECTION_TYPE_QUERY_WARNING' | translate }}
+    </p><br />
+    <p>
+      <a ng-click="updateSelectionType('INSTANCE')">{{ 'CAM_WIDGET_SELECTION_TYPE_QUERY_LINK' | translate }} <strong>{{ 'CAM_WIDGET_SELECTION_TYPE_INSTANCE' | translate }}</strong></a>
+    </p>
+  </div>
+</div>

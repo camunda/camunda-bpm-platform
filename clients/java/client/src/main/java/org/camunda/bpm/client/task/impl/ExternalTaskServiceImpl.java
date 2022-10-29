@@ -47,7 +47,7 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
     try {
       engineClient.lock(externalTaskId, lockDuration);
     } catch (EngineClientException e) {
-      throw LOG.externalTaskServiceException("locking task", e);
+      throw LOG.handledEngineClientException("locking task", e);
     }
   }
 
@@ -56,7 +56,7 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
     try {
       engineClient.unlock(externalTask.getId());
     } catch (EngineClientException e) {
-      throw LOG.externalTaskServiceException("unlocking the external task", e);
+      throw LOG.handledEngineClientException("unlocking the external task", e);
     }
   }
 
@@ -70,7 +70,7 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
     try {
       engineClient.setVariables(processInstanceId, variables);
     } catch (EngineClientException e) {
-      throw LOG.externalTaskServiceException("setting variables for external task", e);
+      throw LOG.handledEngineClientException("setting variables for external task", e);
     }
   }
 
@@ -80,7 +80,7 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
     try {
       engineClient.setVariables(processId, variables);
     } catch (EngineClientException e) {
-      throw LOG.externalTaskServiceException("setting variables for external task", e);
+      throw LOG.handledEngineClientException("setting variables for external task", e);
     }
   }
 
@@ -98,7 +98,7 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
     try {
       engineClient.complete(externalTaskId, variables, localVariables);
     } catch (EngineClientException e) {
-      throw LOG.externalTaskServiceException("completing the external task", e);
+      throw LOG.handledEngineClientException("completing the external task", e);
     }
   }
 
@@ -119,7 +119,7 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
     try {
       engineClient.failure(externalTaskId, errorMessage, errorDetails, retries, retryTimeout, variables, locaclVariables);
     } catch (EngineClientException e) {
-      throw LOG.externalTaskServiceException("notifying a failure", e);
+      throw LOG.handledEngineClientException("notifying a failure", e);
     }
   }
 
@@ -143,7 +143,7 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
     try {
       engineClient.bpmnError(externalTaskId, errorCode, errorMessage, variables);
     } catch (EngineClientException e) {
-      throw LOG.externalTaskServiceException("notifying a BPMN error", e);
+      throw LOG.handledEngineClientException("notifying a BPMN error", e);
     }
   }
 
@@ -157,7 +157,7 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
     try {
       engineClient.extendLock(externalTaskId, newDuration);
     } catch (EngineClientException e) {
-      throw LOG.externalTaskServiceException("extending lock", e);
+      throw LOG.handledEngineClientException("extending lock", e);
     }
   }
 }

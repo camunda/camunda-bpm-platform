@@ -72,7 +72,6 @@ import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -290,9 +289,10 @@ public class HistoricProcessInstanceTest {
   @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
   public void testHistoricProcessInstanceStartDate() {
+    ClockUtil.setCurrentTime(new Date());
     runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-    Date date = new Date();
+    Date date = ClockUtil.getCurrentTime();
 
     assertEquals(1, historyService.createHistoricProcessInstanceQuery().startDateOn(date).count());
     assertEquals(1, historyService.createHistoricProcessInstanceQuery().startDateBy(date).count());

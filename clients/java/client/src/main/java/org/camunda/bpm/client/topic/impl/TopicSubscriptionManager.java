@@ -17,7 +17,6 @@
 package org.camunda.bpm.client.topic.impl;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -130,14 +129,15 @@ public class TopicSubscriptionManager implements Runnable {
   }
 
   protected FetchAndLockResponseDto fetchAndLock(List<TopicRequestDto> subscriptions) {
-    List<ExternalTask> externalTasks;
+    List<ExternalTask> externalTasks = null;
 
     try {
       LOG.fetchAndLock(subscriptions);
       externalTasks = engineClient.fetchAndLock(subscriptions);
-    } catch (EngineClientException e) {
-      LOG.exceptionWhilePerformingFetchAndLock(e);
-      return new FetchAndLockResponseDto(LOG.fetchAndLockException(e));
+
+    } catch (EngineClientException ex) {
+      LOG.exceptionWhilePerformingFetchAndLock(ex);
+      return new FetchAndLockResponseDto(LOG.handledEngineClientException("fetching and locking task", ex));
     }
 
     return new FetchAndLockResponseDto(externalTasks);
@@ -211,12 +211,17 @@ public class TopicSubscriptionManager implements Runnable {
 
   protected void runBackoffStrategy(FetchAndLockResponseDto fetchAndLockResponse) {
     try {
+      List<ExternalTask> externalTasks = fetchAndLockResponse.getExternalTasks();
       if (backoffStrategy instanceof ErrorAwareBackoffStrategy) {
-        ((ErrorAwareBackoffStrategy) backoffStrategy)
-                .reconfigure(fetchAndLockResponse.getExternalTasks(), fetchAndLockResponse.getError());
+        ErrorAwareBackoffStrategy errorAwareBackoffStrategy = ((ErrorAwareBackoffStrategy) backoffStrategy);
+        ExternalTaskClientException exception = fetchAndLockResponse.getError();
+        errorAwareBackoffStrategy.reconfigure(externalTasks, exception);
+
       } else {
-        backoffStrategy.reconfigure(fetchAndLockResponse.getExternalTasks());
+        backoffStrategy.reconfigure(externalTasks);
+
       }
+
       long waitTime = backoffStrategy.calculateBackoffTime();
       suspend(waitTime);
     } catch (Throwable e) {

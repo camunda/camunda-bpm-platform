@@ -203,9 +203,9 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
     try {
       repositoryService.deleteDeployment(processDefinition.getDeploymentId());
       fail("Exception expected");
-    } catch (ProcessEngineException pee) {
+    } catch (ProcessEngineException pex) {
       // Exception expected when deleting deployment with running process
-      assert(pee.getMessage().contains("Deletion of process definition without cascading failed."));
+      assert(pex.getMessage().contains("Deletion of process definition without cascading failed."));
     }
   }
 

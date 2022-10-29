@@ -69,7 +69,7 @@ create table ACT_GE_SCHEMA_LOG (
 );
 
 insert into ACT_GE_SCHEMA_LOG
-values ('0', CURRENT_TIMESTAMP, '7.18.0');
+values ('0', CURRENT_TIMESTAMP, '7.19.0');
 
 create table ACT_RE_DEPLOYMENT (
     ID_ nvarchar(64),
@@ -355,6 +355,8 @@ create table ACT_RU_BATCH (
   CONFIGURATION_ nvarchar(255),
   TENANT_ID_ nvarchar(64),
   CREATE_USER_ID_ nvarchar(255),
+  START_TIME_ datetime2,
+  EXEC_START_TIME_ datetime2,
   primary key (ID_)
 );
 

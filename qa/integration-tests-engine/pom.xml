@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.camunda.bpm.qa</groupId>
     <artifactId>camunda-qa</artifactId>
-    <version>7.18.0-SNAPSHOT</version>
+    <version>7.19.0-SNAPSHOT</version>
   </parent>
 
   <properties>
@@ -85,8 +85,14 @@
 
     <dependency>
       <groupId>com.github.tomakehurst</groupId>
-      <artifactId>wiremock-standalone</artifactId>
+      <artifactId>wiremock-jre8-standalone</artifactId>
       <scope>test</scope>
+    </dependency>
+
+    <!-- required for wiremock-jre8-standalone - see CAM-14755 -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-jdk14</artifactId>
     </dependency>
 
     <dependency>

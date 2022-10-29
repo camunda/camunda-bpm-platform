@@ -1194,7 +1194,6 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   public boolean triggerUpdateEvent() {
     if (lifecycleState == TaskState.STATE_CREATED) {
       setLastUpdated(ClockUtil.getCurrentTime());
-      update();
       return fireEvent(TaskListener.EVENTNAME_UPDATE) && fireAssignmentEvent();
     }
     else {

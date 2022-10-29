@@ -34,7 +34,7 @@ pipeline {
     stage('Prepare') {
       when {
         expression {
-          cambpmWithLabels('upstream')
+          return params.TRIGGERED_BY_UPSTREAM
         }
       }
       steps {
@@ -81,6 +81,7 @@ pipeline {
               },
               postSuccess: {
                 def projectVersion = cambpmUtils.getMavenProjectVersion()
+                projectVersion = projectVersion.substring(0, projectVersion.lastIndexOf('.')) + "-SNAPSHOT"
                 cambpmPublishJavadocs("\"target/site/apidocs/\"", projectVersion)
               }
             ])

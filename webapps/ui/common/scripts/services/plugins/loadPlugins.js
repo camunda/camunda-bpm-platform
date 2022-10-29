@@ -15,7 +15,8 @@
  * limitations under the License.
  */
 
-const baseImportPath = document.querySelector('base').href + '../';
+const appRoot = document.querySelector('base').getAttribute('app-root');
+
 const camundaPlugins = [
   'admin-plugin-adminPlugins',
   'admin-plugin-adminEE',
@@ -48,6 +49,7 @@ module.exports = async function loadPlugins(config, appName) {
     return `${el.location}/${el.main}`;
   });
 
+  const baseImportPath = `${appRoot}/app/${appName}/`;
   const fetchers = customScripts.map(url =>
     window
       ._import(baseImportPath + withSuffix(url, '.js'))
@@ -60,7 +62,7 @@ module.exports = async function loadPlugins(config, appName) {
     })
   );
 
-  const loadedPlugins = (await Promise.all(fetchers)).reduce((acc, module) => {
+  return (await Promise.all(fetchers)).reduce((acc, module) => {
     const plugins = module.default;
     if (!plugins) {
       return acc;
@@ -73,5 +75,4 @@ module.exports = async function loadPlugins(config, appName) {
     }
     return acc;
   }, []);
-  return loadedPlugins;
 };

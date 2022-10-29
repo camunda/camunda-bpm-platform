@@ -73,7 +73,7 @@ function requirejsConf(options) {
       'angular-touch': 'node_modules/angular-touch/angular-touch',
 
       // #### vendor dependencies
-      'angular-bootstrap': 'vendor/ui-bootstrap-tpls-2.5.0-camunda',
+      'angular-bootstrap': 'angular-ui-bootstrap',
       prismjs: 'vendor/prism',
       'bpmn-io': 'node_modules/bower-bpmn-js/dist/bpmn-navigated-viewer',
       'dmn-io': 'node_modules/dmn-js/dist/dmn-modeler'

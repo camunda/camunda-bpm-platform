@@ -20,10 +20,6 @@ package org.camunda.bpm.engine.impl.cfg;
 import static org.camunda.bpm.engine.impl.cmd.HistoryCleanupCmd.MAX_THREADS_NUMBER;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
-import javax.naming.InitialContext;
-import javax.script.ScriptEngineManager;
-import javax.sql.DataSource;
-
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -46,6 +42,10 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+
+import javax.naming.InitialContext;
+import javax.script.ScriptEngineManager;
+import javax.sql.DataSource;
 
 import org.apache.ibatis.builder.xml.XMLConfigBuilder;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
@@ -165,6 +165,7 @@ import org.camunda.bpm.engine.impl.el.DateTimeFunctions;
 import org.camunda.bpm.engine.impl.el.ElProviderCompatible;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.el.JuelExpressionManager;
+import org.camunda.bpm.engine.impl.errorcode.ExceptionCodeProvider;
 import org.camunda.bpm.engine.impl.event.CompensationEventHandler;
 import org.camunda.bpm.engine.impl.event.ConditionalEventHandler;
 import org.camunda.bpm.engine.impl.event.EventHandler;
@@ -222,6 +223,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutorImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.CrdbTransactionRetryInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.DelegateInterceptor;
+import org.camunda.bpm.engine.impl.interceptor.ExceptionCodeInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
 import org.camunda.bpm.engine.impl.jobexecutor.AsyncContinuationJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.DefaultFailedJobCommandFactory;
@@ -349,11 +351,11 @@ import org.camunda.bpm.engine.impl.scripting.engine.VariableScopeResolverFactory
 import org.camunda.bpm.engine.impl.scripting.env.ScriptEnvResolver;
 import org.camunda.bpm.engine.impl.scripting.env.ScriptingEnvironment;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
-import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.DatabaseImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.InternalsImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.JdkImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.ProductImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ParseUtil;
@@ -984,6 +986,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected String loggingContextProcessDefinitionKey;// default == null => disabled by default
   protected String loggingContextProcessInstanceId = "processInstanceId";
   protected String loggingContextTenantId = "tenantId";
+  protected String loggingContextEngineName = "engineName";
 
   // logging levels (with default values)
   protected String logLevelBpmnStackTrace = "DEBUG";
@@ -1015,6 +1018,80 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    *  default: 15 seconds */
   protected int telemetryRequestTimeout = 15 * 1000;
 
+  // Exception Codes ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * Disables the {@link ExceptionCodeInterceptor} and therefore the whole exception code feature.
+   */
+  protected boolean disableExceptionCode;
+
+  /**
+   * Disables the default implementation of {@link ExceptionCodeProvider} which allows overriding the reserved
+   * exception codes > {@link ExceptionCodeInterceptor#MAX_CUSTOM_CODE} or < {@link ExceptionCodeInterceptor#MIN_CUSTOM_CODE}.
+   */
+  protected boolean disableBuiltinExceptionCodeProvider;
+
+  /**
+   * Allows registering a custom implementation of a {@link ExceptionCodeProvider}
+   * allowing to provide custom exception codes.
+   */
+  protected ExceptionCodeProvider customExceptionCodeProvider;
+
+  /**
+   * Holds the default implementation of {@link ExceptionCodeProvider}.
+   */
+  protected ExceptionCodeProvider builtinExceptionCodeProvider;
+
+  /**
+   * @return {@code true} if the exception code feature is disabled and vice-versa.
+   */
+  public boolean isDisableExceptionCode() {
+    return disableExceptionCode;
+  }
+
+  /**
+   * Setter to disables the {@link ExceptionCodeInterceptor} and therefore the whole exception code feature.
+   */
+  public void setDisableExceptionCode(boolean disableExceptionCode) {
+    this.disableExceptionCode = disableExceptionCode;
+  }
+
+  /**
+   * @return {@code true} if the built-in exception code provider is disabled and vice-versa.
+   */
+  public boolean isDisableBuiltinExceptionCodeProvider() {
+    return disableBuiltinExceptionCodeProvider;
+  }
+
+  /**
+   * Setter to disables the default implementation of {@link ExceptionCodeProvider} which allows overriding the reserved
+   * exception codes > {@link ExceptionCodeInterceptor#MAX_CUSTOM_CODE} or < {@link ExceptionCodeInterceptor#MIN_CUSTOM_CODE}.
+   */
+  public void setDisableBuiltinExceptionCodeProvider(boolean disableBuiltinExceptionCodeProvider) {
+    this.disableBuiltinExceptionCodeProvider = disableBuiltinExceptionCodeProvider;
+  }
+
+  /**
+   * @return a custom implementation of a {@link ExceptionCodeProvider} allowing to provide custom error codes.
+   */
+  public ExceptionCodeProvider getCustomExceptionCodeProvider() {
+    return customExceptionCodeProvider;
+  }
+
+  /**
+   * Setter to register a custom implementation of a {@link ExceptionCodeProvider} allowing to provide custom error codes.
+   */
+  public void setCustomExceptionCodeProvider(ExceptionCodeProvider customExceptionCodeProvider) {
+    this.customExceptionCodeProvider = customExceptionCodeProvider;
+  }
+
+  public ExceptionCodeProvider getBuiltinExceptionCodeProvider() {
+    return builtinExceptionCodeProvider;
+  }
+
+  public void setBuiltinExceptionCodeProvider(ExceptionCodeProvider builtinExceptionCodeProvider) {
+    this.builtinExceptionCodeProvider = builtinExceptionCodeProvider;
+  }
 
   // buildProcessEngine ///////////////////////////////////////////////////////
 
@@ -1051,6 +1128,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // Database type needs to be detected before CommandExecutors are initialized
     initDataSource();
 
+    initExceptionCodeProvider();
     initCommandExecutors();
     initServices();
     initIdGenerator();
@@ -1092,6 +1170,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initAdminGroups();
     initPasswordPolicy();
     invokePostInit();
+  }
+
+  public void initExceptionCodeProvider() {
+    if (!isDisableBuiltinExceptionCodeProvider()) {
+      builtinExceptionCodeProvider = new ExceptionCodeProvider() {};
+
+    }
   }
 
   protected void initTypeValidator() {
@@ -5104,6 +5189,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
+  public String getLoggingContextEngineName() {
+    return loggingContextEngineName;
+  }
+
+  public ProcessEngineConfigurationImpl setLoggingContextEngineName(String loggingContextEngineName) {
+    this.loggingContextEngineName = loggingContextEngineName;
+    return this;
+  }
+
   public String getLogLevelBpmnStackTrace() {
     return logLevelBpmnStackTrace;
   }
@@ -5223,6 +5317,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected CrdbTransactionRetryInterceptor getCrdbRetryInterceptor() {
     return new CrdbTransactionRetryInterceptor(commandRetries);
+  }
+
+  /**
+   * @return a exception code interceptor. The interceptor is not registered in case
+   * {@code disableExceptionCode} is configured to {@code true}.
+   */
+  protected ExceptionCodeInterceptor getExceptionCodeInterceptor() {
+    return new ExceptionCodeInterceptor(builtinExceptionCodeProvider, customExceptionCodeProvider);
   }
 
 }

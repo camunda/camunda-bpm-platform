@@ -1346,9 +1346,9 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
 
   @Override
-  public TaskQuery orderByTaskUpdatedAfter() {
-    ensureNotInOrQuery("orderByTaskUpdatedAfter()");
-    return orderBy(TaskQueryProperty.UPDATED_AFTER);
+  public TaskQuery orderByLastUpdated() {
+    ensureNotInOrQuery("orderByLastUpdated()");
+    return orderBy(TaskQueryProperty.LAST_UPDATED);
   }
 
   @Override

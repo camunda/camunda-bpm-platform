@@ -47,7 +47,9 @@ var Batch = function(camAPI, localConf, configuration) {
       currentPage: 1,
       count: 0,
       data: null,
-      sorting: runtimeSorting
+      users: {},
+      sorting: runtimeSorting,
+      query: {}
     },
     history: {
       state: 'INITIAL',
@@ -118,7 +120,8 @@ Batch.prototype._remove = function(params) {
   var obj = this._batches.selection;
   params.id = obj.data.id;
   var self = this;
-  return this._sdk.resource('batch').delete(params, function(err) {
+
+  let cb = err => {
     self.deleteModal.instance && self.deleteModal.instance.close();
     self.deleteModal.instance = null;
 
@@ -131,7 +134,13 @@ Batch.prototype._remove = function(params) {
       obj.type = null;
       obj.data = {};
     }
-  });
+  };
+
+  if (obj.type === 'history') {
+    return this._sdk.resource('history').batchDelete(obj.data.id, cb);
+  } else {
+    return this._sdk.resource('batch').delete(params, cb);
+  }
 };
 
 var handleRetryResponse = function(context) {
@@ -238,6 +247,11 @@ Batch.prototype.getLoadingState = function(type) {
 
 Batch.prototype.getBatches = function(type) {
   return this._batches[type].data;
+};
+
+Batch.prototype.getFullName = function(createUserId) {
+  let user = this._batches.runtime.users[createUserId];
+  return user ? user.firstName + ' ' + user.lastName : createUserId;
 };
 
 Batch.prototype.getSelection = function() {
@@ -456,6 +470,22 @@ Batch.prototype._load = function(type) {
   };
   var cb = function(err, data) {
     obj.data = data.items || data;
+
+    if (type === 'runtime') {
+      // fetch unique usernames
+      let uniqueUserIds = new Set(data.map(item => item.createUserId));
+      this._sdk.resource('user').list(
+        {
+          idIn: Array.from(uniqueUserIds).toString(),
+          maxResults: uniqueUserIds.size
+        },
+        (err, data) => {
+          obj.users = {};
+          data.forEach(item => (obj.users[item.id] = item));
+        }
+      );
+    }
+
     if (typeof data.count !== 'undefined') {
       countCb(err, data);
     } else {
@@ -473,6 +503,10 @@ Batch.prototype._load = function(type) {
     params.sortOrder = obj.sorting.sortOrder;
   }
 
+  if (obj.query) {
+    params = {...params, ...obj.query};
+  }
+
   switch (type) {
     case 'runtime':
       return this._sdk.resource('batch').statistics(params, cb);
@@ -482,9 +516,18 @@ Batch.prototype._load = function(type) {
   }
 };
 
+Batch.prototype.onBatchQueryChange = function(type, query) {
+  if (JSON.stringify(query) === JSON.stringify(this._batches[type].query)) {
+    return;
+  }
+  this._batches[type].query = query;
+  this._load(type);
+};
+
 Batch.prototype.sortingKeys = [
   'id',
   'startTime',
+  'executionStartTime',
   'endTime',
   'type',
   'user',

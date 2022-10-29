@@ -477,4 +477,25 @@ public class SignalRestServiceTest extends AbstractRestServiceTest {
       .post(SIGNAL_URL);
   }
 
+  @Test
+  public void shouldReturnError() {
+    doThrow(new ProcessEngineException("foo", 123))
+        .when(signalBuilderMock).send();
+
+    Map<String, Object> requestBody = new HashMap<>();
+    requestBody.put("name", "aSignalName");
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(requestBody)
+    .then()
+      .expect()
+        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+        .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
+        .body("message", equalTo("foo"))
+        .body("code", equalTo(123))
+    .when()
+      .post(SIGNAL_URL);
+  }
+
 }

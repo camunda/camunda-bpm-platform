@@ -18,6 +18,8 @@ package org.camunda.bpm.engine.batch;
 
 import org.camunda.bpm.engine.query.Query;
 
+import java.util.Date;
+
 public interface BatchStatisticsQuery extends Query<BatchStatisticsQuery, BatchStatistics> {
 
   /**
@@ -42,6 +44,21 @@ public interface BatchStatisticsQuery extends Query<BatchStatisticsQuery, BatchS
   /** Only selects batches which are suspended **/
   BatchStatisticsQuery suspended();
 
+  /** Only selects batches that are started by the given user id **/
+  BatchStatisticsQuery createdBy(String userId);
+
+  /** Only select historic activity instances that were started before the given date. */
+  BatchStatisticsQuery startedBefore(Date date);
+
+  /** Only select historic activity instances that were started after the given date. */
+  BatchStatisticsQuery startedAfter(Date date);
+
+  /** Only selects batches with failed jobs **/
+  BatchStatisticsQuery withFailures();
+
+  /** Only selects batches without failed jobs **/
+  BatchStatisticsQuery withoutFailures();
+
   /**
    * Returns batch statistics sorted by batch id; must be followed by an invocation of {@link #asc()} or {@link #desc()}.
    */
@@ -51,5 +68,10 @@ public interface BatchStatisticsQuery extends Query<BatchStatisticsQuery, BatchS
    * Returns batch statistics sorted by tenant id; must be followed by an invocation of {@link #asc()} or {@link #desc()}.
    */
   BatchStatisticsQuery orderByTenantId();
+
+  /**
+   * Returns batch statistics sorted by start time; must be followed by an invocation of {@link #asc()} or {@link #desc()}.
+   */
+  BatchStatisticsQuery orderByStartTime();
 
 }

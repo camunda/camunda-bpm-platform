@@ -22,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.anyString;
@@ -41,12 +42,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletContextEvent;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ExternalTaskService;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
@@ -69,6 +72,7 @@ import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.helper.variable.EqualsObjectValue;
 import org.camunda.bpm.engine.rest.helper.variable.EqualsPrimitiveValue;
 import org.camunda.bpm.engine.rest.helper.variable.EqualsUntypedValue;
+import org.camunda.bpm.engine.rest.impl.FetchAndLockContextListener;
 import org.camunda.bpm.engine.rest.util.VariablesBuilder;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
@@ -173,6 +177,8 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
 
     // external task
     externalTaskMock = MockProvider.createMockExternalTask();
+
+    new FetchAndLockContextListener().contextInitialized(mock(ServletContextEvent.class, RETURNS_DEEP_STUBS));
   }
 
   @Test
@@ -1773,6 +1779,29 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     json.put("newDuration", 1000);
 
     validateExtendLockRequest(json, Status.NOT_FOUND.getStatusCode());
+  }
+
+  @Test
+  public void shouldReturnErrorCodeWhenCompleting() {
+    doThrow(new ProcessEngineException("foo", 123))
+      .when(externalTaskService)
+      .complete(any(), any(), any(), any());
+
+    Map<String, String> parameters = new HashMap<>();
+    parameters.put("workerId", "aWorkerId");
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(parameters)
+      .pathParam("id", "anExternalTaskId")
+    .then()
+      .expect()
+      .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+      .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
+      .body("message", equalTo("foo"))
+      .body("code", equalTo(123))
+    .when()
+      .post(COMPLETE_EXTERNAL_TASK_URL);
   }
 
   protected void validateExtendLockRequest(Map json, int statusCode) {

@@ -74,10 +74,10 @@ public class ScriptCondition implements Condition {
 
     try {
       result = evaluate(scope, execution);
-    } catch (ProcessEngineException pee) {
-      if (! (pee.getMessage().contains("No such property") ||
-             pee.getCause() instanceof ScriptEvaluationException) ) {
-        throw pee;
+    } catch (ProcessEngineException pex) {
+      if (! (pex.getMessage().contains("No such property") ||
+             pex.getCause() instanceof ScriptEvaluationException) ) {
+        throw pex;
       }
     }
 

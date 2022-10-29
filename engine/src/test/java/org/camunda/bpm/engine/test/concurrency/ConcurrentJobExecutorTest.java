@@ -44,6 +44,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.JobFailureCollector;
 import org.camunda.bpm.engine.impl.management.UpdateJobDefinitionSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.management.UpdateJobSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
@@ -98,7 +99,8 @@ public class ConcurrentJobExecutorTest {
   }
 
   @After
-  public void deleteJobs() {
+  public void tearDown() {
+    ClockUtil.reset();
     for(final Job job : managementService.createJobQuery().list()) {
 
       processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
@@ -135,6 +137,51 @@ public class ConcurrentJobExecutorTest {
     LOG.debug("test thread notifies thread 1");
     threadOne.proceedAndWaitTillDone();
     assertTrue(threadOne.exception instanceof OptimisticLockingException);
+  }
+
+  @Test
+  public void shouldCompleteTimeoutRetryWhenTimeoutedJobCompletesInbetween() {
+    // given a simple process with an async service task
+    testRule.deploy(Bpmn
+        .createExecutableProcess("process")
+          .startEvent()
+          .serviceTask("task")
+            .camundaAsyncBefore()
+            .camundaExpression("${true}")
+          .endEvent()
+        .done());
+    runtimeService.startProcessInstanceByKey("process");
+    Job currentJob = managementService.createJobQuery().singleResult();
+
+    // and a job is executed until before the command context is closed
+    JobExecutionThread threadOne = new JobExecutionThread(currentJob.getId());
+    threadOne.startAndWaitUntilControlIsReturned();
+
+    // and lock is expiring in the meantime
+    ClockUtil.offset((long) engineRule.getProcessEngineConfiguration().getJobExecutor().getLockTimeInMillis() + 10_000L);
+
+    // and job is acquired again
+    JobAcquisitionThread acquisitionThread = new JobAcquisitionThread();
+    acquisitionThread.startAndWaitUntilControlIsReturned();
+    acquisitionThread.proceedAndWaitTillDone();
+
+    // and the job is executed again until before the command context is closed
+    JobExecutionThread threadTwo = new JobExecutionThread(currentJob.getId());
+    threadTwo.startAndWaitUntilControlIsReturned();
+
+    // and the first execution finishes
+    threadOne.proceedAndWaitTillDone();
+
+    // when
+    threadTwo.proceedAndWaitTillDone();
+
+    // then
+    assertThat(threadOne.exception)
+      .isInstanceOf(OptimisticLockingException.class)
+      .hasMessageContaining("DELETE MessageEntity")
+      .hasMessageContaining("Entity was updated by another transaction concurrently");
+    assertThat(threadTwo.exception).isNull();
+    assertThat(managementService.createJobQuery().count()).isEqualTo(0L);
   }
 
   @Test
@@ -444,7 +491,8 @@ public class ConcurrentJobExecutorTest {
     public void run() {
       try {
         JobFailureCollector jobFailureCollector = new JobFailureCollector(jobId);
-        ExecuteJobHelper.executeJob(jobId, processEngineConfiguration.getCommandExecutorTxRequired(),jobFailureCollector, new ControlledCommand<Void>(activeThread, new ExecuteJobsCmd(jobId, jobFailureCollector)));
+        ExecuteJobHelper.executeJob(jobId, processEngineConfiguration.getCommandExecutorTxRequired(),jobFailureCollector,
+            new ControlledCommand<>(activeThread, new ExecuteJobsCmd(jobId, jobFailureCollector)));
 
       }
       catch (OptimisticLockingException e) {
@@ -467,7 +515,7 @@ public class ConcurrentJobExecutorTest {
       try {
         JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
         acquiredJobs = processEngineConfiguration.getCommandExecutorTxRequired()
-          .execute(new ControlledCommand<AcquiredJobs>(activeThread, new AcquireJobsCmd(jobExecutor)));
+          .execute(new ControlledCommand<>(activeThread, new AcquireJobsCmd(jobExecutor)));
 
       } catch (OptimisticLockingException e) {
         this.exception = e;
@@ -572,5 +620,4 @@ public class ConcurrentJobExecutorTest {
       }
     }
   }
-
 }

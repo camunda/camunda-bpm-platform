@@ -17,13 +17,13 @@
 
 var fs = require('fs');
 var through = require('through2');
+const path = require('path');
 
 var included = [
-  'angular',
-  'moment',
-  'camunda-bpm-sdk-js/lib/angularjs/index',
-  'camunda-bpm-sdk-js',
-  'q',
+  '@bpmn-io/dmn-migrate',
+  '@bpmn-io/form-js-editor',
+  '@bpmn-io/form-js-viewer',
+  '@bpmn-io/form-js',
   'angular-animate',
   'angular-cookies',
   'angular-data-depend',
@@ -35,28 +35,45 @@ var included = [
   'angular-sanitize',
   'angular-touch',
   'angular-translate',
+  'angular-ui-bootstrap',
+  'angular',
   'bootstrap',
   'bpmn-js',
+  'bpmn-js/lib/NavigatedViewer',
+  'camunda-bpm-sdk-js',
+  'camunda-bpm-sdk-js/lib/angularjs/index',
   'clipboard',
   'cmmn-js',
-  'dmn-js',
-  'jquery',
-  'lodash',
-
-  // Okay, this looks bad. But hear me out:
-  // We create our own DMN editor using DMN-JS
-  // DMN-JS only exports a viewer on the default entry, so we have to require the modules directly
-  // As we don't want to ship dmn-js multiple times, we need to bundle all the required libs here as well
-  // let's hope we can refactor this when we introduce DMN 1.3
-  // The culprit is over here:
-  // camunda-bpm-webapp/camunda-commons-ui/lib/widgets/dmn-viewer/lib/navigatedViewer.js
-  'dmn-js-shared/lib/base/Manager',
-  'dmn-js-drd/lib/NavigatedViewer',
+  'cmmn-js/lib/Viewer',
+  'cmmn-js/lib/NavigatedViewer',
+  'core-js',
   'dmn-js-decision-table/lib/Viewer',
+  'dmn-js-drd/lib/NavigatedViewer',
   'dmn-js-literal-expression/lib/Viewer',
-  'dmn-js-shared/lib/util/ModelUtil',
+  'dmn-js-shared/lib/base/Manager',
   'dmn-js-shared/lib/util/DiUtil',
-  'dmn-js/lib/Modeler'
+  'dmn-js-shared/lib/util/ModelUtil',
+  'dmn-js',
+  'dmn-js/lib/Modeler',
+  'dom4',
+  'events',
+  'fast-xml-parser',
+  'jquery',
+  'jquery/external/sizzle/dist/sizzle',
+  'jquery-ui/ui/data',
+  'jquery-ui/ui/plugin',
+  'jquery-ui/ui/safe-active-element',
+  'jquery-ui/ui/safe-blur',
+  'jquery-ui/ui/scroll-parent',
+  'jquery-ui/ui/version',
+  'jquery-ui/ui/widget',
+  'jquery-ui/ui/widgets/draggable',
+  'jquery-ui/ui/widgets/mouse',
+  'lodash',
+  'moment',
+  'mousetrap',
+  'q',
+  'superagent'
 ];
 
 module.exports = function(grunt, dirname, licensebookConfig) {
@@ -112,6 +129,79 @@ module.exports = function(grunt, dirname, licensebookConfig) {
     var b = require(dirname + '/node_modules/persistify')(
       browserifyOptions,
       persistifyOptions
+    );
+
+    const addMissingLicenseHeaders = row => {
+      if (
+        row.file &&
+        !row.file.endsWith('.json') &&
+        !/@license|@preserve|@lic|@cc_on|^\/\**!/i.test(row.source)
+      ) {
+        let pkg = null;
+        if (row.file.includes('node_modules')) {
+          pkg = row.file.replace(
+            /^(.*)node_modules\/(@[a-z-\d.]+\/[a-z-\d.]+)?([a-z-\d.]+)?(.*)$/,
+            (match, p1, p2, p3) => p2 || p3
+          );
+        } else if (!row.file.includes('camunda-bpm-sdk-js')) {
+          pkg = row.file.replace(
+            /^(@[a-z-\d.]+\/[a-z-\d.]+)?([a-z-\d.]+)?(.*)$/,
+            (match, p1, p2) => p2 || p1
+          );
+        }
+
+        if (pkg) {
+          let packagePath = `${process.cwd()}/node_modules/${pkg}`;
+          if (!fs.existsSync(packagePath)) {
+            packagePath = `${process.cwd()}/node_modules/camunda-bpm-webapp/node_modules/${pkg}`;
+          }
+
+          let licenseInfo = null;
+          try {
+            licenseInfo = fs.readFileSync(`${packagePath}/LICENSE`, 'utf8');
+          } catch (e) {
+            try {
+              licenseInfo = fs.readFileSync(
+                `${packagePath}/LICENSE.md`,
+                'utf8'
+              );
+            } catch (e) {
+              try {
+                licenseInfo = fs.readFileSync(
+                  `${packagePath}/LICENSE-MIT.txt`,
+                  'utf8'
+                );
+              } catch (e) {
+                try {
+                  licenseInfo = fs.readFileSync(
+                    `${packagePath}/LICENSE.txt`,
+                    'utf8'
+                  );
+                } catch (e) {
+                  console.log(`${pkg} has no license file. 🤷‍`);
+                }
+              }
+            }
+          }
+
+          let packageJsonPath = require.resolve(`${packagePath}/package.json`);
+          const {version, license} = require(packageJsonPath);
+          if (licenseInfo) {
+            row.source = `/*!\n@license ${pkg}@${version}\n${licenseInfo}*/\n${row.source}`;
+          } else if (license) {
+            console.log(`${pkg} has a "license" property. 🤷‍`);
+            row.source = `/*! @license ${pkg}@${version} (${license}) */\n${row.source}`;
+          }
+        }
+      }
+    };
+
+    b.pipeline.get('deps').push(
+      through.obj(function(row, enc, next) {
+        addMissingLicenseHeaders(row);
+        this.push(row);
+        next();
+      })
     );
 
     const includedFiles = licensebookConfig.includedFiles;

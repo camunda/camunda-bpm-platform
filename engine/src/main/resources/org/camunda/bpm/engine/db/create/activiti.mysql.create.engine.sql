@@ -69,7 +69,7 @@ create table ACT_GE_SCHEMA_LOG (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
 insert into ACT_GE_SCHEMA_LOG
-values ('0', CURRENT_TIMESTAMP, '7.18.0');
+values ('0', CURRENT_TIMESTAMP, '7.19.0');
 
 create table ACT_RE_DEPLOYMENT (
     ID_ varchar(64),
@@ -355,6 +355,8 @@ create table ACT_RU_BATCH (
   CONFIGURATION_ varchar(255),
   TENANT_ID_ varchar(64),
   CREATE_USER_ID_ varchar(255),
+  START_TIME_ datetime,
+  EXEC_START_TIME_ datetime,
   primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 

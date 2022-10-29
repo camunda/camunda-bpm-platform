@@ -16,6 +16,12 @@
  */
 package org.camunda.bpm.spring.boot.starter;
 
+import static junit.framework.TestCase.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Collections;
+import java.util.Date;
+
 import org.assertj.core.util.DateUtil;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
@@ -32,7 +38,6 @@ import org.camunda.bpm.spring.boot.starter.test.nonpa.TestApplication;
 import org.camunda.bpm.spring.boot.starter.test.nonpa.TestEventCaptor;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,12 +45,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.util.Collections;
-import java.util.Date;
-
-import static junit.framework.TestCase.fail;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(
@@ -244,7 +243,6 @@ public class CamundaEventingIT extends AbstractCamundaAutoConfigurationIT {
   }
 
   @Test
-  @Ignore("CAM-14699")
   public final void shouldEventHistoryTaskAssignmentChanges() {
     // given
     startEventingInstance();
@@ -330,7 +328,6 @@ public class CamundaEventingIT extends AbstractCamundaAutoConfigurationIT {
   }
 
   @Test
-  @Ignore("CAM-14699")
   public void shouldEventHistoryTaskMultipleAssignmentChanges() {
     // given
     startEventingInstance();

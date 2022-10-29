@@ -29,7 +29,7 @@ pipeline {
     stage('ASSEMBLY') {
       when {
         expression {
-          env.BRANCH_NAME == cambpmDefaultBranch() || (changeRequest() && !pullRequest.labels.contains('no-build'))
+          env.BRANCH_NAME == cambpmDefaultBranch() || (changeRequest() && !pullRequest.labels.contains('ci:no-build'))
         }
       }
       environment {
@@ -43,7 +43,7 @@ pipeline {
           runSteps: {
             withVault([vaultSecrets: [
                 [
-                    path        : 'secret/common/ci-cambpm/xlts.dev',
+                    path        : 'secret/products/cambpm/ci/xlts.dev',
                     secretValues: [
                         [envVar: 'XLTS_REGISTRY', vaultKey: 'registry'],
                         [envVar: 'XLTS_AUTH_TOKEN', vaultKey: 'authToken']]
@@ -66,7 +66,6 @@ pipeline {
                                   '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-webapp*.war',
                                   '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-engine-rest*.war',
                                   '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-example-invoice*.war',
-                                  '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-h2-webapp*.war',
                                   '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-bpm-run-modules-swaggerui-*-run-swaggerui-license-book-json.json')
 
             cambpmStash("platform-stash-runtime",
@@ -114,7 +113,9 @@ pipeline {
                 )
               }
 
-              if (cambpmWithLabels('daily', 'default-build', 'jdk', 'rolling-update', 'migration', 'wildfly', 'all-db', 'h2', 'db2', 'mysql', 'oracle', 'mariadb', 'sqlserver', 'postgresql')) {
+              // don't trigger the daily pipeline from a master branch build
+              // or if a PR has no relevant labels
+              if (env.BRANCH_NAME != cambpmDefaultBranch() && cambpmWithLabels('default-build', 'jdk', 'rolling-update', 'migration', 'wildfly', 'all-db', 'h2', 'db2', 'mysql', 'oracle', 'mariadb', 'sqlserver', 'postgresql')) {
                 cambpmTriggerDownstream(
                   platformVersionDir + "/cambpm-ce/cambpm-daily/${env.BRANCH_NAME}",
                   [string(name: 'UPSTREAM_PROJECT_NAME', value: upstreamProjectName),
@@ -133,6 +134,8 @@ pipeline {
           },
           postFailure: {
             cambpmPublishTestResult()
+            // archive any heap dumps generated in the target folder
+            cambpmArchiveArtifacts(false, '**/target/*.hprof')
           }
         ])
 
@@ -214,7 +217,7 @@ pipeline {
             ])
           }
         }
-        stage('engine-IT-tomcat-9-postgresql-1013') {
+        stage('engine-IT-tomcat-9-postgresql-142') {
           when {
             expression {
               cambpmWithLabels('all-as', 'tomcat')
@@ -222,7 +225,7 @@ pipeline {
           }
           steps {
             cambpmConditionalRetry([
-              agentLabel: 'postgresql_1013',
+              agentLabel: 'postgresql_142',
               runSteps: {
                 cambpmRunMaven('qa/', 'clean install -Ptomcat,postgresql,engine-integration', runtimeStash: true, archiveStash: true)
               },
@@ -232,7 +235,7 @@ pipeline {
             ])
           }
         }
-        stage('engine-IT-wildfly-postgresql-1013') {
+        stage('engine-IT-wildfly-postgresql-142') {
           when {
             expression {
               cambpmWithLabels('all-as', 'wildfly')
@@ -240,7 +243,7 @@ pipeline {
           }
           steps {
             cambpmConditionalRetry([
-              agentLabel: 'postgresql_1013',
+              agentLabel: 'postgresql_142',
               runSteps: {
                 cambpmRunMaven('qa/', 'clean install -Pwildfly,postgresql,engine-integration', runtimeStash: true, archiveStash: true)
               },
@@ -252,7 +255,7 @@ pipeline {
             ])
           }
         }
-        stage('engine-IT-XA-wildfly-postgresql-1013') {
+        stage('engine-IT-XA-wildfly-postgresql-142') {
           when {
             expression {
               cambpmWithLabels('wildfly')
@@ -260,7 +263,7 @@ pipeline {
           }
           steps {
             cambpmConditionalRetry([
-              agentLabel: 'postgresql_1013',
+              agentLabel: 'postgresql_142',
               runSteps: {
                 cambpmRunMaven('qa/', 'clean install -Pwildfly,postgresql,postgresql-xa,engine-integration', runtimeStash: true, archiveStash: true)
               },
