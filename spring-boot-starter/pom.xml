@@ -81,6 +81,8 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
+            <!-- 3.0.0-M3 provides support for Junit Jupiter tests -->
+            <version>3.0.0-M3</version>
             <executions>
               <execution>
                 <goals>
