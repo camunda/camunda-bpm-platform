@@ -31,6 +31,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.mock.Mocks;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -201,4 +202,133 @@ public class ExpressionManagerTest extends PluggableProcessEngineTest {
     String task2Var = (String) runtimeService.getVariable(processInstance.getId(), "task2Var");
     assertEquals("lastParam", task2Var);
   }
+
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void shouldResolveMethodExpressionWithOneNullParameter() {
+    // given
+    BpmnModelInstance process = Bpmn.createExecutableProcess("testProcess")
+        .startEvent()
+          .exclusiveGateway()
+            .condition("true", "${myBean.myMethod(execution.getVariable('v'), "
+                + "execution.getVariable('w'), execution.getVariable('x'), "
+                + "execution.getVariable('y'), execution.getVariable('z'))}")
+            .userTask("userTask")
+          .moveToLastGateway()
+            .condition("false", "${false}")
+            .endEvent()
+        .done();
+
+    deploymentId = repositoryService.createDeployment()
+        .addModelInstance("testProcess.bpmn", process)
+        .deploy()
+        .getId();
+
+    Mocks.register("myBean", new MyBean());
+
+    // when
+    runtimeService.startProcessInstanceByKey("testProcess",
+        Variables.createVariables()
+            .putValue("v", "a")
+            .putValue("w", null)
+            .putValue("x", "b")
+            .putValue("y", "c")
+            .putValue("z", "d"));
+
+    // then
+    HistoricActivityInstance userTask = historyService.createHistoricActivityInstanceQuery()
+        .activityId("userTask")
+        .singleResult();
+
+    assertThat(userTask).isNotNull();
+  }
+
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void shouldResolveMethodExpressionWithTwoNullParameter() {
+    // given
+    BpmnModelInstance process = Bpmn.createExecutableProcess("testProcess")
+        .startEvent()
+          .exclusiveGateway()
+            .condition("true", "${myBean.myMethod(execution.getVariable('v'), "
+                + "execution.getVariable('w'), execution.getVariable('x'), "
+                + "execution.getVariable('y'), execution.getVariable('z'))}")
+            .userTask("userTask")
+          .moveToLastGateway()
+            .condition("false", "${false}")
+            .endEvent()
+        .done();
+
+    deploymentId = repositoryService.createDeployment()
+        .addModelInstance("testProcess.bpmn", process)
+        .deploy()
+        .getId();
+
+    Mocks.register("myBean", new MyBean());
+
+    // when
+    runtimeService.startProcessInstanceByKey("testProcess",
+        Variables.createVariables()
+            .putValue("v", "a")
+            .putValue("w", null)
+            .putValue("x", "b")
+            .putValue("y", null)
+            .putValue("z", "d"));
+
+    // then
+    HistoricActivityInstance userTask = historyService.createHistoricActivityInstanceQuery()
+        .activityId("userTask")
+        .singleResult();
+
+    assertThat(userTask).isNotNull();
+  }
+
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void shouldResolveMethodExpressionWithNoNullParameter() {
+    // given
+    BpmnModelInstance process = Bpmn.createExecutableProcess("testProcess")
+        .startEvent()
+          .exclusiveGateway()
+            .condition("true", "${myBean.myMethod(execution.getVariable('v'), "
+                + "execution.getVariable('w'), execution.getVariable('x'), "
+                + "execution.getVariable('y'), execution.getVariable('z'))}")
+            .userTask("userTask")
+          .moveToLastGateway()
+            .condition("false", "${false}")
+            .endEvent()
+        .done();
+
+    deploymentId = repositoryService.createDeployment()
+        .addModelInstance("testProcess.bpmn", process)
+        .deploy()
+        .getId();
+
+    Mocks.register("myBean", new MyBean());
+
+    // when
+    runtimeService.startProcessInstanceByKey("testProcess",
+        Variables.createVariables()
+            .putValue("v", "a")
+            .putValue("w", "b")
+            .putValue("x", "c")
+            .putValue("y", "d")
+            .putValue("z", "e"));
+
+    // then
+    HistoricActivityInstance userTask = historyService.createHistoricActivityInstanceQuery()
+        .activityId("userTask")
+        .singleResult();
+
+    assertThat(userTask).isNotNull();
+  }
+
+  static class MyBean {
+
+    public boolean myMethod(String v, String w, String x, String y, String z) {
+      return true;
+    }
+
+  }
+
 }
