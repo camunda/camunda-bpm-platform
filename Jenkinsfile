@@ -25,6 +25,7 @@ pipeline {
   }
   parameters {
     string name: 'EE_DOWNSTREAM', defaultValue: 'cambpm-ee-main/PR-727', description: 'The name of the EE branch/PR to run the EE pipeline on, e.g. cambpm-ee-main-pr/master'
+    booleanParam name: 'HAS_ARTIFACTS', defaultValue: false, description: 'whether stores the artifacts in the build'
   }
   stages {
     stage('Maven'){
@@ -120,7 +121,7 @@ pipeline {
               cambpmArchiveArtifacts('3.8/**-list.txt')
               cambpmStash("platform-lists-3.8",
                           "**/**-list.txt")
-              cambpmStash("pom-3.8","3.8/.m2/org/camunda/**/*-SNAPSHOT/**/*.pom")
+              //cambpmStash("pom-3.8","3.8/.m2/org/camunda/**/*-SNAPSHOT/**/*.pom")
                         
               // JOB_NAME, e.g.: '7.15/cambpm-ce/cambpm-main/PR-1373'
               // keep leading slash for the absolute project path
@@ -137,7 +138,14 @@ pipeline {
            
            //    )
            //  }
-
+              if(env.HAS_ARTIFACTS) {
+                cambpmArchiveArtifacts(
+                       '3.8/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-*.tar.gz',
+                       '3.8/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-*.zip',
+                       '3.8/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-*.war')
+                //currentBuild.result = 'SUCCESS'
+               // return
+             }
 
             }
           }
@@ -219,7 +227,15 @@ pipeline {
               cambpmArchiveArtifacts('3.2/**-list.txt')
               cambpmStash("platform-lists-3.2",
                           "**/**-list.txt")
-              cambpmStash("pom-3.2","3.2/.m2/org/camunda/**/*-SNAPSHOT/**/*.pom")
+              //cambpmStash("pom-3.2","3.2/.m2/org/camunda/**/*-SNAPSHOT/**/*.pom")
+              if(env.HAS_ARTIFACTS) {
+                cambpmArchiveArtifacts(
+                       '3.2/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-*.tar.gz',
+                       '3.2/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-*.zip',
+                       '3.2/.m2/org/camunda/**/*-SNAPSHOT/**/camunda-*.war')
+                //currentBuild.result = 'SUCCESS'
+               // return
+             }
 
             }
           }
