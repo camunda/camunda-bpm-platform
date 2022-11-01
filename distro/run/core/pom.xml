@@ -138,21 +138,6 @@
 
   <build>
     <plugins>
-<!--         <plugin> -->
-<!--           <groupId>org.apache.maven.plugins</groupId> -->
-<!--           <artifactId>maven-dependency-plugin</artifactId> -->
-<!--           <executions> -->
-<!--             <execution> -->
-<!--               <phase>package</phase> -->
-<!--               <goals> -->
-<!--                 <goal>list</goal> -->
-<!--               </goals> -->
-<!--               <configuration> -->
-<!--                 <excludeGroupIds>com.sun.activation</excludeGroupIds> -->
-<!--               </configuration> -->
-<!--             </execution> -->
-<!--           </executions> -->
-<!--         </plugin> -->
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>

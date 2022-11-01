@@ -86,10 +86,6 @@
           <groupId>org.springframework</groupId>
           <artifactId>spring-core</artifactId>
         </exclusion>
-<!--         <exclusion> -->
-<!--           <groupId>com.sun.activation</groupId> -->
-<!--           <artifactId>javax.activation</artifactId> -->
-<!--         </exclusion> -->
       </exclusions>
     </dependency>
 

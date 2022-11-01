@@ -12,6 +12,7 @@ pipeline {
   }
   environment {
     LOGGER_LOG_LEVEL = 'DEBUG'
+    //MAVEN_VERSION = 'maven-3.8-latest'
   }
   options {
     buildDiscarder(logRotator(numToKeepStr: '5'))
@@ -24,7 +25,6 @@ pipeline {
   }
   parameters {
     string name: 'EE_DOWNSTREAM', defaultValue: 'cambpm-ee-main/PR-727', description: 'The name of the EE branch/PR to run the EE pipeline on, e.g. cambpm-ee-main-pr/master'
-    string name: 'MAVEN_VERSION', defaultValue: 'maven-3.8-latest', description: 'e.g. maven-3.2-latest'
   }
   stages {
     stage('Maven'){
