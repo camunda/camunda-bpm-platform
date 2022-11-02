@@ -26,7 +26,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import javax.inject.Inject;
-import javax.sql.DataSource;
 import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;

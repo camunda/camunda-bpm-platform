@@ -18,7 +18,6 @@ package org.camunda.bpm.quarkus.engine.test.persistence.conf;
 
 import io.quarkus.test.QuarkusUnitTest;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.quarkus.engine.test.helper.ProcessEngineAwareExtension;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -26,26 +25,23 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import javax.inject.Inject;
-import java.sql.SQLException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ChooseDefaultDatasourceConfigurationTest {
+public class NoDefaultDatasourceConfigurationTest {
 
   @RegisterExtension
   static QuarkusUnitTest unitTest = new ProcessEngineAwareExtension()
-      .withConfigurationResource("org/camunda/bpm/quarkus/engine/test/persistence/conf/multiple-datasources-application.properties")
-      .overrideConfigKey("quarkus.camunda.datasource", "<default>")
+      .withConfigurationResource("org/camunda/bpm/quarkus/engine/test/persistence/conf/secondary-datasource-application.properties")
+      .assertException(throwable -> assertThat(throwable)
+          .hasMessage("No datasource named '<default>' exists")
+          .isInstanceOf(IllegalArgumentException.class))
       .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class));
 
   @Inject
   protected ProcessEngine processEngine;
 
   @Test
-  public void shouldChooseDefaultDatasource() throws SQLException {
-    ProcessEngineConfiguration configuration = processEngine.getProcessEngineConfiguration();
-    assertThat(configuration.getDataSource().getConnection()).asString()
-        .contains("jdbc:h2:./camunda-h2-dbs/process-engine");
+  public void shouldExpectException() {
   }
 
 }
