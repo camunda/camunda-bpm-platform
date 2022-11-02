@@ -26,25 +26,25 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import javax.inject.Inject;
+
 import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class DefaultDatasourceConfigurationTest {
+public class DatasourceConfigurationTest {
 
   @RegisterExtension
   static QuarkusUnitTest unitTest = new ProcessEngineAwareExtension()
-      .withConfigurationResource("org/camunda/bpm/quarkus/engine/test/persistence/conf/secondary-datasource-application.properties")
+      .withConfigurationResource("org/camunda/bpm/quarkus/engine/test/persistence/conf/override-default-datasource-application.properties")
       .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class));
 
   @Inject
   protected ProcessEngine processEngine;
 
   @Test
-  public void shouldChooseDefaultDatasource() throws SQLException {
+  public void shouldOverrideDefaultDatasource() throws SQLException {
     ProcessEngineConfiguration configuration = processEngine.getProcessEngineConfiguration();
-    assertThat(configuration.getDataSource().getConnection()).asString()
-        .contains("jdbc:h2:./camunda-h2-dbs/process-engine");
+    assertThat(configuration.getDataSource().getConnection()).asString().contains("jdbc:h2:mem:primary");
   }
 
 }
