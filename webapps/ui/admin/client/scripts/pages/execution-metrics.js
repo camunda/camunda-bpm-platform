@@ -116,7 +116,7 @@ var Controller = [
         fetchTaskWorkerMetric(function(err, result) {
           if (!err) {
             $scope.loadingState = 'LOADED';
-            $scope.metrics.taskWorkers = result;
+            $scope.metrics = {taskWorkers: result};
           } else {
             setLoadingError('Could not load task worker metrics.');
             $scope.loadingState = 'ERROR';
