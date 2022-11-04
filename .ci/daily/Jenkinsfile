@@ -1,6 +1,6 @@
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
-@Library(['camunda-ci', 'cambpm-jenkins-shared-library@generate-rest-docs']) _
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
 
 def failedStageTypes = []
 
@@ -88,9 +88,9 @@ pipeline {
           }
         }
         stage('stage-restapi-docs') {
-          /*when {
+          when {
             branch cambpmDefaultBranch();
-          }*/
+          }
           steps {
             cambpmConditionalRetry([
               agentLabel : 'centos-stable',
