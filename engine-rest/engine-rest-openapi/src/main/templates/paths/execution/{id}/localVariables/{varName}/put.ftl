@@ -65,8 +65,7 @@
         dto = "ExceptionDto"
         desc = "The variable value or type is invalid, for example if the value could not be parsed
                 to an Integer value or the passed variable type is not supported.
-                See the [Introduction](${docsUrl}/reference/rest/overview/#error-
-                handling) for the error response format."
+                See the [Introduction](${docsUrl}/reference/rest/overview/#error-handling) for the error response format."
         last = true
     />
 
