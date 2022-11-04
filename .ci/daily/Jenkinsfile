@@ -96,7 +96,7 @@ pipeline {
               agentLabel : 'centos-stable',
               runSteps   : {
                 cambpmRunMaven('./engine-rest',
-                  "package -Dmaven.test.skip -DskipTests -pl '!engine-rest,!assembly'",
+                  "package -Dmaven.test.skip -pl '!engine-rest,!assembly'",
                   withNpm: true,
                   jdkVersion: 'jdk-11-latest')
               },
