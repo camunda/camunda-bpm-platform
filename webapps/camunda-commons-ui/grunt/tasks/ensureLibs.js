@@ -132,19 +132,22 @@ module.exports = function(grunt, dirname, licensebookConfig) {
     );
 
     const addMissingLicenseHeaders = row => {
+      // This fix ensures windows compatibility
+      // See https://github.com/camunda/camunda-bpm-platform/issues/2824
+      const rowFile = row.file.replace(/\\/g, '/');
       if (
-        row.file &&
-        !row.file.endsWith('.json') &&
+        rowFile &&
+        !rowFile.endsWith('.json') &&
         !/@license|@preserve|@lic|@cc_on|^\/\**!/i.test(row.source)
       ) {
         let pkg = null;
-        if (row.file.includes('node_modules')) {
-          pkg = row.file.replace(
+        if (rowFile.includes('node_modules')) {
+          pkg = rowFile.replace(
             /^(.*)node_modules\/(@[a-z-\d.]+\/[a-z-\d.]+)?([a-z-\d.]+)?(.*)$/,
             (match, p1, p2, p3) => p2 || p3
           );
-        } else if (!row.file.includes('camunda-bpm-sdk-js')) {
-          pkg = row.file.replace(
+        } else if (!rowFile.includes('camunda-bpm-sdk-js')) {
+          pkg = rowFile.replace(
             /^(@[a-z-\d.]+\/[a-z-\d.]+)?([a-z-\d.]+)?(.*)$/,
             (match, p1, p2) => p2 || p1
           );
