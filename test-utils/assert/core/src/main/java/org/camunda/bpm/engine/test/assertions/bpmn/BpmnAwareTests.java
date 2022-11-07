@@ -952,20 +952,32 @@ public class BpmnAwareTests extends AbstractAssertions {
     if (externalTask == null || variables == null) {
       throw new IllegalArgumentException(format("Illegal call of completeExternalTask(externalTask = '%s', variables = '%s') - both must not be null!", externalTask, variables));
     }
-    List<LockedExternalTask> lockedTasks = fetchAndLock(externalTask.getTopicName(), DEFAULT_WORKER_EXTERNAL_TASK, 1);
-    if (lockedTasks.isEmpty()) {
-      throw new NotFoundException(format("No lockable external task found for externalTask = '%s', variables = '%s'", externalTask, variables));
-    }
-    if (!lockedTasks.get(0).getId().equals(externalTask.getId())) {
-      throw new IllegalStateException(format("Multiple external tasks found for externalTask = '%s', variables = '%s'", externalTask, variables));
-    }
-    complete(lockedTasks.get(0), variables);
+    complete(externalTask, variables, Collections.EMPTY_MAP);
   }
 
-  // same with localVariables
+  /**
+   * Helper method to easily fetch, lock and complete an external task.<p>
+   * Note: if multiple external tasks exist that can be locked for the topic of
+   * the given external task, this method might throw an
+   * {@link IllegalStateException} if an external task with a different id is
+   * locked by chance. In this case, it is more advisable to use the
+   * {@link #fetchAndLock(String, String, int) fetchAndLock} and
+   * {@link #complete(LockedExternalTask, Map)} methods to achieve reliable results.
+   *
+   * @param externalTask
+   *          External task to be completed
+   * @param variables
+   *          Process variables to be passed to the process instance when
+   *          completing the task. For setting those variables, you can use
+   *          withVariables(String key, Object value, ...)
+   * @param localVariables
+   *          Local process variables to be passed to the process instance when
+   *          completing the task. For setting those variables, you can use
+   *          withVariables(String key, Object value, ...)
+   */
   public static void complete(ExternalTask externalTask, Map<String, Object> variables, Map<String, Object> localVariables) {
-    if (externalTask == null || variables == null) {
-      throw new IllegalArgumentException(format("Illegal call of completeExternalTask(externalTask = '%s', variables = '%s') - both must not be null!", externalTask, variables));
+    if (externalTask == null || localVariables == null) {
+      throw new IllegalArgumentException(format("Illegal call of completeExternalTask(externalTask = '%s', localvariables = '%s') - both must not be null!", externalTask, localVariables));
     }
     List<LockedExternalTask> lockedTasks = fetchAndLock(externalTask.getTopicName(), DEFAULT_WORKER_EXTERNAL_TASK, 1);
     if (lockedTasks.isEmpty()) {
@@ -1027,13 +1039,27 @@ public class BpmnAwareTests extends AbstractAssertions {
     if (lockedExternalTask == null || variables == null) {
       throw new IllegalArgumentException(format("Illegal call of completeExternalTask(lockedExternalTask = '%s', variables = '%s') - both must not be null!", lockedExternalTask, variables));
     }
-    externalTaskService().complete(lockedExternalTask.getId(), lockedExternalTask.getWorkerId(), variables);
+    complete(lockedExternalTask, variables, Collections.EMPTY_MAP);
   }
 
-  // same with localVariables
+  /**
+   * Helper method to easily complete a locked external task.
+   *
+   * @param lockedExternalTask
+   *          an external task that was locked using the
+   *          {@link #fetchAndLock(String, String, int) fetchAndLock} method
+   * @param variables
+   *          Process variables to be passed to the process instance when
+   *          completing the task. For setting those variables, you can use
+   *          withVariables(String key, Object value, ...)
+   * @param localVariables
+   *          Local process variables to be passed to the process instance when
+   *          completing the task. For setting those variables, you can use
+   *          withVariables(String key, Object value, ...)
+   */
   public static void complete(LockedExternalTask lockedExternalTask, Map<String, Object> variables, Map<String, Object> localVariables) {
-    if (lockedExternalTask == null || variables == null) {
-      throw new IllegalArgumentException(format("Illegal call of completeExternalTask(lockedExternalTask = '%s', variables = '%s') - both must not be null!", lockedExternalTask, variables));
+    if (lockedExternalTask == null || localVariables == null) {
+      throw new IllegalArgumentException(format("Illegal call of completeExternalTask(lockedExternalTask = '%s', localVariables = '%s') - both must not be null!", lockedExternalTask, localVariables));
     }
     externalTaskService().complete(lockedExternalTask.getId(), lockedExternalTask.getWorkerId(), variables, localVariables);
   }
