@@ -21,14 +21,17 @@ import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.DEFAULT
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.complete;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.externalTask;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.externalTaskQuery;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.fetchAndLock;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.historyService;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.runtimeService;
 import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.withVariables;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
@@ -294,6 +297,84 @@ public class ProcessEngineTestsCompleteExternalTaskTest extends ProcessAssertTes
         complete(lockedTasks.get(0), null);
       }
     }, IllegalArgumentException.class);
+  }
+
+  @Test
+  @Deployment(resources = { "bpmn/ExternalTaskAssert-localVariables.bpmn" })
+  public void testComplete_LockedTaskWithLocalVariables_Success() {
+    // When
+    ProcessInstance pi = runtimeService().startProcessInstanceByKey("ExternalTaskAssert-localVariables");
+    // Then
+    assertThat(externalTaskQuery().singleResult()).isNotNull();
+    // Then
+    assertThat(externalTaskQuery().singleResult()).hasTopicName("External_1");
+
+    // When
+    LockedExternalTask task = fetchAndLock("External_1", "worker1", 1).get(0);
+
+    assertThat(task.getActivityId()).isEqualTo("ExternalTask_1");
+
+    complete(
+      task,
+      Collections.EMPTY_MAP,
+      withVariables(
+        "local_variable_1", "value_1"));
+
+    // Then
+    assertThat(externalTaskQuery().singleResult()).isNotNull();
+    // Then
+    assertThat(externalTaskQuery().singleResult()).hasTopicName("Noop");
+    // Then
+    assertThat(pi).variables().containsKey("variable_1");
+  }
+
+  @Test
+  @Deployment(resources = { "bpmn/ExternalTaskAssert-localVariables.bpmn" })
+  public void testComplete_LockedTaskWithLocalVariables_Failure() {
+    // When
+    runtimeService().startProcessInstanceByKey("ExternalTaskAssert-localVariables");
+    // Then
+    assertThat(externalTaskQuery().singleResult()).isNotNull();
+    // Then
+    LockedExternalTask task = fetchAndLock("External_1", "worker1", 1).get(0);
+    assertThat(task.getActivityId()).isEqualTo("ExternalTask_1");
+    // Then
+    expect(()->complete(task), ProcessEngineException.class);
+  }
+
+  @Test
+  @Deployment(resources = { "bpmn/ExternalTaskAssert-localVariables.bpmn" })
+  public void testCompleteTaskWithLocalVariables_Success() {
+    // When
+    ProcessInstance pi = runtimeService().startProcessInstanceByKey("ExternalTaskAssert-localVariables");
+    // Then
+    assertThat(externalTaskQuery().singleResult()).isNotNull();
+    // Then
+    assertThat(externalTaskQuery().singleResult()).hasTopicName("External_1");
+    // When
+    complete(
+      externalTaskQuery().singleResult(),
+        Collections.EMPTY_MAP,
+        withVariables(
+          "local_variable_1", "value_1"));
+
+    // Then
+    assertThat(externalTaskQuery().singleResult()).isNotNull();
+    // Then
+    assertThat(externalTaskQuery().singleResult()).hasTopicName("Noop");
+    // Then
+    assertThat(pi).variables().containsKey("variable_1");
+  }
+
+  @Test
+  @Deployment(resources = { "bpmn/ExternalTaskAssert-localVariables.bpmn" })
+  public void testCompleteTaskWithoutLocalVariables_Failure() {
+    // When
+    runtimeService().startProcessInstanceByKey("ExternalTaskAssert-localVariables");
+    // Then
+    assertThat(externalTaskQuery().singleResult()).isNotNull();
+    // Then
+    expect(()->complete(externalTaskQuery().singleResult()), ProcessEngineException.class);
   }
 
   private ProcessInstance getProcessInstanceStarted() {
