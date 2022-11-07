@@ -1,6 +1,6 @@
 {
   "name": "fixed-support-cases",
-  "version": "7.19.0-alpha1",
+  "version": "7.19.0-SNAPSHOT",
   "description": "",
   "main": "index.js",
   "scripts": {
