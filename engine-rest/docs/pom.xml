@@ -1,10 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <parent>
     <artifactId>camunda-engine-rest-root</artifactId>
     <groupId>org.camunda.bpm</groupId>
-    <version>7.19.0-SNAPSHOT</version>
+    <version>7.19.0-alpha1</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -76,15 +75,15 @@
                 <configuration>
                   <target description="Build docs">
                     <exec executable="cmd" failonerror="true" dir="${project.basedir}">
-                      <arg value="/c"/>
-                      <arg value="npm"/>
-                      <arg value="install"/>
+                      <arg value="/c" />
+                      <arg value="npm" />
+                      <arg value="install" />
                     </exec>
                     <exec executable="cmd" failonerror="true" dir="${project.basedir}">
-                      <arg value="/c"/>
-                      <arg value="npm"/>
-                      <arg value="run"/>
-                      <arg value="build"/>
+                      <arg value="/c" />
+                      <arg value="npm" />
+                      <arg value="run" />
+                      <arg value="build" />
                     </exec>
                   </target>
                 </configuration>
@@ -118,11 +117,11 @@
                 <configuration>
                   <target description="Build docs">
                     <exec executable="npm" failonerror="true" dir="${project.basedir}">
-                      <arg value="install"/>
+                      <arg value="install" />
                     </exec>
                     <exec executable="npm" failonerror="true" dir="${project.basedir}">
-                      <arg value="run"/>
-                      <arg value="build"/>
+                      <arg value="run" />
+                      <arg value="build" />
                     </exec>
                   </target>
                 </configuration>
