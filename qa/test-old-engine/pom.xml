@@ -381,11 +381,6 @@
                 <exclude>**/SchemaLogEnsureSqlScriptTest.java</exclude>
 
                 <exclude>**/ManagementServiceTableCountTest.java</exclude>
-
-                <!-- Exclude test because testGetTableMetaData() asserts the column count of the Task table which changed, breaking this test. -->
-                <!-- See https://jira.camunda.com/browse/CAM-14677 -->
-                <!-- Reactivate with https://jira.camunda.com/browse/CAM-14698 -->
-                <exclude>**/ManagementServiceTest.java</exclude>
               </excludes>
               <testFailureIgnore>false</testFailureIgnore>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
