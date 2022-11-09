@@ -53,6 +53,7 @@ var Controller = [
     $scope.loadingState = 'INITIAL';
     $scope.alwaysShowUTWMetrics = configuration.getAlwaysShowUniqueTaskWorkerMetrics();
     $scope.showTaskWorkerMetric = $scope.alwaysShowUTWMetrics;
+    $scope.metrics = {};
 
     // sets loading state to error and updates error message
     function setLoadingError(error) {
@@ -116,7 +117,7 @@ var Controller = [
         fetchTaskWorkerMetric(function(err, result) {
           if (!err) {
             $scope.loadingState = 'LOADED';
-            $scope.metrics = {taskWorkers: result};
+            $scope.metrics.taskWorkers = result;
           } else {
             setLoadingError('Could not load task worker metrics.');
             $scope.loadingState = 'ERROR';
