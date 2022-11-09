@@ -93,14 +93,14 @@ pipeline {
               upstreamProjectName = "/" + env.JOB_NAME
               upstreamBuildNumber = env.BUILD_NUMBER
 
-              if (cambpmWithLabels('webapp-integration', 'all-as', 'h2', 'websphere', 'weblogic', 'jbosseap', 'run', 'spring-boot', 'authorizations', 'e2e')) {
-                cambpmTriggerDownstream(
-                  platformVersionDir + "/cambpm-ee/" + eeMainProjectBranch,
-                  [string(name: 'UPSTREAM_PROJECT_NAME', value: upstreamProjectName),
-                  string(name: 'UPSTREAM_BUILD_NUMBER', value: upstreamBuildNumber)],
-                  true, true, true
-                )
-              }
+//              if (cambpmWithLabels('webapp-integration', 'all-as', 'h2', 'websphere', 'weblogic', 'jbosseap', 'run', 'spring-boot', 'authorizations', 'e2e')) {
+//                cambpmTriggerDownstream(
+//                  platformVersionDir + "/cambpm-ee/" + eeMainProjectBranch,
+//                  [string(name: 'UPSTREAM_PROJECT_NAME', value: upstreamProjectName),
+//                  string(name: 'UPSTREAM_BUILD_NUMBER', value: upstreamBuildNumber)],
+//                  true, true, true
+//                )
+//              }
 
               // the sidetrack pipeline should be triggered on daily,
               // or PR builds only, master builds should be excluded.
