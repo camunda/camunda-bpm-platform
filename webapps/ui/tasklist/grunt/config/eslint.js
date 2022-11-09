@@ -19,7 +19,10 @@ module.exports = function(config, eslintConf) {
   'use strict';
 
   eslintConf.tasklist_scripts = {
-    src: ['<%= pkg.gruntConfig.tasklistSourceDir %>/scripts/**/*.js']
+    src: [
+      '<%= pkg.gruntConfig.tasklistSourceDir %>/en.json',
+      '<%= pkg.gruntConfig.tasklistSourceDir %>/scripts/**/*.js'
+    ]
   };
 
   eslintConf.tasklist_plugins = {

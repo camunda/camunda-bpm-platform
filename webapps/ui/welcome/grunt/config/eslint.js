@@ -19,7 +19,10 @@ module.exports = function(config, eslintConf) {
   'use strict';
 
   eslintConf.welcome_scripts = {
-    src: ['<%= pkg.gruntConfig.welcomeSourceDir %>/scripts/**/*.js']
+    src: [
+      '<%= pkg.gruntConfig.welcomeSourceDir %>/en.json',
+      '<%= pkg.gruntConfig.welcomeSourceDir %>/scripts/**/*.js'
+    ]
   };
 
   eslintConf.welcome_plugins = {

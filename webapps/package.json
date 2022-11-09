@@ -74,6 +74,7 @@
     "eslint": "7.26.0",
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-camunda-licensed": "0.4.3",
+    "eslint-plugin-i18n-json": "4.0.0",
     "eslint-plugin-prettier": "3.4.0",
     "exposify": "0.5.0",
     "fs-extra": "10.0.0",
