@@ -21,7 +21,7 @@ var angular = require('../../../../../camunda-bpm-sdk-js/vendor/angular');
 var camShareLink = require('../cam-share-link');
 var clipboardDefinition = require('../../clipboard/cam-widget-clipboard');
 
-require('angular-ui-bootstrap');
+require('ui-bootstrap4');
 require('angular-translate');
 
 

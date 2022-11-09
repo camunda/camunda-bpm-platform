@@ -1,0 +1,53 @@
+// To load all the mixins and
+@import "node_modules/bootstrap/scss/_functions.scss"; // from bootstrap
+@import "node_modules/bootstrap/scss/_variables.scss"; // from bootstrap
+
+// local ./bootstrap.scss import (which import "bootstrap" from the node_modules/bootstrap/scss).
+@import "node_modules/bootstrap/scss/_mixins.scss";
+
+// Reset
+@import "node_modules/bootstrap/scss/reboot.scss";
+@import "node_modules/bootstrap/scss/_print.scss";
+
+// Core CSS
+//@import "node_modules/bootstrap/scss/_scaffolding.scss";
+@import "node_modules/bootstrap/scss/_type.scss";
+@import "node_modules/bootstrap/scss/_code.scss";
+@import "node_modules/bootstrap/scss/_grid.scss";
+@import "node_modules/bootstrap/scss/_tables.scss";
+//@import "node_modules/bootstrap/scss/_glyphicons.scss";
+@import "node_modules/bootstrap/scss/_forms.scss";
+@import "node_modules/bootstrap/scss/_buttons.scss";
+
+// Components
+//@import "node_modules/bootstrap/scss/_component-animations.scss";
+// @import "node_modules/bootstrap/scss/_glyphicons.scss"; // moved before "forms" because it otherwise cause issues with form feedback
+@import "node_modules/bootstrap/scss/_dropdown.scss";
+@import "node_modules/bootstrap/scss/_button-group.scss";
+@import "node_modules/bootstrap/scss/_input-group.scss";
+@import "node_modules/bootstrap/scss/_nav.scss";
+@import "node_modules/bootstrap/scss/_navbar.scss";
+@import "node_modules/bootstrap/scss/_breadcrumb.scss";
+@import "node_modules/bootstrap/scss/_pagination.scss";
+//@import "node_modules/bootstrap/scss/_pager.scss";
+//@import "node_modules/bootstrap/scss/_labels.scss";
+@import "node_modules/bootstrap/scss/mixins/_badge.scss";
+@import "node_modules/bootstrap/scss/_jumbotron.scss";
+//@import "node_modules/bootstrap/scss/_thumbnails.scss";
+@import "node_modules/bootstrap/scss/_alert.scss";
+//@import "node_modules/bootstrap/scss/_progress-bars.scss";
+@import "node_modules/bootstrap/scss/_media.scss";
+@import "node_modules/bootstrap/scss/_list-group.scss";
+//@import "node_modules/bootstrap/scss/_panels.scss";
+//@import "node_modules/bootstrap/scss/_wells.scss";
+@import "node_modules/bootstrap/scss/_close.scss";
+
+// Components w/ JavaScript
+@import "node_modules/bootstrap/scss/_modal.scss";
+@import "node_modules/bootstrap/scss/_tooltip.scss";
+@import "node_modules/bootstrap/scss/_popover.scss";
+@import "node_modules/bootstrap/scss/_carousel.scss";
+
+// Utility classes
+@import "node_modules/bootstrap/scss/_utilities.scss";
+//@import "node_modules/bootstrap/scss/_responsive-utilities.scss";

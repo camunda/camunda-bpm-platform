@@ -20,7 +20,7 @@
 var angular = require('../../../../../camunda-bpm-sdk-js/vendor/angular');
 var clipboardDefinition = require('../cam-widget-clipboard');
 
-require('angular-ui-bootstrap');
+require('ui-bootstrap4');
 
 var clipboardModule = angular.module('clipboardModule', [
   'ui.bootstrap'

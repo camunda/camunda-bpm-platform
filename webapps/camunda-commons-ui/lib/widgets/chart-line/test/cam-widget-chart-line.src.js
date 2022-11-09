@@ -23,7 +23,7 @@ var angular = require('../../../../../camunda-bpm-sdk-js/vendor/angular'),
     data = {},
     chartLineDefinition = require('../cam-widget-chart-line');
 
-require('angular-ui-bootstrap');
+require('ui-bootstrap4');
 
 function shiftTimestamps(json) {
   var diff = moment().valueOf() - moment(json[0].timestamp).valueOf();

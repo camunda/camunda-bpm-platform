@@ -28,7 +28,7 @@ var angular = require('../../../../../camunda-bpm-sdk-js/vendor/angular'),
     varUtils = require('../../variable/cam-variable-utils'),
     camCommonsUi = require('../../index');
 
-require('angular-ui-bootstrap');
+require('ui-bootstrap4');
 require('angular-translate');
 
 var variableModule = angular.module('variableModule', [

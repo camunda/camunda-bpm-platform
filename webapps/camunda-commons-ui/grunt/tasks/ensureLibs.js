@@ -35,7 +35,7 @@ var included = [
   'angular-sanitize',
   'angular-touch',
   'angular-translate',
-  'angular-ui-bootstrap',
+  'ui-bootstrap4',
   'angular',
   'bootstrap',
   'bpmn-js',

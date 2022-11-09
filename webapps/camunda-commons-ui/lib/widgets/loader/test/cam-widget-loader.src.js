@@ -20,7 +20,7 @@
 var angular = require('../../../../../camunda-bpm-sdk-js/vendor/angular'),
     loaderDefinition = require('../cam-widget-loader');
 
-require('angular-ui-bootstrap');
+require('ui-bootstrap4');
 
 var loaderModule = angular.module('loaderModule', ['ui.bootstrap']);
 loaderModule.directive('camWidgetLoader', loaderDefinition);

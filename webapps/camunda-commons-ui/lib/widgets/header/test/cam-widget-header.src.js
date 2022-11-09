@@ -20,7 +20,7 @@
 var angular = require('../../../../../camunda-bpm-sdk-js/vendor/angular'),
     headerDefinition = require('../cam-widget-header');
 
-require('angular-ui-bootstrap');
+require('ui-bootstrap4');
 require('angular-translate');
 
 // naive auth object for test purposes
