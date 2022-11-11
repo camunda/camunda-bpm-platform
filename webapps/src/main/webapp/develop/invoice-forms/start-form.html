@@ -1,11 +1,11 @@
 <form role="form" name="invoiceForm"
       class="form-horizontal">
 
-  <div class="well">Please fill in the details for the invoice you received</div>
+  <div class="card"><div class="card-body">Please fill in the details for the invoice you received</div></div>
 
 
   <div class="form-group">
-    <label class="control-label col-md-4"
+    <label class="col-form-label col-md-4"
            for="invoiceDocumentUpload">Upload your Invoice Document (Required)</label>
     <div class="col-md-8">
       <input type="file"
@@ -14,13 +14,13 @@
              cam-variable-type="File"
              cam-max-filesize="10000000"
              class="form-control"/>
-      <div class="help-block">This field is required</div>
+      <div class="form-text">This field is required</div>
     </div>
   </div>
 
   <script cam-script type="text/form-script">
     var fileUpload = $('#invoiceDocumentUpload');
-    var fileUploadHelpBlock = $('.help-block', fileUpload.parent());
+    var fileUploadHelpBlock = $('.form-text', fileUpload.parent());
 
     function flagFileUpload() {
       var hasFile = fileUpload.get(0).files.length > 0;
@@ -43,7 +43,7 @@
 
 
   <div class="form-group">
-    <label class="control-label col-md-4"
+    <label class="col-form-label col-md-4"
            for="creditor">Creditor</label>
     <div class="col-md-8">
       <input cam-variable-name="creditor"
@@ -52,7 +52,7 @@
              class="form-control"
              type="text"
              required />
-      <div class="help-block">
+      <div class="form-text">
         (e.g. &quot;Great Pizza for Everyone Inc.&quot;)
       </div>
     </div>
@@ -60,7 +60,7 @@
 
 
   <div class="form-group">
-    <label class="control-label col-md-4"
+    <label class="col-form-label col-md-4"
            for="amount">Amount</label>
     <div class="col-md-8">
       <input cam-variable-name="amount"
@@ -70,7 +70,7 @@
              class="form-control"
              type="text"
              required />
-      <div class="help-block">
+      <div class="form-text">
         (e.g. &quot;30.00&quot;)
       </div>
 
@@ -83,7 +83,7 @@
 
 
   <div class="form-group">
-    <label class="control-label col-md-4"
+    <label class="col-form-label col-md-4"
            for="amount">Invoice Category</label>
     <div class="col-md-8">
       <select cam-variable-name="invoiceCategory"
@@ -98,7 +98,7 @@
 
 
   <div class="form-group">
-    <label class="control-label col-md-4"
+    <label class="col-form-label col-md-4"
            for="invoiceNumber">Invoice Number</label>
     <div class="col-md-8">
       <input cam-variable-name="invoiceNumber"
@@ -107,7 +107,7 @@
              class="form-control"
              type="text"
              required />
-      <div class="help-block">
+      <div class="form-text">
         (e.g. &quot;I-12345&quot;)
       </div>
     </div>

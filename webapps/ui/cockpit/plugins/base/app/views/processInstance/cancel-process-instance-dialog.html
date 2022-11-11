@@ -55,7 +55,7 @@
       <div  ng-hide="hideSkipCustomListeners"
             class="form-group skip-custom-listener">
 
-        <label class="control-label col-xs-5"
+        <label class="col-form-label col-xs-5"
                for="skipCustomListeners">
           {{ 'PLUGIN_CANCEL_PROCESS_SKIP_CUSTOM_LISTENERS' | translate }}
           <span class="glyphicon glyphicon-question-sign"
@@ -65,7 +65,7 @@
         </label>
 
         <div class="col-xs-7">
-          <label class="checkbox">
+          <label class="form-check">
             <input name="skipCustomListeners"
                    type="checkbox"
                    ng-model="options.skipCustomListeners">
@@ -77,7 +77,7 @@
       <div class="form-group skip-custom-listener"
            ng-hide="SKIP_IO_MAPPINGS.hidden">
 
-        <label class="control-label col-xs-5"
+        <label class="col-form-label col-xs-5"
                for="skipIoMappings">
           {{ 'PLUGIN_CANCEL_PROCESS_SKIP_IO_MAPPINGS' | translate }}
           <span class="glyphicon glyphicon-question-sign"
@@ -87,7 +87,7 @@
         </label>
 
         <div class="col-xs-7">
-          <label class="checkbox">
+          <label class="form-check">
             <input name="skipIoMappings"
                    type="checkbox"
                    ng-model="options.skipIoMappings">
@@ -112,7 +112,7 @@
 </div>
 
 <div class="modal-footer">
-  <button class="btn btn-default"
+  <button class="btn btn-secondary"
           ng-click="close(status)"
           ng-disabled="status === 'performCancellation'"
           ng-hide="status === 'cancellationSuccess' || status === 'cancellationFailed' || status === 'loadingFailed'">

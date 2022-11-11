@@ -6,9 +6,11 @@
 
 <div ng-show="taskState.$loaded">
   <div ng-hide="task">
-    <div class="no-task well">
+    <div class="no-task card">
+      <div class="card-body">
       <span class="glyphicon glyphicon-info-sign"></span>
       {{ 'SELECT_TASK_IN_LIST' | translate }}
+      </div>
     </div>
   </div>
 
@@ -57,7 +59,7 @@
           {{ 'TASK_HAS_BEEN_REMOVED' | translate }}
         </div>
         <div class="col-xs-4 text-right">
-          <button class="btn btn-default"
+          <button class="btn btn-secondary"
                   ng-click="dismissTask()">{{ 'CLOSE_TASK' | translate }}</button>
         </div>
       </div>

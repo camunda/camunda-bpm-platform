@@ -14,7 +14,7 @@
 
     <div class="form-group">
       <label for="filter-form-color"
-             class="col-xs-2 control-label">{{ 'NEW_TASK_NAME' | translate }}</label>
+             class="col-xs-2 col-form-label">{{ 'NEW_TASK_NAME' | translate }}</label>
       <div class="col-xs-10">
         <input class="form-control"
                name="taskName"
@@ -24,7 +24,7 @@
         <span ng-if="this.newTaskForm.taskName.$invalid && this.newTaskForm.taskName.$dirty"
               class="has-error">
           <span ng-show="this.newTaskForm.taskName.$error.required"
-                class="help-block">
+                class="form-text">
             {{ 'REQUIRED_FIELD' | translate }}
           </span>
         </span>
@@ -33,7 +33,7 @@
 
     <div class="form-group">
       <label for="filter-form-color"
-             class="col-xs-2 control-label">{{ 'NEW_TASK_ASSIGNEE' | translate }}</label>
+             class="col-xs-2 col-form-label">{{ 'NEW_TASK_ASSIGNEE' | translate }}</label>
       <div class="col-xs-10">
         <input class="form-control"
                name="taskAssignee"

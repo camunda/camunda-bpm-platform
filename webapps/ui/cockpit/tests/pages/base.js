@@ -47,7 +47,7 @@ module.exports = Page.extend({
   },
 
   navbarDropDownItems: function() {
-    return this.navbarDropDown().all(by.css('.dropdown-menu > li'));
+    return this.navbarDropDown().all(by.css('.dropdown-item'));
   },
 
   navbarDropDownItem: function(idx) {

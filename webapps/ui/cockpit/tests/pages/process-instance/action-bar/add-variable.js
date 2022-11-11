@@ -67,11 +67,11 @@ module.exports = ActionBar.extend({
   variableValueRadio: function(value) {
     if (value) {
       return element(
-        by.css('.modal-body .variable-value .radio [ng-value="true"]')
+        by.css('.modal-body .variable-value .form-check [ng-value="true"]')
       ).click();
     } else {
       return element(
-        by.css('.modal-body .variable-value .radio [ng-value="false"]')
+        by.css('.modal-body .variable-value .form-check [ng-value="false"]')
       ).click();
     }
   },

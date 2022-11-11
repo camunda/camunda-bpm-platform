@@ -14,9 +14,11 @@
 </div>
 
 <div ng-if="state.$loaded && !state.$error && !resources.length"
-     class="well">
+     class="card">
+  <div class="card-body">
   <span class="glyphicon glyphicon-info-sign"></span>
   {{ 'REPOSITORY_RESOURCES_NO_SRC_AVAILABLE' | translate }}
+  </div>
 </div>
 
 <ol ng-if="state.$loaded && !state.$error && resources.length"

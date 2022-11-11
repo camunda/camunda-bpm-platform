@@ -11,13 +11,13 @@
 
   <div class="section-content">
     <header class="row">
-      <div class="col-xs-8">
+      <div class="offset-8">
         <h3>{{title}} {{'AUTHORIZATION_AUTHORIZATIONS' | translate}}</h3>
       </div>
-      <div class="col-xs-4 text-right"
+      <div class="offset-4 text-right"
            ng-controller="AuthorizationCreateController">
         <a ng-click="addNewAuthorization()"
-           class="btn btn-default"
+           class="btn btn-secondary"
            ng-hide="loadingState === 'LOADING'">
           {{ 'AUTHORIZATION_CREATE_NEW_AUTHORIZATION' | translate }}
           <span class="glyphicon glyphicon-plus-sign"></span>
@@ -106,7 +106,7 @@
 
                 <div class="input-group-btn dropdown" uib-dropdown auto-close="outsideClick">
                   <button type="button"
-                          class="btn btn-default dropdown-toggle"
+                          class="btn btn-secondary dropdown-toggle"
                           uib-dropdown-toggle
                           aria-expanded="false">
                     <span class="glyphicon glyphicon-pencil"></span>
@@ -180,7 +180,7 @@
                   <span class="glyphicon glyphicon-ok "></span>
                 </button>
 
-                <a class="btn btn-default"
+                <a class="btn btn-secondary"
                    ng-click="cancelUpdateAuthorization(authorization)">
                   <span class="glyphicon glyphicon-ban-circle"></span>
                 </a>

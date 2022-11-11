@@ -34,9 +34,11 @@
     <div ng-hide="!processDefinitionState.$loaded || lookupProcessDefinitionByName.$loading">
 
       <div ng-hide="page.total"
-           class="well">
+           class="card">
+        <div class="card-body">
         <span class="glyphicon glyphicon-info-sign"></span>
         {{ 'NO_PROCESS_DEFINITION_AVAILABLE' | translate }}
+      </div>
       </div>
 
       <div ng-if="page.total" class="available-processes">

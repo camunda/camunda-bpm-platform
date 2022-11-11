@@ -61,7 +61,7 @@ module.exports = Base.extend({
 
   isPanelOpen: function(key) {
     var selecta = 'accordion [is-open="accordion.' + key + '"]';
-    var bdySelecta = selecta + ' .panel-body';
+    var bdySelecta = selecta + ' .card-body';
     return element(by.css(bdySelecta)).isDisplayed();
   },
 
@@ -225,7 +225,7 @@ module.exports = Base.extend({
 
   permissionIdHelpText: function() {
     return this.newPermissionPageElement()
-      .element(by.css('.help-block:not(.ng-hide)'))
+      .element(by.css('.form-text:not(.ng-hide)'))
       .getText();
   },
 
@@ -280,7 +280,7 @@ module.exports = Base.extend({
   criterionKeyHelpText: function(idx) {
     return this.criterionList()
       .get(idx)
-      .element(by.css('.help-block:not(.ng-hide)'))
+      .element(by.css('.form-text:not(.ng-hide)'))
       .getText();
   },
 

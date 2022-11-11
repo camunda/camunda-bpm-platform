@@ -8,9 +8,13 @@
 <div ng-show="resourceState.$loaded">
 
   <div ng-if="!resource">
-    <div class="no-resource well">
-      <span class="glyphicon glyphicon-info-sign"></span>
-      {{ 'REPOSITORY_DEPLOYMENT_RESOURCE_DIRECTIVES_SELECT_SRC' | translate }}
+    <div class="no-resource card">
+      <div class="card">
+        <div class="card-body">
+          <span class="glyphicon glyphicon-info-sign"></span>
+          {{ 'REPOSITORY_DEPLOYMENT_RESOURCE_DIRECTIVES_SELECT_SRC' | translate }}
+        </div>
+      </div>
     </div>
   </div>
 

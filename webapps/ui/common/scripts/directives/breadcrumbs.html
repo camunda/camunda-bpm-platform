@@ -33,7 +33,7 @@
 
     <span ng-if="(crumb.type === 'processDefinition' && crumb.processDefinition.suspended) || (crumb.type === 'processInstance' && crumb.processInstance.suspended)"
           ng-show="!crumb.hidden"
-          class="badge badge-warning badge-suspended"
+          class="badge badge-pill badge-warning badge-suspended"
           uib-tooltip="{{ 'BREAD_CRUMBS_CURRENTLY_SUSPENDED' | translate }}"
           tooltip-placement="bottom">
       <span class="glyphicon glyphicon-pause white"></span>

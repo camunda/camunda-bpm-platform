@@ -9,7 +9,7 @@
            class="match-any">
         <button ng-click="switchMatchType()"
                 type="button"
-                class="btn btn-default btn-xs"
+                class="btn btn-secondary btn-xs"
                 ng-disabled="searches.length < 2">
           {{ (matchAny ? 'CAM_WIDGET_SEARCH_MATCH_TYPE_ANY' : 'CAM_WIDGET_SEARCH_MATCH_TYPE_ALL') | translate }}
         </button>
@@ -71,7 +71,7 @@
 
     <span class="dropdown stored-criteria" uib-dropdown>
       <button ng-disabled="!searches.length && !hasCriteriaSets()"
-              class="dropdown-toggle btn btn-default" uib-dropdown-toggle>
+              class="dropdown-toggle btn btn-secondary" uib-dropdown-toggle>
         <span class="glyphicon glyphicon-floppy-disk"></span>
         <span class="caret"></span>
       </button>
@@ -88,7 +88,7 @@
             <span class="input-group-btn">
               <button ng-disabled="!searchCriteriaStorage.nameInput"
                       ng-click="storedCriteriaSaveClick($event)"
-                      class="btn btn-default"
+                      class="btn btn-secondary"
                       type="button">
                 <span class="glyphicon glyphicon-ok"></span>
               </button>

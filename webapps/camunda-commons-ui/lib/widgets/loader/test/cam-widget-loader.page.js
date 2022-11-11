@@ -30,7 +30,7 @@ Loader.prototype.stateText = function() {
   return this.node.element(by.css('.state-display')).getText();
 };
 Loader.prototype.defaultPanel = function() {
-  return this.node.element(by.css('.panel.panel-default'));
+  return this.node.element(by.css('.card.card-secondary'));
 };
 Loader.prototype.loadingNotice = function() {
   return this.node.element(by.css('.loader-state.loading'));

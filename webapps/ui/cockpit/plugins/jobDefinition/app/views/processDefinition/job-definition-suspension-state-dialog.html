@@ -26,7 +26,7 @@
 
       <fieldset>
         <div class="form-group">
-          <label class="col-xs-4 control-label"
+          <label class="col-xs-4 col-form-label"
                  for="includeJobsValue">
             {{ 'PLUGIN_JOBDEFINITION_INCLUDE_EXISTING_JOB' | translate }}
             <!-- activation -->
@@ -45,7 +45,7 @@
           </label>
 
 
-          <div class="col-xs-8 checkbox">
+          <div class="col-xs-8 form-check">
             <label>
               <input id="includeJobsValueId"
                      name="includeJobsValue"
@@ -56,7 +56,7 @@
         </div>
 
         <div class="form-group">
-          <label class="col-xs-4 control-label"
+          <label class="col-xs-4 col-form-label"
                  for="executeImmediately">
             {{ 'PLUGIN_JOBDEFINITION_EXECUTE' | translate }}
             <span class="glyphicon glyphicon-question-sign"
@@ -73,7 +73,7 @@
           </label>
 
           <div class="col-xs-8">
-            <div class="radio">
+            <div class="form-check">
               <label>
                 <input ng-model="data.executeImmediately"
                        ng-value="true"
@@ -83,7 +83,7 @@
               </label>
             </div>
 
-            <div class="radio">
+            <div class="form-check">
               <label>
                 <input ng-model="data.executeImmediately"
                        ng-value="false"
@@ -97,7 +97,7 @@
 
         <div class="form-group"
              ng-show="!data.executeImmediately">
-          <label class="col-xs-4 control-label"
+          <label class="col-xs-4 col-form-label"
                  for="executionDateValue">
             {{ 'PLUGIN_JOBDEFINITION_SCHEDULE_AT' | translate }}
           </label>

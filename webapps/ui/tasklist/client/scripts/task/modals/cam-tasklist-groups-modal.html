@@ -31,7 +31,7 @@
                 ng-click="addGroup()"
                 type="button"
                 ng-disabled="!isEnabled()">
-          <span class="hidden-sm hidden-xs">{{ 'GROUP_ADD' | translate }}</span>
+          <span class="d-sm-none d-none">{{ 'GROUP_ADD' | translate }}</span>
           <span class="glyphicon glyphicon-plus-sign"></span>
         </button>
       </div>
@@ -48,7 +48,7 @@
                ng-change="validateNewGroup()"/>
 
         <span ng-if="newGroup.error"
-              class="help-block">
+              class="form-text">
           {{ newGroup.error.message | translate }}
         </span>
       </div>

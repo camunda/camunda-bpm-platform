@@ -5,7 +5,7 @@
       <div class="form-group">
 
         <label for="filterName"
-               class="col-xs-3 control-label"
+               class="col-xs-3 col-form-label"
                translate="FILTER_NAME_LABEL">Name</label>
 
         <div class="col-xs-9">
@@ -20,7 +20,7 @@
 
           <span ng-if="this.filterGeneralForm.filterName.$invalid && this.filterGeneralForm.filterName.$dirty"
                 class="has-error">
-            <span ng-show="this.filterGeneralForm.filterName.$error.required" class="help-block">
+            <span ng-show="this.filterGeneralForm.filterName.$error.required" class="form-text">
               {{ 'REQUIRED_FIELD' | translate }}
             </span>
           </span>
@@ -35,7 +35,7 @@
       <div class="form-group">
 
         <label for="filter-form-color"
-               class="col-xs-6 control-label"
+               class="col-xs-6 col-form-label"
                translate="FILTER_COLOR_LABEL">Color</label>
 
         <div class="col-xs-6">
@@ -50,7 +50,7 @@
 
           <span ng-if="this.filterGeneralForm.filterColor.$invalid && this.filterGeneralForm.filterColor.$dirty"
                 class="has-error">
-            <span ng-show="this.filterGeneralForm.filterColor.$error.pattern" class="help-block">
+            <span ng-show="this.filterGeneralForm.filterColor.$error.pattern" class="form-text">
               {{ 'REQUIRED_HEX_COLOR_FIELD' | translate }}
             </span>
           </span>
@@ -66,7 +66,7 @@
       <div class="form-group">
 
         <label for="filter-form-description"
-               class="col-xs-3 control-label"
+               class="col-xs-3 col-form-label"
                translate="FILTER_DESCRIPTION_LABEL">Description</label>
 
         <div class="col-xs-9">
@@ -86,7 +86,7 @@
       <div class="form-group">
 
         <label for="filter-form-priority"
-               class="col-xs-6 control-label"
+               class="col-xs-6 col-form-label"
                translate="FILTER_PRIORITY_LABEL">Priority</label>
 
         <div class="col-xs-6">
@@ -101,7 +101,7 @@
 
           <span ng-if="this.filterGeneralForm.filterPriority.$invalid && this.filterGeneralForm.filterPriority.$dirty"
                 class="has-error">
-            <span ng-show="this.filterGeneralForm.filterPriority.$error.pattern" class="help-block">
+            <span ng-show="this.filterGeneralForm.filterPriority.$error.pattern" class="form-text">
               {{ 'REQUIRED_INTEGER_FIELD' | translate }}
             </span>
           </span>
@@ -113,7 +113,7 @@
   </div>
 
   <div class="row">
-    <div class="col-xs-offset-2 col-md-offset-10 col-xs-4 col-md-2 checkbox">
+    <div class="col-xs-offset-2 col-md-offset-10 col-xs-4 col-md-2 form-check">
       <label>
         <input class="form-control"
                name="filterRefresh"

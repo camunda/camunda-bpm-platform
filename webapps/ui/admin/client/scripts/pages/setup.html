@@ -5,16 +5,16 @@
        id="users"
        ng-switch on="created">
     <header class="row">
-      <div class="col-xs-8">
+      <div class="offset-8">
         <h3>{{ 'SETUP_SETUP' | translate }}</h3>
       </div>
-      <div class="col-xs-4 text-right">
+      <div class="offset-4 text-right">
       </div>
     </header>
 
     <div class="row"
          ng-switch-when="true">
-      <div class="col-md-12">
+      <div class="offset-12">
 
         <div uib-alert class="alert alert-success">
           <strong>{{ 'SETUP_USER_CREATED' | translate }}</strong>
@@ -27,7 +27,7 @@
 
     <div class="row"
          ng-switch-when="false">
-      <div class="col-md-8 box">
+      <div class="offset-8 box">
 
         <div notifications-panel
              class="notifications-panel"></div>
@@ -37,10 +37,10 @@
           <div class="h4">{{ 'SETUP_USER_ACCOUNT' | translate }}</div>
 
           <div class="form-group">
-            <label class="control-label col-sm-4"
+            <label class="col-form-label offset-4"
                    for="inputUserId">{{ 'SETUP_USER_ID' | translate }}</label>
 
-            <div class="col-sm-8">
+            <div class="offset-8">
               <input id="inputUserId"
                      name="userId"
                      class="form-control"
@@ -56,10 +56,10 @@
           </div>
 
           <div class="form-group">
-            <label class="control-label col-sm-4"
+            <label class="col-form-label offset-4"
                    for="inputPassword">{{ 'SETUP_USER_PASSWORD' | translate }}</label>
 
-            <div class="col-sm-8">
+            <div class="offset-8">
               <div cam-widget-password
                    cam-widget-password-profile="profile"
                    cam-widget-password-password="credentials.password"
@@ -77,10 +77,10 @@
           </div>
 
           <div class="form-group">
-            <label class="control-label col-sm-4"
+            <label class="col-form-label offset-4"
                    for="inputPasswordRepeat">{{ 'SETUP_USER_PASSWORD_REPEAT' | translate }}</label>
 
-            <div class="col-sm-8">
+            <div class="offset-8">
               <input id="inputPasswordRepeat"
                   name="inputPasswordRepeat"
                   class="form-control"
@@ -98,10 +98,10 @@
           <div class="h4">{{ 'SETUP_USER_PROFILE' | translate }}</div>
 
           <div class="form-group">
-            <label class="control-label col-sm-4"
+            <label class="col-form-label offset-4"
                 for="inputFirstname">{{ 'SETUP_USER_FIRSTNAME' | translate }}</label>
 
-            <div class="col-sm-8">
+            <div class="offset-8">
               <input id="inputFirstname"
                      name="firstname"
                      type="text"
@@ -118,10 +118,10 @@
           </div>
 
           <div class="form-group">
-            <label class="control-label col-sm-4"
+            <label class="col-form-label offset-4"
                 for="inputLastname">{{ 'SETUP_USER_LASTNAME' | translate }}</label>
 
-            <div class="col-sm-8">
+            <div class="offset-8">
               <input id="inputLastname"
                   type="text"
                   class="form-control"
@@ -137,10 +137,10 @@
           </div>
 
           <div class="form-group">
-            <label class="control-label col-sm-4"
+            <label class="col-form-label offset-4"
                 for="inputEmail">{{ 'SETUP_USER_EMAIL' | translate }}</label>
 
-            <div class="col-sm-8">
+            <div class="offset-8">
               <input id="inputEmail"
                   name="email"
                   type="text"
@@ -156,7 +156,7 @@
           </div>
 
           <div class="form-group">
-            <div class="col-sm-8 col-sm-offset-4">
+            <div class="offset-8 col-sm-offset-4">
               <button type="submit"
                       class="btn btn-primary"
                       ng-disabled="!createUserForm.$valid || !credentials.valid"
@@ -168,7 +168,8 @@
       </div>
 
       <div class="col-md-4">
-        <div class="well">
+        <div class="card">
+        <div class="card-body">
           <div class="h4">{{ 'SETUP_USER_MESSAGE_1' | translate }}</div>
           <p>{{ 'SETUP_USER_MESSAGE_2' | translate }}<strong>{{ engineName }}</strong>
           {{ 'SETUP_USER_MESSAGE_3' | translate }}
@@ -179,6 +180,7 @@
               {{ 'SETUP_USER_MESSAGE_5' | translate }}
             </a>
           </p>
+        </div>
         </div>
         </div>
     </div>

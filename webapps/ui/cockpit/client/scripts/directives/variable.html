@@ -2,7 +2,7 @@
   <!-- # CE - camunda-cockpit-ui/client/scripts/directives/variable.html -->
 
   <div ng-if="isBoolean(variable)">
-    <label class="radio">
+    <label class="form-check">
       <input ng-model="variable.value"
              ng-value="true"
              type="radio"
@@ -10,7 +10,7 @@
        true
     </label>
 
-    <label class="radio">
+    <label class="form-check">
       <input ng-model="variable.value"
              ng-value="false"
              type="radio"
@@ -62,7 +62,7 @@
             required></textarea>
 
   <div ng-if="isObject(variable)">
-      <label class="control-label"
+      <label class="col-form-label"
              for="objectTypeName">{{ 'VARIABLE_OBJECT_TYPE_NAME' | translate }}</label>
         <input id="objectTypeName"
                name="objectTypeName"
@@ -71,7 +71,7 @@
                ng-model="variable.valueInfo.objectTypeName"
                autofocus
                required />
-      <label class="control-label"
+      <label class="col-form-label"
              for="serializationDataFormat">{{ 'VARIABLE_SERIALIZATION_DATA_FORMAT' | translate }}</label>
         <input id="serializationDataFormat"
                name="serializationDataFormat"
@@ -79,7 +79,7 @@
                type="text"
                ng-model="variable.valueInfo.serializationDataFormat"
                required />
-      <label class="control-label"
+      <label class="col-form-label"
              for="serializedValue">{{ 'VARIABLE_SERIALIZED_VALUE' | translate }}</label>
         <textarea rows="5"
                   ng-model="variable.value"

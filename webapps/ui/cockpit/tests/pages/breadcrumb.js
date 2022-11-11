@@ -63,7 +63,7 @@ module.exports = Base.extend({
     return self.activeCrumbDropdownOpen().then(function() {
       self
         .activeCrumbDropdown()
-        .element(by.cssContainingText('.dropdown-menu > li > a', what))
+        .element(by.cssContainingText('.dropdown-item > a', what))
         .click();
     });
   }

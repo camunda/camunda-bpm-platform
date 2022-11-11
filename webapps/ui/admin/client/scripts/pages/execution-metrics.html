@@ -17,7 +17,7 @@
   </div>
 
   <div class="row">
-    <div class="form-group col-xs-12 col-sm-6">
+    <div class="form-group offset-12 offset-6">
       <label for="startDate">
         {{ 'EXECUTION_METRICS_START_DATE' | translate }}
       </label>
@@ -33,7 +33,7 @@
       </div>
     </div>
 
-    <div class="form-group col-xs-12 col-sm-6">
+    <div class="form-group offset-12 offset-6">
       <label for="endDate">
         {{ 'EXECUTION_METRICS_END_DATE' | translate }}
       </label>
@@ -60,9 +60,9 @@
   <div cam-widget-loader
        loading-state="{{ loadingState }}"
        text-error="{{ loadingError }}">
-    <div class="panel panel-default">
-      <div class="panel-heading">{{ 'EXECUTION_METRICS_RESULTS' | translate }}</div>
-      <div class="panel-body">
+    <div class="card card-secondary">
+      <div class="card-header">{{ 'EXECUTION_METRICS_RESULTS' | translate }}</div>
+      <div class="card-body">
         <ul>
           <li>
             <strong>{{ metrics.flowNodes.toLocaleString() }}</strong> {{ 'EXECUTION_METRICS_FNI' | translate }}
@@ -88,7 +88,7 @@
        ng-show="loadingState !== 'INITIAL'">
     <button type="submit"
             ng-disabled="!form.$valid || loadingState === 'LOADING'"
-            class="btn btn-default"
+            class="btn btn-secondary"
             ng-click="load()">
       {{ 'EXECUTION_METRICS_REFRESH' | translate }}
     </button>

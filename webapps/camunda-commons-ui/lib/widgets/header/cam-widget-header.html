@@ -1,5 +1,5 @@
 <div class="navbar-header">
-  <button type="button"
+  <!--<button type="button"
           class="navbar-toggle"
           ng-class="{open: !!navbarOpen}"
           ng-click="navbarOpen = !navbarOpen">
@@ -7,15 +7,17 @@
     <span></span>
     <span></span>
     <span></span>
-  </button>
+  </button>-->
 
-  <a class="navbar-brand app-banner"
-     ng-if="authentication.name"
-     href="#/"
-     title="{{ brandName }} {{ appName }}">
-     <span ng-bind-html="logo" class="brand-logo"></span>
-     <span class="brand-name" ng-cloak>{{ brandName }}</span>
-  </a>
+  <div class="float-left">
+    <a class="navbar-brand app-banner"
+       ng-if="authentication.name"
+       href="#/"
+       title="{{ brandName }} {{ appName }}">
+       <span ng-bind-html="logo" class="brand-logo"></span>
+       <span class="brand-name" ng-cloak>{{ brandName }}</span>
+    </a>
+  </div>
 
   <div class="small-screen-warning">
     <span class="glyphicon glyphicon-exclamation-sign"

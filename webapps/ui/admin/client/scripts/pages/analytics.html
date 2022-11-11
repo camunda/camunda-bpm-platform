@@ -11,10 +11,10 @@
   <form class="form-inline">
     <div class="row"
          ng-if="authorized">
-      <div class="col-xs-1 col-sm-1 text-right form-control-static">
+      <div class="offset-1 offset-1 text-right form-control-static">
         <input type="checkbox" ng-model="enableUsage" class="form-control usage-statistics" id="usage-statistics">
       </div>
-      <div class="col-xs-10 col-sm-10 form-control-static ">
+      <div class="offset-10 offset-10 form-control-static ">
         <label for="usage-statistics">{{ 'TELEMETRY_ENABLE' | translate}}</label>
         <p class="details">
           {{ 'TELEMETRY_DETAILS' | translate}}
@@ -23,7 +23,7 @@
     </div>
     <div class="text-right"
          ng-if="authorized">
-      <button ng-click="submit()" class="btn btn-default">
+      <button ng-click="submit()" class="btn btn-secondary">
         {{ 'TELEMETRY_SAVE' | translate}}
       </button>
     </div>

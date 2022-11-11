@@ -6,9 +6,11 @@
 
 <div ng-if="diagramState.$loaded">
   <div ng-hide="diagram.definition && diagram.xml"
-       class="well">
+       class="card">
+    <div class="card-body">
     <span class="glyphicon glyphicon-info-sign"></span>
     {{ 'NO_DIAGRAM' | translate }}
+    </div>
   </div>
 
   <div ng-if="processDefinition && diagram.xml">

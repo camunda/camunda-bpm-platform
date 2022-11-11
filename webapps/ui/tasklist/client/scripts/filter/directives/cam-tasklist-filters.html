@@ -14,7 +14,8 @@
      class="list-unstyled">
 
   <div ng-hide="totalItems"
-       class="well">
+       class="card">
+    <div class="card-body">
     <span class="glyphicon glyphicon-info-sign"></span>
     {{ 'NO_AVAILABLE_FILTER' | translate }}
     <div class="add-initial-filter" ng-if="userCanCreateFilter">
@@ -24,11 +25,12 @@
         {{ 'ADD_FILTER_HINT' | translate }}
       </a>
     </div>
+    </div>
   </div>
 
   <div ng-show="totalItems"
        ng-repeat="(delta, filter) in filters"
-       class="item task-filter cells-wrapper"
+       class="carousel-item task-filter cells-wrapper"
        ng-class="{active: isFocused(filter)}"
        ng-style="filter.style"
        ng-click="focus(filter)">

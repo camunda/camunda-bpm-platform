@@ -116,7 +116,7 @@
         <pre ng-non-bindable>&lt;div cam-widget-loader
      loading-state="LOADED"&gt;
 
-  &lt;div class="panel panel-default"&gt;
+  &lt;div class="panel card-secondary"&gt;
     &lt;div class="panel-heading"&gt;
       This has been loaded
     &lt;/div&gt;
@@ -130,7 +130,7 @@
           <div cam-widget-loader
                loading-state="LOADED">
 
-            <div class="panel panel-default">
+            <div class="panel card-secondary">
               <div class="panel-heading">
                 This has been loaded
               </div>
@@ -200,12 +200,12 @@
         <h3>Interactive</h3>
         <pre ng-non-bindable>&lt;div class="row"&gt;
   &lt;div class="btn-group col-xs-4"&gt;
-    &lt;button class="btn btn-default reload"
+    &lt;button class="btn btn-secondary reload"
             ng-click="reload()"
             ng-enabled="ctrlState !== 'LOADING'"&gt;
       Load
     &lt;/button&gt;
-    &lt;button class="btn btn-default reload-empty"
+    &lt;button class="btn btn-secondary reload-empty"
             ng-click="reload(true)"
             ng-enabled="ctrlState !== 'LOADING'"&gt;
       Load empty
@@ -226,7 +226,7 @@
      loading-state="{{ ctrlState }}"
      text-error="Custom error text"&gt;
 
-  &lt;div class="panel panel-default"&gt;
+  &lt;div class="panel card-secondary"&gt;
     &lt;div class="panel-heading"&gt;
       This has been loaded
     &lt;/div&gt;
@@ -240,12 +240,12 @@
              id="interactive-container">
           <div class="row">
             <div class="btn-group col-xs-4">
-              <button class="btn btn-default reload"
+              <button class="btn btn-secondary reload"
                       ng-click="reload()"
                       ng-enabled="ctrlState !== 'LOADING'">
                 Load
               </button>
-              <button class="btn btn-default reload-empty"
+              <button class="btn btn-secondary reload-empty"
                       ng-click="reload(true)"
                       ng-enabled="ctrlState !== 'LOADING'">
                 Load empty
@@ -266,7 +266,7 @@
                loading-state="{{ ctrlState }}"
                text-error="Custom error text">
 
-            <div class="panel panel-default">
+            <div class="panel card-secondary">
               <div class="panel-heading">
                 This has been loaded
               </div>

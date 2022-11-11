@@ -4,16 +4,16 @@
     <div class="col-xs-2 row-action" ng-show="!filter.id || (filter.id && accesses.update)">
       <a ng-click="addCriterion()"
          href>
-        <span class="hidden-sm hidden-xs">{{ 'FILTER_ADD_CRITERION' | translate }}</span>
+        <span class="d-sm-none d-none">{{ 'FILTER_ADD_CRITERION' | translate }}</span>
         <span class="glyphicon glyphicon-plus-sign"></span>
       </a>
     </div>
 
     <div ng-class="{ 'col-xs-10': !filter.id || (filter.id && accesses.update) , 'col-xs-12': !(!filter.id || (filter.id && accesses.update)) }">
       <div class="form-group" ng-show="query.length">
-        <label class="col-xs-6 control-label"
+        <label class="col-xs-6 col-form-label"
                translate="FILTER_CRITERIA_KEY">Key</label>
-        <label class="col-xs-6 control-label"
+        <label class="col-xs-6 col-form-label"
                translate="FILTER_CRITERIA_VALUE">Value</label>
       </div>
     </div>
@@ -27,7 +27,7 @@
       <div class="col-xs-2 row-action" ng-show="!filter.id || (filter.id && accesses.update)">
         <a ng-click="removeCriterion(delta)"
            href>
-          <span class="hidden-sm hidden-xs">{{ 'FILTER_REMOVE_CRITERION' | translate }}</span>
+          <span class="d-sm-none d-none">{{ 'FILTER_REMOVE_CRITERION' | translate }}</span>
           <span class="glyphicon glyphicon-remove-sign"></span>
         </a>
       </div>
@@ -60,10 +60,10 @@
             </select>
             <div ng-if="this.criteriaFieldForm.queryParamKey.$invalid && this.criteriaFieldForm.queryParamKey.$dirty"
                     class="has-error">
-                <span ng-show="this.criteriaFieldForm.queryParamKey.$error.required" class="help-block">
+                <span ng-show="this.criteriaFieldForm.queryParamKey.$error.required" class="form-text">
                   {{ 'REQUIRED_FIELD' | translate }}
                 </span>
-                <span ng-show="this.criteriaFieldForm.queryParamKey.$error.camUniqueValue" class="help-block">
+                <span ng-show="this.criteriaFieldForm.queryParamKey.$error.camUniqueValue" class="form-text">
                   {{ 'REQUIRE_UNIQUE_KEY' | translate }}
                 </span>
             </div>
@@ -80,7 +80,7 @@
                      required
                      ng-readonly="filter.id && !accesses.update"
                      ng-disabled="filter.id && !accesses.update" />
-              <span class="help-block text-help"
+              <span class="form-text text-help"
                     ng-show="isCriteriaHelpAvailable(queryParam.key)">
                 {{ getCriteriaHelp(queryParam.key) | translate }}
               </span>
@@ -88,19 +88,19 @@
               <div ng-if="this.criteriaFieldForm.queryParamValue.$invalid && this.criteriaFieldForm.queryParamValue.$dirty"
                    class="has-error">
                 <span ng-show="this.criteriaFieldForm.queryParamValue.$error.required"
-                      class="help-block">
+                      class="form-text">
                   {{ 'REQUIRED_FIELD' | translate }}
                 </span>
                 <span ng-show="this.criteriaFieldForm.queryParamValue.$error.number"
-                      class="help-block">
+                      class="form-text">
                   {{ 'REQUIRED_INTEGER_FIELD' | translate }}
                 </span>
                 <span ng-show="this.criteriaFieldForm.queryParamValue.$error.date"
-                      class="help-block">
+                      class="form-text">
                   {{ 'INVALID_DATE' | translate }}
                 </span>
                 <span ng-show="this.criteriaFieldForm.queryParamValue.$error.dateValue"
-                      class="help-block">
+                      class="form-text">
                   {{ 'INVALID_DATE_VALUE' | translate }}
                 </span>
               </div>
@@ -125,14 +125,14 @@
 
   <div ng-if="canIncludeAssignedTasks()"
        class="row">
-    <div class="col-xs-10 col-xs-offset-2 checkbox">
+    <div class="col-xs-10 col-xs-offset-2 form-check">
       <label>
         <input type="checkbox"
                class="form-control"
                ng-model="filter.includeAssignedTasks" />
         {{ 'FILTER_CRITERIA_INCLUDE_ASSIGNED_TASKS' | translate }}
       </label>
-      <div class="help-block"
+      <div class="form-text"
            translate="FILTER_CRITERIA_INCLUDE_ASSIGNED_TASKS_HINT"></div>
     </div>
   </div>
@@ -141,7 +141,7 @@
        class="row match-type">
     <div class="col-xs-10 col-xs-offset-2">
       <button ng-click="switchMatchType()"
-              class="btn btn-default btn-xs"
+              class="btn btn-secondary btn-xs"
               ng-disabled="query.length < 2"
               type="button">
         {{ (filter.matchType === 'all' ? 'MATCH_TYPE_ALL' : 'MATCH_TYPE_ANY') | translate }}

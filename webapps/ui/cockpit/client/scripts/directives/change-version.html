@@ -9,16 +9,16 @@
          required>
          <button ng-click="changeLocation()"
           ng-disabled="!isValid || isValidating || storedVersion == model.newVersion"
-          class="btn btn-xs btn-default">
+          class="btn btn-xs btn-secondary">
     <span class="glyphicon glyphicon-ok"></span>
   </button>
   <button ng-click="close(changeVersionForm)"
-          class="btn btn-xs btn-default">
+          class="btn btn-xs btn-secondary">
     <span class="glyphicon glyphicon-remove"></span>
   </button>
 </form>
 <button ng-if="!isActive"
         ng-click="open()"
-        class="btn btn-xs btn-default">
+        class="btn btn-xs btn-secondary">
   <span>{{ definition.version }}</span>
 </button>

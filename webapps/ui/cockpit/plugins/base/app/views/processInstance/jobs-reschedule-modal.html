@@ -12,7 +12,7 @@
     <form name="rescheduleJobDuedateForm" class="form-horizontal">
       <fieldset>
         <div class="form-group">
-          <label class="control-label col-xs-4">
+          <label class="col-form-label col-xs-4">
                   {{'PLUGIN_JOBS_RECALCULATE' | translate}}
 
             <span uib-tooltip="{{'PLUGIN_JOBS_RECALCULATE_TOOLTIP' | translate}}"
@@ -22,12 +22,12 @@
           </label>
 
           <div class="col-xs-8">
-              <label class="radio">
+              <label class="form-check">
                 <input type="radio" ng-model="recalculationType" value="creation">
                 {{ 'PLUGIN_JOBS_FROM_CREATION' | translate }}
               </label>
 
-            <label class="radio">
+            <label class="form-check">
                 <input type="radio" ng-model="recalculationType" value="now">
                 {{ 'PLUGIN_JOBS_FROM_NOW' | translate }}
             </label>
@@ -35,7 +35,7 @@
         </div>
 
         <div class="form-group">
-          <label class="control-label col-xs-4">
+          <label class="col-form-label col-xs-4">
                   {{'PLUGIN_JOBS_SPECIFIC_DATE' | translate}}
 
             <span uib-tooltip="{{'PLUGIN_JOBS_SPECIFIC_DATE_TOOLTIP' | translate}}"
@@ -45,14 +45,14 @@
           </label>
 
           <div class="col-xs-8">
-              <label class="radio">
+              <label class="form-check">
                 <input type="radio" ng-model="recalculationType" value="specific">
               </label>
           </div>
         </div>
         <div class="form-group"
             ng-show="recalculationType==='specific'">
-          <label class="control-label col-xs-4">
+          <label class="col-form-label col-xs-4">
             {{'PLUGIN_JOBS_CASCADE' | translate}}
 
           <span uib-tooltip="{{'PLUGIN_JOBS_CASCADE_TOOLTIP' | translate}}"
@@ -62,12 +62,12 @@
           </label>
 
           <div class="col-xs-8">
-            <label class="checkbox">
+            <label class="form-check">
                 <input type="checkbox" ng-model="cascade">
             </label>
           </div>
 
-          <label class="control-label col-xs-4">
+          <label class="col-form-label col-xs-4">
             {{'PLUGIN_JOBS_DATE_INPUT' | translate}}
           </label>
 
@@ -85,7 +85,7 @@
 
 <div class="modal-footer">
    <button ng-click="$dismiss()"
-          class="btn btn-default">
+          class="btn btn-secondary">
     {{ 'PLUGIN_JOBS_CLOSE' | translate }}
   </button>
   <button ng-click="submit()"

@@ -19,7 +19,7 @@
       <span>{{ 'FILTER_FORM_PERMISSIONS_EDIT_HINT' | translate }}</span>
     </div>
 
-    <div class="global-access checkbox form-control-static"
+    <div class="global-access form-check form-control-static"
          ng-show="!filter.id || (filter.id && accesses.update)">
       <label>
         <input type="checkbox"
@@ -39,15 +39,15 @@
                   ng-click="addReadPermission()"
                   type="button"
                   ng-disabled="disableAddButton()">
-            <span class="hidden-sm hidden-xs">{{ 'ADD_PERMISSION' | translate }}</span>
+            <span class="d-sm-none d-none">{{ 'ADD_PERMISSION' | translate }}</span>
             <span class="glyphicon glyphicon-plus-sign"></span>
           </button>
         </div>
 
-        <label class="col-xs-2 control-label">
+        <label class="col-xs-2 col-form-label">
           {{ 'FILTER_FORM_PERMISSION_GROUP_USER' | translate }}
         </label>
-        <label class="col-xs-8 control-label">
+        <label class="col-xs-8 col-form-label">
           {{ 'FILTER_FORM_PERMISSION_IDENTIFIER' | translate }}
         </label>
       </div>
@@ -59,7 +59,7 @@
           <button class="btn btn-link btn-remove"
                   ng-if="!isGlobalReadAuthorization"
                   ng-click="removeReadPermission(auth)">
-            <span class="hidden-sm hidden-xs">
+            <span class="d-sm-none d-none">
               {{ 'FILTER_FORM_PERMISSIONS_REMOVE' | translate }}
             </span>
             <span class="glyphicon glyphicon-remove-sign"></span>
@@ -83,7 +83,7 @@
       <div class="form-group new-permission"
            ng-if="showNewPermissionFields">
         <div class="col-xs-2 col-xs-offset-2">
-          <button class="btn btn-default"
+          <button class="btn btn-secondary"
                   type="button"
                   tooltip-append-to-body="false"
                   uib-tooltip="{{ 'FILTER_FORM_PERMISSIONS_IDENTITY_TYPE_TOOLTIP' | translate }}: {{ (newPermission.type === 'user' ? 'FILTER_FORM_PERMISSIONS_IDENTITY_TYPE_USER' : 'FILTER_FORM_PERMISSIONS_IDENTITY_TYPE_GROUP') | translate }}"
@@ -108,15 +108,15 @@
           <div ng-if="this.filterPermissionForm.newPermission.$invalid && this.filterPermissionForm.newPermission.$dirty"
                class="has-error">
             <span ng-show="this.filterPermissionForm.newPermission.$error.required"
-                  class="help-block">
+                  class="form-text">
               {{ 'REQUIRED_FIELD' | translate }}
             </span>
             <span ng-show="this.filterPermissionForm.newPermission.$error.duplicate && newPermission.type === 'user'"
-                  class="help-block">
+                  class="form-text">
               {{ 'FILTER_FORM_PERMISSIONS_DUPLICATE_USER' | translate }}
             </span>
             <span ng-show="this.filterPermissionForm.newPermission.$error.duplicate && newPermission.type === 'group'"
-                  class="help-block">
+                  class="form-text">
               {{ 'FILTER_FORM_PERMISSIONS_DUPLICATE_GROUP' | translate }}
             </span>
           </div>

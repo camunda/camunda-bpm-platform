@@ -23,18 +23,18 @@
 
   <div class="section-content">
     <header class="row">
-      <div class="col-xs-8">
+      <div class="offset-8">
         <h3>{{ 'USERS_EDIT_USER' | translate }} {{user.firstName}} {{user.lastName}}</h3>
       </div>
-      <div class="col-xs-4 text-right">
-        <a class="btn btn-default"
+      <div class="offset-4 text-right">
+        <a class="btn btn-secondary"
            ng-if="show('groups')"
            ng-click="openCreateGroupMembershipDialog()">
           {{ 'USERS_ADD_TO_A_GROUP' | translate }}
           <span class="glyphicon glyphicon-plus-sign"></span>
         </a>
 
-        <a class="btn btn-default"
+        <a class="btn btn-secondary"
            ng-if="show('tenants')"
            ng-click="openCreateTenantMembershipDialog()">
           {{ 'USERS_ADD_TO_A_TENANT' | translate }}
@@ -55,10 +55,10 @@
         <div class="h4">{{ 'USERS_PROFILE' | translate }}</div>
 
         <div class="form-group">
-          <label class="control-label col-sm-4 col-md-2"
+          <label class="col-form-label offset-4 offset-2"
                  for="inputFirstname">{{ 'USERS_FIRSTNAME' | translate }}</label>
 
-          <div class="col-sm-8 col-md-10">
+          <div class="offset-8 offset-10">
             <input id="inputFirstname"
                    name="firstname"
                    class="form-control"
@@ -68,7 +68,7 @@
                    novalidate
                    required/>
 
-            <p class="help-block"
+            <p class="form-text"
                ng-show="editProfileForm.firstname.$error.required">
               {{ 'USERS_FIRSTNAME_REQUIRED' | translate }}
             </p>
@@ -76,10 +76,10 @@
         </div>
 
         <div class="form-group">
-          <label class="control-label col-sm-4 col-md-2"
+          <label class="col-form-label offset-4 offset-2"
                  for="inputLastname">{{ 'USERS_LASTNAME' | translate }}</label>
 
-          <div class="col-sm-8 col-md-10">
+          <div class="offset-8 offset-10">
             <input id="inputLastname"
                    type="text"
                    class="form-control"
@@ -88,7 +88,7 @@
                    novalidate
                    required />
 
-            <p class="help-block"
+            <p class="form-text"
                ng-show="editProfileForm.firstname.$error.required">
               {{ 'USERS_LASTNAME_REQUIRED' | translate }}
             </p>
@@ -96,7 +96,7 @@
         </div>
 
         <div class="form-group">
-          <label class="control-label col-sm-4 col-md-2"
+          <label class="col-form-label offset-4 col-md-2"
                  for="inputEmail">{{ 'USERS_EMAIL' | translate }}</label>
 
           <div class="col-sm-8 col-md-10">
@@ -108,7 +108,7 @@
                    ng-disabled="!availableOperations.update"
                    data-email />
 
-            <p class="help-block"
+            <p class="form-text"
                ng-show="editProfileForm.email.$error.email">
               {{ 'USERS_EMAIL_INVALID' | translate }}
             </p>
@@ -139,13 +139,13 @@
         <p>{{ 'USERS_TYPE_NEW_PASSWORD' | translate }}</p>
 
         <div class="form-group">
-          <label class="control-label col-sm-4 col-md-2"
+          <label class="col-form-label col-sm-4 col-md-2"
                  for="inputAuthenticationUserPassword"
                  ng-if="userId === authenticatedUser">
             {{ 'USERS_OLD_PASSWORD' | translate }}
           </label>
 
-          <label class="control-label col-sm-4 col-md-2"
+          <label class="col-form-label col-sm-4 col-md-2"
                  for="inputAuthenticationUserPassword"
                  ng-if="userId !== authenticatedUser">
             {{ currentUserPassword }}
@@ -162,7 +162,7 @@
         </div>
 
         <div class="form-group">
-          <label class="control-label col-sm-4 col-md-2"
+          <label class="col-form-label col-sm-4 col-md-2"
                  for="inputPassword">{{ 'USERS_NEW_PASSWORD' | translate }}</label>
 
           <div class="col-sm-8 col-md-10">
@@ -179,7 +179,7 @@
         </div>
 
         <div class="form-group">
-          <label class="control-label col-sm-4 col-md-2"
+          <label class="col-form-label col-sm-4 col-md-2"
               for="inputPasswordRepeat">{{ 'USERS_NEW_PASSWORD_REPEAT' | translate }}</label>
 
           <div class="col-sm-8 col-md-10">

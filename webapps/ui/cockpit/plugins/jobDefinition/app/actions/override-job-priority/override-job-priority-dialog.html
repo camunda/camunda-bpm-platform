@@ -19,7 +19,7 @@
       <fieldset>
 
         <div class="form-group" ng-show="hasOverridingJobPriority()">
-          <label class="col-xs-4 control-label"
+          <label class="col-xs-4 col-form-label"
                  for="execute">
             {{ 'PLUGIN_JOBDEFINITION_ACTION_EXECUTE' | translate }}
             <span class="glyphicon glyphicon-question-sign"
@@ -29,7 +29,7 @@
           </label>
 
           <div class="col-xs-8">
-            <div class="radio">
+            <div class="form-check">
               <label>
                 <input ng-model="setJobPriority"
                        ng-value="false"
@@ -39,7 +39,7 @@
               </label>
             </div>
 
-            <div class="radio">
+            <div class="form-check">
               <label>
                 <input ng-model="setJobPriority"
                        ng-value="true"
@@ -52,7 +52,7 @@
         </div>
 
         <div class="form-group" ng-show="setJobPriority">
-          <label class="col-xs-4 control-label"
+          <label class="col-xs-4 col-form-label"
                  for="priority">
             {{ 'PLUGIN_JOBDEFINITION_ACTION_PRIORITY' | translate }}
             <span class="glyphicon glyphicon-question-sign"
@@ -75,7 +75,7 @@
         </div>
 
         <div class="form-group" ng-show="setJobPriority">
-          <label class="col-xs-4 control-label"
+          <label class="col-xs-4 col-form-label"
                  for="includeJobsPriority">
             {{ 'PLUGIN_JOBDEFINITION_ACTION_INCLUDE_EXISTING_JOB' | translate }}
             <span class="glyphicon glyphicon-question-sign"
@@ -84,7 +84,7 @@
             </span>
           </label>
 
-          <div class="col-xs-8 checkbox">
+          <div class="col-xs-8 form-check">
             <label>
               <input name="includeJobsPriority"
                      type="checkbox"

@@ -1,3 +1,5 @@
+$enable-flex: false !default;
+
 // To load all the mixins and
 @import "node_modules/bootstrap/scss/_functions.scss"; // from bootstrap
 @import "node_modules/bootstrap/scss/_variables.scss"; // from bootstrap
@@ -30,15 +32,15 @@
 @import "node_modules/bootstrap/scss/_breadcrumb.scss";
 @import "node_modules/bootstrap/scss/_pagination.scss";
 //@import "node_modules/bootstrap/scss/_pager.scss";
-//@import "node_modules/bootstrap/scss/_labels.scss";
+@import "node_modules/bootstrap/scss/_badge.scss";
 @import "node_modules/bootstrap/scss/mixins/_badge.scss";
 @import "node_modules/bootstrap/scss/_jumbotron.scss";
 //@import "node_modules/bootstrap/scss/_thumbnails.scss";
 @import "node_modules/bootstrap/scss/_alert.scss";
-//@import "node_modules/bootstrap/scss/_progress-bars.scss";
+@import "node_modules/bootstrap/scss/_progress.scss";
 @import "node_modules/bootstrap/scss/_media.scss";
 @import "node_modules/bootstrap/scss/_list-group.scss";
-//@import "node_modules/bootstrap/scss/_panels.scss";
+@import "node_modules/bootstrap/scss/_card.scss";
 //@import "node_modules/bootstrap/scss/_wells.scss";
 @import "node_modules/bootstrap/scss/_close.scss";
 

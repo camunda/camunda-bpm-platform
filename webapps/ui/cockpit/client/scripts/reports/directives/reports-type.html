@@ -7,9 +7,11 @@
 
     <div class="reports-type-selection">
       <div ng-if="!plugins || !(plugins.length > 0)"
-           class="well no-reports-available">
+           class="card no-reports-available">
+        <div class="card-body">
         <span class="glyphicon glyphicon-info-sign"></span>
         {{ 'REPORTS_TYPE_NO_AVAILABLE_REPORTS' | translate }}
+        </div>
       </div>
 
       <ul ng-if="plugins">

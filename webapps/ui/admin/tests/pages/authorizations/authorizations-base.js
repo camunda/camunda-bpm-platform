@@ -57,7 +57,7 @@ module.exports = Page.extend({
   },
 
   cancelEditButton: function(idx) {
-    return this.getAuthorization(idx).element(by.css('.action a.btn-default'));
+    return this.getAuthorization(idx).element(by.css('.action a.btn-secondary'));
   },
 
   authorizationIdentityType: function(idx) {

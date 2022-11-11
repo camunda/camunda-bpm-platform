@@ -22,7 +22,7 @@
           <a state-circle
              incidents="processInstance.incidents"
              ng-href="{{ getProcessInstanceUrl(processInstance, { tab: 'incidents-tab' }) }}"></a>
-          <span class="badge badge-warning badge-suspended"
+          <span class="badge badge-pill badge badge-pill-warning badge-suspended"
                 ng-show="processInstance.suspended"
                 uib-tooltip="{{'PLUGIN_PROCESS_INSTANCE_SUSPENDED' | translate}}"
                 tooltip-placement="left">

@@ -79,13 +79,13 @@
         class="cam-widget-inline-field btn-group">
     <button type="button"
                 ng-if="inOperator && !(varType === 'datetime' || varType === 'date' || varType === 'time')"
-                class="btn btn-xs btn-default"
+                class="btn btn-xs btn-secondary"
                 ng-click="expandValue()">
       <span class="glyphicon glyphicon-resize-full"></span>
     </button>
 
     <button type="button"
-            class="btn btn-xs btn-default"
+            class="btn btn-xs btn-secondary"
             ng-click="changeType()"
             ng-if="flexible">
       <span class="glyphicon"
@@ -93,7 +93,7 @@
     </button>
 
     <button type="button"
-            class="btn btn-xs btn-default"
+            class="btn btn-xs btn-secondary"
             ng-style="{visibility: !isNumber || inlineForm.numberField.$valid ? 'visible' : 'hidden'}"
             ng-click="applyChange($event);"
             ng-keydown="cancelOnEsc($event);">
@@ -101,7 +101,7 @@
     </button>
 
     <button type="button"
-            class="btn btn-xs btn-default"
+            class="btn btn-xs btn-secondary"
             ng-click="cancelChange($event)"
             ng-keydown="trapKeyboard($event); cancelOnEsc($event);">
       <span class="glyphicon glyphicon-remove"></span>

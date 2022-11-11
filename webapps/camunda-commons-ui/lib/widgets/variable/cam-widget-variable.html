@@ -44,7 +44,7 @@
     <div ng-if="variable.type !== 'Null'"
          class="input-group-btn">
       <a ng-click="setNull()"
-         class="btn btn-default set-null"
+         class="btn btn-secondary set-null"
          ng-disabled="isDisabled('value')"
          uib-tooltip="{{ 'CAM_WIDGET_VARIABLE_SET_VALUE_NULL' | translate }}">
         <span class="glyphicon glyphicon-remove"></span>
@@ -77,7 +77,7 @@
 
   <div ng-if="variable.type !== 'Null' && isShown('value') && isNull()"
        ng-click="setNonNull()"
-       class="value-wrapper value null-value btn btn-default"
+       class="value-wrapper value null-value btn btn-secondary"
        ng-disabled="isDisabled('value')"
        uib-tooltip="{{ 'CAM_WIDGET_VARIABLE_RESET' | translate }}">
     <span class="null-symbol">{{ 'CAM_WIDGET_VARIABLE_NULL' | translate }}</span>

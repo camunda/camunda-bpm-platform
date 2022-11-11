@@ -5,8 +5,8 @@
        ng-if="showBusinessKey">
     <label for="business-key-field"
            translate="BUSINESS_KEY"
-           class="control-label col-xs-2">Business key</label>
-    <div class="col-xs-10">
+           class="col-form-label offset-2">Business key</label>
+    <div class="offset-10">
       <input type="text"
             ng-readonly="readonly"
             ng-model="businessKey"
@@ -17,11 +17,11 @@
   </div>
 
   <div class="form-group labels-left">
-    <div class="col-xs-2 row-action">
+    <div class="offset-2 row-action">
       <a href
          ng-click="addVariable()"
          ng-disabled="options.disableAddVariableButton">
-        <span class="hidden-xs hidden-sm"
+        <span class="d-none d-sm-none"
               translate="ADD_VARIABLE">Add variable</span>
         <span class="glyphicon glyphicon-plus-sign"></span>
       </a>
@@ -29,20 +29,20 @@
 
 
 
-    <div class="col-xs-10"
+    <div class="offset-10"
          ng-if="variables.length">
       <div class="row">
-        <label class="control-label col-xs-4"
+        <label class="col-form-label offset-4"
                translate="NAME">Name</label>
 
 
 
-        <label class="control-label col-xs-4"
+        <label class="col-form-label offset-4"
                translate="TYPE">Type</label>
 
 
 
-        <label class="control-label col-xs-4"
+        <label class="col-form-label offset-4"
                translate="VALUE">Value</label>
       </div>
     </div>
@@ -55,11 +55,11 @@
        class="form-group"
        ng-form="repeatForm">
 
-    <div class="col-xs-2 row-action">
+    <div class="offset-2 row-action">
       <a href
          ng-click="removeVariable(delta)"
          ng-if="!variable.fixedName">
-        <span class="hidden-sm hidden-xs"
+        <span class="d-sm-none d-none"
               translate="REMOVE">Remove</span>
         <span class="glyphicon glyphicon-remove-sign"></span>
       </a>
@@ -67,9 +67,9 @@
 
 
 
-    <div class="col-xs-10">
+    <div class="offset-10">
       <div class="row">
-        <div class="col-xs-4">
+        <div class="offset-4">
           <input required
                  type="text"
                  class="form-control"
@@ -80,11 +80,11 @@
                  ng-readonly="variable.fixedName || variable.readonly" />
           <span ng-if="repeatForm.name.$invalid && repeatForm.name.$dirty" class="has-error">
             <span ng-if="repeatForm.name.$error.required"
-                  class="help-block">
+                  class="form-text">
               {{ 'REQUIRED_FIELD' | translate }}
             </span>
             <span ng-if="repeatForm.name.$error.camUniqueValue"
-                  class="help-block">
+                  class="form-text">
               {{ 'REQUIRE_UNIQUE_NAME' | translate }}
             </span>
           </span>
@@ -92,7 +92,7 @@
 
 
 
-        <div class="col-xs-4">
+        <div class="offset-4">
           <select ng-disabled="!variable.name || variable.readonly"
                   class="form-control"
                   ng-model="variable.type">
@@ -115,11 +115,11 @@
 
 
 
-        <div class="col-xs-4"
+        <div class="offset-4"
              ng-switch="variable.type">
 
           <div ng-switch-when="Object">
-            <label class="control-label object-type">{{ "CAM_WIDGET_VARIABLE_DIALOG_LABEL_OBJECT_TYPE" | translate }}</label>
+            <label class="col-form-label object-type">{{ "CAM_WIDGET_VARIABLE_DIALOG_LABEL_OBJECT_TYPE" | translate }}</label>
             <input class="form-control"
                    required
                    ng-model="variable.valueInfo.objectTypeName"
@@ -127,12 +127,12 @@
 
             <span ng-if="repeatForm.objectTypeName.$invalid && repeatForm.objectTypeName.$dirty" class="has-error">
               <span ng-if="repeatForm.objectTypeName.$error.required"
-                    class="help-block">
+                    class="form-text">
                 {{ 'REQUIRED_FIELD' | translate }}
               </span>
             </span>
 
-            <label class="control-label">{{ "CAM_WIDGET_VARIABLE_DIALOG_LABEL_SERIALIZATION" | translate }}</label>
+            <label class="col-form-label">{{ "CAM_WIDGET_VARIABLE_DIALOG_LABEL_SERIALIZATION" | translate }}</label>
             <input class="form-control"
                    required
                    ng-model="variable.valueInfo.serializationDataFormat"
@@ -140,12 +140,12 @@
 
             <span ng-if="repeatForm.serializationDataFormat.$invalid && repeatForm.serializationDataFormat.$dirty" class="has-error">
               <span ng-if="repeatForm.serializationDataFormat.$error.required"
-                    class="help-block">
+                    class="form-text">
                 {{ 'REQUIRED_FIELD' | translate }}
               </span>
             </span>
 
-            <label class="control-label">{{ "CAM_WIDGET_VARIABLE_DIALOG_LABEL_SERIALIZED_VALUE" | translate }}</label>
+            <label class="col-form-label">{{ "CAM_WIDGET_VARIABLE_DIALOG_LABEL_SERIALIZED_VALUE" | translate }}</label>
             <textarea class="form-control"
                    required
                    ng-model="variable.value"
@@ -164,7 +164,7 @@
           <input ng-switch-when="File"
                  ng-if="!variable.readonly"
                  class="form-control"
-                 type="file"                 
+                 type="file"
                  cam-variable-name="{{ variable.name }}"
                  cam-variable-type="File"
                  ng-model="variable.file" />
@@ -189,11 +189,11 @@
 
           <span ng-if="repeatForm.value.$invalid && repeatForm.value.$dirty" class="has-error">
             <span ng-if="repeatForm.value.$error.required"
-                  class="help-block">
+                  class="form-text">
               {{ 'REQUIRED_FIELD' | translate }}
             </span>
             <span ng-if="repeatForm.value.$error.camVariableType"
-                  class="help-block">
+                  class="form-text">
               Only a {{ variable.type }} value is allowed
             </span>
           </span>
@@ -204,10 +204,10 @@
   </div>
   <div class="form-group"
        ng-if="!options.hideLoadVariablesButton && !variablesLoaded">
-    <div class="col-xs-2 row-action">
+    <div class="offset-2 row-action">
       <a href
          ng-click="loadVariables()">
-        <span class="hidden-sm hidden-xs"
+        <span class="d-sm-none d-none"
               translate="LOAD_VARIABLES">Load Variables</span>
         <span class="glyphicon glyphicon-download"></span>
       </a>

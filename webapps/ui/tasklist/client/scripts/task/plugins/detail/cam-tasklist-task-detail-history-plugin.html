@@ -8,9 +8,11 @@
 
   <div ng-hide="!state.$loaded">
     <div ng-if="!days.length">
-      <div class="well">
+      <div class="card">
+        <div class="card-body">
         <span class="glyphicon glyphicon-info-sign"></span>
         {{ 'NO_HISTORY' | translate }}
+        </div>
       </div>
     </div>
 

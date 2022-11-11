@@ -84,7 +84,7 @@ module.exports = Page.extend({
   variableInputElement: function(rowIdx, colIdx) {
     return this.variableList()
       .get(rowIdx)
-      .element(by.css('.row .col-xs-4:nth-child(' + colIdx + ')'));
+      .element(by.css('.row .offset-4:nth-child(' + colIdx + ')'));
   },
 
   variableInputField: function(rowIdx, colIdx, inputValue) {
@@ -99,7 +99,7 @@ module.exports = Page.extend({
 
   variableInputHelpText: function(rowIdx, colIdx) {
     return this.variableInputElement(rowIdx, colIdx)
-      .element(by.css('.has-error .help-block'))
+      .element(by.css('.has-error .form-text'))
       .getText();
   },
 

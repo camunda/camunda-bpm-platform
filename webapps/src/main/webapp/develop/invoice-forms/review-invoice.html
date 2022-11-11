@@ -1,14 +1,16 @@
 <form class="form-horizontal"
       role="form">
 
-  <div class="well">
+  <div class="card">
+    <div class="card-body">
     <strong>Please clarify:</strong>
     This invoice needs clarification and could not be approved due to missing data.
+    </div>
   </div>
 
 
   <div class="form-group">
-    <label class="control-label col-md-4">Invoice Document</label>
+    <label class="col-form-label col-md-4">Invoice Document</label>
     <div class="col-md-8">
       <a class="form-control-static"
          cam-file-download="invoiceDocument"></a>
@@ -17,7 +19,7 @@
 
 
   <div class="form-group">
-    <label class="control-label col-md-4">Creditor</label>
+    <label class="col-form-label col-md-4">Creditor</label>
     <div class="col-md-8">
       <input cam-variable-name="creditor"
              type="text"
@@ -28,7 +30,7 @@
 
 
   <div class="form-group">
-    <label class="control-label col-md-4">Amount</label>
+    <label class="col-form-label col-md-4">Amount</label>
     <div class="col-md-8">
       <input cam-variable-name="amount"
              type="text"
@@ -39,7 +41,7 @@
 
 
   <div class="form-group">
-    <label class="control-label col-md-4">Invoice Category</label>
+    <label class="col-form-label col-md-4">Invoice Category</label>
     <div class="col-md-8">
       <select cam-variable-name="invoiceCategory"
               class="form-control">
@@ -51,7 +53,7 @@
 
 
   <div class="form-group">
-    <label class="control-label col-md-4">Invoice Number</label>
+    <label class="col-form-label col-md-4">Invoice Number</label>
     <div class="col-md-8">
       <input cam-variable-name="invoiceNumber"
              type="text"
@@ -62,7 +64,7 @@
 
 
   <div class="form-group">
-    <label class="control-label col-md-4">Could you clarify the invoice? </label>
+    <label class="col-form-label col-md-4">Could you clarify the invoice? </label>
     <div class="col-md-8 form-control-static">
       <input cam-variable-name="clarified"
              cam-variable-type="Boolean"
