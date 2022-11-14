@@ -219,6 +219,10 @@
         <artifactId>maven-failsafe-plugin</artifactId>
         <configuration>
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
+          <excludes>
+            <!-- TODO resolve #2905 -->
+            <exclude>**/PaSerializationIT.java</exclude>
+          </excludes>
         </configuration>
         <executions>
           <execution>
