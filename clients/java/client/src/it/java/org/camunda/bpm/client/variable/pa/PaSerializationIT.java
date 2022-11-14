@@ -131,32 +131,6 @@ public class PaSerializationIT {
   }
 
   @Test
-  public void shouldSelectSequenceFlowAndCompleteProcessInstance_XmlSerialization() {
-    // given
-    ObjectValue objectValueXmlSerialization = Variables
-      .objectValue(VARIABLE_VALUE_BEAN_BAR)
-      .serializationDataFormat(XML_DATAFORMAT_NAME)
-      .create();
-
-    client.subscribe(EXTERNAL_TASK_TOPIC_NAME)
-      .handler(invocationHandler)
-      .open();
-
-    clientRule.waitForFetchAndLockUntil(() -> !invocationHandler.getInvocations().isEmpty());
-
-    RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
-    ExternalTaskService service = invocation.getExternalTaskService();
-    ExternalTask task = invocation.getExternalTask();
-
-    // when
-    service.complete(task, Collections.singletonMap(VARIABLE_NAME, objectValueXmlSerialization));
-
-    // then
-    HistoricProcessInstanceDto processInstanceDto = engineRule.getHistoricProcessInstanceById(processInstance.getId());
-    assertThat(processInstanceDto.getEndTime()).isNotNull();
-  }
-
-  @Test
   public void shouldSelectSequenceFlowAndCompleteProcessInstance_JavaSerialization() {
     // given
     ObjectValue objectValueJavaSerialization = Variables
