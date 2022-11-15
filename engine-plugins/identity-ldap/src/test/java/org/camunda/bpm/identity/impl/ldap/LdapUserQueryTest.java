@@ -29,19 +29,27 @@ import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.identity.UserQuery;
+
 import static org.camunda.bpm.identity.impl.ldap.LdapTestUtilities.checkPagingResults;
 import static org.camunda.bpm.identity.impl.ldap.LdapTestUtilities.testUserPaging;
 import static org.camunda.bpm.identity.impl.ldap.LdapTestUtilities.testUserPagingWithMemberOfGroup;
 
 /**
  * @author Daniel Meyer
- *
  */
 public class LdapUserQueryTest extends LdapIdentityProviderTest {
 
+  public void testCountUsers() {
+    UserQuery userQuery = identityService.createUserQuery();
+
+    assertEquals(12, userQuery.listPage(0, Integer.MAX_VALUE).size());
+    assertEquals(12, userQuery.count());
+  }
+
   public void testQueryNoFilter() {
     List<User> result = identityService.createUserQuery().list();
-    assertEquals(12, result.size());
+    assertEquals(ldapTestEnvironment.getTotalNumberOfUsersCreated(), result.size());
   }
 
   public void testFilterByUserId() {
@@ -72,24 +80,23 @@ public class LdapUserQueryTest extends LdapIdentityProviderTest {
     assertNotNull(users);
     assertEquals(3, users.size());
   }
-  
-  public void testFilterByUserIdWithCapitalization() {
-	try {
-	  processEngineConfiguration.setAuthorizationEnabled(true);
-	  identityService.setAuthenticatedUserId("Oscar");
-	  User user = identityService.createUserQuery().userId("Oscar").singleResult();
-	  assertNotNull(user);
 
-	  // validate user
-	  assertEquals("oscar", user.getId());
-	  assertEquals("Oscar", user.getFirstName());
-	  assertEquals("The Crouch", user.getLastName());
-	  assertEquals("oscar@camunda.org", user.getEmail());
-	}
-	finally {
+  public void testFilterByUserIdWithCapitalization() {
+    try {
+      processEngineConfiguration.setAuthorizationEnabled(true);
+      identityService.setAuthenticatedUserId("Oscar");
+      User user = identityService.createUserQuery().userId("Oscar").singleResult();
+      assertNotNull(user);
+
+      // validate user
+      assertEquals("oscar", user.getId());
+      assertEquals("Oscar", user.getFirstName());
+      assertEquals("The Crouch", user.getLastName());
+      assertEquals("oscar@camunda.org", user.getEmail());
+    } finally {
       processEngineConfiguration.setAuthorizationEnabled(false);
-	  identityService.clearAuthentication();
-	}
+      identityService.clearAuthentication();
+    }
   }
 
   public void testFilterByFirstname() {
@@ -149,49 +156,49 @@ public class LdapUserQueryTest extends LdapIdentityProviderTest {
 
   public void testFilterByGroupIdAndFirstname() {
     List<User> result = identityService.createUserQuery()
-        .memberOfGroup("development")
-        .userFirstName("Oscar")
-        .list();
+            .memberOfGroup("development")
+            .userFirstName("Oscar")
+            .list();
     assertEquals(1, result.size());
   }
 
   public void testFilterByGroupIdAndId() {
     List<User> result = identityService.createUserQuery()
-        .memberOfGroup("development")
-        .userId("oscar")
-        .list();
+            .memberOfGroup("development")
+            .userId("oscar")
+            .list();
     assertEquals(1, result.size());
   }
 
   public void testFilterByGroupIdAndLastname() {
     List<User> result = identityService.createUserQuery()
-        .memberOfGroup("development")
-        .userLastName("The Crouch")
-        .list();
+            .memberOfGroup("development")
+            .userLastName("The Crouch")
+            .list();
     assertEquals(1, result.size());
   }
 
   public void testFilterByGroupIdAndEmail() {
     List<User> result = identityService.createUserQuery()
-        .memberOfGroup("development")
-        .userEmail("oscar@camunda.org")
-        .list();
+            .memberOfGroup("development")
+            .userEmail("oscar@camunda.org")
+            .list();
     assertEquals(1, result.size());
   }
 
   public void testFilterByGroupIdAndEmailLike() {
     List<User> result = identityService.createUserQuery()
-        .memberOfGroup("development")
-        .userEmailLike("*@camunda.org")
-        .list();
+            .memberOfGroup("development")
+            .userEmailLike("*@camunda.org")
+            .list();
     assertEquals(3, result.size());
   }
 
   public void testFilterByGroupIdAndIdForDnUsingCn() {
     List<User> result = identityService.createUserQuery()
-        .memberOfGroup("external")
-        .userId("fozzie")
-        .list();
+            .memberOfGroup("external")
+            .userId("fozzie")
+            .list();
     assertEquals(1, result.size());
   }
 
@@ -212,7 +219,7 @@ public class LdapUserQueryTest extends LdapIdentityProviderTest {
   }
 
   public void testPagination() {
-    testUserPaging(identityService);
+    testUserPaging(identityService, ldapTestEnvironment);
   }
 
   public void testPaginationWithMemberOfGroup() {

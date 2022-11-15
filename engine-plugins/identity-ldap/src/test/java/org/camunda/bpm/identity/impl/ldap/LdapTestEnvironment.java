@@ -30,9 +30,8 @@ import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.naming.InvalidNameException;
-import javax.naming.NamingException;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -61,18 +60,24 @@ import org.apache.commons.io.FileUtils;
  *
  * @author Bernd Ruecker
  * @author Daniel Meyer
- *
  */
 public class LdapTestEnvironment {
 
   private final static Logger LOG = LoggerFactory.getLogger(LdapTestEnvironment.class.getName());
 
   private static final String BASE_DN = "o=camunda,c=org";
+  public static final String OFFICE_BERKELEY = "office-berkeley";
 
   protected DirectoryService service;
   protected LdapServer ldapService;
   protected String configFilePath = "ldap.properties";
-  protected File workingDirectory = new File( System.getProperty( "java.io.tmpdir" ) + "/server-work" );
+  protected File workingDirectory = new File(System.getProperty("java.io.tmpdir") + "/server-work");
+
+  private int numberOfUsersCreated = 0;
+  private int numberOfGroupsCreated = 0;
+  private int numberOfRolesCreated=0;
+
+  private int numberOfUsersCreatedInBerkeleyOffice = 0;
 
   public LdapTestEnvironment() {
   }
@@ -190,10 +195,23 @@ public class LdapTestEnvironment {
   }
 
   public void init() throws Exception {
+    /// create a simple test
+    init(0,0,0);
+  }
+
+  /**
+   * create a specific test case. Test creates a minimum users/groups/roles but aditionnal users can be added to reach this number.
+   * @param additionalNumberOfUsers add this number of user.
+   * @param additionnalNumberOfGroups add this number of groups
+   * @param additionalNumberOfRoles add this number of roles
+   * @throws Exception
+   */
+    public void init(int additionalNumberOfUsers, int additionnalNumberOfGroups, int additionalNumberOfRoles) throws Exception {
     initializeDirectory();
     startServer();
 
     createGroup("office-berlin");
+
     String dnRoman = createUserUid("roman", "office-berlin", "Roman", "Smirnov", "roman@camunda.org");
     String dnRobert = createUserUid("robert", "office-berlin", "Robert", "Gimbel", "robert@camunda.org");
     String dnDaniel = createUserUid("daniel", "office-berlin", "Daniel", "Meyer", "daniel@camunda.org");
@@ -203,10 +221,12 @@ public class LdapTestEnvironment {
     String dnRizzo = createUserUid("rizzo", "office-berlin", "Rizzo", "The Rat", "rizzo@camunda.org");
 
     createGroup("office-london");
+
     String dnOscar = createUserUid("oscar", "office-london", "Oscar", "The Crouch", "oscar@camunda.org");
     String dnMonster = createUserUid("monster", "office-london", "Cookie", "Monster", "monster@camunda.org");
 
     createGroup("office-home");
+
     // Doesn't work using backslashes, end up with two uid attributes
     // See https://issues.apache.org/jira/browse/DIRSERVER-1442
     String dnDavid = createUserUid("david(IT)", "office-home", "David", "Howe\\IT\\", "david@camunda.org");
@@ -214,6 +234,7 @@ public class LdapTestEnvironment {
     String dnRuecker = createUserUid("ruecker", "office-home", "Bernd", "Ruecker", "ruecker@camunda.org");
 
     createGroup("office-external");
+
     String dnFozzie = createUserCN("fozzie", "office-external", "Bear", "Fozzie", "fozzie@camunda.org");
 
     createRole("management", dnRuecker, dnRobert, dnDaniel);
@@ -222,7 +243,51 @@ public class LdapTestEnvironment {
     createRole("sales", dnRuecker, dnMonster, dnDavid);
     createRole("external", dnFozzie);
     createRole("all", dnRuecker, dnRobert, dnDaniel, dnRoman, dnOscar, dnMonster, dnDavid, dnFozzie, dnGonzo, dnRowlf, dnPepe, dnRizzo);
+
+    // create a large number of users
+    createGroup(OFFICE_BERKELEY);
+
+    // record more than a page in this group
+    for (int i = 1; i <= additionalNumberOfUsers; i++) {
+      String lastName = "fisher" + String.format("%04d", i);
+      createUserUid("jan.fisher." + lastName,
+              OFFICE_BERKELEY,
+              "jan",
+              lastName,
+              "jan.fisher" + lastName + "@camunda.org");
+    }
+
+    // Create a lot of groups
+    for (int i = 1; i <= additionnalNumberOfGroups; i++) {
+      String groupName = "Paris" + String.format("%04d", i);
+      createGroup(groupName);
+    }
+
+    // Create a lot of roles
+    for (int i = 1; i <= additionalNumberOfRoles; i++) {
+      String roleName = "Support" + String.format("%04d", i);
+      createRole(roleName, dnFozzie);
+    }
+
   }
+
+  public int getTotalNumberOfUsersCreated() {
+    return numberOfUsersCreated;
+  }
+
+  public int getTotalNumberOfGroupsCreated() {
+    return numberOfGroupsCreated;
+  }
+
+  public int getTotalNumberOfRolesCreated() {
+    return numberOfRolesCreated;
+  }
+
+  public int getTotalNumberOfUserInOfficeBerkeley() {
+    return numberOfUsersCreatedInBerkeleyOffice;
+  }
+
+  ;
 
   protected String createUserUid(String user, String group, String firstname, String lastname, String email) throws Exception {
     Dn dn = new Dn("uid=" + user + ",ou=" + group + ",o=camunda,c=org");
@@ -237,8 +302,7 @@ public class LdapTestEnvironment {
   }
 
   protected void createUser(String user, String firstname, String lastname,
-          String email, Dn dn) throws Exception, NamingException,
-          UnsupportedEncodingException {
+                            String email, Dn dn) throws Exception {
     if (!service.getAdminSession().exists(dn)) {
       Entry entry = service.newEntry(dn);
       entry.add("objectClass", "top", "person", "inetOrgPerson"); //, "extensibleObject"); //make extensible to allow for the "memberOf" field
@@ -246,14 +310,20 @@ public class LdapTestEnvironment {
       entry.add("cn", firstname);
       entry.add("sn", lastname);
       entry.add("mail", email);
-      entry.add("userPassword", user.getBytes("UTF-8"));
+      entry.add("userPassword", user.getBytes(StandardCharsets.UTF_8));
       service.getAdminSession().add(entry);
       System.out.println("created entry: " + dn.getNormName());
+      numberOfUsersCreated++;
     }
   }
 
-  public void createGroup(String name) throws InvalidNameException, Exception, NamingException
-  {
+  /**
+   * A role is implemented by a LDAP organizationalUnit
+   *
+   * @param name group to create
+   * @throws Exception in case of error
+   */
+  public void createGroup(String name) throws Exception {
     Dn dn = new Dn("ou=" + name + ",o=camunda,c=org");
     if (!service.getAdminSession().exists(dn)) {
       Entry entry = service.newEntry(dn);
@@ -261,9 +331,17 @@ public class LdapTestEnvironment {
       entry.add("ou", name);
       service.getAdminSession().add(entry);
       System.out.println("created entry: " + dn.getNormName());
+      numberOfGroupsCreated++;
     }
   }
 
+  /**
+   * A role is implemented by a LDAP groupOfNames
+   *
+   * @param roleName role to create (cn)
+   * @param users users members of this role
+   * @throws Exception in case of error
+   */
   protected void createRole(String roleName, String... users) throws Exception {
     Dn dn = new Dn("ou=" + roleName + ",o=camunda,c=org");
     if (!service.getAdminSession().exists(dn)) {
@@ -274,6 +352,7 @@ public class LdapTestEnvironment {
         entry.add("member", user);
       }
       service.getAdminSession().add(entry);
+      numberOfRolesCreated++;
     }
   }
 

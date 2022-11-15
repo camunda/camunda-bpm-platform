@@ -21,7 +21,6 @@ import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Resources.GROUP;
 import static org.camunda.bpm.engine.authorization.Resources.USER;
 
-
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
@@ -60,7 +59,7 @@ public class LdapDisableAuthorizationCheckTest extends ResourceProcessEngineTest
   }
 
   public void testUserQueryPagination() {
-    LdapTestUtilities.testUserPaging(identityService);
+    LdapTestUtilities.testUserPaging(identityService, ldapTestEnvironment);
   }
 
   public void testUserQueryPaginationWithAuthenticatedUserWithoutAuthorizations() {
@@ -68,7 +67,7 @@ public class LdapDisableAuthorizationCheckTest extends ResourceProcessEngineTest
       processEngineConfiguration.setAuthorizationEnabled(true);
 
       identityService.setAuthenticatedUserId("oscar");
-      testUserPaging(identityService);
+      testUserPaging(identityService, ldapTestEnvironment);
 
     } finally {
       processEngineConfiguration.setAuthorizationEnabled(false);
@@ -86,7 +85,7 @@ public class LdapDisableAuthorizationCheckTest extends ResourceProcessEngineTest
       processEngineConfiguration.setAuthorizationEnabled(true);
 
       identityService.setAuthenticatedUserId("oscar");
-      testUserPaging(identityService);
+      testUserPaging(identityService, ldapTestEnvironment);
 
     } finally {
       processEngineConfiguration.setAuthorizationEnabled(false);
