@@ -43,6 +43,8 @@ import javax.naming.directory.SearchResult;
 import javax.naming.ldap.Control;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
+import javax.naming.ldap.SortControl;
+import javax.naming.ldap.SortKey;
 import javax.naming.ldap.PagedResultsControl;
 import javax.naming.ldap.PagedResultsResponseControl;
 import javax.naming.ldap.SortControl;
@@ -66,6 +68,7 @@ import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
+import org.camunda.bpm.engine.impl.Direction;
 import org.camunda.bpm.identity.impl.ldap.util.LdapPluginLogger;
 
 /**
@@ -713,20 +716,35 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
           if (LdapPluginLogger.INSTANCE.isDebugEnabled()) {
             resultLogger.append(", OrderBy[");
             resultLogger.append(propertyName);
+            resultLogger.append("-");
+            resultLogger.append(orderingProperty.getDirection() == null ? "no_direction(desc)" : orderingProperty.getDirection().getName());
             resultLogger.append("]");
           }
+          SortKey sortKey = null;
           if (UserQueryProperty.USER_ID.getName().equals(propertyName)) {
-            controls.add(new SortControl(ldapConfiguration.getUserIdAttribute(), Control.CRITICAL));
+            sortKey = new SortKey(ldapConfiguration.getUserIdAttribute(),
+                    Direction.ASCENDING.equals(orderingProperty.getDirection()),
+                    null);
 
           } else if (UserQueryProperty.EMAIL.getName().equals(propertyName)) {
-            controls.add(new SortControl(ldapConfiguration.getUserEmailAttribute(), Control.CRITICAL));
+            sortKey = new SortKey(ldapConfiguration.getUserEmailAttribute(),
+                    Direction.ASCENDING.equals(orderingProperty.getDirection()),
+                    null);
 
           } else if (UserQueryProperty.FIRST_NAME.getName().equals(propertyName)) {
-            controls.add(new SortControl(ldapConfiguration.getUserFirstnameAttribute(), Control.CRITICAL));
+            sortKey = new SortKey(ldapConfiguration.getUserFirstnameAttribute(),
+                    Direction.ASCENDING.equals(orderingProperty.getDirection()),
+                    null);
 
           } else if (UserQueryProperty.LAST_NAME.getName().equals(propertyName)) {
-            controls.add(new SortControl(ldapConfiguration.getUserLastnameAttribute(), Control.CRITICAL));
+            sortKey = new SortKey(ldapConfiguration.getUserLastnameAttribute(),
+                    Direction.ASCENDING.equals(orderingProperty.getDirection()),
+                    null);
+
           }
+          if (sortKey != null)
+            controls.add(new SortControl(new SortKey[]{sortKey}, Control.CRITICAL));
+
         }
       }
 

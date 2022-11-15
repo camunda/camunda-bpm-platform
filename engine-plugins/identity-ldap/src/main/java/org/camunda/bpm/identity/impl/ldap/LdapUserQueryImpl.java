@@ -17,6 +17,7 @@
 package org.camunda.bpm.identity.impl.ldap;
 
 import java.util.List;
+import java.util.Collections;
 
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
@@ -24,7 +25,9 @@ import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.UserQueryImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-
+import org.camunda.bpm.engine.impl.QueryOrderingProperty;
+import org.camunda.bpm.engine.impl.UserQueryProperty;
+import org.camunda.bpm.engine.impl.Direction;
 
 /**
  * @author Daniel Meyer
@@ -63,7 +66,16 @@ public class LdapUserQueryImpl extends UserQueryImpl {
 
   @Override
   public UserQuery desc() {
-    throw new UnsupportedOperationException("The LDAP identity provider does not support descending search order.");
+    // provide this exception then a popup will be visible in the admin task, but display will run correctly
+    if (ldapConfiguration != null && !ldapConfiguration.sortControlSupported)
+      throw new UnsupportedOperationException("The LDAP identity provider does not support descending search order.");
+
+    // assign a default order descending if the list is empty
+    if (getOrderingProperties() != null && getOrderingProperties().isEmpty()) {
+      QueryOrderingProperty orderingProperty = new QueryOrderingProperty(UserQueryProperty.USER_ID, Direction.DESCENDING);
+      this.setOrderingProperties(Collections.singletonList(orderingProperty));
+    }
+    return this;
   }
 
 }
