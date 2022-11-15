@@ -190,8 +190,8 @@ public class PaExceptionIT {
 
   @Test
   public void shouldThrowBadRequestException() {
-    ProcessInstanceDto processInstance = engineRule.startProcessInstanceByKey("Process_14ltot0");
-    processInstances.add(processInstance);
+    ProcessInstanceDto processInstance1 = engineRule.startProcessInstanceByKey("Process_14ltot0");
+    processInstances.add(processInstance1);
 
     // given
     client.subscribe("my-topic")
@@ -204,9 +204,10 @@ public class PaExceptionIT {
     RecordedInvocation invocation = invocationHandler.getInvocations().get(0);
     ExternalTaskService service = invocation.getExternalTaskService();
 
-    String processInstanceId = engineRule.startProcessInstanceByKey(PROCESS_DEFINITION_KEY).getId();
+    ProcessInstanceDto processInstance2 = engineRule.startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+    processInstances.add(processInstance2);
 
-    ExternalTask externalTask = engineRule.getExternalTaskByProcessInstanceId(processInstanceId);
+    ExternalTask externalTask = engineRule.getExternalTaskByProcessInstanceId(processInstance2.getId());
 
     // then
     BadRequestException px = (BadRequestException) catchThrowable(() -> service.complete(externalTask));
