@@ -180,13 +180,15 @@ module.exports = [
       var processDefinitionId = processDefinition.id;
       var processDefinitionKey = processDefinition.key;
       var deploymentId = processDefinition.deploymentId;
+      var processDefinitionName = processDefinition.name;
 
       $scope.options = angular.copy(DEFAULT_OPTIONS);
 
       $scope.params = {
         processDefinitionId: processDefinitionId,
         processDefinitionKey: processDefinitionKey,
-        deploymentId: deploymentId
+        deploymentId: deploymentId,
+        processDefinitionName: processDefinitionName
       };
 
       var searchData = {processStart: processDefinitionKey};
