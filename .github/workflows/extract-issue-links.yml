@@ -23,7 +23,7 @@ jobs:
           secrets: |
             secret/data/products/cambpm/ci/github-workflow SUPPORT_CHANNEL_SLACK_WEBHOOK_URL;
             secret/data/products/cambpm/ci/github-workflow SEC_CHANNEL_SLACK_WEBHOOK_URL;
-            secret/data/products/cambpm/ci/github-workflow TECH_LEAD_SLACK_HANDLE;
+            secret/data/products/cambpm/ci/github-workflow TECH_LEAD_SLACK_ID;
       - uses: "actions/checkout@v2"
       - name: Generate release notes links
         id: generate-release-notes
