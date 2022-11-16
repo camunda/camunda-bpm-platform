@@ -63,7 +63,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "Dear support team, we have released versions ${{ github.event.inputs.versions }} of Camunda Platform 7.\nPlease send a release notification to our customers and update the customers in the support cases below."
+                    "text": "Dear support team, we have released versions ${{ github.event.inputs.versions }} of Camunda Platform 7.\nPlease send a release notification to our customers and update the customers in the support cases below. Please note that the release manager may add extra announcements in the thread of this message shortly after the message is published."
                   }
                 },
                 ${{ steps.generate-release-notes.outputs.release-notes-block }},
@@ -83,7 +83,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "Dear tech lead @${{ steps.secrets.outputs.TECH_LEAD_SLACK_HANDLE }}, we have released versions ${{ github.event.inputs.versions }}.\nPlease find the involved SEC tickets below and publish security notices as needed."
+                    "text": "Dear tech lead <@${{ steps.secrets.outputs.TECH_LEAD_SLACK_ID }}>, we have released versions ${{ github.event.inputs.versions }}.\nPlease find the involved SEC tickets below and publish security notices as needed."
                   }
                 },
                 ${{ steps.format-sec-jira-links.outputs.links-blocks }}
