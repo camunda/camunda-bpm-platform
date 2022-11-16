@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Synchronize label colors
     steps:
-      - uses: "actions/checkout@v2"
+      - uses: "actions/checkout@v3"
       - name: Synchronize label colors
         id: synchronize-label-colors
         uses: ./.github/actions/synchronize-label-colors
