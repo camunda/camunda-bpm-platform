@@ -63,7 +63,7 @@
         last = true
         desc = "The date when the engine started to collect dynamic data, such as command executions and metrics. If telemetry sending is enabled, dynamic data resets on sending the data to Camunda.
                 Dynamic data and the date returned by this method are reset in three cases: engine startup, after engine start when sending telemetry data to Camunda is enabled via API, after sending telemetry data to Camunda (only when this was enabled)
-                The date is in the format <code>Mon DD, YYYY HH:MM::SS XM</code>."/>
+                The date is in the format <code>YYYY-MM-DD'T'HH:mm:ss.SSSZ</code>."/>
 
 </@lib.dto>
 
