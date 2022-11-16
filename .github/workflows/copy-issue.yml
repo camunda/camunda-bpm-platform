@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Deep copy issue
     steps:
-      - uses: "actions/checkout@v2"
+      - uses: "actions/checkout@v3"
       - name: Deep copy issue
         id: copy-issue
         uses: ./.github/actions/copy-issue

@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Import Secrets
         id: secrets
-        uses: hashicorp/vault-action@v2.4.2
+        uses: hashicorp/vault-action@v2.4.3
         with:
           url: ${{ secrets.VAULT_ADDR }}
           method: approle
@@ -30,7 +30,7 @@ jobs:
           app_id: ${{ steps.secrets.outputs.GITHUB_APP_ID }}
           private_key: ${{ steps.secrets.outputs.GITHUB_APP_PRIVATE_KEY }}
       - name: Add to project
-        uses: actions/add-to-project@75ae529d219964f1ad5c0e8351e4e7c38ed501be
+        uses: actions/add-to-project@960fbad431afda394cfcf8743445e741acd19e85
         with:
           project-url: https://github.com/orgs/${{ github.repository_owner }}/projects/40
           github-token: ${{ steps.generate-github-token.outputs.token }}
