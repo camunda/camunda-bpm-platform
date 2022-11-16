@@ -8429,7 +8429,8 @@ module.exports = async function () {
       await octokit.paginate(octokit.rest.issues.listForRepo, {
         owner: repo.owner.login,
         repo: repo.name,
-        labels: label
+        labels: label,
+        state: 'all'
       })
       .then(issuesforLabel => {
         
