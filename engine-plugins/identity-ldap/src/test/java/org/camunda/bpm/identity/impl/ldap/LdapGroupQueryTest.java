@@ -20,8 +20,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Resources.GROUP;
-import static org.camunda.bpm.identity.impl.ldap.LdapTestUtilities.checkPagingResults;
-import static org.camunda.bpm.identity.impl.ldap.LdapTestUtilities.testGroupPaging;
+import static org.camunda.bpm.identity.ldap.util.LdapTestUtilities.checkPagingResults;
+import static org.camunda.bpm.identity.ldap.util.LdapTestUtilities.testGroupPaging;
 
 import java.util.HashSet;
 import java.util.List;
@@ -36,6 +36,7 @@ import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.identity.ldap.util.LdapTestEnvironment;
 import org.camunda.bpm.identity.ldap.util.LdapTestEnvironmentRule;
 import org.junit.Before;
 import org.junit.ClassRule;

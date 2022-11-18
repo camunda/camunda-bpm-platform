@@ -16,79 +16,86 @@
  */
 package org.camunda.bpm.identity.impl.ldap;
 
-import org.camunda.bpm.engine.identity.User;
-import org.camunda.bpm.engine.identity.UserQuery;
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-public class LdapUserLargeQueryTest extends ResourceProcessEngineTestCase {
+import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.identity.UserQuery;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.identity.ldap.util.LdapTestEnvironment;
+import org.camunda.bpm.identity.ldap.util.LdapTestEnvironmentRule;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
 
+public class LdapUserLargeQueryTest {
+
+  @ClassRule
+  public static LdapTestEnvironmentRule ldapRule = new LdapTestEnvironmentRule().additionalNumberOfUsers(80).additionnalNumberOfGroups(5).additionalNumberOfRoles(5); // Attention, stay under 80, there is a limitation in the query on 100
+  @Rule
+  public ProcessEngineRule engineRule = new ProcessEngineRule("camunda.ldap.pages.cfg.xml"); // pageSize = 3 in this configuration
+
+  ProcessEngineConfiguration processEngineConfiguration;
+  IdentityService identityService;
   LdapTestEnvironment ldapTestEnvironment;
 
-  public LdapUserLargeQueryTest() {
-    // pageSize = 3 in this configuration
-    super("camunda.ldap.pages.cfg.xml");
+  @Before
+  public void setup() {
+    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+    identityService = engineRule.getIdentityService();
+    ldapTestEnvironment = ldapRule.getLdapTestEnvironment();
   }
 
-  protected void setUp() throws Exception {
-    ldapTestEnvironment = new LdapTestEnvironment();
-    // Attention, stay under 80, there is a limitation in the query on 100
-    ldapTestEnvironment.init(80, 5, 5);
-    super.setUp();
-  }
-
-  protected void tearDown() throws Exception {
-    if (ldapTestEnvironment != null) {
-      ldapTestEnvironment.shutdown();
-      ldapTestEnvironment = null;
-    }
-    super.tearDown();
-  }
-
+  @Test
   public void testAllUsersQuery() {
     List<User> listUsers = identityService.createUserQuery().list();
 
     // In this group, we expect more than a page size
-    assertEquals(ldapTestEnvironment.getTotalNumberOfUsersCreated(), listUsers.size());
+    assertThat(listUsers).hasSize(ldapTestEnvironment.getTotalNumberOfUsersCreated());
   }
 
+  @Test
   public void testPagesAllUsersQuery() {
     List<User> listUsers = identityService.createUserQuery().list();
 
-    assertEquals(ldapTestEnvironment.getTotalNumberOfUsersCreated(), listUsers.size());
+    assertThat(listUsers).hasSize(ldapTestEnvironment.getTotalNumberOfUsersCreated());
 
     // ask 3 pages
     for (int firstResult = 0; firstResult < 10; firstResult += 4) {
       List<User> listPages = identityService.createUserQuery().listPage(firstResult, 5);
       for (int i = 0; i < listPages.size(); i++) {
-        assertEquals(listUsers.get(firstResult + i).getId(), listPages.get(i).getId());
-        assertEquals(listUsers.get(firstResult + i).getLastName(), listPages.get(i).getLastName());
+        assertThat(listPages.get(i).getId()).isEqualTo(listUsers.get(firstResult + i).getId());
+        assertThat(listPages.get(i).getLastName()).isEqualTo(listUsers.get(firstResult + i).getLastName());
       }
 
     }
   }
 
+  @Test
   public void testQueryPaging() {
     UserQuery query = identityService.createUserQuery();
 
-    assertEquals(92, query.listPage(0, Integer.MAX_VALUE).size());
+    assertThat(query.listPage(0, Integer.MAX_VALUE)).hasSize(92);
 
     // Verifying the un-paged results
-    assertEquals(92, query.count());
-    assertEquals(92, query.list().size());
+    assertThat(query.count()).isEqualTo(92);
+    assertThat(query.list()).hasSize(92);
 
     // Verifying paged results
-    assertEquals(2, query.listPage(0, 2).size());
-    assertEquals(2, query.listPage(2, 2).size());
-    assertEquals(3, query.listPage(4, 3).size());
-    assertEquals(1, query.listPage(91, 3).size());
-    assertEquals(1, query.listPage(91, 1).size());
+    assertThat(query.listPage(0, 2)).hasSize(2);
+    assertThat(query.listPage(2, 2)).hasSize(2);
+    assertThat(query.listPage(4, 3)).hasSize(3);
+    assertThat(query.listPage(91, 3)).hasSize(1);
+    assertThat(query.listPage(91, 1)).hasSize(1);
 
     // Verifying odd usages
-    assertEquals(0, query.listPage(-1, -1).size());
-    assertEquals(0, query.listPage(92, 2).size()); // 92 is the last index with a result
-    assertEquals(92, query.listPage(0, 93).size()); // there are only 92 groups
+    assertThat(query.listPage(-1, -1)).hasSize(0);
+    assertThat(query.listPage(92, 2)).hasSize(0); // 92 is the last index with a result
+    assertThat(query.listPage(0, 93)).hasSize(92); // there are only 92 groups
   }
 
 }
