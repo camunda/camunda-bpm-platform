@@ -14,29 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.identity.impl.ldap;
+package org.camunda.bpm.identity.ldap.util;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.identity.impl.ldap.LdapTestEnvironment;
+import org.junit.rules.ExternalResource;
 
-/**
- * @author Daniel Meyer
- *
- */
-public abstract class LdapIdentityProviderTest extends PluggableProcessEngineTestCase {
+public class LdapTestEnvironmentRule extends ExternalResource{
 
-  protected LdapTestEnvironment ldapTestEnvironment;
+  LdapTestEnvironment ldapTestEnvironment;
 
-  protected void setUp() throws Exception {
+  @Override
+  protected void before() throws Throwable {
     ldapTestEnvironment = new LdapTestEnvironment();
     ldapTestEnvironment.init();
-    super.setUp();
   }
 
-  protected void tearDown() throws Exception {
-    if(ldapTestEnvironment != null) {
+  @Override
+  protected void after() {
+    if (ldapTestEnvironment != null) {
       ldapTestEnvironment.shutdown();
       ldapTestEnvironment = null;
     }
-    super.tearDown();
+  }
+
+  public LdapTestEnvironment getLdapTestEnvironment() {
+    return ldapTestEnvironment;
   }
 }

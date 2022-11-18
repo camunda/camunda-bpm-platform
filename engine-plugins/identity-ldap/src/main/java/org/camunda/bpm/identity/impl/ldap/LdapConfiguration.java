@@ -17,9 +17,10 @@
 package org.camunda.bpm.identity.impl.ldap;
 
 
-import javax.naming.directory.SearchControls;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.naming.directory.SearchControls;
 
 
 /**
@@ -29,6 +30,9 @@ import java.util.Map;
  *
  */
 public class LdapConfiguration {
+
+  public static String LDAP_QUERY_WILDCARD = "*";
+  public static String DB_QUERY_WILDCARD = "%";
 
   protected String initialContextFactory = "com.sun.jndi.ldap.LdapCtxFactory";
   protected String securityAuthentication = "simple";

@@ -21,15 +21,15 @@ import static org.camunda.bpm.engine.authorization.Resources.GROUP;
 import static org.camunda.bpm.engine.authorization.Resources.USER;
 import static org.camunda.bpm.engine.impl.context.Context.getCommandContext;
 import static org.camunda.bpm.engine.impl.context.Context.getProcessEngineConfiguration;
+import static org.camunda.bpm.identity.impl.ldap.LdapConfiguration.DB_QUERY_WILDCARD;
+import static org.camunda.bpm.identity.impl.ldap.LdapConfiguration.LDAP_QUERY_WILDCARD;
 
-import java.io.StringWriter;
 import java.io.IOException;
-
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import javax.naming.AuthenticationException;
 import javax.naming.Context;
@@ -41,9 +41,9 @@ import javax.naming.directory.SearchResult;
 import javax.naming.ldap.Control;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
-import javax.naming.ldap.SortControl;
 import javax.naming.ldap.PagedResultsControl;
 import javax.naming.ldap.PagedResultsResponseControl;
+import javax.naming.ldap.SortControl;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.authorization.Permission;
@@ -171,6 +171,18 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
 
   public List<User> findUserByQueryCriteria(LdapUserQueryImpl query) {
     ensureContextInitialized();
+
+    // convert DB wildcards to LDAP wildcards if necessary
+    if(query.getEmailLike() != null) {
+      query.userEmailLike(query.getEmailLike().replaceAll(DB_QUERY_WILDCARD, LDAP_QUERY_WILDCARD));
+    }
+    if(query.getFirstNameLike() != null) {
+      query.userFirstNameLike(query.getFirstNameLike().replaceAll(DB_QUERY_WILDCARD, LDAP_QUERY_WILDCARD));
+    }
+    if(query.getLastNameLike() != null) {
+      query.userLastNameLike(query.getLastNameLike().replaceAll(DB_QUERY_WILDCARD, LDAP_QUERY_WILDCARD));
+    }
+
     if (query.getGroupId() != null) {
       // if restriction on groupId is provided, we need to search in group tree first, look for the group and then further restrict on the members
       return findUsersByGroupId(query);
@@ -487,6 +499,12 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
   }
 
   public List<Group> findGroupByQueryCriteria(LdapGroupQuery query) {
+
+    // convert DB wildcards to LDAP wildcards if necessary
+    if(query.getNameLike() != null) {
+      query.groupNameLike(query.getNameLike().replaceAll(DB_QUERY_WILDCARD, LDAP_QUERY_WILDCARD));
+    }
+
     StringBuilder resultLogger = new StringBuilder();
     if (LdapPluginLogger.INSTANCE.isDebugEnabled()) {
       resultLogger.append("findGroupByQueryCriteria: from ");
