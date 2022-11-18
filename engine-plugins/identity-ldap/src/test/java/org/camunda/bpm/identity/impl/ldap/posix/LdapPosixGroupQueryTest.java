@@ -16,29 +16,83 @@
  */
 package org.camunda.bpm.identity.impl.ldap.posix;
 
-import org.camunda.bpm.engine.identity.Group;
-import org.camunda.bpm.engine.identity.User;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.identity.Group;
+import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.identity.ldap.util.LdapTestEnvironment;
+import org.camunda.bpm.identity.ldap.util.LdapTestEnvironmentRule;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
 
-/**
- * @author Tom Crossland
- */
-public class LdapPosixGroupQueryTest extends LdapPosixTest {
 
-  public void testFilterByGroupId() {
+public class LdapPosixGroupQueryTest {
+
+  @ClassRule
+  public static LdapTestEnvironmentRule ldapRule = new LdapTestEnvironmentRule().posix(true);
+  @Rule
+  public ProcessEngineRule engineRule = new ProcessEngineRule("posix.camunda.cfg.xml");
+
+  IdentityService identityService;
+  LdapTestEnvironment ldapTestEnvironment;
+
+  @Before
+  public void setup() {
+    identityService = engineRule.getIdentityService();
+    ldapTestEnvironment = ldapRule.getLdapTestEnvironment();
+  }
+
+  @Test
+  public void shouldFindGroupFilterByGroupIdWithoutMembers() {
+    // given
+
+    // when
     Group group = identityService.createGroupQuery().groupId("posix-group-without-members").singleResult();
-    assertNotNull(group);
 
-    group = identityService.createGroupQuery().groupId("posix-group-with-members").singleResult();
-    assertNotNull(group);
+    // then
+    assertThat(group).isNotNull();
+    assertThat(group.getId()).isEqualTo("posix-group-without-members");
+  }
 
+  @Test
+  public void shouldFindGroupFilterByGroupIdWithMembers() {
+    // given
+
+    // when
+    Group group = identityService.createGroupQuery().groupId("posix-group-with-members").singleResult();
+
+    // then
+    assertThat(group).isNotNull();
+    assertThat(group.getId()).isEqualTo("posix-group-with-members");
+  }
+
+  @Test
+  public void shouldFindUserFilterByMemberOfGroupWithoutMember() {
+    // given
+
+    // when
     List<User> result = identityService.createUserQuery().memberOfGroup("posix-group-without-members").list();
-    assertEquals(0, result.size());
 
-    result = identityService.createUserQuery().memberOfGroup("posix-group-with-members").list();
-    assertEquals(3, result.size());
+    // then
+    assertThat(result).hasSize(0);
+  }
+
+  @Test
+  public void shouldFindUserFilterByMemberOfGroupWithMember() {
+    // given
+
+    // when
+    List<User> result = identityService.createUserQuery().memberOfGroup("posix-group-with-members").list();
+
+    // then
+    assertThat(result).hasSize(3);
+    assertThat(result).extracting("id").containsOnly("fozzie", "monster", "ruecker");
   }
 
 }

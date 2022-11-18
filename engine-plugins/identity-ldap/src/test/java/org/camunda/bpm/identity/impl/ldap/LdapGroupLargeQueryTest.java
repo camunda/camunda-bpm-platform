@@ -16,84 +16,88 @@
  */
 package org.camunda.bpm.identity.impl.ldap;
 
-import org.camunda.bpm.engine.identity.Group;
-import org.camunda.bpm.engine.identity.GroupQuery;
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
-public class LdapGroupLargeQueryTest extends ResourceProcessEngineTestCase {
+import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.identity.Group;
+import org.camunda.bpm.engine.identity.GroupQuery;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.identity.ldap.util.LdapTestEnvironment;
+import org.camunda.bpm.identity.ldap.util.LdapTestEnvironmentRule;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
 
+public class LdapGroupLargeQueryTest {
+
+  @ClassRule
+  public static LdapTestEnvironmentRule ldapRule = new LdapTestEnvironmentRule().additionalNumberOfUsers(5).additionnalNumberOfGroups(5).additionalNumberOfRoles(80); // the TestEnvironment creates groups for roles. Attention, stay under 80, there is a limitation in the query on 100
+
+  @Rule
+  public ProcessEngineRule engineRule = new ProcessEngineRule("camunda.ldap.pages.cfg.xml"); // pageSize = 3 in this configuration
+
+  IdentityService identityService;
   LdapTestEnvironment ldapTestEnvironment;
 
-  public LdapGroupLargeQueryTest() {
-    // pageSize = 3 in this configuration
-    super("camunda.ldap.pages.cfg.xml");
+  @Before
+  public void setup() {
+    identityService = engineRule.getIdentityService();
+    ldapTestEnvironment = ldapRule.getLdapTestEnvironment();
   }
 
-  protected void setUp() throws Exception {
-    ldapTestEnvironment = new LdapTestEnvironment();
-    // the TestEnvironment creates groups for roles
-    // Attention, stay under 80, there is a limitation in the query on 100
-    ldapTestEnvironment.init(5, 5, 80);
-    super.setUp();
-  }
-
-  protected void tearDown() throws Exception {
-    if (ldapTestEnvironment != null) {
-      ldapTestEnvironment.shutdown();
-      ldapTestEnvironment = null;
-    }
-    super.tearDown();
-  }
-
+  @Test
   public void testAllGroupsQuery() {
     List<Group> listGroups = identityService.createGroupQuery().list();
 
     // In this group, we expect more than a page size
     // Attention, in the test environment, a Role is implemented by a groupOfNames. the groupQuery search for groups
     // So the comparison must be done via the Roles name
-    assertEquals(ldapTestEnvironment.getTotalNumberOfRolesCreated(), listGroups.size());
+    assertThat(listGroups).hasSize(ldapTestEnvironment.getTotalNumberOfRolesCreated());
   }
 
+  @Test
   public void testPagesAllGroupsQuery() {
     List<Group> listGroups = identityService.createGroupQuery().list();
 
-    assertEquals(ldapTestEnvironment.getTotalNumberOfRolesCreated(), listGroups.size());
+    assertThat(listGroups).hasSize(ldapTestEnvironment.getTotalNumberOfRolesCreated());
 
     // ask 3 pages
     for (int firstResult = 2; firstResult < 10; firstResult += 4) {
       List<Group> listPages = identityService.createGroupQuery().listPage(firstResult, 5);
-      assertTrue("Maximum 5 results expected", listPages.size() <= 5);
+      assertThat(listPages.size()).as("Maximum 5 results expected").isLessThanOrEqualTo(5);
 
       for (int i = 0; i < listPages.size(); i++) {
-        assertEquals(listGroups.get(firstResult + i).getId(), listPages.get(i).getId());
-        assertEquals(listGroups.get(firstResult + i).getName(), listPages.get(i).getName());
+        assertThat(listPages.get(i).getId()).isEqualTo(listGroups.get(firstResult + i).getId());
+        assertThat(listPages.get(i).getName()).isEqualTo(listGroups.get(firstResult + i).getName());
       }
 
     }
   }
 
+  @Test
   public void testQueryPaging() {
     GroupQuery query = identityService.createGroupQuery();
 
-    assertEquals(86, query.listPage(0, Integer.MAX_VALUE).size());
+    assertThat(query.listPage(0, Integer.MAX_VALUE)).hasSize(86);
 
     // Verifying the un-paged results
-    assertEquals(86, query.count());
-    assertEquals(86, query.list().size());
+    assertThat(query.count()).isEqualTo(86);
+    assertThat(query.list()).hasSize(86);
 
     // Verifying paged results
-    assertEquals(2, query.listPage(0, 2).size());
-    assertEquals(2, query.listPage(2, 2).size());
-    assertEquals(3, query.listPage(4, 3).size());
-    assertEquals(1, query.listPage(85, 3).size());
-    assertEquals(1, query.listPage(85, 1).size());
+    assertThat(query.listPage(0, 2)).hasSize(2);
+    assertThat(query.listPage(2, 2)).hasSize(2);
+    assertThat(query.listPage(4, 3)).hasSize(3);
+    assertThat(query.listPage(85, 3)).hasSize(1);
+    assertThat(query.listPage(85, 1)).hasSize(1);
 
     // Verifying odd usages
-    assertEquals(0, query.listPage(-1, -1).size());
-    assertEquals(0, query.listPage(86, 2).size()); // 86 is the last index with a result
-    assertEquals(86, query.listPage(0, 87).size()); // there are only 86 groups
+    assertThat(query.listPage(-1, -1)).hasSize(0);
+    assertThat(query.listPage(86, 2)).hasSize(0); // 86 is the last index with a result
+    assertThat(query.listPage(0, 87)).hasSize(86); // there are only 86 groups
   }
 
 }

@@ -16,17 +16,24 @@
  */
 package org.camunda.bpm.identity.ldap.util;
 
-import org.camunda.bpm.identity.impl.ldap.LdapTestEnvironment;
 import org.junit.rules.ExternalResource;
 
-public class LdapTestEnvironmentRule extends ExternalResource{
+public class LdapTestEnvironmentRule extends ExternalResource {
 
   LdapTestEnvironment ldapTestEnvironment;
 
+  int additionalNumberOfUsers = 0;
+  int additionnalNumberOfGroups = 0;
+  int additionalNumberOfRoles = 0;
+  boolean posix = false;
+
   @Override
-  protected void before() throws Throwable {
-    ldapTestEnvironment = new LdapTestEnvironment();
-    ldapTestEnvironment.init();
+  protected void before() throws Exception {
+    if(posix) {
+      setupPosix();
+    } else {
+      setupLdap();
+    }
   }
 
   @Override
@@ -35,6 +42,36 @@ public class LdapTestEnvironmentRule extends ExternalResource{
       ldapTestEnvironment.shutdown();
       ldapTestEnvironment = null;
     }
+  }
+
+  private void setupLdap() throws Exception {
+    ldapTestEnvironment = new LdapTestEnvironment();
+    ldapTestEnvironment.init(additionalNumberOfUsers, additionnalNumberOfGroups, additionalNumberOfRoles);
+  }
+
+  public void setupPosix() throws Exception {
+    ldapTestEnvironment = new LdapPosixTestEnvironment();
+    ldapTestEnvironment.init();
+  }
+
+  public LdapTestEnvironmentRule additionalNumberOfUsers(int additionalNumberOfUsers) {
+    this.additionalNumberOfUsers = additionalNumberOfUsers;
+    return this;
+  }
+
+  public LdapTestEnvironmentRule additionnalNumberOfGroups(int additionnalNumberOfGroups) {
+    this.additionnalNumberOfGroups = additionnalNumberOfGroups;
+    return this;
+  }
+
+  public LdapTestEnvironmentRule additionalNumberOfRoles(int additionalNumberOfRoles) {
+    this.additionalNumberOfRoles = additionalNumberOfRoles;
+    return this;
+  }
+
+  public LdapTestEnvironmentRule posix(boolean posix) {
+    this.posix = posix;
+    return this;
   }
 
   public LdapTestEnvironment getLdapTestEnvironment() {

@@ -14,20 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.identity.impl.ldap.posix;
+package org.camunda.bpm.identity.ldap.util;
 
 import java.io.File;
-import org.apache.directory.api.ldap.model.entry.Entry;
-
-import org.apache.directory.api.ldap.model.entry.Modification;
-import org.apache.directory.api.ldap.model.entry.Attribute;
-import org.apache.directory.api.ldap.model.entry.ModificationOperation;
-import org.apache.directory.api.ldap.model.name.Dn;
-import org.camunda.bpm.identity.impl.ldap.LdapTestEnvironment;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.directory.api.ldap.model.entry.Attribute;
 import org.apache.directory.api.ldap.model.entry.DefaultModification;
+import org.apache.directory.api.ldap.model.entry.Entry;
+import org.apache.directory.api.ldap.model.entry.Modification;
+import org.apache.directory.api.ldap.model.entry.ModificationOperation;
+import org.apache.directory.api.ldap.model.name.Dn;
 
 /**
  * <p>
@@ -55,7 +53,7 @@ public class LdapPosixTestEnvironment extends LdapTestEnvironment {
       if (null != nisDisabled && "TRUE".equalsIgnoreCase(nisDisabled.getString())) {
         nisDisabled.remove("TRUE");
         nisDisabled.add("FALSE");
-        List<Modification> modifications = new ArrayList<Modification>();
+        List<Modification> modifications = new ArrayList<>();
         modifications.add(new DefaultModification(ModificationOperation.REPLACE_ATTRIBUTE, nisDisabled));
         service.getAdminSession().modify(nis, modifications);
         service.shutdown();

@@ -16,45 +16,44 @@
  */
 package org.camunda.bpm.identity.impl.ldap;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.identity.User;
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.identity.ldap.util.LdapTestEnvironment;
+import org.camunda.bpm.identity.ldap.util.LdapTestEnvironmentRule;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
 
 /**
  * Represents a test case where the sortControlSupport property is enabled.
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
-public class LdapEnableSortControlSupportTest extends ResourceProcessEngineTestCase {
+public class LdapEnableSortControlSupportTest {
 
-  public LdapEnableSortControlSupportTest() {
-    super("camunda.ldap.enable.sort.control.support.cfg.xml");
+  @ClassRule
+  public static LdapTestEnvironmentRule ldapRule = new LdapTestEnvironmentRule();
+  @Rule
+  public ProcessEngineRule engineRule = new ProcessEngineRule("camunda.ldap.enable.sort.control.support.cfg.xml");
+
+  IdentityService identityService;
+  LdapTestEnvironment ldapTestEnvironment;
+
+  @Before
+  public void setup() {
+    identityService = engineRule.getIdentityService();
+    ldapTestEnvironment = ldapRule.getLdapTestEnvironment();
   }
 
-  protected static LdapTestEnvironment ldapTestEnvironment;
-
-  @Override
-  protected void setUp() throws Exception {
-    if(ldapTestEnvironment == null) {
-      ldapTestEnvironment = new LdapTestEnvironment();
-      ldapTestEnvironment.init();
-    }
-    super.setUp();
-  }
-
-  @Override
-  protected void tearDown() throws Exception {
-    if(ldapTestEnvironment != null) {
-      ldapTestEnvironment.shutdown();
-      ldapTestEnvironment = null;
-    }
-    super.tearDown();
-  }
-
-
-
+  @Test
   public void testOrderByUserFirstName() {
     List<User> orderedUsers = identityService.createUserQuery().orderByUserLastName().asc().list();
     List<User> userList = identityService.createUserQuery().list();
@@ -68,7 +67,7 @@ public class LdapEnableSortControlSupportTest extends ResourceProcessEngineTestC
 
     int len = orderedUsers.size();
     for (int i = 0; i < len; i++) {
-      assertEquals("Index: " + i, orderedUsers.get(i).getLastName(), userList.get(i).getLastName());
+      assertThat(orderedUsers.get(i).getLastName()).as("Index: " + i).isEqualTo(userList.get(i).getLastName());
     }
   }
 }

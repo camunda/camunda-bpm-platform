@@ -20,48 +20,54 @@ import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Resources.GROUP;
 import static org.camunda.bpm.engine.authorization.Resources.USER;
+import static org.camunda.bpm.identity.ldap.util.LdapTestUtilities.testGroupPaging;
+import static org.camunda.bpm.identity.ldap.util.LdapTestUtilities.testUserPaging;
 
+import org.camunda.bpm.engine.AuthorizationService;
+import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
-import static org.camunda.bpm.identity.impl.ldap.LdapTestUtilities.testGroupPaging;
-import static org.camunda.bpm.identity.impl.ldap.LdapTestUtilities.testUserPaging;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.identity.ldap.util.LdapTestEnvironment;
+import org.camunda.bpm.identity.ldap.util.LdapTestEnvironmentRule;
+import org.camunda.bpm.identity.ldap.util.LdapTestUtilities;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class LdapDisableAuthorizationCheckTest extends ResourceProcessEngineTestCase {
+public class LdapDisableAuthorizationCheckTest {
 
-  public LdapDisableAuthorizationCheckTest() {
-    super("camunda.ldap.disable.authorization.check.cfg.xml");
+  @ClassRule
+  public static LdapTestEnvironmentRule ldapRule = new LdapTestEnvironmentRule();
+  @Rule
+  public ProcessEngineRule engineRule = new ProcessEngineRule("camunda.ldap.disable.authorization.check.cfg.xml");
+
+  ProcessEngineConfiguration processEngineConfiguration;
+  IdentityService identityService;
+  AuthorizationService authorizationService;
+  LdapTestEnvironment ldapTestEnvironment;
+
+  @Before
+  public void setup() {
+    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+    identityService = engineRule.getIdentityService();
+    authorizationService = engineRule.getAuthorizationService();
+    ldapTestEnvironment = ldapRule.getLdapTestEnvironment();
   }
 
-  protected static LdapTestEnvironment ldapTestEnvironment;
-
-  @Override
-  protected void setUp() throws Exception {
-    if(ldapTestEnvironment == null) {
-      ldapTestEnvironment = new LdapTestEnvironment();
-      ldapTestEnvironment.init();
-    }
-    super.setUp();
-  }
-
-  @Override
-  protected void tearDown() throws Exception {
-    if(ldapTestEnvironment != null) {
-      ldapTestEnvironment.shutdown();
-      ldapTestEnvironment = null;
-    }
-    super.tearDown();
-  }
-
+  @Test
   public void testUserQueryPagination() {
     LdapTestUtilities.testUserPaging(identityService, ldapTestEnvironment);
   }
 
+  @Test
   public void testUserQueryPaginationWithAuthenticatedUserWithoutAuthorizations() {
     try {
       processEngineConfiguration.setAuthorizationEnabled(true);
@@ -75,6 +81,7 @@ public class LdapDisableAuthorizationCheckTest extends ResourceProcessEngineTest
     }
   }
 
+  @Test
   public void testUserQueryPaginationWithAuthenticatedUserWithAuthorizations() {
     createGrantAuthorization(USER, "roman", "oscar", READ);
     createGrantAuthorization(USER, "daniel", "oscar", READ);
@@ -98,10 +105,12 @@ public class LdapDisableAuthorizationCheckTest extends ResourceProcessEngineTest
     }
   }
 
+  @Test
   public void testGroupQueryPagination() {
     testGroupPaging(identityService);
   }
 
+  @Test
   public void testGroupQueryPaginationWithAuthenticatedUserWithoutAuthorizations() {
     try {
       processEngineConfiguration.setAuthorizationEnabled(true);
@@ -115,6 +124,7 @@ public class LdapDisableAuthorizationCheckTest extends ResourceProcessEngineTest
     }
   }
 
+  @Test
   public void testGroupQueryPaginationWithAuthenticatedUserWithAuthorizations() {
     createGrantAuthorization(GROUP, "management", "oscar", READ);
     createGrantAuthorization(GROUP, "consulting", "oscar", READ);

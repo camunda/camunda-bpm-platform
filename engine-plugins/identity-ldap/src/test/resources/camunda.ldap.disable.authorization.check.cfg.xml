@@ -34,7 +34,7 @@
   
     <property name="serverUrl" value="ldap://localhost:${ldap.server.port}/" />
     <property name="managerDn" value="uid=daniel,ou=office-berlin,o=camunda,c=org" />
-    <property name="managerPassword" value="daniel" />    
+    <property name="managerPassword" value="daniel" />
     <property name="baseDn" value="o=camunda,c=org" />
     
     <property name="userSearchBase" value="" />

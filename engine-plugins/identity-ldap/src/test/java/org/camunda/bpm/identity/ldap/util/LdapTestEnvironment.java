@@ -14,29 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.identity.impl.ldap;
+package org.camunda.bpm.identity.ldap.util;
 
-import org.apache.directory.server.core.DefaultDirectoryService;
-import org.apache.directory.server.core.api.DirectoryService;
-import org.apache.directory.api.ldap.model.entry.Entry;
-import org.apache.directory.server.core.api.partition.Partition;
-import org.apache.directory.server.core.partition.impl.btree.jdbm.JdbmIndex;
-import org.apache.directory.server.core.partition.impl.btree.jdbm.JdbmPartition;
-import org.apache.directory.server.ldap.LdapServer;
-import org.apache.directory.server.protocol.shared.transport.TcpTransport;
-import org.apache.directory.server.xdbm.Index;
-import org.apache.directory.api.ldap.model.name.Dn;
-import org.camunda.bpm.engine.impl.util.IoUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.directory.api.ldap.model.entry.Entry;
+import org.apache.directory.api.ldap.model.name.Dn;
 import org.apache.directory.api.ldap.model.schema.SchemaManager;
 import org.apache.directory.api.ldap.model.schema.registries.SchemaLoader;
 import org.apache.directory.api.ldap.schema.extractor.SchemaLdifExtractor;
@@ -45,14 +36,23 @@ import org.apache.directory.api.ldap.schema.loader.LdifSchemaLoader;
 import org.apache.directory.api.ldap.schema.manager.impl.DefaultSchemaManager;
 import org.apache.directory.api.util.exception.Exceptions;
 import org.apache.directory.server.constants.ServerDNConstants;
+import org.apache.directory.server.core.DefaultDirectoryService;
 import org.apache.directory.server.core.api.CacheService;
+import org.apache.directory.server.core.api.DirectoryService;
 import org.apache.directory.server.core.api.DnFactory;
 import org.apache.directory.server.core.api.InstanceLayout;
+import org.apache.directory.server.core.api.partition.Partition;
 import org.apache.directory.server.core.api.schema.SchemaPartition;
+import org.apache.directory.server.core.partition.impl.btree.jdbm.JdbmIndex;
+import org.apache.directory.server.core.partition.impl.btree.jdbm.JdbmPartition;
 import org.apache.directory.server.core.partition.ldif.LdifPartition;
 import org.apache.directory.server.i18n.I18n;
-
-import org.apache.commons.io.FileUtils;
+import org.apache.directory.server.ldap.LdapServer;
+import org.apache.directory.server.protocol.shared.transport.TcpTransport;
+import org.apache.directory.server.xdbm.Index;
+import org.camunda.bpm.engine.impl.util.IoUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -75,7 +75,7 @@ public class LdapTestEnvironment {
 
   private int numberOfUsersCreated = 0;
   private int numberOfGroupsCreated = 0;
-  private int numberOfRolesCreated=0;
+  private int numberOfRolesCreated = 0;
 
   private int numberOfUsersCreatedInBerkeleyOffice = 0;
 
@@ -286,8 +286,6 @@ public class LdapTestEnvironment {
   public int getTotalNumberOfUserInOfficeBerkeley() {
     return numberOfUsersCreatedInBerkeleyOffice;
   }
-
-  ;
 
   protected String createUserUid(String user, String group, String firstname, String lastname, String email) throws Exception {
     Dn dn = new Dn("uid=" + user + ",ou=" + group + ",o=camunda,c=org");

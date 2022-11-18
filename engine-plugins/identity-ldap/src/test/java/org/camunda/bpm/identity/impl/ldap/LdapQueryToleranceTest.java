@@ -16,46 +16,52 @@
  */
 package org.camunda.bpm.identity.impl.ldap;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
-import org.junit.Assert;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.identity.ldap.util.LdapTestEnvironment;
+import org.camunda.bpm.identity.ldap.util.LdapTestEnvironmentRule;
+import org.camunda.commons.testing.ProcessEngineLoggingRule;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.spi.ILoggingEvent;
 
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class LdapQueryToleranceTest extends ResourceProcessEngineTestCase {
+public class LdapQueryToleranceTest {
 
-  private LdapTestEnvironment ldapTestEnvironment;
+  @ClassRule
+  public static LdapTestEnvironmentRule ldapRule = new LdapTestEnvironmentRule();
+  @Rule
+  public ProcessEngineRule engineRule = new ProcessEngineRule("invalid-id-attributes.cfg.xml");
+  @Rule
+  public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule().level(Level.ERROR).watch("org.camunda.bpm.identity.impl.ldap");
 
-  public LdapQueryToleranceTest() {
-    super("invalid-id-attributes.cfg.xml");
+  ProcessEngine processEngine;
+  LdapTestEnvironment ldapTestEnvironment;
+
+  @Before
+  public void setup() {
+    processEngine = engineRule.getProcessEngine();
+    ldapTestEnvironment = ldapRule.getLdapTestEnvironment();
   }
 
-  @Override
-  protected void setUp() throws Exception {
-    ldapTestEnvironment = new LdapTestEnvironment();
-    ldapTestEnvironment.init();
-    super.setUp();
-  }
-
-  @Override
-  protected void tearDown() throws Exception {
-    if(ldapTestEnvironment != null) {
-      ldapTestEnvironment.shutdown();
-      ldapTestEnvironment = null;
-    }
-    super.tearDown();
-  }
-
-  public void testNotReturnGroupsWithNullId() throws Exception
-  {
+  @Test
+  public void testNotReturnGroupsWithNullId() {
     // given
-    // LdapTestEnvironment creates six groups by default;
+    // LdapTestEnvironment creates six roles (groupOfNames) by default;
     // these won't return a group id, because they do not have the group id attribute
     // defined in the ldap plugin config
     // the plugin should not return such groups and instead log an error
@@ -66,25 +72,29 @@ public class LdapQueryToleranceTest extends ResourceProcessEngineTestCase {
 
     // then
     // groups with id null were not returned
-    Assert.assertEquals(0, groups.size());
-    Assert.assertEquals(0, count);
+    assertThat(groups).hasSize(0);
+    assertThat(count).isEqualTo(0);
+    List<ILoggingEvent> filteredLog = loggingRule.getFilteredLog("LDAP-00004 LDAP group query returned a group with id null.");
+    assertThat(filteredLog).hasSize(12); // 2 queries * 6 roles (groupOfNames)
   }
 
-  public void testNotReturnUsersWithNullId() throws Exception
-  {
+  @Test
+  public void testNotReturnUsersWithNullId() {
     // given
-    // LdapTestEnvironment creates six groups by default;
+    // LdapTestEnvironment creates 12 users by default;
     // these won't return a group id, because they do not have the group id attribute
     // defined in the ldap plugin config
     // the plugin should not return such groups and instead log an error
 
     // when
     List<User> users = processEngine.getIdentityService().createUserQuery().list();
-    long count = processEngine.getIdentityService().createGroupQuery().count();
+    long count = processEngine.getIdentityService().createUserQuery().count();
 
     // then
     // groups with id null were not returned
-    Assert.assertEquals(0, users.size());
-    Assert.assertEquals(0, count);
+    assertThat(users).hasSize(0);
+    assertThat(count).isEqualTo(0);
+    List<ILoggingEvent> filteredLog = loggingRule.getFilteredLog("LDAP-00004 LDAP user query returned a user with id null.");
+    assertThat(filteredLog).hasSize(24); // 2 queries * 12 users
   }
 }
