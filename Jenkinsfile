@@ -506,7 +506,7 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel: 'h2',
               runSteps: {
-                cambpmRunMaven('.', 'clean verify -Pcheck-engine,wls-compatibility,jersey2', runtimeStash: true)
+                cambpmRunMaven('.', 'clean verify -pl !engine-rest/docs/ -Pcheck-engine,wls-compatibility,jersey2', runtimeStash: true)
               },
               postFailure: {
                 cambpmPublishTestResult()
