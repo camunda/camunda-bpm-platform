@@ -48,6 +48,7 @@
                                  "decision-instances": { "count": 140 },
                                  "executed-decision-elements": { "count": 732 }
                                },
+                               "data-collection-start-date": "2022-11-320T15:53:20.386+0100",
                                "camunda-integration": [
                                  "spring-boot-starter",
                                  "camunda-bpm-run"
