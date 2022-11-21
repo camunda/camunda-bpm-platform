@@ -70,7 +70,7 @@ module.exports = async function () {
     var linksToIssues = collectionUtils.revertMultiMap(links); // url => [issue id, ..]
     linksToIssues = collectionUtils.sortMapByIntKeys(linksToIssues);
         
-    core.debug(`Result links: ${jsonUtils.stringifyMapToJSON(links)}`);
+    core.info(`Result links: ${jsonUtils.stringifyMapToJSON(links)}`);
     core.debug(`Result reverse links: ${jsonUtils.stringifyMapToJSON(linksToIssues)}`);
     core.debug(`Issues: ${jsonUtils.stringifyMapToJSON(issues)}`);
     
