@@ -976,15 +976,15 @@ public class BpmnAwareTests extends AbstractAssertions {
    *          withVariables(String key, Object value, ...)
    */
   public static void complete(ExternalTask externalTask, Map<String, Object> variables, Map<String, Object> localVariables) {
-    if (externalTask == null || localVariables == null) {
-      throw new IllegalArgumentException(format("Illegal call of completeExternalTask(externalTask = '%s', localvariables = '%s') - both must not be null!", externalTask, localVariables));
+    if (externalTask == null || (variables == null && localVariables == null)) {
+      throw new IllegalArgumentException(format("Illegal call of completeExternalTask(externalTask = '%s', variables = '%s', localvariables = '%s') - provide external task and either variables or local variables.", externalTask, variables, localVariables));
     }
     List<LockedExternalTask> lockedTasks = fetchAndLock(externalTask.getTopicName(), DEFAULT_WORKER_EXTERNAL_TASK, 1);
     if (lockedTasks.isEmpty()) {
-      throw new NotFoundException(format("No lockable external task found for externalTask = '%s', variables = '%s'", externalTask, variables));
+      throw new NotFoundException(format("No lockable external task found for externalTask = '%s', variables = '%s', localVariables = '%s'", externalTask, variables, localVariables));
     }
     if (!lockedTasks.get(0).getId().equals(externalTask.getId())) {
-      throw new IllegalStateException(format("Multiple external tasks found for externalTask = '%s', variables = '%s'", externalTask, variables));
+      throw new IllegalStateException(format("Multiple external tasks found for externalTask = '%s', variables = '%s', localVariables = '%s'", externalTask, variables, localVariables));
     }
     complete(lockedTasks.get(0), variables, localVariables);
   }
@@ -1058,8 +1058,8 @@ public class BpmnAwareTests extends AbstractAssertions {
    *          withVariables(String key, Object value, ...)
    */
   public static void complete(LockedExternalTask lockedExternalTask, Map<String, Object> variables, Map<String, Object> localVariables) {
-    if (lockedExternalTask == null || localVariables == null) {
-      throw new IllegalArgumentException(format("Illegal call of completeExternalTask(lockedExternalTask = '%s', localVariables = '%s') - both must not be null!", lockedExternalTask, localVariables));
+    if (lockedExternalTask == null || (variables == null && localVariables == null)) {
+      throw new IllegalArgumentException(format("Illegal call of completeExternalTask(lockedExternalTask = '%s', variables = '%s', localVariables = '%s') - provide locked external task and either variables or local variables.", lockedExternalTask, variables, localVariables));
     }
     externalTaskService().complete(lockedExternalTask.getId(), lockedExternalTask.getWorkerId(), variables, localVariables);
   }
