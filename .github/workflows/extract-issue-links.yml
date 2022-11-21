@@ -91,5 +91,3 @@ jobs:
             }
         env:
           SLACK_WEBHOOK_URL: ${{ steps.secrets.outputs.SEC_CHANNEL_SLACK_WEBHOOK_URL }} # from previous step that fetches secrets from Vault
-      - name: Display links
-        run: echo "The extracted links are ${{ steps.extract-issue-links.outputs.links }}"
