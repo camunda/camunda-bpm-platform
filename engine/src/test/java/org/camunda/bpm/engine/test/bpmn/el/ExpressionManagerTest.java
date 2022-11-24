@@ -37,6 +37,7 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -203,6 +204,7 @@ public class ExpressionManagerTest extends PluggableProcessEngineTest {
     assertEquals("lastParam", task2Var);
   }
 
+  @Ignore
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void shouldResolveMethodExpressionWithOneNullParameter() {
@@ -243,6 +245,7 @@ public class ExpressionManagerTest extends PluggableProcessEngineTest {
     assertThat(userTask).isNotNull();
   }
 
+  @Ignore
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void shouldResolveMethodExpressionWithTwoNullParameter() {
@@ -283,6 +286,7 @@ public class ExpressionManagerTest extends PluggableProcessEngineTest {
     assertThat(userTask).isNotNull();
   }
 
+  @Ignore
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void shouldResolveMethodExpressionWithNoNullParameter() {
