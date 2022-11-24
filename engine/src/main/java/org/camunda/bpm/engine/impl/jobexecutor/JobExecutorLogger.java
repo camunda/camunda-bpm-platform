@@ -194,22 +194,18 @@ public class JobExecutorLogger extends ProcessEngineLogger {
   }
 
   public void infoJobExecutorDoesNotHandleHistoryCleanupJobs(ProcessEngineConfigurationImpl config) {
-    Long jobExecutorPriorityRangeMin = config.getJobExecutorPriorityRangeMin();
-    Long jobExecutorPriorityRangeMax = config.getJobExecutorPriorityRangeMax();
     logInfo("029",
         "JobExecutor is configured for priority range {}-{}. History cleanup jobs will not be handled, because they are outside the priority range ({}).",
-        jobExecutorPriorityRangeMin == null ? 0 : jobExecutorPriorityRangeMin,
-        jobExecutorPriorityRangeMax == null ? Long.MAX_VALUE : jobExecutorPriorityRangeMax,
+        config.getJobExecutorPriorityRangeMin(),
+        config.getJobExecutorPriorityRangeMax(),
         config.getHistoryCleanupJobPriority());
   }
 
   public void infoJobExecutorDoesNotHandleBatchJobs(ProcessEngineConfigurationImpl config) {
-    Long jobExecutorPriorityRangeMin = config.getJobExecutorPriorityRangeMin();
-    Long jobExecutorPriorityRangeMax = config.getJobExecutorPriorityRangeMax();
     logInfo("030",
         "JobExecutor is configured for priority range {}-{}. Batch jobs will not be handled, because they are outside the priority range ({}).",
-        jobExecutorPriorityRangeMin == null ? 0 : jobExecutorPriorityRangeMin,
-        jobExecutorPriorityRangeMax == null ? Long.MAX_VALUE : jobExecutorPriorityRangeMax,
+        config.getJobExecutorPriorityRangeMin(),
+        config.getJobExecutorPriorityRangeMax(),
         config.getBatchJobPriority());
   }
 

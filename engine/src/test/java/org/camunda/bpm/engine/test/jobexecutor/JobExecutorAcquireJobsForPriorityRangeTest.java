@@ -34,10 +34,10 @@ public class JobExecutorAcquireJobsForPriorityRangeTest extends AbstractJobExecu
   }
 
   @Test
-  public void shouldAcquireAllJobsNoBounds() {
+  public void shouldAcquireAllJobs() {
     // given
-    configuration.setJobExecutorPriorityRangeMin(null);
-    configuration.setJobExecutorPriorityRangeMax(null);
+    configuration.setJobExecutorPriorityRangeMin(0);
+    configuration.setJobExecutorPriorityRangeMax(Long.MAX_VALUE);
 
     // when
     List<AcquirableJobEntity> acquirableJobs = findAcquirableJobs();
@@ -55,7 +55,7 @@ public class JobExecutorAcquireJobsForPriorityRangeTest extends AbstractJobExecu
   @Test
   public void shouldAcquireOnlyJobsInRangeWithUpperBound() {
     // given
-    configuration.setJobExecutorPriorityRangeMin(null);
+    configuration.setJobExecutorPriorityRangeMin(0);
     configuration.setJobExecutorPriorityRangeMax(7L);
 
     // when
@@ -72,7 +72,7 @@ public class JobExecutorAcquireJobsForPriorityRangeTest extends AbstractJobExecu
   public void shouldAcquireOnlyJobsInRangeWithLowerBound() {
     // given
     configuration.setJobExecutorPriorityRangeMin(7L);
-    configuration.setJobExecutorPriorityRangeMax(null);
+    configuration.setJobExecutorPriorityRangeMax(Long.MAX_VALUE);
 
     // when
     List<AcquirableJobEntity> acquirableJobs = findAcquirableJobs();

@@ -49,8 +49,8 @@ public class BatchJobPriorityRangeTest {
 
   protected long defaultBatchJobPriority;
   protected int defaultBatchJobsPerSeed;
-  protected Long defaultJobExecutorPriorityRangeMin;
-  protected Long defaultJobExecutorPriorityRangeMax;
+  protected long defaultJobExecutorPriorityRangeMin;
+  protected long defaultJobExecutorPriorityRangeMax;
 
   @Before
   public void setup() {

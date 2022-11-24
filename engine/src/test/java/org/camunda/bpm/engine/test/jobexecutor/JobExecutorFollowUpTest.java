@@ -114,8 +114,8 @@ public class JobExecutorFollowUpTest {
   protected static ThreadControl executionThread;
 
   protected ProcessEngineConfigurationImpl configuration;
-  protected Long defaultJobExecutorPriorityRangeMin;
-  protected Long defaultJobExecutorPriorityRangeMax;
+  protected long defaultJobExecutorPriorityRangeMin;
+  protected long defaultJobExecutorPriorityRangeMax;
 
   @Before
   public void setUp() throws Exception {
