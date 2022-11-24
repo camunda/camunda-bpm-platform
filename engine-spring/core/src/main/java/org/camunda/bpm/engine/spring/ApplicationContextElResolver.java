@@ -20,8 +20,8 @@ import java.beans.FeatureDescriptor;
 import java.util.Iterator;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import jakarta.el.ELContext;
-import jakarta.el.ELResolver;
+import camundajar.impl.jakarta.el.ELContext;
+import camundajar.impl.jakarta.el.ELResolver;
 import org.springframework.context.ApplicationContext;
 
 /**
