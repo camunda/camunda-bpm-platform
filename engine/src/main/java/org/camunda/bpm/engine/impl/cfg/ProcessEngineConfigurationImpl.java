@@ -519,8 +519,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected PriorityProvider<JobDeclaration<?, ?>> jobPriorityProvider;
 
-  protected Long jobExecutorPriorityRangeMin = null;
-  protected Long jobExecutorPriorityRangeMax = null;
+  protected long jobExecutorPriorityRangeMin = 0;
+  protected long jobExecutorPriorityRangeMax = Long.MAX_VALUE;
 
   // EXTERNAL TASK /////////////////////////////////////////////////////////////
   protected PriorityProvider<ExternalTaskActivityBehavior> externalTaskPriorityProvider;
@@ -2352,23 +2352,20 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       }
     }
 
-    long effectiveJobExecutorPriorityRangeMin = jobExecutorPriorityRangeMin == null ? 0 : jobExecutorPriorityRangeMin;
-    long effectiveJobExecutorPriorityRangeMax = jobExecutorPriorityRangeMax == null ? Long.MAX_VALUE : jobExecutorPriorityRangeMax;
-
     // verify job executor priority range is configured correctly
-    if (effectiveJobExecutorPriorityRangeMin > effectiveJobExecutorPriorityRangeMax) {
+    if (jobExecutorPriorityRangeMin > jobExecutorPriorityRangeMax) {
       throw ProcessEngineLogger.JOB_EXECUTOR_LOGGER.jobExecutorPriorityRangeException(
           "jobExecutorPriorityRangeMin can not be greater than jobExecutorPriorityRangeMax");
     }
-    if (effectiveJobExecutorPriorityRangeMin < 0) {
+    if (jobExecutorPriorityRangeMin < 0) {
       throw ProcessEngineLogger.JOB_EXECUTOR_LOGGER
           .jobExecutorPriorityRangeException("job executor priority range can not be negative");
     }
 
-    if (effectiveJobExecutorPriorityRangeMin > historyCleanupJobPriority || effectiveJobExecutorPriorityRangeMax < historyCleanupJobPriority) {
+    if (jobExecutorPriorityRangeMin > historyCleanupJobPriority || jobExecutorPriorityRangeMax < historyCleanupJobPriority) {
       ProcessEngineLogger.JOB_EXECUTOR_LOGGER.infoJobExecutorDoesNotHandleHistoryCleanupJobs(this);
     }
-    if (effectiveJobExecutorPriorityRangeMin > batchJobPriority || effectiveJobExecutorPriorityRangeMax < batchJobPriority) {
+    if (jobExecutorPriorityRangeMin > batchJobPriority || jobExecutorPriorityRangeMax < batchJobPriority) {
       ProcessEngineLogger.JOB_EXECUTOR_LOGGER.infoJobExecutorDoesNotHandleBatchJobs(this);
     }
   }
@@ -3197,20 +3194,20 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.jobPriorityProvider = jobPriorityProvider;
   }
 
-  public Long getJobExecutorPriorityRangeMin() {
+  public long getJobExecutorPriorityRangeMin() {
     return jobExecutorPriorityRangeMin;
   }
 
-  public ProcessEngineConfigurationImpl setJobExecutorPriorityRangeMin(Long jobExecutorPriorityRangeMin) {
+  public ProcessEngineConfigurationImpl setJobExecutorPriorityRangeMin(long jobExecutorPriorityRangeMin) {
     this.jobExecutorPriorityRangeMin = jobExecutorPriorityRangeMin;
     return this;
   }
 
-  public Long getJobExecutorPriorityRangeMax() {
+  public long getJobExecutorPriorityRangeMax() {
     return jobExecutorPriorityRangeMax;
   }
 
-  public ProcessEngineConfigurationImpl setJobExecutorPriorityRangeMax(Long jobExecutorPriorityRangeMax) {
+  public ProcessEngineConfigurationImpl setJobExecutorPriorityRangeMax(long jobExecutorPriorityRangeMax) {
     this.jobExecutorPriorityRangeMax = jobExecutorPriorityRangeMax;
     return this;
   }

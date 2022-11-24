@@ -178,10 +178,8 @@ public class JobManager extends AbstractManager {
 
   protected boolean isJobPriorityInJobExecutorPriorityRange(long jobPriority) {
     ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
-    Long jobExecutorPriorityRangeMin = configuration.getJobExecutorPriorityRangeMin();
-    Long jobExecutorPriorityRangeMax = configuration.getJobExecutorPriorityRangeMax();
-    return (jobExecutorPriorityRangeMin == null || jobExecutorPriorityRangeMin <= jobPriority)
-        && (jobExecutorPriorityRangeMax == null || jobExecutorPriorityRangeMax >= jobPriority);
+    return (configuration.getJobExecutorPriorityRangeMin() <= jobPriority)
+        && (configuration.getJobExecutorPriorityRangeMax() >= jobPriority);
   }
 
   public void cancelTimers(ExecutionEntity execution) {

@@ -77,7 +77,7 @@ public class JobExecutorPriorityRangeConfigurationTest {
   @Test
   public void shouldThrowExceptionOnNegativeMaxPriorityRangeConfiguration() {
     // given
-    config.setJobExecutorPriorityRangeMin(null);
+    config.setJobExecutorPriorityRangeMin(0L);
     config.setJobExecutorPriorityRangeMax(-10L);
 
     // then
