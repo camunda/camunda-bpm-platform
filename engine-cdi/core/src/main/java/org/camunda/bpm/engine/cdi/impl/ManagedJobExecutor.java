@@ -19,7 +19,7 @@ package org.camunda.bpm.engine.cdi.impl;
 import java.util.List;
 import java.util.concurrent.RejectedExecutionException;
 
-import javax.enterprise.concurrent.ManagedExecutorService;
+import jakarta.enterprise.concurrent.ManagedExecutorService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;

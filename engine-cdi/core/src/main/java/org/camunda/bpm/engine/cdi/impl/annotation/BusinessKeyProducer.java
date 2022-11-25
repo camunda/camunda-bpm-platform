@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.engine.cdi.impl.annotation;
 
-import javax.enterprise.inject.Produces;
+import jakarta.enterprise.inject.Produces;
 import javax.inject.Named;
 
 import org.camunda.bpm.engine.cdi.annotation.BusinessKey;

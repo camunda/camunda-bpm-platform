@@ -16,8 +16,8 @@
  */
 package org.camunda.bpm.engine.cdi.impl;
 
-import javax.enterprise.inject.Produces;
-import javax.enterprise.inject.spi.InjectionPoint;
+import jakarta.enterprise.inject.Produces;
+import jakarta.enterprise.inject.spi.InjectionPoint;
 
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.ProcessEngineService;

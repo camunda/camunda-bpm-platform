@@ -33,7 +33,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 
-import javax.enterprise.inject.spi.BeanManager;
+import jakarta.enterprise.inject.spi.BeanManager;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;

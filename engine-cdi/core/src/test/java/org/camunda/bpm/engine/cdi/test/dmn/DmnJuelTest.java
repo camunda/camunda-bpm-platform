@@ -23,7 +23,7 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import javax.enterprise.context.Dependent;
+import jakarta.enterprise.context.Dependent;
 import javax.inject.Named;
 
 import static org.assertj.core.api.Assertions.assertThat;

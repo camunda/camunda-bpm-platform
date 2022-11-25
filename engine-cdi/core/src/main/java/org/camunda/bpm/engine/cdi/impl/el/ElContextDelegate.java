@@ -18,10 +18,10 @@ package org.camunda.bpm.engine.cdi.impl.el;
 
 import java.util.Locale;
 
-import camundajar.impl.jakarta.el.ELContext;
-import camundajar.impl.jakarta.el.ELResolver;
-import camundajar.impl.jakarta.el.FunctionMapper;
-import camundajar.impl.jakarta.el.VariableMapper;
+import jakarta.el.ELContext;
+import jakarta.el.ELResolver;
+import jakarta.el.FunctionMapper;
+import jakarta.el.VariableMapper;
 
 /**
  * @author Daniel Meyer

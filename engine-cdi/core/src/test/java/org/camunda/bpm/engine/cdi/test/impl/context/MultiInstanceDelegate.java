@@ -21,7 +21,7 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.junit.Assert;
 
-import javax.enterprise.context.Dependent;
+import jakarta.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.inject.Named;
 

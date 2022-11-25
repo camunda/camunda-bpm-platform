@@ -21,7 +21,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.*;
 
-import javax.enterprise.inject.Alternative;
+import jakarta.enterprise.inject.Alternative;
 import javax.inject.Named;
 
 import org.camunda.bpm.engine.cdi.impl.ProcessEngineServicesProducer;

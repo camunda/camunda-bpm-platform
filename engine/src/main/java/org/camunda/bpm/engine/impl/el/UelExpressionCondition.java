@@ -23,7 +23,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.Condition;
-import camundajar.impl.jakarta.el.PropertyNotFoundException;
+import jakarta.el.PropertyNotFoundException;
 
 
 /**

@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.HashMap;
 
-import javax.enterprise.context.Dependent;
+import jakarta.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.inject.Named;
 

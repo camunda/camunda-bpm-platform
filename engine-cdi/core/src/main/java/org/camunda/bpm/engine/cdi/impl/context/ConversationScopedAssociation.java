@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.engine.cdi.impl.context;
 
-import javax.enterprise.context.ConversationScoped;
+import jakarta.enterprise.context.ConversationScoped;
 import java.io.Serializable;
 
 @ConversationScoped

@@ -16,8 +16,8 @@
  */
 package org.camunda.bpm.dmn.engine.impl.el;
 
-import camundajar.impl.jakarta.el.ELContext;
-import camundajar.impl.jakarta.el.ValueExpression;
+import jakarta.el.ELContext;
+import jakarta.el.ValueExpression;
 
 import org.camunda.bpm.dmn.engine.impl.spi.el.ElExpression;
 import org.camunda.bpm.engine.variable.context.VariableContext;

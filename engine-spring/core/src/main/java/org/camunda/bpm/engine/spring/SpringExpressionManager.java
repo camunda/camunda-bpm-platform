@@ -21,12 +21,12 @@ import org.camunda.bpm.engine.impl.el.JuelExpressionManager;
 import org.camunda.bpm.engine.impl.el.ReadOnlyMapELResolver;
 import org.camunda.bpm.engine.impl.el.VariableContextElResolver;
 import org.camunda.bpm.engine.impl.el.VariableScopeElResolver;
-import camundajar.impl.jakarta.el.ArrayELResolver;
-import camundajar.impl.jakarta.el.BeanELResolver;
-import camundajar.impl.jakarta.el.CompositeELResolver;
-import camundajar.impl.jakarta.el.ELResolver;
-import camundajar.impl.jakarta.el.ListELResolver;
-import camundajar.impl.jakarta.el.MapELResolver;
+import jakarta.el.ArrayELResolver;
+import jakarta.el.BeanELResolver;
+import jakarta.el.CompositeELResolver;
+import jakarta.el.ELResolver;
+import jakarta.el.ListELResolver;
+import jakarta.el.MapELResolver;
 import org.camunda.bpm.engine.test.mock.MockElResolver;
 import org.springframework.context.ApplicationContext;
 

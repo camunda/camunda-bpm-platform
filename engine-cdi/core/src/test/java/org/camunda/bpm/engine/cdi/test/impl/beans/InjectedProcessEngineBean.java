@@ -18,7 +18,7 @@ package org.camunda.bpm.engine.cdi.test.impl.beans;
 
 import org.camunda.bpm.engine.ProcessEngine;
 
-import javax.enterprise.context.Dependent;
+import jakarta.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.inject.Named;
 

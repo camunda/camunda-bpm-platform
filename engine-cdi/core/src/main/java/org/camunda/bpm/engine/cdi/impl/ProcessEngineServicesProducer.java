@@ -16,8 +16,8 @@
  */
 package org.camunda.bpm.engine.cdi.impl;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Produces;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Produces;
 import javax.inject.Named;
 
 import org.camunda.bpm.BpmPlatform;

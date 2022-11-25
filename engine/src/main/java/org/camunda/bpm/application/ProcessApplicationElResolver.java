@@ -19,7 +19,7 @@ package org.camunda.bpm.application;
 import java.util.Comparator;
 import java.util.ServiceLoader;
 
-import camundajar.impl.jakarta.el.ELResolver;
+import jakarta.el.ELResolver;
 
 /**
  * <p>SPI interface that allows providing a custom ElResolver implementation.</p>

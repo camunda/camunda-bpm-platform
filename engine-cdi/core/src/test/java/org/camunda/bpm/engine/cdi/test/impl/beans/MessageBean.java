@@ -18,7 +18,7 @@ package org.camunda.bpm.engine.cdi.test.impl.beans;
 
 import java.io.Serializable;
 
-import javax.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 
 /**

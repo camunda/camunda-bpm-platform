@@ -16,8 +16,8 @@
  */
 package org.camunda.bpm.engine.cdi;
 
-import javax.enterprise.inject.Produces;
-import javax.enterprise.inject.Typed;
+import jakarta.enterprise.inject.Produces;
+import jakarta.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
 

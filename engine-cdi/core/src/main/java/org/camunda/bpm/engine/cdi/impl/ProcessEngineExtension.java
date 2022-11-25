@@ -16,11 +16,11 @@
  */
 package org.camunda.bpm.engine.cdi.impl;
 
-import javax.enterprise.event.Observes;
-import javax.enterprise.inject.spi.AfterBeanDiscovery;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.inject.spi.BeforeBeanDiscovery;
-import javax.enterprise.inject.spi.Extension;
+import jakarta.enterprise.event.Observes;
+import jakarta.enterprise.inject.spi.AfterBeanDiscovery;
+import jakarta.enterprise.inject.spi.BeanManager;
+import jakarta.enterprise.inject.spi.BeforeBeanDiscovery;
+import jakarta.enterprise.inject.spi.Extension;
 
 import org.camunda.bpm.engine.cdi.annotation.BusinessProcessScoped;
 import org.camunda.bpm.engine.cdi.impl.context.BusinessProcessContext;

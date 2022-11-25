@@ -22,8 +22,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import javax.enterprise.context.ConversationScoped;
-import javax.enterprise.context.RequestScoped;
+import jakarta.enterprise.context.ConversationScoped;
+import jakarta.enterprise.context.RequestScoped;
 
 /**
  * Declare a bean to be BusinessProcessScoped. Instances of

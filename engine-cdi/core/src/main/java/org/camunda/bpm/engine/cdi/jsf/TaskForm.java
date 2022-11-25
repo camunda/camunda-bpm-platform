@@ -22,9 +22,9 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.enterprise.context.Conversation;
-import javax.enterprise.context.ConversationScoped;
-import javax.enterprise.inject.Instance;
+import jakarta.enterprise.context.Conversation;
+import jakarta.enterprise.context.ConversationScoped;
+import jakarta.enterprise.inject.Instance;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;

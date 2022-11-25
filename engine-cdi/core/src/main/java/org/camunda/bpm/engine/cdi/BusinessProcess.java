@@ -19,9 +19,9 @@ package org.camunda.bpm.engine.cdi;
 import java.io.Serializable;
 import java.util.Map;
 
-import javax.enterprise.context.Conversation;
-import javax.enterprise.context.RequestScoped;
-import javax.enterprise.inject.Instance;
+import jakarta.enterprise.context.Conversation;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.inject.Named;
 

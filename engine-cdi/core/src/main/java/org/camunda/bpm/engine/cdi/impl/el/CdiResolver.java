@@ -19,12 +19,12 @@ package org.camunda.bpm.engine.cdi.impl.el;
 import java.beans.FeatureDescriptor;
 import java.util.Iterator;
 
-import javax.enterprise.inject.spi.BeanManager;
+import jakarta.enterprise.inject.spi.BeanManager;
 
 import org.camunda.bpm.engine.cdi.impl.util.BeanManagerLookup;
 import org.camunda.bpm.engine.cdi.impl.util.ProgrammaticBeanLookup;
-import camundajar.impl.jakarta.el.ELContext;
-import camundajar.impl.jakarta.el.ELResolver;
+import jakarta.el.ELContext;
+import jakarta.el.ELResolver;
 
 
 /**
