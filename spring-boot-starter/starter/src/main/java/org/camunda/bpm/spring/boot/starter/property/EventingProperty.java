@@ -51,7 +51,7 @@ public class EventingProperty {
     return BooleanUtils.isTrue(execution);
   }
 
-  public void setExecution(Boolean execution) {
+  public void setExecution(final Boolean execution) {
     this.execution = execution;
   }
 
@@ -59,7 +59,7 @@ public class EventingProperty {
     return BooleanUtils.isTrue(task);
   }
 
-  public void setTask(Boolean task) {
+  public void setTask(final Boolean task) {
     this.task = task;
   }
 
@@ -67,7 +67,7 @@ public class EventingProperty {
     return BooleanUtils.isTrue(history);
   }
 
-  public void setHistory(Boolean history) {
+  public void setHistory(final Boolean history) {
     this.history = history;
   }
 
@@ -75,8 +75,8 @@ public class EventingProperty {
     return BooleanUtils.isTrue(skippable);
   }
 
-  public void setSkippable(Boolean skippable) {
-    this.skippable = true;
+  public void setSkippable(final Boolean skippable) {
+    this.skippable = skippable;
   }
 
   @Override

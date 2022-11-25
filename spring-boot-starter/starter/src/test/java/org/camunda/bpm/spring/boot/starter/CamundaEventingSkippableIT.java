@@ -16,20 +16,14 @@
  */
 package org.camunda.bpm.spring.boot.starter;
 
-import org.assertj.core.util.DateUtil;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.TaskListener;
-import org.camunda.bpm.engine.history.HistoricVariableInstance;
-import org.camunda.bpm.engine.impl.ProcessInstanceModificationBuilderImpl;
-import org.camunda.bpm.engine.impl.history.event.HistoricIdentityLinkLogEventEntity;
-import org.camunda.bpm.engine.impl.history.event.HistoricTaskInstanceEventEntity;
-import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.spring.boot.starter.event.TaskEvent;
-import org.camunda.bpm.spring.boot.starter.test.nonpa.BoundaryEventServiceTask;
 import org.camunda.bpm.spring.boot.starter.test.nonpa.TestApplication;
 import org.camunda.bpm.spring.boot.starter.test.nonpa.TestEventCaptor;
 import org.junit.After;
@@ -42,21 +36,19 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.Collections;
-import java.util.Date;
+import java.util.List;
 
-import static junit.framework.TestCase.fail;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(
   classes = {TestApplication.class},
-  webEnvironment = WebEnvironment.NONE,
-  properties = "camunda.bpm.eventing.skippable=true"
+  webEnvironment = WebEnvironment.NONE
 )
-@ActiveProfiles("eventing")
+@ActiveProfiles("eventing-skippable")
 public class CamundaEventingSkippableIT extends AbstractCamundaAutoConfigurationIT {
 
+  public static final String SERVICE_TASK = "service_task";
   @Autowired
   private RuntimeService runtime;
 
@@ -89,7 +81,7 @@ public class CamundaEventingSkippableIT extends AbstractCamundaAutoConfiguration
   public final void shouldEventTaskDelete() {
     // given
     startEventingInstance();
-    Task task = taskService.createTaskQuery().active().singleResult();
+    final Task task = taskService.createTaskQuery().active().singleResult();
     eventCaptor.clear();
 
     // when
@@ -103,28 +95,44 @@ public class CamundaEventingSkippableIT extends AbstractCamundaAutoConfiguration
   public final void shouldEventModificationWithSkipListeners() {
     // given
     startEventingInstance();
-    TaskEntity task = (TaskEntity)taskService.createTaskQuery().active().singleResult();
+    final TaskEntity task = (TaskEntity)taskService.createTaskQuery().active().singleResult();
     eventCaptor.clear();
 
+    final List<String> activeActivityIds = runtime.getActiveActivityIds(instance.getId());
 
     // when
     runtimeService
         .createProcessInstanceModification(instance.getProcessInstanceId())
-        .cancelActivityInstance("user_task")
-        .startBeforeActivity("service_task", instance.getId())
+        .cancelAllForActivity(task.getTaskDefinitionKey())
+        .startBeforeActivity(SERVICE_TASK, instance.getId())
         .execute(true, false);
 
     // then
     assertTaskEvents(task, TaskListener.EVENTNAME_DELETE);
-    assertThat(eventCaptor.executionEvents).hasSize(2);
+    assertThat(eventCaptor.executionEvents).hasSize(7);
+    assertThat(eventCaptor.executionEvents.get(0).getEventName()).isEqualTo(ExecutionListener.EVENTNAME_END);
+    assertThat(eventCaptor.executionEvents.get(0).getCurrentActivityId()).isEqualTo(task.getTaskDefinitionKey());
+    assertThat(eventCaptor.executionEvents.get(1).getEventName()).isEqualTo(ExecutionListener.EVENTNAME_START);
+    assertThat(eventCaptor.executionEvents.get(1).getCurrentActivityId()).isEqualTo(SERVICE_TASK);
+    assertThat(eventCaptor.executionEvents.get(2).getEventName()).isEqualTo(ExecutionListener.EVENTNAME_END);
+    assertThat(eventCaptor.executionEvents.get(2).getCurrentActivityId()).isEqualTo(SERVICE_TASK);
+    assertThat(eventCaptor.executionEvents.get(3).getEventName()).isEqualTo(ExecutionListener.EVENTNAME_TAKE);
+    assertThat(eventCaptor.executionEvents.get(3).getCurrentActivityId()).isEqualTo(SERVICE_TASK);
+    assertThat(eventCaptor.executionEvents.get(4).getEventName()).isEqualTo(ExecutionListener.EVENTNAME_START);
+    assertThat(eventCaptor.executionEvents.get(4).getCurrentActivityId()).startsWith("EndEvent");
+    assertThat(eventCaptor.executionEvents.get(5).getEventName()).isEqualTo(ExecutionListener.EVENTNAME_END);
+    assertThat(eventCaptor.executionEvents.get(5).getCurrentActivityId()).startsWith("EndEvent");
+    assertThat(eventCaptor.executionEvents.get(6).getEventName()).isEqualTo(ExecutionListener.EVENTNAME_END);
+    assertThat(eventCaptor.executionEvents.get(6).getCurrentActivityId()).startsWith("EndEvent");
+    assertThat(eventCaptor.executionEvents.get(6).getActivityInstanceId()).isEqualTo(instance.getProcessInstanceId());
   }
 
 
-  protected void assertTaskEvents(Task task, String event) {
+  protected void assertTaskEvents(final Task task, final String event) {
     assertTaskEvents(task, 1, event);
   }
 
-  protected void assertTaskEvents(Task task, int numberOfEvents, String...events) {
+  protected void assertTaskEvents(final Task task, final int numberOfEvents, final String...events) {
     assertThat(eventCaptor.taskEvents).hasSize(numberOfEvents);
     assertThat(eventCaptor.immutableTaskEvents).hasSize(numberOfEvents);
     assertThat(eventCaptor.transactionTaskEvents).hasSize(numberOfEvents);
@@ -143,13 +151,13 @@ public class CamundaEventingSkippableIT extends AbstractCamundaAutoConfiguration
     }
   }
 
-  protected void assertTaskEvent(Task task, TaskEvent taskEvent, String event) {
+  protected void assertTaskEvent(final Task task, final TaskEvent taskEvent, final String event) {
     assertThat(taskEvent.getEventName()).isEqualTo(event);
     assertThat(taskEvent.getId()).isEqualTo(task.getId());
     assertThat(taskEvent.getProcessInstanceId()).isEqualTo(task.getProcessInstanceId());
   }
 
   protected void startEventingInstance() {
-    instance = runtime.startProcessInstanceByKey("eventing-skippable");
+    instance = runtime.startProcessInstanceByKey("eventing");
   }
 }
