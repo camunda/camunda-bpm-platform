@@ -68,6 +68,10 @@
               <pattern>jakarta.el</pattern>
               <shadedPattern>camundajar.impl.jakarta.el</shadedPattern>
             </relocation>
+            <relocation>
+              <pattern>com.sun.el</pattern>
+              <shadedPattern>camundajar.impl.com.sun.el</shadedPattern>
+            </relocation>
           </relocations>
           <transformers>
             <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
