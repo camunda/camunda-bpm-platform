@@ -45,7 +45,8 @@ public class PublishDelegateParseListener extends AbstractBpmnParseListener {
     EVENTNAME_ASSIGNMENT,
     EVENTNAME_CREATE,
     EVENTNAME_DELETE,
-    EVENTNAME_UPDATE);
+    EVENTNAME_UPDATE
+  );
   private static final List<String> EXECUTION_EVENTS = Arrays.asList(
     EVENTNAME_START,
     EVENTNAME_END);
@@ -53,8 +54,11 @@ public class PublishDelegateParseListener extends AbstractBpmnParseListener {
   private final TaskListener taskListener;
   private final ExecutionListener executionListener;
 
+  private final boolean skippable;
+
   public PublishDelegateParseListener(final ApplicationEventPublisher publisher, final EventingProperty property) {
 
+    this.skippable = property.isSkippable();
     if (property.isTask()) {
       this.taskListener = delegateTask -> {
         publisher.publishEvent(delegateTask);
@@ -186,7 +190,11 @@ public class PublishDelegateParseListener extends AbstractBpmnParseListener {
   public void parseProcess(Element processElement, ProcessDefinitionEntity processDefinition) {
     if (executionListener != null) {
       for (String event : EXECUTION_EVENTS) {
-        processDefinition.addListener(event, executionListener);
+        if (skippable) {
+          processDefinition.addListener(event, executionListener);
+        } else {
+          processDefinition.addBuiltInListener(event, executionListener);
+        }
       }
     }
   }
@@ -239,21 +247,33 @@ public class PublishDelegateParseListener extends AbstractBpmnParseListener {
   private void addExecutionListener(final ActivityImpl activity) {
     if (executionListener != null) {
       for (String event : EXECUTION_EVENTS) {
-        activity.addListener(event, executionListener);
+        if (skippable) {
+          activity.addListener(event, executionListener);
+        } else {
+          activity.addBuiltInListener(event, executionListener);
+        }
       }
     }
   }
 
   private void addExecutionListener(final TransitionImpl transition) {
     if (executionListener != null) {
-      transition.addListener(EVENTNAME_TAKE, executionListener);
+      if (skippable) {
+        transition.addListener(EVENTNAME_TAKE, executionListener);
+      } else {
+        transition.addBuiltInListener(EVENTNAME_TAKE, executionListener);
+      }
     }
   }
 
   private void addTaskListener(TaskDefinition taskDefinition) {
     if (taskListener != null) {
       for (String event : TASK_EVENTS) {
-        taskDefinition.addTaskListener(event, taskListener);
+        if (skippable) {
+          taskDefinition.addTaskListener(event, taskListener);
+        } else {
+          taskDefinition.addBuiltInTaskListener(event, taskListener);
+        }
       }
     }
   }

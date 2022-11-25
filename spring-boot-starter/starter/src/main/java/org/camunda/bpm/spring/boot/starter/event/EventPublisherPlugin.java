@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.spring.boot.starter.event;
 
-import org.camunda.bpm.engine.impl.history.handler.CompositeDbHistoryEventHandler;
 import org.camunda.bpm.engine.spring.SpringProcessEngineConfiguration;
 import org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties;
 import org.camunda.bpm.spring.boot.starter.property.EventingProperty;
@@ -65,6 +64,11 @@ public class EventPublisherPlugin extends SpringBootProcessEnginePlugin {
         logger.info("EVENTING-005: Execution events will be published as Spring Events.");
       } else {
         logger.info("EVENTING-006: Execution eventing is disabled via property.");
+      }
+      if (property.isSkippable()) {
+        logger.info("EVENTING-009: Listeners will not be invoked if skipListeners set to true by user.");
+      } else {
+        logger.info("EVENTING-009: Listeners will always be invoked and ignore skipListeners user setting.");
       }
       // register parse listener
       processEngineConfiguration.getCustomPostBPMNParseListeners().add(new PublishDelegateParseListener(this.publisher, property));
