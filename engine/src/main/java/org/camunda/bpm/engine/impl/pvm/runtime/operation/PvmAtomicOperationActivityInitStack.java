@@ -52,7 +52,7 @@ public class PvmAtomicOperationActivityInitStack implements PvmAtomicOperation {
       propagatingExecution = execution.createExecution();
       execution.setActive(false);
       propagatingExecution.setActivity(currentActivity);
-      propagatingExecution.initialize();
+      propagatingExecution.initialize(null, false);
     }
     else {
       propagatingExecution.setActivity(currentActivity);

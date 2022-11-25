@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.signal;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -30,6 +31,7 @@ import java.io.ObjectOutputStream;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RepositoryService;
@@ -41,6 +43,7 @@ import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -677,6 +680,28 @@ public class SignalEventTest {
 
     Job jobAfter = managementService.createJobQuery().singleResult();
     assertNull(jobAfter);
+  }
+
+  @Test
+  @Deployment
+  public void shouldResolveVariableInSignalStartEventSubprocess() {
+    // GIVEN
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("elementId", "hello");
+
+    // WHEN
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("handle-element", variables);
+
+    // THEN
+    assertThat(processInstance.isEnded()).isFalse();
+    assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(1);
+
+    EventSubscription subscription = runtimeService.createEventSubscriptionQuery()
+        .eventType("signal")
+        .eventName("cancel-element-hello")
+        .singleResult();
+
+    assertThat(subscription).isNotNull();
   }
 
 }
