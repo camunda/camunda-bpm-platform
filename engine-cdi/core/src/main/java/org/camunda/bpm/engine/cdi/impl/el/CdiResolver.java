@@ -23,8 +23,8 @@ import javax.enterprise.inject.spi.BeanManager;
 
 import org.camunda.bpm.engine.cdi.impl.util.BeanManagerLookup;
 import org.camunda.bpm.engine.cdi.impl.util.ProgrammaticBeanLookup;
-import jakarta.el.ELContext;
-import jakarta.el.ELResolver;
+import camundajar.impl.jakarta.el.ELContext;
+import camundajar.impl.jakarta.el.ELResolver;
 
 
 /**

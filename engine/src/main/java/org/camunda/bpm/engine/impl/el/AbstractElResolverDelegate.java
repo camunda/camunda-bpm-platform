@@ -20,8 +20,8 @@ import java.beans.FeatureDescriptor;
 import java.util.Collections;
 import java.util.Iterator;
 
-import jakarta.el.ELContext;
-import jakarta.el.ELResolver;
+import camundajar.impl.jakarta.el.ELContext;
+import camundajar.impl.jakarta.el.ELResolver;
 
 /**
  * @author Thorben Lindhauer

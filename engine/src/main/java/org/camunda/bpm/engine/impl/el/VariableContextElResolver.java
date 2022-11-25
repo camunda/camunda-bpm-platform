@@ -19,8 +19,8 @@ package org.camunda.bpm.engine.impl.el;
 import java.beans.FeatureDescriptor;
 import java.util.Iterator;
 
-import jakarta.el.ELContext;
-import jakarta.el.ELResolver;
+import camundajar.impl.jakarta.el.ELContext;
+import camundajar.impl.jakarta.el.ELResolver;
 import org.camunda.bpm.engine.variable.context.VariableContext;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 

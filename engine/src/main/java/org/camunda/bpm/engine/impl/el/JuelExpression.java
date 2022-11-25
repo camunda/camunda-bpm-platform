@@ -22,11 +22,11 @@ import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.delegate.ExpressionGetInvocation;
 import org.camunda.bpm.engine.impl.delegate.ExpressionSetInvocation;
-import jakarta.el.ELContext;
-import jakarta.el.ELException;
-import jakarta.el.MethodNotFoundException;
-import jakarta.el.PropertyNotFoundException;
-import jakarta.el.ValueExpression;
+import camundajar.impl.jakarta.el.ELContext;
+import camundajar.impl.jakarta.el.ELException;
+import camundajar.impl.jakarta.el.MethodNotFoundException;
+import camundajar.impl.jakarta.el.PropertyNotFoundException;
+import camundajar.impl.jakarta.el.ValueExpression;
 
 
 /**

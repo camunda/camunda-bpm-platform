@@ -17,8 +17,8 @@
 package org.camunda.bpm.engine.impl.delegate;
 
 import org.camunda.bpm.engine.delegate.BaseDelegateExecution;
-import jakarta.el.ELContext;
-import jakarta.el.ValueExpression;
+import camundajar.impl.jakarta.el.ELContext;
+import camundajar.impl.jakarta.el.ValueExpression;
 
 /**
  * Class responsible for handling Expression.getValue invocations

@@ -16,9 +16,9 @@
  */
 package org.camunda.bpm.dmn.feel.impl.juel.el;
 
-import jakarta.el.ExpressionFactory;
-import jakarta.el.ValueExpression;
-import jakarta.el.VariableMapper;
+import camundajar.impl.jakarta.el.ExpressionFactory;
+import camundajar.impl.jakarta.el.ValueExpression;
+import camundajar.impl.jakarta.el.VariableMapper;
 
 import org.camunda.bpm.dmn.feel.impl.juel.FeelEngineLogger;
 import org.camunda.bpm.dmn.feel.impl.juel.FeelLogger;

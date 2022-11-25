@@ -18,7 +18,7 @@ package org.camunda.bpm.dmn.feel.impl.juel.el;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import jakarta.el.ELException;
+import camundajar.impl.jakarta.el.ELException;
 
 import org.camunda.bpm.dmn.feel.impl.juel.FeelEngineLogger;
 import org.camunda.bpm.dmn.feel.impl.juel.FeelLogger;

@@ -16,10 +16,10 @@
  */
 package org.camunda.bpm.dmn.feel.impl.juel;
 
-import jakarta.el.ELContext;
-import jakarta.el.ELException;
-import jakarta.el.ExpressionFactory;
-import jakarta.el.ValueExpression;
+import camundajar.impl.jakarta.el.ELContext;
+import camundajar.impl.jakarta.el.ELException;
+import camundajar.impl.jakarta.el.ExpressionFactory;
+import camundajar.impl.jakarta.el.ValueExpression;
 
 import org.camunda.bpm.dmn.feel.impl.FeelEngine;
 import org.camunda.bpm.dmn.feel.impl.juel.el.ElContextFactory;

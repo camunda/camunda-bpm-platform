@@ -16,14 +16,14 @@
  */
 package org.camunda.bpm.dmn.engine.impl.el;
 
-import jakarta.el.ArrayELResolver;
-import jakarta.el.BeanELResolver;
-import jakarta.el.CompositeELResolver;
-import jakarta.el.ELContext;
-import jakarta.el.ELResolver;
-import jakarta.el.ListELResolver;
-import jakarta.el.MapELResolver;
-import jakarta.el.ResourceBundleELResolver;
+import camundajar.impl.jakarta.el.ArrayELResolver;
+import camundajar.impl.jakarta.el.BeanELResolver;
+import camundajar.impl.jakarta.el.CompositeELResolver;
+import camundajar.impl.jakarta.el.ELContext;
+import camundajar.impl.jakarta.el.ELResolver;
+import camundajar.impl.jakarta.el.ListELResolver;
+import camundajar.impl.jakarta.el.MapELResolver;
+import camundajar.impl.jakarta.el.ResourceBundleELResolver;
 
 import org.camunda.bpm.dmn.engine.impl.spi.el.ElExpression;
 import org.camunda.bpm.dmn.engine.impl.spi.el.ElProvider;
