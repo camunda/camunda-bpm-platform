@@ -128,6 +128,7 @@
       <groupId>org.glassfish</groupId>
       <artifactId>jakarta.el</artifactId>
       <version>4.0.2</version>
+      <scope>compile</scope>
     </dependency>
 
     <dependency>
@@ -450,7 +451,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
         <configuration>
-          <promoteTransitiveDependencies>false</promoteTransitiveDependencies>
+          <promoteTransitiveDependencies>true</promoteTransitiveDependencies>
           <createSourcesJar>true</createSourcesJar>
           <createDependencyReducedPom>true</createDependencyReducedPom>
           <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
