@@ -16,10 +16,12 @@
  */
 package org.camunda.bpm.spring.boot.starter.event;
 
+import org.camunda.bpm.engine.delegate.DelegateListener;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.parser.AbstractBpmnParseListener;
+import org.camunda.bpm.engine.impl.core.model.CoreModelElement;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
@@ -45,7 +47,8 @@ public class PublishDelegateParseListener extends AbstractBpmnParseListener {
     EVENTNAME_ASSIGNMENT,
     EVENTNAME_CREATE,
     EVENTNAME_DELETE,
-    EVENTNAME_UPDATE);
+    EVENTNAME_UPDATE
+  );
   private static final List<String> EXECUTION_EVENTS = Arrays.asList(
     EVENTNAME_START,
     EVENTNAME_END);
@@ -53,8 +56,11 @@ public class PublishDelegateParseListener extends AbstractBpmnParseListener {
   private final TaskListener taskListener;
   private final ExecutionListener executionListener;
 
+  private final boolean skippable;
+
   public PublishDelegateParseListener(final ApplicationEventPublisher publisher, final EventingProperty property) {
 
+    this.skippable = property.isSkippable();
     if (property.isTask()) {
       this.taskListener = delegateTask -> {
         publisher.publishEvent(delegateTask);
@@ -186,7 +192,7 @@ public class PublishDelegateParseListener extends AbstractBpmnParseListener {
   public void parseProcess(Element processElement, ProcessDefinitionEntity processDefinition) {
     if (executionListener != null) {
       for (String event : EXECUTION_EVENTS) {
-        processDefinition.addListener(event, executionListener);
+        addListenerOnCoreModelElement(processDefinition, executionListener, event);
       }
     }
   }
@@ -239,21 +245,34 @@ public class PublishDelegateParseListener extends AbstractBpmnParseListener {
   private void addExecutionListener(final ActivityImpl activity) {
     if (executionListener != null) {
       for (String event : EXECUTION_EVENTS) {
-        activity.addListener(event, executionListener);
+        addListenerOnCoreModelElement(activity, executionListener, event);
       }
     }
   }
 
   private void addExecutionListener(final TransitionImpl transition) {
     if (executionListener != null) {
-      transition.addListener(EVENTNAME_TAKE, executionListener);
+      addListenerOnCoreModelElement(transition, executionListener, EVENTNAME_TAKE);
+    }
+  }
+
+  private void addListenerOnCoreModelElement(CoreModelElement element,
+      DelegateListener<?> listener, String event) {
+    if (skippable) {
+      element.addListener(event, listener);
+    } else {
+      element.addBuiltInListener(event, listener);
     }
   }
 
   private void addTaskListener(TaskDefinition taskDefinition) {
     if (taskListener != null) {
       for (String event : TASK_EVENTS) {
-        taskDefinition.addTaskListener(event, taskListener);
+        if (skippable) {
+          taskDefinition.addTaskListener(event, taskListener);
+        } else {
+          taskDefinition.addBuiltInTaskListener(event, taskListener);
+        }
       }
     }
   }

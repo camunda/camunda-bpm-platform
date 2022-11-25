@@ -25,11 +25,13 @@ import java.util.Date;
 import org.assertj.core.util.DateUtil;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.history.event.HistoricIdentityLinkLogEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricTaskInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.spring.boot.starter.event.TaskEvent;
@@ -160,6 +162,19 @@ public class CamundaEventingIT extends AbstractCamundaAutoConfigurationIT {
 
     // then
     assertTaskEvents(task, TaskListener.EVENTNAME_DELETE);
+  }
+
+  @Test
+  public final void shouldNotInvokeHandlerWhenSkippingCustomListeners() {
+    // given
+    startEventingInstance();
+    eventCaptor.clear();
+
+    // when
+    runtimeService.deleteProcessInstance(instance.getProcessInstanceId(), "no need", true);
+
+    // then
+    assertThat(eventCaptor.taskEvents).isEmpty();
   }
 
   @Test
@@ -386,6 +401,25 @@ public class CamundaEventingIT extends AbstractCamundaAutoConfigurationIT {
     } else {
       fail("Expected task instance change event");
     }
+  }
+
+  @Test
+  public final void shouldNotInvokeHandlerOnModificationWhenSkippingCustomListeners() {
+    // given
+    startEventingInstance();
+    final TaskEntity task = (TaskEntity)taskService.createTaskQuery().active().singleResult();
+    eventCaptor.clear();
+
+    // when
+    runtimeService
+        .createProcessInstanceModification(instance.getProcessInstanceId())
+        .cancelAllForActivity(task.getTaskDefinitionKey())
+        .startBeforeActivity("service_task", instance.getId())
+        .execute(true, false);
+
+    // then
+    assertThat(eventCaptor.executionEvents).isEmpty();
+//    assertThat(eventCaptor.taskEvents).isEmpty(); => https://github.com/camunda/camunda-bpm-platform/issues/3103
   }
 
   protected void assertTaskEvents(Task task, String event) {

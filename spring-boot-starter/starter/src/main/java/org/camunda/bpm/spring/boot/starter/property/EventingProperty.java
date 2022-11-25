@@ -38,6 +38,12 @@ public class EventingProperty {
    */
   private Boolean history = Boolean.TRUE;
 
+  /**
+   * Controls if the event listeners for tasks and executions are can be skipped (controlled by `skipCustomListeners`
+   * property in Cockpit and in various APIs). Defaults to true.
+   */
+  private Boolean skippable = Boolean.TRUE;
+
   public EventingProperty() {
 
   }
@@ -66,12 +72,21 @@ public class EventingProperty {
     this.history = history;
   }
 
+  public boolean isSkippable() {
+    return BooleanUtils.isTrue(skippable);
+  }
+
+  public void setSkippable(Boolean skippable) {
+    this.skippable = skippable;
+  }
+
   @Override
   public String toString() {
     return joinOn(this.getClass())
       .add("execution=" + execution)
       .add("task=" + task)
       .add("history=" + history)
+      .add("skippable=" + skippable)
       .toString();
   }
 }
