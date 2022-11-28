@@ -27,6 +27,7 @@ var Controller = [
   'camAPI',
   'Notifications',
   function($scope, $translate, camAPI, Notifications) {
+    $scope.form = {enableUsage: false};
     var telemetryResource = camAPI.resource('telemetry');
 
     telemetryResource.get(function(err, res) {
@@ -43,12 +44,12 @@ var Controller = [
         });
       } else {
         $scope.authorized = true;
-        $scope.enableUsage = res.enableTelemetry;
+        $scope.form.enableUsage = res.enableTelemetry;
       }
     });
 
     $scope.submit = function() {
-      telemetryResource.configure(!!$scope.enableUsage, function(err) {
+      telemetryResource.configure(!!$scope.form.enableUsage, function(err) {
         if (!err) {
           Notifications.addMessage({
             status: $translate.instant('TELEMETRY_SUCCESS_HEADING'),
