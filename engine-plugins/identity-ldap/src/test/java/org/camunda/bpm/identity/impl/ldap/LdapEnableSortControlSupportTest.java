@@ -16,6 +16,10 @@
  */
 package org.camunda.bpm.identity.impl.ldap;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -23,36 +27,30 @@ import java.util.stream.Collectors;
 
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.identity.ldap.util.LdapTestEnvironment;
+import org.camunda.bpm.identity.ldap.util.LdapTestEnvironmentRule;
+import org.junit.*;
 
 /**
  * Represents a test case where the sortControlSupport property is enabled.
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
-public class LdapEnableSortControlSupportTest extends ResourceProcessEngineTestCase {
+public class LdapEnableSortControlSupportTest {
 
-  public LdapEnableSortControlSupportTest() {
-    super("camunda.ldap.enable.sort.control.support.cfg.xml");
-  }
+  @ClassRule
+  public static LdapTestEnvironmentRule ldapRule = new LdapTestEnvironmentRule();
+  @Rule
+  public ProcessEngineRule engineRule = new ProcessEngineRule("camunda.ldap.enable.sort.control.support.cfg.xml");
 
-  protected static LdapTestEnvironment ldapTestEnvironment;
+  IdentityService identityService;
+  LdapTestEnvironment ldapTestEnvironment;
 
-  @Override
-  protected void setUp() throws Exception {
-    if(ldapTestEnvironment == null) {
-      ldapTestEnvironment = new LdapTestEnvironment();
-      ldapTestEnvironment.init();
-    }
-    super.setUp();
-  }
-
-  @Override
-  protected void tearDown() throws Exception {
-    if(ldapTestEnvironment != null) {
-      ldapTestEnvironment.shutdown();
-      ldapTestEnvironment = null;
-    }
-    super.tearDown();
+  @Before
+  public void setup() {
+    identityService = engineRule.getIdentityService();
+    ldapTestEnvironment = ldapRule.getLdapTestEnvironment();
   }
 
   /**
