@@ -71,10 +71,6 @@ public class LdapUserQueryImpl extends UserQueryImpl {
       throw new UnsupportedOperationException("The LDAP identity provider does not support descending search order.");
 
     // assign a default order descending if the list is empty
-    if (getOrderingProperties() != null && getOrderingProperties().isEmpty()) {
-      QueryOrderingProperty orderingProperty = new QueryOrderingProperty(UserQueryProperty.USER_ID, Direction.DESCENDING);
-      this.setOrderingProperties(Collections.singletonList(orderingProperty));
-    }
     return this;
   }
 
