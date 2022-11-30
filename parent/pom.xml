@@ -51,7 +51,7 @@
     <version.wildfly>26.0.1.Final</version.wildfly>
     <version.wildfly.core>18.0.4.Final</version.wildfly.core>
 
-    <version.tomcat>9.0.58</version.tomcat>
+    <version.tomcat>9.0.69</version.tomcat>
 
     <version.arquillian>1.1.10.Final</version.arquillian>
     <version.shrinkwrap.resolvers>2.2.2</version.shrinkwrap.resolvers>
