@@ -4,17 +4,7 @@ on:
   label:
     types: 
       - created
-      
+
 jobs:
-  synchronize-label-colors:
-    runs-on: ubuntu-latest
-    name: Synchronize label colors
-    steps:
-      - uses: "actions/checkout@v3"
-      - name: Synchronize label colors
-        id: synchronize-label-colors
-        uses: ./.github/actions/synchronize-label-colors
-        with: 
-          label: ${{ github.event.label.name }}
-          prefix-delimiter: ":"
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+  call-reusable-flow:
+    uses: camunda/automation-platform-github-actions/.github/workflows/sync-label-colors.yml@main    

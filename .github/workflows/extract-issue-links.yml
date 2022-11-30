@@ -8,86 +8,11 @@ on:
         required: true
 
 jobs:
-  extract-issue-links:
-    runs-on: ubuntu-latest
-    name: Extract JIRA issues and notify on slack
-    steps:
-      - name: Import Secrets
-        id: secrets
-        uses: hashicorp/vault-action@v2.4.3
-        with:
-          url: ${{ secrets.VAULT_ADDR }}
-          method: approle
-          roleId: ${{ secrets.VAULT_ROLE_ID }}
-          secretId: ${{ secrets.VAULT_SECRET_ID }}
-          secrets: |
-            secret/data/products/cambpm/ci/github-workflow SUPPORT_CHANNEL_SLACK_WEBHOOK_URL;
-            secret/data/products/cambpm/ci/github-workflow SEC_CHANNEL_SLACK_WEBHOOK_URL;
-            secret/data/products/cambpm/ci/github-workflow TECH_LEAD_SLACK_ID;
-      - uses: "actions/checkout@v2"
-      - name: Generate release notes links
-        id: generate-release-notes
-        uses: ./.github/actions/generate-release-notes
-        with:
-          versions: ${{ github.event.inputs.versions }}
-          version-prefix: "version:"
-      - name: Extract JIRA links from issues
-        id: extract-issue-links
-        uses: ./.github/actions/extract-issue-links
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          versions: ${{ github.event.inputs.versions }}
-          version-prefix: "version:"
-      - name: Format SUPPORT JIRA slack blocks
-        id: format-support-jira-links
-        uses: ./.github/actions/format-jira-links
-        with:
-          links: ${{ steps.extract-issue-links.outputs.links-reverse }}
-          issues: ${{ steps.extract-issue-links.outputs.issues }}
-          jira-project: "SUPPORT"
-      - name: Format SEC JIRA slack blocks
-        id: format-sec-jira-links
-        uses: ./.github/actions/format-jira-links
-        with:
-          links: ${{ steps.extract-issue-links.outputs.links-reverse }}
-          issues: ${{ steps.extract-issue-links.outputs.issues }}
-          jira-project: "SEC"
-      - name: Notify about fixed support cases
-        uses: 8398a7/action-slack@v3
-        with:
-          status: custom
-          custom_payload: |
-            {
-              blocks: [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "Dear support team, we have released versions ${{ github.event.inputs.versions }} of Camunda Platform 7.\nPlease send a release notification to our customers and update the customers in the support cases below. Please note that the release manager may add extra announcements in the thread of this message shortly after the message is published."
-                  }
-                },
-                ${{ steps.generate-release-notes.outputs.release-notes-block }},
-                ${{ steps.format-support-jira-links.outputs.links-blocks }}
-              ]
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ steps.secrets.outputs.SUPPORT_CHANNEL_SLACK_WEBHOOK_URL }} # from previous step that fetches secrets from Vault  
-      - name: Notify about fixed SEC issues
-        uses: 8398a7/action-slack@v3
-        with:
-          status: custom
-          custom_payload: |
-            {
-              blocks: [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "Dear tech lead <@${{ steps.secrets.outputs.TECH_LEAD_SLACK_ID }}>, we have released versions ${{ github.event.inputs.versions }}.\nPlease find the involved SEC tickets below and publish security notices as needed."
-                  }
-                },
-                ${{ steps.format-sec-jira-links.outputs.links-blocks }}
-              ]
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ steps.secrets.outputs.SEC_CHANNEL_SLACK_WEBHOOK_URL }} # from previous step that fetches secrets from Vault
+  call-reusable-flow:
+    uses: camunda/automation-platform-github-actions/.github/workflows/extract-issue-links.yml@main    
+    secrets: inherit
+    with: 
+      versions: ${{ github.event.inputs.versions }}
+      support-webhook-secret: SUPPORT_CHANNEL_SLACK_WEBHOOK_URL
+      sec-webhook-secret: SEC_CHANNEL_SLACK_WEBHOOK_URL
+      tech-lead-secret: TECH_LEAD_SLACK_ID

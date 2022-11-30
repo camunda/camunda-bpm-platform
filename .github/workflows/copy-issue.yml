@@ -11,17 +11,8 @@ on:
         required: true
       
 jobs:
-  copy-issue:
-    runs-on: ubuntu-latest
-    name: Deep copy issue
-    steps:
-      - uses: "actions/checkout@v3"
-      - name: Deep copy issue
-        id: copy-issue
-        uses: ./.github/actions/copy-issue
-        with: 
-          issue: ${{ github.event.inputs.issue }}
-          deep-copy: true
-          version: ${{ github.event.inputs.version }}
-          version-prefix: "version:"
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+  call-reusable-flow:
+    uses: camunda/automation-platform-github-actions/.github/workflows/copy-issue.yml@main
+    with: 
+      issue: ${{ github.event.inputs.issue }}
+      version: ${{ github.event.inputs.version }}
