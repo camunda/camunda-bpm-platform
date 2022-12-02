@@ -23,23 +23,44 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TestHelperTest {
 
   @Test
-  public void shouldGetMethodShouldWorkForPublicAccessor() throws NoSuchMethodException {
+  public void shouldGetPublicMethod() throws NoSuchMethodException {
     // WHEN we call get method to retrieve a method with public accessor, no exception should be thrown
     Object methodName = TestHelper.getMethod(SomeTestClass.class, "testSomethingWithPublicAccessor", new Class[0]);
     assertThat(methodName.toString()).isEqualTo("public void org.camunda.bpm.engine.impl.test.TestHelperTest$SomeTestClass.testSomethingWithPublicAccessor()");
   }
 
   @Test
-  public void shouldGetMethodShouldWorkForPackagePrivateAccessor() throws NoSuchMethodException {
+  public void shouldGetPublicMethodFromSuperClass() throws NoSuchMethodException {
+    // WHEN we call get method to retrieve a method with public accessor, no exception should be thrown
+    Object methodName = TestHelper.getMethod(SomeOtherTestClass.class, "testSomethingWithPublicAccessor", new Class[0]);
+    assertThat(methodName.toString()).isEqualTo("public void org.camunda.bpm.engine.impl.test.TestHelperTest$SomeTestClass.testSomethingWithPublicAccessor()");
+  }
+
+  @Test
+  public void shouldGetPackagePrivateMethod() throws NoSuchMethodException {
     // WHEN we call get method to retrieve a method with package private accessor, no exception should be thrown
     Object methodName = TestHelper.getMethod(SomeTestClass.class, "testSomethingWithPackagePrivateAccessor", new Class[0]);
     assertThat(methodName.toString()).isEqualTo("void org.camunda.bpm.engine.impl.test.TestHelperTest$SomeTestClass.testSomethingWithPackagePrivateAccessor()");
   }
 
   @Test
-  public void shouldGetMethodShouldWorkForProtectedAccessor() throws NoSuchMethodException {
+  public void shouldGetPackagePrivateMethodFromSuperClass() throws NoSuchMethodException {
+    // WHEN we call get method to retrieve a method with package private accessor, no exception should be thrown
+    Object methodName = TestHelper.getMethod(SomeOtherTestClass.class, "testSomethingWithPackagePrivateAccessor", new Class[0]);
+    assertThat(methodName.toString()).isEqualTo("void org.camunda.bpm.engine.impl.test.TestHelperTest$SomeTestClass.testSomethingWithPackagePrivateAccessor()");
+  }
+
+  @Test
+  public void shouldGetProtectedMethod() throws NoSuchMethodException {
     // WHEN we call get method to retrieve a method with protected accessor, no exception should be thrown
     Object methodName = TestHelper.getMethod(SomeTestClass.class, "testSomethingWithProtected", new Class[0]);
+    assertThat(methodName.toString()).isEqualTo("protected void org.camunda.bpm.engine.impl.test.TestHelperTest$SomeTestClass.testSomethingWithProtected()");
+  }
+
+  @Test
+  public void shouldGetProtectedMethodFromSuperClass() throws NoSuchMethodException {
+    // WHEN we call get method to retrieve a method with protected accessor, no exception should be thrown
+    Object methodName = TestHelper.getMethod(SomeOtherTestClass.class, "testSomethingWithProtected", new Class[0]);
     assertThat(methodName.toString()).isEqualTo("protected void org.camunda.bpm.engine.impl.test.TestHelperTest$SomeTestClass.testSomethingWithProtected()");
   }
 
@@ -54,6 +75,9 @@ public class TestHelperTest {
     protected void testSomethingWithProtected() {
     }
 
+  }
+
+  static class SomeOtherTestClass extends SomeTestClass {
   }
 
 }
