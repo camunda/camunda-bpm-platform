@@ -302,18 +302,17 @@ public class ProcessEngineTestsCompleteExternalTaskTest extends ProcessAssertTes
   @Test
   @Deployment(resources = { "bpmn/ExternalTaskAssert-localVariables.bpmn" })
   public void testComplete_LockedTaskWithLocalVariables_Success() {
-    // When
+    // Given
     ProcessInstance pi = runtimeService().startProcessInstanceByKey("ExternalTaskAssert-localVariables");
-    // Then
+
+    // Assume
     assertThat(externalTaskQuery().singleResult()).isNotNull();
-    // Then
     assertThat(externalTaskQuery().singleResult()).hasTopicName("External_1");
 
-    // When
     LockedExternalTask task = fetchAndLock("External_1", "worker1", 1).get(0);
-
     assertThat(task.getActivityId()).isEqualTo("ExternalTask_1");
 
+    // When
     complete(
       task,
       Collections.EMPTY_MAP,
@@ -322,22 +321,23 @@ public class ProcessEngineTestsCompleteExternalTaskTest extends ProcessAssertTes
 
     // Then
     assertThat(externalTaskQuery().singleResult()).isNotNull();
-    // Then
     assertThat(externalTaskQuery().singleResult()).hasTopicName("Noop");
-    // Then
     assertThat(pi).variables().containsKey("variable_1");
   }
 
   @Test
   @Deployment(resources = { "bpmn/ExternalTaskAssert-localVariables.bpmn" })
   public void testComplete_LockedTaskWithLocalVariables_Failure() {
-    // When
+    // Given
     runtimeService().startProcessInstanceByKey("ExternalTaskAssert-localVariables");
-    // Then
+
+    // Assume
     assertThat(externalTaskQuery().singleResult()).isNotNull();
-    // Then
+
+    // When
     LockedExternalTask task = fetchAndLock("External_1", "worker1", 1).get(0);
     assertThat(task.getActivityId()).isEqualTo("ExternalTask_1");
+
     // Then
     expect(()->complete(task), ProcessEngineException.class);
   }
@@ -345,12 +345,13 @@ public class ProcessEngineTestsCompleteExternalTaskTest extends ProcessAssertTes
   @Test
   @Deployment(resources = { "bpmn/ExternalTaskAssert-localVariables.bpmn" })
   public void testCompleteTaskWithLocalVariables_Success() {
-    // When
+    // Given
     ProcessInstance pi = runtimeService().startProcessInstanceByKey("ExternalTaskAssert-localVariables");
-    // Then
+
+    // Assume
     assertThat(externalTaskQuery().singleResult()).isNotNull();
-    // Then
     assertThat(externalTaskQuery().singleResult()).hasTopicName("External_1");
+
     // When
     complete(
       externalTaskQuery().singleResult(),
@@ -360,20 +361,20 @@ public class ProcessEngineTestsCompleteExternalTaskTest extends ProcessAssertTes
 
     // Then
     assertThat(externalTaskQuery().singleResult()).isNotNull();
-    // Then
     assertThat(externalTaskQuery().singleResult()).hasTopicName("Noop");
-    // Then
     assertThat(pi).variables().containsKey("variable_1");
   }
 
   @Test
   @Deployment(resources = { "bpmn/ExternalTaskAssert-localVariables.bpmn" })
   public void testCompleteTaskWithoutLocalVariables_Failure() {
-    // When
+    // Given
     runtimeService().startProcessInstanceByKey("ExternalTaskAssert-localVariables");
-    // Then
+
+    // Assumen
     assertThat(externalTaskQuery().singleResult()).isNotNull();
-    // Then
+
+    // When & Then
     expect(()->complete(externalTaskQuery().singleResult()), ProcessEngineException.class);
   }
 
