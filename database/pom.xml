@@ -27,7 +27,7 @@
     <version.sqlserver>8.2.2.jre8</version.sqlserver>
     <version.db2-11.5>11.5.0.0</version.db2-11.5>
     <version.db2>${version.db2-11.5}</version.db2>
-    <version.postgresql>42.3.3</version.postgresql>
+    <version.postgresql>42.5.1</version.postgresql>
     <version.liquibase>4.8.0</version.liquibase>
 
     <!-- CockroachDB is compatible with PostgreSQL 9.5,
