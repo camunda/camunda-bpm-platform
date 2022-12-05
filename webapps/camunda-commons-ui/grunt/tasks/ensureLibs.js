@@ -154,9 +154,13 @@ module.exports = function(grunt, dirname, licensebookConfig) {
         }
 
         if (pkg) {
-          let packagePath = `${process.cwd()}/node_modules/${pkg}`;
-          if (!fs.existsSync(packagePath)) {
-            packagePath = `${process.cwd()}/node_modules/camunda-bpm-webapp/node_modules/${pkg}`;
+          const nodeModulesPath = rowFile.split(pkg)[0];
+          let packagePath =  nodeModulesPath + pkg;
+          if (!nodeModulesPath) {
+            packagePath = `${process.cwd()}/node_modules/${pkg}`;
+            if (!fs.existsSync(packagePath)) {
+              packagePath = `${process.cwd()}/node_modules/camunda-bpm-webapp/node_modules/${pkg}`;
+            }
           }
 
           let licenseInfo = null;
