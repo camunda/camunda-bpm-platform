@@ -321,7 +321,18 @@ public abstract class TestHelper {
   }
 
   protected static Method getMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) throws SecurityException, NoSuchMethodException {
-    return clazz.getMethod(methodName, parameterTypes);
+    try {
+      return clazz.getDeclaredMethod(methodName, parameterTypes);
+
+    } catch (NoSuchMethodException e) {
+      if (!clazz.equals(Object.class)) {
+        return getMethod(clazz.getSuperclass(), methodName, parameterTypes);
+
+      } else {
+        throw e;
+
+      }
+    }
   }
 
   /**
