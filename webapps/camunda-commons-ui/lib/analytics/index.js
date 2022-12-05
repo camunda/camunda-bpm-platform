@@ -37,14 +37,14 @@ var modalController = [
     scope.camundaVersion = camundaVersion;
     scope.loadingState = 'INITIAL';
     scope.logo = $sce.trustAsHtml(camundaLogo);
-    scope.enableUsage = false;
+    scope.form = {enableUsage: false};
 
     scope.close = function() {
       scope.$dismiss();
     };
     scope.save = function() {
       scope.loadingState = 'LOADING';
-      telemetryResource.configure(!!scope.enableUsage, function(err) {
+      telemetryResource.configure(!!scope.form.enableUsage, function(err) {
         if (!err) {
           scope.loadingState = 'DONE';
         } else {
