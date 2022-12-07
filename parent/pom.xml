@@ -20,7 +20,7 @@
   <properties>
     <version.quarkus>2.8.2.Final</version.quarkus>
     <version.spring.framework>5.3.22</version.spring.framework>
-    <version.spring-boot>2.7.3</version.spring-boot>
+    <version.spring-boot>2.7.6</version.spring-boot>
     <version.cxf>3.0.3</version.cxf>
     <version.resteasy>3.15.3.Final</version.resteasy>
     <version.jersey2>2.34</version.jersey2>
