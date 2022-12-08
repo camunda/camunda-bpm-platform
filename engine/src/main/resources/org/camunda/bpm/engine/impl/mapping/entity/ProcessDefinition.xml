@@ -233,7 +233,7 @@
             </if>
           </where>
           group by TENANT_ID_, KEY_) VER
-        on RES.KEY_ = VER.KEY_
+        on RES.KEY_ = VER.KEY_ and RES.VERSION_ = VER.MAX_VERSION and ${dbSpecificIfNullFunction}(RES.TENANT_ID_,'dummy') = ${dbSpecificIfNullFunction}(VER.TENANT_ID_,'dummy')
     </if>
     <if test="shouldJoinDeploymentTable">
       inner join ${prefix}ACT_RE_DEPLOYMENT DEP on RES.DEPLOYMENT_ID_ = DEP.ID_
@@ -304,10 +304,6 @@
       </if>
       <if test="deployedAt != null">
         and DEP.DEPLOY_TIME_ = #{deployedAt}
-      </if>
-      <if test="latest">
-       and RES.VERSION_ = VER.MAX_VERSION and
-          (RES.TENANT_ID_ = VER.TENANT_ID_ or (RES.TENANT_ID_ is null and VER.TENANT_ID_ is null))
       </if>
       <if test="suspensionState != null">
         and (RES.SUSPENSION_STATE_ = #{suspensionState.stateCode})
