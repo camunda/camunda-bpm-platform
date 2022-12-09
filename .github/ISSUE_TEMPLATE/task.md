@@ -23,3 +23,8 @@ assignees: ''
 - [ ] #123
 - [ ] Step X
 -->
+
+### Dev2QA handover
+- [ ] Is the testing information present on the description?
+
+Please follow the link to the DEV2QA information/comment template [here](https://confluence.camunda.com/display/AP/Handover+Dev+-%3E+Testing)
