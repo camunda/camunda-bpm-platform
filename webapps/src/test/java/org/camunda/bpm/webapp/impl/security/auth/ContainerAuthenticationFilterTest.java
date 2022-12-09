@@ -87,7 +87,7 @@ public class ContainerAuthenticationFilterTest {
 
   protected ProcessEngine currentEngine;
 
-  private MockedStatic<Authentications> authenticationsMockedStatic;
+  private MockedStatic<AuthenticationUtil> authenticationUtilMockedStatic;
   private MockedStatic<ProcessEngineUtil> processEngineUtilMockedStatic;
 
   public ContainerAuthenticationFilterTest(String requestUrl, String engineName, boolean alreadyAuthenticated, boolean authenticationExpected) {
@@ -195,9 +195,13 @@ public class ContainerAuthenticationFilterTest {
 
   protected void setupAuthentications() {
     Authentications.clearCurrent();
-    authenticationsMockedStatic = mockStatic(Authentications.class);
+    authenticationUtilMockedStatic = mockStatic(AuthenticationUtil.class);
     authentications = mock(Authentications.class);
-    authenticationsMockedStatic.when(() -> Authentications.getFromSession(any())).thenReturn(authentications);
+    authenticationUtilMockedStatic.when(() -> AuthenticationUtil.getAuthsFromSession(any())).thenReturn(authentications);
+    UserAuthentication authentication = mock(UserAuthentication.class);
+    authenticationUtilMockedStatic
+      .when(() -> AuthenticationUtil.createAuthentication(any(ProcessEngine.class), any(), any(), any()))
+      .thenReturn(authentication);
   }
 
   protected void setupFilter() throws ServletException {
@@ -218,7 +222,7 @@ public class ContainerAuthenticationFilterTest {
 
   @After
   public void teardown() {
-    authenticationsMockedStatic.close();
+    authenticationUtilMockedStatic.close();
     processEngineUtilMockedStatic.close();
   }
 
@@ -265,10 +269,10 @@ public class ContainerAuthenticationFilterTest {
     Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
     if (authenticationExpected) {
-      verify(authentications).addAuthentication(any(Authentication.class));
+      verify(authentications).addOrReplace(any(UserAuthentication.class));
 
     } else {
-      verify(authentications, never()).addAuthentication(any(Authentication.class));
+      verify(authentications, never()).addOrReplace(any(UserAuthentication.class));
     }
   }
 }

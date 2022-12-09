@@ -20,15 +20,18 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.rules.ExternalResource;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class HeaderRule extends ExternalResource {
+public class HttpClientRule extends ExternalResource {
 
   public static final String PORT_PLACEHOLDER_WEBAPP_URL = "{PORT}";
   public static final String WEBAPP_URL = "http://localhost:" + PORT_PLACEHOLDER_WEBAPP_URL +
@@ -38,10 +41,10 @@ public class HeaderRule extends ExternalResource {
   protected HttpURLConnection connection = null;
   protected boolean followRedirects;
 
-  public HeaderRule() {
+  public HttpClientRule() {
   }
 
-  public HeaderRule(int port) {
+  public HttpClientRule(int port) {
     this.port = port;
   }
 
@@ -59,11 +62,27 @@ public class HeaderRule extends ExternalResource {
     return performRequest(url, null, null, null);
   }
 
-  public HttpURLConnection performPostRequest(String url, String headerName, String headerValue) {
-    return performRequest(url, "POST", headerName, headerValue);
+  public HttpURLConnection performRequest(String url, Map<String, String> headers) {
+    return performRequest(url, null, headers, null);
   }
 
-  public HttpURLConnection performRequest(String url, String method, String headerName, String headerValue) {
+  public HttpURLConnection performRequest(String url, String headerName, String headerValue) {
+    return performRequest(url, null, Collections.singletonMap(headerName, headerValue), null);
+  }
+
+  public HttpURLConnection performPostRequest(String url, String headerName, String headerValue) {
+    return performPostRequest(url, headerName, headerValue, null);
+  }
+
+  public HttpURLConnection performPostRequest(String url, String headerName, String headerValue, String payload) {
+    return performRequest(url, "POST", Collections.singletonMap(headerName, headerValue), payload);
+  }
+
+  public HttpURLConnection performPostRequest(String url, Map<String, String> headers, String payload) {
+    return performRequest(url, "POST", headers, payload);
+  }
+
+  public HttpURLConnection performRequest(String url, String method, Map<String, String> headers, String payload) {
     try {
       connection =
         (HttpURLConnection) new URL(url)
@@ -82,14 +101,31 @@ public class HeaderRule extends ExternalResource {
       }
     }
 
-    if (headerName != null && headerValue != null) {
-      connection.setRequestProperty(headerName, headerValue);
+    if (headers != null) {
+      headers.forEach((name, value) -> connection.setRequestProperty(name, value));
+    }
+
+    if (payload != null) {
+      connection.setDoOutput(true);
+      connection.setDoInput(true);
+      try(DataOutputStream wr = new DataOutputStream(connection.getOutputStream())) {
+        wr.write(payload.getBytes( StandardCharsets.UTF_8 ));
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
     }
 
     try {
       connection.connect();
     } catch (IOException e) {
       throw new RuntimeException(e);
+    }
+
+    if (payload != null) {
+      try {
+        connection.getContent();
+      } catch (IOException e) {
+      }
     }
 
     if(followRedirects) {
@@ -112,6 +148,14 @@ public class HeaderRule extends ExternalResource {
   }
 
   public String getCookieValue(String cookieName) {
+    return getCookie(cookieName).split(";")[0];
+  }
+
+  public String getSessionCookieValue() {
+    return getCookieValue("JSESSIONID");
+  }
+
+  public String getCookie(String cookieName) {
     List<String> cookies = getCookieHeaders();
 
     for (String cookie : cookies) {
@@ -123,15 +167,27 @@ public class HeaderRule extends ExternalResource {
     return "";
   }
 
-  public String getXsrfCookieValue() {
-    return getCookieValue("XSRF-TOKEN");
+  public String getXsrfCookie() {
+    return getCookie("XSRF-TOKEN");
   }
 
-  public String getSessionCookieValue() {
-    return getCookieValue("JSESSIONID");
+  public String getSessionCookie() {
+    return getCookie("JSESSIONID");
+  }
+
+  public String getContent() {
+    try {
+      StringWriter writer = new StringWriter();
+      IOUtils.copy(connection.getInputStream(), writer, "UTF-8");
+      return writer.toString();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return null;
   }
 
   public String getErrorResponseContent() {
+    getContent();
     try {
       StringWriter writer = new StringWriter();
       IOUtils.copy(connection.getErrorStream(), writer, "UTF-8");
@@ -183,7 +239,7 @@ public class HeaderRule extends ExternalResource {
     return regex.toString();
   }
 
-  public HeaderRule followRedirects(boolean followRedirects) {
+  public HttpClientRule followRedirects(boolean followRedirects) {
     this.followRedirects = followRedirects;
     return this;
   }

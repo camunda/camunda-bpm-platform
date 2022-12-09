@@ -35,7 +35,7 @@ public class SecurityActions {
 
   public static <T> T runWithAuthentications(SecurityAction<T> action, Authentications authentications) throws IOException, ServletException {
 
-    List<Authentication> currentAuthentications = authentications.getAuthentications();
+    List<UserAuthentication> currentAuthentications = authentications.getAuthentications();
     try {
       for (Authentication authentication : currentAuthentications) {
         authenticateProcessEngine(authentication);

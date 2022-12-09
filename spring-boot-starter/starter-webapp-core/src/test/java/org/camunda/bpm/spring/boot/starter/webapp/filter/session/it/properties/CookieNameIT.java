@@ -18,7 +18,7 @@ package org.camunda.bpm.spring.boot.starter.webapp.filter.session.it.properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.camunda.bpm.spring.boot.starter.webapp.filter.util.HeaderRule;
+import org.camunda.bpm.spring.boot.starter.webapp.filter.util.HttpClientRule;
 import org.camunda.bpm.spring.boot.starter.webapp.filter.util.TestApplication;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,7 +39,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class CookieNameIT {
 
   @Rule
-  public HeaderRule headerRule = new HeaderRule();
+  public HttpClientRule httpClientRule = new HttpClientRule();
 
   @LocalServerPort
   public int port;
@@ -49,12 +49,12 @@ public class CookieNameIT {
     // given
 
     // when
-    headerRule.performRequest("http://localhost:" + port + "/camunda/app/tasklist/default");
+    httpClientRule.performRequest("http://localhost:" + port + "/camunda/app/tasklist/default");
 
-    String sessionCookieValue = headerRule.getCookieValue("myFancyCookieName");
+    String sessionCookieValue = httpClientRule.getCookie("myFancyCookieName");
 
     // then
-    assertThat(sessionCookieValue).matches(headerRule.getSessionCookieRegex("myFancyCookieName", "Lax"));
+    assertThat(sessionCookieValue).matches(httpClientRule.getSessionCookieRegex("myFancyCookieName", "Lax"));
   }
 
 }

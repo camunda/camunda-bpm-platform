@@ -14,27 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.webapp.impl.security.filter.util;
+package org.camunda.bpm.spring.boot.starter.property.authcachettl;
 
-import java.util.regex.Pattern;
+import org.camunda.bpm.spring.boot.starter.property.ParsePropertiesHelper;
+import org.junit.Test;
 
-/**
- * @author Nikola Koevski
- */
-public final class CsrfConstants {
+import static org.assertj.core.api.Assertions.assertThat;
 
-  public static final String CSRF_SESSION_MUTEX = "CAMUNDA_CSRF_SESSION_MUTEX";
+public class AuthCacheTTLPropertyDefaultTest extends ParsePropertiesHelper {
 
-  public static final String CSRF_TOKEN_SESSION_ATTR_NAME = "CAMUNDA_CSRF_TOKEN";
+  @Test
+  public void shouldDefaultToEnabledAndTTLFiveMinutes() {
+    // given
 
-  public static final String CSRF_TOKEN_HEADER_NAME = "X-XSRF-TOKEN";
+    // when
+    boolean enabled = webapp.getAuth().getCache().isEnabled();
+    long ttl = webapp.getAuth().getCache().getTimeToLive();
 
-  public static final String CSRF_TOKEN_HEADER_REQUIRED = "Required";
-
-  public static final String CSRF_TOKEN_DEFAULT_COOKIE_NAME = "XSRF-TOKEN";
-
-  public static final Pattern CSRF_NON_MODIFYING_METHODS_PATTERN = Pattern.compile("GET|HEAD|OPTIONS");
-
-  public static final String CSRF_PATH_FIELD_NAME = ";Path=";
+    // then
+    assertThat(enabled).isTrue();
+    assertThat(ttl).isEqualTo(1_000 * 60 * 5);
+  }
 
 }

@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.spring.boot.starter.webapp.filter.headersec.it.properties;
 
-import org.camunda.bpm.spring.boot.starter.webapp.filter.util.HeaderRule;
+import org.camunda.bpm.spring.boot.starter.webapp.filter.util.HttpClientRule;
 import org.camunda.bpm.spring.boot.starter.webapp.filter.util.TestApplication;
 import org.junit.Before;
 import org.junit.Rule;
@@ -43,14 +43,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class HttpHeaderSecurityValueIT {
 
   @Rule
-  public HeaderRule headerRule;
+  public HttpClientRule httpClientRule;
 
   @LocalServerPort
   public int port;
 
   @Before
   public void assignRule() {
-    headerRule = new HeaderRule(port);
+    httpClientRule = new HttpClientRule(port);
   }
 
   @Test
@@ -58,10 +58,10 @@ public class HttpHeaderSecurityValueIT {
     // given
 
     // when
-    headerRule.performRequest();
+    httpClientRule.performRequest();
 
     // then
-    assertThat(headerRule.getHeader("X-XSS-Protection")).isEqualTo("aValue");
+    assertThat(httpClientRule.getHeader("X-XSS-Protection")).isEqualTo("aValue");
   }
 
   @Test
@@ -69,10 +69,10 @@ public class HttpHeaderSecurityValueIT {
     // given
 
     // when
-    headerRule.performRequest();
+    httpClientRule.performRequest();
 
     // then
-    assertThat(headerRule.getHeader("Content-Security-Policy")).isEqualTo("aValue");
+    assertThat(httpClientRule.getHeader("Content-Security-Policy")).isEqualTo("aValue");
   }
 
   @Test
@@ -80,10 +80,10 @@ public class HttpHeaderSecurityValueIT {
     // given
 
     // when
-    headerRule.performRequest();
+    httpClientRule.performRequest();
 
     // then
-    assertThat(headerRule.getHeader("X-Content-Type-Options")).isEqualTo("aValue");
+    assertThat(httpClientRule.getHeader("X-Content-Type-Options")).isEqualTo("aValue");
   }
 
   @Test
@@ -91,10 +91,10 @@ public class HttpHeaderSecurityValueIT {
     // given
 
     // when
-    headerRule.performRequest();
+    httpClientRule.performRequest();
 
     // then
-    assertThat(headerRule.getHeader("Strict-Transport-Security")).isEqualTo("aValue");
+    assertThat(httpClientRule.getHeader("Strict-Transport-Security")).isEqualTo("aValue");
   }
 
 }

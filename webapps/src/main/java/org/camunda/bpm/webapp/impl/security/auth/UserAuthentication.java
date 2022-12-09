@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.webapp.impl.security.auth;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -37,6 +38,8 @@ public class UserAuthentication extends Authentication {
   protected List<String> tenantIds;
 
   protected Set<String> authorizedApps;
+
+  protected Date cacheValidationTime;
 
   public UserAuthentication(String userId, String processEngineName) {
     super(userId, processEngineName);
@@ -69,4 +72,13 @@ public class UserAuthentication extends Authentication {
   public void setAuthorizedApps(Set<String> authorizedApps) {
     this.authorizedApps = authorizedApps;
   }
+
+  public Date getCacheValidationTime() {
+    return cacheValidationTime;
+  }
+
+  public void setCacheValidationTime(Date cacheValidationTime) {
+    this.cacheValidationTime = cacheValidationTime;
+  }
+
 }

@@ -59,6 +59,11 @@
   <filter>
     <filter-name>Authentication Filter</filter-name>
     <filter-class>org.camunda.bpm.webapp.impl.security.auth.AuthenticationFilter</filter-class>
+    <!-- See https://docs.camunda.org/manual/latest/webapps/shared-options/authentication/cache/ -->
+    <init-param>
+      <param-name>cacheTimeToLive</param-name>
+      <param-value>300000</param-value>
+    </init-param>
   </filter>
   <filter-mapping>
     <filter-name>Authentication Filter</filter-name>

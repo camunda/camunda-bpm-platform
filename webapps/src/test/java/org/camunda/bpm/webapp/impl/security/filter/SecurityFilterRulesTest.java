@@ -500,10 +500,10 @@ public class SecurityFilterRulesTest {
   }
 
   private void authenticatedForEngine(String engineName, Runnable codeBlock) {
-    Authentication engineAuth = new Authentication(LOGGED_IN_USER.getIdentityId(), engineName);
+    UserAuthentication engineAuth = new UserAuthentication(LOGGED_IN_USER.getIdentityId(), engineName);
 
     Authentications authentications = new Authentications();
-    authentications.addAuthentication(engineAuth);
+    authentications.addOrReplace(engineAuth);
 
     Authentications.setCurrent(authentications);
 
@@ -523,7 +523,7 @@ public class SecurityFilterRulesTest {
     engineAuth.setAuthorizedApps(authorizedApps);
 
     Authentications authentications = new Authentications();
-    authentications.addAuthentication(engineAuth);
+    authentications.addOrReplace(engineAuth);
 
     Authentications.setCurrent(authentications);
 

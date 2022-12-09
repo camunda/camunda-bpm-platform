@@ -17,9 +17,12 @@
 package org.camunda.bpm.webapp.impl.security.auth;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -35,6 +38,9 @@ import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.webapp.impl.util.ProcessEngineUtil;
+import org.camunda.bpm.webapp.impl.util.ServletContextUtil;
+
+import static org.camunda.bpm.webapp.impl.security.auth.AuthenticationUtil.createAuthentication;
 
 /**
  * Jax-Rs resource allowing users to authenticate with username and password</p>
@@ -44,6 +50,8 @@ import org.camunda.bpm.webapp.impl.util.ProcessEngineUtil;
  */
 @Path(UserAuthenticationResource.PATH)
 public class UserAuthenticationResource {
+
+  protected final static Logger LOGGER = Logger.getLogger(UserAuthenticationResource.class.getName());
 
   public static final String PATH = "/auth/user";
 
@@ -91,8 +99,14 @@ public class UserAuthenticationResource {
       return unauthorized();
     }
 
-    AuthenticationService authenticationService = new AuthenticationService();
-    UserAuthentication authentication = (UserAuthentication) authenticationService.createAuthenticate(processEngine, username, null, null);
+    UserAuthentication authentication = createAuthentication(processEngine, username);
+
+    ServletContext servletContext = request.getServletContext();
+    Date cacheValidationTime = ServletContextUtil.getAuthCacheValidationTime(servletContext);
+    if (cacheValidationTime != null) {
+      LOGGER.finest("Cache validation time: " + cacheValidationTime);
+      authentication.setCacheValidationTime(cacheValidationTime);
+    }
 
     Set<String> authorizedApps = authentication.getAuthorizedApps();
 
@@ -101,7 +115,7 @@ public class UserAuthenticationResource {
     }
 
     if (request != null) {
-      Authentications.revalidateSession(request, authentication);
+      AuthenticationUtil.revalidateSession(request, authentication);
     }
 
     return Response.ok(AuthenticationDto.fromAuthentication(authentication)).build();
@@ -138,7 +152,7 @@ public class UserAuthenticationResource {
     final Authentications authentications = Authentications.getCurrent();
 
     // remove authentication for process engine
-    authentications.removeAuthenticationForProcessEngine(engineName);
+    authentications.removeByEngineName(engineName);
 
     return Response.ok().build();
   }

@@ -27,13 +27,18 @@ import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.webapp.impl.util.ServletContextUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 import org.springframework.mock.web.MockHttpServletRequest;
+
+import java.util.Date;
 
 /**
  * @author Thorben Lindhauer
@@ -59,6 +64,7 @@ public class UserAuthenticationResourceTest {
 
   @After
   public void tearDown() {
+    ClockUtil.reset();
     processEngineConfiguration.setAuthorizationEnabled(false);
 
     for (User user : identityService.createUserQuery().list()) {
@@ -90,6 +96,7 @@ public class UserAuthenticationResourceTest {
 
     // when
     UserAuthenticationResource authResource = new UserAuthenticationResource();
+    authResource.request = new MockHttpServletRequest();
     Response response = authResource.doLogin("UserAuthenticationResourceTest-engine", "tasklist", "jonny", "jonnyspassword");
 
     // then
@@ -146,6 +153,7 @@ public class UserAuthenticationResourceTest {
 
     // when
     UserAuthenticationResource authResource = new UserAuthenticationResource();
+    authResource.request = new MockHttpServletRequest();
     Response response = authResource.doLogin("UserAuthenticationResourceTest-engine", "tasklist", "jonny", "jonnyspassword");
 
     // then
@@ -164,15 +172,40 @@ public class UserAuthenticationResourceTest {
 
     // when
     UserAuthenticationResource authResource = new UserAuthenticationResource();
+    authResource.request = new MockHttpServletRequest();
     Response response = authResource.doLogin("UserAuthenticationResourceTest-engine", "tasklist", "jonny", "jonnyspassword");
 
     // then
     Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
   }
 
+  @Test
+  public void shouldSetAuthCacheValidationTime() {
+    // given
+    ClockUtil.setCurrentTime(ClockUtil.getCurrentTime());
+    User jonny = identityService.newUser("jonny");
+    jonny.setPassword("jonnyspassword");
+    identityService.saveUser(jonny);
+
+    MockHttpServletRequest request = new MockHttpServletRequest();
+    ServletContextUtil.setCacheTTLForLogin(1000 * 60 * 5, request.getServletContext());
+
+    // when
+    UserAuthenticationResource authResource = new UserAuthenticationResource();
+    authResource.request = request;
+    authResource.doLogin("UserAuthenticationResourceTest-engine", "tasklist", "jonny", "jonnyspassword");
+
+    // then
+    UserAuthentication userAuthentication = AuthenticationUtil.getAuthsFromSession(request.getSession())
+      .getAuthentications()
+      .get(0);
+    assertThat(userAuthentication.getCacheValidationTime())
+      .isEqualTo(new Date(ClockUtil.getCurrentTime().getTime() + 1000 * 60 * 5));
+  }
+
   protected void setAuthentication(String user, String engineName) {
     Authentications authentications = new Authentications();
-    authentications.addAuthentication(new Authentication("jonny", "UserAuthenticationResourceTest-engine"));
+    authentications.addOrReplace(new UserAuthentication("jonny", "UserAuthenticationResourceTest-engine"));
     Authentications.setCurrent(authentications);
   }
 

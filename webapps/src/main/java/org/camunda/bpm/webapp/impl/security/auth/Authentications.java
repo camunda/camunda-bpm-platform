@@ -22,8 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import static org.camunda.bpm.webapp.impl.security.auth.AuthenticationUtil.createAuthentication;
 
 /**
  * <p>Wrapper around current authentications.</p>
@@ -39,19 +38,20 @@ import javax.servlet.http.HttpSession;
  * class to a thread local and may be obtained by {@link #getCurrent()}</p>
  *
  * @author Daniel Meyer
- *
  */
 public class Authentications implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  private static String CAM_AUTH_SESSION_KEY = "authenticatedUser";
+  /**
+   * holds the current authentication
+   */
+  private static final ThreadLocal<Authentications> currentAuthentications = new ThreadLocal<Authentications>();
 
-  /** holds the current authentication */
-  private static ThreadLocal<Authentications> currentAuthentications = new ThreadLocal<Authentications>();
-
-  /**holds an entry for each processEngine->userId pair currently authenticated */
-  protected Map<String, Authentication> authentications = new HashMap<String, Authentication>();
+  /**
+   * holds an entry for each processEngine->userId pair currently authenticated
+   */
+  protected Map<String, UserAuthentication> authentications = new HashMap<>();
 
   public Authentications() {
   }
@@ -59,11 +59,10 @@ public class Authentications implements Serializable {
   /**
    * Returns an {@link Authentication} for a provided process engine name or "null".
    *
-   * @param engineName
-   *          the name of the process engine for which the userId should be
-   *          retrieved.
+   * @param engineName the name of the process engine for which the userId should be
+   *                   retrieved.
    * @return {@link Authentication} for the provided process engine or
-   *         "null" if no user is authenticated for this process engine.
+   * "null" if no user is authenticated for this process engine.
    */
   public Authentication getAuthenticationForProcessEngine(String engineName) {
     return authentications.get(engineName);
@@ -73,29 +72,27 @@ public class Authentications implements Serializable {
    * Adds an authentication to the list of current authentications. If there already
    * existis an authentication of the same process engine, it is replaced silently.
    *
-   * @param authentication
-   *          the authentication to add
+   * @param authentication the authentication to add
    */
-  public void addAuthentication(Authentication authentication) {
+  public void addOrReplace(UserAuthentication authentication) {
     authentications.put(authentication.getProcessEngineName(), authentication);
   }
 
   /**
    * Removes the authentication for the provided process engine name.
    *
-   * @param engineName
-   *          the name of the process engine for which the authentication should
-   *          be removed.
+   * @param engineName the name of the process engine for which the authentication should
+   *                   be removed.
    */
-  public void removeAuthenticationForProcessEngine(String engineName) {
+  public void removeByEngineName(String engineName) {
     authentications.remove(engineName);
   }
 
   /**
    * @return all active {@link Authentication Authentications}.
    */
-  public List<Authentication> getAuthentications() {
-    return new ArrayList<Authentication>(authentications.values());
+  public List<UserAuthentication> getAuthentications() {
+    return new ArrayList<>(authentications.values());
   }
 
   /**
@@ -110,15 +107,18 @@ public class Authentications implements Serializable {
 
   // thread-local //////////////////////////////////////////////////////////
 
-  /** sets the {@link Authentications} for the current thread in a thread local.
+  /**
+   * sets the {@link Authentications} for the current thread in a thread local.
+   *
    * @param auth the {@link Authentications} to set.
-   * */
+   */
   public static void setCurrent(Authentications auth) {
     currentAuthentications.set(auth);
   }
 
-  /** clears the {@link Authentications} for the current thread.
-   * */
+  /**
+   * clears the {@link Authentications} for the current thread.
+   */
   public static void clearCurrent() {
     currentAuthentications.remove();
   }
@@ -130,59 +130,6 @@ public class Authentications implements Serializable {
    */
   public static Authentications getCurrent() {
     return currentAuthentications.get();
-  }
-
-  // http session //////////////////////////////////////////////////////////
-
-  /**
-   * Allows obtaining an {@link Authentications} object from the
-   * {@link HttpSession}. If no such object exists in the session, a new
-   * instance is created and returned.
-   *
-   * @param session
-   *          the {@link HttpSession} instance from which to retrieve the
-   *          {@link Authentications}.
-   * @return
-   */
-  public static Authentications getFromSession(HttpSession session) {
-    Authentications authentications = (Authentications) session.getAttribute(CAM_AUTH_SESSION_KEY);
-    if(authentications == null) {
-      authentications = new Authentications();
-      session.setAttribute(CAM_AUTH_SESSION_KEY, authentications);
-    }
-    return authentications;
-  }
-
-  /**
-   * Invalidates the old {@link HttpSession} of the current request and creates
-   * a new one. Additionally transfers the existing authentications to the new
-   * session and adds a new one.
-   *
-   * @param request
-   *          the {@link HttpServletRequest} instance from which the session
-   *          is obtained and a new {@link HttpSession} created.
-   * @param authentication
-   *          the new {@link Authentication} instance that is created
-   *          through user login. It is added to the existing authentications.
-   */
-  public static void revalidateSession(HttpServletRequest request, Authentication authentication) {
-    HttpSession session = request.getSession();
-    Authentications authentications = getFromSession(session);
-
-    // invalidate old & create new session
-    session.invalidate();
-    session = request.getSession(true);
-
-    if (authentication != null) {
-      authentications.addAuthentication(authentication);
-      session.setAttribute(CAM_AUTH_SESSION_KEY, authentications);
-    }
-  }
-
-  public static void updateSession(HttpSession session, Authentications authentications) {
-    if (session != null) {
-      session.setAttribute(CAM_AUTH_SESSION_KEY, authentications);
-    }
   }
 
 }

@@ -48,10 +48,8 @@ public class ContainerBasedAuthenticationFilter implements Filter {
   public static Pattern API_PLUGIN_PATTERN = Pattern.compile("/api/(cockpit|admin|tasklist|welcome)/plugin/[^/]+/([^/]+)/.*");
 
   protected AuthenticationProvider authenticationProvider;
-  protected AuthenticationService userAuthentications;
 
   public void init(FilterConfig filterConfig) throws ServletException {
-    userAuthentications = new AuthenticationService();
 
     String authenticationProviderClassName = filterConfig.getInitParameter(AUTHENTICATION_PROVIDER_PARAM);
 
@@ -97,15 +95,15 @@ public class ContainerBasedAuthenticationFilter implements Filter {
 
     AuthenticationResult authenticationResult = authenticationProvider.extractAuthenticatedUser(req, engine);
     if (authenticationResult.isAuthenticated()) {
-      Authentications authentications = Authentications.getFromSession(req.getSession());
+      Authentications authentications = AuthenticationUtil.getAuthsFromSession(req.getSession());
       String authenticatedUser = authenticationResult.getAuthenticatedUser();
 
       if (!existisAuthentication(authentications, engineName, authenticatedUser)) {
         List<String> groups = authenticationResult.getGroups();
         List<String> tenants = authenticationResult.getTenants();
 
-        Authentication authentication = createAuthentication(engine, authenticatedUser, groups, tenants);
-        authentications.addAuthentication(authentication);
+        UserAuthentication authentication = createAuthentication(engine, authenticatedUser, groups, tenants);
+        authentications.addOrReplace(authentication);
       }
 
       chain.doFilter(request, response);
@@ -180,8 +178,8 @@ public class ContainerBasedAuthenticationFilter implements Filter {
     return processEngineName.equals(engineName) && identityId.equals(username);
   }
 
-  protected Authentication createAuthentication(ProcessEngine processEngine, String username, List<String> groups, List<String> tenants) {
-    return userAuthentications.createAuthenticate(processEngine, username, groups, tenants);
+  protected UserAuthentication createAuthentication(ProcessEngine processEngine, String username, List<String> groups, List<String> tenants) {
+    return AuthenticationUtil.createAuthentication(processEngine, username, groups, tenants);
   }
 
 }

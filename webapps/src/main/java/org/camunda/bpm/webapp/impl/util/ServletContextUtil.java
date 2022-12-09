@@ -16,7 +16,15 @@
  */
 package org.camunda.bpm.webapp.impl.util;
 
+import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.webapp.impl.security.auth.AuthenticationFilter;
+import org.camunda.bpm.webapp.impl.security.auth.UserAuthenticationResource;
+
+import javax.servlet.FilterChain;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import java.util.Date;
 
 /**
  * With Camunda Platform 7.13 we introduced the application path prefix /camunda to Spring Boot.
@@ -31,6 +39,9 @@ public class ServletContextUtil {
 
   protected static final String SUCCESSFUL_ET_ATTR_NAME =
     "org.camunda.bpm.webapp.telemetry.data.stored";
+
+  protected static final String AUTH_CACHE_TTL_ATTR_NAME =
+    "org.camunda.bpm.webapp.auth.cache.ttl";
 
   /**
    * Consumed by Camunda Platform CE & EE Webapp:
@@ -80,6 +91,30 @@ public class ServletContextUtil {
 
   protected static String buildTelemetrySentAttribute(String webappName, String engineName) {
     return SUCCESSFUL_ET_ATTR_NAME + "." + webappName + "." + engineName;
+  }
+
+  /**
+   * Sets {@param cacheTimeToLive} in the {@link AuthenticationFilter} to be used on initial login authentication.
+   * See {@link AuthenticationFilter#doFilter(ServletRequest, ServletResponse, FilterChain)}
+   */
+  public static void setCacheTTLForLogin(long cacheTimeToLive, ServletContext servletContext) {
+    servletContext.setAttribute(AUTH_CACHE_TTL_ATTR_NAME, cacheTimeToLive);
+  }
+
+  /**
+   * Returns {@code authCacheValidationTime} from servlet context to be used on initial login authentication.
+   * See {@link UserAuthenticationResource#doLogin(String, String, String, String)}
+   */
+  public static Date getAuthCacheValidationTime(ServletContext servletContext) {
+    Long cacheTimeToLive = (Long) servletContext.getAttribute(AUTH_CACHE_TTL_ATTR_NAME);
+
+    if (cacheTimeToLive != null) {
+      return new Date(ClockUtil.getCurrentTime().getTime() + cacheTimeToLive);
+
+    } else {
+      return null;
+
+    }
   }
 
 }
