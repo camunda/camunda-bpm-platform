@@ -587,6 +587,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected List<TypedValueSerializer> customPostVariableSerializers;
   protected VariableSerializers variableSerializers;
   protected VariableSerializerFactory fallbackSerializerFactory;
+  protected boolean implicitVariableUpdateDetectionEnabled = true;
 
   protected String defaultSerializationFormat = Variables.SerializationDataFormats.JAVA.getName();
   protected boolean javaSerializationFormatEnabled = false;
@@ -3275,6 +3276,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setFallbackSerializerFactory(VariableSerializerFactory fallbackSerializerFactory) {
     this.fallbackSerializerFactory = fallbackSerializerFactory;
+  }
+
+  public boolean isImplicitVariableUpdateDetectionEnabled() {
+    return implicitVariableUpdateDetectionEnabled;
+  }
+
+  public void setImplicitVariableUpdateDetectionEnabled(boolean newValue) {
+    this.implicitVariableUpdateDetectionEnabled = newValue;
   }
 
   public ProcessEngineConfigurationImpl setVariableTypes(VariableSerializers variableSerializers) {

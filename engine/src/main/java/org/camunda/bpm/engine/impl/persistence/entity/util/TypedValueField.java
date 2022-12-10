@@ -152,8 +152,12 @@ public class TypedValueField implements DbEntityLifecycleAware, CommandContextLi
     return((TypedValueSerializer<TypedValue>) getSerializer()).isMutableValue(value);
   }
 
+  private static boolean isImplicitVariableUpdateDetectionEnabled() {
+    return Context.getProcessEngineConfiguration().isImplicitVariableUpdateDetectionEnabled();
+  }
+
   protected boolean isValuedImplicitlyUpdated() {
-    if (cachedValue != null && isMutableValue(cachedValue)) {
+    if (cachedValue != null && isImplicitVariableUpdateDetectionEnabled() && isMutableValue(cachedValue)) {
       byte[] byteArray = valueFields.getByteArrayValue();
 
       ValueFieldsImpl tempValueFields = new ValueFieldsImpl();
