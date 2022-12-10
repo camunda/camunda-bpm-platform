@@ -30,4 +30,13 @@ public class ProcessEngineConfigurationTest {
     // then
     assertThat(engineConfiguration.isStandaloneTasksEnabled()).isTrue();
   }
+
+  @Test
+  public void shouldEnableImplicitUpdatesDetectionByDefault() {
+    // when
+    ProcessEngineConfigurationImpl engineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration.createStandaloneProcessEngineConfiguration();
+
+    // then
+    assertThat(engineConfiguration.isImplicitVariableUpdateDetectionEnabled()).isTrue();
+  }
 }
