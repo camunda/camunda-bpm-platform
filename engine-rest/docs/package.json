@@ -1,6 +1,6 @@
 {
   "name": "docs",
-  "version": "7.19.0-alpha2",
+  "version": "7.19.0-SNAPSHOT",
   "private": true,
   "scripts": {
     "build": "redoc-cli build -t ./template.hbs target/dependency/openapi.json -o target/index.html"
