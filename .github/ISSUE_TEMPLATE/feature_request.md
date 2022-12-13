@@ -31,6 +31,4 @@ assignees: ''
 -->
 
 ### Dev2QA handover
-- [ ] Is the testing information present on the description?
-
-Please follow the link to the DEV2QA information/comment template [here](https://confluence.camunda.com/display/AP/Handover+Dev+-%3E+Testing)
+- [ ] Does this ticket need a QA test and the testing goals are not clear from the description? Add a [Dev2QA handover comment](https://confluence.camunda.com/display/AP/Handover+Dev+-%3E+Testing)
