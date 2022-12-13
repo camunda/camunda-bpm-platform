@@ -54,7 +54,7 @@
             </h6>
 
             <h5 class="assignee"
-                ng-if="task.assignee"
+                ng-if="hasAssignee(task)"
                 uib-tooltip="task.assignee">
               {{ assigneeDisplayedName(task); }}
             </h5>

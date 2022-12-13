@@ -90,12 +90,12 @@
   </li>
 
   <li class="assignee set-value"
-      ng-if="!task.assignee">
+      ng-if="!hasAssignee()">
     <span tooltip-placement="top"
           uib-tooltip="{{ 'ASSIGNEE' | translate }}"
           class="glyphicon glyphicon-user"></span>
 
-    <button 
+    <button
        class="claim btn-link"
        ng-click="claim()"
        translate="CLAIM_TASK"
@@ -103,7 +103,7 @@
   </li>
 
   <li class="assignee"
-      ng-if="task.assignee">
+      ng-if="hasAssignee()">
     <span cam-widget-inline-field
           tabindex="0"
           ng-keydown="editAssignee($event)"
