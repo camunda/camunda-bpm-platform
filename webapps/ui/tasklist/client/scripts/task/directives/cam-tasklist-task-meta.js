@@ -363,6 +363,11 @@ module.exports = [
           });
         });
 
+        $scope.hasAssignee = function() {
+          // empty string is also a valid assignee
+          return $scope.task.assignee != null;
+        };
+
         $scope.editGroups = function() {
           var groupsChanged;
 

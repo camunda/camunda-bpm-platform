@@ -152,6 +152,11 @@ module.exports = [
             return '&lt;nobody&gt;';
           };
 
+          $scope.hasAssignee = function(task) {
+            // empty string is also a valid assignee
+            return task.assignee != null;
+          };
+
           /**
            * observe the task list query
            */
