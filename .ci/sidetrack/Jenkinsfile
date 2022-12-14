@@ -20,11 +20,7 @@ pipeline {
   }
   options {
     buildDiscarder(logRotator(numToKeepStr: '5'))
-    throttleJobProperty(
-      throttleEnabled: true,
-      throttleOption: 'project',
-      maxConcurrentTotal: 2
-    )
+    disableConcurrentBuilds()
   }
   triggers {
     pollSCM('H H(22-23) * * *') // Sidetrack daily runs before CE daily
