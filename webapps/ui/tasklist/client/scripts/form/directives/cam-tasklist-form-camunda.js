@@ -188,6 +188,7 @@ module.exports = [
                 } else {
                   const valuesKey = variableToValuesKeyMap[key];
                   if (valuesKey) {
+                    // option source input data
                     const valuesKeyVariable = variables[valuesKey];
 
                     if (valuesKeyVariable) {
@@ -196,6 +197,9 @@ module.exports = [
                     } else {
                       type = 'Json';
                     }
+                  } else {
+                    // option source static
+                    type = 'Json';
                   }
                 }
 
