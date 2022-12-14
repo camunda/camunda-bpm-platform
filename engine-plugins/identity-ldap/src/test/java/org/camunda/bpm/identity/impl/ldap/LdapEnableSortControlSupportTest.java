@@ -25,6 +25,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -189,4 +191,79 @@ public class LdapEnableSortControlSupportTest {
       assertEquals("Index: " + i, orderedUsers.get(i).getId(), manualOrderedUsers.get(i).getId());
     }
   }
+
+  /**
+   * Group ID Ordering
+   */
+  @Test
+  public void testOrderByGroupIdAsc() {
+    List<Group> orderedGroup = identityService.createGroupQuery().orderByGroupId().asc().list();
+    List<Group> manualOrderedGroups = identityService.createGroupQuery()
+            .list()
+            .stream()
+            .sorted(Comparator.comparing(Group::getId))
+            .collect(Collectors.toList());
+
+    assertEquals(orderedGroup.size(), manualOrderedGroups.size());
+
+    for (int i = 0; i < orderedGroup.size(); i++) {
+      assertEquals("Index: " + i, orderedGroup.get(i).getId(), manualOrderedGroups.get(i).getId());
+    }
+  }
+
+  @Test
+  public void testOrderByGroupIdDesc() {
+    List<Group> orderedGroup = identityService.createGroupQuery().orderByGroupId().desc().list();
+    List<Group> manualOrderedGroups = identityService.createGroupQuery()
+            .list()
+            .stream()
+            .sorted(Comparator.comparing(Group::getId).reversed())
+            .collect(Collectors.toList());
+
+    assertEquals(orderedGroup.size(), manualOrderedGroups.size());
+
+    for (int i = 0; i < orderedGroup.size(); i++) {
+      assertEquals("Index: " + i, orderedGroup.get(i).getId(), manualOrderedGroups.get(i).getId());
+    }
+  }
+
+  /**
+   * Group Name Ordering
+   */
+  @Test
+  public void testOrderByGroupNameAsc() {
+    List<Group> orderedGroup = identityService.createGroupQuery().orderByGroupName().asc().list();
+    List<Group> manualOrderedGroups = identityService.createGroupQuery()
+            .list()
+            .stream()
+            .sorted(Comparator.comparing(Group::getName))
+            .collect(Collectors.toList());
+
+    assertEquals(orderedGroup.size(), manualOrderedGroups.size());
+
+    for (int i = 0; i < orderedGroup.size(); i++) {
+      assertEquals("Index: " + i, orderedGroup.get(i).getId(), manualOrderedGroups.get(i).getId());
+    }
+  }
+
+  @Test
+  public void testOrderByGroupNameDesc() {
+    List<Group> orderedGroup = identityService.createGroupQuery().orderByGroupName().desc().list();
+    List<Group> manualOrderedGroups = identityService.createGroupQuery()
+            .list()
+            .stream()
+            .sorted(Comparator.comparing(Group::getName).reversed())
+            .collect(Collectors.toList());
+
+    // List<String > listOrder =orderedGroup.stream().map(Group::getName).toList();
+    // List<String > listManual =manualOrderedGroups.stream().map(Group::getName).toList();
+    // assertEquals("NameDesc", String.join(",", listOrder)+" <-> "+String.join(",",listManual));
+
+    assertEquals(orderedGroup.size(), manualOrderedGroups.size());
+
+    for (int i = 0; i < orderedGroup.size(); i++) {
+      assertEquals("Index: " + i, orderedGroup.get(i).getId(), manualOrderedGroups.get(i).getId());
+    }
+  }
+
 }
