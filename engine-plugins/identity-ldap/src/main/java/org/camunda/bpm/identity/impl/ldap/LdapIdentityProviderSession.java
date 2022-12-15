@@ -722,30 +722,24 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
             resultLogger.append("]");
           }
           SortKey sortKey = null;
-          switch (targetQuery) {
-            case USER:
-              if (UserQueryProperty.USER_ID.getName().equals(propertyName)) {
-                sortKey = new SortKey(ldapConfiguration.getUserIdAttribute(),
-                        Direction.ASCENDING.equals(orderingProperty.getDirection()),
-                        null);
+          if (query instanceof LdapUserQueryImpl) {
+            if (UserQueryProperty.USER_ID.getName().equals(propertyName)) {
+              sortKey = new SortKey(ldapConfiguration.getUserIdAttribute(), Direction.ASCENDING.equals(orderingProperty.getDirection()),
+                  null);
 
-              } else if (UserQueryProperty.EMAIL.getName().equals(propertyName)) {
-                sortKey = new SortKey(ldapConfiguration.getUserEmailAttribute(),
-                        Direction.ASCENDING.equals(orderingProperty.getDirection()),
-                        null);
+            } else if (UserQueryProperty.EMAIL.getName().equals(propertyName)) {
+              sortKey = new SortKey(ldapConfiguration.getUserEmailAttribute(), Direction.ASCENDING.equals(orderingProperty.getDirection()),
+                  null);
 
-              } else if (UserQueryProperty.FIRST_NAME.getName().equals(propertyName)) {
-                sortKey = new SortKey(ldapConfiguration.getUserFirstnameAttribute(),
-                        Direction.ASCENDING.equals(orderingProperty.getDirection()),
-                        null);
+            } else if (UserQueryProperty.FIRST_NAME.getName().equals(propertyName)) {
+              sortKey = new SortKey(ldapConfiguration.getUserFirstnameAttribute(), Direction.ASCENDING.equals(orderingProperty.getDirection()),
+                  null);
 
-              } else if (UserQueryProperty.LAST_NAME.getName().equals(propertyName)) {
-                sortKey = new SortKey(ldapConfiguration.getUserLastnameAttribute(),
-                        Direction.ASCENDING.equals(orderingProperty.getDirection()),
-                        null);
-              }
-              break;
-            case GROUP:
+            } else if (UserQueryProperty.LAST_NAME.getName().equals(propertyName)) {
+              sortKey = new SortKey(ldapConfiguration.getUserLastnameAttribute(), Direction.ASCENDING.equals(orderingProperty.getDirection()),
+                  null);
+            }
+          } else if (query instanceof LdapGroupQuery) {
               if (GroupQueryProperty.GROUP_ID.getName().equals(propertyName)) {
                 sortKey = new SortKey(ldapConfiguration.getGroupIdAttribute(),
                         Direction.ASCENDING.equals(orderingProperty.getDirection()),
@@ -756,12 +750,11 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
                         null);
               }
               // not possible to order by Type: LDAP may not support the type
-
-              break;
           }
-          if (sortKey != null)
-            controls.add(new SortControl(new SortKey[]{sortKey}, Control.CRITICAL));
 
+          if (sortKey != null) {
+            controls.add(new SortControl(new SortKey[] { sortKey }, Control.CRITICAL));
+          }
         }
       }
 
