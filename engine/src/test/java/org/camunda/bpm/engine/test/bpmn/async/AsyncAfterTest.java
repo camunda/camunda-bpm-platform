@@ -53,6 +53,39 @@ import org.junit.Test;
 public class AsyncAfterTest extends PluggableProcessEngineTest {
 
   @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/async/Simplified_working.bpmn20.xml", "org/camunda/bpm/engine/test/bpmn/async/Simplified_Not_Working.bpmn20.xml"})
+  public void shouldDemonstrateBug() {
+
+    // given
+    // two versions of the same model:
+    /*
+     * start event -> intermediate throw event -> user task -> end event
+     * event subprocess ( conditional start event -> user task -> end event )
+     */
+    // The intermediate throw event has an output property flag which triggers the conditional start event
+    // the difference between the two versions is the asyncAfter property on the intermediate throw event which is false for Simplified_Working and false for Simplified_Not_Working.
+
+    // start an instance each
+    ProcessInstance workingPI = runtimeService.startProcessInstanceByKey("Simplified_Working");
+    ProcessInstance notWorkingPI = runtimeService.startProcessInstanceByKey("Simplified_Not_Working");
+
+    // when
+    // process all jobs, so async continuation will happen
+    List<Job> list = managementService.createJobQuery().list();
+    testRule.waitForJobExecutorToProcessAllJobs(TimeUnit.MILLISECONDS.convert(5L, TimeUnit.SECONDS));
+
+    // then
+    List<Task> parentProcessTasks = taskService.createTaskQuery().taskName("parentProcessTask").list();
+    List<Task> subProcessTasks = taskService.createTaskQuery().taskName("subProcessTask").list();
+
+    // both instances should have a token at the user task in the parent process
+    assertThat(parentProcessTasks).extracting("processInstanceId").containsExactlyInAnyOrder(workingPI.getId(), notWorkingPI.getId());
+    // test fails here, only one instance has a token at the user task in the event subprocess
+    // this means the conditional start event for Simplified_Not_Working did not trigger
+    assertThat(subProcessTasks).extracting("processInstanceId").containsExactlyInAnyOrder(workingPI.getId(), notWorkingPI.getId());
+  }
+
+  @Test
   public void testTransitionIdRequired() {
 
     // if an outgoing sequence flow has no id, we cannot use it in asyncAfter
@@ -141,7 +174,7 @@ public class AsyncAfterTest extends PluggableProcessEngineTest {
   public void testAsyncAfterServiceTaskMultipleTransitions() {
 
     // start process instance
-    Map<String, Object> varMap = new HashMap<String, Object>();
+    Map<String, Object> varMap = new HashMap<>();
     varMap.put("flowToTake", "flow2");
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess", varMap);
 
@@ -166,7 +199,7 @@ public class AsyncAfterTest extends PluggableProcessEngineTest {
     //////////////////////////////////////////////////////////////
 
     // start process instance
-    varMap = new HashMap<String, Object>();
+    varMap = new HashMap<>();
     varMap.put("flowToTake", "flow3");
     pi = runtimeService.startProcessInstanceByKey("testProcess", varMap);
 
@@ -192,7 +225,7 @@ public class AsyncAfterTest extends PluggableProcessEngineTest {
   public void testAsyncAfterServiceTaskMultipleTransitionsConcurrent() {
 
     // start process instance
-    Map<String, Object> varMap = new HashMap<String, Object>();
+    Map<String, Object> varMap = new HashMap<>();
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess", varMap);
 
     // the service task is completely invoked
@@ -473,7 +506,7 @@ public class AsyncAfterTest extends PluggableProcessEngineTest {
   @Test
   public void testAsyncAfterExclusiveGateway() {
     // start process instance with variables
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("flow", false);
 
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testExclusiveGateway", variables);
@@ -504,7 +537,7 @@ public class AsyncAfterTest extends PluggableProcessEngineTest {
   @Test
   public void testAsyncAfterAndBeforeExclusiveGateway() {
     // start process instance with variables
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("flow", false);
 
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testExclusiveGateway", variables);

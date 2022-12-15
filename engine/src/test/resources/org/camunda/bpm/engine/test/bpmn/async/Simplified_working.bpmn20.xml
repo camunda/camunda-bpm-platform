@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_16i6jbs" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.1.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+  <bpmn:process id="Simplified_Working" name="Simplified_Working" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="Start">
+      <bpmn:outgoing>Flow_1fs8it1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:intermediateThrowEvent id="Event_0066gkp" name="Output Mapping" camunda:asyncAfter="false">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:outputParameter name="flag">true</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1fs8it1</bpmn:incoming>
+      <bpmn:outgoing>Flow_0b6k66a</bpmn:outgoing>
+    </bpmn:intermediateThrowEvent>
+    <bpmn:sequenceFlow id="Flow_1fs8it1" sourceRef="StartEvent_1" targetRef="Event_0066gkp" />
+    <bpmn:endEvent id="Event_0jry4p4" name="End" camunda:asyncBefore="true">
+      <bpmn:incoming>Flow_0bebumk</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0b6k66a" sourceRef="Event_0066gkp" targetRef="parentProcessTask" />
+    <bpmn:subProcess id="Activity_0j33jrb" triggeredByEvent="true">
+      <bpmn:sequenceFlow id="Flow_1x6bhmu" sourceRef="Event_1wuqunh" targetRef="subProcessTask" />
+      <bpmn:endEvent id="Event_111au6u" name="Processed">
+        <bpmn:incoming>Flow_1uacv8m</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:startEvent id="Event_1wuqunh" name="Flag == True" camunda:asyncAfter="true" isInterrupting="false">
+        <bpmn:outgoing>Flow_1x6bhmu</bpmn:outgoing>
+        <bpmn:conditionalEventDefinition id="ConditionalEventDefinition_1e0ftwc" camunda:variableName="flag">
+          <bpmn:condition xsi:type="bpmn:tFormalExpression">#{flag == true}</bpmn:condition>
+        </bpmn:conditionalEventDefinition>
+      </bpmn:startEvent>
+      <bpmn:sequenceFlow id="Flow_1uacv8m" sourceRef="subProcessTask" targetRef="Event_111au6u" />
+      <bpmn:userTask id="subProcessTask" name="subProcessTask">
+        <bpmn:incoming>Flow_1x6bhmu</bpmn:incoming>
+        <bpmn:outgoing>Flow_1uacv8m</bpmn:outgoing>
+      </bpmn:userTask>
+    </bpmn:subProcess>
+    <bpmn:sequenceFlow id="Flow_0bebumk" sourceRef="parentProcessTask" targetRef="Event_0jry4p4" />
+    <bpmn:userTask id="parentProcessTask" name="parentProcessTask">
+      <bpmn:incoming>Flow_0b6k66a</bpmn:incoming>
+      <bpmn:outgoing>Flow_0bebumk</bpmn:outgoing>
+    </bpmn:userTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Simplified_Working">
+      <bpmndi:BPMNEdge id="Flow_0b6k66a_di" bpmnElement="Flow_0b6k66a">
+        <di:waypoint x="348" y="97" />
+        <di:waypoint x="400" y="97" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1fs8it1_di" bpmnElement="Flow_1fs8it1">
+        <di:waypoint x="255" y="97" />
+        <di:waypoint x="312" y="97" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0bebumk_di" bpmnElement="Flow_0bebumk">
+        <di:waypoint x="500" y="97" />
+        <di:waypoint x="562" y="97" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="219" y="79" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="225" y="122" width="25" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0066gkp_di" bpmnElement="Event_0066gkp">
+        <dc:Bounds x="312" y="79" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="291" y="122" width="79" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0jry4p4_di" bpmnElement="Event_0jry4p4">
+        <dc:Bounds x="562" y="79" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="570" y="122" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1yzw53u_di" bpmnElement="parentProcessTask">
+        <dc:Bounds x="400" y="57" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0yeg33o_di" bpmnElement="Activity_0j33jrb" isExpanded="true">
+        <dc:Bounds x="155" y="180" width="350" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1x6bhmu_di" bpmnElement="Flow_1x6bhmu">
+        <di:waypoint x="231" y="280" />
+        <di:waypoint x="270" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1uacv8m_di" bpmnElement="Flow_1uacv8m">
+        <di:waypoint x="370" y="280" />
+        <di:waypoint x="422" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_06xulp0_di" bpmnElement="Event_1wuqunh">
+        <dc:Bounds x="195" y="262" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="182" y="305" width="63" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_111au6u_di" bpmnElement="Event_111au6u">
+        <dc:Bounds x="422" y="262" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="415" y="305" width="52" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0pdxdt0_di" bpmnElement="subProcessTask">
+        <dc:Bounds x="270" y="240" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
