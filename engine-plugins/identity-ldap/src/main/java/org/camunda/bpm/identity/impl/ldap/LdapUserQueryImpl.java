@@ -63,8 +63,9 @@ public class LdapUserQueryImpl extends UserQueryImpl {
   @Override
   public UserQuery desc() {
     // provide this exception then a popup will be visible in the admin task, but display will run correctly
-    if (ldapConfiguration != null && !ldapConfiguration.sortControlSupported)
+    if (ldapConfiguration != null && !ldapConfiguration.isSortControlSupported()) {
       throw new UnsupportedOperationException("The LDAP identity provider does not support descending search order.");
+    }
 
     return this;
   }
