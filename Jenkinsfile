@@ -414,11 +414,8 @@ pipeline {
       parallel {
         stage('engine-api-compatibility') {
           when {
-            allOf {
-              expression {
-                cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit')
-              }
-              branch cambpmDefaultBranch();
+            expression {
+              cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit') && cambpmWithLabels()
             }
           }
           steps {
@@ -432,11 +429,8 @@ pipeline {
         }
         stage('engine-UNIT-plugins') {
           when {
-            allOf {
-              expression {
-                cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit')
-              }
-              branch cambpmDefaultBranch();
+            expression {
+              cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit') && cambpmWithLabels()
             }
           }
           steps {
@@ -473,11 +467,8 @@ pipeline {
         }
         stage('webapp-UNIT-database-table-prefix') {
           when {
-            allOf {
-              expression {
-                cambpmIsNotFailedStageType(failedStageTypes, 'webapp-unit')
-              }
-              branch cambpmDefaultBranch();
+            expression {
+              cambpmIsNotFailedStageType(failedStageTypes, 'webapp-unit') && cambpmWithLabels()
             }
           }
           steps {
