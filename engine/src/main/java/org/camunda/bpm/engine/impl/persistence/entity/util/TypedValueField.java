@@ -152,12 +152,8 @@ public class TypedValueField implements DbEntityLifecycleAware, CommandContextLi
     return((TypedValueSerializer<TypedValue>) getSerializer()).isMutableValue(value);
   }
 
-  private static boolean isImplicitVariableUpdateDetectionEnabled() {
-    return Context.getProcessEngineConfiguration().isImplicitVariableUpdateDetectionEnabled();
-  }
-
   protected boolean isValuedImplicitlyUpdated() {
-    if (cachedValue != null && isImplicitVariableUpdateDetectionEnabled() && isMutableValue(cachedValue)) {
+    if (cachedValue != null && isMutableValue(cachedValue)) {
       byte[] byteArray = valueFields.getByteArrayValue();
 
       ValueFieldsImpl tempValueFields = new ValueFieldsImpl();
@@ -178,11 +174,11 @@ public class TypedValueField implements DbEntityLifecycleAware, CommandContextLi
 
   @Override
   public void onCommandContextClose(CommandContext commandContext) {
-    notifyImplicitValueUpdate();
+    notifyImplicitValueUpdateIfEnabled();
   }
 
-  public void notifyImplicitValueUpdate() {
-    if (isValuedImplicitlyUpdated()) {
+  public void notifyImplicitValueUpdateIfEnabled() {
+    if (isImplicitVariableUpdateDetectionEnabled() && isValuedImplicitlyUpdated()) {
       for (TypedValueUpdateListener typedValueImplicitUpdateListener : updateListeners) {
         typedValueImplicitUpdateListener.onImplicitValueUpdate(cachedValue);
       }
@@ -197,6 +193,10 @@ public class TypedValueField implements DbEntityLifecycleAware, CommandContextLi
   public TypedValueSerializer<?> getSerializer() {
     ensureSerializerInitialized();
     return serializer;
+  }
+
+  private static boolean isImplicitVariableUpdateDetectionEnabled() {
+    return Context.getProcessEngineConfiguration().isImplicitVariableUpdateDetectionEnabled();
   }
 
   protected void ensureSerializerInitialized() {

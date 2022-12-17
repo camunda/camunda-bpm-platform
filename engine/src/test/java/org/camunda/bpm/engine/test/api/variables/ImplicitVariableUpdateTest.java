@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.variables;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -93,5 +94,34 @@ public class ImplicitVariableUpdateTest extends PluggableProcessEngineTest {
 
     Object variableValue = runtimeService.getVariable(instance.getId(), "listVar");
     assertNull(variableValue);
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/variables/ImplicitVariableUpdateTest.sequence.bpmn20.xml")
+  @Test
+  public void testSerialization() {
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("serviceTaskProcess",
+        Variables.createVariables()
+            .putValue("pojo", new Pojo(1))
+            .putValue("delegate", new NoopDelegate()));
+
+    // at this point, the value of Pojo.foo = 1 in database. 
+
+    Pojo.shouldUpdateFoo = true; // implicitly update the value of 'foo' during deserialization.
+
+    // will read foo = 1 from database but increment it to 2 during deserialization.
+    Pojo pojo1 = (Pojo) runtimeService.getVariable(instance.getId(), "pojo");
+
+    // foo = 2  
+    assertThat(pojo1.getFoo()).isEqualTo(2);
+
+    // at this point, the database has value of foo = 2 since the implicit update was detected and flushed.
+
+    Pojo.shouldUpdateFoo = false; // turn off implicit update of 'foo'
+
+    // read foo again from database
+    Pojo pojo2 = (Pojo) runtimeService.getVariable(instance.getId(), "pojo");
+
+    // foo = 2 was fetched from database 
+    assertThat(pojo2.getFoo()).isEqualTo(2);
   }
 }
