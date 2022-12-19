@@ -26,6 +26,8 @@ import static org.camunda.bpm.identity.impl.ldap.LdapConfiguration.LDAP_QUERY_WI
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -41,9 +43,11 @@ import javax.naming.directory.SearchResult;
 import javax.naming.ldap.Control;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
+import javax.naming.ldap.SortControl;
+import javax.naming.ldap.SortKey;
 import javax.naming.ldap.PagedResultsControl;
 import javax.naming.ldap.PagedResultsResponseControl;
-import javax.naming.ldap.SortControl;
+
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.authorization.Permission;
@@ -59,11 +63,13 @@ import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.QueryOrderingProperty;
 import org.camunda.bpm.engine.impl.UserQueryImpl;
 import org.camunda.bpm.engine.impl.UserQueryProperty;
+import org.camunda.bpm.engine.impl.GroupQueryProperty;
 import org.camunda.bpm.engine.impl.identity.IdentityProviderException;
 import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
+import org.camunda.bpm.engine.impl.Direction;
 import org.camunda.bpm.identity.impl.ldap.util.LdapPluginLogger;
 
 /**
@@ -173,13 +179,13 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
     ensureContextInitialized();
 
     // convert DB wildcards to LDAP wildcards if necessary
-    if(query.getEmailLike() != null) {
+    if (query.getEmailLike() != null) {
       query.userEmailLike(query.getEmailLike().replaceAll(DB_QUERY_WILDCARD, LDAP_QUERY_WILDCARD));
     }
-    if(query.getFirstNameLike() != null) {
+    if (query.getFirstNameLike() != null) {
       query.userFirstNameLike(query.getFirstNameLike().replaceAll(DB_QUERY_WILDCARD, LDAP_QUERY_WILDCARD));
     }
-    if(query.getLastNameLike() != null) {
+    if (query.getLastNameLike() != null) {
       query.userLastNameLike(query.getLastNameLike().replaceAll(DB_QUERY_WILDCARD, LDAP_QUERY_WILDCARD));
     }
 
@@ -501,7 +507,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
   public List<Group> findGroupByQueryCriteria(LdapGroupQuery query) {
 
     // convert DB wildcards to LDAP wildcards if necessary
-    if(query.getNameLike() != null) {
+    if (query.getNameLike() != null) {
       query.groupNameLike(query.getNameLike().replaceAll(DB_QUERY_WILDCARD, LDAP_QUERY_WILDCARD));
     }
 
@@ -694,7 +700,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
   }
 
   /**
-   * Return the list of Controls requested in the query
+   * Return the list of Controls requested in the query. Query may be run on USERS or on GROUP
    *
    * @param query query asks, contains the order by requested
    * @return list of control to send to LDAP
@@ -711,19 +717,43 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
           if (LdapPluginLogger.INSTANCE.isDebugEnabled()) {
             resultLogger.append(", OrderBy[");
             resultLogger.append(propertyName);
+            resultLogger.append("-");
+            resultLogger.append(orderingProperty.getDirection() == null ? "no_direction(desc)" : orderingProperty.getDirection().getName());
             resultLogger.append("]");
           }
-          if (UserQueryProperty.USER_ID.getName().equals(propertyName)) {
-            controls.add(new SortControl(ldapConfiguration.getUserIdAttribute(), Control.CRITICAL));
+          SortKey sortKey = null;
+          if (query instanceof LdapUserQueryImpl) {
+            if (UserQueryProperty.USER_ID.getName().equals(propertyName)) {
+              sortKey = new SortKey(ldapConfiguration.getUserIdAttribute(), Direction.ASCENDING.equals(orderingProperty.getDirection()),
+                  null);
 
-          } else if (UserQueryProperty.EMAIL.getName().equals(propertyName)) {
-            controls.add(new SortControl(ldapConfiguration.getUserEmailAttribute(), Control.CRITICAL));
+            } else if (UserQueryProperty.EMAIL.getName().equals(propertyName)) {
+              sortKey = new SortKey(ldapConfiguration.getUserEmailAttribute(), Direction.ASCENDING.equals(orderingProperty.getDirection()),
+                  null);
 
-          } else if (UserQueryProperty.FIRST_NAME.getName().equals(propertyName)) {
-            controls.add(new SortControl(ldapConfiguration.getUserFirstnameAttribute(), Control.CRITICAL));
+            } else if (UserQueryProperty.FIRST_NAME.getName().equals(propertyName)) {
+              sortKey = new SortKey(ldapConfiguration.getUserFirstnameAttribute(), Direction.ASCENDING.equals(orderingProperty.getDirection()),
+                  null);
 
-          } else if (UserQueryProperty.LAST_NAME.getName().equals(propertyName)) {
-            controls.add(new SortControl(ldapConfiguration.getUserLastnameAttribute(), Control.CRITICAL));
+            } else if (UserQueryProperty.LAST_NAME.getName().equals(propertyName)) {
+              sortKey = new SortKey(ldapConfiguration.getUserLastnameAttribute(), Direction.ASCENDING.equals(orderingProperty.getDirection()),
+                  null);
+            }
+          } else if (query instanceof LdapGroupQuery) {
+              if (GroupQueryProperty.GROUP_ID.getName().equals(propertyName)) {
+                sortKey = new SortKey(ldapConfiguration.getGroupIdAttribute(),
+                        Direction.ASCENDING.equals(orderingProperty.getDirection()),
+                        null);
+              } else if (GroupQueryProperty.NAME.getName().equals(propertyName)) {
+                sortKey = new SortKey(ldapConfiguration.getGroupNameAttribute(),
+                        Direction.ASCENDING.equals(orderingProperty.getDirection()),
+                        null);
+              }
+              // not possible to order by Type: LDAP may not support the type
+          }
+
+          if (sortKey != null) {
+            controls.add(new SortControl(new SortKey[] { sortKey }, Control.CRITICAL));
           }
         }
       }
@@ -807,6 +837,11 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
   protected void initializeControls(AbstractQuery<?, ?> query, StringBuilder resultLogger) throws NamingException {
     if (LdapPluginLogger.INSTANCE.isDebugEnabled()) {
       resultLogger.append(query.getFirstResult());
+
+      resultLogger.append(" ");
+      resultLogger.append(query);
+      resultLogger.append(" ");
+
 
       resultLogger.append(ldapConfiguration.isSortControlSupported() ? " -sort-" : "-nosort-");
 
