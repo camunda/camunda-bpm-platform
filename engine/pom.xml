@@ -308,6 +308,12 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-bpm-archunit</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
 
@@ -400,6 +406,9 @@
             <exclude>**/*TestCase.java</exclude>
             <exclude>%regex[.*(${test.excludes}).*Test.*.class]</exclude>
           </excludes>
+          <dependenciesToScan>
+            <dependency>org.camunda.bpm:camunda-bpm-archunit</dependency>
+          </dependenciesToScan>
         </configuration>
       </plugin>
       <plugin>
