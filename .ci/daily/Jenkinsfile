@@ -29,21 +29,23 @@ pipeline {
   }
   stages {
     stage('Prepare') {
+      when {
+        expression {
+          return params.TRIGGERED_BY_UPSTREAM
+        }
+      }
       steps {
         cambpmConditionalRetry([
           agentLabel: 'centos-stable',
           suppressErrors: false,
           runSteps: {
-            TRIGGERED_BY_RELEASE = cambpmUtils.lastAuthor() == 'ci.automation[bot]' // create boolean for release check
-            if(params.TRIGGERED_BY_UPSTREAM) {
-              cambpmCopyArtifacts(params.UPSTREAM_PROJECT_NAME, params.UPSTREAM_BUILD_NUMBER)
-              cambpmStash("platform-stash-runtime",
-                          ".m2/org/camunda/**/*-SNAPSHOT/**",
-                          "**/qa/**,**/*qa*/**,**/*.zip,**/*.tar.gz")
-              cambpmStash("platform-stash-qa",
-                          ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**",
-                          "**/*.zip,**/*.tar.gz")
-            }
+            cambpmCopyArtifacts(params.UPSTREAM_PROJECT_NAME, params.UPSTREAM_BUILD_NUMBER)
+            cambpmStash("platform-stash-runtime",
+                        ".m2/org/camunda/**/*-SNAPSHOT/**",
+                        "**/qa/**,**/*qa*/**,**/*.zip,**/*.tar.gz")
+            cambpmStash("platform-stash-qa",
+                        ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**",
+                        "**/*.zip,**/*.tar.gz")
           }
         ])
       }
@@ -53,7 +55,7 @@ pipeline {
         stage('check-sql-scripts') {
           when {
             expression {
-              cambpmWithLabels()
+              cambpmWithLabels('all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql','cockroachdb')
             }
           }
           steps {

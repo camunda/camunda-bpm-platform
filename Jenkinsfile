@@ -110,8 +110,6 @@ pipeline {
                 )
               }
 
-              TRIGGERED_BY_RELEASE = cambpmUtils.lastAuthor() == 'ci.automation[bot]' // create boolean for release check
-
               // don't trigger the daily pipeline from a master branch build
               // or if a PR has no relevant labels
               if (env.BRANCH_NAME != cambpmDefaultBranch() && cambpmWithLabels('default-build', 'jdk', 'rolling-update', 'migration', 'wildfly', 'all-db', 'h2', 'db2', 'mysql', 'oracle', 'mariadb', 'sqlserver', 'postgresql')) {
@@ -129,7 +127,6 @@ pipeline {
                     withCatch: false,
                     withNpm: true)
               }
-
             }
           },
           postFailure: {
