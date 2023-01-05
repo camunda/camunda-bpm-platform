@@ -53,6 +53,11 @@ pipeline {
     stage('Misc') {
       parallel {
         stage('check-sql-scripts') {
+          when {
+            expression {
+              cambpmWithLabels('all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql','cockroachdb')
+            }
+          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'centos-stable',
@@ -256,7 +261,9 @@ pipeline {
         }
         stage('PERFORMANCE-large-data-h2') {
           when {
-            branch cambpmDefaultBranch();
+            expression {
+              cambpmWithLabels()
+            }
           }
           steps {
             cambpmConditionalRetry([
