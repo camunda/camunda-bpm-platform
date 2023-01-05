@@ -94,7 +94,7 @@ pipeline {
                   platformVersionDir + "/cambpm-ee/" + eeMainProjectBranch,
                   [string(name: 'UPSTREAM_PROJECT_NAME', value: upstreamProjectName),
                   string(name: 'UPSTREAM_BUILD_NUMBER', value: upstreamBuildNumber)],
-                  true, true, true
+                  true, true, true, true
                 )
               }
 
