@@ -18,10 +18,12 @@ package org.camunda.bpm.engine.rest.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.rest.SignalRestService;
 import org.camunda.bpm.engine.rest.dto.SignalDto;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.runtime.SignalEventReceivedBuilder;
 
 import javax.ws.rs.core.Response.Status;
@@ -44,7 +46,13 @@ public class SignalRestServiceImpl extends AbstractRestProcessEngineAware implem
     }
 
     SignalEventReceivedBuilder signalEvent = createSignalEventReceivedBuilder(dto);
-    signalEvent.send();
+    try {
+      signalEvent.send();
+    } catch (NotFoundException e) {
+      // keeping compatibility with older versions where ProcessEngineException (=> 500) was
+      // thrown; NotFoundException translates to 400 by default
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
+    }
   }
 
   protected SignalEventReceivedBuilder createSignalEventReceivedBuilder(SignalDto dto) {

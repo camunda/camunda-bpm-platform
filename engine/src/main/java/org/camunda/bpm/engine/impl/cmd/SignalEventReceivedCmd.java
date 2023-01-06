@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.SignalEventReceivedBuilderImpl;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
@@ -119,11 +120,11 @@ public class SignalEventReceivedCmd implements Command<Void> {
 
     ExecutionManager executionManager = commandContext.getExecutionManager();
     ExecutionEntity execution = executionManager.findExecutionById(executionId);
-    ensureNotNull("Cannot find execution with id '" + executionId + "'", "execution", execution);
+    ensureNotNull(NotFoundException.class, "Cannot find execution with id '" + executionId + "'", "execution", execution);
 
     EventSubscriptionManager eventSubscriptionManager = commandContext.getEventSubscriptionManager();
     List<EventSubscriptionEntity> signalEvents = eventSubscriptionManager.findSignalEventSubscriptionsByNameAndExecution(signalName, executionId);
-    ensureNotEmpty("Execution '" + executionId + "' has not subscribed to a signal event with name '" + signalName + "'.", signalEvents);
+    ensureNotEmpty(NotFoundException.class, "Execution '" + executionId + "' has not subscribed to a signal event with name '" + signalName + "'.", signalEvents);
 
     checkAuthorizationOfCatchSignals(commandContext, signalEvents);
     notifyExecutions(signalEvents);

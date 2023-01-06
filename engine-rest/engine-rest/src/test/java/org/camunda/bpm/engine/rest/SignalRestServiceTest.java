@@ -20,8 +20,10 @@ import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.impl.SignalEventReceivedBuilderImpl;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.util.VariablesBuilder;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.camunda.bpm.engine.runtime.SignalEventReceivedBuilder;
@@ -452,6 +454,27 @@ public class SignalRestServiceTest extends AbstractRestServiceTest {
       .expect()
         .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
         .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
+        .body("message", equalTo(message))
+    .when()
+      .post(SIGNAL_URL);
+  }
+
+  @Test
+  public void shouldThrowNotFoundException() {
+    String message = "expected exception";
+    doThrow(new NotFoundException(message)).when(signalBuilderMock).send();
+
+    Map<String, Object> requestBody = new HashMap<String, Object>();
+    requestBody.put("name", "aSignalName");
+    requestBody.put("executionId", "foo");
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(requestBody)
+    .then()
+      .expect()
+        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+        .body("type", equalTo(RestException.class.getSimpleName()))
         .body("message", equalTo(message))
     .when()
       .post(SIGNAL_URL);

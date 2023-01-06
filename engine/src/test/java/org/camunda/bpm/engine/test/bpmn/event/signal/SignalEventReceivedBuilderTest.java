@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -160,7 +160,7 @@ public class SignalEventReceivedBuilderTest extends PluggableProcessEngineTest {
     try {
       runtimeService.createSignalEvent("signal").executionId("nonExisting").send();
 
-    } catch (ProcessEngineException e) {
+    } catch (NotFoundException e) {
       assertThat(e.getMessage()).contains("Cannot find execution with id 'nonExisting'");
     }
   }
@@ -179,7 +179,7 @@ public class SignalEventReceivedBuilderTest extends PluggableProcessEngineTest {
     try {
       runtimeService.createSignalEvent("signal").executionId(executionId).send();
 
-    } catch (ProcessEngineException e) {
+    } catch (NotFoundException e) {
       assertThat(e.getMessage()).contains("Execution '" + executionId + "' has not subscribed to a signal event with name 'signal'");
     }
   }
