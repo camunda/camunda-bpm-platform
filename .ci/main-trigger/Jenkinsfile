@@ -1,6 +1,6 @@
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
-@Library(['camunda-ci', 'cambpm-jenkins-shared-library@3021']) _
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
 
 pipeline {
   agent {
@@ -10,13 +10,14 @@ pipeline {
   }
   environment {
     LOGGER_LOG_LEVEL = 'DEBUG'
+    MAVEN_VERSION = 'maven-3.8-latest'
   }
   options {
     buildDiscarder(logRotator(numToKeepStr: '5'))
     disableConcurrentBuilds()
   }
   triggers {
-    pollSCM('H H(16-17) * * *') // CE main daily trigger
+    pollSCM('H H(15-16) * * *') // CE main daily trigger; UTC time
   }
   stages {
     stage('Trigger Main EE') {
@@ -29,11 +30,10 @@ pipeline {
           // keep leading slash for the absolute project path
           platformVersionDir = "/" + env.JOB_NAME.split('/')[0]
 
-          // build quietPeriod: 10, wait: false, job: platformVersionDir + "/cambpm-ce/cambpm-main/"+ cambpmDefaultBranch()
-            cambpmTriggerDownstream(
-              platformVersionDir + "/cambpm-ce/cambpm-main/"+ cambpmDefaultBranch(),
-              [], false, false, false, false
-            )
+          cambpmTriggerDownstream(
+            platformVersionDir + "/cambpm-ce/cambpm-main/"+ cambpmDefaultBranch(),
+            [], false, false, false, false
+          )
         }
       }
     }
