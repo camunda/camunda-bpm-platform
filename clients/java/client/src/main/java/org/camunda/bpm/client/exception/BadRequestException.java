@@ -19,7 +19,7 @@ package org.camunda.bpm.client.exception;
 /**
  * Thrown when you perform an illegal operation or the given data is invalid.
  */
-public class BadRequestException extends NotAcquiredException {
+public class BadRequestException extends RestException {
 
   public BadRequestException(String message, RestException restException) {
     super(message, restException);
