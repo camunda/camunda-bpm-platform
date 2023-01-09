@@ -16,12 +16,14 @@
  */
 package org.camunda.bpm.engine.rest.spi.impl;
 
+import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.util.EngineUtil;
 
 public abstract class AbstractProcessEngineAware {
 
-  protected ProcessEngine processEngine;
+  private ProcessEngine processEngine;
 
   public AbstractProcessEngineAware() {
     processEngine = EngineUtil.lookupProcessEngine(null);
@@ -31,5 +33,10 @@ public abstract class AbstractProcessEngineAware {
     processEngine = EngineUtil.lookupProcessEngine(engineName);
   }
 
-
+  protected ProcessEngine getProcessEngine() {
+    if (processEngine == null) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, "No process engine available");
+    }
+    return processEngine;
+  }
 }

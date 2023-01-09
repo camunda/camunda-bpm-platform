@@ -48,14 +48,14 @@ public class AuthorizationResourceImpl extends AbstractAuthorizedRestResource im
   public AuthorizationResourceImpl(String processEngineName, String resourceId, String relativeRootResourcePath, ObjectMapper objectMapper) {
     super(processEngineName, AUTHORIZATION, resourceId, objectMapper);
     this.relativeRootResourcePath = relativeRootResourcePath;
-    authorizationService = processEngine.getAuthorizationService();
+    authorizationService = getProcessEngine().getAuthorizationService();
   }
 
   public AuthorizationDto getAuthorization(UriInfo context) {
 
     Authorization dbAuthorization = getDbAuthorization();
 
-    return AuthorizationDto.fromAuthorization(dbAuthorization, processEngine.getProcessEngineConfiguration());
+    return AuthorizationDto.fromAuthorization(dbAuthorization, getProcessEngine().getProcessEngineConfiguration());
 
   }
 
@@ -68,7 +68,7 @@ public class AuthorizationResourceImpl extends AbstractAuthorizedRestResource im
     // get db auth
     Authorization dbAuthorization = getDbAuthorization();
     // copy values from dto
-    AuthorizationDto.update(dto, dbAuthorization, processEngine.getProcessEngineConfiguration());
+    AuthorizationDto.update(dto, dbAuthorization, getProcessEngine().getProcessEngineConfiguration());
     // save
     authorizationService.saveAuthorization(dbAuthorization);
   }

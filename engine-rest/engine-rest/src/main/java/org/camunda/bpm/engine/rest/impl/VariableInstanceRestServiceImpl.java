@@ -39,7 +39,7 @@ public class VariableInstanceRestServiceImpl extends AbstractRestProcessEngineAw
 
   @Override
   public VariableInstanceResource getVariableInstance(String id) {
-    return new VariableInstanceResourceImpl(id, processEngine);
+    return new VariableInstanceResourceImpl(id, getProcessEngine());
   }
 
   @Override
@@ -69,7 +69,7 @@ public class VariableInstanceRestServiceImpl extends AbstractRestProcessEngineAw
       matchingInstances = query.list();
     }
 
-    List<VariableInstanceDto> instanceResults = new ArrayList<VariableInstanceDto>();
+    List<VariableInstanceDto> instanceResults = new ArrayList<>();
     for (VariableInstance instance : matchingInstances) {
       VariableInstanceDto resultInstance = VariableInstanceDto.fromVariableInstance(instance);
       instanceResults.add(resultInstance);

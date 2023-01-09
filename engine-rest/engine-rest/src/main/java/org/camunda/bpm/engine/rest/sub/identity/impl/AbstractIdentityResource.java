@@ -34,7 +34,7 @@ public abstract class AbstractIdentityResource extends AbstractAuthorizedRestRes
 
   public AbstractIdentityResource(String processEngineName, Resource resource, String resourceId, ObjectMapper objectMapper) {
     super(processEngineName, resource, resourceId, objectMapper);
-    this.identityService = processEngine.getIdentityService();
+    this.identityService = getProcessEngine().getIdentityService();
   }
 
   protected void ensureNotReadOnly() {

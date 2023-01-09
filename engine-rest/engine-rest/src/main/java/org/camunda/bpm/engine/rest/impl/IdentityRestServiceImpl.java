@@ -63,8 +63,8 @@ public class IdentityRestServiceImpl extends AbstractRestProcessEngineAware impl
         .asc()
         .unlimitedList();
 
-    Set<UserDto> allGroupUsers = new HashSet<UserDto>();
-    List<GroupDto> allGroups = new ArrayList<GroupDto>();
+    Set<UserDto> allGroupUsers = new HashSet<>();
+    List<GroupDto> allGroups = new ArrayList<>();
 
     for (Group group : userGroups) {
       List<User> groupUsers = identityService.createUserQuery()
@@ -98,10 +98,10 @@ public class IdentityRestServiceImpl extends AbstractRestProcessEngineAware impl
 
   @Override
   public Response getPasswordPolicy() {
-    boolean isEnabled = processEngine.getProcessEngineConfiguration().isEnablePasswordPolicy();
+    boolean isEnabled = getProcessEngine().getProcessEngineConfiguration().isEnablePasswordPolicy();
 
     if (isEnabled) {
-      IdentityService identityService = processEngine.getIdentityService();
+      IdentityService identityService = getProcessEngine().getIdentityService();
 
       return Response.status(Status.OK.getStatusCode())
         .entity(PasswordPolicyDto.fromPasswordPolicy(identityService.getPasswordPolicy()))
@@ -115,10 +115,10 @@ public class IdentityRestServiceImpl extends AbstractRestProcessEngineAware impl
 
   @Override
   public Response checkPassword(PasswordPolicyRequestDto dto) {
-    boolean isEnabled = processEngine.getProcessEngineConfiguration().isEnablePasswordPolicy();
+    boolean isEnabled = getProcessEngine().getProcessEngineConfiguration().isEnablePasswordPolicy();
 
     if (isEnabled) {
-      IdentityService identityService = processEngine.getIdentityService();
+      IdentityService identityService = getProcessEngine().getIdentityService();
 
       User user = null;
       UserProfileDto profileDto = dto.getProfile();

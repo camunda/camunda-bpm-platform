@@ -99,7 +99,7 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
 	public List<ProcessDefinitionDto> getProcessDefinitions(UriInfo uriInfo,
 	    Integer firstResult, Integer maxResults) {
     ProcessDefinitionQueryDto queryDto = new ProcessDefinitionQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
-	  List<ProcessDefinitionDto> definitions = new ArrayList<ProcessDefinitionDto>();
+	  List<ProcessDefinitionDto> definitions = new ArrayList<>();
 
 	  ProcessEngine engine = getProcessEngine();
 	  ProcessDefinitionQuery query = queryDto.toQuery(engine);
@@ -174,7 +174,7 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
 
     List<ProcessDefinitionStatistics> queryResults = query.unlimitedList();
 
-    List<StatisticsResultDto> results = new ArrayList<StatisticsResultDto>();
+    List<StatisticsResultDto> results = new ArrayList<>();
     for (ProcessDefinitionStatistics queryResult : queryResults) {
       StatisticsResultDto dto = ProcessDefinitionStatisticsResultDto.fromProcessDefinitionStatistics(queryResult);
       results.add(dto);
@@ -200,7 +200,7 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
 
   @Override
   public void deleteProcessDefinitionsByKey(String processDefinitionKey, boolean cascade, boolean skipCustomListeners, boolean skipIoMappings) {
-    RepositoryService repositoryService = processEngine.getRepositoryService();
+    RepositoryService repositoryService = getProcessEngine().getRepositoryService();
 
     DeleteProcessDefinitionsBuilder builder = repositoryService.deleteProcessDefinitions()
       .byKey(processDefinitionKey);
@@ -210,7 +210,7 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
 
   @Override
   public void deleteProcessDefinitionsByKeyAndTenantId(String processDefinitionKey, boolean cascade, boolean skipCustomListeners, boolean skipIoMappings, String tenantId) {
-    RepositoryService repositoryService = processEngine.getRepositoryService();
+    RepositoryService repositoryService = getProcessEngine().getRepositoryService();
 
     DeleteProcessDefinitionsBuilder builder = repositoryService.deleteProcessDefinitions()
       .byKey(processDefinitionKey)
