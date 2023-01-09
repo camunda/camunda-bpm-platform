@@ -19,7 +19,7 @@ package org.camunda.bpm.client.exception;
 /**
  * Thrown if something went wrong during the engine execution (e.g., a persistence exception occurred).
  */
-public class EngineException extends NotResumedException {
+public class EngineException extends RestException {
 
   public EngineException(String message, RestException restException) {
     super(message, restException);
