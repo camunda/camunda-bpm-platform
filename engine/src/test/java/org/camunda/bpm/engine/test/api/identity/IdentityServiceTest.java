@@ -1083,7 +1083,7 @@ public class IdentityServiceTest {
   }
 
   @Test
-  public void shouldIncludeHashedPasswordAndSaltInUserToString() {
+  public void shouldNotIncludeHashedPasswordAndSaltInUserToString() {
     // given
     User user = identityService.newUser("id");
 
