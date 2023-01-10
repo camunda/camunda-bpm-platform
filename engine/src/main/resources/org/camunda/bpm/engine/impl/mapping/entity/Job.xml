@@ -89,6 +89,9 @@
       REV_ = 1 + REV_ ,
       LOCK_OWNER_ = NULL,
       LOCK_EXP_TIME_ = NULL,
+      <if test="dueDate != null">
+        DUEDATE_ = #{dueDate, jdbcType=TIMESTAMP},
+      </if>
       RETRIES_ = #{retries, jdbcType=INTEGER}
     <where>
       RETRIES_ = 0

@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -382,6 +383,142 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     // when/then
     assertThatThrownBy(() -> managementService.setJobRetriesAsync(query, -1))
       .isInstanceOf(ProcessEngineException.class);
+  }
+
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
+  @Test
+  public void shouldSetJobDueDateOnJobRetryAsyncByJobQuery() {
+    //given
+    JobQuery query = managementService.createJobQuery();
+
+    Date newDueDate = new Date(0);
+
+    //when
+    Batch batch = managementService.setJobRetriesAsync(RETRIES)
+        .jobQuery(query)
+        .dueDate(newDueDate).execute();
+    completeSeedJobs(batch);
+    List<Exception> exceptions = executeBatchJobs(batch);
+
+    // then
+    assertThat(exceptions).hasSize(0);
+    for (String id : ids) {
+      Job job = managementService.createJobQuery().jobId(id).singleResult();
+      assertThat(job.getRetries()).isEqualTo(RETRIES);
+      assertThat(job.getDuedate()).isEqualTo(newDueDate);
+    }
+  }
+
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
+  @Test
+  public void shouldSetJobDueDateOnJobRetryAsyncByProcessInstanceIds() {
+    //given
+    Date newDueDate = new Date(0);
+
+    //when
+    Batch batch = managementService.setJobRetriesAsync(RETRIES)
+        .processInstanceIds(processInstanceIds)
+        .dueDate(newDueDate).execute();
+    completeSeedJobs(batch);
+    List<Exception> exceptions = executeBatchJobs(batch);
+
+    // then
+    assertThat(exceptions).hasSize(0);
+    for (String id : processInstanceIds) {
+      Job job = managementService.createJobQuery().processInstanceId(id).singleResult();
+      assertThat(job.getRetries()).isEqualTo(RETRIES);
+      assertThat(job.getDuedate()).isEqualTo(newDueDate);
+    }
+  }
+
+  @Test
+  public void shouldSetJobDueDateOnJobRetryAsyncByProcessInstanceQuery() {
+    //given
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+    Date newDueDate = new Date(0);
+
+    //when
+    Batch batch = managementService.setJobRetriesAsync(RETRIES).processInstanceQuery(query).dueDate(newDueDate).execute();
+    completeSeedJobs(batch);
+    List<Exception> exceptions = executeBatchJobs(batch);
+
+    // then
+    assertThat(exceptions).hasSize(0);
+    for (String id : ids) {
+      Job jobResult = managementService.createJobQuery().jobId(id).singleResult();
+      assertThat(jobResult.getRetries()).isEqualTo(RETRIES);
+      assertThat(jobResult.getDuedate()).isEqualTo(newDueDate);
+    }
+  }
+
+
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
+  @Test
+  public void shouldSetJobDueDateOnJobRetryAsyncByHistoricProcessInstanceQuery() {
+    //given
+    HistoricProcessInstanceQuery historicProcessInstanceQuery =
+        historyService.createHistoricProcessInstanceQuery();
+
+    Date newDueDate = new Date(0);
+
+    //when
+    Batch batch = managementService.setJobRetriesAsync(RETRIES)
+        .historicProcessInstanceQuery(historicProcessInstanceQuery)
+        .dueDate(newDueDate).execute();
+    completeSeedJobs(batch);
+    List<Exception> exceptions = executeBatchJobs(batch);
+
+    // then
+    assertThat(exceptions).hasSize(0);
+    for (String id : ids) {
+      Job jobResult = managementService.createJobQuery().jobId(id).singleResult();
+      assertThat(jobResult.getRetries()).isEqualTo(RETRIES);
+      assertThat(jobResult.getDuedate()).isEqualTo(newDueDate);
+    }
+  }
+
+  @Test
+  public void shouldSetJobDueDateOnJobRetryAsyncByJobIds() {
+    //given
+    Date newDueDate = new Date(0);
+
+    //when
+    Batch batch = managementService.setJobRetriesAsync(RETRIES).jobIds(ids).dueDate(newDueDate).execute();
+    completeSeedJobs(batch);
+    List<Exception> exceptions = executeBatchJobs(batch);
+
+    // then
+    assertThat(exceptions).hasSize(0);
+    for (String id : ids) {
+      Job jobResult = managementService.createJobQuery().jobId(id).singleResult();
+      assertThat(jobResult.getRetries()).isEqualTo(RETRIES);
+      assertThat(jobResult.getDuedate()).isEqualTo(newDueDate);
+    }
+  }
+
+  @Test
+  public void shouldThrowErrorOnEmptySetRetryBuilderConfig() {
+    // given
+
+    // when/then
+    assertThatThrownBy(() -> managementService.setJobRetriesAsync(RETRIES).execute())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("050")
+      .hasMessageContaining("You must specify at least one of jobIds, jobQuery or one of processInstanceIds, processInstanceQuery, historicProcessInstanceQuery.");
+  }
+
+  @Test
+  public void shouldThrowErrorOnInvalidSetRetryBuilderConfig() {
+    // given
+
+    // when/then
+    assertThatThrownBy(() -> managementService.setJobRetriesAsync(RETRIES)
+        .jobIds(ids)
+        .processInstanceIds(processInstanceIds)
+        .execute())
+    .isInstanceOf(ProcessEngineException.class)
+    .hasMessageContaining("051")
+    .hasMessageContaining("You can either specify any of jobIds, jobQuery or any of processInstanceIds, processInstanceQuery, historicProcessInstanceQuery.");
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)

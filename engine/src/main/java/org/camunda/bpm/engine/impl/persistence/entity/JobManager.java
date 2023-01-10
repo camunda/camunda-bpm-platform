@@ -390,10 +390,11 @@ public class JobManager extends AbstractManager {
     getDbEntityManager().update(JobEntity.class, "updateJobSuspensionStateByParameters", configureParameterizedQuery(parameters));
   }
 
-  public void updateFailedJobRetriesByJobDefinitionId(String jobDefinitionId, int retries) {
+  public void updateFailedJobRetriesByJobDefinitionId(String jobDefinitionId, int retries, Date dueDate) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("jobDefinitionId", jobDefinitionId);
     parameters.put("retries", retries);
+    parameters.put("dueDate", dueDate);
     getDbEntityManager().update(JobEntity.class, "updateFailedJobRetriesByParameters", parameters);
   }
 

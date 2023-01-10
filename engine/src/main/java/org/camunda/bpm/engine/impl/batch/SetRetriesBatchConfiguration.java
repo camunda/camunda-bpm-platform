@@ -16,19 +16,22 @@
  */
 package org.camunda.bpm.engine.impl.batch;
 
+import java.util.Date;
 import java.util.List;
 
 public class SetRetriesBatchConfiguration extends BatchConfiguration {
 
   protected int retries;
+  protected Date dueDate;
 
-  public SetRetriesBatchConfiguration(List<String> ids, int retries) {
-    this(ids, null, retries);
+  public SetRetriesBatchConfiguration(List<String> ids, int retries, Date dueDate) {
+    this(ids, null, retries, dueDate);
   }
 
-  public SetRetriesBatchConfiguration(List<String> ids, DeploymentMappings mappings, int retries) {
+  public SetRetriesBatchConfiguration(List<String> ids, DeploymentMappings mappings, int retries, Date dueDate) {
     super(ids, mappings);
     this.retries = retries;
+    this.dueDate = dueDate;
   }
 
   public int getRetries() {
@@ -37,5 +40,13 @@ public class SetRetriesBatchConfiguration extends BatchConfiguration {
 
   public void setRetries(int retries) {
     this.retries = retries;
+  }
+
+  public Date getDueDate() {
+    return dueDate;
+  }
+
+  public void setDueDate(Date dueDate) {
+    this.dueDate = dueDate;
   }
 }

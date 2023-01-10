@@ -16,52 +16,99 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionManager;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
-
-import java.io.Serializable;
 
 
 /**
  * @author Askar Akhmerov
  */
-public class SetJobRetriesCmd extends AbstractSetJobRetriesCmd implements Command<Void>, Serializable {
+public class SetJobRetriesCmd implements Command<Void>, Serializable {
 
   protected static final long serialVersionUID = 1L;
 
+  protected static final String RETRIES = "retries";
+  protected static final String DUE_DATE = "dueDate";
 
   protected final String jobId;
   protected final String jobDefinitionId;
+  protected final List<String> jobIds;
   protected final int retries;
+  protected final Date dueDate;
 
-
-  public SetJobRetriesCmd(String jobId, String jobDefinitionId, int retries) {
-    if ((jobId == null || jobId.isEmpty()) && (jobDefinitionId == null || jobDefinitionId.isEmpty())) {
-      throw new ProcessEngineException("Either job definition id or job id has to be provided as parameter.");
-    }
-
-    if (retries < 0) {
-      throw new ProcessEngineException("The number of job retries must be a non-negative Integer, but '" + retries + "' has been provided.");
-    }
-
+  public SetJobRetriesCmd(String jobId, String jobDefinitionId, int retries, Date dueDate) {
     this.jobId = jobId;
     this.jobDefinitionId = jobDefinitionId;
+    this.jobIds = null;
     this.retries = retries;
+    this.dueDate = dueDate;
+  }
+
+  public SetJobRetriesCmd(List<String> jobIds, int retries, Date dueDate) {
+    this.jobId = null;
+    this.jobDefinitionId = null;
+    this.jobIds = jobIds;
+    this.retries = retries;
+    this.dueDate = dueDate;
   }
 
   public Void execute(CommandContext commandContext) {
     if (jobId != null) {
-      setJobRetriesByJobId(jobId, retries, commandContext);
-    } else {
+      setJobRetriesByJobId(jobId, retries, dueDate, commandContext);
+    } else if(jobDefinitionId != null){
       setJobRetriesByJobDefinitionId(commandContext);
+    } else if(jobIds != null) {
+      for (String id : jobIds) {
+        setJobRetriesByJobId(id, retries, dueDate, commandContext);
+      }
     }
 
     return null;
+  }
+
+  protected void setJobRetriesByJobId(String jobId, int retries, Date dueDate, CommandContext commandContext) {
+    JobEntity job = commandContext
+        .getJobManager()
+        .findJobById(jobId);
+    if (job != null) {
+      for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+        checker.checkUpdateRetriesJob(job);
+      }
+
+      if (job.isInInconsistentLockState()) {
+        job.resetLock();
+      }
+
+      List<PropertyChange> propertyChanges = new ArrayList<>();
+
+      int oldRetries = job.getRetries();
+      job.setRetries(retries);
+      propertyChanges.add(new PropertyChange(RETRIES, oldRetries, job.getRetries()));
+
+      if(dueDate != null) {
+        Date oldDueDate = job.getDuedate();
+        job.setDuedate(dueDate);
+        propertyChanges.add(new PropertyChange(DUE_DATE, oldDueDate, job.getDuedate()));
+      }
+
+      commandContext.getOperationLogManager().logJobOperation(getLogEntryOperation(), job.getId(),
+          job.getJobDefinitionId(), job.getProcessInstanceId(), job.getProcessDefinitionId(),
+          job.getProcessDefinitionKey(), propertyChanges);
+    } else {
+      throw new ProcessEngineException("No job found with id '" + jobId + "'.");
+    }
   }
 
   protected void setJobRetriesByJobDefinitionId(CommandContext commandContext) {
@@ -77,12 +124,20 @@ public class SetJobRetriesCmd extends AbstractSetJobRetriesCmd implements Comman
 
     commandContext
         .getJobManager()
-        .updateFailedJobRetriesByJobDefinitionId(jobDefinitionId, retries);
+        .updateFailedJobRetriesByJobDefinitionId(jobDefinitionId, retries, dueDate);
 
-    PropertyChange propertyChange = new PropertyChange(RETRIES, null, retries);
+    List<PropertyChange> propertyChanges = new ArrayList<>();
+    propertyChanges.add(new PropertyChange(RETRIES, null, retries));
+
+    if(dueDate != null) {
+      propertyChanges.add(new PropertyChange(DUE_DATE, null, dueDate));
+    }
+
     commandContext.getOperationLogManager().logJobOperation(getLogEntryOperation(), null, jobDefinitionId, null,
-        null, null, propertyChange);
+        null, null, propertyChanges);
   }
 
-
+  protected String getLogEntryOperation() {
+    return UserOperationLogEntry.OPERATION_TYPE_SET_JOB_RETRIES;
+  }
 }

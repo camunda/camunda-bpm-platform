@@ -61,9 +61,6 @@ import org.camunda.bpm.engine.impl.cmd.ReportDbMetricsCmd;
 import org.camunda.bpm.engine.impl.cmd.SetJobDefinitionPriorityCmd;
 import org.camunda.bpm.engine.impl.cmd.SetJobDuedateCmd;
 import org.camunda.bpm.engine.impl.cmd.SetJobPriorityCmd;
-import org.camunda.bpm.engine.impl.cmd.SetJobRetriesCmd;
-import org.camunda.bpm.engine.impl.cmd.SetJobsRetriesBatchCmd;
-import org.camunda.bpm.engine.impl.cmd.SetJobsRetriesCmd;
 import org.camunda.bpm.engine.impl.cmd.SetLicenseKeyCmd;
 import org.camunda.bpm.engine.impl.cmd.SetPropertyCmd;
 import org.camunda.bpm.engine.impl.cmd.SuspendBatchCmd;
@@ -77,6 +74,8 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.ExecuteJobHelper;
 import org.camunda.bpm.engine.impl.management.PurgeReport;
+import org.camunda.bpm.engine.impl.management.SetJobRetriesAsyncBuilderImpl;
+import org.camunda.bpm.engine.impl.management.SetJobRetriesBuilderImpl;
 import org.camunda.bpm.engine.impl.management.UpdateJobDefinitionSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.management.UpdateJobSuspensionStateBuilderImpl;
 import org.camunda.bpm.engine.impl.metrics.MetricsQueryImpl;
@@ -89,6 +88,7 @@ import org.camunda.bpm.engine.management.JobDefinitionQuery;
 import org.camunda.bpm.engine.management.MetricsQuery;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatisticsQuery;
 import org.camunda.bpm.engine.management.SchemaLogQuery;
+import org.camunda.bpm.engine.management.SetJobRetriesAsyncBuilder;
 import org.camunda.bpm.engine.management.TableMetaData;
 import org.camunda.bpm.engine.management.TablePageQuery;
 import org.camunda.bpm.engine.management.UpdateJobDefinitionSuspensionStateSelectBuilder;
@@ -150,44 +150,66 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
   }
 
   public void setJobRetries(String jobId, int retries) {
-    commandExecutor.execute(new SetJobRetriesCmd(jobId, null, retries));
+    setJobRetries(retries).jobId(jobId).execute();
   }
 
   public void setJobRetries(List<String> jobIds, int retries) {
-    commandExecutor.execute(new SetJobsRetriesCmd(jobIds, retries));
+    setJobRetries(retries).jobIds(jobIds).execute();
+  }
+
+  public void setJobRetriesByJobDefinitionId(String jobDefinitionId, int retries) {
+    setJobRetries(retries).jobDefinitionId(jobDefinitionId).execute();
+  }
+
+  @Override
+  public SetJobRetriesBuilderImpl setJobRetries(int retries) {
+    return new SetJobRetriesBuilderImpl(commandExecutor, retries);
   }
 
   @Override
   public Batch setJobRetriesAsync(List<String> jobIds, int retries) {
-    return this.setJobRetriesAsync(jobIds, (JobQuery) null, retries);
+    return setJobRetriesAsync(retries)
+        .jobIds(jobIds)
+        .execute();
   }
 
   @Override
   public Batch setJobRetriesAsync(JobQuery jobQuery, int retries) {
-    return this.setJobRetriesAsync(null, jobQuery, retries);
+    return setJobRetriesAsync(retries)
+        .jobQuery(jobQuery)
+        .execute();
   }
 
   @Override
   public Batch setJobRetriesAsync(List<String> jobIds, JobQuery jobQuery, int retries) {
-    return commandExecutor.execute(new SetJobsRetriesBatchCmd(jobIds, jobQuery, retries));
+    return setJobRetriesAsync(retries)
+        .jobIds(jobIds)
+        .jobQuery(jobQuery)
+        .execute();
   }
 
   @Override
   public Batch setJobRetriesAsync(List<String> processInstanceIds, ProcessInstanceQuery query, int retries) {
-    return commandExecutor.execute(new SetJobsRetriesByProcessBatchCmd(processInstanceIds, query,
-        null, retries));
+    return setJobRetriesAsync(retries)
+        .processInstanceIds(processInstanceIds)
+        .processInstanceQuery(query)
+        .execute();
   }
 
   @Override
   public Batch setJobRetriesAsync(List<String> processInstanceIds, ProcessInstanceQuery query,
                                   HistoricProcessInstanceQuery historicProcessInstanceQuery,
                                   int retries) {
-    return commandExecutor.execute(new SetJobsRetriesByProcessBatchCmd(processInstanceIds, query,
-        historicProcessInstanceQuery, retries));
+    return setJobRetriesAsync(retries)
+        .processInstanceIds(processInstanceIds)
+        .processInstanceQuery(query)
+        .historicProcessInstanceQuery(historicProcessInstanceQuery)
+        .execute();
   }
 
-  public void setJobRetriesByJobDefinitionId(String jobDefinitionId, int retries) {
-    commandExecutor.execute(new SetJobRetriesCmd(null, jobDefinitionId, retries));
+  @Override
+  public SetJobRetriesAsyncBuilder setJobRetriesAsync(int retries) {
+    return new SetJobRetriesAsyncBuilderImpl(commandExecutor, retries);
   }
 
   public void setJobDuedate(String jobId, Date newDuedate) {

@@ -16,10 +16,10 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
-
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.batch.Batch;
@@ -39,12 +39,13 @@ import org.camunda.bpm.engine.impl.util.EnsureUtil;
 public abstract class AbstractSetJobsRetriesBatchCmd implements Command<Batch> {
 
   protected int retries;
+  protected Date dueDate;
 
   @Override
   public Batch execute(CommandContext commandContext) {
     BatchElementConfiguration elementConfiguration = collectJobIds(commandContext);
 
-    ensureNotEmpty(BadUserRequestException.class, "jobIds", elementConfiguration.getIds());
+    EnsureUtil.ensureNotEmpty(BadUserRequestException.class, "jobIds", elementConfiguration.getIds());
     EnsureUtil.ensureGreaterThanOrEqual("Retries count", retries, 0);
 
     return new BatchBuilder(commandContext)
@@ -77,7 +78,7 @@ public abstract class AbstractSetJobsRetriesBatchCmd implements Command<Batch> {
   protected abstract BatchElementConfiguration collectJobIds(CommandContext commandContext);
 
   public BatchConfiguration getConfiguration(BatchElementConfiguration elementConfiguration) {
-    return new SetRetriesBatchConfiguration(elementConfiguration.getIds(), elementConfiguration.getMappings(), retries);
+    return new SetRetriesBatchConfiguration(elementConfiguration.getIds(), elementConfiguration.getMappings(), retries, dueDate);
   }
 
 }

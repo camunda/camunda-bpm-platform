@@ -25,7 +25,7 @@
   <logger name="org.testcontainers" level="info" />
   <logger name="com.github" level="info" />
 
-<!--  <logger name="org.camunda.bpm.engine.impl.persistence.entity" level="debug" />-->
+<!--  <logger name="org.camunda.bpm.engine.impl.persistence.entity" level="debug" /> -->
 <!--  <logger name="org.camunda.bpm.engine.impl.persistence.entity.JobEntity" level="debug" />-->
 <!--  <logger name="org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEntity" level="debug" />-->
 

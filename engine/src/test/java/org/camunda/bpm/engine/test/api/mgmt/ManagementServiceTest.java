@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.mgmt;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -198,7 +199,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTest {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
   @Test
-  public void testSetJobsRetries() {
+  public void testSetMultipleJobRetries() {
     //given
     runtimeService.startProcessInstanceByKey("exceptionInJobExecution");
     runtimeService.startProcessInstanceByKey("exceptionInJobExecution");
@@ -212,33 +213,130 @@ public class ManagementServiceTest extends PluggableProcessEngineTest {
   }
 
   @Test
-  public void testSetJobsRetriesWithNull() {
-    try {
-      //when
-      managementService.setJobRetries((List<String>) null, 5);
-      fail("exception expected");
-      //then
-    } catch (ProcessEngineException e) {
-      //expected
+  public void shouldThrowExceptionOnSetJobRetriesWithNull() {
+    assertThatThrownBy(() -> managementService.setJobRetries((List<String>) null, 5))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("job ids is null");
+  }
+
+  @Test
+  public void shouldThrowExceptionOnSetJobRetriesWithNoJobReference() {
+    // given
+
+    // when/then
+    assertThatThrownBy(() -> managementService.setJobRetries(5).execute())
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("052")
+      .hasMessageContaining("You must specify exactly one of jobId, jobIds or jobDefinitionId as parameter.");
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
+  @Test
+  public void shouldSetJobRetriesWithDuedateByJobIds() {
+    // given
+    Date newDueDate = new Date(0);
+    runtimeService.startProcessInstanceByKey("exceptionInJobExecution");
+
+    List<String> jobIds = getAllJobIds();
+
+    // when
+    managementService.setJobRetries(5).jobIds(jobIds).dueDate(newDueDate).execute();
+
+    // then
+    List<Job> jobs = managementService.createJobQuery().list();
+    for (Job job : jobs) {
+      assertThat(job.getRetries()).isEqualTo(5);
+      assertThat(job.getDuedate()).isEqualTo(newDueDate);
     }
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
   @Test
-  public void testSetJobsRetriesWithNegativeRetries() {
-    try {
-      //when
-      managementService.setJobRetries(Arrays.asList(new String[]{"aFake"}), -1);
-      fail("exception expected");
-      //then
-    } catch (ProcessEngineException e) {
-      //expected
-    }
+  public void shouldSetJobRetriesWithDuedateByJobId() {
+    // given
+    Date newDueDate = new Date(0);
+    runtimeService.startProcessInstanceByKey("exceptionInJobExecution");
+
+    List<String> jobIds = getAllJobIds();
+    String jobId = jobIds.get(0);
+
+    // when
+    managementService.setJobRetries(5).jobId(jobId).dueDate(newDueDate).execute();
+
+    // then
+    Job job = managementService.createJobQuery().jobId(jobId).singleResult();
+    assertThat(job.getRetries()).isEqualTo(5);
+    assertThat(job.getDuedate()).isEqualTo(newDueDate);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
   @Test
-  public void testSetJobsRetriesWithFake() {
+  public void shouldSetJobRetriesWithNullDuedateByJobId() {
+    // given
+    runtimeService.startProcessInstanceByKey("exceptionInJobExecution");
+
+    List<Job> jobs = managementService.createJobQuery().list();
+    Job job = jobs.get(0);
+    String jobId = job.getId();
+
+    // when
+    managementService.setJobRetries(5).jobId(jobId).dueDate(null).execute();
+
+    // then
+    Job updatedJob = managementService.createJobQuery().jobId(jobId).singleResult();
+    assertThat(updatedJob.getRetries()).isEqualTo(5);
+    assertThat(updatedJob.getDuedate()).isEqualTo(job.getDuedate());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
+  @Test
+  public void shouldSetJobRetriesWithDuedateByJobDefinitionId() {
+    // given
+    Date newDueDate = new Date(0);
+    runtimeService.startProcessInstanceByKey("exceptionInJobExecution");
+
+    List<Job> list = managementService.createJobQuery().list();
+    Job job = list.get(0);
+    managementService.setJobRetries(job.getId(), 0);
+
+    // when
+    managementService.setJobRetries(5).jobDefinitionId(job.getJobDefinitionId()).dueDate(newDueDate).execute();
+
+    // then
+    job = managementService.createJobQuery().jobDefinitionId(job.getJobDefinitionId()).singleResult();
+    assertThat(job.getRetries()).isEqualTo(5);
+    assertThat(job.getDuedate()).isEqualTo(newDueDate);
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
+  @Test
+  public void shouldSetJobRetriesWithNullDuedateByJobDefinitionId() {
+    // given
+    runtimeService.startProcessInstanceByKey("exceptionInJobExecution");
+
+    List<Job> list = managementService.createJobQuery().list();
+    Job job = list.get(0);
+    managementService.setJobRetries(job.getId(), 0);
+
+    // when
+    managementService.setJobRetries(5).jobDefinitionId(job.getJobDefinitionId()).dueDate(null).execute();
+
+    // then
+    Job updatedJob = managementService.createJobQuery().jobDefinitionId(job.getJobDefinitionId()).singleResult();
+    assertThat(updatedJob.getRetries()).isEqualTo(5);
+    assertThat(updatedJob.getDuedate()).isEqualTo(job.getDuedate());
+  }
+
+  @Test
+  public void shouldThrowExceptionOnSetJobRetriesWithNegativeRetries() {
+    assertThatThrownBy(() -> managementService.setJobRetries("aFake", -1))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("The number of job retries must be a non-negative Integer, but '-1' has been provided.");
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
+  @Test
+  public void testSetJobRetriesWithFake() {
     //given
     runtimeService.startProcessInstanceByKey("exceptionInJobExecution");
 
@@ -300,33 +398,26 @@ public class ManagementServiceTest extends PluggableProcessEngineTest {
   }
 
   @Test
-  public void testSetJobRetriesUnexistingJobId() {
-    try {
-      managementService.setJobRetries("unexistingjob", 5);
-      fail("ProcessEngineException expected");
-    } catch (ProcessEngineException re) {
-      testRule.assertTextPresent("No job found with id 'unexistingjob'.", re.getMessage());
-    }
+  public void shouldThrowExceptionOnSetJobRetriesWithUnexistingJobId() {
+    assertThatThrownBy(() -> managementService.setJobRetries("unexistingjob", 5))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("No job found with id 'unexistingjob'.");
   }
 
   @Test
-  public void testSetJobRetriesEmptyJobId() {
-    try {
-      managementService.setJobRetries("", 5);
-      fail("ProcessEngineException expected");
-    } catch (ProcessEngineException re) {
-      testRule.assertTextPresent("Either job definition id or job id has to be provided as parameter.", re.getMessage());
-    }
+  public void shouldThrowExceptionOnSetJobRetriesWithEmptyJobId() {
+    assertThatThrownBy(() -> managementService.setJobRetries("", 5))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("052")
+      .hasMessageContaining("You must specify exactly one of jobId, jobIds or jobDefinitionId as parameter.");
   }
 
   @Test
   public void testSetJobRetriesJobIdNull() {
-    try {
-      managementService.setJobRetries((String) null, 5);
-      fail("ProcessEngineException expected");
-    } catch (ProcessEngineException re) {
-      testRule.assertTextPresent("Either job definition id or job id has to be provided as parameter.", re.getMessage());
-    }
+    assertThatThrownBy(() -> managementService.setJobRetries((String) null, 5))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("052")
+      .hasMessageContaining("You must specify exactly one of jobId, jobIds or jobDefinitionId as parameter.");
   }
 
   @Test
@@ -365,22 +456,18 @@ public class ManagementServiceTest extends PluggableProcessEngineTest {
 
   @Test
   public void testSetJobRetriesByJobDefinitionIdEmptyJobDefinitionId() {
-    try {
-      managementService.setJobRetriesByJobDefinitionId("", 5);
-      fail("ProcessEngineException expected");
-    } catch (ProcessEngineException re) {
-      testRule.assertTextPresent("Either job definition id or job id has to be provided as parameter.", re.getMessage());
-    }
+      assertThatThrownBy(() -> managementService.setJobRetriesByJobDefinitionId("", 5))
+        .isInstanceOf(ProcessEngineException.class)
+        .hasMessageContaining("052")
+        .hasMessageContaining("You must specify exactly one of jobId, jobIds or jobDefinitionId as parameter.");
   }
 
   @Test
   public void testSetJobRetriesByJobDefinitionIdNull() {
-    try {
-      managementService.setJobRetriesByJobDefinitionId(null, 5);
-      fail("ProcessEngineException expected");
-    } catch (ProcessEngineException re) {
-      testRule.assertTextPresent("Either job definition id or job id has to be provided as parameter.", re.getMessage());
-    }
+    assertThatThrownBy(() -> managementService.setJobRetriesByJobDefinitionId(null, 5))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("052")
+      .hasMessageContaining("You must specify exactly one of jobId, jobIds or jobDefinitionId as parameter.");
   }
 
   @Test

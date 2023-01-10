@@ -16,18 +16,18 @@
  */
 package org.camunda.bpm.engine.impl.batch.job;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.batch.AbstractBatchJobHandler;
 import org.camunda.bpm.engine.impl.batch.BatchJobContext;
 import org.camunda.bpm.engine.impl.batch.BatchJobDeclaration;
 import org.camunda.bpm.engine.impl.batch.SetRetriesBatchConfiguration;
-import org.camunda.bpm.engine.impl.cmd.SetJobsRetriesCmd;
+import org.camunda.bpm.engine.impl.cmd.SetJobRetriesCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
-
-import java.util.List;
 
 
 /**
@@ -52,7 +52,7 @@ public class SetJobRetriesJobHandler extends AbstractBatchJobHandler<SetRetriesB
 
   @Override
   protected SetRetriesBatchConfiguration createJobConfiguration(SetRetriesBatchConfiguration configuration, List<String> jobIds) {
-    return new SetRetriesBatchConfiguration(jobIds, configuration.getRetries());
+    return new SetRetriesBatchConfiguration(jobIds, configuration.getRetries(), null);
   }
 
   @Override
@@ -61,7 +61,11 @@ public class SetJobRetriesJobHandler extends AbstractBatchJobHandler<SetRetriesB
                              CommandContext commandContext,
                              String tenantId) {
 
-    commandContext.executeWithOperationLogPrevented(
-        new SetJobsRetriesCmd(batchConfiguration.getIds(), batchConfiguration.getRetries()));
+    for (String jobId : batchConfiguration.getIds()) {
+      commandContext.executeWithOperationLogPrevented(
+          new SetJobRetriesCmd(jobId, null, batchConfiguration.getRetries(), batchConfiguration.getDueDate()));
+
+    }
+
   }
 }

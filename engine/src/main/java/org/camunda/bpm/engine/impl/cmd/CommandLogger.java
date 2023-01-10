@@ -332,4 +332,22 @@ public class CommandLogger extends ProcessEngineLogger {
         + "please disable the built-in error code provider.", builtinCode, initialCode);
   }
 
+  public ProcessEngineException exceptionSettingJobRetriesAsyncNoJobsSpecified() {
+    return new ProcessEngineException(exceptionMessage(
+        "050",
+        "You must specify at least one of jobIds, jobQuery or one of processInstanceIds, processInstanceQuery, historicProcessInstanceQuery."));
+  }
+
+  public ProcessEngineException exceptionSettingJobRetriesAsyncJobsNotSpecifiedCorrectly() {
+    return new ProcessEngineException(exceptionMessage(
+        "051",
+        "You can either specify any of jobIds, jobQuery or any of processInstanceIds, processInstanceQuery, historicProcessInstanceQuery."));
+  }
+
+  public ProcessEngineException exceptionSettingJobRetriesJobsNotSpecifiedCorrectly() {
+    return new ProcessEngineException(exceptionMessage(
+        "052",
+        "You must specify exactly one of jobId, jobIds or jobDefinitionId as parameter. The parameter can not be null."));
+  }
+
 }
