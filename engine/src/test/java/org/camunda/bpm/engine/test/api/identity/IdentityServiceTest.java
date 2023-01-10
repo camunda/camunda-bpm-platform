@@ -1068,7 +1068,7 @@ public class IdentityServiceTest {
   }
 
   @Test
-  public void shouldIncludePlaintextPasswordInUserToString() {
+  public void shouldNotIncludePlaintextPasswordInUserToString() {
     // given
     User user = identityService.newUser("id");
 
