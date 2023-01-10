@@ -160,7 +160,7 @@ public class UserEntity implements User, Serializable, DbEntity, HasDbRevision {
       .getSaltGenerator()
       .generateSalt();
   }
-  
+
 
   public boolean checkPasswordAgainstPolicy() {
     PasswordPolicyResult result = Context.getProcessEngineConfiguration()
@@ -181,8 +181,8 @@ public class UserEntity implements User, Serializable, DbEntity, HasDbRevision {
            + ", firstName=" + firstName
            + ", lastName=" + lastName
            + ", email=" + email
-           + ", password=" + password
-           + ", salt=" + salt
+           + ", password=******" // sensitive for logging
+           + ", salt=******" // sensitive for logging
            + ", lockExpirationTime=" + lockExpirationTime
            + ", attempts=" + attempts
            + "]";
