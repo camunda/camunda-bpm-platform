@@ -8,6 +8,67 @@
 
   <div ng-hide="status === 'finished' || status === 'failed'">
     <p>{{ 'PLUGIN_JOB_RETRY_LEGEND_2' | translate }}</p>
+    <div class="due-date">
+      <p>{{ 'PLUGIN_JOB_RETRY_DUE_DATE_INFO' | translate }}</p>
+      <div class="row">
+        <label class="col-sm-5 form-control-static text-right">
+          {{ 'PLUGIN_JOB_RETRY_DUE_DATE_RESET' | translate }}
+          <span class="glyphicon glyphicon-question-sign"
+                uib-tooltip="{{ 'PLUGIN_JOB_RETRY_DUE_DATE_RESET_TOOLTIP' | translate }}"
+                tooltip-placement="right"></span>
+        </label>
+        <div class="col-sm-7">
+          <input type="radio"
+                 name="dueDateMode"
+                 id="preserveDueDate"
+                 class="form-control"
+                 ng-model="radio.value"
+                 value="preserveDueDate"
+                 ng-checked="true">
+        </div>
+      </div>
+      <div class="row">
+        <label class="col-sm-5 form-control-static text-right">
+          {{ 'PLUGIN_JOB_RETRY_DUE_DATE_SET' | translate }}
+          <span class="glyphicon glyphicon-question-sign"
+                uib-tooltip="{{ 'PLUGIN_JOB_RETRY_DUE_DATE_SET_TOOLTIP' | translate }}"
+                tooltip-placement="right"></span>
+        </label>
+        <div class="col-sm-7">
+          <input type="radio"
+                 name="dueDateMode"
+                 id="dueDate"
+                 class="form-control"
+                 ng-model="radio.value"
+                 value="dueDate">
+        </div>
+      </div>
+      <div class="row">
+        <div ng-if="radio.value === 'dueDate'">
+          <label class="col-sm-5 form-control-static text-right">{{ 'PLUGIN_JOB_RETRY_DUE_DATE' | translate }}</label>
+          <div class="col-sm-7">
+              <span cam-widget-inline-field
+                    class="form-control-static"
+                    type="datetime"
+                    change="changeDueDate(varValue)"
+                    value="dueDate"
+                    flexible="true">
+              <a class="form-control-static">{{dueDate}}</a>
+              </span>
+
+            <p class="help-block"
+               ng-show="!dueDate">
+              {{ 'PLUGIN_JOB_RETRY_DUE_DATE_REQUIRED' | translate }}
+            </p>
+
+            <p class="help-block"
+               ng-show="dueDate && !checkDateFormat(dueDate)">
+              {{ 'PLUGIN_JOB_RETRY_DUE_DATE_PATTERN' | translate }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
     <p>{{ 'PLUGIN_JOB_RETRY_LEGEND_3' | translate }}</p>
   </div>
 
@@ -33,7 +94,7 @@
           class="btn btn-primary"
           ng-click="incrementRetry()"
           ng-hide="status === 'finished' || status === 'failed'"
-          ng-disabled="status === 'performing'">
+          ng-disabled="status === 'performing' || (radio.value === 'dueDate' && (!dueDate || dueDate && !checkDateFormat(dueDate)))">
     {{ 'PLUGIN_JOB_RETRY_BTN_RETRY' | translate }}
   </button>
 

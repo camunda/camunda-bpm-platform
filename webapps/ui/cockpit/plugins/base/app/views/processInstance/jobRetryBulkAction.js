@@ -28,7 +28,7 @@ var actionTemplate = fs.readFileSync(
   'utf8'
 );
 
-module.exports = function(ngModule) {
+module.exports = function(ngModule, pluginPoint) {
   ngModule.controller('JobRetryActionController', [
     '$scope',
     '$uibModal',
@@ -54,16 +54,13 @@ module.exports = function(ngModule) {
   ]);
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
-    ViewsProvider.registerDefaultView(
-      'cockpit.processInstance.runtime.action',
-      {
-        id: 'job-retry-action',
-        label: 'Job Retry Action',
-        template: actionTemplate,
-        controller: 'JobRetryActionController',
-        priority: 15
-      }
-    );
+    ViewsProvider.registerDefaultView(pluginPoint, {
+      id: 'job-retry-action',
+      label: 'Job Retry Action',
+      template: actionTemplate,
+      controller: 'JobRetryActionController',
+      priority: 15
+    });
   };
 
   Configuration.$inject = ['ViewsProvider'];
