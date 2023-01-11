@@ -460,7 +460,7 @@ public class SignalRestServiceTest extends AbstractRestServiceTest {
   }
 
   @Test
-  public void shouldThrowNotFoundException() {
+  public void shouldReturnInternalServerErrorResponseForNotFoundException() {
     String message = "expected exception";
     doThrow(new NotFoundException(message)).when(signalBuilderMock).send();
 

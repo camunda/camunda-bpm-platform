@@ -120,7 +120,7 @@ public class SignalEventReceivedCmd implements Command<Void> {
 
     ExecutionManager executionManager = commandContext.getExecutionManager();
     ExecutionEntity execution = executionManager.findExecutionById(executionId);
-    ensureNotNull(NotFoundException.class, "Cannot find execution with id '" + executionId + "'", "execution", execution);
+    ensureNotNull("Cannot find execution with id '" + executionId + "'", "execution", execution);
 
     EventSubscriptionManager eventSubscriptionManager = commandContext.getEventSubscriptionManager();
     List<EventSubscriptionEntity> signalEvents = eventSubscriptionManager.findSignalEventSubscriptionsByNameAndExecution(signalName, executionId);
