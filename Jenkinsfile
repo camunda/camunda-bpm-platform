@@ -551,9 +551,7 @@ pipeline {
       }
     }
     always {
-      script {
-        cambpmWithSpanAttributes()
-      }
+      cambpmWithSpanAttributes()
     }
   }
 }
