@@ -48,7 +48,7 @@ public class SetExternalTaskRetriesBatchConfigurationJsonConverter
 
   @Override
   public SetRetriesBatchConfiguration readConfiguration(JsonObject json) {
-    return new SetRetriesBatchConfiguration(readExternalTaskIds(json), readIdMappings(json), JsonUtil.getInt(json, RETRIES), null);
+    return new SetRetriesBatchConfiguration(readExternalTaskIds(json), readIdMappings(json), JsonUtil.getInt(json, RETRIES));
   }
 
   protected List<String> readExternalTaskIds(JsonObject json) {

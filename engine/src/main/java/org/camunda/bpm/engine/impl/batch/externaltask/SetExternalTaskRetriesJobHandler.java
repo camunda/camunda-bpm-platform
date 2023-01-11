@@ -60,7 +60,7 @@ public class SetExternalTaskRetriesJobHandler extends AbstractBatchJobHandler<Se
   @Override
   protected SetRetriesBatchConfiguration createJobConfiguration(SetRetriesBatchConfiguration configuration,
       List<String> processIdsForJob) {
-    return new SetRetriesBatchConfiguration(processIdsForJob, configuration.getRetries(), null);
+    return new SetRetriesBatchConfiguration(processIdsForJob, configuration.getRetries());
   }
 
   @Override

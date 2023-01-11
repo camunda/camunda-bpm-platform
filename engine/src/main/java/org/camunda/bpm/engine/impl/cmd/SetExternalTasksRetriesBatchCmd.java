@@ -49,7 +49,7 @@ public class SetExternalTasksRetriesBatchCmd extends AbstractSetExternalTaskRetr
 
   public BatchConfiguration getConfiguration(BatchElementConfiguration elementConfiguration) {
     return new SetRetriesBatchConfiguration(elementConfiguration.getIds(),
-        elementConfiguration.getMappings(), builder.getRetries(), null);
+        elementConfiguration.getMappings(), builder.getRetries());
   }
 
 }

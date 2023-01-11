@@ -22,7 +22,7 @@ import java.util.List;
 import org.camunda.bpm.engine.impl.batch.AbstractBatchConfigurationObjectConverter;
 import org.camunda.bpm.engine.impl.batch.DeploymentMappingJsonConverter;
 import org.camunda.bpm.engine.impl.batch.DeploymentMappings;
-import org.camunda.bpm.engine.impl.batch.SetRetriesBatchConfiguration;
+import org.camunda.bpm.engine.impl.batch.SetJobRetriesBatchConfiguration;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
 
 import com.google.gson.JsonObject;
@@ -31,7 +31,7 @@ import com.google.gson.JsonObject;
  * @author Askar Akhmerov
  */
 public class SetJobRetriesBatchConfigurationJsonConverter
-    extends AbstractBatchConfigurationObjectConverter<SetRetriesBatchConfiguration> {
+    extends AbstractBatchConfigurationObjectConverter<SetJobRetriesBatchConfiguration> {
 
   public static final SetJobRetriesBatchConfigurationJsonConverter INSTANCE = new SetJobRetriesBatchConfigurationJsonConverter();
 
@@ -41,7 +41,7 @@ public class SetJobRetriesBatchConfigurationJsonConverter
   public static final String DUE_DATE = "dueDate";
 
   @Override
-  public JsonObject writeConfiguration(SetRetriesBatchConfiguration configuration) {
+  public JsonObject writeConfiguration(SetJobRetriesBatchConfiguration configuration) {
     JsonObject json = JsonUtil.createObject();
 
     JsonUtil.addListField(json, JOB_IDS, configuration.getIds());
@@ -52,10 +52,10 @@ public class SetJobRetriesBatchConfigurationJsonConverter
   }
 
   @Override
-  public SetRetriesBatchConfiguration readConfiguration(JsonObject json) {
+  public SetJobRetriesBatchConfiguration readConfiguration(JsonObject json) {
     Date dueDate = new Date(JsonUtil.getLong(json, DUE_DATE));
 
-    SetRetriesBatchConfiguration configuration = new SetRetriesBatchConfiguration(
+    SetJobRetriesBatchConfiguration configuration = new SetJobRetriesBatchConfiguration(
         readJobIds(json), readIdMappings(json), JsonUtil.getInt(json, RETRIES), dueDate);
 
     return configuration;

@@ -26,7 +26,7 @@ import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.batch.BatchConfiguration;
 import org.camunda.bpm.engine.impl.batch.BatchElementConfiguration;
-import org.camunda.bpm.engine.impl.batch.SetRetriesBatchConfiguration;
+import org.camunda.bpm.engine.impl.batch.SetJobRetriesBatchConfiguration;
 import org.camunda.bpm.engine.impl.batch.builder.BatchBuilder;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -78,7 +78,7 @@ public abstract class AbstractSetJobsRetriesBatchCmd implements Command<Batch> {
   protected abstract BatchElementConfiguration collectJobIds(CommandContext commandContext);
 
   public BatchConfiguration getConfiguration(BatchElementConfiguration elementConfiguration) {
-    return new SetRetriesBatchConfiguration(elementConfiguration.getIds(), elementConfiguration.getMappings(), retries, dueDate);
+    return new SetJobRetriesBatchConfiguration(elementConfiguration.getIds(), elementConfiguration.getMappings(), retries, dueDate);
   }
 
 }

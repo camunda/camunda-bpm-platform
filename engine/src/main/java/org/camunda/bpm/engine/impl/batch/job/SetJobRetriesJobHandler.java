@@ -22,7 +22,7 @@ import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.batch.AbstractBatchJobHandler;
 import org.camunda.bpm.engine.impl.batch.BatchJobContext;
 import org.camunda.bpm.engine.impl.batch.BatchJobDeclaration;
-import org.camunda.bpm.engine.impl.batch.SetRetriesBatchConfiguration;
+import org.camunda.bpm.engine.impl.batch.SetJobRetriesBatchConfiguration;
 import org.camunda.bpm.engine.impl.cmd.SetJobRetriesCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
@@ -33,7 +33,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 /**
  * @author Askar Akhmerov
  */
-public class SetJobRetriesJobHandler extends AbstractBatchJobHandler<SetRetriesBatchConfiguration> {
+public class SetJobRetriesJobHandler extends AbstractBatchJobHandler<SetJobRetriesBatchConfiguration> {
   public static final BatchJobDeclaration JOB_DECLARATION = new BatchJobDeclaration(Batch.TYPE_SET_JOB_RETRIES);
 
   @Override
@@ -51,12 +51,12 @@ public class SetJobRetriesJobHandler extends AbstractBatchJobHandler<SetRetriesB
   }
 
   @Override
-  protected SetRetriesBatchConfiguration createJobConfiguration(SetRetriesBatchConfiguration configuration, List<String> jobIds) {
-    return new SetRetriesBatchConfiguration(jobIds, configuration.getRetries(), null);
+  protected SetJobRetriesBatchConfiguration createJobConfiguration(SetJobRetriesBatchConfiguration configuration, List<String> jobIds) {
+    return new SetJobRetriesBatchConfiguration(jobIds, configuration.getRetries(), null);
   }
 
   @Override
-  public void executeHandler(SetRetriesBatchConfiguration batchConfiguration,
+  public void executeHandler(SetJobRetriesBatchConfiguration batchConfiguration,
                              ExecutionEntity execution,
                              CommandContext commandContext,
                              String tenantId) {
