@@ -45,7 +45,7 @@
         </label>
         <div class="col-xs-8">
           <label>
-            <input type="number" min="0" ng-model="ttl" oninput="validity.valid || (value='');"/>
+            <input type="number" min="0" step="1" ng-model="ttl" ng-change="validate()" />
             {{ 'TIME_TO_LIVE_DAYS' | translate }}
           </label>
         </div>

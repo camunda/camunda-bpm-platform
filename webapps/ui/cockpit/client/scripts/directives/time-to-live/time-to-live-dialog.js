@@ -36,7 +36,13 @@ const Controller = [
     $scope.ttl = $scope.definition.historyTimeToLive;
 
     $scope.isValid = () => {
-      return !($scope.mode === 'UPDATE' && $scope.ttl == null);
+      return (
+        $scope.mode !== 'UPDATE' || ($scope.ttl != null && $scope.ttl >= 0)
+      );
+    };
+
+    $scope.validate = () => {
+      if (!$scope.isValid()) $scope.ttl = null;
     };
 
     $scope.save = () => {
