@@ -68,5 +68,8 @@ pipeline {
         }
       }
     }
+    always {
+      cambpmWithSpanAttributes()
+    }
   }
 }

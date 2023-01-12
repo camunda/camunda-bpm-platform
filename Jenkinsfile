@@ -550,5 +550,8 @@ pipeline {
         }
       }
     }
+    always {
+      cambpmWithSpanAttributes()
+    }
   }
 }
