@@ -15,6 +15,7 @@
                      "summary": "POST `/job/retries`",
                      "value": {
                        "retries" : 5,
+                       "dueDate": "2017-04-06T13:57:45.000+0200",
                        "jobIds": ["aJob","secondJob"],
                        "jobQuery": {
                          "dueDates":

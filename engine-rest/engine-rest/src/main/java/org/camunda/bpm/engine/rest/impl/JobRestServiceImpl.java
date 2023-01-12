@@ -16,7 +16,12 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
+
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.batch.Batch;
@@ -35,10 +40,7 @@ import org.camunda.bpm.engine.rest.sub.runtime.impl.JobResourceImpl;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
-import java.util.ArrayList;
-import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JobRestServiceImpl extends AbstractRestProcessEngineAware
     implements JobRestService {
@@ -73,7 +75,7 @@ public class JobRestServiceImpl extends AbstractRestProcessEngineAware
       matchingJobs = query.list();
     }
 
-    List<JobDto> jobResults = new ArrayList<JobDto>();
+    List<JobDto> jobResults = new ArrayList<>();
     for (Job job : matchingJobs) {
       JobDto resultJob = JobDto.fromJob(job);
       jobResults.add(resultJob);
@@ -114,11 +116,12 @@ public class JobRestServiceImpl extends AbstractRestProcessEngineAware
     }
 
     try {
-      Batch batch = getProcessEngine().getManagementService().setJobRetriesAsync(
-          setJobRetriesDto.getJobIds(),
-          jobQuery,
-          setJobRetriesDto.getRetries().intValue()
-      );
+      Batch batch = getProcessEngine().getManagementService()
+          .setJobRetriesAsync(setJobRetriesDto.getRetries().intValue())
+          .jobIds(setJobRetriesDto.getJobIds())
+          .jobQuery(jobQuery)
+          .dueDate(setJobRetriesDto.getDueDate())
+          .execute();
       return BatchDto.fromBatch(batch);
     } catch (BadUserRequestException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());

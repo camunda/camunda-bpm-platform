@@ -55,9 +55,9 @@ import org.camunda.bpm.engine.rest.sub.runtime.impl.ProcessInstanceResourceImpl;
 import org.camunda.bpm.engine.runtime.MessageCorrelationAsyncBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
+import org.camunda.bpm.engine.variable.VariableMap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.camunda.bpm.engine.variable.VariableMap;
 
 public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAware implements
     ProcessInstanceRestService {
@@ -207,11 +207,12 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
     }
 
     try {
-      Batch batch = getProcessEngine().getManagementService().setJobRetriesAsync(
-          setJobRetriesDto.getProcessInstances(),
-          processInstanceQuery,
-          setJobRetriesDto.getRetries().intValue()
-      );
+      Batch batch = getProcessEngine().getManagementService()
+          .setJobRetriesAsync(setJobRetriesDto.getRetries().intValue())
+          .processInstanceIds(setJobRetriesDto.getProcessInstances())
+          .processInstanceQuery(processInstanceQuery)
+          .dueDate(setJobRetriesDto.getDueDate())
+          .execute();
       return BatchDto.fromBatch(batch);
     } catch (BadUserRequestException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
@@ -228,12 +229,12 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
 
     try {
       ManagementService managementService = getProcessEngine().getManagementService();
-      Batch batch = managementService.setJobRetriesAsync(
-        setJobRetriesDto.getProcessInstances(),
-        null,
-        query,
-        setJobRetriesDto.getRetries());
-
+      Batch batch = managementService
+          .setJobRetriesAsync(setJobRetriesDto.getRetries())
+          .processInstanceIds(setJobRetriesDto.getProcessInstances())
+          .historicProcessInstanceQuery(query)
+          .dueDate(setJobRetriesDto.getDueDate())
+          .execute();
       return BatchDto.fromBatch(batch);
     } catch (BadUserRequestException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());

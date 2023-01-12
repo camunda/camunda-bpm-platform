@@ -16,6 +16,7 @@
                      "summary": "POST `/process-instance/job-retries` Request Body 1",
                      "value": {
                          "retries": 5,
+                         "dueDate": "2017-04-06T13:57:45.000+0200",
                          "processInstances": ["aProcess", "secondProcess"],
                          "processInstanceQuery": {
                            "processDefinitionId": "aProcessDefinitionId"

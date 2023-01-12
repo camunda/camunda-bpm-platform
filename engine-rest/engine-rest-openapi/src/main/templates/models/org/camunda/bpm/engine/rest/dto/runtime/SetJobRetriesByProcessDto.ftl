@@ -1,5 +1,6 @@
 <#macro dto_macro docsUrl="">
-<@lib.dto>
+<@lib.dto 
+    extends = "SetJobRetriesDto">
 
     <@lib.property
         name = "processInstances"

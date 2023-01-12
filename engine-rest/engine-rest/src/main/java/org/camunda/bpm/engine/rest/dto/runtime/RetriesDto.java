@@ -16,9 +16,12 @@
  */
 package org.camunda.bpm.engine.rest.dto.runtime;
 
+import java.util.Date;
+
 public class RetriesDto {
 
-  private Integer retries;
+  protected Integer retries;
+  protected Date dueDate;
 
   public Integer getRetries() {
     return retries;
@@ -26,5 +29,13 @@ public class RetriesDto {
 
   public void setRetries(Integer retries) {
     this.retries = retries;
+  }
+
+  public Date getDueDate() {
+    return dueDate;
+  }
+
+  public void setDueDate(Date dueDate) {
+    this.dueDate = dueDate;
   }
 }
