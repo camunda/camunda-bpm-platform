@@ -62,16 +62,16 @@ public class JobExecutorPriorityRangeConfigurationTest {
   }
 
   @Test
-  public void shouldThrowExceptionOnNegativeMinPriorityRangeConfiguration() {
+  public void shouldAllowNegativePriorityRangeConfiguration() {
     // given
     config.setJobExecutorPriorityRangeMin(-10L);
-    config.setJobExecutorPriorityRangeMax(0L);
+    config.setJobExecutorPriorityRangeMax(-5);
+
+    // when
+    config.buildProcessEngine();
 
     // then
-    assertThatThrownBy(() -> {
-      config.buildProcessEngine();
-    }).isInstanceOf(ProcessEngineException.class)
-    .hasMessage("ENGINE-14031 Invalid configuration for job executor priority range. Reason: job executor priority range can not be negative");
+    // no exception
   }
 
   @Test

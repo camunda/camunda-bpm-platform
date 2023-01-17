@@ -213,8 +213,11 @@ public class JobManager extends AbstractManager {
       }
     }
 
-    params.put("jobPriorityMin", engineConfiguration.getJobExecutorPriorityRangeMin());
-    params.put("jobPriorityMax", engineConfiguration.getJobExecutorPriorityRangeMax());
+    boolean jobExecutorAcquireByPriority = engineConfiguration.isJobExecutorAcquireByPriority();
+    long jobExecutorPriorityRangeMin = engineConfiguration.getJobExecutorPriorityRangeMin();
+    long jobExecutorPriorityRangeMax = engineConfiguration.getJobExecutorPriorityRangeMax();
+    params.put("jobPriorityMin", jobExecutorAcquireByPriority && jobExecutorPriorityRangeMin != Long.MIN_VALUE ? jobExecutorPriorityRangeMin : null);
+    params.put("jobPriorityMax", jobExecutorAcquireByPriority && jobExecutorPriorityRangeMax != Long.MAX_VALUE ? jobExecutorPriorityRangeMax : null);
 
     params.put("historyCleanupEnabled", engineConfiguration.isHistoryCleanupEnabled());
 

@@ -34,16 +34,19 @@ public class HistoryCleanupJobPriorityRangeTest extends AbstractJobExecutorAcqui
 
   protected HistoryService historyService;
   protected long defaultHistoryCleanupJobPriority;
+  protected boolean defaultIsJobExecutorAcquireByPriority;
 
   @Before
   public void setup() {
     historyService = rule.getHistoryService();
     defaultHistoryCleanupJobPriority = configuration.getHistoryCleanupJobPriority();
+    defaultIsJobExecutorAcquireByPriority = configuration.isJobExecutorAcquireByPriority();
   }
 
   @After
   public void tearDown() {
     configuration.setHistoryCleanupJobPriority(defaultHistoryCleanupJobPriority);
+    configuration.setJobExecutorAcquireByPriority(defaultIsJobExecutorAcquireByPriority);
     resetDatabase();
   }
 
@@ -96,6 +99,7 @@ public class HistoryCleanupJobPriorityRangeTest extends AbstractJobExecutorAcqui
   @Test
   public void shouldNotAcquireHistoryCleanupJobOutsidePriorityRange() {
     // given
+    configuration.setJobExecutorAcquireByPriority(true);
     configuration.setJobExecutorPriorityRangeMin(5L);
     configuration.setJobExecutorPriorityRangeMax(15L);
     configuration.setHistoryCleanupJobPriority(20L);

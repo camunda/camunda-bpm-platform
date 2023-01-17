@@ -17,19 +17,30 @@
 package org.camunda.bpm.engine.test.jobexecutor;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.persistence.entity.AcquirableJobEntity;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.commons.testing.ProcessEngineLoggingRule;
+import org.camunda.commons.testing.WatchLogger;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+
+import ch.qos.logback.classic.spi.ILoggingEvent;
 
 @Deployment(resources = "org/camunda/bpm/engine/test/jobexecutor/JobExecutorAcquireJobsForPriorityRangeTest.jobPrioProcess.bpmn20.xml")
 public class JobExecutorAcquireJobsForPriorityRangeTest extends AbstractJobExecutorAcquireJobsTest {
 
+  @Rule
+  public ProcessEngineLoggingRule loggingRule = new ProcessEngineLoggingRule();
+
   @Before
   public void setUp() {
     configuration.setJobExecutorAcquireByPriority(true);
+    // create 10 jobs, 5 with prio 5 and 5 with prio 10
     createJobs();
   }
 
@@ -111,6 +122,90 @@ public class JobExecutorAcquireJobsForPriorityRangeTest extends AbstractJobExecu
 
     // then
     assertThat(acquirableJobs).hasSize(0);
+  }
+
+  @Test
+  public void shouldAcquireJobsWithNegativePriorityInRange() {
+    // given
+    configuration.setJobExecutorPriorityRangeMin(-5);
+    startProcess("jobPrioProcess", "task3", 1);
+
+    // when
+    List<AcquirableJobEntity> acquirableJobs = findAcquirableJobs();
+
+    // then
+    Job jobWithNegativePrio = managementService.createJobQuery().priorityLowerThanOrEquals(-5).singleResult();
+    assertThat(acquirableJobs).extracting("id").contains(jobWithNegativePrio.getId());
+  }
+
+  @Test
+  public void shouldSetDefaultPriorityRange() {
+    // given standard configuration
+
+    // when
+
+    // then
+    // no configuration exception
+    assertThat(configuration.getJobExecutorPriorityRangeMin()).isEqualTo(Long.MIN_VALUE);
+    assertThat(configuration.getJobExecutorPriorityRangeMax()).isEqualTo(Long.MAX_VALUE);
+  }
+
+  @Test
+  public void shouldAcquireAllJobsWhenDefaultPriorityRange() {
+    // given default configuration
+
+    // when
+    List<AcquirableJobEntity> acquirableJobs = findAcquirableJobs();
+
+    // then
+    assertThat(acquirableJobs).hasSize(10);
+  }
+
+  @Test
+  @WatchLogger(loggerNames = "org.camunda.bpm.engine.impl.persistence.entity.JobEntity", level = "debug")
+  public void shouldDisableRangeCheckInQueryWhenDefaultConfig() {
+    // given default configuration
+    configuration.setJobExecutorAcquireByPriority(false);
+
+    // when
+    findAcquirableJobs();
+
+    // then
+    List<ILoggingEvent> log = loggingRule.getFilteredLog("Preparing: select");
+    assertThat(log).hasSize(1);
+    assertThat(log.get(0).getMessage()).doesNotContain("RES.PRIORITY_ >= ? and RES.PRIORITY_ <= ?");
+  }
+
+  @Test
+  @WatchLogger(loggerNames = "org.camunda.bpm.engine.impl.persistence.entity.JobEntity", level = "debug")
+  public void shouldEnableRangeCheckInQueryWhenUsingCustomMinBoundaryConfig() {
+    // given default configuration
+    configuration.setJobExecutorPriorityRangeMin(6);
+
+    // when
+    findAcquirableJobs();
+
+    // then
+    List<ILoggingEvent> log = loggingRule.getFilteredLog("Preparing: select");
+    assertThat(log).hasSize(1);
+    assertThat(log.get(0).getMessage()).contains("RES.PRIORITY_ >= ?");
+    assertThat(log.get(0).getMessage()).doesNotContain("RES.PRIORITY_ <= ?");
+  }
+
+  @Test
+  @WatchLogger(loggerNames = "org.camunda.bpm.engine.impl.persistence.entity.JobEntity", level = "debug")
+  public void shouldEnableRangeCheckInQueryWhenUsingCustomMaxBoundaryConfig() {
+    // given default configuration
+    configuration.setJobExecutorPriorityRangeMax(11);
+
+    // when
+    findAcquirableJobs();
+
+    // then
+    List<ILoggingEvent> log = loggingRule.getFilteredLog("Preparing: select");
+    assertThat(log).hasSize(1);
+    assertThat(log.get(0).getMessage()).doesNotContain("RES.PRIORITY_ >= ?");
+    assertThat(log.get(0).getMessage()).contains("RES.PRIORITY_ <= ?");
   }
 
   private void createJobs() {
