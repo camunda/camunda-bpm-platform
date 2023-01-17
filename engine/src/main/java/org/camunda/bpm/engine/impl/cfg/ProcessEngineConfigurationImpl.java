@@ -519,7 +519,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected PriorityProvider<JobDeclaration<?, ?>> jobPriorityProvider;
 
-  protected long jobExecutorPriorityRangeMin = 0;
+  protected long jobExecutorPriorityRangeMin = Long.MIN_VALUE;
   protected long jobExecutorPriorityRangeMax = Long.MAX_VALUE;
 
   // EXTERNAL TASK /////////////////////////////////////////////////////////////
@@ -2357,10 +2357,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     if (jobExecutorPriorityRangeMin > jobExecutorPriorityRangeMax) {
       throw ProcessEngineLogger.JOB_EXECUTOR_LOGGER.jobExecutorPriorityRangeException(
           "jobExecutorPriorityRangeMin can not be greater than jobExecutorPriorityRangeMax");
-    }
-    if (jobExecutorPriorityRangeMin < 0) {
-      throw ProcessEngineLogger.JOB_EXECUTOR_LOGGER
-          .jobExecutorPriorityRangeException("job executor priority range can not be negative");
     }
 
     if (jobExecutorPriorityRangeMin > historyCleanupJobPriority || jobExecutorPriorityRangeMax < historyCleanupJobPriority) {
