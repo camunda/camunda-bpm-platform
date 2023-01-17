@@ -30,9 +30,10 @@ import org.camunda.bpm.cockpit.impl.plugin.resources.IncidentRestService;
 import org.camunda.bpm.cockpit.plugin.test.AbstractCockpitPluginTest;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.authorization.Groups;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -40,9 +41,11 @@ public class IncidentRestServiceTenantCheckTest extends AbstractCockpitPluginTes
 
   protected static final String TENANT_ONE = "tenant1";
   protected static final String TENANT_TWO = "tenant2";
+  protected static final String ADMIN_GROUP = "adminGroup";
+  protected static final String ADMIN_USER = "adminUser";
 
   private ProcessEngine processEngine;
-  private ProcessEngineConfiguration processEngineConfiguration;
+  private ProcessEngineConfigurationImpl processEngineConfiguration;
   private RuntimeService runtimeService;
   private IdentityService identityService;
 
@@ -56,10 +59,13 @@ public class IncidentRestServiceTenantCheckTest extends AbstractCockpitPluginTes
   public void init() throws Exception {
 
     processEngine = getProcessEngine();
-    processEngineConfiguration = processEngine.getProcessEngineConfiguration();
+    processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
 
     runtimeService = processEngine.getRuntimeService();
     identityService = processEngine.getIdentityService();
+
+    processEngineConfiguration.getAdminGroups().add(ADMIN_GROUP);
+    processEngineConfiguration.getAdminUsers().add(ADMIN_USER);
 
     resource = new IncidentRestService(processEngine.getName());
 
@@ -76,6 +82,12 @@ public class IncidentRestServiceTenantCheckTest extends AbstractCockpitPluginTes
 
     queryParameter = new IncidentQueryDto();
     queryParameter.setProcessInstanceIdIn(new String[]{processInstanceTenantOne, processInstanceTenantTwo});
+  }
+
+  @After
+  public void tearDown() {
+    processEngineConfiguration.getAdminGroups().remove(ADMIN_GROUP);
+    processEngineConfiguration.getAdminUsers().remove(ADMIN_USER);
   }
 
   @Test
@@ -109,7 +121,7 @@ public class IncidentRestServiceTenantCheckTest extends AbstractCockpitPluginTes
     List<IncidentDto> result = resource.queryIncidents(queryParameter, null, null);
     assertThat(result).hasSize(2);
 
-    Set<String> processInstnaceIds = new HashSet<String>();
+    Set<String> processInstnaceIds = new HashSet<>();
     for (IncidentDto incidentDto : result) {
       processInstnaceIds.add(incidentDto.getProcessInstanceId());
     }
@@ -127,7 +139,43 @@ public class IncidentRestServiceTenantCheckTest extends AbstractCockpitPluginTes
     List<IncidentDto> result = resource.queryIncidents(queryParameter, null, null);
     assertThat(result).hasSize(2);
 
-    Set<String> processInstnaceIds = new HashSet<String>();
+    Set<String> processInstnaceIds = new HashSet<>();
+    for (IncidentDto incidentDto : result) {
+      processInstnaceIds.add(incidentDto.getProcessInstanceId());
+    }
+
+    assertThat(processInstnaceIds).contains(processInstanceTenantOne);
+    assertThat(processInstnaceIds).contains(processInstanceTenantTwo);
+  }
+
+  @Test
+  public void queryIncidentsByProcessInstanceIdsWithAdminGroups() {
+
+    identityService.setAuthentication("user", Collections.singletonList(ADMIN_GROUP), null);
+
+
+    List<IncidentDto> result = resource.queryIncidents(queryParameter, null, null);
+    assertThat(result).hasSize(2);
+
+    Set<String> processInstnaceIds = new HashSet<>();
+    for (IncidentDto incidentDto : result) {
+      processInstnaceIds.add(incidentDto.getProcessInstanceId());
+    }
+
+    assertThat(processInstnaceIds).contains(processInstanceTenantOne);
+    assertThat(processInstnaceIds).contains(processInstanceTenantTwo);
+  }
+
+  @Test
+  public void queryIncidentsByProcessInstanceIdsWithAdminUsers() {
+
+    identityService.setAuthentication("adminUser", null, null);
+
+
+    List<IncidentDto> result = resource.queryIncidents(queryParameter, null, null);
+    assertThat(result).hasSize(2);
+
+    Set<String> processInstnaceIds = new HashSet<>();
     for (IncidentDto incidentDto : result) {
       processInstnaceIds.add(incidentDto.getProcessInstanceId());
     }

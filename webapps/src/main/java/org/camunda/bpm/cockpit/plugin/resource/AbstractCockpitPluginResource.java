@@ -22,9 +22,9 @@ import org.camunda.bpm.cockpit.db.CommandExecutor;
 import org.camunda.bpm.cockpit.db.QueryParameters;
 import org.camunda.bpm.cockpit.db.QueryService;
 import org.camunda.bpm.cockpit.plugin.spi.CockpitPlugin;
-import org.camunda.bpm.engine.authorization.Groups;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.db.AuthorizationCheck;
 import org.camunda.bpm.engine.impl.db.PermissionCheck;
 import org.camunda.bpm.engine.impl.db.TenantCheck;
@@ -82,15 +82,28 @@ public class AbstractCockpitPluginResource extends AbstractAppPluginResource<Coc
   }
 
   /**
-   * Return <code>true</code> if the given authentication contains the group {@link Groups#CAMUNDA_ADMIN}.
+   * Return <code>true</code> if the given authentication is part of the admin groups or admin users
    */
   protected boolean isCamundaAdmin(Authentication authentication) {
+    ProcessEngineConfigurationImpl engineConfiguration =
+        (ProcessEngineConfigurationImpl) getProcessEngine().getProcessEngineConfiguration();
     List<String> groupIds = authentication.getGroupIds();
     if (groupIds != null) {
-      return groupIds.contains(Groups.CAMUNDA_ADMIN);
-    } else {
-      return false;
+      List<String> adminGroups = engineConfiguration.getAdminGroups();
+      for (String adminGroup : adminGroups) {
+        if (groupIds.contains(adminGroup)) {
+          return true;
+        }
+      }
     }
+
+    String userId = authentication.getUserId();
+    if (userId != null) {
+      List<String> adminUsers = engineConfiguration.getAdminUsers();
+      return adminUsers != null && adminUsers.contains(userId);
+    }
+
+    return false;
   }
 
   /**
