@@ -29,10 +29,11 @@ import org.camunda.bpm.cockpit.impl.plugin.resources.ProcessInstanceRestService;
 import org.camunda.bpm.cockpit.plugin.test.AbstractCockpitPluginTest;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.authorization.Groups;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -40,9 +41,11 @@ public class ProcessInstanceRestServiceTenantCheckTest extends AbstractCockpitPl
 
   protected static final String TENANT_ONE = "tenant1";
   protected static final String TENANT_TWO = "tenant2";
+  protected static final String ADMIN_GROUP = "adminGroup";
+  protected static final String ADMIN_USER = "adminUser";
 
   private ProcessEngine processEngine;
-  private ProcessEngineConfiguration processEngineConfiguration;
+  private ProcessEngineConfigurationImpl processEngineConfiguration;
   private RuntimeService runtimeService;
   private IdentityService identityService;
 
@@ -53,10 +56,13 @@ public class ProcessInstanceRestServiceTenantCheckTest extends AbstractCockpitPl
   public void init() throws Exception {
 
     processEngine = getProcessEngine();
-    processEngineConfiguration = getProcessEngine().getProcessEngineConfiguration();
+    processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
 
     runtimeService = processEngine.getRuntimeService();
     identityService = processEngine.getIdentityService();
+
+    processEngineConfiguration.getAdminGroups().add(ADMIN_GROUP);
+    processEngineConfiguration.getAdminUsers().add(ADMIN_USER);
 
     resource = new ProcessInstanceRestService(processEngine.getName());
 
@@ -68,6 +74,12 @@ public class ProcessInstanceRestServiceTenantCheckTest extends AbstractCockpitPl
 
     queryParameter = new ProcessInstanceQueryDto();
     queryParameter.setActivityIdIn(new String[] { "ServiceTask_1" });
+  }
+
+  @After
+  public void tearDown() {
+    processEngineConfiguration.getAdminGroups().remove(ADMIN_GROUP);
+    processEngineConfiguration.getAdminUsers().remove(ADMIN_USER);
   }
 
   @Test
@@ -157,6 +169,42 @@ public class ProcessInstanceRestServiceTenantCheckTest extends AbstractCockpitPl
   public void queryWithContainingIncidentsWithCamundaAdmin() {
 
     identityService.setAuthentication("user", Collections.singletonList(Groups.CAMUNDA_ADMIN), null);
+
+    List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
+    assertThat(result).isNotEmpty();
+    assertThat(result).hasSize(2);
+
+    List<IncidentStatisticsDto> incidents = result.get(0).getIncidents();
+    assertThat(incidents).isNotEmpty();
+    assertThat(incidents).hasSize(1);
+
+    incidents = result.get(1).getIncidents();
+    assertThat(incidents).isNotEmpty();
+    assertThat(incidents).hasSize(1);
+  }
+
+  @Test
+  public void queryWithContainingIncidentsWithAdminGroups() {
+
+    identityService.setAuthentication("user", Collections.singletonList(ADMIN_GROUP), null);
+
+    List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
+    assertThat(result).isNotEmpty();
+    assertThat(result).hasSize(2);
+
+    List<IncidentStatisticsDto> incidents = result.get(0).getIncidents();
+    assertThat(incidents).isNotEmpty();
+    assertThat(incidents).hasSize(1);
+
+    incidents = result.get(1).getIncidents();
+    assertThat(incidents).isNotEmpty();
+    assertThat(incidents).hasSize(1);
+  }
+
+  @Test
+  public void queryWithContainingIncidentsWithAdminUsers() {
+
+    identityService.setAuthentication("adminUser", null, null);
 
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
     assertThat(result).isNotEmpty();

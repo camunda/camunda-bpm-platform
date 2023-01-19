@@ -29,10 +29,11 @@ import org.camunda.bpm.cockpit.impl.plugin.base.sub.resources.ProcessDefinitionR
 import org.camunda.bpm.cockpit.plugin.test.AbstractCockpitPluginTest;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.authorization.Groups;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -40,9 +41,11 @@ public class ProcessDefinitionResourceTenantCheckTest extends AbstractCockpitPlu
 
   protected static final String TENANT_ONE = "tenant1";
   protected static final String TENANT_TWO = "tenant2";
+  protected static final String ADMIN_GROUP = "adminGroup";
+  protected static final String ADMIN_USER = "adminUser";
 
   private ProcessEngine processEngine;
-  private ProcessEngineConfiguration processEngineConfiguration;
+  private ProcessEngineConfigurationImpl processEngineConfiguration;
   private RuntimeService runtimeService;
   private IdentityService identityService;
 
@@ -53,20 +56,30 @@ public class ProcessDefinitionResourceTenantCheckTest extends AbstractCockpitPlu
   public void init() throws Exception {
 
     processEngine = getProcessEngine();
-    processEngineConfiguration = processEngine.getProcessEngineConfiguration();
+    processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
 
     runtimeService = processEngine.getRuntimeService();
     identityService = processEngine.getIdentityService();
 
+    processEngineConfiguration.getAdminGroups().add(ADMIN_GROUP);
+    processEngineConfiguration.getAdminUsers().add(ADMIN_USER);
+
     deploy("processes/multi-tenancy-call-activity.bpmn");
     deployForTenant(TENANT_ONE, "processes/user-task-process.bpmn");
     deployForTenant(TENANT_TWO, "processes/user-task-process.bpmn");
+
 
     ProcessInstance processInstance = runtimeService.createProcessInstanceByKey("multiTenancyCallActivity").execute();
 
     resource = new ProcessDefinitionResource(getProcessEngine().getName(), processInstance.getProcessDefinitionId());
 
     queryParameter = new ProcessDefinitionQueryDto();
+  }
+
+  @After
+  public void tearDown() {
+    processEngineConfiguration.getAdminGroups().remove(ADMIN_GROUP);
+    processEngineConfiguration.getAdminUsers().remove(ADMIN_USER);
   }
 
   @Test
@@ -115,8 +128,32 @@ public class ProcessDefinitionResourceTenantCheckTest extends AbstractCockpitPlu
     assertThat(getCalledFromActivityIds(result)).contains("CallActivity_Tenant1", "CallActivity_Tenant2");
   }
 
+  @Test
+  public void calledProcessDefinitionByParentProcessDefinitionIdWithAdminGroups() {
+
+    identityService.setAuthentication("user", Collections.singletonList(ADMIN_GROUP), null);
+
+    List<ProcessDefinitionDto> result = resource.queryCalledProcessDefinitions(queryParameter);
+    assertThat(result).isNotEmpty();
+    assertThat(result).hasSize(2);
+
+    assertThat(getCalledFromActivityIds(result)).contains("CallActivity_Tenant1", "CallActivity_Tenant2");
+  }
+
+  @Test
+  public void calledProcessDefinitionByParentProcessDefinitionIdWithAdminUsers() {
+
+    identityService.setAuthentication("adminUser", null, null);
+
+    List<ProcessDefinitionDto> result = resource.queryCalledProcessDefinitions(queryParameter);
+    assertThat(result).isNotEmpty();
+    assertThat(result).hasSize(2);
+
+    assertThat(getCalledFromActivityIds(result)).contains("CallActivity_Tenant1", "CallActivity_Tenant2");
+  }
+
   protected List<String> getCalledFromActivityIds(List<ProcessDefinitionDto> processDefinitions) {
-    List<String> activityIds = new ArrayList<String>();
+    List<String> activityIds = new ArrayList<>();
 
     for (ProcessDefinitionDto processDefinition : processDefinitions) {
       activityIds.addAll(processDefinition.getCalledFromActivityIds());

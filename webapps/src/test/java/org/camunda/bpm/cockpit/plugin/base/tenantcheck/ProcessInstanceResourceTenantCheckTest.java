@@ -17,9 +17,6 @@
 package org.camunda.bpm.cockpit.plugin.base.tenantcheck;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.CoreMatchers.hasItems;
-import static org.junit.Assert.assertThat;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -32,10 +29,11 @@ import org.camunda.bpm.cockpit.impl.plugin.base.sub.resources.ProcessInstanceRes
 import org.camunda.bpm.cockpit.plugin.test.AbstractCockpitPluginTest;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.authorization.Groups;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -43,10 +41,12 @@ public class ProcessInstanceResourceTenantCheckTest extends AbstractCockpitPlugi
 
   protected static final String TENANT_ONE = "tenant1";
   protected static final String TENANT_TWO = "tenant2";
+  protected static final String ADMIN_GROUP = "adminGroup";
+  protected static final String ADMIN_USER = "adminUser";
 
   private ProcessInstanceResource resource;
   private ProcessEngine processEngine;
-  private ProcessEngineConfiguration processEngineConfiguration;
+  private ProcessEngineConfigurationImpl processEngineConfiguration;
   private RuntimeService runtimeService;
   private IdentityService identityService;
   private CalledProcessInstanceQueryDto queryParameter;
@@ -55,9 +55,12 @@ public class ProcessInstanceResourceTenantCheckTest extends AbstractCockpitPlugi
   public void init() throws Exception {
 
     processEngine = getProcessEngine();
-    processEngineConfiguration = getProcessEngine().getProcessEngineConfiguration();
+    processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
     runtimeService = processEngine.getRuntimeService();
     identityService = processEngine.getIdentityService();
+
+    processEngineConfiguration.getAdminGroups().add(ADMIN_GROUP);
+    processEngineConfiguration.getAdminUsers().add(ADMIN_USER);
 
     deploy("processes/multi-tenancy-call-activity.bpmn");
     deployForTenant(TENANT_ONE, "processes/user-task-process.bpmn");
@@ -68,6 +71,12 @@ public class ProcessInstanceResourceTenantCheckTest extends AbstractCockpitPlugi
     resource = new ProcessInstanceResource(getProcessEngine().getName(), processInstance.getId());
 
     queryParameter = new CalledProcessInstanceQueryDto();
+  }
+
+  @After
+  public void tearDown() {
+    processEngineConfiguration.getAdminGroups().remove(ADMIN_GROUP);
+    processEngineConfiguration.getAdminUsers().remove(ADMIN_USER);
   }
 
   @Test
@@ -102,7 +111,7 @@ public class ProcessInstanceResourceTenantCheckTest extends AbstractCockpitPlugi
     assertThat(result).isNotEmpty();
     assertThat(result).hasSize(2);
 
-    assertThat(getCalledActivityIds(result), hasItems("CallActivity_Tenant1", "CallActivity_Tenant2"));
+    assertThat(getCalledActivityIds(result)).contains("CallActivity_Tenant1", "CallActivity_Tenant2");
   }
 
   @Test
@@ -114,11 +123,35 @@ public class ProcessInstanceResourceTenantCheckTest extends AbstractCockpitPlugi
     assertThat(result).isNotEmpty();
     assertThat(result).hasSize(2);
 
-    assertThat(getCalledActivityIds(result), hasItems("CallActivity_Tenant1", "CallActivity_Tenant2"));
+    assertThat(getCalledActivityIds(result)).contains("CallActivity_Tenant1", "CallActivity_Tenant2");
+  }
+
+  @Test
+  public void getCalledProcessInstancesByParentProcessInstanceIdWithAdminGroups() {
+
+    identityService.setAuthentication("user", Collections.singletonList(ADMIN_GROUP), null);
+
+    List<CalledProcessInstanceDto> result = resource.queryCalledProcessInstances(queryParameter);
+    assertThat(result).isNotEmpty();
+    assertThat(result).hasSize(2);
+
+    assertThat(getCalledActivityIds(result)).contains("CallActivity_Tenant1", "CallActivity_Tenant2");
+  }
+
+  @Test
+  public void getCalledProcessInstancesByParentProcessInstanceIdWithAdminUsers() {
+
+    identityService.setAuthentication("adminUser", null, null);
+
+    List<CalledProcessInstanceDto> result = resource.queryCalledProcessInstances(queryParameter);
+    assertThat(result).isNotEmpty();
+    assertThat(result).hasSize(2);
+
+    assertThat(getCalledActivityIds(result)).contains("CallActivity_Tenant1", "CallActivity_Tenant2");
   }
 
   private Set<String> getCalledActivityIds(List<CalledProcessInstanceDto> result) {
-    Set<String> callActivityIds = new HashSet<String>();
+    Set<String> callActivityIds = new HashSet<>();
     for (CalledProcessInstanceDto calledProcessInstanceDto : result) {
        callActivityIds.add(calledProcessInstanceDto.getCallActivityId());
     }
