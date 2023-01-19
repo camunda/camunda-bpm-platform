@@ -36,7 +36,7 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 public class ArchRulesTest {
 
   @ArchTest
-  public static final ArchRule public_api_should_not_expose_implementation = classes().that()
+  public static final ArchRule publicApiShouldNotExposeImplementation = classes().that()
       .areInterfaces().and().resideOutsideOfPackages("..impl..")
       .should().onlyDependOnClassesThat().resideOutsideOfPackages("..impl..")
       .because("Interfaces that don't reside in an `impl` package are considered public API.");
