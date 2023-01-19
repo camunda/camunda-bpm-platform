@@ -171,9 +171,8 @@ public class JobExecutorAcquireJobsForPriorityRangeTest extends AbstractJobExecu
     findAcquirableJobs();
 
     // then
-    List<ILoggingEvent> log = loggingRule.getFilteredLog("Preparing: select");
-    assertThat(log).hasSize(1);
-    assertThat(log.get(0).getMessage()).doesNotContain("RES.PRIORITY_ >= ? and RES.PRIORITY_ <= ?");
+    List<ILoggingEvent> log = loggingRule.getFilteredLog("RES.PRIORITY_ >= ? and RES.PRIORITY_ <= ?");
+    assertThat(log).hasSize(0);
   }
 
   @Test
@@ -186,10 +185,10 @@ public class JobExecutorAcquireJobsForPriorityRangeTest extends AbstractJobExecu
     findAcquirableJobs();
 
     // then
-    List<ILoggingEvent> log = loggingRule.getFilteredLog("Preparing: select");
-    assertThat(log).hasSize(1);
-    assertThat(log.get(0).getMessage()).contains("RES.PRIORITY_ >= ?");
-    assertThat(log.get(0).getMessage()).doesNotContain("RES.PRIORITY_ <= ?");
+    List<ILoggingEvent> logRangeMinCheck = loggingRule.getFilteredLog("RES.PRIORITY_ >= ?");
+    assertThat(logRangeMinCheck).hasSize(1);
+    List<ILoggingEvent> logRangeMaxCheck = loggingRule.getFilteredLog("RES.PRIORITY_ <= ?");
+    assertThat(logRangeMaxCheck).hasSize(0);
   }
 
   @Test
@@ -202,10 +201,10 @@ public class JobExecutorAcquireJobsForPriorityRangeTest extends AbstractJobExecu
     findAcquirableJobs();
 
     // then
-    List<ILoggingEvent> log = loggingRule.getFilteredLog("Preparing: select");
-    assertThat(log).hasSize(1);
-    assertThat(log.get(0).getMessage()).doesNotContain("RES.PRIORITY_ >= ?");
-    assertThat(log.get(0).getMessage()).contains("RES.PRIORITY_ <= ?");
+    List<ILoggingEvent> logRangeMinCheck = loggingRule.getFilteredLog("RES.PRIORITY_ >= ?");
+    assertThat(logRangeMinCheck).hasSize(0);
+    List<ILoggingEvent> logRangeMaxCheck = loggingRule.getFilteredLog("RES.PRIORITY_ <= ?");
+    assertThat(logRangeMaxCheck).hasSize(1);
   }
 
   private void createJobs() {
