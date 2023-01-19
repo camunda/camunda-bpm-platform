@@ -20,7 +20,7 @@ module.exports = function(config, eslintConf) {
 
   eslintConf.admin_scripts = {
     src: [
-      '<%= pkg.gruntConfig.adminSourceDir %>/en.json',
+      '<%= pkg.gruntConfig.adminSourceDir %>/locales/en.json',
       '<%= pkg.gruntConfig.adminSourceDir %>/scripts/**/*.js'
     ]
   };

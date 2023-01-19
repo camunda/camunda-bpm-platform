@@ -20,7 +20,7 @@ module.exports = function(config, eslintConf) {
 
   eslintConf.tasklist_scripts = {
     src: [
-      '<%= pkg.gruntConfig.tasklistSourceDir %>/en.json',
+      '<%= pkg.gruntConfig.tasklistSourceDir %>/locales/en.json',
       '<%= pkg.gruntConfig.tasklistSourceDir %>/scripts/**/*.js'
     ]
   };

@@ -20,7 +20,7 @@ module.exports = function(config, eslintConf) {
 
   eslintConf.cockpit_scripts = {
     src: [
-      '<%= pkg.gruntConfig.cockpitSourceDir %>/en.json',
+      '<%= pkg.gruntConfig.cockpitSourceDir %>/locales/en.json',
       '<%= pkg.gruntConfig.cockpitSourceDir %>/scripts/**/*.js',
       '!<%= pkg.gruntConfig.cockpitSourceDir %>/scripts/*.js'
     ]
