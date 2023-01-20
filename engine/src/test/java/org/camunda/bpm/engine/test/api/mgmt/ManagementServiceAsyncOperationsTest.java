@@ -394,9 +394,9 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     Date newDueDate = new Date(0);
 
     //when
-    Batch batch = managementService.setJobRetriesAsync(RETRIES)
+    Batch batch = managementService.setJobRetriesByJobsAsync(RETRIES)
         .jobQuery(query)
-        .dueDate(newDueDate).execute();
+        .dueDate(newDueDate).executeAsync();
     completeSeedJobs(batch);
     List<Exception> exceptions = executeBatchJobs(batch);
 
@@ -416,9 +416,9 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     Date newDueDate = new Date(0);
 
     //when
-    Batch batch = managementService.setJobRetriesAsync(RETRIES)
+    Batch batch = managementService.setJobRetriesByProcessAsync(RETRIES)
         .processInstanceIds(processInstanceIds)
-        .dueDate(newDueDate).execute();
+        .dueDate(newDueDate).executeAsync();
     completeSeedJobs(batch);
     List<Exception> exceptions = executeBatchJobs(batch);
 
@@ -438,7 +438,7 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     Date newDueDate = new Date(0);
 
     //when
-    Batch batch = managementService.setJobRetriesAsync(RETRIES).processInstanceQuery(query).dueDate(newDueDate).execute();
+    Batch batch = managementService.setJobRetriesByProcessAsync(RETRIES).processInstanceQuery(query).dueDate(newDueDate).executeAsync();
     completeSeedJobs(batch);
     List<Exception> exceptions = executeBatchJobs(batch);
 
@@ -462,9 +462,9 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     Date newDueDate = new Date(0);
 
     //when
-    Batch batch = managementService.setJobRetriesAsync(RETRIES)
+    Batch batch = managementService.setJobRetriesByProcessAsync(RETRIES)
         .historicProcessInstanceQuery(historicProcessInstanceQuery)
-        .dueDate(newDueDate).execute();
+        .dueDate(newDueDate).executeAsync();
     completeSeedJobs(batch);
     List<Exception> exceptions = executeBatchJobs(batch);
 
@@ -483,7 +483,7 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     Date newDueDate = new Date(0);
 
     //when
-    Batch batch = managementService.setJobRetriesAsync(RETRIES).jobIds(ids).dueDate(newDueDate).execute();
+    Batch batch = managementService.setJobRetriesByJobsAsync(RETRIES).jobIds(ids).dueDate(newDueDate).executeAsync();
     completeSeedJobs(batch);
     List<Exception> exceptions = executeBatchJobs(batch);
 
@@ -497,28 +497,25 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
   }
 
   @Test
-  public void shouldThrowErrorOnEmptySetRetryBuilderConfig() {
+  public void shouldThrowErrorOnEmptySetRetryByJobsBuilderConfig() {
     // given
 
     // when/then
-    assertThatThrownBy(() -> managementService.setJobRetriesAsync(RETRIES).execute())
+    assertThatThrownBy(() -> managementService.setJobRetriesByJobsAsync(RETRIES).executeAsync())
       .isInstanceOf(ProcessEngineException.class)
       .hasMessageContaining("050")
-      .hasMessageContaining("You must specify at least one of jobIds, jobQuery or one of processInstanceIds, processInstanceQuery, historicProcessInstanceQuery.");
+      .hasMessageContaining("You must specify at least one of jobIds or jobQuery.");
   }
 
   @Test
-  public void shouldThrowErrorOnInvalidSetRetryBuilderConfig() {
+  public void shouldThrowErrorOnEmptySetRetryByProcessBuilderConfig() {
     // given
 
     // when/then
-    assertThatThrownBy(() -> managementService.setJobRetriesAsync(RETRIES)
-        .jobIds(ids)
-        .processInstanceIds(processInstanceIds)
-        .execute())
+    assertThatThrownBy(() -> managementService.setJobRetriesByProcessAsync(RETRIES).executeAsync())
     .isInstanceOf(ProcessEngineException.class)
     .hasMessageContaining("051")
-    .hasMessageContaining("You can either specify any of jobIds, jobQuery or any of processInstanceIds, processInstanceQuery, historicProcessInstanceQuery.");
+    .hasMessageContaining("You must specify at least one of or one of processInstanceIds, processInstanceQuery, or historicProcessInstanceQuery.");
   }
 
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)

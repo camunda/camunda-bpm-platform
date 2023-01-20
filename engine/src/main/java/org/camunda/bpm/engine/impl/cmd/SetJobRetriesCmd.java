@@ -66,19 +66,19 @@ public class SetJobRetriesCmd implements Command<Void>, Serializable {
 
   public Void execute(CommandContext commandContext) {
     if (jobId != null) {
-      setJobRetriesByJobId(jobId, retries, dueDate, commandContext);
+      setJobRetriesByJobId(jobId, commandContext);
     } else if(jobDefinitionId != null){
       setJobRetriesByJobDefinitionId(commandContext);
     } else if(jobIds != null) {
       for (String id : jobIds) {
-        setJobRetriesByJobId(id, retries, dueDate, commandContext);
+        setJobRetriesByJobId(id, commandContext);
       }
     }
 
     return null;
   }
 
-  protected void setJobRetriesByJobId(String jobId, int retries, Date dueDate, CommandContext commandContext) {
+  protected void setJobRetriesByJobId(String jobId, CommandContext commandContext) {
     JobEntity job = commandContext
         .getJobManager()
         .findJobById(jobId);

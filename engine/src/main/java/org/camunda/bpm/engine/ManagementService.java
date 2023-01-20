@@ -42,8 +42,9 @@ import org.camunda.bpm.engine.management.JobDefinitionQuery;
 import org.camunda.bpm.engine.management.MetricsQuery;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatisticsQuery;
 import org.camunda.bpm.engine.management.SchemaLogQuery;
-import org.camunda.bpm.engine.management.SetJobRetriesAsyncBuilder;
 import org.camunda.bpm.engine.management.SetJobRetriesBuilder;
+import org.camunda.bpm.engine.management.SetJobRetriesByJobsAsyncBuilder;
+import org.camunda.bpm.engine.management.SetJobRetriesByProcessAsyncBuilder;
 import org.camunda.bpm.engine.management.TableMetaData;
 import org.camunda.bpm.engine.management.TablePage;
 import org.camunda.bpm.engine.management.TablePageQuery;
@@ -959,19 +960,34 @@ public interface ManagementService {
                             int retries);
 
   /**
-   * Creates a fluent builder to set the number of retries that jobs have left asynchronously.
+   * Creates a fluent builder to set the number of retries for one or multiple jobs asynchronously.
    *
    * Whenever the JobExecutor fails to execute a job, this value is decremented.
    * When it hits zero, the job is supposed to be dead and not retried again.
    * In that case, this method can be used to increase the number of retries.
    *
-   * @see SetJobRetriesAsyncBuilder
+   * @see SetJobRetriesByJobsAsyncBuilder
    *
    * @param retries number of retries
    *
    * @return the builder instance
    */
-  SetJobRetriesAsyncBuilder setJobRetriesAsync(int retries);
+  SetJobRetriesByJobsAsyncBuilder setJobRetriesByJobsAsync(int retries);
+
+  /**
+   * Creates a fluent builder to set the number of retries for one or multiple jobs referenced by process asynchronously.
+   *
+   * Whenever the JobExecutor fails to execute a job, this value is decremented.
+   * When it hits zero, the job is supposed to be dead and not retried again.
+   * In that case, this method can be used to increase the number of retries.
+   *
+   * @see SetJobRetriesByProcessAsyncBuilder
+   *
+   * @param retries number of retries
+   *
+   * @return the builder instance
+   */
+  SetJobRetriesByProcessAsyncBuilder setJobRetriesByProcessAsync(int retries);
 
   /**
    * <p>

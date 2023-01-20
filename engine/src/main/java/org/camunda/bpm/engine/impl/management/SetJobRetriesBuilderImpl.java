@@ -97,7 +97,7 @@ public class SetJobRetriesBuilderImpl implements SetJobRetriesBuilder {
     }
 
     if (!(byJobId ^ byJobIds ^ byJobDefinitionId)) {
-      // more than one method specified
+      // more than one or no method specified
       throw LOG.exceptionSettingJobRetriesJobsNotSpecifiedCorrectly();
     }
 

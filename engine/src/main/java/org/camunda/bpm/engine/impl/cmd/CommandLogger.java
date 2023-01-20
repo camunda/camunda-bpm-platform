@@ -335,13 +335,13 @@ public class CommandLogger extends ProcessEngineLogger {
   public ProcessEngineException exceptionSettingJobRetriesAsyncNoJobsSpecified() {
     return new ProcessEngineException(exceptionMessage(
         "050",
-        "You must specify at least one of jobIds, jobQuery or one of processInstanceIds, processInstanceQuery, historicProcessInstanceQuery."));
+        "You must specify at least one of jobIds or jobQuery."));
   }
 
-  public ProcessEngineException exceptionSettingJobRetriesAsyncJobsNotSpecifiedCorrectly() {
+  public ProcessEngineException exceptionSettingJobRetriesAsyncNoProcessesSpecified() {
     return new ProcessEngineException(exceptionMessage(
         "051",
-        "You can either specify any of jobIds, jobQuery or any of processInstanceIds, processInstanceQuery, historicProcessInstanceQuery."));
+        "You must specify at least one of or one of processInstanceIds, processInstanceQuery, or historicProcessInstanceQuery."));
   }
 
   public ProcessEngineException exceptionSettingJobRetriesJobsNotSpecifiedCorrectly() {
