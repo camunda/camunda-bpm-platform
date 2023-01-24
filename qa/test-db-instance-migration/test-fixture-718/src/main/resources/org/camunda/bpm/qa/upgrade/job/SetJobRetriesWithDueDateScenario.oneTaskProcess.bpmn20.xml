@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="org.camunda.bpm.engine.test.enginge.test.api.mgmt">
+
+  <process id="createProcessForSetRetriesWithDueDate_718" isExecutable="true">
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="userTask" />
+    <userTask id="userTask" name="First line support" />
+    <sequenceFlow id="flow2" sourceRef="userTask" targetRef="normalEnd" />
+    <endEvent id="normalEnd" />
+    <boundaryEvent id="escalationTimer" cancelActivity="true" attachedToRef="userTask">
+      <timerEventDefinition>
+        <timeDuration>PT4H</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <sequenceFlow id="flow3" sourceRef="escalationTimer" targetRef="escalatedEnd" />
+    <endEvent id="escalatedEnd" />
+  </process>
+  <message id="message" name="message" />
+</definitions>

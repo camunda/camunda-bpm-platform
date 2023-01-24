@@ -16,6 +16,11 @@
  */
 package org.camunda.bpm.qa.upgrade.scenarios7110.gson.batch;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
+import java.util.List;
+
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -23,11 +28,6 @@ import org.camunda.bpm.qa.upgrade.Origin;
 import org.camunda.bpm.qa.upgrade.ScenarioUnderTest;
 import org.junit.Rule;
 import org.junit.Test;
-
-import java.util.List;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
 /**
  * @author Tassilo Weidner
@@ -53,8 +53,11 @@ public class SetJobRetriesBatchTest {
       assertThat(job.getRetries(), is(3));
     }
 
+    String batchId = engineRule.getManagementService().getProperties().get("SetJobRetriesBatchScenario.retries.batchId");
+
     Batch batch = engineRule.getManagementService().createBatchQuery()
       .type(Batch.TYPE_SET_JOB_RETRIES)
+      .batchId(batchId)
       .singleResult();
 
     String jobId = engineRule.getManagementService().createJobQuery()
