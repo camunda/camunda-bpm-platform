@@ -1,6 +1,6 @@
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
-@Library(['camunda-ci', 'cambpm-jenkins-shared-library@3089']) _
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
 
 def failedStageTypes = []
 
@@ -89,7 +89,7 @@ pipeline {
               upstreamProjectName = "/" + env.JOB_NAME
               upstreamBuildNumber = env.BUILD_NUMBER
 
-              if (cambpmWithLabels(false, 'webapp-integration', 'all-as', 'h2', 'websphere', 'weblogic', 'jbosseap', 'run', 'spring-boot', 'authorizations', 'e2e')) {
+              if (env.BRANCH_NAME == cambpmDefaultBranch() || cambpmWithLabels(false, 'webapp-integration', 'all-as', 'h2', 'websphere', 'weblogic', 'jbosseap', 'run', 'spring-boot', 'authorizations', 'e2e')) {
                 cambpmTriggerDownstream(
                   platformVersionDir + "/cambpm-ee/" + eeMainProjectBranch,
                   [string(name: 'UPSTREAM_PROJECT_NAME', value: upstreamProjectName),
@@ -121,7 +121,7 @@ pipeline {
               }
 
               // only execute on version (default) branch (e.g. master, 7.15)
-              if (cambpmWithLabels(false)) {
+              if (env.BRANCH_NAME == cambpmDefaultBranch()) {
                 cambpmRunMaven('.',
                     'org.sonatype.plugins:nexus-staging-maven-plugin:deploy-staged -DaltStagingDirectory=${WORKSPACE}/staging -DskipStaging=true',
                     withCatch: false,
