@@ -77,12 +77,12 @@ public class AuthorizationRestServiceImpl extends AbstractAuthorizedRestResource
 
     }
 
-    final Authentication currentAuthentication = processEngine.getIdentityService().getCurrentAuthentication();
+    final Authentication currentAuthentication = getProcessEngine().getIdentityService().getCurrentAuthentication();
     if(currentAuthentication == null) {
       throw new InvalidRequestException(Status.UNAUTHORIZED, "You must be authenticated in order to use this resource.");
     }
 
-    final AuthorizationService authorizationService = processEngine.getAuthorizationService();
+    final AuthorizationService authorizationService = getProcessEngine().getAuthorizationService();
 
     ResourceUtil resource = new ResourceUtil(resourceName, resourceType);
     ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) getProcessEngine().getProcessEngineConfiguration();
@@ -162,7 +162,7 @@ public class AuthorizationRestServiceImpl extends AbstractAuthorizedRestResource
       resultList = query.list();
     }
 
-    return AuthorizationDto.fromAuthorizationList(resultList, processEngine.getProcessEngineConfiguration());
+    return AuthorizationDto.fromAuthorizationList(resultList, getProcessEngine().getProcessEngineConfiguration());
   }
 
   public CountResultDto getAuthorizationCount(UriInfo uriInfo) {
@@ -177,10 +177,10 @@ public class AuthorizationRestServiceImpl extends AbstractAuthorizedRestResource
   }
 
   public AuthorizationDto createAuthorization(UriInfo context, AuthorizationCreateDto dto) {
-    final AuthorizationService authorizationService = processEngine.getAuthorizationService();
+    final AuthorizationService authorizationService = getProcessEngine().getAuthorizationService();
 
     Authorization newAuthorization = authorizationService.createNewAuthorization(dto.getType());
-    AuthorizationCreateDto.update(dto, newAuthorization, processEngine.getProcessEngineConfiguration());
+    AuthorizationCreateDto.update(dto, newAuthorization, getProcessEngine().getProcessEngineConfiguration());
 
     newAuthorization = authorizationService.saveAuthorization(newAuthorization);
 

@@ -78,7 +78,7 @@ public class ExternalTaskRestServiceImpl extends AbstractRestProcessEngineAware 
       matchingTasks = query.list();
     }
 
-    List<ExternalTaskDto> taskResults = new ArrayList<ExternalTaskDto>();
+    List<ExternalTaskDto> taskResults = new ArrayList<>();
     for (ExternalTask task : matchingTasks) {
       ExternalTaskDto resultInstance = ExternalTaskDto.fromExternalTask(task);
       taskResults.add(resultInstance);
@@ -118,7 +118,7 @@ public class ExternalTaskRestServiceImpl extends AbstractRestProcessEngineAware 
   @Override
   public void fetchAndLock(FetchExternalTasksExtendedDto dto, AsyncResponse asyncResponse) {
     FetchAndLockHandler fetchAndLockHandler = FetchAndLockContextListener.getFetchAndLockHandler();
-    fetchAndLockHandler.addPendingRequest(dto, asyncResponse, processEngine);
+    fetchAndLockHandler.addPendingRequest(dto, asyncResponse, getProcessEngine());
   }
 
   @Override
@@ -152,7 +152,7 @@ public class ExternalTaskRestServiceImpl extends AbstractRestProcessEngineAware 
   @Override
   public List<String> getTopicNames(boolean withLockedTasks, boolean withUnlockedTasks,
                                     boolean withRetriesLeft) {
-    return processEngine.getExternalTaskService()
+    return getProcessEngine().getExternalTaskService()
                         .getTopicNames(withLockedTasks, withUnlockedTasks, withRetriesLeft);
   }
 

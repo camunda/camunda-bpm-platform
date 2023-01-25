@@ -103,7 +103,7 @@ public class GroupResourceImpl extends AbstractIdentityResource implements Group
   }
 
   public GroupMembersResource getGroupMembersResource() {
-    return new GroupMembersResourceImpl(processEngine.getName(), resourceId, rootResourcePath, getObjectMapper());
+    return new GroupMembersResourceImpl(getProcessEngine().getName(), resourceId, rootResourcePath, getObjectMapper());
   }
 
   protected Group findGroupObject() {

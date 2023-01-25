@@ -89,7 +89,7 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
   public FilterResourceImpl(String processEngineName, ObjectMapper objectMapper, String filterId, String relativeRootResourcePath) {
     super(processEngineName, FILTER, filterId, objectMapper);
     this.relativeRootResourcePath = relativeRootResourcePath;
-    filterService = processEngine.getFilterService();
+    filterService = getProcessEngine().getFilterService();
   }
 
   public FilterDto getFilter(Boolean itemCount) {
@@ -125,7 +125,7 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
     Filter filter = getDbFilter();
 
     try {
-      filterDto.updateFilter(filter, processEngine);
+      filterDto.updateFilter(filter, getProcessEngine());
     }
     catch (NotValidException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, e, "Unable to update filter with invalid content");
@@ -351,7 +351,7 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
       String resourceType = getDbFilter().getResourceType();
       AbstractQueryDto<?> queryDto = getQueryDtoForQuery(queryString, resourceType);
       queryDto.setObjectMapper(getObjectMapper());
-      return queryDto.toQuery(processEngine);
+      return queryDto.toQuery(getProcessEngine());
     }
   }
 
@@ -381,7 +381,6 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
     }
   }
 
-  @SuppressWarnings("unchecked")
   protected HalTask convertToHalTask(Task task) {
     HalTask halTask = HalTask.generate(task, getProcessEngine());
     Map<String, List<VariableInstance>> variableInstances = getVariableInstancesForTasks(halTask);

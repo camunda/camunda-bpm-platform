@@ -45,9 +45,9 @@ public class HistoricProcessDefinitionRestServiceImpl extends AbstractRestProces
   public List<HistoricActivityStatisticsDto> getHistoricActivityStatistics(UriInfo uriInfo, String processDefinitionId) {
     HistoricActivityStatisticsQueryDto queryDto = new HistoricActivityStatisticsQueryDto(getObjectMapper(), processDefinitionId, uriInfo.getQueryParameters());
 
-    HistoricActivityStatisticsQuery query = queryDto.toQuery(processEngine);
+    HistoricActivityStatisticsQuery query = queryDto.toQuery(getProcessEngine());
 
-    List<HistoricActivityStatisticsDto> result = new ArrayList<HistoricActivityStatisticsDto>();
+    List<HistoricActivityStatisticsDto> result = new ArrayList<>();
 
     List<HistoricActivityStatistics> statistics = query.unlimitedList();
 
@@ -61,7 +61,7 @@ public class HistoricProcessDefinitionRestServiceImpl extends AbstractRestProces
   @Override
   public List<CleanableHistoricProcessInstanceReportResultDto> getCleanableHistoricProcessInstanceReport(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
     CleanableHistoricProcessInstanceReportDto queryDto = new CleanableHistoricProcessInstanceReportDto(objectMapper, uriInfo.getQueryParameters());
-    CleanableHistoricProcessInstanceReport query = queryDto.toQuery(processEngine);
+    CleanableHistoricProcessInstanceReport query = queryDto.toQuery(getProcessEngine());
 
     List<CleanableHistoricProcessInstanceReportResult> reportResult;
     if (firstResult != null || maxResults != null) {
@@ -87,7 +87,7 @@ public class HistoricProcessDefinitionRestServiceImpl extends AbstractRestProces
   public CountResultDto getCleanableHistoricProcessInstanceReportCount(UriInfo uriInfo) {
     CleanableHistoricProcessInstanceReportDto queryDto = new CleanableHistoricProcessInstanceReportDto(objectMapper, uriInfo.getQueryParameters());
     queryDto.setObjectMapper(objectMapper);
-    CleanableHistoricProcessInstanceReport query = queryDto.toQuery(processEngine);
+    CleanableHistoricProcessInstanceReport query = queryDto.toQuery(getProcessEngine());
 
     long count = query.count();
     CountResultDto result = new CountResultDto();
