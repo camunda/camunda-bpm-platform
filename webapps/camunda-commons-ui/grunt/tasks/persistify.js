@@ -17,7 +17,7 @@
 
 var fs = require('fs');
 var through = require('through2');
-var envify = require('envify/custom');
+var envify = require('@browserify/envify/custom');
 
 // Path is relative to the working dir the grunt task was started from
 var packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
