@@ -75,11 +75,15 @@ import org.junit.Test;
 public class ManagementServiceTest extends PluggableProcessEngineTest {
 
   protected boolean tearDownTelemetry;
+  protected boolean tearDownEnsureJobDueDateNotNull;
 
   @After
   public void tearDown() {
     if (tearDownTelemetry) {
       managementService.toggleTelemetry(false);
+    }
+    if(tearDownEnsureJobDueDateNotNull) {
+      processEngineConfiguration.setEnsureJobDueDateNotNull(false);
     }
   }
 
@@ -325,6 +329,23 @@ public class ManagementServiceTest extends PluggableProcessEngineTest {
     Job updatedJob = managementService.createJobQuery().jobDefinitionId(job.getJobDefinitionId()).singleResult();
     assertThat(updatedJob.getRetries()).isEqualTo(5);
     assertThat(updatedJob.getDuedate()).isEqualTo(job.getDuedate());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
+  @Test
+  public void shouldThrowExceptionOnSetJobRetriesWithNullDuedate() {
+    // given
+    tearDownEnsureJobDueDateNotNull = true;
+    processEngineConfiguration.setEnsureJobDueDateNotNull(true);
+    runtimeService.startProcessInstanceByKey("exceptionInJobExecution");
+
+    List<Job> list = managementService.createJobQuery().list();
+    Job job = list.get(0);
+
+    // when/then
+    assertThatThrownBy(() -> managementService.setJobRetries(5).jobDefinitionId(job.getJobDefinitionId()).dueDate(null).execute())
+      .isInstanceOf(NullValueException.class)
+      .hasMessageContaining("dueDate is null");
   }
 
   @Test

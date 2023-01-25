@@ -30,6 +30,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
+import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 
 /**
@@ -65,6 +66,9 @@ public class SetJobRetriesCmd implements Command<Void>, Serializable {
   }
 
   public Void execute(CommandContext commandContext) {
+    if(commandContext.getProcessEngineConfiguration().isEnsureJobDueDateNotNull()) {
+      EnsureUtil.ensureNotNull(DUE_DATE, dueDate);
+    }
     if (jobId != null) {
       setJobRetriesByJobId(jobId, commandContext);
     } else if(jobDefinitionId != null){

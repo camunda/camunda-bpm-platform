@@ -47,6 +47,9 @@ public abstract class AbstractSetJobsRetriesBatchCmd implements Command<Batch> {
 
     EnsureUtil.ensureNotEmpty(BadUserRequestException.class, "jobIds", elementConfiguration.getIds());
     EnsureUtil.ensureGreaterThanOrEqual("Retries count", retries, 0);
+    if(commandContext.getProcessEngineConfiguration().isEnsureJobDueDateNotNull()) {
+      EnsureUtil.ensureNotNull(BadUserRequestException.class, "dueDate", dueDate);
+    }
 
     return new BatchBuilder(commandContext)
         .config(getConfiguration(elementConfiguration))
