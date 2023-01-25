@@ -7,6 +7,6 @@ module.exports = function(config, localesConfig, pathConfig) {
       onlyProd: 1,
       anOption: 'for production'
     },
-    src: [`${pathConfig.sourceDir}/en.json`]
+    src: [`${pathConfig.sourceDir}/locales/en.json`]
   };
 };
