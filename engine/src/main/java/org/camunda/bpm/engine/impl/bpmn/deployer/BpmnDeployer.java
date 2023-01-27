@@ -300,7 +300,7 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
 
     String tenantId = processDefinition.getTenantId();
 
-    if(isSameMessageEventSubscriptionAlreadyPresent(messageEventDefinition, tenantId)) {
+    if(isSameMessageStartEventSubscriptionAlreadyPresent(messageEventDefinition, tenantId)) {
       throw LOG.messageEventSubscriptionWithSameNameExists(processDefinition.getResourceName(), messageEventDefinition.getUnresolvedEventName());
     }
 
@@ -309,32 +309,28 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
 
   }
 
-  protected boolean isSameMessageEventSubscriptionAlreadyPresent(EventSubscriptionDeclaration eventSubscription, String tenantId) {
+  protected boolean isSameMessageStartEventSubscriptionAlreadyPresent(EventSubscriptionDeclaration eventSubscription,
+                                                                      String tenantId) {
     // look for subscriptions for the same name in db:
-    List<EventSubscriptionEntity> subscriptionsForSameMessageName = getEventSubscriptionManager()
-      .findEventSubscriptionsByNameAndTenantId(EventType.MESSAGE.name(), eventSubscription.getUnresolvedEventName(), tenantId);
+    EventSubscriptionEntity subscriptionForSameMessageName = getEventSubscriptionManager()
+        .findMessageStartEventSubscriptionByNameAndTenantId(eventSubscription.getUnresolvedEventName(), tenantId);
 
     // also look for subscriptions created in the session:
     List<EventSubscriptionEntity> cachedSubscriptions = getDbEntityManager()
-      .getCachedEntitiesByType(EventSubscriptionEntity.class);
+        .getCachedEntitiesByType(EventSubscriptionEntity.class);
 
     for (EventSubscriptionEntity cachedSubscription : cachedSubscriptions) {
+      if (eventSubscription.getUnresolvedEventName().equals(cachedSubscription.getEventName()) &&
+          hasTenantId(cachedSubscription, tenantId) &&
+          !subscriptionForSameMessageName.equals(cachedSubscription) &&
+          !isSubscriptionOfDifferentTypeAsDeclaration(cachedSubscription, eventSubscription)) {
 
-      if(eventSubscription.getUnresolvedEventName().equals(cachedSubscription.getEventName())
-        && hasTenantId(cachedSubscription, tenantId)
-        && !subscriptionsForSameMessageName.contains(cachedSubscription)) {
-
-        subscriptionsForSameMessageName.add(cachedSubscription);
+        subscriptionForSameMessageName = cachedSubscription;
+        break;
       }
     }
 
-    // remove subscriptions deleted in the same command
-    subscriptionsForSameMessageName = getDbEntityManager().pruneDeletedEntities(subscriptionsForSameMessageName);
-
-    // remove subscriptions for different type of event (i.e. remove intermediate message event subscriptions)
-    subscriptionsForSameMessageName = filterSubscriptionsOfDifferentType(eventSubscription, subscriptionsForSameMessageName);
-
-    return !subscriptionsForSameMessageName.isEmpty();
+    return subscriptionForSameMessageName != null && !getDbEntityManager().isDeleted(subscriptionForSameMessageName);
   }
 
   protected boolean hasTenantId(EventSubscriptionEntity cachedSubscription, String tenantId) {
@@ -343,30 +339,6 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
     } else {
       return tenantId.equals(cachedSubscription.getTenantId());
     }
-  }
-
-  /**
-   * It is possible to deploy a process containing a start and intermediate
-   * message event that wait for the same message or to have two processes, one
-   * with a message start event and the other one with a message intermediate
-   * event, that subscribe for the same message. Therefore we have to find out
-   * if there are subscriptions for the other type of event and remove those.
-   *
-   * @param eventSubscription
-   * @param subscriptionsForSameMessageName
-   */
-  protected List<EventSubscriptionEntity> filterSubscriptionsOfDifferentType(EventSubscriptionDeclaration eventSubscription,
-      List<EventSubscriptionEntity> subscriptionsForSameMessageName) {
-    ArrayList<EventSubscriptionEntity> filteredSubscriptions = new ArrayList<EventSubscriptionEntity>(subscriptionsForSameMessageName);
-
-    for (EventSubscriptionEntity subscriptionEntity : new ArrayList<EventSubscriptionEntity>(subscriptionsForSameMessageName)) {
-
-      if (isSubscriptionOfDifferentTypeAsDeclaration(subscriptionEntity, eventSubscription)) {
-        filteredSubscriptions.remove(subscriptionEntity);
-      }
-    }
-
-    return filteredSubscriptions;
   }
 
   protected boolean isSubscriptionOfDifferentTypeAsDeclaration(EventSubscriptionEntity subscriptionEntity,
