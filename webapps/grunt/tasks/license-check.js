@@ -46,7 +46,8 @@ const ALLOWED_PACKAGES = [
   'map-stream@0.1.0', // uses the MIT, but has wrong license field
   'stackframe@0.3.1', // uses the MIT, but has wrong license field
   'argparse@2.0.1',
-  'jetpack-id@1.0.0'
+  'jetpack-id@1.0.0',
+  'caniuse-lite@1.0.30001378' // uses CC BY 4.0, permitted as of https://jira.camunda.com/browse/OB-26
 ];
 
 const parseResults = (ALLOWED_LICENSES, resolve, reject) =>

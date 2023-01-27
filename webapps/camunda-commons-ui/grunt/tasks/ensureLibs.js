@@ -42,6 +42,7 @@ var included = [
   'bpmn-js/lib/NavigatedViewer',
   'camunda-bpm-sdk-js',
   'camunda-bpm-sdk-js/lib/angularjs/index',
+  'camunda-dmn-js',
   'clipboard',
   'cmmn-js',
   'cmmn-js/lib/Viewer',
@@ -53,8 +54,6 @@ var included = [
   'dmn-js-shared/lib/base/Manager',
   'dmn-js-shared/lib/util/DiUtil',
   'dmn-js-shared/lib/util/ModelUtil',
-  'dmn-js',
-  'dmn-js/lib/Modeler',
   'dom4',
   'events',
   'fast-xml-parser',
@@ -83,7 +82,7 @@ module.exports = function(grunt, dirname, licensebookConfig) {
     var browserifyOptions = {
       transform: [
         [
-          'envify',
+          '@browserify/envify',
           {
             global: true,
             NODE_ENV: 'production'

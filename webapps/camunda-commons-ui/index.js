@@ -76,7 +76,7 @@ function requirejsConf(options) {
       'angular-bootstrap': 'angular-ui-bootstrap',
       prismjs: 'vendor/prism',
       'bpmn-io': 'node_modules/bower-bpmn-js/dist/bpmn-navigated-viewer',
-      'dmn-io': 'node_modules/dmn-js/dist/dmn-modeler'
+      'dmn-io': 'node_modules/camunda-dmn-js'
     },
 
     shim: {
