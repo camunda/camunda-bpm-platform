@@ -82,8 +82,7 @@ pipeline {
                   jdkVersion: 'jdk-11-latest')
               },
               postSuccess: {
-                def projectVersion = cambpmUtils.getMavenProjectVersion()
-                projectVersion = projectVersion.substring(0, projectVersion.lastIndexOf('.')) + "-SNAPSHOT"
+                def projectVersion = env.JOB_NAME.split('/')[0] + "-SNAPSHOT"
                 cambpmPublishDocs("\"target/site/apidocs/\"", projectVersion, "javadoc")
               }
             ])
@@ -103,8 +102,7 @@ pipeline {
                   jdkVersion: 'jdk-11-latest')
               },
               postSuccess: {
-                def projectVersion = cambpmUtils.getMavenProjectVersion()
-                projectVersion = projectVersion.substring(0, projectVersion.lastIndexOf('.')) + "-SNAPSHOT"
+                def projectVersion = env.JOB_NAME.split('/')[0] + "-SNAPSHOT"
                 cambpmPublishDocs("\"engine-rest/docs/target/index.html\"", projectVersion, "rest")
               }
             ])
