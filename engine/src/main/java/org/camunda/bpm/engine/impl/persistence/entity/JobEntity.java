@@ -222,6 +222,10 @@ public abstract class JobEntity extends AcquirableJobEntity
       this.execution = execution;
       executionId = execution.getId();
       processInstanceId = execution.getProcessInstanceId();
+      // if the execution is suspended, suspend the job entity as well to prevent unwanted job execution
+      if(execution.isSuspended()) {
+        suspensionState = execution.getSuspensionState();
+      }
       this.execution.addJob(this);
     }
     else {
@@ -626,13 +630,13 @@ public abstract class JobEntity extends AcquirableJobEntity
 
   @Override
   public Set<String> getReferencedEntityIds() {
-    Set<String> referencedEntityIds = new HashSet<String>();
+    Set<String> referencedEntityIds = new HashSet<>();
     return referencedEntityIds;
   }
 
   @Override
   public Map<String, Class> getReferencedEntitiesIdAndClass() {
-    Map<String, Class> referenceIdAndClass = new HashMap<String, Class>();
+    Map<String, Class> referenceIdAndClass = new HashMap<>();
 
     if (exceptionByteArrayId != null) {
       referenceIdAndClass.put(exceptionByteArrayId, ByteArrayEntity.class);
@@ -649,7 +653,7 @@ public abstract class JobEntity extends AcquirableJobEntity
   @Override
   public void postLoad() {
     if (exceptionByteArrayId != null) {
-      persistedDependentEntities = new HashMap<String, Class>();
+      persistedDependentEntities = new HashMap<>();
       persistedDependentEntities.put(exceptionByteArrayId, ByteArrayEntity.class);
     }
     else {
