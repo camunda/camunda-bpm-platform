@@ -359,9 +359,9 @@
           </when>
           <otherwise>
             RES.NAME_ = #{variableName}
+            ${collationForCaseSensitivity}
           </otherwise>
         </choose>
-        ${collationForCaseSensitivity}
       </if>
       <if test="variableNameLike != null">
         and
@@ -371,10 +371,10 @@
           </when>
           <otherwise>
             RES.NAME_ like #{variableNameLike}
+            ${collationForCaseSensitivity}
           </otherwise>
           </choose>
           ESCAPE ${escapeChar}
-          ${collationForCaseSensitivity}
       </if>
       <if test="includeDeleted == false">
         and (RES.STATE_ != 'DELETED' or RES.STATE_ is null)
