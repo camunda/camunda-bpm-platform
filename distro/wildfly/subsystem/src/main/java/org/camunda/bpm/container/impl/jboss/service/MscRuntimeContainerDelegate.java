@@ -28,7 +28,7 @@ import org.camunda.bpm.ProcessEngineService;
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.application.ProcessApplicationReference;
-import org.camunda.bpm.application.impl.ServletProcessApplication;
+import org.camunda.bpm.application.impl.JakartaServletProcessApplication;
 import org.camunda.bpm.container.ExecutorService;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.container.impl.jboss.util.BindingUtil;
@@ -130,13 +130,13 @@ public class MscRuntimeContainerDelegate implements Service<MscRuntimeContainerD
   }
 
   public void deployProcessApplication(AbstractProcessApplication processApplication) {
-    if(processApplication instanceof ServletProcessApplication) {
-      deployServletProcessApplication((ServletProcessApplication)processApplication);
+    if(processApplication instanceof JakartaServletProcessApplication) {
+      deployServletProcessApplication((JakartaServletProcessApplication)processApplication);
     }
   }
 
   @SuppressWarnings("unchecked")
-  protected void deployServletProcessApplication(ServletProcessApplication processApplication) {
+  protected void deployServletProcessApplication(JakartaServletProcessApplication processApplication) {
 
     ClassLoader contextClassloader = ClassLoaderUtil.getContextClassloader();
     String moduleName = ((ModuleClassLoader)contextClassloader).getModule().getIdentifier().toString();

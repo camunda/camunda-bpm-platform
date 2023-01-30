@@ -18,7 +18,7 @@ package org.camunda.bpm.container.impl.jboss.config;
 
 import java.util.Set;
 
-import org.camunda.bpm.engine.impl.cfg.JtaProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.cfg.JakartaProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator;
 import org.camunda.bpm.engine.impl.telemetry.CamundaIntegration;
 
@@ -27,7 +27,7 @@ import org.camunda.bpm.engine.impl.telemetry.CamundaIntegration;
  * @author Daniel Meyer
  *
  */
-public class ManagedJtaProcessEngineConfiguration extends JtaProcessEngineConfiguration {
+public class ManagedJtaProcessEngineConfiguration extends JakartaProcessEngineConfiguration {
 
   public ManagedJtaProcessEngineConfiguration() {
     // override job executor auto activate: set to true in shared engine scenario

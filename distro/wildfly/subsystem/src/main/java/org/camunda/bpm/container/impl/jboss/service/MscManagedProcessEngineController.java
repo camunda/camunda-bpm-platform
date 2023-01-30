@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.container.impl.jboss.service;
 
+import jakarta.transaction.TransactionManager;
 import org.camunda.bpm.container.impl.jboss.config.ManagedJtaProcessEngineConfiguration;
 import org.camunda.bpm.container.impl.jboss.config.ManagedProcessEngineMetadata;
 import org.camunda.bpm.container.impl.jboss.plugin.JBossConnectProcessEnginePlugin;
@@ -28,7 +29,7 @@ import org.camunda.bpm.container.impl.metadata.spi.ProcessEnginePluginXml;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.cfg.JtaProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.cfg.JakartaProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
 import org.jboss.as.connector.subsystems.datasources.DataSourceReferenceFactoryService;
 import org.jboss.as.naming.deployment.ContextNames;
@@ -42,7 +43,6 @@ import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
 
 import javax.sql.DataSource;
-import javax.transaction.TransactionManager;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -76,7 +76,7 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
 
   protected ManagedProcessEngineMetadata processEngineMetadata;
 
-  protected JtaProcessEngineConfiguration processEngineConfiguration;
+  protected JakartaProcessEngineConfiguration processEngineConfiguration;
 
   /**
    * Instantiate  the process engine controller for a process engine configuration.
@@ -181,7 +181,7 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
     processEngine = processEngineConfiguration.buildProcessEngine();
   }
 
-  protected void addProcessEnginePlugins(JtaProcessEngineConfiguration processEngineConfiguration) {
+  protected void addProcessEnginePlugins(JakartaProcessEngineConfiguration processEngineConfiguration) {
     // add process engine plugins:
     List<ProcessEnginePluginXml> pluginConfigurations = processEngineMetadata.getPluginConfigurations();
 
@@ -215,7 +215,7 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
     }
   }
 
-  protected JtaProcessEngineConfiguration createProcessEngineConfiguration() {
+  protected JakartaProcessEngineConfiguration createProcessEngineConfiguration() {
 
     String configurationClassName = ManagedJtaProcessEngineConfiguration.class.getName();
     if(processEngineMetadata.getConfiguration() != null && !processEngineMetadata.getConfiguration().isEmpty()) {
@@ -224,12 +224,12 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
 
     Object configurationObject = createInstance(configurationClassName);
 
-    if (configurationObject instanceof JtaProcessEngineConfiguration) {
-      return (JtaProcessEngineConfiguration) configurationObject;
+    if (configurationObject instanceof JakartaProcessEngineConfiguration) {
+      return (JakartaProcessEngineConfiguration) configurationObject;
 
     } else {
       throw new ProcessEngineException("Configuration class '"+configurationClassName+"' " +
-      		"is not a subclass of " + JtaProcessEngineConfiguration.class.getName());
+      		"is not a subclass of " + JakartaProcessEngineConfiguration.class.getName());
     }
 
   }
