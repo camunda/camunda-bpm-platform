@@ -18,9 +18,7 @@ package org.camunda.bpm.engine.impl.util;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-
 import javax.servlet.ServletContextEvent;
-
 import org.camunda.bpm.engine.ProcessEngine;
 
 /**
@@ -32,6 +30,7 @@ public class ClassLoaderUtil {
   public static ClassLoader getContextClassloader() {
     if(System.getSecurityManager() != null) {
       return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+        @Override
         public ClassLoader run() {
           return Thread.currentThread().getContextClassLoader();
         }
@@ -44,6 +43,7 @@ public class ClassLoaderUtil {
   public static ClassLoader getClassloader(final Class<?> clazz) {
     if(System.getSecurityManager() != null) {
       return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+        @Override
         public ClassLoader run() {
           return clazz.getClassLoader();
         }
@@ -56,6 +56,7 @@ public class ClassLoaderUtil {
   public static void setContextClassloader(final ClassLoader classLoader) {
     if(System.getSecurityManager() != null) {
       AccessController.doPrivileged(new PrivilegedAction<Void>() {
+        @Override
         public Void run() {
           Thread.currentThread().setContextClassLoader(classLoader);
           return null;
@@ -69,6 +70,7 @@ public class ClassLoaderUtil {
   public static ClassLoader getServletContextClassloader(final ServletContextEvent sce) {
     if(System.getSecurityManager() != null) {
       return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+        @Override
         public ClassLoader run() {
           return sce.getServletContext().getClassLoader();
         }
@@ -81,6 +83,7 @@ public class ClassLoaderUtil {
   public static ClassLoader getServletContextClassloader(final jakarta.servlet.ServletContextEvent sce) {
     if(System.getSecurityManager() != null) {
       return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+        @Override
         public ClassLoader run() {
           return sce.getServletContext().getClassLoader();
         }

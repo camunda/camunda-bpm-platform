@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.interceptor;
 
-import java.lang.reflect.UndeclaredThrowableException;
 import javax.transaction.HeuristicMixedException;
 import javax.transaction.HeuristicRollbackException;
 import javax.transaction.InvalidTransactionException;
@@ -26,7 +25,6 @@ import javax.transaction.Status;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
-
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
@@ -35,56 +33,21 @@ import org.camunda.bpm.engine.impl.db.sql.DbSqlSession;
 /**
  * @author Guillaume Nodet
  */
-public class JtaTransactionInterceptor extends CommandInterceptor {
+public class JtaTransactionInterceptor extends AbstractTransactionInterceptor {
 
   protected final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
   protected final TransactionManager transactionManager;
-  protected final boolean requiresNew;
-  protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
   public JtaTransactionInterceptor(TransactionManager transactionManager,
                                    boolean requiresNew,
                                    ProcessEngineConfigurationImpl processEngineConfiguration) {
+    super(requiresNew, processEngineConfiguration);
     this.transactionManager = transactionManager;
-    this.requiresNew = requiresNew;
-    this.processEngineConfiguration = processEngineConfiguration;
   }
 
-  public <T> T execute(Command<T> command) {
-    Transaction oldTx = null;
-    try {
-      boolean existing = isExisting();
-      boolean isNew = !existing || requiresNew;
-      if (existing && requiresNew) {
-        oldTx = doSuspend();
-      }
-      if (isNew) {
-        doBegin();
-      }
-      T result;
-      try {
-        result = next.execute(command);
-      } catch (RuntimeException ex) {
-        doRollback(isNew);
-        throw ex;
-      } catch (Error err) {
-        doRollback(isNew);
-        throw err;
-      } catch (Exception ex) {
-        doRollback(isNew);
-        throw new UndeclaredThrowableException(ex, "TransactionCallback threw undeclared checked exception");
-      }
-      if (isNew) {
-        doCommit();
-      }
-      return result;
-    } finally {
-      doResume(oldTx);
-    }
-  }
-
-  private void doBegin() {
+  @Override
+  protected void doBegin() {
     try {
       transactionManager.begin();
     } catch (NotSupportedException e) {
@@ -94,7 +57,8 @@ public class JtaTransactionInterceptor extends CommandInterceptor {
     }
   }
 
-  private boolean isExisting() {
+  @Override
+  protected boolean isExisting() {
     try {
       return transactionManager.getStatus() != Status.STATUS_NO_TRANSACTION;
     } catch (SystemException e) {
@@ -102,7 +66,8 @@ public class JtaTransactionInterceptor extends CommandInterceptor {
     }
   }
 
-  private Transaction doSuspend() {
+  @Override
+  protected Transaction doSuspend() {
     try {
       return transactionManager.suspend();
     } catch (SystemException e) {
@@ -110,10 +75,11 @@ public class JtaTransactionInterceptor extends CommandInterceptor {
     }
   }
 
-  private void doResume(Transaction tx) {
+  @Override
+  protected void doResume(Object tx) {
     if (tx != null) {
       try {
-        transactionManager.resume(tx);
+        transactionManager.resume((Transaction) tx);
       } catch (SystemException e) {
         throw new TransactionException("Unable to resume transaction", e);
       } catch (InvalidTransactionException e) {
@@ -122,7 +88,8 @@ public class JtaTransactionInterceptor extends CommandInterceptor {
     }
   }
 
-  private void doCommit() {
+  @Override
+  protected void doCommit() {
     try {
       transactionManager.commit();
     } catch (HeuristicMixedException e) {
@@ -149,7 +116,8 @@ public class JtaTransactionInterceptor extends CommandInterceptor {
     }
   }
 
-  private void doRollback(boolean isNew) {
+  @Override
+  protected void doRollback(boolean isNew) {
     try {
       if (isNew) {
         transactionManager.rollback();
@@ -158,25 +126,6 @@ public class JtaTransactionInterceptor extends CommandInterceptor {
       }
     } catch (SystemException e) {
       LOG.exceptionWhileRollingBackTransaction(e);
-    }
-  }
-
-  public static class TransactionException extends RuntimeException {
-    private static final long serialVersionUID = 1L;
-
-    private TransactionException() {
-    }
-
-    private TransactionException(String s) {
-      super(s);
-    }
-
-    private TransactionException(String s, Throwable throwable) {
-      super(s, throwable);
-    }
-
-    private TransactionException(Throwable throwable) {
-      super(throwable);
     }
   }
 }

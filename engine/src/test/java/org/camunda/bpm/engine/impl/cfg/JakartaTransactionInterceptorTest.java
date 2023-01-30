@@ -20,13 +20,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
+import jakarta.transaction.RollbackException;
+import jakarta.transaction.TransactionManager;
 import java.sql.SQLException;
-import javax.transaction.RollbackException;
-import javax.transaction.TransactionManager;
 import org.camunda.bpm.engine.CrdbTransactionRetryException;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
-import org.camunda.bpm.engine.impl.interceptor.JtaTransactionInterceptor;
+import org.camunda.bpm.engine.impl.interceptor.JakartaTransactionInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.TransactionException;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,7 +40,7 @@ import org.mockito.junit.MockitoJUnitRunner;
  * it mocks the involved resources. This is not great, but better than no test.
  */
 @RunWith(MockitoJUnitRunner.class)
-public class JtaTransactionInterceptorTest {
+public class JakartaTransactionInterceptorTest {
 
 
   @Mock
@@ -61,7 +61,7 @@ public class JtaTransactionInterceptorTest {
   public void shouldConvertSqlExceptionToCrdbError() throws Exception {
 
     // given
-    JtaTransactionInterceptor interceptor = new JtaTransactionInterceptor(
+    JakartaTransactionInterceptor interceptor = new JakartaTransactionInterceptor(
         txManager, true, engineConfiguration);
     interceptor.setNext(nextInterceptor);
 
@@ -79,7 +79,7 @@ public class JtaTransactionInterceptorTest {
   public void shoulNotConvertUnrelatedSqlExceptionToCrdbError() throws Exception {
 
     // given
-    JtaTransactionInterceptor interceptor = new JtaTransactionInterceptor(
+    JakartaTransactionInterceptor interceptor = new JakartaTransactionInterceptor(
         txManager, true, engineConfiguration);
     interceptor.setNext(nextInterceptor);
 
@@ -99,7 +99,7 @@ public class JtaTransactionInterceptorTest {
   public void shoulNotConvertGenericRuntimeExceptionToCrdbError() throws Exception {
 
     // given
-    JtaTransactionInterceptor interceptor = new JtaTransactionInterceptor(
+    JakartaTransactionInterceptor interceptor = new JakartaTransactionInterceptor(
         txManager, true, engineConfiguration);
     interceptor.setNext(nextInterceptor);
 

@@ -16,44 +16,36 @@
  */
 package org.camunda.bpm.engine.impl.cfg;
 
-import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.cfg.jta.JakartaTransactionContextFactory;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import org.camunda.bpm.engine.impl.cfg.standalone.StandaloneTransactionContextFactory;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.CommandCounterInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
-import org.camunda.bpm.engine.impl.interceptor.JakartaTransactionInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.LogInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.ProcessApplicationContextInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.TxContextCommandContextFactory;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import jakarta.transaction.TransactionManager;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
-/**
- * @author Tom Baeyens
- */
-public class JakartaProcessEngineConfiguration extends ProcessEngineConfigurationImpl {
-
-  private final static ConfigurationLogger LOG = ProcessEngineLogger.CONFIG_LOGGER;
-
-  protected TransactionManager transactionManager;
+public abstract class AbstractTransactionProcessEngineConfiguration extends ProcessEngineConfigurationImpl {
 
   protected String transactionManagerJndiName;
 
   /** {@link CommandContextFactory} to be used for DbSchemaOperations */
   protected CommandContextFactory dbSchemaOperationsCommandContextFactory;
 
-  public JakartaProcessEngineConfiguration() {
+  public AbstractTransactionProcessEngineConfiguration() {
     transactionsExternallyManaged = true;
   }
 
+  protected abstract CommandInterceptor createTransactionInterceptor(boolean requiresNew);
+
+  protected abstract void initTransactionManager();
+
+  @Override
   protected void init() {
     initTransactionManager();
     initDbSchemaOperationsCommandContextFactory();
@@ -74,7 +66,7 @@ public class JakartaProcessEngineConfiguration extends ProcessEngineConfiguratio
     defaultCommandInterceptorsTxRequired.add(new LogInterceptor());
     defaultCommandInterceptorsTxRequired.add(new CommandCounterInterceptor(this));
     defaultCommandInterceptorsTxRequired.add(new ProcessApplicationContextInterceptor(this));
-    defaultCommandInterceptorsTxRequired.add(new JakartaTransactionInterceptor(transactionManager, false, this));
+    defaultCommandInterceptorsTxRequired.add(createTransactionInterceptor(false));
     defaultCommandInterceptorsTxRequired.add(new CommandContextInterceptor(commandContextFactory, this));
     return defaultCommandInterceptorsTxRequired;
   }
@@ -93,7 +85,7 @@ public class JakartaProcessEngineConfiguration extends ProcessEngineConfiguratio
     defaultCommandInterceptorsTxRequiresNew.add(new LogInterceptor());
     defaultCommandInterceptorsTxRequiresNew.add(new CommandCounterInterceptor(this));
     defaultCommandInterceptorsTxRequiresNew.add(new ProcessApplicationContextInterceptor(this));
-    defaultCommandInterceptorsTxRequiresNew.add(new JakartaTransactionInterceptor(transactionManager, true, this));
+    defaultCommandInterceptorsTxRequiresNew.add(createTransactionInterceptor(true));
     defaultCommandInterceptorsTxRequiresNew.add(new CommandContextInterceptor(commandContextFactory, this, true));
     return defaultCommandInterceptorsTxRequiresNew;
   }
@@ -120,37 +112,6 @@ public class JakartaProcessEngineConfiguration extends ProcessEngineConfiguratio
       cmdContextFactory.setTransactionContextFactory(new StandaloneTransactionContextFactory());
       dbSchemaOperationsCommandContextFactory = cmdContextFactory;
     }
-  }
-
-  protected void initTransactionManager() {
-    if(transactionManager == null){
-
-      if(transactionManagerJndiName == null || transactionManagerJndiName.length() == 0) {
-        throw LOG.invalidConfigTransactionManagerIsNull();
-      }
-
-      try {
-        transactionManager = (TransactionManager) new InitialContext().lookup(transactionManagerJndiName);
-
-      } catch(NamingException e) {
-        throw LOG.invalidConfigCannotFindTransactionManger(transactionManagerJndiName+"'.", e);
-      }
-    }
-  }
-
-  @Override
-  protected void initTransactionContextFactory() {
-    if(transactionContextFactory == null) {
-      transactionContextFactory = new JakartaTransactionContextFactory(transactionManager);
-    }
-  }
-
-  public TransactionManager getTransactionManager() {
-    return transactionManager;
-  }
-
-  public void setTransactionManager(TransactionManager transactionManager) {
-    this.transactionManager = transactionManager;
   }
 
   public String getTransactionManagerJndiName() {

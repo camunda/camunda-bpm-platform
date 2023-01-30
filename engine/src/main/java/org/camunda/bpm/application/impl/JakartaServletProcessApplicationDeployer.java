@@ -16,13 +16,13 @@
  */
 package org.camunda.bpm.application.impl;
 
+import jakarta.servlet.ServletContainerInitializer;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletContextListener;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.HandlesTypes;
 import java.util.HashSet;
 import java.util.Set;
-import javax.servlet.ServletContainerInitializer;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextListener;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.HandlesTypes;
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -34,13 +34,11 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
  * we automatically add the class as {@link ServletContextListener} to the
  * {@link ServletContext}.</p>
  *
- * <p><strong>NOTE:</strong> Only works with Servlet 3.0 or better.</p>
- *
- * @author Daniel Meyer
+ * <p><strong>NOTE:</strong> Only works with Servlet 5.0 or better.</p>
  *
  */
 @HandlesTypes(ProcessApplication.class)
-public class ServletProcessApplicationDeployer implements ServletContainerInitializer {
+public class JakartaServletProcessApplicationDeployer implements ServletContainerInitializer {
 
   private static ProcessApplicationLogger LOG = ProcessEngineLogger.PROCESS_APPLICATION_LOGGER;
 

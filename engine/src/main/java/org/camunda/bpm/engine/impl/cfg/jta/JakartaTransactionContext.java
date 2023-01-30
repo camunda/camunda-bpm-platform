@@ -16,6 +16,11 @@
  */
 package org.camunda.bpm.engine.impl.cfg.jta;
 
+import jakarta.transaction.Status;
+import jakarta.transaction.Synchronization;
+import jakarta.transaction.SystemException;
+import jakarta.transaction.Transaction;
+import jakarta.transaction.TransactionManager;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.TransactionContext;
 import org.camunda.bpm.engine.impl.cfg.TransactionListener;
@@ -24,15 +29,6 @@ import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
-import jakarta.transaction.Status;
-import jakarta.transaction.Synchronization;
-import jakarta.transaction.SystemException;
-import jakarta.transaction.Transaction;
-import jakarta.transaction.TransactionManager;
-
-/**
- * @author Daniel Meyer
- */
 public class JakartaTransactionContext implements TransactionContext {
 
   public final static TransactionLogger LOG = ProcessEngineLogger.TX_LOGGER;
@@ -43,10 +39,12 @@ public class JakartaTransactionContext implements TransactionContext {
     this.transactionManager = transactionManager;
   }
 
+  @Override
   public void commit() {
     // managed transaction, ignore
   }
 
+  @Override
   public void rollback() {
     // managed transaction, mark rollback-only if not done so already.
     try {
@@ -70,6 +68,7 @@ public class JakartaTransactionContext implements TransactionContext {
     }
   }
 
+  @Override
   public void addTransactionListener(TransactionState transactionState, final TransactionListener transactionListener) {
     Transaction transaction = getTransaction();
     CommandContext commandContext = Context.getCommandContext();
@@ -93,6 +92,7 @@ public class JakartaTransactionContext implements TransactionContext {
       this.commandContext = commandContext;
     }
 
+    @Override
     public void beforeCompletion() {
       if(TransactionState.COMMITTING.equals(transactionState)
          || TransactionState.ROLLINGBACK.equals(transactionState)) {
@@ -100,6 +100,7 @@ public class JakartaTransactionContext implements TransactionContext {
       }
     }
 
+    @Override
     public void afterCompletion(int status) {
       if(Status.STATUS_ROLLEDBACK == status && TransactionState.ROLLED_BACK.equals(transactionState)) {
         transactionListener.execute(commandContext);
@@ -110,6 +111,7 @@ public class JakartaTransactionContext implements TransactionContext {
 
   }
 
+  @Override
   public boolean isTransactionActive() {
     try {
       return transactionManager.getStatus() != Status.STATUS_MARKED_ROLLBACK && transactionManager.getStatus() != Status.STATUS_NO_TRANSACTION;

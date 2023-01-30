@@ -16,15 +16,11 @@
  */
 package org.camunda.bpm.engine.impl.cfg.jta;
 
+import jakarta.transaction.TransactionManager;
 import org.camunda.bpm.engine.impl.cfg.TransactionContext;
 import org.camunda.bpm.engine.impl.cfg.TransactionContextFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
-import jakarta.transaction.TransactionManager;
-
-/**
- * @author Daniel Meyer
- */
 public class JakartaTransactionContextFactory implements TransactionContextFactory {
 
   protected final TransactionManager transactionManager;
@@ -33,6 +29,7 @@ public class JakartaTransactionContextFactory implements TransactionContextFacto
     this.transactionManager = transactionManager;
   }
 
+  @Override
   public TransactionContext openTransactionContext(CommandContext commandContext) {
     return new JakartaTransactionContext(transactionManager);
   }
