@@ -104,7 +104,7 @@ public class ProcessApplicationProcessor implements DeploymentUnitProcessor {
       processApplicationAnnotations = compositeIndex.getAnnotations(DotName.createSimple(ProcessApplication.class.getName()));
       postDeployAnnnotations = compositeIndex.getAnnotations(DotName.createSimple(PostDeploy.class.getName()));
       preUndeployAnnnotations = compositeIndex.getAnnotations(DotName.createSimple(PreUndeploy.class.getName()));
-      servletProcessApplications = compositeIndex.getAllKnownSubclasses(DotName.createSimple(ServletProcessApplication.class.getName()));
+      servletProcessApplications = compositeIndex.getAllKnownSubclasses(DotName.createSimple(JakartaServletProcessApplication.class.getName()));
     } else {
       return null;
     }
