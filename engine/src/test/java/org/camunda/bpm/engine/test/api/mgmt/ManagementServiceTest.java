@@ -333,7 +333,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTest {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
   @Test
-  public void shouldThrowExceptionOnSetJobRetriesWithNullDuedate() {
+  public void shouldSetDueDateOnSetJobRetriesWithNullDuedateWhenEnsureDueDateNotNull() {
     // given
     tearDownEnsureJobDueDateNotNull = true;
     processEngineConfiguration.setEnsureJobDueDateNotNull(true);
@@ -342,10 +342,12 @@ public class ManagementServiceTest extends PluggableProcessEngineTest {
     List<Job> list = managementService.createJobQuery().list();
     Job job = list.get(0);
 
-    // when/then
-    assertThatThrownBy(() -> managementService.setJobRetries(5).jobDefinitionId(job.getJobDefinitionId()).dueDate(null).execute())
-      .isInstanceOf(NullValueException.class)
-      .hasMessageContaining("dueDate is null");
+    // when
+    managementService.setJobRetries(5).jobDefinitionId(job.getJobDefinitionId()).dueDate(null).execute();
+
+    // then
+    job = managementService.createJobQuery().jobId(job.getId()).singleResult();
+    assertThat(job.getDuedate()).isNotNull();
   }
 
   @Test

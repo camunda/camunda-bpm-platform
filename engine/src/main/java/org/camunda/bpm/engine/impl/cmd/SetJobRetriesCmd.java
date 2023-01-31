@@ -30,7 +30,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
-import org.camunda.bpm.engine.impl.util.EnsureUtil;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 
 /**
@@ -47,7 +47,7 @@ public class SetJobRetriesCmd implements Command<Void>, Serializable {
   protected final String jobDefinitionId;
   protected final List<String> jobIds;
   protected final int retries;
-  protected final Date dueDate;
+  protected Date dueDate;
 
   public SetJobRetriesCmd(String jobId, String jobDefinitionId, int retries, Date dueDate) {
     this.jobId = jobId;
@@ -66,8 +66,8 @@ public class SetJobRetriesCmd implements Command<Void>, Serializable {
   }
 
   public Void execute(CommandContext commandContext) {
-    if(commandContext.getProcessEngineConfiguration().isEnsureJobDueDateNotNull()) {
-      EnsureUtil.ensureNotNull(DUE_DATE, dueDate);
+    if(dueDate == null && commandContext.getProcessEngineConfiguration().isEnsureJobDueDateNotNull()) {
+      dueDate = ClockUtil.getCurrentTime();
     }
     if (jobId != null) {
       setJobRetriesByJobId(jobId, commandContext);

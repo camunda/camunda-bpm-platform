@@ -31,6 +31,7 @@ import org.camunda.bpm.engine.impl.batch.builder.BatchBuilder;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 /**
@@ -47,8 +48,8 @@ public abstract class AbstractSetJobsRetriesBatchCmd implements Command<Batch> {
 
     EnsureUtil.ensureNotEmpty(BadUserRequestException.class, "jobIds", elementConfiguration.getIds());
     EnsureUtil.ensureGreaterThanOrEqual("Retries count", retries, 0);
-    if(commandContext.getProcessEngineConfiguration().isEnsureJobDueDateNotNull()) {
-      EnsureUtil.ensureNotNull(BadUserRequestException.class, "dueDate", dueDate);
+    if(dueDate == null && commandContext.getProcessEngineConfiguration().isEnsureJobDueDateNotNull()) {
+      dueDate = ClockUtil.getCurrentTime();
     }
 
     return new BatchBuilder(commandContext)
