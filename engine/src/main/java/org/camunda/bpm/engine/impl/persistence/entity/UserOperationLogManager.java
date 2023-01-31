@@ -62,13 +62,13 @@ public class UserOperationLogManager extends AbstractHistoricManager {
   }
 
   public long findOperationLogEntryCountByQueryCriteria(UserOperationLogQueryImpl query) {
-    getAuthorizationManager().configureUserOperationLogQuery(query);
+    configureQuery(query);
     return (Long) getDbEntityManager().selectOne("selectUserOperationLogEntryCountByQueryCriteria", query);
   }
 
   @SuppressWarnings("unchecked")
   public List<UserOperationLogEntry> findOperationLogEntriesByQueryCriteria(UserOperationLogQueryImpl query, Page page) {
-    getAuthorizationManager().configureUserOperationLogQuery(query);
+    configureQuery(query);
     return getDbEntityManager().selectList("selectUserOperationLogEntriesByQueryCriteria", query, page);
   }
 
@@ -665,32 +665,34 @@ public class UserOperationLogManager extends AbstractHistoricManager {
     }
   }
 
-  public void logSetAnnotationOperation(String operationId) {
-    logAnnotationOperation(operationId, EntityTypes.OPERATION_LOG, "operationId", UserOperationLogEntry.OPERATION_TYPE_SET_ANNOTATION);
+  public void logSetAnnotationOperation(String operationId, String tenantId) {
+    logAnnotationOperation(operationId, EntityTypes.OPERATION_LOG, "operationId", UserOperationLogEntry.OPERATION_TYPE_SET_ANNOTATION, tenantId);
   }
 
-  public void logClearAnnotationOperation(String operationId) {
-    logAnnotationOperation(operationId, EntityTypes.OPERATION_LOG, "operationId", UserOperationLogEntry.OPERATION_TYPE_CLEAR_ANNOTATION);
+  public void logClearAnnotationOperation(String operationId, String tenantId) {
+    logAnnotationOperation(operationId, EntityTypes.OPERATION_LOG, "operationId", UserOperationLogEntry.OPERATION_TYPE_CLEAR_ANNOTATION, tenantId);
   }
 
-  public void logSetIncidentAnnotationOperation(String incidentId) {
-    logAnnotationOperation(incidentId, EntityTypes.INCIDENT, "incidentId", UserOperationLogEntry.OPERATION_TYPE_SET_ANNOTATION);
+  public void logSetIncidentAnnotationOperation(String incidentId, String tenantId) {
+    logAnnotationOperation(incidentId, EntityTypes.INCIDENT, "incidentId", UserOperationLogEntry.OPERATION_TYPE_SET_ANNOTATION, tenantId);
   }
 
-  public void logClearIncidentAnnotationOperation(String incidentId) {
-    logAnnotationOperation(incidentId, EntityTypes.INCIDENT, "incidentId", UserOperationLogEntry.OPERATION_TYPE_CLEAR_ANNOTATION);
+  public void logClearIncidentAnnotationOperation(String incidentId, String tenantId) {
+    logAnnotationOperation(incidentId, EntityTypes.INCIDENT, "incidentId", UserOperationLogEntry.OPERATION_TYPE_CLEAR_ANNOTATION, tenantId);
   }
 
-  protected void logAnnotationOperation(String id, String type, String idProperty, String operationType) {
+  protected void logAnnotationOperation(String id, String type, String idProperty, String operationType, String tenantId) {
     if (isUserOperationLogEnabled()) {
 
       UserOperationLogContextEntryBuilder entryBuilder =
           UserOperationLogContextEntryBuilder.entry(operationType, type)
               .propertyChanges(new PropertyChange(idProperty, null, id))
-              .category(UserOperationLogEntry.CATEGORY_OPERATOR);
+              .category(UserOperationLogEntry.CATEGORY_OPERATOR)
+              .tenantId(tenantId);
 
       UserOperationLogContext context = new UserOperationLogContext();
       context.addEntry(entryBuilder.create());
+
 
       fireUserOperationLog(context);
     }
@@ -790,6 +792,11 @@ public class UserOperationLogManager extends AbstractHistoricManager {
     default:
       return null;
     }
+  }
+
+  protected void configureQuery(UserOperationLogQueryImpl query) {
+    getAuthorizationManager().configureUserOperationLogQuery(query);
+    getTenantManager().configureQuery(query);
   }
 
 }

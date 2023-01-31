@@ -323,4 +323,9 @@ public class UserOperationLogContextEntryBuilder {
     entry.setAnnotation(annotation);
     return this;
   }
+
+  public UserOperationLogContextEntryBuilder tenantId(String tenantId) {
+    entry.setTenantId(tenantId);
+    return this;
+  }
 }

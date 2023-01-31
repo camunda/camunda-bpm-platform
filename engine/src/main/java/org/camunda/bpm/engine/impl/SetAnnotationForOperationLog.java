@@ -63,11 +63,11 @@ public class SetAnnotationForOperationLog implements Command<Void> {
 
     if (annotation == null) {
       commandContext.getOperationLogManager()
-          .logClearAnnotationOperation(operationId);
+          .logClearAnnotationOperation(operationId, operationLogEntry.getTenantId());
 
     } else {
       commandContext.getOperationLogManager()
-          .logSetAnnotationOperation(operationId);
+          .logSetAnnotationOperation(operationId, operationLogEntry.getTenantId());
     }
 
     return null;
