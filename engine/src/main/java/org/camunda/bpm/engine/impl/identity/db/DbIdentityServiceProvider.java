@@ -55,11 +55,12 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
 
   // users ////////////////////////////////////////////////////////
 
+  @Override
   public UserEntity createNewUser(String userId) {
-    checkAuthorization(Permissions.CREATE, Resources.USER, null);
     return new UserEntity(userId);
   }
 
+  @Override
   public IdentityOperationResult saveUser(User user) {
     UserEntity userEntity = (UserEntity) user;
 
@@ -81,6 +82,7 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
     return new IdentityOperationResult(userEntity, operation);
   }
 
+  @Override
   public IdentityOperationResult deleteUser(final String userId) {
     checkAuthorization(Permissions.DELETE, Resources.USER, userId);
     UserEntity user = findUserById(userId);
@@ -109,6 +111,7 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
     return new IdentityOperationResult(null, IdentityOperationResult.OPERATION_NONE);
   }
 
+  @Override
   public boolean checkPassword(String userId, String password) {
     UserEntity user = findUserById(userId);
     if (user == null || password == null) {
@@ -168,6 +171,7 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
     getIdentityInfoManager().updateUserLock(user, attempts, lockExpirationTime);
   }
 
+  @Override
   public IdentityOperationResult unlockUser(String userId) {
     UserEntity user = findUserById(userId);
     if(user != null) {
@@ -186,11 +190,12 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
 
   // groups ////////////////////////////////////////////////////////
 
+  @Override
   public GroupEntity createNewGroup(String groupId) {
-    checkAuthorization(Permissions.CREATE, Resources.GROUP, null);
     return new GroupEntity(groupId);
   }
 
+  @Override
   public IdentityOperationResult saveGroup(Group group) {
     GroupEntity groupEntity = (GroupEntity) group;
     String operation = null;
@@ -207,6 +212,7 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
     return new IdentityOperationResult(groupEntity, operation);
   }
 
+  @Override
   public IdentityOperationResult deleteGroup(final String groupId) {
     checkAuthorization(Permissions.DELETE, Resources.GROUP, groupId);
     GroupEntity group = findGroupById(groupId);
@@ -236,11 +242,12 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
 
   // tenants //////////////////////////////////////////////////////
 
+  @Override
   public Tenant createNewTenant(String tenantId) {
-    checkAuthorization(Permissions.CREATE, Resources.TENANT, null);
     return new TenantEntity(tenantId);
   }
 
+  @Override
   public IdentityOperationResult saveTenant(Tenant tenant) {
     TenantEntity tenantEntity = (TenantEntity) tenant;
     String operation = null;
@@ -257,6 +264,7 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
     return new IdentityOperationResult(tenantEntity, operation);
   }
 
+  @Override
   public IdentityOperationResult deleteTenant(String tenantId) {
     checkAuthorization(Permissions.DELETE, Resources.TENANT, tenantId);
     TenantEntity tenant = findTenantById(tenantId);
@@ -272,6 +280,7 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
 
   // membership //////////////////////////////////////////////////////
 
+  @Override
   public IdentityOperationResult createMembership(String userId, String groupId) {
     checkAuthorization(Permissions.CREATE, Resources.GROUP_MEMBERSHIP, groupId);
     UserEntity user = findUserById(userId);
@@ -286,12 +295,13 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
     return new IdentityOperationResult(null, IdentityOperationResult.OPERATION_CREATE);
   }
 
+  @Override
   public IdentityOperationResult deleteMembership(String userId, String groupId) {
     checkAuthorization(Permissions.DELETE, Resources.GROUP_MEMBERSHIP, groupId);
     if (existsMembership(userId, groupId)) {
       deleteAuthorizations(Resources.GROUP_MEMBERSHIP, groupId);
-  
-      Map<String, Object> parameters = new HashMap<String, Object>();
+
+      Map<String, Object> parameters = new HashMap<>();
       parameters.put("userId", userId);
       parameters.put("groupId", groupId);
       getDbEntityManager().delete(MembershipEntity.class, "deleteMembership", parameters);
@@ -308,6 +318,7 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
     getDbEntityManager().delete(MembershipEntity.class, "deleteMembershipsByGroupId", groupId);
   }
 
+  @Override
   public IdentityOperationResult createTenantUserMembership(String tenantId, String userId) {
     checkAuthorization(Permissions.CREATE, Resources.TENANT_MEMBERSHIP, tenantId);
 
@@ -327,6 +338,7 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
     return new IdentityOperationResult(null, IdentityOperationResult.OPERATION_CREATE);
   }
 
+  @Override
   public IdentityOperationResult createTenantGroupMembership(String tenantId, String groupId) {
     checkAuthorization(Permissions.CREATE, Resources.TENANT_MEMBERSHIP, tenantId);
 
@@ -346,14 +358,15 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
     return new IdentityOperationResult(null, IdentityOperationResult.OPERATION_CREATE);
   }
 
+  @Override
   public IdentityOperationResult deleteTenantUserMembership(String tenantId, String userId) {
     checkAuthorization(Permissions.DELETE, Resources.TENANT_MEMBERSHIP, tenantId);
     if (existsTenantMembership(tenantId, userId, null)) {
       deleteAuthorizations(Resources.TENANT_MEMBERSHIP, userId);
-  
+
       deleteAuthorizationsForUser(Resources.TENANT, tenantId, userId);
-  
-      Map<String, Object> parameters = new HashMap<String, Object>();
+
+      Map<String, Object> parameters = new HashMap<>();
       parameters.put("tenantId", tenantId);
       parameters.put("userId", userId);
       getDbEntityManager().delete(TenantMembershipEntity.class, "deleteTenantMembership", parameters);
@@ -362,15 +375,16 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
     return new IdentityOperationResult(null, IdentityOperationResult.OPERATION_NONE);
   }
 
+  @Override
   public IdentityOperationResult deleteTenantGroupMembership(String tenantId, String groupId) {
     checkAuthorization(Permissions.DELETE, Resources.TENANT_MEMBERSHIP, tenantId);
-    
+
     if (existsTenantMembership(tenantId, null, groupId)) {
       deleteAuthorizations(Resources.TENANT_MEMBERSHIP, groupId);
-  
+
       deleteAuthorizationsForGroup(Resources.TENANT, tenantId, groupId);
-  
-      Map<String, Object> parameters = new HashMap<String, Object>();
+
+      Map<String, Object> parameters = new HashMap<>();
       parameters.put("tenantId", tenantId);
       parameters.put("groupId", groupId);
       getDbEntityManager().delete(TenantMembershipEntity.class, "deleteTenantMembership", parameters);
