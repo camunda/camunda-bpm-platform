@@ -45,9 +45,9 @@ public class MigrateSuspendedInstanceTest {
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testHelper);
 
-  RuntimeService runtimeService;
-  RepositoryService repositoryService;
-  ManagementService managementService;
+  protected RuntimeService runtimeService;
+  protected RepositoryService repositoryService;
+  protected ManagementService managementService;
 
   @Before
   public void setup() {
@@ -60,14 +60,27 @@ public class MigrateSuspendedInstanceTest {
   public void shouldNotExecuteTimerJobAfterMigrateSuspendedInstance() {
     // given
     // process instance with single user task
-    BpmnModelInstance modelInstanceVersion1 = Bpmn.createExecutableProcess("processId").startEvent().userTask("userTask").endEvent().done();
+    BpmnModelInstance modelInstanceVersion1 = Bpmn.createExecutableProcess("processId")
+        .startEvent()
+        .userTask("userTask")
+        .endEvent()
+        .done();
     ProcessDefinition definition1 = testHelper.deployAndGetDefinition(modelInstanceVersion1);
     ProcessInstance processInstance1 = runtimeService.startProcessInstanceById(definition1.getId());
     // suspend instance, jobs belonging to suspended instances should not execute
     runtimeService.suspendProcessInstanceById(processInstance1.getId());
 
     // version two has a cycle timer
-    BpmnModelInstance modelInstanceVersion2 = Bpmn.createExecutableProcess("processId").startEvent().userTask("userTask").endEvent().moveToActivity("userTask").boundaryEvent().cancelActivity(false).timerWithCycle("R3/PT5S").endEvent().done();
+    BpmnModelInstance modelInstanceVersion2 = Bpmn.createExecutableProcess("processId")
+        .startEvent()
+        .userTask("userTask")
+        .endEvent()
+        .moveToActivity("userTask")
+        .boundaryEvent()
+        .cancelActivity(false)
+        .timerWithCycle("R3/PT5S")
+        .endEvent()
+        .done();
     ProcessDefinition definition2 = testHelper.deployAndGetDefinition(modelInstanceVersion2);
 
     // migrate process instance to version 2

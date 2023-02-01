@@ -86,7 +86,9 @@ public abstract class JobDeclaration<S, T extends JobEntity> implements Serializ
       if(jobDefinition != null) {
         // if job definition is suspended while creating a job instance,
         // suspend the job instance right away:
-        job.setSuspensionState(jobDefinition.getSuspensionState());
+        if(jobDefinition.isSuspended()) {
+          job.setSuspensionState(jobDefinition.getSuspensionState());
+        }
         job.setProcessDefinitionKey(jobDefinition.getProcessDefinitionKey());
         job.setProcessDefinitionId(jobDefinition.getProcessDefinitionId());
         job.setTenantId(jobDefinition.getTenantId());
