@@ -2,7 +2,7 @@
 <assembly xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xmlns="urn:maven:assembly:1.1.2">
 
-  <id>wildfly</id>
+  <id>wildfly-jakarta</id>
 
   <formats>
     <format>war</format>
@@ -20,15 +20,16 @@
   <dependencySets>
     <dependencySet>
       <outputDirectory>/</outputDirectory>
+      <useProjectAttachments>true</useProjectAttachments>
       <includes>
-        <include>org.camunda.bpm:camunda-engine-rest:war</include>
+        <include>org.camunda.bpm:camunda-engine-rest:war:jakarta</include>
       </includes>
       <unpack>true</unpack>
       <unpackOptions>
         <excludes>
           <exclude>**/jboss-deployment-structure.xml</exclude>
           <exclude>**/web.xml</exclude>
-          <exclude>WEB-INF/lib/camunda-engine-rest-core-${project.version}-jakarta.jar</exclude>
+          <exclude>WEB-INF/lib/camunda-engine-rest-core-${project.version}.jar</exclude>
         </excludes>
       </unpackOptions>
     </dependencySet>

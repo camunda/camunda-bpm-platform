@@ -82,7 +82,7 @@
       <artifactId>camunda-commons-logging</artifactId>
       <scope>provided</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>javax.activation</groupId>
       <artifactId>activation</artifactId>
@@ -97,7 +97,7 @@
     </dependency>
 
     <!--
-      needed for offline shrinkwrap (in particular CustomJacksonDateFormatTest), 
+      needed for offline shrinkwrap (in particular CustomJacksonDateFormatTest),
       BOMs must be installed before this module is built
     -->
     <dependency>
@@ -291,7 +291,7 @@
           </systemPropertyVariables>
         </configuration>
       </plugin>
-      
+
       <plugin>
         <groupId>org.jboss.shrinkwrap.resolver</groupId>
         <artifactId>shrinkwrap-resolver-maven-plugin</artifactId>
@@ -304,6 +304,32 @@
           </execution>
         </executions>
       </plugin>
+
+      <plugin>
+        <groupId>org.eclipse.transformer</groupId>
+        <artifactId>transformer-maven-plugin</artifactId>
+        <version>0.5.0</version>
+        <configuration>
+          <rules>
+            <jakartaDefaults>true</jakartaDefaults>
+          </rules>
+          <classifier>jakarta</classifier>
+          <artifact>
+            <groupId>org.camunda.bpm</groupId>
+            <artifactId>camunda-engine-rest-core</artifactId>
+            <version>${project.version}</version>
+          </artifact>
+        </configuration>
+        <executions>
+          <execution>
+            <id>transform-jar</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
     </plugins>
   </build>
 
@@ -353,7 +379,7 @@
             </exclusion>
           </exclusions>
         </dependency>
-        
+
         <dependency>
           <groupId>io.netty</groupId>
           <artifactId>netty-all</artifactId>
@@ -543,7 +569,7 @@
           <version>2.0.1</version>
           <scope>provided</scope>
         </dependency>
-        
+
         <dependency>
           <groupId>org.apache.cxf</groupId>
           <artifactId>cxf-rt-frontend-jaxrs</artifactId>
