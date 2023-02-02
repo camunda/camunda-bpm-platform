@@ -43,7 +43,7 @@ import org.junit.Test;
 import org.junit.rules.RuleChain;
 
 @RequiredHistoryLevel(HISTORY_FULL)
-public class MultiTenancyUserOperationLogTest {
+public class MultiTenancyUserOperationLogTenantCheckTest {
 
   protected static final String USER_ID = "aUserId";
   protected static final String USER_WITHOUT_TENANT = "aUserId1";

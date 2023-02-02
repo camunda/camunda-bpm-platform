@@ -32,6 +32,7 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeleteDeploymentFailListener;
+import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.UserOperationLogManager;
 
@@ -67,7 +68,9 @@ public class DeleteDeploymentCmd implements Command<Void>, Serializable {
 
     UserOperationLogManager logManager = commandContext.getOperationLogManager();
     List<PropertyChange> propertyChanges = Arrays.asList(new PropertyChange("cascade", null, cascade));
-    logManager.logDeploymentOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE, deploymentId, propertyChanges);
+    DeploymentEntity deployment = commandContext.getDeploymentManager().findDeploymentById(deploymentId);
+    String tenantId = deployment != null ? deployment.getTenantId() : null;
+    logManager.logDeploymentOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE, deploymentId, tenantId, propertyChanges);
 
     commandContext
       .getDeploymentManager()

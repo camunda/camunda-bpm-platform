@@ -169,6 +169,8 @@ public class UserOperationLogManager extends AbstractHistoricManager {
       UserOperationLogContextEntryBuilder entryBuilder =
           UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.TENANT)
             .category(UserOperationLogEntry.CATEGORY_ADMIN)
+            // TODO
+//            .tenantId(tenantId)
             .propertyChanges(new PropertyChange("tenantId", null, tenantId));
 
       context.addEntry(entryBuilder.create());
@@ -318,7 +320,7 @@ public class UserOperationLogManager extends AbstractHistoricManager {
     }
   }
 
-  public void logCaseInstanceOperation(String operation, String caseInstanceId, List<PropertyChange> propertyChanges) {
+  public void logCaseInstanceOperation(String operation, String caseInstanceId, String tenantId, List<PropertyChange> propertyChanges) {
     if (isUserOperationLogEnabled()) {
 
       UserOperationLogContext context = new UserOperationLogContext();
@@ -326,6 +328,7 @@ public class UserOperationLogManager extends AbstractHistoricManager {
         UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.CASE_INSTANCE)
           .caseInstanceId(caseInstanceId)
           .propertyChanges(propertyChanges)
+          .tenantId(tenantId)
           .category(UserOperationLogEntry.CATEGORY_OPERATOR);
 
       context.addEntry(entryBuilder.create());
@@ -333,7 +336,7 @@ public class UserOperationLogManager extends AbstractHistoricManager {
     }
   }
 
-  public void logCaseDefinitionOperation(String operation, String caseDefinitionId, List<PropertyChange> propertyChanges) {
+  public void logCaseDefinitionOperation(String operation, String caseDefinitionId, String tenantId, List<PropertyChange> propertyChanges) {
     if (isUserOperationLogEnabled()) {
 
       UserOperationLogContext context = new UserOperationLogContext();
@@ -341,6 +344,7 @@ public class UserOperationLogManager extends AbstractHistoricManager {
         UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.CASE_DEFINITION)
           .propertyChanges(propertyChanges)
           .caseDefinitionId(caseDefinitionId)
+          .tenantId(tenantId)
           .category(UserOperationLogEntry.CATEGORY_OPERATOR);
 
       context.addEntry(entryBuilder.create());
@@ -348,13 +352,14 @@ public class UserOperationLogManager extends AbstractHistoricManager {
     }
   }
 
-  public void logDecisionDefinitionOperation(String operation, List<PropertyChange> propertyChanges) {
+  public void logDecisionDefinitionOperation(String operation, String tenantId, List<PropertyChange> propertyChanges) {
     if (isUserOperationLogEnabled()) {
 
       UserOperationLogContext context = new UserOperationLogContext();
       UserOperationLogContextEntryBuilder entryBuilder =
         UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.DECISION_DEFINITION)
           .propertyChanges(propertyChanges)
+          .tenantId(tenantId)
           .category(UserOperationLogEntry.CATEGORY_OPERATOR);
 
       context.addEntry(entryBuilder.create());
@@ -535,7 +540,7 @@ public class UserOperationLogManager extends AbstractHistoricManager {
     }
   }
 
-  public void logDeploymentOperation(String operation, String deploymentId, List<PropertyChange> propertyChanges) {
+  public void logDeploymentOperation(String operation, String deploymentId, String tenantId, List<PropertyChange> propertyChanges) {
     if(isUserOperationLogEnabled()) {
 
       UserOperationLogContext context = new UserOperationLogContext();
@@ -543,6 +548,7 @@ public class UserOperationLogManager extends AbstractHistoricManager {
       UserOperationLogContextEntryBuilder entryBuilder =
           UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.DEPLOYMENT)
             .deploymentId(deploymentId)
+            .tenantId(tenantId)
             .propertyChanges(propertyChanges)
             .category(UserOperationLogEntry.CATEGORY_OPERATOR);
 
@@ -552,20 +558,21 @@ public class UserOperationLogManager extends AbstractHistoricManager {
 
   }
 
-  public void logBatchOperation(String operation, List<PropertyChange> propertyChange) {
-    logBatchOperation(operation, null, propertyChange);
+  public void logBatchOperation(String operation, String tenantId, List<PropertyChange> propertyChange) {
+    logBatchOperation(operation, null, tenantId, propertyChange);
   }
 
-  public void logBatchOperation(String operation, String batchId, PropertyChange propertyChange) {
-    logBatchOperation(operation, batchId, Collections.singletonList(propertyChange));
+  public void logBatchOperation(String operation, String batchId, String tenantId, PropertyChange propertyChange) {
+    logBatchOperation(operation, batchId, tenantId, Collections.singletonList(propertyChange));
   }
 
-  public void logBatchOperation(String operation, String batchId, List<PropertyChange> propertyChanges) {
+  public void logBatchOperation(String operation, String batchId, String tenantId, List<PropertyChange> propertyChanges) {
     if(isUserOperationLogEnabled()) {
       UserOperationLogContext context = new UserOperationLogContext();
       UserOperationLogContextEntryBuilder entryBuilder =
         UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.BATCH)
           .batchId(batchId)
+          .tenantId(tenantId)
           .propertyChanges(propertyChanges)
           .category(UserOperationLogEntry.CATEGORY_OPERATOR);
 
@@ -575,12 +582,13 @@ public class UserOperationLogManager extends AbstractHistoricManager {
     }
   }
 
-  public void logDecisionInstanceOperation(String operation, List<PropertyChange> propertyChanges) {
+  public void logDecisionInstanceOperation(String operation, String tenantId, List<PropertyChange> propertyChanges) {
     if(isUserOperationLogEnabled()) {
       UserOperationLogContext context = new UserOperationLogContext();
       UserOperationLogContextEntryBuilder entryBuilder =
         UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.DECISION_INSTANCE)
           .propertyChanges(propertyChanges)
+          .tenantId(tenantId)
           .category(UserOperationLogEntry.CATEGORY_OPERATOR);
 
       context.addEntry(entryBuilder.create());

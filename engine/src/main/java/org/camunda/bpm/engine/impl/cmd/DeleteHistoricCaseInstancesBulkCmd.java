@@ -56,9 +56,10 @@ public class DeleteHistoricCaseInstancesBulkCmd implements Command<Void>, Serial
       }
     });
 
-    commandContext.getOperationLogManager().logCaseInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY, 
-        null, Collections.singletonList(new PropertyChange("nrOfInstances", null, caseInstanceIds.size())));
-    
+    // TODO
+    commandContext.getOperationLogManager().logCaseInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY,
+        null, null, Collections.singletonList(new PropertyChange("nrOfInstances", null, caseInstanceIds.size())));
+
     commandContext.getHistoricCaseInstanceManager().deleteHistoricCaseInstancesByIds(caseInstanceIds);
 
     return null;

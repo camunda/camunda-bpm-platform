@@ -355,7 +355,7 @@ public class DeployCmd implements Command<DeploymentWithDefinitions>, Serializab
       properties.add(deployChangedOnly);
     }
 
-    logManager.logDeploymentOperation(UserOperationLogEntry.OPERATION_TYPE_CREATE, deployment.getId(), properties);
+    logManager.logDeploymentOperation(UserOperationLogEntry.OPERATION_TYPE_CREATE, deployment.getId(), deployment.getTenantId(), properties);
   }
 
   protected DeploymentEntity initDeployment() {

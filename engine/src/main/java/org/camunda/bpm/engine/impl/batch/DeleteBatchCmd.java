@@ -47,7 +47,7 @@ public class DeleteBatchCmd implements Command<Void> {
     ensureNotNull(BadUserRequestException.class, "Batch for id '" + batchId + "' cannot be found", "batch", batchEntity);
 
     checkAccess(commandContext, batchEntity);
-    writeUserOperationLog(commandContext);
+    writeUserOperationLog(commandContext, batchEntity.getTenantId());
     batchEntity.delete(cascadeToHistory, true);
 
     return null;
@@ -59,10 +59,11 @@ public class DeleteBatchCmd implements Command<Void> {
     }
   }
 
-  protected void writeUserOperationLog(CommandContext commandContext) {
+  protected void writeUserOperationLog(CommandContext commandContext, String tenantId) {
     commandContext.getOperationLogManager()
       .logBatchOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE,
         batchId,
+        tenantId,
         new PropertyChange("cascadeToHistory", null, cascadeToHistory));
   }
 }

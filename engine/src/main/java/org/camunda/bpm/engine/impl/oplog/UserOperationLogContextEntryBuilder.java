@@ -126,6 +126,9 @@ public class UserOperationLogContextEntryBuilder {
     entry.setCaseInstanceId(task.getCaseInstanceId());
     entry.setCaseExecutionId(task.getCaseExecutionId());
     entry.setTaskId(task.getId());
+    if (entry.getTenantId() == null && task.getTenantId() != null) { // standalone task with tenant
+      entry.setTenantId(task.getTenantId());
+    }
 
     ExecutionEntity execution = task.getExecution();
     if (execution != null) {

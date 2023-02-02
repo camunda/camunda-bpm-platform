@@ -54,7 +54,7 @@ public abstract class AbstractSetBatchStateCmd implements Command<Void> {
 
     batchManager.updateBatchSuspensionStateById(batchId, getNewSuspensionState());
 
-    logUserOperation(commandContext);
+    logUserOperation(commandContext, batch.getTenantId());
 
     return null;
   }
@@ -84,10 +84,10 @@ public abstract class AbstractSetBatchStateCmd implements Command<Void> {
 
   protected abstract AbstractSetJobDefinitionStateCmd createSetJobDefinitionStateCommand(UpdateJobDefinitionSuspensionStateBuilderImpl builder);
 
-  protected void logUserOperation(CommandContext commandContext) {
+  protected void logUserOperation(CommandContext commandContext, String tenantId) {
     PropertyChange propertyChange = new PropertyChange(SUSPENSION_STATE_PROPERTY, null, getNewSuspensionState().getName());
     commandContext.getOperationLogManager()
-      .logBatchOperation(getUserOperationType(), batchId, propertyChange);
+      .logBatchOperation(getUserOperationType(), batchId, tenantId, propertyChange);
   }
 
   protected abstract String getUserOperationType();

@@ -87,8 +87,10 @@ public class DeleteHistoricDecisionInstancesBatchCmd implements Command<Batch> {
     propertyChanges.add(new PropertyChange("async", null, true));
     propertyChanges.add(new PropertyChange("deleteReason", null, deleteReason));
 
+    // TODO
     commandContext.getOperationLogManager()
       .logDecisionInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY,
+          null,
           propertyChanges);
   }
 

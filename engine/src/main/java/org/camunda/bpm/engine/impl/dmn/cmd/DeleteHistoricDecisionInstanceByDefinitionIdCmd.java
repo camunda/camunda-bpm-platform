@@ -71,8 +71,11 @@ public class DeleteHistoricDecisionInstanceByDefinitionIdCmd implements Command<
     propertyChanges.add(new PropertyChange("nrOfInstances", null, numInstances));
     propertyChanges.add(new PropertyChange("async", null, false));
 
+    // TODO
     commandContext.getOperationLogManager()
-      .logDecisionInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY, propertyChanges);
+      .logDecisionInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY,
+          null,
+          propertyChanges);
   }
 
   protected long getDecisionInstanceCount(CommandContext commandContext) {

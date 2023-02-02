@@ -70,18 +70,18 @@ public class EvaluateDecisionTableCmd implements Command<DmnDecisionTableResult>
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkEvaluateDecision(decisionDefinition);
     }
-    
+
     writeUserOperationLog(commandContext, decisionDefinition);
 
     return doEvaluateDecision(decisionDefinition, variables);
 
   }
-  
+
   protected void writeUserOperationLog(CommandContext commandContext, DecisionDefinition decisionDefinition) {
     List<PropertyChange> propertyChanges = new ArrayList<>();
     propertyChanges.add(new PropertyChange("decisionDefinitionId", null, decisionDefinition.getId()));
     propertyChanges.add(new PropertyChange("decisionDefinitionKey", null, decisionDefinition.getKey()));
-    commandContext.getOperationLogManager().logDecisionDefinitionOperation(UserOperationLogEntry.OPERATION_TYPE_EVALUATE, propertyChanges);
+    commandContext.getOperationLogManager().logDecisionDefinitionOperation(UserOperationLogEntry.OPERATION_TYPE_EVALUATE, decisionDefinition.getTenantId(), propertyChanges);
   }
 
   protected DmnDecisionTableResult doEvaluateDecision(DecisionDefinition decisionDefinition, VariableMap variables) {
