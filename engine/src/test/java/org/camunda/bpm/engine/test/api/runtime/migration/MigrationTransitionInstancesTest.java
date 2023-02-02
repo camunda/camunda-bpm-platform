@@ -23,6 +23,7 @@ import static org.camunda.bpm.engine.test.util.MigratingProcessInstanceValidatio
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.jobexecutor.AsyncContinuationJobHandler;
@@ -44,6 +45,7 @@ import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -514,9 +516,8 @@ public class MigrationTransitionInstancesTest {
     Job jobBeforeMigration = rule.getManagementService().createJobQuery().singleResult();
     rule.getManagementService().setJobPriority(jobBeforeMigration.getId(), 42);
 
-    // TODO: fix CAM-5692
-//    Date newDueDate = new DateTime().plusHours(10).toDate();
-//    rule.getManagementService().setJobDuedate(jobBeforeMigration.getId(), newDueDate);
+    Date newDueDate = new DateTime().plusHours(10).toDate();
+    rule.getManagementService().setJobDuedate(jobBeforeMigration.getId(), newDueDate);
     rule.getManagementService().setJobRetries(jobBeforeMigration.getId(), 52);
     rule.getManagementService().suspendJobById(jobBeforeMigration.getId());
 
@@ -527,7 +528,7 @@ public class MigrationTransitionInstancesTest {
     Job job = testHelper.snapshotAfterMigration.getJobs().get(0);
 
     Assert.assertEquals(42, job.getPriority());
-//    Assert.assertEquals(newDueDate, job.getDuedate());
+    Assert.assertEquals(newDueDate, job.getDuedate());
     Assert.assertEquals(52, job.getRetries());
     Assert.assertTrue(job.isSuspended());
   }
