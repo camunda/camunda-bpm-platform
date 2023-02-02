@@ -48,21 +48,24 @@ public class SetJobRetriesCmd implements Command<Void>, Serializable {
   protected final List<String> jobIds;
   protected final int retries;
   protected Date dueDate;
+  protected final boolean isDueDateSet;
 
-  public SetJobRetriesCmd(String jobId, String jobDefinitionId, int retries, Date dueDate) {
+  public SetJobRetriesCmd(String jobId, String jobDefinitionId, int retries, Date dueDate, boolean isDueDateSet) {
     this.jobId = jobId;
     this.jobDefinitionId = jobDefinitionId;
     this.jobIds = null;
     this.retries = retries;
     this.dueDate = dueDate;
+    this.isDueDateSet = isDueDateSet;
   }
 
-  public SetJobRetriesCmd(List<String> jobIds, int retries, Date dueDate) {
+  public SetJobRetriesCmd(List<String> jobIds, int retries, Date dueDate, boolean isDueDateSet) {
     this.jobId = null;
     this.jobDefinitionId = null;
     this.jobIds = jobIds;
     this.retries = retries;
     this.dueDate = dueDate;
+    this.isDueDateSet = isDueDateSet;
   }
 
   public Void execute(CommandContext commandContext) {
@@ -101,7 +104,7 @@ public class SetJobRetriesCmd implements Command<Void>, Serializable {
       job.setRetries(retries);
       propertyChanges.add(new PropertyChange(RETRIES, oldRetries, job.getRetries()));
 
-      if(dueDate != null) {
+      if (isDueDateSet) {
         Date oldDueDate = job.getDuedate();
         job.setDuedate(dueDate);
         propertyChanges.add(new PropertyChange(DUE_DATE, oldDueDate, job.getDuedate()));
@@ -128,12 +131,12 @@ public class SetJobRetriesCmd implements Command<Void>, Serializable {
 
     commandContext
         .getJobManager()
-        .updateFailedJobRetriesByJobDefinitionId(jobDefinitionId, retries, dueDate);
+        .updateFailedJobRetriesByJobDefinitionId(jobDefinitionId, retries, dueDate, isDueDateSet);
 
     List<PropertyChange> propertyChanges = new ArrayList<>();
     propertyChanges.add(new PropertyChange(RETRIES, null, retries));
 
-    if(dueDate != null) {
+    if (isDueDateSet) {
       propertyChanges.add(new PropertyChange(DUE_DATE, null, dueDate));
     }
 

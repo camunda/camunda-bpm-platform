@@ -289,7 +289,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTest {
     // then
     Job updatedJob = managementService.createJobQuery().jobId(jobId).singleResult();
     assertThat(updatedJob.getRetries()).isEqualTo(5);
-    assertThat(updatedJob.getDuedate()).isEqualTo(job.getDuedate());
+    assertThat(updatedJob.getDuedate()).isNull();
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
@@ -328,7 +328,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTest {
     // then
     Job updatedJob = managementService.createJobQuery().jobDefinitionId(job.getJobDefinitionId()).singleResult();
     assertThat(updatedJob.getRetries()).isEqualTo(5);
-    assertThat(updatedJob.getDuedate()).isEqualTo(job.getDuedate());
+    assertThat(updatedJob.getDuedate()).isNull();
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
@@ -341,6 +341,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTest {
 
     List<Job> list = managementService.createJobQuery().list();
     Job job = list.get(0);
+    managementService.setJobRetries(job.getId(), 0);
 
     // when
     managementService.setJobRetries(5).jobDefinitionId(job.getJobDefinitionId()).dueDate(null).execute();
@@ -348,6 +349,26 @@ public class ManagementServiceTest extends PluggableProcessEngineTest {
     // then
     job = managementService.createJobQuery().jobId(job.getId()).singleResult();
     assertThat(job.getDuedate()).isNotNull();
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
+  @Test
+  public void shouldSetDueDateNullOnSetJobRetriesWithNullDuedateWhenNotEnsureDueDateNotNull() {
+    // given
+    tearDownEnsureJobDueDateNotNull = true;
+    processEngineConfiguration.setEnsureJobDueDateNotNull(false);
+    runtimeService.startProcessInstanceByKey("exceptionInJobExecution");
+
+    List<Job> list = managementService.createJobQuery().list();
+    Job job = list.get(0);
+    managementService.setJobRetries(job.getId(), 0);
+
+    // when
+    managementService.setJobRetries(5).jobDefinitionId(job.getJobDefinitionId()).dueDate(null).execute();
+
+    // then
+    job = managementService.createJobQuery().jobId(job.getId()).singleResult();
+    assertThat(job.getDuedate()).isNull();
   }
 
   @Test

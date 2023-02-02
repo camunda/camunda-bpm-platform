@@ -41,6 +41,7 @@ public abstract class AbstractSetJobsRetriesBatchCmd implements Command<Batch> {
 
   protected int retries;
   protected Date dueDate;
+  protected boolean isDueDateSet;
 
   @Override
   public Batch execute(CommandContext commandContext) {
@@ -82,7 +83,7 @@ public abstract class AbstractSetJobsRetriesBatchCmd implements Command<Batch> {
   protected abstract BatchElementConfiguration collectJobIds(CommandContext commandContext);
 
   public BatchConfiguration getConfiguration(BatchElementConfiguration elementConfiguration) {
-    return new SetJobRetriesBatchConfiguration(elementConfiguration.getIds(), elementConfiguration.getMappings(), retries, dueDate);
+    return new SetJobRetriesBatchConfiguration(elementConfiguration.getIds(), elementConfiguration.getMappings(), retries, dueDate, isDueDateSet);
   }
 
 }

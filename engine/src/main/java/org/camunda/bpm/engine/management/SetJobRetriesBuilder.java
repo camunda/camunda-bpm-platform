@@ -75,8 +75,8 @@ public interface SetJobRetriesBuilder {
    * When a {@link Job} is executed is determined by the due date. By setting the due date together with the job retries, the scheduled execution date of the
    * job can be adjusted.
    *
-   * @param the new due date for the updated jobs. If it is null, the retries of the jobs will be updated but the due date is ignored.  Can not be null if
-   * {@link ProcessEngineConfiguration#isEnsureJobDueDateNotNull() ensureJobDueDateNotNull} is false.
+   * @param dueDate The new due date for the updated jobs. If it is null, the due date will be set to null. If
+   * {@link ProcessEngineConfiguration#isEnsureJobDueDateNotNull() ensureJobDueDateNotNull} is true, the due date will be set to the current date instead of null.
    *
    * @return the builder instance
    */

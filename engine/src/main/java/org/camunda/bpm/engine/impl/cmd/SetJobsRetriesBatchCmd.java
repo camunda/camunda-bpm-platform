@@ -34,11 +34,12 @@ public class SetJobsRetriesBatchCmd extends AbstractSetJobsRetriesBatchCmd {
   protected List<String> ids;
   protected JobQuery jobQuery;
 
-  public SetJobsRetriesBatchCmd(List<String> ids, JobQuery jobQuery, int retries, Date dueDate) {
+  public SetJobsRetriesBatchCmd(List<String> ids, JobQuery jobQuery, int retries, Date dueDate, boolean isDueDateSet) {
     this.jobQuery = jobQuery;
     this.ids = ids;
     this.retries = retries;
     this.dueDate = dueDate;
+    this.isDueDateSet = isDueDateSet;
   }
 
   protected BatchElementConfiguration collectJobIds(CommandContext commandContext) {

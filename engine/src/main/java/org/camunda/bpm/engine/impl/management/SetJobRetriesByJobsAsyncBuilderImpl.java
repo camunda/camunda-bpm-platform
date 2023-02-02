@@ -40,6 +40,7 @@ public class SetJobRetriesByJobsAsyncBuilderImpl implements SetJobRetriesByJobsA
   protected JobQuery jobQuery;
   protected Integer retries;
   protected Date dueDate;
+  protected boolean isDueDateSet;
 
   public SetJobRetriesByJobsAsyncBuilderImpl(CommandExecutor commandExecutor, int retries) {
     this.commandExecutor = commandExecutor;
@@ -61,13 +62,14 @@ public class SetJobRetriesByJobsAsyncBuilderImpl implements SetJobRetriesByJobsA
   @Override
   public SetJobRetriesAsyncBuilder dueDate(Date dueDate) {
     this.dueDate = dueDate;
+    isDueDateSet = true;
     return this;
   }
 
   @Override
   public Batch executeAsync() {
     validateParameters();
-    return commandExecutor.execute(new SetJobsRetriesBatchCmd(jobIds, jobQuery, retries, dueDate));
+    return commandExecutor.execute(new SetJobsRetriesBatchCmd(jobIds, jobQuery, retries, dueDate, isDueDateSet));
   }
 
   protected void validateParameters() {

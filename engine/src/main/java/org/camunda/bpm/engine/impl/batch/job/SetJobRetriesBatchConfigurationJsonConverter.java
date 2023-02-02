@@ -53,14 +53,14 @@ public class SetJobRetriesBatchConfigurationJsonConverter
 
   @Override
   public SetJobRetriesBatchConfiguration readConfiguration(JsonObject json) {
-    boolean hasConfiguredDueDate = json.has(DUE_DATE) && !json.get(DUE_DATE).isJsonNull();
+    boolean isdDueDateSet = json.has(DUE_DATE);
     Date dueDate = null;
-    if(hasConfiguredDueDate) {
+    if(isdDueDateSet && !json.get(DUE_DATE).isJsonNull()) {
       dueDate = new Date(JsonUtil.getLong(json, DUE_DATE));
     }
 
     SetJobRetriesBatchConfiguration configuration = new SetJobRetriesBatchConfiguration(
-        readJobIds(json), readIdMappings(json), JsonUtil.getInt(json, RETRIES), dueDate);
+        readJobIds(json), readIdMappings(json), JsonUtil.getInt(json, RETRIES), dueDate, isdDueDateSet);
 
     return configuration;
   }

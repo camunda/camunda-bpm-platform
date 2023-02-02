@@ -41,6 +41,7 @@ public class SetJobRetriesBuilderImpl implements SetJobRetriesBuilder {
   protected Integer retries;
   protected Date dueDate;
 
+  protected boolean isDueDateSet = false;
   boolean byJobId = false;
   boolean byJobIds = false;
   boolean byJobDefinitionId = false;
@@ -73,6 +74,7 @@ public class SetJobRetriesBuilderImpl implements SetJobRetriesBuilder {
 
   @Override
   public SetJobRetriesBuilder dueDate(Date dueDate) {
+    isDueDateSet = true;
     this.dueDate = dueDate;
     return this;
   }
@@ -82,9 +84,9 @@ public class SetJobRetriesBuilderImpl implements SetJobRetriesBuilder {
     validateParameters();
 
     if (byJobId || byJobDefinitionId) {
-      commandExecutor.execute(new SetJobRetriesCmd(jobId, jobDefinitionId, retries, dueDate));
+      commandExecutor.execute(new SetJobRetriesCmd(jobId, jobDefinitionId, retries, dueDate, isDueDateSet));
     } else if (byJobIds) {
-      commandExecutor.execute(new SetJobRetriesCmd(jobIds, retries, dueDate));
+      commandExecutor.execute(new SetJobRetriesCmd(jobIds, retries, dueDate, isDueDateSet));
     }
 
   }

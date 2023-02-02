@@ -41,6 +41,7 @@ public class SetJobRetriesByProcessAsyncBuilderImpl implements SetJobRetriesByPr
   protected HistoricProcessInstanceQuery historicProcessInstanceQuery;
   protected Integer retries;
   protected Date dueDate;
+  protected boolean isDueDateSet;
 
   public SetJobRetriesByProcessAsyncBuilderImpl(CommandExecutor commandExecutor, int retries) {
     this.commandExecutor = commandExecutor;
@@ -68,6 +69,7 @@ public class SetJobRetriesByProcessAsyncBuilderImpl implements SetJobRetriesByPr
   @Override
   public SetJobRetriesByProcessAsyncBuilder dueDate(Date dueDate) {
     this.dueDate = dueDate;
+    isDueDateSet = true;
     return this;
   }
 
@@ -75,7 +77,7 @@ public class SetJobRetriesByProcessAsyncBuilderImpl implements SetJobRetriesByPr
   public Batch executeAsync() {
     validateParameters();
     return commandExecutor.execute(new SetJobsRetriesByProcessBatchCmd(processInstanceIds, processInstanceQuery,
-        historicProcessInstanceQuery, retries, dueDate));
+        historicProcessInstanceQuery, retries, dueDate, isDueDateSet));
   }
 
   protected void validateParameters() {

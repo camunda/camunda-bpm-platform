@@ -41,12 +41,14 @@ public class SetJobsRetriesByProcessBatchCmd extends AbstractSetJobsRetriesBatch
                                          ProcessInstanceQuery query,
                                          HistoricProcessInstanceQuery historicProcessInstanceQuery,
                                          int retries,
-                                         Date dueDate) {
+                                         Date dueDate,
+                                         boolean isDueDateSet) {
     this.processInstanceIds = processInstanceIds;
     this.query = query;
     this.historicProcessInstanceQuery = historicProcessInstanceQuery;
     this.retries = retries;
     this.dueDate = dueDate;
+    this.isDueDateSet = isDueDateSet;
   }
 
   protected BatchElementConfiguration collectJobIds(CommandContext commandContext) {

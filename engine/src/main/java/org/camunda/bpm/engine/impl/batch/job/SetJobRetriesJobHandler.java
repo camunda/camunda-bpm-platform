@@ -52,7 +52,7 @@ public class SetJobRetriesJobHandler extends AbstractBatchJobHandler<SetJobRetri
 
   @Override
   protected SetJobRetriesBatchConfiguration createJobConfiguration(SetJobRetriesBatchConfiguration configuration, List<String> jobIds) {
-    return new SetJobRetriesBatchConfiguration(jobIds, configuration.getRetries(), configuration.getDueDate());
+    return new SetJobRetriesBatchConfiguration(jobIds, configuration.getRetries(), configuration.getDueDate(), configuration.isDueDateSet());
   }
 
   @Override
@@ -62,7 +62,7 @@ public class SetJobRetriesJobHandler extends AbstractBatchJobHandler<SetJobRetri
                              String tenantId) {
 
     commandContext.executeWithOperationLogPrevented(
-        new SetJobRetriesCmd(batchConfiguration.getIds(), batchConfiguration.getRetries(), batchConfiguration.getDueDate()));
+        new SetJobRetriesCmd(batchConfiguration.getIds(), batchConfiguration.getRetries(), batchConfiguration.getDueDate(), batchConfiguration.isDueDateSet()));
 
   }
 }

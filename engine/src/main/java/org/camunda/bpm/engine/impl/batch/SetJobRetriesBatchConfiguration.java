@@ -22,14 +22,16 @@ import java.util.List;
 public class SetJobRetriesBatchConfiguration extends SetRetriesBatchConfiguration {
 
   protected Date dueDate;
+  protected boolean isDueDateSet;
 
-  public SetJobRetriesBatchConfiguration(List<String> ids, int retries, Date dueDate) {
-    this(ids, null, retries, dueDate);
+  public SetJobRetriesBatchConfiguration(List<String> ids, int retries, Date dueDate, boolean isDueDateSet) {
+    this(ids, null, retries, dueDate, isDueDateSet);
   }
 
-  public SetJobRetriesBatchConfiguration(List<String> ids, DeploymentMappings mappings, int retries, Date dueDate) {
+  public SetJobRetriesBatchConfiguration(List<String> ids, DeploymentMappings mappings, int retries, Date dueDate, boolean isDueDateSet) {
     super(ids, mappings, retries);
     this.dueDate = dueDate;
+    this.isDueDateSet = isDueDateSet;
   }
 
   public Date getDueDate() {
@@ -37,7 +39,12 @@ public class SetJobRetriesBatchConfiguration extends SetRetriesBatchConfiguratio
   }
 
   public void setDueDate(Date dueDate) {
+    isDueDateSet = true;
     this.dueDate = dueDate;
+  }
+
+  public boolean isDueDateSet() {
+    return isDueDateSet;
   }
 
 }
