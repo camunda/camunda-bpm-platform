@@ -21,6 +21,7 @@ import static org.camunda.bpm.engine.variable.Variables.stringValue;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,7 @@ import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProviderCaseInstance
 import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProviderHistoricDecisionInstanceContext;
 import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProviderProcessInstanceContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.management.ActivityStatisticsQuery;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -269,6 +271,31 @@ public class TenantIdProviderTest {
     // then the tenant id provider can set the tenant id to a value
     ProcessInstance processInstance = engineRule.getRuntimeService().createProcessInstanceQuery().singleResult();
     assertThat(processInstance.getTenantId()).isEqualTo(tenantId);
+  }
+
+  @Test
+  public void shouldQueryForActivityInstances() {
+    // given
+    testRule.deploy(Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY).startEvent().userTask().done());
+
+    TestTenantIdProvider.delegate = new StaticTenantIdTestProvider(TENANT_ID);
+    engineRule.getRuntimeService().startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+
+    TestTenantIdProvider.delegate = new StaticTenantIdTestProvider("tenant2");
+    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+
+    // when
+    engineRule.getIdentityService().setAuthentication("user", null, Collections.singletonList("tenant2"));
+
+    // then
+    ActivityStatisticsQuery query = engineRule.getManagementService()
+        .createActivityStatisticsQuery(processInstance.getProcessDefinitionId())
+        .includeIncidentsForType("foo")
+        // test fails with any other filter as well
+        /*.includeFailedJobs()*/
+        /*.includeIncidents()*/;
+
+    assertThat(query.singleResult().getInstances()).isEqualTo(1);
   }
 
   @Test
