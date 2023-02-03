@@ -135,9 +135,11 @@ pipeline {
             INPUT_WAIT_INPUT_WAIT_WORKFLOW = 'true'
           }
           steps {
-            script {
-              camundaGitHubWorkflowDispatch.prepareStep()
-              camundaGitHubWorkflowDispatch.dispatchStep('github-cambpm-ci-pipeline-app')
+            catchError(stageResult: 'FAILURE') {
+              script {
+                camundaGitHubWorkflowDispatch.prepareStep()
+                camundaGitHubWorkflowDispatch.dispatchStep('github-cambpm-ci-pipeline-app')
+              }
             }
           }
         }
