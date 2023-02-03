@@ -16,75 +16,217 @@
  */
 package org.camunda.bpm.engine.test.api.multitenancy.query;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.camunda.bpm.engine.EntityTypes;
+import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
+import org.camunda.bpm.engine.test.api.runtime.migration.batch.BatchMigrationHelper;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.RuleChain;
 
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
 public class MultiTenancyUserOperationLogQueryTest {
-//
-//  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
-//
-//  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
-//
-//  protected HistoryService historyService;
-//  protected RuntimeService runtimeService;
-//  protected RepositoryService repositoryService;
-//  protected TaskService taskService;
-//
-//  @Rule
-//  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-//
-//  protected static final String A_USER_ID = "aUserId";
-//
-//  protected final static String TENANT_NULL = null;
-//  protected final static String TENANT_1 = "tenant1";
-//  protected final static String TENANT_2 = "tenant2";
-//  protected final static String TENANT_3 = "tenant3";
-//
-//
-//  protected ProcessInstance process;
-//  @Before
-//  public void init() {
-//    taskService = engineRule.getTaskService();
-//    repositoryService = engineRule.getRepositoryService();
-//    historyService = engineRule.getHistoryService();
-//    runtimeService = engineRule.getRuntimeService();
-//
-//    // create sample identity link
-//    BpmnModelInstance oneTaskProcess = Bpmn.createExecutableProcess("testProcess")
-//    .startEvent()
-//    .userTask("task").camundaCandidateUsers(A_USER_ID)
-//    .endEvent()
-//    .done();
-//
-//    // deploy tenants
-//    testRule.deployForTenant(TENANT_NULL, oneTaskProcess);
-//    testRule.deployForTenant(TENANT_1, oneTaskProcess);
-//    testRule.deployForTenant(TENANT_2, oneTaskProcess);
-//    testRule.deployForTenant(TENANT_3, oneTaskProcess);
-//  }
-//  @Test
-//  public void testQueryProcessInstanceOperationsById() {
-//    // given
-//    process = startProcessInstanceForTenant(TENANT_1);
-//
-//    // when
-//    runtimeService.suspendProcessInstanceById(process.getId());
-//    runtimeService.activateProcessInstanceById(process.getId());
-//
-//    runtimeService.deleteProcessInstance(process.getId(), "a delete reason");
-//
-//    // then
-//    assertEquals(4, query().entityType(PROCESS_INSTANCE).count());
-//    assertThat(query().tenantIdIn(TENANT_1).count()).isEqualTo(4L);
-//
-//  }
-//  protected UserOperationLogQuery query() {
-//    return historyService.createUserOperationLogQuery();
-//  }
-//  protected ProcessInstance startProcessInstanceForTenant(String tenant) {
-//    return runtimeService.createProcessInstanceByKey("testProcess")
-//        .processDefinitionTenantId(tenant)
-//        .execute();
-//  }
+  protected static final String USER_ONE = "aUserId";
+  protected static final String USER_TWO = "aUserId1";
+  protected static final String USER_WITHOUT_TENANT = "aUserId1";
+
+  protected static final String TENANT_ONE = "tenant1";
+  protected static final String TENANT_TWO = "tenant2";
+  protected static final String PROCESS_NAME = "process";
+  protected static final String TASK_ID = "aTaskId";
+
+  protected static final BpmnModelInstance MODEL = Bpmn.createExecutableProcess(PROCESS_NAME)
+      .startEvent().userTask(TASK_ID).done();
+
+  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+  protected BatchMigrationHelper batchHelper = new BatchMigrationHelper(engineRule);
+
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+
+  protected ProcessEngineConfiguration processEngineConfiguration;
+  protected TaskService taskService;
+  protected HistoryService historyService;
+  protected RepositoryService repositoryService;
+  protected RuntimeService runtimeService;
+  protected IdentityService identityService;
+  protected ManagementService managementService;
+
+  @Before
+  public void init() {
+    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+    taskService = engineRule.getTaskService();
+    historyService = engineRule.getHistoryService();
+    identityService = engineRule.getIdentityService();
+    runtimeService = engineRule.getRuntimeService();
+  }
+
+  @Test
+  public void shouldReturnNoResultsWithoutTenant() {
+    // given logs with assigned tenant
+    testRule.deployForTenant(TENANT_ONE, MODEL);
+    identityService.setAuthentication(USER_ONE, null, Arrays.asList(TENANT_ONE));
+
+    runtimeService.startProcessInstanceByKey(PROCESS_NAME);
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    taskService.complete(taskId);
+
+    // when authenticated user without tenants
+    identityService.setAuthentication(USER_WITHOUT_TENANT, null);
+    UserOperationLogEntry singleResult = historyService.createUserOperationLogQuery()
+        .entityType(EntityTypes.TASK)
+        .singleResult();
+
+    // then
+    assertThat(singleResult).isEqualTo(null);
+  }
+
+  @Test
+  public void shouldReturnResultsWhenMultipleTenants() {
+    // given task with no tenant, with TENANT_ONE, and with TENANT_TWO
+    testRule.deploy(MODEL);
+    runtimeService.startProcessInstanceByKey(PROCESS_NAME);
+    identityService.setAuthenticatedUserId(USER_WITHOUT_TENANT);
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+    taskService.complete(taskId);
+
+    testRule.deployForTenant(TENANT_ONE, MODEL);
+    identityService.setAuthentication(USER_ONE, null, Arrays.asList(TENANT_ONE));
+    runtimeService.createProcessInstanceByKey(PROCESS_NAME)
+    .processDefinitionTenantId(TENANT_ONE)
+    .execute();
+    taskId = taskService.createTaskQuery().tenantIdIn(TENANT_ONE).singleResult().getId();
+    taskService.complete(taskId);
+
+    testRule.deployForTenant(TENANT_TWO, MODEL);
+    identityService.setAuthentication(USER_TWO, null, Arrays.asList(TENANT_TWO));
+    runtimeService.createProcessInstanceByKey(PROCESS_NAME)
+    .processDefinitionTenantId(TENANT_TWO)
+    .execute();
+    taskId = taskService.createTaskQuery().tenantIdIn(TENANT_TWO).singleResult().getId();
+    taskService.complete(taskId);
+
+    // when query with USER_TWO
+    List<UserOperationLogEntry> list = historyService.createUserOperationLogQuery()
+        .entityType(EntityTypes.TASK)
+        .list();
+
+    // then
+    assertThat(list.size()).isEqualTo(2);
+    assertThat(list.get(0).getTenantId()).isIn(null, TENANT_TWO);
+    assertThat(list.get(1).getTenantId()).isIn(null, TENANT_TWO);
+  }
+
+  @Test
+  public void shouldReturnResultsWhenTwoTenant() {
+    // given logs with assigned tenant
+    // and user belonging to two tenants
+    testRule.deployForTenant(TENANT_ONE, MODEL);
+    identityService.setAuthentication(USER_ONE, null, Arrays.asList(TENANT_ONE, TENANT_TWO));
+
+    runtimeService.startProcessInstanceByKey(PROCESS_NAME);
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    taskService.complete(taskId);
+
+    // when
+    UserOperationLogEntry singleResult = historyService.createUserOperationLogQuery()
+        .entityType(EntityTypes.TASK)
+        .singleResult();
+
+    // then
+    assertThat(singleResult.getTenantId()).isEqualTo(TENANT_ONE);
+  }
+
+  @Test
+  public void shouldReturnResultsWithoutTenantId() {
+    // given task with no tenant, with TENANT_ONE, and with TENANT_TWO
+    testRule.deploy(MODEL);
+    runtimeService.startProcessInstanceByKey(PROCESS_NAME);
+    identityService.setAuthenticatedUserId(USER_WITHOUT_TENANT);
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+    taskService.complete(taskId);
+
+    testRule.deployForTenant(TENANT_ONE, MODEL);
+    identityService.setAuthentication(USER_ONE, null, Arrays.asList(TENANT_ONE));
+    runtimeService.createProcessInstanceByKey(PROCESS_NAME)
+    .processDefinitionTenantId(TENANT_ONE)
+    .execute();
+    taskId = taskService.createTaskQuery().tenantIdIn(TENANT_ONE).singleResult().getId();
+    taskService.complete(taskId);
+
+    testRule.deployForTenant(TENANT_TWO, MODEL);
+    identityService.setAuthentication(USER_TWO, null, Arrays.asList(TENANT_TWO));
+    runtimeService.createProcessInstanceByKey(PROCESS_NAME)
+    .processDefinitionTenantId(TENANT_TWO)
+    .execute();
+    taskId = taskService.createTaskQuery().tenantIdIn(TENANT_TWO).singleResult().getId();
+    taskService.complete(taskId);
+
+    // when query without tenant id
+    List<UserOperationLogEntry> list = historyService.createUserOperationLogQuery()
+        .entityType(EntityTypes.TASK)
+        .withoutTenantId()
+        .list();
+
+    // then
+    assertThat(list.size()).isEqualTo(1);
+    assertThat(list.get(0).getTenantId()).isEqualTo(null);
+  }
+
+  @Test
+  public void shouldReturnResultsTenantIdIn() {
+    // given task with no tenant, with TENANT_ONE, and with TENANT_TWO
+    testRule.deploy(MODEL);
+    runtimeService.startProcessInstanceByKey(PROCESS_NAME);
+    identityService.setAuthenticatedUserId(USER_WITHOUT_TENANT);
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+    taskService.complete(taskId);
+
+    testRule.deployForTenant(TENANT_ONE, MODEL);
+    identityService.setAuthentication(USER_ONE, null, Arrays.asList(TENANT_ONE));
+    runtimeService.createProcessInstanceByKey(PROCESS_NAME)
+    .processDefinitionTenantId(TENANT_ONE)
+    .execute();
+    taskId = taskService.createTaskQuery().tenantIdIn(TENANT_ONE).singleResult().getId();
+    taskService.complete(taskId);
+
+    testRule.deployForTenant(TENANT_TWO, MODEL);
+    identityService.setAuthentication(USER_TWO, null, Arrays.asList(TENANT_TWO));
+    runtimeService.createProcessInstanceByKey(PROCESS_NAME)
+    .processDefinitionTenantId(TENANT_TWO)
+    .execute();
+    taskId = taskService.createTaskQuery().tenantIdIn(TENANT_TWO).singleResult().getId();
+    taskService.complete(taskId);
+
+    // when query with USER_TWO
+    List<UserOperationLogEntry> list = historyService.createUserOperationLogQuery()
+        .entityType(EntityTypes.TASK)
+        .tenantIdIn(TENANT_TWO)
+        .list();
+
+    // then
+    assertThat(list.size()).isEqualTo(1);
+    assertThat(list.get(0).getTenantId()).isEqualTo(TENANT_TWO);
+  }
 }

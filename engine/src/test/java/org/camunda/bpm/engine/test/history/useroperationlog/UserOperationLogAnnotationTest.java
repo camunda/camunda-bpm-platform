@@ -314,13 +314,13 @@ public class UserOperationLogAnnotationTest {
   }
 
   @Test
-  public void shouldThrowExceptionWhenOperationsEmpty() {
+  public void shouldThrowExceptionWhenOperationNull() {
     // given
 
     // when/then
     assertThatThrownBy(() -> historyService.setAnnotationForOperationLogById("anOperationId", ANNOTATION))
       .isInstanceOf(BadUserRequestException.class)
-      .hasMessageContaining("operations is empty");
+      .hasMessageContaining("operation is null");
 
   }
 

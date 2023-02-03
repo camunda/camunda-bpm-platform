@@ -24,8 +24,6 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
-import java.util.List;
-
 public class SetAnnotationForOperationLog implements Command<Void> {
 
   protected String operationId;
@@ -40,19 +38,8 @@ public class SetAnnotationForOperationLog implements Command<Void> {
   public Void execute(CommandContext commandContext) {
     EnsureUtil.ensureNotNull(NotValidException.class, "operation id", operationId);
 
-    commandContext.disableAuthorizationCheck();
-
-    List<UserOperationLogEntry> operationLogEntries = commandContext.getProcessEngineConfiguration()
-        .getHistoryService()
-        .createUserOperationLogQuery()
-        .operationId(operationId)
-        .list();
-
-    commandContext.enableAuthorizationCheck();
-
-    EnsureUtil.ensureNotEmpty(BadUserRequestException.class, "operations", operationLogEntries);
-
-    UserOperationLogEntry operationLogEntry = operationLogEntries.get(0);
+    UserOperationLogEntry operationLogEntry = commandContext.getOperationLogManager().findOperationLogByOperationId(operationId);
+    EnsureUtil.ensureNotNull(BadUserRequestException.class, "operation", operationLogEntry);
 
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkUpdateUserOperationLog(operationLogEntry);

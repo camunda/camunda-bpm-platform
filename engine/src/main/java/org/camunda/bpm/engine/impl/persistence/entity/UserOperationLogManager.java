@@ -61,6 +61,14 @@ public class UserOperationLogManager extends AbstractHistoricManager {
     return getDbEntityManager().selectById(UserOperationLogEntryEventEntity.class, entryId);
   }
 
+  public UserOperationLogEntry findOperationLogByOperationId(String operationId) {
+    List<?> list = getDbEntityManager().selectList("selectUserOperationLogByOperationId", operationId, 0, 1);
+    if (list!=null && !list.isEmpty()) {
+      return (UserOperationLogEntry) list.get(0);
+    }
+    return null;
+  }
+
   public long findOperationLogEntryCountByQueryCriteria(UserOperationLogQueryImpl query) {
     configureQuery(query);
     return (Long) getDbEntityManager().selectOne("selectUserOperationLogEntryCountByQueryCriteria", query);
