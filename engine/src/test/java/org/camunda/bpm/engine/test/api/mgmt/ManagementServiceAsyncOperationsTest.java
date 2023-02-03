@@ -483,6 +483,35 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     }
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_ACTIVITY)
+  @Test
+  public void shouldSetDueDateNull() {
+    // given
+    engineConfiguration.setEnsureJobDueDateNotNull(false);
+    HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery();
+
+    // assume
+    List<Job> job = managementService.createJobQuery().list();
+    assertThat(job.get(0).getDuedate()).isNull();
+    assertThat(job.get(1).getDuedate()).isNull();
+
+    // when
+    Batch batch = managementService.setJobRetriesByProcessAsync(RETRIES)
+        .historicProcessInstanceQuery(historicProcessInstanceQuery)
+        .dueDate(null)
+        .executeAsync();
+    completeSeedJobs(batch);
+    List<Exception> exceptions = executeBatchJobs(batch);
+
+    // then
+    assertThat(exceptions).hasSize(0);
+    for (String id : ids) {
+      Job jobResult = managementService.createJobQuery().jobId(id).singleResult();
+      assertThat(jobResult.getRetries()).isEqualTo(RETRIES);
+      assertThat(jobResult.getDuedate()).isNull();
+    }
+  }
+
   @Test
   public void shouldSetJobDueDateOnJobRetryAsyncByJobIds() {
     //given
