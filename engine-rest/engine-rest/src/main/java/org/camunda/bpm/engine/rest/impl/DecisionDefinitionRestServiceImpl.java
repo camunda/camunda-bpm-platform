@@ -16,12 +16,11 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
-
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinitionQuery;
@@ -32,8 +31,7 @@ import org.camunda.bpm.engine.rest.dto.repository.DecisionDefinitionQueryDto;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.repository.DecisionDefinitionResource;
 import org.camunda.bpm.engine.rest.sub.repository.impl.DecisionDefinitionResourceImpl;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.camunda.bpm.engine.rest.util.QueryUtil;
 
 public class DecisionDefinitionRestServiceImpl extends AbstractRestProcessEngineAware implements DecisionDefinitionRestService {
 
@@ -61,6 +59,7 @@ public class DecisionDefinitionRestServiceImpl extends AbstractRestProcessEngine
     }
   }
 
+  @Override
   public DecisionDefinitionResource getDecisionDefinitionByKeyAndTenantId(String decisionDefinitionKey, String tenantId) {
 
     DecisionDefinition decisionDefinition = getProcessEngine()
@@ -93,29 +92,13 @@ public class DecisionDefinitionRestServiceImpl extends AbstractRestProcessEngine
     ProcessEngine engine = getProcessEngine();
     DecisionDefinitionQuery query = queryDto.toQuery(engine);
 
-    List<DecisionDefinition> matchingDefinitions = null;
-
-    if (firstResult != null || maxResults != null) {
-      matchingDefinitions = executePaginatedQuery(query, firstResult, maxResults);
-    } else {
-      matchingDefinitions = query.list();
-    }
+    List<DecisionDefinition> matchingDefinitions = QueryUtil.list(query, firstResult, maxResults);
 
     for (DecisionDefinition definition : matchingDefinitions) {
       DecisionDefinitionDto def = DecisionDefinitionDto.fromDecisionDefinition(definition);
       definitions.add(def);
     }
     return definitions;
-  }
-
-  private List<DecisionDefinition> executePaginatedQuery(DecisionDefinitionQuery query, Integer firstResult, Integer maxResults) {
-    if (firstResult == null) {
-      firstResult = 0;
-    }
-    if (maxResults == null) {
-      maxResults = Integer.MAX_VALUE;
-    }
-    return query.listPage(firstResult, maxResults);
   }
 
   @Override

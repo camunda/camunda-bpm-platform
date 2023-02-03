@@ -16,9 +16,18 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
+import static org.camunda.bpm.engine.authorization.Authorization.ANY;
+import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
+import static org.camunda.bpm.engine.authorization.Resources.GROUP;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.net.URI;
+import java.util.List;
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.IdentityService;
-import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.rest.GroupRestService;
@@ -26,26 +35,11 @@ import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.ResourceOptionsDto;
 import org.camunda.bpm.engine.rest.dto.identity.GroupDto;
 import org.camunda.bpm.engine.rest.dto.identity.GroupQueryDto;
-import org.camunda.bpm.engine.rest.dto.task.TaskDto;
-import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.identity.GroupResource;
 import org.camunda.bpm.engine.rest.sub.identity.impl.GroupResourceImpl;
 import org.camunda.bpm.engine.rest.util.PathUtil;
-import org.camunda.bpm.engine.task.Task;
-import org.camunda.bpm.engine.task.TaskQuery;
-
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.camunda.bpm.engine.authorization.Authorization.ANY;
-import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
-import static org.camunda.bpm.engine.authorization.Resources.GROUP;
+import org.camunda.bpm.engine.rest.util.QueryUtil;
 
 /**
  * @author Daniel Meyer
@@ -57,42 +51,43 @@ public class GroupRestServiceImpl extends AbstractAuthorizedRestResource impleme
     super(engineName, GROUP, ANY, objectMapper);
   }
 
+  @Override
   public GroupResource getGroup(String id) {
     id = PathUtil.decodePathParam(id);
     return new GroupResourceImpl(getProcessEngine().getName(), id, relativeRootResourcePath, getObjectMapper());
   }
 
+  @Override
   public List<GroupDto> queryGroups(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
     GroupQueryDto queryDto = new GroupQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
     return queryGroups(queryDto, firstResult, maxResults);
   }
 
+  @Override
   public List<GroupDto> queryGroups(GroupQueryDto queryDto, Integer firstResult, Integer maxResults) {
 
     queryDto.setObjectMapper(getObjectMapper());
     GroupQuery query = queryDto.toQuery(getProcessEngine());
 
-    List<Group> resultList;
-    if(firstResult != null || maxResults != null) {
-      resultList = executePaginatedQuery(query, firstResult, maxResults);
-    } else {
-      resultList = query.list();
-    }
+    List<Group> resultList = QueryUtil.list(query, firstResult, maxResults);
 
     return GroupDto.fromGroupList(resultList);
   }
 
+  @Override
   public CountResultDto getGroupCount(UriInfo uriInfo) {
     GroupQueryDto queryDto = new GroupQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
     return queryGroupCount(queryDto);
   }
 
+  @Override
   public CountResultDto queryGroupCount(GroupQueryDto queryDto) {
     GroupQuery query = queryDto.toQuery(getProcessEngine());
     long count = query.count();
     return new CountResultDto(count);
   }
 
+  @Override
   public void createGroup(GroupDto groupDto) {
     final IdentityService identityService = getIdentityService();
 
@@ -106,6 +101,7 @@ public class GroupRestServiceImpl extends AbstractAuthorizedRestResource impleme
 
   }
 
+  @Override
   public ResourceOptionsDto availableOperations(UriInfo context) {
 
     final IdentityService identityService = getIdentityService();
@@ -134,16 +130,6 @@ public class GroupRestServiceImpl extends AbstractAuthorizedRestResource impleme
   }
 
   // utility methods //////////////////////////////////////
-
-  protected List<Group> executePaginatedQuery(GroupQuery query, Integer firstResult, Integer maxResults) {
-    if (firstResult == null) {
-      firstResult = 0;
-    }
-    if (maxResults == null) {
-      maxResults = Integer.MAX_VALUE;
-    }
-    return query.listPage(firstResult, maxResults);
-  }
 
   protected IdentityService getIdentityService() {
     return getProcessEngine().getIdentityService();

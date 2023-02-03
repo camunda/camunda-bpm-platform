@@ -17,6 +17,9 @@
 package org.camunda.bpm.engine.rest.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.List;
+import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.VariableInstanceRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
@@ -24,12 +27,9 @@ import org.camunda.bpm.engine.rest.dto.runtime.VariableInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableInstanceQueryDto;
 import org.camunda.bpm.engine.rest.sub.runtime.VariableInstanceResource;
 import org.camunda.bpm.engine.rest.sub.runtime.impl.VariableInstanceResourceImpl;
+import org.camunda.bpm.engine.rest.util.QueryUtil;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
-
-import javax.ws.rs.core.UriInfo;
-import java.util.ArrayList;
-import java.util.List;
 
 public class VariableInstanceRestServiceImpl extends AbstractRestProcessEngineAware implements VariableInstanceRestService {
 
@@ -62,12 +62,7 @@ public class VariableInstanceRestServiceImpl extends AbstractRestProcessEngineAw
       query.disableCustomObjectDeserialization();
     }
 
-    List<VariableInstance> matchingInstances;
-    if (firstResult != null || maxResults != null) {
-      matchingInstances = executePaginatedQuery(query, firstResult, maxResults);
-    } else {
-      matchingInstances = query.list();
-    }
+    List<VariableInstance> matchingInstances = QueryUtil.list(query, firstResult, maxResults);
 
     List<VariableInstanceDto> instanceResults = new ArrayList<>();
     for (VariableInstance instance : matchingInstances) {
@@ -75,16 +70,6 @@ public class VariableInstanceRestServiceImpl extends AbstractRestProcessEngineAw
       instanceResults.add(resultInstance);
     }
     return instanceResults;
-  }
-
-  private List<VariableInstance> executePaginatedQuery(VariableInstanceQuery query, Integer firstResult, Integer maxResults) {
-    if (firstResult == null) {
-      firstResult = 0;
-    }
-    if (maxResults == null) {
-      maxResults = Integer.MAX_VALUE;
-    }
-    return query.listPage(firstResult, maxResults);
   }
 
   @Override

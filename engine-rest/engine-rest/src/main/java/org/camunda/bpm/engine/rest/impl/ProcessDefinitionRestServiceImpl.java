@@ -16,12 +16,11 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
-
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
@@ -42,8 +41,7 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.repository.ProcessDefinitionResource;
 import org.camunda.bpm.engine.rest.sub.repository.impl.ProcessDefinitionResourceImpl;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.camunda.bpm.engine.rest.util.QueryUtil;
 
 public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineAware implements ProcessDefinitionRestService {
 
@@ -51,7 +49,8 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
     super(engineName, objectMapper);
   }
 
-	public ProcessDefinitionResource getProcessDefinitionByKey(String processDefinitionKey) {
+	@Override
+  public ProcessDefinitionResource getProcessDefinitionByKey(String processDefinitionKey) {
 
 	  ProcessDefinition processDefinition = getProcessEngine()
         .getRepositoryService()
@@ -70,7 +69,8 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
     }
 	}
 
-	public ProcessDefinitionResource getProcessDefinitionByKeyAndTenantId(String processDefinitionKey, String tenantId) {
+	@Override
+  public ProcessDefinitionResource getProcessDefinitionByKeyAndTenantId(String processDefinitionKey, String tenantId) {
 
     ProcessDefinition processDefinition = getProcessEngine()
         .getRepositoryService()
@@ -104,29 +104,13 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
 	  ProcessEngine engine = getProcessEngine();
 	  ProcessDefinitionQuery query = queryDto.toQuery(engine);
 
-	  List<ProcessDefinition> matchingDefinitions = null;
-
-	  if (firstResult != null || maxResults != null) {
-	    matchingDefinitions = executePaginatedQuery(query, firstResult, maxResults);
-	  } else {
-	    matchingDefinitions = query.list();
-	  }
+	  List<ProcessDefinition> matchingDefinitions = QueryUtil.list(query, firstResult, maxResults);
 
 	  for (ProcessDefinition definition : matchingDefinitions) {
 	    ProcessDefinitionDto def = ProcessDefinitionDto.fromProcessDefinition(definition);
 	    definitions.add(def);
 	  }
 	  return definitions;
-	}
-
-	private List<ProcessDefinition> executePaginatedQuery(ProcessDefinitionQuery query, Integer firstResult, Integer maxResults) {
-	  if (firstResult == null) {
-	    firstResult = 0;
-	  }
-	  if (maxResults == null) {
-	    maxResults = Integer.MAX_VALUE;
-	  }
-	  return query.listPage(firstResult, maxResults);
 	}
 
 	@Override
@@ -183,6 +167,7 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
     return results;
   }
 
+  @Override
   public void updateSuspensionState(ProcessDefinitionSuspensionStateDto dto) {
     if (dto.getProcessDefinitionId() != null) {
       String message = "Only processDefinitionKey can be set to update the suspension state.";

@@ -17,6 +17,9 @@
 package org.camunda.bpm.engine.rest.impl.history;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.List;
+import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricExternalTaskLog;
 import org.camunda.bpm.engine.history.HistoricExternalTaskLogQuery;
@@ -26,10 +29,7 @@ import org.camunda.bpm.engine.rest.dto.history.HistoricExternalTaskLogQueryDto;
 import org.camunda.bpm.engine.rest.history.HistoricExternalTaskLogRestService;
 import org.camunda.bpm.engine.rest.sub.history.HistoricExternalTaskLogResource;
 import org.camunda.bpm.engine.rest.sub.history.impl.HistoricExternalTaskLogResourceImpl;
-
-import javax.ws.rs.core.UriInfo;
-import java.util.ArrayList;
-import java.util.List;
+import org.camunda.bpm.engine.rest.util.QueryUtil;
 
 public class HistoricExternalTaskLogRestServiceImpl implements HistoricExternalTaskLogRestService {
 
@@ -57,12 +57,7 @@ public class HistoricExternalTaskLogRestServiceImpl implements HistoricExternalT
     queryDto.setObjectMapper(objectMapper);
     HistoricExternalTaskLogQuery query = queryDto.toQuery(processEngine);
 
-    List<HistoricExternalTaskLog> matchingHistoricExternalTaskLogs;
-    if (firstResult != null || maxResults != null) {
-      matchingHistoricExternalTaskLogs = executePaginatedQuery(query, firstResult, maxResults);
-    } else {
-      matchingHistoricExternalTaskLogs = query.list();
-    }
+    List<HistoricExternalTaskLog> matchingHistoricExternalTaskLogs = QueryUtil.list(query, firstResult, maxResults);
 
     List<HistoricExternalTaskLogDto> results = new ArrayList<HistoricExternalTaskLogDto>();
     for (HistoricExternalTaskLog historicExternalTaskLog : matchingHistoricExternalTaskLogs) {
@@ -91,13 +86,4 @@ public class HistoricExternalTaskLogRestServiceImpl implements HistoricExternalT
     return result;
   }
 
-  protected List<HistoricExternalTaskLog> executePaginatedQuery(HistoricExternalTaskLogQuery query, Integer firstResult, Integer maxResults) {
-    if (firstResult == null) {
-      firstResult = 0;
-    }
-    if (maxResults == null) {
-      maxResults = Integer.MAX_VALUE;
-    }
-    return query.listPage(firstResult, maxResults);
-  }
 }

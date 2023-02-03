@@ -17,8 +17,18 @@
 package org.camunda.bpm.engine.rest.impl;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.camunda.bpm.engine.authorization.Authorization.ANY;
+import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
+import static org.camunda.bpm.engine.authorization.Resources.AUTHORIZATION;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.authorization.Authorization;
@@ -39,19 +49,8 @@ import org.camunda.bpm.engine.rest.dto.authorization.AuthorizationQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.authorization.AuthorizationResource;
 import org.camunda.bpm.engine.rest.sub.authorization.impl.AuthorizationResourceImpl;
+import org.camunda.bpm.engine.rest.util.QueryUtil;
 import org.camunda.bpm.engine.rest.util.ResourceUtil;
-
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.camunda.bpm.engine.authorization.Authorization.ANY;
-import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
-import static org.camunda.bpm.engine.authorization.Resources.AUTHORIZATION;
 
 /**
  * @author Daniel Meyer
@@ -63,6 +62,7 @@ public class AuthorizationRestServiceImpl extends AbstractAuthorizedRestResource
     super(engineName,AUTHORIZATION, ANY, objectMapper);
   }
 
+  @Override
   public AuthorizationCheckResultDto isUserAuthorized(String permissionName, String resourceName, Integer resourceType, String resourceId, String userId) {
 
     // validate request:
@@ -116,15 +116,18 @@ public class AuthorizationRestServiceImpl extends AbstractAuthorizedRestResource
     return new AuthorizationCheckResultDto(isUserAuthorized, permissionName, resource, resourceId);
   }
 
+  @Override
   public AuthorizationResource getAuthorization(String id) {
     return new AuthorizationResourceImpl(getProcessEngine().getName(), id, relativeRootResourcePath, getObjectMapper());
   }
 
+  @Override
   public List<AuthorizationDto> queryAuthorizations(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
     AuthorizationQueryDto queryDto = new AuthorizationQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
     return queryAuthorizations(queryDto, firstResult, maxResults);
   }
 
+  @Override
   public ResourceOptionsDto availableOperations(UriInfo context) {
 
     UriBuilder baseUriBuilder = context.getBaseUriBuilder()
@@ -155,16 +158,12 @@ public class AuthorizationRestServiceImpl extends AbstractAuthorizedRestResource
     queryDto.setObjectMapper(getObjectMapper());
     AuthorizationQuery query = queryDto.toQuery(getProcessEngine());
 
-    List<Authorization> resultList;
-    if(firstResult != null || maxResults != null) {
-      resultList = executePaginatedQuery(query, firstResult, maxResults);
-    } else {
-      resultList = query.list();
-    }
+    List<Authorization> resultList = QueryUtil.list(query, firstResult, maxResults);
 
     return AuthorizationDto.fromAuthorizationList(resultList, getProcessEngine().getProcessEngineConfiguration());
   }
 
+  @Override
   public CountResultDto getAuthorizationCount(UriInfo uriInfo) {
     AuthorizationQueryDto queryDto = new AuthorizationQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
     return getAuthorizationCount(queryDto);
@@ -176,6 +175,7 @@ public class AuthorizationRestServiceImpl extends AbstractAuthorizedRestResource
     return new CountResultDto(count);
   }
 
+  @Override
   public AuthorizationDto createAuthorization(UriInfo context, AuthorizationCreateDto dto) {
     final AuthorizationService authorizationService = getProcessEngine().getAuthorizationService();
 
@@ -188,16 +188,6 @@ public class AuthorizationRestServiceImpl extends AbstractAuthorizedRestResource
   }
 
   // utility methods //////////////////////////////////////
-
-  protected List<Authorization> executePaginatedQuery(AuthorizationQuery query, Integer firstResult, Integer maxResults) {
-    if (firstResult == null) {
-      firstResult = 0;
-    }
-    if (maxResults == null) {
-      maxResults = Integer.MAX_VALUE;
-    }
-    return query.listPage(firstResult, maxResults);
-  }
 
   protected IdentityService getIdentityService() {
     return getProcessEngine().getIdentityService();

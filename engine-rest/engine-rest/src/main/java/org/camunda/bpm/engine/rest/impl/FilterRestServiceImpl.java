@@ -16,7 +16,19 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
+import static org.camunda.bpm.engine.authorization.Authorization.ANY;
+import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
+import static org.camunda.bpm.engine.authorization.Resources.FILTER;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.FilterService;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -31,19 +43,7 @@ import org.camunda.bpm.engine.rest.dto.runtime.FilterQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.runtime.FilterResource;
 import org.camunda.bpm.engine.rest.sub.runtime.impl.FilterResourceImpl;
-
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.camunda.bpm.engine.authorization.Authorization.ANY;
-import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
-import static org.camunda.bpm.engine.authorization.Resources.FILTER;
+import org.camunda.bpm.engine.rest.util.QueryUtil;
 
 
 /**
@@ -55,15 +55,17 @@ public class FilterRestServiceImpl extends AbstractAuthorizedRestResource implem
     super(engineName, FILTER, ANY, objectMapper);
   }
 
+  @Override
   public FilterResource getFilter(String filterId) {
     return new FilterResourceImpl(getProcessEngine().getName(), getObjectMapper(), filterId, relativeRootResourcePath);
   }
 
+  @Override
   public List<FilterDto> getFilters(UriInfo uriInfo, Boolean itemCount, Integer firstResult, Integer maxResults) {
     FilterService filterService = getProcessEngine().getFilterService();
     FilterQuery query = getQueryFromQueryParameters(uriInfo.getQueryParameters());
 
-    List<Filter> matchingFilters = executeFilterQuery(query, firstResult, maxResults);
+    List<Filter> matchingFilters = QueryUtil.list(query, firstResult, maxResults);
 
     List<FilterDto> filters = new ArrayList<FilterDto>();
     for (Filter filter : matchingFilters) {
@@ -77,30 +79,13 @@ public class FilterRestServiceImpl extends AbstractAuthorizedRestResource implem
     return filters;
   }
 
-  public List<Filter> executeFilterQuery(FilterQuery query, Integer firstResult, Integer maxResults) {
-    if (firstResult != null || maxResults != null) {
-      return executePaginatedQuery(query, firstResult, maxResults);
-    }
-    else {
-      return query.list();
-    }
-  }
-
-  protected List<Filter> executePaginatedQuery(FilterQuery query, Integer firstResult, Integer maxResults) {
-    if (firstResult == null) {
-      firstResult = 0;
-    }
-    if (maxResults == null) {
-      maxResults = Integer.MAX_VALUE;
-    }
-    return query.listPage(firstResult, maxResults);
-  }
-
+  @Override
   public CountResultDto getFiltersCount(UriInfo uriInfo) {
     FilterQuery query = getQueryFromQueryParameters(uriInfo.getQueryParameters());
     return new CountResultDto(query.count());
   }
 
+  @Override
   public FilterDto createFilter(FilterDto filterDto) {
     FilterService filterService = getProcessEngine().getFilterService();
 
@@ -133,6 +118,7 @@ public class FilterRestServiceImpl extends AbstractAuthorizedRestResource implem
     return queryDto.toQuery(engine);
   }
 
+  @Override
   public ResourceOptionsDto availableOperations(UriInfo context) {
 
     UriBuilder baseUriBuilder = context.getBaseUriBuilder()

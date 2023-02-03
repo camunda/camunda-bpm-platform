@@ -17,6 +17,9 @@
 package org.camunda.bpm.engine.rest.impl.history;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.List;
+import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.history.HistoricIncidentQuery;
@@ -24,10 +27,7 @@ import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricIncidentDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricIncidentQueryDto;
 import org.camunda.bpm.engine.rest.history.HistoricIncidentRestService;
-
-import javax.ws.rs.core.UriInfo;
-import java.util.ArrayList;
-import java.util.List;
+import org.camunda.bpm.engine.rest.util.QueryUtil;
 
 /**
  * @author Roman Smirnov
@@ -48,12 +48,7 @@ public class HistoricIncidentRestServiceImpl implements HistoricIncidentRestServ
     HistoricIncidentQueryDto queryDto = new HistoricIncidentQueryDto(objectMapper, uriInfo.getQueryParameters());
     HistoricIncidentQuery query = queryDto.toQuery(processEngine);
 
-    List<HistoricIncident> queryResult;
-    if (firstResult != null || maxResults != null) {
-      queryResult = executePaginatedQuery(query, firstResult, maxResults);
-    } else {
-      queryResult = query.list();
-    }
+    List<HistoricIncident> queryResult = QueryUtil.list(query, firstResult, maxResults);
 
     List<HistoricIncidentDto> result = new ArrayList<HistoricIncidentDto>();
     for (HistoricIncident historicIncident : queryResult) {
@@ -74,16 +69,6 @@ public class HistoricIncidentRestServiceImpl implements HistoricIncidentRestServ
     result.setCount(count);
 
     return result;
-  }
-
-  private List<HistoricIncident> executePaginatedQuery(HistoricIncidentQuery query, Integer firstResult, Integer maxResults) {
-    if (firstResult == null) {
-      firstResult = 0;
-    }
-    if (maxResults == null) {
-      maxResults = Integer.MAX_VALUE;
-    }
-    return query.listPage(firstResult, maxResults);
   }
 
 }

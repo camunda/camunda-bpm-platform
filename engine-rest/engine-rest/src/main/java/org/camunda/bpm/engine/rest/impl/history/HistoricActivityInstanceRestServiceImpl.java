@@ -17,6 +17,9 @@
 package org.camunda.bpm.engine.rest.impl.history;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.List;
+import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
@@ -26,10 +29,7 @@ import org.camunda.bpm.engine.rest.dto.history.HistoricActivityInstanceQueryDto;
 import org.camunda.bpm.engine.rest.history.HistoricActivityInstanceRestService;
 import org.camunda.bpm.engine.rest.sub.history.HistoricActivityInstanceResource;
 import org.camunda.bpm.engine.rest.sub.history.impl.HistoricActivityInstanceResourceImpl;
-
-import javax.ws.rs.core.UriInfo;
-import java.util.ArrayList;
-import java.util.List;
+import org.camunda.bpm.engine.rest.util.QueryUtil;
 
 public class HistoricActivityInstanceRestServiceImpl implements HistoricActivityInstanceRestService {
 
@@ -41,6 +41,7 @@ public class HistoricActivityInstanceRestServiceImpl implements HistoricActivity
     this.processEngine = processEngine;
   }
 
+  @Override
   public HistoricActivityInstanceResource getHistoricCaseInstance(String activityInstanceId) {
     return new HistoricActivityInstanceResourceImpl(processEngine, activityInstanceId);
   }
@@ -56,12 +57,7 @@ public class HistoricActivityInstanceRestServiceImpl implements HistoricActivity
     queryDto.setObjectMapper(objectMapper);
     HistoricActivityInstanceQuery query = queryDto.toQuery(processEngine);
 
-    List<HistoricActivityInstance> matchingHistoricActivityInstances;
-    if (firstResult != null || maxResults != null) {
-      matchingHistoricActivityInstances = executePaginatedQuery(query, firstResult, maxResults);
-    } else {
-      matchingHistoricActivityInstances = query.list();
-    }
+    List<HistoricActivityInstance> matchingHistoricActivityInstances = QueryUtil.list(query, firstResult, maxResults);
 
     List<HistoricActivityInstanceDto> historicActivityInstanceResults = new ArrayList<HistoricActivityInstanceDto>();
     for (HistoricActivityInstance historicActivityInstance : matchingHistoricActivityInstances) {
@@ -70,16 +66,6 @@ public class HistoricActivityInstanceRestServiceImpl implements HistoricActivity
       historicActivityInstanceResults.add(resultHistoricActivityInstance);
     }
     return historicActivityInstanceResults;
-  }
-
-  private List<HistoricActivityInstance> executePaginatedQuery(HistoricActivityInstanceQuery query, Integer firstResult, Integer maxResults) {
-    if (firstResult == null) {
-      firstResult = 0;
-    }
-    if (maxResults == null) {
-      maxResults = Integer.MAX_VALUE;
-    }
-    return query.listPage(firstResult, maxResults);
   }
 
   @Override

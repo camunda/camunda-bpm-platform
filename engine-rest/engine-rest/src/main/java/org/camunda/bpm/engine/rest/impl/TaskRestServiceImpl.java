@@ -16,16 +16,15 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Variant;
-
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.exception.NotValidException;
@@ -40,10 +39,9 @@ import org.camunda.bpm.engine.rest.sub.task.TaskReportResource;
 import org.camunda.bpm.engine.rest.sub.task.TaskResource;
 import org.camunda.bpm.engine.rest.sub.task.impl.TaskReportResourceImpl;
 import org.camunda.bpm.engine.rest.sub.task.impl.TaskResourceImpl;
+import org.camunda.bpm.engine.rest.util.QueryUtil;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implements TaskRestService {
 
@@ -53,6 +51,7 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
     super(engineName, objectMapper);
   }
 
+  @Override
   public Object getTasks(Request request, UriInfo uriInfo, Integer firstResult, Integer maxResults) {
     Variant variant = request.selectVariant(VARIANTS);
     if (variant != null) {
@@ -108,24 +107,7 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
 
     // enable initialization of form key:
     query.initializeFormKeys();
-
-    List<Task> matchingTasks;
-    if (firstResult != null || maxResults != null) {
-      matchingTasks = executePaginatedQuery(query, firstResult, maxResults);
-    } else {
-      matchingTasks = query.list();
-    }
-    return matchingTasks;
-  }
-
-  protected List<Task> executePaginatedQuery(TaskQuery query, Integer firstResult, Integer maxResults) {
-    if (firstResult == null) {
-      firstResult = 0;
-    }
-    if (maxResults == null) {
-      maxResults = Integer.MAX_VALUE;
-    }
-    return query.listPage(firstResult, maxResults);
+    return QueryUtil.list(query, firstResult, maxResults);
   }
 
   @Override
@@ -152,6 +134,7 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
     return new TaskResourceImpl(getProcessEngine(), id, relativeRootResourcePath, getObjectMapper());
   }
 
+  @Override
   public void createTask(TaskDto taskDto) {
     ProcessEngine engine = getProcessEngine();
     TaskService taskService = engine.getTaskService();
