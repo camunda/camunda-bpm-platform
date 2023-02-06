@@ -47,20 +47,27 @@ public class SetJobRetriesBatchConfigurationJsonConverter
     JsonUtil.addListField(json, JOB_IDS, configuration.getIds());
     JsonUtil.addListField(json, JOB_ID_MAPPINGS, DeploymentMappingJsonConverter.INSTANCE, configuration.getIdMappings());
     JsonUtil.addField(json, RETRIES, configuration.getRetries());
-    JsonUtil.addDateField(json, DUE_DATE, configuration.getDueDate());
+    if(configuration.isDueDateSet()) {
+      Date dueDate = configuration.getDueDate();
+      if (dueDate == null) {
+        JsonUtil.addNullField(json, DUE_DATE);
+      } else {
+        JsonUtil.addDateField(json, DUE_DATE, dueDate);
+      }
+    }
     return json;
   }
 
   @Override
   public SetJobRetriesBatchConfiguration readConfiguration(JsonObject json) {
-    boolean isdDueDateSet = json.has(DUE_DATE);
+    boolean isDueDateSet = json.has(DUE_DATE);
     Date dueDate = null;
-    if(isdDueDateSet && !json.get(DUE_DATE).isJsonNull()) {
+    if (isDueDateSet && !json.get(DUE_DATE).isJsonNull()) {
       dueDate = new Date(JsonUtil.getLong(json, DUE_DATE));
     }
 
     SetJobRetriesBatchConfiguration configuration = new SetJobRetriesBatchConfiguration(
-        readJobIds(json), readIdMappings(json), JsonUtil.getInt(json, RETRIES), dueDate, isdDueDateSet);
+        readJobIds(json), readIdMappings(json), JsonUtil.getInt(json, RETRIES), dueDate, isDueDateSet);
 
     return configuration;
   }

@@ -29,7 +29,6 @@ import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.batch.Batch;
-import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.runtime.Job;
@@ -492,8 +491,8 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
 
     // assume
     List<Job> job = managementService.createJobQuery().list();
-    assertThat(job.get(0).getDuedate()).isNull();
-    assertThat(job.get(1).getDuedate()).isNull();
+    assertThat(job.get(0).getDuedate()).isNotNull();
+    assertThat(job.get(1).getDuedate()).isNotNull();
 
     // when
     Batch batch = managementService.setJobRetriesByProcessAsync(RETRIES)
@@ -529,17 +528,6 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
       assertThat(jobResult.getRetries()).isEqualTo(RETRIES);
       assertThat(jobResult.getDuedate()).isEqualTo(newDueDate);
     }
-  }
-
-  public void shouldThrowExceptionOnSetJobRetriesWithNullDuedate() {
-    // given
-    tearDownEnsureJobDueDateNotNull = true;
-    engineConfiguration.setEnsureJobDueDateNotNull(true);
-
-    // when/then
-    assertThatThrownBy(() -> managementService.setJobRetriesByJobsAsync(5).jobIds(ids).dueDate(null).executeAsync())
-      .isInstanceOf(NullValueException.class)
-      .hasMessageContaining("dueDate is null");
   }
 
   @Test

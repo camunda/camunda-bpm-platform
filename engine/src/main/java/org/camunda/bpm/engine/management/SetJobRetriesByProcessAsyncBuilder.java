@@ -19,7 +19,6 @@ package org.camunda.bpm.engine.management;
 import java.util.List;
 
 import org.camunda.bpm.engine.ManagementService;
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
@@ -30,9 +29,6 @@ public interface SetJobRetriesByProcessAsyncBuilder extends SetJobRetriesAsyncBu
 
   /**
    * Specifies a list of process instance ids. All jobs belonging to those process instances will be updated.
-   *
-   * <strong>Note:</strong> You can reference jobs either by specific jobs ({@link #jobQuery}, {@link #jobIds}) or by process ({@link #processInstanceIds}, {@link #processInstanceQuery}, {@link #historicProcessInstanceQuery}).
-   * If you provide processInstanceIds, calling {@link #jobQuery} or {@link #jobIds} is not allowed and will cause a {@link ProcessEngineException} on {@link #executeAsync()}.
    *
    * @param processInstanceIds the list of process instance ids
    *
@@ -45,9 +41,6 @@ public interface SetJobRetriesByProcessAsyncBuilder extends SetJobRetriesAsyncBu
   /**
    * Specifies a process instance query. All jobs belonging to those process instances will be updated.
    *
-   * <strong>Note:</strong> You can reference jobs either by specific jobs ({@link #jobQuery}, {@link #jobIds}) or by process ({@link #processInstanceIds}, {@link #processInstanceQuery}, {@link #historicProcessInstanceQuery}).
-   * If you provide a processInstanceQuery, calling {@link #jobQuery} or {@link #jobIds} is not allowed and will cause a {@link ProcessEngineException} on {@link #executeAsync()}.
-   *
    * @param query the process instance query
    *
    * @see ManagementService#setJobRetriesAsync(List, ProcessInstanceQuery, int)
@@ -58,9 +51,6 @@ public interface SetJobRetriesByProcessAsyncBuilder extends SetJobRetriesAsyncBu
 
   /**
    * Specifies a historic process instance query that identifies runtime process instances with jobs that have to be modified. All jobs belonging to those process instances will be updated.
-   *
-   * <strong>Note:</strong> You can reference jobs either by specific jobs ({@link #jobQuery}, {@link #jobIds}) or by process ({@link #processInstanceIds}, {@link #processInstanceQuery}, {@link #historicProcessInstanceQuery}).
-   * If you provide a {@link HistoricProcessInstanceQuery}, calling {@link #jobQuery} or {@link #jobIds} is not allowed and will cause a {@link ProcessEngineException} on {@link #executeAsync()}.
    *
    * @param query the historic process instance
    *
