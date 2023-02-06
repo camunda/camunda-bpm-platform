@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
@@ -527,10 +528,10 @@ public class MigrationTransitionInstancesTest {
     // then
     Job job = testHelper.snapshotAfterMigration.getJobs().get(0);
 
-    Assert.assertEquals(42, job.getPriority());
-    Assert.assertEquals(newDueDate, job.getDuedate());
-    Assert.assertEquals(52, job.getRetries());
-    Assert.assertTrue(job.isSuspended());
+    assertThat(job.getPriority()).isEqualTo(42);
+    assertThat(job.getDuedate()).isEqualToIgnoringMillis(newDueDate);
+    assertThat(job.getRetries()).isEqualTo(52);
+    assertThat(job.isSuspended()).isTrue();
   }
 
   @Test
