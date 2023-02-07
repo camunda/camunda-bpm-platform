@@ -350,4 +350,16 @@ public class CommandLogger extends ProcessEngineLogger {
         "You must specify exactly one of jobId, jobIds or jobDefinitionId as parameter. The parameter can not be null."));
   }
 
+  public ProcessEngineException exceptionNoJobFoundForId(String jobId) {
+    return new ProcessEngineException(exceptionMessage(
+        "053",
+        "No job found with id '{}'.'", jobId));
+    }
+
+  public ProcessEngineException exceptionJobRetriesMustNotBeNegative(Integer retries) {
+    return new ProcessEngineException(exceptionMessage(
+        "054",
+        "The number of job retries must be a non-negative Integer, but '{}' has been provided.", retries));
+  }
+
 }

@@ -21,8 +21,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -39,6 +39,7 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 public class SetJobRetriesCmd implements Command<Void>, Serializable {
 
   protected static final long serialVersionUID = 1L;
+  protected static final CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
   protected static final String RETRIES = "retries";
   protected static final String DUE_DATE = "dueDate";
@@ -114,7 +115,7 @@ public class SetJobRetriesCmd implements Command<Void>, Serializable {
           job.getJobDefinitionId(), job.getProcessInstanceId(), job.getProcessDefinitionId(),
           job.getProcessDefinitionKey(), propertyChanges);
     } else {
-      throw new ProcessEngineException("No job found with id '" + jobId + "'.");
+      throw LOG.exceptionNoJobFoundForId(jobId);
     }
   }
 

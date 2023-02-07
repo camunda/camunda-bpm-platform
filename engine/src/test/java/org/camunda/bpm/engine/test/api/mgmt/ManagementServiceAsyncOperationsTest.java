@@ -59,6 +59,8 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
+  protected final Date TEST_DUE_DATE = new Date(1675752840000L);
+
   protected List<String> processInstanceIds;
   protected List<String> ids;
 
@@ -396,12 +398,10 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     //given
     JobQuery query = managementService.createJobQuery();
 
-    Date newDueDate = new Date(0);
-
     //when
     Batch batch = managementService.setJobRetriesByJobsAsync(RETRIES)
         .jobQuery(query)
-        .dueDate(newDueDate).executeAsync();
+        .dueDate(TEST_DUE_DATE).executeAsync();
     completeSeedJobs(batch);
     List<Exception> exceptions = executeBatchJobs(batch);
 
@@ -410,7 +410,7 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     for (String id : ids) {
       Job job = managementService.createJobQuery().jobId(id).singleResult();
       assertThat(job.getRetries()).isEqualTo(RETRIES);
-      assertThat(job.getDuedate()).isEqualTo(newDueDate);
+      assertThat(job.getDuedate()).isEqualToIgnoringMillis(TEST_DUE_DATE);
     }
   }
 
@@ -418,12 +418,11 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
   @Test
   public void shouldSetJobDueDateOnJobRetryAsyncByProcessInstanceIds() {
     //given
-    Date newDueDate = new Date(0);
 
     //when
     Batch batch = managementService.setJobRetriesByProcessAsync(RETRIES)
         .processInstanceIds(processInstanceIds)
-        .dueDate(newDueDate).executeAsync();
+        .dueDate(TEST_DUE_DATE).executeAsync();
     completeSeedJobs(batch);
     List<Exception> exceptions = executeBatchJobs(batch);
 
@@ -432,7 +431,7 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     for (String id : processInstanceIds) {
       Job job = managementService.createJobQuery().processInstanceId(id).singleResult();
       assertThat(job.getRetries()).isEqualTo(RETRIES);
-      assertThat(job.getDuedate()).isEqualTo(newDueDate);
+      assertThat(job.getDuedate()).isEqualToIgnoringMillis(TEST_DUE_DATE);
     }
   }
 
@@ -440,10 +439,9 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
   public void shouldSetJobDueDateOnJobRetryAsyncByProcessInstanceQuery() {
     //given
     ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
-    Date newDueDate = new Date(0);
 
     //when
-    Batch batch = managementService.setJobRetriesByProcessAsync(RETRIES).processInstanceQuery(query).dueDate(newDueDate).executeAsync();
+    Batch batch = managementService.setJobRetriesByProcessAsync(RETRIES).processInstanceQuery(query).dueDate(TEST_DUE_DATE).executeAsync();
     completeSeedJobs(batch);
     List<Exception> exceptions = executeBatchJobs(batch);
 
@@ -452,7 +450,7 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     for (String id : ids) {
       Job jobResult = managementService.createJobQuery().jobId(id).singleResult();
       assertThat(jobResult.getRetries()).isEqualTo(RETRIES);
-      assertThat(jobResult.getDuedate()).isEqualTo(newDueDate);
+      assertThat(jobResult.getDuedate()).isEqualToIgnoringMillis(TEST_DUE_DATE);
     }
   }
 
@@ -464,12 +462,10 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     HistoricProcessInstanceQuery historicProcessInstanceQuery =
         historyService.createHistoricProcessInstanceQuery();
 
-    Date newDueDate = new Date(0);
-
     //when
     Batch batch = managementService.setJobRetriesByProcessAsync(RETRIES)
         .historicProcessInstanceQuery(historicProcessInstanceQuery)
-        .dueDate(newDueDate).executeAsync();
+        .dueDate(TEST_DUE_DATE).executeAsync();
     completeSeedJobs(batch);
     List<Exception> exceptions = executeBatchJobs(batch);
 
@@ -478,7 +474,7 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     for (String id : ids) {
       Job jobResult = managementService.createJobQuery().jobId(id).singleResult();
       assertThat(jobResult.getRetries()).isEqualTo(RETRIES);
-      assertThat(jobResult.getDuedate()).isEqualTo(newDueDate);
+      assertThat(jobResult.getDuedate()).isEqualToIgnoringMillis(TEST_DUE_DATE);
     }
   }
 
@@ -514,10 +510,9 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
   @Test
   public void shouldSetJobDueDateOnJobRetryAsyncByJobIds() {
     //given
-    Date newDueDate = new Date(0);
 
     //when
-    Batch batch = managementService.setJobRetriesByJobsAsync(RETRIES).jobIds(ids).dueDate(newDueDate).executeAsync();
+    Batch batch = managementService.setJobRetriesByJobsAsync(RETRIES).jobIds(ids).dueDate(TEST_DUE_DATE).executeAsync();
     completeSeedJobs(batch);
     List<Exception> exceptions = executeBatchJobs(batch);
 
@@ -526,7 +521,7 @@ public class ManagementServiceAsyncOperationsTest extends AbstractAsyncOperation
     for (String id : ids) {
       Job jobResult = managementService.createJobQuery().jobId(id).singleResult();
       assertThat(jobResult.getRetries()).isEqualTo(RETRIES);
-      assertThat(jobResult.getDuedate()).isEqualTo(newDueDate);
+      assertThat(jobResult.getDuedate()).isEqualToIgnoringMillis(TEST_DUE_DATE);
     }
   }
 

@@ -22,7 +22,6 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.util.Date;
 import java.util.List;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.cmd.SetJobRetriesCmd;
@@ -95,7 +94,7 @@ public class SetJobRetriesBuilderImpl implements SetJobRetriesBuilder {
     ensureNotNull("commandExecutor", commandExecutor);
     ensureNotNull("retries", retries);
     if (retries < 0) {
-      throw new ProcessEngineException("The number of job retries must be a non-negative Integer, but '" + retries + "' has been provided.");
+      throw LOG.exceptionJobRetriesMustNotBeNegative(retries);
     }
 
     if (!(byJobId ^ byJobIds ^ byJobDefinitionId)) {
