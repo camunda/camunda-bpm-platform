@@ -39,6 +39,7 @@ import java.util.stream.Stream;
 import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.engine.EntityTypes;
+import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
@@ -102,6 +103,9 @@ import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.MetricIntervalValue;
 import org.camunda.bpm.engine.management.MetricsQuery;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
+import org.camunda.bpm.engine.management.SetJobRetriesBuilder;
+import org.camunda.bpm.engine.management.SetJobRetriesByJobsAsyncBuilder;
+import org.camunda.bpm.engine.management.SetJobRetriesByProcessAsyncBuilder;
 import org.camunda.bpm.engine.query.PeriodUnit;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.repository.CaseDefinition;
@@ -3333,5 +3337,38 @@ public abstract class MockProvider {
     when(mock.isDeletionLog()).thenReturn(EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_IS_DELETION_LOG);
 
     return mock;
+  }
+
+  public static SetJobRetriesByJobsAsyncBuilder createMockSetJobRetriesByJobsAsyncBuilder(ManagementService mockManagementService) {
+    Batch batchEntity = MockProvider.createMockBatch();
+    SetJobRetriesByJobsAsyncBuilder mockSetJobRetriesByJobsAsyncBuilder = mock(SetJobRetriesByJobsAsyncBuilder.class);
+    when(mockManagementService.setJobRetriesByJobsAsync(anyInt())).thenReturn(mockSetJobRetriesByJobsAsyncBuilder);
+    when(mockSetJobRetriesByJobsAsyncBuilder.jobIds(any())).thenReturn(mockSetJobRetriesByJobsAsyncBuilder);
+    when(mockSetJobRetriesByJobsAsyncBuilder.jobQuery(any())).thenReturn(mockSetJobRetriesByJobsAsyncBuilder);
+    when(mockSetJobRetriesByJobsAsyncBuilder.dueDate(any())).thenReturn(mockSetJobRetriesByJobsAsyncBuilder);
+    when(mockSetJobRetriesByJobsAsyncBuilder.executeAsync()).thenReturn(batchEntity);
+    return mockSetJobRetriesByJobsAsyncBuilder;
+  }
+
+  public static SetJobRetriesByProcessAsyncBuilder createMockSetJobRetriesByProcessAsyncBuilder(ManagementService mockManagementService) {
+    Batch batchEntity = MockProvider.createMockBatch();
+    SetJobRetriesByProcessAsyncBuilder mockSetJobRetriesByProcessAsyncBuilder = mock(SetJobRetriesByProcessAsyncBuilder.class);
+    when(mockManagementService.setJobRetriesByProcessAsync(anyInt())).thenReturn(mockSetJobRetriesByProcessAsyncBuilder);
+    when(mockSetJobRetriesByProcessAsyncBuilder.processInstanceIds(any())).thenReturn(mockSetJobRetriesByProcessAsyncBuilder);
+    when(mockSetJobRetriesByProcessAsyncBuilder.processInstanceQuery(any())).thenReturn(mockSetJobRetriesByProcessAsyncBuilder);
+    when(mockSetJobRetriesByProcessAsyncBuilder.historicProcessInstanceQuery(any())).thenReturn(mockSetJobRetriesByProcessAsyncBuilder);
+    when(mockSetJobRetriesByProcessAsyncBuilder.dueDate(any())).thenReturn(mockSetJobRetriesByProcessAsyncBuilder);
+    when(mockSetJobRetriesByProcessAsyncBuilder.executeAsync()).thenReturn(batchEntity);
+    return mockSetJobRetriesByProcessAsyncBuilder;
+  }
+
+  public static SetJobRetriesBuilder createMockSetJobRetriesBuilder(ManagementService mockManagementService) {
+    SetJobRetriesBuilder mockSetJobRetriesBuilder = mock(SetJobRetriesBuilder.class);
+    when(mockManagementService.setJobRetries(anyInt())).thenReturn(mockSetJobRetriesBuilder);
+    when(mockSetJobRetriesBuilder.jobId(any())).thenReturn(mockSetJobRetriesBuilder);
+    when(mockSetJobRetriesBuilder.jobIds(any())).thenReturn(mockSetJobRetriesBuilder);
+    when(mockSetJobRetriesBuilder.jobDefinitionId(any())).thenReturn(mockSetJobRetriesBuilder);
+    when(mockSetJobRetriesBuilder.dueDate(any())).thenReturn(mockSetJobRetriesBuilder);
+    return mockSetJobRetriesBuilder;
   }
 }

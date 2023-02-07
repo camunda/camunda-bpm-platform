@@ -117,11 +117,11 @@ public class JobRestServiceImpl extends AbstractRestProcessEngineAware
 
     try {
       Batch batch = getProcessEngine().getManagementService()
-          .setJobRetriesAsync(setJobRetriesDto.getRetries().intValue())
+          .setJobRetriesByJobsAsync(setJobRetriesDto.getRetries().intValue())
           .jobIds(setJobRetriesDto.getJobIds())
           .jobQuery(jobQuery)
           .dueDate(setJobRetriesDto.getDueDate())
-          .execute();
+          .executeAsync();
       return BatchDto.fromBatch(batch);
     } catch (BadUserRequestException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());

@@ -48,12 +48,11 @@ import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
-import org.camunda.bpm.engine.management.SetJobRetriesAsyncBuilder;
 import org.camunda.bpm.engine.management.SetJobRetriesBuilder;
+import org.camunda.bpm.engine.management.SetJobRetriesByJobsAsyncBuilder;
 import org.camunda.bpm.engine.management.UpdateJobSuspensionStateSelectBuilder;
 import org.camunda.bpm.engine.management.UpdateJobSuspensionStateTenantBuilder;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
@@ -101,7 +100,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
   private UpdateJobSuspensionStateSelectBuilder mockSuspensionStateSelectBuilder;
 
   private JobQuery mockQuery;
-  private SetJobRetriesAsyncBuilder mockSetJobRetriesAsyncBuilder;
+  private SetJobRetriesByJobsAsyncBuilder mockSetJobRetriesByJobsAsyncBuilder;
   private SetJobRetriesBuilder mockSetJobRetriesBuilder;
 
   @Before
@@ -128,23 +127,9 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
     mockManagementService = mock(ManagementService.class);
     when(mockManagementService.createJobQuery()).thenReturn(mockQuery);
 
-    mockSetJobRetriesAsyncBuilder = mock(SetJobRetriesAsyncBuilder.class);
-    when(mockManagementService.setJobRetriesAsync(anyInt())).thenReturn(mockSetJobRetriesAsyncBuilder);
-    when(mockSetJobRetriesAsyncBuilder.jobIds(any())).thenReturn(mockSetJobRetriesAsyncBuilder);
-    when(mockSetJobRetriesAsyncBuilder.jobQuery(any())).thenReturn(mockSetJobRetriesAsyncBuilder);
-    when(mockSetJobRetriesAsyncBuilder.processInstanceIds(any())).thenReturn(mockSetJobRetriesAsyncBuilder);
-    when(mockSetJobRetriesAsyncBuilder.processInstanceQuery(any())).thenReturn(mockSetJobRetriesAsyncBuilder);
-    when(mockSetJobRetriesAsyncBuilder.historicProcessInstanceQuery(any())).thenReturn(mockSetJobRetriesAsyncBuilder);
-    when(mockSetJobRetriesAsyncBuilder.dueDate(any())).thenReturn(mockSetJobRetriesAsyncBuilder);
-    Batch batchEntity = MockProvider.createMockBatch();
-    when(mockSetJobRetriesAsyncBuilder.execute()).thenReturn(batchEntity);
+    mockSetJobRetriesByJobsAsyncBuilder = MockProvider.createMockSetJobRetriesByJobsAsyncBuilder(mockManagementService);
 
-    mockSetJobRetriesBuilder = mock(SetJobRetriesBuilder.class);
-    when(mockManagementService.setJobRetries(anyInt())).thenReturn(mockSetJobRetriesBuilder);
-    when(mockSetJobRetriesBuilder.jobId(any())).thenReturn(mockSetJobRetriesBuilder);
-    when(mockSetJobRetriesBuilder.jobIds(any())).thenReturn(mockSetJobRetriesBuilder);
-    when(mockSetJobRetriesBuilder.jobDefinitionId(any())).thenReturn(mockSetJobRetriesBuilder);
-    when(mockSetJobRetriesBuilder.dueDate(any())).thenReturn(mockSetJobRetriesBuilder);
+    mockSetJobRetriesBuilder = MockProvider.createMockSetJobRetriesBuilder(mockManagementService);
 
     mockSuspensionStateSelectBuilder = mock(UpdateJobSuspensionStateSelectBuilder.class);
     when(mockManagementService.updateJobSuspensionState()).thenReturn(mockSuspensionStateSelectBuilder);
@@ -1451,7 +1436,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
   }
 
   @Test
-  public void testSetRetriesAsync() {
+  public void testSetRetriesByJobsAsync() {
     List<String> ids = Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
 
     Map<String, Object> messageBodyJson = new HashMap<>();
@@ -1466,12 +1451,12 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
     verifyBatchJson(response.asString());
 
-    verify(mockManagementService, times(1)).setJobRetriesAsync(eq(5));
-    verify(mockSetJobRetriesAsyncBuilder, times(1)).jobIds(eq(ids));
-    verify(mockSetJobRetriesAsyncBuilder, times(1)).jobQuery(null);
-    verify(mockSetJobRetriesAsyncBuilder, times(1)).dueDate(null);
-    verify(mockSetJobRetriesAsyncBuilder, times(1)).execute();
-    verifyNoMoreInteractions(mockSetJobRetriesAsyncBuilder);
+    verify(mockManagementService, times(1)).setJobRetriesByJobsAsync(5);
+    verify(mockSetJobRetriesByJobsAsyncBuilder, times(1)).jobIds(eq(ids));
+    verify(mockSetJobRetriesByJobsAsyncBuilder, times(1)).jobQuery(null);
+    verify(mockSetJobRetriesByJobsAsyncBuilder, times(1)).dueDate(null);
+    verify(mockSetJobRetriesByJobsAsyncBuilder, times(1)).executeAsync();
+    verifyNoMoreInteractions(mockSetJobRetriesByJobsAsyncBuilder);
   }
 
   @Test
@@ -1492,12 +1477,12 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
     verifyBatchJson(response.asString());
 
-    verify(mockManagementService, times(1)).setJobRetriesAsync(eq(5));
-    verify(mockSetJobRetriesAsyncBuilder, times(1)).jobIds(eq(ids));
-    verify(mockSetJobRetriesAsyncBuilder, times(1)).jobQuery(null);
-    verify(mockSetJobRetriesAsyncBuilder, times(1)).dueDate(newDueDate);
-    verify(mockSetJobRetriesAsyncBuilder, times(1)).execute();
-    verifyNoMoreInteractions(mockSetJobRetriesAsyncBuilder);
+    verify(mockManagementService, times(1)).setJobRetriesByJobsAsync(eq(5));
+    verify(mockSetJobRetriesByJobsAsyncBuilder, times(1)).jobIds(eq(ids));
+    verify(mockSetJobRetriesByJobsAsyncBuilder, times(1)).jobQuery(null);
+    verify(mockSetJobRetriesByJobsAsyncBuilder, times(1)).dueDate(newDueDate);
+    verify(mockSetJobRetriesByJobsAsyncBuilder, times(1)).executeAsync();
+    verifyNoMoreInteractions(mockSetJobRetriesByJobsAsyncBuilder);
   }
 
   @Test
@@ -1515,19 +1500,19 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
     verifyBatchJson(response.asString());
 
-    verify(mockManagementService, times(1)).setJobRetriesAsync(eq(5));
-    verify(mockSetJobRetriesAsyncBuilder, times(1)).jobIds(null);
-    verify(mockSetJobRetriesAsyncBuilder, times(1)).jobQuery(any(JobQuery.class));
-    verify(mockSetJobRetriesAsyncBuilder, times(1)).dueDate(null);
-    verify(mockSetJobRetriesAsyncBuilder, times(1)).execute();
-    verifyNoMoreInteractions(mockSetJobRetriesAsyncBuilder);
+    verify(mockManagementService, times(1)).setJobRetriesByJobsAsync(5);
+    verify(mockSetJobRetriesByJobsAsyncBuilder, times(1)).jobIds(null);
+    verify(mockSetJobRetriesByJobsAsyncBuilder, times(1)).jobQuery(any(JobQuery.class));
+    verify(mockSetJobRetriesByJobsAsyncBuilder, times(1)).dueDate(null);
+    verify(mockSetJobRetriesByJobsAsyncBuilder, times(1)).executeAsync();
+    verifyNoMoreInteractions(mockSetJobRetriesByJobsAsyncBuilder);
   }
 
 
   @Test
   public void testSetRetriesWithBadRequestQuery() {
     doThrow(new BadUserRequestException("job ids are empty"))
-        .when(mockSetJobRetriesAsyncBuilder).jobQuery(eq((JobQuery) null));
+        .when(mockSetJobRetriesByJobsAsyncBuilder).jobQuery(eq((JobQuery) null));
 
     Map<String, Object> messageBodyJson = new HashMap<>();
     messageBodyJson.put(RETRIES, 5);
@@ -1551,7 +1536,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
   @Test
   public void testSetRetriesWithNegativeRetries() {
     doThrow(new BadUserRequestException("retries are negative"))
-        .when(mockManagementService).setJobRetriesAsync(eq(MockProvider.EXAMPLE_NEGATIVE_JOB_RETRIES));
+        .when(mockManagementService).setJobRetriesByJobsAsync(eq(MockProvider.EXAMPLE_NEGATIVE_JOB_RETRIES));
 
     Map<String, Object> messageBodyJson = new HashMap<>();
     messageBodyJson.put(RETRIES, MockProvider.EXAMPLE_NEGATIVE_JOB_RETRIES);
