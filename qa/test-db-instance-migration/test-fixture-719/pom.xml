@@ -144,51 +144,6 @@
         </plugins>
       </build>
     </profile>
-    <profile>
-      <id>h2</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>delete-h2-database</id>
-                <phase>generate-test-sources</phase>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-                <configuration>
-                  <target>
-                    <delete>
-                      <fileset dir="${project.basedir}/../target/h2/">
-                        <include name="*.db" />
-                      </fileset>
-                    </delete>
-                  </target>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>sql-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>import-database-h2-2</id>
-                <phase>process-test-sources</phase>
-                <goals>
-                  <goal>execute</goal>
-                </goals>
-                <configuration>
-                  <sqlCommand>RUNSCRIPT FROM '${database.host}changelog.h2.sql' CHARSET 'UTF-8'</sqlCommand>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
   </profiles>
 
 </project>

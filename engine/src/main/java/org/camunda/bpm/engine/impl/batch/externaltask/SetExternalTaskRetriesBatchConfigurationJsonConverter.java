@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.impl.batch.DeploymentMappingJsonConverter;
 import org.camunda.bpm.engine.impl.batch.DeploymentMappings;
 import org.camunda.bpm.engine.impl.batch.SetRetriesBatchConfiguration;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
+
 import com.google.gson.JsonObject;
 
 public class SetExternalTaskRetriesBatchConfigurationJsonConverter

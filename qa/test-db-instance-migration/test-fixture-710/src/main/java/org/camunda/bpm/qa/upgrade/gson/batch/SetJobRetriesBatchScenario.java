@@ -16,14 +16,15 @@
  */
 package org.camunda.bpm.qa.upgrade.gson.batch;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.qa.upgrade.DescribesScenario;
 import org.camunda.bpm.qa.upgrade.ScenarioSetup;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Tassilo Weidner
@@ -53,7 +54,8 @@ public class SetJobRetriesBatchScenario {
           jobIds.add(job.getId());
         }
 
-        engine.getManagementService().setJobRetriesAsync(jobIds, 22);
+        Batch batch = engine.getManagementService().setJobRetriesAsync(jobIds, 22);
+        engine.getManagementService().setProperty("SetJobRetriesBatchScenario.retries.batchId", batch.getId());
       }
     };
   }

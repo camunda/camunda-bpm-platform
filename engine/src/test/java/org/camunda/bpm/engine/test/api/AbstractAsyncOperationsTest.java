@@ -17,7 +17,6 @@
 package org.camunda.bpm.engine.test.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
@@ -112,24 +111,24 @@ public abstract class AbstractAsyncOperationsTest {
    * Execute all batch jobs of batch once and collect exceptions during job execution.
    *
    * @param batch the batch for which the batch jobs should be executed
-   * @return the catched exceptions of the batch job executions, is empty if non where thrown
+   * @return the caught exceptions of the batch job executions, is empty if non where thrown
    */
   protected List<Exception> executeBatchJobs(Batch batch) {
     String batchJobDefinitionId = batch.getBatchJobDefinitionId();
     List<Job> batchJobs = managementService.createJobQuery().jobDefinitionId(batchJobDefinitionId).list();
-    assertFalse(batchJobs.isEmpty());
+    assertThat(batchJobs).isNotEmpty();
 
-    List<Exception> catchedExceptions = new ArrayList<>();
+    List<Exception> caughtExceptions = new ArrayList<>();
 
     for (Job batchJob : batchJobs) {
       try {
         managementService.executeJob(batchJob.getId());
       } catch (Exception e) {
-        catchedExceptions.add(e);
+        caughtExceptions.add(e);
       }
     }
 
-    return catchedExceptions;
+    return caughtExceptions;
   }
 
   protected List<String> startTestProcesses(int numberOfProcesses) {

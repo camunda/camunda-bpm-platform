@@ -332,4 +332,34 @@ public class CommandLogger extends ProcessEngineLogger {
         + "please disable the built-in error code provider.", builtinCode, initialCode);
   }
 
+  public ProcessEngineException exceptionSettingJobRetriesAsyncNoJobsSpecified() {
+    return new ProcessEngineException(exceptionMessage(
+        "050",
+        "You must specify at least one of jobIds or jobQuery."));
+  }
+
+  public ProcessEngineException exceptionSettingJobRetriesAsyncNoProcessesSpecified() {
+    return new ProcessEngineException(exceptionMessage(
+        "051",
+        "You must specify at least one of or one of processInstanceIds, processInstanceQuery, or historicProcessInstanceQuery."));
+  }
+
+  public ProcessEngineException exceptionSettingJobRetriesJobsNotSpecifiedCorrectly() {
+    return new ProcessEngineException(exceptionMessage(
+        "052",
+        "You must specify exactly one of jobId, jobIds or jobDefinitionId as parameter. The parameter can not be null."));
+  }
+
+  public ProcessEngineException exceptionNoJobFoundForId(String jobId) {
+    return new ProcessEngineException(exceptionMessage(
+        "053",
+        "No job found with id '{}'.'", jobId));
+    }
+
+  public ProcessEngineException exceptionJobRetriesMustNotBeNegative(Integer retries) {
+    return new ProcessEngineException(exceptionMessage(
+        "054",
+        "The number of job retries must be a non-negative Integer, but '{}' has been provided.", retries));
+  }
+
 }
