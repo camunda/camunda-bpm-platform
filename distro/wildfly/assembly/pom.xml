@@ -16,7 +16,7 @@
     Assembles the Camunda Platform and makes it ready for qa.
     The assembly is installed to maven later in the reactor, if the integration tests pass successfully
   </description>
-  
+
   <properties>
     <!-- generate a bom of compile time dependencies for the license book.
     Note: Every compile time dependency will end up in the license book. Please
@@ -36,7 +36,7 @@
       <groupId>org.camunda.bpm.javaee</groupId>
       <artifactId>camunda-ejb-client</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
@@ -51,15 +51,15 @@
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-cdi</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-spring</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine-rest</artifactId>
+      <artifactId>camunda-engine-rest-jakarta</artifactId>
       <classifier>classes</classifier>
       <version>${project.version}</version>
     </dependency>
@@ -107,7 +107,7 @@
     </dependency>
 
     <dependency>
-      <!-- this dependency is to make sure that we are executed after camunda-modules 
+      <!-- this dependency is to make sure that we are executed after camunda-modules
         in the reactor -->
       <groupId>org.camunda.bpm.wildfly</groupId>
       <artifactId>camunda-wildfly-modules</artifactId>

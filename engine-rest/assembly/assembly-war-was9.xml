@@ -39,7 +39,6 @@
       <unpackOptions>
         <excludes>
           <exclude>**/web.xml</exclude>
-          <exclude>WEB-INF/lib/camunda-engine-rest-core-${project.version}-jakarta.jar</exclude>
         </excludes>
       </unpackOptions>
       <includes>

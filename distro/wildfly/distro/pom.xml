@@ -39,9 +39,9 @@
 
     <dependency>
       <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine-rest</artifactId>
+      <artifactId>camunda-engine-rest-jakarta</artifactId>
       <version>${project.version}</version>
-      <classifier>wildfly-jakarta</classifier>
+      <classifier>wildfly</classifier>
       <type>war</type>
     </dependency>
 

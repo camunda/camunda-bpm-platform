@@ -10,11 +10,11 @@
     <relativePath>../</relativePath>
     <version>7.19.0-SNAPSHOT</version>
   </parent>
-
+  
   <properties>
     <!-- generate a bom of dependencies for the license book.
-    We include compile and provided scope dependencies;
-    all the dependencies that we include in only one of the
+    We include compile and provided scope dependencies; 
+    all the dependencies that we include in only one of the 
     runtime-specific-WARs are in provided scope -->
     <skip-third-party-bom>false</skip-third-party-bom>
     <third-party-bom-scopes>compile|provided</third-party-bom-scopes>
@@ -25,12 +25,6 @@
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-rest-core</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine-rest-core</artifactId>
-      <version>${project.version}</version>
-      <classifier>jakarta</classifier>
     </dependency>
 
     <!-- dependencies only used for assemblies should be scope provided -->
@@ -74,36 +68,9 @@
 
   <build>
     <plugins>
-
-      <plugin>
-        <groupId>org.eclipse.transformer</groupId>
-        <artifactId>transformer-maven-plugin</artifactId>
-        <version>0.5.0</version>
-        <configuration>
-          <rules>
-            <jakartaDefaults>true</jakartaDefaults>
-          </rules>
-          <classifier>jakarta</classifier>
-          <artifact>
-            <groupId>org.camunda.bpm</groupId>
-            <artifactId>camunda-engine-rest</artifactId>
-            <version>${project.version}</version>
-          </artifact>
-        </configuration>
-        <executions>
-          <execution>
-            <id>transform-war</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>3.4.2</version>
         <executions>
           <execution>
             <id>wildfly</id>
@@ -124,30 +91,6 @@
               <finalName>camunda-engine-rest-${project.version}</finalName>
               <attach>true</attach>
               <classifier>wildfly</classifier>
-              <outputDirectory>target/</outputDirectory>
-              <workDirectory>target/assembly/work</workDirectory>
-            </configuration>
-          </execution>
-
-          <execution>
-            <id>wildfly-jakarta</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-            <configuration>
-              <archive>
-                <manifestEntries>
-                  <!-- module dependencies for deployment on wildfly  -->
-                  <Dependencies>org.camunda.bpm.camunda-engine,org.camunda.bpm.dmn.camunda-engine-dmn,org.camunda.commons.camunda-commons-logging,org.camunda.spin.camunda-spin-core,org.graalvm.js.js-scriptengine services</Dependencies>
-                </manifestEntries>
-              </archive>
-              <descriptors>
-                <descriptor>assembly-war-wildfly-jakarta.xml</descriptor>
-              </descriptors>
-              <finalName>camunda-engine-rest-${project.version}</finalName>
-              <attach>true</attach>
-              <classifier>wildfly-jakarta</classifier>
               <outputDirectory>target/</outputDirectory>
               <workDirectory>target/assembly/work</workDirectory>
             </configuration>
