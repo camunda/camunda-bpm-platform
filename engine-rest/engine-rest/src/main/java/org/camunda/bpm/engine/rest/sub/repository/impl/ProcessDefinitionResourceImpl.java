@@ -263,8 +263,8 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
       return ProcessDefinitionDiagramDto.create(processDefinitionId, new String(processModel, "UTF-8"));
     } catch (AuthorizationException e) {
       throw e;
-    } catch (ProcessEngineException e) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, e, "No matching definition with id " + processDefinitionId);
+    } catch (NotFoundException e) {
+      throw new InvalidRequestException(Status.NOT_FOUND, e, "No matching definition with id " + processDefinitionId);
     } catch (UnsupportedEncodingException e) {
       throw new RestException(Status.INTERNAL_SERVER_ERROR, e);
     } finally {
@@ -388,7 +388,7 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
       return engine.getRepositoryService().getStaticCalledProcessDefinitions(processDefinitionId).stream()
         .map(CalledProcessDefinitionDto::from)
         .collect(Collectors.toList());
-    } catch (NullValueException e) {
+    } catch (NotFoundException e) {
       throw new InvalidRequestException(Status.NOT_FOUND, e.getMessage());
     }
   }
