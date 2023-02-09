@@ -47,8 +47,10 @@ public class MultiTenancyUserOperationLogTenantCheckTest {
   protected static final String USER_ONE = "aUserId";
   protected static final String USER_TWO = "user_two";
   protected static final String USER_WITHOUT_TENANT = "aUserId1";
+
   protected static final String TENANT_ONE = "tenant1";
   protected static final String TENANT_TWO = "tenant2";
+
   protected static final String PROCESS_NAME = "process";
   protected static final String AN_ANNOTATION = "anAnnotation";
 

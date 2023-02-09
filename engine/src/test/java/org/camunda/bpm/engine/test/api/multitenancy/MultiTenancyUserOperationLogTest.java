@@ -76,7 +76,9 @@ public class MultiTenancyUserOperationLogTest {
 
   protected static final String USER_ID = "aUserId";
   protected static final String USER_WITHOUT_TENANT = "aUserId1";
+
   protected static final String TENANT_ONE = "tenant1";
+
   protected static final String PROCESS_NAME = "process";
   protected static final String TASK_ID = "aTaskId";
   protected static final String AN_ANNOTATION = "anAnnotation";
@@ -770,7 +772,7 @@ public class MultiTenancyUserOperationLogTest {
     // then
     assertThat(list.size()).isEqualTo(4); // 2 properties per log
     for (UserOperationLogEntry userOperationLogEntry : list) {
-      assertThat(userOperationLogEntry.getTenantId()).isEqualTo(null);
+      assertThat(userOperationLogEntry.getTenantId()).isEqualTo("testTenant");
     }
 
     // finish

@@ -196,6 +196,7 @@ public class UserOperationLogManager extends AbstractHistoricManager {
       UserOperationLogContext context = new UserOperationLogContext();
       UserOperationLogContextEntryBuilder entryBuilder =
           UserOperationLogContextEntryBuilder.entry(operation, entityType)
+            .tenantId(tenantId)
             .category(UserOperationLogEntry.CATEGORY_ADMIN);
       List<PropertyChange> propertyChanges = new ArrayList<>();
       if (userId != null) {
@@ -208,6 +209,7 @@ public class UserOperationLogManager extends AbstractHistoricManager {
         propertyChanges.add(new PropertyChange("tenantId", null, tenantId));
       }
       entryBuilder.propertyChanges(propertyChanges);
+
 
       context.addEntry(entryBuilder.create());
       fireUserOperationLog(context);
@@ -702,8 +704,8 @@ public class UserOperationLogManager extends AbstractHistoricManager {
       UserOperationLogContextEntryBuilder entryBuilder =
           UserOperationLogContextEntryBuilder.entry(operationType, type)
               .propertyChanges(new PropertyChange(idProperty, null, id))
-              .category(UserOperationLogEntry.CATEGORY_OPERATOR)
-              .tenantId(tenantId);
+              .tenantId(tenantId)
+              .category(UserOperationLogEntry.CATEGORY_OPERATOR);
 
       UserOperationLogContext context = new UserOperationLogContext();
       context.addEntry(entryBuilder.create());
