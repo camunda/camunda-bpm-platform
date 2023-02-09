@@ -65,6 +65,7 @@ import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -75,8 +76,6 @@ public class MultiTenancyUserOperationLogTest {
 
   protected static final String USER_ID = "aUserId";
   protected static final String USER_WITHOUT_TENANT = "aUserId1";
-  // TODO
-  // protected static final String TENANT_TWO = "tenant2";
   protected static final String TENANT_ONE = "tenant1";
   protected static final String PROCESS_NAME = "process";
   protected static final String TASK_ID = "aTaskId";
@@ -101,46 +100,31 @@ public class MultiTenancyUserOperationLogTest {
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
-  protected ProcessEngineConfiguration processEngineConfiguration;
+  protected ProcessEngineConfiguration configuration;
   protected TaskService taskService;
   protected HistoryService historyService;
   protected RepositoryService repositoryService;
   protected RuntimeService runtimeService;
   protected IdentityService identityService;
   protected ManagementService managementService;
+  protected boolean isDefaultTenantCheckEnabled;
 
   @Before
   public void init() {
-    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+    configuration = engineRule.getProcessEngineConfiguration();
     taskService = engineRule.getTaskService();
     historyService = engineRule.getHistoryService();
     repositoryService = engineRule.getRepositoryService();
     runtimeService = engineRule.getRuntimeService();
     identityService = engineRule.getIdentityService();
     managementService = engineRule.getManagementService();
+    isDefaultTenantCheckEnabled = configuration.isTenantCheckEnabled();
+    configuration.setTenantCheckEnabled(false);
   }
 
-  @Test
-  public void shouldLogWithTenant() {
-    // given
-    testRule.deployForTenant(TENANT_ONE, MODEL);
-    identityService.setAuthentication(USER_ID, null, Arrays.asList(TENANT_ONE));
-
-    runtimeService.startProcessInstanceByKey(PROCESS_NAME);
-    String taskId = taskService.createTaskQuery().singleResult().getId();
-
-    taskService.complete(taskId);
-
-    UserOperationLogEntry singleResult = historyService.createUserOperationLogQuery().entityType(EntityTypes.TASK).singleResult();
-
-    // when
-    historyService.setAnnotationForOperationLogById(singleResult.getOperationId(), AN_ANNOTATION);
-    singleResult = historyService.createUserOperationLogQuery()
-        .operationType(UserOperationLogEntry.OPERATION_TYPE_SET_ANNOTATION)
-        .singleResult();
-
-    // then
-    assertThat(singleResult.getTenantId()).isEqualTo(TENANT_ONE);
+  @After
+  public void tearDown() {
+    configuration.setTenantCheckEnabled(isDefaultTenantCheckEnabled);
   }
 
   @Test
@@ -536,7 +520,6 @@ public class MultiTenancyUserOperationLogTest {
     HistoricDecisionInstanceQuery historicDecisionInstanceQuery = historyService.createHistoricDecisionInstanceQuery();
 
     // when
-    // TODO
     Batch batch = historyService.setRemovalTimeToHistoricDecisionInstances()
       .clearedRemovalTime()
       .byQuery(historicDecisionInstanceQuery)
@@ -731,6 +714,7 @@ public class MultiTenancyUserOperationLogTest {
     identityService.saveTenant(newTenant);
     identityService.deleteTenant(newTenant.getId());
 
+
     List<UserOperationLogEntry> list = historyService.createUserOperationLogQuery()
         .entityType(EntityTypes.TENANT)
         .list();
@@ -738,7 +722,7 @@ public class MultiTenancyUserOperationLogTest {
     // then
     assertThat(list.size()).isEqualTo(3);
     for (UserOperationLogEntry userOperationLogEntry : list) {
-      assertThat(userOperationLogEntry.getTenantId()).isEqualTo(null);
+      assertThat(userOperationLogEntry.getTenantId()).isEqualTo("test");
     }
   }
 

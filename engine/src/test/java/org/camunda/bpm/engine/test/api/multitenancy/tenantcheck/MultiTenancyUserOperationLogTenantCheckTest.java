@@ -26,7 +26,6 @@ import java.util.Arrays;
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
@@ -45,16 +44,15 @@ import org.junit.rules.RuleChain;
 @RequiredHistoryLevel(HISTORY_FULL)
 public class MultiTenancyUserOperationLogTenantCheckTest {
 
-  protected static final String USER_ID = "aUserId";
+  protected static final String USER_ONE = "aUserId";
+  protected static final String USER_TWO = "user_two";
   protected static final String USER_WITHOUT_TENANT = "aUserId1";
-  // TODO
-  // protected static final String TENANT_TWO = "tenant2";
   protected static final String TENANT_ONE = "tenant1";
+  protected static final String TENANT_TWO = "tenant2";
   protected static final String PROCESS_NAME = "process";
-  protected static final String TASK_ID = "aTaskId";
   protected static final String AN_ANNOTATION = "anAnnotation";
 
-  protected static final BpmnModelInstance MODEL = Bpmn.createExecutableProcess(PROCESS_NAME).startEvent().userTask(TASK_ID).done();
+  protected static final BpmnModelInstance MODEL = Bpmn.createExecutableProcess(PROCESS_NAME).startEvent().userTask("aTaskId").done();
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
 
@@ -63,7 +61,6 @@ public class MultiTenancyUserOperationLogTenantCheckTest {
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
-  protected ProcessEngineConfiguration processEngineConfiguration;
   protected TaskService taskService;
   protected HistoryService historyService;
   protected RuntimeService runtimeService;
@@ -71,7 +68,6 @@ public class MultiTenancyUserOperationLogTenantCheckTest {
 
   @Before
   public void init() {
-    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
     taskService = engineRule.getTaskService();
     historyService = engineRule.getHistoryService();
     runtimeService = engineRule.getRuntimeService();
@@ -82,7 +78,7 @@ public class MultiTenancyUserOperationLogTenantCheckTest {
   public void shouldSetAnnotationWithoutTenant() {
     // given
     testRule.deploy(MODEL);
-    identityService.setAuthentication(USER_ID, null);
+    identityService.setAuthentication(USER_ONE, null);
 
     runtimeService.startProcessInstanceByKey(PROCESS_NAME);
     String taskId = taskService.createTaskQuery().singleResult().getId();
@@ -105,7 +101,7 @@ public class MultiTenancyUserOperationLogTenantCheckTest {
   public void shouldSetAnnotationWithTenant() {
     // given
     testRule.deployForTenant(TENANT_ONE, MODEL);
-    identityService.setAuthentication(USER_ID, null, Arrays.asList(TENANT_ONE));
+    identityService.setAuthentication(USER_ONE, null, Arrays.asList(TENANT_ONE));
 
     runtimeService.startProcessInstanceByKey(PROCESS_NAME);
     String taskId = taskService.createTaskQuery().singleResult().getId();
@@ -125,10 +121,32 @@ public class MultiTenancyUserOperationLogTenantCheckTest {
   }
 
   @Test
+  public void shouldThrowExceptionWhenSetAnnotationWithDifferentTenant() {
+    // given
+    testRule.deployForTenant(TENANT_ONE, MODEL);
+    identityService.setAuthentication(USER_ONE, null, Arrays.asList(TENANT_ONE));
+
+    runtimeService.startProcessInstanceByKey(PROCESS_NAME);
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    taskService.complete(taskId);
+
+    UserOperationLogEntry singleResult = historyService.createUserOperationLogQuery().entityType(EntityTypes.TASK).singleResult();
+
+    identityService.setAuthentication(USER_TWO, null, Arrays.asList(TENANT_TWO));
+
+    // when/then
+    assertThatThrownBy(() -> historyService.setAnnotationForOperationLogById(singleResult.getOperationId(), AN_ANNOTATION))
+    .isInstanceOf(ProcessEngineException.class)
+    .hasMessageContaining("Cannot update the user operation log entry '"
+        + singleResult.getId() +"' because it belongs to no authenticated tenant.");
+  }
+
+  @Test
   public void shouldThrowExceptionWhenSetAnnotationWithNoAuthenticatedTenant() {
     // given
     testRule.deployForTenant(TENANT_ONE, MODEL);
-    identityService.setAuthentication(USER_ID, null, Arrays.asList(TENANT_ONE));
+    identityService.setAuthentication(USER_ONE, null, Arrays.asList(TENANT_ONE));
 
     runtimeService.startProcessInstanceByKey(PROCESS_NAME);
     String taskId = taskService.createTaskQuery().singleResult().getId();
@@ -150,7 +168,7 @@ public class MultiTenancyUserOperationLogTenantCheckTest {
   public void shouldClearAnnotationWithoutTenant() {
     // given
     testRule.deploy(MODEL);
-    identityService.setAuthentication(USER_ID, null);
+    identityService.setAuthentication(USER_ONE, null);
 
     runtimeService.startProcessInstanceByKey(PROCESS_NAME);
     String taskId = taskService.createTaskQuery().singleResult().getId();
@@ -173,7 +191,7 @@ public class MultiTenancyUserOperationLogTenantCheckTest {
   @Test
   public void shouldClearAnnotationWithTenant() {
     testRule.deployForTenant(TENANT_ONE, MODEL);
-    identityService.setAuthentication(USER_ID, null, Arrays.asList(TENANT_ONE));
+    identityService.setAuthentication(USER_ONE, null, Arrays.asList(TENANT_ONE));
 
     runtimeService.startProcessInstanceByKey(PROCESS_NAME);
     String taskId = taskService.createTaskQuery().singleResult().getId();
@@ -195,10 +213,33 @@ public class MultiTenancyUserOperationLogTenantCheckTest {
   }
 
   @Test
+  public void shouldThrowExceptionWhenClearAnnotationWithDifferentTenant() {
+    // given
+    testRule.deployForTenant(TENANT_ONE, MODEL);
+    identityService.setAuthentication(USER_ONE, null, Arrays.asList(TENANT_ONE));
+
+    runtimeService.startProcessInstanceByKey(PROCESS_NAME);
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    taskService.complete(taskId);
+
+    UserOperationLogEntry singleResult = historyService.createUserOperationLogQuery().entityType(EntityTypes.TASK).singleResult();
+    historyService.setAnnotationForOperationLogById(singleResult.getOperationId(), AN_ANNOTATION);
+
+    identityService.setAuthentication(USER_TWO, null, Arrays.asList(TENANT_TWO));
+
+    // when/then
+    assertThatThrownBy(() ->  historyService.clearAnnotationForOperationLogById(singleResult.getOperationId()))
+    .isInstanceOf(ProcessEngineException.class)
+    .hasMessageContaining("Cannot update the user operation log entry '"
+        + singleResult.getId() +"' because it belongs to no authenticated tenant.");
+  }
+
+  @Test
   public void shouldThrowExceptionWhenClearAnnotationWithNoAuthenticatedTenant() {
     // given
     testRule.deployForTenant(TENANT_ONE, MODEL);
-    identityService.setAuthentication(USER_ID, null, Arrays.asList(TENANT_ONE));
+    identityService.setAuthentication(USER_ONE, null, Arrays.asList(TENANT_ONE));
 
     runtimeService.startProcessInstanceByKey(PROCESS_NAME);
     String taskId = taskService.createTaskQuery().singleResult().getId();
@@ -217,9 +258,8 @@ public class MultiTenancyUserOperationLogTenantCheckTest {
         + singleResult.getId() +"' because it belongs to no authenticated tenant.");
   }
 
-
   @Test
-  public void shouldDeleteAnnotationWithoutTenant() {
+  public void shouldDeleteWithoutTenant() {
     // given
     testRule.deploy(MODEL);
     runtimeService.startProcessInstanceByKey(PROCESS_NAME);
@@ -239,9 +279,9 @@ public class MultiTenancyUserOperationLogTenantCheckTest {
   }
 
   @Test
-  public void shouldDeleteAnnotationWithTenant() {
+  public void shouldDeleteWithTenant() {
     testRule.deployForTenant(TENANT_ONE, MODEL);
-    identityService.setAuthentication(USER_ID, null, Arrays.asList(TENANT_ONE));
+    identityService.setAuthentication(USER_ONE, null, Arrays.asList(TENANT_ONE));
 
     runtimeService.startProcessInstanceByKey(PROCESS_NAME);
     String taskId = taskService.createTaskQuery().singleResult().getId();
@@ -261,10 +301,32 @@ public class MultiTenancyUserOperationLogTenantCheckTest {
   }
 
   @Test
+  public void shouldThrownExceptionWhenDeleteWithDifferentTenant() {
+    testRule.deployForTenant(TENANT_ONE, MODEL);
+    identityService.setAuthentication(USER_ONE, null, Arrays.asList(TENANT_ONE));
+
+    runtimeService.startProcessInstanceByKey(PROCESS_NAME);
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    taskService.complete(taskId);
+
+    UserOperationLogEntry singleResult = historyService.createUserOperationLogQuery().entityType(EntityTypes.TASK).singleResult();
+    String entryId = singleResult.getId();
+
+    identityService.setAuthentication(USER_TWO, null, Arrays.asList(TENANT_TWO));
+
+    // when/then
+    assertThatThrownBy(() -> historyService.deleteUserOperationLogEntry(entryId))
+    .isInstanceOf(ProcessEngineException.class)
+    .hasMessageContaining("Cannot delete the user operation log entry '"
+        + entryId +"' because it belongs to no authenticated tenant.");
+  }
+
+  @Test
   public void shouldThrownExceptionWhenDeleteWithNoAuthenticatedTenant() {
     // given
     testRule.deployForTenant(TENANT_ONE, MODEL);
-    identityService.setAuthentication(USER_ID, null, Arrays.asList(TENANT_ONE));
+    identityService.setAuthentication(USER_ONE, null, Arrays.asList(TENANT_ONE));
 
     runtimeService.startProcessInstanceByKey(PROCESS_NAME);
     String taskId = taskService.createTaskQuery().singleResult().getId();
@@ -282,6 +344,5 @@ public class MultiTenancyUserOperationLogTenantCheckTest {
     .hasMessageContaining("Cannot delete the user operation log entry '"
         + entryId +"' because it belongs to no authenticated tenant.");
   }
-
 
 }

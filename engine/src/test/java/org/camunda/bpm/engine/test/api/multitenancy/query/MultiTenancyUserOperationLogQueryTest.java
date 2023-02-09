@@ -24,15 +24,12 @@ import java.util.List;
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
-import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
-import org.camunda.bpm.engine.test.api.runtime.migration.batch.BatchMigrationHelper;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -51,29 +48,23 @@ public class MultiTenancyUserOperationLogQueryTest {
   protected static final String TENANT_ONE = "tenant1";
   protected static final String TENANT_TWO = "tenant2";
   protected static final String PROCESS_NAME = "process";
-  protected static final String TASK_ID = "aTaskId";
 
   protected static final BpmnModelInstance MODEL = Bpmn.createExecutableProcess(PROCESS_NAME)
-      .startEvent().userTask(TASK_ID).done();
+      .startEvent().userTask("aTaskId").done();
 
   protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
-  protected BatchMigrationHelper batchHelper = new BatchMigrationHelper(engineRule);
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
-  protected ProcessEngineConfiguration processEngineConfiguration;
   protected TaskService taskService;
   protected HistoryService historyService;
-  protected RepositoryService repositoryService;
   protected RuntimeService runtimeService;
   protected IdentityService identityService;
-  protected ManagementService managementService;
 
   @Before
   public void init() {
-    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
     taskService = engineRule.getTaskService();
     historyService = engineRule.getHistoryService();
     identityService = engineRule.getIdentityService();

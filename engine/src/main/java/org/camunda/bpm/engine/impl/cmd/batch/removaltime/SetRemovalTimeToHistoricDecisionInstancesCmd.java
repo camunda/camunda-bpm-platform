@@ -100,7 +100,6 @@ public class SetRemovalTimeToHistoricDecisionInstancesCmd implements Command<Bat
     propertyChanges.add(new PropertyChange("nrOfInstances", null, numInstances));
     propertyChanges.add(new PropertyChange("async", null, true));
 
-    // TODO
     commandContext.getOperationLogManager()
       .logDecisionInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_SET_REMOVAL_TIME, null, propertyChanges);
   }

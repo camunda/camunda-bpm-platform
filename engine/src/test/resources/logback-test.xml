@@ -24,7 +24,6 @@
   <!-- Ignore Testcontainers debug logs -->
   <logger name="org.testcontainers" level="info" />
   <logger name="com.github" level="info" />
-  <logger name="org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntity" level="debug" />
 
 <!--  <logger name="org.camunda.bpm.engine.impl.persistence.entity" level="debug" />-->
 <!--  <logger name="org.camunda.bpm.engine.impl.persistence.entity.JobEntity" level="debug" />-->

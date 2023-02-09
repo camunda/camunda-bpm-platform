@@ -177,8 +177,7 @@ public class UserOperationLogManager extends AbstractHistoricManager {
       UserOperationLogContextEntryBuilder entryBuilder =
           UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.TENANT)
             .category(UserOperationLogEntry.CATEGORY_ADMIN)
-            // TODO
-//            .tenantId(tenantId)
+            .tenantId(tenantId)
             .propertyChanges(new PropertyChange("tenantId", null, tenantId));
 
       context.addEntry(entryBuilder.create());
