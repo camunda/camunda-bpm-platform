@@ -80,19 +80,6 @@ public class ClassLoaderUtil {
     }
   }
 
-  public static ClassLoader getServletContextClassloader(final jakarta.servlet.ServletContextEvent sce) {
-    if(System.getSecurityManager() != null) {
-      return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
-        @Override
-        public ClassLoader run() {
-          return sce.getServletContext().getClassLoader();
-        }
-      });
-    } else {
-      return sce.getServletContext().getClassLoader();
-    }
-  }
-
   /**
    * Switch the current Thread ClassLoader to the ProcessEngine's
    * to assure the loading of the engine classes during job execution.
