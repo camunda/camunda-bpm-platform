@@ -104,16 +104,16 @@ public class MultiTenancyUserOperationLogQueryTest {
     testRule.deployForTenant(TENANT_ONE, MODEL);
     identityService.setAuthentication(USER_ONE, null, Arrays.asList(TENANT_ONE));
     runtimeService.createProcessInstanceByKey(PROCESS_NAME)
-    .processDefinitionTenantId(TENANT_ONE)
-    .execute();
+        .processDefinitionTenantId(TENANT_ONE)
+        .execute();
     taskId = taskService.createTaskQuery().tenantIdIn(TENANT_ONE).singleResult().getId();
     taskService.complete(taskId);
 
     testRule.deployForTenant(TENANT_TWO, MODEL);
     identityService.setAuthentication(USER_TWO, null, Arrays.asList(TENANT_TWO));
     runtimeService.createProcessInstanceByKey(PROCESS_NAME)
-    .processDefinitionTenantId(TENANT_TWO)
-    .execute();
+        .processDefinitionTenantId(TENANT_TWO)
+        .execute();
     taskId = taskService.createTaskQuery().tenantIdIn(TENANT_TWO).singleResult().getId();
     taskService.complete(taskId);
 
@@ -161,16 +161,16 @@ public class MultiTenancyUserOperationLogQueryTest {
     testRule.deployForTenant(TENANT_ONE, MODEL);
     identityService.setAuthentication(USER_ONE, null, Arrays.asList(TENANT_ONE));
     runtimeService.createProcessInstanceByKey(PROCESS_NAME)
-    .processDefinitionTenantId(TENANT_ONE)
-    .execute();
+        .processDefinitionTenantId(TENANT_ONE)
+        .execute();
     taskId = taskService.createTaskQuery().tenantIdIn(TENANT_ONE).singleResult().getId();
     taskService.complete(taskId);
 
     testRule.deployForTenant(TENANT_TWO, MODEL);
     identityService.setAuthentication(USER_TWO, null, Arrays.asList(TENANT_TWO));
     runtimeService.createProcessInstanceByKey(PROCESS_NAME)
-    .processDefinitionTenantId(TENANT_TWO)
-    .execute();
+        .processDefinitionTenantId(TENANT_TWO)
+        .execute();
     taskId = taskService.createTaskQuery().tenantIdIn(TENANT_TWO).singleResult().getId();
     taskService.complete(taskId);
 
@@ -197,16 +197,16 @@ public class MultiTenancyUserOperationLogQueryTest {
     testRule.deployForTenant(TENANT_ONE, MODEL);
     identityService.setAuthentication(USER_ONE, null, Arrays.asList(TENANT_ONE));
     runtimeService.createProcessInstanceByKey(PROCESS_NAME)
-    .processDefinitionTenantId(TENANT_ONE)
-    .execute();
+        .processDefinitionTenantId(TENANT_ONE)
+        .execute();
     taskId = taskService.createTaskQuery().tenantIdIn(TENANT_ONE).singleResult().getId();
     taskService.complete(taskId);
 
     testRule.deployForTenant(TENANT_TWO, MODEL);
     identityService.setAuthentication(USER_TWO, null, Arrays.asList(TENANT_TWO));
     runtimeService.createProcessInstanceByKey(PROCESS_NAME)
-    .processDefinitionTenantId(TENANT_TWO)
-    .execute();
+        .processDefinitionTenantId(TENANT_TWO)
+        .execute();
     taskId = taskService.createTaskQuery().tenantIdIn(TENANT_TWO).singleResult().getId();
     taskService.complete(taskId);
 
