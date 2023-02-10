@@ -282,6 +282,7 @@ public class MultiTenancyUserOperationLogTenantCheckTest {
 
   @Test
   public void shouldDeleteWithTenant() {
+    // given
     testRule.deployForTenant(TENANT_ONE, MODEL);
     identityService.setAuthentication(USER_ONE, null, Arrays.asList(TENANT_ONE));
 
@@ -304,6 +305,7 @@ public class MultiTenancyUserOperationLogTenantCheckTest {
 
   @Test
   public void shouldThrownExceptionWhenDeleteWithDifferentTenant() {
+    // given
     testRule.deployForTenant(TENANT_ONE, MODEL);
     identityService.setAuthentication(USER_ONE, null, Arrays.asList(TENANT_ONE));
 

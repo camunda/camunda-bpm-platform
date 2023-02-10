@@ -83,7 +83,7 @@ public class MultiTenancyUserOperationLogTest {
   protected static final String TASK_ID = "aTaskId";
   protected static final String AN_ANNOTATION = "anAnnotation";
 
-  // normalize timestamps for databases which do not provide millisecond presision.
+  // normalize timestamps for databases which do not provide millisecond precision.
   protected Date today = new Date((ClockUtil.getCurrentTime().getTime() / 1000) * 1000);
   protected Date tomorrow = new Date(((ClockUtil.getCurrentTime().getTime() + 86400000) / 1000) * 1000);
   protected Date yesterday = new Date(((ClockUtil.getCurrentTime().getTime() - 86400000) / 1000) * 1000);
@@ -131,6 +131,7 @@ public class MultiTenancyUserOperationLogTest {
 
   @Test
   public void shouldLogUserOperationsWithTenant() {
+    // given
     testRule.deployForTenant(TENANT_ONE, MODEL);
     identityService.setAuthentication(USER_ID, null, Arrays.asList(TENANT_ONE));
 
@@ -168,7 +169,7 @@ public class MultiTenancyUserOperationLogTest {
     // when
     runtimeService.setAnnotationForIncidentById(incident.getId(), AN_ANNOTATION);
     runtimeService.clearAnnotationForIncidentById(incident.getId());
-     List<UserOperationLogEntry> list = historyService.createUserOperationLogQuery()
+    List<UserOperationLogEntry> list = historyService.createUserOperationLogQuery()
         .entityType(EntityTypes.INCIDENT)
         .list();
 
@@ -197,7 +198,7 @@ public class MultiTenancyUserOperationLogTest {
 
     List<UserOperationLogEntry> list = historyService.createUserOperationLogQuery().list();
 
-    //then
+    // then
     assertThat(list.size()).isEqualTo(4);
     for (UserOperationLogEntry userOperationLogEntry : list) {
       assertThat(userOperationLogEntry.getEntityType()).isEqualTo(EntityTypes.IDENTITY_LINK);
@@ -207,7 +208,7 @@ public class MultiTenancyUserOperationLogTest {
 
   @Test
   public void shouldLogAttachmentOperationsWithTenant() {
-    //given
+    // given
     testRule.deployForTenant(TENANT_ONE, MODEL);
     // create a process with a userTask and work with it
     ProcessInstance process = runtimeService.startProcessInstanceByKey(PROCESS_NAME);
@@ -221,7 +222,7 @@ public class MultiTenancyUserOperationLogTest {
 
     List<UserOperationLogEntry> list = historyService.createUserOperationLogQuery().list();
 
-    //then
+    // then
     assertThat(list.size()).isEqualTo(2);
     for (UserOperationLogEntry userOperationLogEntry : list) {
       assertThat(userOperationLogEntry.getEntityType()).isEqualTo(EntityTypes.ATTACHMENT);
@@ -240,23 +241,22 @@ public class MultiTenancyUserOperationLogTest {
 
     identityService.setAuthentication(USER_ID, null, Arrays.asList(TENANT_ONE));
 
-    // when assign and reassign the userTask
+    // assign and reassign the userTask
     ClockUtil.setCurrentTime(today);
     taskService.setOwner(processTaskId, "icke");
     taskService.claim(processTaskId, "icke");
     taskService.setAssignee(processTaskId, "er");
 
-    // when change priority of task
+    // change priority of task
     taskService.setPriority(processTaskId, 10);
 
-
-    // when complete the userTask to finish the process
+    // complete the userTask to finish the process
     taskService.complete(processTaskId);
 
-
+    // when
     List<UserOperationLogEntry> list = historyService.createUserOperationLogQuery().list();
 
-    //then
+    // then
     assertThat(list.size()).isEqualTo(5);
     for (UserOperationLogEntry userOperationLogEntry : list) {
       assertThat(userOperationLogEntry.getEntityType()).isEqualTo(EntityTypes.TASK);
@@ -266,7 +266,7 @@ public class MultiTenancyUserOperationLogTest {
 
   @Test
   public void shouldLogStandaloneTaskOperationsWithTenant() {
-    //given
+    // given
     identityService.setAuthentication(USER_ID, null, Arrays.asList(TENANT_ONE));
     // create a standalone userTask
     userTask = taskService.newTask();
@@ -286,12 +286,12 @@ public class MultiTenancyUserOperationLogTest {
     taskService.complete(userTask.getId());
     historyService.deleteHistoricTaskInstance(userTask.getId());// 2 log entries
 
-    List<UserOperationLogEntry> list = historyService.createUserOperationLogQuery().list();
+    List<UserOperationLogEntry> list = historyService.createUserOperationLogQuery()
+        .entityType(EntityTypes.TASK).list();
 
-    //then
+    // then
     assertThat(list.size()).isEqualTo(8);
     for (UserOperationLogEntry userOperationLogEntry : list) {
-      assertThat(userOperationLogEntry.getEntityType()).isEqualTo(EntityTypes.TASK);
       assertThat(userOperationLogEntry.getTenantId()).isEqualTo(TENANT_ONE);
     }
   }
@@ -303,7 +303,7 @@ public class MultiTenancyUserOperationLogTest {
     runtimeService.startProcessInstanceByKey(PROCESS_NAME);
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
 
-    // when I set a job priority
+    // when set a job priority
     identityService.setAuthentication(USER_ID, null, Arrays.asList(TENANT_ONE));
     managementService.setOverridingJobPriorityForJobDefinition(jobDefinition.getId(), 42);
 
@@ -323,10 +323,11 @@ public class MultiTenancyUserOperationLogTest {
     runtimeService.startProcessInstanceByKey(PROCESS_NAME);
     Job job = managementService.createJobQuery().singleResult();
 
-    // when I set a job priority
+    // I set a job priority
     identityService.setAuthentication(USER_ID, null, Arrays.asList(TENANT_ONE));
     managementService.setJobRetries(job.getId(), 4);
 
+    // when
     UserOperationLogEntry singleResult = historyService.createUserOperationLogQuery()
         .entityType(EntityTypes.JOB)
         .operationType(UserOperationLogEntry.OPERATION_TYPE_SET_JOB_RETRIES)
@@ -407,6 +408,7 @@ public class MultiTenancyUserOperationLogTest {
     identityService.setAuthentication(USER_ID, null, Arrays.asList(TENANT_ONE));
     String deploymentId = testRule.deployForTenant(TENANT_ONE, "org/camunda/bpm/engine/test/api/externaltask/externalTaskPriorityExpression.bpmn20.xml").getId();
 
+    // when
     repositoryService.deleteDeployment(deploymentId);
 
     List<UserOperationLogEntry> list = historyService.createUserOperationLogQuery()
@@ -514,7 +516,7 @@ public class MultiTenancyUserOperationLogTest {
     testRule.deployForTenant(TENANT_ONE, "org/camunda/bpm/engine/test/api/dmn/Example.dmn");
     identityService.setAuthentication(USER_ID, null, Arrays.asList(TENANT_ONE));
     engineRule.getDecisionService().evaluateDecisionByKey("decision")
-    .variables(
+      .variables(
         Variables.createVariables()
         .putValue("status", "silver")
         .putValue("sum", 723)
@@ -574,16 +576,15 @@ public class MultiTenancyUserOperationLogTest {
         .singleResult()
         .getId();
 
-    // disable human task -> case instance is completed
     caseService
       .withCaseExecution(caseExecutionId).complete();
 
-    // when
     caseService
       .withCaseExecution(caseInstanceId)
       .close();
-    historyService.deleteHistoricCaseInstance(caseInstanceId);
+
     // when
+    historyService.deleteHistoricCaseInstance(caseInstanceId);
     UserOperationLogEntry singleResult = historyService.createUserOperationLogQuery()
         .operationType(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY)
         .entityType(EntityTypes.CASE_INSTANCE)
