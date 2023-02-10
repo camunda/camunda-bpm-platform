@@ -59,6 +59,8 @@ public class DecisionTableEvaluationHandler implements DmnDecisionLogicEvaluatio
   protected final String inputEntryExpressionLanguage;
   protected final String outputEntryExpressionLanguage;
 
+  protected final boolean returnBlankTableOutputAsNull;
+
   public DecisionTableEvaluationHandler(DefaultDmnEngineConfiguration configuration) {
     expressionEvaluationHandler = new ExpressionEvaluationHandler(configuration);
     feelEngine = configuration.getFeelEngine();
@@ -68,6 +70,7 @@ public class DecisionTableEvaluationHandler implements DmnDecisionLogicEvaluatio
     inputExpressionExpressionLanguage = configuration.getDefaultInputExpressionExpressionLanguage();
     inputEntryExpressionLanguage = configuration.getDefaultInputEntryExpressionLanguage();
     outputEntryExpressionLanguage = configuration.getDefaultOutputEntryExpressionLanguage();
+    returnBlankTableOutputAsNull = configuration.isReturnBlankTableOutputAsNull();
   }
 
   @Override
@@ -211,16 +214,16 @@ public class DecisionTableEvaluationHandler implements DmnDecisionLogicEvaluatio
   }
 
   protected Map<String, DmnEvaluatedOutput> evaluateOutputEntries(List<DmnDecisionTableOutputImpl> decisionTableOutputs, DmnDecisionTableRuleImpl matchingRule, VariableContext variableContext) {
-    Map<String, DmnEvaluatedOutput> outputEntries = new LinkedHashMap<String, DmnEvaluatedOutput>();
+    Map<String, DmnEvaluatedOutput> outputEntries = new LinkedHashMap<>();
 
     for (int outputIdx = 0; outputIdx < decisionTableOutputs.size(); outputIdx++) {
-      // evaluate output entry, skip empty expressions
       DmnExpressionImpl conclusion = matchingRule.getConclusions().get(outputIdx);
-      if (isNonEmptyExpression(conclusion)) {
-        Object value = evaluateOutputEntry(conclusion, variableContext);
 
-        // transform to output type
+      boolean isNonEmptyExpression = isNonEmptyExpression(conclusion);
+      if (returnBlankTableOutputAsNull || isNonEmptyExpression) {
         DmnDecisionTableOutputImpl decisionTableOutput = decisionTableOutputs.get(outputIdx);
+        Object value = isNonEmptyExpression ? evaluateOutputEntry(conclusion, variableContext) : null;
+        // transform to output type
         TypedValue typedValue = decisionTableOutput.getTypeDefinition().transform(value);
 
         // set on result

@@ -663,6 +663,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    */
   protected boolean dmnFeelEnableLegacyBehavior = false;
 
+  /**
+   * Controls whether blank DMN table outputs are swallowed or returned as {@code null}.
+   */
+  protected boolean dmnReturnBlankTableOutputAsNull = false;
+
   protected HistoryLevel historyLevel;
 
   /**
@@ -2641,7 +2646,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
           .dmnHistoryEventProducer(dmnHistoryEventProducer)
           .scriptEngineResolver(scriptingEngines)
           .feelCustomFunctionProviders(dmnFeelCustomFunctionProviders)
-          .enableFeelLegacyBehavior(dmnFeelEnableLegacyBehavior);
+          .enableFeelLegacyBehavior(dmnFeelEnableLegacyBehavior)
+          .returnBlankTableOutputAsNull(dmnReturnBlankTableOutputAsNull);
 
       if (dmnElProvider != null) {
         dmnEngineConfigurationBuilder.elProvider(dmnElProvider);
@@ -5217,6 +5223,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfigurationImpl setDmnFeelEnableLegacyBehavior(boolean dmnFeelEnableLegacyBehavior) {
     this.dmnFeelEnableLegacyBehavior = dmnFeelEnableLegacyBehavior;
+    return this;
+  }
+
+  public boolean isDmnReturnBlankTableOutputAsNull() {
+    return dmnReturnBlankTableOutputAsNull;
+  }
+
+  public ProcessEngineConfigurationImpl setDmnReturnBlankTableOutputAsNull(boolean dmnReturnBlankTableOutputAsNull) {
+    this.dmnReturnBlankTableOutputAsNull = dmnReturnBlankTableOutputAsNull;
     return this;
   }
 

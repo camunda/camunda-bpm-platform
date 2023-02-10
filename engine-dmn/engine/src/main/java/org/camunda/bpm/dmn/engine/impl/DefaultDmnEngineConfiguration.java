@@ -81,6 +81,8 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
 
   protected DmnTransformer transformer = new DefaultDmnTransformer();
 
+  protected boolean returnBlankTableOutputAsNull = false;
+
   @Override
   public DmnEngine buildEngine() {
     init();
@@ -600,6 +602,24 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
    */
   public DefaultDmnEngineConfiguration enableFeelLegacyBehavior(boolean enableFeelLegacyBehavior) {
     setEnableFeelLegacyBehavior(enableFeelLegacyBehavior);
+    return this;
+  }
+
+  /**
+   * @return whether blank table outputs are swallowed or returned as {@code null}.
+   */
+  public boolean isReturnBlankTableOutputAsNull() {
+    return returnBlankTableOutputAsNull;
+  }
+
+  /**
+   * Controls whether blank table outputs are swallowed or returned as {@code null}.
+   *
+   * @param returnBlankTableOutputAsNull toggles whether blank table outputs are swallowed or returned as {@code null}.
+   * @return this
+   */
+  public DefaultDmnEngineConfiguration setReturnBlankTableOutputAsNull(boolean returnBlankTableOutputAsNull) {
+    this.returnBlankTableOutputAsNull = returnBlankTableOutputAsNull;
     return this;
   }
 
