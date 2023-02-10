@@ -349,4 +349,32 @@ public class MultiTenancyUserOperationLogTenantCheckTest {
         + entryId +"' because it belongs to no authenticated tenant.");
   }
 
+  @Test
+  public void shouldDeleteWhenTenantCheckDisabled() {
+    // given
+    testRule.deployForTenant(TENANT_ONE, MODEL);
+    identityService.setAuthentication(USER_ONE, null, Arrays.asList(TENANT_ONE));
+
+    runtimeService.startProcessInstanceByKey(PROCESS_NAME);
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    taskService.complete(taskId);
+
+    UserOperationLogEntry singleResult = historyService.createUserOperationLogQuery().entityType(EntityTypes.TASK).singleResult();
+    // assume
+    assertThat(singleResult).isNotNull();
+    String entryId = singleResult.getId();
+
+    identityService.setAuthentication(USER_WITHOUT_TENANT, null);
+    engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
+    // when
+    historyService.deleteUserOperationLogEntry(entryId);
+
+    // then
+    singleResult = historyService.createUserOperationLogQuery().entityType(EntityTypes.TASK).singleResult();
+    assertNull(singleResult);
+
+    // finish
+    engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(true);
+  }
 }
