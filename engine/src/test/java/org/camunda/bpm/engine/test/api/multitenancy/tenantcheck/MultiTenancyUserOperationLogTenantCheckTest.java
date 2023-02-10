@@ -139,9 +139,9 @@ public class MultiTenancyUserOperationLogTenantCheckTest {
 
     // when/then
     assertThatThrownBy(() -> historyService.setAnnotationForOperationLogById(singleResult.getOperationId(), AN_ANNOTATION))
-    .isInstanceOf(ProcessEngineException.class)
-    .hasMessageContaining("Cannot update the user operation log entry '"
-        + singleResult.getId() +"' because it belongs to no authenticated tenant.");
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot update the user operation log entry '"
+                            + singleResult.getId() +"' because it belongs to no authenticated tenant.");
   }
 
   @Test
@@ -161,9 +161,9 @@ public class MultiTenancyUserOperationLogTenantCheckTest {
 
     // when/then
     assertThatThrownBy(() -> historyService.setAnnotationForOperationLogById(singleResult.getOperationId(), AN_ANNOTATION))
-    .isInstanceOf(ProcessEngineException.class)
-    .hasMessageContaining("Cannot update the user operation log entry '"
-        + singleResult.getId() +"' because it belongs to no authenticated tenant.");
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot update the user operation log entry '"
+                            + singleResult.getId() +"' because it belongs to no authenticated tenant.");
   }
 
   @Test
@@ -232,9 +232,9 @@ public class MultiTenancyUserOperationLogTenantCheckTest {
 
     // when/then
     assertThatThrownBy(() ->  historyService.clearAnnotationForOperationLogById(singleResult.getOperationId()))
-    .isInstanceOf(ProcessEngineException.class)
-    .hasMessageContaining("Cannot update the user operation log entry '"
-        + singleResult.getId() +"' because it belongs to no authenticated tenant.");
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot update the user operation log entry '"
+                            + singleResult.getId() +"' because it belongs to no authenticated tenant.");
   }
 
   @Test
@@ -255,9 +255,9 @@ public class MultiTenancyUserOperationLogTenantCheckTest {
 
     // when/then
     assertThatThrownBy(() ->  historyService.clearAnnotationForOperationLogById(singleResult.getOperationId()))
-    .isInstanceOf(ProcessEngineException.class)
-    .hasMessageContaining("Cannot update the user operation log entry '"
-        + singleResult.getId() +"' because it belongs to no authenticated tenant.");
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot update the user operation log entry '"
+                            + singleResult.getId() +"' because it belongs to no authenticated tenant.");
   }
 
   @Test
@@ -321,9 +321,9 @@ public class MultiTenancyUserOperationLogTenantCheckTest {
 
     // when/then
     assertThatThrownBy(() -> historyService.deleteUserOperationLogEntry(entryId))
-    .isInstanceOf(ProcessEngineException.class)
-    .hasMessageContaining("Cannot delete the user operation log entry '"
-        + entryId +"' because it belongs to no authenticated tenant.");
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot delete the user operation log entry '"
+                            + entryId +"' because it belongs to no authenticated tenant.");
   }
 
   @Test
@@ -344,9 +344,9 @@ public class MultiTenancyUserOperationLogTenantCheckTest {
 
     // when/then
     assertThatThrownBy(() -> historyService.deleteUserOperationLogEntry(entryId))
-    .isInstanceOf(ProcessEngineException.class)
-    .hasMessageContaining("Cannot delete the user operation log entry '"
-        + entryId +"' because it belongs to no authenticated tenant.");
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot delete the user operation log entry '"
+                            + entryId +"' because it belongs to no authenticated tenant.");
   }
 
   @Test
