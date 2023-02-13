@@ -1006,6 +1006,26 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
 
   }
 
+  @Test
+  public void testGetProcessModelByInvalidId() throws Exception {
+    try {
+      repositoryService.getProcessModel("invalid");
+      fail();
+    } catch (NotFoundException e) {
+      testRule.assertTextPresent("no deployed process definition found with id 'invalid'", e.getMessage());
+    }
+  }
+
+  @Test
+  public void testGetProcessModelByNullId() throws Exception {
+    try {
+      repositoryService.getProcessModel(null);
+      fail();
+    } catch (ProcessEngineException e) {
+      testRule.assertTextPresent("The process definition id is mandatory", e.getMessage());
+    }
+  }
+
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   @Test
@@ -1386,7 +1406,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTest {
   @Test
   public void testGetStaticCallActivityMappingShouldThrowIfProcessDoesNotExist(){
     //given //when //then
-    assertThrows(NullValueException.class, () -> repositoryService.getStaticCalledProcessDefinitions("notExistingId"));
+    assertThrows(NotFoundException.class, () -> repositoryService.getStaticCalledProcessDefinitions("notExistingId"));
   }
 
   @Test

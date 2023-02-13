@@ -22,6 +22,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
+import org.camunda.bpm.engine.exception.NotFoundException;
+
 /**
  * @author: Johannes Heinemann
  */
@@ -44,7 +46,7 @@ public class ProcessDefinitionCache extends ResourceDefinitionCache<ProcessDefin
 
   @Override
   protected void checkDefinitionFound(String definitionId, ProcessDefinitionEntity definition) {
-    ensureNotNull("no deployed process definition found with id '" + definitionId + "'", "processDefinition", definition);
+    ensureNotNull(NotFoundException.class, "no deployed process definition found with id '" + definitionId + "'", "processDefinition", definition);
   }
 
   @Override
