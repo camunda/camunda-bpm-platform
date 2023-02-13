@@ -69,7 +69,6 @@ public abstract class AbstractEmptyBodyFilterTest extends AbstractRestServiceTes
 
   protected CloseableHttpClient client;
   protected RequestConfig reqConfig;
-  protected final String BASE_URL = "http://localhost:38080";
 
   @Before
   public void setUpHttpClientAndRuntimeData() {
@@ -132,7 +131,7 @@ public abstract class AbstractEmptyBodyFilterTest extends AbstractRestServiceTes
   }
 
   private void evaluatePostRequest(HttpEntity reqBody, String reqContentType, int expectedStatusCode, boolean assertResponseBody) throws IOException {
-    HttpPost post = new HttpPost(BASE_URL + START_PROCESS_INSTANCE_BY_KEY_URL);
+    HttpPost post = new HttpPost("http://localhost:" + PORT + START_PROCESS_INSTANCE_BY_KEY_URL);
     post.setConfig(reqConfig);
 
     if(reqContentType != null) {

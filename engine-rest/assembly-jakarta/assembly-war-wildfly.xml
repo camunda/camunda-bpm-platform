@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xmlns="urn:maven:assembly:1.1.2">
+
+  <id>wildfly</id>
+
+  <formats>
+    <format>war</format>
+  </formats>
+
+  <includeBaseDirectory>false</includeBaseDirectory>
+
+  <fileSets>
+    <fileSet>
+      <directory>src/main/runtime/wildfly/webapp</directory>
+      <outputDirectory>/</outputDirectory>
+    </fileSet>
+  </fileSets>
+
+  <dependencySets>
+    <dependencySet>
+      <outputDirectory>WEB-INF/lib</outputDirectory>
+      <useTransitiveDependencies>true</useTransitiveDependencies>
+      <useTransitiveFiltering>true</useTransitiveFiltering>
+      <scope>provided</scope>
+      <includes>
+        <include>org.camunda.bpm:camunda-engine-rest-core-jakarta:jar</include>
+      </includes>
+      <excludes>
+        <exclude>org.camunda.bpm:camunda-engine-rest-core-jakarta:jar:tests</exclude>
+        <exclude>org.camunda.bpm:camunda-engine-rest-core-jakarta:jar:sources</exclude>
+      </excludes>
+    </dependencySet>
+
+    <dependencySet>
+      <outputDirectory>/</outputDirectory>
+      <includes>
+        <include>org.camunda.bpm:camunda-engine-rest-jakarta:war:*</include>
+      </includes>
+      <unpack>true</unpack>
+      <unpackOptions>
+        <excludes>
+          <exclude>**/jboss-deployment-structure.xml</exclude>
+          <exclude>**/web.xml</exclude>
+        </excludes>
+      </unpackOptions>
+    </dependencySet>
+  </dependencySets>
+
+</assembly>

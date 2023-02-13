@@ -119,6 +119,14 @@ engine-rest-unit-resteasy:
   labels:
   - 'rest-api'
   nodeLabel: 'h2'
+engine-rest-jakarta-unit-resteasy:
+  directory: 'engine-rest/engine-rest-jakarta'
+  command: 'clean install -Presteasy'
+  stash:
+    runtimeStash: true
+  labels:
+    - 'rest-api'
+  nodeLabel: 'h2'
 engine-rest-unit-cxf:
   directory: 'engine-rest/engine-rest'
   command: 'clean install -Pcxf'
