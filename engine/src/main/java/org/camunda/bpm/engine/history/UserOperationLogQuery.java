@@ -104,13 +104,13 @@ public interface UserOperationLogQuery extends Query<UserOperationLogQuery, User
    * which will be logged as separate {@link UserOperationLogEntry OperationLogEntries} with the same 'operationId'
    * */
   UserOperationLogQuery operationId(String operationId);
-  
+
   /** Query entries which are existing for the external task. */
   UserOperationLogQuery externalTaskId(String externalTaskId);
 
   /** Query entries that changed a property. */
   UserOperationLogQuery property(String property);
-  
+
   /**
    * Query for operations of the given category only. This allows you to restrict the
    * result set to all operations which were performed in the same domain (ie. all Task Worker Operations,
@@ -121,7 +121,7 @@ public interface UserOperationLogQuery extends Query<UserOperationLogQuery, User
    * @see UserOperationLogEntry#CATEGORY_TASK_WORKER
    */
   UserOperationLogQuery category(String category);
-  
+
   /**
    * Query for operations of given categories only. This allows you to restrict the
    * result set to all operations which were performed in the same domain (ie. all Task Worker Operations,
@@ -141,4 +141,12 @@ public interface UserOperationLogQuery extends Query<UserOperationLogQuery, User
 
   /** Order by time stamp (needs to be followed by {@link #asc()} or {@link #desc()}). */
   UserOperationLogQuery orderByTimestamp();
+
+  /**
+   * Only select entries which have the given tenant id.
+   **/
+  UserOperationLogQuery tenantIdIn(String... tenantIds);
+
+  /** Only selects entries that have no tenant id. */
+  UserOperationLogQuery withoutTenantId();
 }

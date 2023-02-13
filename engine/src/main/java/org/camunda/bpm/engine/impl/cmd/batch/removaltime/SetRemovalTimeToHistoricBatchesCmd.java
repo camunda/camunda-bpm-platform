@@ -112,7 +112,7 @@ public class SetRemovalTimeToHistoricBatchesCmd implements Command<Batch> {
     propertyChanges.add(new PropertyChange("async", null, true));
 
     commandContext.getOperationLogManager()
-      .logBatchOperation(UserOperationLogEntry.OPERATION_TYPE_SET_REMOVAL_TIME, propertyChanges);
+      .logBatchOperation(UserOperationLogEntry.OPERATION_TYPE_SET_REMOVAL_TIME, null, propertyChanges);
   }
 
   protected boolean hasRemovalTime() {

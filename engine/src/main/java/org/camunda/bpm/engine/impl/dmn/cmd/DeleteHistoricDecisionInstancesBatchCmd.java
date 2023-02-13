@@ -89,6 +89,7 @@ public class DeleteHistoricDecisionInstancesBatchCmd implements Command<Batch> {
 
     commandContext.getOperationLogManager()
       .logDecisionInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY,
+          null,
           propertyChanges);
   }
 

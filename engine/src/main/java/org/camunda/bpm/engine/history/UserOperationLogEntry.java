@@ -230,4 +230,9 @@ public interface UserOperationLogEntry {
   /** An arbitrary annotation set by a user for auditing reasons */
   String getAnnotation();
 
+  /**
+   * The id of the tenant this user operation log belongs to. Can be <code>null</code>
+   * if the user operation log belongs to no single tenant.
+   */
+  String getTenantId();
 }
