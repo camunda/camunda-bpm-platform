@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -17,6 +18,11 @@
     <version.rest-assured>4.5.0</version.rest-assured>
     <!-- override groovy version with the one used by rest-assured -->
     <version.groovy>3.0.9</version.groovy>
+    <version.jakarta.jakartaee-bom>10.0.0</version.jakarta.jakartaee-bom>
+    <version.jakarta.servlet-api>6.0.0</version.jakarta.servlet-api>
+    <version.jakarta.activation-api>2.1.0</version.jakarta.activation-api>
+    <version.jakarta.ws.rs-api>3.1.0</version.jakarta.ws.rs-api>
+    <version.jakarta.xml.bind-api>4.0.0</version.jakarta.xml.bind-api>
   </properties>
 
   <dependencyManagement>
@@ -37,7 +43,7 @@
         <scope>import</scope>
         <type>pom</type>
       </dependency>
-       <dependency>
+      <dependency>
         <groupId>com.sun.xml.bind</groupId>
         <artifactId>jaxb-impl</artifactId>
         <version>${version.xml.jaxb-impl}</version>
@@ -54,8 +60,25 @@
         <scope>import</scope>
         <type>pom</type>
       </dependency>
+      <!-- Jakarta APIs -->
+      <dependency>
+        <groupId>jakarta.platform</groupId>
+        <artifactId>jakarta.jakartaee-bom</artifactId>
+        <version>${version.jakarta.jakartaee-bom}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+      <dependency>
+        <groupId>jakarta.xml.bind</groupId>
+        <artifactId>jakarta.xml.bind-api</artifactId>
+        <version>${version.jakarta.xml.bind-api}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
+
+  <dependencies>
+
+  </dependencies>
 
   <modules>
     <module>engine-rest</module>
@@ -64,5 +87,18 @@
     <module>assembly</module>
     <module>docs</module>
   </modules>
+
+  <profiles>
+    <profile>
+      <id>jdk11-and-onwards</id>
+      <activation>
+        <jdk>[11,)</jdk>
+      </activation>
+      <modules>
+        <module>engine-rest-jakarta</module>
+        <module>assembly-jakarta</module>
+      </modules>
+    </profile>
+  </profiles>
 
 </project>
