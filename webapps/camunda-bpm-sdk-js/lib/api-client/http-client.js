@@ -76,7 +76,7 @@ function end(self, done, deferred) {
       if (deferred) {
         deferred.reject(err);
       }
-      return done(err);
+      return done(err, null, response.headers);
     }
 
     // superagent puts the parsed data into a property named "body"
@@ -99,7 +99,8 @@ function end(self, done, deferred) {
     }
     done(
       null,
-      response.body ? response.body : response.text ? response.text : ''
+      response.body ? response.body : response.text ? response.text : '',
+      response.headers
     );
   };
 }

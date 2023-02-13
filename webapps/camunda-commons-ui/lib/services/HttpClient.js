@@ -26,7 +26,8 @@ module.exports = [
   '$q',
   '$cookies',
   'configuration',
-  function($rootScope, $timeout, $q, $cookies, configuration) {
+  'ifUnauthorizedForwardToWelcomeApp',
+  function($rootScope, $timeout, $q, $cookies, configuration, ifUnauthorizedForwardToWelcomeApp) {
     function setHeaders(options) {
       var headers = (options.headers = options.headers || {});
       var token = $cookies.get(configuration.getCsrfCookieName());
@@ -52,8 +53,10 @@ module.exports = [
             ? options.done
             : angular.noop;
 
-          options.done = function(err, result) {
+          options.done = function(err, result, headers) {
             function applyResponse() {
+              ifUnauthorizedForwardToWelcomeApp(headers);
+
               // in case the session expired
               if (err && err.status === 401) {
                 // broadcast that the authentication changed

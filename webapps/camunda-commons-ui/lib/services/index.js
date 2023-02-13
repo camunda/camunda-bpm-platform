@@ -30,6 +30,7 @@ var angular = require('../../../camunda-bpm-sdk-js/vendor/angular'),
   HttpClient = require('./HttpClient'),
   unescape = require('./unescape'),
   fixDate = require('./fixDate'),
+  ifUnauthorizedForwardToWelcomeApp = require('./ifUnauthorizedForwardToWelcomeApp'),
   unfixDate = require('./unfixDate'),
   shouldDisplayAuthenticationError = require('./shouldDisplayAuthenticationError');
 
@@ -46,6 +47,7 @@ ngModule.factory('ResourceResolver', ResourceResolver);
 ngModule.factory('camAPIHttpClient', HttpClient);
 ngModule.factory('unescape', unescape);
 ngModule.factory('fixDate', fixDate);
+ngModule.factory('ifUnauthorizedForwardToWelcomeApp', ifUnauthorizedForwardToWelcomeApp);
 ngModule.factory('unfixDate', unfixDate);
 ngModule.factory(
   'shouldDisplayAuthenticationError',
@@ -62,12 +64,14 @@ ngModule.config([
       '$rootScope',
       '$q',
       'RequestLogger',
-      function($rootScope, $q, RequestLogger) {
+      'ifUnauthorizedForwardToWelcomeApp',
+      function($rootScope, $q, RequestLogger, ifUnauthorizedForwardToWelcomeApp) {
         RequestLogger.logStarted();
 
         return {
           response: function(response) {
             RequestLogger.logFinished();
+            ifUnauthorizedForwardToWelcomeApp(response.headers());
 
             return response;
           },
