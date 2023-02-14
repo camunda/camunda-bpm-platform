@@ -16,30 +16,27 @@
  */
 package org.camunda.bpm.engine.impl.interceptor;
 
-import javax.transaction.HeuristicMixedException;
-import javax.transaction.HeuristicRollbackException;
-import javax.transaction.InvalidTransactionException;
-import javax.transaction.NotSupportedException;
-import javax.transaction.RollbackException;
-import javax.transaction.Status;
-import javax.transaction.SystemException;
-import javax.transaction.Transaction;
-import javax.transaction.TransactionManager;
+import jakarta.transaction.HeuristicMixedException;
+import jakarta.transaction.HeuristicRollbackException;
+import jakarta.transaction.InvalidTransactionException;
+import jakarta.transaction.NotSupportedException;
+import jakarta.transaction.RollbackException;
+import jakarta.transaction.Status;
+import jakarta.transaction.SystemException;
+import jakarta.transaction.Transaction;
+import jakarta.transaction.TransactionManager;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSession;
 
-/**
- * @author Guillaume Nodet
- */
-public class JtaTransactionInterceptor extends AbstractTransactionInterceptor {
+public class JakartaTransactionInterceptor extends AbstractTransactionInterceptor {
 
   protected final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
   protected final TransactionManager transactionManager;
 
-  public JtaTransactionInterceptor(TransactionManager transactionManager,
+  public JakartaTransactionInterceptor(TransactionManager transactionManager,
                                    boolean requiresNew,
                                    ProcessEngineConfigurationImpl processEngineConfiguration) {
     super(requiresNew, processEngineConfiguration);

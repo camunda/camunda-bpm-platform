@@ -32,9 +32,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimerTask;
-
-import javax.ws.rs.core.MediaType;
-
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmd.IsTelemetryEnabledCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -164,7 +161,7 @@ public class TelemetrySendingTask extends TimerTask {
       String telemetryData = JsonUtil.asString(dataToSend);
       Map<String, Object> requestParams = assembleRequestParameters(METHOD_NAME_POST,
           telemetryEndpoint,
-          MediaType.APPLICATION_JSON,
+          "application/json",
           telemetryData);
       requestParams = addRequestTimeoutConfiguration(requestParams, telemetryRequestTimeout);
 

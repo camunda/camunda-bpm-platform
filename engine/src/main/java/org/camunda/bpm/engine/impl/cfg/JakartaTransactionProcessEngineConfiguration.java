@@ -16,19 +16,16 @@
  */
 package org.camunda.bpm.engine.impl.cfg;
 
+import jakarta.transaction.TransactionManager;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.transaction.TransactionManager;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.cfg.jta.JtaTransactionContextFactory;
+import org.camunda.bpm.engine.impl.cfg.jta.JakartaTransactionContextFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
-import org.camunda.bpm.engine.impl.interceptor.JtaTransactionInterceptor;
+import org.camunda.bpm.engine.impl.interceptor.JakartaTransactionInterceptor;
 
 
-/**
- * @author Tom Baeyens
- */
-public class JtaProcessEngineConfiguration extends AbstractTransactionProcessEngineConfiguration {
+public class JakartaTransactionProcessEngineConfiguration extends AbstractTransactionProcessEngineConfiguration {
 
   private final static ConfigurationLogger LOG = ProcessEngineLogger.CONFIG_LOGGER;
 
@@ -36,7 +33,7 @@ public class JtaProcessEngineConfiguration extends AbstractTransactionProcessEng
 
   @Override
   protected CommandInterceptor createTransactionInterceptor(boolean requiresNew) {
-    return new JtaTransactionInterceptor(transactionManager, requiresNew, this);
+    return new JakartaTransactionInterceptor(transactionManager, requiresNew, this);
   }
 
   @Override
@@ -56,7 +53,7 @@ public class JtaProcessEngineConfiguration extends AbstractTransactionProcessEng
   @Override
   protected void initTransactionContextFactory() {
     if(transactionContextFactory == null) {
-      transactionContextFactory = new JtaTransactionContextFactory(transactionManager);
+      transactionContextFactory = new JakartaTransactionContextFactory(transactionManager);
     }
   }
 
