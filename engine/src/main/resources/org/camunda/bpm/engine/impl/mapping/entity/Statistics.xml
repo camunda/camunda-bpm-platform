@@ -603,6 +603,9 @@
                     <bind name="permissionChecks" value="processInstancePermissionChecks" />
                     <include refid="acitivityStatisticsAuthorizationCheck" />
 
+                    <bind name="columnPrefix" value="'E.'"/>
+                    <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
+
                    group by
                     E.ACT_ID_
                ) INSTANCE
