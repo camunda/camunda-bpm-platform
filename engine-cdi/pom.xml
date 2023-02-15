@@ -24,5 +24,17 @@
     <module>core</module>
     <module>compatibility-test-weld3</module>
   </modules>
-  
+
+  <profiles>
+    <profile>
+      <id>jdk11-and-onwards</id>
+      <activation>
+        <jdk>[11,)</jdk>
+      </activation>
+      <modules>
+        <module>jakarta</module>
+      </modules>
+    </profile>
+  </profiles>
+
 </project>
