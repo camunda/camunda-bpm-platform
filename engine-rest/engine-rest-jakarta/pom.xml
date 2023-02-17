@@ -22,6 +22,25 @@
     <version.resteasy>6.2.2.Final</version.resteasy>
   </properties>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>jakarta.platform</groupId>
+        <artifactId>jakarta.jakartaee-bom</artifactId>
+        <version>${version.jakarta-ee-spec}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.resteasy</groupId>
+        <artifactId>resteasy-bom</artifactId>
+        <version>${version.resteasy}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
 
     <dependency>
@@ -105,6 +124,14 @@
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-core-internal-dependencies</artifactId>
       <version>${project.version}</version>
+      <type>pom</type>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>jakarta.platform</groupId>
+      <artifactId>jakarta.jakartaee-bom</artifactId>
+      <version>${version.jakarta-ee-spec}</version>
       <type>pom</type>
       <scope>test</scope>
     </dependency>
@@ -532,7 +559,6 @@
         <dependency>
           <groupId>org.jboss.resteasy</groupId>
           <artifactId>resteasy-core</artifactId>
-          <version>${version.resteasy}</version>
           <scope>test</scope>
           <exclusions>
             <exclusion>
@@ -556,7 +582,6 @@
         <dependency>
           <groupId>org.jboss.resteasy</groupId>
           <artifactId>resteasy-netty4</artifactId>
-          <version>${version.resteasy}</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
