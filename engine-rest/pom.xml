@@ -18,11 +18,6 @@
     <version.rest-assured>4.5.0</version.rest-assured>
     <!-- override groovy version with the one used by rest-assured -->
     <version.groovy>3.0.9</version.groovy>
-    <version.jakarta.jakartaee-bom>10.0.0</version.jakarta.jakartaee-bom>
-    <version.jakarta.servlet-api>6.0.0</version.jakarta.servlet-api>
-    <version.jakarta.activation-api>2.1.0</version.jakarta.activation-api>
-    <version.jakarta.ws.rs-api>3.1.0</version.jakarta.ws.rs-api>
-    <version.jakarta.xml.bind-api>4.0.0</version.jakarta.xml.bind-api>
   </properties>
 
   <dependencyManagement>
@@ -59,19 +54,6 @@
         <version>${version.jackson}</version>
         <scope>import</scope>
         <type>pom</type>
-      </dependency>
-      <!-- Jakarta APIs -->
-      <dependency>
-        <groupId>jakarta.platform</groupId>
-        <artifactId>jakarta.jakartaee-bom</artifactId>
-        <version>${version.jakarta.jakartaee-bom}</version>
-        <scope>import</scope>
-        <type>pom</type>
-      </dependency>
-      <dependency>
-        <groupId>jakarta.xml.bind</groupId>
-        <artifactId>jakarta.xml.bind-api</artifactId>
-        <version>${version.jakarta.xml.bind-api}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
