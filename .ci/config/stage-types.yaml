@@ -42,6 +42,7 @@ db-unit-authorizations:
     runtimeStash: true
   labels:
   - 'authorizations'
+  - 'mariadb'
 sql-scripts:
   directory: 'distro/sql-script'
   command: 'install -Pcheck-sql,'
@@ -76,6 +77,8 @@ instance-migration:
   stash:
     runtimeStash: true
     qaStash: true
+  labels:
+  - 'mariadb'
 old-engine:
   directory: 'qa'
   command: 'verify -Pold-engine,'
@@ -96,6 +99,8 @@ rolling-update:
   stash:
     runtimeStash: true
     qaStash: true
+  labels:
+  - 'mariadb'
 large-data-tests:
   directory: 'qa/large-data-tests'
   command: 'verify -Plarge-data-tests,'
