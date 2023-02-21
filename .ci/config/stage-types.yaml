@@ -79,6 +79,8 @@ instance-migration:
     qaStash: true
   labels:
   - 'mariadb'
+  - 'mysql'
+  - 'sqlserver'
 old-engine:
   directory: 'qa'
   command: 'verify -Pold-engine,'
@@ -101,6 +103,8 @@ rolling-update:
     qaStash: true
   labels:
   - 'mariadb'
+  - 'mysql'
+  - 'sqlserver'
 large-data-tests:
   directory: 'qa/large-data-tests'
   command: 'verify -Plarge-data-tests,'

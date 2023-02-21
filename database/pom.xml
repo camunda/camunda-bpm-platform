@@ -24,11 +24,11 @@
     <version.oracle>${version.oracle-12}</version.oracle>
     <version.mariadb>3.1.2</version.mariadb>
     <version.mariadb-v1>1.1.8</version.mariadb-v1>
-    <version.mysql>8.0.28</version.mysql>
-    <version.sqlserver>8.2.2.jre8</version.sqlserver>
+    <version.mysql>8.0.32</version.mysql>
+    <version.sqlserver>12.2.0.jre8</version.sqlserver>
     <version.db2-11.5>11.5.0.0</version.db2-11.5>
     <version.db2>${version.db2-11.5}</version.db2>
-    <version.postgresql>42.5.1</version.postgresql>
+    <version.postgresql>42.5.4</version.postgresql>
     <version.liquibase>4.8.0</version.liquibase>
 
     <!-- CockroachDB is compatible with PostgreSQL 9.5,
