@@ -25,7 +25,7 @@
     <version.mariadb>1.7.6</version.mariadb>
     <version.mariadb-v1>1.1.8</version.mariadb-v1>
     <version.mysql>8.0.32</version.mysql>
-    <version.sqlserver>12.2.0.jre8</version.sqlserver>
+    <version.sqlserver>8.4.1.jre8</version.sqlserver>
     <version.db2-11.5>11.5.0.0</version.db2-11.5>
     <version.db2>${version.db2-11.5}</version.db2>
     <version.postgresql>42.5.4</version.postgresql>

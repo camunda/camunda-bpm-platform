@@ -17,7 +17,7 @@ pipeline {
   options {
     buildDiscarder(logRotator(numToKeepStr: '5'))
     copyArtifactPermission('*')
-    disableConcurrentBuilds(abortPrevious: true)
+    disableConcurrentBuilds()
    }
   parameters {
     string name: 'EE_DOWNSTREAM', defaultValue: 'cambpm-ee-main-pr/' + cambpmDefaultBranch(), description: 'The name of the EE branch/PR to run the EE pipeline on, e.g. cambpm-ee-main/PR-333'
