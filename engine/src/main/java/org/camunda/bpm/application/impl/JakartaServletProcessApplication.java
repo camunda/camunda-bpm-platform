@@ -16,13 +16,13 @@
  */
 package org.camunda.bpm.application.impl;
 
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
 import java.lang.ref.WeakReference;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
-import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
+import org.camunda.bpm.engine.impl.util.JakartaClassLoaderUtil;
 
 /**
  * <p>
@@ -37,8 +37,8 @@ import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
  *
  * <h2>Usage</h2>
  * <p>
- * In a <strong>Servlet 3.0</strong> container it is sufficient adding a custom
- * subclass of {@link ServletProcessApplication} annotated with
+ * In a <strong>Servlet 5.0</strong> container it is sufficient adding a custom
+ * subclass of {@link JakartaServletProcessApplication} annotated with
  * <code>{@literal @}ProcessApplication</code> to your application:
  *
  * <pre>
@@ -51,23 +51,6 @@ import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
  * This, in combination with a <code>META-INF/processes.xml</code> file is
  * sufficient for making sure that the process application class is picked up at
  * runtime.
- * </p>
- * <p>
- * In a <strong>Servlet 2.5</strong> container, the process application can be
- * added as a web listener to your project's <code>web.xml</code>
- * </p>
- *
- * <pre>
- * {@literal <}?xml version="1.0" encoding="UTF-8"?{@literal >}
- * {@literal <}web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
- *       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- *       xsi:schemaLocation="http://java.sun.com/xml/ns/javaee    http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"{@literal >}
- *
- * {@literal <}listener{@literal >}
- *   {@literal <}listener-class{@literal >}org.my.project.MyProcessApplication{@literal <}/listener-class{@literal >}
- * {@literal <}/listener{@literal >}
- *{@literal <}/web-app{@literal >}
- * </pre>
  * </p>
  *
  * <h2>Invocation Semantics</h2>
@@ -102,16 +85,12 @@ import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
  * <h2>Process Application Reference</h2>
  * <p>
  * The process engine holds a {@link WeakReference} to the
- * {@link ServletProcessApplication} and does not cache any classes loaded using
+ * {@link JakartaServletProcessApplication} and does not cache any classes loaded using
  * the Process Application classloader.
  * </p>
  *
- *
- * @author Daniel Meyer
- * @author Thorben Lindhauer
- *
  */
-public class ServletProcessApplication extends AbstractServletProcessApplication implements ServletContextListener {
+public class JakartaServletProcessApplication extends AbstractServletProcessApplication implements ServletContextListener {
 
   protected ServletContext servletContext;
 
@@ -128,15 +107,11 @@ public class ServletProcessApplication extends AbstractServletProcessApplication
   }
 
   protected ClassLoader initProcessApplicationClassloader(ServletContextEvent sce) {
-    if (isServlet30ApiPresent(sce) && getClass().equals(ServletProcessApplication.class)) {
-      return ClassLoaderUtil.getServletContextClassloader(sce);
+    if (getClass().equals(JakartaServletProcessApplication.class)) {
+      return JakartaClassLoaderUtil.getServletContextClassloader(sce);
     } else {
-      return ClassLoaderUtil.getClassloader(getClass());
+      return JakartaClassLoaderUtil.getClassloader(getClass());
     }
-  }
-
-  private boolean isServlet30ApiPresent(ServletContextEvent sce) {
-    return sce.getServletContext().getMajorVersion() >= 3;
   }
 
   @Override

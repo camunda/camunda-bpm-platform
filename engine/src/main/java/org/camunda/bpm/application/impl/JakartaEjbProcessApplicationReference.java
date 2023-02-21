@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.application.impl;
 
-import javax.ejb.EJBException;
+import jakarta.ejb.EJBException;
 import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
@@ -31,7 +31,7 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
  * @author Daniel Meyer
  *
  */
-public class EjbProcessApplicationReference implements ProcessApplicationReference {
+public class JakartaEjbProcessApplicationReference implements ProcessApplicationReference {
 
   private static ProcessApplicationLogger LOG = ProcessEngineLogger.PROCESS_APPLICATION_LOGGER;
 
@@ -41,7 +41,7 @@ public class EjbProcessApplicationReference implements ProcessApplicationReferen
   /** the name of the process application */
   protected String processApplicationName;
 
-  public EjbProcessApplicationReference(ProcessApplicationInterface selfReference, String name) {
+  public JakartaEjbProcessApplicationReference(ProcessApplicationInterface selfReference, String name) {
     this.selfReference = selfReference;
     this.processApplicationName = name;
   }
