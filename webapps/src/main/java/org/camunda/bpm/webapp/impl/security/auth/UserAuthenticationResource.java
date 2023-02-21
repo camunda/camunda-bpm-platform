@@ -40,8 +40,6 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.webapp.impl.util.ProcessEngineUtil;
 import org.camunda.bpm.webapp.impl.util.ServletContextUtil;
 
-import static org.camunda.bpm.webapp.impl.security.auth.AuthenticationUtil.createAuthentication;
-
 /**
  * Jax-Rs resource allowing users to authenticate with username and password</p>
  *
@@ -99,7 +97,7 @@ public class UserAuthenticationResource {
       return unauthorized();
     }
 
-    UserAuthentication authentication = createAuthentication(processEngine, username);
+    UserAuthentication authentication = AuthenticationUtil.createAuthentication(processEngine, username);
 
     ServletContext servletContext = request.getServletContext();
     Date cacheValidationTime = ServletContextUtil.getAuthCacheValidationTime(servletContext);

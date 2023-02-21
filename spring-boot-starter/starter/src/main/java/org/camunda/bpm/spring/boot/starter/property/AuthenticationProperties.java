@@ -38,18 +38,21 @@ public class AuthenticationProperties {
     public static final long AUTH_CACHE_TIME_TO_LIVE = 1_000 * 60 * 5;
 
     /**
-     * Enables authorization.
+     * Enables authentication time to live.
      */
+    protected boolean ttlEnabled = true;
 
-    protected boolean enabled = true;
+    /**
+     * Authentication time to live.
+     */
     protected long timeToLive = AUTH_CACHE_TIME_TO_LIVE;
 
-    public boolean isEnabled() {
-      return enabled;
+    public boolean isTtlEnabled() {
+      return ttlEnabled;
     }
 
-    public void setEnabled(boolean enabled) {
-      this.enabled = enabled;
+    public void setTtlEnabled(boolean ttlEnabled) {
+      this.ttlEnabled = ttlEnabled;
     }
 
     public long getTimeToLive() {
@@ -63,7 +66,7 @@ public class AuthenticationProperties {
     @Override
     public String toString() {
       return joinOn(this.getClass())
-          .add("enabled=" + enabled)
+          .add("ttlEnabled=" + ttlEnabled)
           .add("timeToLive=" + timeToLive)
           .toString();
     }

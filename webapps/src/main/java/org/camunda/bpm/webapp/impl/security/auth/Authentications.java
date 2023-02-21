@@ -70,7 +70,7 @@ public class Authentications implements Serializable {
 
   /**
    * Adds an authentication to the list of current authentications. If there already
-   * existis an authentication of the same process engine, it is replaced silently.
+   * exists an authentication of the same process engine, it is replaced silently.
    *
    * @param authentication the authentication to add
    */

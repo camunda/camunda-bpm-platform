@@ -105,7 +105,7 @@ public class AuthCacheTest {
     MockFilterConfig config = new MockFilterConfig();
     config.addInitParameter(AuthenticationFilter.AUTH_CACHE_TTL_INIT_PARAM_NAME, " 123   ");
     authenticationFilter.init(config);
-    assertThat(authenticationFilter.getcacheTimeToLive()).isEqualTo(123);
+    assertThat(authenticationFilter.getCacheTimeToLive()).isEqualTo(123);
   }
 
   @Test

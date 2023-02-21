@@ -32,6 +32,7 @@ import org.camunda.bpm.webapp.impl.IllegalWebAppConfigurationException;
 import org.camunda.bpm.webapp.impl.security.SecurityActions;
 import org.camunda.bpm.webapp.impl.security.SecurityActions.SecurityAction;
 import org.camunda.bpm.webapp.impl.util.ServletContextUtil;
+import org.camunda.bpm.webapp.impl.util.ServletFilterUtil;
 
 /**
  * <p>Servlet {@link Filter} implementation responsible for populating the
@@ -50,7 +51,7 @@ public class AuthenticationFilter implements Filter {
 
   public void init(FilterConfig filterConfig) throws ServletException {
     String authCacheTTLAsString = filterConfig.getInitParameter(AUTH_CACHE_TTL_INIT_PARAM_NAME);
-    if (!isEmpty(authCacheTTLAsString)) {
+    if (!ServletFilterUtil.isEmpty(authCacheTTLAsString)) {
       cacheTimeToLive = Long.parseLong(authCacheTTLAsString.trim());
 
       if (cacheTimeToLive < 0) {
@@ -92,15 +93,11 @@ public class AuthenticationFilter implements Filter {
 
   }
 
-  protected boolean isEmpty(String string) {
-    return string == null || string.trim().isEmpty();
-  }
-
   public void destroy() {
 
   }
 
-  public Long getcacheTimeToLive() {
+  public Long getCacheTimeToLive() {
     return cacheTimeToLive;
   }
 

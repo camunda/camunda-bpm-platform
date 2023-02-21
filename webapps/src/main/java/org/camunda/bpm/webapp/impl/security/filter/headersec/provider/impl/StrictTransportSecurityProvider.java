@@ -18,6 +18,7 @@ package org.camunda.bpm.webapp.impl.security.filter.headersec.provider.impl;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.webapp.impl.security.filter.headersec.provider.HeaderSecurityProvider;
+import org.camunda.bpm.webapp.impl.util.ServletFilterUtil;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -70,7 +71,7 @@ public class StrictTransportSecurityProvider extends HeaderSecurityProvider {
   public void parseParams() {
 
     String disabled = getParameterValue(DISABLED);
-    if (isEmpty(disabled)) {
+    if (ServletFilterUtil.isEmpty(disabled)) {
       setDisabled(true);
 
     } else {
@@ -83,7 +84,7 @@ public class StrictTransportSecurityProvider extends HeaderSecurityProvider {
         checkAnyParameterDefined(MAX_AGE, INCLUDE_SUBDOMAINS_DISABLED);
 
       String value = getParameterValue(VALUE);
-      boolean isValueParameterDefined = !isEmpty(value);
+      boolean isValueParameterDefined = !ServletFilterUtil.isEmpty(value);
 
       if (isValueParameterDefined && isAnyParameterDefined) {
         String className = this.getClass().getSimpleName();
@@ -99,7 +100,7 @@ public class StrictTransportSecurityProvider extends HeaderSecurityProvider {
         headerValueStringBuilder.append(VALUE_PART_MAX_AGE);
 
         String maxAge = getParameterValue(MAX_AGE);
-        if (isEmpty(maxAge)) {
+        if (ServletFilterUtil.isEmpty(maxAge)) {
           headerValueStringBuilder.append(MAX_AGE_DEFAULT_VALUE);
 
         } else {
@@ -109,7 +110,7 @@ public class StrictTransportSecurityProvider extends HeaderSecurityProvider {
         }
 
         String includeSubdomainsDisabled = getParameterValue(INCLUDE_SUBDOMAINS_DISABLED);
-        if (!isEmpty(includeSubdomainsDisabled) && !Boolean.parseBoolean(includeSubdomainsDisabled)) {
+        if (!ServletFilterUtil.isEmpty(includeSubdomainsDisabled) && !Boolean.parseBoolean(includeSubdomainsDisabled)) {
           headerValueStringBuilder.append(VALUE_PART_INCLUDE_SUBDOMAINS);
 
         }
@@ -137,7 +138,7 @@ public class StrictTransportSecurityProvider extends HeaderSecurityProvider {
   protected boolean checkAnyParameterDefined(Parameters... parameters) {
     for (Parameters parameter : parameters) {
       String parameterValue = getParameterValue(parameter);
-      if (!isEmpty(parameterValue)) {
+      if (!ServletFilterUtil.isEmpty(parameterValue)) {
         return true;
       }
     }

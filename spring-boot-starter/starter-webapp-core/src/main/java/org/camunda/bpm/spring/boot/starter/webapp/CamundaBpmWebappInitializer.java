@@ -139,7 +139,7 @@ public class CamundaBpmWebappInitializer implements ServletContextInitializer {
 
   protected String getAuthCacheTTL(WebappProperty webapp) {
     long authCacheTTL = webapp.getAuth().getCache().getTimeToLive();
-    boolean authCacheTTLEnabled = webapp.getAuth().getCache().isEnabled();
+    boolean authCacheTTLEnabled = webapp.getAuth().getCache().isTtlEnabled();
     if (authCacheTTLEnabled) {
       return Long.toString(authCacheTTL);
 

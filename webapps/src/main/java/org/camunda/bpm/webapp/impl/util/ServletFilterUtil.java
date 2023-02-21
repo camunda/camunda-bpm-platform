@@ -14,26 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.spring.boot.starter.property.authcachettl;
+package org.camunda.bpm.webapp.impl.util;
 
-import org.camunda.bpm.spring.boot.starter.property.ParsePropertiesHelper;
-import org.junit.Test;
+/**
+ * Common logic that is used in servlet filters.
+ */
+public class ServletFilterUtil {
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-public class AuthCacheTTLPropertyDefaultTest extends ParsePropertiesHelper {
-
-  @Test
-  public void shouldDefaultToEnabledAndTTLFiveMinutes() {
-    // given
-
-    // when
-    boolean enabled = webapp.getAuth().getCache().isTtlEnabled();
-    long ttl = webapp.getAuth().getCache().getTimeToLive();
-
-    // then
-    assertThat(enabled).isTrue();
-    assertThat(ttl).isEqualTo(1_000 * 60 * 5);
+  /**
+   * Checks if servlet filter init parameter is empty.
+   */
+  public static boolean isEmpty(String string) {
+    return string == null || string.trim().isEmpty();
   }
 
 }

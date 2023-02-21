@@ -23,7 +23,7 @@ import org.springframework.test.context.TestPropertySource;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @TestPropertySource(properties = {
-    "camunda.bpm.webapp.auth.cache.enabled=false",
+    "camunda.bpm.webapp.auth.cache.ttl-enabled=false",
     "camunda.bpm.webapp.auth.cache.time-to-live=6",
 })
 public class AuthCacheTTLPropertyTest extends ParsePropertiesHelper {
@@ -33,7 +33,7 @@ public class AuthCacheTTLPropertyTest extends ParsePropertiesHelper {
     // given
 
     // when
-    boolean cacheEnabled = webapp.getAuth().getCache().isEnabled();
+    boolean cacheEnabled = webapp.getAuth().getCache().isTtlEnabled();
     long ttl = webapp.getAuth().getCache().getTimeToLive();
 
     // then

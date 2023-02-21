@@ -51,8 +51,4 @@ public abstract class HeaderSecurityProvider {
     this.disabled = disabled;
   }
 
-  protected boolean isEmpty(String string) {
-    return string == null || string.trim().isEmpty();
-  }
-
 }

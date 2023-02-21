@@ -18,6 +18,7 @@ package org.camunda.bpm.webapp.impl.security.filter.headersec.provider.impl;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.webapp.impl.security.filter.headersec.provider.HeaderSecurityProvider;
+import org.camunda.bpm.webapp.impl.util.ServletFilterUtil;
 
 import java.util.Map;
 
@@ -45,7 +46,7 @@ public class XssProtectionProvider extends HeaderSecurityProvider {
 
     String disabled = initParams.get(DISABLED_PARAM);
 
-    if (isEmpty(disabled)) {
+    if (ServletFilterUtil.isEmpty(disabled)) {
       setDisabled(false);
 
     } else {
@@ -57,14 +58,14 @@ public class XssProtectionProvider extends HeaderSecurityProvider {
     String option = initParams.get(OPTION_PARAM);
 
     if (!isDisabled()) {
-      if (!isEmpty(value) && !isEmpty(option)) {
+      if (!ServletFilterUtil.isEmpty(value) && !ServletFilterUtil.isEmpty(option)) {
         throw new ProcessEngineException(this.getClass().getSimpleName() + ": cannot set both " + VALUE_PARAM + " and " + OPTION_PARAM + ".");
       }
 
-      if (!isEmpty(value)) {
+      if (!ServletFilterUtil.isEmpty(value)) {
         setValue(value);
 
-      } else if (!isEmpty(option)) {
+      } else if (!ServletFilterUtil.isEmpty(option)) {
         setValue(parseValue(option).getHeaderValue());
 
       } else {

@@ -17,6 +17,7 @@
 package org.camunda.bpm.webapp.impl.security.filter.headersec.provider.impl;
 
 import org.camunda.bpm.webapp.impl.security.filter.headersec.provider.HeaderSecurityProvider;
+import org.camunda.bpm.webapp.impl.util.ServletFilterUtil;
 
 import java.util.Map;
 
@@ -41,7 +42,7 @@ public class ContentTypeOptionsProvider extends HeaderSecurityProvider {
 
     String disabled = initParams.get(DISABLED_PARAM);
 
-    if (isEmpty(disabled)) {
+    if (ServletFilterUtil.isEmpty(disabled)) {
       setDisabled(false);
 
     } else {
@@ -52,7 +53,7 @@ public class ContentTypeOptionsProvider extends HeaderSecurityProvider {
     String value = initParams.get(VALUE_PARAM);
 
     if (!isDisabled()) {
-      if (!isEmpty(value)) {
+      if (!ServletFilterUtil.isEmpty(value)) {
         setValue(value);
 
       } else {

@@ -41,7 +41,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestPropertySource(properties = {
   "camunda.bpm.admin-user.id=demo",
   "camunda.bpm.admin-user.password=demo",
-  "camunda.bpm.webapp.auth.cache.enabled=false"
+  "camunda.bpm.webapp.auth.cache.ttl-enabled=false"
 })
 @DirtiesContext
 public class AuthCacheTTLDisabledIT {
