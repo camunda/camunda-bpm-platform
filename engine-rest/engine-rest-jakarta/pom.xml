@@ -267,7 +267,7 @@
         <executions>
           <execution>
             <id>unpack-engine-rest-core</id>
-            <phase>process-sources</phase>
+            <phase>generate-sources</phase>
             <goals>
               <goal>unpack</goal>
             </goals>
@@ -303,7 +303,7 @@
         <executions>
           <execution>
             <id>copy-test-sources</id>
-            <phase>process-sources</phase>
+            <phase>generate-sources</phase>
             <goals>
               <goal>copy-resources</goal>
             </goals>
@@ -319,7 +319,7 @@
           </execution>
           <execution>
             <id>copy-test-sources-resteasy</id>
-            <phase>process-sources</phase>
+            <phase>generate-sources</phase>
             <goals>
               <goal>copy-resources</goal>
             </goals>
@@ -331,6 +331,7 @@
                   <filtering>false</filtering>
                   <excludes>
                     <exclude>**/ResteasyTomcatServerBootstrap.java</exclude>
+                    <exclude>**/ResteasySpecifics.java</exclude>
                   </excludes>
                 </resource>
               </resources>
@@ -338,7 +339,7 @@
           </execution>
           <execution>
             <id>copy-test-resources</id>
-            <phase>process-sources</phase>
+            <phase>generate-sources</phase>
             <goals>
               <goal>copy-resources</goal>
             </goals>
@@ -354,7 +355,7 @@
           </execution>
           <execution>
             <id>copy-test-resources-resteasy</id>
-            <phase>process-sources</phase>
+            <phase>generate-sources</phase>
             <goals>
               <goal>copy-resources</goal>
             </goals>
@@ -391,7 +392,7 @@
         <executions>
           <execution>
             <id>transform-jakarta-sources</id>
-            <phase>process-sources</phase>
+            <phase>generate-sources</phase>
             <goals>
               <goal>transform</goal>
             </goals>
@@ -401,7 +402,7 @@
           </execution>
           <execution>
             <id>transform-jakarta-test-sources</id>
-            <phase>process-test-sources</phase>
+            <phase>generate-test-sources</phase>
             <goals>
               <goal>transform</goal>
             </goals>
@@ -412,7 +413,7 @@
           <!-- resteasy test-sources & test-resources -->
           <execution>
             <id>transform-jakarta-test-sources-resteasy</id>
-            <phase>process-test-sources</phase>
+            <phase>generate-test-sources</phase>
             <goals>
               <goal>transform</goal>
             </goals>
@@ -422,7 +423,7 @@
           </execution>
           <execution>
             <id>transform-jakarta-test-resources-resteasy</id>
-            <phase>process-test-sources</phase>
+            <phase>generate-test-sources</phase>
             <goals>
               <goal>transform</goal>
             </goals>
@@ -439,7 +440,7 @@
         <executions>
           <execution>
             <id>add-jakarta-source</id>
-            <phase>process-sources</phase>
+            <phase>generate-sources</phase>
             <goals>
               <goal>add-source</goal>
             </goals>
@@ -451,7 +452,7 @@
           </execution>
           <execution>
             <id>add-jakarta-resource</id>
-            <phase>process-sources</phase>
+            <phase>generate-sources</phase>
             <goals>
               <goal>add-resource</goal>
             </goals>
@@ -465,7 +466,7 @@
           </execution>
           <execution>
             <id>add-jakarta-test-source</id>
-            <phase>process-test-sources</phase>
+            <phase>generate-test-sources</phase>
             <goals>
               <goal>add-test-source</goal>
             </goals>
@@ -477,7 +478,7 @@
           </execution>
           <execution>
             <id>add-jakarta-test-resource</id>
-            <phase>process-test-sources</phase>
+            <phase>generate-test-sources</phase>
             <goals>
               <goal>add-test-resource</goal>
             </goals>
@@ -559,13 +560,30 @@
       </activation>
       <properties>
         <version.netty>4.1.89.Final</version.netty>
+        <version.undertow>2.3.0.Final</version.undertow>
       </properties>
       <dependencies>
+        <dependency>
+          <groupId>io.undertow</groupId>
+          <artifactId>undertow-servlet</artifactId>
+          <version>${version.undertow}</version>
+          <scope>test</scope>
+        </dependency>
         <dependency>
           <groupId>org.jboss.resteasy</groupId>
           <artifactId>resteasy-core</artifactId>
           <scope>test</scope>
         </dependency>
+        <dependency>
+          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>resteasy-undertow</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <!--dependency>
+          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>resteasy-servlet-initializer</artifactId>
+          <scope>test</scope>
+        </dependency-->
         <dependency>
           <groupId>org.jboss.resteasy</groupId>
           <artifactId>resteasy-netty4</artifactId>
@@ -588,7 +606,7 @@
             <executions>
               <execution>
                 <id>add-jakarta-resteasy-test-source</id>
-                <phase>process-test-sources</phase>
+                <phase>generate-test-sources</phase>
                 <goals>
                   <goal>add-test-source</goal>
                 </goals>
@@ -601,7 +619,7 @@
               </execution>
               <execution>
                 <id>add-jakarta-resteasy-test-resource</id>
-                <phase>process-test-sources</phase>
+                <phase>generate-test-sources</phase>
                 <goals>
                   <goal>add-test-resource</goal>
                 </goals>

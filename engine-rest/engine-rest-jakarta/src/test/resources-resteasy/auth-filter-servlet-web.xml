@@ -7,6 +7,11 @@
   <display-name>camunda rest api</display-name>
 
   <context-param>
+    <param-name>system</param-name>
+    <param-value>system-context</param-value>
+  </context-param>
+
+  <context-param>
 	  <param-name>resteasy.servlet.mapping.prefix</param-name>
 	  <param-value>/rest</param-value>
   </context-param>
@@ -14,8 +19,9 @@
   <servlet>
     <servlet-name>Resteasy</servlet-name>
     <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
+    <load-on-startup>0</load-on-startup>
     <init-param>
-      <param-name>javax.ws.rs.Application</param-name>
+      <param-name>jakarta.ws.rs.Application</param-name>
       <param-value>org.camunda.bpm.engine.rest.util.container.JaxrsApplication</param-value>
     </init-param>
   </servlet>
@@ -24,6 +30,20 @@
     <servlet-name>Resteasy</servlet-name>
     <url-pattern>/rest/*</url-pattern>
   </servlet-mapping>
+
+  <!--filter>
+    <filter-name>Resteasy</filter-name>
+    <filter-class>org.jboss.resteasy.plugins.server.servlet.FilterDispatcher</filter-class>
+    <init-param>
+      <param-name>jakarta.ws.rs.Application</param-name>
+      <param-value>org.camunda.bpm.engine.rest.util.container.JaxrsApplication</param-value>
+    </init-param>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>Resteasy</filter-name>
+    <url-pattern>/rest/*</url-pattern>
+  </filter-mapping-->
 
   <filter>
     <filter-name>camunda-auth</filter-name>
