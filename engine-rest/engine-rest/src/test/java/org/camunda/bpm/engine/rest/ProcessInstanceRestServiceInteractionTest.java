@@ -3276,7 +3276,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
     Map<String, Object> messageBodyJson = new HashMap<>();
     messageBodyJson.put("processInstances", ids);
     messageBodyJson.put(RETRIES, MockProvider.EXAMPLE_JOB_RETRIES);
-    Date newDueDate = new Date(0);
+    Date newDueDate = new Date(1675752840000L);
     messageBodyJson.put("dueDate", newDueDate);
 
     Response response = given()
@@ -3301,7 +3301,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
     messageBodyJson.put(RETRIES, MockProvider.EXAMPLE_JOB_RETRIES);
     HistoricProcessInstanceQueryDto query = new HistoricProcessInstanceQueryDto();
     messageBodyJson.put("processInstanceQuery", query);
-    Date newDueDate = new Date(0);
+    Date newDueDate = new Date(1675752840000L);
     messageBodyJson.put("dueDate", newDueDate);
 
     Response response = given()
@@ -3428,7 +3428,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
     SetJobRetriesByProcessDto body = new SetJobRetriesByProcessDto();
     body.setRetries(MockProvider.EXAMPLE_JOB_RETRIES);
     body.setHistoricProcessInstanceQuery(new HistoricProcessInstanceQueryDto());
-    Date newDueDate = new Date(0);
+    Date newDueDate = new Date(1675752840000L);
     body.setDueDate(newDueDate);
 
     Response response = given()
@@ -3472,7 +3472,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
     SetJobRetriesByProcessDto body = new SetJobRetriesByProcessDto();
     body.setRetries(MockProvider.EXAMPLE_JOB_RETRIES);
     body.setProcessInstances(Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID));
-    Date newDueDate = new Date(0);
+    Date newDueDate = new Date(1675752840000L);
     body.setDueDate(newDueDate);
 
     given()

@@ -1341,7 +1341,7 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
   public void testSetJobRetriesWithDueDate() {
     Map<String, Object> retriesVariableJson = new HashMap<>();
     retriesVariableJson.put("retries", MockProvider.EXAMPLE_JOB_RETRIES);
-    Date newDueDate = new Date(0);
+    Date newDueDate = new Date(1675752840000L);
     retriesVariableJson.put("dueDate", newDueDate);
 
     given()
