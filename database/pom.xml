@@ -22,12 +22,13 @@
     <version.oracle-12>12.1.0.2</version.oracle-12>
     <version.oracle-19>19.3.0.0</version.oracle-19>
     <version.oracle>${version.oracle-12}</version.oracle>
-    <version.mariadb>1.1.8</version.mariadb>
-    <version.mysql>8.0.28</version.mysql>
-    <version.sqlserver>8.2.2.jre8</version.sqlserver>
+    <version.mariadb>1.7.6</version.mariadb>
+    <version.mariadb-v1>1.1.8</version.mariadb-v1>
+    <version.mysql>8.0.32</version.mysql>
+    <version.sqlserver>8.4.1.jre8</version.sqlserver>
     <version.db2-11.5>11.5.0.0</version.db2-11.5>
     <version.db2>${version.db2-11.5}</version.db2>
-    <version.postgresql>42.5.1</version.postgresql>
+    <version.postgresql>42.5.4</version.postgresql>
     <version.liquibase>4.8.0</version.liquibase>
 
     <!-- CockroachDB is compatible with PostgreSQL 9.5,
@@ -244,7 +245,7 @@
         <database.type>mariadb</database.type>
         <database.driver>org.mariadb.jdbc.Driver</database.driver>
         <database.datasource.class>org.mariadb.jdbc.MySQLDataSource</database.datasource.class>
-        <database.tc.url>cammariadb:10.3</database.tc.url>
+        <database.tc.url>cammariadb:10.6</database.tc.url>
         <database.tc.params>/${database.name}?user=${database.username}&amp;amp;password=${database.password}</database.tc.params>
       </properties>
 
@@ -308,12 +309,6 @@
           </plugins>
         </pluginManagement>
       </build>
-    </profile>
-    <profile>
-      <id>mysql-5.7</id>
-      <properties>
-        <database.tc.url>cammysql:5.7</database.tc.url>
-      </properties>
     </profile>
 
     <profile>
