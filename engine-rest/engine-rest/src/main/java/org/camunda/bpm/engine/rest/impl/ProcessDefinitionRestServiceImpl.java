@@ -45,14 +45,14 @@ import org.camunda.bpm.engine.rest.util.QueryUtil;
 
 public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineAware implements ProcessDefinitionRestService {
 
-	public ProcessDefinitionRestServiceImpl(String engineName, ObjectMapper objectMapper) {
+  public ProcessDefinitionRestServiceImpl(String engineName, ObjectMapper objectMapper) {
     super(engineName, objectMapper);
   }
 
-	@Override
+  @Override
   public ProcessDefinitionResource getProcessDefinitionByKey(String processDefinitionKey) {
 
-	  ProcessDefinition processDefinition = getProcessEngine()
+    ProcessDefinition processDefinition = getProcessEngine()
         .getRepositoryService()
         .createProcessDefinitionQuery()
         .processDefinitionKey(processDefinitionKey)
@@ -67,9 +67,9 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
     } else {
       return getProcessDefinitionById(processDefinition.getId());
     }
-	}
+  }
 
-	@Override
+  @Override
   public ProcessDefinitionResource getProcessDefinitionByKeyAndTenantId(String processDefinitionKey, String tenantId) {
 
     ProcessDefinition processDefinition = getProcessEngine()
@@ -96,28 +96,28 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
   }
 
   @Override
-	public List<ProcessDefinitionDto> getProcessDefinitions(UriInfo uriInfo,
-	    Integer firstResult, Integer maxResults) {
+  public List<ProcessDefinitionDto> getProcessDefinitions(UriInfo uriInfo,
+      Integer firstResult, Integer maxResults) {
     ProcessDefinitionQueryDto queryDto = new ProcessDefinitionQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
-	  List<ProcessDefinitionDto> definitions = new ArrayList<>();
+    List<ProcessDefinitionDto> definitions = new ArrayList<>();
 
-	  ProcessEngine engine = getProcessEngine();
-	  ProcessDefinitionQuery query = queryDto.toQuery(engine);
+    ProcessEngine engine = getProcessEngine();
+    ProcessDefinitionQuery query = queryDto.toQuery(engine);
 
-	  List<ProcessDefinition> matchingDefinitions = QueryUtil.list(query, firstResult, maxResults);
+    List<ProcessDefinition> matchingDefinitions = QueryUtil.list(query, firstResult, maxResults);
 
-	  for (ProcessDefinition definition : matchingDefinitions) {
-	    ProcessDefinitionDto def = ProcessDefinitionDto.fromProcessDefinition(definition);
-	    definitions.add(def);
-	  }
-	  return definitions;
-	}
+    for (ProcessDefinition definition : matchingDefinitions) {
+      ProcessDefinitionDto def = ProcessDefinitionDto.fromProcessDefinition(definition);
+      definitions.add(def);
+    }
+    return definitions;
+  }
 
-	@Override
+  @Override
   public CountResultDto getProcessDefinitionsCount(UriInfo uriInfo) {
-	  ProcessDefinitionQueryDto queryDto = new ProcessDefinitionQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
+    ProcessDefinitionQueryDto queryDto = new ProcessDefinitionQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
 
-	  ProcessEngine engine = getProcessEngine();
+    ProcessEngine engine = getProcessEngine();
     ProcessDefinitionQuery query = queryDto.toQuery(engine);
 
     long count = query.count();
@@ -188,7 +188,7 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
     RepositoryService repositoryService = getProcessEngine().getRepositoryService();
 
     DeleteProcessDefinitionsBuilder builder = repositoryService.deleteProcessDefinitions()
-      .byKey(processDefinitionKey);
+        .byKey(processDefinitionKey);
 
     deleteProcessDefinitions(builder, cascade, skipCustomListeners, skipIoMappings);
   }
@@ -198,8 +198,8 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
     RepositoryService repositoryService = getProcessEngine().getRepositoryService();
 
     DeleteProcessDefinitionsBuilder builder = repositoryService.deleteProcessDefinitions()
-      .byKey(processDefinitionKey)
-      .withTenantId(tenantId);
+        .byKey(processDefinitionKey)
+        .withTenantId(tenantId);
 
     deleteProcessDefinitions(builder, cascade, skipCustomListeners, skipIoMappings);
   }
