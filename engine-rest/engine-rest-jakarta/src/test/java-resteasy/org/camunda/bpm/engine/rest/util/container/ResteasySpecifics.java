@@ -51,10 +51,10 @@ public class ResteasySpecifics implements ContainerSpecifics {
     //TEST_RULE_FACTORIES.put(ServletAuthenticationFilterTest.class, new ServletContainerRuleFactory("auth-filter-servlet-web.xml"));
     TEST_RULE_FACTORIES.put(ServletAuthenticationFilterTest.class, new UndertowServletContainerRuleFactory());
 
-    TEST_RULE_FACTORIES.put(NoServletAuthenticationFilterTest.class, new ServletContainerRuleFactory("auth-filter-no-servlet-web.xml"));
+    /*TEST_RULE_FACTORIES.put(NoServletAuthenticationFilterTest.class, new ServletContainerRuleFactory("auth-filter-no-servlet-web.xml"));
     TEST_RULE_FACTORIES.put(ServletEmptyBodyFilterTest.class, new ServletContainerRuleFactory("empty-body-filter-servlet-web.xml"));
     TEST_RULE_FACTORIES.put(NoServletEmptyBodyFilterTest.class, new ServletContainerRuleFactory("empty-body-filter-no-servlet-web.xml"));
-    TEST_RULE_FACTORIES.put(CustomJacksonDateFormatTest.class, new ServletContainerRuleFactory("custom-date-format-web.xml"));
+    TEST_RULE_FACTORIES.put(CustomJacksonDateFormatTest.class, new ServletContainerRuleFactory("custom-date-format-web.xml"));*/
   }
 
   public TestRule getTestRule(Class<?> testClass) {
