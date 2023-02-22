@@ -147,9 +147,14 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
     Map<String, Object> retriesVariableJson = new HashMap<>();
     retriesVariableJson.put("retries", MockProvider.EXAMPLE_JOB_RETRIES);
 
-    given().pathParam("id", MockProvider.EXAMPLE_JOB_ID).contentType(ContentType.JSON).body(retriesVariableJson).then().expect()
-    .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when().put(JOB_RESOURCE_SET_RETRIES_URL);
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_JOB_ID)
+      .contentType(ContentType.JSON)
+      .body(retriesVariableJson)
+    .then().expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .put(JOB_RESOURCE_SET_RETRIES_URL);
 
     verify(mockManagementService).setJobRetries(MockProvider.EXAMPLE_JOB_RETRIES);
     verify(mockSetJobRetriesBuilder).jobId(MockProvider.EXAMPLE_JOB_ID);
@@ -165,9 +170,13 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
     Date newDueDate = new Date(0);
     retriesVariableJson.put("dueDate", newDueDate);
 
-    given().pathParam("id", MockProvider.EXAMPLE_JOB_ID).contentType(ContentType.JSON).body(retriesVariableJson).then().expect()
-    .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when().put(JOB_RESOURCE_SET_RETRIES_URL);
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_JOB_ID)
+      .contentType(ContentType.JSON)
+      .body(retriesVariableJson).then().expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .put(JOB_RESOURCE_SET_RETRIES_URL);
 
     verify(mockManagementService).setJobRetries(MockProvider.EXAMPLE_JOB_RETRIES);
     verify(mockSetJobRetriesBuilder).jobId(MockProvider.EXAMPLE_JOB_ID);
@@ -185,18 +194,22 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
     Map<String, Object> retriesVariableJson = new HashMap<>();
     retriesVariableJson.put("retries", MockProvider.EXAMPLE_JOB_RETRIES);
 
-    given().pathParam("id", MockProvider.NON_EXISTING_JOB_ID).contentType(ContentType.JSON)
-    .body(retriesVariableJson).then().expect()
-    .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
-    .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-    .body("message", equalTo(expectedMessage))
-    .when().put(JOB_RESOURCE_SET_RETRIES_URL);
+    given()
+      .pathParam("id", MockProvider.NON_EXISTING_JOB_ID)
+      .contentType(ContentType.JSON)
+      .body(retriesVariableJson)
+    .then().expect()
+      .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo(expectedMessage))
+    .when()
+      .put(JOB_RESOURCE_SET_RETRIES_URL);
 
-  verify(mockManagementService).setJobRetries(MockProvider.EXAMPLE_JOB_RETRIES);
-  verify(mockSetJobRetriesBuilder).jobId(MockProvider.NON_EXISTING_JOB_ID);
-  verify(mockSetJobRetriesBuilder).dueDate(null);
-  verify(mockSetJobRetriesBuilder).execute();
-  verifyNoMoreInteractions(mockSetJobRetriesBuilder);
+    verify(mockManagementService).setJobRetries(MockProvider.EXAMPLE_JOB_RETRIES);
+    verify(mockSetJobRetriesBuilder).jobId(MockProvider.NON_EXISTING_JOB_ID);
+    verify(mockSetJobRetriesBuilder).dueDate(null);
+    verify(mockSetJobRetriesBuilder).execute();
+    verifyNoMoreInteractions(mockSetJobRetriesBuilder);
   }
 
   @Test
@@ -210,11 +223,16 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
     Map<String, Object> retriesVariableJson = new HashMap<>();
     retriesVariableJson.put("retries", MockProvider.EXAMPLE_NEGATIVE_JOB_RETRIES);
 
-    given().pathParam("id", MockProvider.EXAMPLE_JOB_ID).contentType(ContentType.JSON).body(retriesVariableJson).then().then().expect()
-    .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
-    .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-    .body("message", equalTo(expectedMessage))
-    .when().put(JOB_RESOURCE_SET_RETRIES_URL);
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_JOB_ID)
+      .contentType(ContentType.JSON)
+      .body(retriesVariableJson)
+    .then().expect()
+      .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo(expectedMessage))
+    .when()
+      .put(JOB_RESOURCE_SET_RETRIES_URL);
 
     verify(mockManagementService).setJobRetries(MockProvider.EXAMPLE_NEGATIVE_JOB_RETRIES);
     verifyNoMoreInteractions(mockSetJobRetriesBuilder);
@@ -253,7 +271,8 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
       .body("jobDefinitionId", equalTo(MockProvider.EXAMPLE_JOB_DEFINITION_ID))
       .body("tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
       .body("createTime", equalTo(MockProvider.EXAMPLE_JOB_CREATE_TIME))
-    .when().get(SINGLE_JOB_RESOURCE_URL);
+    .when()
+      .get(SINGLE_JOB_RESOURCE_URL);
 
     InOrder inOrder = inOrder(mockQuery);
     inOrder.verify(mockQuery).jobId(MockProvider.EXAMPLE_JOB_ID);
@@ -269,17 +288,25 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
     String jobId = MockProvider.NON_EXISTING_JOB_ID;
 
-    given().pathParam("id", jobId).then().expect().statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
-    .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-    .body("message", equalTo("Job with id " + jobId + " does not exist")).when()
-    .get(SINGLE_JOB_RESOURCE_URL);
+    given()
+      .pathParam("id", jobId)
+    .then().expect()
+      .statusCode(Status.NOT_FOUND.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("Job with id " + jobId + " does not exist"))
+    .when()
+      .get(SINGLE_JOB_RESOURCE_URL);
   }
 
   @Test
   public void testExecuteJob() {
-    given().pathParam("id", MockProvider.EXAMPLE_JOB_ID)
-    .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
-    .when().post(JOB_RESOURCE_EXECUTE_JOB_URL);
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_JOB_ID)
+    .then().expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(JOB_RESOURCE_EXECUTE_JOB_URL);
 
     verify(mockManagementService).executeJob(MockProvider.EXAMPLE_JOB_ID);
   }
@@ -371,9 +398,14 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
     Map<String, Object> duedateVariableJson = new HashMap<>();
     duedateVariableJson.put("duedate", newDuedate);
 
-    given().pathParam("id", MockProvider.EXAMPLE_JOB_ID).contentType(ContentType.JSON).body(duedateVariableJson).then().expect()
-    .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when().put(JOB_RESOURCE_SET_DUEDATE_URL);
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_JOB_ID)
+      .contentType(ContentType.JSON)
+      .body(duedateVariableJson)
+    .then().expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .put(JOB_RESOURCE_SET_DUEDATE_URL);
 
     verify(mockManagementService).setJobDuedate(MockProvider.EXAMPLE_JOB_ID, newDuedate, false);
   }
@@ -383,9 +415,14 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
     Map<String, Object> duedateVariableJson = new HashMap<>();
     duedateVariableJson.put("duedate", null);
 
-    given().pathParam("id", MockProvider.EXAMPLE_JOB_ID).contentType(ContentType.JSON).body(duedateVariableJson).then().expect()
-    .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when().put(JOB_RESOURCE_SET_DUEDATE_URL);
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_JOB_ID)
+      .contentType(ContentType.JSON)
+      .body(duedateVariableJson)
+    .then().expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .put(JOB_RESOURCE_SET_DUEDATE_URL);
 
     verify(mockManagementService).setJobDuedate(MockProvider.EXAMPLE_JOB_ID, null, false);
   }
@@ -397,9 +434,14 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
     duedateVariableJson.put("duedate", newDuedate);
     duedateVariableJson.put("cascade", true);
 
-    given().pathParam("id", MockProvider.EXAMPLE_JOB_ID).contentType(ContentType.JSON).body(duedateVariableJson).then().expect()
-    .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when().put(JOB_RESOURCE_SET_DUEDATE_URL);
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_JOB_ID)
+      .contentType(ContentType.JSON)
+      .body(duedateVariableJson)
+    .then().expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .put(JOB_RESOURCE_SET_DUEDATE_URL);
 
     verify(mockManagementService).setJobDuedate(MockProvider.EXAMPLE_JOB_ID, newDuedate, true);
   }
@@ -410,9 +452,14 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
     duedateVariableJson.put("duedate", null);
     duedateVariableJson.put("cascade", true);
 
-    given().pathParam("id", MockProvider.EXAMPLE_JOB_ID).contentType(ContentType.JSON).body(duedateVariableJson).then().expect()
-    .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when().put(JOB_RESOURCE_SET_DUEDATE_URL);
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_JOB_ID)
+      .contentType(ContentType.JSON)
+      .body(duedateVariableJson)
+    .then().expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .put(JOB_RESOURCE_SET_DUEDATE_URL);
 
     verify(mockManagementService).setJobDuedate(MockProvider.EXAMPLE_JOB_ID, null, true);
   }
@@ -1399,11 +1446,11 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
     given()
       .pathParam("id", jobId)
-      .then().expect()
+    .then().expect()
       .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
       .body("type", equalTo(RestException.class.getSimpleName()))
       .body("message", equalTo(expectedMessage))
-      .when()
+    .when()
       .delete(SINGLE_JOB_RESOURCE_URL);
 
     verify(mockManagementService).deleteJob(jobId);
@@ -1440,11 +1487,14 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
     messageBodyJson.put("jobIds", ids);
     messageBodyJson.put(RETRIES, 5);
 
-    Response response = given()
-        .contentType(ContentType.JSON).body(messageBodyJson)
+    Response response =
+        given()
+          .contentType(ContentType.JSON)
+          .body(messageBodyJson)
         .then().expect()
-        .statusCode(Status.OK.getStatusCode())
-        .when().post(JOBS_SET_RETRIES_URL);
+          .statusCode(Status.OK.getStatusCode())
+        .when()
+          .post(JOBS_SET_RETRIES_URL);
 
     verifyBatchJson(response.asString());
 
@@ -1466,11 +1516,14 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
     messageBodyJson.put("dueDate", newDueDate);
     messageBodyJson.put(RETRIES, 5);
 
-    Response response = given()
-        .contentType(ContentType.JSON).body(messageBodyJson)
+    Response response =
+        given()
+          .contentType(ContentType.JSON)
+          .body(messageBodyJson)
         .then().expect()
-        .statusCode(Status.OK.getStatusCode())
-        .when().post(JOBS_SET_RETRIES_URL);
+          .statusCode(Status.OK.getStatusCode())
+        .when()
+          .post(JOBS_SET_RETRIES_URL);
 
     verifyBatchJson(response.asString());
 
@@ -1489,11 +1542,14 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
     HistoricProcessInstanceQueryDto query = new HistoricProcessInstanceQueryDto();
     messageBodyJson.put("jobQuery", query);
 
-    Response response = given()
-        .contentType(ContentType.JSON).body(messageBodyJson)
+    Response response =
+        given()
+          .contentType(ContentType.JSON)
+          .body(messageBodyJson)
         .then().expect()
-        .statusCode(Status.OK.getStatusCode())
-        .when().post(JOBS_SET_RETRIES_URL);
+          .statusCode(Status.OK.getStatusCode())
+        .when()
+          .post(JOBS_SET_RETRIES_URL);
 
     verifyBatchJson(response.asString());
 
@@ -1515,10 +1571,11 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
     messageBodyJson.put(RETRIES, 5);
 
     given()
-        .contentType(ContentType.JSON).body(messageBodyJson)
-        .then().expect()
-        .statusCode(Status.BAD_REQUEST.getStatusCode())
-        .when().post(JOBS_SET_RETRIES_URL);
+      .contentType(ContentType.JSON).body(messageBodyJson)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when()
+      .post(JOBS_SET_RETRIES_URL);
   }
 
   @Test
@@ -1542,9 +1599,10 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
     given()
         .contentType(ContentType.JSON).body(messageBodyJson)
-        .then().expect()
+      .then().expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode())
-        .when().post(JOBS_SET_RETRIES_URL);
+      .when()
+        .post(JOBS_SET_RETRIES_URL);
   }
 
   @Test
@@ -1553,19 +1611,19 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
     messageBodyJson.put("jobIds", null);
 
     given()
-        .contentType(ContentType.JSON)
-        .body(messageBodyJson)
-        .then().expect()
-        .statusCode(Status.BAD_REQUEST.getStatusCode())
-        .when().post(JOBS_SET_RETRIES_URL);
+      .contentType(ContentType.JSON)
+      .body(messageBodyJson)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when()
+      .post(JOBS_SET_RETRIES_URL);
   }
 
   @Test
   public void testRecalculateDuedateWithoutDateBase() {
     given()
       .pathParam("id", MockProvider.EXAMPLE_JOB_ID)
-    .then()
-      .expect()
+    .then().expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when().post(JOB_RESOURCE_RECALC_DUEDATE_URL);
 
@@ -1577,8 +1635,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
     given()
       .pathParam("id", MockProvider.EXAMPLE_JOB_ID)
       .queryParam("creationDateBased", true)
-    .then()
-      .expect()
+    .then().expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when().post(JOB_RESOURCE_RECALC_DUEDATE_URL);
 
@@ -1590,8 +1647,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
     given()
       .pathParam("id", MockProvider.EXAMPLE_JOB_ID)
       .queryParam("creationDateBased", false)
-    .then()
-      .expect()
+    .then().expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when().post(JOB_RESOURCE_RECALC_DUEDATE_URL);
 
