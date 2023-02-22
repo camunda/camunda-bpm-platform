@@ -17,7 +17,6 @@
 package org.camunda.bpm.engine.rest.sub.management;
 
 import javax.ws.rs.core.Response.Status;
-
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;

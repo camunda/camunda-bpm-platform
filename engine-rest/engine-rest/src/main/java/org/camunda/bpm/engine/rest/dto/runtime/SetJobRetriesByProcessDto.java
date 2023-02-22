@@ -17,7 +17,6 @@
 package org.camunda.bpm.engine.rest.dto.runtime;
 
 import java.util.List;
-
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
 
 /**
