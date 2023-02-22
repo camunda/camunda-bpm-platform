@@ -68,6 +68,7 @@ import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.HistoryServiceImpl;
 import org.camunda.bpm.engine.impl.ManagementServiceImpl;
+import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
@@ -3296,10 +3297,11 @@ public class ProcessInstanceRestServiceInteractionTest extends
   }
 
   @Test
-  public void testSetRetriesByProcessAsyncWithQuery() {
+  public void testSetRetriesByProcessAsyncWithQueryAndDueDate() {
+    when(runtimeServiceMock.createProcessInstanceQuery()).thenReturn(new ProcessInstanceQueryImpl());
     Map<String, Object> messageBodyJson = new HashMap<>();
     messageBodyJson.put(RETRIES, MockProvider.EXAMPLE_JOB_RETRIES);
-    HistoricProcessInstanceQueryDto query = new HistoricProcessInstanceQueryDto();
+    ProcessInstanceQueryDto query = new ProcessInstanceQueryDto();
     messageBodyJson.put("processInstanceQuery", query);
     Date newDueDate = new Date(1675752840000L);
     messageBodyJson.put("dueDate", newDueDate);
@@ -3314,17 +3316,18 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
     verify(mockManagementService, times(1)).setJobRetriesByProcessAsync(eq(MockProvider.EXAMPLE_JOB_RETRIES));
     verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceIds(null);
-    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceQuery(null);
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceQuery(any(ProcessInstanceQuery.class));
     verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).dueDate(newDueDate);
     verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).executeAsync();
     verifyNoMoreInteractions(mockSetJobRetriesByProcessAsyncBuilder);
   }
 
   @Test
-  public void testSetRetriesByProcessAsyncWithQueryAndDueDate() {
+  public void testSetRetriesByProcessAsyncWithQuery() {
+    when(runtimeServiceMock.createProcessInstanceQuery()).thenReturn(new ProcessInstanceQueryImpl());
     Map<String, Object> messageBodyJson = new HashMap<>();
     messageBodyJson.put(RETRIES, MockProvider.EXAMPLE_JOB_RETRIES);
-    HistoricProcessInstanceQueryDto query = new HistoricProcessInstanceQueryDto();
+    ProcessInstanceQueryDto query = new ProcessInstanceQueryDto();
     messageBodyJson.put("processInstanceQuery", query);
 
     Response response = given()
@@ -3337,7 +3340,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
     verify(mockManagementService, times(1)).setJobRetriesByProcessAsync(eq(MockProvider.EXAMPLE_JOB_RETRIES));
     verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceIds(null);
-    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceQuery(null);
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceQuery(any(ProcessInstanceQuery.class));
     verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).dueDate(null);
     verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).executeAsync();
     verifyNoMoreInteractions(mockSetJobRetriesByProcessAsyncBuilder);
