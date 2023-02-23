@@ -160,34 +160,6 @@ public class ResteasySpecifics implements ContainerSpecifics {
     }
   }
 
-  public static class ServletContainerRuleFactory implements TestRuleFactory {
-
-    protected String webXmlResource;
-
-    public ServletContainerRuleFactory(String webXmlResource) {
-      this.webXmlResource = webXmlResource;
-    }
-
-    public TestRule createTestRule() {
-      final TemporaryFolder tempFolder = new TemporaryFolder();
-
-      return RuleChain.outerRule(tempFolder).around(new ExternalResource() {
-
-        ResteasyTomcatServerBootstrap bootstrap = new ResteasyTomcatServerBootstrap(webXmlResource);
-
-        protected void before() throws Throwable {
-          bootstrap.setWorkingDir(tempFolder.getRoot().getAbsolutePath());
-          bootstrap.start();
-        }
-
-        protected void after() {
-          bootstrap.stop();
-        }
-      });
-    }
-
-  }
-
   public static class UndertowServletContainerRuleFactory implements TestRuleFactory {
 
     protected DeploymentInfo deploymentInfo;

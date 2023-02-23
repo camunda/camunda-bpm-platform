@@ -15,8 +15,6 @@
   </parent>
 
   <properties>
-    <!-- pin tomcat version for engine-rest -->
-    <version.tomcat>10.1.5</version.tomcat>
     <rest.http.port>38081</rest.http.port>
     <version.spring.framework>6.0.4</version.spring.framework>
     <version.resteasy>6.2.2.Final</version.resteasy>
@@ -143,23 +141,6 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- only included to prevent java.lang.ClassNotFoundException: org.apache.jasper.servlet.JspServlet -->
-    <!-- removing this dep. will not break the tests, but makes them "ugly"-->
-    <dependency>
-      <groupId>org.apache.tomcat.embed</groupId>
-      <artifactId>tomcat-embed-jasper</artifactId>
-      <version>${version.tomcat}</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jboss.shrinkwrap.resolver</groupId>
-      <artifactId>shrinkwrap-resolver-depchain</artifactId>
-      <version>${version.shrinkwrap.resolvers}</version>
-      <scope>test</scope>
-      <type>pom</type>
-    </dependency>
-
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
@@ -212,42 +193,9 @@
       </exclusions>
     </dependency>
 
-    <!-- Tomcat for resteasy and wink -->
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jul-to-slf4j</artifactId>
-      <scope>test</scope>
-    </dependency>
-
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-testing</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.tomcat.embed</groupId>
-      <artifactId>tomcat-embed-core</artifactId>
-      <version>${version.tomcat}</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.tomcat</groupId>
-      <artifactId>tomcat-juli</artifactId>
-      <version>${version.tomcat}</version>
       <scope>test</scope>
     </dependency>
 
@@ -313,6 +261,9 @@
                 <resource>
                   <directory>${basedir}/../engine-rest/src/test/java</directory>
                   <filtering>false</filtering>
+                  <excludes>
+                      <exclude>**/TomcatServerBootstrap.java</exclude>
+                  </excludes>
                 </resource>
               </resources>
             </configuration>
@@ -576,11 +527,6 @@
           <artifactId>resteasy-undertow</artifactId>
           <scope>test</scope>
         </dependency>
-        <!--dependency>
-          <groupId>org.jboss.resteasy</groupId>
-          <artifactId>resteasy-servlet-initializer</artifactId>
-          <scope>test</scope>
-        </dependency-->
         <dependency>
           <groupId>org.jboss.resteasy</groupId>
           <artifactId>resteasy-netty4</artifactId>
@@ -596,7 +542,6 @@
 
       <build>
         <plugins>
-
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>build-helper-maven-plugin</artifactId>
