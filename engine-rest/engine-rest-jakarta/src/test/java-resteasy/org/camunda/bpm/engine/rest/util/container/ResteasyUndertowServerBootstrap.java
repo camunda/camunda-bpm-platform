@@ -16,11 +16,7 @@
  */
 package org.camunda.bpm.engine.rest.util.container;
 
-import io.undertow.servlet.Servlets;
-import jakarta.servlet.DispatcherType;
-import org.camunda.bpm.engine.rest.security.auth.ProcessEngineAuthenticationFilter;
-import org.jboss.resteasy.plugins.server.servlet.FilterDispatcher;
-import org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap;
+import io.undertow.servlet.api.DeploymentInfo;
 import org.jboss.resteasy.plugins.server.undertow.UndertowJaxrsServer;
 
 import java.util.Properties;
@@ -29,27 +25,13 @@ public class ResteasyUndertowServerBootstrap extends EmbeddedServerBootstrap {
 
   private UndertowJaxrsServer server;
 
-  public ResteasyUndertowServerBootstrap() {
+  public ResteasyUndertowServerBootstrap(DeploymentInfo deploymentInfo) {
     Properties serverProperties = readProperties();
     int port = Integer.parseInt(serverProperties.getProperty(PORT_PROPERTY));
 
     this.server = new UndertowJaxrsServer();
     this.server.setPort(port);
-
-    this.server.deploy(Servlets.deployment()
-        .setDeploymentName("rest-test.war")
-        .setContextPath("/rest-test/rest")
-        .setClassLoader(ResteasyUndertowServerBootstrap.class.getClassLoader())
-        .addListener(Servlets.listener(ResteasyBootstrap.class))
-        .addFilter(Servlets.filter("camunda-auth", ProcessEngineAuthenticationFilter.class)
-            .addInitParam("authentication-provider", "org.camunda.bpm.engine.rest.security.auth.impl.HttpBasicAuthenticationProvider")
-            .addInitParam("rest-url-pattern-prefix", "")
-        )
-        .addFilterUrlMapping("camunda-auth", "/*", DispatcherType.REQUEST)
-        .addFilter(Servlets.filter("Resteasy", FilterDispatcher.class).addInitParam("jakarta.ws.rs.Application", "org.camunda.bpm.engine.rest.util.container.JaxrsApplication"))
-        .addFilterUrlMapping("Resteasy", "/*", DispatcherType.REQUEST)
-
-    );
+    this.server.deploy(deploymentInfo);
   }
 
   @Override

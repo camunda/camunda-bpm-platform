@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.rest;
 
 import static io.restassured.RestAssured.given;
+import static org.camunda.bpm.engine.rest.mapper.JacksonConfigurator.DEFAULT_DATE_FORMAT;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 import static org.mockito.Mockito.eq;
@@ -30,11 +31,12 @@ import java.util.Map;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
-import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.helper.variable.EqualsPrimitiveValue;
+import org.camunda.bpm.engine.rest.mapper.JacksonConfigurator;
 import org.camunda.bpm.engine.rest.util.VariablesBuilder;
 import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.camunda.bpm.engine.variable.Variables;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -65,6 +67,11 @@ public class CustomJacksonDateFormatTest extends AbstractRestServiceTest {
       .thenReturn(Variables.dateValue(testDate));
 
     when(processEngine.getRuntimeService()).thenReturn(runtimeServiceMock);
+  }
+
+  @AfterClass
+  public static void reset() {
+    JacksonConfigurator.setDateFormatString(DEFAULT_DATE_FORMAT);
   }
 
   @Test

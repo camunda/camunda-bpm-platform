@@ -56,9 +56,6 @@ import static org.mockito.Mockito.when;
  */
 public abstract class AbstractEmptyBodyFilterTest extends AbstractRestServiceTest {
 
-  @ClassRule
-  public static TestContainerRule rule = new TestContainerRule();
-
   protected static final String TEST_RESOURCE_ROOT_PATH = "/rest-test/rest";
   protected static final String PROCESS_DEFINITION_URL = TEST_RESOURCE_ROOT_PATH + "/process-definition";
   protected static final String SINGLE_PROCESS_DEFINITION_BY_KEY_URL = PROCESS_DEFINITION_URL + "/key/" + MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY;

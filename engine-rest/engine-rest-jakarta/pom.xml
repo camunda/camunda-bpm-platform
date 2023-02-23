@@ -365,9 +365,6 @@
                 <resource>
                   <directory>${basedir}/../engine-rest/src/test/resources-resteasy</directory>
                   <filtering>false</filtering>
-                  <excludes>
-                    <exclude>**/*-web.xml</exclude>
-                  </excludes>
                 </resource>
               </resources>
             </configuration>
@@ -625,7 +622,6 @@
                 </goals>
                 <configuration>
                   <resources>
-                    <resource><directory>${basedir}/src/test/resources-resteasy</directory></resource>
                     <resource><directory>${project.build.directory}/generated-test-resources/jakarta-resteasy</directory></resource>
                   </resources>
                 </configuration>
