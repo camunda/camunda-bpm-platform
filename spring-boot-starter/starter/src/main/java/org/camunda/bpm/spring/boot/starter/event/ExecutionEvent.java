@@ -145,4 +145,22 @@ public class ExecutionEvent {
     return tenantId;
   }
 
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName()
+        + "[id=" + id
+        + ", eventName=" + eventName
+        + ", businessKey=" + businessKey
+        + ", activityInstanceId=" + activityInstanceId
+        + ", currentActivityId=" + currentActivityId
+        + ", currentActivityName=" + currentActivityName
+        + ", currentTransitionId=" + currentTransitionId
+        + ", parentActivityInstanceId=" + parentActivityInstanceId
+        + ", parentId=" + parentId
+        + ", processBusinessKey=" + processBusinessKey
+        + ", processDefinitionId=" + processDefinitionId
+        + ", processInstanceId=" + processInstanceId
+        + ", tenantId=" + tenantId
+        + "]";
+  }
 }
