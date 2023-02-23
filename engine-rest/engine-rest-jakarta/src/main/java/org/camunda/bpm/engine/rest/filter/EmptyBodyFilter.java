@@ -26,108 +26,80 @@ import java.io.InputStreamReader;
 import java.io.PushbackInputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.util.regex.Pattern;
 
-public class EmptyBodyFilter implements Filter {
-
-  protected static final Pattern CONTENT_TYPE_JSON_PATTERN = Pattern.compile("^application\\/json((;)(.*)?)?$", Pattern.CASE_INSENSITIVE);
+public class EmptyBodyFilter extends AbstractEmptyBodyFilter {
 
   @Override
-  public void doFilter(final ServletRequest req, final ServletResponse resp, FilterChain chain) throws IOException, ServletException {
+  public HttpServletRequestWrapper wrapRequest(HttpServletRequest req, boolean isBodyEmpty, PushbackInputStream requestBody) {
+    return new HttpServletRequestWrapper(req) {
 
-    final boolean isContentTypeJson =
-      CONTENT_TYPE_JSON_PATTERN.matcher(req.getContentType() == null ? "" : req.getContentType()).find();
+      @Override
+      public ServletInputStream getInputStream() throws IOException {
 
-    if (isContentTypeJson) {
-      final PushbackInputStream requestBody = new PushbackInputStream(req.getInputStream());
-      int firstByte = requestBody.read();
-      final boolean isBodyEmpty = firstByte == -1;
-      requestBody.unread(firstByte);
+        return new ServletInputStream() {
 
-      HttpServletRequestWrapper wrappedRequest = new HttpServletRequestWrapper((HttpServletRequest) req) {
+          boolean finished = false;
 
-        @Override
-        public ServletInputStream getInputStream() throws IOException {
+          @Override
+          public boolean isFinished() {
+            return this.finished;
+          }
 
-          return new ServletInputStream() {
+          @Override
+          public boolean isReady() {
+            return true;
+          }
 
-            boolean finished = false;
+          @Override
+          public void setReadListener(final ReadListener readListener) {
+            throw new UnsupportedOperationException();
+          }
 
-            @Override
-            public boolean isFinished() {
-              return this.finished;
+          InputStream inputStream = isBodyEmpty ? new ByteArrayInputStream("{}".getBytes(Charset.forName("UTF-8"))) : requestBody;
+
+          @Override
+          public int read() throws IOException {
+            int data = this.inputStream.read();
+            if (data == -1) {
+              this.finished = true;
             }
+            return data;
+          }
 
-            @Override
-            public boolean isReady() {
-              return true;
-            }
+          @Override
+          public int available() throws IOException {
+            return inputStream.available();
+          }
 
-            @Override
-            public void setReadListener(final ReadListener readListener) {
-              throw new UnsupportedOperationException();
-            }
+          @Override
+          public void close() throws IOException {
+            inputStream.close();
+          }
 
-            InputStream inputStream = isBodyEmpty ? new ByteArrayInputStream("{}".getBytes(Charset.forName("UTF-8"))) : requestBody;
+          @Override
+          public synchronized void mark(int readlimit) {
+            inputStream.mark(readlimit);
+          }
 
-            @Override
-            public int read() throws IOException {
-              int data = this.inputStream.read();
-              if (data == -1) {
-                this.finished = true;
-              }
-              return data;
-            }
+          @Override
+          public synchronized void reset() throws IOException {
+            inputStream.reset();
+          }
 
-            @Override
-            public int available() throws IOException {
-              return inputStream.available();
-            }
+          @Override
+          public boolean markSupported() {
+            return inputStream.markSupported();
+          }
 
-            @Override
-            public void close() throws IOException {
-              inputStream.close();
-            }
+        };
+      }
 
-            @Override
-            public synchronized void mark(int readlimit) {
-              inputStream.mark(readlimit);
-            }
+      @Override
+      public BufferedReader getReader() throws IOException {
+        return new BufferedReader(new InputStreamReader(this.getInputStream()));
+      }
 
-            @Override
-            public synchronized void reset() throws IOException {
-              inputStream.reset();
-            }
-
-            @Override
-            public boolean markSupported() {
-              return inputStream.markSupported();
-            }
-
-          };
-        }
-
-        @Override
-        public BufferedReader getReader() throws IOException {
-          return new BufferedReader(new InputStreamReader(this.getInputStream()));
-        }
-
-      };
-
-      chain.doFilter(wrappedRequest, resp);
-    } else {
-      chain.doFilter(req, resp);
-    }
-  }
-
-  @Override
-  public void destroy() {
-
-  }
-
-  @Override
-  public void init(FilterConfig filterConfig) throws ServletException {
-
+    };
   }
 
 }
