@@ -194,4 +194,28 @@ public class TaskEvent {
     return tenantId;
   }
 
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName()
+        + "[id=" + id
+        + ", eventName=" + eventName
+        + ", name=" + name
+        + ", createTime=" + createTime
+        + ", executionId=" + executionId
+        + ", processDefinitionId=" + processDefinitionId
+        + ", processInstanceId=" + processInstanceId
+        + ", taskDefinitionKey=" + taskDefinitionKey
+        + ", assignee=" + assignee
+        + ", owner=" + owner
+        + ", description=" + description
+        + ", dueDate=" + dueDate
+        + ", followUpDate=" + followUpDate
+        + ", priority=" + priority
+        + ", deleteReason=" + deleteReason
+        + ", caseDefinitionId=" + caseDefinitionId
+        + ", caseExecutionId=" + caseExecutionId
+        + ", caseInstanceId=" + caseInstanceId
+        + ", tenantId=" + tenantId
+        + "]";
+  }
 }
