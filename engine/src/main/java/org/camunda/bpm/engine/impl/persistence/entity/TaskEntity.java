@@ -260,8 +260,6 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   public void update() {
     ensureTenantIdNotChanged();
 
-    registerCommandContextCloseListener();
-
     CommandContext commandContext = Context.getCommandContext();
     DbEntityManager dbEntityManger = commandContext.getDbEntityManager();
 
@@ -1193,6 +1191,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
   public boolean triggerUpdateEvent() {
     if (lifecycleState == TaskState.STATE_CREATED) {
+      registerCommandContextCloseListener();
       setLastUpdated(ClockUtil.getCurrentTime());
       return fireEvent(TaskListener.EVENTNAME_UPDATE) && fireAssignmentEvent();
     }
