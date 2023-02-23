@@ -17,6 +17,9 @@
 package org.camunda.bpm.engine.rest.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.List;
+import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.ExecutionRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
@@ -24,12 +27,9 @@ import org.camunda.bpm.engine.rest.dto.runtime.ExecutionDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ExecutionQueryDto;
 import org.camunda.bpm.engine.rest.sub.runtime.ExecutionResource;
 import org.camunda.bpm.engine.rest.sub.runtime.impl.ExecutionResourceImpl;
+import org.camunda.bpm.engine.rest.util.QueryUtil;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
-
-import javax.ws.rs.core.UriInfo;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ExecutionRestServiceImpl extends AbstractRestProcessEngineAware implements ExecutionRestService {
 
@@ -56,12 +56,7 @@ public class ExecutionRestServiceImpl extends AbstractRestProcessEngineAware imp
     queryDto.setObjectMapper(getObjectMapper());
     ExecutionQuery query = queryDto.toQuery(engine);
 
-    List<Execution> matchingExecutions;
-    if (firstResult != null || maxResults != null) {
-      matchingExecutions = executePaginatedQuery(query, firstResult, maxResults);
-    } else {
-      matchingExecutions = query.list();
-    }
+    List<Execution> matchingExecutions = QueryUtil.list(query, firstResult, maxResults);
 
     List<ExecutionDto> executionResults = new ArrayList<ExecutionDto>();
     for (Execution execution : matchingExecutions) {
@@ -69,16 +64,6 @@ public class ExecutionRestServiceImpl extends AbstractRestProcessEngineAware imp
       executionResults.add(resultExecution);
     }
     return executionResults;
-  }
-
-  private List<Execution> executePaginatedQuery(ExecutionQuery query, Integer firstResult, Integer maxResults) {
-    if (firstResult == null) {
-      firstResult = 0;
-    }
-    if (maxResults == null) {
-      maxResults = Integer.MAX_VALUE;
-    }
-    return query.listPage(firstResult, maxResults);
   }
 
   @Override

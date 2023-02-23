@@ -17,6 +17,10 @@
 package org.camunda.bpm.engine.rest.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.List;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.JobDefinitionQuery;
 import org.camunda.bpm.engine.rest.JobDefinitionRestService;
@@ -27,11 +31,7 @@ import org.camunda.bpm.engine.rest.dto.management.JobDefinitionSuspensionStateDt
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.management.JobDefinitionResource;
 import org.camunda.bpm.engine.rest.sub.management.JobDefinitionResourceImpl;
-
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
-import java.util.ArrayList;
-import java.util.List;
+import org.camunda.bpm.engine.rest.util.QueryUtil;
 
 /**
  * @author roman.smirnov
@@ -42,10 +42,12 @@ public class JobDefinitionRestServiceImpl extends AbstractRestProcessEngineAware
     super(engineName, objectMapper);
   }
 
+  @Override
   public JobDefinitionResource getJobDefinition(String jobDefinitionId) {
     return new JobDefinitionResourceImpl(getProcessEngine(), jobDefinitionId);
   }
 
+  @Override
   public List<JobDefinitionDto> getJobDefinitions(UriInfo uriInfo, Integer firstResult,
       Integer maxResults) {
     JobDefinitionQueryDto queryDto = new JobDefinitionQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
@@ -53,21 +55,18 @@ public class JobDefinitionRestServiceImpl extends AbstractRestProcessEngineAware
 
   }
 
+  @Override
   public CountResultDto getJobDefinitionsCount(UriInfo uriInfo) {
     JobDefinitionQueryDto queryDto = new JobDefinitionQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
     return queryJobDefinitionsCount(queryDto);
   }
 
+  @Override
   public List<JobDefinitionDto> queryJobDefinitions(JobDefinitionQueryDto queryDto, Integer firstResult, Integer maxResults) {
     queryDto.setObjectMapper(getObjectMapper());
     JobDefinitionQuery query = queryDto.toQuery(getProcessEngine());
 
-    List<JobDefinition> matchingJobDefinitions;
-    if (firstResult != null || maxResults != null) {
-      matchingJobDefinitions = executePaginatedQuery(query, firstResult, maxResults);
-    } else {
-      matchingJobDefinitions = query.list();
-    }
+    List<JobDefinition> matchingJobDefinitions = QueryUtil.list(query, firstResult, maxResults);
 
     List<JobDefinitionDto> jobDefinitionResults = new ArrayList<JobDefinitionDto>();
     for (JobDefinition jobDefinition : matchingJobDefinitions) {
@@ -78,6 +77,7 @@ public class JobDefinitionRestServiceImpl extends AbstractRestProcessEngineAware
     return jobDefinitionResults;
   }
 
+  @Override
   public CountResultDto queryJobDefinitionsCount(JobDefinitionQueryDto queryDto) {
     queryDto.setObjectMapper(getObjectMapper());
     JobDefinitionQuery query = queryDto.toQuery(getProcessEngine());
@@ -89,16 +89,7 @@ public class JobDefinitionRestServiceImpl extends AbstractRestProcessEngineAware
     return result;
   }
 
-  private List<JobDefinition> executePaginatedQuery(JobDefinitionQuery query, Integer firstResult, Integer maxResults) {
-    if (firstResult == null) {
-      firstResult = 0;
-    }
-    if (maxResults == null) {
-      maxResults = Integer.MAX_VALUE;
-    }
-    return query.listPage(firstResult, maxResults);
-  }
-
+  @Override
   public void updateSuspensionState(JobDefinitionSuspensionStateDto dto) {
     if (dto.getJobDefinitionId() != null) {
       String message = "Either processDefinitionId or processDefinitionKey can be set to update the suspension state.";

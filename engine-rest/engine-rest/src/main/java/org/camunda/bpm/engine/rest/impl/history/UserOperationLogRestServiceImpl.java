@@ -17,6 +17,9 @@
 package org.camunda.bpm.engine.rest.impl.history;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.rest.dto.AnnotationDto;
@@ -24,10 +27,7 @@ import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.history.UserOperationLogEntryDto;
 import org.camunda.bpm.engine.rest.dto.history.UserOperationLogQueryDto;
 import org.camunda.bpm.engine.rest.history.UserOperationLogRestService;
-
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-import java.util.List;
+import org.camunda.bpm.engine.rest.util.QueryUtil;
 
 /**
  * @author Danny Gräf
@@ -53,18 +53,7 @@ public class UserOperationLogRestServiceImpl implements UserOperationLogRestServ
   public List<UserOperationLogEntryDto> queryUserOperationEntries(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
     UserOperationLogQueryDto queryDto = new UserOperationLogQueryDto(objectMapper, uriInfo.getQueryParameters());
     UserOperationLogQuery query = queryDto.toQuery(processEngine);
-
-    if (firstResult == null && maxResults == null) {
-      return UserOperationLogEntryDto.map(query.list());
-    } else {
-      if (firstResult == null) {
-        firstResult = 0;
-      }
-      if (maxResults == null) {
-        maxResults = Integer.MAX_VALUE;
-      }
-      return UserOperationLogEntryDto.map(query.listPage(firstResult, maxResults));
-    }
+    return UserOperationLogEntryDto.map(QueryUtil.list(query, firstResult, maxResults));
   }
 
   @Override

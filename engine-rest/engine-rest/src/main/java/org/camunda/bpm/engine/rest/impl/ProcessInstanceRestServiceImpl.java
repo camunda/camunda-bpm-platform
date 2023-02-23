@@ -16,13 +16,12 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
-
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ManagementService;
@@ -52,11 +51,10 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.runtime.ProcessInstanceResource;
 import org.camunda.bpm.engine.rest.sub.runtime.impl.ProcessInstanceResourceImpl;
+import org.camunda.bpm.engine.rest.util.QueryUtil;
 import org.camunda.bpm.engine.runtime.MessageCorrelationAsyncBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.variable.VariableMap;
 
 public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAware implements
@@ -81,12 +79,7 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
     queryDto.setObjectMapper(getObjectMapper());
     ProcessInstanceQuery query = queryDto.toQuery(engine);
 
-    List<ProcessInstance> matchingInstances;
-    if (firstResult != null || maxResults != null) {
-      matchingInstances = executePaginatedQuery(query, firstResult, maxResults);
-    } else {
-      matchingInstances = query.list();
-    }
+    List<ProcessInstance> matchingInstances = QueryUtil.list(query, firstResult, maxResults);
 
     List<ProcessInstanceDto> instanceResults = new ArrayList<>();
     for (ProcessInstance instance : matchingInstances) {
@@ -94,16 +87,6 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
       instanceResults.add(resultInstance);
     }
     return instanceResults;
-  }
-
-  private List<ProcessInstance> executePaginatedQuery(ProcessInstanceQuery query, Integer firstResult, Integer maxResults) {
-    if (firstResult == null) {
-      firstResult = 0;
-    }
-    if (maxResults == null) {
-      maxResults = Integer.MAX_VALUE;
-    }
-    return query.listPage(firstResult, maxResults);
   }
 
   @Override
@@ -319,12 +302,12 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
     return BatchDto.fromBatch(batch);
   }
 
-  protected <T extends Query, R extends AbstractQueryDto> T toQuery(R query) {
+  protected <T extends Query<?,?>, R extends AbstractQueryDto<T>> T toQuery(R query) {
     if (query == null) {
       return null;
     }
 
-    return (T) query.toQuery(getProcessEngine());
+    return query.toQuery(getProcessEngine());
   }
 
 }

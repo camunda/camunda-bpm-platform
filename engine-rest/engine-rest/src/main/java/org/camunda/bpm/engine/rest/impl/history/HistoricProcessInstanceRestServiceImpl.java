@@ -17,6 +17,16 @@
 package org.camunda.bpm.engine.rest.impl.history;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Request;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Variant;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -39,18 +49,8 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.history.HistoricProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.sub.history.HistoricProcessInstanceResource;
 import org.camunda.bpm.engine.rest.sub.history.impl.HistoricProcessInstanceResourceImpl;
+import org.camunda.bpm.engine.rest.util.QueryUtil;
 import org.camunda.bpm.engine.rest.util.URLEncodingUtil;
-
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.core.Variant;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
   public class HistoricProcessInstanceRestServiceImpl implements HistoricProcessInstanceRestService {
 
@@ -82,12 +82,7 @@ import java.util.List;
     queryDto.setObjectMapper(objectMapper);
     HistoricProcessInstanceQuery query = queryDto.toQuery(processEngine);
 
-    List<HistoricProcessInstance> matchingHistoricProcessInstances;
-    if (firstResult != null || maxResults != null) {
-      matchingHistoricProcessInstances = executePaginatedQuery(query, firstResult, maxResults);
-    } else {
-      matchingHistoricProcessInstances = query.list();
-    }
+    List<HistoricProcessInstance> matchingHistoricProcessInstances = QueryUtil.list(query, firstResult, maxResults);
 
     List<HistoricProcessInstanceDto> historicProcessInstanceDtoResults = new ArrayList<HistoricProcessInstanceDto>();
     for (HistoricProcessInstance historicProcessInstance : matchingHistoricProcessInstances) {
@@ -95,16 +90,6 @@ import java.util.List;
       historicProcessInstanceDtoResults.add(resultHistoricProcessInstanceDto);
     }
     return historicProcessInstanceDtoResults;
-  }
-
-  private List<HistoricProcessInstance> executePaginatedQuery(HistoricProcessInstanceQuery query, Integer firstResult, Integer maxResults) {
-    if (firstResult == null) {
-      firstResult = 0;
-    }
-    if (maxResults == null) {
-      maxResults = Integer.MAX_VALUE;
-    }
-    return query.listPage(firstResult, maxResults);
   }
 
   @Override
@@ -228,7 +213,7 @@ import java.util.List;
     String reportType = queryParameters.getFirst("reportType");
     return ReportResultToCsvConverter.convertReportResult(reports, reportType);
   }
-  
+
   @Override
   public Response deleteHistoricVariableInstancesByProcessInstanceId(String processInstanceId) {
     try {

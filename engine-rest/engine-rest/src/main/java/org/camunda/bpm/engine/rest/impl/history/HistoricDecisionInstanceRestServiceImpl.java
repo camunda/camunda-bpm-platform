@@ -16,12 +16,12 @@
  */
 package org.camunda.bpm.engine.rest.impl.history;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
-
+import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -33,14 +33,13 @@ import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricDecisionInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricDecisionInstanceQueryDto;
-import org.camunda.bpm.engine.rest.dto.history.batch.removaltime.SetRemovalTimeToHistoricDecisionInstancesDto;
 import org.camunda.bpm.engine.rest.dto.history.batch.DeleteHistoricDecisionInstancesDto;
+import org.camunda.bpm.engine.rest.dto.history.batch.removaltime.SetRemovalTimeToHistoricDecisionInstancesDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.history.HistoricDecisionInstanceRestService;
 import org.camunda.bpm.engine.rest.sub.history.HistoricDecisionInstanceResource;
 import org.camunda.bpm.engine.rest.sub.history.impl.HistoricDecisionInstanceResourceImpl;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.camunda.bpm.engine.rest.util.QueryUtil;
 
 public class HistoricDecisionInstanceRestServiceImpl implements HistoricDecisionInstanceRestService {
 
@@ -52,10 +51,12 @@ public class HistoricDecisionInstanceRestServiceImpl implements HistoricDecision
     this.processEngine = processEngine;
   }
 
+  @Override
   public HistoricDecisionInstanceResource getHistoricDecisionInstance(String decisionInstanceId) {
     return new HistoricDecisionInstanceResourceImpl(processEngine, decisionInstanceId);
   }
 
+  @Override
   public List<HistoricDecisionInstanceDto> getHistoricDecisionInstances(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
     HistoricDecisionInstanceQueryDto queryHistoricDecisionInstanceDto = new HistoricDecisionInstanceQueryDto(objectMapper, uriInfo.getQueryParameters());
     return queryHistoricDecisionInstances(queryHistoricDecisionInstanceDto, firstResult, maxResults);
@@ -64,12 +65,7 @@ public class HistoricDecisionInstanceRestServiceImpl implements HistoricDecision
   public List<HistoricDecisionInstanceDto> queryHistoricDecisionInstances(HistoricDecisionInstanceQueryDto queryDto, Integer firstResult, Integer maxResults) {
     HistoricDecisionInstanceQuery query = queryDto.toQuery(processEngine);
 
-    List<HistoricDecisionInstance> matchingHistoricDecisionInstances;
-    if (firstResult != null || maxResults != null) {
-      matchingHistoricDecisionInstances = executePaginatedQuery(query, firstResult, maxResults);
-    } else {
-      matchingHistoricDecisionInstances = query.list();
-    }
+    List<HistoricDecisionInstance> matchingHistoricDecisionInstances = QueryUtil.list(query, firstResult, maxResults);
 
     List<HistoricDecisionInstanceDto> historicDecisionInstanceDtoResults = new ArrayList<HistoricDecisionInstanceDto>();
     for (HistoricDecisionInstance historicDecisionInstance : matchingHistoricDecisionInstances) {
@@ -79,16 +75,7 @@ public class HistoricDecisionInstanceRestServiceImpl implements HistoricDecision
     return historicDecisionInstanceDtoResults;
   }
 
-  private List<HistoricDecisionInstance> executePaginatedQuery(HistoricDecisionInstanceQuery query, Integer firstResult, Integer maxResults) {
-    if (firstResult == null) {
-      firstResult = 0;
-    }
-    if (maxResults == null) {
-      maxResults = Integer.MAX_VALUE;
-    }
-    return query.listPage(firstResult, maxResults);
-  }
-
+  @Override
   public CountResultDto getHistoricDecisionInstancesCount(UriInfo uriInfo) {
     HistoricDecisionInstanceQueryDto queryDto = new HistoricDecisionInstanceQueryDto(objectMapper, uriInfo.getQueryParameters());
     return queryHistoricDecisionInstancesCount(queryDto);
@@ -102,6 +89,7 @@ public class HistoricDecisionInstanceRestServiceImpl implements HistoricDecision
     return new CountResultDto(count);
   }
 
+  @Override
   public BatchDto deleteAsync(DeleteHistoricDecisionInstancesDto dto) {
     HistoricDecisionInstanceQuery decisionInstanceQuery = null;
     if (dto.getHistoricDecisionInstanceQuery() != null) {
@@ -119,6 +107,7 @@ public class HistoricDecisionInstanceRestServiceImpl implements HistoricDecision
     }
   }
 
+  @Override
   public BatchDto setRemovalTimeAsync(SetRemovalTimeToHistoricDecisionInstancesDto dto) {
     HistoryService historyService = processEngine.getHistoryService();
 

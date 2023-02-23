@@ -16,13 +16,12 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.ws.rs.container.AsyncResponse;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
-
+import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -38,15 +37,14 @@ import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskQueryDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksExtendedDto;
+import org.camunda.bpm.engine.rest.dto.externaltask.SetRetriesForExternalTasksDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.rest.dto.externaltask.SetRetriesForExternalTasksDto;
 import org.camunda.bpm.engine.rest.spi.FetchAndLockHandler;
 import org.camunda.bpm.engine.rest.sub.externaltask.ExternalTaskResource;
 import org.camunda.bpm.engine.rest.sub.externaltask.impl.ExternalTaskResourceImpl;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.camunda.bpm.engine.rest.util.QueryUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
 /**
@@ -71,12 +69,7 @@ public class ExternalTaskRestServiceImpl extends AbstractRestProcessEngineAware 
     queryDto.setObjectMapper(getObjectMapper());
     ExternalTaskQuery query = queryDto.toQuery(engine);
 
-    List<ExternalTask> matchingTasks;
-    if (firstResult != null || maxResults != null) {
-      matchingTasks = executePaginatedQuery(query, firstResult, maxResults);
-    } else {
-      matchingTasks = query.list();
-    }
+    List<ExternalTask> matchingTasks = QueryUtil.list(query, firstResult, maxResults);
 
     List<ExternalTaskDto> taskResults = new ArrayList<>();
     for (ExternalTask task : matchingTasks) {
@@ -84,16 +77,6 @@ public class ExternalTaskRestServiceImpl extends AbstractRestProcessEngineAware 
       taskResults.add(resultInstance);
     }
     return taskResults;
-  }
-
-  protected List<ExternalTask> executePaginatedQuery(ExternalTaskQuery query, Integer firstResult, Integer maxResults) {
-    if (firstResult == null) {
-      firstResult = 0;
-    }
-    if (maxResults == null) {
-      maxResults = Integer.MAX_VALUE;
-    }
-    return query.listPage(firstResult, maxResults);
   }
 
   @Override

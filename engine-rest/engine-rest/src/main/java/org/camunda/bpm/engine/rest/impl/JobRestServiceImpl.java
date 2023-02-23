@@ -17,6 +17,10 @@
 package org.camunda.bpm.engine.rest.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.List;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.batch.Batch;
@@ -32,13 +36,9 @@ import org.camunda.bpm.engine.rest.dto.runtime.SetJobRetriesDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.runtime.JobResource;
 import org.camunda.bpm.engine.rest.sub.runtime.impl.JobResourceImpl;
+import org.camunda.bpm.engine.rest.util.QueryUtil;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
-
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
-import java.util.ArrayList;
-import java.util.List;
 
 public class JobRestServiceImpl extends AbstractRestProcessEngineAware
     implements JobRestService {
@@ -66,12 +66,7 @@ public class JobRestServiceImpl extends AbstractRestProcessEngineAware
     queryDto.setObjectMapper(getObjectMapper());
     JobQuery query = queryDto.toQuery(engine);
 
-    List<Job> matchingJobs;
-    if (firstResult != null || maxResults != null) {
-      matchingJobs = executePaginatedQuery(query, firstResult, maxResults);
-    } else {
-      matchingJobs = query.list();
-    }
+    List<Job> matchingJobs = QueryUtil.list(query, firstResult, maxResults);
 
     List<JobDto> jobResults = new ArrayList<JobDto>();
     for (Job job : matchingJobs) {
@@ -125,17 +120,7 @@ public class JobRestServiceImpl extends AbstractRestProcessEngineAware
     }
   }
 
-  private List<Job> executePaginatedQuery(JobQuery query,
-                                          Integer firstResult, Integer maxResults) {
-    if (firstResult == null) {
-      firstResult = 0;
-    }
-    if (maxResults == null) {
-      maxResults = Integer.MAX_VALUE;
-    }
-    return query.listPage(firstResult, maxResults);
-  }
-
+  @Override
   public void updateSuspensionState(JobSuspensionStateDto dto) {
     if (dto.getJobId() != null) {
       String message = "Either jobDefinitionId, processInstanceId, processDefinitionId or processDefinitionKey can be set to update the suspension state.";

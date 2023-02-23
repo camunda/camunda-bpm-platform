@@ -17,18 +17,18 @@
 package org.camunda.bpm.engine.rest.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.List;
+import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.rest.IncidentRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.runtime.IncidentDto;
 import org.camunda.bpm.engine.rest.dto.runtime.IncidentQueryDto;
 import org.camunda.bpm.engine.rest.sub.repository.impl.IncidentResourceImpl;
 import org.camunda.bpm.engine.rest.sub.runtime.IncidentResource;
+import org.camunda.bpm.engine.rest.util.QueryUtil;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.IncidentQuery;
-
-import javax.ws.rs.core.UriInfo;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Roman Smirnov
@@ -45,12 +45,7 @@ public class IncidentRestServiceImpl extends AbstractRestProcessEngineAware impl
     IncidentQueryDto queryDto = new IncidentQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
     IncidentQuery query = queryDto.toQuery(getProcessEngine());
 
-    List<Incident> queryResult;
-    if (firstResult != null || maxResults != null) {
-      queryResult = executePaginatedQuery(query, firstResult, maxResults);
-    } else {
-      queryResult = query.list();
-    }
+    List<Incident> queryResult = QueryUtil.list(query, firstResult, maxResults);
 
     List<IncidentDto> result = new ArrayList<>();
     for (Incident incident : queryResult) {
@@ -71,16 +66,6 @@ public class IncidentRestServiceImpl extends AbstractRestProcessEngineAware impl
     result.setCount(count);
 
     return result;
-  }
-
-  private List<Incident> executePaginatedQuery(IncidentQuery query, Integer firstResult, Integer maxResults) {
-    if (firstResult == null) {
-      firstResult = 0;
-    }
-    if (maxResults == null) {
-      maxResults = Integer.MAX_VALUE;
-    }
-    return query.listPage(firstResult, maxResults);
   }
 
   @Override
