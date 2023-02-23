@@ -3280,11 +3280,13 @@ public class ProcessInstanceRestServiceInteractionTest extends
     Date newDueDate = new Date(1675752840000L);
     messageBodyJson.put("dueDate", newDueDate);
 
-    Response response = given()
-        .contentType(ContentType.JSON).body(messageBodyJson)
+    Response response = 
+        given()
+          .contentType(ContentType.JSON).body(messageBodyJson)
         .then().expect()
-        .statusCode(Status.OK.getStatusCode())
-        .when().post(SET_JOB_RETRIES_ASYNC_URL);
+          .statusCode(Status.OK.getStatusCode())
+        .when()
+          .post(SET_JOB_RETRIES_ASYNC_URL);
 
     verifyBatchJson(response.asString());
 
@@ -3330,11 +3332,13 @@ public class ProcessInstanceRestServiceInteractionTest extends
     ProcessInstanceQueryDto query = new ProcessInstanceQueryDto();
     messageBodyJson.put("processInstanceQuery", query);
 
-    Response response = given()
-        .contentType(ContentType.JSON).body(messageBodyJson)
+    Response response = 
+        given()
+          .contentType(ContentType.JSON).body(messageBodyJson)
         .then().expect()
-        .statusCode(Status.OK.getStatusCode())
-        .when().post(SET_JOB_RETRIES_ASYNC_URL);
+          .statusCode(Status.OK.getStatusCode())
+        .when()
+          .post(SET_JOB_RETRIES_ASYNC_URL);
 
     verifyBatchJson(response.asString());
 
@@ -3434,11 +3438,13 @@ public class ProcessInstanceRestServiceInteractionTest extends
     Date newDueDate = new Date(1675752840000L);
     body.setDueDate(newDueDate);
 
-    Response response = given()
-        .contentType(ContentType.JSON).body(body)
+    Response response = 
+        given()
+          .contentType(ContentType.JSON).body(body)
         .then().expect()
-        .statusCode(Status.OK.getStatusCode())
-        .when().post(SET_JOB_RETRIES_ASYNC_HIST_QUERY_URL);
+          .statusCode(Status.OK.getStatusCode())
+        .when()
+          .post(SET_JOB_RETRIES_ASYNC_HIST_QUERY_URL);
 
     verifyBatchJson(response.asString());
 
@@ -3479,10 +3485,11 @@ public class ProcessInstanceRestServiceInteractionTest extends
     body.setDueDate(newDueDate);
 
     given()
-    .contentType(ContentType.JSON).body(body)
+      .contentType(ContentType.JSON).body(body)
     .then().expect()
-    .statusCode(Status.OK.getStatusCode())
-    .when().post(SET_JOB_RETRIES_ASYNC_HIST_QUERY_URL);
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(SET_JOB_RETRIES_ASYNC_HIST_QUERY_URL);
 
     verify(mockManagementService, times(1)).setJobRetriesByProcessAsync(eq(MockProvider.EXAMPLE_JOB_RETRIES));
     verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceIds(Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID));
