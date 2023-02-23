@@ -17,7 +17,6 @@
 package org.camunda.bpm.engine.management;
 
 import java.util.List;
-
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.runtime.JobQuery;
@@ -28,12 +27,12 @@ import org.camunda.bpm.engine.runtime.JobQuery;
 public interface SetJobRetriesByJobsAsyncBuilder extends SetJobRetriesAsyncBuilder {
 
   /**
-   * Specifies a {@link JobQuery} to reference jobs that will be updated.
+   * Specifies a {@link JobQuery} to reference jobs that will be updated. If this method and {@link #jobIds(List)} is
+   * called together, the builder will operate on the jobs referenced by job query and job ids. If neither method is
+   * called, a {@link ProcessEngineException} is thrown on {@link #executeAsync()}.
    *
-   * <strong>Note:</strong> You can reference jobs either by specific jobs ({@link #jobQuery}, {@link #jobIds}) or by process ({@link #processInstanceIds}, {@link #processInstanceQuery}, {@link #historicProcessInstanceQuery}).
-   * If you provide a job query, calling {@link #processInstanceIds}, {@link #processInstanceQuery} or {@link #historicProcessInstanceQuery} are not allowed and will cause a {@link ProcessEngineException} on {@link #executeAsync()}.
-   *
-   * @param query the query to reference jobs that will be updated.
+   * @param query
+   *          the query to reference jobs that will be updated.
    *
    * @see ManagementService#setJobRetriesAsync(JobQuery, int)
    *
@@ -42,12 +41,12 @@ public interface SetJobRetriesByJobsAsyncBuilder extends SetJobRetriesAsyncBuild
   SetJobRetriesByJobsAsyncBuilder jobQuery(JobQuery query);
 
   /**
-   * Specifies a list of job ids that will be updated.
+   * Specifies a list of job ids that will be updated. If this method and {@link #jobQuery(JobQuery)} is called
+   * together, the builder will operate on the jobs referenced by job query and job ids. If neither method is called, a
+   * {@link ProcessEngineException} is thrown on {@link #executeAsync()}.
    *
-   * <strong>Note:</strong> You can reference jobs either by specific jobs ({@link #jobQuery}, {@link #jobIds}) or by process ({@link #processInstanceIds}, {@link #processInstanceQuery}, {@link #historicProcessInstanceQuery}).
-   * If you provide a list of jobs, calling {@link #processInstanceIds}, {@link #processInstanceQuery} or {@link #historicProcessInstanceQuery} are not allowed and will cause a {@link ProcessEngineException} on {@link #executeAsync()}.
-   *
-   * @param jobIds The list of job ids that will be updated.
+   * @param jobIds
+   *          The list of job ids that will be updated.
    *
    * @see ManagementService#setJobRetriesAsync(JobQuery, int)
    *
