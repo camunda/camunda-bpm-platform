@@ -39,7 +39,6 @@ import org.camunda.bpm.engine.impl.cmd.CreateTaskCmd;
 import org.camunda.bpm.engine.impl.cmd.DelegateTaskCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteAttachmentCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteGroupIdentityLinkCmd;
-import org.camunda.bpm.engine.impl.cmd.DeleteTaskAttachmentCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteTaskCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteUserIdentityLinkCmd;
 import org.camunda.bpm.engine.impl.cmd.GetAttachmentCmd;
@@ -393,7 +392,7 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
   }
 
   public void deleteTaskAttachment(String taskId, String attachmentId) {
-    commandExecutor.execute(new DeleteTaskAttachmentCmd(taskId, attachmentId));
+    commandExecutor.execute(new DeleteAttachmentCmd(taskId, attachmentId));
   }
 
   public Attachment getAttachment(String attachmentId) {

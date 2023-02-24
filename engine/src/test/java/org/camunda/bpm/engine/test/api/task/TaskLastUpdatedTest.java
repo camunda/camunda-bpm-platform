@@ -232,6 +232,23 @@ public class TaskLastUpdatedTest {
   }
 
   @Test
+  public void shouldSetLastUpdatedOnDeleteTaskAttachment() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    Attachment attachment = taskService.createAttachment(null, task.getId(), processInstance.getId(), "myAttachment", "attachmentDescription", "http://camunda.com");
+    Date beforeUpdate = getBeforeCurrentTime();
+
+    // when
+    taskService.deleteTaskAttachment(task.getId(), attachment.getId());
+
+    // then
+    Task taskResult = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertThat(taskResult).isNotNull();
+    assertThat(taskResult.getLastUpdated()).isAfter(beforeUpdate);
+  }
+
+  @Test
   public void shouldSetLastUpdatedOnComment() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
