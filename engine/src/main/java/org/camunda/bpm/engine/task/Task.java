@@ -114,7 +114,7 @@ public interface Task {
 
   /**
    * The date/time when this task was last updated.
-   * All operations that fire {@link TaskListener.EVENTNAME_UPDATE} count as an update to the task.
+   * All operations that fire {@link TaskListener#EVENTNAME_UPDATE} count as an update to the task.
    * Returns null if the task was never updated before (i.e. it was only created).
    * */
   Date getLastUpdated();
