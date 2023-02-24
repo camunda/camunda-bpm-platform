@@ -16,7 +16,6 @@
 
   <properties>
     <rest.http.port>38081</rest.http.port>
-    <version.spring.framework>6.0.4</version.spring.framework>
     <version.resteasy>6.2.2.Final</version.resteasy>
   </properties>
 
@@ -181,19 +180,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-test</artifactId>
-      <version>${version.spring.framework}</version>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.springframework</groupId>
-          <artifactId>spring-jcl</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-testing</artifactId>
       <scope>test</scope>
@@ -209,6 +195,16 @@
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <testExcludes>
+            <exclude>**/AuthenticationFilterPathMatchingTest.java</exclude>
+          </testExcludes>
+        </configuration>
+      </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
@@ -572,6 +568,44 @@
                 </configuration>
               </execution>
             </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>jdk17-and-onwards</id>
+      <activation>
+        <jdk>[17,)</jdk>
+      </activation>
+
+      <properties>
+        <version.spring.framework>6.0.4</version.spring.framework>
+      </properties>
+
+      <dependencies>
+        <dependency>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-test</artifactId>
+          <version>${version.spring.framework}</version>
+          <scope>test</scope>
+          <exclusions>
+            <exclusion>
+              <groupId>org.springframework</groupId>
+              <artifactId>spring-jcl</artifactId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+      </dependencies>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+              <testExcludes combine.self="override"/>
+            </configuration>
           </plugin>
         </plugins>
       </build>
