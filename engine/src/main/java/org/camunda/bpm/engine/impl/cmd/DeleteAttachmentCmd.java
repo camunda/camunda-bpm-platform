@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.Serializable;
 
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
@@ -34,15 +36,30 @@ public class DeleteAttachmentCmd implements Command<Object>, Serializable {
 
   private static final long serialVersionUID = 1L;
   protected String attachmentId;
+  protected String taskId;
 
   public DeleteAttachmentCmd(String attachmentId) {
     this.attachmentId = attachmentId;
   }
 
+  public DeleteAttachmentCmd(String taskId, String attachmentId) {
+    this.taskId = taskId;
+    this.attachmentId = attachmentId;
+  }
+
   public Object execute(CommandContext commandContext) {
-    AttachmentEntity attachment = commandContext
-      .getDbEntityManager()
-      .selectById(AttachmentEntity.class, attachmentId);
+    AttachmentEntity attachment = null;
+    if (taskId != null) {
+      attachment = (AttachmentEntity) commandContext
+          .getAttachmentManager()
+          .findAttachmentByTaskIdAndAttachmentId(taskId, attachmentId);
+      ensureNotNull("No attachment exist for task id '" + taskId + " and attachmentId '" + attachmentId + "'.", "attachment", attachment);
+    } else {
+      attachment = commandContext
+          .getDbEntityManager()
+          .selectById(AttachmentEntity.class, attachmentId);
+      ensureNotNull("No attachment exist with attachmentId '" + attachmentId + "'.", "attachment", attachment);
+    }
 
     commandContext
       .getDbEntityManager()
