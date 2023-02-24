@@ -17,7 +17,6 @@
 package org.camunda.bpm.engine.rest.sub.management;
 
 import javax.ws.rs.core.Response.Status;
-
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -69,8 +68,11 @@ public class JobDefinitionResourceImpl implements JobDefinitionResource {
 
   public void setJobRetries(RetriesDto dto) {
     try {
-      ManagementService managementService = engine.getManagementService();
-      managementService.setJobRetriesByJobDefinitionId(jobDefinitionId, dto.getRetries());
+      engine.getManagementService()
+        .setJobRetries(dto.getRetries())
+        .jobDefinitionId(jobDefinitionId)
+        .dueDate(dto.getDueDate())
+        .execute();
     } catch (AuthorizationException e) {
       throw e;
     } catch (ProcessEngineException e) {

@@ -17,7 +17,6 @@
 package org.camunda.bpm.engine.rest.sub.runtime.impl;
 
 import javax.ws.rs.core.Response.Status;
-
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -26,9 +25,9 @@ import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.rest.dto.runtime.JobDto;
 import org.camunda.bpm.engine.rest.dto.runtime.JobDuedateDto;
+import org.camunda.bpm.engine.rest.dto.runtime.JobSuspensionStateDto;
 import org.camunda.bpm.engine.rest.dto.runtime.PriorityDto;
 import org.camunda.bpm.engine.rest.dto.runtime.RetriesDto;
-import org.camunda.bpm.engine.rest.dto.runtime.JobSuspensionStateDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.runtime.JobResource;
@@ -73,7 +72,10 @@ public class JobResourceImpl implements JobResource {
   public void setJobRetries(RetriesDto dto) {
     try {
       ManagementService managementService = engine.getManagementService();
-      managementService.setJobRetries(jobId, dto.getRetries());
+      managementService.setJobRetries(dto.getRetries())
+        .jobId(jobId)
+        .dueDate(dto.getDueDate())
+        .execute();
     } catch (AuthorizationException e) {
       throw e;
     } catch (ProcessEngineException e) {
@@ -106,7 +108,7 @@ public class JobResourceImpl implements JobResource {
       throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, e.getMessage());
     }
   }
-  
+
   @Override
   public void recalculateDuedate(boolean creationDateBased) {
     try {

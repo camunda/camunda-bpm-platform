@@ -190,11 +190,12 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
     }
 
     try {
-      Batch batch = getProcessEngine().getManagementService().setJobRetriesAsync(
-          setJobRetriesDto.getProcessInstances(),
-          processInstanceQuery,
-          setJobRetriesDto.getRetries().intValue()
-      );
+      Batch batch = getProcessEngine().getManagementService()
+          .setJobRetriesByProcessAsync(setJobRetriesDto.getRetries().intValue())
+          .processInstanceIds(setJobRetriesDto.getProcessInstances())
+          .processInstanceQuery(processInstanceQuery)
+          .dueDate(setJobRetriesDto.getDueDate())
+          .executeAsync();
       return BatchDto.fromBatch(batch);
     } catch (BadUserRequestException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
@@ -211,12 +212,12 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
 
     try {
       ManagementService managementService = getProcessEngine().getManagementService();
-      Batch batch = managementService.setJobRetriesAsync(
-        setJobRetriesDto.getProcessInstances(),
-        null,
-        query,
-        setJobRetriesDto.getRetries());
-
+      Batch batch = managementService
+          .setJobRetriesByProcessAsync(setJobRetriesDto.getRetries())
+          .processInstanceIds(setJobRetriesDto.getProcessInstances())
+          .historicProcessInstanceQuery(query)
+          .dueDate(setJobRetriesDto.getDueDate())
+          .executeAsync();
       return BatchDto.fromBatch(batch);
     } catch (BadUserRequestException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());

@@ -21,10 +21,9 @@ import java.util.List;
 /**
  * @author Askar Akhmerov
  */
-public class SetJobRetriesDto {
+public class SetJobRetriesDto extends RetriesDto {
   protected List<String> jobIds;
   protected JobQueryDto jobQuery;
-  protected Integer retries;
 
   public List<String> getJobIds() {
     return jobIds;
@@ -42,11 +41,4 @@ public class SetJobRetriesDto {
     this.jobQuery = jobQuery;
   }
 
-  public Integer getRetries() {
-    return retries;
-  }
-
-  public void setRetries(Integer retries) {
-    this.retries = retries;
-  }
 }

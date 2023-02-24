@@ -16,6 +16,7 @@
                      "summary": "POST `/process-instance/job-retries-historic-query-based` Request Body 1",
                      "value": {
                        "retries": 5,
+                       "dueDate": "2017-04-06T13:57:45.000+0200",
                        "historicProcessInstanceQuery": {
                          "startedBefore": "2017-04-28T11:24:37.769+0200"
                        },

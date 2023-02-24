@@ -68,7 +68,7 @@ public class JobRestServiceImpl extends AbstractRestProcessEngineAware
 
     List<Job> matchingJobs = QueryUtil.list(query, firstResult, maxResults);
 
-    List<JobDto> jobResults = new ArrayList<JobDto>();
+    List<JobDto> jobResults = new ArrayList<>();
     for (Job job : matchingJobs) {
       JobDto resultJob = JobDto.fromJob(job);
       jobResults.add(resultJob);
@@ -109,11 +109,12 @@ public class JobRestServiceImpl extends AbstractRestProcessEngineAware
     }
 
     try {
-      Batch batch = getProcessEngine().getManagementService().setJobRetriesAsync(
-          setJobRetriesDto.getJobIds(),
-          jobQuery,
-          setJobRetriesDto.getRetries().intValue()
-      );
+      Batch batch = getProcessEngine().getManagementService()
+          .setJobRetriesByJobsAsync(setJobRetriesDto.getRetries().intValue())
+          .jobIds(setJobRetriesDto.getJobIds())
+          .jobQuery(jobQuery)
+          .dueDate(setJobRetriesDto.getDueDate())
+          .executeAsync();
       return BatchDto.fromBatch(batch);
     } catch (BadUserRequestException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());

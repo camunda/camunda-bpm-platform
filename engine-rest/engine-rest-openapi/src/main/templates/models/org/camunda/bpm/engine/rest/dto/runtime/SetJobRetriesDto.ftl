@@ -1,8 +1,10 @@
 <#macro dto_macro docsUrl="">
 <#-- Generated From File: camunda-docs-manual/public/reference/rest/job/post-set-job-retries/index.html -->
-<@lib.dto desc = "Defines the number of retries for a selection of jobs.
-                  Please note that if both jobIds and jobQuery are provided,
-                  then retries will be set on the union of these sets.">
+<@lib.dto 
+    extends = "RetriesDto"
+    desc = "Defines the number of retries for a selection of jobs.
+            Please note that if both jobIds and jobQuery are provided,
+            then retries will be set on the union of these sets.">
     
     <@lib.property
         name = "jobIds"
