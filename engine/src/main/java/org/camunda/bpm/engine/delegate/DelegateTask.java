@@ -80,6 +80,13 @@ public interface DelegateTask extends VariableScope, BpmnModelExecutionContext, 
   /** The date/time when this task was created */
   Date getCreateTime();
 
+  /**
+   * The date/time when this task was last updated.
+   * All operations that fire {@link TaskListener#EVENTNAME_UPDATE} count as an update to the task.
+   * Returns null if the task was never updated before (i.e. it was only created).
+   * */
+  Date getLastUpdated();
+
   /** The id of the activity in the process defining this task or null if this is not related to a process */
   String getTaskDefinitionKey();
 
