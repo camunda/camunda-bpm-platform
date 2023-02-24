@@ -637,6 +637,23 @@ public class TaskListenerTest extends AbstractTaskListenerTest {
   }
 
   @Test
+  public void testUpdateTaskListenerOnAttachmentDeleteWithTaskId() {
+    // given
+    createAndDeployModelWithTaskEventsRecorderOnUserTask(TaskListener.EVENTNAME_UPDATE);
+    runtimeService.startProcessInstanceByKey("process");
+    Task task = taskService.createTaskQuery().singleResult();
+
+    Attachment attachment = taskService.createAttachment("foo", task.getId(), null, "bar", "baz", IoUtil.stringAsInputStream("foo"));
+
+    // when
+    taskService.deleteTaskAttachment(task.getId(), attachment.getId());
+
+    // then
+    assertEquals(2, RecorderTaskListener.getTotalEventCount());
+    assertEquals(2, RecorderTaskListener.getEventCount(TaskListener.EVENTNAME_UPDATE)); // create and delete attachment
+  }
+
+  @Test
   public void testUpdateTaskListenerOnSetLocalVariable() {
     // given
     createAndDeployModelWithTaskEventsRecorderOnUserTask(TaskListener.EVENTNAME_UPDATE);
