@@ -1153,11 +1153,7 @@ public class TenantIdProviderTest {
   @Test
   public void shouldQueryForActivityInstancesIncludeIncidentsForTypeGetIncidents() {
     // given
-    testRule.deploy(Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY).startEvent()
-        .serviceTask()
-          .camundaDelegateExpression("org.camunda.bpm.engine.test.api.multitenancy.FailingDelegate")
-          .camundaAsyncBefore()
-        .done());
+    testRule.deploy(FAILING_PROCESS);
 
     TestTenantIdProvider.delegate = new StaticTenantIdTestProvider(TENANT_ID);
     engineRule.getRuntimeService().startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
@@ -1182,11 +1178,7 @@ public class TenantIdProviderTest {
   @Test
   public void shouldQueryForActivityInstancesIncludeIncidentsGetIncidents() {
     // given
-    testRule.deploy(Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY).startEvent()
-        .serviceTask()
-          .camundaDelegateExpression("org.camunda.bpm.engine.test.api.multitenancy.FailingDelegate")
-          .camundaAsyncBefore()
-        .done());
+    testRule.deploy(FAILING_PROCESS);
 
     TestTenantIdProvider.delegate = new StaticTenantIdTestProvider(TENANT_ID);
     engineRule.getRuntimeService().startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
