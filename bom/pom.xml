@@ -60,6 +60,11 @@
       </dependency>
       <dependency>
         <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-engine-cdi-jakarta</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm</groupId>
         <artifactId>camunda-engine-spring</artifactId>
         <version>${project.version}</version>
       </dependency>
