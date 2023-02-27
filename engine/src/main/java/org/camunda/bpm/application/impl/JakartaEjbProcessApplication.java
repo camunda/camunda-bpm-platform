@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.application.impl;
 
-import javax.ejb.SessionContext;
+import jakarta.ejb.SessionContext;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import org.camunda.bpm.application.ProcessApplicationInterface;
@@ -26,7 +26,7 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
 /**
- * <p>Common base class for writing EJB process applications.</p>
+ * <p>Common base class for writing Jakarta Enterprise Bean process applications.</p>
  *
  * <p>An EJB Process Application exposes itself as a Session Bean Component inside the EJB container.
  * This determines the invocation semantics when invoking code from the process application and the
@@ -41,7 +41,7 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
  * {@literal @}Startup
  * {@literal @}ConcurrencyManagement(ConcurrencyManagementType.BEAN)
  * {@literal @}TransactionAttribute(TransactionAttributeType.REQUIRED)
- * public class DefaultEjbProcessApplication extends EjbProcessApplication {
+ * public class DefaultEjbProcessApplication extends JakartaEjbProcessApplication {
  *
  *   {@literal @}PostConstruct
  *   public void deploy() {
@@ -61,12 +61,12 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
  * <p>This allows the process engine as well as other applications to invoke this EJB Process
  * Application and get EJB invocation semantics for the invocation. For example, if your
  * process application provides a {@link JavaDelegate} implementation, the process engine
- * will call the {@link EjbProcessApplication EjbProcessApplication's}
+ * will call the {@link JakartaEjbProcessApplication JakartaEjbProcessApplication's}
  * {@link #execute(java.util.concurrent.Callable)} Method and from that method invoke
  * the {@link JavaDelegate}. This makes sure that
  * <ul>
  * <li>the call is intercepted by the EJB container and "enters" the process application legally.</li>
- * <li>the {@link JavaDelegate} may take advantage of the {@link EjbProcessApplication}'s invocation context
+ * <li>the {@link JavaDelegate} may take advantage of the {@link JakartaEjbProcessApplication}'s invocation context
  * and resolve resources from the component's Environment (such as a <code>java:comp/BeanManager</code>).
  * </ul>
  * </p>
@@ -89,19 +89,16 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
  * <p>When the process application registers with a process engine
  * (see {@link ManagementService#registerProcessApplication(String, ProcessApplicationReference)},
  * the process application passes a reference to itself to the process engine. This reference allows the
- * process engine to reference the process application. The {@link EjbProcessApplication} takes advantage
- * of the Ejb Containers naming context and passes a reference containing the EJBProcessApplication's
+ * process engine to reference the process application. The {@link JakartaEjbProcessApplication} takes advantage
+ * of the EJB Container's naming context and passes a reference containing the JakartaEjbProcessApplication's
  * Component Name to the process engine. Whenever the process engine needs access to process application,
  * the actual component instance is looked up and invoked.</p>
  *
- * @author Daniel Meyer
- *
  */
-public class EjbProcessApplication extends AbstractEjbProcessApplication {
+public class JakartaEjbProcessApplication extends AbstractEjbProcessApplication {
 
   private static ProcessApplicationLogger LOG = ProcessEngineLogger.PROCESS_APPLICATION_LOGGER;
-
-  private EjbProcessApplicationReference ejbProcessApplicationReference;
+  private JakartaEjbProcessApplicationReference ejbProcessApplicationReference;
 
   @Override
   protected ProcessApplicationInterface lookupSelfReference() {
@@ -117,7 +114,7 @@ public class EjbProcessApplication extends AbstractEjbProcessApplication {
   @Override
   protected void ensureEjbProcessApplicationReferenceInitialized() {
     if (ejbProcessApplicationReference == null) {
-      ejbProcessApplicationReference = new EjbProcessApplicationReference(selfReference, getName());
+      ejbProcessApplicationReference = new JakartaEjbProcessApplicationReference(selfReference, getName());
     }
   }
 

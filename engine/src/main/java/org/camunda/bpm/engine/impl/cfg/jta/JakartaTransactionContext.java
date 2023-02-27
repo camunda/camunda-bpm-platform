@@ -16,24 +16,24 @@
  */
 package org.camunda.bpm.engine.impl.cfg.jta;
 
-import javax.transaction.Status;
-import javax.transaction.Synchronization;
-import javax.transaction.Transaction;
-import javax.transaction.TransactionManager;
+import jakarta.transaction.Status;
+import jakarta.transaction.Synchronization;
+import jakarta.transaction.Transaction;
+import jakarta.transaction.TransactionManager;
 import org.camunda.bpm.engine.impl.cfg.TransactionListener;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
 /**
- * JTA-based implementation of the {@link AbstractTransactionContext}
+ * Jakarta Transactions-based implementation of the {@link AbstractTransactionContext}
  *
  * @author Daniel Meyer
  */
-public class JtaTransactionContext extends AbstractTransactionContext {
+public class JakartaTransactionContext extends AbstractTransactionContext {
 
   protected final TransactionManager transactionManager;
 
-  public JtaTransactionContext(TransactionManager transactionManager) {
+  public JakartaTransactionContext(TransactionManager transactionManager) {
     this.transactionManager = transactionManager;
   }
 

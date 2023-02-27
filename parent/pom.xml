@@ -34,6 +34,8 @@
     <version.hibernate>5.6.5.Final</version.hibernate>
     <version.hikaricp>4.0.3</version.hikaricp>
     <version.jackson>2.14.1</version.jackson>
+    <version.xml.bind-api>2.3.3</version.xml.bind-api>
+    <version.xml.jaxb-impl>2.3.6</version.xml.jaxb-impl>
 
     <version.slf4j>1.7.26</version.slf4j>
     <version.logback>1.2.11</version.logback>
@@ -59,6 +61,7 @@
     <version.freemarker>2.3.31</version.freemarker>
 
     <version.jboss-javaee-spec>3.0.2.Final</version.jboss-javaee-spec>
+    <version.jakarta-ee-spec>10.0.0</version.jakarta-ee-spec>
 
     <!-- OSGi bundles properties -->
     <camunda.artifact />
@@ -107,18 +110,6 @@
         <version>${project.version}</version>
         <type>pom</type>
         <scope>import</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>jakarta.xml.bind</groupId>
-        <artifactId>jakarta.xml.bind-api</artifactId>
-        <version>2.3.3</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.sun.xml.bind</groupId>
-        <artifactId>jaxb-impl</artifactId>
-        <version>2.3.6</version>
       </dependency>
 
     </dependencies>
