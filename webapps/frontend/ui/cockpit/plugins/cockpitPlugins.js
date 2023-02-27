@@ -26,7 +26,7 @@ var angular = require('angular'),
   tasks = require('./tasks/app/plugin'),
   externalTasksTab = require('./external-tasks-process-instance-runtime-tab');
 
-module.exports = angular.module('cockpit.plugin.cockpitPlugins', [
+export default angular.module('cockpit.plugin.cockpitPlugins', [
   base.name,
   decisionList.name,
   jobDefinition.name,

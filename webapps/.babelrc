@@ -13,15 +13,6 @@
   ],
   "plugins": [
     "@babel/plugin-proposal-object-rest-spread",
-    "@babel/plugin-transform-object-assign",
-    [
-      // By default, this plugin will attempt to add annotations to common AngularJS code patterns.
-      // This behavior can be disabled (requiring you to mark up functions with /* @ngInject */ or 'ngInject')
-      // https://www.npmjs.com/package/babel-plugin-angularjs-annotate
-      "angularjs-annotate",
-      {
-        "explicitOnly": false
-      }
-    ]
+    "@babel/plugin-transform-object-assign"
   ]
 }

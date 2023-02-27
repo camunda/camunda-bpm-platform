@@ -17,14 +17,14 @@
 
 import '../styles/styles.less';
 
+window.jQuery = require('jquery');
+
 import {
   requirejs,
   define,
   require as rjsrequire,
 } from 'exports-loader?exports=requirejs,define,require!requirejs/require';
 
-window.define = define;
-window.require = rjsrequire;
 window.bust = '$CACHE_BUST';
 
 // camunda-admin-bootstrap is copied as-is, so we have to inline everything
@@ -193,7 +193,11 @@ define('camunda-admin-bootstrap', function () {
           require([], function () {
             window.define = undefined;
             window.require = undefined;
+
             camundaAdminUi.init(pluginDependencies);
+
+            window.define = define;
+            window.require = rjsrequire;
           });
         }
       });

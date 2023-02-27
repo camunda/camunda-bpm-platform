@@ -37,7 +37,7 @@ export const setupDev = () => {
         if (json.message !== 'Setup action not available') {
           window.location.href = `/camunda/app/admin/${engine}/setup/#setup`;
         }
-      });
+      }).catch(() => {});
     });
   }
 };

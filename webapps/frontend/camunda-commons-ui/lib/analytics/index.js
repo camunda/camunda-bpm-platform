@@ -35,7 +35,6 @@ var modalController = [
   function(scope, $sce, Notifications, telemetryResource, $translate) {
     scope.camundaVersion = camundaVersion;
     scope.loadingState = 'INITIAL';
-    scope.enableUsage = false;
     scope.form = {enableUsage: false};
 
     scope.close = function() {

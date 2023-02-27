@@ -22,4 +22,4 @@ import 'ui/admin/plugins/styles.less';
 var angular = require('angular'),
   base = require('./base/app/plugin');
 
-module.exports = angular.module('admin.plugin.adminPlugins', [base.name]);
+export default angular.module('admin.plugin.adminPlugins', [base.name]);

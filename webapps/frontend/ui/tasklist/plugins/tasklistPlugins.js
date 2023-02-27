@@ -24,7 +24,7 @@ var angular = require('angular'),
   tasklistCard = require('./tasklistCard/app/plugin'),
   tasklistSorting = require('./tasklistSorting/app/plugin');
 
-module.exports = angular.module('tasklist.plugin.tasklistPlugins', [
+export default angular.module('tasklist.plugin.tasklistPlugins', [
   standaloneTask.name,
   tasklistCard.name,
   tasklistSorting.name

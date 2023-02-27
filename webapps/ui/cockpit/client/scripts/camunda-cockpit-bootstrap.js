@@ -18,6 +18,8 @@
 import 'ui/cockpit/client/styles/styles.less';
 import 'ui/cockpit/client/styles/styles-components.less';
 
+window.jQuery = require('jquery');
+
 import {
   requirejs,
   define,
@@ -34,7 +36,7 @@ const baseImportPath = `${appRoot}/app/cockpit/`;
 
 requirejs.config({
   baseUrl: baseImportPath,
-  urlArgs: 'bust=$CACHE_BUST'
+  urlArgs: 'bust=$CACHE_BUST',
 });
 
 function withSuffix(string, suffix) {
@@ -122,7 +124,10 @@ define('camunda-cockpit-bootstrap', [], function () {
       pluginPackages.forEach(function (plugin) {
         var node = document.createElement('link');
         node.setAttribute('rel', 'stylesheet');
-        node.setAttribute('href', plugin.location + '/plugin.css?bust=$CACHE_BUST');
+        node.setAttribute(
+          'href',
+          plugin.location + '/plugin.css?bust=$CACHE_BUST'
+        );
         document.head.appendChild(node);
       });
 
@@ -294,9 +299,6 @@ define('camunda-cockpit-bootstrap', [], function () {
         }
 
         function initCockpitUi(pluginDependencies) {
-          window.define = undefined;
-          window.require = undefined;
-
           // now that we loaded the plugins and the additional modules, we can finally
           // initialize Cockpit
           camundaCockpitUi.init(pluginDependencies);

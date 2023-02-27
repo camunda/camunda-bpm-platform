@@ -59,7 +59,7 @@ module.exports = function(ngModule, appRoot, appName) {
               url: [options.prefix, options.key, options.suffix].join(''),
               method: 'GET',
               // Use `now` instead of `window.bust` to update translations without rebuilding the app
-              params: {"bust": now}
+              params: {"bust": CAMUNDA_VERSION}
             },
             options.$http
           )

@@ -144,7 +144,7 @@ export function init(pluginDependencies) {
 
       $animateProvider.classNameFilter(/angular-animate/);
 
-      $qProvider.errorOnUnhandledRejections(false);
+      $qProvider.errorOnUnhandledRejections(true);
     }
   ];
 
