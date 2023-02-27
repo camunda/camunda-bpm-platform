@@ -22,8 +22,6 @@ import java.util.concurrent.Callable;
 import org.camunda.bpm.ProcessApplicationService;
 import org.camunda.bpm.application.impl.EjbProcessApplication;
 import org.camunda.bpm.application.impl.EmbeddedProcessApplication;
-import org.camunda.bpm.application.impl.JakartaEjbProcessApplication;
-import org.camunda.bpm.application.impl.JakartaServletProcessApplication;
 import org.camunda.bpm.application.impl.ServletProcessApplication;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.TaskListener;
@@ -67,10 +65,10 @@ import org.camunda.bpm.engine.repository.DeploymentBuilder;
  * your application and the process engine. There are different base classes you can extent to reflect
  * different environments (e.g. Servlet vs. EJB Container):
  * <ul>
- *  <li> {@link ServletProcessApplication}: To be used for Process Applications in a Servlet Container like Apache Tomcat.</li>
- *  <li> {@link JakartaServletProcessApplication}: To be used for Process Applications in a Jakarta Servlet Container like Undertow.</li>
- *  <li> {@link EjbProcessApplication}: To be used in a Java EE application server like WildFly, Glassfish or WebSphere Application Server.</li>
- *  <li> {@link JakartaEjbProcessApplication}: To be used in a Jakarta EE 9+ application server like WildFly or Glassfish.</li>
+ *  <li> {@link ServletProcessApplication}: To be used for Process Applications in a Servlet Container like Apache Tomcat.
+ *  Use the JakartaServletProcessApplication in a Jakarta Servlet 5+ Container.</li>
+ *  <li> {@link EjbProcessApplication}: To be used in a Java EE application server like WildFly, Glassfish or WebSphere Application Server.
+ *  Use the JakartaEjbProcessApplication in a Jakarta EE 9+ application server.</li>
  *  <li> {@link EmbeddedProcessApplication}: To be used when embedding the process engine is an ordinary Java SE application.</li>
  *  <li> org.camunda.bpm.engine.spring.application.SpringProcessApplication: To be used for bootstrapping the process application from a Spring Application Context.</li>
  * </ul>
