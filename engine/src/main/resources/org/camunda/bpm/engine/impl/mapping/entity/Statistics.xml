@@ -493,7 +493,7 @@
                   on
                       E.PROC_DEF_ID_ = P.ID_
 
-                    <if test="!revokeAuthorizationCheckEnabled">
+                  <if test="!revokeAuthorizationCheckEnabled">
                       <bind name="atomicChecks" value="processInstancePermissionChecks" />
                       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClauseWithBinding" />
                       AUTH ON (AUTH.RESOURCE_ID_ ${authJoinStart} E.PROC_INST_ID_ ${authJoinSeparator} P.KEY_ ${authJoinSeparator} '*' ${authJoinEnd})
@@ -603,6 +603,9 @@
                     <bind name="permissionChecks" value="processInstancePermissionChecks" />
                     <include refid="acitivityStatisticsAuthorizationCheck" />
 
+                    <bind name="columnPrefix" value="'E.'"/>
+                    <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
+
                    group by
                     E.ACT_ID_
                ) INSTANCE
@@ -637,6 +640,9 @@
 
                     <bind name="permissionChecks" value="jobPermissionChecks" />
                     <include refid="acitivityStatisticsAuthorizationCheck" />
+
+                    <bind name="columnPrefix" value="'JOB.'"/>
+                    <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
 
                 group by
                     JOBDEF.ACT_ID_
@@ -677,6 +683,8 @@
                   <bind name="permissionChecks" value="incidentPermissionChecks" />
                   <include refid="acitivityStatisticsAuthorizationCheck" />
 
+                  <bind name="columnPrefix" value="'I.'"/>
+                  <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheckWithPrefix" />
               group by
                   I.ACTIVITY_ID_, I.INCIDENT_TYPE_
             ) INC
