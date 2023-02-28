@@ -1611,6 +1611,60 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
 
   @Test
+  public void testSetRetriesAsyncWithCreateTimesQuery() {
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    messageBodyJson.put(RETRIES, 5);
+    Map<String, Object> condition = new HashMap<String, Object>();
+    condition.put("operator", "lt");
+    condition.put("value", "2022-12-15T10:45:00.000+0100");
+    Map<String, Object> jobQueryDto = new HashMap<String, Object>();
+    jobQueryDto.put("createTimes", Arrays.asList(condition));
+    messageBodyJson.put("jobQuery", jobQueryDto);
+
+    Response response = given()
+        .contentType(ContentType.JSON).body(messageBodyJson)
+        .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when().post(JOBS_SET_RETRIES_URL);
+
+    verifyBatchJson(response.asString());
+
+    verify(mockManagementService, times(1)).setJobRetriesByJobsAsync(5);
+    verify(mockSetJobRetriesByJobsAsyncBuilder, times(1)).jobIds(null);
+    verify(mockSetJobRetriesByJobsAsyncBuilder, times(1)).jobQuery(any(JobQuery.class));
+    verify(mockSetJobRetriesByJobsAsyncBuilder, times(1)).executeAsync();
+    verifyNoMoreInteractions(mockSetJobRetriesByJobsAsyncBuilder);
+  }
+
+
+  @Test
+  public void testSetRetriesAsyncWithDueDatesQuery() {
+      Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+      messageBodyJson.put(RETRIES, 5);
+      Map<String, Object> condition = new HashMap<String, Object>();
+      condition.put("operator", "lt");
+      condition.put("value", "2022-12-15T10:45:00.000+0100");
+      Map<String, Object> jobQueryDto = new HashMap<String, Object>();
+      jobQueryDto.put("dueDates", Arrays.asList(condition));
+      messageBodyJson.put("jobQuery", jobQueryDto);
+
+      Response response = given()
+          .contentType(ContentType.JSON).body(messageBodyJson)
+          .then().expect()
+          .statusCode(Status.OK.getStatusCode())
+          .when().post(JOBS_SET_RETRIES_URL);
+
+      verifyBatchJson(response.asString());
+
+      verify(mockManagementService, times(1)).setJobRetriesByJobsAsync(5);
+      verify(mockSetJobRetriesByJobsAsyncBuilder, times(1)).jobIds(null);
+      verify(mockSetJobRetriesByJobsAsyncBuilder, times(1)).jobQuery(any(JobQuery.class));
+      verify(mockSetJobRetriesByJobsAsyncBuilder, times(1)).executeAsync();
+      verifyNoMoreInteractions(mockSetJobRetriesByJobsAsyncBuilder);
+  }
+
+
+  @Test
   public void testSetRetriesWithBadRequestQuery() {
     doThrow(new BadUserRequestException("job ids are empty"))
         .when(mockSetJobRetriesByJobsAsyncBuilder).jobQuery(eq((JobQuery) null));
