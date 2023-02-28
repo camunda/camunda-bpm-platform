@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.spring.boot.starter.webapp.filter.util.HttpClientRule;
 import org.camunda.bpm.spring.boot.starter.webapp.filter.util.TestApplication;
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -54,6 +55,11 @@ public class AuthCacheTTLDisabledIT {
 
   @Autowired
   protected IdentityService identityService;
+
+  @After
+  public void reset() {
+    ClockUtil.reset();
+  }
 
   @Test
   public void shouldNotRemoveCache() {
