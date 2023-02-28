@@ -105,7 +105,9 @@ public class JobRestServiceImpl extends AbstractRestProcessEngineAware
     }
     JobQuery jobQuery = null;
     if (setJobRetriesDto.getJobQuery() != null) {
-      jobQuery = setJobRetriesDto.getJobQuery().toQuery(getProcessEngine());
+      JobQueryDto jobQueryDto = setJobRetriesDto.getJobQuery();
+      jobQueryDto.setObjectMapper(getObjectMapper());
+      jobQuery = jobQueryDto.toQuery(getProcessEngine());
     }
 
     try {
