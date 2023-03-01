@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly
+  xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="
+    http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2
+      http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+  <id>frontend-sources</id>
+  <formats>
+    <format>zip</format>
+  </formats>
+  <baseDirectory>camunda-webapp-frontend-sources</baseDirectory>
+  <fileSets>
+    <!-- Only respect frontend code -->
+    <fileSet>
+      <outputDirectory>/</outputDirectory>
+      <directory>../frontend</directory>
+
+      <excludes>
+        <!-- These excludes are only needed to speed up the build locally (when the folders are already dirty);
+        with a clean copy of the repo (e.g., on Jenkins) these folders should not exist -->
+        <exclude>**/node_modules/**</exclude>
+        <exclude>**/.idea/**</exclude>
+        <exclude>**/.settings/**</exclude>
+        <exclude>**/dist/**</exclude>
+        <exclude>camunda-commons-ui/cache/**</exclude>
+        <exclude>ui/cockpit/build/**</exclude>
+      </excludes>
+    </fileSet>
+  </fileSets>
+</assembly>

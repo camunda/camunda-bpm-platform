@@ -7,11 +7,12 @@ Clean, package and install it via [Maven](https://maven.apache.org/).
 
 The structure is as follows:
 
-* `ui` - HTML, CSS and Javascript sources as well as Plugins and tests for the Camunda webapplications Cockpit, Tasklist and Admin.
-* `src` - Java sources and tests for the Camunda web application.
+* `assembly` - Java sources and tests for the Camunda web application.
+* `frontend` - HTML, CSS and Javascript sources as well as Plugins and tests for the Camunda webapplications Cockpit, Tasklist and Admin.
 
+## FRONTEND
 
-## UI
+### UI
 
 There are 3 web applications available for the Camunda Platform :
 
@@ -31,20 +32,20 @@ Parts of the web applications can be extended using plugins.
 
 See [plugin development guide](http://docs.camunda.org/latest/real-life/how-to/#cockpit-how-to-develop-a-cockpit-plugin) for details.
 
+#### Translations
 
-## Libraries
+English and german translations are located in the `ui/<app>/client/locales` folders.  
+Translations for other languages are available in the [camunda-7-webapp-translations](https://github.com/camunda-community-hub/camunda-7-webapp-translations) repository.
 
-### [camunda-bpm-sdk-js](https://github.com/camunda/camunda-bpm-platform/tree/master/webapps/camunda-bpm-sdk-js)
+### Libraries
+
+#### [camunda-bpm-sdk-js](https://github.com/camunda/camunda-bpm-platform/tree/master/webapps/frontend/camunda-bpm-sdk-js)
 
 Has tools to work with the REST API and forms (included transitively via camunda-commons-ui).
 
-### [camunda-commons-ui](https://github.com/camunda/camunda-bpm-platform/tree/master/webapps/camunda-commons-ui)
+#### [camunda-commons-ui](https://github.com/camunda/camunda-bpm-platform/tree/master/webapps/frontend/camunda-commons-ui)
 
 Contains resources like images, [`.less`](http://lesscss.org) stylesheets as well as some [angular.js](http://angularjs.org) modules.
-
-### [camunda-webapp-translations](https://github.com/camunda/camunda-webapp-translations)
-
-Contains the translation files for all application texts in different languages.
 
 ### Prerequisite
 
@@ -63,7 +64,7 @@ Installing the webapps is done by Grunt:
 ```sh
 # cd <path to your workspace>
 git clone git@github.com:camunda/camunda-bpm-platform.git
-cd camunda-bpm-platform/webapps
+cd camunda-bpm-platform/webapps/frontend
 npm install
 grunt
 ```
@@ -71,11 +72,12 @@ grunt
 To start the server in development mode, call
 
 ```sh
+cd camunda-bpm-platform/webapps/assembly
 mvn jetty:run -Pdevelop
 ```
 The webapps are then available pointing a browser at [http://localhost:8080](http://localhost:8080). To login as an admin user, use `jonny1` as username and password.
 
-You can now start developing using the `grunt auto-build` command in the webapp directory. To shorten compile times, you can specify the project you are going to make changes to by calling `grunt auto-build:admin`
+You can now start developing using the `grunt auto-build` command in the frontend directory. To shorten compile times, you can specify the project you are going to make changes to by calling `grunt auto-build:admin`
 
 If you are only changing Javascript files, you can set the environment variable `FAST_BUILD` to 1 to further improve compile times.
 
@@ -84,6 +86,7 @@ If you are only changing Javascript files, you can set the environment variable 
 Install the webapps with Grunt and start the server in test mode:
 
 ```sh
+cd camunda-bpm-platform/webapps/assembly
 mvn jetty:run -Pdev-e2e
 ```
 
@@ -92,6 +95,7 @@ Make sure that you terminate the server for development or use another port. You
 To run the tests, call
 
 ```sh
+cd camunda-bpm-platform/webapps/frontend
 grunt test-e2e --protractorConfig=ui/common/tests/develop.conf.js
 ```
 
