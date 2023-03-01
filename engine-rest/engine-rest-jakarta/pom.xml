@@ -53,6 +53,16 @@
     <dependency>
       <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
       <artifactId>jackson-jakarta-rs-json-provider</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>jakarta.activation</groupId>
+          <artifactId>jakarta.activation-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>jakarta.xml.bind</groupId>
+          <artifactId>jakarta.xml.bind-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -191,6 +201,13 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.eclipse.transformer</groupId>
+      <artifactId>org.eclipse.transformer.jakarta</artifactId>
+      <version>0.5.0</version>
+      <scope>provided</scope>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -210,34 +227,10 @@
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
           <execution>
-            <id>unpack-engine-rest-core</id>
-            <phase>generate-sources</phase>
+            <phase>initialize</phase>
             <goals>
-              <goal>unpack</goal>
+              <goal>properties</goal>
             </goals>
-            <inherited>false</inherited>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.camunda.bpm</groupId>
-                  <artifactId>camunda-engine-rest-core</artifactId>
-                  <version>${project.version}</version>
-                  <classifier>sources</classifier>
-                  <type>jar</type>
-                  <outputDirectory>${project.build.directory}/generated-sources/jakarta</outputDirectory>
-                  <excludes>META-INF/**,**/EmptyBodyFilter.java</excludes>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.camunda.bpm</groupId>
-                  <artifactId>camunda-engine-rest-core</artifactId>
-                  <version>${project.version}</version>
-                  <classifier>sources</classifier>
-                  <type>jar</type>
-                  <outputDirectory>${project.build.directory}/generated-resources/jakarta</outputDirectory>
-                  <includes>META-INF/services/**</includes>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
           </execution>
         </executions>
       </plugin>
@@ -245,9 +238,46 @@
       <plugin>
         <artifactId>maven-resources-plugin</artifactId>
         <executions>
+          <!-- copy main sources & resources -->
+          <execution>
+            <id>copy-main-sources</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/generated-sources/jakarta</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${basedir}/../engine-rest/src/main/java</directory>
+                  <filtering>false</filtering>
+                  <excludes>
+                    <exclude>**/EmptyBodyFilter.java</exclude>
+                  </excludes>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-main-resources</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/generated-resources/jakarta</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${basedir}/../engine-rest/src/main/resources</directory>
+                  <filtering>false</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <!-- copy test sources & resources -->
           <execution>
             <id>copy-test-sources</id>
-            <phase>generate-sources</phase>
+            <phase>generate-test-sources</phase>
             <goals>
               <goal>copy-resources</goal>
             </goals>
@@ -266,7 +296,7 @@
           </execution>
           <execution>
             <id>copy-test-sources-resteasy</id>
-            <phase>generate-sources</phase>
+            <phase>generate-test-sources</phase>
             <goals>
               <goal>copy-resources</goal>
             </goals>
@@ -286,7 +316,7 @@
           </execution>
           <execution>
             <id>copy-test-resources</id>
-            <phase>generate-sources</phase>
+            <phase>generate-test-resources</phase>
             <goals>
               <goal>copy-resources</goal>
             </goals>
@@ -302,7 +332,7 @@
           </execution>
           <execution>
             <id>copy-test-resources-resteasy</id>
-            <phase>generate-sources</phase>
+            <phase>generate-test-resources</phase>
             <goals>
               <goal>copy-resources</goal>
             </goals>
@@ -327,7 +357,8 @@
           <rules>
             <jakartaDefaults>true</jakartaDefaults>
             <renames>
-              <rename>${basedir}/transform-renames.properties</rename>
+              <rename>jar:file://${org.eclipse.transformer:org.eclipse.transformer.jakarta:jar}!/org/eclipse/transformer/jakarta/jakarta-renames.properties</rename>
+              <rename>${basedir}/engine-rest-jakarta-renames.properties</rename>
             </renames>
           </rules>
           <classifier>jakarta</classifier>
@@ -367,7 +398,7 @@
           </execution>
           <execution>
             <id>transform-jakarta-test-resources-resteasy</id>
-            <phase>generate-test-sources</phase>
+            <phase>generate-test-resources</phase>
             <goals>
               <goal>transform</goal>
             </goals>
@@ -396,7 +427,7 @@
           </execution>
           <execution>
             <id>add-jakarta-resource</id>
-            <phase>generate-sources</phase>
+            <phase>generate-resources</phase>
             <goals>
               <goal>add-resource</goal>
             </goals>
@@ -422,7 +453,7 @@
           </execution>
           <execution>
             <id>add-jakarta-test-resource</id>
-            <phase>generate-test-sources</phase>
+            <phase>generate-test-resources</phase>
             <goals>
               <goal>add-test-resource</goal>
             </goals>
@@ -557,7 +588,7 @@
               </execution>
               <execution>
                 <id>add-jakarta-resteasy-test-resource</id>
-                <phase>generate-test-sources</phase>
+                <phase>generate-test-resources</phase>
                 <goals>
                   <goal>add-test-resource</goal>
                 </goals>

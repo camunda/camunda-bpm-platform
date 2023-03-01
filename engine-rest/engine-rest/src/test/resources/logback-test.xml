@@ -7,9 +7,6 @@
   </appender>
 
   <logger name="org.camunda" level="debug" />
-  <logger name="org.apache" level="trace" />
-  <logger name="org.jboss" level="trace" />
-  <logger name="io.undertow" level="trace" />
 
   <root level="info">
     <appender-ref ref="STDOUT" />

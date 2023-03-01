@@ -127,6 +127,7 @@ engine-rest-jakarta-unit-resteasy:
   labels:
     - 'rest-api'
   nodeLabel: 'h2'
+  jdkVersion: 'openjdk-jdk-17-latest'
 engine-rest-unit-cxf:
   directory: 'engine-rest/engine-rest'
   command: 'clean install -Pcxf'
