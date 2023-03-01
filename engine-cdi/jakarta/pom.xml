@@ -239,15 +239,20 @@
         </executions>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>initialize</phase>
+            <goals>
+              <goal>properties</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.eclipse.transformer</groupId>
         <artifactId>transformer-maven-plugin</artifactId>
-        <version>0.5.0</version>
-        <configuration>
-          <rules>
-            <jakartaDefaults>true</jakartaDefaults>
-          </rules>
-          <classifier>jakarta</classifier>
-        </configuration>
         <executions>
           <execution>
             <id>transform-jakarta-sources</id>
