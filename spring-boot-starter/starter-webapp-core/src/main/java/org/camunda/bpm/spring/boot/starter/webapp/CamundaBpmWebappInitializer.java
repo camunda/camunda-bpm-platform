@@ -93,6 +93,7 @@ public class CamundaBpmWebappInitializer implements ServletContextInitializer {
     ServletContextUtil.setAppPath(applicationPath, servletContext);
 
     registerFilter("Authentication Filter", AuthenticationFilter.class,
+        Collections.singletonMap("cacheTimeToLive", getAuthCacheTTL(webapp)),
         applicationPath + "/api/*", applicationPath + "/app/*");
     registerFilter("Security Filter", LazySecurityFilter.class,
         singletonMap("configFile", webapp.getSecurityConfigFile()),
@@ -134,6 +135,18 @@ public class CamundaBpmWebappInitializer implements ServletContextInitializer {
         applicationPath + "/api/engine/*");
     registerServlet("Welcome Api", WelcomeApplication.class,
         applicationPath + "/api/welcome/*");
+  }
+
+  protected String getAuthCacheTTL(WebappProperty webapp) {
+    long authCacheTTL = webapp.getAuth().getCache().getTimeToLive();
+    boolean authCacheTTLEnabled = webapp.getAuth().getCache().isTtlEnabled();
+    if (authCacheTTLEnabled) {
+      return Long.toString(authCacheTTL);
+
+    } else {
+      return ""; // Empty string disables TTL
+
+    }
   }
 
   private FilterRegistration registerFilter(final String filterName, final Class<? extends Filter> filterClass, final String... urlPatterns) {

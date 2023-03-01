@@ -35,14 +35,18 @@ import java.io.Serializable;
  */
 public class HttpSessionMutexListener implements HttpSessionListener {
 
+  public static final String AUTH_TIME_SESSION_MUTEX = "CAMUNDA_AUTH_TIME_SESSION_MUTEX";
+
   @Override
   public void sessionCreated(HttpSessionEvent event) {
     event.getSession().setAttribute(CsrfConstants.CSRF_SESSION_MUTEX, new SessionMutex());
+    event.getSession().setAttribute(AUTH_TIME_SESSION_MUTEX, new SessionMutex());
   }
 
   @Override
   public void sessionDestroyed(HttpSessionEvent event) {
     event.getSession().removeAttribute(CsrfConstants.CSRF_SESSION_MUTEX);
+    event.getSession().removeAttribute(AUTH_TIME_SESSION_MUTEX);
   }
 
   /**

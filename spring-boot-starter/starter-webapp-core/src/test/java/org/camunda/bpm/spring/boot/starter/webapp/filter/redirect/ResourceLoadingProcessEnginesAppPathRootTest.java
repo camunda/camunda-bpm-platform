@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 
 import org.apache.commons.io.IOUtils;
-import org.camunda.bpm.spring.boot.starter.webapp.filter.util.HeaderRule;
+import org.camunda.bpm.spring.boot.starter.webapp.filter.util.HttpClientRule;
 import org.camunda.bpm.spring.boot.starter.webapp.filter.util.TestApplication;
 import org.junit.Rule;
 import org.junit.Test;
@@ -42,7 +42,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class ResourceLoadingProcessEnginesAppPathRootTest {
 
   @Rule
-  public HeaderRule rule = new HeaderRule().followRedirects(true);
+  public HttpClientRule rule = new HttpClientRule().followRedirects(true);
 
   @LocalServerPort
   public int port;

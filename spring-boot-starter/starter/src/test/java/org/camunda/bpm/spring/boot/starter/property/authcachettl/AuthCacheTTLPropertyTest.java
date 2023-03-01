@@ -14,41 +14,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.webapp.impl.security.filter.headersec.provider;
+package org.camunda.bpm.spring.boot.starter.property.authcachettl;
 
-import javax.servlet.ServletContext;
-import java.util.HashMap;
-import java.util.Map;
+import org.camunda.bpm.spring.boot.starter.property.ParsePropertiesHelper;
+import org.junit.Test;
+import org.springframework.test.context.TestPropertySource;
 
-/**
- * @author Tassilo Weidner
- */
-public abstract class HeaderSecurityProvider {
+import static org.assertj.core.api.Assertions.assertThat;
 
-  protected boolean disabled = false;
-  protected String value = null;
-  protected Map<String, String> initParams = new HashMap<>();
+@TestPropertySource(properties = {
+    "camunda.bpm.webapp.auth.cache.ttl-enabled=false",
+    "camunda.bpm.webapp.auth.cache.time-to-live=6",
+})
+public class AuthCacheTTLPropertyTest extends ParsePropertiesHelper {
 
-  abstract public Map<String, String> initParams();
+  @Test
+  public void shouldBeConfigurable() {
+    // given
 
-  abstract public void parseParams();
+    // when
+    boolean cacheEnabled = webapp.getAuth().getCache().isTtlEnabled();
+    long ttl = webapp.getAuth().getCache().getTimeToLive();
 
-  abstract public String getHeaderName();
-
-  public String getHeaderValue(final ServletContext servletContext) {
-    return value;
-  }
-
-  public void setValue(String value) {
-    this.value = value;
-  }
-
-  public boolean isDisabled() {
-    return disabled;
-  }
-
-  protected void setDisabled(boolean disabled) {
-    this.disabled = disabled;
+    // then
+    assertThat(cacheEnabled).isFalse();
+    assertThat(ttl).isEqualTo(6);
   }
 
 }

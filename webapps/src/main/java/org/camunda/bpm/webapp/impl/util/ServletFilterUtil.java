@@ -14,41 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.webapp.impl.security.filter.headersec.provider;
-
-import javax.servlet.ServletContext;
-import java.util.HashMap;
-import java.util.Map;
+package org.camunda.bpm.webapp.impl.util;
 
 /**
- * @author Tassilo Weidner
+ * Common logic that is used in servlet filters.
  */
-public abstract class HeaderSecurityProvider {
+public class ServletFilterUtil {
 
-  protected boolean disabled = false;
-  protected String value = null;
-  protected Map<String, String> initParams = new HashMap<>();
-
-  abstract public Map<String, String> initParams();
-
-  abstract public void parseParams();
-
-  abstract public String getHeaderName();
-
-  public String getHeaderValue(final ServletContext servletContext) {
-    return value;
-  }
-
-  public void setValue(String value) {
-    this.value = value;
-  }
-
-  public boolean isDisabled() {
-    return disabled;
-  }
-
-  protected void setDisabled(boolean disabled) {
-    this.disabled = disabled;
+  /**
+   * Checks if servlet filter init parameter is empty.
+   */
+  public static boolean isEmpty(String string) {
+    return string == null || string.trim().isEmpty();
   }
 
 }

@@ -21,16 +21,18 @@ import java.io.IOException;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
-import org.camunda.bpm.cockpit.Cockpit;
-import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.webapp.impl.IllegalWebAppConfigurationException;
 import org.camunda.bpm.webapp.impl.security.SecurityActions;
 import org.camunda.bpm.webapp.impl.security.SecurityActions.SecurityAction;
-
+import org.camunda.bpm.webapp.impl.util.ServletContextUtil;
+import org.camunda.bpm.webapp.impl.util.ServletFilterUtil;
 
 /**
  * <p>Servlet {@link Filter} implementation responsible for populating the
@@ -43,44 +45,60 @@ import org.camunda.bpm.webapp.impl.security.SecurityActions.SecurityAction;
  */
 public class AuthenticationFilter implements Filter {
 
+  public static final String AUTH_CACHE_TTL_INIT_PARAM_NAME = "cacheTimeToLive";
+
+  protected Long cacheTimeToLive = null;
+
   public void init(FilterConfig filterConfig) throws ServletException {
+    String authCacheTTLAsString = filterConfig.getInitParameter(AUTH_CACHE_TTL_INIT_PARAM_NAME);
+    if (!ServletFilterUtil.isEmpty(authCacheTTLAsString)) {
+      cacheTimeToLive = Long.parseLong(authCacheTTLAsString.trim());
 
-  }
-
-  public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain) throws IOException, ServletException {
-
-    final HttpServletRequest req = (HttpServletRequest) request;
-
-    // get authentication from session
-    Authentications authentications = Authentications.getFromSession(req.getSession());
-    Authentications.setCurrent(authentications);
-
-    try {
-
-      SecurityActions.runWithAuthentications(new SecurityAction<Void>() {
-        public Void execute() throws IOException, ServletException {
-          chain.doFilter(request, response);
-          return null;
-        }
-      }, authentications);
-    } finally {
-      Authentications.clearCurrent();
-      Authentications.updateSession(req.getSession(false), authentications);
-    }
-
-  }
-
-  protected void clearProcessEngineAuthentications(Authentications authentications) {
-    for (Authentication authentication : authentications.getAuthentications()) {
-      ProcessEngine processEngine = Cockpit.getProcessEngine(authentication.getProcessEngineName());
-      if(processEngine != null) {
-        processEngine.getIdentityService().clearAuthentication();
+      if (cacheTimeToLive < 0) {
+        throw new IllegalWebAppConfigurationException("'" + AUTH_CACHE_TTL_INIT_PARAM_NAME + "' cannot be negative.");
       }
     }
   }
 
+  public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
+    throws IOException, ServletException {
+
+    HttpServletRequest req = (HttpServletRequest) request;
+
+    HttpSession session = req.getSession(true);
+
+    // get authentication from session
+    Authentications authentications = AuthenticationUtil.getAuthsFromSession(session);
+
+    if (cacheTimeToLive != null) {
+      if (cacheTimeToLive > 0) {
+        ServletContext servletContext = request.getServletContext();
+        ServletContextUtil.setCacheTTLForLogin(cacheTimeToLive, servletContext);
+      }
+      AuthenticationUtil.updateCache(authentications, session, cacheTimeToLive);
+    }
+
+    Authentications.setCurrent(authentications);
+
+    try {
+
+      SecurityActions.runWithAuthentications((SecurityAction<Void>) () -> {
+        chain.doFilter(request, response);
+        return null;
+      }, authentications);
+    } finally {
+      Authentications.clearCurrent();
+      AuthenticationUtil.updateSession(req.getSession(false), authentications);
+    }
+
+  }
+
   public void destroy() {
 
+  }
+
+  public Long getCacheTimeToLive() {
+    return cacheTimeToLive;
   }
 
 }

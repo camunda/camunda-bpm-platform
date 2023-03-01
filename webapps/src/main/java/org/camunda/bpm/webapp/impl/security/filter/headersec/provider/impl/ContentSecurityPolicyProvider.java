@@ -17,6 +17,7 @@
 package org.camunda.bpm.webapp.impl.security.filter.headersec.provider.impl;
 
 import org.camunda.bpm.webapp.impl.security.filter.headersec.provider.HeaderSecurityProvider;
+import org.camunda.bpm.webapp.impl.util.ServletFilterUtil;
 
 import javax.servlet.ServletContext;
 import java.util.Base64;
@@ -56,7 +57,7 @@ public class ContentSecurityPolicyProvider extends HeaderSecurityProvider {
   public void parseParams() {
     String disabled = initParams.get(DISABLED_PARAM);
 
-    if (isEmpty(disabled)) {
+    if (ServletFilterUtil.isEmpty(disabled)) {
       setDisabled(false);
 
     } else {
@@ -65,7 +66,7 @@ public class ContentSecurityPolicyProvider extends HeaderSecurityProvider {
     }
 
     String value = initParams.get(VALUE_PARAM);
-    if (!isEmpty(value)) {
+    if (!ServletFilterUtil.isEmpty(value)) {
       value = normalizeString(value);
       setValue(value);
 
