@@ -76,6 +76,7 @@ pipeline {
               agentLabel : 'centos-stable',
               runSteps   : {
                 sh(label: 'Create webapps target dir', script: 'mkdir -p ./webapps/assembly/target/webapp')
+                sh(label: 'Create webapps Jakarta target dir', script: 'mkdir -p ./webapps/assembly-jakarta/target/webapp')
                 cambpmRunMaven('.',
                   'package javadoc:javadoc javadoc:aggregate -Pdistro,distro-wildfly,distro-webjar,javadocs -DskipTests=true -Dskip.frontend.build=true',
                   withNpm: true,

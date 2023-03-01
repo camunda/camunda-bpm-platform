@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.camunda.bpm</groupId>
+    <artifactId>camunda-database-settings</artifactId>
+    <version>7.19.0-SNAPSHOT</version>
+    <relativePath>../database</relativePath>
+  </parent>
+
+  <artifactId>camunda-webapp-root</artifactId>
+  <groupId>org.camunda.bpm.webapp</groupId>
+  <packaging>pom</packaging>
+  <name>Camunda Platform - Webapp - Root</name>
+
+  <modules>
+    <module>assembly</module>
+  </modules>
+
+  <profiles>
+    <profile>
+      <id>jdk11-and-onwards</id>
+      <activation>
+        <jdk>[11,)</jdk>
+      </activation>
+      <modules>
+        <module>assembly-jakarta</module>
+      </modules>
+    </profile>
+  </profiles>
+
+</project>

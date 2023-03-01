@@ -21,12 +21,24 @@ var fs = require('fs');
 module.exports = function(grunt) {
   'use strict';
 
+  const buildTarget = grunt.option('assembly-jakarta') ? '../assembly-jakarta' : '../assembly';
+  console.log('Using build target', buildTarget);
+
   require('load-grunt-tasks')(grunt);
   require('./grunt/tasks/terser')(grunt);
 
   var pkg = require('./package.json');
   var protractorConfig =
     grunt.option('protractorConfig') || 'ui/common/tests/ci.conf.js';
+
+  // replace ${buildTarget} variable in gruntConfig
+  pkg.gruntConfig.buildTarget = buildTarget;
+  for (let gruntConfigKey in pkg.gruntConfig) {
+    const val = pkg.gruntConfig[gruntConfigKey];
+    if (typeof val === 'string') {
+      pkg.gruntConfig[gruntConfigKey] = val.replace('${buildTarget}', buildTarget);
+    }
+  }
 
   var config = pkg.gruntConfig || {};
 
@@ -184,7 +196,7 @@ module.exports = function(grunt) {
 
     localescompile: localesConf,
 
-    clean: require('./grunt/config/clean')(config),
+    clean: require('./grunt/config/clean')(buildTarget),
 
     watch: watchConf,
 
@@ -213,7 +225,7 @@ module.exports = function(grunt) {
     }
   });
 
-  require('./grunt/tasks/license-header')(grunt, false);
+  require('./grunt/tasks/license-header')(grunt, false, buildTarget);
   require('./camunda-commons-ui/grunt/tasks/localescompile')(grunt);
   var licensebookConfig = {
     enabled: false,
