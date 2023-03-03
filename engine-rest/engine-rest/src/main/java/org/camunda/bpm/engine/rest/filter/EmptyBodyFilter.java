@@ -20,12 +20,9 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PushbackInputStream;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 
 /**
  * @author Tassilo Weidner
@@ -41,7 +38,7 @@ public class EmptyBodyFilter extends AbstractEmptyBodyFilter {
 
         return new ServletInputStream() {
 
-          InputStream inputStream = isBodyEmpty ? new ByteArrayInputStream("{}".getBytes(Charset.forName("UTF-8"))) : requestBody;
+          final InputStream inputStream = getRequestBody(isBodyEmpty, requestBody);
 
           @Override
           public int read() throws IOException {
@@ -78,7 +75,7 @@ public class EmptyBodyFilter extends AbstractEmptyBodyFilter {
 
       @Override
       public BufferedReader getReader() throws IOException {
-        return new BufferedReader(new InputStreamReader(this.getInputStream()));
+        return EmptyBodyFilter.this.getReader(this.getInputStream());
       }
 
     };

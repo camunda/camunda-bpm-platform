@@ -43,6 +43,12 @@
     <dependency>
       <groupId>commons-fileupload</groupId>
       <artifactId>commons-fileupload</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-io</groupId>
+          <artifactId>commons-io</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <!-- override managed version from commons-fileupload -->
     <dependency>
@@ -171,15 +177,12 @@
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpcore</artifactId>
-      <version>4.4.5</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
-      <!-- override version -->
-      <version>1.15</version>
       <scope>test</scope>
     </dependency>
 
@@ -201,27 +204,10 @@
       <scope>test</scope>
     </dependency>
 
-    <dependency>
-      <groupId>org.eclipse.transformer</groupId>
-      <artifactId>org.eclipse.transformer.jakarta</artifactId>
-      <version>0.5.0</version>
-      <scope>provided</scope>
-    </dependency>
-
   </dependencies>
 
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <testExcludes>
-            <exclude>**/AuthenticationFilterPathMatchingTest.java</exclude>
-          </testExcludes>
-        </configuration>
-      </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
@@ -352,17 +338,6 @@
       <plugin>
         <groupId>org.eclipse.transformer</groupId>
         <artifactId>transformer-maven-plugin</artifactId>
-        <version>0.5.0</version>
-        <configuration>
-          <rules>
-            <jakartaDefaults>true</jakartaDefaults>
-            <renames>
-              <rename>jar:file://${org.eclipse.transformer:org.eclipse.transformer.jakarta:jar}!/org/eclipse/transformer/jakarta/jakarta-renames.properties</rename>
-              <rename>${basedir}/engine-rest-jakarta-renames.properties</rename>
-            </renames>
-          </rules>
-          <classifier>jakarta</classifier>
-        </configuration>
         <!-- sources & test-sources -->
         <executions>
           <execution>
@@ -529,14 +504,32 @@
 
   <profiles>
     <profile>
+      <id>distro</id>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <skipTests>true</skipTests>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
       <id>resteasy</id>
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
+
       <properties>
         <version.netty>4.1.89.Final</version.netty>
         <version.undertow>2.3.0.Final</version.undertow>
       </properties>
+
       <dependencies>
         <dependency>
           <groupId>io.undertow</groupId>
@@ -605,6 +598,104 @@
     </profile>
 
     <profile>
+      <id>wildfly-compatibility</id>
+
+      <properties>
+        <version.netty>4.1.89.Final</version.netty>
+        <version.undertow>2.3.0.Final</version.undertow>
+        <!-- Test with Resteasy version used by Wildfly 27.0.0.Final -->
+        <version.resteasy>6.2.1.Final</version.resteasy>
+      </properties>
+
+      <dependencies>
+        <dependency>
+          <groupId>io.undertow</groupId>
+          <artifactId>undertow-servlet</artifactId>
+          <version>${version.undertow}</version>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>resteasy-core</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>resteasy-undertow</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>resteasy-netty4</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>io.netty</groupId>
+          <artifactId>netty-all</artifactId>
+          <version>${version.netty}</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>add-jakarta-resteasy-test-source</id>
+                <phase>generate-test-sources</phase>
+                <goals>
+                  <goal>add-test-source</goal>
+                </goals>
+                <configuration>
+                  <sources>
+                    <source>${basedir}/src/test/java-resteasy</source>
+                    <source>${project.build.directory}/generated-test-sources/jakarta-resteasy</source>
+                  </sources>
+                </configuration>
+              </execution>
+              <execution>
+                <id>add-jakarta-resteasy-test-resource</id>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>add-test-resource</goal>
+                </goals>
+                <configuration>
+                  <resources>
+                    <resource><directory>${project.build.directory}/generated-test-resources/jakarta-resteasy</directory></resource>
+                  </resources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>below-jdk17</id>
+      <activation>
+        <jdk>(,17)</jdk>
+      </activation>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+              <testExcludes>
+                <exclude>**/AuthenticationFilterPathMatchingTest.java</exclude>
+              </testExcludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
       <id>jdk17-and-onwards</id>
       <activation>
         <jdk>[17,)</jdk>
@@ -628,18 +719,6 @@
           </exclusions>
         </dependency>
       </dependencies>
-
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <configuration>
-              <testExcludes combine.self="override"/>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
   </profiles>
 

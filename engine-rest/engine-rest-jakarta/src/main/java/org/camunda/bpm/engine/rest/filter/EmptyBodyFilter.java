@@ -16,16 +16,14 @@
  */
 package org.camunda.bpm.engine.rest.filter;
 
-import jakarta.servlet.*;
+import jakarta.servlet.ReadListener;
+import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PushbackInputStream;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 
 public class EmptyBodyFilter extends AbstractEmptyBodyFilter {
 
@@ -38,6 +36,7 @@ public class EmptyBodyFilter extends AbstractEmptyBodyFilter {
 
         return new ServletInputStream() {
 
+          final InputStream inputStream = getRequestBody(isBodyEmpty, requestBody);
           boolean finished = false;
 
           @Override
@@ -54,8 +53,6 @@ public class EmptyBodyFilter extends AbstractEmptyBodyFilter {
           public void setReadListener(final ReadListener readListener) {
             throw new UnsupportedOperationException();
           }
-
-          InputStream inputStream = isBodyEmpty ? new ByteArrayInputStream("{}".getBytes(Charset.forName("UTF-8"))) : requestBody;
 
           @Override
           public int read() throws IOException {
@@ -96,7 +93,7 @@ public class EmptyBodyFilter extends AbstractEmptyBodyFilter {
 
       @Override
       public BufferedReader getReader() throws IOException {
-        return new BufferedReader(new InputStreamReader(this.getInputStream()));
+        return EmptyBodyFilter.this.getReader(this.getInputStream());
       }
 
     };

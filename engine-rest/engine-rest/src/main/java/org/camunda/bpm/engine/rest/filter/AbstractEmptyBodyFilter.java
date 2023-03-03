@@ -20,12 +20,18 @@ import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
+import javax.servlet.ServletInputStream;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PushbackInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
 
 /**
@@ -53,6 +59,10 @@ public abstract class AbstractEmptyBodyFilter implements Filter {
     }
   }
 
+  public InputStream getRequestBody(boolean isBodyEmpty, PushbackInputStream requestBody) {
+    return isBodyEmpty ? new ByteArrayInputStream("{}".getBytes(StandardCharsets.UTF_8)) : requestBody;
+  }
+
   public abstract HttpServletRequestWrapper wrapRequest(HttpServletRequest req, boolean isBodyEmpty, PushbackInputStream requestBody);
 
   @Override
@@ -65,4 +75,7 @@ public abstract class AbstractEmptyBodyFilter implements Filter {
 
   }
 
+  public BufferedReader getReader(final ServletInputStream inputStream) {
+    return new BufferedReader(new InputStreamReader(inputStream));
+  }
 }

@@ -153,6 +153,15 @@ engine-rest-IT-embedded-wildfly:
   labels:
   - 'rest-api'
   nodeLabel: 'h2'
+engine-rest-jakarta-unit-compatibility-wildfly:
+  directory: 'engine-rest/engine-rest-jakarta'
+  command: 'clean install -Pwildfly-compatibility'
+  stash:
+    runtimeStash: true
+  labels:
+    - 'rest-api'
+  nodeLabel: 'h2'
+  jdkVersion: 'openjdk-jdk-17-latest'
 platform-jdk-openjdk-jdk-17-latest:
   directory: '.'
   command: 'install source:jar source:test-jar -pl ''!webapps'' -Pdistro,distro-ce,distro-wildfly'
