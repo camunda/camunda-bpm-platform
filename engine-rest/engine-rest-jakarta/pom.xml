@@ -16,7 +16,7 @@
 
   <properties>
     <rest.http.port>38081</rest.http.port>
-    <version.resteasy>6.2.2.Final</version.resteasy>
+    <version.resteasy>6.2.3.Final</version.resteasy>
   </properties>
 
   <dependencyManagement>
