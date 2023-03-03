@@ -48,6 +48,8 @@ public class ExpressionManagerTest extends PluggableProcessEngineTest {
 
   @After
   public void clear() {
+    Mocks.reset();
+
     if (deploymentId != null) {
       repositoryService.deleteDeployment(deploymentId, true);
       deploymentId = null;
