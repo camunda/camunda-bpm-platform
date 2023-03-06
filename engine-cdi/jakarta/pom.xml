@@ -46,19 +46,6 @@
   </dependencyManagement>
 
   <dependencies>
-    <!-- engine CDI artifact and tests -->
-    <dependency>
-      <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine-cdi</artifactId>
-      <version>${project.version}</version>
-      <classifier>sources</classifier>
-    </dependency>
-    <dependency>
-      <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine-cdi</artifactId>
-      <version>${project.version}</version>
-      <classifier>test-sources</classifier>
-    </dependency>
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
