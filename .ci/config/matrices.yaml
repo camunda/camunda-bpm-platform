@@ -19,7 +19,7 @@ engine-webapp-unit:
   - 'db2_115'
   - 'sqlserver_2017'
   - 'sqlserver_2019'
-  stages: 
+  stages:
   - 'db-unit'
   - 'db-unit-authorizations'
 engine-rest:
@@ -29,8 +29,10 @@ engine-rest:
   - 'engine-rest-unit-cxf'
   - 'engine-rest-unit-compatibility-wildfly'
   - 'engine-rest-IT-embedded-wildfly'
+  - 'engine-rest-jakarta-unit-resteasy'
+  - 'engine-rest-jakarta-unit-compatibility-wildfly'
 daily-stages:
-  databases: 
+  databases:
   - 'postgresql_122'
   - 'postgresql_132'
   - 'postgresql_142'
@@ -45,7 +47,7 @@ daily-stages:
   - 'db2_115'
   - 'sqlserver_2017'
   - 'sqlserver_2019'
-  stages: 
+  stages:
   - 'sql-scripts'
   - 'upgrade-database'
   - 'instance-migration'

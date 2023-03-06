@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+
+  <display-name>Camunda Platform rest api</display-name>
+
+  <!-- rest bootstrap listener -->
+  <listener>
+    <listener-class>org.camunda.bpm.engine.rest.impl.web.bootstrap.RestContainerBootstrap</listener-class>
+  </listener>
+
+  <filter>
+    <filter-name>EmptyBodyFilter</filter-name>
+    <filter-class>org.camunda.bpm.engine.rest.filter.EmptyBodyFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>EmptyBodyFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <filter>
+    <filter-name>CacheControlFilter</filter-name>
+    <filter-class>org.camunda.bpm.engine.rest.filter.CacheControlFilter</filter-class>    
+  </filter>
+  <filter-mapping>
+    <filter-name>CacheControlFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  
+  <!-- Http Basic Authentication Filter -->
+  <!-- <filter>
+    <filter-name>camunda-auth</filter-name>
+    <filter-class>
+      org.camunda.bpm.engine.rest.security.auth.ProcessEngineAuthenticationFilter
+    </filter-class>
+	<async-supported>true</async-supported>
+    <init-param>
+      <param-name>authentication-provider</param-name>
+      <param-value>org.camunda.bpm.engine.rest.security.auth.impl.HttpBasicAuthenticationProvider</param-value>
+    </init-param>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>camunda-auth</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping> -->
+  
+</web-app>

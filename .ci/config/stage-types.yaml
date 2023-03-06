@@ -119,6 +119,15 @@ engine-rest-unit-resteasy:
   labels:
   - 'rest-api'
   nodeLabel: 'h2'
+engine-rest-jakarta-unit-resteasy:
+  directory: 'engine-rest/engine-rest-jakarta'
+  command: 'clean install -Presteasy'
+  stash:
+    runtimeStash: true
+  labels:
+    - 'rest-api'
+  nodeLabel: 'h2'
+  jdkVersion: 'openjdk-jdk-17-latest'
 engine-rest-unit-cxf:
   directory: 'engine-rest/engine-rest'
   command: 'clean install -Pcxf'
@@ -144,6 +153,15 @@ engine-rest-IT-embedded-wildfly:
   labels:
   - 'rest-api'
   nodeLabel: 'h2'
+engine-rest-jakarta-unit-compatibility-wildfly:
+  directory: 'engine-rest/engine-rest-jakarta'
+  command: 'clean install -Pwildfly-compatibility'
+  stash:
+    runtimeStash: true
+  labels:
+    - 'rest-api'
+  nodeLabel: 'h2'
+  jdkVersion: 'openjdk-jdk-17-latest'
 platform-jdk-openjdk-jdk-17-latest:
   directory: '.'
   command: 'install source:jar source:test-jar -pl ''!webapps'' -Pdistro,distro-ce,distro-wildfly'

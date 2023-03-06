@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -17,6 +18,8 @@
     <version.rest-assured>4.5.0</version.rest-assured>
     <!-- override groovy version with the one used by rest-assured -->
     <version.groovy>3.0.9</version.groovy>
+    <version.apache.httpcore>4.4.5</version.apache.httpcore>
+    <version.commons-codec>1.15</version.commons-codec>
   </properties>
 
   <dependencyManagement>
@@ -37,7 +40,7 @@
         <scope>import</scope>
         <type>pom</type>
       </dependency>
-       <dependency>
+      <dependency>
         <groupId>com.sun.xml.bind</groupId>
         <artifactId>jaxb-impl</artifactId>
         <version>${version.xml.jaxb-impl}</version>
@@ -54,6 +57,16 @@
         <scope>import</scope>
         <type>pom</type>
       </dependency>
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpcore</artifactId>
+        <version>${version.apache.httpcore}</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-codec</groupId>
+        <artifactId>commons-codec</artifactId>
+        <version>${version.commons-codec}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -64,5 +77,18 @@
     <module>assembly</module>
     <module>docs</module>
   </modules>
+
+  <profiles>
+    <profile>
+      <id>jdk11-and-onwards</id>
+      <activation>
+        <jdk>[11,)</jdk>
+      </activation>
+      <modules>
+        <module>engine-rest-jakarta</module>
+        <module>assembly-jakarta</module>
+      </modules>
+    </profile>
+  </profiles>
 
 </project>
