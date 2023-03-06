@@ -30,6 +30,7 @@ var angular = require('../../../../camunda-commons-ui/vendor/angular');
 var dataDepend = require('angular-data-depend');
 var camCommon = require('../../../common/scripts/module');
 var lodash = require('../../../../camunda-commons-ui/vendor/lodash');
+const translatePaginationCtrls = require('../../../common/scripts/util/translate-pagination-ctrls');
 
 /**
  * @namespace cam
@@ -96,13 +97,16 @@ module.exports = function(pluginDependencies) {
     '$locationProvider',
     '$animateProvider',
     '$qProvider',
+    '$provide',
     function(
       $modalProvider,
       $tooltipProvider,
       $locationProvider,
       $animateProvider,
-      $qProvider
+      $qProvider,
+      $provide
     ) {
+      translatePaginationCtrls($provide);
       $modalProvider.options = {
         animation: true,
         backdrop: true,

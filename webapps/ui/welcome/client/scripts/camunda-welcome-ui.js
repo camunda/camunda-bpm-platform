@@ -35,6 +35,7 @@ var pagesModule = require('./pages/main');
 var directivesModule = require('./directives/main');
 var servicesModule = require('./services/main');
 var pluginsModule = require('./plugins/main');
+const translatePaginationCtrls = require('../../../common/scripts/util/translate-pagination-ctrls');
 
 module.exports = function(pluginDependencies) {
   var ngDependencies = [
@@ -68,7 +69,15 @@ module.exports = function(pluginDependencies) {
     'UriProvider',
     '$animateProvider',
     '$qProvider',
-    function($routeProvider, UriProvider, $animateProvider, $qProvider) {
+    '$provide',
+    function(
+      $routeProvider,
+      UriProvider,
+      $animateProvider,
+      $qProvider,
+      $provide
+    ) {
+      translatePaginationCtrls($provide);
       $routeProvider.otherwise({redirectTo: '/welcome'});
 
       UriProvider.replace(':appName', 'welcome');
