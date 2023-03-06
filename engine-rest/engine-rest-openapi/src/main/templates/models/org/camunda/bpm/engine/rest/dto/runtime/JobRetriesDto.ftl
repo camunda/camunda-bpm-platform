@@ -8,7 +8,7 @@
         format = "date-time"
         last = true
         desc = "The due date to set for the job. A due date indicates when this job is ready for execution.
-                Due dates in the past will be scheduled for execution." />
+                Jobs with due dates in the past will be scheduled for execution." />
 
 </@lib.dto>
 
