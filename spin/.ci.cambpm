@@ -1,12 +1,12 @@
 @Library("camunda-ci") _
 buildMavenAndDeployToMavenCentral([
-  jdk:8,
+  jdk:11,
   mvn:3.5,
   additionalMvnGoals:'javadoc:javadoc',
   licenseCheck:true,
   publishZipArtifactToCamundaOrg:true,
   extraJdks: [
-   'jdk-11-latest',
+   'jdk-8-latest',
    'jdk-17-latest',
    'openjdk-jdk-8-latest',
    'openjdk-jdk-11-latest',
