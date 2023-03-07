@@ -54,7 +54,7 @@ if (!registryConfigured) {
   );
 }
 
-if (process.argv[2] === 'install') {
+if (registryConfigured && process.argv[2] === 'install') {
   const {xltsVersion, dependencies} = require('../package.json').xlts;
 
   const getNpmPackages = dependencies =>

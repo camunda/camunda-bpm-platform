@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dependencies": "license-checker --production --json --relativeLicensePath",
+    "xlts-install": "node scripts/xlts install",
     "start": "webpack-dev-server --mode development --config webpack.dev.js",
     "test": "karma start karma.config.js",
     "license-check": "node ./scripts/licenseCheck",

@@ -19,6 +19,10 @@
   <properties>
     <version.jetty>9.4.31.v20200723</version.jetty>
 
+    <version.eirslett.frontend.maven.plugin>1.12.1</version.eirslett.frontend.maven.plugin>
+    <version.nodejs>17.9.1</version.nodejs>
+    <version.npm>8.11.0</version.npm>
+
     <web.resources.override>src/main/runtime/default/webapp</web.resources.override>
     <java.resources.override>src/main/runtime/default/resources</java.resources.override>
     <properties.override>src/main/runtime/default/config.properties</properties.override>
@@ -340,6 +344,64 @@
               <descriptors>
                 <descriptor>assembly.xml</descriptor>
               </descriptors>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>com.github.eirslett</groupId>
+        <artifactId>frontend-maven-plugin</artifactId>
+        <version>${version.eirslett.frontend.maven.plugin}</version>
+        <configuration>
+          <nodeVersion>v${version.nodejs}</nodeVersion>
+          <npmVersion>${version.npm}</npmVersion>
+        </configuration>
+        <executions>
+          <execution>
+            <id>install node and npm</id>
+            <goals>
+              <goal>install-node-and-npm</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>npm ci</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <phase>generate-resources</phase>
+            <configuration>
+              <arguments>ci</arguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>Install XLTS.dev dependencies</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <phase>generate-resources</phase>
+            <configuration>
+              <arguments>run xlts-install</arguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>License check</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <phase>generate-resources</phase>
+            <configuration>
+              <arguments>run license-check</arguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>Build</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <phase>generate-resources</phase>
+            <configuration>
+              <arguments>run build</arguments>
             </configuration>
           </execution>
         </executions>
@@ -925,112 +987,6 @@
                 <configuration>
                   <target>
                     <copy file="target/test-classes/camunda.cfg.prefix.xml" tofile="target/test-classes/camunda.cfg.xml" overwrite="true" />
-                  </target>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>node-build-windows</id>
-      <activation>
-        <os>
-          <family>windows</family>
-        </os>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>build-frontend</id>
-                <phase>generate-resources</phase>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-                <inherited>false</inherited>
-                <configuration>
-                  <skip>${skip.frontend.build}</skip>
-                  <target>
-                    <!-- run node build -->
-                    <exec executable="cmd" failonerror="true">
-                      <arg value="/c" />
-                      <arg value="npm" />
-                      <arg value="ci" />
-                    </exec>
-                    <exec executable="cmd" failonerror="true">
-                      <arg value="/c" />
-                      <arg value="node" />
-                      <arg value="scripts/xlts" />
-                      <arg value="install" />
-                    </exec>
-                    <exec executable="cmd" failonerror="true">
-                      <arg value="/c" />
-                      <arg value="npm" />
-                      <arg value="run" />
-                      <arg value="license-check" />
-                    </exec>
-                    <exec executable="cmd" failonerror="true">
-                      <arg value="/c" />
-                      <env key="NODE_ENV" value="production"/>
-                      <arg value="npm" />
-                      <arg value="run" />
-                      <arg value="build" />
-                    </exec>
-                  </target>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>node-build-unix</id>
-      <activation>
-        <os>
-          <family>!windows</family>
-        </os>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>build-frontend</id>
-                <phase>generate-resources</phase>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-                <inherited>false</inherited>
-                <configuration>
-                  <skip>${skip.frontend.build}</skip>
-                  <target>
-                    <!-- run node build -->
-                    <exec executable="npm" failonerror="true">
-                      <arg value="ci" />
-                    </exec>
-                    <exec executable="node" failonerror="true">
-                      <arg value="scripts/xlts" />
-                      <arg value="install" />
-                    </exec>
-                    <exec executable="npm" failonerror="true">
-                      <arg value="run" />
-                      <arg value="license-check" />
-                    </exec>
-                    <exec executable="npm" failonerror="true">
-                      <env key="NODE_ENV" value="production"/>
-                      <arg value="run" />
-                      <arg value="build" />
-                    </exec>
                   </target>
                 </configuration>
               </execution>
