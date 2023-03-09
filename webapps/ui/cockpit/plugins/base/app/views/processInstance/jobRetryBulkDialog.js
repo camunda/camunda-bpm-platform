@@ -44,14 +44,21 @@ module.exports = [
     $scope.radio = {value: 'preserveDueDate'};
     $scope.dueDate = moment().format('YYYY-MM-DDTHH:mm:00');
 
-    $scope.checkDateFormat = date =>
+    const checkDateFormat = ($scope.checkDateFormat = () =>
       /(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)(?:.(\d\d\d)| )?$/.test(
-        date
-      );
+        $scope.dueDate
+      ));
 
     $scope.changeDueDate = dueDate => {
       $scope.dueDate = dueDate;
     };
+
+    $scope.checkRetryDisabled = () =>
+      !$scope.failedJobs ||
+      !$scope.failedJobs.length ||
+      !$scope.selectedFailedJobIds.length ||
+      ($scope.radio.value === 'dueDate' &&
+        (!$scope.dueDate || ($scope.dueDate && !checkDateFormat())));
 
     var jobRetriesData = processData.newChild($scope);
 

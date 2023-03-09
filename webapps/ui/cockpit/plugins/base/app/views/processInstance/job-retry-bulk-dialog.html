@@ -65,7 +65,7 @@
                 </p>
 
                 <p class="help-block"
-                   ng-show="dueDate && !checkDateFormat(dueDate)">
+                   ng-show="dueDate && !checkDateFormat()">
                   {{ 'PLUGIN_JOB_RETRY_DUE_DATE_PATTERN' | translate }}
                 </p>
               </div>
@@ -183,7 +183,7 @@
 
   <button class="btn btn-primary"
           ng-click="retryFailedJobs(selectedFailedJobIds)"
-          ng-disabled="!failedJobs || !failedJobs.length || !selectedFailedJobIds.length || (radio.value === 'dueDate' && (!dueDate || dueDate && !checkDateFormat(dueDate)))"
+          ng-disabled="checkRetryDisabled()"
           ng-hide="status === 'finished' || status === 'performing'">
     {{ 'PLUGIN_JOB_RETRY_BULK_RETRY' | translate }}
     <span ng-if="selectedFailedJobIds.length > 1"

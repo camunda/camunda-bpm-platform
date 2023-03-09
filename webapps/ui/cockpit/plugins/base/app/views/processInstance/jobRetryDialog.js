@@ -45,10 +45,15 @@ module.exports = [
     $scope.radio = {value: 'preserveDueDate'};
     $scope.dueDate = moment().format('YYYY-MM-DDTHH:mm:00');
 
-    $scope.checkDateFormat = date =>
+    const checkDateFormat = ($scope.checkDateFormat = () =>
       /(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)(?:.(\d\d\d)| )?$/.test(
-        date
-      );
+        $scope.dueDate
+      ));
+
+    $scope.checkRetryDisabled = () =>
+      $scope.status === PERFORM ||
+      ($scope.radio.value === 'dueDate' &&
+        (!$scope.dueDate || ($scope.dueDate && !checkDateFormat())));
 
     $scope.changeDueDate = dueDate => {
       $scope.dueDate = dueDate;
