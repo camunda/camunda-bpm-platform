@@ -16,9 +16,11 @@
  */
 package org.camunda.bpm.webapp.impl.security.auth;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Date;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -35,10 +37,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import static org.assertj.core.api.Assertions.assertThat;
 import org.springframework.mock.web.MockHttpServletRequest;
-
-import java.util.Date;
 
 /**
  * @author Thorben Lindhauer
@@ -92,12 +91,12 @@ public class UserAuthenticationResourceTest {
     authorizationService.saveAuthorization(authorization);
 
     processEngineConfiguration.setAuthorizationEnabled(true);
-    setAuthentication("jonny", "UserAuthenticationResourceTest-engine");
+    setAuthentication("jonny", "webapps-test-engine");
 
     // when
     UserAuthenticationResource authResource = new UserAuthenticationResource();
     authResource.request = new MockHttpServletRequest();
-    Response response = authResource.doLogin("UserAuthenticationResourceTest-engine", "tasklist", "jonny", "jonnyspassword");
+    Response response = authResource.doLogin("webapps-test-engine", "tasklist", "jonny", "jonnyspassword");
 
     // then
     Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
@@ -118,7 +117,7 @@ public class UserAuthenticationResourceTest {
     authorizationService.saveAuthorization(authorization);
 
     processEngineConfiguration.setAuthorizationEnabled(true);
-    setAuthentication("jonny", "UserAuthenticationResourceTest-engine");
+    setAuthentication("jonny", "webapps-test-engine");
 
     // when
     UserAuthenticationResource authResource = new UserAuthenticationResource();
@@ -126,13 +125,13 @@ public class UserAuthenticationResourceTest {
     String oldSessionId = authResource.request.getSession().getId();
 
     // first login session
-    Response response = authResource.doLogin("UserAuthenticationResourceTest-engine", "tasklist", "jonny", "jonnyspassword");
+    Response response = authResource.doLogin("webapps-test-engine", "tasklist", "jonny", "jonnyspassword");
     String newSessionId = authResource.request.getSession().getId();
 
-    authResource.doLogout("UserAuthenticationResourceTest-engine");
+    authResource.doLogout("webapps-test-engine");
 
     // second login session
-    response = authResource.doLogin("UserAuthenticationResourceTest-engine", "tasklist", "jonny", "jonnyspassword");
+    response = authResource.doLogin("webapps-test-engine", "tasklist", "jonny", "jonnyspassword");
     String newestSessionId = authResource.request.getSession().getId();
 
     // then
@@ -149,12 +148,12 @@ public class UserAuthenticationResourceTest {
     identityService.saveUser(jonny);
 
     processEngineConfiguration.setAuthorizationEnabled(true);
-    setAuthentication("jonny", "UserAuthenticationResourceTest-engine");
+    setAuthentication("jonny", "webapps-test-engine");
 
     // when
     UserAuthenticationResource authResource = new UserAuthenticationResource();
     authResource.request = new MockHttpServletRequest();
-    Response response = authResource.doLogin("UserAuthenticationResourceTest-engine", "tasklist", "jonny", "jonnyspassword");
+    Response response = authResource.doLogin("webapps-test-engine", "tasklist", "jonny", "jonnyspassword");
 
     // then
     Assert.assertEquals(Status.FORBIDDEN.getStatusCode(), response.getStatus());
@@ -168,12 +167,12 @@ public class UserAuthenticationResourceTest {
     identityService.saveUser(jonny);
 
     processEngineConfiguration.setAuthorizationEnabled(false);
-    setAuthentication("jonny", "UserAuthenticationResourceTest-engine");
+    setAuthentication("jonny", "webapps-test-engine");
 
     // when
     UserAuthenticationResource authResource = new UserAuthenticationResource();
     authResource.request = new MockHttpServletRequest();
-    Response response = authResource.doLogin("UserAuthenticationResourceTest-engine", "tasklist", "jonny", "jonnyspassword");
+    Response response = authResource.doLogin("webapps-test-engine", "tasklist", "jonny", "jonnyspassword");
 
     // then
     Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
@@ -193,7 +192,7 @@ public class UserAuthenticationResourceTest {
     // when
     UserAuthenticationResource authResource = new UserAuthenticationResource();
     authResource.request = request;
-    authResource.doLogin("UserAuthenticationResourceTest-engine", "tasklist", "jonny", "jonnyspassword");
+    authResource.doLogin("webapps-test-engine", "tasklist", "jonny", "jonnyspassword");
 
     // then
     UserAuthentication userAuthentication = AuthenticationUtil.getAuthsFromSession(request.getSession())
@@ -205,7 +204,7 @@ public class UserAuthenticationResourceTest {
 
   protected void setAuthentication(String user, String engineName) {
     Authentications authentications = new Authentications();
-    authentications.addOrReplace(new UserAuthentication("jonny", "UserAuthenticationResourceTest-engine"));
+    authentications.addOrReplace(new UserAuthentication(user, engineName));
     Authentications.setCurrent(authentications);
   }
 

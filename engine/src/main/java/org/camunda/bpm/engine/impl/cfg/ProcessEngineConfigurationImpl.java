@@ -42,11 +42,9 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
-
 import javax.naming.InitialContext;
 import javax.script.ScriptEngineManager;
 import javax.sql.DataSource;
-
 import org.apache.ibatis.builder.xml.XMLConfigBuilder;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.apache.ibatis.mapping.Environment;
@@ -975,6 +973,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected int loginDelayFactor = 2;
   protected int loginDelayMaxTime = 60;
   protected int loginDelayBase = 3;
+
+  // webapps logging
+  protected boolean webappsAuthenticationLoggingEnabled = false;
 
   // max results limit
   protected int queryMaxResultsLimit = Integer.MAX_VALUE;
@@ -5094,6 +5095,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setLoginDelayBase(int loginInitialDelay) {
     this.loginDelayBase = loginInitialDelay;
+  }
+
+  public boolean isWebappsAuthenticationLoggingEnabled() {
+    return webappsAuthenticationLoggingEnabled;
+  }
+
+  public void setWebappsAuthenticationLoggingEnabled(boolean webappsAuthenticationLoggingEnabled) {
+    this.webappsAuthenticationLoggingEnabled = webappsAuthenticationLoggingEnabled;
   }
 
   public List<String> getAdminGroups() {

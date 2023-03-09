@@ -20,8 +20,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
-
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.FormParam;
@@ -32,11 +30,11 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.Tenant;
-import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.webapp.impl.WebappLogger;
 import org.camunda.bpm.webapp.impl.util.ProcessEngineUtil;
 import org.camunda.bpm.webapp.impl.util.ServletContextUtil;
 
@@ -49,7 +47,7 @@ import org.camunda.bpm.webapp.impl.util.ServletContextUtil;
 @Path(UserAuthenticationResource.PATH)
 public class UserAuthenticationResource {
 
-  protected final static Logger LOGGER = Logger.getLogger(UserAuthenticationResource.class.getName());
+  protected final static WebappLogger LOGGER = WebappLogger.INSTANCE;
 
   public static final String PATH = "/auth/user";
 
@@ -84,7 +82,7 @@ public class UserAuthenticationResource {
 
     final ProcessEngine processEngine = ProcessEngineUtil.lookupProcessEngine(engineName);
     if(processEngine == null) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, "Process engine with name "+engineName+" does not exist");
+      throw LOGGER.invalidRequestEngineNotFoundForName(engineName);
     }
 
     // make sure authentication is executed without authentication :)
@@ -94,6 +92,9 @@ public class UserAuthenticationResource {
     boolean isPasswordValid = processEngine.getIdentityService().checkPassword(username, password);
 
     if (!isPasswordValid) {
+      if(isWebappsAuthenticationLoggingEnabled(processEngine)) {
+        LOGGER.infoWebappFailedLogin(username);
+      }
       return unauthorized();
     }
 
@@ -102,7 +103,7 @@ public class UserAuthenticationResource {
     ServletContext servletContext = request.getServletContext();
     Date cacheValidationTime = ServletContextUtil.getAuthCacheValidationTime(servletContext);
     if (cacheValidationTime != null) {
-      LOGGER.finest("Cache validation time: " + cacheValidationTime);
+      LOGGER.traceCacheValidationTime(cacheValidationTime);
       authentication.setCacheValidationTime(cacheValidationTime);
     }
 
@@ -116,6 +117,9 @@ public class UserAuthenticationResource {
       AuthenticationUtil.revalidateSession(request, authentication);
     }
 
+    if(isWebappsAuthenticationLoggingEnabled(processEngine)) {
+      LOGGER.infoWebappSuccessfulLogin(username);
+    }
     return Response.ok(AuthenticationDto.fromAuthentication(authentication)).build();
   }
 
@@ -124,7 +128,7 @@ public class UserAuthenticationResource {
       .groupMember(userId)
       .list();
 
-    List<String> groupIds = new ArrayList<String>();
+    List<String> groupIds = new ArrayList<>();
     for (Group group : groups) {
       groupIds.add(group.getId());
     }
@@ -137,7 +141,7 @@ public class UserAuthenticationResource {
       .includingGroupsOfUser(true)
       .list();
 
-    List<String> tenantIds = new ArrayList<String>();
+    List<String> tenantIds = new ArrayList<>();
     for(Tenant tenant : tenants) {
       tenantIds.add(tenant.getId());
     }
@@ -149,8 +153,19 @@ public class UserAuthenticationResource {
   public Response doLogout(@PathParam("processEngineName") String engineName) {
     final Authentications authentications = Authentications.getCurrent();
 
+    ProcessEngine processEngine = ProcessEngineUtil.lookupProcessEngine(engineName);
+    if(processEngine == null) {
+      throw LOGGER.invalidRequestEngineNotFoundForName(engineName);
+    }
+
     // remove authentication for process engine
-    authentications.removeByEngineName(engineName);
+    if(authentications != null) {
+      UserAuthentication removedAuthentication = authentications.removeByEngineName(engineName);
+
+      if(isWebappsAuthenticationLoggingEnabled(processEngine) && removedAuthentication != null) {
+        LOGGER.infoWebappLogout(removedAuthentication.getName());
+      }
+    }
 
     return Response.ok().build();
   }
@@ -165,5 +180,9 @@ public class UserAuthenticationResource {
 
   protected Response notFound() {
     return Response.status(Status.NOT_FOUND).build();
+  }
+
+  private boolean isWebappsAuthenticationLoggingEnabled(ProcessEngine processEngine) {
+    return ((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration()).isWebappsAuthenticationLoggingEnabled();
   }
 }

@@ -20,10 +20,10 @@ import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
 import static org.camunda.bpm.engine.authorization.Permissions.ALL;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.ServiceLoader;
-
 import javax.servlet.ServletException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -34,7 +34,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.Providers;
-
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -49,10 +48,9 @@ import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.impl.UserRestServiceImpl;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 import org.camunda.bpm.engine.rest.util.ProvidersUtil;
+import org.camunda.bpm.webapp.impl.WebappLogger;
 import org.camunda.bpm.webapp.impl.security.SecurityActions;
 import org.camunda.bpm.webapp.impl.security.SecurityActions.SecurityAction;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * <p>Jax RS resource allowing to perform the setup steps.</p>
@@ -66,6 +64,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Path("/setup/{engine}")
 public class SetupResource {
 
+  protected final static WebappLogger LOGGER = WebappLogger.INSTANCE;
+
   @Context
   protected Providers providers;
 
@@ -77,7 +77,7 @@ public class SetupResource {
 
     final ProcessEngine processEngine = lookupProcessEngine(processEngineName);
     if(processEngine == null) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, "Process Engine '"+processEngineName+"' does not exist.");
+      throw LOGGER.invalidRequestEngineNotFoundForName(processEngineName);
     }
 
     SecurityActions.runWithoutAuthentication(new SecurityAction<Void>() {
