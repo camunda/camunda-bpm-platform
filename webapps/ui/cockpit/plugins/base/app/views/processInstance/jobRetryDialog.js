@@ -17,6 +17,8 @@
 
 'use strict';
 
+const moment = require('moment');
+
 module.exports = [
   '$scope',
   '$location',
@@ -25,6 +27,7 @@ module.exports = [
   '$uibModalInstance',
   'incident',
   '$translate',
+  'fixDate',
   function(
     $scope,
     $location,
@@ -32,11 +35,29 @@ module.exports = [
     JobResource,
     $modalInstance,
     incident,
-    $translate
+    $translate,
+    fixDate
   ) {
     var FINISHED = 'finished',
       PERFORM = 'performing',
       FAILED = 'failed';
+
+    $scope.radio = {value: 'preserveDueDate'};
+    $scope.dueDate = moment().format('YYYY-MM-DDTHH:mm:00');
+
+    const checkDateFormat = ($scope.checkDateFormat = () =>
+      /(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)(?:.(\d\d\d)| )?$/.test(
+        $scope.dueDate
+      ));
+
+    $scope.checkRetryDisabled = () =>
+      $scope.status === PERFORM ||
+      ($scope.radio.value === 'dueDate' &&
+        (!$scope.dueDate || ($scope.dueDate && !checkDateFormat())));
+
+    $scope.changeDueDate = dueDate => {
+      $scope.dueDate = dueDate;
+    };
 
     $scope.$on('$routeChangeStart', function() {
       $modalInstance.close($scope.status);
@@ -45,13 +66,19 @@ module.exports = [
     $scope.incrementRetry = function() {
       $scope.status = PERFORM;
 
+      let payload = {
+        retries: 1
+      };
+
+      if ($scope.radio.value === 'dueDate') {
+        payload = {...payload, dueDate: fixDate($scope.dueDate)};
+      }
+
       JobResource.setRetries(
         {
           id: incident.configuration
         },
-        {
-          retries: 1
-        },
+        payload,
         function() {
           $scope.status = FINISHED;
 

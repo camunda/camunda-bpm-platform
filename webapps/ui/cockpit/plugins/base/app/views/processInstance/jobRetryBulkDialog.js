@@ -18,6 +18,7 @@
 'use strict';
 
 var angular = require('angular');
+var moment = require('moment');
 
 module.exports = [
   '$scope',
@@ -28,6 +29,7 @@ module.exports = [
   'processData',
   'processInstance',
   '$translate',
+  'fixDate',
   function(
     $scope,
     $q,
@@ -36,8 +38,28 @@ module.exports = [
     $modalInstance,
     processData,
     processInstance,
-    $translate
+    $translate,
+    fixDate
   ) {
+    $scope.radio = {value: 'preserveDueDate'};
+    $scope.dueDate = moment().format('YYYY-MM-DDTHH:mm:00');
+
+    const checkDateFormat = ($scope.checkDateFormat = () =>
+      /(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)(?:.(\d\d\d)| )?$/.test(
+        $scope.dueDate
+      ));
+
+    $scope.changeDueDate = dueDate => {
+      $scope.dueDate = dueDate;
+    };
+
+    $scope.checkRetryDisabled = () =>
+      !$scope.failedJobs ||
+      !$scope.failedJobs.length ||
+      !$scope.selectedFailedJobIds.length ||
+      ($scope.radio.value === 'dueDate' &&
+        (!$scope.dueDate || ($scope.dueDate && !checkDateFormat())));
+
     var jobRetriesData = processData.newChild($scope);
 
     var jobPages = ($scope.jobPages = {size: 5, total: 0});
@@ -57,12 +79,17 @@ module.exports = [
       SUCCESS = 'successful',
       FAILED = 'failed';
 
-    var executionIdToInstanceMap = jobRetriesData.observe(
-      'executionIdToInstanceMap',
-      function(executionMap) {
+    let executionIdToInstanceMap = null;
+    try {
+      jobRetriesData.observe('executionIdToInstanceMap', function(
+        executionMap
+      ) {
         executionIdToInstanceMap = executionMap;
-      }
-    );
+        $scope.runtimeView = true;
+      });
+    } catch (ignored) {
+      $scope.runtimeView = false;
+    }
 
     $scope.$on('$routeChangeStart', function() {
       $modalInstance.close($scope.status);
@@ -117,8 +144,9 @@ module.exports = [
             .$promise.then(function(response) {
               for (var i = 0, job; (job = response[i]); i++) {
                 jobIdToFailedJobMap[job.id] = job;
-                var instance = executionIdToInstanceMap[job.executionId];
-                job.instance = instance;
+                if ($scope.runtimeView) {
+                  job.instance = executionIdToInstanceMap[job.executionId];
+                }
                 job.selected = selectedFailedJobIds.indexOf(job.id) > -1;
               }
 
@@ -180,7 +208,6 @@ module.exports = [
         if ($scope.form.allJobsSelected === true) {
           $scope.form.allJobsSelected = false;
         }
-        return;
       }
     });
 
@@ -218,13 +245,20 @@ module.exports = [
 
       function retryJob(job) {
         job.status = PERFORM;
+
+        let payload = {
+          retries: 1
+        };
+
+        if ($scope.radio.value === 'dueDate') {
+          payload = {...payload, dueDate: fixDate($scope.dueDate)};
+        }
+
         JobResource.setRetries(
           {
             id: job.id
           },
-          {
-            retries: 1
-          },
+          payload,
           function() {
             job.status = SUCCESS;
 

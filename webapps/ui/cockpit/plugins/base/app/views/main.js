@@ -85,7 +85,7 @@ variableInstancesTab(ngModule);
 ngModule.config(incidentsTab);
 calledProcessInstanceTable(ngModule);
 userTasksTable(ngModule);
-jobRetryBulkAction(ngModule);
+jobRetryBulkAction(ngModule, 'cockpit.processInstance.runtime.action');
 ngModule.controller('JobRetriesController', jobRetryBulkDialog);
 ngModule.controller('JobRetryController', jobRetryDialog);
 ngModule.controller('ExternalTaskRetryController', externalTaskRetryDialog);
