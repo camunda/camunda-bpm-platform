@@ -18,13 +18,11 @@
   <dependencyManagement>
     <dependencies>
 
-      <!-- https://jira.camunda.com/browse/CAM-13717 -->
+      <!-- Explicit override Snakeyaml version before spring-boot-dependencies -->
       <dependency>
-        <groupId>org.glassfish.jersey</groupId>
-        <artifactId>jersey-bom</artifactId>
-        <version>${version.jersey2}</version>
-        <scope>import</scope>
-        <type>pom</type>
+        <groupId>org.yaml</groupId>
+        <artifactId>snakeyaml</artifactId>
+        <version>${version.snakeyaml}</version>
       </dependency>
 
       <dependency>
