@@ -274,13 +274,14 @@ module.exports = [
            * expose current task as scope variable
            */
           $scope.taskState = taskData.observe('task', function(task) {
+            const oldTask = $scope.task;
             $scope.task = task;
             task && setLink(task);
 
             // check if the current tab is an external plugin and select a deep copy to re-render the plugin
             const taskDetailsTab = $scope.selectedTaskDetailTab;
 
-            if (taskDetailsTab.pluginPoint) {
+            if (oldTask?.id !== task.id && taskDetailsTab.pluginPoint) {
               $scope.selectTaskDetailTab(angular.copy(taskDetailsTab));
             }
           });
