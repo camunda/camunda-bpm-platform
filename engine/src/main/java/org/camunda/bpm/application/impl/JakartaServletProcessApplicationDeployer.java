@@ -40,7 +40,7 @@ public class JakartaServletProcessApplicationDeployer extends AbstractServletPro
   @Override
   public void onStartup(Set<Class<?>> c, ServletContext ctx) throws ServletException {
     try {
-      onStartUp(c, ctx.getContextPath(), ServletProcessApplication.class, ctx::addListener);
+      onStartUp(c, ctx.getContextPath(), JakartaServletProcessApplication.class, ctx::addListener);
     } catch (Exception e) {
       if (e instanceof ServletException) {
         throw (ServletException) e;
