@@ -30,33 +30,25 @@ const PRODUCTION_LICENSES = [
   'ISC',
   'MIT',
   'WTFPL',
-  'SIL'
+  'OFL-1.1'
+];
+
+const DEV_LICENSES = [
+  'CC-BY-3.0',
+  'CC-BY-4.0',
+  'ODC-By-1.0',
+  'Unlicense',
+  'Zlib'
 ];
 
 const ALLOWED_PACKAGES = [
-  'extract-loader',
-  'dmn-js',
-  'bpmn-js',
-  '@bpmn-io/form-js',
-  'mousetrap',
-  'cmmn-js',
-  'inherits-browser',
-  '@bpmn-io/form-js-playground',
-  '@bpmn-io/form-js-editor',
-  '@bpmn-io/form-js-viewer',
-  'dmn-js-literal-expression',
-  'dmn-js-drd',
-  'dmn-js-decision-table',
-  'dmn-js-shared',
-  'inherits',
-  'hat',
-  'caniuse-lite@1.0.30001458'
+  'argparse@2.0.1',
+  'caniuse-lite@1.0.30001458', // uses CC BY 4.0, permitted as of https://jira.camunda.com/browse/OB-26
 ];
 
-const parseResults = (resolve, reject) =>
+const parseResults = (allowedLicenses, resolve, reject) =>
   function (err, packages) {
     if (err) {
-      console.log(err);
       throw err;
     } else {
       const entries = Object.entries(packages);
@@ -83,11 +75,11 @@ const parseResults = (resolve, reject) =>
         licenses = typeof licenses === 'object' ? licenses : [licenses];
 
         let approved = hasMultipleLicenses
-          ? licenses.every((license) => PRODUCTION_LICENSES.includes(license))
-          : licenses.some((license) => PRODUCTION_LICENSES.includes(license));
+          ? licenses.every((license) => allowedLicenses.includes(license))
+          : licenses.some((license) => allowedLicenses.includes(license));
 
         if (!approved) {
-          licenseWarning += `${id} uses ${licenses.join(' OR/AND ')}\n`;
+          licenseWarning += `${id} uses ${licenses.join(' OR ')}\n`;
         }
       }
 
@@ -106,10 +98,27 @@ if (require.main === module) {
   checker.init(
     {
       start: path.resolve(__dirname, '..'),
-      excludePrivatePackages: true,
       production: true,
+      excludePrivatePackages: true,
     },
     parseResults(
+      PRODUCTION_LICENSES,
+      () => console.log('License check passed'),
+      (warn) => {
+        console.warn('License check did not pass');
+        console.warn(warn);
+        process.exit(1);
+      }
+    )
+  );
+  checker.init(
+    {
+      start: path.resolve(__dirname, '..'),
+      development: true,
+      excludePrivatePackages: true,
+    },
+    parseResults(
+      [...PRODUCTION_LICENSES, ...DEV_LICENSES],
       () => console.log('License check passed'),
       (warn) => {
         console.warn('License check did not pass');
@@ -119,7 +128,3 @@ if (require.main === module) {
     )
   );
 }
-
-module.exports = {
-  allowedPackages: ALLOWED_PACKAGES,
-};
