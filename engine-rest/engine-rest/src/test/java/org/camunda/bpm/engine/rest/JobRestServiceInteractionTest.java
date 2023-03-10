@@ -143,7 +143,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
   }
 
   @Test
-  public void testSetJobRetries() {
+  public void testSetRetries() {
     Map<String, Object> retriesVariableJson = new HashMap<>();
     retriesVariableJson.put("retries", MockProvider.EXAMPLE_JOB_RETRIES);
 
@@ -158,13 +158,12 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
     verify(mockManagementService).setJobRetries(MockProvider.EXAMPLE_JOB_RETRIES);
     verify(mockSetJobRetriesBuilder).jobId(MockProvider.EXAMPLE_JOB_ID);
-    verify(mockSetJobRetriesBuilder).dueDate(null);
     verify(mockSetJobRetriesBuilder).execute();
     verifyNoMoreInteractions(mockSetJobRetriesBuilder);
   }
 
   @Test
-  public void testSetJobRetriesWithDueDate() {
+  public void testSetRetriesWithDueDate() {
     Map<String, Object> retriesVariableJson = new HashMap<>();
     retriesVariableJson.put("retries", MockProvider.EXAMPLE_JOB_RETRIES);
     Date newDueDate = new Date(1675752840000L);
@@ -186,7 +185,28 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
   }
 
   @Test
-  public void testSetJobRetriesNonExistentJob() {
+  public void testSetRetriesWithNullDueDate() {
+    Map<String, Object> retriesVariableJson = new HashMap<>();
+    retriesVariableJson.put("retries", MockProvider.EXAMPLE_JOB_RETRIES);
+    retriesVariableJson.put("dueDate", null);
+
+    given()
+    .pathParam("id", MockProvider.EXAMPLE_JOB_ID)
+    .contentType(ContentType.JSON)
+    .body(retriesVariableJson).then().expect()
+    .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+    .put(JOB_RESOURCE_SET_RETRIES_URL);
+
+    verify(mockManagementService).setJobRetries(MockProvider.EXAMPLE_JOB_RETRIES);
+    verify(mockSetJobRetriesBuilder).jobId(MockProvider.EXAMPLE_JOB_ID);
+    verify(mockSetJobRetriesBuilder).dueDate(null);
+    verify(mockSetJobRetriesBuilder).execute();
+    verifyNoMoreInteractions(mockSetJobRetriesBuilder);
+  }
+
+  @Test
+  public void testSetRetriesNonExistentJob() {
     String expectedMessage = "No job found with id '" + MockProvider.NON_EXISTING_JOB_ID + "'.";
 
     doThrow(new ProcessEngineException(expectedMessage)).when(mockSetJobRetriesBuilder).execute();
@@ -207,13 +227,12 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
     verify(mockManagementService).setJobRetries(MockProvider.EXAMPLE_JOB_RETRIES);
     verify(mockSetJobRetriesBuilder).jobId(MockProvider.NON_EXISTING_JOB_ID);
-    verify(mockSetJobRetriesBuilder).dueDate(null);
     verify(mockSetJobRetriesBuilder).execute();
     verifyNoMoreInteractions(mockSetJobRetriesBuilder);
   }
 
   @Test
-  public void testSetJobRetriesNegativeRetries() {
+  public void testSetRetriesNegativeRetries() {
 
     String expectedMessage = "The number of job retries must be a non-negative Integer, but '" + MockProvider.EXAMPLE_NEGATIVE_JOB_RETRIES
         + "' has been provided.";
@@ -239,7 +258,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
   }
 
   @Test
-  public void testSetJobRetriesThrowsAuthorizationException() {
+  public void testSetRetriesThrowsAuthorizationException() {
     String message = "expected exception";
     doThrow(new AuthorizationException(message)).when(mockManagementService).setJobRetries(anyInt());
 

@@ -16,12 +16,15 @@
  */
 package org.camunda.bpm.engine.rest.dto.runtime;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.Date;
 
+@JsonIgnoreProperties(value = { "dueDateSet" })
 public class RetriesDto {
 
   protected Integer retries;
   protected Date dueDate;
+  protected boolean dueDateSet = false; // internal property to distinguish between missing due date and null due date parameters
 
   public Integer getRetries() {
     return retries;
@@ -36,6 +39,11 @@ public class RetriesDto {
   }
 
   public void setDueDate(Date dueDate) {
+    this.dueDateSet = true;
     this.dueDate = dueDate;
+  }
+
+  public boolean isDueDateSet() {
+    return dueDateSet;
   }
 }
