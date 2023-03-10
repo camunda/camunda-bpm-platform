@@ -19,7 +19,6 @@ package org.camunda.bpm.engine.impl.el;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.camunda.bpm.dmn.engine.impl.spi.el.ElProvider;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
@@ -124,7 +123,7 @@ public class JuelExpressionManager implements ExpressionManager, ElProviderCompa
     elContext.putContext(VariableScope.class, variableScope);
     return elContext;
   }
- 
+
   protected void ensureInitialized() {
     if (!initialized) {
       synchronized (this) {
@@ -160,14 +159,18 @@ public class JuelExpressionManager implements ExpressionManager, ElProviderCompa
 
     return elResolver;
   }
-  
+
   protected FunctionMapper createFunctionMapper() {
     FunctionMapper functionMapper = new FunctionMapper() {
       @Override
       public Method resolveFunction(String prefix, String localName) {
-        return functions.get(localName);
+        String fullName = localName;
+        if (prefix != null && !prefix.trim().isEmpty()) {
+          fullName = prefix + ":" + localName;
+        }
+        return functions.get(fullName);
       }
-      
+
     };
     return functionMapper;
   }
