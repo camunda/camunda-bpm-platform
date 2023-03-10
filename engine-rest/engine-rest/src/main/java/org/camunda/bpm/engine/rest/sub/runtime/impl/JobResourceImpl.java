@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.management.SetJobRetriesBuilder;
 import org.camunda.bpm.engine.rest.dto.runtime.JobDto;
 import org.camunda.bpm.engine.rest.dto.runtime.JobDuedateDto;
 import org.camunda.bpm.engine.rest.dto.runtime.JobSuspensionStateDto;
@@ -72,10 +73,13 @@ public class JobResourceImpl implements JobResource {
   public void setJobRetries(RetriesDto dto) {
     try {
       ManagementService managementService = engine.getManagementService();
-      managementService.setJobRetries(dto.getRetries())
-        .jobId(jobId)
-        .dueDate(dto.getDueDate())
-        .execute();
+      SetJobRetriesBuilder builder = managementService
+          .setJobRetries(dto.getRetries())
+          .jobId(jobId);
+      if (dto.isDueDateSet()) {
+        builder.dueDate(dto.getDueDate());
+      }
+      builder.execute();
     } catch (AuthorizationException e) {
       throw e;
     } catch (ProcessEngineException e) {

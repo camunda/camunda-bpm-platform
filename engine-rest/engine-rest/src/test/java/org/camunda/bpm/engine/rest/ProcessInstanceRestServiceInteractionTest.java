@@ -3255,17 +3255,18 @@ public class ProcessInstanceRestServiceInteractionTest extends
     messageBodyJson.put(RETRIES, MockProvider.EXAMPLE_JOB_RETRIES);
 
     Response response = given()
-        .contentType(ContentType.JSON).body(messageBodyJson)
+        .contentType(ContentType.JSON)
+        .body(messageBodyJson)
         .then().expect()
-        .statusCode(Status.OK.getStatusCode())
-        .when().post(SET_JOB_RETRIES_ASYNC_URL);
+          .statusCode(Status.OK.getStatusCode())
+        .when()
+          .post(SET_JOB_RETRIES_ASYNC_URL);
 
     verifyBatchJson(response.asString());
 
     verify(mockManagementService, times(1)).setJobRetriesByProcessAsync(eq(MockProvider.EXAMPLE_JOB_RETRIES));
     verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceIds(Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID));
     verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceQuery(null);
-    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).dueDate(null);
     verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).executeAsync();
     verifyNoMoreInteractions(mockSetJobRetriesByProcessAsyncBuilder);
   }
@@ -3280,7 +3281,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
     Date newDueDate = new Date(1675752840000L);
     messageBodyJson.put("dueDate", newDueDate);
 
-    Response response = 
+    Response response =
         given()
           .contentType(ContentType.JSON).body(messageBodyJson)
         .then().expect()
@@ -3294,6 +3295,33 @@ public class ProcessInstanceRestServiceInteractionTest extends
     verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceIds(Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID));
     verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceQuery(null);
     verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).dueDate(eq(newDueDate));
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).executeAsync();
+    verifyNoMoreInteractions(mockSetJobRetriesByProcessAsyncBuilder);
+  }
+
+  @Test
+  public void testSetRetriesByProcessAsyncWithNullDueDate() {
+    List<String> ids = Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+
+    Map<String, Object> messageBodyJson = new HashMap<>();
+    messageBodyJson.put("processInstances", ids);
+    messageBodyJson.put(RETRIES, MockProvider.EXAMPLE_JOB_RETRIES);
+    messageBodyJson.put("dueDate", null);
+
+    Response response =
+        given()
+          .contentType(ContentType.JSON).body(messageBodyJson)
+        .then().expect()
+          .statusCode(Status.OK.getStatusCode())
+        .when()
+          .post(SET_JOB_RETRIES_ASYNC_URL);
+
+    verifyBatchJson(response.asString());
+
+    verify(mockManagementService, times(1)).setJobRetriesByProcessAsync(eq(MockProvider.EXAMPLE_JOB_RETRIES));
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceIds(Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID));
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceQuery(null);
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).dueDate(null);
     verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).executeAsync();
     verifyNoMoreInteractions(mockSetJobRetriesByProcessAsyncBuilder);
   }
@@ -3332,7 +3360,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
     ProcessInstanceQueryDto query = new ProcessInstanceQueryDto();
     messageBodyJson.put("processInstanceQuery", query);
 
-    Response response = 
+    Response response =
         given()
           .contentType(ContentType.JSON).body(messageBodyJson)
         .then().expect()
@@ -3345,7 +3373,6 @@ public class ProcessInstanceRestServiceInteractionTest extends
     verify(mockManagementService, times(1)).setJobRetriesByProcessAsync(eq(MockProvider.EXAMPLE_JOB_RETRIES));
     verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceIds(null);
     verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceQuery(any(ProcessInstanceQuery.class));
-    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).dueDate(null);
     verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).executeAsync();
     verifyNoMoreInteractions(mockSetJobRetriesByProcessAsyncBuilder);
   }
@@ -3389,10 +3416,12 @@ public class ProcessInstanceRestServiceInteractionTest extends
     messageBodyJson.put("processInstanceQuery", query);
 
     given()
-        .contentType(ContentType.JSON).body(messageBodyJson)
-        .then().expect()
-        .statusCode(Status.BAD_REQUEST.getStatusCode())
-        .when().post(SET_JOB_RETRIES_ASYNC_URL);
+      .contentType(ContentType.JSON)
+      .body(messageBodyJson)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when()
+      .post(SET_JOB_RETRIES_ASYNC_URL);
 
     verify(mockManagementService, times(1)).setJobRetriesByProcessAsync(eq(MockProvider.EXAMPLE_NEGATIVE_JOB_RETRIES));
     verifyNoMoreInteractions(mockSetJobRetriesByProcessAsyncBuilder);
@@ -3413,14 +3442,14 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .contentType(ContentType.JSON).body(body)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
-    .when().post(SET_JOB_RETRIES_ASYNC_HIST_QUERY_URL);
+    .when()
+      .post(SET_JOB_RETRIES_ASYNC_HIST_QUERY_URL);
 
     verifyBatchJson(response.asString());
 
     verify(mockManagementService, times(1)).setJobRetriesByProcessAsync(eq(MockProvider.EXAMPLE_JOB_RETRIES));
     verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceIds(null);
     verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).historicProcessInstanceQuery(any());
-    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).dueDate(null);
     verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).executeAsync();
     verifyNoMoreInteractions(mockSetJobRetriesByProcessAsyncBuilder);
   }
@@ -3438,7 +3467,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
     Date newDueDate = new Date(1675752840000L);
     body.setDueDate(newDueDate);
 
-    Response response = 
+    Response response =
         given()
           .contentType(ContentType.JSON).body(body)
         .then().expect()
@@ -3457,13 +3486,43 @@ public class ProcessInstanceRestServiceInteractionTest extends
   }
 
   @Test
-  public void testSetRetriesByProcessAsyncHistoricQueryBasedWithProcessInstanceIds() {
+  public void testSetRetriesByProcessAsyncHistoricQueryBasedWithQueryAndNullDueDate() {
+    HistoricProcessInstanceQuery mockedHistoricProcessInstanceQuery = mock(HistoricProcessInstanceQuery.class);
+    when(historyServiceMock.createHistoricProcessInstanceQuery()).thenReturn(mockedHistoricProcessInstanceQuery);
+    List<HistoricProcessInstance> historicProcessInstances = MockProvider.createMockRunningHistoricProcessInstances();
+    when(mockedHistoricProcessInstanceQuery.list()).thenReturn(historicProcessInstances);
+
     SetJobRetriesByProcessDto body = new SetJobRetriesByProcessDto();
     body.setRetries(MockProvider.EXAMPLE_JOB_RETRIES);
-    body.setProcessInstances(Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID));
+    body.setHistoricProcessInstanceQuery(new HistoricProcessInstanceQueryDto());
+    body.setDueDate(null);
+
+    Response response =
+        given()
+          .contentType(ContentType.JSON).body(body)
+        .then().expect()
+          .statusCode(Status.OK.getStatusCode())
+        .when()
+          .post(SET_JOB_RETRIES_ASYNC_HIST_QUERY_URL);
+
+    verifyBatchJson(response.asString());
+
+    verify(mockManagementService, times(1)).setJobRetriesByProcessAsync(eq(MockProvider.EXAMPLE_JOB_RETRIES));
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceIds(null);
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).historicProcessInstanceQuery(any());
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).dueDate(null);
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).executeAsync();
+    verifyNoMoreInteractions(mockSetJobRetriesByProcessAsyncBuilder);
+  }
+
+  @Test
+  public void testSetRetriesByProcessAsyncHistoricQueryBasedWithProcessInstanceIds() {
+    Map<String, Object> messageBodyJson = new HashMap<>();
+    messageBodyJson.put(RETRIES, MockProvider.EXAMPLE_JOB_RETRIES);
+    messageBodyJson.put("processInstances", Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID));
 
     given()
-      .contentType(ContentType.JSON).body(body)
+      .contentType(ContentType.JSON).body(messageBodyJson)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
     .when().post(SET_JOB_RETRIES_ASYNC_HIST_QUERY_URL);
@@ -3471,7 +3530,6 @@ public class ProcessInstanceRestServiceInteractionTest extends
     verify(mockManagementService, times(1)).setJobRetriesByProcessAsync(eq(MockProvider.EXAMPLE_JOB_RETRIES));
     verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceIds(Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID));
     verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).historicProcessInstanceQuery(null);
-    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).dueDate(null);
     verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).executeAsync();
     verifyNoMoreInteractions(mockSetJobRetriesByProcessAsyncBuilder);
   }
@@ -3520,7 +3578,6 @@ public class ProcessInstanceRestServiceInteractionTest extends
     verify(mockManagementService, times(1)).setJobRetriesByProcessAsync(eq(MockProvider.EXAMPLE_JOB_RETRIES));
     verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceIds(Arrays.asList(MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID));
     verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).historicProcessInstanceQuery(any());
-    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).dueDate(null);
     verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).executeAsync();
     verifyNoMoreInteractions(mockSetJobRetriesByProcessAsyncBuilder);
   }

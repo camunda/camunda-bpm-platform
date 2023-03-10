@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
+import org.camunda.bpm.engine.management.SetJobRetriesByJobsAsyncBuilder;
 import org.camunda.bpm.engine.rest.JobRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
@@ -109,12 +110,14 @@ public class JobRestServiceImpl extends AbstractRestProcessEngineAware
     }
 
     try {
-      Batch batch = getProcessEngine().getManagementService()
+      SetJobRetriesByJobsAsyncBuilder builder = getProcessEngine().getManagementService()
           .setJobRetriesByJobsAsync(setJobRetriesDto.getRetries().intValue())
           .jobIds(setJobRetriesDto.getJobIds())
-          .jobQuery(jobQuery)
-          .dueDate(setJobRetriesDto.getDueDate())
-          .executeAsync();
+          .jobQuery(jobQuery);
+      if(setJobRetriesDto.isDueDateSet()) {
+        builder.dueDate(setJobRetriesDto.getDueDate());
+      }
+      Batch batch = builder.executeAsync();
       return BatchDto.fromBatch(batch);
     } catch (BadUserRequestException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
