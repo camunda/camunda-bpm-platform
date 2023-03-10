@@ -59,7 +59,7 @@ public abstract class AbstractServletProcessApplicationDeployer {
         throw getServletException(LOG.paWrongTypeException(paClass));
       }
 
-      // add it as listener if it's a ServletProcessApplication
+      // add it as listener if it's a servlet process application
       if (servletProcessApplicationClass.isAssignableFrom(paClass)) {
         LOG.detectedPa(paClass);
         processApplicationClassNameConsumer.accept(paClass.getName());
