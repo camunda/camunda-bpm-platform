@@ -45,6 +45,7 @@ import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.commons.utils.cache.Cache;
 import org.junit.Before;
@@ -287,6 +288,27 @@ public class DeploymentCacheCfgTest {
     repositoryService.deleteDeployment(deployment.getId(), true);
   }
 
+  @Test
+  public void shouldNotAddIdentityLinksAfterRecache() {
+    // given cache size + 1 deployed process
+    testRule.deploy(createModel("1"));
+    testRule.deploy(createModel("2"));
+    testRule.deploy(createModel("3"));
+
+    // when process start from 1 to 3 they are re-cached
+    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("Process1");
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("Process2");
+    ProcessInstance processInstance3 = runtimeService.startProcessInstanceByKey("Process3");
+
+    // then
+    assertThat(repositoryService.getIdentityLinksForProcessDefinition(processInstance1.getProcessDefinitionId()).size())
+        .isEqualTo(1);
+    assertThat(repositoryService.getIdentityLinksForProcessDefinition(processInstance2.getProcessDefinitionId()).size())
+        .isEqualTo(1);
+    assertThat(repositoryService.getIdentityLinksForProcessDefinition(processInstance3.getProcessDefinitionId()).size())
+        .isEqualTo(1);
+  }
+
   protected List<BpmnModelInstance> createSequentialCallActivityProcess() {
     List<BpmnModelInstance> modelInstances = new LinkedList<>();
 
@@ -332,6 +354,17 @@ public class DeploymentCacheCfgTest {
       result.add(ProcessModels.oneTaskProcess(i));
     }
     return result;
+  }
+
+  protected BpmnModelInstance createModel(String suffix) {
+    BpmnModelInstance bpmnModel = Bpmn.createExecutableProcess("Process" + suffix)
+        .startEvent("startEvent")
+        .userTask().name("User Task")
+        .endEvent("endEvent")
+        .done();
+    org.camunda.bpm.model.bpmn.instance.Process model = bpmnModel.getModelElementById("Process" + suffix);
+    model.setCamundaCandidateStarterUsers("demo" + suffix);
+    return bpmnModel;
   }
 
 
