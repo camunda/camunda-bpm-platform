@@ -32,6 +32,7 @@ import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
+import org.camunda.bpm.engine.management.SetJobRetriesByProcessAsyncBuilder;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
@@ -190,12 +191,14 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
     }
 
     try {
-      Batch batch = getProcessEngine().getManagementService()
+      SetJobRetriesByProcessAsyncBuilder builder = getProcessEngine().getManagementService()
           .setJobRetriesByProcessAsync(setJobRetriesDto.getRetries().intValue())
           .processInstanceIds(setJobRetriesDto.getProcessInstances())
-          .processInstanceQuery(processInstanceQuery)
-          .dueDate(setJobRetriesDto.getDueDate())
-          .executeAsync();
+          .processInstanceQuery(processInstanceQuery);
+      if(setJobRetriesDto.isDueDateSet()) {
+        builder.dueDate(setJobRetriesDto.getDueDate());
+      }
+      Batch batch = builder.executeAsync();
       return BatchDto.fromBatch(batch);
     } catch (BadUserRequestException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
@@ -212,12 +215,14 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
 
     try {
       ManagementService managementService = getProcessEngine().getManagementService();
-      Batch batch = managementService
+      SetJobRetriesByProcessAsyncBuilder builder = managementService
           .setJobRetriesByProcessAsync(setJobRetriesDto.getRetries())
           .processInstanceIds(setJobRetriesDto.getProcessInstances())
-          .historicProcessInstanceQuery(query)
-          .dueDate(setJobRetriesDto.getDueDate())
-          .executeAsync();
+          .historicProcessInstanceQuery(query);
+      if(setJobRetriesDto.isDueDateSet()) {
+        builder.dueDate(setJobRetriesDto.getDueDate());
+      }
+      Batch batch = builder.executeAsync();
       return BatchDto.fromBatch(batch);
     } catch (BadUserRequestException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());

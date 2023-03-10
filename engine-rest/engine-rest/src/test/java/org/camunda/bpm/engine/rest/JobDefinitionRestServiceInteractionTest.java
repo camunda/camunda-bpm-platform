@@ -1332,7 +1332,6 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
 
     verify(mockManagementService, times(1)).setJobRetries(MockProvider.EXAMPLE_JOB_RETRIES);
     verify(mockSetJobRetriesBuilder, times(1)).jobDefinitionId(MockProvider.EXAMPLE_JOB_DEFINITION_ID);
-    verify(mockSetJobRetriesBuilder, times(1)).dueDate(null);
     verify(mockSetJobRetriesBuilder, times(1)).execute();
     verifyNoMoreInteractions(mockSetJobRetriesBuilder);
   }
@@ -1362,6 +1361,29 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
   }
 
   @Test
+  public void testSetJobRetriesWithNullDueDate() {
+    Map<String, Object> retriesVariableJson = new HashMap<>();
+    retriesVariableJson.put("retries", MockProvider.EXAMPLE_JOB_RETRIES);
+    retriesVariableJson.put("dueDate", null);
+
+    given()
+    .pathParam("id", MockProvider.EXAMPLE_JOB_DEFINITION_ID)
+    .contentType(ContentType.JSON)
+    .body(retriesVariableJson)
+    .then()
+    .expect()
+    .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+    .put(JOB_DEFINITION_RETRIES_URL);
+
+    verify(mockManagementService, times(1)).setJobRetries(MockProvider.EXAMPLE_JOB_RETRIES);
+    verify(mockSetJobRetriesBuilder, times(1)).jobDefinitionId(MockProvider.EXAMPLE_JOB_DEFINITION_ID);
+    verify(mockSetJobRetriesBuilder, times(1)).dueDate(null);
+    verify(mockSetJobRetriesBuilder, times(1)).execute();
+    verifyNoMoreInteractions(mockSetJobRetriesBuilder);
+  }
+
+  @Test
   public void testSetJobRetriesExceptionExpected() {
     doThrow(new ProcessEngineException("job definition not found"))
       .when(mockSetJobRetriesBuilder).execute();
@@ -1383,7 +1405,6 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
 
     verify(mockManagementService, times(1)).setJobRetries(MockProvider.EXAMPLE_JOB_RETRIES);
     verify(mockSetJobRetriesBuilder, times(1)).jobDefinitionId(MockProvider.NON_EXISTING_JOB_DEFINITION_ID);
-    verify(mockSetJobRetriesBuilder, times(1)).dueDate(null);
     verify(mockSetJobRetriesBuilder, times(1)).execute();
     verifyNoMoreInteractions(mockSetJobRetriesBuilder);
   }
