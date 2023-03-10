@@ -32,6 +32,7 @@ var $ = (window.jQuery = window.$ = require('jquery')),
   camCommon = require('../../../common/scripts/module'),
   lodash = require('../../../../camunda-commons-ui/vendor/lodash'),
   moment = require('../../../../camunda-commons-ui/vendor/moment');
+const translatePaginationCtrls = require('../../../common/scripts/util/translate-pagination-ctrls');
 
 var APP_NAME = 'cam.admin';
 
@@ -71,6 +72,7 @@ module.exports = function(pluginDependencies) {
     '$locationProvider',
     '$animateProvider',
     '$qProvider',
+    '$provide',
     function(
       $routeProvider,
       UriProvider,
@@ -78,8 +80,10 @@ module.exports = function(pluginDependencies) {
       $tooltipProvider,
       $locationProvider,
       $animateProvider,
-      $qProvider
+      $qProvider,
+      $provide
     ) {
+      translatePaginationCtrls($provide);
       $routeProvider.otherwise({redirectTo: '/'});
 
       UriProvider.replace(':appName', 'admin');
@@ -148,6 +152,7 @@ module.exports = function(pluginDependencies) {
     'camAPI',
     function($scope, $route, camAPI) {
       var userService = camAPI.resource('user');
+
       function getUserProfile(auth) {
         if (!auth || !auth.name) {
           $scope.userFullName = null;
