@@ -57,6 +57,7 @@ public class CommandContextInterceptor extends CommandInterceptor {
   private final static CommandLogger LOG = CommandLogger.CMD_LOGGER;
 
   protected CommandContextFactory commandContextFactory;
+  protected CommandInvocationContextFactory commandInvocationContextFactory;
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
   /** if true, we will always open a new command context */
@@ -65,13 +66,14 @@ public class CommandContextInterceptor extends CommandInterceptor {
   public CommandContextInterceptor() {
   }
 
-  public CommandContextInterceptor(CommandContextFactory commandContextFactory, ProcessEngineConfigurationImpl processEngineConfiguration) {
+  public CommandContextInterceptor(CommandContextFactory commandContextFactory, CommandInvocationContextFactory commandInvocationContextFactory, ProcessEngineConfigurationImpl processEngineConfiguration) {
     this.commandContextFactory = commandContextFactory;
+    this.commandInvocationContextFactory = commandInvocationContextFactory;
     this.processEngineConfiguration = processEngineConfiguration;
   }
 
-  public CommandContextInterceptor(CommandContextFactory commandContextFactory, ProcessEngineConfigurationImpl processEngineConfiguration, boolean alwaysOpenNew) {
-    this(commandContextFactory, processEngineConfiguration);
+  public CommandContextInterceptor(CommandContextFactory commandContextFactory, CommandInvocationContextFactory commandInvocationContextFactory, ProcessEngineConfigurationImpl processEngineConfiguration, boolean alwaysOpenNew) {
+    this(commandContextFactory, commandInvocationContextFactory, processEngineConfiguration);
     this.alwaysOpenNew = alwaysOpenNew;
   }
 
@@ -90,7 +92,7 @@ public class CommandContextInterceptor extends CommandInterceptor {
     boolean isNew = ProcessEngineContextImpl.consume();
     boolean openNew = (context == null || isNew);
 
-    CommandInvocationContext commandInvocationContext = new CommandInvocationContext(command, processEngineConfiguration);
+    CommandInvocationContext commandInvocationContext = commandInvocationContextFactory.createCommandInvocationContext(command, processEngineConfiguration);
     Context.setCommandInvocationContext(commandInvocationContext);
 
     try {

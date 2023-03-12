@@ -70,7 +70,7 @@ public abstract class AbstractTransactionProcessEngineConfiguration extends Proc
     defaultCommandInterceptorsTxRequired.add(new CommandCounterInterceptor(this));
     defaultCommandInterceptorsTxRequired.add(new ProcessApplicationContextInterceptor(this));
     defaultCommandInterceptorsTxRequired.add(createTransactionInterceptor(false));
-    defaultCommandInterceptorsTxRequired.add(new CommandContextInterceptor(commandContextFactory, this));
+    defaultCommandInterceptorsTxRequired.add(new CommandContextInterceptor(commandContextFactory, commandInvocationContextFactory, this));
     return defaultCommandInterceptorsTxRequired;
   }
 
@@ -89,7 +89,7 @@ public abstract class AbstractTransactionProcessEngineConfiguration extends Proc
     defaultCommandInterceptorsTxRequiresNew.add(new CommandCounterInterceptor(this));
     defaultCommandInterceptorsTxRequiresNew.add(new ProcessApplicationContextInterceptor(this));
     defaultCommandInterceptorsTxRequiresNew.add(createTransactionInterceptor(true));
-    defaultCommandInterceptorsTxRequiresNew.add(new CommandContextInterceptor(commandContextFactory, this, true));
+    defaultCommandInterceptorsTxRequiresNew.add(new CommandContextInterceptor(commandContextFactory, commandInvocationContextFactory, this, true));
     return defaultCommandInterceptorsTxRequiresNew;
   }
 
@@ -102,7 +102,7 @@ public abstract class AbstractTransactionProcessEngineConfiguration extends Proc
       List<CommandInterceptor> commandInterceptorsDbSchemaOperations = new ArrayList<CommandInterceptor>();
       commandInterceptorsDbSchemaOperations.add(new LogInterceptor());
       commandInterceptorsDbSchemaOperations.add(new CommandCounterInterceptor(this));
-      commandInterceptorsDbSchemaOperations.add(new CommandContextInterceptor(dbSchemaOperationsCommandContextFactory, this));
+      commandInterceptorsDbSchemaOperations.add(new CommandContextInterceptor(dbSchemaOperationsCommandContextFactory, commandInvocationContextFactory, this));
       commandInterceptorsDbSchemaOperations.add(actualCommandExecutor);
       commandExecutorSchemaOperations = initInterceptorChain(commandInterceptorsDbSchemaOperations);
     }

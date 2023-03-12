@@ -217,14 +217,7 @@ import org.camunda.bpm.engine.impl.identity.db.DbIdentityServiceProvider;
 import org.camunda.bpm.engine.impl.incident.CompositeIncidentHandler;
 import org.camunda.bpm.engine.impl.incident.DefaultIncidentHandler;
 import org.camunda.bpm.engine.impl.incident.IncidentHandler;
-import org.camunda.bpm.engine.impl.interceptor.CommandContextFactory;
-import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-import org.camunda.bpm.engine.impl.interceptor.CommandExecutorImpl;
-import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
-import org.camunda.bpm.engine.impl.interceptor.CrdbTransactionRetryInterceptor;
-import org.camunda.bpm.engine.impl.interceptor.DelegateInterceptor;
-import org.camunda.bpm.engine.impl.interceptor.ExceptionCodeInterceptor;
-import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
+import org.camunda.bpm.engine.impl.interceptor.*;
 import org.camunda.bpm.engine.impl.jobexecutor.AsyncContinuationJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.DefaultFailedJobCommandFactory;
 import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobExecutor;
@@ -646,7 +639,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected BusinessCalendarManager businessCalendarManager;
 
   protected String wsSyncFactoryClassName = DEFAULT_WS_SYNC_FACTORY;
-
+  protected CommandInvocationContextFactory commandInvocationContextFactory;
   protected CommandContextFactory commandContextFactory;
   protected TransactionContextFactory transactionContextFactory;
   protected BpmnParseFactory bpmnParseFactory;
@@ -1125,6 +1118,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initDmnEngine();
     initBusinessCalendarManager();
     initCommandContextFactory();
+    initCommandInvocationContextFactory();
     initTransactionContextFactory();
 
     // Database type needs to be detected before CommandExecutors are initialized
@@ -2454,6 +2448,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
   }
 
+  protected void initCommandInvocationContextFactory() {
+    if (commandInvocationContextFactory == null) {
+      commandInvocationContextFactory = new CommandInvocationContextFactory();
+    }
+  }
+
   protected void initTransactionContextFactory() {
     if (transactionContextFactory == null) {
       transactionContextFactory = new StandaloneTransactionContextFactory();
@@ -3320,6 +3320,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfigurationImpl setCommandContextFactory(CommandContextFactory commandContextFactory) {
     this.commandContextFactory = commandContextFactory;
+    return this;
+  }
+
+  public CommandInvocationContextFactory getCommandInvocationContextFactory() {
+    return commandInvocationContextFactory;
+  }
+
+  public ProcessEngineConfigurationImpl setCommandInvocationContextFactory(CommandInvocationContextFactory commandInvocationContextFactory) {
+    this.commandInvocationContextFactory = commandInvocationContextFactory;
     return this;
   }
 

@@ -61,7 +61,7 @@ public class QuarkusProcessEngineConfiguration extends CdiJtaProcessEngineConfig
       commandInterceptorsDbSchemaOperations.add(new LogInterceptor());
       commandInterceptorsDbSchemaOperations.add(new CommandCounterInterceptor(this));
       commandInterceptorsDbSchemaOperations.add(new JtaTransactionInterceptor(transactionManager, false, this));
-      commandInterceptorsDbSchemaOperations.add(new CommandContextInterceptor(dbSchemaOperationsCommandContextFactory, this));
+      commandInterceptorsDbSchemaOperations.add(new CommandContextInterceptor(dbSchemaOperationsCommandContextFactory, commandInvocationContextFactory, this));
       commandInterceptorsDbSchemaOperations.add(actualCommandExecutor);
       commandExecutorSchemaOperations = initInterceptorChain(commandInterceptorsDbSchemaOperations);
     }

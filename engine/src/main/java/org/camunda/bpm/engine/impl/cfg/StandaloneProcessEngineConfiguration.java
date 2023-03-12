@@ -45,7 +45,7 @@ public class StandaloneProcessEngineConfiguration extends ProcessEngineConfigura
     defaultCommandInterceptorsTxRequired.add(new LogInterceptor());
     defaultCommandInterceptorsTxRequired.add(new CommandCounterInterceptor(this));
     defaultCommandInterceptorsTxRequired.add(new ProcessApplicationContextInterceptor(this));
-    defaultCommandInterceptorsTxRequired.add(new CommandContextInterceptor(commandContextFactory, this));
+    defaultCommandInterceptorsTxRequired.add(new CommandContextInterceptor(commandContextFactory, commandInvocationContextFactory, this));
     return defaultCommandInterceptorsTxRequired;
   }
 
@@ -60,7 +60,7 @@ public class StandaloneProcessEngineConfiguration extends ProcessEngineConfigura
     defaultCommandInterceptorsTxRequired.add(new LogInterceptor());
     defaultCommandInterceptorsTxRequired.add(new CommandCounterInterceptor(this));
     defaultCommandInterceptorsTxRequired.add(new ProcessApplicationContextInterceptor(this));
-    defaultCommandInterceptorsTxRequired.add(new CommandContextInterceptor(commandContextFactory, this, true));
+    defaultCommandInterceptorsTxRequired.add(new CommandContextInterceptor(commandContextFactory, commandInvocationContextFactory, this, true));
     return defaultCommandInterceptorsTxRequired;
   }
 
