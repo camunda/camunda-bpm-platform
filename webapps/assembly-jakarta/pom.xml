@@ -26,45 +26,10 @@
     <web.resources.override>${jakarta.runtime}/default/webapp</web.resources.override>
     <java.resources.override>${jakarta.runtime}/default/resources</java.resources.override>
     <properties.override>${jakarta.runtime}/default/config.properties</properties.override>
-
-    <history.level>full</history.level>
-
-    <frontend.app.path>${project.build.directory}/webapp/</frontend.app.path>
-
-    <frontend.development.cockpit.path>${frontend.app.path}</frontend.development.cockpit.path>
-    <frontend.development.tasklist.path>${frontend.app.path}</frontend.development.tasklist.path>
-    <frontend.react.path>../frontend/ui/cockpit</frontend.react.path>
-
-    <exec.shell>bash</exec.shell>
-    <exec.arg>-c</exec.arg>
-
-    <skip.frontend.build>false</skip.frontend.build>
-
-    <authorizationCheckRevokes>auto</authorizationCheckRevokes>
-
-    <jdbcBatchProcessing>true</jdbcBatchProcessing>
-
-    <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
-
-    <!-- generate a bom of compile time dependencies for the license book.
-    Note: Every compile time dependency will end up in the license book. Please
-    declare only dependencies that are actually needed -->
-    <skip-third-party-bom>false</skip-third-party-bom>
-
-    <!-- frontend-sources artifact is for internal use only.
-    Artifact generation is skipped when it comes to maven central deployment -->
-    <skip-zip-frontend-sources>false</skip-zip-frontend-sources>
   </properties>
 
   <dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>org.camunda.bpm</groupId>
-        <artifactId>camunda-core-internal-dependencies</artifactId>
-        <version>${project.version}</version>
-        <scope>import</scope>
-        <type>pom</type>
-      </dependency>
       <dependency>
         <groupId>org.camunda.bpm</groupId>
         <artifactId>camunda-engine-rest-core-jakarta</artifactId>
@@ -91,20 +56,6 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-
-  <repositories>
-    <repository>
-      <id>camunda-nexus</id>
-      <name>Camunda Platform Maven Repository</name>
-      <url>https://artifacts.camunda.com/artifactory/public/</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
 
   <dependencies>
 
@@ -156,51 +107,7 @@
 
     <dependency>
       <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <!-- rest api -->
-    <dependency>
-      <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-rest-core-jakarta</artifactId>
-    </dependency>
-
-    <!-- tests -->
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.fasterxml.uuid</groupId>
-      <artifactId>java-uuid-generator</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.assertj</groupId>
-      <artifactId>assertj-core</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-inline</artifactId>
-      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -210,70 +117,10 @@
       <scope>test</scope>
       <classifier>tests</classifier>
     </dependency>
-
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-webapp</artifactId>
-      <version>${version.jetty}</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.glassfish.jersey.core</groupId>
-      <artifactId>jersey-common</artifactId>
-      <version>${version.jersey2}</version>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
   <build>
     <finalName>camunda-webapp-jakarta</finalName>
-
-    <pluginManagement>
-      <plugins>
-        <!-- test plugins -->
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <configuration>
-            <systemPropertyVariables>
-              <myWorkingDir>${project.build.directory}</myWorkingDir>
-            </systemPropertyVariables>
-            <argLine>-XX:MaxMetaspaceSize=128m</argLine>
-          </configuration>
-        </plugin>
-
-        <!-- code plugins -->
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-dependency-plugin</artifactId>
-          <version>2.8</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-resources-plugin</artifactId>
-          <version>2.6</version>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-antrun-plugin</artifactId>
-          <version>1.8</version>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>build-helper-maven-plugin</artifactId>
-          <version>1.9.1</version>
-        </plugin>
-
-        <plugin>
-          <groupId>org.eclipse.jetty</groupId>
-          <artifactId>jetty-maven-plugin</artifactId>
-          <version>${version.jetty}</version>
-        </plugin>
-
-      </plugins>
-    </pluginManagement>
 
     <plugins>
       <plugin>
@@ -528,33 +375,8 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
-        <configuration>
+        <configuration combine.children="append">
           <warSourceDirectory>${jakarta.webapp}</warSourceDirectory>
-          <webResources>
-            <resource>
-              <filtering>true</filtering>
-              <directory>${web.resources.override}</directory>
-            </resource>
-            <resource>
-              <filtering>false</filtering>
-              <directory>target/webapp</directory>
-              <excludes>
-                <exclude>**/*.html</exclude>
-              </excludes>
-            </resource>
-            <resource>
-              <filtering>true</filtering>
-              <directory>target/webapp</directory>
-              <!-- no filtering for favicon because linux destroys images through carriage return -->
-              <includes>
-                <include>**/*.html</include>
-              </includes>
-            </resource>
-          </webResources>
-          <!-- exclude development resources (task forms etc.) -->
-          <packagingExcludes>
-            develop/**
-          </packagingExcludes>
         </configuration>
       </plugin>
       <plugin>
@@ -568,18 +390,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>create-jar</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-            <phase>package</phase>
-            <configuration>
-              <classifier>classes</classifier>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -592,21 +402,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>zip-frontend-sources</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-            <configuration>
-              <skipAssembly>${skip-zip-frontend-sources}</skipAssembly>
-              <descriptors>
-                <descriptor>assembly.xml</descriptor>
-              </descriptors>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>
@@ -765,6 +560,27 @@
       <properties>
         <java.resources.override>${jakarta.runtime}/develop/resources</java.resources.override>
         <skip.frontend.build>true</skip.frontend.build>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>mariadb</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <excludedGroups>org.camunda.bpm.cockpit.plugin.base.SlowMariaDbTest</excludedGroups>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>h2</id>
+      <properties>
+        <project.parent.basedir>./</project.parent.basedir>
       </properties>
     </profile>
 
