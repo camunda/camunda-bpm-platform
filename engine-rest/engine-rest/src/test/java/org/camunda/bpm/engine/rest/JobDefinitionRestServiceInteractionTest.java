@@ -1428,6 +1428,11 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
         .body("message", equalTo(expectedMessage))
     .when()
       .put(JOB_DEFINITION_RETRIES_URL);
+
+    verify(mockManagementService, times(1)).setJobRetries(MockProvider.EXAMPLE_JOB_RETRIES);
+    verify(mockSetJobRetriesBuilder, times(1)).jobDefinitionId(MockProvider.NON_EXISTING_JOB_DEFINITION_ID);
+    verify(mockSetJobRetriesBuilder, times(1)).execute();
+    verifyNoMoreInteractions(mockSetJobRetriesBuilder);
   }
 
   @Test

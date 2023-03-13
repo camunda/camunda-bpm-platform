@@ -81,7 +81,6 @@ import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceSuspensionStateDto;
-import org.camunda.bpm.engine.rest.dto.runtime.SetJobRetriesByProcessDto;
 import org.camunda.bpm.engine.rest.dto.runtime.batch.CorrelationMessageAsyncDto;
 import org.camunda.bpm.engine.rest.dto.runtime.batch.DeleteProcessInstancesDto;
 import org.camunda.bpm.engine.rest.dto.runtime.batch.SetVariablesAsyncDto;
@@ -3390,6 +3389,12 @@ public class ProcessInstanceRestServiceInteractionTest extends
         .then().expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode())
         .when().post(SET_JOB_RETRIES_ASYNC_URL);
+
+    verify(mockManagementService, times(1)).setJobRetriesByProcessAsync(eq(MockProvider.EXAMPLE_JOB_RETRIES));
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceIds(null);
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceQuery(null);
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).executeAsync();
+    verifyNoMoreInteractions(mockSetJobRetriesByProcessAsyncBuilder);
   }
 
   @Test
@@ -3434,9 +3439,9 @@ public class ProcessInstanceRestServiceInteractionTest extends
     List<HistoricProcessInstance> historicProcessInstances = MockProvider.createMockRunningHistoricProcessInstances();
     when(mockedHistoricProcessInstanceQuery.list()).thenReturn(historicProcessInstances);
 
-    SetJobRetriesByProcessDto body = new SetJobRetriesByProcessDto();
-    body.setRetries(MockProvider.EXAMPLE_JOB_RETRIES);
-    body.setHistoricProcessInstanceQuery(new HistoricProcessInstanceQueryDto());
+    Map<String, Object> body = new HashMap<>();
+    body.put(RETRIES, MockProvider.EXAMPLE_JOB_RETRIES);
+    body.put("historicProcessInstanceQuery", new HistoricProcessInstanceQueryDto());
 
     Response response = given()
       .contentType(ContentType.JSON).body(body)
@@ -3461,11 +3466,11 @@ public class ProcessInstanceRestServiceInteractionTest extends
     List<HistoricProcessInstance> historicProcessInstances = MockProvider.createMockRunningHistoricProcessInstances();
     when(mockedHistoricProcessInstanceQuery.list()).thenReturn(historicProcessInstances);
 
-    SetJobRetriesByProcessDto body = new SetJobRetriesByProcessDto();
-    body.setRetries(MockProvider.EXAMPLE_JOB_RETRIES);
-    body.setHistoricProcessInstanceQuery(new HistoricProcessInstanceQueryDto());
+    Map<String, Object> body = new HashMap<>();
+    body.put(RETRIES, MockProvider.EXAMPLE_JOB_RETRIES);
+    body.put("historicProcessInstanceQueryDto", new HistoricProcessInstanceQueryDto());
     Date newDueDate = new Date(1675752840000L);
-    body.setDueDate(newDueDate);
+    body.put("dueDate", newDueDate);
 
     Response response =
         given()
@@ -3492,10 +3497,10 @@ public class ProcessInstanceRestServiceInteractionTest extends
     List<HistoricProcessInstance> historicProcessInstances = MockProvider.createMockRunningHistoricProcessInstances();
     when(mockedHistoricProcessInstanceQuery.list()).thenReturn(historicProcessInstances);
 
-    SetJobRetriesByProcessDto body = new SetJobRetriesByProcessDto();
-    body.setRetries(MockProvider.EXAMPLE_JOB_RETRIES);
-    body.setHistoricProcessInstanceQuery(new HistoricProcessInstanceQueryDto());
-    body.setDueDate(null);
+    Map<String, Object> body = new HashMap<>();
+    body.put(RETRIES, MockProvider.EXAMPLE_JOB_RETRIES);
+    body.put("historicProcessInstanceQuery", new HistoricProcessInstanceQueryDto());
+    body.put("dueDate",null);
 
     Response response =
         given()
@@ -3536,11 +3541,11 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
   @Test
   public void testSetRetriesByProcessAsyncHistoricQueryBasedWithProcessInstanceIdsAndDueDate() {
-    SetJobRetriesByProcessDto body = new SetJobRetriesByProcessDto();
-    body.setRetries(MockProvider.EXAMPLE_JOB_RETRIES);
-    body.setProcessInstances(Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID));
+    Map<String, Object> body = new HashMap<>();
+    body.put(RETRIES, MockProvider.EXAMPLE_JOB_RETRIES);
+    body.put("processInstances", Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID));
     Date newDueDate = new Date(1675752840000L);
-    body.setDueDate(newDueDate);
+    body.put("dueDate", newDueDate);
 
     given()
       .contentType(ContentType.JSON).body(body)
@@ -3564,10 +3569,10 @@ public class ProcessInstanceRestServiceInteractionTest extends
     List<HistoricProcessInstance> historicProcessInstances = MockProvider.createMockRunningHistoricProcessInstances();
     when(mockedHistoricProcessInstanceQuery.list()).thenReturn(historicProcessInstances);
 
-    SetJobRetriesByProcessDto body = new SetJobRetriesByProcessDto();
-    body.setRetries(MockProvider.EXAMPLE_JOB_RETRIES);
-    body.setProcessInstances(Arrays.asList(MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID));
-    body.setHistoricProcessInstanceQuery(new HistoricProcessInstanceQueryDto());
+    Map<String, Object> body = new HashMap<>();
+    body.put(RETRIES, MockProvider.EXAMPLE_JOB_RETRIES);
+    body.put("processInstances", Arrays.asList(MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID));
+    body.put("historicProcessInstanceQuery", new HistoricProcessInstanceQueryDto());
 
     given()
       .contentType(ContentType.JSON).body(body)
@@ -3587,14 +3592,20 @@ public class ProcessInstanceRestServiceInteractionTest extends
     doThrow(new BadUserRequestException("jobIds is empty"))
       .when(mockSetJobRetriesByProcessAsyncBuilder).executeAsync();
 
-    SetJobRetriesByProcessDto body = new SetJobRetriesByProcessDto();
-    body.setRetries(MockProvider.EXAMPLE_JOB_RETRIES);
+    Map<String, Object> body = new HashMap<>();
+    body.put(RETRIES, MockProvider.EXAMPLE_JOB_RETRIES);
 
     given()
       .contentType(ContentType.JSON).body(body)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
     .when().post(SET_JOB_RETRIES_ASYNC_HIST_QUERY_URL);
+
+    verify(mockManagementService, times(1)).setJobRetriesByProcessAsync(eq(MockProvider.EXAMPLE_JOB_RETRIES));
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceIds(null);
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).historicProcessInstanceQuery(null);
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).executeAsync();
+    verifyNoMoreInteractions(mockSetJobRetriesByProcessAsyncBuilder);
   }
 
   @Test
@@ -3607,9 +3618,9 @@ public class ProcessInstanceRestServiceInteractionTest extends
     List<HistoricProcessInstance> historicProcessInstances = MockProvider.createMockRunningHistoricProcessInstances();
     when(mockedHistoricProcessInstanceQuery.list()).thenReturn(historicProcessInstances);
 
-    SetJobRetriesByProcessDto body = new SetJobRetriesByProcessDto();
-    body.setRetries(MockProvider.EXAMPLE_NEGATIVE_JOB_RETRIES);
-    body.setHistoricProcessInstanceQuery(new HistoricProcessInstanceQueryDto());
+    Map<String, Object> body = new HashMap<>();
+    body.put(RETRIES, MockProvider.EXAMPLE_NEGATIVE_JOB_RETRIES);
+    body.put("historicProcessInstanceQuery", new HistoricProcessInstanceQueryDto());
 
     given()
       .contentType(ContentType.JSON).body(body)

@@ -57,6 +57,7 @@ import org.camunda.bpm.engine.management.UpdateJobSuspensionStateSelectBuilder;
 import org.camunda.bpm.engine.management.UpdateJobSuspensionStateTenantBuilder;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
+import org.camunda.bpm.engine.rest.dto.runtime.JobQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.JobSuspensionStateDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
@@ -274,6 +275,9 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
       .body("message", equalTo(message))
     .when()
       .put(JOB_RESOURCE_SET_RETRIES_URL);
+
+    verify(mockManagementService).setJobRetries(MockProvider.EXAMPLE_NEGATIVE_JOB_RETRIES);
+    verifyNoMoreInteractions(mockSetJobRetriesBuilder);
   }
 
   @Test
@@ -1629,6 +1633,8 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
         .then().expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode())
         .when().post(JOBS_SET_RETRIES_URL);
+
+    verifyNoMoreInteractions(mockSetJobRetriesBuilder);
   }
 
   @Test
@@ -1638,7 +1644,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
     Map<String, Object> messageBodyJson = new HashMap<>();
     messageBodyJson.put(RETRIES, MockProvider.EXAMPLE_NEGATIVE_JOB_RETRIES);
-    HistoricProcessInstanceQueryDto query = new HistoricProcessInstanceQueryDto();
+    JobQueryDto query = new JobQueryDto();
     messageBodyJson.put("jobQuery", query);
 
     given()
@@ -1661,6 +1667,8 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
       .statusCode(Status.BAD_REQUEST.getStatusCode())
     .when()
       .post(JOBS_SET_RETRIES_URL);
+
+    verifyNoMoreInteractions(mockSetJobRetriesBuilder);
   }
 
   @Test
