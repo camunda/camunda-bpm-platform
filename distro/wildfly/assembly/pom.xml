@@ -34,7 +34,7 @@
 
     <dependency>
       <groupId>org.camunda.bpm.javaee</groupId>
-      <artifactId>camunda-ejb-client</artifactId>
+      <artifactId>camunda-ejb-client-jakarta</artifactId>
     </dependency>
     
     <dependency>
@@ -49,7 +49,7 @@
 
     <dependency>
       <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine-cdi</artifactId>
+      <artifactId>camunda-engine-cdi-jakarta</artifactId>
     </dependency>
     
     <dependency>
@@ -59,7 +59,7 @@
     
     <dependency>
       <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine-rest</artifactId>
+      <artifactId>camunda-engine-rest-jakarta</artifactId>
       <classifier>classes</classifier>
       <version>${project.version}</version>
     </dependency>

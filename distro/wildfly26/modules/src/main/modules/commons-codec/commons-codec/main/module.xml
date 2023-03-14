@@ -1,0 +1,11 @@
+<module xmlns="urn:jboss:module:1.0" name="commons-codec.commons-codec">
+  <resources>
+    <resource-root path="commons-codec-1.15.jar" />
+  </resources>
+
+  <dependencies>
+
+    <module name="javax.api" />
+
+  </dependencies>
+</module>

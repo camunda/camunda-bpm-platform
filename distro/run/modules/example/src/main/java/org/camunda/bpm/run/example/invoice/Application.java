@@ -17,8 +17,8 @@
 package org.camunda.bpm.run.example.invoice;
 
 import javax.annotation.PostConstruct;
-
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.example.invoice.InvoiceApplicationHelper;
 import org.camunda.bpm.example.invoice.InvoiceProcessApplication;
 import org.camunda.bpm.spring.boot.starter.annotation.EnableProcessApplication;
 import org.camunda.bpm.spring.boot.starter.event.PostDeployEvent;
@@ -47,7 +47,7 @@ public class Application implements WebMvcConfigurer {
   @PostConstruct
   public void deployInvoice() {
     LOG.info("Invoice example started, creating deployment");
-    invoicePa.createDeployment("invoiceProcessApplicationSpringBoot", processEngine, invoicePa.getClass().getClassLoader());
+    InvoiceApplicationHelper.createDeployment("invoiceProcessApplicationSpringBoot", processEngine, invoicePa.getClass().getClassLoader(), invoicePa.getReference());
   }
 
   @EventListener

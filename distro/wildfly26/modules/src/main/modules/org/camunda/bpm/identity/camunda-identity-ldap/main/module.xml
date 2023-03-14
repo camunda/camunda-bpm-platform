@@ -1,0 +1,15 @@
+<module xmlns="urn:jboss:module:1.0" name="org.camunda.bpm.identity.camunda-identity-ldap">
+  <resources>
+    <resource-root path="camunda-identity-ldap-@project.version@.jar" />
+  </resources>
+
+  <dependencies>
+
+    <module name="sun.jdk" />
+
+    <module name="javax.api" />
+    <module name="org.camunda.bpm.camunda-engine" />
+    <module name="org.camunda.commons.camunda-commons-logging" />
+
+  </dependencies>
+</module>

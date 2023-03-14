@@ -14,7 +14,7 @@
 
   <dependencies>
     <dependency>
-      <!-- this dependency is to make sure that we are executed after the 
+      <!-- this dependency is to make sure that we are executed after the
         integration tests have passed in the reactor -->
       <groupId>org.camunda.bpm.qa</groupId>
       <artifactId>camunda-qa</artifactId>
@@ -22,7 +22,7 @@
       <type>pom</type>
       <scope>provided</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.camunda.bpm.wildfly</groupId>
       <artifactId>camunda-wildfly-assembly</artifactId>
@@ -39,19 +39,19 @@
 
     <dependency>
       <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine-rest</artifactId>
+      <artifactId>camunda-engine-rest-jakarta</artifactId>
       <version>${project.version}</version>
       <classifier>wildfly</classifier>
       <type>war</type>
     </dependency>
-    
+
     <dependency>
       <groupId>org.camunda.bpm.webapp</groupId>
-      <artifactId>camunda-webapp-jboss</artifactId>
+      <artifactId>camunda-webapp-wildfly</artifactId>
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
-    
+
     <dependency>
       <groupId>org.camunda.bpm.example</groupId>
       <artifactId>camunda-example-invoice</artifactId>
@@ -60,7 +60,7 @@
     </dependency>
 
   </dependencies>
-  
+
   <build>
     <plugins>
       <plugin>
@@ -90,5 +90,5 @@
       </plugin>
     </plugins>
   </build>
-  
+
 </project>
