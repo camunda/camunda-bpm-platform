@@ -37,14 +37,14 @@
     <dependencySet>
         <outputFileNameMapping>${artifact.artifactId}-${artifact.version}.${artifact.extension}</outputFileNameMapping>
         <includes>
-            <include>org.camunda.bpm:camunda-engine-rest:war:*</include>
+            <include>org.camunda.bpm:camunda-engine-rest-jakarta:war:*</include>
         </includes>
         <outputDirectory>server/wildfly-${version.wildfly}/standalone/deployments</outputDirectory>
     </dependencySet>
     
     <dependencySet>
         <includes>
-          <include>org.camunda.bpm.webapp:camunda-webapp-jboss:war:*</include>
+          <include>org.camunda.bpm.webapp:camunda-webapp-wildfly:war:*</include>
         </includes>
         <outputDirectory>server/wildfly-${version.wildfly}/standalone/deployments</outputDirectory>
     </dependencySet>

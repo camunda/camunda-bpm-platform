@@ -1,0 +1,16 @@
+<module xmlns="urn:jboss:module:1.0" name="org.apache.httpcomponents.httpclient">
+  <resources>
+    <resource-root path="httpclient-4.5.13.jar" />
+  </resources>
+
+  <dependencies>
+
+    <module name="javax.api" />
+
+    <module name="commons-logging.commons-logging" />
+    <module name="commons-codec.commons-codec" />
+
+    <module name="org.apache.httpcomponents.httpcore" export="true" />
+
+  </dependencies>
+</module>

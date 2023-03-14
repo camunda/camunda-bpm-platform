@@ -1,0 +1,11 @@
+<module xmlns="urn:jboss:module:1.0" name="org.graalvm.truffle.truffle-api">
+  <resources>
+    <resource-root path="truffle-api-@version.graal.js@.jar" />
+  </resources>
+
+  <dependencies>
+    <module name="javax.api" />
+    <module name="sun.jdk" />
+    <module name="org.graalvm.sdk.graal-sdk" />
+  </dependencies>
+</module>
