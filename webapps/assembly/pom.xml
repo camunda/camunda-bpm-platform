@@ -11,7 +11,6 @@
   </parent>
 
   <artifactId>camunda-webapp</artifactId>
-  <groupId>org.camunda.bpm.webapp</groupId>
   <packaging>war</packaging>
   <name>Camunda Platform - Webapp - Assembly</name>
   <inceptionYear>2014</inceptionYear>
