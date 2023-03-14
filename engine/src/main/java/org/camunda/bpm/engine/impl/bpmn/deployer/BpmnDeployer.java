@@ -142,10 +142,10 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
 
     if (deployment.isNew()) {
       adjustStartEventSubscriptions(definition, latestDefinition);
-    }
 
-    // add "authorizations"
-    addAuthorizations(definition);
+      // add "authorizations"
+      addAuthorizations(definition);
+    }
   }
 
   @Override
