@@ -19,7 +19,6 @@ package org.camunda.bpm.integrationtest.functional.spin;
 import java.util.concurrent.Callable;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.runtime.TransitionInstance;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.integrationtest.functional.spin.dataformat.CustomDataFormatConfigurator;
 import org.camunda.bpm.integrationtest.functional.spin.dataformat.XmlSerializableJsonDeserializer;
@@ -33,7 +32,6 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -64,7 +62,7 @@ public class PaContextSwitchCustomSerializerTest extends AbstractFoxPlatformInte
   @Deployment(name = "pa4")
   public static WebArchive createDeployment2() {
     WebArchive webArchive = ShrinkWrap.create(WebArchive.class, "pa4.war")
-        .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
+        .addAsWebInfResource("org/camunda/bpm/integrationtest/beans.xml", "beans.xml")
         .addAsLibraries(DeploymentHelper.getEngineCdi())
         .addAsResource("META-INF/processes.xml")
         .addClass(AbstractFoxPlatformIntegrationTest.class)

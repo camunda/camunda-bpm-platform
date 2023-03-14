@@ -175,7 +175,29 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel: 'h2',
               runSteps: {
-                cambpmRunMaven('distro/wildfly/subsystem', 'test', runtimeStash: true)
+                cambpmRunMaven('distro/wildfly/subsystem', 
+                  'test', 
+                  runtimeStash: true,
+                  // we need to use JDK 11 for WildFly 27+
+                  jdkVersion: 'jdk-11-latest')
+              },
+              postFailure: {
+                cambpmPublishTestResult()
+              }
+            ])
+          }
+        }
+        stage('wildfly26-subsystem-UNIT-wildfly') {
+          when {
+            expression {
+              cambpmWithLabels('wildfly')
+            }
+          }
+          steps {
+            cambpmConditionalRetry([
+              agentLabel: 'h2',
+              runSteps: {
+                cambpmRunMaven('distro/wildfly26/subsystem', 'test', runtimeStash: true)
               },
               postFailure: {
                 cambpmPublishTestResult()

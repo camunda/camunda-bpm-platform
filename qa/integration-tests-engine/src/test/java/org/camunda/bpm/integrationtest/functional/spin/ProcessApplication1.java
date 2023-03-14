@@ -17,13 +17,13 @@
 package org.camunda.bpm.integrationtest.functional.spin;
 
 import org.camunda.bpm.application.ProcessApplication;
-import org.camunda.bpm.application.impl.ServletProcessApplication;
 
 /**
  * @author Thorben Lindhauer
  *
  */
 @ProcessApplication("pa1")
-public class ProcessApplication1 extends ServletProcessApplication {
+// Using fully-qualified class name instead of import statement to allow for automatic Jakarta transformation
+public class ProcessApplication1 extends org.camunda.bpm.application.impl.ServletProcessApplication {
 
 }

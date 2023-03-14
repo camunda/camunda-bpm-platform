@@ -24,7 +24,6 @@ import org.camunda.bpm.integrationtest.util.TestContainer;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 import org.junit.Test;
@@ -40,7 +39,7 @@ public class ProcessApplicationExecutionListenerTest extends AbstractFoxPlatform
   @Deployment
   public static WebArchive createDeployment() {
     WebArchive archive = ShrinkWrap.create(WebArchive.class, "test.war")
-      .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
+      .addAsWebInfResource("org/camunda/bpm/integrationtest/beans.xml", "beans.xml")
       .addAsLibraries(DeploymentHelper.getEngineCdi())
       .addAsResource("META-INF/processes.xml", "META-INF/processes.xml")
       .addClass(AbstractFoxPlatformIntegrationTest.class)

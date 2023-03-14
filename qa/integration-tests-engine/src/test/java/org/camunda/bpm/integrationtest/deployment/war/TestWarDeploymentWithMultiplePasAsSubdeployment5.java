@@ -28,7 +28,6 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.Asset;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
@@ -96,7 +95,7 @@ public class TestWarDeploymentWithMultiplePasAsSubdeployment5 extends AbstractFo
             .addAsResource(processAssets[8], "alternateDirectory/process8.bpmn");
     
     WebArchive deployment = ShrinkWrap.create(WebArchive.class, "test.war")
-            .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
+            .addAsWebInfResource("org/camunda/bpm/integrationtest/beans.xml", "beans.xml")
             .addAsLibraries(DeploymentHelper.getEngineCdi())
             
             .addAsLibraries(pa2)

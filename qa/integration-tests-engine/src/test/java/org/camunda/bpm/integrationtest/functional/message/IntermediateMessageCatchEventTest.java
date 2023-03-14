@@ -18,8 +18,6 @@ package org.camunda.bpm.integrationtest.functional.message;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;

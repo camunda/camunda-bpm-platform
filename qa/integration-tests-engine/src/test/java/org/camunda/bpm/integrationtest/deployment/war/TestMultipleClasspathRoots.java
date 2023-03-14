@@ -28,7 +28,6 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.Asset;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
@@ -84,7 +83,7 @@ public class TestMultipleClasspathRoots extends AbstractFoxPlatformIntegrationTe
         .addAsResource(processAssets[0], "directory/processes/process.bpmn");
 
     WebArchive archive = ShrinkWrap.create(WebArchive.class, "test.war")
-        .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
+        .addAsWebInfResource("org/camunda/bpm/integrationtest/beans.xml", "beans.xml")
         .addAsLibraries(DeploymentHelper.getEngineCdi())
 
         .addAsLibraries(pa0)

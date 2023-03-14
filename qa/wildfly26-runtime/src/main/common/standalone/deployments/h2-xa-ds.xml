@@ -1,0 +1,17 @@
+<datasources>
+ <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true">
+   <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1</connection-url>
+   <driver>h2</driver>
+   <security>
+     <user-name>sa</user-name>
+     <password>sa</password>
+   </security>
+ </datasource>
+ <xa-datasource jndi-name="java:jboss/datasources/ProcessEngine" enabled="true" use-ccm="true" pool-name="ProcessEngine">
+   <xa-datasource-property name="URL">${database.url}</xa-datasource-property>
+   <driver>h2</driver>
+   <transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>
+   <xa-datasource-property name="User">${database.username}</xa-datasource-property>
+   <xa-datasource-property name="password">${database.password}</xa-datasource-property>
+ </xa-datasource>
+</datasources>

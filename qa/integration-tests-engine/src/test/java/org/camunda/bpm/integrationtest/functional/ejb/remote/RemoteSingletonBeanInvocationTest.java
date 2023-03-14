@@ -27,7 +27,6 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 import org.junit.Test;
@@ -62,7 +61,7 @@ public class RemoteSingletonBeanInvocationTest extends AbstractFoxPlatformIntegr
   public static WebArchive delegateDeployment() {
     WebArchive webArchive = ShrinkWrap.create(WebArchive.class, "service.war")
       .addAsLibraries(DeploymentHelper.getEjbClient())
-      .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
+      .addAsWebInfResource("org/camunda/bpm/integrationtest/beans.xml", "beans.xml")
       .addClass(AbstractFoxPlatformIntegrationTest.class)
       .addClass(RemoteSingletonBean.class) // the EJB
       .addClass(BusinessInterface.class); // the business interface
