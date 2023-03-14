@@ -1,0 +1,10 @@
+<module xmlns="urn:jboss:module:1.0" name="org.freemarker.freemarker">
+  <resources>
+    <resource-root path="freemarker-@version.freemarker@.jar" />
+  </resources>
+
+  <dependencies>
+    <module name="javax.api" />
+    <module name="org.apache.log4j" optional="true"/>
+  </dependencies>
+</module>

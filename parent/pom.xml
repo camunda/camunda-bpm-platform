@@ -50,8 +50,10 @@
     <version.bouncycastle>1.47</version.bouncycastle>
 
     <!-- application servers -->
-    <version.wildfly>26.0.1.Final</version.wildfly>
-    <version.wildfly.core>18.0.4.Final</version.wildfly.core>
+    <version.wildfly>27.0.1.Final</version.wildfly>
+    <version.wildfly.core>19.0.1.Final</version.wildfly.core>
+    <version.wildfly26>26.0.1.Final</version.wildfly26>
+    <version.wildfly26.core>18.0.4.Final</version.wildfly26.core>
 
     <version.tomcat>9.0.72</version.tomcat>
 

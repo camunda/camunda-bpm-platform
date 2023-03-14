@@ -1,0 +1,17 @@
+<module xmlns="urn:jboss:module:1.0" name="org.camunda.bpm.dmn.camunda-engine-feel-scala">
+  <resources>
+    <resource-root path="camunda-engine-feel-scala-@project.version@.jar" />
+  </resources>
+
+  <dependencies>
+    <module name="org.slf4j" />
+    <module name="sun.jdk" />
+    <module name="org.camunda.bpm.dmn.camunda-engine-feel-api" />
+    <module name="org.camunda.commons.camunda-commons-typed-values" />
+    <module name="org.camunda.commons.camunda-commons-logging" />
+
+    <module name="org.camunda.bpm.camunda-engine-plugin-spin" optional="true" />
+
+    <module name="org.camunda.feel.feel-engine" />
+  </dependencies>
+</module>
