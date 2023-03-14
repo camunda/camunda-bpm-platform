@@ -18,16 +18,16 @@ package org.camunda.bpm.integrationtest.functional.spin;
 
 import org.camunda.bpm.application.PostDeploy;
 import org.camunda.bpm.application.ProcessApplication;
-import org.camunda.bpm.application.impl.ServletProcessApplication;
 
 /**
- * {@link ServletProcessApplication} is fine on all containers as the tests
+ * {@link org.camunda.bpm.application.impl.ServletProcessApplication} is fine on all containers as the tests
  * don't require Java EE features
  *
  * @author Thorben Lindhauer
  */
 @ProcessApplication
-public class ReferenceStoringProcessApplication extends ServletProcessApplication {
+// Using fully-qualified class name instead of import statement to allow for automatic Jakarta transformation
+public class ReferenceStoringProcessApplication extends org.camunda.bpm.application.impl.ServletProcessApplication {
 
   public static ReferenceStoringProcessApplication INSTANCE = null;
 

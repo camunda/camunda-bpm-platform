@@ -17,7 +17,6 @@
 package org.camunda.bpm.integrationtest.functional.event.beans;
 
 import org.camunda.bpm.application.ProcessApplication;
-import org.camunda.bpm.application.impl.ServletProcessApplication;
 import org.camunda.bpm.engine.cdi.impl.event.CdiEventListener;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.TaskListener;
@@ -27,7 +26,8 @@ import org.camunda.bpm.engine.delegate.TaskListener;
  *
  */
 @ProcessApplication
-public class CdiEventSupportProcessApplication extends ServletProcessApplication {
+// Using fully-qualified class name instead of import statement to allow for automatic Jakarta transformation
+public class CdiEventSupportProcessApplication extends org.camunda.bpm.application.impl.ServletProcessApplication {
 
   public static final String LISTENER_INVOCATION_COUNT = "listenerInvocationCount";
 

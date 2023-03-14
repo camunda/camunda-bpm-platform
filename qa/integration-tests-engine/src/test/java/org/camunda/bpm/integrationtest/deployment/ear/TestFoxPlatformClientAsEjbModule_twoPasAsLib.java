@@ -25,7 +25,6 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.ByteArrayAsset;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -79,7 +78,7 @@ public class TestFoxPlatformClientAsEjbModule_twoPasAsLib extends AbstractFoxPla
     JavaArchive foxPlatformClientJar = DeploymentHelper.getEjbClient();
 
     WebArchive testJar = ShrinkWrap.create(WebArchive.class, "client-test.war")
-      .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
+      .addAsWebInfResource("org/camunda/bpm/integrationtest/beans.xml", "beans.xml")
       .setManifest(new ByteArrayAsset(("Class-Path: " + foxPlatformClientJar.getName()+"\n").getBytes()))
       .addClass(AbstractFoxPlatformIntegrationTest.class)
       .addClass(TestFoxPlatformClientAsEjbModule_twoPasAsLib.class);

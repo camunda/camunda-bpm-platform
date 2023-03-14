@@ -1,0 +1,32 @@
+<datasources>
+  <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true">
+    <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1</connection-url>
+    <driver>h2</driver>
+    <security>
+      <user-name>sa</user-name>
+      <password>sa</password>
+    </security>
+  </datasource>
+  <xa-datasource jndi-name="java:jboss/datasources/ProcessEngine" pool-name="ProcessEngine" enabled="true" use-ccm="false">
+    <driver>postgresql</driver>
+    <xa-datasource-property name="ServerName">${database.host}</xa-datasource-property>
+    <xa-datasource-property name="PortNumber">${database.port}</xa-datasource-property>
+    <xa-datasource-property name="DatabaseName">${database.name}</xa-datasource-property>
+    <xa-datasource-property name="User">${database.username}</xa-datasource-property>
+    <xa-datasource-property name="Password">${database.password}</xa-datasource-property>
+    <xa-pool>
+      <min-pool-size>1</min-pool-size>
+      <max-pool-size>60</max-pool-size>
+      <prefill>false</prefill>
+      <use-strict-min>false</use-strict-min>
+      <flush-strategy>FailingConnectionOnly</flush-strategy>
+    </xa-pool>
+    <transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>
+    <validation>
+      <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter" />
+      <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker" />
+      <validate-on-match>false</validate-on-match>
+      <background-validation>false</background-validation>
+    </validation>
+  </xa-datasource>
+</datasources>

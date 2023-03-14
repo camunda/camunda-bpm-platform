@@ -300,12 +300,12 @@
   <profiles>
 
     <profile>
-      <id>wildfly</id>
+      <id>wildfly26</id>
       <dependencies>
         <dependency>
           <!-- make sure this comes after runtime in the reactor build -->
           <groupId>org.camunda.bpm.qa</groupId>
-          <artifactId>camunda-qa-wildfly-runtime</artifactId>
+          <artifactId>camunda-qa-wildfly26-runtime</artifactId>
           <version>${project.version}</version>
           <scope>provided</scope>
           <type>pom</type>
@@ -320,7 +320,7 @@
       <build>
         <testResources>
           <testResource>
-            <directory>src/test/resources-wildfly</directory>
+            <directory>src/test/resources-wildfly26</directory>
             <filtering>true</filtering>
           </testResource>
         </testResources>
@@ -337,7 +337,7 @@
                 </goals>
                 <configuration>
                   <sources>
-                    <source>src/test/java-wildfly</source>
+                    <source>src/test/java-wildfly26</source>
                   </sources>
                 </configuration>
               </execution>
@@ -378,12 +378,12 @@
     </profile>
 
     <profile>
-      <id>wildfly-domain</id>
+      <id>wildfly26-domain</id>
       <dependencies>
         <dependency>
           <!-- make sure this comes after runtime in the reactor build -->
           <groupId>org.camunda.bpm.qa</groupId>
-          <artifactId>camunda-qa-wildfly-runtime</artifactId>
+          <artifactId>camunda-qa-wildfly26-runtime</artifactId>
           <version>${project.version}</version>
           <scope>provided</scope>
           <type>pom</type>
@@ -398,7 +398,7 @@
       <build>
         <testResources>
           <testResource>
-            <directory>src/test/resources-wildfly-domain</directory>
+            <directory>src/test/resources-wildfly26-domain</directory>
             <filtering>true</filtering>
           </testResource>
         </testResources>
@@ -415,7 +415,7 @@
                 </goals>
                 <configuration>
                   <sources>
-                    <source>src/test/java-wildfly</source>
+                    <source>src/test/java-wildfly26</source>
                   </sources>
                 </configuration>
               </execution>
@@ -446,7 +446,7 @@
     </profile>
 
     <profile>
-      <id>wildfly-servlet</id>
+      <id>wildfly26-servlet</id>
       <build>
         <plugins>
           <plugin>
@@ -461,7 +461,7 @@
                 </goals>
                 <configuration>
                   <sources>
-                    <source>src/test/java-wildfly-servlet</source>
+                    <source>src/test/java-wildfly26-servlet</source>
                   </sources>
                 </configuration>
               </execution>
@@ -628,7 +628,7 @@
                 </goals>
                 <configuration>
                   <sources>
-                    <source>src/test/java-wildfly</source>
+                    <source>src/test/java-wildfly26</source>
                   </sources>
                 </configuration>
               </execution>
@@ -641,7 +641,7 @@
                 <configuration>
                   <resources>
                     <resource>
-                      <directory>src/test/resources-wildfly</directory>
+                      <directory>src/test/resources-wildfly26</directory>
                     </resource>
                   </resources>
                 </configuration>

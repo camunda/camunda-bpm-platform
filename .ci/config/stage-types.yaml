@@ -144,9 +144,9 @@ engine-rest-unit-compatibility-wildfly:
   labels:
   - 'rest-api'
   nodeLabel: 'h2'
-engine-rest-IT-embedded-wildfly:
+engine-rest-IT-embedded-wildfly26:
   directory: 'qa'
-  command: 'clean install -Pwildfly,h2,webapps-integration,embedded-engine-rest'
+  command: 'clean install -Pwildfly26,h2,webapps-integration,embedded-engine-rest'
   stash:
     runtimeStash: true
     archiveStash: true

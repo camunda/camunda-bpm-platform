@@ -21,11 +21,11 @@ import java.util.List;
 import org.camunda.bpm.application.PostDeploy;
 import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationInfo;
-import org.camunda.bpm.application.impl.ServletProcessApplication;
 import org.camunda.bpm.engine.ProcessEngine;
 
 @ProcessApplication
-public class PostDeployInjectApp extends ServletProcessApplication {
+// Using fully-qualified class name instead of import statement to allow for automatic Jakarta transformation
+public class PostDeployInjectApp extends org.camunda.bpm.application.impl.ServletProcessApplication {
   
   public static ProcessEngine processEngine;
   public static ProcessApplicationInfo processApplicationInfo;

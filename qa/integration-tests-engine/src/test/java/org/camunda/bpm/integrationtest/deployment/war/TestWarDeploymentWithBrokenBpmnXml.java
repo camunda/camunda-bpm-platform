@@ -22,7 +22,6 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 import org.junit.Test;
@@ -48,7 +47,7 @@ public class TestWarDeploymentWithBrokenBpmnXml {
   public static WebArchive processArchive() {    
     
     WebArchive deployment = ShrinkWrap.create(WebArchive.class, "test.war")
-      .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
+      .addAsWebInfResource("org/camunda/bpm/integrationtest/beans.xml", "beans.xml")
       .addAsResource("META-INF/processes.xml", "META-INF/processes.xml")
       .addAsResource("org/camunda/bpm/integrationtest/deployment/war/TestWarDeploymentWithBrokenBpmnXml.testXmlInvalid.bpmn20.xml");
     

@@ -17,14 +17,13 @@
 package org.camunda.bpm.integrationtest.functional.context;
 
 import java.util.concurrent.Callable;
-
 import org.camunda.bpm.application.InvocationContext;
 import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationExecutionException;
-import org.camunda.bpm.application.impl.ServletProcessApplication;
 
 @ProcessApplication("app")
-public class ProcessApplicationWithInvocationContext extends ServletProcessApplication {
+// Using fully-qualified class name instead of import statement to allow for automatic Jakarta transformation
+public class ProcessApplicationWithInvocationContext extends org.camunda.bpm.application.impl.ServletProcessApplication {
 
   private static InvocationContext invocationContext = null;
 
