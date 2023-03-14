@@ -28,12 +28,11 @@ import org.camunda.bpm.application.PostDeploy;
 import org.camunda.bpm.application.PreUndeploy;
 import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationInterface;
-import org.camunda.bpm.application.impl.EjbProcessApplication;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.junit.Assert;
 
 /**
- * Custom {@link EjbProcessApplication} with PA lifecycle callbacks
+ * Custom {@link org.camunda.bpm.application.impl.EjbProcessApplication} with PA lifecycle callbacks
  *
  * @author Daniel Meyer
  *
@@ -44,7 +43,8 @@ import org.junit.Assert;
 @TransactionAttribute(TransactionAttributeType.REQUIRED)
 @ProcessApplication
 @Local(ProcessApplicationInterface.class)
-public class CustomEjbProcessApplication extends EjbProcessApplication {
+// Using fully-qualified class name instead of import statement to allow for automatic Jakarta transformation
+public class CustomEjbProcessApplication extends org.camunda.bpm.application.impl.EjbProcessApplication {
 
   @PostDeploy
   public void postDeploy(ProcessEngine processEngine) {

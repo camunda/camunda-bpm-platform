@@ -24,7 +24,6 @@ import javax.ejb.Startup;
 import javax.enterprise.concurrent.ManagedExecutorService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.cdi.impl.ManagedJobExecutor;
-import org.camunda.bpm.engine.impl.cfg.JtaProcessEngineConfiguration;
 
 @Startup
 @Singleton
@@ -38,7 +37,9 @@ public class ManagedJobExecutorBean {
 
   @PostConstruct
   public void startEngine() {
-    JtaProcessEngineConfiguration processEngineConfiguration = new JtaProcessEngineConfiguration();
+    // Using fully-qualified class name instead of import statement to allow for automatic Jakarta transformation
+    org.camunda.bpm.engine.impl.cfg.JtaProcessEngineConfiguration processEngineConfiguration =
+        new org.camunda.bpm.engine.impl.cfg.JtaProcessEngineConfiguration();
     processEngineConfiguration.setDatabaseSchemaUpdate("true")
       .setHistory("auto")
       .setDbMetricsReporterActivate(false)

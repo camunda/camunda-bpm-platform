@@ -1,0 +1,11 @@
+<module xmlns="urn:jboss:module:1.0" name="org.jruby.jruby-complete">
+  <resources>
+    <resource-root path="jruby-complete-9.1.17.0.jar" />
+  </resources>
+
+  <dependencies>
+    <module name="javax.api" />
+    <module name="sun.jdk" />
+    <module name="org.camunda.spin.camunda-spin-core" />
+  </dependencies>
+</module>

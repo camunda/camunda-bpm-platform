@@ -24,6 +24,7 @@ import org.camunda.bpm.application.impl.ServletProcessApplication;
  *
  */
 @ProcessApplication
-public class TestProcessApplication extends ServletProcessApplication {
+// Using fully-qualified class name instead of import statement to allow for automatic Jakarta transformation
+public class TestProcessApplication extends org.camunda.bpm.application.impl.ServletProcessApplication {
 
 }

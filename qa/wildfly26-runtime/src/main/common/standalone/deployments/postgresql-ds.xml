@@ -1,0 +1,28 @@
+<datasources>
+  <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true">
+    <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1</connection-url>
+    <driver>h2</driver>
+    <security>
+      <user-name>sa</user-name>
+      <password>sa</password>
+    </security>
+  </datasource>
+  <datasource jta="true" jndi-name="java:jboss/datasources/ProcessEngine" pool-name="ProcessEngine" enabled="true" use-java-context="true" use-ccm="true">
+    <connection-url>${database.url}</connection-url>
+    <driver>postgresql</driver>
+    <transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>
+    <pool>
+      <prefill>false</prefill>
+      <use-strict-min>false</use-strict-min>
+      <flush-strategy>FailingConnectionOnly</flush-strategy>
+    </pool>
+    <security>
+      <user-name>${database.username}</user-name>
+      <password>${database.password}</password>
+    </security>
+    <validation>
+      <validate-on-match>false</validate-on-match>
+      <background-validation>false</background-validation>
+    </validation>
+  </datasource>
+</datasources>

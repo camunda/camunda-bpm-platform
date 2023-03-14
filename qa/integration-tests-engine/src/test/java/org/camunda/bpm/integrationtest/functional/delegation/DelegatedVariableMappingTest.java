@@ -24,7 +24,6 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
-import static org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest.initWebArchiveDeployment;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;

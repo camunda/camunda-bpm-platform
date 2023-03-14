@@ -17,13 +17,13 @@
 package org.camunda.bpm.integrationtest.deployment.war.apps;
 
 import org.camunda.bpm.application.ProcessApplication;
-import org.camunda.bpm.application.impl.ServletProcessApplication;
 
 /**
  * @author Daniel Meyer
  *
  */
 @ProcessApplication
-public class CustomServletPA extends ServletProcessApplication {
+// Using fully-qualified class name instead of import statement to allow for automatic Jakarta transformation
+public class CustomServletPA extends org.camunda.bpm.application.impl.ServletProcessApplication {
 
 }
