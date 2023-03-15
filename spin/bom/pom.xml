@@ -15,6 +15,10 @@
   <name>camunda spin - bom</name>
   <packaging>pom</packaging>
 
+  <properties>
+    <plugin.version.javadoc>3.3.1</plugin.version.javadoc>
+  </properties>
+
   <dependencyManagement>
     <dependencies>
 
@@ -63,7 +67,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
-          <version>3.3.1</version>
+          <version>${plugin.version.javadoc}</version>
           <configuration combine.children="append">
             <doclint>none</doclint>
             <detectJavaApiLink>false</detectJavaApiLink>
