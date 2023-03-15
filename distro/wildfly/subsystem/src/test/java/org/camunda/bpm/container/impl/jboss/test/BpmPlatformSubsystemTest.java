@@ -16,11 +16,10 @@
  */
 package org.camunda.bpm.container.impl.jboss.test;
 
+import java.io.IOException;
 import org.camunda.bpm.container.impl.jboss.extension.BpmPlatformExtension;
 import org.camunda.bpm.container.impl.jboss.extension.ModelConstants;
 import org.jboss.as.subsystem.test.AbstractSubsystemBaseTest;
-
-import java.io.IOException;
 
 
 /**
@@ -46,7 +45,8 @@ public class BpmPlatformSubsystemTest extends AbstractSubsystemBaseTest {
   /**
    * Method is only used by WF-10 to validate the subsystem schema. Isn't executed when running WF8.
    */
+  @Override
   protected String getSubsystemXsdPath() throws Exception {
-    return "schema/foxEngineSubsystem_1_1.xsd";
+    return "schema/camundaPlatformSubsystem.xsd";
   }
 }
