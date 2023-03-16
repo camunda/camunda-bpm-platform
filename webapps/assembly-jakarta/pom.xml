@@ -761,6 +761,7 @@
                 <exclude>**/CsrfPreventionFilterAppPathTest.java</exclude>
                 <exclude>**/CsrfPreventionFilterTest.java</exclude>
                 <exclude>**/UserAuthenticationResourceTest.java</exclude>
+                <exclude>**/UserAuthenticationResourceLoggingTest.java</exclude>
               </testExcludes>
             </configuration>
           </plugin>
