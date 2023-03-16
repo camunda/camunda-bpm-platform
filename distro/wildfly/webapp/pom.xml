@@ -11,7 +11,7 @@
   <name>Camunda Platform - webapp - WildFly</name>
   <artifactId>camunda-webapp-wildfly</artifactId>
   <packaging>war</packaging>
-  
+
   <properties>
     <!-- generate a bom of compile time dependencies for the license book.
     Note: Every compile time dependency will end up in the license book. Please
@@ -22,8 +22,7 @@
   <dependencies>
     <dependency>
       <groupId>org.camunda.bpm.webapp</groupId>
-      <!-- adjust to camunda-webapp-jakarta when https://github.com/camunda/camunda-bpm-platform/issues/3098 is done -->
-      <artifactId>camunda-webapp</artifactId>
+      <artifactId>camunda-webapp-jakarta</artifactId>
       <version>${project.version}</version>
       <type>war</type>
       <scope>runtime</scope>
@@ -43,7 +42,7 @@
               <!-- module dependencies for deployment on JBoss/WildFly -->
               <Dependencies>org.camunda.bpm.camunda-engine,org.camunda.bpm.dmn.camunda-engine-dmn,org.camunda.bpm.model.camunda-bpmn-model,org.camunda.bpm.model.camunda-cmmn-model,org.camunda.bpm.model.camunda-dmn-model,org.camunda.bpm.model.camunda-xml-model,org.camunda.commons.camunda-commons-logging,org.camunda.spin.camunda-spin-core,org.graalvm.js.js-scriptengine services</Dependencies>
             </manifestEntries>
-          </archive>          
+          </archive>
         </configuration>
       </plugin>
     </plugins>

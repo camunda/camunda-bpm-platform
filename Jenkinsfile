@@ -339,31 +339,30 @@ pipeline {
             ])
           }
         }
-// enable this stage when https://github.com/camunda/camunda-bpm-platform/issues/3098 is done
-//        stage('webapp-IT-wildfly-h2') {
-//          when {
-//            expression {
-//              cambpmWithLabels('webapp-integration', 'h2', 'wildfly')
-//            }
-//          }
-//          steps {
-//            cambpmConditionalRetry([
-//              agentLabel: 'chrome_78',
-//              runSteps: {
-//                cambpmRunMaven('qa/', 
-//                  'clean install -Pwildfly,h2,webapps-integration', 
-//                  runtimeStash: true, 
-//                  archiveStash: true,
-//                  // we need to use JDK 11 for WildFly 27+
-//                  jdkVersion: 'jdk-11-latest')
-//              },
-//              postFailure: {
-//                cambpmPublishTestResult()
-//                cambpmArchiveArtifacts('qa/integration-tests-webapps/shared-engine/target/selenium-screenshots/*')
-//              }
-//            ])
-//          }
-//        }
+        stage('webapp-IT-wildfly-h2') {
+          when {
+            expression {
+              cambpmWithLabels('webapp-integration', 'h2', 'wildfly')
+            }
+          }
+          steps {
+            cambpmConditionalRetry([
+              agentLabel: 'chrome_78',
+              runSteps: {
+                cambpmRunMaven('qa/',
+                  'clean install -Pwildfly,h2,webapps-integration',
+                  runtimeStash: true,
+                  archiveStash: true,
+                  // we need to use JDK 11 for WildFly 27+
+                  jdkVersion: 'jdk-11-latest')
+              },
+              postFailure: {
+                cambpmPublishTestResult()
+                cambpmArchiveArtifacts('qa/integration-tests-webapps/shared-engine/target/selenium-screenshots/*')
+              }
+            ])
+          }
+        }
         stage('webapp-IT-wildfly26-h2') {
           when {
             expression {
