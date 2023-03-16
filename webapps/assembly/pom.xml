@@ -89,7 +89,6 @@
       <scope>test</scope>
       <classifier>tests</classifier>
     </dependency>
-
   </dependencies>
 
   <build>
@@ -169,11 +168,6 @@
     <profile>
       <id>develop</id>
       <dependencies>
-        <dependency>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-api</artifactId>
-          <version>${version.slf4j}</version>
-        </dependency>
         <dependency>
           <groupId>org.jboss.resteasy</groupId>
           <artifactId>resteasy-jaxrs</artifactId>
@@ -383,11 +377,6 @@
             </configuration>
             <dependencies>
               <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>${version.slf4j}</version>
-              </dependency>
-              <dependency>
                 <groupId>org.camunda.bpm</groupId>
                 <artifactId>camunda-engine</artifactId>
                 <version>${project.version}</version>
@@ -551,11 +540,6 @@
               </execution>
             </executions>
             <dependencies>
-              <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>${version.slf4j}</version>
-              </dependency>
               <dependency>
                 <groupId>org.camunda.bpm</groupId>
                 <artifactId>camunda-engine</artifactId>
