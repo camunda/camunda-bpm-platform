@@ -89,7 +89,7 @@
         <module>engine-spring</module>
         <module>engine-rest</module>
 
-        <module>webapps/assembly</module>
+        <module>webapps</module>
 
         <module>examples/invoice</module>
 
@@ -158,7 +158,7 @@
         <module>engine-spring</module>
         <module>engine-rest</module>
 
-        <module>webapps/assembly</module>
+        <module>webapps</module>
 
         <module>examples/invoice</module>
 
@@ -272,7 +272,7 @@
         <module>javaee/ejb-client</module>
         <module>javaee/ejb-client-jakarta</module>
 
-        <module>webapps/assembly</module>
+        <module>webapps</module>
 
         <module>engine-plugins</module>
 

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-module.exports = function() {
+module.exports = function(buildTarget) {
   'use strict';
 
   return {
@@ -23,13 +23,13 @@ module.exports = function() {
       options: {
         force: true
       },
-      src: ['../assembly/target/webapp/plugin']
+      src: [buildTarget + '/target/webapp/plugin']
     },
     apps: {
       options: {
         force: true
       },
-      src: ['../assembly/target/webapp/app', '../assembly/target/webapp/lib']
+      src: [buildTarget + "/target/webapp/app", buildTarget + "/target/webapp/lib"]
     },
     'sdk-js': {
       src: [

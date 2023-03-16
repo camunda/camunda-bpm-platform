@@ -7,7 +7,9 @@ Clean, package and install it via [Maven](https://maven.apache.org/).
 
 The structure is as follows:
 
-* `assembly` - Java sources and tests for the Camunda web application.
+* `assembly` - Java sources and tests for the Camunda web application based on `javax` namespace.
+* `assembly-jakarta` - Java sources and tests for the Camunda web application based on `jakarta` namespace.
+  * This module is created from the `assembly` module via code transformation.
 * `frontend` - HTML, CSS and Javascript sources as well as Plugins and tests for the Camunda webapplications Cockpit, Tasklist and Admin.
 
 ## FRONTEND
@@ -81,6 +83,27 @@ You can now start developing using the `grunt auto-build` command in the fronten
 
 If you are only changing Javascript files, you can set the environment variable `FAST_BUILD` to 1 to further improve compile times.
 
+##### Jakarta Webapps
+
+In order to run the Jakarta Webapps start Jetty the same way from the `assembly-jakarta` folder
+
+```sh
+cd camunda-bpm-platform/webapps/assembly
+mvn jetty:run -Pdevelop
+```
+
+And start Grunt with an additional `--assembly-jakarta` argument
+
+```sh
+grunt --assembly-jakarta
+```
+
+or in watch mode
+
+```sh
+grunt auto-build --assembly-jakarta
+```
+
 #### Testing
 
 Install the webapps with Grunt and start the server in test mode:
@@ -106,6 +129,10 @@ describe.only('Cockpit Dashboard Spec', function() {
   // ...
 }
 ```
+
+##### Jakarta Webapps
+
+In order to test the Jakarta Webapps run the same command with an additional `--assembly-jakarta` argument.
 
 #### AngularJS libraries from XLTS.dev
 

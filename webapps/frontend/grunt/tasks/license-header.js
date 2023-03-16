@@ -45,12 +45,13 @@ const APACHE = `/*
 
 `;
 
-module.exports = function(grunt, isEE) {
+module.exports = function(grunt, isEE, buildTarget) {
   const LICENSE_BANNER = isEE ? COMERCIAL : APACHE;
 
   grunt.registerTask('license-header', function() {
     const targets = glob.sync(
-      '../assembly/target/webapp/{**/camunda-*.js,plugin/**/*.js,lib/globalize.js}'
+      buildTarget +
+        '/target/webapp/{**/camunda-*.js,plugin/**/*.js,lib/globalize.js}'
     );
 
     console.log('Adding license header to files:');

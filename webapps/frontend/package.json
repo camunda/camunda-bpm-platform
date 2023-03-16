@@ -5,21 +5,23 @@
   "gruntConfig": {
     "connectPort": 8020,
     "livereloadPort": 8021,
-    "welcomeBuildTarget": "../assembly/target/webapp/app/welcome",
+    "welcomeBuildTarget": "${buildTarget}/target/webapp/app/welcome",
     "welcomeSourceDir": "ui/welcome/client",
-    "adminBuildTarget": "../assembly/target/webapp/app/admin",
+    "adminBuildTarget": "${buildTarget}/target/webapp/app/admin",
     "adminSourceDir": "ui/admin/client",
-    "cockpitBuildTarget": "../assembly/target/webapp/app/cockpit",
+    "cockpitBuildTarget": "${buildTarget}/target/webapp/app/cockpit",
     "cockpitSourceDir": "ui/cockpit/client",
-    "tasklistBuildTarget": "../assembly/target/webapp/app/tasklist",
+    "tasklistBuildTarget": "${buildTarget}/target/webapp/app/tasklist",
     "tasklistSourceDir": "ui/tasklist/client",
-    "pluginBuildTarget": "../assembly/target/webapp/plugin",
+    "pluginBuildTarget": "${buildTarget}/target/webapp/plugin",
     "pluginSourceDir": "ui",
-    "libTargetDir": "../assembly/target/webapp/lib",
+    "libTargetDir": "${buildTarget}/target/webapp/lib",
     "commonsUiDir": "./camunda-commons-ui"
   },
   "scripts": {
-    "dependencies": "license-checker --production --json --relativeLicensePath"
+    "dependencies": "license-checker --production --json --relativeLicensePath",
+    "start": "grunt auto-build",
+    "start:jakarta": "grunt auto-build --assembly-jakarta"
   },
   "dependencies": {
     "@bpmn-io/dmn-migrate": "0.4.3",
