@@ -22,7 +22,8 @@ var angular = require('../../../../camunda-bpm-sdk-js/vendor/angular'),
   template = fs.readFileSync(__dirname + '/cam-widget-loader.html', 'utf8');
 
 module.exports = [
-  function() {
+  '$translate',
+  function($translate) {
     return {
       transclude: true,
 
@@ -37,7 +38,7 @@ module.exports = [
 
       compile: function(element, attrs) {
         if (!angular.isDefined(attrs.textLoading)) {
-          attrs.textLoading = 'Loading…';
+          attrs.textLoading = $translate.instant('LOADING');
         }
 
         if (!angular.isDefined(attrs.loadingState)) {
