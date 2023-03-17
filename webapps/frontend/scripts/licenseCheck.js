@@ -103,7 +103,7 @@ if (require.main === module) {
     },
     parseResults(
       PRODUCTION_LICENSES,
-      () => console.log('License check passed'),
+      () => console.log('Production packages license check passed'),
       (warn) => {
         console.warn('License check did not pass');
         console.warn(warn);
@@ -119,7 +119,7 @@ if (require.main === module) {
     },
     parseResults(
       [...PRODUCTION_LICENSES, ...DEV_LICENSES],
-      () => console.log('License check passed'),
+      () => console.log('Development packages license check passed'),
       (warn) => {
         console.warn('License check did not pass');
         console.warn(warn);

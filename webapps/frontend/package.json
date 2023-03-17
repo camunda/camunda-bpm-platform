@@ -48,6 +48,7 @@
     "dmn-js-decision-table": "14.1.1",
     "dmn-js-drd": "14.0.2",
     "dmn-js-literal-expression": "14.0.2",
+    "dmn-js-properties-panel": "^1.3.1",
     "dmn-js-shared": "14.0.2",
     "dom4": "2.1.6",
     "events": "3.3.0",
