@@ -78,7 +78,7 @@ pipeline {
                 sh(label: 'Create webapps target dir', script: 'mkdir -p ./webapps/assembly/target/webapp')
                 sh(label: 'Create webapps Jakarta target dir', script: 'mkdir -p ./webapps/assembly-jakarta/target/webapp')
                 cambpmRunMaven('.',
-                  'package javadoc:javadoc javadoc:aggregate -Pdistro,distro-wildfly,distro-webjar,javadocs -DskipTests=true -Dskip.frontend.build=true',
+                  "package javadoc:javadoc javadoc:aggregate -Pdistro,distro-wildfly,distro-webjar,javadocs -pl '!distro/wildfly/modules,!distro/wildfly26/modules' -DskipTests=true -Dskip.frontend.build=true",
                   withNpm: true,
                   jdkVersion: 'jdk-11-latest')
               },
