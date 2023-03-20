@@ -22,7 +22,9 @@
 #     sqlserver: [INT; OPTIONAL;]
 db-unit:
   directory: '.'
-  command: 'clean test -pl "engine,webapps/assembly,webapps/assembly-jakarta" -Dskip.frontend.build=true -P'
+# TODO see https://github.com/camunda/camunda-bpm-platform/issues/3258
+#  command: 'clean test -pl "engine,webapps/assembly,webapps/assembly-jakarta" -Dskip.frontend.build=true -P'
+  command: 'clean test -pl "engine,webapps/assembly" -Dskip.frontend.build=true -P'
   stash:
     runtimeStash: true
   labels:
@@ -37,7 +39,9 @@ db-unit:
   - 'authorizations'
 db-unit-authorizations:
   directory: '.'
-  command: 'clean test -pl "engine,webapps/assembly,webapps/assembly-jakarta" -Dskip.frontend.build=true -PcfgAuthorizationCheckRevokesAlways,'
+# TODO see https://github.com/camunda/camunda-bpm-platform/issues/3258
+#  command: 'clean test -pl "engine,webapps/assembly,webapps/assembly-jakarta" -Dskip.frontend.build=true -PcfgAuthorizationCheckRevokesAlways,'
+  command: 'clean test -pl "engine,webapps/assembly" -Dskip.frontend.build=true -PcfgAuthorizationCheckRevokesAlways,'
   stash:
     runtimeStash: true
   labels:
