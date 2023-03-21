@@ -93,7 +93,7 @@ public class UserAuthenticationResource {
 
     if (!isPasswordValid) {
       if(isWebappsAuthenticationLoggingEnabled(processEngine)) {
-        LOGGER.infoWebappFailedLogin(username);
+        LOGGER.infoWebappFailedLogin(username, "bad credentials");
       }
       return unauthorized();
     }
@@ -110,6 +110,7 @@ public class UserAuthenticationResource {
     Set<String> authorizedApps = authentication.getAuthorizedApps();
 
     if (!authorizedApps.contains(appName)) {
+      LOGGER.infoWebappFailedLogin(username, "not authorized");
       return forbidden();
     }
 

@@ -19,6 +19,8 @@ package org.camunda.bpm.webapp.impl;
 import java.util.Date;
 import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.exception.RestException;
+import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 import org.camunda.commons.logging.BaseLogger;
 
 public class WebappLogger extends BaseLogger {
@@ -33,16 +35,24 @@ public class WebappLogger extends BaseLogger {
         "Process engine with name " + engineName + " does not exist");
   }
 
-  public void infoWebappSuccessfulLogin(String username) {
-    logInfo("001", "successful login for user {}", username);
+  public InvalidRequestException setupActionNotAvailable() {
+    return new InvalidRequestException(Status.FORBIDDEN, "Setup action not available");
   }
 
-  public void infoWebappFailedLogin(String username) {
-    logInfo("002", "failed login attempt for user {}", username);
+  public RestException processEngineProviderNotFound() {
+    return new RestException(Status.BAD_REQUEST, "Could not find an implementation of the " + ProcessEngineProvider.class + "- SPI");
+  }
+
+  public void infoWebappSuccessfulLogin(String username) {
+    logInfo("001", "Successful login for user {}.", username);
+  }
+
+  public void infoWebappFailedLogin(String username, String reason) {
+    logInfo("002", "Failed login attempt for user {}. Reason: {}", username, reason);
   }
 
   public void infoWebappLogout(String username) {
-    logInfo("003", "successful logout for user {}", username);
+    logInfo("003", "Successful logout for user {}.", username);
   }
 
   public void traceCacheValidationTime(Date cacheValidationTime) {

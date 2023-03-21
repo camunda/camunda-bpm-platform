@@ -32,7 +32,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.Providers;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.IdentityService;
@@ -43,8 +42,6 @@ import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 import org.camunda.bpm.engine.rest.dto.identity.UserDto;
-import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.impl.UserRestServiceImpl;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 import org.camunda.bpm.engine.rest.util.ProvidersUtil;
@@ -149,7 +146,7 @@ public class SetupResource {
     if (processEngine.getIdentityService().isReadOnly()
         || (processEngine.getIdentityService().createUserQuery().memberOfGroup(Groups.CAMUNDA_ADMIN).count() > 0)) {
 
-      throw new InvalidRequestException(Status.FORBIDDEN, "Setup action not available");
+      throw LOGGER.setupActionNotAvailable();
     }
   }
 
@@ -163,7 +160,7 @@ public class SetupResource {
       return provider.getProcessEngine(engineName);
 
     } else {
-      throw new RestException(Status.BAD_REQUEST, "Could not find an implementation of the "+ProcessEngineProvider.class+"- SPI");
+      throw LOGGER.processEngineProviderNotFound();
 
     }
 

@@ -21,8 +21,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import java.util.List;
+import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -45,17 +49,20 @@ public class UserAuthenticationResourceLoggingTest {
   protected ProcessEngine processEngine;
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
   protected IdentityService identityService;
+  protected AuthorizationService authorizationService;
 
   @Before
   public void setUp() {
     this.processEngine = processEngineRule.getProcessEngine();
     this.processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
     this.identityService = processEngine.getIdentityService();
+    this.authorizationService = processEngine.getAuthorizationService();
   }
 
   @After
   public void tearDown() {
     ClockUtil.reset();
+    processEngineConfiguration.setAuthorizationEnabled(false);
     processEngineConfiguration.setWebappsAuthenticationLoggingEnabled(false);
 
     for (User user : identityService.createUserQuery().list()) {
@@ -83,7 +90,7 @@ public class UserAuthenticationResourceLoggingTest {
     // then
     List<ILoggingEvent> filteredLog = loggingRule.getFilteredLog("jonny");
     assertThat(filteredLog).hasSize(1);
-    assertThat(filteredLog.get(0).getFormattedMessage()).contains("successful login for user jonny");
+    assertThat(filteredLog.get(0).getFormattedMessage()).contains("Successful login for user jonny");
   }
 
   @Test
@@ -124,7 +131,7 @@ public class UserAuthenticationResourceLoggingTest {
     // then
     List<ILoggingEvent> filteredLog = loggingRule.getFilteredLog("jonny");
     assertThat(filteredLog).hasSize(1);
-    assertThat(filteredLog.get(0).getFormattedMessage()).contains("failed login attempt for user jonny");
+    assertThat(filteredLog.get(0).getFormattedMessage()).contains("Failed login attempt for user jonny. Reason: bad credentials");
   }
 
   @Test
@@ -164,9 +171,9 @@ public class UserAuthenticationResourceLoggingTest {
     authResource.doLogout("webapps-test-engine");
 
     // then
-    List<ILoggingEvent> filteredLog = loggingRule.getFilteredLog("logout");
+    List<ILoggingEvent> filteredLog = loggingRule.getFilteredLog("jonny");
     assertThat(filteredLog).hasSize(1);
-    assertThat(filteredLog.get(0).getFormattedMessage()).contains("successful logout for user jonny");
+    assertThat(filteredLog.get(0).getFormattedMessage()).contains("Successful logout for user jonny");
   }
 
   @Test
@@ -186,7 +193,7 @@ public class UserAuthenticationResourceLoggingTest {
     authResource.doLogout("webapps-test-engine");
 
     // then
-    List<ILoggingEvent> filteredLog = loggingRule.getFilteredLog("logout");
+    List<ILoggingEvent> filteredLog = loggingRule.getFilteredLog("jonny");
     assertThat(filteredLog).hasSize(0);
   }
 
@@ -202,8 +209,59 @@ public class UserAuthenticationResourceLoggingTest {
     authResource.doLogout("webapps-test-engine");
 
     // then
-    List<ILoggingEvent> filteredLog = loggingRule.getFilteredLog("logout");
+    List<ILoggingEvent> filteredLog = loggingRule.getFilteredLog("jonny");
     assertThat(filteredLog).hasSize(0);
+  }
+
+  @Test
+  public void shouldProduceLogStatementOnLoginWhenAuthorized() {
+    // given
+    User jonny = identityService.newUser("jonny");
+    jonny.setPassword("jonnyspassword");
+    identityService.saveUser(jonny);
+
+    Authorization authorization = authorizationService.createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
+    authorization.setResource(Resources.APPLICATION);
+    authorization.setResourceId("tasklist");
+    authorization.setPermissions(new Permissions[] {Permissions.ACCESS});
+    authorization.setUserId(jonny.getId());
+    authorizationService.saveAuthorization(authorization);
+
+    processEngineConfiguration.setAuthorizationEnabled(true);
+    processEngineConfiguration.setWebappsAuthenticationLoggingEnabled(true);
+
+    UserAuthenticationResource authResource = new UserAuthenticationResource();
+    authResource.request = new MockHttpServletRequest();
+
+    // when
+    authResource.doLogin("webapps-test-engine", "tasklist", "jonny", "jonnyspassword");
+
+    // then
+    List<ILoggingEvent> filteredLog = loggingRule.getFilteredLog("jonny");
+    assertThat(filteredLog).hasSize(1);
+    assertThat(filteredLog.get(0).getFormattedMessage()).contains("Successful login for user jonny");
+  }
+
+  @Test
+  public void shouldProduceLogStatementOnLoginWhenNotAuthorized() {
+    // given
+    User jonny = identityService.newUser("jonny");
+    jonny.setPassword("jonnyspassword");
+    identityService.saveUser(jonny);
+
+    processEngineConfiguration.setAuthorizationEnabled(true);
+    processEngineConfiguration.setWebappsAuthenticationLoggingEnabled(true);
+
+    UserAuthenticationResource authResource = new UserAuthenticationResource();
+    authResource.request = new MockHttpServletRequest();
+
+    // when
+    authResource.doLogin("webapps-test-engine", "tasklist", "jonny", "jonnyspassword");
+
+    // then
+    List<ILoggingEvent> filteredLog = loggingRule.getFilteredLog("jonny");
+    assertThat(filteredLog).hasSize(1);
+    assertThat(filteredLog.get(0).getFormattedMessage()).contains("Failed login attempt for user jonny. Reason: not authorized");
   }
 
   protected void setAuthentication(String user, String engineName) {
