@@ -51,19 +51,25 @@ public class UserAuthenticationResourceLoggingTest {
   protected IdentityService identityService;
   protected AuthorizationService authorizationService;
 
+  protected boolean authorizationEnabledInitialValue;
+  protected boolean webappsAuthenticationLoggingEnabledInitialValue;
+
   @Before
   public void setUp() {
     this.processEngine = processEngineRule.getProcessEngine();
     this.processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
     this.identityService = processEngine.getIdentityService();
     this.authorizationService = processEngine.getAuthorizationService();
+
+    authorizationEnabledInitialValue = processEngineConfiguration.isAuthorizationEnabled();
+    webappsAuthenticationLoggingEnabledInitialValue = processEngineConfiguration.isWebappsAuthenticationLoggingEnabled();
   }
 
   @After
   public void tearDown() {
     ClockUtil.reset();
-    processEngineConfiguration.setAuthorizationEnabled(false);
-    processEngineConfiguration.setWebappsAuthenticationLoggingEnabled(false);
+    processEngineConfiguration.setAuthorizationEnabled(authorizationEnabledInitialValue);
+    processEngineConfiguration.setWebappsAuthenticationLoggingEnabled(webappsAuthenticationLoggingEnabledInitialValue);
 
     for (User user : identityService.createUserQuery().list()) {
       identityService.deleteUser(user.getId());
