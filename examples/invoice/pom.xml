@@ -86,7 +86,7 @@
     </plugins>
   </build>
 
-   <profiles>
+  <profiles>
     <profile>
       <id>develop</id>
       <dependencies>
@@ -102,7 +102,7 @@
           <resource>
             <directory>src/main/resources</directory>
             <excludes>
-                <exclude>META-INF/processes.xml</exclude>
+              <exclude>META-INF/processes.xml</exclude>
             </excludes>
           </resource>
           <resource>
@@ -126,6 +126,27 @@
             </configuration>
           </plugin>
         </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>below-java11</id>
+      <activation>
+        <jdk>(,11)</jdk>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <artifactId>maven-compiler-plugin</artifactId>
+              <configuration>
+                <!-- Jakarta EE 10 libraries are not part of the runs before Java 11 -->
+                <excludes combine.children="append">
+                  <exclude>**/Jakarta*.java</exclude>
+                </excludes>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
       </build>
     </profile>
   </profiles>
