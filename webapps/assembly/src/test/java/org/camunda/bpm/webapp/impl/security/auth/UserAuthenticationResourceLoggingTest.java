@@ -74,6 +74,9 @@ public class UserAuthenticationResourceLoggingTest {
     for (User user : identityService.createUserQuery().list()) {
       identityService.deleteUser(user.getId());
     }
+    for (Authorization authorization : authorizationService.createAuthorizationQuery().list()) {
+      authorizationService.deleteAuthorization(authorization.getId());
+    }
 
     Authentications.clearCurrent();
   }
