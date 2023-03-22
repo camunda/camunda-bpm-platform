@@ -22,8 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.camunda.bpm.webapp.impl.security.auth.AuthenticationUtil.createAuthentication;
-
 /**
  * <p>Wrapper around current authentications.</p>
  *
@@ -46,7 +44,7 @@ public class Authentications implements Serializable {
   /**
    * holds the current authentication
    */
-  private static final ThreadLocal<Authentications> currentAuthentications = new ThreadLocal<Authentications>();
+  private static final ThreadLocal<Authentications> currentAuthentications = new ThreadLocal<>();
 
   /**
    * holds an entry for each processEngine->userId pair currently authenticated
@@ -83,9 +81,10 @@ public class Authentications implements Serializable {
    *
    * @param engineName the name of the process engine for which the authentication should
    *                   be removed.
+   * @return the removed user authentication
    */
-  public void removeByEngineName(String engineName) {
-    authentications.remove(engineName);
+  public UserAuthentication removeByEngineName(String engineName) {
+    return authentications.remove(engineName);
   }
 
   /**

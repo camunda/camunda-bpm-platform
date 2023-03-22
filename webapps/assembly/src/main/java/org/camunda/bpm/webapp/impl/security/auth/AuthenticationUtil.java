@@ -25,24 +25,20 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.logging.Logger;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.ws.rs.core.Response.Status;
-
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
-import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.webapp.impl.WebappLogger;
 import org.camunda.bpm.webapp.impl.util.ProcessEngineUtil;
 
 public class AuthenticationUtil {
 
-  protected final static Logger LOGGER = Logger.getLogger(AuthenticationUtil.class.getName());
+  protected final static WebappLogger LOGGER = WebappLogger.INSTANCE;
 
   protected static final String CAM_AUTH_SESSION_KEY = "authenticatedUser";
 
@@ -61,7 +57,7 @@ public class AuthenticationUtil {
     ProcessEngine processEngine = ProcessEngineUtil.lookupProcessEngine(engineName);
 
     if (processEngine == null) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, "Process engine with name " + engineName + " does not exist");
+      throw LOGGER.invalidRequestEngineNotFoundForName(engineName);
     }
 
     return createAuthentication(processEngine, username, groupIds, tenantIds);
@@ -238,14 +234,14 @@ public class AuthenticationUtil {
             if (cacheTimeToLive > 0) {
               Date newCacheValidationTime = new Date(ClockUtil.getCurrentTime().getTime() + cacheTimeToLive);
               updatedAuth.setCacheValidationTime(newCacheValidationTime);
-              LOGGER.finest("Cache validation time updated from: " + cacheValidationTime + " to: " + newCacheValidationTime);
+              LOGGER.traceCacheValidationTimeUpdated(cacheValidationTime, newCacheValidationTime);
             }
-            LOGGER.finest("Authentication updated: " + engineName);
+            LOGGER.traceAuthenticationUpdated(engineName);
             authentications.addOrReplace(updatedAuth);
 
           } else {
             authentications.removeByEngineName(engineName);
-            LOGGER.finest("Authentication removed: " + engineName);
+            LOGGER.traceAuthenticationRemoved(engineName);
 
           }
         }
