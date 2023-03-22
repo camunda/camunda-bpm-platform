@@ -22,9 +22,7 @@
 #     sqlserver: [INT; OPTIONAL;]
 db-unit:
   directory: '.'
-# TODO see https://github.com/camunda/camunda-bpm-platform/issues/3258
-#  command: 'clean test -pl "engine,webapps/assembly,webapps/assembly-jakarta" -Dskip.frontend.build=true -P'
-  command: 'clean test -pl "engine,webapps/assembly" -Dskip.frontend.build=true -P'
+  command: 'clean package -pl "engine,webapps/assembly,webapps/assembly-jakarta" -Dskip.frontend.build=true -P'
   stash:
     runtimeStash: true
   labels:
@@ -37,15 +35,15 @@ db-unit:
   - 'postgresql'
   - 'cockroachdb'
   - 'authorizations'
+  jdkVersion: 'openjdk-jdk-11-latest'
 db-unit-authorizations:
   directory: '.'
-# TODO see https://github.com/camunda/camunda-bpm-platform/issues/3258
-#  command: 'clean test -pl "engine,webapps/assembly,webapps/assembly-jakarta" -Dskip.frontend.build=true -PcfgAuthorizationCheckRevokesAlways,'
-  command: 'clean test -pl "engine,webapps/assembly" -Dskip.frontend.build=true -PcfgAuthorizationCheckRevokesAlways,'
+  command: 'clean package -pl "engine,webapps/assembly,webapps/assembly-jakarta" -Dskip.frontend.build=true -PcfgAuthorizationCheckRevokesAlways,'
   stash:
     runtimeStash: true
   labels:
   - 'authorizations'
+  jdkVersion: 'openjdk-jdk-11-latest'
 sql-scripts:
   directory: 'distro/sql-script'
   command: 'install -Pcheck-sql,'
