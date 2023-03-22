@@ -205,7 +205,6 @@
     <if test="parameter.tenantId == null">
       and D.TENANT_ID_ is null
     </if>
-    order by B.ID_ asc
   </sql>
 
   <!-- postgresql specific -->
