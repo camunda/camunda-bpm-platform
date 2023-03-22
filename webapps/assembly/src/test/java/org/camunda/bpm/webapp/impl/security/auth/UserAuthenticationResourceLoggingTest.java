@@ -273,6 +273,27 @@ public class UserAuthenticationResourceLoggingTest {
     assertThat(filteredLog.get(0).getFormattedMessage()).contains("Failed login attempt for user jonny. Reason: not authorized");
   }
 
+  @Test
+  public void shouldNotProduceLogStatementOnLoginWhenNotAuthorizedAndWebappsLoggingDisabled() {
+    // given
+    User jonny = identityService.newUser("jonny");
+    jonny.setPassword("jonnyspassword");
+    identityService.saveUser(jonny);
+
+    processEngineConfiguration.setAuthorizationEnabled(true);
+    processEngineConfiguration.setWebappsAuthenticationLoggingEnabled(false);
+
+    UserAuthenticationResource authResource = new UserAuthenticationResource();
+    authResource.request = new MockHttpServletRequest();
+
+    // when
+    authResource.doLogin("webapps-test-engine", "tasklist", "jonny", "jonnyspassword");
+
+    // then
+    List<ILoggingEvent> filteredLog = loggingRule.getFilteredLog("jonny");
+    assertThat(filteredLog).hasSize(0);
+  }
+
   protected void setAuthentication(String user, String engineName) {
     Authentications authentications = new Authentications();
     authentications.addOrReplace(new UserAuthentication(user, engineName));

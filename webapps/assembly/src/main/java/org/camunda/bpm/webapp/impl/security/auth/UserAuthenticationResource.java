@@ -110,7 +110,9 @@ public class UserAuthenticationResource {
     Set<String> authorizedApps = authentication.getAuthorizedApps();
 
     if (!authorizedApps.contains(appName)) {
-      LOGGER.infoWebappFailedLogin(username, "not authorized");
+      if(isWebappsAuthenticationLoggingEnabled(processEngine)) {
+        LOGGER.infoWebappFailedLogin(username, "not authorized");
+      }
       return forbidden();
     }
 
