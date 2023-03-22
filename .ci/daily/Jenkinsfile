@@ -75,8 +75,6 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel : 'centos-stable',
               runSteps   : {
-                sh(label: 'Create webapps target dir', script: 'mkdir -p ./webapps/assembly/target/webapp')
-                sh(label: 'Create webapps Jakarta target dir', script: 'mkdir -p ./webapps/assembly-jakarta/target/webapp')
                 cambpmRunMaven('.',
                   "package javadoc:javadoc javadoc:aggregate -Pdistro,distro-wildfly,distro-webjar,javadocs -pl '!distro/wildfly/modules,!distro/wildfly26/modules' -DskipTests=true -Dskip.frontend.build=true",
                   withNpm: true,
@@ -176,8 +174,8 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel: 'h2',
               runSteps: {
-                cambpmRunMaven('distro/wildfly/subsystem', 
-                  'test', 
+                cambpmRunMaven('distro/wildfly/subsystem',
+                  'test',
                   runtimeStash: true,
                   // we need to use JDK 11 for WildFly 27+
                   jdkVersion: 'jdk-11-latest')
