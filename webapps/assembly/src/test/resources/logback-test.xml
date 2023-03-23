@@ -14,8 +14,7 @@
 
   <logger name="org.springframework" level="info" />
 
-  <!-- wiremock logger -->
-  <logger name="org.mortbay.log" level="info" />
+  <logger name="org.eclipse.jetty" level="info" />
 
   <logger name="org.camunda" level="info" />
 
