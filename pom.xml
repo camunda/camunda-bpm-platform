@@ -304,6 +304,22 @@
 
   </profiles>
 
+  <repositories>
+    <repository>
+      <id>maven-central</id>
+      <name>Maven Central</name>
+      <url>https://repo1.maven.org/maven2</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>camunda-nexus</id>
+      <name>Camunda Nexus</name>
+      <url>https://artifacts.camunda.com/artifactory/internal</url>
+    </repository>
+  </repositories>
+
   <licenses>
     <license>
       <name>The Apache Software License, Version 2.0</name>
