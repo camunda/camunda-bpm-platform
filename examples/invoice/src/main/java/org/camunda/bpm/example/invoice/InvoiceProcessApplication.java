@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.repository.DeploymentBuilder;
  * Process Application exposing this application's resources the process engine.
  */
 @ProcessApplication(name = "InvoiceProcessApplication")
+// Using fully-qualified class name instead of import statement to allow for automatic Jakarta transformation
 public class InvoiceProcessApplication extends org.camunda.bpm.application.impl.ServletProcessApplication {
 
   /**
