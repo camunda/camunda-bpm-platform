@@ -91,7 +91,7 @@
 
         <module>webapps</module>
 
-        <module>examples/invoice</module>
+        <module>examples</module>
 
         <module>engine-plugins</module>
 
@@ -160,7 +160,7 @@
 
         <module>webapps</module>
 
-        <module>examples/invoice</module>
+        <module>examples</module>
 
         <module>engine-plugins</module>
 
