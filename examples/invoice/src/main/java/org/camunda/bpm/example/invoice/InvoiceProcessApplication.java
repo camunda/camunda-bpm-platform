@@ -19,7 +19,6 @@ package org.camunda.bpm.example.invoice;
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.application.PostDeploy;
 import org.camunda.bpm.application.ProcessApplication;
-import org.camunda.bpm.application.impl.ServletProcessApplication;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 
@@ -27,7 +26,8 @@ import org.camunda.bpm.engine.repository.DeploymentBuilder;
  * Process Application exposing this application's resources the process engine.
  */
 @ProcessApplication(name = "InvoiceProcessApplication")
-public class InvoiceProcessApplication extends ServletProcessApplication {
+// Using fully-qualified class name instead of import statement to allow for automatic Jakarta transformation
+public class InvoiceProcessApplication extends org.camunda.bpm.application.impl.ServletProcessApplication {
 
   /**
    * In a @PostDeploy Hook you can interact with the process engine and access

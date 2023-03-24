@@ -50,6 +50,13 @@
           <scope>test</scope>
           <type>war</type>
         </dependency>
+        <dependency>
+          <groupId>org.camunda.bpm.example</groupId>
+          <artifactId>camunda-example-invoice-jakarta</artifactId>
+          <version>${project.version}</version>
+          <scope>test</scope>
+          <type>war</type>
+        </dependency>
       </dependencies>
       <build>
         <plugins>
@@ -93,7 +100,7 @@
               <deployables>
                 <deployable>
                   <groupId>org.camunda.bpm.example</groupId>
-                  <artifactId>camunda-example-invoice</artifactId>
+                  <artifactId>camunda-example-invoice-jakarta</artifactId>
                   <type>war</type>
                   <pingURL>http://localhost:${jboss.http.port}/engine-rest/engine/default/user/demo/profile</pingURL>
                   <pingTimeout>${cargo.deploy.timeout}</pingTimeout>

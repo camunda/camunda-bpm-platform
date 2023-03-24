@@ -51,7 +51,7 @@
 
     <dependencySet>
         <includes>
-          <include>org.camunda.bpm.example:camunda-example-invoice:war:*</include>
+          <include>org.camunda.bpm.example:camunda-example-invoice-jakarta:war:*</include>
         </includes>
         <outputDirectory>server/wildfly-${version.wildfly}/standalone/deployments</outputDirectory>
     </dependencySet>
