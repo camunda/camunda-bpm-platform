@@ -39,11 +39,6 @@
 
     <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
 
-    <!-- generate a bom of compile time dependencies for the license book.
-    Note: Every compile time dependency will end up in the license book. Please
-    declare only dependencies that are actually needed -->
-    <skip-third-party-bom>false</skip-third-party-bom>
-
     <!-- frontend-sources artifact is for internal use only.
     Artifact generation is skipped when it comes to maven central deployment -->
     <skip-zip-frontend-sources>false</skip-zip-frontend-sources>
