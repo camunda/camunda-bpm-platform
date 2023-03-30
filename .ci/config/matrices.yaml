@@ -5,20 +5,10 @@
 #   databases: [LIST; OPTIONAL; Doc: defines the databases to be used in the stage generation ]
 engine-webapp-unit:
   databases:
-  - 'postgresql_122'
-  - 'postgresql_132'
-  - 'postgresql_142'
   - 'postgresql_150'
   - 'aws_aurora_postgresql_12'
   - 'aws_aurora_postgresql_13'
   - 'aws_aurora_postgresql_14'
-  - 'mariadb_106'
-  - 'mysql_80'
-  - 'oracle_12'
-  - 'oracle_19'
-  - 'db2_115'
-  - 'sqlserver_2017'
-  - 'sqlserver_2019'
   stages:
   - 'db-unit'
   - 'db-unit-authorizations'
@@ -33,20 +23,10 @@ engine-rest:
   - 'engine-rest-jakarta-unit-compatibility-wildfly'
 daily-stages:
   databases:
-  - 'postgresql_122'
-  - 'postgresql_132'
-  - 'postgresql_142'
   - 'postgresql_150'
   - 'aws_aurora_postgresql_12'
   - 'aws_aurora_postgresql_13'
   - 'aws_aurora_postgresql_14'
-  - 'mariadb_106'
-  - 'mysql_80'
-  - 'oracle_12'
-  - 'oracle_19'
-  - 'db2_115'
-  - 'sqlserver_2017'
-  - 'sqlserver_2019'
   stages:
   - 'sql-scripts'
   - 'upgrade-database'
