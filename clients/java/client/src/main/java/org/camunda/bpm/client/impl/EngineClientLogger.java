@@ -66,4 +66,9 @@ public class EngineClientLogger extends ExternalTaskClientLogger {
       "008", "Exception while executing request interceptor: {}", e);
   }
 
+  protected void exceptionWhileClosingClient(IOException e) {
+    logError(
+            "009", "Exception while closing client", e);
+  }
+
 }

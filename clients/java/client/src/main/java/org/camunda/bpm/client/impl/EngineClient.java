@@ -164,4 +164,8 @@ public class EngineClient {
   public boolean isUsePriority() {
     return usePriority;
   }
+
+  public void close() {
+    engineInteraction.close();
+  }
 }

@@ -24,17 +24,16 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.AbstractResponseHandler;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
-import org.camunda.bpm.client.exception.EngineException;
 import org.camunda.bpm.client.exception.RestException;
 import org.camunda.bpm.client.interceptor.impl.RequestInterceptorHandler;
 import org.camunda.commons.utils.IoUtil;
@@ -54,7 +53,7 @@ public class RequestExecutor {
   protected static final Header HEADER_CONTENT_TYPE_JSON = new BasicHeader(HttpHeaders.CONTENT_TYPE, "application/json");
   protected static final Header HEADER_USER_AGENT = new BasicHeader(HttpHeaders.USER_AGENT, "Camunda External Task Client");
 
-  protected HttpClient httpClient;
+  protected CloseableHttpClient httpClient;
   protected ObjectMapper objectMapper;
 
   protected RequestExecutor(RequestInterceptorHandler requestInterceptorHandler, ObjectMapper objectMapper) {
@@ -190,6 +189,14 @@ public class RequestExecutor {
       .addInterceptorLast(requestInterceptorHandler);
 
     this.httpClient = httpClientBuilder.build();
+  }
+
+  protected void close() {
+    try {
+      httpClient.close();
+    } catch (IOException e) {
+      LOG.exceptionWhileClosingClient(e);
+    }
   }
 
 }

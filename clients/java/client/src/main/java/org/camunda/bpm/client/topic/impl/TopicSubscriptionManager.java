@@ -161,6 +161,8 @@ public class TopicSubscriptionManager implements Runnable {
   }
 
   public synchronized void stop() {
+    engineClient.close();
+
     if (isRunning.compareAndSet(true, false)) {
       resume();
 
