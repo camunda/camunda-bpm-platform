@@ -226,8 +226,6 @@
         <dependency>
           <groupId>com.github.tomakehurst</groupId>
           <artifactId>wiremock</artifactId>
-          <!-- remove with 7.19.0 release, see https://github.com/camunda/camunda-bpm-platform/issues/2903 for details -->
-          <version>1.58</version>
           <scope>test</scope>
         </dependency>
         
