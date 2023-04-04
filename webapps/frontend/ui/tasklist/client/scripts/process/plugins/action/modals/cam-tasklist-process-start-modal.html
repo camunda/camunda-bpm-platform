@@ -1,6 +1,7 @@
 <div class="modal-header">
   <div class="row">
-    <div class="col-xs-6">
+    <div class="col-xs-6"
+         ng-if="!PROCESS_TO_START_SELECTED">
       <h3 class="modal-title">{{ 'START_PROCESS' | translate }}</h3>
     </div>
 
@@ -16,6 +17,9 @@
         </div>
       </form>
     </div>
+  </div>
+  <div ng-if="PROCESS_TO_START_SELECTED">
+    <h3 class="modal-title">{{ 'START_PROCESS' | translate }}: {{ params.processDefinitionName }}</h3>
   </div>
 </div>
 
