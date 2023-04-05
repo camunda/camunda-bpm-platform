@@ -15,6 +15,8 @@
 
   <properties>
     <skip-third-party-bom>false</skip-third-party-bom>
+    <!-- json-smart and accessors-smart are runtime dependencies of json-path -->
+    <third-party-bom-scopes>compile|runtime</third-party-bom-scopes>
   </properties>
 
   <dependencyManagement>
