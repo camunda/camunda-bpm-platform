@@ -69,7 +69,7 @@ create table ACT_GE_SCHEMA_LOG (
 );
 
 insert into ACT_GE_SCHEMA_LOG
-values ('0', CURRENT_TIMESTAMP, '7.19.0');
+values ('0', CURRENT_TIMESTAMP, '7.20.0');
 
 create table ACT_RE_DEPLOYMENT (
     ID_ varchar(64),

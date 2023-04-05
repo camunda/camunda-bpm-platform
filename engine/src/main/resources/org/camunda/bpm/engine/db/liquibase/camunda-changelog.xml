@@ -109,5 +109,17 @@
     <tagDatabase tag="7.19.0"/>
   </changeSet>
 
+  <changeSet author="Camunda" id="7.19-to-7.20">
+    <sqlFile path="upgrade/${db.name}_engine_7.19_to_7.20.sql"
+             encoding="UTF-8"
+             relativeToChangelogFile="true"
+             splitStatements="true"
+             stripComments="true"/>
+  </changeSet>
+
+  <changeSet author="Camunda" id="7.20.0-tag">
+    <tagDatabase tag="7.20.0"/>
+  </changeSet>
+
 
 </databaseChangeLog>
