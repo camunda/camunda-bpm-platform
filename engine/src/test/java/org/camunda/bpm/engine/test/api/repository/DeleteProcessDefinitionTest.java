@@ -16,27 +16,13 @@
  */
 package org.camunda.bpm.engine.test.api.repository;
 
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertNull;
-import static junit.framework.TestCase.assertTrue;
-import static junit.framework.TestCase.fail;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.camunda.bpm.engine.test.api.repository.RedeploymentTest.DEPLOYMENT_NAME;
-import static org.junit.Assert.assertEquals;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.exception.NotFoundException;
-import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
@@ -56,6 +42,20 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static junit.framework.TestCase.assertNotNull;
+import static junit.framework.TestCase.assertNull;
+import static junit.framework.TestCase.assertTrue;
+import static junit.framework.TestCase.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.camunda.bpm.engine.test.api.repository.RedeploymentTest.DEPLOYMENT_NAME;
+import static org.junit.Assert.assertEquals;
+
 /**
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
@@ -71,6 +71,7 @@ public class DeleteProcessDefinitionTest {
   protected HistoryService historyService;
   protected RepositoryService repositoryService;
   protected RuntimeService runtimeService;
+  protected ManagementService managementService;
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
   protected Deployment deployment;
 
@@ -79,6 +80,7 @@ public class DeleteProcessDefinitionTest {
     historyService = engineRule.getHistoryService();
     repositoryService = engineRule.getRepositoryService();
     runtimeService = engineRule.getRuntimeService();
+    managementService = engineRule.getManagementService();
     processEngineConfiguration = (ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration();
   }
 
@@ -254,6 +256,31 @@ public class DeleteProcessDefinitionTest {
 
     //clean up
     repositoryService.deleteDeployment(deployment2.getId(), true);
+  }
+
+  @Test
+  public void shouldRestorePreviousStartTimerDefinitions() {
+    BpmnModelInstance processV1 = Bpmn.createExecutableProcess()
+        .id("one")
+        .startEvent()
+        .timerWithCycle("R/PT15M")
+        .userTask("aTaskName")
+        .endEvent()
+        .done();
+
+    testHelper.deploy(processV1);
+    testHelper.deploy("org/camunda/bpm/engine/test/repository/one.bpmn20.xml");
+
+    ProcessDefinition processV2 = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("one")
+        .latestVersion()
+        .singleResult();
+
+    repositoryService.deleteProcessDefinition(processV2.getId());
+
+    long timerDefinitions = managementService.createJobQuery().processDefinitionKey("one").count();
+
+    assertThat(timerDefinitions).isEqualTo(1);
   }
 
   @Test
