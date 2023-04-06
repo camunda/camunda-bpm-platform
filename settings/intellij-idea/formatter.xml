@@ -5,8 +5,8 @@
       <option name="TAB_SIZE" value="2" />
     </value>
   </option>
-  <option name="CLASS_COUNT_TO_USE_IMPORT_ON_DEMAND" value="5" />
-  <option name="NAMES_COUNT_TO_USE_IMPORT_ON_DEMAND" value="3" />
+  <option name="CLASS_COUNT_TO_USE_IMPORT_ON_DEMAND" value="99999" />
+  <option name="NAMES_COUNT_TO_USE_IMPORT_ON_DEMAND" value="9999" />
   <option name="WRAP_WHEN_TYPING_REACHES_RIGHT_MARGIN" value="true" />
   <JavaCodeStyleSettings>
     <option name="CLASS_COUNT_TO_USE_IMPORT_ON_DEMAND" value="99999" />
