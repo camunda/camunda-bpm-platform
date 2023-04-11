@@ -89,7 +89,7 @@ pipeline {
         }
         stage('stage-restapi-docs') {
           when {
-            branch cambpmDefaultBranch();
+            branch 'master';
           }
           steps {
             cambpmConditionalRetry([
