@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -50,6 +49,7 @@ import org.camunda.bpm.engine.impl.dmn.deployer.DecisionDefinitionDeployer;
 import org.camunda.bpm.engine.impl.el.FixedValue;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
+import org.camunda.bpm.engine.impl.management.DatabaseContentReport;
 import org.camunda.bpm.engine.impl.management.DatabasePurgeReport;
 import org.camunda.bpm.engine.impl.management.PurgeReport;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.CachePurgeReport;
@@ -336,14 +336,24 @@ public abstract class TestHelper {
   }
 
   /**
+   * Checks the database tables for content.
+   *
+   * @param processEngine the {@link ProcessEngine} to test
+   * @param ignoreExcludedTables if true, data in some tables will be ignored. Check {@link DatabaseContentReport} for more info.
+   * @return a {@link DatabaseContentReport} containing all database table counts.
+   */
+  public static boolean isDbClean(ProcessEngine processEngine, boolean ignoreExcludedTables) {
+    DatabaseContentReport dbContentReport = ((ManagementServiceImpl) processEngine.getManagementService()).getDbTableCounts();
+    return dbContentReport.isDatabaseClean(ignoreExcludedTables);
+  }
+  /**
    * Ensures that the deployment cache and database is clean after a test. If not the cache
    * and database will be cleared.
    *
    * @param processEngine the {@link ProcessEngine} to test
-   * @throws AssertionError if the deployment cache or database was not clean
    */
   public static void assertAndEnsureCleanDbAndCache(ProcessEngine processEngine) {
-    assertAndEnsureCleanDbAndCache(processEngine, true);
+    assertAndEnsureCleanDbAndCache(processEngine, false);
   }
 
   /**

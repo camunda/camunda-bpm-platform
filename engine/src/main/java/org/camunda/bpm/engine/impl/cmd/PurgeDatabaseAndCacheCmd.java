@@ -16,6 +16,11 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
@@ -28,11 +33,6 @@ import org.camunda.bpm.engine.impl.management.PurgeReport;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.CachePurgeReport;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Purges the database and the deployment cache.
@@ -48,11 +48,6 @@ public class PurgeDatabaseAndCacheCmd implements Command<PurgeReport>, Serializa
   protected static final String SELECT_TABLE_COUNT = "selectTableCount";
   protected static final String TABLE_NAME = "tableName";
   protected static final String EMPTY_STRING = "";
-
-  public static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = Arrays.asList(
-    "ACT_GE_PROPERTY",
-    "ACT_GE_SCHEMA_LOG"
-  );
 
   @Override
   public PurgeReport execute(CommandContext commandContext) {
@@ -76,48 +71,49 @@ public class PurgeDatabaseAndCacheCmd implements Command<PurgeReport>, Serializa
     // to delete the table data as bulk operation (execution, incident etc.)
     // The flag will be reset by the DBEntityManager after flush.
     dbEntityManager.setIgnoreForeignKeysForNextFlush(true);
-    List<String> tablesNames = dbEntityManager.getTableNamesPresentInDatabase();
+
+    GetDatabaseCountsCmd checkDatabaseCleanCmd = new GetDatabaseCountsCmd();
+    Map<String, Long> databaseContentReport = checkDatabaseCleanCmd.execute(commandContext).getReportExcludingIgnoredTables();
     String databaseTablePrefix = commandContext.getProcessEngineConfiguration().getDatabaseTablePrefix().trim();
 
-    // for each table
+
     DatabasePurgeReport databasePurgeReport = new DatabasePurgeReport();
-    for (String tableName : tablesNames) {
+    // for each table
+    for (Entry<String, Long> table : databaseContentReport.entrySet()) {
+      String tableName = table.getKey();
       String tableNameWithoutPrefix = tableName.replace(databaseTablePrefix, EMPTY_STRING);
-      if (!TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.contains(tableNameWithoutPrefix)) {
+      Long count = table.getValue();
 
-        // Check if table contains data
-        Map<String, String> param = new HashMap<String, String>();
-        param.put(TABLE_NAME, tableName);
-        Long count = (Long) dbEntityManager.selectOne(SELECT_TABLE_COUNT, param);
-
-        if (count > 0) {
-          // allow License Key in byte array table
-          if (tableNameWithoutPrefix.equals("ACT_GE_BYTEARRAY") && commandContext.getResourceManager().findLicenseKeyResource() != null) {
-            if (count != 1) {
-              DbBulkOperation purgeByteArrayPreserveLicenseKeyBulkOp = new DbBulkOperation(DbOperationType.DELETE_BULK, ByteArrayEntity.class,
-                  "purgeTablePreserveLicenseKey", LicenseCmd.LICENSE_KEY_BYTE_ARRAY_ID);
-              databasePurgeReport.addPurgeInformation(tableName, count - 1);
-              dbEntityManager.getDbOperationManager().addOperation(purgeByteArrayPreserveLicenseKeyBulkOp);
-            }
-            databasePurgeReport.setDbContainsLicenseKey(true);
-            continue;
+      if (count > 0) {
+        // allow License Key in byte array table
+        if (tableNameWithoutPrefix.equals("ACT_GE_BYTEARRAY") && commandContext.getResourceManager().findLicenseKeyResource() != null) {
+          if (count != 1) {
+            DbBulkOperation purgeByteArrayPreserveLicenseKeyBulkOp = new DbBulkOperation(DbOperationType.DELETE_BULK, ByteArrayEntity.class,
+                "purgeTablePreserveLicenseKey", LicenseCmd.LICENSE_KEY_BYTE_ARRAY_ID);
+            databasePurgeReport.addPurgeInformation(tableName, count - 1);
+            dbEntityManager.getDbOperationManager().addOperation(purgeByteArrayPreserveLicenseKeyBulkOp);
           }
-          databasePurgeReport.addPurgeInformation(tableName, count);
-          // Get corresponding entity classes for the table, which contains data
-          List<Class<? extends DbEntity>> entities = commandContext.getTableDataManager().getEntities(tableName);
-
-          if (entities.isEmpty()) {
-            throw new ProcessEngineException("No mapped implementation of "
-                                            + DbEntity.class.getName()
-                                            + " was found for: "
-                                            + tableName);
-          }
-
-          // Delete the table data as bulk operation with the first entity
-          Class<? extends DbEntity> entity = entities.get(0);
-          DbBulkOperation deleteBulkOp = new DbBulkOperation(DbOperationType.DELETE_BULK, entity, DELETE_TABLE_DATA, param);
-          dbEntityManager.getDbOperationManager().addOperation(deleteBulkOp);
+          databasePurgeReport.setDbContainsLicenseKey(true);
+          continue;
         }
+        databasePurgeReport.addPurgeInformation(tableName, count);
+        // Get corresponding entity classes for the table, which contains data
+        List<Class<? extends DbEntity>> entities = commandContext.getTableDataManager().getEntities(tableName);
+
+        if (entities.isEmpty()) {
+          throw new ProcessEngineException("No mapped implementation of "
+                                          + DbEntity.class.getName()
+                                          + " was found for: "
+                                          + tableName);
+        }
+
+        // Delete the table data as bulk operation with the first entity
+        Map<String, String> param = new HashMap<>();
+        param.put(TABLE_NAME, tableName);
+
+        Class<? extends DbEntity> entity = entities.get(0);
+        DbBulkOperation deleteBulkOp = new DbBulkOperation(DbOperationType.DELETE_BULK, entity, DELETE_TABLE_DATA, param);
+        dbEntityManager.getDbOperationManager().addOperation(deleteBulkOp);
       }
     }
     return databasePurgeReport;
