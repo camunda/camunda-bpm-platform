@@ -129,8 +129,13 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
     this(true, false);
   }
 
+  public ProcessEngineRule(boolean ensureCleanAfterTest) {
+    this(ensureCleanAfterTest, false);
+  }
+
   public ProcessEngineRule(boolean ensureCleanAfterTest, boolean failIfNotClean) {
     this.ensureCleanAfterTest = ensureCleanAfterTest;
+    this.failIfNotClean = failIfNotClean;
   }
 
   public ProcessEngineRule(String configurationResource) {
