@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.camunda.bpm.webapp</groupId>
     <artifactId>camunda-webapp-root</artifactId>
-    <version>7.19.0-SNAPSHOT</version>
+    <version>7.20.0-SNAPSHOT</version>
     <relativePath>../</relativePath>
   </parent>
 
@@ -18,6 +18,11 @@
   <properties>
     <java.resources.override>src/main/runtime/default/resources</java.resources.override>
     <properties.override>src/main/runtime/default/config.properties</properties.override>
+
+    <!-- generate a bom of compile time dependencies for the license book.
+    Note: Every compile time dependency will end up in the license book. Please
+    declare only dependencies that are actually needed -->
+    <skip-third-party-bom>false</skip-third-party-bom>
   </properties>
 
   <dependencyManagement>

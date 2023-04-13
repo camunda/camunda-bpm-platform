@@ -6,7 +6,7 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-parent</artifactId>
     <relativePath>../parent</relativePath>
-    <version>7.19.0-SNAPSHOT</version>
+    <version>7.20.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-database-settings</artifactId>
@@ -36,7 +36,7 @@
     <version.cockroachdb>42.2.9</version.cockroachdb>
 
     <!-- needed for sql script and backward compatibility checks -->
-    <camunda.version.old>7.18.0</camunda.version.old>
+    <camunda.version.old>7.19.0</camunda.version.old>
 
     <!-- Testcontainers JDBC URL parameters. By default, an empty string -->
     <database.tc.params />
