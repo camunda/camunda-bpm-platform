@@ -14,6 +14,8 @@
     <!-- We shade artifacts into the jar, so we need to generate 
     a dependency BOM for the license book -->
     <skip-third-party-bom>false</skip-third-party-bom>
+    <!-- json-smart and accessors-smart are runtime dependencies of json-path -->
+    <third-party-bom-scopes>compile|runtime</third-party-bom-scopes>
   </properties>
   
   <dependencies>
