@@ -113,7 +113,8 @@ module.exports = {
       'cam-common': path.resolve(__dirname, 'ui/common/scripts/module'),
       jquery: path.resolve(__dirname, 'node_modules/jquery'),
       'core-js': path.resolve(__dirname, 'node_modules/core-js'),
-      angular: path.resolve(__dirname, 'node_modules/angular') // avoid loading angular twice
+      angular: path.resolve(__dirname, 'node_modules/angular'), // avoid loading angular twice
+      ids: path.resolve(__dirname, 'node_modules/ids/dist/index.umd.js') // prevent ids from being tree shaken (transitive dependency of form-js)
     }
   },
   module: {
@@ -217,7 +218,8 @@ module.exports = {
       ]
     }),
     new webpack.DefinePlugin({
-      CAMUNDA_VERSION: `'${version}'`
+      CAMUNDA_VERSION: `'${version}'`,
+      _import: 'import' // dynamic import workaround
     }),
     new ESLintPlugin()
   ],

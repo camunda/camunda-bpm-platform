@@ -44,17 +44,13 @@ function withSuffix(string, suffix) {
 }
 
 const loadConfig = (async function() {
-  const config = (
-    await eval(
-      `import('${baseImportPath +
-        'scripts/config.js?bust=' +
-        new Date().getTime()}')`
-    )
-  ).default;
+  const configPath =
+    baseImportPath + 'scripts/config.js?bust=' + new Date().getTime();
+  const config = (await _import(configPath)).default; // eslint-disable-line
 
   if (Array.isArray(config.bpmnJs && config.bpmnJs.additionalModules)) {
-    const fetchers = config.bpmnJs.additionalModules.map(el =>
-      eval(`import('${withSuffix(baseImportPath + el, '.js')}')`)
+    const fetchers = config.bpmnJs.additionalModules.map(
+      el => _import(withSuffix(baseImportPath + el, '.js')) // eslint-disable-line
     );
     const bpmnJsModules = await Promise.all(fetchers);
     config.bpmnJs.additionalModules = bpmnJsModules.map(el => el.default);
@@ -246,7 +242,7 @@ define('camunda-cockpit-bootstrap', [], function() {
                   })
                   .fail(function(response) {
                     if (response.status === 404) {
-                    /* eslint-disable */
+                      /* eslint-disable */
                       console.error(
                         'bpmn-js moddle extension "' +
                           extensionName +

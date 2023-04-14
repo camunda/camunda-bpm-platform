@@ -131,7 +131,7 @@ export function init(pluginDependencies) {
 
       $animateProvider.classNameFilter(/angular-animate/);
 
-      $qProvider.errorOnUnhandledRejections(false);
+      $qProvider.errorOnUnhandledRejections(DEV_MODE); // eslint-disable-line
     }
   ];
 

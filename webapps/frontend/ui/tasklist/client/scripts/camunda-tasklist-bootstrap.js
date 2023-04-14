@@ -37,13 +37,9 @@ requirejs.config({
 });
 
 const loadConfig = (async function() {
-  const config = (
-    await eval(
-      `import('${baseImportPath +
-        'scripts/config.js?bust=' +
-        new Date().getTime()}')`
-    )
-  ).default;
+  const configPath =
+    baseImportPath + 'scripts/config.js?bust=' + new Date().getTime();
+  const config = (await _import(configPath)).default; // eslint-disable-line
 
   window.camTasklistConf = config;
   return config;
