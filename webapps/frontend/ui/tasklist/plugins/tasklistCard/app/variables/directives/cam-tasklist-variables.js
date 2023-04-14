@@ -16,7 +16,6 @@
  */
 
 'use strict';
-var fs = require('fs');
 
 var template = require('./cam-tasklist-variables.html')();
 var modalTemplate = require('./../modals/cam-tasklist-variables-detail-modal.html')();

@@ -17,8 +17,6 @@
 
 'use strict';
 
-var fs = require('fs');
-
 var template = require('./execution-metrics.html')();
 var CamSDK = require('camunda-bpm-sdk-js/lib/angularjs/index');
 

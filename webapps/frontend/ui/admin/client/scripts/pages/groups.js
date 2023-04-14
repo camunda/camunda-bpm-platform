@@ -17,8 +17,6 @@
 
 'use strict';
 
-var fs = require('fs');
-
 var template = require('./groups.html')();
 var searchConfig = require('./groups-search-plugin-config.json');
 

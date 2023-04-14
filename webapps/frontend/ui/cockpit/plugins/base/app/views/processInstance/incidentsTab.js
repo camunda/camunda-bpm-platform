@@ -17,8 +17,6 @@
 
 'use strict';
 
-var fs = require('fs');
-
 var incidentsTemplate = require('./incidents-tab.html')();
 
 var Configuration = function PluginConfiguration(ViewsProvider) {

@@ -17,8 +17,6 @@
 
 'use strict';
 
-var fs = require('fs');
-
 var template = require('./tenants.html')();
 var searchConfig = require('./tenants-search-plugin-config.json');
 

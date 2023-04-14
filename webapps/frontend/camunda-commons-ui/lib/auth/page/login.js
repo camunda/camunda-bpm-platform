@@ -17,8 +17,6 @@
 
 'use strict';
 
-var fs = require('fs');
-
 var template = require('./login.html')();
 var logo = require('svg-inline-loader?classPrefix&removeSVGTagAttrs=false!./logo.svg');
 

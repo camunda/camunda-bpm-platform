@@ -17,7 +17,6 @@
 
 'use strict';
 
-var fs = require('fs');
 var angular = require('angular');
 
 var template = require('./process-instance-table.html')();

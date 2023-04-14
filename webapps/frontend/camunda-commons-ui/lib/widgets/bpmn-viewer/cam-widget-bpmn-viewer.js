@@ -16,7 +16,7 @@
  */
 
 'use strict';
-var fs = require('fs');
+
 var ModuleLoader = require('../../util/moduleLoader');
 
 var angular = require('../../../../camunda-bpm-sdk-js/vendor/angular'),

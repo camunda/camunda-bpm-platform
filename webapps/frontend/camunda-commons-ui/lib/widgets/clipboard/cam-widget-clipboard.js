@@ -16,7 +16,7 @@
  */
 
 'use strict';
-var fs = require('fs');
+
 var Clipboard = require('clipboard');
 
 var template = require('./cam-widget-clipboard.html')();

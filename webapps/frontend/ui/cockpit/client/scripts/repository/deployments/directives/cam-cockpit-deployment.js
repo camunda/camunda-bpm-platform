@@ -17,8 +17,6 @@
 
 'use strict';
 
-var fs = require('fs');
-
 var template = require('./cam-cockpit-deployment.html')();
 
 module.exports = [

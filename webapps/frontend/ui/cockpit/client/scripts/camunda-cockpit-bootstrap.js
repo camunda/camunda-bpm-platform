@@ -23,7 +23,7 @@ window.jQuery = require('jquery');
 import {
   requirejs,
   define,
-  require as rjsrequire,
+  require as rjsrequire
 } from 'exports-loader?exports=requirejs,define,require!requirejs/require';
 
 window.define = define;
@@ -36,28 +36,28 @@ const baseImportPath = `${appRoot}/app/cockpit/`;
 
 requirejs.config({
   baseUrl: baseImportPath,
-  urlArgs: 'bust=$CACHE_BUST',
+  urlArgs: 'bust=$CACHE_BUST'
 });
 
 function withSuffix(string, suffix) {
   return !string.endsWith(suffix) ? string + suffix : string;
 }
 
-const loadConfig = (async function () {
+const loadConfig = (async function() {
   const config = (
     await eval(
-      `import('${
-        baseImportPath + 'scripts/config.js?bust=' + new Date().getTime()
-      }')`
+      `import('${baseImportPath +
+        'scripts/config.js?bust=' +
+        new Date().getTime()}')`
     )
   ).default;
 
   if (Array.isArray(config.bpmnJs && config.bpmnJs.additionalModules)) {
-    const fetchers = config.bpmnJs.additionalModules.map((el) =>
+    const fetchers = config.bpmnJs.additionalModules.map(el =>
       eval(`import('${withSuffix(baseImportPath + el, '.js')}')`)
     );
     const bpmnJsModules = await Promise.all(fetchers);
-    config.bpmnJs.additionalModules = bpmnJsModules.map((el) => el.default);
+    config.bpmnJs.additionalModules = bpmnJsModules.map(el => el.default);
   }
 
   window.camCockpitConf = config;
@@ -65,24 +65,24 @@ const loadConfig = (async function () {
   return config;
 })();
 
-define('camunda-cockpit-bootstrap', [], function () {
-  const bootstrap = function (config) {
+define('camunda-cockpit-bootstrap', [], function() {
+  const bootstrap = function(config) {
     'use strict';
 
     var camundaCockpitUi = require('./camunda-cockpit-ui');
 
     requirejs.config({
-      baseUrl: '../../lib',
+      baseUrl: '../../lib'
     });
 
     var requirePackages = window;
     camundaCockpitUi.exposePackages(requirePackages);
 
-    define('globalize', [], function () {
-      return function (r, m, p) {
+    define('globalize', [], function() {
+      return function(r, m, p) {
         for (var i = 0; i < m.length; i++) {
-          (function (i) {
-            define(m[i], function () {
+          (function(i) {
+            define(m[i], function() {
               return p[m[i]];
             });
           })(i);
@@ -90,7 +90,7 @@ define('camunda-cockpit-bootstrap', [], function () {
       };
     });
 
-    requirejs(['globalize'], function (globalize) {
+    requirejs(['globalize'], function(globalize) {
       globalize(
         requirejs,
         [
@@ -100,7 +100,7 @@ define('camunda-cockpit-bootstrap', [], function () {
           'jquery',
           'angular-data-depend',
           'moment',
-          'events',
+          'events'
         ],
         requirePackages
       );
@@ -109,19 +109,19 @@ define('camunda-cockpit-bootstrap', [], function () {
       var pluginDependencies = window.PLUGIN_DEPENDENCIES || [];
 
       pluginPackages = pluginPackages.filter(
-        (el) =>
+        el =>
           el.name === 'cockpit-plugin-cockpitPlugins' ||
           el.name === 'cockpit-plugin-cockpitEE' ||
           el.name.startsWith('cockpit-plugin-legacy')
       );
       pluginDependencies = pluginDependencies.filter(
-        (el) =>
+        el =>
           el.requirePackageName === 'cockpit-plugin-cockpitPlugins' ||
           el.requirePackageName === 'cockpit-plugin-cockpitEE' ||
           el.requirePackageName.startsWith('cockpit-plugin-legacy')
       );
 
-      pluginPackages.forEach(function (plugin) {
+      pluginPackages.forEach(function(plugin) {
         var node = document.createElement('link');
         node.setAttribute('rel', 'stylesheet');
         node.setAttribute(
@@ -135,17 +135,17 @@ define('camunda-cockpit-bootstrap', [], function () {
         packages: pluginPackages,
         baseUrl: '../',
         paths: {
-          ngDefine: `${appRoot}/lib/ngDefine`,
-        },
+          ngDefine: `${appRoot}/lib/ngDefine`
+        }
       });
 
       var dependencies = ['jquery', 'angular', 'ngDefine', 'moment'].concat(
-        pluginDependencies.map(function (plugin) {
+        pluginDependencies.map(function(plugin) {
           return plugin.requirePackageName;
         })
       );
 
-      requirejs(dependencies, function (jquery, angular) {
+      requirejs(dependencies, function(jquery, angular) {
         // we now loaded the cockpit and the plugins, great
         // before we start initializing the cockpit though (and leave the requirejs context),
         // lets see if we should load some custom scripts first
@@ -153,10 +153,10 @@ define('camunda-cockpit-bootstrap', [], function () {
         if (window.camCockpitConf && window.camCockpitConf.csrfCookieName) {
           angular.module('cam.commons').config([
             '$httpProvider',
-            function ($httpProvider) {
+            function($httpProvider) {
               $httpProvider.defaults.xsrfCookieName =
                 window.camCockpitConf.csrfCookieName;
-            },
+            }
           ]);
         }
 
@@ -185,9 +185,9 @@ define('camunda-cockpit-bootstrap', [], function () {
             'enforceDefine',
             'xhtml',
             'urlArgs',
-            'scriptType',
+            'scriptType'
             // 'skipDataMain' // not relevant either
-          ].forEach(function (prop) {
+          ].forEach(function(prop) {
             if (custom[prop]) {
               conf[prop] = custom[prop];
             }
@@ -201,7 +201,7 @@ define('camunda-cockpit-bootstrap', [], function () {
           var bpmnJsAdditionalModules = (config.bpmnJs || {}).additionalModules;
 
           if (bpmnJsAdditionalModules) {
-            angular.forEach(bpmnJsAdditionalModules, function (module, name) {
+            angular.forEach(bpmnJsAdditionalModules, function(module, name) {
               conf['paths'][name] = bpmnJsAdditionalModules[name];
               custom['deps'].push(name);
             });
@@ -212,55 +212,56 @@ define('camunda-cockpit-bootstrap', [], function () {
           if (bpmnJsModdleExtensions) {
             var moddleExtensions = {};
 
-            angular.forEach(
-              bpmnJsModdleExtensions,
-              function (path, extensionName) {
-                moddleExtensions[extensionName] = jquery.getJSON(
-                  '../' + path + '.json',
-                  function (moddleExtension) {
-                    return moddleExtension;
-                  }
-                );
-              }
-            );
+            angular.forEach(bpmnJsModdleExtensions, function(
+              path,
+              extensionName
+            ) {
+              moddleExtensions[extensionName] = jquery.getJSON(
+                '../' + path + '.json',
+                function(moddleExtension) {
+                  return moddleExtension;
+                }
+              );
+            });
 
             window.bpmnJsModdleExtensions = {};
 
-            var promises = Object.keys(moddleExtensions).map(function (
+            var promises = Object.keys(moddleExtensions).map(function(
               extensionName
             ) {
               return moddleExtensions[extensionName];
             });
 
-            jquery.when(promises).then(function () {
+            jquery.when(promises).then(function() {
               // wait until promises are resolved: fail || success
-              angular.forEach(
-                moddleExtensions,
-                function (promise, extensionName) {
-                  promise
-                    .done(function (moddleExtension) {
-                      window.bpmnJsModdleExtensions[extensionName] =
-                        moddleExtension;
-                    })
-                    .fail(function (response) {
-                      if (response.status === 404) {
-                        // tslint:disable-next-line:no-console
-                        console.error(
-                          'bpmn-js moddle extension "' +
-                            extensionName +
-                            '" could not be loaded.'
-                        );
-                      } else {
-                        // tslint:disable-next-line:no-console
-                        console.error(
-                          'unhandled error with bpmn-js moddle extension "' +
-                            extensionName +
-                            '"'
-                        );
-                      }
-                    });
-                }
-              );
+              angular.forEach(moddleExtensions, function(
+                promise,
+                extensionName
+              ) {
+                promise
+                  .done(function(moddleExtension) {
+                    window.bpmnJsModdleExtensions[
+                      extensionName
+                    ] = moddleExtension;
+                  })
+                  .fail(function(response) {
+                    if (response.status === 404) {
+                    /* eslint-disable */
+                      console.error(
+                        'bpmn-js moddle extension "' +
+                          extensionName +
+                          '" could not be loaded.'
+                      );
+                    } else {
+                      /* eslint-disable */
+                      console.error(
+                        'unhandled error with bpmn-js moddle extension "' +
+                          extensionName +
+                          '"'
+                      );
+                    }
+                  });
+              });
 
               loadRequireJsDeps();
             });
@@ -278,7 +279,7 @@ define('camunda-cockpit-bootstrap', [], function () {
           // executed yet and the angular modules provided by those plugins will
           // not have been defined yet. Placing a new require call here will put
           // the bootstrapping of the angular app at the end of the queue
-          require([], function () {
+          require([], function() {
             initCockpitUi(pluginDependencies);
           });
         }
@@ -288,7 +289,7 @@ define('camunda-cockpit-bootstrap', [], function () {
           requirejs.config(conf);
 
           // load the dependencies and bootstrap the AngularJS application
-          requirejs(custom.deps || [], function () {
+          requirejs(custom.deps || [], function() {
             // create a AngularJS module (with possible AngularJS module dependencies)
             // on which the custom scripts can register their
             // directives, controllers, services and all when loaded
@@ -306,9 +307,9 @@ define('camunda-cockpit-bootstrap', [], function () {
       });
     });
   };
-  loadConfig.then((config) => {
+  loadConfig.then(config => {
     bootstrap(config);
   });
 });
 
-requirejs(['camunda-cockpit-bootstrap'], function () {});
+requirejs(['camunda-cockpit-bootstrap'], function() {});

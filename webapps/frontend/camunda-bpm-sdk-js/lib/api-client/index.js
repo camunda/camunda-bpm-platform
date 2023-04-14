@@ -131,7 +131,7 @@ CamundaClient.HttpClient = require('./http-client');
     _resources['modification'] = require('./resources/modification');
     _resources['message'] = require('./resources/message');
     _resources['password-policy'] = require('./resources/password-policy');
-    
+
     /* jshint sub: false */
     var self = this;
 

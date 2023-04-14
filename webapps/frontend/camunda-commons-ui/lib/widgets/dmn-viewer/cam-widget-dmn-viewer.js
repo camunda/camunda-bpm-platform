@@ -16,7 +16,6 @@
  */
 
 'use strict';
-var fs = require('fs');
 
 var migrateDiagram = require('@bpmn-io/dmn-migrate').migrateDiagram;
 

@@ -17,8 +17,6 @@
 
 'use strict';
 
-var fs = require('fs');
-
 var template = require('./pd-incidents-tab.html')();
 
 var Configuration = function PluginConfiguration(ViewsProvider) {

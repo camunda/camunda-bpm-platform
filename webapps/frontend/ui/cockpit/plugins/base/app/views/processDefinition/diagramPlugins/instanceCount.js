@@ -19,7 +19,6 @@
 
 var instanceCount = require('../../common/diagramPlugins/instanceCount');
 
-var fs = require('fs');
 var template = require('./overlayAction.html')();
 
 module.exports = [

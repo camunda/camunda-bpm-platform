@@ -17,8 +17,6 @@
 
 'use strict';
 
-var fs = require('fs');
-
 var dialogTemplate = require('./job-retry-bulk-dialog.html')();
 var actionTemplate = require('./job-retry-bulk-action.html')();
 

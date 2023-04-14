@@ -16,8 +16,6 @@
  */
 
 'use strict';
-/* jshint browserify: true */
-var fs = require('fs');
 var template = require('./custom-links.html')();
 
 module.exports = [

@@ -18,7 +18,7 @@
 'use strict';
 
 if (process.env.NODE_ENV === 'development') {
-  require("../../../common/scripts/util/dev-setup").setupDev();
+  require('../../../common/scripts/util/dev-setup').setupDev();
 }
 
 const $ = window.jQuery;
@@ -58,7 +58,7 @@ export function init(pluginDependencies) {
     require('./services/main').name,
     require('./navigation/main').name
   ].concat(
-    pluginDependencies.map(function (el) {
+    pluginDependencies.map(function(el) {
       return el.ngModuleName;
     })
   );
@@ -83,7 +83,7 @@ export function init(pluginDependencies) {
     '$animateProvider',
     '$qProvider',
     '$compileProvider',
-    function (
+    function(
       $routeProvider,
       UriProvider,
       $modalProvider,
@@ -116,7 +116,7 @@ export function init(pluginDependencies) {
 
       UriProvider.replace(':engine', [
         '$window',
-        function ($window) {
+        function($window) {
           var uri = $window.location.href;
 
           var match = uri.match(/\/app\/cockpit\/([\w-]+)(|\/)/);
@@ -165,7 +165,7 @@ export function init(pluginDependencies) {
 
   appNgModule.config([
     'camDateFormatProvider',
-    function (camDateFormatProvider) {
+    function(camDateFormatProvider) {
       var formats = {
         monthName: 'MMMM',
         day: 'DD',
@@ -195,7 +195,7 @@ export function init(pluginDependencies) {
       window.parent.postMessage({type: 'loadamd'}, '*');
     }
   });
-};
+}
 
 export function exposePackages(container) {
   container.angular = angular;
@@ -207,5 +207,4 @@ export function exposePackages(container) {
   container['events'] = events;
   container['cam-common'] = camCommon;
   container['lodash'] = lodash;
-};
-
+}

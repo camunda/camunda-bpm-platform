@@ -17,7 +17,6 @@
 
 'use strict';
 
-const fs = require('fs');
 const template = require('./time-to-live-dialog.html')();
 
 const Controller = [

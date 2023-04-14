@@ -17,8 +17,6 @@
 
 'use strict';
 
-var fs = require('fs');
-
 var template = require('./external-tasks-tab.html')();
 
 module.exports = function() {

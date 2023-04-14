@@ -17,8 +17,6 @@
 
 'use strict';
 
-var fs = require('fs');
-
 var template = require('./activity-instance-tree.html')();
 
 var angular = require('../../../../../camunda-commons-ui/vendor/angular');

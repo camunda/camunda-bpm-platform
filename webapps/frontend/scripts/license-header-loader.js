@@ -14,9 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 var fs = require('fs');
 
-const addMissingLicenseHeaders = (filePath, source, callback, addDependency) => {
+const addMissingLicenseHeaders = (filePath, source) => {
   // This fix ensures windows compatibility
   // See https://github.com/camunda/camunda-bpm-platform/issues/2824
   const rowFile = filePath.replace(/\\/g, '/');
@@ -49,10 +50,7 @@ const addMissingLicenseHeaders = (filePath, source, callback, addDependency) => 
         licenseInfo = fs.readFileSync(`${packagePath}/LICENSE`, 'utf8');
       } catch (e) {
         try {
-          licenseInfo = fs.readFileSync(
-            `${packagePath}/LICENSE.md`,
-            'utf8'
-          );
+          licenseInfo = fs.readFileSync(`${packagePath}/LICENSE.md`, 'utf8');
         } catch (e) {
           try {
             licenseInfo = fs.readFileSync(
@@ -66,7 +64,7 @@ const addMissingLicenseHeaders = (filePath, source, callback, addDependency) => 
                 'utf8'
               );
             } catch (e) {
-              console.log(`${pkg} has no license file. 🤷‍`);
+              console.log(`${pkg} has no license file. 🤷‍`);// eslint-disable-line
             }
           }
         }
@@ -77,7 +75,7 @@ const addMissingLicenseHeaders = (filePath, source, callback, addDependency) => 
       if (licenseInfo) {
         return `/*!\n@license ${pkg}@${version}\n${licenseInfo}*/\n${source}`;
       } else if (license) {
-        console.log(`${pkg} has a "license" property. 🤷‍`);
+        console.log(`${pkg} has a "license" property. 🤷‍`);// eslint-disable-line
         return `/*! @license ${pkg}@${version} (${license}) */\n${source}`;
       }
     }
@@ -86,6 +84,6 @@ const addMissingLicenseHeaders = (filePath, source, callback, addDependency) => 
   }
 };
 
-module.exports = function (source) {
+module.exports = function(source) {
   return addMissingLicenseHeaders(this.resourcePath, source);
-}
+};

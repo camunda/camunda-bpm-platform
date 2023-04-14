@@ -22,8 +22,6 @@ var events = require('../components/events');
 var angular = require('../../../../../../camunda-commons-ui/vendor/angular');
 var searchConfig = require('../config/batch-search-config.json');
 
-var fs = require('fs');
-
 var deleteModalTemplate = require('./../templates/delete-modal.html')();
 var deleteModalCtrl = require('./modal-ctrl');
 

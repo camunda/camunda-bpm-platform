@@ -17,8 +17,6 @@
 
 'use strict';
 
-var fs = require('fs');
-
 var template = require('./job-definition-suspension-overlay.html')();
 
 var Controller = [

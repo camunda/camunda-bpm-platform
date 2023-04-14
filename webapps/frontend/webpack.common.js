@@ -14,11 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 'use strict';
 
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const ESLintPlugin = require('eslint-webpack-plugin');
 
 const path = require('path');
 const webpack = require('webpack');
@@ -216,12 +218,13 @@ module.exports = {
     }),
     new webpack.DefinePlugin({
       CAMUNDA_VERSION: `'${version}'`
-    })
+    }),
+    new ESLintPlugin()
   ],
   optimization: {
     // Avoids that imported modules are initialized for each chunk separately
     runtimeChunk: {
       name: 'lib/runtime'
-    },
+    }
   }
 };

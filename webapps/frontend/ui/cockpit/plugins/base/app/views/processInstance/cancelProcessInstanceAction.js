@@ -17,8 +17,6 @@
 
 'use strict';
 
-var fs = require('fs');
-
 var dialogTemplate = require('./cancel-process-instance-dialog.html')();
 var actionTemplate = require('./cancel-process-instance-action.html')();
 

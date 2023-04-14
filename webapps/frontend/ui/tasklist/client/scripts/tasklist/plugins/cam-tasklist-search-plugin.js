@@ -16,7 +16,6 @@
  */
 
 'use strict';
-var fs = require('fs');
 
 var template = require('./cam-tasklist-search-plugin.html')();
 var searchConfigJSON = require('./cam-tasklist-search-plugin-config.json');

@@ -16,7 +16,6 @@
  */
 
 'use strict';
-var fs = require('fs');
 
 var angular = require('../../../../camunda-bpm-sdk-js/vendor/angular'),
   typeUtils = require('../../../../camunda-bpm-sdk-js/lib/forms/type-util'),

@@ -17,8 +17,6 @@
 
 'use strict';
 
-var fs = require('fs');
-
 var template = require('./process-instance-runtime-external-tasks.html')();
 
 module.exports = [

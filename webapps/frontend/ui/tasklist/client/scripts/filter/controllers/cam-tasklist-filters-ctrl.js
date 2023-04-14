@@ -16,7 +16,6 @@
  */
 
 'use strict';
-var fs = require('fs');
 var $ = require('jquery');
 
 var template = require('./../modals/cam-tasklist-filter-modal.html')();

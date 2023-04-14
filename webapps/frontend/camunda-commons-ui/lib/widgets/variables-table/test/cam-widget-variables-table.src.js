@@ -17,8 +17,6 @@
 
 'use strict';
 
-var fs = require('fs');
-
 var angular = require('../../../../../camunda-bpm-sdk-js/vendor/angular'),
     variablesTableDefinition = require('../cam-widget-variables-table'),
     renderVarTemplateDefinition = require('../cam-render-var-template'),

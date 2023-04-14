@@ -17,8 +17,6 @@
 
 'use strict';
 
-var fs = require('fs');
-
 var template = require('./tenantEdit.html')();
 var confirmationTemplate = require('./generic-confirmation.html')();
 

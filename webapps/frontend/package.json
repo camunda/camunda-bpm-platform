@@ -80,6 +80,7 @@
     "eslint-plugin-camunda-licensed": "0.4.6",
     "eslint-plugin-i18n-json": "4.0.0",
     "eslint-plugin-prettier": "3.4.1",
+    "eslint-webpack-plugin": "4.0.1",
     "exports-loader": "4.0.0",
     "extract-loader": "5.1.0",
     "file-loader": "6.2.0",

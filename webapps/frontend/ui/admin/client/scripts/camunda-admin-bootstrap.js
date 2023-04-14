@@ -22,7 +22,7 @@ window.jQuery = require('jquery');
 import {
   requirejs,
   define,
-  require as rjsrequire,
+  require as rjsrequire
 } from 'exports-loader?exports=requirejs,define,require!requirejs/require';
 
 window.bust = '$CACHE_BUST';
@@ -36,12 +36,12 @@ requirejs.config({
   urlArgs: 'bust=$CACHE_BUST'
 });
 
-const loadConfig = (async function () {
+const loadConfig = (async function() {
   const config = (
     await eval(
-      `import('${
-        baseImportPath + 'scripts/config.js?bust=' + new Date().getTime()
-      }')`
+      `import('${baseImportPath +
+        'scripts/config.js?bust=' +
+        new Date().getTime()}')`
     )
   ).default;
 
@@ -49,23 +49,23 @@ const loadConfig = (async function () {
   return config;
 })();
 
-define('camunda-admin-bootstrap', function () {
+define('camunda-admin-bootstrap', function() {
   'use strict';
-  const bootstrap = function (config) {
+  const bootstrap = function(config) {
     var camundaAdminUi = require('./camunda-admin-ui');
 
     requirejs.config({
-      baseUrl: '../../../lib',
+      baseUrl: '../../../lib'
     });
 
     var requirePackages = window;
     camundaAdminUi.exposePackages(requirePackages);
 
-    define('globalize', [], function () {
-      return function (r, m, p) {
+    define('globalize', [], function() {
+      return function(r, m, p) {
         for (var i = 0; i < m.length; i++) {
-          (function (i) {
-            define(m[i], function () {
+          (function(i) {
+            define(m[i], function() {
               return p[m[i]];
             });
           })(i);
@@ -73,7 +73,7 @@ define('camunda-admin-bootstrap', function () {
       };
     });
 
-    requirejs(['globalize'], function (globalize) {
+    requirejs(['globalize'], function(globalize) {
       globalize(
         requirejs,
         ['angular', 'camunda-commons-ui', 'camunda-bpm-sdk-js', 'jquery'],
@@ -84,23 +84,26 @@ define('camunda-admin-bootstrap', function () {
       var pluginDependencies = window.PLUGIN_DEPENDENCIES || [];
 
       pluginPackages = pluginPackages.filter(
-        (el) =>
+        el =>
           el.name === 'admin-plugin-adminPlugins' ||
           el.name === 'admin-plugin-adminEE' ||
           el.name.startsWith('admin-plugin-legacy')
       );
 
       pluginDependencies = pluginDependencies.filter(
-        (el) =>
+        el =>
           el.requirePackageName === 'admin-plugin-adminPlugins' ||
           el.requirePackageName === 'admin-plugin-adminEE' ||
           el.requirePackageName.startsWith('admin-plugin-legacy')
       );
 
-      pluginPackages.forEach(function (plugin) {
+      pluginPackages.forEach(function(plugin) {
         var node = document.createElement('link');
         node.setAttribute('rel', 'stylesheet');
-        node.setAttribute('href', plugin.location + '/plugin.css?bust=$CACHE_BUST');
+        node.setAttribute(
+          'href',
+          plugin.location + '/plugin.css?bust=$CACHE_BUST'
+        );
         document.head.appendChild(node);
       });
 
@@ -108,17 +111,17 @@ define('camunda-admin-bootstrap', function () {
         packages: pluginPackages,
         baseUrl: './',
         paths: {
-          ngDefine: `${appRoot}/lib/ngDefine`,
-        },
+          ngDefine: `${appRoot}/lib/ngDefine`
+        }
       });
 
       var dependencies = ['angular', 'ngDefine'].concat(
-        pluginDependencies.map(function (plugin) {
+        pluginDependencies.map(function(plugin) {
           return plugin.requirePackageName;
         })
       );
 
-      requirejs(dependencies, function (angular) {
+      requirejs(dependencies, function(angular) {
         // we now loaded admin and the plugins, great
         // before we start initializing admin though (and leave the requirejs context),
         // lets see if we should load some custom scripts first
@@ -126,9 +129,9 @@ define('camunda-admin-bootstrap', function () {
         if (config && config.csrfCookieName) {
           angular.module('cam.commons').config([
             '$httpProvider',
-            function ($httpProvider) {
+            function($httpProvider) {
               $httpProvider.defaults.xsrfCookieName = config.csrfCookieName;
-            },
+            }
           ]);
         }
 
@@ -154,9 +157,9 @@ define('camunda-admin-bootstrap', function () {
             'enforceDefine',
             'xhtml',
             'urlArgs',
-            'scriptType',
+            'scriptType'
             // 'skipDataMain' // not relevant either
-          ].forEach(function (prop) {
+          ].forEach(function(prop) {
             if (custom[prop]) {
               conf[prop] = custom[prop];
             }
@@ -166,7 +169,7 @@ define('camunda-admin-bootstrap', function () {
           requirejs.config(conf);
 
           // load the dependencies and bootstrap the AngularJS application
-          requirejs(custom.deps || [], function () {
+          requirejs(custom.deps || [], function() {
             // create a AngularJS module (with possible AngularJS module dependencies)
             // on which the custom scripts can register their
             // directives, controllers, services and all when loaded
@@ -190,7 +193,7 @@ define('camunda-admin-bootstrap', function () {
           // executed yet and the angular modules provided by those plugins will
           // not have been defined yet. Placing a new require call here will put
           // the bootstrapping of the angular app at the end of the queue
-          require([], function () {
+          require([], function() {
             window.define = undefined;
             window.require = undefined;
 
@@ -204,9 +207,9 @@ define('camunda-admin-bootstrap', function () {
     });
   };
 
-  loadConfig.then((config) => {
+  loadConfig.then(config => {
     bootstrap(config);
   });
 });
 
-requirejs(['camunda-admin-bootstrap'], function () {});
+requirejs(['camunda-admin-bootstrap'], function() {});

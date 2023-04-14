@@ -17,8 +17,6 @@
 
 'use strict';
 
-var fs = require('fs');
-
 var template = require('./users.html')();
 var searchConfig = require('./users-search-plugin-config.json');
 

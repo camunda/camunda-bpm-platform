@@ -17,8 +17,6 @@
 
 'use strict';
 
-var fs = require('fs');
-
 var template = require('./processes.html')();
 
 var angular = require('../../../../../camunda-commons-ui/vendor/angular');

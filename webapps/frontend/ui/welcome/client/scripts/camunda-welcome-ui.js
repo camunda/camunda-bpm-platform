@@ -18,7 +18,7 @@
 'use strict';
 
 if (process.env.NODE_ENV === 'development') {
-  require("../../../common/scripts/util/dev-setup").setupDev();
+  require('../../../common/scripts/util/dev-setup').setupDev();
 }
 
 const $ = window.jQuery;
@@ -145,7 +145,7 @@ export function init(pluginDependencies) {
       window.parent.postMessage({type: 'loadamd'}, '*');
     }
   });
-};
+}
 
 export function exposePackages(container) {
   container.angular = angular;
@@ -154,7 +154,7 @@ export function exposePackages(container) {
   container['camunda-bpm-sdk-js'] = sdk;
   container['cam-common'] = camCommon;
   container['lodash'] = lodash;
-};
+}
 
 /* live-reload
 // loads livereload client library (without breaking other scripts execution)

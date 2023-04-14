@@ -16,7 +16,6 @@
  */
 
 'use strict';
-var fs = require('fs');
 
 var template = require('./cam-tasklist-task-meta.html')();
 var editGroupsFormTemplate = require('./../modals/cam-tasklist-groups-modal.html')();

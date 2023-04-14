@@ -27,7 +27,14 @@ module.exports = [
   '$cookies',
   'configuration',
   'ifUnauthorizedForwardToWelcomeApp',
-  function($rootScope, $timeout, $q, $cookies, configuration, ifUnauthorizedForwardToWelcomeApp) {
+  function(
+    $rootScope,
+    $timeout,
+    $q,
+    $cookies,
+    configuration,
+    ifUnauthorizedForwardToWelcomeApp
+  ) {
     function setHeaders(options) {
       var headers = (options.headers = options.headers || {});
       var token = $cookies.get(configuration.getCsrfCookieName());

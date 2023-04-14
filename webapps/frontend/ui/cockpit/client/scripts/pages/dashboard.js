@@ -17,7 +17,6 @@
 
 'use strict';
 
-var fs = require('fs');
 var template = require('./dashboard.html')();
 var series = require('camunda-bpm-sdk-js').utils.series;
 

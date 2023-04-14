@@ -16,7 +16,6 @@
  */
 
 'use strict';
-const fs = require('fs');
 const angular = require('angular');
 const template = require('./template.html')();
 

@@ -43,11 +43,11 @@ const DEV_LICENSES = [
 
 const ALLOWED_PACKAGES = [
   'argparse@2.0.1',
-  'caniuse-lite@1.0.30001458', // uses CC BY 4.0, permitted as of https://jira.camunda.com/browse/OB-26
+  'caniuse-lite@1.0.30001458' // uses CC BY 4.0, permitted as of https://jira.camunda.com/browse/OB-26
 ];
 
 const parseResults = (allowedLicenses, resolve, reject) =>
-  function (err, packages) {
+  function(err, packages) {
     if (err) {
       throw err;
     } else {
@@ -75,8 +75,8 @@ const parseResults = (allowedLicenses, resolve, reject) =>
         licenses = typeof licenses === 'object' ? licenses : [licenses];
 
         let approved = hasMultipleLicenses
-          ? licenses.every((license) => allowedLicenses.includes(license))
-          : licenses.some((license) => allowedLicenses.includes(license));
+          ? licenses.every(license => allowedLicenses.includes(license))
+          : licenses.some(license => allowedLicenses.includes(license));
 
         if (!approved) {
           licenseWarning += `${id} uses ${licenses.join(' OR ')}\n`;
@@ -99,14 +99,14 @@ if (require.main === module) {
     {
       start: path.resolve(__dirname, '..'),
       production: true,
-      excludePrivatePackages: true,
+      excludePrivatePackages: true
     },
     parseResults(
       PRODUCTION_LICENSES,
-      () => console.log('Production packages license check passed'),
-      (warn) => {
-        console.warn('License check did not pass');
-        console.warn(warn);
+      () => console.log('Production packages license check passed'),// eslint-disable-line
+      warn => {
+        console.warn('License check did not pass');// eslint-disable-line
+        console.warn(warn);// eslint-disable-line
         process.exit(1);
       }
     )
@@ -115,14 +115,14 @@ if (require.main === module) {
     {
       start: path.resolve(__dirname, '..'),
       development: true,
-      excludePrivatePackages: true,
+      excludePrivatePackages: true
     },
     parseResults(
       [...PRODUCTION_LICENSES, ...DEV_LICENSES],
-      () => console.log('Development packages license check passed'),
-      (warn) => {
-        console.warn('License check did not pass');
-        console.warn(warn);
+      () => console.log('Development packages license check passed'),// eslint-disable-line
+      warn => {
+        console.warn('License check did not pass');// eslint-disable-line
+        console.warn(warn);// eslint-disable-line
         process.exit(1);
       }
     )

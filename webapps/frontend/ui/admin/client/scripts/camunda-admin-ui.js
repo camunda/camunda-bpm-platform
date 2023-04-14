@@ -18,7 +18,7 @@
 'use strict';
 
 if (process.env.NODE_ENV === 'development') {
-  require("../../../common/scripts/util/dev-setup").setupDev();
+  require('../../../common/scripts/util/dev-setup').setupDev();
 }
 
 // DOM Polyfills
@@ -199,7 +199,7 @@ export function init(pluginDependencies) {
       }
     });
   });
-};
+}
 
 export function exposePackages(requirePackages) {
   requirePackages.angular = angular;
@@ -209,4 +209,4 @@ export function exposePackages(requirePackages) {
   requirePackages['cam-common'] = camCommon;
   requirePackages['lodash'] = lodash;
   requirePackages['moment'] = moment;
-};
+}

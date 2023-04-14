@@ -17,8 +17,6 @@
 
 'use strict';
 
-var fs = require('fs');
-
 var template = require('./cam-cockpit-deployments-sorting-choices.html')();
 
 var angular = require('../../../../../../../camunda-commons-ui/vendor/angular');

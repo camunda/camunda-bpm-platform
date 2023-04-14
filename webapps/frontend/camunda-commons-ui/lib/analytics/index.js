@@ -15,15 +15,12 @@
  * limitations under the License.
  */
 
-var fs = require('fs');
 var angular = require('angular');
 
 var modalTemplate = require('./modal.html')();
 
 // CAMUNDA_VERSION has a structure of 'major.minor.patch[-SNAPSHOT]', but we only need 'major.minor' for doc links
-var camundaVersion = (CAMUNDA_VERSION || '').match(
-  /([0-9]+.[0-9]+)/
-);
+var camundaVersion = (CAMUNDA_VERSION || '').match(/([0-9]+.[0-9]+)/); // eslint-disable-line
 camundaVersion = camundaVersion ? camundaVersion[0] : 'latest'; // if 'latest' is chosen, something went wrong
 
 var modalController = [

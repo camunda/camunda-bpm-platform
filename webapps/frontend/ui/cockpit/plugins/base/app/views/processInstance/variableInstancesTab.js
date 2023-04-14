@@ -18,7 +18,6 @@
 'use strict';
 
 var angular = require('angular');
-var fs = require('fs');
 
 var searchWidgetUtils = require('../../../../../../common/scripts/util/search-widget-utils');
 var variableInstancesTabSearchConfig = require('./variable-instances-tab-search-config.json');

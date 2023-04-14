@@ -113,7 +113,7 @@ var ChoicesFieldHandler = AbstractFormField.extend(
 
       // check if variable is defined before writing values to the html
       // variableValue can be the Number 0 or negative, so `|| ''` does not work here
-      variableValue = (variableValue === null) ? '' : variableValue;
+      variableValue = variableValue === null ? '' : variableValue;
 
       if (variableValue !== this.previousValue) {
         // write value to html control

@@ -17,8 +17,6 @@
 
 'use strict';
 
-var fs = require('fs');
-
 var angular = require('angular');
 var actionTemplate = require('./bulk-override-job-priority-action.html')();
 var dialogTemplate = require('./bulk-override-job-priority-dialog.html')();

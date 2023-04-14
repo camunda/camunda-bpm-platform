@@ -17,8 +17,6 @@
 
 'use strict';
 
-var fs = require('fs');
-
 var template = require('./decisions-table.html')();
 
 module.exports = function() {

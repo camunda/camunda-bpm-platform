@@ -17,7 +17,6 @@
 
 'use strict';
 
-const fs = require('fs');
 const angular = require('angular');
 const modalDialog = require('./time-to-live-dialog');
 
@@ -51,7 +50,7 @@ module.exports = [
             controller: modalDialog.controller,
             template: modalDialog.template
           });
-          dialog.result.then(angular.noop).catch(console.error);
+          dialog.result.then(angular.noop).catch(console.error); // eslint-disable-line
         };
       }
     };

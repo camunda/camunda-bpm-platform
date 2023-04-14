@@ -16,7 +16,6 @@
  */
 
 'use strict';
-var fs = require('fs');
 
 var $ = require('jquery'),
   template = require('./cam-widget-search-pill.html')();

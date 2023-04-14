@@ -16,7 +16,6 @@
  */
 
 'use strict';
-var fs = require('fs');
 
 var tasklistTemplate = require('./../index.html')();
 

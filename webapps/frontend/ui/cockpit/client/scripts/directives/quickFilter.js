@@ -36,8 +36,6 @@
 
 'use strict';
 
-var fs = require('fs');
-
 var template = require('./quick-filter.html')();
 
 var $ = require('jquery');

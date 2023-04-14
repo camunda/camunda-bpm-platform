@@ -18,7 +18,6 @@
 'use strict';
 
 var angular = require('angular');
-var fs = require('fs');
 
 var template = require('./variable-inspect-dialog.html')();
 

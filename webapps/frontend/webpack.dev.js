@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 'use strict';
 
 const path = require('path');
@@ -21,7 +22,7 @@ const webpack = require('webpack');
 
 const commonConfig = require(path.resolve(__dirname, './webpack.common.js'));
 
-const { merge } = require('webpack-merge');
+const {merge} = require('webpack-merge');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = (_env, argv = {}) => {
@@ -121,7 +122,7 @@ module.exports = (_env, argv = {}) => {
             if (eeBuild && eeApps.includes(name)) {
               pluginDependencies.push({
                 ngModuleName: `${name}.plugin.${name}EE`,
-                requirePackageName: `${name}-plugin-${name}EE`,
+                requirePackageName: `${name}-plugin-${name}EE`
               });
             }
           }
@@ -136,7 +137,7 @@ module.exports = (_env, argv = {}) => {
               pluginPackages.push({
                 name: `${name}-plugin-${name}EE`,
                 location: `/plugin/${name}EE/app/`,
-                main: 'plugin.js',
+                main: 'plugin.js'
               });
             }
           }

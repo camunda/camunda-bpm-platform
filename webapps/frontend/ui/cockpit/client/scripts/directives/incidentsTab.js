@@ -18,7 +18,6 @@
 'use strict';
 
 var angular = require('angular');
-var fs = require('fs');
 
 var template = require('./incidents-tab.html')();
 var inspectTemplate = require('./incidents-tab-stacktrace.html')();

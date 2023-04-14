@@ -16,7 +16,6 @@
  */
 
 'use strict';
-var fs = require('fs');
 
 var addCommentTemplate = require('./cam-tasklist-task-action-comment-plugin.html')();
 var addCommentFormTemplate = require('./modals/cam-tasklist-comment-form.html')();

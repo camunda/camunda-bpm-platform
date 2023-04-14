@@ -17,8 +17,6 @@
 
 'use strict';
 
-var fs = require('fs');
-
 var createTaskActionTemplate = require('./cam-tasklist-navbar-action-create-task-plugin.html')();
 var createTaskModalTemplate = require('./modals/cam-tasklist-create-task-modal.html')();
 

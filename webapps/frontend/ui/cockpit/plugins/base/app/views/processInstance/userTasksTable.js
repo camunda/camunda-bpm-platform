@@ -17,7 +17,6 @@
 
 'use strict';
 
-var fs = require('fs');
 var searchWidgetUtils = require('../../../../../../common/scripts/util/search-widget-utils');
 var angular = require('angular');
 

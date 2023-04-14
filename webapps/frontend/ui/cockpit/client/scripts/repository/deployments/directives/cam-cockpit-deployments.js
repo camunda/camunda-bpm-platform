@@ -17,7 +17,6 @@
 
 'use strict';
 
-var fs = require('fs');
 var lodash = require('../../../../../../../camunda-commons-ui/vendor/lodash');
 
 var template = require('./cam-cockpit-deployments.html')();

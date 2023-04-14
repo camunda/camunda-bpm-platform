@@ -17,9 +17,6 @@
 
 'use strict';
 
-const angular = require('angular');
-const fs = require('fs');
-
 const template = require('./cam-annotation-edit.html')();
 const annotationModal = require('./cam-annotation-modal');
 

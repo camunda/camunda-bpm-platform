@@ -17,8 +17,6 @@
 
 'use strict';
 
-var fs = require('fs');
-
 var angular = require('angular');
 
 var template = require('./variable-upload-dialog.html')();

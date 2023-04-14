@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 'use strict';
 
 const path = require('path');
@@ -25,7 +26,7 @@ const {merge} = require('webpack-merge');
 const TerserPlugin = require('terser-webpack-plugin');
 const fs = require('fs');
 
-module.exports = (_env, argv = {}) => {
+module.exports = () => {
   const productionConfig = {
     output: {
       //publicPath: '',
@@ -41,14 +42,16 @@ module.exports = (_env, argv = {}) => {
       ]
     },
     plugins: [
-      new webpack.BannerPlugin(fs.readFileSync('./license-banner.txt', 'utf-8')),
+      new webpack.BannerPlugin(
+        fs.readFileSync('./license-banner.txt', 'utf-8')
+      ),
       new webpack.DefinePlugin({
         // define custom global variables
         DEV_MODE: false
       }),
       new webpack.ProvidePlugin({
-        DEV_MODE: false,
-      }),
+        DEV_MODE: false
+      })
     ],
     optimization: {
       minimize: true,

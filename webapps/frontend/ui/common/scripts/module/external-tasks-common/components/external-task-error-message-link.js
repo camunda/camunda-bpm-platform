@@ -17,8 +17,6 @@
 
 'use strict';
 
-var fs = require('fs');
-
 var template = require('./external-task-error-message-link.html')();
 
 module.exports = function() {

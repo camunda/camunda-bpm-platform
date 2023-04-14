@@ -17,8 +17,6 @@
 
 'use strict';
 
-var fs = require('fs');
-
 var template = require('./userEdit.html')();
 var groupTemplate = require('./create-group-membership.html')();
 var tenantTemplate = require('./create-tenant-user-membership.html')();

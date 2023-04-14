@@ -16,7 +16,7 @@
  */
 
 'use strict';
-var fs = require('fs');
+
 var Viewer = require('cmmn-js/lib/NavigatedViewer');
 
 var template = require('./cam-widget-cmmn-viewer.html')();

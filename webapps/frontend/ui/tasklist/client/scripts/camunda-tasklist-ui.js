@@ -18,7 +18,7 @@
 'use strict';
 
 if (process.env.NODE_ENV === 'development') {
-  require("../../../common/scripts/util/dev-setup").setupDev();
+  require('../../../common/scripts/util/dev-setup').setupDev();
 }
 
 const $ = window.jQuery;
@@ -170,7 +170,7 @@ export function init(pluginDependencies) {
     tasklistApp,
     'tasklist'
   ).then(bootstrapApp);
-};
+}
 
 export function exposePackages(container) {
   container.angular = angular;
@@ -180,4 +180,4 @@ export function exposePackages(container) {
   container['angular-data-depend'] = dataDepend;
   container['cam-common'] = camCommon;
   container['lodash'] = lodash;
-};
+}

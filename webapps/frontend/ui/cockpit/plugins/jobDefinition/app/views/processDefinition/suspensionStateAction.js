@@ -17,8 +17,6 @@
 
 'use strict';
 
-var fs = require('fs');
-
 var angular = require('angular');
 var actionTemplate = require('./suspension-state-action.html')();
 var dialogTemplate = require('./job-definition-suspension-state-dialog.html')();

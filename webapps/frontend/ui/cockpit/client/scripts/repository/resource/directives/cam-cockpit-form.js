@@ -17,8 +17,6 @@
 
 'use strict';
 
-var fs = require('fs');
-
 var template = require('./cam-cockpit-form.html')();
 
 const Form = require('@bpmn-io/form-js').Form;

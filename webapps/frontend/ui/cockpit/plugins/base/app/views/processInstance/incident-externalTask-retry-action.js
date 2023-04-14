@@ -17,8 +17,6 @@
 
 'use strict';
 
-var fs = require('fs');
-
 var angular = require('angular');
 var actionTemplate = require('./incident-external-task-action.html')();
 var dialogTemplate = require('./job-retry-dialog.html')();

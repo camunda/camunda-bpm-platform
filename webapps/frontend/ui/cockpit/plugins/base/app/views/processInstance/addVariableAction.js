@@ -18,7 +18,6 @@
 'use strict';
 
 var angular = require('angular');
-var fs = require('fs');
 
 var actionTemplate = require('./add-variable-action.html')();
 var addTemplate = require('../../../../../client/scripts/components/variables/variable-add-dialog');

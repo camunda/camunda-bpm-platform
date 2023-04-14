@@ -16,7 +16,6 @@
  */
 
 'use strict';
-var fs = require('fs');
 
 var template = require('./cam-tasklist-form-generic-variables.html')();
 
