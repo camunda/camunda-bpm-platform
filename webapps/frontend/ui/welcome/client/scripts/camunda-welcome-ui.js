@@ -155,8 +155,3 @@ export function exposePackages(container) {
   container['cam-common'] = camCommon;
   container['lodash'] = lodash;
 }
-
-/* live-reload
-// loads livereload client library (without breaking other scripts execution)
-$('body').append('<script src="//' + location.hostname + ':LIVERELOAD_PORT/livereload.js?snipver=1"></script>');
-/* */

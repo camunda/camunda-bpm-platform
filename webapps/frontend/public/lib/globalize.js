@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-define([], function() {// eslint-disable-line
+define([], function() {
   return function(r, m, p) {
     for (var i = 0; i < m.length; i++) {
       (function(i) {
-        define(m[i], function() {// eslint-disable-line
+        define(m[i], function() {
           return p[m[i]];
         });
       })(i);

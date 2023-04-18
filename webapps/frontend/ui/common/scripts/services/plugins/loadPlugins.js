@@ -51,16 +51,15 @@ module.exports = async function loadPlugins(config, appName) {
 
   const baseImportPath = `${appRoot}/app/${appName}/`;
   const fetchers = customScripts.map(url =>
-    eval(`import('${baseImportPath + withSuffix(url, '.js')}')`).catch(e =>
-      /* eslint-disable */
-      console.error(e)
-    )
+    _import(baseImportPath + withSuffix(url, '.js')) // eslint-disable-line
+      .catch(
+        e => console.error(e) // eslint-disable-line
+      )
   );
 
   fetchers.push(
     ...JARScripts.map(url => {
-      /* eslint-disable */
-      return `import('${url}')`.catch(e => console.error(e));
+      return _import(url).catch(e => console.error(e)); // eslint-disable-line
     })
   );
 

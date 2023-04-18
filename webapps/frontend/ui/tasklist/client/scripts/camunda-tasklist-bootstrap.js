@@ -25,9 +25,11 @@ import {
   require as rjsrequire
 } from 'exports-loader?exports=requirejs,define,require!requirejs/require';
 
+window.define = define;
+window.require = rjsrequire;
 window.bust = '$CACHE_BUST';
 
-//  Camunda-Cockpit-Bootstrap is copied as-is, so we have to inline everything
+//  camunda-tasklist-bootstrap is copied as-is, so we have to inline everything
 const appRoot = document.querySelector('base').getAttribute('app-root');
 const baseImportPath = `${appRoot}/app/tasklist/`;
 
@@ -46,31 +48,16 @@ const loadConfig = (async function() {
 })();
 
 define('camunda-tasklist-bootstrap', function() {
-  const bootstrap = function(config) {
-    'use strict';
-
-    var camundaTasklistUi = require('./camunda-tasklist-ui');
-
+  'use strict';
+  const bootstrap = config => {
     requirejs.config({
       baseUrl: '../../../lib'
     });
-    var requirePackages = window;
 
-    camundaTasklistUi.exposePackages(requirePackages);
+    var camundaTasklistUi = require('./camunda-tasklist-ui');
+    camundaTasklistUi.exposePackages(window);
 
-    define('globalize', [], function() {
-      return function(r, m, p) {
-        for (var i = 0; i < m.length; i++) {
-          (function(i) {
-            define(m[i], function() {
-              return p[m[i]];
-            });
-          })(i);
-        }
-      };
-    });
-
-    requirejs(['globalize'], function(globalize) {
+    requirejs([`${appRoot}/lib/globalize.js`], function(globalize) {
       globalize(
         requirejs,
         [
@@ -80,7 +67,7 @@ define('camunda-tasklist-bootstrap', function() {
           'jquery',
           'angular-data-depend'
         ],
-        requirePackages
+        window
       );
 
       var pluginPackages = window.PLUGIN_PACKAGES || [];
@@ -127,20 +114,16 @@ define('camunda-tasklist-bootstrap', function() {
         // before we start initializing the tasklist though (and leave the requirejs context),
         // lets see if we should load some custom scripts first
 
-        if (window.camTasklistConf && window.camTasklistConf.csrfCookieName) {
+        if (config && config.csrfCookieName) {
           angular.module('cam.commons').config([
             '$httpProvider',
             function($httpProvider) {
-              $httpProvider.defaults.xsrfCookieName =
-                window.camTasklistConf.csrfCookieName;
+              $httpProvider.defaults.xsrfCookieName = config.csrfCookieName;
             }
           ]);
         }
 
-        if (
-          typeof window.camTasklistConf !== 'undefined' &&
-          window.camTasklistConf.requireJsConfig
-        ) {
+        if (typeof config !== 'undefined' && config.requireJsConfig) {
           var custom = config.requireJsConfig || {};
 
           // copy the relevant RequireJS configuration in a empty object
@@ -180,15 +163,9 @@ define('camunda-tasklist-bootstrap', function() {
             // directives, controllers, services and all when loaded
             angular.module('cam.tasklist.custom', custom.ngDeps);
 
-            window.define = undefined;
-            window.require = undefined;
-
             // now that we loaded the plugins and the additional modules, we can finally
             // initialize the tasklist
             camundaTasklistUi.init(pluginDependencies);
-
-            window.define = define;
-            window.require = rjsrequire;
           });
         } else {
           // for consistency, also create a empty module
@@ -201,9 +178,7 @@ define('camunda-tasklist-bootstrap', function() {
           // executed yet and the angular modules provided by those plugins will
           // not have been defined yet. Placing a new require call here will put
           // the bootstrapping of the angular app at the end of the queue
-          require([], function() {
-            window.define = undefined;
-            window.require = undefined;
+          rjsrequire([], function() {
             camundaTasklistUi.init(pluginDependencies);
           });
         }

@@ -30,7 +30,7 @@ window.define = define;
 window.require = rjsrequire;
 window.bust = '$CACHE_BUST';
 
-//  Camunda-Cockpit-Bootstrap is copied as-is, so we have to inline everything
+//  camunda-cockpit-bootstrap is copied as-is, so we have to inline everything
 const appRoot = document.querySelector('base').getAttribute('app-root');
 const baseImportPath = `${appRoot}/app/cockpit/`;
 
@@ -61,32 +61,17 @@ const loadConfig = (async function() {
   return config;
 })();
 
-define('camunda-cockpit-bootstrap', [], function() {
-  const bootstrap = function(config) {
-    'use strict';
+define('camunda-cockpit-bootstrap', function() {
+  'use strict';
+  const bootstrap = config => {
+    requirejs.config({
+      baseUrl: '../../../lib'
+    });
 
     var camundaCockpitUi = require('./camunda-cockpit-ui');
+    camundaCockpitUi.exposePackages(window);
 
-    requirejs.config({
-      baseUrl: '../../lib'
-    });
-
-    var requirePackages = window;
-    camundaCockpitUi.exposePackages(requirePackages);
-
-    define('globalize', [], function() {
-      return function(r, m, p) {
-        for (var i = 0; i < m.length; i++) {
-          (function(i) {
-            define(m[i], function() {
-              return p[m[i]];
-            });
-          })(i);
-        }
-      };
-    });
-
-    requirejs(['globalize'], function(globalize) {
+    requirejs([`${appRoot}/lib/globalize.js`], function(globalize) {
       globalize(
         requirejs,
         [
@@ -98,7 +83,7 @@ define('camunda-cockpit-bootstrap', [], function() {
           'moment',
           'events'
         ],
-        requirePackages
+        window
       );
 
       var pluginPackages = window.PLUGIN_PACKAGES || [];
@@ -129,7 +114,7 @@ define('camunda-cockpit-bootstrap', [], function() {
 
       requirejs.config({
         packages: pluginPackages,
-        baseUrl: '../',
+        baseUrl: './',
         paths: {
           ngDefine: `${appRoot}/lib/ngDefine`
         }
@@ -146,12 +131,11 @@ define('camunda-cockpit-bootstrap', [], function() {
         // before we start initializing the cockpit though (and leave the requirejs context),
         // lets see if we should load some custom scripts first
 
-        if (window.camCockpitConf && window.camCockpitConf.csrfCookieName) {
+        if (config && config.csrfCookieName) {
           angular.module('cam.commons').config([
             '$httpProvider',
             function($httpProvider) {
-              $httpProvider.defaults.xsrfCookieName =
-                window.camCockpitConf.csrfCookieName;
+              $httpProvider.defaults.xsrfCookieName = config.csrfCookieName;
             }
           ]);
         }
@@ -275,7 +259,7 @@ define('camunda-cockpit-bootstrap', [], function() {
           // executed yet and the angular modules provided by those plugins will
           // not have been defined yet. Placing a new require call here will put
           // the bootstrapping of the angular app at the end of the queue
-          require([], function() {
+          rjsrequire([], function() {
             initCockpitUi(pluginDependencies);
           });
         }

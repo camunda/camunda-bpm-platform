@@ -25,6 +25,8 @@ import {
   require as rjsrequire
 } from 'exports-loader?exports=requirejs,define,require!requirejs/require';
 
+window.define = define;
+window.require = rjsrequire;
 window.bust = '$CACHE_BUST';
 
 // camunda-admin-bootstrap is copied as-is, so we have to inline everything
@@ -47,33 +49,19 @@ const loadConfig = (async function() {
 
 define('camunda-admin-bootstrap', function() {
   'use strict';
-  const bootstrap = function(config) {
-    var camundaAdminUi = require('./camunda-admin-ui');
-
+  const bootstrap = config => {
     requirejs.config({
       baseUrl: '../../../lib'
     });
 
-    var requirePackages = window;
-    camundaAdminUi.exposePackages(requirePackages);
+    var camundaAdminUi = require('./camunda-admin-ui');
+    camundaAdminUi.exposePackages(window);
 
-    define('globalize', [], function() {
-      return function(r, m, p) {
-        for (var i = 0; i < m.length; i++) {
-          (function(i) {
-            define(m[i], function() {
-              return p[m[i]];
-            });
-          })(i);
-        }
-      };
-    });
-
-    requirejs(['globalize'], function(globalize) {
+    requirejs([`${appRoot}/lib/globalize.js`], function(globalize) {
       globalize(
         requirejs,
         ['angular', 'camunda-commons-ui', 'camunda-bpm-sdk-js', 'jquery'],
-        requirePackages
+        window
       );
 
       var pluginPackages = window.PLUGIN_PACKAGES || [];
@@ -171,9 +159,6 @@ define('camunda-admin-bootstrap', function() {
             // directives, controllers, services and all when loaded
             angular.module('cam.admin.custom', custom.ngDeps);
 
-            window.define = undefined;
-            window.require = undefined;
-
             // now that we loaded the plugins and the additional modules, we can finally
             // initialize Admin
             camundaAdminUi.init(pluginDependencies);
@@ -189,14 +174,8 @@ define('camunda-admin-bootstrap', function() {
           // executed yet and the angular modules provided by those plugins will
           // not have been defined yet. Placing a new require call here will put
           // the bootstrapping of the angular app at the end of the queue
-          require([], function() {
-            window.define = undefined;
-            window.require = undefined;
-
+          rjsrequire([], function() {
             camundaAdminUi.init(pluginDependencies);
-
-            window.define = define;
-            window.require = rjsrequire;
           });
         }
       });

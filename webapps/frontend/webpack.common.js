@@ -213,13 +213,13 @@ module.exports = {
       patterns: [
         {
           from: path.resolve(__dirname, 'public'),
-          to: 'app'
+          to: './'
         }
       ]
     }),
     new webpack.DefinePlugin({
       CAMUNDA_VERSION: `'${version}'`,
-      _import: 'import' // dynamic import workaround
+      _import: 'function(filePath) { return import(filePath) }' // dynamic import workaround
     }),
     new ESLintPlugin()
   ],

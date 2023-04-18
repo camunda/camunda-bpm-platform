@@ -69,7 +69,7 @@ module.exports = () => {
               return `For license information, please see ${licenseFile}`;
             }
           },
-          exclude: /scripts\/config\.js/
+          exclude: [/scripts\/config\.js/, /lib\/globalize\.js/]
         })
       ],
       // Bundle all third-party modules into the lib/deps.js bundle

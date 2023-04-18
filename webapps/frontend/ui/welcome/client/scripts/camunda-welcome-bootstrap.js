@@ -25,6 +25,8 @@ import {
   require as rjsrequire
 } from 'exports-loader?exports=requirejs,define,require!requirejs/require';
 
+window.define = define;
+window.require = rjsrequire;
 window.bust = '$CACHE_BUST';
 
 // camunda-welcome-bootstrap is copied as-is, so we have to inline everything
@@ -47,7 +49,6 @@ const loadConfig = (async function() {
 
 define('camunda-welcome-bootstrap', function() {
   'use strict';
-
   const bootstrap = config => {
     requirejs.config({
       baseUrl: '../../../lib'
@@ -56,19 +57,7 @@ define('camunda-welcome-bootstrap', function() {
     var camundaWelcomeUi = require('./camunda-welcome-ui');
     camundaWelcomeUi.exposePackages(window);
 
-    define('globalize', [], function() {
-      return function(r, m, p) {
-        for (var i = 0; i < m.length; i++) {
-          (function(i) {
-            define(m[i], function() {
-              return p[m[i]];
-            });
-          })(i);
-        }
-      };
-    });
-
-    requirejs(['globalize'], function(globalize) {
+    requirejs([`${appRoot}/lib/globalize.js`], function(globalize) {
       globalize(
         requirejs,
         [
@@ -164,9 +153,6 @@ define('camunda-welcome-bootstrap', function() {
             // directives, controllers, services and all when loaded
             angular.module('cam.welcome.custom', custom.ngDeps);
 
-            window.define = undefined;
-            window.require = undefined;
-
             // now that we loaded the plugins and the additional modules, we can finally
             // initialize Welcome
             camundaWelcomeUi.init(pluginDependencies);
@@ -182,12 +168,8 @@ define('camunda-welcome-bootstrap', function() {
           // executed yet and the angular modules provided by those plugins will
           // not have been defined yet. Placing a new require call here will put
           // the bootstrapping of the angular app at the end of the queue
-          require([], function() {
-            window.define = undefined;
-            window.require = undefined;
+          rjsrequire([], function() {
             camundaWelcomeUi.init(pluginDependencies);
-            window.define = define;
-            window.require = rjsrequire;
           });
         }
       });

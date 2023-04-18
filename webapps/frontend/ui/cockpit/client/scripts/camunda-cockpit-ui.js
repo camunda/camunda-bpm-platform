@@ -42,6 +42,8 @@ var APP_NAME = 'cam.cockpit';
 
 var angular = require('camunda-commons-ui/vendor/angular');
 
+const translatePaginationCtrls = require('../../../common/scripts/util/translate-pagination-ctrls');
+
 export function init(pluginDependencies) {
   var ngDependencies = [
     'ng',
@@ -83,6 +85,7 @@ export function init(pluginDependencies) {
     '$animateProvider',
     '$qProvider',
     '$compileProvider',
+    '$provide',
     function(
       $routeProvider,
       UriProvider,
@@ -91,8 +94,11 @@ export function init(pluginDependencies) {
       $locationProvider,
       $animateProvider,
       $qProvider,
-      $compileProvider
+      $compileProvider,
+      $provide
     ) {
+      translatePaginationCtrls($provide);
+
       $compileProvider.aHrefSanitizationTrustedUrlList(
         /^\s*(https?|s?ftp|mailto|tel|file|blob):/
       );

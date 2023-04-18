@@ -60,6 +60,7 @@ Page.prototype.isActive = function(params) {
 };
 
 Page.prototype.navigateToWebapp = function(appName) {
+  browser.sleep(5000);
   browser.get('camunda/app/' + appName.toLowerCase() + '/');
   browser.driver
     .manage()
