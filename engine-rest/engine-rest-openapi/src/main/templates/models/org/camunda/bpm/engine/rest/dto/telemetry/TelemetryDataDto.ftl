@@ -10,8 +10,8 @@
 
     <@lib.property
         name = "product"
-        type = "object"
-        additionalProperties = true
+        type = "ref"
+        additionalProperties = false
         dto = "TelemetryProductDto"
         desc = "Information about the product collection telemetry data."
         last = true
