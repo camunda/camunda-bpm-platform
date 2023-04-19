@@ -39,7 +39,9 @@
         examples = ['"example-1": {
                        "summary": "GET /process-definition/statistics?failedJobs=true",
                        "description": "Request with Query Parameter `failedJobs=true`",
-                       "value": [{"id":"aProcessDefinitionId",
+                       "value": [{
+                         "@class": "org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionStatisticsResultDto",
+                         "id":"aProcessDefinitionId",
                          "instances": 123,
                          "failedJobs": 42,
                          "definition": 
@@ -59,7 +61,9 @@
                            "startableInTasklist": false},
                          "incidents": []
                         },
-                        {"id": "aProcessDefinitionId:2",
+                        {
+                         "@class": "org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionStatisticsResultDto",
+                         "id": "aProcessDefinitionId:2",
                          "instances": 124,
                          "failedJobs": 43,
                          "definition": 
@@ -84,6 +88,7 @@
                        "summary": "GET /process-definition/statistics?incidents=true",
                        "description": "Request with Query Parameter `incidents=true`",
                        "value": [{
+                         "@class": "org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionStatisticsResultDto",
                          "id": "aProcessDefinitionId",
                          "instances": 123,
                          "failedJobs": 0,
@@ -111,6 +116,7 @@
                            "incidentCount": 20
                          }]
                      }, {
+                         "@class": "org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionStatisticsResultDto",
                          "id": "aProcessDefinitionId:2",
                          "instances": 124,
                          "failedJobs": 0,
@@ -145,7 +151,9 @@
                     '"example-3": {
                        "summary": "GET /process-definition/statistics?incidentsForType=anIncident",
                        "description": "Request with Query Parameter `incidentsForType=anIncident`",
-                       "value": [{"id":"aProcessDefinitionId",
+                       "value": [{
+                         "@class": "org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionStatisticsResultDto",
+                         "id":"aProcessDefinitionId",
                          "id": "aProcessDefinitionId",
                          "instances": 123,
                          "failedJobs": 0,
@@ -175,6 +183,7 @@
                        "summary": "GET /process-definition/statistics?rootIncidents=true",
                        "description": "Request with Query Parameter `rootIncidents=true`",
                        "value": [{
+                         "@class": "org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionStatisticsResultDto",
                          "id": "aProcessDefinitionId",
                          "instances": 123,
                          "failedJobs": 0,

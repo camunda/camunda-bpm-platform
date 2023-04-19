@@ -23,6 +23,11 @@
         desc = "The name of the activity"/>
 
     <@lib.property
+        name = "name"
+        type = "string"
+        desc = "The name of the activity. This property is deprecated. Please use 'activityName'."/>
+
+    <@lib.property
         name = "activityType"
         type = "string"
         desc = "The type of activity (corresponds to the XML element name in the BPMN 2.0, e.g., 'userTask')"/>

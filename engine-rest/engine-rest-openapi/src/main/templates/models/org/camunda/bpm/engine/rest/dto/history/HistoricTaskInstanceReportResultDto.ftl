@@ -90,12 +90,17 @@
       name = "average"
       type = "integer"
       format = "int64"
-      last = true
       desc = "The average duration in milliseconds of all completed process instances which were
               started in the given period.
 
               ${noteDurationReport}"
   />
+
+  <@lib.property
+      name = "tenantId"
+      type = "string"
+      last = true
+      desc = "The id of the tenant." />
 
 </@lib.dto>
 </#macro>

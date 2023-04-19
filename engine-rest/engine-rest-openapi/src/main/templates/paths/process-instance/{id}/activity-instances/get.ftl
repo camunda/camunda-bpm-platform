@@ -50,7 +50,8 @@
                            "id": "648d7e21-f71c-11e9-a725-e4a7a094a9d6",
                            "activityId": "AttachedTimerBoundaryEvent"
                          }
-                         ]
+                         ],
+                         "name": "Approve Invoice"
                        }
                        ],
                        "childTransitionInstances": [],
@@ -59,7 +60,8 @@
                        ],
                        "activityName": "Invoice Receipt",
                        "incidentIds": null,
-                       "incidents": null
+                       "incidents": null,
+                       "name": "Invoice Receipt"
                      }
                    }'
       ] />

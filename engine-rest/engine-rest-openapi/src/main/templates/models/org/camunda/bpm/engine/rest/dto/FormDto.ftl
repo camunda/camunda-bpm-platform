@@ -10,6 +10,12 @@
         desc = "The form key." />
 
     <@lib.property
+        name = "camundaFormRef"
+        type = "ref"
+        dto = "CamundaFormRef"
+        desc = "A reference to a specific version of a Camunda Form." />
+
+    <@lib.property
         name = "contextPath"
         type = "string"
         last = true

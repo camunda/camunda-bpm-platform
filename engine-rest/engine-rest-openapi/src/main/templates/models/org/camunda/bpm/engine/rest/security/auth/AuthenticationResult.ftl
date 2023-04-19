@@ -8,7 +8,7 @@
     />
 
     <@lib.property
-        name = "isAuthenticated"
+        name = "authenticated"
         type = "boolean"
         desc = "A flag indicating if user is authenticated."
     />

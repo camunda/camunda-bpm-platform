@@ -34,12 +34,15 @@
                        "summary": "GET /process-definition/aProcessDefinitionId/statistics?failedJobs=true",
                        "description": "Request with Query Parameter `failedJobs=true`",
                        "value": [{
+                         "@class": "org.camunda.bpm.engine.rest.dto.repository.ActivityStatisticsResultDto",
                          "id":"anActivity",
                          "instances": 123,
                          "failedJobs": 42,
                          "incidents": []
                         },
-                        {"id": "anotherActivity",
+                        {
+                         "@class": "org.camunda.bpm.engine.rest.dto.repository.ActivityStatisticsResultDto",
+                         "id": "anotherActivity",
                          "instances": 124,
                          "failedJobs": 43,
                          "incidents": []
@@ -49,6 +52,7 @@
                        "summary": "GET /process-definition/aProcessDefinitionId/statistics?incidents=true",
                        "description": "Request with Query Parameter `incidents=true`",
                        "value": [{
+                         "@class": "org.camunda.bpm.engine.rest.dto.repository.ActivityStatisticsResultDto",
                          "id": "anActivity",
                          "instances": 123,
                          "failedJobs": 0,
@@ -60,6 +64,7 @@
                            "incidentCount": 20
                          }]
                      }, {
+                         "@class": "org.camunda.bpm.engine.rest.dto.repository.ActivityStatisticsResultDto",
                          "id": "anotherActivity",
                          "instances": 124,
                          "failedJobs": 0,
@@ -79,6 +84,7 @@
                        "summary": "GET /process-definition/aProcessDefinitionId/statistics?incidentsForType=anIncident",
                        "description": "Request with Query Parameter `incidentsForType=anIncident`",
                        "value": [{
+                         "@class": "org.camunda.bpm.engine.rest.dto.repository.ActivityStatisticsResultDto",
                          "id": "anActivity",
                          "instances": 123,
                          "failedJobs": 0,

@@ -20,9 +20,9 @@
     />
     
     <@lib.property
-        name = "isAuthorized"
+        name = "authorized"
         type = "boolean"
-        desc = "True / false for isAuthorized."
+        desc = "Returns true or false depending on whether the user is authorized or not."
         last = true
     />
 
