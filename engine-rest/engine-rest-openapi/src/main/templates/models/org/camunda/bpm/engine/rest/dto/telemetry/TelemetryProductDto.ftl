@@ -18,8 +18,8 @@
 
     <@lib.property
         name = "internals"
-        type = "object"
-        additionalProperties = true
+        type = "ref"
+        additionalProperties = false
         dto = "TelemetryInternalsDto"
         last = true
         desc = "Internal data and metrics collected by the product."/>
