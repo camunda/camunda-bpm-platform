@@ -54,6 +54,8 @@ public class UserOperationLogQueryImpl extends AbstractQuery<UserOperationLogQue
   protected String category;
   protected Date timestampAfter;
   protected Date timestampBefore;
+  protected String[] tenantIds;
+  protected boolean isTenantIdSet;
 
   protected String[] entityTypes;
   protected String[] categories;
@@ -149,7 +151,7 @@ public class UserOperationLogQueryImpl extends AbstractQuery<UserOperationLogQue
     this.operationId = operationId;
     return this;
   }
-  
+
   public UserOperationLogQuery externalTaskId(String externalTaskId) {
     ensureNotNull("externalTaskId", externalTaskId);
     this.externalTaskId = externalTaskId;
@@ -179,13 +181,13 @@ public class UserOperationLogQueryImpl extends AbstractQuery<UserOperationLogQue
     this.entityTypes = entityTypes;
     return this;
   }
-  
+
   public UserOperationLogQuery category(String category) {
     ensureNotNull("category", category);
     this.category = category;
     return this;
   }
-  
+
   public UserOperationLogQuery categoryIn(String... categories) {
     ensureNotNull("categories", (Object[]) categories);
     this.categories = categories;
@@ -218,6 +220,23 @@ public class UserOperationLogQueryImpl extends AbstractQuery<UserOperationLogQue
     return commandContext
         .getOperationLogManager()
         .findOperationLogEntriesByQueryCriteria(this, page);
+  }
+
+  public boolean isTenantIdSet() {
+    return isTenantIdSet;
+  }
+
+  public UserOperationLogQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    this.isTenantIdSet = true;
+    return this;
+  }
+
+  public UserOperationLogQuery withoutTenantId() {
+    this.tenantIds = null;
+    this.isTenantIdSet = true;
+    return this;
   }
 
   @Override

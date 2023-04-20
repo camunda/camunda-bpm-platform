@@ -126,6 +126,7 @@ drop index ACT_IDX_AUTH_GROUP_ID;
 
 drop index ACT_IDX_EXEC_BUSKEY;
 drop index ACT_IDX_TASK_CREATE;
+drop index ACT_IDX_TASK_LAST_UPDATED;
 drop index ACT_IDX_TASK_ASSIGNEE;
 drop index ACT_IDX_TASK_OWNER;
 drop index ACT_IDX_IDENT_LNK_USER;

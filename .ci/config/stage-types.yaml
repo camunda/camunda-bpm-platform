@@ -22,7 +22,7 @@
 #     sqlserver: [INT; OPTIONAL;]
 db-unit:
   directory: '.'
-  command: 'clean test -pl "engine,webapps" -Dskip.frontend.build=true -P'
+  command: 'clean package -pl "engine,webapps/assembly,webapps/assembly-jakarta" -Dskip.frontend.build=true -P'
   stash:
     runtimeStash: true
   labels:
@@ -35,13 +35,15 @@ db-unit:
   - 'postgresql'
   - 'cockroachdb'
   - 'authorizations'
+  jdkVersion: 'openjdk-jdk-11-latest'
 db-unit-authorizations:
   directory: '.'
-  command: 'clean test -pl "engine,webapps" -Dskip.frontend.build=true -PcfgAuthorizationCheckRevokesAlways,'
+  command: 'clean package -pl "engine,webapps/assembly,webapps/assembly-jakarta" -Dskip.frontend.build=true -PcfgAuthorizationCheckRevokesAlways,'
   stash:
     runtimeStash: true
   labels:
   - 'authorizations'
+  jdkVersion: 'openjdk-jdk-11-latest'
 sql-scripts:
   directory: 'distro/sql-script'
   command: 'install -Pcheck-sql,'
@@ -119,25 +121,18 @@ engine-rest-unit-resteasy:
   labels:
   - 'rest-api'
   nodeLabel: 'h2'
+engine-rest-jakarta-unit-resteasy:
+  directory: 'engine-rest/engine-rest-jakarta'
+  command: 'clean install -Presteasy'
+  stash:
+    runtimeStash: true
+  labels:
+    - 'rest-api'
+  nodeLabel: 'h2'
+  jdkVersion: 'openjdk-jdk-17-latest'
 engine-rest-unit-cxf:
   directory: 'engine-rest/engine-rest'
   command: 'clean install -Pcxf'
-  stash:
-    runtimeStash: true
-  labels:
-  - 'rest-api'
-  nodeLabel: 'h2'
-engine-rest-unit-jaxrs2-jersey-2:
-  directory: 'engine-rest/engine-rest-jaxrs2'
-  command: 'clean install -Pjersey2'
-  stash:
-    runtimeStash: true
-  labels:
-  - 'rest-api'
-  nodeLabel: 'h2'
-engine-rest-unit-jaxrs2-resteasy:
-  directory: 'engine-rest/engine-rest-jaxrs2'
-  command: 'clean install -Presteasy'
   stash:
     runtimeStash: true
   labels:
@@ -151,58 +146,35 @@ engine-rest-unit-compatibility-wildfly:
   labels:
   - 'rest-api'
   nodeLabel: 'h2'
-engine-rest-IT-embedded-wildfly:
+engine-rest-IT-embedded-wildfly26:
   directory: 'qa'
-  command: 'clean install -Pwildfly,h2,webapps-integration,embedded-engine-rest'
+  command: 'clean install -Pwildfly26,h2,webapps-integration,embedded-engine-rest'
   stash:
     runtimeStash: true
     archiveStash: true
   labels:
   - 'rest-api'
   nodeLabel: 'h2'
+engine-rest-jakarta-unit-compatibility-wildfly:
+  directory: 'engine-rest/engine-rest-jakarta'
+  command: 'clean install -Pwildfly-compatibility'
+  stash:
+    runtimeStash: true
+  labels:
+    - 'rest-api'
+  nodeLabel: 'h2'
+  jdkVersion: 'openjdk-jdk-17-latest'
 platform-jdk-openjdk-jdk-17-latest:
   directory: '.'
-  command: 'install source:jar source:test-jar -pl ''!webapps'' -Pdistro,distro-ce,distro-wildfly'
+  command: 'install source:jar source:test-jar -pl ''!webapps/assembly'',''!webapps/assembly-jakarta'' -Pdistro,distro-ce,distro-wildfly'
   stash:
     runtimeStash: true
   nodeLabel: 'h2'
   jdkVersion: 'openjdk-jdk-17-latest'
   withNpm: true
-platform-jdk-openjdk-jdk-15-latest:
-  directory: '.'
-  command: 'install source:jar source:test-jar -pl ''!webapps'' -Pdistro,distro-ce,distro-wildfly'
-  stash:
-    runtimeStash: true
-  nodeLabel: 'h2'
-  jdkVersion: 'openjdk-jdk-15-latest'
-  withNpm: true
-platform-jdk-openjdk-jdk-14-latest:
-  directory: '.'
-  command: 'install source:jar source:test-jar -pl ''!webapps'' -Pdistro,distro-ce,distro-wildfly'
-  stash:
-    runtimeStash: true
-  nodeLabel: 'h2'
-  jdkVersion: 'openjdk-jdk-14-latest'
-  withNpm: true
-platform-jdk-openjdk-jdk-13-latest:
-  directory: '.'
-  command: 'install source:jar source:test-jar -pl ''!webapps'' -Pdistro,distro-ce,distro-wildfly'
-  stash:
-    runtimeStash: true
-  nodeLabel: 'h2'
-  jdkVersion: 'openjdk-jdk-13-latest'
-  withNpm: true
-platform-jdk-openjdk-jdk-12-latest:
-  directory: '.'
-  command: 'install source:jar source:test-jar -pl ''!webapps'' -Pdistro,distro-ce,distro-wildfly'
-  stash:
-    runtimeStash: true
-  nodeLabel: 'h2'
-  jdkVersion: 'openjdk-jdk-12-latest'
-  withNpm: true
 platform-jdk-openjdk-jdk-11-latest:
   directory: '.'
-  command: 'install source:jar source:test-jar -pl ''!webapps'' -Pdistro,distro-ce,distro-wildfly'
+  command: 'install source:jar source:test-jar -pl ''!webapps/assembly'',''!webapps/assembly-jakarta'' -Pdistro,distro-ce,distro-wildfly'
   stash:
     runtimeStash: true
   nodeLabel: 'h2'
@@ -210,7 +182,11 @@ platform-jdk-openjdk-jdk-11-latest:
   withNpm: true
 platform-jdk-openjdk-jdk-8-latest:
   directory: '.'
-  command: 'install source:jar source:test-jar -pl ''!webapps'',''!quarkus-extension/engine/deployment'',''!quarkus-extension/engine/runtime'',''!quarkus-extension/engine/qa'' -Pdistro,distro-ce,distro-wildfly'
+  command: 'install source:jar source:test-jar
+    -pl ''!distro/wildfly,!distro/wildfly/subsystem,!distro/wildfly/modules,!distro/wildfly/assembly,!distro/wildfly/webapp,!distro/wildfly/distro,
+          !qa/integration-tests-engine-jakarta,!webapps/assembly,
+          !quarkus-extension/engine/deployment,!quarkus-extension/engine/runtime,!quarkus-extension/engine/qa'' 
+    -Pdistro,distro-ce,distro-wildfly'
   stash:
     runtimeStash: true
   nodeLabel: 'h2'
@@ -218,47 +194,15 @@ platform-jdk-openjdk-jdk-8-latest:
   withNpm: true
 platform-jdk-jdk-17-latest:
   directory: '.'
-  command: 'install source:jar source:test-jar -pl ''!webapps'' -Pdistro,distro-ce,distro-wildfly'
+  command: 'install source:jar source:test-jar -pl ''!webapps/assembly'',''!webapps/assembly-jakarta'' -Pdistro,distro-ce,distro-wildfly'
   stash:
     runtimeStash: true
   nodeLabel: 'h2'
   jdkVersion: 'jdk-17-latest'
   withNpm: true
-platform-jdk-jdk-15-latest:
-  directory: '.'
-  command: 'install source:jar source:test-jar -pl ''!webapps'' -Pdistro,distro-ce,distro-wildfly'
-  stash:
-    runtimeStash: true
-  nodeLabel: 'h2'
-  jdkVersion: 'jdk-15-latest'
-  withNpm: true
-platform-jdk-jdk-14-latest:
-  directory: '.'
-  command: 'install source:jar source:test-jar -pl ''!webapps'' -Pdistro,distro-ce,distro-wildfly'
-  stash:
-    runtimeStash: true
-  nodeLabel: 'h2'
-  jdkVersion: 'jdk-14-latest'
-  withNpm: true
-platform-jdk-jdk-13-latest:
-  directory: '.'
-  command: 'install source:jar source:test-jar -pl ''!webapps'' -Pdistro,distro-ce,distro-wildfly'
-  stash:
-    runtimeStash: true
-  nodeLabel: 'h2'
-  jdkVersion: 'jdk-13-latest'
-  withNpm: true
-platform-jdk-jdk-12-latest:
-  directory: '.'
-  command: 'install source:jar source:test-jar -pl ''!webapps'' -Pdistro,distro-ce,distro-wildfly'
-  stash:
-    runtimeStash: true
-  nodeLabel: 'h2'
-  jdkVersion: 'jdk-12-latest'
-  withNpm: true
 platform-jdk-jdk-11-latest:
   directory: '.'
-  command: 'install source:jar source:test-jar -pl ''!webapps'' -Pdistro,distro-ce,distro-wildfly'
+  command: 'install source:jar source:test-jar -pl ''!webapps/assembly'',''!webapps/assembly-jakarta'' -Pdistro,distro-ce,distro-wildfly'
   stash:
     runtimeStash: true
   nodeLabel: 'h2'
@@ -266,7 +210,11 @@ platform-jdk-jdk-11-latest:
   withNpm: true
 platform-jdk-jdk-8-latest:
   directory: '.'
-  command: 'install source:jar source:test-jar -pl ''!webapps'',''!quarkus-extension/engine/deployment'',''!quarkus-extension/engine/runtime'',''!quarkus-extension/engine/qa'' -Pdistro,distro-ce,distro-wildfly'
+  command: 'install source:jar source:test-jar
+    -pl ''!distro/wildfly,!distro/wildfly/subsystem,!distro/wildfly/modules,!distro/wildfly/assembly,!distro/wildfly/webapp,!distro/wildfly/distro,
+          !qa/integration-tests-engine-jakarta,!webapps/assembly,
+          !quarkus-extension/engine/deployment,!quarkus-extension/engine/runtime,!quarkus-extension/engine/qa''
+    -Pdistro,distro-ce,distro-wildfly'
   stash:
     runtimeStash: true
   nodeLabel: 'h2'
@@ -274,7 +222,11 @@ platform-jdk-jdk-8-latest:
   withNpm: true
 platform-jdk-ibm-jdk-8-latest:
   directory: '.'
-  command: 'install source:jar source:test-jar -pl ''!webapps'',''!quarkus-extension/engine/deployment'',''!quarkus-extension/engine/runtime'',''!quarkus-extension/engine/qa'' -Pdistro,distro-ce,distro-wildfly'
+  command: 'install source:jar source:test-jar
+    -pl ''!distro/wildfly,!distro/wildfly/subsystem,!distro/wildfly/modules,!distro/wildfly/assembly,!distro/wildfly/webapp,!distro/wildfly/distro,
+          !qa/integration-tests-engine-jakarta,!webapps/assembly,
+          !quarkus-extension/engine/deployment,!quarkus-extension/engine/runtime,!quarkus-extension/engine/qa''
+    -Pdistro,distro-ce,distro-wildfly'
   stash:
     runtimeStash: true
   nodeLabel: 'h2'

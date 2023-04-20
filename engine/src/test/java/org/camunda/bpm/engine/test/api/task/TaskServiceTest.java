@@ -51,7 +51,6 @@ import org.camunda.bpm.engine.TaskAlreadyClaimedException;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
-import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.identity.Group;
@@ -1994,6 +1993,36 @@ public class TaskServiceTest {
     assertThat(fetched.getProcessInstanceId()).isNotNull();
     assertThat(fetched.getCreateTime()).isEqualTo(fixedDate);
     taskService.deleteAttachment(attachment.getId());
+  }
+
+  @Test
+  public void testDeleteTaskAttachmentWithNullParameter() {
+    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
+    if (historyLevel> ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      try {
+        taskService.deleteAttachment(null);
+        fail("expected process engine exception");
+      } catch (ProcessEngineException e) {}
+    }
+  }
+
+  @Test
+  @Deployment(resources={
+  "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
+  public void testDeleteAttachment() throws ParseException {
+    // given
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+    Attachment attachment = taskService.createAttachment("web page", taskId, null, "weatherforcast", "temperatures and more",
+        new ByteArrayInputStream("someContent".getBytes()));
+    Attachment fetched = taskService.getAttachment(attachment.getId());
+    assertThat(fetched).isNotNull();
+    // when
+    taskService.deleteAttachment(attachment.getId());
+    // then
+    fetched = taskService.getAttachment(attachment.getId());
+    assertThat(fetched).isNull();
   }
 
   @Test

@@ -12,6 +12,7 @@ pipeline {
   }
   environment {
     LOGGER_LOG_LEVEL = 'DEBUG'
+    MAVEN_VERSION = 'maven-3.8-latest'
   }
   parameters {
     booleanParam name: 'TRIGGERED_BY_UPSTREAM', defaultValue: false, description: 'Is the current build triggered in the scope of an upstream pipeline (pull request or default branch)'
@@ -21,11 +22,7 @@ pipeline {
   }
   options {
     buildDiscarder(logRotator(numToKeepStr: '5'))
-    throttleJobProperty(
-      throttleEnabled: true,
-      throttleOption: 'project',
-      maxConcurrentTotal: 2
-    )
+    disableConcurrentBuilds()
   }
   triggers {
     pollSCM('H H(0-3) * * *') // CE daily runs after EE daily and Sidetrack daily
@@ -34,7 +31,7 @@ pipeline {
     stage('Prepare') {
       when {
         expression {
-          cambpmWithLabels('upstream')
+          return params.TRIGGERED_BY_UPSTREAM
         }
       }
       steps {
@@ -56,11 +53,16 @@ pipeline {
     stage('Misc') {
       parallel {
         stage('check-sql-scripts') {
+          when {
+            expression {
+              cambpmWithLabels('all-db','h2','db2','mysql','oracle','mariadb','sqlserver','postgresql','cockroachdb')
+            }
+          }
           steps {
             cambpmConditionalRetry([
               agentLabel: 'centos-stable',
               runSteps: {
-                sh '.ci/scripts/check-sql-scripts.sh'
+                sh(label: 'Check SQL scripts', script: '.ci/scripts/check-sql-scripts.sh')
               }
             ])
           }
@@ -73,15 +75,34 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel : 'centos-stable',
               runSteps   : {
-                sh 'mkdir -p ./webapps/target/webapp'
                 cambpmRunMaven('.',
-                  'package javadoc:javadoc javadoc:aggregate -Pdistro,distro-wildfly,distro-webjar,javadocs -DskipTests=true -Dskip.frontend.build=true',
+                  "package javadoc:javadoc javadoc:aggregate -Pdistro,distro-wildfly,distro-webjar,javadocs -pl '!distro/wildfly/modules,!distro/wildfly26/modules' -DskipTests=true -Dskip.frontend.build=true",
                   withNpm: true,
                   jdkVersion: 'jdk-11-latest')
               },
               postSuccess: {
-                def projectVersion = cambpmUtils.getMavenProjectVersion()
-                cambpmPublishJavadocs("\"target/site/apidocs/\"", projectVersion)
+                def projectVersion = env.JOB_NAME.split('/')[0] + "-SNAPSHOT"
+                cambpmPublishDocs("\"target/site/apidocs/\"", projectVersion, "javadoc")
+              }
+            ])
+          }
+        }
+        stage('stage-restapi-docs') {
+          when {
+            branch cambpmDefaultBranch();
+          }
+          steps {
+            cambpmConditionalRetry([
+              agentLabel : 'centos-stable',
+              runSteps   : {
+                cambpmRunMaven('./engine-rest',
+                  "package -Dmaven.test.skip -pl '!engine-rest,!assembly'",
+                  withNpm: true,
+                  jdkVersion: 'jdk-11-latest')
+              },
+              postSuccess: {
+                def projectVersion = env.JOB_NAME.split('/')[0] + "-SNAPSHOT"
+                cambpmPublishDocs("\"engine-rest/docs/target/index.html\"", projectVersion, "rest")
               }
             ])
           }
@@ -100,6 +121,9 @@ pipeline {
               ])
             }
           }
+          options {
+            timeout(time: 45, unit: 'MINUTES')
+          }
           environment {
             // define helper script input arguments
             INPUT_OWNER = 'camunda'
@@ -110,9 +134,11 @@ pipeline {
             INPUT_WAIT_INPUT_WAIT_WORKFLOW = 'true'
           }
           steps {
-            script {
-              camundaGitHubWorkflowDispatch.prepareStep()
-              camundaGitHubWorkflowDispatch.dispatchStep('github-cambpm-ci-pipeline-app')
+            catchError(stageResult: 'FAILURE') {
+              script {
+                camundaGitHubWorkflowDispatch.prepareStep()
+                camundaGitHubWorkflowDispatch.dispatchStep('github-cambpm-ci-pipeline-app')
+              }
             }
           }
         }
@@ -148,7 +174,29 @@ pipeline {
             cambpmConditionalRetry([
               agentLabel: 'h2',
               runSteps: {
-                cambpmRunMaven('distro/wildfly/subsystem', 'test', runtimeStash: true)
+                cambpmRunMaven('distro/wildfly/subsystem',
+                  'test',
+                  runtimeStash: true,
+                  // we need to use JDK 11 for WildFly 27+
+                  jdkVersion: 'jdk-11-latest')
+              },
+              postFailure: {
+                cambpmPublishTestResult()
+              }
+            ])
+          }
+        }
+        stage('wildfly26-subsystem-UNIT-wildfly') {
+          when {
+            expression {
+              cambpmWithLabels('wildfly')
+            }
+          }
+          steps {
+            cambpmConditionalRetry([
+              agentLabel: 'h2',
+              runSteps: {
+                cambpmRunMaven('distro/wildfly26/subsystem', 'test', runtimeStash: true)
               },
               postFailure: {
                 cambpmPublishTestResult()
@@ -234,7 +282,9 @@ pipeline {
         }
         stage('PERFORMANCE-large-data-h2') {
           when {
-            branch cambpmDefaultBranch();
+            expression {
+              cambpmWithLabels()
+            }
           }
           steps {
             cambpmConditionalRetry([
@@ -283,6 +333,9 @@ pipeline {
           cambpmSendEmailNotification()
         }
       }
+    }
+    always {
+      cambpmWithSpanAttributes()
     }
   }
 }

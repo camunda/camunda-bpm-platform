@@ -1,0 +1,14 @@
+<module xmlns="urn:jboss:module:1.0" name="com.jayway.jsonpath.json-path">
+  <resources>
+    <resource-root path="json-path-@version.json-path@.jar" />
+  </resources>
+
+  <dependencies>
+
+    <module name="javax.api" />
+    <module name="com.fasterxml.jackson.core.jackson-databind" slot="@version.jackson@"/>
+    <module name="org.slf4j" />
+    <module name="net.minidev.json-smart" />
+
+  </dependencies>
+</module>

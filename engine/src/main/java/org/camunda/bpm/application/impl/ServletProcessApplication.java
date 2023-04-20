@@ -17,39 +17,46 @@
 package org.camunda.bpm.application.impl;
 
 import java.lang.ref.WeakReference;
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-
 import org.camunda.bpm.application.AbstractProcessApplication;
-import org.camunda.bpm.application.ProcessApplicationInfo;
-import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
 
 /**
- * <p>A {@link AbstractProcessApplication} Implementation to be used in a Servlet container environment.</p>
+ * <p>
+ * A {@link AbstractProcessApplication} Implementation to be used in a Servlet
+ * container environment.
+ * </p>
  *
- * <p>This class implements the {@link ServletContextListener} interface and can thus participate in the
- * deployment lifecycle of your web application.</p>
+ * <p>
+ * This class implements the {@link ServletContextListener} interface and can
+ * thus participate in the deployment lifecycle of your web application.
+ * </p>
  *
  * <h2>Usage</h2>
- * <p>In a <strong>Servlet 3.0</strong> container it is sufficient adding a custom subclass of
- * {@link ServletProcessApplication} annotated with <code>{@literal @}ProcessApplication</code> to your
- * application:
+ * <p>
+ * In a <strong>Servlet 3.0</strong> container it is sufficient adding a custom
+ * subclass of {@link ServletProcessApplication} annotated with
+ * <code>{@literal @}ProcessApplication</code> to your application:
+ *
  * <pre>
  * {@literal @}ProcessApplication("Loan Approval App")
  * public class LoanApprovalApplication extends ServletProcessApplication {
  * // empty implementation
  * }
  * </pre>
- * This, in combination with a <code>META-INF/processes.xml</code> file is sufficient for making sure
- * that the process application class is picked up at runtime.</p>
- * <p>In a <strong>Servlet 2.5</strong> container, the process application can be added as a web listener
- * to your project's <code>web.xml</code></p>
+ *
+ * This, in combination with a <code>META-INF/processes.xml</code> file is
+ * sufficient for making sure that the process application class is picked up at
+ * runtime.
+ * </p>
+ * <p>
+ * In a <strong>Servlet 2.5</strong> container, the process application can be
+ * added as a web listener to your project's <code>web.xml</code>
+ * </p>
+ *
  * <pre>
  * {@literal <}?xml version="1.0" encoding="UTF-8"?{@literal >}
  * {@literal <}web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
@@ -64,14 +71,17 @@ import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
  * </p>
  *
  * <h2>Invocation Semantics</h2>
- * <p>When the {@link #execute(java.util.concurrent.Callable)} method is invoked, the servlet process
- * application modifies the context classloader of the current Thread to the classloader that loaded
- * the application-provided subclass of this class. This allows
+ * <p>
+ * When the {@link #execute(java.util.concurrent.Callable)} method is invoked,
+ * the servlet process application modifies the context classloader of the
+ * current Thread to the classloader that loaded the application-provided
+ * subclass of this class. This allows
  * <ul>
- * <li>the process engine to resolve {@link JavaDelegate} implementations using the classloader
- * of the process application</li>
- * <li>In apache tomcat this allows you to resolve Naming Resources (JNDI) form the naming
- * context of the process application. JNDI name resolution is based on the TCCL in Apache Tomcat.</li>
+ * <li>the process engine to resolve {@link JavaDelegate} implementations using
+ * the classloader of the process application</li>
+ * <li>In apache tomcat this allows you to resolve Naming Resources (JNDI) form
+ * the naming context of the process application. JNDI name resolution is based
+ * on the TCCL in Apache Tomcat.</li>
  * </ul>
  * </p>
  *
@@ -90,40 +100,22 @@ import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
  * </pre>
  *
  * <h2>Process Application Reference</h2>
- * <p>The process engine holds a {@link WeakReference} to the {@link ServletProcessApplication} and does not cache any
- * classes loaded using the Process Application classloader.</p>
+ * <p>
+ * The process engine holds a {@link WeakReference} to the
+ * {@link ServletProcessApplication} and does not cache any classes loaded using
+ * the Process Application classloader.
+ * </p>
  *
  *
  * @author Daniel Meyer
  * @author Thorben Lindhauer
  *
  */
-public class ServletProcessApplication extends AbstractProcessApplication implements ServletContextListener {
+public class ServletProcessApplication extends AbstractServletProcessApplication implements ServletContextListener {
 
-  protected String servletContextName;
-  protected String servletContextPath;
-
-  protected ProcessApplicationReferenceImpl reference;
-
-  protected ClassLoader processApplicationClassloader;
   protected ServletContext servletContext;
 
-
-  protected String autodetectProcessApplicationName() {
-    String name = (servletContextName != null && !servletContextName.isEmpty()) ? servletContextName : servletContextPath;
-    if(name.startsWith("/")) {
-      name = name.substring(1);
-    }
-    return name;
-  }
-
-  public ProcessApplicationReference getReference() {
-     if(reference == null) {
-       reference = new ProcessApplicationReferenceImpl(this);
-     }
-     return reference;
-  }
-
+  @Override
   public void contextInitialized(ServletContextEvent sce) {
     servletContext = sce.getServletContext();
     servletContextPath = servletContext.getContextPath();
@@ -136,44 +128,27 @@ public class ServletProcessApplication extends AbstractProcessApplication implem
   }
 
   protected ClassLoader initProcessApplicationClassloader(ServletContextEvent sce) {
-
     if (isServlet30ApiPresent(sce) && getClass().equals(ServletProcessApplication.class)) {
       return ClassLoaderUtil.getServletContextClassloader(sce);
-
     } else {
       return ClassLoaderUtil.getClassloader(getClass());
-
     }
-
   }
 
   private boolean isServlet30ApiPresent(ServletContextEvent sce) {
     return sce.getServletContext().getMajorVersion() >= 3;
   }
 
-  public ClassLoader getProcessApplicationClassloader() {
-    return processApplicationClassloader;
-  }
-
+  @Override
   public void contextDestroyed(ServletContextEvent sce) {
-
     // perform lifecycle stop
     undeploy();
 
     // clear the reference
-    if(reference != null) {
+    if (reference != null) {
       reference.clear();
     }
     reference = null;
-  }
-
-  public Map<String, String> getProperties() {
-    Map<String, String> properties = new HashMap<String, String>();
-
-    // set the servlet context path as property
-    properties.put(ProcessApplicationInfo.PROP_SERVLET_CONTEXT_PATH, servletContextPath);
-
-    return properties;
   }
 
   public ServletContext getServletContext() {

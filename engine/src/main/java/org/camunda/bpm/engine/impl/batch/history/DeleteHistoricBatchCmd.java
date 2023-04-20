@@ -40,7 +40,7 @@ public class DeleteHistoricBatchCmd implements Command<Object> {
 
     checkAccess(commandContext, historicBatch);
 
-    writeUserOperationLog(commandContext);
+    writeUserOperationLog(commandContext, historicBatch.getTenantId());
 
     historicBatch.delete();
 
@@ -53,9 +53,9 @@ public class DeleteHistoricBatchCmd implements Command<Object> {
     }
   }
 
-  protected void writeUserOperationLog(CommandContext commandContext) {
+  protected void writeUserOperationLog(CommandContext commandContext, String tenantId) {
     commandContext.getOperationLogManager()
-      .logBatchOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY, batchId, PropertyChange.EMPTY_CHANGE);
+      .logBatchOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY, batchId, tenantId, PropertyChange.EMPTY_CHANGE);
   }
 
 }

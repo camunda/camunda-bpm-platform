@@ -60,7 +60,10 @@ public class AbstractWebappUiIntegrationTest extends AbstractWebIntegrationTest 
 
     ChromeOptions chromeOptions = new ChromeOptions()
         .setHeadless(true)
-        .addArguments("--window-size=1920,1200");
+        .addArguments("--window-size=1920,1200")
+        .addArguments("--disable-gpu")
+        .addArguments("--no-sandbox")
+        .addArguments("--disable-dev-shm-usage");
 
     driver = new ChromeDriver(chromeDriverService, chromeOptions);
   }

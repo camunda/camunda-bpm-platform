@@ -16,12 +16,11 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
-
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
@@ -42,18 +41,18 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.repository.ProcessDefinitionResource;
 import org.camunda.bpm.engine.rest.sub.repository.impl.ProcessDefinitionResourceImpl;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.camunda.bpm.engine.rest.util.QueryUtil;
 
 public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineAware implements ProcessDefinitionRestService {
 
-	public ProcessDefinitionRestServiceImpl(String engineName, ObjectMapper objectMapper) {
+  public ProcessDefinitionRestServiceImpl(String engineName, ObjectMapper objectMapper) {
     super(engineName, objectMapper);
   }
 
-	public ProcessDefinitionResource getProcessDefinitionByKey(String processDefinitionKey) {
+  @Override
+  public ProcessDefinitionResource getProcessDefinitionByKey(String processDefinitionKey) {
 
-	  ProcessDefinition processDefinition = getProcessEngine()
+    ProcessDefinition processDefinition = getProcessEngine()
         .getRepositoryService()
         .createProcessDefinitionQuery()
         .processDefinitionKey(processDefinitionKey)
@@ -68,9 +67,10 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
     } else {
       return getProcessDefinitionById(processDefinition.getId());
     }
-	}
+  }
 
-	public ProcessDefinitionResource getProcessDefinitionByKeyAndTenantId(String processDefinitionKey, String tenantId) {
+  @Override
+  public ProcessDefinitionResource getProcessDefinitionByKeyAndTenantId(String processDefinitionKey, String tenantId) {
 
     ProcessDefinition processDefinition = getProcessEngine()
         .getRepositoryService()
@@ -96,44 +96,28 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
   }
 
   @Override
-	public List<ProcessDefinitionDto> getProcessDefinitions(UriInfo uriInfo,
-	    Integer firstResult, Integer maxResults) {
+  public List<ProcessDefinitionDto> getProcessDefinitions(UriInfo uriInfo,
+      Integer firstResult, Integer maxResults) {
     ProcessDefinitionQueryDto queryDto = new ProcessDefinitionQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
-	  List<ProcessDefinitionDto> definitions = new ArrayList<ProcessDefinitionDto>();
+    List<ProcessDefinitionDto> definitions = new ArrayList<>();
 
-	  ProcessEngine engine = getProcessEngine();
-	  ProcessDefinitionQuery query = queryDto.toQuery(engine);
+    ProcessEngine engine = getProcessEngine();
+    ProcessDefinitionQuery query = queryDto.toQuery(engine);
 
-	  List<ProcessDefinition> matchingDefinitions = null;
+    List<ProcessDefinition> matchingDefinitions = QueryUtil.list(query, firstResult, maxResults);
 
-	  if (firstResult != null || maxResults != null) {
-	    matchingDefinitions = executePaginatedQuery(query, firstResult, maxResults);
-	  } else {
-	    matchingDefinitions = query.list();
-	  }
+    for (ProcessDefinition definition : matchingDefinitions) {
+      ProcessDefinitionDto def = ProcessDefinitionDto.fromProcessDefinition(definition);
+      definitions.add(def);
+    }
+    return definitions;
+  }
 
-	  for (ProcessDefinition definition : matchingDefinitions) {
-	    ProcessDefinitionDto def = ProcessDefinitionDto.fromProcessDefinition(definition);
-	    definitions.add(def);
-	  }
-	  return definitions;
-	}
-
-	private List<ProcessDefinition> executePaginatedQuery(ProcessDefinitionQuery query, Integer firstResult, Integer maxResults) {
-	  if (firstResult == null) {
-	    firstResult = 0;
-	  }
-	  if (maxResults == null) {
-	    maxResults = Integer.MAX_VALUE;
-	  }
-	  return query.listPage(firstResult, maxResults);
-	}
-
-	@Override
+  @Override
   public CountResultDto getProcessDefinitionsCount(UriInfo uriInfo) {
-	  ProcessDefinitionQueryDto queryDto = new ProcessDefinitionQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
+    ProcessDefinitionQueryDto queryDto = new ProcessDefinitionQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
 
-	  ProcessEngine engine = getProcessEngine();
+    ProcessEngine engine = getProcessEngine();
     ProcessDefinitionQuery query = queryDto.toQuery(engine);
 
     long count = query.count();
@@ -174,7 +158,7 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
 
     List<ProcessDefinitionStatistics> queryResults = query.unlimitedList();
 
-    List<StatisticsResultDto> results = new ArrayList<StatisticsResultDto>();
+    List<StatisticsResultDto> results = new ArrayList<>();
     for (ProcessDefinitionStatistics queryResult : queryResults) {
       StatisticsResultDto dto = ProcessDefinitionStatisticsResultDto.fromProcessDefinitionStatistics(queryResult);
       results.add(dto);
@@ -183,6 +167,7 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
     return results;
   }
 
+  @Override
   public void updateSuspensionState(ProcessDefinitionSuspensionStateDto dto) {
     if (dto.getProcessDefinitionId() != null) {
       String message = "Only processDefinitionKey can be set to update the suspension state.";
@@ -200,21 +185,21 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
 
   @Override
   public void deleteProcessDefinitionsByKey(String processDefinitionKey, boolean cascade, boolean skipCustomListeners, boolean skipIoMappings) {
-    RepositoryService repositoryService = processEngine.getRepositoryService();
+    RepositoryService repositoryService = getProcessEngine().getRepositoryService();
 
     DeleteProcessDefinitionsBuilder builder = repositoryService.deleteProcessDefinitions()
-      .byKey(processDefinitionKey);
+        .byKey(processDefinitionKey);
 
     deleteProcessDefinitions(builder, cascade, skipCustomListeners, skipIoMappings);
   }
 
   @Override
   public void deleteProcessDefinitionsByKeyAndTenantId(String processDefinitionKey, boolean cascade, boolean skipCustomListeners, boolean skipIoMappings, String tenantId) {
-    RepositoryService repositoryService = processEngine.getRepositoryService();
+    RepositoryService repositoryService = getProcessEngine().getRepositoryService();
 
     DeleteProcessDefinitionsBuilder builder = repositoryService.deleteProcessDefinitions()
-      .byKey(processDefinitionKey)
-      .withTenantId(tenantId);
+        .byKey(processDefinitionKey)
+        .withTenantId(tenantId);
 
     deleteProcessDefinitions(builder, cascade, skipCustomListeners, skipIoMappings);
   }

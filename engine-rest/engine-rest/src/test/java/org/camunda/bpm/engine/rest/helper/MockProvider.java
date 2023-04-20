@@ -17,8 +17,8 @@
 package org.camunda.bpm.engine.rest.helper;
 
 import static org.camunda.bpm.engine.rest.util.DateTimeUtils.withTimezone;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyInt;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -35,10 +35,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.engine.EntityTypes;
+import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
@@ -102,6 +102,9 @@ import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.MetricIntervalValue;
 import org.camunda.bpm.engine.management.MetricsQuery;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
+import org.camunda.bpm.engine.management.SetJobRetriesBuilder;
+import org.camunda.bpm.engine.management.SetJobRetriesByJobsAsyncBuilder;
+import org.camunda.bpm.engine.management.SetJobRetriesByProcessAsyncBuilder;
 import org.camunda.bpm.engine.query.PeriodUnit;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.repository.CaseDefinition;
@@ -180,6 +183,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_TASK_NAME = "aName";
   public static final String EXAMPLE_TASK_ASSIGNEE_NAME = "anAssignee";
   public static final String EXAMPLE_TASK_CREATE_TIME = withTimezone("2013-01-23T13:42:42");
+  public static final String EXAMPLE_TASK_LAST_UPDATED = withTimezone("2013-01-23T13:42:45");
   public static final String EXAMPLE_TASK_DUE_DATE = withTimezone("2013-01-23T13:42:43");
   public static final String EXAMPLE_FOLLOW_UP_DATE = withTimezone("2013-01-23T13:42:44");
   public static final DelegationState EXAMPLE_TASK_DELEGATION_STATE = DelegationState.RESOLVED;
@@ -994,6 +998,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_TELEMETRY_LICENSE_RAW = "customer=customer name;expiryDate=2022-09-30;camundaBPM=true;optimize=false;cawemo=false";
   public static final String EXAMPLE_TELEMETRY_JDK_VERSION = "14.0.2";
   public static final String EXAMPLE_TELEMETRY_JDK_VENDOR = "Oracle Corporation";
+  public static final String EXAMPLE_TELEMETRY_DATA_COLLECTION_START_DATE = withTimezone("2022-01-01T00:00:00");
 
   public static final DatabaseImpl EXAMPLE_TELEMETRY_DATABASE = new DatabaseImpl(EXAMPLE_TELEMETRY_DB_VENDOR,
       EXAMPLE_TELEMETRY_DB_VERSION);
@@ -1020,6 +1025,7 @@ public abstract class MockProvider {
         .collect(Collectors.toMap(data -> (String) data[0], data -> new MetricImpl((Long) data[1]))));
     EXAMPLE_TELEMETRY_INTERNALS.setCamundaIntegration(Collections.singleton("spring-boot"));
     EXAMPLE_TELEMETRY_INTERNALS.setWebapps(Collections.singleton("cockpit"));
+    EXAMPLE_TELEMETRY_INTERNALS.setDataCollectionStartDate(DateTimeUtil.parseDate(EXAMPLE_TELEMETRY_DATA_COLLECTION_START_DATE));
   }
   public static final ProductImpl EXAMPLE_TELEMETRY_PRODUCT = new ProductImpl(EXAMPLE_TELEMETRY_PRODUCT_NAME,
       EXAMPLE_TELEMETRY_PRODUCT_VERSION, EXAMPLE_TELEMETRY_PRODUCT_EDITION, EXAMPLE_TELEMETRY_INTERNALS);
@@ -1034,6 +1040,7 @@ public abstract class MockProvider {
       .id(EXAMPLE_TASK_ID).name(EXAMPLE_TASK_NAME)
       .assignee(EXAMPLE_TASK_ASSIGNEE_NAME)
       .createTime(DateTimeUtil.parseDate(EXAMPLE_TASK_CREATE_TIME))
+      .lastUpdated(DateTimeUtil.parseDate(EXAMPLE_TASK_LAST_UPDATED))
       .dueDate(DateTimeUtil.parseDate(EXAMPLE_TASK_DUE_DATE))
       .followUpDate(DateTimeUtil.parseDate(EXAMPLE_FOLLOW_UP_DATE))
       .delegationState(EXAMPLE_TASK_DELEGATION_STATE).description(EXAMPLE_TASK_DESCRIPTION)
@@ -3162,6 +3169,8 @@ public abstract class MockProvider {
       .batchJobDefinitionId(EXAMPLE_BATCH_JOB_DEFINITION_ID)
       .suspended()
       .createUserId(EXAMPLE_USER_ID)
+      .startTime(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_BATCH_START_TIME))
+      .executionStartTime(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_BATCH_START_TIME))
       .tenantId(EXAMPLE_TENANT_ID);
   }
 
@@ -3188,6 +3197,7 @@ public abstract class MockProvider {
       .tenantId(EXAMPLE_TENANT_ID)
       .createUserId(EXAMPLE_USER_ID)
       .startTime(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_BATCH_START_TIME))
+      .executionStartTime(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_BATCH_START_TIME))
       .endTime(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_BATCH_END_TIME))
       .removalTime(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_BATCH_REMOVAL_TIME));
   }
@@ -3216,6 +3226,7 @@ public abstract class MockProvider {
       .tenantId(EXAMPLE_TENANT_ID)
       .createUserId(EXAMPLE_USER_ID)
       .suspended()
+      .startTime(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_BATCH_START_TIME))
       .remainingJobs(EXAMPLE_BATCH_REMAINING_JOBS)
       .completedJobs(EXAMPLE_BATCH_COMPLETED_JOBS)
       .failedJobs(EXAMPLE_BATCH_FAILED_JOBS);
@@ -3325,5 +3336,38 @@ public abstract class MockProvider {
     when(mock.isDeletionLog()).thenReturn(EXAMPLE_HISTORIC_EXTERNAL_TASK_LOG_IS_DELETION_LOG);
 
     return mock;
+  }
+
+  public static SetJobRetriesByJobsAsyncBuilder createMockSetJobRetriesByJobsAsyncBuilder(ManagementService mockManagementService) {
+    Batch batchEntity = MockProvider.createMockBatch();
+    SetJobRetriesByJobsAsyncBuilder mockSetJobRetriesByJobsAsyncBuilder = mock(SetJobRetriesByJobsAsyncBuilder.class);
+    when(mockManagementService.setJobRetriesByJobsAsync(anyInt())).thenReturn(mockSetJobRetriesByJobsAsyncBuilder);
+    when(mockSetJobRetriesByJobsAsyncBuilder.jobIds(any())).thenReturn(mockSetJobRetriesByJobsAsyncBuilder);
+    when(mockSetJobRetriesByJobsAsyncBuilder.jobQuery(any())).thenReturn(mockSetJobRetriesByJobsAsyncBuilder);
+    when(mockSetJobRetriesByJobsAsyncBuilder.dueDate(any())).thenReturn(mockSetJobRetriesByJobsAsyncBuilder);
+    when(mockSetJobRetriesByJobsAsyncBuilder.executeAsync()).thenReturn(batchEntity);
+    return mockSetJobRetriesByJobsAsyncBuilder;
+  }
+
+  public static SetJobRetriesByProcessAsyncBuilder createMockSetJobRetriesByProcessAsyncBuilder(ManagementService mockManagementService) {
+    Batch batchEntity = MockProvider.createMockBatch();
+    SetJobRetriesByProcessAsyncBuilder mockSetJobRetriesByProcessAsyncBuilder = mock(SetJobRetriesByProcessAsyncBuilder.class);
+    when(mockManagementService.setJobRetriesByProcessAsync(anyInt())).thenReturn(mockSetJobRetriesByProcessAsyncBuilder);
+    when(mockSetJobRetriesByProcessAsyncBuilder.processInstanceIds(any())).thenReturn(mockSetJobRetriesByProcessAsyncBuilder);
+    when(mockSetJobRetriesByProcessAsyncBuilder.processInstanceQuery(any())).thenReturn(mockSetJobRetriesByProcessAsyncBuilder);
+    when(mockSetJobRetriesByProcessAsyncBuilder.historicProcessInstanceQuery(any())).thenReturn(mockSetJobRetriesByProcessAsyncBuilder);
+    when(mockSetJobRetriesByProcessAsyncBuilder.dueDate(any())).thenReturn(mockSetJobRetriesByProcessAsyncBuilder);
+    when(mockSetJobRetriesByProcessAsyncBuilder.executeAsync()).thenReturn(batchEntity);
+    return mockSetJobRetriesByProcessAsyncBuilder;
+  }
+
+  public static SetJobRetriesBuilder createMockSetJobRetriesBuilder(ManagementService mockManagementService) {
+    SetJobRetriesBuilder mockSetJobRetriesBuilder = mock(SetJobRetriesBuilder.class);
+    when(mockManagementService.setJobRetries(anyInt())).thenReturn(mockSetJobRetriesBuilder);
+    when(mockSetJobRetriesBuilder.jobId(any())).thenReturn(mockSetJobRetriesBuilder);
+    when(mockSetJobRetriesBuilder.jobIds(any())).thenReturn(mockSetJobRetriesBuilder);
+    when(mockSetJobRetriesBuilder.jobDefinitionId(any())).thenReturn(mockSetJobRetriesBuilder);
+    when(mockSetJobRetriesBuilder.dueDate(any())).thenReturn(mockSetJobRetriesBuilder);
+    return mockSetJobRetriesBuilder;
   }
 }

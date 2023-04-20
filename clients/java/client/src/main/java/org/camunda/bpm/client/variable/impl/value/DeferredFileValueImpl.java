@@ -53,7 +53,8 @@ public class DeferredFileValueImpl extends FileValueImpl implements DeferredFile
       this.isLoaded = true;
 
     } catch (EngineClientException e) {
-      throw LOG.cannotLoadDeferedFileValueException(variableName, e);
+      throw LOG.handledEngineClientException("loading deferred file", e);
+
     }
   }
 

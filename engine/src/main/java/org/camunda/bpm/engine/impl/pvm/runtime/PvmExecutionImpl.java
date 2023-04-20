@@ -46,6 +46,7 @@ import org.camunda.bpm.engine.impl.incident.IncidentContext;
 import org.camunda.bpm.engine.impl.incident.IncidentHandler;
 import org.camunda.bpm.engine.impl.incident.IncidentHandling;
 import org.camunda.bpm.engine.impl.persistence.entity.DelayedVariableEvent;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
@@ -315,6 +316,14 @@ public abstract class PvmExecutionImpl extends CoreExecution implements
 
   @Override
   public void destroy() {
+    destroy(false);
+  }
+
+  /**
+   * @param alwaysSkipIoMappings set to true to always skip IO mappings,
+   * regardless of internal state of execution (=> {@link CoreExecution#isSkipIoMappings()})
+   */
+  public void destroy(boolean alwaysSkipIoMappings) {
     LOG.destroying(this);
     setScope(false);
   }
@@ -352,7 +361,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements
     PvmActivity activity = getActivity();
     if (isActive && activity != null) {
       // set activity instance state to cancel
-      if (activityInstanceState != ENDING.getStateCode()) {
+      if (activityInstanceState != ENDING.getStateCode() || activityInstanceEndListenersFailed) {
         setCanceled(true);
         performOperation(PvmAtomicOperation.FIRE_ACTIVITY_END);
       }
@@ -1042,16 +1051,16 @@ public abstract class PvmExecutionImpl extends CoreExecution implements
     // and the activity is left with the scope
     // execution)
     recyclableExecutions.remove(this);
-    
+
     // End all other executions synchronously.
     // This ensures a proper execution tree in case
     // the activity is marked as 'async-after'.
     // Otherwise, ending the other executions as well
     // as the next logical operation are executed
-    // asynchronously. The order of those operations can 
-    // not be guaranteed anymore. This can lead to executions 
-    // getting stuck in case they rely on ending the other 
-    // executions first. 
+    // asynchronously. The order of those operations can
+    // not be guaranteed anymore. This can lead to executions
+    // getting stuck in case they rely on ending the other
+    // executions first.
     for (ActivityExecution execution : recyclableExecutions) {
       execution.setIgnoreAsync(true);
       execution.end(_transitions.isEmpty());
@@ -1848,6 +1857,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements
     return activityInstanceState == state.getStateCode();
   }
 
+  @Override
   public boolean hasFailedOnEndListeners() {
     return activityInstanceEndListenersFailed;
   }

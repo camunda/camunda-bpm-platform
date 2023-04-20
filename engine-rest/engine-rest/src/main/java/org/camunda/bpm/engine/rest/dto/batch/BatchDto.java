@@ -18,6 +18,8 @@ package org.camunda.bpm.engine.rest.dto.batch;
 
 import org.camunda.bpm.engine.batch.Batch;
 
+import java.util.Date;
+
 public class BatchDto {
 
   protected String id;
@@ -32,6 +34,8 @@ public class BatchDto {
   protected boolean suspended;
   protected String tenantId;
   protected String createUserId;
+  protected Date startTime;
+  protected Date executionStartTime;
 
   public String getId() {
     return id;
@@ -81,6 +85,22 @@ public class BatchDto {
     return createUserId;
   }
 
+  public Date getStartTime() {
+    return startTime;
+  }
+
+  public void setStartTime(final Date startTime) {
+    this.startTime = startTime;
+  }
+
+  public Date getExecutionStartTime() {
+    return executionStartTime;
+  }
+
+  public void setExecutionStartTime(final Date executionStartTime) {
+    this.executionStartTime = executionStartTime;
+  }
+
   public static BatchDto fromBatch(Batch batch) {
     BatchDto dto = new BatchDto();
     dto.id = batch.getId();
@@ -95,6 +115,8 @@ public class BatchDto {
     dto.suspended = batch.isSuspended();
     dto.tenantId = batch.getTenantId();
     dto.createUserId = batch.getCreateUserId();
+    dto.startTime = batch.getStartTime();
+    dto.executionStartTime = batch.getExecutionStartTime();
     return dto;
   }
 

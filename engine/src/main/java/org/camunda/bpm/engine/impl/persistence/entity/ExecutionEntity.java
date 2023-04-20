@@ -28,6 +28,7 @@ import java.util.Set;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
@@ -55,7 +56,6 @@ import org.camunda.bpm.engine.impl.db.HasDbReferences;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
-import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
@@ -67,7 +67,6 @@ import org.camunda.bpm.engine.impl.jobexecutor.MessageJobDeclaration;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
-import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
@@ -79,6 +78,7 @@ import org.camunda.bpm.engine.impl.tree.ExecutionTopDownWalker;
 import org.camunda.bpm.engine.impl.tree.TreeVisitor;
 import org.camunda.bpm.engine.impl.util.BitMaskUtil;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
+import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.impl.variable.VariableDeclaration;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -504,19 +504,18 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
    * removed afterwards.
    */
   @Override
-  public void destroy() {
-
+  public void destroy(boolean alwaysSkipIoMappings) {
     ensureParentInitialized();
 
     // execute Output Mappings (if they exist).
     ensureActivityInitialized();
-    if (activity != null && activity.getIoMapping() != null && !skipIoMapping) {
+    if (activity != null && activity.getIoMapping() != null && !skipIoMapping && !alwaysSkipIoMappings) {
       activity.getIoMapping().executeOutputParameters(this);
     }
 
     clearExecution();
 
-    super.destroy();
+    super.destroy(alwaysSkipIoMappings);
 
     removeEventSubscriptionsExceptCompensation();
   }
@@ -1311,6 +1310,10 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
       Collection<JobEntity> jobs,
       Collection<IncidentEntity> incidents,
       Collection<ExternalTaskEntity> externalTasks) {
+
+    EnsureUtil.ensureNotEmpty(NullValueException.class,
+        String.format("Cannot restore state of process instance %s", processInstanceId),
+        "list of executions", executions);
 
     if(!isProcessInstanceExecution()) {
       throw LOG.restoreProcessInstanceException(this);

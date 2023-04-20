@@ -16,7 +16,17 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
+import static org.camunda.bpm.engine.authorization.Authorization.ANY;
+import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
+import static org.camunda.bpm.engine.authorization.Resources.USER;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.net.URI;
+import java.util.List;
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
@@ -30,17 +40,7 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.identity.UserResource;
 import org.camunda.bpm.engine.rest.sub.identity.impl.UserResourceImpl;
 import org.camunda.bpm.engine.rest.util.PathUtil;
-
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
-import java.net.URI;
-import java.util.List;
-
-import static org.camunda.bpm.engine.authorization.Authorization.ANY;
-import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
-import static org.camunda.bpm.engine.authorization.Resources.USER;
+import org.camunda.bpm.engine.rest.util.QueryUtil;
 
 /**
  * @author Daniel Meyer
@@ -52,11 +52,13 @@ public class UserRestServiceImpl extends AbstractAuthorizedRestResource implemen
     super(engineName, USER, ANY, objectMapper);
   }
 
+  @Override
   public UserResource getUser(String id) {
     id = PathUtil.decodePathParam(id);
     return new UserResourceImpl(getProcessEngine().getName(), id, relativeRootResourcePath, getObjectMapper());
   }
 
+  @Override
   public List<UserProfileDto> queryUsers(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
     UserQueryDto queryDto = new UserQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
     return queryUsers(queryDto, firstResult, maxResults);
@@ -67,17 +69,13 @@ public class UserRestServiceImpl extends AbstractAuthorizedRestResource implemen
     queryDto.setObjectMapper(getObjectMapper());
     UserQuery query = queryDto.toQuery(getProcessEngine());
 
-    List<User> resultList;
-    if(firstResult != null || maxResults != null) {
-      resultList = executePaginatedQuery(query, firstResult, maxResults);
-    } else {
-      resultList = query.list();
-    }
+    List<User> resultList = QueryUtil.list(query, firstResult, maxResults);
 
     return UserProfileDto.fromUserList(resultList);
   }
 
 
+  @Override
   public CountResultDto getUserCount(UriInfo uriInfo) {
     UserQueryDto queryDto = new UserQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
     return getUserCount(queryDto);
@@ -89,6 +87,7 @@ public class UserRestServiceImpl extends AbstractAuthorizedRestResource implemen
     return new CountResultDto(count);
   }
 
+  @Override
   public void createUser(UserDto userDto) {
     final IdentityService identityService = getIdentityService();
 
@@ -112,6 +111,7 @@ public class UserRestServiceImpl extends AbstractAuthorizedRestResource implemen
 
   }
 
+  @Override
   public ResourceOptionsDto availableOperations(UriInfo context) {
 
     final IdentityService identityService = getIdentityService();
@@ -140,16 +140,6 @@ public class UserRestServiceImpl extends AbstractAuthorizedRestResource implemen
   }
 
   // utility methods //////////////////////////////////////
-
-  protected List<User> executePaginatedQuery(UserQuery query, Integer firstResult, Integer maxResults) {
-    if (firstResult == null) {
-      firstResult = 0;
-    }
-    if (maxResults == null) {
-      maxResults = Integer.MAX_VALUE;
-    }
-    return query.listPage(firstResult, maxResults);
-  }
 
   protected IdentityService getIdentityService() {
     return getProcessEngine().getIdentityService();

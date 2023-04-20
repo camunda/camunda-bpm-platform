@@ -153,7 +153,6 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
   protected ProcessEngineConfiguration processEngineConfigurationMock;
 
   @Before
-  @SuppressWarnings("unchecked")
   public void setUpRuntimeData() {
     filterServiceMock = mock(FilterService.class);
 
@@ -728,7 +727,7 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
   }
 
   protected Map<String, Object> toFilterRequest(Filter filter) {
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
 
     json.put("id", filter.getId());
     json.put("name", filter.getName());
@@ -1530,7 +1529,7 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
   @Test
   public void testHalTaskQueryWithWrongFormatVariablesProperties() {
     // mock properties with variable name list in wrong format
-    Map<String, Object> properties = new HashMap<String, Object>();
+    Map<String, Object> properties = new HashMap<>();
     properties.put("variables", "foo");
     Filter filter =  mockFilter().properties(properties).build();
     when(filterServiceMock.getFilter(eq(EXAMPLE_FILTER_ID))).thenReturn(filter);
@@ -1553,7 +1552,7 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
   @Test
   public void testHalTaskQueryWithEmptyVariablesProperties() {
     // mock properties with variable name list in wrong format
-    Map<String, Object> properties = new HashMap<String, Object>();
+    Map<String, Object> properties = new HashMap<>();
     properties.put("variables", Collections.emptyList());
     Filter filter =  mockFilter().properties(properties).build();
     when(filterServiceMock.getFilter(eq(EXAMPLE_FILTER_ID))).thenReturn(filter);
@@ -1680,7 +1679,7 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
       createTaskMock(TASK_B_ID, PROCESS_INSTANCE_A_ID, EXECUTION_B_ID, null, null),
       createTaskMock(TASK_C_ID, null, null, CASE_INSTANCE_A_ID, CASE_EXECUTION_A_ID)
     );
-    when(filterServiceMock.list(eq(EXAMPLE_FILTER_ID), Mockito.<Query>any())).thenReturn(tasks);
+    when(filterServiceMock.list(eq(EXAMPLE_FILTER_ID), Mockito.<Query<?, Task>>any())).thenReturn(tasks);
 
     // mock variable instances
     List<VariableInstance> variableInstances = Arrays.asList(
@@ -1772,8 +1771,8 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
       createTaskMock(TASK_B_ID, PROCESS_INSTANCE_A_ID, EXECUTION_A_ID, null, null),
       createTaskMock(TASK_C_ID, PROCESS_INSTANCE_A_ID, EXECUTION_B_ID, null, null)
     );
-    when(filterServiceMock.list(eq(EXAMPLE_FILTER_ID), Mockito.<Query>any())).thenReturn(tasks);
-    when(filterServiceMock.listPage(eq(EXAMPLE_FILTER_ID), Mockito.<Query>any(), eq(0), eq(2))).thenReturn(tasks.subList(0, 2));
+    when(filterServiceMock.list(eq(EXAMPLE_FILTER_ID), Mockito.<Query<?, Task>>any())).thenReturn(tasks);
+    when(filterServiceMock.listPage(eq(EXAMPLE_FILTER_ID), Mockito.<Query<?, Task>>any(), eq(0), eq(2))).thenReturn(tasks.subList(0, 2));
     when(filterServiceMock.listPage(eq(EXAMPLE_FILTER_ID), any(), eq(5), eq(2))).thenReturn(Collections.emptyList());
     when(filterServiceMock.count(eq(EXAMPLE_FILTER_ID), any())).thenReturn((long) tasks.size());
 
@@ -1818,17 +1817,17 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
 
   protected Filter mockFilterWithVariableNames() {
     // mock properties with variable name list (names are ignored but variable names list must not be empty)
-    List<Map<String, String>> variables = new ArrayList<Map<String, String>>();
-    Map<String, String> foo = new HashMap<String, String>();
+    List<Map<String, String>> variables = new ArrayList<>();
+    Map<String, String> foo = new HashMap<>();
     foo.put("name", "foo");
     foo.put("label", "Foo");
     variables.add(foo);
-    Map<String, String> bar = new HashMap<String, String>();
+    Map<String, String> bar = new HashMap<>();
     bar.put("name", "bar");
     bar.put("label", "Bar");
     variables.add(bar);
 
-    Map<String, Object> properties = new HashMap<String, Object>();
+    Map<String, Object> properties = new HashMap<>();
     properties.put("variables", variables);
 
     Filter filter = mockFilter().properties(properties).build();

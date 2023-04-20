@@ -30,13 +30,17 @@ import org.camunda.bpm.engine.impl.pvm.PvmException;
  */
 public abstract class AbstractEventAtomicOperation<T extends CoreExecution> implements CoreAtomicOperation<T> {
 
+  @Override
   public boolean isAsync(T execution) {
     return false;
   }
 
+  @Override
   public void execute(T execution) {
     CoreModelElement scope = getScope(execution);
-    List<DelegateListener<? extends BaseDelegateExecution>> listeners = getListeners(scope, execution);
+    List<DelegateListener<? extends BaseDelegateExecution>> listeners = execution.hasFailedOnEndListeners()
+        ? getBuiltinListeners(scope)
+        : getListeners(scope, execution);
     int listenerIndex = execution.getListenerIndex();
 
     if(listenerIndex == 0) {
@@ -80,10 +84,14 @@ public abstract class AbstractEventAtomicOperation<T extends CoreExecution> impl
 
   protected List<DelegateListener<? extends BaseDelegateExecution>> getListeners(CoreModelElement scope, T execution) {
     if(execution.isSkipCustomListeners()) {
-      return scope.getBuiltInListeners(getEventName());
+      return getBuiltinListeners(scope);
     } else {
       return scope.getListeners(getEventName());
     }
+  }
+
+  protected List<DelegateListener<? extends BaseDelegateExecution>> getBuiltinListeners(CoreModelElement scope) {
+    return scope.getBuiltInListeners(getEventName());
   }
 
   protected boolean isSkipNotifyListeners(T execution) {

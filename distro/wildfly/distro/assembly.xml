@@ -33,32 +33,25 @@
         <include>org.camunda.bpm.distro:camunda-sql-scripts:jar:*</include>
       </includes>
     </dependencySet>
-      
-  	<dependencySet>
-  		<includes>
-  			<include>org.camunda.bpm.distro:camunda-h2-webapp:war:*</include>
-  		</includes>
-  		<outputDirectory>server/wildfly-${version.wildfly}/standalone/deployments</outputDirectory>
-  	</dependencySet>
 
     <dependencySet>
         <outputFileNameMapping>${artifact.artifactId}-${artifact.version}.${artifact.extension}</outputFileNameMapping>
         <includes>
-            <include>org.camunda.bpm:camunda-engine-rest:war:*</include>
+            <include>org.camunda.bpm:camunda-engine-rest-jakarta:war:*</include>
         </includes>
         <outputDirectory>server/wildfly-${version.wildfly}/standalone/deployments</outputDirectory>
     </dependencySet>
     
     <dependencySet>
         <includes>
-          <include>org.camunda.bpm.webapp:camunda-webapp-jboss:war:*</include>
+          <include>org.camunda.bpm.webapp:camunda-webapp-wildfly:war:*</include>
         </includes>
         <outputDirectory>server/wildfly-${version.wildfly}/standalone/deployments</outputDirectory>
     </dependencySet>
 
     <dependencySet>
         <includes>
-          <include>org.camunda.bpm.example:camunda-example-invoice:war:*</include>
+          <include>org.camunda.bpm.example:camunda-example-invoice-jakarta:war:*</include>
         </includes>
         <outputDirectory>server/wildfly-${version.wildfly}/standalone/deployments</outputDirectory>
     </dependencySet>

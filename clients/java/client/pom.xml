@@ -10,11 +10,11 @@
   <parent>
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-external-task-client-root</artifactId>
-    <version>7.17.0</version>
+    <version>7.20.0-SNAPSHOT</version>
   </parent>
 
   <properties>
-    <version.httpclient>4.5.9</version.httpclient>
+    <version.httpclient>4.5.13</version.httpclient>
 
     <engine.runtime>${project.build.directory}/camunda-tomcat</engine.runtime>
     <tomcat.runtime>${engine.runtime}/server/apache-tomcat-${version.tomcat}</tomcat.runtime>
@@ -36,6 +36,13 @@
         <groupId>org.camunda.bpm</groupId>
         <artifactId>camunda-core-internal-dependencies</artifactId>
         <version>${project.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson</groupId>
+        <artifactId>jackson-bom</artifactId>
+        <version>${version.jackson}</version>
         <scope>import</scope>
         <type>pom</type>
       </dependency>
@@ -64,7 +71,6 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>${version.jackson}</version>
     </dependency>
 
 
@@ -319,24 +325,11 @@
         <dependency>
           <groupId>com.sun.xml.bind</groupId>
           <artifactId>jaxb-impl</artifactId>
+          <version>${version.xml.jaxb-impl}</version>
           <scope>provided</scope>
         </dependency>
       </dependencies>
     </profile>
   </profiles>
-
-  <!-- DO NOT REMOVE IF YOU DON'T KNOW WHAT YOU DO -->
-  <repositories>
-    <repository>
-      <id>test</id>
-      <url>http://repository</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
 
 </project>

@@ -16,9 +16,9 @@
  */
 package org.camunda.bpm.engine.impl.util;
 
-import org.joda.time.DateTimeUtils;
-
 import java.util.Date;
+
+import org.joda.time.DateTimeUtils;
 
 
 /**
@@ -29,7 +29,7 @@ public class ClockUtil {
   /**
    * Freezes the clock to a specified Date that will be returned by
    * {@link #now()} and {@link #getCurrentTime()}
-   * 
+   *
    * @param currentTime
    *          the Date to freeze the clock at
    */
@@ -52,7 +52,7 @@ public class ClockUtil {
   /**
    * Moves the clock by the given offset and keeps it running from that point
    * on.
-   * 
+   *
    * @param offsetInMillis
    *          the offset to move the clock by
    * @return the new 'now'

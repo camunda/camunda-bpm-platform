@@ -1,0 +1,53 @@
+// https://github.com/camunda/jenkins-global-shared-library
+// https://github.com/camunda/cambpm-jenkins-shared-library
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
+
+pipeline {
+  agent {
+    node {
+      label 'jenkins-job-runner'
+    }
+  }
+  environment {
+    LOGGER_LOG_LEVEL = 'DEBUG'
+    MAVEN_VERSION = 'maven-3.8-latest'
+  }
+  options {
+    buildDiscarder(logRotator(numToKeepStr: '5'))
+    disableConcurrentBuilds()
+  }
+  triggers {
+    pollSCM('H H(15-16) * * *') // CE main daily trigger; UTC time
+  }
+  stages {
+    stage('Trigger Main EE') {
+      when {
+        branch cambpmDefaultBranch();
+      }
+      steps {
+        script {
+          // JOB_NAME, e.g.: '7.15/cambpm-ce/cambpm-main/7.15'
+          // keep leading slash for the absolute project path
+          platformVersionDir = "/" + env.JOB_NAME.split('/')[0]
+
+          cambpmTriggerDownstream(
+            platformVersionDir + "/cambpm-ce/cambpm-main/"+ cambpmDefaultBranch(),
+            [], false, false, false, false
+          )
+        }
+      }
+    }
+  }
+  post {
+    changed {
+      script {
+        if (!agentDisconnected()){
+          cambpmSendEmailNotification()
+        }
+      }
+    }
+    always {
+      cambpmWithSpanAttributes()
+    }
+  }
+}

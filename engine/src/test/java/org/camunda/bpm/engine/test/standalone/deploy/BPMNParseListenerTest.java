@@ -20,6 +20,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
@@ -28,8 +30,10 @@ import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.parser.AbstractBpmnParseListener;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
+import org.camunda.bpm.engine.impl.core.variable.mapping.IoMapping;
 import org.camunda.bpm.engine.impl.el.Expression;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
+import org.camunda.bpm.engine.impl.el.JuelExpressionManager;
 import org.camunda.bpm.engine.impl.form.FormDefinition;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessInstanceWithVariablesImpl;
@@ -141,7 +145,7 @@ public class BPMNParseListenerTest {
         UserTaskActivityBehavior activityBehavior = (UserTaskActivityBehavior) activity.getActivityBehavior();
         TaskDefinition taskDefinition = activityBehavior.getTaskDefinition();
 
-        ExpressionManager expressionManager = new ExpressionManager();
+        ExpressionManager expressionManager = new JuelExpressionManager();
         Expression formKeyExpression = expressionManager.createExpression(modifiedFormKey);
 
         taskDefinition.setFormKey(formKeyExpression);
@@ -189,7 +193,7 @@ public class BPMNParseListenerTest {
         TaskDefinition taskDefinition = activityBehavior.getTaskDefinition();
         FormDefinition formDefinition = taskDefinition.getFormDefinition();
 
-        ExpressionManager expressionManager = new ExpressionManager();
+        ExpressionManager expressionManager = new JuelExpressionManager();
 
         Expression formRefExpression = expressionManager.createExpression(modifiedFormRef);
         formDefinition.setCamundaFormDefinitionKey(formRefExpression);
@@ -254,6 +258,26 @@ public class BPMNParseListenerTest {
     engineTestRule.deployForTenant("parseListenerTenantId", model);
   }
 
+  @Test
+  public void shouldInvokeParseIoMapping() {
+    // given
+    AtomicInteger invokeTimes = new AtomicInteger();
+    DelegatingBpmnParseListener.DELEGATE = new AbstractBpmnParseListener() {
+      @Override
+      public void parseIoMapping(Element extensionElements, ActivityImpl activity, IoMapping inputOutput) {
+        invokeTimes.incrementAndGet();
+      }
+
+    };
+
+    // when
+    engineTestRule.deploy("org/camunda/bpm/engine/test/standalone/deploy/"
+        + "BPMNParseListenerTest.shouldInvokeParseIoMapping.bpmn20.xml");
+
+    // then
+    assertEquals(1, invokeTimes.get());
+  }
+
   // helper ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   protected BpmnParseListener createBpmnParseListenerAndAssertTenantId(String tenantId) {
@@ -285,6 +309,5 @@ public class BPMNParseListenerTest {
       }
     };
   }
-
 
 }

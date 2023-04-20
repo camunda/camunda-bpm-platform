@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.rest.impl.history;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.UriInfo;
@@ -26,7 +27,7 @@ import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricIdentityLinkLogDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricIdentityLinkLogQueryDto;
 import org.camunda.bpm.engine.rest.history.HistoricIdentityLinkLogRestService;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.camunda.bpm.engine.rest.util.QueryUtil;
 /**
  *
  * @author Deivarayan Azhagappan
@@ -47,12 +48,7 @@ public class HistoricIdentityLinkLogRestServiceImpl implements HistoricIdentityL
     HistoricIdentityLinkLogQueryDto queryDto = new HistoricIdentityLinkLogQueryDto(objectMapper, uriInfo.getQueryParameters());
     HistoricIdentityLinkLogQuery query = queryDto.toQuery(processEngine);
 
-    List<HistoricIdentityLinkLog> queryResult;
-    if (firstResult != null || maxResults != null) {
-      queryResult = executePaginatedQuery(query, firstResult, maxResults);
-    } else {
-      queryResult = query.list();
-    }
+    List<HistoricIdentityLinkLog> queryResult = QueryUtil.list(query, firstResult, maxResults);
     List<HistoricIdentityLinkLogDto> result = new ArrayList<HistoricIdentityLinkLogDto>();
     for (HistoricIdentityLinkLog historicIdentityLink : queryResult) {
       HistoricIdentityLinkLogDto dto = HistoricIdentityLinkLogDto.fromHistoricIdentityLink(historicIdentityLink);
@@ -72,15 +68,6 @@ public class HistoricIdentityLinkLogRestServiceImpl implements HistoricIdentityL
 
     return result;
 
-  }
-  private List<HistoricIdentityLinkLog> executePaginatedQuery(HistoricIdentityLinkLogQuery query, Integer firstResult, Integer maxResults) {
-    if (firstResult == null) {
-      firstResult = 0;
-    }
-    if (maxResults == null) {
-      maxResults = Integer.MAX_VALUE;
-    }
-    return query.listPage(firstResult, maxResults);
   }
 
 }

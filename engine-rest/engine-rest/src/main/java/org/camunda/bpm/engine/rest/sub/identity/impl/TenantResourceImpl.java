@@ -99,11 +99,11 @@ public class TenantResourceImpl extends AbstractIdentityResource implements Tena
   }
 
   public TenantUserMembersResource getTenantUserMembersResource() {
-    return new TenantUserMembersResourceImpl(processEngine.getName(), resourceId, rootResourcePath, getObjectMapper());
+    return new TenantUserMembersResourceImpl(getProcessEngine().getName(), resourceId, rootResourcePath, getObjectMapper());
   }
 
   public TenantGroupMembersResource getTenantGroupMembersResource() {
-    return new TenantGroupMembersResourceImpl(processEngine.getName(), resourceId, rootResourcePath, getObjectMapper());
+    return new TenantGroupMembersResourceImpl(getProcessEngine().getName(), resourceId, rootResourcePath, getObjectMapper());
   }
 
   protected Tenant findTenantObject() {

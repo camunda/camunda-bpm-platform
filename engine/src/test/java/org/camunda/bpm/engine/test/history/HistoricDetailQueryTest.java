@@ -120,6 +120,29 @@ public class HistoricDetailQueryTest {
 
   @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void shouldQueryByUserOperationIdAndVariableUpdates() {
+    startProcessInstance(PROCESS_KEY);
+
+    identityService.setAuthenticatedUserId("demo");
+
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    // when
+    taskService.resolveTask(taskId, getVariables());
+
+    //then
+    String userOperationId = historyService.createHistoricDetailQuery().singleResult().getUserOperationId();
+
+    HistoricDetailQuery query = historyService.createHistoricDetailQuery()
+        .userOperationId(userOperationId)
+        .variableUpdates();
+
+    assertEquals(1, query.list().size());
+    assertEquals(1, query.count());
+  }
+
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void testQueryByInvalidUserOperationId() {
     startProcessInstance(PROCESS_KEY);
 

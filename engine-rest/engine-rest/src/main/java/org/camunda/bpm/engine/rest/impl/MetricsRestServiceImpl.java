@@ -60,14 +60,14 @@ public class MetricsRestServiceImpl extends AbstractRestProcessEngineAware imple
 
   @Override
   public MetricsResource getMetrics(String name) {
-    return new MetricsResourceImpl(name, processEngine, objectMapper);
+    return new MetricsResourceImpl(name, getProcessEngine(), objectMapper);
   }
 
   @Override
   public List<MetricsIntervalResultDto> interval(UriInfo uriInfo) {
     MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
     final String name = queryParameters.getFirst(QUERY_PARAM_NAME);
-    MetricsQuery query = processEngine.getManagementService()
+    MetricsQuery query = getProcessEngine().getManagementService()
       .createMetricsQuery()
       .name(name)
       .reporter(queryParameters.getFirst(QUERY_PARAM_REPORTER));
@@ -94,7 +94,7 @@ public class MetricsRestServiceImpl extends AbstractRestProcessEngineAware imple
   @Override
   public Response deleteTaskMetrics(String dateString) {
     Date date = dateConverter.convertQueryParameterToType(dateString);
-    processEngine.getManagementService().deleteTaskMetrics(date);
+    getProcessEngine().getManagementService().deleteTaskMetrics(date);
 
     // return no content (204) since resource is deleted
     return Response.noContent().build();

@@ -9,7 +9,7 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-database-settings</artifactId>
     <relativePath>../database</relativePath>
-    <version>7.17.0</version>
+    <version>7.20.0-SNAPSHOT</version>
   </parent>
 
   <dependencyManagement>
@@ -31,6 +31,14 @@
         <scope>import</scope>
       </dependency>
 
+      <dependency>
+        <groupId>jakarta.platform</groupId>
+        <artifactId>jakarta.jakartaee-bom</artifactId>
+        <version>${version.jakarta-ee-spec}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 
@@ -47,7 +55,7 @@
       <groupId>org.camunda.bpm.model</groupId>
       <artifactId>camunda-cmmn-model</artifactId>
     </dependency>
-
+    
     <dependency>
       <groupId>org.camunda.bpm.dmn</groupId>
       <artifactId>camunda-engine-dmn</artifactId>
@@ -160,6 +168,24 @@
     </dependency>
 
     <dependency>
+      <groupId>jakarta.transaction</groupId>
+      <artifactId>jakarta.transaction-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>jakarta.ejb</groupId>
+      <artifactId>jakarta.ejb-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.apache.tomcat</groupId>
       <artifactId>catalina</artifactId>
       <scope>provided</scope>
@@ -265,7 +291,7 @@
       <artifactId>jcl-over-slf4j</artifactId>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jul-to-slf4j</artifactId>
@@ -280,7 +306,7 @@
 
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
-      <artifactId>groovy-all</artifactId>
+      <artifactId>groovy-jsr223</artifactId>
       <scope>test</scope>
     </dependency>
 
@@ -308,6 +334,12 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-bpm-archunit</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
 
@@ -400,6 +432,9 @@
             <exclude>**/*TestCase.java</exclude>
             <exclude>%regex[.*(${test.excludes}).*Test.*.class]</exclude>
           </excludes>
+          <dependenciesToScan>
+            <dependency>org.camunda.bpm:camunda-bpm-archunit</dependency>
+          </dependenciesToScan>
         </configuration>
       </plugin>
       <plugin>
@@ -469,6 +504,30 @@
           </transformers>
           <shadeTestJar>true</shadeTestJar>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-upgrade-scripts-liquibase</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+
+                <!-- copy all upgrade scripts after 7.15 -->
+                <mkdir dir="target/classes/org/camunda/bpm/engine/db/liquibase/upgrade" />
+                <copy todir="target/classes/org/camunda/bpm/engine/db/liquibase/upgrade">
+                  <fileset dir="target/classes/org/camunda/bpm/engine/db/upgrade" excludes="*_6.*_*,*_7.0_*,*_7.1_*,*_7.2_*,*_7.3_*,*_7.4_*,*_7.5_*,*_7.6_*,*_7.7_*, *_7.8_*,*_7.9_*,*_7.10_*,*_7.11_*,*_7.12_*,*_7.13_*,*_7.14_*,*_7.15_*" />
+                </copy>
+
+              </target>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
     <pluginManagement>
@@ -618,29 +677,6 @@
               <systemPropertyVariables>
                 <jdbcUrl>jdbc:h2:mem:camunda_${surefire.forkNumber};DB_CLOSE_DELAY=1000</jdbcUrl>
               </systemPropertyVariables>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>mariadb-galera</id>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <failIfNoTests>false</failIfNoTests>
-              <trimStackTrace>false</trimStackTrace>
-              <redirectTestOutputToFile>true</redirectTestOutputToFile>
-              <excludes combine.children="append">
-                <exclude>**/JdbcStatementTimeoutTest.java</exclude>
-                <exclude>**/CompetingMessageCorrelationTest.java</exclude>
-                <exclude>**/ConcurrentDeploymentTest.java</exclude>
-                <exclude>**/DatabaseFlushTest.java</exclude>
-                <exclude>**/*TestCase.java</exclude>
-              </excludes>
             </configuration>
           </plugin>
         </plugins>
@@ -886,6 +922,31 @@
                 <excludes combine.children="append">
                   <exclude>**/*NashornTest.java</exclude>
                 </excludes>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    
+    <profile>
+      <id>below-java11</id>
+      <activation>
+        <jdk>(,11)</jdk>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <artifactId>maven-compiler-plugin</artifactId>
+              <configuration>
+                <!-- Jakarta-based classes can only be used with JDK 11+ -->
+                <excludes combine.children="append">
+                  <exclude>**/Jakarta*.java</exclude>
+                </excludes>
+                <testExcludes>
+                  <exclude>**/Jakarta*.java</exclude>
+                </testExcludes>
               </configuration>
             </plugin>
           </plugins>

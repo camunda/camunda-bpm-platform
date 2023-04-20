@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.camunda.bpm.run</groupId>
     <artifactId>camunda-bpm-run-modules</artifactId>
-    <version>7.17.0</version>
+    <version>7.20.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-bpm-run-modules-swaggerui</artifactId>
@@ -42,27 +42,6 @@
 
   </dependencies>
   <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.owasp</groupId>
-          <artifactId>dependency-check-maven</artifactId>
-          <!-- This is necessary when pom.xml and package-lock.json
-            are not co-located. We use this configuration via 
-            https://github.com/camunda/automation-platform-vulnerability-scan -->
-          <configuration>
-            <scanSet>
-              <fileSet>
-              <directory>ui</directory>
-                 <includes>
-                   <include>package-lock.json</include>
-                 </includes>
-              </fileSet>
-            </scanSet>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
     <plugins>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>

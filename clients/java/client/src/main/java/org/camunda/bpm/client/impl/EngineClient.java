@@ -77,27 +77,27 @@ public class EngineClient {
     this.baseUrl = baseUrl;
   }
 
-  public List<ExternalTask> fetchAndLock(List<TopicRequestDto> topics) throws EngineClientException {
+  public List<ExternalTask> fetchAndLock(List<TopicRequestDto> topics)  {
     FetchAndLockRequestDto payload = new FetchAndLockRequestDto(workerId, maxTasks, asyncResponseTimeout, topics, usePriority);
     String resourceUrl = baseUrl + FETCH_AND_LOCK_RESOURCE_PATH;
     ExternalTask[] externalTasks = engineInteraction.postRequest(resourceUrl, payload, ExternalTaskImpl[].class);
     return Arrays.asList(externalTasks);
   }
 
-  public void lock(String taskId, long lockDuration) throws EngineClientException {
+  public void lock(String taskId, long lockDuration)  {
     LockRequestDto payload = new LockRequestDto(workerId, lockDuration);
     String resourcePath = LOCK_RESOURCE_PATH.replace("{id}", taskId);
     String resourceUrl = baseUrl + resourcePath;
     engineInteraction.postRequest(resourceUrl, payload, Void.class);
   }
 
-  public void unlock(String taskId) throws EngineClientException {
+  public void unlock(String taskId)  {
     String resourcePath = UNLOCK_RESOURCE_PATH.replace("{id}", taskId);
     String resourceUrl = baseUrl + resourcePath;
     engineInteraction.postRequest(resourceUrl, null, Void.class);
   }
 
-  public void complete(String taskId, Map<String, Object> variables, Map<String, Object> localVariables) throws EngineClientException {
+  public void complete(String taskId, Map<String, Object> variables, Map<String, Object> localVariables)  {
     Map<String, TypedValueField> typedValueDtoMap = typedValues.serializeVariables(variables);
     Map<String, TypedValueField> localTypedValueDtoMap = typedValues.serializeVariables(localVariables);
 
@@ -107,16 +107,16 @@ public class EngineClient {
     engineInteraction.postRequest(resourceUrl, payload, Void.class);
   }
 
-  public void setVariables(String proccessId,Map<String, Object> variables) throws EngineClientException {
+  public void setVariables(String processId, Map<String, Object> variables)  {
     Map<String, TypedValueField> typedValueDtoMap = typedValues.serializeVariables(variables);
     SetVariablesRequestDto payload = new SetVariablesRequestDto(workerId, typedValueDtoMap);
-    String resourcePath = SET_VARIABLES_RESOURCE_PATH.replace("{id}", proccessId);
+    String resourcePath = SET_VARIABLES_RESOURCE_PATH.replace("{id}", processId);
     String resourceUrl = baseUrl + resourcePath;
     engineInteraction.postRequest(resourceUrl, payload, Void.class);
   }
 
 
-  public void failure(String taskId, String errorMessage, String errorDetails, int retries, long retryTimeout, Map<String, Object> variables, Map<String, Object> localVariables) throws EngineClientException {
+  public void failure(String taskId, String errorMessage, String errorDetails, int retries, long retryTimeout, Map<String, Object> variables, Map<String, Object> localVariables)  {
     Map<String, TypedValueField> typedValueDtoMap = typedValues.serializeVariables(variables);
     Map<String, TypedValueField> localTypedValueDtoMap = typedValues.serializeVariables(localVariables);
 
@@ -126,7 +126,7 @@ public class EngineClient {
     engineInteraction.postRequest(resourceUrl, payload, Void.class);
   }
 
-  public void bpmnError(String taskId, String errorCode, String errorMessage, Map<String, Object> variables) throws EngineClientException {
+  public void bpmnError(String taskId, String errorCode, String errorMessage, Map<String, Object> variables)  {
     Map<String, TypedValueField> typeValueDtoMap = typedValues.serializeVariables(variables);
     BpmnErrorRequestDto payload = new BpmnErrorRequestDto(workerId, errorCode, errorMessage, typeValueDtoMap);
     String resourcePath = BPMN_ERROR_RESOURCE_PATH.replace("{id}", taskId);
@@ -134,14 +134,14 @@ public class EngineClient {
     engineInteraction.postRequest(resourceUrl, payload, Void.class);
   }
 
-  public void extendLock(String taskId, long newDuration) throws EngineClientException {
+  public void extendLock(String taskId, long newDuration)  {
     ExtendLockRequestDto payload = new ExtendLockRequestDto(workerId, newDuration);
     String resourcePath = EXTEND_LOCK_RESOURCE_PATH.replace("{id}", taskId);
     String resourceUrl = baseUrl + resourcePath;
     engineInteraction.postRequest(resourceUrl, payload, Void.class);
   }
 
-  public byte[] getLocalBinaryVariable(String variableName, String processInstanceId) throws EngineClientException {
+  public byte[] getLocalBinaryVariable(String variableName, String processInstanceId)  {
     String resourcePath = baseUrl + GET_LOCAL_BINARY_VARIABLE
             .replace(ID_PATH_PARAM, processInstanceId)
             .replace(NAME_PATH_PARAM, variableName);

@@ -51,7 +51,7 @@ public class DeleteHistoricDecisionInstanceByInstanceIdCmd implements Command<Ob
         .findHistoricDecisionInstance(historicDecisionInstanceId);
     ensureNotNull("No historic decision instance found with id: " + historicDecisionInstanceId,
         "historicDecisionInstance", historicDecisionInstance);
-    writeUserOperationLog(commandContext);
+    writeUserOperationLog(commandContext, historicDecisionInstance);
 
     for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkDeleteHistoricDecisionInstance(historicDecisionInstance);
@@ -64,11 +64,13 @@ public class DeleteHistoricDecisionInstanceByInstanceIdCmd implements Command<Ob
     return null;
   }
 
-  protected void writeUserOperationLog(CommandContext commandContext) {
+  protected void writeUserOperationLog(CommandContext commandContext, HistoricDecisionInstance historicDecisionInstance) {
     List<PropertyChange> propertyChanges = new ArrayList<PropertyChange>();
     propertyChanges.add(new PropertyChange("nrOfInstances", null, 1));
     propertyChanges.add(new PropertyChange("async", null, false));
 
-    commandContext.getOperationLogManager().logDecisionInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY, propertyChanges);
+    commandContext.getOperationLogManager().logDecisionInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY,
+        historicDecisionInstance.getTenantId(),
+        propertyChanges);
   }
 }

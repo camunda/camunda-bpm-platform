@@ -16,18 +16,18 @@
  */
 package org.camunda.bpm.engine.test.api.cfg;
 
-import java.util.List;
+import java.lang.reflect.Method;
+import java.util.Map;
 
-import org.camunda.bpm.engine.impl.el.ExpressionManager;
-import org.camunda.bpm.engine.impl.javax.el.FunctionMapper;
+import org.camunda.bpm.engine.impl.el.JuelExpressionManager;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class CustomExpressionManager extends ExpressionManager {
+public class CustomExpressionManager extends JuelExpressionManager {
 
-  public List<FunctionMapper> getFunctionMappers() {
-    return functionMappers;
+  public Map<String, Method> getFunctions() {
+    return functions;
   }
 }

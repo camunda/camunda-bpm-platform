@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.camunda.bpm.wildfly</groupId>
     <artifactId>camunda-wildfly</artifactId>
-    <version>7.17.0</version>
+    <version>7.20.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-wildfly-assembly</artifactId>
@@ -34,7 +34,7 @@
 
     <dependency>
       <groupId>org.camunda.bpm.javaee</groupId>
-      <artifactId>camunda-ejb-client</artifactId>
+      <artifactId>camunda-ejb-client-jakarta</artifactId>
     </dependency>
     
     <dependency>
@@ -49,7 +49,7 @@
 
     <dependency>
       <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine-cdi</artifactId>
+      <artifactId>camunda-engine-cdi-jakarta</artifactId>
     </dependency>
     
     <dependency>
@@ -59,7 +59,7 @@
     
     <dependency>
       <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine-rest</artifactId>
+      <artifactId>camunda-engine-rest-jakarta</artifactId>
       <classifier>classes</classifier>
       <version>${project.version}</version>
     </dependency>
@@ -78,9 +78,25 @@
 
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
-      <artifactId>groovy-all</artifactId>
+      <artifactId>groovy</artifactId>
     </dependency>
-    
+    <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-jsr223</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-json</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-xml</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-templates</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>org.graalvm.js</groupId>
       <artifactId>js</artifactId>

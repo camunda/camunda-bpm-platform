@@ -33,7 +33,8 @@
             "mediaType": "application/octet-stream",
             "examples": ['"example-1": {
                        "summary": "GET `/history/variable-instance/someId/data`",
-                       "description": "For binary variables or files without any MIME type information, a byte stream is returned."
+                       "description": "For binary variables or files without any MIME type information, a byte stream is returned.",
+                       "value": ""
                      }']
           },
           {
@@ -42,7 +43,8 @@
             "examples": ['"example-1": {
                        "summary": "GET `/history/variable-instance/someId/data`",
                        "description": "File variables with MIME type information are returned as the saved type. Additionally,
-                            for file variables the Content-Disposition header will be set."
+                            for file variables the Content-Disposition header will be set.",
+                       "value": ""
                      }']
           }
         ]

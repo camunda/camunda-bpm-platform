@@ -1,160 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <title>camunda invoice example</title>
+<head>
+  <meta charset=utf-8>
+  <meta http-equiv=X-UA-Compatible content="IE=edge">
+  <meta name=viewport content="width=device-width,initial-scale=1">
+  <meta name="author" content="camunda.org community"/>
 
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome to the Camunda Platform</title>
 
-    <meta name="description" content="camunda invoice example" />
-    <meta name="author" content="camunda services GmbH" />
+  <base app-base="."/>
 
-    <!-- styles -->
-    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="assets/css/common.css" rel="stylesheet" />
-    <link href="assets/css/app.css" rel="stylesheet" />
+  <link rel="stylesheet" href="./assets/css/styles.min.css">
+  <link rel="stylesheet" href="./assets/css/intro.css">
+  <link rel="shortcut icon" href="./assets/img/favicon.ico"/>
+</head>
 
-    <!-- For IE6-8 support of HTML5 elements -->
-    <!--[if lt IE 9]>
-      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-
-    <!-- favicon -->
-    <link href="/camunda/assets/img/favicon.ico" rel="shortcut icon" type="image/x-icon" />
-  </head>
-
-  <body>
-
-    <!-- navigation -->
-    <div class="navbar navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container">
-          <a class="brand" href="#/">
-            invoice example
-          </a>
-
-          <ul class="nav pull-right">
-
-            <li class="dropdown">
-              <a href class="dropdown-toggle" data-toggle="dropdown">
-                <i class="icon-home"></i>
-              </a>
-
-              <ul class="dropdown-menu">
-                <li>
-                  <a href="/camunda/app/tasklist/">Tasklist</a>
-                </li>
-                <li>
-                  <a href="/camunda/app/cockpit/">Cockpit</a>
-                </li>
-                <li>
-                  <a href="/camunda/app/admin/">Admin</a>
-                </li>
-              </ul>
-            </li>
-          </ul>
-        </div>
+<body>
+<header cam-widget-header>
+  <div class="container">
+    <div class="row">
+      <div class="col-xs-8">
+        <a class="navbar-brand" href="/camunda-welcome/index.html" title="Camunda Platform">
+          <svg width="26" height="26" viewBox="0 0 26 26" class="logo">
+            <path
+              d="M13,0 C20.1797017,0 26,5.82029825 26,13 C26,20.1797017 20.1797017,26 13,26 C5.82029825,26 0,20.1797017 0,13 C0,5.82029825 5.82029825,0 13,0 Z M15.9924973,18.7781515 L9.99320872,18.7781515 L9.99320872,22.1683591 L15.9924973,22.1683591 L15.9924973,18.7781515 Z M13,3.83248173 C11.0249014,3.83248173 10.0058211,4.99702477 9.99320872,7.04527521 L9.99320872,7.04527521 L9.99320872,13.69284 L9.99685,13.8998115 C10.0647928,15.8025897 11.0827733,16.8913395 12.985706,16.8913395 C14.9608046,16.8913395 15.9773624,15.7267965 15.9924973,13.678546 L15.9924973,13.678546 L15.9924973,11.9834422 L14.0913912,11.9834422 L14.0913912,13.8105556 L14.0867571,13.9750837 C14.0405969,14.7638347 13.6523228,15.0490913 13.0445637,15.0490913 C12.4105815,15.0490913 11.9977362,14.7245327 11.9977362,13.8105556 L11.9977362,13.8105556 L11.9977362,6.89476748 L12.0023704,6.72991255 C12.0485306,5.93798383 12.4368047,5.62774885 13.0445637,5.64193778 C13.678546,5.64193778 14.0913912,5.99592523 14.0913912,6.90990233 L14.0913912,6.90990233 L14.0913912,8.28044758 L15.9924973,8.28044758 L15.9924973,7.04527521 L15.9888705,6.83655109 C15.9211931,4.91809617 14.9069918,3.83248173 13,3.83248173 Z"></path>
+          </svg>
+          <span class="brand-name">Camunda Platform</span>
+        </a>
+      </div>
+      <div class="col-xs-4 text-right">
       </div>
     </div>
+  </div>
+</header>
 
-    <!-- content -->
-    <div class="ctn-main">
-      <div class="ctn-wrapper container">
+<div class="container page-content">
+  <div class="row">
+    <div class="col-xs-12">
+      <!-- content start -->
+      <section>
+        <header>
+          <h1>Overview</h1>
+        </header>
 
-        <div class="row">
+        <p>
+          This example allows you to walk through the features of Camunda Platform guided by a simple invoice process.
+        </p>
 
-          <div class="span12">
-            <div class="page-header">
-              <h1>Overview</h1>
-            </div>
+        <p>
+          Get started with the example by logging into the <a target="_blank" href="/camunda/app/tasklist/">camunda
+          Tasklist</a> using
+          the credentials <code>demo:demo</code>.
+        </p>
+      </section>
 
-            <p>
-              This example allows you to walk through the features of Camunda Platform guided by a simple invoice process.
-            </p>
-            <p>
-              Get started with the example by logging into the <a target="_blank" href="/camunda/app/tasklist/">camunda Tasklist</a> using
-              the credentials <code>demo:demo</code>.
-            </p>
 
-          </div>
-        </div>
-        <div class="row">
-          <div class="span12">
+      <section>
 
-            <div class="page-header">
-              <h1>Available Personas</h1>
-            </div>
+        <header>
+          <h1>Available Personas</h1>
+        </header>
 
-            <p>
-              The following logins are provided by the show case and can be used to play around with the invoice process:
-            </p>
+        <p>
+          The following logins are provided by the show case and can be used to play around with the invoice process:
+        </p>
 
-            <table class="table table-bordered table-striped" style="max-width: 400px">
-              <tr>
-                <th>Username</th>
-                <th>Password</th>
-                <th>Groups</th>
-              </tr>
+        <table class="table table-bordered table-striped">
+          <tr>
+            <th>Username</th>
+            <th>Password</th>
+            <th>Groups</th>
+          </tr>
 
-              <tr>
-                <td>demo</td>
-                <td>demo</td>
-                <td>Sales, Accounting, Management</td>
-              </tr>
+          <tr>
+            <td>demo</td>
+            <td>demo</td>
+            <td>Sales, Accounting, Management</td>
+          </tr>
 
-              <tr>
-                <td>john</td>
-                <td>john</td>
-                <td>Sales</td>
-              </tr>
+          <tr>
+            <td>john</td>
+            <td>john</td>
+            <td>Sales</td>
+          </tr>
 
-              <tr>
-                <td>mary</td>
-                <td>mary</td>
-                <td>Accounting</td>
-              </tr>
+          <tr>
+            <td>mary</td>
+            <td>mary</td>
+            <td>Accounting</td>
+          </tr>
 
-              <tr>
-                <td>peter</td>
-                <td>peter</td>
-                <td>Management</td>
-              </tr>
-            </table>
-          </div>
-        </div>
-        <div class="row">
-          <div class="span12">
+          <tr>
+            <td>peter</td>
+            <td>peter</td>
+            <td>Management</td>
+          </tr>
+        </table>
+      </section>
 
-            <div class="page-header">
-              <h1>Async Continuation Demo</h1>
-            </div>
+      <section>
 
-            <p>
-              This process allows you to experiment with <a href="http://docs.camunda.org/latest/guides/user-guide/#process-engine-transactions-in-processes-asynchronous-continuations">asychronous continuations</a>:
-            </p>
-            <ol>
-              <li>Start a new instance of the <em>Invoice Receipt</em> process.</li>
-              <li>Log into cockpit. Select an instance of the <em>Invoice Receipt</em> process.</li>
-              <li>Add a variable named <code>shouldFail</code> to the process and set it to <code>true</code></li>
-              <li>Using the tasklist, make the process advance to the <em>Archive Invoice</em> service task.</li>
-              <li>Back to cockpit, you see an Incident which has been created for the service task.</li>
-              <li>Set the value of the variable <code>shouldFail</code> to <code>false</code> and increment the retries of the failed job.
-              As a result, the process instance is completed.</li>
-          </div>
-        </div>
+        <header>
+          <h1>Async Continuation Demo</h1>
+        </header>
 
-        <div class="ctn-push-down"></div>
-      </div>
+        <p>
+          This process allows you to experiment with <a
+          href="https://docs.camunda.org/manual/latest/user-guide/process-engine/transactions-in-processes/#asynchronous-continuations">asychronous
+          continuations</a>:
+        </p>
+        <ol>
+          <li>Start a new instance of the <em>Invoice Receipt</em> process.</li>
+          <li>Log into cockpit. Select an instance of the <em>Invoice Receipt</em> process.</li>
+          <li>Add a variable named <code>shouldFail</code> to the process and set it to <code>true</code></li>
+          <li>Using the tasklist, make the process advance to the <em>Archive Invoice</em> service task.</li>
+          <li>Back to cockpit, you see an Incident which has been created for the service task.</li>
+          <li>Set the value of the variable <code>shouldFail</code> to <code>false</code> and increment the retries of
+            the failed job.
+            As a result, the process instance is completed.
+          </li>
+        </ol>
+      </section>
 
-      <!-- footer -->
-      <footer>
-        <div>
-          Powered by <a href="http://camunda.org">Camunda Platform</a>
-        </div>
-      </footer>
+
+      <!-- content end -->
     </div>
-  </body>
-
-  <script type="text/javascript" src="assets/vendor/jquery/jquery.min.js"></script>
-  <script type="text/javascript" src="assets/vendor/bootstrap/js/bootstrap.min.js"></script>
+  </div>
+</div>
+</body>
 </html>

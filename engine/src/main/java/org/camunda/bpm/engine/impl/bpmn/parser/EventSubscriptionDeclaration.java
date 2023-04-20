@@ -16,6 +16,11 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.parser;
 
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.Map;
+
+import org.camunda.bpm.engine.delegate.BaseDelegateExecution;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.impl.core.model.CallableElement;
@@ -29,10 +34,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
-
-import java.io.Serializable;
-import java.util.Collections;
-import java.util.Map;
 
 /**
  * @author Daniel Meyer
@@ -170,7 +171,13 @@ public class EventSubscriptionDeclaration implements Serializable {
    */
   public String resolveExpressionOfEventName(VariableScope scope) {
     if (isExpressionAvailable()) {
-      return (String) eventName.getValue(scope);
+      if(scope instanceof BaseDelegateExecution) {
+        // the variable scope execution is also the current context execution
+        // during expression evaluation the current context is updated with the scope execution
+        return (String) eventName.getValue(scope, (BaseDelegateExecution) scope);
+      } else {
+        return (String) eventName.getValue(scope);
+      }
     } else {
       return null;
     }

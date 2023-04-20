@@ -47,6 +47,7 @@ public class UserOperationLogContextEntry {
   protected String rootProcessInstanceId;
   protected String externalTaskId;
   protected String annotation;
+  protected String tenantId;
 
   public UserOperationLogContextEntry(String operationType, String entityType) {
     this.operationType = operationType;
@@ -188,11 +189,11 @@ public class UserOperationLogContextEntry {
   public void setRootProcessInstanceId(String rootProcessInstanceId) {
     this.rootProcessInstanceId = rootProcessInstanceId;
   }
-  
+
   public String getExternalTaskId() {
     return externalTaskId;
   }
-  
+
   public void setExternalTaskId(String externalTaskId) {
     this.externalTaskId = externalTaskId;
   }
@@ -205,4 +206,11 @@ public class UserOperationLogContextEntry {
     this.annotation = annotation;
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
+  }
 }

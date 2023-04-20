@@ -45,30 +45,30 @@ public class DeleteHistoricVariableInstancesByProcessInstanceIdCmd implements Co
   public DeleteHistoricVariableInstancesByProcessInstanceIdCmd(String processInstanceId) {
     this.processInstanceId = processInstanceId;
   }
-  
+
   @Override
   public Void execute(CommandContext commandContext) {
     ensureNotEmpty(BadUserRequestException.class,"processInstanceId", processInstanceId);
 
     HistoricProcessInstanceEntity instance = commandContext.getHistoricProcessInstanceManager().findHistoricProcessInstance(processInstanceId);
     ensureNotNull(NotFoundException.class, "No historic process instance found with id: " + processInstanceId, "instance", instance);
-    
+
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkDeleteHistoricVariableInstancesByProcessInstance(instance);
     }
 
     commandContext.getHistoricDetailManager().deleteHistoricDetailsByProcessInstanceIds(Arrays.asList(processInstanceId));
     commandContext.getHistoricVariableInstanceManager().deleteHistoricVariableInstanceByProcessInstanceIds(Arrays.asList(processInstanceId));
-    
+
     // create user operation log
     ResourceDefinitionEntity<?> definition = null;
     try {
       definition = commandContext.getProcessEngineConfiguration().getDeploymentCache().findDeployedProcessDefinitionById(instance.getProcessDefinitionId());
-    } catch (NullValueException nve) {
+    } catch (NotFoundException e) {
       // definition has been deleted already
     }
     commandContext.getOperationLogManager().logHistoricVariableOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY, instance, definition, PropertyChange.EMPTY_CHANGE);
-    
+
     return null;
   }
 }

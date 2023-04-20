@@ -23,12 +23,11 @@ import java.util.List;
 import org.camunda.bpm.dmn.engine.delegate.DmnDecisionEvaluationListener;
 import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.impl.spi.el.DmnScriptEngineResolver;
+import org.camunda.bpm.dmn.engine.impl.spi.el.ElProvider;
 import org.camunda.bpm.dmn.engine.impl.spi.transform.DmnTransformer;
 import org.camunda.bpm.dmn.feel.impl.scala.function.FeelCustomFunctionProvider;
-import org.camunda.bpm.engine.impl.dmn.el.ProcessEngineElProvider;
 import org.camunda.bpm.engine.impl.dmn.transformer.DecisionDefinitionHandler;
 import org.camunda.bpm.engine.impl.dmn.transformer.DecisionRequirementsDefinitionTransformHandler;
-import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.history.parser.HistoryDecisionEvaluationListener;
 import org.camunda.bpm.engine.impl.history.producer.DmnHistoryEventProducer;
 import org.camunda.bpm.engine.impl.metrics.dmn.MetricsDecisionEvaluationListener;
@@ -48,7 +47,7 @@ public class DmnEngineConfigurationBuilder {
 
   protected DmnHistoryEventProducer dmnHistoryEventProducer;
   protected DmnScriptEngineResolver scriptEngineResolver;
-  protected ExpressionManager expressionManager;
+  protected ElProvider elProvider;
   protected List<FeelCustomFunctionProvider> feelCustomFunctionProviders;
 
   /**
@@ -72,8 +71,8 @@ public class DmnEngineConfigurationBuilder {
     return this;
   }
 
-  public DmnEngineConfigurationBuilder expressionManager(ExpressionManager expressionManager) {
-    this.expressionManager = expressionManager;
+  public DmnEngineConfigurationBuilder elProvider(ElProvider elProvider) {
+    this.elProvider = elProvider;
 
     return this;
   }
@@ -106,9 +105,7 @@ public class DmnEngineConfigurationBuilder {
 
     // do not override the el provider if set
     if (dmnEngineConfiguration.getElProvider() == null) {
-      ensureNotNull("expressionManager", expressionManager);
-
-      ProcessEngineElProvider elProvider = new ProcessEngineElProvider(expressionManager);
+      ensureNotNull("elProvider", elProvider);
       dmnEngineConfiguration.setElProvider(elProvider);
     }
 

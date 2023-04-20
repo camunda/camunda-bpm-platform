@@ -1,0 +1,87 @@
+<!-- # CE - camunda-bpm-webapp/ui/cockpit/client/scripts/components/ttl/time-to-live-dialog.html -->
+<div class="modal-header">
+  <h3>
+    {{ 'TIME_TO_LIVE_POPUP_TITLE' | translate }}
+  </h3>
+</div>
+
+<div class="modal-body">
+  <div notifications-panel></div>
+
+  <div ng-show="!status" class="container-fluid">
+
+    <form class="form-inline">
+
+      <div class="row" style="margin-bottom: 20px;">
+        <div class="col-xs-12">
+          {{ 'TIME_TO_LIVE_POPUP_SUBTITLE' | translate }}
+        </div>
+      </div>
+
+      <div class="row" style="margin-bottom: 10px;">
+        <label class="col-xs-4 text-right" for="ttl_dialog_input_remove">
+          {{ 'TIME_TO_LIVE_POPUP_RADIO_CLEAR' | translate }}
+          <span class="glyphicon glyphicon-question-sign" tooltip-placement="right"
+                uib-tooltip="{{ 'TIME_TO_LIVE_POPUP_RADIO_CLEAR_TOOLTIP' | translate }}"></span>
+        </label>
+        <div class="col-xs-8">
+          <input id="ttl_dialog_input_remove" type="radio" ng-model="mode" ng-value="'REMOVE'"/>
+        </div>
+      </div>
+
+      <div class="row" style="margin-bottom: 10px;">
+        <label class="col-xs-4 text-right" for="ttl_dialog_input_value">
+          {{ 'TIME_TO_LIVE_POPUP_RADIO_UPDATE' | translate }}
+          <span class="glyphicon glyphicon-question-sign" tooltip-placement="right"
+                uib-tooltip="{{ 'TIME_TO_LIVE_POPUP_RADIO_UPDATE_TOOLTIP' | translate }}"></span>
+        </label>
+        <div class="col-xs-8">
+          <input id="ttl_dialog_input_value" type="radio" ng-model="mode" ng-value="'UPDATE'"/>
+        </div>
+      </div>
+      <div ng-show="mode === 'UPDATE'" class="row" style="margin-bottom: 10px;">
+        <label class="col-xs-4 text-right">
+          {{ 'DECISION_DEFINITION_HISTORY_TIME_TO_LIVE' | translate }}
+        </label>
+        <div class="col-xs-8">
+          <label>
+            <input type="number" min="0" step="1" ng-model="ttl" ng-change="validate()" />
+            {{ 'TIME_TO_LIVE_DAYS' | translate }}
+          </label>
+        </div>
+      </div>
+
+    </form>
+
+  </div>
+
+  <div ng-show="status === 'SUCCESS'" class="container-fluid">
+    <span ng-show="ttl !== null">
+      {{ 'TIME_TO_LIVE_POPUP_STATE_SUCCESS_MESSAGE_UPDATE' | translate:{ttl} }}
+    </span>
+    <span ng-show="ttl === null">
+      {{ 'TIME_TO_LIVE_POPUP_STATE_SUCCESS_MESSAGE_CLEAR' | translate }}
+    </span>
+  </div>
+  <div ng-show="status === 'FAIL'" class="container-fluid">
+    {{ 'TIME_TO_LIVE_MESSAGE_ERR' | translate }}
+  </div>
+</div>
+
+<div class="modal-footer">
+
+  <div ng-show="!status" class="container-fluid">
+    <button class="btn btn-link" ng-click="close(null)">{{ 'CLOSE' | translate }}</button>
+    <button type="submit"
+            class="btn btn-primary"
+            ng-click="save()"
+            ng-disabled="!isValid()">{{ 'SAVE' | translate }}
+    </button>
+  </div>
+
+  <div ng-show="!!status" class="container-fluid">
+    <button class="btn btn-primary" ng-click="close(null)">{{ 'OK' | translate }}</button>
+  </div>
+
+</div>
+<!-- / CE - camunda-bpm-webapp/ui/cockpit/client/scripts/components/ttl/time-to-live-dialog.html -->

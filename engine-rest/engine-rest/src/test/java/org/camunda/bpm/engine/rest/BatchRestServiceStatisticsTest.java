@@ -38,6 +38,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.batch.BatchStatistics;
 import org.camunda.bpm.engine.batch.BatchStatisticsQuery;
+import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.rest.dto.batch.BatchStatisticsDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
@@ -225,6 +226,16 @@ public class BatchRestServiceStatisticsTest extends AbstractRestServiceTest {
     executeAndVerifySorting("tenantId", "desc", Status.OK);
     inOrder.verify(queryMock).orderByTenantId();
     inOrder.verify(queryMock).desc();
+
+    inOrder = Mockito.inOrder(queryMock);
+    executeAndVerifySorting("startTime", "asc", Status.OK);
+    inOrder.verify(queryMock).orderByStartTime();
+    inOrder.verify(queryMock).asc();
+
+    inOrder = Mockito.inOrder(queryMock);
+    executeAndVerifySorting("startTime", "desc", Status.OK);
+    inOrder.verify(queryMock).orderByStartTime();
+    inOrder.verify(queryMock).desc();
   }
 
   @Test
@@ -265,6 +276,11 @@ public class BatchRestServiceStatisticsTest extends AbstractRestServiceTest {
     parameters.put("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID + "," + MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
     parameters.put("withoutTenantId", true);
     parameters.put("suspended", true);
+    parameters.put("createdBy", MockProvider.EXAMPLE_USER_ID);
+    parameters.put("startedBefore", MockProvider.EXAMPLE_HISTORIC_BATCH_START_TIME);
+    parameters.put("startedAfter", MockProvider.EXAMPLE_HISTORIC_BATCH_END_TIME);
+    parameters.put("withFailures", true);
+    parameters.put("withoutFailures", true);
 
     return parameters;
   }
@@ -275,6 +291,11 @@ public class BatchRestServiceStatisticsTest extends AbstractRestServiceTest {
     verify(queryMock).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID, MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
     verify(queryMock).withoutTenantId();
     verify(queryMock).suspended();
+    verify(queryMock).createdBy(MockProvider.EXAMPLE_USER_ID);
+    verify(queryMock).startedBefore(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_BATCH_START_TIME));
+    verify(queryMock).startedAfter(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_BATCH_END_TIME));
+    verify(queryMock).withFailures();
+    verify(queryMock).withoutFailures();
   }
 
   protected void executeAndVerifySorting(String sortBy, String sortOrder, Status expectedStatus) {
@@ -292,6 +313,8 @@ public class BatchRestServiceStatisticsTest extends AbstractRestServiceTest {
     assertEquals("There should be one batch statistics returned.", 1, batches.size());
 
     BatchStatisticsDto batchStatistics = from(batchStatisticsListJson).getObject("[0]", BatchStatisticsDto.class);
+    String returnedStartTime = from(batchStatisticsListJson).getString("[0].startTime");
+
     assertNotNull("The returned batch statistics should not be null.", batchStatistics);
     assertEquals(MockProvider.EXAMPLE_BATCH_ID, batchStatistics.getId());
     assertEquals(MockProvider.EXAMPLE_BATCH_TYPE, batchStatistics.getType());
@@ -304,6 +327,7 @@ public class BatchRestServiceStatisticsTest extends AbstractRestServiceTest {
     assertEquals(MockProvider.EXAMPLE_BATCH_JOB_DEFINITION_ID, batchStatistics.getBatchJobDefinitionId());
     assertEquals(MockProvider.EXAMPLE_TENANT_ID, batchStatistics.getTenantId());
     assertEquals(MockProvider.EXAMPLE_USER_ID, batchStatistics.getCreateUserId());
+    assertEquals(MockProvider.EXAMPLE_HISTORIC_BATCH_START_TIME, returnedStartTime);
     assertEquals(MockProvider.EXAMPLE_BATCH_REMAINING_JOBS, batchStatistics.getRemainingJobs());
     assertEquals(MockProvider.EXAMPLE_BATCH_COMPLETED_JOBS, batchStatistics.getCompletedJobs());
     assertEquals(MockProvider.EXAMPLE_BATCH_FAILED_JOBS, batchStatistics.getFailedJobs());

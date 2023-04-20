@@ -1,0 +1,86 @@
+<div ng-show="!taskState.$loaded"
+     class="loader">
+  <span class="animate-spin glyphicon glyphicon-refresh"></span>
+  {{ 'LOADING' | translate }}
+</div>
+
+<div ng-show="taskState.$loaded">
+  <div ng-hide="task">
+    <div class="no-task well">
+      <span class="glyphicon glyphicon-info-sign"></span>
+      {{ 'SELECT_TASK_IN_LIST' | translate }}
+    </div>
+  </div>
+
+  <section ng-if="task"
+           class="task-card"
+           ng-class="{'task-removed': !taskExists}">
+    <header class="row">
+      <div class="col-xs-12">
+        <div class="tenant-id"
+             ng-if="task.tenantId"
+             uib-tooltip="{{ task.tenantId }}">
+          {{ task.tenantId }}
+        </div>
+
+        <div class="names">
+          <h2 class="task">{{ task.name || task.taskDefinitionKey || task.id }} </h2>
+          <div class="definition-name">
+          <h4 class="process-definition"
+              ng-if="task.processDefinitionId">
+            {{ task._embedded.processDefinition[0].name || task._embedded.processDefinition[0].key }}
+              <span ng-if="task._embedded.processDefinition[0].versionTag">(v. {{ task._embedded.processDefinition[0].versionTag }})</span>
+            </h4>
+          <h4 class="case-definition"
+              ng-if="task.caseDefinitionId">
+            {{ task._embedded.caseDefinition[0].name || task._embedded.caseDefinition[0].key }}
+          </h4>
+          <a class="instance-link"  ng-if="instanceLink"
+            ng-href="{{instanceLink}}" class="ng-binding" href="{{instanceLink}}">
+            <span tooltip-placement="top"
+                  uib-tooltip="{{ 'INSTANCE_LINK' | translate }}"
+                  class="glyphicon glyphicon-new-window">
+              </span>
+          </a>
+          </div>
+        </div>
+
+        <div cam-tasklist-task-meta
+             task-data="taskData"
+             error-handler="errorHandler"></div>
+      </div>
+    </header>
+
+    <div class="task-removed-alert">
+      <div uib-alert class="alert alert-info row">
+        <div class="col-xs-8 text-padded">
+          {{ 'TASK_HAS_BEEN_REMOVED' | translate }}
+        </div>
+        <div class="col-xs-4 text-right">
+          <button class="btn btn-default"
+                  ng-click="dismissTask()">{{ 'CLOSE_TASK' | translate }}</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="row tabbed-content">
+
+      <div ng-show="taskDetailTabs.length" class="col-xs-12">
+        <ul class="nav nav-tabs">
+          <li ng-class="{ active: selectedTaskDetailTab.id === taskDetailTab.id }" ng-repeat="taskDetailTab in taskDetailTabs">
+            <a href ng-click="selectTaskDetailTab(taskDetailTab)">{{ taskDetailTab.label | translate }}</a>
+          </li>
+        </ul>
+
+        <div class="tab-content">
+          <view provider="selectedTaskDetailTab" vars="taskVars"></view>
+        </div>
+
+      </div>
+    </div>
+
+  </section>
+
+</div>
+
+

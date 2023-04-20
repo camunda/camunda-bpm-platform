@@ -1,0 +1,134 @@
+<div ng-show="!state.$loaded && !state.$error"
+     class="loader">
+  <span class="animate-spin glyphicon glyphicon-refresh"></span>
+  {{ 'LOADING' | translate }}
+</div>
+
+<div ng-show="state.$error"
+     uib-alert class="alert alert-danger"
+     role="alert">
+  <span class="glyphicon glyphicon-exclamation-sign"></span>
+  <strong class="status">{{ 'FAILURE' | translate }}:</strong>
+  <span class="message">{{ error.message }}</span>
+</div>
+
+<div ng-if="state.$loaded && !state.$error">
+  <div ng-if="!totalItems"
+       class="well">
+    <span class="glyphicon glyphicon-info-sign"></span>
+    {{ 'NO_MATCHING_TASK' | translate }}
+  </div>
+
+  <div ng-if="totalItems && !tasks"
+       class="well">
+    <span class="glyphicon glyphicon-info-sign"></span>
+    {{ 'RESTRICTION_NOTICE' | translate }}
+    <a ng-click="resetPage()">{{ 'RESET_PAGE' | translate }}</a>
+  </div>
+
+  <div ng-if="totalItems"
+       ng-keydown="handleKeydown($event)">
+    <ol class="tasks-list list-unstyled">
+      <li class="task"
+          ng-repeat="(delta, task) in tasks"
+          ng-class="{active: currentTaskId === task.id}">
+
+        <div class="clickable"
+             ng-click="focus($event, task)">
+          <div class="names">
+            <h4 class="task">
+              <a ng-href="{{ getHrefUrl(task) }}"
+                 ng-click="focus($event, task)">
+                {{ task.name || task.taskDefinitionKey || task.id }}
+              </a>
+            </h4>
+
+            <h6 class="process-definition"
+                ng-if="task.processDefinitionId">
+              {{ task._embedded.processDefinition[0].name || task._embedded.processDefinition[0].key }}
+            </h6>
+
+            <h6 class="case-definition"
+                ng-if="task.caseDefinitionId">
+              {{ task._embedded.caseDefinition[0].name || task._embedded.caseDefinition[0].key }}
+            </h6>
+
+            <h5 class="assignee"
+                ng-if="hasAssignee(task)"
+                uib-tooltip="task.assignee">
+              {{ assigneeDisplayedName(task); }}
+            </h5>
+          </div>
+
+          <div class="cells-wrapper">
+            <div class="dates"
+                 ng-click="focus($event, task)">
+              <span class="due-date"
+                    ng-if="!!task.due"
+                    ng-class="{overdue: task.due && (task.due < now) }">
+                {{ 'DUE' | translate }}
+                <span tooltip-placement="top"
+                      uib-tooltip="{{ task.due | camDate:'long' }}"
+                      am-time-ago="task.due">{{ task.due }}</span>
+              </span>
+
+              <span class="followup-date"
+                    ng-if="!!task.followUp"
+                    ng-class="{overdue: task.followUp && (task.followUp < now) }">
+                {{ 'FOLLOW_UP' | translate }}
+                <span tooltip-placement="top"
+                      uib-tooltip="{{ task.followUp | camDate:'long' }}"
+                      am-time-ago="task.followUp">{{ task.followUp }}</span>
+              </span>
+
+              <span class="creation-date">
+                {{ 'CREATION' | translate }}
+                <span tooltip-placement="top"
+                      uib-tooltip="{{ task.created | camDate:'long' }}"
+                      am-time-ago="task.created">{{ task.created }}</span>
+              </span>
+            </div>
+
+            <div class="priority"
+                 tooltip-placement="right"
+                 uib-tooltip="{{ 'PRIORITY' | translate }}">
+              {{ task.priority }}
+            </div>
+          </div>
+
+          <div class="task-card-details"
+               ng-class="{expanded: !!expanded[delta]}">
+            <view ng-repeat="plugin in cardPlugins"
+                  data-plugin-id="{{ plugin.id }}"
+                  class="tasklist-card-plugin"
+                  vars="cardPluginVars"
+                  provider="plugin"></view>
+
+            <div class="shutter actions"
+                 ng-click="toggle(delta, $event)"
+                 tooltip-placement="bottom"
+                 uib-tooltip="{{ (!!expanded[delta] ? 'SHOW_LESS' : 'SHOW_MORE') | translate }}">
+              <a class="glyphicon"
+                 ng-class="{'glyphicon-menu-up': expanded[delta], 'glyphicon-menu-down': !expanded[delta]}"
+                 href>
+              </a>
+            </div>
+          </div><!-- / details -->
+        </div>
+      </li>
+    </ol>
+  </div>
+</div>
+
+<ul uib-pagination ng-show="state.$loaded && totalItems > pageSize"
+            total-items="totalItems"
+            items-per-page="pageSize"
+            max-size="5"
+            class="pagination-sm"
+            boundary-links="true"
+            ng-model="pageNum"
+            ng-change="pageChange()"
+            next-text="&rsaquo;"
+            last-text="&raquo;"
+            previous-text="&lsaquo;"
+            first-text="&laquo;"></ul>

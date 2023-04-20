@@ -278,6 +278,13 @@ public interface HistoryEventProducer {
   HistoryEvent createBatchEndEvent(Batch batch);
 
   /**
+   * Creates the history event fired when a batch has been <strong>updated</strong>.
+   *
+   * @since 7.18
+   */
+  HistoryEvent createBatchUpdateEvent(Batch batch);
+
+  /**
    * Fired when an identity link is added
    * @param identitylink
    * @return

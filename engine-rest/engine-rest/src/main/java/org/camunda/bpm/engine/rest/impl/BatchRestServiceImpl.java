@@ -16,11 +16,10 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.ws.rs.core.UriInfo;
-
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.BatchQuery;
@@ -34,8 +33,7 @@ import org.camunda.bpm.engine.rest.dto.batch.BatchStatisticsDto;
 import org.camunda.bpm.engine.rest.dto.batch.BatchStatisticsQueryDto;
 import org.camunda.bpm.engine.rest.sub.batch.BatchResource;
 import org.camunda.bpm.engine.rest.sub.batch.impl.BatchResourceImpl;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.camunda.bpm.engine.rest.util.QueryUtil;
 
 public class BatchRestServiceImpl extends AbstractRestProcessEngineAware implements BatchRestService {
 
@@ -43,21 +41,17 @@ public class BatchRestServiceImpl extends AbstractRestProcessEngineAware impleme
     super(engineName, objectMapper);
   }
 
+  @Override
   public BatchResource getBatch(String batchId) {
     return new BatchResourceImpl(getProcessEngine(), batchId);
   }
 
+  @Override
   public List<BatchDto> getBatches(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
     BatchQueryDto queryDto = new BatchQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
     BatchQuery query = queryDto.toQuery(getProcessEngine());
 
-    List<Batch> matchingBatches;
-    if (firstResult != null || maxResults != null) {
-      matchingBatches = executePaginatedQuery(query, firstResult, maxResults);
-    }
-    else {
-      matchingBatches = query.list();
-    }
+    List<Batch> matchingBatches = QueryUtil.list(query, firstResult, maxResults);
 
     List<BatchDto> batchResults = new ArrayList<BatchDto>();
     for (Batch matchingBatch : matchingBatches) {
@@ -66,6 +60,7 @@ public class BatchRestServiceImpl extends AbstractRestProcessEngineAware impleme
     return batchResults;
   }
 
+  @Override
   public CountResultDto getBatchesCount(UriInfo uriInfo) {
     ProcessEngine processEngine = getProcessEngine();
     BatchQueryDto queryDto = new BatchQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
@@ -75,17 +70,12 @@ public class BatchRestServiceImpl extends AbstractRestProcessEngineAware impleme
     return new CountResultDto(count);
   }
 
+  @Override
   public List<BatchStatisticsDto> getStatistics(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
     BatchStatisticsQueryDto queryDto = new BatchStatisticsQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
     BatchStatisticsQuery query = queryDto.toQuery(getProcessEngine());
 
-    List<BatchStatistics> batchStatisticsList;
-    if (firstResult != null || maxResults != null) {
-      batchStatisticsList = executePaginatedStatisticsQuery(query, firstResult, maxResults);
-    }
-    else {
-      batchStatisticsList = query.list();
-    }
+    List<BatchStatistics> batchStatisticsList = QueryUtil.list(query, firstResult, maxResults);
 
     List<BatchStatisticsDto> statisticsResults = new ArrayList<BatchStatisticsDto>();
     for (BatchStatistics batchStatistics : batchStatisticsList) {
@@ -95,6 +85,7 @@ public class BatchRestServiceImpl extends AbstractRestProcessEngineAware impleme
     return statisticsResults;
   }
 
+  @Override
   public CountResultDto getStatisticsCount(UriInfo uriInfo) {
     BatchStatisticsQueryDto queryDto = new BatchStatisticsQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
     BatchStatisticsQuery query = queryDto.toQuery(getProcessEngine());
@@ -103,25 +94,4 @@ public class BatchRestServiceImpl extends AbstractRestProcessEngineAware impleme
     return new CountResultDto(count);
   }
 
-  protected List<Batch> executePaginatedQuery(BatchQuery query, Integer firstResult, Integer maxResults) {
-    if (firstResult == null) {
-      firstResult = 0;
-    }
-    if (maxResults == null) {
-      maxResults = Integer.MAX_VALUE;
-    }
-
-    return query.listPage(firstResult, maxResults);
-  }
-
-  protected List<BatchStatistics> executePaginatedStatisticsQuery(BatchStatisticsQuery query, Integer firstResult, Integer maxResults) {
-    if (firstResult == null) {
-      firstResult = 0;
-    }
-    if (maxResults == null) {
-      maxResults = Integer.MAX_VALUE;
-    }
-
-    return query.listPage(firstResult, maxResults);
-  }
 }

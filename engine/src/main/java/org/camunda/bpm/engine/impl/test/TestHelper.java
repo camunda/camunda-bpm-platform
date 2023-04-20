@@ -59,7 +59,6 @@ import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
-import org.junit.Assert;
 import org.slf4j.Logger;
 
 
@@ -322,7 +321,18 @@ public abstract class TestHelper {
   }
 
   protected static Method getMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) throws SecurityException, NoSuchMethodException {
-    return clazz.getMethod(methodName, parameterTypes);
+    try {
+      return clazz.getDeclaredMethod(methodName, parameterTypes);
+
+    } catch (NoSuchMethodException e) {
+      if (!clazz.equals(Object.class)) {
+        return getMethod(clazz.getSuperclass(), methodName, parameterTypes);
+
+      } else {
+        throw e;
+
+      }
+    }
   }
 
   /**
@@ -377,10 +387,17 @@ public abstract class TestHelper {
     }
 
     if (fail && message.length() > 0) {
-      Assert.fail(message.toString());
+      fail(message.toString());
     }
 
     return message.toString();
+  }
+
+  protected static void fail(String message) {
+    if (message == null) {
+        throw new AssertionError();
+    }
+    throw new AssertionError(message);
   }
 
   /**
@@ -414,7 +431,7 @@ public abstract class TestHelper {
       LOG.error(outputMessage.toString());
 
       if (fail) {
-        Assert.fail(outputMessage.toString());
+        fail(outputMessage.toString());
       }
 
       return outputMessage.toString();

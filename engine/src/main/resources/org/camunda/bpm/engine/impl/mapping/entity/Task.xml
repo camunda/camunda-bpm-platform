@@ -31,6 +31,7 @@
       DESCRIPTION_,
       PRIORITY_,
       CREATE_TIME_,
+      LAST_UPDATED_,
       OWNER_,
       ASSIGNEE_,
       DELEGATION_,
@@ -53,6 +54,7 @@
       #{description, jdbcType=VARCHAR},
       #{priority, jdbcType=INTEGER},
       #{createTime, jdbcType=TIMESTAMP},
+      #{lastUpdated, jdbcType=TIMESTAMP},
       #{owner, jdbcType=VARCHAR},
       #{assignee, jdbcType=VARCHAR},
       #{delegationStateString, jdbcType=VARCHAR},
@@ -81,6 +83,7 @@
       PARENT_TASK_ID_ = #{parentTaskId, jdbcType=VARCHAR},
       PRIORITY_ = #{priority, jdbcType=INTEGER},
       CREATE_TIME_ = #{createTime, jdbcType=TIMESTAMP},
+      LAST_UPDATED_ = #{lastUpdated, jdbcType=TIMESTAMP},
       OWNER_ = #{owner, jdbcType=VARCHAR},
       ASSIGNEE_ = #{assignee, jdbcType=VARCHAR},
       DELEGATION_ = #{delegationStateString, jdbcType=VARCHAR},
@@ -153,6 +156,7 @@
     <result property="descriptionWithoutCascade" column="DESCRIPTION_" jdbcType="VARCHAR"/>
     <result property="priorityWithoutCascade" column="PRIORITY_" jdbcType="INTEGER"/>
     <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP" />
+    <result property="lastUpdated" column="LAST_UPDATED_" jdbcType="TIMESTAMP" />
     <result property="ownerWithoutCascade" column="OWNER_" jdbcType="VARCHAR"/>
     <result property="assigneeWithoutCascade" column="ASSIGNEE_" jdbcType="VARCHAR"/>
     <result property="delegationStateString" column="DELEGATION_" jdbcType="VARCHAR"/>
@@ -224,7 +228,7 @@
     RES.CREATE_TIME_, RES.OWNER_, RES.ASSIGNEE_, RES.DELEGATION_, RES.EXECUTION_ID_,
     RES.PROC_INST_ID_, RES.PROC_DEF_ID_, RES.CASE_EXECUTION_ID_, RES.CASE_INST_ID_,
     RES.CASE_DEF_ID_, RES.TASK_DEF_KEY_, RES.DUE_DATE_, RES.FOLLOW_UP_DATE_,
-    RES.SUSPENSION_STATE_, RES.TENANT_ID_
+    RES.SUSPENSION_STATE_, RES.TENANT_ID_, RES.LAST_UPDATED_
   </sql>
 
   <sql id="selectTaskByQueryCriteriaSql">
@@ -457,6 +461,10 @@
             </if>
             <if test="query.createTimeAfter != null">
               ${queryType} RES.CREATE_TIME_ &gt; #{query.createTimeAfter}
+            </if>
+            <if test="query.updatedAfter != null">
+              ${queryType} (RES.LAST_UPDATED_ &gt; #{query.updatedAfter}
+              OR RES.LAST_UPDATED_ IS NULL AND RES.CREATE_TIME_ &gt; #{query.updatedAfter})
             </if>
             <if test="query.key != null">
               ${queryType} RES.TASK_DEF_KEY_ = #{query.key}

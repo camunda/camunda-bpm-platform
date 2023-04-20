@@ -16,17 +16,13 @@
  */
 package org.camunda.bpm.application.impl;
 
-import java.util.HashSet;
 import java.util.Set;
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.HandlesTypes;
-
-import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplication;
-import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
 /**
  * <p>This class is an implementation of {@link ServletContainerInitializer} and
@@ -41,52 +37,22 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
  *
  */
 @HandlesTypes(ProcessApplication.class)
-public class ServletProcessApplicationDeployer implements ServletContainerInitializer {
+public class ServletProcessApplicationDeployer extends AbstractServletProcessApplicationDeployer implements ServletContainerInitializer {
 
-  private static ProcessApplicationLogger LOG = ProcessEngineLogger.PROCESS_APPLICATION_LOGGER;
-
+  @Override
   public void onStartup(Set<Class<?>> c, ServletContext ctx) throws ServletException {
-    if(c == null || c.isEmpty()) {
-      // skip deployments that do not carry a PA
-      return;
-
-    }
-
-    if (c.contains(ProcessApplication.class)) {
-      // this is a workaround for a bug in WebSphere-8.5 who
-      // ships the annotation itself as part of the discovered classes.
-
-      // copy into a fresh Set as we don't know if the original Set is mutable or immutable.
-      c = new HashSet<Class<?>>(c);
-
-      // and now remove the annotation itself.
-      c.remove(ProcessApplication.class);
-    }
-
-
-    String contextPath = ctx.getContextPath();
-    if(c.size() > 1) {
-      // a deployment must only contain a single PA
-      throw LOG.multiplePasException(c, contextPath);
-
-    } else if(c.size() == 1) {
-      Class<?> paClass = c.iterator().next();
-
-      // validate whether it is a legal Process Application
-      if(!AbstractProcessApplication.class.isAssignableFrom(paClass)) {
-        throw LOG.paWrongTypeException(paClass);
-      }
-
-      // add it as listener if it's a ServletProcessApplication
-      if(ServletProcessApplication.class.isAssignableFrom(paClass)) {
-        LOG.detectedPa(paClass);
-        ctx.addListener(paClass.getName());
+    try {
+      onStartUp(c, ctx.getContextPath(), ServletProcessApplication.class, ctx::addListener);
+    } catch (Exception e) {
+      if (e instanceof ServletException) {
+        throw (ServletException) e;
       }
     }
-    else {
-      LOG.servletDeployerNoPaFound(contextPath);
-    }
+  }
 
+  @Override
+  protected Exception getServletException(String message) {
+    return new ServletException(message);
   }
 
 }

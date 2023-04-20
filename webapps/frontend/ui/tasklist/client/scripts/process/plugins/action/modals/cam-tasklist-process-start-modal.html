@@ -1,0 +1,146 @@
+<div class="modal-header">
+  <div class="row">
+    <div class="col-xs-6"
+         ng-if="!PROCESS_TO_START_SELECTED">
+      <h3 class="modal-title">{{ 'START_PROCESS' | translate }}</h3>
+    </div>
+
+    <div class="col-xs-6">
+      <form>
+        <div class="form-group has-feedback"
+             ng-if="!PROCESS_TO_START_SELECTED">
+          <input type="text"
+                 ng-model="page.searchValue"
+                 placeholder="{{ 'SEARCH_PROCESS_BY_NAME' | translate }}"
+                 ng-change="lookupProcessDefinitionByName()"
+                 class="form-control">
+        </div>
+      </form>
+    </div>
+  </div>
+  <div ng-if="PROCESS_TO_START_SELECTED">
+    <h3 class="modal-title">{{ 'START_PROCESS' | translate }}: {{ params.processDefinitionName }}</h3>
+  </div>
+</div>
+
+<div class="modal-body">
+
+  <div notifications-panel></div>
+
+  <div ng-if="!PROCESS_TO_START_SELECTED">
+
+    <div ng-if="!processDefinitionState.$loaded || lookupProcessDefinitionByName.$loading"
+       class="loader">
+      <span class="animate-spin glyphicon glyphicon-refresh"></span>
+      {{ 'LOADING' | translate }}
+    </div>
+
+    <div ng-hide="!processDefinitionState.$loaded || lookupProcessDefinitionByName.$loading">
+
+      <div ng-hide="page.total"
+           class="well">
+        <span class="glyphicon glyphicon-info-sign"></span>
+        {{ 'NO_PROCESS_DEFINITION_AVAILABLE' | translate }}
+      </div>
+
+      <div ng-if="page.total" class="available-processes">
+
+        <div class="text-help">
+          <span class="glyphicon glyphicon-info-sign"></span>
+          {{ 'CLICK_PROCESS_TO_START' | translate }}
+        </div>
+
+        <ul class="processes">
+          <li ng-repeat="processDefinition in processDefinitions">
+            <a href
+               ng-click="selectProcessDefinition(processDefinition)">
+              {{ processDefinition.name || processDefinition.key }}
+            </a>
+            <span ng-if="processDefinition.tenantId"
+                  class="tenant-id">
+              {{ processDefinition.tenantId }}
+            </span>
+          </li>
+        </ul>
+
+      </div>
+
+      <ul uib-pagination ng-if="page.total > page.size"
+                  total-items="page.total"
+                  items-per-page="page.size"
+                  max-size="5"
+                  class="pagination-sm"
+                  boundary-links="true"
+                  ng-model="page.current"
+                  ng-change="pageChange()"
+                  next-text="&rsaquo;"
+                  last-text="&raquo;"
+                  previous-text="&lsaquo;"
+                  first-text="&laquo;"></ul>
+    </div>
+  </div>
+
+  <div ng-if="PROCESS_TO_START_SELECTED">
+
+    <div ng-if="startFormState.$error" uib-alert class="alert alert-danger" role="alert">
+      <span class="glyphicon glyphicon-exclamation-sign"></span>
+      <strong class="status">{{ 'FORM_FAILURE' | translate }}</strong>
+      <span class="message">{{ startFormState.$error.message }}</span>
+    </div>
+
+    <div ng-if="startFormState.$loaded && !startFormState.$error"
+         cam-tasklist-form
+         tasklist-form="startForm"
+         on-form-completion-callback="completionCallback"
+         on-form-completion="registerCompletionHandler"
+         on-form-validation="notifyFormValidation"
+         options="options"
+         params="params" >
+    </div>
+  </div>
+
+</div>
+
+<div class="modal-footer">
+  <div ng-if="!PROCESS_TO_START_SELECTED"
+       class="row row-action">
+
+    <div class="col-xs-12">
+      <button class="btn btn-link"
+              type="button"
+              ng-click="$dismiss()">
+        {{ 'CLOSE' | translate }}
+      </button>
+    </div>
+  </div>
+
+  <div ng-if="PROCESS_TO_START_SELECTED"
+       class="row">
+
+    <div class="col-xs-4 align-left">
+      <button class="btn btn-link"
+              type="button"
+              ng-click="back()">
+        {{ 'BACK' | translate }}
+      </button>
+    </div>
+
+    <div class="col-xs-8">
+      <button class="btn btn-link"
+              type="button"
+              ng-click="$dismiss()">
+        {{ 'CLOSE' | translate }}
+      </button>
+
+      <button class="btn btn-primary"
+              type="submit"
+              ng-disabled="$invalid || requestInProgress"
+              ng-click="startProcessInstance()"
+              ng-hide="options.hideStartButton">
+        {{ 'START' | translate }}
+      </button>
+    </div>
+
+  </div>
+
+</div>

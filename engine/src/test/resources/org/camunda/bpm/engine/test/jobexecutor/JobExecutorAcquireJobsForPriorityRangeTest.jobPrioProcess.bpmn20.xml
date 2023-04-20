@@ -13,6 +13,9 @@
     <sequenceFlow id="flow3" sourceRef="start" targetRef="task2" />
     <manualTask id="task2" camunda:asyncBefore="true" camunda:asyncAfter="true" camunda:jobPriority="5" />
     <sequenceFlow id="flow4" sourceRef="task2" targetRef="end" />
+    <sequenceFlow id="flow5" sourceRef="start" targetRef="task3" />
+    <manualTask id="task3" camunda:asyncBefore="true" camunda:asyncAfter="true" camunda:jobPriority="-5" />
+    <sequenceFlow id="flow6" sourceRef="task3" targetRef="end" />
     <endEvent id="end" />
 
   </process>

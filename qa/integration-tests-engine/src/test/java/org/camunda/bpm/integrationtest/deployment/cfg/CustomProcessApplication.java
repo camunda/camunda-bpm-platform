@@ -17,7 +17,6 @@
 package org.camunda.bpm.integrationtest.deployment.cfg;
 
 import org.camunda.bpm.application.ProcessApplication;
-import org.camunda.bpm.application.impl.ServletProcessApplication;
 
 /**
  * @author Daniel Meyer
@@ -26,7 +25,8 @@ import org.camunda.bpm.application.impl.ServletProcessApplication;
 @ProcessApplication(
     deploymentDescriptors = {"my/alternate/location/processes.xml"}
 )
-public class CustomProcessApplication extends ServletProcessApplication {
+// Using fully-qualified class name instead of import statement to allow for automatic Jakarta transformation
+public class CustomProcessApplication extends org.camunda.bpm.application.impl.ServletProcessApplication {
   
 
 }

@@ -27,6 +27,8 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,11 +38,20 @@ public class CamundaEngineDefaultConfigTest {
 
   @RegisterExtension
   static final QuarkusUnitTest unitTest = new ProcessEngineAwareExtension()
-      .engineConfig(QuarkusProcessEngineConfiguration::new)
       .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class));
 
   @Inject
   public ProcessEngine processEngine;
+
+  @ApplicationScoped
+  static class EngineConfigurer {
+
+    @Produces
+    public QuarkusProcessEngineConfiguration engineConfiguration() {
+      return new QuarkusProcessEngineConfiguration();
+    }
+
+  }
 
   @Test
   public void shouldApplyDefaults() {

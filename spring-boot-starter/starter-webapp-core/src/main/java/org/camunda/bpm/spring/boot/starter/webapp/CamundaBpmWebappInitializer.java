@@ -16,6 +16,20 @@
  */
 package org.camunda.bpm.spring.boot.starter.webapp;
 
+import static java.util.Collections.singletonMap;
+import static org.glassfish.jersey.servlet.ServletProperties.JAXRS_APPLICATION_CLASS;
+
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.Map;
+
+import javax.servlet.DispatcherType;
+import javax.servlet.Filter;
+import javax.servlet.FilterRegistration;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletRegistration;
+import javax.servlet.SessionTrackingMode;
+
 import org.camunda.bpm.admin.impl.web.AdminApplication;
 import org.camunda.bpm.admin.impl.web.bootstrap.AdminContainerBootstrap;
 import org.camunda.bpm.cockpit.impl.web.CockpitApplication;
@@ -41,19 +55,6 @@ import org.glassfish.jersey.servlet.ServletContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
-
-import javax.servlet.DispatcherType;
-import javax.servlet.Filter;
-import javax.servlet.FilterRegistration;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletRegistration;
-import javax.servlet.SessionTrackingMode;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.Map;
-
-import static java.util.Collections.singletonMap;
-import static org.glassfish.jersey.servlet.ServletProperties.JAXRS_APPLICATION_CLASS;
 
 /**
  * Inspired by:
@@ -92,6 +93,7 @@ public class CamundaBpmWebappInitializer implements ServletContextInitializer {
     ServletContextUtil.setAppPath(applicationPath, servletContext);
 
     registerFilter("Authentication Filter", AuthenticationFilter.class,
+        Collections.singletonMap("cacheTimeToLive", getAuthCacheTTL(webapp)),
         applicationPath + "/api/*", applicationPath + "/app/*");
     registerFilter("Security Filter", LazySecurityFilter.class,
         singletonMap("configFile", webapp.getSecurityConfigFile()),
@@ -133,6 +135,18 @@ public class CamundaBpmWebappInitializer implements ServletContextInitializer {
         applicationPath + "/api/engine/*");
     registerServlet("Welcome Api", WelcomeApplication.class,
         applicationPath + "/api/welcome/*");
+  }
+
+  protected String getAuthCacheTTL(WebappProperty webapp) {
+    long authCacheTTL = webapp.getAuth().getCache().getTimeToLive();
+    boolean authCacheTTLEnabled = webapp.getAuth().getCache().isTtlEnabled();
+    if (authCacheTTLEnabled) {
+      return Long.toString(authCacheTTL);
+
+    } else {
+      return ""; // Empty string disables TTL
+
+    }
   }
 
   private FilterRegistration registerFilter(final String filterName, final Class<? extends Filter> filterClass, final String... urlPatterns) {

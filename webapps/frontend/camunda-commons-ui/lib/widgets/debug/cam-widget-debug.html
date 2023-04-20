@@ -1,0 +1,27 @@
+<div class="debug">
+  <div class="col-xs-2"
+        ng-if="!disableToggleButton">
+    <button class="btn btn-default btn-round"
+            ng-click="toggleOpen()"
+            uib-tooltip="{{tooltip}}"
+            tooltip-placement="{{tooltipPlacement}}">
+      <span class="glyphicon"
+            ng-class="{'glyphicon-eye-open': !open, 'glyphicon-eye-close': open}"></span>
+    </button>
+  </div>
+  <div class="col-xs-10"
+       ng-show="open || disableToggleButton"
+       cam-hover-area>
+    <span ng-show="extended" cam-widget-clipboard="extendedInfo"
+          no-tooltip>
+      <code>{{ extensionName }}</code>
+    </span>
+    <pre ng-show="extended">{{ extendedInfo }}</pre>
+    <span cam-widget-clipboard="debugged | json "
+          no-tooltip
+          cam-hoverable-title="data-id">
+      <code>{{ varName }}</code>
+    </span>
+    <pre cam-hover-trigger="data-id">{{ debugged | json }}</pre>
+  </div>
+</div>

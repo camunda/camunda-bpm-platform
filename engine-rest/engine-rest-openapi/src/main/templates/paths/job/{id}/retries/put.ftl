@@ -23,11 +23,12 @@
 
   <@lib.requestBody
       mediaType = "application/json"
-      dto = "RetriesDto"
+      dto = "JobRetriesDto"
       examples = ['"example-1": {
                      "summary": "PUT `/job/aJobId/retries`",
                      "value": {
-                       "retries": 3
+                       "retries": 3,
+                       "dueDate": "2017-04-06T13:57:45.000+0200"
                      }
                    }']
   />

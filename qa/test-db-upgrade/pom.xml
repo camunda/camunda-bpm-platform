@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.camunda.bpm.qa</groupId>
     <artifactId>camunda-qa</artifactId>
-    <version>7.17.0</version>
+    <version>7.20.0-SNAPSHOT</version>
   </parent>
 
   <properties>
@@ -17,7 +17,7 @@
 
          See CAM-6338
     -->
-    <camunda.version.old>7.16.0</camunda.version.old>
+    <camunda.version.old>7.19.0</camunda.version.old>
   </properties>
 
   <artifactId>camunda-qa-db-upgrade</artifactId>
@@ -329,26 +329,38 @@
       </build>
     </profile>
     <profile>
-      <id>mariadb-galera</id>
+      <id>below-java11</id>
+      <activation>
+        <jdk>(,11)</jdk>
+      </activation>
       <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <failIfNoTests>false</failIfNoTests>
-              <trimStackTrace>false</trimStackTrace>
-              <redirectTestOutputToFile>true</redirectTestOutputToFile>
-              <excludes combine.children="append">
-                <exclude>**/JdbcStatementTimeoutTest.java</exclude>
-                <exclude>**/CompetingMessageCorrelationTest.java</exclude>
-                <exclude>**/ConcurrentDeploymentTest.java</exclude>
-                <exclude>**/DatabaseFlushTest.java</exclude>
-                <exclude>**/*TestCase.java</exclude>
-              </excludes>
-            </configuration>
-          </plugin>
-        </plugins>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <artifactId>maven-surefire-plugin</artifactId>
+              <configuration>
+                <!-- Jakarta EE 10 libraries are not part of the runs before Java 11 -->
+                <excludes combine.children="append">
+                  <exclude>**/Jakarta*.java</exclude>
+                </excludes>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
       </build>
+    </profile>
+    <profile>
+      <id>java11</id>
+      <activation>
+        <jdk>[11,)</jdk>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>jakarta.transaction</groupId>
+          <artifactId>jakarta.transaction-api</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
     </profile>
   </profiles>
 
@@ -358,6 +370,13 @@
         <groupId>org.springframework</groupId>
         <artifactId>spring-framework-bom</artifactId>
         <version>${version.spring.framework}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>jakarta.platform</groupId>
+        <artifactId>jakarta.jakartaee-bom</artifactId>
+        <version>${version.jakarta-ee-spec}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -428,7 +447,7 @@
 
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
-      <artifactId>groovy-all</artifactId>
+      <artifactId>groovy-jsr223</artifactId>
     </dependency>
 
     <dependency>
@@ -474,5 +493,4 @@
     </dependency>
 
   </dependencies>
-
 </project>

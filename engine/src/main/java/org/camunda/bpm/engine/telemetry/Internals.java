@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.telemetry;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
@@ -48,6 +49,31 @@ public interface Internals {
    * Camunda Platform. May be null when no license is used.
    */
   public LicenseKeyData getLicenseKey();
+
+  /**
+   * The date when the engine started to collect dynamic data, such as command executions
+   * and metrics. If telemetry sending is enabled, dynamic data resets on sending the data
+   * to Camunda.
+   *
+   * This method returns a date that represents the date and time when the dynamic data collected
+   * for telemetry is reset. Dynamic data and the date returned by this method are reset in three
+   * cases:
+   *
+   * <ul>
+   *   <li>At engine startup, the date is set to the current time, even if telemetry is disabled.
+   *       It is then only used by the telemetry Query API that returns the currently collected
+   *       data but sending telemetry to Camunda is disabled.</li>
+   *   <li>When sending telemetry to Camunda is enabled after engine start via API (e.g.,
+   *       {@link ManagementService#toggleTelemetry(boolean)}. This call causes the engine to wipe
+   *       all dynamic data and therefore the collection date is reset to the current time.</li>
+   *   <li>When sending telemetry to Camunda is enabled, after sending the data, all existing dynamic
+   *       data is wiped and therefore the collection date is reset to the current time.</li>
+   * </ul>
+   *
+   * @return A date that represents the start of the time frame where the current telemetry
+   * data set was collected.
+   */
+  public Date getDataCollectionStartDate();
 
   /**
    * Information about the number of command executions performed by the Camunda

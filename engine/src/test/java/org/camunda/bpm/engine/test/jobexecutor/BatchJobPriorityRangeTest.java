@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.test.jobexecutor;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -49,8 +50,9 @@ public class BatchJobPriorityRangeTest {
 
   protected long defaultBatchJobPriority;
   protected int defaultBatchJobsPerSeed;
-  protected Long defaultJobExecutorPriorityRangeMin;
-  protected Long defaultJobExecutorPriorityRangeMax;
+  protected long defaultJobExecutorPriorityRangeMin;
+  protected long defaultJobExecutorPriorityRangeMax;
+  protected boolean defaultIsJobExecutorAcquireByPriority;
 
   @Before
   public void setup() {
@@ -61,6 +63,8 @@ public class BatchJobPriorityRangeTest {
     defaultBatchJobPriority = configuration.getBatchJobPriority();
     defaultJobExecutorPriorityRangeMin = configuration.getJobExecutorPriorityRangeMin();
     defaultJobExecutorPriorityRangeMax = configuration.getJobExecutorPriorityRangeMax();
+    defaultIsJobExecutorAcquireByPriority = configuration.isJobExecutorAcquireByPriority();
+
   }
 
   @After
@@ -69,6 +73,7 @@ public class BatchJobPriorityRangeTest {
     configuration.setBatchJobsPerSeed(defaultBatchJobsPerSeed);
     configuration.setJobExecutorPriorityRangeMin(defaultJobExecutorPriorityRangeMin);
     configuration.setJobExecutorPriorityRangeMax(defaultJobExecutorPriorityRangeMax);
+    configuration.setJobExecutorAcquireByPriority(defaultIsJobExecutorAcquireByPriority);
     helper.removeAllRunningAndHistoricBatches();
   }
 
@@ -109,6 +114,7 @@ public class BatchJobPriorityRangeTest {
   @Test
   public void shouldNotAcquireBatchJobOutsidePriorityRange() {
     // given
+    configuration.setJobExecutorAcquireByPriority(true);
     configuration.setJobExecutorPriorityRangeMin(5L);
     configuration.setJobExecutorPriorityRangeMax(15L);
     configuration.setBatchJobPriority(20L);

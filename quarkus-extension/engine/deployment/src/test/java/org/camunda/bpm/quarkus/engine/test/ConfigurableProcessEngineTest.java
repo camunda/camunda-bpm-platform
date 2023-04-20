@@ -35,7 +35,8 @@ public class ConfigurableProcessEngineTest {
   @RegisterExtension
   static final QuarkusUnitTest unitTest = new QuarkusUnitTest()
       .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class)
-                                    .addClass(MyConfig.class));
+                                    .addClass(MyConfig.class))
+      .withConfigurationResource("application.properties");
 
   @ApplicationScoped
   static class MyConfig {

@@ -26,7 +26,6 @@ import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.authorization.TaskPermissions;
 import org.camunda.bpm.engine.exception.NotFoundException;
-import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.task.Attachment;
@@ -51,64 +50,64 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
  */
 public interface TaskService {
 
-	/**
-	 * Creates a new task that is not related to any process instance.
-	 *
-	 * The returned task is transient and must be saved with {@link #saveTask(Task)} 'manually'.
-	 *
+  /**
+   * Creates a new task that is not related to any process instance.
+   *
+   * The returned task is transient and must be saved with {@link #saveTask(Task)} 'manually'.
+   *
    * @throws AuthorizationException
    *          if the user has no {@link Permissions#CREATE} permission on {@link Resources#TASK}.
-	 */
+   */
   Task newTask();
 
   /** create a new task with a user defined task id */
   Task newTask(String taskId);
 
-	/**
-	 * Saves the given task to the persistent data store. If the task is already
-	 * present in the persistent store, it is updated.
-	 * After a new task has been saved, the task instance passed into this method
-	 * is updated with the id of the newly created task.
-	 *
-	 * @param task the task, cannot be null.
-	 *
+  /**
+   * Saves the given task to the persistent data store. If the task is already
+   * present in the persistent store, it is updated.
+   * After a new task has been saved, the task instance passed into this method
+   * is updated with the id of the newly created task.
+   *
+   * @param task the task, cannot be null.
+   *
    * @throws AuthorizationException
    *          If the task is already present and the user has no {@link Permissions#UPDATE} permission
    *          on {@link Resources#TASK} or no {@link Permissions#UPDATE_TASK} permission on
    *          {@link Resources#PROCESS_DEFINITION}.
    *          Or if the task is not present and the user has no {@link Permissions#CREATE} permission
    *          on {@link Resources#TASK}.
-	 */
-	void saveTask(Task task);
+   */
+  void saveTask(Task task);
 
-	/**
-	 * Deletes the given task, not deleting historic information that is related to this task.
-	 *
-	 * @param taskId The id of the task that will be deleted, cannot be null. If no task
-	 * exists with the given taskId, the operation is ignored.
-	 *
-	 * @throws ProcessEngineException
+  /**
+   * Deletes the given task, not deleting historic information that is related to this task.
+   *
+   * @param taskId The id of the task that will be deleted, cannot be null. If no task
+   * exists with the given taskId, the operation is ignored.
+   *
+   * @throws ProcessEngineException
    *          when an error occurs while deleting the task or in case the task is part
    *          of a running process or case instance.
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#DELETE} permission on {@link Resources#TASK}.
-	 */
-	void deleteTask(String taskId);
+   */
+  void deleteTask(String taskId);
 
-	/**
-	 * Deletes all tasks of the given collection, not deleting historic information that is related
-	 * to these tasks.
-	 *
-	 * @param taskIds The id's of the tasks that will be deleted, cannot be null. All
-	 * id's in the list that don't have an existing task will be ignored.
-	 *
-	 * @throws ProcessEngineException
-	 *          when an error occurs while deleting the tasks or in case one of the tasks
+  /**
+   * Deletes all tasks of the given collection, not deleting historic information that is related
+   * to these tasks.
+   *
+   * @param taskIds The id's of the tasks that will be deleted, cannot be null. All
+   * id's in the list that don't have an existing task will be ignored.
+   *
+   * @throws ProcessEngineException
+   *          when an error occurs while deleting the tasks or in case one of the tasks
    *          is part of a running process or case instance.
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#DELETE} permission on {@link Resources#TASK}.
-	 */
-	void deleteTasks(Collection<String> taskIds);
+   */
+  void deleteTasks(Collection<String> taskIds);
 
   /**
    * Deletes the given task.

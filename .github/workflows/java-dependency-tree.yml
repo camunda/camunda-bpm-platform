@@ -7,9 +7,9 @@ on:
 jobs:
     build:
       runs-on: ubuntu-latest
-      if: ${{ github.event.label.name == 'java-dependency-tree' }}
+      if: ${{ github.event.label.name == 'bot:java-dependency-tree' }}
       steps:
-      - uses: actions/checkout@v2.3.4
+      - uses: actions/checkout@v3
         with:
           ref: ${{ github.event.pull_request.head.sha }}
       - uses: camunda/java-dependency-tree-diff@main

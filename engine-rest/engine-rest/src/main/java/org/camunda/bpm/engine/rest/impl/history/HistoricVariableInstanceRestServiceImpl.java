@@ -17,6 +17,9 @@
 package org.camunda.bpm.engine.rest.impl.history;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.List;
+import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
@@ -26,10 +29,7 @@ import org.camunda.bpm.engine.rest.dto.history.HistoricVariableInstanceQueryDto;
 import org.camunda.bpm.engine.rest.history.HistoricVariableInstanceRestService;
 import org.camunda.bpm.engine.rest.sub.history.HistoricVariableInstanceResource;
 import org.camunda.bpm.engine.rest.sub.history.impl.HistoricVariableInstanceResourceImpl;
-
-import javax.ws.rs.core.UriInfo;
-import java.util.ArrayList;
-import java.util.List;
+import org.camunda.bpm.engine.rest.util.QueryUtil;
 
 public class HistoricVariableInstanceRestServiceImpl implements HistoricVariableInstanceRestService {
 
@@ -41,6 +41,7 @@ public class HistoricVariableInstanceRestServiceImpl implements HistoricVariable
     this.processEngine = processEngine;
   }
 
+  @Override
   public HistoricVariableInstanceResource variableInstanceResource(String variableId) {
     return new HistoricVariableInstanceResourceImpl(variableId, processEngine);
   }
@@ -63,12 +64,7 @@ public class HistoricVariableInstanceRestServiceImpl implements HistoricVariable
       query.disableCustomObjectDeserialization();
     }
 
-    List<HistoricVariableInstance> matchingHistoricVariableInstances;
-    if (firstResult != null || maxResults != null) {
-      matchingHistoricVariableInstances = executePaginatedQuery(query, firstResult, maxResults);
-    } else {
-      matchingHistoricVariableInstances = query.list();
-    }
+    List<HistoricVariableInstance> matchingHistoricVariableInstances = QueryUtil.list(query, firstResult, maxResults);
 
     List<HistoricVariableInstanceDto> historicVariableInstanceDtoResults = new ArrayList<HistoricVariableInstanceDto>();
     for (HistoricVariableInstance historicVariableInstance : matchingHistoricVariableInstances) {
@@ -76,16 +72,6 @@ public class HistoricVariableInstanceRestServiceImpl implements HistoricVariable
       historicVariableInstanceDtoResults.add(resultHistoricVariableInstance);
     }
     return historicVariableInstanceDtoResults;
-  }
-
-  private List<HistoricVariableInstance> executePaginatedQuery(HistoricVariableInstanceQuery query, Integer firstResult, Integer maxResults) {
-    if (firstResult == null) {
-      firstResult = 0;
-    }
-    if (maxResults == null) {
-      maxResults = Integer.MAX_VALUE;
-    }
-    return query.listPage(firstResult, maxResults);
   }
 
   @Override

@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.impl.json;
 
+import org.camunda.bpm.engine.impl.batch.AbstractBatchConfigurationObjectConverter;
 import org.camunda.bpm.engine.impl.batch.DeploymentMappingJsonConverter;
 import org.camunda.bpm.engine.impl.batch.DeploymentMappings;
 import org.camunda.bpm.engine.impl.batch.message.MessageCorrelationBatchConfiguration;
@@ -24,7 +25,8 @@ import com.google.gson.JsonObject;
 
 import java.util.List;
 
-public class MessageCorrelationBatchConfigurationJsonConverter extends JsonObjectConverter<MessageCorrelationBatchConfiguration> {
+public class MessageCorrelationBatchConfigurationJsonConverter
+    extends AbstractBatchConfigurationObjectConverter<MessageCorrelationBatchConfiguration> {
 
   public static final MessageCorrelationBatchConfigurationJsonConverter INSTANCE = new MessageCorrelationBatchConfigurationJsonConverter();
 
@@ -33,7 +35,8 @@ public class MessageCorrelationBatchConfigurationJsonConverter extends JsonObjec
   public static final String PROCESS_INSTANCE_ID_MAPPINGS = "processInstanceIdMappings";
   public static final String BATCH_ID = "batchId";
 
-  public JsonObject toJsonObject(MessageCorrelationBatchConfiguration configuration) {
+  @Override
+  public JsonObject writeConfiguration(MessageCorrelationBatchConfiguration configuration) {
     JsonObject json = JsonUtil.createObject();
 
     JsonUtil.addField(json, MESSAGE_NAME, configuration.getMessageName());
@@ -44,7 +47,8 @@ public class MessageCorrelationBatchConfigurationJsonConverter extends JsonObjec
     return json;
   }
 
-  public MessageCorrelationBatchConfiguration toObject(JsonObject json) {
+  @Override
+  public MessageCorrelationBatchConfiguration readConfiguration(JsonObject json) {
     return new MessageCorrelationBatchConfiguration(
         readProcessInstanceIds(json),
         readIdMappings(json),

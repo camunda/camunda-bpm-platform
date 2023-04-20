@@ -21,12 +21,12 @@ package org.camunda.bpm.client.exception;
  *
  * @author Tassilo Weidner
  */
-public class NotFoundException extends ExternalTaskClientException {
+public class NotFoundException extends RestException {
 
   private static final long serialVersionUID = 1L;
 
-  public NotFoundException(String message) {
-    super(message);
+  public NotFoundException(String message, RestException restException) {
+    super(message, restException);
   }
 
 }

@@ -20,6 +20,7 @@ import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +31,7 @@ import org.camunda.bpm.engine.batch.BatchStatisticsQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
+import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,18 +40,25 @@ public class BatchStatisticsQueryDto extends AbstractQueryDto<BatchStatisticsQue
 
   private static final String SORT_BY_BATCH_ID_VALUE = "batchId";
   private static final String SORT_BY_TENANT_ID_VALUE = "tenantId";
+  private static final String SORT_BY_START_TIME_VALUE = "startTime";
 
   protected String batchId;
   protected String type;
   protected List<String> tenantIds;
   protected Boolean withoutTenantId;
   protected Boolean suspended;
+  protected String userId;
+  protected Date startedBefore;
+  protected Date startedAfter;
+  protected Boolean withFailures;
+  protected Boolean withoutFailures;
 
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
-    VALID_SORT_BY_VALUES = new ArrayList<String>();
+    VALID_SORT_BY_VALUES = new ArrayList<>();
     VALID_SORT_BY_VALUES.add(SORT_BY_BATCH_ID_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_TENANT_ID_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_START_TIME_VALUE);
   }
 
   public BatchStatisticsQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
@@ -81,6 +90,31 @@ public class BatchStatisticsQueryDto extends AbstractQueryDto<BatchStatisticsQue
     this.suspended = suspended;
   }
 
+  @CamundaQueryParam(value="createdBy")
+  public void setCreateUserId(String userId) {
+    this.userId = userId;
+  }
+
+  @CamundaQueryParam(value = "startedBefore", converter = DateConverter.class)
+  public void setStartedBefore(Date startedBefore) {
+    this.startedBefore = startedBefore;
+  }
+
+  @CamundaQueryParam(value = "startedAfter", converter = DateConverter.class)
+  public void setStartedAfter(Date startedAfter) {
+    this.startedAfter = startedAfter;
+  }
+
+  @CamundaQueryParam(value = "withFailures", converter = BooleanConverter.class)
+  public void setWithFailures(final Boolean withFailures) {
+    this.withFailures = withFailures;
+  }
+
+  @CamundaQueryParam(value = "withoutFailures", converter = BooleanConverter.class)
+  public void setWithoutFailures(final Boolean withoutFailures) {
+    this.withoutFailures = withoutFailures;
+  }
+
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
   }
@@ -108,6 +142,21 @@ public class BatchStatisticsQueryDto extends AbstractQueryDto<BatchStatisticsQue
     if (FALSE.equals(suspended)) {
       query.active();
     }
+    if (userId != null) {
+      query.createdBy(userId);
+    }
+    if (startedBefore != null) {
+      query.startedBefore(startedBefore);
+    }
+    if (startedAfter != null) {
+      query.startedAfter(startedAfter);
+    }
+    if (TRUE.equals(withFailures)) {
+      query.withFailures();
+    }
+    if (TRUE.equals(withoutFailures)) {
+      query.withoutFailures();
+    }
   }
 
   protected void applySortBy(BatchStatisticsQuery query, String sortBy, Map<String, Object> parameters, ProcessEngine engine) {
@@ -116,6 +165,9 @@ public class BatchStatisticsQueryDto extends AbstractQueryDto<BatchStatisticsQue
     }
     else if (sortBy.equals(SORT_BY_TENANT_ID_VALUE)) {
       query.orderByTenantId();
+    }
+    else if (sortBy.equals(SORT_BY_START_TIME_VALUE)) {
+      query.orderByStartTime();
     }
   }
 

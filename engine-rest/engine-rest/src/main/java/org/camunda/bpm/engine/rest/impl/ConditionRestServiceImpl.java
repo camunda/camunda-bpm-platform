@@ -47,7 +47,7 @@ public class ConditionRestServiceImpl extends AbstractRestProcessEngineAware imp
     ConditionEvaluationBuilder builder = createConditionEvaluationBuilder(conditionDto);
     List<ProcessInstance> processInstances = builder.evaluateStartConditions();
 
-    List<ProcessInstanceDto> result = new ArrayList<ProcessInstanceDto>();
+    List<ProcessInstanceDto> result = new ArrayList<>();
     for (ProcessInstance processInstance : processInstances) {
       result.add(ProcessInstanceDto.fromProcessInstance(processInstance));
     }
@@ -55,11 +55,11 @@ public class ConditionRestServiceImpl extends AbstractRestProcessEngineAware imp
   }
 
   protected ConditionEvaluationBuilder createConditionEvaluationBuilder(EvaluationConditionDto conditionDto) {
-    RuntimeService runtimeService = processEngine.getRuntimeService();
+    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
 
     ObjectMapper objectMapper = getObjectMapper();
 
-    VariableMap variables = VariableValueDto.toMap(conditionDto.getVariables(), processEngine, objectMapper);
+    VariableMap variables = VariableValueDto.toMap(conditionDto.getVariables(), getProcessEngine(), objectMapper);
 
     ConditionEvaluationBuilder builder = runtimeService.createConditionEvaluation();
 

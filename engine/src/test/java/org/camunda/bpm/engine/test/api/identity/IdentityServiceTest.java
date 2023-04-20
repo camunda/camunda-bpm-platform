@@ -52,6 +52,7 @@ import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.identity.Account;
 import org.camunda.bpm.engine.impl.identity.Authentication;
+import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
@@ -1064,6 +1065,44 @@ public class IdentityServiceTest {
   public void shouldCreateUserWithEmptyUserId() {
     User user = identityService.newUser("");
     assertThat(user).isNotNull();
+  }
+
+  @Test
+  public void shouldNotIncludePlaintextPasswordInUserToString() {
+    // given
+    User user = identityService.newUser("id");
+
+    String password = "this is a password";
+    user.setPassword(password);
+
+    // when
+    String toString = user.toString();
+
+    // then
+    assertThat(toString).doesNotContain(password);
+  }
+
+  @Test
+  public void shouldNotIncludeHashedPasswordAndSaltInUserToString() {
+    // given
+    User user = identityService.newUser("id");
+
+    String password = "this is a password";
+    user.setPassword(password);
+
+    identityService.saveUser(user);
+
+    UserEntity userEntity = (UserEntity) user;
+    String salt = userEntity.getSalt();
+    String hashedPassword = userEntity.getPassword();
+
+    // when
+    String toString = user.toString();
+
+    // then
+    assertThat(toString).doesNotContain(salt);
+    assertThat(toString).doesNotContain(hashedPassword);
+
   }
 
   private Object createStringSet(String... strings) {

@@ -22,8 +22,10 @@ import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySorting;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RuntimeService;
@@ -31,6 +33,7 @@ import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.batch.BatchQuery;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.MigrationTestRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.batch.BatchMigrationHelper;
@@ -69,6 +72,7 @@ public class BatchQueryTest {
   @After
   public void removeBatches() {
     helper.removeAllRunningAndHistoricBatches();
+    ClockUtil.reset();
   }
 
   @Test
@@ -83,7 +87,7 @@ public class BatchQueryTest {
     // then
     Assert.assertEquals(2, list.size());
 
-    List<String> batchIds = new ArrayList<String>();
+    List<String> batchIds = new ArrayList<>();
     for (Batch resultBatch : list) {
       batchIds.add(resultBatch.getId());
     }
@@ -95,6 +99,7 @@ public class BatchQueryTest {
   @Test
   public void testBatchQueryResult() {
     // given
+    ClockUtil.setCurrentTime(new Date());
     Batch batch = helper.migrateProcessInstancesAsync(1);
 
     // when
@@ -114,6 +119,8 @@ public class BatchQueryTest {
     Assert.assertEquals(batch.getTotalJobs(), resultBatch.getTotalJobs());
     Assert.assertEquals(batch.getJobsCreated(), resultBatch.getJobsCreated());
     Assert.assertEquals(batch.isSuspended(), resultBatch.isSuspended());
+    Assertions.assertThat(batch.getStartTime()).isEqualToIgnoringMillis(resultBatch.getStartTime());
+    Assertions.assertThat(batch.getStartTime()).isEqualToIgnoringMillis(ClockUtil.getCurrentTime());
   }
 
   @Test
@@ -276,7 +283,7 @@ public class BatchQueryTest {
     Assert.assertEquals(2, query.count());
     Assert.assertEquals(2, query.list().size());
 
-    List<String> foundIds = new ArrayList<String>();
+    List<String> foundIds = new ArrayList<>();
     for (Batch batch : query.list()) {
       foundIds.add(batch.getId());
     }

@@ -18,14 +18,16 @@ package org.camunda.bpm.engine.impl.batch.externaltask;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.batch.AbstractBatchConfigurationObjectConverter;
 import org.camunda.bpm.engine.impl.batch.DeploymentMappingJsonConverter;
 import org.camunda.bpm.engine.impl.batch.DeploymentMappings;
 import org.camunda.bpm.engine.impl.batch.SetRetriesBatchConfiguration;
-import org.camunda.bpm.engine.impl.json.JsonObjectConverter;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
+
 import com.google.gson.JsonObject;
 
-public class SetExternalTaskRetriesBatchConfigurationJsonConverter extends JsonObjectConverter<SetRetriesBatchConfiguration> {
+public class SetExternalTaskRetriesBatchConfigurationJsonConverter
+    extends AbstractBatchConfigurationObjectConverter<SetRetriesBatchConfiguration> {
 
   public static final SetExternalTaskRetriesBatchConfigurationJsonConverter INSTANCE = new SetExternalTaskRetriesBatchConfigurationJsonConverter();
 
@@ -34,7 +36,7 @@ public class SetExternalTaskRetriesBatchConfigurationJsonConverter extends JsonO
   public static final String RETRIES = "retries";
 
   @Override
-  public JsonObject toJsonObject(SetRetriesBatchConfiguration configuration) {
+  public JsonObject writeConfiguration(SetRetriesBatchConfiguration configuration) {
     JsonObject json = JsonUtil.createObject();
 
     JsonUtil.addListField(json, EXTERNAL_TASK_IDS, configuration.getIds());
@@ -45,7 +47,7 @@ public class SetExternalTaskRetriesBatchConfigurationJsonConverter extends JsonO
   }
 
   @Override
-  public SetRetriesBatchConfiguration toObject(JsonObject json) {
+  public SetRetriesBatchConfiguration readConfiguration(JsonObject json) {
     return new SetRetriesBatchConfiguration(readExternalTaskIds(json), readIdMappings(json), JsonUtil.getInt(json, RETRIES));
   }
 

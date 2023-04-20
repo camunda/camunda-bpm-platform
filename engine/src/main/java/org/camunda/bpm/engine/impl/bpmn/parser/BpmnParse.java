@@ -16,6 +16,25 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.parser;
 
+import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.findCamundaExtensionElement;
+import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.parseCamundaExtensionProperties;
+import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.parseCamundaScript;
+import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.parseInputOutput;
+import static org.camunda.bpm.engine.impl.util.ClassDelegateUtil.instantiateDelegate;
+
+import java.io.InputStream;
+import java.net.URL;
+import java.text.StringCharacterIterator;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.camunda.bpm.engine.ActivityTypes;
 import org.camunda.bpm.engine.BpmnParseException;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -141,25 +160,6 @@ import org.camunda.bpm.engine.impl.util.xml.Namespace;
 import org.camunda.bpm.engine.impl.util.xml.Parse;
 import org.camunda.bpm.engine.impl.variable.VariableDeclaration;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
-
-import java.io.InputStream;
-import java.net.URL;
-import java.text.StringCharacterIterator;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.findCamundaExtensionElement;
-import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.parseCamundaExtensionProperties;
-import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.parseCamundaScript;
-import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.parseInputOutput;
-import static org.camunda.bpm.engine.impl.util.ClassDelegateUtil.instantiateDelegate;
 
 /**
  * Specific parsing of one BPMN 2.0 XML file, created by the {@link BpmnParser}.
@@ -1871,7 +1871,7 @@ public class BpmnParse extends Parse {
 
       // Validation
       if (behavior.getLoopCardinalityExpression() == null && behavior.getCollectionExpression() == null && behavior.getCollectionVariable() == null) {
-        addError("Either loopCardinality or loopDataInputRef/activiti:collection must been set", miLoopCharacteristics, id);
+        addError("Either loopCardinality or loopDataInputRef/activiti:collection must be set", miLoopCharacteristics, id);
       }
 
       // Validation
@@ -3592,7 +3592,6 @@ public class BpmnParse extends Parse {
     }
 
     // Parse the timer declaration
-    // TODO move the timer declaration into the bpmn activity or next to the TimerSession
     TimerDeclarationImpl timerDeclaration = new TimerDeclarationImpl(expression, type, jobHandlerType);
     timerDeclaration.setRawJobHandlerConfiguration(timerActivity.getId());
     timerDeclaration.setExclusive(TRUE.equals(timerEventDefinition.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "exclusive", String.valueOf(JobEntity.DEFAULT_EXCLUSIVE))));
@@ -4809,6 +4808,10 @@ public class BpmnParse extends Parse {
             // * sequential: after each iteration local variables are purged
             activity.setScope(true);
           }
+        }
+
+        for (BpmnParseListener parseListener : parseListeners) {
+          parseListener.parseIoMapping(extensionElements, activity, inputOutput);
         }
       }
     }

@@ -1,0 +1,10 @@
+<module xmlns="urn:jboss:module:1.0" name="org.camunda.feel.feel-engine">
+  <resources>
+    <resource-root path="feel-engine-@version.feel-scala@-scala-shaded.jar" />
+  </resources>
+
+  <dependencies>
+    <module name="sun.jdk" />
+    <module name="org.slf4j" />
+  </dependencies>
+</module>

@@ -1488,13 +1488,26 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
   @Test
   public void testNonExistingProcessDefinitionBpmn20XmlRetrieval() {
     String nonExistingId = "aNonExistingDefinitionId";
-    when(repositoryServiceMock.getProcessModel(eq(nonExistingId))).thenThrow(new ProcessEngineException("no matching process definition found."));
+    when(repositoryServiceMock.getProcessModel(eq(nonExistingId))).thenThrow(new NotFoundException("no matching process definition found."));
 
     given().pathParam("id", nonExistingId)
     .then().expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
       .body("message", equalTo("No matching definition with id " + nonExistingId))
+    .when().get(XML_DEFINITION_URL);
+  }
+
+  @Test
+  public void testGetProcessDefinitionBpmn20XmlThrowsProcessEngineException() {
+    String processDefinitionId = "someId";
+    when(repositoryServiceMock.getProcessModel(eq(processDefinitionId))).thenThrow(new ProcessEngineException("generic message"));
+
+    given().pathParam("id", processDefinitionId)
+    .then().expect()
+      .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
+      .body("message", equalTo("generic message"))
     .when().get(XML_DEFINITION_URL);
   }
 
@@ -4069,7 +4082,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
   public void testGetStaticCalledProcessDefinitionNonExistingProcess() {
 
     when(repositoryServiceMock.getStaticCalledProcessDefinitions("NonExistingId")).thenThrow(
-      new NullValueException());
+      new NotFoundException());
 
     given()
       .pathParam("id", "NonExistingId")
@@ -4077,6 +4090,42 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
       .statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
     .when()
       .get(PROCESS_DEFINITION_CALL_ACTIVITY_MAPPINGS);
+  }
+
+  @Test
+  public void shouldReturnErrorCodeWhenStartingProcessInstance() {
+    when(mockInstantiationBuilder.executeWithVariablesInReturn(anyBoolean(), anyBoolean()))
+      .thenThrow(new ProcessEngineException("foo", 123));
+
+    given()
+      .pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(EMPTY_JSON_OBJECT)
+    .then().expect()
+      .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot instantiate process definition aProcDefId: foo"))
+      .body("code", equalTo(123))
+    .when()
+      .post(START_PROCESS_INSTANCE_BY_KEY_URL);
+  }
+
+  @Test
+  public void shouldReturnErrorCodeWhenSubmittingForm() {
+    doThrow(new ProcessEngineException("foo", 123))
+        .when(formServiceMock).submitStartForm(any(String.class), Mockito.any());
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(EMPTY_JSON_OBJECT)
+    .then().expect()
+      .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot instantiate process definition aProcDefId: foo"))
+      .body("code", equalTo(123))
+    .when()
+      .post(SUBMIT_FORM_URL);
   }
 
 }

@@ -344,7 +344,7 @@ public class TransientVariableTest {
     Task task = taskService.createTaskQuery().singleResult();
 
     // when
-    Map<String, Object> formValues = new HashMap<String, Object>();
+    Map<String, Object> formValues = new HashMap<>();
     formValues.put("stringField", Variables.stringValue("foobar", true));
     formValues.put("longField", 9L);
     engineRule.getFormService().submitTaskForm(task.getId(), formValues);
@@ -362,7 +362,7 @@ public class TransientVariableTest {
     ProcessDefinition processDefinition = engineRule.getRepositoryService().createProcessDefinitionQuery().singleResult();
 
     // when
-    Map<String, Object> formValues = new HashMap<String, Object>();
+    Map<String, Object> formValues = new HashMap<>();
     formValues.put("stringField", Variables.stringValue("foobar", true));
     formValues.put("longField", 9L);
     engineRule.getFormService().submitStartForm(processDefinition.getId(), formValues);
@@ -524,7 +524,7 @@ public class TransientVariableTest {
     testRule.deploy(instance);
 
     String output = "transientVariableOutput";
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put(output, false);
 
     // when
@@ -553,7 +553,7 @@ public class TransientVariableTest {
     testRule.deploy(instance);
 
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("transient1", true);
     variables.put("transient2", false);
 
@@ -577,7 +577,7 @@ public class TransientVariableTest {
 
     testRule.deploy(instance);
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("transient1", false);
     variables.put("transient2", true);
 
@@ -601,7 +601,7 @@ public class TransientVariableTest {
 
     testRule.deploy(instance);
 
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<String, Object> variables = new HashMap<>();
     variables.put("var", false);
 
     // when/then
@@ -636,12 +636,12 @@ public class TransientVariableTest {
 
 
   @Test
-  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   public void testTransientLocalVariable() {
     // given
     BpmnModelInstance model = Bpmn.createExecutableProcess("process")
         .startEvent()
         .serviceTask().camundaClass(SetTransientLocalVariableDelegate.class)
+        .userTask()
         .endEvent()
         .done();
 
@@ -651,12 +651,92 @@ public class TransientVariableTest {
     runtimeService.startProcessInstanceByKey("process");
 
     // then
-    long numHistoricVariables =
-        engineRule.getHistoryService()
-          .createHistoricVariableInstanceQuery()
+    long numVariables =
+        runtimeService
+          .createVariableInstanceQuery()
           .count();
 
-    assertThat(numHistoricVariables).isEqualTo(0);
+    assertThat(numVariables).isEqualTo(0);
+  }
+
+  @Test
+  public void shouldRemoveNonTransientAndSetNonTransient() {
+    // given
+    BpmnModelInstance model = Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .serviceTask().camundaClass(RemoveAndSetVariableDelegate.class)
+        .userTask()
+        .endEvent()
+        .done();
+
+    testRule.deploy(model);
+
+    // when
+    runtimeService.startProcessInstanceByKey("process",
+        Variables.putValue("transient1", false).putValue("transient2", false));
+
+    // then
+    assertThat(runtimeService.createVariableInstanceQuery().variableName(VARIABLE_NAME).count())
+      .isEqualTo(1L);
+  }
+
+  @Test
+  public void shouldRemoveTransientAndSetTransient() {
+    // given
+    BpmnModelInstance model = Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .serviceTask().camundaClass(RemoveAndSetVariableDelegate.class)
+        .userTask()
+        .endEvent()
+        .done();
+
+    testRule.deploy(model);
+
+    // when
+    runtimeService.startProcessInstanceByKey("process",
+        Variables.putValue("transient1", true).putValue("transient2", true));
+
+    // then
+    assertThat(runtimeService.createVariableInstanceQuery().variableName(VARIABLE_NAME).count())
+      .isEqualTo(0L);
+  }
+
+  @Test
+  public void shouldFailRemoveTransientAndSetNonTransient() {
+    // given
+    BpmnModelInstance model = Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .serviceTask().camundaClass(RemoveAndSetVariableDelegate.class)
+        .userTask()
+        .endEvent()
+        .done();
+
+    testRule.deploy(model);
+
+    // when/then
+    assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("process",
+        Variables.putValue("transient1", true).putValue("transient2", false)))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot set transient variable with name variable to non-transient variable and vice versa.");
+  }
+
+  @Test
+  public void shouldFailRemoveNonTransientAndSetTransient() {
+    // given
+    BpmnModelInstance model = Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .serviceTask().camundaClass(RemoveAndSetVariableDelegate.class)
+        .userTask()
+        .endEvent()
+        .done();
+
+    testRule.deploy(model);
+
+    // when/then
+    assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("process",
+        Variables.putValue("transient1", false).putValue("transient2", true)))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("Cannot set transient variable with name variable to non-transient variable and vice versa.");
   }
 
   public static class ReadTypedTransientVariableDelegate implements JavaDelegate {
@@ -731,6 +811,15 @@ public class TransientVariableTest {
     }
   }
 
-
+  public static class RemoveAndSetVariableDelegate implements JavaDelegate {
+    @Override
+    public void execute(DelegateExecution execution) throws Exception {
+      Boolean transient1 = (Boolean) execution.getVariable("transient1");
+      Boolean transient2 = (Boolean) execution.getVariable("transient2");
+      execution.setVariable(VARIABLE_NAME, Variables.integerValue(1, transient1));
+      execution.removeVariable(VARIABLE_NAME);
+      execution.setVariable(VARIABLE_NAME, Variables.integerValue(2, transient2));
+    }
+  }
 
 }

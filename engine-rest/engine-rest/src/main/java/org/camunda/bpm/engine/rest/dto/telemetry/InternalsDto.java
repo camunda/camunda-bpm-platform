@@ -16,12 +16,12 @@
  */
 package org.camunda.bpm.engine.rest.dto.telemetry;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.camunda.bpm.engine.telemetry.Command;
 import org.camunda.bpm.engine.telemetry.Internals;
 import org.camunda.bpm.engine.telemetry.LicenseKeyData;
 
@@ -32,16 +32,18 @@ public class InternalsDto {
   public static final String SERIALIZED_APPLICATION_SERVER = "application-server";
   public static final String SERIALIZED_CAMUNDA_INTEGRATION = "camunda-integration";
   public static final String SERIALIZED_LICENSE_KEY = "license-key";
+  public static final String SERIALIZED_TELEMETRY_DATA_COLLECTION_START_DATE = "data-collection-start-date";
 
   protected DatabaseDto database;
   @JsonProperty(value = SERIALIZED_APPLICATION_SERVER)
   protected ApplicationServerDto applicationServer;
   @JsonProperty(value = SERIALIZED_LICENSE_KEY)
   protected LicenseKeyDataDto licenseKey;
-  protected Map<String, CommandDto> commands;
   @JsonProperty(value = SERIALIZED_CAMUNDA_INTEGRATION)
   protected Set<String> camundaIntegration;
-
+  @JsonProperty(value = SERIALIZED_TELEMETRY_DATA_COLLECTION_START_DATE)
+  protected Date dataCollectionStartDate;
+  protected Map<String, CommandDto> commands;
   protected Map<String, MetricDto> metrics;
   protected Set<String> webapps;
 
@@ -120,6 +122,14 @@ public class InternalsDto {
     this.webapps = webapps;
   }
 
+  public Date getDataCollectionStartDate() {
+    return dataCollectionStartDate;
+  }
+
+  public void setDataCollectionStartDate(Date dataCollectionStartDate) {
+    this.dataCollectionStartDate = dataCollectionStartDate;
+  }
+
   public static InternalsDto fromEngineDto(Internals other) {
 
     LicenseKeyData licenseKey = other.getLicenseKey();
@@ -128,6 +138,8 @@ public class InternalsDto {
         ApplicationServerDto.fromEngineDto(other.getApplicationServer()),
         licenseKey != null ? LicenseKeyDataDto.fromEngineDto(licenseKey) : null,
         JdkDto.fromEngineDto(other.getJdk()));
+
+    dto.dataCollectionStartDate = other.getDataCollectionStartDate();
 
     dto.commands = new HashMap<>();
     other.getCommands().forEach((name, command) -> dto.commands.put(name, new CommandDto(command.getCount())));

@@ -8,7 +8,7 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-engine-rest-root</artifactId>
     <relativePath>../</relativePath>
-    <version>7.17.0</version>
+    <version>7.20.0-SNAPSHOT</version>
   </parent>
   
   <properties>
@@ -25,13 +25,6 @@
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-rest-core</artifactId>
       <version>${project.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine-rest-jaxrs2</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
     </dependency>
 
     <!-- dependencies only used for assemblies should be scope provided -->
@@ -116,24 +109,6 @@
               <finalName>camunda-engine-rest-${project.version}</finalName>
               <attach>true</attach>
               <classifier>tomcat</classifier>
-              <outputDirectory>target/</outputDirectory>
-              <workDirectory>target/assembly/work</workDirectory>
-            </configuration>
-          </execution>
-
-          <execution>
-            <id>was</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-            <configuration>
-              <descriptors>
-                <descriptor>assembly-war-was.xml</descriptor>
-              </descriptors>
-              <finalName>camunda-engine-rest-${project.version}</finalName>
-              <attach>true</attach>
-              <classifier>was</classifier>
               <outputDirectory>target/</outputDirectory>
               <workDirectory>target/assembly/work</workDirectory>
             </configuration>

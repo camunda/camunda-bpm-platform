@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.test.api.mgmt;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.batchStatisticsById;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.batchStatisticsByStartTime;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySorting;
 import static org.junit.Assert.assertEquals;
@@ -25,6 +26,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.ManagementService;
@@ -34,6 +36,7 @@ import org.camunda.bpm.engine.batch.BatchStatisticsQuery;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.api.runtime.migration.MigrationTestRule;
@@ -76,6 +79,7 @@ public class BatchStatisticsQueryTest {
   public void resetBatchJobsPerSeed() {
     engineRule.getProcessEngineConfiguration()
       .setBatchJobsPerSeed(defaultBatchJobsPerSeed);
+    ClockUtil.reset();
   }
 
   @After
@@ -255,6 +259,40 @@ public class BatchStatisticsQueryTest {
 
     // then
     verifySorting(statistics, inverted(batchStatisticsById()));
+  }
+
+  @Test
+  public void testQueryOrderByStartTimeAsc() {
+    // given
+    helper.migrateProcessInstancesAsync(1);
+    final long oneHour = 60 * 60 * 1000L;
+    ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() + oneHour));
+    helper.migrateProcessInstancesAsync(1);
+
+    // when
+    List<BatchStatistics> statistics = managementService.createBatchStatisticsQuery()
+      .orderByStartTime().asc()
+      .list();
+
+    // then
+    verifySorting(statistics, batchStatisticsByStartTime());
+  }
+
+  @Test
+  public void testQueryOrderByStartTimeDesc() {
+    // given
+    helper.migrateProcessInstancesAsync(1);
+    final long oneHour = 60 * 60 * 1000L;
+    ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() + oneHour));
+    helper.migrateProcessInstancesAsync(1);
+
+    // when
+    List<BatchStatistics> statistics = managementService.createBatchStatisticsQuery()
+      .orderByStartTime().desc()
+      .list();
+
+    // then
+    verifySorting(statistics, inverted(batchStatisticsByStartTime()));
   }
 
   @Test
@@ -599,6 +637,118 @@ public class BatchStatisticsQueryTest {
       batch1.getId(),
       batch3.getId()
     );
+  }
+
+  @Test
+  public void shouldQueryByFailures() {
+    // given
+    Batch batch1 = helper.migrateProcessInstancesAsync(2);
+    Batch batch2 = helper.migrateProcessInstancesAsync(1);
+    helper.executeSeedJob(batch1);
+    helper.executeSeedJob(batch2);
+    helper.failExecutionJobs(batch1, 1);
+
+    // when
+    final long total = managementService.createBatchStatisticsQuery().count();
+    BatchStatisticsQuery queryWithFailures = managementService.createBatchStatisticsQuery().withFailures();
+    BatchStatisticsQuery queryWithoutFailures = managementService.createBatchStatisticsQuery().withoutFailures();
+
+    // then
+    assertThat(total).isEqualTo(2);
+
+    final List<BatchStatistics> batchWithFailures = queryWithFailures.list();
+    assertThat(batchWithFailures).hasSize(1);
+    assertThat(queryWithFailures.count()).isEqualTo(1);
+    final BatchStatistics batch1Statistics = batchWithFailures.get(0);
+    assertThat(batch1Statistics.getId()).isEqualTo(batch1.getId());
+    assertThat(batch1Statistics.getFailedJobs()).isEqualTo(1);
+    assertThat(batch1Statistics.getTotalJobs()).isEqualTo(2);
+
+    final List<BatchStatistics> batchWithoutFailures = queryWithoutFailures.list();
+    assertThat(batchWithoutFailures).hasSize(1);
+    assertThat(queryWithoutFailures.count()).isEqualTo(1);
+    final BatchStatistics batch2Statistics = batchWithoutFailures.get(0);
+    assertThat(batch2Statistics.getId()).isEqualTo(batch2.getId());
+    assertThat(batch2Statistics.getFailedJobs()).isZero();
+    assertThat(batch2Statistics.getTotalJobs()).isEqualTo(1);
+  }
+
+  @Test
+  public void shouldQueryByStartedAfter() {
+    // given
+    final long oneMin = 60 * 1000L;
+    ClockUtil.setCurrentTime(ClockUtil.getCurrentTime());
+    final Date oneMinLater = new Date(ClockUtil.getCurrentTime().getTime() + oneMin);
+    final Date oneMinEarlier= new Date(ClockUtil.getCurrentTime().getTime() - oneMin);
+    final Batch batch = helper.migrateProcessInstancesAsync(1);
+
+    // when
+    BatchStatisticsQuery query1 = managementService.createBatchStatisticsQuery().startedAfter(oneMinEarlier);
+    BatchStatisticsQuery query2 = managementService.createBatchStatisticsQuery().startedAfter(oneMinLater);
+
+    // then
+    final List<BatchStatistics> batchStatistics = query1.list();
+    assertThat(batchStatistics.get(0).getId()).isEqualTo(batch.getId());
+    assertThat(batchStatistics.get(0).getStartTime()).isEqualToIgnoringMillis(ClockUtil.getCurrentTime());
+    assertThat(batchStatistics).hasSize(1);
+    assertThat(query1.count()).isEqualTo(1);
+
+    assertThat(query2.count()).isEqualTo(0);
+    assertThat(query2.list()).hasSize(0);
+  }
+
+  @Test
+  public void shouldQueryByStartedBefore() {
+    // given
+    final long oneMin = 60 * 1000L;
+    ClockUtil.setCurrentTime(ClockUtil.getCurrentTime());
+    final Date oneMinLater = new Date(ClockUtil.getCurrentTime().getTime() + oneMin);
+    final Date oneMinEarlier= new Date(ClockUtil.getCurrentTime().getTime() - oneMin);
+    final Batch batch = helper.migrateProcessInstancesAsync(1);
+
+    // when
+    BatchStatisticsQuery query1 = managementService.createBatchStatisticsQuery().startedBefore(oneMinEarlier);
+    BatchStatisticsQuery query2 = managementService.createBatchStatisticsQuery().startedBefore(oneMinLater);
+
+    // then
+    assertThat(query1.count()).isEqualTo(0);
+    assertThat(query1.list()).hasSize(0);
+
+    final List<BatchStatistics> batchStatistics = query2.list();
+    assertThat(batchStatistics.get(0).getId()).isEqualTo(batch.getId());
+    assertThat(batchStatistics.get(0).getStartTime()).isEqualToIgnoringMillis(ClockUtil.getCurrentTime());
+    assertThat(batchStatistics).hasSize(1);
+    assertThat(query2.count()).isEqualTo(1);
+  }
+
+  @Test
+  public void shouldQueryByCreatedBy() {
+    // given
+    engineRule.getIdentityService().setAuthenticatedUserId("user1");
+    final Batch batch1 = helper.migrateProcessInstancesAsync(1);
+    engineRule.getIdentityService().setAuthenticatedUserId("user2");
+    final Batch batch2 = helper.migrateProcessInstancesAsync(1);
+
+    // when
+    BatchStatisticsQuery query1 = managementService.createBatchStatisticsQuery().createdBy("user1");
+    BatchStatisticsQuery query2 = managementService.createBatchStatisticsQuery().createdBy("user2");
+    BatchStatisticsQuery query3 = managementService.createBatchStatisticsQuery().createdBy("user3");
+
+    // then
+    final BatchStatistics user1Batch = query1.list().get(0);
+    assertThat(user1Batch.getId()).isEqualTo(batch1.getId());
+    assertThat(user1Batch.getCreateUserId()).isEqualTo(batch1.getCreateUserId());
+    assertThat(query1.list()).hasSize(1);
+    assertThat(query1.count()).isEqualTo(1);
+
+    final BatchStatistics user2Batch = query2.list().get(0);
+    assertThat(user2Batch.getId()).isEqualTo(batch2.getId());
+    assertThat(user2Batch.getCreateUserId()).isEqualTo(batch2.getCreateUserId());
+    assertThat(query2.list()).hasSize(1);
+    assertThat(query2.count()).isEqualTo(1);
+
+    assertThat(query3.list()).hasSize(0);
+    assertThat(query3.count()).isEqualTo(0);
   }
 
   protected void deleteMigrationJobs(Batch batch) {

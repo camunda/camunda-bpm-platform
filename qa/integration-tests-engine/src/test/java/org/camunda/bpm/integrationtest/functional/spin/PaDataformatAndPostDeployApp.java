@@ -20,7 +20,6 @@ import static org.junit.Assert.assertNotNull;
 
 import org.camunda.bpm.application.PostDeploy;
 import org.camunda.bpm.application.ProcessApplication;
-import org.camunda.bpm.application.impl.ServletProcessApplication;
 import org.camunda.bpm.engine.ProcessEngine;
 
 
@@ -29,7 +28,8 @@ import org.camunda.bpm.engine.ProcessEngine;
  *
  */
 @ProcessApplication(PaDataformatAndPostDeployApp.PA_NAME)
-public class PaDataformatAndPostDeployApp extends ServletProcessApplication {
+// Using fully-qualified class name instead of import statement to allow for automatic Jakarta transformation
+public class PaDataformatAndPostDeployApp extends org.camunda.bpm.application.impl.ServletProcessApplication {
 
   public final static String PA_NAME  = "PaDataformatAndPostDeployApp";
 

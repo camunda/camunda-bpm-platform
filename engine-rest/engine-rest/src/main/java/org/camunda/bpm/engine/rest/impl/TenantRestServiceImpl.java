@@ -20,14 +20,13 @@ import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
 import static org.camunda.bpm.engine.authorization.Resources.TENANT;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
 import java.util.List;
-
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.TenantQuery;
@@ -40,8 +39,7 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.identity.TenantResource;
 import org.camunda.bpm.engine.rest.sub.identity.impl.TenantResourceImpl;
 import org.camunda.bpm.engine.rest.util.PathUtil;
-
-import com.fasterxml.jackson.databind.ObjectMapper;;
+import org.camunda.bpm.engine.rest.util.QueryUtil;;
 
 public class TenantRestServiceImpl extends AbstractAuthorizedRestResource implements TenantRestService {
 
@@ -49,26 +47,24 @@ public class TenantRestServiceImpl extends AbstractAuthorizedRestResource implem
     super(engineName, TENANT, ANY, objectMapper);
   }
 
+  @Override
   public TenantResource getTenant(String id) {
     id = PathUtil.decodePathParam(id);
     return new TenantResourceImpl(getProcessEngine().getName(), id, relativeRootResourcePath, getObjectMapper());
   }
 
+  @Override
   public List<TenantDto> queryTenants(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
     TenantQueryDto queryDto = new TenantQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
 
     TenantQuery query = queryDto.toQuery(getProcessEngine());
 
-    List<Tenant> tenants;
-    if (firstResult != null || maxResults != null) {
-      tenants = executePaginatedQuery(query, firstResult, maxResults);
-    } else {
-      tenants = query.list();
-    }
+    List<Tenant> tenants = QueryUtil.list(query, firstResult, maxResults);
 
     return TenantDto.fromTenantList(tenants );
   }
 
+  @Override
   public CountResultDto getTenantCount(UriInfo uriInfo) {
     TenantQueryDto queryDto = new TenantQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
 
@@ -78,6 +74,7 @@ public class TenantRestServiceImpl extends AbstractAuthorizedRestResource implem
     return new CountResultDto(count);
   }
 
+  @Override
   public void createTenant(TenantDto dto) {
 
     if (getIdentityService().isReadOnly()) {
@@ -90,6 +87,7 @@ public class TenantRestServiceImpl extends AbstractAuthorizedRestResource implem
     getIdentityService().saveTenant(newTenant);
   }
 
+  @Override
   public ResourceOptionsDto availableOperations(UriInfo context) {
 
     UriBuilder baseUriBuilder = context.getBaseUriBuilder()
@@ -113,16 +111,6 @@ public class TenantRestServiceImpl extends AbstractAuthorizedRestResource implem
     }
 
     return resourceOptionsDto;
-  }
-
-  protected List<Tenant> executePaginatedQuery(TenantQuery query, Integer firstResult, Integer maxResults) {
-    if (firstResult == null) {
-      firstResult = 0;
-    }
-    if (maxResults == null) {
-      maxResults = Integer.MAX_VALUE;
-    }
-    return query.listPage(firstResult, maxResults);
   }
 
   protected IdentityService getIdentityService() {

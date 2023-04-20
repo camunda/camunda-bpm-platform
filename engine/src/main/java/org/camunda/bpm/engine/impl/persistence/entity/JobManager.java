@@ -178,10 +178,8 @@ public class JobManager extends AbstractManager {
 
   protected boolean isJobPriorityInJobExecutorPriorityRange(long jobPriority) {
     ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
-    Long jobExecutorPriorityRangeMin = configuration.getJobExecutorPriorityRangeMin();
-    Long jobExecutorPriorityRangeMax = configuration.getJobExecutorPriorityRangeMax();
-    return (jobExecutorPriorityRangeMin == null || jobExecutorPriorityRangeMin <= jobPriority)
-        && (jobExecutorPriorityRangeMax == null || jobExecutorPriorityRangeMax >= jobPriority);
+    return (configuration.getJobExecutorPriorityRangeMin() <= jobPriority)
+        && (configuration.getJobExecutorPriorityRangeMax() >= jobPriority);
   }
 
   public void cancelTimers(ExecutionEntity execution) {
@@ -215,8 +213,11 @@ public class JobManager extends AbstractManager {
       }
     }
 
-    params.put("jobPriorityMin", engineConfiguration.getJobExecutorPriorityRangeMin());
-    params.put("jobPriorityMax", engineConfiguration.getJobExecutorPriorityRangeMax());
+    boolean jobExecutorAcquireByPriority = engineConfiguration.isJobExecutorAcquireByPriority();
+    long jobExecutorPriorityRangeMin = engineConfiguration.getJobExecutorPriorityRangeMin();
+    long jobExecutorPriorityRangeMax = engineConfiguration.getJobExecutorPriorityRangeMax();
+    params.put("jobPriorityMin", jobExecutorAcquireByPriority && jobExecutorPriorityRangeMin != Long.MIN_VALUE ? jobExecutorPriorityRangeMin : null);
+    params.put("jobPriorityMax", jobExecutorAcquireByPriority && jobExecutorPriorityRangeMax != Long.MAX_VALUE ? jobExecutorPriorityRangeMax : null);
 
     params.put("historyCleanupEnabled", engineConfiguration.isHistoryCleanupEnabled());
 
@@ -389,10 +390,12 @@ public class JobManager extends AbstractManager {
     getDbEntityManager().update(JobEntity.class, "updateJobSuspensionStateByParameters", configureParameterizedQuery(parameters));
   }
 
-  public void updateFailedJobRetriesByJobDefinitionId(String jobDefinitionId, int retries) {
+  public void updateFailedJobRetriesByJobDefinitionId(String jobDefinitionId, int retries, Date dueDate, boolean isDueDateSet) {
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("jobDefinitionId", jobDefinitionId);
     parameters.put("retries", retries);
+    parameters.put("dueDate", dueDate);
+    parameters.put("isDueDateSet", isDueDateSet);
     getDbEntityManager().update(JobEntity.class, "updateFailedJobRetriesByParameters", parameters);
   }
 

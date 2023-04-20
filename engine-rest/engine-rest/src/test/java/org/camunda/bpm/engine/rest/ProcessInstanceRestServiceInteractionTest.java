@@ -19,28 +19,47 @@ package org.camunda.bpm.engine.rest;
 import static io.restassured.RestAssured.given;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockBatch;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockHistoricProcessInstance;
 import static org.camunda.bpm.engine.rest.util.DateTimeUtils.DATE_FORMAT_WITH_TIMEZONE;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.RETURNS_DEFAULTS;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
-
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NullValueException;
@@ -49,16 +68,19 @@ import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.HistoryServiceImpl;
 import org.camunda.bpm.engine.impl.ManagementServiceImpl;
+import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
 import org.camunda.bpm.engine.impl.batch.BatchEntity;
+import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.util.IoUtil;
+import org.camunda.bpm.engine.management.SetJobRetriesByProcessAsyncBuilder;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceSuspensionStateDto;
-import org.camunda.bpm.engine.rest.dto.runtime.SetJobRetriesByProcessDto;
 import org.camunda.bpm.engine.rest.dto.runtime.batch.CorrelationMessageAsyncDto;
 import org.camunda.bpm.engine.rest.dto.runtime.batch.DeleteProcessInstancesDto;
 import org.camunda.bpm.engine.rest.dto.runtime.batch.SetVariablesAsyncDto;
@@ -86,6 +108,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateSelectBuilder;
 import org.camunda.bpm.engine.runtime.UpdateProcessInstanceSuspensionStateTenantBuilder;
 import org.camunda.bpm.engine.runtime.UpdateProcessInstancesSuspensionStateBuilder;
+import org.camunda.bpm.engine.task.Comment;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.SerializableValueType;
@@ -100,11 +123,6 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.TypeFactory;
-import io.restassured.http.ContentType;
-import io.restassured.response.Response;
 import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
 
@@ -122,6 +140,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
   protected static final String PROCESS_INSTANCE_URL = TEST_RESOURCE_ROOT_PATH + "/process-instance";
   protected static final String SINGLE_PROCESS_INSTANCE_URL = PROCESS_INSTANCE_URL + "/{id}";
   protected static final String PROCESS_INSTANCE_VARIABLES_URL = SINGLE_PROCESS_INSTANCE_URL + "/variables";
+  protected static final String PROCESS_INSTANCE_COMMENTS_URL = SINGLE_PROCESS_INSTANCE_URL + "/comment";
   protected static final String DELETE_PROCESS_INSTANCES_ASYNC_URL = PROCESS_INSTANCE_URL + "/delete";
   protected static final String DELETE_PROCESS_INSTANCES_ASYNC_HIST_QUERY_URL = PROCESS_INSTANCE_URL + "/delete-historic-query-based";
   protected static final String SET_JOB_RETRIES_ASYNC_URL = PROCESS_INSTANCE_URL + "/job-retries";
@@ -158,13 +177,19 @@ public class ProcessInstanceRestServiceInteractionTest extends
           .objectTypeName(ExampleVariableObject.class.getName()));
   }
 
+  private List<Comment> mockTaskComments;
+  private HistoricProcessInstanceQuery historicProcessInstanceQueryMock;
+
   private RuntimeServiceImpl runtimeServiceMock;
   private ManagementServiceImpl mockManagementService;
   private HistoryServiceImpl historyServiceMock;
+  private TaskService taskServiceMock;
 
   private UpdateProcessInstanceSuspensionStateTenantBuilder mockUpdateSuspensionStateBuilder;
   private UpdateProcessInstanceSuspensionStateSelectBuilder mockUpdateSuspensionStateSelectBuilder;
   private UpdateProcessInstancesSuspensionStateBuilder mockUpdateProcessInstancesSuspensionStateBuilder;
+
+  private SetJobRetriesByProcessAsyncBuilder mockSetJobRetriesByProcessAsyncBuilder;
 
   @Before
   public void setUpRuntimeData() {
@@ -193,11 +218,34 @@ public class ProcessInstanceRestServiceInteractionTest extends
     when(mockUpdateSuspensionStateSelectBuilder.byProcessInstanceQuery(any())).thenReturn(mockUpdateProcessInstancesSuspensionStateBuilder);
     when(mockUpdateSuspensionStateSelectBuilder.byHistoricProcessInstanceQuery(any())).thenReturn(mockUpdateProcessInstancesSuspensionStateBuilder);
 
+    // tasks and task service
+    taskServiceMock = mock(TaskService.class);
+    when(processEngine.getTaskService()).thenReturn(taskServiceMock);
+
+    mockTaskComments = MockProvider.createMockTaskComments();
+    when(taskServiceMock.getProcessInstanceComments(EXAMPLE_PROCESS_INSTANCE_ID)).thenReturn(mockTaskComments);
+
+    historicProcessInstanceQueryMock = mock(HistoricProcessInstanceQuery.class);
+    when(historyServiceMock.createHistoricProcessInstanceQuery()).thenReturn(historicProcessInstanceQueryMock);
+    when(historicProcessInstanceQueryMock.processInstanceId(eq(EXAMPLE_PROCESS_INSTANCE_ID))).thenReturn(historicProcessInstanceQueryMock);
+    HistoricProcessInstance historicProcessInstanceMock = createMockHistoricProcessInstance();
+    when(historicProcessInstanceQueryMock.singleResult()).thenReturn(historicProcessInstanceMock);
+
     // runtime service
     when(processEngine.getRuntimeService()).thenReturn(runtimeServiceMock);
     when(processEngine.getManagementService()).thenReturn(mockManagementService);
     when(processEngine.getHistoryService()).thenReturn(historyServiceMock);
 
+    // jobs
+    mockSetJobRetriesByProcessAsyncBuilder = MockProvider.createMockSetJobRetriesByProcessAsyncBuilder(mockManagementService);
+  }
+
+  public void mockHistoryFull() {
+    when(mockManagementService.getHistoryLevel()).thenReturn(ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL);
+  }
+
+  public void mockHistoryDisabled() {
+    when(mockManagementService.getHistoryLevel()).thenReturn(ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE);
   }
 
   @Test
@@ -309,7 +357,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
     List<String> ids = Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
     when(runtimeServiceMock.deleteProcessInstancesAsync(any(), any(), any(), anyBoolean(), anyBoolean())).thenReturn(new BatchEntity());
 
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> messageBodyJson = new HashMap<>();
     messageBodyJson.put("processInstanceIds", ids);
     messageBodyJson.put(DELETE_REASON, TEST_DELETE_REASON);
 
@@ -324,7 +372,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
   @Test
   public void testDeleteAsyncWithQuery() {
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> messageBodyJson = new HashMap<>();
     messageBodyJson.put(DELETE_REASON, TEST_DELETE_REASON);
     ProcessInstanceQueryDto query = new ProcessInstanceQueryDto();
     messageBodyJson.put("processInstanceQuery", query);
@@ -345,7 +393,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
     doThrow(new BadUserRequestException("process instance ids are empty"))
       .when(runtimeServiceMock).deleteProcessInstancesAsync(eq((List<String>) null), eq((ProcessInstanceQuery) null), anyString(), anyBoolean(), anyBoolean());
 
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> messageBodyJson = new HashMap<>();
     messageBodyJson.put(DELETE_REASON, TEST_DELETE_REASON);
 
     given()
@@ -358,7 +406,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
   @Test
   public void testDeleteAsyncWithSkipCustomListeners() {
     when(runtimeServiceMock.deleteProcessInstancesAsync(any(), any(), any(), anyBoolean(), anyBoolean())).thenReturn(new BatchEntity());
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> messageBodyJson = new HashMap<>();
     messageBodyJson.put(DELETE_REASON, TEST_DELETE_REASON);
     messageBodyJson.put("processInstanceIds", Arrays.asList("processInstanceId1", "processInstanceId2"));
     messageBodyJson.put("skipCustomListeners", true);
@@ -375,7 +423,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
   @Test
   public void testDeleteAsyncWithSkipSubprocesses() {
     when(runtimeServiceMock.deleteProcessInstancesAsync(any(), any(), any(), anyBoolean(), anyBoolean())).thenReturn(new BatchEntity());
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> messageBodyJson = new HashMap<>();
     messageBodyJson.put(DELETE_REASON, TEST_DELETE_REASON);
     messageBodyJson.put("processInstanceIds", Arrays.asList("processInstanceId1", "processInstanceId2"));
     messageBodyJson.put("skipSubprocesses", true);
@@ -618,6 +666,39 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .when().get(PROCESS_INSTANCE_VARIABLES_URL);
 
     Assert.assertEquals("Should return exactly one variable", 1, response.jsonPath().getMap("").size());
+  }
+
+  @Test
+  public void testGetProcessInstanceComments() {
+    mockHistoryFull();
+
+    Response response = given()
+      .pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("$.size()", equalTo(1))
+    .when()
+      .get(PROCESS_INSTANCE_COMMENTS_URL);
+
+    verifyTaskComments(mockTaskComments, response);
+    verify(taskServiceMock).getProcessInstanceComments(EXAMPLE_PROCESS_INSTANCE_ID);
+  }
+
+  @Test
+  public void testGetProcessInstanceCommentsWithHistoryDisabled() {
+    mockHistoryDisabled();
+
+    given()
+      .pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("$.size()", equalTo(0))
+    .when()
+      .get(PROCESS_INSTANCE_COMMENTS_URL);
   }
 
   @Test
@@ -991,12 +1072,12 @@ public class ProcessInstanceRestServiceInteractionTest extends
     String variableKey = "aKey";
     int variableValue = 123;
 
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> messageBodyJson = new HashMap<>();
 
     Map<String, Object> modifications = VariablesBuilder.create().variable(variableKey, variableValue).getVariables();
     messageBodyJson.put("modifications", modifications);
 
-    List<String> deletions = new ArrayList<String>();
+    List<String> deletions = new ArrayList<>();
     deletions.add("deleteKey");
     messageBodyJson.put("deletions", deletions);
 
@@ -1004,7 +1085,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
       .when().post(PROCESS_INSTANCE_VARIABLES_URL);
 
-    Map<String, Object> expectedModifications = new HashMap<String, Object>();
+    Map<String, Object> expectedModifications = new HashMap<>();
     expectedModifications.put(variableKey, variableValue);
     verify(runtimeServiceMock).updateVariables(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), argThat(new EqualsMap(expectedModifications)),
         argThat(new EqualsList(deletions)));
@@ -1016,7 +1097,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
     String variableValue = "1abc";
     String variableType = "Integer";
 
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> messageBodyJson = new HashMap<>();
 
     Map<String, Object> modifications = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
     messageBodyJson.put("modifications", modifications);
@@ -1035,7 +1116,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
     String variableValue = "1abc";
     String variableType = "Short";
 
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> messageBodyJson = new HashMap<>();
 
     Map<String, Object> modifications = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
     messageBodyJson.put("modifications", modifications);
@@ -1054,7 +1135,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
     String variableValue = "1abc";
     String variableType = "Long";
 
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> messageBodyJson = new HashMap<>();
 
     Map<String, Object> modifications = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
     messageBodyJson.put("modifications", modifications);
@@ -1073,7 +1154,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
     String variableValue = "1abc";
     String variableType = "Double";
 
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> messageBodyJson = new HashMap<>();
 
     Map<String, Object> modifications = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
     messageBodyJson.put("modifications", modifications);
@@ -1092,7 +1173,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
     String variableValue = "1abc";
     String variableType = "Date";
 
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> messageBodyJson = new HashMap<>();
 
     Map<String, Object> modifications = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
     messageBodyJson.put("modifications", modifications);
@@ -1111,7 +1192,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
     String variableValue = "1abc";
     String variableType = "X";
 
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> messageBodyJson = new HashMap<>();
 
     Map<String, Object> modifications = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
     messageBodyJson.put("modifications", modifications);
@@ -1130,7 +1211,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
     String variableKey = "aKey";
     int variableValue = 123;
 
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> messageBodyJson = new HashMap<>();
 
     Map<String, Object> modifications = VariablesBuilder.create().variable(variableKey, variableValue).getVariables();
 
@@ -1154,7 +1235,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
   public void testVariableModificationThrowsAuthorizationException() {
     String variableKey = "aKey";
     int variableValue = 123;
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> messageBodyJson = new HashMap<>();
     Map<String, Object> modifications = VariablesBuilder.create().variable(variableKey, variableValue).getVariables();
     messageBodyJson.put("modifications", modifications);
 
@@ -1689,7 +1770,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
   @Test
   public void testPutSingleSerializableVariable() throws Exception {
 
-    ArrayList<String> serializable = new ArrayList<String>();
+    ArrayList<String> serializable = new ArrayList<>();
     serializable.add("foo");
 
     ObjectMapper mapper = new ObjectMapper();
@@ -1714,7 +1795,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
   @Test
   public void testPutSingleSerializableVariableUnsupportedMediaType() throws Exception {
 
-    ArrayList<String> serializable = new ArrayList<String>();
+    ArrayList<String> serializable = new ArrayList<>();
     serializable.add("foo");
 
     ObjectMapper mapper = new ObjectMapper();
@@ -1829,6 +1910,26 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .body("type", Matchers.is(RestException.class.getSimpleName()))
       .body("message", Matchers.is("Cannot put process instance variable " + variableKey + ": expected exception"))
       .when().put(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
+  }
+
+  @Test
+  public void shouldReturnErrorOnSettingVariable() {
+    String variableKey = "aVariableKey";
+    String variableValue = "aVariableValue";
+
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue);
+
+    doThrow(new ProcessEngineException("foo", 123))
+        .when(runtimeServiceMock)
+        .setVariable(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey), any());
+
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+    .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+      .body("type", Matchers.is(RestException.class.getSimpleName()))
+      .body("message", Matchers.is("Cannot put process instance variable aVariableKey: foo"))
+      .body("code", Matchers.is(123))
+    .when().put(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
   }
 
   @Test
@@ -2114,7 +2215,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
   @Test
   public void testActivateProcessInstanceByProcessDefinitionKey() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
 
@@ -2133,7 +2234,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
   @Test
   public void testActivateProcessInstanceByProcessDefinitionKeyWithException() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
 
@@ -2156,7 +2257,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
   @Test
   public void testActivateProcessInstanceByProcessDefinitionKeyThrowsAuthorizationException() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
 
@@ -2180,7 +2281,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
   @Test
   public void testSuspendProcessInstanceByProcessDefinitionKey() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
 
@@ -2199,7 +2300,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
   @Test
   public void testSuspendProcessInstanceByProcessDefinitionKeyWithException() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
 
@@ -2222,7 +2323,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
   @Test
   public void testSuspendProcessInstanceByProcessDefinitionKeyThrowsAuthorizationException() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
 
@@ -2246,7 +2347,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
   @Test
   public void testActivateProcessInstanceByProcessDefinitionKeyAndTenantId() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
     params.put("processDefinitionTenantId", MockProvider.EXAMPLE_TENANT_ID);
@@ -2267,7 +2368,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
   @Test
   public void testActivateProcessInstanceByProcessDefinitionKeyWithoutTenantId() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
     params.put("processDefinitionWithoutTenantId", true);
@@ -2288,7 +2389,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
   @Test
   public void testSuspendProcessInstanceByProcessDefinitionKeyAndTenantId() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
     params.put("processDefinitionTenantId", MockProvider.EXAMPLE_TENANT_ID);
@@ -2309,7 +2410,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
   @Test
   public void testSuspendProcessInstanceByProcessDefinitionKeyWithoutTenantId() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
     params.put("processDefinitionWithoutTenantId", true);
@@ -2330,7 +2431,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
   @Test
   public void testActivateProcessInstanceByProcessDefinitionId() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
 
@@ -2349,7 +2450,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
   @Test
   public void testActivateProcessInstanceByProcessDefinitionIdWithException() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
 
@@ -2372,7 +2473,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
   @Test
   public void testActivateProcessInstanceByProcessDefinitionIdThrowsAuthorizationException() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
 
@@ -2396,7 +2497,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
   @Test
   public void testSuspendProcessInstanceByProcessDefinitionId() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
 
@@ -2415,7 +2516,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
   @Test
   public void testSuspendProcessInstanceByProcessDefinitionIdWithException() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
 
@@ -2438,7 +2539,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
   @Test
   public void testSuspendProcessInstanceByProcessDefinitionIdThrowsAuthorizationException() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
 
@@ -2462,7 +2563,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
   @Test
   public void testActivateProcessInstanceByIdShouldThrowException() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("processInstanceId", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
 
@@ -2482,7 +2583,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
   @Test
   public void testSuspendProcessInstanceByIdShouldThrowException() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("processInstanceId", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
 
@@ -2502,7 +2603,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
   @Test
   public void testSuspendWithMultipleByParameters() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
@@ -2523,7 +2624,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
   @Test
   public void testSuspendProcessInstanceByNothing() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
 
     String message = "Either processDefinitionId or processDefinitionKey should be set to update the suspension state.";
@@ -2544,7 +2645,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
   @Test
   public void testSuspendInstances() {
     List<String> ids = Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> messageBodyJson = new HashMap<>();
     messageBodyJson.put("processInstanceIds", ids);
     messageBodyJson.put("suspended", true);
     given()
@@ -2564,7 +2665,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
   @Test
   public void testActivateInstances() {
     List<String> ids = Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> messageBodyJson = new HashMap<>();
     messageBodyJson.put("processInstanceIds", ids);
     messageBodyJson.put("suspended", false);
 
@@ -2585,7 +2686,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
   public void testSuspendInstancesMultipleGroupOperations() {
     List<String> ids = Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
     ProcessInstanceQueryDto query = new ProcessInstanceQueryDto();
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> messageBodyJson = new HashMap<>();
     messageBodyJson.put("processInstanceIds", ids);
     messageBodyJson.put("processInstanceQuery", query);
     messageBodyJson.put("suspended", true);
@@ -2609,7 +2710,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
   @Test
   public void testSuspendProcessInstanceQuery() {
     ProcessInstanceQueryDto query = new ProcessInstanceQueryDto();
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> messageBodyJson = new HashMap<>();
     messageBodyJson.put("processInstanceQuery", query);
     messageBodyJson.put("suspended", true);
     given()
@@ -2629,7 +2730,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
   @Test
   public void testActivateProcessInstanceQuery() {
     ProcessInstanceQueryDto query = new ProcessInstanceQueryDto();
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> messageBodyJson = new HashMap<>();
     messageBodyJson.put("processInstanceQuery", query);
     messageBodyJson.put("suspended", false);
 
@@ -2650,7 +2751,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
   @Test
   public void testSuspendHistoricProcessInstanceQuery() {
     HistoricProcessInstanceQueryDto query = new HistoricProcessInstanceQueryDto();
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> messageBodyJson = new HashMap<>();
     messageBodyJson.put("historicProcessInstanceQuery", query);
     messageBodyJson.put("suspended", true);
     given()
@@ -2670,7 +2771,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
   @Test
   public void testActivateHistoricProcessInstanceQuery() {
     HistoricProcessInstanceDto query = new HistoricProcessInstanceDto();
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> messageBodyJson = new HashMap<>();
     messageBodyJson.put("historicProcessInstanceQuery", query);
     messageBodyJson.put("suspended", false);
 
@@ -2689,7 +2790,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
   @Test
   public void testSuspendAsyncWithProcessInstances() {
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> messageBodyJson = new HashMap<>();
     List<String> ids = Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
     messageBodyJson.put("processInstanceIds", ids);
     messageBodyJson.put("suspended", true);
@@ -2710,7 +2811,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
   @Test
   public void testActivateAsyncWithProcessInstances() {
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> messageBodyJson = new HashMap<>();
     List<String> ids = Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
     messageBodyJson.put("processInstanceIds", ids);
     messageBodyJson.put("suspended", false);
@@ -2732,7 +2833,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
   @Test
   public void testSuspendAsyncWithProcessInstanceQuery() {
     ProcessInstanceQueryDto query = new ProcessInstanceQueryDto();
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> messageBodyJson = new HashMap<>();
     messageBodyJson.put("processInstanceQuery", query);
     messageBodyJson.put("suspended", true);
 
@@ -2754,7 +2855,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
   @Test
   public void testActivateAsyncWithProcessInstanceQuery() {
     ProcessInstanceQueryDto query = new ProcessInstanceQueryDto();
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> messageBodyJson = new HashMap<>();
     messageBodyJson.put("processInstanceQuery", query);
     messageBodyJson.put("suspended", false);
 
@@ -2774,7 +2875,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
   @Test
   public void testSuspendAsyncWithHistoricProcessInstanceQuery() {
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> messageBodyJson = new HashMap<>();
     List<String> ids = Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
     messageBodyJson.put("processInstanceIds", ids);
     messageBodyJson.put("suspended", true);
@@ -2795,7 +2896,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
   @Test
   public void testActivateAsyncWithHistoricProcessInstanceQuery() {
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> messageBodyJson = new HashMap<>();
     List<String> ids = Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
     messageBodyJson.put("processInstanceIds", ids);
     messageBodyJson.put("suspended", false);
@@ -2818,7 +2919,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
   public void testSuspendAsyncWithMultipleGroupOperations() {
     List<String> ids = Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
     ProcessInstanceQueryDto query = new ProcessInstanceQueryDto();
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> messageBodyJson = new HashMap<>();
     messageBodyJson.put("processInstanceIds", ids);
     messageBodyJson.put("processInstanceQuery", query);
     messageBodyJson.put("suspended", true);
@@ -2841,7 +2942,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
   @Test
   public void testSuspendAsyncWithNothing() {
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> messageBodyJson = new HashMap<>();
     messageBodyJson.put("suspended", true);
 
     String message = "Either processInstanceIds, processInstanceQuery or historicProcessInstanceQuery should be set to update the suspension state.";
@@ -2864,11 +2965,11 @@ public class ProcessInstanceRestServiceInteractionTest extends
     ProcessInstanceModificationInstantiationBuilder mockModificationBuilder = setUpMockModificationBuilder();
     when(runtimeServiceMock.createProcessInstanceModification(anyString())).thenReturn(mockModificationBuilder);
 
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put("skipCustomListeners", true);
     json.put("skipIoMappings", true);
 
-    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+    List<Map<String, Object>> instructions = new ArrayList<>();
 
     instructions.add(ModificationInstructionBuilder.cancellation().activityId("activityId").getJson());
     instructions.add(ModificationInstructionBuilder.cancellation().activityInstanceId("activityInstanceId").getJson());
@@ -2918,9 +3019,9 @@ public class ProcessInstanceRestServiceInteractionTest extends
     ProcessInstanceModificationInstantiationBuilder mockModificationBuilder = setUpMockModificationBuilder();
     when(runtimeServiceMock.createProcessInstanceModification(anyString())).thenReturn(mockModificationBuilder);
 
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
 
-    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+    List<Map<String, Object>> instructions = new ArrayList<>();
 
     instructions.add(
         ModificationInstructionBuilder.startBefore()
@@ -2971,10 +3072,10 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
   @Test
   public void testInvalidModification() {
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
 
     // start before: missing activity id
-    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+    List<Map<String, Object>> instructions = new ArrayList<>();
     instructions.add(ModificationInstructionBuilder.startBefore().getJson());
     json.put("instructions", instructions);
 
@@ -2991,7 +3092,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .post(PROCESS_INSTANCE_MODIFICATION_URL);
 
     // start after: missing ancestor activity instance id
-    instructions = new ArrayList<Map<String, Object>>();
+    instructions = new ArrayList<>();
     instructions.add(ModificationInstructionBuilder.startAfter().getJson());
     json.put("instructions", instructions);
 
@@ -3008,7 +3109,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .post(PROCESS_INSTANCE_MODIFICATION_URL);
 
     // start transition: missing ancestor activity instance id
-    instructions = new ArrayList<Map<String, Object>>();
+    instructions = new ArrayList<>();
     instructions.add(ModificationInstructionBuilder.startTransition().getJson());
     json.put("instructions", instructions);
 
@@ -3025,7 +3126,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .post(PROCESS_INSTANCE_MODIFICATION_URL);
 
     // cancel: missing activity id and activity instance id
-    instructions = new ArrayList<Map<String, Object>>();
+    instructions = new ArrayList<>();
     instructions.add(ModificationInstructionBuilder.cancellation().getJson());
     json.put("instructions", instructions);
 
@@ -3043,7 +3144,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .post(PROCESS_INSTANCE_MODIFICATION_URL);
 
     // cancel: both, activity id and activity instance id, set
-    instructions = new ArrayList<Map<String, Object>>();
+    instructions = new ArrayList<>();
     instructions.add(ModificationInstructionBuilder.cancellation().activityId("anActivityId")
         .activityInstanceId("anActivityInstanceId").getJson());
     json.put("instructions", instructions);
@@ -3071,9 +3172,9 @@ public class ProcessInstanceRestServiceInteractionTest extends
     String message = "expected exception";
     doThrow(new AuthorizationException(message)).when(mockModificationBuilder).execute(anyBoolean(), anyBoolean());
 
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
 
-    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+    List<Map<String, Object>> instructions = new ArrayList<>();
 
     instructions.add(
         ModificationInstructionBuilder.startBefore()
@@ -3112,9 +3213,9 @@ public class ProcessInstanceRestServiceInteractionTest extends
     ProcessInstanceModificationInstantiationBuilder mockModificationBuilder = setUpMockModificationBuilder();
     when(runtimeServiceMock.createProcessInstanceModification(anyString())).thenReturn(mockModificationBuilder);
 
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
 
-    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+    List<Map<String, Object>> instructions = new ArrayList<>();
     instructions.add(
         ModificationInstructionBuilder.startBefore()
           .activityId("activityId")
@@ -3147,16 +3248,92 @@ public class ProcessInstanceRestServiceInteractionTest extends
   @Test
   public void testSetRetriesByProcessAsync() {
     List<String> ids = Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
-    Batch batchEntity = MockProvider.createMockBatch();
-    when(mockManagementService.setJobRetriesAsync(
-        any(),
-        Mockito.<ProcessInstanceQuery>any(),
-        anyInt())
-    ).thenReturn(batchEntity);
 
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> messageBodyJson = new HashMap<>();
     messageBodyJson.put("processInstances", ids);
-    messageBodyJson.put(RETRIES, 5);
+    messageBodyJson.put(RETRIES, MockProvider.EXAMPLE_JOB_RETRIES);
+
+    Response response = given()
+        .contentType(ContentType.JSON)
+        .body(messageBodyJson)
+        .then().expect()
+          .statusCode(Status.OK.getStatusCode())
+        .when()
+          .post(SET_JOB_RETRIES_ASYNC_URL);
+
+    verifyBatchJson(response.asString());
+
+    verify(mockManagementService, times(1)).setJobRetriesByProcessAsync(eq(MockProvider.EXAMPLE_JOB_RETRIES));
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceIds(Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID));
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceQuery(null);
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).executeAsync();
+    verifyNoMoreInteractions(mockSetJobRetriesByProcessAsyncBuilder);
+  }
+
+  @Test
+  public void testSetRetriesByProcessAsyncWithDueDate() {
+    List<String> ids = Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+
+    Map<String, Object> messageBodyJson = new HashMap<>();
+    messageBodyJson.put("processInstances", ids);
+    messageBodyJson.put(RETRIES, MockProvider.EXAMPLE_JOB_RETRIES);
+    Date newDueDate = new Date(1675752840000L);
+    messageBodyJson.put("dueDate", newDueDate);
+
+    Response response =
+        given()
+          .contentType(ContentType.JSON).body(messageBodyJson)
+        .then().expect()
+          .statusCode(Status.OK.getStatusCode())
+        .when()
+          .post(SET_JOB_RETRIES_ASYNC_URL);
+
+    verifyBatchJson(response.asString());
+
+    verify(mockManagementService, times(1)).setJobRetriesByProcessAsync(eq(MockProvider.EXAMPLE_JOB_RETRIES));
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceIds(Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID));
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceQuery(null);
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).dueDate(eq(newDueDate));
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).executeAsync();
+    verifyNoMoreInteractions(mockSetJobRetriesByProcessAsyncBuilder);
+  }
+
+  @Test
+  public void testSetRetriesByProcessAsyncWithNullDueDate() {
+    List<String> ids = Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+
+    Map<String, Object> messageBodyJson = new HashMap<>();
+    messageBodyJson.put("processInstances", ids);
+    messageBodyJson.put(RETRIES, MockProvider.EXAMPLE_JOB_RETRIES);
+    messageBodyJson.put("dueDate", null);
+
+    Response response =
+        given()
+          .contentType(ContentType.JSON).body(messageBodyJson)
+        .then().expect()
+          .statusCode(Status.OK.getStatusCode())
+        .when()
+          .post(SET_JOB_RETRIES_ASYNC_URL);
+
+    verifyBatchJson(response.asString());
+
+    verify(mockManagementService, times(1)).setJobRetriesByProcessAsync(eq(MockProvider.EXAMPLE_JOB_RETRIES));
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceIds(Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID));
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceQuery(null);
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).dueDate(null);
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).executeAsync();
+    verifyNoMoreInteractions(mockSetJobRetriesByProcessAsyncBuilder);
+  }
+
+  @Test
+  public void testSetRetriesByProcessAsyncWithQueryAndDueDate() {
+    when(runtimeServiceMock.createProcessInstanceQuery()).thenReturn(new ProcessInstanceQueryImpl());
+    Map<String, Object> messageBodyJson = new HashMap<>();
+    messageBodyJson.put(RETRIES, MockProvider.EXAMPLE_JOB_RETRIES);
+    ProcessInstanceQueryDto query = new ProcessInstanceQueryDto();
+    messageBodyJson.put("processInstanceQuery", query);
+    Date newDueDate = new Date(1675752840000L);
+    messageBodyJson.put("dueDate", newDueDate);
 
     Response response = given()
         .contentType(ContentType.JSON).body(messageBodyJson)
@@ -3166,54 +3343,63 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
     verifyBatchJson(response.asString());
 
-    verify(mockManagementService, times(1)).setJobRetriesAsync(
-        eq(ids), eq((ProcessInstanceQuery) null), eq(5));
+    verify(mockManagementService, times(1)).setJobRetriesByProcessAsync(eq(MockProvider.EXAMPLE_JOB_RETRIES));
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceIds(null);
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceQuery(any(ProcessInstanceQuery.class));
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).dueDate(newDueDate);
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).executeAsync();
+    verifyNoMoreInteractions(mockSetJobRetriesByProcessAsyncBuilder);
   }
 
   @Test
   public void testSetRetriesByProcessAsyncWithQuery() {
-    Batch batchEntity = MockProvider.createMockBatch();
-    when(mockManagementService.setJobRetriesAsync(
-        any(),
-        Mockito.<ProcessInstanceQuery>any(),
-        anyInt())
-    ).thenReturn(batchEntity);
-
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
-    messageBodyJson.put(RETRIES, 5);
-    HistoricProcessInstanceQueryDto query = new HistoricProcessInstanceQueryDto();
+    when(runtimeServiceMock.createProcessInstanceQuery()).thenReturn(new ProcessInstanceQueryImpl());
+    Map<String, Object> messageBodyJson = new HashMap<>();
+    messageBodyJson.put(RETRIES, MockProvider.EXAMPLE_JOB_RETRIES);
+    ProcessInstanceQueryDto query = new ProcessInstanceQueryDto();
     messageBodyJson.put("processInstanceQuery", query);
 
-    Response response = given()
-        .contentType(ContentType.JSON).body(messageBodyJson)
+    Response response =
+        given()
+          .contentType(ContentType.JSON).body(messageBodyJson)
         .then().expect()
-        .statusCode(Status.OK.getStatusCode())
-        .when().post(SET_JOB_RETRIES_ASYNC_URL);
+          .statusCode(Status.OK.getStatusCode())
+        .when()
+          .post(SET_JOB_RETRIES_ASYNC_URL);
 
     verifyBatchJson(response.asString());
 
-    verify(mockManagementService, times(1)).setJobRetriesAsync(
-        eq((List<String>) null), Mockito.<ProcessInstanceQuery>any(), Mockito.eq(5));
+    verify(mockManagementService, times(1)).setJobRetriesByProcessAsync(eq(MockProvider.EXAMPLE_JOB_RETRIES));
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceIds(null);
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceQuery(any(ProcessInstanceQuery.class));
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).executeAsync();
+    verifyNoMoreInteractions(mockSetJobRetriesByProcessAsyncBuilder);
   }
 
   @Test
   public void testSetRetriesByProcessWithBadRequestQuery() {
     doThrow(new BadUserRequestException("job ids are empty"))
-        .when(mockManagementService).setJobRetriesAsync(eq((List<String>) null), eq((ProcessInstanceQuery) null), anyInt());
+        .when(mockSetJobRetriesByProcessAsyncBuilder).executeAsync();
 
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
-    messageBodyJson.put(RETRIES, 5);
+    Map<String, Object> messageBodyJson = new HashMap<>();
+    messageBodyJson.put(RETRIES, MockProvider.EXAMPLE_JOB_RETRIES);
 
     given()
         .contentType(ContentType.JSON).body(messageBodyJson)
         .then().expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode())
         .when().post(SET_JOB_RETRIES_ASYNC_URL);
+
+    verify(mockManagementService, times(1)).setJobRetriesByProcessAsync(eq(MockProvider.EXAMPLE_JOB_RETRIES));
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceIds(null);
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceQuery(null);
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).executeAsync();
+    verifyNoMoreInteractions(mockSetJobRetriesByProcessAsyncBuilder);
   }
 
   @Test
   public void testSetRetriesByProcessWithoutRetries() {
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> messageBodyJson = new HashMap<>();
     messageBodyJson.put("processInstances", null);
 
     given()
@@ -3227,103 +3413,166 @@ public class ProcessInstanceRestServiceInteractionTest extends
   @Test
   public void testSetRetriesByProcessWithNegativeRetries() {
     doThrow(new BadUserRequestException("retries are negative"))
-        .when(mockManagementService).setJobRetriesAsync(
-        any(),
-        Mockito.<ProcessInstanceQuery>any(),
-        eq(-1));
+        .when(mockManagementService).setJobRetriesByProcessAsync(eq(MockProvider.EXAMPLE_NEGATIVE_JOB_RETRIES));
 
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
-    messageBodyJson.put(RETRIES, -1);
+    Map<String, Object> messageBodyJson = new HashMap<>();
+    messageBodyJson.put(RETRIES, MockProvider.EXAMPLE_NEGATIVE_JOB_RETRIES);
     HistoricProcessInstanceQueryDto query = new HistoricProcessInstanceQueryDto();
     messageBodyJson.put("processInstanceQuery", query);
 
     given()
-        .contentType(ContentType.JSON).body(messageBodyJson)
-        .then().expect()
-        .statusCode(Status.BAD_REQUEST.getStatusCode())
-        .when().post(SET_JOB_RETRIES_ASYNC_URL);
+      .contentType(ContentType.JSON)
+      .body(messageBodyJson)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when()
+      .post(SET_JOB_RETRIES_ASYNC_URL);
+
+    verify(mockManagementService, times(1)).setJobRetriesByProcessAsync(eq(MockProvider.EXAMPLE_NEGATIVE_JOB_RETRIES));
+    verifyNoMoreInteractions(mockSetJobRetriesByProcessAsyncBuilder);
   }
 
   @Test
   public void testSetRetriesByProcessAsyncHistoricQueryBasedWithQuery() {
-    Batch batchEntity = MockProvider.createMockBatch();
-    when(mockManagementService.setJobRetriesAsync(
-      eq((List<String>)null),
-      eq((ProcessInstanceQuery) null),
-      any(HistoricProcessInstanceQuery.class),
-      anyInt())
-    ).thenReturn(batchEntity);
-
     HistoricProcessInstanceQuery mockedHistoricProcessInstanceQuery = mock(HistoricProcessInstanceQuery.class);
     when(historyServiceMock.createHistoricProcessInstanceQuery()).thenReturn(mockedHistoricProcessInstanceQuery);
     List<HistoricProcessInstance> historicProcessInstances = MockProvider.createMockRunningHistoricProcessInstances();
     when(mockedHistoricProcessInstanceQuery.list()).thenReturn(historicProcessInstances);
 
-    SetJobRetriesByProcessDto body = new SetJobRetriesByProcessDto();
-    body.setRetries(MockProvider.EXAMPLE_JOB_RETRIES);
-    body.setHistoricProcessInstanceQuery(new HistoricProcessInstanceQueryDto());
+    Map<String, Object> body = new HashMap<>();
+    body.put(RETRIES, MockProvider.EXAMPLE_JOB_RETRIES);
+    body.put("historicProcessInstanceQuery", new HistoricProcessInstanceQueryDto());
 
     Response response = given()
       .contentType(ContentType.JSON).body(body)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
-    .when().post(SET_JOB_RETRIES_ASYNC_HIST_QUERY_URL);
+    .when()
+      .post(SET_JOB_RETRIES_ASYNC_HIST_QUERY_URL);
 
     verifyBatchJson(response.asString());
 
-    verify(mockManagementService, times(1)).setJobRetriesAsync(
-        null,
-        null,
-        mockedHistoricProcessInstanceQuery,
-        MockProvider.EXAMPLE_JOB_RETRIES);
+    verify(mockManagementService, times(1)).setJobRetriesByProcessAsync(eq(MockProvider.EXAMPLE_JOB_RETRIES));
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceIds(null);
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).historicProcessInstanceQuery(any());
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).executeAsync();
+    verifyNoMoreInteractions(mockSetJobRetriesByProcessAsyncBuilder);
   }
 
   @Test
-  public void testSetRetriesByProcessAsyncHistoricQueryBasedWithProcessInstanceIds() {
-    Batch batchEntity = MockProvider.createMockBatch();
-    when(mockManagementService.setJobRetriesAsync(
-      anyList(),
-      eq((ProcessInstanceQuery) null),
-      eq((HistoricProcessInstanceQuery) null),
-      anyInt())
-    ).thenReturn(batchEntity);
-
-    SetJobRetriesByProcessDto body = new SetJobRetriesByProcessDto();
-    body.setRetries(MockProvider.EXAMPLE_JOB_RETRIES);
-    body.setProcessInstances(Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID));
-
-    given()
-      .contentType(ContentType.JSON).body(body)
-    .then().expect()
-      .statusCode(Status.OK.getStatusCode())
-    .when().post(SET_JOB_RETRIES_ASYNC_HIST_QUERY_URL);
-
-    verify(mockManagementService, times(1)).setJobRetriesAsync(
-        Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID),
-        null,
-        null,
-        MockProvider.EXAMPLE_JOB_RETRIES);
-  }
-
-  @Test
-  public void testSetRetriesByProcessAsyncHistoricQueryBasedWithQueryAndProcessInstanceIds() {
-    Batch batchEntity = MockProvider.createMockBatch();
-    when(mockManagementService.setJobRetriesAsync(
-      anyList(),
-      eq((ProcessInstanceQuery) null),
-      any(HistoricProcessInstanceQuery.class),
-      anyInt())
-    ).thenReturn(batchEntity);
-
+  public void testSetRetriesByProcessAsyncHistoricQueryBasedWithQueryAndDueDate() {
     HistoricProcessInstanceQuery mockedHistoricProcessInstanceQuery = mock(HistoricProcessInstanceQuery.class);
     when(historyServiceMock.createHistoricProcessInstanceQuery()).thenReturn(mockedHistoricProcessInstanceQuery);
     List<HistoricProcessInstance> historicProcessInstances = MockProvider.createMockRunningHistoricProcessInstances();
     when(mockedHistoricProcessInstanceQuery.list()).thenReturn(historicProcessInstances);
 
-    SetJobRetriesByProcessDto body = new SetJobRetriesByProcessDto();
-    body.setRetries(MockProvider.EXAMPLE_JOB_RETRIES);
-    body.setProcessInstances(Arrays.asList(MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID));
-    body.setHistoricProcessInstanceQuery(new HistoricProcessInstanceQueryDto());
+    Map<String, Object> body = new HashMap<>();
+    body.put(RETRIES, MockProvider.EXAMPLE_JOB_RETRIES);
+    body.put("historicProcessInstanceQueryDto", new HistoricProcessInstanceQueryDto());
+    Date newDueDate = new Date(1675752840000L);
+    body.put("dueDate", newDueDate);
+
+    Response response =
+        given()
+          .contentType(ContentType.JSON).body(body)
+        .then().expect()
+          .statusCode(Status.OK.getStatusCode())
+        .when()
+          .post(SET_JOB_RETRIES_ASYNC_HIST_QUERY_URL);
+
+    verifyBatchJson(response.asString());
+
+    verify(mockManagementService, times(1)).setJobRetriesByProcessAsync(eq(MockProvider.EXAMPLE_JOB_RETRIES));
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceIds(null);
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).historicProcessInstanceQuery(any());
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).dueDate(newDueDate);
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).executeAsync();
+    verifyNoMoreInteractions(mockSetJobRetriesByProcessAsyncBuilder);
+  }
+
+  @Test
+  public void testSetRetriesByProcessAsyncHistoricQueryBasedWithQueryAndNullDueDate() {
+    HistoricProcessInstanceQuery mockedHistoricProcessInstanceQuery = mock(HistoricProcessInstanceQuery.class);
+    when(historyServiceMock.createHistoricProcessInstanceQuery()).thenReturn(mockedHistoricProcessInstanceQuery);
+    List<HistoricProcessInstance> historicProcessInstances = MockProvider.createMockRunningHistoricProcessInstances();
+    when(mockedHistoricProcessInstanceQuery.list()).thenReturn(historicProcessInstances);
+
+    Map<String, Object> body = new HashMap<>();
+    body.put(RETRIES, MockProvider.EXAMPLE_JOB_RETRIES);
+    body.put("historicProcessInstanceQuery", new HistoricProcessInstanceQueryDto());
+    body.put("dueDate",null);
+
+    Response response =
+        given()
+          .contentType(ContentType.JSON).body(body)
+        .then().expect()
+          .statusCode(Status.OK.getStatusCode())
+        .when()
+          .post(SET_JOB_RETRIES_ASYNC_HIST_QUERY_URL);
+
+    verifyBatchJson(response.asString());
+
+    verify(mockManagementService, times(1)).setJobRetriesByProcessAsync(eq(MockProvider.EXAMPLE_JOB_RETRIES));
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceIds(null);
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).historicProcessInstanceQuery(any());
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).dueDate(null);
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).executeAsync();
+    verifyNoMoreInteractions(mockSetJobRetriesByProcessAsyncBuilder);
+  }
+
+  @Test
+  public void testSetRetriesByProcessAsyncHistoricQueryBasedWithProcessInstanceIds() {
+    Map<String, Object> messageBodyJson = new HashMap<>();
+    messageBodyJson.put(RETRIES, MockProvider.EXAMPLE_JOB_RETRIES);
+    messageBodyJson.put("processInstances", Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID));
+
+    given()
+      .contentType(ContentType.JSON).body(messageBodyJson)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when().post(SET_JOB_RETRIES_ASYNC_HIST_QUERY_URL);
+
+    verify(mockManagementService, times(1)).setJobRetriesByProcessAsync(eq(MockProvider.EXAMPLE_JOB_RETRIES));
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceIds(Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID));
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).historicProcessInstanceQuery(null);
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).executeAsync();
+    verifyNoMoreInteractions(mockSetJobRetriesByProcessAsyncBuilder);
+  }
+
+  @Test
+  public void testSetRetriesByProcessAsyncHistoricQueryBasedWithProcessInstanceIdsAndDueDate() {
+    Map<String, Object> body = new HashMap<>();
+    body.put(RETRIES, MockProvider.EXAMPLE_JOB_RETRIES);
+    body.put("processInstances", Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID));
+    Date newDueDate = new Date(1675752840000L);
+    body.put("dueDate", newDueDate);
+
+    given()
+      .contentType(ContentType.JSON).body(body)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(SET_JOB_RETRIES_ASYNC_HIST_QUERY_URL);
+
+    verify(mockManagementService, times(1)).setJobRetriesByProcessAsync(eq(MockProvider.EXAMPLE_JOB_RETRIES));
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceIds(Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID));
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).historicProcessInstanceQuery(null);
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).dueDate(newDueDate);
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).executeAsync();
+    verifyNoMoreInteractions(mockSetJobRetriesByProcessAsyncBuilder);
+  }
+
+  @Test
+  public void testSetRetriesByProcessAsyncHistoricQueryBasedWithQueryAndProcessInstanceIds() {
+    HistoricProcessInstanceQuery mockedHistoricProcessInstanceQuery = mock(HistoricProcessInstanceQuery.class);
+    when(historyServiceMock.createHistoricProcessInstanceQuery()).thenReturn(mockedHistoricProcessInstanceQuery);
+    List<HistoricProcessInstance> historicProcessInstances = MockProvider.createMockRunningHistoricProcessInstances();
+    when(mockedHistoricProcessInstanceQuery.list()).thenReturn(historicProcessInstances);
+
+    Map<String, Object> body = new HashMap<>();
+    body.put(RETRIES, MockProvider.EXAMPLE_JOB_RETRIES);
+    body.put("processInstances", Arrays.asList(MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID));
+    body.put("historicProcessInstanceQuery", new HistoricProcessInstanceQueryDto());
 
     given()
       .contentType(ContentType.JSON).body(body)
@@ -3331,52 +3580,56 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .statusCode(Status.OK.getStatusCode())
     .when().post(SET_JOB_RETRIES_ASYNC_HIST_QUERY_URL);
 
-    verify(mockManagementService, times(1)).setJobRetriesAsync(
-      Arrays.asList(MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID),
-      null,
-      mockedHistoricProcessInstanceQuery,
-      MockProvider.EXAMPLE_JOB_RETRIES);
+    verify(mockManagementService, times(1)).setJobRetriesByProcessAsync(eq(MockProvider.EXAMPLE_JOB_RETRIES));
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceIds(Arrays.asList(MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID));
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).historicProcessInstanceQuery(any());
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).executeAsync();
+    verifyNoMoreInteractions(mockSetJobRetriesByProcessAsyncBuilder);
   }
 
   @Test
   public void testSetRetriesByProcessAsyncHistoricQueryBasedWithBadRequestQuery() {
     doThrow(new BadUserRequestException("jobIds is empty"))
-      .when(mockManagementService).setJobRetriesAsync(eq((List<String>)null),
-        eq((ProcessInstanceQuery) null), eq((HistoricProcessInstanceQuery) null), anyInt());
+      .when(mockSetJobRetriesByProcessAsyncBuilder).executeAsync();
 
-    SetJobRetriesByProcessDto body = new SetJobRetriesByProcessDto();
-    body.setRetries(MockProvider.EXAMPLE_JOB_RETRIES);
+    Map<String, Object> body = new HashMap<>();
+    body.put(RETRIES, MockProvider.EXAMPLE_JOB_RETRIES);
 
     given()
       .contentType(ContentType.JSON).body(body)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
     .when().post(SET_JOB_RETRIES_ASYNC_HIST_QUERY_URL);
+
+    verify(mockManagementService, times(1)).setJobRetriesByProcessAsync(eq(MockProvider.EXAMPLE_JOB_RETRIES));
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).processInstanceIds(null);
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).historicProcessInstanceQuery(null);
+    verify(mockSetJobRetriesByProcessAsyncBuilder, times(1)).executeAsync();
+    verifyNoMoreInteractions(mockSetJobRetriesByProcessAsyncBuilder);
   }
 
   @Test
   public void testSetRetriesByProcessAsyncHistoricQueryBasedWithNegativeRetries() {
     doThrow(new BadUserRequestException("retries are negative"))
-      .when(mockManagementService).setJobRetriesAsync(
-        any(),
-        eq((ProcessInstanceQuery) null),
-        any(),
-        eq(MockProvider.EXAMPLE_NEGATIVE_JOB_RETRIES));
+      .when(mockManagementService).setJobRetriesByProcessAsync(eq(MockProvider.EXAMPLE_NEGATIVE_JOB_RETRIES));
 
     HistoricProcessInstanceQuery mockedHistoricProcessInstanceQuery = mock(HistoricProcessInstanceQuery.class);
     when(historyServiceMock.createHistoricProcessInstanceQuery()).thenReturn(mockedHistoricProcessInstanceQuery);
     List<HistoricProcessInstance> historicProcessInstances = MockProvider.createMockRunningHistoricProcessInstances();
     when(mockedHistoricProcessInstanceQuery.list()).thenReturn(historicProcessInstances);
 
-    SetJobRetriesByProcessDto body = new SetJobRetriesByProcessDto();
-    body.setRetries(MockProvider.EXAMPLE_NEGATIVE_JOB_RETRIES);
-    body.setHistoricProcessInstanceQuery(new HistoricProcessInstanceQueryDto());
+    Map<String, Object> body = new HashMap<>();
+    body.put(RETRIES, MockProvider.EXAMPLE_NEGATIVE_JOB_RETRIES);
+    body.put("historicProcessInstanceQuery", new HistoricProcessInstanceQueryDto());
 
     given()
       .contentType(ContentType.JSON).body(body)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
     .when().post(SET_JOB_RETRIES_ASYNC_HIST_QUERY_URL);
+
+    verify(mockManagementService, times(1)).setJobRetriesByProcessAsync(eq(MockProvider.EXAMPLE_NEGATIVE_JOB_RETRIES));
+    verifyNoMoreInteractions(mockSetJobRetriesByProcessAsyncBuilder);
   }
 
   @Test
@@ -3386,11 +3639,11 @@ public class ProcessInstanceRestServiceInteractionTest extends
     Batch batchMock = createMockBatch();
     when(mockModificationBuilder.executeAsync(anyBoolean(), anyBoolean())).thenReturn(batchMock);
 
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
     json.put("skipCustomListeners", true);
     json.put("skipIoMappings", true);
 
-    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+    List<Map<String, Object>> instructions = new ArrayList<>();
 
     instructions.add(ModificationInstructionBuilder.cancellation().activityId("activityId").getJson());
     instructions.add(ModificationInstructionBuilder.cancellation().activityInstanceId("activityInstanceId").getJson());
@@ -3437,10 +3690,10 @@ public class ProcessInstanceRestServiceInteractionTest extends
 
   @Test
   public void testInvalidModificationAsync() {
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
 
     // start before: missing activity id
-    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+    List<Map<String, Object>> instructions = new ArrayList<>();
     instructions.add(ModificationInstructionBuilder.startBefore().getJson());
     json.put("instructions", instructions);
 
@@ -3457,7 +3710,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .post(PROCESS_INSTANCE_MODIFICATION_ASYNC_URL);
 
     // start after: missing ancestor activity instance id
-    instructions = new ArrayList<Map<String, Object>>();
+    instructions = new ArrayList<>();
     instructions.add(ModificationInstructionBuilder.startAfter().getJson());
     json.put("instructions", instructions);
 
@@ -3474,7 +3727,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .post(PROCESS_INSTANCE_MODIFICATION_ASYNC_URL);
 
     // start transition: missing ancestor activity instance id
-    instructions = new ArrayList<Map<String, Object>>();
+    instructions = new ArrayList<>();
     instructions.add(ModificationInstructionBuilder.startTransition().getJson());
     json.put("instructions", instructions);
 
@@ -3491,7 +3744,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .post(PROCESS_INSTANCE_MODIFICATION_ASYNC_URL);
 
     // cancel: missing activity id and activity instance id
-    instructions = new ArrayList<Map<String, Object>>();
+    instructions = new ArrayList<>();
     instructions.add(ModificationInstructionBuilder.cancellation().getJson());
     json.put("instructions", instructions);
 
@@ -3509,7 +3762,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .post(PROCESS_INSTANCE_MODIFICATION_ASYNC_URL);
 
     // cancel: both, activity id and activity instance id, set
-    instructions = new ArrayList<Map<String, Object>>();
+    instructions = new ArrayList<>();
     instructions.add(ModificationInstructionBuilder.cancellation().activityId("anActivityId")
         .activityInstanceId("anActivityInstanceId").getJson());
     json.put("instructions", instructions);
@@ -3537,9 +3790,9 @@ public class ProcessInstanceRestServiceInteractionTest extends
     String message = "expected exception";
     doThrow(new AuthorizationException(message)).when(mockModificationBuilder).executeAsync(anyBoolean(), anyBoolean());
 
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
 
-    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+    List<Map<String, Object>> instructions = new ArrayList<>();
 
     instructions.add(
         ModificationInstructionBuilder.startBefore()
@@ -3573,9 +3826,9 @@ public class ProcessInstanceRestServiceInteractionTest extends
     Batch batchMock = createMockBatch();
     when(mockModificationBuilder.executeAsync(anyBoolean(), anyBoolean())).thenReturn(batchMock);
 
-    Map<String, Object> json = new HashMap<String, Object>();
+    Map<String, Object> json = new HashMap<>();
 
-    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+    List<Map<String, Object>> instructions = new ArrayList<>();
     instructions.add(ModificationInstructionBuilder.cancellation().activityId("activityId").getJson());
 
     json.put("instructions", instructions);
@@ -3607,8 +3860,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     ProcessInstanceModificationInstantiationBuilder mockModificationBuilder = setUpMockModificationBuilder();
     when(runtimeServiceMock.createProcessInstanceModification(anyString())).thenReturn(mockModificationBuilder);
 
-    Map<String, Object> json = new HashMap<String, Object>();
-    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+    Map<String, Object> json = new HashMap<>();
+    List<Map<String, Object>> instructions = new ArrayList<>();
     instructions.add(ModificationInstructionBuilder.cancellation().activityId("activityId").getJson());
     json.put("instructions", instructions);
 
@@ -3632,8 +3885,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
     Batch batchMock = createMockBatch();
     when(mockModificationBuilder.executeAsync(anyBoolean(), anyBoolean())).thenReturn(batchMock);
 
-    Map<String, Object> json = new HashMap<String, Object>();
-    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+    Map<String, Object> json = new HashMap<>();
+    List<Map<String, Object>> instructions = new ArrayList<>();
     instructions.add(ModificationInstructionBuilder.cancellation().activityId("activityId").getJson());
     json.put("instructions", instructions);
 
@@ -3708,8 +3961,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
           .body(body)
         .then().expect()
           .statusCode(Status.BAD_REQUEST.getStatusCode())
-          .body(Matchers.containsString("{\"type\":\"InvalidRequestException\"," +
-              "\"message\":\"Cannot set variables: Unsupported value type 'unknown'\"}"))
+          .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+          .body("message", equalTo("Cannot set variables: Unsupported value type 'unknown'"))
         .when()
           .post(PROCESS_INSTANCE_SET_VARIABLES_ASYNC_URL);
   }
@@ -3730,8 +3983,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
           .body("{}")
         .then().expect()
           .statusCode(Status.BAD_REQUEST.getStatusCode())
-          .body(Matchers.containsString("{\"type\":\"InvalidRequestException\"," +
-              "\"message\":\"message\"}"))
+          .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+          .body("message", equalTo("message"))
         .when()
           .post(PROCESS_INSTANCE_SET_VARIABLES_ASYNC_URL);
   }
@@ -3765,7 +4018,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
           .body("{}")
         .then().expect()
           .statusCode(Status.BAD_REQUEST.getStatusCode())
-          .body(Matchers.containsString("{\"type\":\"InvalidRequestException\",\"message\":\"message\"}"))
+          .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+          .body("message", equalTo("message"))
         .when()
           .post(PROCESS_INSTANCE_SET_VARIABLES_ASYNC_URL);
   }
@@ -3782,7 +4036,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
           .body("{}")
         .then().expect()
           .statusCode(Status.BAD_REQUEST.getStatusCode())
-          .body(Matchers.containsString("{\"type\":\"BadUserRequestException\",\"message\":\"message\"}"))
+          .body("type", equalTo(BadUserRequestException.class.getSimpleName()))
+          .body("message", equalTo("message"))
         .when()
           .post(PROCESS_INSTANCE_SET_VARIABLES_ASYNC_URL);
   }
@@ -3939,8 +4194,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .body("{}")
     .then().expect()
       .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
-      .body(Matchers.containsString("{\"type\":\"ProcessEngineException\"," +
-          "\"message\":\"message\"}"))
+      .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
+      .body("message", equalTo("message"))
     .when()
       .post(PROCESS_INSTANCE_CORRELATE_MESSAGE_ASYNC_URL);
   }
@@ -3972,7 +4227,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .body("{}")
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body(Matchers.containsString("{\"type\":\"InvalidRequestException\",\"message\":\"message\"}"))
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("message"))
     .when()
       .post(PROCESS_INSTANCE_CORRELATE_MESSAGE_ASYNC_URL);
   }
@@ -3988,7 +4244,8 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .body("{}")
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body(Matchers.containsString("{\"type\":\"BadUserRequestException\",\"message\":\"message\"}"))
+      .body("type", equalTo(BadUserRequestException.class.getSimpleName()))
+      .body("message", equalTo("message"))
     .when()
       .post(PROCESS_INSTANCE_CORRELATE_MESSAGE_ASYNC_URL);
   }
@@ -4134,5 +4391,27 @@ public class ProcessInstanceRestServiceInteractionTest extends
     assertEquals(MockProvider.EXAMPLE_MONITOR_JOB_DEFINITION_ID, batch.getMonitorJobDefinitionId());
     assertEquals(MockProvider.EXAMPLE_BATCH_JOB_DEFINITION_ID, batch.getBatchJobDefinitionId());
     assertEquals(MockProvider.EXAMPLE_TENANT_ID, batch.getTenantId());
+  }
+
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  private void verifyTaskComments(List<Comment> mockTaskComments, Response response) {
+    List list = response.as(List.class);
+    assertEquals(1, list.size());
+
+    LinkedHashMap<String, String> resourceHashMap = (LinkedHashMap<String, String>) list.get(0);
+
+    String returnedId = resourceHashMap.get("id");
+    String returnedUserId = resourceHashMap.get("userId");
+    String returnedTaskId = resourceHashMap.get("taskId");
+    Date returnedTime = DateTimeUtil.parseDate(resourceHashMap.get("time"));
+    String returnedFullMessage = resourceHashMap.get("message");
+
+    Comment mockComment = mockTaskComments.get(0);
+
+    assertEquals(mockComment.getId(), returnedId);
+    assertEquals(mockComment.getTaskId(), returnedTaskId);
+    assertEquals(mockComment.getUserId(), returnedUserId);
+    assertEquals(mockComment.getTime(), returnedTime);
+    assertEquals(mockComment.getFullMessage(), returnedFullMessage);
   }
 }

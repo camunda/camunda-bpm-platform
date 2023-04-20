@@ -50,7 +50,7 @@ public class MigrationRestServiceImpl extends AbstractRestProcessEngineAware imp
   }
 
   public MigrationPlanDto generateMigrationPlan(MigrationPlanGenerationDto generationDto) {
-    RuntimeService runtimeService = processEngine.getRuntimeService();
+    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
 
     String sourceProcessDefinitionId = generationDto.getSourceProcessDefinitionId();
     String targetProcessDefinitionId = generationDto.getTargetProcessDefinitionId();
@@ -65,7 +65,7 @@ public class MigrationRestServiceImpl extends AbstractRestProcessEngineAware imp
 
       Map<String, VariableValueDto> variableDtos = generationDto.getVariables();
       if (variableDtos != null) {
-        instructionsBuilder.setVariables(toMap(variableDtos, processEngine, objectMapper));
+        instructionsBuilder.setVariables(toMap(variableDtos, getProcessEngine(), objectMapper));
       }
 
       MigrationPlan migrationPlan = instructionsBuilder.build();
@@ -101,7 +101,7 @@ public class MigrationRestServiceImpl extends AbstractRestProcessEngineAware imp
     MigrationPlan migrationPlan = createMigrationPlan(migrationExecution.getMigrationPlan());
     List<String> processInstanceIds = migrationExecution.getProcessInstanceIds();
 
-    MigrationPlanExecutionBuilder executionBuilder = processEngine.getRuntimeService()
+    MigrationPlanExecutionBuilder executionBuilder = getProcessEngine().getRuntimeService()
       .newMigration(migrationPlan).processInstanceIds(processInstanceIds);
 
     ProcessInstanceQueryDto processInstanceQueryDto = migrationExecution.getProcessInstanceQuery();
@@ -123,7 +123,7 @@ public class MigrationRestServiceImpl extends AbstractRestProcessEngineAware imp
 
   protected MigrationPlan createMigrationPlan(MigrationPlanDto migrationPlanDto) {
     try {
-      return MigrationPlanDto.toMigrationPlan(processEngine, objectMapper, migrationPlanDto);
+      return MigrationPlanDto.toMigrationPlan(getProcessEngine(), objectMapper, migrationPlanDto);
     }
     catch (MigrationPlanValidationException e) {
       throw e;

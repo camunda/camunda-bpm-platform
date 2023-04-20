@@ -16,14 +16,15 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+
 import org.camunda.bpm.engine.impl.JobQueryImpl;
 import org.camunda.bpm.engine.impl.batch.BatchElementConfiguration;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.runtime.JobQuery;
-
-import java.util.HashSet;
-import java.util.List;
 
 /**
  * @author Askar Akhmerov
@@ -33,10 +34,12 @@ public class SetJobsRetriesBatchCmd extends AbstractSetJobsRetriesBatchCmd {
   protected List<String> ids;
   protected JobQuery jobQuery;
 
-  public SetJobsRetriesBatchCmd(List<String> ids, JobQuery jobQuery, int retries) {
+  public SetJobsRetriesBatchCmd(List<String> ids, JobQuery jobQuery, int retries, Date dueDate, boolean isDueDateSet) {
     this.jobQuery = jobQuery;
     this.ids = ids;
     this.retries = retries;
+    this.dueDate = dueDate;
+    this.isDueDateSet = isDueDateSet;
   }
 
   protected BatchElementConfiguration collectJobIds(CommandContext commandContext) {

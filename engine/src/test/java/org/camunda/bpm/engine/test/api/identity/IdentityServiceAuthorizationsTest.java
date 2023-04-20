@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.identity;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GLOBAL;
 import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
@@ -55,7 +56,6 @@ import org.camunda.bpm.engine.identity.Tenant;
 import org.camunda.bpm.engine.identity.TenantQuery;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TenantEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -80,7 +80,29 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
   }
 
   @Test
-  public void testUserCreateAuthorizations() {
+  public void shouldCreateTransientUserWithoutPermission() {
+    // given nobody has CREATE permission on USER resource
+    Authorization basePerms = authorizationService.createNewAuthorization(AUTH_TYPE_GLOBAL);
+    basePerms.setResource(USER);
+    basePerms.setResourceId(ANY);
+    basePerms.addPermission(ALL); // add all then remove 'create'
+    basePerms.removePermission(CREATE);
+    authorizationService.saveAuthorization(basePerms);
+
+    processEngineConfiguration.setAuthorizationEnabled(true);
+    identityService.setAuthenticatedUserId(jonny2);
+
+    // when
+    try {
+      identityService.newUser("jonny1");
+    } catch (AuthorizationException e) {
+      // then
+      fail("no authorization exception expected");
+    }
+  }
+
+  @Test
+  public void testUserInsertionAuthorizations() {
 
     // add base permission which allows nobody to create users:
     Authorization basePerms = authorizationService.createNewAuthorization(AUTH_TYPE_GLOBAL);
@@ -93,19 +115,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     processEngineConfiguration.setAuthorizationEnabled(true);
     identityService.setAuthenticatedUserId(jonny2);
 
-    try {
-      identityService.newUser("jonny1");
-      fail("exception expected");
-
-    } catch (AuthorizationException e) {
-      assertEquals(1, e.getMissingAuthorizations().size());
-      MissingAuthorization info = e.getMissingAuthorizations().get(0);
-      assertEquals(jonny2, e.getUserId());
-      assertExceptionInfo(CREATE.getName(), USER.resourceName(), null, info);
-    }
-
-    // circumvent auth check to get new transient userobject
-    User newUser = new UserEntity("jonny1");
+    User newUser = identityService.newUser("jonny1");
 
     try {
       identityService.saveUser(newUser);
@@ -191,9 +201,8 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
   @Test
   public void testUserUpdateAuthorizations() {
 
-    // crate user while still in god-mode:
-    User jonny1 = identityService.newUser("jonny1");
-    identityService.saveUser(jonny1);
+    // insert user while still in god-mode:
+    identityService.saveUser(identityService.newUser("jonny1"));
 
     // create global auth
     Authorization basePerms = authorizationService.createNewAuthorization(AUTH_TYPE_GLOBAL);
@@ -208,13 +217,12 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     identityService.setAuthenticatedUserId(jonny2);
 
     // fetch user:
-    jonny1 = identityService.createUserQuery().singleResult();
+    User jonny1 = identityService.createUserQuery().singleResult();
     jonny1.setFirstName("Jonny");
 
     try {
       identityService.saveUser(jonny1);
       fail("exception expected");
-
     } catch (AuthorizationException e) {
       assertEquals(1, e.getMissingAuthorizations().size());
       MissingAuthorization info = e.getMissingAuthorizations().get(0);
@@ -223,8 +231,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     }
 
     // but I can create a new user:
-    User jonny3 = identityService.newUser("jonny3");
-    identityService.saveUser(jonny3);
+    identityService.saveUser(identityService.newUser("jonny3"));
 
   }
 
@@ -309,7 +316,29 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
   }
 
   @Test
-  public void testGroupCreateAuthorizations() {
+  public void shouldCreateTransientGroupWithoutPermission() {
+    // given nobody has CREATE permission on GROUP resource
+    Authorization basePerms = authorizationService.createNewAuthorization(AUTH_TYPE_GLOBAL);
+    basePerms.setResource(GROUP);
+    basePerms.setResourceId(ANY);
+    basePerms.addPermission(ALL); // add all then remove 'create'
+    basePerms.removePermission(CREATE);
+    authorizationService.saveAuthorization(basePerms);
+
+    processEngineConfiguration.setAuthorizationEnabled(true);
+    identityService.setAuthenticatedUserId(jonny2);
+
+    // when
+    try {
+      identityService.newGroup("group1");
+    } catch (AuthorizationException e) {
+      // then
+      fail("no authorization exception expected");
+    }
+  }
+
+  @Test
+  public void testGroupInsertionAuthorizations() {
 
     // add base permission which allows nobody to create groups:
     Authorization basePerms = authorizationService.createNewAuthorization(AUTH_TYPE_GLOBAL);
@@ -322,19 +351,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     processEngineConfiguration.setAuthorizationEnabled(true);
     identityService.setAuthenticatedUserId(jonny2);
 
-    try {
-      identityService.newGroup("group1");
-      fail("exception expected");
-
-    } catch (AuthorizationException e) {
-      assertEquals(1, e.getMissingAuthorizations().size());
-      MissingAuthorization info = e.getMissingAuthorizations().get(0);
-      assertEquals(jonny2, e.getUserId());
-      assertExceptionInfo(CREATE.getName(), GROUP.resourceName(), null, info);
-    }
-
-    // circumvent auth check to get new transient userobject
-    Group group = new GroupEntity("group1");
+    Group group = identityService.newGroup("group1");
 
     try {
       identityService.saveGroup(group);
@@ -459,7 +476,29 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
   }
 
   @Test
-  public void testTenantCreateAuthorizations() {
+  public void shouldCreateTransientTenantWithoutPermission() {
+    // given nobody has CREATE permission on TENANT resource
+    Authorization basePerms = authorizationService.createNewAuthorization(AUTH_TYPE_GLOBAL);
+    basePerms.setResource(TENANT);
+    basePerms.setResourceId(ANY);
+    basePerms.addPermission(ALL); // add all then remove 'create'
+    basePerms.removePermission(CREATE);
+    authorizationService.saveAuthorization(basePerms);
+
+    processEngineConfiguration.setAuthorizationEnabled(true);
+    identityService.setAuthenticatedUserId(jonny2);
+
+    // when
+    try {
+      identityService.newTenant("tenant");
+    } catch (AuthorizationException e) {
+      // then
+      fail("no authorization exception expected");
+    }
+  }
+
+  @Test
+  public void testTenantInsertionAuthorizations() {
 
     // add base permission which allows nobody to create tenants:
     Authorization basePerms = authorizationService.createNewAuthorization(AUTH_TYPE_GLOBAL);
@@ -472,19 +511,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     processEngineConfiguration.setAuthorizationEnabled(true);
     identityService.setAuthenticatedUserId(jonny2);
 
-    try {
-      identityService.newTenant("tenant");
-
-      fail("exception expected");
-    } catch (AuthorizationException e) {
-      assertEquals(1, e.getMissingAuthorizations().size());
-      MissingAuthorization info = e.getMissingAuthorizations().get(0);
-      assertEquals(jonny2, e.getUserId());
-      assertExceptionInfo(CREATE.getName(), TENANT.resourceName(), null, info);
-    }
-
-    // circumvent auth check to get new transient userobject
-    Tenant tenant = new TenantEntity("tenant");
+    Tenant tenant = identityService.newTenant("tenant");
 
     try {
       identityService.saveTenant(tenant);
@@ -1162,6 +1189,90 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
 
     // now the base permission applies and grants us read access
     assertEquals(1, identityService.createTenantQuery().count());
+  }
+
+  @Test
+  public void shouldDeleteTenantUserMembership() {
+    // given
+    User userOne = identityService.newUser("userOne");
+    identityService.saveUser(userOne);
+
+    User userTwo = identityService.newUser("userTwo");
+    identityService.saveUser(userTwo);
+
+    Tenant tenantOne = identityService.newTenant("tenantOne");
+    identityService.saveTenant(tenantOne);
+
+    engineRule.getProcessEngineConfiguration().setAuthorizationEnabled(true);
+
+    identityService.createTenantUserMembership("tenantOne", "userOne");
+    identityService.createTenantUserMembership("tenantOne", "userTwo");
+
+    // assume
+    List<Authorization> authorizations = engineRule.getAuthorizationService()
+        .createAuthorizationQuery()
+        .list();
+
+    assertThat(authorizations).extracting("resourceId", "userId")
+        .containsExactlyInAnyOrder(
+            tuple("tenantOne", "userOne"),
+            tuple("tenantOne", "userTwo")
+        );
+
+    // when
+    identityService.deleteTenantUserMembership("tenantOne", "userOne");
+
+    // then
+    authorizations = engineRule.getAuthorizationService()
+        .createAuthorizationQuery()
+        .list();
+
+    assertThat(authorizations).extracting("resourceId", "userId")
+        .containsExactly(
+            tuple("tenantOne", "userTwo")
+        );
+  }
+
+  @Test
+  public void shouldDeleteTenantGroupMembership() {
+    // given
+    Group groupOne = identityService.newGroup("groupOne");
+    identityService.saveGroup(groupOne);
+
+    Group groupTwo = identityService.newGroup("groupTwo");
+    identityService.saveGroup(groupTwo);
+
+    Tenant tenantOne = identityService.newTenant("tenantOne");
+    identityService.saveTenant(tenantOne);
+
+    engineRule.getProcessEngineConfiguration().setAuthorizationEnabled(true);
+
+    identityService.createTenantGroupMembership("tenantOne", "groupOne");
+    identityService.createTenantGroupMembership("tenantOne", "groupTwo");
+
+    // assume
+    List<Authorization> authorizations = engineRule.getAuthorizationService()
+        .createAuthorizationQuery()
+        .list();
+
+    assertThat(authorizations).extracting("resourceId", "groupId")
+        .containsExactlyInAnyOrder(
+            tuple("tenantOne", "groupOne"),
+            tuple("tenantOne", "groupTwo")
+        );
+
+    // when
+    identityService.deleteTenantGroupMembership("tenantOne", "groupOne");
+
+    // then
+    authorizations = engineRule.getAuthorizationService()
+        .createAuthorizationQuery()
+        .list();
+
+    assertThat(authorizations).extracting("resourceId", "groupId")
+        .containsExactly(
+            tuple("tenantOne", "groupTwo")
+        );
   }
 
   protected void lockUser(String userId, String invalidPassword) throws ParseException {

@@ -18,34 +18,23 @@ package org.camunda.bpm.integrationtest.functional.cdi;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Callable;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
-import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.authorization.Resources;
-import org.camunda.bpm.engine.cdi.impl.util.ProgrammaticBeanLookup;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
-import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.task.Task;
-import org.camunda.bpm.integrationtest.functional.cdi.beans.ExampleBean;
-import org.camunda.bpm.integrationtest.jobexecutor.beans.PriorityBean;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.camunda.bpm.integrationtest.util.DeploymentHelper;
 import org.camunda.bpm.integrationtest.util.TestContainer;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.ByteArrayAsset;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import static org.camunda.bpm.application.ProcessApplicationContext.withProcessApplicationContext;
 
 @RunWith(Arquillian.class)
 public class CdiBeanResolutionTwoEnginesTest extends AbstractFoxPlatformIntegrationTest {

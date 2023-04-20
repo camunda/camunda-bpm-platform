@@ -1,0 +1,83 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="urn:org.camunda.bpm.jboss:1.1"
+  xmlns="urn:org.camunda.bpm.jboss:1.1"
+  elementFormDefault="qualified"
+  attributeFormDefault="unqualified"
+  version="1.0">
+
+  <xs:element name="subsystem" type="subsystemType" />
+  
+  <xs:complexType name="subsystemType">
+    <xs:all>
+      <xs:element name="process-engines" type="process-enginesType" />
+      <xs:element name="job-executor" type="job-executorType" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:complexType name="process-enginesType">
+    <xs:choice minOccurs="1" maxOccurs="unbounded">
+      <xs:element name="process-engine" type="process-engineType" />
+    </xs:choice>
+  </xs:complexType>
+  
+  <xs:complexType name="process-engineType">
+    <xs:sequence>
+      <xs:element name="datasource" minOccurs="1" maxOccurs="1" />
+      <xs:element name="history-level" minOccurs="0" maxOccurs="1" />
+      <xs:element name="configuration" minOccurs="0" maxOccurs="1" />
+      <xs:element name="properties" type="propertiesType" minOccurs="0" maxOccurs="1" />
+      <xs:element name="plugins" type="pluginsType" minOccurs="0" maxOccurs="1" />
+    </xs:sequence>
+    <xs:attribute name="name" use="required" />
+    <xs:attribute name="default" use="optional" />
+  </xs:complexType>
+  
+  <xs:complexType name="job-executorType">
+    <xs:sequence>
+      <xs:element name="thread-pool-name" minOccurs="0" maxOccurs="1" />
+      <xs:element name="core-threads" minOccurs="1" maxOccurs="1" />
+      <xs:element name="max-threads" minOccurs="1" maxOccurs="1" />
+      <xs:element name="queue-length" minOccurs="1" maxOccurs="1" />
+      <xs:element name="keepalive-time" minOccurs="0" maxOccurs="1" />
+      <xs:element name="allow-core-timeout" minOccurs="0" maxOccurs="1" />
+      <xs:element name="job-acquisitions" type="job-acquisitionsType" minOccurs="1" maxOccurs="1" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="job-acquisitionsType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="job-acquisition" type="job-acquisitionType" />
+    </xs:choice>
+  </xs:complexType>
+  
+  <xs:complexType name="job-acquisitionType">
+    <xs:sequence>
+      <xs:element name="acquisition-strategy" minOccurs="0" maxOccurs="1" />
+      <xs:element name="properties" type="propertiesType" minOccurs="0" maxOccurs="1" />
+    </xs:sequence>
+    <xs:attribute name="name" use="required" />
+  </xs:complexType>
+  
+  <xs:complexType name="propertiesType">
+    <xs:sequence>
+      <xs:element name="property" type="propertyType" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="propertyType" mixed="true">
+    <xs:attribute name="name" use="required" />
+  </xs:complexType>
+
+  <xs:complexType name="pluginsType">
+    <xs:sequence>
+      <xs:element name="plugin" type="pluginType" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="pluginType">
+    <xs:sequence>
+      <xs:element name="class" minOccurs="1" maxOccurs="1" />
+      <xs:element name="properties" type="propertiesType" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>

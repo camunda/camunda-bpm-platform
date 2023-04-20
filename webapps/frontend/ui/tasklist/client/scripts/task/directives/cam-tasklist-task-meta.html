@@ -1,0 +1,146 @@
+<ul class="meta list-inline dates times">
+
+  <li>
+
+    <span cam-widget-inline-field
+          tabindex="0"
+          ng-keydown="openDatepicker($event)"
+          class="followup-date"
+          ng-class="{overdue: task.followUp && (task.followUp < now) }"
+          type="datetime"
+          change="saveFollowUpDate(varValue)"
+          on-start-editing="startEditingFollowUpDate(this)"
+          on-cancel-editing="cancelEditingFollowUpDate(this)"
+          value="task.followUp">
+      <span tooltip-placement="top"
+            uib-tooltip="{{ 'FOLLOW_UP_DATE' | translate }}"
+            class="glyphicon glyphicon-calendar"></span>
+
+      <span ng-if="task.followUp"
+            tooltip-placement="top"
+            uib-tooltip="{{ task.followUp | camDate:'long' }}"
+            am-time-ago="task.followUp">{{ task.followUp }}</span>
+      <a ng-if="!task.followUp"
+         translate="SET_FOLLOW_UP_DATE">Set follow up</a>
+    </span>
+
+    <a href
+       ng-if="task.followUp && !editingState.followUp"
+       tooltip-placement="top"
+       uib-tooltip="{{ 'RESET_FOLLOW_UP_DATE' | translate }}"
+       ng-click="resetFollowUpDate()"
+       class="reset-follow-up-date glyphicon glyphicon-remove">
+    </a>
+
+  </li>
+
+  <li>
+
+    <span cam-widget-inline-field
+          tabindex="0"
+          ng-keydown="openDatepicker($event)"
+          class="due-date"
+          ng-class="{overdue: task.due && (task.due < now) }"
+          type="datetime"
+          change="saveDueDate(varValue)"
+          on-start-editing="startEditingDueDate(this)"
+          on-cancel-editing="cancelEditingDueDate(this)"
+          value="task.due">
+
+      <span tooltip-placement="top"
+            uib-tooltip="{{ 'DUE_DATE' | translate }}"
+            class="glyphicon glyphicon-bell"></span>
+
+      <span ng-if="task.due"
+            tooltip-placement="top"
+            uib-tooltip="{{ task.due | camDate:'long' }}"
+            am-time-ago="task.due">{{ task.due }}</span>
+
+      <a ng-if="!task.due"
+         translate="SET_DUE_DATE">Set due date</a>
+    </span>
+
+    <a href
+       ng-if="task.due && !editingState.due"
+       tooltip-placement="top"
+       uib-tooltip="{{ 'RESET_DUE_DATE' | translate }}"
+       ng-click="resetDueDate()"
+       class="reset-due-date glyphicon glyphicon-remove">
+    </a>
+  </li>
+</ul>
+
+
+<ul class="meta list-inline actors">
+  <li class="groups">
+    <span ng-click="editGroups()">
+      <span tooltip-placement="top"
+            uib-tooltip="{{ 'GROUPS' | translate }}"
+            class="glyphicon glyphicon-th"></span>
+
+      <a href ng-if="groupNames.length > 0">
+        {{ groupNames.join(', ') }}
+      </a>
+
+      <a href ng-if="groupNames.length === 0"
+         translate="ADD_GROUPS">
+        Add groups
+      </a>
+    </span>
+  </li>
+
+  <li class="assignee set-value"
+      ng-if="!hasAssignee()">
+    <span tooltip-placement="top"
+          uib-tooltip="{{ 'ASSIGNEE' | translate }}"
+          class="glyphicon glyphicon-user"></span>
+
+    <button
+       class="claim btn-link"
+       ng-click="claim()"
+       translate="CLAIM_TASK"
+       ng-disabled="submitInProgress">Claim</button>
+  </li>
+
+  <li class="assignee"
+      ng-if="hasAssignee()">
+    <span cam-widget-inline-field
+          tabindex="0"
+          ng-keydown="editAssignee($event)"
+          ng-paste="editAssignee($event)"
+          ng-class="{'has-error': !validAssignee, 'validating': validationInProgress}"
+          class="set-value"
+          type="text"
+          validate="isInvalidUser(this)"
+          change="assign(varValue)"
+          on-start-editing="startEditingAssignee(this)"
+          on-cancel-editing="cancelEditingAssignee(this)"
+          value="assignee.id">
+
+      <span tooltip-placement="top"
+            uib-tooltip="{{ 'ASSIGNEE' | translate }}"
+            class="glyphicon glyphicon-user"></span>
+      <span ng-if="assignee.firstName || assignee.lastName">{{ assignee.firstName }} {{ assignee.lastName }}</span>
+      <span ng-if="!(assignee.firstName || assignee.lastName)">{{ assignee.id }}</span>
+    </span>
+
+    <button
+       ng-if="isAssignee && !editingState.assignee"
+       tooltip-placement="top"
+       uib-tooltip="{{ 'UNCLAIM_TASK' | translate }}"
+       ng-click="unclaim()"
+       ng-disabled="submitInProgress"
+       class="unclaim glyphicon glyphicon-remove btn-link">
+    </button>
+
+    <a href
+       ng-if="!isAssignee && !editingState.assignee"
+       tooltip-placement="top"
+       uib-tooltip="{{ 'RESET_TASK_ASSIGNEE' | translate }}"
+       ng-click="resetAssignee()"
+       class="reset-assignee glyphicon glyphicon-remove">
+    </a>
+
+  </li>
+
+</ul>

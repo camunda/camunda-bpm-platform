@@ -35,6 +35,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,7 +45,6 @@ public class ManagedJobExecutorTest {
 
   @RegisterExtension
   static final QuarkusUnitTest unitTest = new ProcessEngineAwareExtension()
-      .engineConfig(QuarkusProcessEngineConfiguration::new) // Use default config with Job Executor enabled
       .withConfigurationResource("org/camunda/bpm/quarkus/engine/test/config/" +
                                      "job-executor-application.properties")
       .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class));
@@ -66,6 +67,16 @@ public class ManagedJobExecutorTest {
   protected void setUp() {
     processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine
         .getProcessEngineConfiguration();
+  }
+
+  @ApplicationScoped
+  static class EngineConfigurer {
+
+    @Produces
+    public QuarkusProcessEngineConfiguration engineConfiguration() {
+      return new QuarkusProcessEngineConfiguration();
+    }
+
   }
 
   @Test

@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.camunda.bpm.springboot.project</groupId>
     <artifactId>qa-webapp</artifactId>
-    <version>7.17.0</version>
+    <version>7.20.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>qa-webapp-ce-runtime</artifactId>
@@ -82,12 +82,6 @@
         <dependency>
           <groupId>org.seleniumhq.selenium</groupId>
           <artifactId>selenium-java</artifactId>
-          <version>${version.selenium}</version>
-        </dependency>
-
-        <dependency>
-          <groupId>org.seleniumhq.selenium</groupId>
-          <artifactId>selenium-server</artifactId>
           <version>${version.selenium}</version>
         </dependency>
 

@@ -17,6 +17,7 @@
 package org.camunda.bpm;
 
 import com.sun.jersey.api.client.ClientResponse;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -25,9 +26,10 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 public class HttpHeaderSecurityIT extends AbstractWebIntegrationTest {
+
+  public static final String CSP_VALUE = "base-uri 'self';script-src 'nonce-([-_a-zA-Z\\d]*)' 'strict-dynamic' 'unsafe-eval' https: 'self' 'unsafe-inline';style-src 'unsafe-inline' 'self';default-src 'self';img-src 'self' data:;block-all-mixed-content;form-action 'self';frame-ancestors 'none';object-src 'none';sandbox allow-forms allow-scripts allow-same-origin allow-popups allow-downloads";
 
   @Before
   public void createClient() throws Exception {
@@ -45,7 +47,7 @@ public class HttpHeaderSecurityIT extends AbstractWebIntegrationTest {
 
     // then
     assertEquals(200, response.getStatus());
-    assertTrue(isHeaderPresent("X-XSS-Protection", "1; mode=block", response));
+    assertHeaderPresent("X-XSS-Protection", "1; mode=block", response);
 
     // cleanup
     response.close();
@@ -61,7 +63,7 @@ public class HttpHeaderSecurityIT extends AbstractWebIntegrationTest {
 
     // then
     assertEquals(200, response.getStatus());
-    assertTrue(isHeaderPresent("Content-Security-Policy", "base-uri 'self'", response));
+    assertHeaderPresent("Content-Security-Policy", CSP_VALUE, response);
 
     // cleanup
     response.close();
@@ -77,7 +79,7 @@ public class HttpHeaderSecurityIT extends AbstractWebIntegrationTest {
 
     // then
     assertEquals(200, response.getStatus());
-    assertTrue(isHeaderPresent("X-Content-Type-Options", "nosniff", response));
+    assertHeaderPresent("X-Content-Type-Options", "nosniff", response);
 
     // cleanup
     response.close();
@@ -101,17 +103,17 @@ public class HttpHeaderSecurityIT extends AbstractWebIntegrationTest {
     response.close();
   }
 
-  protected boolean isHeaderPresent(String expectedName, String expectedValue, ClientResponse response) {
+  protected void assertHeaderPresent(String expectedName, String expectedValue, ClientResponse response) {
     MultivaluedMap<String, String> headers = response.getHeaders();
 
     List<String> values = headers.get(expectedName);
     for (String value : values) {
-      if (value.equals(expectedValue)) {
-        return true;
+      if (value.matches(expectedValue)) {
+        return;
       }
     }
 
-    return false;
+    Assert.fail(String.format("Header '%s' didn't match.\nExpected:\t%s \nActual:\t%s", expectedName, expectedValue, values));
   }
 
 }

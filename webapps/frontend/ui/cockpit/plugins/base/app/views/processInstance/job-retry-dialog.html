@@ -1,0 +1,107 @@
+<!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/job-retry-dialog.html -->
+<div class="modal-header">
+  <h3>{{ 'PLUGIN_JOB_RETRY_LEGEND_1' | translate }}</h3>
+</div>
+
+<div class="job-retry modal-body">
+  <div notifications-panel></div>
+
+  <div ng-hide="status === 'finished' || status === 'failed'">
+    <p>{{ 'PLUGIN_JOB_RETRY_LEGEND_2' | translate }}</p>
+    <div class="due-date">
+      <p>{{ 'PLUGIN_JOB_RETRY_DUE_DATE_INFO' | translate }}</p>
+      <div class="row">
+        <label class="col-sm-5 form-control-static text-right">
+          {{ 'PLUGIN_JOB_RETRY_DUE_DATE_KEEP' | translate }}
+          <span class="glyphicon glyphicon-question-sign"
+                uib-tooltip="{{ 'PLUGIN_JOB_RETRY_DUE_DATE_KEEP_TOOLTIP' | translate }}"
+                tooltip-placement="right"></span>
+        </label>
+        <div class="col-sm-7">
+          <input type="radio"
+                 name="dueDateMode"
+                 id="preserveDueDate"
+                 class="form-control"
+                 ng-model="radio.value"
+                 value="preserveDueDate"
+                 ng-checked="true">
+        </div>
+      </div>
+      <div class="row">
+        <label class="col-sm-5 form-control-static text-right">
+          {{ 'PLUGIN_JOB_RETRY_DUE_DATE_SET' | translate }}
+          <span class="glyphicon glyphicon-question-sign"
+                uib-tooltip="{{ 'PLUGIN_JOB_RETRY_DUE_DATE_SET_TOOLTIP' | translate }}"
+                tooltip-placement="right"></span>
+        </label>
+        <div class="col-sm-7">
+          <input type="radio"
+                 name="dueDateMode"
+                 id="dueDate"
+                 class="form-control"
+                 ng-model="radio.value"
+                 value="dueDate">
+        </div>
+      </div>
+      <div class="row">
+        <div ng-if="radio.value === 'dueDate'">
+          <label class="col-sm-5 form-control-static text-right">{{ 'PLUGIN_JOB_RETRY_DUE_DATE' | translate }}</label>
+          <div class="col-sm-7">
+              <span cam-widget-inline-field
+                    class="form-control-static"
+                    type="datetime"
+                    change="changeDueDate(varValue)"
+                    value="dueDate"
+                    flexible="true">
+              <a class="form-control-static">{{dueDate}}</a>
+              </span>
+
+            <p class="help-block"
+               ng-show="!dueDate">
+              {{ 'PLUGIN_JOB_RETRY_DUE_DATE_REQUIRED' | translate }}
+            </p>
+
+            <p class="help-block"
+               ng-show="dueDate && !checkDateFormat()">
+              {{ 'PLUGIN_JOB_RETRY_DUE_DATE_PATTERN' | translate }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p>{{ 'PLUGIN_JOB_RETRY_LEGEND_3' | translate }}</p>
+  </div>
+
+  <div ng-show="status === 'finished'">
+    {{ 'PLUGIN_JOB_RETRY_LEGEND_4' | translate }}
+  </div>
+
+  <div ng-show="status === 'failed'">
+    {{ 'PLUGIN_JOB_RETRY_LEGEND_5' | translate }}
+  </div>
+
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-default"
+          ng-click="close(status)"
+          ng-disabled="status === 'performing'"
+          ng-hide="status === 'finished' || status === 'failed'">
+    {{ 'PLUGIN_JOB_RETRY_BTN_CLOSE' | translate }}
+  </button>
+
+  <button type="submit"
+          class="btn btn-primary"
+          ng-click="incrementRetry()"
+          ng-hide="status === 'finished' || status === 'failed'"
+          ng-disabled="checkRetryDisabled()">
+    {{ 'PLUGIN_JOB_RETRY_BTN_RETRY' | translate }}
+  </button>
+
+  <button class="btn btn-primary"
+          ng-click="close(status)"
+          ng-show="status === 'finished' || status === 'failed'">
+    {{ 'PLUGIN_JOB_RETRY_BTN_OK' | translate }}
+  </button>
+</div>
+<!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/job-retry-dialog.html -->

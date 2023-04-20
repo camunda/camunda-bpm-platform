@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.impl.batch.BatchJobHandler;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -133,6 +134,7 @@ public class BatchBuilder {
     batch.setInvocationsPerBatchJob(invocationPerBatchJobCount);
 
     batch.setTenantId(tenantId);
+    batch.setStartTime(ClockUtil.getCurrentTime());
 
     byte[] configAsBytes = jobHandler.writeConfiguration(config);
     batch.setConfigurationBytes(configAsBytes);

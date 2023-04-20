@@ -21,6 +21,7 @@ import static org.camunda.bpm.engine.variable.Variables.stringValue;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,12 +35,14 @@ import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProviderCaseInstance
 import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProviderHistoricDecisionInstanceContext;
 import org.camunda.bpm.engine.impl.cfg.multitenancy.TenantIdProviderProcessInstanceContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.management.ActivityStatisticsQuery;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
@@ -69,6 +72,13 @@ public class TenantIdProviderTest {
   protected static final String DECISION_DEFINITION_KEY = "decision";
   protected static final String CASE_DEFINITION_KEY = "caseTaskCase";
 
+  protected static final BpmnModelInstance TASK_PROCESS = Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY).startEvent().userTask().done();
+  protected static final BpmnModelInstance FAILING_PROCESS = Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY).startEvent()
+      .serviceTask()
+        .camundaClass("org.camunda.bpm.engine.test.api.multitenancy.FailingDelegate")
+        .camundaAsyncBefore()
+      .done();
+
   protected static final String DMN_FILE = "org/camunda/bpm/engine/test/api/multitenancy/simpleDecisionTable.dmn";
 
   protected static final String CMMN_FILE = "org/camunda/bpm/engine/test/api/multitenancy/CaseWithCaseTask.cmmn";
@@ -77,6 +87,7 @@ public class TenantIdProviderTest {
   protected static final String CMMN_SUBPROCESS_FILE = "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn";
 
   protected static final String TENANT_ID = "tenant1";
+  protected static final String TENANT_TWO = "tenant2";
 
   @ClassRule
   public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(CONFIGURATION_RESOURCE);
@@ -1041,6 +1052,152 @@ public class TenantIdProviderTest {
 
     // then
     assertThat(tenantIdProvider.retreivedVariableValue).isEqualTo(variableValue);
+  }
+
+  // query activity instances //////////////////////////////////
+
+  @Test
+  public void shouldQueryForActivityInstancesIncludeIncidentsForTypeGetInstances() {
+    // given
+    testRule.deploy(TASK_PROCESS);
+
+    TestTenantIdProvider.delegate = new StaticTenantIdTestProvider(TENANT_ID);
+    engineRule.getRuntimeService().startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+
+    TestTenantIdProvider.delegate = new StaticTenantIdTestProvider(TENANT_TWO);
+    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+
+    // when
+    engineRule.getIdentityService().setAuthentication("user", null, Collections.singletonList(TENANT_TWO));
+
+    // then
+    ActivityStatisticsQuery query = engineRule.getManagementService()
+        .createActivityStatisticsQuery(processInstance.getProcessDefinitionId())
+        .includeIncidentsForType("foo");
+
+    int instances = query.singleResult().getInstances();
+    assertThat(instances).isEqualTo(1);
+  }
+
+  @Test
+  public void shouldQueryForActivityInstancesIncludeFailedJobsGetInstances() {
+    // given
+    testRule.deploy(TASK_PROCESS);
+
+    TestTenantIdProvider.delegate = new StaticTenantIdTestProvider(TENANT_ID);
+    engineRule.getRuntimeService().startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+
+    TestTenantIdProvider.delegate = new StaticTenantIdTestProvider(TENANT_TWO);
+    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+
+    // when
+    engineRule.getIdentityService().setAuthentication("user", null, Collections.singletonList(TENANT_TWO));
+
+    // then
+    ActivityStatisticsQuery query = engineRule.getManagementService()
+        .createActivityStatisticsQuery(processInstance.getProcessDefinitionId())
+        .includeFailedJobs();
+
+    int instances = query.singleResult().getInstances();
+    assertThat(instances).isEqualTo(1);
+  }
+
+  @Test
+  public void shouldQueryForActivityInstancesIncludeIncidentsGetInstances() {
+    // given
+    testRule.deploy(TASK_PROCESS);
+
+    TestTenantIdProvider.delegate = new StaticTenantIdTestProvider(TENANT_ID);
+    engineRule.getRuntimeService().startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+
+    TestTenantIdProvider.delegate = new StaticTenantIdTestProvider(TENANT_TWO);
+    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+
+    // when
+    engineRule.getIdentityService().setAuthentication("user", null, Collections.singletonList(TENANT_TWO));
+
+    // then
+    ActivityStatisticsQuery query = engineRule.getManagementService()
+        .createActivityStatisticsQuery(processInstance.getProcessDefinitionId())
+        .includeIncidents();
+
+    int instances = query.singleResult().getInstances();
+    assertThat(instances).isEqualTo(1);
+  }
+
+  @Test
+  public void shouldQueryForActivityInstancesIncludeFailedJobsGetJobs() {
+    // given
+    testRule.deploy(FAILING_PROCESS);
+
+    TestTenantIdProvider.delegate = new StaticTenantIdTestProvider(TENANT_ID);
+    engineRule.getRuntimeService().startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+
+    TestTenantIdProvider.delegate = new StaticTenantIdTestProvider(TENANT_TWO);
+    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+
+    testRule.executeAvailableJobs();
+
+    // when
+    engineRule.getIdentityService().setAuthentication("user", null, Collections.singletonList(TENANT_TWO));
+
+    // then
+    ActivityStatisticsQuery query = engineRule.getManagementService()
+        .createActivityStatisticsQuery(processInstance.getProcessDefinitionId())
+        .includeFailedJobs();
+
+    int jobs = query.singleResult().getFailedJobs();
+    assertThat(jobs).isEqualTo(1);
+  }
+
+  @Test
+  public void shouldQueryForActivityInstancesIncludeIncidentsForTypeGetIncidents() {
+    // given
+    testRule.deploy(FAILING_PROCESS);
+
+    TestTenantIdProvider.delegate = new StaticTenantIdTestProvider(TENANT_ID);
+    engineRule.getRuntimeService().startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+
+    TestTenantIdProvider.delegate = new StaticTenantIdTestProvider(TENANT_TWO);
+    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+
+    testRule.executeAvailableJobs();
+
+    // when
+    engineRule.getIdentityService().setAuthentication("user", null, Collections.singletonList(TENANT_TWO));
+
+    // then
+    ActivityStatisticsQuery query = engineRule.getManagementService()
+        .createActivityStatisticsQuery(processInstance.getProcessDefinitionId())
+        .includeIncidentsForType(Incident.FAILED_JOB_HANDLER_TYPE);
+
+    int incidents = query.singleResult().getIncidentStatistics().get(0).getIncidentCount();
+    assertThat(incidents).isEqualTo(1);
+  }
+
+  @Test
+  public void shouldQueryForActivityInstancesIncludeIncidentsGetIncidents() {
+    // given
+    testRule.deploy(FAILING_PROCESS);
+
+    TestTenantIdProvider.delegate = new StaticTenantIdTestProvider(TENANT_ID);
+    engineRule.getRuntimeService().startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+
+    TestTenantIdProvider.delegate = new StaticTenantIdTestProvider(TENANT_TWO);
+    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+
+    testRule.executeAvailableJobs();
+
+    // when
+    engineRule.getIdentityService().setAuthentication("user", null, Collections.singletonList(TENANT_TWO));
+
+    // then
+    ActivityStatisticsQuery query = engineRule.getManagementService()
+        .createActivityStatisticsQuery(processInstance.getProcessDefinitionId())
+        .includeIncidents();
+
+    int incidents = query.singleResult().getIncidentStatistics().get(0).getIncidentCount();
+    assertThat(incidents).isEqualTo(1);
   }
 
   // helpers //////////////////////////////////////////

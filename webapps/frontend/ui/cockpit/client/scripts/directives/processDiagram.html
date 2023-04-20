@@ -1,0 +1,21 @@
+<div class="process-diagram-wrapper" ng-if="diagramEnabled">
+  <div diagram-statistics-loader></div>
+  <div
+    cam-widget-bpmn-viewer
+    diagram-data="diagramData"
+    key="{{key}}"
+    control="control"
+    on-load="onLoad()"
+    on-click="onClick(element, $event)"
+    on-root-change="onRootChange()"
+    on-mouse-enter="onMouseEnter(element, $event)"
+    on-mouse-leave="onMouseLeave(element, $event)"
+    bpmn-js-conf="bpmnJsConf"
+  ></div>
+</div>
+<div ng-if="!diagramEnabled" class="placeholder-container">
+  <div class="placeholder-content">
+    <span class="glyphicon glyphicon-refresh animate-spin"></span>
+    <span class="loading-text">Loading diagram</span>
+  </div>
+</div>

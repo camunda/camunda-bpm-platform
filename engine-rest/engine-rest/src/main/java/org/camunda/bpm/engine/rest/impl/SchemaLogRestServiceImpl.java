@@ -16,17 +16,16 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
-
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
-
 import org.camunda.bpm.engine.management.SchemaLogEntry;
 import org.camunda.bpm.engine.management.SchemaLogQuery;
 import org.camunda.bpm.engine.rest.SchemaLogRestService;
 import org.camunda.bpm.engine.rest.dto.SchemaLogEntryDto;
 import org.camunda.bpm.engine.rest.dto.SchemaLogQueryDto;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.camunda.bpm.engine.rest.util.QueryUtil;
 
 /**
  * @author Miklas Boskamp
@@ -45,23 +44,8 @@ public class SchemaLogRestServiceImpl extends AbstractRestProcessEngineAware imp
 
   @Override
   public List<SchemaLogEntryDto> querySchemaLog(SchemaLogQueryDto dto, Integer firstResult, Integer maxResults) {
-    SchemaLogQuery query = dto.toQuery(processEngine);
-    List<SchemaLogEntry> schemaLogEntries;
-    if (firstResult != null || maxResults != null) {
-      schemaLogEntries = executePaginatedQuery(query, firstResult, maxResults);
-    } else {
-      schemaLogEntries = query.list();
-    }
+    SchemaLogQuery query = dto.toQuery(getProcessEngine());
+    List<SchemaLogEntry> schemaLogEntries = QueryUtil.list(query, firstResult, maxResults);
     return SchemaLogEntryDto.fromSchemaLogEntries(schemaLogEntries);
-  }
-
-  protected List<SchemaLogEntry> executePaginatedQuery(SchemaLogQuery query, Integer firstResult, Integer maxResults) {
-    if (firstResult == null) {
-      firstResult = 0;
-    }
-    if (maxResults == null) {
-      maxResults = Integer.MAX_VALUE;
-    }
-    return query.listPage(firstResult, maxResults);
   }
 }

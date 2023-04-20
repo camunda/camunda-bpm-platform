@@ -43,6 +43,9 @@ public class WebappProperty {
   @NestedConfigurationProperty
   protected HeaderSecurityProperties headerSecurity = new HeaderSecurityProperties();
 
+  @NestedConfigurationProperty
+  protected AuthenticationProperties auth = new AuthenticationProperties();
+
   public boolean isIndexRedirectEnabled() {
     return indexRedirectEnabled;
   }
@@ -115,6 +118,14 @@ public class WebappProperty {
     this.headerSecurity = headerSecurity;
   }
 
+  public AuthenticationProperties getAuth() {
+    return auth;
+  }
+
+  public void setAuth(AuthenticationProperties authentication) {
+    this.auth = authentication;
+  }
+
   @Override
   public String toString() {
     return joinOn(this.getClass())
@@ -125,6 +136,7 @@ public class WebappProperty {
       .add("csrf='" + csrf + '\'')
       .add("headerSecurityProperties='" + headerSecurity + '\'')
       .add("sessionCookie='" + sessionCookie + '\'')
+      .add("auth='" + auth + '\'')
       .toString();
   }
 }

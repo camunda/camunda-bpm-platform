@@ -47,9 +47,9 @@ public class SetAnnotationForIncidentCmd implements Command<Void> {
 
     IncidentEntity incident = (IncidentEntity) commandContext.getIncidentManager().findIncidentById(incidentId);
     EnsureUtil.ensureNotNull(BadUserRequestException.class, "incident", incident);
-
+    ExecutionEntity execution = null;
     if (incident.getExecutionId() != null) {
-      ExecutionEntity execution = commandContext.getExecutionManager().findExecutionById(incident.getExecutionId());
+      execution = commandContext.getExecutionManager().findExecutionById(incident.getExecutionId());
       if (execution != null) {
         // check rights for updating an execution-related incident
         for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
@@ -62,13 +62,14 @@ public class SetAnnotationForIncidentCmd implements Command<Void> {
 
     triggerHistoryEvent(commandContext, incident);
 
+    String tenantId = execution != null ? execution.getTenantId() : null;
     if (annotation == null) {
       commandContext.getOperationLogManager()
-          .logClearIncidentAnnotationOperation(incidentId);
+          .logClearIncidentAnnotationOperation(incidentId, tenantId);
 
     } else {
       commandContext.getOperationLogManager()
-          .logSetIncidentAnnotationOperation(incidentId);
+          .logSetIncidentAnnotationOperation(incidentId, tenantId);
     }
 
     return null;

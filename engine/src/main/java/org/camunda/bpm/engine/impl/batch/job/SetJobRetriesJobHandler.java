@@ -16,26 +16,24 @@
  */
 package org.camunda.bpm.engine.impl.batch.job;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.impl.batch.AbstractBatchJobHandler;
-import org.camunda.bpm.engine.impl.batch.BatchJobConfiguration;
 import org.camunda.bpm.engine.impl.batch.BatchJobContext;
 import org.camunda.bpm.engine.impl.batch.BatchJobDeclaration;
-import org.camunda.bpm.engine.impl.batch.SetRetriesBatchConfiguration;
-import org.camunda.bpm.engine.impl.cmd.SetJobsRetriesCmd;
+import org.camunda.bpm.engine.impl.batch.SetJobRetriesBatchConfiguration;
+import org.camunda.bpm.engine.impl.cmd.SetJobRetriesCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
-import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
-
-import java.util.List;
 
 
 /**
  * @author Askar Akhmerov
  */
-public class SetJobRetriesJobHandler extends AbstractBatchJobHandler<SetRetriesBatchConfiguration> {
+public class SetJobRetriesJobHandler extends AbstractBatchJobHandler<SetJobRetriesBatchConfiguration> {
   public static final BatchJobDeclaration JOB_DECLARATION = new BatchJobDeclaration(Batch.TYPE_SET_JOB_RETRIES);
 
   @Override
@@ -53,21 +51,18 @@ public class SetJobRetriesJobHandler extends AbstractBatchJobHandler<SetRetriesB
   }
 
   @Override
-  protected SetRetriesBatchConfiguration createJobConfiguration(SetRetriesBatchConfiguration configuration, List<String> jobIds) {
-    return new SetRetriesBatchConfiguration(jobIds, configuration.getRetries());
+  protected SetJobRetriesBatchConfiguration createJobConfiguration(SetJobRetriesBatchConfiguration configuration, List<String> jobIds) {
+    return new SetJobRetriesBatchConfiguration(jobIds, configuration.getRetries(), configuration.getDueDate(), configuration.isDueDateSet());
   }
 
   @Override
-  public void execute(BatchJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
-    ByteArrayEntity configurationEntity = commandContext
-        .getDbEntityManager()
-        .selectById(ByteArrayEntity.class, configuration.getConfigurationByteArrayId());
-
-    SetRetriesBatchConfiguration batchConfiguration = readConfiguration(configurationEntity.getBytes());
+  public void executeHandler(SetJobRetriesBatchConfiguration batchConfiguration,
+                             ExecutionEntity execution,
+                             CommandContext commandContext,
+                             String tenantId) {
 
     commandContext.executeWithOperationLogPrevented(
-        new SetJobsRetriesCmd(batchConfiguration.getIds(), batchConfiguration.getRetries()));
+        new SetJobRetriesCmd(batchConfiguration.getIds(), batchConfiguration.getRetries(), batchConfiguration.getDueDate(), batchConfiguration.isDueDateSet()));
 
-    commandContext.getByteArrayManager().delete(configurationEntity);
   }
 }

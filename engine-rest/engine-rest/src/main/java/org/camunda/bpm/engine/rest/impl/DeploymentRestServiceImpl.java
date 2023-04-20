@@ -16,20 +16,22 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
-
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
-import org.camunda.bpm.engine.repository.*;
+import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.repository.DeploymentBuilder;
+import org.camunda.bpm.engine.repository.DeploymentQuery;
+import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
 import org.camunda.bpm.engine.rest.DeploymentRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.DeploymentDto;
@@ -40,8 +42,7 @@ import org.camunda.bpm.engine.rest.mapper.MultipartFormData;
 import org.camunda.bpm.engine.rest.mapper.MultipartFormData.FormPart;
 import org.camunda.bpm.engine.rest.sub.repository.DeploymentResource;
 import org.camunda.bpm.engine.rest.sub.repository.impl.DeploymentResourceImpl;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.camunda.bpm.engine.rest.util.QueryUtil;
 
 public class DeploymentRestServiceImpl extends AbstractRestProcessEngineAware implements DeploymentRestService {
 
@@ -67,22 +68,19 @@ public class DeploymentRestServiceImpl extends AbstractRestProcessEngineAware im
     super(engineName, objectMapper);
   }
 
+  @Override
   public DeploymentResource getDeployment(String deploymentId) {
     return new DeploymentResourceImpl(getProcessEngine().getName(), deploymentId, relativeRootResourcePath, getObjectMapper());
   }
 
+  @Override
   public List<DeploymentDto> getDeployments(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
     DeploymentQueryDto queryDto = new DeploymentQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
 
     ProcessEngine engine = getProcessEngine();
     DeploymentQuery query = queryDto.toQuery(engine);
 
-    List<Deployment> matchingDeployments;
-    if (firstResult != null || maxResults != null) {
-      matchingDeployments = executePaginatedQuery(query, firstResult, maxResults);
-    } else {
-      matchingDeployments = query.list();
-    }
+    List<Deployment> matchingDeployments = QueryUtil.list(query, firstResult, maxResults);
 
     List<DeploymentDto> deployments = new ArrayList<DeploymentDto>();
     for (Deployment deployment : matchingDeployments) {
@@ -92,6 +90,7 @@ public class DeploymentRestServiceImpl extends AbstractRestProcessEngineAware im
     return deployments;
   }
 
+  @Override
   public DeploymentWithDefinitionsDto createDeployment(UriInfo uriInfo, MultipartFormData payload) {
     DeploymentBuilder deploymentBuilder = extractDeploymentInformation(payload);
 
@@ -181,16 +180,7 @@ public class DeploymentRestServiceImpl extends AbstractRestProcessEngineAware im
     }
   }
 
-  private List<Deployment> executePaginatedQuery(DeploymentQuery query, Integer firstResult, Integer maxResults) {
-    if (firstResult == null) {
-      firstResult = 0;
-    }
-    if (maxResults == null) {
-      maxResults = Integer.MAX_VALUE;
-    }
-    return query.listPage(firstResult, maxResults);
-  }
-
+  @Override
   public CountResultDto getDeploymentsCount(UriInfo uriInfo) {
     DeploymentQueryDto queryDto = new DeploymentQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
 

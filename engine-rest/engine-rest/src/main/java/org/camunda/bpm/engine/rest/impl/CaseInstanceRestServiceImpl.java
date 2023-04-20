@@ -17,6 +17,9 @@
 package org.camunda.bpm.engine.rest.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.List;
+import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.CaseInstanceRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
@@ -24,12 +27,9 @@ import org.camunda.bpm.engine.rest.dto.runtime.CaseInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.CaseInstanceQueryDto;
 import org.camunda.bpm.engine.rest.sub.runtime.CaseInstanceResource;
 import org.camunda.bpm.engine.rest.sub.runtime.impl.CaseInstanceResourceImpl;
+import org.camunda.bpm.engine.rest.util.QueryUtil;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.CaseInstanceQuery;
-
-import javax.ws.rs.core.UriInfo;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Roman Smirnov
@@ -41,26 +41,24 @@ public class CaseInstanceRestServiceImpl extends AbstractRestProcessEngineAware 
     super(engineName, objectMapper);
   }
 
+  @Override
   public CaseInstanceResource getCaseInstance(String caseInstanceId) {
     return new CaseInstanceResourceImpl(getProcessEngine(), caseInstanceId, getObjectMapper());
   }
 
+  @Override
   public List<CaseInstanceDto> getCaseInstances(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
     CaseInstanceQueryDto queryDto = new CaseInstanceQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
     return queryCaseInstances(queryDto, firstResult, maxResults);
   }
 
+  @Override
   public List<CaseInstanceDto> queryCaseInstances(CaseInstanceQueryDto queryDto, Integer firstResult, Integer maxResults) {
     ProcessEngine engine = getProcessEngine();
     queryDto.setObjectMapper(getObjectMapper());
     CaseInstanceQuery query = queryDto.toQuery(engine);
 
-    List<CaseInstance> matchingInstances;
-    if (firstResult != null || maxResults != null) {
-      matchingInstances = executePaginatedQuery(query, firstResult, maxResults);
-    } else {
-      matchingInstances = query.list();
-    }
+    List<CaseInstance> matchingInstances = QueryUtil.list(query, firstResult, maxResults);
 
     List<CaseInstanceDto> instanceResults = new ArrayList<CaseInstanceDto>();
     for (CaseInstance instance : matchingInstances) {
@@ -70,21 +68,13 @@ public class CaseInstanceRestServiceImpl extends AbstractRestProcessEngineAware 
     return instanceResults;
   }
 
-  private List<CaseInstance> executePaginatedQuery(CaseInstanceQuery query, Integer firstResult, Integer maxResults) {
-    if (firstResult == null) {
-      firstResult = 0;
-    }
-    if (maxResults == null) {
-      maxResults = Integer.MAX_VALUE;
-    }
-    return query.listPage(firstResult, maxResults);
-  }
-
+  @Override
   public CountResultDto getCaseInstancesCount(UriInfo uriInfo) {
     CaseInstanceQueryDto queryDto = new CaseInstanceQueryDto(getObjectMapper(), uriInfo.getQueryParameters());
     return queryCaseInstancesCount(queryDto);
   }
 
+  @Override
   public CountResultDto queryCaseInstancesCount(CaseInstanceQueryDto queryDto) {
     ProcessEngine engine = getProcessEngine();
     queryDto.setObjectMapper(getObjectMapper());

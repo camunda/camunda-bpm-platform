@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.camunda.bpm.dmn</groupId>
     <artifactId>camunda-engine-dmn-root</artifactId>
-    <version>7.17.0</version>
+    <version>7.20.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-engine-dmn</artifactId>
@@ -94,7 +94,7 @@
 
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
-      <artifactId>groovy-all</artifactId>
+      <artifactId>groovy-jsr223</artifactId>
       <scope>test</scope>
     </dependency>
 
@@ -116,10 +116,25 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-bpm-archunit</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
   <build>
     <plugins>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <dependenciesToScan>
+            <dependency>org.camunda.bpm:camunda-bpm-archunit</dependency>
+          </dependenciesToScan>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>

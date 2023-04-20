@@ -29,19 +29,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.exception.NotFoundException;
-import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
@@ -71,6 +71,7 @@ public class DeleteProcessDefinitionTest {
   protected HistoryService historyService;
   protected RepositoryService repositoryService;
   protected RuntimeService runtimeService;
+  protected ManagementService managementService;
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
   protected Deployment deployment;
 
@@ -79,6 +80,7 @@ public class DeleteProcessDefinitionTest {
     historyService = engineRule.getHistoryService();
     repositoryService = engineRule.getRepositoryService();
     runtimeService = engineRule.getRuntimeService();
+    managementService = engineRule.getManagementService();
     processEngineConfiguration = (ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration();
   }
 
@@ -145,10 +147,10 @@ public class DeleteProcessDefinitionTest {
     try {
       repositoryService.deleteProcessDefinition(processDefinition.getId());
       fail("Should fail, since there exists a process instance");
-    } catch (ProcessEngineException pee) {
+    } catch (ProcessEngineException pex) {
       // then Exception is expected, the deletion should fail since there exist a process instance
       // and the cascade flag is per default false
-      assertTrue(pee.getMessage().contains("Deletion of process definition without cascading failed."));
+      assertTrue(pex.getMessage().contains("Deletion of process definition without cascading failed."));
     }
     assertEquals(1, repositoryService.createProcessDefinitionQuery().count());
   }
@@ -254,6 +256,35 @@ public class DeleteProcessDefinitionTest {
 
     //clean up
     repositoryService.deleteDeployment(deployment2.getId(), true);
+  }
+
+  @Test
+  public void shouldRestorePreviousStartTimerDefinitions() {
+    // given
+    BpmnModelInstance processV1 = Bpmn.createExecutableProcess()
+        .id("one")
+        .startEvent()
+        .timerWithCycle("R/PT15M")
+        .userTask("aTaskName")
+        .endEvent()
+        .done();
+
+    BpmnModelInstance processV2 = Bpmn.createExecutableProcess()
+        .id("one")
+        .startEvent()
+        .endEvent()
+        .done();
+
+    testHelper.deploy(processV1);
+    DeploymentWithDefinitions deployment = testHelper.deploy(processV2);
+
+    //when
+    repositoryService.deleteProcessDefinition(deployment.getDeployedProcessDefinitions().get(0).getId());
+
+    //then
+    long timerDefinitions = managementService.createJobQuery().processDefinitionKey("one").count();
+
+    assertThat(timerDefinitions).isEqualTo(1);
   }
 
   @Test

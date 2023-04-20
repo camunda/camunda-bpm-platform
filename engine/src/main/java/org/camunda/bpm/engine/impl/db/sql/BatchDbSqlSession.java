@@ -25,12 +25,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.ibatis.exceptions.PersistenceException;
 import org.apache.ibatis.executor.BatchExecutorException;
 import org.apache.ibatis.executor.BatchResult;
 import org.apache.ibatis.session.ExecutorType;
-import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.db.DbEntity;
-import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.FlushResult;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbBulkOperation;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbEntityOperation;
@@ -72,7 +71,7 @@ public class BatchDbSqlSession extends DbSqlSession {
     try {
       // applies all operations
       batchResults = flushBatchOperations();
-    } catch (RuntimeException e) {
+    } catch (PersistenceException e) {
       return postProcessBatchFailure(operations, e);
     }
 
@@ -96,7 +95,7 @@ public class BatchDbSqlSession extends DbSqlSession {
     return FlushResult.withFailures(failedOperations);
   }
 
-  protected FlushResult postProcessBatchFailure(List<DbOperation> operations, RuntimeException exception) {
+  protected FlushResult postProcessBatchFailure(List<DbOperation> operations, PersistenceException exception) {
     BatchExecutorException batchExecutorException =
         ExceptionUtil.findBatchExecutorException(exception);
 
@@ -144,7 +143,7 @@ public class BatchDbSqlSession extends DbSqlSession {
   protected void postProcessJdbcBatchResult(
       Iterator<DbOperation> operationsIt,
       int[] statementResults,
-      Exception failure,
+      PersistenceException failure,
       List<DbOperation> failedOperations) {
     boolean failureHandled = false;
 
@@ -218,7 +217,7 @@ public class BatchDbSqlSession extends DbSqlSession {
 
   protected void postProcessOperationPerformed(DbOperation operation,
                                                int rowsAffected,
-                                               Exception failure) {
+                                               PersistenceException failure) {
 
     switch(operation.getOperationType()) {
 

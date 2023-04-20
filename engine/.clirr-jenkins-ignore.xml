@@ -23,4 +23,11 @@
     <differenceType>8001</differenceType>
     <className>org/camunda/bpm/engine/variable/**/*</className>
   </difference>
+  <!-- 5001: superclass removed -->
+  <!-- new interface introduced in hierarchy, previous superclass renamed -->
+  <difference>
+    <differenceType>5001</differenceType>
+    <className>org/camunda/bpm/engine/test/mock/MockExpressionManager</className>
+    <to>**</to>
+  </difference>
 </differences>

@@ -67,6 +67,9 @@ public class BatchEntity implements Batch, DbEntity, HasDbReferences, Nameable, 
 
   protected int suspensionState = SuspensionState.ACTIVE.getStateCode();
 
+  protected Date startTime;
+  protected Date executionStartTime;
+
   protected int revision;
 
   // transient
@@ -188,6 +191,22 @@ public class BatchEntity implements Batch, DbEntity, HasDbReferences, Nameable, 
     return suspensionState == SuspensionState.SUSPENDED.getStateCode();
   }
 
+  public Date getStartTime() {
+    return startTime;
+  }
+
+  public void setStartTime(final Date startTime) {
+    this.startTime = startTime;
+  }
+
+  public Date getExecutionStartTime() {
+    return executionStartTime;
+  }
+
+  public void setExecutionStartTime(final Date executionStartTime) {
+    this.executionStartTime = executionStartTime;
+  }
+
   public void setRevision(int revision) {
     this.revision = revision;
 
@@ -247,6 +266,7 @@ public class BatchEntity implements Batch, DbEntity, HasDbReferences, Nameable, 
   public Object getPersistentState() {
     HashMap<String, Object> persistentState = new HashMap<>();
     persistentState.put("jobsCreated", jobsCreated);
+    persistentState.put("executionStartTime", executionStartTime);
     return persistentState;
   }
 
@@ -395,6 +415,12 @@ public class BatchEntity implements Batch, DbEntity, HasDbReferences, Nameable, 
     Context.getCommandContext()
       .getHistoricBatchManager()
       .completeHistoricBatch(this);
+  }
+
+  public void fireHistoricUpdateEvent() {
+    Context.getCommandContext()
+      .getHistoricBatchManager()
+      .updateHistoricBatch(this);
   }
 
   public boolean isCompleted() {

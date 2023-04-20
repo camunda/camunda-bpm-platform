@@ -74,7 +74,7 @@
   </changeSet>
 
   <changeSet author="Camunda" id="7.16-to-7.17">
-    <sqlFile path="../upgrade/${db.name}_engine_7.16_to_7.17.sql"
+    <sqlFile path="upgrade/${db.name}_engine_7.16_to_7.17.sql"
              encoding="UTF-8"
              relativeToChangelogFile="true"
              splitStatements="true"
@@ -84,5 +84,42 @@
   <changeSet author="Camunda" id="7.17.0-tag">
     <tagDatabase tag="7.17.0"/>
   </changeSet>
+
+  <changeSet author="Camunda" id="7.17-to-7.18">
+    <sqlFile path="upgrade/${db.name}_engine_7.17_to_7.18.sql"
+             encoding="UTF-8"
+             relativeToChangelogFile="true"
+             splitStatements="true"
+             stripComments="true"/>
+  </changeSet>
+
+  <changeSet author="Camunda" id="7.18.0-tag">
+    <tagDatabase tag="7.18.0"/>
+  </changeSet>
+
+  <changeSet author="Camunda" id="7.18-to-7.19">
+    <sqlFile path="upgrade/${db.name}_engine_7.18_to_7.19.sql"
+             encoding="UTF-8"
+             relativeToChangelogFile="true"
+             splitStatements="true"
+             stripComments="true"/>
+  </changeSet>
+
+  <changeSet author="Camunda" id="7.19.0-tag">
+    <tagDatabase tag="7.19.0"/>
+  </changeSet>
+
+  <changeSet author="Camunda" id="7.19-to-7.20">
+    <sqlFile path="upgrade/${db.name}_engine_7.19_to_7.20.sql"
+             encoding="UTF-8"
+             relativeToChangelogFile="true"
+             splitStatements="true"
+             stripComments="true"/>
+  </changeSet>
+
+  <changeSet author="Camunda" id="7.20.0-tag">
+    <tagDatabase tag="7.20.0"/>
+  </changeSet>
+
 
 </databaseChangeLog>

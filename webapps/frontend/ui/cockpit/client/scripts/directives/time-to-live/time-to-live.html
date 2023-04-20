@@ -1,0 +1,8 @@
+<a ng-click="showDialog()" class="ng-binding" href>
+  <span ng-show="definition.historyTimeToLive == null" class="null-value">
+    {{ 'TIME_TO_LIVE_NULL' | translate }}
+  </span>
+  <span ng-show="definition.historyTimeToLive != null">
+    {{format(definition.historyTimeToLive)}}
+  </span>
+</a>

@@ -55,6 +55,16 @@
         dto = "AbstractVendorVersionInformationDto"
         desc = "Vendor and version of the installed JDK."/>
 
+    <@lib.property
+        name = "data-collection-start-date"
+        type = "string"
+        format = "date-time"
+        nullable = false
+        last = true
+        desc = "The date when the engine started to collect dynamic data, such as command executions and metrics. If telemetry sending is enabled, dynamic data resets on sending the data to Camunda.
+                Dynamic data and the date returned by this method are reset in three cases: engine startup, after engine start when sending telemetry data to Camunda is enabled via API, after sending telemetry data to Camunda (only when this was enabled)
+                The date is in the format <code>YYYY-MM-DD'T'HH:mm:ss.SSSZ</code>."/>
+
 </@lib.dto>
 
 </#macro>

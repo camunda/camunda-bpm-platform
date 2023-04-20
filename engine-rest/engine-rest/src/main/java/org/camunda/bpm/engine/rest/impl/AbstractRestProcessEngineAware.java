@@ -17,28 +17,26 @@
 package org.camunda.bpm.engine.rest.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.rest.spi.impl.AbstractProcessEngineAware;
+import org.camunda.bpm.engine.rest.util.EngineUtil;
 
-import javax.ws.rs.core.Response.Status;
+public abstract class AbstractRestProcessEngineAware {
 
-public abstract class AbstractRestProcessEngineAware extends AbstractProcessEngineAware {
+  /*
+   * private to enforce the use of getProcessEngine in subclasses
+   * for consistent error handling for unknown process engines
+   */
+  private ProcessEngine processEngine;
 
   protected ObjectMapper objectMapper;
 
   protected String relativeRootResourcePath = "/";
 
   public AbstractRestProcessEngineAware(String engineName, final ObjectMapper objectMapper) {
-    super(engineName);
+    this.processEngine = EngineUtil.lookupProcessEngine(engineName);
     this.objectMapper = objectMapper;
-  }
-
-  protected ProcessEngine getProcessEngine() {
-    if (processEngine == null) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, "No process engine available");
-    }
-    return processEngine;
   }
 
   /**
@@ -53,5 +51,12 @@ public abstract class AbstractRestProcessEngineAware extends AbstractProcessEngi
 
   protected ObjectMapper getObjectMapper() {
     return objectMapper;
+  }
+
+  protected ProcessEngine getProcessEngine() {
+    if (processEngine == null) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, "No process engine available");
+    }
+    return processEngine;
   }
 }

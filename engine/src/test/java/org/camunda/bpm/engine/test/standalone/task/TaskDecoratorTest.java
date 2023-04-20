@@ -63,10 +63,8 @@ public class TaskDecoratorTest extends PluggableProcessEngineTest {
   }
 
   @After
-  public void tearDown() {
-    processEngineConfiguration
-      .getCommandExecutorTxRequired()
-      .execute(new DeleteTaskCommand(task));
+  public void tearDown() throws InterruptedException {
+    taskService.deleteTask(task.getId(), true);
   }
 
   protected void decorate(TaskEntity task, TaskDecorator decorator) {
@@ -264,7 +262,7 @@ public class TaskDecoratorTest extends PluggableProcessEngineTest {
   @Test
   public void testDecorateCandidateUsers() {
     // given
-    List<String> aCandidateUserList = new ArrayList<String>();
+    List<String> aCandidateUserList = new ArrayList<>();
     aCandidateUserList.add("john");
     aCandidateUserList.add("peter");
     aCandidateUserList.add("mary");
@@ -308,7 +306,7 @@ public class TaskDecoratorTest extends PluggableProcessEngineTest {
     taskService.setVariable(task.getId(), "peter", "peter");
     taskService.setVariable(task.getId(), "mary", "mary");
 
-    List<String> aCandidateUserList = new ArrayList<String>();
+    List<String> aCandidateUserList = new ArrayList<>();
     aCandidateUserList.add("${john}");
     aCandidateUserList.add("${peter}");
     aCandidateUserList.add("${mary}");
@@ -347,7 +345,7 @@ public class TaskDecoratorTest extends PluggableProcessEngineTest {
   @Test
   public void testDecorateCandidateGroups() {
     // given
-    List<String> aCandidateGroupList = new ArrayList<String>();
+    List<String> aCandidateGroupList = new ArrayList<>();
     aCandidateGroupList.add("management");
     aCandidateGroupList.add("accounting");
     aCandidateGroupList.add("backoffice");
@@ -391,7 +389,7 @@ public class TaskDecoratorTest extends PluggableProcessEngineTest {
     taskService.setVariable(task.getId(), "accounting", "accounting");
     taskService.setVariable(task.getId(), "backoffice", "backoffice");
 
-    List<String> aCandidateGroupList = new ArrayList<String>();
+    List<String> aCandidateGroupList = new ArrayList<>();
     aCandidateGroupList.add("${management}");
     aCandidateGroupList.add("${accounting}");
     aCandidateGroupList.add("${backoffice}");

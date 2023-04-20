@@ -1,0 +1,50 @@
+{
+  "rules": {
+    "space-before-blocks": [ 2, "always"],
+    "space-before-function-paren": [ 2, "never" ],
+    "semi": [ 2, "always" ],
+    "no-console": 1,
+    "no-self-assign": 0,
+    "no-useless-escape": "off",
+    "i18n-json/sorted-keys": [2, {
+      "order": "asc",
+      "indentSpaces": 2
+    }],
+    "i18n-json/valid-json": 0,
+    "i18n-json/valid-message-syntax": 0
+  },
+  "env": {
+    "node": true,
+    "browser": true,
+    "es6": true
+  },
+  "overrides": [
+    {
+      "files": ["*.json"],
+      "rules": {
+        "license-header/header": "off",
+        "prettier/prettier": "off"
+      }
+    }
+  ],
+  "extends": [
+    "eslint:recommended",
+    "plugin:camunda-licensed/apache",
+    "plugin:prettier/recommended",
+    "plugin:i18n-json/recommended"
+  ],
+  "parserOptions": {
+    "ecmaVersion": 2020,
+    "sourceType": "module"
+  },
+  "globals": {
+    "requirejs": false,
+    "expect": false,
+    "it": false,
+    "describe": false,
+    "beforeEach": true,
+    "afterEach": true,
+    "before": true,
+    "after": true
+  }
+}

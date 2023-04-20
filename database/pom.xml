@@ -6,7 +6,7 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-parent</artifactId>
     <relativePath>../parent</relativePath>
-    <version>7.17.0</version>
+    <version>7.20.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-database-settings</artifactId>
@@ -17,21 +17,18 @@
   <properties>
 
     <!-- database driver versions -->
-    <version.h2>2.0.206</version.h2>
+    <version.h2>2.1.214</version.h2>
     <version.h2-v1>1.4.190</version.h2-v1><!-- used for instance migration qa -->
     <version.oracle-12>12.1.0.2</version.oracle-12>
-    <version.oracle-18>18.3.0.0</version.oracle-18>
     <version.oracle-19>19.3.0.0</version.oracle-19>
     <version.oracle>${version.oracle-12}</version.oracle>
-    <version.mariadb>1.1.8</version.mariadb>
-    <version.mariadb.galera>1.6.3</version.mariadb.galera>
-    <version.mysql>8.0.23</version.mysql>
-    <version.sqlserver>8.2.2.jre8</version.sqlserver>
+    <version.mariadb>1.7.6</version.mariadb>
+    <version.mariadb-v1>1.1.8</version.mariadb-v1>
+    <version.mysql>8.0.32</version.mysql>
+    <version.sqlserver>8.4.1.jre8</version.sqlserver>
     <version.db2-11.5>11.5.0.0</version.db2-11.5>
-    <version.db2-11.1>11.1.1.1</version.db2-11.1>
-    <version.db2-10.5>10.5.0.5</version.db2-10.5>
-    <version.db2>${version.db2-10.5}</version.db2>
-    <version.postgresql>42.3.3</version.postgresql>
+    <version.db2>${version.db2-11.5}</version.db2>
+    <version.postgresql>42.5.4</version.postgresql>
     <version.liquibase>4.8.0</version.liquibase>
 
     <!-- CockroachDB is compatible with PostgreSQL 9.5,
@@ -39,7 +36,7 @@
     <version.cockroachdb>42.2.9</version.cockroachdb>
 
     <!-- needed for sql script and backward compatibility checks -->
-    <camunda.version.old>7.16.0</camunda.version.old>
+    <camunda.version.old>7.19.0</camunda.version.old>
 
     <!-- Testcontainers JDBC URL parameters. By default, an empty string -->
     <database.tc.params />
@@ -54,17 +51,7 @@
       </dependency>
       <dependency>
         <groupId>com.oracle.jdbc</groupId>
-        <artifactId>ojdbc6</artifactId>
-        <version>${version.oracle}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.oracle.jdbc</groupId>
         <artifactId>ojdbc7</artifactId>
-        <version>${version.oracle}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.oracle.jdbc</groupId>
-        <artifactId>ojdbc8</artifactId>
         <version>${version.oracle}</version>
       </dependency>
       <dependency>
@@ -78,8 +65,8 @@
         <version>${version.mariadb}</version>
       </dependency>
       <dependency>
-        <groupId>mysql</groupId>
-        <artifactId>mysql-connector-java</artifactId>
+        <groupId>com.mysql</groupId>
+        <artifactId>mysql-connector-j</artifactId>
         <version>${version.mysql}</version>
       </dependency>
       <dependency>
@@ -95,11 +82,6 @@
       <dependency>
         <groupId>com.ibm.db2</groupId>
         <artifactId>jcc</artifactId>
-        <version>${version.db2}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.ibm.db2.jcc</groupId>
-        <artifactId>db2jcc4</artifactId>
         <version>${version.db2}</version>
       </dependency>
     </dependencies>
@@ -144,6 +126,7 @@
         <database.datasource.class>com.ibm.db2.jcc.DB2SimpleDataSource</database.datasource.class>
       </properties>
     </profile>
+
     <profile>
       <id>db2-115</id>
       <properties>
@@ -165,64 +148,6 @@
                 <dependency>
                   <groupId>com.ibm.db2</groupId>
                   <artifactId>jcc</artifactId>
-                  <version>${version.db2}</version>
-                </dependency>
-              </dependencies>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
-    <profile>
-      <id>db2-111</id>
-      <properties>
-        <version.db2>${version.db2-11.1}</version.db2>
-      </properties>
-      <dependencies>
-        <dependency>
-          <groupId>com.ibm.db2.jcc</groupId>
-          <artifactId>db2jcc4</artifactId>
-        </dependency>
-      </dependencies>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.codehaus.mojo</groupId>
-              <artifactId>sql-maven-plugin</artifactId>
-              <dependencies>
-                <dependency>
-                  <groupId>com.ibm.db2.jcc</groupId>
-                  <artifactId>db2jcc4</artifactId>
-                  <version>${version.db2}</version>
-                </dependency>
-              </dependencies>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
-    <profile>
-      <id>db2-105</id>
-      <properties>
-        <version.db2>${version.db2-10.5}</version.db2>
-      </properties>
-      <dependencies>
-        <dependency>
-          <groupId>com.ibm.db2.jcc</groupId>
-          <artifactId>db2jcc4</artifactId>
-        </dependency>
-      </dependencies>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.codehaus.mojo</groupId>
-              <artifactId>sql-maven-plugin</artifactId>
-              <dependencies>
-                <dependency>
-                  <groupId>com.ibm.db2.jcc</groupId>
-                  <artifactId>db2jcc4</artifactId>
                   <version>${version.db2}</version>
                 </dependency>
               </dependencies>
@@ -279,12 +204,13 @@
         <database.password>sa</database.password>
         <database.port>18080</database.port>
         <!-- This url has to consistent for the subprojects: {server}-runtime and webapp-integration-tests -->
-        <database.url>jdbc:h2:${database.host}${database.name};AUTO_SERVER=TRUE;AUTO_SERVER_PORT=${database.port};LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE</database.url>
+        <database.url>jdbc:h2:${database.host}${database.name};AUTO_SERVER=TRUE;AUTO_SERVER_PORT=${database.port};LOCK_TIMEOUT=10000</database.url>
 
         <database.type>h2</database.type>
         <database.driver>org.h2.Driver</database.driver>
         <database.datasource.class>org.h2.jdbcx.JdbcDataSource</database.datasource.class>
         <jboss.datasource.filename>h2-ds.xml</jboss.datasource.filename>
+        <was.liberty.datasource.filename>h2-config.xml</was.liberty.datasource.filename>
         <hibernate.dialect>org.hibernate.dialect.H2Dialect</hibernate.dialect>
       </properties>
       <dependencies>
@@ -319,7 +245,7 @@
         <database.type>mariadb</database.type>
         <database.driver>org.mariadb.jdbc.Driver</database.driver>
         <database.datasource.class>org.mariadb.jdbc.MySQLDataSource</database.datasource.class>
-        <database.tc.url>cammariadb:10.3</database.tc.url>
+        <database.tc.url>cammariadb:10.6</database.tc.url>
         <database.tc.params>/${database.name}?user=${database.username}&amp;amp;password=${database.password}</database.tc.params>
       </properties>
 
@@ -348,18 +274,6 @@
         </pluginManagement>
       </build>
     </profile>
-    <profile>
-      <id>mariadb-galera</id>
-      <properties>
-        <version.mariadb>${version.mariadb.galera}</version.mariadb>
-      </properties>
-    </profile>
-    <profile>
-      <id>mariadb-10.2</id>
-      <properties>
-        <database.tc.url>cammariadb:10.2</database.tc.url>
-      </properties>
-    </profile>
 
     <profile>
       <id>mysql</id>
@@ -373,8 +287,8 @@
 
       <dependencies>
         <dependency>
-          <groupId>mysql</groupId>
-          <artifactId>mysql-connector-java</artifactId>
+          <groupId>com.mysql</groupId>
+          <artifactId>mysql-connector-j</artifactId>
           <scope>test</scope>
         </dependency>
       </dependencies>
@@ -386,8 +300,8 @@
               <artifactId>sql-maven-plugin</artifactId>
               <dependencies>
                 <dependency>
-                  <groupId>mysql</groupId>
-                  <artifactId>mysql-connector-java</artifactId>
+                  <groupId>com.mysql</groupId>
+                  <artifactId>mysql-connector-j</artifactId>
                   <version>${version.mysql}</version>
                 </dependency>
               </dependencies>
@@ -395,12 +309,6 @@
           </plugins>
         </pluginManagement>
       </build>
-    </profile>
-    <profile>
-      <id>mysql-5.7</id>
-      <properties>
-        <database.tc.url>cammysql:5.7</database.tc.url>
-      </properties>
     </profile>
 
     <profile>
@@ -441,37 +349,7 @@
         </pluginManagement>
       </build>
     </profile>
-    <profile>
-      <id>oracle-18</id>
-      <properties>
-        <version.oracle>${version.oracle-18}</version.oracle>
-      </properties>
-      <dependencies>
-        <dependency>
-          <groupId>com.oracle.jdbc</groupId>
-          <artifactId>ojdbc8</artifactId>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
 
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.codehaus.mojo</groupId>
-              <artifactId>sql-maven-plugin</artifactId>
-              <dependencies>
-                <dependency>
-                  <groupId>com.oracle.jdbc</groupId>
-                  <artifactId>ojdbc8</artifactId>
-                  <version>${version.oracle}</version>
-                </dependency>
-              </dependencies>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
     <profile>
       <id>oracle-19</id>
       <properties>
@@ -511,6 +389,7 @@
         <database.driver>org.postgresql.Driver</database.driver>
         <database.datasource.class>org.postgresql.ds.PGSimpleDataSource</database.datasource.class>
         <jboss.datasource.filename>postgresql-ds.xml</jboss.datasource.filename>
+        <was.liberty.datasource.filename>postgresql-config.xml</was.liberty.datasource.filename>
         <hibernate.dialect>org.hibernate.dialect.PostgreSQLDialect</hibernate.dialect>
         <database.tc.url>campostgresql:13.2</database.tc.url>
       </properties>
@@ -545,6 +424,7 @@
       <properties>
         <database.datasource.class>org.postgresql.xa.PGXADataSource</database.datasource.class>
         <jboss.datasource.filename>postgresql-xa-ds.xml</jboss.datasource.filename>
+        <was.liberty.datasource.filename>postgresql-xa-config.xml</was.liberty.datasource.filename>
       </properties>
     </profile>
     <profile>
@@ -629,12 +509,22 @@
 
     <profile>
       <id>testcontainers</id>
+      <dependencyManagement>
+        <dependencies>
+          <dependency>
+            <groupId>com.fasterxml.jackson</groupId>
+            <artifactId>jackson-bom</artifactId>
+            <version>${version.jackson}</version>
+            <scope>import</scope>
+            <type>pom</type>
+          </dependency>
+        </dependencies>
+      </dependencyManagement>
       <dependencies>
         <!-- Testcontainers depends on docker-java which depends on jackson-annotations -->
         <dependency>
           <artifactId>jackson-annotations</artifactId>
           <groupId>com.fasterxml.jackson.core</groupId>
-          <version>${version.jackson}</version>
           <scope>test</scope>
         </dependency>
       </dependencies>

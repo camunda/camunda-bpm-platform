@@ -32,9 +32,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimerTask;
-
-import javax.ws.rs.core.MediaType;
-
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmd.IsTelemetryEnabledCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -46,10 +43,11 @@ import org.camunda.bpm.engine.impl.telemetry.TelemetryLogger;
 import org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry;
 import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServerImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.CommandImpl;
-import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.InternalsImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.MetricImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.ProductImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
 import org.camunda.bpm.engine.impl.util.TelemetryUtil;
 import org.camunda.bpm.engine.telemetry.Command;
@@ -121,6 +119,8 @@ public class TelemetrySendingTask extends TimerTask {
     if(sendData) {
       try {
         sendData(mergedData);
+        // reset data collection time frame on successful submit
+        updateDataCollectionStartDate();
       } catch (Exception e) {
         // so that we send it again the next time
         restoreDynamicData(dynamicData);
@@ -147,6 +147,10 @@ public class TelemetrySendingTask extends TimerTask {
     internals.setWebapps(telemetryRegistry.getWebapps());
   }
 
+  public void updateDataCollectionStartDate() {
+    staticData.getProduct().getInternals().setDataCollectionStartDate(ClockUtil.getCurrentTime());
+  }
+
   protected boolean isTelemetryEnabled() {
     Boolean telemetryEnabled = commandExecutor.execute(new IsTelemetryEnabledCmd());
     return telemetryEnabled != null && telemetryEnabled.booleanValue();
@@ -157,7 +161,7 @@ public class TelemetrySendingTask extends TimerTask {
       String telemetryData = JsonUtil.asString(dataToSend);
       Map<String, Object> requestParams = assembleRequestParameters(METHOD_NAME_POST,
           telemetryEndpoint,
-          MediaType.APPLICATION_JSON,
+          "application/json",
           telemetryData);
       requestParams = addRequestTimeoutConfiguration(requestParams, telemetryRequestTimeout);
 

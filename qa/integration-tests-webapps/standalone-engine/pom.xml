@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.camunda.bpm.qa</groupId>
     <artifactId>camunda-qa-integration-tests-webapps-root</artifactId>
-    <version>7.17.0</version>
+    <version>7.20.0-SNAPSHOT</version>
     <relativePath>../</relativePath>
   </parent>
 
@@ -30,10 +30,10 @@
 
   <profiles>
     <profile>
-      <id>wildfly-vanilla</id>
+      <id>wildfly26-vanilla</id>
 
       <properties>
-        <jboss.runtime>${basedir}/../../vanilla-runtimes/wildfly/target/server/wildfly-${version.wildfly}</jboss.runtime>
+        <jboss.runtime>${basedir}/../../vanilla-runtimes/wildfly26/target/server/wildfly-${version.wildfly26}</jboss.runtime>
         <http.port>${jboss.http.port}</http.port>
       </properties>
 
@@ -72,7 +72,7 @@
               <!-- Container configuration -->
               <container>
                 <type>installed</type>
-                <containerId>${cargo.wildfly.container.id}</containerId>
+                <containerId>${cargo.wildfly26.container.id}</containerId>
                 <append>false</append>
                 <home>${jboss.runtime}</home>
                 <timeout>${cargo.timeout}</timeout>

@@ -10,12 +10,15 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-database-settings</artifactId>
     <relativePath>../../database</relativePath>
-    <version>7.17.0</version>
+    <version>7.20.0-SNAPSHOT</version>
   </parent>
 
   <properties>
     <arquillian.container.version>2.1.0.Final</arquillian.container.version>
     <arquillian.junit.version>1.6.0.Final</arquillian.junit.version>
+    <weld.version>3.1.9.Final</weld.version>
+    <javaee.spec>jboss-javaee-8.0</javaee.spec>
+    <javaee.spec.version>1.0.4.Final</javaee.spec.version>
   </properties>
   
   <dependencyManagement>
@@ -30,7 +33,7 @@
       <dependency>
         <groupId>org.jboss.weld</groupId>
         <artifactId>weld-core-bom</artifactId>
-        <version>3.1.9.Final</version>
+        <version>${weld.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -65,8 +68,8 @@
     
     <dependency>
       <groupId>org.jboss.spec</groupId>
-      <artifactId>jboss-javaee-8.0</artifactId>
-      <version>1.0.4.Final</version>
+      <artifactId>${javaee.spec}</artifactId>
+      <version>${javaee.spec.version}</version>
       <type>pom</type>
       <scope>test</scope>
     </dependency>

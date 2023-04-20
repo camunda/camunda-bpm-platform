@@ -18,6 +18,7 @@ package org.camunda.bpm.spring.boot.starter.event;
 
 import java.util.Date;
 import org.camunda.bpm.engine.delegate.DelegateTask;
+import org.camunda.bpm.engine.delegate.TaskListener;
 
 public class TaskEvent {
 
@@ -33,6 +34,7 @@ public class TaskEvent {
   protected String executionId;
   protected Date followUpDate;
   protected String id;
+  protected Date lastUpdated;
   protected String name;
   protected String owner;
   protected int priority;
@@ -54,6 +56,7 @@ public class TaskEvent {
     this.executionId = delegateTask.getExecutionId();
     this.followUpDate = delegateTask.getFollowUpDate();
     this.id = delegateTask.getId();
+    this.lastUpdated = delegateTask.getLastUpdated();
     this.name = delegateTask.getName();
     this.owner = delegateTask.getOwner();
     this.priority = delegateTask.getPriority();
@@ -140,6 +143,15 @@ public class TaskEvent {
     return id;
   }
 
+  /**
+   * The date/time when this task was last updated.
+   * All operations that fire {@link TaskListener#EVENTNAME_UPDATE} count as an update to the task.
+   * Returns null if the task was never updated before (i.e. it was only created).
+   * */
+  public Date getLastUpdated() {
+    return lastUpdated;
+  }
+
   /** Name or title of the task. */
   public String getName() {
     return name;
@@ -194,4 +206,29 @@ public class TaskEvent {
     return tenantId;
   }
 
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName()
+        + "[id=" + id
+        + ", eventName=" + eventName
+        + ", name=" + name
+        + ", createTime=" + createTime
+        + ", lastUpdated=" + lastUpdated
+        + ", executionId=" + executionId
+        + ", processDefinitionId=" + processDefinitionId
+        + ", processInstanceId=" + processInstanceId
+        + ", taskDefinitionKey=" + taskDefinitionKey
+        + ", assignee=" + assignee
+        + ", owner=" + owner
+        + ", description=" + description
+        + ", dueDate=" + dueDate
+        + ", followUpDate=" + followUpDate
+        + ", priority=" + priority
+        + ", deleteReason=" + deleteReason
+        + ", caseDefinitionId=" + caseDefinitionId
+        + ", caseExecutionId=" + caseExecutionId
+        + ", caseInstanceId=" + caseInstanceId
+        + ", tenantId=" + tenantId
+        + "]";
+  }
 }

@@ -16,10 +16,9 @@
  */
 package org.camunda.bpm.engine.rest.impl.history;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
-
 import javax.ws.rs.core.UriInfo;
-
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.CleanableHistoricDecisionInstanceReport;
 import org.camunda.bpm.engine.history.CleanableHistoricDecisionInstanceReportResult;
@@ -27,8 +26,7 @@ import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.history.CleanableHistoricDecisionInstanceReportDto;
 import org.camunda.bpm.engine.rest.dto.history.CleanableHistoricDecisionInstanceReportResultDto;
 import org.camunda.bpm.engine.rest.history.HistoricDecisionDefinitionRestService;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.camunda.bpm.engine.rest.util.QueryUtil;
 
 public class HistoricDecisionDefinitionRestServiceImpl implements HistoricDecisionDefinitionRestService {
 
@@ -45,24 +43,9 @@ public class HistoricDecisionDefinitionRestServiceImpl implements HistoricDecisi
     CleanableHistoricDecisionInstanceReportDto queryDto = new CleanableHistoricDecisionInstanceReportDto(objectMapper, uriInfo.getQueryParameters());
     CleanableHistoricDecisionInstanceReport query = queryDto.toQuery(processEngine);
 
-    List<CleanableHistoricDecisionInstanceReportResult> reportResult;
-    if (firstResult != null || maxResults != null) {
-      reportResult = executePaginatedQuery(query, firstResult, maxResults);
-      } else {
-      reportResult = query.list();
-      }
+    List<CleanableHistoricDecisionInstanceReportResult> reportResult = QueryUtil.list(query, firstResult, maxResults);
 
     return CleanableHistoricDecisionInstanceReportResultDto.convert(reportResult);
-  }
-
-  private List<CleanableHistoricDecisionInstanceReportResult> executePaginatedQuery(CleanableHistoricDecisionInstanceReport query, Integer firstResult, Integer maxResults) {
-    if (firstResult == null) {
-      firstResult = 0;
-    }
-    if (maxResults == null) {
-      maxResults = Integer.MAX_VALUE;
-    }
-    return query.listPage(firstResult, maxResults);
   }
 
   @Override

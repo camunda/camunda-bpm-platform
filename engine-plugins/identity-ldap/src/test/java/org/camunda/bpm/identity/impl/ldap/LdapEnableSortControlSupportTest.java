@@ -16,59 +16,258 @@
  */
 package org.camunda.bpm.identity.impl.ldap;
 
-import java.util.Collections;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.identity.ldap.util.LdapTestEnvironment;
+import org.camunda.bpm.identity.ldap.util.LdapTestEnvironmentRule;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
 
 /**
  * Represents a test case where the sortControlSupport property is enabled.
  *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
-public class LdapEnableSortControlSupportTest extends ResourceProcessEngineTestCase {
+public class LdapEnableSortControlSupportTest {
 
-  public LdapEnableSortControlSupportTest() {
-    super("camunda.ldap.enable.sort.control.support.cfg.xml");
+  @ClassRule
+  public static LdapTestEnvironmentRule ldapRule = new LdapTestEnvironmentRule();
+
+  @Rule
+  public ProcessEngineRule engineRule = new ProcessEngineRule("camunda.ldap.enable.sort.control.support.cfg.xml");
+
+  IdentityService identityService;
+  LdapTestEnvironment ldapTestEnvironment;
+
+  @Before
+  public void setup() {
+    identityService = engineRule.getIdentityService();
+    ldapTestEnvironment = ldapRule.getLdapTestEnvironment();
   }
 
-  protected static LdapTestEnvironment ldapTestEnvironment;
+  /**
+   * FirstName
+   */
+  @Test
+  public void testOrderByUserFirstNameAsc() {
+    List<User> orderedUsers = identityService.createUserQuery().orderByUserFirstName().asc().list();
+    List<User> manualOrderedUsers = identityService.createUserQuery()
+        .list()
+        .stream()
+        .sorted(Comparator.comparing(User::getFirstName))
+        .collect(Collectors.toList());
 
-  @Override
-  protected void setUp() throws Exception {
-    if(ldapTestEnvironment == null) {
-      ldapTestEnvironment = new LdapTestEnvironment();
-      ldapTestEnvironment.init();
+    assertThat(orderedUsers.size()).isEqualTo(manualOrderedUsers.size());
+
+    for (int i = 0; i < orderedUsers.size(); i++) {
+      assertThat(orderedUsers.get(i).getId()).isEqualTo(manualOrderedUsers.get(i).getId());
     }
-    super.setUp();
   }
 
-  @Override
-  protected void tearDown() throws Exception {
-    if(ldapTestEnvironment != null) {
-      ldapTestEnvironment.shutdown();
-      ldapTestEnvironment = null;
+  @Test
+  public void testOrderByUserFirstNameDesc() {
+    List<User> orderedUsers = identityService.createUserQuery().orderByUserFirstName().desc().list();
+
+    List<User> manualOrderedUsers = identityService.createUserQuery()
+        .list()
+        .stream()
+        .sorted(Comparator.comparing(User::getFirstName).reversed())
+        .collect(Collectors.toList());
+
+    assertThat(orderedUsers.size()).isEqualTo(manualOrderedUsers.size());
+
+    for (int i = 0; i < orderedUsers.size(); i++) {
+      assertThat(orderedUsers.get(i).getId()).isEqualTo(manualOrderedUsers.get(i).getId());
     }
-    super.tearDown();
   }
 
-
-
-  public void testOrderByUserFirstName() {
+  /**
+   * LastName
+   */
+  @Test
+  public void testOrderByUserLastNameAsc() {
     List<User> orderedUsers = identityService.createUserQuery().orderByUserLastName().asc().list();
-    List<User> userList = identityService.createUserQuery().list();
 
-    Collections.sort(userList, new Comparator<User>() {
-      @Override
-      public int compare(User o1, User o2) {
-        return o1.getLastName().compareToIgnoreCase(o2.getLastName());
-      }
-    });
+    List<User> manualOrderedUsers = identityService.createUserQuery()
+        .list()
+        .stream()
+        .sorted(Comparator.comparing(User::getLastName))
+        .collect(Collectors.toList());
 
-    int len = orderedUsers.size();
-    for (int i = 0; i < len; i++) {
-      assertEquals("Index: " + i, orderedUsers.get(i).getLastName(), userList.get(i).getLastName());
+    assertThat(orderedUsers.size()).isEqualTo(manualOrderedUsers.size());
+
+    for (int i = 0; i < orderedUsers.size(); i++) {
+      assertThat(orderedUsers.get(i).getLastName()).isEqualTo(manualOrderedUsers.get(i).getLastName());
     }
   }
+
+  @Test
+  public void testOrderByUserLastNameDesc() {
+    List<User> orderedUsers = identityService.createUserQuery().orderByUserLastName().desc().list();
+
+    List<User> manualOrderedUsers = identityService.createUserQuery()
+        .list()
+        .stream()
+        .sorted(Comparator.comparing(User::getLastName).reversed())
+        .collect(Collectors.toList());
+
+    assertThat(orderedUsers.size()).isEqualTo(manualOrderedUsers.size());
+
+    for (int i = 0; i < orderedUsers.size(); i++) {
+      assertThat(orderedUsers.get(i).getLastName()).isEqualTo(manualOrderedUsers.get(i).getLastName());
+    }
+  }
+
+  /**
+   * EMAIL
+   */
+  @Test
+  public void testOrderByUserEmailAsc() {
+    List<User> orderedUsers = identityService.createUserQuery().orderByUserEmail().asc().list();
+    List<User> manualOrderedUsers = identityService.createUserQuery()
+        .list()
+        .stream()
+        .sorted(Comparator.comparing(User::getEmail))
+        .collect(Collectors.toList());
+
+    assertThat(orderedUsers.size()).isEqualTo(manualOrderedUsers.size());
+
+    for (int i = 0; i < orderedUsers.size(); i++) {
+      assertThat(orderedUsers.get(i).getId()).isEqualTo(manualOrderedUsers.get(i).getId());
+    }
+  }
+
+  @Test
+  public void testOrderByUserEmailDesc() {
+    List<User> orderedUsers = identityService.createUserQuery().orderByUserEmail().desc().list();
+
+    List<User> manualOrderedUsers = identityService.createUserQuery()
+        .list()
+        .stream()
+        .sorted(Comparator.comparing(User::getEmail).reversed())
+        .collect(Collectors.toList());
+
+    assertThat(orderedUsers.size()).isEqualTo(manualOrderedUsers.size());
+
+    for (int i = 0; i < orderedUsers.size(); i++) {
+      assertThat(orderedUsers.get(i).getId()).isEqualTo(manualOrderedUsers.get(i).getId());
+    }
+  }
+
+  /**
+   * ID
+   */
+  @Test
+  public void testOrderByUserIdAsc() {
+    List<User> orderedUsers = identityService.createUserQuery().orderByUserId().asc().list();
+    List<User> manualOrderedUsers = identityService.createUserQuery()
+        .list()
+        .stream()
+        .sorted(Comparator.comparing(User::getId))
+        .collect(Collectors.toList());
+
+    assertThat(orderedUsers.size()).isEqualTo(manualOrderedUsers.size());
+
+    for (int i = 0; i < orderedUsers.size(); i++) {
+      assertThat(orderedUsers.get(i).getId()).isEqualTo(manualOrderedUsers.get(i).getId());
+    }
+  }
+
+  @Test
+  public void testOrderByUserIdDesc() {
+    List<User> orderedUsers = identityService.createUserQuery().orderByUserId().desc().list();
+
+    List<User> manualOrderedUsers = identityService.createUserQuery()
+        .list()
+        .stream()
+        .sorted(Comparator.comparing(User::getId).reversed())
+        .collect(Collectors.toList());
+
+    assertThat(orderedUsers.size()).isEqualTo(manualOrderedUsers.size());
+
+    for (int i = 0; i < orderedUsers.size(); i++) {
+      assertThat(orderedUsers.get(i).getId()).isEqualTo(manualOrderedUsers.get(i).getId());
+    }
+  }
+
+  /**
+   * Group ID Ordering
+   */
+  @Test
+  public void testOrderByGroupIdAsc() {
+    List<Group> orderedGroup = identityService.createGroupQuery().orderByGroupId().asc().list();
+    List<Group> manualOrderedGroups = identityService.createGroupQuery()
+        .list()
+        .stream()
+        .sorted(Comparator.comparing(Group::getId))
+        .collect(Collectors.toList());
+
+    assertThat(orderedGroup.size()).isEqualTo(manualOrderedGroups.size());
+
+    for (int i = 0; i < orderedGroup.size(); i++) {
+      assertThat(orderedGroup.get(i).getId()).isEqualTo(manualOrderedGroups.get(i).getId());
+    }
+  }
+
+  @Test
+  public void testOrderByGroupIdDesc() {
+    List<Group> orderedGroup = identityService.createGroupQuery().orderByGroupId().desc().list();
+    List<Group> manualOrderedGroups = identityService.createGroupQuery()
+        .list()
+        .stream()
+        .sorted(Comparator.comparing(Group::getId).reversed())
+        .collect(Collectors.toList());
+
+    assertThat(orderedGroup.size()).isEqualTo(manualOrderedGroups.size());
+
+    for (int i = 0; i < orderedGroup.size(); i++) {
+      assertThat(orderedGroup.get(i).getId()).isEqualTo(manualOrderedGroups.get(i).getId());
+    }
+  }
+
+  /**
+   * Group Name Ordering
+   */
+  @Test
+  public void testOrderByGroupNameAsc() {
+    List<Group> orderedGroup = identityService.createGroupQuery().orderByGroupName().asc().list();
+    List<Group> manualOrderedGroups = identityService.createGroupQuery()
+        .list()
+        .stream()
+        .sorted(Comparator.comparing(Group::getName))
+        .collect(Collectors.toList());
+
+    assertThat(orderedGroup.size()).isEqualTo(manualOrderedGroups.size());
+
+    for (int i = 0; i < orderedGroup.size(); i++) {
+      assertThat(orderedGroup.get(i).getId()).isEqualTo(manualOrderedGroups.get(i).getId());
+    }
+  }
+
+  @Test
+  public void testOrderByGroupNameDesc() {
+    List<Group> orderedGroup = identityService.createGroupQuery().orderByGroupName().desc().list();
+    List<Group> manualOrderedGroups = identityService.createGroupQuery()
+        .list()
+        .stream()
+        .sorted(Comparator.comparing(Group::getName).reversed())
+        .collect(Collectors.toList());
+
+    assertThat(orderedGroup.size()).isEqualTo(manualOrderedGroups.size());
+
+    for (int i = 0; i < orderedGroup.size(); i++) {
+      assertThat(orderedGroup.get(i).getId()).isEqualTo(manualOrderedGroups.get(i).getId());
+    }
+  }
+
 }

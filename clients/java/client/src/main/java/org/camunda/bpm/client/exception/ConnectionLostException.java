@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.client.exception;
 
+import java.io.IOException;
+
 /**
  * <p>Exception is thrown if the connection could not be established</p>
  *
@@ -25,8 +27,8 @@ public class ConnectionLostException extends ExternalTaskClientException {
 
   private static final long serialVersionUID = 1L;
 
-  public ConnectionLostException(String message) {
-    super(message);
+  public ConnectionLostException(String message, IOException e) {
+    super(message, e);
   }
 
 }

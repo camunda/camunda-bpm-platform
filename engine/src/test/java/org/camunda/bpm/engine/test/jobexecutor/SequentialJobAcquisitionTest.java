@@ -23,7 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-
+import java.util.function.Supplier;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -32,7 +32,7 @@ import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
-import org.camunda.bpm.engine.impl.jobexecutor.SequentialJobAcquisitionRunnable;
+import org.camunda.bpm.engine.impl.jobexecutor.ThreadPoolJobExecutor;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.junit.After;
 import org.junit.Assert;
@@ -221,9 +221,11 @@ public class SequentialJobAcquisitionTest {
     jobExecutor.start();
     waitForJobExecutorToProcessAllJobs(10000, 100, jobExecutor, engine2.getManagementService(), false);
 
+    waitForJobExecutionRunnablesToFinish(10000, 100, jobExecutor);
+
     Thread.sleep(2000);
 
-    Assert.assertFalse(((SequentialJobAcquisitionRunnable) jobExecutor.getAcquireJobsRunnable()).isJobAdded());
+    Assert.assertFalse(jobExecutor.getAcquireJobsRunnable().isJobAdded());
 
     Assert.assertEquals(0, engine1.getManagementService().createJobQuery().count());
     Assert.assertEquals(0, engine2.getManagementService().createJobQuery().count());
@@ -233,26 +235,10 @@ public class SequentialJobAcquisitionTest {
   ////////// helper methods ////////////////////////////
 
 
-  public void waitForJobExecutorToProcessAllJobs(long maxMillisToWait, long intervalMillis, JobExecutor jobExecutor, ManagementService managementService, boolean shutdown) {
-
+  protected void waitForJobExecutorToProcessAllJobs(long maxMillisToWait, long intervalMillis, JobExecutor jobExecutor,
+      ManagementService managementService, boolean shutdown) {
     try {
-      Timer timer = new Timer();
-      InteruptTask task = new InteruptTask(Thread.currentThread());
-      timer.schedule(task, maxMillisToWait);
-      boolean areJobsAvailable = true;
-      try {
-        while (areJobsAvailable && !task.isTimeLimitExceeded()) {
-          Thread.sleep(intervalMillis);
-          areJobsAvailable = areJobsAvailable(managementService);
-        }
-      } catch (InterruptedException e) {
-      } finally {
-        timer.cancel();
-      }
-      if (areJobsAvailable) {
-        throw new ProcessEngineException("time limit of " + maxMillisToWait + " was exceeded");
-      }
-
+      waitForCondition(maxMillisToWait, intervalMillis, () -> !areJobsAvailable(managementService));
     } finally {
       if (shutdown) {
         jobExecutor.shutdown();
@@ -260,7 +246,31 @@ public class SequentialJobAcquisitionTest {
     }
   }
 
-  public boolean areJobsAvailable(ManagementService managementService) {
+  protected void waitForJobExecutionRunnablesToFinish(long maxMillisToWait, long intervalMillis, JobExecutor jobExecutor) {
+    waitForCondition(maxMillisToWait, intervalMillis,
+        () -> ((ThreadPoolJobExecutor) jobExecutor).getThreadPoolExecutor().getActiveCount() == 0);
+  }
+
+  protected void waitForCondition(long maxMillisToWait, long intervalMillis, Supplier<Boolean> conditionSupplier) {
+    boolean conditionFulfilled = false;
+    Timer timer = new Timer();
+    InteruptTask task = new InteruptTask(Thread.currentThread());
+    timer.schedule(task, maxMillisToWait);
+    try {
+      while (!conditionFulfilled && !task.isTimeLimitExceeded()) {
+        Thread.sleep(intervalMillis);
+        conditionFulfilled = conditionSupplier.get();
+      }
+    } catch (InterruptedException e) {
+    } finally {
+      timer.cancel();
+    }
+    if (!conditionFulfilled) {
+      throw new ProcessEngineException("time limit of " + maxMillisToWait + " was exceeded");
+    }
+  }
+
+  protected boolean areJobsAvailable(ManagementService managementService) {
     return !managementService
       .createJobQuery()
       .executable()
@@ -277,6 +287,7 @@ public class SequentialJobAcquisitionTest {
     public boolean isTimeLimitExceeded() {
       return timeLimitExceeded;
     }
+    @Override
     public void run() {
       timeLimitExceeded = true;
       thread.interrupt();

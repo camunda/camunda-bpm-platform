@@ -72,6 +72,7 @@ public class UpdateCaseDefinitionHistoryTimeToLiveCmd implements Command<Void>, 
     commandContext.getOperationLogManager()
       .logCaseDefinitionOperation(UserOperationLogEntry.OPERATION_TYPE_UPDATE_HISTORY_TIME_TO_LIVE,
         caseDefinitionId,
+        caseDefinitionEntity.getTenantId(),
         propertyChanges);
   }
 }

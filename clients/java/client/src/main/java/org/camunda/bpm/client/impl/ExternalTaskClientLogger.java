@@ -19,13 +19,12 @@ package org.camunda.bpm.client.impl;
 import java.io.IOException;
 import java.util.Collection;
 
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpResponseException;
 import org.camunda.bpm.client.exception.ConnectionLostException;
 import org.camunda.bpm.client.exception.ExternalTaskClientException;
-import org.camunda.bpm.client.exception.NotAcquiredException;
+import org.camunda.bpm.client.exception.BadRequestException;
 import org.camunda.bpm.client.exception.NotFoundException;
-import org.camunda.bpm.client.exception.NotResumedException;
+import org.camunda.bpm.client.exception.EngineException;
+import org.camunda.bpm.client.exception.RestException;
 import org.camunda.bpm.client.exception.UnknownHttpErrorException;
 import org.camunda.bpm.client.exception.ValueMapperException;
 import org.camunda.bpm.client.spi.DataFormat;
@@ -107,36 +106,40 @@ public class ExternalTaskClientLogger extends BaseLogger {
       "006", "Topic name '{}' has already been subscribed", topicName));
   }
 
-  public ExternalTaskClientException externalTaskServiceException(String actionName, EngineClientException e) {
+  public ExternalTaskClientException handledEngineClientException(String actionName, EngineClientException e) {
     Throwable causedException = e.getCause();
 
-    if (causedException instanceof HttpResponseException) {
-      switch (((HttpResponseException) causedException).getStatusCode()) {
+    if (causedException instanceof RestException) {
+      RestException restException = (RestException) causedException;
+
+      String message = restException.getMessage();
+      int httpStatusCode = restException.getHttpStatusCode();
+
+      switch (httpStatusCode) {
         case 400:
-          return new NotAcquiredException(exceptionMessage(
-            "007", "Exception while {}: The task's most recent lock could not be acquired", actionName));
+          return new BadRequestException(createMessage("007", actionName, message), restException);
         case 404:
-          return new NotFoundException(exceptionMessage(
-            "008", "Exception while {}: The task could not be found", actionName));
+          return new NotFoundException(createMessage("008", actionName, message), restException);
         case 500:
-          String processEngineError = e.getCause().getMessage();
-          String exceptionReason = (processEngineError != null && !processEngineError.isEmpty())? " Reason: " + processEngineError : "";
-          return new NotResumedException(exceptionMessage(
-            "009", "Exception while {}: The corresponding process instance could not be resumed.{}", actionName, exceptionReason), processEngineError);
+          return new EngineException(createMessage("009", actionName, message), restException);
         default:
-          int statusCode = ((HttpResponseException) causedException).getStatusCode();
           return new UnknownHttpErrorException(exceptionMessage(
-            "031", "Exception while performing an HTTP Request. The request failed with status code: {}.", statusCode));
+            "031", "Exception while {}: The request failed with status code {} and message: \"{}\"", actionName, httpStatusCode, message), restException);
       }
     }
 
-    if (causedException instanceof ClientProtocolException || causedException instanceof IOException) {
+    if (causedException instanceof IOException) {
+      IOException ioException = (IOException) causedException;
       return new ConnectionLostException(exceptionMessage(
-        "010", "Exception while {}: Connection could not be established", actionName));
+        "010", "Exception while {}: Connection could not be established with message: \"{}\"", actionName, ioException.getMessage()), ioException);
     }
 
     return new ExternalTaskClientException(exceptionMessage(
       "011", "Exception while {}: ", actionName), e);
+  }
+
+  protected String createMessage(String id, String actionName, String message) {
+    return exceptionMessage(id, "Exception while {}: {}", actionName, message);
   }
 
   public ExternalTaskClientException basicAuthCredentialsNullException() {
@@ -228,10 +231,6 @@ public class ExternalTaskClientLogger extends BaseLogger {
 
   public ExternalTaskClientException multipleProvidersForDataformat(String dataFormatName) {
     return new ExternalTaskClientException(exceptionMessage("028", "Multiple providers found for dataformat '{}'", dataFormatName));
-  }
-
-  public ExternalTaskClientException cannotLoadDeferedFileValueException(String variableName, Exception e) {
-    return new ExternalTaskClientException(exceptionMessage("029", "Variable '{}' of type file could not be retrieved", variableName), e);
   }
 
   public ExternalTaskClientException passNullValueParameter(String parameterName) {

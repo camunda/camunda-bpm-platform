@@ -74,6 +74,6 @@ public class UpdateDecisionDefinitionHistoryTimeToLiveCmd implements Command<Voi
     propertyChanges.add(new PropertyChange("decisionDefinitionKey", null, decisionDefinitionEntity.getKey()));
 
     commandContext.getOperationLogManager()
-      .logDecisionDefinitionOperation(UserOperationLogEntry.OPERATION_TYPE_UPDATE_HISTORY_TIME_TO_LIVE, propertyChanges);
+      .logDecisionDefinitionOperation(UserOperationLogEntry.OPERATION_TYPE_UPDATE_HISTORY_TIME_TO_LIVE, decisionDefinitionEntity.getTenantId(), propertyChanges);
   }
 }

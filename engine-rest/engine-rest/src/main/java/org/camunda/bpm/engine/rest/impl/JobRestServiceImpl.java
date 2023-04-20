@@ -17,11 +17,16 @@
 package org.camunda.bpm.engine.rest.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.List;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
+import org.camunda.bpm.engine.management.SetJobRetriesByJobsAsyncBuilder;
 import org.camunda.bpm.engine.rest.JobRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
@@ -32,13 +37,9 @@ import org.camunda.bpm.engine.rest.dto.runtime.SetJobRetriesDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.runtime.JobResource;
 import org.camunda.bpm.engine.rest.sub.runtime.impl.JobResourceImpl;
+import org.camunda.bpm.engine.rest.util.QueryUtil;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
-
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
-import java.util.ArrayList;
-import java.util.List;
 
 public class JobRestServiceImpl extends AbstractRestProcessEngineAware
     implements JobRestService {
@@ -66,14 +67,9 @@ public class JobRestServiceImpl extends AbstractRestProcessEngineAware
     queryDto.setObjectMapper(getObjectMapper());
     JobQuery query = queryDto.toQuery(engine);
 
-    List<Job> matchingJobs;
-    if (firstResult != null || maxResults != null) {
-      matchingJobs = executePaginatedQuery(query, firstResult, maxResults);
-    } else {
-      matchingJobs = query.list();
-    }
+    List<Job> matchingJobs = QueryUtil.list(query, firstResult, maxResults);
 
-    List<JobDto> jobResults = new ArrayList<JobDto>();
+    List<JobDto> jobResults = new ArrayList<>();
     for (Job job : matchingJobs) {
       JobDto resultJob = JobDto.fromJob(job);
       jobResults.add(resultJob);
@@ -110,32 +106,27 @@ public class JobRestServiceImpl extends AbstractRestProcessEngineAware
     }
     JobQuery jobQuery = null;
     if (setJobRetriesDto.getJobQuery() != null) {
-      jobQuery = setJobRetriesDto.getJobQuery().toQuery(getProcessEngine());
+      JobQueryDto jobQueryDto = setJobRetriesDto.getJobQuery();
+      jobQueryDto.setObjectMapper(getObjectMapper());
+      jobQuery = jobQueryDto.toQuery(getProcessEngine());
     }
 
     try {
-      Batch batch = getProcessEngine().getManagementService().setJobRetriesAsync(
-          setJobRetriesDto.getJobIds(),
-          jobQuery,
-          setJobRetriesDto.getRetries().intValue()
-      );
+      SetJobRetriesByJobsAsyncBuilder builder = getProcessEngine().getManagementService()
+          .setJobRetriesByJobsAsync(setJobRetriesDto.getRetries().intValue())
+          .jobIds(setJobRetriesDto.getJobIds())
+          .jobQuery(jobQuery);
+      if(setJobRetriesDto.isDueDateSet()) {
+        builder.dueDate(setJobRetriesDto.getDueDate());
+      }
+      Batch batch = builder.executeAsync();
       return BatchDto.fromBatch(batch);
     } catch (BadUserRequestException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, e.getMessage());
     }
   }
 
-  private List<Job> executePaginatedQuery(JobQuery query,
-                                          Integer firstResult, Integer maxResults) {
-    if (firstResult == null) {
-      firstResult = 0;
-    }
-    if (maxResults == null) {
-      maxResults = Integer.MAX_VALUE;
-    }
-    return query.listPage(firstResult, maxResults);
-  }
-
+  @Override
   public void updateSuspensionState(JobSuspensionStateDto dto) {
     if (dto.getJobId() != null) {
       String message = "Either jobDefinitionId, processInstanceId, processDefinitionId or processDefinitionKey can be set to update the suspension state.";

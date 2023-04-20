@@ -69,7 +69,7 @@ create table ACT_GE_SCHEMA_LOG (
 );
 
 insert into ACT_GE_SCHEMA_LOG
-values ('0', CURRENT_TIMESTAMP, '7.17.0');
+values ('0', CURRENT_TIMESTAMP, '7.20.0');
 
 create table ACT_RE_DEPLOYMENT (
     ID_ nvarchar(64),
@@ -198,6 +198,7 @@ create table ACT_RU_TASK (
     DELEGATION_ nvarchar(64),
     PRIORITY_ int,
     CREATE_TIME_ datetime2,
+    LAST_UPDATED_ datetime2,
     DUE_DATE_ datetime2,
     FOLLOW_UP_DATE_ datetime2,
     SUSPENSION_STATE_ int,
@@ -354,6 +355,8 @@ create table ACT_RU_BATCH (
   CONFIGURATION_ nvarchar(255),
   TENANT_ID_ nvarchar(64),
   CREATE_USER_ID_ nvarchar(255),
+  START_TIME_ datetime2,
+  EXEC_START_TIME_ datetime2,
   primary key (ID_)
 );
 
@@ -361,6 +364,7 @@ create index ACT_IDX_EXEC_ROOT_PI on ACT_RU_EXECUTION(ROOT_PROC_INST_ID_);
 create index ACT_IDX_EXEC_BUSKEY on ACT_RU_EXECUTION(BUSINESS_KEY_);
 create index ACT_IDX_EXEC_TENANT_ID on ACT_RU_EXECUTION(TENANT_ID_);
 create index ACT_IDX_TASK_CREATE on ACT_RU_TASK(CREATE_TIME_);
+create index ACT_IDX_TASK_LAST_UPDATED on ACT_RU_TASK(LAST_UPDATED_);
 create index ACT_IDX_TASK_ASSIGNEE on ACT_RU_TASK(ASSIGNEE_);
 create index ACT_IDX_TASK_OWNER on ACT_RU_TASK(OWNER_);
 create index ACT_IDX_TASK_TENANT_ID on ACT_RU_TASK(TENANT_ID_);

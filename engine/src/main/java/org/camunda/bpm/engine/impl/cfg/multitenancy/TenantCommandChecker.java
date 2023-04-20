@@ -481,12 +481,16 @@ public class TenantCommandChecker implements CommandChecker {
 
   @Override
   public void checkDeleteUserOperationLog(UserOperationLogEntry entry) {
-    // tenant check is not available for user operation log
+    if (entry != null && !getTenantManager().isAuthenticatedTenant(entry.getTenantId())) {
+      throw LOG.exceptionCommandWithUnauthorizedTenant("delete the user operation log entry '" + entry.getId() + "'");
+    }
   }
 
   @Override
   public void checkUpdateUserOperationLog(UserOperationLogEntry entry) {
-    // tenant check is not available for user operation log
+    if (entry != null && !getTenantManager().isAuthenticatedTenant(entry.getTenantId())) {
+      throw LOG.exceptionCommandWithUnauthorizedTenant("update the user operation log entry '" + entry.getId() + "'");
+    }
   }
 
   @Override

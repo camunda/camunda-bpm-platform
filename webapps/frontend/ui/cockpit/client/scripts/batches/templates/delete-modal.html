@@ -1,0 +1,15 @@
+<div class="modal-header">
+  <h3 class="modal-title">{{ 'BATCHES_DELETE_TITLE' | translate }}</h3>
+</div>
+<div class="modal-body">
+  {{ 'BATCHES_DELETE_LEGEND' | translate }}<br />
+  <div ng-if="ctrl.type === 'runtime'">
+    <br />
+    <input type="radio" ng-model="ctrl.cascade" ng-value="false" ng-disabled="ctrl.disable" /> {{ 'BATCHES_DELETE_INPUT_KEEP' | translate }}<br />
+    <input type="radio" ng-model="ctrl.cascade" ng-value="true" ng-disabled="ctrl.disable" /> {{ 'BATCHES_DELETE_INPUT_DELETE' | translate }}
+  </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-default" ng-click="ctrl.cancel()" ng-disabled="ctrl.disable">{{ 'BATCHES_DELETE_BTN_CANCEL'  | translate }}</button>
+    <button class="btn btn-primary" ng-click="ctrl.confirm()" ng-disabled="ctrl.disable">{{ 'BATCHES_DELETE_BTN_CONFIRM' | translate }}</button>
+</div>

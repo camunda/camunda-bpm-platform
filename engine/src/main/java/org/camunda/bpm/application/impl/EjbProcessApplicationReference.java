@@ -17,7 +17,6 @@
 package org.camunda.bpm.application.impl;
 
 import javax.ejb.EJBException;
-
 import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
@@ -47,16 +46,17 @@ public class EjbProcessApplicationReference implements ProcessApplicationReferen
     this.processApplicationName = name;
   }
 
+  @Override
   public String getName() {
     return processApplicationName;
   }
 
+  @Override
   public ProcessApplicationInterface getProcessApplication() throws ProcessApplicationUnavailableException {
     try {
       // check whether process application is still deployed
       selfReference.getName();
-    }
-    catch(EJBException e) {
+    } catch (EJBException e) {
       throw LOG.processApplicationUnavailableException(processApplicationName, e);
     }
     return selfReference;

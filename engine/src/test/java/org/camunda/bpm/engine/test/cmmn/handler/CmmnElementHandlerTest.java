@@ -21,6 +21,7 @@ import java.util.HashMap;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.handler.CmmnHandlerContext;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
+import org.camunda.bpm.engine.impl.el.JuelExpressionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.model.cmmn.Cmmn;
@@ -60,7 +61,7 @@ public abstract class CmmnElementHandlerTest {
     caseDefinition.setTaskDefinitions(new HashMap<String, TaskDefinition>());
     context.setCaseDefinition(caseDefinition);
 
-    ExpressionManager expressionManager = new ExpressionManager();
+    ExpressionManager expressionManager = new JuelExpressionManager();
     context.setExpressionManager(expressionManager);
 
     DeploymentEntity deployment = new DeploymentEntity();

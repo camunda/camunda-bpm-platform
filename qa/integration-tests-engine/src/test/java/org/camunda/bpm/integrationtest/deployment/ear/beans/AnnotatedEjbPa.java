@@ -18,8 +18,6 @@ package org.camunda.bpm.integrationtest.deployment.ear.beans;
 
 import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationInterface;
-import org.camunda.bpm.application.impl.EjbProcessApplication;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ejb.ConcurrencyManagement;
@@ -39,7 +37,8 @@ import javax.ejb.TransactionAttributeType;
 @TransactionAttribute(TransactionAttributeType.REQUIRED)
 @ProcessApplication(deploymentDescriptors = {"deployment-descriptor-with-custom-filename.xml"})
 @Local(ProcessApplicationInterface.class)
-public class AnnotatedEjbPa extends EjbProcessApplication {
+// Using fully-qualified class name instead of import statement to allow for automatic Jakarta transformation
+public class AnnotatedEjbPa extends org.camunda.bpm.application.impl.EjbProcessApplication {
 
   @PostConstruct
   public void start() {

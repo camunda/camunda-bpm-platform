@@ -523,7 +523,7 @@ public interface RepositoryService {
    * @param processDefinitionId
    *          id of a {@link ProcessDefinition}, cannot be null.
    *
-   * @throws ProcessEngineException
+   * @throws NotFoundException
    *           when the process model doesn't exist.
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_DEFINITION}.
@@ -809,7 +809,7 @@ public interface RepositoryService {
    * @param processDefinitionId id of a {@link ProcessDefinition}
    * @return a list of {@link CalledProcessDefinition}.
    *
-   * @throws ProcessEngineException
+   * @throws NotFoundException
    *          When the process definition doesn't exist.
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#READ} permission on {@link Resources#PROCESS_DEFINITION}.

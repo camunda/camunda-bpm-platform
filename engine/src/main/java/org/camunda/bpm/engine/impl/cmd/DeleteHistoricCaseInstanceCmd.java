@@ -56,9 +56,11 @@ public class DeleteHistoricCaseInstanceCmd implements Command<Object>, Serializa
     }
 
     ensureNotNull("Case instance is still running, cannot delete historic case instance: " + caseInstanceId, "instance.getCloseTime()", instance.getCloseTime());
-    
-    commandContext.getOperationLogManager().logCaseInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY, 
-        caseInstanceId, Collections.singletonList(PropertyChange.EMPTY_CHANGE));
+
+    commandContext.getOperationLogManager().logCaseInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY,
+        caseInstanceId,
+        instance.getTenantId(),
+        Collections.singletonList(PropertyChange.EMPTY_CHANGE));
 
     commandContext
       .getHistoricCaseInstanceManager()

@@ -8,7 +8,7 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-engine-rest-root</artifactId>
     <relativePath>../</relativePath>
-    <version>7.17.0</version>
+    <version>7.20.0-SNAPSHOT</version>
   </parent>
 
   <properties>
@@ -22,6 +22,12 @@
     <dependency>
       <groupId>commons-fileupload</groupId>
       <artifactId>commons-fileupload</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-io</groupId>
+          <artifactId>commons-io</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <!-- override managed version from commons-fileupload -->
     <dependency>
@@ -32,7 +38,6 @@
     <dependency>
       <groupId>com.fasterxml.jackson.jaxrs</groupId>
       <artifactId>jackson-jaxrs-json-provider</artifactId>
-      <version>${version.jackson}</version>
       <!--
       * Since version 2.10.0 this dependency comes with transitive Jakarta dependencies
       * These trans-deps are directly included in JDKs <= Java 8 * For Java >= 9 compatible containers, we make sure to include these dependencies
@@ -52,13 +57,11 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>${version.jackson}</version>
     </dependency>
 
     <dependency>
       <groupId>com.fasterxml.jackson.datatype</groupId>
       <artifactId>jackson-datatype-jsr310</artifactId>
-      <version>${version.jackson}</version>
     </dependency>
 
     <!-- provided deps -->
@@ -85,7 +88,7 @@
       <artifactId>camunda-commons-logging</artifactId>
       <scope>provided</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>javax.activation</groupId>
       <artifactId>activation</artifactId>
@@ -100,7 +103,7 @@
     </dependency>
 
     <!--
-      needed for offline shrinkwrap (in particular CustomJacksonDateFormatTest), 
+      needed for offline shrinkwrap (in particular CustomJacksonDateFormatTest),
       BOMs must be installed before this module is built
     -->
     <dependency>
@@ -164,15 +167,12 @@
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpcore</artifactId>
-      <version>4.4.5</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
-      <!-- override version -->
-      <version>1.15</version>
       <scope>test</scope>
     </dependency>
 
@@ -285,20 +285,16 @@
         </configuration>
       </plugin>
 
-      <!-- the test runtimes each bring the JAX-RS classes themselves -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <classpathDependencyExcludes>
-            <classpathDependencyExclude>org.jboss.spec.javax.ws.rs:jboss-jaxrs-api_1.1_spec</classpathDependencyExclude>
-          </classpathDependencyExcludes>
           <systemPropertyVariables>
             <restEasyVersion>${version.resteasy}</restEasyVersion>
           </systemPropertyVariables>
         </configuration>
       </plugin>
-      
+
       <plugin>
         <groupId>org.jboss.shrinkwrap.resolver</groupId>
         <artifactId>shrinkwrap-resolver-maven-plugin</artifactId>
@@ -360,7 +356,7 @@
             </exclusion>
           </exclusions>
         </dependency>
-        
+
         <dependency>
           <groupId>io.netty</groupId>
           <artifactId>netty-all</artifactId>
@@ -381,11 +377,6 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
-              <excludes>
-                <!-- This test is only needed for the Resteasy 2 profile; with
-                  Resteasy 3 we can run the regular test -->
-                <exclude>**/ResteasyTaskRestServiceInteractionTest.java</exclude>
-              </excludes>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
             <executions>
@@ -396,6 +387,7 @@
                   <goal>test</goal>
                 </goals>
                 <configuration>
+                  <!-- Ensures that endpoints work with other encodings than UTF-8 (cf. CAM-6983) -->
                   <argLine>-Dfile.encoding=ISO-8859-1</argLine>
                   <includes>
                     <include>**/ProcessDefinitionRestServiceInteractionTest.java</include>
@@ -493,6 +485,7 @@
                   <goal>test</goal>
                 </goals>
                 <configuration>
+                  <!-- Ensures that endpoints work with other encodings than UTF-8 (cf. CAM-6983) -->
                   <argLine>-Dfile.encoding=ISO-8859-1</argLine>
                   <includes>
                     <include>**/ProcessDefinitionRestServiceInteractionTest.java</include>
@@ -553,7 +546,7 @@
           <version>2.0.1</version>
           <scope>provided</scope>
         </dependency>
-        
+
         <dependency>
           <groupId>org.apache.cxf</groupId>
           <artifactId>cxf-rt-frontend-jaxrs</artifactId>
@@ -590,6 +583,7 @@
                   <goal>test</goal>
                 </goals>
                 <configuration>
+                  <!-- Ensures that endpoints work with other encodings than UTF-8 (cf. CAM-6983) -->
                   <argLine>-Dfile.encoding=ISO-8859-1</argLine>
                   <includes>
                     <include>**/ProcessDefinitionRestServiceInteractionTest.java</include>
@@ -654,19 +648,18 @@
       <properties>
         <!-- Test with Resteasy version used by the oldest
              Camunda-supported Wildfly/JBoss EAP version.
-             Currently this is JBoss EAP 7.0 (3.0.16.Final) and 7.1 (3.0.24.Final). -->
-        <version.resteasy>3.0.16.Final</version.resteasy>
+             Currently, this is JBoss EAP 7.2. -->
+        <version.resteasy>3.6.1.SP2</version.resteasy>
+        <version.netty>4.1.42.Final</version.netty>
       </properties>
-      <!-- Resteasy 3.0.X is more similar to Resteasy 2.x, so we need to define separate
-           dependencies for testing compatibility with older Wildfly/JBoss versions.
-           We can drop the 'dependencies' and 'build' sections below once we drop support for
-           Resteasy 3.0.X -->
+
       <dependencies>
         <dependency>
           <groupId>org.jboss.spec.javax.ws.rs</groupId>
-          <artifactId>jboss-jaxrs-api_1.1_spec</artifactId>
+          <artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
           <scope>provided</scope>
         </dependency>
+
         <dependency>
           <groupId>org.jboss.resteasy</groupId>
           <artifactId>resteasy-jaxrs</artifactId>
@@ -681,8 +674,15 @@
         </dependency>
 
         <dependency>
+          <groupId>io.netty</groupId>
+          <artifactId>netty-all</artifactId>
+          <version>${version.netty}</version>
+          <scope>test</scope>
+        </dependency>
+
+        <dependency>
           <groupId>org.jboss.resteasy</groupId>
-          <artifactId>resteasy-netty</artifactId>
+          <artifactId>resteasy-netty4</artifactId>
           <version>${version.resteasy}</version>
           <scope>test</scope>
         </dependency>
@@ -692,14 +692,6 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <excludes>
-                <exclude>**/TaskRestServiceInteractionTest.java</exclude>
-                <exclude>**/NoServletEmptyBodyFilterTest.java</exclude>
-                <exclude>**/ServletEmptyBodyFilterTest.java</exclude>
-              </excludes>
-              <redirectTestOutputToFile>true</redirectTestOutputToFile>
-            </configuration>
             <executions>
               <execution>
                 <id>encoding-test</id>
@@ -708,10 +700,11 @@
                   <goal>test</goal>
                 </goals>
                 <configuration>
+                  <!-- Ensures that endpoints work with other encodings than UTF-8 (cf. CAM-6983) -->
                   <argLine>-Dfile.encoding=ISO-8859-1</argLine>
                   <includes>
                     <include>**/ProcessDefinitionRestServiceInteractionTest.java</include>
-                    <include>**/ResteasyTaskRestServiceInteractionTest.java</include>
+                    <include>**/TaskRestServiceInteractionTest.java</include>
                   </includes>
                 </configuration>
               </execution>

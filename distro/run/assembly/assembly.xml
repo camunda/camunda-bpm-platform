@@ -44,7 +44,11 @@
       <outputDirectory>configuration/userlib/</outputDirectory>
       <includes>
         <include>com.h2database:h2</include>
-        <include>org.codehaus.groovy:groovy-all:jar:*</include>
+        <include>org.codehaus.groovy:groovy:jar:*</include>
+        <include>org.codehaus.groovy:groovy-jsr223:jar:*</include>
+        <include>org.codehaus.groovy:groovy-json:jar:*</include>
+        <include>org.codehaus.groovy:groovy-xml:jar:*</include>
+        <include>org.codehaus.groovy:groovy-templates:jar:*</include>
       </includes>
     </dependencySet>
   </dependencySets>

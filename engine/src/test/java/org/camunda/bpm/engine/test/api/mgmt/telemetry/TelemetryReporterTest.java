@@ -26,8 +26,11 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.management.Metrics.ACTIVTY_INSTANCE_START;
+import static org.camunda.bpm.engine.management.Metrics.DECISION_INSTANCES;
 import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_ELEMENTS;
 import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_INSTANCES;
+import static org.camunda.bpm.engine.management.Metrics.FLOW_NODE_INSTANCES;
+import static org.camunda.bpm.engine.management.Metrics.PROCESS_INSTANCES;
 import static org.camunda.bpm.engine.management.Metrics.ROOT_PROCESS_INSTANCE_START;
 
 import java.net.HttpURLConnection;
@@ -52,21 +55,24 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.ManagementServiceImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.metrics.Meter;
 import org.camunda.bpm.engine.impl.metrics.util.MetricsUtil;
+import org.camunda.bpm.engine.impl.telemetry.CamundaIntegration;
 import org.camunda.bpm.engine.impl.telemetry.PlatformTelemetryRegistry;
 import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServerImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.CommandImpl;
-import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.DatabaseImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.InternalsImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.JdkImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyDataImpl;
 import org.camunda.bpm.engine.impl.telemetry.dto.ProductImpl;
+import org.camunda.bpm.engine.impl.telemetry.dto.TelemetryDataImpl;
 import org.camunda.bpm.engine.impl.telemetry.reporter.TelemetryReporter;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.impl.util.JsonUtil;
 import org.camunda.bpm.engine.impl.util.ParseUtil;
 import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.telemetry.Command;
@@ -91,19 +97,26 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
-import org.skyscreamer.jsonassert.JSONCompareMode;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.http.Fault;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 
 public class TelemetryReporterTest {
 
-  private static final String GET_LICENSE_KEY_CMD = "GetLicenseKeyCmd";
-  private static final String GET_HISTORY_LEVEL_CMD = "GetHistoryLevelCmd";
+  protected static final String DEPLOY_CMD = "DeployCmd";
+  protected static final String GET_NEXT_ID_BLOCK_CMD = "GetNextIdBlockCmd";
+  protected static final String BOOTSTRAP_ENGINE_CMD = "BootstrapEngineCommand";
+  protected static final String START_PROCESS_INSTANCE_CMD = "StartProcessInstanceCmd";
+  protected static final String GET_LICENSE_KEY_CMD = "GetLicenseKeyCmd";
+  protected static final String GET_HISTORY_LEVEL_CMD = "GetHistoryLevelCmd";
+  protected static final String IS_TELEMETRY_ENABLED_CMD = "IsTelemetryEnabledCmd";
+  protected static final String TELEMETRY_CONFIGURE_CMD = "TelemetryConfigureCmd";
+  protected static final String GET_TELEMETRY_DATA_CMD = "GetTelemetryDataCmd";
+
   protected static final String TELEMETRY_ENDPOINT = "http://localhost:8084/pings";
   protected static final String TELEMETRY_ENDPOINT_PATH = "/pings";
   protected static final String VALID_UUID_V4 = "cb07ce31-c8e3-4f5f-94c2-1b28175c2022";
@@ -210,7 +223,7 @@ public class TelemetryReporterTest {
     // given
     managementService.toggleTelemetry(true);
     TelemetryDataImpl data = createDataToSend();
-    String requestBody = new Gson().toJson(data);
+    String requestBody = toJson(data);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
             .willReturn(aResponse()
                         .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
@@ -230,7 +243,7 @@ public class TelemetryReporterTest {
 
     // then
     verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
-              .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
+              .withRequestBody(equalToJson(requestBody, true, true))
               .withHeader("Content-Type",  equalTo("application/json")));
   }
 
@@ -331,17 +344,65 @@ public class TelemetryReporterTest {
   }
 
   @Test
-  public void shouldSendTelemetryWithApplicationServerInfo() {
-    // given default telemetry data (no application server)
-    managementService.toggleTelemetry(true);
-    // set application server after initialization
+  public void shouldSendCompleteTelemetryData() {
+    // given
     String applicationServerVersion = "Tomcat 10";
     PlatformTelemetryRegistry.setApplicationServer(applicationServerVersion);
+    LicenseKeyDataImpl licenseKey = new LicenseKeyDataImpl("customer a", "UNIFIED", "2029-09-01", false, Collections.singletonMap("camundaBPM", "true"), "raw license");
 
-    TelemetryDataImpl expectedData = extendData(configuration.getTelemetryData(), b ->
-      b.applicationServer(applicationServerVersion));
+    ProcessEngineConfigurationImpl configuration = createEngine(true);
 
-    String requestBody = new Gson().toJson(expectedData);
+    configuration.getRepositoryService().createDeployment().addClasspathResource("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml").deploy();
+
+    configuration.getTelemetryRegistry().setLicenseKey(licenseKey);
+    configuration.getTelemetryData().getProduct().getInternals().getCamundaIntegration().add(CamundaIntegration.SPRING_BOOT_STARTER);
+    ((ManagementServiceImpl) configuration.getManagementService()).addWebappToTelemetry("cockpit");
+    ((ManagementServiceImpl) configuration.getManagementService()).addWebappToTelemetry("admin");
+    // produce some data
+    configuration.getManagementService().toggleTelemetry(true);
+    configuration.getRuntimeService().startProcessInstanceByKey("oneTaskProcess");
+
+    // setup
+    TelemetryDataImpl initialTelemetryData = (TelemetryDataImpl) configuration.getManagementService().getTelemetryData();
+    TelemetryDataImpl expectedData = simpleData(b -> {
+      b.installation(initialTelemetryData.getInstallation());
+
+      ProductImpl product = initialTelemetryData.getProduct();
+      b.productName("Camunda BPM Runtime");
+      b.productVersion(product.getVersion());
+      b.productEdition("community");
+
+      InternalsImpl internals = product.getInternals();
+      b.database(internals.getDatabase().getVendor(), internals.getDatabase().getVersion());
+      b.applicationServer(applicationServerVersion);
+      b.licenseKey(licenseKey);
+      b.addIntegration(CamundaIntegration.SPRING_BOOT_STARTER);
+      b.dataCollectionStartDate(internals.getDataCollectionStartDate());
+
+      b.countCommand(IS_TELEMETRY_ENABLED_CMD, 2);
+      b.countCommand(TELEMETRY_CONFIGURE_CMD, 1);
+      b.countCommand(GET_TELEMETRY_DATA_CMD, 1);
+      b.countCommand(GET_NEXT_ID_BLOCK_CMD, 1);
+      b.countCommand(START_PROCESS_INSTANCE_CMD, 1);
+      b.countCommand(DEPLOY_CMD, 1);
+      b.countCommand(GET_LICENSE_KEY_CMD, 1);
+      b.countCommand(BOOTSTRAP_ENGINE_CMD, 1);
+
+      b.countMetric(ROOT_PROCESS_INSTANCE_START, 1);
+      b.countMetric(ACTIVTY_INSTANCE_START, 2);
+      b.countMetric(EXECUTED_DECISION_ELEMENTS, 0);
+      b.countMetric(FLOW_NODE_INSTANCES, 2);
+      b.countMetric(EXECUTED_DECISION_INSTANCES, 0);
+      b.countMetric(DECISION_INSTANCES, 0);
+      b.countMetric(PROCESS_INSTANCES, 1);
+
+      b.webapps("cockpit", "admin");
+      b.jdk(internals.getJdk());
+      b.telemetryEnabled(true);
+    });
+
+    // use JsonUtil to get the full JSON (not ignoring null values)
+    String requestBody = JsonUtil.asString(expectedData);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
         .willReturn(aResponse()
             .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
@@ -351,7 +412,31 @@ public class TelemetryReporterTest {
 
     // then
     verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
-        .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
+        .withRequestBody(equalToJson(requestBody, true, false))
+        .withHeader("Content-Type",  equalTo("application/json")));
+  }
+
+  @Test
+  public void shouldSendTelemetryWithApplicationServerInfo() {
+    // given default telemetry data (no application server)
+    managementService.toggleTelemetry(true);
+    // set application server after initialization
+    String applicationServerVersion = "Tomcat 10";
+    PlatformTelemetryRegistry.setApplicationServer(applicationServerVersion);
+
+    TelemetryDataImpl expectedData = simpleData(b -> b.applicationServer(applicationServerVersion));
+
+    String requestBody = toJson(expectedData);
+    stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+        .willReturn(aResponse()
+            .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
+
+    // when
+    configuration.getTelemetryReporter().reportNow();
+
+    // then
+    verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+        .withRequestBody(equalToJson(requestBody, true, true))
         .withHeader("Content-Type",  equalTo("application/json")));
   }
 
@@ -360,21 +445,21 @@ public class TelemetryReporterTest {
     // given
     String applicationServerVersion = "Tomcat 10";
     PlatformTelemetryRegistry.setApplicationServer(applicationServerVersion);
-    ProcessEngineConfigurationImpl processEngineConfiguration = createEngine(true);
+    ProcessEngineConfigurationImpl configuration = createEngine(true);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
             .willReturn(aResponse()
                         .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
 
-    TelemetryDataImpl expectedData = initData(processEngineConfiguration.getTelemetryData());
-    expectedData.getProduct().getInternals().setApplicationServer(new ApplicationServerImpl(applicationServerVersion));
-    String requestBody = new Gson().toJson(expectedData);
+    TelemetryDataImpl expectedData = simpleData( b -> b.applicationServer(applicationServerVersion));
+
+    String requestBody = toJson(expectedData);
 
     // when
-    processEngineConfiguration.getTelemetryReporter().reportNow();
+    configuration.getTelemetryReporter().reportNow();
 
     // then
     verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
-        .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
+        .withRequestBody(equalToJson(requestBody, true, true))
         .withHeader("Content-Type",  equalTo("application/json")));
   }
 
@@ -386,10 +471,9 @@ public class TelemetryReporterTest {
     LicenseKeyDataImpl licenseKey = new LicenseKeyDataImpl("customer a", "UNIFIED", "2029-09-01", false, Collections.singletonMap("camundaBPM", "true"), "raw license");
     configuration.getTelemetryRegistry().setLicenseKey(licenseKey);
 
-    TelemetryDataImpl expectedData = extendData(configuration.getTelemetryData(), b->
-       b.licenseKey(licenseKey));
+    TelemetryDataImpl expectedData = simpleData(b-> b.licenseKey(licenseKey));
 
-    String requestBody = new Gson().toJson(expectedData);
+    String requestBody = toJson(expectedData);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
             .willReturn(aResponse()
                         .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
@@ -399,7 +483,7 @@ public class TelemetryReporterTest {
 
     // then
     verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
-              .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
+              .withRequestBody(equalToJson(requestBody, true, true))
               .withHeader("Content-Type",  equalTo("application/json")));
   }
 
@@ -422,17 +506,16 @@ public class TelemetryReporterTest {
     LicenseKeyDataImpl secondLicenseKey = new LicenseKeyDataImpl("customer b", "UNIFIED", "2029-08-01", false, Collections.singletonMap("cawemo", "true"), "new raw license");
     configuration.getTelemetryRegistry().setLicenseKey(secondLicenseKey);
 
-    TelemetryDataImpl expectedData = extendData(configuration.getTelemetryData(), b->
-      b.licenseKey(secondLicenseKey));
+    TelemetryDataImpl expectedData = simpleData(b-> b.licenseKey(secondLicenseKey));
 
-    String requestBody = new Gson().toJson(expectedData);
+    String requestBody = toJson(expectedData);
 
     // when
     configuration.getTelemetryReporter().reportNow();
 
     // then
     verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
-              .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
+              .withRequestBody(equalToJson(requestBody, true, true))
               .withHeader("Content-Type",  equalTo("application/json")));
   }
 
@@ -444,10 +527,9 @@ public class TelemetryReporterTest {
     String licenseKeyRaw = "raw license";
     managementService.setLicenseKey(licenseKeyRaw);
 
-    TelemetryDataImpl expectedData = extendData(configuration.getTelemetryData(),
-        b -> b.licenseKeyRaw(licenseKeyRaw));
+    TelemetryDataImpl expectedData = simpleData(b -> b.licenseKeyRaw(licenseKeyRaw));
 
-    String requestBody = new Gson().toJson(expectedData);
+    String requestBody = toJson(expectedData);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
             .willReturn(aResponse()
                         .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
@@ -457,7 +539,7 @@ public class TelemetryReporterTest {
 
     // then
     verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
-              .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
+              .withRequestBody(equalToJson(requestBody, true, true))
               .withHeader("Content-Type",  equalTo("application/json")));
 
     // cleanup
@@ -473,12 +555,11 @@ public class TelemetryReporterTest {
     managementService.getHistoryLevel();
     managementService.getLicenseKey();
 
-    TelemetryDataImpl expectedData = extendData(configuration.getTelemetryData(),
-        b -> b
-          .countCommand(GET_HISTORY_LEVEL_CMD, 1)
+    TelemetryDataImpl expectedData = simpleData(
+        b -> b.countCommand(GET_HISTORY_LEVEL_CMD, 1)
           .countCommand(GET_LICENSE_KEY_CMD, 1));
 
-    String requestBody = new Gson().toJson(expectedData);
+    String requestBody = toJson(expectedData);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
             .willReturn(aResponse()
                 .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
@@ -488,7 +569,7 @@ public class TelemetryReporterTest {
 
     // then
     verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
-        .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
+        .withRequestBody(equalToJson(requestBody, true, true))
         .withHeader("Content-Type",  equalTo("application/json")));
   }
 
@@ -507,13 +588,13 @@ public class TelemetryReporterTest {
 
     ClockUtil.setCurrentTime(addHour(ClockUtil.getCurrentTime()));
 
-    TelemetryDataImpl expectedData = extendData(configuration.getTelemetryData(),
+    TelemetryDataImpl expectedData = simpleData(
         b -> b.countMetric(ROOT_PROCESS_INSTANCE_START, 3)
           .countMetric(EXECUTED_DECISION_ELEMENTS, 0)
           .countMetric(EXECUTED_DECISION_INSTANCES, 0)
           .countMetric(ACTIVTY_INSTANCE_START, 6));
 
-    String requestBody = new Gson().toJson(expectedData);
+    String requestBody = toJson(expectedData);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
             .willReturn(aResponse()
                         .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
@@ -523,7 +604,7 @@ public class TelemetryReporterTest {
 
     // then
     verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
-        .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
+        .withRequestBody(equalToJson(requestBody, true, true))
         .withHeader("Content-Type",  equalTo("application/json")));
   }
 
@@ -538,13 +619,13 @@ public class TelemetryReporterTest {
     }
     configuration.getDbMetricsReporter().reportNow();
 
-    TelemetryDataImpl expectedData = extendData(configuration.getTelemetryData(),
+    TelemetryDataImpl expectedData = simpleData(
         b -> b.countMetric(ROOT_PROCESS_INSTANCE_START, 0)
           .countMetric(EXECUTED_DECISION_ELEMENTS, 0)
           .countMetric(EXECUTED_DECISION_INSTANCES, 0)
           .countMetric(ACTIVTY_INSTANCE_START, 0));
 
-    String requestBody = new Gson().toJson(expectedData);
+    String requestBody = toJson(expectedData);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
         .willReturn(aResponse()
             .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
@@ -556,7 +637,7 @@ public class TelemetryReporterTest {
 
     // then
     verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
-        .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
+        .withRequestBody(equalToJson(requestBody, true, true))
         .withHeader("Content-Type",  equalTo("application/json")));
   }
 
@@ -573,13 +654,14 @@ public class TelemetryReporterTest {
 
     ClockUtil.setCurrentTime(addHour(ClockUtil.getCurrentTime()));
 
-    TelemetryDataImpl expectedData = extendData(configuration.getTelemetryData(),
+    TelemetryDataImpl expectedData = simpleData(
         b -> b.countMetric(ROOT_PROCESS_INSTANCE_START, 2)
           .countMetric(EXECUTED_DECISION_ELEMENTS, 2)
           .countMetric(EXECUTED_DECISION_INSTANCES, 2)
-          .countMetric(ACTIVTY_INSTANCE_START, 4));
+          .countMetric(ACTIVTY_INSTANCE_START, 4)
+          );
 
-    String requestBody = new Gson().toJson(expectedData);
+    String requestBody = toJson(expectedData);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
             .willReturn(aResponse()
                         .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
@@ -589,7 +671,7 @@ public class TelemetryReporterTest {
 
     // then
     verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
-        .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
+        .withRequestBody(equalToJson(requestBody, true, true))
         .withHeader("Content-Type",  equalTo("application/json")));
   }
 
@@ -608,13 +690,13 @@ public class TelemetryReporterTest {
 
     ClockUtil.setCurrentTime(addHour(ClockUtil.getCurrentTime()));
 
-    TelemetryDataImpl expectedData = extendData(configuration.getTelemetryData(),
+    TelemetryDataImpl expectedData = simpleData(
         b -> b.countMetric(ROOT_PROCESS_INSTANCE_START, 1)
           .countMetric(EXECUTED_DECISION_ELEMENTS, 16)
           .countMetric(EXECUTED_DECISION_INSTANCES, 1)
           .countMetric(ACTIVTY_INSTANCE_START, 3));
 
-    String requestBody = new Gson().toJson(expectedData);
+    String requestBody = toJson(expectedData);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
             .willReturn(aResponse()
                         .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
@@ -624,7 +706,7 @@ public class TelemetryReporterTest {
 
     // then
     verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
-        .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
+        .withRequestBody(equalToJson(requestBody, true, true))
         .withHeader("Content-Type",  equalTo("application/json")));
   }
 
@@ -641,13 +723,13 @@ public class TelemetryReporterTest {
 
     ClockUtil.setCurrentTime(addHour(ClockUtil.getCurrentTime()));
 
-    TelemetryDataImpl expectedData = extendData(configuration.getTelemetryData(),
+    TelemetryDataImpl expectedData = simpleData(
         b -> b.countMetric(ROOT_PROCESS_INSTANCE_START, 4)
           .countMetric(EXECUTED_DECISION_ELEMENTS, 0)
           .countMetric(EXECUTED_DECISION_INSTANCES, 0)
           .countMetric(ACTIVTY_INSTANCE_START, 12));
 
-    String requestBody = new Gson().toJson(expectedData);
+    String requestBody = toJson(expectedData);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
             .willReturn(aResponse()
                         .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
@@ -657,7 +739,7 @@ public class TelemetryReporterTest {
 
     // then
     verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
-        .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
+        .withRequestBody(equalToJson(requestBody, true, true))
         .withHeader("Content-Type",  equalTo("application/json")));
   }
 
@@ -755,15 +837,14 @@ public class TelemetryReporterTest {
     telemetryReporter.reportNow();
 
     // then
-    TelemetryDataImpl expectedData = extendData(configuration.getTelemetryData(),
-        b -> b
-          .countCommand(GET_HISTORY_LEVEL_CMD, 1)
+    TelemetryDataImpl expectedData = simpleData(
+        b -> b.countCommand(GET_HISTORY_LEVEL_CMD, 1)
           .countMetric(Metrics.ROOT_PROCESS_INSTANCE_START, 1));
 
-    String expectedBody = new Gson().toJson(expectedData);
+    String expectedBody = toJson(expectedData);
 
     verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
-        .withRequestBody(equalToJson(expectedBody, JSONCompareMode.LENIENT))
+        .withRequestBody(equalToJson(expectedBody, true, true))
         .withHeader("Content-Type",  equalTo("application/json")));
   }
 
@@ -852,12 +933,11 @@ public class TelemetryReporterTest {
         .willReturn(aResponse()
                     .withStatus(HttpURLConnection.HTTP_INTERNAL_ERROR)));
 
-    TelemetryDataImpl expectedData = extendData(configuration.getTelemetryData(),
-        b -> b
-          .countCommand(GET_HISTORY_LEVEL_CMD, 1)
+    TelemetryDataImpl expectedData = simpleData(
+        b -> b.countCommand(GET_HISTORY_LEVEL_CMD, 1)
           .countCommand(GET_LICENSE_KEY_CMD, 1));
 
-    String expectedRequestBody = new Gson().toJson(expectedData);
+    String expectedRequestBody = toJson(expectedData);
 
     // when
     configuration.getTelemetryReporter().reportNow();
@@ -866,7 +946,7 @@ public class TelemetryReporterTest {
     // the request is made and the data is not reset between requests
     verify(3, postRequestedFor(
         urlEqualTo(TELEMETRY_ENDPOINT_PATH))
-        .withRequestBody(equalToJson(expectedRequestBody, JSONCompareMode.LENIENT))
+        .withRequestBody(equalToJson(expectedRequestBody, true, true))
         );
   }
 
@@ -886,12 +966,11 @@ public class TelemetryReporterTest {
         .willReturn(aResponse()
                     .withStatus(HttpURLConnection.HTTP_NO_CONTENT)));
 
-    TelemetryDataImpl expectedData = extendData(configuration.getTelemetryData(),
-        b -> b
-          .countCommand(GET_HISTORY_LEVEL_CMD, 1)
+    TelemetryDataImpl expectedData = simpleData(
+        b -> b.countCommand(GET_HISTORY_LEVEL_CMD, 1)
           .countCommand(GET_LICENSE_KEY_CMD, 1));
 
-    String expectedRequestBody = new Gson().toJson(expectedData);
+    String expectedRequestBody = toJson(expectedData);
 
     // when
     configuration.getTelemetryReporter().reportNow();
@@ -900,7 +979,7 @@ public class TelemetryReporterTest {
     // the request is made and the data is not reset between requests
     verify(1, postRequestedFor(
         urlEqualTo(TELEMETRY_ENDPOINT_PATH))
-        .withRequestBody(equalToJson(expectedRequestBody, JSONCompareMode.LENIENT))
+        .withRequestBody(equalToJson(expectedRequestBody, true, true))
         );
 
     assertThat(loggingRule.getFilteredLog("Telemetry request was sent, "
@@ -919,12 +998,11 @@ public class TelemetryReporterTest {
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
         .willReturn(aResponse().withFault(Fault.MALFORMED_RESPONSE_CHUNK)));
 
-    TelemetryDataImpl expectedData = extendData(configuration.getTelemetryData(),
-        b -> b
-          .countCommand(GET_HISTORY_LEVEL_CMD, 1)
+    TelemetryDataImpl expectedData = simpleData(
+        b -> b.countCommand(GET_HISTORY_LEVEL_CMD, 1)
           .countCommand(GET_LICENSE_KEY_CMD, 1));
 
-    String expectedRequestBody = new Gson().toJson(expectedData);
+    String expectedRequestBody = toJson(expectedData);
 
     // when
     configuration.getTelemetryReporter().reportNow();
@@ -932,7 +1010,7 @@ public class TelemetryReporterTest {
     // the request is made and the data is not reset between requests
     verify(3, postRequestedFor(
         urlEqualTo(TELEMETRY_ENDPOINT_PATH))
-        .withRequestBody(equalToJson(expectedRequestBody, JSONCompareMode.LENIENT))
+        .withRequestBody(equalToJson(expectedRequestBody, true, true))
         );
   }
 
@@ -962,12 +1040,15 @@ public class TelemetryReporterTest {
   @Test
   public void shouldSendDataWithCamundaIntegration() {
     // given
-    TelemetryDataImpl expectedData = createDataWithCamundaIntegration(configuration.getTelemetryData(), "wildfly-integration");
+    TelemetryDataImpl expectedData = simpleData(
+        b -> b.addIntegration("wildfly-integration"));
+
     // creating a new object as during the report the object is being modified
-    TelemetryDataImpl givenData = createDataWithCamundaIntegration(configuration.getTelemetryData(), "wildfly-integration");
+    TelemetryDataImpl givenData = extendData(getTelemetryDataIgnoreCollectionTimeFrame(),
+        b -> b.addIntegration("wildfly-integration"));
     managementService.toggleTelemetry(true);
 
-    String requestBody = new Gson().toJson(expectedData);
+    String requestBody = toJson(expectedData);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
             .willReturn(aResponse()
                 .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
@@ -987,7 +1068,7 @@ public class TelemetryReporterTest {
 
     // then
     verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
-        .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
+        .withRequestBody(equalToJson(requestBody, true, true))
         .withHeader("Content-Type",  equalTo("application/json")));
   }
 
@@ -999,9 +1080,10 @@ public class TelemetryReporterTest {
     Set<String> webapps = new HashSet<>(Arrays.asList("cockpit", "admin"));
     configuration.getTelemetryRegistry().setWebapps(webapps);
 
-    TelemetryDataImpl expectedData = extendData(configuration.getTelemetryData(),
-        b -> b.webapps("cockpit", "admin"));
-    String requestBody = new Gson().toJson(expectedData);
+    TelemetryDataImpl expectedData = simpleData(
+        b ->  b.webapps("cockpit", "admin"));
+
+    String requestBody = toJson(expectedData);
     stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
         .willReturn(aResponse()
             .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
@@ -1011,9 +1093,53 @@ public class TelemetryReporterTest {
 
     // then
     verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
-        .withRequestBody(equalToJson(requestBody, JSONCompareMode.LENIENT))
+        .withRequestBody(equalToJson(requestBody, true, true))
         .withHeader("Content-Type",  equalTo("application/json")));
   }
+
+  @Test
+  public void shouldSendDataWithDataCollectionTimeFrame() {
+    // given default telemetry data
+    managementService.toggleTelemetry(true);
+
+    stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+        .willReturn(aResponse()
+            .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
+
+    // when
+    configuration.getTelemetryReporter().reportNow();
+
+    //then
+    verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+        // we can only check that the property is included in the response i.e., it is not null
+        .withRequestBody(WireMock.matchingJsonPath("$.product.internals.data-collection-start-date"))
+        .withHeader("Content-Type",  equalTo("application/json")));
+  }
+
+  @Test
+  public void shouldResetDataCollectionTimeFrameAfterSending() {
+    // given default telemetry data
+    managementService.toggleTelemetry(true);
+
+    stubFor(post(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+        .willReturn(aResponse()
+            .withStatus(HttpURLConnection.HTTP_ACCEPTED)));
+
+    // we need to create this object before the reporter fires because the data collection time frame will be reset
+    Date telemetryDataTimeFrameBeforeReported = configuration.getTelemetryData().getProduct().getInternals().getDataCollectionStartDate();
+
+    // when
+    configuration.getTelemetryReporter().reportNow();
+
+    //then
+    verify(postRequestedFor(urlEqualTo(TELEMETRY_ENDPOINT_PATH))
+        .withHeader("Content-Type",  equalTo("application/json")));
+    assertThat(managementService.getTelemetryData().getProduct().getInternals().getDataCollectionStartDate())
+      .isAfter(telemetryDataTimeFrameBeforeReported);
+  }
+
+
+  // HELPER METHODS
 
   protected ProcessEngineConfigurationImpl createEngine(Boolean initTelemetry) {
     ProcessEngineConfigurationImpl processEngineConfiguration = new StandaloneInMemProcessEngineConfiguration();
@@ -1053,17 +1179,16 @@ public class TelemetryReporterTest {
     return data;
   }
 
-  protected TelemetryDataImpl createDataWithCamundaIntegration(TelemetryDataImpl telemetryData, String integrationString) {
-    InternalsImpl internals = new InternalsImpl(null, null, null, null);
-    TelemetryDataImpl data = new TelemetryDataImpl(telemetryData.getInstallation(), new ProductImpl("dummy", "dummy", "dummy", internals));
-    HashSet<String> integration = new HashSet<>();
-    integration.add(integrationString);
-    internals.setCamundaIntegration(integration);
-    return data;
-  }
-
   protected TelemetryDataImpl extendData(TelemetryDataImpl telemetryData, Consumer<TelemetryDataBuilder> configuration) {
     TelemetryDataBuilder builder = new TelemetryDataBuilder(telemetryData);
+
+    configuration.accept(builder);
+
+    return builder.data;
+  }
+
+  protected TelemetryDataImpl simpleData(Consumer<TelemetryDataBuilder> configuration) {
+    TelemetryDataBuilder builder = new TelemetryDataBuilder();
 
     configuration.accept(builder);
 
@@ -1073,23 +1198,41 @@ public class TelemetryReporterTest {
   protected static class TelemetryDataBuilder {
     protected TelemetryDataImpl data;
 
+    // Constructors
+    public TelemetryDataBuilder() {
+      data = new TelemetryDataImpl(null, new ProductImpl(null, null, null, new InternalsImpl(null, null, null, null)));
+    }
+
     public TelemetryDataBuilder(TelemetryDataImpl initialValues) {
       data = new TelemetryDataImpl(initialValues.getInstallation(), new ProductImpl(initialValues.getProduct()));
       data.getProduct().getInternals().setTelemetryEnabled(true);
     }
 
-    public TelemetryDataBuilder countCommand(String name, int count) {
-      data.getProduct().getInternals().putCommand(name, count);
+    public TelemetryDataBuilder installation(String installation) {
+      data.setInstallation(installation);
       return this;
     }
 
-    public TelemetryDataBuilder countMetric(String name, int count) {
-      data.getProduct().getInternals().putMetric(name, count);
+    // Product
+    public TelemetryDataBuilder productName(String name) {
+      data.getProduct().setName(name);
+      return this;
+    }
 
-      // add public name as expected
-      final String publicName = MetricsUtil.resolvePublicName(name);
-      data.getProduct().getInternals().putMetric(publicName, count);
+    public TelemetryDataBuilder productVersion(String version) {
+      data.getProduct().setVersion(version);
+      return this;
+    }
 
+    public TelemetryDataBuilder productEdition(String edition) {
+      data.getProduct().setEdition(edition);
+      return this;
+    }
+
+    // Internals
+    public TelemetryDataBuilder database(String vendor, String version) {
+      DatabaseImpl database = new DatabaseImpl(vendor, version);
+      data.getProduct().getInternals().setDatabase(database);
       return this;
     }
 
@@ -1109,6 +1252,34 @@ public class TelemetryReporterTest {
       return this;
     }
 
+    public TelemetryDataBuilder addIntegration(String integration) {
+      if(data.getProduct().getInternals().getCamundaIntegration() == null) {
+        data.getProduct().getInternals().setCamundaIntegration(new HashSet<>());
+      }
+      data.getProduct().getInternals().getCamundaIntegration().add(integration);
+      return this;
+    }
+
+    public TelemetryDataBuilder dataCollectionStartDate(Date date) {
+      data.getProduct().getInternals().setDataCollectionStartDate(date);
+      return this;
+    }
+
+    public TelemetryDataBuilder countCommand(String name, int count) {
+      data.getProduct().getInternals().putCommand(name, count);
+      return this;
+    }
+
+    public TelemetryDataBuilder countMetric(String name, int count) {
+      data.getProduct().getInternals().putMetric(name, count);
+
+      // add public name as expected
+      final String publicName = MetricsUtil.resolvePublicName(name);
+      data.getProduct().getInternals().putMetric(publicName, count);
+
+      return this;
+    }
+
     public TelemetryDataBuilder webapps(String... webapps) {
       Set<String> webappSet = new HashSet<>();
       for (String webapp : webapps) {
@@ -1118,7 +1289,17 @@ public class TelemetryReporterTest {
       data.getProduct().getInternals().setWebapps(webappSet);
       return this;
     }
-  }
+
+    public TelemetryDataBuilder jdk(JdkImpl jdk) {
+      data.getProduct().getInternals().setJdk(jdk);
+      return this;
+    }
+
+    public TelemetryDataBuilder telemetryEnabled(boolean enabled) {
+      data.getProduct().getInternals().setTelemetryEnabled(enabled);
+      return this;
+    }
+}
 
   protected Map<String, Command> getDefaultCommandCounts() {
     Map<String, Command> commands = new HashMap<>();
@@ -1187,4 +1368,13 @@ public class TelemetryReporterTest {
     assertThat(loggingRule.getFilteredLog(debugLogMessage)).hasSize(1);
   }
 
+  protected TelemetryDataImpl getTelemetryDataIgnoreCollectionTimeFrame() {
+    TelemetryDataImpl telemetryData = new TelemetryDataImpl(configuration.getTelemetryData());
+    telemetryData.getProduct().getInternals().setDataCollectionStartDate(null);
+    return telemetryData;
+  }
+
+  protected String toJson(TelemetryDataImpl expectedData) {
+    return new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").create().toJson(expectedData);
+  }
 }

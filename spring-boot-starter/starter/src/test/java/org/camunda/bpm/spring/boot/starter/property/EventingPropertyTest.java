@@ -16,15 +16,16 @@
  */
 package org.camunda.bpm.spring.boot.starter.property;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import org.junit.Test;
 import org.springframework.test.context.TestPropertySource;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @TestPropertySource(properties = {
   "camunda.bpm.eventing.execution=false",
   "camunda.bpm.eventing.task=false",
-  "camunda.bpm.eventing.history=false"})
+  "camunda.bpm.eventing.history=false",
+  "camunda.bpm.eventing.skippable=false"})
 public class EventingPropertyTest extends ParsePropertiesHelper {
 
   @Test
@@ -32,6 +33,7 @@ public class EventingPropertyTest extends ParsePropertiesHelper {
     assertThat(properties.getEventing().isExecution()).isFalse();
     assertThat(properties.getEventing().isTask()).isFalse();
     assertThat(properties.getEventing().isHistory()).isFalse();
+    assertThat(properties.getEventing().isSkippable()).isFalse();
   }
 
 }

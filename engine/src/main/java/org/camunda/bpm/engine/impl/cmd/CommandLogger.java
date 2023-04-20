@@ -317,4 +317,49 @@ public class CommandLogger extends ProcessEngineLogger {
       cause.getMessage());
   }
 
+  public void warnFilteringDuplicatesEnabledWithNullDeploymentName() {
+    logWarn("047", "Deployment name set to null. Filtering duplicates will not work properly.");
+  }
+
+  public void warnReservedErrorCode(int initialCode) {
+    logWarn("048", "With error code {} you are using a reserved error code. Falling back to default error code 0. "
+        + "If you want to override built-in error codes, please disable the built-in error code provider.", initialCode);
+  }
+
+  public void warnResetToBuiltinCode(Integer builtinCode, int initialCode) {
+    logWarn("049", "You are trying to override the built-in code {} with {}. "
+        + "Falling back to built-in code. If you want to override built-in error codes, "
+        + "please disable the built-in error code provider.", builtinCode, initialCode);
+  }
+
+  public ProcessEngineException exceptionSettingJobRetriesAsyncNoJobsSpecified() {
+    return new ProcessEngineException(exceptionMessage(
+        "050",
+        "You must specify at least one of jobIds or jobQuery."));
+  }
+
+  public ProcessEngineException exceptionSettingJobRetriesAsyncNoProcessesSpecified() {
+    return new ProcessEngineException(exceptionMessage(
+        "051",
+        "You must specify at least one of or one of processInstanceIds, processInstanceQuery, or historicProcessInstanceQuery."));
+  }
+
+  public ProcessEngineException exceptionSettingJobRetriesJobsNotSpecifiedCorrectly() {
+    return new ProcessEngineException(exceptionMessage(
+        "052",
+        "You must specify exactly one of jobId, jobIds or jobDefinitionId as parameter. The parameter can not be null."));
+  }
+
+  public ProcessEngineException exceptionNoJobFoundForId(String jobId) {
+    return new ProcessEngineException(exceptionMessage(
+        "053",
+        "No job found with id '{}'.'", jobId));
+    }
+
+  public ProcessEngineException exceptionJobRetriesMustNotBeNegative(Integer retries) {
+    return new ProcessEngineException(exceptionMessage(
+        "054",
+        "The number of job retries must be a non-negative Integer, but '{}' has been provided.", retries));
+  }
+
 }

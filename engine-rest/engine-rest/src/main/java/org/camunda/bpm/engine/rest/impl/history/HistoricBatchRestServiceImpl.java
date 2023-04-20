@@ -16,12 +16,11 @@
  */
 package org.camunda.bpm.engine.rest.impl.history;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import javax.ws.rs.core.UriInfo;
-
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.batch.Batch;
@@ -30,7 +29,6 @@ import org.camunda.bpm.engine.batch.history.HistoricBatchQuery;
 import org.camunda.bpm.engine.history.CleanableHistoricBatchReport;
 import org.camunda.bpm.engine.history.CleanableHistoricBatchReportResult;
 import org.camunda.bpm.engine.history.SetRemovalTimeSelectModeForHistoricBatchesBuilder;
-import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.history.batch.CleanableHistoricBatchReportDto;
@@ -41,8 +39,7 @@ import org.camunda.bpm.engine.rest.dto.history.batch.removaltime.SetRemovalTimeT
 import org.camunda.bpm.engine.rest.history.HistoricBatchRestService;
 import org.camunda.bpm.engine.rest.sub.history.HistoricBatchResource;
 import org.camunda.bpm.engine.rest.sub.history.impl.HistoricBatchResourceImpl;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.camunda.bpm.engine.rest.util.QueryUtil;
 
 public class HistoricBatchRestServiceImpl implements HistoricBatchRestService {
 
@@ -59,19 +56,12 @@ public class HistoricBatchRestServiceImpl implements HistoricBatchRestService {
     return new HistoricBatchResourceImpl(processEngine, batchId);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public List<HistoricBatchDto> getHistoricBatches(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
     HistoricBatchQueryDto queryDto = new HistoricBatchQueryDto(objectMapper, uriInfo.getQueryParameters());
     HistoricBatchQuery query = queryDto.toQuery(processEngine);
 
-    List<HistoricBatch> matchingBatches;
-    if (firstResult != null || maxResults != null) {
-      matchingBatches = (List<HistoricBatch>) executePaginatedQuery(query, firstResult, maxResults);
-    }
-    else {
-      matchingBatches = query.list();
-    }
+    List<HistoricBatch> matchingBatches = QueryUtil.list(query, firstResult, maxResults);
 
     List<HistoricBatchDto> batchResults = new ArrayList<HistoricBatchDto>();
     for (HistoricBatch matchingBatch : matchingBatches) {
@@ -89,30 +79,12 @@ public class HistoricBatchRestServiceImpl implements HistoricBatchRestService {
     return new CountResultDto(count);
   }
 
-  @SuppressWarnings("rawtypes")
-  protected List<?> executePaginatedQuery(Query query, Integer firstResult, Integer maxResults) {
-    if (firstResult == null) {
-      firstResult = 0;
-    }
-    if (maxResults == null) {
-      maxResults = Integer.MAX_VALUE;
-    }
-
-    return query.listPage(firstResult, maxResults);
-  }
-
-  @SuppressWarnings("unchecked")
   @Override
   public List<CleanableHistoricBatchReportResultDto> getCleanableHistoricBatchesReport(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
     CleanableHistoricBatchReportDto queryDto = new CleanableHistoricBatchReportDto(objectMapper, uriInfo.getQueryParameters());
     CleanableHistoricBatchReport query = queryDto.toQuery(processEngine);
 
-    List<CleanableHistoricBatchReportResult> reportResult;
-    if (firstResult != null || maxResults != null) {
-      reportResult = (List<CleanableHistoricBatchReportResult>) executePaginatedQuery(query, firstResult, maxResults);
-    } else {
-      reportResult = query.list();
-    }
+    List<CleanableHistoricBatchReportResult> reportResult = QueryUtil.list(query, firstResult, maxResults);
 
     return CleanableHistoricBatchReportResultDto.convert(reportResult);
   }
@@ -130,6 +102,7 @@ public class HistoricBatchRestServiceImpl implements HistoricBatchRestService {
     return result;
   }
 
+  @Override
   public BatchDto setRemovalTimeAsync(SetRemovalTimeToHistoricBatchesDto dto) {
     HistoryService historyService = processEngine.getHistoryService();
 

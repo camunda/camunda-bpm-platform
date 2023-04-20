@@ -21,13 +21,12 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyBoolean;
-import static org.mockito.Mockito.anyInt;
-import static org.mockito.Mockito.anyLong;
-import static org.mockito.Mockito.anyList;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -36,27 +35,29 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.ws.rs.core.Response.Status;
-
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
+import org.camunda.bpm.engine.management.SetJobRetriesBuilder;
+import org.camunda.bpm.engine.management.SetJobRetriesByJobsAsyncBuilder;
 import org.camunda.bpm.engine.management.UpdateJobSuspensionStateSelectBuilder;
 import org.camunda.bpm.engine.management.UpdateJobSuspensionStateTenantBuilder;
 import org.camunda.bpm.engine.rest.dto.batch.BatchDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
+import org.camunda.bpm.engine.rest.dto.runtime.JobQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.JobSuspensionStateDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
@@ -71,10 +72,6 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.InOrder;
-import org.mockito.Mockito;
-
-import io.restassured.http.ContentType;
-import io.restassured.response.Response;
 
 public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
@@ -101,6 +98,8 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
   private UpdateJobSuspensionStateSelectBuilder mockSuspensionStateSelectBuilder;
 
   private JobQuery mockQuery;
+  private SetJobRetriesByJobsAsyncBuilder mockSetJobRetriesByJobsAsyncBuilder;
+  private SetJobRetriesBuilder mockSetJobRetriesBuilder;
 
   @Before
   public void setUpRuntimeData() {
@@ -126,6 +125,10 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
     mockManagementService = mock(ManagementService.class);
     when(mockManagementService.createJobQuery()).thenReturn(mockQuery);
 
+    mockSetJobRetriesByJobsAsyncBuilder = MockProvider.createMockSetJobRetriesByJobsAsyncBuilder(mockManagementService);
+
+    mockSetJobRetriesBuilder = MockProvider.createMockSetJobRetriesBuilder(mockManagementService);
+
     mockSuspensionStateSelectBuilder = mock(UpdateJobSuspensionStateSelectBuilder.class);
     when(mockManagementService.updateJobSuspensionState()).thenReturn(mockSuspensionStateSelectBuilder);
 
@@ -141,64 +144,126 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
   }
 
   @Test
-  public void testSetJobRetries() {
-    Map<String, Object> retriesVariableJson = new HashMap<String, Object>();
+  public void testSetRetries() {
+    Map<String, Object> retriesVariableJson = new HashMap<>();
     retriesVariableJson.put("retries", MockProvider.EXAMPLE_JOB_RETRIES);
 
-    given().pathParam("id", MockProvider.EXAMPLE_JOB_ID).contentType(ContentType.JSON).body(retriesVariableJson).then().expect()
-    .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when().put(JOB_RESOURCE_SET_RETRIES_URL);
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_JOB_ID)
+      .contentType(ContentType.JSON)
+      .body(retriesVariableJson)
+    .then().expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .put(JOB_RESOURCE_SET_RETRIES_URL);
 
-    verify(mockManagementService).setJobRetries(MockProvider.EXAMPLE_JOB_ID, MockProvider.EXAMPLE_JOB_RETRIES);
+    verify(mockManagementService).setJobRetries(MockProvider.EXAMPLE_JOB_RETRIES);
+    verify(mockSetJobRetriesBuilder).jobId(MockProvider.EXAMPLE_JOB_ID);
+    verify(mockSetJobRetriesBuilder).execute();
+    verifyNoMoreInteractions(mockSetJobRetriesBuilder);
   }
 
   @Test
-  public void testSetJobRetriesNonExistentJob() {
+  public void testSetRetriesWithDueDate() {
+    Map<String, Object> retriesVariableJson = new HashMap<>();
+    retriesVariableJson.put("retries", MockProvider.EXAMPLE_JOB_RETRIES);
+    Date newDueDate = new Date(1675752840000L);
+    retriesVariableJson.put("dueDate", newDueDate);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_JOB_ID)
+      .contentType(ContentType.JSON)
+      .body(retriesVariableJson).then().expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .put(JOB_RESOURCE_SET_RETRIES_URL);
+
+    verify(mockManagementService).setJobRetries(MockProvider.EXAMPLE_JOB_RETRIES);
+    verify(mockSetJobRetriesBuilder).jobId(MockProvider.EXAMPLE_JOB_ID);
+    verify(mockSetJobRetriesBuilder).dueDate(newDueDate);
+    verify(mockSetJobRetriesBuilder).execute();
+    verifyNoMoreInteractions(mockSetJobRetriesBuilder);
+  }
+
+  @Test
+  public void testSetRetriesWithNullDueDate() {
+    Map<String, Object> retriesVariableJson = new HashMap<>();
+    retriesVariableJson.put("retries", MockProvider.EXAMPLE_JOB_RETRIES);
+    retriesVariableJson.put("dueDate", null);
+
+    given()
+    .pathParam("id", MockProvider.EXAMPLE_JOB_ID)
+    .contentType(ContentType.JSON)
+    .body(retriesVariableJson).then().expect()
+    .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+    .put(JOB_RESOURCE_SET_RETRIES_URL);
+
+    verify(mockManagementService).setJobRetries(MockProvider.EXAMPLE_JOB_RETRIES);
+    verify(mockSetJobRetriesBuilder).jobId(MockProvider.EXAMPLE_JOB_ID);
+    verify(mockSetJobRetriesBuilder).dueDate(null);
+    verify(mockSetJobRetriesBuilder).execute();
+    verifyNoMoreInteractions(mockSetJobRetriesBuilder);
+  }
+
+  @Test
+  public void testSetRetriesNonExistentJob() {
     String expectedMessage = "No job found with id '" + MockProvider.NON_EXISTING_JOB_ID + "'.";
 
-    doThrow(new ProcessEngineException(expectedMessage)).when(mockManagementService).setJobRetries(MockProvider.NON_EXISTING_JOB_ID,
-        MockProvider.EXAMPLE_JOB_RETRIES);
+    doThrow(new ProcessEngineException(expectedMessage)).when(mockSetJobRetriesBuilder).execute();
 
-    Map<String, Object> retriesVariableJson = new HashMap<String, Object>();
+    Map<String, Object> retriesVariableJson = new HashMap<>();
     retriesVariableJson.put("retries", MockProvider.EXAMPLE_JOB_RETRIES);
 
-    given().pathParam("id", MockProvider.NON_EXISTING_JOB_ID).contentType(ContentType.JSON)
-    .body(retriesVariableJson).then().expect()
-    .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
-    .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-    .body("message", equalTo(expectedMessage))
-    .when().put(JOB_RESOURCE_SET_RETRIES_URL);
+    given()
+      .pathParam("id", MockProvider.NON_EXISTING_JOB_ID)
+      .contentType(ContentType.JSON)
+      .body(retriesVariableJson)
+    .then().expect()
+      .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo(expectedMessage))
+    .when()
+      .put(JOB_RESOURCE_SET_RETRIES_URL);
 
-    verify(mockManagementService).setJobRetries(MockProvider.NON_EXISTING_JOB_ID, MockProvider.EXAMPLE_JOB_RETRIES);
+    verify(mockManagementService).setJobRetries(MockProvider.EXAMPLE_JOB_RETRIES);
+    verify(mockSetJobRetriesBuilder).jobId(MockProvider.NON_EXISTING_JOB_ID);
+    verify(mockSetJobRetriesBuilder).execute();
+    verifyNoMoreInteractions(mockSetJobRetriesBuilder);
   }
 
   @Test
-  public void testSetJobRetriesNegativeRetries() {
+  public void testSetRetriesNegativeRetries() {
 
     String expectedMessage = "The number of job retries must be a non-negative Integer, but '" + MockProvider.EXAMPLE_NEGATIVE_JOB_RETRIES
         + "' has been provided.";
 
-    doThrow(new ProcessEngineException(expectedMessage)).when(mockManagementService).setJobRetries(MockProvider.EXAMPLE_JOB_ID,
-        MockProvider.EXAMPLE_NEGATIVE_JOB_RETRIES);
+    doThrow(new ProcessEngineException(expectedMessage)).when(mockManagementService).setJobRetries(MockProvider.EXAMPLE_NEGATIVE_JOB_RETRIES);
 
-    Map<String, Object> retriesVariableJson = new HashMap<String, Object>();
+    Map<String, Object> retriesVariableJson = new HashMap<>();
     retriesVariableJson.put("retries", MockProvider.EXAMPLE_NEGATIVE_JOB_RETRIES);
 
-    given().pathParam("id", MockProvider.EXAMPLE_JOB_ID).contentType(ContentType.JSON).body(retriesVariableJson).then().then().expect()
-    .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
-    .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-    .body("message", equalTo(expectedMessage))
-    .when().put(JOB_RESOURCE_SET_RETRIES_URL);
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_JOB_ID)
+      .contentType(ContentType.JSON)
+      .body(retriesVariableJson)
+    .then().expect()
+      .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo(expectedMessage))
+    .when()
+      .put(JOB_RESOURCE_SET_RETRIES_URL);
 
-    verify(mockManagementService).setJobRetries(MockProvider.EXAMPLE_JOB_ID, MockProvider.EXAMPLE_NEGATIVE_JOB_RETRIES);
+    verify(mockManagementService).setJobRetries(MockProvider.EXAMPLE_NEGATIVE_JOB_RETRIES);
+    verifyNoMoreInteractions(mockSetJobRetriesBuilder);
   }
 
   @Test
-  public void testSetJobRetriesThrowsAuthorizationException() {
+  public void testSetRetriesThrowsAuthorizationException() {
     String message = "expected exception";
-    doThrow(new AuthorizationException(message)).when(mockManagementService).setJobRetries(anyString(), anyInt());
+    doThrow(new AuthorizationException(message)).when(mockManagementService).setJobRetries(anyInt());
 
-    Map<String, Object> retriesVariableJson = new HashMap<String, Object>();
+    Map<String, Object> retriesVariableJson = new HashMap<>();
     retriesVariableJson.put("retries", MockProvider.EXAMPLE_NEGATIVE_JOB_RETRIES);
 
     given()
@@ -210,6 +275,9 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
       .body("message", equalTo(message))
     .when()
       .put(JOB_RESOURCE_SET_RETRIES_URL);
+
+    verify(mockManagementService).setJobRetries(MockProvider.EXAMPLE_NEGATIVE_JOB_RETRIES);
+    verifyNoMoreInteractions(mockSetJobRetriesBuilder);
   }
 
   @Test
@@ -226,7 +294,8 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
       .body("jobDefinitionId", equalTo(MockProvider.EXAMPLE_JOB_DEFINITION_ID))
       .body("tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
       .body("createTime", equalTo(MockProvider.EXAMPLE_JOB_CREATE_TIME))
-    .when().get(SINGLE_JOB_RESOURCE_URL);
+    .when()
+      .get(SINGLE_JOB_RESOURCE_URL);
 
     InOrder inOrder = inOrder(mockQuery);
     inOrder.verify(mockQuery).jobId(MockProvider.EXAMPLE_JOB_ID);
@@ -242,17 +311,25 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
     String jobId = MockProvider.NON_EXISTING_JOB_ID;
 
-    given().pathParam("id", jobId).then().expect().statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
-    .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-    .body("message", equalTo("Job with id " + jobId + " does not exist")).when()
-    .get(SINGLE_JOB_RESOURCE_URL);
+    given()
+      .pathParam("id", jobId)
+    .then().expect()
+      .statusCode(Status.NOT_FOUND.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("Job with id " + jobId + " does not exist"))
+    .when()
+      .get(SINGLE_JOB_RESOURCE_URL);
   }
 
   @Test
   public void testExecuteJob() {
-    given().pathParam("id", MockProvider.EXAMPLE_JOB_ID)
-    .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
-    .when().post(JOB_RESOURCE_EXECUTE_JOB_URL);
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_JOB_ID)
+    .then().expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(JOB_RESOURCE_EXECUTE_JOB_URL);
 
     verify(mockManagementService).executeJob(MockProvider.EXAMPLE_JOB_ID);
   }
@@ -341,24 +418,34 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
   @Test
   public void testSetJobDuedate() {
     Date newDuedate = MockProvider.createMockDuedate();
-    Map<String, Object> duedateVariableJson = new HashMap<String, Object>();
+    Map<String, Object> duedateVariableJson = new HashMap<>();
     duedateVariableJson.put("duedate", newDuedate);
 
-    given().pathParam("id", MockProvider.EXAMPLE_JOB_ID).contentType(ContentType.JSON).body(duedateVariableJson).then().expect()
-    .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when().put(JOB_RESOURCE_SET_DUEDATE_URL);
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_JOB_ID)
+      .contentType(ContentType.JSON)
+      .body(duedateVariableJson)
+    .then().expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .put(JOB_RESOURCE_SET_DUEDATE_URL);
 
     verify(mockManagementService).setJobDuedate(MockProvider.EXAMPLE_JOB_ID, newDuedate, false);
   }
 
   @Test
   public void testSetJobDuedateNull() {
-    Map<String, Object> duedateVariableJson = new HashMap<String, Object>();
+    Map<String, Object> duedateVariableJson = new HashMap<>();
     duedateVariableJson.put("duedate", null);
 
-    given().pathParam("id", MockProvider.EXAMPLE_JOB_ID).contentType(ContentType.JSON).body(duedateVariableJson).then().expect()
-    .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when().put(JOB_RESOURCE_SET_DUEDATE_URL);
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_JOB_ID)
+      .contentType(ContentType.JSON)
+      .body(duedateVariableJson)
+    .then().expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .put(JOB_RESOURCE_SET_DUEDATE_URL);
 
     verify(mockManagementService).setJobDuedate(MockProvider.EXAMPLE_JOB_ID, null, false);
   }
@@ -366,26 +453,36 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
   @Test
   public void testSetJobDuedateCascade() {
     Date newDuedate = MockProvider.createMockDuedate();
-    Map<String, Object> duedateVariableJson = new HashMap<String, Object>();
+    Map<String, Object> duedateVariableJson = new HashMap<>();
     duedateVariableJson.put("duedate", newDuedate);
     duedateVariableJson.put("cascade", true);
 
-    given().pathParam("id", MockProvider.EXAMPLE_JOB_ID).contentType(ContentType.JSON).body(duedateVariableJson).then().expect()
-    .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when().put(JOB_RESOURCE_SET_DUEDATE_URL);
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_JOB_ID)
+      .contentType(ContentType.JSON)
+      .body(duedateVariableJson)
+    .then().expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .put(JOB_RESOURCE_SET_DUEDATE_URL);
 
     verify(mockManagementService).setJobDuedate(MockProvider.EXAMPLE_JOB_ID, newDuedate, true);
   }
 
   @Test
   public void testSetJobDuedateNullCascade() {
-    Map<String, Object> duedateVariableJson = new HashMap<String, Object>();
+    Map<String, Object> duedateVariableJson = new HashMap<>();
     duedateVariableJson.put("duedate", null);
     duedateVariableJson.put("cascade", true);
 
-    given().pathParam("id", MockProvider.EXAMPLE_JOB_ID).contentType(ContentType.JSON).body(duedateVariableJson).then().expect()
-    .statusCode(Status.NO_CONTENT.getStatusCode())
-    .when().put(JOB_RESOURCE_SET_DUEDATE_URL);
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_JOB_ID)
+      .contentType(ContentType.JSON)
+      .body(duedateVariableJson)
+    .then().expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .put(JOB_RESOURCE_SET_DUEDATE_URL);
 
     verify(mockManagementService).setJobDuedate(MockProvider.EXAMPLE_JOB_ID, null, true);
   }
@@ -398,7 +495,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
     doThrow(new ProcessEngineException(expectedMessage)).when(mockManagementService).setJobDuedate(MockProvider.NON_EXISTING_JOB_ID,
         newDuedate, false);
 
-    Map<String, Object> duedateVariableJson = new HashMap<String, Object>();
+    Map<String, Object> duedateVariableJson = new HashMap<>();
     duedateVariableJson.put("duedate", newDuedate);
 
     given().pathParam("id", MockProvider.NON_EXISTING_JOB_ID).contentType(ContentType.JSON)
@@ -417,7 +514,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
     doThrow(new AuthorizationException(message)).when(mockManagementService).setJobDuedate(anyString(), any(Date.class), anyBoolean());
 
     Date newDuedate = MockProvider.createMockDuedate();
-    Map<String, Object> duedateVariableJson = new HashMap<String, Object>();
+    Map<String, Object> duedateVariableJson = new HashMap<>();
     duedateVariableJson.put("duedate", newDuedate);
 
     given()
@@ -544,7 +641,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void testSuspendWithMultipleByParameters() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("jobDefinitionId", MockProvider.EXAMPLE_JOB_DEFINITION_ID);
     params.put("processInstanceId", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
@@ -592,7 +689,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void testActivateJobByProcessDefinitionKey() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
 
@@ -611,7 +708,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void testActivateJobByProcessDefinitionKeyWithException() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
 
@@ -634,7 +731,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void testActivateJobByProcessDefinitionKeyThrowsAuthorizationException() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
 
@@ -657,7 +754,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void testSuspendJobByProcessDefinitionKey() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
 
@@ -676,7 +773,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void testSuspendJobByProcessDefinitionKeyWithException() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
 
@@ -699,7 +796,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void testSuspendJobByProcessDefinitionKeyThrowsAuthorizationException() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
 
@@ -722,7 +819,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void testActivateJobByProcessDefinitionKeyAndTenantId() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
     params.put("processDefinitionTenantId", MockProvider.EXAMPLE_TENANT_ID);
@@ -743,7 +840,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void testActivateJobByProcessDefinitionKeyWithoutTenantId() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
     params.put("processDefinitionWithoutTenantId", true);
@@ -764,7 +861,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void testSuspendJobByProcessDefinitionKeyAndTenantId() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
     params.put("processDefinitionTenantId", MockProvider.EXAMPLE_TENANT_ID);
@@ -785,7 +882,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void testSuspendJobByProcessDefinitionKeyWithoutTenantId() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
     params.put("processDefinitionWithoutTenantId", true);
@@ -806,7 +903,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void testActivateJobByProcessDefinitionId() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
 
@@ -825,7 +922,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void testActivateJobByProcessDefinitionIdWithException() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
 
@@ -848,7 +945,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void testActivateJobByProcessDefinitionIdThrowsAuthorizationException() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
 
@@ -871,7 +968,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void testSuspendJobByProcessDefinitionId() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
 
@@ -890,7 +987,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void testSuspendJobByProcessDefinitionIdWithException() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
 
@@ -913,7 +1010,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void testSuspendJobByProcessDefinitionIdThrowsAuthorizationException() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
 
@@ -936,7 +1033,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void testActivateJobByProcessInstanceId() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("processInstanceId", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
 
@@ -955,7 +1052,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void testActivateJobByProcessInstanceIdWithException() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("processInstanceId", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
 
@@ -978,7 +1075,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void testActivateJobByProcessInstanceIdThrowsAuthorizationException() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("processInstanceId", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
 
@@ -1001,7 +1098,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void testSuspendJobByProcessInstanceId() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("processInstanceId", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
 
@@ -1020,7 +1117,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void testSuspendJobByProcessInstanceIdWithException() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("processInstanceId", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
 
@@ -1043,7 +1140,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void testSuspendJobByProcessInstanceIdThrowsAuthorizationException() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("processInstanceId", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
 
@@ -1066,7 +1163,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void testActivateJobByJobDefinitionId() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("jobDefinitionId", MockProvider.EXAMPLE_JOB_DEFINITION_ID);
 
@@ -1085,7 +1182,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void testActivateJobByJobDefinitionIdThrowsAuthorizationException() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("jobDefinitionId", MockProvider.EXAMPLE_JOB_DEFINITION_ID);
 
@@ -1108,7 +1205,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void testSuspendJobByJobDefinitionId() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("jobDefinitionId", MockProvider.EXAMPLE_JOB_DEFINITION_ID);
 
@@ -1127,7 +1224,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void testSuspendJobByJobDefinitionIdThrowsAuthorizationException() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("jobDefinitionId", MockProvider.EXAMPLE_JOB_DEFINITION_ID);
 
@@ -1150,7 +1247,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void testActivateJobByIdShouldThrowException() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", false);
     params.put("jobId", MockProvider.EXAMPLE_JOB_ID);
 
@@ -1170,7 +1267,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void testSuspendJobByIdShouldThrowException() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
     params.put("jobId", MockProvider.EXAMPLE_JOB_ID);
 
@@ -1190,7 +1287,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void testSuspendJobByNothing() {
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Object> params = new HashMap<>();
     params.put("suspended", true);
 
     String message = "Either jobId, jobDefinitionId, processInstanceId, processDefinitionId or processDefinitionKey should be set to update the suspension state.";
@@ -1209,7 +1306,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void testSetJobPriority() {
-    Map<String, Object> priorityJson = new HashMap<String, Object>();
+    Map<String, Object> priorityJson = new HashMap<>();
     priorityJson.put("priority", MockProvider.EXAMPLE_JOB_PRIORITY);
 
     given()
@@ -1225,7 +1322,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @Test
   public void testSetJobPriorityToExtremeValue() {
-    Map<String, Object> priorityJson = new HashMap<String, Object>();
+    Map<String, Object> priorityJson = new HashMap<>();
     priorityJson.put("priority", Long.MAX_VALUE);
 
     given()
@@ -1246,7 +1343,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
     doThrow(new NotFoundException(expectedMessage))
       .when(mockManagementService).setJobPriority(MockProvider.NON_EXISTING_JOB_ID, MockProvider.EXAMPLE_JOB_PRIORITY);
 
-    Map<String, Object> priorityJson = new HashMap<String, Object>();
+    Map<String, Object> priorityJson = new HashMap<>();
     priorityJson.put("priority", MockProvider.EXAMPLE_JOB_PRIORITY);
 
     given()
@@ -1269,7 +1366,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
     doThrow(new ProcessEngineException(expectedMessage))
       .when(mockManagementService).setJobPriority(MockProvider.EXAMPLE_JOB_ID, MockProvider.EXAMPLE_JOB_PRIORITY);
 
-    Map<String, Object> priorityJson = new HashMap<String, Object>();
+    Map<String, Object> priorityJson = new HashMap<>();
     priorityJson.put("priority", MockProvider.EXAMPLE_JOB_PRIORITY);
 
     given()
@@ -1289,7 +1386,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
   public void testSetNullJobPriorityFailure() {
     String expectedMessage = "Priority for job '" +  MockProvider.EXAMPLE_JOB_ID + "' cannot be null.";
 
-    Map<String, Object> priorityJson = new HashMap<String, Object>();
+    Map<String, Object> priorityJson = new HashMap<>();
     priorityJson.put("priority", null);
 
     given()
@@ -1311,7 +1408,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
     doThrow(new AuthorizationException(message))
       .when(mockManagementService).setJobPriority(any(), anyLong());
 
-    Map<String, Object> priorityJson = new HashMap<String, Object>();
+    Map<String, Object> priorityJson = new HashMap<>();
     priorityJson.put("priority", MockProvider.EXAMPLE_JOB_PRIORITY);
 
     given()
@@ -1372,11 +1469,11 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
     given()
       .pathParam("id", jobId)
-      .then().expect()
+    .then().expect()
       .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
       .body("type", equalTo(RestException.class.getSimpleName()))
       .body("message", equalTo(expectedMessage))
-      .when()
+    .when()
       .delete(SINGLE_JOB_RESOURCE_URL);
 
     verify(mockManagementService).deleteJob(jobId);
@@ -1406,45 +1503,124 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
   }
 
   @Test
-  public void testSetRetriesAsync() {
+  public void testSetRetriesByJobsAsync() {
     List<String> ids = Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
-    Batch batchEntity = MockProvider.createMockBatch();
-    when(mockManagementService.setJobRetriesAsync(
-        anyList(),
-        Mockito.<JobQuery>any(),
-        anyInt())
-    ).thenReturn(batchEntity);
 
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> messageBodyJson = new HashMap<>();
     messageBodyJson.put("jobIds", ids);
     messageBodyJson.put(RETRIES, 5);
 
-    Response response = given()
-        .contentType(ContentType.JSON).body(messageBodyJson)
+    Response response =
+        given()
+          .contentType(ContentType.JSON)
+          .body(messageBodyJson)
         .then().expect()
-        .statusCode(Status.OK.getStatusCode())
-        .when().post(JOBS_SET_RETRIES_URL);
+          .statusCode(Status.OK.getStatusCode())
+        .when()
+          .post(JOBS_SET_RETRIES_URL);
 
     verifyBatchJson(response.asString());
 
-    verify(mockManagementService, times(1)).setJobRetriesAsync(
-        eq(ids), eq((JobQuery) null), eq(5));
+    verify(mockManagementService, times(1)).setJobRetriesByJobsAsync(5);
+    verify(mockSetJobRetriesByJobsAsyncBuilder, times(1)).jobIds(eq(ids));
+    verify(mockSetJobRetriesByJobsAsyncBuilder, times(1)).jobQuery(null);
+    verify(mockSetJobRetriesByJobsAsyncBuilder, times(1)).executeAsync();
+    verifyNoMoreInteractions(mockSetJobRetriesByJobsAsyncBuilder);
   }
 
   @Test
-  public void testSetRetriesAsyncWithQuery() {
-    Batch batchEntity = MockProvider.createMockBatch();
-    when(mockManagementService.setJobRetriesAsync(
-        any(),
-        any(JobQuery.class),
-        anyInt())
-    ).thenReturn(batchEntity);
+  public void testSetRetriesAsyncWithDueDate() {
+    List<String> ids = Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
 
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> messageBodyJson = new HashMap<>();
+    messageBodyJson.put("jobIds", ids);
+    Date newDueDate = new Date(1675752840000L);
+    messageBodyJson.put("dueDate", newDueDate);
+    messageBodyJson.put(RETRIES, 5);
+
+    Response response =
+        given()
+          .contentType(ContentType.JSON)
+          .body(messageBodyJson)
+        .then().expect()
+          .statusCode(Status.OK.getStatusCode())
+        .when()
+          .post(JOBS_SET_RETRIES_URL);
+
+    verifyBatchJson(response.asString());
+
+    verify(mockManagementService, times(1)).setJobRetriesByJobsAsync(eq(5));
+    verify(mockSetJobRetriesByJobsAsyncBuilder, times(1)).jobIds(eq(ids));
+    verify(mockSetJobRetriesByJobsAsyncBuilder, times(1)).jobQuery(null);
+    verify(mockSetJobRetriesByJobsAsyncBuilder, times(1)).dueDate(newDueDate);
+    verify(mockSetJobRetriesByJobsAsyncBuilder, times(1)).executeAsync();
+    verifyNoMoreInteractions(mockSetJobRetriesByJobsAsyncBuilder);
+  }
+
+  @Test
+  public void testSetRetriesAsyncWithNullDueDate() {
+    List<String> ids = Arrays.asList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+
+    Map<String, Object> messageBodyJson = new HashMap<>();
+    messageBodyJson.put("jobIds", ids);
+    messageBodyJson.put("dueDate", null);
+    messageBodyJson.put(RETRIES, 5);
+
+    Response response =
+        given()
+          .contentType(ContentType.JSON)
+          .body(messageBodyJson)
+        .then().expect()
+          .statusCode(Status.OK.getStatusCode())
+        .when()
+          .post(JOBS_SET_RETRIES_URL);
+
+    verifyBatchJson(response.asString());
+
+    verify(mockManagementService, times(1)).setJobRetriesByJobsAsync(eq(5));
+    verify(mockSetJobRetriesByJobsAsyncBuilder, times(1)).jobIds(eq(ids));
+    verify(mockSetJobRetriesByJobsAsyncBuilder, times(1)).jobQuery(null);
+    verify(mockSetJobRetriesByJobsAsyncBuilder, times(1)).dueDate(null);
+    verify(mockSetJobRetriesByJobsAsyncBuilder, times(1)).executeAsync();
+    verifyNoMoreInteractions(mockSetJobRetriesByJobsAsyncBuilder);
+  }
+  @Test
+  public void testSetRetriesAsyncWithQuery() {
+    Map<String, Object> messageBodyJson = new HashMap<>();
     messageBodyJson.put(RETRIES, 5);
     HistoricProcessInstanceQueryDto query = new HistoricProcessInstanceQueryDto();
     messageBodyJson.put("jobQuery", query);
 
+    Response response =
+        given()
+          .contentType(ContentType.JSON)
+          .body(messageBodyJson)
+        .then().expect()
+          .statusCode(Status.OK.getStatusCode())
+        .when()
+          .post(JOBS_SET_RETRIES_URL);
+
+    verifyBatchJson(response.asString());
+
+    verify(mockManagementService, times(1)).setJobRetriesByJobsAsync(5);
+    verify(mockSetJobRetriesByJobsAsyncBuilder, times(1)).jobIds(null);
+    verify(mockSetJobRetriesByJobsAsyncBuilder, times(1)).jobQuery(any(JobQuery.class));
+    verify(mockSetJobRetriesByJobsAsyncBuilder, times(1)).executeAsync();
+    verifyNoMoreInteractions(mockSetJobRetriesByJobsAsyncBuilder);
+  }
+
+
+  @Test
+  public void testSetRetriesAsyncWithCreateTimesQuery() {
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    messageBodyJson.put(RETRIES, 5);
+    Map<String, Object> condition = new HashMap<String, Object>();
+    condition.put("operator", "lt");
+    condition.put("value", "2022-12-15T10:45:00.000+0100");
+    Map<String, Object> jobQueryDto = new HashMap<String, Object>();
+    jobQueryDto.put("createTimes", Arrays.asList(condition));
+    messageBodyJson.put("jobQuery", jobQueryDto);
+
     Response response = given()
         .contentType(ContentType.JSON).body(messageBodyJson)
         .then().expect()
@@ -1453,24 +1629,55 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
     verifyBatchJson(response.asString());
 
-    verify(mockManagementService, times(1)).setJobRetriesAsync(
-        eq((List<String>) null), any(JobQuery.class), Mockito.eq(5));
+    verify(mockManagementService, times(1)).setJobRetriesByJobsAsync(5);
+    verify(mockSetJobRetriesByJobsAsyncBuilder, times(1)).jobIds(null);
+    verify(mockSetJobRetriesByJobsAsyncBuilder, times(1)).jobQuery(any(JobQuery.class));
+    verify(mockSetJobRetriesByJobsAsyncBuilder, times(1)).executeAsync();
+    verifyNoMoreInteractions(mockSetJobRetriesByJobsAsyncBuilder);
+  }
+
+
+  @Test
+  public void testSetRetriesAsyncWithDueDatesQuery() {
+      Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+      messageBodyJson.put(RETRIES, 5);
+      Map<String, Object> condition = new HashMap<String, Object>();
+      condition.put("operator", "lt");
+      condition.put("value", "2022-12-15T10:45:00.000+0100");
+      Map<String, Object> jobQueryDto = new HashMap<String, Object>();
+      jobQueryDto.put("dueDates", Arrays.asList(condition));
+      messageBodyJson.put("jobQuery", jobQueryDto);
+
+      Response response = given()
+          .contentType(ContentType.JSON).body(messageBodyJson)
+          .then().expect()
+          .statusCode(Status.OK.getStatusCode())
+          .when().post(JOBS_SET_RETRIES_URL);
+
+      verifyBatchJson(response.asString());
+
+      verify(mockManagementService, times(1)).setJobRetriesByJobsAsync(5);
+      verify(mockSetJobRetriesByJobsAsyncBuilder, times(1)).jobIds(null);
+      verify(mockSetJobRetriesByJobsAsyncBuilder, times(1)).jobQuery(any(JobQuery.class));
+      verify(mockSetJobRetriesByJobsAsyncBuilder, times(1)).executeAsync();
+      verifyNoMoreInteractions(mockSetJobRetriesByJobsAsyncBuilder);
   }
 
 
   @Test
   public void testSetRetriesWithBadRequestQuery() {
     doThrow(new BadUserRequestException("job ids are empty"))
-        .when(mockManagementService).setJobRetriesAsync(eq((List<String>) null), eq((JobQuery) null), anyInt());
+        .when(mockSetJobRetriesByJobsAsyncBuilder).jobQuery(eq((JobQuery) null));
 
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> messageBodyJson = new HashMap<>();
     messageBodyJson.put(RETRIES, 5);
 
     given()
-        .contentType(ContentType.JSON).body(messageBodyJson)
-        .then().expect()
-        .statusCode(Status.BAD_REQUEST.getStatusCode())
-        .when().post(JOBS_SET_RETRIES_URL);
+      .contentType(ContentType.JSON).body(messageBodyJson)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when()
+      .post(JOBS_SET_RETRIES_URL);
   }
 
   @Test
@@ -1480,47 +1687,49 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
         .then().expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode())
         .when().post(JOBS_SET_RETRIES_URL);
+
+    verifyNoMoreInteractions(mockSetJobRetriesBuilder);
   }
 
   @Test
   public void testSetRetriesWithNegativeRetries() {
     doThrow(new BadUserRequestException("retries are negative"))
-        .when(mockManagementService).setJobRetriesAsync(
-        any(),
-        Mockito.<JobQuery>any(),
-        eq(-1));
+        .when(mockManagementService).setJobRetriesByJobsAsync(eq(MockProvider.EXAMPLE_NEGATIVE_JOB_RETRIES));
 
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
-    messageBodyJson.put(RETRIES, -1);
-    HistoricProcessInstanceQueryDto query = new HistoricProcessInstanceQueryDto();
+    Map<String, Object> messageBodyJson = new HashMap<>();
+    messageBodyJson.put(RETRIES, MockProvider.EXAMPLE_NEGATIVE_JOB_RETRIES);
+    JobQueryDto query = new JobQueryDto();
     messageBodyJson.put("jobQuery", query);
 
     given()
         .contentType(ContentType.JSON).body(messageBodyJson)
-        .then().expect()
+      .then().expect()
         .statusCode(Status.BAD_REQUEST.getStatusCode())
-        .when().post(JOBS_SET_RETRIES_URL);
+      .when()
+        .post(JOBS_SET_RETRIES_URL);
   }
 
   @Test
   public void testSetRetriesWithoutRetries() {
-    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> messageBodyJson = new HashMap<>();
     messageBodyJson.put("jobIds", null);
 
     given()
-        .contentType(ContentType.JSON)
-        .body(messageBodyJson)
-        .then().expect()
-        .statusCode(Status.BAD_REQUEST.getStatusCode())
-        .when().post(JOBS_SET_RETRIES_URL);
+      .contentType(ContentType.JSON)
+      .body(messageBodyJson)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when()
+      .post(JOBS_SET_RETRIES_URL);
+
+    verifyNoMoreInteractions(mockSetJobRetriesBuilder);
   }
 
   @Test
   public void testRecalculateDuedateWithoutDateBase() {
     given()
       .pathParam("id", MockProvider.EXAMPLE_JOB_ID)
-    .then()
-      .expect()
+    .then().expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when().post(JOB_RESOURCE_RECALC_DUEDATE_URL);
 
@@ -1532,8 +1741,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
     given()
       .pathParam("id", MockProvider.EXAMPLE_JOB_ID)
       .queryParam("creationDateBased", true)
-    .then()
-      .expect()
+    .then().expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when().post(JOB_RESOURCE_RECALC_DUEDATE_URL);
 
@@ -1545,8 +1753,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
     given()
       .pathParam("id", MockProvider.EXAMPLE_JOB_ID)
       .queryParam("creationDateBased", false)
-    .then()
-      .expect()
+    .then().expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when().post(JOB_RESOURCE_RECALC_DUEDATE_URL);
 

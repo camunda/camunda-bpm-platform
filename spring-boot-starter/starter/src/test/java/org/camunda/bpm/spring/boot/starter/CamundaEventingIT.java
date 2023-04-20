@@ -16,6 +16,13 @@
  */
 package org.camunda.bpm.spring.boot.starter;
 
+import static junit.framework.TestCase.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.ByteArrayInputStream;
+import java.util.Collections;
+import java.util.Date;
+
 import org.assertj.core.util.DateUtil;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
@@ -23,7 +30,9 @@ import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.history.event.HistoricIdentityLinkLogEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricTaskInstanceEventEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.spring.boot.starter.event.TaskEvent;
@@ -39,12 +48,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.util.Collections;
-import java.util.Date;
-
-import static junit.framework.TestCase.fail;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(
@@ -163,6 +166,19 @@ public class CamundaEventingIT extends AbstractCamundaAutoConfigurationIT {
   }
 
   @Test
+  public final void shouldNotInvokeHandlerWhenSkippingCustomListeners() {
+    // given
+    startEventingInstance();
+    eventCaptor.clear();
+
+    // when
+    runtimeService.deleteProcessInstance(instance.getProcessInstanceId(), "no need", true);
+
+    // then
+    assertThat(eventCaptor.taskEvents).isEmpty();
+  }
+
+  @Test
   public final void shouldEventExecution() {
     // given
     startEventingInstance();
@@ -257,6 +273,11 @@ public class CamundaEventingIT extends AbstractCamundaAutoConfigurationIT {
 
     // then in reverse order
 
+    // update task event
+    HistoryEvent historyTaskEvent = eventCaptor.historyEvents.pop();
+    assertThat(historyTaskEvent.getEventType()).isEqualTo("update");
+    assertThat(historyTaskEvent).isInstanceOf(HistoricTaskInstanceEventEntity.class);
+
     // Remove candidate group
     HistoryEvent candidateGroupEvent = eventCaptor.historyEvents.pop();
     assertThat(candidateGroupEvent.getEventType()).isEqualTo("delete-identity-link");
@@ -268,6 +289,10 @@ public class CamundaEventingIT extends AbstractCamundaAutoConfigurationIT {
       fail("Expected identity link log event");
     }
 
+    // update task event
+    historyTaskEvent = eventCaptor.historyEvents.pop();
+    assertThat(historyTaskEvent.getEventType()).isEqualTo("update");
+    assertThat(historyTaskEvent).isInstanceOf(HistoricTaskInstanceEventEntity.class);
 
     // Remove candidate user
     HistoryEvent candidateUserEvent = eventCaptor.historyEvents.pop();
@@ -280,6 +305,11 @@ public class CamundaEventingIT extends AbstractCamundaAutoConfigurationIT {
       fail("Expected identity link log event");
     }
 
+    // update task event
+    historyTaskEvent = eventCaptor.historyEvents.pop();
+    assertThat(historyTaskEvent.getEventType()).isEqualTo("update");
+    assertThat(historyTaskEvent).isInstanceOf(HistoricTaskInstanceEventEntity.class);
+
     // Add candidate group
     candidateGroupEvent = eventCaptor.historyEvents.pop();
     assertThat(candidateGroupEvent.getEventType()).isEqualTo("add-identity-link");
@@ -290,6 +320,11 @@ public class CamundaEventingIT extends AbstractCamundaAutoConfigurationIT {
     } else {
       fail("Expected identity link log event");
     }
+
+    // update task event
+    historyTaskEvent = eventCaptor.historyEvents.pop();
+    assertThat(historyTaskEvent.getEventType()).isEqualTo("update");
+    assertThat(historyTaskEvent).isInstanceOf(HistoricTaskInstanceEventEntity.class);
 
     // Add candidate user
     candidateUserEvent = eventCaptor.historyEvents.pop();
@@ -340,6 +375,11 @@ public class CamundaEventingIT extends AbstractCamundaAutoConfigurationIT {
 
     // then in reverse order
 
+    // update task event
+    HistoryEvent historyTaskEvent = eventCaptor.historyEvents.pop();
+    assertThat(historyTaskEvent.getEventType()).isEqualTo("update");
+    assertThat(historyTaskEvent).isInstanceOf(HistoricTaskInstanceEventEntity.class);
+
     // Add candidate user
     HistoryEvent candidateUserEvent = eventCaptor.historyEvents.pop();
     assertThat(candidateUserEvent.getEventType()).isEqualTo("add-identity-link");
@@ -350,6 +390,11 @@ public class CamundaEventingIT extends AbstractCamundaAutoConfigurationIT {
     } else {
       fail("Expected identity link log event");
     }
+
+    // update task event
+    historyTaskEvent = eventCaptor.historyEvents.pop();
+    assertThat(historyTaskEvent.getEventType()).isEqualTo("update");
+    assertThat(historyTaskEvent).isInstanceOf(HistoricTaskInstanceEventEntity.class);
 
     // Add candidate user
     candidateUserEvent = eventCaptor.historyEvents.pop();
@@ -386,6 +431,126 @@ public class CamundaEventingIT extends AbstractCamundaAutoConfigurationIT {
     } else {
       fail("Expected task instance change event");
     }
+
+    assertThat(eventCaptor.executionEvents).isEmpty();
+  }
+
+  @Test
+  public final void shouldNotInvokeHandlerOnModificationWhenSkippingCustomListeners() {
+    // given
+    startEventingInstance();
+    final TaskEntity task = (TaskEntity)taskService.createTaskQuery().active().singleResult();
+    eventCaptor.clear();
+
+    // when
+    runtimeService
+        .createProcessInstanceModification(instance.getProcessInstanceId())
+        .cancelAllForActivity(task.getTaskDefinitionKey())
+        .startBeforeActivity("service_task", instance.getId())
+        .execute(true, false);
+
+    // then
+    assertThat(eventCaptor.executionEvents).isEmpty();
+//    assertThat(eventCaptor.taskEvents).isEmpty(); => https://github.com/camunda/camunda-bpm-platform/issues/3103
+  }
+
+  @Test
+  public void shouldEventHistoryTaskVariableChange() {
+    // given
+    startEventingInstance();
+    Task task = taskService.createTaskQuery().active().singleResult();
+    eventCaptor.clear();
+
+    // when
+    taskService.setVariable(task.getId(), "VARIABLE", "VALUE");
+    taskService.saveTask(task);
+
+    // then
+
+    // task update
+    TaskEvent taskEvent = eventCaptor.taskEvents.pop();
+    assertThat(taskEvent.getEventName()).isEqualTo(TaskListener.EVENTNAME_UPDATE);
+    assertThat(taskEvent.getLastUpdated()).isNotNull();
+
+    assertThat(eventCaptor.taskEvents).isEmpty();
+
+    // historic task update
+    HistoryEvent historicUpdateTaskEvent = eventCaptor.historyEvents.pop();
+    assertThat(historicUpdateTaskEvent.getEventType()).isEqualTo("update");
+    assertThat(historicUpdateTaskEvent).isInstanceOf(HistoricTaskInstanceEventEntity.class);
+
+    // add variable
+    HistoryEvent historicVariableEvent = eventCaptor.historyEvents.pop();
+    assertThat(historicVariableEvent.getEventType()).isEqualTo("create");
+    assertThat(historicVariableEvent).isInstanceOf(HistoricVariableUpdateEventEntity.class);
+
+    assertThat(eventCaptor.historyEvents).isEmpty();
+  }
+
+  @Test
+  public void shouldEventHistoryTaskPriorityChange() {
+    // given
+    startEventingInstance();
+    Task task = taskService.createTaskQuery().active().singleResult();
+    eventCaptor.clear();
+
+    // when
+    taskService.setPriority(task.getId(), 14);
+
+    // then
+
+    // task update
+    TaskEvent taskEvent = eventCaptor.taskEvents.pop();
+    assertThat(taskEvent.getEventName()).isEqualTo(TaskListener.EVENTNAME_UPDATE);
+    assertThat(taskEvent.getLastUpdated()).isNotNull();
+
+    assertThat(eventCaptor.taskEvents).isEmpty();
+
+    // historic task update
+    HistoryEvent historicUpdateTaskEvent = eventCaptor.historyEvents.pop();
+    assertThat(historicUpdateTaskEvent.getEventType()).isEqualTo("update");
+    assertThat(historicUpdateTaskEvent).isInstanceOf(HistoricTaskInstanceEventEntity.class);
+
+    assertThat(eventCaptor.historyEvents).isEmpty();
+  }
+
+  @Test
+  public void shouldEventHistoryTaskAddDeleteAttachment() {
+    // given
+    startEventingInstance();
+    Task task = taskService.createTaskQuery().active().singleResult();
+    eventCaptor.clear();
+
+    // when
+    String attachmentId = taskService.createAttachment(null, task.getId(), null, null, null,
+        new ByteArrayInputStream("hello world".getBytes())).getId();
+    taskService.deleteAttachment(attachmentId);
+
+    // then
+
+    // task update for delete
+    TaskEvent taskEvent = eventCaptor.taskEvents.pop();
+    assertThat(taskEvent.getEventName()).isEqualTo(TaskListener.EVENTNAME_UPDATE);
+    assertThat(taskEvent.getLastUpdated()).isNotNull();
+
+    // task update for create
+    taskEvent = eventCaptor.taskEvents.pop();
+    assertThat(taskEvent.getEventName()).isEqualTo(TaskListener.EVENTNAME_UPDATE);
+    assertThat(taskEvent.getLastUpdated()).isNotNull();
+
+    assertThat(eventCaptor.taskEvents).isEmpty();
+
+    // task update for delete attachment
+    HistoryEvent historicUpdateTaskEvent = eventCaptor.historyEvents.pop();
+    assertThat(historicUpdateTaskEvent.getEventType()).isEqualTo("update");
+    assertThat(historicUpdateTaskEvent).isInstanceOf(HistoricTaskInstanceEventEntity.class);
+
+    // task update for add attachment
+    historicUpdateTaskEvent = eventCaptor.historyEvents.pop();
+    assertThat(historicUpdateTaskEvent.getEventType()).isEqualTo("update");
+    assertThat(historicUpdateTaskEvent).isInstanceOf(HistoricTaskInstanceEventEntity.class);
+
+    assertThat(eventCaptor.historyEvents).isEmpty();
   }
 
   protected void assertTaskEvents(Task task, String event) {

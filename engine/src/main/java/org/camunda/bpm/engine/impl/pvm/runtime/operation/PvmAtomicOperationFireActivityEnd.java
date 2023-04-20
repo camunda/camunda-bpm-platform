@@ -43,9 +43,4 @@ public class PvmAtomicOperationFireActivityEnd extends AbstractPvmEventAtomicOpe
   protected void eventNotificationsCompleted(PvmExecutionImpl execution) {
     // nothing to do
   }
-
-  @Override
-  protected boolean isSkipNotifyListeners(PvmExecutionImpl execution) {
-    return execution.hasFailedOnEndListeners();
-  }
 }

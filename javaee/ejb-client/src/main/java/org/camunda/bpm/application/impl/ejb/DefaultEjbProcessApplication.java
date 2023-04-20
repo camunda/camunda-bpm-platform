@@ -25,7 +25,6 @@ import javax.ejb.*;
 
 import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationInterface;
-import org.camunda.bpm.application.impl.EjbProcessApplication;
 
 
 /**
@@ -40,7 +39,8 @@ import org.camunda.bpm.application.impl.EjbProcessApplication;
 @TransactionAttribute(TransactionAttributeType.REQUIRED)
 @ProcessApplication
 @Local(ProcessApplicationInterface.class)
-public class DefaultEjbProcessApplication extends EjbProcessApplication {
+// Using fully-qualified class name instead of import statement to allow for automatic Jakarta transformation
+public class DefaultEjbProcessApplication extends org.camunda.bpm.application.impl.EjbProcessApplication {
   
   protected Map<String, String> properties = new HashMap<String, String>();
   

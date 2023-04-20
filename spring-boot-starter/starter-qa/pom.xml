@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.camunda.bpm.springboot.project</groupId>
     <artifactId>camunda-bpm-spring-boot-starter-root</artifactId>
-    <version>7.17.0</version>
+    <version>7.20.0-SNAPSHOT</version>
   </parent>
 
   <packaging>pom</packaging>
@@ -22,7 +22,9 @@
       </activation>
       <modules>
         <module>integration-test-simple</module>
+        <module>integration-test-request-scope</module>
         <module>integration-test-plugins</module>
+        <module>integration-test-liquibase</module>
       </modules>
       <build>
         <pluginManagement>
@@ -67,8 +69,10 @@
           distro-ce is not used for building the spring boot starter -->
       <modules>
         <module>integration-test-simple</module>
+        <module>integration-test-request-scope</module>
         <module>integration-test-plugins</module>
         <module>integration-test-webapp</module>
+        <module>integration-test-liquibase</module>
       </modules>
     </profile>
   </profiles>

@@ -143,6 +143,13 @@ public enum HistoryEventTypes implements HistoryEventType {
   BATCH_END("batch", "end"),
 
   /**
+   * fired when a batch was updated.
+   *
+   * @since 7.18
+   */
+  BATCH_UPDATE("batch", "update"),
+
+  /**
    * fired when an identity link is added
    *
    * @since 7.5

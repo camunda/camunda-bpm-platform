@@ -18,7 +18,7 @@ package org.camunda.bpm.spring.boot.starter.webapp.filter.session.it.properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.camunda.bpm.spring.boot.starter.webapp.filter.util.HeaderRule;
+import org.camunda.bpm.spring.boot.starter.webapp.filter.util.HttpClientRule;
 import org.camunda.bpm.spring.boot.starter.webapp.filter.util.TestApplication;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,18 +38,18 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class SameSiteEnabledIT {
 
   @Rule
-  public HeaderRule headerRule = new HeaderRule();
+  public HttpClientRule httpClientRule = new HttpClientRule();
 
   @LocalServerPort
   public int port;
 
   @Test
   public void shouldEnableSameSiteCookie() {
-    headerRule.performRequest("http://localhost:" + port + "/camunda/app/tasklist/default");
+    httpClientRule.performRequest("http://localhost:" + port + "/camunda/app/tasklist/default");
 
-    String sessionCookieValue = headerRule.getSessionCookieValue();
+    String sessionCookieValue = httpClientRule.getSessionCookie();
 
-    assertThat(sessionCookieValue).matches(headerRule.getSessionCookieRegex("Lax"));
+    assertThat(sessionCookieValue).matches(httpClientRule.getSessionCookieRegex("Lax"));
   }
 
 }

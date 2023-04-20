@@ -17,10 +17,7 @@
 package org.camunda.bpm.application.impl;
 
 import java.util.Set;
-
 import javax.naming.NamingException;
-import javax.servlet.ServletException;
-
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationExecutionException;
@@ -124,7 +121,7 @@ public class ProcessApplicationLogger extends ProcessEngineLogger {
         "Listener invoked for context '{}' but no process application annotation detected.", ctxName);
   }
 
-  public ServletException multiplePasException(Set<Class<?>> c, String appId) {
+  public String multiplePasException(Set<Class<?>> c, String appId) {
 
     StringBuilder builder = new StringBuilder();
     builder.append("An application must not contain more than one class annotated with @ProcessApplication.\n Application '");
@@ -137,14 +134,14 @@ public class ProcessApplicationLogger extends ProcessEngineLogger {
     }
     String msg = builder.toString();
 
-    return new ServletException(exceptionMessage("013", msg));
+    return exceptionMessage("013", msg);
   }
 
-  public ServletException paWrongTypeException(Class<?> paClass) {
-    return new ServletException(exceptionMessage(
+  public String paWrongTypeException(Class<?> paClass) {
+    return exceptionMessage(
         "014",
         "Class '{}' is annotated with @{} but is not a subclass of {}",
-        paClass, ProcessApplication.class.getName(), AbstractProcessApplication.class.getName()));
+        paClass, ProcessApplication.class.getName(), AbstractProcessApplication.class.getName());
   }
 
   public void detectedPa(Class<?> paClass) {
@@ -204,7 +201,7 @@ public class ProcessApplicationLogger extends ProcessEngineLogger {
 
   public void debugNoTargetProcessApplicationFound(ExecutionEntity execution, ProcessApplicationManager processApplicationManager) {
     logDebug("023",
-        "no target process application found for Execution[{}], ProcessDefinition[{}], Deployment[{}] Registrations[{}]",
+        "No target process application found for Execution[{}], ProcessDefinition[{}], Deployment[{}] Registrations[{}]",
             execution.getId(),
             execution.getProcessDefinitionId(),
             execution.getProcessDefinition().getDeploymentId(),
@@ -213,7 +210,7 @@ public class ProcessApplicationLogger extends ProcessEngineLogger {
 
   public void debugNoTargetProcessApplicationFoundForCaseExecution(CaseExecutionEntity execution, ProcessApplicationManager processApplicationManager) {
     logDebug("024",
-        "no target process application found for CaseExecution[{}], CaseDefinition[{}], Deployment[{}] Registrations[{}]",
+        "No target process application found for CaseExecution[{}], CaseDefinition[{}], Deployment[{}] Registrations[{}]",
             execution.getId(),
             execution.getCaseDefinitionId(),
             ((CaseDefinitionEntity)execution.getCaseDefinition()).getDeploymentId(),

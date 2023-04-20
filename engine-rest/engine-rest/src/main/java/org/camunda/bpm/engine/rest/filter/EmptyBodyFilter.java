@@ -20,96 +20,65 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PushbackInputStream;
 import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.util.regex.Pattern;
 
 /**
  * @author Tassilo Weidner
  */
-public class EmptyBodyFilter implements Filter {
-
-  protected static final Pattern CONTENT_TYPE_JSON_PATTERN = Pattern.compile("^application\\/json((;)(.*)?)?$", Pattern.CASE_INSENSITIVE);
+public class EmptyBodyFilter extends AbstractEmptyBodyFilter {
 
   @Override
-  public void doFilter(final ServletRequest req, final ServletResponse resp, FilterChain chain) throws IOException, ServletException {
+  public HttpServletRequestWrapper wrapRequest(HttpServletRequest req, boolean isBodyEmpty, PushbackInputStream requestBody) {
+    return new HttpServletRequestWrapper(req) {
 
-    final boolean isContentTypeJson =
-      CONTENT_TYPE_JSON_PATTERN.matcher(req.getContentType() == null ? "" : req.getContentType()).find();
+      @Override
+      public ServletInputStream getInputStream() throws IOException {
 
-    if (isContentTypeJson) {
-      final PushbackInputStream requestBody = new PushbackInputStream(req.getInputStream());
-      int firstByte = requestBody.read();
-      final boolean isBodyEmpty = firstByte == -1;
-      requestBody.unread(firstByte);
+        return new ServletInputStream() {
 
-      HttpServletRequestWrapper wrappedRequest = new HttpServletRequestWrapper((HttpServletRequest) req) {
+          final InputStream inputStream = getRequestBody(isBodyEmpty, requestBody);
 
-        @Override
-        public ServletInputStream getInputStream() throws IOException {
+          @Override
+          public int read() throws IOException {
+            return inputStream.read();
+          }
 
-          return new ServletInputStream() {
+          @Override
+          public int available() throws IOException {
+            return inputStream.available();
+          }
 
-            InputStream inputStream = isBodyEmpty ? new ByteArrayInputStream("{}".getBytes(Charset.forName("UTF-8"))) : requestBody;
+          @Override
+          public void close() throws IOException {
+            inputStream.close();
+          }
 
-            @Override
-            public int read() throws IOException {
-              return inputStream.read();
-            }
+          @Override
+          public synchronized void mark(int readlimit) {
+            inputStream.mark(readlimit);
+          }
 
-            @Override
-            public int available() throws IOException {
-              return inputStream.available();
-            }
+          @Override
+          public synchronized void reset() throws IOException {
+            inputStream.reset();
+          }
 
-            @Override
-            public void close() throws IOException {
-              inputStream.close();
-            }
+          @Override
+          public boolean markSupported() {
+            return inputStream.markSupported();
+          }
 
-            @Override
-            public synchronized void mark(int readlimit) {
-              inputStream.mark(readlimit);
-            }
+        };
+      }
 
-            @Override
-            public synchronized void reset() throws IOException {
-              inputStream.reset();
-            }
+      @Override
+      public BufferedReader getReader() throws IOException {
+        return EmptyBodyFilter.this.getReader(this.getInputStream());
+      }
 
-            @Override
-            public boolean markSupported() {
-              return inputStream.markSupported();
-            }
-
-          };
-        }
-
-        @Override
-        public BufferedReader getReader() throws IOException {
-          return new BufferedReader(new InputStreamReader(this.getInputStream()));
-        }
-
-      };
-
-      chain.doFilter(wrappedRequest, resp);
-    } else {
-      chain.doFilter(req, resp);
-    }
-  }
-
-  @Override
-  public void destroy() {
-
-  }
-
-  @Override
-  public void init(FilterConfig filterConfig) throws ServletException {
-
+    };
   }
 
 }

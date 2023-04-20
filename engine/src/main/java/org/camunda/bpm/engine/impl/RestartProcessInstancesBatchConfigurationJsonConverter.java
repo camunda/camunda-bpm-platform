@@ -18,15 +18,16 @@ package org.camunda.bpm.engine.impl;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.batch.AbstractBatchConfigurationObjectConverter;
 import org.camunda.bpm.engine.impl.batch.DeploymentMappingJsonConverter;
 import org.camunda.bpm.engine.impl.batch.DeploymentMappings;
 import org.camunda.bpm.engine.impl.cmd.AbstractProcessInstanceModificationCommand;
-import org.camunda.bpm.engine.impl.json.JsonObjectConverter;
 import org.camunda.bpm.engine.impl.json.ModificationCmdJsonConverter;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
 import com.google.gson.JsonObject;
 
-public class RestartProcessInstancesBatchConfigurationJsonConverter extends JsonObjectConverter<RestartProcessInstancesBatchConfiguration>{
+public class RestartProcessInstancesBatchConfigurationJsonConverter
+    extends AbstractBatchConfigurationObjectConverter<RestartProcessInstancesBatchConfiguration> {
 
   public static final RestartProcessInstancesBatchConfigurationJsonConverter INSTANCE = new RestartProcessInstancesBatchConfigurationJsonConverter();
 
@@ -40,7 +41,7 @@ public class RestartProcessInstancesBatchConfigurationJsonConverter extends Json
   public static final String WITHOUT_BUSINESS_KEY = "withoutBusinessKey";
 
   @Override
-  public JsonObject toJsonObject(RestartProcessInstancesBatchConfiguration configuration) {
+  public JsonObject writeConfiguration(RestartProcessInstancesBatchConfiguration configuration) {
     JsonObject json = JsonUtil.createObject();
 
     JsonUtil.addListField(json, PROCESS_INSTANCE_IDS, configuration.getIds());
@@ -56,7 +57,7 @@ public class RestartProcessInstancesBatchConfigurationJsonConverter extends Json
   }
 
   @Override
-  public RestartProcessInstancesBatchConfiguration toObject(JsonObject json) {
+  public RestartProcessInstancesBatchConfiguration readConfiguration(JsonObject json) {
     List<String> processInstanceIds = readProcessInstanceIds(json);
     DeploymentMappings idMappings = readIdMappings(json);
     List<AbstractProcessInstanceModificationCommand> instructions = JsonUtil.asList(JsonUtil.getArray(json, INSTRUCTIONS), ModificationCmdJsonConverter.INSTANCE);

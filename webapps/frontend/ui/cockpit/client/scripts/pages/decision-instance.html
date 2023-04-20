@@ -1,0 +1,181 @@
+<!-- # CE - camunda-cockpit-ui/client/scripts/pages/decision-instance.html -->
+<div class="ctn-fixed-view decision-page-layout">
+  <div class="ctn-content-container"
+       ctn-collapsable-parent="sidebar">
+
+    <!-- tool bar -->
+    <div class="ctn-toolbar">
+
+      <!-- Toolbar actions are provided by plugins -->
+      <span ng-repeat="tabProvider in decisionInstanceActions">
+        <view provider="tabProvider"
+              vars="decisionInstanceVars" />
+      </span>
+
+    </div>
+
+
+    <!-- sidebar -->
+    <div class="ctn-column ctn-sidebar ctn-scroll"
+         cam-hover-area
+         ctn-collapsable="left">
+      <dl class="process-information">
+        <dt cam-widget-clipboard="decisionInstance.id"
+            cam-hoverable-title="instance-id">
+          <span uib-tooltip="{{ 'DECISION_INSTANCE_TOOLTIP_INSTANCE_ID' |  translate }}">{{ 'DECISION_INSTANCE_INSTANCE_ID' |  translate }}</span>
+        </dt>
+        <dd class="instance-id"
+            cam-hover-trigger="instance-id">{{ decisionInstance.id }}</dd>
+
+        <dt>{{ 'DECISION_INSTANCE_DEFINITION_VERSION' |  translate }}</dt>
+        <dd class="definition-version">{{decisionDefinition.version}}</dd>
+
+        <dt cam-widget-clipboard="decisionInstance.decisionDefinitionId"
+            cam-hoverable-title="definition-id">{{ 'DECISION_INSTANCE_DEFINITION_ID' |  translate }}</dt>
+        <dd class="definition-id"
+            cam-hover-trigger="definition-id">
+          <a ng-href="#/decision-definition/{{ decisionInstance.decisionDefinitionId }}">{{ decisionInstance.decisionDefinitionId }}</a>
+        </dd>
+
+        <dt cam-widget-clipboard="decisionInstance.decisionDefinitionKey"
+            cam-hoverable-title="definition-key">{{ 'DECISION_INSTANCE_DEFINITION_KEY' |  translate }}</dt>
+        <dd class="definition-key"
+            cam-hover-trigger="definition-key">{{ decisionInstance.decisionDefinitionKey }}</dd>
+
+        <dt>{{ 'DECISION_INSTANCE_DEFINITION_NAME' |  translate }}</dt>
+        <dd class="definition-name"
+            ng-if="decisionInstance.decisionDefinitionName && decisionInstance.decisionDefinitionName !== decisionInstance.key">{{ decisionInstance.decisionDefinitionName }}</dd>
+        <dd class="definition-name"
+            ng-if="!decisionInstance.decisionDefinitionName || decisionInstance.decisionDefinitionName === decisionInstance.key"><span class="null-value">{{ 'DECISION_INSTANCE_NULL' |  translate }}</span></dd>
+
+        <dt ng-if="decisionInstance.tenantId"
+            cam-widget-clipboard="decisionInstance.tenantId"
+            cam-hoverable-title="tenant-id">{{ 'DECISION_INSTANCE_TENANT_ID' |  translate }}</dt>
+        <dd class="tenant-id"
+            ng-if="decisionInstance.tenantId"
+            cam-hover-trigger="tenant-id">{{ decisionInstance.tenantId }}</dd>
+        <dt ng-if="!decisionInstance.tenantId">{{ 'DECISION_INSTANCE_TENANT_ID' |  translate }}</dt>
+        <dd class="tenant-id"
+            ng-if="!decisionInstance.tenantId"><span class="null-value">{{ 'DECISION_INSTANCE_NULL' |  translate }}</span></dd>
+
+        <dt cam-widget-clipboard="decisionDefinition.deploymentId"
+            cam-hoverable-title="deployment-id">{{ 'DECISION_INSTANCE_DEPLOYMENT_ID' |  translate }}</dt>
+        <dd class="deployment-id"
+            ng-if="decisionDefinition"
+            cam-hover-trigger="deployment-id">
+          <a ng-href="{{ getDeploymentUrl() }}">{{ decisionDefinition.deploymentId }}</a>
+        </dd>
+
+        <dt ng-if="decisionInstance.processInstanceId"
+            cam-widget-clipboard="decisionInstance.processInstanceId"
+            cam-hoverable-title="super-process-instance-id">{{ 'DECISION_INSTANCE_PROCESS_INSTANCE_ID' |  translate }}</dt>
+        <dd class="super-process-instance-id"
+            ng-if="decisionInstance.processInstanceId"
+            cam-hover-trigger="super-process-instance-id">
+          <a ng-href="{{ processInstanceLink }}">{{ decisionInstance.processInstanceId }}</a>
+        </dd>
+        <dt ng-if="!decisionInstance.processInstanceId">{{ 'DECISION_INSTANCE_PROCESS_INSTANCE_ID' |  translate }}</dt>
+        <dd class="super-process-instance-id"
+            ng-if="!decisionInstance.processInstanceId"><span class="null-value">{{ 'DECISION_INSTANCE_NULL' |  translate }}</span></dd>
+
+        <dt ng-if="decisionInstance.caseInstanceId"
+            cam-widget-clipboard="decisionInstance.caseInstanceId"
+            cam-hoverable-title="super-case-instance-id">{{ 'DECISION_INSTANCE_CASE_INSTANCE_ID' |  translate }}</dt>
+        <dd class="super-case-instance-id"
+            ng-if="decisionInstance.caseInstanceId"
+            cam-hover-trigger="super-case-instance-id">
+          <a ng-if="hasCasePlugin"
+             ng-href="#/case-instance/{{decisionInstance.caseInstanceId}}?searchQuery={{ getActivitySearch(decisionInstance) }}">
+            {{ decisionInstance.caseInstanceId }}
+          </a>
+          <span ng-if="!hasCasePlugin">
+            {{ decisionInstance.caseInstanceId }}
+          </span>
+        </dd>
+        <dt ng-if="!decisionInstance.caseInstanceId">{{ 'DECISION_INSTANCE_CASE_INSTANCE_ID' |  translate }}</dt>
+        <dd class="super-case-instance-id"
+            ng-if="!decisionInstance.caseInstanceId"><span class="null-value">{{ 'DECISION_INSTANCE_NULL' |  translate }}</span></dd>
+
+
+        <dt ng-if="decisionInstance.decisionRequirementsDefinitionId"
+            cam-widget-clipboard="decisionInstance.decisionRequirementsDefinitionId"
+            cam-hoverable-title="drd">{{ 'DECISION_INSTANCE_DECISION_REQUIREMENTS_DEFINITION' |  translate }}</dt>
+        <dd class="super-case-instance-id"
+            ng-if="decisionInstance.decisionRequirementsDefinitionId"
+            cam-hover-trigger="drd">
+          <a ng-if="hasCasePlugin"
+             ng-href="#/decision-requirement/{{decisionInstance.decisionRequirementsDefinitionId}}/history">
+            {{ decisionInstance.decisionRequirementsDefinitionId }}
+          </a>
+          <span ng-if="!hasCasePlugin">
+            {{ decisionInstance.decisionRequirementsDefinitionId }}
+          </span>
+        </dd>
+        <dt ng-if="!decisionInstance.decisionRequirementsDefinitionId">{{ 'DECISION_INSTANCE_DECISION_REQUIREMENTS_DEFINITION' |  translate }}</dt>
+        <dd class="super-case-instance-id"
+            ng-if="!decisionInstance.decisionRequirementsDefinitionId"><span class="null-value">{{ 'DECISION_INSTANCE_NULL' |  translate }}</span></dd>
+
+        <dt ng-if="decisionInstance.removalTime"
+            cam-widget-clipboard="decisionInstance.removalTime | camDate"
+            cam-hoverable-title="removal-time">{{ 'DECISION_INSTANCE_REMOVAL_TIME' |  translate }}</dt>
+        <dd class="removal-time"
+            ng-if="decisionInstance.removalTime"
+            cam-hover-trigger="removal-time">{{ decisionInstance.removalTime | camDate }}</dd>
+        <dt ng-if="!decisionInstance.removalTime">{{ 'DECISION_INSTANCE_REMOVAL_TIME' |  translate }}</dt>
+        <dd class="removal-time"
+            ng-if="!decisionInstance.removalTime"><span class="null-value">{{ 'DECISION_INSTANCE_NULL' |  translate }}</span></dd>
+      </dl>
+
+      <a class="hide-collapsable pull-right"></a>
+    </div>
+
+    <div class="ctn-column ctn-content"
+         ctn-collapsable-parent="tabs">
+
+      <!-- content top pane -->
+      <div class="ctn-row ctn-content-top"
+           ctn-collapsable="top">
+        <div decision-table="tableXml"
+             table="{{decisionDefinition.key}}"
+             control="control"
+             on-load="initializeTablePlugins()"
+             style="height: 100%;padding:20px 10px;margin:0;"></div>
+        <a class="hide-collapsable vertical-collapse"
+           title="{{ 'DECISION_INSTANCE_SHOW_TABS' |  translate }}"></a>
+
+        <a class="maximize-collapsable vertical-collapse"
+           maximize-parent-direction="left"
+           title="{{ 'DECISION_INSTANCE_MAXIMIZE_DIAGRAM' |  translate }}"></a>
+
+        <a class="restore-collapsable vertical-collapse"
+           maximize-parent-direction="left"
+           title="{{ 'DECISION_INSTANCE_RESTORE_DEFAULT_SIZE' |  translate }}"></a>
+      </div>
+
+      <!-- content bottom pane -->
+      <div class="ctn-row ctn-content-bottom ctn-tabbed">
+        <a class="show-collapsable vertical-collapse"
+           title="{{ 'DECISION_INSTANCE_HIDE_TABS' |  translate }}"></a>
+        <div ng-show="decisionInstanceTabs.length">
+          <ul class="nav nav-tabs">
+            <li ng-class="{ active: selectedTab == tabProvider }"
+                ng-repeat="tabProvider in decisionInstanceTabs">
+              <!-- translation of the title the of label <a> -->
+              <a href ng-click="selectTab(tabProvider)">{{ tabProvider.label | translate}}</a>
+            </li>
+          </ul>
+
+          <div class="ctn-tabbed-content ctn-scroll">
+            <view provider="selectedTab"
+                  vars="decisionInstanceVars" />
+          </div>
+        </div>
+      </div>
+
+      <a class="show-collapsable"></a>
+    </div>
+
+  </div>
+
+</div><!-- end .ctn-fixed-view -->
+<!-- / CE - camunda-cockpit-ui/client/scripts/pages/decision-instance.html -->

@@ -16,6 +16,12 @@
  */
 package org.camunda.bpm.client.backoff;
 
+import org.camunda.bpm.client.exception.BadRequestException;
+import org.camunda.bpm.client.exception.ConnectionLostException;
+import org.camunda.bpm.client.exception.EngineException;
+import org.camunda.bpm.client.exception.ExternalTaskClientException;
+import org.camunda.bpm.client.exception.NotFoundException;
+import org.camunda.bpm.client.exception.UnknownHttpErrorException;
 import org.camunda.bpm.client.task.ExternalTask;
 
 import java.util.List;
@@ -31,7 +37,7 @@ public interface ErrorAwareBackoffStrategy extends BackoffStrategy {
   /**
    * This is to provide compatibility with existing BackoffStrategy configurations.
    * Do not override. Implementations of ErrorAwareBackoffStrategy should override
-   * {@link #reconfigure(List, Exception)} instead.
+   * {@link #reconfigure(List, ExternalTaskClientException)} instead.
    *
    * @param externalTasks which have been fetched
    */
@@ -47,11 +53,16 @@ public interface ErrorAwareBackoffStrategy extends BackoffStrategy {
    * <p>The implementation might count the amount of invocations and realize a strategy reset.
    *
    * @param externalTasks which have been fetched
+   * @param exception can be of the following types: <ul>
+   *    <li>{@link EngineException} if something went wrong during the engine execution (e.g., a persistence exception occurred).
+   *    <li>{@link BadRequestException} if an illegal operation was performed or the given data is invalid.
+   *    <li>{@link ConnectionLostException} if the connection could not be established.
+   *    <li>{@link UnknownHttpErrorException} if the HTTP status code is not known by the client.
    */
-  void reconfigure(List<ExternalTask> externalTasks, Exception e);
+  void reconfigure(List<ExternalTask> externalTasks, ExternalTaskClientException exception);
 
   /**
-   * <p>Calculates the back off time and is invoked after {@link #reconfigure(List, Exception)}.
+   * <p>Calculates the back off time and is invoked after {@link #reconfigure(List, ExternalTaskClientException)}.
    *
    * @return the back off time between fetch and lock requests in milliseconds
    */

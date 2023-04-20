@@ -18,6 +18,8 @@ package org.camunda.bpm.quarkus.engine.test.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 import java.sql.SQLException;
 
@@ -37,14 +39,6 @@ public class CamundaEngineProgrammaticAndConfigFileTest {
 
   @RegisterExtension
   static final QuarkusUnitTest unitTest = new ProcessEngineAwareExtension()
-      .engineConfig(() -> {
-        QuarkusProcessEngineConfiguration engineConfig = new QuarkusProcessEngineConfiguration();
-        engineConfig.setProcessEngineName("customEngine");
-        engineConfig.setJobExecutorActivate(false);
-        engineConfig.setHistory("full");
-
-        return engineConfig;
-      })
       .withConfigurationResource("org/camunda/bpm/quarkus/engine/test/config/mixed-application.properties")
       .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class));
 
@@ -53,6 +47,21 @@ public class CamundaEngineProgrammaticAndConfigFileTest {
 
   @Inject
   ProcessEngine processEngine;
+
+  @ApplicationScoped
+  static class EngineConfigurer {
+
+    @Produces
+    public QuarkusProcessEngineConfiguration engineConfiguration() {
+      QuarkusProcessEngineConfiguration engineConfig = new QuarkusProcessEngineConfiguration();
+      engineConfig.setProcessEngineName("customEngine");
+      engineConfig.setJobExecutorActivate(false);
+      engineConfig.setHistory("full");
+
+      return engineConfig;
+    }
+
+  }
 
   @Test
   public void shouldUseProvidedConfigurationAndConfigProperties() throws SQLException {

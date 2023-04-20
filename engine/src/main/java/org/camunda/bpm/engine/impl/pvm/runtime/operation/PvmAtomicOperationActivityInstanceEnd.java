@@ -20,7 +20,6 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmLogger;
 import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
-import org.camunda.bpm.engine.impl.pvm.runtime.ActivityInstanceState;
 import org.camunda.bpm.engine.impl.pvm.runtime.CompensationBehavior;
 import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
@@ -73,9 +72,7 @@ public abstract class PvmAtomicOperationActivityInstanceEnd extends AbstractPvmE
   @Override
   protected boolean isSkipNotifyListeners(PvmExecutionImpl execution) {
     // listeners are skipped if this execution is not part of an activity instance.
-    // or if the end listeners for this activity instance were triggered before already and failed.
-    return execution.hasFailedOnEndListeners() ||
-        execution.getActivityInstanceId() == null;
+    return execution.getActivityInstanceId() == null;
   }
 
 

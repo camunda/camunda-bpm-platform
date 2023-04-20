@@ -16,24 +16,22 @@
  */
 package org.camunda.bpm.engine.rest.impl.history;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.ws.rs.core.UriInfo;
-
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.history.HistoricCaseActivityStatistics;
 import org.camunda.bpm.engine.history.CleanableHistoricCaseInstanceReport;
 import org.camunda.bpm.engine.history.CleanableHistoricCaseInstanceReportResult;
+import org.camunda.bpm.engine.history.HistoricCaseActivityStatistics;
 import org.camunda.bpm.engine.history.HistoricCaseActivityStatisticsQuery;
-import org.camunda.bpm.engine.rest.dto.history.HistoricCaseActivityStatisticsDto;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.history.CleanableHistoricCaseInstanceReportDto;
 import org.camunda.bpm.engine.rest.dto.history.CleanableHistoricCaseInstanceReportResultDto;
+import org.camunda.bpm.engine.rest.dto.history.HistoricCaseActivityStatisticsDto;
 import org.camunda.bpm.engine.rest.history.HistoricCaseDefinitionRestService;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.camunda.bpm.engine.rest.util.QueryUtil;
 
 /**
  * @author Roman Smirnov
@@ -49,6 +47,7 @@ public class HistoricCaseDefinitionRestServiceImpl implements HistoricCaseDefini
     this.processEngine = processEngine;
   }
 
+  @Override
   public List<HistoricCaseActivityStatisticsDto> getHistoricCaseActivityStatistics(String caseDefinitionId) {
     HistoryService historyService = processEngine.getHistoryService();
 
@@ -71,24 +70,9 @@ public class HistoricCaseDefinitionRestServiceImpl implements HistoricCaseDefini
     CleanableHistoricCaseInstanceReportDto queryDto = new CleanableHistoricCaseInstanceReportDto(objectMapper, uriInfo.getQueryParameters());
     CleanableHistoricCaseInstanceReport query = queryDto.toQuery(processEngine);
 
-    List<CleanableHistoricCaseInstanceReportResult> reportResult;
-    if (firstResult != null || maxResults != null) {
-    reportResult = executePaginatedQuery(query, firstResult, maxResults);
-    } else {
-    reportResult = query.list();
-    }
+    List<CleanableHistoricCaseInstanceReportResult> reportResult = QueryUtil.list(query, firstResult, maxResults);
 
     return CleanableHistoricCaseInstanceReportResultDto.convert(reportResult);
-  }
-
-  private List<CleanableHistoricCaseInstanceReportResult> executePaginatedQuery(CleanableHistoricCaseInstanceReport query, Integer firstResult, Integer maxResults) {
-    if (firstResult == null) {
-      firstResult = 0;
-    }
-    if (maxResults == null) {
-      maxResults = Integer.MAX_VALUE;
-    }
-    return query.listPage(firstResult, maxResults);
   }
 
   @Override

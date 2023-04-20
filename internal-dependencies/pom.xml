@@ -6,7 +6,7 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-parent</artifactId>
     <relativePath>../parent</relativePath>
-    <version>7.17.0</version>
+    <version>7.20.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-core-internal-dependencies</artifactId>
@@ -67,7 +67,7 @@
       <dependency>
         <groupId>commons-fileupload</groupId>
         <artifactId>commons-fileupload</artifactId>
-        <version>1.4</version>
+        <version>1.5</version>
       </dependency>
 
       <dependency>
@@ -138,11 +138,16 @@
         <artifactId>openjpa</artifactId>
         <version>${version.openjpa}</version>
       </dependency>
+
+      <!-- groovy script engine dependencies -->
       <dependency>
         <groupId>org.codehaus.groovy</groupId>
-        <artifactId>groovy-all</artifactId>
+        <artifactId>groovy-bom</artifactId>
         <version>${version.groovy}</version>
+        <scope>import</scope>
+        <type>pom</type>
       </dependency>
+
       <dependency>
         <groupId>org.graalvm.js</groupId>
         <artifactId>js</artifactId>
@@ -353,8 +358,8 @@
 
       <dependency>
         <groupId>com.github.tomakehurst</groupId>
-        <artifactId>wiremock-standalone</artifactId>
-        <version>2.27.2</version>
+        <artifactId>wiremock-jre8-standalone</artifactId>
+        <version>${version.wiremock-jre8}</version>
         <scope>test</scope>
       </dependency>
 

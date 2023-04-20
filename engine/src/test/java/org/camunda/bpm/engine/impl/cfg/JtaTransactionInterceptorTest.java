@@ -21,15 +21,13 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import java.sql.SQLException;
-
 import javax.transaction.RollbackException;
 import javax.transaction.TransactionManager;
-
 import org.camunda.bpm.engine.CrdbTransactionRetryException;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.JtaTransactionInterceptor;
-import org.camunda.bpm.engine.impl.interceptor.JtaTransactionInterceptor.TransactionException;
+import org.camunda.bpm.engine.impl.interceptor.TransactionException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

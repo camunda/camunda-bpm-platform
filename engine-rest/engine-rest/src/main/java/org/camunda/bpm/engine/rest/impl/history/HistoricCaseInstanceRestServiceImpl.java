@@ -17,6 +17,9 @@
 package org.camunda.bpm.engine.rest.impl.history;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.List;
+import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricCaseInstance;
 import org.camunda.bpm.engine.history.HistoricCaseInstanceQuery;
@@ -26,10 +29,7 @@ import org.camunda.bpm.engine.rest.dto.history.HistoricCaseInstanceQueryDto;
 import org.camunda.bpm.engine.rest.history.HistoricCaseInstanceRestService;
 import org.camunda.bpm.engine.rest.sub.history.HistoricCaseInstanceResource;
 import org.camunda.bpm.engine.rest.sub.history.impl.HistoricCaseInstanceResourceImpl;
-
-import javax.ws.rs.core.UriInfo;
-import java.util.ArrayList;
-import java.util.List;
+import org.camunda.bpm.engine.rest.util.QueryUtil;
 
 public class HistoricCaseInstanceRestServiceImpl implements HistoricCaseInstanceRestService {
 
@@ -41,24 +41,22 @@ public class HistoricCaseInstanceRestServiceImpl implements HistoricCaseInstance
     this.processEngine = processEngine;
   }
 
+  @Override
   public HistoricCaseInstanceResource getHistoricCaseInstance(String caseInstanceId) {
     return new HistoricCaseInstanceResourceImpl(processEngine, caseInstanceId);
   }
 
+  @Override
   public List<HistoricCaseInstanceDto> getHistoricCaseInstances(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
     HistoricCaseInstanceQueryDto queryHistoricCaseInstanceDto = new HistoricCaseInstanceQueryDto(objectMapper, uriInfo.getQueryParameters());
     return queryHistoricCaseInstances(queryHistoricCaseInstanceDto, firstResult, maxResults);
   }
 
+  @Override
   public List<HistoricCaseInstanceDto> queryHistoricCaseInstances(HistoricCaseInstanceQueryDto queryDto, Integer firstResult, Integer maxResults) {
     HistoricCaseInstanceQuery query = queryDto.toQuery(processEngine);
 
-    List<HistoricCaseInstance> matchingHistoricCaseInstances;
-    if (firstResult != null || maxResults != null) {
-      matchingHistoricCaseInstances = executePaginatedQuery(query, firstResult, maxResults);
-    } else {
-      matchingHistoricCaseInstances = query.list();
-    }
+    List<HistoricCaseInstance> matchingHistoricCaseInstances = QueryUtil.list(query, firstResult, maxResults);
 
     List<HistoricCaseInstanceDto> historicCaseInstanceDtoResults = new ArrayList<HistoricCaseInstanceDto>();
     for (HistoricCaseInstance historicCaseInstance : matchingHistoricCaseInstances) {
@@ -68,21 +66,13 @@ public class HistoricCaseInstanceRestServiceImpl implements HistoricCaseInstance
     return historicCaseInstanceDtoResults;
   }
 
-  private List<HistoricCaseInstance> executePaginatedQuery(HistoricCaseInstanceQuery query, Integer firstResult, Integer maxResults) {
-    if (firstResult == null) {
-      firstResult = 0;
-    }
-    if (maxResults == null) {
-      maxResults = Integer.MAX_VALUE;
-    }
-    return query.listPage(firstResult, maxResults);
-  }
-
+  @Override
   public CountResultDto getHistoricCaseInstancesCount(UriInfo uriInfo) {
     HistoricCaseInstanceQueryDto queryDto = new HistoricCaseInstanceQueryDto(objectMapper, uriInfo.getQueryParameters());
     return queryHistoricCaseInstancesCount(queryDto);
   }
 
+  @Override
   public CountResultDto queryHistoricCaseInstancesCount(HistoricCaseInstanceQueryDto queryDto) {
     HistoricCaseInstanceQuery query = queryDto.toQuery(processEngine);
 

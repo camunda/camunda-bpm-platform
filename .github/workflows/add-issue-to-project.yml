@@ -1,0 +1,14 @@
+name: Add issue to project
+
+on:
+  issues:
+    types:
+      - opened
+      - transferred
+
+jobs:
+  call-reusable-flow:
+    uses: camunda/automation-platform-github-actions/.github/workflows/add-issue-to-project.yml@main
+    secrets: inherit
+    with:
+      project: '40'

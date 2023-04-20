@@ -1,0 +1,10 @@
+<module xmlns="urn:jboss:module:1.0" name="com.ibm.icu.icu4j">
+  <resources>
+    <resource-root path="icu4j-@version.icu.icu4j@.jar" />
+  </resources>
+
+  <dependencies>
+    <module name="javax.api" />
+    <module name="sun.jdk" />
+  </dependencies>
+</module>

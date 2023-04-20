@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-root</artifactId>
-    <version>7.17.0</version>
+    <version>7.20.0-SNAPSHOT</version>
     <relativePath>../</relativePath>
   </parent>
 
@@ -18,46 +18,53 @@
   </description>
 
   <properties>
-    <version.quarkus>2.1.2.Final</version.quarkus>
-    <version.spring.framework>5.2.19.RELEASE</version.spring.framework>
-    <version.spring-boot>2.6.4</version.spring-boot>
+    <version.quarkus>2.16.4.Final</version.quarkus>
+    <version.spring.framework>5.3.22</version.spring.framework>
+    <version.spring-boot>2.7.9</version.spring-boot>
     <version.cxf>3.0.3</version.cxf>
-    <version.resteasy>3.14.0.Final</version.resteasy>
+    <version.resteasy>3.15.3.Final</version.resteasy>
     <version.jersey2>2.34</version.jersey2>
     <!-- use minimum version of resteasy and jersey -->
     <version.jaxrs.api>2.0.1.Final</version.jaxrs.api>
-    <version.groovy>2.4.13</version.groovy>
+    <version.groovy>2.4.21</version.groovy>
     <version.graal.js>21.1.0</version.graal.js>
     <version.icu.icu4j>68.2</version.icu.icu4j>
     <version.gson>2.8.9</version.gson>
     <version.openjpa>2.4.3</version.openjpa>
     <version.hibernate>5.6.5.Final</version.hibernate>
     <version.hikaricp>4.0.3</version.hikaricp>
-    <version.jackson>2.13.1</version.jackson>
+    <version.jackson>2.14.1</version.jackson>
+    <version.xml.bind-api>2.3.3</version.xml.bind-api>
+    <version.xml.jaxb-impl>2.3.6</version.xml.jaxb-impl>
+    <version.snakeyaml>1.33</version.snakeyaml>
 
     <version.slf4j>1.7.26</version.slf4j>
-    <version.logback>1.2.10</version.logback>
+    <version.logback>1.2.11</version.logback>
     <version.junit>4.13.1</version.junit>
     <version.assertj>2.9.1</version.assertj>
     <version.mockito>4.3.1</version.mockito>
-    <version.wiremock>1.58</version.wiremock>
+    <version.wiremock>2.27.2</version.wiremock>
+    <version.wiremock-jre8>2.27.2</version.wiremock-jre8>
     <version.testcontainers>1.16.0</version.testcontainers>
 
     <version.commonj>1.1.0</version.commonj>
     <version.bouncycastle>1.47</version.bouncycastle>
 
     <!-- application servers -->
-    <version.wildfly>26.0.1.Final</version.wildfly>
-    <version.wildfly.core>18.0.4.Final</version.wildfly.core>
+    <version.wildfly>27.0.1.Final</version.wildfly>
+    <version.wildfly.core>19.0.1.Final</version.wildfly.core>
+    <version.wildfly26>26.0.1.Final</version.wildfly26>
+    <version.wildfly26.core>18.0.4.Final</version.wildfly26.core>
 
-    <version.tomcat>9.0.58</version.tomcat>
+    <version.tomcat>9.0.72</version.tomcat>
 
     <version.arquillian>1.1.10.Final</version.arquillian>
     <version.shrinkwrap.resolvers>2.2.2</version.shrinkwrap.resolvers>
-    <version.selenium>3.141.59</version.selenium>
+    <version.selenium>4.1.4</version.selenium>
     <version.freemarker>2.3.31</version.freemarker>
 
     <version.jboss-javaee-spec>3.0.2.Final</version.jboss-javaee-spec>
+    <version.jakarta-ee-spec>10.0.0</version.jakarta-ee-spec>
 
     <!-- OSGi bundles properties -->
     <camunda.artifact />
@@ -108,18 +115,6 @@
         <scope>import</scope>
       </dependency>
 
-      <dependency>
-        <groupId>jakarta.xml.bind</groupId>
-        <artifactId>jakarta.xml.bind-api</artifactId>
-        <version>2.3.3</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.sun.xml.bind</groupId>
-        <artifactId>jaxb-impl</artifactId>
-        <version>2.3.6</version>
-      </dependency>
-
     </dependencies>
   </dependencyManagement>
 
@@ -136,7 +131,7 @@
             <systemPropertyVariables>
               <myWorkingDir>${project.build.directory}</myWorkingDir>
             </systemPropertyVariables>
-            <argLine>-Xmx968m -Duser.language=en -Duser.region=US</argLine>
+            <argLine>-Xmx968m -Duser.language=en -Duser.region=US -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=${project.build.directory}/heap_dump.hprof</argLine>
             <redirectTestOutputToFile>true</redirectTestOutputToFile>
           </configuration>
         </plugin>
@@ -146,6 +141,7 @@
           <version>2.16</version>
           <configuration>
             <argLine>-Xmx968m</argLine>
+            <runOrder>hourly</runOrder>
           </configuration>
           <executions>
               <execution>
@@ -229,7 +225,7 @@
         <plugin>
           <groupId>org.codehaus.cargo</groupId>
           <artifactId>cargo-maven3-plugin</artifactId>
-          <version>1.9.9</version>
+          <version>1.10.5</version>
         </plugin>
         <plugin>
           <groupId>net.kennychua</groupId>
@@ -273,6 +269,22 @@
             <windowtitle>Camunda Platform Javadocs ${project.version}</windowtitle>
           </configuration>
         </plugin>
+
+        <plugin>
+          <groupId>org.eclipse.transformer</groupId>
+          <artifactId>transformer-maven-plugin</artifactId>
+          <version>0.5.0</version>
+          <configuration>
+            <rules>
+              <jakartaDefaults>true</jakartaDefaults>
+              <renames>
+                <rename>jar:file:${org.camunda.bpm:camunda-engine:jar}!/META-INF/jakarta-renames.properties</rename>
+                <rename>jar:file:${org.camunda.bpm:camunda-engine:jar}!/META-INF/camunda-renames.properties</rename>
+              </renames>
+            </rules>
+            <classifier>jakarta</classifier>
+          </configuration>
+        </plugin>
       </plugins>
     </pluginManagement>
   </build>
@@ -301,7 +313,7 @@
     <repository>
       <id>com.springsource.repository.bundles.external</id>
       <name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
-      <url>https://repository.springsource.com/maven/bundles/external</url>
+      <url>https://repo.spring.io/plugins-release</url>
     </repository>
   </repositories>
 

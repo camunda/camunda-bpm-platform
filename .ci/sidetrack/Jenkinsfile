@@ -10,6 +10,7 @@ pipeline {
   }
   environment {
     LOGGER_LOG_LEVEL = 'DEBUG'
+    MAVEN_VERSION = 'maven-3.8-latest'
   }
   parameters {
     booleanParam name: 'TRIGGERED_BY_UPSTREAM', defaultValue: false, description: 'Is the current build triggered in the scope of an upstream pipeline (pull request or default branch)'
@@ -19,11 +20,7 @@ pipeline {
   }
   options {
     buildDiscarder(logRotator(numToKeepStr: '5'))
-    throttleJobProperty(
-      throttleEnabled: true,
-      throttleOption: 'project',
-      maxConcurrentTotal: 2
-    )
+    disableConcurrentBuilds()
   }
   triggers {
     pollSCM('H H(22-23) * * *') // Sidetrack daily runs before CE daily
@@ -32,7 +29,7 @@ pipeline {
     stage('Prepare') {
       when {
         expression {
-          cambpmWithLabels('upstream')
+          return params.TRIGGERED_BY_UPSTREAM
         }
       }
       steps {
@@ -70,6 +67,9 @@ pipeline {
           cambpmSendEmailNotification()
         }
       }
+    }
+    always {
+      cambpmWithSpanAttributes()
     }
   }
 }

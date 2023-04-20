@@ -76,6 +76,7 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
   public static final String CREATED = "created";
   public static final String CREATED_BEFORE = "createdBefore";
   public static final String CREATED_AFTER = "createdAfter";
+  public static final String UPDATED_AFTER = "updatedAfter";
   public static final String KEY = "key";
   public static final String KEYS = "keys";
   public static final String KEY_LIKE = "keyLike";
@@ -180,6 +181,7 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     JsonUtil.addDateField(json, CREATED, query.getCreateTime());
     JsonUtil.addDateField(json, CREATED_BEFORE, query.getCreateTimeBefore());
     JsonUtil.addDateField(json, CREATED_AFTER, query.getCreateTimeAfter());
+    JsonUtil.addDateField(json, UPDATED_AFTER, query.getUpdatedAfter());
     JsonUtil.addField(json, KEY, query.getKey());
     JsonUtil.addArrayField(json, KEYS, query.getKeys());
     JsonUtil.addField(json, KEY_LIKE, query.getKeyLike());
@@ -399,6 +401,9 @@ public class JsonTaskQueryConverter extends JsonObjectConverter<TaskQuery> {
     }
     if (json.has(CREATED_AFTER)) {
       query.taskCreatedAfter(new Date(JsonUtil.getLong(json, CREATED_AFTER)));
+    }
+    if (json.has(UPDATED_AFTER)) {
+      query.taskUpdatedAfter(new Date(JsonUtil.getLong(json, UPDATED_AFTER)));
     }
     if (json.has(KEY)) {
       query.taskDefinitionKey(JsonUtil.getString(json, KEY));

@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.camunda.bpm.run</groupId>
     <artifactId>camunda-bpm-run-modules</artifactId>
-    <version>7.17.0</version>
+    <version>7.20.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-bpm-run-modules-example-invoice</artifactId>
@@ -59,13 +59,21 @@
                   <type>war</type>
                   <outputDirectory>${project.build.directory}/classes</outputDirectory>
                   <excludes>
-                    assets/**,META-INF/**,*.html,WEB-INF/*.xml,WEB-INF
+                    META-INF/**,WEB-INF/*.xml,WEB-INF
                   </excludes>
                   <fileMappers>
                     <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
                        <pattern>^\QWEB-INF/classes/\E</pattern>
                        <replacement>./</replacement>
-                     </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                    </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                    <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                      <pattern>^\Qindex.html\E</pattern>
+                      <replacement>./camunda-invoice/index.html</replacement>
+                    </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                    <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                      <pattern>^\Qassets/\E</pattern>
+                      <replacement>./camunda-invoice/assets/</replacement>
+                    </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
                   </fileMappers>
                 </artifactItem>
               </artifactItems>

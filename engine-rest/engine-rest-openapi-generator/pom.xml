@@ -8,8 +8,12 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-engine-rest-root</artifactId>
     <relativePath>../</relativePath>
-    <version>7.17.0</version>
+    <version>7.20.0-SNAPSHOT</version>
   </parent>
+
+  <properties>
+    <version.json-schema-validator>1.0.76</version.json-schema-validator>
+  </properties>
 
   <dependencies>
 
@@ -34,7 +38,7 @@
     <dependency>
       <groupId>com.networknt</groupId>
       <artifactId>json-schema-validator</artifactId>
-      <version>1.0.29</version>
+      <version>${version.json-schema-validator}</version>
     </dependency>
 
   </dependencies>

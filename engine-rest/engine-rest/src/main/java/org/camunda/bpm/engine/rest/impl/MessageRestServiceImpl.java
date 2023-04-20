@@ -22,6 +22,7 @@ import java.util.Map.Entry;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.rest.MessageRestService;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
@@ -115,6 +116,7 @@ public class MessageRestServiceImpl extends AbstractRestProcessEngineAware imple
   }
 
   protected MessageCorrelationBuilder createMessageCorrelationBuilder(CorrelationMessageDto messageDto) {
+    ProcessEngine processEngine = getProcessEngine();
     RuntimeService runtimeService = processEngine.getRuntimeService();
 
     ObjectMapper objectMapper = getObjectMapper();

@@ -16,13 +16,12 @@
  */
 package org.camunda.bpm.client.topic.impl;
 
-import java.util.List;
-
 import org.camunda.bpm.client.exception.ExternalTaskClientException;
-import org.camunda.bpm.client.exception.FetchAndLockException;
 import org.camunda.bpm.client.impl.EngineClientException;
 import org.camunda.bpm.client.impl.ExternalTaskClientLogger;
 import org.camunda.bpm.client.topic.impl.dto.TopicRequestDto;
+
+import java.util.List;
 
 /**
  * @author Tassilo Weidner
@@ -31,7 +30,7 @@ public class TopicSubscriptionManagerLogger extends ExternalTaskClientLogger {
 
   protected void exceptionWhilePerformingFetchAndLock(EngineClientException e) {
     logError(
-      "001", "Exception while fetch and lock task.", e);
+      "001", "Exception while fetching and locking task.", e);
   }
 
   public void exceptionWhileExecutingExternalTaskHandler(String topicName, Throwable e) {
@@ -71,10 +70,6 @@ public class TopicSubscriptionManagerLogger extends ExternalTaskClientLogger {
     logDebug(
       "008",
       String.format("Fetch and lock new external tasks for %d topics", subscriptions.size()));
-  }
-
-  protected FetchAndLockException fetchAndLockException(Exception e) {
-    return new FetchAndLockException(exceptionMessage("009", "Exception while fetch and lock task."), e);
   }
 
 }

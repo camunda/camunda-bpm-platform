@@ -44,14 +44,14 @@ public class DeleteHistoricVariableInstanceCmd implements Command<Void>, Seriali
   public DeleteHistoricVariableInstanceCmd(String variableInstanceId) {
     this.variableInstanceId = variableInstanceId;
   }
-  
+
   @Override
   public Void execute(CommandContext commandContext) {
     ensureNotEmpty(BadUserRequestException.class,"variableInstanceId", variableInstanceId);
 
     HistoricVariableInstanceEntity variable = commandContext.getHistoricVariableInstanceManager().findHistoricVariableInstanceByVariableInstanceId(variableInstanceId);
     ensureNotNull(NotFoundException.class, "No historic variable instance found with id: " + variableInstanceId, "variable", variable);
-    
+
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkDeleteHistoricVariableInstance(variable);
     }
@@ -59,11 +59,11 @@ public class DeleteHistoricVariableInstanceCmd implements Command<Void>, Seriali
     commandContext
       .getHistoricDetailManager()
       .deleteHistoricDetailsByVariableInstanceId(variableInstanceId);
-    
+
     commandContext
       .getHistoricVariableInstanceManager()
       .deleteHistoricVariableInstanceByVariableInstanceId(variableInstanceId);
-    
+
     // create user operation log
     ResourceDefinitionEntity<?> definition = null;
     try {
@@ -72,12 +72,12 @@ public class DeleteHistoricVariableInstanceCmd implements Command<Void>, Seriali
       } else if (variable.getCaseDefinitionId() != null) {
         definition = commandContext.getProcessEngineConfiguration().getDeploymentCache().findDeployedCaseDefinitionById(variable.getCaseDefinitionId());
       }
-    } catch (NullValueException nve) {
+    } catch (NotFoundException e) {
       // definition has been deleted already
     }
     commandContext.getOperationLogManager().logHistoricVariableOperation(
         UserOperationLogEntry.OPERATION_TYPE_DELETE_HISTORY, variable, definition, new PropertyChange("name", null, variable.getName()));
-    
+
     return null;
   }
 }

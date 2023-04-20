@@ -16,11 +16,10 @@
  */
 package org.camunda.bpm.engine.rest.impl.history;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.ws.rs.core.UriInfo;
-
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.history.HistoricJobLogQuery;
@@ -30,8 +29,7 @@ import org.camunda.bpm.engine.rest.dto.history.HistoricJobLogQueryDto;
 import org.camunda.bpm.engine.rest.history.HistoricJobLogRestService;
 import org.camunda.bpm.engine.rest.sub.history.HistoricJobLogResource;
 import org.camunda.bpm.engine.rest.sub.history.impl.HistoricJobLogResourceImpl;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.camunda.bpm.engine.rest.util.QueryUtil;
 
 /**
  * @author Roman Smirnov
@@ -47,25 +45,23 @@ public class HistoricJobLogRestServiceImpl implements HistoricJobLogRestService 
     this.processEngine = processEngine;
   }
 
+  @Override
   public HistoricJobLogResource getHistoricJobLog(String historicJobLogId) {
     return new HistoricJobLogResourceImpl(historicJobLogId, processEngine);
   }
 
+  @Override
   public List<HistoricJobLogDto> getHistoricJobLogs(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
     HistoricJobLogQueryDto queryDto = new HistoricJobLogQueryDto(objectMapper, uriInfo.getQueryParameters());
     return queryHistoricJobLogs(queryDto, firstResult, maxResults);
   }
 
+  @Override
   public List<HistoricJobLogDto> queryHistoricJobLogs(HistoricJobLogQueryDto queryDto, Integer firstResult, Integer maxResults) {
     queryDto.setObjectMapper(objectMapper);
     HistoricJobLogQuery query = queryDto.toQuery(processEngine);
 
-    List<HistoricJobLog> matchingHistoricJobLogs;
-    if (firstResult != null || maxResults != null) {
-      matchingHistoricJobLogs = executePaginatedQuery(query, firstResult, maxResults);
-    } else {
-      matchingHistoricJobLogs = query.list();
-    }
+    List<HistoricJobLog> matchingHistoricJobLogs = QueryUtil.list(query, firstResult, maxResults);
 
     List<HistoricJobLogDto> results = new ArrayList<HistoricJobLogDto>();
     for (HistoricJobLog historicJobLog : matchingHistoricJobLogs) {
@@ -76,11 +72,13 @@ public class HistoricJobLogRestServiceImpl implements HistoricJobLogRestService 
     return results;
   }
 
+  @Override
   public CountResultDto getHistoricJobLogsCount(UriInfo uriInfo) {
     HistoricJobLogQueryDto queryDto = new HistoricJobLogQueryDto(objectMapper, uriInfo.getQueryParameters());
     return queryHistoricJobLogsCount(queryDto);
   }
 
+  @Override
   public CountResultDto queryHistoricJobLogsCount(HistoricJobLogQueryDto queryDto) {
     queryDto.setObjectMapper(objectMapper);
     HistoricJobLogQuery query = queryDto.toQuery(processEngine);
@@ -90,16 +88,6 @@ public class HistoricJobLogRestServiceImpl implements HistoricJobLogRestService 
     result.setCount(count);
 
     return result;
-  }
-
-  protected List<HistoricJobLog> executePaginatedQuery(HistoricJobLogQuery query, Integer firstResult, Integer maxResults) {
-    if (firstResult == null) {
-      firstResult = 0;
-    }
-    if (maxResults == null) {
-      maxResults = Integer.MAX_VALUE;
-    }
-    return query.listPage(firstResult, maxResults);
   }
 
 }

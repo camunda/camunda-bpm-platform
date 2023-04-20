@@ -10,8 +10,15 @@
     <@lib.property
         name = "message"
         type = "string"
-        last = true
         desc = "A detailed message of the error." />
+
+    <@lib.property
+        name = "code"
+        type = "number"
+        last = true
+        desc = "The code allows your client application to identify the error in an automated fashion.
+                You can look up the meaning of all built-in codes and learn how to add custom codes
+                in the [User Guide](${docsUrl}/user-guide/process-engine/error-handling/#exception-codes)." />
 
 </@lib.dto>
 </#macro>

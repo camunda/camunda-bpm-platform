@@ -42,7 +42,8 @@
             "mediaType": "image/*",
             "examples": ['"example-1": {
                        "summary": "GET `/decision-requirements-definition/key/invoiceKey/tenant-id/tenantA/diagram`",
-                       "description": "GET `/decision-requirements-definition/key/invoiceKey/tenant-id/tenantA/diagram`"
+                       "description": "GET `/decision-requirements-definition/key/invoiceKey/tenant-id/tenantA/diagram`",
+                       "value": ""
                      }']
           },
           {
@@ -50,7 +51,8 @@
             "mediaType": "application/octet-stream",
             "examples": ['"example-1": {
                        "summary": "GET `/decision-requirements-definition/key/invoiceKey/tenant-id/tenantA/diagram`",
-                       "description": "GET `/decision-requirements-definition/key/invoiceKey/tenant-id/tenantA/diagram`"
+                       "description": "GET `/decision-requirements-definition/key/invoiceKey/tenant-id/tenantA/diagram`",
+                       "value": ""
                      }']
           }
         ]

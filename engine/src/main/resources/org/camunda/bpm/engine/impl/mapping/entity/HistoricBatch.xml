@@ -74,6 +74,7 @@
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
     <result property="endTime" column="END_TIME_" jdbcType="TIMESTAMP" />
     <result property="removalTime" column="REMOVAL_TIME_" jdbcType="TIMESTAMP" />
+    <result property="executionStartTime" column="EXEC_START_TIME_" jdbcType="TIMESTAMP" />
   </resultMap>
 
   <resultMap id="finishedReportResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.CleanableHistoricBatchesReportResultEntity">
@@ -142,7 +143,10 @@
         END_TIME_ = #{endTime, jdbcType=TIMESTAMP},
       </if>
       <if test="removalTime != null">
-        REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+        REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP},
+      </if>
+      <if test="executionStartTime != null">
+        EXEC_START_TIME_ = #{executionStartTime, jdbcType=TIMESTAMP}
       </if>
     </set>
     where ID_= #{id, jdbcType=VARCHAR}
@@ -155,7 +159,10 @@
         RES.END_TIME_ = #{endTime, jdbcType=TIMESTAMP},
       </if>
       <if test="removalTime != null">
-        RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+        RES.REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP},
+      </if>
+      <if test="executionStartTime != null">
+        EXEC_START_TIME_ = #{executionStartTime, jdbcType=TIMESTAMP}
       </if>
     </set>
     FROM ${prefix}ACT_HI_BATCH RES WITH (FORCESEEK)

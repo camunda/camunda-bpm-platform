@@ -1,0 +1,438 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>camunda-qa-wildfly26-runtime</artifactId>
+  <packaging>jar</packaging>
+
+  <name>Camunda Platform - QA Wildfly 26 Test Runtime</name>
+
+  <parent>
+    <groupId>org.camunda.bpm.qa</groupId>
+    <artifactId>camunda-qa</artifactId>
+    <version>7.20.0-SNAPSHOT</version>
+  </parent>
+
+  <dependencies>
+    <!--
+      database drivers
+      we deploy all and only activate one with a *-ds.xml database deployment
+    -->
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.python</groupId>
+      <artifactId>jython</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jruby</groupId>
+      <artifactId>jruby-complete</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm.qa</groupId>
+      <artifactId>camunda-qa-ensure-clean-db</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/common/standalone/</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>deployments/${jboss.datasource.filename}</include>
+        </includes>
+      </resource>
+      <!-- server specific -->
+      <resource>
+        <directory>src/main/wildfly/standalone</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/*.xml</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>src/main/wildfly/domain</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/*.xml</include>
+        </includes>
+      </resource>
+    </resources>
+    <plugins>
+      <!-- create sources to be used by camunda-bpm-platform-ee -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>add-resources</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>add-resource</goal>
+            </goals>
+            <configuration>
+              <resources>
+                <resource>
+                  <directory>src/main</directory>
+                  <includes>
+                    <include>**/*.xml</include>
+                  </includes>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+            <configuration>
+              <forceCreation>true</forceCreation>
+              <!-- exclude otherwise there would be duplicates in -sources.jar -->
+              <excludes>
+                <exclude>deployments/**/*</exclude>
+                <exclude>configuration/**/*</exclude>
+                <exclude>**/configuration/**/*</exclude>
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <failIfNoTests>false</failIfNoTests>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+
+    <profile>
+      <id>wildfly26</id>
+      <dependencies>
+        <dependency>
+          <!-- make sure it comes after WildFly 26 modules in the build -->
+          <groupId>org.camunda.bpm.wildfly</groupId>
+          <artifactId>camunda-wildfly26-modules</artifactId>
+          <version>${project.version}</version>
+          <type>pom</type>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+
+      <build>
+        <plugins>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-enforcer-plugin</artifactId>
+            <version>3.0.0-M1</version>
+            <executions>
+              <execution>
+                <id>enforce-java</id>
+                <goals>
+                  <goal>enforce</goal>
+                </goals>
+                <configuration>
+                  <rules>
+                    <requireJavaVersion>
+                      <version>[1.8,)</version>
+                      <message>
+                        *****************************************************************************************************
+                        *                                                                                                   *
+                        *               You must use at least JDK 1.8 to start Camunda Platform Wildfly!!!                  *
+                        *                                                                                                   *
+                        *****************************************************************************************************
+                      </message>
+                    </requireJavaVersion>
+                  </rules>
+                  <failFast>true</failFast>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <version>3.5.0</version>
+            <executions>
+              <execution>
+                <id>unpack-server</id>
+                <phase>generate-resources</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <inherited>false</inherited>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.wildfly</groupId>
+                      <artifactId>wildfly-dist</artifactId>
+                      <version>${version.wildfly26}</version>
+                      <type>tar.gz</type>
+                      <overWrite>true</overWrite>
+                      <outputDirectory>target/</outputDirectory>
+                      <excludes>**/h2database/**</excludes>
+                    </artifactItem>
+                    <artifactItem>
+                      <groupId>org.camunda.bpm.wildfly</groupId>
+                      <artifactId>camunda-wildfly26-modules</artifactId>
+                      <version>${project.version}</version>
+                      <type>tar.gz</type>
+                      <overWrite>true</overWrite>
+                      <outputDirectory>${wildfly26.runtime.location}/modules</outputDirectory>
+                      <excludes>**/META-INF/**</excludes>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-resources-plugin</artifactId>
+            <configuration>
+              <delimiters>
+                <delimiter>${*}</delimiter>
+              </delimiters>
+              <useDefaultDelimiters>false</useDefaultDelimiters>
+            </configuration>
+            <executions>
+              <execution>
+                <id>copy-filtered-main-resources</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>resources</goal>
+                </goals>
+                <configuration>
+                  <overwrite>true</overwrite>
+                  <outputDirectory>${wildfly26.runtime.location}/standalone</outputDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>copy-distro</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <target unless="maven.test.skip">
+                    <copy todir="${wildfly26.runtime.location}/modules" overwrite="true">
+                      <fileset dir="src/main/common/modules" />
+                    </copy>
+                  </target>
+                </configuration>
+              </execution>
+              <execution>
+                <id>copy-test-dependencies</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <target unless="maven.test.skip">
+                    <dependencyfilesets scopes="runtime" />
+
+                    <!-- copy modules -->
+                    <copy todir="${wildfly26.runtime.location}/modules" flatten="false" overwrite="true">
+                      <fileset refid="maven.project.dependencies" />
+                      <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />
+                    </copy>
+
+                    <delete>
+                      <fileset dir="${wildfly26.runtime.location}/modules/org/camunda/bpm/qa" includes="**/*.jar" />
+                    </delete>
+                    <!-- copy all files again, but this only matches fox files and this treatment makes is maven 2/3 compatible => timestamped snapshot -->
+                    <copy todir="${wildfly26.runtime.location}/modules" flatten="false" verbose="true">
+                      <fileset refid="maven.project.dependencies" />
+                      <mapper>
+                        <chainedmapper>
+                          <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />
+                          <regexpmapper from="^(org.camunda.bpm.qa.*)/((camunda-[A-Za-z-]*)[0-9\.]*).*.jar$$" to="\1/\3${project.version}.jar" handledirsep="yes" />
+                        </chainedmapper>
+                      </mapper>
+                    </copy>
+
+                    <!-- replace database versions -->
+                    <replace dir="${wildfly26.runtime.location}/modules">
+                      <include name="**/module.xml" />
+                      <replacefilter token="@project.version@" value="${project.version}" />
+                      <replacefilter token="@version.postgresql@" value="${version.postgresql}" />
+                    </replace>
+
+                  </target>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>wildfly26-domain</id>
+      <dependencies>
+        <dependency>
+          <!-- make sure it comes after WildFly 26 modules in the build -->
+          <groupId>org.camunda.bpm.wildfly</groupId>
+          <artifactId>camunda-wildfly26-modules</artifactId>
+          <version>${project.version}</version>
+          <type>pom</type>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <version>3.5.0</version>
+            <executions>
+              <execution>
+                <id>unpack-server</id>
+                <phase>generate-resources</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <inherited>false</inherited>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.wildfly</groupId>
+                      <artifactId>wildfly-dist</artifactId>
+                      <version>${version.wildfly26}</version>
+                      <type>tar.gz</type>
+                      <overWrite>true</overWrite>
+                      <outputDirectory>target/</outputDirectory>
+                      <excludes>**/h2database/**</excludes>
+                    </artifactItem>
+                    <artifactItem>
+                      <groupId>org.camunda.bpm.wildfly</groupId>
+                      <artifactId>camunda-wildfly26-modules</artifactId>
+                      <version>${project.version}</version>
+                      <type>tar.gz</type>
+                      <overWrite>true</overWrite>
+                      <outputDirectory>${wildfly26.runtime.location}/modules</outputDirectory>
+                      <excludes>**/META-INF/**</excludes>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-resources-plugin</artifactId>
+            <configuration>
+              <delimiters>
+                <delimiter>${*}</delimiter>
+              </delimiters>
+              <useDefaultDelimiters>false</useDefaultDelimiters>
+            </configuration>
+            <executions>
+              <execution>
+                <id>copy-filtered-main-resources</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>resources</goal>
+                </goals>
+                <configuration>
+                  <overwrite>true</overwrite>
+                  <outputDirectory>${wildfly26.runtime.location}/domain</outputDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>copy-distro</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <target unless="maven.test.skip">
+                    <copy todir="${wildfly26.runtime.location}/modules" overwrite="true">
+                      <fileset dir="src/main/common/modules" />
+                    </copy>
+                  </target>
+                </configuration>
+              </execution>
+              <execution>
+                <id>copy-test-dependencies</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <target unless="maven.test.skip">
+                    <dependencyfilesets scopes="runtime" />
+
+                    <!-- copy modules -->
+                    <copy todir="${wildfly26.runtime.location}/modules" flatten="false" overwrite="true">
+                      <fileset refid="maven.project.dependencies" />
+                      <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />
+                    </copy>
+
+                    <delete>
+                      <fileset dir="${wildfly26.runtime.location}/modules/org/camunda/bpm/qa" includes="**/*.jar" />
+                    </delete>
+                    <!-- copy all files again, but this only matches fox files and this treatment makes is maven 2/3 compatible => timestamped snapshot -->
+                    <copy todir="${wildfly26.runtime.location}/modules" flatten="false" verbose="true">
+                      <fileset refid="maven.project.dependencies" />
+                      <mapper>
+                        <chainedmapper>
+                          <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />
+                          <regexpmapper from="^(org.camunda.bpm.qa.*)/((camunda-[A-Za-z-]*)[0-9\.]*).*.jar$$" to="\1/\3${project.version}.jar" handledirsep="yes" />
+                        </chainedmapper>
+                      </mapper>
+                    </copy>
+
+                    <!-- replace database versions -->
+                    <replace dir="${wildfly26.runtime.location}/modules">
+                      <include name="**/module.xml" />
+                      <replacefilter token="@project.version@" value="${project.version}" />
+                      <replacefilter token="@version.postgresql@" value="${version.postgresql}" />
+                    </replace>
+
+                  </target>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>

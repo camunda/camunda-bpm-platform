@@ -1,69 +1,24 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.camunda.bpm.example</groupId>
   <artifactId>camunda-example-invoice</artifactId>
   <packaging>war</packaging>
-  <name>Camunda Platform - example - invoice</name>
+  <name>Camunda Platform - Example - Invoice</name>
 
   <parent>
-    <groupId>org.camunda.bpm</groupId>
-    <artifactId>camunda-database-settings</artifactId>
-    <relativePath>../../database</relativePath>
-    <version>7.17.0</version>
+    <groupId>org.camunda.bpm.example</groupId>
+    <artifactId>camunda-example-root</artifactId>
+    <relativePath>../</relativePath>
+    <version>7.20.0-SNAPSHOT</version>
   </parent>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.camunda.bpm</groupId>
-        <artifactId>camunda-core-internal-dependencies</artifactId>
-        <version>${project.version}</version>
-        <scope>import</scope>
-        <type>pom</type>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
-
-    <dependency>
-      <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
       <version>3.0.1</version>
       <scope>provided</scope>
     </dependency>
-
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <scope>test</scope>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.graalvm.js</groupId>
-      <artifactId>js</artifactId>
-      <scope>test</scope>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.graalvm.js</groupId>
-      <artifactId>js-scriptengine</artifactId>
-      <scope>test</scope>
-    </dependency>
-
   </dependencies>
 
   <build>
@@ -71,15 +26,11 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
-        <configuration>
-          <failOnMissingWebXml>false</failOnMissingWebXml>
-          <attachClasses>true</attachClasses>
-        </configuration>
       </plugin>
     </plugins>
   </build>
 
-   <profiles>
+  <profiles>
     <profile>
       <id>develop</id>
       <dependencies>
@@ -95,7 +46,7 @@
           <resource>
             <directory>src/main/resources</directory>
             <excludes>
-                <exclude>META-INF/processes.xml</exclude>
+              <exclude>META-INF/processes.xml</exclude>
             </excludes>
           </resource>
           <resource>
@@ -107,16 +58,6 @@
           <plugin>
             <groupId>org.mortbay.jetty</groupId>
             <artifactId>jetty-maven-plugin</artifactId>
-            <version>8.1.14.v20131031</version>
-            <configuration>
-              <webAppConfig>
-                <contextPath>/camunda</contextPath>
-                <resourceBases>
-                  <resourceBase>${project.basedir}/src/main/webapp</resourceBase>
-                  <resourceBase>${project.basedir}/src/develop/webapp</resourceBase>
-                </resourceBases>
-              </webAppConfig>
-            </configuration>
           </plugin>
         </plugins>
       </build>

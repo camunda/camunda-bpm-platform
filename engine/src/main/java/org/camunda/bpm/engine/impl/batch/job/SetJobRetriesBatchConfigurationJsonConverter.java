@@ -16,39 +16,58 @@
  */
 package org.camunda.bpm.engine.impl.batch.job;
 
+import java.util.Date;
+import java.util.List;
+
+import org.camunda.bpm.engine.impl.batch.AbstractBatchConfigurationObjectConverter;
 import org.camunda.bpm.engine.impl.batch.DeploymentMappingJsonConverter;
 import org.camunda.bpm.engine.impl.batch.DeploymentMappings;
-import org.camunda.bpm.engine.impl.batch.SetRetriesBatchConfiguration;
-import org.camunda.bpm.engine.impl.json.JsonObjectConverter;
+import org.camunda.bpm.engine.impl.batch.SetJobRetriesBatchConfiguration;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
-import com.google.gson.JsonObject;
 
-import java.util.List;
+import com.google.gson.JsonObject;
 
 /**
  * @author Askar Akhmerov
  */
-public class SetJobRetriesBatchConfigurationJsonConverter extends JsonObjectConverter<SetRetriesBatchConfiguration> {
+public class SetJobRetriesBatchConfigurationJsonConverter
+    extends AbstractBatchConfigurationObjectConverter<SetJobRetriesBatchConfiguration> {
+
   public static final SetJobRetriesBatchConfigurationJsonConverter INSTANCE = new SetJobRetriesBatchConfigurationJsonConverter();
 
   public static final String JOB_IDS = "jobIds";
   public static final String JOB_ID_MAPPINGS = "jobIdMappings";
   public static final String RETRIES = "retries";
+  public static final String DUE_DATE = "dueDate";
 
-  public JsonObject toJsonObject(SetRetriesBatchConfiguration configuration) {
+  @Override
+  public JsonObject writeConfiguration(SetJobRetriesBatchConfiguration configuration) {
     JsonObject json = JsonUtil.createObject();
 
     JsonUtil.addListField(json, JOB_IDS, configuration.getIds());
     JsonUtil.addListField(json, JOB_ID_MAPPINGS, DeploymentMappingJsonConverter.INSTANCE, configuration.getIdMappings());
     JsonUtil.addField(json, RETRIES, configuration.getRetries());
+    if(configuration.isDueDateSet()) {
+      Date dueDate = configuration.getDueDate();
+      if (dueDate == null) {
+        JsonUtil.addNullField(json, DUE_DATE);
+      } else {
+        JsonUtil.addDateField(json, DUE_DATE, dueDate);
+      }
+    }
     return json;
   }
 
-  public SetRetriesBatchConfiguration toObject(JsonObject json) {
-    SetRetriesBatchConfiguration configuration = new SetRetriesBatchConfiguration(
-        readJobIds(json), readIdMappings(json),
-        JsonUtil.getInt(json, RETRIES)
-    );
+  @Override
+  public SetJobRetriesBatchConfiguration readConfiguration(JsonObject json) {
+    boolean isDueDateSet = json.has(DUE_DATE);
+    Date dueDate = null;
+    if (isDueDateSet && !json.get(DUE_DATE).isJsonNull()) {
+      dueDate = new Date(JsonUtil.getLong(json, DUE_DATE));
+    }
+
+    SetJobRetriesBatchConfiguration configuration = new SetJobRetriesBatchConfiguration(
+        readJobIds(json), readIdMappings(json), JsonUtil.getInt(json, RETRIES), dueDate, isDueDateSet);
 
     return configuration;
   }

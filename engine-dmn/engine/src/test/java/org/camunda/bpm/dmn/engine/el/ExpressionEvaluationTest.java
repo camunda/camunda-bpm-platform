@@ -34,7 +34,7 @@ public class ExpressionEvaluationTest extends DmnEngineTest {
     @Test
     @DecisionResource(resource = DMN_INPUT_VARIABLE)
     public void testHasInputVariableName() {
-      DmnDecisionResult decisionResult = dmnEngine.evaluateDecision(decision, Variables.createVariables().putValue("in", 2));
+      DmnDecisionResult decisionResult = dmnEngine.evaluateDecision(decision, Variables.createVariables().putValue("inVar", 2));
 
       assertThat((boolean) decisionResult.getSingleEntry()).isEqualTo(true);
     }
@@ -42,7 +42,7 @@ public class ExpressionEvaluationTest extends DmnEngineTest {
     @Test
     @DecisionResource(resource = DMN_OVERRIDE_INPUT_VARIABLE)
     public void testOverrideInputVariableName() {
-      DmnDecisionResult decisionResult = dmnEngine.evaluateDecision(decision, Variables.createVariables().putValue("in", 2));
+      DmnDecisionResult decisionResult = dmnEngine.evaluateDecision(decision, Variables.createVariables().putValue("inVar", 2));
 
       assertThat((boolean) decisionResult.getSingleEntry()).isEqualTo(true);
     }
@@ -50,7 +50,7 @@ public class ExpressionEvaluationTest extends DmnEngineTest {
     @Test
     @DecisionResource(resource = DMN_VARIABLE_CONTEXT)
     public void testHasVariableContext() {
-      DmnDecisionResult decisionResult = dmnEngine.evaluateDecision(decision, Variables.createVariables().putValue("in", 3));
+      DmnDecisionResult decisionResult = dmnEngine.evaluateDecision(decision, Variables.createVariables().putValue("inVar", 3));
 
       assertThat((boolean) decisionResult.getSingleEntry()).isEqualTo(true);
     }
@@ -58,7 +58,7 @@ public class ExpressionEvaluationTest extends DmnEngineTest {
     @Test
     @DecisionResource(resource = DMN_VARIABLE_CONTEXT_WITH_INPUT_VARIABLE)
     public void testHasInputVariableNameInVariableContext() {
-      DmnDecisionResult decisionResult = dmnEngine.evaluateDecision(decision, Variables.createVariables().putValue("in", 3));
+      DmnDecisionResult decisionResult = dmnEngine.evaluateDecision(decision, Variables.createVariables().putValue("inVar", 3));
 
       assertThat((boolean) decisionResult.getSingleEntry()).isEqualTo(true);
     }

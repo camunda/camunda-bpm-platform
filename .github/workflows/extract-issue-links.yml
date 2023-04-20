@@ -1,0 +1,20 @@
+name: Send SUPPORT and SEC notifications
+
+on: 
+  workflow_dispatch:
+    inputs:
+      versions:
+        description: 'Release versions (comma-separated list, e.g. 7.17.0,7.16.3,7.15.8)'
+        required: true
+
+jobs:
+  call-reusable-flow:
+    uses: camunda/automation-platform-github-actions/.github/workflows/extract-issue-links.yml@main    
+    secrets: inherit
+    with: 
+      versions: ${{ github.event.inputs.versions }}
+      support-webhook-secret: SUPPORT_CHANNEL_SLACK_WEBHOOK_URL
+      sec-webhook-secret: SEC_CHANNEL_SLACK_WEBHOOK_URL
+      translation-webhook-secret: TRANSLATION_CHANNEL_SLACK_WEBHOOK_URL
+      translation-notification-matcher: 7\.[0-9]+\.0
+      tech-lead-secret: TECH_LEAD_SLACK_ID

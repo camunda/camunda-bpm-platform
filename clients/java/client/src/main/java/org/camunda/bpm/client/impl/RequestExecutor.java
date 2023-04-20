@@ -24,9 +24,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
@@ -36,6 +34,8 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
+import org.camunda.bpm.client.exception.EngineException;
+import org.camunda.bpm.client.exception.RestException;
 import org.camunda.bpm.client.interceptor.impl.RequestInterceptorHandler;
 import org.camunda.commons.utils.IoUtil;
 
@@ -63,7 +63,7 @@ public class RequestExecutor {
     initHttpClient(requestInterceptorHandler);
   }
 
-  protected <T> T postRequest(String resourceUrl, RequestDto requestDto, Class<T> responseClass) throws EngineClientException {
+  protected <T> T postRequest(String resourceUrl, RequestDto requestDto, Class<T> responseClass) {
     ByteArrayEntity serializedRequest = serializeRequest(requestDto);
     HttpUriRequest httpRequest = RequestBuilder.post(resourceUrl)
       .addHeader(HEADER_USER_AGENT)
@@ -74,7 +74,7 @@ public class RequestExecutor {
     return executeRequest(httpRequest, responseClass);
   }
 
-  protected byte[] getRequest(String resourceUrl) throws EngineClientException {
+  protected byte[] getRequest(String resourceUrl)  {
     HttpUriRequest httpRequest = RequestBuilder.get(resourceUrl)
       .addHeader(HEADER_USER_AGENT)
       .addHeader(HEADER_CONTENT_TYPE_JSON)
@@ -83,22 +83,16 @@ public class RequestExecutor {
     return executeRequest(httpRequest, byte[].class);
   }
 
-  protected <T> T executeRequest(HttpUriRequest httpRequest, Class<T> responseClass) throws EngineClientException {
+  protected <T> T executeRequest(HttpUriRequest httpRequest, Class<T> responseClass) {
     try {
       return httpClient.execute(httpRequest, handleResponse(responseClass));
-    } catch (RuntimeException e) {
-      Throwable cause = e.getCause();
-      if (cause instanceof EngineClientException) {
-        throw (EngineClientException) e.getCause();
-      } else {
-        throw e;
-      }
-    } catch (HttpResponseException e) { // catches >= 300 HTTP status responses
+
+    } catch (RestException e) { // catches >= 300 HTTP status responses
       throw LOG.exceptionWhileReceivingResponse(httpRequest, e);
-    } catch (ClientProtocolException e) {
+
+    } catch (IOException e) { // connection was aborted
       throw LOG.exceptionWhileEstablishingConnection(httpRequest, e);
-    } catch (IOException e) {
-      throw LOG.exceptionWhileEstablishingConnection(httpRequest, e);
+
     }
   }
 
@@ -117,11 +111,7 @@ public class RequestExecutor {
             IoUtil.closeSilently(inputStream);
           }
         } else if (!responseClass.isAssignableFrom(Void.class)) {
-          try {
-            response = deserializeResponse(responseEntity, responseClass);
-          } catch (EngineClientException e) {
-            throw new RuntimeException(e);
-          }
+          response = deserializeResponse(responseEntity, responseClass);
         }
 
         try {
@@ -135,18 +125,20 @@ public class RequestExecutor {
       }
 
       @Override
-      public T handleResponse(HttpResponse response) throws HttpResponseException, IOException {
+      public T handleResponse(HttpResponse response) throws IOException {
         final StatusLine statusLine = response.getStatusLine();
         final HttpEntity entity = response.getEntity();
         if (statusLine.getStatusCode() >= 300) {
-          InputStream inputStream = null;
           try {
-            inputStream = entity.getContent();
-            String error = IoUtil.inputStreamAsString(inputStream);
-            throw new HttpResponseException(statusLine.getStatusCode(), error);
+            RestException engineException = deserializeResponse(entity, EngineRestExceptionDto.class).toRestException();
+
+            int statusCode = statusLine.getStatusCode();
+            engineException.setHttpStatusCode(statusCode);
+
+            throw engineException;
+
           } finally {
             EntityUtils.consume(entity);
-            IoUtil.closeSilently(inputStream);
           }
         }
         return entity == null ? null : handleEntity(entity);
@@ -154,20 +146,28 @@ public class RequestExecutor {
     };
   }
 
-  protected <T> T deserializeResponse(HttpEntity httpEntity, Class<T> responseClass) throws EngineClientException {
+  protected <T> T deserializeResponse(HttpEntity httpEntity, Class<T> responseClass) {
+    InputStream inputStream = null;
     try {
-      InputStream responseBody = httpEntity.getContent();
-      return objectMapper.readValue(responseBody, responseClass);
+      inputStream = httpEntity.getContent();
+      return objectMapper.readValue(inputStream, responseClass);
+
     } catch (JsonParseException e) {
       throw LOG.exceptionWhileParsingJsonObject(responseClass, e);
+
     } catch (JsonMappingException e) {
       throw LOG.exceptionWhileMappingJsonObject(responseClass, e);
+
     } catch (IOException e) {
       throw LOG.exceptionWhileDeserializingJsonObject(responseClass, e);
+
+    } finally {
+      IoUtil.closeSilently(inputStream);
+
     }
   }
 
-  protected ByteArrayEntity serializeRequest(RequestDto dto) throws EngineClientException {
+  protected ByteArrayEntity serializeRequest(RequestDto dto)  {
     byte[] serializedRequest = null;
 
     try {

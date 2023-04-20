@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.camunda.bpm.qa</groupId>
     <artifactId>camunda-qa</artifactId>
-    <version>7.17.0</version>
+    <version>7.20.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-qa-old-engine</artifactId>
@@ -12,7 +12,7 @@
   <name>Camunda Platform - QA - test new schema with old engine</name>
 
   <properties>
-    <camunda.old.engine.version>7.16.0</camunda.old.engine.version>
+    <camunda.old.engine.version>7.19.0</camunda.old.engine.version>
   </properties>
 
   <build>
@@ -91,48 +91,6 @@
     </profile>
 
     <profile>
-      <id>mariadb-galera</id>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <failIfNoTests>false</failIfNoTests>
-              <trimStackTrace>false</trimStackTrace>
-              <redirectTestOutputToFile>true</redirectTestOutputToFile>
-              <excludes combine.children="append">
-                <exclude>**/JdbcStatementTimeoutTest.java</exclude>
-                <exclude>**/CompetingMessageCorrelationTest.java</exclude>
-                <exclude>**/ConcurrentDeploymentTest.java</exclude>
-                <exclude>**/DatabaseFlushTest.java</exclude>
-                <exclude>**/*TestCase.java</exclude>
-              </excludes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    
-    <profile>
-      <!-- For 7.16 to 7.17, we are not executing these tests against h2, because
-        the 7.16 engine works with H2 1.4 and the 7.17 engine works with H2 2.0. It
-        is therefore not possible to perform a rolling update when using H2. 
-        This profile should be removed with 7.18 development via https://jira.camunda.com/browse/CAM-14434.
-        -->
-      <id>h2</id>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <skipTests>true</skipTests>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
       <id>old-engine</id>
 
       <dependencyManagement>
@@ -141,7 +99,7 @@
             <groupId>org.camunda.bpm</groupId>
             <artifactId>camunda-bom</artifactId>
             <!-- Cannot use variables due to bug in Maven Release Plugin -->
-            <version>7.16.0</version>
+            <version>7.19.0</version>
             <scope>import</scope>
             <type>pom</type>
           </dependency>
@@ -212,7 +170,7 @@
 
         <dependency>
           <groupId>org.codehaus.groovy</groupId>
-          <artifactId>groovy-all</artifactId>
+          <artifactId>groovy-jsr223</artifactId>
         </dependency>
 
         <dependency>
@@ -423,6 +381,7 @@
                 <exclude>**/SchemaLogEnsureSqlScriptTest.java</exclude>
 
                 <exclude>**/ManagementServiceTableCountTest.java</exclude>
+
               </excludes>
               <testFailureIgnore>false</testFailureIgnore>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
@@ -431,6 +390,51 @@
 
         </plugins>
       </build>
+    </profile>
+    <profile>
+      <id>below-java11</id>
+      <activation>
+        <jdk>(,11)</jdk>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <artifactId>maven-surefire-plugin</artifactId>
+              <configuration>
+                <!-- Jakarta EE 10 libraries are not part of the runs before Java 11 -->
+                <excludes combine.children="append">
+                  <exclude>**/Jakarta*.java</exclude>
+                </excludes>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <profile>
+      <id>java11</id>
+      <activation>
+        <jdk>[11,)</jdk>
+      </activation>
+      <dependencyManagement>
+        <dependencies>
+          <dependency>
+            <groupId>jakarta.platform</groupId>
+            <artifactId>jakarta.jakartaee-bom</artifactId>
+            <version>${version.jakarta-ee-spec}</version>
+            <type>pom</type>
+            <scope>import</scope>
+          </dependency>
+        </dependencies>
+      </dependencyManagement>
+      <dependencies>
+        <dependency>
+          <groupId>jakarta.transaction</groupId>
+          <artifactId>jakarta.transaction-api</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
     </profile>
   </profiles>
 </project>
