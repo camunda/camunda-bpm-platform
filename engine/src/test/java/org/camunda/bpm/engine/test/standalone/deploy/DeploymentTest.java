@@ -46,6 +46,7 @@ public class DeploymentTest {
   });
 
   protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+
   protected ProcessEngineTestRule testHelper = new ProcessEngineTestRule(engineRule);
 
   @Rule
@@ -95,20 +96,20 @@ public class DeploymentTest {
         .startEvent()
         .userTask("userTask")
         .camundaTaskListenerClass(TargetVariableScopeTest.TaskListener.EVENTNAME_DELETE, SingleVariableListener.class)
-        .serviceTask("serviceTask").camundaAsyncBefore().camundaClass(JobExecutorFollowUpTest.SyncDelegate.class.getName())
+        .serviceTask("serviceTask")
+        .camundaAsyncBefore()
+        .camundaClass(JobExecutorFollowUpTest.SyncDelegate.class.getName())
         .endEvent()
         .done();
 
-    DeploymentWithDefinitions deployment = engineRule.getRepositoryService()
-        .createDeployment()
-        .addModelInstance("foo.bpmn", instance)
-        .deployWithResult();
+    DeploymentWithDefinitions deployment = testHelper.deploy(instance);
 
     ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("process");
     assertThat(engineRule.getRuntimeService().createProcessInstanceQuery().count()).isEqualTo(1L);
 
     //when
-    engineRule.getRuntimeService().createProcessInstanceModification(processInstance.getId())
+    engineRule.getRuntimeService()
+        .createProcessInstanceModification(processInstance.getId())
         .cancelAllForActivity("userTask")
         .startAfterActivity("serviceTask")
         .execute(true, false);
@@ -120,7 +121,5 @@ public class DeploymentTest {
 
     //then
     assertThat(isListenerCalled).isNull();
-
-    engineRule.getRepositoryService().deleteDeployment(deployment.getId(), true);
   }
 }
