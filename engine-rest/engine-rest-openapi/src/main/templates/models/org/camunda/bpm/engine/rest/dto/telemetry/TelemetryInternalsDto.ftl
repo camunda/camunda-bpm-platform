@@ -3,22 +3,22 @@
 
     <@lib.property
         name = "database"
-        type = "object"
-        additionalProperties = true
+        type = "ref"
+        additionalProperties = false
         dto = "AbstractVendorVersionInformationDto"
         desc = "Vendor and version of the connected database."/>
 
     <@lib.property
         name = "application-server"
-        type = "object"
-        additionalProperties = true
+        type = "ref"
+        additionalProperties = false
         dto = "AbstractVendorVersionInformationDto"
         desc = "Vendor and version of the application server."/>
 
     <@lib.property
         name = "license-key"
-        type = "object"
-        additionalProperties = true
+        type = "ref"
+        additionalProperties = false
         dto = "TelemetryLicenseKeyDto"
         desc = "Information about the Camunda license key."/>
 
@@ -50,9 +50,8 @@
 
     <@lib.property
         name = "jdk"
-        type = "object"
-        last = true
-        additionalProperties = true
+        type = "ref"
+        additionalProperties = false
         dto = "AbstractVendorVersionInformationDto"
         desc = "Vendor and version of the installed JDK."/>
 
