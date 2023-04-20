@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.test.concurrency;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.errorcode.BuiltinExceptionCode;
@@ -23,8 +25,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Test;
-
-import static org.assertj.core.api.Java6Assertions.assertThat;
 
 public class BuiltinExceptionCodeForeignKeyConstraintViolationTest extends ConcurrencyTestCase {
 
@@ -38,6 +38,7 @@ public class BuiltinExceptionCodeForeignKeyConstraintViolationTest extends Concu
       this.processDefinitionId = processDefinitionId;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
       monitor.sync();  // thread will block here until makeContinue() is called from main thread
 
@@ -60,6 +61,7 @@ public class BuiltinExceptionCodeForeignKeyConstraintViolationTest extends Concu
       this.processDefinitionKey = processDefinitionKey;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
       monitor.sync();  // thread will block here until makeContinue() is called from main thread
 

@@ -17,9 +17,9 @@
 package org.camunda.bpm.engine.impl.util;
 
 import java.util.Arrays;
-
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 
 public class DatabaseUtil {
 
@@ -43,5 +43,12 @@ public class DatabaseUtil {
   public static boolean checkDatabaseType(ProcessEngineConfigurationImpl configuration, String... databaseTypes) {
     String dbType = configuration.getDatabaseType();
     return Arrays.stream(databaseTypes).anyMatch(dbType::equals);
+  }
+
+  /**
+   * @return true if the currently used database is known to roll back transactions on SQL errors.
+   */
+  public static boolean checkDatabaseRollsBackTransactionOnError() {
+    return checkDatabaseType(DbSqlSessionFactory.POSTGRES);
   }
 }

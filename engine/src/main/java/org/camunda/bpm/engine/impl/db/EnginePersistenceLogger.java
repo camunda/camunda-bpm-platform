@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.ibatis.executor.BatchExecutorException;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
 import org.camunda.bpm.engine.AuthorizationException;
@@ -37,7 +36,6 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.db.entitymanager.cache.CachedDbEntity;
 import org.camunda.bpm.engine.impl.db.entitymanager.cache.DbEntityState;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
-import org.camunda.bpm.engine.impl.errorcode.BuiltinExceptionCode;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
@@ -860,6 +858,16 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
         "Cannot resolve a unique Camunda Form definition for key '{}' because it exists for multiple tenants.",
         camundaFormDefinitionKey
         ));
+  }
+
+  public void concurrentModificationFailureIgnored(DbOperation operation) {
+    logDebug(
+      "110",
+      "An OptimisticLockingListener attempted to ignore a failure of: {}. "
+      + "Since the database aborted the transaction, ignoring the failure "
+      + "is not possible and an exception is thrown instead.",
+      operation
+    );
   }
 
   // exception code 110 is already taken. See requiredCamundaAdminOrPermissionException() for details.

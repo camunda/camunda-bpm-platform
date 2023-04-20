@@ -16,25 +16,24 @@
  */
 package org.camunda.bpm.engine.impl.util;
 
+import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.CRDB;
+import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.DB2;
+import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.H2;
+import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.MARIADB_MYSQL;
+import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.MSSQL;
+import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.ORACLE;
+import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.POSTGRES;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.SQLException;
 import java.util.function.Supplier;
-
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.apache.ibatis.executor.BatchExecutorException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.repository.ResourceType;
-
-import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.CRDB;
-import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.DB2;
-import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.H2;
-import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.MARIADB_MYSQL;
-import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.ORACLE;
-import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.POSTGRES;
-import static org.camunda.bpm.engine.impl.util.ExceptionUtil.DEADLOCK_CODES.MSSQL;
 
 /**
  * @author Roman Smirnov
@@ -191,25 +190,22 @@ public class ExceptionUtil {
     String sqlState = sqlException.getSQLState();
     int errorCode = sqlException.getErrorCode();
 
-    // PostgreSQL doesn't allow for a proper check
-    if ("23503".equals(sqlState) && errorCode == 0) {
-      return !skipPostgres;
-    } else {
-      // SqlServer
-      return message.contains("foreign key constraint") ||
-          "23000".equals(sqlState) && errorCode == 547 ||
-          // MySql & MariaDB & PostgreSQL
-          "23000".equals(sqlState) && errorCode == 1452 ||
-          // Oracle & H2
-          message.contains("integrity constraint") ||
-          // Oracle
-          "23000".equals(sqlState) && errorCode == 2291 ||
-          // H2
-          "23506".equals(sqlState) && errorCode == 23506 ||
-          // DB2
-          "23503".equals(sqlState) && errorCode == -530 ||
-          "23504".equals(sqlState) && errorCode == -532;
-    }
+    // SqlServer & PostgreSQL
+    return message.contains("foreign key constraint") ||
+        "23000".equals(sqlState) && errorCode == 547 ||
+        // MySql & MariaDB & PostgreSQL
+        "23000".equals(sqlState) && errorCode == 1452 ||
+        // Oracle & H2
+        message.contains("integrity constraint") ||
+        // Oracle
+        "23000".equals(sqlState) && errorCode == 2291 ||
+        // H2
+        "23506".equals(sqlState) && errorCode == 23506 ||
+        // DB2
+        "23503".equals(sqlState) && errorCode == -530 ||
+        "23504".equals(sqlState) && errorCode == -532 ||
+        // PostgreSQL
+        "23503".equals(sqlState) && errorCode == 0;
   }
 
   public static boolean checkVariableIntegrityViolation(PersistenceException persistenceException) {
@@ -309,7 +305,7 @@ public class ExceptionUtil {
     } else {
       return false;
     }
-    
+
     int errorCode = sqlException.getErrorCode();
 
     return MARIADB_MYSQL.equals(errorCode, sqlState) ||
