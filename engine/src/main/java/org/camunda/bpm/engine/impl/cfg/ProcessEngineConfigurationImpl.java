@@ -994,7 +994,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   // logging levels (with default values)
   protected String logLevelBpmnStackTrace = "DEBUG";
 
-  // OLEs for foreign key constrain violations
+  // OLEs for foreign key constraint violations on databases that rollback on SQL exceptions, e.g. PostgreSQL
   protected boolean enableOptimisticLockingOnForeignKeyViolation = true;
 
   // telemetry ///////////////////////////////////////////////////////
