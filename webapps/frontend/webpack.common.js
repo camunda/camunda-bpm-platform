@@ -165,8 +165,18 @@ module.exports = {
       },
       {
         test: /\.js$/,
-        exclude: /node_modules/,
-        use: ['babel-loader']
+        exclude: {
+          and: [/node_modules/], // Exclude libraries in node_modules
+          not: [/lezer-feel/] // Include only necessary to provide Chrome 78 compatibility (optional chaining)
+        },
+        use: {
+          loader: 'babel-loader',
+          // Options only necessary to provide Chrome 78 compatibility (optional chaining)
+          options: {
+            presets: [['@babel/preset-env']],
+            plugins: ['@babel/plugin-proposal-optional-chaining']
+          }
+        }
       }
     ]
   },
