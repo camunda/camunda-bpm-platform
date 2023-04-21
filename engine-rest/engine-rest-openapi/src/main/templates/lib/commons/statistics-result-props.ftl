@@ -22,7 +22,13 @@
         name = "incidents"
         type = "array"
         dto = "IncidentStatisticsResultDto"
-        last = last
         desc = "Each item in the resulting array is an object which contains `incidentType` and `incidentCount`.
                 **Note**: Will be an empty array, if `incidents` or `incidentsForType` were excluded.
                 Furthermore, the array will be also empty if no incidents were found."/>
+
+    <@lib.property
+        name = "@class"
+        type = "string"
+        desc = "The fully qualified class name of the data transfer object class.
+                The class name might change in future releases."
+        last = last />

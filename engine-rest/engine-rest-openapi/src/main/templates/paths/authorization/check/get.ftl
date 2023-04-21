@@ -69,7 +69,7 @@
                          "permissionName": "READ",
                          "resourceName": "USER",
                          "resourceId": "jonny",
-                         "isAuthorized": true
+                         "authorized": true
                        }
                      }']
     />
