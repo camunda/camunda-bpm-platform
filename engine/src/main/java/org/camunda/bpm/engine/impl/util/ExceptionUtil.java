@@ -175,17 +175,17 @@ public class ExceptionUtil {
         message.contains("SQLCODE=-803, SQLSTATE=23505");
   }
 
-  public static boolean checkForeignKeyConstraintViolation(PersistenceException persistenceException, boolean skipPostgres) {
+  public static boolean checkForeignKeyConstraintViolation(PersistenceException persistenceException) {
     SQLException sqlException = unwrapException(persistenceException);
 
     if (sqlException == null) {
       return false;
     }
 
-    return checkForeignKeyConstraintViolation(sqlException, skipPostgres);
+    return checkForeignKeyConstraintViolation(sqlException);
   }
 
-  public static boolean checkForeignKeyConstraintViolation(SQLException sqlException, boolean skipPostgres) {
+  public static boolean checkForeignKeyConstraintViolation(SQLException sqlException) {
     String message = sqlException.getMessage().toLowerCase();
     String sqlState = sqlException.getSQLState();
     int errorCode = sqlException.getErrorCode();

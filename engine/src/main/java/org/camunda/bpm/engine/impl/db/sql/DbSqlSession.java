@@ -262,7 +262,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
   protected boolean isConcurrentModificationException(DbOperation failedOperation,
                                                       PersistenceException cause) {
 
-    boolean isConstraintViolation = ExceptionUtil.checkForeignKeyConstraintViolation(cause, true);
+    boolean isConstraintViolation = ExceptionUtil.checkForeignKeyConstraintViolation(cause);
     boolean isVariableIntegrityViolation = ExceptionUtil.checkVariableIntegrityViolation(cause);
 
     if (isVariableIntegrityViolation) {
@@ -275,7 +275,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
       || failedOperation.getOperationType().equals(DbOperationType.UPDATE))
       ) {
       if (DatabaseUtil.checkDatabaseRollsBackTransactionOnError()) {
-        return Context.getCommandContext().getProcessEngineConfiguration().getEnableOptimisticLockingOnForeignKeyViolation();
+        return Context.getCommandContext().getProcessEngineConfiguration().isEnableOptimisticLockingOnForeignKeyViolation();
       }
       DbEntity entity = ((DbEntityOperation) failedOperation).getEntity();
       for (Map.Entry<String, Class> reference : ((HasDbReferences)entity).getReferencedEntitiesIdAndClass().entrySet()) {

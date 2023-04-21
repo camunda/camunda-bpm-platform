@@ -16,17 +16,16 @@
  */
 package org.camunda.bpm.engine.impl.errorcode;
 
-import org.camunda.bpm.engine.OptimisticLockingException;
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.util.ExceptionUtil;
-
-import java.sql.SQLException;
-
 import static org.camunda.bpm.engine.impl.errorcode.BuiltinExceptionCode.COLUMN_SIZE_TOO_SMALL;
 import static org.camunda.bpm.engine.impl.errorcode.BuiltinExceptionCode.DEADLOCK;
 import static org.camunda.bpm.engine.impl.errorcode.BuiltinExceptionCode.FOREIGN_KEY_CONSTRAINT_VIOLATION;
 import static org.camunda.bpm.engine.impl.errorcode.BuiltinExceptionCode.OPTIMISTIC_LOCKING;
+
+import java.sql.SQLException;
+import org.camunda.bpm.engine.OptimisticLockingException;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 
 /**
  * <p>One of the provider methods are called when a {@link ProcessEngineException} occurs.
@@ -78,7 +77,7 @@ public interface ExceptionCodeProvider {
       return DEADLOCK.getCode();
     }
 
-    boolean foreignKeyConstraintViolated = ExceptionUtil.checkForeignKeyConstraintViolation(sqlException, false);
+    boolean foreignKeyConstraintViolated = ExceptionUtil.checkForeignKeyConstraintViolation(sqlException);
     if (foreignKeyConstraintViolated) {
       return FOREIGN_KEY_CONSTRAINT_VIOLATION.getCode();
     }

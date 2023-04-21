@@ -5223,7 +5223,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
-  public boolean getEnableOptimisticLockingOnForeignKeyViolation() {
+  public boolean isEnableOptimisticLockingOnForeignKeyViolation() {
     return enableOptimisticLockingOnForeignKeyViolation;
   }
 
