@@ -41,6 +41,7 @@ public abstract class DbOperation implements Recyclable {
    */
   protected Class<? extends DbEntity> entityType;
 
+  @Override
   public void recycle() {
     // clean out the object state
     operationType = null;
@@ -74,8 +75,9 @@ public abstract class DbOperation implements Recyclable {
   }
 
   public boolean isFailed() {
-    return state == State.FAILED_CONCURRENT_MODIFICATION 
-        || state == State.FAILED_CONCURRENT_MODIFICATION_CRDB 
+    return state == State.FAILED_CONCURRENT_MODIFICATION
+        || state == State.FAILED_CONCURRENT_MODIFICATION_CRDB
+        || state == State.FAILED_CONCURRENT_MODIFICATION_EXCEPTION
         || state == State.FAILED_ERROR;
   }
 
@@ -117,7 +119,13 @@ public abstract class DbOperation implements Recyclable {
      * Indicates that the operation was not performed and was a concurrency
      * conflict. Applies to CockroachDB (with isolation level SERIALIZABLE).
      */
-    FAILED_CONCURRENT_MODIFICATION_CRDB
+    FAILED_CONCURRENT_MODIFICATION_CRDB,
+
+    /**
+     * Indicates that the operation was not performed and was a concurrency
+     * conflict with a SQL exception. Applies to PostgreSQL.
+     */
+    FAILED_CONCURRENT_MODIFICATION_EXCEPTION
   }
 
 }

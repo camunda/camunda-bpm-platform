@@ -31,7 +31,6 @@ import static org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.DeploymentQueryImpl;
@@ -71,7 +70,6 @@ import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation.State;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperationManager;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperationType;
-import org.camunda.bpm.engine.impl.db.sql.DbSqlSession;
 import org.camunda.bpm.engine.impl.identity.db.DbGroupQueryImpl;
 import org.camunda.bpm.engine.impl.identity.db.DbUserQueryImpl;
 import org.camunda.bpm.engine.impl.interceptor.Session;
@@ -253,6 +251,7 @@ public class DbEntityManager implements Session, EntityLoadListener {
 
   }
 
+  @Override
   public void onEntityLoaded(DbEntity entity) {
     // we get a callback when the persistence session loads an object from the database
     DbEntity cachedPersistentObject = dbEntityCache.get(entity.getClass(), entity.getId());
@@ -286,6 +285,7 @@ public class DbEntityManager implements Session, EntityLoadListener {
     }
   }
 
+  @Override
   public void flush() {
 
     // flush the entity cache which inserts operations to the db operation manager
@@ -349,16 +349,15 @@ public class DbEntityManager implements Session, EntityLoadListener {
 
       for (DbOperation failedOperation : failedOperations) {
         State failureState = failedOperation.getState();
-
         if (failureState == State.FAILED_CONCURRENT_MODIFICATION) {
           // this method throws an exception in case the flush cannot be continued;
           // accordingly, this method will be left as well in this case
           handleConcurrentModification(failedOperation);
-        }
-        else if (failureState == State.FAILED_CONCURRENT_MODIFICATION_CRDB) {
+        } else if (failureState == State.FAILED_CONCURRENT_MODIFICATION_CRDB) {
           handleConcurrentModificationCrdb(failedOperation);
-        }
-        else if (failureState == State.FAILED_ERROR) {
+        } else if (failureState == State.FAILED_CONCURRENT_MODIFICATION_EXCEPTION) {
+          handleConcurrentModificationWithRolledBackTransaction(failedOperation);
+        } else if (failureState == State.FAILED_ERROR) {
           // Top level persistence exception
           Exception failure = failedOperation.getFailure();
           throw LOG.flushDbOperationException(allOperations, failedOperation, failure);
@@ -413,17 +412,29 @@ public class DbEntityManager implements Session, EntityLoadListener {
         throw LOG.concurrentUpdateDbEntityException(dbOperation);
     }
   }
-  
+
   protected void handleConcurrentModificationCrdb(DbOperation dbOperation) {
     OptimisticLockingResult handlingResult = invokeOptimisticLockingListeners(dbOperation);
-    
+
     if (OptimisticLockingResult.IGNORE.equals(handlingResult)) {
       LOG.crdbFailureIgnored(dbOperation);
     }
-    
+
     // CRDB concurrent modification exceptions always lead to the transaction
     // being aborted, so we must always throw an exception.
     throw LOG.crdbTransactionRetryException(dbOperation);
+  }
+
+  protected void handleConcurrentModificationWithRolledBackTransaction(DbOperation dbOperation) {
+    OptimisticLockingResult handlingResult = invokeOptimisticLockingListeners(dbOperation);
+
+    if (OptimisticLockingResult.IGNORE.equals(handlingResult)) {
+      LOG.concurrentModificationFailureIgnored(dbOperation);
+    }
+
+    // On some databases like PostgreSQL, concurrent modification exceptions always lead
+    // to the transaction being aborted, so we must always throw an exception.
+    throw LOG.concurrentUpdateDbEntityException(dbOperation);
   }
 
   private OptimisticLockingResult invokeOptimisticLockingListeners(DbOperation dbOperation) {
@@ -439,7 +450,7 @@ public class DbEntityManager implements Session, EntityLoadListener {
     }
     return handlingResult;
   }
-  
+
 
   /**
    * Determines if a failed database operation (OptimisticLockingException)
@@ -450,7 +461,7 @@ public class DbEntityManager implements Session, EntityLoadListener {
    */
   protected boolean canIgnoreHistoryModificationFailure(DbOperation dbOperation) {
     DbEntity dbEntity = ((DbEntityOperation) dbOperation).getEntity();
-    return 
+    return
         Context.getProcessEngineConfiguration().isSkipHistoryOptimisticLockingExceptions()
         && (dbEntity instanceof HistoricEntity || isHistoricByteArray(dbEntity));
   }
@@ -630,6 +641,7 @@ public class DbEntityManager implements Session, EntityLoadListener {
     dbOperationManager.addOperation(dbOperation);
   }
 
+  @Override
   public void close() {
 
   }

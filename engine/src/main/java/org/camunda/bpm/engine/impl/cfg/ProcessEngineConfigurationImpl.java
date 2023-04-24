@@ -994,6 +994,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   // logging levels (with default values)
   protected String logLevelBpmnStackTrace = "DEBUG";
 
+  // OLEs for foreign key constraint violations on databases that rollback on SQL exceptions, e.g. PostgreSQL
+  protected boolean enableOptimisticLockingOnForeignKeyViolation = true;
+
   // telemetry ///////////////////////////////////////////////////////
   /**
    * Sets the initial property value of telemetry configuration only once
@@ -5217,6 +5220,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfigurationImpl setLogLevelBpmnStackTrace(final String logLevelBpmnStackTrace) {
     this.logLevelBpmnStackTrace = logLevelBpmnStackTrace;
+    return this;
+  }
+
+  public boolean isEnableOptimisticLockingOnForeignKeyViolation() {
+    return enableOptimisticLockingOnForeignKeyViolation;
+  }
+
+  public ProcessEngineConfigurationImpl setEnableOptimisticLockingOnForeignKeyViolation(boolean enableOptimisticLockingOnForeignKeyViolation) {
+    this.enableOptimisticLockingOnForeignKeyViolation = enableOptimisticLockingOnForeignKeyViolation;
     return this;
   }
 

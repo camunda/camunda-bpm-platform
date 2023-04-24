@@ -35,7 +35,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.apache.ibatis.executor.BatchResult;
 import org.apache.ibatis.mapping.BoundSql;
@@ -99,6 +98,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
 
   // select ////////////////////////////////////////////
 
+  @Override
   public List<?> selectList(String statement, Object parameter) {
     statement = dbSqlSessionFactory.mapStatement(statement);
     List<Object> resultList = executeSelectList(statement, parameter);
@@ -112,6 +112,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
     return ExceptionUtil.doWithExceptionWrapper(() -> sqlSession.selectList(statement, parameter));
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public <T extends DbEntity> T selectById(Class<T> type, String id) {
     String selectStatement = dbSqlSessionFactory.getSelectStatement(type);
@@ -123,6 +124,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
     return (T) result;
   }
 
+  @Override
   public Object selectOne(String statement, Object parameter) {
     String mappedStatement = dbSqlSessionFactory.mapStatement(statement);
     Object result = ExceptionUtil.doWithExceptionWrapper(() -> sqlSession.selectOne(mappedStatement, parameter));
@@ -132,6 +134,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
 
   // lock ////////////////////////////////////////////
 
+  @Override
   public void lock(String statement, Object parameter) {
     // do not perform locking if H2 database is used. H2 uses table level locks
     // by default which may cause deadlocks if the deploy command needs to get a new
@@ -210,7 +213,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
   protected void entityDeletePerformed(DbEntityOperation operation,
                                        int rowsAffected,
                                        PersistenceException failure) {
-    
+
     if (failure != null) {
       configureFailedDbEntityOperation(operation, failure);
     } else {
@@ -237,10 +240,10 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
     State failedState;
     if (isCrdbConcurrencyConflict(failure)) {
       failedState = State.FAILED_CONCURRENT_MODIFICATION_CRDB;
-      
     } else if (isConcurrentModificationException(operation, failure)) {
-
-      failedState = State.FAILED_CONCURRENT_MODIFICATION;
+      failedState = DatabaseUtil.checkDatabaseRollsBackTransactionOnError()
+          ? State.FAILED_CONCURRENT_MODIFICATION_EXCEPTION
+          : State.FAILED_CONCURRENT_MODIFICATION;
     } else if (DbOperationType.DELETE.equals(operationType)
               && dependencyOperation != null
               && dependencyOperation.getState() != null
@@ -259,11 +262,10 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
   protected boolean isConcurrentModificationException(DbOperation failedOperation,
                                                       PersistenceException cause) {
 
-    boolean isConstraintViolation = ExceptionUtil.checkForeignKeyConstraintViolation(cause, true);
+    boolean isConstraintViolation = ExceptionUtil.checkForeignKeyConstraintViolation(cause);
     boolean isVariableIntegrityViolation = ExceptionUtil.checkVariableIntegrityViolation(cause);
 
     if (isVariableIntegrityViolation) {
-
       return true;
     } else if (
       isConstraintViolation
@@ -272,12 +274,13 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
       && (failedOperation.getOperationType().equals(DbOperationType.INSERT)
       || failedOperation.getOperationType().equals(DbOperationType.UPDATE))
       ) {
-
+      if (DatabaseUtil.checkDatabaseRollsBackTransactionOnError()) {
+        return Context.getCommandContext().getProcessEngineConfiguration().isEnableOptimisticLockingOnForeignKeyViolation();
+      }
       DbEntity entity = ((DbEntityOperation) failedOperation).getEntity();
       for (Map.Entry<String, Class> reference : ((HasDbReferences)entity).getReferencedEntitiesIdAndClass().entrySet()) {
         DbEntity referencedEntity = selectById(reference.getValue(), reference.getKey());
         if (referencedEntity == null) {
-
           return true;
         }
       }
@@ -431,9 +434,11 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
 
   // flush ////////////////////////////////////////////////////////////////////
 
+  @Override
   public void flush() {
   }
 
+  @Override
   public void flushOperations() {
     ExceptionUtil.doWithExceptionWrapper(this::flushBatchOperations);
   }
@@ -449,6 +454,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
     }
   }
 
+  @Override
   public void close() {
     ExceptionUtil.doWithExceptionWrapper(() -> {
       sqlSession.close();
@@ -456,6 +462,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
     });
   }
 
+  @Override
   public void commit() {
     ExceptionUtil.doWithExceptionWrapper(() -> {
       sqlSession.commit();
@@ -463,6 +470,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
     });
   }
 
+  @Override
   public void rollback() {
     ExceptionUtil.doWithExceptionWrapper(() -> {
       sqlSession.rollback();
@@ -472,6 +480,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
 
   // schema operations ////////////////////////////////////////////////////////
 
+  @Override
   public void dbSchemaCheckVersion() {
     try {
       String dbVersion = getDbVersion();
