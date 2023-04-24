@@ -1996,6 +1996,27 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTest {
     assertThat(tasks).hasSize(0);
   }
 
+  @Test
+  @Deployment
+  public void shouldThrowProcessEngineExceptionWhenOtherResourceIsNotFound() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalAndScriptTask");
+    List<LockedExternalTask> lockedExternalTasks = externalTaskService
+        .fetchAndLock(1, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    assertThat(lockedExternalTasks).hasSize(1);
+    LockedExternalTask task = lockedExternalTasks.get(0);
+
+    // when NotFoundException occurs in the same transaction
+    // then a ProcessEngineException is thrown
+    assertThatThrownBy(() -> externalTaskService.complete(task.getId(), WORKER_ID))
+        .isExactlyInstanceOf(ProcessEngineException.class)
+        .isNotInstanceOf(NotFoundException.class)
+        .hasMessageContaining("Unable to find resource at path foo");
+  }
+
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
   @Test
   public void testLocking() {

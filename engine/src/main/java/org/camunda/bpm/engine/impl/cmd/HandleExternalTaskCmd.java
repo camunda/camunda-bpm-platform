@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -25,16 +26,16 @@ import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 /**
  * Represents an abstract class for the handle of external task commands.
- * 
+ *
  * @author Christopher Zell <christopher.zell@camunda.com>
  */
 public abstract class HandleExternalTaskCmd extends ExternalTaskCmd {
-  
+
   /**
    * The reported worker id.
    */
   protected String workerId;
-  
+
   public HandleExternalTaskCmd(String externalTaskId, String workerId) {
     super(externalTaskId);
     this.workerId = workerId;
@@ -42,7 +43,7 @@ public abstract class HandleExternalTaskCmd extends ExternalTaskCmd {
 
   @Override
   public Void execute(CommandContext commandContext) {
-    validateInput();    
+    validateInput();
 
     ExternalTaskEntity externalTask = commandContext.getExternalTaskManager().findExternalTaskById(externalTaskId);
     EnsureUtil.ensureNotNull(NotFoundException.class,
@@ -55,20 +56,24 @@ public abstract class HandleExternalTaskCmd extends ExternalTaskCmd {
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkUpdateProcessInstanceById(externalTask.getProcessInstanceId());
     }
-    
-    execute(externalTask);
-    
+
+    try {
+      execute(externalTask);
+    } catch (NotFoundException e) {
+      throw new ProcessEngineException(e.getMessage(), e);
+    }
+
     return null;
   }
-  
+
   /**
    * Returns the error message. Which is used to create an specific message
    *  for the BadUserRequestException if an worker has no rights to execute commands of the external task.
-   * 
+   *
    * @return the specific error message
    */
   public abstract String getErrorMessageOnWrongWorkerAccess();
-    
+
   /**
    * Validates the current input of the command.
    */
