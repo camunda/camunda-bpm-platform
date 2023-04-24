@@ -60,6 +60,7 @@ public abstract class HandleExternalTaskCmd extends ExternalTaskCmd {
     try {
       execute(externalTask);
     } catch (NotFoundException e) {
+      // wrap up NotFoundExceptions reported for entities different than external tasks
       throw new ProcessEngineException(e.getMessage(), e);
     }
 
