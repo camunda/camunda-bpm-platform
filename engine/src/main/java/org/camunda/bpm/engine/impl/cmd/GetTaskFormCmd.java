@@ -20,6 +20,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.form.handler.TaskFormHandler;
@@ -44,7 +45,7 @@ public class GetTaskFormCmd implements Command<TaskFormData>, Serializable {
   public TaskFormData execute(CommandContext commandContext) {
     TaskManager taskManager = commandContext.getTaskManager();
     TaskEntity task = taskManager.findTaskById(taskId);
-    ensureNotNull("No task found for taskId '" + taskId + "'", "task", task);
+    ensureNotNull(NotFoundException.class, "No task found for taskId '" + taskId + "'", "task", task);
 
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkReadTaskVariable(task);

@@ -21,6 +21,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.io.Serializable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -57,7 +58,7 @@ public abstract class AddIdentityLinkCmd implements Command<Void>, Serializable 
 
   protected void validateParams(String userId, String groupId, String type, String taskId) {
     ensureNotNull("taskId", taskId);
-    ensureNotNull("type is required when adding a new task identity link", "type", type);
+    ensureNotNull(NotFoundException.class, "type is required when adding a new task identity link", "type", type);
 
     // Special treatment for assignee, group cannot be used an userId may be null
     if (IdentityLinkType.ASSIGNEE.equals(type)) {

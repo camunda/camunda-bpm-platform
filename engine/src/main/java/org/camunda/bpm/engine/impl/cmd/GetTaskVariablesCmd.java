@@ -21,6 +21,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.io.Serializable;
 import java.util.Collection;
 
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -56,7 +57,7 @@ public class GetTaskVariablesCmd implements Command<VariableMap>, Serializable {
       .getTaskManager()
       .findTaskById(taskId);
 
-    ensureNotNull("task " + taskId + " doesn't exist", "task", task);
+    ensureNotNull(NotFoundException.class, "task " + taskId + " doesn't exist", "task", task);
 
     checkGetTaskVariables(task, commandContext);
 

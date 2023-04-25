@@ -21,6 +21,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.io.Serializable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -58,7 +59,7 @@ public abstract class DeleteIdentityLinkCmd implements Command<Void>, Serializab
 
   protected void validateParams(String userId, String groupId, String type, String taskId) {
     ensureNotNull("taskId", taskId);
-    ensureNotNull("type is required when adding a new task identity link", "type", type);
+    ensureNotNull(NotFoundException.class, "type is required when adding a new task identity link", "type", type);
 
     // Special treatment for assignee and owner: group cannot be used and userId may be null
     if (IdentityLinkType.ASSIGNEE.equals(type) || IdentityLinkType.OWNER.equals(type)) {
@@ -78,7 +79,7 @@ public abstract class DeleteIdentityLinkCmd implements Command<Void>, Serializab
 
     TaskManager taskManager = commandContext.getTaskManager();
     task = taskManager.findTaskById(taskId);
-    ensureNotNull("Cannot find task with id " + taskId, "task", task);
+    ensureNotNull(NotFoundException.class, "Cannot find task with id " + taskId, "task", task);
 
     checkDeleteIdentityLink(task, commandContext);
 

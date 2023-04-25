@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -45,7 +46,7 @@ public class GetExternalTaskErrorDetailsCmd implements Command<String>, Serializ
         .getExternalTaskManager()
         .findExternalTaskById(externalTaskId);
 
-    ensureNotNull("No external task found with id " + externalTaskId, "externalTask", externalTask);
+    ensureNotNull(NotFoundException.class, "No external task found with id " + externalTaskId, "externalTask", externalTask);
 
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkReadProcessInstance(externalTask.getProcessInstanceId());

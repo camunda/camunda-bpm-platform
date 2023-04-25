@@ -20,6 +20,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -49,7 +50,7 @@ public class GetRenderedTaskFormCmd  implements Command<Object>, Serializable {
   public Object execute(CommandContext commandContext) {
     TaskManager taskManager = commandContext.getTaskManager();
     TaskEntity task = taskManager.findTaskById(taskId);
-    ensureNotNull("Task '" + taskId + "' not found", "task", task);
+    ensureNotNull(NotFoundException.class, "Task '" + taskId + "' not found", "task", task);
 
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkReadTaskVariable(task);
@@ -66,7 +67,7 @@ public class GetRenderedTaskFormCmd  implements Command<Object>, Serializable {
       .getFormEngines()
       .get(formEngineName);
 
-    ensureNotNull("No formEngine '" + formEngineName + "' defined process engine configuration", "formEngine", formEngine);
+    ensureNotNull(NotFoundException.class, "No formEngine '" + formEngineName + "' defined process engine configuration", "formEngine", formEngine);
 
     TaskFormData taskForm = taskFormHandler.createTaskForm(task);
 

@@ -20,6 +20,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.Map;
 
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceLifecycleListener;
@@ -51,7 +52,7 @@ public class SetTaskVariablesCmd extends AbstractSetVariableCmd implements Varia
       .getTaskManager()
       .findTaskById(entityId);
 
-    ensureNotNull("task " + entityId + " doesn't exist", "task", task);
+    ensureNotNull(NotFoundException.class, "task " + entityId + " doesn't exist", "task", task);
 
     checkSetTaskVariables(task);
 
