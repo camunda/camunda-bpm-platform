@@ -29,20 +29,21 @@
   </dependencyManagement>
 
   <dependencies>
-    
+
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
       <scope>provided</scope>
     </dependency>
-           
+
     <dependency>
       <groupId>org.jboss.ironjacamar</groupId>
       <artifactId>ironjacamar-spec-api</artifactId>
       <version>${version.org.jboss.ironjacamar}</version>
       <scope>provided</scope>
     </dependency>
-    
+
+    <!-- the artifact can be found in SpringSource Enterprise Bundle Repository - https://repo.spring.io/plugins-release -->
     <dependency>
       <groupId>com.bea.commonj</groupId>
       <artifactId>com.springsource.commonj</artifactId>
