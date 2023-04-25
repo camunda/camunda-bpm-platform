@@ -16,12 +16,13 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.history.event.HistoricExternalTaskLogEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 public class GetHistoricExternalTaskLogErrorDetailsCmd implements Command<String> {
 
@@ -38,7 +39,7 @@ public class GetHistoricExternalTaskLogErrorDetailsCmd implements Command<String
         .getHistoricExternalTaskLogManager()
         .findHistoricExternalTaskLogById(historicExternalTaskLogId);
 
-    ensureNotNull("No historic external task log found with id " + historicExternalTaskLogId, "historicExternalTaskLog", event);
+    ensureNotNull(NotFoundException.class, "No historic external task log found with id " + historicExternalTaskLogId, "historicExternalTaskLog", event);
 
     for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkReadHistoricExternalTaskLog(event);

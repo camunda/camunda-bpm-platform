@@ -20,6 +20,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -46,12 +47,12 @@ public class GetJobExceptionStacktraceCmd implements Command<String>, Serializab
       .getJobManager()
       .findJobById(jobId);
 
-    ensureNotNull("No job found with id " + jobId, "job", job);
+    ensureNotNull(NotFoundException.class, "No job found with id " + jobId, "job", job);
 
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkReadJob(job);
     }
-    
+
     return job.getExceptionStacktrace();
   }
 

@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -86,7 +87,7 @@ public class SetProcessDefinitionVersionCmd implements Command<Void>, Serializab
 
   public SetProcessDefinitionVersionCmd(String processInstanceId, Integer processDefinitionVersion) {
     ensureNotEmpty("The process instance id is mandatory", "processInstanceId", processInstanceId);
-    ensureNotNull("The process definition version is mandatory", "processDefinitionVersion", processDefinitionVersion);
+    ensureNotNull(NotFoundException.class, "The process definition version is mandatory", "processDefinitionVersion", processDefinitionVersion);
     ensurePositive("The process definition version must be positive", "processDefinitionVersion", processDefinitionVersion.longValue());
     this.processInstanceId = processInstanceId;
     this.processDefinitionVersion = processDefinitionVersion;

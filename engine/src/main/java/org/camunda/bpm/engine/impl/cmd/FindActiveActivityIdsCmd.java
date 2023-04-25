@@ -21,6 +21,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.io.Serializable;
 import java.util.List;
 
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -46,7 +47,7 @@ public class FindActiveActivityIdsCmd implements Command<List<String>>, Serializ
     // fetch execution
     ExecutionManager executionManager = commandContext.getExecutionManager();
     ExecutionEntity execution = executionManager.findExecutionById(executionId);
-    ensureNotNull("execution " + executionId + " doesn't exist", "execution", execution);
+    ensureNotNull(NotFoundException.class, "execution " + executionId + " doesn't exist", "execution", execution);
 
     checkGetActivityIds(execution, commandContext);
 

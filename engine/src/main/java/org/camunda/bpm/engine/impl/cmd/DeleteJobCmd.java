@@ -21,6 +21,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.io.Serializable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -47,7 +48,7 @@ public class DeleteJobCmd implements Command<Object>, Serializable {
     ensureNotNull("jobId", jobId);
 
     JobEntity job = commandContext.getJobManager().findJobById(jobId);
-    ensureNotNull("No job found with id '" + jobId + "'", "job", job);
+    ensureNotNull(NotFoundException.class, "No job found with id '" + jobId + "'", "job", job);
 
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkUpdateJob(job);
@@ -59,10 +60,10 @@ public class DeleteJobCmd implements Command<Object>, Serializable {
       throw new ProcessEngineException("Cannot delete job when the job is being executed. Try again later.");
     }
 
-    commandContext.getOperationLogManager().logJobOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE, jobId, 
-        job.getJobDefinitionId(), job.getProcessInstanceId(), job.getProcessDefinitionId(), 
+    commandContext.getOperationLogManager().logJobOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE, jobId,
+        job.getJobDefinitionId(), job.getProcessInstanceId(), job.getProcessDefinitionId(),
         job.getProcessDefinitionKey(), PropertyChange.EMPTY_CHANGE);
-    
+
     job.delete();
     return null;
   }

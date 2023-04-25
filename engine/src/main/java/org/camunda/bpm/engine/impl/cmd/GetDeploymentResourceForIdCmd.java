@@ -22,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Serializable;
 
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -53,7 +54,7 @@ public class GetDeploymentResourceForIdCmd implements Command<InputStream>, Seri
     ResourceEntity resource = commandContext
       .getResourceManager()
       .findResourceByDeploymentIdAndResourceId(deploymentId, resourceId);
-    ensureNotNull("no resource found with id '" + resourceId + "' in deployment '" + deploymentId + "'", "resource", resource);
+    ensureNotNull(NotFoundException.class, "no resource found with id '" + resourceId + "' in deployment '" + deploymentId + "'", "resource", resource);
     return new ByteArrayInputStream(resource.getBytes());
   }
 

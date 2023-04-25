@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -50,7 +51,7 @@ public class UnlockJobCmd implements Command<Void> {
     JobEntity job = getJob();
 
     if (Context.getJobExecutorContext() == null) {
-      EnsureUtil.ensureNotNull("Job with id " + jobId + " does not exist", "job", job);
+      EnsureUtil.ensureNotNull(NotFoundException.class, "Job with id " + jobId + " does not exist", "job", job);
     }
     else if (Context.getJobExecutorContext() != null && job == null) {
       // CAM-1842

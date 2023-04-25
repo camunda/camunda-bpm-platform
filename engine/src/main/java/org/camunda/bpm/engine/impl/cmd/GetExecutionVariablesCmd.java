@@ -21,6 +21,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.io.Serializable;
 import java.util.Collection;
 
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -55,7 +56,7 @@ public class GetExecutionVariablesCmd implements Command<VariableMap>, Serializa
       .getExecutionManager()
       .findExecutionById(executionId);
 
-    ensureNotNull("execution " + executionId + " doesn't exist", "execution", execution);
+    ensureNotNull(NotFoundException.class, "execution " + executionId + " doesn't exist", "execution", execution);
 
     checkGetExecutionVariables(execution, commandContext);
 

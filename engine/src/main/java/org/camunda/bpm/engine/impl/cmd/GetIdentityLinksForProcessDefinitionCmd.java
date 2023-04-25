@@ -16,29 +16,31 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.Serializable;
 import java.util.List;
+
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.task.IdentityLink;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-
 
 /**
  * @author Tijs Rademakers
  */
 public class GetIdentityLinksForProcessDefinitionCmd implements Command<List<IdentityLink>>, Serializable {
-  
+
   private static final long serialVersionUID = 1L;
   protected String processDefinitionId;
 
   public GetIdentityLinksForProcessDefinitionCmd(String processDefinitionId) {
     this.processDefinitionId = processDefinitionId;
   }
-  
+
   @SuppressWarnings({"unchecked", "rawtypes"})
   public List<IdentityLink> execute(CommandContext commandContext) {
     ProcessDefinitionEntity processDefinition = Context
@@ -46,10 +48,10 @@ public class GetIdentityLinksForProcessDefinitionCmd implements Command<List<Ide
       .getProcessDefinitionManager()
       .findLatestProcessDefinitionById(processDefinitionId);
 
-    ensureNotNull("Cannot find process definition with id " + processDefinitionId, "processDefinition", processDefinition);
+    ensureNotNull(NotFoundException.class, "Cannot find process definition with id " + processDefinitionId, "processDefinition", processDefinition);
 
     List<IdentityLink> identityLinks = (List) processDefinition.getIdentityLinks();
     return identityLinks;
   }
-  
+
 }

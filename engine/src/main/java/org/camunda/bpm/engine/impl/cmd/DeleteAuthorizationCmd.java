@@ -16,15 +16,15 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
+import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.AuthorizationQueryImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-
-import org.camunda.bpm.engine.history.UserOperationLogEntry;
 
 /**
  * @author Daniel Meyer
@@ -46,7 +46,7 @@ public class DeleteAuthorizationCmd implements Command<Void> {
       .authorizationId(authorizationId)
       .singleResult();
 
-    ensureNotNull("Authorization for Id '" + authorizationId + "' does not exist", "authorization", authorization);
+    ensureNotNull(NotFoundException.class, "Authorization for Id '" + authorizationId + "' does not exist", "authorization", authorization);
 
     authorizationManager.delete(authorization);
     commandContext.getOperationLogManager().logAuthorizationOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE, authorization, null);

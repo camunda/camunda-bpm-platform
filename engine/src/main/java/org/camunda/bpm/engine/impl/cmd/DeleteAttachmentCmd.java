@@ -20,6 +20,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -53,12 +54,12 @@ public class DeleteAttachmentCmd implements Command<Object>, Serializable {
       attachment = (AttachmentEntity) commandContext
           .getAttachmentManager()
           .findAttachmentByTaskIdAndAttachmentId(taskId, attachmentId);
-      ensureNotNull("No attachment exist for task id '" + taskId + " and attachmentId '" + attachmentId + "'.", "attachment", attachment);
+      ensureNotNull(NotFoundException.class, "No attachment exist for task id '" + taskId + " and attachmentId '" + attachmentId + "'.", "attachment", attachment);
     } else {
       attachment = commandContext
           .getDbEntityManager()
           .selectById(AttachmentEntity.class, attachmentId);
-      ensureNotNull("No attachment exist with attachmentId '" + attachmentId + "'.", "attachment", attachment);
+      ensureNotNull(NotFoundException.class, "No attachment exist with attachmentId '" + attachmentId + "'.", "attachment", attachment);
     }
 
     commandContext

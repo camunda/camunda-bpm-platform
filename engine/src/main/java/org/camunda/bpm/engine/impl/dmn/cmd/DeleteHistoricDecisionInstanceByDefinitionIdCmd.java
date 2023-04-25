@@ -16,6 +16,12 @@
  */
 package org.camunda.bpm.engine.impl.dmn.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.HistoricDecisionInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
@@ -23,11 +29,6 @@ import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntit
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * Deletes historic decision instances with the given id of the decision definition.
@@ -50,7 +51,7 @@ public class DeleteHistoricDecisionInstanceByDefinitionIdCmd implements Command<
     DecisionDefinitionEntity decisionDefinition = commandContext
         .getDecisionDefinitionManager()
         .findDecisionDefinitionById(decisionDefinitionId);
-    ensureNotNull("No decision definition found with id: " + decisionDefinitionId, "decisionDefinition", decisionDefinition);
+    ensureNotNull(NotFoundException.class, "No decision definition found with id: " + decisionDefinitionId, "decisionDefinition", decisionDefinition);
 
     for(CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkDeleteHistoricDecisionInstance(decisionDefinition.getKey());

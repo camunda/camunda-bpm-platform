@@ -20,6 +20,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.Collection;
 
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -45,7 +46,7 @@ public class RemoveTaskVariablesCmd extends AbstractRemoveVariableCmd {
       .getTaskManager()
       .findTaskById(entityId);
 
-    ensureNotNull("Cannot find task with id " + entityId, "task", task);
+    ensureNotNull(NotFoundException.class, "Cannot find task with id " + entityId, "task", task);
 
     checkRemoveTaskVariables(task);
 
