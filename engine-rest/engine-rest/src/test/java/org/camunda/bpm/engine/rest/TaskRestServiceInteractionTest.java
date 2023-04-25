@@ -1152,13 +1152,13 @@ public class TaskRestServiceInteractionTest extends
 
   @Test
   public void testUnsuccessfulClaimTask() {
-    doThrow(new ProcessEngineException("expected exception")).when(taskServiceMock).claim(any(), any());
+    doThrow(new NotFoundException("expected exception")).when(taskServiceMock).claim(any(), any());
 
     given().pathParam("id", EXAMPLE_TASK_ID)
       .header("accept", MediaType.APPLICATION_JSON)
       .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
       .then().expect()
-        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
+        .statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
         .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
         .body("message", equalTo("expected exception"))
       .when().post(CLAIM_TASK_URL);
@@ -1340,6 +1340,22 @@ public class TaskRestServiceInteractionTest extends
       .pathParam("id", EXAMPLE_TASK_ID)
     .then().expect()
       .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .get(TASK_IDENTITY_LINKS_URL);
+  }
+
+
+  @Test
+  public void testGetIdentityLinksThrowsNotFoundException() {
+    String message = "expected exception";
+    doThrow(new NotFoundException(message)).when(taskServiceMock).getIdentityLinksForTask(anyString());
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+    .then().expect()
+      .statusCode(Status.NOT_FOUND.getStatusCode())
       .body("type", equalTo(AuthorizationException.class.getSimpleName()))
       .body("message", equalTo(message))
     .when()
@@ -1811,6 +1827,21 @@ public class TaskRestServiceInteractionTest extends
       .when().post(COMPLETE_TASK_URL);
   }
 
+
+  @Test
+  public void testCompleteUnexistingTask() {
+    doThrow(new NotFoundException("expected exception")).when(taskServiceMock).complete(any(String.class), Mockito.any());
+
+    given().pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
+      .then().expect()
+        .statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(RestException.class.getSimpleName()))
+        .body("message", equalTo("Cannot complete task " + EXAMPLE_TASK_ID + ": expected exception"))
+      .when().post(COMPLETE_TASK_URL);
+  }
+
   @Test
   public void shouldReturnErrorOnCompletingTask() {
     doThrow(new ProcessEngineException("foo", 123))
@@ -2073,7 +2104,7 @@ public class TaskRestServiceInteractionTest extends
 
   @Test
   public void testUnsuccessfulDelegateTask() {
-    doThrow(new ProcessEngineException("expected exception")).when(taskServiceMock).delegateTask(any(String.class), any(String.class));
+    doThrow(new NotFoundException("expected exception")).when(taskServiceMock).delegateTask(any(String.class), any(String.class));
 
     Map<String, Object> json = new HashMap<>();
     json.put("userId", EXAMPLE_USER_ID);
@@ -2082,7 +2113,7 @@ public class TaskRestServiceInteractionTest extends
       .header("accept", MediaType.APPLICATION_JSON)
       .contentType(POST_JSON_CONTENT_TYPE).body(json)
       .then().expect()
-        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
+        .statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
         .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
         .body("message", equalTo("expected exception"))
       .when().post(DELEGATE_TASK_URL);

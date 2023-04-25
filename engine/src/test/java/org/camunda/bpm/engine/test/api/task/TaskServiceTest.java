@@ -529,6 +529,18 @@ public class TaskServiceTest {
   }
 
   @Test
+  public void testTaskDelegationUnexistingTask() {
+    try {
+      // when
+      taskService.delegateTask("unexistingtaskid", "joesmoe");
+      fail("ProcessEngineException expected");
+    } catch (NotFoundException e) {
+      // then
+      testRule.assertTextPresent("Cannot find task with id unexistingtaskid", e.getMessage());
+    }
+  }
+
+  @Test
   public void testTaskAssignee() {
     Task task = taskService.newTask();
     task.setAssignee("johndoe");
@@ -617,8 +629,8 @@ public class TaskServiceTest {
     try {
       taskService.claim("unexistingtaskid", user.getId());
       fail("ProcessEngineException expected");
-    } catch (ProcessEngineException ae) {
-      testRule.assertTextPresent("Cannot find task with id unexistingtaskid", ae.getMessage());
+    } catch (NotFoundException e) {
+      testRule.assertTextPresent("Cannot find task with id unexistingtaskid", e.getMessage());
     }
 
     identityService.deleteUser(user.getId());
@@ -729,8 +741,8 @@ public class TaskServiceTest {
     try {
       taskService.complete("unexistingtask", variables);
       fail("ProcessEngineException expected");
-    } catch (ProcessEngineException ae) {
-      testRule.assertTextPresent("Cannot find task with id unexistingtask", ae.getMessage());
+    } catch (NotFoundException e) {
+      testRule.assertTextPresent("Cannot find task with id unexistingtask", e.getMessage());
     }
   }
 
