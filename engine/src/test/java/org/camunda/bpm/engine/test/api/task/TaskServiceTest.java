@@ -147,7 +147,7 @@ public class TaskServiceTest {
   }
 
   @Test
-  public void testSaveTaskUpdate() throws Exception{
+  public void testSaveTaskUpdate() throws Exception {
 
     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
     Task task = taskService.newTask();
@@ -220,6 +220,30 @@ public class TaskServiceTest {
 
     // Finally, delete task
     taskService.deleteTask(task.getId(), true);
+  }
+
+  @Test
+  public void test() throws ParseException {
+    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+
+    Task taskV1 = taskService.newTask("foo");
+    taskV1.setDescription("description");
+    taskV1.setName("taskname");
+    taskV1.setPriority(0);
+    taskV1.setAssignee("taskassignee");
+    taskV1.setOwner("taskowner");
+    Date dueDate = sdf.parse("01/02/2003 04:05:06");
+    taskV1.setDueDate(dueDate);
+    taskV1.setCaseInstanceId("taskcaseinstanceid");
+
+    taskService.saveTask(taskV1);
+
+    taskV1 = taskService.createTaskQuery()
+        .taskId("foo")
+        .singleResult();
+
+    taskService.setVariableLocal("foo", "myVariable", true); // persisted immediately & changes task version to v2
+    taskService.saveTask(taskV1); // this writes the change to the database
   }
 
   @Test

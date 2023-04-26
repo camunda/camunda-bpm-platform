@@ -21,6 +21,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -124,6 +125,26 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
 
   public void setAssignee(String taskId, String userId) {
     commandExecutor.execute(new AssignTaskCmd(taskId, userId));
+  }
+
+  @Override
+  public void setName(String taskId, String name) {
+    commandExecutor.execute()
+  }
+
+  @Override
+  public void setDescription(String taskId, String description) {
+    //TODO implement
+  }
+
+  @Override
+  public void setDueDate(String taskId, Date dueDate) {
+    //TODO implement
+  }
+
+  @Override
+  public void setFollowUpDate(String taskId, Date followUpDate) {
+    //TODO implement
   }
 
   public void setOwner(String taskId, String userId) {

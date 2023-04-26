@@ -18,6 +18,7 @@ package org.camunda.bpm.engine;
 
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -334,6 +335,58 @@ public interface TaskService {
    *          (if the task is part of a running process instance).
    */
   void setAssignee(String taskId, String userId);
+
+  /**
+   * Changes the name of the task with the given id to the provided one.
+   * @param taskId id of the task, cannot be null.
+   * @param name the new name to set to the task, cannot be null.
+   *
+   * @throws ProcessEngineException when the task does not exist
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
+   *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
+   *          (if the task is part of a running process instance).
+   */
+  void setName(String taskId, String name); //TODO implement operations
+
+  /**
+   * Changes the description of the task with the given id to the provided one.
+   * @param taskId id of the task, cannot be null.
+   * @param description the given description, cannot be null.
+   *
+   * @throws ProcessEngineException when the task does not exist
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
+   *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
+   *          (if the task is part of a running process instance).
+   */
+  void setDescription(String taskId, String description);
+
+  /**
+   * Changes the dueDate of the task with the given id to the provided one.
+   * @param taskId id of the task, cannot be null.
+   * @param dueDate
+   *
+   * @throws ProcessEngineException when the task does not exist
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
+   *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
+   *          (if the task is part of a running process instance).
+   */
+  void setDueDate(String taskId, Date dueDate);
+
+  /**
+   * Changes the followUpDate of the task with the given id to the provided one.
+   * @param taskId id of the task, cannot be null.
+   * @param followUpDate the given followUpDate, cannot be null.
+   *
+   * @throws ProcessEngineException when the task does not exist
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
+   *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
+   *          (if the task is part of a running process instance).
+   */
+  void setFollowUpDate(String taskId, Date followUpDate);
 
   /**
    * Transfers ownership of this task to another user.
