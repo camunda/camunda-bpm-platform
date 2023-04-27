@@ -63,7 +63,8 @@ public class AbstractWebappUiIntegrationTest extends AbstractWebIntegrationTest 
         .addArguments("--window-size=1920,1200")
         .addArguments("--disable-gpu")
         .addArguments("--no-sandbox")
-        .addArguments("--disable-dev-shm-usage");
+        .addArguments("--disable-dev-shm-usage")
+        .addArguments("--remote-allow-origins=*");
 
     driver = new ChromeDriver(chromeDriverService, chromeOptions);
   }
