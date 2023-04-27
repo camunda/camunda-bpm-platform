@@ -12,9 +12,6 @@
   <name>camunda DMN - engine FEEL - JUEL</name>
 
   <properties>
-    <!-- We shade artifacts into the jar, so we need to generate 
-    a dependency BOM for the license book -->
-    <skip-third-party-bom>false</skip-third-party-bom>
     <camunda.artifact>org.camunda.bpm.dmn.feel.impl.juel</camunda.artifact>
   </properties>
   <dependencies>
@@ -34,18 +31,8 @@
     </dependency>
 
     <dependency>
-      <groupId>de.odysseus.juel</groupId>
-      <artifactId>juel-api</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>de.odysseus.juel</groupId>
-      <artifactId>juel-spi</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>de.odysseus.juel</groupId>
-      <artifactId>juel-impl</artifactId>
+      <groupId>org.camunda.bpm.juel</groupId>
+      <artifactId>camunda-juel</artifactId>
     </dependency>
 
     <dependency>
@@ -59,72 +46,21 @@
       <artifactId>assertj-core</artifactId>
       <scope>test</scope>
     </dependency>
+
   </dependencies>
 
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <createDependencyReducedPom>true</createDependencyReducedPom>
-              <createSourcesJar>true</createSourcesJar>
-              <promoteTransitiveDependencies>true</promoteTransitiveDependencies>
-              <artifactSet>
-                <excludes>
-                  <exclude>org.camunda.commons:*</exclude>
-                  <exclude>org.camunda.bpm.dmn:camunda-engine-feel-api</exclude>
-                  <exclude>org.slf4j:*</exclude>
-                </excludes>
-              </artifactSet>
-              <relocations>
-                <relocation>
-                  <pattern>de.odysseus.el</pattern>
-                  <shadedPattern>camundafeel.de.odysseus.el</shadedPattern>
-                </relocation>
-                <relocation>
-                  <pattern>javax.el</pattern>
-                  <shadedPattern>camundafeel.javax.el</shadedPattern>
-                </relocation>
-              </relocations>
-              <transformers>
-                <transformer implementation="org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer">
-                  <resources>
-                    <resource>
-                      META-INF/services/javax.el.ExpressionFactory
-                    </resource>
-                  </resources>
-                </transformer>
-              </transformers>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
-        <configuration>
-          <unpackBundle>false</unpackBundle>
-          <instructions>
-            <Import-Package>
-              !de.odysseus.el*,
-              !javax.el,
-              *
-            </Import-Package>
-            <Bundle-ClassPath>.</Bundle-ClassPath>
-            <Embed-Dependency>
-              de.odysseus.el*;inline=true,
-              javax.el*;inline=true
-            </Embed-Dependency>
-          </instructions>
-        </configuration>
         <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>cleanVersions</goal>
+            </goals>
+          </execution>
           <execution>
             <id>bundle-manifest</id>
             <phase>process-classes</phase>

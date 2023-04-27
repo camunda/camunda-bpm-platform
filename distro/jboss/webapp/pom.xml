@@ -40,7 +40,7 @@
           <archive>
             <manifestEntries>
               <!-- module dependencies for deployment on JBoss/WildFly -->
-              <Dependencies>org.camunda.bpm.camunda-engine,org.camunda.bpm.dmn.camunda-engine-dmn,org.camunda.bpm.model.camunda-bpmn-model,org.camunda.bpm.model.camunda-cmmn-model,org.camunda.bpm.model.camunda-dmn-model,org.camunda.bpm.model.camunda-xml-model,org.camunda.commons.camunda-commons-logging,org.camunda.spin.camunda-spin-core,org.graalvm.js.js-scriptengine services</Dependencies>
+              <Dependencies>org.camunda.bpm.camunda-engine,org.camunda.bpm.dmn.camunda-engine-dmn,org.camunda.bpm.model.camunda-bpmn-model,org.camunda.bpm.model.camunda-cmmn-model,org.camunda.bpm.model.camunda-dmn-model,org.camunda.bpm.model.camunda-xml-model,org.camunda.commons.camunda-commons-logging,org.camunda.spin.camunda-spin-core,org.camunda.bpm.juel.camunda-juel services,org.graalvm.js.js-scriptengine services</Dependencies>
             </manifestEntries>
           </archive>          
         </configuration>

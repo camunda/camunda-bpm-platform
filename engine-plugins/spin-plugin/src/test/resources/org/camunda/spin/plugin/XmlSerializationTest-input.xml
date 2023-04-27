@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<example>
+  <cosigner>
+    <firstName>John</firstName>
+    <lastName>Doe</lastName>
+    <phone>7605794440</phone>
+    <address1>122 Main St</address1>
+    <address2>Secondary St</address2>
+    <city>San Diego</city>
+    <state>CA</state>
+    <zipCode>12345</zipCode>
+    <accountNumber>MBR000123</accountNumber>
+    <required>true</required>
+    <email>aa@test.com</email>
+  </cosigner>
+</example>

@@ -16,21 +16,20 @@
  */
 package org.camunda.bpm.engine.spring;
 
+import java.util.Map;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.el.JuelExpressionManager;
 import org.camunda.bpm.engine.impl.el.ReadOnlyMapELResolver;
 import org.camunda.bpm.engine.impl.el.VariableContextElResolver;
 import org.camunda.bpm.engine.impl.el.VariableScopeElResolver;
-import org.camunda.bpm.engine.impl.javax.el.ArrayELResolver;
-import org.camunda.bpm.engine.impl.javax.el.BeanELResolver;
-import org.camunda.bpm.engine.impl.javax.el.CompositeELResolver;
-import org.camunda.bpm.engine.impl.javax.el.ELResolver;
-import org.camunda.bpm.engine.impl.javax.el.ListELResolver;
-import org.camunda.bpm.engine.impl.javax.el.MapELResolver;
 import org.camunda.bpm.engine.test.mock.MockElResolver;
+import org.camunda.bpm.impl.juel.jakarta.el.ArrayELResolver;
+import org.camunda.bpm.impl.juel.jakarta.el.BeanELResolver;
+import org.camunda.bpm.impl.juel.jakarta.el.CompositeELResolver;
+import org.camunda.bpm.impl.juel.jakarta.el.ELResolver;
+import org.camunda.bpm.impl.juel.jakarta.el.ListELResolver;
+import org.camunda.bpm.impl.juel.jakarta.el.MapELResolver;
 import org.springframework.context.ApplicationContext;
-
-import java.util.Map;
 
 
 /**
@@ -55,7 +54,7 @@ public class SpringExpressionManager extends JuelExpressionManager {
     super(beans);
     this.applicationContext = applicationContext;
   }
-  
+
   /**
    * @param applicationContext
    *          the applicationContext to use.

@@ -18,10 +18,9 @@ package org.camunda.bpm.engine.spring;
 
 import java.beans.FeatureDescriptor;
 import java.util.Iterator;
-
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.javax.el.ELContext;
-import org.camunda.bpm.engine.impl.javax.el.ELResolver;
+import org.camunda.bpm.impl.juel.jakarta.el.ELContext;
+import org.camunda.bpm.impl.juel.jakarta.el.ELResolver;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -31,11 +30,12 @@ import org.springframework.context.ApplicationContext;
 public class ApplicationContextElResolver extends ELResolver {
 
   protected ApplicationContext applicationContext;
-  
+
   public ApplicationContextElResolver(ApplicationContext applicationContext) {
     this.applicationContext = applicationContext;
   }
 
+  @Override
   public Object getValue(ELContext context, Object base, Object property) {
     if (base == null) {
       // according to javadoc, can only be a String
@@ -50,28 +50,33 @@ public class ApplicationContextElResolver extends ELResolver {
     return null;
   }
 
+  @Override
   public boolean isReadOnly(ELContext context, Object base, Object property) {
     return true;
   }
 
+  @Override
   public void setValue(ELContext context, Object base, Object property, Object value) {
     if(base == null) {
       String key = (String) property;
       if (applicationContext.containsBean(key)) {
-        throw new ProcessEngineException("Cannot set value of '" + property + 
+        throw new ProcessEngineException("Cannot set value of '" + property +
           "', it resolves to a bean defined in the Spring application-context.");
       }
     }
   }
 
+  @Override
   public Class< ? > getCommonPropertyType(ELContext context, Object arg) {
     return Object.class;
   }
 
+  @Override
   public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object arg) {
     return null;
   }
 
+  @Override
   public Class< ? > getType(ELContext context, Object arg1, Object arg2) {
     return Object.class;
   }

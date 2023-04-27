@@ -20,8 +20,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
-import javax.el.ELException;
-import javax.el.ExpressionFactory;
+import org.camunda.bpm.impl.juel.jakarta.el.ELException;
+import org.camunda.bpm.impl.juel.jakarta.el.ExpressionFactory;
 
 import org.camunda.bpm.dmn.feel.impl.FeelEngine;
 import org.camunda.bpm.dmn.feel.impl.FeelEngineFactory;
@@ -34,7 +34,7 @@ import org.camunda.bpm.dmn.feel.impl.juel.transform.FeelToJuelTransformImpl;
 import org.camunda.commons.utils.cache.Cache;
 import org.camunda.commons.utils.cache.ConcurrentLruCache;
 
-import de.odysseus.el.ExpressionFactoryImpl;
+import org.camunda.bpm.impl.juel.ExpressionFactoryImpl;
 
 public class FeelEngineFactoryImpl implements FeelEngineFactory {
 

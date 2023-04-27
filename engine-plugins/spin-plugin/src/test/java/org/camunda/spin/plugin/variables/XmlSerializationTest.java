@@ -16,14 +16,15 @@
  */
 package org.camunda.spin.plugin.variables;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.variable.Variables.objectValue;
 import static org.camunda.bpm.engine.variable.Variables.serializedObjectValue;
 import static org.camunda.spin.plugin.variables.TypedValueAssert.assertObjectValueDeserializedNull;
 import static org.camunda.spin.plugin.variables.TypedValueAssert.assertObjectValueSerializedNull;
 import static org.camunda.spin.plugin.variables.TypedValueAssert.assertUntypedNullValue;
 
+import java.io.Reader;
 import java.util.List;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -42,6 +43,7 @@ import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.spin.DataFormats;
 import org.camunda.spin.Spin;
+import org.camunda.spin.impl.util.SpinIoUtil;
 import org.camunda.spin.xml.SpinXmlElement;
 
 public class XmlSerializationTest extends PluggableProcessEngineTestCase {
@@ -477,5 +479,26 @@ public class XmlSerializationTest extends PluggableProcessEngineTestCase {
     Task task = taskService.createTaskQuery().singleResult();
     assertNotNull(task);
     assertEquals("userTask1", task.getTaskDefinitionKey());
+  }
+
+  public void testOverloadedAppendMethod() {
+    // given
+    deployment(Bpmn.createExecutableProcess("spin-xml-issue")
+        .startEvent()
+        .serviceTask()
+          .camundaExpression("${XML(\"<result/>\").append(xmlInput.xPath(\"//cosigner/*\").elementList()).toString()}")
+          .camundaResultVariable("output")
+        .userTask()
+        .endEvent()
+        .done());
+
+    Reader xmlInput = SpinIoUtil.classpathResourceAsReader("org/camunda/spin/plugin/XmlSerializationTest-input.xml");
+    String expectedOutput = SpinIoUtil.fileAsString("org/camunda/spin/plugin/XmlSerializationTest-output.xml");
+    VariableMap variables = Variables.putValue("xmlInput", Spin.XML(xmlInput));
+    // when
+    runtimeService.startProcessInstanceByKey("spin-xml-issue", variables);
+    // then
+    VariableInstance output = runtimeService.createVariableInstanceQuery().variableName("output").singleResult();
+    assertThat((String) output.getValue()).isEqualToIgnoringWhitespace(expectedOutput);
   }
 }

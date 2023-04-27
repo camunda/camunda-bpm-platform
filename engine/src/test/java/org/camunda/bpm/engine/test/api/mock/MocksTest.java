@@ -94,26 +94,27 @@ public class MocksTest {
   //helper ////////////////////////////////////////////////////////////
   private void testMockAvailability() {
     //given
-    final String testStr = "testValue";
-
-    Mocks.register("myMock", new Object() {
-
-      public String getTest() {
-        return testStr;
-      }
-
-      public void testMethod(DelegateExecution execution, String str) {
-        execution.setVariable("testVar", str);
-      }
-
-    });
+    Mocks.register("myMock", new MyPojo());
 
     //when
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("mocksTest");
     Mocks.reset();
 
     //then
-    assertEquals(testStr, runtimeService.getVariable(pi.getId(), "testVar"));
+    assertEquals("testValue", runtimeService.getVariable(pi.getId(), "testVar"));
   }
 
+  public static class MyPojo {
+
+    public String test = "testValue";
+
+    public String getTest() {
+      return test;
+    }
+
+    public void testMethod(DelegateExecution execution, String str) {
+      execution.setVariable("testVar", str);
+    }
+
+  }
 }
