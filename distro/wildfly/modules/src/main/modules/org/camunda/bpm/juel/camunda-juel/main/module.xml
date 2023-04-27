@@ -1,0 +1,6 @@
+<module xmlns="urn:jboss:module:1.0" name="org.camunda.bpm.juel.camunda-juel">
+  <resources>
+    <resource-root path="camunda-juel-@project.version@.jar" />
+  </resources>
+
+</module>

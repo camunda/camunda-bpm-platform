@@ -54,18 +54,8 @@
     </dependency>
 
     <dependency>
-      <groupId>de.odysseus.juel</groupId>
-      <artifactId>juel-api</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>de.odysseus.juel</groupId>
-      <artifactId>juel-spi</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>de.odysseus.juel</groupId>
-      <artifactId>juel-impl</artifactId>
+      <groupId>org.camunda.bpm.juel</groupId>
+      <artifactId>camunda-juel</artifactId>
     </dependency>
 
     <dependency>

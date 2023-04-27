@@ -48,7 +48,7 @@ public class EmbeddedEngineRest_WILDFLY {
     WebArchive archive = ShrinkWrap.create(WebArchive.class, "embedded-engine-rest.war")
         .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
         .addAsWebInfResource("jboss-deployment-structure.xml")
-        .addAsManifestResource("org.camunda.bpm.engine.rest.spi.ProcessEngineProvider", "services/org.camunda.bpm.engine.rest.spi.ProcessEngineProvider")
+        .addAsManifestResource("org.camunda.bpm.engine.rest.spi.ProcessEngineProvider", "META-INF/services/org.camunda.bpm.engine.rest.spi.ProcessEngineProvider")
         .addAsLibraries(engineRestClasses)
         .addClasses(CustomRestApplication.class, CustomProcessEngineProvider.class);
 

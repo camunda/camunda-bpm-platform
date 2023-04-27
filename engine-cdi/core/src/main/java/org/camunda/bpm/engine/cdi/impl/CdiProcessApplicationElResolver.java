@@ -19,20 +19,22 @@ package org.camunda.bpm.engine.cdi.impl;
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationElResolver;
 import org.camunda.bpm.engine.cdi.impl.el.CdiResolver;
-import org.camunda.bpm.engine.impl.javax.el.ELResolver;
+import org.camunda.bpm.impl.juel.jakarta.el.ELResolver;
 
 /**
  * <p>Exposes the CdiResolver in a multiple-applications, shared process engine context.</p>
- * 
+ *
  * @author Daniel Meyer
  *
  */
 public class CdiProcessApplicationElResolver implements ProcessApplicationElResolver {
 
+  @Override
   public Integer getPrecedence() {
     return ProcessApplicationElResolver.CDI_RESOLVER;
   }
-  
+
+  @Override
   public ELResolver getElResolver(AbstractProcessApplication processApplication) {
     return new CdiResolver();
   }

@@ -57,6 +57,7 @@ public class ModuleDependencyProcessor implements DeploymentUnitProcessor {
   public static ModuleIdentifier MODULE_IDENTIFYER_CONNECT = ModuleIdentifier.create("org.camunda.connect.camunda-connect-core");
   public static ModuleIdentifier MODULE_IDENTIFYER_ENGINE_DMN = ModuleIdentifier.create("org.camunda.bpm.dmn.camunda-engine-dmn");
   public static ModuleIdentifier MODULE_IDENTIFYER_GRAAL_JS = ModuleIdentifier.create("org.graalvm.js.js-scriptengine");
+  public static ModuleIdentifier MODULE_IDENTIFYER_JUEL = ModuleIdentifier.create("org.camunda.bpm.juel.camunda-juel");
 
   public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
 
@@ -124,6 +125,7 @@ public class ModuleDependencyProcessor implements DeploymentUnitProcessor {
     addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFYER_CONNECT);
     addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFYER_ENGINE_DMN);
     addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFYER_GRAAL_JS, true);
+    addSystemDependency(moduleLoader, moduleSpecification, MODULE_IDENTIFYER_JUEL, true);
   }
 
   private void addSystemDependency(ModuleLoader moduleLoader, final ModuleSpecification moduleSpecification, ModuleIdentifier dependency) {

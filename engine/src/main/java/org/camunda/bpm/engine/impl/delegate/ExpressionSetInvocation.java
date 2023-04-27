@@ -17,8 +17,8 @@
 package org.camunda.bpm.engine.impl.delegate;
 
 import org.camunda.bpm.engine.delegate.BaseDelegateExecution;
-import org.camunda.bpm.engine.impl.javax.el.ELContext;
-import org.camunda.bpm.engine.impl.javax.el.ValueExpression;
+import org.camunda.bpm.impl.juel.jakarta.el.ELContext;
+import org.camunda.bpm.impl.juel.jakarta.el.ValueExpression;
 
 /**
  * Class responsible for handling Expression.setValue() invocations.

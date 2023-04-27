@@ -28,24 +28,6 @@
         <scope>import</scope>
         <type>pom</type>
       </dependency>
-
-      <dependency>
-        <groupId>de.odysseus.juel</groupId>
-        <artifactId>juel-api</artifactId>
-        <version>${version.juel}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>de.odysseus.juel</groupId>
-        <artifactId>juel-impl</artifactId>
-        <version>${version.juel}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>de.odysseus.juel</groupId>
-        <artifactId>juel-spi</artifactId>
-        <version>${version.juel}</version>
-      </dependency>
     </dependencies>
   </dependencyManagement>
 
