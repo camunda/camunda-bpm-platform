@@ -328,7 +328,7 @@ pipeline {
           }
           steps {
             cambpmConditionalRetry([
-              agentLabel: 'chrome_78',
+              agentLabel: 'chrome_112',
               runSteps: {
                 cambpmRunMaven('qa/', 'clean install -Ptomcat,h2,webapps-integration', runtimeStash: true, archiveStash: true)
               },
@@ -347,7 +347,7 @@ pipeline {
           }
           steps {
             cambpmConditionalRetry([
-              agentLabel: 'chrome_78',
+              agentLabel: 'chrome_112',
               runSteps: {
                 cambpmRunMaven('qa/',
                   'clean install -Pwildfly,h2,webapps-integration',
@@ -371,7 +371,7 @@ pipeline {
           }
           steps {
             cambpmConditionalRetry([
-              agentLabel: 'chrome_78',
+              agentLabel: 'chrome_112',
               runSteps: {
                 cambpmRunMaven('qa/', 'clean install -Pwildfly26,h2,webapps-integration', runtimeStash: true, archiveStash: true)
               },
@@ -390,7 +390,7 @@ pipeline {
           }
           steps {
             cambpmConditionalRetry([
-              agentLabel: 'chrome_78',
+              agentLabel: 'chrome_112',
               runSteps: {
                 cambpmRunMaven('qa/', 'clean install -Ptomcat-vanilla,webapps-integration-sa', runtimeStash: true, archiveStash: true)
               },
@@ -409,7 +409,7 @@ pipeline {
           }
           steps {
             cambpmConditionalRetry([
-              agentLabel: 'chrome_78',
+              agentLabel: 'chrome_112',
               runSteps: {
                 cambpmRunMaven('qa/', 'clean install -Pwildfly26-vanilla,webapps-integration-sa', runtimeStash: true, archiveStash: true)
               },
@@ -428,7 +428,7 @@ pipeline {
           }
           steps {
             cambpmConditionalRetry([
-              agentLabel: 'chrome_78',
+              agentLabel: 'chrome_112',
               runSteps: {
                 cambpmRunMaven('distro/run/', 'clean install -Pintegration-test-camunda-run', runtimeStash: true, archiveStash: true, qaStash: true)
               },
@@ -447,7 +447,7 @@ pipeline {
           }
           steps {
             cambpmConditionalRetry([
-              agentLabel: 'chrome_78',
+              agentLabel: 'chrome_112',
               runSteps: {
                 cambpmRunMaven('spring-boot-starter/', 'clean install -Pintegration-test-spring-boot-starter', runtimeStash: true, archiveStash: true, qaStash: true)
               },
