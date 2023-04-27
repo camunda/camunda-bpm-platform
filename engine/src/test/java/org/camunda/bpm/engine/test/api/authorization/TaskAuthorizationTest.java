@@ -4675,6 +4675,212 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(80, task.getPriority());
   }
 
+  @Test
+  public void testSetNameStandalone() {
+    // given
+    String taskId = "myTask";
+    createTask(taskId);
+
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
+
+    // when
+    taskService.setName(taskId, "testName");
+
+    // then
+    Task task = selectSingleTask();
+
+    assertNotNull(task);
+    assertEquals("testName", task.getName());
+
+    deleteTask(taskId, true);
+  }
+
+  @Test
+  public void testSetNameWithoutAuthorization() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+
+    try {
+      // when
+      taskService.setName(taskId, "newName");
+      fail("Exception expected: It should not be possible to set a name");
+    } catch (AuthorizationException e) {
+      // then
+      String message = e.getMessage();
+      testRule.assertTextPresent(userId, message);
+      testRule.assertTextPresent(UPDATE.getName(), message);
+      testRule.assertTextPresent(taskId, message);
+      testRule.assertTextPresent(TASK.resourceName(), message);
+      testRule.assertTextPresent(UPDATE_TASK.getName(), message);
+      testRule.assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
+  }
+
+  @Test
+  public void testSetNameWithTaskAssignPermission() {
+    // given
+    String taskId = "myTask";
+    createTask(taskId);
+
+    createGrantAuthorization(TASK, taskId, userId, TASK_ASSIGN);
+
+    // when
+    taskService.setName(taskId, "newName");
+
+    // then
+    Task task = selectSingleTask();
+
+    assertNotNull(task);
+    assertEquals("newName", task.getName());
+
+    deleteTask(taskId, true);
+  }
+
+  @Test
+  public void testProcessTaskSetNameWithUpdatePermissionOnTask() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
+
+    // when
+    taskService.setName(taskId, "testName");
+
+    // then
+    Task task = selectSingleTask();
+
+    assertNotNull(task);
+    assertEquals("testName", task.getName());
+  }
+
+  @Test
+  public void testProcessTaskSetNameWithTaskAssignPermissionOnTask() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+
+    createGrantAuthorization(TASK, taskId, userId, TASK_ASSIGN);
+
+    // when
+    taskService.setName(taskId, "testName");
+
+    // then
+    Task task = selectSingleTask();
+
+    assertNotNull(task);
+    assertEquals("testName", task.getName());
+  }
+
+  @Test
+  public void testProcessTaskSetNameWithUpdatePermissionOnAnyTask() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+
+    createGrantAuthorization(TASK, ANY, userId, UPDATE);
+
+    // when
+    taskService.setName(taskId, "testName");
+
+    // then
+    Task task = selectSingleTask();
+
+    assertNotNull(task);
+    assertEquals("testName", task.getName());
+  }
+
+  @Test
+  public void testProcessTaskSetNameWithTaskAssignPermissionOnAnyTask() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+
+    createGrantAuthorization(TASK, ANY, userId, TASK_ASSIGN);
+
+    // when
+    taskService.setName(taskId, "testName");
+
+    // then
+    Task task = selectSingleTask();
+
+    assertNotNull(task);
+    assertEquals("testName", task.getName());
+  }
+
+  @Test
+  public void testProcessTaskSetNameWithUpdateTasksPermissionOnProcessDefinition() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_TASK);
+
+    // when
+    taskService.setName(taskId, "testName");
+
+    // then
+    Task task = selectSingleTask();
+    assertNotNull(task);
+    assertEquals("testName", task.getName());
+  }
+
+  @Test
+  public void testProcessTaskSetNameWithTaskAssignPermissionOnProcessDefinition() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, TASK_ASSIGN);
+
+    // when
+    taskService.setName(taskId, "testName");
+
+    // then
+    Task task = selectSingleTask();
+    assertNotNull(task);
+    assertEquals("testName", task.getName());
+  }
+
+  @Test
+  public void testProcessTaskSetName() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_TASK);
+
+    // when
+    taskService.setName(taskId, "testName");
+
+    // then
+    Task task = selectSingleTask();
+
+    assertNotNull(task);
+    assertEquals("testName", task.getName());
+  }
+
+  @Test
+  public void testProcessTaskSetNameWithTaskAssignPermission() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+
+    createGrantAuthorization(TASK, taskId, userId, TASK_ASSIGN);
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, TASK_ASSIGN);
+
+    // when
+    taskService.setName(taskId, "testName");
+
+    // then
+    Task task = selectSingleTask();
+
+    assertNotNull(task);
+    assertEquals("testName", task.getName());
+  }
+
   // get sub tasks ((standalone) task) ////////////////////////////////////
 
   @Test
