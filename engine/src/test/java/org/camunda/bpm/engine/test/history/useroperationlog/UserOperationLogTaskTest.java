@@ -167,6 +167,18 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
 
   @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  public void testSetName() {
+    startTestProcess();
+
+    taskService.setName(task.getId(), "foo");
+
+    UserOperationLogQuery query = queryOperationDetails("SetName");
+
+    assertThat(query.count()).isEqualTo(1);
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
   public void testClaimTask() {
     startTestProcess();
 
