@@ -43,10 +43,9 @@
       <scope>provided</scope>
     </dependency>
 
-    <!-- the artifact can be found in SpringSource Enterprise Bundle Repository - https://repo.spring.io/plugins-release -->
     <dependency>
-      <groupId>com.bea.commonj</groupId>
-      <artifactId>com.springsource.commonj</artifactId>
+      <groupId>org.codehaus.fabric3.api</groupId>
+      <artifactId>commonj</artifactId>
       <version>1.1.0</version>
       <scope>provided</scope>
     </dependency>
