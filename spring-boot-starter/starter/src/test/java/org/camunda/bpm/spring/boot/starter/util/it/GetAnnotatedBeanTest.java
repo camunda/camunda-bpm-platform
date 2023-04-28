@@ -42,6 +42,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class GetAnnotatedBeanTest {
 
+
   @SpringBootApplication
   @EnableProcessApplication("withNameApplication")
   public static class WithName {

@@ -21,7 +21,7 @@
 
     <dependency>
       <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine-rest-core</artifactId>
+      <artifactId>camunda-engine-rest-core-jakarta</artifactId>
       <version>${project.version}</version>
     </dependency>
 

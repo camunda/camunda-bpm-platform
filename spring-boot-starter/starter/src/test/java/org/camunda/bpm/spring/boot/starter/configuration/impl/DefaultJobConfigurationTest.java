@@ -24,6 +24,7 @@ import static org.springframework.test.util.ReflectionTestUtils.setField;
 
 import java.util.Arrays;
 
+import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.NotifyAcquisitionRejectedJobsHandler;
@@ -38,6 +39,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
@@ -45,6 +47,7 @@ import org.springframework.test.context.junit4.SpringRunner;
   classes = {TestApplication.class},
   webEnvironment = WebEnvironment.NONE
 )
+@ContextConfiguration(classes = DefaultJobExecutor.class)
 public class DefaultJobConfigurationTest {
 
   private final SpringProcessEngineConfiguration processEngineConfiguration = new SpringProcessEngineConfiguration();

@@ -121,8 +121,8 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>javax.transaction</groupId>
-      <artifactId>javax.transaction-api</artifactId>
+      <groupId>jakarta.transaction</groupId>
+      <artifactId>jakarta.transaction-api</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -136,9 +136,9 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>javax.interceptor</groupId>
-      <artifactId>javax.interceptor-api</artifactId>
-      <version>1.2.1</version>
+      <groupId>jakarta.interceptor</groupId>
+      <artifactId>jakarta.interceptor-api</artifactId>
+      <version>1.2.5</version>
       <scope>test</scope>
     </dependency>
     <dependency>

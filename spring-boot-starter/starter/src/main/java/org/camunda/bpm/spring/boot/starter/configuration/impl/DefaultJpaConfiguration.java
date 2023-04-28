@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.spring.boot.starter.configuration.impl;
 
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.camunda.bpm.engine.spring.SpringProcessEngineConfiguration;
 import org.camunda.bpm.spring.boot.starter.configuration.CamundaJpaConfiguration;

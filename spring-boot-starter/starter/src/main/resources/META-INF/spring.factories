@@ -3,3 +3,5 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=org.camunda.bpm.s
 
 # Application Listeners
 org.springframework.context.ApplicationListener=org.camunda.bpm.spring.boot.starter.runlistener.PropertiesListener
+
+#org.springframework.beans.BeanInfoFactory=org.springframework.beans.ExtendedBeanInfoFactory

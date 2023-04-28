@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.spring.boot.starter.test.nonpa.TestApplication;
