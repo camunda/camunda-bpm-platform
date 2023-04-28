@@ -31,6 +31,7 @@ import static org.junit.Assert.fail;
 import java.util.Collections;
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.exception.NotValidException;
@@ -41,6 +42,7 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.variables.scope.TargetVariableScopeTest;
 import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener;
 import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
@@ -913,6 +915,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTest 
     assertThat(isListenerCalled).isNull();
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
   @Test
   public void shouldNotSkipCustomListenersOnProcessInstanceModification() {
     //given
@@ -947,6 +950,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTest 
     assertThat(isListenerCalled).isNotNull();
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
   @Test
   public void shouldNotSkipCustomListenersWithoutFlagPassedOnProcessInstanceModification() {
     //given
