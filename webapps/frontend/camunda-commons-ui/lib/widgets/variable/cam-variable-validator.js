@@ -17,7 +17,7 @@
 
 'use strict';
 
-var typeUtils = require('../../../../camunda-bpm-sdk-js/lib/forms/type-util');
+var typeUtils = require('camunda-bpm-sdk-js/lib/forms/type-util');
 
 module.exports = [
   function() {

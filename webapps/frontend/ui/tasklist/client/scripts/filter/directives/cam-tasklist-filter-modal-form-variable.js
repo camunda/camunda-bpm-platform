@@ -19,7 +19,7 @@
 
 var template = require('./cam-tasklist-filter-modal-form-variable.html')();
 
-var angular = require('../../../../../../camunda-commons-ui/vendor/angular');
+var angular = require('camunda-commons-ui/vendor/angular');
 
 var copy = angular.copy;
 

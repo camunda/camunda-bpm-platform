@@ -17,9 +17,9 @@
 
 'use strict';
 
-var angular = require('../../../../../camunda-bpm-sdk-js/vendor/angular'),
+var angular = require('camunda-bpm-sdk-js/vendor/angular'),
     fs = require('fs'),
-    moment = require('../../../../../camunda-bpm-sdk-js/vendor/moment'),
+    moment = require('camunda-bpm-sdk-js/vendor/moment'),
     data = {},
     chartLineDefinition = require('../cam-widget-chart-line');
 

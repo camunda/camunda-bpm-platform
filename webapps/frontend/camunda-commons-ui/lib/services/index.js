@@ -21,7 +21,7 @@
 
 'use strict';
 
-var angular = require('../../../camunda-bpm-sdk-js/vendor/angular'),
+var angular = require('camunda-bpm-sdk-js/vendor/angular'),
   util = require('./../util/index'),
   escape = require('./escape'),
   debounce = require('./debounce'),

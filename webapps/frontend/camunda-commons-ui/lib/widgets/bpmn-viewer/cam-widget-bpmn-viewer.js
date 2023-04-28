@@ -19,7 +19,7 @@
 
 var ModuleLoader = require('../../util/moduleLoader');
 
-var angular = require('../../../../camunda-bpm-sdk-js/vendor/angular'),
+var angular = require('camunda-bpm-sdk-js/vendor/angular'),
   Viewer = require('../../util/viewer'),
   template = require('./cam-widget-bpmn-viewer.html')();
 

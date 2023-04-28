@@ -25,7 +25,7 @@ var debouncePromiseFactory = require('camunda-bpm-sdk-js').utils
 var debounceQuery = debouncePromiseFactory();
 var debounceCount = debouncePromiseFactory();
 
-var angular = require('../../../../../camunda-commons-ui/vendor/angular');
+var angular = require('camunda-commons-ui/vendor/angular');
 
 var Controller = [
   '$scope',

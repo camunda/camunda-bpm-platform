@@ -16,7 +16,7 @@
  */
 
 'use strict';
-var moment = require('../../../camunda-bpm-sdk-js/vendor/moment');
+var moment = require('camunda-bpm-sdk-js/vendor/moment');
 
 module.exports = function() {
   return function(value) {

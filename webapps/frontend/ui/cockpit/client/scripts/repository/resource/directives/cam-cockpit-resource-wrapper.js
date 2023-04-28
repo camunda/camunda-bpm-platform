@@ -19,7 +19,7 @@
 
 var template = require('./cam-cockpit-resource-wrapper.html')();
 
-var angular = require('../../../../../../../camunda-commons-ui/vendor/angular');
+var angular = require('camunda-commons-ui/vendor/angular');
 
 module.exports = [
   function() {

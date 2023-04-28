@@ -26,14 +26,14 @@ const $ = window.jQuery;
 // DOM Polyfills
 require('dom4');
 
-var commons = require('../../../../camunda-commons-ui/lib');
+var commons = require('camunda-commons-ui/lib');
 var sdk = require('camunda-bpm-sdk-js/lib/angularjs/index');
 require('angular-data-depend');
 
-var angular = require('../../../../camunda-commons-ui/vendor/angular');
+var angular = require('camunda-commons-ui/vendor/angular');
 var dataDepend = require('angular-data-depend');
 var camCommon = require('../../../common/scripts/module');
-var lodash = require('../../../../camunda-commons-ui/vendor/lodash');
+var lodash = require('camunda-commons-ui/vendor/lodash');
 const translatePaginationCtrls = require('../../../common/scripts/util/translate-pagination-ctrls');
 
 /**

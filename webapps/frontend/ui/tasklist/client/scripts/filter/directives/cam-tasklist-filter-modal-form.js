@@ -19,7 +19,7 @@
 
 var template = require('./cam-tasklist-filter-modal-form.html')();
 
-var angular = require('../../../../../../camunda-commons-ui/vendor/angular');
+var angular = require('camunda-commons-ui/vendor/angular');
 
 var isArray = angular.isArray;
 

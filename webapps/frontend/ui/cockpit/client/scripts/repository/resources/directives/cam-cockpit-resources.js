@@ -19,7 +19,7 @@
 
 var template = require('./cam-cockpit-resources.html')();
 
-var angular = require('../../../../../../../camunda-commons-ui/vendor/angular');
+var angular = require('camunda-commons-ui/vendor/angular');
 
 var $ = angular.element;
 

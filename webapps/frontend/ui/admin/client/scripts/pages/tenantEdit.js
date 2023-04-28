@@ -20,7 +20,7 @@
 var template = require('./tenantEdit.html')();
 var confirmationTemplate = require('./generic-confirmation.html')();
 
-var angular = require('../../../../../camunda-commons-ui/vendor/angular');
+var angular = require('camunda-commons-ui/vendor/angular');
 
 var Controller = [
   '$scope',

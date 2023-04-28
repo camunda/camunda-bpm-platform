@@ -19,7 +19,7 @@
 
 var migrateDiagram = require('@bpmn-io/dmn-migrate').migrateDiagram;
 
-var angular = require('../../../../camunda-bpm-sdk-js/vendor/angular');
+var angular = require('camunda-bpm-sdk-js/vendor/angular');
 var Viewer = require('./lib/navigatedViewer').default;
 var Modeler = require('camunda-dmn-js').CamundaPlatformModeler;
 var changeDmnNamespace = require('../../util/change-dmn-namespace');

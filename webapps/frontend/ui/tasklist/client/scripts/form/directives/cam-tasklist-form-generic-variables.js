@@ -19,7 +19,7 @@
 
 var template = require('./cam-tasklist-form-generic-variables.html')();
 
-var angular = require('../../../../../../camunda-commons-ui/vendor/angular');
+var angular = require('camunda-commons-ui/vendor/angular');
 
 module.exports = [
   'camAPI',

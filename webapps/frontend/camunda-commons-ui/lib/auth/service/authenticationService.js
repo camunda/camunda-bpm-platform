@@ -17,7 +17,7 @@
 
 'use strict';
 
-require('../../../../camunda-bpm-sdk-js/vendor/angular');
+require('camunda-bpm-sdk-js/vendor/angular');
 var $ = require('jquery');
 var Authentication = require('../util/authentication');
 

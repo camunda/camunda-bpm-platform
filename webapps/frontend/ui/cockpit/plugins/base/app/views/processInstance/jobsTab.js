@@ -18,7 +18,7 @@
 'use strict';
 
 var angular = require('angular');
-var moment = require('../../../../../../../camunda-commons-ui/vendor/moment');
+var moment = require('camunda-commons-ui/vendor/moment');
 
 var jobsTemplate = require('./jobs-tab.html')();
 var jobRescheduleTemplate = require('./jobs-reschedule-modal.html')();

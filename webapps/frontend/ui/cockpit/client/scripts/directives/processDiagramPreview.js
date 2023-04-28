@@ -19,7 +19,7 @@
 
 var template = require('./processDiagramPreview.html')();
 
-var angular = require('../../../../../camunda-commons-ui/vendor/angular');
+var angular = require('camunda-commons-ui/vendor/angular');
 
 module.exports = [
   'ProcessDefinitionResource',

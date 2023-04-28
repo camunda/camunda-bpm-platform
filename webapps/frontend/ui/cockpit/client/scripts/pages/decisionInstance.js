@@ -19,12 +19,12 @@
 
 var template = require('./decision-instance.html')();
 
-var angular = require('../../../../../camunda-commons-ui/vendor/angular'),
+var angular = require('camunda-commons-ui/vendor/angular'),
   routeUtil = require('../../../../common/scripts/util/routeUtil');
 
 require('angular-data-depend');
 
-var camCommons = require('../../../../../camunda-commons-ui/lib');
+var camCommons = require('camunda-commons-ui/lib');
 
 var ngModule = angular.module('cam.cockpit.pages.decisionInstance', [
   'dataDepend',

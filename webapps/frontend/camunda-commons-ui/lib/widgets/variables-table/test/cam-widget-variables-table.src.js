@@ -17,7 +17,7 @@
 
 'use strict';
 
-var angular = require('../../../../../camunda-bpm-sdk-js/vendor/angular'),
+var angular = require('camunda-bpm-sdk-js/vendor/angular'),
     variablesTableDefinition = require('../cam-widget-variables-table'),
     renderVarTemplateDefinition = require('../cam-render-var-template'),
     fancyDialogTemplate = require('./fancy-modal.html'),

@@ -19,7 +19,7 @@
 
 var template = require('./cam-tasklist-filter-modal-form-criteria.html')();
 
-var angular = require('../../../../../../camunda-commons-ui/vendor/angular');
+var angular = require('camunda-commons-ui/vendor/angular');
 var criteria = require('./cam-tasklist-filter-modal-criteria');
 
 var each = angular.forEach;

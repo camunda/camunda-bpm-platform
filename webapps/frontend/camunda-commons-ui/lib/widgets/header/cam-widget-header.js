@@ -19,7 +19,7 @@
 
 var $ = require('jquery');
 
-var angular = require('../../../../camunda-bpm-sdk-js/vendor/angular'),
+var angular = require('camunda-bpm-sdk-js/vendor/angular'),
   template = require('./cam-widget-header.html'),
   logo = require('raw-loader!./logo-2020-round.svg').default;
 

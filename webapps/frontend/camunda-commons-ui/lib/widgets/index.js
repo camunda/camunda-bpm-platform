@@ -17,7 +17,7 @@
 
 'use strict';
 
-var angular = require('../../../camunda-bpm-sdk-js/vendor/angular'),
+var angular = require('camunda-bpm-sdk-js/vendor/angular'),
   annotationEdit = require('./annotation/cam-annotation-edit'),
   inlineField = require('./inline-field/cam-widget-inline-field'),
   searchPill = require('./search-pill/cam-widget-search-pill'),

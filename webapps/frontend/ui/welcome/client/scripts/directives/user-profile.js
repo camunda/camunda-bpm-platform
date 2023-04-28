@@ -18,7 +18,7 @@
 'use strict';
 
 var template = require('./user-profile.html')();
-var angular = require('../../../../../camunda-commons-ui/vendor/angular');
+var angular = require('camunda-commons-ui/vendor/angular');
 
 module.exports = [
   'camAPI',
