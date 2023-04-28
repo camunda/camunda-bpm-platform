@@ -913,6 +913,74 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTest 
     assertThat(isListenerCalled).isNull();
   }
 
+  @Test
+  public void shouldNotSkipCustomListenersOnProcessInstanceModification() {
+    //given
+    BpmnModelInstance instance = Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .userTask("userTask")
+        .camundaTaskListenerClass(TargetVariableScopeTest.TaskListener.EVENTNAME_DELETE, SingleVariableListener.class)
+        .serviceTask("serviceTask")
+        .camundaAsyncBefore()
+        .camundaClass(JobExecutorFollowUpTest.SyncDelegate.class.getName())
+        .endEvent()
+        .done();
+
+    testRule.deploy(instance);
+
+    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("process");
+    assertThat(engineRule.getRuntimeService().createProcessInstanceQuery().count()).isEqualTo(1L);
+
+    //when
+    engineRule.getRuntimeService()
+        .createProcessInstanceModification(processInstance.getId())
+        .cancelAllForActivity("userTask")
+        .startAfterActivity("serviceTask")
+        .execute(false, false);
+
+    //then
+    HistoricVariableInstance isListenerCalled = engineRule.getHistoryService()
+        .createHistoricVariableInstanceQuery()
+        .variableName("isListenerCalled")
+        .singleResult();
+
+    assertThat(isListenerCalled).isNotNull();
+  }
+
+  @Test
+  public void shouldNotSkipCustomListenersWithoutFlagPassedOnProcessInstanceModification() {
+    //given
+    BpmnModelInstance instance = Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .userTask("userTask")
+        .camundaTaskListenerClass(TargetVariableScopeTest.TaskListener.EVENTNAME_DELETE, SingleVariableListener.class)
+        .serviceTask("serviceTask")
+        .camundaAsyncBefore()
+        .camundaClass(JobExecutorFollowUpTest.SyncDelegate.class.getName())
+        .endEvent()
+        .done();
+
+    testRule.deploy(instance);
+
+    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("process");
+    assertThat(engineRule.getRuntimeService().createProcessInstanceQuery().count()).isEqualTo(1L);
+
+    //when
+    engineRule.getRuntimeService()
+        .createProcessInstanceModification(processInstance.getId())
+        .cancelAllForActivity("userTask")
+        .startAfterActivity("serviceTask")
+        .execute();
+
+    //then
+    HistoricVariableInstance isListenerCalled = engineRule.getHistoryService()
+        .createHistoricVariableInstanceQuery()
+        .variableName("isListenerCalled")
+        .singleResult();
+
+    assertThat(isListenerCalled).isNotNull();
+  }
+
   @Deployment(resources = TASK_LISTENER_PROCESS)
   @Test
   public void testSkipTaskListenerInvocation() {
