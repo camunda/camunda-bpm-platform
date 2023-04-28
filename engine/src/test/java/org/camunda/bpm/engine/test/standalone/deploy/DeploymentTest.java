@@ -19,12 +19,8 @@ package org.camunda.bpm.engine.test.standalone.deploy;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.test.api.variables.scope.TargetVariableScopeTest;
-import org.camunda.bpm.engine.test.jobexecutor.JobExecutorFollowUpTest;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
@@ -41,12 +37,10 @@ public class DeploymentTest {
   public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration -> {
     configuration.setJdbcUrl("jdbc:h2:mem:DeploymentTest-HistoryLevelNone;DB_CLOSE_DELAY=1000");
     configuration.setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP);
-    configuration.setHistoryLevel(HistoryLevel.HISTORY_LEVEL_FULL);
-    configuration.setDbHistoryUsed(true);
+    configuration.setHistoryLevel(HistoryLevel.HISTORY_LEVEL_NONE);
+    configuration.setDbHistoryUsed(false);
   });
-
   protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
-
   protected ProcessEngineTestRule testHelper = new ProcessEngineTestRule(engineRule);
 
   @Rule
@@ -87,39 +81,5 @@ public class DeploymentTest {
 
      long count = engineRule.getRepositoryService().createDeploymentQuery().count();
      assertThat(count).isEqualTo(0L);
-  }
-
-  @Test
-  public void shouldSkipCustomListenersOnProcessInstanceModification() {
-    //given
-    BpmnModelInstance instance = Bpmn.createExecutableProcess("process")
-        .startEvent()
-        .userTask("userTask")
-        .camundaTaskListenerClass(TargetVariableScopeTest.TaskListener.EVENTNAME_DELETE, SingleVariableListener.class)
-        .serviceTask("serviceTask")
-        .camundaAsyncBefore()
-        .camundaClass(JobExecutorFollowUpTest.SyncDelegate.class.getName())
-        .endEvent()
-        .done();
-
-    DeploymentWithDefinitions deployment = testHelper.deploy(instance);
-
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("process");
-    assertThat(engineRule.getRuntimeService().createProcessInstanceQuery().count()).isEqualTo(1L);
-
-    //when
-    engineRule.getRuntimeService()
-        .createProcessInstanceModification(processInstance.getId())
-        .cancelAllForActivity("userTask")
-        .startAfterActivity("serviceTask")
-        .execute(true, false);
-
-    HistoricVariableInstance isListenerCalled = engineRule.getHistoryService()
-        .createHistoricVariableInstanceQuery()
-        .variableName("isListenerCalled")
-        .singleResult();
-
-    //then
-    assertThat(isListenerCalled).isNull();
   }
 }

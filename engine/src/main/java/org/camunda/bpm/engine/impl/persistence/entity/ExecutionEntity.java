@@ -522,7 +522,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   public void removeAllTasks() {
     // delete all the tasks
-    removeTasks(null);
+    removeTasks();
 
     // delete external tasks
     removeExternalTasks();
@@ -1100,8 +1100,8 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     }
   }
 
-  private void removeTasks(String reason) {
-    removeTasks(reason, skipCustomListeners);
+  protected void removeTasks() {
+    removeTasks(null, skipCustomListeners);
   }
 
   protected void removeExternalTasks() {

@@ -34,18 +34,24 @@ import java.util.List;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.api.variables.scope.TargetVariableScopeTest;
 import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener;
 import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
 import org.camunda.bpm.engine.test.bpmn.tasklistener.util.RecorderTaskListener;
+import org.camunda.bpm.engine.test.jobexecutor.JobExecutorFollowUpTest;
+import org.camunda.bpm.engine.test.standalone.deploy.SingleVariableListener;
 import org.camunda.bpm.engine.test.util.ExecutionTree;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Test;
 
 /**
@@ -873,6 +879,40 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTest 
     assertTrue(RecorderExecutionListener.getRecordedEvents().isEmpty());
   }
 
+  @Test
+  public void shouldSkipCustomListenersOnProcessInstanceModification() {
+    //given
+    BpmnModelInstance instance = Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .userTask("userTask")
+        .camundaTaskListenerClass(TargetVariableScopeTest.TaskListener.EVENTNAME_DELETE, SingleVariableListener.class)
+        .serviceTask("serviceTask")
+        .camundaAsyncBefore()
+        .camundaClass(JobExecutorFollowUpTest.SyncDelegate.class.getName())
+        .endEvent()
+        .done();
+
+    testRule.deploy(instance);
+
+    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("process");
+    assertThat(engineRule.getRuntimeService().createProcessInstanceQuery().count()).isEqualTo(1L);
+
+    //when
+    engineRule.getRuntimeService()
+        .createProcessInstanceModification(processInstance.getId())
+        .cancelAllForActivity("userTask")
+        .startAfterActivity("serviceTask")
+        .execute(true, false);
+
+    //then
+    HistoricVariableInstance isListenerCalled = engineRule.getHistoryService()
+        .createHistoricVariableInstanceQuery()
+        .variableName("isListenerCalled")
+        .singleResult();
+
+    assertThat(isListenerCalled).isNull();
+  }
+
   @Deployment(resources = TASK_LISTENER_PROCESS)
   @Test
   public void testSkipTaskListenerInvocation() {
@@ -898,6 +938,8 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTest 
     // then no listeners are invoked
     assertTrue(RecorderTaskListener.getRecordedEvents().isEmpty());
   }
+
+
 
   @Deployment(resources = IO_MAPPING_PROCESS)
   @Test
