@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.engine.spring.application;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationInfo;

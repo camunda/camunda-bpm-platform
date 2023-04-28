@@ -22,7 +22,7 @@ import java.math.BigInteger;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;

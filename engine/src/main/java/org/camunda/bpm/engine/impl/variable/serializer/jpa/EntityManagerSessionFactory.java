@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.engine.impl.variable.serializer.jpa;
 
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManagerFactory;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.Session;
 import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
@@ -35,7 +35,7 @@ public class EntityManagerSessionFactory implements SessionFactory {
   public EntityManagerSessionFactory(Object entityManagerFactory, boolean handleTransactions, boolean closeEntityManager) {
     ensureNotNull("entityManagerFactory", entityManagerFactory);
     if (!(entityManagerFactory instanceof EntityManagerFactory)) {
-      throw new ProcessEngineException("EntityManagerFactory must implement 'javax.persistence.EntityManagerFactory'");
+      throw new ProcessEngineException("EntityManagerFactory must implement 'jakarta.persistence.EntityManagerFactory'");
     }
 
     this.entityManagerFactory = (EntityManagerFactory) entityManagerFactory;

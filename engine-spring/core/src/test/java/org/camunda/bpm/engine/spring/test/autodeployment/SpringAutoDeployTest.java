@@ -18,7 +18,6 @@ package org.camunda.bpm.engine.spring.test.autodeployment;
 
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.impl.test.PvmTestCase;
-import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
@@ -26,11 +25,9 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -108,7 +105,7 @@ public class SpringAutoDeployTest extends PvmTestCase {
     assertEquals(3, processDefinitionQuery.count());
 
     // Creating a new app context with same resources doesn't lead to more deployments
-    ((AbstractXmlApplicationContext) applicationContext).destroy();
+    ((AbstractXmlApplicationContext) applicationContext).close();
     applicationContext = new ClassPathXmlApplicationContext(CTX_PATH);
     assertEquals(1, deploymentQuery.count());
     assertEquals(3, processDefinitionQuery.count());
@@ -148,7 +145,7 @@ public class SpringAutoDeployTest extends PvmTestCase {
     assertEquals(1, repositoryService.createDeploymentQuery().count());
 
     // when
-    ((AbstractXmlApplicationContext) applicationContext).destroy();
+    ((AbstractXmlApplicationContext) applicationContext).close();
 
     DynamicResourceProducer.clearResources();
     DynamicResourceProducer.addResource("a.bpmn", model2);
@@ -174,7 +171,7 @@ public class SpringAutoDeployTest extends PvmTestCase {
 
     createAppContext(CTX_DYNAMIC_DEPLOY_PATH);
     assertEquals(1, repositoryService.createDeploymentQuery().count());
-    ((AbstractXmlApplicationContext)applicationContext).destroy();
+    ((AbstractXmlApplicationContext)applicationContext).close();
 
     // when
     DynamicResourceProducer.clearResources();

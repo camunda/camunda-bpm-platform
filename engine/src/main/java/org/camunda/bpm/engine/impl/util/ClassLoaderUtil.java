@@ -18,7 +18,7 @@ package org.camunda.bpm.engine.impl.util;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import javax.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextEvent;
 import org.camunda.bpm.engine.ProcessEngine;
 
 /**

@@ -20,7 +20,7 @@ import javax.sql.DataSource;
 
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
-import org.springframework.beans.factory.annotation.Required;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,25 +32,28 @@ import static org.junit.Assert.assertEquals;
 public class UserBean {
 
   /** injected by Spring */
+  @Autowired
   private RuntimeService runtimeService;
-  
+
   /** injected by Spring */
+  @Autowired
   private TaskService taskService;
-  
+
   /** injected by Spring */
+  @Autowired
   private DataSource dataSource;
 
   @Transactional
   public void hello() {
     // here you can do transactional stuff in your domain model
-    // and it will be combined in the same transaction as 
+    // and it will be combined in the same transaction as
     // the startProcessInstanceByKey to the Activiti RuntimeService
     runtimeService.startProcessInstanceByKey("helloProcess");
   }
-  
+
   @Transactional
   public void completeTask(String taskId) {
-    
+
     // First insert a record in the MY_TABLE table
     JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
     int results = jdbcTemplate.queryForObject("select count(*) from MY_TABLE", Integer.class);
@@ -66,20 +69,17 @@ public class UserBean {
   }
 
   // getters and setters //////////////////////////////////////////////////////
-  
-  @Required
+
   public void setRuntimeService(RuntimeService runtimeService) {
     this.runtimeService = runtimeService;
   }
-  
-  @Required
+
   public void setTaskService(TaskService taskService) {
     this.taskService = taskService;
   }
 
-  @Required
   public void setDataSource(DataSource dataSource) {
     this.dataSource = dataSource;
   }
-  
+
 }
