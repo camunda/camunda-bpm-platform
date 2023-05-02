@@ -31,21 +31,28 @@ import static org.junit.Assert.fail;
 import java.util.Collections;
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener;
 import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
 import org.camunda.bpm.engine.test.bpmn.tasklistener.util.RecorderTaskListener;
+import org.camunda.bpm.engine.test.standalone.deploy.SingleVariableListener;
 import org.camunda.bpm.engine.test.util.ExecutionTree;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Test;
 
 /**
@@ -70,6 +77,12 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTest 
   protected static final String TRANSACTION_WITH_COMPENSATION_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.testTransactionWithCompensation.bpmn20.xml";
   protected static final String CALL_ACTIVITY_PARENT_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.testCancelCallActivityParentProcess.bpmn";
   protected static final String CALL_ACTIVITY_CHILD_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.testCancelCallActivityChildProcess.bpmn";
+  protected static final BpmnModelInstance SIMPLE_TASK_PROCESS_WITH_DELETE_LISTENER = Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .userTask("userTask")
+        .camundaTaskListenerClass(TaskListener.EVENTNAME_DELETE, SingleVariableListener.class)
+      .endEvent()
+      .done();
 
   @Deployment(resources = PARALLEL_GATEWAY_PROCESS)
   @Test
@@ -871,6 +884,75 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTest 
 
     // then no listeners are invoked
     assertTrue(RecorderExecutionListener.getRecordedEvents().isEmpty());
+  }
+
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
+  @Test
+  public void shouldSkipCustomListenersOnProcessInstanceModification() {
+    //given
+    testRule.deploy(SIMPLE_TASK_PROCESS_WITH_DELETE_LISTENER);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+    assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(1L);
+
+    //when
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .cancelAllForActivity("userTask")
+        .startAfterActivity("userTask")
+        .execute(true, false);
+
+    //then
+    HistoricVariableInstance isListenerCalled = historyService.createHistoricVariableInstanceQuery()
+        .variableName("isListenerCalled")
+        .singleResult();
+
+    assertThat(isListenerCalled).isNull();
+  }
+
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
+  @Test
+  public void shouldNotSkipCustomListenersOnProcessInstanceModification() {
+    //given
+    testRule.deploy(SIMPLE_TASK_PROCESS_WITH_DELETE_LISTENER);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+    assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(1L);
+
+    //when
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .cancelAllForActivity("userTask")
+        .startAfterActivity("userTask")
+        .execute(false, false);
+
+    //then
+    HistoricVariableInstance isListenerCalled = historyService.createHistoricVariableInstanceQuery()
+        .variableName("isListenerCalled")
+        .singleResult();
+
+    assertThat(isListenerCalled).isNotNull();
+  }
+
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
+  @Test
+  public void shouldNotSkipCustomListenersWithoutFlagPassedOnProcessInstanceModification() {
+    //given
+    testRule.deploy(SIMPLE_TASK_PROCESS_WITH_DELETE_LISTENER);
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+    assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(1L);
+
+    //when
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+        .cancelAllForActivity("userTask")
+        .startAfterActivity("userTask")
+        .execute();
+
+    //then
+    HistoricVariableInstance isListenerCalled = historyService.createHistoricVariableInstanceQuery()
+        .variableName("isListenerCalled")
+        .singleResult();
+
+    assertThat(isListenerCalled).isNotNull();
   }
 
   @Deployment(resources = TASK_LISTENER_PROCESS)

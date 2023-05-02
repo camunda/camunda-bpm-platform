@@ -522,7 +522,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   public void removeAllTasks() {
     // delete all the tasks
-    removeTasks(null);
+    removeTasks();
 
     // delete external tasks
     removeExternalTasks();
@@ -569,7 +569,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
       removeEventSubscriptionsExceptCompensation();
     }
 
-    removeTasks(reason);
+    removeTasks(reason, skipCustomListeners);
 
     super.interrupt(reason, skipCustomListeners, skipIoMappings, externallyTerminated);
   }
@@ -1081,7 +1081,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     }
   }
 
-  protected void removeTasks(String reason) {
+  protected void removeTasks(String reason, boolean skipCustomListeners) {
     if (reason == null) {
       reason = TaskEntity.DELETE_REASON_DELETED;
     }
@@ -1098,6 +1098,10 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
         task.delete(reason, false, skipCustomListeners);
       }
     }
+  }
+
+  protected void removeTasks() {
+    removeTasks(null, skipCustomListeners);
   }
 
   protected void removeExternalTasks() {
