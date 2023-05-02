@@ -66,6 +66,7 @@ import org.camunda.bpm.engine.impl.cmd.SaveAttachmentCmd;
 import org.camunda.bpm.engine.impl.cmd.SaveTaskCmd;
 import org.camunda.bpm.engine.impl.cmd.SetTaskOwnerCmd;
 import org.camunda.bpm.engine.impl.cmd.SetTaskPriorityCmd;
+import org.camunda.bpm.engine.impl.cmd.SetTaskPropertyCmd;
 import org.camunda.bpm.engine.impl.cmd.SetTaskVariablesCmd;
 import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 import org.camunda.bpm.engine.task.Attachment;
@@ -129,7 +130,7 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
 
   @Override
   public void setName(String taskId, String name) {
-    commandExecutor.execute()
+    commandExecutor.execute(new SetTaskPropertyCmd(taskId, (t) -> t.setName(name)));
   }
 
   @Override

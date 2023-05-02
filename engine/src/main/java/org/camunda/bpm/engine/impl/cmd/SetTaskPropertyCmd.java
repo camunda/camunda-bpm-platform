@@ -22,6 +22,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.io.Serializable;
 import java.util.function.Consumer;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
@@ -44,30 +45,26 @@ public class SetTaskPropertyCmd implements Command<Void>, Serializable {
     consumer.accept(task);
 
     task.triggerUpdateEvent();
-    task.logUserOperation(UserOperationLogEntry.OPERATION_TYPE_SET_PRIORITY);
+    task.logUserOperation(UserOperationLogEntry.OPERATION_TYPE_SET_NAME);
 
     return null;
   }
 
-  private TaskEntity validateAndGet(String taskId, CommandContext context) {
+  protected TaskEntity validateAndGet(String taskId, CommandContext context) {
     ensureNotNull("taskId", taskId);
 
     TaskManager taskManager = context.getTaskManager();
     TaskEntity task = taskManager.findTaskById(taskId);
 
     ensureNotNull("Cannot find task with id " + taskId, "task", task);
+    checkTaskPriority(task, context);
 
     return task;
   }
 
-  private String getMethodName() {
-    return new Object() {
-    }.getClass().getEnclosingMethod().getName();
-  }
-
-  public static void main(String[] args) {
-
-    new SetTaskPropertyCmd("taskId", (t) -> t.setName("name"));
-
+  protected void checkTaskPriority(TaskEntity task, CommandContext commandContext) {
+    for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+      checker.checkTaskAssign(task);
+    }
   }
 }
