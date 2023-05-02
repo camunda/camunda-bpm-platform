@@ -34,6 +34,7 @@ import java.util.List;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
@@ -43,11 +44,9 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
-import org.camunda.bpm.engine.test.api.variables.scope.TargetVariableScopeTest;
 import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener;
 import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
 import org.camunda.bpm.engine.test.bpmn.tasklistener.util.RecorderTaskListener;
-import org.camunda.bpm.engine.test.jobexecutor.JobExecutorFollowUpTest;
 import org.camunda.bpm.engine.test.standalone.deploy.SingleVariableListener;
 import org.camunda.bpm.engine.test.util.ExecutionTree;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
@@ -78,6 +77,12 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTest 
   protected static final String TRANSACTION_WITH_COMPENSATION_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.testTransactionWithCompensation.bpmn20.xml";
   protected static final String CALL_ACTIVITY_PARENT_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.testCancelCallActivityParentProcess.bpmn";
   protected static final String CALL_ACTIVITY_CHILD_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.testCancelCallActivityChildProcess.bpmn";
+  protected static final BpmnModelInstance SIMPLE_TASK_PROCESS_WITH_DELETE_LISTENER = Bpmn.createExecutableProcess("process")
+      .startEvent()
+      .userTask("userTask")
+        .camundaTaskListenerClass(TaskListener.EVENTNAME_DELETE, SingleVariableListener.class)
+      .endEvent()
+      .done();
 
   @Deployment(resources = PARALLEL_GATEWAY_PROCESS)
   @Test
@@ -881,34 +886,23 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTest 
     assertTrue(RecorderExecutionListener.getRecordedEvents().isEmpty());
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_AUDIT)
   @Test
   public void shouldSkipCustomListenersOnProcessInstanceModification() {
     //given
-    BpmnModelInstance instance = Bpmn.createExecutableProcess("process")
-        .startEvent()
-        .userTask("userTask")
-        .camundaTaskListenerClass(TargetVariableScopeTest.TaskListener.EVENTNAME_DELETE, SingleVariableListener.class)
-        .serviceTask("serviceTask")
-        .camundaAsyncBefore()
-        .camundaClass(JobExecutorFollowUpTest.SyncDelegate.class.getName())
-        .endEvent()
-        .done();
+    testRule.deploy(SIMPLE_TASK_PROCESS_WITH_DELETE_LISTENER);
 
-    testRule.deploy(instance);
-
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("process");
-    assertThat(engineRule.getRuntimeService().createProcessInstanceQuery().count()).isEqualTo(1L);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+    assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(1L);
 
     //when
-    engineRule.getRuntimeService()
-        .createProcessInstanceModification(processInstance.getId())
+    runtimeService.createProcessInstanceModification(processInstance.getId())
         .cancelAllForActivity("userTask")
-        .startAfterActivity("serviceTask")
+        .startAfterActivity("userTask")
         .execute(true, false);
 
     //then
-    HistoricVariableInstance isListenerCalled = engineRule.getHistoryService()
-        .createHistoricVariableInstanceQuery()
+    HistoricVariableInstance isListenerCalled = historyService.createHistoricVariableInstanceQuery()
         .variableName("isListenerCalled")
         .singleResult();
 
@@ -919,31 +913,19 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTest 
   @Test
   public void shouldNotSkipCustomListenersOnProcessInstanceModification() {
     //given
-    BpmnModelInstance instance = Bpmn.createExecutableProcess("process")
-        .startEvent()
-        .userTask("userTask")
-        .camundaTaskListenerClass(TargetVariableScopeTest.TaskListener.EVENTNAME_DELETE, SingleVariableListener.class)
-        .serviceTask("serviceTask")
-        .camundaAsyncBefore()
-        .camundaClass(JobExecutorFollowUpTest.SyncDelegate.class.getName())
-        .endEvent()
-        .done();
+    testRule.deploy(SIMPLE_TASK_PROCESS_WITH_DELETE_LISTENER);
 
-    testRule.deploy(instance);
-
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("process");
-    assertThat(engineRule.getRuntimeService().createProcessInstanceQuery().count()).isEqualTo(1L);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+    assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(1L);
 
     //when
-    engineRule.getRuntimeService()
-        .createProcessInstanceModification(processInstance.getId())
+    runtimeService.createProcessInstanceModification(processInstance.getId())
         .cancelAllForActivity("userTask")
-        .startAfterActivity("serviceTask")
+        .startAfterActivity("userTask")
         .execute(false, false);
 
     //then
-    HistoricVariableInstance isListenerCalled = engineRule.getHistoryService()
-        .createHistoricVariableInstanceQuery()
+    HistoricVariableInstance isListenerCalled = historyService.createHistoricVariableInstanceQuery()
         .variableName("isListenerCalled")
         .singleResult();
 
@@ -954,31 +936,19 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTest 
   @Test
   public void shouldNotSkipCustomListenersWithoutFlagPassedOnProcessInstanceModification() {
     //given
-    BpmnModelInstance instance = Bpmn.createExecutableProcess("process")
-        .startEvent()
-        .userTask("userTask")
-        .camundaTaskListenerClass(TargetVariableScopeTest.TaskListener.EVENTNAME_DELETE, SingleVariableListener.class)
-        .serviceTask("serviceTask")
-        .camundaAsyncBefore()
-        .camundaClass(JobExecutorFollowUpTest.SyncDelegate.class.getName())
-        .endEvent()
-        .done();
+    testRule.deploy(SIMPLE_TASK_PROCESS_WITH_DELETE_LISTENER);
 
-    testRule.deploy(instance);
-
-    ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("process");
-    assertThat(engineRule.getRuntimeService().createProcessInstanceQuery().count()).isEqualTo(1L);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+    assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(1L);
 
     //when
-    engineRule.getRuntimeService()
-        .createProcessInstanceModification(processInstance.getId())
+    runtimeService.createProcessInstanceModification(processInstance.getId())
         .cancelAllForActivity("userTask")
-        .startAfterActivity("serviceTask")
+        .startAfterActivity("userTask")
         .execute();
 
     //then
-    HistoricVariableInstance isListenerCalled = engineRule.getHistoryService()
-        .createHistoricVariableInstanceQuery()
+    HistoricVariableInstance isListenerCalled = historyService.createHistoricVariableInstanceQuery()
         .variableName("isListenerCalled")
         .singleResult();
 
@@ -1010,8 +980,6 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTest 
     // then no listeners are invoked
     assertTrue(RecorderTaskListener.getRecordedEvents().isEmpty());
   }
-
-
 
   @Deployment(resources = IO_MAPPING_PROCESS)
   @Test

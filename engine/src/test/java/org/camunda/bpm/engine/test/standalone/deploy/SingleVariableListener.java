@@ -19,8 +19,9 @@ package org.camunda.bpm.engine.test.standalone.deploy;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
+import org.camunda.bpm.engine.delegate.TaskListener;
 
-public class SingleVariableListener implements org.camunda.bpm.engine.delegate.TaskListener {
+public class SingleVariableListener implements TaskListener {
 
   @Override
   public void notify(DelegateTask delegateTask) {
