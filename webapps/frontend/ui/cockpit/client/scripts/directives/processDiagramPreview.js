@@ -17,14 +17,9 @@
 
 'use strict';
 
-var fs = require('fs');
+var template = require('./processDiagramPreview.html')();
 
-var template = fs.readFileSync(
-  __dirname + '/processDiagramPreview.html',
-  'utf8'
-);
-
-var angular = require('../../../../../camunda-commons-ui/vendor/angular');
+var angular = require('camunda-commons-ui/vendor/angular');
 
 module.exports = [
   'ProcessDefinitionResource',

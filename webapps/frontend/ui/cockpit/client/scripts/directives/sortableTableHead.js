@@ -17,9 +17,7 @@
 
 'use strict';
 
-var fs = require('fs');
-
-var template = fs.readFileSync(__dirname + '/sortable-table-head.html', 'utf8');
+var template = require('./sortable-table-head.html')();
 
 var Directive = function() {
   return {

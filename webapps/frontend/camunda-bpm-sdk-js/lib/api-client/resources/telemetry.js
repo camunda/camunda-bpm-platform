@@ -19,6 +19,8 @@
 
 var AbstractClientResource = require('./../abstract-client-resource');
 
+function noop() {}
+
 /**
  * Telemetry Resource
  * @class
@@ -68,12 +70,12 @@ Telemetry.configure = function(payload, done) {
  * @param  {Object}   payload
  * @param  {Function} done
  */
- Telemetry.fetchData = function(payload, done) {
+Telemetry.fetchData = function(payload, done) {
   if (typeof payload === 'function') {
     done = payload;
     payload = {};
   }
-  
+
   payload = payload || {};
   done = done || noop;
 

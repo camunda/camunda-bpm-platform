@@ -17,8 +17,8 @@
 
 'use strict';
 
-var angular = require('../../../../camunda-bpm-sdk-js/vendor/angular');
-var moment = require('../../../../camunda-bpm-sdk-js/vendor/moment');
+var angular = require('camunda-bpm-sdk-js/vendor/angular');
+var moment = require('camunda-bpm-sdk-js/vendor/moment');
 require('angular-translate');
 
 var filtersModule = angular.module('cam.commons.filter.date', [

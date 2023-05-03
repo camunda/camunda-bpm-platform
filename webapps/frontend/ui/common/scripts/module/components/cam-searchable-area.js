@@ -17,9 +17,7 @@
 
 'use strict';
 
-var fs = require('fs');
-
-var template = fs.readFileSync(__dirname + '/cam-searchable-area.html', 'utf8');
+var template = require('./cam-searchable-area.html')();
 
 module.exports = function() {
   return {

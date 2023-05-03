@@ -16,18 +16,11 @@
  */
 
 'use strict';
-var fs = require('fs');
 
-var template = fs.readFileSync(
-  __dirname + '/cam-tasklist-task-meta.html',
-  'utf8'
-);
-var editGroupsFormTemplate = fs.readFileSync(
-  __dirname + '/../modals/cam-tasklist-groups-modal.html',
-  'utf8'
-);
+var template = require('./cam-tasklist-task-meta.html')();
+var editGroupsFormTemplate = require('./../modals/cam-tasklist-groups-modal.html')();
 
-var angular = require('../../../../../../camunda-commons-ui/vendor/angular');
+var angular = require('camunda-commons-ui/vendor/angular');
 
 module.exports = [
   '$uibModal',

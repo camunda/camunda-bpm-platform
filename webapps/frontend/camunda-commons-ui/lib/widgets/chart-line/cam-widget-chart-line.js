@@ -19,7 +19,7 @@
 
 var throttle = require('lodash').throttle;
 var LineChart = require('./../../chart/line');
-var moment = require('../../../../camunda-bpm-sdk-js/vendor/moment'); // this should be left as-is to support development with `line.html`
+var moment = require('camunda-bpm-sdk-js/vendor/moment'); // this should be left as-is to support development with `line.html`
 var abbreviateNumber = require('./../../filter/abbreviateNumber')();
 
 module.exports = [

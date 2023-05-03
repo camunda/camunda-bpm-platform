@@ -17,12 +17,7 @@
 
 'use strict';
 
-var fs = require('fs');
-
-var template = fs.readFileSync(
-  __dirname + '/job-definition-suspension-overlay.html',
-  'utf8'
-);
+var template = require('./job-definition-suspension-overlay.html')();
 
 var Controller = [
   '$scope',

@@ -19,22 +19,14 @@
 
 var Ctrl = require('../components/batch');
 var events = require('../components/events');
-var angular = require('../../../../../../camunda-commons-ui/vendor/angular');
+var angular = require('camunda-commons-ui/vendor/angular');
 var searchConfig = require('../config/batch-search-config.json');
 
-var fs = require('fs');
-
-var deleteModalTemplate = fs.readFileSync(
-  __dirname + '/../templates/delete-modal.html',
-  'utf8'
-);
+var deleteModalTemplate = require('./../templates/delete-modal.html')();
 var deleteModalCtrl = require('./modal-ctrl');
 
 var jobLogModalCtrl = require('./job-log-ctrl');
-var jobLogModalTemplate = fs.readFileSync(
-  __dirname + '/../templates/job-log.html',
-  'utf8'
-);
+var jobLogModalTemplate = require('./../templates/job-log.html')();
 
 module.exports = [
   '$scope',

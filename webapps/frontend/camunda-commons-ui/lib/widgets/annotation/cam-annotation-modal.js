@@ -17,12 +17,7 @@
 
 'use strict';
 
-var fs = require('fs');
-
-var template = fs.readFileSync(
-  __dirname + '/cam-annotation-modal.html',
-  'utf8'
-);
+var template = require('./cam-annotation-modal.html')();
 
 module.exports = (annotation, readOnly, callback) => {
   return {

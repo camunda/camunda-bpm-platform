@@ -19,8 +19,7 @@
 
 var instanceCount = require('../../common/diagramPlugins/instanceCount');
 
-var fs = require('fs');
-var template = fs.readFileSync(__dirname + '/overlayAction.html', 'utf8');
+var template = require('./overlayAction.html')();
 
 module.exports = [
   'ViewsProvider',

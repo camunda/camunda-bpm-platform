@@ -17,6 +17,10 @@
 
 'use strict';
 
+if (process.env.NODE_ENV === 'development') {
+  require('../../../common/scripts/util/dev-setup').setupDev();
+}
+
 // DOM Polyfills
 require('dom4');
 
@@ -26,17 +30,17 @@ var $ = (window.jQuery = window.$ = require('jquery')),
   filtersModule = require('./filters/main'),
   servicesModule = require('./services/main'),
   resourcesModule = require('./resources/main'),
-  camCommonsUi = require('../../../../camunda-commons-ui/lib'),
+  camCommonsUi = require('camunda-commons-ui/lib'),
   sdk = require('camunda-bpm-sdk-js/lib/angularjs/index'),
-  angular = require('../../../../camunda-commons-ui/vendor/angular'),
+  angular = require('camunda-commons-ui/vendor/angular'),
   camCommon = require('../../../common/scripts/module'),
-  lodash = require('../../../../camunda-commons-ui/vendor/lodash'),
-  moment = require('../../../../camunda-commons-ui/vendor/moment');
+  lodash = require('camunda-commons-ui/vendor/lodash'),
+  moment = require('camunda-commons-ui/vendor/moment');
 const translatePaginationCtrls = require('../../../common/scripts/util/translate-pagination-ctrls');
 
 var APP_NAME = 'cam.admin';
 
-module.exports = function(pluginDependencies) {
+export function init(pluginDependencies) {
   var ngDependencies = [
     'ng',
     'ngResource',
@@ -86,6 +90,7 @@ module.exports = function(pluginDependencies) {
       translatePaginationCtrls($provide);
       $routeProvider.otherwise({redirectTo: '/'});
 
+      UriProvider.replace(':appRoot', getUri('app-root'));
       UriProvider.replace(':appName', 'admin');
       UriProvider.replace('app://', getUri('href'));
       UriProvider.replace(
@@ -126,7 +131,7 @@ module.exports = function(pluginDependencies) {
 
       $animateProvider.classNameFilter(/angular-animate/);
 
-      $qProvider.errorOnUnhandledRejections(false);
+      $qProvider.errorOnUnhandledRejections(DEV_MODE); // eslint-disable-line
     }
   ];
 
@@ -194,9 +199,9 @@ module.exports = function(pluginDependencies) {
       }
     });
   });
-};
+}
 
-module.exports.exposePackages = function(requirePackages) {
+export function exposePackages(requirePackages) {
   requirePackages.angular = angular;
   requirePackages.jquery = $;
   requirePackages['camunda-commons-ui'] = camCommonsUi;
@@ -204,4 +209,4 @@ module.exports.exposePackages = function(requirePackages) {
   requirePackages['cam-common'] = camCommon;
   requirePackages['lodash'] = lodash;
   requirePackages['moment'] = moment;
-};
+}

@@ -17,7 +17,7 @@
 
 'use strict';
 
-var angular = require('../../../../../camunda-bpm-sdk-js/vendor/angular'),
+var angular = require('camunda-bpm-sdk-js/vendor/angular'),
     variableDefinition = require('../cam-widget-variable'),
     variableValidator = require('../cam-variable-validator');
 

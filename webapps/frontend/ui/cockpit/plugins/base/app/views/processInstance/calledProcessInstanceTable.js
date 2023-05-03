@@ -17,14 +17,10 @@
 
 'use strict';
 
-var fs = require('fs');
 var searchWidgetUtils = require('../../../../../../common/scripts/util/search-widget-utils');
 var angular = require('angular');
 
-var template = fs.readFileSync(
-  __dirname + '/called-process-instance-table.html',
-  'utf8'
-);
+var template = require('./called-process-instance-table.html')();
 
 module.exports = function(ngModule) {
   ngModule.controller('CalledProcessInstanceController', [

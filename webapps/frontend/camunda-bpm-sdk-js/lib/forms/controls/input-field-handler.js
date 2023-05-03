@@ -56,7 +56,9 @@ var InputFieldHandler = AbstractFormField.extend(
       });
 
       // remember the original value found in the element for later checks
-      this.originalValue = isBooleanCheckbox(this.element) ? this.element.checked : this.element.val();
+      this.originalValue = isBooleanCheckbox(this.element)
+        ? this.element.checked
+        : this.element.val();
 
       this.previousValue = this.originalValue;
 

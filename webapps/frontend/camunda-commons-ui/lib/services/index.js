@@ -21,7 +21,7 @@
 
 'use strict';
 
-var angular = require('../../../camunda-bpm-sdk-js/vendor/angular'),
+var angular = require('camunda-bpm-sdk-js/vendor/angular'),
   util = require('./../util/index'),
   escape = require('./escape'),
   debounce = require('./debounce'),
@@ -47,7 +47,10 @@ ngModule.factory('ResourceResolver', ResourceResolver);
 ngModule.factory('camAPIHttpClient', HttpClient);
 ngModule.factory('unescape', unescape);
 ngModule.factory('fixDate', fixDate);
-ngModule.factory('ifUnauthorizedForwardToWelcomeApp', ifUnauthorizedForwardToWelcomeApp);
+ngModule.factory(
+  'ifUnauthorizedForwardToWelcomeApp',
+  ifUnauthorizedForwardToWelcomeApp
+);
 ngModule.factory('unfixDate', unfixDate);
 ngModule.factory(
   'shouldDisplayAuthenticationError',
@@ -65,7 +68,12 @@ ngModule.config([
       '$q',
       'RequestLogger',
       'ifUnauthorizedForwardToWelcomeApp',
-      function($rootScope, $q, RequestLogger, ifUnauthorizedForwardToWelcomeApp) {
+      function(
+        $rootScope,
+        $q,
+        RequestLogger,
+        ifUnauthorizedForwardToWelcomeApp
+      ) {
         RequestLogger.logStarted();
 
         return {
@@ -98,14 +106,19 @@ ngModule.config([
   '$httpProvider',
   '$windowProvider',
   function($httpProvider, $windowProvider) {
-    var window = $windowProvider.$get();
-    var uri = window.location.href;
+    // eslint-disable-next-line
+    if (!DEV_MODE) {
+      var window = $windowProvider.$get();
+      var uri = window.location.href;
 
-    var match = uri.match(/\/(?:app)(?!.*\/app\/)\/([\w-]+)\/([\w-]+)/);
-    if (match) {
-      $httpProvider.defaults.headers.get = {'X-Authorized-Engine': match[2]};
+      var match = uri.match(/\/(?:app)(?!.*\/app\/)\/([\w-]+)\/([\w-]+)/);
+      if (match) {
+        $httpProvider.defaults.headers.get = {'X-Authorized-Engine': match[2]};
+      } else {
+        throw new Error('no process engine selected');
+      }
     } else {
-      throw new Error('no process engine selected');
+      $httpProvider.defaults.headers.get = {'X-Authorized-Engine': 'default'};
     }
   }
 ]);

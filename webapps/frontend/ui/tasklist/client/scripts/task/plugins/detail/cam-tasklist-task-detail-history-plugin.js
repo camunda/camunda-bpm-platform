@@ -16,15 +16,11 @@
  */
 
 'use strict';
-var fs = require('fs');
 
-var template = fs.readFileSync(
-  __dirname + '/cam-tasklist-task-detail-history-plugin.html',
-  'utf8'
-);
+var template = require('./cam-tasklist-task-detail-history-plugin.html')();
 
 var jquery = require('jquery');
-var moment = require('../../../../../../../camunda-commons-ui/vendor/moment');
+var moment = require('camunda-commons-ui/vendor/moment');
 
 var findOrCreateDay = function(days, timestamp) {
   var day = jquery.grep(days, function(elem) {

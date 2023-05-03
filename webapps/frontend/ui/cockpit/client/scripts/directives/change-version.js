@@ -17,9 +17,7 @@
 
 'use strict';
 
-var fs = require('fs');
-
-var template = fs.readFileSync(__dirname + '/change-version.html', 'utf8');
+var template = require('./change-version.html')();
 
 module.exports = [
   '$timeout',

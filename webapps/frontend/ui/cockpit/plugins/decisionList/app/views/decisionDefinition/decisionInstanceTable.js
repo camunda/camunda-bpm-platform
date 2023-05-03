@@ -17,16 +17,10 @@
 
 'use strict';
 
-var fs = require('fs');
 var angular = require('angular');
 
-var template = fs.readFileSync(
-  __dirname + '/decision-instance-table.html',
-  'utf8'
-);
-var decisionSearchConfig = JSON.parse(
-  fs.readFileSync(__dirname + '/decision-instance-search-config.json', 'utf8')
-);
+var template = require('./decision-instance-table.html')();
+var decisionSearchConfig = require('./decision-instance-search-config.json');
 
 var debouncePromiseFactory = require('camunda-bpm-sdk-js').utils
   .debouncePromiseFactory;

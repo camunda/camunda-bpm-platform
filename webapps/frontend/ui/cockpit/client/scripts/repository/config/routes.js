@@ -17,12 +17,7 @@
 
 'use strict';
 
-var fs = require('fs');
-
-var template = fs.readFileSync(
-  __dirname + '/../controllers/cam-cockpit-repository-view.html',
-  'utf8'
-);
+var template = require('./../controllers/cam-cockpit-repository-view.html')();
 
 module.exports = [
   '$routeProvider',

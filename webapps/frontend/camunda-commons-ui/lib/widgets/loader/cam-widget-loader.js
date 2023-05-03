@@ -16,10 +16,9 @@
  */
 
 'use strict';
-var fs = require('fs');
 
-var angular = require('../../../../camunda-bpm-sdk-js/vendor/angular'),
-  template = fs.readFileSync(__dirname + '/cam-widget-loader.html', 'utf8');
+var angular = require('camunda-bpm-sdk-js/vendor/angular'),
+  template = require('./cam-widget-loader.html')();
 
 module.exports = [
   '$translate',

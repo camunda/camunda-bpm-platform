@@ -17,14 +17,9 @@
 
 'use strict';
 
-var fs = require('fs');
+var template = require('./activity-instance-tree.html')();
 
-var template = fs.readFileSync(
-  __dirname + '/activity-instance-tree.html',
-  'utf8'
-);
-
-var angular = require('../../../../../camunda-commons-ui/vendor/angular');
+var angular = require('camunda-commons-ui/vendor/angular');
 
 // QUESTION: Shouldn't we use the templateUrl property instead?
 

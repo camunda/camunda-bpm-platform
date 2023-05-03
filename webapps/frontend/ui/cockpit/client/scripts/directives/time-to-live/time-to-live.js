@@ -17,11 +17,10 @@
 
 'use strict';
 
-const fs = require('fs');
 const angular = require('angular');
 const modalDialog = require('./time-to-live-dialog');
 
-const template = fs.readFileSync(__dirname + '/time-to-live.html', 'utf8');
+const template = require('./time-to-live.html')();
 
 module.exports = [
   '$translate',
@@ -51,7 +50,7 @@ module.exports = [
             controller: modalDialog.controller,
             template: modalDialog.template
           });
-          dialog.result.then(angular.noop).catch(console.error);
+          dialog.result.then(angular.noop).catch(console.error); // eslint-disable-line
         };
       }
     };

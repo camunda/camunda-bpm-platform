@@ -17,9 +17,7 @@
 
 'use strict';
 
-var fs = require('fs');
-
-var template = fs.readFileSync(__dirname + '/pd-incidents-tab.html', 'utf8');
+var template = require('./pd-incidents-tab.html')();
 
 var Configuration = function PluginConfiguration(ViewsProvider) {
   ViewsProvider.registerDefaultView('cockpit.processDefinition.runtime.tab', {

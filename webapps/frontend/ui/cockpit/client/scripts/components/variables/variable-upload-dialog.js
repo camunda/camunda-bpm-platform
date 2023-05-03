@@ -17,14 +17,9 @@
 
 'use strict';
 
-var fs = require('fs');
-
 var angular = require('angular');
 
-var template = fs.readFileSync(
-  __dirname + '/variable-upload-dialog.html',
-  'utf8'
-);
+var template = require('./variable-upload-dialog.html')();
 
 var Controller = [
   '$uibModalInstance',

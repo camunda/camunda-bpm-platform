@@ -18,7 +18,6 @@
 'use strict';
 
 (function(factory) {
-  /* global global: false */
   factory(typeof window !== 'undefined' ? window : global);
 })(function(root) {
   root = root || {};
