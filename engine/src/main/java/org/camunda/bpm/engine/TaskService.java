@@ -18,6 +18,7 @@ package org.camunda.bpm.engine;
 
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -507,6 +508,14 @@ public interface TaskService {
    *          (if the task is part of a running process instance).
    */
   void setPriority(String taskId, int priority);
+
+  void setName(String taskId, String name);
+
+  void setDescription(String taskId, String description);
+
+  void setDueDate(String taskId, Date dueDate);
+
+  void setFollowUpDate(String taskId, Date followUpDate);
 
   /**
    * Returns a new {@link TaskQuery} that can be used to dynamically query tasks.
