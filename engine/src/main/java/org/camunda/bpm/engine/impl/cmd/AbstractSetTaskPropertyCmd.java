@@ -26,6 +26,12 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
 
+/**
+ * Abstract command class, meant to encapsulate boilerplate logic for concrete commands that wish to set a property
+ * on a task and inherit authorization, multi-tenancy
+ *
+ * @param <T> the type of the value to set by this command
+ */
 public abstract class AbstractSetTaskPropertyCmd<T> implements Command<Void>, Serializable {
 
   private final String taskId;
@@ -48,23 +54,47 @@ public abstract class AbstractSetTaskPropertyCmd<T> implements Command<Void>, Se
     return null;
   }
 
+  /**
+   * Validates the given taskId against to verify it references an existing task before returning the task.
+   *
+   * @param taskId  the given taskId, non null
+   * @param context the context, non null
+   * @return the corresponding task entity
+   */
   protected TaskEntity validateAndGet(String taskId, CommandContext context) {
     TaskManager taskManager = context.getTaskManager();
     TaskEntity task = requireNonNull(taskManager.findTaskById(taskId), "Cannot find task with id " + taskId);
 
-    checkTaskPriority(task, context);
+    checkTaskAgainstContext(task, context);
 
     return task;
   }
 
-  protected void checkTaskPriority(TaskEntity task, CommandContext commandContext) {
-    for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
+  /**
+   * Perform multi-tenancy & authorization checks on the given task against the given command context.
+   *
+   * @param task    the given task
+   * @param context the given command context to check against
+   */
+  protected void checkTaskAgainstContext(TaskEntity task, CommandContext context) {
+    for (CommandChecker checker : context.getProcessEngineConfiguration().getCommandCheckers()) {
       checker.checkTaskAssign(task);
     }
   }
 
+  /**
+   * Returns the User Operation Log name that corresponds to this command. Meant to be implemented by concretions.
+   *
+   * @return the user operation log name
+   */
   protected abstract String getUserOperationLogName();
 
+  /**
+   * Executes the set operation of the concrete command.
+   *
+   * @param task  the task entity on which to set a property
+   * @param value the value to se
+   */
   protected abstract void executeSetOperation(TaskEntity task, T value);
 
 }

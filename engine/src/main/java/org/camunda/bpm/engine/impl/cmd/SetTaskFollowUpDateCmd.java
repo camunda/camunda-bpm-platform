@@ -21,9 +21,9 @@ import java.util.Date;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 
-public class SetFollowUpDateCmd extends AbstractSetTaskPropertyCmd<Date> {
+public class SetTaskFollowUpDateCmd extends AbstractSetTaskPropertyCmd<Date> {
 
-  public SetFollowUpDateCmd(String taskId, Date value) {
+  public SetTaskFollowUpDateCmd(String taskId, Date value) {
     super(taskId, value);
   }
 

@@ -51,6 +51,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.joda.time.DateTime;
 import org.junit.Test;
 
 /**
@@ -163,6 +164,66 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
     assertEquals(10, Integer.parseInt(userOperationLogEntry.getOrgValue()));
     assertEquals(75, Integer.parseInt(userOperationLogEntry.getNewValue()));
     assertEquals(UserOperationLogEntry.CATEGORY_TASK_WORKER, userOperationLogEntry.getCategory());
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  public void testSetName() {
+    // given
+    startTestProcess();
+
+    // when
+    taskService.setName(task.getId(), "the-name");
+
+    // then
+    UserOperationLogQuery query = queryOperationDetails("SetName");
+
+    assertEquals(1, query.count());
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  public void testSetDescription() {
+    // given
+    startTestProcess();
+
+    // when
+    taskService.setDescription(task.getId(), "the-description");
+
+    // then
+    UserOperationLogQuery query = queryOperationDetails("SetDescription");
+
+    assertEquals(1, query.count());
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  public void testSetDueDate() {
+    // given
+    startTestProcess();
+
+    // when
+    taskService.setDueDate(task.getId(), DateTime.now().toDate());
+
+    // then
+    UserOperationLogQuery query = queryOperationDetails("SetDueDate");
+
+    assertEquals(1, query.count());
+  }
+
+  @Test
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  public void setFollowUpDate() {
+    // given
+    startTestProcess();
+
+    // when
+    taskService.setFollowUpDate(task.getId(), DateTime.now().toDate());
+
+    // then
+    UserOperationLogQuery query = queryOperationDetails("SetFollowUpDate");
+
+    assertEquals(1, query.count());
   }
 
   @Test

@@ -64,9 +64,9 @@ import org.camunda.bpm.engine.impl.cmd.RemoveTaskVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.ResolveTaskCmd;
 import org.camunda.bpm.engine.impl.cmd.SaveAttachmentCmd;
 import org.camunda.bpm.engine.impl.cmd.SaveTaskCmd;
-import org.camunda.bpm.engine.impl.cmd.SetDescriptionCmd;
-import org.camunda.bpm.engine.impl.cmd.SetDueDateCmd;
-import org.camunda.bpm.engine.impl.cmd.SetFollowUpDateCmd;
+import org.camunda.bpm.engine.impl.cmd.SetTaskDescriptionCmd;
+import org.camunda.bpm.engine.impl.cmd.SetTaskDueDateCmd;
+import org.camunda.bpm.engine.impl.cmd.SetTaskFollowUpDateCmd;
 import org.camunda.bpm.engine.impl.cmd.SetTaskNameCmd;
 import org.camunda.bpm.engine.impl.cmd.SetTaskOwnerCmd;
 import org.camunda.bpm.engine.impl.cmd.SetTaskPriorityCmd;
@@ -210,17 +210,17 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
 
   @Override
   public void setDescription(String taskId, String description) {
-    commandExecutor.execute(new SetDescriptionCmd(taskId, description));
+    commandExecutor.execute(new SetTaskDescriptionCmd(taskId, description));
   }
 
   @Override
   public void setDueDate(String taskId, Date dueDate) {
-    commandExecutor.execute(new SetDueDateCmd(taskId, dueDate));
+    commandExecutor.execute(new SetTaskDueDateCmd(taskId, dueDate));
   }
 
   @Override
   public void setFollowUpDate(String taskId, Date followUpDate) {
-    commandExecutor.execute(new SetFollowUpDateCmd(taskId, followUpDate));
+    commandExecutor.execute(new SetTaskFollowUpDateCmd(taskId, followUpDate));
   }
 
   public TaskQuery createTaskQuery() {

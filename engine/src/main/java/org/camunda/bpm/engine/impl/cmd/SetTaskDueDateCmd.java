@@ -17,22 +17,23 @@
 
 package org.camunda.bpm.engine.impl.cmd;
 
+import java.util.Date;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 
-public class SetDescriptionCmd extends AbstractSetTaskPropertyCmd<String> {
+public class SetTaskDueDateCmd extends AbstractSetTaskPropertyCmd<Date> {
 
-  public SetDescriptionCmd(String taskId, String description) {
-    super(taskId, description);
+  public SetTaskDueDateCmd(String taskId, Date value) {
+    super(taskId, value);
   }
 
   @Override
   protected String getUserOperationLogName() {
-    return UserOperationLogEntry.OPERATION_TYPE_SET_DESCRIPTION;
+    return UserOperationLogEntry.OPERATION_TYPE_SET_DUEDATE;
   }
 
   @Override
-  protected void executeSetOperation(TaskEntity task, String value) {
-    task.setDescription(value);
+  protected void executeSetOperation(TaskEntity task, Date value) {
+    task.setDueDate(value);
   }
 }
