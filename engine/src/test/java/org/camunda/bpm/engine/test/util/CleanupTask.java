@@ -14,25 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.cmd;
 
-import org.camunda.bpm.engine.history.UserOperationLogEntry;
-import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+package org.camunda.bpm.engine.test.util;
 
-public class SetTaskNameCmd extends AbstractSetTaskPropertyCmd<String> {
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-  public SetTaskNameCmd(String taskId, String name) {
-    super(taskId, name);
-  }
-
-  @Override
-  protected String getUserOperationLogName() {
-    return UserOperationLogEntry.OPERATION_TYPE_SET_NAME;
-  }
-
-  @Override
-  protected void executeSetOperation(TaskEntity task, String value) {
-    task.setName(value);
-  }
-
+/**
+ * Annotation for test methods that require cleanup of the task they create after method execution.
+ */
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface CleanupTask {
 }

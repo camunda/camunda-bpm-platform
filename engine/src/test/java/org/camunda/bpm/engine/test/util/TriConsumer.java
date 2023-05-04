@@ -14,25 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.cmd;
 
-import org.camunda.bpm.engine.history.UserOperationLogEntry;
-import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+package org.camunda.bpm.engine.test.util;
 
-public class SetTaskNameCmd extends AbstractSetTaskPropertyCmd<String> {
-
-  public SetTaskNameCmd(String taskId, String name) {
-    super(taskId, name);
-  }
-
-  @Override
-  protected String getUserOperationLogName() {
-    return UserOperationLogEntry.OPERATION_TYPE_SET_NAME;
-  }
-
-  @Override
-  protected void executeSetOperation(TaskEntity task, String value) {
-    task.setName(value);
-  }
-
+/**
+ * Used internally by the test to model parameterized lambda calls to TaskService set operations.
+ */
+@FunctionalInterface
+public interface TriConsumer<T, U, V> {
+  void accept(T t, U u, V v);
 }

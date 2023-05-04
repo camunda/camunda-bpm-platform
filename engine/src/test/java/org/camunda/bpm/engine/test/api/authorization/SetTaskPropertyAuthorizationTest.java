@@ -17,21 +17,16 @@
 
 package org.camunda.bpm.engine.test.api.authorization;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Fail.fail;
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Permissions.TASK_ASSIGN;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_TASK;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.TASK;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Date;
@@ -39,6 +34,9 @@ import java.util.List;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.test.util.CleanupTask;
+import org.camunda.bpm.engine.test.util.ObjectProperty;
+import org.camunda.bpm.engine.test.util.TriConsumer;
 import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.Before;
@@ -90,7 +88,7 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
   public void setUp() throws Exception {
     testRule.deploy("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml");
     super.setUp();
-    this.deleteTask = getAnnotation(name.getMethodName(), CleanupTask.class) != null;
+    deleteTask = getAnnotation(name.getMethodName(), CleanupTask.class) != null;
   }
 
   @After
@@ -130,7 +128,7 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
     // then
     Task task = selectSingleTask();
 
-    assertNotNull(task);
+    assertThat(task).isNotNull();
     assertHasPropertyValue(task, operationName, value);
   }
 
@@ -147,7 +145,7 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
     // then
     Task task = selectSingleTask();
 
-    assertNotNull(task);
+    assertThat(task).isNotNull();
     assertHasPropertyValue(task, operationName, value);
   }
 
@@ -165,7 +163,7 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
     // then
     Task task = selectSingleTask();
 
-    assertNotNull(task);
+    assertThat(task).isNotNull();
     assertHasPropertyValue(task, operationName, value);
   }
 
@@ -205,7 +203,7 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
     // then
     Task task = selectSingleTask();
 
-    assertNotNull(task);
+    assertThat(task).isNotNull();
     assertHasPropertyValue(task, operationName, value);
   }
 
@@ -223,7 +221,7 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
     // then
     Task task = selectSingleTask();
 
-    assertNotNull(task);
+    assertThat(task).isNotNull();
     assertHasPropertyValue(task, operationName, value);
   }
 
@@ -241,7 +239,7 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
     // then
     Task task = selectSingleTask();
 
-    assertNotNull(task);
+    assertThat(task).isNotNull();
     assertHasPropertyValue(task, operationName, value);
   }
 
@@ -259,7 +257,7 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
     // then
     Task task = selectSingleTask();
 
-    assertNotNull(task);
+    assertThat(task).isNotNull();
     assertHasPropertyValue(task, operationName, value);
   }
 
@@ -278,7 +276,7 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
     // then
     Task task = selectSingleTask();
 
-    assertNotNull(task);
+    assertThat(task).isNotNull();
     assertHasPropertyValue(task, operationName, value);
   }
 
@@ -297,32 +295,19 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
     // then
     Task task = selectSingleTask();
 
-    assertNotNull(task);
+    assertThat(task).isNotNull();
     assertHasPropertyValue(task, operationName, value);
   }
 
   protected void assertHasPropertyValue(Task task, String operationName, Object expectedValue) {
     try {
-      Method taskPropertyGetter = getTaskPropertyGetterForOperation(task, operationName);
+      Object value = ObjectProperty.ofSetterMethod(task, operationName).getValue();
 
-      Object value = taskPropertyGetter.invoke(task);
-
-      assertEquals("Task should have ", expectedValue, value);
+      assertThat(value).isEqualTo(expectedValue);
     } catch (Exception e) {
       fail("Failed to assert property for operationName=" + operationName + " due to : " + e.getMessage());
     }
   }
-
-  protected Method getTaskPropertyGetterForOperation(Task task, String operationName) {
-    String propertyName = operationName.split("set")[1];
-    String getterName = "get" + propertyName;
-
-    return Arrays.stream(task.getClass().getMethods())
-        .filter(method -> getterName.equals(method.getName()))
-        .findFirst()
-        .orElseThrow(() -> new RuntimeException("Getter method of Task for " + operationName + " could not be found"));
-  }
-
   protected <T extends Annotation> T getAnnotation(String methodName, Class<T> annotation) {
     try {
       String methodWithoutParamsName = methodName.split("\\[")[0];
@@ -332,20 +317,4 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
       throw new RuntimeException(e);
     }
   }
-}
-
-/**
- * Used internally by the test to model parameterized lambda calls to TaskService set operations.
- */
-@FunctionalInterface
-interface TriConsumer<T, U, V> {
-  void accept(T t, U u, V v);
-}
-
-/**
- * Annotation for test methods that require cleanup of the task they create after method execution.
- */
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
-@interface CleanupTask {
 }
