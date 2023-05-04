@@ -37,7 +37,7 @@ const registryConfigured = exec(`npm get @${scope}:registry`) !== 'undefined\n';
 
 const {XLTS_REGISTRY, XLTS_AUTH_TOKEN} = process.env;
 
-if (!registryConfigured) {
+if (!registryConfigured && XLTS_REGISTRY && XLTS_AUTH_TOKEN) {
   exec(
     `npm set @${scope}:registry https://${XLTS_REGISTRY}/`,
     'XLTS.dev registry configured.'
