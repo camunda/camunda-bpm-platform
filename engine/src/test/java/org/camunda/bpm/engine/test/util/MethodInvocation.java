@@ -27,7 +27,7 @@ public class MethodInvocation {
 
   private final Object object;
   private final Method method;
-  private final Object args[];
+  private final Object[] args;
 
   private MethodInvocation(Object object, Method method, Object[] args) {
     this.object = object;
