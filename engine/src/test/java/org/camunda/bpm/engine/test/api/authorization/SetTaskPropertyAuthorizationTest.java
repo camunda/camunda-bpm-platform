@@ -27,6 +27,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
+import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Date;
@@ -35,8 +40,11 @@ import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.task.Task;
 import org.joda.time.DateTime;
+import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -46,17 +54,15 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
 
   protected static final String PROCESS_KEY = "oneTaskProcess";
 
+  @Rule
+  public TestName name = new TestName();
+
   protected final String operationName;
   protected final TriConsumer<TaskService, String, Object> operation;
   protected final String taskId;
   protected final Object value;
 
-  public SetTaskPropertyAuthorizationTest(String operationName, TriConsumer<TaskService, String, Object> operation, String taskId, Object value) {
-    this.operationName = operationName;
-    this.operation = operation;
-    this.taskId = taskId;
-    this.value = value;
-  }
+  protected boolean deleteTask;
 
   @Parameters(name = "{0}")
   public static List<Object[]> data() {
@@ -73,13 +79,30 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
     });
   }
 
+  public SetTaskPropertyAuthorizationTest(String operationName, TriConsumer<TaskService, String, Object> operation, String taskId, Object value) {
+    this.operationName = operationName;
+    this.operation = operation;
+    this.taskId = taskId;
+    this.value = value;
+  }
+
   @Before
   public void setUp() throws Exception {
     testRule.deploy("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml");
     super.setUp();
+    this.deleteTask = getAnnotation(name.getMethodName(), CleanupTask.class) != null;
+  }
+
+  @After
+  public void tearDown() {
+    super.tearDown();
+    if (deleteTask) {
+      deleteTask(taskId, true);
+    }
   }
 
   @Test
+  @CleanupTask
   public void setOperationWithoutAuthorization() {
     // given
     createTask(taskId);
@@ -92,11 +115,10 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
       // then
       testRule.assertTextPresent("The user with id '" + userId + "' does not have one of the following permissions: 'TASK_ASSIGN'", e.getMessage());
     }
-
-    deleteTask(taskId, true);
   }
 
   @Test
+  @CleanupTask
   public void setOperationStandalone() {
     // given
     createTask(taskId);
@@ -110,11 +132,10 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
 
     assertNotNull(task);
     assertHasPropertyValue(task, operationName, value);
-
-    deleteTask(taskId, true);
   }
 
   @Test
+  @CleanupTask
   public void setOperationWithTaskAssignPermission() {
     // given
     createTask(taskId);
@@ -128,8 +149,6 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
 
     assertNotNull(task);
     assertHasPropertyValue(task, operationName, value);
-
-    deleteTask(taskId, true);
   }
 
   @Test
@@ -145,6 +164,7 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
 
     // then
     Task task = selectSingleTask();
+
     assertNotNull(task);
     assertHasPropertyValue(task, operationName, value);
   }
@@ -303,6 +323,15 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
         .orElseThrow(() -> new RuntimeException("Getter method of Task for " + operationName + " could not be found"));
   }
 
+  protected <T extends Annotation> T getAnnotation(String methodName, Class<T> annotation) {
+    try {
+      String methodWithoutParamsName = methodName.split("\\[")[0];
+      Method method = this.getClass().getMethod(methodWithoutParamsName);
+      return method.getAnnotation(annotation);
+    } catch (NoSuchMethodException e) {
+      throw new RuntimeException(e);
+    }
+  }
 }
 
 /**
@@ -311,4 +340,12 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
 @FunctionalInterface
 interface TriConsumer<T, U, V> {
   void accept(T t, U u, V v);
+}
+
+/**
+ * Annotation for test methods that require cleanup of the task they create after method execution.
+ */
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+@interface CleanupTask {
 }
