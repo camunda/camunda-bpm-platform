@@ -25,6 +25,7 @@ import org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties;
 import org.camunda.bpm.spring.boot.starter.property.ManagementProperties;
 import org.camunda.bpm.spring.boot.starter.util.CamundaBpmVersion;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
@@ -47,6 +48,7 @@ import org.springframework.context.annotation.Primary;
   SpringProcessEngineServicesConfiguration.class
 })
 @Configuration
+//@AutoConfiguration
 @ConditionalOnProperty(prefix = CamundaBpmProperties.PREFIX, name = "enabled", matchIfMissing = true)
 @AutoConfigureAfter(HibernateJpaAutoConfiguration.class)
 public class CamundaBpmAutoConfiguration {

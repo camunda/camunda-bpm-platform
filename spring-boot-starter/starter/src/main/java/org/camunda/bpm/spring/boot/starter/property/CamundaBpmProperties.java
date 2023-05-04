@@ -22,7 +22,6 @@ import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.spring.boot.starter.configuration.id.IdGeneratorConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
-
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashSet;
