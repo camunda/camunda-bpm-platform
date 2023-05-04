@@ -30,7 +30,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplicat
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -94,10 +93,10 @@ public class CamundaBpmWebappAutoConfiguration implements WebMvcConfigurer {
     }
   }
 
-  @SuppressWarnings("deprecation")
-  @Override
-  public void configurePathMatch(PathMatchConfigurer configurer) {
-    configurer.setUseTrailingSlashMatch(true);
-  }
+//  @SuppressWarnings("deprecation")
+//  @Override
+//  public void configurePathMatch(PathMatchConfigurer configurer) {
+//    configurer.setUseTrailingSlashMatch(true);
+//  }
 
 }
