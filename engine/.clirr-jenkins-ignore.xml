@@ -30,4 +30,60 @@
     <className>org/camunda/bpm/engine/test/mock/MockExpressionManager</className>
     <to>**</to>
   </difference>
+  <!-- 5001: superclass removed -->
+  <!-- new JUEL module with different package names -->
+  <difference>
+    <differenceType>5001</differenceType>
+    <className>org/camunda/bpm/engine/test/mock/MockElResolver</className>
+    <to>**</to>
+  </difference>
+  <!-- 6004: field type changed -->
+  <!-- new JUEL module with different package names -->
+  <difference>
+    <differenceType>6004</differenceType>
+    <className>org/camunda/bpm/application/AbstractProcessApplication</className>
+    <field>processApplication*ElResolver</field>
+    <from>**</from>
+    <to>**</to>
+  </difference>
+  <!-- 7006: method return type changed -->
+  <!-- new JUEL module with different package names -->
+  <difference>
+    <differenceType>7006</differenceType>
+    <className>org/camunda/bpm/application/AbstractProcessApplication</className>
+    <method>*ElResolver*</method>
+    <to>**</to>
+  </difference>
+  <!-- 7006: method return type changed -->
+  <!-- new JUEL module with different package names -->
+  <difference>
+    <differenceType>7006</differenceType>
+    <className>org/camunda/bpm/application/ProcessApplicationElResolver</className>
+    <method>*ElResolver*</method>
+    <to>**</to>
+  </difference>
+  <!-- 7006: method return type changed -->
+  <!-- new JUEL module with different package names -->
+  <difference>
+    <differenceType>7006</differenceType>
+    <className>org/camunda/bpm/application/ProcessApplicationInterface</className>
+    <method>*ElResolver*</method>
+    <to>**</to>
+  </difference>
+  <!-- 7006: method return type changed -->
+  <!-- new JUEL module with different package names -->
+  <difference>
+    <differenceType>7006</differenceType>
+    <className>org/camunda/bpm/engine/test/mock/MockExpressionManager</className>
+    <method>*ElResolver*</method>
+    <to>**</to>
+  </difference>
+  <!-- 7005: method parameter type changed -->
+  <!-- new JUEL module with different package names -->
+  <difference>
+    <differenceType>7005</differenceType>
+    <className>org/camunda/bpm/engine/test/mock/MockElResolver</className>
+    <method>*ELContext*</method>
+    <to>**</to>
+  </difference>
 </differences>
