@@ -30,7 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * JUnit 4 Rule that performs resources cleanup for methods that require post-method execution cleanup.
+ * JUnit 4 Rule that performs resource cleanup for methods that require post-method execution cleanup.
  * Currently, the rule supports only clean up of {@link Task}s but the rule can be extended for other resources that
  * might pollute sequential execution of other test methods.
  */
@@ -62,7 +62,6 @@ public class TaskCleanupRule extends TestWatcher {
     } finally {
       LOG.debug("deleteTasks: {}", methodHasTaskCleanupAnnotation);
     }
-
   }
 
   private void deleteAllTasks() {
