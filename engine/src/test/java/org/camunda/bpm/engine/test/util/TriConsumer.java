@@ -18,7 +18,7 @@
 package org.camunda.bpm.engine.test.util;
 
 /**
- * Used internally by the test to model parameterized lambda calls to TaskService set operations.
+ * Used internally by any test that requires a consumer having 3 parameters.
  */
 @FunctionalInterface
 public interface TriConsumer<T, U, V> {
