@@ -26,8 +26,6 @@ import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_TASK;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.TASK;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -36,13 +34,12 @@ import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.util.CleanupTask;
 import org.camunda.bpm.engine.test.util.ObjectProperty;
+import org.camunda.bpm.engine.test.util.TaskCleanupRule;
 import org.camunda.bpm.engine.test.util.TriConsumer;
 import org.joda.time.DateTime;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -53,7 +50,7 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
   protected static final String PROCESS_KEY = "oneTaskProcess";
 
   @Rule
-  public TestName name = new TestName();
+  public TaskCleanupRule cleanupRule = new TaskCleanupRule(testRule);
 
   protected final String operationName;
   protected final TriConsumer<TaskService, String, Object> operation;
@@ -77,6 +74,7 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
     });
   }
 
+  // Constructor to pass data entries to parameterized test instance instance fields
   public SetTaskPropertyAuthorizationTest(String operationName, TriConsumer<TaskService, String, Object> operation, String taskId, Object value) {
     this.operationName = operationName;
     this.operation = operation;
@@ -88,15 +86,6 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
   public void setUp() throws Exception {
     testRule.deploy("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml");
     super.setUp();
-    deleteTask = getAnnotation(name.getMethodName(), CleanupTask.class) != null;
-  }
-
-  @After
-  public void tearDown() {
-    super.tearDown();
-    if (deleteTask) {
-      deleteTask(taskId, true);
-    }
   }
 
   @Test
@@ -299,22 +288,13 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
     assertHasPropertyValue(task, operationName, value);
   }
 
-  protected void assertHasPropertyValue(Task task, String operationName, Object expectedValue) {
+  private void assertHasPropertyValue(Task task, String operationName, Object expectedValue) {
     try {
       Object value = ObjectProperty.ofSetterMethod(task, operationName).getValue();
 
       assertThat(value).isEqualTo(expectedValue);
     } catch (Exception e) {
       fail("Failed to assert property for operationName=" + operationName + " due to : " + e.getMessage());
-    }
-  }
-  protected <T extends Annotation> T getAnnotation(String methodName, Class<T> annotation) {
-    try {
-      String methodWithoutParamsName = methodName.split("\\[")[0];
-      Method method = this.getClass().getMethod(methodWithoutParamsName);
-      return method.getAnnotation(annotation);
-    } catch (NoSuchMethodException e) {
-      throw new RuntimeException(e);
     }
   }
 }
