@@ -78,6 +78,8 @@ public class CamundaBpmWebappAutoConfiguration implements WebMvcConfigurer {
         .addResourceLocations("classpath:/api/");
     registry.addResourceHandler(applicationPath + "/app/**")
         .addResourceLocations(classpath + "/app/");
+    registry.addResourceHandler(applicationPath + "/assets/**")
+        .addResourceLocations(classpath + "/assets/");
   }
 
   @Override
