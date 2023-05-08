@@ -123,7 +123,7 @@ public class CamundaBpmWebappInitializer implements ServletContextInitializer {
         applicationPath + "/api/*", applicationPath + "/app/*");
 
     registerFilter("CacheControlFilter", CacheControlFilter.class,
-        applicationPath + "/api/*", applicationPath + "/app/*");
+        applicationPath + "/api/*", applicationPath + "/app/*", applicationPath + "/assets/*");
 
     registerServlet("Cockpit Api", CockpitApplication.class,
         applicationPath + "/api/cockpit/*");
