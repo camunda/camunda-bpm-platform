@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.run.example.invoice;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.example.invoice.InvoiceApplicationHelper;
 import org.camunda.bpm.example.invoice.InvoiceProcessApplication;
