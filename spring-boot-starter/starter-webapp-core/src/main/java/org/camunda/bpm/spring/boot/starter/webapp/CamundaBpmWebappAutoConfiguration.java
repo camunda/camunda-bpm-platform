@@ -80,6 +80,8 @@ public class CamundaBpmWebappAutoConfiguration implements WebMvcConfigurer {
         .addResourceLocations(classpath + "/app/");
     registry.addResourceHandler(applicationPath + "/assets/**")
         .addResourceLocations(classpath + "/assets/");
+    registry.addResourceHandler(applicationPath + "/favicon.ico")
+        .addResourceLocations(classpath);
   }
 
   @Override
