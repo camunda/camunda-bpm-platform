@@ -613,13 +613,6 @@
     </profile>
 
     <profile>
-      <id>skipFrontendBuild</id>
-      <properties>
-        <skip.frontend.build>true</skip.frontend.build>
-      </properties>
-    </profile>
-
-    <profile>
       <id>cfgAuthorizationCheckRevokesAlways</id>
       <properties>
         <authorizationCheckRevokes>always</authorizationCheckRevokes>
