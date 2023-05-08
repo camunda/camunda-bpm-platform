@@ -61,6 +61,11 @@
       <version>${version.xml.jaxb-impl}</version>
       <scope>test</scope>
     </dependency>
+<dependency>
+    <groupId>jakarta.activation</groupId>
+    <artifactId>jakarta.activation-api</artifactId>
+    <version>2.0.1</version>
+</dependency>
   </dependencies>
 
 </project>
