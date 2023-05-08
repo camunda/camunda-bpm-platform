@@ -86,6 +86,7 @@ public interface UserOperationLogEntry {
   String OPERATION_TYPE_SET_PRIORITY = "SetPriority";
   String OPERATION_TYPE_SET_NAME = "SetName";
   String OPERATION_TYPE_SET_DESCRIPTION = "SetDescription";
+  String OPERATION_TYPE_SET_DUE_DATE = "SetDueDate";
   String OPERATION_TYPE_SET_FOLLOW_UP_DATE = "SetFollowUpDate";
 
   String OPERATION_TYPE_UPDATE = "Update";
@@ -96,7 +97,7 @@ public interface UserOperationLogEntry {
   String OPERATION_TYPE_DELETE_USER_LINK = "DeleteUserLink";
   String OPERATION_TYPE_ADD_GROUP_LINK = "AddGroupLink";
   String OPERATION_TYPE_DELETE_GROUP_LINK = "DeleteGroupLink";
-  String OPERATION_TYPE_SET_DUEDATE = "SetDueDate";
+
   String OPERATION_TYPE_RECALC_DUEDATE = "RecalculateDueDate";
   String OPERATION_TYPE_UNLOCK = "Unlock";
   String OPERATION_TYPE_EXECUTE = "Execute";

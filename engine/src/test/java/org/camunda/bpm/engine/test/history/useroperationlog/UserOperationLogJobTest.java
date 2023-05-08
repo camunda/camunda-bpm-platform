@@ -335,7 +335,7 @@ public class UserOperationLogJobTest extends AbstractUserOperationLogTest {
     // then one op log entry is written
     UserOperationLogQuery query = historyService
             .createUserOperationLogQuery()
-            .operationType(UserOperationLogEntry.OPERATION_TYPE_SET_DUEDATE);
+            .operationType(UserOperationLogEntry.OPERATION_TYPE_SET_DUE_DATE);
     assertEquals(1, query.count());
 
     // assert details
