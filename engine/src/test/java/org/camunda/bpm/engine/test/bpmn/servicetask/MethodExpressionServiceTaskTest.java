@@ -30,7 +30,7 @@ import org.junit.Test;
 /**
  * @author Christian Stettler
  */
-public class ObjectPropertyExpressionServiceTaskTest extends PluggableProcessEngineTest {
+public class MethodExpressionServiceTaskTest extends PluggableProcessEngineTest {
 
   @Deployment
   @Test
