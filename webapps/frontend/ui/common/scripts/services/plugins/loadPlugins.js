@@ -45,20 +45,21 @@ module.exports = async function loadPlugins(config, appName) {
       !camundaPlugins.includes(el.name) &&
       !el.name.startsWith(`${appName}-plugin-legacy`)
   ).map(el => {
-    addCssSource(`${el.location}/plugin.css`);
+    addCssSource(`${el.location}/plugin.css?bust=$CACHE_BUST`);
     return `${el.location}/${el.main}`;
   });
 
   const baseImportPath = `${appRoot}/app/${appName}/`;
   const fetchers = customScripts.map(url =>
-    window
-      ._import(baseImportPath + withSuffix(url, '.js'))
-      .catch(e => console.error(e))
+    _import(baseImportPath + withSuffix(url, '.js')) // eslint-disable-line
+      .catch(
+        e => console.error(e) // eslint-disable-line
+      )
   );
 
   fetchers.push(
     ...JARScripts.map(url => {
-      return window._import(url).catch(e => console.error(e));
+      return _import(url).catch(e => console.error(e)); // eslint-disable-line
     })
   );
 

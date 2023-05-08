@@ -17,7 +17,7 @@
 
 'use strict';
 
-var angular = require('../../../../../camunda-bpm-sdk-js/vendor/angular'),
+var angular = require('camunda-bpm-sdk-js/vendor/angular'),
     camCommonsUi = require('../../index');
 
 var testModule = angular.module('myModule', [camCommonsUi.name]);

@@ -1,6 +1,6 @@
 @import "./_app-variables";
-@import "./../../../common/styles/cam-webapps-common.less";
-@import "./../../../common/styles/app-splash";
+@import "ui/common/styles/cam-webapps-common.less";
+@import "ui/common/styles/app-splash";
 
 /* ---------------------------------------------------------------- */
 
@@ -93,11 +93,11 @@ table.cam-table > tbody > tr > td.action {
 
 /* ---------------------------------------------------------------- */
 
-@import "pages/authorizations.less";
-@import "pages/analytics.less";
-@import "pages/metrics.less";
-@import "pages/dashboard";
-@import "directives/cam-breadcrumbs-panel.less";
+@import "../scripts/pages/authorizations.less";
+@import "../scripts/pages/analytics.less";
+@import "../scripts/pages/metrics.less";
+@import "ui/common/styles/pages/dashboard.less";
+@import "ui/common/styles/directives/cam-breadcrumbs-panel.less";
 
 .dashboard section .stats {
   padding-bottom: @grid-gutter-width * 0.5;

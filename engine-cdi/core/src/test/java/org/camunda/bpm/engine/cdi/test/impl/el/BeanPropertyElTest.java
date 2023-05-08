@@ -16,15 +16,14 @@
  */
 package org.camunda.bpm.engine.cdi.test.impl.el;
 
+import static org.junit.Assert.assertEquals;
+
 import org.camunda.bpm.engine.cdi.test.CdiProcessEngineTestCase;
 import org.camunda.bpm.engine.cdi.test.impl.beans.MessageBean;
 import org.camunda.bpm.engine.test.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 @RunWith(Arquillian.class)
 public class BeanPropertyElTest extends CdiProcessEngineTestCase {
@@ -45,7 +44,7 @@ public class BeanPropertyElTest extends CdiProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("getBeanProperty");
 
     messageBean = getBeanInstance(MessageBean.class);
-    assertNull(messageBean.getMessage());
+    assertEquals("", messageBean.getMessage());
   }
 
 }

@@ -16,12 +16,11 @@
  */
 
 'use strict';
-var fs = require('fs');
 
-var angular = require('../../../../camunda-bpm-sdk-js/vendor/angular'),
+var angular = require('camunda-bpm-sdk-js/vendor/angular'),
   copy = angular.copy,
   $ = require('jquery'),
-  template = fs.readFileSync(__dirname + '/cam-widget-search.html', 'utf8');
+  template = require('./cam-widget-search.html')();
 
 var dateRegex = /(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)(?:.(\d\d\d)| )?$/;
 
@@ -164,7 +163,7 @@ module.exports = [
             }
             return el;
           });
-        }
+        };
 
         if ($scope.types) initTypes();
 
@@ -736,7 +735,7 @@ module.exports = [
 
             if (
               $scope.matchAny &&
-              !$location.search().hasOwnProperty(searchId + 'OrQuery')
+              !$location.search().hasOwnProperty(searchId + 'OrQuery')// eslint-disable-line
             ) {
               newLocation = $location.url() + '&' + searchId + 'OrQuery';
             } else if (!$scope.matchAny) {
@@ -776,11 +775,11 @@ module.exports = [
         $scope.$on('$locationChangeSuccess', function() {
           $scope.matchAny = $location
             .search()
-            .hasOwnProperty(searchId + 'OrQuery');
+            .hasOwnProperty(searchId + 'OrQuery');// eslint-disable-line
 
           if (
             !IGNORE_URL_UPDATE &&
-            $location.search().hasOwnProperty(searchId + 'Query')
+            $location.search().hasOwnProperty(searchId + 'Query')// eslint-disable-line
           ) {
             // make new array of searches from the url
             var searches = getSearchesFromURL();

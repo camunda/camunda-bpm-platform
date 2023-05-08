@@ -16,7 +16,7 @@
  */
 
 'use strict';
-var angular = require('../../../camunda-bpm-sdk-js/vendor/angular');
+var angular = require('camunda-bpm-sdk-js/vendor/angular');
 
 module.exports = function() {
   var TEMPLATES_PATTERN = /[\w]+:\/\/|:[\w]+/g;

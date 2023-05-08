@@ -16,12 +16,12 @@
  */
 package org.camunda.bpm.dmn.engine.impl.el;
 
-import javax.el.ELContext;
-import javax.el.ELResolver;
+import org.camunda.bpm.impl.juel.jakarta.el.ELContext;
+import org.camunda.bpm.impl.juel.jakarta.el.ELResolver;
 
 import org.camunda.bpm.engine.variable.context.VariableContext;
 
-import de.odysseus.el.util.SimpleContext;
+import org.camunda.bpm.impl.juel.SimpleContext;
 
 /**
  * @author Daniel Meyer

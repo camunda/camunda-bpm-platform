@@ -16,14 +16,10 @@
  */
 
 'use strict';
-var fs = require('fs');
 
-var template = fs.readFileSync(
-  __dirname + '/cam-tasklist-form-generic-variables.html',
-  'utf8'
-);
+var template = require('./cam-tasklist-form-generic-variables.html')();
 
-var angular = require('../../../../../../camunda-commons-ui/vendor/angular');
+var angular = require('camunda-commons-ui/vendor/angular');
 
 module.exports = [
   'camAPI',

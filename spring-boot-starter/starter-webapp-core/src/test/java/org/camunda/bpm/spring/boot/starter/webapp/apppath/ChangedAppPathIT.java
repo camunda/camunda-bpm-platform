@@ -149,7 +149,7 @@ public class ChangedAppPathIT {
 
     // when
     ResponseEntity<String> response = restClient.getForEntity(MY_APP_PATH +
-        "/lib/require.js", String.class);
+        "/lib/deps.js", String.class);
 
     // then
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);

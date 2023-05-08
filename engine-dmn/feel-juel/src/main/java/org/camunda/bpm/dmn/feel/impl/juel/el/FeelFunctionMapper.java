@@ -22,7 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import javax.el.FunctionMapper;
+import org.camunda.bpm.impl.juel.jakarta.el.FunctionMapper;
 
 import org.camunda.bpm.dmn.feel.impl.juel.FeelEngineLogger;
 import org.camunda.bpm.dmn.feel.impl.juel.FeelLogger;

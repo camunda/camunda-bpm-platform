@@ -133,6 +133,22 @@
         <artifactId>maven-resources-plugin</artifactId>
         <executions>
           <execution>
+            <id>copy-resources-assembly</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}/target/webapp</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${basedir}/../frontend/target/webapp</directory>
+                  <filtering>false</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
             <id>copy-sources</id>
             <phase>generate-sources</phase>
             <goals>
@@ -587,102 +603,6 @@
       <properties>
         <project.parent.basedir>./</project.parent.basedir>
       </properties>
-    </profile>
-
-    <profile>
-      <id>node-build-windows</id>
-      <activation>
-        <os>
-          <family>windows</family>
-        </os>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>build-frontend</id>
-                <phase>generate-resources</phase>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-                <inherited>false</inherited>
-                <configuration>
-                  <skip>${skip.frontend.build}</skip>
-                  <target>
-                    <!-- run node build -->
-                    <exec executable="cmd" failonerror="true" dir="../frontend">
-                      <arg value="/c" />
-                      <arg value="npm" />
-                      <arg value="ci" />
-                    </exec>
-                    <exec executable="cmd" failonerror="true" dir="../frontend">
-                      <arg value="/c" />
-                      <arg value="node" />
-                      <arg value="scripts/xlts" />
-                      <arg value="install" />
-                    </exec>
-                    <exec executable="cmd" failonerror="true" dir="../frontend">
-                      <arg value="/c" />
-                      <arg value="node_modules\.bin\grunt.cmd" />
-                      <arg value="build" />
-                      <arg value="--color=false" />
-                      <arg value="--assembly-jakarta" />
-                    </exec>
-                  </target>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>node-build-unix</id>
-      <activation>
-        <os>
-          <family>!windows</family>
-        </os>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>build-frontend</id>
-                <phase>generate-resources</phase>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-                <inherited>false</inherited>
-                <configuration>
-                  <skip>${skip.frontend.build}</skip>
-                  <target>
-                    <!-- run node build -->
-                    <exec executable="npm" failonerror="true" dir="../frontend">
-                      <arg value="ci" />
-                    </exec>
-                    <exec executable="node" failonerror="true" dir="../frontend">
-                      <arg value="scripts/xlts" />
-                      <arg value="install" />
-                    </exec>
-                    <exec executable="./node_modules/grunt-cli/bin/grunt" failonerror="true" dir="../frontend">
-                      <arg value="build" />
-                      <arg value="--color=false" />
-                      <arg value="--assembly-jakarta" />
-                    </exec>
-                  </target>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
 
     <profile>

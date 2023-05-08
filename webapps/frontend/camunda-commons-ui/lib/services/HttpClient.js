@@ -17,7 +17,7 @@
 
 'use strict';
 
-var angular = require('../../../camunda-bpm-sdk-js/vendor/angular');
+var angular = require('camunda-bpm-sdk-js/vendor/angular');
 var CamSDK = require('camunda-bpm-sdk-js/lib/angularjs/index');
 
 module.exports = [
@@ -27,7 +27,14 @@ module.exports = [
   '$cookies',
   'configuration',
   'ifUnauthorizedForwardToWelcomeApp',
-  function($rootScope, $timeout, $q, $cookies, configuration, ifUnauthorizedForwardToWelcomeApp) {
+  function(
+    $rootScope,
+    $timeout,
+    $q,
+    $cookies,
+    configuration,
+    ifUnauthorizedForwardToWelcomeApp
+  ) {
     function setHeaders(options) {
       var headers = (options.headers = options.headers || {});
       var token = $cookies.get(configuration.getCsrfCookieName());

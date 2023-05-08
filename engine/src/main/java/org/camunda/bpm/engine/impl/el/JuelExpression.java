@@ -22,11 +22,11 @@ import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.delegate.ExpressionGetInvocation;
 import org.camunda.bpm.engine.impl.delegate.ExpressionSetInvocation;
-import org.camunda.bpm.engine.impl.javax.el.ELContext;
-import org.camunda.bpm.engine.impl.javax.el.ELException;
-import org.camunda.bpm.engine.impl.javax.el.MethodNotFoundException;
-import org.camunda.bpm.engine.impl.javax.el.PropertyNotFoundException;
-import org.camunda.bpm.engine.impl.javax.el.ValueExpression;
+import org.camunda.bpm.impl.juel.jakarta.el.ELContext;
+import org.camunda.bpm.impl.juel.jakarta.el.ELException;
+import org.camunda.bpm.impl.juel.jakarta.el.MethodNotFoundException;
+import org.camunda.bpm.impl.juel.jakarta.el.PropertyNotFoundException;
+import org.camunda.bpm.impl.juel.jakarta.el.ValueExpression;
 
 
 /**
@@ -64,7 +64,14 @@ public class JuelExpression implements Expression {
     } catch (MethodNotFoundException mnfe) {
       throw new ProcessEngineException("Unknown method used in expression: " + expressionText+". Cause: "+mnfe.getMessage(), mnfe);
     } catch(ELException ele) {
-      throw new ProcessEngineException("Error while evaluating expression: " + expressionText+". Cause: "+ele.getMessage(), ele);
+      Throwable cause = ele.getCause();
+      if (cause != null) {
+        throw new ProcessEngineException(cause);
+
+      } else {
+        throw new ProcessEngineException("Error while evaluating expression: " + expressionText + ". Cause: " + ele.getMessage(), ele);
+
+      }
     } catch (Exception e) {
       throw new ProcessEngineException("Error while evaluating expression: " + expressionText+". Cause: "+e.getMessage(), e);
     }

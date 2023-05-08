@@ -17,7 +17,7 @@
 
 'use strict';
 
-var angular = require('../../../../../camunda-bpm-sdk-js/vendor/angular'),
+var angular = require('camunda-bpm-sdk-js/vendor/angular'),
     loaderDefinition = require('../cam-widget-loader');
 
 require('angular-ui-bootstrap');

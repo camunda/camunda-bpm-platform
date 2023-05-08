@@ -17,12 +17,7 @@
 
 'use strict';
 
-var fs = require('fs');
-
-var template = fs.readFileSync(
-  __dirname + '/output-variable-table.html',
-  'utf8'
-);
+var template = require('./output-variable-table.html')();
 
 module.exports = [
   'ViewsProvider',

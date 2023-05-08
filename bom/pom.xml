@@ -103,7 +103,11 @@
         <artifactId>camunda-ejb-client-jakarta</artifactId>
         <version>${project.version}</version>
       </dependency>
-
+      <dependency>
+        <groupId>org.camunda.bpm.juel</groupId>
+        <artifactId>camunda-juel</artifactId>
+        <version>${project.version}</version>
+      </dependency>
       <dependency>
         <groupId>org.camunda.bpm.model</groupId>
         <artifactId>camunda-xml-model</artifactId>

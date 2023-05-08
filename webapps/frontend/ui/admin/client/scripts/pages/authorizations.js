@@ -17,13 +17,8 @@
 
 'use strict';
 
-var fs = require('fs');
-
-var template = fs.readFileSync(__dirname + '/authorizations.html', 'utf8');
-var confirmTemplate = fs.readFileSync(
-  __dirname + '/confirm-delete-authorization.html',
-  'utf8'
-);
+var template = require('./authorizations.html')();
+var confirmTemplate = require('./confirm-delete-authorization.html')();
 
 module.exports = [
   '$routeProvider',

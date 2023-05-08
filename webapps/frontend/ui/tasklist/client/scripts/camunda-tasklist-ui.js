@@ -17,19 +17,23 @@
 
 'use strict';
 
+if (process.env.NODE_ENV === 'development') {
+  require('../../../common/scripts/util/dev-setup').setupDev();
+}
+
+const $ = window.jQuery;
+
 // DOM Polyfills
 require('dom4');
 
-var $ = (window.jQuery = window.$ = require('jquery'));
-
-var commons = require('../../../../camunda-commons-ui/lib');
+var commons = require('camunda-commons-ui/lib');
 var sdk = require('camunda-bpm-sdk-js/lib/angularjs/index');
 require('angular-data-depend');
 
-var angular = require('../../../../camunda-commons-ui/vendor/angular');
+var angular = require('camunda-commons-ui/vendor/angular');
 var dataDepend = require('angular-data-depend');
 var camCommon = require('../../../common/scripts/module');
-var lodash = require('../../../../camunda-commons-ui/vendor/lodash');
+var lodash = require('camunda-commons-ui/vendor/lodash');
 const translatePaginationCtrls = require('../../../common/scripts/util/translate-pagination-ctrls');
 
 /**
@@ -57,7 +61,7 @@ function bootstrapApp() {
   });
 }
 
-module.exports = function(pluginDependencies) {
+export function init(pluginDependencies) {
   var ngDeps = [
     commons.name,
     'pascalprecht.translate',
@@ -123,7 +127,7 @@ module.exports = function(pluginDependencies) {
 
       $animateProvider.classNameFilter(/angular-animate/);
 
-      $qProvider.errorOnUnhandledRejections(false);
+      $qProvider.errorOnUnhandledRejections(DEV_MODE); // eslint-disable-line
     }
   ];
 
@@ -166,9 +170,9 @@ module.exports = function(pluginDependencies) {
     tasklistApp,
     'tasklist'
   ).then(bootstrapApp);
-};
+}
 
-module.exports.exposePackages = function(container) {
+export function exposePackages(container) {
   container.angular = angular;
   container.jquery = $;
   container['camunda-commons-ui'] = commons;
@@ -176,9 +180,4 @@ module.exports.exposePackages = function(container) {
   container['angular-data-depend'] = dataDepend;
   container['cam-common'] = camCommon;
   container['lodash'] = lodash;
-};
-
-/* live-reload
-  // loads livereload client library (without breaking other scripts execution)
-  $('body').append('<script src="//' + location.hostname + ':LIVERELOAD_PORT/livereload.js?snipver=1"></script>');
-  /* */
+}

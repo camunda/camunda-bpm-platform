@@ -16,13 +16,9 @@
  */
 
 'use strict';
-var fs = require('fs');
 
 var $ = require('jquery'),
-  template = fs.readFileSync(
-    __dirname + '/cam-widget-search-pill.html',
-    'utf8'
-  );
+  template = require('./cam-widget-search-pill.html')();
 
 module.exports = [
   '$timeout',

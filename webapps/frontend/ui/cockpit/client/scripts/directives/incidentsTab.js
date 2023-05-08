@@ -18,13 +18,9 @@
 'use strict';
 
 var angular = require('angular');
-var fs = require('fs');
 
-var template = fs.readFileSync(__dirname + '/incidents-tab.html', 'utf8');
-var inspectTemplate = fs.readFileSync(
-  __dirname + '/incidents-tab-stacktrace.html',
-  'utf8'
-);
+var template = require('./incidents-tab.html')();
+var inspectTemplate = require('./incidents-tab-stacktrace.html')();
 
 var debouncePromiseFactory = require('camunda-bpm-sdk-js').utils
   .debouncePromiseFactory;

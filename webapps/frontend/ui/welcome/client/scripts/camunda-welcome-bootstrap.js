@@ -15,170 +15,168 @@
  * limitations under the License.
  */
 
-// Dynamic import for use within browserify
-window._import = path => {
-  return import(path);
-};
+import '../styles/styles.less';
+
+window.jQuery = require('jquery');
+
+import {
+  requirejs,
+  define,
+  require as rjsrequire
+} from 'exports-loader?exports=requirejs,define,require!requirejs/require';
+
+window.define = define;
+window.require = rjsrequire;
+window.bust = '$CACHE_BUST';
 
 // camunda-welcome-bootstrap is copied as-is, so we have to inline everything
 const appRoot = document.querySelector('base').getAttribute('app-root');
 const baseImportPath = `${appRoot}/app/welcome/`;
 
+requirejs.config({
+  baseUrl: baseImportPath,
+  urlArgs: 'bust=$CACHE_BUST'
+});
+
 const loadConfig = (async function() {
-  // eslint-disable-next-line
-  const config =
-    (
-      await import(
-        baseImportPath + 'scripts/config.js?bust=' + new Date().getTime()
-      )
-    ).default || {};
+  const configPath =
+    baseImportPath + 'scripts/config.js?bust=' + new Date().getTime();
+  const config = (await _import(configPath)).default; // eslint-disable-line
 
   window.camWelcomeConf = config;
   return config;
 })();
 
-window.__define(
-  'camunda-welcome-bootstrap',
-  ['./scripts/camunda-welcome-ui'],
-  function() {
-    'use strict';
+define('camunda-welcome-bootstrap', function() {
+  'use strict';
+  const bootstrap = config => {
+    requirejs.config({
+      baseUrl: '../../../lib'
+    });
 
-    const bootstrap = config => {
-      var camundaWelcomeUi = window.CamundaWelcomeUi;
+    var camundaWelcomeUi = require('./camunda-welcome-ui');
+    camundaWelcomeUi.exposePackages(window);
+
+    requirejs([`${appRoot}/lib/globalize.js`], function(globalize) {
+      globalize(
+        requirejs,
+        [
+          'angular',
+          'camunda-commons-ui',
+          'camunda-bpm-sdk-js',
+          'jquery',
+          'angular-data-depend',
+          'moment',
+          'events'
+        ],
+        window
+      );
+
+      var pluginPackages = window.PLUGIN_PACKAGES || [];
+      var pluginDependencies = window.PLUGIN_DEPENDENCIES || [];
+
+      pluginPackages.forEach(function(plugin) {
+        var node = document.createElement('link');
+        node.setAttribute('rel', 'stylesheet');
+        node.setAttribute(
+          'href',
+          plugin.location + '/plugin.css?bust=$CACHE_BUST'
+        );
+        document.head.appendChild(node);
+      });
 
       requirejs.config({
-        baseUrl: '../../../lib'
+        packages: pluginPackages,
+        baseUrl: './',
+        paths: {
+          ngDefine: `${appRoot}/lib/ngDefine`
+        }
       });
 
-      var requirePackages = window;
-      camundaWelcomeUi.exposePackages(requirePackages);
+      var dependencies = ['angular', 'ngDefine'].concat(
+        pluginDependencies.map(function(plugin) {
+          return plugin.requirePackageName;
+        })
+      );
 
-      window.define = window.__define;
-      window.require = window.__require;
+      requirejs(dependencies, function(angular) {
+        // we now loaded the welcome and the plugins, great
+        // before we start initializing the welcome though (and leave the requirejs context),
+        // lets see if we should load some custom scripts first
 
-      requirejs(['globalize'], function(globalize) {
-        globalize(
-          requirejs,
+        if (config && config.csrfCookieName) {
+          angular.module('cam.commons').config([
+            '$httpProvider',
+            function($httpProvider) {
+              $httpProvider.defaults.xsrfCookieName = config.csrfCookieName;
+            }
+          ]);
+        }
+
+        if (typeof config !== 'undefined' && config.requireJsConfig) {
+          var custom = config.requireJsConfig || {};
+
+          // copy the relevant RequireJS configuration in a empty object
+          // see: http://requirejs.org/docs/api.html#config
+          var conf = {};
           [
-            'angular',
-            'camunda-commons-ui',
-            'camunda-bpm-sdk-js',
-            'jquery',
-            'angular-data-depend',
-            'moment',
-            'events'
-          ],
-          requirePackages
-        );
+            'baseUrl',
+            'paths',
+            'bundles',
+            'shim',
+            'map',
+            'config',
+            'packages',
+            // 'nodeIdCompat',
+            'waitSeconds',
+            'context',
+            // 'deps', // not relevant in this case
+            'callback',
+            'enforceDefine',
+            'xhtml',
+            'urlArgs',
+            'scriptType'
+            // 'skipDataMain' // not relevant either
+          ].forEach(function(prop) {
+            if (custom[prop]) {
+              conf[prop] = custom[prop];
+            }
+          });
 
-        var pluginPackages = window.PLUGIN_PACKAGES || [];
-        var pluginDependencies = window.PLUGIN_DEPENDENCIES || [];
+          // configure RequireJS
+          requirejs.config(conf);
 
-        pluginPackages.forEach(function(plugin) {
-          var node = document.createElement('link');
-          node.setAttribute('rel', 'stylesheet');
-          node.setAttribute('href', plugin.location + '/plugin.css');
-          document.head.appendChild(node);
-        });
+          // load the dependencies and bootstrap the AngularJS application
+          requirejs(custom.deps || [], function() {
+            // create a AngularJS module (with possible AngularJS module dependencies)
+            // on which the custom scripts can register their
+            // directives, controllers, services and all when loaded
+            angular.module('cam.welcome.custom', custom.ngDeps);
 
-        requirejs.config({
-          packages: pluginPackages,
-          baseUrl: '../',
-          paths: {
-            ngDefine: '../../lib/ngDefine'
-          }
-        });
+            // now that we loaded the plugins and the additional modules, we can finally
+            // initialize Welcome
+            camundaWelcomeUi.init(pluginDependencies);
+          });
+        } else {
+          // for consistency, also create a empty module
+          angular.module('cam.welcome.custom', []);
 
-        var dependencies = ['angular', 'ngDefine'].concat(
-          pluginDependencies.map(function(plugin) {
-            return plugin.requirePackageName;
-          })
-        );
-
-        requirejs(dependencies, function(angular) {
-          // we now loaded the welcome and the plugins, great
-          // before we start initializing the welcome though (and leave the requirejs context),
-          // lets see if we should load some custom scripts first
-
-          if (config && config.csrfCookieName) {
-            angular.module('cam.commons').config([
-              '$httpProvider',
-              function($httpProvider) {
-                $httpProvider.defaults.xsrfCookieName = config.csrfCookieName;
-              }
-            ]);
-          }
-
-          if (typeof config !== 'undefined' && config.requireJsConfig) {
-            var custom = config.requireJsConfig || {};
-
-            // copy the relevant RequireJS configuration in a empty object
-            // see: http://requirejs.org/docs/api.html#config
-            var conf = {};
-            [
-              'baseUrl',
-              'paths',
-              'bundles',
-              'shim',
-              'map',
-              'config',
-              'packages',
-              // 'nodeIdCompat',
-              'waitSeconds',
-              'context',
-              // 'deps', // not relevant in this case
-              'callback',
-              'enforceDefine',
-              'xhtml',
-              'urlArgs',
-              'scriptType'
-              // 'skipDataMain' // not relevant either
-            ].forEach(function(prop) {
-              if (custom[prop]) {
-                conf[prop] = custom[prop];
-              }
-            });
-
-            // configure RequireJS
-            requirejs.config(conf);
-
-            // load the dependencies and bootstrap the AngularJS application
-            requirejs(custom.deps || [], function() {
-              // create a AngularJS module (with possible AngularJS module dependencies)
-              // on which the custom scripts can register their
-              // directives, controllers, services and all when loaded
-              angular.module('cam.welcome.custom', custom.ngDeps);
-
-              window.define = undefined;
-              window.require = undefined;
-
-              // now that we loaded the plugins and the additional modules, we can finally
-              // initialize Welcome
-              camundaWelcomeUi(pluginDependencies);
-            });
-          } else {
-            // for consistency, also create a empty module
-            angular.module('cam.welcome.custom', []);
-
-            // make sure that we are at the end of the require-js callback queue.
-            // Why? => the plugins will also execute require(..) which will place new
-            // entries into the queue.  if we bootstrap the angular app
-            // synchronously, the plugins' require callbacks will not have been
-            // executed yet and the angular modules provided by those plugins will
-            // not have been defined yet. Placing a new require call here will put
-            // the bootstrapping of the angular app at the end of the queue
-            require([], function() {
-              window.define = undefined;
-              window.require = undefined;
-              camundaWelcomeUi(pluginDependencies);
-            });
-          }
-        });
+          // make sure that we are at the end of the require-js callback queue.
+          // Why? => the plugins will also execute require(..) which will place new
+          // entries into the queue.  if we bootstrap the angular app
+          // synchronously, the plugins' require callbacks will not have been
+          // executed yet and the angular modules provided by those plugins will
+          // not have been defined yet. Placing a new require call here will put
+          // the bootstrapping of the angular app at the end of the queue
+          rjsrequire([], function() {
+            camundaWelcomeUi.init(pluginDependencies);
+          });
+        }
       });
-    };
+    });
+  };
 
-    loadConfig.then(config => bootstrap(config));
-  }
-);
+  loadConfig.then(config => bootstrap(config));
+});
 
 requirejs(['camunda-welcome-bootstrap'], function() {});

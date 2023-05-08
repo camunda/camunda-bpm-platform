@@ -18,7 +18,7 @@
 'use strict';
 const Form = require('@bpmn-io/form-js').Form;
 
-var angular = require('../../../../../../camunda-commons-ui/vendor/angular');
+var angular = require('camunda-commons-ui/vendor/angular');
 
 module.exports = [
   'camAPI',

@@ -17,7 +17,7 @@
 
 'use strict';
 
-var angular = require('../../../../../camunda-bpm-sdk-js/vendor/angular');
+var angular = require('camunda-bpm-sdk-js/vendor/angular');
 var camShareLink = require('../cam-share-link');
 var clipboardDefinition = require('../../clipboard/cam-widget-clipboard');
 

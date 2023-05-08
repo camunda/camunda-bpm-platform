@@ -26,7 +26,7 @@
     <http.ctx-path.webapp>camunda/</http.ctx-path.webapp>
     <http.ctx-path.rest>engine-rest/</http.ctx-path.rest>
 
-    <version.chromedriver>78.0.3904.70</version.chromedriver>
+    <version.chromedriver>112.0.5615.49</version.chromedriver>
 
     <!-- default os -->
     <os.type>linux64</os.type>

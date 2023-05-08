@@ -39,7 +39,7 @@ function requirejsConf(options) {
   options = options || {};
 
   if (typeof options.pathPrefix === 'undefined') {
-    options.pathPrefix = '../../camunda-commons-ui';
+    options.pathPrefix = 'camunda-commons-ui';
   }
 
   var conf = {

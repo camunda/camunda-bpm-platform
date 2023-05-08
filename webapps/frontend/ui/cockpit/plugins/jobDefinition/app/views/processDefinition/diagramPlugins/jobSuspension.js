@@ -18,9 +18,8 @@
 'use strict';
 
 var angular = require('angular');
-var fs = require('fs');
 
-var template = fs.readFileSync(__dirname + '/jobSuspension.html', 'utf8');
+var template = require('./jobSuspension.html')();
 
 module.exports = [
   'ViewsProvider',

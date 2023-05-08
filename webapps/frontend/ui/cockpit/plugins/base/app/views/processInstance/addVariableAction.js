@@ -18,12 +18,8 @@
 'use strict';
 
 var angular = require('angular');
-var fs = require('fs');
 
-var actionTemplate = fs.readFileSync(
-  __dirname + '/add-variable-action.html',
-  'utf8'
-);
+var actionTemplate = require('./add-variable-action.html')();
 var addTemplate = require('../../../../../client/scripts/components/variables/variable-add-dialog');
 
 var Configuration = function PluginConfiguration(ViewsProvider) {

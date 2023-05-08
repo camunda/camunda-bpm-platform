@@ -17,7 +17,7 @@
 
 'use strict';
 
-var angular = require('../../../camunda-bpm-sdk-js/vendor/angular');
+var angular = require('camunda-bpm-sdk-js/vendor/angular');
 
 function escapeHtml(html) {
   var text = document.createTextNode(html);

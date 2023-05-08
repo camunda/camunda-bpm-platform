@@ -17,7 +17,7 @@
 
 'use strict';
 
-var angular = require('../../../camunda-bpm-sdk-js/vendor/angular');
+var angular = require('camunda-bpm-sdk-js/vendor/angular');
 // module is passed by the "loader" (main.js)
 module.exports = function(module) {
   module.directive('view', [

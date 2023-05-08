@@ -22,14 +22,14 @@ const {execSync} = require('child_process');
 const exec = (cmd, successMsg) => {
   return execSync(cmd, (error, stdout, stderr) => {
     if (error) {
-      console.err(`error: ${error.message}`);
+      console.err(`error: ${error.message}`); // eslint-disable-line
       return;
     }
     if (stderr) {
-      console.err(`stderr: ${stderr}`);
+      console.err(`stderr: ${stderr}`); // eslint-disable-line
       return;
     }
-    console.log(successMsg ? successMsg : `stdout: ${stdout}`);
+    console.log(successMsg ? successMsg : `stdout: ${stdout}`); // eslint-disable-line
   }).toString();
 };
 
@@ -37,12 +37,7 @@ const registryConfigured = exec(`npm get @${scope}:registry`) !== 'undefined\n';
 
 const {XLTS_REGISTRY, XLTS_AUTH_TOKEN} = process.env;
 
-if (!registryConfigured && (!XLTS_REGISTRY || !XLTS_AUTH_TOKEN)) {
-  console.log('XLTS installation skipped.');
-  return;
-}
-
-if (!registryConfigured) {
+if (!registryConfigured && XLTS_REGISTRY && XLTS_AUTH_TOKEN) {
   exec(
     `npm set @${scope}:registry https://${XLTS_REGISTRY}/`,
     'XLTS.dev registry configured.'
@@ -54,13 +49,20 @@ if (!registryConfigured) {
   );
 }
 
-if (process.argv[2] === 'install') {
+if (
+  (registryConfigured || (XLTS_REGISTRY && XLTS_AUTH_TOKEN)) &&
+  process.argv[2] === 'install'
+) {
   const {xltsVersion, dependencies} = require('../package.json').xlts;
 
   const getNpmPackages = dependencies =>
     dependencies
-      .map(npmPackage => `${npmPackage}@npm:@${scope}/${npmPackage}@${xltsVersion}`)
+      .map(
+        npmPackage => `${npmPackage}@npm:@${scope}/${npmPackage}@${xltsVersion}`
+      )
       .join(' ');
 
-  exec(`npm i --no-save ${getNpmPackages(dependencies)}`);
+  exec(`npm i --save-exact ${getNpmPackages(dependencies)}`);
+} else {
+  console.log('XLTS installation skipped.'); // eslint-disable-line
 }

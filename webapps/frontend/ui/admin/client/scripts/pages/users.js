@@ -17,19 +17,15 @@
 
 'use strict';
 
-var fs = require('fs');
-
-var template = fs.readFileSync(__dirname + '/users.html', 'utf8');
-var searchConfig = JSON.parse(
-  fs.readFileSync(__dirname + '/users-search-plugin-config.json', 'utf8')
-);
+var template = require('./users.html')();
+var searchConfig = require('./users-search-plugin-config.json');
 
 var debouncePromiseFactory = require('camunda-bpm-sdk-js').utils
   .debouncePromiseFactory;
 var debounceQuery = debouncePromiseFactory();
 var debounceCount = debouncePromiseFactory();
 
-var angular = require('../../../../../camunda-commons-ui/vendor/angular');
+var angular = require('camunda-commons-ui/vendor/angular');
 
 var Controller = [
   '$scope',

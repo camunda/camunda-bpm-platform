@@ -17,14 +17,9 @@
 
 'use strict';
 
-var fs = require('fs');
+var template = require('./cam-cockpit-resource-wrapper.html')();
 
-var template = fs.readFileSync(
-  __dirname + '/cam-cockpit-resource-wrapper.html',
-  'utf8'
-);
-
-var angular = require('../../../../../../../camunda-commons-ui/vendor/angular');
+var angular = require('camunda-commons-ui/vendor/angular');
 
 module.exports = [
   function() {

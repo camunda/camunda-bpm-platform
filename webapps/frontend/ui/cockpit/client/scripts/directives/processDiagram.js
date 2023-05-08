@@ -17,11 +17,9 @@
 
 'use strict';
 
-var fs = require('fs');
+var template = require('./processDiagram.html')();
 
-var template = fs.readFileSync(__dirname + '/processDiagram.html', 'utf8');
-
-var angular = require('../../../../../camunda-commons-ui/vendor/angular');
+var angular = require('camunda-commons-ui/vendor/angular');
 
 var DirectiveController = [
   '$scope',

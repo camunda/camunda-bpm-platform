@@ -55,23 +55,16 @@
       <groupId>org.camunda.bpm.model</groupId>
       <artifactId>camunda-cmmn-model</artifactId>
     </dependency>
-    
+
+    <dependency>
+      <groupId>org.camunda.bpm.juel</groupId>
+      <artifactId>camunda-juel</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>org.camunda.bpm.dmn</groupId>
       <artifactId>camunda-engine-dmn</artifactId>
       <exclusions>
-        <exclusion>
-          <groupId>de.odysseus.juel</groupId>
-          <artifactId>juel-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>de.odysseus.juel</groupId>
-          <artifactId>juel-spi</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>de.odysseus.juel</groupId>
-          <artifactId>juel-impl</artifactId>
-        </exclusion>
         <!-- these exclusions are needed when building with Maven >= 3.3
           see CAM-11822 for details -->
         <exclusion>
@@ -479,6 +472,7 @@
             <excludes>
               <exclude>org.camunda.bpm.model:*</exclude>
               <exclude>org.camunda.bpm.dmn:*</exclude>
+              <exclude>org.camunda.bpm.juel:*</exclude>
               <exclude>org.camunda.commons:*</exclude>
               <exclude>org.camunda.connect:*</exclude>
               <exclude>org.camunda.feel:*</exclude>

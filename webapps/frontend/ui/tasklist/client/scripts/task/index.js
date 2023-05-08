@@ -17,7 +17,7 @@
 
 'use strict';
 
-var angular = require('../../../../../camunda-commons-ui/vendor/angular'),
+var angular = require('camunda-commons-ui/vendor/angular'),
   taskDirective = require('./directives/cam-tasklist-task'),
   taskMetaDirective = require('./directives/cam-tasklist-task-meta'),
   camTaskActionCtrl = require('./controller/cam-tasklist-task-action-ctrl'),

@@ -17,27 +17,32 @@
 
 'use strict';
 
+if (process.env.NODE_ENV === 'development') {
+  require('../../../common/scripts/util/dev-setup').setupDev();
+}
+
+const $ = window.jQuery;
+
 // DOM Polyfills
 require('dom4');
 
 /* jshint browserify: true */
-var $ = (window.jQuery = window.$ = require('jquery'));
 
-var commons = require('../../../../camunda-commons-ui/lib');
+var commons = require('camunda-commons-ui/lib');
 var sdk = require('camunda-bpm-sdk-js/lib/angularjs/index');
 var camCommon = require('../../../common/scripts/module');
-var lodash = require('../../../../camunda-commons-ui/vendor/lodash');
+var lodash = require('camunda-commons-ui/vendor/lodash');
 
 var APP_NAME = 'cam.welcome';
 
-var angular = require('../../../../camunda-commons-ui/vendor/angular');
+var angular = require('camunda-commons-ui/vendor/angular');
 var pagesModule = require('./pages/main');
 var directivesModule = require('./directives/main');
 var servicesModule = require('./services/main');
 var pluginsModule = require('./plugins/main');
 const translatePaginationCtrls = require('../../../common/scripts/util/translate-pagination-ctrls');
 
-module.exports = function(pluginDependencies) {
+export function init(pluginDependencies) {
   var ngDependencies = [
     'ng',
     'ngResource',
@@ -80,6 +85,7 @@ module.exports = function(pluginDependencies) {
       translatePaginationCtrls($provide);
       $routeProvider.otherwise({redirectTo: '/welcome'});
 
+      UriProvider.replace(':appRoot', getUri('app-root'));
       UriProvider.replace(':appName', 'welcome');
       UriProvider.replace('app://', getUri('href'));
       UriProvider.replace('adminbase://', getUri('app-root') + '/app/admin/');
@@ -104,7 +110,7 @@ module.exports = function(pluginDependencies) {
 
       $animateProvider.classNameFilter(/angular-animate/);
 
-      $qProvider.errorOnUnhandledRejections(false);
+      $qProvider.errorOnUnhandledRejections(DEV_MODE); // eslint-disable-line
     }
   ];
 
@@ -139,18 +145,13 @@ module.exports = function(pluginDependencies) {
       window.parent.postMessage({type: 'loadamd'}, '*');
     }
   });
-};
+}
 
-module.exports.exposePackages = function(container) {
+export function exposePackages(container) {
   container.angular = angular;
   container.jquery = $;
   container['camunda-commons-ui'] = commons;
   container['camunda-bpm-sdk-js'] = sdk;
   container['cam-common'] = camCommon;
   container['lodash'] = lodash;
-};
-
-/* live-reload
-// loads livereload client library (without breaking other scripts execution)
-$('body').append('<script src="//' + location.hostname + ':LIVERELOAD_PORT/livereload.js?snipver=1"></script>');
-/* */
+}
