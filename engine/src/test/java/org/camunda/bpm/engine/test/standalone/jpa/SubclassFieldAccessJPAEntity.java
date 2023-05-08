@@ -16,8 +16,8 @@
  */
 package org.camunda.bpm.engine.test.standalone.jpa;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
+import javax.persistence.Column;
+import javax.persistence.Entity;
 
 /**
  * @author Frederik Heremans

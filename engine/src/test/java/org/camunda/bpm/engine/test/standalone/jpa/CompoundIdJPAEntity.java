@@ -16,8 +16,8 @@
  */
 package org.camunda.bpm.engine.test.standalone.jpa;
 
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
 
 
 /**

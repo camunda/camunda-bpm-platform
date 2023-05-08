@@ -16,9 +16,9 @@
  */
 package org.camunda.bpm.engine.test.standalone.jpa;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.MappedSuperclass;
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
 
 /**
  * Mapped superclass containing an

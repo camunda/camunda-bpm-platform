@@ -16,8 +16,8 @@
  */
 package org.camunda.bpm.engine.impl.cfg;
 
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 
 
 /**
