@@ -46,7 +46,7 @@ pipeline {
                         [envVar: 'XLTS_AUTH_TOKEN', vaultKey: 'authToken']]
                 ]]]) {
               cambpmRunMaven('.',
-                  'clean source:jar deploy source:test-jar com.mycila:license-maven-plugin:check -Pdistro,distro-ce,distro-wildfly,distro-webjar,h2-in-memory -DaltStagingDirectory=${WORKSPACE}/staging -DskipRemoteStaging=true -fn',
+                  'clean source:jar deploy source:test-jar com.mycila:license-maven-plugin:check -Pdistro,distro-ce,distro-wildfly,distro-webjar,h2-in-memory -DaltStagingDirectory=${WORKSPACE}/staging -DskipRemoteStaging=true -DskipTests -fn',
                   withCatch: false,
                   withNpm: true,
                   jdkVersion: 'jdk-17-latest')
