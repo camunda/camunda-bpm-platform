@@ -40,10 +40,24 @@ var commonsUtil = require('../util/index'),
 var ngModule = angular.module('cam.commons.auth', [
   angular.module('ngRoute').name,
   commonsUtil.name,
-  'pascalprecht.translate'
+  'pascalprecht.translate',
+  'webapps.plugin',
+  'camunda.common.services'
 ]);
 
 ngModule
+  .config([
+    'ViewsProvider',
+    'canonicalAppNameProvider',
+    function(ViewsProvider, {$get: canonicalAppName}) {
+      ViewsProvider.registerDefaultView(`${canonicalAppName()}.login`, {
+        id: 'default-login-form',
+        controller: require('./page/form'),
+        template: require('./page/form.html?raw'),
+        priority: 0
+      });
+    }
+  ])
   .config(loginPage)
 
   // redirect after login support

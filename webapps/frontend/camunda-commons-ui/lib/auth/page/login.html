@@ -1,9 +1,6 @@
 <!-- # CE - camunda-commons-ui/lib/auth/page/login.html -->
 <div class="form-signin-container">
-  <form class="form-signin"
-        ng-submit="login()"
-        name="signinForm"
-        request-aware>
+  <div class="form-signin">
 
     <div class="login-header">
       <div class="login-logo" ng-bind-html="logo"></div>
@@ -17,25 +14,10 @@
          ng-if="signinForm.$dirty"
          class="notifications-panel"></div>
 
-    <input autofocus
-           tabindex="1"
-           type="text"
-           class="form-control"
-           placeholder="{{ 'PAGE_LOGIN_USERNAME' | translate }}"
-           auto-fill
-           required
-           ng-model="username"></input>
-    <input tabindex="2"
-           type="password"
-           class="form-control"
-           placeholder="{{ 'PAGE_LOGIN_PASSWORD' | translate }}"
-           auto-fill
-           required
-           ng-model="password"></input>
-    <button tabindex="3"
-            class="btn btn-lg btn-primary"
-            type="submit"
-            ng-disabled="status === 'LOADING'">{{ 'PAGE_LOGIN_SIGN_IN_ACTION' | translate }}</button>
+    <view
+      ng-repeat="plugin in loginPlugins"
+      data-plugin-id="{{ plugin.id }}"
+      provider="plugin"></view>
 
     <div ng-if="showFirstLogin"
          class="alert-info alert">
@@ -45,6 +27,6 @@
         <span class="message" ng-bind-html="FirstLoginMessage"></span>
       </div>
     </div>
-  </form>
+  </div>
 </div>
 <!-- / CE - camunda-commons-ui/lib/auth/page/login.html -->
