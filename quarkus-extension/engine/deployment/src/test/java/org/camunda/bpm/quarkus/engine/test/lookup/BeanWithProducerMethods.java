@@ -16,9 +16,9 @@
  */
 package org.camunda.bpm.quarkus.engine.test.lookup;
 
-import javax.enterprise.context.Dependent;
-import javax.enterprise.inject.Produces;
-import javax.inject.Named;
+import jakarta.enterprise.context.Dependent;
+import jakarta.enterprise.inject.Produces;
+import jakarta.inject.Named;
 
 public class BeanWithProducerMethods {
 

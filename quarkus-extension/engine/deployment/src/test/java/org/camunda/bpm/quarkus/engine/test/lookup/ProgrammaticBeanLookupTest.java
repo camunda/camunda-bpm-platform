@@ -25,11 +25,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.camunda.bpm.engine.cdi.impl.util.ProgrammaticBeanLookup;
 
-import javax.annotation.Priority;
-import javax.enterprise.context.Dependent;
-import javax.enterprise.inject.Alternative;
-import javax.enterprise.inject.Specializes;
-import javax.inject.Named;
+import jakarta.annotation.Priority;
+import jakarta.enterprise.context.Dependent;
+import jakarta.enterprise.inject.Alternative;
+import jakarta.enterprise.inject.Specializes;
+import jakarta.inject.Named;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

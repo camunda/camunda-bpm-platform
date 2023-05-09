@@ -20,8 +20,8 @@ import io.quarkus.arc.InjectableContext;
 import org.camunda.bpm.engine.cdi.impl.context.BusinessProcessContext;
 import org.camunda.bpm.engine.cdi.impl.util.BeanManagerLookup;
 
-import javax.enterprise.context.spi.Contextual;
-import javax.enterprise.inject.spi.BeanManager;
+import jakarta.enterprise.context.spi.Contextual;
+import jakarta.enterprise.inject.spi.BeanManager;
 
 public class InjectableBusinessProcessContext extends BusinessProcessContext implements InjectableContext {
 

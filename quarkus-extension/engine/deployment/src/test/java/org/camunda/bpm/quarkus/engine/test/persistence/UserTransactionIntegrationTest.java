@@ -28,11 +28,11 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import javax.enterprise.context.Dependent;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.transaction.Status;
-import javax.transaction.UserTransaction;
+import jakarta.enterprise.context.Dependent;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.transaction.Status;
+import jakarta.transaction.UserTransaction;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

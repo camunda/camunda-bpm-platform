@@ -18,9 +18,9 @@ package org.camunda.bpm.quarkus.engine.test.deployment;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
-import javax.inject.Inject;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Observes;
+import jakarta.inject.Inject;
 import java.util.List;
 
 import io.quarkus.test.QuarkusUnitTest;

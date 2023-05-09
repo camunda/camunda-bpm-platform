@@ -19,7 +19,7 @@ package org.camunda.bpm.quarkus.engine.extension.impl;
 import static com.arjuna.ats.jta.TransactionManager.transactionManager;
 import static io.quarkus.datasource.common.runtime.DataSourceUtil.DEFAULT_DATASOURCE_NAME;
 
-import javax.enterprise.inject.spi.BeanManager;
+import jakarta.enterprise.inject.spi.BeanManager;
 import java.util.ArrayList;
 import java.util.List;
 

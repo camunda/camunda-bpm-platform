@@ -27,8 +27,8 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import javax.enterprise.inject.spi.Bean;
-import javax.inject.Named;
+import jakarta.enterprise.inject.spi.Bean;
+import jakarta.inject.Named;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 

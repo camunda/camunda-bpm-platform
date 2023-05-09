@@ -70,7 +70,7 @@
 
     <dependency>
       <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine-cdi</artifactId>
+      <artifactId>camunda-engine-cdi-jakarta</artifactId>
       <version>${project.version}</version>
       <type>test-jar</type>
       <classifier>tests-quarkus</classifier>

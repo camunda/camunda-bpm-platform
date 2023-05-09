@@ -39,9 +39,9 @@ import org.camunda.bpm.quarkus.engine.extension.QuarkusProcessEngineConfiguratio
 import org.junit.After;
 import org.junit.Before;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Produces;
-import javax.enterprise.inject.spi.BeanManager;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Produces;
+import jakarta.enterprise.inject.spi.BeanManager;
 import java.util.HashSet;
 import java.util.Set;
 

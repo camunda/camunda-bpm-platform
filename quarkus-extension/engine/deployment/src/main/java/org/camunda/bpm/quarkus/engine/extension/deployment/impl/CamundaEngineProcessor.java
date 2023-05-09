@@ -45,7 +45,7 @@ import org.camunda.bpm.quarkus.engine.extension.impl.InjectableBusinessProcessCo
 import org.camunda.bpm.quarkus.engine.extension.QuarkusProcessEngineConfiguration;
 import org.jboss.jandex.DotName;
 
-import javax.enterprise.context.Dependent;
+import jakarta.enterprise.context.Dependent;
 
 import static io.quarkus.arc.deployment.ContextRegistrationPhaseBuildItem.ContextConfiguratorBuildItem;
 import static io.quarkus.deployment.annotations.ExecutionTime.RUNTIME_INIT;
