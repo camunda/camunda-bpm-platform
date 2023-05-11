@@ -60,7 +60,7 @@ public class SetJobDuedateCmd implements Command<Void>, Serializable {
         checker.checkUpdateJob(job);
       }
       
-      commandContext.getOperationLogManager().logJobOperation(UserOperationLogEntry.OPERATION_TYPE_SET_DUE_DATE, jobId,
+      commandContext.getOperationLogManager().logJobOperation(UserOperationLogEntry.OPERATION_TYPE_SET_DUEDATE, jobId, 
           job.getJobDefinitionId(), job.getProcessInstanceId(), job.getProcessDefinitionId(), job.getProcessDefinitionKey(),
           Collections.singletonList(new PropertyChange("duedate", job.getDuedate(), newDuedate)));
 

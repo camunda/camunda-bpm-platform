@@ -29,7 +29,7 @@ public class SetTaskDueDateCmd extends AbstractSetTaskPropertyCmd<Date> {
 
   @Override
   protected String getUserOperationLogName() {
-    return UserOperationLogEntry.OPERATION_TYPE_SET_DUE_DATE;
+    return UserOperationLogEntry.OPERATION_TYPE_SET_DUEDATE;
   }
 
   @Override
