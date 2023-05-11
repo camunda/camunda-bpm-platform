@@ -20,6 +20,7 @@ package org.camunda.bpm.engine.impl.cmd;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -44,12 +45,19 @@ public abstract class AbstractSetTaskPropertyCmd<T> implements Command<Void>, Se
    * @param taskId the id of the task whose property should be changed
    * @param value  the new value to set to the referenced task
    * @throws NullValueException in case the given taskId or the given value are null
+   * @throws NotFoundException  in case the referenced task does not exist
    */
   public AbstractSetTaskPropertyCmd(String taskId, T value) {
-    this.taskId = validateAndGet(taskId);
-    this.value = validateAndGet(value);
+    this.taskId = ensureNotNullAndGet("taskId", taskId);
+    this.value = ensureNotNullAndGet("value", value);
   }
 
+  /**
+   * Executes this command against the command context to perform the set-operation.
+   *
+   * @param context the command context
+   * @throws NotFoundException in case the referenced task does not exist
+   */
   @Override
   public Void execute(CommandContext context) {
     TaskEntity task = validateAndGet(taskId, context);
@@ -73,7 +81,7 @@ public abstract class AbstractSetTaskPropertyCmd<T> implements Command<Void>, Se
     TaskManager taskManager = context.getTaskManager();
     TaskEntity task = taskManager.findTaskById(taskId);
 
-    ensureNotNull("Cannot find task with id " + taskId, "task", task);
+    ensureNotNull(NotFoundException.class, "Cannot find task with id " + taskId, "task", task);
 
     checkTaskAgainstContext(task, context);
 
@@ -115,8 +123,8 @@ public abstract class AbstractSetTaskPropertyCmd<T> implements Command<Void>, Se
    * @return the value
    * @throws NullValueException in case the given value is null
    */
-  protected <T> T validateAndGet(T value) {
-    ensureNotNull("taskId", value);
+  protected <T> T ensureNotNullAndGet(String variableName, T value) {
+    ensureNotNull(variableName, value);
     return value;
   }
 

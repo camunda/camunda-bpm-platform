@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.authorization.TaskPermissions;
 import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.task.Attachment;
@@ -514,7 +515,7 @@ public interface TaskService {
    *
    * @param taskId id of the task, not null
    * @param name   the new task name, not null
-   * @throws ProcessEngineException when the task doesn't exist.
+   * @throws NotFoundException when the task doesn't exist.
    * @throws AuthorizationException If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
    *                                or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
    *                                (if the task is part of a running process instance).
@@ -526,7 +527,7 @@ public interface TaskService {
    *
    * @param taskId      id of the task, not null
    * @param description the new task description, not null
-   * @throws ProcessEngineException when the task doesn't exist.
+   * @throws NullValueException when the task doesn't exist.
    * @throws AuthorizationException If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
    *                                or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
    *                                (if the task is part of a running process instance).
@@ -538,7 +539,7 @@ public interface TaskService {
    *
    * @param taskId  id of the task, not null
    * @param dueDate the new task dueDate, not null
-   * @throws ProcessEngineException when the task doesn't exist.
+   * @throws NullValueException when the task doesn't exist
    * @throws AuthorizationException If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
    *                                or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
    *                                (if the task is part of a running process instance).
@@ -550,7 +551,7 @@ public interface TaskService {
    *
    * @param taskId       id of the task, not null
    * @param followUpDate the new task followUpDate, not null
-   * @throws ProcessEngineException when the task doesn't exist.
+   * @throws NullValueException when the task doesn't exist.
    * @throws AuthorizationException If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
    *                                or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
    *                                (if the task is part of a running process instance).
