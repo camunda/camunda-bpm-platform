@@ -98,7 +98,7 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
 
   @Test
   @CleanupTask
-  public void setOperationWithoutAuthorization() {
+  public void shouldSetOperationWithoutAuthorization() {
     // given
     createTask(taskId);
 
