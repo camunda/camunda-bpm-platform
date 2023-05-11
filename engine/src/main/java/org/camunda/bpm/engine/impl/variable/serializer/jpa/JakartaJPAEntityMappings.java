@@ -16,18 +16,20 @@
  */
 package org.camunda.bpm.engine.impl.variable.serializer.jpa;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import jakarta.persistence.EntityManager;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+import jakarta.persistence.EntityManager;
 
 /**
  * @author Frederik Heremans
@@ -36,11 +38,11 @@ public class JakartaJPAEntityMappings {
 
   private Map<String, EntityMetaData> classMetaDatamap;
 
-  private JPAEntityScanner enitityScanner;
+  private JakartaJPAEntityScanner enitityScanner;
 
   public JakartaJPAEntityMappings() {
     classMetaDatamap = new HashMap<String, EntityMetaData>();
-    enitityScanner = new JPAEntityScanner();
+    enitityScanner = new JakartaJPAEntityScanner();
   }
 
   public boolean isJPAEntity(Object value) {

@@ -36,7 +36,9 @@ import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.LogInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.ProcessApplicationContextInterceptor;
 import org.camunda.bpm.engine.impl.variable.serializer.jpa.JakartaEntityManagerSession;
+import org.camunda.bpm.engine.impl.variable.serializer.jpa.JakartaJPAVariableSerializer;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
+import org.camunda.bpm.engine.variable.type.ValueType;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ContextResource;
 import org.springframework.core.io.Resource;
@@ -60,6 +62,11 @@ public class SpringTransactionsProcessEngineConfiguration extends ProcessEngineC
 
   public SpringTransactionsProcessEngineConfiguration() {
     transactionsExternallyManaged = true;
+  }
+  /* (non-Javadoc)
+   * @see org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl#extracted()
+   */
+  protected void extracted() {
   }
 
   @Override
@@ -124,6 +131,17 @@ public class SpringTransactionsProcessEngineConfiguration extends ProcessEngineC
     if (jpaEntityManagerFactory != null) {
       sessionFactories.put(JakartaEntityManagerSession.class,
               new SpringEntityManagerSessionFactory(jpaEntityManagerFactory, jpaHandleTransaction, jpaCloseEntityManager));
+    }
+    JakartaJPAVariableSerializer jpaType = (JakartaJPAVariableSerializer) variableSerializers.getSerializerByName(JakartaJPAVariableSerializer.NAME);
+    // Add JPA-type
+    if (jpaType == null) {
+      // We try adding the variable right after byte serializer, if available
+      int serializableIndex = variableSerializers.getSerializerIndexByName(ValueType.BYTES.getName());
+      if (serializableIndex > -1) {
+        variableSerializers.addSerializer(new JakartaJPAVariableSerializer(), serializableIndex);
+      } else {
+        variableSerializers.addSerializer(new JakartaJPAVariableSerializer());
+      }
     }
   }
 

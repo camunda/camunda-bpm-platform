@@ -1152,6 +1152,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initTypeValidator();
     initSerialization();
     initJpa();
+    extracted();
     initDelegateInterceptor();
     initEventHandlers();
     initProcessApplicationManager();
@@ -2731,6 +2732,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     if (jpaPersistenceUnitName != null) {
       jpaEntityManagerFactory = JpaHelper.createEntityManagerFactory(jpaPersistenceUnitName);
     }
+
+  }
+
+  protected void extracted() {
     if (jpaEntityManagerFactory != null) {
       sessionFactories.put(EntityManagerSession.class, new EntityManagerSessionFactory(jpaEntityManagerFactory, jpaHandleTransaction, jpaCloseEntityManager));
       JPAVariableSerializer jpaType = (JPAVariableSerializer) variableSerializers.getSerializerByName(JPAVariableSerializer.NAME);

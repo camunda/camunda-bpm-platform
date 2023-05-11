@@ -69,6 +69,7 @@ public class SpringTransactionsProcessEngineConfiguration extends ProcessEngineC
     return processEngine;
   }
 
+
   protected Collection< ? extends CommandInterceptor> getDefaultCommandInterceptorsTxRequired() {
     if (transactionManager==null) {
       throw new ProcessEngineException("transactionManager is required property for SpringProcessEngineConfiguration, use "+StandaloneProcessEngineConfiguration.class.getName()+" otherwise");
@@ -121,6 +122,7 @@ public class SpringTransactionsProcessEngineConfiguration extends ProcessEngineC
   @Override
   protected void initJpa() {
     super.initJpa();
+    super.extracted();
     if (jpaEntityManagerFactory != null) {
       sessionFactories.put(EntityManagerSession.class,
               new SpringEntityManagerSessionFactory(jpaEntityManagerFactory, jpaHandleTransaction, jpaCloseEntityManager));
