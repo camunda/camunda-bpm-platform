@@ -57,8 +57,8 @@ public abstract class AbstractSetTaskPropertyCmd<T> implements Command<Void>, Se
   /**
    * Validates the given taskId against to verify it references an existing task before returning the task.
    *
-   * @param taskId  the given taskId, non null
-   * @param context the context, non null
+   * @param taskId  the given taskId, non-null
+   * @param context the context, non-null
    * @return the corresponding task entity
    */
   protected TaskEntity validateAndGet(String taskId, CommandContext context) {
