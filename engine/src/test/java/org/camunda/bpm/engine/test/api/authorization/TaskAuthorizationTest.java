@@ -4438,6 +4438,21 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(userId, task.getAssignee());
   }
 
+  @Test
+  public void testCaseTaskSetPriority() {
+    // given
+    testRule.createCaseInstanceByKey(CASE_KEY);
+    String taskId = selectSingleTask().getId();
+
+    // when
+    taskService.setPriority(taskId, 80);
+
+    // then
+    Task task = selectSingleTask();
+    assertNotNull(task);
+    assertEquals(80, task.getPriority());
+  }
+
   // get sub tasks ((standalone) task) ////////////////////////////////////`
 
   @Test
