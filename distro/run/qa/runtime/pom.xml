@@ -143,9 +143,7 @@
             <artifactId>maven-failsafe-plugin</artifactId>
             <version>2.16</version>
             <configuration>
-                    <argLine>
-            --add-opens java.base/java.lang=ALL-UNNAMED
-        </argLine>
+                    
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
               <dependenciesToScan>
                 <dependenciesToScan>org.camunda.bpm.run:camunda-bpm-run-qa-integration-tests</dependenciesToScan>

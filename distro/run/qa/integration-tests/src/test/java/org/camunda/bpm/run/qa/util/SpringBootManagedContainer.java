@@ -36,10 +36,6 @@ import java.util.concurrent.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.jna.Pointer;
-import com.sun.jna.platform.win32.Kernel32;
-import com.sun.jna.platform.win32.WinNT;
-
 /**
  * Container that handles a managed Spring Boot application that is started by
  * the distro's startup scripts
@@ -63,6 +59,7 @@ public class SpringBootManagedContainer {
 
   protected Thread shutdownThread;
   protected Process startupProcess;
+  static int pid;
 
   protected List<File> configurationFiles = new ArrayList<>();
 
@@ -106,9 +103,9 @@ public class SpringBootManagedContainer {
       startupProcessBuilder.directory(new File(baseDirectory));
       log.info("Starting Spring Boot application with: " + startupProcessBuilder.command());
       startupProcess = startupProcessBuilder.start();
+      pid = (int) startupProcess.pid();
       new Thread(new ConsoleConsumer()).start();
       final Process proc = startupProcess;
-
       shutdownThread = new Thread(() -> {
         if (proc != null) {
           killProcess(proc, true);
@@ -262,14 +259,20 @@ public class SpringBootManagedContainer {
     if (process.getClass().getName().equals("java.lang.Win32Process") || process.getClass().getName().equals("java.lang.ProcessImpl")) {
       /* determine the pid on windows plattforms */
       try {
-        Field f = process.getClass().getDeclaredField("handle");
-        f.setAccessible(true);
-        long handl = f.getLong(process);
-
-        Kernel32 kernel = Kernel32.INSTANCE;
-        WinNT.HANDLE handle = new WinNT.HANDLE();
-        handle.setPointer(Pointer.createConstant(handl));
-        int ret = kernel.GetProcessId(handle);
+//        Field field = process.getClass().getDeclaredField("handle");
+////        field.setAccessible(true);
+//        MethodHandle getter = MethodHandles.lookup().unreflectGetter(field);
+//        Object value = getter.invokeExact(process.getClass());
+////        Field f = process.getClass().getDeclaredField("handle");
+////        long handl = field.getLong(process);
+//        String stringToConvert = String.valueOf(value);
+//        Long convertedLong = Long.parseLong(stringToConvert);
+//
+//        Kernel32 kernel = Kernel32.INSTANCE;
+//        WinNT.HANDLE handle = new WinNT.HANDLE();
+//        handle.setPointer(Pointer.createConstant(convertedLong));
+//        int ret = kernel.GetProcessId(handle);
+        int ret = pid;
         log.debug("Detected pid: {}", ret);
         return ret;
       } catch (Throwable ex) {
