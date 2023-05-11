@@ -16,53 +16,23 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-
-import java.io.Serializable;
-
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
-import org.camunda.bpm.engine.impl.cfg.CommandChecker;
-import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
 
+public class SetTaskPriorityCmd extends AbstractSetTaskPropertyCmd<Integer> {
 
-/**
- * @author Joram Barrez
- */
-public class SetTaskPriorityCmd implements Command<Void>, Serializable {
-
-  private static final long serialVersionUID = 1L;
-
-  protected int priority;
-  protected String taskId;
-
-  public SetTaskPriorityCmd(String taskId, int priority) {
-    this.taskId = taskId;
-    this.priority = priority;
+  public SetTaskPriorityCmd(String taskId, Integer priority) {
+    super(taskId, priority);
   }
 
-  public Void execute(CommandContext commandContext) {
-    ensureNotNull("taskId", taskId);
+  @Override
+  protected String getUserOperationLogName() {
+    return UserOperationLogEntry.OPERATION_TYPE_SET_PRIORITY;
+  }
 
-    TaskManager taskManager = commandContext.getTaskManager();
-    TaskEntity task = taskManager.findTaskById(taskId);
-    ensureNotNull("Cannot find task with id " + taskId, "task", task);
-
-    checkTaskPriority(task, commandContext);
-
+  @Override
+  protected void executeSetOperation(TaskEntity task, Integer priority) {
     task.setPriority(priority);
-
-    task.triggerUpdateEvent();
-    task.logUserOperation(UserOperationLogEntry.OPERATION_TYPE_SET_PRIORITY);
-
-    return null;
   }
 
-  protected void checkTaskPriority(TaskEntity task, CommandContext commandContext) {
-    for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
-      checker.checkTaskAssign(task);
-    }
-  }
 }

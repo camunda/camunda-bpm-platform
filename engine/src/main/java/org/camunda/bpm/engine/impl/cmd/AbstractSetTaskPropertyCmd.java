@@ -17,9 +17,10 @@
 
 package org.camunda.bpm.engine.impl.cmd;
 
-import static java.util.Objects.requireNonNull;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -38,8 +39,8 @@ public abstract class AbstractSetTaskPropertyCmd<T> implements Command<Void>, Se
   protected final T value;
 
   public AbstractSetTaskPropertyCmd(String taskId, T value) {
-    this.taskId = requireNonNull(taskId);
-    this.value = requireNonNull(value);
+    this.taskId = validateAndGet(taskId);
+    this.value = validateAndGet(value);
   }
 
   @Override
@@ -63,7 +64,9 @@ public abstract class AbstractSetTaskPropertyCmd<T> implements Command<Void>, Se
    */
   protected TaskEntity validateAndGet(String taskId, CommandContext context) {
     TaskManager taskManager = context.getTaskManager();
-    TaskEntity task = requireNonNull(taskManager.findTaskById(taskId), "Cannot find task with id " + taskId);
+    TaskEntity task = taskManager.findTaskById(taskId);
+
+    ensureNotNull("Cannot find task with id " + taskId, "task", task);
 
     checkTaskAgainstContext(task, context);
 
@@ -96,5 +99,18 @@ public abstract class AbstractSetTaskPropertyCmd<T> implements Command<Void>, Se
    * @param value the value to se
    */
   protected abstract void executeSetOperation(TaskEntity task, T value);
+
+  /**
+   * Ensures the value is not null and returns the value.
+   *
+   * @param value the value
+   * @param <T>   the type of the value
+   * @return the value
+   * @throws NullValueException in case the given value is null
+   */
+  protected <T> T validateAndGet(T value) {
+    ensureNotNull("taskId", value);
+    return value;
+  }
 
 }
