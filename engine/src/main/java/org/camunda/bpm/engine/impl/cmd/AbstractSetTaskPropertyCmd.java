@@ -48,6 +48,25 @@ public abstract class AbstractSetTaskPropertyCmd<T> implements Command<Void>, Se
    * @throws NotFoundException  in case the referenced task does not exist
    */
   public AbstractSetTaskPropertyCmd(String taskId, T value) {
+    this(taskId, value, false);
+  }
+
+  /**
+   * Constructor with parameterized validation for the given input. Used by implementations that wish to
+   * avoid validation e.g {@link SetTaskPriorityCmd}.
+   *
+   * @param taskId                 the id of the task whose property should be changed
+   * @param value                  the new value to set to the referenced task
+   * @param excludeInputValidation if true, the validation of the input will be excluded
+   */
+  protected AbstractSetTaskPropertyCmd(String taskId, T value, boolean excludeInputValidation) {
+
+    if (excludeInputValidation) {
+      this.taskId = taskId;
+      this.value = value;
+      return;
+    }
+
     this.taskId = ensureNotNullAndGet("taskId", taskId);
     this.value = ensureNotNullAndGet("value", value);
   }

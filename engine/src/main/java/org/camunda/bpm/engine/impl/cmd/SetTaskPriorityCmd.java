@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 
@@ -30,10 +29,9 @@ public class SetTaskPriorityCmd extends AbstractSetTaskPropertyCmd<Integer> {
    *
    * @param taskId   the id of the referenced task, non-null
    * @param priority the new priority value to set, non-null
-   * @throws NullValueException in case the given taskId or the given priority value are null
    */
   public SetTaskPriorityCmd(String taskId, Integer priority) {
-    super(taskId, priority);
+    super(taskId, priority, true);
   }
 
   @Override
