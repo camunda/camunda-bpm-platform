@@ -18,11 +18,11 @@ package org.camunda.bpm.engine.spring.application;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import jakarta.servlet.ServletContext;
+import javax.servlet.ServletContext;
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationElResolver;
 import org.camunda.bpm.application.impl.EjbProcessApplication;
-import org.camunda.bpm.application.impl.JakartaServletProcessApplication;
+import org.camunda.bpm.application.impl.ServletProcessApplication;
 import org.camunda.bpm.engine.spring.ApplicationContextElResolver;
 import org.camunda.bpm.impl.juel.jakarta.el.ELResolver;
 import org.springframework.util.ClassUtils;
@@ -63,8 +63,8 @@ public class SpringProcessApplicationElResolver implements ProcessApplicationElR
       SpringProcessApplication springProcessApplication = (SpringProcessApplication) processApplication;
       return new ApplicationContextElResolver(springProcessApplication.getApplicationContext());
 
-    } else if (processApplication instanceof JakartaServletProcessApplication) {
-      JakartaServletProcessApplication servletProcessApplication = (JakartaServletProcessApplication) processApplication;
+    } else if (processApplication instanceof ServletProcessApplication) {
+      ServletProcessApplication servletProcessApplication = (ServletProcessApplication) processApplication;
 
       if(!ClassUtils.isPresent("org.springframework.web.context.support.WebApplicationContextUtils", processApplication.getProcessApplicationClassloader())) {
         LOGGER.log(Level.FINE, "WebApplicationContextUtils must be present for SpringProcessApplicationElResolver to work");

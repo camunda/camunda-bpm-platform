@@ -15,49 +15,49 @@
  * limitations under the License.
  */
 package org.camunda.bpm.integrationtest.jobexecutor.beans;
-//
-//import javax.annotation.PostConstruct;
-//import javax.annotation.PreDestroy;
-//import javax.annotation.Resource;
-//import javax.ejb.Singleton;
-//import javax.ejb.Startup;
-//import javax.enterprise.concurrent.ManagedExecutorService;
-//import org.camunda.bpm.engine.ProcessEngine;
-//import org.camunda.bpm.engine.cdi.impl.ManagedJobExecutor;
-//
-//@Startup
-//@Singleton
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.annotation.Resource;
+import javax.ejb.Singleton;
+import javax.ejb.Startup;
+import javax.enterprise.concurrent.ManagedExecutorService;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.cdi.impl.ManagedJobExecutor;
+
+@Startup
+@Singleton
 public class ManagedJobExecutorBean {
-//
-//  @Resource
-//  private ManagedExecutorService managedExecutorService;
-//
-//  protected ProcessEngine processEngine;
-//  protected ManagedJobExecutor jobExecutor;
-//
-//  @PostConstruct
-//  public void startEngine() {
-//    // Using fully-qualified class name instead of import statement to allow for automatic Jakarta transformation
-//    org.camunda.bpm.engine.impl.cfg.JtaProcessEngineConfiguration processEngineConfiguration =
-//        new org.camunda.bpm.engine.impl.cfg.JtaProcessEngineConfiguration();
-//    processEngineConfiguration.setDatabaseSchemaUpdate("true")
-//      .setHistory("auto")
-//      .setDbMetricsReporterActivate(false)
-//      .setDataSourceJndiName("java:jboss/datasources/ProcessEngine");
-//    processEngineConfiguration.setTransactionManagerJndiName("java:/TransactionManager");
-//    jobExecutor = new ManagedJobExecutor(managedExecutorService);
-//    processEngine = processEngineConfiguration
-//        .setJobExecutor(jobExecutor)
-//        .buildProcessEngine();
-//  }
-//
-//  @PreDestroy
-//  public void stopEngine() {
-//    processEngine.close();
-//    jobExecutor.shutdown();
-//  }
-//
-//  public ProcessEngine getProcessEngine() {
-//    return processEngine;
-//  }
+
+  @Resource
+  private ManagedExecutorService managedExecutorService;
+
+  protected ProcessEngine processEngine;
+  protected ManagedJobExecutor jobExecutor;
+
+  @PostConstruct
+  public void startEngine() {
+    // Using fully-qualified class name instead of import statement to allow for automatic Jakarta transformation
+    org.camunda.bpm.engine.impl.cfg.JtaProcessEngineConfiguration processEngineConfiguration =
+        new org.camunda.bpm.engine.impl.cfg.JtaProcessEngineConfiguration();
+    processEngineConfiguration.setDatabaseSchemaUpdate("true")
+      .setHistory("auto")
+      .setDbMetricsReporterActivate(false)
+      .setDataSourceJndiName("java:jboss/datasources/ProcessEngine");
+    processEngineConfiguration.setTransactionManagerJndiName("java:/TransactionManager");
+    jobExecutor = new ManagedJobExecutor(managedExecutorService);
+    processEngine = processEngineConfiguration
+        .setJobExecutor(jobExecutor)
+        .buildProcessEngine();
+  }
+
+  @PreDestroy
+  public void stopEngine() {
+    processEngine.close();
+    jobExecutor.shutdown();
+  }
+
+  public ProcessEngine getProcessEngine() {
+    return processEngine;
+  }
 }

@@ -16,8 +16,8 @@
  */
 package org.camunda.bpm.engine.impl.variable.serializer.jpa;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.Session;
@@ -29,7 +29,7 @@ import org.camunda.bpm.engine.impl.interceptor.Session;
 public interface EntityManagerSession extends Session {
   /**
    * Get an {@link EntityManager} instance associated with this session.
-   * @throws ProcessEngineException when no {@link EntityManagerFactory} instance 
+   * @throws ProcessEngineException when no {@link EntityManagerFactory} instance
    * is configured for the process engine.
    */
   EntityManager getEntityManager();

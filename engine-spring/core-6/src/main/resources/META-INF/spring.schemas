@@ -1,0 +1,2 @@
+http\://www.activiti.org/schema/spring/components/activiti-5.0.xsd=org/camunda/bpm/engine/spring/components/config/xml/camunda-7.0.xsd
+http\://www.activiti.org/schema/spring/components/activiti.xsd=org/camunda/bpm/engine/spring/components/config/xml/camunda-7.0.xsd

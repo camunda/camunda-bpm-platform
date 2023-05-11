@@ -22,7 +22,7 @@ import java.math.BigInteger;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import jakarta.persistence.EntityManager;
+import javax.persistence.EntityManager;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
@@ -35,7 +35,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 public class JPAEntityMappings {
 
   private Map<String, EntityMetaData> classMetaDatamap;
-  
+
   private JPAEntityScanner enitityScanner;
 
   public JPAEntityMappings() {
@@ -45,13 +45,13 @@ public class JPAEntityMappings {
 
   public boolean isJPAEntity(Object value) {
     if (value != null) {
-      // EntityMetaData will be added for all classes, even those who are not 
-      // JPA-entities to prevent unneeded annotation scanning  
+      // EntityMetaData will be added for all classes, even those who are not
+      // JPA-entities to prevent unneeded annotation scanning
       return getEntityMetaData(value.getClass()).isJPAEntity();
     }
     return false;
   }
-  
+
   private EntityMetaData getEntityMetaData(Class<?> clazz) {
     EntityMetaData metaData = classMetaDatamap.get(clazz.getName());
     if (metaData == null) {
@@ -68,16 +68,16 @@ public class JPAEntityMappings {
 
   public String getJPAClassString(Object value) {
     ensureNotNull("null value cannot be saved", "value", value);
-    
+
     EntityMetaData metaData = getEntityMetaData(value.getClass());
     if(!metaData.isJPAEntity()) {
       throw new ProcessEngineException("Object is not a JPA Entity: class='" + value.getClass() + "', " + value);
     }
-    
+
     // Extract the ID from the Entity instance using the metaData
     return metaData.getEntityClass().getName();
   }
-  
+
   public String getJPAIdString(Object value) {
     EntityMetaData metaData = getEntityMetaData(value.getClass());
     if(!metaData.isJPAEntity()) {
@@ -99,10 +99,10 @@ public class JPAEntityMappings {
     } catch (IllegalAccessException iae) {
       throw new ProcessEngineException("Cannot access id method/field for JPA Entity", iae);
     } catch (InvocationTargetException ite) {
-      throw new ProcessEngineException("Exception occured while getting value from id field/method on JPAEntity: " + 
+      throw new ProcessEngineException("Exception occured while getting value from id field/method on JPAEntity: " +
         ite.getCause().getMessage(), ite.getCause());
     }
-    
+
     // Fall trough when no method and field is set
     throw new ProcessEngineException("Cannot get id from JPA Entity, no id method/field set");
   }
@@ -162,7 +162,7 @@ public class JPAEntityMappings {
       throw new ProcessEngineException("Unsupported Primary key type for JPA-Entity: " + type.getName());
     }
   }
-  
+
   public String getIdString(Object value) {
     ensureNotNull("Value of primary key for JPA-Entity", value);
     // Only java.sql.date and java.util.date require custom handling, the other types

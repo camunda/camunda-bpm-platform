@@ -16,10 +16,10 @@
  */
 package org.camunda.bpm.engine.impl.variable.serializer.jpa;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.PersistenceException;
-import jakarta.persistence.TransactionRequiredException;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceException;
+import javax.persistence.TransactionRequiredException;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.TransactionContext;
@@ -38,13 +38,13 @@ public class EntityManagerSessionImpl implements EntityManagerSession {
   private EntityManager entityManager;
   private boolean handleTransactions;
   private boolean closeEntityManager;
-  
-  public EntityManagerSessionImpl(EntityManagerFactory entityManagerFactory, EntityManager entityManager, 
+
+  public EntityManagerSessionImpl(EntityManagerFactory entityManagerFactory, EntityManager entityManager,
           boolean handleTransactions, boolean closeEntityManager) {
     this(entityManagerFactory, handleTransactions, closeEntityManager);
     this.entityManager = entityManager;
   }
-  
+
   public EntityManagerSessionImpl(EntityManagerFactory entityManagerFactory, boolean handleTransactions, boolean closeEntityManager) {
     this.entityManagerFactory = entityManagerFactory;
     this.handleTransactions = handleTransactions;
@@ -85,7 +85,7 @@ public class EntityManagerSessionImpl implements EntityManagerSession {
   public EntityManager getEntityManager() {
     if (entityManager == null) {
       entityManager = getEntityManagerFactory().createEntityManager();
-      
+
       if(handleTransactions) {
         // Add transaction listeners, if transactions should be handled
         TransactionListener jpaTransactionCommitListener = new TransactionListener() {
@@ -95,7 +95,7 @@ public class EntityManagerSessionImpl implements EntityManagerSession {
             }
           }
         };
-        
+
         TransactionListener jpaTransactionRollbackListener = new TransactionListener() {
           public void execute(CommandContext commandContext) {
             if (isTransactionActive()) {
@@ -114,7 +114,7 @@ public class EntityManagerSessionImpl implements EntityManagerSession {
         }
       }
     }
-    
+
     return entityManager;
   }
 
