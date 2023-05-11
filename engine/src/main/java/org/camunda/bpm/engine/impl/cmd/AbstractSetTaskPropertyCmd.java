@@ -34,8 +34,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
  */
 public abstract class AbstractSetTaskPropertyCmd<T> implements Command<Void>, Serializable {
 
-  private final String taskId;
-  private final T value;
+  protected final String taskId;
+  protected final T value;
 
   public AbstractSetTaskPropertyCmd(String taskId, T value) {
     this.taskId = requireNonNull(taskId);
