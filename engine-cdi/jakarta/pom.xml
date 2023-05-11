@@ -17,6 +17,7 @@
     <arquillian.container.version>3.0.2.Final</arquillian.container.version>
     <arquillian.junit.version>1.7.0.Alpha14</arquillian.junit.version>
     <weld.version>5.0.1.Final</weld.version>
+        <version.spring.framework>6.0.8</version.spring.framework>
   </properties>
   
   <dependencyManagement>
@@ -54,9 +55,16 @@
           <artifactId>livetribe-jsr223</artifactId>
           <groupId>org.livetribe</groupId>
         </exclusion>
+        <exclusion>          <artifactId>spring-beans</artifactId>
+          <groupId>org.springframework</groupId></exclusion>
       </exclusions>
     </dependency>
-
+    <dependency>
+<artifactId>spring-beans</artifactId>
+          <groupId>org.springframework</groupId>
+			  <version>${version.spring.framework}</version>
+		  </dependency>
+	
     <dependency>
       <groupId>jakarta.enterprise.concurrent</groupId>
       <artifactId>jakarta.enterprise.concurrent-api</artifactId>
