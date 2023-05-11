@@ -16,7 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 
@@ -38,11 +37,6 @@ public class SetTaskPriorityCmd extends AbstractSetTaskPropertyCmd<Integer> {
   @Override
   protected String getUserOperationLogName() {
     return UserOperationLogEntry.OPERATION_TYPE_SET_PRIORITY;
-  }
-
-  @Override
-  protected Class<? extends ProcessEngineException> getTaskNotFoundValidationException() {
-    return ProcessEngineException.class;
   }
 
   @Override

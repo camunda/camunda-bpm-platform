@@ -20,7 +20,6 @@ package org.camunda.bpm.engine.impl.cmd;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
@@ -101,7 +100,7 @@ public abstract class AbstractSetTaskPropertyCmd<T> implements Command<Void>, Se
     TaskManager taskManager = context.getTaskManager();
     TaskEntity task = taskManager.findTaskById(taskId);
 
-    ensureNotNull(getTaskNotFoundValidationException(), "Cannot find task with id " + taskId, "task", task);
+    ensureNotNull(NotFoundException.class, "Cannot find task with id " + taskId, "task", task);
 
     checkTaskAgainstContext(task, context);
 
@@ -134,15 +133,6 @@ public abstract class AbstractSetTaskPropertyCmd<T> implements Command<Void>, Se
    * @param value the value to se
    */
   protected abstract void executeSetOperation(TaskEntity task, T value);
-
-  /**
-   * Returns the class of the exception that will be thrown in case the task does not exist.
-   *
-   * @return the class of the exception
-   */
-  protected Class<? extends ProcessEngineException> getTaskNotFoundValidationException() {
-    return NotFoundException.class;
-  }
 
   /**
    * Ensures the value is not null and returns the value.

@@ -501,8 +501,7 @@ public interface TaskService {
    * @param taskId id of the task, cannot be null.
    * @param priority the new priority for the task.
    *
-   * @throws ProcessEngineException
-   *          when the task doesn't exist.
+   * @throws NotFoundException when the task doesn't exist.
    * @throws AuthorizationException
    *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
    *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
