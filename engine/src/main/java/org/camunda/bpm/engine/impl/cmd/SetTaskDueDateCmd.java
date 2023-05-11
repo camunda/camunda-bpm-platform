@@ -18,11 +18,22 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.util.Date;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 
+/**
+ * Command to change task priority to a new value.
+ */
 public class SetTaskDueDateCmd extends AbstractSetTaskPropertyCmd<Date> {
 
+  /**
+   * Public Constructor.
+   *
+   * @param taskId the id of the referenced task, non-null
+   * @param value  the task dueDate value to set, non-null
+   * @throws NullValueException in case the given taskId or the given dueDate value are null
+   */
   public SetTaskDueDateCmd(String taskId, Date value) {
     super(taskId, value);
   }

@@ -18,11 +18,22 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.util.Date;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 
+/**
+ * Command to change task followUpDate to a new value.
+ */
 public class SetTaskFollowUpDateCmd extends AbstractSetTaskPropertyCmd<Date> {
 
+  /**
+   * Constructor to create a SetTaskFollowUpDateCmd.
+   *
+   * @param taskId the id of the referenced task, non-null
+   * @param value  the followUpDate value to set, non-null
+   * @throws NullValueException in case the given taskId or the given followUpDate value are null
+   */
   public SetTaskFollowUpDateCmd(String taskId, Date value) {
     super(taskId, value);
   }

@@ -17,11 +17,22 @@
 
 package org.camunda.bpm.engine.impl.cmd;
 
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 
+/**
+ * Command that changes the description of a task.
+ */
 public class SetTaskDescriptionCmd extends AbstractSetTaskPropertyCmd<String> {
 
+  /**
+   * Public Constructor.
+   *
+   * @param taskId      the id of the task whose description should be changed
+   * @param description the new description value to change to
+   * @throws NullValueException in case the given taskId or the given description are null
+   */
   public SetTaskDescriptionCmd(String taskId, String description) {
     super(taskId, description);
   }

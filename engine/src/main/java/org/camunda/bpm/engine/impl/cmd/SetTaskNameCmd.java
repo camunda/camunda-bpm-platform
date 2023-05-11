@@ -16,11 +16,22 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 
+/**
+ * Command to change a Task's name to a new value.
+ */
 public class SetTaskNameCmd extends AbstractSetTaskPropertyCmd<String> {
 
+  /**
+   * Public Constructor.
+   *
+   * @param taskId the id of the referenced task, non-null
+   * @param name   the new name value to set, non-null
+   * @throws NullValueException in case the given taskId or the given name value are null
+   */
   public SetTaskNameCmd(String taskId, String name) {
     super(taskId, name);
   }

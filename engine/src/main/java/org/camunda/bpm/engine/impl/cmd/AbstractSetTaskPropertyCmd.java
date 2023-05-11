@@ -38,6 +38,13 @@ public abstract class AbstractSetTaskPropertyCmd<T> implements Command<Void>, Se
   protected final String taskId;
   protected final T value;
 
+  /**
+   * Constructor of Commands that wish to set a property to a given task.
+   *
+   * @param taskId the id of the task whose property should be changed
+   * @param value  the new value to set to the referenced task
+   * @throws NullValueException in case the given taskId or the given value are null
+   */
   public AbstractSetTaskPropertyCmd(String taskId, T value) {
     this.taskId = validateAndGet(taskId);
     this.value = validateAndGet(value);
