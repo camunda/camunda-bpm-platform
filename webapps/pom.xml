@@ -166,6 +166,7 @@
           <npmVersion>${version.npm}</npmVersion>
           <workingDirectory>./frontend</workingDirectory>
           <outputdir>${project.build.directory}/webapp</outputdir>
+          <skip>${skip.frontend.build}</skip>
         </configuration>
         <executions>
           <execution>
@@ -343,6 +344,13 @@
       <modules>
         <module>assembly-jakarta</module>
       </modules>
+    </profile>
+
+    <profile>
+      <id>skipFrontendBuild</id>
+      <properties>
+        <skip.frontend.build>true</skip.frontend.build>
+      </properties>
     </profile>
   </profiles>
 
