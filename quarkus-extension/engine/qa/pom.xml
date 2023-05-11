@@ -44,7 +44,7 @@
           </systemPropertyVariables>
 
           <dependenciesToScan>
-            <dependency>org.camunda.bpm:camunda-engine-cdi</dependency>
+            <dependency>org.camunda.bpm:camunda-engine-cdi-jakarta</dependency>
           </dependenciesToScan>
 
           <excludes>
