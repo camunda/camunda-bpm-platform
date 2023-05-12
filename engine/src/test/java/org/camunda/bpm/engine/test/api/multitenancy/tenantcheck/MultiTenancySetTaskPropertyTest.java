@@ -124,7 +124,7 @@ public class MultiTenancySetTaskPropertyTest {
   }
 
   @Test
-  public void setOperationForTaskWithAuthenticatedTenant() {
+  public void shouldSetOperationForTaskWithAuthenticatedTenant() {
     // given
     identityService.setAuthentication("aUserId", null, Collections.singletonList(TENANT_ONE));
 
@@ -136,7 +136,7 @@ public class MultiTenancySetTaskPropertyTest {
   }
 
   @Test
-  public void setOperationForTaskWithNoAuthenticatedTenant() {
+  public void shouldSetOperationForTaskWithNoAuthenticatedTenant() {
     // given
     identityService.setAuthentication("aUserId", null);
 
@@ -149,7 +149,7 @@ public class MultiTenancySetTaskPropertyTest {
   }
 
   @Test
-  public void setOperationForTaskWithDisabledTenantCheck() {
+  public void shouldSetOperationForTaskWithDisabledTenantCheck() {
     // given
     identityService.setAuthentication("aUserId", null);
     engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);

@@ -50,7 +50,7 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
   protected static final String PROCESS_KEY = "oneTaskProcess";
 
   @Rule
-  public EntityRemoveRule cleanupRule = new EntityRemoveRule(testRule);
+  public EntityRemoveRule entityRemoveRule = new EntityRemoveRule(testRule);
 
   protected final String operationName;
   protected final TriConsumer<TaskService, String, Object> operation;
@@ -118,7 +118,7 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
 
   @Test
   @RemoveAfter
-  public void setOperationStandalone() {
+  public void shouldSetOperationStandalone() {
     // given
     createTask(taskId);
     createGrantAuthorization(TASK, taskId, userId, UPDATE);
@@ -135,7 +135,7 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
 
   @Test
   @RemoveAfter
-  public void setOperationWithTaskAssignPermission() {
+  public void shouldSetOperationWithTaskAssignPermission() {
     // given
     createTask(taskId);
     createGrantAuthorization(TASK, taskId, userId, TASK_ASSIGN);
@@ -151,7 +151,7 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
   }
 
   @Test
-  public void processWithTaskAssignPermissionOnTask() {
+  public void shouldSetOperationOnProcessWithTaskAssignPermissionOnTask() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -169,7 +169,7 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
   }
 
   @Test
-  public void processTaskOperationWithoutAuthorization() {
+  public void shouldSetOperationOnProcessWithoutAuthorization() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -191,7 +191,7 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
   }
 
   @Test
-  public void processWithUpdatePermissionOnAnyTask() {
+  public void shouldSetOperationOnProcessWithUpdatePermissionOnAnyTask() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -209,7 +209,7 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
   }
 
   @Test
-  public void processWithTaskAssignPermissionOnAnyTask() {
+  public void shouldSetOperationOnProcessWithTaskAssignPermissionOnAnyTask() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -227,7 +227,7 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
   }
 
   @Test
-  public void processWithUpdateTasksPermissionOnProcessDefinition() {
+  public void shouldSetOperationOnProcessWithUpdateTasksPermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -245,7 +245,7 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
   }
 
   @Test
-  public void processWithTaskAssignPermissionOnProcessDefinition() {
+  public void shouldSetOperationOnProcessWithTaskAssignPermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -263,7 +263,7 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
   }
 
   @Test
-  public void processTask() {
+  public void shouldSetOperationOnProcessTask() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -282,7 +282,7 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
   }
 
   @Test
-  public void processWithTaskAssignPermission() {
+  public void shouldSetOperationOnProcessWithTaskAssignPermission() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
