@@ -101,7 +101,7 @@
     "webpack-merge": "5.8.0"
   },
   "xlts": {
-    "xltsVersion": "1.9.0",
+    "xltsVersion": "1.9.1",
     "dependencies": [
       "angular",
       "angular-animate",
