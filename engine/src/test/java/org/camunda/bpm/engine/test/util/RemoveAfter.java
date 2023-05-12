@@ -27,5 +27,11 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface CleanupTask {
+public @interface RemoveAfter {
+
+  /**
+   * An array of class arguments whose related entities should be removed after the execution of the method.
+   * @return the array of classes
+   */
+  Class[] value() default {};
 }

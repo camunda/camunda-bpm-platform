@@ -32,9 +32,9 @@ import java.util.List;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.task.Task;
-import org.camunda.bpm.engine.test.util.CleanupTask;
+import org.camunda.bpm.engine.test.util.EntityRemoveRule;
 import org.camunda.bpm.engine.test.util.ObjectProperty;
-import org.camunda.bpm.engine.test.util.TaskCleanupRule;
+import org.camunda.bpm.engine.test.util.RemoveAfter;
 import org.camunda.bpm.engine.test.util.TriConsumer;
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -50,7 +50,7 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
   protected static final String PROCESS_KEY = "oneTaskProcess";
 
   @Rule
-  public TaskCleanupRule cleanupRule = new TaskCleanupRule(testRule);
+  public EntityRemoveRule cleanupRule = new EntityRemoveRule(testRule);
 
   protected final String operationName;
   protected final TriConsumer<TaskService, String, Object> operation;
@@ -99,7 +99,7 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
   }
 
   @Test
-  @CleanupTask
+  @RemoveAfter
   public void shouldSetOperationWithoutAuthorization() {
     // given
     createTask(taskId);
@@ -110,12 +110,14 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
       fail("Exception expected: It should not be possible to " + operationName);
     } catch (AuthorizationException e) {
       // then
-      testRule.assertTextPresent("The user with id '" + userId + "' does not have one of the following permissions: 'TASK_ASSIGN'", e.getMessage());
+      testRule.assertTextPresent(
+          "The user with id '" + userId + "' does not have one of the following permissions: 'TASK_ASSIGN'",
+          e.getMessage());
     }
   }
 
   @Test
-  @CleanupTask
+  @RemoveAfter
   public void setOperationStandalone() {
     // given
     createTask(taskId);
@@ -132,7 +134,7 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
   }
 
   @Test
-  @CleanupTask
+  @RemoveAfter
   public void setOperationWithTaskAssignPermission() {
     // given
     createTask(taskId);
