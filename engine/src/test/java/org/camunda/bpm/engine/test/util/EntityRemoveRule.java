@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import org.apache.commons.lang3.ArrayUtils;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
@@ -67,21 +66,25 @@ public class EntityRemoveRule extends TestWatcher {
         public void evaluate() throws Throwable {
           base.evaluate();
 
-          if (methodHasRemoveAfterAnnotation) {
-            Class<?>[] classes = ArrayUtils.nullToEmpty(removeAfterAnnotation.value());
-
-            if (classes.length == 0 && defaultRemovalStrategy.isRemoveAll()) {
-              removable.removeAll();
-              return;
-            }
-
-            removable.remove(classes);
+          if (!methodHasRemoveAfterAnnotation) {
+            return;
           }
+
+          if (hasZeroArguments(removeAfterAnnotation) && defaultRemovalStrategy.isRemoveAll()) {
+            removable.removeAll();
+            return;
+          }
+
+          removable.remove(removeAfterAnnotation.value());
         }
       };
     } finally {
       LOG.debug("deleteTasks: {}", methodHasRemoveAfterAnnotation);
     }
+  }
+
+  private boolean hasZeroArguments(RemoveAfter annotation) {
+    return annotation.value() == null || annotation.value().length == 0;
   }
 
   private <T extends Annotation> T getAnnotation(Description description, Class<T> annotation) {
@@ -131,6 +134,7 @@ public class EntityRemoveRule extends TestWatcher {
      */
     public void remove(Class<?> clazz) throws Exception {
       Objects.requireNonNull(clazz, "remove does not accept null arguments");
+
       ThrowingRunnable runnable = mappings.get(clazz);
 
       if (runnable == null) {
