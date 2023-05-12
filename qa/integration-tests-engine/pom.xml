@@ -123,7 +123,7 @@
 
     <dependency>
       <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine-cdi-jakarta</artifactId>
+      <artifactId>camunda-engine-cdi</artifactId>
       <scope>provided</scope>
       <exclusions>
         <exclusion>

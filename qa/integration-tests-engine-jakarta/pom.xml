@@ -279,7 +279,7 @@
                   <!-- Spring excluded until Spring 6 is supported in Engine Spring,
                        Jakarta JPA not supported,
                        some classes manually overridden -->
-                  <!-- <excludes>**/spring/**/*.java,**/jpa/*.java,**/DeploymentHelper.java</excludes> -->
+                  <excludes>**/spring/**/*.java,**/jpa/*.java,**/DeploymentHelper.java</excludes>
                 </resource>
               </resources>
             </configuration>
