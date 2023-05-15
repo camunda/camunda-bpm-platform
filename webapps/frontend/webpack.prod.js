@@ -24,12 +24,29 @@ const commonConfig = require(path.resolve(__dirname, './webpack.common.js'));
 
 const {merge} = require('webpack-merge');
 const TerserPlugin = require('terser-webpack-plugin');
+const HtmlWebPackPlugin = require("html-webpack-plugin");
 const fs = require('fs');
+
+class HtmlAdditionalAttributesPlugin {
+  apply(compiler) {
+    compiler.hooks.compilation.tap(HtmlAdditionalAttributesPlugin.name, compilation => {
+      HtmlWebPackPlugin.getHooks(compilation).alterAssetTags.tap(
+        HtmlAdditionalAttributesPlugin.name,
+        config => {
+          config.assetTags.scripts.forEach(script => {
+            script.attributes['$CSP_NONCE'] = true;
+            script.attributes.charset = 'UTF-8';
+          });
+          return config;
+        }
+      );
+    });
+  }
+}
 
 module.exports = () => {
   const productionConfig = {
     output: {
-      //publicPath: '',
       clean: true
     },
     module: {
@@ -51,7 +68,8 @@ module.exports = () => {
       }),
       new webpack.ProvidePlugin({
         DEV_MODE: false
-      })
+      }),
+      new HtmlAdditionalAttributesPlugin()
     ],
     optimization: {
       minimize: true,
