@@ -18,11 +18,11 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import static org.camunda.bpm.engine.task.IdentityLinkType.isAssignee;
+import static org.camunda.bpm.engine.task.IdentityLinkType.isOwner;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
-import org.camunda.bpm.engine.task.IdentityLinkType;
 
 /**
  * Abstract class that modifies {@link AbstractSetTaskPropertyCmd} to customize validation & logging for
@@ -46,12 +46,12 @@ public abstract class AbstractAddIdentityLinkCmd extends AbstractSetTaskProperty
   @Override
   protected void executeSetOperation(TaskEntity task, Integer value) {
 
-    if (IdentityLinkType.ASSIGNEE.equals(type)) {
+    if (isAssignee(type)) {
       task.setAssignee(userId);
       return;
     }
 
-    if (IdentityLinkType.OWNER.equals(type)) {
+    if (isOwner(type)) {
       task.setOwner(userId);
       return;
     }
@@ -78,7 +78,7 @@ public abstract class AbstractAddIdentityLinkCmd extends AbstractSetTaskProperty
       throw new ProcessEngineException("Incompatible usage: cannot use ASSIGNEE together with a groupId");
     }
 
-    if (!isAssignee(type)  && hasNullIdentity(userId, groupId)) {
+    if (!isAssignee(type) && hasNullIdentity(userId, groupId)) {
       throw new ProcessEngineException("userId and groupId cannot both be null");
     }
   }

@@ -42,4 +42,8 @@ public class IdentityLinkType {
     return ASSIGNEE.equals(type);
   }
 
+  public static boolean isOwner(String type) {
+    return OWNER.equals(type);
+  }
+
 }
