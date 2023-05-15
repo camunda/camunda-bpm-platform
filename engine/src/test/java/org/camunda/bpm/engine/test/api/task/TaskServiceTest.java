@@ -1160,7 +1160,7 @@ public class TaskServiceTest {
       taskService.setAssignee(null, "userId");
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      testRule.assertTextPresent("taskId is null", ae.getMessage());
+      testRule.assertTextPresent("Invalid task id: id is null", ae.getMessage());
     }
   }
 
@@ -1203,7 +1203,7 @@ public class TaskServiceTest {
       taskService.addCandidateUser(null, "userId");
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      testRule.assertTextPresent("taskId is null", ae.getMessage());
+      testRule.assertTextPresent("Invalid task id: id is null", ae.getMessage());
     }
   }
 
@@ -1238,7 +1238,7 @@ public class TaskServiceTest {
       taskService.addCandidateGroup(null, "groupId");
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      testRule.assertTextPresent("taskId is null", ae.getMessage());
+      testRule.assertTextPresent("Invalid task id: id is null", ae.getMessage());
     }
   }
 
@@ -1271,7 +1271,7 @@ public class TaskServiceTest {
       taskService.addGroupIdentityLink(null, "groupId", IdentityLinkType.CANDIDATE);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      testRule.assertTextPresent("taskId is null", ae.getMessage());
+      testRule.assertTextPresent("Invalid task id: id is null", ae.getMessage());
     }
   }
 
@@ -1306,7 +1306,7 @@ public class TaskServiceTest {
       taskService.addUserIdentityLink(null, "userId", IdentityLinkType.CANDIDATE);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      testRule.assertTextPresent("taskId is null", ae.getMessage());
+      testRule.assertTextPresent("Invalid task id: id is null", ae.getMessage());
     }
   }
 
@@ -1498,7 +1498,7 @@ public class TaskServiceTest {
       taskService.setPriority(null, 12345);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      testRule.assertTextPresent("taskId is null", ae.getMessage());
+      testRule.assertTextPresent("Invalid task id: id is null", ae.getMessage());
     }
   }
 

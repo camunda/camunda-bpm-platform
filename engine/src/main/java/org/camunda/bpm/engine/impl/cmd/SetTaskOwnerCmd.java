@@ -18,12 +18,13 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 
 /**
  * @author Danny Gräf
  */
-public class SetTaskOwnerCmd extends AddIdentityLinkCmd {
+public class SetTaskOwnerCmd extends AbstractAddIdentityLinkCmdNew {
 
   private static final long serialVersionUID = 1L;
 
@@ -32,9 +33,7 @@ public class SetTaskOwnerCmd extends AddIdentityLinkCmd {
   }
 
   @Override
-  public Void execute(CommandContext commandContext) {
-    super.execute(commandContext);
+  protected void logOperation(CommandContext context, TaskEntity task) {
     task.logUserOperation(UserOperationLogEntry.OPERATION_TYPE_SET_OWNER);
-    return null;
   }
 }

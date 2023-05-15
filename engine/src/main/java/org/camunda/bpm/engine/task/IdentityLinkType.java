@@ -38,4 +38,8 @@ public class IdentityLinkType {
 
   public static final String OWNER = "owner";
 
+  public static boolean isAssignee(String type) {
+    return ASSIGNEE.equals(type);
+  }
+
 }

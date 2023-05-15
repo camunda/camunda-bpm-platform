@@ -19,12 +19,14 @@ package org.camunda.bpm.engine.impl.cmd;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.UserOperationLogManager;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class AddUserIdentityLinkCmd extends AddIdentityLinkCmd {
+public class AddUserIdentityLinkCmd extends AbstractAddIdentityLinkCmdNew {
 
   private static final long serialVersionUID = 1L;
 
@@ -33,15 +35,11 @@ public class AddUserIdentityLinkCmd extends AddIdentityLinkCmd {
   }
 
   @Override
-  public Void execute(CommandContext commandContext) {
-    super.execute(commandContext);
-
+  protected void logOperation(CommandContext context, TaskEntity task) {
     PropertyChange propertyChange = new PropertyChange(type, null, userId);
-    
-    commandContext.getOperationLogManager()
-      .logLinkOperation(UserOperationLogEntry.OPERATION_TYPE_ADD_USER_LINK, task, propertyChange);
-    
-    return null;
+    UserOperationLogManager logManager = context.getOperationLogManager();
+
+    logManager.logLinkOperation(UserOperationLogEntry.OPERATION_TYPE_ADD_USER_LINK, task, propertyChange);
   }
 
 }

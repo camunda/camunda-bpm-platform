@@ -84,9 +84,13 @@ public abstract class AbstractSetTaskPropertyCmd<T> implements Command<Void>, Se
     executeSetOperation(task, value);
 
     task.triggerUpdateEvent();
-    task.logUserOperation(getUserOperationLogName());
+    logOperation(context, task);
 
     return null;
+  }
+
+  protected void logOperation(CommandContext context, TaskEntity task) {
+    task.logUserOperation(getUserOperationLogName());
   }
 
   /**
