@@ -4453,7 +4453,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     assertEquals(80, task.getPriority());
   }
 
-  // get sub tasks ((standalone) task) ////////////////////////////////////`
+  // get sub tasks ((standalone) task) ////////////////////////////////////
 
   @Test
   public void testStandaloneTaskGetSubTasksWithoutAuthorization() {

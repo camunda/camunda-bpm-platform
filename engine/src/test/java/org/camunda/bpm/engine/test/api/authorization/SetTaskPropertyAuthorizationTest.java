@@ -69,8 +69,8 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
    */
   @Parameters(name = "{0}")
   public static List<Object[]> data() {
-    TriConsumer<TaskService, String, Object> setName = (taskService, taskId, value) -> taskService.setName(taskId, (String) value);
     TriConsumer<TaskService, String, Object> setPriority = (taskService, taskId, value) -> taskService.setPriority(taskId, (int) value);
+    TriConsumer<TaskService, String, Object> setName = (taskService, taskId, value) -> taskService.setName(taskId, (String) value);
     TriConsumer<TaskService, String, Object> setDescription = (taskService, taskId, value) -> taskService.setDescription(taskId, (String) value);
     TriConsumer<TaskService, String, Object> setDueDate = (taskService, taskId, value) -> taskService.setDueDate(taskId, (Date) value);
     TriConsumer<TaskService, String, Object> setFollowUpDate = (taskService, taskId, value) -> taskService.setFollowUpDate(taskId, (Date) value);

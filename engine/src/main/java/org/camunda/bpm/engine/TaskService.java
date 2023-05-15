@@ -495,7 +495,7 @@ public interface TaskService {
 
   /**
    * Changes the priority of the task.
-   *
+   * <p>
    * Authorization: actual owner / business admin
    *
    * @param taskId id of the task, cannot be null.

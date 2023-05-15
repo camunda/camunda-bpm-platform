@@ -46,9 +46,11 @@ public final class Removable {
    */
   private Removable(ProcessEngine engine) {
     Map<Class<?>, ThrowingRunnable> mappings = new HashMap<>();
+
     mappings.put(Task.class, this::removeAllTasks);
     mappings.put(ProcessInstance.class, this::removeAllProcessInstances);
     mappings.put(Deployment.class, this::removeAllDeployments);
+
     // Add here new mappings with [class - associated remove method]
 
     this.engine = engine;
@@ -93,6 +95,7 @@ public final class Removable {
    */
   public void remove(Class<?>[] classes) throws Exception {
     Objects.requireNonNull(classes, "remove does not accept null arguments");
+
     for (Class<?> clazz : classes) {
       remove(clazz);
     }
