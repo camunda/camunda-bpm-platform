@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.task.IdentityLinkType;
 /**
  * @author Danny Gräf
  */
-public class AssignTaskCmd extends AbstractAddIdentityLinkCmdNew {
+public class AssignTaskCmd extends AbstractAddIdentityLinkCmd {
 
   private static final long serialVersionUID = 1L;
 

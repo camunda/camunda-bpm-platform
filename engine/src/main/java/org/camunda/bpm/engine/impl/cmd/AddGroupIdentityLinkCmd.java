@@ -27,7 +27,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.UserOperationLogManager;
  * @author Daniel Meyer
  *
  */
-public class AddGroupIdentityLinkCmd extends AbstractAddIdentityLinkCmdNew {
+public class AddGroupIdentityLinkCmd extends AbstractAddIdentityLinkCmd {
 
   public AddGroupIdentityLinkCmd(String taskId, String groupId, String type) {
     super(taskId, null, groupId, type);

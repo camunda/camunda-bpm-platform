@@ -28,13 +28,13 @@ import org.camunda.bpm.engine.task.IdentityLinkType;
  * Abstract class that modifies {@link AbstractSetTaskPropertyCmd} to customize validation & logging for
  * Add Identity Link related Commands.
  */
-public abstract class AbstractAddIdentityLinkCmdNew extends AbstractSetTaskPropertyCmd<Integer> {
+public abstract class AbstractAddIdentityLinkCmd extends AbstractSetTaskPropertyCmd<Integer> {
 
   protected final String userId;
   protected final String groupId;
   protected final String type;
 
-  public AbstractAddIdentityLinkCmdNew(String taskId, String userId, String groupId, String type) {
+  public AbstractAddIdentityLinkCmd(String taskId, String userId, String groupId, String type) {
     super(taskId, null, true);
     validateParameters(type, userId, groupId);
 

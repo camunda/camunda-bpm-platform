@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.task.IdentityLinkType;
 /**
  * @author Danny Gräf
  */
-public class SetTaskOwnerCmd extends AbstractAddIdentityLinkCmdNew {
+public class SetTaskOwnerCmd extends AbstractAddIdentityLinkCmd {
 
   private static final long serialVersionUID = 1L;
 

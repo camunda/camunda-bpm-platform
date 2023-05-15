@@ -26,7 +26,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.UserOperationLogManager;
  * @author Daniel Meyer
  *
  */
-public class AddUserIdentityLinkCmd extends AbstractAddIdentityLinkCmdNew {
+public class AddUserIdentityLinkCmd extends AbstractAddIdentityLinkCmd {
 
   private static final long serialVersionUID = 1L;
 
