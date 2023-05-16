@@ -321,7 +321,6 @@
       </build>
       <properties>
         <java.resources.override>src/main/runtime/develop/resources</java.resources.override>
-        <skip.frontend.build>true</skip.frontend.build>
       </properties>
     </profile>
 
@@ -475,7 +474,6 @@
       </build>
       <properties>
         <java.resources.override>src/main/runtime/test/resources</java.resources.override>
-        <skip.frontend.build>true</skip.frontend.build>
       </properties>
     </profile>
 

@@ -580,7 +580,6 @@
       </build>
       <properties>
         <java.resources.override>${jakarta.runtime}/develop/resources</java.resources.override>
-        <skip.frontend.build>true</skip.frontend.build>
       </properties>
     </profile>
 
@@ -602,20 +601,6 @@
       <id>h2</id>
       <properties>
         <project.parent.basedir>./</project.parent.basedir>
-      </properties>
-    </profile>
-
-    <profile>
-      <id>doFrontendBuild</id>
-      <properties>
-        <skip.frontend.build>false</skip.frontend.build>
-      </properties>
-    </profile>
-
-    <profile>
-      <id>skipFrontendBuild</id>
-      <properties>
-        <skip.frontend.build>true</skip.frontend.build>
       </properties>
     </profile>
 

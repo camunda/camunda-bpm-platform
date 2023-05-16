@@ -309,12 +309,6 @@
       <name>jboss</name>
       <url>https://repository.jboss.org/nexus/content/groups/public/</url>
     </repository>
-    <!-- required for commonJ dependency -->
-    <repository>
-      <id>com.springsource.repository.bundles.external</id>
-      <name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
-      <url>https://repo.spring.io/plugins-release</url>
-    </repository>
   </repositories>
 
   <licenses>

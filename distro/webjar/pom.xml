@@ -97,4 +97,14 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>skipFrontendBuild</id>
+      <properties>
+        <skip.frontend.build>true</skip.frontend.build>
+      </properties>
+    </profile>
+  </profiles>
+
 </project>
