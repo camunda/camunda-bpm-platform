@@ -51,8 +51,6 @@ var Controller = [
 
     $scope.variable = variable;
 
-    var file;
-
     $scope.$on('$routeChangeStart', function() {
       $modalInstance.dismiss();
     });
@@ -93,8 +91,9 @@ var Controller = [
         });
       }
 
-      // perform HTML 5 file opload (not supported by IE 9)
+      // perform HTML 5 file upload (not supported by IE 9)
       var fd = new FormData();
+      const file = angular.element('#variableFileUpload')[0].files[0];
       fd.append('data', file);
       fd.append('valueType', variable.type);
 
@@ -108,10 +107,6 @@ var Controller = [
         })
         .then(uploadComplete)
         .catch(uploadFailed);
-    };
-
-    $scope.setFile = function(element) {
-      file = element.files[0];
     };
   }
 ];
