@@ -498,14 +498,12 @@ public interface TaskService {
    * <p>
    * Authorization: actual owner / business admin
    *
-   * @param taskId id of the task, cannot be null.
+   * @param taskId   id of the task, cannot be null.
    * @param priority the new priority for the task.
-   *
-   * @throws NotFoundException when the task doesn't exist.
-   * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
-   *          (if the task is part of a running process instance).
+   * @throws NotFoundException      when the task doesn't exist.
+   * @throws AuthorizationException If the user hasn't any of {@link Permissions#UPDATE}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#TASK}
+   *                                or no {@link Permissions#UPDATE_TASK}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#PROCESS_DEFINITION}
+   *                                (if the task is part of a running process instance).
    */
   void setPriority(String taskId, int priority);
 
@@ -516,8 +514,8 @@ public interface TaskService {
    * @param name   the new task name, not null
    * @throws NullValueException     in case the given arguments are null.
    * @throws NotFoundException      when the task doesn't exist.
-   * @throws AuthorizationException If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
-   *                                or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
+   * @throws AuthorizationException If the user hasn't any of {@link Permissions#UPDATE}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#TASK}
+   *                                or no {@link Permissions#UPDATE_TASK}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#PROCESS_DEFINITION}
    *                                (if the task is part of a running process instance).
    */
   void setName(String taskId, String name);
@@ -529,8 +527,8 @@ public interface TaskService {
    * @param description the new task description, not null
    * @throws NullValueException     in case the given arguments are null.
    * @throws NotFoundException      when the task doesn't exist.
-   * @throws AuthorizationException If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
-   *                                or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
+   * @throws AuthorizationException If the user hasn't any of {@link Permissions#UPDATE}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#TASK}
+   *                                or no {@link Permissions#UPDATE_TASK}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#PROCESS_DEFINITION}
    *                                (if the task is part of a running process instance).
    */
   void setDescription(String taskId, String description);
@@ -542,8 +540,8 @@ public interface TaskService {
    * @param dueDate the new task dueDate, not null
    * @throws NullValueException     in case the given arguments are null.
    * @throws NotFoundException      when the task doesn't exist.
-   * @throws AuthorizationException If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
-   *                                or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
+   * @throws AuthorizationException If the user hasn't any of {@link Permissions#UPDATE}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#TASK}
+   *                                or no {@link Permissions#UPDATE_TASK}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#PROCESS_DEFINITION}
    *                                (if the task is part of a running process instance).
    */
   void setDueDate(String taskId, Date dueDate);
@@ -555,8 +553,8 @@ public interface TaskService {
    * @param followUpDate the new task followUpDate, not null
    * @throws NullValueException     in case the given arguments are null.
    * @throws NotFoundException      when the task doesn't exist.
-   * @throws AuthorizationException If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
-   *                                or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
+   * @throws AuthorizationException If the user hasn't any of {@link Permissions#UPDATE}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#TASK}
+   *                                or no {@link Permissions#UPDATE_TASK}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#PROCESS_DEFINITION}
    *                                (if the task is part of a running process instance).
    */
   void setFollowUpDate(String taskId, Date followUpDate);
