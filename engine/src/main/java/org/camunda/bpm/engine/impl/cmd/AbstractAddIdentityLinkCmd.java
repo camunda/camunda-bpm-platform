@@ -17,12 +17,10 @@
 
 package org.camunda.bpm.engine.impl.cmd;
 
-import static org.camunda.bpm.engine.task.IdentityLinkType.isAssignee;
-import static org.camunda.bpm.engine.task.IdentityLinkType.isOwner;
-
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.task.IdentityLinkType;
 
 /**
  * Abstract class that modifies {@link AbstractSetTaskPropertyCmd} to customize validation & logging for
@@ -60,7 +58,7 @@ public abstract class AbstractAddIdentityLinkCmd extends AbstractSetTaskProperty
   }
 
   /**
-   * Method to be overriden by concrete identity commands that wish to log an operation.
+   * Method to be overridden by concrete identity commands that wish to log an operation.
    *
    * @param context the command context
    * @param task    the task related entity
@@ -75,16 +73,24 @@ public abstract class AbstractAddIdentityLinkCmd extends AbstractSetTaskProperty
   protected void validateParameters(String type, String userId, String groupId) {
 
     if (isAssignee(type) && groupId != null) {
-      throw new ProcessEngineException("Incompatible usage: cannot use ASSIGNEE together with a groupId");
+      throw new BadUserRequestException("Incompatible usage: cannot use ASSIGNEE together with a groupId");
     }
 
     if (!isAssignee(type) && hasNullIdentity(userId, groupId)) {
-      throw new ProcessEngineException("userId and groupId cannot both be null");
+      throw new BadUserRequestException("userId and groupId cannot both be null");
     }
   }
 
   protected boolean hasNullIdentity(String userId, String groupId) {
     return (userId == null) && (groupId == null);
+  }
+
+  protected boolean isAssignee(String type) {
+    return IdentityLinkType.ASSIGNEE.equals(type);
+  }
+
+  protected boolean isOwner(String type) {
+    return IdentityLinkType.OWNER.equals(type);
   }
 
 }
