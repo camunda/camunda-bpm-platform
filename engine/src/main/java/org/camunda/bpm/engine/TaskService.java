@@ -328,8 +328,7 @@ public interface TaskService {
    * @param taskId id of the task, cannot be null.
    * @param userId id of the user to use as assignee.
    *
-   * @throws ProcessEngineException
-   *          when the task or user doesn't exist.
+   * @throws NotFoundException when the task or user doesn't exist.
    * @throws AuthorizationException If the user hasn't any of {@link Permissions#UPDATE}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#TASK}
    *                                or no {@link Permissions#UPDATE_TASK}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#PROCESS_DEFINITION}
    *                                (if the task is part of a running process instance).
@@ -342,7 +341,7 @@ public interface TaskService {
    *
    * @param taskId id of the task, cannot be null.
    * @param userId of the person that is receiving ownership.
-   * @throws ProcessEngineException when the task or user doesn't exist.
+   * @throws NotFoundException when the task or user doesn't exist.
    * @throws AuthorizationException If the user hasn't any of {@link Permissions#UPDATE}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#TASK}
    *                                or no {@link Permissions#UPDATE_TASK}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#PROCESS_DEFINITION}
    *                                (if the task is part of a running process instance).
