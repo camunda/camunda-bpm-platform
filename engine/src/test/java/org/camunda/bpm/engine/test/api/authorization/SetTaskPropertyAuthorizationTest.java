@@ -100,7 +100,7 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
 
   @Test
   @RemoveAfter
-  public void shouldSetOperationWithoutAuthorization() {
+  public void shouldSetOperationStandaloneWithoutAuthorization() {
     // given
     createTask(taskId);
 
@@ -135,7 +135,7 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
 
   @Test
   @RemoveAfter
-  public void shouldSetOperationWithTaskAssignPermission() {
+  public void shouldSetOperationStandaloneWithTaskAssignPermission() {
     // given
     createTask(taskId);
     createGrantAuthorization(TASK, taskId, userId, TASK_ASSIGN);
