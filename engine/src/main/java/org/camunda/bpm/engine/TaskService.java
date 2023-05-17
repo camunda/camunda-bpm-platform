@@ -330,10 +330,9 @@ public interface TaskService {
    *
    * @throws ProcessEngineException
    *          when the task or user doesn't exist.
-   * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
-   *          (if the task is part of a running process instance).
+   * @throws AuthorizationException If the user hasn't any of {@link Permissions#UPDATE}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#TASK}
+   *                                or no {@link Permissions#UPDATE_TASK}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#PROCESS_DEFINITION}
+   *                                (if the task is part of a running process instance).
    */
   void setAssignee(String taskId, String userId);
 
@@ -343,13 +342,10 @@ public interface TaskService {
    *
    * @param taskId id of the task, cannot be null.
    * @param userId of the person that is receiving ownership.
-   *
-   * @throws ProcessEngineException
-   *          when the task or user doesn't exist.
-   * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
-   *          (if the task is part of a running process instance).
+   * @throws ProcessEngineException when the task or user doesn't exist.
+   * @throws AuthorizationException If the user hasn't any of {@link Permissions#UPDATE}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#TASK}
+   *                                or no {@link Permissions#UPDATE_TASK}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#PROCESS_DEFINITION}
+   *                                (if the task is part of a running process instance).
    */
   void setOwner(String taskId, String userId);
 
