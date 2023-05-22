@@ -18,6 +18,7 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.task.IdentityLinkType;
@@ -77,7 +78,7 @@ public abstract class AbstractAddIdentityLinkCmd extends AbstractSetTaskProperty
     }
 
     if (!isAssignee(type) && hasNullIdentity(userId, groupId)) {
-      throw new BadUserRequestException("userId and groupId cannot both be null");
+      throw new NullValueException("userId and groupId cannot both be null");
     }
   }
 

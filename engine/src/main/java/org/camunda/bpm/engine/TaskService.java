@@ -328,6 +328,7 @@ public interface TaskService {
    * @param taskId id of the task, cannot be null.
    * @param userId id of the user to use as assignee.
    *
+   * @throws NullValueException in case the given taskId is null.
    * @throws NotFoundException when the task or user doesn't exist.
    * @throws AuthorizationException If the user hasn't any of {@link Permissions#UPDATE}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#TASK}
    *                                or no {@link Permissions#UPDATE_TASK}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#PROCESS_DEFINITION}
@@ -341,6 +342,8 @@ public interface TaskService {
    *
    * @param taskId id of the task, cannot be null.
    * @param userId of the person that is receiving ownership.
+   *
+   * @throws NullValueException in case the given taskId or userId is null.
    * @throws NotFoundException when the task or user doesn't exist.
    * @throws AuthorizationException If the user hasn't any of {@link Permissions#UPDATE}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#TASK}
    *                                or no {@link Permissions#UPDATE_TASK}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#PROCESS_DEFINITION}
@@ -368,12 +371,11 @@ public interface TaskService {
    * @param taskId id of the task, cannot be null.
    * @param userId id of the user to use as candidate, cannot be null.
    *
-   * @throws ProcessEngineException
-   *          when the task or user doesn't exist.
-   * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
-   *          (if the task is part of a running process instance).
+   * @throws NullValueException in case the given taskId or userId is null.
+   * @throws NotFoundException when the task doesn't exist.
+   * @throws AuthorizationException If the user hasn't any of {@link Permissions#UPDATE}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#TASK}
+   *                                or no {@link Permissions#UPDATE_TASK}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#PROCESS_DEFINITION}
+   *                                (if the task is part of a running process instance).
    */
   void addCandidateUser(String taskId, String userId);
 
@@ -383,12 +385,11 @@ public interface TaskService {
    * @param taskId id of the task, cannot be null.
    * @param groupId id of the group to use as candidate, cannot be null.
    *
-   * @throws ProcessEngineException
-   *          when the task or group doesn't exist.
-   * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
-   *          (if the task is part of a running process instance).
+   * @throws NullValueException in case the given taskId or groupId is null.
+   * @throws NotFoundException when the task doesn't exist.
+   * @throws AuthorizationException If the user hasn't any of {@link Permissions#UPDATE}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#TASK}
+   *                                or no {@link Permissions#UPDATE_TASK}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#PROCESS_DEFINITION}
+   *                                (if the task is part of a running process instance).
    */
   void addCandidateGroup(String taskId, String groupId);
 
@@ -400,12 +401,11 @@ public interface TaskService {
    * @param userId id of the user involve, cannot be null.
    * @param identityLinkType type of identityLink, cannot be null (@see {@link IdentityLinkType}).
    *
-   * @throws ProcessEngineException
-   *          when the task or user doesn't exist.
-   * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
-   *          (if the task is part of a running process instance).
+   * @throws NullValueException in case the given taskId or userId is null.
+   * @throws NotFoundException when the task doesn't exist.
+   * @throws AuthorizationException If the user hasn't any of {@link Permissions#UPDATE}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#TASK}
+   *                                or no {@link Permissions#UPDATE_TASK}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#PROCESS_DEFINITION}
+   *                                (if the task is part of a running process instance).
    */
   void addUserIdentityLink(String taskId, String userId, String identityLinkType);
 
@@ -417,12 +417,11 @@ public interface TaskService {
    * @param groupId id of the group to involve, cannot be null.
    * @param identityLinkType type of identity, cannot be null (@see {@link IdentityLinkType}).
    *
-   * @throws ProcessEngineException
-   *          when the task or group doesn't exist.
-   * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#TASK}
-   *          or no {@link Permissions#UPDATE_TASK} permission on {@link Resources#PROCESS_DEFINITION}
-   *          (if the task is part of a running process instance).
+   * @throws NullValueException in case the given taskId or groupId is null.
+   * @throws NotFoundException when the task doesn't exist.
+   * @throws AuthorizationException If the user hasn't any of {@link Permissions#UPDATE}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#TASK}
+   *                                or no {@link Permissions#UPDATE_TASK}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#PROCESS_DEFINITION}
+   *                                (if the task is part of a running process instance).
    */
   void addGroupIdentityLink(String taskId, String groupId, String identityLinkType);
 
@@ -495,6 +494,7 @@ public interface TaskService {
    *
    * @param taskId   id of the task, cannot be null.
    * @param priority the new priority for the task.
+   * @throws NullValueException     in case the given taskId is null.
    * @throws NotFoundException      when the task doesn't exist.
    * @throws AuthorizationException If the user hasn't any of {@link Permissions#UPDATE}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#TASK}
    *                                or no {@link Permissions#UPDATE_TASK}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#PROCESS_DEFINITION}
