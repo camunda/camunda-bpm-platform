@@ -17,7 +17,9 @@
 package org.camunda.bpm.engine.impl.jobexecutor.historycleanup;
 
 import java.util.Date;
+import org.camunda.bpm.engine.history.HistoryCleanupRetryConfiguration;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ConstantValueProvider;
@@ -54,7 +56,6 @@ public class HistoryCleanupJobDeclaration extends JobDeclaration<HistoryCleanupC
   protected void postInitialize(HistoryCleanupContext context, EverLivingJobEntity job) {
   }
 
-
   @Override
   public EverLivingJobEntity reconfigure(HistoryCleanupContext context, EverLivingJobEntity job) {
     HistoryCleanupJobHandlerConfiguration configuration = resolveJobHandlerConfiguration(context);
@@ -69,6 +70,17 @@ public class HistoryCleanupJobDeclaration extends JobDeclaration<HistoryCleanupC
     config.setMinuteFrom(context.getMinuteFrom());
     config.setMinuteTo(context.getMinuteTo());
     return config;
+  }
+
+  @Override
+  protected int resolveRetries(HistoryCleanupContext context) {
+    HistoryCleanupRetryConfiguration retryConfiguration = context.getRetryConfiguration();
+
+    if (retryConfiguration.isEmpty()) {
+      return super.resolveRetries(context);
+    }
+
+    return retryConfiguration.getMaxNumberOfRetries();
   }
 
   @Override
@@ -92,8 +104,9 @@ public class HistoryCleanupJobDeclaration extends JobDeclaration<HistoryCleanupC
   }
 
   public ParameterValueProvider getJobPriorityProvider() {
-    long historyCleanupJobPriority = Context.getProcessEngineConfiguration()
-        .getHistoryCleanupJobPriority();
+    ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
+    long historyCleanupJobPriority = configuration.getHistoryCleanupJobPriority();
+
     return new ConstantValueProvider(historyCleanupJobPriority);
   }
 }

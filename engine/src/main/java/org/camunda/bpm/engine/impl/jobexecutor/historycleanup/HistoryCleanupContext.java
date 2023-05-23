@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.impl.jobexecutor.historycleanup;
 
+import org.camunda.bpm.engine.history.HistoryCleanupRetryConfiguration;
+
 /**
  * @author Svetlana Dorokhova.
  */
@@ -24,11 +26,13 @@ public class HistoryCleanupContext {
   private boolean immediatelyDue;
   private int minuteFrom;
   private int minuteTo;
+  private HistoryCleanupRetryConfiguration retryConfiguration;
 
-  public HistoryCleanupContext(boolean immediatelyDue, int minuteFrom, int minuteTo) {
+  public HistoryCleanupContext(boolean immediatelyDue, int minuteFrom, int minuteTo, HistoryCleanupRetryConfiguration retryConfiguration) {
     this.immediatelyDue = immediatelyDue;
     this.minuteFrom = minuteFrom;
     this.minuteTo = minuteTo;
+    this.retryConfiguration = retryConfiguration;
   }
 
   public HistoryCleanupContext(int minuteFrom, int minuteTo) {
@@ -58,5 +62,13 @@ public class HistoryCleanupContext {
 
   public void setMinuteTo(int minuteTo) {
     this.minuteTo = minuteTo;
+  }
+
+  public HistoryCleanupRetryConfiguration getRetryConfiguration() {
+    return this.retryConfiguration;
+  }
+
+  public void setRetryConfiguration(HistoryCleanupRetryConfiguration retryConfiguration) {
+    this.retryConfiguration = retryConfiguration;
   }
 }
