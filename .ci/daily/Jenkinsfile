@@ -164,47 +164,7 @@ pipeline {
             ])
           }
         }
-        stage('wildfly-subsystem-UNIT-wildfly') {
-          when {
-            expression {
-              cambpmWithLabels('wildfly')
-            }
-          }
-          steps {
-            cambpmConditionalRetry([
-              agentLabel: 'h2',
-              runSteps: {
-                cambpmRunMaven('distro/wildfly/subsystem',
-                  'test',
-                  runtimeStash: true,
-                  // we need to use JDK 11 for WildFly 27+
-                  jdkVersion: 'jdk-11-latest')
-              },
-              postFailure: {
-                cambpmPublishTestResult()
-              }
-            ])
-          }
-        }
-        stage('wildfly26-subsystem-UNIT-wildfly') {
-          when {
-            expression {
-              cambpmWithLabels('wildfly')
-            }
-          }
-          steps {
-            cambpmConditionalRetry([
-              agentLabel: 'h2',
-              runSteps: {
-                cambpmRunMaven('distro/wildfly26/subsystem', 'test', runtimeStash: true)
-              },
-              postFailure: {
-                cambpmPublishTestResult()
-              }
-            ])
-          }
-        }
-        stage('UPGRADE-databases-from-714-h2') {
+        stage('UPGRADE-databases-h2') {
           when {
             expression {
               cambpmWithLabels('h2', 'all-db')
@@ -242,7 +202,7 @@ pipeline {
             ])
           }
         }
-        stage('UPGRADE-old-engine-from-714-h2') {
+        stage('UPGRADE-old-engine-h2') {
           when {
             expression {
               cambpmWithLabels('h2', 'all-db')
