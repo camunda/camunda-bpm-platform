@@ -27,22 +27,6 @@ const webpack = require('webpack');
 
 const {version} = require(path.resolve(__dirname, './package.json'));
 
-class HtmlNoncePlugin {
-  apply(compiler) {
-    compiler.hooks.compilation.tap(HtmlNoncePlugin.name, compilation => {
-      HtmlWebPackPlugin.getHooks(compilation).alterAssetTags.tap(
-        HtmlNoncePlugin.name,
-        config => {
-          config.assetTags.scripts.forEach(script => {
-            script.attributes['$CSP_NONCE'] = true;
-          });
-          return config;
-        }
-      );
-    });
-  }
-}
-
 module.exports = {
   entry: {
     /* Cockpit */
@@ -203,7 +187,6 @@ module.exports = {
       favicon: path.resolve(__dirname, 'ui/common/images/favicon.ico'),
       publicPath: '$APP_ROOT'
     }),
-    new HtmlNoncePlugin(),
     new MiniCssExtractPlugin({
       // both options are optional, similar to the same options in webpackOptions.output
       filename: `[name].css?bust=${version}`,

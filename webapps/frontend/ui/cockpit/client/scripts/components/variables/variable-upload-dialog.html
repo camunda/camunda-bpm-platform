@@ -20,12 +20,12 @@ This feature is unsupported in your Browser.
     <p>{{ 'VARIABLE_UPLOAD_SELECT_FILE' | translate }}:</p>
 
     <p>
-      <input name="data"
+      <input id="variableFileUpload"
+             name="data"
              type="file"
              size="50"
              maxlength="100000"
-             accept="*/*"
-             onchange="angular.element(this).scope().setFile(this)" />
+             accept="*/*" />
     </p>
 
   </div>
