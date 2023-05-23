@@ -21,6 +21,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,6 +64,10 @@ import org.camunda.bpm.engine.impl.cmd.RemoveTaskVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.ResolveTaskCmd;
 import org.camunda.bpm.engine.impl.cmd.SaveAttachmentCmd;
 import org.camunda.bpm.engine.impl.cmd.SaveTaskCmd;
+import org.camunda.bpm.engine.impl.cmd.SetTaskDescriptionCmd;
+import org.camunda.bpm.engine.impl.cmd.SetTaskDueDateCmd;
+import org.camunda.bpm.engine.impl.cmd.SetTaskFollowUpDateCmd;
+import org.camunda.bpm.engine.impl.cmd.SetTaskNameCmd;
 import org.camunda.bpm.engine.impl.cmd.SetTaskOwnerCmd;
 import org.camunda.bpm.engine.impl.cmd.SetTaskPriorityCmd;
 import org.camunda.bpm.engine.impl.cmd.SetTaskVariablesCmd;
@@ -196,6 +201,26 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
 
   public void setPriority(String taskId, int priority) {
     commandExecutor.execute(new SetTaskPriorityCmd(taskId, priority) );
+  }
+
+  @Override
+  public void setName(String taskId, String name) {
+    commandExecutor.execute(new SetTaskNameCmd(taskId, name));
+  }
+
+  @Override
+  public void setDescription(String taskId, String description) {
+    commandExecutor.execute(new SetTaskDescriptionCmd(taskId, description));
+  }
+
+  @Override
+  public void setDueDate(String taskId, Date dueDate) {
+    commandExecutor.execute(new SetTaskDueDateCmd(taskId, dueDate));
+  }
+
+  @Override
+  public void setFollowUpDate(String taskId, Date followUpDate) {
+    commandExecutor.execute(new SetTaskFollowUpDateCmd(taskId, followUpDate));
   }
 
   public TaskQuery createTaskQuery() {

@@ -51,6 +51,7 @@ import org.camunda.bpm.engine.TaskAlreadyClaimedException;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.identity.Group;
@@ -79,6 +80,7 @@ import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.engine.test.util.RemoveAfter;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
@@ -1159,8 +1161,8 @@ public class TaskServiceTest {
     try {
       taskService.setAssignee(null, "userId");
       fail("ProcessEngineException expected");
-    } catch (ProcessEngineException ae) {
-      testRule.assertTextPresent("taskId is null", ae.getMessage());
+    } catch (NullValueException ae) {
+      testRule.assertTextPresent("Invalid task id: id is null", ae.getMessage());
     }
   }
 
@@ -1172,11 +1174,51 @@ public class TaskServiceTest {
     try {
       taskService.setAssignee("unexistingTaskId", user.getId());
       fail("ProcessEngineException expected");
-    } catch (ProcessEngineException ae) {
+    } catch (NotFoundException ae) {
       testRule.assertTextPresent("Cannot find task with id unexistingTaskId", ae.getMessage());
     }
 
     identityService.deleteUser(user.getId());
+  }
+
+  @Test
+  public void testSetOwnerNullTaskId() {
+    try {
+      taskService.setOwner(null, "userId");
+      fail("ProcessEngineException expected");
+    } catch (NullValueException ae) {
+      testRule.assertTextPresent("Invalid task id: id is null", ae.getMessage());
+    }
+  }
+
+  @Test
+  public void testSetOwnerUnexistingTask() {
+    User user = identityService.newUser("user");
+    identityService.saveUser(user);
+
+    try {
+      taskService.setOwner("unexistingTaskId", user.getId());
+      fail("ProcessEngineException expected");
+    } catch (NotFoundException ae) {
+      testRule.assertTextPresent("Cannot find task with id unexistingTaskId", ae.getMessage());
+    }
+
+    identityService.deleteUser(user.getId());
+  }
+
+  @Test
+  public void testSetOwnerNullUser() {
+    Task task = taskService.newTask();
+    taskService.saveTask(task);
+
+    try {
+      taskService.setOwner(task.getId(), null);
+      fail("ProcessEngineException expected");
+    } catch (NullValueException ae) {
+      testRule.assertTextPresent("userId and groupId cannot both be null", ae.getMessage());
+    }
+
+    taskService.deleteTask(task.getId(), true);
   }
 
   @Test
@@ -1202,8 +1244,8 @@ public class TaskServiceTest {
     try {
       taskService.addCandidateUser(null, "userId");
       fail("ProcessEngineException expected");
-    } catch (ProcessEngineException ae) {
-      testRule.assertTextPresent("taskId is null", ae.getMessage());
+    } catch (NullValueException ae) {
+      testRule.assertTextPresent("Invalid task id: id is null", ae.getMessage());
     }
   }
 
@@ -1212,7 +1254,7 @@ public class TaskServiceTest {
     try {
       taskService.addCandidateUser("taskId", null);
       fail("ProcessEngineException expected");
-    } catch (ProcessEngineException ae) {
+    } catch (NullValueException ae) {
       testRule.assertTextPresent("userId and groupId cannot both be null", ae.getMessage());
     }
   }
@@ -1237,8 +1279,8 @@ public class TaskServiceTest {
     try {
       taskService.addCandidateGroup(null, "groupId");
       fail("ProcessEngineException expected");
-    } catch (ProcessEngineException ae) {
-      testRule.assertTextPresent("taskId is null", ae.getMessage());
+    } catch (NullValueException ae) {
+      testRule.assertTextPresent("Invalid task id: id is null", ae.getMessage());
     }
   }
 
@@ -1247,7 +1289,7 @@ public class TaskServiceTest {
     try {
       taskService.addCandidateGroup("taskId", null);
       fail("ProcessEngineException expected");
-    } catch (ProcessEngineException ae) {
+    } catch (NullValueException ae) {
       testRule.assertTextPresent("userId and groupId cannot both be null", ae.getMessage());
     }
   }
@@ -1270,8 +1312,8 @@ public class TaskServiceTest {
     try {
       taskService.addGroupIdentityLink(null, "groupId", IdentityLinkType.CANDIDATE);
       fail("ProcessEngineException expected");
-    } catch (ProcessEngineException ae) {
-      testRule.assertTextPresent("taskId is null", ae.getMessage());
+    } catch (NullValueException ae) {
+      testRule.assertTextPresent("Invalid task id: id is null", ae.getMessage());
     }
   }
 
@@ -1280,7 +1322,7 @@ public class TaskServiceTest {
     try {
       taskService.addGroupIdentityLink("taskId", null, IdentityLinkType.CANDIDATE);
       fail("ProcessEngineException expected");
-    } catch (ProcessEngineException ae) {
+    } catch (NullValueException ae) {
       testRule.assertTextPresent("userId and groupId cannot both be null", ae.getMessage());
     }
   }
@@ -1305,8 +1347,8 @@ public class TaskServiceTest {
     try {
       taskService.addUserIdentityLink(null, "userId", IdentityLinkType.CANDIDATE);
       fail("ProcessEngineException expected");
-    } catch (ProcessEngineException ae) {
-      testRule.assertTextPresent("taskId is null", ae.getMessage());
+    } catch (NullValueException ae) {
+      testRule.assertTextPresent("Invalid task id: id is null", ae.getMessage());
     }
   }
 
@@ -1315,7 +1357,7 @@ public class TaskServiceTest {
     try {
       taskService.addUserIdentityLink("taskId", null, IdentityLinkType.CANDIDATE);
       fail("ProcessEngineException expected");
-    } catch (ProcessEngineException ae) {
+    } catch (NullValueException ae) {
       testRule.assertTextPresent("userId and groupId cannot both be null", ae.getMessage());
     }
   }
@@ -1487,7 +1529,7 @@ public class TaskServiceTest {
     try {
       taskService.setPriority("unexistingtask", 12345);
       fail("ProcessEngineException expected");
-    } catch (ProcessEngineException ae) {
+    } catch (NotFoundException ae) {
       testRule.assertTextPresent("Cannot find task with id unexistingtask", ae.getMessage());
     }
   }
@@ -1497,9 +1539,149 @@ public class TaskServiceTest {
     try {
       taskService.setPriority(null, 12345);
       fail("ProcessEngineException expected");
-    } catch (ProcessEngineException ae) {
+    } catch (NullValueException ae) {
+      testRule.assertTextPresent("Invalid task id: id is null", ae.getMessage());
+    }
+  }
+
+  @Test
+  public void testSetNameUnexistingTaskId() {
+    try {
+      taskService.setName("unexistingtask", "foo");
+      fail("ProcessEngineException expected");
+    } catch (NotFoundException ae) {
+      testRule.assertTextPresent("Cannot find task with id unexistingtask", ae.getMessage());
+    }
+  }
+
+  @Test
+  public void testSetNameNullTaskId() {
+    try {
+      taskService.setName(null, "foo");
+      fail("ProcessEngineException expected");
+    } catch (NullValueException ae) {
       testRule.assertTextPresent("taskId is null", ae.getMessage());
     }
+  }
+
+  @Test
+  public void testSetNameNullTaskName() {
+    Task task = taskService.newTask();
+    taskService.saveTask(task);
+
+    try {
+      taskService.setName(task.getId(), null);
+      fail("ProcessEngineException expected");
+    } catch (NullValueException ae) {
+      testRule.assertTextPresent("value is null", ae.getMessage());
+    }
+
+    taskService.deleteTask(task.getId(), true);
+  }
+
+  @Test
+  public void testSetDescriptionUnexistingTaskId() {
+    try {
+      taskService.setDescription("unexistingtask", "foo");
+      fail("ProcessEngineException expected");
+    } catch (NotFoundException ae) {
+      testRule.assertTextPresent("Cannot find task with id unexistingtask", ae.getMessage());
+    }
+  }
+
+  @Test
+  public void testSetDescriptionNullTaskId() {
+    try {
+      taskService.setDescription(null, "foo");
+      fail("ProcessEngineException expected");
+    } catch (NullValueException ae) {
+      testRule.assertTextPresent("taskId is null", ae.getMessage());
+    }
+  }
+
+  @Test
+  public void testSetDescriptionNullDescription() {
+    Task task = taskService.newTask();
+    taskService.saveTask(task);
+
+    try {
+      taskService.setDescription(task.getId(), null);
+      fail("ProcessEngineException expected");
+    } catch (NullValueException ae) {
+      testRule.assertTextPresent("value is null", ae.getMessage());
+    }
+
+    taskService.deleteTask(task.getId(), true);
+  }
+
+  @Test
+  public void testSetDueDateUnexistingTaskId() {
+    try {
+      taskService.setDueDate("unexistingtask", new Date());
+      fail("ProcessEngineException expected");
+    } catch (NotFoundException ae) {
+      testRule.assertTextPresent("Cannot find task with id unexistingtask", ae.getMessage());
+    }
+  }
+
+  @Test
+  public void testSetDueDateNullTaskId() {
+    try {
+      taskService.setDueDate(null, new Date());
+      fail("ProcessEngineException expected");
+    } catch (NullValueException ae) {
+      testRule.assertTextPresent("taskId is null", ae.getMessage());
+    }
+  }
+
+  @Test
+  public void testSetDueDateNullDueDate() {
+    Task task = taskService.newTask();
+    taskService.saveTask(task);
+
+    try {
+      taskService.setDueDate(task.getId(), null);
+      fail("ProcessEngineException expected");
+    } catch (NullValueException ae) {
+      testRule.assertTextPresent("value is null", ae.getMessage());
+    }
+
+    taskService.deleteTask(task.getId(), true);
+  }
+
+  @Test
+  public void testSetFollowUpDateUnexistingTaskId() {
+    try {
+      taskService.setFollowUpDate("unexistingtask", new Date());
+      fail("ProcessEngineException expected");
+    } catch (NotFoundException ae) {
+      testRule.assertTextPresent("Cannot find task with id unexistingtask", ae.getMessage());
+    }
+  }
+
+  @Test
+  public void testSetFollowUpDateNullTaskId() {
+    try {
+      taskService.setFollowUpDate(null, new Date());
+      fail("ProcessEngineException expected");
+    } catch (NullValueException ae) {
+      testRule.assertTextPresent("taskId is null", ae.getMessage());
+    }
+  }
+
+  @Test
+  public void testSetFollowUpDateNullFollowUpDate() {
+    Task task = taskService.newTask();
+    taskService.saveTask(task);
+
+    try {
+      taskService.setFollowUpDate(task.getId(), null);
+      fail("ProcessEngineException expected");
+    } catch (NullValueException ae) {
+      testRule.assertTextPresent("value is null", ae.getMessage());
+    }
+
+    taskService.deleteTask(task.getId(), true);
   }
 
   /**

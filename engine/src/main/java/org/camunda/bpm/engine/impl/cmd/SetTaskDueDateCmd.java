@@ -14,26 +14,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.camunda.bpm.engine.impl.cmd;
 
+import java.util.Date;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
-import org.camunda.bpm.engine.task.IdentityLinkType;
 
 /**
- * @author Danny Gräf
+ * Command to change task priority to a new value.
  */
-public class SetTaskOwnerCmd extends AbstractAddIdentityLinkCmd {
+public class SetTaskDueDateCmd extends AbstractSetTaskPropertyCmd<Date> {
 
-  private static final long serialVersionUID = 1L;
-
-  public SetTaskOwnerCmd(String taskId, String userId) {
-    super(taskId, userId, null, IdentityLinkType.OWNER);
+  /**
+   * Public Constructor.
+   *
+   * @param taskId the id of the referenced task, non-null
+   * @param value  the task dueDate value to set, non-null
+   * @throws NullValueException in case the given taskId or the given dueDate value are null
+   */
+  public SetTaskDueDateCmd(String taskId, Date value) {
+    super(taskId, value);
   }
 
   @Override
-  protected void logOperation(CommandContext context, TaskEntity task) {
-    task.logUserOperation(UserOperationLogEntry.OPERATION_TYPE_SET_OWNER);
+  protected String getUserOperationLogName() {
+    return UserOperationLogEntry.OPERATION_TYPE_SET_DUEDATE;
+  }
+
+  @Override
+  protected void executeSetOperation(TaskEntity task, Date value) {
+    task.setDueDate(value);
   }
 }

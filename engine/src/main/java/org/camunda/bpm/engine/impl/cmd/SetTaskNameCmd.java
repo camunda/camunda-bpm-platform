@@ -16,24 +16,34 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
-import org.camunda.bpm.engine.task.IdentityLinkType;
 
 /**
- * @author Danny Gräf
+ * Command to change a Task's name to a new value.
  */
-public class SetTaskOwnerCmd extends AbstractAddIdentityLinkCmd {
+public class SetTaskNameCmd extends AbstractSetTaskPropertyCmd<String> {
 
-  private static final long serialVersionUID = 1L;
-
-  public SetTaskOwnerCmd(String taskId, String userId) {
-    super(taskId, userId, null, IdentityLinkType.OWNER);
+  /**
+   * Public Constructor.
+   *
+   * @param taskId the id of the referenced task, non-null
+   * @param name   the new name value to set, non-null
+   * @throws NullValueException in case the given taskId or the given name value are null
+   */
+  public SetTaskNameCmd(String taskId, String name) {
+    super(taskId, name);
   }
 
   @Override
-  protected void logOperation(CommandContext context, TaskEntity task) {
-    task.logUserOperation(UserOperationLogEntry.OPERATION_TYPE_SET_OWNER);
+  protected String getUserOperationLogName() {
+    return UserOperationLogEntry.OPERATION_TYPE_SET_NAME;
   }
+
+  @Override
+  protected void executeSetOperation(TaskEntity task, String value) {
+    task.setName(value);
+  }
+
 }
