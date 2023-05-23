@@ -14,26 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.cmd;
 
-import org.camunda.bpm.engine.history.UserOperationLogEntry;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
-import org.camunda.bpm.engine.task.IdentityLinkType;
+package org.camunda.bpm.engine.test.util;
 
 /**
- * @author Danny Gräf
+ * Used internally by any test that requires a consumer having 3 parameters.
  */
-public class SetTaskOwnerCmd extends AbstractAddIdentityLinkCmd {
-
-  private static final long serialVersionUID = 1L;
-
-  public SetTaskOwnerCmd(String taskId, String userId) {
-    super(taskId, userId, null, IdentityLinkType.OWNER);
-  }
-
-  @Override
-  protected void logOperation(CommandContext context, TaskEntity task) {
-    task.logUserOperation(UserOperationLogEntry.OPERATION_TYPE_SET_OWNER);
-  }
+@FunctionalInterface
+public interface TriConsumer<T, U, V> {
+  void accept(T t, U u, V v);
 }

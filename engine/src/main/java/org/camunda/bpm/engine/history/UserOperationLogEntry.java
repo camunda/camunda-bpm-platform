@@ -81,8 +81,13 @@ public interface UserOperationLogEntry {
   String OPERATION_TYPE_DELEGATE = "Delegate";
   String OPERATION_TYPE_DELETE = "Delete";
   String OPERATION_TYPE_RESOLVE = "Resolve";
+
   String OPERATION_TYPE_SET_OWNER = "SetOwner";
   String OPERATION_TYPE_SET_PRIORITY = "SetPriority";
+  String OPERATION_TYPE_SET_NAME = "SetName";
+  String OPERATION_TYPE_SET_DESCRIPTION = "SetDescription";
+  String OPERATION_TYPE_SET_FOLLOW_UP_DATE = "SetFollowUpDate";
+
   String OPERATION_TYPE_UPDATE = "Update";
   String OPERATION_TYPE_ACTIVATE = "Activate";
   String OPERATION_TYPE_SUSPEND = "Suspend";

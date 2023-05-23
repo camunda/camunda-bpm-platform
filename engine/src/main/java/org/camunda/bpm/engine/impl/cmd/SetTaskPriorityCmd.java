@@ -16,53 +16,31 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-
-import java.io.Serializable;
-
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
-import org.camunda.bpm.engine.impl.cfg.CommandChecker;
-import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
-
 
 /**
- * @author Joram Barrez
+ * Command to change task priority to a new value.
  */
-public class SetTaskPriorityCmd implements Command<Void>, Serializable {
+public class SetTaskPriorityCmd extends AbstractSetTaskPropertyCmd<Integer> {
 
-  private static final long serialVersionUID = 1L;
-
-  protected int priority;
-  protected String taskId;
-
-  public SetTaskPriorityCmd(String taskId, int priority) {
-    this.taskId = taskId;
-    this.priority = priority;
+  /**
+   * Public constructor.
+   *
+   * @param taskId   the id of the referenced task, non-null
+   * @param priority the new priority value to set, non-null
+   */
+  public SetTaskPriorityCmd(String taskId, Integer priority) {
+    super(taskId, priority, true);
   }
 
-  public Void execute(CommandContext commandContext) {
-    ensureNotNull("taskId", taskId);
+  @Override
+  protected String getUserOperationLogName() {
+    return UserOperationLogEntry.OPERATION_TYPE_SET_PRIORITY;
+  }
 
-    TaskManager taskManager = commandContext.getTaskManager();
-    TaskEntity task = taskManager.findTaskById(taskId);
-    ensureNotNull("Cannot find task with id " + taskId, "task", task);
-
-    checkTaskPriority(task, commandContext);
-
+  @Override
+  protected void executeSetOperation(TaskEntity task, Integer priority) {
     task.setPriority(priority);
-
-    task.triggerUpdateEvent();
-    task.logUserOperation(UserOperationLogEntry.OPERATION_TYPE_SET_PRIORITY);
-
-    return null;
-  }
-
-  protected void checkTaskPriority(TaskEntity task, CommandContext commandContext) {
-    for (CommandChecker checker : commandContext.getProcessEngineConfiguration().getCommandCheckers()) {
-      checker.checkTaskAssign(task);
-    }
   }
 }

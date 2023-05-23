@@ -14,26 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.cmd;
 
-import org.camunda.bpm.engine.history.UserOperationLogEntry;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
-import org.camunda.bpm.engine.task.IdentityLinkType;
+package org.camunda.bpm.engine.test.util;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * @author Danny Gräf
+ * Annotation for test methods that require cleanup of the task they create after method execution.
  */
-public class SetTaskOwnerCmd extends AbstractAddIdentityLinkCmd {
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface RemoveAfter {
 
-  private static final long serialVersionUID = 1L;
-
-  public SetTaskOwnerCmd(String taskId, String userId) {
-    super(taskId, userId, null, IdentityLinkType.OWNER);
-  }
-
-  @Override
-  protected void logOperation(CommandContext context, TaskEntity task) {
-    task.logUserOperation(UserOperationLogEntry.OPERATION_TYPE_SET_OWNER);
-  }
+  /**
+   * An array of class arguments whose related entities should be removed after the execution of the method.
+   * @return the array of classes
+   */
+  Class[] value() default {};
 }

@@ -304,41 +304,6 @@ public class MultiTenancyTaskServiceCmdsTenantCheckTest {
     assertThat(taskService.createTaskQuery().taskDelegationState(DelegationState.RESOLVED).taskId(task.getId()).count()).isEqualTo(1L);
   }
 
-  // set priority test cases
-  @Test
-  public void setPriorityForTaskWithAuthenticatedTenant() {
-
-    identityService.setAuthentication("aUserId", null, Arrays.asList(TENANT_ONE));
-
-    taskService.setPriority(task.getId(), 1);
-
-    assertThat(taskService.createTaskQuery().taskPriority(1).taskId(task.getId()).count()).isEqualTo(1L);
-  }
-
-  @Test
-  public void setPriorityForTaskWithNoAuthenticatedTenant() {
-
-    identityService.setAuthentication("aUserId", null);
-
-    // when/then
-    assertThatThrownBy(() -> taskService.setPriority(task.getId(), 1))
-      .isInstanceOf(ProcessEngineException.class)
-      .hasMessageContaining("Cannot assign the task '"
-          + task.getId() +"' because it belongs to no authenticated tenant.");
-
-  }
-
-  @Test
-  public void setPriorityForTaskWithDisabledTenantCheck() {
-
-    identityService.setAuthentication("aUserId", null);
-    engineRule.getProcessEngineConfiguration().setTenantCheckEnabled(false);
-
-    // then
-    taskService.setPriority(task.getId(), 1);
-    assertThat(taskService.createTaskQuery().taskPriority(1).taskId(task.getId()).count()).isEqualTo(1L);
-  }
-
   // delete task test
   @Test
   public void deleteTaskWithAuthenticatedTenant() {

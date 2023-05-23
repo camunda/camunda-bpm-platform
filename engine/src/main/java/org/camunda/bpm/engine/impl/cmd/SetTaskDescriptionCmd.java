@@ -14,26 +14,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.camunda.bpm.engine.impl.cmd;
 
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
-import org.camunda.bpm.engine.task.IdentityLinkType;
 
 /**
- * @author Danny Gräf
+ * Command that changes the description of a task.
  */
-public class SetTaskOwnerCmd extends AbstractAddIdentityLinkCmd {
+public class SetTaskDescriptionCmd extends AbstractSetTaskPropertyCmd<String> {
 
-  private static final long serialVersionUID = 1L;
-
-  public SetTaskOwnerCmd(String taskId, String userId) {
-    super(taskId, userId, null, IdentityLinkType.OWNER);
+  /**
+   * Public Constructor.
+   *
+   * @param taskId      the id of the task whose description should be changed
+   * @param description the new description value to change to
+   * @throws NullValueException in case the given taskId or the given description are null
+   */
+  public SetTaskDescriptionCmd(String taskId, String description) {
+    super(taskId, description);
   }
 
   @Override
-  protected void logOperation(CommandContext context, TaskEntity task) {
-    task.logUserOperation(UserOperationLogEntry.OPERATION_TYPE_SET_OWNER);
+  protected String getUserOperationLogName() {
+    return UserOperationLogEntry.OPERATION_TYPE_SET_DESCRIPTION;
+  }
+
+  @Override
+  protected void executeSetOperation(TaskEntity task, String value) {
+    task.setDescription(value);
   }
 }

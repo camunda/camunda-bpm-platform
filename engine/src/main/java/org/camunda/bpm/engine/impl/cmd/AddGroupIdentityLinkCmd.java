@@ -16,32 +16,28 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_ADD_GROUP_LINK;
+
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
+import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.UserOperationLogManager;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class AddGroupIdentityLinkCmd extends AddIdentityLinkCmd {
-
-  private static final long serialVersionUID = 1L;
+public class AddGroupIdentityLinkCmd extends AbstractAddIdentityLinkCmd {
 
   public AddGroupIdentityLinkCmd(String taskId, String groupId, String type) {
     super(taskId, null, groupId, type);
   }
 
   @Override
-  public Void execute(CommandContext commandContext) {
-    super.execute(commandContext);
-
+  protected void logOperation(CommandContext context, TaskEntity task) {
     PropertyChange propertyChange = new PropertyChange(type, null, groupId);
+    UserOperationLogManager logManager = context.getOperationLogManager();
 
-    commandContext.getOperationLogManager()
-      .logLinkOperation(UserOperationLogEntry.OPERATION_TYPE_ADD_GROUP_LINK, task, propertyChange);
-
-    return null;
+    logManager.logLinkOperation(OPERATION_TYPE_ADD_GROUP_LINK, task, propertyChange);
   }
-
 }
