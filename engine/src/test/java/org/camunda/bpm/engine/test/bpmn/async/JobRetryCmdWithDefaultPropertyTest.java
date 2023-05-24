@@ -22,13 +22,16 @@ import static org.junit.Assert.fail;
 
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -59,6 +62,12 @@ public class JobRetryCmdWithDefaultPropertyTest {
     runtimeService = engineRule.getRuntimeService();
     managementService = engineRule.getManagementService();
   }
+
+  @After
+  public void tearDown() {
+    testRule.deleteHistoryCleanupJobs();
+  }
+
   /**
    * Check if property "DefaultNumberOfRetries" will be used
    */
@@ -97,19 +106,21 @@ public class JobRetryCmdWithDefaultPropertyTest {
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/async/FoxJobRetryCmdTest.testFailedServiceTask.bpmn20.xml" })
   @Test
-  public void test() {
+  public void shouldApplyCleanupJobRetries() {
+    //given
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("failedServiceTask");
 
-    Job job = managementService.createJobQuery().processInstanceId(pi.getProcessInstanceId()).singleResult();
+    JobQuery jobQuery = managementService.createJobQuery().processInstanceId(pi.getProcessInstanceId());
+    Job job = jobQuery.singleResult();
+
     assertNotNull(job);
     assertEquals(2, job.getRetries()); // one try already failed
 
+    ProcessEngineConfiguration configuration = engineRule.getProcessEngineConfiguration();
+    //when
+    configuration.setHistoryCleanupDefaultNumberOfRetries(22);
 
-//    managementService.setJobRetriesAsync();
-
-    job = managementService.createJobQuery().jobId(job.getId()).singleResult();
-    assertEquals(22, job.getRetries());
-
+    //then
     Job cleanupJob = historyService.cleanUpHistoryAsync(true);
 
     assertEquals(22, cleanupJob.getRetries());
