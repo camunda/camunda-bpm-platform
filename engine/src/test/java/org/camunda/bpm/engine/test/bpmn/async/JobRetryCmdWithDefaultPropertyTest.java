@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.bpmn.async;
 
+import static org.camunda.bpm.model.xml.test.assertions.ModelAssertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
@@ -24,6 +25,7 @@ import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -31,6 +33,7 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.engine.test.util.Removable;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -55,17 +58,20 @@ public class JobRetryCmdWithDefaultPropertyTest {
   protected RuntimeService runtimeService;
   protected ManagementService managementService;
   protected HistoryService historyService;
+  protected Removable removable;
 
   @Before
   public void setUp() {
     historyService = engineRule.getHistoryService();
     runtimeService = engineRule.getRuntimeService();
     managementService = engineRule.getManagementService();
+    removable = Removable.of(testRule);
   }
 
   @After
-  public void tearDown() {
+  public void tearDown() throws Exception {
     testRule.deleteHistoryCleanupJobs();
+    removable.remove(HistoricIncident.class);
   }
 
   /**
@@ -123,6 +129,20 @@ public class JobRetryCmdWithDefaultPropertyTest {
     //then
     Job cleanupJob = historyService.cleanUpHistoryAsync(true);
 
-    assertEquals(22, cleanupJob.getRetries());
+    assertThat(cleanupJob.getRetries()).isEqualTo(22);
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/async/FoxJobRetryCmdTest.testFailedServiceTask.bpmn20.xml" })
+  @Test
+  public void shouldDisableRetriesOnCleanupJob() {
+    //given
+    ProcessEngineConfiguration configuration = engineRule.getProcessEngineConfiguration();
+    configuration.setHistoryCleanupDefaultNumberOfRetries(0);
+
+    //when
+    Job cleanupJob = historyService.cleanUpHistoryAsync(true);
+
+    //then
+    assertThat(cleanupJob.getRetries()).isEqualTo(0);
   }
 }

@@ -25,6 +25,13 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.history.HistoricIncident;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
+import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentEntity;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
@@ -50,6 +57,7 @@ public final class Removable {
     mappings.put(Task.class, this::removeAllTasks);
     mappings.put(ProcessInstance.class, this::removeAllProcessInstances);
     mappings.put(Deployment.class, this::removeAllDeployments);
+    mappings.put(HistoricIncident.class, this::removeAllIncidents);
 
     // Add here new mappings with [class - associated remove method]
 
@@ -69,13 +77,19 @@ public final class Removable {
     return new Removable(engineTestRule.processEngineRule.getProcessEngine());
   }
 
+  public static Removable of(ProcessEngine engine) {
+    Objects.requireNonNull(engine);
+
+    return new Removable(engine);
+  }
+
   /**
    * Removes the associated mapped entities from the db for the given class.
    *
    * @param clazz the given class to delete associated entities for
    * @throws Exception in case anything fails during the process of deletion
    */
-  public void remove(Class<?> clazz) throws Exception {
+  public void remove(Class<?> clazz) throws EntityRemoveException {
     Objects.requireNonNull(clazz, "remove does not accept null arguments");
 
     ThrowingRunnable runnable = mappings.get(clazz);
@@ -84,7 +98,11 @@ public final class Removable {
       throw new UnsupportedOperationException("class " + clazz.getName() + " is not supported yet for Removal");
     }
 
-    runnable.execute();
+    try {
+      runnable.execute();
+    } catch (Exception e) {
+      throw new EntityRemoveException(e);
+    }
   }
 
   /**
@@ -93,7 +111,7 @@ public final class Removable {
    * @param classes the given classes to delete associated entities for
    * @throws Exception in case anything fails during the process of deletion for any of the classes
    */
-  public void remove(Class<?>[] classes) throws Exception {
+  public void remove(Class<?>[] classes) throws EntityRemoveException {
     Objects.requireNonNull(classes, "remove does not accept null arguments");
 
     for (Class<?> clazz : classes) {
@@ -142,6 +160,30 @@ public final class Removable {
     } catch (Exception e) {
       throw new EntityRemoveException(e);
     }
+  }
+
+  private void removeAllIncidents() {
+    ProcessEngineConfigurationImpl engineConfiguration = (ProcessEngineConfigurationImpl) engine.getProcessEngineConfiguration();
+    CommandExecutor commandExecutor = engineConfiguration.getCommandExecutorTxRequired();
+
+    commandExecutor.execute(commandContext -> {
+      HistoryLevel historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
+
+      if (historyLevel.equals(HistoryLevel.HISTORY_LEVEL_FULL)) {
+        commandContext.getHistoricJobLogManager()
+            .deleteHistoricJobLogsByHandlerType(TimerSuspendProcessDefinitionHandler.TYPE);
+
+        List<HistoricIncident> incidents = Context.getProcessEngineConfiguration()
+            .getHistoryService()
+            .createHistoricIncidentQuery()
+            .list();
+
+        for (HistoricIncident incident : incidents) {
+          commandContext.getHistoricIncidentManager().delete((HistoricIncidentEntity) incident);
+        }
+      }
+      return null;
+    });
   }
 }
 
