@@ -85,10 +85,24 @@ public class AbstractAppPluginRootResource<T extends AppPlugin> {
   private final String pluginName;
 
   protected AppRuntimeDelegate<T> runtimeDelegate;
+  protected List<String> allowedAssets;
 
   public AbstractAppPluginRootResource(String pluginName, AppRuntimeDelegate<T> runtimeDelegate) {
     this.pluginName = pluginName;
     this.runtimeDelegate = runtimeDelegate;
+    this.allowedAssets = getAllowedAssets();
+  }
+
+  /**
+   * Returns the list of allowed assets to be loaded by the plugin root resource.
+   *
+   * @return list of allowed assets
+   */
+  protected List<String> getAllowedAssets() {
+    List<String> assets = new ArrayList<>();
+    assets.add("app/plugin.js");
+    assets.add("app/plugin.css");
+    return assets;
   }
 
   /**
@@ -111,6 +125,10 @@ public class AbstractAppPluginRootResource<T extends AppPlugin> {
   @GET
   @Path("/static/{file:.*}")
   public Response getAsset(@PathParam("file") String file) {
+
+    if (!allowedAssets.contains(file)) {
+      throw new RestException(Status.FORBIDDEN, "Not allowed to load the following file '" + file + "'.");
+    }
 
     AppPlugin plugin = runtimeDelegate.getAppPluginRegistry().getPlugin(pluginName);
 
