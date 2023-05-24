@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.test.api.runtime;
+package org.camunda.bpm.engine.test.history.useroperationlog;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -36,7 +36,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
-public class StartProcessInstanceUserOperationLogTest {
+public class UserOperationLogProcessInstanceTest {
 
   @Rule
   public ProcessEngineRule rule = new ProvidedProcessEngineRule();
@@ -56,13 +56,11 @@ public class StartProcessInstanceUserOperationLogTest {
   @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
   public void shouldProduceUserOperationLogStartProcessInstanceByKey() {
-    // given
+    // when
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-    // when
-    UserOperationLogEntry userOperationLog = historyService.createUserOperationLogQuery().singleResult();
-
     // then
+    UserOperationLogEntry userOperationLog = historyService.createUserOperationLogQuery().singleResult();
     assertThat(userOperationLog.getOperationType()).isEqualTo(UserOperationLogEntry.OPERATION_TYPE_CREATE);
     assertThat(userOperationLog.getProcessInstanceId()).isEqualTo(instance.getId());
   }
@@ -72,12 +70,12 @@ public class StartProcessInstanceUserOperationLogTest {
   public void shouldProduceUserOperationLogStartProcessInstanceById() {
     // given
     ProcessDefinition processDefinition = rule.getRepositoryService().createProcessDefinitionQuery().singleResult();
-    ProcessInstance instance = runtimeService.startProcessInstanceById(processDefinition.getId());
 
     // when
-    UserOperationLogEntry userOperationLog = historyService.createUserOperationLogQuery().singleResult();
+    ProcessInstance instance = runtimeService.startProcessInstanceById(processDefinition.getId());
 
     // then
+    UserOperationLogEntry userOperationLog = historyService.createUserOperationLogQuery().singleResult();
     assertThat(userOperationLog.getOperationType()).isEqualTo(UserOperationLogEntry.OPERATION_TYPE_CREATE);
     assertThat(userOperationLog.getProcessDefinitionId()).isEqualTo(processDefinition.getId());
     assertThat(userOperationLog.getProcessInstanceId()).isEqualTo(instance.getId());
@@ -87,14 +85,13 @@ public class StartProcessInstanceUserOperationLogTest {
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
   public void shouldProduceUserOperationLogStartProcessInstanceAtActivity() {
     // given
-
     ProcessDefinition processDefinition = rule.getRepositoryService().createProcessDefinitionQuery().singleResult();
-    ProcessInstance instance = runtimeService.createProcessInstanceById(processDefinition.getId()).startBeforeActivity("theTask").execute();
 
     // when
-    UserOperationLogEntry userOperationLog = historyService.createUserOperationLogQuery().singleResult();
+    ProcessInstance instance = runtimeService.createProcessInstanceById(processDefinition.getId()).startBeforeActivity("theTask").execute();
 
     // then
+    UserOperationLogEntry userOperationLog = historyService.createUserOperationLogQuery().singleResult();
     assertThat(userOperationLog.getOperationType()).isEqualTo(UserOperationLogEntry.OPERATION_TYPE_CREATE);
     assertThat(userOperationLog.getProcessDefinitionId()).isEqualTo(processDefinition.getId());
     assertThat(userOperationLog.getProcessInstanceId()).isEqualTo(instance.getId());
@@ -108,12 +105,12 @@ public class StartProcessInstanceUserOperationLogTest {
     Map<String, Object> properties = new HashMap<>();
     properties.put("itemName", "apple");
     properties.put("amount", 5);
-    ProcessInstance instance = formService.submitStartForm(processDefinition.getId(), properties);
 
     // when
-    UserOperationLogEntry userOperationLog = historyService.createUserOperationLogQuery().singleResult();
+    ProcessInstance instance = formService.submitStartForm(processDefinition.getId(), properties);
 
     // then
+    UserOperationLogEntry userOperationLog = historyService.createUserOperationLogQuery().singleResult();
     assertThat(userOperationLog.getOperationType()).isEqualTo(UserOperationLogEntry.OPERATION_TYPE_CREATE);
     assertThat(userOperationLog.getProcessDefinitionId()).isEqualTo(processDefinition.getId());
     assertThat(userOperationLog.getProcessInstanceId()).isEqualTo(instance.getId());
