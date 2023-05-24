@@ -115,6 +115,18 @@
           <version>${version.jersey-json}</version>
         </dependency>
 
+        <dependency>
+          <groupId>org.graalvm.js</groupId>
+          <artifactId>js</artifactId>
+          <version>${version.graal.js}</version>
+        </dependency>
+
+        <dependency>
+          <groupId>org.graalvm.js</groupId>
+          <artifactId>js-scriptengine</artifactId>
+          <version>${version.graal.js}</version>
+        </dependency>
+
       </dependencies>
 
       <build>
