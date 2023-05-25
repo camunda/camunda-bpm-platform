@@ -29,6 +29,7 @@ import org.mockito.Mockito;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import java.io.ByteArrayInputStream;
@@ -36,36 +37,40 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.camunda.bpm.webapp.plugin.resource.AbstractAppPluginRootResource.MIME_TYPE_TEXT_CSS;
+import static org.camunda.bpm.webapp.plugin.resource.AbstractAppPluginRootResource.MIME_TYPE_TEXT_JAVASCRIPT;
 
 @RunWith(Parameterized.class)
 public class AbstractAppPluginRootResourceTest {
 
+  public static final String PLUGIN_NAME = "test-plugin";
   public static final String ASSET_DIR = "plugin/asset-dir";
   public static final String ASSET_CONTENT = "content";
 
-  final String assetName;
-  final String contentType;
-  final boolean assetAllowed;
+  private final String assetName;
+  private final String assetMediaType;
+  private final boolean assetAllowed;
 
+  private AppRuntimeDelegate<AppPlugin> runtimeDelegate;
+  private AppPluginRegistry<AppPlugin>  pluginRegistry;
   private AbstractAppPluginRootResource<AppPlugin> pluginRootResource;
   private ServletContext mockServletContext;
 
-  public AbstractAppPluginRootResourceTest(String assetName, String contentType, boolean assetAllowed) {
+  public AbstractAppPluginRootResourceTest(String assetName, String assetMediaType, boolean assetAllowed) {
     this.assetName = assetName;
-    this.contentType = contentType;
+    this.assetMediaType = assetMediaType;
     this.assetAllowed = assetAllowed;
   }
 
   @Parameters
   public static Collection<Object[]> getAssets() {
     return Arrays.asList(new Object[][]{
-        {"app/plugin.js", "text/javascript", true},
-        {"app/plugin.css", "text/css", true},
-        {"app/asset.js", "text/javascript", true},
+        {"app/plugin.js", MIME_TYPE_TEXT_JAVASCRIPT, true},
+        {"app/plugin.css", MIME_TYPE_TEXT_CSS, true},
+        {"app/asset.js", MIME_TYPE_TEXT_JAVASCRIPT, true},
         {"app/plugin.cs", null, false},
         {"../..", null, false},
         {"../../annotations-api.jar", null, false},
@@ -74,15 +79,15 @@ public class AbstractAppPluginRootResourceTest {
 
   @Before
   public void setup() throws ServletException {
-    AppRuntimeDelegate<AppPlugin> runtimeDelegate = Mockito.mock(AppRuntimeDelegate.class);
+    runtimeDelegate = Mockito.mock(AppRuntimeDelegate.class);
+    pluginRegistry = Mockito.mock(AppPluginRegistry.class);
     AppPlugin plugin = Mockito.mock(AppPlugin.class);
-    AppPluginRegistry<AppPlugin> pluginRegistry = Mockito.mock(AppPluginRegistry.class);
 
     Mockito.doReturn(pluginRegistry).when(runtimeDelegate).getAppPluginRegistry();
-    Mockito.doReturn(plugin).when(pluginRegistry).getPlugin(ASSET_DIR);
+    Mockito.doReturn(plugin).when(pluginRegistry).getPlugin(PLUGIN_NAME);
     Mockito.doReturn(ASSET_DIR).when(plugin).getAssetDirectory();
 
-    pluginRootResource = new AbstractAppPluginRootResource<>(ASSET_DIR, runtimeDelegate);
+    pluginRootResource = new AbstractAppPluginRootResource<>(PLUGIN_NAME, runtimeDelegate);
     mockServletContext = Mockito.mock(ServletContext.class);
     pluginRootResource.servletContext = mockServletContext;
     pluginRootResource.allowedAssets.add("app/asset.js");
@@ -106,8 +111,13 @@ public class AbstractAppPluginRootResourceTest {
         ((StreamingOutput) actual.getEntity()).write(output);
 
         assertThat(output.toString()).isEqualTo(ASSET_CONTENT);
-        assertThat(actual.getMetadata()).containsEntry("Content-Type", Collections.singletonList(contentType));
+        assertThat(actual.getHeaders()).containsKey(HttpHeaders.CONTENT_TYPE).hasSize(1);
+        assertThat(actual.getHeaders().get(HttpHeaders.CONTENT_TYPE)).hasSize(1);
+        // In IDE it's String, with maven it's MediaType class
+        assertThat(actual.getHeaders().get(HttpHeaders.CONTENT_TYPE).get(0).toString()).isEqualTo(assetMediaType);
 
+        Mockito.verify(runtimeDelegate).getAppPluginRegistry();
+        Mockito.verify(pluginRegistry).getPlugin(PLUGIN_NAME);
         Mockito.verify(mockServletContext).getResourceAsStream(resourceName);
       } else {
         fail("should throw RestException for '%s'", assetName);
@@ -122,6 +132,8 @@ public class AbstractAppPluginRootResourceTest {
         assertThat(e).isInstanceOf(RestException.class);
         assertThat(e).hasMessage("Not allowed to load the following file '" + assetName + "'.");
 
+        Mockito.verify(runtimeDelegate, Mockito.never()).getAppPluginRegistry();
+        Mockito.verify(pluginRegistry, Mockito.never()).getPlugin(PLUGIN_NAME);
         Mockito.verify(mockServletContext, Mockito.never()).getResourceAsStream(assetName);
       }
     }
