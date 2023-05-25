@@ -94,7 +94,8 @@ public class AbstractAppPluginRootResource<T extends AppPlugin> {
   }
 
   /**
-   * Returns the list of allowed assets to be loaded by the plugin root resource.
+   * <p>Returns the list of allowed assets to be served by the {@link #getAsset(String)} method.</p>
+   * <p>The default implementation includes: <code>["app/plugin.js","app/plugin.css"]</code></p>
    *
    * @return list of allowed assets
    */
@@ -117,7 +118,8 @@ public class AbstractAppPluginRootResource<T extends AppPlugin> {
   }
 
   /**
-   * Provides a plugins asset files via <code>$PLUGIN_ROOT_PATH/static</code>.
+   * <p>Provides a plugins asset files via <code>$PLUGIN_ROOT_PATH/static</code>.</p>
+   * <p>Assets must be explicitly declared in the {@link #getAllowedAssets()} method.</p>
    *
    * @param file
    * @return

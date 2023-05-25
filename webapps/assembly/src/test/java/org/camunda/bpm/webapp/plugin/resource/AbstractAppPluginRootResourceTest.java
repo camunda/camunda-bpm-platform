@@ -71,6 +71,8 @@ public class AbstractAppPluginRootResourceTest {
         {"app/plugin.js", MIME_TYPE_TEXT_JAVASCRIPT, true},
         {"app/plugin.css", MIME_TYPE_TEXT_CSS, true},
         {"app/asset.js", MIME_TYPE_TEXT_JAVASCRIPT, true},
+        {null, null, false},
+        {"", null, false},
         {"app/plugin.cs", null, false},
         {"../..", null, false},
         {"../../annotations-api.jar", null, false},
