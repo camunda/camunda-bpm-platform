@@ -187,7 +187,8 @@ platform-jdk-openjdk-jdk-11-latest:
           !spring-boot-starter/starter-qa/integration-test-webapp/runtime,
           !distro/run,!distro/run/assembly,!distro/run/core,!distro/run/distro,!distro/run/modules,!distro/run/modules/example,
           !distro/run/modules/rest,!distro/run/modules/swaggerui,!distro/run/modules/webapps,!distro/run/qa,!distro/run/qa/integration-tests,
-          !distro/run/qa/runtime''
+          !distro/run/qa/runtime,
+          !test-utils/assert,!test-utils/assert/core,!test-utils/assert/qa''
     -Pdistro,distro-ce,distro-wildfly'
   stash:
     runtimeStash: true
@@ -211,7 +212,8 @@ platform-jdk-openjdk-jdk-8-latest:
           !spring-boot-starter/starter-qa/integration-test-webapp/runtime,
           !distro/run,!distro/run/assembly,!distro/run/core,!distro/run/distro,!distro/run/modules,!distro/run/modules/example,
           !distro/run/modules/rest,!distro/run/modules/swaggerui,!distro/run/modules/webapps,!distro/run/qa,!distro/run/qa/integration-tests,
-          !distro/run/qa/runtime'' 
+          !distro/run/qa/runtime,
+          !test-utils/assert,!test-utils/assert/core,!test-utils/assert/qa'' 
     -Pdistro,distro-ce,distro-wildfly'
   stash:
     runtimeStash: true
@@ -241,7 +243,8 @@ platform-jdk-jdk-11-latest:
           !spring-boot-starter/starter-qa/integration-test-webapp/runtime,
           !distro/run,!distro/run/assembly,!distro/run/core,!distro/run/distro,!distro/run/modules,!distro/run/modules/example,
           !distro/run/modules/rest,!distro/run/modules/swaggerui,!distro/run/modules/webapps,!distro/run/qa,!distro/run/qa/integration-tests,
-          !distro/run/qa/runtime''
+          !distro/run/qa/runtime,
+          !test-utils/assert,!test-utils/assert/core,!test-utils/assert/qa''
     -Pdistro,distro-ce,distro-wildfly'
   stash:
     runtimeStash: true
@@ -265,7 +268,8 @@ platform-jdk-jdk-8-latest:
           !spring-boot-starter/starter-qa/integration-test-webapp/runtime,
           !distro/run,!distro/run/assembly,!distro/run/core,!distro/run/distro,!distro/run/modules,!distro/run/modules/example,
           !distro/run/modules/rest,!distro/run/modules/swaggerui,!distro/run/modules/webapps,!distro/run/qa,!distro/run/qa/integration-tests,
-          !distro/run/qa/runtime''
+          !distro/run/qa/runtime,
+          !test-utils/assert,!test-utils/assert/core,!test-utils/assert/qa''
     -Pdistro,distro-ce,distro-wildfly'
   stash:
     runtimeStash: true
@@ -289,7 +293,8 @@ platform-jdk-ibm-jdk-8-latest:
           !spring-boot-starter/starter-qa/integration-test-webapp/runtime,
           !distro/run,!distro/run/assembly,!distro/run/core,!distro/run/distro,!distro/run/modules,!distro/run/modules/example,
           !distro/run/modules/rest,!distro/run/modules/swaggerui,!distro/run/modules/webapps,!distro/run/qa,!distro/run/qa/integration-tests,
-          !distro/run/qa/runtime''
+          !distro/run/qa/runtime,
+          !test-utils/assert,!test-utils/assert/core,!test-utils/assert/qa''
     -Pdistro,distro-ce,distro-wildfly'
   stash:
     runtimeStash: true
