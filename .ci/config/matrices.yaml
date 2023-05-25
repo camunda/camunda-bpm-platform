@@ -41,7 +41,6 @@ daily-stages:
   - 'sqlserver_2019'
   stages:
   - 'sql-scripts'
-  - 'upgrade-database'
   - 'instance-migration'
   - 'old-engine'
   - 'rolling-update'
@@ -54,7 +53,6 @@ sidetrack-stages:
   - 'db-unit'
   - 'db-unit-authorizations'
   - 'sql-scripts'
-  - 'upgrade-database'
   - 'instance-migration'
   - 'old-engine'
   - 'rolling-update'
