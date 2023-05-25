@@ -79,14 +79,14 @@ public class DmnEngineExtension implements TestInstancePostProcessor, ParameterR
   }
 
   @Override
-  public boolean supportsParameter(ParameterContext parameterContext,
-      ExtensionContext extensionContext) throws ParameterResolutionException {
+  public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
+      throws ParameterResolutionException {
     return DmnEngine.class.equals(parameterContext.getParameter().getType());
   }
 
   @Override
-  public Object resolveParameter(ParameterContext parameterContext,
-      ExtensionContext extensionContext) throws ParameterResolutionException {
+  public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
+      throws ParameterResolutionException {
     if (!DmnEngine.class.equals(parameterContext.getParameter().getType())) {
       return null;
     }
