@@ -64,9 +64,9 @@ public class DmnEngineExtension implements TestInstancePostProcessor, ParameterR
     field.setAccessible(true);
     try {
       field.set(instance, dmnEngine);
-	  } catch (IllegalAccessException iae) {
+    } catch (IllegalAccessException iae) {
       throw new RuntimeException(iae);
-	  }
+    }
   }
 
   @Override
