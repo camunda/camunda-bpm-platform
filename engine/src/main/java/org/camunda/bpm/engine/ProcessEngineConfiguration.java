@@ -938,8 +938,9 @@ public abstract class ProcessEngineConfiguration {
     return this.historyCleanupDefaultNumberOfRetries;
   }
 
-  public void setHistoryCleanupDefaultNumberOfRetries(int historyCleanupDefaultNumberOfRetries) {
+  public ProcessEngineConfiguration setHistoryCleanupDefaultNumberOfRetries(int historyCleanupDefaultNumberOfRetries) {
     this.historyCleanupDefaultNumberOfRetries = historyCleanupDefaultNumberOfRetries;
+    return this;
   }
 
   public ValueTypeResolver getValueTypeResolver() {
