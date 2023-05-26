@@ -97,7 +97,7 @@ public class AbstractAppPluginRootResourceTest {
   }
 
   @Test
-  public void testGetAsset() throws IOException {
+  public void shouldGetAssetIfAllowed() throws IOException {
     // given
     String resourceName = "/" + ASSET_DIR + "/" + assetName;
     ByteArrayInputStream inputStream = new ByteArrayInputStream(ASSET_CONTENT.getBytes());
