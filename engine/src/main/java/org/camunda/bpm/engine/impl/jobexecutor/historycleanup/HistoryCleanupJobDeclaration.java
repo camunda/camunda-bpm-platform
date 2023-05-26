@@ -17,7 +17,7 @@
 package org.camunda.bpm.engine.impl.jobexecutor.historycleanup;
 
 import java.util.Date;
-import org.camunda.bpm.engine.history.HistoryCleanupRetryConfiguration;
+import org.camunda.bpm.engine.history.HistoryCleanupConfiguration;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
@@ -74,13 +74,13 @@ public class HistoryCleanupJobDeclaration extends JobDeclaration<HistoryCleanupC
 
   @Override
   protected int resolveRetries(HistoryCleanupContext context) {
-    HistoryCleanupRetryConfiguration retryConfiguration = context.getRetryConfiguration();
+    HistoryCleanupConfiguration configuration = context.getConfiguration();
 
-    if (retryConfiguration.isEmpty()) {
+    if (configuration.isEmpty()) {
       return super.resolveRetries(context);
     }
 
-    return retryConfiguration.getMaxNumberOfRetries();
+    return configuration.getMaxNumberOfRetries();
   }
 
   @Override

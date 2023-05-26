@@ -20,7 +20,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.ListIterator;
 import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.history.HistoryCleanupRetryConfiguration;
+import org.camunda.bpm.engine.history.HistoryCleanupConfiguration;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -124,7 +124,7 @@ public class HistoryCleanupCmd implements Command<Job> {
     CommandContext commandContext = Context.getCommandContext();
 
     JobManager jobManager = commandContext.getJobManager();
-    HistoryCleanupRetryConfiguration configuration = HistoryCleanupRetryConfiguration.of(commandContext);
+    HistoryCleanupConfiguration configuration = HistoryCleanupConfiguration.of(commandContext);
 
     acquireExclusiveLock(commandContext);
 
@@ -146,7 +146,7 @@ public class HistoryCleanupCmd implements Command<Job> {
   protected List<Job> reconfigureJobs(List<Job> historyCleanupJobs, int degreeOfParallelism, int[][] minuteChunks) {
     CommandContext commandContext = Context.getCommandContext();
     JobManager jobManager = commandContext.getJobManager();
-    HistoryCleanupRetryConfiguration configuration = HistoryCleanupRetryConfiguration.of(commandContext);
+    HistoryCleanupConfiguration configuration = HistoryCleanupConfiguration.of(commandContext);
 
     int size = Math.min(degreeOfParallelism, historyCleanupJobs.size());
 
@@ -195,12 +195,12 @@ public class HistoryCleanupCmd implements Command<Job> {
   }
 
   @SuppressWarnings("unchecked")
-  protected JobEntity createJob(int[] minuteChunk, HistoryCleanupRetryConfiguration configuration) {
+  protected JobEntity createJob(int[] minuteChunk, HistoryCleanupConfiguration configuration) {
     HistoryCleanupContext context = createCleanupContext(minuteChunk, configuration);
     return HISTORY_CLEANUP_JOB_DECLARATION.createJobInstance(context);
   }
 
-  protected HistoryCleanupContext createCleanupContext(int[] minuteChunk, HistoryCleanupRetryConfiguration configuration) {
+  protected HistoryCleanupContext createCleanupContext(int[] minuteChunk, HistoryCleanupConfiguration configuration) {
     int minuteFrom = minuteChunk[0];
     int minuteTo = minuteChunk[1];
 

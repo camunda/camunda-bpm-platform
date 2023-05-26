@@ -17,37 +17,26 @@
 
 package org.camunda.bpm.engine.history;
 
-import java.util.Objects;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
-public class HistoryCleanupRetryConfiguration {
-
-  private static final HistoryCleanupRetryConfiguration EMPTY = new HistoryCleanupRetryConfiguration(null);
+public class HistoryCleanupConfiguration {
 
   protected final Integer maxNumberOfRetries;
 
-  private HistoryCleanupRetryConfiguration(Integer maxNumberOfRetries) {
+  private HistoryCleanupConfiguration(Integer maxNumberOfRetries) {
     this.maxNumberOfRetries = maxNumberOfRetries;
   }
 
-  public static HistoryCleanupRetryConfiguration empty() {
-    return EMPTY;
-  }
-
-  public static HistoryCleanupRetryConfiguration of(CommandContext context) {
+  public static HistoryCleanupConfiguration of(CommandContext context) {
     ProcessEngineConfiguration config = context.getProcessEngineConfiguration();
 
     final int numberOfRetries = config.getHistoryCleanupDefaultNumberOfRetries();
     return of(numberOfRetries);
   }
 
-  public static HistoryCleanupRetryConfiguration of(Integer maxNumberOfRetries) {
-    return new HistoryCleanupRetryConfiguration(maxNumberOfRetries);
-  }
-
-  public static HistoryCleanupRetryConfiguration noRetries() {
-    return new HistoryCleanupRetryConfiguration(0);
+  public static HistoryCleanupConfiguration of(Integer maxNumberOfRetries) {
+    return new HistoryCleanupConfiguration(maxNumberOfRetries);
   }
 
   public int getMaxNumberOfRetries() {
@@ -55,7 +44,7 @@ public class HistoryCleanupRetryConfiguration {
   }
 
   public boolean isEmpty() {
-    return Objects.equals(maxNumberOfRetries, EMPTY.maxNumberOfRetries);
+    return maxNumberOfRetries == null;
   }
 
 }
