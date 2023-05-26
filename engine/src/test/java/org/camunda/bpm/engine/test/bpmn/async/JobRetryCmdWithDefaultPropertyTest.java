@@ -72,6 +72,7 @@ public class JobRetryCmdWithDefaultPropertyTest {
   public void tearDown() throws Exception {
     testRule.deleteHistoryCleanupJobs();
     removable.remove(HistoricIncident.class);
+    resetHistoryCleanupConfig();
   }
 
   /**
@@ -144,5 +145,9 @@ public class JobRetryCmdWithDefaultPropertyTest {
 
     //then
     assertThat(cleanupJob.getRetries()).isEqualTo(0);
+  }
+
+  private void resetHistoryCleanupConfig() {
+    engineRule.getProcessEngineConfiguration().setHistoryCleanupDefaultNumberOfRetries(3);
   }
 }
