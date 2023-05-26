@@ -274,6 +274,21 @@
       <build>
         <plugins>
           <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>generate-resources</phase>
+                <configuration>
+                  <tasks>
+                    <mkdir dir="${project.basedir}/target/webapp" />
+                    <mkdir dir="${project.basedir}/target/camunda-welcome" />
+                  </tasks>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-maven-plugin</artifactId>
             <configuration>
@@ -285,6 +300,12 @@
                   <resourceBase>${project.basedir}/src/main/webapp</resourceBase>
                 </resourceBases>
               </webAppConfig>
+              <contextHandlers>
+                <contextHandler implementation="org.eclipse.jetty.maven.plugin.JettyWebAppContext">
+                  <war>${project.basedir}/target/camunda-welcome/</war>
+                  <contextPath>/camunda-welcome</contextPath>
+                </contextHandler>
+              </contextHandlers>
             </configuration>
           </plugin>
           <plugin>
