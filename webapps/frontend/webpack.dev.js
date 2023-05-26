@@ -88,7 +88,7 @@ module.exports = (_env, argv = {}) => {
             '^/api': ''
           }
         },
-        '/camunda-welcome/': {
+        '/camunda-welcome': {
           target: 'http://localhost:8080/',
           logLevel: 'debug'
         },
