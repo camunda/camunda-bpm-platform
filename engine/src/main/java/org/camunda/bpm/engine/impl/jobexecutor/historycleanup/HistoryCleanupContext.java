@@ -16,8 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.jobexecutor.historycleanup;
 
-import org.camunda.bpm.engine.history.HistoryCleanupConfiguration;
-
 /**
  * @author Svetlana Dorokhova.
  */

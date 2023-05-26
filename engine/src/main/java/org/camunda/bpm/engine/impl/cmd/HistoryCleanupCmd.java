@@ -20,7 +20,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.ListIterator;
 import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.history.HistoryCleanupConfiguration;
+import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupConfiguration;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;

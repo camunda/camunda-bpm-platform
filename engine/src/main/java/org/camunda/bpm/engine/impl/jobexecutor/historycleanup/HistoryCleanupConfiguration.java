@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.engine.history;
+package org.camunda.bpm.engine.impl.jobexecutor.historycleanup;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
