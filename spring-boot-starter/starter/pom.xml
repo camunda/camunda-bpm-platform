@@ -20,18 +20,22 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
+        <version>6.0.9</version>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-jdbc</artifactId>
+        <version>6.0.6</version>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-tx</artifactId>
+        <version>6.0.6</version>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-orm</artifactId>
+        <version>6.0.6</version>
     </dependency>
 
     <dependency>
@@ -43,7 +47,8 @@
     <dependency>
       <groupId>org.camunda.spin</groupId>
       <artifactId>camunda-spin-dataformat-json-jackson</artifactId>
-      <optional>true</optional>
+        <version>1.18.1</version>
+        <optional>true</optional>
     </dependency>
 
     <dependency>
@@ -55,42 +60,50 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-autoconfigure</artifactId>
+        <version>3.0.4</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter</artifactId>
+        <version>3.0.4</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-jpa</artifactId>
-      <optional>true</optional>
+        <version>3.0.4</version>
+        <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-actuator</artifactId>
-      <optional>true</optional>
+        <version>3.0.4</version>
+        <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
-      <optional>true</optional>
+        <version>3.0.4</version>
+        <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-jersey</artifactId>
-      <optional>true</optional>
+        <version>3.0.4</version>
+        <optional>true</optional>
     </dependency>
 
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-configuration-processor</artifactId>
-      <optional>true</optional>
+        <version>3.0.4</version>
+        <optional>true</optional>
     </dependency>
 
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-devtools</artifactId>
-      <scope>provided</scope>
+        <version>3.0.4</version>
+        <scope>provided</scope>
       <optional>true</optional>
     </dependency>
 
@@ -108,12 +121,14 @@
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-testing</artifactId>
-      <scope>test</scope>
+        <version>1.11.0</version>
+        <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.uuid</groupId>
       <artifactId>java-uuid-generator</artifactId>
-      <exclusions>
+        <version>4.2.0</version>
+        <exclusions>
         <exclusion>
           <groupId>log4j</groupId>
           <artifactId>log4j</artifactId>
@@ -133,12 +148,13 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-websocket</artifactId>
-      <scope>test</scope>
+        <version>3.0.4</version>
+        <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>javax.interceptor</groupId>
       <artifactId>javax.interceptor-api</artifactId>
-      <version>1.2.1</version>
+      <version>1.2.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>

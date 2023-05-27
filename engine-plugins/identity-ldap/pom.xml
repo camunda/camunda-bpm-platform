@@ -21,13 +21,15 @@
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-logging</artifactId>
+        <version>1.11.0</version>
     </dependency>
 
     <!-- LDAP Libraries to start test server -->
     <dependency>
       <groupId>org.apache.directory.server</groupId>
       <artifactId>apacheds-all</artifactId>
-      <exclusions>
+        <version>2.0.0.AM26</version>
+        <exclusions>
         <exclusion>
           <groupId>org.apache.directory.shared</groupId>
           <artifactId>shared-ldap</artifactId>
@@ -40,13 +42,15 @@
       <!-- required for LdapTestEnvironment -->
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <scope>test</scope>
+        <version>2.11.0</version>
+        <scope>test</scope>
     </dependency>
     
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <scope>test</scope>
+        <version>1.4.6</version>
+        <scope>test</scope>
     </dependency>
   </dependencies>
 

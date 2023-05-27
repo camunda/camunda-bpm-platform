@@ -73,73 +73,86 @@
     <dependency>
       <groupId>org.jboss.shrinkwrap.resolver</groupId>
       <artifactId>shrinkwrap-resolver-depchain</artifactId>
-      <scope>test</scope>
+        <version>3.1.4</version>
+        <scope>test</scope>
       <type>pom</type>
     </dependency>
 
     <dependency>
       <groupId>org.jboss.arquillian.junit</groupId>
       <artifactId>arquillian-junit-container</artifactId>
-      <scope>test</scope>
+        <version>1.7.0.Alpha14</version>
+        <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jboss.arquillian.protocol</groupId>
       <artifactId>arquillian-protocol-servlet-jakarta</artifactId>
-      <scope>test</scope>
+        <version>1.7.0.Alpha14</version>
+        <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <scope>test</scope>
+        <version>4.13.2</version>
+        <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>com.github.tomakehurst</groupId>
       <artifactId>wiremock-jre8-standalone</artifactId>
-      <scope>test</scope>
+        <version>2.35.0</version>
+        <scope>test</scope>
     </dependency>
 
     <!-- required for wiremock-jre8-standalone - see CAM-14755 -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-jdk14</artifactId>
+        <version>2.0.5</version>
     </dependency>
 
     <dependency>
       <groupId>jakarta.annotation</groupId>
       <artifactId>jakarta.annotation-api</artifactId>
-      <scope>provided</scope>
+        <version>2.1.0</version>
+        <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>jakarta.ejb</groupId>
       <artifactId>jakarta.ejb-api</artifactId>
-      <scope>provided</scope>
+        <version>4.0.1</version>
+        <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>jakarta.enterprise.concurrent</groupId>
       <artifactId>jakarta.enterprise.concurrent-api</artifactId>
-      <scope>provided</scope>
+        <version>3.0.2</version>
+        <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>jakarta.enterprise</groupId>
       <artifactId>jakarta.enterprise.cdi-api</artifactId>
-      <scope>provided</scope>
+        <version>4.0.1</version>
+        <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>jakarta.inject</groupId>
       <artifactId>jakarta.inject-api</artifactId>
-      <scope>provided</scope>
+        <version>2.0.1.MR</version>
+        <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>jakarta.servlet</groupId>
       <artifactId>jakarta.servlet-api</artifactId>
-      <scope>provided</scope>
+        <version>5.0.0</version>
+        <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>jakarta.transaction</groupId>
       <artifactId>jakarta.transaction-api</artifactId>
-      <scope>provided</scope>
+        <version>2.0.1</version>
+        <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -190,16 +203,19 @@
     <dependency>
       <groupId>org.camunda.spin</groupId>
       <artifactId>camunda-spin-core</artifactId>
+        <version>1.18.1</version>
     </dependency>
 
     <dependency>
       <groupId>org.camunda.spin</groupId>
       <artifactId>camunda-spin-dataformat-json-jackson</artifactId>
+        <version>1.18.1</version>
     </dependency>
 
     <dependency>
       <groupId>com.fasterxml.jackson.datatype</groupId>
       <artifactId>jackson-datatype-joda</artifactId>
+        <version>2.14.2</version>
     </dependency>
 
     <!--
@@ -225,13 +241,15 @@
     <dependency>
       <groupId>org.camunda.connect</groupId>
       <artifactId>camunda-connect-core</artifactId>
+        <version>1.5.5</version>
     </dependency>
 
     <!-- required for TestWarDeploymentWithProcessEnginePlugin -->
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
       <artifactId>groovy-jsr223</artifactId>
-      <scope>test</scope>
+        <version>3.0.16</version>
+        <scope>test</scope>
     </dependency>
 
   </dependencies>

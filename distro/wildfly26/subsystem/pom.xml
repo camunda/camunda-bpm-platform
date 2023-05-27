@@ -28,7 +28,8 @@
     <dependency>
       <groupId>com.fasterxml.uuid</groupId>
       <artifactId>java-uuid-generator</artifactId>
-      <exclusions>
+        <version>4.2.0</version>
+        <exclusions>
         <exclusion>
           <groupId>log4j</groupId>
           <artifactId>log4j</artifactId>
@@ -79,7 +80,8 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <scope>test</scope>
+        <version>4.13.2</version>
+        <scope>test</scope>
     </dependency>
   </dependencies>
 

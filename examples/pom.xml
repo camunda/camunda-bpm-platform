@@ -40,7 +40,8 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <scope>test</scope>
+        <version>4.13.2</version>
+        <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -52,13 +53,15 @@
     <dependency>
       <groupId>org.graalvm.js</groupId>
       <artifactId>js</artifactId>
-      <scope>test</scope>
+        <version>22.3.1</version>
+        <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.graalvm.js</groupId>
       <artifactId>js-scriptengine</artifactId>
-      <scope>test</scope>
+        <version>22.3.1</version>
+        <scope>test</scope>
     </dependency>
 
   </dependencies>

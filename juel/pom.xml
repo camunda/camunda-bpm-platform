@@ -21,7 +21,7 @@
     a dependency BOM for the license book -->
     <skip-third-party-bom>false</skip-third-party-bom>
     <!-- Using Jakarta Expression Language 4.0 for Java 8 compatibility -->
-    <version.jakarta.el>4.0.0</version.jakarta.el>
+    <version.jakarta.el>5.0.1</version.jakarta.el>
   </properties>
 
   <dependencies>

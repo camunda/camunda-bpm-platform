@@ -26,33 +26,36 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
+        <version>4.13.2</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.jackson</groupId>
       <artifactId>jackson-mapper-asl</artifactId>
-      <version>1.9.11</version>
+      <version>1.9.13</version>
     </dependency>
 
     <dependency>
       <groupId>org.apache.tomcat</groupId>
       <artifactId>tomcat-jdbc</artifactId>
-      <version>7.0.33</version>
+      <version>11.0.0-M4</version>
     </dependency>
 
     <dependency>
       <groupId>org.apache.tomcat</groupId>
       <artifactId>tomcat-juli</artifactId>
-      <version>7.0.33</version>
+      <version>11.0.0-M4</version>
     </dependency>
 
     <dependency>
       <groupId>com.fasterxml.uuid</groupId>
       <artifactId>java-uuid-generator</artifactId>
+        <version>4.2.0</version>
     </dependency>
 
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
+        <version>1.4.6</version>
     </dependency>
 
   </dependencies>

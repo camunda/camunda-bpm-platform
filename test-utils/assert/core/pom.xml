@@ -17,7 +17,8 @@
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
-      <scope>provided</scope>
+        <version>3.24.2</version>
+        <scope>provided</scope>
     </dependency>
 
     <!-- managed by camunda internal dependencies -->

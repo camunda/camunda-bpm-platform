@@ -29,17 +29,20 @@
     <dependency>
       <groupId>com.fasterxml.uuid</groupId>
       <artifactId>java-uuid-generator</artifactId>
+        <version>4.2.0</version>
     </dependency>
 
     <!-- Quarkus dependencies -->
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-arc</artifactId>
+        <version>3.0.0.Alpha6</version>
     </dependency>
 
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-agroal</artifactId>
+        <version>3.0.0.Alpha6</version>
     </dependency>
 
   </dependencies>

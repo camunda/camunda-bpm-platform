@@ -17,14 +17,16 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
-      <scope>compile</scope>
+        <version>3.0.4</version>
+        <scope>compile</scope>
     </dependency>
 
     <!-- needed for JUnit4 execution -->
     <dependency>
       <groupId>org.junit.vintage</groupId>
       <artifactId>junit-vintage-engine</artifactId>
-      <scope>compile</scope>
+        <version>5.9.2</version>
+        <scope>compile</scope>
       <exclusions>
         <exclusion>
           <groupId>org.hamcrest</groupId>

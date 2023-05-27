@@ -62,43 +62,50 @@
     <dependency>
       <groupId>org.jboss.shrinkwrap.resolver</groupId>
       <artifactId>shrinkwrap-resolver-depchain</artifactId>
-      <scope>test</scope>
+        <version>3.1.4</version>
+        <scope>test</scope>
       <type>pom</type>
     </dependency>
 
     <dependency>
       <groupId>org.jboss.arquillian.junit</groupId>
       <artifactId>arquillian-junit-container</artifactId>
-      <scope>test</scope>
+        <version>1.7.0.Alpha14</version>
+        <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jboss.arquillian.protocol</groupId>
       <artifactId>arquillian-protocol-servlet</artifactId>
-      <scope>test</scope>
+        <version>1.7.0.Alpha14</version>
+        <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <scope>test</scope>
+        <version>4.13.2</version>
+        <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>com.github.tomakehurst</groupId>
       <artifactId>wiremock-jre8-standalone</artifactId>
-      <scope>test</scope>
+        <version>2.35.0</version>
+        <scope>test</scope>
     </dependency>
 
     <!-- required for wiremock-jre8-standalone - see CAM-14755 -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-jdk14</artifactId>
+        <version>2.0.5</version>
     </dependency>
 
     <dependency>
       <groupId>org.jboss.spec</groupId>
       <artifactId>jboss-javaee-6.0</artifactId>
-      <type>pom</type>
+        <version>3.0.3.Final</version>
+        <type>pom</type>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
@@ -111,7 +118,7 @@
     <dependency>
       <groupId>javax.enterprise.concurrent</groupId>
       <artifactId>javax.enterprise.concurrent-api</artifactId>
-      <version>1.0</version>
+      <version>1.1</version>
       <scope>provided</scope>
     </dependency>
 
@@ -175,16 +182,19 @@
     <dependency>
       <groupId>org.camunda.spin</groupId>
       <artifactId>camunda-spin-core</artifactId>
+        <version>1.18.1</version>
     </dependency>
 
     <dependency>
       <groupId>org.camunda.spin</groupId>
       <artifactId>camunda-spin-dataformat-json-jackson</artifactId>
+        <version>1.18.1</version>
     </dependency>
 
     <dependency>
       <groupId>com.fasterxml.jackson.datatype</groupId>
       <artifactId>jackson-datatype-joda</artifactId>
+        <version>2.14.2</version>
     </dependency>
 
     <!--
@@ -210,6 +220,7 @@
     <dependency>
       <groupId>org.camunda.connect</groupId>
       <artifactId>camunda-connect-core</artifactId>
+        <version>1.5.5</version>
     </dependency>
 
     <!-- explicit Spring dependencies for applications
@@ -217,29 +228,34 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
+        <version>6.0.9</version>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-jdbc</artifactId>
+        <version>6.0.6</version>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-tx</artifactId>
+        <version>6.0.6</version>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-orm</artifactId>
+        <version>6.0.6</version>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-web</artifactId>
+        <version>6.0.6</version>
     </dependency>
 
      <!-- weld for CDI support on tomcat-->
     <dependency>
       <groupId>org.jboss.weld.servlet</groupId>
       <artifactId>weld-servlet</artifactId>
-      <version>1.1.10.Final</version>
+      <version>2.4.8.Final</version>
       <scope>test</scope>
     </dependency>
 
@@ -247,7 +263,8 @@
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
       <artifactId>groovy-jsr223</artifactId>
-      <scope>test</scope>
+        <version>3.0.16</version>
+        <scope>test</scope>
     </dependency>
 
   </dependencies>

@@ -25,13 +25,15 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <scope>provided</scope>
+        <version>4.13.2</version>
+        <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
-      <scope>provided</scope>
+        <version>3.24.2</version>
+        <scope>provided</scope>
     </dependency>
 
   </dependencies>

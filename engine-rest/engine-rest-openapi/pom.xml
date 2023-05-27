@@ -18,14 +18,14 @@
     <openapi.generator.version>4.2.3</openapi.generator.version>
     <!-- properties versions used by the openapi client -->
     <!-- update them during openapi.generator version update  -->
-    <gson-fire-version>1.8.3</gson-fire-version>
-    <swagger-core-version>1.5.22</swagger-core-version>
-    <okhttp-version>3.14.2</okhttp-version>
-    <gson-version>2.8.9</gson-version>
-    <commons-lang3-version>3.9</commons-lang3-version>
+    <gson-fire-version>1.8.5</gson-fire-version>
+    <swagger-core-version>1.6.8</swagger-core-version>
+    <okhttp-version>5.0.0-alpha.11</okhttp-version>
+    <gson-version>2.10.1</gson-version>
+    <commons-lang3-version>3.12.0</commons-lang3-version>
     <maven-plugin-version>1.0.0</maven-plugin-version>
-    <javax-annotation-version>1.0</javax-annotation-version>
-    <junit-version>4.13.1</junit-version>
+    <javax-annotation-version>1.0-20050927.133100</javax-annotation-version>
+    <junit-version>4.13.2</junit-version>
   </properties>
 
   <dependencies>
@@ -41,7 +41,8 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-jdk14</artifactId>
-      <scope>test</scope>
+        <version>2.0.5</version>
+        <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.github.tomakehurst</groupId>
@@ -52,7 +53,8 @@
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
-      <scope>test</scope>
+        <version>3.24.2</version>
+        <scope>test</scope>
     </dependency>
 
 

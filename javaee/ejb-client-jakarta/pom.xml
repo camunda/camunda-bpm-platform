@@ -36,17 +36,20 @@
     <dependency>
       <groupId>jakarta.annotation</groupId>
       <artifactId>jakarta.annotation-api</artifactId>
-      <scope>provided</scope>
+        <version>2.1.0</version>
+        <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>jakarta.ejb</groupId>
       <artifactId>jakarta.ejb-api</artifactId>
-      <scope>provided</scope>
+        <version>4.0.1</version>
+        <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>jakarta.servlet</groupId>
       <artifactId>jakarta.servlet-api</artifactId>
-      <scope>provided</scope>
+        <version>5.0.0</version>
+        <scope>provided</scope>
     </dependency>
 
     <dependency>

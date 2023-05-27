@@ -47,13 +47,14 @@
     <dependency>
       <groupId>javax.enterprise.concurrent</groupId>
       <artifactId>javax.enterprise.concurrent-api</artifactId>
-      <version>1.0</version>
+      <version>1.1</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.jboss.spec</groupId>
       <artifactId>jboss-javaee-6.0</artifactId>
-      <type>pom</type>
+        <version>3.0.3.Final</version>
+        <type>pom</type>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
@@ -66,17 +67,20 @@
     <dependency>
       <groupId>org.jboss.arquillian.junit</groupId>
       <artifactId>arquillian-junit-container</artifactId>
-      <scope>test</scope>
+        <version>1.7.0.Alpha14</version>
+        <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <scope>test</scope>
+        <version>4.13.2</version>
+        <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
-      <scope>test</scope>
+        <version>3.24.2</version>
+        <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.h2database</groupId>
@@ -86,17 +90,20 @@
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <scope>test</scope>
+        <version>1.4.6</version>
+        <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
-      <scope>test</scope>
+        <version>2.0.5</version>
+        <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jul-to-slf4j</artifactId>
-      <scope>test</scope>
+        <version>2.0.5</version>
+        <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.camunda.bpm</groupId>

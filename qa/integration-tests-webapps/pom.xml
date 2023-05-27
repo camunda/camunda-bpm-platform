@@ -84,7 +84,8 @@
     <dependency>
       <groupId>org.jboss.shrinkwrap.resolver</groupId>
       <artifactId>shrinkwrap-resolver-depchain</artifactId>
-      <exclusions>
+        <version>3.1.4</version>
+        <exclusions>
         <exclusion>
           <!-- conflicts with the version pulled in transitively via selenium-java  -->
           <groupId>com.google.guava</groupId>
@@ -98,18 +99,21 @@
     <dependency>
       <groupId>org.jboss.arquillian.junit</groupId>
       <artifactId>arquillian-junit-container</artifactId>
-      <scope>test</scope>
+        <version>1.7.0.Alpha14</version>
+        <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jboss.arquillian.protocol</groupId>
       <artifactId>arquillian-protocol-servlet</artifactId>
-      <scope>test</scope>
+        <version>1.7.0.Alpha14</version>
+        <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.jboss.spec</groupId>
       <artifactId>jboss-javaee-6.0</artifactId>
-      <type>pom</type>
+        <version>3.0.3.Final</version>
+        <type>pom</type>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
@@ -122,50 +126,56 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <scope>test</scope>
+        <version>4.13.2</version>
+        <scope>test</scope>
     </dependency>
     
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-java</artifactId>
-      <scope>test</scope>
+        <version>4.8.1</version>
+        <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>xml-apis</groupId>
       <artifactId>xml-apis</artifactId>
-      <version>1.4.01</version>
+      <version>2.0.2</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
-      <scope>test</scope>
+        <version>4.5.14</version>
+        <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>com.sun.jersey.contribs</groupId>
       <artifactId>jersey-apache-client4</artifactId>
-      <scope>test</scope>
+        <version>1.19.4</version>
+        <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-json</artifactId>
-      <scope>test</scope>
+        <version>1.19.4</version>
+        <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.sun.jersey.contribs</groupId>
       <artifactId>jersey-multipart</artifactId>
-      <version>1.15</version>
+      <version>1.19.4</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <scope>test</scope>
+        <version>2.11.0</version>
+        <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -177,7 +187,8 @@
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-logging</artifactId>
-      <scope>test</scope>
+        <version>1.11.0</version>
+        <scope>test</scope>
     </dependency>
 
     <dependency>

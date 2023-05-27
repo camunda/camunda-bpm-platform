@@ -13,7 +13,7 @@
 
   <properties>
     <!-- pin tomcat version for engine-rest -->
-    <version.tomcat>7.0.50</version.tomcat>
+    <version.tomcat>11.0.0-M4</version.tomcat>
     <rest.http.port>38080</rest.http.port>
     <javax.activation.version>1.1.1</javax.activation.version>
   </properties>
@@ -33,15 +33,17 @@
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
+        <version>2.11.0</version>
     </dependency>
 
     <dependency>
       <groupId>com.fasterxml.jackson.jaxrs</groupId>
       <artifactId>jackson-jaxrs-json-provider</artifactId>
-      <!--
-      * Since version 2.10.0 this dependency comes with transitive Jakarta dependencies
-      * These trans-deps are directly included in JDKs <= Java 8 * For Java >= 9 compatible containers, we make sure to include these dependencies
-      -->
+        <version>2.14.2</version>
+        <!--
+        * Since version 2.10.0 this dependency comes with transitive Jakarta dependencies
+        * These trans-deps are directly included in JDKs <= Java 8 * For Java >= 9 compatible containers, we make sure to include these dependencies
+        -->
       <exclusions>
         <exclusion>
           <groupId>jakarta.activation</groupId>
@@ -57,11 +59,13 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
+        <version>2.15.1</version>
     </dependency>
 
     <dependency>
       <groupId>com.fasterxml.jackson.datatype</groupId>
       <artifactId>jackson-datatype-jsr310</artifactId>
+        <version>2.14.2</version>
     </dependency>
 
     <!-- provided deps -->
@@ -86,7 +90,8 @@
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-logging</artifactId>
-      <scope>provided</scope>
+        <version>1.11.0</version>
+        <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -99,7 +104,8 @@
     <dependency>
       <groupId>com.sun.xml.bind</groupId>
       <artifactId>jaxb-impl</artifactId>
-      <scope>test</scope>
+        <version>4.0.2</version>
+        <scope>test</scope>
     </dependency>
 
     <!--
@@ -126,7 +132,8 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <scope>test</scope>
+        <version>4.13.2</version>
+        <scope>test</scope>
     </dependency>
 
     <!-- only included to prevent java.lang.ClassNotFoundException: org.apache.jasper.servlet.JspServlet -->
@@ -149,7 +156,8 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <scope>test</scope>
+        <version>5.2.0</version>
+        <scope>test</scope>
       <exclusions>
         <exclusion>
           <groupId>org.hamcrest</groupId>
@@ -161,13 +169,15 @@
     <dependency>
       <groupId>io.rest-assured</groupId>
       <artifactId>rest-assured</artifactId>
-      <scope>test</scope>
+        <version>5.3.0</version>
+        <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpcore</artifactId>
-      <scope>test</scope>
+        <version>4.4.15</version>
+        <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -199,25 +209,29 @@
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <scope>test</scope>
+        <version>1.4.6</version>
+        <scope>test</scope>
     </dependency>
 
    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
-      <scope>test</scope>
+       <version>2.0.5</version>
+       <scope>test</scope>
    </dependency>
 
    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jul-to-slf4j</artifactId>
-      <scope>test</scope>
+       <version>2.0.5</version>
+       <scope>test</scope>
    </dependency>
 
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-testing</artifactId>
-      <scope>test</scope>
+        <version>1.11.0</version>
+        <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -237,7 +251,8 @@
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
-      <scope>test</scope>
+        <version>3.24.2</version>
+        <scope>test</scope>
     </dependency>
 
   </dependencies>

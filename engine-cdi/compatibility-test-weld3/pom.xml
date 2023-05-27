@@ -14,8 +14,8 @@
   </parent>
 
   <properties>
-    <arquillian.container.version>2.1.0.Final</arquillian.container.version>
-    <arquillian.junit.version>1.6.0.Final</arquillian.junit.version>
+    <arquillian.container.version>3.0.2.Final</arquillian.container.version>
+    <arquillian.junit.version>1.7.0.Alpha14</arquillian.junit.version>
     <weld.version>3.1.9.Final</weld.version>
     <javaee.spec>jboss-javaee-8.0</javaee.spec>
     <javaee.spec.version>1.0.4.Final</javaee.spec.version>
@@ -83,17 +83,20 @@
     <dependency>
       <groupId>org.jboss.weld</groupId>
       <artifactId>weld-core-impl</artifactId>
-      <scope>test</scope>
+        <version>5.1.0.Final</version>
+        <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jboss.weld.module</groupId>
       <artifactId>weld-web</artifactId>
-      <scope>test</scope>
+        <version>5.1.0.Final</version>
+        <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jboss.weld</groupId>
       <artifactId>weld-api</artifactId>
-      <scope>test</scope>
+        <version>5.0.Final</version>
+        <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jboss.arquillian.junit</groupId>
@@ -104,12 +107,14 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <scope>test</scope>
+        <version>4.13.2</version>
+        <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
-      <scope>test</scope>
+        <version>3.24.2</version>
+        <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.h2database</groupId>
@@ -119,17 +124,20 @@
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <scope>test</scope>
+        <version>1.4.6</version>
+        <scope>test</scope>
     </dependency>    
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
-      <scope>test</scope>
+        <version>2.0.5</version>
+        <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jul-to-slf4j</artifactId>
-      <scope>test</scope>
+        <version>2.0.5</version>
+        <scope>test</scope>
     </dependency>
   </dependencies>
 

@@ -52,12 +52,14 @@
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
+        <version>2.11.0</version>
     </dependency>
 
     <dependency>
       <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
       <artifactId>jackson-jakarta-rs-json-provider</artifactId>
-      <exclusions>
+        <version>2.15.1</version>
+        <exclusions>
         <exclusion>
           <groupId>jakarta.activation</groupId>
           <artifactId>jakarta.activation-api</artifactId>
@@ -72,33 +74,39 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
+        <version>2.15.1</version>
     </dependency>
 
     <dependency>
       <groupId>com.fasterxml.jackson.datatype</groupId>
       <artifactId>jackson-datatype-jsr310</artifactId>
+        <version>2.14.2</version>
     </dependency>
 
     <!-- provided deps -->
     <dependency>
       <groupId>jakarta.servlet</groupId>
       <artifactId>jakarta.servlet-api</artifactId>
-      <scope>provided</scope>
+        <version>5.0.0</version>
+        <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>jakarta.activation</groupId>
       <artifactId>jakarta.activation-api</artifactId>
-      <scope>provided</scope>
+        <version>2.1.0</version>
+        <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>jakarta.ws.rs</groupId>
       <artifactId>jakarta.ws.rs-api</artifactId>
-      <scope>provided</scope>
+        <version>3.1.0</version>
+        <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>jakarta.xml.bind</groupId>
       <artifactId>jakarta.xml.bind-api</artifactId>
-      <scope>provided</scope>
+        <version>4.0.0</version>
+        <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -116,7 +124,8 @@
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-logging</artifactId>
-      <scope>provided</scope>
+        <version>1.11.0</version>
+        <scope>provided</scope>
     </dependency>
 
     <!--
@@ -151,13 +160,15 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <scope>test</scope>
+        <version>4.13.2</version>
+        <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <scope>test</scope>
+        <version>5.2.0</version>
+        <scope>test</scope>
       <exclusions>
         <exclusion>
           <groupId>org.hamcrest</groupId>
@@ -169,13 +180,15 @@
     <dependency>
       <groupId>io.rest-assured</groupId>
       <artifactId>rest-assured</artifactId>
-      <scope>test</scope>
+        <version>5.3.0</version>
+        <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpcore</artifactId>
-      <scope>test</scope>
+        <version>4.4.15</version>
+        <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -193,13 +206,15 @@
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-testing</artifactId>
-      <scope>test</scope>
+        <version>1.11.0</version>
+        <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
-      <scope>test</scope>
+        <version>3.24.2</version>
+        <scope>test</scope>
     </dependency>
 
   </dependencies>

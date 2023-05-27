@@ -26,30 +26,34 @@
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-arc-deployment</artifactId>
+        <version>3.0.0.Alpha6</version>
     </dependency>
 
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-agroal-deployment</artifactId>
+        <version>3.0.0.Alpha6</version>
     </dependency>
 
     <!-- Test dependencies -->
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-junit5-internal</artifactId>
-      <scope>test</scope>
+        <version>3.0.0.Alpha6</version>
+        <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-jdbc-h2-deployment</artifactId>
-      <scope>test</scope>
+        <version>3.0.0.Alpha6</version>
+        <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
-      <version>3.22.0</version>
+      <version>3.24.2</version>
       <scope>test</scope>
     </dependency>
 

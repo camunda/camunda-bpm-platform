@@ -12,7 +12,7 @@
   </parent>
 
   <properties>
-    <version.json-schema-validator>1.0.76</version.json-schema-validator>
+    <version.json-schema-validator>1.0.78</version.json-schema-validator>
   </properties>
 
   <dependencies>
@@ -26,12 +26,14 @@
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
+        <version>2.10.1</version>
     </dependency>
 
     <!-- file management -->
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
+        <version>2.11.0</version>
     </dependency>
 
     <!-- json schema validation -->

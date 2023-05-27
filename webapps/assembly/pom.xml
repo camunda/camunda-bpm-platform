@@ -51,7 +51,8 @@
     <dependency>
       <groupId>org.jboss.spec</groupId>
       <artifactId>jboss-javaee-6.0</artifactId>
-      <type>pom</type>
+        <version>3.0.3.Final</version>
+        <type>pom</type>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
@@ -64,7 +65,8 @@
     <dependency>
       <groupId>org.jboss.spec.javax.ws.rs</groupId>
       <artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
-      <scope>provided</scope>
+        <version>2.0.2.Final</version>
+        <scope>provided</scope>
     </dependency>
 
     <!-- rest api -->

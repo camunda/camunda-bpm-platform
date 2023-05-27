@@ -20,7 +20,7 @@
     <version.nodejs>17.9.1</version.nodejs>
     <version.npm>8.11.0</version.npm>
 
-    <version.jetty>9.4.31.v20200723</version.jetty>
+    <version.jetty>11.0.14</version.jetty>
 
     <web.resources.override>src/main/runtime/default/webapp</web.resources.override>
 
@@ -70,7 +70,8 @@
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-logging</artifactId>
-      <exclusions>
+        <version>1.11.0</version>
+        <exclusions>
         <exclusion>
           <groupId>org.slf4j</groupId>
           <artifactId>slf4j-api</artifactId>
@@ -83,18 +84,21 @@
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-testing</artifactId>
-      <scope>test</scope>
+        <version>1.11.0</version>
+        <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <scope>provided</scope>
+        <version>4.13.2</version>
+        <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>com.fasterxml.uuid</groupId>
       <artifactId>java-uuid-generator</artifactId>
-      <scope>test</scope>
+        <version>4.2.0</version>
+        <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -106,19 +110,22 @@
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
-      <scope>test</scope>
+        <version>3.24.2</version>
+        <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <scope>test</scope>
+        <version>5.2.0</version>
+        <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-inline</artifactId>
-      <scope>test</scope>
+        <version>5.2.0</version>
+        <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -138,7 +145,8 @@
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <scope>test</scope>
+        <version>1.4.6</version>
+        <scope>test</scope>
     </dependency>
 
   </dependencies>

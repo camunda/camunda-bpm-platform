@@ -16,6 +16,7 @@
     <dependency>
       <groupId>org.camunda.spin</groupId>
       <artifactId>camunda-spin-core</artifactId>
+        <version>1.18.1</version>
     </dependency>
 
     <dependency>
@@ -35,55 +36,64 @@
     <dependency>
       <groupId>org.camunda.spin</groupId>
       <artifactId>camunda-spin-dataformat-json-jackson</artifactId>
-      <scope>test</scope>
+        <version>1.18.1</version>
+        <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.camunda.spin</groupId>
       <artifactId>camunda-spin-dataformat-xml-dom</artifactId>
-      <scope>test</scope>
+        <version>1.18.1</version>
+        <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
-      <scope>test</scope>
+        <version>3.24.2</version>
+        <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <scope>test</scope>
+        <version>1.4.6</version>
+        <scope>test</scope>
     </dependency>
     
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
-      <scope>test</scope>
+        <version>2.0.5</version>
+        <scope>test</scope>
    </dependency>
    
    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jul-to-slf4j</artifactId>
-      <scope>test</scope>
+       <version>2.0.5</version>
+       <scope>test</scope>
    </dependency>
 
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
       <artifactId>groovy-jsr223</artifactId>
-      <scope>test</scope>
+        <version>3.0.16</version>
+        <scope>test</scope>
     </dependency>
     
     <dependency>
       <groupId>org.graalvm.js</groupId>
       <artifactId>js</artifactId>
-      <scope>test</scope>
+        <version>22.3.1</version>
+        <scope>test</scope>
     </dependency>
     
     <dependency>
       <groupId>org.graalvm.js</groupId>
       <artifactId>js-scriptengine</artifactId>
-      <scope>test</scope>
+        <version>22.3.1</version>
+        <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -95,25 +105,29 @@
     <dependency>
       <groupId>org.skyscreamer</groupId>
       <artifactId>jsonassert</artifactId>
-      <scope>test</scope>
+        <version>1.5.1</version>
+        <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.python</groupId>
       <artifactId>jython</artifactId>
-      <scope>test</scope>
+        <version>2.7.3b1</version>
+        <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.jruby</groupId>
       <artifactId>jruby-complete</artifactId>
-      <scope>test</scope>
+        <version>9.4.2.0</version>
+        <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <scope>test</scope>
+        <version>5.2.0</version>
+        <scope>test</scope>
       <exclusions>
         <exclusion>
           <groupId>org.hamcrest</groupId>
@@ -125,7 +139,8 @@
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-testing</artifactId>
-      <scope>test</scope>
+        <version>1.11.0</version>
+        <scope>test</scope>
     </dependency>
 
   </dependencies>

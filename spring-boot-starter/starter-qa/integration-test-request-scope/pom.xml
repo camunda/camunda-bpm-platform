@@ -53,11 +53,13 @@
     <dependency>
       <groupId>org.graalvm.js</groupId>
       <artifactId>js</artifactId>
+        <version>22.3.1</version>
     </dependency>
 
     <dependency>
       <groupId>org.graalvm.js</groupId>
       <artifactId>js-scriptengine</artifactId>
+        <version>22.3.1</version>
     </dependency>
   </dependencies>
 

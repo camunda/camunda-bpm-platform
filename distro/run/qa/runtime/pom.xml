@@ -52,33 +52,38 @@
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
-      <scope>test</scope>
+        <version>3.24.2</version>
+        <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <scope>test</scope>
+        <version>1.4.6</version>
+        <scope>test</scope>
     </dependency>
 
     <!-- JNA needed for Managed Container -->
     <dependency>
       <groupId>net.java.dev.jna</groupId>
       <artifactId>jna</artifactId>
-      <scope>test</scope>
+        <version>5.12.1</version>
+        <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>net.java.dev.jna</groupId>
       <artifactId>jna-platform</artifactId>
-      <scope>test</scope>
+        <version>5.12.1</version>
+        <scope>test</scope>
     </dependency>
 
     <!-- REST -->
     <dependency>
       <groupId>io.rest-assured</groupId>
       <artifactId>rest-assured</artifactId>
-      <scope>test</scope>
+        <version>5.3.0</version>
+        <scope>test</scope>
     </dependency>
 
     <!-- SpringBoot BOM excludes commons-logging, so we need to add it explicitly -->
@@ -104,7 +109,8 @@
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-java</artifactId>
-      <scope>test</scope>
+        <version>4.8.1</version>
+        <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -116,19 +122,22 @@
     <dependency>
       <groupId>com.sun.jersey.contribs</groupId>
       <artifactId>jersey-apache-client4</artifactId>
-      <scope>test</scope>
+        <version>1.19.4</version>
+        <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-json</artifactId>
-      <scope>test</scope>
+        <version>1.19.4</version>
+        <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
-      <scope>test</scope>
+        <version>3.0.4</version>
+        <scope>test</scope>
     </dependency>
 
   </dependencies>

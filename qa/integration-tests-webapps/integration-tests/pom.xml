@@ -24,7 +24,8 @@
     <dependency>
       <groupId>org.jboss.shrinkwrap.resolver</groupId>
       <artifactId>shrinkwrap-resolver-depchain</artifactId>
-      <exclusions>
+        <version>3.1.4</version>
+        <exclusions>
         <exclusion>
           <!-- conflicts with the version pulled in transitively via selenium-java  -->
           <groupId>com.google.guava</groupId>
@@ -37,7 +38,7 @@
     <dependency>
       <groupId>com.konghq</groupId>
       <artifactId>unirest-java</artifactId>
-      <version>2.3.10</version>
+      <version>3.14.2</version>
       <classifier>standalone</classifier>
       <scope>provided</scope>
     </dependency>
@@ -57,37 +58,44 @@
     <dependency>
       <groupId>com.sun.jersey.contribs</groupId>
       <artifactId>jersey-apache-client4</artifactId>
-      <scope>provided</scope>
+        <version>1.19.4</version>
+        <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-json</artifactId>
-      <scope>provided</scope>
+        <version>1.19.4</version>
+        <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <scope>provided</scope>
+        <version>4.13.2</version>
+        <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
-      <scope>provided</scope>
+        <version>4.5.14</version>
+        <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.jboss.arquillian.junit</groupId>
       <artifactId>arquillian-junit-container</artifactId>
-      <scope>provided</scope>
+        <version>1.7.0.Alpha14</version>
+        <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <scope>provided</scope>
+        <version>2.11.0</version>
+        <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-java</artifactId>
-      <scope>provided</scope>
+        <version>4.8.1</version>
+        <scope>provided</scope>
     </dependency>
   </dependencies>
 
