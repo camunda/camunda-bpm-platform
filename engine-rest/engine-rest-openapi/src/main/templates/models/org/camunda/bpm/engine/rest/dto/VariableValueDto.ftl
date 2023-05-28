@@ -5,7 +5,8 @@
         name = "value"
         type = "ref"
         dto = "AnyValue"
-        desc = "The variable's value. Value differs depending on the variable's type and on the deserializeValues parameter."/>
+        desc = "The variable's value. Value differs depending on the variable's type and on the deserializeValues parameter.
+                For variables of type File the value has to be submitted as Base64 encoded string."/>
 
     <@lib.property
         name = "type"
