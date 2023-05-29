@@ -21,20 +21,29 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.history.HistoricCaseInstance;
+import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricIncident;
+import org.camunda.bpm.engine.history.HistoricJobLog;
+import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
+import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupJobDeclaration;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.runtime.Incident;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.slf4j.Logger;
@@ -59,8 +68,15 @@ public final class Removable {
     mappings.put(Task.class, this::removeAllTasks);
     mappings.put(ProcessInstance.class, this::removeAllProcessInstances);
     mappings.put(Deployment.class, this::removeAllDeployments);
+
     mappings.put(Incident.class, this::removeAllIncidents);
     mappings.put(HistoricIncident.class, this::removeAllHistoricIncidents);
+
+    mappings.put(HistoricProcessInstance.class, this::removeAllHistoricProcessInstances);
+    mappings.put(HistoricDecisionInstance.class, this::removeAllHistoricDecisionInstances);
+    mappings.put(HistoricCaseInstance.class, this::removeAllHistoricCaseInstances);
+
+    mappings.put(HistoryCleanupJobDeclaration.class, this::removeHistoryCleanupJobRelatedEntries);
 
     // Add here new mappings with [class - associated remove method]
 
@@ -128,10 +144,68 @@ public final class Removable {
    *
    * @throws Exception in case anything fails during the process of deletion for any of the classes
    */
-  public void removeAll() throws Exception {
-    for (Map.Entry<Class<?>, ThrowingRunnable> entry : mappings.entrySet()) {
-      ThrowingRunnable runnable = entry.getValue();
-      runnable.execute();
+  public void removeAll() throws EntityRemoveException {
+    try {
+      for (Map.Entry<Class<?>, ThrowingRunnable> entry : mappings.entrySet()) {
+        ThrowingRunnable runnable = entry.getValue();
+
+        runnable.execute();
+      }
+    } catch (Exception e) {
+      throw new EntityRemoveException(e);
+    }
+  }
+
+  private void removeHistoryCleanupJobRelatedEntries() {
+    HistoryService historyService = engine.getHistoryService();
+    ProcessEngineConfigurationImpl config = (ProcessEngineConfigurationImpl) engine.getProcessEngineConfiguration();
+
+    config.getCommandExecutorTxRequired().execute((Command<Void>) context -> {
+
+      List<Job> jobs = historyService.findHistoryCleanupJobs();
+
+      for (Job job : jobs) {
+        context.getJobManager().deleteJob((JobEntity) job);
+        context.getHistoricJobLogManager().deleteHistoricJobLogByJobId(job.getId());
+      }
+
+      final List<HistoricJobLog> list = historyService.createHistoricJobLogQuery().list();
+      for (HistoricJobLog jobLog : list) {
+        context.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobLog.getJobId());
+      }
+
+      List<HistoricIncident> historicIncidents = historyService.createHistoricIncidentQuery().list();
+      for (HistoricIncident historicIncident : historicIncidents) {
+        context.getDbEntityManager().delete((HistoricIncidentEntity) historicIncident);
+      }
+
+      context.getMeterLogManager().deleteAll();
+      return null;
+    });
+  }
+
+  private void removeAllHistoricProcessInstances() {
+    HistoryService historyService = engine.getHistoryService();
+    List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery().list();
+    for (HistoricProcessInstance historicProcessInstance : historicProcessInstances) {
+      historyService.deleteHistoricProcessInstance(historicProcessInstance.getId());
+    }
+  }
+
+  private void removeAllHistoricDecisionInstances() {
+    HistoryService historyService = engine.getHistoryService();
+    List<HistoricDecisionInstance> historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery()
+        .list();
+    for (HistoricDecisionInstance historicDecisionInstance : historicDecisionInstances) {
+      historyService.deleteHistoricDecisionInstanceByInstanceId(historicDecisionInstance.getId());
+    }
+  }
+
+  private void removeAllHistoricCaseInstances() {
+    HistoryService historyService = engine.getHistoryService();
+    List<HistoricCaseInstance> historicCaseInstances = historyService.createHistoricCaseInstanceQuery().list();
+    for (HistoricCaseInstance historicCaseInstance : historicCaseInstances) {
+      historyService.deleteHistoricCaseInstance(historicCaseInstance.getId());
     }
   }
 
@@ -201,7 +275,8 @@ public final class Removable {
         commandContext.getHistoricJobLogManager()
             .deleteHistoricJobLogsByHandlerType(TimerSuspendProcessDefinitionHandler.TYPE);
 
-        List<Incident> incidents = Context.getProcessEngineConfiguration().getRuntimeService()
+        List<Incident> incidents = Context.getProcessEngineConfiguration()
+            .getRuntimeService()
             .createIncidentQuery()
             .list();
 

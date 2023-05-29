@@ -38,7 +38,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.TimeZone;
-
 import org.apache.commons.lang3.time.DateUtils;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.CaseService;
@@ -51,8 +50,6 @@ import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.history.HistoricCaseInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
-import org.camunda.bpm.engine.history.HistoricIncident;
-import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.BatchWindowConfiguration;
@@ -63,7 +60,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHelper;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupJobHandlerConfiguration;
 import org.camunda.bpm.engine.impl.metrics.Meter;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.ExceptionUtil;
@@ -81,11 +77,10 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.dmn.businessruletask.TestPojo;
-import org.camunda.bpm.engine.test.util.EntityRemoveRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
-import org.camunda.bpm.engine.test.util.RemoveAfter;
+import org.camunda.bpm.engine.test.util.Removable;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.After;
@@ -130,13 +125,13 @@ public class HistoryCleanupTest {
 
   protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
-  protected EntityRemoveRule entityRemoveRule = EntityRemoveRule.ofUnitializedRule(() -> testRule);
+
+  protected Removable removable;
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule)
       .around(engineRule)
-      .around(testRule)
-      .around(entityRemoveRule);
+      .around(testRule);
 
   private final Random random = new Random();
 
@@ -165,6 +160,7 @@ public class HistoryCleanupTest {
     processEngineConfiguration.setHistoryCleanupStrategy(HISTORY_CLEANUP_STRATEGY_END_TIME_BASED);
 
     identityService.setAuthenticatedUserId(USER_ID);
+    removable = Removable.of(testRule);
   }
 
   @After
@@ -175,55 +171,11 @@ public class HistoryCleanupTest {
     processEngineConfiguration.setHistoryCleanupBatchSize(defaultBatchSize);
     processEngineConfiguration.setHistoryCleanupStrategy(HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED);
     processEngineConfiguration.setHistoryCleanupEnabled(true);
+    processEngineConfiguration.setHistoryCleanupDefaultNumberOfRetries(3);
 
-    processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
-      public Void execute(CommandContext commandContext) {
-
-        // delete all cleanup jobs, & their historic log
-        List<Job> jobs = historyService.findHistoryCleanupJobs();
-        for (Job job: jobs) {
-          commandContext.getJobManager().deleteJob((JobEntity) job);
-          commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(job.getId());
-        }
-        // ------
-
-        //cleanup "detached" historic job logs
-        final List<HistoricJobLog> list = historyService.createHistoricJobLogQuery().list();
-        for (HistoricJobLog jobLog: list) {
-          commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobLog.getJobId());
-        }
-
-        // historic incident
-        List<HistoricIncident> historicIncidents = historyService.createHistoricIncidentQuery().list();
-        for (HistoricIncident historicIncident : historicIncidents) {
-          commandContext.getDbEntityManager().delete((HistoricIncidentEntity) historicIncident);
-        }
-
-        commandContext.getMeterLogManager().deleteAll();
-
-        return null;
-      }
-    });
-
-    List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery().list();
-    for (HistoricProcessInstance historicProcessInstance: historicProcessInstances) {
-      historyService.deleteHistoricProcessInstance(historicProcessInstance.getId());
-    }
-
-    List<HistoricDecisionInstance> historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery().list();
-    for (HistoricDecisionInstance historicDecisionInstance: historicDecisionInstances) {
-      historyService.deleteHistoricDecisionInstanceByInstanceId(historicDecisionInstance.getId());
-    }
-
-    List<HistoricCaseInstance> historicCaseInstances = historyService.createHistoricCaseInstanceQuery().list();
-    for (HistoricCaseInstance historicCaseInstance: historicCaseInstances) {
-      historyService.deleteHistoricCaseInstance(historicCaseInstance.getId());
-    }
-
+    removable.removeAll();
     clearMetrics();
     identityService.clearAuthentication();
-
-    resetHistoryCleanupConfig();
   }
 
   protected void clearMetrics() {
@@ -1395,7 +1347,6 @@ public class HistoryCleanupTest {
   }
 
   @Test
-  @RemoveAfter
   public void shouldDisableRetriesOnCleanupJob() {
     //given
     ProcessEngineConfiguration configuration = engineRule.getProcessEngineConfiguration();
@@ -1406,10 +1357,6 @@ public class HistoryCleanupTest {
 
     //then
     assertThat(cleanupJob.getRetries()).isEqualTo(0);
-  }
-
-  private void resetHistoryCleanupConfig() {
-    engineRule.getProcessEngineConfiguration().setHistoryCleanupDefaultNumberOfRetries(3);
   }
 
   private Date getNextRunWithinBatchWindow(Date currentTime) {
