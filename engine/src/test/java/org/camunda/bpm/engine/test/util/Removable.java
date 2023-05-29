@@ -32,7 +32,9 @@ import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
 import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.slf4j.Logger;
@@ -57,7 +59,8 @@ public final class Removable {
     mappings.put(Task.class, this::removeAllTasks);
     mappings.put(ProcessInstance.class, this::removeAllProcessInstances);
     mappings.put(Deployment.class, this::removeAllDeployments);
-    mappings.put(HistoricIncident.class, this::removeAllIncidents);
+    mappings.put(Incident.class, this::removeAllIncidents);
+    mappings.put(HistoricIncident.class, this::removeAllHistoricIncidents);
 
     // Add here new mappings with [class - associated remove method]
 
@@ -68,13 +71,14 @@ public final class Removable {
   /**
    * Static Creation method.
    *
-   * @param engineTestRule the process engine test rule, non-null.
+   * @param rule the process engine test rule, non-null.
    * @return the {@link Removable}
    */
-  public static Removable of(ProcessEngineTestRule engineTestRule) {
-    Objects.requireNonNull(engineTestRule);
+  public static Removable of(ProcessEngineTestRule rule) {
+    Objects.requireNonNull(rule);
+    Objects.requireNonNull(rule.processEngineRule);
 
-    return new Removable(engineTestRule.processEngineRule.getProcessEngine());
+    return of(rule.processEngineRule.getProcessEngine());
   }
 
   public static Removable of(ProcessEngine engine) {
@@ -162,7 +166,7 @@ public final class Removable {
     }
   }
 
-  private void removeAllIncidents() {
+  private void removeAllHistoricIncidents() {
     ProcessEngineConfigurationImpl engineConfiguration = (ProcessEngineConfigurationImpl) engine.getProcessEngineConfiguration();
     CommandExecutor commandExecutor = engineConfiguration.getCommandExecutorTxRequired();
 
@@ -185,6 +189,30 @@ public final class Removable {
       return null;
     });
   }
+
+  private void removeAllIncidents() {
+    ProcessEngineConfigurationImpl engineConfiguration = (ProcessEngineConfigurationImpl) engine.getProcessEngineConfiguration();
+    CommandExecutor commandExecutor = engineConfiguration.getCommandExecutorTxRequired();
+
+    commandExecutor.execute(commandContext -> {
+      HistoryLevel historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
+
+      if (historyLevel.equals(HistoryLevel.HISTORY_LEVEL_FULL)) {
+        commandContext.getHistoricJobLogManager()
+            .deleteHistoricJobLogsByHandlerType(TimerSuspendProcessDefinitionHandler.TYPE);
+
+        List<Incident> incidents = Context.getProcessEngineConfiguration().getRuntimeService()
+            .createIncidentQuery()
+            .list();
+
+        for (Incident incident : incidents) {
+          commandContext.getIncidentManager().delete((IncidentEntity) incident);
+        }
+      }
+      return null;
+    });
+  }
+
 }
 
 /**

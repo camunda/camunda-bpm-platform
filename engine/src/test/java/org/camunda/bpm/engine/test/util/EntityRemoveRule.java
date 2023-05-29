@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.test.util;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.function.Supplier;
 import org.camunda.bpm.engine.task.Task;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
@@ -35,10 +36,23 @@ public class EntityRemoveRule extends TestWatcher {
 
   private static final Logger LOG = LoggerFactory.getLogger(EntityRemoveRule.class);
 
-  private final Removable removable;
+  private Removable removable;
+  private Supplier<ProcessEngineTestRule> supplier;
 
-  public EntityRemoveRule(ProcessEngineTestRule engineTestRule) {
+  private EntityRemoveRule(ProcessEngineTestRule engineTestRule) {
     this.removable = Removable.of(engineTestRule);
+  }
+
+  private EntityRemoveRule(Supplier<ProcessEngineTestRule> supplier) {
+    this.supplier = supplier;
+  }
+
+  public static EntityRemoveRule of(ProcessEngineTestRule rule) {
+    return new EntityRemoveRule(rule);
+  }
+
+  public static EntityRemoveRule ofUnitializedRule(Supplier<ProcessEngineTestRule> supplier) {
+    return new EntityRemoveRule(supplier);
   }
 
   @Override
@@ -50,6 +64,11 @@ public class EntityRemoveRule extends TestWatcher {
       return new Statement() {
         @Override
         public void evaluate() throws Throwable {
+
+          if (isNotInitialized()) {
+            removable = Removable.of(supplier.get());
+          }
+
           base.evaluate();
 
           if (!methodHasRemoveAfterAnnotation) {
@@ -86,6 +105,10 @@ public class EntityRemoveRule extends TestWatcher {
       throw new RuntimeException(
           "Failed to fetch annotation | annotationName: " + annotation.getName() + ", methodName: " + methodName, e);
     }
+  }
+
+  private boolean isNotInitialized() {
+    return supplier != null && removable == null;
   }
 
 }
