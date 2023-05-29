@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import org.camunda.bpm.engine.impl.HistoryCleanupRetriesFactory;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -58,7 +59,8 @@ public class EverLivingJobEntity extends JobEntity {
     }
 
     //cancel the retries -> will resolve job incident if present
-    setRetries(commandContext.getProcessEngineConfiguration().getDefaultNumberOfRetries());
+    int retries = HistoryCleanupRetriesFactory.create(jobHandlerType);
+    setRetries(retries);
 
     //delete the job's exception byte array and exception message
     if (exceptionByteArrayId != null) {

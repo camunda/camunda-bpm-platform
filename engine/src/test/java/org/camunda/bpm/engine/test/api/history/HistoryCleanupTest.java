@@ -646,22 +646,20 @@ public class HistoryCleanupTest {
   }
 
   @Test
-  public void testHistoryCleanupJobResolveIncident() {
+  public void shouldResolveIncidentAndApplyDefaultRetryConfig() {
     //given
     String jobId = historyService.cleanUpHistoryAsync(true).getId();
     imitateFailedJob(jobId);
 
-    assertEquals(5, processEngineConfiguration.getDefaultNumberOfRetries());
     //when
-    //call to cleanup history means that incident was resolved
     jobId = historyService.cleanUpHistoryAsync(true).getId();
 
     //then
     JobEntity jobEntity = getJobEntity(jobId);
-    assertEquals(5, jobEntity.getRetries());
-    assertEquals(null, jobEntity.getExceptionByteArrayId());
-    assertEquals(null, jobEntity.getExceptionMessage());
 
+    assertThat(jobEntity.getExceptionByteArrayId()).isNull();
+    assertThat(jobEntity.getExceptionMessage()).isNull();
+    assertThat(jobEntity.getRetries()).isEqualTo(3);
   }
 
   private void imitateFailedJob(final String jobId) {
@@ -1358,6 +1356,7 @@ public class HistoryCleanupTest {
     //then
     assertThat(cleanupJob.getRetries()).isEqualTo(0);
   }
+
 
   private Date getNextRunWithinBatchWindow(Date currentTime) {
     return processEngineConfiguration.getBatchWindowManager().getNextBatchWindow(currentTime, processEngineConfiguration).getStart();
