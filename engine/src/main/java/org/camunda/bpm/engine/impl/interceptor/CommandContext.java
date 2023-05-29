@@ -648,10 +648,6 @@ public class CommandContext {
     return restrictUserOperationLogToAuthenticatedUsers;
   }
 
-  public boolean isHistoryCleanupEnabled() {
-    return processEngineConfiguration.isHistoryCleanupEnabled();
-  }
-
   public void setRestrictUserOperationLogToAuthenticatedUsers(boolean restrictUserOperationLogToAuthenticatedUsers) {
     this.restrictUserOperationLogToAuthenticatedUsers = restrictUserOperationLogToAuthenticatedUsers;
   }

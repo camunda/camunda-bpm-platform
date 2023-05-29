@@ -60,13 +60,13 @@ public class HistoryCleanupCmd implements Command<Job> {
   @Override
   public Job execute(CommandContext context) {
 
-    if (!context.isHistoryCleanupEnabled()) {
+    ProcessEngineConfigurationImpl processEngineConfiguration = context.getProcessEngineConfiguration();
+
+    if (!processEngineConfiguration.isHistoryCleanupEnabled()) {
       throw new BadUserRequestException("History cleanup is disabled for this engine");
     }
 
     AuthorizationManager authorizationManager = context.getAuthorizationManager();
-    ProcessEngineConfigurationImpl processEngineConfiguration = context.getProcessEngineConfiguration();
-
     authorizationManager.checkCamundaAdmin();
 
     //validate
