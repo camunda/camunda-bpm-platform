@@ -271,7 +271,6 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
 
   public Map<Class<? extends DbEntity>, DbOperation> deleteHistoricProcessInstancesByRemovalTime(Date removalTime, int minuteFrom, int minuteTo, int batchSize) {
     CommandContext commandContext = Context.getCommandContext();
-    commandContext = null;
 
     Map<Class<? extends DbEntity>, DbOperation> deleteOperations = new HashMap<>();
 
