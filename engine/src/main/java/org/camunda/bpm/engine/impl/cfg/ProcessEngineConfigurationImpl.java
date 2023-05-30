@@ -376,9 +376,6 @@ import org.camunda.bpm.engine.impl.variable.serializer.StringValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.TypedValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializerFactory;
 import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
-import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSession;
-import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSessionFactory;
-import org.camunda.bpm.engine.impl.variable.serializer.jpa.JPAVariableSerializer;
 import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
@@ -2734,23 +2731,23 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   // JPA //////////////////////////////////////////////////////////////////////
 
   protected void initJpa() {
-    if (jpaPersistenceUnitName != null) {
-      jpaEntityManagerFactory = JpaHelper.createEntityManagerFactory(jpaPersistenceUnitName);
-    }
-    if (jpaEntityManagerFactory != null) {
-      sessionFactories.put(EntityManagerSession.class, new EntityManagerSessionFactory(jpaEntityManagerFactory, jpaHandleTransaction, jpaCloseEntityManager));
-      JPAVariableSerializer jpaType = (JPAVariableSerializer) variableSerializers.getSerializerByName(JPAVariableSerializer.NAME);
-      // Add JPA-type
-      if (jpaType == null) {
-        // We try adding the variable right after byte serializer, if available
-        int serializableIndex = variableSerializers.getSerializerIndexByName(ValueType.BYTES.getName());
-        if (serializableIndex > -1) {
-          variableSerializers.addSerializer(new JPAVariableSerializer(), serializableIndex);
-        } else {
-          variableSerializers.addSerializer(new JPAVariableSerializer());
-        }
-      }
-    }
+//    if (jpaPersistenceUnitName != null) {
+//      jpaEntityManagerFactory = JpaHelper.createEntityManagerFactory(jpaPersistenceUnitName);
+//    }
+//    if (jpaEntityManagerFactory != null) {
+//      sessionFactories.put(EntityManagerSession.class, new EntityManagerSessionFactory(jpaEntityManagerFactory, jpaHandleTransaction, jpaCloseEntityManager));
+//      JPAVariableSerializer jpaType = (JPAVariableSerializer) variableSerializers.getSerializerByName(JPAVariableSerializer.NAME);
+//      // Add JPA-type
+//      if (jpaType == null) {
+//        // We try adding the variable right after byte serializer, if available
+//        int serializableIndex = variableSerializers.getSerializerIndexByName(ValueType.BYTES.getName());
+//        if (serializableIndex > -1) {
+//          variableSerializers.addSerializer(new JPAVariableSerializer(), serializableIndex);
+//        } else {
+//          variableSerializers.addSerializer(new JPAVariableSerializer());
+//        }
+//      }
+//    }
   }
 
   protected void initBeans() {

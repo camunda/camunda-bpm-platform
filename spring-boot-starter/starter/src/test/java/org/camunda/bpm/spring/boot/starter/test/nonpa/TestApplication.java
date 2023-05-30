@@ -24,7 +24,6 @@ import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.spin.plugin.impl.SpinProcessEnginePlugin;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -33,7 +32,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 public class TestApplication {
 
-  @ConditionalOnProperty(prefix = "camunda.bpm.jpa", name = "enabled", havingValue = "false")
+  // TODO
+//  @ConditionalOnProperty(prefix = "camunda.bpm.jpa", name = "enabled", havingValue = "false")
   @Configuration
   public class TestConfiguration {
 

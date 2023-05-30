@@ -130,12 +130,6 @@ public class CamundaBpmProperties {
   private EventingProperty eventing = new EventingProperty();
 
   /**
-   * JPA configuration
-   */
-  @NestedConfigurationProperty
-  private JpaProperty jpa = new JpaProperty();
-
-  /**
    * job execution configuration
    */
   @NestedConfigurationProperty
@@ -237,14 +231,6 @@ public class CamundaBpmProperties {
 
   public void setEventing(EventingProperty eventing) {
     this.eventing = eventing;
-  }
-
-  public JpaProperty getJpa() {
-    return jpa;
-  }
-
-  public void setJpa(JpaProperty jpa) {
-    this.jpa = jpa;
   }
 
   public JobExecutionProperty getJobExecution() {
@@ -358,7 +344,6 @@ public class CamundaBpmProperties {
       .add("licenseFile=" + licenseFile)
       .add("metrics=" + metrics)
       .add("database=" + database)
-      .add("jpa=" + jpa)
       .add("jobExecution=" + jobExecution)
       .add("webapp=" + webapp)
       .add("authorization=" + authorization)

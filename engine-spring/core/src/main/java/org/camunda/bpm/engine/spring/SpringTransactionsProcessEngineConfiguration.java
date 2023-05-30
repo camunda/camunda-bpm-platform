@@ -35,7 +35,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandCounterInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.LogInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.ProcessApplicationContextInterceptor;
-import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSession;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ContextResource;
@@ -115,15 +114,6 @@ public class SpringTransactionsProcessEngineConfiguration extends ProcessEngineC
   protected void initTransactionContextFactory() {
     if(transactionContextFactory == null && transactionManager != null) {
       transactionContextFactory = new SpringTransactionContextFactory(transactionManager);
-    }
-  }
-
-  @Override
-  protected void initJpa() {
-    super.initJpa();
-    if (jpaEntityManagerFactory != null) {
-      sessionFactories.put(EntityManagerSession.class,
-              new SpringEntityManagerSessionFactory(jpaEntityManagerFactory, jpaHandleTransaction, jpaCloseEntityManager));
     }
   }
 

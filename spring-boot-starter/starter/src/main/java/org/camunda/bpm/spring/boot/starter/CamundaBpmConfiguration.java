@@ -31,7 +31,6 @@ import org.camunda.bpm.spring.boot.starter.configuration.CamundaFailedJobConfigu
 import org.camunda.bpm.spring.boot.starter.configuration.CamundaHistoryConfiguration;
 import org.camunda.bpm.spring.boot.starter.configuration.CamundaHistoryLevelAutoHandlingConfiguration;
 import org.camunda.bpm.spring.boot.starter.configuration.CamundaJobConfiguration;
-import org.camunda.bpm.spring.boot.starter.configuration.CamundaJpaConfiguration;
 import org.camunda.bpm.spring.boot.starter.configuration.CamundaMetricsConfiguration;
 import org.camunda.bpm.spring.boot.starter.configuration.CamundaProcessEngineConfiguration;
 import org.camunda.bpm.spring.boot.starter.configuration.condition.NeedsHistoryAutoConfigurationCondition;
@@ -46,7 +45,6 @@ import org.camunda.bpm.spring.boot.starter.configuration.impl.DefaultHistoryConf
 import org.camunda.bpm.spring.boot.starter.configuration.impl.DefaultHistoryLevelAutoHandlingConfiguration;
 import org.camunda.bpm.spring.boot.starter.configuration.impl.DefaultJobConfiguration;
 import org.camunda.bpm.spring.boot.starter.configuration.impl.DefaultJobConfiguration.JobConfiguration;
-import org.camunda.bpm.spring.boot.starter.configuration.impl.DefaultJpaConfiguration;
 import org.camunda.bpm.spring.boot.starter.configuration.impl.DefaultMetricsConfiguration;
 import org.camunda.bpm.spring.boot.starter.configuration.impl.DefaultProcessEngineConfiguration;
 import org.camunda.bpm.spring.boot.starter.configuration.impl.GenericPropertiesConfiguration;
@@ -89,14 +87,6 @@ public class CamundaBpmConfiguration {
   @ConditionalOnMissingBean(CamundaDatasourceConfiguration.class)
   public static CamundaDatasourceConfiguration camundaDatasourceConfiguration() {
     return new DefaultDatasourceConfiguration();
-  }
-
-  @Bean
-  @ConditionalOnBean(name = "entityManagerFactory")
-  @ConditionalOnMissingBean(CamundaJpaConfiguration.class)
-  @ConditionalOnProperty(prefix = "camunda.bpm.jpa", name = "enabled", havingValue = "true", matchIfMissing = true)
-  public static CamundaJpaConfiguration camundaJpaConfiguration() {
-    return new DefaultJpaConfiguration();
   }
 
   @Bean
