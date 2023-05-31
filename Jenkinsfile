@@ -89,7 +89,7 @@ pipeline {
               upstreamProjectName = "/" + env.JOB_NAME
               upstreamBuildNumber = env.BUILD_NUMBER
 
-              if (env.BRANCH_NAME == cambpmDefaultBranch() || cambpmWithLabels('webapp-integration', 'all-as', 'h2', 'websphere', 'weblogic', 'jbosseap', 'run', 'spring-boot', 'authorizations', 'e2e')) {
+              if (env.BRANCH_NAME == cambpmDefaultBranch() || cambpmWithLabels('webapp-integration', 'all-as', 'h2', 'websphere', 'weblogic', 'jbosseap', 'run', 'spring-boot', 'e2e')) {
                 cambpmTriggerDownstream(
                   platformVersionDir + "/cambpm-ee/" + eeMainProjectBranch,
                   [string(name: 'UPSTREAM_PROJECT_NAME', value: upstreamProjectName),
@@ -102,7 +102,7 @@ pipeline {
               // or PR builds only, master builds should be excluded.
               // The Sidetrack pipeline contains CRDB and Azure DB stages,
               // triggered with the cockroachdb and sqlserver PR labels.
-              if (env.BRANCH_NAME != cambpmDefaultBranch() && cambpmWithLabels('all-db', 'cockroachdb', 'sqlserver', 'authorizations')) {
+              if (env.BRANCH_NAME != cambpmDefaultBranch() && cambpmWithLabels('all-db', 'cockroachdb', 'sqlserver')) {
                 cambpmTriggerDownstream(
                   platformVersionDir + "/cambpm-ce/cambpm-sidetrack/${env.BRANCH_NAME}",
                   [string(name: 'UPSTREAM_PROJECT_NAME', value: upstreamProjectName),
@@ -143,7 +143,7 @@ pipeline {
         stage('db-UNIT-h2') {
           when {
             expression {
-              cambpmWithLabels('h2', 'rolling-update', 'migration', 'all-db', 'default-build', 'authorizations')
+              cambpmWithLabels('h2', 'rolling-update', 'migration', 'all-db', 'default-build')
             }
           }
           steps {
@@ -155,25 +155,6 @@ pipeline {
               postFailure: {
                 cambpmPublishTestResult()
                 cambpmAddFailedStageType(failedStageTypes, 'db-unit')
-              }
-            ])
-          }
-        }
-        stage('db-UNIT-authorizations-h2') {
-          when {
-            expression {
-              cambpmWithLabels('h2', 'authorizations')
-            }
-          }
-          steps {
-            cambpmConditionalRetry([
-              agentLabel: 'h2',
-              runSteps: {
-                cambpmRunMavenByStageType('db-unit-authorizations', 'h2')
-              },
-              postFailure: {
-                cambpmPublishTestResult()
-                cambpmAddFailedStageType(failedStageTypes, 'db-unit-authorizations')
               }
             ])
           }

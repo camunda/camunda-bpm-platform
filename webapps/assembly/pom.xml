@@ -587,13 +587,6 @@
       </build>
     </profile>
 
-    <profile>
-      <id>cfgAuthorizationCheckRevokesAlways</id>
-      <properties>
-        <authorizationCheckRevokes>always</authorizationCheckRevokes>
-      </properties>
-    </profile>
-
     <!--  check history audit -->
     <profile>
       <id>cfghistoryaudit</id>

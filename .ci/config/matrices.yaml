@@ -21,7 +21,6 @@ engine-webapp-unit:
   - 'sqlserver_2019'
   stages:
   - 'db-unit'
-  - 'db-unit-authorizations'
 engine-rest:
   stages:
   - 'engine-rest-unit-jersey-2'
@@ -51,7 +50,6 @@ sidetrack-stages:
   - 'azure_sql_db_150'
   stages:
   - 'db-unit'
-  - 'db-unit-authorizations'
   - 'sql-scripts'
   - 'instance-migration'
   - 'old-engine'
