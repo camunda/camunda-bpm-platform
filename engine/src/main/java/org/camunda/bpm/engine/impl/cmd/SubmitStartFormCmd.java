@@ -19,8 +19,9 @@ package org.camunda.bpm.engine.impl.cmd;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Map;
-
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.CommandChecker;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -29,6 +30,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.cache.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
@@ -71,6 +73,13 @@ public class SubmitStartFormCmd implements Command<ProcessInstance>, Serializabl
     }
 
     processInstance.startWithFormProperties(variables);
+
+    commandContext.getOperationLogManager().logProcessInstanceOperation(
+        UserOperationLogEntry.OPERATION_TYPE_CREATE,
+        processInstance.getId(),
+        processInstance.getProcessDefinitionId(),
+        processInstance.getProcessDefinition().getKey(),
+        Collections.singletonList(PropertyChange.EMPTY_CHANGE));
 
     return processInstance;
   }
