@@ -31,7 +31,7 @@ public class HistoryCleanupConfiguration {
   public static HistoryCleanupConfiguration of(CommandContext context) {
     ProcessEngineConfiguration config = context.getProcessEngineConfiguration();
 
-    final int numberOfRetries = config.getHistoryCleanupDefaultNumberOfRetries();
+    final Integer numberOfRetries = config.getHistoryCleanupDefaultNumberOfRetries();
     return of(numberOfRetries);
   }
 
@@ -39,7 +39,7 @@ public class HistoryCleanupConfiguration {
     return new HistoryCleanupConfiguration(maxNumberOfRetries);
   }
 
-  public int getMaxNumberOfRetries() {
+  public Integer getMaxNumberOfRetries() {
     return maxNumberOfRetries;
   }
 

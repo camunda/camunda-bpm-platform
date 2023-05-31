@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupJobH
 
 public class HistoryCleanupRetriesFactory {
 
-  public static int create(HistoryCleanupContext context) {
+  public static Integer create(HistoryCleanupContext context) {
     HistoryCleanupConfiguration configuration = context.getConfiguration();
 
     if (configuration.isEmpty()) {
@@ -34,7 +34,7 @@ public class HistoryCleanupRetriesFactory {
     return configuration.getMaxNumberOfRetries();
   }
 
-  public static int create(String jobHandlerType) {
+  public static Integer create(String jobHandlerType) {
 
     if (HistoryCleanupJobHandler.TYPE.equals(jobHandlerType)) {
       return Context.getProcessEngineConfiguration().getHistoryCleanupDefaultNumberOfRetries();

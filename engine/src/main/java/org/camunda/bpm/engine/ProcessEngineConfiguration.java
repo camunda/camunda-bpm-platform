@@ -260,7 +260,8 @@ public abstract class ProcessEngineConfiguration {
   protected boolean jpaCloseEntityManager;
 
   protected int defaultNumberOfRetries = JobEntity.DEFAULT_RETRIES;
-  protected int historyCleanupDefaultNumberOfRetries = JobEntity.DEFAULT_RETRIES;
+
+  protected Integer historyCleanupDefaultNumberOfRetries;
 
   protected ClassLoader classLoader;
 
@@ -934,11 +935,11 @@ public abstract class ProcessEngineConfiguration {
     this.defaultNumberOfRetries = defaultNumberOfRetries;
   }
 
-  public int getHistoryCleanupDefaultNumberOfRetries() {
+  public Integer getHistoryCleanupDefaultNumberOfRetries() {
     return this.historyCleanupDefaultNumberOfRetries;
   }
 
-  public ProcessEngineConfiguration setHistoryCleanupDefaultNumberOfRetries(int historyCleanupDefaultNumberOfRetries) {
+  public ProcessEngineConfiguration setHistoryCleanupDefaultNumberOfRetries(Integer historyCleanupDefaultNumberOfRetries) {
     this.historyCleanupDefaultNumberOfRetries = historyCleanupDefaultNumberOfRetries;
     return this;
   }
