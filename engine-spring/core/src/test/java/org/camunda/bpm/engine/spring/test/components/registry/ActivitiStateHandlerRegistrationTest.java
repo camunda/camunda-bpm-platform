@@ -41,7 +41,7 @@ public class ActivitiStateHandlerRegistrationTest {
     int processVariablesIndex = 4;
     int processIdIndex = 2;
     String processName = "testProcess";
-    ActivitiStateHandlerRegistration registration = new ActivitiStateHandlerRegistration(processVariablesExpected, 
+    ActivitiStateHandlerRegistration registration = new ActivitiStateHandlerRegistration(processVariablesExpected,
         handlerMethod, handler, stateName, beanName,
         processVariablesIndex, processIdIndex, processName);
     assertEquals("org.camunda.bpm.engine.spring.components.registry.ActivitiStateHandlerRegistration@" + Integer.toHexString(registration.hashCode()) + "["
@@ -54,7 +54,7 @@ public class ActivitiStateHandlerRegistrationTest {
         + "processIdIndex=2, "
         + "processName=testProcess]", registration.toString());
   }
-  
+
   @Test
   public void shouldHaveDetailledStringRepresentationWithNullValues() throws Exception {
     Map<Integer, String> processVariablesExpected = Collections.singletonMap(34, "testValue");
@@ -65,7 +65,7 @@ public class ActivitiStateHandlerRegistrationTest {
     int processVariablesIndex = 4;
     int processIdIndex = 2;
     String processName = "testProcess";
-    ActivitiStateHandlerRegistration registration = new ActivitiStateHandlerRegistration(processVariablesExpected, 
+    ActivitiStateHandlerRegistration registration = new ActivitiStateHandlerRegistration(processVariablesExpected,
         handlerMethod, handler, stateName, beanName,
         processVariablesIndex, processIdIndex, processName);
     assertEquals("org.camunda.bpm.engine.spring.components.registry.ActivitiStateHandlerRegistration@" + Integer.toHexString(registration.hashCode()) + "["

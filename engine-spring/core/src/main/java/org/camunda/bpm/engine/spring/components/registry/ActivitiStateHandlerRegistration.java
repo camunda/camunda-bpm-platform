@@ -31,70 +31,70 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 1.0
  */
 public class ActivitiStateHandlerRegistration {
-	private Map<Integer, String> processVariablesExpected = new ConcurrentHashMap<Integer, String>();
-	private Method handlerMethod;
-	private Object handler;
-	private String stateName;
-	private String beanName;
-	private int processVariablesIndex = -1;
-	private int processIdIndex = -1;
-	private String processName;
+  private Map<Integer, String> processVariablesExpected = new ConcurrentHashMap<Integer, String>();
+  private Method handlerMethod;
+  private Object handler;
+  private String stateName;
+  private String beanName;
+  private int processVariablesIndex = -1;
+  private int processIdIndex = -1;
+  private String processName;
 
-	public ActivitiStateHandlerRegistration(
-			Map<Integer, String> processVariablesExpected, Method handlerMethod,
-			Object handler, String stateName, String beanName,
-			int processVariablesIndex, int processIdIndex, String processName) {
-		this.processVariablesExpected = processVariablesExpected;
-		this.handlerMethod = handlerMethod;
-		this.handler = handler;
-		this.stateName = stateName;
-		this.beanName = beanName;
-		this.processVariablesIndex = processVariablesIndex;
-		this.processIdIndex = processIdIndex;
-		this.processName = processName;
-	}
+  public ActivitiStateHandlerRegistration(
+      Map<Integer, String> processVariablesExpected, Method handlerMethod,
+      Object handler, String stateName, String beanName,
+      int processVariablesIndex, int processIdIndex, String processName) {
+    this.processVariablesExpected = processVariablesExpected;
+    this.handlerMethod = handlerMethod;
+    this.handler = handler;
+    this.stateName = stateName;
+    this.beanName = beanName;
+    this.processVariablesIndex = processVariablesIndex;
+    this.processIdIndex = processIdIndex;
+    this.processName = processName;
+  }
 
-	public int getProcessVariablesIndex() {
-		return processVariablesIndex;
-	}
+  public int getProcessVariablesIndex() {
+    return processVariablesIndex;
+  }
 
-	public int getProcessIdIndex() {
-		return processIdIndex;
-	}
+  public int getProcessIdIndex() {
+    return processIdIndex;
+  }
 
-	public boolean requiresProcessId() {
-		return this.processIdIndex > -1;
-	}
+  public boolean requiresProcessId() {
+    return this.processIdIndex > -1;
+  }
 
-	public boolean requiresProcessVariablesMap() {
-		return processVariablesIndex > -1;
-	}
+  public boolean requiresProcessVariablesMap() {
+    return processVariablesIndex > -1;
+  }
 
-	public String getBeanName() {
-		return beanName;
-	}
+  public String getBeanName() {
+    return beanName;
+  }
 
-	public Map<Integer, String> getProcessVariablesExpected() {
-		return processVariablesExpected;
-	}
+  public Map<Integer, String> getProcessVariablesExpected() {
+    return processVariablesExpected;
+  }
 
-	public Method getHandlerMethod() {
-		return handlerMethod;
-	}
+  public Method getHandlerMethod() {
+    return handlerMethod;
+  }
 
-	public Object getHandler() {
-		return handler;
-	}
+  public Object getHandler() {
+    return handler;
+  }
 
-	public String getStateName() {
-		return stateName;
-	}
+  public String getStateName() {
+    return stateName;
+  }
 
-	public String getProcessName() {
-		return processName;
-	}
+  public String getProcessName() {
+    return processName;
+  }
 
-	@Override
+  @Override
   public String toString() {
     return super.toString() + "["
         + "processVariablesExpected=" + processVariablesExpected + ", "

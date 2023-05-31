@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.spring;
+package org.camunda.bpm.engine.spring.impl;
 
 
 import org.camunda.bpm.engine.impl.cfg.TransactionContext;
@@ -34,8 +34,8 @@ public class SpringTransactionContext implements TransactionContext {
 
   protected PlatformTransactionManager transactionManager;
   protected CommandContext commandContext;
-  protected TransactionState lastTransactionState = null; 
-  
+  protected TransactionState lastTransactionState = null;
+
   public SpringTransactionContext(PlatformTransactionManager transactionManager, CommandContext commandContext) {
     this.transactionManager = transactionManager;
     this.commandContext = commandContext;
@@ -60,7 +60,7 @@ public class SpringTransactionContext implements TransactionContext {
       }
     });
   }
-  
+
   public void commit() {
     // Do nothing, transaction is managed by spring
   }
@@ -73,34 +73,34 @@ public class SpringTransactionContext implements TransactionContext {
 
   public void addTransactionListener(final TransactionState transactionState, final TransactionListener transactionListener) {
     if (transactionState.equals(TransactionState.COMMITTING)) {
-      
+
       TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
         @Override
         public void beforeCommit(boolean readOnly) {
           transactionListener.execute(commandContext);
         }
       });
-      
+
     } else if (transactionState.equals(TransactionState.COMMITTED)) {
-    
+
       TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
         @Override
         public void afterCommit() {
           transactionListener.execute(commandContext);
         }
       });
-      
+
     } else if (transactionState.equals(TransactionState.ROLLINGBACK)) {
-      
+
       TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
         @Override
         public void beforeCompletion() {
           transactionListener.execute(commandContext);
         }
       });
-      
+
     } else if (transactionState.equals(TransactionState.ROLLED_BACK)) {
-      
+
       TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
         @Override
         public void afterCompletion(int status) {
@@ -109,9 +109,9 @@ public class SpringTransactionContext implements TransactionContext {
           }
         }
       });
-      
+
     }
-    
+
   }
 
   public boolean isTransactionActive() {
@@ -119,7 +119,7 @@ public class SpringTransactionContext implements TransactionContext {
            !TransactionState.ROLLED_BACK.equals(lastTransactionState) &&
            !TransactionState.ROLLINGBACK.equals(lastTransactionState);
   }
-  
+
   protected abstract class TransactionSynchronizationAdapter implements TransactionSynchronization {
 
     public void suspend() {
@@ -142,7 +142,7 @@ public class SpringTransactionContext implements TransactionContext {
 
     public void afterCompletion(int status) {
     }
-    
+
   }
 
 }

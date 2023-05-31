@@ -53,188 +53,188 @@ import org.springframework.util.ClassUtils;
  */
 public class ProcessScope implements Scope, InitializingBean, BeanFactoryPostProcessor, DisposableBean {
 
-	/**
-	 * Map of the processVariables. Supports correct, scoped access to process variables so that
-	 * <code>
-	 *
-	 * @Value("#{ processVariables['customerId'] }") long customerId;
-	 * </code>
-	 * <p/>
-	 * works in any bean - scoped or not
-	 */
-	public final static String PROCESS_SCOPE_PROCESS_VARIABLES_SINGLETON = "processVariables";
-	public final static String PROCESS_SCOPE_NAME = "process";
+  /**
+   * Map of the processVariables. Supports correct, scoped access to process variables so that
+   * <code>
+   *
+   * @Value("#{ processVariables['customerId'] }") long customerId;
+   * </code>
+   * <p/>
+   * works in any bean - scoped or not
+   */
+  public final static String PROCESS_SCOPE_PROCESS_VARIABLES_SINGLETON = "processVariables";
+  public final static String PROCESS_SCOPE_NAME = "process";
 
-	private ClassLoader classLoader = ClassUtils.getDefaultClassLoader();
+  private ClassLoader classLoader = ClassUtils.getDefaultClassLoader();
 
-	private boolean proxyTargetClass = true;
+  private boolean proxyTargetClass = true;
 
-	private Logger logger = Logger.getLogger(getClass().getName());
+  private Logger logger = Logger.getLogger(getClass().getName());
 
-	private ProcessEngine processEngine;
+  private ProcessEngine processEngine;
 
-	private RuntimeService runtimeService;
+  private RuntimeService runtimeService;
 
-	// set through Namespace reflection if nothing else
-	@SuppressWarnings("unused")
-	public void setProcessEngine(ProcessEngine processEngine) {
-		this.processEngine = processEngine;
-	}
+  // set through Namespace reflection if nothing else
+  @SuppressWarnings("unused")
+  public void setProcessEngine(ProcessEngine processEngine) {
+    this.processEngine = processEngine;
+  }
 
-	public Object get(String name, ObjectFactory<?> objectFactory) {
+  public Object get(String name, ObjectFactory<?> objectFactory) {
 
-		ExecutionEntity executionEntity = null;
-		try {
-			logger.fine("returning scoped object having beanName '" + name + "' for conversation ID '" + this.getConversationId() + "'. ");
+    ExecutionEntity executionEntity = null;
+    try {
+      logger.fine("returning scoped object having beanName '" + name + "' for conversation ID '" + this.getConversationId() + "'. ");
 
-			ProcessInstance processInstance = Context.getExecutionContext().getProcessInstance();
-			executionEntity = (ExecutionEntity) processInstance;
+      ProcessInstance processInstance = Context.getExecutionContext().getProcessInstance();
+      executionEntity = (ExecutionEntity) processInstance;
 
-			Object scopedObject = executionEntity.getVariable(name);
-			if (scopedObject == null) {
-				scopedObject = objectFactory.getObject();
-				if (scopedObject instanceof ScopedObject) {
-					ScopedObject sc = (ScopedObject) scopedObject;
-					scopedObject = sc.getTargetObject();
-					logger.fine("de-referencing " + ScopedObject.class.getName() + "#targetObject before persisting variable");
-				}
-				persistVariable(name, scopedObject);
-			}
-			return createDirtyCheckingProxy(name, scopedObject);
-		} catch (Throwable th) {
-			logger.warning("couldn't return value from process scope! " + StringUtil.getStackTrace(th));
-		} finally {
-			if (executionEntity != null) {
-				logger.fine("set variable '" + name + "' on executionEntity# " + executionEntity.getId());
-			}
-		}
-		return null;
-	}
+      Object scopedObject = executionEntity.getVariable(name);
+      if (scopedObject == null) {
+        scopedObject = objectFactory.getObject();
+        if (scopedObject instanceof ScopedObject) {
+          ScopedObject sc = (ScopedObject) scopedObject;
+          scopedObject = sc.getTargetObject();
+          logger.fine("de-referencing " + ScopedObject.class.getName() + "#targetObject before persisting variable");
+        }
+        persistVariable(name, scopedObject);
+      }
+      return createDirtyCheckingProxy(name, scopedObject);
+    } catch (Throwable th) {
+      logger.warning("couldn't return value from process scope! " + StringUtil.getStackTrace(th));
+    } finally {
+      if (executionEntity != null) {
+        logger.fine("set variable '" + name + "' on executionEntity# " + executionEntity.getId());
+      }
+    }
+    return null;
+  }
 
-	public void registerDestructionCallback(String name, Runnable callback) {
-		logger.fine("no support for registering descruction callbacks implemented currently. registerDestructionCallback('" + name + "',callback) will do nothing.");
-	}
+  public void registerDestructionCallback(String name, Runnable callback) {
+    logger.fine("no support for registering descruction callbacks implemented currently. registerDestructionCallback('" + name + "',callback) will do nothing.");
+  }
 
-	private String getExecutionId() {
-		return Context.getExecutionContext().getExecution().getId();
-	}
+  private String getExecutionId() {
+    return Context.getExecutionContext().getExecution().getId();
+  }
 
-	public Object remove(String name) {
+  public Object remove(String name) {
 
-		logger.fine("remove '" + name + "'");
-		return runtimeService.getVariable(getExecutionId(), name);
-	}
+    logger.fine("remove '" + name + "'");
+    return runtimeService.getVariable(getExecutionId(), name);
+  }
 
-	public Object resolveContextualObject(String key) {
+  public Object resolveContextualObject(String key) {
 
-		if ("executionId".equalsIgnoreCase(key))
-			return Context.getExecutionContext().getExecution().getId();
+    if ("executionId".equalsIgnoreCase(key))
+      return Context.getExecutionContext().getExecution().getId();
 
-		if ("processInstance".equalsIgnoreCase(key))
-			return Context.getExecutionContext().getProcessInstance();
+    if ("processInstance".equalsIgnoreCase(key))
+      return Context.getExecutionContext().getProcessInstance();
 
-		if ("processInstanceId".equalsIgnoreCase(key))
-			return Context.getExecutionContext().getProcessInstance().getId();
+    if ("processInstanceId".equalsIgnoreCase(key))
+      return Context.getExecutionContext().getProcessInstance().getId();
 
-		return null;
-	}
+    return null;
+  }
 
-	/**
-	 * creates a proxy that dispatches invocations to the currently bound {@link ProcessInstance}
-	 *
-	 * @return shareable {@link ProcessInstance}
-	 */
-	private Object createSharedProcessInstance()   {
-		ProxyFactory proxyFactoryBean = new ProxyFactory(ProcessInstance.class, new MethodInterceptor() {
-			public Object invoke(MethodInvocation methodInvocation) throws Throwable {
-				String methodName = methodInvocation.getMethod().getName() ;
+  /**
+   * creates a proxy that dispatches invocations to the currently bound {@link ProcessInstance}
+   *
+   * @return shareable {@link ProcessInstance}
+   */
+  private Object createSharedProcessInstance()   {
+    ProxyFactory proxyFactoryBean = new ProxyFactory(ProcessInstance.class, new MethodInterceptor() {
+      public Object invoke(MethodInvocation methodInvocation) throws Throwable {
+        String methodName = methodInvocation.getMethod().getName() ;
 
-				logger.info("method invocation for " + methodName+ ".");
-				if(methodName.equals("toString"))
-					return "SharedProcessInstance";
+        logger.info("method invocation for " + methodName+ ".");
+        if(methodName.equals("toString"))
+          return "SharedProcessInstance";
 
 
-				ProcessInstance processInstance = Context.getExecutionContext().getProcessInstance();
-				Method method = methodInvocation.getMethod();
-				Object[] args = methodInvocation.getArguments();
-				Object result = method.invoke(processInstance, args);
-				return result;
-			}
-		});
-		return proxyFactoryBean.getProxy(this.classLoader);
-	}
+        ProcessInstance processInstance = Context.getExecutionContext().getProcessInstance();
+        Method method = methodInvocation.getMethod();
+        Object[] args = methodInvocation.getArguments();
+        Object result = method.invoke(processInstance, args);
+        return result;
+      }
+    });
+    return proxyFactoryBean.getProxy(this.classLoader);
+  }
 
-	public String getConversationId() {
-		return getExecutionId();
-	}
+  public String getConversationId() {
+    return getExecutionId();
+  }
 
-	private final ConcurrentHashMap<String, Object> processVariablesMap = new ConcurrentHashMap<String, Object>() {
-		@Override
-		public java.lang.Object get(java.lang.Object o) {
+  private final ConcurrentHashMap<String, Object> processVariablesMap = new ConcurrentHashMap<String, Object>() {
+    @Override
+    public java.lang.Object get(java.lang.Object o) {
 
-			Assert.isInstanceOf(String.class, o, "the 'key' must be a String");
+      Assert.isInstanceOf(String.class, o, "the 'key' must be a String");
 
-			String varName = (String) o;
+      String varName = (String) o;
 
-			ProcessInstance processInstance = Context.getExecutionContext().getProcessInstance();
-			ExecutionEntity executionEntity = (ExecutionEntity) processInstance;
-			if (executionEntity.getVariableNames().contains(varName)) {
-				return executionEntity.getVariable(varName);
-			}
-			throw new RuntimeException("no processVariable by the name of '" + varName + "' is available!");
-		}
-	};
+      ProcessInstance processInstance = Context.getExecutionContext().getProcessInstance();
+      ExecutionEntity executionEntity = (ExecutionEntity) processInstance;
+      if (executionEntity.getVariableNames().contains(varName)) {
+        return executionEntity.getVariable(varName);
+      }
+      throw new RuntimeException("no processVariable by the name of '" + varName + "' is available!");
+    }
+  };
 
-	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+  public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 
-		beanFactory.registerScope(ProcessScope.PROCESS_SCOPE_NAME, this);
+    beanFactory.registerScope(ProcessScope.PROCESS_SCOPE_NAME, this);
 
-		Assert.isInstanceOf(BeanDefinitionRegistry.class, beanFactory, "BeanFactory was not a BeanDefinitionRegistry, so ProcessScope cannot be used.");
+    Assert.isInstanceOf(BeanDefinitionRegistry.class, beanFactory, "BeanFactory was not a BeanDefinitionRegistry, so ProcessScope cannot be used.");
 
-		BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
+    BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
 
-		for (String beanName : beanFactory.getBeanDefinitionNames()) {
-			BeanDefinition definition = beanFactory.getBeanDefinition(beanName);
-			// Replace this or any of its inner beans with scoped proxy if it has this scope
-			boolean scoped = PROCESS_SCOPE_NAME.equals(definition.getScope());
-			Scopifier scopifier = new Scopifier(registry, PROCESS_SCOPE_NAME, proxyTargetClass, scoped);
-			scopifier.visitBeanDefinition(definition);
-			if (scoped) {
-				Scopifier.createScopedProxy(beanName, definition, registry, proxyTargetClass);
-			}
-		}
+    for (String beanName : beanFactory.getBeanDefinitionNames()) {
+      BeanDefinition definition = beanFactory.getBeanDefinition(beanName);
+      // Replace this or any of its inner beans with scoped proxy if it has this scope
+      boolean scoped = PROCESS_SCOPE_NAME.equals(definition.getScope());
+      Scopifier scopifier = new Scopifier(registry, PROCESS_SCOPE_NAME, proxyTargetClass, scoped);
+      scopifier.visitBeanDefinition(definition);
+      if (scoped) {
+        Scopifier.createScopedProxy(beanName, definition, registry, proxyTargetClass);
+      }
+    }
 
-		beanFactory.registerSingleton(ProcessScope.PROCESS_SCOPE_PROCESS_VARIABLES_SINGLETON, this.processVariablesMap);
-		beanFactory.registerResolvableDependency(ProcessInstance.class,  createSharedProcessInstance());
-	}
+    beanFactory.registerSingleton(ProcessScope.PROCESS_SCOPE_PROCESS_VARIABLES_SINGLETON, this.processVariablesMap);
+    beanFactory.registerResolvableDependency(ProcessInstance.class,  createSharedProcessInstance());
+  }
 
-	public void destroy() throws Exception {
-		logger.info(ProcessScope.class.getName() + "#destroy() called ...");
-	}
+  public void destroy() throws Exception {
+    logger.info(ProcessScope.class.getName() + "#destroy() called ...");
+  }
 
-	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(this.processEngine, "the 'processEngine' must not be null!");
-		this.runtimeService = this.processEngine.getRuntimeService();
-	}
+  public void afterPropertiesSet() throws Exception {
+    Assert.notNull(this.processEngine, "the 'processEngine' must not be null!");
+    this.runtimeService = this.processEngine.getRuntimeService();
+  }
 
-	private Object createDirtyCheckingProxy(final String name, final Object scopedObject) throws Throwable {
-		ProxyFactory proxyFactoryBean = new ProxyFactory(scopedObject);
-		proxyFactoryBean.setProxyTargetClass(this.proxyTargetClass);
-		proxyFactoryBean.addAdvice(new MethodInterceptor() {
-			public Object invoke(MethodInvocation methodInvocation) throws Throwable {
-				Object result = methodInvocation.proceed();
-				persistVariable(name, scopedObject);
-				return result;
-			}
-		});
-		return proxyFactoryBean.getProxy(this.classLoader);
-	}
+  private Object createDirtyCheckingProxy(final String name, final Object scopedObject) throws Throwable {
+    ProxyFactory proxyFactoryBean = new ProxyFactory(scopedObject);
+    proxyFactoryBean.setProxyTargetClass(this.proxyTargetClass);
+    proxyFactoryBean.addAdvice(new MethodInterceptor() {
+      public Object invoke(MethodInvocation methodInvocation) throws Throwable {
+        Object result = methodInvocation.proceed();
+        persistVariable(name, scopedObject);
+        return result;
+      }
+    });
+    return proxyFactoryBean.getProxy(this.classLoader);
+  }
 
-	private void persistVariable(String variableName, Object scopedObject) {
-		ProcessInstance processInstance = Context.getExecutionContext().getProcessInstance();
-		ExecutionEntity executionEntity = (ExecutionEntity) processInstance;
-		Assert.isTrue(scopedObject instanceof Serializable, "the scopedObject is not " + Serializable.class.getName() + "!");
-		executionEntity.setVariable(variableName, scopedObject);
-	}
+  private void persistVariable(String variableName, Object scopedObject) {
+    ProcessInstance processInstance = Context.getExecutionContext().getProcessInstance();
+    ExecutionEntity executionEntity = (ExecutionEntity) processInstance;
+    Assert.isTrue(scopedObject instanceof Serializable, "the scopedObject is not " + Serializable.class.getName() + "!");
+    executionEntity.setVariable(variableName, scopedObject);
+  }
 }
 

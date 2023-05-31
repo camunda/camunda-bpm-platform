@@ -33,8 +33,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 public class TestApplication {
 
-  // TODO
-  @ConditionalOnProperty(prefix = "camunda.bpm.dummy", name = "enabled", havingValue = "false")
+  @ConditionalOnProperty(prefix = "camunda.bpm", name = "process-engine-name", havingValue = "nojpaTestEngine")
   @Configuration()
   public class TestConfiguration {
 

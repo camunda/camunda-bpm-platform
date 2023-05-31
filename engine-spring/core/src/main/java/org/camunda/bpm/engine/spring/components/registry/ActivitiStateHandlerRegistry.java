@@ -42,126 +42,126 @@ import java.util.logging.Logger;
  */
 public class ActivitiStateHandlerRegistry extends ReceiveTaskActivityBehavior implements BeanFactoryAware, BeanNameAware, ActivityBehavior, InitializingBean {
 
-	private Logger logger = Logger.getLogger(getClass().getName());
+  private Logger logger = Logger.getLogger(getClass().getName());
 
-	private String beanName;
+  private String beanName;
 
-	private BeanFactory beanFactory;
+  private BeanFactory beanFactory;
 
-	private volatile ConcurrentHashMap<String, ActivitiStateHandlerRegistration> registrations = new ConcurrentHashMap<String, ActivitiStateHandlerRegistration>();
+  private volatile ConcurrentHashMap<String, ActivitiStateHandlerRegistration> registrations = new ConcurrentHashMap<String, ActivitiStateHandlerRegistration>();
 
-	private ProcessEngine processEngine;
+  private ProcessEngine processEngine;
 
-	public void setProcessEngine(ProcessEngine processEngine) {
-		this.processEngine = processEngine;
-	}
+  public void setProcessEngine(ProcessEngine processEngine) {
+    this.processEngine = processEngine;
+  }
 
-	@Override
-	public void execute(ActivityExecution execution) throws Exception {
+  @Override
+  public void execute(ActivityExecution execution) throws Exception {
 
-	}
+  }
 
-	@Override
-	public void signal(ActivityExecution execution, String signalName, Object data) throws Exception {
-		leave(execution);
-	}
+  @Override
+  public void signal(ActivityExecution execution, String signalName, Object data) throws Exception {
+    leave(execution);
+  }
 
-	protected String registrationKey(String stateName, String processName) {
-		return (org.camunda.commons.utils.StringUtil.defaultString(processName) +
-				":" + org.camunda.commons.utils.StringUtil.defaultString(stateName)).toLowerCase();
-	}
+  protected String registrationKey(String stateName, String processName) {
+    return (org.camunda.commons.utils.StringUtil.defaultString(processName) +
+        ":" + org.camunda.commons.utils.StringUtil.defaultString(stateName)).toLowerCase();
+  }
 
-	/**
-	 * used at runtime to register state handlers as they are registered with the spring context
-	 *
-	 * @param registration the {@link org.camunda.bpm.engine.test.spring.components.registry.ActivitiStateHandlerRegistration}
-	 */
-	public void registerActivitiStateHandler(
-			ActivitiStateHandlerRegistration registration) {
-		String regKey = registrationKey(registration.getProcessName(),
-				registration.getStateName());
-		this.registrations.put(regKey, registration);
-	}
+  /**
+   * used at runtime to register state handlers as they are registered with the spring context
+   *
+   * @param registration the {@link org.camunda.bpm.engine.spring.components.registry.spring.components.registry.ActivitiStateHandlerRegistration}
+   */
+  public void registerActivitiStateHandler(
+      ActivitiStateHandlerRegistration registration) {
+    String regKey = registrationKey(registration.getProcessName(),
+        registration.getStateName());
+    this.registrations.put(regKey, registration);
+  }
 
-	/**
-	 * this is responsible for looking up components in the registry and returning the appropriate handler based
-	 * on specificity of the {@link org.camunda.bpm.engine.test.spring.components.registry.ActivitiStateHandlerRegistration}
-	 *
-	 * @param processName the process name to look for (optional)
-	 * @param stateName	 the state name to look for (not optional)
-	 * @return all matching options
-	 */
-	public Collection<ActivitiStateHandlerRegistration> findRegistrationsForProcessAndState(
-			String processName, String stateName) {
-		Collection<ActivitiStateHandlerRegistration> registrationCollection = new ArrayList<ActivitiStateHandlerRegistration>();
-		String regKeyFull = registrationKey(processName, stateName);
-		String regKeyWithJustState = registrationKey(null, stateName);
+  /**
+   * this is responsible for looking up components in the registry and returning the appropriate handler based
+   * on specificity of the {@link org.camunda.bpm.engine.spring.components.registry.spring.components.registry.ActivitiStateHandlerRegistration}
+   *
+   * @param processName the process name to look for (optional)
+   * @param stateName   the state name to look for (not optional)
+   * @return all matching options
+   */
+  public Collection<ActivitiStateHandlerRegistration> findRegistrationsForProcessAndState(
+      String processName, String stateName) {
+    Collection<ActivitiStateHandlerRegistration> registrationCollection = new ArrayList<ActivitiStateHandlerRegistration>();
+    String regKeyFull = registrationKey(processName, stateName);
+    String regKeyWithJustState = registrationKey(null, stateName);
 
-		for (String k : this.registrations.keySet())
-			if (k.contains(regKeyFull)) {
-				registrationCollection.add(this.registrations.get(k));
-			}
+    for (String k : this.registrations.keySet())
+      if (k.contains(regKeyFull)) {
+        registrationCollection.add(this.registrations.get(k));
+      }
 
-		if (registrationCollection.size() == 0) {
-			for (String k : this.registrations.keySet())
-				if (k.contains(regKeyWithJustState)) {
-					registrationCollection.add(this.registrations.get(k));
-				}
-		}
+    if (registrationCollection.size() == 0) {
+      for (String k : this.registrations.keySet())
+        if (k.contains(regKeyWithJustState)) {
+          registrationCollection.add(this.registrations.get(k));
+        }
+    }
 
-		return registrationCollection;
-	}
+    return registrationCollection;
+  }
 
-	/**
-	 * this scours the registry looking for candidate registrations that match a given process name and/ or state nanme
-	 *
-	 * @param processName the name of the process
-	 * @param stateName	 the name of the state
-	 * @return an unambiguous {@link org.camunda.bpm.engine.test.spring.components.registry.ActivitiStateHandlerRegistry} or null
-	 */
-	public ActivitiStateHandlerRegistration findRegistrationForProcessAndState(String processName, String stateName) {
+  /**
+   * this scours the registry looking for candidate registrations that match a given process name and/ or state nanme
+   *
+   * @param processName the name of the process
+   * @param stateName   the name of the state
+   * @return an unambiguous {@link org.camunda.bpm.engine.spring.components.registry.spring.components.registry.ActivitiStateHandlerRegistry} or null
+   */
+  public ActivitiStateHandlerRegistration findRegistrationForProcessAndState(String processName, String stateName) {
 
-		ActivitiStateHandlerRegistration r = null;
+    ActivitiStateHandlerRegistration r = null;
 
-		String key = registrationKey(processName, stateName);
+    String key = registrationKey(processName, stateName);
 
-		Collection<ActivitiStateHandlerRegistration> rs = this.findRegistrationsForProcessAndState(
-				processName, stateName);
+    Collection<ActivitiStateHandlerRegistration> rs = this.findRegistrationsForProcessAndState(
+        processName, stateName);
 
-		for (ActivitiStateHandlerRegistration sr : rs) {
-			String kName = registrationKey(sr.getProcessName(), sr.getStateName());
-			if (key.equalsIgnoreCase(kName)) {
-				r = sr;
-				break;
-			}
-		}
+    for (ActivitiStateHandlerRegistration sr : rs) {
+      String kName = registrationKey(sr.getProcessName(), sr.getStateName());
+      if (key.equalsIgnoreCase(kName)) {
+        r = sr;
+        break;
+      }
+    }
 
-		for (ActivitiStateHandlerRegistration sr : rs) {
-			String kName = registrationKey(null, sr.getStateName());
-			if (key.equalsIgnoreCase(kName)) {
-				r = sr;
-				break;
-			}
-		}
+    for (ActivitiStateHandlerRegistration sr : rs) {
+      String kName = registrationKey(null, sr.getStateName());
+      if (key.equalsIgnoreCase(kName)) {
+        r = sr;
+        break;
+      }
+    }
 
-		if ((r == null) && (rs.size() > 0)) {
-			r = rs.iterator().next();
-		}
+    if ((r == null) && (rs.size() > 0)) {
+      r = rs.iterator().next();
+    }
 
-		return r;
-	}
+    return r;
+  }
 
-	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
-		this.beanFactory = beanFactory;
-	}
+  public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+    this.beanFactory = beanFactory;
+  }
 
-	public void setBeanName(String name) {
-		this.beanName = name;
-	}
+  public void setBeanName(String name) {
+    this.beanName = name;
+  }
 
-	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(this.processEngine, "the 'processEngine' can't be null");
-		logger.info( "this bean contains a processEngine reference. "+ this.processEngine);
-		logger.info("starting " + getClass().getName());
-	}
+  public void afterPropertiesSet() throws Exception {
+    Assert.notNull(this.processEngine, "the 'processEngine' can't be null");
+    logger.info( "this bean contains a processEngine reference. "+ this.processEngine);
+    logger.info("starting " + getClass().getName());
+  }
 }

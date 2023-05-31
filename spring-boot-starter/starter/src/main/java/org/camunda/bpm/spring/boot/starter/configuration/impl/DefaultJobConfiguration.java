@@ -25,7 +25,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.NotifyAcquisitionRejectedJobsHandler;
 import org.camunda.bpm.engine.spring.SpringProcessEngineConfiguration;
-import org.camunda.bpm.engine.spring.components.jobexecutor.SpringJobExecutor;
+import org.camunda.bpm.engine.spring.impl.jobexecutor.SpringJobExecutor;
 import org.camunda.bpm.spring.boot.starter.configuration.CamundaJobConfiguration;
 import org.camunda.bpm.spring.boot.starter.event.JobExecutorStartingEventListener;
 import org.camunda.bpm.spring.boot.starter.property.CamundaBpmProperties;

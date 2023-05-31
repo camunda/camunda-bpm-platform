@@ -35,64 +35,64 @@ import org.w3c.dom.Element;
  * registers support for handling the annotations in the org.camunda.bpm.engine.annotations package.
  * <p/>
  * The first major component is the state handlers. For this to work, a BeanFactoryPostProcessor is registered which in turn registers a
- * {@link org.camunda.bpm.engine.test.spring.components.registry.ActivitiStateHandlerRegistry} if none exists.
+ * {@link org.camunda.bpm.engine.spring.components.registry.spring.components.registry.ActivitiStateHandlerRegistry} if none exists.
  *
  * @author Josh Long
  * @since 5.3
  */
 public class ActivitiAnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 
-	private final String processEngineAttribute = "process-engine";
+  private final String processEngineAttribute = "process-engine";
 
-	public BeanDefinition parse(Element element, ParserContext parserContext) {
-		registerProcessScope(element, parserContext);
-		registerStateHandlerAnnotationBeanFactoryPostProcessor(element, parserContext);
-		registerProcessStartAnnotationBeanPostProcessor(element, parserContext);
-		return null;
-	}
+  public BeanDefinition parse(Element element, ParserContext parserContext) {
+    registerProcessScope(element, parserContext);
+    registerStateHandlerAnnotationBeanFactoryPostProcessor(element, parserContext);
+    registerProcessStartAnnotationBeanPostProcessor(element, parserContext);
+    return null;
+  }
 
-	private void configureProcessEngine(AbstractBeanDefinition abstractBeanDefinition, Element element) {
-		String procEngineRef = element.getAttribute(processEngineAttribute);
-		if (StringUtils.hasText(procEngineRef))
-			abstractBeanDefinition.getPropertyValues().add(Conventions.attributeNameToPropertyName(processEngineAttribute), new RuntimeBeanReference(procEngineRef));
-	}
+  private void configureProcessEngine(AbstractBeanDefinition abstractBeanDefinition, Element element) {
+    String procEngineRef = element.getAttribute(processEngineAttribute);
+    if (StringUtils.hasText(procEngineRef))
+      abstractBeanDefinition.getPropertyValues().add(Conventions.attributeNameToPropertyName(processEngineAttribute), new RuntimeBeanReference(procEngineRef));
+  }
 
-	private void registerStateHandlerAnnotationBeanFactoryPostProcessor(Element element, ParserContext context) {
-		Class clz = StateHandlerAnnotationBeanFactoryPostProcessor.class;
-		BeanDefinitionBuilder postProcessorBuilder = BeanDefinitionBuilder.genericBeanDefinition(clz.getName());
+  private void registerStateHandlerAnnotationBeanFactoryPostProcessor(Element element, ParserContext context) {
+    Class clz = StateHandlerAnnotationBeanFactoryPostProcessor.class;
+    BeanDefinitionBuilder postProcessorBuilder = BeanDefinitionBuilder.genericBeanDefinition(clz.getName());
 
-		BeanDefinitionHolder postProcessorHolder = new BeanDefinitionHolder(
-				postProcessorBuilder.getBeanDefinition(),
-				ActivitiContextUtils.ANNOTATION_STATE_HANDLER_BEAN_FACTORY_POST_PROCESSOR_BEAN_NAME);
-		configureProcessEngine(postProcessorBuilder.getBeanDefinition(), element);
-		BeanDefinitionReaderUtils.registerBeanDefinition(postProcessorHolder, context.getRegistry());
+    BeanDefinitionHolder postProcessorHolder = new BeanDefinitionHolder(
+        postProcessorBuilder.getBeanDefinition(),
+        ActivitiContextUtils.ANNOTATION_STATE_HANDLER_BEAN_FACTORY_POST_PROCESSOR_BEAN_NAME);
+    configureProcessEngine(postProcessorBuilder.getBeanDefinition(), element);
+    BeanDefinitionReaderUtils.registerBeanDefinition(postProcessorHolder, context.getRegistry());
 
-	}
+  }
 
-	private void registerProcessScope(Element element, ParserContext parserContext) {
-		Class clz = ProcessScope.class;
-		BeanDefinitionBuilder processScopeBDBuilder = BeanDefinitionBuilder.genericBeanDefinition(clz);
-		AbstractBeanDefinition scopeBeanDefinition = processScopeBDBuilder.getBeanDefinition();
-		scopeBeanDefinition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-		configureProcessEngine(scopeBeanDefinition, element);
-		String beanName = baseBeanName(clz);
-		parserContext.getRegistry().registerBeanDefinition(beanName, scopeBeanDefinition);
-	}
+  private void registerProcessScope(Element element, ParserContext parserContext) {
+    Class clz = ProcessScope.class;
+    BeanDefinitionBuilder processScopeBDBuilder = BeanDefinitionBuilder.genericBeanDefinition(clz);
+    AbstractBeanDefinition scopeBeanDefinition = processScopeBDBuilder.getBeanDefinition();
+    scopeBeanDefinition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+    configureProcessEngine(scopeBeanDefinition, element);
+    String beanName = baseBeanName(clz);
+    parserContext.getRegistry().registerBeanDefinition(beanName, scopeBeanDefinition);
+  }
 
-	private void registerProcessStartAnnotationBeanPostProcessor(Element element, ParserContext parserContext) {
-		Class clz = ProcessStartAnnotationBeanPostProcessor.class;
+  private void registerProcessStartAnnotationBeanPostProcessor(Element element, ParserContext parserContext) {
+    Class clz = ProcessStartAnnotationBeanPostProcessor.class;
 
-		BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(clz);
-		AbstractBeanDefinition beanDefinition = beanDefinitionBuilder.getBeanDefinition();
-		beanDefinition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-		configureProcessEngine(beanDefinition, element);
+    BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(clz);
+    AbstractBeanDefinition beanDefinition = beanDefinitionBuilder.getBeanDefinition();
+    beanDefinition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+    configureProcessEngine(beanDefinition, element);
 
-		String beanName = baseBeanName(clz);
-		parserContext.getRegistry().registerBeanDefinition(beanName, beanDefinition);
-	}
+    String beanName = baseBeanName(clz);
+    parserContext.getRegistry().registerBeanDefinition(beanName, beanDefinition);
+  }
 
-	private String baseBeanName(Class cl) {
-		return cl.getName().toLowerCase();
-	}
+  private String baseBeanName(Class cl) {
+    return cl.getName().toLowerCase();
+  }
 }
 

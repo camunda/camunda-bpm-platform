@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.spring.components.jobexecutor;
+package org.camunda.bpm.engine.spring.impl.jobexecutor;
 
 import java.util.List;
 import java.util.concurrent.RejectedExecutionException;
@@ -39,38 +39,38 @@ import org.springframework.core.task.TaskExecutor;
  */
 public class SpringJobExecutor extends JobExecutor {
 
-	private TaskExecutor taskExecutor;
+  private TaskExecutor taskExecutor;
 
-	public TaskExecutor getTaskExecutor() {
-		return taskExecutor;
-	}
+  public TaskExecutor getTaskExecutor() {
+    return taskExecutor;
+  }
 
-	/**
-	 * Required spring injected {@link TaskExecutor}} implementation that will be used to execute runnable jobs.
-	 *
-	 * @param taskExecutor
-	 */
-	public void setTaskExecutor(TaskExecutor taskExecutor) {
-		this.taskExecutor = taskExecutor;
-	}
+  /**
+   * Required spring injected {@link TaskExecutor}} implementation that will be used to execute runnable jobs.
+   *
+   * @param taskExecutor
+   */
+  public void setTaskExecutor(TaskExecutor taskExecutor) {
+    this.taskExecutor = taskExecutor;
+  }
 
-	public void executeJobs(List<String> jobIds, ProcessEngineImpl processEngine) {
-	  try {
+  public void executeJobs(List<String> jobIds, ProcessEngineImpl processEngine) {
+    try {
       taskExecutor.execute(getExecuteJobsRunnable(jobIds, processEngine));
     } catch (RejectedExecutionException e) {
 
       logRejectedExecution(processEngine, jobIds.size());
       rejectedJobsHandler.jobsRejected(jobIds, processEngine, this);
     }
-	}
+  }
 
-	@Override
-	protected void startExecutingJobs() {
-		startJobAcquisitionThread();
-	}
+  @Override
+  protected void startExecutingJobs() {
+    startJobAcquisitionThread();
+  }
 
-	@Override
-	protected void stopExecutingJobs() {
-		stopJobAcquisitionThread();
-	}
+  @Override
+  protected void stopExecutingJobs() {
+    stopJobAcquisitionThread();
+  }
 }

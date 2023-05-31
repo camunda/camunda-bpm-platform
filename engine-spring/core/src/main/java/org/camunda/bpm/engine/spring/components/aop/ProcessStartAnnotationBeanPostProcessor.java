@@ -41,51 +41,51 @@ import org.springframework.util.ClassUtils;
  */
 public class ProcessStartAnnotationBeanPostProcessor extends ProxyConfig implements BeanPostProcessor, InitializingBean {
 
-	private Log log = LogFactory.getLog(getClass()) ;
+  private Log log = LogFactory.getLog(getClass()) ;
 
-	/**
-	 * the process engine as created by a {@link org.camunda.bpm.engine.spring.ProcessEngineFactoryBean}
-	 */
-	private ProcessEngine processEngine;
+  /**
+   * the process engine as created by a {@link org.camunda.bpm.engine.spring.ProcessEngineFactoryBean}
+   */
+  private ProcessEngine processEngine;
 
-	private ProcessStartingPointcutAdvisor advisor;
+  private ProcessStartingPointcutAdvisor advisor;
 
-	private volatile ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
+  private volatile ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
 
-	public void setProcessEngine(ProcessEngine processEngine) {
-		this.processEngine = processEngine;
-	}
+  public void setProcessEngine(ProcessEngine processEngine) {
+    this.processEngine = processEngine;
+  }
 
-	public void afterPropertiesSet() throws Exception {
-		this.advisor = new ProcessStartingPointcutAdvisor(this.processEngine);
-	}
+  public void afterPropertiesSet() throws Exception {
+    this.advisor = new ProcessStartingPointcutAdvisor(this.processEngine);
+  }
 
-	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-	 	if (bean instanceof AopInfrastructureBean) {
-			// Ignore AOP infrastructure such as scoped proxies.
-			return bean;
-		}
-		Class<?> targetClass = AopUtils.getTargetClass(bean);
-		if (AopUtils.canApply(this.advisor, targetClass)) {
-			if (bean instanceof Advised) {
-				((Advised) bean).addAdvisor(0, this.advisor);
-				return bean;
-			}
-			else {
-				ProxyFactory proxyFactory = new ProxyFactory(bean);
-				// Copy our properties (proxyTargetClass etc) inherited from ProxyConfig.
-				proxyFactory.copyFrom(this);
-				proxyFactory.addAdvisor(this.advisor);
-				return proxyFactory.getProxy(this.beanClassLoader);
-			}
-		}
-		else {
-			// No async proxy needed.
-			return bean;
-		}
-	}
+  public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+     if (bean instanceof AopInfrastructureBean) {
+      // Ignore AOP infrastructure such as scoped proxies.
+      return bean;
+    }
+    Class<?> targetClass = AopUtils.getTargetClass(bean);
+    if (AopUtils.canApply(this.advisor, targetClass)) {
+      if (bean instanceof Advised) {
+        ((Advised) bean).addAdvisor(0, this.advisor);
+        return bean;
+      }
+      else {
+        ProxyFactory proxyFactory = new ProxyFactory(bean);
+        // Copy our properties (proxyTargetClass etc) inherited from ProxyConfig.
+        proxyFactory.copyFrom(this);
+        proxyFactory.addAdvisor(this.advisor);
+        return proxyFactory.getProxy(this.beanClassLoader);
+      }
+    }
+    else {
+      // No async proxy needed.
+      return bean;
+    }
+  }
 
-	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-		return bean;
-	}
+  public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+    return bean;
+  }
 }

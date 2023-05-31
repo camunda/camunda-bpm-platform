@@ -38,7 +38,7 @@ import org.springframework.aop.support.ComposablePointcut;
  * Advised methods can declare a return
  * type of {@link org.camunda.bpm.engine.runtime.ProcessInstance} and then subsequently
  * return null. The real return ProcessInstance value will be given by the aspect.
- * 
+ *
  *
  * @author Josh Long
  * @since 5.3
@@ -46,61 +46,61 @@ import org.springframework.aop.support.ComposablePointcut;
 public class ProcessStartingPointcutAdvisor implements PointcutAdvisor, Serializable {
 
 
-	/**
-	 * annotations that shall be scanned
-	 */
-	private Set<Class<? extends Annotation>> annotations = new HashSet<Class<? extends Annotation>>(Arrays.asList(StartProcess.class));
+  /**
+   * annotations that shall be scanned
+   */
+  private Set<Class<? extends Annotation>> annotations = new HashSet<Class<? extends Annotation>>(Arrays.asList(StartProcess.class));
 
-	/**
-	 * the {@link org.aopalliance.intercept.MethodInterceptor} that handles launching the business process.
-	 */
-	protected MethodInterceptor advice;
+  /**
+   * the {@link org.aopalliance.intercept.MethodInterceptor} that handles launching the business process.
+   */
+  protected MethodInterceptor advice;
 
-	/**
-	 * matches any method containing the {@link StartProcess} annotation.
-	 */
-	protected Pointcut pointcut;
+  /**
+   * matches any method containing the {@link StartProcess} annotation.
+   */
+  protected Pointcut pointcut;
 
-	/**
-	 * the injected reference to the {@link org.camunda.bpm.engine.ProcessEngine}
-	 */
-	protected ProcessEngine processEngine;
+  /**
+   * the injected reference to the {@link org.camunda.bpm.engine.ProcessEngine}
+   */
+  protected ProcessEngine processEngine;
 
-	public ProcessStartingPointcutAdvisor(ProcessEngine pe) {
-		this.processEngine = pe;
-		this.pointcut = buildPointcut();
-		this.advice = buildAdvise();
+  public ProcessStartingPointcutAdvisor(ProcessEngine pe) {
+    this.processEngine = pe;
+    this.pointcut = buildPointcut();
+    this.advice = buildAdvise();
 
-	}
+  }
 
-	protected MethodInterceptor buildAdvise() {
-		return new ProcessStartingMethodInterceptor(this.processEngine);
-	}
+  protected MethodInterceptor buildAdvise() {
+    return new ProcessStartingMethodInterceptor(this.processEngine);
+  }
 
-	public Pointcut getPointcut() {
-		return pointcut;
-	}
+  public Pointcut getPointcut() {
+    return pointcut;
+  }
 
-	public Advice getAdvice() {
-		return advice;
-	}
+  public Advice getAdvice() {
+    return advice;
+  }
 
-	public boolean isPerInstance() {
-		return true;
-	}
+  public boolean isPerInstance() {
+    return true;
+  }
 
-	private Pointcut buildPointcut() {
-		ComposablePointcut result = null;
-		for (Class<? extends Annotation> publisherAnnotationType : this.annotations) {
-			Pointcut mpc = new MetaAnnotationMatchingPointcut(null, publisherAnnotationType);
-			if (result == null) {
-				result = new ComposablePointcut(mpc);
-			} else {
-				result.union(mpc);
-			}
-		}
-		return result;
-	}
+  private Pointcut buildPointcut() {
+    ComposablePointcut result = null;
+    for (Class<? extends Annotation> publisherAnnotationType : this.annotations) {
+      Pointcut mpc = new MetaAnnotationMatchingPointcut(null, publisherAnnotationType);
+      if (result == null) {
+        result = new ComposablePointcut(mpc);
+      } else {
+        result.union(mpc);
+      }
+    }
+    return result;
+  }
 
 
 }
