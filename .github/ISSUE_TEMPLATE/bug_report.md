@@ -8,19 +8,19 @@ assignees:
 ---
 
 ### Environment (Required on creation)
- 
+
 ### Description (Required on creation; please attach any relevant screenshots, stacktraces, log files, etc. to the ticket)
- 
+
 ### Steps to reproduce (Required on creation)
-    
+
 ### Observed Behavior (Required on creation)
-    
+
 ### Expected behavior (Required on creation)
-    
+
 ### Root Cause (Required on prioritization)
-    
+
 ### Solution Ideas
-    
+
 ### Hints
 
 ### Links
