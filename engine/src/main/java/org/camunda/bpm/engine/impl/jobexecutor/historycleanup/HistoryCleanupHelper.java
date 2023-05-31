@@ -47,7 +47,7 @@ public abstract class HistoryCleanupHelper {
    * @return the effective max number of retries
    */
   public static int getMaxRetries() {
-    ProcessEngineConfiguration config = Context.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl config = Context.getProcessEngineConfiguration();
 
     Integer historyCleanupRetries = config.getHistoryCleanupDefaultNumberOfRetries();
     int defaultRetries = config.getDefaultNumberOfRetries();

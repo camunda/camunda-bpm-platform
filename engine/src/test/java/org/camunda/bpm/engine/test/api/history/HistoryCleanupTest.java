@@ -1353,19 +1353,46 @@ public class HistoryCleanupTest {
   }
 
   @Test
-  public void shouldApplyCleanupJobRetries() {
-    engineRule.getProcessEngineConfiguration().setHistoryCleanupDefaultNumberOfRetries(22);
+  public void shouldApplyGlobalJobRetries() {
+    // given
+    engineRule.getProcessEngineConfiguration().setDefaultNumberOfRetries(7);
 
-    //then
+    // when
     Job cleanupJob = historyService.cleanUpHistoryAsync(true);
 
+    // then
+    assertThat(cleanupJob.getRetries()).isEqualTo(7);
+  }
+
+  @Test
+  public void shouldApplyLocalJobRetries() {
+    // given
+    engineRule.getProcessEngineConfiguration().setDefaultNumberOfRetries(7);
+    engineRule.getProcessEngineConfiguration().setHistoryCleanupDefaultNumberOfRetries(1);
+
+    // when
+    Job cleanupJob = historyService.cleanUpHistoryAsync(true);
+
+    // then
+    assertThat(cleanupJob.getRetries()).isEqualTo(1);
+  }
+
+  @Test
+  public void shouldApplyCleanupJobRetries() {
+    // given
+    engineRule.getProcessEngineConfiguration().setHistoryCleanupDefaultNumberOfRetries(22);
+
+    // when
+    Job cleanupJob = historyService.cleanUpHistoryAsync(true);
+
+    // then
     assertThat(cleanupJob.getRetries()).isEqualTo(22);
   }
 
   @Test
   public void shouldDisableRetriesOnCleanupJob() {
     //given
-    ProcessEngineConfiguration configuration = engineRule.getProcessEngineConfiguration();
+    ProcessEngineConfigurationImpl configuration = engineRule.getProcessEngineConfiguration();
     configuration.setHistoryCleanupDefaultNumberOfRetries(0);
 
     //when

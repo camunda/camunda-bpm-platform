@@ -261,8 +261,6 @@ public abstract class ProcessEngineConfiguration {
 
   protected int defaultNumberOfRetries = JobEntity.DEFAULT_RETRIES;
 
-  protected Integer historyCleanupDefaultNumberOfRetries;
-
   protected ClassLoader classLoader;
 
   protected boolean createIncidentOnFailedJobEnabled = true;
@@ -933,15 +931,6 @@ public abstract class ProcessEngineConfiguration {
 
   public void setDefaultNumberOfRetries(int defaultNumberOfRetries) {
     this.defaultNumberOfRetries = defaultNumberOfRetries;
-  }
-
-  public Integer getHistoryCleanupDefaultNumberOfRetries() {
-    return this.historyCleanupDefaultNumberOfRetries;
-  }
-
-  public ProcessEngineConfiguration setHistoryCleanupDefaultNumberOfRetries(Integer historyCleanupDefaultNumberOfRetries) {
-    this.historyCleanupDefaultNumberOfRetries = historyCleanupDefaultNumberOfRetries;
-    return this;
   }
 
   public ValueTypeResolver getValueTypeResolver() {
