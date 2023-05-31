@@ -646,7 +646,25 @@ public class HistoryCleanupTest {
   }
 
   @Test
-  public void shouldResolveIncidentAndApplyDefaultRetryConfig() {
+  public void shouldResolveIncidentAndApplyHistoryCleanupDefaultRetriesConfig() {
+    //given
+    processEngineConfiguration.setHistoryCleanupDefaultNumberOfRetries(10);
+    String jobId = historyService.cleanUpHistoryAsync(true).getId();
+    imitateFailedJob(jobId);
+
+    //when
+    jobId = historyService.cleanUpHistoryAsync(true).getId();
+
+    //then
+    JobEntity jobEntity = getJobEntity(jobId);
+
+    assertThat(jobEntity.getExceptionByteArrayId()).isNull();
+    assertThat(jobEntity.getExceptionMessage()).isNull();
+    assertThat(jobEntity.getRetries()).isEqualTo(10);
+  }
+
+  @Test
+  public void shouldResolveIncidentAndApplyDefaultRetriesConfig() {
     //given
     String jobId = historyService.cleanUpHistoryAsync(true).getId();
     imitateFailedJob(jobId);
@@ -659,7 +677,7 @@ public class HistoryCleanupTest {
 
     assertThat(jobEntity.getExceptionByteArrayId()).isNull();
     assertThat(jobEntity.getExceptionMessage()).isNull();
-    assertThat(jobEntity.getRetries()).isEqualTo(3);
+    assertThat(jobEntity.getRetries()).isEqualTo(5);
   }
 
   private void imitateFailedJob(final String jobId) {

@@ -20,7 +20,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.ListIterator;
 import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupConfiguration;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -124,7 +123,7 @@ public class HistoryCleanupCmd implements Command<Job> {
     CommandContext commandContext = Context.getCommandContext();
 
     JobManager jobManager = commandContext.getJobManager();
-    HistoryCleanupConfiguration configuration = HistoryCleanupConfiguration.of(commandContext);
+    int maxRetries = HistoryCleanupHelper.getMaxRetries();
 
     acquireExclusiveLock(commandContext);
 
@@ -133,7 +132,7 @@ public class HistoryCleanupCmd implements Command<Job> {
 
     if (historyCleanupJobs.isEmpty()) {
       for (int[] minuteChunk : minuteChunks) {
-        JobEntity job = createJob(minuteChunk, configuration);
+        JobEntity job = createJob(minuteChunk, maxRetries);
         jobManager.insertAndHintJobExecutor(job);
         historyCleanupJobs.add(job);
       }
@@ -146,7 +145,7 @@ public class HistoryCleanupCmd implements Command<Job> {
   protected List<Job> reconfigureJobs(List<Job> historyCleanupJobs, int degreeOfParallelism, int[][] minuteChunks) {
     CommandContext commandContext = Context.getCommandContext();
     JobManager jobManager = commandContext.getJobManager();
-    HistoryCleanupConfiguration configuration = HistoryCleanupConfiguration.of(commandContext);
+    int maxRetries = HistoryCleanupHelper.getMaxRetries();
 
     int size = Math.min(degreeOfParallelism, historyCleanupJobs.size());
 
@@ -154,7 +153,7 @@ public class HistoryCleanupCmd implements Command<Job> {
       JobEntity historyCleanupJob = (JobEntity) historyCleanupJobs.get(i);
 
       //apply new configuration
-      HistoryCleanupContext historyCleanupContext = createCleanupContext(minuteChunks[i], configuration);
+      HistoryCleanupContext historyCleanupContext = createCleanupContext(minuteChunks[i], maxRetries);
 
       HISTORY_CLEANUP_JOB_DECLARATION.reconfigure(historyCleanupContext, historyCleanupJob);
 
@@ -168,7 +167,7 @@ public class HistoryCleanupCmd implements Command<Job> {
     if (delta > 0) {
       //create new job, as there are not enough of them
       for (int i = size; i < degreeOfParallelism; i++) {
-        JobEntity job = createJob(minuteChunks[i], configuration);
+        JobEntity job = createJob(minuteChunks[i], maxRetries);
         jobManager.insertAndHintJobExecutor(job);
         historyCleanupJobs.add(job);
       }
@@ -195,16 +194,16 @@ public class HistoryCleanupCmd implements Command<Job> {
   }
 
   @SuppressWarnings("unchecked")
-  protected JobEntity createJob(int[] minuteChunk, HistoryCleanupConfiguration configuration) {
-    HistoryCleanupContext context = createCleanupContext(minuteChunk, configuration);
+  protected JobEntity createJob(int[] minuteChunk, int maxRetries) {
+    HistoryCleanupContext context = createCleanupContext(minuteChunk, maxRetries);
     return HISTORY_CLEANUP_JOB_DECLARATION.createJobInstance(context);
   }
 
-  protected HistoryCleanupContext createCleanupContext(int[] minuteChunk, HistoryCleanupConfiguration configuration) {
+  protected HistoryCleanupContext createCleanupContext(int[] minuteChunk, int maxRetries) {
     int minuteFrom = minuteChunk[0];
     int minuteTo = minuteChunk[1];
 
-    return new HistoryCleanupContext(immediatelyDue, minuteFrom, minuteTo, configuration);
+    return new HistoryCleanupContext(immediatelyDue, minuteFrom, minuteTo, maxRetries);
   }
 
   protected void writeUserOperationLog(CommandContext commandContext) {

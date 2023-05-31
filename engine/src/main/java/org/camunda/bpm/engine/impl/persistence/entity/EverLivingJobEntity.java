@@ -16,11 +16,11 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import org.camunda.bpm.engine.impl.HistoryCleanupRetriesFactory;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHelper;
 
 /**
  * JobEntity for ever living job, which can be rescheduled and executed again.
@@ -59,7 +59,7 @@ public class EverLivingJobEntity extends JobEntity {
     }
 
     //cancel the retries -> will resolve job incident if present
-    int retries = HistoryCleanupRetriesFactory.create(jobHandlerType);
+    int retries = HistoryCleanupHelper.getMaxRetries();
     setRetries(retries);
 
     //delete the job's exception byte array and exception message

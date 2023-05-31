@@ -24,13 +24,13 @@ public class HistoryCleanupContext {
   private boolean immediatelyDue;
   private int minuteFrom;
   private int minuteTo;
-  private HistoryCleanupConfiguration configuration;
+  private int maxRetries;
 
-  public HistoryCleanupContext(boolean immediatelyDue, int minuteFrom, int minuteTo, HistoryCleanupConfiguration configuration) {
+  public HistoryCleanupContext(boolean immediatelyDue, int minuteFrom, int minuteTo, int maxRetries) {
     this.immediatelyDue = immediatelyDue;
     this.minuteFrom = minuteFrom;
     this.minuteTo = minuteTo;
-    this.configuration = configuration;
+    this.maxRetries = maxRetries;
   }
 
   public HistoryCleanupContext(int minuteFrom, int minuteTo) {
@@ -62,11 +62,11 @@ public class HistoryCleanupContext {
     this.minuteTo = minuteTo;
   }
 
-  public HistoryCleanupConfiguration getConfiguration() {
-    return this.configuration;
+  public int getMaxRetries() {
+    return this.maxRetries;
   }
 
-  public void setConfiguration(HistoryCleanupConfiguration configuration) {
-    this.configuration = configuration;
+  public void setMaxRetries(int maxRetries) {
+    this.maxRetries = maxRetries;
   }
 }
