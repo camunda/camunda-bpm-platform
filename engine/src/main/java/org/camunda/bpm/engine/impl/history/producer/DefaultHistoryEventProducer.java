@@ -1090,11 +1090,9 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
       byte[] exceptionBytes = toByteArray(exceptionStacktrace);
 
       ByteArrayEntity byteArray = createJobExceptionByteArray(exceptionBytes, ResourceTypes.HISTORY);
-      byteArray.setRootProcessInstanceId(event.getRootProcessInstanceId());
 
-      if (isHistoryRemovalTimeStrategyStart()) {
-        byteArray.setRemovalTime(event.getRemovalTime());
-      }
+      byteArray.setRootProcessInstanceId(event.getRootProcessInstanceId());
+      byteArray.setRemovalTime(event.getRemovalTime());
 
       event.setExceptionByteArrayId(byteArray.getId());
     }
