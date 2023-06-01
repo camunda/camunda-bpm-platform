@@ -16,6 +16,7 @@
  */
 package org.camunda.bpm.engine.test.api.history;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_CLEANUP_STRATEGY_END_TIME_BASED;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED;
@@ -37,7 +38,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.TimeZone;
-
 import org.apache.commons.lang3.time.DateUtils;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.CaseService;
@@ -50,8 +50,6 @@ import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.history.HistoricCaseInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
-import org.camunda.bpm.engine.history.HistoricIncident;
-import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.BatchWindowConfiguration;
@@ -62,7 +60,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHelper;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupJobHandlerConfiguration;
 import org.camunda.bpm.engine.impl.metrics.Meter;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.ExceptionUtil;
@@ -83,6 +80,7 @@ import org.camunda.bpm.engine.test.dmn.businessruletask.TestPojo;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.camunda.bpm.engine.test.util.Removable;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.After;
@@ -104,9 +102,11 @@ public class HistoryCleanupTest {
   private static final int CASE_INSTANCES_COUNT = 4;
   private static final int HISTORY_TIME_TO_LIVE = 5;
   private static final int DAYS_IN_THE_PAST = -6;
+
   protected static final String ONE_TASK_PROCESS = "oneTaskProcess";
   protected static final String DECISION = "decision";
   protected static final String ONE_TASK_CASE = "case";
+
   private static final int NUMBER_OF_THREADS = 3;
   private static final String USER_ID = "demo";
 
@@ -126,10 +126,14 @@ public class HistoryCleanupTest {
   protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
-  @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+  protected Removable removable;
 
-  private Random random = new Random();
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule)
+      .around(engineRule)
+      .around(testRule);
+
+  private final Random random = new Random();
 
   private HistoryService historyService;
   private RuntimeService runtimeService;
@@ -156,6 +160,7 @@ public class HistoryCleanupTest {
     processEngineConfiguration.setHistoryCleanupStrategy(HISTORY_CLEANUP_STRATEGY_END_TIME_BASED);
 
     identityService.setAuthenticatedUserId(USER_ID);
+    removable = Removable.of(testRule);
   }
 
   @After
@@ -166,50 +171,10 @@ public class HistoryCleanupTest {
     processEngineConfiguration.setHistoryCleanupBatchSize(defaultBatchSize);
     processEngineConfiguration.setHistoryCleanupStrategy(HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED);
     processEngineConfiguration.setHistoryCleanupEnabled(true);
+    processEngineConfiguration.setHistoryCleanupDefaultNumberOfRetries(3);
 
-    processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
-      public Void execute(CommandContext commandContext) {
-
-        List<Job> jobs = historyService.findHistoryCleanupJobs();
-        for (Job job: jobs) {
-          commandContext.getJobManager().deleteJob((JobEntity) job);
-          commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(job.getId());
-        }
-
-        //cleanup "detached" historic job logs
-        final List<HistoricJobLog> list = historyService.createHistoricJobLogQuery().list();
-        for (HistoricJobLog jobLog: list) {
-          commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobLog.getJobId());
-        }
-
-        List<HistoricIncident> historicIncidents = historyService.createHistoricIncidentQuery().list();
-        for (HistoricIncident historicIncident : historicIncidents) {
-          commandContext.getDbEntityManager().delete((HistoricIncidentEntity) historicIncident);
-        }
-
-        commandContext.getMeterLogManager().deleteAll();
-
-        return null;
-      }
-    });
-
-    List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery().list();
-    for (HistoricProcessInstance historicProcessInstance: historicProcessInstances) {
-      historyService.deleteHistoricProcessInstance(historicProcessInstance.getId());
-    }
-
-    List<HistoricDecisionInstance> historicDecisionInstances = historyService.createHistoricDecisionInstanceQuery().list();
-    for (HistoricDecisionInstance historicDecisionInstance: historicDecisionInstances) {
-      historyService.deleteHistoricDecisionInstanceByInstanceId(historicDecisionInstance.getId());
-    }
-
-    List<HistoricCaseInstance> historicCaseInstances = historyService.createHistoricCaseInstanceQuery().list();
-    for (HistoricCaseInstance historicCaseInstance: historicCaseInstances) {
-      historyService.deleteHistoricCaseInstance(historicCaseInstance.getId());
-    }
-
+    removable.removeAll();
     clearMetrics();
-
     identityService.clearAuthentication();
   }
 
@@ -681,22 +646,38 @@ public class HistoryCleanupTest {
   }
 
   @Test
-  public void testHistoryCleanupJobResolveIncident() {
+  public void shouldResolveIncidentAndApplyHistoryCleanupDefaultRetriesConfig() {
     //given
+    processEngineConfiguration.setHistoryCleanupDefaultNumberOfRetries(10);
     String jobId = historyService.cleanUpHistoryAsync(true).getId();
     imitateFailedJob(jobId);
 
-    assertEquals(5, processEngineConfiguration.getDefaultNumberOfRetries());
     //when
-    //call to cleanup history means that incident was resolved
     jobId = historyService.cleanUpHistoryAsync(true).getId();
 
     //then
     JobEntity jobEntity = getJobEntity(jobId);
-    assertEquals(5, jobEntity.getRetries());
-    assertEquals(null, jobEntity.getExceptionByteArrayId());
-    assertEquals(null, jobEntity.getExceptionMessage());
 
+    assertThat(jobEntity.getExceptionByteArrayId()).isNull();
+    assertThat(jobEntity.getExceptionMessage()).isNull();
+    assertThat(jobEntity.getRetries()).isEqualTo(10);
+  }
+
+  @Test
+  public void shouldResolveIncidentAndApplyDefaultRetriesConfig() {
+    //given
+    String jobId = historyService.cleanUpHistoryAsync(true).getId();
+    imitateFailedJob(jobId);
+
+    //when
+    jobId = historyService.cleanUpHistoryAsync(true).getId();
+
+    //then
+    JobEntity jobEntity = getJobEntity(jobId);
+
+    assertThat(jobEntity.getExceptionByteArrayId()).isNull();
+    assertThat(jobEntity.getExceptionMessage()).isNull();
+    assertThat(jobEntity.getRetries()).isEqualTo(5);
   }
 
   private void imitateFailedJob(final String jobId) {
@@ -1370,6 +1351,57 @@ public class HistoryCleanupTest {
       .isInstanceOf(ProcessEngineException.class)
       .hasMessageContaining("historyTimeToLive");
   }
+
+  @Test
+  public void shouldApplyGlobalJobRetries() {
+    // given
+    engineRule.getProcessEngineConfiguration().setDefaultNumberOfRetries(7);
+
+    // when
+    Job cleanupJob = historyService.cleanUpHistoryAsync(true);
+
+    // then
+    assertThat(cleanupJob.getRetries()).isEqualTo(7);
+  }
+
+  @Test
+  public void shouldApplyLocalJobRetries() {
+    // given
+    engineRule.getProcessEngineConfiguration().setDefaultNumberOfRetries(7);
+    engineRule.getProcessEngineConfiguration().setHistoryCleanupDefaultNumberOfRetries(1);
+
+    // when
+    Job cleanupJob = historyService.cleanUpHistoryAsync(true);
+
+    // then
+    assertThat(cleanupJob.getRetries()).isEqualTo(1);
+  }
+
+  @Test
+  public void shouldApplyCleanupJobRetries() {
+    // given
+    engineRule.getProcessEngineConfiguration().setHistoryCleanupDefaultNumberOfRetries(22);
+
+    // when
+    Job cleanupJob = historyService.cleanUpHistoryAsync(true);
+
+    // then
+    assertThat(cleanupJob.getRetries()).isEqualTo(22);
+  }
+
+  @Test
+  public void shouldDisableRetriesOnCleanupJob() {
+    //given
+    ProcessEngineConfigurationImpl configuration = engineRule.getProcessEngineConfiguration();
+    configuration.setHistoryCleanupDefaultNumberOfRetries(0);
+
+    //when
+    Job cleanupJob = historyService.cleanUpHistoryAsync(true);
+
+    //then
+    assertThat(cleanupJob.getRetries()).isEqualTo(0);
+  }
+
 
   private Date getNextRunWithinBatchWindow(Date currentTime) {
     return processEngineConfiguration.getBatchWindowManager().getNextBatchWindow(currentTime, processEngineConfiguration).getStart();

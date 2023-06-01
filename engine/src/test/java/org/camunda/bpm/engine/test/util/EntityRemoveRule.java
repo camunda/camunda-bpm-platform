@@ -37,8 +37,12 @@ public class EntityRemoveRule extends TestWatcher {
 
   private final Removable removable;
 
-  public EntityRemoveRule(ProcessEngineTestRule engineTestRule) {
+  private EntityRemoveRule(ProcessEngineTestRule engineTestRule) {
     this.removable = Removable.of(engineTestRule);
+  }
+
+  public static EntityRemoveRule of(ProcessEngineTestRule rule) {
+    return new EntityRemoveRule(rule);
   }
 
   @Override
@@ -50,6 +54,7 @@ public class EntityRemoveRule extends TestWatcher {
       return new Statement() {
         @Override
         public void evaluate() throws Throwable {
+
           base.evaluate();
 
           if (!methodHasRemoveAfterAnnotation) {

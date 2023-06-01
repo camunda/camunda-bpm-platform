@@ -50,7 +50,7 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
   protected static final String PROCESS_KEY = "oneTaskProcess";
 
   @Rule
-  public EntityRemoveRule entityRemoveRule = new EntityRemoveRule(testRule);
+  public EntityRemoveRule entityRemoveRule = EntityRemoveRule.of(testRule);
 
   protected final String operationName;
   protected final TriConsumer<TaskService, String, Object> operation;
