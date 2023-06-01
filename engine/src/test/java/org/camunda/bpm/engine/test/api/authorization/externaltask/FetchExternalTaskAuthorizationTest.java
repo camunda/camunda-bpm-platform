@@ -26,7 +26,6 @@ import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
-
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.test.api.authorization.AuthorizationTest;
 import org.junit.Before;
@@ -44,6 +43,7 @@ public class FetchExternalTaskAuthorizationTest extends AuthorizationTest {
   protected String instance1Id;
   protected String instance2Id;
 
+  @Override
   @Before
   public void setUp() throws Exception {
     testRule.deploy(
@@ -243,4 +243,33 @@ public class FetchExternalTaskAuthorizationTest extends AuthorizationTest {
     assertEquals(instance1Id, tasks.get(0).getProcessInstanceId());
   }
 
+  @Test
+  public void shouldLockNoTaskWithRevokedUpdateInstanceOnAnyProcessDefinition() {
+    // given
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, ANY, READ_INSTANCE, UPDATE_INSTANCE);
+    createRevokeAuthorization(PROCESS_DEFINITION, ANY, userId, UPDATE_INSTANCE);
+
+    // when
+    List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
+      .topic("externalTaskTopic", LOCK_TIME)
+      .execute();
+
+    // then
+    assertEquals(0, tasks.size());
+  }
+
+  @Test
+  public void shouldNotLockAnyTaskWithRevokedUpdateInstancePermissionOnAnyProcessDefinition() {
+    // given
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, ANY, READ_INSTANCE, UPDATE_INSTANCE);
+    createRevokeAuthorization(PROCESS_DEFINITION, ANY, userId, UPDATE_INSTANCE);
+
+    // when
+    List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
+      .topic("externalTaskTopic", LOCK_TIME)
+      .execute();
+
+    // then
+    assertEquals(0, tasks.size());
+  }
 }

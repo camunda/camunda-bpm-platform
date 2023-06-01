@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.authorization;
 
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
+import static org.camunda.bpm.engine.authorization.Permissions.ALL;
 import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
 import static org.camunda.bpm.engine.authorization.Permissions.CREATE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
@@ -41,14 +42,12 @@ import static org.junit.Assert.fail;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
-import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.TaskServiceImpl;
 import org.camunda.bpm.engine.impl.cfg.auth.DefaultAuthorizationProvider;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
@@ -56,7 +55,6 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
-import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
@@ -81,6 +79,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   protected static final String CANDIDATE_GROUPS_PROCESS_KEY = "candidateGroupsProcess";
   protected static final String INVALID_PERMISSION = "invalidPermission";
 
+  @Override
   @Before
   public void setUp() throws Exception {
     testRule.deploy(
@@ -92,11 +91,13 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     super.setUp();
   }
 
+  @Override
   @After
   public void tearDown() {
     super.tearDown();
 
     processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
+      @Override
       public Void execute(CommandContext commandContext) {
 
         List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().includeDeleted().list();
@@ -190,6 +191,37 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
     // then
     verifyQueryResults(query, 1);
+  }
+
+  @Test
+  public void shouldNotFindTaskWithRevokedReadPermissionOnTask() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, ANY, ALL);
+    createGrantAuthorization(TASK, ANY, ANY, ALL);
+    createRevokeAuthorization(TASK, taskId, userId, READ);
+
+    // when
+    TaskQuery query = taskService.createTaskQuery();
+
+    // then
+    verifyQueryResults(query, 0);
+  }
+
+  @Test
+  public void shouldNotFindTaskWithRevokedReadTaskPermissionOnDefinition() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, "*", ALL);
+    createGrantAuthorization(TASK, ANY, "*", ALL);
+    createRevokeAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_TASK);
+
+    // when
+    TaskQuery query = taskService.createTaskQuery();
+
+    // then
+    verifyQueryResults(query, 0);
   }
 
   @Test
@@ -6500,14 +6532,6 @@ public class TaskAuthorizationTest extends AuthorizationTest {
 
 
   // helper ////////////////////////////////////////////////////////////////////////////////
-
-  protected void verifyQueryResults(TaskQuery query, int countExpected) {
-    verifyQueryResults((AbstractQuery<?, ?>) query, countExpected);
-  }
-
-  protected void verifyQueryResults(VariableInstanceQuery query, int countExpected) {
-    verifyQueryResults((AbstractQuery<?, ?>) query, countExpected);
-  }
 
   protected void verifyMessageIsValid(String taskId, String message) {
     testRule.assertTextPresent(userId, message);

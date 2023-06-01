@@ -28,7 +28,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.util.List;
-
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.authorization.HistoricProcessInstancePermissions;
@@ -60,6 +59,7 @@ public class HistoricVariableInstanceAuthorizationTest extends AuthorizationTest
   protected boolean ensureSpecificVariablePermission;
   protected String deploymentId;
 
+  @Override
   @Before
   public void setUp() throws Exception {
     deploymentId = testRule.deploy(
@@ -72,6 +72,7 @@ public class HistoricVariableInstanceAuthorizationTest extends AuthorizationTest
     super.setUp();
   }
 
+  @Override
   @After
   public void tearDown() {
     super.tearDown();
@@ -196,6 +197,21 @@ public class HistoricVariableInstanceAuthorizationTest extends AuthorizationTest
 
     // then
     verifyQueryResults(query, 1);
+  }
+
+  @Test
+  public void shouldNotFindVariableWithRevokedReadHistoryVariablePermissionOnProcessDefinition() {
+    setReadHistoryVariableAsDefaultReadPermission();
+
+    startProcessInstanceByKey(PROCESS_KEY, getVariables());
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, ANY, READ_HISTORY_VARIABLE);
+    createRevokeAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_HISTORY_VARIABLE);
+
+    // when
+    HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
+
+    // then
+    verifyQueryResults(query, 0);
   }
 
   // historic variable instance query (multiple process instances) ////////////////////////
@@ -455,7 +471,7 @@ public class HistoricVariableInstanceAuthorizationTest extends AuthorizationTest
   public void testDeleteHistoricProcessVariableInstanceWithoutAuthorization() {
     // given
     startProcessInstanceByKey(PROCESS_KEY, getVariables());
-    
+
     disableAuthorization();
     String variableInstanceId = historyService.createHistoricVariableInstanceQuery().singleResult().getId();
     assertEquals(1L, historyService.createHistoricDetailQuery().count());
@@ -474,13 +490,13 @@ public class HistoricVariableInstanceAuthorizationTest extends AuthorizationTest
       testRule.assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
-  
+
   @Test
   public void testDeleteHistoricProcessVariableInstanceWithDeleteHistoryPermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(PROCESS_KEY, getVariables());
     createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, DELETE_HISTORY);
-    
+
     disableAuthorization();
     String variableInstanceId = historyService.createHistoricVariableInstanceQuery().singleResult().getId();
     assertEquals(1L, historyService.createHistoricDetailQuery().count());
@@ -505,9 +521,9 @@ public class HistoricVariableInstanceAuthorizationTest extends AuthorizationTest
     disableAuthorization();
     taskService.complete(taskId);
     enableAuthorization();
-    
+
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, DELETE_HISTORY);
-    
+
     disableAuthorization();
     repositoryService.deleteDeployment(deploymentId);
     String variableInstanceId = historyService.createHistoricVariableInstanceQuery().singleResult().getId();
@@ -524,13 +540,13 @@ public class HistoricVariableInstanceAuthorizationTest extends AuthorizationTest
     verifyVariablesDeleted();
     cleanUpAfterDeploymentDeletion();
   }
-  
+
   // delete historic variable instance (case variables) /////////////////////////////////////////////
   @Test
   public void testDeleteHistoricCaseVariableInstance() {
     // given
     createCaseInstanceByKey(CASE_KEY, getVariables());
-    
+
     disableAuthorization();
     String variableInstanceId = historyService.createHistoricVariableInstanceQuery().singleResult().getId();
     assertEquals(1L, historyService.createHistoricDetailQuery().count());
@@ -542,7 +558,7 @@ public class HistoricVariableInstanceAuthorizationTest extends AuthorizationTest
     // then
     verifyVariablesDeleted();
   }
-  
+
   // delete historic variable instance (task variables) /////////////////////////////////////////////
   @Test
   public void testDeleteHistoricStandaloneTaskVariableInstance() {
@@ -562,17 +578,17 @@ public class HistoricVariableInstanceAuthorizationTest extends AuthorizationTest
     // then
     verifyVariablesDeleted();
     deleteTask(taskId, true);
-    
+
     // XXX if CAM-6570 is implemented, there should be a check for variables of standalone tasks here as well
   }
-  
+
   // delete historic variable instances (process variables) /////////////////////////////////////////////
   @Test
   public void testDeleteHistoricProcessVariableInstancesWithoutAuthorization() {
     // given
     ProcessInstance instance = startProcessInstanceByKey(PROCESS_KEY, getVariables());
     verifyVariablesCreated();
-    
+
     try {
       // when
       historyService.deleteHistoricVariableInstancesByProcessInstanceId(instance.getId());
@@ -593,7 +609,7 @@ public class HistoricVariableInstanceAuthorizationTest extends AuthorizationTest
     ProcessInstance instance = startProcessInstanceByKey(PROCESS_KEY, getVariables());
     verifyVariablesCreated();
     createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, DELETE_HISTORY);
-    
+
     try {
       // when
       historyService.deleteHistoricVariableInstancesByProcessInstanceId(instance.getId());
@@ -603,7 +619,7 @@ public class HistoricVariableInstanceAuthorizationTest extends AuthorizationTest
     // then
     verifyVariablesDeleted();
   }
-  
+
   // delete deployment (cascade = false)
   @Test
   public void testDeleteHistoricProcessVariableInstancesAfterDeletingDeployment() {
@@ -613,10 +629,10 @@ public class HistoricVariableInstanceAuthorizationTest extends AuthorizationTest
     disableAuthorization();
     taskService.complete(taskId);
     enableAuthorization();
-    
+
     verifyVariablesCreated();
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, DELETE_HISTORY);
-    
+
     disableAuthorization();
     repositoryService.deleteDeployment(deploymentId);
     enableAuthorization();
@@ -627,7 +643,7 @@ public class HistoricVariableInstanceAuthorizationTest extends AuthorizationTest
     } catch (AuthorizationException e) {
       fail("It should be possible to delete the historic variable instance with granted permissions after the process definition is deleted");
     }
-    
+
     // then
     verifyVariablesDeleted();
     cleanUpAfterDeploymentDeletion();
@@ -638,21 +654,21 @@ public class HistoricVariableInstanceAuthorizationTest extends AuthorizationTest
   protected void verifyQueryResults(HistoricVariableInstanceQuery query, int countExpected) {
     verifyQueryResults((AbstractQuery<?, ?>) query, countExpected);
   }
-  
+
   protected void verifyVariablesDeleted() {
     disableAuthorization();
     assertEquals(0L, historyService.createHistoricVariableInstanceQuery().count());
     assertEquals(0L, historyService.createHistoricDetailQuery().count());
     enableAuthorization();
   }
-  
+
   protected void verifyVariablesCreated() {
     disableAuthorization();
     assertEquals(1L, historyService.createHistoricVariableInstanceQuery().count());
     assertEquals(1L, historyService.createHistoricDetailQuery().count());
     enableAuthorization();
   }
-  
+
   protected void cleanUpAfterDeploymentDeletion() {
     disableAuthorization();
     List<HistoricProcessInstance> instances = historyService.createHistoricProcessInstanceQuery().list();

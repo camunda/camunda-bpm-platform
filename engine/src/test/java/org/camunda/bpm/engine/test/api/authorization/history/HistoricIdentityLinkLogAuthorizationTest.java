@@ -25,7 +25,6 @@ import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
-
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.authorization.HistoricProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.HistoricTaskPermissions;
@@ -45,6 +44,7 @@ public class HistoricIdentityLinkLogAuthorizationTest extends AuthorizationTest 
   protected static final String ONE_PROCESS_KEY = "demoAssigneeProcess";
   protected static final String CASE_KEY = "oneTaskCase";
 
+  @Override
   @Before
   public void setUp() throws Exception {
     testRule.deploy( "org/camunda/bpm/engine/test/api/authorization/oneTaskProcess.bpmn20.xml",
@@ -52,6 +52,7 @@ public class HistoricIdentityLinkLogAuthorizationTest extends AuthorizationTest 
     super.setUp();
   }
 
+  @Override
   @After
   public void tearDown() {
     super.tearDown();
@@ -135,6 +136,24 @@ public class HistoricIdentityLinkLogAuthorizationTest extends AuthorizationTest 
 
     // then
     verifyQueryResults(query, 1);
+  }
+
+  @Test
+  public void shouldNotFindLinkWithRevokedReadHistoryPermissionOnAnyProcessDefinition() {
+    // given
+    disableAuthorization();
+    startProcessInstanceByKey(ONE_PROCESS_KEY);
+
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
+    createRevokeAuthorization(PROCESS_DEFINITION, ONE_PROCESS_KEY, userId, READ_HISTORY);
+
+    enableAuthorization();
+
+    // when
+    HistoricIdentityLinkLogQuery query = historyService.createHistoricIdentityLinkLogQuery();
+
+    // then
+    verifyQueryResults(query, 0);
   }
 
   @Test

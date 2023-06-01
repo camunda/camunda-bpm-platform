@@ -35,7 +35,6 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.application.impl.EmbeddedProcessApplication;
@@ -153,6 +152,21 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
 
     // then
     verifyQueryResults(query, 2);
+  }
+
+  @Test
+  public void shouldNotFindDeploymentWithRevokedReadPermissionOnAnyDeployment() {
+    // given
+    createDeployment("first");
+    createDeployment("second");
+    createGrantAuthorization(DEPLOYMENT, ANY, ANY, READ);
+    createRevokeAuthorization(DEPLOYMENT, ANY, userId, READ);
+
+    // when
+    DeploymentQuery query = repositoryService.createDeploymentQuery();
+
+    // then
+    verifyQueryResults(query, 0);
   }
 
   // create deployment ///////////////////////////////////////////////

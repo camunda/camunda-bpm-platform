@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.authorization;
 
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
+import static org.camunda.bpm.engine.authorization.Permissions.ALL;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.junit.Assert.assertEquals;
@@ -24,8 +25,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.List;
-
-import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.management.IncidentStatistics;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatisticsQuery;
@@ -41,6 +40,7 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
   protected static final String ONE_TASK_PROCESS_KEY = "oneTaskProcess";
   protected static final String ONE_INCIDENT_PROCESS_KEY = "process";
 
+  @Override
   @Before
   public void setUp() throws Exception {
     testRule.deploy(
@@ -108,6 +108,19 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     for (ProcessDefinitionStatistics result : statistics) {
       verifyStatisticsResult(result, 0, 0, 0);
     }
+  }
+
+  @Test
+  public void shouldNotFindStatisticsWithRevokedReadPermissionOnAnyProcessDefinition() {
+    // given
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, "*", ALL);
+    createRevokeAuthorization(PROCESS_DEFINITION, ANY, userId, READ);
+
+    // when
+    ProcessDefinitionStatisticsQuery query = managementService.createProcessDefinitionStatisticsQuery();
+
+    // then
+    verifyQueryResults(query, 0);
   }
 
   // including instances //////////////////////////////////////////////////////////////
@@ -229,10 +242,6 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
   }
 
   // helper ///////////////////////////////////////////////////////////////////////////
-
-  protected void verifyQueryResults(ProcessDefinitionStatisticsQuery query, int countExpected) {
-    verifyQueryResults((AbstractQuery<?, ?>) query, countExpected);
-  }
 
   protected void verifyStatisticsResult(ProcessDefinitionStatistics statistics, int instances, int failedJobs, int incidents) {
     assertEquals("Instances", instances, statistics.getInstances());

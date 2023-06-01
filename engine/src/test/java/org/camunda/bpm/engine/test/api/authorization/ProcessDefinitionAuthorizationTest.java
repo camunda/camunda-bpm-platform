@@ -36,12 +36,10 @@ import static org.junit.Assert.fail;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
-
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
 import org.camunda.bpm.engine.authorization.ProcessInstancePermissions;
-import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.RepositoryServiceImpl;
 import org.camunda.bpm.engine.impl.pvm.ReadOnlyProcessDefinition;
 import org.camunda.bpm.engine.repository.CalledProcessDefinition;
@@ -63,6 +61,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
   protected static final String ONE_TASK_PROCESS_KEY = "oneTaskProcess";
   protected static final String TWO_TASKS_PROCESS_KEY = "twoTasksProcess";
 
+  @Override
   @Before
   public void setUp() throws Exception {
     testRule.deploy(
@@ -1339,10 +1338,6 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
   }
 
   // helper /////////////////////////////////////////////////////////////////////
-
-  protected void verifyQueryResults(ProcessDefinitionQuery query, int countExpected) {
-    verifyQueryResults((AbstractQuery<?, ?>) query, countExpected);
-  }
 
   protected void verifyProcessDefinitionSuspendedByKeyIncludingInstances() {
     ProcessDefinition definition = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY);

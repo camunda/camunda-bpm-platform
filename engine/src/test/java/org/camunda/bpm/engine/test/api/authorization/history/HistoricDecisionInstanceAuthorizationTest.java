@@ -28,7 +28,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.commons.lang3.time.DateUtils;
 import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
 import org.camunda.bpm.engine.AuthorizationException;
@@ -56,6 +55,7 @@ public class HistoricDecisionInstanceAuthorizationTest extends AuthorizationTest
   protected static final String PROCESS_KEY = "testProcess";
   protected static final String DECISION_DEFINITION_KEY = "testDecision";
 
+  @Override
   @Before
   public void setUp() throws Exception {
     testRule.deploy("org/camunda/bpm/engine/test/history/HistoricDecisionInstanceTest.processWithBusinessRuleTask.bpmn20.xml",
@@ -70,6 +70,7 @@ public class HistoricDecisionInstanceAuthorizationTest extends AuthorizationTest
     super.setUp();
   }
 
+  @Override
   @After
   public void tearDown() {
     super.tearDown();
@@ -132,6 +133,20 @@ public class HistoricDecisionInstanceAuthorizationTest extends AuthorizationTest
 
     // then
     verifyQueryResults(query, 1);
+  }
+
+  @Test
+  public void shouldNotFindDecisionInstanceWithRevokedReadPermissionOnAnyDecisionDefinition() {
+    // given
+    startProcessInstanceAndEvaluateDecision();
+    createGrantAuthorization(DECISION_DEFINITION, ANY, ANY, READ_HISTORY);
+    createRevokeAuthorization(DECISION_DEFINITION, ANY, userId, READ_HISTORY);
+
+    // when
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
+
+    // then
+    verifyQueryResults(query, 0);
   }
 
   @Test
@@ -272,6 +287,21 @@ public class HistoricDecisionInstanceAuthorizationTest extends AuthorizationTest
     prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 10);
 
     createGrantAuthorization(DECISION_DEFINITION, DECISION_DEFINITION_KEY, userId, Permissions.READ_HISTORY);
+
+    // when
+    List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService.createCleanableHistoricDecisionInstanceReport().list();
+
+    // then
+    assertEquals(0, reportResults.size());
+  }
+
+  @Test
+  public void shouldNotFindCleanupReportWithRevokedReadHistoryPermissionOnDecisionDefinition() {
+    // given
+    prepareDecisionInstances(DECISION_DEFINITION_KEY, -6, 5, 10);
+
+    createGrantAuthorization(DECISION_DEFINITION, ANY, userId, Permissions.READ, Permissions.READ_HISTORY);
+    createRevokeAuthorization(DECISION_DEFINITION, DECISION_DEFINITION_KEY, userId, Permissions.READ_HISTORY);
 
     // when
     List<CleanableHistoricDecisionInstanceReportResult> reportResults = historyService.createCleanableHistoricDecisionInstanceReport().list();

@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.authorization;
 
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
+import static org.camunda.bpm.engine.authorization.Permissions.ALL;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
@@ -30,9 +31,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.Date;
-
 import org.camunda.bpm.engine.AuthorizationException;
-import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendJobDefinitionHandler;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -53,6 +52,7 @@ public class JobAuthorizationTest extends AuthorizationTest {
   protected static final String TIMER_BOUNDARY_PROCESS_KEY = "timerBoundaryProcess";
   protected static final String ONE_INCIDENT_PROCESS_KEY = "process";
 
+  @Override
   @Before
   public void setUp() throws Exception {
     testRule.deploy(
@@ -62,6 +62,7 @@ public class JobAuthorizationTest extends AuthorizationTest {
     super.setUp();
   }
 
+  @Override
   @After
   public void tearDown() {
     super.tearDown();
@@ -124,6 +125,20 @@ public class JobAuthorizationTest extends AuthorizationTest {
 
     // then
     verifyQueryResults(query, 2);
+  }
+
+  @Test
+  public void shouldNotFindJobWithRevokedReadPermissionOnProcessInstance() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(TIMER_BOUNDARY_PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, ANY, ALL);
+    createRevokeAuthorization(PROCESS_INSTANCE, processInstanceId, userId, READ);
+
+    // when
+    JobQuery query = managementService.createJobQuery();
+
+    // then
+    verifyQueryResults(query, 0);
   }
 
   @Test
@@ -480,10 +495,6 @@ public class JobAuthorizationTest extends AuthorizationTest {
   }
 
   // helper /////////////////////////////////////////////////////
-
-  protected void verifyQueryResults(JobQuery query, int countExpected) {
-    verifyQueryResults((AbstractQuery<?, ?>) query, countExpected);
-  }
 
   protected Job selectAnyJob() {
     disableAuthorization();
