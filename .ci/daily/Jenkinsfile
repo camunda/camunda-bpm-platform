@@ -164,25 +164,6 @@ pipeline {
             ])
           }
         }
-        stage('UPGRADE-databases-h2') {
-          when {
-            expression {
-              cambpmWithLabels('h2', 'all-db')
-            }
-          }
-          steps {
-            cambpmConditionalRetry([
-              agentLabel: 'h2',
-              runSteps: {
-                cambpmRunMavenByStageType('upgrade-database', 'h2')
-              },
-              postFailure: {
-                cambpmPublishTestResult()
-                cambpmAddFailedStageType(failedStageTypes, 'upgrade-database')
-              }
-            ])
-          }
-        }
         stage('UPGRADE-instance-migration-h2') {
           when {
             expression {
