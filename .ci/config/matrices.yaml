@@ -26,26 +26,18 @@ engine-rest:
   stages:
   - 'engine-rest-unit-jersey-2'
   - 'engine-rest-unit-resteasy'
-  - 'engine-rest-unit-cxf'
   - 'engine-rest-unit-compatibility-wildfly'
   - 'engine-rest-IT-embedded-wildfly26'
   - 'engine-rest-jakarta-unit-resteasy'
   - 'engine-rest-jakarta-unit-compatibility-wildfly'
 daily-stages:
   databases:
-  - 'postgresql_122'
-  - 'postgresql_132'
-  - 'postgresql_142'
   - 'postgresql_150'
-  - 'aws_aurora_postgresql_12'
-  - 'aws_aurora_postgresql_13'
   - 'aws_aurora_postgresql_14'
   - 'mariadb_106'
   - 'mysql_80'
-  - 'oracle_12'
   - 'oracle_19'
   - 'db2_115'
-  - 'sqlserver_2017'
   - 'sqlserver_2019'
   stages:
   - 'sql-scripts'

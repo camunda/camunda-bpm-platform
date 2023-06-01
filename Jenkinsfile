@@ -556,26 +556,6 @@ pipeline {
             ])
           }
         }
-        stage('engine-UNIT-wls-compatibility') {
-          when {
-            expression {
-              cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit') && cambpmWithLabels('rest-api')
-            }
-          }
-          steps {
-            cambpmConditionalRetry([
-              agentLabel: 'h2',
-              runSteps: {
-                cambpmRunMaven('.', 'clean verify -pl !engine-rest/docs/ -Pcheck-engine,wls-compatibility,jersey2', runtimeStash: true)
-              },
-              postFailure: {
-                cambpmPublishTestResult()
-                // archive any heap dumps generated in the target folder
-                cambpmArchiveArtifacts(false, '**/target/*.hprof')
-              }
-            ])
-          }
-        }
         stage('engine-IT-wildfly-domain') {
           when {
             expression {

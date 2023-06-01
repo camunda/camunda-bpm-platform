@@ -787,17 +787,6 @@
     </profile>
 
     <profile>
-      <id>wls-compatibility</id>
-      <dependencies>
-        <dependency>
-          <groupId>joda-time</groupId>
-          <artifactId>joda-time</artifactId>
-          <version>1.2.1</version>
-        </dependency>
-      </dependencies>
-    </profile>
-
-    <profile>
       <id>check-plugins</id>
       <dependencies>
         <dependency>
