@@ -58,6 +58,11 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>org.camunda.bpm.dmn</groupId>
+      <artifactId>camunda-dmn-junit5</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
       <scope>test</scope>
@@ -65,11 +70,6 @@
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.groovy</groupId>
-      <artifactId>groovy-jsr223</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
