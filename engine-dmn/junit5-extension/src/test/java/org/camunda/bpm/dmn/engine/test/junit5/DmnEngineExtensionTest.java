@@ -27,6 +27,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(DmnEngineExtension.class)
 class DmnEngineExtensionTest {
+  public static final String DMN_MINIMAL = "org/camunda/bpm/dmn/engine/test/junit5/DecisionWithLiteralExpression.dmn";
+
   DmnEngine dmnEngineField;
 
   @Test
@@ -42,7 +44,7 @@ class DmnEngineExtensionTest {
   // Copy from "/engine-dmn/engine/.../DmnDecisionEvaluationTest.java".
   protected void shouldEvaluateDecisionWithLiteralExpression(DmnEngine dmnEngine) {
     DmnDecisionResult result = dmnEngine.evaluateDecision(
-        dmnEngine.parseDecision("decision", IoUtil.stringAsInputStream(DMN_FILE)),
+        dmnEngine.parseDecision("decision", IoUtil.fileAsStream(DMN_MINIMAL)),
         createVariables()
             .putValue("a", 2)
             .putValue("b", 3));
@@ -50,16 +52,4 @@ class DmnEngineExtensionTest {
     assertThat(result.getSingleResult()).containsOnlyKeys("c");
     assertThat((int) result.getSingleEntry()).isEqualTo(5);
   }
-
-  // Copy of "/engine-dmn/engine/.../DecisionWithLiteralExpression.dmn".
-  protected static final String DMN_FILE = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-      + "<definitions xmlns=\"http://www.omg.org/spec/DMN/20151101/dmn.xsd\"\n"
-      + "    name=\"camunda\" namespace=\"http://camunda.org/schema/1.0/dmn\">\n"
-      + "  <decision id=\"decision\" name=\"Decision\">\n"
-      + "    <variable id=\"v1\" name=\"c\" typeRef=\"integer\" />\n"
-      + "    <literalExpression id=\"e1\" label=\"expression 1\" expressionLanguage=\"groovy\">\n"
-      + "      <text>a + b</text>\n"
-      + "    </literalExpression>\n"
-      + "  </decision>\n"
-      + "</definitions>";
 }
