@@ -14,6 +14,9 @@
     <!-- Database configurations -->
     <property name="databaseSchemaUpdate" value="false" />
 
+    <!-- JPA configurations -->
+    <property name="jpaPersistenceUnitName" value="activiti-jpa-pu" />
+
     <!-- job executor configurations -->
     <property name="jobExecutorActivate" value="false" />
 

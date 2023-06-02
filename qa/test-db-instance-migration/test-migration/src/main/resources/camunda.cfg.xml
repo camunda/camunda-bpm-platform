@@ -13,6 +13,8 @@
     
     <!-- Database configurations -->
     <property name="databaseSchemaUpdate" value="true" />
+
+    <property name="javaSerializationFormatEnabled" value="true" />
     
     <!-- job executor configurations -->
     <property name="jobExecutorActivate" value="false" />
@@ -28,6 +30,13 @@
 
     <property name="jdbcBatchProcessing" value="false"/>
 
+    <!-- JPA configurations -->
+    <property name="jpaPersistenceUnitName" value="activiti-jpa-pu" />
+    <property name="processEnginePlugins">
+      <list>
+        <bean class="org.camunda.bpm.qa.upgrade.scenarios7190.variables.JPAVariablesSerializerPlugin" />
+      </list>
+    </property>
   </bean>
   
 </beans>
