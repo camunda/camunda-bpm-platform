@@ -254,11 +254,6 @@ public abstract class ProcessEngineConfiguration {
   protected Integer jdbcStatementTimeout;
   protected boolean jdbcBatchProcessing = true;
 
-  protected String jpaPersistenceUnitName;
-  protected Object jpaEntityManagerFactory;
-  protected boolean jpaHandleTransaction;
-  protected boolean jpaCloseEntityManager;
-
   protected int defaultNumberOfRetries = JobEntity.DEFAULT_RETRIES;
 
   protected ClassLoader classLoader;
@@ -803,41 +798,6 @@ public abstract class ProcessEngineConfiguration {
   public ProcessEngineConfiguration setClassLoader(ClassLoader classLoader) {
     this.classLoader = classLoader;
     return this;
-  }
-
-  public Object getJpaEntityManagerFactory() {
-    return jpaEntityManagerFactory;
-  }
-
-  public ProcessEngineConfiguration setJpaEntityManagerFactory(Object jpaEntityManagerFactory) {
-    this.jpaEntityManagerFactory = jpaEntityManagerFactory;
-    return this;
-  }
-
-  public boolean isJpaHandleTransaction() {
-    return jpaHandleTransaction;
-  }
-
-  public ProcessEngineConfiguration setJpaHandleTransaction(boolean jpaHandleTransaction) {
-    this.jpaHandleTransaction = jpaHandleTransaction;
-    return this;
-  }
-
-  public boolean isJpaCloseEntityManager() {
-    return jpaCloseEntityManager;
-  }
-
-  public ProcessEngineConfiguration setJpaCloseEntityManager(boolean jpaCloseEntityManager) {
-    this.jpaCloseEntityManager = jpaCloseEntityManager;
-    return this;
-  }
-
-  public String getJpaPersistenceUnitName() {
-    return jpaPersistenceUnitName;
-  }
-
-  public void setJpaPersistenceUnitName(String jpaPersistenceUnitName) {
-    this.jpaPersistenceUnitName = jpaPersistenceUnitName;
   }
 
   public String getDataSourceJndiName() {

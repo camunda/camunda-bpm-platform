@@ -31,7 +31,6 @@
     <property name="jdbcBatchProcessing" value="false"/>
 
     <!-- JPA configurations -->
-    <property name="jpaPersistenceUnitName" value="activiti-jpa-pu" />
     <property name="processEnginePlugins">
       <list>
         <bean class="org.camunda.bpm.qa.upgrade.scenarios7190.variables.JPAVariablesSerializerPlugin" />
