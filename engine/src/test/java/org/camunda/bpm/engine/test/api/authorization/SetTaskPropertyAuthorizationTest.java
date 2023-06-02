@@ -79,8 +79,8 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
         { "setPriority", setPriority, "taskId", 80 },
         { "setName", setName, "taskId", "name" },
         { "setDescription", setDescription, "taskId", "description" },
-        { "setDueDate", setDueDate, "taskId",  DateTime.now().toDate()},
-        { "setFollowUpDate", setFollowUpDate, "taskId", DateTime.now().toDate() }
+        { "setDueDate", setDueDate, "taskId",  DateTime.now().toInstant().withMillis(0).toDate() },
+        { "setFollowUpDate", setFollowUpDate, "taskId", DateTime.now().toInstant().withMillis(0).toDate() }
     });
   }
 

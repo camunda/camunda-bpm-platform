@@ -105,8 +105,8 @@ public class MultiTenancySetTaskPropertyTest {
         { "setPriority", setPriority, 1, "taskPriority"},
         { "setName", setName, "name", "taskName" },
         { "setDescription", setDescription, "description", "taskDescription" },
-        { "setDueDate", setDueDate, DateTime.now().toDate(), "dueDate" },
-        { "setFollowUpDate", setFollowUpDate, DateTime.now().toDate(), "followUpDate" }
+        { "setDueDate", setDueDate, DateTime.now().toInstant().withMillis(0).toDate(), "dueDate" },
+        { "setFollowUpDate", setFollowUpDate, DateTime.now().toInstant().withMillis(0).toDate(), "followUpDate" }
     });
   }
 
