@@ -9,7 +9,7 @@
     <groupId>org.camunda.bpm.example</groupId>
     <artifactId>camunda-example-root</artifactId>
     <relativePath>../</relativePath>
-    <version>7.20.0-SNAPSHOT</version>
+    <version>7.20.0-alpha2</version>
   </parent>
 
   <dependencyManagement>
