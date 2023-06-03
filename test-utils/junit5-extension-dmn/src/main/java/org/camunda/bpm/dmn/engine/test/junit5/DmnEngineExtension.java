@@ -18,9 +18,12 @@ package org.camunda.bpm.dmn.engine.test.junit5;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Objects;
+import java.util.Optional;
 
 import org.camunda.bpm.dmn.engine.DmnEngine;
 import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
+import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
@@ -30,7 +33,7 @@ import org.junit.jupiter.api.extension.TestInstancePostProcessor;
 /**
  * JUnit 5 Extension to create and inject a {@link DmnEngine} into the test class.
  * <p>
- * Usage:
+ * Usage with the default configuration:
  * </p>
  * <pre>
  * <code>@ExtendWith(DmnEngineExtension.class)</code>
@@ -47,15 +50,39 @@ import org.junit.jupiter.api.extension.TestInstancePostProcessor;
  *   ...
  * }
  * </pre>
+ * <p>
+ * If you want to use a custom {@link DmnEngineConfiguration} (created in the test programmatically),
+ * you can register the extension directly and use the factory method to configure it.
+ * <br>
+ * Usage with a custom configuration:
+ * </p>
+ * <pre>
+ * DmnEngineConfiguration myConfiguration = createMyEngineConfiguration();
+ * 
+ * <code>@RegisterExtension</code>
+ * DmnEngineExtension dmnEngineExtension = DmnEngineExtension.forConfiguration(myConfiguration);
+ * </pre>
  */
-public class DmnEngineExtension implements TestInstancePostProcessor, ParameterResolver {
+public class DmnEngineExtension implements TestInstancePostProcessor, BeforeTestExecutionCallback, ParameterResolver {
 
-  protected DmnEngineConfiguration dmnEngineConfiguration;
+  protected final DmnEngineConfiguration dmnEngineConfiguration;
   protected DmnEngine dmnEngine;
+
+  public DmnEngineExtension() {
+    dmnEngineConfiguration = DmnEngineConfiguration.createDefaultDmnEngineConfiguration();
+  }
+
+  public static DmnEngineExtension forConfiguration(DmnEngineConfiguration configuration) {
+    return new DmnEngineExtension(
+        Objects.requireNonNull(configuration, "configuration must not be null"));
+  }
+
+  protected DmnEngineExtension(DmnEngineConfiguration configuration) {
+    dmnEngineConfiguration = configuration;
+  }
 
   protected void initializeDmnEngine() {
     if (dmnEngine == null) {
-      dmnEngineConfiguration = DmnEngineConfiguration.createDefaultDmnEngineConfiguration();
       dmnEngine = dmnEngineConfiguration.buildEngine();
     }
   }
@@ -71,11 +98,15 @@ public class DmnEngineExtension implements TestInstancePostProcessor, ParameterR
 
   @Override
   public void postProcessTestInstance(Object testInstance, ExtensionContext context) throws Exception {
-    initializeDmnEngine();
+    injectIntoTestInstance(testInstance);
+  }
 
-    Arrays.stream(testInstance.getClass().getDeclaredFields())
-      .filter(field -> DmnEngine.class.equals(field.getType()))
-      .forEach(field -> injectDmnEngine(testInstance, field));
+  @Override
+  public void beforeTestExecution(ExtensionContext context) throws Exception {
+    final Optional<Object> testInstance = context.getTestInstance();
+    if (testInstance.isPresent()) {
+      injectIntoTestInstance(testInstance.get());
+    }
   }
 
   @Override
@@ -93,5 +124,13 @@ public class DmnEngineExtension implements TestInstancePostProcessor, ParameterR
 
     initializeDmnEngine();
     return dmnEngine;
+  }
+
+  private void injectIntoTestInstance(Object testInstance) throws Exception {
+    initializeDmnEngine();
+
+    Arrays.stream(testInstance.getClass().getDeclaredFields())
+        .filter(field -> DmnEngine.class.equals(field.getType()))
+        .forEach(field -> injectDmnEngine(testInstance, field));
   }
 }
