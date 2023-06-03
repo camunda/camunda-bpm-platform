@@ -1,4 +1,4 @@
-# Camunda DMN JUnit 5
+# Camunda Platform DMN JUnit 5
 
 JUnit 5 extension that allows you to inject a DMN engine into your test.
 

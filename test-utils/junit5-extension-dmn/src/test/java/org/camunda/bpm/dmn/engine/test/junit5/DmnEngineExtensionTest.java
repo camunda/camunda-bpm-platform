@@ -41,7 +41,6 @@ class DmnEngineExtensionTest {
     shouldEvaluateDecisionWithLiteralExpression(dmnEngineParam);
   }
 
-  // Copy from "/engine-dmn/engine/.../DmnDecisionEvaluationTest.java".
   protected void shouldEvaluateDecisionWithLiteralExpression(DmnEngine dmnEngine) {
     DmnDecisionResult result = dmnEngine.evaluateDecision(
         dmnEngine.parseDecision("decision", IoUtil.fileAsStream(DMN_MINIMAL)),

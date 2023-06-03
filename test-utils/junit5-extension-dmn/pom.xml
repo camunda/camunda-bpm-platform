@@ -6,10 +6,10 @@
   <name>Camunda DMN - JUnit 5 Extension</name>
 
   <parent>
-    <groupId>org.camunda.bpm.dmn</groupId>
-    <artifactId>camunda-engine-dmn-root</artifactId>
+    <groupId>org.camunda.bpm</groupId>
+    <artifactId>camunda-database-settings</artifactId>
     <version>7.20.0-SNAPSHOT</version>
-    <relativePath>../engine-dmn</relativePath>
+    <relativePath>../../database</relativePath>
   </parent>
 
   <properties>
