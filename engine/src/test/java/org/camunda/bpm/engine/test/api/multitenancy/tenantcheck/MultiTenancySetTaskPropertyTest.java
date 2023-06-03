@@ -30,6 +30,7 @@ import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ClockTestUtil;
 import org.camunda.bpm.engine.test.util.MethodInvocation;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
@@ -105,8 +106,8 @@ public class MultiTenancySetTaskPropertyTest {
         { "setPriority", setPriority, 1, "taskPriority"},
         { "setName", setName, "name", "taskName" },
         { "setDescription", setDescription, "description", "taskDescription" },
-        { "setDueDate", setDueDate, DateTime.now().toInstant().withMillis(0).toDate(), "dueDate" },
-        { "setFollowUpDate", setFollowUpDate, DateTime.now().toInstant().withMillis(0).toDate(), "followUpDate" }
+        { "setDueDate", setDueDate, ClockTestUtil.setClockToDateWithoutMilliseconds(), "dueDate" },
+        { "setFollowUpDate", setFollowUpDate, ClockTestUtil.setClockToDateWithoutMilliseconds(), "followUpDate" }
     });
   }
 

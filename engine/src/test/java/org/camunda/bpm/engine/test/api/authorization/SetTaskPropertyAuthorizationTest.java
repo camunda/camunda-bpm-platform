@@ -26,12 +26,14 @@ import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_TASK;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.TASK;
 
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.test.util.ClockTestUtil;
 import org.camunda.bpm.engine.test.util.EntityRemoveRule;
 import org.camunda.bpm.engine.test.util.ObjectProperty;
 import org.camunda.bpm.engine.test.util.RemoveAfter;
@@ -79,8 +81,8 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
         { "setPriority", setPriority, "taskId", 80 },
         { "setName", setName, "taskId", "name" },
         { "setDescription", setDescription, "taskId", "description" },
-        { "setDueDate", setDueDate, "taskId",  DateTime.now().toInstant().withMillis(0).toDate() },
-        { "setFollowUpDate", setFollowUpDate, "taskId", DateTime.now().toInstant().withMillis(0).toDate() }
+        { "setDueDate", setDueDate, "taskId",  ClockTestUtil.setClockToDateWithoutMilliseconds() },
+        { "setFollowUpDate", setFollowUpDate, "taskId", ClockTestUtil.setClockToDateWithoutMilliseconds() }
     });
   }
 
@@ -308,5 +310,10 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
     } catch (Exception e) {
       fail("Failed to assert property for operationName=" + operationName + " due to : " + e.getMessage());
     }
+  }
+
+  public static void main(String[] args) {
+
+    System.out.println(ClockTestUtil.setClockToDateWithoutMilliseconds());
   }
 }
