@@ -17,11 +17,11 @@
 package org.camunda.bpm.qa.upgrade.scenarios7190.variables;
 
 import javax.persistence.EntityManagerFactory;
-
 import javax.persistence.Persistence;
-
 import org.camunda.bpm.engine.impl.cfg.AbstractProcessEnginePlugin;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
+import org.camunda.bpm.engine.variable.type.ValueType;
 
 public class JPAVariablesSerializerPlugin extends AbstractProcessEnginePlugin {
 
@@ -29,7 +29,26 @@ public class JPAVariablesSerializerPlugin extends AbstractProcessEnginePlugin {
   public void postInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
     EntityManagerFactory jpaEntityManagerFactory = Persistence.createEntityManagerFactory("activiti-jpa-pu");
     processEngineConfiguration.getSessionFactories().put(EntityManagerSession.class,
-        new EntityManagerSessionFactory(jpaEntityManagerFactory));
-    processEngineConfiguration.getVariableSerializers().addSerializer(new JPAVariableSerializer());
+        new EntityManagerSessionFactory(jpaEntityManagerFactory, true, true));
+
+    VariableSerializers variableSerializers = processEngineConfiguration.getVariableSerializers();
+    int index = variableSerializers.getSerializerIndexByName(ValueType.BYTES.getName());
+    if (index > -1) {
+      variableSerializers.addSerializer(new JPAVariableSerializer(), index);
+    } else {
+      variableSerializers.addSerializer(new JPAVariableSerializer());
+    }
+
+//    EntityManager manager = jpaEntityManagerFactory.createEntityManager();
+//    manager.getTransaction().begin();
+//
+//    FieldAccessJPAEntity entityToQuery = new FieldAccessJPAEntity();
+//    entityToQuery.setId(1L);
+//    entityToQuery.setMyValue("value1");
+//    manager.persist(entityToQuery);
+//
+//    manager.flush();
+//    manager.getTransaction().commit();
+//    manager.close();
   }
 }

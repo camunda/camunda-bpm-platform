@@ -16,7 +16,11 @@
  */
 package org.camunda.bpm.qa.upgrade.scenarios7190.variables;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import javax.persistence.EntityManagerFactory;
+
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.Session;
 import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
 
@@ -26,9 +30,18 @@ import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
 public class EntityManagerSessionFactory implements SessionFactory {
 
   protected EntityManagerFactory entityManagerFactory;
+  protected boolean handleTransactions;
+  protected boolean closeEntityManager;
 
-  public EntityManagerSessionFactory(Object entityManagerFactory) {
+  public EntityManagerSessionFactory(Object entityManagerFactory, boolean handleTransactions, boolean closeEntityManager) {
+    ensureNotNull("entityManagerFactory", entityManagerFactory);
+    if (!(entityManagerFactory instanceof EntityManagerFactory)) {
+      throw new ProcessEngineException("EntityManagerFactory must implement 'javax.persistence.EntityManagerFactory'");
+    }
+
     this.entityManagerFactory = (EntityManagerFactory) entityManagerFactory;
+    this.handleTransactions = handleTransactions;
+    this.closeEntityManager = closeEntityManager;
   }
 
   public Class< ? > getSessionType() {
@@ -36,7 +49,7 @@ public class EntityManagerSessionFactory implements SessionFactory {
   }
 
   public Session openSession() {
-    return new EntityManagerSession(entityManagerFactory, true, true);
+    return new EntityManagerSessionImpl(entityManagerFactory, handleTransactions, closeEntityManager);
   }
 
   public EntityManagerFactory getEntityManagerFactory() {

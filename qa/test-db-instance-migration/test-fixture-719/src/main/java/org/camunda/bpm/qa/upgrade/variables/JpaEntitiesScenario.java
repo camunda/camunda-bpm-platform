@@ -25,12 +25,13 @@ import javax.persistence.EntityManagerFactory;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSession;
 import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSessionFactory;
+import org.camunda.bpm.qa.upgrade.variables.FieldAccessJPAEntity;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.qa.upgrade.DescribesScenario;
 import org.camunda.bpm.qa.upgrade.ScenarioSetup;
 
 public class JpaEntitiesScenario {
-  static org.camunda.bpm.qa.upgrade.variables.FieldAccessJPAEntity  simpleEntityFieldAccess;
+  static FieldAccessJPAEntity simpleEntityFieldAccess;
 //  static org.camunda.bpm.qa.upgrade.variables.PropertyAccessJPAEntity simpleEntityPropertyAccess;
 //  static org.camunda.bpm.qa.upgrade.variables.SubclassFieldAccessJPAEntity subclassFieldAccess;
 //  static org.camunda.bpm.qa.upgrade.variables.SubclassPropertyAccessJPAEntity subclassPropertyAccess;

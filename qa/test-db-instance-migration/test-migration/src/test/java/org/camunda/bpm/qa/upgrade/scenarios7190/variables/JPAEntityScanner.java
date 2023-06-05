@@ -26,8 +26,8 @@ import org.camunda.bpm.engine.ProcessEngineException;
 
 
 /**
- * Scans class and creates {@link EntityMetaData} based on it. 
- * 
+ * Scans class and creates {@link EntityMetaData} based on it.
+ *
  * @author Frederik Heremans
  */
 public class JPAEntityScanner {
@@ -35,11 +35,11 @@ public class JPAEntityScanner {
   public EntityMetaData scanClass(Class<?> clazz) {
     EntityMetaData metaData = new EntityMetaData();
     metaData.setEntityClass(clazz);
-    
+
     // Class should have @Entity annotation
     boolean isEntity = isEntityAnnotationPresent(clazz);
     metaData.setJPAEntity(isEntity);
-    
+
     if(isEntity) {
       // Try to find a field annotated with @Id
       Field idField = getIdField(clazz);
@@ -61,7 +61,7 @@ public class JPAEntityScanner {
 
   private Method getIdMethod(Class< ? > clazz) {
     Method idMethod = null;
-    // Get all public declared methods on the class. According to spec, @Id should only be 
+    // Get all public declared methods on the class. According to spec, @Id should only be
     // applied to fields and property get methods
     Method[] methods = clazz.getMethods();
     Id idAnnotation = null;
@@ -86,7 +86,7 @@ public class JPAEntityScanner {
        break;
      }
    }
-   
+
    if(idField == null) {
      // Check superClass for fields with @Id, since getDeclaredFields does
      // not return superclass-fields.

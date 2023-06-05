@@ -19,15 +19,15 @@ package org.camunda.bpm.qa.upgrade.scenarios7190.variables;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.util.Map;
-import org.camunda.bpm.qa.upgrade.variables.*;
+
+import javax.persistence.EntityManager;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.qa.upgrade.Origin;
 import org.camunda.bpm.qa.upgrade.ScenarioUnderTest;
 import org.camunda.bpm.qa.upgrade.UpgradeTestRule;
+import org.camunda.bpm.qa.upgrade.variables.FieldAccessJPAEntity;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -61,71 +61,46 @@ public class JpaEntitiesTest {
 
 
     // Read entity with @Id on field
-    Object fieldAccessResult = runtimeService.getVariable(processInstanceId, "simpleEntityFieldAccess");
-    assertThat(fieldAccessResult).isInstanceOf(FieldAccessJPAEntity.class);
-    assertThat(((FieldAccessJPAEntity)fieldAccessResult).getId().longValue()).isEqualTo(1L);
-    assertThat(((FieldAccessJPAEntity)fieldAccessResult).getMyValue()).isEqualTo("value1");
+    Object singleResult = runtimeService.getVariable(processInstanceId,"simpleEntityFieldAccess");
+    assertThat(singleResult).isInstanceOf(FieldAccessJPAEntity.class);
+    assertThat(((FieldAccessJPAEntity)singleResult).getId().longValue()).isEqualTo(1L);
+    assertThat(((FieldAccessJPAEntity)singleResult).getMyValue()).isEqualTo("value1");
 
-//    // Read entity with @Id on property
-//    Object propertyAccessResult = runtimeService.getVariable(processInstanceId, "simpleEntityPropertyAccess");
-//    assertThat(propertyAccessResult).isInstanceOf(PropertyAccessJPAEntity.class);
-//    assertThat(((PropertyAccessJPAEntity)propertyAccessResult).getId().longValue()).isEqualTo(1L);
-//    assertThat(((PropertyAccessJPAEntity)propertyAccessResult).getMyValue()).isEqualTo("value2");
-//
-//    // Read entity with @Id on field of mapped superclass
-//    Object subclassFieldResult = runtimeService.getVariable(processInstanceId, "subclassFieldAccess");
-//    assertThat(subclassFieldResult).isInstanceOf(PropertyAccessJPAEntity.class);
-//    assertThat(((SubclassFieldAccessJPAEntity)subclassFieldResult).getId().longValue()).isEqualTo(1L);
-//    assertThat(((SubclassFieldAccessJPAEntity)subclassFieldResult).getValue()).isEqualTo("value3");
-//
-//    // Read entity with @Id on property of mapped superclass
-//    Object subclassPropertyResult = runtimeService.getVariable(processInstanceId, "subclassPropertyAccess");
-//    assertThat(subclassPropertyResult).isInstanceOf(PropertyAccessJPAEntity.class);
-//    assertThat(((SubclassPropertyAccessJPAEntity)subclassPropertyResult).getId().longValue()).isEqualTo(1L);
-//    assertThat(((SubclassPropertyAccessJPAEntity)subclassPropertyResult).getValue()).isEqualTo("value4");
 
     // -----------------------------------------------------------------------------
     // Test updating JPA-entity to null-value and back again
     // -----------------------------------------------------------------------------
-    Object currentValue = runtimeService.getVariable(processInstanceId, "simpleEntityFieldAccess");
     // Set to null
     runtimeService.setVariable(processInstanceId, "simpleEntityFieldAccess", null);
-    currentValue = runtimeService.getVariable(processInstanceId, "simpleEntityFieldAccess");
+    Object currentValue = runtimeService.createVariableInstanceQuery().variableName("simpleEntityFieldAccess").singleResult().getValue();
     assertThat(currentValue).isNull();
+
+    FieldAccessJPAEntity entity = extracted();
     // Set to JPA-entity again
-    runtimeService.setVariable(processInstanceId, "simpleEntityFieldAccess", "testString");
-    currentValue = runtimeService.getVariable(processInstanceId, "simpleEntityFieldAccess");
-    assertThat(currentValue).isNotNull();
-    assertThat(currentValue).isInstanceOf(String.class);
-    assertThat(currentValue).isEqualTo("testString");
-    assertEquals(1L, ((FieldAccessJPAEntity)currentValue).getId().longValue());
-    FieldAccessJPAEntity simpleEntityFieldAccess = new FieldAccessJPAEntity();
-    simpleEntityFieldAccess.setId(1L);
-    simpleEntityFieldAccess.setMyValue("value1");
-    runtimeService.setVariable(processInstanceId, "simpleEntityFieldAccess", simpleEntityFieldAccess);
-    currentValue = runtimeService.getVariable(processInstanceId, "simpleEntityFieldAccess");
+    runtimeService.setVariable(processInstanceId, "simpleEntityFieldAccess", entity);
+
+    currentValue = runtimeService.createVariableInstanceQuery().variableName("simpleEntityFieldAccess").singleResult().getValue();
     assertNotNull(currentValue);
-    assertTrue(currentValue instanceof String);
-    assertEquals(1L, ((FieldAccessJPAEntity)currentValue).getId().longValue());
+    assertThat(currentValue).isInstanceOf(FieldAccessJPAEntity.class);
+    assertEquals(10L, ((FieldAccessJPAEntity)currentValue).getId().longValue());
+    assertThat(((FieldAccessJPAEntity)currentValue).getMyValue()).isEqualTo("value10");
+  }
 
-//    Batch batch = managementService.createBatchQuery().batchId(batchId).singleResult();
-//    String seedJobDefinitionId = batch.getSeedJobDefinitionId();
-//    Job seedJob = managementService.createJobQuery().jobDefinitionId(seedJobDefinitionId).singleResult();
-//
-//    Job timerJob = managementService.createJobQuery().processDefinitionKey("createProcessForSetRetriesWithDueDate_718").singleResult();
-//
-//    managementService.executeJob(seedJob.getId());
-//    List<Job> batchJobs = managementService.createJobQuery()
-//        .jobDefinitionId(batch.getBatchJobDefinitionId())
-//        .list();
-//
-//    // when
-//    batchJobs.forEach(job -> managementService.executeJob(job.getId()));
+  protected FieldAccessJPAEntity extracted() {
+    EntityManagerSessionFactory entityManagerSessionFactory = (EntityManagerSessionFactory) engineRule.getProcessEngineConfiguration()
+        .getSessionFactories()
+        .get(EntityManagerSession.class);
+    EntityManager manager = entityManagerSessionFactory.getEntityManagerFactory().createEntityManager();
+    manager.getTransaction().begin();
 
-    // then
-//    Job timerJobAfterBatch = managementService.createJobQuery().processDefinitionKey("createProcessForSetRetriesWithDueDate_718").singleResult();
-//    assertThat(timerJob.getDuedate()).isEqualToIgnoringMillis(timerJobAfterBatch.getDuedate());
-//    assertThat(timerJob.getRetries()).isEqualTo(3);
-//    assertThat(timerJobAfterBatch.getRetries()).isEqualTo(5);
+    FieldAccessJPAEntity entity = new FieldAccessJPAEntity();
+    entity.setId(10L);
+    entity.setMyValue("value10");
+    manager.persist(entity);
+
+    manager.flush();
+    manager.getTransaction().commit();
+    manager.close();
+    return entity;
   }
 }

@@ -21,7 +21,7 @@ import java.lang.reflect.Method;
 
 /**
  * Class containing meta-data about Entity-classes.
- * 
+ *
  * @author Frederik Heremans
  */
 public class EntityMetaData {
@@ -71,7 +71,7 @@ public class EntityMetaData {
       idType = idField.getType();
     } else if (idMethod != null) {
       idType = idMethod.getReturnType();
-    } 
+    }
     return idType;
   }
 }

@@ -19,100 +19,16 @@ package org.camunda.bpm.qa.upgrade.scenarios7190.variables;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.cfg.TransactionContext;
-import org.camunda.bpm.engine.impl.cfg.TransactionListener;
-import org.camunda.bpm.engine.impl.cfg.TransactionState;
-import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.Session;
 
 /**
  * @author Frederik Heremans
- * @author Joram Barrez
  */
-public class EntityManagerSession implements Session {
-
-  private EntityManagerFactory entityManagerFactory;
-  private EntityManager entityManager;
-  private boolean handleTransactions;
-  private boolean closeEntityManager;
-
-  public EntityManagerSession(EntityManagerFactory entityManagerFactory, EntityManager entityManager,
-          boolean handleTransactions, boolean closeEntityManager) {
-    this(entityManagerFactory, handleTransactions, closeEntityManager);
-    this.entityManager = entityManager;
-  }
-
-  public EntityManagerSession(EntityManagerFactory entityManagerFactory, boolean handleTransactions, boolean closeEntityManager) {
-    this.entityManagerFactory = entityManagerFactory;
-    this.handleTransactions = handleTransactions;
-    this.closeEntityManager = closeEntityManager;
-  }
-
-  public void flush() {
-    if (entityManager != null && (!handleTransactions || isTransactionActive()) ) {
-      try {
-        entityManager.flush();
-      } catch (Exception e) {
-        throw new ProcessEngineException("Error while flushing EntityManager: " + e.getMessage(), e);
-      }
-    }
-  }
-
-  protected boolean isTransactionActive() {
-    if (handleTransactions && entityManager.getTransaction() != null) {
-      return entityManager.getTransaction().isActive();
-    }
-    return false;
-  }
-
-  public void close() {
-    if (closeEntityManager && entityManager != null && !entityManager.isOpen()) {
-      try {
-        entityManager.close();
-      } catch (IllegalStateException ise) {
-        throw new ProcessEngineException("Error while closing EntityManager, may have already been closed or it is container-managed", ise);
-      }
-    }
-  }
-
-  public EntityManager getEntityManager() {
-    if (entityManager == null) {
-      entityManager = getEntityManagerFactory().createEntityManager();
-
-      if(handleTransactions) {
-        // Add transaction listeners, if transactions should be handled
-        TransactionListener jpaTransactionCommitListener = new TransactionListener() {
-          public void execute(CommandContext commandContext) {
-            if (isTransactionActive()) {
-              entityManager.getTransaction().commit();
-            }
-          }
-        };
-
-        TransactionListener jpaTransactionRollbackListener = new TransactionListener() {
-          public void execute(CommandContext commandContext) {
-            if (isTransactionActive()) {
-              entityManager.getTransaction().rollback();
-            }
-          }
-        };
-
-        TransactionContext transactionContext = Context.getCommandContext().getTransactionContext();
-        transactionContext.addTransactionListener(TransactionState.COMMITTED, jpaTransactionCommitListener);
-        transactionContext.addTransactionListener(TransactionState.ROLLED_BACK, jpaTransactionRollbackListener);
-
-        // Also, start a transaction, if one isn't started already
-        if (!isTransactionActive()) {
-          entityManager.getTransaction().begin();
-        }
-      }
-    }
-
-    return entityManager;
-  }
-
-  private EntityManagerFactory getEntityManagerFactory() {
-    return entityManagerFactory;
-  }
+public interface EntityManagerSession extends Session {
+  /**
+   * Get an {@link EntityManager} instance associated with this session.
+   * @throws ProcessEngineException when no {@link EntityManagerFactory} instance
+   * is configured for the process engine.
+   */
+  EntityManager getEntityManager();
 }
