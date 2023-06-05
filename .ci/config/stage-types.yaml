@@ -58,20 +58,6 @@ sql-scripts:
   - 'sqlserver'
   - 'postgresql'
   - 'cockroachdb'
-upgrade-database:
-  directory: 'qa/test-db-upgrade'
-  command: 'verify -Pupgrade-db,'
-  stash:
-    runtimeStash: true
-  labels:
-  - 'all-db'
-  - 'db2'
-  - 'mysql'
-  - 'oracle'
-  - 'mariadb'
-  - 'sqlserver'
-  - 'postgresql'
-  - 'cockroachdb'
 instance-migration:
   directory: 'qa/test-db-instance-migration'
   command: 'verify -Pinstance-migration,'
