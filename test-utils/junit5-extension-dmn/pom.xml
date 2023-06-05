@@ -1,21 +1,22 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>camunda-bpm-junit5</artifactId>
+  <groupId>org.camunda.bpm.dmn</groupId>
+  <artifactId>camunda-dmn-junit5</artifactId>
   <packaging>jar</packaging>
-  
-  <name>Camunda Platform - JUnit 5 Extension</name>
-  
+
+  <name>Camunda DMN - JUnit 5 Extension</name>
+
   <parent>
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-database-settings</artifactId>
-    <relativePath>../../database</relativePath>
     <version>7.20.0-SNAPSHOT</version>
+    <relativePath>../../database</relativePath>
   </parent>
 
   <properties>
     <version.junit5>5.8.2</version.junit5>
   </properties>
-  
+
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -34,7 +35,7 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.assertj</groupId>
@@ -53,23 +54,18 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>org.camunda.bpm.dmn</groupId>
-      <artifactId>camunda-dmn-junit5</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <scope>test</scope>
+      <artifactId>camunda-engine-dmn</artifactId>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-jsr223</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
