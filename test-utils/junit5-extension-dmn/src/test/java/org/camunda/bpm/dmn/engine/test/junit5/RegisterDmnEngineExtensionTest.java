@@ -54,7 +54,7 @@ class RegisterDmnEngineExtensionTest {
   }
 
   @Test
-  void shouldInjectEngineWithCustomConfigurationOaramVersion(DmnEngine dmnEngineParam) {
+  void shouldInjectEngineWithCustomConfigurationParamVersion(DmnEngine dmnEngineParam) {
     assertThat(dmnEngineParam.getConfiguration())
         .isEqualTo(customConfiguration);
   }
