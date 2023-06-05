@@ -26,7 +26,6 @@ import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_TASK;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.TASK;
 
-import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -38,7 +37,6 @@ import org.camunda.bpm.engine.test.util.EntityRemoveRule;
 import org.camunda.bpm.engine.test.util.ObjectProperty;
 import org.camunda.bpm.engine.test.util.RemoveAfter;
 import org.camunda.bpm.engine.test.util.TriConsumer;
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -310,10 +308,5 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
     } catch (Exception e) {
       fail("Failed to assert property for operationName=" + operationName + " due to : " + e.getMessage());
     }
-  }
-
-  public static void main(String[] args) {
-
-    System.out.println(ClockTestUtil.setClockToDateWithoutMilliseconds());
   }
 }
