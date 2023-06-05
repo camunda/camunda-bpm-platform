@@ -80,6 +80,7 @@ public class SqlScriptTest {
   protected Database database;
   protected String databaseType;
   protected String projectVersion;
+  protected Liquibase liquibase;
 
   @Before
   public void setup() throws Exception {
@@ -91,77 +92,65 @@ public class SqlScriptTest {
     projectVersion = properties.getProperty("project.version");
 
     SnapshotParserFactory.getInstance().register(new DirectAccessSnapshotParser());
+
     database = getDatabase();
+    liquibase = getLiquibase();
+    liquibase.dropAll();
   }
 
   @After
   public void tearDown() throws Exception {
-    database = getDatabase();
-    try (Liquibase liquibase = getLiquibase()) {
+    try {
       liquibase.dropAll();
+    } finally {
+      liquibase.close();
     }
   }
 
   @Test
   public void shouldEqualLiquibaseChangelogAndCreateScripts() throws Exception {
     // given
-    try (Liquibase liquibase = getLiquibase()) {
-      //   database cleared and set up with Liquibase changelog
-      liquibase.dropAll();
+    executeSqlScript("create", "engine");
+    executeSqlScript("create", "identity");
+    DatabaseSnapshot snapshotManualScripts = createCurrentDatabaseSnapshot();
+    liquibase.dropAll();
 
-      // execute the SQL scripts
-      executeSqlScript("create", "engine");
-      executeSqlScript("create", "identity");
+    // when set up with Liquibase changelog
+    liquibase.update(new Contexts());
 
-      //   snapshot created of the database for manual scripts
-      DatabaseSnapshot snapshotManualScripts = createCurrentDatabaseSnapshot();
-      //   database cleared and set up with Liquibase changelog
-      liquibase.dropAll();
-      liquibase.update(new Contexts());
-      //   snapshot created of the database for Liquibase changelog
-      DatabaseSnapshot snapshotLiquibaseChangelog = createCurrentDatabaseSnapshot();
+    // then
+    DatabaseSnapshot snapshotLiquibaseChangelog = createCurrentDatabaseSnapshot();
+    Database currentDatabase = getDatabaseForSnapshot(snapshotManualScripts);
+    Database upgradedDatabase = getDatabaseForSnapshot(snapshotLiquibaseChangelog);
+    DiffResult diffResult = liquibase.diff(currentDatabase, upgradedDatabase, new CompareControl());
+    List<ChangeSet> changeSetsToApply = new DiffToChangeLog(diffResult, new CustomDiffOutputControl()).generateChangeSets();
 
-      //   diff created for both snapshot
-      Database currentDatabase = getDatabaseForSnapshot(snapshotManualScripts);
-      Database upgradedDatabase = getDatabaseForSnapshot(snapshotLiquibaseChangelog);
-      DiffResult diffResult = liquibase.diff(currentDatabase, upgradedDatabase, new CompareControl());
-
-      // when generating changes to apply between both databases
-      List<ChangeSet> changeSetsToApply = new DiffToChangeLog(diffResult, new CustomDiffOutputControl()).generateChangeSets();
-
-      // then
-      assertThat(changeSetsToApply)
-        .withFailMessage("Liquibase database schema misses changes: %s", getChanges(changeSetsToApply))
-        .isEmpty();
-    }
+    assertThat(changeSetsToApply)
+      .withFailMessage("Liquibase database schema misses changes: %s", getChanges(changeSetsToApply))
+      .isEmpty();
   }
 
   @Test
   public void shouldEqualOldUpgradedAndNewCreatedViaLiquibase() throws Exception {
-    // given
-    try (Liquibase liquibaseCurrent = getLiquibase();
-        Liquibase liquibaseOld = getLiquibase("scripts-old/")) {
-      liquibaseCurrent.dropAll();
-
-      // execute the current scripts
-      liquibaseCurrent.update(new Contexts());
+    try (Liquibase liquibaseOld = getLiquibase("scripts-old/")) {
+      // given
+      liquibase.update(new Contexts());
       DatabaseSnapshot snapshotCurrent = createCurrentDatabaseSnapshot();
+      liquibase.dropAll();
 
-      // cleared database
-      liquibaseCurrent.dropAll();
-
-      // execute the old scripts
+      // old changelog executed
       liquibaseOld.update(new Contexts());
 
-      // when
-      liquibaseCurrent.update(new Contexts());
+      // when new changelog executed afterward
+      liquibase.update(new Contexts());
 
       // then
       DatabaseSnapshot snapshotUpgraded = createCurrentDatabaseSnapshot();
       Database currentDatabase = getDatabaseForSnapshot(snapshotCurrent);
       Database upgradedDatabase = getDatabaseForSnapshot(snapshotUpgraded);
-      DiffResult diffResult = liquibaseCurrent.diff(currentDatabase, upgradedDatabase, new CompareControl());
+      DiffResult diffResult = liquibase.diff(currentDatabase, upgradedDatabase, new CompareControl());
       List<ChangeSet> changeSetsToApply = new DiffToChangeLog(diffResult, new DiffOutputControl()).generateChangeSets();
+
       assertThat(changeSetsToApply)
         .withFailMessage("Resulting upgraded database misses changes: %s", getChanges(changeSetsToApply))
         .isEmpty();
@@ -174,36 +163,31 @@ public class SqlScriptTest {
     String currentMajorMinor = properties.getProperty("current.majorminor");
     String oldMajorMinor = properties.getProperty("old.majorminor");
 
-    try (Liquibase liquibase = getLiquibase()) {
-      liquibase.dropAll();
+    executeSqlScript("create", "engine");
+    executeSqlScript("create", "identity");
+    DatabaseSnapshot snapshotCurrent = createCurrentDatabaseSnapshot();
 
-      // execute the current scripts
-      executeSqlScript("create", "engine");
-      executeSqlScript("create", "identity");
-      DatabaseSnapshot snapshotCurrent = createCurrentDatabaseSnapshot();
+    liquibase.dropAll();
 
-      // cleared database
-      liquibase.dropAll();
+    // old CREATE scripts executed
+    executeSqlScript("scripts-old/", "create", "engine_" + oldMajorMinor + ".0");
+    executeSqlScript("scripts-old/", "create", "identity_" + oldMajorMinor + ".0");
 
-      // execute the old scripts
-      executeSqlScript("scripts-old/", "create", "engine_" + oldMajorMinor + ".0");
-      executeSqlScript("scripts-old/", "create", "identity_" + oldMajorMinor + ".0");
+    // when UPGRADE scripts executed
+    executeSqlScript("local-upgrade-test/", "upgrade", "engine_" + oldMajorMinor + "_patch");
+    executeSqlScript("local-upgrade-test/", "upgrade", "engine_" + oldMajorMinor + "_to_" + currentMajorMinor);
+    executeSqlScript("local-upgrade-test/", "upgrade", "engine_" + currentMajorMinor + "_patch");
 
-      // when
-      executeSqlScript("local-upgrade-test/", "upgrade", "engine_" + oldMajorMinor + "_patch");
-      executeSqlScript("local-upgrade-test/", "upgrade", "engine_" + oldMajorMinor + "_to_" + currentMajorMinor);
-      executeSqlScript("local-upgrade-test/", "upgrade", "engine_" + currentMajorMinor + "_patch");
+    // then
+    DatabaseSnapshot snapshotUpgraded = createCurrentDatabaseSnapshot();
+    Database currentDatabase = getDatabaseForSnapshot(snapshotCurrent);
+    Database upgradedDatabase = getDatabaseForSnapshot(snapshotUpgraded);
+    DiffResult diffResult = liquibase.diff(currentDatabase, upgradedDatabase, new CompareControl());
+    List<ChangeSet> changeSetsToApply = new DiffToChangeLog(diffResult, new DiffOutputControl()).generateChangeSets();
 
-      // then
-      DatabaseSnapshot snapshotUpgraded = createCurrentDatabaseSnapshot();
-      Database currentDatabase = getDatabaseForSnapshot(snapshotCurrent);
-      Database upgradedDatabase = getDatabaseForSnapshot(snapshotUpgraded);
-      DiffResult diffResult = liquibase.diff(currentDatabase, upgradedDatabase, new CompareControl());
-      List<ChangeSet> changeSetsToApply = new DiffToChangeLog(diffResult, new DiffOutputControl()).generateChangeSets();
-      assertThat(changeSetsToApply)
-        .withFailMessage("Resulting upgraded database schema differs: %s", getChanges(changeSetsToApply))
-        .isEmpty();
-    }
+    assertThat(changeSetsToApply)
+      .withFailMessage("Resulting upgraded database schema differs: %s", getChanges(changeSetsToApply))
+      .isEmpty();
   }
 
   protected void executeSqlScript(String sqlFolder, String sqlScript) throws LiquibaseException {
