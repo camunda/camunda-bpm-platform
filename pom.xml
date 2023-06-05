@@ -284,6 +284,7 @@
         <module>clients/java</module>
 
         <module>test-utils/junit5-extension</module>
+        <module>test-utils/junit5-extension-dmn</module>
         <module>test-utils/assert</module>
 
         <module>internal-dependencies</module>
