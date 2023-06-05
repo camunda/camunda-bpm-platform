@@ -382,44 +382,6 @@ pipeline {
             ])
           }
         }
-        stage('webapp-IT-standalone-tomcat-9') {
-          when {
-            expression {
-              cambpmWithLabels('tomcat', 'webapp-integration')
-            }
-          }
-          steps {
-            cambpmConditionalRetry([
-              agentLabel: 'chrome_112',
-              runSteps: {
-                cambpmRunMaven('qa/', 'clean install -Ptomcat-vanilla,webapps-integration-sa', runtimeStash: true, archiveStash: true)
-              },
-              postFailure: {
-                cambpmPublishTestResult()
-                cambpmArchiveArtifacts('qa/integration-tests-webapps/standalone-engine/target/selenium-screenshots/*')
-              }
-            ])
-          }
-        }
-        stage('webapp-IT-standalone-wildfly26') {
-          when {
-            expression {
-              cambpmWithLabels('wildfly', 'webapp-integration')
-            }
-          }
-          steps {
-            cambpmConditionalRetry([
-              agentLabel: 'chrome_112',
-              runSteps: {
-                cambpmRunMaven('qa/', 'clean install -Pwildfly26-vanilla,webapps-integration-sa', runtimeStash: true, archiveStash: true)
-              },
-              postFailure: {
-                cambpmPublishTestResult()
-                cambpmArchiveArtifacts('qa/integration-tests-webapps/standalone-engine/target/selenium-screenshots/*')
-              }
-            ])
-          }
-        }
         stage('camunda-run-IT') {
           when {
             expression {
