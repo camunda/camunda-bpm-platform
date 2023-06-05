@@ -32,11 +32,11 @@ import java.util.List;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.test.util.ClockTestUtil;
 import org.camunda.bpm.engine.test.util.EntityRemoveRule;
 import org.camunda.bpm.engine.test.util.ObjectProperty;
 import org.camunda.bpm.engine.test.util.RemoveAfter;
 import org.camunda.bpm.engine.test.util.TriConsumer;
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -79,8 +79,8 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
         { "setPriority", setPriority, "taskId", 80 },
         { "setName", setName, "taskId", "name" },
         { "setDescription", setDescription, "taskId", "description" },
-        { "setDueDate", setDueDate, "taskId",  DateTime.now().toDate()},
-        { "setFollowUpDate", setFollowUpDate, "taskId", DateTime.now().toDate() }
+        { "setDueDate", setDueDate, "taskId",  ClockTestUtil.setClockToDateWithoutMilliseconds() },
+        { "setFollowUpDate", setFollowUpDate, "taskId", ClockTestUtil.setClockToDateWithoutMilliseconds() }
     });
   }
 
