@@ -1,4 +1,2 @@
 node_modules/**/*.js
 */test/**
-grunt/
-Gruntfile.js

@@ -51,7 +51,7 @@ Contains resources like images, [`.less`](http://lesscss.org) stylesheets as wel
 
 ### Prerequisite
 
-You need [node.js](http://nodejs.org) and npm. You will also need to install [grunt](http://gruntjs.com) globally using `npm install -g grunt-cli`.
+You need [node.js](http://nodejs.org) >= 17 and npm.
 
 ### Setup
 
@@ -59,16 +59,16 @@ You need [node.js](http://nodejs.org) and npm. You will also need to install [gr
 
 See https://github.com/camunda/camunda-bpm-platform/blob/master/CONTRIBUTING.md#build-from-source
 
-#### Using Grunt
+#### Using Webpack
 
-Installing the webapps is done by Grunt:
+Build the web apps using Webpack:
 
 ```sh
 # cd <path to your workspace>
 git clone git@github.com:camunda/camunda-bpm-platform.git
 cd camunda-bpm-platform/webapps/frontend
 npm install
-grunt
+npm start
 ```
 
 To start the server in development mode, call
@@ -77,11 +77,10 @@ To start the server in development mode, call
 cd camunda-bpm-platform/webapps/assembly
 mvn jetty:run -Pdevelop
 ```
+
 The webapps are then available pointing a browser at [http://localhost:8080](http://localhost:8080). To login as an admin user, use `jonny1` as username and password.
 
-You can now start developing using the `grunt auto-build` command in the frontend directory. To shorten compile times, you can specify the project you are going to make changes to by calling `grunt auto-build:admin`
-
-If you are only changing Javascript files, you can set the environment variable `FAST_BUILD` to 1 to further improve compile times.
+You can now start developing using the `npm run start` command in the frontend directory.
 
 ##### Jakarta Webapps
 
@@ -90,49 +89,8 @@ In order to run the Jakarta Webapps start Jetty the same way from the `assembly-
 ```sh
 cd camunda-bpm-platform/webapps/assembly
 mvn jetty:run -Pdevelop
+npm run start
 ```
-
-And start Grunt with an additional `--assembly-jakarta` argument
-
-```sh
-grunt --assembly-jakarta
-```
-
-or in watch mode
-
-```sh
-grunt auto-build --assembly-jakarta
-```
-
-#### Testing
-
-Install the webapps with Grunt and start the server in test mode:
-
-```sh
-cd camunda-bpm-platform/webapps/assembly
-mvn jetty:run -Pdev-e2e
-```
-
-Make sure that you terminate the server for development or use another port. You may configure the port the server runs on by passing the argument -Djetty.port=WHICH_PORT to the command line.
-
-To run the tests, call
-
-```sh
-cd camunda-bpm-platform/webapps/frontend
-grunt test-e2e --protractorConfig=ui/common/tests/develop.conf.js
-```
-
-Now, it opens a new browser at [http://localhost:8080](http://localhost:8080) and does the test steps. If you want to test only one spec or a part of it then you can annotate the description of the spec with the keyword `only`:
-
-```javascript
-describe.only('Cockpit Dashboard Spec', function() {
-  // ...
-}
-```
-
-##### Jakarta Webapps
-
-In order to test the Jakarta Webapps run the same command with an additional `--assembly-jakarta` argument.
 
 #### AngularJS libraries from XLTS.dev
 
@@ -165,7 +123,6 @@ The supported browsers are:
 - Chrome Latest
 - Firefox Latest
 - Edge Latest
-
 
 ## Contributing
 
