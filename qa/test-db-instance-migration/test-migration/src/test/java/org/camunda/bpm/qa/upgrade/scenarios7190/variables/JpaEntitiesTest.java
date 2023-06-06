@@ -17,17 +17,13 @@
 package org.camunda.bpm.qa.upgrade.scenarios7190.variables;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import java.util.Map;
 
-import javax.persistence.EntityManager;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.qa.upgrade.Origin;
 import org.camunda.bpm.qa.upgrade.ScenarioUnderTest;
 import org.camunda.bpm.qa.upgrade.UpgradeTestRule;
-import org.camunda.bpm.qa.upgrade.variables.FieldAccessJPAEntity;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -57,50 +53,12 @@ public class JpaEntitiesTest {
     // given
     Map<String, String> properties = managementService.getProperties();
     String processInstanceId = properties.get("JpaEntitiesScenario.processInstanceId");
-    System.out.println("Boom="+engineRule.getProcessEngineConfiguration().isJavaSerializationFormatEnabled());
 
+    // when
+    Object singleResult = runtimeService.getVariable(processInstanceId, "simpleEntityFieldAccess");
 
-    // Read entity with @Id on field
-    Object singleResult = runtimeService.getVariable(processInstanceId,"simpleEntityFieldAccess");
-    assertThat(singleResult).isInstanceOf(FieldAccessJPAEntity.class);
-    assertThat(((FieldAccessJPAEntity)singleResult).getId().longValue()).isEqualTo(1L);
-    assertThat(((FieldAccessJPAEntity)singleResult).getMyValue()).isEqualTo("value1");
-
-
-    // -----------------------------------------------------------------------------
-    // Test updating JPA-entity to null-value and back again
-    // -----------------------------------------------------------------------------
-    // Set to null
-    runtimeService.setVariable(processInstanceId, "simpleEntityFieldAccess", null);
-    Object currentValue = runtimeService.createVariableInstanceQuery().variableName("simpleEntityFieldAccess").singleResult().getValue();
-    assertThat(currentValue).isNull();
-
-    FieldAccessJPAEntity entity = extracted();
-    // Set to JPA-entity again
-    runtimeService.setVariable(processInstanceId, "simpleEntityFieldAccess", entity);
-
-    currentValue = runtimeService.createVariableInstanceQuery().variableName("simpleEntityFieldAccess").singleResult().getValue();
-    assertNotNull(currentValue);
-    assertThat(currentValue).isInstanceOf(FieldAccessJPAEntity.class);
-    assertEquals(10L, ((FieldAccessJPAEntity)currentValue).getId().longValue());
-    assertThat(((FieldAccessJPAEntity)currentValue).getMyValue()).isEqualTo("value10");
+    // then value is empty due to empty JPA test serializer
+    assertThat(singleResult).isNull();
   }
 
-  protected FieldAccessJPAEntity extracted() {
-    EntityManagerSessionFactory entityManagerSessionFactory = (EntityManagerSessionFactory) engineRule.getProcessEngineConfiguration()
-        .getSessionFactories()
-        .get(EntityManagerSession.class);
-    EntityManager manager = entityManagerSessionFactory.getEntityManagerFactory().createEntityManager();
-    manager.getTransaction().begin();
-
-    FieldAccessJPAEntity entity = new FieldAccessJPAEntity();
-    entity.setId(10L);
-    entity.setMyValue("value10");
-    manager.persist(entity);
-
-    manager.flush();
-    manager.getTransaction().commit();
-    manager.close();
-    return entity;
-  }
 }
