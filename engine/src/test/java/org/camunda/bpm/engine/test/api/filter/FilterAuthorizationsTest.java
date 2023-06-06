@@ -268,6 +268,7 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTest {
   public void shouldNotFindFilterWithRevokedReadPermissionOnAnyFilter() {
     Filter filter = createTestFilter();
 
+    grantReadFilter(filter.getId());
     revokeReadFilter(filter.getId());
 
     long count = filterService.createFilterQuery().count();

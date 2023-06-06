@@ -218,7 +218,7 @@ public class AuthorizationQueryAuthorizationsTest {
   }
 
   @Test
-  public void shouldNotFindAllAuthorizationsWithRevokedReadPermissionOnOneAuthorization () throws Exception {
+  public void shouldNotFindAllAuthorizationsWithRevokedReadPermissionOnOneAuthorization() throws Exception {
     // given
     Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
     authorization.setUserId("userId");

@@ -36,7 +36,6 @@ import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
-import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
@@ -650,10 +649,6 @@ public class HistoricVariableInstanceAuthorizationTest extends AuthorizationTest
   }
 
   // helper ////////////////////////////////////////////////////////
-
-  protected void verifyQueryResults(HistoricVariableInstanceQuery query, int countExpected) {
-    verifyQueryResults((AbstractQuery<?, ?>) query, countExpected);
-  }
 
   protected void verifyVariablesDeleted() {
     disableAuthorization();

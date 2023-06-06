@@ -36,7 +36,6 @@ import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.history.HistoricJobLogQuery;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
-import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -577,12 +576,6 @@ public class HistoricJobLogAuthorizationTest extends AuthorizationTest {
     assertThat(query.list())
         .extracting("jobDefinitionType", "processInstanceId")
         .containsExactly(tuple("batch-seed-job", null));
-  }
-
-  // helper ////////////////////////////////////////////////////////
-
-  protected void verifyQueryResults(HistoricJobLogQuery query, int countExpected) {
-    verifyQueryResults((AbstractQuery<?, ?>) query, countExpected);
   }
 
 }

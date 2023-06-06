@@ -44,7 +44,6 @@ import org.camunda.bpm.engine.authorization.AuthorizationQuery;
 import org.camunda.bpm.engine.authorization.Groups;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.authorization.SystemPermissions;
-import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
 import org.camunda.bpm.engine.repository.Resource;
@@ -897,10 +896,6 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
   }
 
   // helper /////////////////////////////////////////////////////////
-
-  protected void verifyQueryResults(DeploymentQuery query, int countExpected) {
-    verifyQueryResults((AbstractQuery<?, ?>) query, countExpected);
-  }
 
   protected String createDeployment(String name) {
     return createDeployment(name, FIRST_RESOURCE, SECOND_RESOURCE).getId();

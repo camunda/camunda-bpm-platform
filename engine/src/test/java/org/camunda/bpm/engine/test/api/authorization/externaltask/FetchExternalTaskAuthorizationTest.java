@@ -244,10 +244,10 @@ public class FetchExternalTaskAuthorizationTest extends AuthorizationTest {
   }
 
   @Test
-  public void shouldLockNoTaskWithRevokedUpdateInstanceOnAnyProcessDefinition() {
+  public void shouldLockNoTaskForProcessDefinitionWithRevokedUpdateInstancePermission() {
     // given
-    createGrantAuthorization(PROCESS_DEFINITION, ANY, ANY, READ_INSTANCE, UPDATE_INSTANCE);
-    createRevokeAuthorization(PROCESS_DEFINITION, ANY, userId, UPDATE_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE, UPDATE_INSTANCE);
+    createRevokeAuthorization(PROCESS_DEFINITION, "oneExternalTaskProcess", userId, UPDATE_INSTANCE);
 
     // when
     List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
@@ -255,21 +255,6 @@ public class FetchExternalTaskAuthorizationTest extends AuthorizationTest {
       .execute();
 
     // then
-    assertEquals(0, tasks.size());
-  }
-
-  @Test
-  public void shouldNotLockAnyTaskWithRevokedUpdateInstancePermissionOnAnyProcessDefinition() {
-    // given
-    createGrantAuthorization(PROCESS_DEFINITION, ANY, ANY, READ_INSTANCE, UPDATE_INSTANCE);
-    createRevokeAuthorization(PROCESS_DEFINITION, ANY, userId, UPDATE_INSTANCE);
-
-    // when
-    List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
-      .topic("externalTaskTopic", LOCK_TIME)
-      .execute();
-
-    // then
-    assertEquals(0, tasks.size());
+    assertEquals(1, tasks.size());
   }
 }

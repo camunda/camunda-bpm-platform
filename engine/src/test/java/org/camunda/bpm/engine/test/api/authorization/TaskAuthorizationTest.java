@@ -213,8 +213,8 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   public void shouldNotFindTaskWithRevokedReadTaskPermissionOnDefinition() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
-    createGrantAuthorization(PROCESS_DEFINITION, ANY, "*", ALL);
-    createGrantAuthorization(TASK, ANY, "*", ALL);
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, ANY, ALL);
+    createGrantAuthorization(TASK, ANY, ANY, ALL);
     createRevokeAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_TASK);
 
     // when

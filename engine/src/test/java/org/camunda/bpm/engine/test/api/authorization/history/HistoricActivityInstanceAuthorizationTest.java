@@ -28,7 +28,6 @@ import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
-import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.authorization.AuthorizationTest;
@@ -362,12 +361,6 @@ public class HistoricActivityInstanceAuthorizationTest extends AuthorizationTest
     assertThat(query.list())
         .extracting("processInstanceId")
         .containsExactly(processInstanceId, processInstanceId);
-  }
-
-  // helper ////////////////////////////////////////////////////////
-
-  protected void verifyQueryResults(HistoricActivityInstanceQuery query, int countExpected) {
-    verifyQueryResults((AbstractQuery<?, ?>) query, countExpected);
   }
 
 }

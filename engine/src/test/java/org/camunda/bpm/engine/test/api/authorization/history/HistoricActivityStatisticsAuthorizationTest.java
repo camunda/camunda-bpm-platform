@@ -134,8 +134,8 @@ public class HistoricActivityStatisticsAuthorizationTest extends AuthorizationTe
     startProcessInstanceByKey(PROCESS_KEY);
     startProcessInstanceByKey(PROCESS_KEY);
 
-    createGrantAuthorization(PROCESS_DEFINITION, ANY, ANY, READ_HISTORY);
-    createRevokeAuthorization(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
+    createRevokeAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_HISTORY);
 
     // when
     HistoricActivityStatisticsQuery query = historyService.createHistoricActivityStatisticsQuery(processDefinitionId);

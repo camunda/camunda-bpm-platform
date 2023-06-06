@@ -41,7 +41,6 @@ import org.camunda.bpm.engine.history.CleanableHistoricProcessInstanceReportResu
 import org.camunda.bpm.engine.history.DurationReportResult;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
-import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.query.PeriodUnit;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -907,10 +906,6 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
   }
 
   // helper ////////////////////////////////////////////////////////
-
-  protected void verifyQueryResults(HistoricProcessInstanceQuery query, int countExpected) {
-    verifyQueryResults((AbstractQuery<?, ?>) query, countExpected);
-  }
 
   protected void prepareProcessInstances(String key, int daysInThePast, Integer historyTimeToLive, int instanceCount) {
     ProcessDefinition processDefinition = selectProcessDefinitionByKey(key);
