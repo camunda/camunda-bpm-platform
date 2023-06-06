@@ -27,8 +27,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.List;
-
-import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.management.DeploymentStatistics;
 import org.camunda.bpm.engine.management.DeploymentStatisticsQuery;
 import org.camunda.bpm.engine.management.IncidentStatistics;
@@ -50,6 +48,7 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
   protected String secondDeploymentId;
   protected String thirdDeploymentId;
 
+  @Override
   @Before
   public void setUp() throws Exception {
     firstDeploymentId = createDeployment("first", "org/camunda/bpm/engine/test/api/authorization/oneIncidentProcess.bpmn20.xml").getId();
@@ -58,6 +57,7 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
     super.setUp();
   }
 
+  @Override
   @After
   public void tearDown() {
     super.tearDown();
@@ -122,6 +122,19 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
     for (DeploymentStatistics statistics : result) {
       verifyStatisticsResult(statistics, 0, 0, 0);
     }
+  }
+
+  @Test
+  public void shouldNotFindStatisticsWithRevokedReadPermissionOnAnyDeployment() {
+    // given
+    createGrantAuthorization(DEPLOYMENT, ANY, ANY, READ);
+    createRevokeAuthorization(DEPLOYMENT, ANY, userId, READ);
+
+    // when
+    DeploymentStatisticsQuery query = managementService.createDeploymentStatisticsQuery();
+
+    // then
+    verifyQueryResults(query, 0);
   }
 
   // deployment statistics query (including process instances) /////////////////////////////////////////////
@@ -781,10 +794,6 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
   }
 
   // helper ///////////////////////////////////////////////////////////////////////////
-
-  protected void verifyQueryResults(DeploymentStatisticsQuery query, int countExpected) {
-    verifyQueryResults((AbstractQuery<?, ?>) query, countExpected);
-  }
 
   protected void verifyStatisticsResult(DeploymentStatistics statistics, int instances, int failedJobs, int incidents) {
     assertEquals("Instances", instances, statistics.getInstances());

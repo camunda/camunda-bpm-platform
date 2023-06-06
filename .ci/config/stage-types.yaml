@@ -34,15 +34,6 @@ db-unit:
   - 'sqlserver'
   - 'postgresql'
   - 'cockroachdb'
-  - 'authorizations'
-  jdkVersion: 'openjdk-jdk-11-latest'
-db-unit-authorizations:
-  directory: '.'
-  command: 'clean package -pl "engine,webapps/assembly,webapps/assembly-jakarta" -Dskip.frontend.build=true -PcfgAuthorizationCheckRevokesAlways,'
-  stash:
-    runtimeStash: true
-  labels:
-  - 'authorizations'
   jdkVersion: 'openjdk-jdk-11-latest'
 sql-scripts:
   directory: 'distro/sql-script'

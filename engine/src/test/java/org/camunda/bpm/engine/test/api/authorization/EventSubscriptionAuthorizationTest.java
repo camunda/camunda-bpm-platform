@@ -24,9 +24,9 @@ import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -39,6 +39,7 @@ public class EventSubscriptionAuthorizationTest extends AuthorizationTest {
   protected static final String ONE_TASK_PROCESS_KEY = "oneTaskProcess";
   protected static final String SIGNAL_BOUNDARY_PROCESS_KEY = "signalBoundaryProcess";
 
+  @Override
   @Before
   public void setUp() throws Exception {
     testRule.deploy(
@@ -248,8 +249,20 @@ public class EventSubscriptionAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 7);
   }
 
-  protected void verifyQueryResults(EventSubscriptionQuery query, int countExpected) {
-    verifyQueryResults((AbstractQuery<?, ?>) query, countExpected);
-  }
+  @Test
+  public void shouldNotFindSubscriptionWithRevokedReadPermissionOnAnyProcessInstance() {
+    // given
+    ProcessInstance instance1 = startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
+    ProcessInstance instance2 = startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY);
 
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ);
+    createRevokeAuthorization(PROCESS_INSTANCE, instance1.getId(), userId, READ);
+    createRevokeAuthorization(PROCESS_INSTANCE, instance2.getId(), userId, READ);
+
+    // when
+    EventSubscriptionQuery query = runtimeService.createEventSubscriptionQuery();
+
+    // then
+    verifyQueryResults(query, 0);
+  }
 }

@@ -21,13 +21,12 @@ import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Resources.DECISION_REQUIREMENTS_DEFINITION;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario.scenario;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
-import static org.hamcrest.CoreMatchers.hasItems;
+import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.revoke;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.repository.DecisionRequirementsDefinition;
@@ -88,7 +87,12 @@ public class DecisionRequirementsDefinitionQueryAuthorizationTest {
           .withAuthorizations(
             grant(DECISION_REQUIREMENTS_DEFINITION, DEFINITION_KEY, "userId", Permissions.READ),
             grant(DECISION_REQUIREMENTS_DEFINITION, ANY, "userId", Permissions.READ))
-          .succeeds(), expectedDefinitions(DEFINITION_KEY, ANOTHER_DEFINITION_KEY) }
+          .succeeds(), expectedDefinitions(DEFINITION_KEY, ANOTHER_DEFINITION_KEY) },
+      { scenario()
+          .withAuthorizations(
+            grant(DECISION_REQUIREMENTS_DEFINITION, ANY, ANY, Permissions.READ),
+            revoke(DECISION_REQUIREMENTS_DEFINITION, ANY, "userId", Permissions.READ))
+          .succeeds(), expectedDefinitions() }
     });
   }
 
@@ -116,7 +120,7 @@ public class DecisionRequirementsDefinitionQueryAuthorizationTest {
 
     // then
     if (authRule.assertScenario(scenario)) {
-      assertThat(count).isEqualTo((long) expectedDefinitionKeys.length);
+      assertThat(count).isEqualTo(expectedDefinitionKeys.length);
 
       List<String> definitionKeys = getDefinitionKeys(definitions);
       assertThat(definitionKeys).containsExactlyInAnyOrder(expectedDefinitionKeys);

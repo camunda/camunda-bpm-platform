@@ -29,10 +29,8 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.Date;
 import java.util.List;
-
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.history.HistoricIncident;
-import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -57,6 +55,7 @@ public class IncidentAuthorizationTest extends AuthorizationTest {
   protected static final String ONE_INCIDENT_PROCESS_KEY = "process";
   protected static final String ANOTHER_ONE_INCIDENT_PROCESS_KEY = "anotherOneIncidentProcess";
 
+  @Override
   @Before
   public void setUp() throws Exception {
     testRule.deploy(
@@ -243,6 +242,20 @@ public class IncidentAuthorizationTest extends AuthorizationTest {
     Incident incident = query.singleResult();
     assertNotNull(incident);
     assertEquals(processInstanceId, incident.getProcessInstanceId());
+  }
+
+  @Test
+  public void shouldNotFindIncidentWithRevokedReadPermissionOnProcessInstance() {
+    // given
+    String processInstanceId = startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE);
+    createRevokeAuthorization(PROCESS_INSTANCE, processInstanceId, userId, READ);
+
+    // when
+    IncidentQuery query = runtimeService.createIncidentQuery();
+
+    // then
+    verifyQueryResults(query, 0);
   }
 
   @Test
@@ -561,10 +574,6 @@ public class IncidentAuthorizationTest extends AuthorizationTest {
     return jobId;
   }
 
-  protected void verifyQueryResults(IncidentQuery query, int countExpected) {
-    verifyQueryResults((AbstractQuery<?, ?>) query, countExpected);
-  }
-
   protected void cleanupStandalonIncident(String jobId) {
     disableAuthorization();
     managementService.deleteJob(jobId);
@@ -575,6 +584,7 @@ public class IncidentAuthorizationTest extends AuthorizationTest {
   protected void clearDatabase() {
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
     commandExecutor.execute(new Command<Object>() {
+      @Override
       public Object execute(CommandContext commandContext) {
         HistoryLevel historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
         if (historyLevel.equals(HistoryLevel.HISTORY_LEVEL_FULL)) {

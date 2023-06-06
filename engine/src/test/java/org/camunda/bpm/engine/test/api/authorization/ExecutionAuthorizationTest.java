@@ -24,7 +24,6 @@ import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -40,6 +39,7 @@ public class ExecutionAuthorizationTest extends AuthorizationTest {
   protected static final String ONE_TASK_PROCESS_KEY = "oneTaskProcess";
   protected static final String MESSAGE_BOUNDARY_PROCESS_KEY = "messageBoundaryProcess";
 
+  @Override
   @Before
   public void setUp() throws Exception {
     testRule.deploy(
@@ -106,6 +106,20 @@ public class ExecutionAuthorizationTest extends AuthorizationTest {
 
     // then
     verifyQueryResults(query, 1);
+  }
+
+  @Test
+  public void shouldNotFindExecutionWithRevokedReadPermissionOnProcess() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(ONE_TASK_PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, ANY, READ);
+    createRevokeAuthorization(PROCESS_INSTANCE, processInstanceId, userId, READ);
+
+    // when
+    ExecutionQuery query = runtimeService.createExecutionQuery();
+
+    // then
+    verifyQueryResults(query, 0);
   }
 
   @Test
@@ -262,7 +276,4 @@ public class ExecutionAuthorizationTest extends AuthorizationTest {
     verifyQueryResults(query, 2);
   }
 
-  protected void verifyQueryResults(ExecutionQuery query, int countExpected) {
-    verifyQueryResults((AbstractQuery<?, ?>) query, countExpected);
-  }
 }

@@ -28,7 +28,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.camunda.bpm.engine.AuthorizationException;
-import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.JobDefinitionQuery;
 import org.camunda.bpm.engine.runtime.Job;
@@ -44,6 +43,7 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
   protected static final String TIMER_START_PROCESS_KEY = "timerStartProcess";
   protected static final String TIMER_BOUNDARY_PROCESS_KEY = "timerBoundaryProcess";
 
+  @Override
   @Before
   public void setUp() throws Exception {
     testRule.deploy(
@@ -100,6 +100,19 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
 
     // then
     verifyQueryResults(query, 2);
+  }
+
+  @Test
+  public void shouldNotFindJobDefinitionWithRevokedReadPermissionOnProcessDefinition() {
+    // given
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, ANY, READ);
+    createRevokeAuthorization(PROCESS_DEFINITION, TIMER_START_PROCESS_KEY, userId, READ);
+
+    // when
+    JobDefinitionQuery query = managementService.createJobDefinitionQuery();
+
+    // then
+    verifyQueryResults(query, 0);
   }
 
   // suspend job definition by id ///////////////////////////////
@@ -1112,10 +1125,6 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
   }
 
   // helper /////////////////////////////////////////////////////
-
-  protected void verifyQueryResults(JobDefinitionQuery query, int countExpected) {
-    verifyQueryResults((AbstractQuery<?, ?>) query, countExpected);
-  }
 
   protected JobDefinition selectJobDefinitionByProcessDefinitionKey(String processDefinitionKey) {
     disableAuthorization();

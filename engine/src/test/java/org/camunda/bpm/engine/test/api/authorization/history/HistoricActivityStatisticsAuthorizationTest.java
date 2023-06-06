@@ -23,11 +23,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.util.List;
-
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricActivityStatistics;
 import org.camunda.bpm.engine.history.HistoricActivityStatisticsQuery;
-import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.authorization.AuthorizationTest;
@@ -43,6 +41,7 @@ public class HistoricActivityStatisticsAuthorizationTest extends AuthorizationTe
 
   protected static final String PROCESS_KEY = "oneTaskProcess";
 
+  @Override
   @Before
   public void setUp() throws Exception {
     testRule.deploy(
@@ -124,6 +123,25 @@ public class HistoricActivityStatisticsAuthorizationTest extends AuthorizationTe
     // then
     verifyQueryResults(query, 1);
     verifyStatisticsResult(query.singleResult(), 3, 0, 0, 0);
+  }
+
+  @Test
+  public void shouldNotFindStatisticsWithRevokedReadHistoryPermissionOnAnyProcessDefinition() {
+    // given
+    String processDefinitionId = selectProcessDefinitionByKey(PROCESS_KEY).getId();
+
+    startProcessInstanceByKey(PROCESS_KEY);
+    startProcessInstanceByKey(PROCESS_KEY);
+    startProcessInstanceByKey(PROCESS_KEY);
+
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
+    createRevokeAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_HISTORY);
+
+    // when
+    HistoricActivityStatisticsQuery query = historyService.createHistoricActivityStatisticsQuery(processDefinitionId);
+
+    // then
+    verifyQueryResults(query, 0);
   }
 
   // historic activity statistics query (including finished) //////////////////////////////////
@@ -504,10 +522,6 @@ public class HistoricActivityStatisticsAuthorizationTest extends AuthorizationTe
   }
 
   // helper ////////////////////////////////////////////////////////
-
-  protected void verifyQueryResults(HistoricActivityStatisticsQuery query, int countExpected) {
-    verifyQueryResults((AbstractQuery<?, ?>) query, countExpected);
-  }
 
   protected void verifyStatisticsResult(HistoricActivityStatistics statistics, int instances, int finished, int canceled, int completeScope) {
     assertEquals("Instances", instances, statistics.getInstances());

@@ -18,14 +18,15 @@ package org.camunda.bpm.engine.test.api.identity;
 
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
+import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_REVOKE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
-
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.authorization.AuthorizationQuery;
 import org.camunda.bpm.engine.authorization.BatchPermissions;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
@@ -216,7 +217,47 @@ public class AuthorizationQueryAuthorizationsTest {
         .count());
   }
 
+  @Test
+  public void shouldNotFindAllAuthorizationsWithRevokedReadPermissionOnOneAuthorization() throws Exception {
+    // given
+    Authorization authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+    authorization.setUserId("userId");
+    authorization.setResource(Resources.PROCESS_DEFINITION);
+    authorization.addPermission(Permissions.READ);
+    authorization.addPermission(ProcessDefinitionPermissions.RETRY_JOB);
+    authorization.setResourceId(ANY);
+    authorizationService.saveAuthorization(authorization);
+
+    authorization = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+    authorization.setUserId("*");
+    authorization.setResource(Resources.AUTHORIZATION);
+    authorization.addPermission(Permissions.READ);
+    authorization.setResourceId(ANY);
+    authorizationService.saveAuthorization(authorization);
+
+    authorization = authorizationService.createNewAuthorization(AUTH_TYPE_REVOKE);
+    authorization.setUserId("userId");
+    authorization.setResource(Resources.AUTHORIZATION);
+    authorization.addPermission(Permissions.READ);
+    authorization.setResourceId(ANY);
+    authorizationService.saveAuthorization(authorization);
+
+    processEngineConfiguration.setAuthorizationEnabled(true);
+    processEngineConfiguration.getIdentityService().setAuthenticatedUserId("userId");
+
+    AuthorizationQuery authQuery = authorizationService.createAuthorizationQuery();
+
+    // when
+    long authorizationsCount = authQuery.count();
+    List<Authorization> authorizations = authQuery.list();
+
+    // then
+    assertEquals(0, authorizationsCount);
+    assertEquals(0, authorizations.size());
+  }
+
   protected void cleanupAfterTest() {
+    processEngineConfiguration.getIdentityService().clearAuthentication();
     for (Authorization authorization : authorizationService.createAuthorizationQuery().list()) {
       authorizationService.deleteAuthorization(authorization.getId());
     }

@@ -641,13 +641,6 @@
     </profile>
 
     <profile>
-      <id>cfgAuthorizationCheckRevokesAlways</id>
-      <properties>
-        <authorizationCheckRevokes>always</authorizationCheckRevokes>
-      </properties>
-    </profile>
-
-    <profile>
       <id>cfgJdbcBatchProcessingOff</id>
       <properties>
         <jdbcBatchProcessing>false</jdbcBatchProcessing>
