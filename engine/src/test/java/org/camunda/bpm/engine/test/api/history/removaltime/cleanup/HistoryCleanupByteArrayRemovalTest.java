@@ -24,11 +24,10 @@ import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_FULL;
 import static org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_REMOVAL_TIME_STRATEGY_END;
 import static org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupHandler.MAX_BATCH_SIZE;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
@@ -37,11 +36,11 @@ import org.camunda.bpm.engine.impl.history.event.HistoricJobLogEvent;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.historycleanup.HistoryCleanupRemovalTime;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
-import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.resources.GetByteArrayCommand;
 import org.camunda.bpm.engine.test.util.EntityRemoveRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.test.util.RemoveAfter;
@@ -54,32 +53,56 @@ import org.junit.rules.RuleChain;
 @RequiredHistoryLevel(HISTORY_FULL)
 public class HistoryCleanupByteArrayRemovalTest {
 
-  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
+  private ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(config -> {
+
+    config.setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_END)
+        .setHistoryRemovalTimeProvider(new DefaultHistoryRemovalTimeProvider())
+        .initHistoryRemovalTime();
+
+    config.setHistoryCleanupStrategy(HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED);
+
+    config.setHistoryCleanupBatchSize(MAX_BATCH_SIZE);
+    config.setHistoryCleanupBatchWindowStartTime(null);
+    config.setHistoryCleanupDegreeOfParallelism(1);
+
+    config.setBatchOperationHistoryTimeToLive(null);
+    config.setBatchOperationsForHistoryCleanup(null);
+
+    config.setHistoryTimeToLive(null);
+
+    config.setTaskMetricsEnabled(false);
+    config.setTaskMetricsTimeToLive(null);
+
+    config.initHistoryCleanup();
+  });
+
+  protected ProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
-  protected EntityRemoveRule entityRemoveRule = EntityRemoveRule.of(testRule);
+  protected EntityRemoveRule entityRemoveRule = EntityRemoveRule.ofLazyRule(() -> testRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(engineRule)
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule)
+      .around(engineRule)
       .around(testRule)
       .around(entityRemoveRule);
 
   private ManagementService managementService;
   private HistoryService historyService;
-
   private ProcessEngineConfigurationImpl engineConfiguration;
 
   @Before
   public void init() {
-    managementService = engineRule.getManagementService();
-    historyService = engineRule.getHistoryService();
+    ProcessEngine processEngine = bootstrapRule.getProcessEngine();
 
-    initEngineConfiguration();
+    managementService = processEngine.getManagementService();
+    historyService = processEngine.getHistoryService();
+    engineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
   }
 
   @After
   public void tearDown() {
     restoreCleanupJobHandler();
-    runHistoryCleanup();
+    testRule.deleteHistoryCleanupJobs();
   }
 
   @Test
@@ -116,18 +139,10 @@ public class HistoryCleanupByteArrayRemovalTest {
     engineConfiguration.getJobHandlers().put(HistoryCleanupJobHandler.TYPE, new FailingHistoryCleanupJobHandler());
   }
 
-  protected List<Job> runHistoryCleanup() {
+  protected void runHistoryCleanup() {
     historyService.cleanUpHistoryAsync(true);
 
-    List<Job> jobs = historyService.findHistoryCleanupJobs();
-    List<String> jobIds = new ArrayList<>();
-
-    for (Job job : jobs) {
-      jobIds.add(job.getId());
-      managementService.executeJob(job.getId());
-    }
-
-    return jobs;
+    historyService.findHistoryCleanupJobs().forEach(job -> managementService.executeJob(job.getId()));
   }
 
   protected HistoricJobLogEvent getLastFailingHistoryCleanupJobEvent() {
@@ -135,30 +150,6 @@ public class HistoryCleanupByteArrayRemovalTest {
         .failureLog()
         .jobDefinitionType("history-cleanup")
         .singleResult();
-  }
-
-  protected void initEngineConfiguration() {
-    engineConfiguration = engineRule.getProcessEngineConfiguration();
-
-    engineConfiguration.setHistoryRemovalTimeStrategy(HISTORY_REMOVAL_TIME_STRATEGY_END)
-        .setHistoryRemovalTimeProvider(new DefaultHistoryRemovalTimeProvider())
-        .initHistoryRemovalTime();
-
-    engineConfiguration.setHistoryCleanupStrategy(HISTORY_CLEANUP_STRATEGY_REMOVAL_TIME_BASED);
-
-    engineConfiguration.setHistoryCleanupBatchSize(MAX_BATCH_SIZE);
-    engineConfiguration.setHistoryCleanupBatchWindowStartTime(null);
-    engineConfiguration.setHistoryCleanupDegreeOfParallelism(1);
-
-    engineConfiguration.setBatchOperationHistoryTimeToLive(null);
-    engineConfiguration.setBatchOperationsForHistoryCleanup(null);
-
-    engineConfiguration.setHistoryTimeToLive(null);
-
-    engineConfiguration.setTaskMetricsEnabled(false);
-    engineConfiguration.setTaskMetricsTimeToLive(null);
-
-    engineConfiguration.initHistoryCleanup();
   }
 
   /* History Cleanup Job Handler that fails during process cleanup */

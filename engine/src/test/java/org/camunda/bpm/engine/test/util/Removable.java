@@ -98,8 +98,6 @@ public final class Removable {
   }
 
   public static Removable of(ProcessEngine engine) {
-    Objects.requireNonNull(engine);
-
     return new Removable(engine);
   }
 
@@ -116,6 +114,10 @@ public final class Removable {
 
     if (runnable == null) {
       throw new UnsupportedOperationException("class " + clazz.getName() + " is not supported yet for Removal");
+    }
+
+    if (!isInitialized()) {
+      throw new EntityRemoveException("Removable is not initialized");
     }
 
     try {
@@ -288,6 +290,10 @@ public final class Removable {
     });
   }
 
+  public boolean isInitialized() {
+    return engine != null;
+  }
+
 }
 
 /**
@@ -296,6 +302,10 @@ public final class Removable {
 class EntityRemoveException extends RuntimeException {
   public EntityRemoveException(Exception e) {
     super(e);
+  }
+
+  public EntityRemoveException(String message) {
+    super(message);
   }
 }
 

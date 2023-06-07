@@ -19,6 +19,8 @@ package org.camunda.bpm.engine.test.util;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.function.Supplier;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.task.Task;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
@@ -35,7 +37,11 @@ public class EntityRemoveRule extends TestWatcher {
 
   private static final Logger LOG = LoggerFactory.getLogger(EntityRemoveRule.class);
 
-  private final Removable removable;
+  protected Removable removable;
+
+  private EntityRemoveRule() {
+    this.removable = Removable.of((ProcessEngine) null);
+  }
 
   private EntityRemoveRule(ProcessEngineTestRule engineTestRule) {
     this.removable = Removable.of(engineTestRule);
@@ -43,6 +49,10 @@ public class EntityRemoveRule extends TestWatcher {
 
   public static EntityRemoveRule of(ProcessEngineTestRule rule) {
     return new EntityRemoveRule(rule);
+  }
+
+  public static EntityRemoveRule ofLazyRule(Supplier<ProcessEngineTestRule> ruleSupplier) {
+    return new LazyEntityRemoveRuleProxy(ruleSupplier);
   }
 
   @Override
@@ -54,24 +64,44 @@ public class EntityRemoveRule extends TestWatcher {
       return new Statement() {
         @Override
         public void evaluate() throws Throwable {
-
           base.evaluate();
-
-          if (!methodHasRemoveAfterAnnotation) {
-            return;
-          }
-
-          if (hasZeroArguments(removeAfterAnnotation)) {
-            removable.removeAll();
-            return;
-          }
-
-          removable.remove(removeAfterAnnotation.value());
+          executePostEvaluate(removeAfterAnnotation, methodHasRemoveAfterAnnotation);
         }
       };
     } finally {
       LOG.debug("deleteTasks: {}", methodHasRemoveAfterAnnotation);
     }
+  }
+
+  protected void executePostEvaluate(RemoveAfter removeAfterAnnotation, boolean methodHasRemoveAfterAnnotation) {
+
+    if (!methodHasRemoveAfterAnnotation) {
+      return;
+    }
+
+    executePreRemoval();
+    executeRemoval(removeAfterAnnotation);
+  }
+
+  /**
+   * Hook method to supp
+   */
+  protected void executePreRemoval() {
+  }
+
+  /**
+   * Hook method for executing removal.
+   *
+   * @param removeAfterAnnotation the remove after annotation parameter of the executing method.
+   */
+  protected void executeRemoval(RemoveAfter removeAfterAnnotation) {
+
+    if (hasZeroArguments(removeAfterAnnotation)) {
+      removable.removeAll();
+      return;
+    }
+
+    removable.remove(removeAfterAnnotation.value());
   }
 
   private boolean hasZeroArguments(RemoveAfter annotation) {
@@ -90,6 +120,23 @@ public class EntityRemoveRule extends TestWatcher {
     } catch (NoSuchMethodException e) {
       throw new RuntimeException(
           "Failed to fetch annotation | annotationName: " + annotation.getName() + ", methodName: " + methodName, e);
+    }
+  }
+
+  /* Proxy that enables EntityRemoveRule to support lazy initialization by initializing the rule using a supplier &
+   *  after the execution of the method, before removal. */
+  private static class LazyEntityRemoveRuleProxy extends EntityRemoveRule {
+
+    private Supplier<ProcessEngineTestRule> supplier;
+
+    public LazyEntityRemoveRuleProxy(Supplier<ProcessEngineTestRule> supplier) {
+      super();
+      this.supplier = supplier;
+    }
+
+    @Override
+    protected void executePreRemoval() {
+      removable = Removable.of(supplier.get());
     }
   }
 
