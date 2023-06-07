@@ -208,7 +208,6 @@
 
       <modules>
         <module>shared-engine</module>
-        <module>standalone-engine</module>
       </modules>
     </profile>
 
@@ -216,13 +215,6 @@
       <id>webapps-integration</id>
       <modules>
         <module>shared-engine</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>webapps-integration-sa</id>
-      <modules>
-        <module>standalone-engine</module>
       </modules>
     </profile>
 

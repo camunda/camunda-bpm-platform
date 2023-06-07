@@ -75,9 +75,6 @@
         <module>wildfly-runtime</module>
         <module>wildfly26-runtime</module>
         <module>tomcat-runtime</module>
-        <module>vanilla-runtimes/tomcat</module>
-        <module>vanilla-runtimes/wildfly</module>
-        <module>vanilla-runtimes/wildfly26</module>
         <module>integration-tests-webapps</module>
         <module>integration-tests-engine</module>
         <module>integration-tests-engine-jakarta</module>
@@ -125,38 +122,10 @@
       </modules>
     </profile>
 
-    <profile>
-      <id>tomcat-vanilla</id>
-      <modules>
-        <module>vanilla-runtimes/tomcat</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>wildfly-vanilla</id>
-      <modules>
-        <module>vanilla-runtimes/wildfly</module>
-      </modules>
-    </profile>
-    
-    <profile>
-      <id>wildfly26-vanilla</id>
-      <modules>
-        <module>vanilla-runtimes/wildfly26</module>
-      </modules>
-    </profile>
-
     <!-- Testsuite profiles -->
 
     <profile>
       <id>webapps-integration</id>
-      <modules>
-        <module>integration-tests-webapps</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>webapps-integration-sa</id>
       <modules>
         <module>integration-tests-webapps</module>
       </modules>
