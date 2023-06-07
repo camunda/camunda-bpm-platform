@@ -18,7 +18,7 @@ package org.camunda.bpm.engine.runtime;
 
 import java.io.Serializable;
 
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.query.Query;
 
 /**
@@ -26,50 +26,74 @@ import org.camunda.bpm.engine.query.Query;
  */
 public interface VariableInstanceQuery extends Query<VariableInstanceQuery, VariableInstance> {
 
-  /** Only select the variable with the given Id
-   * @param the id of the variable to select
-   * @return the query object */
+  /**
+   * Only select the variable with the given Id
+   *
+   * @param id the id of the variable to select
+   * @return the query object
+   */
   VariableInstanceQuery variableId(String id);
 
-  /** Only select variable instances which have the variable name. **/
+  /**
+   * Only select variable instances which have the variable name.
+   **/
   VariableInstanceQuery variableName(String variableName);
 
-  /** Only select variable instances which have one of the variables names. **/
+  /**
+   * Only select variable instances which have one of the variables names.
+   **/
   VariableInstanceQuery variableNameIn(String... variableNames);
 
-  /** Only select variable instances which have the name like the assigned variable name.
+  /**
+   * Only select variable instances which have the name like the assigned variable name.
    * The string can include the wildcard character '%' to express like-strategy:
    * starts with (string%), ends with (%string) or contains (%string%).
    **/
   VariableInstanceQuery variableNameLike(String variableNameLike);
 
-  /** Only select variable instances which have one of the executions ids. **/
+  /**
+   * Only select variable instances which have one of the executions ids.
+   **/
   VariableInstanceQuery executionIdIn(String... executionIds);
 
-  /** Only select variable instances which have one of the process instance ids. **/
+  /**
+   * Only select variable instances which have one of the process instance ids.
+   **/
   VariableInstanceQuery processInstanceIdIn(String... processInstanceIds);
 
-  /** Only select variable instances which have one of the case execution ids. **/
+  /**
+   * Only select variable instances which have one of the case execution ids.
+   **/
   VariableInstanceQuery caseExecutionIdIn(String... caseExecutionIds);
 
-  /** Only select variable instances which have one of the case instance ids. **/
+  /**
+   * Only select variable instances which have one of the case instance ids.
+   **/
   VariableInstanceQuery caseInstanceIdIn(String... caseInstanceIds);
 
-  /** Only select variable instances which have one of the task ids. **/
+  /**
+   * Only select variable instances which have one of the task ids.
+   **/
   VariableInstanceQuery taskIdIn(String... taskIds);
 
-  /** Only select variable instances which are related to one of the given batch ids. **/
+  /**
+   * Only select variable instances which are related to one of the given batch ids.
+   **/
   VariableInstanceQuery batchIdIn(String... batchIds);
 
-  /** Only select variables instances which have on of the variable scope ids. **/
+  /**
+   * Only select variables instances which have on of the variable scope ids.
+   **/
   VariableInstanceQuery variableScopeIdIn(String... variableScopeIds);
 
-  /** Only select variable instances which have one of the activity instance ids. **/
+  /**
+   * Only select variable instances which have one of the activity instance ids.
+   **/
   VariableInstanceQuery activityInstanceIdIn(String... activityInstanceIds);
 
   /**
    * The query will match the names of variables in a case-insensitive way.<br>
-   * Note: This affects all <code>variableValueXXX</code> filters: 
+   * Note: This affects all <code>variableValueXXX</code> filters:
    * <ul>
    *  <li>{@link #variableValueEquals(String, Object)}</li>
    *  <li>{@link #variableValueGreaterThan(String, Object)}</li>
@@ -90,7 +114,7 @@ public interface VariableInstanceQuery extends Query<VariableInstanceQuery, Vari
 
   /**
    * The query will match the values of variables in a case-insensitive way.<br>
-   * Note: This affects all <code>variableValueXXX</code> filters: 
+   * Note: This affects all <code>variableValueXXX</code> filters:
    * <ul>
    *  <li>{@link #variableValueEquals(String, Object)}</li>
    *  <li>{@link #variableValueGreaterThan(String, Object)}</li>
@@ -106,10 +130,11 @@ public interface VariableInstanceQuery extends Query<VariableInstanceQuery, Vari
   /**
    * Only select variables instances which have the given name and value. The type
    * of variable is determined based on the value, using types configured in
-   * {@link ProcessEngineConfiguration#getVariableSerializers()}.
+   * {@link ProcessEngineConfigurationImpl#getVariableSerializers()}.
    * Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
    * are not supported.
-   * @param name name of the variable, cannot be null.
+   *
+   * @param name  name of the variable, cannot be null.
    * @param value variable value, can be null.
    */
   VariableInstanceQuery variableValueEquals(String name, Object value);
@@ -119,7 +144,8 @@ public interface VariableInstanceQuery extends Query<VariableInstanceQuery, Vari
    * with a different value than the passed value.
    * Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
    * are not supported.
-   * @param name name of the variable, cannot be null.
+   *
+   * @param name  name of the variable, cannot be null.
    * @param value variable value, can be null.
    */
   VariableInstanceQuery variableValueNotEquals(String name, Object value);
@@ -128,7 +154,8 @@ public interface VariableInstanceQuery extends Query<VariableInstanceQuery, Vari
    * Only select variable instances which value is greater than the passed value.
    * Booleans, Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
    * are not supported.
-   * @param name variable name, cannot be null.
+   *
+   * @param name  variable name, cannot be null.
    * @param value variable value, cannot be null.
    */
   VariableInstanceQuery variableValueGreaterThan(String name, Object value);
@@ -137,7 +164,8 @@ public interface VariableInstanceQuery extends Query<VariableInstanceQuery, Vari
    * Only select variable instances which value is greater than or equal to
    * the passed value. Booleans, Byte-arrays and {@link Serializable} objects (which
    * are not primitive type wrappers) are not supported.
-   * @param name variable name, cannot be null.
+   *
+   * @param name  variable name, cannot be null.
    * @param value variable value, cannot be null.
    */
   VariableInstanceQuery variableValueGreaterThanOrEqual(String name, Object value);
@@ -146,7 +174,8 @@ public interface VariableInstanceQuery extends Query<VariableInstanceQuery, Vari
    * Only select variable instances which value is less than the passed value.
    * Booleans, Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
    * are not supported.
-   * @param name variable name, cannot be null.
+   *
+   * @param name  variable name, cannot be null.
    * @param value variable value, cannot be null.
    */
   VariableInstanceQuery variableValueLessThan(String name, Object value);
@@ -155,7 +184,8 @@ public interface VariableInstanceQuery extends Query<VariableInstanceQuery, Vari
    * Only select variable instances which value is less than or equal to the passed value.
    * Booleans, Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
    * are not supported.
-   * @param name variable name, cannot be null.
+   *
+   * @param name  variable name, cannot be null.
    * @param value variable value, cannot be null.
    */
   VariableInstanceQuery variableValueLessThanOrEqual(String name, Object value);
@@ -180,23 +210,32 @@ public interface VariableInstanceQuery extends Query<VariableInstanceQuery, Vari
   /**
    * Only select variable instances which value is like the given value.
    * This be used on string variables only.
-   * @param name variable name, cannot be null.
+   *
+   * @param name  variable name, cannot be null.
    * @param value variable value, cannot be null. The string can include the
-   * wildcard character '%' to express like-strategy:
-   * starts with (string%), ends with (%string) or contains (%string%).
+   *              wildcard character '%' to express like-strategy:
+   *              starts with (string%), ends with (%string) or contains (%string%).
    */
   VariableInstanceQuery variableValueLike(String name, String value);
 
-  /** Only select variable instances with one of the given tenant ids. */
+  /**
+   * Only select variable instances with one of the given tenant ids.
+   */
   VariableInstanceQuery tenantIdIn(String... tenantIds);
 
-  /** Order by variable name (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  /**
+   * Order by variable name (needs to be followed by {@link #asc()} or {@link #desc()}).
+   */
   VariableInstanceQuery orderByVariableName();
 
-  /** Order by variable type (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  /**
+   * Order by variable type (needs to be followed by {@link #asc()} or {@link #desc()}).
+   */
   VariableInstanceQuery orderByVariableType();
 
-  /** Order by activity instance id (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  /**
+   * Order by activity instance id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   */
   VariableInstanceQuery orderByActivityInstanceId();
 
   /**

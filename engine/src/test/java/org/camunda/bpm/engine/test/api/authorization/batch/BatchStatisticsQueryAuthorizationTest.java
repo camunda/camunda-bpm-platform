@@ -16,11 +16,11 @@
  */
 package org.camunda.bpm.engine.test.api.authorization.batch;
 
+import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 import java.util.List;
-
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
@@ -144,7 +144,7 @@ public class BatchStatisticsQueryAuthorizationTest {
   @Test
   public void testQueryListAccessAll() {
     // given
-    authRule.createGrantAuthorization(Resources.BATCH, "*", "user", Permissions.READ);
+    authRule.createGrantAuthorization(Resources.BATCH, ANY, "user", Permissions.READ);
 
     // when
     authRule.enableAuthorization("user");
@@ -158,7 +158,7 @@ public class BatchStatisticsQueryAuthorizationTest {
   @Test
   public void testQueryListMultiple() {
     // given
-    authRule.createGrantAuthorization(Resources.BATCH, "*", "user", Permissions.READ);
+    authRule.createGrantAuthorization(Resources.BATCH, ANY, "user", Permissions.READ);
     authRule.createGrantAuthorization(Resources.BATCH, batch1.getId(), "user", Permissions.READ);
 
     // when
@@ -176,8 +176,8 @@ public class BatchStatisticsQueryAuthorizationTest {
     ProcessInstance pi = createMigrationPlan();
 
     // when
-    authRule.createGrantAuthorization(Resources.BATCH, "*", "userId", Permissions.CREATE);
-    authRule.createGrantAuthorization(Resources.PROCESS_DEFINITION, "*", "userId", Permissions.MIGRATE_INSTANCE);
+    authRule.createGrantAuthorization(Resources.BATCH, ANY, "userId", Permissions.CREATE);
+    authRule.createGrantAuthorization(Resources.PROCESS_DEFINITION, ANY, "userId", Permissions.MIGRATE_INSTANCE);
 
     authRule.enableAuthorization("userId");
     batch3 = engineRule.getRuntimeService()
@@ -189,6 +189,21 @@ public class BatchStatisticsQueryAuthorizationTest {
     // then
     BatchStatistics batchStatistics = engineRule.getManagementService().createBatchStatisticsQuery().batchId(batch3.getId()).singleResult();
     assertEquals("userId", batchStatistics.getCreateUserId());
+  }
+
+  @Test
+  public void shouldNotFindStatisticsWithRevokedReadPermissionOnBatch() {
+    // given
+    authRule.createGrantAuthorization(Resources.BATCH, ANY, ANY, Permissions.READ);
+    authRule.createRevokeAuthorization(Resources.BATCH, ANY, "user", Permissions.READ);
+
+    // when
+    authRule.enableAuthorization("user");
+    List<BatchStatistics> batches = engineRule.getManagementService().createBatchStatisticsQuery().list();
+    authRule.disableAuthorization();
+
+    // then
+    Assert.assertEquals(0, batches.size());
   }
 
   protected ProcessInstance createMigrationPlan() {

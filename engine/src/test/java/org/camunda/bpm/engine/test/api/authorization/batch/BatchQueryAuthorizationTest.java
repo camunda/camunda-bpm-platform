@@ -16,9 +16,10 @@
  */
 package org.camunda.bpm.engine.test.api.authorization.batch;
 
+import static org.camunda.bpm.engine.authorization.Authorization.ANY;
+
 import java.util.Arrays;
 import java.util.List;
-
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
@@ -135,7 +136,7 @@ public class BatchQueryAuthorizationTest {
   @Test
   public void testQueryListAccessAll() {
     // given
-    authRule.createGrantAuthorization(Resources.BATCH, "*", "user", Permissions.READ);
+    authRule.createGrantAuthorization(Resources.BATCH, ANY, "user", Permissions.READ);
 
     // when
     authRule.enableAuthorization("user");
@@ -150,7 +151,7 @@ public class BatchQueryAuthorizationTest {
   public void testQueryListMultiple() {
     // given
     authRule.createGrantAuthorization(Resources.BATCH, batch1.getId(), "user", Permissions.READ);
-    authRule.createGrantAuthorization(Resources.BATCH, "*", "user", Permissions.READ);
+    authRule.createGrantAuthorization(Resources.BATCH, ANY, "user", Permissions.READ);
 
     // when
     authRule.enableAuthorization("user");
@@ -159,5 +160,35 @@ public class BatchQueryAuthorizationTest {
 
     // then
     Assert.assertEquals(2, batches.size());
+  }
+
+  @Test
+  public void shouldFindEmptyBatchListWithRevokedReadPermissionOnAllBatches() {
+    // given
+    authRule.createGrantAuthorization(Resources.BATCH, ANY, ANY, Permissions.READ);
+    authRule.createRevokeAuthorization(Resources.BATCH, ANY, "user", Permissions.READ);
+
+    // when
+    authRule.enableAuthorization("user");
+    List<Batch> batches = engineRule.getManagementService().createBatchQuery().list();
+    authRule.disableAuthorization();
+
+    // then
+    Assert.assertEquals(0, batches.size());
+  }
+
+  @Test
+  public void shouldFindNoBatchWithRevokedReadPermissionOnAllBatches() {
+    // given
+    authRule.createGrantAuthorization(Resources.BATCH, ANY, ANY, Permissions.READ);
+    authRule.createRevokeAuthorization(Resources.BATCH, ANY, "user", Permissions.READ);
+
+    // when
+    authRule.enableAuthorization("user");
+    long batchCount = engineRule.getManagementService().createBatchQuery().count();
+    authRule.disableAuthorization();
+
+    // then
+    Assert.assertEquals(0L, batchCount);
   }
 }

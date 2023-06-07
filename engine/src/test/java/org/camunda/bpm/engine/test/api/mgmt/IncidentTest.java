@@ -54,6 +54,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.api.runtime.util.ChangeVariablesDelegate;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.camunda.bpm.engine.test.util.Removable;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
@@ -814,24 +815,6 @@ public class IncidentTest extends PluggableProcessEngineTest {
 
   protected void cleanupStandalonIncident(String jobId) {
     managementService.deleteJob(jobId);
-    clearDatabase();
-  }
-
-  protected void clearDatabase() {
-    CommandExecutor commandExecutor = engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired();
-    commandExecutor.execute(new Command<Object>() {
-      public Object execute(CommandContext commandContext) {
-        HistoryLevel historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
-        if (historyLevel.equals(HistoryLevel.HISTORY_LEVEL_FULL)) {
-          commandContext.getHistoricJobLogManager().deleteHistoricJobLogsByHandlerType(TimerSuspendProcessDefinitionHandler.TYPE);
-          List<HistoricIncident> incidents = Context.getProcessEngineConfiguration().getHistoryService().createHistoricIncidentQuery().list();
-          for (HistoricIncident incident : incidents) {
-            commandContext.getHistoricIncidentManager().delete((HistoricIncidentEntity) incident);
-          }
-        }
-
-        return null;
-      }
-    });
+    Removable.of(processEngine).remove(HistoricIncident.class);
   }
 }

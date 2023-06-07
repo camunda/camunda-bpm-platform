@@ -32,7 +32,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.List;
-
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.authorization.Authorization;
@@ -46,7 +45,6 @@ import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceReportResult;
-import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.query.PeriodUnit;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
@@ -68,6 +66,7 @@ public class HistoricTaskInstanceAuthorizationTest extends AuthorizationTest {
 
   protected String deploymentId;
 
+  @Override
   @Before
   public void setUp() throws Exception {
     deploymentId = testRule.deploy(
@@ -78,6 +77,7 @@ public class HistoricTaskInstanceAuthorizationTest extends AuthorizationTest {
 
   }
 
+  @Override
   @After
   public void tearDown() {
     super.tearDown();
@@ -153,6 +153,20 @@ public class HistoricTaskInstanceAuthorizationTest extends AuthorizationTest {
 
     // then
     verifyQueryResults(query, 1);
+  }
+
+  @Test
+  public void shouldNottFindTaskWithRevokedReadHistoryPermissionOnProcessDefinition() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, ANY, READ_HISTORY);
+    createRevokeAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_HISTORY);
+
+    // when
+    HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
+
+    // then
+    verifyQueryResults(query, 0);
   }
 
   // historic task instance query (multiple process instances) ////////////////////////
@@ -1123,12 +1137,6 @@ public class HistoricTaskInstanceAuthorizationTest extends AuthorizationTest {
     assertThat(query.list())
         .extracting("processInstanceId")
         .containsExactly(processInstanceId);
-  }
-
-  // helper ////////////////////////////////////////////////////////
-
-  protected void verifyQueryResults(HistoricTaskInstanceQuery query, int countExpected) {
-    verifyQueryResults((AbstractQuery<?, ?>) query, countExpected);
   }
 
 }

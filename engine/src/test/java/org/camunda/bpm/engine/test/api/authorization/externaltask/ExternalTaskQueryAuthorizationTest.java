@@ -38,6 +38,7 @@ public class ExternalTaskQueryAuthorizationTest extends AuthorizationTest {
   protected String instance1Id;
   protected String instance2Id;
 
+  @Override
   @Before
   public void setUp() throws Exception {
     deploymentId = testRule.deploy(
@@ -120,5 +121,18 @@ public class ExternalTaskQueryAuthorizationTest extends AuthorizationTest {
 
     // then
     verifyQueryResults(query, 2);
+  }
+
+  @Test
+  public void shouldNotFindTaskWithRevokedReadOnProcessInstance() {
+    // given
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE);
+    createRevokeAuthorization(PROCESS_INSTANCE, instance1Id, userId, READ);
+
+    // when
+    ExternalTaskQuery query = externalTaskService.createExternalTaskQuery();
+
+    // then
+    verifyQueryResults(query, 1);
   }
 }

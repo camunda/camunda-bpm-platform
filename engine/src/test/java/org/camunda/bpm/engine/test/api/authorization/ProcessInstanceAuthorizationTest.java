@@ -44,10 +44,8 @@ import static org.junit.Assert.fail;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.authorization.Authorization;
-import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -76,6 +74,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
   protected boolean ensureSpecificVariablePermission;
 
+  @Override
   @Before
   public void setUp() throws Exception {
     testRule.deploy(
@@ -91,6 +90,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     super.setUp();
   }
 
+  @Override
   @After
   public void tearDown() {
     super.tearDown();
@@ -191,6 +191,20 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     ProcessInstance instance = query.singleResult();
     assertNotNull(instance);
     assertEquals(processInstanceId, instance.getId());
+  }
+
+  @Test
+  public void shouldNotFindProcessInstanceWithRevokedReadPermissionOnProcessDefinition() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, ANY, ALL);
+    createRevokeAuthorization(PROCESS_INSTANCE, processInstanceId, userId, READ);
+
+    // when
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+
+    // then
+    verifyQueryResults(query, 0);
   }
 
   // process instance query (multiple process instances) ////////////////////////
@@ -5533,14 +5547,6 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
   // helper /////////////////////////////////////////////////////
 
-  protected void verifyQueryResults(ProcessInstanceQuery query, int countExpected) {
-    verifyQueryResults((AbstractQuery<?, ?>) query, countExpected);
-  }
-
-  protected void verifyQueryResults(VariableInstanceQuery query, int countExpected) {
-    verifyQueryResults((AbstractQuery<?, ?>) query, countExpected);
-  }
-
   protected void verifyMessageIsValid(String processInstanceId, String message) {
     testRule.assertTextPresent(userId, message);
     testRule.assertTextPresent(UPDATE.getName(), message);
@@ -5655,7 +5661,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
     // then (2)
     verifyVariableInstanceCountDisabledAuthorization(0);
-  
+
     // when (3)
     ((RuntimeServiceImpl)runtimeService).updateVariablesLocal(processInstanceId, getVariables(), Arrays.asList(VARIABLE_NAME));
 
