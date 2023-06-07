@@ -227,8 +227,8 @@ pipeline {
                   'clean install -Pwildfly,postgresql,engine-integration-jakarta', 
                   runtimeStash: true, 
                   archiveStash: true,
-                  // we need to use JDK 11 for WildFly 27+
-                  jdkVersion: 'jdk-11-latest')
+                  // we need to use JDK 17 for WildFly 27+ + Spring 6
+                  jdkVersion: 'jdk-17-latest')
               },
               postFailure: {
                 cambpmPublishTestResult()
@@ -515,8 +515,8 @@ pipeline {
                   'clean install -Pwildfly-domain,h2,engine-integration-jakarta',
                   runtimeStash: true,
                   archiveStash: true,
-                  // we need to use JDK 11 for WildFly 27+
-                  jdkVersion: 'jdk-11-latest')
+                  // we need to use JDK 17 for WildFly 27+ + Spring 6
+                  jdkVersion: 'jdk-17 -latest')
               },
               postFailure: {
                 cambpmPublishTestResult()
@@ -538,8 +538,8 @@ pipeline {
                   'clean install -Pwildfly,wildfly-servlet,h2,engine-integration-jakarta',
                   runtimeStash: true,
                   archiveStash: true,
-                  // we need to use JDK 11 for WildFly 27+
-                  jdkVersion: 'jdk-11-latest')
+                  // we need to use JDK 17 for WildFly 27+ + Spring 6
+                  jdkVersion: 'jdk-17-latest')
               },
               postFailure: {
                 cambpmPublishTestResult()

@@ -24,5 +24,18 @@
     <module>core</module>
     <module>compatibility-test-spring4</module>
   </modules>
+
+  <profiles>
+    <profile>
+      <id>jdk17</id>
+      <activation>
+        <jdk>[17,)</jdk>
+      </activation>
+      <modules>
+        <module>core-6</module>
+      </modules>
+    </profile>
+  </profiles>
+
   
 </project>
