@@ -29,12 +29,12 @@ var _ = require('lodash');
 // @name camunda-commons-ui.requirejs
 //
 // This function is aimed to provide a common (but overridable)
-// configuration for grunt require.js tasks.
+// configuration for require.js tasks.
 //
 // @param options
 // @param options.pathPrefix should be the path to
 //                           camunda-commons-ui relative from
-//                           the project running the grunt task
+//                           the project running the task
 function requirejsConf(options) {
   options = options || {};
 
@@ -135,68 +135,12 @@ function requirejsConf(options) {
   return conf;
 }
 
-function livereloadSnippet(grunt) {
-  return function(data) {
-    var buildMode = grunt.config('buildMode');
-    var livereloadPort = grunt.config('pkg.gruntConfig.livereloadPort');
-    if (buildMode !== 'prod' && livereloadPort) {
-      grunt.log.writeln(
-        'Enabling livereload for ' + data.name + ' on port: ' + livereloadPort
-      );
-      var contents = grunt.file.read(data.path);
-
-      contents = contents
-        .replace(/\/\* live-reload/, '/* live-reload */')
-        .replace(/LIVERELOAD_PORT/g, livereloadPort);
-
-      grunt.file.write(data.path, contents);
-    }
-  };
-}
-
-function builder(grunt) {
-  return function(mode) {
-    mode = mode || 'prod';
-    var pkg = grunt.config.data.pkg;
-    var config = pkg.gruntConfig;
-
-    grunt.config.data.buildTarget =
-      mode === 'prod' ? config.prodTarget : config.devTarget;
-    grunt.log.subhead(
-      'Will build the "' +
-        pkg.name +
-        '" project in "' +
-        mode +
-        '" mode and place it in "' +
-        grunt.config('buildTarget') +
-        '"'
-    );
-    if (mode === 'dev') {
-      grunt.log.writeln(
-        'Will serve on port "' +
-          config.connectPort +
-          '" and liverreload available on port "' +
-          config.livereloadPort +
-          '"'
-      );
-    }
-
-    var tasks = ['clean', 'copy', 'less', 'requirejs'];
-
-    grunt.task.run(tasks);
-  };
-}
-
 module.exports = {
   // @name camunda-commons-ui.utils
   utils: {
     // @name camunda-commons-ui.utils._
     _: _
   },
-
-  builder: builder,
-
-  livereloadSnippet: livereloadSnippet,
 
   requirejs: requirejsConf
 };
