@@ -34,7 +34,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 public class TestApplication {
 
   @ConditionalOnProperty(prefix = "camunda.bpm", name = "process-engine-name", havingValue = "nojpaTestEngine")
-  @Configuration()
+  @Configuration
   public class TestConfiguration {
 
     @Bean(name = "spinProcessEnginePlugin")

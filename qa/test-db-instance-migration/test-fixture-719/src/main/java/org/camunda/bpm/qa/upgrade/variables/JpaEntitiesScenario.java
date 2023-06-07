@@ -25,17 +25,14 @@ import javax.persistence.EntityManagerFactory;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSession;
 import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSessionFactory;
-import org.camunda.bpm.qa.upgrade.variables.FieldAccessJPAEntity;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.qa.upgrade.DescribesScenario;
 import org.camunda.bpm.qa.upgrade.ScenarioSetup;
 
 public class JpaEntitiesScenario {
-  static FieldAccessJPAEntity simpleEntityFieldAccess;
-//  static org.camunda.bpm.qa.upgrade.variables.PropertyAccessJPAEntity simpleEntityPropertyAccess;
-//  static org.camunda.bpm.qa.upgrade.variables.SubclassFieldAccessJPAEntity subclassFieldAccess;
-//  static org.camunda.bpm.qa.upgrade.variables.SubclassPropertyAccessJPAEntity subclassPropertyAccess;
-  static EntityManagerFactory entityManagerFactory;
+
+  protected static FieldAccessJPAEntity simpleEntityFieldAccess;
+  protected static EntityManagerFactory entityManagerFactory;
 
   @Deployment
   public static String deployOneTask() {
@@ -54,9 +51,6 @@ public class JpaEntitiesScenario {
 
       Map<String, Object> variables = new HashMap<String, Object>();
       variables.put("simpleEntityFieldAccess", simpleEntityFieldAccess);
-//      variables.put("simpleEntityPropertyAccess", simpleEntityPropertyAccess);
-//      variables.put("subclassFieldAccess", subclassFieldAccess);
-//      variables.put("subclassPropertyAccess", subclassPropertyAccess);
 
       //
       String id = engine.getRuntimeService().startProcessInstanceByKey("JPAVariableProcess", variables).getId();
@@ -77,21 +71,6 @@ public class JpaEntitiesScenario {
     simpleEntityFieldAccess.setId(1L);
     simpleEntityFieldAccess.setMyValue("value1");
     manager.persist(simpleEntityFieldAccess);
-
-//    simpleEntityPropertyAccess = new PropertyAccessJPAEntity();
-//    simpleEntityPropertyAccess.setId(1L);
-//    simpleEntityPropertyAccess.setMyValue("value2");
-//    manager.persist(simpleEntityPropertyAccess);
-//
-//    subclassFieldAccess = new SubclassFieldAccessJPAEntity();
-//    subclassFieldAccess.setId(1L);
-//    subclassFieldAccess.setValue("value3");
-//    manager.persist(subclassFieldAccess);
-//
-//    subclassPropertyAccess = new SubclassPropertyAccessJPAEntity();
-//    subclassPropertyAccess.setId(1L);
-//    subclassPropertyAccess.setValue("value4");
-//    manager.persist(subclassPropertyAccess);
 
     manager.flush();
     manager.getTransaction().commit();

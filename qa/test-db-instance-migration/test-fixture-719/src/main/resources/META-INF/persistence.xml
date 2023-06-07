@@ -7,12 +7,6 @@
     <provider>org.apache.openjpa.persistence.PersistenceProviderImpl</provider>
     
     <class>org.camunda.bpm.qa.upgrade.variables.FieldAccessJPAEntity</class>
-<!--    <class>org.camunda.bpm.qa.upgrade.variables.PropertyAccessJPAEntity</class>-->
-<!--    <class>org.camunda.bpm.qa.upgrade.variables.SubclassFieldAccessJPAEntity</class>-->
-<!--    <class>org.camunda.bpm.qa.upgrade.variables.SubclassPropertyAccessJPAEntity</class>-->
-<!--     Mapped superclasses -->
-<!--    <class>org.camunda.bpm.qa.upgrade.variables.MappedSuperClassFieldAccessJPAEntity</class>-->
-<!--    <class>org.camunda.bpm.qa.upgrade.variables.MappedSuperClassPropertyAccessJPAEntity</class>-->
 
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
