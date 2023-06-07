@@ -65,6 +65,7 @@
       <id>distro</id>
       <activation>
         <activeByDefault>true</activeByDefault>
+        <jdk>[17,)</jdk>
       </activation>
       <modules>
         <module>modules</module>
@@ -80,6 +81,7 @@
       <id>distro-ce</id>
       <activation>
         <activeByDefault>true</activeByDefault>
+        <jdk>[17,)</jdk>
       </activation>
       <modules>
         <module>modules/webapps</module>
