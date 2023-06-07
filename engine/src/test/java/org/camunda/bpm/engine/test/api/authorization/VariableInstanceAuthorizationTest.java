@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.authorization;
 
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
+import static org.camunda.bpm.engine.authorization.Permissions.ALL;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_INSTANCE;
 import static org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions.READ_INSTANCE_VARIABLE;
@@ -28,8 +29,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
-
-import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.junit.After;
@@ -48,6 +47,7 @@ public class VariableInstanceAuthorizationTest extends AuthorizationTest {
   protected String deploymentId;
   protected boolean ensureSpecificVariablePermission;
 
+  @Override
   @Before
   public void setUp() throws Exception {
     deploymentId = testRule.deploy(
@@ -57,6 +57,7 @@ public class VariableInstanceAuthorizationTest extends AuthorizationTest {
     super.setUp();
   }
 
+  @Override
   @After
   public void tearDown() {
     super.tearDown();
@@ -240,7 +241,7 @@ public class VariableInstanceAuthorizationTest extends AuthorizationTest {
     // then
     verifyQueryResults(query, 1);
   }
-  
+
 
 
   @Test
@@ -468,7 +469,7 @@ public class VariableInstanceAuthorizationTest extends AuthorizationTest {
 
     deleteTask(taskId, true);
   }
-  
+
   /*
    * CAM-10864: Tests that the query itself works if authorization is used and a value matcher
    */
@@ -490,11 +491,21 @@ public class VariableInstanceAuthorizationTest extends AuthorizationTest {
     assertEquals(1, ignoreCaseResults.size());
   }
 
-  // helper ////////////////////////////////////////////////////////////////
+  @Test
+  public void shouldNotFindProcessVariableWithRevokedReadPermissionOnProcessInstance() {
+    // given
+    String processInstanceId = startProcessInstanceByKey(PROCESS_KEY, getVariables()).getId();
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, ANY, ALL);
+    createRevokeAuthorization(PROCESS_INSTANCE, processInstanceId, userId, READ);
 
-  protected void verifyQueryResults(VariableInstanceQuery query, int countExpected) {
-    verifyQueryResults((AbstractQuery<?, ?>) query, countExpected);
+    // when
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
+
+    // then
+    verifyQueryResults(query, 0);
   }
+
+  // helper ////////////////////////////////////////////////////////////////
 
   protected void setReadVariableAsDefaultReadVariablePermission() {
     processEngineConfiguration.setEnforceSpecificVariablePermission(true);

@@ -25,7 +25,6 @@ import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
-
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.authorization.HistoricProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.HistoricTaskPermissions;
@@ -33,7 +32,6 @@ import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
-import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.authorization.AuthorizationTest;
@@ -54,6 +52,7 @@ public class HistoricDetailAuthorizationTest extends AuthorizationTest {
 
   protected String deploymentId;
 
+  @Override
   @Before
   public void setUp() throws Exception {
     deploymentId = testRule.deploy(
@@ -64,6 +63,7 @@ public class HistoricDetailAuthorizationTest extends AuthorizationTest {
     super.setUp();
   }
 
+  @Override
   @After
   public void tearDown() {
     super.tearDown();
@@ -144,6 +144,20 @@ public class HistoricDetailAuthorizationTest extends AuthorizationTest {
 
     // then
     verifyQueryResults(query, 1);
+  }
+
+  @Test
+  public void shouldNotFindDetailWithRevokedReadHistoryPermissionOnProcessDefinition() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY, getVariables());
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
+    createRevokeAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_HISTORY);
+
+    // when
+    HistoricDetailQuery query = historyService.createHistoricDetailQuery().variableUpdates();
+
+    // then
+    verifyQueryResults(query, 0);
   }
 
   // historic variable update query (multiple process instances) ///////////////////////////////////////////
@@ -1184,12 +1198,6 @@ public class HistoricDetailAuthorizationTest extends AuthorizationTest {
     assertThat(query.list())
         .extracting("processInstanceId")
         .containsExactly(processInstanceId);
-  }
-
-  // helper ////////////////////////////////////////////////////////
-
-  protected void verifyQueryResults(HistoricDetailQuery query, int countExpected) {
-    verifyQueryResults((AbstractQuery<?, ?>) query, countExpected);
   }
 
 }

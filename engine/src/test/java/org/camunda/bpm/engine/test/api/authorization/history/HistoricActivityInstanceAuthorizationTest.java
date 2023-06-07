@@ -22,14 +22,12 @@ import static org.camunda.bpm.engine.authorization.Permissions.READ_HISTORY;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 
 import java.util.List;
-
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.authorization.HistoricProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
-import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.authorization.AuthorizationTest;
@@ -49,6 +47,7 @@ public class HistoricActivityInstanceAuthorizationTest extends AuthorizationTest
 
   protected String deploymentId;
 
+  @Override
   @Before
   public void setUp() throws Exception {
     deploymentId = createDeployment(null,
@@ -58,6 +57,7 @@ public class HistoricActivityInstanceAuthorizationTest extends AuthorizationTest
     super.setUp();
   }
 
+  @Override
   @After
   public void tearDown() {
     super.tearDown();
@@ -117,6 +117,20 @@ public class HistoricActivityInstanceAuthorizationTest extends AuthorizationTest
 
     // then
     verifyQueryResults(query, 2);
+  }
+
+  @Test
+  public void shouldNotFindInstanceWithRevokedReadHistoryPermissionOnAnyProcessDefinition() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, ANY, READ_HISTORY);
+    createRevokeAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, READ_HISTORY);
+
+    // when
+    HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
+
+    // then
+    verifyQueryResults(query, 0);
   }
 
   // historic activity instance query (multiple process instances) ////////////////////////
@@ -347,12 +361,6 @@ public class HistoricActivityInstanceAuthorizationTest extends AuthorizationTest
     assertThat(query.list())
         .extracting("processInstanceId")
         .containsExactly(processInstanceId, processInstanceId);
-  }
-
-  // helper ////////////////////////////////////////////////////////
-
-  protected void verifyQueryResults(HistoricActivityInstanceQuery query, int countExpected) {
-    verifyQueryResults((AbstractQuery<?, ?>) query, countExpected);
   }
 
 }

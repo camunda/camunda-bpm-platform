@@ -23,14 +23,12 @@ import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 
 import java.util.Date;
 import java.util.List;
-
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.authorization.HistoricProcessInstancePermissions;
 import org.camunda.bpm.engine.authorization.ProcessDefinitionPermissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.history.HistoricIncidentQuery;
-import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -57,6 +55,7 @@ public class HistoricIncidentAuthorizationTest extends AuthorizationTest {
 
   protected String deploymentId;
 
+  @Override
   @Before
   public void setUp() throws Exception {
     deploymentId = testRule.deploy(
@@ -66,6 +65,7 @@ public class HistoricIncidentAuthorizationTest extends AuthorizationTest {
     super.setUp();
   }
 
+  @Override
   @After
   public void tearDown() {
     super.tearDown();
@@ -327,6 +327,20 @@ public class HistoricIncidentAuthorizationTest extends AuthorizationTest {
         .containsExactly(processInstanceId);
   }
 
+  @Test
+  public void shouldNotFindIncidentWithRevokedReadHistoryPermissionOnAnyProcessDefinition() {
+    // given
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, ANY, READ_HISTORY);
+    createRevokeAuthorization(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
+
+    // when
+    HistoricIncidentQuery query = historyService.createHistoricIncidentQuery();
+
+    // then
+    verifyQueryResults(query, 0);
+  }
+
   // historic incident query (multiple incidents ) ///////////////////////////////////////////
 
   @Test
@@ -536,13 +550,10 @@ public class HistoricIncidentAuthorizationTest extends AuthorizationTest {
 
   // helper ////////////////////////////////////////////////////////////
 
-  protected void verifyQueryResults(HistoricIncidentQuery query, int countExpected) {
-    verifyQueryResults((AbstractQuery<?, ?>) query, countExpected);
-  }
-
   protected void clearDatabase() {
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
     commandExecutor.execute(new Command<Object>() {
+      @Override
       public Object execute(CommandContext commandContext) {
         commandContext.getHistoricJobLogManager().deleteHistoricJobLogsByHandlerType(TimerSuspendProcessDefinitionHandler.TYPE);
         List<HistoricIncident> incidents = Context.getProcessEngineConfiguration().getHistoryService().createHistoricIncidentQuery().list();

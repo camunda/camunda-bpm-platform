@@ -26,7 +26,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 import java.io.InputStream;
-
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinitionQuery;
@@ -43,6 +42,7 @@ public class DecisionDefinitionAuthorizationTest extends AuthorizationTest {
   protected static final String PROCESS_KEY = "testProcess";
   protected static final String DECISION_DEFINITION_KEY = "sampleDecision";
 
+  @Override
   @Before
   public void setUp() throws Exception {
     testRule.deploy(
@@ -100,6 +100,18 @@ public class DecisionDefinitionAuthorizationTest extends AuthorizationTest {
 
     // then
     verifyQueryResults(query, 2);
+  }
+
+  @Test
+  public void shouldNotFindDefinitionWithRevokedReadPermissionOnDefinition() {
+    createGrantAuthorization(DECISION_DEFINITION, ANY, ANY, READ);
+    createRevokeAuthorization(DECISION_DEFINITION, ANY, userId, READ);
+
+    // when
+    DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
+
+    // then
+    verifyQueryResults(query, 0);
   }
 
   @Test

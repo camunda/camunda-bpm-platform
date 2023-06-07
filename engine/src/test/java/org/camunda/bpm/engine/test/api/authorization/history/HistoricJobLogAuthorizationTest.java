@@ -28,7 +28,6 @@ import static org.junit.Assert.fail;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.authorization.HistoricProcessInstancePermissions;
@@ -37,7 +36,6 @@ import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.history.HistoricJobLogQuery;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
-import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -63,6 +61,7 @@ public class HistoricJobLogAuthorizationTest extends AuthorizationTest {
   protected String batchId;
   protected String deploymentId;
 
+  @Override
   @Before
   public void setUp() throws Exception {
     deploymentId = testRule.deploy(
@@ -73,11 +72,13 @@ public class HistoricJobLogAuthorizationTest extends AuthorizationTest {
     super.setUp();
   }
 
+  @Override
   @After
   public void tearDown() {
     super.tearDown();
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
     commandExecutor.execute(new Command<Object>() {
+      @Override
       public Object execute(CommandContext commandContext) {
         commandContext.getHistoricJobLogManager().deleteHistoricJobLogsByHandlerType(TimerSuspendProcessDefinitionHandler.TYPE);
         return null;
@@ -181,6 +182,20 @@ public class HistoricJobLogAuthorizationTest extends AuthorizationTest {
 
     // then
     verifyQueryResults(query, 5);
+  }
+
+  @Test
+  public void shouldNotFindJobLogWithRevokedHistoryReadPermissionOnAnyProcessDefinition() {
+    // given
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, ANY, READ_HISTORY);
+    createRevokeAuthorization(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
+
+    // when
+    HistoricJobLogQuery query = historyService.createHistoricJobLogQuery();
+
+    // then
+    verifyQueryResults(query, 0);
   }
 
   // historic job log query (multiple process instance) ////////////////////////////////////////////////
@@ -561,12 +576,6 @@ public class HistoricJobLogAuthorizationTest extends AuthorizationTest {
     assertThat(query.list())
         .extracting("jobDefinitionType", "processInstanceId")
         .containsExactly(tuple("batch-seed-job", null));
-  }
-
-  // helper ////////////////////////////////////////////////////////
-
-  protected void verifyQueryResults(HistoricJobLogQuery query, int countExpected) {
-    verifyQueryResults((AbstractQuery<?, ?>) query, countExpected);
   }
 
 }

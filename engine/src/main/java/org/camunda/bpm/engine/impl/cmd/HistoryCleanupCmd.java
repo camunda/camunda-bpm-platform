@@ -16,12 +16,14 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import java.util.Date;
+import java.util.List;
+import java.util.ListIterator;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
@@ -35,12 +37,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyManager;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
-import org.camunda.bpm.engine.impl.util.DatabaseUtil;
 import org.camunda.bpm.engine.runtime.Job;
-
-import java.util.Date;
-import java.util.List;
-import java.util.ListIterator;
 
 /**
  * @author Svetlana Dorokhova
@@ -60,14 +57,15 @@ public class HistoryCleanupCmd implements Command<Job> {
   }
 
   @Override
-  public Job execute(CommandContext commandContext) {
-    if (!isHistoryCleanupEnabled(commandContext)) {
+  public Job execute(CommandContext context) {
+
+    ProcessEngineConfigurationImpl processEngineConfiguration = context.getProcessEngineConfiguration();
+
+    if (!processEngineConfiguration.isHistoryCleanupEnabled()) {
       throw new BadUserRequestException("History cleanup is disabled for this engine");
     }
 
-    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
-
+    AuthorizationManager authorizationManager = context.getAuthorizationManager();
     authorizationManager.checkCamundaAdmin();
 
     //validate
@@ -82,7 +80,7 @@ public class HistoryCleanupCmd implements Command<Job> {
     int[][] minuteChunks = HistoryCleanupHelper.listMinuteChunks(degreeOfParallelism);
 
     if (shouldCreateJobs(historyCleanupJobs)) {
-      historyCleanupJobs = createJobs(degreeOfParallelism, minuteChunks);
+      historyCleanupJobs = createJobs(minuteChunks);
 
     }
     else if (shouldReconfigureJobs(historyCleanupJobs)) {
@@ -94,7 +92,7 @@ public class HistoryCleanupCmd implements Command<Job> {
 
     }
 
-    writeUserOperationLog(commandContext);
+    writeUserOperationLog(context);
 
     return historyCleanupJobs.size() > 0 ? historyCleanupJobs.get(0) : null;
   }
@@ -121,10 +119,11 @@ public class HistoryCleanupCmd implements Command<Job> {
     return immediatelyDue || HistoryCleanupHelper.isBatchWindowConfigured(commandContext);
   }
 
-  protected List<Job> createJobs(int degreeOfParallelism, int[][] minuteChunks) {
+  protected List<Job> createJobs(int[][] minuteChunks) {
     CommandContext commandContext = Context.getCommandContext();
 
     JobManager jobManager = commandContext.getJobManager();
+    int maxRetries = HistoryCleanupHelper.getMaxRetries();
 
     acquireExclusiveLock(commandContext);
 
@@ -133,7 +132,7 @@ public class HistoryCleanupCmd implements Command<Job> {
 
     if (historyCleanupJobs.isEmpty()) {
       for (int[] minuteChunk : minuteChunks) {
-        JobEntity job = createJob(minuteChunk);
+        JobEntity job = createJob(minuteChunk, maxRetries);
         jobManager.insertAndHintJobExecutor(job);
         historyCleanupJobs.add(job);
       }
@@ -146,6 +145,7 @@ public class HistoryCleanupCmd implements Command<Job> {
   protected List<Job> reconfigureJobs(List<Job> historyCleanupJobs, int degreeOfParallelism, int[][] minuteChunks) {
     CommandContext commandContext = Context.getCommandContext();
     JobManager jobManager = commandContext.getJobManager();
+    int maxRetries = HistoryCleanupHelper.getMaxRetries();
 
     int size = Math.min(degreeOfParallelism, historyCleanupJobs.size());
 
@@ -153,7 +153,7 @@ public class HistoryCleanupCmd implements Command<Job> {
       JobEntity historyCleanupJob = (JobEntity) historyCleanupJobs.get(i);
 
       //apply new configuration
-      HistoryCleanupContext historyCleanupContext = createCleanupContext(minuteChunks[i]);
+      HistoryCleanupContext historyCleanupContext = createCleanupContext(minuteChunks[i], maxRetries);
 
       HISTORY_CLEANUP_JOB_DECLARATION.reconfigure(historyCleanupContext, historyCleanupJob);
 
@@ -167,7 +167,7 @@ public class HistoryCleanupCmd implements Command<Job> {
     if (delta > 0) {
       //create new job, as there are not enough of them
       for (int i = size; i < degreeOfParallelism; i++) {
-        JobEntity job = createJob(minuteChunks[i]);
+        JobEntity job = createJob(minuteChunks[i], maxRetries);
         jobManager.insertAndHintJobExecutor(job);
         historyCleanupJobs.add(job);
       }
@@ -194,15 +194,16 @@ public class HistoryCleanupCmd implements Command<Job> {
   }
 
   @SuppressWarnings("unchecked")
-  protected JobEntity createJob(int[] minuteChunk) {
-    HistoryCleanupContext historyCleanupContext = createCleanupContext(minuteChunk);
-    return HISTORY_CLEANUP_JOB_DECLARATION.createJobInstance(historyCleanupContext);
+  protected JobEntity createJob(int[] minuteChunk, int maxRetries) {
+    HistoryCleanupContext context = createCleanupContext(minuteChunk, maxRetries);
+    return HISTORY_CLEANUP_JOB_DECLARATION.createJobInstance(context);
   }
 
-  protected HistoryCleanupContext createCleanupContext(int[] minuteChunk) {
+  protected HistoryCleanupContext createCleanupContext(int[] minuteChunk, int maxRetries) {
     int minuteFrom = minuteChunk[0];
     int minuteTo = minuteChunk[1];
-    return new HistoryCleanupContext(immediatelyDue, minuteFrom, minuteTo);
+
+    return new HistoryCleanupContext(immediatelyDue, minuteFrom, minuteTo, maxRetries);
   }
 
   protected void writeUserOperationLog(CommandContext commandContext) {
@@ -215,11 +216,6 @@ public class HistoryCleanupCmd implements Command<Job> {
         null,
         null,
         propertyChange);
-  }
-
-  protected boolean isHistoryCleanupEnabled(CommandContext commandContext) {
-    return commandContext.getProcessEngineConfiguration()
-        .isHistoryCleanupEnabled();
   }
 
   protected void acquireExclusiveLock(CommandContext commandContext) {

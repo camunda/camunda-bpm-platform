@@ -30,32 +30,35 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.test.util.ClockTestUtil;
 import org.camunda.bpm.engine.test.util.EntityRemoveRule;
 import org.camunda.bpm.engine.test.util.ObjectProperty;
 import org.camunda.bpm.engine.test.util.RemoveAfter;
 import org.camunda.bpm.engine.test.util.TriConsumer;
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
-@RunWith(Parameterized.class)
 public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
 
   protected static final String PROCESS_KEY = "oneTaskProcess";
 
   @Rule
-  public EntityRemoveRule entityRemoveRule = new EntityRemoveRule(testRule);
+  public EntityRemoveRule entityRemoveRule = EntityRemoveRule.of(testRule);
 
-  protected final String operationName;
-  protected final TriConsumer<TaskService, String, Object> operation;
-  protected final String taskId;
-  protected final Object value;
+  @Parameter(1)
+  public String operationName;
+  @Parameter(2)
+  public TriConsumer<TaskService, String, Object> operation;
+  @Parameter(3)
+  public String taskId;
+  @Parameter(4)
+  public Object value;
 
   protected boolean deleteTask;
 
@@ -67,7 +70,7 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
    * setValue: The value to use to set property to
    * taskQueryBuilderMethodName: The corresponding taskQuery builder method name to use for assertion purposes
    */
-  @Parameters(name = "{0}")
+  @Parameters(name = "{1} (mode {0})")
   public static List<Object[]> data() {
     TriConsumer<TaskService, String, Object> setPriority = (taskService, taskId, value) -> taskService.setPriority(taskId, (int) value);
     TriConsumer<TaskService, String, Object> setName = (taskService, taskId, value) -> taskService.setName(taskId, (String) value);
@@ -76,22 +79,20 @@ public class SetTaskPropertyAuthorizationTest extends AuthorizationTest {
     TriConsumer<TaskService, String, Object> setFollowUpDate = (taskService, taskId, value) -> taskService.setFollowUpDate(taskId, (Date) value);
 
     return Arrays.asList(new Object[][] {
-        { "setPriority", setPriority, "taskId", 80 },
-        { "setName", setName, "taskId", "name" },
-        { "setDescription", setDescription, "taskId", "description" },
-        { "setDueDate", setDueDate, "taskId",  DateTime.now().toDate()},
-        { "setFollowUpDate", setFollowUpDate, "taskId", DateTime.now().toDate() }
+        { ProcessEngineConfiguration.AUTHORIZATION_CHECK_REVOKE_ALWAYS, "setPriority", setPriority, "taskId", 80 },
+        { ProcessEngineConfiguration.AUTHORIZATION_CHECK_REVOKE_ALWAYS, "setName", setName, "taskId", "name" },
+        { ProcessEngineConfiguration.AUTHORIZATION_CHECK_REVOKE_ALWAYS, "setDescription", setDescription, "taskId", "description" },
+        { ProcessEngineConfiguration.AUTHORIZATION_CHECK_REVOKE_ALWAYS, "setDueDate", setDueDate, "taskId",  ClockTestUtil.setClockToDateWithoutMilliseconds() },
+        { ProcessEngineConfiguration.AUTHORIZATION_CHECK_REVOKE_ALWAYS, "setFollowUpDate", setFollowUpDate, "taskId", ClockTestUtil.setClockToDateWithoutMilliseconds() },
+        { ProcessEngineConfiguration.AUTHORIZATION_CHECK_REVOKE_AUTO, "setPriority", setPriority, "taskId", 80 },
+        { ProcessEngineConfiguration.AUTHORIZATION_CHECK_REVOKE_AUTO, "setName", setName, "taskId", "name" },
+        { ProcessEngineConfiguration.AUTHORIZATION_CHECK_REVOKE_AUTO, "setDescription", setDescription, "taskId", "description" },
+        { ProcessEngineConfiguration.AUTHORIZATION_CHECK_REVOKE_AUTO, "setDueDate", setDueDate, "taskId",  ClockTestUtil.setClockToDateWithoutMilliseconds()},
+        { ProcessEngineConfiguration.AUTHORIZATION_CHECK_REVOKE_AUTO, "setFollowUpDate", setFollowUpDate, "taskId", ClockTestUtil.setClockToDateWithoutMilliseconds() }
     });
   }
 
-  // Constructor to pass data entries to parameterized test instance instance fields
-  public SetTaskPropertyAuthorizationTest(String operationName, TriConsumer<TaskService, String, Object> operation, String taskId, Object value) {
-    this.operationName = operationName;
-    this.operation = operation;
-    this.taskId = taskId;
-    this.value = value;
-  }
-
+  @Override
   @Before
   public void setUp() throws Exception {
     testRule.deploy("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml");

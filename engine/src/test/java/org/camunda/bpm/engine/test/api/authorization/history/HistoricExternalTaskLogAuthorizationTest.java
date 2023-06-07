@@ -28,7 +28,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import java.util.List;
-
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.authorization.HistoricProcessInstancePermissions;
@@ -53,6 +52,7 @@ public class HistoricExternalTaskLogAuthorizationTest extends AuthorizationTest 
   protected final String ERROR_DETAILS = "These are the error details!";
   protected final String ANOTHER_PROCESS_KEY = "AnotherProcess";
 
+  @Override
   @Before
   public void setUp() throws Exception {
     BpmnModelInstance defaultModel = createDefaultExternalTaskModel().build();
@@ -61,6 +61,7 @@ public class HistoricExternalTaskLogAuthorizationTest extends AuthorizationTest 
     super.setUp();
   }
 
+  @Override
   @After
   public void tearDown() {
     super.tearDown();
@@ -157,6 +158,20 @@ public class HistoricExternalTaskLogAuthorizationTest extends AuthorizationTest 
 
     // then
     verifyQueryResults(query, 8);
+  }
+
+  @Test
+  public void shouldNotFindLogsWithRevokedHistoryReadPermissionOnAnyProcessDefinition() {
+    // given
+    startThreeProcessInstancesDeleteOneAndCompleteTwoWithFailure();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, ANY, READ_HISTORY);
+    createRevokeAuthorization(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
+
+    // when
+    HistoricExternalTaskLogQuery query = historyService.createHistoricExternalTaskLogQuery();
+
+    // then
+    verifyQueryResults(query, 0);
   }
 
   @Test
