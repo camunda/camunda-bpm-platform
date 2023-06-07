@@ -4,7 +4,6 @@
      version="1.0"
 >
   <persistence-unit name="activiti-jpa-pu">
-    <!-- TODO -->
     <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider> 
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
      <properties>

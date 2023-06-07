@@ -16,7 +16,7 @@
 
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
-      <property name="openjpa.ConnectionURL" value="jdbc:h2:./camunda-h2-default/process-engine;TRACE_LEVEL_FILE=0;DB_CLOSE_ON_EXIT=FALSE"/>
+      <property name="openjpa.ConnectionURL" value="jdbc:h2:mem:activiti-jpa;DB_CLOSE_DELAY=1000"/>
       <property name="openjpa.ConnectionDriverName" value="org.h2.Driver"/>
       <property name="openjpa.ConnectionUserName" value="sa"/>
       <property name="openjpa.ConnectionPassword" value=""/>

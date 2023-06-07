@@ -1153,7 +1153,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initValueTypeResolver();
     initTypeValidator();
     initSerialization();
-    initJpa();
     initDelegateInterceptor();
     initEventHandlers();
     initProcessApplicationManager();
@@ -2725,28 +2724,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       commandCheckers.add(new TenantCommandChecker());
       commandCheckers.add(new AuthorizationCommandChecker());
     }
-  }
-
-  // JPA //////////////////////////////////////////////////////////////////////
-
-  protected void initJpa() {
-//    if (jpaPersistenceUnitName != null) {
-//      jpaEntityManagerFactory = JpaHelper.createEntityManagerFactory(jpaPersistenceUnitName);
-//    }
-//    if (jpaEntityManagerFactory != null) {
-//      sessionFactories.put(EntityManagerSession.class, new EntityManagerSessionFactory(jpaEntityManagerFactory, jpaHandleTransaction, jpaCloseEntityManager));
-//      JPAVariableSerializer jpaType = (JPAVariableSerializer) variableSerializers.getSerializerByName(JPAVariableSerializer.NAME);
-//      // Add JPA-type
-//      if (jpaType == null) {
-//        // We try adding the variable right after byte serializer, if available
-//        int serializableIndex = variableSerializers.getSerializerIndexByName(ValueType.BYTES.getName());
-//        if (serializableIndex > -1) {
-//          variableSerializers.addSerializer(new JPAVariableSerializer(), serializableIndex);
-//        } else {
-//          variableSerializers.addSerializer(new JPAVariableSerializer());
-//        }
-//      }
-//    }
   }
 
   protected void initBeans() {
