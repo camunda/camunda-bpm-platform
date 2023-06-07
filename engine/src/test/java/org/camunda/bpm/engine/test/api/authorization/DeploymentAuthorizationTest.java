@@ -35,7 +35,6 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.application.impl.EmbeddedProcessApplication;
@@ -45,7 +44,6 @@ import org.camunda.bpm.engine.authorization.AuthorizationQuery;
 import org.camunda.bpm.engine.authorization.Groups;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.authorization.SystemPermissions;
-import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
 import org.camunda.bpm.engine.repository.Resource;
@@ -153,6 +151,21 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
 
     // then
     verifyQueryResults(query, 2);
+  }
+
+  @Test
+  public void shouldNotFindDeploymentWithRevokedReadPermissionOnAnyDeployment() {
+    // given
+    createDeployment("first");
+    createDeployment("second");
+    createGrantAuthorization(DEPLOYMENT, ANY, ANY, READ);
+    createRevokeAuthorization(DEPLOYMENT, ANY, userId, READ);
+
+    // when
+    DeploymentQuery query = repositoryService.createDeploymentQuery();
+
+    // then
+    verifyQueryResults(query, 0);
   }
 
   // create deployment ///////////////////////////////////////////////
@@ -883,10 +896,6 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
   }
 
   // helper /////////////////////////////////////////////////////////
-
-  protected void verifyQueryResults(DeploymentQuery query, int countExpected) {
-    verifyQueryResults((AbstractQuery<?, ?>) query, countExpected);
-  }
 
   protected String createDeployment(String name) {
     return createDeployment(name, FIRST_RESOURCE, SECOND_RESOURCE).getId();

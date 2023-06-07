@@ -931,6 +931,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected long historyCleanupJobPriority = DefaultJobPriorityProvider.DEFAULT_PRIORITY;
 
   /**
+   * Specifies how often a cleanup job will be executed before an incident is raised.
+   * This property overrides the global {@code defaultNumberOfRetries} property which has a default value of {@code 3}.
+   */
+  protected Integer historyCleanupDefaultNumberOfRetries;
+
+  /**
    * Time to live for historic job log entries written by history cleanup jobs.
    * Must be an ISO-8601 conform String specifying only a number of days. Only
    * works in conjunction with removal-time-based cleanup strategy.
@@ -4033,6 +4039,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfigurationImpl setHistoryCleanupJobPriority(long historyCleanupJobPriority) {
     this.historyCleanupJobPriority = historyCleanupJobPriority;
+    return this;
+  }
+
+  public Integer getHistoryCleanupDefaultNumberOfRetries() {
+    return this.historyCleanupDefaultNumberOfRetries;
+  }
+
+  public ProcessEngineConfigurationImpl setHistoryCleanupDefaultNumberOfRetries(Integer historyCleanupDefaultNumberOfRetries) {
+    this.historyCleanupDefaultNumberOfRetries = historyCleanupDefaultNumberOfRetries;
     return this;
   }
 

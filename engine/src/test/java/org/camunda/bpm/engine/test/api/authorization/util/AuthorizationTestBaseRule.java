@@ -18,7 +18,6 @@ package org.camunda.bpm.engine.test.api.authorization.util;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
@@ -57,6 +56,7 @@ public class AuthorizationTestBaseRule extends TestWatcher {
     engineRule.getIdentityService().clearAuthentication();
   }
 
+  @Override
   protected void finished(Description description) {
     engineRule.getIdentityService().clearAuthentication();
 
@@ -88,6 +88,17 @@ public class AuthorizationTestBaseRule extends TestWatcher {
     authorization.setUserId(userId);
     for (Permission permission : permissions) {
       authorization.addPermission(permission);
+    }
+
+    engineRule.getAuthorizationService().saveAuthorization(authorization);
+    manageAuthorization(authorization);
+  }
+
+  public void createRevokeAuthorization(Resource resource, String resourceId, String userId, Permission... permissions) {
+    Authorization authorization = createAuthorization(Authorization.AUTH_TYPE_REVOKE, resource, resourceId);
+    authorization.setUserId(userId);
+    for (Permission permission : permissions) {
+      authorization.removePermission(permission);
     }
 
     engineRule.getAuthorizationService().saveAuthorization(authorization);

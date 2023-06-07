@@ -17,6 +17,7 @@
 package org.camunda.bpm.engine.test.api.authorization.batch;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -25,7 +26,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.commons.lang3.time.DateUtils;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.HistoryService;
@@ -163,7 +163,7 @@ public class HistoricBatchQueryAuthorizationTest {
   @Test
   public void testQueryListAccessAll() {
     // given
-    authRule.createGrantAuthorization(Resources.BATCH, "*", "user", Permissions.READ_HISTORY);
+    authRule.createGrantAuthorization(Resources.BATCH, ANY, "user", Permissions.READ_HISTORY);
 
     // when
     authRule.enableAuthorization("user");
@@ -177,7 +177,7 @@ public class HistoricBatchQueryAuthorizationTest {
   @Test
   public void testQueryListMultiple() {
     // given
-    authRule.createGrantAuthorization(Resources.BATCH, "*", "user", Permissions.READ_HISTORY);
+    authRule.createGrantAuthorization(Resources.BATCH, ANY, "user", Permissions.READ_HISTORY);
     authRule.createGrantAuthorization(Resources.BATCH, batch1.getId(), "user", Permissions.READ_HISTORY);
 
     // when
@@ -190,9 +190,39 @@ public class HistoricBatchQueryAuthorizationTest {
   }
 
   @Test
+  public void shouldFindEmptyBatchListWithRevokedReadHistoryPermissionOnAllBatches() {
+    // given
+    authRule.createGrantAuthorization(Resources.BATCH, ANY, ANY, Permissions.READ_HISTORY);
+    authRule.createRevokeAuthorization(Resources.BATCH, ANY, "user", Permissions.READ_HISTORY);
+
+    // when
+    authRule.enableAuthorization("user");
+    List<HistoricBatch> batches = engineRule.getHistoryService().createHistoricBatchQuery().list();
+    authRule.disableAuthorization();
+
+    // then
+    Assert.assertTrue(batches.isEmpty());
+  }
+
+  @Test
+  public void shouldNotFindBatchWithRevokedReadHistoryPermissionOnAllBatches() {
+    // given
+    authRule.createGrantAuthorization(Resources.BATCH, ANY, ANY, Permissions.READ_HISTORY);
+    authRule.createRevokeAuthorization(Resources.BATCH, ANY, "user", Permissions.READ_HISTORY);
+
+    // when
+    authRule.enableAuthorization("user");
+    long batchCount = engineRule.getHistoryService().createHistoricBatchQuery().count();
+    authRule.disableAuthorization();
+
+    // then
+    Assert.assertEquals(0L, batchCount);
+  }
+
+  @Test
   public void testHistoryCleanupReportQueryWithPermissions() {
     // given
-    authRule.createGrantAuthorization(Resources.BATCH, "*", "user", Permissions.READ_HISTORY);
+    authRule.createGrantAuthorization(Resources.BATCH, ANY, "user", Permissions.READ_HISTORY);
     String migrationOperationsTTL = "P0D";
     prepareBatch(migrationOperationsTTL);
 

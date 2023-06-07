@@ -34,33 +34,10 @@ db-unit:
   - 'sqlserver'
   - 'postgresql'
   - 'cockroachdb'
-  - 'authorizations'
-  jdkVersion: 'openjdk-jdk-11-latest'
-db-unit-authorizations:
-  directory: '.'
-  command: 'clean package -pl "engine,webapps/assembly,webapps/assembly-jakarta" -Dskip.frontend.build=true -PcfgAuthorizationCheckRevokesAlways,'
-  stash:
-    runtimeStash: true
-  labels:
-  - 'authorizations'
   jdkVersion: 'openjdk-jdk-11-latest'
 sql-scripts:
   directory: 'distro/sql-script'
   command: 'install -Pcheck-sql,'
-  stash:
-    runtimeStash: true
-  labels:
-  - 'all-db'
-  - 'db2'
-  - 'mysql'
-  - 'oracle'
-  - 'mariadb'
-  - 'sqlserver'
-  - 'postgresql'
-  - 'cockroachdb'
-upgrade-database:
-  directory: 'qa/test-db-upgrade'
-  command: 'verify -Pupgrade-db,'
   stash:
     runtimeStash: true
   labels:
@@ -130,14 +107,6 @@ engine-rest-jakarta-unit-resteasy:
     - 'rest-api'
   nodeLabel: 'h2'
   jdkVersion: 'openjdk-jdk-17-latest'
-engine-rest-unit-cxf:
-  directory: 'engine-rest/engine-rest'
-  command: 'clean install -Pcxf'
-  stash:
-    runtimeStash: true
-  labels:
-  - 'rest-api'
-  nodeLabel: 'h2'
 engine-rest-unit-compatibility-wildfly:
   directory: 'engine-rest/engine-rest'
   command: 'clean install -Pwildfly-compatibility'

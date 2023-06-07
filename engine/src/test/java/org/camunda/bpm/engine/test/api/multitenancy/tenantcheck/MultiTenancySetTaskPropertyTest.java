@@ -24,19 +24,20 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.util.ClockTestUtil;
 import org.camunda.bpm.engine.test.util.MethodInvocation;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.test.util.TriConsumer;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -105,8 +106,8 @@ public class MultiTenancySetTaskPropertyTest {
         { "setPriority", setPriority, 1, "taskPriority"},
         { "setName", setName, "name", "taskName" },
         { "setDescription", setDescription, "description", "taskDescription" },
-        { "setDueDate", setDueDate, DateTime.now().toDate(), "dueDate" },
-        { "setFollowUpDate", setFollowUpDate, DateTime.now().toDate(), "followUpDate" }
+        { "setDueDate", setDueDate, ClockTestUtil.setClockToDateWithoutMilliseconds(), "dueDate" },
+        { "setFollowUpDate", setFollowUpDate, ClockTestUtil.setClockToDateWithoutMilliseconds(), "followUpDate" }
     });
   }
 

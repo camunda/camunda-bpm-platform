@@ -43,8 +43,8 @@ import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElem
 /**
  * NOTE:
  * copied from
- * <a href="https://github.com/camunda/camunda-bpm-platform/blob/master/qa/integration-tests-webapps/integration-tests/src/test/java/org/camunda/bpm/LoginIT.java">platform</a>
- * then added <code>@BeforeClass</code> and <code>@AfterClass</code> methods for container setup
+ * <a href="https://github.com/camunda/camunda-bpm-platform/blob/master/qa/integration-tests-webapps/integration-tests/src/main/java/org/camunda/bpm/LoginIT.java">platform</a>
+ * then added <code>@BeforeParam</code> and <code>@AfterParam</code> methods for container setup
  * and <code>@Parameters</code> for different setups, might be removed with https://jira.camunda.com/browse/CAM-11379
  */
 @RunWith(Parameterized.class)

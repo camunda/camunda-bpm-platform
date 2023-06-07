@@ -20,7 +20,6 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.DecisionService;
@@ -153,7 +152,14 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
 
   @Override
   public void starting(Description description) {
-    deploymentId = TestHelper.annotationDeploymentSetUp(processEngine, description.getTestClass(), description.getMethodName(),
+    String methodName = description.getMethodName();
+    if (methodName != null) {
+      // cut off method variant suffix "[variant name]" for parameterized tests
+      int methodNameVariantStart = description.getMethodName().indexOf('[');
+      int methodNameEnd = methodNameVariantStart < 0 ? description.getMethodName().length() : methodNameVariantStart;
+      methodName = description.getMethodName().substring(0, methodNameEnd);
+    }
+    deploymentId = TestHelper.annotationDeploymentSetUp(processEngine, description.getTestClass(), methodName,
         description.getAnnotation(Deployment.class));
   }
 

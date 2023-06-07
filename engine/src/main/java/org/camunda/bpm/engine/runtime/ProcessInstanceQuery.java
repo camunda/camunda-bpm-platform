@@ -19,7 +19,7 @@ package org.camunda.bpm.engine.runtime;
 import java.io.Serializable;
 import java.util.Set;
 
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.query.Query;
 
@@ -32,23 +32,31 @@ import org.camunda.bpm.engine.query.Query;
  */
 public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, ProcessInstance> {
 
-  /** Select the process instance with the given id */
+  /**
+   * Select the process instance with the given id
+   */
   ProcessInstanceQuery processInstanceId(String processInstanceId);
 
-  /** Select process instances whose id is in the given set of ids */
+  /**
+   * Select process instances whose id is in the given set of ids
+   */
   ProcessInstanceQuery processInstanceIds(Set<String> processInstanceIds);
 
-  /** Select process instances with the given business key */
+  /**
+   * Select process instances with the given business key
+   */
   ProcessInstanceQuery processInstanceBusinessKey(String processInstanceBusinessKey);
 
-  /** Select process instance with the given business key, unique for the given process definition */
+  /**
+   * Select process instance with the given business key, unique for the given process definition
+   */
   ProcessInstanceQuery processInstanceBusinessKey(String processInstanceBusinessKey, String processDefinitionKey);
 
   /**
    * Select process instances with a business key like the given value.
    *
    * @param processInstanceBusinessKeyLike The string can include the wildcard character '%' to express
-   *    like-strategy: starts with (string%), ends with (%string) or contains (%string%).
+   *                                       like-strategy: starts with (string%), ends with (%string) or contains (%string%).
    */
   ProcessInstanceQuery processInstanceBusinessKeyLike(String processInstanceBusinessKeyLike);
 
@@ -63,7 +71,9 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
    */
   ProcessInstanceQuery processDefinitionKeyIn(String... processDefinitionKeys);
 
-  /** Select historic process instances that don't have a process-definition of which the key is present in the given list */
+  /**
+   * Select historic process instances that don't have a process-definition of which the key is present in the given list
+   */
   ProcessInstanceQuery processDefinitionKeyNotIn(String... processDefinitionKeys);
 
   /**
@@ -74,6 +84,7 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
 
   /**
    * Selects the process instances which belong to the given deployment id.
+   *
    * @since 7.4
    */
   ProcessInstanceQuery deploymentId(String deploymentId);
@@ -125,10 +136,11 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
 
   /**
    * Only select process instances which have a global variable with the given value. The type
-   * of variable is determined based on the value, using types configured in
-   * {@link ProcessEngineConfiguration#getVariableSerializers()}.
+   * of the variable is determined based on the value, using types configured in
+   * {@link ProcessEngineConfigurationImpl#getVariableSerializers()}.
    * Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
    * are not supported.
+   *
    * @param name name of the variable, cannot be null.
    */
   ProcessInstanceQuery variableValueEquals(String name, Object value);
@@ -138,16 +150,17 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
    * with a different value than the passed value.
    * Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
    * are not supported.
+   *
    * @param name name of the variable, cannot be null.
    */
   ProcessInstanceQuery variableValueNotEquals(String name, Object value);
-
 
   /**
    * Only select process instances which have a variable value greater than the passed value.
    * Booleans, Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
    * are not supported.
-   * @param name variable name, cannot be null.
+   *
+   * @param name  variable name, cannot be null.
    * @param value variable value, cannot be null.
    */
   ProcessInstanceQuery variableValueGreaterThan(String name, Object value);
@@ -156,7 +169,8 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
    * Only select process instances which have a global variable value greater than or equal to
    * the passed value. Booleans, Byte-arrays and {@link Serializable} objects (which
    * are not primitive type wrappers) are not supported.
-   * @param name variable name, cannot be null.
+   *
+   * @param name  variable name, cannot be null.
    * @param value variable value, cannot be null.
    */
   ProcessInstanceQuery variableValueGreaterThanOrEqual(String name, Object value);
@@ -165,7 +179,8 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
    * Only select process instances which have a global variable value less than the passed value.
    * Booleans, Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
    * are not supported.
-   * @param name variable name, cannot be null.
+   *
+   * @param name  variable name, cannot be null.
    * @param value variable value, cannot be null.
    */
   ProcessInstanceQuery variableValueLessThan(String name, Object value);
@@ -174,7 +189,8 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
    * Only select process instances which have a global variable value less than or equal to the passed value.
    * Booleans, Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
    * are not supported.
-   * @param name variable name, cannot be null.
+   *
+   * @param name  variable name, cannot be null.
    * @param value variable value, cannot be null.
    */
   ProcessInstanceQuery variableValueLessThanOrEqual(String name, Object value);
@@ -182,10 +198,11 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
   /**
    * Only select process instances which have a global variable value like the given value.
    * This be used on string variables only.
-   * @param name variable name, cannot be null.
+   *
+   * @param name  variable name, cannot be null.
    * @param value variable value, cannot be null. The string can include the
-   * wildcard character '%' to express like-strategy:
-   * starts with (string%), ends with (%string) or contains (%string%).
+   *              wildcard character '%' to express like-strategy:
+   *              starts with (string%), ends with (%string) or contains (%string%).
    */
   ProcessInstanceQuery variableValueLike(String name, String value);
 
@@ -228,10 +245,14 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
    */
   ProcessInstanceQuery incidentMessageLike(String incidentMessageLike);
 
-  /** Only select process instances with one of the given tenant ids. */
+  /**
+   * Only select process instances with one of the given tenant ids.
+   */
   ProcessInstanceQuery tenantIdIn(String... tenantIds);
 
-  /** Only selects process instances which have no tenant id. */
+  /**
+   * Only selects process instances which have no tenant id.
+   */
   ProcessInstanceQuery withoutTenantId();
 
   /**
@@ -245,24 +266,36 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
    */
   ProcessInstanceQuery activityIdIn(String... activityIds);
 
-  /** Only selects process instances which are top level process instances. */
+  /**
+   * Only selects process instances which are top level process instances.
+   */
   ProcessInstanceQuery rootProcessInstances();
 
-  /** Only selects process instances which don't have subprocesses and thus are leaves of the execution tree. */
+  /**
+   * Only selects process instances which don't have subprocesses and thus are leaves of the execution tree.
+   */
   ProcessInstanceQuery leafProcessInstances();
 
-  /** Only selects process instances which process definition has no tenant id. */
+  /**
+   * Only selects process instances which process definition has no tenant id.
+   */
   ProcessInstanceQuery processDefinitionWithoutTenantId();
 
   //ordering /////////////////////////////////////////////////////////////////
 
-  /** Order by id (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  /**
+   * Order by id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   */
   ProcessInstanceQuery orderByProcessInstanceId();
 
-  /** Order by process definition key (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  /**
+   * Order by process definition key (needs to be followed by {@link #asc()} or {@link #desc()}).
+   */
   ProcessInstanceQuery orderByProcessDefinitionKey();
 
-  /** Order by process definition id (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  /**
+   * Order by process definition id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   */
   ProcessInstanceQuery orderByProcessDefinitionId();
 
   /**
@@ -271,7 +304,9 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
    */
   ProcessInstanceQuery orderByTenantId();
 
-  /** Order by the business key (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  /**
+   * Order by the business key (needs to be followed by {@link #asc()} or {@link #desc()}).
+   */
   ProcessInstanceQuery orderByBusinessKey();
 
   /**
@@ -281,11 +316,10 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
    *
    * @return an object of the type {@link ProcessInstanceQuery} on which an arbitrary amount of filter criteria could be applied.
    * The several filter criteria will be linked together by an OR expression.
-   *
    * @throws ProcessEngineException when or() has been invoked directly after or() or after or() and trailing filter
-   * criteria. To prevent throwing this exception, {@link #endOr()} must be invoked after a chain of filter criteria to
-   * mark the end of the OR query.
-   * */
+   *                                criteria. To prevent throwing this exception, {@link #endOr()} must be invoked after a chain of filter criteria to
+   *                                mark the end of the OR query.
+   */
   ProcessInstanceQuery or();
 
   /**
@@ -295,9 +329,8 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
    *
    * @return an object of the type {@link ProcessInstanceQuery} on which an arbitrary amount of filter criteria could be applied.
    * The filter criteria will be linked together by an AND expression.
-   *
    * @throws ProcessEngineException when endOr() has been invoked before {@link #or()} was invoked. To prevent throwing
-   * this exception, {@link #or()} must be invoked first.
-   * */
+   *                                this exception, {@link #or()} must be invoked first.
+   */
   ProcessInstanceQuery endOr();
 }

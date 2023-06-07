@@ -20,7 +20,6 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import javax.sql.DataSource;
-
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.identity.PasswordPolicy;
@@ -259,6 +258,7 @@ public abstract class ProcessEngineConfiguration {
   protected Object jpaEntityManagerFactory;
   protected boolean jpaHandleTransaction;
   protected boolean jpaCloseEntityManager;
+
   protected int defaultNumberOfRetries = JobEntity.DEFAULT_RETRIES;
 
   protected ClassLoader classLoader;

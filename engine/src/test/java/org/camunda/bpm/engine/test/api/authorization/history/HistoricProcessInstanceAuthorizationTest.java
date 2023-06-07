@@ -28,7 +28,6 @@ import static org.junit.Assert.fail;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import org.apache.commons.lang3.time.DateUtils;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -42,7 +41,6 @@ import org.camunda.bpm.engine.history.CleanableHistoricProcessInstanceReportResu
 import org.camunda.bpm.engine.history.DurationReportResult;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
-import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.query.PeriodUnit;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -66,6 +64,7 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
 
   protected String deploymentId;
 
+  @Override
   @Before
   public void setUp() throws Exception {
     deploymentId = testRule.deploy(
@@ -75,6 +74,7 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
     super.setUp();
   }
 
+  @Override
   @After
   public void tearDown() {
     super.tearDown();
@@ -141,6 +141,20 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
 
     // then
     verifyQueryResults(query, 1);
+  }
+
+  @Test
+  public void shouldNotFindInstanceWithRevokedReadHistoryPermissionOnAnyProcessDefinition() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY).getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, ANY, READ_HISTORY);
+    createRevokeAuthorization(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
+
+    // when
+    HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
+
+    // then
+    verifyQueryResults(query, 0);
   }
 
   // historic process instance query (multiple process instances) ////////////////////////
@@ -653,6 +667,23 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
   }
 
   @Test
+  public void shouldNotFindCleanupReportWithRevokedReadHistoryPermissionOnProcessDefinition() {
+    // given
+    prepareProcessInstances(PROCESS_KEY, -6, 5, 10);
+
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, Permissions.READ, Permissions.READ_HISTORY);
+    createRevokeAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, Permissions.READ_HISTORY);
+
+    List<CleanableHistoricProcessInstanceReportResult> reportResults = historyService.createCleanableHistoricProcessInstanceReport().list();
+
+    // then
+    assertEquals(1, reportResults.size());
+    assertEquals(MESSAGE_START_PROCESS_KEY, reportResults.get(0).getProcessDefinitionKey());
+    assertEquals(0, reportResults.get(0).getCleanableProcessInstanceCount());
+    assertEquals(0, reportResults.get(0).getFinishedProcessInstanceCount());
+  }
+
+  @Test
   public void testCheckAllHistoricProcessInstancePermissions() {
     // given
     processEngineConfiguration.setEnableHistoricInstancePermissions(true);
@@ -875,10 +906,6 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
   }
 
   // helper ////////////////////////////////////////////////////////
-
-  protected void verifyQueryResults(HistoricProcessInstanceQuery query, int countExpected) {
-    verifyQueryResults((AbstractQuery<?, ?>) query, countExpected);
-  }
 
   protected void prepareProcessInstances(String key, int daysInThePast, Integer historyTimeToLive, int instanceCount) {
     ProcessDefinition processDefinition = selectProcessDefinitionByKey(key);

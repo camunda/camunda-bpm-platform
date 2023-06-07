@@ -21,13 +21,13 @@ import static org.camunda.bpm.engine.authorization.Resources.TASK;
 import static org.camunda.bpm.engine.authorization.TaskPermissions.UPDATE_VARIABLE;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationScenario.scenario;
 import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.grant;
+import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationSpec.revoke;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.util.Arrays;
 import java.util.Collection;
-
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RuntimeService;
@@ -102,7 +102,14 @@ public class StandaloneTaskAuthorizationTest {
       scenario()
         .withAuthorizations(
           grant(TASK, "*", userId, UPDATE_VARIABLE))
-        .succeeds()
+        .succeeds(),
+      scenario()
+        .withAuthorizations(
+          grant(TASK, "*", "*", UPDATE),
+          revoke(TASK, "taskId", userId, UPDATE))
+        .failsDueToRequired(
+          grant(TASK, "taskId", userId, UPDATE),
+          grant(TASK, "taskId", userId, UPDATE_VARIABLE))
       );
   }
 

@@ -22,7 +22,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 import java.util.List;
-
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -32,6 +31,7 @@ import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.FilterEntity;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
@@ -265,6 +265,60 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTest {
   }
 
   @Test
+  public void shouldNotFindFilterWithRevokedReadPermissionOnAnyFilter() {
+    Filter filter = createTestFilter();
+
+    grantReadFilter(filter.getId());
+    revokeReadFilter(filter.getId());
+
+    long count = filterService.createFilterQuery().count();
+    assertEquals(0, count);
+
+    Filter returnedFilter = filterService.createFilterQuery().filterId(filter.getId()).singleResult();
+    assertNull(returnedFilter);
+
+    try {
+      filterService.getFilter(filter.getId());
+      fail("Exception expected");
+    }
+    catch (AuthorizationException e) {
+      // expected
+    }
+
+    try {
+      filterService.singleResult(filter.getId());
+      fail("Exception expected");
+    }
+    catch (AuthorizationException e) {
+      // expected
+    }
+
+    try {
+      filterService.list(filter.getId());
+      fail("Exception expected");
+    }
+    catch (AuthorizationException e) {
+      // expected
+    }
+
+    try {
+      filterService.listPage(filter.getId(), 1, 2);
+      fail("Exception expected");
+    }
+    catch (AuthorizationException e) {
+      // expected
+    }
+
+    try {
+      filterService.count(filter.getId());
+      fail("Exception expected");
+    }
+    catch (AuthorizationException e) {
+      // expected
+    }
+  }
+
+  @Test
   public void testReadFilterPermittedWithMultiple() {
     Filter filter = createTestFilter();
 
@@ -416,6 +470,11 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTest {
     assertFilterPermission(Permissions.READ, testUser, filterId, true);
   }
 
+  protected void revokeReadFilter(String filterId) {
+    revokeFilterPermission(readAuthorization, filterId);
+    assertFilterPermission(Permissions.READ, testUser, filterId, false);
+  }
+
   protected void grantDeleteFilter(String filterId) {
     grantFilterPermission(deleteAuthorization, filterId);
     assertFilterPermission(Permissions.DELETE, testUser, filterId, true);
@@ -425,6 +484,14 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTest {
     if (filterId != null) {
       authorization.setResourceId(filterId);
     }
+    authorizationService.saveAuthorization(authorization);
+  }
+
+  protected void revokeFilterPermission(Authorization authorization, String filterId) {
+    if (filterId != null) {
+      authorization.setResourceId(filterId);
+    }
+    ((AuthorizationEntity) authorization).setAuthorizationType(Authorization.AUTH_TYPE_REVOKE);
     authorizationService.saveAuthorization(authorization);
   }
 

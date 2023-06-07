@@ -18,34 +18,45 @@ package org.camunda.bpm.engine.runtime;
 
 import java.io.Serializable;
 
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.query.Query;
 
-
-
-/** Allows programmatic querying of {@link Execution}s.
+/**
+ * Allows programmatic querying of {@link Execution}s.
  *
  * @author Joram Barrez
  * @author Frederik Heremans
  */
-public interface ExecutionQuery extends Query<ExecutionQuery, Execution>{
+public interface ExecutionQuery extends Query<ExecutionQuery, Execution> {
 
-  /** Only select executions which have the given process definition key. **/
+  /**
+   * Only select executions which have the given process definition key.
+   **/
   ExecutionQuery processDefinitionKey(String processDefinitionKey);
 
-  /** Only select executions which have the given process definition id. **/
+  /**
+   * Only select executions which have the given process definition id.
+   **/
   ExecutionQuery processDefinitionId(String processDefinitionId);
 
-  /** Only select executions which have the given process instance id. **/
+  /**
+   * Only select executions which have the given process instance id.
+   **/
   ExecutionQuery processInstanceId(String processInstanceId);
 
-  /** Only select executions that belong to a process instance with the given business key */
+  /**
+   * Only select executions that belong to a process instance with the given business key
+   */
   ExecutionQuery processInstanceBusinessKey(String processInstanceBusinessKey);
 
-  /** Only select executions with the given id. **/
+  /**
+   * Only select executions with the given id.
+   **/
   ExecutionQuery executionId(String executionId);
 
-  /** Only select executions which contain an activity with the given id. **/
+  /**
+   * Only select executions which contain an activity with the given id.
+   **/
   ExecutionQuery activityId(String activityId);
 
   /**
@@ -61,9 +72,10 @@ public interface ExecutionQuery extends Query<ExecutionQuery, Execution>{
   /**
    * Only select executions which have a local variable with the given value. The type
    * of variable is determined based on the value, using types configured in
-   * {@link ProcessEngineConfiguration#getVariableSerializers()}.
+   * {@link ProcessEngineConfigurationImpl#getVariableSerializers()}.
    * Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
    * are not supported.
+   *
    * @param name name of the variable, cannot be null.
    */
   ExecutionQuery variableValueEquals(String name, Object value);
@@ -73,16 +85,17 @@ public interface ExecutionQuery extends Query<ExecutionQuery, Execution>{
    * with a different value than the passed value.
    * Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
    * are not supported.
+   *
    * @param name name of the variable, cannot be null.
    */
   ExecutionQuery variableValueNotEquals(String name, Object value);
-
 
   /**
    * Only select executions which have a local variable value greater than the passed value.
    * Booleans, Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
    * are not supported.
-   * @param name variable name, cannot be null.
+   *
+   * @param name  variable name, cannot be null.
    * @param value variable value, cannot be null.
    */
   ExecutionQuery variableValueGreaterThan(String name, Object value);
@@ -91,7 +104,8 @@ public interface ExecutionQuery extends Query<ExecutionQuery, Execution>{
    * Only select executions which have a local variable value greater than or equal to
    * the passed value. Booleans, Byte-arrays and {@link Serializable} objects (which
    * are not primitive type wrappers) are not supported.
-   * @param name variable name, cannot be null.
+   *
+   * @param name  variable name, cannot be null.
    * @param value variable value, cannot be null.
    */
   ExecutionQuery variableValueGreaterThanOrEqual(String name, Object value);
@@ -100,7 +114,8 @@ public interface ExecutionQuery extends Query<ExecutionQuery, Execution>{
    * Only select executions which have a local variable value less than the passed value.
    * Booleans, Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
    * are not supported.
-   * @param name variable name, cannot be null.
+   *
+   * @param name  variable name, cannot be null.
    * @param value variable value, cannot be null.
    */
   ExecutionQuery variableValueLessThan(String name, Object value);
@@ -109,7 +124,8 @@ public interface ExecutionQuery extends Query<ExecutionQuery, Execution>{
    * Only select executions which have a local variable value less than or equal to the passed value.
    * Booleans, Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers)
    * are not supported.
-   * @param name variable name, cannot be null.
+   *
+   * @param name  variable name, cannot be null.
    * @param value variable value, cannot be null.
    */
   ExecutionQuery variableValueLessThanOrEqual(String name, Object value);
@@ -117,10 +133,11 @@ public interface ExecutionQuery extends Query<ExecutionQuery, Execution>{
   /**
    * Only select executions which have a local variable value like the given value.
    * This be used on string variables only.
-   * @param name variable name, cannot be null.
+   *
+   * @param name  variable name, cannot be null.
    * @param value variable value, cannot be null. The string can include the
-   * wildcard character '%' to express like-strategy:
-   * starts with (string%), ends with (%string) or contains (%string%).
+   *              wildcard character '%' to express like-strategy:
+   *              starts with (string%), ends with (%string) or contains (%string%).
    */
   ExecutionQuery variableValueLike(String name, String value);
 
@@ -149,7 +166,7 @@ public interface ExecutionQuery extends Query<ExecutionQuery, Execution>{
   /**
    * Only select executions which have a signal event subscription
    * for the given signal name.
-   *
+   * <p>
    * (The signalName is specified using the 'name' attribute of the signal element
    * in the BPMN 2.0 XML.)
    *
@@ -160,7 +177,7 @@ public interface ExecutionQuery extends Query<ExecutionQuery, Execution>{
   /**
    * Only select executions which have a message event subscription
    * for the given messageName.
-   *
+   * <p>
    * (The messageName is specified using the 'name' attribute of the message element
    * in the BPMN 2.0 XML.)
    *
@@ -205,25 +222,37 @@ public interface ExecutionQuery extends Query<ExecutionQuery, Execution>{
    */
   ExecutionQuery incidentMessageLike(String incidentMessageLike);
 
-   /** Only selects executions with one of the given tenant ids. */
+  /**
+   * Only selects executions with one of the given tenant ids.
+   */
   ExecutionQuery tenantIdIn(String... tenantIds);
 
-  /** Only selects executions which have no tenant id. */
+  /**
+   * Only selects executions which have no tenant id.
+   */
   ExecutionQuery withoutTenantId();
 
   //ordering //////////////////////////////////////////////////////////////
 
-  /** Order by id (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  /**
+   * Order by id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   */
   ExecutionQuery orderByProcessInstanceId();
 
-  /** Order by process definition key (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  /**
+   * Order by process definition key (needs to be followed by {@link #asc()} or {@link #desc()}).
+   */
   ExecutionQuery orderByProcessDefinitionKey();
 
-  /** Order by process definition id (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  /**
+   * Order by process definition id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   */
   ExecutionQuery orderByProcessDefinitionId();
 
-  /** Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
-   * Note that the ordering of executions without tenant id is database-specific. */
+  /**
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Note that the ordering of executions without tenant id is database-specific.
+   */
   ExecutionQuery orderByTenantId();
 
 }
