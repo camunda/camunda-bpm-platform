@@ -38,7 +38,6 @@
       <id>distro</id>
       <activation>
         <activeByDefault>true</activeByDefault>
-        <jdk>[17,)</jdk>
       </activation>
       <modules>
         <module>core</module>
