@@ -75,6 +75,13 @@ define('camunda-welcome-bootstrap', function() {
       var pluginPackages = window.PLUGIN_PACKAGES || [];
       var pluginDependencies = window.PLUGIN_DEPENDENCIES || [];
 
+      pluginPackages = pluginPackages.filter(el =>
+        el.name.startsWith('welcome-plugin-legacy')
+      );
+      pluginDependencies = pluginDependencies.filter(el =>
+        el.requirePackageName.startsWith('welcome-plugin-legacy')
+      );
+
       pluginPackages.forEach(function(plugin) {
         var node = document.createElement('link');
         node.setAttribute('rel', 'stylesheet');
