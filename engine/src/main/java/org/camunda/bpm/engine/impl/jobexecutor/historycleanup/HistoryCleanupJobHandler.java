@@ -49,11 +49,15 @@ public class HistoryCleanupJobHandler implements JobHandler<HistoryCleanupJobHan
 
   }
 
+  protected HistoryCleanupRemovalTime getTimeBasedHandler() {
+    return new HistoryCleanupRemovalTime();
+  }
+
   protected HistoryCleanupHandler initCleanupHandler(HistoryCleanupJobHandlerConfiguration configuration, CommandContext commandContext) {
     HistoryCleanupHandler cleanupHandler = null;
 
     if (isHistoryCleanupStrategyRemovalTimeBased(commandContext)) {
-      cleanupHandler = new HistoryCleanupRemovalTime();
+      cleanupHandler = getTimeBasedHandler();
     } else {
       cleanupHandler = new HistoryCleanupBatch();
     }

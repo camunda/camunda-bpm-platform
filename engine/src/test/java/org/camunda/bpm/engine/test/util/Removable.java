@@ -98,8 +98,6 @@ public final class Removable {
   }
 
   public static Removable of(ProcessEngine engine) {
-    Objects.requireNonNull(engine);
-
     return new Removable(engine);
   }
 
@@ -107,7 +105,7 @@ public final class Removable {
    * Removes the associated mapped entities from the db for the given class.
    *
    * @param clazz the given class to delete associated entities for
-   * @throws Exception in case anything fails during the process of deletion
+   * @throws EntityRemoveException in case anything fails during the process of deletion
    */
   public void remove(Class<?> clazz) throws EntityRemoveException {
     Objects.requireNonNull(clazz, "remove does not accept null arguments");
@@ -116,6 +114,10 @@ public final class Removable {
 
     if (runnable == null) {
       throw new UnsupportedOperationException("class " + clazz.getName() + " is not supported yet for Removal");
+    }
+
+    if (!isInitialized()) {
+      throw new EntityRemoveException("Removable is not initialized");
     }
 
     try {
@@ -129,7 +131,7 @@ public final class Removable {
    * Removes the associated mapped entities from the db for the given classes.
    *
    * @param classes the given classes to delete associated entities for
-   * @throws Exception in case anything fails during the process of deletion for any of the classes
+   * @throws EntityRemoveException in case anything fails during the process of deletion for any of the classes
    */
   public void remove(Class<?>[] classes) throws EntityRemoveException {
     Objects.requireNonNull(classes, "remove does not accept null arguments");
@@ -142,7 +144,7 @@ public final class Removable {
   /**
    * Removes associated mapped entities for all known classes.
    *
-   * @throws Exception in case anything fails during the process of deletion for any of the classes
+   * @throws EntityRemoveException in case anything fails during the process of deletion for any of the classes
    */
   public void removeAll() throws EntityRemoveException {
     try {
@@ -288,6 +290,10 @@ public final class Removable {
     });
   }
 
+  public boolean isInitialized() {
+    return engine != null;
+  }
+
 }
 
 /**
@@ -296,6 +302,10 @@ public final class Removable {
 class EntityRemoveException extends RuntimeException {
   public EntityRemoveException(Exception e) {
     super(e);
+  }
+
+  public EntityRemoveException(String message) {
+    super(message);
   }
 }
 
