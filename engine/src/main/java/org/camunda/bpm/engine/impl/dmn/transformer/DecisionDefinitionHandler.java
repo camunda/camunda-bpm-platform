@@ -16,6 +16,8 @@
  */
 package org.camunda.bpm.engine.impl.dmn.transformer;
 
+import java.util.Optional;
+import java.util.function.Function;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionImpl;
 import org.camunda.bpm.dmn.engine.impl.spi.transform.DmnElementTransformContext;
 import org.camunda.bpm.dmn.engine.impl.transform.DmnDecisionTransformHandler;
@@ -24,6 +26,15 @@ import org.camunda.bpm.engine.impl.util.ParseUtil;
 import org.camunda.bpm.model.dmn.instance.Decision;
 
 public class DecisionDefinitionHandler extends DmnDecisionTransformHandler {
+
+  protected final Integer configuredHistoryTTL;
+  protected Function<String, Integer> parseFunction = ParseUtil::parseHistoryTimeToLive;
+
+  public DecisionDefinitionHandler(String configuredHistoryTTL) {
+    this.configuredHistoryTTL = Optional.ofNullable(configuredHistoryTTL)
+        .map(parseFunction)
+        .orElse(null);
+  }
 
   @Override
   protected DmnDecisionImpl createDmnElement() {
@@ -36,10 +47,24 @@ public class DecisionDefinitionHandler extends DmnDecisionTransformHandler {
 
     String category = context.getModelInstance().getDefinitions().getNamespace();
     decisionDefinition.setCategory(category);
-    decisionDefinition.setHistoryTimeToLive(ParseUtil.parseHistoryTimeToLive(decision.getCamundaHistoryTimeToLiveString()));
+    decisionDefinition.setHistoryTimeToLive(getEffectiveHistoryTimeToLive(decision));
     decisionDefinition.setVersionTag(decision.getVersionTag());
 
     return decisionDefinition;
+  }
+
+  protected Integer getEffectiveHistoryTimeToLive(Decision decision) {
+
+    if (!hasNullTTLConfigured(decision)) {
+      return parseFunction.apply(decision.getCamundaHistoryTimeToLiveString());
+    }
+
+    return configuredHistoryTTL;
+  }
+
+  private boolean hasNullTTLConfigured(Decision decision) {
+    return decision.getCamundaHistoryTimeToLiveString() == null
+        || "null".equals(decision.getCamundaHistoryTimeToLiveString());
   }
 
 }
