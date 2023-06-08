@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./cam-tasklist-task-detail-history-plugin.html')();
+var template = require('./cam-tasklist-task-detail-history-plugin.html?raw');
 
 var jquery = require('jquery');
 var moment = require('camunda-commons-ui/vendor/moment');

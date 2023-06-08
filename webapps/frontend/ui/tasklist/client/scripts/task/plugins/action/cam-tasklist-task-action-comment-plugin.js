@@ -17,8 +17,8 @@
 
 'use strict';
 
-var addCommentTemplate = require('./cam-tasklist-task-action-comment-plugin.html')();
-var addCommentFormTemplate = require('./modals/cam-tasklist-comment-form.html')();
+var addCommentTemplate = require('./cam-tasklist-task-action-comment-plugin.html?raw');
+var addCommentFormTemplate = require('./modals/cam-tasklist-comment-form.html?raw');
 
 var Controller = [
   '$scope',

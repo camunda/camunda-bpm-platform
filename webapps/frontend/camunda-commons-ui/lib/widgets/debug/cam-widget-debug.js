@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./cam-widget-debug.html')();
+var template = require('./cam-widget-debug.html?raw');
 
 module.exports = [
   function() {

@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./cam-toolbar.html')();
+var template = require('./cam-toolbar.html?raw');
 
 module.exports = function() {
   return {

@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./process-instance.html')();
+var template = require('./process-instance.html?raw');
 
 var angular = require('camunda-commons-ui/vendor/angular');
 var commonModule = require('../../../../common/scripts/module');

@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./diagram-statistics-loader.html')();
+var template = require('./diagram-statistics-loader.html?raw');
 
 module.exports = [
   'Loaders',

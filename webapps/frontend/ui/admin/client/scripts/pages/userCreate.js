@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./userCreate.html')();
+var template = require('./userCreate.html?raw');
 
 var Controller = [
   '$scope',

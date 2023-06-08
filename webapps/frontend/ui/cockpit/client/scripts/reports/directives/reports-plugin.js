@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./reports-plugin.html')();
+var template = require('./reports-plugin.html?raw');
 
 module.exports = [
   function() {

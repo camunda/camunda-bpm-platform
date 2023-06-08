@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./breadcrumbs.html')();
+var template = require('./breadcrumbs.html?raw');
 
 module.exports = [
   '$location',

@@ -19,8 +19,8 @@
 
 var angular = require('camunda-bpm-sdk-js/vendor/angular'),
   typeUtils = require('camunda-bpm-sdk-js/lib/forms/type-util'),
-  templateDialog = require('./cam-widget-variable-dialog.html')(),
-  templateStringDialog = require('./cam-widget-string-dialog.html')();
+  templateDialog = require('./cam-widget-variable-dialog.html?raw'),
+  templateStringDialog = require('./cam-widget-string-dialog.html?raw');
 
 var varUtils = {};
 

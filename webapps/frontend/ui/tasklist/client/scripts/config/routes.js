@@ -17,7 +17,7 @@
 
 'use strict';
 
-var tasklistTemplate = require('./../index.html')();
+var tasklistTemplate = require('./../index.html?raw');
 
 module.exports = [
   '$routeProvider',

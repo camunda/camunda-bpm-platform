@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./users.html')();
+var template = require('./users.html?raw');
 var searchConfig = require('./users-search-plugin-config.json');
 
 var debouncePromiseFactory = require('camunda-bpm-sdk-js').utils

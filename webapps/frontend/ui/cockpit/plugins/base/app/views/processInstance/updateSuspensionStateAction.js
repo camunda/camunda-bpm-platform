@@ -17,8 +17,8 @@
 
 'use strict';
 
-var actionTemplate = require('./update-suspension-state-action.html')();
-var dialogTemplate = require('./update-suspension-state-dialog.html')();
+var actionTemplate = require('./update-suspension-state-action.html?raw');
+var dialogTemplate = require('./update-suspension-state-dialog.html?raw');
 var angular = require('angular');
 
 var Configuration = function PluginConfiguration(ViewsProvider) {

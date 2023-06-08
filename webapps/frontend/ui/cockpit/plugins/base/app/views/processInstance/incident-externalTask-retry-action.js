@@ -18,8 +18,8 @@
 'use strict';
 
 var angular = require('angular');
-var actionTemplate = require('./incident-external-task-action.html')();
-var dialogTemplate = require('./job-retry-dialog.html')();
+var actionTemplate = require('./incident-external-task-action.html?raw');
+var dialogTemplate = require('./job-retry-dialog.html?raw');
 
 var Configuration = function PluginConfiguration(ViewsProvider) {
   ViewsProvider.registerDefaultView('cockpit.incident.action', {

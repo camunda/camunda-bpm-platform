@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./cam-pagination.html')();
+var template = require('./cam-pagination.html?raw');
 
 module.exports = function() {
   return {

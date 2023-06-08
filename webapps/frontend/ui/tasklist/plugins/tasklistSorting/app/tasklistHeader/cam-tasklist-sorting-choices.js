@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./cam-tasklist-sorting-choices.html')();
+var template = require('./cam-tasklist-sorting-choices.html?raw');
 
 var angular = require('camunda-commons-ui/vendor/angular');
 var $ = require('jquery');

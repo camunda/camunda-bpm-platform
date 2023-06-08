@@ -19,7 +19,7 @@
 
 var Viewer = require('cmmn-js/lib/NavigatedViewer');
 
-var template = require('./cam-widget-cmmn-viewer.html')();
+var template = require('./cam-widget-cmmn-viewer.html?raw');
 
 module.exports = [
   '$compile',

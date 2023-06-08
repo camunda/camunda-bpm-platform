@@ -19,7 +19,7 @@
 
 var Clipboard = require('clipboard');
 
-var template = require('./cam-widget-clipboard.html')();
+var template = require('./cam-widget-clipboard.html?raw');
 
 module.exports = [
   '$timeout',

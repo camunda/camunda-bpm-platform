@@ -24,23 +24,26 @@ const commonConfig = require(path.resolve(__dirname, './webpack.common.js'));
 
 const {merge} = require('webpack-merge');
 const TerserPlugin = require('terser-webpack-plugin');
-const HtmlWebPackPlugin = require("html-webpack-plugin");
+const HtmlWebPackPlugin = require('html-webpack-plugin');
 const fs = require('fs');
 
 class HtmlAdditionalAttributesPlugin {
   apply(compiler) {
-    compiler.hooks.compilation.tap(HtmlAdditionalAttributesPlugin.name, compilation => {
-      HtmlWebPackPlugin.getHooks(compilation).alterAssetTags.tap(
-        HtmlAdditionalAttributesPlugin.name,
-        config => {
-          config.assetTags.scripts.forEach(script => {
-            script.attributes['$CSP_NONCE'] = true;
-            script.attributes.charset = 'UTF-8';
-          });
-          return config;
-        }
-      );
-    });
+    compiler.hooks.compilation.tap(
+      HtmlAdditionalAttributesPlugin.name,
+      compilation => {
+        HtmlWebPackPlugin.getHooks(compilation).alterAssetTags.tap(
+          HtmlAdditionalAttributesPlugin.name,
+          config => {
+            config.assetTags.scripts.forEach(script => {
+              script.attributes['$CSP_NONCE'] = true;
+              script.attributes.charset = 'UTF-8';
+            });
+            return config;
+          }
+        );
+      }
+    );
   }
 }
 
@@ -103,5 +106,18 @@ module.exports = () => {
     }
   };
 
-  return merge(commonConfig, productionConfig);
+  const merged = merge(commonConfig, productionConfig);
+
+  merged.plugins.forEach(plugin => {
+    if (plugin instanceof HtmlWebPackPlugin) {
+      plugin.userOptions = {
+        ...plugin.userOptions,
+        appRoot: '$APP_ROOT',
+        base: '$BASE',
+        pluginDeps: '$PLUGIN_DEPENDENCIES',
+        pluginPackages: '$PLUGIN_PACKAGES'
+      };
+    }
+  });
+  return merged;
 };

@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./cam-widget-footer.html')();
+var template = require('./cam-widget-footer.html?raw');
 
 module.exports = [
   function() {

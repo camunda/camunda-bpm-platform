@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./setup.html')();
+var template = require('./setup.html?raw');
 
 var Controller = [
   '$scope',

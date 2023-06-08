@@ -17,7 +17,7 @@
 
 'use strict';
 
-const template = require('./cam-annotation-edit.html')();
+const template = require('./cam-annotation-edit.html?raw');
 const annotationModal = require('./cam-annotation-modal');
 
 module.exports = [

@@ -19,8 +19,8 @@
 
 var angular = require('angular');
 
-var template = require('./incidents-tab.html')();
-var inspectTemplate = require('./incidents-tab-stacktrace.html')();
+var template = require('./incidents-tab.html?raw');
+var inspectTemplate = require('./incidents-tab-stacktrace.html?raw');
 
 var debouncePromiseFactory = require('camunda-bpm-sdk-js').utils
   .debouncePromiseFactory;

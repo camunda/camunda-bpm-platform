@@ -20,7 +20,7 @@
 const angular = require('angular');
 const modalDialog = require('./time-to-live-dialog');
 
-const template = require('./time-to-live.html')();
+const template = require('./time-to-live.html?raw');
 
 module.exports = [
   '$translate',

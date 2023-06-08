@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./activity-instance-tree.html')();
+var template = require('./activity-instance-tree.html?raw');
 
 var angular = require('camunda-commons-ui/vendor/angular');
 

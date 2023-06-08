@@ -19,7 +19,7 @@
 
 var angular = require('angular');
 
-var template = require('./instanceCount.html')();
+var template = require('./instanceCount.html?raw');
 
 module.exports = function(
   $scope,

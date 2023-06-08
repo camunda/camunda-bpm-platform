@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./decision-list.html')();
+var template = require('./decision-list.html?raw');
 
 module.exports = [
   'ViewsProvider',

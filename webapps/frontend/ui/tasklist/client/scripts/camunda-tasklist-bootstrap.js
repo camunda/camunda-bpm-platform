@@ -27,7 +27,7 @@ import {
 
 window.define = define;
 window.require = rjsrequire;
-window.bust = '$CACHE_BUST';
+window.bust = CAMUNDA_VERSION; // eslint-disable-line
 
 //  camunda-tasklist-bootstrap is copied as-is, so we have to inline everything
 const appRoot = document.querySelector('base').getAttribute('app-root');
@@ -35,7 +35,7 @@ const baseImportPath = `${appRoot}/app/tasklist/`;
 
 requirejs.config({
   baseUrl: baseImportPath,
-  urlArgs: 'bust=$CACHE_BUST'
+  urlArgs: `bust=${CAMUNDA_VERSION}` // eslint-disable-line
 });
 
 const loadConfig = (async function() {
@@ -90,7 +90,7 @@ define('camunda-tasklist-bootstrap', function() {
         node.setAttribute('rel', 'stylesheet');
         node.setAttribute(
           'href',
-          plugin.location + '/plugin.css?bust=$CACHE_BUST'
+          plugin.location + `/plugin.css?bust=${CAMUNDA_VERSION}` // eslint-disable-line
         );
         document.head.appendChild(node);
       });

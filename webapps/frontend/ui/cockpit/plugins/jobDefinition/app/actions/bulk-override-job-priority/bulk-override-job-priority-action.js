@@ -18,8 +18,8 @@
 'use strict';
 
 var angular = require('angular');
-var actionTemplate = require('./bulk-override-job-priority-action.html')();
-var dialogTemplate = require('./bulk-override-job-priority-dialog.html')();
+var actionTemplate = require('./bulk-override-job-priority-action.html?raw');
+var dialogTemplate = require('./bulk-override-job-priority-dialog.html?raw');
 
 var Configuration = function PluginConfiguration(ViewsProvider) {
   ViewsProvider.registerDefaultView(

@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./groups.html')();
+var template = require('./groups.html?raw');
 var searchConfig = require('./groups-search-plugin-config.json');
 
 var angular = require('camunda-commons-ui/vendor/angular');

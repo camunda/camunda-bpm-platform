@@ -17,8 +17,8 @@
 
 'use strict';
 
-var dialogTemplate = require('./job-retry-bulk-dialog.html')();
-var actionTemplate = require('./job-retry-bulk-action.html')();
+var dialogTemplate = require('./job-retry-bulk-dialog.html?raw');
+var actionTemplate = require('./job-retry-bulk-action.html?raw');
 
 module.exports = function(ngModule, pluginPoint) {
   ngModule.controller('JobRetryActionController', [

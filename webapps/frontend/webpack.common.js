@@ -104,44 +104,9 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /(\.js)|(\.html)$/,
-        exclude: /node_modules/,
-        loader: 'string-replace-loader',
-        options: {
-          multiple: [
-            {
-              search: /\$CACHE_BUST/g,
-              replace: version
-            }
-          ]
-        }
-      },
-      {
-        test: /\.html$/,
-        loader: 'string-replace-loader',
-        options: {
-          multiple: [{search: /\$VERSION/g, replace: version}]
-        }
-      },
-      {
-        test: /\.html$/,
-        use: [
-          {
-            loader: 'ejs-loader',
-            options: {
-              esModule: false
-            }
-          },
-          {
-            loader: 'extract-loader'
-          },
-          {
-            loader: 'html-loader',
-            options: {
-              minimize: false
-            }
-          }
-        ]
+        test: /(\.html)|(\.svg)$/,
+        resourceQuery: /raw/,
+        type: 'asset/source'
       },
       {
         test: /\.less$/i,
@@ -157,35 +122,43 @@ module.exports = {
   plugins: [
     new HtmlWebPackPlugin({
       minify: false,
+      appName: 'cockpit',
       template: path.resolve(__dirname, 'ui/cockpit/client/scripts/index.html'),
       filename: 'app/cockpit/index.html',
       chunks: ['app/cockpit/camunda-cockpit-bootstrap'],
       favicon: path.resolve(__dirname, 'ui/common/images/favicon.ico'),
-      publicPath: '$APP_ROOT'
+      publicPath: '$APP_ROOT',
+      version
     }),
     new HtmlWebPackPlugin({
       minify: false,
+      appName: 'tasklist',
       template: path.resolve(__dirname, 'ui/tasklist/client/index.html'),
       filename: 'app/tasklist/index.html',
       chunks: ['app/tasklist/camunda-tasklist-bootstrap'],
       favicon: path.resolve(__dirname, 'ui/common/images/favicon.ico'),
-      publicPath: '$APP_ROOT'
+      publicPath: '$APP_ROOT',
+      version
     }),
     new HtmlWebPackPlugin({
       minify: false,
+      appName: 'admin',
       template: path.resolve(__dirname, 'ui/admin/client/scripts/index.html'),
       filename: 'app/admin/index.html',
       chunks: ['app/admin/camunda-admin-bootstrap'],
       favicon: path.resolve(__dirname, 'ui/common/images/favicon.ico'),
-      publicPath: '$APP_ROOT'
+      publicPath: '$APP_ROOT',
+      version
     }),
     new HtmlWebPackPlugin({
       minify: false,
+      appName: 'welcome',
       template: path.resolve(__dirname, 'ui/welcome/client/scripts/index.html'),
       filename: 'app/welcome/index.html',
       chunks: ['app/welcome/camunda-welcome-bootstrap'],
       favicon: path.resolve(__dirname, 'ui/common/images/favicon.ico'),
-      publicPath: '$APP_ROOT'
+      publicPath: '$APP_ROOT',
+      version
     }),
     new MiniCssExtractPlugin({
       // both options are optional, similar to the same options in webpackOptions.output

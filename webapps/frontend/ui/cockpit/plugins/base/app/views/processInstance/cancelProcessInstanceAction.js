@@ -17,8 +17,8 @@
 
 'use strict';
 
-var dialogTemplate = require('./cancel-process-instance-dialog.html')();
-var actionTemplate = require('./cancel-process-instance-action.html')();
+var dialogTemplate = require('./cancel-process-instance-dialog.html?raw');
+var actionTemplate = require('./cancel-process-instance-action.html?raw');
 
 module.exports = function(ngModule) {
   ngModule.controller('CancelProcessInstanceActionController', [

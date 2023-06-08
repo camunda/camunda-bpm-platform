@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./../templates/cam-cockpit-batch-view.html')();
+var template = require('./../templates/cam-cockpit-batch-view.html?raw');
 var ctrl = require('../controllers/view-ctrl');
 
 module.exports = [

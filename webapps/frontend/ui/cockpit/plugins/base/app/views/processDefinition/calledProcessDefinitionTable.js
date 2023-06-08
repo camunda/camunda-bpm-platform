@@ -20,7 +20,7 @@
 var angular = require('angular');
 var searchWidgetUtils = require('../../../../../../common/scripts/util/search-widget-utils');
 
-var template = require('./called-process-definition-table.html')();
+var template = require('./called-process-definition-table.html?raw');
 
 module.exports = [
   'ViewsProvider',

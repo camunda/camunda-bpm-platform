@@ -20,8 +20,8 @@
 var angular = require('angular');
 var moment = require('camunda-commons-ui/vendor/moment');
 
-var jobsTemplate = require('./jobs-tab.html')();
-var jobRescheduleTemplate = require('./jobs-reschedule-modal.html')();
+var jobsTemplate = require('./jobs-tab.html?raw');
+var jobRescheduleTemplate = require('./jobs-reschedule-modal.html?raw');
 
 var Configuration = function PluginConfiguration(ViewsProvider) {
   ViewsProvider.registerDefaultView('cockpit.processInstance.runtime.tab', {

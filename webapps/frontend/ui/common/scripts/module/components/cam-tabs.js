@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./cam-tabs.html')();
+var template = require('./cam-tabs.html?raw');
 
 module.exports = function() {
   return {

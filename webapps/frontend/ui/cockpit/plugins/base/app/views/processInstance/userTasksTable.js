@@ -20,8 +20,8 @@
 var searchWidgetUtils = require('../../../../../../common/scripts/util/search-widget-utils');
 var angular = require('angular');
 
-var identityLinksTemplate = require('./identity-links-modal.html')();
-var userTasksTemplate = require('./user-tasks-table.html')();
+var identityLinksTemplate = require('./identity-links-modal.html?raw');
+var userTasksTemplate = require('./user-tasks-table.html?raw');
 
 module.exports = function(ngModule) {
   /**

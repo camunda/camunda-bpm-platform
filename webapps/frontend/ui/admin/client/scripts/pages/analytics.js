@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./analytics.html')();
+var template = require('./analytics.html?raw');
 
 var Controller = [
   '$scope',

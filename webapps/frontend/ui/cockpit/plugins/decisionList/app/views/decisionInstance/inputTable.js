@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./input-variable-table.html')();
+var template = require('./input-variable-table.html?raw');
 
 module.exports = [
   'ViewsProvider',

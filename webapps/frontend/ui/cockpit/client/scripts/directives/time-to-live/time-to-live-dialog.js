@@ -17,7 +17,7 @@
 
 'use strict';
 
-const template = require('./time-to-live-dialog.html')();
+const template = require('./time-to-live-dialog.html?raw');
 
 const Controller = [
   'camAPI',

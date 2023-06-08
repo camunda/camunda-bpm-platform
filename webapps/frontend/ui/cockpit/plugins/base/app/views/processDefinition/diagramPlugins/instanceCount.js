@@ -19,7 +19,7 @@
 
 var instanceCount = require('../../common/diagramPlugins/instanceCount');
 
-var template = require('./overlayAction.html')();
+var template = require('./overlayAction.html?raw');
 
 module.exports = [
   'ViewsProvider',

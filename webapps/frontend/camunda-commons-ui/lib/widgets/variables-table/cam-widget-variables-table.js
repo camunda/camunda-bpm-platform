@@ -19,8 +19,8 @@
 
 var angular = require('camunda-bpm-sdk-js/vendor/angular'),
   varUtils = require('../variable/cam-variable-utils'),
-  template = require('./cam-widget-variables-table.html'),
-  confirmationTemplate = require('./cam-widget-variables-deletion-dialog.html')();
+  template = require('./cam-widget-variables-table.html?raw'),
+  confirmationTemplate = require('./cam-widget-variables-deletion-dialog.html?raw');
 
 var typeUtils = varUtils.typeUtils;
 

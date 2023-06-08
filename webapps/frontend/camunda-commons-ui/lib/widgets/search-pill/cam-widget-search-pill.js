@@ -18,7 +18,7 @@
 'use strict';
 
 var $ = require('jquery'),
-  template = require('./cam-widget-search-pill.html')();
+  template = require('./cam-widget-search-pill.html?raw');
 
 module.exports = [
   '$timeout',

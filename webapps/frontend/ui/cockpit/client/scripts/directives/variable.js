@@ -24,7 +24,7 @@
 
 var angular = require('angular');
 
-var template = require('./variable.html')();
+var template = require('./variable.html?raw');
 
 module.exports = [
   'typeUtils',

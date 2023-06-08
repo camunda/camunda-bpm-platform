@@ -18,8 +18,8 @@
 'use strict';
 require('mousetrap');
 
-var helpLinkTemplate = require('./cam-tasklist-shortcut-help-plugin.html')();
-var showHelpTemplate = require('./modals/cam-tasklist-shortcut-help.html')();
+var helpLinkTemplate = require('./cam-tasklist-shortcut-help-plugin.html?raw');
+var showHelpTemplate = require('./modals/cam-tasklist-shortcut-help.html?raw');
 
 var Controller = [
   '$scope',

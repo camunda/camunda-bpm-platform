@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./cam-cockpit-resources.html')();
+var template = require('./cam-cockpit-resources.html?raw');
 
 var angular = require('camunda-commons-ui/vendor/angular');
 

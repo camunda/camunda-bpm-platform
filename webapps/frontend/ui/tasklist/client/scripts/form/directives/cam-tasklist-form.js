@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./cam-tasklist-form.html')();
+var template = require('./cam-tasklist-form.html?raw');
 
 var EMBEDDED_KEY = 'embedded:',
   APP_KEY = 'app:',

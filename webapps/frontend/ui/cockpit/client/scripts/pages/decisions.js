@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./decisions.html')();
+var template = require('./decisions.html?raw');
 
 var Controller = [
   '$scope',

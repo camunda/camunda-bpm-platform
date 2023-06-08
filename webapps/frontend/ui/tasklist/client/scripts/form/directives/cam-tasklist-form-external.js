@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./cam-tasklist-form-external.html')();
+var template = require('./cam-tasklist-form-external.html?raw');
 
 module.exports = [
   '$location',

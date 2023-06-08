@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./cam-annotation-modal.html')();
+var template = require('./cam-annotation-modal.html?raw');
 
 module.exports = (annotation, readOnly, callback) => {
   return {

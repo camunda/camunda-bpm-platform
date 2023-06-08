@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./execution-metrics.html')();
+var template = require('./execution-metrics.html?raw');
 var CamSDK = require('camunda-bpm-sdk-js/lib/angularjs/index');
 
 var debouncePromiseFactory = require('camunda-bpm-sdk-js').utils

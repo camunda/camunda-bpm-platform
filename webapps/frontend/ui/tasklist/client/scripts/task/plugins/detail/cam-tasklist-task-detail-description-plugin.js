@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./cam-tasklist-task-detail-description-plugin.html')();
+var template = require('./cam-tasklist-task-detail-description-plugin.html?raw');
 
 var Controller = ['$scope', function() {}];
 

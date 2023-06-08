@@ -17,7 +17,7 @@
 
 'use strict';
 
-var template = require('./cam-tasklist-filter-modal-form-general.html')();
+var template = require('./cam-tasklist-filter-modal-form-general.html?raw');
 
 module.exports = [
   function() {
