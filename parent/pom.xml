@@ -132,7 +132,7 @@
             <systemPropertyVariables>
               <myWorkingDir>${project.build.directory}</myWorkingDir>
             </systemPropertyVariables>
-            <argLine>-Xmx968m -Duser.language=en -Duser.region=US -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=${project.build.directory}/heap_dump.hprof</argLine>
+            <argLine>-Xmx2g -Duser.language=en -Duser.region=US -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=${project.build.directory}/heap_dump.hprof</argLine>
             <redirectTestOutputToFile>true</redirectTestOutputToFile>
           </configuration>
         </plugin>
@@ -141,7 +141,7 @@
           <artifactId>maven-failsafe-plugin</artifactId>
           <version>2.16</version>
           <configuration>
-            <argLine>-Xmx968m</argLine>
+            <argLine>-Xmx2g</argLine>
             <runOrder>hourly</runOrder>
           </configuration>
           <executions>
