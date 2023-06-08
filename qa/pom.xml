@@ -77,13 +77,22 @@
         <module>tomcat-runtime</module>
         <module>integration-tests-webapps</module>
         <module>integration-tests-engine</module>
-        <module>integration-tests-engine-jakarta</module>
         <module>test-db-util</module>
         <module>test-db-instance-migration</module>
         <module>test-db-rolling-update</module>
         <module>test-old-engine</module>
         <module>performance-tests-engine</module>
         <module>large-data-tests</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>jdk17</id>
+      <activation>
+        <jdk>[17,)</jdk>
+      </activation>
+      <modules>
+        <module>integration-tests-engine-jakarta</module>
       </modules>
     </profile>
 
