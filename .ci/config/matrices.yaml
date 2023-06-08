@@ -59,8 +59,5 @@ jdk-ce-stages:
   stages:
   - 'platform-jdk-openjdk-jdk-17-latest'
   - 'platform-jdk-openjdk-jdk-11-latest'
-  - 'platform-jdk-openjdk-jdk-8-latest'
   - 'platform-jdk-jdk-17-latest'
   - 'platform-jdk-jdk-11-latest'
-  - 'platform-jdk-jdk-8-latest'
-  - 'platform-jdk-ibm-jdk-8-latest'
