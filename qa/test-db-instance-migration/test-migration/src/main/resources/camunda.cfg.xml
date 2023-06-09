@@ -28,12 +28,6 @@
 
     <property name="jdbcBatchProcessing" value="false"/>
 
-    <!-- JPA configurations -->
-    <property name="processEnginePlugins">
-      <list>
-        <bean class="org.camunda.bpm.qa.upgrade.scenarios7190.variables.JPAVariablesSerializerPlugin" />
-      </list>
-    </property>
   </bean>
   
 </beans>

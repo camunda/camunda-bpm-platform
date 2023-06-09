@@ -17,10 +17,13 @@
 package org.camunda.bpm.qa.upgrade.scenarios7190.variables;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.Map;
 
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.qa.upgrade.Origin;
 import org.camunda.bpm.qa.upgrade.ScenarioUnderTest;
 import org.camunda.bpm.qa.upgrade.UpgradeTestRule;
@@ -32,9 +35,9 @@ import org.slf4j.LoggerFactory;
 
 @ScenarioUnderTest("JpaEntitiesScenario")
 @Origin("7.19.0")
-public class JpaEntitiesTest {
+public class JPAVariableTest {
 
-  Logger LOG = LoggerFactory.getLogger(JpaEntitiesTest.class);
+  Logger LOG = LoggerFactory.getLogger(JPAVariableTest.class);
   @Rule
   public UpgradeTestRule engineRule = new UpgradeTestRule();
 
@@ -54,11 +57,11 @@ public class JpaEntitiesTest {
     Map<String, String> properties = managementService.getProperties();
     String processInstanceId = properties.get("JpaEntitiesScenario.processInstanceId");
 
-    // when
-    Object singleResult = runtimeService.getVariable(processInstanceId, "simpleEntityFieldAccess");
-
-    // then value is empty due to empty JPA test serializer
-    assertThat(singleResult).isNull();
+    // when the variable is fetched
+    // then an exception is thrown
+    assertThatThrownBy(() -> runtimeService.getVariable(processInstanceId, "simpleEntityFieldAccess"))
+    .isInstanceOf(ProcessEngineException.class)
+    .hasMessageContaining("No serializer defined for variable instance");
   }
 
 }

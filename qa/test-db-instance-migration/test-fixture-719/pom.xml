@@ -52,7 +52,6 @@
     <dependency>
       <groupId>org.apache.openjpa</groupId>
       <artifactId>openjpa</artifactId>
-      <scope>test</scope>
     </dependency>
 
     <dependency>
