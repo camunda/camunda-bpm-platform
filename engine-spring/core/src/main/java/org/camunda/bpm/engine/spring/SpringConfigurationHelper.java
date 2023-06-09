@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.spring.impl;
+package org.camunda.bpm.engine.spring;
 
 import java.net.URL;
 import java.util.Map;
@@ -31,12 +31,12 @@ import org.springframework.core.io.UrlResource;
  * @author Tom Baeyens
  */
 public class SpringConfigurationHelper {
-
+  
   private static Logger log = Logger.getLogger(SpringConfigurationHelper.class.getName());
 
   public static ProcessEngine buildProcessEngine(URL resource) {
     log.fine("==== BUILDING SPRING APPLICATION CONTEXT AND PROCESS ENGINE =========================================");
-
+    
     ApplicationContext applicationContext = new GenericXmlApplicationContext(new UrlResource(resource));
     Map<String, ProcessEngine> beansOfType = applicationContext.getBeansOfType(ProcessEngine.class);
     if ( (beansOfType==null)
@@ -44,7 +44,7 @@ public class SpringConfigurationHelper {
        ) {
       throw new ProcessEngineException("no "+ProcessEngine.class.getName()+" defined in the application context "+resource.toString());
     }
-
+    
     ProcessEngine processEngine = beansOfType.values().iterator().next();
 
     log.fine("==== SPRING PROCESS ENGINE CREATED ==================================================================");

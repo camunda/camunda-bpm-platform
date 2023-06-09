@@ -16,8 +16,6 @@
  */
 package org.camunda.bpm.engine.spring;
 
-import org.camunda.bpm.engine.spring.impl.SpringArtifactFactory;
-import org.camunda.bpm.engine.spring.impl.SpringBeansResolverFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;

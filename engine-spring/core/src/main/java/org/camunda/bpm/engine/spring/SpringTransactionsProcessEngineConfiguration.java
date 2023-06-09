@@ -36,8 +36,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.LogInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.ProcessApplicationContextInterceptor;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
-import org.camunda.bpm.engine.spring.impl.SpringTransactionContextFactory;
-import org.camunda.bpm.engine.spring.impl.SpringTransactionInterceptor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ContextResource;
 import org.springframework.core.io.Resource;

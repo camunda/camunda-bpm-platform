@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.spring.impl;
+package org.camunda.bpm.engine.spring;
 
 import java.util.Map;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;

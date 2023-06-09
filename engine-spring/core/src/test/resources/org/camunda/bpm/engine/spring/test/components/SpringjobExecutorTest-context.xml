@@ -46,10 +46,10 @@
     <bean id="historyService" factory-bean="processEngine" factory-method="getHistoryService"/>
     <bean id="managementService" factory-bean="processEngine" factory-method="getManagementService"/>
     
-    <bean id="springJobExecutor" class="org.camunda.bpm.engine.spring.impl.jobexecutor.SpringJobExecutor">
-      <property name="taskExecutor">
-        <bean class="org.springframework.core.task.SyncTaskExecutor" />
-      </property>
+    <bean id="springJobExecutor" class="org.camunda.bpm.engine.spring.components.jobexecutor.SpringJobExecutor">
+    	<property name="taskExecutor">
+    		<bean class="org.springframework.core.task.SyncTaskExecutor" />
+    	</property>
     </bean>
 
 </beans>
