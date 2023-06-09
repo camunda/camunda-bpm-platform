@@ -93,7 +93,7 @@ public class TestHelperTest {
     boolean isClean = TestHelper.isDbClean(engineRule.getProcessEngine(), false);
     assertThat(isClean).isFalse();
     Map<String, Long> databaseContent = engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired().execute(new GetDatabaseCountsCmd()).getReportOnlyIncludingDirtyTables();
-    assertThat(databaseContent.keySet()).containsOnly(DatabaseContentReport.TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.toArray(new String[0]));
+    assertThat(databaseContent.keySet()).containsOnly(DatabaseContentReport.TABLE_NAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.toArray(new String[0]));
   }
 
   @Test

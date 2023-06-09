@@ -40,13 +40,18 @@ public class GetDatabaseCountsCmd implements Command<DatabaseContentReport> {
 
     for (String tableName : tablesNames) {
       String tableNameWithoutPrefix = tableName.replace(databaseTablePrefix, EMPTY_STRING);
-      Map<String, String> param = new HashMap<>();
-      param.put(TABLE_NAME, tableName);
-      Long count = (Long) dbEntityManager.selectOne(SELECT_TABLE_COUNT, param);
-      contentReport.addDatabaseInformation(tableNameWithoutPrefix, count);
+      Long count = (Long) dbEntityManager.selectOne(SELECT_TABLE_COUNT, mapOf(TABLE_NAME, tableName));
+
+      contentReport.addTableCountEntry(tableNameWithoutPrefix, count);
     }
 
     return contentReport;
+  }
+
+  protected Map<String, String> mapOf(String key, String value) {
+    Map<String, String> result = new HashMap<>();
+    result.put(key, value);
+    return result;
   }
 
 }

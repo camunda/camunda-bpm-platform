@@ -46,8 +46,11 @@ public class ProcessEngineRuleCleanupAfterTest {
   private RuntimeService runtimeService;
   private RepositoryService repositoryService;
 
-  public static final BpmnModelInstance ONE_TASK_PROCESS = Bpmn.createExecutableProcess("oneTaskProcess").startEvent()
-      .userTask("userTask").endEvent().done();
+  public static final BpmnModelInstance ONE_TASK_PROCESS = Bpmn.createExecutableProcess("oneTaskProcess")
+      .startEvent()
+      .userTask("userTask")
+      .endEvent()
+      .done();
 
   @Before
   public void setup() {
@@ -58,8 +61,7 @@ public class ProcessEngineRuleCleanupAfterTest {
   @Test
   public void run_order_1_shouldLeaveDbDirty() {
     //given some content in the database
-    repositoryService.createDeployment()
-        .addModelInstance("oneTaskProcess.bpmn", ONE_TASK_PROCESS).deploy();
+    repositoryService.createDeployment().addModelInstance("oneTaskProcess.bpmn", ONE_TASK_PROCESS).deploy();
     runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
     // then data should be silently cleaned, no exception expected
@@ -70,7 +72,10 @@ public class ProcessEngineRuleCleanupAfterTest {
     // given after run_order_1_shouldLeaveDbDirty was executed, the database is clean for this test
 
     // then
-    DatabaseContentReport databaseContentReport = engineRule.getProcessEngineConfiguration().getCommandExecutorTxRequired().execute(new GetDatabaseCountsCmd());
+    DatabaseContentReport databaseContentReport = engineRule.getProcessEngineConfiguration()
+        .getCommandExecutorTxRequired()
+        .execute(new GetDatabaseCountsCmd());
+
     assertThat(databaseContentReport.isDatabaseClean(true)).isTrue();
   }
 
