@@ -66,7 +66,7 @@ public class DecisionDefinitionTest {
   @Test
   public void shouldUseHistoryTimeToLiveOnDecisionDefinitions() {
     // given
-    DmnModelInstance model = createDmnModelInstanceWithNullHistoryTTLDefinition();
+    DmnModelInstance model = createDmnModelInstanceWithHistoryTTLDecision(null);
 
     DeploymentBuilder builder = repositoryService.createDeployment().addModelInstance("foo.dmn", model);
 
@@ -78,7 +78,22 @@ public class DecisionDefinitionTest {
     assertThat(deployment.getDeployedDecisionDefinitions().get(0).getHistoryTimeToLive()).isEqualTo(30);
   }
 
-  protected DmnModelInstance createDmnModelInstanceWithNullHistoryTTLDefinition() {
+  @Test
+  public void shouldNotOverrideWithGlobalConfigOnDecisionHistoryTTLPresence() {
+    // given
+    DmnModelInstance model = createDmnModelInstanceWithHistoryTTLDecision("P10D");
+
+    DeploymentBuilder builder = repositoryService.createDeployment().addModelInstance("foo.dmn", model);
+
+    // when
+    DeploymentWithDefinitions deployment = testRule.deploy(builder);
+
+    // then
+    assertThat(deployment.getDeployedDecisionDefinitions().size()).isEqualTo(1);
+    assertThat(deployment.getDeployedDecisionDefinitions().get(0).getHistoryTimeToLive()).isEqualTo(10);
+  }
+
+  protected DmnModelInstance createDmnModelInstanceWithHistoryTTLDecision(String historyTTL) {
     DmnModelInstance modelInstance = Dmn.createEmptyModel();
     Definitions definitions = modelInstance.newInstance(Definitions.class);
     definitions.setId(DmnModelConstants.DMN_ELEMENT_DEFINITIONS);
@@ -91,7 +106,7 @@ public class DecisionDefinitionTest {
     decision.setId("Decision-1");
     decision.setName("foo");
 
-    decision.setCamundaHistoryTimeToLiveString(null);
+    decision.setCamundaHistoryTimeToLiveString(historyTTL);
 
 
     modelInstance.getDefinitions().addChildElement(decision);
