@@ -28,12 +28,9 @@ import org.camunda.bpm.model.dmn.instance.Decision;
 public class DecisionDefinitionHandler extends DmnDecisionTransformHandler {
 
   protected final Integer configuredHistoryTTL;
-  protected Function<String, Integer> parseFunction = ParseUtil::parseHistoryTimeToLive;
 
   public DecisionDefinitionHandler(String configuredHistoryTTL) {
-    this.configuredHistoryTTL = Optional.ofNullable(configuredHistoryTTL)
-        .map(parseFunction)
-        .orElse(null);
+    this.configuredHistoryTTL = ParseUtil.parseHistoryTimeToLive(configuredHistoryTTL);
   }
 
   @Override
