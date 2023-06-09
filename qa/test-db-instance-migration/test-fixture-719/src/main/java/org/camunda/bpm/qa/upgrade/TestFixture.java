@@ -19,7 +19,7 @@ package org.camunda.bpm.qa.upgrade;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.qa.upgrade.variables.JpaEntitiesScenario;
+import org.camunda.bpm.qa.upgrade.variables.JpaVariableScenario;
 
 public class TestFixture {
 
@@ -37,7 +37,7 @@ public class TestFixture {
     ScenarioRunner runner = new ScenarioRunner(processEngine, ENGINE_VERSION);
 
     // example scenario setup
-    runner.setupScenarios(JpaEntitiesScenario.class);
+    runner.setupScenarios(JpaVariableScenario.class);
 
     processEngine.close();
   }

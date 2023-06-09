@@ -29,7 +29,7 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.qa.upgrade.DescribesScenario;
 import org.camunda.bpm.qa.upgrade.ScenarioSetup;
 
-public class JpaEntitiesScenario {
+public class JpaVariableScenario {
 
   protected static FieldAccessJPAEntity simpleEntityFieldAccess;
   protected static EntityManagerFactory entityManagerFactory;
@@ -39,8 +39,8 @@ public class JpaEntitiesScenario {
     return "org/camunda/bpm/qa/upgrade/variables/JpaEntitiesScenario.oneTaskProcess.bpmn20.xml";
   }
 
-  @DescribesScenario("createJpaVariables")
-  public static ScenarioSetup createJpaVariables() {
+  @DescribesScenario("createJpaVariable")
+  public static ScenarioSetup createJpaVariable() {
     return (engine, scenarioName) -> {
       EntityManagerSessionFactory entityManagerSessionFactory = (EntityManagerSessionFactory) ((ProcessEngineConfigurationImpl) engine.getProcessEngineConfiguration())
           .getSessionFactories()

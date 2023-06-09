@@ -33,7 +33,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ScenarioUnderTest("JpaEntitiesScenario")
+@ScenarioUnderTest("JpaVariableScenario")
 @Origin("7.19.0")
 public class JPAVariableTest {
 
@@ -51,7 +51,7 @@ public class JPAVariableTest {
   }
 
   @Test
-  @ScenarioUnderTest("createJpaVariables.1")
+  @ScenarioUnderTest("createJpaVariable.1")
   public void shouldHandleJpaVariables() {
     // given
     Map<String, String> properties = managementService.getProperties();
