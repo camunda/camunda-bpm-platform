@@ -66,7 +66,8 @@ public class DecisionDefinitionTest {
   @Test
   public void shouldUseHistoryTimeToLiveOnDecisionDefinitions() {
     // given
-    DmnModelInstance model = createDmnModelInstance();
+    DmnModelInstance model = createDmnModelInstanceWithNullHistoryTTLDefinition();
+
     DeploymentBuilder builder = repositoryService.createDeployment().addModelInstance("foo.dmn", model);
 
     // when
@@ -77,11 +78,7 @@ public class DecisionDefinitionTest {
     assertThat(deployment.getDeployedDecisionDefinitions().get(0).getHistoryTimeToLive()).isEqualTo(30);
   }
 
-  protected DmnModelInstance createDmnModelInstance() {
-    return createDmnModelInstance(null);
-  }
-
-  protected DmnModelInstance createDmnModelInstance(Integer camundaHistoryTimeToLive) {
+  protected DmnModelInstance createDmnModelInstanceWithNullHistoryTTLDefinition() {
     DmnModelInstance modelInstance = Dmn.createEmptyModel();
     Definitions definitions = modelInstance.newInstance(Definitions.class);
     definitions.setId(DmnModelConstants.DMN_ELEMENT_DEFINITIONS);
@@ -94,9 +91,8 @@ public class DecisionDefinitionTest {
     decision.setId("Decision-1");
     decision.setName("foo");
 
-    if (camundaHistoryTimeToLive != null) {
-      decision.setCamundaHistoryTimeToLive(camundaHistoryTimeToLive);
-    }
+    decision.setCamundaHistoryTimeToLiveString(null);
+
 
     modelInstance.getDefinitions().addChildElement(decision);
 

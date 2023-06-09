@@ -16,8 +16,6 @@
  */
 package org.camunda.bpm.engine.impl.dmn.transformer;
 
-import java.util.Optional;
-import java.util.function.Function;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionImpl;
 import org.camunda.bpm.dmn.engine.impl.spi.transform.DmnElementTransformContext;
 import org.camunda.bpm.dmn.engine.impl.transform.DmnDecisionTransformHandler;
@@ -41,32 +39,24 @@ public class DecisionDefinitionHandler extends DmnDecisionTransformHandler {
   @Override
   protected DmnDecisionImpl createFromDecision(DmnElementTransformContext context, Decision decision) {
     DecisionDefinitionEntity decisionDefinition = (DecisionDefinitionEntity) super.createFromDecision(context, decision);
-
     String category = context.getModelInstance().getDefinitions().getNamespace();
+
     decisionDefinition.setCategory(category);
-   Integer localHistoryTimeToLive = ParseUtil.parseHistoryTimeToLive(decision.getCamundaHistoryTimeToLiveString());
-    if(localHistoryTimeToLive != null) {
-      decisionDefinition.setHistoryTimeToLive(localHistoryTimeToLive);
-    } else {
-      decisionDefinition.setHistoryTimeToLive(configuredHistoryTTL);
-    }
     decisionDefinition.setVersionTag(decision.getVersionTag());
+
+    setHistoryTTL(decision, decisionDefinition);
 
     return decisionDefinition;
   }
 
-  protected Integer getEffectiveHistoryTimeToLive(Decision decision) {
+  private void setHistoryTTL(Decision decision, DecisionDefinitionEntity decisionDefinition) {
+    Integer localHistoryTimeToLive = ParseUtil.parseHistoryTimeToLive(decision.getCamundaHistoryTimeToLiveString());
 
-    if (!hasNullTTLConfigured(decision)) {
-      return parseFunction.apply(decision.getCamundaHistoryTimeToLiveString());
+    if (localHistoryTimeToLive != null) {
+      decisionDefinition.setHistoryTimeToLive(localHistoryTimeToLive);
+    } else {
+      decisionDefinition.setHistoryTimeToLive(configuredHistoryTTL);
     }
 
-    return configuredHistoryTTL;
   }
-
-  private boolean hasNullTTLConfigured(Decision decision) {
-    return decision.getCamundaHistoryTimeToLiveString() == null
-        || "null".equals(decision.getCamundaHistoryTimeToLiveString());
-  }
-
 }
