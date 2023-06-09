@@ -35,7 +35,7 @@ public class SetTaskFollowUpDateCmd extends AbstractSetTaskPropertyCmd<Date> {
    * @throws NullValueException in case the given taskId or the given followUpDate value are null
    */
   public SetTaskFollowUpDateCmd(String taskId, Date value) {
-    super(taskId, value);
+    super(taskId, value, true);
   }
 
   @Override

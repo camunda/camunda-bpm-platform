@@ -507,7 +507,7 @@ public interface TaskService {
    *
    * @param taskId id of the task, not null
    * @param name   the new task name, not null
-   * @throws NullValueException     in case the given arguments are null.
+   * @throws NullValueException     in case the taskId is null.
    * @throws NotFoundException      when the task doesn't exist.
    * @throws AuthorizationException If the user hasn't any of {@link Permissions#UPDATE}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#TASK}
    *                                or no {@link Permissions#UPDATE_TASK}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#PROCESS_DEFINITION}
@@ -520,7 +520,7 @@ public interface TaskService {
    *
    * @param taskId      id of the task, not null
    * @param description the new task description, not null
-   * @throws NullValueException     in case the given arguments are null.
+   * @throws NullValueException     in case the taskId is null.
    * @throws NotFoundException      when the task doesn't exist.
    * @throws AuthorizationException If the user hasn't any of {@link Permissions#UPDATE}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#TASK}
    *                                or no {@link Permissions#UPDATE_TASK}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#PROCESS_DEFINITION}
@@ -533,7 +533,7 @@ public interface TaskService {
    *
    * @param taskId  id of the task, not null
    * @param dueDate the new task dueDate, not null
-   * @throws NullValueException     in case the given arguments are null.
+   * @throws NullValueException     in case the taskId is null.
    * @throws NotFoundException      when the task doesn't exist.
    * @throws AuthorizationException If the user hasn't any of {@link Permissions#UPDATE}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#TASK}
    *                                or no {@link Permissions#UPDATE_TASK}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#PROCESS_DEFINITION}
@@ -546,7 +546,7 @@ public interface TaskService {
    *
    * @param taskId       id of the task, not null
    * @param followUpDate the new task followUpDate, not null
-   * @throws NullValueException     in case the given arguments are null.
+   * @throws NullValueException     in case the taskId is null.
    * @throws NotFoundException      when the task doesn't exist.
    * @throws AuthorizationException If the user hasn't any of {@link Permissions#UPDATE}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#TASK}
    *                                or no {@link Permissions#UPDATE_TASK}, {@link Permissions#TASK_ASSIGN} permissions on {@link Resources#PROCESS_DEFINITION}

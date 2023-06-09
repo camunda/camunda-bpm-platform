@@ -35,7 +35,7 @@ public class SetTaskDueDateCmd extends AbstractSetTaskPropertyCmd<Date> {
    * @throws NullValueException in case the given taskId or the given dueDate value are null
    */
   public SetTaskDueDateCmd(String taskId, Date value) {
-    super(taskId, value);
+    super(taskId, value, true);
   }
 
   @Override

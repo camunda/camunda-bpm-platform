@@ -34,7 +34,7 @@ public class SetTaskDescriptionCmd extends AbstractSetTaskPropertyCmd<String> {
    * @throws NullValueException in case the given taskId or the given description are null
    */
   public SetTaskDescriptionCmd(String taskId, String description) {
-    super(taskId, description);
+    super(taskId, description, true);
   }
 
   @Override
