@@ -75,7 +75,7 @@ public class DecisionDefinitionTest {
   }
 
   @Test
-  public void shouldUseHistoryTimeToLiveOnDecisionDefinitions() {
+  public void shouldUseHistoryTTLOnDecisionDefinitions() {
     // given
     DmnModelInstance model = createDmnModelInstance(null);
 
@@ -105,7 +105,7 @@ public class DecisionDefinitionTest {
   }
 
   @Test
-  public void shouldApplyHistoryTimeToLiveOnRemovalTimeOfDecisionInstance() {
+  public void shouldApplyHistoryTTLOnRemovalTimeOfDecisionInstance() {
     DmnModelInstance model = createDmnModelInstance("P10D");
     DeploymentBuilder builder = repositoryService.createDeployment().addModelInstance("foo.dmn", model);
 
