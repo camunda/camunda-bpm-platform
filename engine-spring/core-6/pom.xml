@@ -210,6 +210,8 @@
                 <resource>
                   <directory>${basedir}/../core/src/test/java</directory>
                   <filtering>false</filtering>
+                  <!-- Nashorn is not part of the JDK anymore in Java 15+ -->
+                  <excludes>**/*NashornTest.java</excludes>
                 </resource>
               </resources>
             </configuration>
@@ -378,27 +380,6 @@
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <executions>
-          <!-- create test jar that is consumed by the compatibility tests -->
-          <execution>
-            <id>create-test-jar</id>
-            <phase>package</phase>
-            <goals>
-              <goal>test-jar</goal>
-            </goals>
-            <configuration>
-              <forceCreation>true</forceCreation>
-              <excludes>
-                <!-- this is re-defined in the consuming artifacts -->
-                <exclude>META-INF/services/org.camunda.bpm.engine.spring.test.SpringTestHelper</exclude>
-              </excludes>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
         <version>3.0.0-M1</version>
         <executions>
@@ -427,29 +408,5 @@
       </plugin>
     </plugins>
   </build>
-  
-  <profiles>
-    <profile>
-      <id>java15</id>
-      <activation>
-        <jdk>[15,)</jdk>
-      </activation>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-surefire-plugin</artifactId>
-              <configuration>
-                <!-- Nashorn is not part of the JDK anymore in Java 15+ -->
-                <excludes>
-                  <exclude>**/*NashornTest.java</exclude>
-                </excludes>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
-  </profiles>
+
 </project>
