@@ -105,7 +105,7 @@ public class DecisionDefinitionTest {
   }
 
   @Test
-  public void shouldApplyHistoryTTLOnRemovalTimeOfDecisionInstance() {
+  public void shouldApplyHistoryTTLOnRemovalTimeOfDecisionInstanceLocal() {
     DmnModelInstance model = createDmnModelInstance("P10D");
     DeploymentBuilder builder = repositoryService.createDeployment().addModelInstance("foo.dmn", model);
 
@@ -123,6 +123,30 @@ public class DecisionDefinitionTest {
 
     Date expectedRemovalDate = DateTime.now()
         .plusDays(10)
+        .toDate();
+
+    assertThat(result.getRemovalTime()).isInSameDayAs(expectedRemovalDate);
+  }
+
+  @Test
+  public void shouldApplyHistoryTTLOnRemovalTimeOfDecisionInstanceGlobal() {
+    DmnModelInstance model = createDmnModelInstance(null);
+    DeploymentBuilder builder = repositoryService.createDeployment().addModelInstance("foo.dmn", model);
+
+    testRule.deploy(builder);
+
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("input", "single entry");
+
+    decisionService.evaluateDecisionByKey("Decision-1")
+        .variables(variables)
+        .evaluate();
+
+    HistoricDecisionInstance result = historyService.createHistoricDecisionInstanceQuery()
+        .singleResult();
+
+    Date expectedRemovalDate = DateTime.now()
+        .plusDays(30)
         .toDate();
 
     assertThat(result.getRemovalTime()).isInSameDayAs(expectedRemovalDate);
