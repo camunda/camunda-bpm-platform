@@ -14,30 +14,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.test.standalone.jpa;
+package org.camunda.bpm.qa.upgrade.variables;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import java.sql.Date;
-
 /**
+ * Simple JPA entity, id is set on a field.
+ * 
  * @author Frederik Heremans
  */
-@Entity(name = "SQLDATE_ID_ENTITY")
-public class SQLDateIdJPAEntity {
+@Entity(name = "JPA_ENTITY_FIELD")
+public class FieldAccessJPAEntity {
 
   @Id
   @Column(name = "ID_")
-  private Date dateId;
+  private Long id;
 
-  public Date getDateId() {
-    return dateId;
+  private String myValue;
+
+  public FieldAccessJPAEntity() {
+    // Empty constructor needed for JPA
   }
 
-  public void setDateId(Date dateId) {
-    this.dateId = dateId;
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public String getMyValue() {
+    return myValue;
+  }
+
+  public void setMyValue(String myValue) {
+    this.myValue = myValue;
   }
 
 }

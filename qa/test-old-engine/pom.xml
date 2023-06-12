@@ -144,11 +144,17 @@
           <scope>test</scope>
         </dependency>
 
+        <!-- TODO replace with below after 7.20 release -->
         <dependency>
           <groupId>org.apache.openjpa</groupId>
           <artifactId>openjpa</artifactId>
           <scope>test</scope>
         </dependency>
+        <!-- <dependency>
+          <groupId>commons-collections</groupId>
+          <artifactId>commons-collections</artifactId>
+          <scope>test</scope>
+        </dependency> -->
 
         <dependency>
           <groupId>org.apache.commons</groupId>

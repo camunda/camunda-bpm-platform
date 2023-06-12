@@ -376,9 +376,6 @@ import org.camunda.bpm.engine.impl.variable.serializer.StringValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.TypedValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializerFactory;
 import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
-import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSession;
-import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSessionFactory;
-import org.camunda.bpm.engine.impl.variable.serializer.jpa.JPAVariableSerializer;
 import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
@@ -390,7 +387,6 @@ import org.camunda.bpm.engine.runtime.WhitelistingDeserializationTypeValidator;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.mock.MocksResolverFactory;
 import org.camunda.bpm.engine.variable.Variables;
-import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.connect.Connectors;
 import org.camunda.connect.spi.Connector;
 import org.camunda.connect.spi.ConnectorRequest;
@@ -1157,7 +1153,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initValueTypeResolver();
     initTypeValidator();
     initSerialization();
-    initJpa();
     initDelegateInterceptor();
     initEventHandlers();
     initProcessApplicationManager();
@@ -2731,28 +2726,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
   }
 
-  // JPA //////////////////////////////////////////////////////////////////////
-
-  protected void initJpa() {
-    if (jpaPersistenceUnitName != null) {
-      jpaEntityManagerFactory = JpaHelper.createEntityManagerFactory(jpaPersistenceUnitName);
-    }
-    if (jpaEntityManagerFactory != null) {
-      sessionFactories.put(EntityManagerSession.class, new EntityManagerSessionFactory(jpaEntityManagerFactory, jpaHandleTransaction, jpaCloseEntityManager));
-      JPAVariableSerializer jpaType = (JPAVariableSerializer) variableSerializers.getSerializerByName(JPAVariableSerializer.NAME);
-      // Add JPA-type
-      if (jpaType == null) {
-        // We try adding the variable right after byte serializer, if available
-        int serializableIndex = variableSerializers.getSerializerIndexByName(ValueType.BYTES.getName());
-        if (serializableIndex > -1) {
-          variableSerializers.addSerializer(new JPAVariableSerializer(), serializableIndex);
-        } else {
-          variableSerializers.addSerializer(new JPAVariableSerializer());
-        }
-      }
-    }
-  }
-
   protected void initBeans() {
     if (beans == null) {
       beans = DEFAULT_BEANS_MAP;
@@ -3706,24 +3679,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   @Override
   public ProcessEngineConfigurationImpl setTransactionsExternallyManaged(boolean transactionsExternallyManaged) {
     super.setTransactionsExternallyManaged(transactionsExternallyManaged);
-    return this;
-  }
-
-  @Override
-  public ProcessEngineConfigurationImpl setJpaEntityManagerFactory(Object jpaEntityManagerFactory) {
-    this.jpaEntityManagerFactory = jpaEntityManagerFactory;
-    return this;
-  }
-
-  @Override
-  public ProcessEngineConfigurationImpl setJpaHandleTransaction(boolean jpaHandleTransaction) {
-    this.jpaHandleTransaction = jpaHandleTransaction;
-    return this;
-  }
-
-  @Override
-  public ProcessEngineConfigurationImpl setJpaCloseEntityManager(boolean jpaCloseEntityManager) {
-    this.jpaCloseEntityManager = jpaCloseEntityManager;
     return this;
   }
 

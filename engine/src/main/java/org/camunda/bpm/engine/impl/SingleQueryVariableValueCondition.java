@@ -27,7 +27,6 @@ import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.variable.serializer.TypedValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.ValueFields;
 import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
-import org.camunda.bpm.engine.impl.variable.serializer.jpa.JPAVariableSerializer;
 import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.TypedValue;
@@ -79,12 +78,6 @@ public class SingleQueryVariableValueCondition extends AbstractQueryVariableValu
     }
     else if(serializer.getType() == ValueType.FILE){
       throw new ProcessEngineException("Variables of type File cannot be used to query");
-    }
-    else if(serializer instanceof JPAVariableSerializer) {
-      if(wrappedQueryValue.getOperator() != QueryOperator.EQUALS) {
-        throw new ProcessEngineException("JPA entity variables can only be used in 'variableValueEquals'");
-      }
-
     }
     else {
       if(!serializer.getType().isPrimitiveValueType()) {
