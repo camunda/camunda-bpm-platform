@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.test.dmn.deployment;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,6 +27,7 @@ import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
@@ -42,7 +44,6 @@ import org.camunda.bpm.model.dmn.instance.Input;
 import org.camunda.bpm.model.dmn.instance.InputExpression;
 import org.camunda.bpm.model.dmn.instance.Output;
 import org.camunda.bpm.model.dmn.instance.Text;
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -59,9 +60,7 @@ public class DecisionDefinitionTest {
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule)
-      .around(engineRule)
-      .around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
 
   protected RepositoryService repositoryService;
   protected DecisionService decisionService;
@@ -106,6 +105,7 @@ public class DecisionDefinitionTest {
 
   @Test
   public void shouldApplyHistoryTTLOnRemovalTimeOfDecisionInstanceLocal() {
+    // given
     DmnModelInstance model = createDmnModelInstance("P10D");
     DeploymentBuilder builder = repositoryService.createDeployment().addModelInstance("foo.dmn", model);
 
@@ -114,22 +114,25 @@ public class DecisionDefinitionTest {
     Map<String, Object> variables = new HashMap<>();
     variables.put("input", "single entry");
 
+    // when
     decisionService.evaluateDecisionByKey("Decision-1")
         .variables(variables)
         .evaluate();
 
-    HistoricDecisionInstance result = historyService.createHistoricDecisionInstanceQuery()
-        .singleResult();
+    HistoricDecisionInstance result = historyService.createHistoricDecisionInstanceQuery().singleResult();
 
-    Date expectedRemovalDate = DateTime.now()
-        .plusDays(10)
-        .toDate();
+    // then
+    Date expectedRemovalDate = Date.from(ClockUtil.now()
+        .toInstant()
+        .plus(10, ChronoUnit.DAYS)
+    );
 
     assertThat(result.getRemovalTime()).isInSameDayAs(expectedRemovalDate);
   }
 
   @Test
   public void shouldApplyHistoryTTLOnRemovalTimeOfDecisionInstanceGlobal() {
+    // given
     DmnModelInstance model = createDmnModelInstance(null);
     DeploymentBuilder builder = repositoryService.createDeployment().addModelInstance("foo.dmn", model);
 
@@ -138,16 +141,18 @@ public class DecisionDefinitionTest {
     Map<String, Object> variables = new HashMap<>();
     variables.put("input", "single entry");
 
+    // when
     decisionService.evaluateDecisionByKey("Decision-1")
         .variables(variables)
         .evaluate();
 
-    HistoricDecisionInstance result = historyService.createHistoricDecisionInstanceQuery()
-        .singleResult();
+    HistoricDecisionInstance result = historyService.createHistoricDecisionInstanceQuery().singleResult();
 
-    Date expectedRemovalDate = DateTime.now()
-        .plusDays(30)
-        .toDate();
+    // then
+    Date expectedRemovalDate = Date.from(ClockUtil.now()
+        .toInstant()
+        .plus(30, ChronoUnit.DAYS)
+    );
 
     assertThat(result.getRemovalTime()).isInSameDayAs(expectedRemovalDate);
   }
@@ -160,13 +165,11 @@ public class DecisionDefinitionTest {
     definitions.setNamespace(DmnModelConstants.CAMUNDA_NS);
     modelInstance.setDefinitions(definitions);
 
-
     Decision decision = modelInstance.newInstance(Decision.class);
     decision.setId("Decision-1");
     decision.setName("foo");
 
     decision.setCamundaHistoryTimeToLiveString(historyTTL);
-
 
     modelInstance.getDefinitions().addChildElement(decision);
 
