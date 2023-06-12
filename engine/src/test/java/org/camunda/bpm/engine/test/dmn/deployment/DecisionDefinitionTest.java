@@ -19,7 +19,13 @@ package org.camunda.bpm.engine.test.dmn.deployment;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import org.camunda.bpm.engine.DecisionService;
+import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
@@ -36,6 +42,7 @@ import org.camunda.bpm.model.dmn.instance.Input;
 import org.camunda.bpm.model.dmn.instance.InputExpression;
 import org.camunda.bpm.model.dmn.instance.Output;
 import org.camunda.bpm.model.dmn.instance.Text;
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -57,10 +64,14 @@ public class DecisionDefinitionTest {
       .around(testRule);
 
   protected RepositoryService repositoryService;
+  protected DecisionService decisionService;
+  protected HistoryService historyService;
 
   @Before
   public void init() {
     this.repositoryService = engineRule.getRepositoryService();
+    this.decisionService = engineRule.getDecisionService();
+    this.historyService = engineRule.getHistoryService();
   }
 
   @Test
@@ -91,6 +102,30 @@ public class DecisionDefinitionTest {
     // then
     assertThat(deployment.getDeployedDecisionDefinitions().size()).isEqualTo(1);
     assertThat(deployment.getDeployedDecisionDefinitions().get(0).getHistoryTimeToLive()).isEqualTo(10);
+  }
+
+  @Test
+  public void shouldApplyHistoryTimeToLiveOnRemovalTimeOfDecisionInstance() {
+    DmnModelInstance model = createDmnModelInstance("P10D");
+    DeploymentBuilder builder = repositoryService.createDeployment().addModelInstance("foo.dmn", model);
+
+    testRule.deploy(builder);
+
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("input", "single entry");
+
+    decisionService.evaluateDecisionByKey("Decision-1")
+        .variables(variables)
+        .evaluate();
+
+    HistoricDecisionInstance result = historyService.createHistoricDecisionInstanceQuery()
+        .singleResult();
+
+    Date expectedRemovalDate = DateTime.now()
+        .plusDays(10)
+        .toDate();
+
+    assertThat(result.getRemovalTime()).isInSameDayAs(expectedRemovalDate);
   }
 
   protected DmnModelInstance createDmnModelInstance(String historyTTL) {
