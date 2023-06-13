@@ -23,6 +23,14 @@
       </dependency>
 
       <dependency>
+        <groupId>jakarta.platform</groupId>
+        <artifactId>jakarta.jakartaee-bom</artifactId>
+        <version>${version.jakarta-ee-spec}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-framework-bom</artifactId>
         <version>${version.spring.framework6}</version>
@@ -249,16 +257,9 @@
       <plugin>
         <groupId>org.eclipse.transformer</groupId>
         <artifactId>transformer-maven-plugin</artifactId>
-        <configuration>
-          <rules>
-            <renames combine.children="append">
-              <rename>${project.basedir}/renames.properties</rename>
-            </renames>
-          </rules>
-        </configuration>
         <executions>
           <execution>
-            <id>transform-jakarta-sources</id>
+            <id>transform-java-sources</id>
             <phase>generate-sources</phase>
             <goals>
               <goal>transform</goal>
@@ -268,7 +269,7 @@
             </configuration>
           </execution>
           <execution>
-            <id>transform-jakarta-resources</id>
+            <id>transform-resources</id>
             <phase>generate-resources</phase>
             <goals>
               <goal>transform</goal>
@@ -278,7 +279,7 @@
             </configuration>
           </execution>
           <execution>
-            <id>transform-jakarta-test-sources</id>
+            <id>transform-java-test-sources</id>
             <phase>generate-test-sources</phase>
             <goals>
               <goal>transform</goal>
@@ -288,7 +289,7 @@
             </configuration>
           </execution>
           <execution>
-            <id>transform-jakarta-test-resources</id>
+            <id>transform-test-resources</id>
             <phase>generate-test-resources</phase>
             <goals>
               <goal>transform</goal>
@@ -314,7 +315,7 @@
         <version>3.2.0</version>
         <executions>
           <execution>
-            <id>add-jakarta-source</id>
+            <id>add-java-source</id>
             <phase>generate-sources</phase>
             <goals>
               <goal>add-source</goal>
@@ -326,7 +327,7 @@
             </configuration>
           </execution>
           <execution>
-            <id>add-jakarta-resource</id>
+            <id>add-resources</id>
             <phase>generate-resources</phase>
             <goals>
               <goal>add-resource</goal>
@@ -338,7 +339,7 @@
             </configuration>
           </execution>
           <execution>
-            <id>add-jakarta-test-source</id>
+            <id>add-java-test-source</id>
             <phase>generate-test-sources</phase>
             <goals>
               <goal>add-test-source</goal>
@@ -350,7 +351,7 @@
             </configuration>
           </execution>
           <execution>
-            <id>add-jakarta-test-resource</id>
+            <id>add-test-resources</id>
             <phase>generate-test-resources</phase>
             <goals>
               <goal>add-test-resource</goal>

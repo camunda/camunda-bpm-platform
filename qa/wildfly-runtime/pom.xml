@@ -156,18 +156,6 @@
           <version>${project.version}</version>
           <type>pom</type>
           <scope>test</scope>
-          <exclusions>
-            <exclusion>
-              <groupId>org.camunda.bpm</groupId>
-              <artifactId>camunda-engine-spring</artifactId>
-            </exclusion>
-          </exclusions>
-        </dependency>
-        <dependency>
-          <groupId>org.camunda.bpm</groupId>
-          <artifactId>camunda-engine-spring-6</artifactId>
-          <version>${project.version}</version>
-          <scope>test</scope>
         </dependency>
       </dependencies>
 
