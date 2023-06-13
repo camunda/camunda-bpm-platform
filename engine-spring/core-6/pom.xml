@@ -173,7 +173,7 @@
               <goal>copy-resources</goal>
             </goals>
             <configuration>
-              <outputDirectory>${project.build.directory}/generated-sources/jakarta</outputDirectory>
+              <outputDirectory>${project.build.directory}/generated-sources/java</outputDirectory>
                <resources>
                 <resource>
                   <directory>${basedir}/../core/src/main/java</directory>
@@ -189,7 +189,7 @@
               <goal>copy-resources</goal>
             </goals>
             <configuration>
-              <outputDirectory>${project.build.directory}/generated-resources/jakarta</outputDirectory>
+              <outputDirectory>${project.build.directory}/generated-resources/java</outputDirectory>
               <resources>
                 <resource>
                   <directory>${basedir}/../core/src/main/resources</directory>
@@ -205,7 +205,7 @@
               <goal>copy-resources</goal>
             </goals>
             <configuration>
-              <outputDirectory>${project.build.directory}/generated-test-sources/jakarta</outputDirectory>
+              <outputDirectory>${project.build.directory}/generated-test-sources/java</outputDirectory>
               <resources>
                 <resource>
                   <directory>${basedir}/../core/src/test/java</directory>
@@ -223,7 +223,7 @@
               <goal>copy-resources</goal>
             </goals>
             <configuration>
-              <outputDirectory>${project.build.directory}/generated-test-resources/jakarta</outputDirectory>
+              <outputDirectory>${project.build.directory}/generated-test-resources/java</outputDirectory>
               <resources>
                 <resource>
                   <directory>${basedir}/../core/src/test/resources</directory>
@@ -251,12 +251,10 @@
         <artifactId>transformer-maven-plugin</artifactId>
         <configuration>
           <rules>
-            <jakartaDefaults>true</jakartaDefaults>
             <renames combine.children="append">
               <rename>${project.basedir}/renames.properties</rename>
             </renames>
           </rules>
-          <classifier>jakarta</classifier>
         </configuration>
         <executions>
           <execution>
@@ -266,7 +264,7 @@
               <goal>transform</goal>
             </goals>
             <configuration>
-              <transformDirectory>${project.build.directory}/generated-sources/jakarta</transformDirectory>
+              <transformDirectory>${project.build.directory}/generated-sources/java</transformDirectory>
             </configuration>
           </execution>
           <execution>
@@ -276,7 +274,7 @@
               <goal>transform</goal>
             </goals>
             <configuration>
-              <transformDirectory>${project.build.directory}/generated-resources/jakarta</transformDirectory>
+              <transformDirectory>${project.build.directory}/generated-resources/java</transformDirectory>
             </configuration>
           </execution>
           <execution>
@@ -286,7 +284,7 @@
               <goal>transform</goal>
             </goals>
             <configuration>
-              <transformDirectory>${project.build.directory}/generated-test-sources/jakarta</transformDirectory>
+              <transformDirectory>${project.build.directory}/generated-test-sources/java</transformDirectory>
             </configuration>
           </execution>
           <execution>
@@ -296,7 +294,7 @@
               <goal>transform</goal>
             </goals>
             <configuration>
-              <transformDirectory>${project.build.directory}/generated-test-resources/jakarta</transformDirectory>
+              <transformDirectory>${project.build.directory}/generated-test-resources/java</transformDirectory>
             </configuration>
           </execution>
         </executions>
@@ -323,7 +321,7 @@
             </goals>
             <configuration>
               <sources>
-                <source>${basedir}/target/generated-sources/jakarta</source>
+                <source>${basedir}/target/generated-sources/java</source>
               </sources>
             </configuration>
           </execution>
@@ -335,7 +333,7 @@
             </goals>
             <configuration>
               <resources>
-                <resource><directory>${basedir}/target/generated-resources/jakarta</directory></resource>
+                <resource><directory>${basedir}/target/generated-resources/java</directory></resource>
               </resources>
             </configuration>
           </execution>
@@ -347,7 +345,7 @@
             </goals>
             <configuration>
               <sources>
-                <source>${basedir}/target/generated-test-sources/jakarta</source>
+                <source>${basedir}/target/generated-test-sources/java</source>
               </sources>
             </configuration>
           </execution>
@@ -359,7 +357,7 @@
             </goals>
             <configuration>
               <resources>
-                <resource><directory>${basedir}/target/generated-test-resources/jakarta</directory></resource>
+                <resource><directory>${basedir}/target/generated-test-resources/java</directory></resource>
               </resources>
             </configuration>
           </execution>

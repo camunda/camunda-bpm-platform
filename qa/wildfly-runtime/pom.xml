@@ -16,19 +16,13 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>org.camunda.bpm</groupId>
-        <artifactId>camunda-engine</artifactId>
-        <exclusions>
-          <exclusion>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-beans</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-beans</artifactId>
         <version>${version.spring.framework6}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-engine</artifactId>
       </dependency>
     </dependencies>
   </dependencyManagement>
