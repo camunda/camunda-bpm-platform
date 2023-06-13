@@ -86,4 +86,19 @@
     <method>*ELContext*</method>
     <to>**</to>
   </difference>
+
+  <!-- 6001: removed field -->
+  <!-- removed feature: handling JPA entities as variables-->
+  <difference>
+    <differenceType>6001</differenceType>
+    <className>org/camunda/bpm/engine/ProcessEngineConfiguration</className>
+    <field>jpa**</field>
+  </difference>
+  <!-- 7002: removed method -->
+  <!-- removed feature: handling JPA entities as variables-->
+  <difference>
+    <differenceType>7002</differenceType>
+    <className>org/camunda/bpm/engine/ProcessEngineConfiguration</className>
+    <method>**Jpa**</method>
+  </difference>
 </differences>

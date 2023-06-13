@@ -433,7 +433,7 @@ pipeline {
         stage('engine-api-compatibility') {
           when {
             expression {
-              cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit') && cambpmWithLabels()
+              cambpmIsNotFailedStageType(failedStageTypes, 'engine-unit') && cambpmWithLabels('default-build')
             }
           }
           steps {
