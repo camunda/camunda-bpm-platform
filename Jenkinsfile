@@ -15,7 +15,7 @@ pipeline {
     MAVEN_VERSION = 'maven-3.8-latest'
   }
   options {
-    buildDiscarder(logRotator(numToKeepStr: '5'))
+    buildDiscarder(logRotator(numToKeepStr: '10'))
     copyArtifactPermission('*')
     disableConcurrentBuilds(abortPrevious: true)
    }

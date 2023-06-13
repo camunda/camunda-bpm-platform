@@ -19,7 +19,7 @@ pipeline {
     string name: 'PR_LABELS', defaultValue: '', description: 'The labels assigned to the CE pull request'
   }
   options {
-    buildDiscarder(logRotator(numToKeepStr: '5'))
+    buildDiscarder(logRotator(numToKeepStr: '10'))
     disableConcurrentBuilds()
   }
   triggers {
