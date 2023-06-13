@@ -25,6 +25,12 @@ import org.camunda.bpm.model.dmn.instance.Decision;
 
 public class DecisionDefinitionHandler extends DmnDecisionTransformHandler {
 
+  protected final Integer configuredHistoryTTL;
+
+  public DecisionDefinitionHandler(String configuredHistoryTTL) {
+    this.configuredHistoryTTL = ParseUtil.parseHistoryTimeToLive(configuredHistoryTTL);
+  }
+
   @Override
   protected DmnDecisionImpl createDmnElement() {
     return new DecisionDefinitionEntity();
@@ -33,13 +39,24 @@ public class DecisionDefinitionHandler extends DmnDecisionTransformHandler {
   @Override
   protected DmnDecisionImpl createFromDecision(DmnElementTransformContext context, Decision decision) {
     DecisionDefinitionEntity decisionDefinition = (DecisionDefinitionEntity) super.createFromDecision(context, decision);
-
     String category = context.getModelInstance().getDefinitions().getNamespace();
+
     decisionDefinition.setCategory(category);
-    decisionDefinition.setHistoryTimeToLive(ParseUtil.parseHistoryTimeToLive(decision.getCamundaHistoryTimeToLiveString()));
     decisionDefinition.setVersionTag(decision.getVersionTag());
+
+    setHistoryTTL(decision, decisionDefinition);
 
     return decisionDefinition;
   }
 
+  private void setHistoryTTL(Decision decision, DecisionDefinitionEntity decisionDefinition) {
+    Integer localHistoryTimeToLive = ParseUtil.parseHistoryTimeToLive(decision.getCamundaHistoryTimeToLiveString());
+
+    if (localHistoryTimeToLive != null) {
+      decisionDefinition.setHistoryTimeToLive(localHistoryTimeToLive);
+    } else {
+      decisionDefinition.setHistoryTimeToLive(configuredHistoryTTL);
+    }
+
+  }
 }
