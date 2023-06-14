@@ -42,6 +42,9 @@ function CamPaginationSearchIntegrationController(
 
   // reset Page when changing Tabs
   $scope.$on('$destroy', function() {
+    // when not resetting searches, state from other page is used
+    // which can lead to search not reloading due to dirty check
+    $scope.config.searches = null;
     search('page', null);
   });
 
