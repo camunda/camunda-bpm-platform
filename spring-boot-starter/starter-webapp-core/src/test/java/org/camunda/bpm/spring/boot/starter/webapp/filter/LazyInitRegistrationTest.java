@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.servlet.Filter;
+import jakarta.servlet.Filter;
 
 import org.camunda.bpm.spring.boot.starter.webapp.filter.LazyDelegateFilter.InitHook;
 import org.junit.Before;

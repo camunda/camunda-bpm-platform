@@ -1,2 +1,0 @@
-# AutoConfigurations
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=org.camunda.bpm.spring.boot.starter.webapp.CamundaBpmWebappAutoConfiguration

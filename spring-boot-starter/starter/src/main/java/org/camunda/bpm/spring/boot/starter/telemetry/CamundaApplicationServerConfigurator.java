@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.spring.boot.starter.telemetry;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.ManagementServiceImpl;

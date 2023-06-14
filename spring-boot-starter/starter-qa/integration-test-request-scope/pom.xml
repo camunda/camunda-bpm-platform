@@ -12,18 +12,6 @@
   <artifactId>qa-request-scope</artifactId>
   <name>Camunda Platform - Spring Boot Starter - QA - Request Scope</name>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.camunda.bpm</groupId>
-        <artifactId>camunda-core-internal-dependencies</artifactId>
-        <version>${project.version}</version>
-        <scope>import</scope>
-        <type>pom</type>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
 
     <dependency>
@@ -53,12 +41,15 @@
     <dependency>
       <groupId>org.graalvm.js</groupId>
       <artifactId>js</artifactId>
+      <version>${version.graal.js}</version>
     </dependency>
 
     <dependency>
       <groupId>org.graalvm.js</groupId>
       <artifactId>js-scriptengine</artifactId>
+      <version>${version.graal.js}</version>
     </dependency>
+
   </dependencies>
 
   <profiles>

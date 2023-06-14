@@ -19,8 +19,8 @@ package org.camunda.bpm.spring.boot.starter.webapp.filter;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
 
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.spring.boot.starter.property.WebappProperty;
