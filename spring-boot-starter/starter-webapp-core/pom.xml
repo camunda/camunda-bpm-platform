@@ -63,6 +63,7 @@
       <groupId>org.mockito</groupId>
       <artifactId>mockito-inline</artifactId>
       <scope>test</scope>
+      <version>${version.mockito}</version>
     </dependency>
 
   </dependencies>
