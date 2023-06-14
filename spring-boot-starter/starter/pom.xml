@@ -13,7 +13,7 @@
   <dependencies>
     <dependency>
       <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine-spring</artifactId>
+      <artifactId>camunda-engine-spring-6</artifactId>
     </dependency>
 
     <!-- Spring dependencies required by camunda-engine-spring -->
