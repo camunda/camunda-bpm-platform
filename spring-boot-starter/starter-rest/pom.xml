@@ -21,7 +21,7 @@
 
     <dependency>
       <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine-rest-core</artifactId>
+      <artifactId>camunda-engine-rest-core-jakarta</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -52,13 +52,6 @@
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.sun.xml.bind</groupId>
-      <artifactId>jaxb-impl</artifactId>
-      <version>${version.xml.jaxb-impl}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

@@ -54,7 +54,7 @@ public class RestIT extends AbstractWebIntegrationTest {
   private static final String HISTORIC_DETAIL_PATH = ENGINE_DEFAULT_PATH + "/history/detail";
 
   private static final String PROCESS_INSTANCE_PATH = ENGINE_DEFAULT_PATH + "/process-instance";
-  
+
   private static final String SCHEMA_LOG_PATH = ENGINE_DEFAULT_PATH + "/schema/log";
 
 
@@ -302,17 +302,17 @@ public class RestIT extends AbstractWebIntegrationTest {
 
   protected void assertMediaTypesOfResource(String resourcePath, boolean postSupported) {
     WebResource resource = client.resource(resourcePath);
-    assertMediaTypes(resource, postSupported, MediaType.APPLICATION_JSON_TYPE);
-    assertMediaTypes(resource, postSupported, MediaType.APPLICATION_JSON_TYPE, MediaType.WILDCARD);
-    assertMediaTypes(resource, postSupported, MediaType.APPLICATION_JSON_TYPE, MediaType.APPLICATION_JSON);
-    assertMediaTypes(resource, postSupported, Hal.APPLICATION_HAL_JSON_TYPE, Hal.APPLICATION_HAL_JSON);
-    assertMediaTypes(resource, postSupported, Hal.APPLICATION_HAL_JSON_TYPE, Hal.APPLICATION_HAL_JSON, MediaType.APPLICATION_JSON + "; q=0.5");
-    assertMediaTypes(resource, postSupported, MediaType.APPLICATION_JSON_TYPE, Hal.APPLICATION_HAL_JSON + "; q=0.5", MediaType.APPLICATION_JSON);
-    assertMediaTypes(resource, postSupported, MediaType.APPLICATION_JSON_TYPE, Hal.APPLICATION_HAL_JSON + "; q=0.5 ", MediaType.APPLICATION_JSON + "; q=0.6");
-    assertMediaTypes(resource, postSupported, Hal.APPLICATION_HAL_JSON_TYPE, Hal.APPLICATION_HAL_JSON + "; q=0.6", MediaType.APPLICATION_JSON + "; q=0.5");
+    assertMediaTypes(resource, postSupported, MediaType.APPLICATION_JSON_TYPE.getType());
+    assertMediaTypes(resource, postSupported, MediaType.APPLICATION_JSON_TYPE.getType(), MediaType.WILDCARD);
+    assertMediaTypes(resource, postSupported, MediaType.APPLICATION_JSON_TYPE.getType(), MediaType.APPLICATION_JSON);
+    assertMediaTypes(resource, postSupported, Hal.APPLICATION_HAL_JSON, Hal.APPLICATION_HAL_JSON);
+    assertMediaTypes(resource, postSupported, Hal.APPLICATION_HAL_JSON, Hal.APPLICATION_HAL_JSON, MediaType.APPLICATION_JSON + "; q=0.5");
+    assertMediaTypes(resource, postSupported, MediaType.APPLICATION_JSON_TYPE.getType(), Hal.APPLICATION_HAL_JSON + "; q=0.5", MediaType.APPLICATION_JSON);
+    assertMediaTypes(resource, postSupported, MediaType.APPLICATION_JSON_TYPE.getType(), Hal.APPLICATION_HAL_JSON + "; q=0.5 ", MediaType.APPLICATION_JSON + "; q=0.6");
+    assertMediaTypes(resource, postSupported, Hal.APPLICATION_HAL_JSON, Hal.APPLICATION_HAL_JSON + "; q=0.6", MediaType.APPLICATION_JSON + "; q=0.5");
   }
 
-  protected void assertMediaTypes(WebResource resource, boolean postSupported, MediaType expectedMediaType, String... acceptMediaTypes) {
+  protected void assertMediaTypes(WebResource resource, boolean postSupported, String expectedMediaType, String... acceptMediaTypes) {
     // test GET request
     ClientResponse response = resource.accept(acceptMediaTypes).get(ClientResponse.class);
     assertMediaType(response, expectedMediaType);
@@ -326,7 +326,7 @@ public class RestIT extends AbstractWebIntegrationTest {
     }
   }
 
-  protected void assertMediaType(ClientResponse response, MediaType expected) {
+  protected void assertMediaType(ClientResponse response, String expected) {
     MediaType actual = response.getType();
     assertEquals(200, response.getStatus());
     // use startsWith cause sometimes server also returns quality parameters (e.g. websphere/wink)
