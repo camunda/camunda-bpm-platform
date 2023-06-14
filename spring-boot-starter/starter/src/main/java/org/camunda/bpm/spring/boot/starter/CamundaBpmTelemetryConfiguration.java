@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.spring.boot.starter;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 import org.camunda.bpm.spring.boot.starter.telemetry.CamundaApplicationServerConfigurator;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;

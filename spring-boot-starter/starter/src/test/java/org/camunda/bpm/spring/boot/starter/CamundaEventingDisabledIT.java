@@ -33,7 +33,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

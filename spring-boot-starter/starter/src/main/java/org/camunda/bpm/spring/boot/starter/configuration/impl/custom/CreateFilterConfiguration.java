@@ -21,7 +21,7 @@ import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.spring.boot.starter.configuration.impl.AbstractCamundaConfiguration;
 import org.camunda.bpm.spring.boot.starter.property.FilterProperty;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
