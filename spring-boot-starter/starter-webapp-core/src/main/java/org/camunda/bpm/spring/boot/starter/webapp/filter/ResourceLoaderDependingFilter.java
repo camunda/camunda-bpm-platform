@@ -16,7 +16,7 @@
  */
 package org.camunda.bpm.spring.boot.starter.webapp.filter;
 
-import javax.servlet.Filter;
+import jakarta.servlet.Filter;
 import org.camunda.bpm.spring.boot.starter.property.WebappProperty;
 
 import org.springframework.core.io.ResourceLoader;
