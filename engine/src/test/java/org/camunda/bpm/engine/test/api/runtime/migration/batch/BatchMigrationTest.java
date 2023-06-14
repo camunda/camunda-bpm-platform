@@ -423,7 +423,7 @@ public class BatchMigrationTest {
 
       // extend waiting time for CRDB since it takes longer to process all the jobs there
       // see CAM-12239 for more details
-      testRule.waitForJobExecutorToProcessAllJobs(30000L);
+      testRule.waitForJobExecutorToProcessAllJobs(60000L);
 
       // then all process instances where migrated
       assertEquals(0, helper.countSourceProcessInstances());
