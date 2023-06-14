@@ -19,17 +19,12 @@ package org.camunda.bpm.engine.impl.dmn.transformer;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionImpl;
 import org.camunda.bpm.dmn.engine.impl.spi.transform.DmnElementTransformContext;
 import org.camunda.bpm.dmn.engine.impl.transform.DmnDecisionTransformHandler;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.impl.util.ParseUtil;
 import org.camunda.bpm.model.dmn.instance.Decision;
 
 public class DecisionDefinitionHandler extends DmnDecisionTransformHandler {
-
-  protected final Integer configuredHistoryTTL;
-
-  public DecisionDefinitionHandler(String configuredHistoryTTL) {
-    this.configuredHistoryTTL = ParseUtil.parseHistoryTimeToLive(configuredHistoryTTL);
-  }
 
   @Override
   protected DmnDecisionImpl createDmnElement() {
@@ -55,6 +50,7 @@ public class DecisionDefinitionHandler extends DmnDecisionTransformHandler {
     if (localHistoryTimeToLive != null) {
       decisionDefinition.setHistoryTimeToLive(localHistoryTimeToLive);
     } else {
+      Integer configuredHistoryTTL = ParseUtil.parseHistoryTimeToLive(Context.getProcessEngineConfiguration().getHistoryTimeToLive());
       decisionDefinition.setHistoryTimeToLive(configuredHistoryTTL);
     }
 
