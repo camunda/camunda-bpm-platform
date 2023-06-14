@@ -55,11 +55,11 @@ import org.junit.rules.RuleChain;
 public class DecisionDefinitionTest {
 
   @ClassRule
-  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration -> {
+  public static ProcessEngineBootstrapRule BOOTSTRAP_RULE = new ProcessEngineBootstrapRule(configuration -> {
     configuration.setHistoryTimeToLive("P30D");
   });
 
-  protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+  protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(BOOTSTRAP_RULE);
 
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
