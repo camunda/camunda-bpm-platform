@@ -22,7 +22,7 @@ public class DeploymentHelper extends AbstractDeploymentHelper {
 
   protected static final String CAMUNDA_EJB_CLIENT = "org.camunda.bpm.javaee:camunda-ejb-client-jakarta";
   protected static final String CAMUNDA_ENGINE_CDI = "org.camunda.bpm:camunda-engine-cdi-jakarta";
-  protected static final String CAMUNDA_ENGINE_SPRING = "org.camunda.bpm:camunda-engine-spring";
+  protected static final String CAMUNDA_ENGINE_SPRING = "org.camunda.bpm:camunda-engine-spring-6";
 
   public static JavaArchive getEjbClient() {
     return getEjbClient(CAMUNDA_EJB_CLIENT);

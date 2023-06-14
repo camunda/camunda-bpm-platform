@@ -70,6 +70,11 @@
       </dependency>
       <dependency>
         <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-engine-spring-6</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm</groupId>
         <artifactId>camunda-engine-rest</artifactId>
         <version>${project.version}</version>
       </dependency>

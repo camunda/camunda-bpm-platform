@@ -15,6 +15,7 @@
     <!-- Needs to be updated after a new WildFly release -->
     <wildfly.container.adapter.groupId>org.wildfly.arquillian</wildfly.container.adapter.groupId>
     <wildfly.container.adapter.version>5.0.0.Alpha6</wildfly.container.adapter.version>
+    <version.spring.framework>${version.spring.framework6}</version.spring.framework>
 
     <version.arquillian>1.7.0.Alpha13</version.arquillian>
 
@@ -141,6 +142,12 @@
       <artifactId>jakarta.transaction-api</artifactId>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>jakarta.persistence</groupId>
+      <artifactId>jakarta.persistence-api</artifactId>
+      <version>3.1.0</version>
+      <scope>test</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.camunda.bpm.javaee</groupId>
@@ -165,6 +172,12 @@
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
       <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>spring-beans</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -183,6 +196,19 @@
         <exclusion>
           <groupId>de.odysseus.juel</groupId>
           <artifactId>juel-impl</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine-spring-6</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>camunda-engine</artifactId>
+          <groupId>org.camunda.bpm</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -225,6 +251,29 @@
     <dependency>
       <groupId>org.camunda.connect</groupId>
       <artifactId>camunda-connect-core</artifactId>
+    </dependency>
+
+    <!-- explicit Spring dependencies for applications
+      that pack camunda-engine-spring -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-jdbc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-tx</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-orm</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-web</artifactId>
     </dependency>
 
     <!-- required for TestWarDeploymentWithProcessEnginePlugin -->
@@ -279,7 +328,7 @@
                   <!-- Spring excluded until Spring 6 is supported in Engine Spring,
                        Jakarta JPA not supported,
                        some classes manually overridden -->
-                  <excludes>**/spring/**/*.java,**/jpa/*.java,**/DeploymentHelper.java</excludes>
+                  <excludes>**/DeploymentHelper.java,**/JavascriptScriptEngineSupportNashornTest.java</excludes>
                 </resource>
               </resources>
             </configuration>

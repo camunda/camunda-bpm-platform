@@ -22,7 +22,6 @@ import javax.servlet.ServletContext;
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationElResolver;
 import org.camunda.bpm.application.impl.EjbProcessApplication;
-import org.camunda.bpm.application.impl.ServletProcessApplication;
 import org.camunda.bpm.engine.spring.ApplicationContextElResolver;
 import org.camunda.bpm.impl.juel.jakarta.el.ELResolver;
 import org.springframework.util.ClassUtils;
@@ -36,7 +35,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  *  <ul>
  *    <li>Bootstrapping through {@link SpringProcessApplication}. In this case the spring application context
  *        is retrieved from the {@link SpringProcessApplication} class.</li>
- *    <li>Bootstrapping through {@link ServletProcessApplication}. In this case we have access to the {@link ServletContext}
+ *    <li>Bootstrapping through {@link org.camunda.bpm.application.impl.ServletProcessApplication}. In this case we have access to the {@link ServletContext}
  *        which allows accessing the web application's application context through the WebApplicationContextUtils class.</li>
  *    </li>
  *  </ul>
@@ -63,8 +62,9 @@ public class SpringProcessApplicationElResolver implements ProcessApplicationElR
       SpringProcessApplication springProcessApplication = (SpringProcessApplication) processApplication;
       return new ApplicationContextElResolver(springProcessApplication.getApplicationContext());
 
-    } else if (processApplication instanceof ServletProcessApplication) {
-      ServletProcessApplication servletProcessApplication = (ServletProcessApplication) processApplication;
+    } else if (processApplication instanceof org.camunda.bpm.application.impl.ServletProcessApplication) {
+      // Using fully-qualified class name instead of import statement to allow for automatic transformation
+      org.camunda.bpm.application.impl.ServletProcessApplication servletProcessApplication = (org.camunda.bpm.application.impl.ServletProcessApplication) processApplication;
 
       if(!ClassUtils.isPresent("org.springframework.web.context.support.WebApplicationContextUtils", processApplication.getProcessApplicationClassloader())) {
         LOGGER.log(Level.FINE, "WebApplicationContextUtils must be present for SpringProcessApplicationElResolver to work");
