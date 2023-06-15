@@ -57,18 +57,11 @@ public abstract class AbstractSetTaskPropertyCmd<T> implements Command<Void>, Se
    *
    * @param taskId                 the id of the task whose property should be changed
    * @param value                  the new value to set to the referenced task
-   * @param excludeInputValidation if true, the validation of the input will be excluded
+   * @param skipValueValidation if true, the validation of the value will be excluded
    */
-  protected AbstractSetTaskPropertyCmd(String taskId, T value, boolean excludeInputValidation) {
-
-    if (excludeInputValidation) {
-      this.taskId = taskId;
-      this.value = value;
-      return;
-    }
-
+  protected AbstractSetTaskPropertyCmd(String taskId, T value, boolean skipValueValidation) {
     this.taskId = ensureNotNullAndGet("taskId", taskId);
-    this.value = ensureNotNullAndGet("value", value);
+    this.value = skipValueValidation ? value : ensureNotNullAndGet("value", value);
   }
 
   /**
