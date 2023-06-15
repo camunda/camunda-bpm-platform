@@ -82,6 +82,9 @@
               <trimStackTrace>false</trimStackTrace>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
               <excludes combine.children="append">
+                <!-- One test method here is known to cause timeout issues.
+                     Can be removed with 7.21.0 as the method in question is removed
+                     in 7.20.0. -->
                 <exclude>**/BatchMigrationTest.java</exclude>
               </excludes>
             </configuration>
