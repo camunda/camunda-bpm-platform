@@ -61,7 +61,6 @@ import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.QueryOrderingProperty;
-import org.camunda.bpm.engine.impl.UserQueryImpl;
 import org.camunda.bpm.engine.impl.UserQueryProperty;
 import org.camunda.bpm.engine.impl.GroupQueryProperty;
 import org.camunda.bpm.engine.impl.identity.IdentityProviderException;
@@ -161,7 +160,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
     return new LdapUserQueryImpl(getProcessEngineConfiguration().getCommandExecutorTxRequired(), ldapConfiguration);
   }
 
-  public UserQueryImpl createUserQuery(CommandContext commandContext) {
+  public UserQuery createUserQuery(CommandContext commandContext) {
     return new LdapUserQueryImpl(ldapConfiguration);
   }
 
