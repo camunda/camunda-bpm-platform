@@ -25,11 +25,13 @@ import java.util.HashMap;
 import java.util.Map;
 import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
@@ -45,22 +47,25 @@ import org.camunda.bpm.model.dmn.instance.InputExpression;
 import org.camunda.bpm.model.dmn.instance.Output;
 import org.camunda.bpm.model.dmn.instance.Text;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 
 public class DecisionDefinitionTest {
 
-  protected ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration -> {
+  @ClassRule
+  public static ProcessEngineBootstrapRule BOOTSTRAP_RULE = new ProcessEngineBootstrapRule(configuration -> {
     configuration.setHistoryTimeToLive("P30D");
   });
 
-  protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+  protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(BOOTSTRAP_RULE);
 
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
-  public RuleChain ruleChain = RuleChain.outerRule(bootstrapRule).around(engineRule).around(testRule);
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule)
+      .around(testRule);
 
   protected RepositoryService repositoryService;
   protected DecisionService decisionService;
@@ -103,6 +108,7 @@ public class DecisionDefinitionTest {
     assertThat(deployment.getDeployedDecisionDefinitions().get(0).getHistoryTimeToLive()).isEqualTo(10);
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Test
   public void shouldApplyHistoryTTLOnRemovalTimeOfDecisionInstanceLocal() {
     // given
@@ -130,6 +136,7 @@ public class DecisionDefinitionTest {
     assertThat(result.getRemovalTime()).isInSameDayAs(expectedRemovalDate);
   }
 
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Test
   public void shouldApplyHistoryTTLOnRemovalTimeOfDecisionInstanceGlobal() {
     // given

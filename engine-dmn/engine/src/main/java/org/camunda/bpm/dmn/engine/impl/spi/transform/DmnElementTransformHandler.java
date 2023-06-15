@@ -19,7 +19,9 @@ package org.camunda.bpm.dmn.engine.impl.spi.transform;
 import org.camunda.bpm.model.dmn.instance.DmnModelElementInstance;
 
 /**
- * Handler to transform a DMN model element.
+ * Handler to transform a DMN model element. By design, all handler implementations have to be stateless since they are
+ * stored by the static context of DefaultElementTransformHandlerRegistry & can be shared across different
+ * DmnEngineConfigurations or ProcessEngineConfiguration.
  *
  * @param <Source> the type of the transformation input
  * @param <Target> the type of the transformation output

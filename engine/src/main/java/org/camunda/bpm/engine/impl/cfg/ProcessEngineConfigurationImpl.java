@@ -2641,8 +2641,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
           .dmnHistoryEventProducer(dmnHistoryEventProducer)
           .scriptEngineResolver(scriptingEngines)
           .feelCustomFunctionProviders(dmnFeelCustomFunctionProviders)
-          .enableFeelLegacyBehavior(dmnFeelEnableLegacyBehavior)
-          .historyTimeToLive(historyTimeToLive);
+          .enableFeelLegacyBehavior(dmnFeelEnableLegacyBehavior);
 
       if (dmnElProvider != null) {
         dmnEngineConfigurationBuilder.elProvider(dmnElProvider);

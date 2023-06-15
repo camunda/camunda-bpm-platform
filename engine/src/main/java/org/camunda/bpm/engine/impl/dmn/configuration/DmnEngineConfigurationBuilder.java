@@ -49,7 +49,6 @@ public class DmnEngineConfigurationBuilder {
   protected DmnScriptEngineResolver scriptEngineResolver;
   protected ElProvider elProvider;
   protected List<FeelCustomFunctionProvider> feelCustomFunctionProviders;
-  protected String historyTimeToLive;
 
   /**
    * Creates a new builder to modify the given DMN engine configuration.
@@ -95,7 +94,7 @@ public class DmnEngineConfigurationBuilder {
     // override the decision table handler
     DmnTransformer dmnTransformer = dmnEngineConfiguration.getTransformer();
     dmnTransformer.getElementTransformHandlerRegistry().addHandler(Definitions.class, new DecisionRequirementsDefinitionTransformHandler());
-    dmnTransformer.getElementTransformHandlerRegistry().addHandler(Decision.class, new DecisionDefinitionHandler(historyTimeToLive));
+    dmnTransformer.getElementTransformHandlerRegistry().addHandler(Decision.class, new DecisionDefinitionHandler());
 
     // do not override the script engine resolver if set
     if (dmnEngineConfiguration.getScriptEngineResolver() == null) {
@@ -134,11 +133,6 @@ public class DmnEngineConfigurationBuilder {
   public DmnEngineConfigurationBuilder enableFeelLegacyBehavior(boolean dmnFeelEnableLegacyBehavior) {
     dmnEngineConfiguration
         .enableFeelLegacyBehavior(dmnFeelEnableLegacyBehavior);
-    return this;
-  }
-
-  public DmnEngineConfigurationBuilder historyTimeToLive(String historyTimeToLive) {
-    this.historyTimeToLive = historyTimeToLive;
     return this;
   }
 }
