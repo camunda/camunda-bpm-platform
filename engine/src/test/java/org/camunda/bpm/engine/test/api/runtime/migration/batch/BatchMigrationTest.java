@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
@@ -403,6 +404,30 @@ public class BatchMigrationTest {
       // then all process instances were migrated
       assertEquals(0, helper.countSourceProcessInstances());
       assertEquals(10, helper.countTargetProcessInstances());
+
+    } finally {
+      processEngineConfiguration.setAuthorizationEnabled(false);
+    }
+  }
+
+  @Test
+  @RequiredDatabase(includes = DbSqlSessionFactory.CRDB)
+  public void testMigrationJobsExecutionByJobExecutorWithAuthorizationEnabledAndTenantUsesCockroachDB() {
+    ProcessEngineConfigurationImpl processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+
+    processEngineConfiguration.setAuthorizationEnabled(true);
+
+    try {
+      Batch batch = helper.migrateProcessInstancesAsyncForTenant(3, "someTenantId");
+      helper.completeSeedJobs(batch);
+
+      // extend waiting time for CRDB since it takes longer to process all the jobs there
+      // see CAM-12239 for more details
+      testRule.waitForJobExecutorToProcessAllJobs(30000L);
+
+      // then all process instances where migrated
+      assertEquals(0, helper.countSourceProcessInstances());
+      assertEquals(3, helper.countTargetProcessInstances());
 
     } finally {
       processEngineConfiguration.setAuthorizationEnabled(false);
@@ -961,7 +986,6 @@ public class BatchMigrationTest {
       this.byteArrayId = byteArrayId;
     }
 
-    @Override
     public ByteArrayEntity execute(CommandContext commandContext) {
       return (ByteArrayEntity) commandContext.getDbEntityManager()
         .selectOne("selectByteArray", byteArrayId);
