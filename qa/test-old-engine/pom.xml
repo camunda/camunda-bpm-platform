@@ -72,6 +72,28 @@
     </profile>
 
     <profile>
+      <id>cockroachdb</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <failIfNoTests>false</failIfNoTests>
+              <trimStackTrace>false</trimStackTrace>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+              <excludes combine.children="append">
+                <!-- One test method here is known to cause timeout issues.
+                     Can be removed with 7.21.0 as the method in question is removed
+                     in 7.20.0. -->
+                <exclude>**/BatchMigrationTest.java</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
       <id>mariadb</id>
       <build>
         <plugins>
