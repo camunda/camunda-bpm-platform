@@ -30,7 +30,8 @@ const PRODUCTION_LICENSES = [
 
 
 const ALLOWED_PACKAGES = [
-    'emitter-component@1.1.1' // uses MIT, but does not provide license field https://github.com/component/emitter/blob/master/LICENSE
+    'emitter-component@1.1.1', // uses MIT, but does not provide license field https://github.com/component/emitter/blob/master/LICENSE
+    'argparse@2.0.1', // uses Python-2.0 but isn't part of the prod build
 ];
 
 const parseResults = (ALLOWED_LICENSES, resolve, reject) =>

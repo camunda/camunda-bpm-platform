@@ -27,10 +27,12 @@ const config = {
             patterns: [{from: 'src/index.html'}, {from: 'src/favicon.ico'}],
         }),
         new LicenseCheckerWebpackPlugin({
+            // https://github.com/microsoft/license-checker-webpack-plugin/issues/25
+            filter: /(^.*[/\\]node_modules[/\\]((?:@[^/\\]+[/\\])?(?:[^@/\\][^/\\]*)))/,
             outputFilename: path.join( "..", "..", "THIRD-PARTY-NOTICE.json"),
             outputWriter: writeThirdPartyNotice,
             override: {
-                "swagger-ui@~3.43.0": { repository: "https://github.com/swagger-api/swagger-ui" }
+                "swagger-ui@~5.1.0": { repository: "https://github.com/swagger-api/swagger-ui" }
             },
             ignore: Object.keys(require('./package.json').devDependencies)
         })
