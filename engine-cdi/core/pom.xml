@@ -241,21 +241,6 @@
           <useDefaultManifestFile combine.self="override" />
         </configuration>
         <executions>
-          <!-- create test jar that is consumed by the quarkus qa -->
-          <execution>
-            <id>create-test-jar-quarkus</id>
-            <phase>package</phase>
-            <goals>
-              <goal>test-jar</goal>
-            </goals>
-            <configuration>
-              <classifier>tests-quarkus</classifier>
-              <forceCreation>true</forceCreation>
-              <excludes>
-                <exclude>org/camunda/bpm/engine/cdi/test/CdiProcessEngineTestCase.class</exclude>
-              </excludes>
-            </configuration>
-          </execution>
           <!-- create test jar that is consumed by the weld3 tests -->
           <execution>
             <id>create-test-jar-weld</id>

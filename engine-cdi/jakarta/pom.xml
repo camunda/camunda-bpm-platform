@@ -18,7 +18,7 @@
     <arquillian.junit.version>1.7.0.Alpha14</arquillian.junit.version>
     <weld.version>5.0.1.Final</weld.version>
   </properties>
-  
+
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -87,7 +87,7 @@
       <artifactId>jakarta.interceptor-api</artifactId>
       <scope>provided</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.jboss.arquillian.container</groupId>
       <artifactId>arquillian-weld-embedded</artifactId>
@@ -134,7 +134,7 @@
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
       <scope>test</scope>
-    </dependency>    
+    </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
@@ -146,7 +146,7 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  
+
   <build>
     <plugins>
       <plugin>
@@ -367,6 +367,21 @@
             </goals>
             <configuration>
               <forceCreation>true</forceCreation>
+            </configuration>
+          </execution>
+          <!-- create test jar that is consumed by the quarkus qa -->
+          <execution>
+            <id>create-test-jar-quarkus</id>
+            <phase>package</phase>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+            <configuration>
+              <classifier>tests-quarkus</classifier>
+              <forceCreation>true</forceCreation>
+              <excludes>
+                <exclude>org/camunda/bpm/engine/cdi/test/CdiProcessEngineTestCase.class</exclude>
+              </excludes>
             </configuration>
           </execution>
         </executions>

@@ -18,7 +18,7 @@ package org.camunda.bpm.quarkus.engine.test.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import io.quarkus.test.QuarkusUnitTest;
 import org.camunda.bpm.engine.ProcessEngine;

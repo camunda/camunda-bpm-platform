@@ -21,11 +21,11 @@ import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.CommandCounterInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
-import org.camunda.bpm.engine.impl.interceptor.JtaTransactionInterceptor;
+import org.camunda.bpm.engine.impl.interceptor.JakartaTransactionInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.LogInterceptor;
 import org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator;
 
-import javax.transaction.TransactionManager;
+import jakarta.transaction.TransactionManager;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,7 +52,7 @@ public class QuarkusProcessEngineConfiguration extends CdiJtaProcessEngineConfig
   /**
    * We need to make sure, that the root command always calls {@link TransactionManager#begin} in its interceptor chain
    * since Agroal does not support deferred/lazy enlistment. This is why we override this method to add
-   * the {@link JtaTransactionInterceptor} to the interceptor chain.
+   * the {@link JakartaTransactionInterceptor} to the interceptor chain.
    */
   @Override
   protected void initCommandExecutorDbSchemaOperations() {
@@ -60,7 +60,7 @@ public class QuarkusProcessEngineConfiguration extends CdiJtaProcessEngineConfig
       List<CommandInterceptor> commandInterceptorsDbSchemaOperations = new ArrayList<>();
       commandInterceptorsDbSchemaOperations.add(new LogInterceptor());
       commandInterceptorsDbSchemaOperations.add(new CommandCounterInterceptor(this));
-      commandInterceptorsDbSchemaOperations.add(new JtaTransactionInterceptor(transactionManager, false, this));
+      commandInterceptorsDbSchemaOperations.add(new JakartaTransactionInterceptor(transactionManager, false, this));
       commandInterceptorsDbSchemaOperations.add(new CommandContextInterceptor(dbSchemaOperationsCommandContextFactory, this));
       commandInterceptorsDbSchemaOperations.add(actualCommandExecutor);
       commandExecutorSchemaOperations = initInterceptorChain(commandInterceptorsDbSchemaOperations);

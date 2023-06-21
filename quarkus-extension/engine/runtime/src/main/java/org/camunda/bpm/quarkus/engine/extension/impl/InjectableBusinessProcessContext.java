@@ -20,8 +20,8 @@ import io.quarkus.arc.InjectableContext;
 import org.camunda.bpm.engine.cdi.impl.context.BusinessProcessContext;
 import org.camunda.bpm.engine.cdi.impl.util.BeanManagerLookup;
 
-import javax.enterprise.context.spi.Contextual;
-import javax.enterprise.inject.spi.BeanManager;
+import jakarta.enterprise.context.spi.Contextual;
+import jakarta.enterprise.inject.spi.BeanManager;
 
 public class InjectableBusinessProcessContext extends BusinessProcessContext implements InjectableContext {
 
@@ -32,19 +32,19 @@ public class InjectableBusinessProcessContext extends BusinessProcessContext imp
 
   @Override
   public ContextState getState() {
-    // Not needed internally by Quarkus 2.0.2
+    // Not needed internally by Quarkus
     throw new UnsupportedOperationException("io.quarkus.arc.InjectableContext#getState is unsupported");
   }
 
   @Override
   public void destroy() {
-    // Not needed internally by Quarkus 2.0.2
+    // Not needed internally by Quarkus
     throw new UnsupportedOperationException("io.quarkus.arc.InjectableContext#destroy is unsupported");
   }
 
   @Override
   public void destroy(Contextual<?> contextual) {
-    // Not needed internally by Quarkus 2.0.2
+    // Not needed internally by Quarkus
     throw new UnsupportedOperationException("io.quarkus.arc.InjectableContext#destroy(contextual) is unsupported");
   }
 
