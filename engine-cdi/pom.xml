@@ -22,7 +22,6 @@
   -->
   <modules>
     <module>core</module>
-    <module>compatibility-test-weld3</module>
   </modules>
 
   <profiles>
