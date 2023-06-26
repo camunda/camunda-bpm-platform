@@ -1,0 +1,16 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg">
+<metadata>Copyright (C) 2015 by original authors @ fontello.com</metadata>
+<defs>
+<font id="cam-reporting" horiz-adv-x="1000" >
+<font-face font-family="cam-reporting" font-weight="400" font-stretch="normal" units-per-em="1000" ascent="850" descent="-150" />
+<missing-glyph horiz-adv-x="1000" />
+<glyph glyph-name="pie-chart" unicode="&#xe800;" d="m368 770l0-368-368 0q18 146 121 249t247 119z m106 0q156-20 261-139t105-279q0-174-123-298t-299-124q-160 0-278 105t-140 263l424 0q20 0 35 14t15 36l0 422z" horiz-adv-x="840" />
+<glyph glyph-name="lines-chart" unicode="&#xe801;" d="m34 284q-42 10-32 56 10 42 54 32l98-24-52-80z m890-12q14 12 33 11t31-15q32-32-2-64l-252-226q-12-12-30-12-14 0-28 10l-286 220-54 14 50 80 36-8q12-4 16-8l264-204z m-490 220l-350-550q-12-22-38-22-12 0-24 8-16 10-20 29t6 33l374 588q8 16 28 20 18 6 36-6l246-156 226 326q10 16 28 19t34-9q38-24 12-62l-252-362q-24-36-62-12z" horiz-adv-x="1003" />
+<glyph glyph-name="bars-chart" unicode="&#xe802;" d="m750 800q22 0 36-15t14-35l0-850-200 0 0 850q0 50 40 50l110 0z m-300-300q22 0 36-15t14-35l0-550-200 0 0 550q0 50 40 50l110 0z m-300-300q22 0 36-15t14-35l0-250-200 0 0 250q0 50 40 50l110 0z" horiz-adv-x="800" />
+<glyph glyph-name="areas-chart" unicode="&#xe803;" d="m964 732q16 22 16-4l0-768-964 0q-12 0-15 7t5 17l230 288q20 22 40 2l74-66q10-8 21-7t17 11l158 238q16 26 38 4l112-104q20-20 38 4z" horiz-adv-x="980" />
+<glyph glyph-name="grid" unicode="&#xe804;" d="m0-22l0 744 970 0 0-744-970 0z m519 452l0-159 159 0 0 159-159 0z m0-384l159 0 0 157-159 0 0-157z m159 609l-159 0 0-158 159 0 0 158z m225-384l0 159-158 0 0-159 158 0z m-158-225l158 0 0 157-158 0 0-157z m158 451l0 158-158 0 0-158 158 0z m-835-67l0-159 158 0 0 159-158 0z m0-384l158 0 0 157-158 0 0-157z m158 609l-158 0 0-158 158 0 0 158z m225-384l0 159-157 0 0-159 157 0z m-157-225l157 0 0 157-157 0 0-157z m157 451l0 158-157 0 0-158 157 0z" horiz-adv-x="970" />
+</font>
+</defs>
+</svg>
