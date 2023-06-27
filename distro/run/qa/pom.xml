@@ -22,7 +22,6 @@
     <version.httpcomponents>4.5.10</version.httpcomponents>
     <version.junit>4.13.1</version.junit>
     <version.chromedriver>112.0.5615.49</version.chromedriver>
-    <version.httpclient>4.5.14</version.httpclient>
   </properties>
 
   <dependencyManagement>
