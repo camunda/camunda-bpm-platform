@@ -2,9 +2,9 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>camunda-bpm-assert-root</artifactId>
   <packaging>pom</packaging>
-  
+
   <name>Camunda Platform - Assert - Root</name>
-  
+
   <parent>
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-database-settings</artifactId>
@@ -14,7 +14,18 @@
 
   <dependencyManagement>
     <dependencies>
-      <!-- spring-boot-dependencies as first element in the list
+      <!-- spring-framework-bom as first element in the list
+           ensures to be chosen over spring-boot-dependencies
+           to load spring-beans with Spring 5.
+           Can be removed if camunda-engine supports Spring 6a -->
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-framework-bom</artifactId>
+        <version>${version.spring.framework}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+      <!-- spring-boot-dependencies as second element in the list
            ensures to be chosen over internal-dependencies for assertj -->
       <dependency>
         <groupId>org.springframework.boot</groupId>
@@ -52,29 +63,5 @@
       </modules>
     </profile>
   </profiles>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <version>3.0.0-M1</version>
-        <configuration>
-          <rules>
-            <requireJavaVersion>
-              <version>[17,)</version>
-            </requireJavaVersion>
-          </rules>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>enforce</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
 
 </project>
