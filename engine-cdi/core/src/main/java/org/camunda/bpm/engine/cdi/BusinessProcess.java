@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 import javax.enterprise.context.Conversation;
+import javax.enterprise.context.Dependent;
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
@@ -83,6 +84,7 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
  * @author Falko Menge
  */
 @Named
+@Dependent
 public class BusinessProcess implements Serializable {
 
   private static final long serialVersionUID = 1L;
