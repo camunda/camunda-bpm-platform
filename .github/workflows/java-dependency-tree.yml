@@ -15,3 +15,7 @@ jobs:
       - uses: camunda/java-dependency-tree-diff@3441-use-jdk17-spring-boot
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Diff
+          path: /github/workspace/dep-tree-diff.txt
