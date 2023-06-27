@@ -24,7 +24,7 @@ jobs:
           secrets: |
             secret/data/github.com/organizations/camunda NEXUS_USR;
             secret/data/github.com/organizations/camunda NEXUS_PSW;
-      - uses: camunda/java-dependency-tree-diff@main
+      - uses: camunda/java-dependency-tree-diff@3441-use-jdk17
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NEXUS_USR: ${{ steps.secrets.outputs.NEXUS_USR }}
