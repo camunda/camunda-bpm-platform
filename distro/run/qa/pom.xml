@@ -27,14 +27,6 @@
   <dependencyManagement>
     <dependencies>
 
-
-      <dependency>
-        <groupId>org.apache.httpcomponents</groupId>
-        <artifactId>httpclient</artifactId>
-        <version>${version.httpclient}</version>
-        <scope>test</scope>
-      </dependency>
-
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpcomponents-client</artifactId>
