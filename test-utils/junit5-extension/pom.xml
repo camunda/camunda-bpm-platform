@@ -13,7 +13,7 @@
   </parent>
 
   <properties>
-    <version.junit5>5.8.2</version.junit5>
+    <version.junit5>5.9.3</version.junit5>
   </properties>
   
   <dependencyManagement>
@@ -39,7 +39,7 @@
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
-      <version>3.21.0</version>
+      <version>3.24.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>
