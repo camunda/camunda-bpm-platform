@@ -31,6 +31,7 @@ import java.util.function.Supplier;
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.apache.ibatis.executor.BatchExecutorException;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.ProcessEnginePersistenceException;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.repository.ResourceType;
@@ -44,6 +45,8 @@ public class ExceptionUtil {
   public static final String PERSISTENCE_EXCEPTION_MESSAGE = "An exception occurred in the " +
       "persistence layer. Please check the server logs for a detailed message and the entire " +
       "exception stack trace.";
+
+  public static final String PERSISTENCE_CONNECTION_ERROR_CLASS = "08";
 
   public static String getExceptionStacktrace(Throwable exception) {
     StringWriter stringWriter = new StringWriter();
@@ -352,8 +355,8 @@ public class ExceptionUtil {
     }
   }
 
-  public static ProcessEngineException wrapPersistenceException(Exception ex) {
-    return new ProcessEngineException(PERSISTENCE_EXCEPTION_MESSAGE, ex);
+  public static ProcessEnginePersistenceException wrapPersistenceException(Exception ex) {
+    return new ProcessEnginePersistenceException(PERSISTENCE_EXCEPTION_MESSAGE, ex);
   }
 
 }

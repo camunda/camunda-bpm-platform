@@ -20,9 +20,12 @@ import javax.ws.rs.core.Response;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.logging.Level;
+import java.sql.SQLException;
 
+import org.camunda.bpm.engine.ProcessEnginePersistenceException;
 import org.camunda.commons.logging.BaseLogger;
+
+import static org.camunda.bpm.engine.impl.util.ExceptionUtil.PERSISTENCE_CONNECTION_ERROR_CLASS;
 
 public class ExceptionLogger extends BaseLogger {
 
@@ -37,8 +40,15 @@ public class ExceptionLogger extends BaseLogger {
     Response.Status status = ExceptionHandlerHelper.getInstance().getStatus(throwable);
     int statusCode = status.getStatusCode();
 
-    if ( statusCode >= 500) {
-      logWarn(String.valueOf(statusCode), getStackTrace(throwable));
+    if (statusCode >= 500) {
+      if (persistenceConnectionError(throwable)) {
+        // Persistence connection exceptions are logged as errors
+        logError(String.valueOf(statusCode), getStackTrace(throwable));
+
+      } else {
+        logWarn(String.valueOf(statusCode), getStackTrace(throwable));
+
+      }
     } else {
       logDebug(String.valueOf(statusCode), getStackTrace(throwable));
     }
@@ -46,10 +56,29 @@ public class ExceptionLogger extends BaseLogger {
 
   protected String getStackTrace(Throwable aThrowable) {
 
-    final Writer      result      = new StringWriter();
+    final Writer result = new StringWriter();
     final PrintWriter printWriter = new PrintWriter(result);
     aThrowable.printStackTrace(printWriter);
 
     return result.toString();
   }
+
+  protected boolean persistenceConnectionError(Throwable throwable) {
+    if (throwable instanceof ProcessEnginePersistenceException) {
+      SQLException sqlException = (SQLException) throwable.getCause().getCause();
+      if (sqlException != null) {
+        String sqlState = sqlException.getSQLState();
+        return sqlState != null && sqlState.startsWith(PERSISTENCE_CONNECTION_ERROR_CLASS);
+
+      } else {
+        return false;
+
+      }
+
+    } else {
+      return false;
+
+    }
+  }
+
 }
