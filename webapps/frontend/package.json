@@ -12,7 +12,8 @@
     "build": "webpack --mode production --config webpack.prod.js",
     "prettier": "prettier --write \"**/*.{js,json,css,scss,less,md,ts,html}\"",
     "lint": "eslint .",
-    "update": "npx npm-check -u"
+    "update": "npx npm-check -u",
+    "postinstall": "node ./scripts/enforce-versions"
   },
   "browserslist": [
     "last 2 versions"
