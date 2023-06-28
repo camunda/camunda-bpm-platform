@@ -30,6 +30,7 @@ public class LdapLoginCatchAuthenticationExceptionTest {
 
   @ClassRule
   public static LdapTestEnvironmentRule ldapRule = new LdapTestEnvironmentRule();
+
   @Rule
   public ProcessEngineRule engineRule = new ProcessEngineRule("camunda.ldap.disable.catch.authentication.exception.cfg.xml");
 
