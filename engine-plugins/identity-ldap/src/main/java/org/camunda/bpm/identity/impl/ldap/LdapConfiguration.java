@@ -19,7 +19,6 @@ package org.camunda.bpm.identity.impl.ldap;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.naming.directory.SearchControls;
 
 
@@ -72,6 +71,8 @@ public class LdapConfiguration {
   protected boolean authorizationCheckEnabled = true;
 
   protected Integer pageSize = null; // null => disabled
+
+  protected boolean passwordCheckCatchAuthenticationException = true;
 
   // getters / setters //////////////////////////////////////
 
@@ -296,6 +297,14 @@ public class LdapConfiguration {
 
   public void setPageSize(Integer pageSize) {
     this.pageSize = pageSize;
+  }
+
+  public boolean isPasswordCheckCatchAuthenticationException() {
+    return passwordCheckCatchAuthenticationException;
+  }
+
+  public void setPasswordCheckCatchAuthenticationException(boolean passwordCheckCatchAuthenticationException) {
+    this.passwordCheckCatchAuthenticationException = passwordCheckCatchAuthenticationException;
   }
 
 }

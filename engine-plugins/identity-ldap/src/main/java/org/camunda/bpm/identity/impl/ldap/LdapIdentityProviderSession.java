@@ -26,13 +26,10 @@ import static org.camunda.bpm.identity.impl.ldap.LdapConfiguration.LDAP_QUERY_WI
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-
 import javax.naming.AuthenticationException;
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
@@ -43,12 +40,10 @@ import javax.naming.directory.SearchResult;
 import javax.naming.ldap.Control;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
-import javax.naming.ldap.SortControl;
-import javax.naming.ldap.SortKey;
 import javax.naming.ldap.PagedResultsControl;
 import javax.naming.ldap.PagedResultsResponseControl;
-
-
+import javax.naming.ldap.SortControl;
+import javax.naming.ldap.SortKey;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
@@ -60,16 +55,16 @@ import org.camunda.bpm.engine.identity.TenantQuery;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.impl.AbstractQuery;
+import org.camunda.bpm.engine.impl.Direction;
+import org.camunda.bpm.engine.impl.GroupQueryProperty;
 import org.camunda.bpm.engine.impl.QueryOrderingProperty;
 import org.camunda.bpm.engine.impl.UserQueryImpl;
 import org.camunda.bpm.engine.impl.UserQueryProperty;
-import org.camunda.bpm.engine.impl.GroupQueryProperty;
 import org.camunda.bpm.engine.impl.identity.IdentityProviderException;
 import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
-import org.camunda.bpm.engine.impl.Direction;
 import org.camunda.bpm.identity.impl.ldap.util.LdapPluginLogger;
 
 /**
@@ -428,7 +423,11 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
         return true;
 
       } catch (LdapAuthenticationException e) {
-        return false;
+        if(ldapConfiguration.isPasswordCheckCatchAuthenticationException()) {
+          return false;
+        } else {
+          throw e;
+        }
 
       } finally {
         closeLdapCtx(context);
